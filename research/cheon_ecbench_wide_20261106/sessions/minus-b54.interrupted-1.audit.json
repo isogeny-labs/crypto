@@ -1,0 +1,49 @@
+{
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1hdfbec79c5d42",
+  "session_status": "interrupted",
+  "records_bound": true,
+  "ok": true,
+  "problems": [],
+  "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "stop": true,
+    "workloads": true
+  },
+  "records": 1,
+  "verified_records": 0,
+  "planned_executions": 48,
+  "interruption_point": 1,
+  "warnings": [
+    "INTERRUPTED: session ends after 1 of 48 planned executions; it is a prefix of its plan and must not be cited as complete or used to stop early on a favourable figure",
+    "stopped: interrupt at seq Some(0): interrupted by signal 15"
+  ],
+  "regraded": true,
+  "replays": [],
+  "files": {
+    "host.json": "366e4c4645d0e8f6a3ade02348d857520dbb14c2af020a0fb48e6d9379cbf168",
+    "plan.json": "4bda5e8ffbf2580cdf59527af15f04633a11f8a3ed5bbf35c5be4f57c3a5c565",
+    "records.jsonl": "c689c202903d6960d27d440207fdd90c0d21807b8b5b774126ee085f6a8201c7",
+    "session.json": "2b57c60f52976c46f2b96e7b15ffa90474699e97205e7427642d355ec6b466d2",
+    "spec.json": "7aa5189acdc9dd3d738bcd46a51cb81cad069678cecac47d2017406bb12bb4d3"
+  },
+  "auditor_binary_sha256": "d4df6333bcf94bc9feed8adaa725a801a48ce37489fbf06cbc7c04d87aa01db1",
+  "auditor_env_class_id": "ECBENV3h8d80c7bc4dfc",
+  "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+  "audited_unix_ms": 1794034130214
+}

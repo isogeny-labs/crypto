@@ -1,0 +1,35 @@
+Run at the Rust crate root (cryptanalysis/suite or crypto checkout).
+
+# Regenerate the g1p catalogue from the pinned upstream section.
+# CACHE_DIR holds the fetched documents; the importer reuses them offline.
+cargo run --release --manifest-path tools/efd/Cargo.toml -- \
+  CACHE_DIR src/prime_ecc/efd/catalogue.json g1p
+
+# Full prime EFD test group (catalogue hashes, chart round trip, affine-law
+# comparison, checked short-Weierstrass adapter on small and large primes).
+cargo test --lib prime_ecc::efd
+
+# Emit the per-formula coverage rows checked into this directory.
+EFD_COVERAGE_OUT=docs/efd/prime-validation/coverage.json \
+  cargo test --lib prime_ecc::efd::tests::all_471
+
+# Second small prime (p = 97, also 1 mod 12).
+EFD_TEST_P=97 cargo test --lib prime_ecc::efd
+
+# The importer check target builds and its tests pass.
+cargo test --release --manifest-path tools/efd/Cargo.toml
+
+# Regenerate both catalogues from a fetch cache and diff (ignores the date).
+tools/efd/replay.sh G1P_CACHE G12O_CACHE
+
+# Symbolic verification of every formula program (needs sympy).
+python3 tools/efd/verify_symbolic.py --out docs/efd/prime-validation/symbolic.json
+python3 tools/efd/verify_symbolic.py --catalogue src/prime_ecc/efd/legacy_catalogue.json \
+  --out docs/efd/prime-validation/symbolic-legacy.json
+
+# Symbolic verification of the Weierstrass bridges.
+python3 tools/efd/verify_bridges.py --out docs/efd/prime-validation/bridges.json
+
+# Source hashes for the module and catalogue.
+cd src/prime_ecc/efd && sha256sum mod.rs program.rs formats.rs checked.rs \
+  tests.rs catalogue.json

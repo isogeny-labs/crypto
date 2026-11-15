@@ -1,0 +1,84 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-14T04:13:42+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/quartic_dl1_cd_sqrt_20261113/combo/run-local.sh",
+        "<published image v2/v3 dir>",
+        "<scratch>/combo-out"
+      ],
+      "cwd": "research/quartic_dl1_cd_sqrt_20261113/combo",
+      "exit": 0,
+      "started_utc": "2026-11-14T03:56:57+00:00",
+      "wall_s": 919.0
+    }
+  ],
+  "commit": "a595db838d07300dc76cfabf161037fe295fc3a9",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T04:13:41+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261113-quartic-dl1-cd-sqrt"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T0413Z-quartic-dl1-cd17-chain",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 3,
+      "name": "dl_meq_cd170_chain_over_cd200_k22",
+      "note": "additions free (frozen model); frozen grid constants",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.681
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 3,
+      "name": "dl_meq_cd170_chain_over_cd200_k22_wadd1",
+      "note": "additions priced at 1 M-eq",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.851
+    }
+  ],
+  "problem": "ic:ghs-weak-quartic-dl-k12-22",
+  "raw": [
+    {
+      "bytes": 30244,
+      "path": "research/quartic_dl1_cd_sqrt_20261113/combo/runs-combo-20261114.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/47/47d11e3afb41ea05f30659d13d3663c857d13cb91bafd126fcf4538fa7cf4725",
+      "sha256": "47d11e3afb41ea05f30659d13d3663c857d13cb91bafd126fcf4538fa7cf4725",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf",
+    "png": [
+      "research/quartic_dl1_cd_sqrt_20261113/combo/combo.png"
+    ],
+    "svg": [
+      "research/quartic_dl1_cd_sqrt_20261113/combo/combo.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "quartic-dl1-cd17-chain",
+  "status": "measured",
+  "summary": "c_D=1.7 + sqrt chain: robust DL improvement at k=18..22 (0.68-0.74 additions free, 0.85-0.88 at 1 M-eq, CPU 0.80-0.91); chain adds 0.6-6.5% counted, no CPU gain; D dearer. Local, unvalidated.",
+  "validation": null
+}

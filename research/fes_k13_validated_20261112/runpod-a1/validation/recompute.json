@@ -1,0 +1,677 @@
+{
+ "schema": "validator-recompute/v1",
+ "session_id": "ECBS1h695ef8e76c34",
+ "integrity": {
+  "records": 336,
+  "expected": 336,
+  "records_sha256": "965d95f5ab02e85ba7bbc33024f306243c0e7fecf88b04196a98dde0bf9962c8",
+  "records_sha256_matches_session_json": true,
+  "seq_is_0_to_n_minus_1": true,
+  "one_session_id": true,
+  "one_binary_sha256": [
+   "8f9576b5bf81819274cc6049eb671c6d97f0bc6660f99d0445448edb4e5130f4"
+  ],
+  "binary_matches_session_json": true,
+  "one_env_class": [
+   "ECBENV3h3ea0ce3c3fe0"
+  ],
+  "statuses": {
+   "verified": 336
+  },
+  "warmup_only_round0": true,
+  "every_cell_exactly_once": true,
+  "algorithm_seed_shared_by_all_arms": true,
+  "records_match_plan": true,
+  "alternate_measured_order_holds": true,
+  "target_seed_from_protocol_tag": 24899570366495,
+  "measurement_seed_from_protocol_tag": 171474876352264,
+  "target_seed_matches": true,
+  "measurement_seed_matches": true
+ },
+ "accounting_checks": {
+  "total_gae_eq_sum_phase_gae": true,
+  "s_eq_total_over_sqrt_r": true,
+  "max_abs_dev_total_vs_phases": 1.8189894035458565e-12,
+  "max_rel_dev_s": 0.0,
+  "ic_G_minus_C_eq_adds_plus_doubles": true,
+  "ic_max_abs_dev_G_minus_C": 1.8189894035458565e-12,
+  "solver_pricing_notes": []
+ },
+ "arms": {
+  "rho-sfstrong-v2": {
+   "role": "reference",
+   "method": "rho.signed_frobenius_strong_v2",
+   "measured": 48,
+   "verified": 48,
+   "mean_s": 2.5844832898041115,
+   "min_s": 2.197654034426786,
+   "max_s": 3.0020354463305385,
+   "mean_s_ci95_log_cluster_t": [
+    2.5123539146480036,
+    2.658683490543381
+   ],
+   "band_mean_s": {
+    "0": 2.5844832898041115,
+    "0.1": 2.677303691154579,
+    "1": 3.5126873033087898
+   },
+   "charged_sum_gae": 5552.076488455546,
+   "native_sum": 1994,
+   "unpriced_listed": [
+    "canonicalisations_uncharged",
+    "partition_hashes_uncharged",
+    "table_inserts_uncharged",
+    "table_queries_uncharged"
+   ],
+   "priced_counter_mean_counts": {
+    "canonicalisations_uncharged": 18.9375,
+    "partition_hashes_uncharged": 12.875,
+    "table_inserts_uncharged": 4.333333333333333,
+    "table_queries_uncharged": 5.395833333333333
+   },
+   "lower_bound_flag": [
+    true
+   ],
+   "isolation_levels": {
+    "L1": 48
+   }
+  },
+  "rho-negation": {
+   "role": "baseline",
+   "method": "rho.negation",
+   "measured": 48,
+   "verified": 48,
+   "mean_s": 2.7878705300298487,
+   "min_s": 1.5193871113737563,
+   "max_s": 4.803944543314082,
+   "mean_s_ci95_log_cluster_t": [
+    2.50512129514231,
+    3.1025332415161113
+   ],
+   "band_mean_s": {
+    "0": 2.7878705300298487,
+    "0.1": 2.927426981007132,
+    "1": 4.1834350398026805
+   },
+   "charged_sum_gae": 5989.0,
+   "native_sum": 2998,
+   "unpriced_listed": [
+    "canonicalisations_uncharged"
+   ],
+   "priced_counter_mean_counts": {
+    "canonicalisations_uncharged": 62.458333333333336
+   },
+   "lower_bound_flag": [
+    true
+   ],
+   "isolation_levels": {
+    "L1": 48
+   }
+  },
+  "ic-pairtable-mitm2": {
+   "role": "baseline",
+   "method": "ic.pipeline",
+   "measured": 48,
+   "verified": 48,
+   "mean_s": 197.48875834226385,
+   "min_s": 195.63159976548587,
+   "max_s": 199.81710365938403,
+   "mean_s_ci95_log_cluster_t": [
+    197.10577257253507,
+    197.87248827132345
+   ],
+   "band_mean_s": {
+    "0": 197.21961244612893,
+    "0.1": 216.59552210416243,
+    "1": 390.97870902646355
+   },
+   "charged_sum_gae": 423674.00000000006,
+   "native_sum": 416240,
+   "unpriced_listed": [],
+   "priced_counter_mean_counts": {
+    "table_insert_attempts": 8192.0
+   },
+   "lower_bound_flag": [
+    false
+   ],
+   "isolation_levels": {
+    "L1": 46,
+    "L2": 2
+   }
+  },
+  "ic-descent-inherited-f4": {
+   "role": "baseline",
+   "method": "ic.pipeline",
+   "measured": 48,
+   "verified": 48,
+   "mean_s": 121.54420898208006,
+   "min_s": 35.33131158673853,
+   "max_s": 223.56067517656655,
+   "mean_s_ci95_log_cluster_t": [
+    106.68895995489105,
+    138.4678859305189
+   ],
+   "band_mean_s": {
+    "0": 15.174320176642675,
+    "0.1": 4621.699133238475,
+    "1": 46080.42245079496
+   },
+   "charged_sum_gae": 32597.999999999993,
+   "native_sum": 98958961,
+   "unpriced_listed": [],
+   "priced_counter_mean_counts": {
+    "table_insert_attempts": 0.0
+   },
+   "lower_bound_flag": [
+    false
+   ],
+   "isolation_levels": {
+    "L2": 43,
+    "L1": 5
+   }
+  },
+  "ic-descent-fes-f2": {
+   "role": "candidate",
+   "method": "ic.pipeline",
+   "measured": 48,
+   "verified": 48,
+   "mean_s": 86.06689876023547,
+   "min_s": 28.022071443154093,
+   "max_s": 143.2693851859937,
+   "mean_s_ci95_log_cluster_t": [
+    78.91401830838943,
+    93.8681266141674
+   ],
+   "band_mean_s": {
+    "0": 15.17711316765623,
+    "0.1": 3081.7630559809927,
+    "1": 30681.036541301015
+   },
+   "charged_sum_gae": 32603.99999999999,
+   "native_sum": 65877461,
+   "unpriced_listed": [],
+   "priced_counter_mean_counts": {
+    "table_insert_attempts": 0.0
+   },
+   "lower_bound_flag": [
+    false
+   ],
+   "isolation_levels": {
+    "L2": 44,
+    "L1": 4
+   }
+  },
+  "rho-sfstrong-v2-aa": {
+   "role": "control",
+   "method": "rho.signed_frobenius_strong_v2",
+   "measured": 48,
+   "verified": 48,
+   "mean_s": 2.5844832898041115,
+   "min_s": 2.197654034426786,
+   "max_s": 3.0020354463305385,
+   "mean_s_ci95_log_cluster_t": [
+    2.5123539146480036,
+    2.658683490543381
+   ],
+   "band_mean_s": {
+    "0": 2.5844832898041115,
+    "0.1": 2.677303691154579,
+    "1": 3.5126873033087898
+   },
+   "charged_sum_gae": 5552.076488455546,
+   "native_sum": 1994,
+   "unpriced_listed": [
+    "canonicalisations_uncharged",
+    "partition_hashes_uncharged",
+    "table_inserts_uncharged",
+    "table_queries_uncharged"
+   ],
+   "priced_counter_mean_counts": {
+    "canonicalisations_uncharged": 18.9375,
+    "partition_hashes_uncharged": 12.875,
+    "table_inserts_uncharged": 4.333333333333333,
+    "table_queries_uncharged": 5.395833333333333
+   },
+   "lower_bound_flag": [
+    true
+   ],
+   "isolation_levels": {
+    "L1": 48
+   }
+  }
+ },
+ "paired_fes_over_inherited": {
+  "a": "ic-descent-inherited-f4",
+  "b": "ic-descent-fes-f2",
+  "pairs": 48,
+  "workloads": 8,
+  "same_seeds": true,
+  "ratio_of_totals": 0.7081118835774792,
+  "ci95_linearised_t_log": [
+   0.6682851635212668,
+   0.7503120928520939
+  ],
+  "ci95_linearised_t_linear": [
+   0.6671213154363734,
+   0.749102451718585
+  ],
+  "se": 0.0173349182702051,
+  "df": 7,
+  "t975": 2.364624251592784,
+  "gae_basis_ratio": 0.7081118835774792,
+  "gae_basis_ci95": [
+   0.6682851635212668,
+   0.7503120928520939
+  ],
+  "ci_entirely_below_1": true,
+  "per_workload": {
+   "W0317f6abdbe6": {
+    "pairs": 6,
+    "a_mean_s": 111.45322589567276,
+    "b_mean_s": 77.95595181483674,
+    "ratio_b_over_a": 0.6994499368534063,
+    "per_pair_ratios": [
+     0.867922,
+     0.699179,
+     0.732153,
+     0.736079,
+     0.688375,
+     0.527058
+    ]
+   },
+   "W0db0098cab33": {
+    "pairs": 6,
+    "a_mean_s": 123.44860883914627,
+    "b_mean_s": 87.0942577578441,
+    "ratio_b_over_a": 0.7055102408754403,
+    "per_pair_ratios": [
+     0.711649,
+     0.726165,
+     0.670794,
+     0.710553,
+     0.685905,
+     0.732876
+    ]
+   },
+   "W397d9e81e56e": {
+    "pairs": 6,
+    "a_mean_s": 144.32553827029437,
+    "b_mean_s": 97.78603430346963,
+    "ratio_b_over_a": 0.6775379844441316,
+    "per_pair_ratios": [
+     0.626175,
+     0.722662,
+     0.705064,
+     0.607007,
+     0.727059,
+     0.709319
+    ]
+   },
+   "W3e8f3093142d": {
+    "pairs": 6,
+    "a_mean_s": 132.8856665184923,
+    "b_mean_s": 91.41794538860024,
+    "ratio_b_over_a": 0.6879443643824339,
+    "per_pair_ratios": [
+     0.721302,
+     0.685719,
+     0.711311,
+     0.640852,
+     0.687205,
+     0.735726
+    ]
+   },
+   "W4028b938b5e1": {
+    "pairs": 6,
+    "a_mean_s": 116.09726193916428,
+    "b_mean_s": 80.64259644450878,
+    "ratio_b_over_a": 0.69461238876388,
+    "per_pair_ratios": [
+     0.73037,
+     0.699558,
+     0.793123,
+     0.694111,
+     0.631316,
+     0.720811
+    ]
+   },
+   "W8f17ebdf8664": {
+    "pairs": 6,
+    "a_mean_s": 110.47326914401047,
+    "b_mean_s": 78.09366136140441,
+    "ratio_b_over_a": 0.7069009722125927,
+    "per_pair_ratios": [
+     0.763408,
+     0.708411,
+     0.69482,
+     0.682297,
+     0.697658,
+     0.722002
+    ]
+   },
+   "Wee0cc1d80340": {
+    "pairs": 6,
+    "a_mean_s": 88.86473309298981,
+    "b_mean_s": 77.12136459241613,
+    "ratio_b_over_a": 0.8678511925728153,
+    "per_pair_ratios": [
+     0.730068,
+     0.728,
+     0.720623,
+     0.741174,
+     1.644118,
+     0.717371
+    ]
+   },
+   "Wfe0ef994165f": {
+    "pairs": 6,
+    "a_mean_s": 144.8053681568703,
+    "b_mean_s": 98.4233784188037,
+    "ratio_b_over_a": 0.6796942659762438,
+    "per_pair_ratios": [
+     0.694598,
+     0.693871,
+     0.870755,
+     0.706792,
+     0.47162,
+     0.708307
+    ]
+   }
+  },
+  "pairs_with_b_lt_a": 47,
+  "per_pair_ratio_min": 0.47161987413335527,
+  "per_pair_ratio_max": 1.6441184071907173,
+  "band_ratio_b_over_a": {
+   "0": 1.000184060371802,
+   "0.1": 0.6668030451868829,
+   "1": 0.6658150014588617
+  }
+ },
+ "t_quantile_selftest": {
+  "t975_df7": 2.364624251592784,
+  "textbook": 2.364624251592785,
+  "abs_err": 8.881784197001252e-16
+ },
+ "band_ranks": [
+  {
+   "a": "ic-descent-fes-f2",
+   "b": "ic-descent-inherited-f4",
+   "verdict": "unresolved inside the band",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": "<",
+    "1": "<"
+   }
+  },
+  {
+   "a": "ic-descent-fes-f2",
+   "b": "ic-pairtable-mitm2",
+   "verdict": "unresolved inside the band",
+   "order_by_weight": {
+    "0": "<",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-descent-fes-f2",
+   "b": "rho-negation",
+   "verdict": "rho-negation < ic-descent-fes-f2",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-descent-fes-f2",
+   "b": "rho-sfstrong-v2",
+   "verdict": "rho-sfstrong-v2 < ic-descent-fes-f2",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-descent-fes-f2",
+   "b": "rho-sfstrong-v2-aa",
+   "verdict": "rho-sfstrong-v2-aa < ic-descent-fes-f2",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-descent-inherited-f4",
+   "b": "ic-pairtable-mitm2",
+   "verdict": "unresolved inside the band",
+   "order_by_weight": {
+    "0": "<",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-descent-inherited-f4",
+   "b": "rho-negation",
+   "verdict": "rho-negation < ic-descent-inherited-f4",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-descent-inherited-f4",
+   "b": "rho-sfstrong-v2",
+   "verdict": "rho-sfstrong-v2 < ic-descent-inherited-f4",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-descent-inherited-f4",
+   "b": "rho-sfstrong-v2-aa",
+   "verdict": "rho-sfstrong-v2-aa < ic-descent-inherited-f4",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-pairtable-mitm2",
+   "b": "rho-negation",
+   "verdict": "rho-negation < ic-pairtable-mitm2",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-pairtable-mitm2",
+   "b": "rho-sfstrong-v2",
+   "verdict": "rho-sfstrong-v2 < ic-pairtable-mitm2",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "ic-pairtable-mitm2",
+   "b": "rho-sfstrong-v2-aa",
+   "verdict": "rho-sfstrong-v2-aa < ic-pairtable-mitm2",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "rho-negation",
+   "b": "rho-sfstrong-v2",
+   "verdict": "rho-sfstrong-v2 < rho-negation",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "rho-negation",
+   "b": "rho-sfstrong-v2-aa",
+   "verdict": "rho-sfstrong-v2-aa < rho-negation",
+   "order_by_weight": {
+    "0": ">",
+    "0.1": ">",
+    "1": ">"
+   }
+  },
+  {
+   "a": "rho-sfstrong-v2",
+   "b": "rho-sfstrong-v2-aa",
+   "verdict": "unresolved inside the band",
+   "order_by_weight": {
+    "0": "=",
+    "0.1": "=",
+    "1": "="
+   }
+  }
+ ],
+ "distance_to_rho": {
+  "ic-descent-inherited-f4/rho-sfstrong-v2": {
+   "charged_mean_s_ratio": 47.02843677170472,
+   "band_ratio": {
+    "0": 5.871316806924606,
+    "0.1": 1726.2513582257757,
+    "1": 13118.281951083241
+   },
+   "band_order": "rho-sfstrong-v2 < ic-descent-inherited-f4"
+  },
+  "ic-descent-inherited-f4/rho-negation": {
+   "charged_mean_s_ratio": 43.59750844698614,
+   "band_ratio": {
+    "0": 5.442978794456502,
+    "0.1": 1578.7581255565449,
+    "1": 11014.972627128072
+   },
+   "band_order": "rho-negation < ic-descent-inherited-f4"
+  },
+  "ic-descent-fes-f2/rho-sfstrong-v2": {
+   "charged_mean_s_ratio": 33.30139494411621,
+   "band_ratio": {
+    "0": 5.872397483679055,
+    "0.1": 1151.0696624229402,
+    "1": 8734.348916398249
+   },
+   "band_order": "rho-sfstrong-v2 < ic-descent-fes-f2"
+  },
+  "ic-descent-fes-f2/rho-negation": {
+   "charged_mean_s_ratio": 30.871913825680416,
+   "band_ratio": {
+    "0": 5.44398063115712,
+    "0.1": 1052.7207257346395,
+    "1": 7333.9340158006
+   },
+   "band_order": "rho-negation < ic-descent-fes-f2"
+  },
+  "ic-pairtable-mitm2/rho-sfstrong-v2": {
+   "charged_mean_s_ratio": 76.41324636199614,
+   "band_ratio": {
+    "0": 76.30910721077908,
+    "0.1": 80.90061759514337,
+    "1": 111.30472919071948
+   },
+   "band_order": "rho-sfstrong-v2 < ic-pairtable-mitm2"
+  },
+  "ic-pairtable-mitm2/rho-negation": {
+   "charged_mean_s_ratio": 70.83856879829689,
+   "band_ratio": {
+    "0": 70.74202704959092,
+    "0.1": 73.98836025950898,
+    "1": 93.45877378435516
+   },
+   "band_order": "rho-negation < ic-pairtable-mitm2"
+  }
+ },
+ "H2": {
+  "descent_records_all_rounds": 112,
+  "priced_by_counts": {
+   "pinned": 112
+  },
+  "priced_by_pinned_on_every_descent_record": true,
+  "solver_uncharged_counters_anywhere": [],
+  "solver_counters_in_unpriced_anywhere": [],
+  "ns_per_word_xor_pinned_on_every_descent_record": true,
+  "solver_op_units": [
+   [
+    "ic-descent-fes-f2",
+    "word XORs (Gray-code steps)"
+   ],
+   [
+    "ic-descent-inherited-f4",
+    "word XORs (elimination, specialisation and linear elimination only)"
+   ]
+  ],
+  "descent_cost_unpriced_empty": true,
+  "supported": true
+ },
+ "fes_f2_count_structure": {
+  "points_eq_calls_times_2_pow_nvars": true,
+  "n_vars": [
+   14
+  ],
+  "ops_minus_2_points_per_call_distinct": [
+   390.97435897435895,
+   393.6666666666667,
+   393.7142857142857,
+   394.11764705882354,
+   394.73333333333335,
+   396.43636363636364,
+   397.14285714285717,
+   401.28846153846155,
+   401.4848484848485,
+   402.3863636363636
+  ],
+  "note": "fes-f2 is described as two word XORs per point of the Gray-code enumeration; ops - 2*points is the per-call set-up"
+ },
+ "aa_control": {
+  "pairs": 48,
+  "count_identical_pairs": 48,
+  "ops_ratio": 1.0,
+  "pairs_both_at_least_L2": 0,
+  "protocol_threshold": "wall.status admitted, pairs_below_level 0, aa_pairs >= 5, aa_ci95 present",
+  "wall_threshold_met": false,
+  "L2_blockers_seen_on_aa_arms": [
+   "L2: solve too short to admit wall time"
+  ]
+ },
+ "positive_control": {
+  "arm": "ic-pairtable-mitm2",
+  "verified": 48,
+  "measured": 48,
+  "mean_s": 197.48875834226385,
+  "above_both_descent_arms_charged": true,
+  "local_reference_s": 197.7
+ },
+ "H1": {
+  "frozen_text": "S(ic-descent-fes-f2) < S(ic-descent-inherited-f4) on icv1-f2m13-t181-515ee569: the paired ops ratio fes/inherited from `ecbench compare --a ic-descent-inherited-f4 --b ic-descent-fes-f2` over the 48 (target, round) pairs has its 95 % interval entirely below 1, and the order holds at every band weight (0, 0.1, 1 GAE).",
+  "leg_interval_below_1": true,
+  "leg_order_at_every_band_weight": false,
+  "band_order_verdict": "unresolved inside the band",
+  "order_by_weight": {
+   "0": "fes > inherited",
+   "0.1": "fes < inherited",
+   "1": "fes < inherited"
+  },
+  "every_measured_IC_run_verified": true,
+  "supported": false,
+  "verdict": "not supported: the order is not fes < inherited at every band weight (band verdict: unresolved inside the band); the paired 95 % interval itself is below 1"
+ }
+}
