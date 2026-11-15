@@ -1,0 +1,189 @@
+{
+  "D": 32,
+  "basis_size": 7,
+  "censored": "no",
+  "censored_reason": null,
+  "construction": {
+    "per_cell": {
+      "cpu_s": 0.5115145980000001,
+      "field_multiplications": 2188176,
+      "what": "independent of the target: S_{m+1} by resultants (split by power of x_R), its elementary-symmetric rewrite, X^(2^t) mod P, the R_j tower"
+    },
+    "per_target": {
+      "cpu_s": 0.014262486000000019,
+      "field_multiplications": 54790,
+      "what": "substituting x_R, scaling by powers of g, S_3 boxes, tower and membership equations"
+    },
+    "unit": "field multiplications counted by examples/pkm_oracle_program/algebra.rs (every Pol::mul and Pol::scale, including the p-1 scaling inside Pol::sub); additions not counted; per_cell is shared by every target of the cell and is metered once per export process"
+  },
+  "construction_cell_cpu_s": 0.5115145980000001,
+  "construction_cell_field_multiplications": 2188176,
+  "construction_cpu_s": 0.014262486000000019,
+  "construction_field_multiplications": 54790,
+  "cpu_over_wall": 1.013429856716772,
+  "cpu_s": 0.02608059,
+  "deadline_secs": 100.0,
+  "degree_bound_binding": false,
+  "degree_reached": 32,
+  "doc": "[pcc:unverified] instrument output; no claim",
+  "extract_field_multiplications": 7679388,
+  "extraction": {
+    "candidates_rejected": 0,
+    "classifier_expected": 1,
+    "classifier_real_count": 1,
+    "classifier_real_count_distinct": 0,
+    "complete": true,
+    "cpu_s": 0.030457973000000006,
+    "decompositions_signed_base": [
+      [
+        1,
+        -2,
+        -2,
+        -2
+      ]
+    ],
+    "distinct_x_multisets": 1,
+    "equation_check_failures": 0,
+    "extract_max_q": 4096,
+    "extraction_budget_s": 99.974265027,
+    "f4_field_ops": 7677168,
+    "f4_runs": 10,
+    "fp_rational_solutions": 4,
+    "lift_and_root_field_multiplications": 84,
+    "lift_field_multiplications": 84,
+    "lift_note": "x_i must be a real base abscissa; decomposition = sorted signed-symbol list whose point sum is exactly R (R lifted to y <= (p-1)/2; counts are invariant under R -> -R)",
+    "matches_classifier": true,
+    "method": "f4_fp::solve_visit, unrestricted domains (a second F4 run plus substitution tree, charged to extraction)",
+    "non_split_elem_vectors": 0,
+    "quotient_dimension": 4,
+    "root_field_multiplications": 2136,
+    "solution_semantics": "ordered_repeats_unlifted",
+    "solution_semantics_detail": {
+      "classifier_set": "real_count",
+      "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+      "extra_algebraic_solutions": "tuples whose internal partial sums are not F_p-rational (wires in F_pbar) and identity partial sums (leading coefficients both vanish)",
+      "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+      "not_representable": "none: symmetric in x_0..x_{m-1}, all permutations are zeros",
+      "ordered": true,
+      "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+      "wires": "no wires: every internal wire eliminated by a Sylvester resultant (formal degrees, nothing divided out)"
+    },
+    "solutions_visited": 4,
+    "timed_out": false,
+    "unlifted_multisets_not_real_base": 0,
+    "unlifted_solutions": 0,
+    "verified_decomposition_format": "list of decompositions, each a list of [x, sign] pairs (sign +1 = the point with y <= (p-1)/2, -1 = its negative), pairs sorted by (x, sign), decompositions sorted lexicographically",
+    "verified_distinct_abscissa": 0,
+    "verified_real_decompositions": [
+      [
+        [
+          87043,
+          1
+        ],
+        [
+          175110,
+          -1
+        ],
+        [
+          175110,
+          -1
+        ],
+        [
+          175110,
+          -1
+        ]
+      ]
+    ],
+    "verified_real_decompositions_count": 1,
+    "wall_s": 0.033069546,
+    "work": {
+      "point_adds": 30,
+      "point_doubles": 0,
+      "point_field_ops": {
+        "invs": 28,
+        "muls": 56,
+        "sqrs": 28
+      },
+      "root_finding_field_muls": 0
+    }
+  },
+  "field_ops": 7677130,
+  "field_ops_total_delta": 7677130,
+  "fp_rational_solutions": 4,
+  "inconsistent": false,
+  "m": 4,
+  "matches_classifier": true,
+  "max_cols": 6561,
+  "max_degree": 64,
+  "max_input_degree": 32,
+  "max_rows": 6306,
+  "max_total_degree": 32,
+  "native_ops_total_delta": 249935,
+  "nequations": 5,
+  "nterms_total": 6569,
+  "nvars": 4,
+  "order": "grevlex",
+  "p": 262153,
+  "pairs_above_bound": 0,
+  "presentation": "mono-direct",
+  "schema": "pkm.present-panel.solve/v2",
+  "sha256": "e1d77517b726ca488608996226d5b50684fb6d478be0123113ce7b9fd7df37e4",
+  "solution_semantics": "ordered_repeats_unlifted",
+  "solution_semantics_detail": {
+    "classifier_set": "real_count",
+    "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+    "extra_algebraic_solutions": "tuples whose internal partial sums are not F_p-rational (wires in F_pbar) and identity partial sums (leading coefficients both vanish)",
+    "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+    "not_representable": "none: symmetric in x_0..x_{m-1}, all permutations are zeros",
+    "ordered": true,
+    "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+    "wires": "no wires: every internal wire eliminated by a Sylvester resultant (formal degrees, nothing divided out)"
+  },
+  "solve_field_multiplications": 7677130,
+  "solving_degree": 3,
+  "solving_degree_max": 32,
+  "steps": 13,
+  "steps_to_solution": 12,
+  "system": "research/pkm_present_panel_20261115/smoke/export_t2_m4/d005624.mono-direct.system.json",
+  "system_file_sha256": "834ce8eeaf6f9b910cb41abf71a8a5a49f053f127ef3ea9f88a3bb6ae0a5773f",
+  "t": 2,
+  "threads": {
+    "RAYON_NUM_THREADS": "1",
+    "note": "cpu_over_wall near 1 under RAYON_NUM_THREADS=1 means the engine honours it; well above 1 means it does not",
+    "rayon_current_num_threads": 1
+  },
+  "threads_used": 1,
+  "timed_out": false,
+  "tool": {
+    "git_commit": "41abbf1405a1adaf7f900b74d8875658ec3aac7a",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "1488ae452e54dfed6eaeb4a123297a8cc8736fcc11004129493bbaf348f2b8b5"
+  },
+  "total_cpu_s": 0.06055942000000001,
+  "total_wall_s": 0.064519374,
+  "unlifted_solutions": 0,
+  "verified_real_decompositions": [
+    [
+      [
+        87043,
+        1
+      ],
+      [
+        175110,
+        -1
+      ],
+      [
+        175110,
+        -1
+      ],
+      [
+        175110,
+        -1
+      ]
+    ]
+  ],
+  "verified_real_decompositions_count": 1,
+  "vm_hwm_kb": 13252,
+  "wall_s": 0.025734973
+}

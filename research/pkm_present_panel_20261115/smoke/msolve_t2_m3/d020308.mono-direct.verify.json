@@ -1,0 +1,108 @@
+{
+  "cpu_s": 0.0005751479999999999,
+  "doc": "[pcc:unverified] instrument output; no claim",
+  "eliminating_degree": 2,
+  "extraction": {
+    "classifier_expected": 1,
+    "classifier_real_count": 1,
+    "classifier_real_count_distinct": 0,
+    "decompositions_signed_base": [
+      [
+        1,
+        -2,
+        -2
+      ]
+    ],
+    "distinct_x_multisets": 2,
+    "equation_check_failures": 1,
+    "fp_rational_solutions": 2,
+    "lift_and_root_field_multiplications": 36,
+    "lift_field_multiplications": 36,
+    "lift_note": "x_i must be a real base abscissa; decomposition = sorted signed-symbol list whose point sum is exactly R (R lifted to y <= (p-1)/2; counts are invariant under R -> -R)",
+    "matches_classifier": true,
+    "non_split_elem_vectors": 0,
+    "solution_semantics": "ordered_repeats_unlifted",
+    "solution_semantics_detail": {
+      "classifier_set": "real_count",
+      "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+      "extra_algebraic_solutions": "tuples whose internal partial sums are not F_p-rational (wires in F_pbar) and identity partial sums (leading coefficients both vanish)",
+      "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+      "not_representable": "none: symmetric in x_0..x_{m-1}, all permutations are zeros",
+      "ordered": true,
+      "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+      "wires": "no wires: every internal wire eliminated by a Sylvester resultant (formal degrees, nothing divided out)"
+    },
+    "unlifted_multisets_not_real_base": 1,
+    "unlifted_solutions": 1,
+    "verified_decomposition_format": "list of decompositions, each a list of [x, sign] pairs (sign +1 = the point with y <= (p-1)/2, -1 = its negative), pairs sorted by (x, sign), decompositions sorted lexicographically",
+    "verified_distinct_abscissa": 0,
+    "verified_real_decompositions": [
+      [
+        [
+          87043,
+          1
+        ],
+        [
+          175110,
+          -1
+        ],
+        [
+          175110,
+          -1
+        ]
+      ]
+    ],
+    "verified_real_decompositions_count": 1,
+    "work": {
+      "point_adds": 14,
+      "point_doubles": 0,
+      "point_field_ops": {
+        "invs": 12,
+        "muls": 24,
+        "sqrs": 12
+      },
+      "root_finding_field_muls": 0
+    }
+  },
+  "fp_rational_solutions": 2,
+  "fp_roots_of_eliminating_polynomial": 2,
+  "msolve_outcome": "zero_dimensional",
+  "msolve_output": "research/pkm_present_panel_20261115/smoke/msolve_t2_m3/d020308.mono-direct.out",
+  "msolve_output_sha256": "09591e0712355199925b26acf838bc97cce10cab773909d2a045877334f30227",
+  "nequations": 4,
+  "nvars": 3,
+  "presentation": "mono-direct",
+  "quotient_dimension_with_multiplicity": 3,
+  "reconstruction_field_muls": 12,
+  "root_finding_field_muls": 337,
+  "schema": "pkm.present-panel.verify-msolve/v1",
+  "separating_variable": "A",
+  "sha256": "3a4a6664cb0a1d138bda50ccad663215e3f367fcd230343b8316a15b27a33308",
+  "system": "research/pkm_present_panel_20261115/smoke/export_t2_m3/d020308.mono-direct.system.json",
+  "system_file_sha256": "bc406504707234c4f2cab09b50e8c6df2b57a7dfab4cf69f95548d1456196353",
+  "tool": {
+    "git_commit": "41abbf1405a1adaf7f900b74d8875658ec3aac7a",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "1488ae452e54dfed6eaeb4a123297a8cc8736fcc11004129493bbaf348f2b8b5"
+  },
+  "unlifted_solutions": 1,
+  "verified_real_decompositions": [
+    [
+      [
+        87043,
+        1
+      ],
+      [
+        175110,
+        -1
+      ],
+      [
+        175110,
+        -1
+      ]
+    ]
+  ],
+  "verified_real_decompositions_count": 1,
+  "wall_s": 0.000574814
+}

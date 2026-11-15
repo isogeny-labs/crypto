@@ -1,0 +1,101 @@
+
+--------------- INPUT DATA ---------------
+#variables                       8
+#equations                       9
+#invalid equations               0
+field characteristic        262153
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         1
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+ 32       1       1   21438 x 21693       0.01%        1 new       0 zero         0.01 | 0.01         
+  9       8       8    1033 x 1280        0.33%        8 new       0 zero         0.00 | 0.00         
+  8      64      64    1089 x 1272        1.45%       28 new      36 zero         0.00 | 0.00         
+  7     224     224    1220 x 1215        4.00%       56 new     168 zero         0.00 | 0.00         
+  6     448     448    1324 x 1039        6.57%       70 new     378 zero         0.01 | 0.01         
+  5     560     560    1198 x 731         7.93%       56 new     504 zero         0.01 | 0.01         
+  4     448     448     806 x 395         8.23%       28 new     420 zero         0.00 | 0.00         
+  3     224     224     372 x 157         8.18%        8 new     216 zero         0.00 | 0.00         
+  2      36      36      80 x 45         10.67%        1 new      35 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+reduce final basis        1 x 1         100.00%        1 new       0 zeroTime for rational param:          0.03 (elapsed) sec /  0.03 sec (cpu)
+
+------------------------------------------------------------------------------------
+msolve overall time           0.04 sec (elapsed) /  0.04 sec (cpu)
+------------------------------------------------------------------------------------
+         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ---------------
+overall(elapsed)        0.02 sec
+overall(cpu)            0.02 sec
+select                  0.00 sec  16.0%
+symbolic prep.          0.00 sec  13.6%
+update                  0.00 sec  18.7%
+convert                 0.00 sec   6.6%
+linear algebra          0.01 sec  40.7%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                     1
+#terms in basis                   1
+#pairs reduced                 2013
+#GM criterion                 32967
+#redundant elements             264
+#rows reduced                  4027
+#zero reductions               1757
+max. matrix data              21438 x 21693 (0.011%)
+max. symbolic hash table size  2^15
+max. basis hash table size     2^16
+-----------------------------------------
+
+Grobner basis has a single element
+No solution
+	Command being timed: "msolve -t 1 -v 2 -P 1 -f research/pkm_present_panel_20261115/smoke/export_t2_m4/d000000.mono-tower.ms -o research/pkm_present_panel_20261115/smoke/msolve_t2_m4/d000000.mono-tower.out"
+	User time (seconds): 0.02
+	System time (seconds): 0.00
+	Percent of CPU this job got: 97%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.03
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 9584
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1810
+	Voluntary context switches: 1
+	Involuntary context switches: 1
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 16
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

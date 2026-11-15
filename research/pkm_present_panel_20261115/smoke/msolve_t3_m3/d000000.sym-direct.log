@@ -1,0 +1,103 @@
+
+--------------- INPUT DATA ---------------
+#variables                       3
+#equations                       4
+#invalid equations               0
+field characteristic        262153
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         1
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  6       3       3      13 x 84         33.88%        3 new       0 zero         0.00 | 0.00         
+  7       4       4      22 x 110        47.02%        4 new       0 zero         0.00 | 0.00         
+  7       6       6      28 x 107        48.83%        5 new       1 zero         0.00 | 0.00         
+  7       8       8      36 x 104        45.17%        6 new       2 zero         0.00 | 0.00         
+  6       6      14      28 x 80         55.18%        6 new       0 zero         0.00 | 0.00         
+  6       6      20      32 x 78         55.69%        6 new       0 zero         0.00 | 0.00         
+  6       6      28      35 x 75         55.89%        6 new       0 zero         0.00 | 0.00         
+  6      18      30      51 x 73         56.54%       18 new       0 zero         0.00 | 0.00         
+  5      36      46      69 x 55         49.72%       18 new      18 zero         0.00 | 0.00         
+  3      18      45      34 x 20         25.00%        3 new      15 zero         0.00 | 0.00         
+  2       6      33      15 x 10         32.00%        1 new       5 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+reduce final basis        1 x 1         100.00%        1 new       0 zeroTime for rational param:          0.00 (elapsed) sec /  0.00 sec (cpu)
+
+------------------------------------------------------------------------------------
+msolve overall time           0.00 sec (elapsed) /  0.00 sec (cpu)
+------------------------------------------------------------------------------------
+         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ---------------
+overall(elapsed)        0.00 sec
+overall(cpu)            0.00 sec
+select                  0.00 sec  11.4%
+symbolic prep.          0.00 sec   7.5%
+update                  0.00 sec  38.8%
+convert                 0.00 sec  19.9%
+linear algebra          0.00 sec  12.7%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                     1
+#terms in basis                   1
+#pairs reduced                  117
+#GM criterion                  3016
+#redundant elements              79
+#rows reduced                   235
+#zero reductions                 41
+max. matrix data                 69 x 55 (49.723%)
+max. symbolic hash table size  2^11
+max. basis hash table size     2^16
+-----------------------------------------
+
+Grobner basis has a single element
+No solution
+	Command being timed: "msolve -t 1 -v 2 -P 1 -f research/pkm_present_panel_20261115/smoke/export_t3_m3/d000000.sym-direct.ms -o research/pkm_present_panel_20261115/smoke/msolve_t3_m3/d000000.sym-direct.out"
+	User time (seconds): 0.00
+	System time (seconds): 0.00
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.00
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 5812
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 614
+	Voluntary context switches: 1
+	Involuntary context switches: 1
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 24
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

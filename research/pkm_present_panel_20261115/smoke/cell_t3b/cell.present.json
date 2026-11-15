@@ -1,0 +1,80 @@
+{
+  "cells": [
+    {
+      "B_real": 6,
+      "p": 262217,
+      "path": "cell.json",
+      "sha256": "e06e18fb86f1529b23443efe4da952399a4ec9f50476cf09967f75340a63cee2",
+      "slug": "smoke-t3b",
+      "t": 3
+    }
+  ],
+  "doc": "[pcc:unverified] instrument output; no claim",
+  "flags": {
+    "nested_ts": [],
+    "no_l1_reuse": true,
+    "prime": null,
+    "ratio": 6,
+    "require_breal": 5,
+    "seed": 777,
+    "slug": "smoke-t3b",
+    "t": 3
+  },
+  "require_breal_rejections": [
+    {
+      "p": 262153,
+      "reason": "B_real = 4 < 5"
+    },
+    {
+      "p": 262193,
+      "reason": "B_real = 4 < 5"
+    }
+  ],
+  "rule": "p runs over the primes >= 2^(T*R) (T*R >= 16) with 2^T | p-1, in increasing order; a prime is ELIGIBLE iff it is not a Fermat prime (p-1 not a power of two), a prime-order curve y^2=x^3+ax+b is found within 400 attempts, and a base with B_real >= ceil(B/2) exists under the g rule; the first eligible prime is used and every rejected prime is recorded. Curve search: StdRng (rand 0.8, ChaCha12) seeded by SHA-256('pkm.m8-panel/v1|curve|<slug>|<seed>|<p>'), a, b uniform in [1,p), skip singular, #E counted natively (exhaustive Legendre sum for p < 2^20, else Hasse-interval baby-step giant-step of a random point whose unique candidate is #E), first prime #E; r*Pv = O is checked for a random point. zeta = h^((p-1)>>T) for the least h >= 2 with zeta^(2^(T-1)) != 1. g rule: the least integer g in [2, 20000) outside mu_(2^T) (g^(2^T) != 1) with B_real >= ceil(2^T/2). V = { g*zeta^k }. Real base = { x in V : x^3+ax+b is a non-zero square }, positive sign = the point with y <= (p-1)/2. Generator P = point with the least x >= 1, y <= (p-1)/2. Exception: T=3, R=8 reuses the L1 decisive cell (p=16801793; a, b, g reconstructed by a native port of CPython random.Random(str) following gen.py, no eligibility rule applied; see l1_reuse).",
+  "schema": "pkm.present-panel.cell/v1",
+  "sha256": "77fda0ab277bb0e24f0bf645b932d7f2d648830ea6d08d276c74027f2bcf4afa",
+  "sym_applicability": [
+    {
+      "B_real": 6,
+      "sym_applicable_m": [
+        {
+          "applicable": true,
+          "m": 2
+        },
+        {
+          "applicable": true,
+          "m": 3
+        },
+        {
+          "applicable": true,
+          "m": 4
+        },
+        {
+          "applicable": true,
+          "m": 5
+        },
+        {
+          "applicable": false,
+          "m": 6
+        },
+        {
+          "applicable": false,
+          "m": 7
+        },
+        {
+          "applicable": false,
+          "m": 8
+        }
+      ],
+      "t": 3
+    }
+  ],
+  "sym_applicable_rule": "B_real >= m + 1",
+  "tool": {
+    "git_commit": "56f78ee7635de3042f10ad0732707a39f4c64772",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "6f568765e9cda372cbf7a813b7010b1d2fe097d11ccaa42c2406af3c61c992a8"
+  },
+  "wrapper_rule": "derive_from(t, ratio, seed, no_l1_reuse = true, min_prime = prime); --prime P pins the prime (error if the eligibility rule steps off P); --require-breal N steps to the next eligible prime while B_real < N (each rejection recorded; error with --prime); --slug NAME replaces the cell slug that seeds the targets/planted RNG streams (derivation_slug keeps the one that seeded the curve); --nested-ts reuses p, a, b, r, g, generator at smaller t with zeta_t' = zeta_t^(2^(t-t')) and slug <slug>-nested-t<t'>"
+}

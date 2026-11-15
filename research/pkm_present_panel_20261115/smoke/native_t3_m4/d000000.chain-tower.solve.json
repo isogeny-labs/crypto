@@ -1,0 +1,93 @@
+{
+  "D": 7,
+  "basis_size": 1898,
+  "censored": "timeout",
+  "censored_reason": "deadline",
+  "construction": {
+    "per_cell": {
+      "cpu_s": 0.0,
+      "field_multiplications": 0,
+      "what": "independent of the target: S_{m+1} by resultants (split by power of x_R), its elementary-symmetric rewrite, X^(2^t) mod P, the R_j tower"
+    },
+    "per_target": {
+      "cpu_s": 0.000079167,
+      "field_multiplications": 139,
+      "what": "substituting x_R, scaling by powers of g, S_3 boxes, tower and membership equations"
+    },
+    "unit": "field multiplications counted by examples/pkm_oracle_program/algebra.rs (every Pol::mul and Pol::scale, including the p-1 scaling inside Pol::sub); additions not counted; per_cell is shared by every target of the cell and is metered once per export process"
+  },
+  "construction_cell_cpu_s": 0.0,
+  "construction_cell_field_multiplications": 0,
+  "construction_cpu_s": 0.000079167,
+  "construction_field_multiplications": 139,
+  "cpu_over_wall": 0.9897553485424192,
+  "cpu_s": 99.413718487,
+  "deadline_secs": 100.0,
+  "degree_bound_binding": false,
+  "degree_reached": 7,
+  "doc": "[pcc:unverified] instrument output; no claim",
+  "extract_field_multiplications": 0,
+  "extraction": {
+    "status": "skipped: F4 run censored"
+  },
+  "field_ops": 35128833437,
+  "field_ops_total_delta": 35128833437,
+  "fp_rational_solutions": null,
+  "inconsistent": false,
+  "m": 4,
+  "matches_classifier": null,
+  "max_cols": 21619,
+  "max_degree": 64,
+  "max_input_degree": 4,
+  "max_rows": 25929,
+  "max_total_degree": 4,
+  "native_ops_total_delta": 79787767,
+  "nequations": 15,
+  "nterms_total": 59,
+  "nvars": 14,
+  "order": "grevlex",
+  "p": 262153,
+  "pairs_above_bound": 0,
+  "presentation": "chain-tower",
+  "schema": "pkm.present-panel.solve/v2",
+  "sha256": "7db2fb2208f14ecc390dfbacf78510f8cc6f3635228be3fbec73ef3466d514fc",
+  "solution_semantics": "ordered_repeats",
+  "solution_semantics_detail": {
+    "classifier_set": "real_count",
+    "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+    "extra_algebraic_solutions": "none beyond twist points of V (x_i in V not on the real base), which do not lift",
+    "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+    "not_representable": "tuples whose fixed-order prefix is an identity partial sum (P + (-P)); their reorderings are present",
+    "ordered": true,
+    "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+    "wires": "m-2 F_p wires: partial-sum abscissae of the fixed left-to-right order"
+  },
+  "solve_field_multiplications": 35128833437,
+  "solving_degree": 6,
+  "solving_degree_max": 7,
+  "steps": 30,
+  "steps_to_solution": 29,
+  "system": "research/pkm_present_panel_20261115/smoke/export_t3_m4/d000000.chain-tower.system.json",
+  "system_file_sha256": "cacc487ae110a0aebd2c0d0df9ff32c669d7e721bb7c1f3fe2c78c740e19f6b8",
+  "t": 3,
+  "threads": {
+    "RAYON_NUM_THREADS": "1",
+    "note": "cpu_over_wall near 1 under RAYON_NUM_THREADS=1 means the engine honours it; well above 1 means it does not",
+    "rayon_current_num_threads": 1
+  },
+  "threads_used": 1,
+  "timed_out": true,
+  "tool": {
+    "git_commit": "41abbf1405a1adaf7f900b74d8875658ec3aac7a",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "1488ae452e54dfed6eaeb4a123297a8cc8736fcc11004129493bbaf348f2b8b5"
+  },
+  "total_cpu_s": 99.41455241999999,
+  "total_wall_s": 100.44513141,
+  "unlifted_solutions": null,
+  "verified_real_decompositions": null,
+  "verified_real_decompositions_count": null,
+  "vm_hwm_kb": 1630876,
+  "wall_s": 100.442719136
+}

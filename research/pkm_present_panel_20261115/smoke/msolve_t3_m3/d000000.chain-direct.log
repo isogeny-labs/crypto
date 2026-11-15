@@ -1,0 +1,117 @@
+
+--------------- INPUT DATA ---------------
+#variables                       4
+#equations                       5
+#invalid equations               0
+field characteristic        262153
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         1
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+ 10       3       3      29 x 139         6.20%        3 new       0 zero         0.00 | 0.00         
+  9       2       8      11 x 28         36.36%        2 new       0 zero         0.00 | 0.00         
+  8       4      10      14 x 29         44.83%        2 new       2 zero         0.00 | 0.00         
+  7       4      10      14 x 29         48.77%        2 new       2 zero         0.00 | 0.00         
+  6       2      11      11 x 26         52.45%        1 new       1 zero         0.00 | 0.00         
+  6       2      11      11 x 26         51.75%        1 new       1 zero         0.00 | 0.00         
+  7       2      12      14 x 28         49.23%        0 new       2 zero         0.00 | 0.00         
+ 11       4      10     200 x 524         2.71%        4 new       0 zero         0.00 | 0.00         
+ 12      10      22     482 x 876         2.17%        6 new       4 zero         0.00 | 0.00         
+ 12      22      28     624 x 1012        2.93%       22 new       0 zero         0.00 | 0.00         
+ 11      36      74     555 x 905         5.87%       34 new       2 zero         0.00 | 0.00         
+ 11     128     132     656 x 880        12.99%       68 new      60 zero         0.01 | 0.01         
+  9      40     214     334 x 578        17.09%       40 new       0 zero         0.00 | 0.00         
+  9     160     226     490 x 562        26.22%       87 new      85 zero         0.01 | 0.01         
+  7      52     285     200 x 305        34.41%       52 new       0 zero         0.00 | 0.00         
+  6      36     333     136 x 205        41.92%       36 new       0 zero         0.00 | 0.00         
+  5      16     337      68 x 121        48.70%       16 new       0 zero         0.00 | 0.00         
+  4      12     338      29 x 57         37.08%        9 new       3 zero         0.00 | 0.00         
+  3       7     331      17 x 25         32.47%        3 new       4 zero         0.00 | 0.00         
+  2       3     326       8 x 9          33.33%        0 new       3 zero         0.00 | 0.00         
+  3       4     323      12 x 15         22.22%        0 new       4 zero         0.00 | 0.00         
+  4      12     319      40 x 49         17.45%        0 new      12 zero         0.00 | 0.00         
+  5      31     307     110 x 113        28.33%        9 new      22 zero         0.00 | 0.00         
+  5      24     272      90 x 91         22.82%       24 new       0 zero         0.00 | 0.00         
+  2       6     282      15 x 10         20.00%        1 new       5 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+reduce final basis        1 x 1         100.00%        1 new       0 zeroTime for rational param:          0.03 (elapsed) sec /  0.03 sec (cpu)
+
+------------------------------------------------------------------------------------
+msolve overall time           0.03 sec (elapsed) /  0.03 sec (cpu)
+------------------------------------------------------------------------------------
+         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ---------------
+overall(elapsed)        0.03 sec
+overall(cpu)            0.03 sec
+select                  0.00 sec  10.7%
+symbolic prep.          0.00 sec   5.6%
+update                  0.01 sec  44.2%
+convert                 0.00 sec   3.4%
+linear algebra          0.01 sec  34.5%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                     1
+#terms in basis                   1
+#pairs reduced                  622
+#GM criterion                 90053
+#redundant elements             426
+#rows reduced                  1269
+#zero reductions                212
+max. matrix data                624 x 1012 (2.934%)
+max. symbolic hash table size  2^11
+max. basis hash table size     2^16
+-----------------------------------------
+
+Grobner basis has a single element
+No solution
+	Command being timed: "msolve -t 1 -v 2 -P 1 -f research/pkm_present_panel_20261115/smoke/export_t3_m3/d000000.chain-direct.ms -o research/pkm_present_panel_20261115/smoke/msolve_t3_m3/d000000.chain-direct.out"
+	User time (seconds): 0.02
+	System time (seconds): 0.00
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.02
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 6784
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 919
+	Voluntary context switches: 1
+	Involuntary context switches: 0
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 24
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

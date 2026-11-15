@@ -1,0 +1,110 @@
+
+--------------- INPUT DATA ---------------
+#variables                       9
+#equations                      10
+#invalid equations               0
+field characteristic        262153
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         1
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  4       3       7      24 x 29          7.18%        3 new       0 zero         0.00 | 0.00         
+  3       3      10       7 x 14         18.37%        3 new       0 zero         0.00 | 0.00         
+  3       5      12      23 x 33          8.96%        0 new       5 zero         0.00 | 0.00         
+  4       4       7      75 x 132         2.64%        4 new       0 zero         0.00 | 0.00         
+  4       9      16      24 x 53          6.60%        9 new       0 zero         0.00 | 0.00         
+  5      46      46     195 x 226         2.41%       16 new      30 zero         0.00 | 0.00         
+  5      70      73     240 x 231         5.36%       19 new      51 zero         0.00 | 0.00         
+  4      30      77     137 x 149        12.87%       22 new       8 zero         0.00 | 0.00         
+  3      12     127      66 x 74         20.72%       12 new       0 zero         0.00 | 0.00         
+  3      72     108     138 x 71         15.34%        7 new      68 zero         0.00 | 0.00         
+  2      21      53      48 x 28         16.67%        0 new      21 zero         0.00 | 0.00         
+  3       1      32      21 x 21         13.83%        0 new       1 zero         0.00 | 0.00         
+  4      24      31      97 x 74         15.35%        0 new      24 zero         0.00 | 0.00         
+  5       7       7      99 x 93          6.60%        0 new       7 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+reduce final basis        9 x 10         17.78%        9 new       0 zeroDimension of quotient: 1
+[1, 1], Non trivial / Trivial = 100.00%
+Density of non-trivial part 100.00%
+Time spent to generate sequence (elapsed): 0.00 sec (0.00 Gops/sec)
+Time spent to compute eliminating polynomial (elapsed): 0.00 sec
+Elimination polynomial has degree 1.
+Time for rational param:          0.00 (elapsed) sec /  0.00 sec (cpu)
+
+------------------------------------------------------------------------------------
+msolve overall time           0.00 sec (elapsed) /  0.00 sec (cpu)
+------------------------------------------------------------------------------------
+         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ---------------
+overall(elapsed)        0.00 sec
+overall(cpu)            0.00 sec
+select                  0.00 sec  13.5%
+symbolic prep.          0.00 sec   5.5%
+update                  0.00 sec  52.3%
+convert                 0.00 sec   8.6%
+linear algebra          0.00 sec  12.3%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                     9
+#terms in basis                  16
+#pairs reduced                  307
+#GM criterion                  5153
+#redundant elements              96
+#rows reduced                   629
+#zero reductions                215
+max. matrix data                240 x 231 (5.361%)
+max. symbolic hash table size  2^11
+max. basis hash table size     2^16
+-----------------------------------------
+
+	Command being timed: "msolve -t 1 -v 2 -P 1 -f research/pkm_present_panel_20261115/smoke/export_t3_m3/d000125.sym-tower.ms -o research/pkm_present_panel_20261115/smoke/msolve_t3_m3/d000125.sym-tower.out"
+	User time (seconds): 0.00
+	System time (seconds): 0.00
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.00
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 6224
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 636
+	Voluntary context switches: 1
+	Involuntary context switches: 0
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 24
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

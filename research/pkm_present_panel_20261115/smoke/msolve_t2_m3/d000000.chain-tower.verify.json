@@ -1,0 +1,68 @@
+{
+  "cpu_s": 0.0002298650000000001,
+  "doc": "[pcc:unverified] instrument output; no claim",
+  "extraction": {
+    "classifier_expected": 0,
+    "classifier_real_count": 0,
+    "classifier_real_count_distinct": 0,
+    "decompositions_signed_base": [],
+    "distinct_x_multisets": 0,
+    "equation_check_failures": 0,
+    "fp_rational_solutions": 0,
+    "lift_and_root_field_multiplications": 0,
+    "lift_field_multiplications": 0,
+    "lift_note": "x_i must be a real base abscissa; decomposition = sorted signed-symbol list whose point sum is exactly R (R lifted to y <= (p-1)/2; counts are invariant under R -> -R)",
+    "matches_classifier": true,
+    "non_split_elem_vectors": 0,
+    "solution_semantics": "ordered_repeats",
+    "solution_semantics_detail": {
+      "classifier_set": "real_count",
+      "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+      "extra_algebraic_solutions": "none beyond twist points of V (x_i in V not on the real base), which do not lift",
+      "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+      "not_representable": "tuples whose fixed-order prefix is an identity partial sum (P + (-P)); their reorderings are present",
+      "ordered": true,
+      "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+      "wires": "m-2 F_p wires: partial-sum abscissae of the fixed left-to-right order"
+    },
+    "unlifted_multisets_not_real_base": 0,
+    "unlifted_solutions": 0,
+    "verified_decomposition_format": "list of decompositions, each a list of [x, sign] pairs (sign +1 = the point with y <= (p-1)/2, -1 = its negative), pairs sorted by (x, sign), decompositions sorted lexicographically",
+    "verified_distinct_abscissa": 0,
+    "verified_real_decompositions": [],
+    "verified_real_decompositions_count": 0,
+    "work": {
+      "point_adds": 0,
+      "point_doubles": 0,
+      "point_field_ops": {
+        "invs": 0,
+        "muls": 0,
+        "sqrs": 0
+      },
+      "root_finding_field_muls": 0
+    }
+  },
+  "fp_rational_solutions": 0,
+  "msolve_outcome": "no_solution_in_closure",
+  "msolve_output": "research/pkm_present_panel_20261115/smoke/msolve_t2_m3/d000000.chain-tower.out",
+  "msolve_output_sha256": "0333251e6ebb3890ef547f522ec55f27f0cef9a860998757e31f3e1b819e7490",
+  "nequations": 8,
+  "nvars": 7,
+  "presentation": "chain-tower",
+  "reconstruction_field_muls": 0,
+  "root_finding_field_muls": 0,
+  "schema": "pkm.present-panel.verify-msolve/v1",
+  "sha256": "79917434048e470d71b00d2a3e3d71a2a932072c78365ca9ff3dfd9afe83f09d",
+  "system": "research/pkm_present_panel_20261115/smoke/export_t2_m3/d000000.chain-tower.system.json",
+  "system_file_sha256": "cca2cfdfbf6154d04fb333066029e4ae2389b8750cfa8c7d2e7998db1f5297f8",
+  "tool": {
+    "git_commit": "41abbf1405a1adaf7f900b74d8875658ec3aac7a",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "1488ae452e54dfed6eaeb4a123297a8cc8736fcc11004129493bbaf348f2b8b5"
+  },
+  "unlifted_solutions": 0,
+  "verified_real_decompositions": [],
+  "verified_real_decompositions_count": 0,
+  "wall_s": 0.000230139
+}
