@@ -187,3 +187,23 @@ One bounded project-context replay under600s using exact public dependency cache
 ### Errors
 
 First attempt was a real diagonal tactic failure; second was a metadata case-classifier failure after all true proofs passed; third complete8-stage replay passes unchanged mathematics/criteria. Earlier v3 source-tree read was truncated by tool output budget before any mutation; larger metadata read succeeded, not a research retry. No gate/trust/keyring/ledger patch or skipped false control. [pcc:unverified]
+
+## 2026-11-15 — completed proof, controls and project replay
+
+### What was done
+
+Five unique chord algebra theorems pass the current unchanged scoped Lean gate; final eight-stage protocol passes all three true gates and rejects all five false statements. Pinned Lake project replay with LEAN_PATH unset passes the same5/0/0 audit. Retained first diagonal source failure and second classifier failure. Local archive restoration/repack exact; historical canonical checker reports10/4 expected incomplete-coverage findings and0 final findings. No signed PCC/global proof/IDC/solver-degree claim. [pcc:unverified]
+
+### Decisions made
+
+Stop replaying this completed component. Preserve dated source/protocols; update active status and pursue proper-extension structured trace membership next. Existing local resources only, no paid resources. GitHub source checkpoint permission persists; raw/report assets remain local after prior upload denials. [pcc:unverified]
+
+### Open threads
+
+Actual trace fixture and odd-subgroup reduction, independent native algebraic membership/audit, projected useful rows and full source-policy frontier, relevant expanded minimum degree and original-source recovery. Automation stays paused; PR stays open/autooff. [pcc:unverified]
+
+### Errors
+
+Original proof normalization failed; existing h2 was explicitly used without changing the theorem. Capitalized Type mismatch required case-insensitive metadata matching. Initial USTAR archive preparation stopped on long paths; deterministic GNU format restores/repackages exactly. Initial incomplete-export flow metadata counted absent rows, corrected using official observed-row flow while retaining10/4 real coverage findings. All originals retained; no scientific rerun for packaging. [pcc:unverified]
+
+Packaging notes: first journal write exceeded the command argument limit before execution; bounded chunks preserved the complete incoming main journal. Whole-journal prose lint finds two inherited lines; own new entry lint is clean, and inherited wording is untouched. Lesson-tool warnings reflect its scratch ROOT; evidence paths target this PR checkout. [pcc:unverified]

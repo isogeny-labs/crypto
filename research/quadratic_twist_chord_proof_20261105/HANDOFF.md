@@ -1,3 +1,11 @@
+# Current handoff — 2026-11-15
+
+The bounded proof run is complete. Official source gate:5 unique public theorems,0 failing/0 trusted-native axioms; final full8-stage plan exits0 with all5 false-statement controls rejected. Pinned Lake PROJECT replay also exits0. Raw outputs, failed sources and incomplete attempts remain local. These are scoped kernel/audit observations, not signed PCC standing, new IDC1s or a solver-degree result. [pcc:unverified]
+
+Read kernel-20261115/README.md before any new work. No rerun of the completed proof/native census is needed. Next research lane: actual proper-extension trace-projected membership with a checked source reduction and full strongest-source frontier. New fixture/source/independent native audit and pre-data contract required. Keep PR3560 open/auto-merge off; automation paused. No process in flight. Result assets remain local under the existing upload boundary.
+
+## Preserved historical handoff
+
 ## Goal
 Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
 ## Lead / hypothesis

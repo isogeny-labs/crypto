@@ -1,3 +1,9 @@
+# Chord algebra and auxiliary-twist experiments
+
+Current status, 2026-11-15: five chord algebra declarations pass the pinned Lean build and unmodified scoped axiom gate; five false-statement controls reject. The native partial-chord study remains a fixed-cap admission improvement with no minimum-degree or strongest-source-frontier gain. See [kernel component](kernel-20261115/README.md) for exact scope, preserved failures and next experiment. [pcc:unverified]
+
+The following entries are historical states, preserved unchanged.
+
 # Chord proof source, not yet executed
 
 Five proposed Lean declarations implement the curve-line factorization, cubic remainder, distinct-root membership and diagonal discriminant. No elaboration, axiom audit, scientific execution or mathematical result is claimed. [pcc:unverified]
