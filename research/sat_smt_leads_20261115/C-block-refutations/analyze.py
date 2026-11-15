@@ -677,7 +677,7 @@ if WRITE:
         fig.savefig(os.path.join(H, name + ".png"), dpi=160)
         plt.close(fig)
 
-    fig, axs = plt.subplots(1, 2, figsize=(10.5, 4.2))
+    fig, axs = plt.subplots(1, 2, figsize=(11, 5.6))
     ax = axs[0]
     series = [(1, "budget 1", "o"), (3, "budget 3 (primary)", "s"), (10, "budget 10", "^")]
     for i, (b, lab, mk) in enumerate(series):
@@ -694,14 +694,14 @@ if WRITE:
     ax.plot(xs, [mean([d["covlift"] for d in cell("sweep", l, 3, 0)]) for l in xs], color=COL[4], lw=2, ls=":", marker="v", ms=6,
             label="budget 3, lift-adjusted events")
     ax.axhline(0.10, color=MUTED, lw=0.8, ls=(0, (4, 4)))
-    ax.text(Ls[0], 0.105, "rule: 10 %", color=MUTED, fontsize=8)
+    ax.text(Ls[0] + 0.12, 0.065, "rule: 10 %", color=MUTED, fontsize=8)
     ax.set_xticks(Ls)
     ax.set_ylim(0, 1.02)
     ax.set_xlabel("l (dimension of V)")
     ax.set_ylabel("share of leaves under an event")
     ax.set_title("Leaves under cheap subcube events (j >= 2, cost < 2^j)", fontsize=10, color=INK, loc="left")
     ax.grid(axis="y", color="#e4e3df", lw=0.6)
-    ax.legend(frameon=False, fontsize=8, loc="center left")
+    ax.legend(frameon=False, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=2)
     ax = axs[1]
     for i, (b, lab, mk) in enumerate([(0, "budget 0 (the scan done by CMS)", "o"), (3, "budget 3", "s"), (10, "budget 10", "^")]):
         xs = [l for l in Ls if cell("sweep", l, b, 0)]
@@ -710,15 +710,15 @@ if WRITE:
         ax.plot(xs, ys, color=COL[i], lw=2, marker=mk, ms=7, label=lab + ": (leaves + conflicts) / 2^l")
         ax.plot(xs, yc, color=COL[i], lw=1.5, ls="--", marker=mk, ms=5, mfc=SURF, label=lab + ": conflicts / 2^l")
     ax.axhline(1.0, color=INK, lw=1)
-    ax.text(Ls[0], 1.04, "linear 2+1 scan = 1", color=INK, fontsize=8)
+    ax.text(Ls[0], 0.72, "linear 2+1 scan = 1", color=INK, fontsize=8)
     ax.set_xticks(Ls)
     ax.set_ylim(0, None)
     ax.set_xlabel("l (dimension of V)")
     ax.set_ylabel("cost at the root / 2^l")
     ax.set_title("Root total of the same runs", fontsize=10, color=INK, loc="left")
     ax.grid(axis="y", color="#e4e3df", lw=0.6)
-    ax.legend(frameon=False, fontsize=7.5, loc="lower left", ncol=1)
-    fig.suptitle("Lead C pilot, non-decomposable targets, rep 0, unverified pilot numbers", fontsize=9, color=MUTED, x=0.01, ha="left")
+    ax.legend(frameon=False, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=1)
+    fig.suptitle("Lead C pilot, 24 non-decomposable targets per size, rep 0; unverified pilot numbers", fontsize=9, color=MUTED, x=0.01, ha="left")
     finish(fig, "fig_covered_fraction_vs_l")
 
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
@@ -738,7 +738,7 @@ if WRITE:
     ax.axhline(1.0, color=INK, lw=1)
     ax.text(Ls[0] - 0.1, 1.02, "alpha = 1: cost doubles with each free coordinate (the scan)", color=INK, fontsize=8)
     ax.axhline(0.9, color=MUTED, lw=0.8, ls=(0, (4, 4)))
-    ax.text(Ls[0] - 0.1, 0.83, "rule: warm upper bound < 0.9", color=MUTED, fontsize=8)
+    ax.text(Ls[0] - 0.1, 0.78, "rule: warm upper bound < 0.9", color=MUTED, fontsize=8)
     ax.set_xticks(Ls)
     ax.set_xlabel("l (dimension of V)")
     ax.set_ylabel("alpha: slope of log2(mean conflicts) in j")
