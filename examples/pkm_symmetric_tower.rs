@@ -928,7 +928,6 @@ fn measure(eqs: &[Pol], n: usize, p: u64, budget: Duration) -> f4_fp::F4Report {
     f4_fp::f4(&input, n, p, &opts)
 }
 
-
 // ============================================ pricing study (2026-11-15) ====
 //
 // `research/pkm_priced_20261115/`: the per-target S5 build, counted
@@ -1102,7 +1101,11 @@ fn ec_add(p1: Pt, p2: Pt, a: u64, p: u64) -> Pt {
         if addm(y1, y2, p) == 0 {
             return None;
         }
-        mulm(addm(mulm(3, mulm(x1, x1, p), p), a, p), invm(mulm(2, y1, p), p), p)
+        mulm(
+            addm(mulm(3, mulm(x1, x1, p), p), a, p),
+            invm(mulm(2, y1, p), p),
+            p,
+        )
     } else {
         mulm(subm(y2, y1, p), invm(subm(x2, x1, p), p), p)
     };
@@ -1176,7 +1179,11 @@ fn run_curve(args: &[String]) {
     let h = n / r;
     let mut gen = None;
     for x in 1..p {
-        let rhs = addm(addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p), inst.b, p);
+        let rhs = addm(
+            addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p),
+            inst.b,
+            p,
+        );
         if let Some(y) = sqrtm(rhs, p) {
             if y == 0 {
                 continue;
@@ -1191,11 +1198,21 @@ fn run_curve(args: &[String]) {
     let (gx, gy) = gen.expect("generator of order r");
     let base = inst.base();
     let on_curve = |x: u64| {
-        let rhs = addm(addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p), inst.b, p);
+        let rhs = addm(
+            addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p),
+            inst.b,
+            p,
+        );
         sqrtm(rhs, p).is_some()
     };
     let liftable = base.iter().filter(|&&x| on_curve(x)).count();
-    let c4 = |l: usize| if l < 4 { 0.0 } else { (l * (l - 1) * (l - 2) * (l - 3)) as f64 / 24.0 };
+    let c4 = |l: usize| {
+        if l < 4 {
+            0.0
+        } else {
+            (l * (l - 1) * (l - 2) * (l - 3)) as f64 / 24.0
+        }
+    };
     // Signed sums: 16 sign patterns over an unordered 4-subset, +-R giving one
     // x value, so 8 x values per subset; a random point hits one with
     // probability (8 C(L,4)) / ((#E - 1)/2) = 16 C(L,4) / #E.
@@ -1249,7 +1266,11 @@ fn run_calibrate(args: &[String]) {
         let (mut q, g) = {
             let mut x = 1;
             loop {
-                let rhs = addm(addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p), inst.b, p);
+                let rhs = addm(
+                    addm(mulm(mulm(x, x, p), x, p), mulm(inst.a, x, p), p),
+                    inst.b,
+                    p,
+                );
                 if let Some(y) = sqrtm(rhs, p) {
                     if y != 0 {
                         break (Some((x, y)), Some((x, y)));
@@ -1291,10 +1312,12 @@ fn run_stage0(args: &[String]) {
     let (inst, mut rng) = legacy_instance(p, m, t);
     let base = inst.base();
     let row = |v: serde_json::Value| println!("{v}");
-    row(serde_json::json!({"kind": "config", "p": p, "m": m, "t": t, "N": m * t, "a": inst.a, "b": inst.b,
+    row(
+        serde_json::json!({"kind": "config", "p": p, "m": m, "t": t, "N": m * t, "a": inst.a, "b": inst.b,
         "g": inst.g, "zeta": inst.zeta, "seed": seed, "targets": targets, "target_lo": lo,
         "f4_targets": f4_targets, "xr_nodes": XR_NODES, "counted_unit":
-        "mulmod = kind0 + kind3 (every executed field multiplication, inversions' included); f4 = f4_fp field_ops (row multiply-subtracts)"}));
+        "mulmod = kind0 + kind3 (every executed field multiplication, inversions' included); f4 = f4_fp field_ops (row multiply-subtracts)"}),
+    );
 
     // Parametric precompute, once per curve, its own snapshot.
     let mut mismatches_total = 0usize;
@@ -1309,11 +1332,13 @@ fn run_stage0(args: &[String]) {
     let pre_ms = t0.elapsed().as_secs_f64() * 1e3;
     let pre = cnt::diff(&cnt::snapshot(), &pre0);
     if let Some(ps) = &param {
-        row(serde_json::json!({"kind": "param_precompute", "xr_nodes": XR_NODES,
+        row(
+            serde_json::json!({"kind": "param_precompute", "xr_nodes": XR_NODES,
             "e_monomials": ps.terms.len(),
             "mulmod": cnt::mulmods(&pre, &(0..cnt::NST).collect::<Vec<_>>()),
             "addsub": cnt::addsubs(&pre, &(0..cnt::NST).collect::<Vec<_>>()),
-            "grid_builds_inside": XR_NODES, "stages": stage_json(&pre), "ms": pre_ms}));
+            "grid_builds_inside": XR_NODES, "stages": stage_json(&pre), "ms": pre_ms}),
+        );
     }
 
     // Tower assembly (x_R independent): counted once, outside both builds.
@@ -1327,7 +1352,9 @@ fn run_stage0(args: &[String]) {
 
     // Planted target: both builds must reproduce the planted decomposition.
     match find_planted(&inst, m, &mut rng) {
-        None => row(serde_json::json!({"kind": "planted", "status": "skipped: no planted decomposition"})),
+        None => row(
+            serde_json::json!({"kind": "planted", "status": "skipped: no planted decomposition"}),
+        ),
         Some((w, _partial, xr)) => {
             let _g = cnt::Guard::enter(cnt::CHECK);
             let se = s_in_e_grid(&inst, m, xr);
@@ -1338,14 +1365,19 @@ fn run_stage0(args: &[String]) {
                 Some(ps) => {
                     let sp = ps.eval(xr);
                     let (eqs, _) = symmetric_system_from(&inst, m, &sp);
-                    (eqs.iter().all(|e| e.eval(&sol, p) == 0), compare_coeffs(&se, &sp))
+                    (
+                        eqs.iter().all(|e| e.eval(&sol, p) == 0),
+                        compare_coeffs(&se, &sp),
+                    )
                 }
                 None => (true, (0, 0)),
             };
             compared_total += cmp.0;
             mismatches_total += cmp.1;
-            row(serde_json::json!({"kind": "planted", "x_r": xr, "grid_vanishes_at_planted": ok_grid,
-                "param_vanishes_at_planted": ok_param, "coeffs_compared": cmp.0, "mismatches": cmp.1}));
+            row(
+                serde_json::json!({"kind": "planted", "x_r": xr, "grid_vanishes_at_planted": ok_grid,
+                "param_vanishes_at_planted": ok_param, "coeffs_compared": cmp.0, "mismatches": cmp.1}),
+            );
             assert!(ok_grid && ok_param, "planted check failed");
         }
     }
@@ -1356,7 +1388,9 @@ fn run_stage0(args: &[String]) {
         let xr = target_xr(seed, t, i, p);
         if base.contains(&xr) {
             excluded += 1;
-            row(serde_json::json!({"kind": "excluded", "target": i, "x_r": xr, "reason": "x_R in V"}));
+            row(
+                serde_json::json!({"kind": "excluded", "target": i, "x_r": xr, "reason": "x_R in V"}),
+            );
             continue;
         }
         let s0 = cnt::snapshot();
@@ -1393,9 +1427,11 @@ fn run_stage0(args: &[String]) {
         }
         row(rec);
     }
-    row(serde_json::json!({"kind": "stage0_verdict", "coeffs_compared": compared_total,
+    row(
+        serde_json::json!({"kind": "stage0_verdict", "coeffs_compared": compared_total,
         "mismatches": mismatches_total, "targets_run": targets - excluded, "excluded_x_r_in_V": excluded,
-        "param_checked": !skip_param, "coefficient_check_passed": !skip_param && mismatches_total == 0}));
+        "param_checked": !skip_param, "coefficient_check_passed": !skip_param && mismatches_total == 0}),
+    );
     if mismatches_total != 0 {
         std::process::exit(3);
     }
@@ -1420,15 +1456,23 @@ fn run_summary(args: &[String]) {
         .filter(|s| !s.is_empty())
         .flat_map(read_jsonl)
         .collect();
-    let curve = read_jsonl(&argv(args, "--curve", "curve.json")).pop().unwrap_or_default();
-    let calib = read_jsonl(&argv(args, "--calib", "calib.json")).pop().unwrap_or_default();
+    let curve = read_jsonl(&argv(args, "--curve", "curve.json"))
+        .pop()
+        .unwrap_or_default();
+    let calib = read_jsonl(&argv(args, "--calib", "calib.json"))
+        .pop()
+        .unwrap_or_default();
     let band: serde_json::Value = std::fs::read_to_string(argv(args, "--band", "band.json"))
         .ok()
         .and_then(|s| serde_json::from_str(&s).ok())
         .unwrap_or_default();
     let amort: f64 = argv(args, "--amortise", "100").parse().unwrap();
     let mean = |key: &dyn Fn(&serde_json::Value) -> Option<f64>| -> Option<f64> {
-        let v: Vec<f64> = rows.iter().filter(|r| r["kind"] == "target").filter_map(key).collect();
+        let v: Vec<f64> = rows
+            .iter()
+            .filter(|r| r["kind"] == "target")
+            .filter_map(key)
+            .collect();
         (!v.is_empty()).then(|| v.iter().sum::<f64>() / v.len() as f64)
     };
     let grid = mean(&|r| r["grid"]["mulmod"].as_f64());
@@ -1436,27 +1480,61 @@ fn run_summary(args: &[String]) {
     let f4 = mean(&|r| r["f4"]["field_ops"].as_f64());
     let inv_share = mean(&|r| {
         let st = r["grid"]["stages"].as_object()?;
-        let inv: f64 = st.values().filter_map(|v| v["mul_inside_inv"].as_f64()).sum();
+        let inv: f64 = st
+            .values()
+            .filter_map(|v| v["mul_inside_inv"].as_f64())
+            .sum();
         let all: f64 = st.values().filter_map(|v| v["mulmod"].as_f64()).sum();
         Some(inv / all)
     });
-    let pre = rows.iter().find(|r| r["kind"] == "param_precompute").and_then(|r| r["mulmod"].as_f64());
-    let (n_order, r_sub) = (curve["order"].as_f64().unwrap_or(f64::NAN), curve["r"].as_f64().unwrap_or(f64::NAN));
-    let y = curve["yield_per_target_derived"].as_f64().unwrap_or(f64::NAN);
-    let need = curve["relations_needed_derived"].as_f64().unwrap_or(f64::NAN);
+    let pre = rows
+        .iter()
+        .find(|r| r["kind"] == "param_precompute")
+        .and_then(|r| r["mulmod"].as_f64());
+    let (n_order, r_sub) = (
+        curve["order"].as_f64().unwrap_or(f64::NAN),
+        curve["r"].as_f64().unwrap_or(f64::NAN),
+    );
+    let y = curve["yield_per_target_derived"]
+        .as_f64()
+        .unwrap_or(f64::NAN);
+    let need = curve["relations_needed_derived"]
+        .as_f64()
+        .unwrap_or(f64::NAN);
     let targets_per_solve = need / y;
     // rho-neg S(w) = s0 + w u is linear in w: fit from the band's weights.
-    let ws: Vec<f64> = band["weights"].as_array().map(|a| a.iter().filter_map(|x| x.as_f64()).collect()).unwrap_or_default();
-    let rho = band["rows"].as_array().and_then(|rs| rs.iter().find(|r| r["arm"] == "rho-neg")).cloned().unwrap_or_default();
-    let ms: Vec<f64> = rho["mean_s"].as_array().map(|a| a.iter().filter_map(|x| x.as_f64()).collect()).unwrap_or_default();
+    let ws: Vec<f64> = band["weights"]
+        .as_array()
+        .map(|a| a.iter().filter_map(|x| x.as_f64()).collect())
+        .unwrap_or_default();
+    let rho = band["rows"]
+        .as_array()
+        .and_then(|rs| rs.iter().find(|r| r["arm"] == "rho-neg"))
+        .cloned()
+        .unwrap_or_default();
+    let ms: Vec<f64> = rho["mean_s"]
+        .as_array()
+        .map(|a| a.iter().filter_map(|x| x.as_f64()).collect())
+        .unwrap_or_default();
     let (rho_s0, rho_u, rho_lin_resid) = if ws.len() == 3 && ms.len() == 3 {
         let u = (ms[2] - ms[0]) / (ws[2] - ws[0]);
-        (ms[0], u, (ms[1] - (ms[0] + u * ws[1])).abs() / ms[1].abs().max(1e-300))
+        (
+            ms[0],
+            u,
+            (ms[1] - (ms[0] + u * ws[1])).abs() / ms[1].abs().max(1e-300),
+        )
     } else {
         (f64::NAN, f64::NAN, f64::NAN)
     };
     let w_cal = calib["w_cal"].as_f64().unwrap_or(f64::NAN);
-    let weights = [("w0", 0.0), ("w0.1", 0.1), ("w1", 1.0), ("w_cal", w_cal), ("10w_cal", 10.0 * w_cal), ("legacy_1/13", 1.0 / 13.0)];
+    let weights = [
+        ("w0", 0.0),
+        ("w0.1", 0.1),
+        ("w1", 1.0),
+        ("w_cal", w_cal),
+        ("10w_cal", 10.0 * w_cal),
+        ("legacy_1/13", 1.0 / 13.0),
+    ];
     let sqrt_r = r_sub.sqrt();
     let arm = |name: &str, per_target_ops: Option<f64>, setup_ops: f64| -> serde_json::Value {
         let mut out = serde_json::Map::new();
@@ -1688,8 +1766,15 @@ mod tests {
         assert_eq!(mulm(r, 7, P), 1);
         let d = cnt::diff(&cnt::snapshot(), &s0);
         assert_eq!(d[cnt::OTHER][2], 1);
-        assert!(d[cnt::OTHER][3] >= 14, "Fermat inversion is about 2 log p mulmods");
-        assert_eq!(d[cnt::OTHER][0], 1, "only the explicit mulm is outside the inversion");
+        assert!(
+            d[cnt::OTHER][3] >= 14,
+            "Fermat inversion is about 2 log p mulmods"
+        );
+        assert_eq!(
+            d[cnt::OTHER][0],
+            1,
+            "only the explicit mulm is outside the inversion"
+        );
     }
 
     #[test]
@@ -1706,7 +1791,10 @@ mod tests {
     fn param_is_exact_on_a_degree_8_family() {
         let fam = |x: u64| {
             let mut f = Pol::zero(4);
-            for (k, e) in [[1, 0, 0, 0], [0, 1, 0, 0], [2, 1, 0, 1], [0, 0, 0, 0]].iter().enumerate() {
+            for (k, e) in [[1, 0, 0, 0], [0, 1, 0, 0], [2, 1, 0, 1], [0, 0, 0, 0]]
+                .iter()
+                .enumerate()
+            {
                 let mut c = 0;
                 for j in 0..=8u64 {
                     c = addm(c, mulm(1000 + 37 * j + 11 * k as u64, powm(x, j, P), P), P);
@@ -1750,7 +1838,11 @@ mod tests {
         let n = curve_order(inst.a, inst.b, P);
         let mut x = 1;
         let pt = loop {
-            let rhs = addm(addm(mulm(mulm(x, x, P), x, P), mulm(inst.a, x, P), P), inst.b, P);
+            let rhs = addm(
+                addm(mulm(mulm(x, x, P), x, P), mulm(inst.a, x, P), P),
+                inst.b,
+                P,
+            );
             if let Some(y) = sqrtm(rhs, P) {
                 if y != 0 {
                     break Some((x, y));
