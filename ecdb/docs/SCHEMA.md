@@ -183,6 +183,8 @@ table with Vélu isogenies of elliptic curves, and `source_curve_id` /
 | `curve_morphism` | covers C -> E. Kinds: GHS Weil descent, generalized GHS, Diem, isogeny-then-GHS, explicit hyperelliptic pullback, Scholten, (2, 2)-gluing, Frey–Kani, Satoh, quotient. Also the descent degree, the GHS magic number m, cover genus, the explicit map, existence over the base field, minimal degree and genus, whether the DLP subgroup is carried, and a per-claim contract |
 | `curve_relation` | typed non-isogeny links: isomorphism (u, r, s, t), quadratic, cubic, quartic and sextic twists, base change (with embedding), Frobenius conjugate, birational model change, reduction mod p, CM lift, quotient by an automorphism |
 | `curve_morphism` | covers C -> E. Kinds: GHS Weil descent, generalized GHS, Diem, isogeny-then-GHS, explicit hyperelliptic pullback, Scholten, (2, 2)-gluing, Frey–Kani, Satoh, quotient (the Ciani quartic quotients, below). Also the descent degree, the GHS magic number m, cover genus, the explicit map, existence over the base field, minimal degree and genus, whether the DLP subgroup is carried, and a per-claim contract |
+| `curve_relation` | typed non-isogeny links: isomorphism (u, r, s, t), quadratic, cubic, quartic and sextic twists, base change (with embedding), Frobenius conjugate, birational model change, reduction mod p, CM lift, quotient by an automorphism |
+| `curve_morphism` | covers C -> E. Kinds: GHS Weil descent, generalized GHS, Diem, isogeny-then-GHS, explicit hyperelliptic pullback, Scholten, (2, 2)-gluing (rows from `import gluings`, below), Frey–Kani, Satoh, quotient. Also the descent degree, the GHS magic number m, cover genus, the explicit map, existence over the base field, minimal degree and genus, whether the DLP subgroup is carried, and a per-claim contract |
 | `dlp_transfer` | routes that move a DLP to another group: Jacobian, Weil restriction, F_{q^k}^* (MOV / Frey–Rück), additive group (anomalous), isogenous curve, extension-field curve, Pohlig–Hellman factor. Each carries invariants, the full cost record, log2 transfer / target / total / matched-reference costs, the ratio, the verdict and notes; the cost model is stored once in the provenance |
 | `certificate` | volcano-level, order, kernel, Jacobian-gluing, cover, primality and irreducibility certificates with their hypotheses |
 
@@ -384,6 +386,89 @@ meets this.
 Counts of the first import into an empty database: 16 fields, 128 quartics,
 120 genus-3 classes, 384 morphisms, 346 distinct quotient curves in 133
 genus-1 classes, 381 `av_component` rows; a second import inserts 0.
+### Genus-2 gluings of census-fp pairs (`ecdb import gluings`)
+
+`src/import/gluing.rs` (also part of `ecdb import all`, after `end-rings`)
+glues pairs of census-fp curves along their 2-torsion. For every pair
+{E1, E2} (E1 = E2 included) of short-Weierstrass census-fp curves over F_p,
+5 <= p < 50, whose cubics split into three distinct linear factors over F_p,
+and for each of the six bijections psi: (a_i, 0) -> (b_i, 0) of the sorted
+2-torsion abscissae, it builds the genus-2 curve C whose Jacobian is
+(2,2)-isogenous to E1 x E2 with kernel the graph of psi. No migration: the
+rows go into existing tables, and `curve_morphism` kind `gluing_2_2` already
+existed.
+
+- **Formula.** Howe, Leprévost and Poonen, "Large torsion subgroups of split
+  Jacobians of curves of genus two or three", Forum Math. 12 (2000),
+  Proposition 4 (the n = 2 case of Frey–Kani 1991):
+  C: y^2 = -prod_i (A (a_j - a_i)(a_i - a_k) x^2 + B (b_j - b_i)(b_i - b_k)), with
+  A = Δ2 A1 / A2 and B = Δ1 B1 / B2 as in the module documentation. A psi
+  for which A1, B1, A2 or B2 vanishes (among them the restriction of an
+  isomorphism E1 -> E2) is counted `gluing_degenerate` and skipped.
+- **Maps.** The sextic is even, h(u) = G(u^2), so C has the quotients
+  Q_X: Y^2 = G(X) (X = u^2, Y = v) and Q_Z: W^2 = Z^3 G(1/Z) (Z = 1/u^2,
+  W = v/u^3). The importer finds an F_p-isomorphism X = lambda x + mu,
+  Y = w y of one quotient onto E1 and of the other onto E2 (a quadratic twist
+  is refused), and stores each composite C -> E as
+  `map` = {"x": {"num", "den"}, "y": {"v_num", "den"}}: x = num(u)/den(u),
+  y = v v_num(u)/den(u), ascending residues mod p, with `quotient`, `convention`
+  and `gluing` (E1, E2, their 2-torsion abscissae, psi, the formula). Degree 2
+  (x o phi has degree 4 on C).
+- **Checks, before any write.** Each census trace is recounted and must equal
+  the trace in ecdb (otherwise `gluing_census_refused` and a problem). C is
+  smooth of genus 2: deg h = 6 and gcd(h, h') = 1 over F_p. Each map is
+  re-proved as the polynomial identity h yn^2 xd^3 = yd^2 (xn^3 + a xn xd^2 +
+  b xd^3) over F_p. L(Jac C) from exhaustive counts of #C(F_p) and #C(F_p^2)
+  must equal L(E1) L(E2) with the traces ecdb holds. A failure is
+  `gluing_crosscheck_failures` with a problem line, and nothing of that gluing
+  is stored. ecdb verifies the isogeny class (equal L-polynomials, Tate), the
+  maps, and the kernel's 2-torsion correspondence: the two stored maps send
+  each Weierstrass pair {(±r, 0)} of C to (a_i, 0) on E1 and (b_i, 0) on E2
+  for the same i, so the graph of psi lies in the order-4 kernel (the order
+  is the theorem's). For j = 0 or 1728 several isomorphisms of a quotient onto
+  E exist; only a pair of maps that realizes psi is stored (the first version
+  could store maps that realized psi composed with an automorphism).
+- **Writes (insert only).** `curve` (family `gluing`, model `hyperelliptic`,
+  `smoothness_status` `proved`); `hyperelliptic_model` (deg f = 6, `split` with
+  2 points at infinity when the leading coefficient is a square, else `inert`);
+  two `curve_morphism` rows of kind `gluing_2_2`, construction
+  `hlp_2_2_gluing_v1_qx` or `hlp_2_2_gluing_v1_qz` by the quotient the map
+  factors through (so a self-gluing keeps both maps), degree 2,
+  `minimal_degree` 2, `subgroup_transfer` `not_tested`, status `proved`; an
+  `isogeny_class_fq` row (status `proved`) and `abelian_variety.isogeny_class_id`
+  where it is NULL; a `curve_zeta` row with [#C(F_p), #C(F_p^2)]. When several
+  (pair, psi) give the same C, the first names it and its maps
+  (`gluing_morphisms_duplicate` counts the rest).
+- **Existing rows.** Before any write the importer reads what ecdb holds for
+  each glued curve: the curve (genus, smoothness), its hyperelliptic_model
+  (f, h, deg f, infinity type and points), curve_zeta (the counts as a prefix,
+  its class), the Jacobian's class, its gluing_2_2 morphisms with the same
+  target and construction (map, degree, status), and the class stored under
+  the computed label (its L-polynomial). A NULL is no disagreement; any other
+  difference refuses the curve as a whole (`gluing_existing_conflicts`, or
+  `gluing_class_conflicts` for a class, with a problem line), and nothing of
+  it is written or overwritten.
+- **Verified so far (no deployed run yet).** Without a database, the ignored
+  test `census_range_sweep` covers the whole range (one curve per
+  F_p-isomorphism class): 3,877 gluings and 227 degenerate psi, every gluing
+  passing. On a throwaway database seeded with every F_p-isomorphism class of
+  curves over 5 <= p < 50 (682 curves, 113 with full 2-torsion, 684 pairs):
+  3,877 gluings computed, 3,841 distinct curves, 7,682 morphisms, 199 genus-2
+  classes, 3,841 Jacobians linked and 3,841 zeta rows, 0 problems; a second run
+  inserted 0. A corrupted stored census trace was refused with its curve, and
+  a glued Jacobian relinked to a wrong class was reported and left unchanged.
+  After the review fixes (kernel check, existing-row comparison), a fresh
+  throwaway database seeded the same way gave the same counts (3,841 curves,
+  7,682 morphisms, 72 duplicate maps of an already-named curve not
+  re-offered, 199 classes, 0 problems), a rerun inserted 0, and an
+  independent script re-checked every stored map identity and the
+  Weierstrass-pair correspondence with the stored psi. Corrupting a stored
+  zeta count, an infinity type, a map, a morphism status, a Jacobian link or
+  the L-polynomial of a stored class each refused the affected curves with a
+  problem line and left the stored rows unchanged.
+- **Not computed.** n = 3 ((3,3) Frey–Kani gluings along anti-isometries of
+  E1[3] and E2[3]), and pairs without full rational 2-torsion (the general
+  2-torsion gluing over the splitting field).
 
 ### Global curves, security, evidence (`0007`)
 

@@ -60,6 +60,10 @@ It holds:
   `ecdb import levels57` certifies the ℓ = 5, 7 levels of every ordinary
   census curve from rational isogenies it computes, replacing upper bounds
   (`level_at_most`) with exact levels.
+- genus-2 curves glued from census-fp pairs with full rational 2-torsion
+  over F_p, p < 50 (`ecdb import gluings`, Howe–Leprévost–Poonen Prop. 4):
+  family `gluing`, the two degree-2 maps C -> E1, C -> E2 as `curve_morphism`
+  kind `gluing_2_2`, and L(Jac C) = L(E1) L(E2), verified by point counts.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).

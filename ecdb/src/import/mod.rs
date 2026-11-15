@@ -23,6 +23,7 @@ pub mod enrich;
 pub mod factor_bases;
 pub mod generated;
 pub mod levels57;
+pub mod gluing;
 pub mod lmfdb;
 pub mod pack;
 pub mod registry;
@@ -219,6 +220,8 @@ pub enum Selection {
     EndRings,
     /// Certified l = 5, 7 volcano levels from computed rational isogenies (census-fp).
     Levels57,
+    /// Genus-2 (2,2)-gluings of census-fp pairs with full rational 2-torsion (src/import/gluing.rs).
+    Gluings,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
     /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10 (curve_ell_torsion, frobenius_ell).
@@ -292,6 +295,10 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // After end-rings and volcanoes: it reads End(E) and cross-checks the craters.
     if all || what == Selection::ClassGroups {
         reports.push(class_group::import(ctx).await?);
+    }
+    // After the census: it reads the census-fp curves and their traces.
+    if all || what == Selection::Gluings {
+        reports.push(gluing::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {
