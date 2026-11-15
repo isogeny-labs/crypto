@@ -15,11 +15,13 @@ def median(xs):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('rundir')
+    ap.add_argument('rundir', nargs='+', help='one or more run directories; their results.jsonl are merged')
     ap.add_argument('--json')
     ap.add_argument('--md')
     args = ap.parse_args()
-    rows = [json.loads(l) for l in open(os.path.join(args.rundir, 'results.jsonl'))]
+    rows = []
+    for rd in args.rundir:
+        rows += [json.loads(l) for l in open(os.path.join(rd, 'results.jsonl'))]
     rows = [r for r in rows if 'skipped' not in r['result']]
     # the Rust panel records the base with the 2-torsion point included; the
     # Python cross-check recorded the x != 0 count (see PREREGISTRATION amendment 1)
