@@ -81,5 +81,10 @@ jobs:
       - name: Run reused-Rust S4 triple-arm root extraction with batched inversion
         timeout-minutes: 2
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s4_triple_projection
+      - name: Audit exact S3 discriminant and signed-S4 generic-group equivalence
+        timeout-minutes: 2
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_discriminant_gate
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_discriminant_gate
       - name: Lint adapter and CLI
         run: cargo +1.100.0 clippy --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib --bin prime31-algebraic-ic -- -D warnings
