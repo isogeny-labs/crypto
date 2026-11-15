@@ -1,0 +1,43 @@
+import Mathlib.Tactic
+namespace TwistTraceQuartic
+variable {K : Type*} [Field K]
+def quartic (A delta s t l : K) := l^4-6*s*l^2-3*s^2-8*t*l-4*(A+delta)
+def realPart (s l : K) := (l^2-s)/2
+def imagY (s t l : K) := l*(realPart s l-s)-t
+
+theorem real_redundancy (A B delta a s t l : K) :
+    (l*(a-s)-t)^2+delta*l^2-a^3-3*a*delta-A*a-B =
+      (a-s)*(2*(l*(a-s)-t)*l-3*a^2-delta-A) +
+      (t^2-s^3-A*s-B)+(l^2-s-2*a)*(delta-(a-s)^2) := by ring
+
+theorem quartic_identity (A delta s t l : K) (h2 : (2:K) ≠ 0) :
+    4*(2*imagY s t l*l-3*(realPart s l)^2-delta-A) =
+      quartic A delta s t l := by
+  unfold quartic imagY realPart
+  field_simp [h2]
+  ring
+
+theorem reconstructed_curve (A B delta s t l : K) (h2 : (2:K) ≠ 0)
+    (ht : t^2=s^3+A*s+B) (hq : quartic A delta s t l=0) :
+    (imagY s t l)^2+delta*l^2 =
+      (realPart s l)^3+3*(realPart s l)*delta+A*(realPart s l)+B+1 := by
+  have hd : l^2-s-2*realPart s l=0 := by
+    unfold realPart
+    field_simp [h2]
+    ring
+  have hi4 : 4*(2*imagY s t l*l-3*(realPart s l)^2-delta-A)=0 := by
+    rw [quartic_identity A delta s t l h2, hq]
+  have h4 : (4:K) ≠ 0 := by
+    intro z
+    have zz : (2:K)*(2:K)=0 := by linear_combination z
+    exact (mul_eq_zero.mp zz).elim h2 h2
+  have hi := (mul_eq_zero.mp hi4).resolve_left h4
+  have hr := real_redundancy A B delta (realPart s l) s t l
+  change (imagY s t l)^2+delta*l^2-(realPart s l)^3-
+    3*(realPart s l)*delta-A*(realPart s l)-B = _ at hr
+  rw [hi, hd, ht] at hr
+  linear_combination hr
+#print axioms real_redundancy
+#print axioms quartic_identity
+#print axioms reconstructed_curve
+end TwistTraceQuartic
