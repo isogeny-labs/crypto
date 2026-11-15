@@ -19,6 +19,7 @@ import numpy as np
 CENS = ("timeout", "as_rlimit", "crash")
 STRATA = ("sat", "unsat")
 BASE = "chain-tower"
+CONTROL = "mono-tower"  # positive control for the statistic at m = 3 (protocol v1.2)
 NOT_CAND = (BASE, "aa")
 SYM = ("sym-tower", "sym-direct")
 READINGS = ("w", "w_plus", "w_solve")
@@ -47,16 +48,22 @@ CHOICES = [
     "(mono-direct included).",
     "|median| > D_AA uses the largest per-curve D_AA of the cell; within_control_distribution uses per-curve medians against "
     "the per-curve D_AA.",
-    "positive control (mono-direct, m = 3) is judged per (cell, stratum): supported_within_scope with a positive median "
+    "positive control (mono-tower, m = 3) is judged per (cell, stratum): supported_within_scope with a positive median "
     "there; if not detected, that stratum's other verdicts are inconclusive.  At m = 4 no control arm exists: verdicts are "
     "not gated by it and carry positive_control = 'not available at m=4'.",
     "w^+ and w^solve and the msolve proxy enter the verdict by sign of their own pooled medians (nonzero and equal to the "
     "primary sign), not by their own tests.",
-    "C1 compares the unordered, sign-carrying sets of verified decompositions (a decomposition = a multiset of "
+    "C1 is semantics-adjusted: tree-tower is compared with the baseline minus tree-missable decompositions; chain-direct/aa "
+    "with the baseline; monolithic arms must contain the baseline, their extras must be chain-missable, and their count must "
+    "equal the classifier's real_count (the monolithic arm stands in for the non-public classifier set, so for m = 4, "
+    "where none runs, a baseline deficiency is only counted as classifier_bound_only).  Exclusions are reported per cell "
+    "(c1_semantics_exclusions).  C1 compares the unordered, sign-carrying sets of verified decompositions (a decomposition = a multiset of "
     "(abscissa, sign) elements; ordered arms collapse); sym arms are compared with the distinct-abscissa subset of the "
-    "baseline's set.  Planted 'found' = non-empty (hidden.json is never read).",
+    "baseline's set.  Planted 'found' = the public planted_abscissae appear among the verified decompositions when the row "
+    "carries them, else the list is non-empty (hidden.json is never read).  A null verified list (extraction skipped or "
+    "censored, instrument status recorded) makes C1 / planted / negative checks not evaluable for that call.",
     "per-arm variety gate: the protocol gives no per-arm count formula from the public classifier fields, so the gate is "
-    "partial: equal fp_rational_solutions within {chain-tower, chain-direct, aa} and within {sym-tower, sym-direct}, and "
+    "partial: equal fp_rational_solutions within {chain-tower, tree-tower, chain-direct, aa} and within {sym-tower, sym-direct}, and "
     "equality with row['predicted_fp_rational'][arm] when the instrument supplies it.",
     "C3 pairs instances by (curve, label, draw rank) as written; cells of different t carry different target files, so "
     "this pairs instances of the same curve and label that are not the same target.",
@@ -262,6 +269,38 @@ def distinct(dec):
     return len({x for x, _ in dec}) == len(dec)
 
 
+MONO_ARMS = ("mono-tower", "mono-direct")
+
+
+def _net_zero(elems):
+    net = {}
+    for x, sg in elems:
+        if sg not in (1, -1):
+            raise AnalysisError(f"decomposition element without a +-1 sign: {(x, sg)}")
+        net[x] = net.get(x, 0) + sg
+    return all(v == 0 for v in net.values())
+
+
+def chain_missable(dec):
+    """True iff every ordering of the summands has an identity prefix sum (prefixes of length 2..m-1, the multiset of
+    signed abscissae with equal-x opposite-sign pairs cancelled being empty)."""
+    m = len(dec)
+    for perm in set(itertools.permutations(dec)):
+        if not any(_net_zero(perm[:k]) for k in range(2, m)):
+            return False
+    return True
+
+
+def tree_missable(dec):
+    """m = 4: every partition of the four summands into two pairs contains a cancelling pair."""
+    if len(dec) != 4:
+        return False
+    for (a, b), (c, d) in (((0, 1), (2, 3)), ((0, 2), (1, 3)), ((0, 3), (1, 2))):
+        if not (_net_zero([dec[a], dec[b]]) or _net_zero([dec[c], dec[d]])):
+            return False
+    return True
+
+
 # ------------------------------------------------------------------ analysis
 class Run:
     def __init__(self, rows, strict_lb=False):
@@ -304,7 +343,8 @@ class Run:
     def controls(self):
         res = {}
         for cell in self.cells:
-            cr = {"c1_evaluated": 0, "c1_not_evaluable": 0, "c1_failures": [], "classifier_failures": [],
+            cr = {"c1_semantics_exclusions": {"chain_missable": 0, "chain_missable_known_instances": 0, "tree_missable": 0},
+                  "classifier_bound_only": 0, "c1_evaluated": 0, "c1_not_evaluable": 0, "c1_failures": [], "classifier_failures": [],
                   "negative_failures": [], "planted_failures": [], "variety_failures": [],
                   "variety_gate": "partial (see choices)", "instances_checked": 0}
             arm_bad = defaultdict(list)
@@ -318,12 +358,23 @@ class Run:
                     rc, rcd = any_row.get("real_count"), any_row.get("real_count_distinct")
                     cr["instances_checked"] += 1
                     where = f"{curve}/{inst}"
+                    for a, r in list(done.items()):
+                        if "verified_real_decompositions" not in r:
+                            raise AnalysisError(f"row {key_of(r)} (censored=no) lacks verified_real_decompositions")
+                        if r["verified_real_decompositions"] is None:  # extraction skipped / censored: not evaluable
+                            cr["c1_not_evaluable_extraction"] = cr.get("c1_not_evaluable_extraction", 0) + 1
+                            del done[a]
                     for a, r in done.items():  # negative control: no false relation
-                        need(r, ["verified_real_decompositions"])
                         if rc == 0 and r["verified_real_decompositions"]:
                             cr["negative_failures"].append(f"{where} {a}: {len(r['verified_real_decompositions'])} "
                                                            f"verified on a real-UNSAT instance")
-                        if label == "planted" and not r["verified_real_decompositions"]:
+                        pab = r.get("planted_abscissae")
+                        if label == "planted" and pab is not None:
+                            want = sorted(pab)
+                            found = any(sorted(x for x, _ in d) == want for d in norm_set(r["verified_real_decompositions"]))
+                        else:
+                            found = bool(r["verified_real_decompositions"])
+                        if label == "planted" and not found:
                             cr["planted_failures"].append(f"{where} {a}: planted decomposition not found")
                             arm_bad[a].append(f"planted not found on {where}")
                     if base is None:
@@ -331,20 +382,50 @@ class Run:
                         continue
                     sb = norm_set(base["verified_real_decompositions"])
                     sbd = {d for d in sb if distinct(d)}
-                    if rc is not None and len(sb) != rc or (rcd is not None and len(sbd) != rcd):
-                        cr["classifier_failures"].append(
-                            f"{where}: baseline verified {len(sb)} (distinct {len(sbd)}) vs classifier "
-                            f"{rc} (distinct {rcd})")
+                    mono = [done[x] for x in MONO_ARMS if x in done]
+                    M = norm_set(mono[0]["verified_real_decompositions"]) if mono else None
+                    # classifier gate.  The classifier's set is not public, only its counts; the monolithic arm (which
+                    # represents every decomposition) stands in for it where it ran.  Distinct-abscissa decompositions are
+                    # never chain-missable (a missable one contains a cancelling pair), so that count is exact.
+                    bad = []
+                    if rcd is not None and len(sbd) != rcd:
+                        bad.append(f"distinct {len(sbd)} vs classifier {rcd}")
+                    if M is not None:
+                        nm = sum(chain_missable(d) for d in M)
+                        if rc is not None and len(M) != rc:
+                            bad.append(f"monolithic arm {len(M)} vs classifier {rc}")
+                        if not sb <= M or len(sb) != len(M) - nm:
+                            bad.append(f"baseline {len(sb)} vs monolithic {len(M)} minus {nm} chain-missable")
+                        cr["c1_semantics_exclusions"]["chain_missable"] += nm
+                        cr["c1_semantics_exclusions"]["chain_missable_known_instances"] += 1
+                    else:
+                        if rc is not None and len(sb) > rc:
+                            bad.append(f"baseline {len(sb)} exceeds classifier {rc}")
+                        if rc is not None and len(sb) < rc:
+                            cr["classifier_bound_only"] += 1  # deficiency cannot be split into missable / bug here
+                    if bad:
+                        cr["classifier_failures"].append(f"{where}: " + "; ".join(bad))
                     for a, r in done.items():
                         if a == BASE:
                             continue
                         sa = norm_set(r["verified_real_decompositions"])
-                        want = sbd if a in SYM else sb
+                        if a in SYM:
+                            want, why = sbd, "distinct-abscissa subset of the baseline"
+                        elif a == "tree-tower":
+                            tm = {d for d in sb if tree_missable(d)}
+                            want, why = sb - tm, f"baseline minus {len(tm)} tree-missable"
+                            cr["c1_semantics_exclusions"]["tree_missable"] += len(tm)
+                        elif a in MONO_ARMS:
+                            ok = sb <= sa and all(chain_missable(d) for d in sa - sb) and (M is None or sa == M)
+                            want, why = (sa if ok else sb), "baseline plus chain-missable extras (full classifier set)"
+                        else:
+                            want, why = sb, "baseline"
                         cr["c1_evaluated"] += 1
                         if sa != want:
-                            cr["c1_failures"].append(f"{where} {a}: {len(sa)} decompositions vs expected {len(want)}")
-                    for grp in (("chain-tower", "chain-direct", "aa"), ("sym-tower", "sym-direct")):
-                        have = {a: done[a].get("fp_rational_solutions") for a in grp if a in done}
+                            cr["c1_failures"].append(f"{where} {a}: {len(sa)} decompositions vs expected {len(want)} ({why})")
+                    for grp in (("chain-tower", "tree-tower", "chain-direct", "aa"), ("sym-tower", "sym-direct")):
+                        have = {a: done[a].get("fp_rational_solutions") for a in grp if a in done
+                                and done[a].get("fp_rational_solutions") is not None}
                         for a, n in have.items():
                             if n is None:
                                 raise AnalysisError(f"{cell}/{where}/{a}: fp_rational_solutions missing")
@@ -397,20 +478,20 @@ class Run:
         # positive control gating (m = 3): second pass
         det = {}
         for v in verdicts:
-            if v["arm"] == "mono-direct":
+            if v["arm"] == CONTROL:
                 det[(v["cell"], v["stratum"])] = (v["supported"] and v["median"] is not None and v["median"] > 0)
         for v in verdicts:
             c = v["cell"]
-            if self.meta[c]["m"] == 3 and ("mono-direct" in self.arms[c]):
+            if self.meta[c]["m"] == 3 and (CONTROL in self.arms[c]):
                 v["positive_control"] = "detected" if det.get((c, v["stratum"])) else "NOT detected"
-                if v["arm"] != "mono-direct" and not det.get((c, v["stratum"])):
+                if v["arm"] != CONTROL and not det.get((c, v["stratum"])):
                     if v["verdict"] in ("supported_within_scope", "within_control_distribution"):
-                        v["reasons"].append("positive control (mono-direct) not detected in this cell/stratum")
+                        v["reasons"].append("positive control (mono-tower) not detected in this cell/stratum")
                         v["verdict"] = "inconclusive"
             else:
                 v["positive_control"] = f"not available at m={self.meta[c]['m']}"
         for v in verdicts:
-            if v["arm"] == "mono-direct" and v["verdict"] == "supported_within_scope" and v["median"] <= 0:
+            if v["arm"] == CONTROL and v["verdict"] == "supported_within_scope" and v["median"] <= 0:
                 v["verdict"] = "inconclusive"
                 v["reasons"].append("supported with the wrong sign (control expects > 0)")
         return verdicts
@@ -596,6 +677,7 @@ def figure(run, out_dir):
     import matplotlib.pyplot as plt
     import matplotlib.ticker
     cols = {"chain-tower": "#1f4e79", "tree-tower": "#e08a00", "chain-direct": "#2a9d8f", "mono-direct": "#c0392b",
+            "mono-tower": "#e377c2",
             "sym-tower": "#7b4fa3", "sym-direct": "#8c564b"}
     ms = sorted({v["m"] for v in run.meta.values()})
     fig, axes = plt.subplots(len(ms), 2, figsize=(11, 4.2 * len(ms)), squeeze=False, sharey=False)
@@ -657,7 +739,7 @@ def figure(run, out_dir):
     plt.close(fig)
 
 
-ARM_DRAW = ["chain-tower", "tree-tower", "chain-direct", "mono-direct", "sym-tower", "sym-direct"]
+ARM_DRAW = ["chain-tower", "tree-tower", "chain-direct", "mono-tower", "mono-direct", "sym-tower", "sym-direct"]
 
 
 def run_summary(run):
@@ -713,10 +795,11 @@ def build_report(run, ctl, daa, v, c3, out, results, protocol, typst_status):
         x = ctl[c]
         body.append([c, x["instances_checked"], x["c1_evaluated"], x["c1_not_evaluable"], len(x["c1_failures"]),
                      len(x["classifier_failures"]), len(x["negative_failures"]), len(x["planted_failures"]),
-                     len(x["variety_failures"]), "INVALID" if x["cell_invalid"] else "ok"])
+                     len(x["variety_failures"]), "INVALID" if x["cell_invalid"] else "ok",
+                     json.dumps(x["c1_semantics_exclusions"])])
     L.append(md_table(["cell", "instances", "C1 arm-instance checks", "C1 not evaluable (baseline censored)", "C1 failures",
                        "classifier gate failures", "false relations (UNSAT)", "planted not found", "variety gate failures (partial)",
-                       "cell"], body))
+                       "cell", "c1_semantics_exclusions"], body))
     for c in run.cells:
         x = ctl[c]
         for kind in ("c1_failures", "classifier_failures", "negative_failures", "planted_failures", "variety_failures"):
@@ -726,10 +809,10 @@ def build_report(run, ctl, daa, v, c3, out, results, protocol, typst_status):
     L.append(md_table(["cell", "curve", "D_AA", "pairs", "not evaluable", "censor mismatches"],
                       [[c, cu, fmt(daa[(c, cu)]["D_AA"]), daa[(c, cu)]["n"], daa[(c, cu)]["n_not_evaluable"],
                         daa[(c, cu)]["n_censor_mismatch"]] for c in run.cells for cu in run.curves[c]]))
-    L.append("\nPositive control for the statistic (mono-direct, m = 3):\n")
+    L.append("\nPositive control for the statistic (mono-tower, m = 3):\n")
     L.append(md_table(["cell", "stratum", "median log2 ratio", "verdict", "control"],
                       [[x["cell"], x["stratum"], fmt(x["median"]), x["verdict"], x["positive_control"]]
-                       for x in v if x["arm"] == "mono-direct"]))
+                       for x in v if x["arm"] == CONTROL]))
     L.append("\n## C2: median paired log2(w_A / w_chain-tower), pooled over curves (section 5)\n")
     L.append("Rule text. `supported_within_scope`: exact sign-flip p <= 0.05/k, bootstrap interval (20,000 resamples, level "
              "1 - 0.05/k) excludes 0, per-curve medians share the sign on every curve, |median| > D_AA, the same sign on w^+ "

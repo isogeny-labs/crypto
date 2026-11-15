@@ -83,7 +83,7 @@ def test_pair_value_censoring_rules():
 
 # ------------------------------------------------------------------ whole pipeline on a synthetic rows.jsonl
 def spec_basic():
-    return {"chain-tower": lin(1), "chain-direct": lin(0.25, proxy_f=0.5), "mono-direct": lin(8, proxy_f=2),
+    return {"chain-tower": lin(1), "chain-direct": lin(0.25, proxy_f=0.5), "mono-tower": lin(8, proxy_f=2),
             "sym-direct": lin(lambda c: 0.5 if c == "c1" else 2.0)}
 
 
@@ -98,7 +98,7 @@ def test_known_medians_and_verdicts(tmp_path):
         assert cd["median_w_solve"] == -2.0 and cd["median_w_plus"] < 0 and cd["median_msolve_proxy"] == -1.0
         assert cd["D_AA"] == 0.0 and cd["verdict"] == "supported_within_scope" and cd["direction"] == "lower"
         assert cd["positive_control"] == "detected"
-        mo = rec(doc, "m3t3", "mono-direct", st)
+        mo = rec(doc, "m3t3", "mono-tower", st)
         assert mo["median"] == 3.0 and mo["verdict"] == "supported_within_scope"
         sy = rec(doc, "m3t3", "sym-direct", st)          # five -1 and five +1 pairs: median 0, S = 0, p = 1
         assert sy["median"] == 0.0 and sy["p"] == 1.0 and sy["verdict"] == "inconclusive"
@@ -118,9 +118,9 @@ def test_censoring_enters_as_inf_and_dropped_counted(tmp_path):
     cdir = lin(0.25, cens_at={("c1", "sat", 4), ("c1", "sat", 0), ("c1", "sat", 1), ("c1", "sat", 2),
                               ("c2", "sat", 0), ("c2", "sat", 1)}, w_lo=10 ** 9)
     mono = lin(8, cens_at={("c1", "sat", 0), ("c1", "sat", 1), ("c2", "sat", 0), ("c2", "sat", 1)})
-    rows = mk_rows([("m3t2", 3, 2, 5, {"chain-tower": chain, "chain-direct": cdir, "mono-direct": mono})])
+    rows = mk_rows([("m3t2", 3, 2, 5, {"chain-tower": chain, "chain-direct": cdir, "mono-tower": mono})])
     rc, out, doc = run_main(tmp_path, rows)
-    md = rec(doc, "m3t2", "mono-direct", "sat")
+    md = rec(doc, "m3t2", "mono-tower", "sat")
     # 4 candidate-censored pairs (+inf), 2 baseline-censored pairs (-inf: c1 idx 4, c2 idx 3), 4 pairs at +3
     # sorted: -inf,-inf,3,3,3,3,inf,inf,inf,inf -> n = 10, median = (3 + 3) / 2 = 3
     assert md["n_pos_inf"] == 4 and md["n_neg_inf"] == 2 and md["median"] == 3.0 and md["n_valid"] == 10
@@ -145,7 +145,7 @@ def test_c1_failure_invalidates_the_cell(tmp_path):
     def dec(arm, label, name):
         if label == "unsat":
             return []
-        if arm == "mono-direct" and name == "d000000":
+        if arm == "mono-tower" and name == "d000000":
             return [[[1, 1], [2, 1], [4, -1]]]                                          # differs from the baseline's set
         return [[[1, 1], [2, 1], [3, -1]]]
     rows = mk_rows([("m3t3", 3, 3, 5, spec_basic())], dec_fn=dec)
@@ -195,13 +195,13 @@ def test_not_applicable_arms_are_not_pairs_and_not_in_k(tmp_path):
 
 
 def test_positive_control_not_detected_makes_cell_inconclusive(tmp_path):
-    spec = {"chain-tower": lin(1), "chain-direct": lin(0.25), "mono-direct": lin(1)}   # mono equals baseline: control blind
+    spec = {"chain-tower": lin(1), "chain-direct": lin(0.25), "mono-tower": lin(1)}   # mono equals baseline: control blind
     rows = mk_rows([("m3t3", 3, 3, 5, spec)])
     rc, out, doc = run_main(tmp_path, rows)
     cd = rec(doc, "m3t3", "chain-direct", "sat")
     assert cd["positive_control"] == "NOT detected" and cd["verdict"] == "inconclusive"
     assert any("positive control" in r for r in cd["reasons"])
-    assert rec(doc, "m3t3", "mono-direct", "sat")["verdict"] == "within_control_distribution"
+    assert rec(doc, "m3t3", "mono-tower", "sat")["verdict"] == "within_control_distribution"
 
 
 def test_m4_cells_are_not_gated_by_the_m3_control(tmp_path):
@@ -235,6 +235,29 @@ def test_c3_censored_numerator_is_a_lower_bound(tmp_path):
     assert g["n_lower"] == 1 and g["n_exact"] == 21
 
 
+def test_null_verified_is_not_evaluable_and_planted_abscissae_checked(tmp_path):
+    spec = {"chain-tower": lin(1), "chain-direct": lin(0.25)}
+
+    def dec(arm, label, name):
+        if label == "unsat":
+            return []
+        if arm == "chain-direct" and name == "d000000":
+            return None                                  # extraction skipped: not evaluable, not a failure
+        return [[[1, 1], [2, 1], [3, -1]]]
+    rows = mk_rows([("m3t3", 3, 3, 5, spec)], dec_fn=dec)
+    for r in rows:
+        if r["label"] == "planted":
+            r["planted_abscissae"] = [1, 2, 3]
+    rc, out, doc = run_main(tmp_path, rows)
+    ctl = doc["controls"]["m3t3"]
+    assert ctl["c1_not_evaluable_extraction"] == 2 and not ctl["cell_invalid"] and not ctl["planted_failures"]
+    for r in rows:
+        if r["label"] == "planted":
+            r["planted_abscissae"] = [1, 2, 4]           # the verified list no longer contains the planted set
+    rc, out, doc = run_main(tmp_path, rows)
+    assert doc["controls"]["m3t3"]["planted_failures"]
+
+
 def test_missing_field_on_completed_row_fails_loudly(tmp_path):
     rows = mk_rows([("m3t3", 3, 3, 5, spec_basic())])
     for r in rows:
@@ -252,3 +275,38 @@ def test_cli_exit_code_on_contract_failure(tmp_path):
     r = subprocess.run([sys.executable, str(ANALYSIS / "build_results.py"), "--results", str(tmp_path / "res"),
                         "--out", str(tmp_path / "o")], capture_output=True, text=True)
     assert r.returncode == 3 and "lacks" in r.stderr
+
+
+def test_semantics_missable_hand_cases():
+    P, N, Q = (1, 1), (1, -1), (2, 1)
+    # SMOKE case {-P,-P,-P,+P}: each of the 3 pairings pairs +P with a -P -> tree-missable; the ordering
+    # (-P,-P,-P,+P) has prefix sums {-P,-P} and {-P,-P,-P} (no cancellation) -> not chain-missable
+    d = tuple(sorted([N, N, N, P]))
+    assert br.tree_missable(d) and not br.chain_missable(d)
+    # {P,-P,Q} (m = 3): ordering (P, Q, -P) has the non-identity prefix {P,Q} -> neither
+    e = tuple(sorted([P, N, Q]))
+    assert not br.tree_missable(e) and not br.chain_missable(e)
+    # four distinct summands: nothing cancels
+    assert not br.tree_missable(((1, 1), (2, 1), (3, 1), (4, -1))) and not br.chain_missable(((1, 1), (2, 1), (3, 1), (4, -1)))
+    # {P,-P,Q,-Q}: pairing (P,Q),(-P,-Q) has no cancelling pair -> not tree-missable
+    assert not br.tree_missable(tuple(sorted([P, N, Q, (2, -1)])))
+
+
+def test_tree_tower_missing_a_tree_missable_decomposition_is_not_a_failure(tmp_path):
+    P, N = [1, 1], [1, -1]
+    full = [[N, N, N, P], [[1, 1], [2, 1], [3, -1], [4, 1]]]
+    spec = {"chain-tower": lin(1), "tree-tower": lin(0.5), "chain-direct": lin(0.25)}
+
+    def dec(arm, label, name):
+        if label == "unsat":
+            return []
+        return full[1:] if arm == "tree-tower" else full
+    rows = mk_rows([("m4t3", 4, 3, 5, spec)], dec_fn=dec, rc=(2, 1))
+    rc, out, doc = run_main(tmp_path, rows)
+    ctl = doc["controls"]["m4t3"]
+    assert ctl["c1_failures"] == [] and not ctl["cell_invalid"]
+    assert ctl["c1_semantics_exclusions"]["tree_missable"] == 12   # 1 per sat or planted instance (5 + 1), 2 curves
+    # a tree-tower that misses the non-missable one is a failure
+    rows = mk_rows([("m4t3", 4, 3, 5, spec)], dec_fn=lambda a, l, n: [] if l == "unsat" else (full[:1] if a == "tree-tower" else full), rc=(2, 1))
+    rc, out, doc = run_main(tmp_path, rows)
+    assert doc["controls"]["m4t3"]["c1_failures"] and "c1_semantics_exclusions" in (out / "RESULTS.md").read_text()

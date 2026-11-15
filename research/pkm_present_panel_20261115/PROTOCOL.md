@@ -302,6 +302,15 @@ Resolved while the runner and analysis were built (`runner/`, `analysis/`), befo
     m = 4, t = 3 run only on curves with `B_real(t = 3) ≥ 5` (the curve rule guarantees it at t = 4 only).
 18. (v1.2) The wrapper's `--min-prime` was not honoured in its first build (every curve landed on p = 1048609);
     fixed in `81242d990e` before any target was used, and the curves re-derived from scratch under the rule above.
+19. (v1.2) C1 is semantics-adjusted for the ordered arms, by a frozen predicate on the decomposition list: a
+    decomposition is *tree-missable* (m = 4) when every partition of its summands into two pairs contains a
+    cancelling pair (same abscissa, opposite sign), and *chain-missable* when every ordering has an identity
+    prefix sum. tree-tower's expected set is the baseline's minus the tree-missable ones; chain-direct and the
+    A/A must equal the baseline; a monolithic arm must contain the baseline, its extras must be chain-missable,
+    and its count must equal `real_count`; where a monolithic arm ran its set stands in for the classifier's
+    (only counts are public), and the baseline must equal it minus the chain-missable ones; at m = 4 a baseline
+    shortfall against `real_count` is reported (`classifier_bound_only`), not judged. Exclusion counts are
+    reported per cell.
 
 ## 9. Freeze
 
