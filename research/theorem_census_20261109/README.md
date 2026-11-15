@@ -391,6 +391,36 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual all-n Miller-function audit](../miller_recursion_audit_20261115/README.md)
+constructs actual nonzero rational functions for every n and actual nonsingular
+point, with actual finite-support point divisor n(P)−([n]P)−(n−1)(O).
+The actual step is1 at a zero input, vertical for negative points, and actual
+chord/vertical otherwise. Its exact actual local-valuation divisor is proved
+in every branch; induction gives all-n source divisors and the n-torsion
+specialization n(P)−n(O). Source leading-residue-one normalization uses actual
+X/Y and the actual infinity valuation, with proved product/quotient closure.
+Any valid normalized i,j functions yield a valid normalized i+j function;
+constructed f1=1. Chosen-function uniqueness and binary-program/runtime
+refinement are not inferred. Actual F5 nonzero T=(4,0), T+T=O, has correct
+vertical step infinity order−2; unsafe ordinary chord has pole−3 and the
+actual prescribed chord-divisor assertion is false. Source Algorithm29
+explicitly requires the exceptional simplification; qualified source survives.
+Over arbitraryK these are nonsingularKpoint divisors; elliptic model over
+algebraically closedK includes all geometric points. SeparateMathlib
+Scheme.localRing/Divisor APIcomparison, general all-function divisor finiteness,
+translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonical pairing/MOV-FR
+and complete14 remainopen. Exact local **PCC-20261115-529612** PASS at2026-11-15T06:52:24Z, signedunverified.
+Whole285/0fail/0trusted/standardfoundations;33modules27exactcredited+6new,
+36formal-config+14artifactpins; full1244-character binding3be8f68d63b18ecd7bf18c28c045b53530c90948403c38146513bc3bcdb1d3bd/native1complete/
+0prefix/0unresolved. Sevenstates/twofailures/fivesuccesses, 261files/
+64objects/32952-byte losslessXZ/fivegate/onepagePDF46939
+fullread/visual/inbounds; final07/projectlogs clean, inheritedauditordeprecation
+recorded. Ch26PDF2–6/printed574–578 text/visual scoped, notall16pages; Def26.3.4/
+Ex26.3.5/Algorithm29/Ex26.3.6 and exactofficial/prior proofs credited. No novelty/
+canonicalpromotion/independentphysicalhost/frozenedits/cryptoPython/spend/upload.
+[pcc:unverified]
+
+
 The [actual finite-point local-ring and divisor audit](../miller_finite_point_audit_20261115/README.md)
 now derives actual nonsingular-point local DVRs, full actual FunctionField fraction
 rings and official normalized adic valuations. Actual evaluation kernel is the
