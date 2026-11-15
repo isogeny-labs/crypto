@@ -37,17 +37,28 @@ From /workspace/scratch/big-prime-halving, commit/push all native source and
 immutable wrapper (already sourcef5b318b482), restore this saved resume to
 .resume/RESUME.md and pass scripts/checkpoint.sh gate after restoring its
 existing upload access. Ready PR4305 records the pending scope. Run
-timeout1500 bash on copied
-wrapper /workspace/scratch/big-prime-halving-runner001.sh with arguments
-/workspace/scratch/big-prime-halving-build002
-/workspace/scratch/big-prime-halving-qualification001
-/workspace/scratch/aux-halving-qualification001. Capture outer log adjacent.
+the following command once, only after the gate succeeds and after checking
+that neither its output directory nor its outer log already exists:
+
+    timeout --signal=KILL 1500 bash /workspace/scratch/big-prime-halving-runner001.sh /workspace/scratch/big-prime-halving-build002 /workspace/scratch/big-prime-halving-qualification001 /workspace/scratch/aux-halving-qualification001 > /workspace/scratch/big-prime-halving-qualification001.log 2>&1
+
+Do not replace any existing output. Retain the outer status and full log.
 Inspect every exit, retain failures, archive whole raw round, publish report/PR.
 After4304lands, retarget4305to main and enable auto-merge under its review/
 validation requirements. Keep the missing numerical qualification explicit.
 
 ## Runs in flight
 None. The shared local gate is complete. No native case or paid job is running.
+At16:06:45Z the CLI, token file/environment and AWS key pair remain unavailable;
+no qualification directory exists. Parent4304 head417dd19e29 has pending
+required CI as last read16:03Z (next normal unchanged-head check about16:53Z).
+Its older PCC43732872143 was cancelled for a higher-priority request, while
+replacement43732981463 was running; do not call the cancellation a pass.
+Child4305 headddba0d7b00 was last read16:04:48Z with validation/PCC/learning
+pending. The new handoff-only head needs its own eventual status; never carry
+those earlier passes forward. The research goal is paused at this documented
+external-access dependency after independent work; its algorithm criterion
+has not been met.
 
 ## Stop and success conditions
 Local functional controls only under AGENTS9a, one thread2GiB, census120s,
