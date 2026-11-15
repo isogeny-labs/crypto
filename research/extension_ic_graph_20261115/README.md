@@ -59,7 +59,32 @@ sampler comparison. The native incremental sampler charges construction,
 cycle detection and uniform restarts; it recovers through IC relations.
 The corrected implementation passes all 33 filtered cubic tests, including
 the exact pilot fresh-stream regression. The failed unbounded-walk prototype
-is retained in validation. Successor timing has not started. [pcc:unverified]
+is retained in validation. [pcc:unverified]
+
+The matched successors completed on source `515a68ce9`. Walk pair-only
+graph/rho is 1.294 and 2.901 on seeds 3/11, against fresh 31.47 and 40.47;
+all 240 executions recover and local controls pass. The different samplers
+have different residual streams. See [fresh 03](local-p67-fresh-20261115-03/report.pdf)
+and [walk 04](local-p67-radding-20261115-04/report.pdf). [pcc:unverified]
+
+[Scale 05](local-pair-scale-20261115-05/report.pdf), frozen by
+[Amendment 4](AMENDMENT_4_SCALE.md), checks p127/523/1039 and fresh seeds
+17/23/37 on source `2c4292443`. All 270 executions recover. At p1039,
+subgroup orders exceed 2^30 and graph/rho is 5.36–14.27. One p127/seed23
+A/A failure remains an inconclusive diagnostic. No measurement was retried.
+[pcc:unverified]
+
+The next [prepared-oracle and epoch controls](AMENDMENT_5_PREPARED_EPOCH.md)
+test cheaper arithmetic on an identical stream and whether trajectory
+coalescence explains the walk's low relation counts. Implementation checks
+are in progress; these treatments have not been measured. [pcc:unverified]
+
+Exact visual copies are under `benchmarks/20261115-cubic-graph-*`. The
+admitted benchmark index and leaderboard remain unchanged: independent
+replay/recompute, strongest-reference coverage and full pricing are missing.
+Historical plans retain their original component hashes; use their pinned
+source checkpoints for replay, rather than the current source by default.
+[pcc:unverified]
 
 ## Scope and status
 
