@@ -66,3 +66,44 @@ research for extension work. Recheck access before any new experiment.
 
 ## CT21 — rational Richelot frontier after degree-seven gluing (2026-11-11)
 **[pcc:unverified]** New supported CT20 B+A/B+B source charts each have three Frobenius-stable quadratic pairings, one degenerate (det=0) and two nondegenerate. Determinants B+A `(0,28,73)` and B+B `(0,33,68)`; the two nondegenerate codomains within each chart differ by `t -> -t`. Frozen representative Richelot output sextics: B+A `[7,15,20,20,95,24,82]`; B+B `[1,63,81,46,18,69,84]`. Local stdlib polynomial/Rabin/Fp2 census finds irreducible degree-six outputs and common #J=12317; each has exactly one rational Richelot kernel (the dual), a forced-backtrack boundary for a *further single rational degree-two hop*. Source CT16 control checked too. See `CT21_RICHELOT_FRONTIER.md`, `ct21_richelot_neighbors.py`, and bounded regression workflow in stacked CT21 PR. Producer check only, independent CI/PCC and original geometric 7-hop still outstanding. Continue exact balanced-divisor P1/N1, both 12,317-class dual[7] validations and 64-lift torsion action to select *which* kernel is transported. No paid compute/benchmark.
+
+
+## CT22 — mod-4 HLP quotient / invariant split Richelot kernel (2026-11-11)
+
+**[pcc:unverified]** Isolated Rust test ct22_mod4_gluing.rs and
+CT22_FOUR_TORSION_INVARIANT.md enumerate an *abstract*, 256-element
+E[4] symplectic module with a 4-element HLP gluing graph, 64 lifts,
+16 quotient J[2] elements, 15 Lagrangian subgroups, and exactly three
+Frobenius-stable Lagrangians for both p=101 elliptic traces
+t=-7,-11 (each 1 mod 4). The opposite/split Richelot norm kernel
+has order four and intersection sizes [4,1,1] with those stable planes.
+Under the **conditional actual HLP diagrams** with odd-degree
+alpha, N1 Phi=alpha N0 shows that Phi maps the split kernel to
+the split kernel and only permutes the two nonsplit kernels. The
+illustrative mod4 B=I+F (det=3 mod4) is not any actual Kohel map;
+a rotated wrong gluing is rejected. Producing Python cross-check
+passed; new Rust workflow/exact-head execution and independent PCC
+are pending. This narrows CT21's *unlabeled* successor
+curve-isomorphism class, but does **not** replace actual E[4]
+maps/kernel labels, geometric divisor correspondences, the 12,317-class
+dual[7] tests, 109 scalar recovery, or full-cost benchmarks. No
+cloud spending. Keep root #3877 ledger/archive gates untouched.
+
+
+### CT22b concrete extension-field result (2026-11-11)
+
+**[pcc:unverified]** CT22 now includes ct22_actual_e4.py:
+constructs *actual* F101^6 elliptic E[4] classes via cubic-field
+half-point x=r +/- sqrt(3r^2+a) and y=zeta*u (zeta^2=2).
+Evaluates all four degree-seven Kohel maps and normalized duals
+at all 16 source/target E[4] elements, 256 group-addition pairs
+per map, plus Frobenius and curve identities. Then forms all
+64 actual product E[4] lifts of the HLP graph for CT20 B+A/B+B,
+replays two product maps and complete 16-class quotient-addition
+tables, and checks the norm-kernel image and wrong-graph negative.
+Local Python producer-run self-check passed; exact-head CI
+and independent signed PCC are pending. This is a genuine
+finite-field elliptic-torsion map, **not** a genus-two balanced
+divisor isogeny. Next: match six target branch points to actual
+product four-torsion cosets for both nonsplit Richelot labels,
+then execute full 12,317-class Phi and dual[7] tests.
