@@ -45,6 +45,21 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [15 November N83 K600 v3 local-store construction control](20261115-n83-k600-v3-local-custody/)
+([PDF](20261115-n83-k600-v3-local-custody/REPORT.pdf),
+[SVG](20261115-n83-k600-v3-local-custody/custody-flow.svg),
+[150 dpi PNG](20261115-n83-k600-v3-local-custody/custody-flow.png))
+records one primary GF(2^83) base construction and independent local-store
+import: 600 signed-Frobenius columns, 99,600 points, and an exact match to
+the historical 3,025,798-byte compressed object. Construction took
+1,102.783 ms; generic replay took 753.807 ms; local publish and fresh pull
+took 36.091 and 22.700 ms; the producer's in-process wall was 1,963.477 ms.
+These are single-sample L0 diagnostics on a shared macOS arm64 Darwin 27.2.0
+host, with no comparative ratio. The [study result and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-local-custody-20261115/RESULT.md)
+are the source of truth. No relation search, matched rho or cold IC total
+runtime was measured, so this documentary record remains outside the admitted
+table; the temporary file store was not an S3 publication.
+
 The [10 November tm1514 recheck at k = 24](20261110-tm1514-recheck/)
 ([PDF](20261110-tm1514-recheck/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a
 frozen re-measurement of the ledger incumbent (`wwalkGg-x09-sr-n2`) against matched
