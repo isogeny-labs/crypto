@@ -422,6 +422,7 @@ struct MultiOut {
     total_ms: f64,
     determined: usize,
     solved: usize,
+    recs: Vec<Option<u64>>,
     ok: usize,
 }
 
@@ -538,6 +539,7 @@ fn sym_multi(
     let t1 = Instant::now();
     let mut solved = 0;
     let mut ok = 0;
+    let mut recs: Vec<Option<u64>> = vec![None; qs.len()];
     for (qi, q) in qs.iter().enumerate() {
         let mut tries = 0u64;
         'target: loop {
@@ -565,6 +567,7 @@ fn sym_multi(
                         let num = fnum.sub(s, fnum.to_mont(a_eff % n));
                         let x = fnum.from_mont(fnum.mul(num, fnum.inv(fnum.to_mont(bb % n))));
                         solved += 1;
+                        recs[qi] = Some(x);
                         if c.mul(Some(g), x) == Some(*q) && x == ks[qi] {
                             ok += 1;
                         }
@@ -590,6 +593,7 @@ fn sym_multi(
         determined,
         solved,
         ok,
+        recs,
     }
 }
 
@@ -630,7 +634,8 @@ fn main() {
             let row = json!({"bits": bits, "curve": c.name, "T": t_count, "inst": ins, "B": bsz, "base_fb": fb,
                 "sym_total_ms": s.total_ms, "sym_setup_ms": s.setup_ms, "sym_pair_ms": s.pair_ms, "sym_collect_ms": s.collect_ms, "sym_per_target_ms": s.per_target_ms,
                 "sym_determined": s.determined, "sym_solved": s.solved, "sym_ok": s.ok,
-                "base_total_ms": base_ms, "base_setup_ms": bsetup, "base_ok": bok});
+                "base_total_ms": base_ms, "base_setup_ms": bsetup, "base_ok": bok,
+                "cert": {"g": [c.canonical(g).0, c.canonical(g).1], "k": ks, "q": qs.iter().map(|q| { let z = c.canonical(*q); [z.0, z.1] }).collect::<Vec<_>>(), "p": c.f.p, "n": c.n, "sym_rec": s.recs, "base_rec": base.as_ref().map(|b| b.0.clone())}});
             writeln!(out, "{row}").unwrap();
             println!("{row}");
         }
