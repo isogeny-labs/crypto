@@ -225,7 +225,7 @@ paths:
       responses: { "200": { description: OK } }
   /v1/curves/{reference}/relations:
     get:
-      summary: Typed relations to other curves (quadratic_twist, isomorphism, birational_model_change), each with other_curve_id and other_slug.
+      summary: Typed relations to other curves (quadratic_twist, isomorphism, birational_model_change, prym_complement), each with other_curve_id and other_slug.
       description: Twist pairs are recorded only for j != 0, 1728 and t != 0, where the quadratic twist is the unique curve with the same j and trace -t.
       parameters: [{ $ref: "#/components/parameters/reference" }]
       responses: { "200": { description: "{curve_id, items[]}" } }
