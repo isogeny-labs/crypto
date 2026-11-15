@@ -48,10 +48,18 @@ try {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(url);
     await page.locator('#graph .node').first().waitFor();
+    await page.locator('#graph [data-node="C2_2"]').click();
+    assert((await page.locator('#details').textContent()).includes('Hyperelliptic'));
+    await page.locator('#graph [data-edge="cC2_2"]').click();
+    assert((await page.locator('#details').textContent()).includes('Finite separable cover'));
+    const model = JSON.parse((await download('#export')).toString());
+    const displayed = await page.locator('#graph [data-edge]').evaluateAll(nodes => nodes.map(n => n.dataset.edge).sort());
+    assert.deepEqual(displayed, model.edges.map(e => e.id).sort());
     await page.locator('#plus').click();
     const svg = await download('#svgExport', output && resolve(output, name + '.svg'));
     const text = svg.toString();
-    assert(text.includes('Transfer graph'));
+    assert(text.includes('Elliptic transfers'));
+    assert(text.includes('same source in every panel'));
     assert(text.includes('c = 0'));
     assert(!text.includes('<parsererror'));
     assert(text.includes('Hyperelliptic'));
@@ -60,7 +68,8 @@ try {
     const png = await download('#pngExport', output && resolve(output, name + '.png'));
     assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
     assert.equal(png.readUInt32BE(16), 2000);
-    assert.equal(png.readUInt32BE(20), 1620);
+    const initialHeight = png.readUInt32BE(20);
+    assert(initialHeight > 2000);
     const pixels = await page.evaluate(async base64 => {
       const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
       const bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
@@ -70,18 +79,18 @@ try {
       ctx.drawImage(bitmap, 0, 0);
       const image = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
       const counts = [0, 0, 0, 0];
-      const colors = [[180,233,138], [123,175,255], [180,154,255], [237,183,121]];
+      const colors = [[49,95,168], [22,123,121], [135,83,156], [113,96,168]];
       for (let i = 0; i < image.length; i += 4) {
         colors.forEach((c, j) => { if (c.every((v, k) => image[i + k] === v)) counts[j]++; });
       }
       return { corner: Array.from(image.slice(0, 4)), counts };
     }, png.toString('base64'));
-    assert.deepEqual(pixels.corner, [16, 23, 34, 255]);
+    assert.deepEqual(pixels.corner, [248, 250, 252, 255]);
     assert(pixels.counts.every(count => count > 40), 'all four object types appear in the PNG');
     await page.locator('#n').fill('6');
     await page.locator('#form button[type=submit]').click();
     const tall = await download('#pngExport');
-    assert(tall.readUInt32BE(20) > 1620, 'the PNG expands for larger graphs');
+    assert(tall.readUInt32BE(20) > initialHeight, 'the PNG expands for larger graphs');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.locator('#pngExport').scrollIntoViewIfNeeded();
     assert(await page.locator('#pngExport').isVisible());

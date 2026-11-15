@@ -86,3 +86,18 @@ Open `tools/curve-atlas/curve-atlas.html` directly in a browser. For source
 development, serve `tools/curve-atlas/dist/` with a static HTTP server.
 JavaScript is used for browser-local interaction; no Python runtime is added
 to the application's computation path. Fonts have system fallbacks.
+
+## Diagram layout revision, 2026-11-15
+
+The initial all-to-one diagram was rejected for visual quality. The live graph
+and both image exports now use the same light-background atlas: separate rows
+for isogenies and each higher-genus cover, with local cover/pullback/norm arrows,
+curve equations, map formulas and genus/dimension labels. Repeated elliptic
+source labels explicitly refer to the same model; the JSON graph remains unique.
+The diagram scrolls on narrow screens rather than shrinking all text to fit.
+
+`REDESIGN.md` and `redesign-validation.log` retain the revision scope and
+producer browser observations; no independent execution standing is asserted.
+[pcc:unverified] The original PCC-pinned logs are unchanged. Shared log/ledger
+conflicts remain assigned to Copilot, so this revision modifies only the tool's
+source and its local notes, not the conflicted files.
