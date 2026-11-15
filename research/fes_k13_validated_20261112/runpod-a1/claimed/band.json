@@ -1,0 +1,209 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "ic-descent-fes-f2",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        15.177113167656225,
+        3081.763055980992,
+        30681.036541301
+      ],
+      "charged_sum": 32603.999999999996,
+      "native_sum": 65877461,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 0.0
+      }
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "ic-descent-inherited-f4",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        15.174320176642675,
+        4621.699133238475,
+        46080.42245079496
+      ],
+      "charged_sum": 32598.0,
+      "native_sum": 98958961,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 0.0
+      }
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "ic-pairtable-mitm2",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        197.21961244612893,
+        216.59552210416246,
+        390.97870902646355
+      ],
+      "charged_sum": 423674.0,
+      "native_sum": 416240,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 8192.0
+      }
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "rho-negation",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        2.7878705300298487,
+        2.9274269810071316,
+        4.18343503980268
+      ],
+      "charged_sum": 5989.0,
+      "native_sum": 2998,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "rho-sfstrong-v2",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        2.5844832898041115,
+        2.677303691154579,
+        3.5126873033087898
+      ],
+      "charged_sum": 5552.07648845554,
+      "native_sum": 1994,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "log2_r": 10.967946705812707,
+      "arm": "rho-sfstrong-v2-aa",
+      "runs": 48,
+      "verified": 48,
+      "mean_s": [
+        2.5844832898041115,
+        2.677303691154579,
+        3.5126873033087898
+      ],
+      "charged_sum": 5552.07648845554,
+      "native_sum": 1994,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-fes-f2",
+      "b": "ic-descent-inherited-f4",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-fes-f2",
+      "b": "ic-pairtable-mitm2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-fes-f2",
+      "b": "rho-negation",
+      "verdict": "rho-negation < ic-descent-fes-f2"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-fes-f2",
+      "b": "rho-sfstrong-v2",
+      "verdict": "rho-sfstrong-v2 < ic-descent-fes-f2"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-fes-f2",
+      "b": "rho-sfstrong-v2-aa",
+      "verdict": "rho-sfstrong-v2-aa < ic-descent-fes-f2"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-inherited-f4",
+      "b": "ic-pairtable-mitm2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-inherited-f4",
+      "b": "rho-negation",
+      "verdict": "rho-negation < ic-descent-inherited-f4"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-inherited-f4",
+      "b": "rho-sfstrong-v2",
+      "verdict": "rho-sfstrong-v2 < ic-descent-inherited-f4"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-descent-inherited-f4",
+      "b": "rho-sfstrong-v2-aa",
+      "verdict": "rho-sfstrong-v2-aa < ic-descent-inherited-f4"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-pairtable-mitm2",
+      "b": "rho-negation",
+      "verdict": "rho-negation < ic-pairtable-mitm2"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-pairtable-mitm2",
+      "b": "rho-sfstrong-v2",
+      "verdict": "rho-sfstrong-v2 < ic-pairtable-mitm2"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "ic-pairtable-mitm2",
+      "b": "rho-sfstrong-v2-aa",
+      "verdict": "rho-sfstrong-v2-aa < ic-pairtable-mitm2"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "rho-negation",
+      "b": "rho-sfstrong-v2",
+      "verdict": "rho-sfstrong-v2 < rho-negation"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "rho-negation",
+      "b": "rho-sfstrong-v2-aa",
+      "verdict": "rho-sfstrong-v2-aa < rho-negation"
+    },
+    {
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": "rho-sfstrong-v2",
+      "b": "rho-sfstrong-v2-aa",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}
