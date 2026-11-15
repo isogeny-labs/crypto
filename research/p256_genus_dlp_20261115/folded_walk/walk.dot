@@ -1,0 +1,17 @@
+digraph folded_walk {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.22", ranksep="0.32"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fb", fontname="Helvetica", fontsize=12, margin="0.14,0.1"];
+  edge [fontname="Helvetica", fontsize=10, color="#496078"];
+  inputs [label="Public G, Q=kG and mixed images\nSame prime subgroup; answer withheld from solver"];
+  jump [label="32 independent coefficient jumps\nD + [u]G' + [v]Q'"];
+  canon [label="Choose canonical signed orbit representative\nApply its multiplier to both coefficients"];
+  collision [label="Distinguished points + 16-state history\nCollision equation and scalar replay"];
+  escape [label="Fruitless short cycle\nBounded doubling/jump escape; counted restart", fillcolor="#fff1d9"];
+  result [label="Producer checks: 54 paired public toy cases\nActual P-256: 32 transitions per arm\nUnsigned; no cost measurement", fillcolor="#e7f4ea"];
+  pending [label="Pending RunPod cost experiment\nSource / A/A / generic / folded controls\nAccess check: HTTP401; no pod launched", style="rounded,dashed,filled", fillcolor="#f3f3f3"];
+  inputs -> jump -> canon -> collision;
+  collision -> escape [label="zero denominator"];
+  escape -> jump [label="resume or bounded failure"];
+  collision -> result [label="recover + replay"];
+  result -> pending [style=dashed];
+}
