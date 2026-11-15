@@ -973,7 +973,7 @@ fn main() {
                 o => panic!("ic5b table mode {o}"),
             };
             let bsz: usize = args.get(9).map(|s| s.parse().unwrap()).unwrap_or(1).max(1);
-            assert!((2..=4).contains(&k));
+            assert!((2..=5).contains(&k)); // k = 5 added for research/mt_ic_retune_20261115
             let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
             let classes = |m: usize| -> f64 {
                 let mut c = 1.0;
