@@ -9,3 +9,9 @@ Changed only the two map literal constructors to iter().copied().collect(); no p
 At01c4ba62 both native builds0 and solver0; auditA101 on exact input-polynomial mismatch before receipt; auditB/controls unstarted. C++ used neg(8) on a FIELD code (1+i), while the quartic requires the INTEGER coefficient−8 (−1 in characteristic7). Rust independently reconstructed the correct coefficient and refused it. Every original source/case/log remains immutable/local. No degree observation from that attempt is accepted. [pcc:unverified]
 
 Change exactly that literal to neg(mod(8)); leave Rust arithmetic, cap/order/resource/coverage/hypotheses/acceptance unchanged. PINS.v3/run-v3 freeze the faithful correction before a fresh complete replay. This is a real producer defect, not an auditor relaxation. [pcc:unverified]
+
+## Actual corrected ordinary-order result before adaptation
+
+At a561d240 all11 stages pass: both builds, all153 scientific configurations plus positive algebra control, two identical independent audit receipts, six changed payloads rejected101/no receipt. Four scientific configurations certify nonempty bases: axis/axis of grids12 and42 at caps16 and20, each ordinary degree8/expanded witness16/two ordered roots.149 remain unknown. NO complete16-branch auxiliary case and NO source arm completes within cap20. This is not a solving-degree or speed improvement. [pcc:unverified]
+
+Next actual algorithm change: weighted graded monomial order consistent with ai weight2, plus the standard coprime-leading-monomial product criterion, applied to both source and auxiliary. Preserve ordinary-order outputs and sources; fresh versioned sources/pins before the same153 cases. Exact witness expansion, input normal forms and every S-pair still independently checked. [pcc:unverified]
