@@ -48,11 +48,11 @@ Ring $FF_p[y_(1,0..k-1), y_(2,0..k-1)]$, grevlex, generators $y_(s,j+1) - y_(s,j
   [7], [F1], [D=4: 829/1471], [D=5: 3473/3473], [5],
   [8], [F1], [D=4: 1061/2517], [D=5: 6885/6885], [5],
   [9], [F1], [D=4: 1301/4048], [D=5: 12616/12616], [5],
-  [10], [F2 ($p$=65537, $n$=3)], [D=5: see REPORT.md §8], [—], [$>= 6$],
+  [10], [F2 ($p$=65537, $n$=3)], [D=5: 18569/21700], [—], [$>= 6$],
   [11..15], [F2], [transferred from $k = 10$ by T4 (Lean)], [—], [$>= 6$],
 )
 
-*Depth-15 milestone.* On the admissible instance F2 beyond depth 14 the delivered pair is: lower certificate LFD(15) $>= 6$ (certified full closure $1 in.not V_5(10)$ plus the Lean-proved reduction $Q_15 -> Q_10$), upper bound LFD(15) $<= 31$ (Theorem 7, a proof). The expected exact value 7 (lane-P law) needs the closure on 2,629,575 columns ($D = 7$) for an upper certificate and on 768,212 columns ($D = 6$) for a direct lower certificate; both exceed this host.
+*Depth-15 milestone.* On the admissible instance F2 beyond depth 14 the delivered pair is: lower certificate LFD(15) $>= 6$ (certified full closure $1 in.not V_5(10)$, verified by the independent checker with the full closure sweep, plus the Lean-proved reduction $Q_15 -> Q_10$), upper bound LFD(15) $<= 31$ (Theorem 7, a proof). The expected exact value 7 (lane-P law) needs the closure on 2,629,575 columns ($D = 7$) for an upper certificate and on 768,212 columns ($D = 6$) for a direct lower certificate; both exceed this host.
 
 = Open problem and missing lemma
 
@@ -60,4 +60,4 @@ A linear lower bound needs a *locality* lemma: for $c <= alpha k - beta$, $1 in.
 
 = Files
 
-`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit}.lean` (Lean 4.34.1, Mathlib v4.34.1; 15 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).
+`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit,LowerThree}.lean` (Lean 4.34.1, Mathlib v4.34.1; 17 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).

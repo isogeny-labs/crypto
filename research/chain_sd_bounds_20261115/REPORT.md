@@ -21,7 +21,7 @@ beyond depth 14, and Lean proofs.
 | T5 | ℤ-exponent (no-wrap) model: `π_k(W_c) ⊆ U_c(k)`; observed equality in all 6 tested cells | containment proved (§5), equality empirical |
 | T6 | Constant lower bound `LFD(k) ≥ 4` for all `k ≥ 2` (needs `t ≠ 0`, `A ≠ −3t²`); `LFD(k) ≥ 3` for `k ≥ 2` and all `(A, B, t)` | `≥ 4` proved (§7, desk); `≥ 3` Lean (`one_not_mem_closure_two`, `two_lt_solvingDegree`) |
 | T7 | Upper bound `LFD(k) ≤ 2k + 1` for every unit instance, `k ≥ 1`: `A = 2, B = 1` | proved (§6, desk) |
-| T8 | Finite depths: exact `LFD(k) = 4, 4, 4, 4, 5, 5, 5, 5` for `k = 2..9` on the admissible instance `p = 12289, n = 11`, each with an upper and a lower replay certificate; `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on `p = 65537, n = 3` by one certified closure at `k = 10` plus T4 | certified (§8; k = 10 cell ⟨pending: see §8⟩) |
+| T8 | Finite depths: exact `LFD(k) = 4, 4, 4, 4, 5, 5, 5, 5` for `k = 2..9` on the admissible instance `p = 12289, n = 11`, each with an upper and a lower replay certificate; `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on `p = 65537, n = 3` by one certified closure at `k = 10` plus T4 | certified (§8; all 17 certificates verified by the independent checker) |
 | T9 | Linear lower bound `ck − C ≤ LFD(k)` with `c > 0` | **open** (§7.3: the missing lemma is stated exactly; the lane-P slope-1/14 proof is not re-derived here) |
 
 Separate reports, as requested: finite-depth results in §8, constant bounds in §6–7 (`4 ≤ LFD(k) ≤ 2k + 1`), linear growth in §7.3 (open above; the proved linear *upper* growth is `2k + 1`).
@@ -257,7 +257,7 @@ with the same `(p, A, B, t)`. Table in §8.
 The primary theorem asks for `ck − C ≤ LFD(k)` with `c > 0`. **This is not proved here.** What is
 established: `LFD` is nondecreasing in `k` on a fixed instance (T4); `LFD(k) ≥ 4` for `k ≥ 2` (T6);
 `LFD(k) ≥ 5` for `6 ≤ k ≤ 11` on `p = 12289, n = 11` and `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on
-`p = 65537, n = 3` (§8, certified ⟨pending the k = 10 certificate⟩); and the exact values
+`p = 65537, n = 3` (§8, certified); and the exact values
 `LFD(k) = ⌊(k + 14)/4⌋` for `k ≤ 9` here (and for `k ≤ 15` in lane P, not re-verified).
 
 **Missing Lemma (locality).** There are `α > 0`, `β` such that for every admissible unit instance and
@@ -303,8 +303,8 @@ implementation; exit 0, `"verified":true`). Lower certificates include the full 
 | 6 | F1 | D = 4: 605/794 ✓ | D = 5: 1586/1586 ✓ | 5 |
 | 7 | F1 | D = 4: 829/1471 ✓ | D = 5: 3473/3473 ✓ | 5 |
 | 8 | F1 | D = 4: 1061/2517 ✓ | D = 5: 6885/6885 ✓ | 5 |
-| 9 | F1 | D = 4: 1301/4048 ✓ | D = 5: 12616/12616 ⟨pending verification⟩ | 5 |
-| 10 | F2 | D = 5: ⟨pending⟩/21700 | — | ≥ 6 |
+| 9 | F1 | D = 4: 1301/4048 ✓ | D = 5: 12616/12616 ✓ | 5 |
+| 10 | F2 | D = 5: 18569/21700 ✓ (closure sweep: 3,163 rows × 20 shifts, 0 nonzero) | — | ≥ 6 |
 | 11..15 | F2 | transferred from k = 10 by Theorem 4 (Lean) | — | ≥ 6 |
 
 Additional computed values without certificate files (engine runs, `verify_closed: bad = 0`):

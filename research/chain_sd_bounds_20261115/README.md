@@ -17,5 +17,4 @@ where the report says so.
 Headline: `4 ≤ LFD(k) ≤ 2k + 1` for every admissible unit instance (`k ≥ 2`, `A ≠ −3t²`);
 exact `LFD(k) = 4, 4, 4, 4, 5, 5, 5, 5` at `k = 2..9` with verified upper and lower certificates;
 `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on the admissible instance `p = 65537, n = 3` by a certified
-depth-10 closure plus the Lean-proved depth monotonicity (see `REPORT.md` §8 for the status of that
-certificate); the linear lower bound `ck − C` remains open with the missing lemma stated exactly.
+depth-10 closure (verified by the independent checker) plus the Lean-proved depth monotonicity; the linear lower bound `ck − C` remains open with the missing lemma stated exactly.

@@ -26,7 +26,7 @@ cert = V["certified"]
 ax.scatter([c["k"] for c in cert], [c["lfd"] for c in cert], marker="o", s=46, color="#d62728", zorder=5,
            label="certified exact LFD (upper+lower replay certificates, p=12289 n=11)")
 comp = V["computed"]
-ax.scatter([c["k"] for c in comp], [c["lfd"] for c in comp], marker="s", s=40, facecolors="none", edgecolors="#d62728", zorder=4,
+if comp: ax.scatter([c["k"] for c in comp], [c["lfd"] for c in comp], marker="s", s=40, facecolors="none", edgecolors="#d62728", zorder=4,
            label="computed exact LFD (engine, verify_closed; no certificate file)")
 lane = V["laneP_unverified"]
 ax.scatter([c["k"] for c in lane], [c["lfd"] for c in lane], marker="x", s=40, color="#1f77b4", zorder=4,
