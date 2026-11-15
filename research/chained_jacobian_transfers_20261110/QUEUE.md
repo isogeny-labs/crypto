@@ -1,3 +1,13 @@
+# The finite FB30 mismatch is present before descent
+
+pcc/claims/PCC-20261115-3555e4.json: exact published consumerfe914417 character3a7d56/full60calls/13200direct-source norm-cofactor4-BSGSwitnesses/15125relation occurrences. Everyrelation and all180canonical-character decompositions hold; all60postsolver ratios pass actualtarget checks. FB30all15functional tables differon29columns/179-171-174knownlogs/all45Yvalues;45largerFBcalls agree. Full53962B/twoopenedpage report2fd6b0 and currentproblem02 mirrored. All343producer science/transfergraph unchanged. [pcc:unverified]
+
+Rankc0479c360certificates/1440470rowoperations/FB30nullities6-10-13/largerFBnullity1; proof19c467bothoriginalgates27declarations0trusted/allninebindings; passive d118b9full100native60calls660events/strictnon-timeparity; acceptedIC-samplerCI0b4ddb/full474memberartifact/wholecontrols-runtime-prepared-logs remain preserved. Everyfailed source/report/governance/transport specimen remains, with exact frozenprose negative1/currentcanonical0 and byte-preserved generated assets/raw diagnostics. [pcc:unverified]
+
+NEXT: genuineNEW27/allcomplete post26 source-build-native-runtime-fullprepared-raw-control-failure-wholeGitHubartifact-log-reportdraft roots. Stage archive and newGitblob cache inRAM as needed for diskcapacity, retain whole input/custody receipts and normal publication/replays-before-actualbot/exactFF/allheldbyte-link rules. Then prospective whole diagnosticCI and prior-review/frozen unassisted relation-completion successor. No numericLean/globalmodel-program-character/causal/calibrated/strongest-reference ormerge waiver. Vault8edec422/VLT1 only and KB127 remain explicit. [pcc:unverified]
+
+---
+
 # Accepted CI, passive capture and complete finite relation ranks
 
 pcc/claims/PCC-20261115-719d74.json: exact normallypublished consumer4ec3401 mirror. Fresh GitHub CI0b4ddb/whole43MB474member artifact/102phases1503guards/two100-101populations/allcontrols/both26declarationgates14bindings/fullruntime-preparedclosure/fulljob-runlogs and actual downloadedRust replays; passive captured118b9/full100native60calls660events28phases/allnon-time reports-counters/scalar/inputparity/fourwhole-stage omissions101. [pcc:unverified]
