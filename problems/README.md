@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Prepared/joint collector runtime qualification](point-table-joint-runtime-qualification.md) | open | matched native point-table/joint runtime result | current-source S3 upload/readback, authenticated exact native image/execution, admitted matched comparison |
 | [Prepared-table PCC/artifact storage](prepared-point-tables-ledger-artifact-policy.md) | open | canonical producer artifact registration | reviewed append-only storage contract or approved policy exception covering gate and migration readers |
 | [Historical benchmark registry path](benchmark-record-mutable-registry-path.md) | resolved | offline archived-input availability for a reused registry path | existing guarded archive verification, matched readback and substitution controls; both records preserved |
 | [Primo has no prime-field or bit-vector route for index calculus](primo-prime-field-theory-gap.md) | open | using `primo-smt` on prime-field IC or claiming a prime-field performance advantage from the binary adapter | exact native frontend or qualified Primo theory support, SAT/UNSAT controls with independent model checks, and a matched stage benchmark |
