@@ -100,3 +100,32 @@
 - The proof-record outer batch reported1 despite a successful Clippy transcript;
   retained it and checked the explicit Clippy status separately:0, no source change.
 - No frozen research source, pre-call record, original bound or cap changed.
+
+## 17:35Z — Published research follow-on and prepared run bundle
+
+### What was done (commands, files, features)
+- Published PR4313 at a8d410f0e. The first current-head check shows mergeable,
+  ordinary validation in progress and no observed failing check; not all passed.
+- Preserved latest-main journal210incoming/210own full blocks in a212-block
+  union with both multiplicities checked; receipt journal-merge-001.json. Main
+  ledger prefix and all frozen/inherited source bindings pass. No numeric
+  qualification was repeated for this metadata-only merge.
+- Prepared /workspace/p256-minimal-transport-ready.tar.gz from published a8d410f0e,
+  with the original binary, source archive, clean source-state receipt, qualifier,
+  saved instructions and SHA256 manifest. It is a local handoff, not an S3
+  checkpoint or a RunPod execution receipt.
+
+### Decisions made (and why)
+- Keep the original requirement open and ask only for missing environment access:
+  RunPod key and checkpoint-upload route. Neither authorization nor a new
+  performance result is inferred from the lack of a response.
+- Enable ordinary MERGE auto-merge under current-head checks; never bypass a
+  failed review/validation gate. Shared PR12 is already merged.
+
+### Open threads (unfinished, pick up next time)
+- PR4313 required checks/review, checkpoint upload and provider authentication.
+- Then execute the exact source-bound native qualifier and charge complete cold
+  map/destination/solve costs. No pod, candidate panel or timed run is active.
+
+### Errors (what went wrong, how it was handled)
+- None beyond the preserved source-review/build/administrative diagnostics.
