@@ -10,6 +10,8 @@ Let E/F128 be ordinary, let t=129-#E(F128), and set A=Res_(F128/F2) E. A smooth 
 
 For each of these eight traces, the census finds exactly one F2-isomorphism class. In the published n=7 W1 source family, the trace set is `{-17,-15,-9,-7,-1,1,7,9,15,17}`. Hence its genus-seven hyperelliptic route exists at `±15, ±9, ±1` and is excluded at `±17, ±7`. The `±9` source classes occur only in the nonclassical W1 coefficient slice of the q=2 census; they are new **geometry candidates in this bounded audit**, not a new GHS family or a demonstrated vulnerability. The `±13` hyperelliptic classes are outside the observed W1 source trace set.
 
+In the frozen 112-equation source census, the trace bins have 14 equations at `±15` combined, 42 at `±9`, 28 at `±1`, and 28 at `±17,±7` combined. Thus 84 of 112 exact source equations pass this genus-seven hyperelliptic **isogeny-class existence** screen, while 28 fail it. These are equation counts in the fixed field representation, not counts of distinct isomorphism classes or curves with an explicit subgroup transfer.
+
 ## Reduction and proof boundary
 
 The Weil polynomial of A is `X^14-tX^7+128`; its reciprocal L-polynomial is `1-tT^7+128T^14`. If J_Y~A, the point counts are `N_m=2^m+1` for 1≤m≤6 and `N_7=129-7t`. Ordinarity gives 2-rank seven. [Borodin–May, Lemmas 2.1–2.2](https://arxiv.org/pdf/2508.16886) then force the eight geometric Weierstrass points into one rational point and one degree-seven Frobenius orbit; the detailed parity argument is in `BRANCH_SUPPORT_BOUND.md`.

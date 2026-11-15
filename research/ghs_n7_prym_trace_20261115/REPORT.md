@@ -39,6 +39,8 @@ The [same proof for any even q](BRANCH_SUPPORT_BOUND.md) gives an exact branch-s
 
 The [complete finite census](HYPERELLIPTIC_CLASSIFICATION.md) tested 294,912 normalized equations over those supports. A separate direct `(x,y)` program reproduced every stage count and trace bin. The only genus-seven hyperelliptic Jacobian traces are `±15, ±13, ±9, ±1`, with one F2-isomorphism class per trace in this normalized search. Intersecting with the W1 source traces gives:
 
+Of the 112 exact source equations, 84 pass the genus-seven hyperelliptic isogeny-class existence screen and 28 (`±17,±7`) fail it. The 42 `±9` passing equations are entirely in the nonclassical W1 slice. These counts do not certify any subgroup transfer.
+
 The trace-set intersection and witness seventh-count arithmetic were checked in [`HyperellipticTraceLedger.lean`](HyperellipticTraceLedger.lean). The Lean input lists come from the native census; the geometric completeness theorem and Jacobian isogeny application remain paper-level and require independent review. The [proof map and prior-work check](HYPERELLIPTIC_CLASSIFICATION.md) give the exact scope.
 
 | W1 trace class | genus-seven hyperelliptic target with the required Weil polynomial | source status |
