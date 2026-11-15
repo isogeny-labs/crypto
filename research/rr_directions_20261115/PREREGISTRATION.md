@@ -72,3 +72,22 @@ P4. On the norm form F4 solving degree is 4 at m = 7 (smoke) and at most 5 at m 
 Changing the encoding, witnesses, budget or seed between arms; counting a timeout as a
 refutation; any statement about n = 83 or 131; any end-to-end or rho comparison (this is a
 stage diagnostic, AGENTS.md §2/§5).
+
+## Amendment 1 (2026-11-15T02:50Z, additive, before the Rust panel ran)
+
+- **Instrument of record** is `examples/rr_quadratic_panel.rs` (Rust, AGENTS.md
+  implementation-language rule), not the Python harness; the Python passes already started
+  (`runs/panel_20261115/`, 1 GiB F4 matrix cap) stay as a cross-check on the same cell
+  definitions and are labelled as such.
+- **Factor base definition.** 0 ∈ V always, and both polynomial systems admit the 2-torsion
+  point T = (0, 1) as a summand (the smoke run found 3 verified extra norm solutions with
+  x_i = 0 at m = 7). The base is therefore *every affine point with x ∈ V, T included*, and
+  the ground truth is `truth_ordered_*_incl_2torsion`. The Python count was changed to match
+  for future runs; its committed records before this amendment used the x ≠ 0 count.
+- **F4 matrix cap.** The smoke runs hit the default cap `MAX_MATRIX_WORDS = 2^27` (1 GiB) on
+  the incidence arm at m = 7, degree 4. The Rust panel runs with
+  `F4_F2_MAX_MATRIX_WORDS = 2^30` (8 GiB; the container has 15 GiB) through a new,
+  default-preserving environment override in `pq_f4_f2.rs`; the 600 s budget stands. A
+  result that is still undecided then reports which of the two limits stopped it.
+- **F4 budget overrun.** F4 checks its deadline between matrices, so a step can overrun it
+  (85 s against a 60 s budget in the smoke run); reported wall is the true wall.

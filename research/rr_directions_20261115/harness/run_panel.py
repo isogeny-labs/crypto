@@ -69,9 +69,13 @@ def drawInstance(f, curve, ell, rng, planted):
 
 
 def countTruth(curve, span, target):
+    """Ordered factor-base triples summing to target; the base is every affine
+    point with x in V, the 2-torsion point (0, 1) included since 0 is in V and
+    both polynomial systems admit it (the Rust panel records both counts)."""
     pts = []
     for x in span:
         if x == 0:
+            pts.append((0, 1))
             continue
         p = curve.pointFromX(x)
         if p is not None:
