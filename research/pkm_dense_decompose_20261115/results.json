@@ -3,11 +3,11 @@
  "metric": "field_ops (counted F_p multiplications)",
  "validity": {
   "V1": {
-   "checked": 76,
+   "checked": 150,
    "disagree": []
   },
   "V2": {
-   "planted": 34,
+   "planted": 68,
    "without_relation": []
   },
   "V3": [
@@ -23,7 +23,22 @@
    },
    {
     "cell": "m2-t8",
-    "pairs": 2,
+    "pairs": 4,
+    "equal": true
+   },
+   {
+    "cell": "m3-t2",
+    "pairs": 4,
+    "equal": true
+   },
+   {
+    "cell": "m3-t3",
+    "pairs": 4,
+    "equal": true
+   },
+   {
+    "cell": "m3-t4",
+    "pairs": 4,
     "equal": true
    }
   ],
@@ -54,7 +69,22 @@
    [
     2,
     256,
-    0.000985245400625518
+    0.0009852559498218169
+   ],
+   [
+    3,
+    4,
+    0.13288008651073374
+   ],
+   [
+    3,
+    8,
+    0.0819629463716763
+   ],
+   [
+    3,
+    16,
+    0.04101801242128452
    ]
   ],
   "verdict": "held"
@@ -83,9 +113,29 @@
     2,
     128,
     1.00388291186381
+   ],
+   [
+    2,
+    256,
+    1.0019245814919582
+   ],
+   [
+    3,
+    4,
+    4.066008590158993
+   ],
+   [
+    3,
+    8,
+    1.01287196560931
+   ],
+   [
+    3,
+    16,
+    1.0038526970451214
    ]
   ],
-  "verdict": "held"
+  "verdict": "falsified"
  },
  "P4": {
   "cells": [
@@ -118,6 +168,30 @@
     256,
     "coset",
     180.64603378626515
+   ],
+   [
+    3,
+    4,
+    "coset",
+    43.17176317501627
+   ],
+   [
+    3,
+    8,
+    "coset",
+    3549.434845735027
+   ],
+   [
+    3,
+    16,
+    "coset",
+    31450.209063764207
+   ],
+   [
+    3,
+    32,
+    "coset",
+    247518.46775798048
    ]
   ],
   "verdict": "held"
@@ -292,20 +366,172 @@
    "vkind": "coset",
    "membership": "both",
    "censored": 0,
-   "tower_planted_ops_median": 9985312283.5,
-   "tower_planted_over_enum_median": 183351.30891479985,
+   "tower_planted_ops_median": 9985205369.0,
+   "tower_planted_over_enum_median": 183349.34573999266,
    "tower_staircase_max": 2,
-   "tower_linear_stage_share_median": 1.5422656645484642e-08,
+   "tower_linear_stage_share_median": 1.5823410151435214e-08,
+   "tower_random_ops_median": 9979181522.0,
    "dense_planted_ops_median": 9837983.0,
    "dense_planted_over_enum_median": 180.64603378626515,
    "dense_staircase_max": 2,
    "dense_linear_stage_share_median": 5.18398944173821e-06,
-   "dense_over_tower_planted_median": 0.000985245400625518,
+   "dense_random_ops_median": 9837952.0,
+   "dense_over_tower_planted_median": 0.0009852559498218169,
    "dense_over_tower_planted_range": [
     0.000985234851429219,
     0.0009852559498218169
    ],
    "enum_ops": 54460
+  },
+  {
+   "cell": "m2-t8-random",
+   "p": 1399680001,
+   "m": 2,
+   "S": 256,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 9856917.0,
+   "dense_planted_over_enum_median": 197.96186134318765,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 5.1740315962891844e-06,
+   "dense_random_ops_median": 9856886.0,
+   "enum_ops": 49792
+  },
+  {
+   "cell": "m3-t2-both",
+   "p": 1399680001,
+   "m": 3,
+   "S": 4,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 499360.0,
+   "tower_planted_over_enum_median": 324.89264801561484,
+   "tower_staircase_max": 3,
+   "tower_linear_stage_share_median": 0.0004405639218199295,
+   "tower_random_ops_median": 475447.0,
+   "dense_planted_ops_median": 66355.0,
+   "dense_planted_over_enum_median": 43.17176317501627,
+   "dense_staircase_max": 3,
+   "dense_linear_stage_share_median": 0.0026976113329816895,
+   "dense_random_ops_median": 57907.0,
+   "dense_over_tower_planted_median": 0.13288008651073374,
+   "dense_over_tower_planted_range": [
+    0.13288008651073374,
+    0.13288008651073374
+   ],
+   "enum_ops": 1537
+  },
+  {
+   "cell": "m3-t2-random",
+   "p": 1399680001,
+   "m": 3,
+   "S": 4,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 269800.0,
+   "dense_planted_over_enum_median": 175.53675992192584,
+   "dense_staircase_max": 3,
+   "dense_linear_stage_share_median": 0.0006634544106745737,
+   "dense_random_ops_median": 256270.0,
+   "enum_ops": 1537
+  },
+  {
+   "cell": "m3-t3-both",
+   "p": 1399680001,
+   "m": 3,
+   "S": 8,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 238612530.0,
+   "tower_planted_over_enum_median": 43305.35934664247,
+   "tower_staircase_max": 6,
+   "tower_linear_stage_share_median": 8.285398926871108e-06,
+   "tower_random_ops_median": 237586213.0,
+   "dense_planted_ops_median": 19557386.0,
+   "dense_planted_over_enum_median": 3549.434845735027,
+   "dense_staircase_max": 6,
+   "dense_linear_stage_share_median": 8.917347134223356e-05,
+   "dense_random_ops_median": 18966498.0,
+   "dense_over_tower_planted_median": 0.0819629463716763,
+   "dense_over_tower_planted_range": [
+    0.08075005479411868,
+    0.0819629463716763
+   ],
+   "enum_ops": 5510
+  },
+  {
+   "cell": "m3-t3-random",
+   "p": 1399680001,
+   "m": 3,
+   "S": 8,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 19809128.0,
+   "dense_planted_over_enum_median": 3595.1230490018147,
+   "dense_staircase_max": 6,
+   "dense_linear_stage_share_median": 8.804022064979336e-05,
+   "dense_random_ops_median": 19216967.0,
+   "enum_ops": 5510
+  },
+  {
+   "cell": "m3-t4-both",
+   "p": 1399680001,
+   "m": 3,
+   "S": 16,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 15920618832.0,
+   "tower_planted_over_enum_median": 766741.4193796956,
+   "tower_staircase_max": 6,
+   "tower_linear_stage_share_median": 1.3099364753021018e-07,
+   "tower_random_ops_median": 15884632465.0,
+   "dense_planted_ops_median": 653032141.0,
+   "dense_planted_over_enum_median": 31450.209063764207,
+   "dense_staircase_max": 6,
+   "dense_linear_stage_share_median": 2.6706189335939593e-06,
+   "dense_random_ops_median": 633904462.0,
+   "dense_over_tower_planted_median": 0.04101801242128452,
+   "dense_over_tower_planted_range": [
+    0.041017893249524644,
+    0.041027888319828995
+   ],
+   "enum_ops": 20764
+  },
+  {
+   "cell": "m3-t4-random",
+   "p": 1399680001,
+   "m": 3,
+   "S": 16,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 655548076.0,
+   "dense_planted_over_enum_median": 20457.109564674676,
+   "dense_staircase_max": 6,
+   "dense_linear_stage_share_median": 2.6603693365122467e-06,
+   "dense_random_ops_median": 636416385.0,
+   "enum_ops": 32045
+  },
+  {
+   "cell": "m3-t5-dense",
+   "p": 1399680001,
+   "m": 3,
+   "S": 32,
+   "vkind": "coset",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 25130302513.0,
+   "dense_planted_over_enum_median": 247518.46775798048,
+   "dense_staircase_max": 6,
+   "dense_linear_stage_share_median": 6.939828914108067e-08,
+   "dense_random_ops_median": 24243671900.0,
+   "enum_ops": 101529
   }
  ],
  "note": "No claim about cryptographic sizes or Pollard rho [pcc:unverified]."
