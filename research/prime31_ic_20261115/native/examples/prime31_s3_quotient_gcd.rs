@@ -193,8 +193,9 @@ fn split_linear_roots(f: &[u64], remaining_depth: usize) -> Result<Vec<u64>,Stri
         let z=powmod_poly(xshift.clone(),(P-1)/2,f);
         // Include zero, nonzero squares and non-squares. Any nontrivial
         // factor is valid; retaining every branch makes splitting exact.
-        for divisor in [&xshift[..], &diff(&z,&[1]), &sum(&z,&[1])] {
-            let g=gcd(f.to_vec(),divisor.to_vec());
+        let candidates=[xshift,diff(&z,&[1]),sum(&z,&[1])];
+        for divisor in &candidates {
+            let g=gcd(f.to_vec(),divisor.clone());
             if g.len()<=1 || g.len()>=f.len() { continue; }
             let (q,r)=divrem(f,&g);
             if !r.is_empty() { return Err("nonexact m4 factor split".into()); }
