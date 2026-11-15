@@ -91,7 +91,7 @@ A < 40,000, while the k = 24 prime does at A = 7,842. The shape is restrictive a
 ## 4. L2: both checks from the ladder (`L2_ladder_check/`)
 
 ecbench sessions k = 20 and k = 24 (the snc-panel's five curves, 8 rounds, alternate order, seeds 20261130 and
-20261134; 1,620 records each, all verified, 8 replays identical per session, `verify-k*.json`). Arms: `rho-neg`
+20261134; 1,620 records each, all passing the audit, 8 replays identical per session, `verify-k*.json`). Arms: `rho-neg`
 (reference), `tw2cj-lazy` (baseline, `wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run`), `tw2cj-lazy-lcheck`
 (the same with `lcheck=1`).
 
