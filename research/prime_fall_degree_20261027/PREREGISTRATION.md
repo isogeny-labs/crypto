@@ -593,3 +593,16 @@ Nothing else changes.
   ledger entry naming decision 12).
 - **Amendment 15 §3** ("no job starts while S3 upload is unavailable") reads, for these jobs: no job starts unless the session
   can commit and push to the study branch.
+
+## Amendment 18 (2026-11-15; resources only; before any job of Amendment 16 runs): 16 vCPU, and a job time limit that fits US$40
+
+- **Why** (measured). RunPod refused a 12-vCPU CPU pod ("vcpuCount must be a power of two"). The 16-vCPU reserved pod created
+  for `iso-a` (`w3ao0j8mfsiasz`, `cpu5m`/`cpu3m`, 128 GB, EU-RO-1) costs US$1.04/h. Amendment 16 §6's limit of 172,800 s plus
+  Amendment 15's 4-hour idle allowance would cost US$54, above the US$40 per-job ceiling (owner decisions 4 and 9).
+- **Change.**
+  - Amendment 16 jobs run on 16-vCPU pods. `RAYON_NUM_THREADS` stays 12, which is what the instrument depends on.
+  - The `iso-a` job time limit is **120,000 s** (cost at the limit plus 4 h idle: US$38.80).
+  - The `iso-x` job limit stays 90,000 s, which costs US$27.20 at this price.
+- **Unchanged:** every per-system budget (1,800 s; 86,400 s for X), every cell, seed, cap and rule.
+- **If the limit is reached.** A job stopped at its time limit has exit `deadline`. Its rows up to the last fetch are kept.
+  Systems not reached are reported as not run, not as censored. The projected wall time is 2–6 h (Amendment 16 §6, heuristic).
