@@ -410,7 +410,15 @@ fn num(v: &Value, k: &str) -> f64 {
 /// Derived values from the recorded runs in DIR: every number is read from the
 /// raw records, nothing is re-measured.
 fn report(dir: &str) -> Res<Value> {
-    let variants = ["before", "skip_only", "memo_only", "after"];
+    let variants = [
+        "before",
+        "skip_only",
+        "memo_only",
+        "dedupe",
+        "fold",
+        "valid",
+        "final",
+    ];
     let mut counts = serde_json::Map::new();
     for slots in [2, 3] {
         let base = read_jsonl(&format!("{dir}/counts{slots}_before.jsonl"))?;
@@ -447,46 +455,125 @@ fn report(dir: &str) -> Res<Value> {
         }
         counts.insert(format!("slots_{slots}"), Value::Object(per));
     }
-    let (sb, sa) = (
-        read_jsonl(&format!("{dir}/solves_before.jsonl"))?,
-        read_jsonl(&format!("{dir}/solves_after.jsonl"))?,
-    );
-    let solves = json!({
-        "n": sa.len(),
-        "all_verified_before_and_after": sb.iter().chain(&sa).all(|r| r["ok"] == json!(true)),
-        "same_scalar_and_relations": sb.iter().zip(&sa).all(|(b, a)| b["recovered"] == a["recovered"] && b["relations"] == a["relations"]),
-        "step_ratio": spread(sb.iter().zip(&sa).map(|(b, a)| num(b, "steps") / num(a, "steps")).collect()),
-        "rows": sb.iter().zip(&sa).map(|(b, a)| json!({ "p": a["p"], "seed": a["seed"], "secret": a["secret"],
-            "recovered": a["recovered"], "relations": a["relations"], "steps_before": b["steps"], "steps": a["steps"],
-            "ratio": num(b, "steps") / num(a, "steps") })).collect::<Vec<_>>(),
-    });
-    let (zb, za) = (
-        read_jsonl(&format!("{dir}/sizes_before.jsonl"))?,
-        read_jsonl(&format!("{dir}/sizes_after.jsonl"))?,
-    );
-    let sizes: Vec<Value> = zb.iter().zip(&za).map(|(b, a)| json!({ "p": a["p"], "d": a["d"], "slots": a["slots"],
-        "edges_before": b["edges"], "edges": a["edges"], "fraction": num(a, "edges") / num(b, "edges"),
-        "max_degree_before": b["max_degree"], "max_degree": a["max_degree"] })).collect();
+    let stages = ["dedupe", "final"];
+    let sb = read_jsonl(&format!("{dir}/solves_before.jsonl"))?;
+    let mut solves = serde_json::Map::new();
+    for stage in stages {
+        let sa = read_jsonl(&format!("{dir}/solves_{stage}.jsonl"))?;
+        solves.insert(stage.into(), json!({
+            "n": sa.len(),
+            "all_verified_before_and_after": sb.iter().chain(&sa).all(|r| r["ok"] == json!(true)),
+            "same_scalar_and_relations": sb.len() == sa.len() && sb.iter().zip(&sa).all(|(b, a)| b["recovered"] == a["recovered"] && b["relations"] == a["relations"]),
+            "step_ratio": spread(sb.iter().zip(&sa).map(|(b, a)| num(b, "steps") / num(a, "steps")).collect()),
+            "rows": sb.iter().zip(&sa).map(|(b, a)| json!({ "p": a["p"], "seed": a["seed"], "secret": a["secret"],
+                "recovered": a["recovered"], "relations": a["relations"], "steps_before": b["steps"], "steps": a["steps"],
+                "ratio": num(b, "steps") / num(a, "steps") })).collect::<Vec<_>>(),
+        }));
+    }
+    let zb = read_jsonl(&format!("{dir}/sizes_before.jsonl"))?;
+    let mut sizes = serde_json::Map::new();
     let eb: Value = serde_json::from_str(
         &std::fs::read_to_string(format!("{dir}/eccp131_before.json")).map_err(e)?,
     )
     .map_err(e)?;
-    let ea: Value = serde_json::from_str(
-        &std::fs::read_to_string(format!("{dir}/eccp131_after.json")).map_err(e)?,
-    )
-    .map_err(e)?;
-    let eccp: Vec<Value> = eb["networks"]
-        .as_array()
-        .ok_or("eccp131 networks")?
-        .iter()
-        .zip(ea["networks"].as_array().ok_or("eccp131 networks")?)
-        .map(|(b, a)| {
-            json!({ "slots": a["slots"], "edges_before": b["edges"], "edges": a["edges"],
-            "fraction": num(a, "edges") / num(b, "edges"),
-            "log2_edges_before": num(b, "edges").log2(), "log2_edges": num(a, "edges").log2() })
-        })
-        .collect();
+    let mut eccp = serde_json::Map::new();
+    for stage in stages {
+        let za = read_jsonl(&format!("{dir}/sizes_{stage}.jsonl"))?;
+        sizes.insert(stage.into(), json!(zb.iter().zip(&za).map(|(b, a)| json!({ "p": a["p"], "d": a["d"], "slots": a["slots"],
+            "edges_before": b["edges"], "edges": a["edges"], "fraction": num(a, "edges") / num(b, "edges"),
+            "vertices_before": b["vertices"], "vertices": a["vertices"],
+            "max_degree_before": b["max_degree"], "max_degree": a["max_degree"] })).collect::<Vec<_>>()));
+        let ea: Value = serde_json::from_str(
+            &std::fs::read_to_string(format!("{dir}/eccp131_{stage}.json")).map_err(e)?,
+        )
+        .map_err(e)?;
+        eccp.insert(stage.into(), json!(eb["networks"].as_array().ok_or("eccp131 networks")?.iter()
+            .zip(ea["networks"].as_array().ok_or("eccp131 networks")?)
+            .map(|(b, a)| json!({ "slots": a["slots"], "edges_before": b["edges"], "edges": a["edges"],
+                "vertices_before": b["vertices"], "vertices": a["vertices"],
+                "fraction": num(a, "edges") / num(b, "edges"),
+                "log2_edges_before": num(b, "edges").log2(), "log2_edges": num(a, "edges").log2() }))
+            .collect::<Vec<_>>()));
+    }
     Ok(json!({ "counts": counts, "solves": solves, "sizes": sizes, "eccp131": eccp }))
+}
+
+/// Network size of one integer product of two w-bit words (both free, or the
+/// second a constant with alternating bits) with the Fourier and schoolbook
+/// encoders. Build only; no count.
+fn mult(widths: &[u64]) -> Res<Vec<Value>> {
+    use hashed_ecdl_tensor::encoding::Encoder;
+    let m = meter(u64::MAX / 2);
+    let mut out = Vec::new();
+    for &w in widths {
+        let w = w as usize;
+        let constant = (0..w).fold(BigUint::from(0u8), |acc, i| {
+            if i % 2 == 0 {
+                acc | (BigUint::from(1u8) << i)
+            } else {
+                acc
+            }
+        });
+        for (operand, method) in [
+            ("free", "fourier"),
+            ("free", "schoolbook"),
+            ("constant", "fourier"),
+            ("constant", "schoolbook"),
+        ] {
+            let mut enc = Encoder::new();
+            let a = enc.input_word(w, &m).map_err(e)?;
+            let b = if operand == "free" {
+                enc.input_word(w, &m).map_err(e)?
+            } else {
+                Encoder::constant(w, &constant).map_err(e)?
+            };
+            let product = if method == "fourier" {
+                enc.integer_multiply(&a, &b, &m)
+            } else {
+                enc.schoolbook_multiply(&a, &b, &m)
+            }
+            .map_err(e)?;
+            enc.mark_interface(&product, &m).map_err(e)?;
+            let net = enc.finish(&m).map_err(e)?;
+            let mut rec = size_record(&net);
+            rec["width"] = json!(w);
+            rec["operand"] = json!(operand);
+            rec["method"] = json!(method);
+            out.push(rec);
+        }
+    }
+    Ok(out)
+}
+
+/// Network size of one modular product x*c mod q (c constant) and one modular
+/// sum x+y mod q at the width of q. Build only; no count.
+fn modops(primes: &[u64]) -> Res<Vec<Value>> {
+    use hashed_ecdl_tensor::encoding::Encoder;
+    let m = meter(u64::MAX / 2);
+    let mut out = Vec::new();
+    for &q in primes {
+        let q = BigUint::from(q);
+        let w = q.bits() as usize;
+        for op in ["multiply_by_constant", "multiply", "add"] {
+            let mut enc = Encoder::new();
+            let x = enc.input_word(w, &m).map_err(e)?;
+            let y = enc.input_word(w, &m).map_err(e)?;
+            let c = Encoder::constant(w, &(&q - 2u8)).map_err(e)?;
+            let r = match op {
+                "multiply_by_constant" => enc.modular_multiply(&x, &c, &q, &m),
+                "multiply" => enc.modular_multiply(&x, &y, &q, &m),
+                _ => enc.modular_add(&x, &y, &q, &m),
+            }
+            .map_err(e)?;
+            enc.mark_interface(&r, &m).map_err(e)?;
+            let net = enc.finish(&m).map_err(e)?;
+            let mut rec = size_record(&net);
+            rec["q_bits"] = json!(w);
+            rec["op"] = json!(op);
+            out.push(rec);
+        }
+    }
+    Ok(out)
 }
 
 fn main() {
@@ -514,6 +601,8 @@ fn main() {
                 .into_iter()
                 .try_for_each(|p| sizes(p).map(|v| v.into_iter().for_each(print)))?,
             Some("size-json") => print(size_json(&args[2])?),
+            Some("modops") => modops(&nums(2))?.into_iter().for_each(print),
+            Some("mult") => mult(&nums(2))?.into_iter().for_each(print),
             Some("report") => println!(
                 "{}",
                 serde_json::to_string_pretty(&report(&args[2])?).map_err(e)?
