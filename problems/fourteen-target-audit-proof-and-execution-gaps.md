@@ -2085,3 +2085,32 @@ visuallyinspectedone-page47416byte report. Eleven snapshots/sevenfailed
 states incl08Leanpanic/fullbacktrace retained; final11advisoryfree.
 No limits/options/waivers/nativecrypto/cryptoPython/spend/upload.
 [pcc:unverified]
+
+
+### Actual Galois characters and finite continuous-class perfectness
+
+The [actual Galois-character pairing audit](../research/galois_character_pairing_audit_20261115/README.md)
+proves the finite-module pairing displayed in Bruin2011 Lemma2.1 for every
+finite K and finite Abelian M with continuous action and exponent dividing
+#K−1. Its first factor consists of all actual Gamma-equivariant characters
+M→(AlgebraicClosure K) units; unique descent to K units follows from actual
+Frobenius fixed fields, and invariance under all Gamma follows from actual
+density. The second factor is all continuous crossed cocycles modulo all
+principal cocycles. Both perfectness MulEquivs, exact source formula on every
+representative, both bilinear laws, both trivial radicals and equal cardinality
+are proved. Seven credited prior core files remain byte-identical.
+For every finite characteristic-2 K, actual M=Z/2 with trivial action has
+all characters trivial and an actual nonzero continuous-cocycle class;
+no right-nondegenerate bilinear map on the same domains exists after deleting
+the annihilation hypothesis. The qualified source lemma survives.
+Exact local **PCC-20261115-4711ad** replay PASS at 2026-11-15T00:52:09Z; signed standing unverified.
+Whole gate73/0/0 includes reused proofs, complete1184-character binding
+`117deabc6ffa81828e499acbcc42d2c0a96947d2d3e5605128590db25ba4aee7`,
+independent native1complete/0prefix/0unresolved;15formal/config+14artifactpins,
+106files/41objects/18280-byte losslessXZ/fivegate files and inspected one-page
+46919-byte PDF. Six snapshots/four failed states retained; final06 advisory-free.
+Separate continuous homogeneous-complex H1 comparison, isogeny-kernel/Lang/
+Cartier group scheme/Jacobian/divisor/full Tate/MOV/FR bridges remain open;
+original FR94 remains unread. No novelty, canonical promotion or full14 closure.
+No frozen edits/cryptographic Python/new native cryptographic experiment/spend/upload.
+[pcc:unverified]
