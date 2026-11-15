@@ -80,6 +80,11 @@ all110 interleaved cold solves pass. Per-size five-seed median gain vs frozen ta
 1.27..2.94x, exploratory L0 macOS. Producer assertions [pcc:unverified].
 Five records now closed with raw hashes and shared report/plots in
 benchmarks/20261114-hec-anchor-forest. Source-linked report visually inspected, two pages.
-Next: finish final checks and open stacked PR on research/hec-followups-20261114; preserve
+PR4274 is open ready for review, stacked on research/hec-followups-20261114. All12 release
+library tests and13 research-example tests passed;2dense tests also passed in debug. Current
+Lean recheck compiled Algebra.lean and Forest.lean; outputs retained in the anchor run directory.
+Checkpoint20261115T060823Z-2c7378556b09 uploaded successfully. Artifact migration commitf385e46524
+was fast-forwarded locally; the report PNG now has an artifact-store manifest. Next: finish
+current-head CI and S3 custody checks; preserve
 independent replay, external comparison, held-out scaling and >=10x as outstanding research.
 Do not mark the goal complete based on this engineering/algebraic reuse pilot.
