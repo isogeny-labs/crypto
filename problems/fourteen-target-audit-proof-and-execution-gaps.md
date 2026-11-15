@@ -3242,3 +3242,68 @@ no absence claim. Same host/prover/procedural header check, no independent
 parser/compiler/physical-host assurance. No holes/custom axioms/native proof
 evaluation/raised limits/new global flags/waivers/frozen edits/cryptoPython/
 native crypto experiment/spend/upload. [pcc:unverified]
+
+
+### Actual every-field translation and rational-point local basechange
+
+The [actual every-field translation proof](../research/general_translation_audit_20261115/README.md)
+removes the algebraically closed coefficient restriction from the actual
+function-field action and all-point local translation interfaces. For every
+field, every nonsingular general Weierstrass model and every characteristic
+including two and three, actual translated generic x is transcendental,
+coordinate substitution injective, and the actual fraction-field map is a
+coefficient-fixing RingEquiv with composition, identity, explicit negative-point
+inverse and faithfulness. Actual local values/orders/regular-ring isomorphisms
+and residues commute at every point, including infinity. No transcendence,
+injection, inverse, local invariance or ramification premise is supplied.
+
+The actual infinity valuation is trivial on coefficient functions. Exact
+translated x-difference values exp(−1)/exp(−2), with the second derivative
+branch using actual nonsingularity, let the official
+Valuation.transcendental_of_ne_one prove transcendence over the original field.
+Credited norm-product injection and fraction generation derive the action.
+Actual coordinate formulas prove the arbitrary coefficient-field extension
+square. Actual point-evaluation/localization/full-field/residue diagrams,
+chosen-uniformizer preservation and actual unit/DVR factorization prove
+normalized finite-point basechange. Credited infinity basechange completes
+every-point image normalization. Actual AC comparison in the proof gives
+every-field local translation, with no AC assumption on the conclusion.
+Actual coefficient-extension regular-ring injection and residue diagram are
+also derived. These extension statements concern images of actual K-rational
+points, not all closed places or geometric divisor descent.
+
+Actual K-rational point divisors satisfy D(φ_Qf)=pushforward(−Q)D(f), with
+support-disjointness iff and guarded evaluation transport. Actual nonsingular
+F2 y²+y=x³ and credited F3 y²=x³+x+1 have constructed nonzero points and
+nonidentity function-field translations. The credited source formula
+x↦1/x,y↦−y/x² now holds over every valid coefficient field; actual F5 affine
+coordinate-ring preservation fails. The credited F3 numerator x²+1 has actual
+rational-only divisor degree −4, preserved under every translation. Thus
+rational-point transport does not imply geometric degree zero. Known methods
+and controls credited; no new population, qualified-source refutation or novelty.
+
+Exact local **PCC-20261115-833af1 PASS at 2026-11-15T22:06:27Z**, signed standing unverified.
+Whole tracked/transitive gate92/twelve concrete modules/zero failures or
+trusted-native exemptions.105 frozen imports/zero copies/117 old formal files/
+all134 predecessor pins match before-after11states and gate.132formal17artifact
+149pins/117customimports; full3968-character header SHA
+1b948fe2fb1c6a1af59ef94db55340d8d15f3080d15f149ee4d80771b2161168,
+native1complete/0prefix/0unresolved/empty suffix after completed gate.
+Lossless259files/91objects/40432B XZ/roundtrip equal/five gate files.
+First valid onepage47541B PDF/all5013characters read/individual full-page
+visual/inbounds. Four failed01/03/06/07/seven successful states retained;
+exact source/root coverage asserted every state from01; final/source warnings0,
+one frozen auditor deprecation. Fresh Galbraithch7PDF6–9 printed128–131 and
+ch9PDF3–4 printed167–168 fulltext/each page visual. Lemma7.3.6 is an exercise,
+its proof not read/no whole chapter or Scheme-proof claim. Official valuation,
+actual norm/Point.map/local DVR proofs read/reused; relative algebraic closure
+reviewed alternative not selected. Copyright files local/excluded. Five correct
+KB calls/Conductor127 before code; expanded publication Conductor127 before
+maps/outside pins, bounded fallback/no absence claim. Same host/prover/procedural
+written-header check, no independent parser/compiler/physical-host assurance.
+No holes/custom axioms/native proof evaluation/raised limits/new global flags/
+waivers/frozen edits/cryptoPython/native crypto experiment/spend/upload.
+
+Separate Scheme/line-bundle comparison, general geometric divisor/Picard/Galois
+descent, reciprocity, isogeny/Lang/Jacobian and canonical Weil–Tate/MOV–FR remain
+open. The fourteen-item request remains active. [pcc:unverified]
