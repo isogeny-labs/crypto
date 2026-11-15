@@ -1,0 +1,5 @@
+{"arms": {"batched": {"table": true, "batched": true, "c": 2.0}, "table": {"table": true, "batched": false, "c": 2.0}, "bsgs_tuned": {"mode": "tuned", "B": "ceil(sqrt(T n / 4))"}},
+ "T": [1000, 10000], "bits": [25, 29, 31], "instances": {"25": 2, "29": 2, "31": 1}, "extra": 6,
+ "basis": "c = 2.0 inherited from the table-mode freeze (selected on 26/30-bit curves); the batched arm was explored only at 27 bits (pf_tscale). Evaluation curves 25, 29, 31 bits were not used for any tuning of this arm.",
+ "prediction": "batched/table total time ratio <= 0.7 at T = 10000 (per-target phase 2x or more faster); batched/BSGS ratio between 2x and 5x at T = 10000",
+ "abandon_if": "batched/table median >= 1.0 at T = 10000"}
