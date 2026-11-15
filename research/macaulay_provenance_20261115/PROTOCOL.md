@@ -80,3 +80,10 @@ verified relation yield and implementing arbitrary large-prime arithmetic remain
 separate obligations. An unknown from this strategy/cap is not a lower bound
 on the ideal's certificate degree, and does not refute every possible solver.
 [pcc:unverified]
+
+Pre-execution certificate format clarification: the proof serializes the source
+multiples actually referenced by the selected candidate basis, with their IDs
+remapped compactly. The producer still generates/reduces the entire prescribed
+Macaulay rowspace and logs its total counts. Unused internal rows are not part
+of the successful basis-membership proof object. No raw file is truncated or
+removed, and this compact proof does not certify a negative rowspace/rank claim.
