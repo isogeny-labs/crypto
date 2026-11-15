@@ -658,6 +658,48 @@ fn audited_constructed_export(
     Ok((xcnf_path, hashes))
 }
 
+fn audited_natural_export(
+    arm_lock: &Value,
+    arm_lock_path: &Path,
+    preflight_hashes: &[String],
+    unpinned_replay_sha: &str,
+    export_root: &Path,
+) -> Result<(PathBuf, Vec<String>)> {
+    let root = fs::canonicalize(export_root)?;
+    if root.join("failure.json").exists() {
+        return Err("natural export has a terminal failure receipt".into());
+    }
+    let stage_path = root.join("export-stage.json");
+    let export_path = root.join("natural.json");
+    let xcnf_path = root.join("natural.xcnf");
+    let stage: Value = serde_json::from_slice(&fs::read(&stage_path)?)?;
+    let export: Value = serde_json::from_slice(&fs::read(&export_path)?)?;
+    let hashes = vec![
+        sha256_file(&stage_path)?,
+        sha256_file(&export_path)?,
+        sha256_file(&xcnf_path)?,
+    ];
+    if stage["schema"] != "n83.k600-m6-native-arm-export/v1"
+        || stage["status"] != "PASS_EXPORT_ONLY"
+        || stage["mode"] != "natural"
+        || stage["source_commit"] != arm_lock["source_commit"]
+        || stage["lock_sha256"] != sha256_file(arm_lock_path)?
+        || stage["preflight_outer_sha256"] != preflight_hashes[1]
+        || stage["unpinned_replay_stage_sha256"] != unpinned_replay_sha
+        || stage["export_json_sha256"] != hashes[1]
+        || stage["xcnf_sha256"] != hashes[2]
+        || stage["exporter_exit_code"] != 0
+        || stage["solver_executed"] != false
+        || stage["model_replayed"] != false
+        || !stage["total_index_calculus_runtime_ms"].is_null()
+        || !stage["selected_best_total_runtime"].is_null()
+    {
+        return Err("natural XCNF export stage differs from two replayed controls".into());
+    }
+    validate_export(&export, arm_lock, "natural", &xcnf_path)?;
+    Ok((xcnf_path, hashes))
+}
+
 fn docker_solver_args(
     lock: &Value,
     solver: &Path,
@@ -962,18 +1004,20 @@ fn solve(
     output: &Path,
     outer_seconds: u64,
     pinned_controls: Option<(&Path, &Path, &Path)>,
+    natural_controls: Option<(&Path, &Path, &Path, &Path, &Path, &Path)>,
 ) -> Result<Value> {
     let stage_start = Instant::now();
     if !matches!(
-        (mode, pinned_controls.is_some()),
-        ("positive-pinned", false) | ("positive-unpinned", true)
+        (mode, pinned_controls.is_some(), natural_controls.is_some()),
+        ("positive-pinned", false, false)
+            | ("positive-unpinned", true, false)
+            | ("natural", false, true)
     ) || !output.is_absolute()
         || output.exists()
         || !(6..=3_600).contains(&outer_seconds)
     {
         return Err(
-            "constructed mode/control, new absolute output, and 6..3600 outer seconds required"
-                .into(),
+            "frozen mode/control, new absolute output, and 6..3600 outer seconds required".into(),
         );
     }
     let repo = fs::canonicalize(env!("CARGO_MANIFEST_DIR"))?;
@@ -994,12 +1038,27 @@ fn solve(
             ))
         })
         .transpose()?;
+    let natural_controls = natural_controls
+        .map(|(a, b, c, d, e, f)| -> Result<_> {
+            Ok([
+                fs::canonicalize(a)?,
+                fs::canonicalize(b)?,
+                fs::canonicalize(c)?,
+                fs::canonicalize(d)?,
+                fs::canonicalize(e)?,
+                fs::canonicalize(f)?,
+            ])
+        })
+        .transpose()?;
     if parent.starts_with(&repo)
         || parent.starts_with(stage_root)
         || parent.starts_with(&export_root)
         || pinned_controls.as_ref().is_some_and(|(a, b, c)| {
             parent.starts_with(a) || parent.starts_with(b) || parent.starts_with(c)
         })
+        || natural_controls
+            .as_ref()
+            .is_some_and(|dirs| dirs.iter().any(|dir| parent.starts_with(dir)))
     {
         return Err("solver output overlaps frozen source or input".into());
     }
@@ -1035,8 +1094,33 @@ fn solve(
         return Err("K600 arm lock, source, base, or solver changed before launch".into());
     }
     let preflight_hashes = preflight_gate(&lock, preflight_lock_path, preflight_root)?;
-    let (xcnf, export_hashes) =
-        audited_constructed_export(&lock, &lock_path, &preflight_hashes, mode, &export_root)?;
+    let natural_hashes = natural_controls
+        .as_ref()
+        .map(|dirs| {
+            audited_unpinned_replay(
+                &lock,
+                &lock_path,
+                &preflight_hashes,
+                &dirs[0],
+                &dirs[1],
+                &dirs[2],
+                &dirs[3],
+                &dirs[4],
+                &dirs[5],
+            )
+        })
+        .transpose()?;
+    let (xcnf, export_hashes) = if mode == "natural" {
+        audited_natural_export(
+            &lock,
+            &lock_path,
+            &preflight_hashes,
+            &natural_hashes.as_ref().ok_or("natural control missing")?[3],
+            &export_root,
+        )?
+    } else {
+        audited_constructed_export(&lock, &lock_path, &preflight_hashes, mode, &export_root)?
+    };
     let pinned_hashes = pinned_controls
         .as_ref()
         .map(|(a, b, c)| audited_pinned_replay(&lock, &lock_path, &preflight_hashes, a, b, c))
@@ -1079,7 +1163,11 @@ fn solve(
         } else if exit == Some(10) {
             "SAT_PENDING_XCNF_REPLAY"
         } else if exit == Some(20) {
-            "UNSAT_CONSTRUCTED_CONTROL"
+            if mode == "natural" {
+                "UNSAT_NATURAL_QUERY"
+            } else {
+                "UNSAT_CONSTRUCTED_CONTROL"
+            }
         } else if exit == Some(0) {
             "UNKNOWN_solver_cap_or_exit0"
         } else if matches!(exit, Some(134 | 137)) {
@@ -1094,9 +1182,24 @@ fn solve(
             || sha256_file(&supervisor)? != lock["supervisor_sha256"]
             || sha256_file(&stage_root.join("staging.json"))? != lock["staging_receipt_sha256"]
             || preflight_gate(&lock, preflight_lock_path, preflight_root)? != preflight_hashes
-            || audited_constructed_export(&lock, &lock_path, &preflight_hashes, mode, &export_root)?
-                .1
-                != export_hashes
+            || (if mode == "natural" {
+                audited_natural_export(
+                    &lock,
+                    &lock_path,
+                    &preflight_hashes,
+                    &natural_hashes.as_ref().ok_or("natural control missing")?[3],
+                    &export_root,
+                )?
+            } else {
+                audited_constructed_export(
+                    &lock,
+                    &lock_path,
+                    &preflight_hashes,
+                    mode,
+                    &export_root,
+                )?
+            })
+            .1 != export_hashes
             || pinned_controls
                 .as_ref()
                 .map(|(a, b, c)| {
@@ -1104,6 +1207,23 @@ fn solve(
                 })
                 .transpose()?
                 != pinned_hashes
+            || natural_controls
+                .as_ref()
+                .map(|dirs| {
+                    audited_unpinned_replay(
+                        &lock,
+                        &lock_path,
+                        &preflight_hashes,
+                        &dirs[0],
+                        &dirs[1],
+                        &dirs[2],
+                        &dirs[3],
+                        &dirs[4],
+                        &dirs[5],
+                    )
+                })
+                .transpose()?
+                != natural_hashes
             || docker_short(&["image", "inspect", "--format", image_format, image])?
                 != image_identity
         {
@@ -1119,6 +1239,7 @@ fn solve(
             "preflight_outer_sha256":preflight_hashes[1],
             "export_stage_sha256":export_hashes[0],"xcnf_sha256":export_hashes[2],
             "pinned_replay_stage_sha256":pinned_hashes.as_ref().map(|hashes|&hashes[2]),
+            "unpinned_replay_stage_sha256":natural_hashes.as_ref().map(|hashes|&hashes[3]),
             "solver_binary_sha256":lock["solver_sha256"],"stdout_sha256":sha256_file(&stdout_path)?,
             "stderr_sha256":sha256_file(&stderr_path)?,"exit_code":exit,
             "outer_wall_limit_seconds":outer_seconds,"solver_internal_maxtime_seconds":solver_seconds,
@@ -1134,7 +1255,7 @@ fn solve(
             if receipt["status"] == "SAT_PENDING_XCNF_REPLAY" {
                 Ok(receipt)
             } else {
-                Err(format!("constructed solver ended with {}", receipt["status"]).into())
+                Err(format!("K600 {mode} solver ended with {}", receipt["status"]).into())
             }
         }
         Err(error) => {
@@ -1785,7 +1906,7 @@ fn main() -> Result<()> {
             let result = (|| -> Result<Value> {
                 let seconds: u64 = args[8].parse()?;
                 solve(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
-                    &args[5],Path::new(&args[6]),&output,seconds,None)
+                    &args[5],Path::new(&args[6]),&output,seconds,None,None)
             })();
             (output,result,false)
         }
@@ -1795,7 +1916,18 @@ fn main() -> Result<()> {
                 let seconds: u64 = args[10].parse()?;
                 solve(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
                     "positive-unpinned",Path::new(&args[5]),&output,seconds,
-                    Some((Path::new(&args[6]),Path::new(&args[7]),Path::new(&args[8]))))
+                    Some((Path::new(&args[6]),Path::new(&args[7]),Path::new(&args[8]))),None)
+            })();
+            (output,result,false)
+        }
+        Some("solve-natural") if args.len() == 14 => {
+            let output = PathBuf::from(&args[12]);
+            let result = (|| -> Result<Value> {
+                let seconds: u64 = args[13].parse()?;
+                solve(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
+                    "natural",Path::new(&args[5]),&output,seconds,None,
+                    Some((Path::new(&args[6]),Path::new(&args[7]),Path::new(&args[8]),
+                        Path::new(&args[9]),Path::new(&args[10]),Path::new(&args[11]))))
             })();
             (output,result,false)
         }
@@ -1818,7 +1950,7 @@ fn main() -> Result<()> {
             })();
             (output,result,false)
         }
-        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned|positive-unpinned NEW_OUTPUT OUTER_SECONDS | solve ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned EXPORT_DIR NEW_OUTPUT OUTER_SECONDS | replay-pinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN EXPORT_DIR SOLVER_DIR NEW_OUTPUT OUTER_SECONDS | solve-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | replay-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT UNPINNED_SOLVER PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | export-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS".into()),
+        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned|positive-unpinned NEW_OUTPUT OUTER_SECONDS | solve ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned EXPORT_DIR NEW_OUTPUT OUTER_SECONDS | replay-pinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN EXPORT_DIR SOLVER_DIR NEW_OUTPUT OUTER_SECONDS | solve-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | replay-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT UNPINNED_SOLVER PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | export-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | solve-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN NATURAL_EXPORT PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS".into()),
     };
     if let Err(error) = &result {
         if stage_created_output && output.is_dir() && !output.join("staging.json").exists() {
@@ -2108,6 +2240,7 @@ mod tests {
             &output,
             10,
             None,
+            None,
         )
         .is_err());
         assert!(!output.exists());
@@ -2124,6 +2257,29 @@ mod tests {
                 Path::new("/missing-pinned-solver"),
                 Path::new("/missing-pinned-replay")
             )),
+            None,
+        )
+        .is_err());
+        assert!(!output.exists());
+    }
+
+    #[test]
+    fn natural_solver_requires_both_replayed_controls() {
+        let output = std::env::temp_dir().join(format!(
+            "n83-k600-m6-natural-solver-gate-{}",
+            std::process::id()
+        ));
+        assert!(!output.exists());
+        assert!(solve(
+            Path::new("/missing-arm-lock"),
+            Path::new("/missing-preflight-lock"),
+            Path::new("/missing-preflight-run"),
+            "natural",
+            Path::new("/missing-export"),
+            &output,
+            10,
+            None,
+            None
         )
         .is_err());
         assert!(!output.exists());

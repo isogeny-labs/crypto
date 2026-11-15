@@ -196,6 +196,19 @@ The image/build receipt, cumulative budget controller, natural solver and
 replay, useful rank and full cold-runtime selection remain open. No graph
 changed because this revision contains no K600 measurement.
 
+The [natural solver amendment](NATURAL_SOLVER_AMENDMENT.md) adds
+`solve-natural`, requiring the natural XCNF receipt and both completed
+constructed-control replays before one bounded solver invocation. Its
+receipt distinguishes `SAT_PENDING_XCNF_REPLAY`, `UNSAT_NATURAL_QUERY`,
+caps and failures; it binds the unpinned replay digest and leaves total IC
+runtime null. The release example passed **12/12** tests and the production
+release build exited 0; [test](natural-solver-test.log.gz) and
+[build](natural-solver-build.log.gz) logs preserve results. No natural
+solver ran. The source-matched image/build receipt, cumulative budget
+controller, natural model replay, rank/logs and full cold-runtime selection
+remain open. No graph changed because this revision contains no K600
+measurement.
+
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
 
