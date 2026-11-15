@@ -1,0 +1,10 @@
+digraph G {
+ rankdir=LR;graph[bgcolor="white",nodesep=.45,ranksep=.6];
+ node[shape=box,style="rounded,filled",fillcolor="#eaf1fa",fontname="Helvetica",fontsize=12];
+ A[label="Generic Packed invariant\npositive denominator + literals"];
+ B[label="Actual grid / mask / scalars\nderived construction budgets"];
+ C[label="Signed input volume\nand working-precision caps"];
+ D[label="OPEN: preparation / weighted\noperations / total bit cost",fillcolor="#fff0d8",style="rounded,dashed"];
+ {rank=same;A;D;}{rank=same;B;C;}
+ A->B;B->C;C->D[constraint=false,style=dashed];A->D[style=invis];
+}
