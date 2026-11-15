@@ -1,5 +1,10 @@
 # Native K600 m6 arm-input staging component
 
+The [outer arm budget controller amendment](ARM_BUDGET_CONTROLLER_AMENDMENT.md)
+records the native nine-phase ordering and its current accounting limit.
+It is implementation evidence only; the K600 execution and full cold budget
+receipt remain pending.
+
 **Status: implemented and locally tested, not run against S3 for this arm pair.**
 The Rust `examples/n83_k600_m6_native_arms.rs` `stage` command bridges the
 already verified read-only astronomy-store K600 object to the original
