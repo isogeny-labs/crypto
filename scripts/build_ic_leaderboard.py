@@ -2669,7 +2669,7 @@ def tableb_binary_ksum_md(k: dict) -> list[str]:
          "weight, pooled and in every replicate, beyond the replicate noise. Primary rows n21, n24, n27; n15, n18 secondary. "
          f"Track: {k['track']}. {k['validation']}. Table B's recorded figures are another harness's before marks, shown, "
          "never divided into the new S. Part of the gain over Table B's own row comes from tuning the incumbent's base "
-         "(inc-tb is 1.4–3.4× the tuned incumbent); the claim is only against the tuned incumbent.", "",
+         "(inc-tb is 1.4–3.4× the tuned incumbent at w = 0, 1.5–3.9× at w = 1); the claim is only against the tuned incumbent.", "",
          "| curve | role | w | Table B before (S_IC, S_rho) | S rho-neg | S inc-tb | strictest incumbent: S | S ksum4 | S ksum5 | ksum5 / incumbent [95%] | ksum4 / incumbent | L1 ksum5 | distance remaining: ksum5 / rho-neg |",
          "|:--|:--|--:|:--|--:|--:|:--|--:|--:|:--|--:|:--|--:|"]
     for r in k["rows"]:
