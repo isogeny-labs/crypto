@@ -184,6 +184,9 @@ fn run<F: PrimeField + Clone>(
         );
         let table = table?;
         for i in 0..rounds + 2 {
+            // Fixture construction is outside the arm intervals. A fresh
+            // budget must not inherit elapsed time from previous benchmarks.
+            let fixtures = context(&field, seconds);
             let t = fixtures.group_add(
                 &e,
                 &Some(base[i % base.len()].clone()),
