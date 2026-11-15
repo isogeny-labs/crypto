@@ -6,10 +6,11 @@
 //! S4(x0,x1,x2,u), S4(x3,x4,x5,v), S3(x6,x7,w), S4(u,v,w,x(R)).
 //! All signed point lifts and the full public target are checked separately.
 //! [pcc:unverified]
-use prime31_algebraic_ic::{check_curve, f4_fp_tower::{SquareRule,TowerRing}, Arithmetic, Base, Point, PRIME31};
+use prime31_algebraic_ic::{check_curve, f4_fp_tower::{f4_tower, RPoly, SquareRule, TowerF4Options, TowerRing}, Arithmetic, Base, Point, PRIME31};
 use serde::Deserialize;
 use serde_json::json;
 use std::collections::{BTreeMap, HashSet};
+use std::time::Duration;
 
 const Q: Point = Some((1_547_953_785, 1_667_575_595));
 const NX: usize = 11;
@@ -139,7 +140,53 @@ fn summands(ar:&mut Arithmetic,ps:&[(u64,u64)],start:usize,end:usize)->Point {
 }
 #[derive(Deserialize)]
 struct Transcript { witnesses:Vec<[u64;4]> }
+// Exact expected raw eight-summand witness count on a uniformly random
+// prime-order public mask: each signed template maps to exactly one target.
+// This counts templates WITH multiplicity, not distinct points or row rank.
+fn choose(n:u128,k:u128)->u128 {
+    if k>n {return 0;}
+    let mut out=1_u128;
+    for i in 1..=k.min(n-k) {out=out*(n+1-i)/i;}
+    out
+}
+
+fn capped_f4(input:&[RPoly],ring:&TowerRing,known_witness:Option<&[u64]>)->Result<serde_json::Value,String>{
+    // Deliberately tight pre-registered exploratory caps, not an EC solve.
+    // Symbolic work and input formation are NOT included in muladds.
+    let opts=TowerF4Options::new(12)
+        .with_budget(Duration::from_secs(5))
+        .with_max_nnz(15_000)
+        .with_max_dense(15_000);
+    let rep=f4_tower(input,ring,&opts);
+    if let Some(xs)=known_witness {
+        if rep.inconsistent {return Err("F4 refuted a witnessed positive prime31 ideal".into());}
+        if rep.basis.iter().any(|g|ring.eval(g,xs)!=0) {
+            return Err("F4 basis does not vanish at the known valid witness".into());
+        }
+    }
+    let censored=rep.timed_out || rep.oversize || rep.pairs_above_bound>0
+        || rep.staircase_at_stop.is_some();
+    let verdict=if censored {"undetermined"} else if rep.inconsistent {
+        "complete_refutation"
+    } else {"basis_computed_without_root_extraction"};
+    Ok(json!({"verdict":verdict,"timed_out":rep.timed_out,
+        "oversize":rep.oversize,"pairs_above_bound":rep.pairs_above_bound,
+        "staircase_at_stop":rep.staircase_at_stop,
+        "inconsistent":rep.inconsistent,"degree_reached":rep.degree_reached,
+        "solving_degree_max":rep.solving_degree_max,"steps":rep.steps,
+        "max_cols":rep.max_cols,"max_nnz":rep.max_nnz,
+        "max_dense_entries":rep.max_dense_entries,"muladds":rep.muladds,
+        "reported_ms":rep.ms,"basis_elements":rep.basis.len(),
+        "degree_cap":12,"nnz_cap":15_000,"dense_cap":15_000,
+        "budget_seconds":5,"root_extraction":"not_implemented",
+        "scope":"bounded F4 pilot only; no target logarithm recovered"}))
+}
 fn main()->Result<(),String>{
+    let args:Vec<_>=std::env::args().skip(1).collect();
+    if args.len()>1 || (!args.is_empty() && args[0]!="--probe-f4") {
+        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4]".into());
+    }
+    let probe_f4=!args.is_empty();
     let e=PRIME31;
     let mut ar=Arithmetic::default();
     check_curve(e,&mut ar)?;
@@ -161,6 +208,7 @@ fn main()->Result<(),String>{
     if nf_terms!=[526,526,16] {return Err(format!("F4 tower input terms changed: {nf_terms:?}"));}
     let mut checked=0;
     let mut mutated=0;
+    let mut f4_probe_records=Vec::new();
     let mut first_aux=None;
     for [aa,bb,lc,rc] in transcript.witnesses {
         let ps=witness_points(lc,rc,&fb,&ar)?;
@@ -190,6 +238,20 @@ fn main()->Result<(),String>{
         let terminal=s4(&u,&v,&w,&Polynomial::constant(r.0));
         let final_poly=ring.from_raw(&terminal.raw_tower());
         if ring.eval(&final_poly,&xs)!=0 {return Err("S4 target polynomial residual !=0".into());}
+        if probe_f4 && checked==0 {
+            let mut input=polys.clone();
+            input.push(final_poly.clone());
+            let result=capped_f4(&input,&ring,Some(&xs))?;
+            f4_probe_records.push(json!({"arm":"known_natural_positive_fixture",
+                "selection":"first previously recorded natural m8 witness; NOT an oracle discovery",
+                "result":result}));
+            let unknown_final=s4(&u,&v,&w,&Polynomial::constant(Q.unwrap().0));
+            input[3]=ring.from_raw(&unknown_final.raw_tower());
+            let result=capped_f4(&input,&ring,None)?;
+            f4_probe_records.push(json!({"arm":"public_Q_unclassified_target",
+                "selection":"Q without any planted base-point witness",
+                "result":result}));
+        }
         let corrupted=s4(&u,&v,&w,&Polynomial::constant(add(r.0,1)));
         if ring.eval(&ring.from_raw(&corrupted.raw_tower()),&xs)!=0 {mutated+=1;}
         // The polynomial system uses x only. After a candidate x-tuple is
@@ -221,6 +283,14 @@ fn main()->Result<(),String>{
         || first_aux!=Some([803_189_040,898_740_481,729_813_404,903_384_438]) {
         return Err("frozen balanced m8 certificate controls changed".into());
     }
+    let left=choose(15,4)*16;
+    let right=choose(16,4)*16;
+    let split=left*right;
+    let full=choose(31,8)*256;
+    let n=e.n as u128;
+    if left!=21_840 || right!=29_120 || split!=635_980_800 || full!=2_019_513_600 {
+        return Err("m8 template cardinality drift".into());
+    }
     println!("{}",json!({"status":"[pcc:unverified]",
       "scope":"F4 tower-input construction and existing generic-witness semantic bridge; NOT an F4 relation oracle or cheaper ECDLP",
       "p":P,"n":e.n,"depth":DEPTH,"B":fb.points.len(),
@@ -231,6 +301,14 @@ fn main()->Result<(),String>{
       "unique_full_target_y_signs_per_tuple":1,
       "abscissa_only_sign_solutions_per_tuple":2,
       "first_auxiliary_x":first_aux,
+      "uniform_mask_eight_sum_accounting":{
+          "split_templates":split,"all_distinct_eight_templates":full,
+          "subgroup_order":n,"split_expected_raw_witnesses_exact":"635980800/2147446831",
+          "all_expected_raw_witnesses_exact":"2019513600/2147446831",
+          "split_min_mean_calls_for_32_rank":(32*n+split-1)/split,
+          "all_min_mean_calls_for_32_rank":(32*n+full-1)/full,
+          "qualification":"uniform public masks, one raw witness per template, rank increment <= raw count; no F4 cost claim"},
+      "f4_probe_requested":probe_f4,"f4_probe_records":f4_probe_records,
       "rust_compilation_status":"must be confirmed on exact GitHub head"}));
     Ok(())
 }
