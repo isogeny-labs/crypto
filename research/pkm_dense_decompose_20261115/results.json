@@ -3,11 +3,11 @@
  "metric": "field_ops (counted F_p multiplications)",
  "validity": {
   "V1": {
-   "checked": 150,
+   "checked": 180,
    "disagree": []
   },
   "V2": {
-   "planted": 68,
+   "planted": 80,
    "without_relation": []
   },
   "V3": [
@@ -133,6 +133,11 @@
     3,
     16,
     1.0038526970451214
+   ],
+   [
+    3,
+    32,
+    1.0009379585059832
    ]
   ],
   "verdict": "falsified"
@@ -196,7 +201,16 @@
   ],
   "verdict": "held"
  },
- "replication_P2": [],
+ "replication_P2": [
+  [
+   "rep-P2-m2-t6-both",
+   0.005419574666721599
+  ],
+  [
+   "rep-P2-m3-t3-both",
+   0.08076797040632021
+  ]
+ ],
  "cells": [
   {
    "cell": "m2-t4-both",
@@ -532,6 +546,71 @@
    "dense_linear_stage_share_median": 6.939828914108067e-08,
    "dense_random_ops_median": 24243671900.0,
    "enum_ops": 101529
+  },
+  {
+   "cell": "m3-t5-random",
+   "p": 1399680001,
+   "m": 3,
+   "S": 32,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 25153873694.0,
+   "dense_planted_over_enum_median": 247750.62981020202,
+   "dense_staircase_max": 6,
+   "dense_linear_stage_share_median": 6.933325742253367e-08,
+   "dense_random_ops_median": 24267243081.0,
+   "enum_ops": 101529
+  },
+  {
+   "cell": "rep-P2-m2-t6-both",
+   "p": 3265920001,
+   "m": 2,
+   "S": 64,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 110319912.5,
+   "tower_planted_over_enum_median": 7860.34289276808,
+   "tower_staircase_max": 2,
+   "tower_linear_stage_share_median": 1.1058721274267683e-06,
+   "tower_random_ops_median": 110172474.0,
+   "dense_planted_ops_median": 597887.0,
+   "dense_planted_over_enum_median": 42.59971499821874,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 8.530039957383252e-05,
+   "dense_random_ops_median": 597856.0,
+   "dense_over_tower_planted_median": 0.005419574666721599,
+   "dense_over_tower_planted_range": [
+    0.005419189494414882,
+    0.005420372538274406
+   ],
+   "enum_ops": 14035
+  },
+  {
+   "cell": "rep-P2-m3-t3-both",
+   "p": 3265920001,
+   "m": 3,
+   "S": 8,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 238072455.0,
+   "tower_planted_over_enum_median": 27491.04561200924,
+   "tower_staircase_max": 6,
+   "tower_linear_stage_share_median": 9.99695659877998e-07,
+   "tower_random_ops_median": 237586213.0,
+   "dense_planted_ops_median": 19228629.0,
+   "dense_planted_over_enum_median": 2220.3959584295612,
+   "dense_staircase_max": 6,
+   "dense_linear_stage_share_median": 9.309036021236875e-06,
+   "dense_random_ops_median": 18966498.0,
+   "dense_over_tower_planted_median": 0.08076797040632021,
+   "dense_over_tower_planted_range": [
+    0.08076797040632021,
+    0.0819574135294151
+   ],
+   "enum_ops": 8660
   }
  ],
  "note": "No claim about cryptographic sizes or Pollard rho [pcc:unverified]."
