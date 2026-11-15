@@ -339,3 +339,33 @@ fn main() -> Result<(), String> {
     })).unwrap());
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn signed_tuple_encoding_and_relation_difference() {
+        let a = triple_code(1, 7, 129, 0);
+        let b = triple_code(1, 7, 129, 4);
+        assert_eq!(decode(a), [(1, 1), (7, 1), (129, 1)]);
+        assert_eq!(decode(b), [(1, 1), (7, 1), (129, -1)]);
+        let row = collision_row(a, b, 130, 977);
+        assert_eq!(row.iter().filter(|&&c| c != 0).count(), 1);
+        assert_eq!(row[129], 975); // -2 modulo 977
+        assert_eq!(weighted_sum(a, &[1; 130], 977), 3);
+        assert_eq!(weighted_sum(b, &[1; 130], 977), 1);
+    }
+
+    #[test]
+    fn homogeneous_rank_has_one_dimensional_kernel() {
+        let n = 977;
+        let mut rank = HomogeneousRank::new(4);
+        rank.insert(vec![1, n - 1, 0, 0], n);
+        rank.insert(vec![0, 1, n - 1, 0], n);
+        rank.insert(vec![0, 0, 1, n - 1], n);
+        rank.insert(vec![1, 0, 0, n - 1], n);
+        assert_eq!(rank.rank, 3);
+        assert_eq!(rank.kernel(n), Some(vec![1, 1, 1, 1]));
+    }
+}
