@@ -1,0 +1,64 @@
++ 03:05:16 pgrep -f 'http.server 8080'
++ 03:05:16 export DEBIAN_FRONTEND=noninteractive
++ 03:05:16 DEBIAN_FRONTEND=noninteractive
++ 03:05:16 apt-get update -qq
+++ 03:05:18 date -u +%FT%TZ
++ 03:05:18 echo '2026-11-12T03:05:18Z boot: apt update exit=0'
++ 03:05:18 apt-get install -y -qq jq curl git
+++ 03:05:22 date -u +%FT%TZ
++ 03:05:22 echo '2026-11-12T03:05:22Z boot: apt base exit=0'
++ 03:05:22 apt-get install -y -qq build-essential pkg-config libssl-dev time
+++ 03:05:24 date -u +%FT%TZ
++ 03:05:24 echo '2026-11-12T03:05:24Z boot: apt build tools exit=0'
+++ 03:05:24 curl -sS -m 60 -H 'Authorization: Bearer [REDACTED_RUNPOD_API_KEY]' https://rest.runpod.io/v1/pods/xkgx6mw9roo3zl
+++ 03:05:24 jq -r '.costPerHr // empty'
++ 03:05:25 COST=2.08
+++ 03:05:25 awk -v c=2.08 'BEGIN{ if (c+0 <= 0) { print 0; exit } h = int(100 / c); print (h < 36 ? h : 36) }'
++ 03:05:25 HRS=36
++ 03:05:25 '[' 36 -gt 0 ']'
++ 03:05:25 DEADLINE_EPOCH=1794582316
++ 03:05:25 sleep 600
+++ 03:05:25 date -u -d @1794582316 +%FT%TZ
+++ 03:05:25 left
++ 03:05:25 log 'pod xkgx6mw9roo3zl start; costPerHr 2.08; limit 36 h; deadline 2026-11-13T15:05:16Z'
++++ 03:05:25 date +%s
++ 03:05:25 tee -a /workspace/out/run.log
+++ 03:05:25 echo 129591
++ 03:05:25 '[' 129591 -gt 120 ']'
+++ 03:05:25 date -u +%FT%TZ
++ 03:05:25 sleep 60
++ 03:05:25 echo '2026-11-12T03:05:25Z pod xkgx6mw9roo3zl start; costPerHr 2.08; limit 36 h; deadline 2026-11-13T15:05:16Z'
++ 03:05:25 grep MemTotal /proc/meminfo
++ 03:05:25 nproc
++ 03:05:25 lscpu
++ 03:05:25 grep 'Model name'
++ 03:05:25 echo 'costPerHr 2.08'
++ 03:05:25 command -v cargo
++ 03:05:25 curl -sSf https://sh.rustup.rs -o /workspace/rustup.sh
++ 03:05:25 sh /workspace/rustup.sh -y --profile minimal
++ 03:05:33 . /root/.cargo/env
+++ 03:05:33 case ":${PATH}:" in
+++ 03:05:33 export PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ 03:05:33 PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ 03:05:33 rustc --version
++ 03:05:33 log 'rust ready'
++ 03:05:33 tee -a /workspace/out/run.log
+++ 03:05:33 date -u +%FT%TZ
++ 03:05:33 echo '2026-11-12T03:05:33Z rust ready'
++ 03:05:33 pack
++ 03:05:33 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:05:33 mv -f /workspace/out.tgz.part /workspace/serve/7a65ef7fe97cec04c919f910f8963274/out.tgz
++ 03:05:33 sha256sum /workspace/serve/7a65ef7fe97cec04c919f910f8963274/out.tgz
++ 03:05:33 cut '-d ' -f1
++ 03:05:33 S=research/fall_degree_bounds_20261008
++ 03:05:33 curl -sS -m 120 -o /workspace/source_paths.txt https://raw.githubusercontent.com/isogeny-labs/crypto/a2be660914e8e485eefd45f2958eb6d18344dadf/research/fall_degree_bounds_20261008/e13/source_paths.txt
++ 03:05:33 echo '97b6bbde009ee1e04884041280b1c5dcd9030024d95b940f7e4a12bd9bd28ecd  /workspace/source_paths.txt'
++ 03:05:33 sha256sum -c -
++ 03:05:33 finish G-src-b_failed
++ 03:05:33 log 'finish: G-src-b_failed'
+++ 03:05:33 date -u +%FT%TZ
++ 03:05:33 tee -a /workspace/out/run.log
++ 03:05:33 echo '2026-11-12T03:05:33Z finish: G-src-b_failed'
++ 03:05:33 echo G-src-b_failed
++ 03:05:33 pack
++ 03:05:33 tar czf /workspace/out.tgz.part -C /workspace out

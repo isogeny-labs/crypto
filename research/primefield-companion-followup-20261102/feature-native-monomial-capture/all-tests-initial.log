@@ -1,0 +1,41 @@
+test_canonical_hash (test_capture.Capture) ... ok
+test_missing_executable (test_capture.Capture) ... ok
+test_nonzero_retained (test_capture.Capture) ... ok
+test_success_and_exclusive (test_capture.Capture) ... ok
+test_timeout_retained (test_capture.Capture) ... FAIL
+test_schema_and_charged_metrics (test_export.Export) ... FAIL
+test_wrong_bindings_and_failure (test_export.Export) ... ok
+test_corruptions (test_analyze.Parser) ... ok
+test_duplicate_keys (test_analyze.Parser) ... ok
+test_setup_charged (test_analyze.Parser) ... ok
+
+======================================================================
+FAIL: test_timeout_retained (test_capture.Capture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-monomial-capture/test_capture.py", line 14, in test_timeout_retained
+    out,r=self.run_stub('import time;print("partial",flush=True);time.sleep(10)',.2);self.assertTrue(r['timed_out']);self.assertNotEqual(r['exit_code'],0);self.assertEqual((out/'rows.jsonl').read_text(),'partial\n');self.assertTrue((out/'attempt.json').exists())
+AssertionError: '' != 'partial\n'
++ partial
+
+
+======================================================================
+FAIL: test_schema_and_charged_metrics (test_export.Export)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-monomial-capture/test_export.py", line 11, in test_schema_and_charged_metrics
+    p,r=self.fixture();out=e.convert(Parser().panel(),p,r);self.assertEqual(e.protocol_tool.schema_errors(out,'experiment.export/v1'),[]);self.assertEqual(out['flow']['completed'],60);self.assertEqual(out['runs'][0]['measurements']['counted']['modular_product_helpers'],17);self.assertFalse(out['runs'][0]['measurements']['wall_valid'])
+AssertionError: Lists differ: ["schema: notes/0: 'Fixed costs including [106 chars]ct'"] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+"schema: notes/0: 'Fixed costs including teardown added to each query. No clock claim. Raw stage vectors retained separately.' is not of type 'object'"
+
++ []
+- ["schema: notes/0: 'Fixed costs including teardown added to each query. No "
+-  "clock claim. Raw stage vectors retained separately.' is not of type 'object'"]
+
+----------------------------------------------------------------------
+Ran 10 tests in 4.281s
+
+FAILED (failures=2)

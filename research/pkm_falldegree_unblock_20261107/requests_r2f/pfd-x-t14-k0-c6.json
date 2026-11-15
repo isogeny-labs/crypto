@@ -1,0 +1,24 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "pfd-x-t14-k0-c6-20261108",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0d6b2ecd6df3f5f092fe4b6179986b041eb7d6be3b94e52d92809bdab2ff3ae8",
+    "command": [
+      "/usr/local/bin/entry.sh",
+      "cap:14:0:6:27900000000"
+    ],
+    "cpu": 12,
+    "memory": "112Gi",
+    "seconds": 90000,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 300
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "source_revision": "f13a690df016d0a457bd40579fbb9d054f486adf",
+    "study": "prime_fall_degree",
+    "protocol_sha256": "cc6573af0782aa2ed6bdb47059613fe9e1b75713cef9ac30784e8be2404e73ab",
+    "note": "Amendment 7 B bracket step: Kummer m=2 P1 t=14 draw 0 cap 6, --budget 86400 --max-dense 27900000000. Run only after G3 passed (pfd-a). Amendment 9 (R2-C, AMENDMENT_R2_C_cpu12.md, frozen 2026-11-08): cpu 14->12 because a 14-vCPU pod cannot be scheduled on cpu-spot (14180m > 14000m allocatable); RAYON_NUM_THREADS=12 from the pod env; instance_type r6i.4xlarge where seconds > 90000 (US$40 per job); every wall budget and seconds unchanged. Amendment 10 (R2-A, AMENDMENT_R2_A_stageB_m6t6.md, frozen 2026-11-08): protocol hash after Amendment 10; no field other than provenance changes. Amendment 11 (R2-D, AMENDMENT_R2_D_g3_scope.md, frozen 2026-11-09): G3 applies at m <= 6 (F4 engine capacity); the stage C G3-only job pfd-g3c-20261109 runs before pfd-b and any pfd-x; one or more G3 disagreements stop further PKM submissions; protocol hash after Amendment 11. Amendment 12 (R2-E, AMENDMENT_R2_E_price_guard.md, frozen 2026-11-09): no instance pin; the US$40 per-job ceiling is enforced by the price guard (node type and Spot price read after start)."
+  }
+}

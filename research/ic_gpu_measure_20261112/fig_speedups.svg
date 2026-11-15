@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 316" width="760" height="316" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">IC GPU kernel speedups on an A100</title>
+<desc id="d">Speedup (old median kernel time over new), log scale; each row names the two arms. Medians of 5 interleaved runs; A/A spread at most 0.7 percent.</desc>
+<style>.s{fill:#fcfcfb}.b{fill:#2a78d6}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.s{fill:#1a1a19}.b{fill:#3987e5}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
+<rect class="s" width="760" height="316"/>
+<text class="p" x="16" y="24" font-size="15" font-weight="600">Index-calculus GPU kernels: measured speedups (A100 80GB PCIe)</text>
+<text class="q" x="16" y="42" font-size="12">old median ÷ new median kernel time, log scale; identical outputs in every arm</text>
+<line class="g" x1="300.0" x2="300.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="300.0" y="298" font-size="11" text-anchor="middle">1×</text>
+<line class="g" x1="378.0" x2="378.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="378.0" y="298" font-size="11" text-anchor="middle">2×</text>
+<line class="g" x1="456.0" x2="456.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="456.0" y="298" font-size="11" text-anchor="middle">4×</text>
+<line class="g" x1="534.0" x2="534.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="534.0" y="298" font-size="11" text-anchor="middle">8×</text>
+<line class="g" x1="612.0" x2="612.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="612.0" y="298" font-size="11" text-anchor="middle">16×</text>
+<line class="g" x1="690.0" x2="690.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="690.0" y="298" font-size="11" text-anchor="middle">32×</text>
+<text class="p" x="290" y="71.4" font-size="12" text-anchor="end">FES walk, n=30: main → O(1) Gray walk</text>
+<g><title>FES walk, n=30: main → O(1) Gray walk: 25.82× faster</title><path class="b" d="M300,56 h361.9 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-361.9 z"/></g>
+<text class="p" x="671.9" y="71.4" font-size="12" font-weight="600">25.82×</text>
+<text class="p" x="290" y="107.4" font-size="12" text-anchor="end">FES walk, n=26: main → O(1) Gray walk</text>
+<g><title>FES walk, n=26: main → O(1) Gray walk: 18.57× faster</title><path class="b" d="M300,92 h324.7 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-324.7 z"/></g>
+<text class="p" x="634.7" y="107.4" font-size="12" font-weight="600">18.57×</text>
+<text class="p" x="290" y="143.4" font-size="12" text-anchor="end">spmv kernel: base → main (Barrett mulmod)</text>
+<g><title>spmv kernel: base → main (Barrett mulmod): 15.14× faster</title><path class="b" d="M300,128 h301.8 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-301.8 z"/></g>
+<text class="p" x="611.8" y="143.4" font-size="12" font-weight="600">15.14×</text>
+<text class="p" x="290" y="179.4" font-size="12" text-anchor="end">macaulay, batch 8192: main → shared u16</text>
+<g><title>macaulay, batch 8192: main → shared u16: 3.66× faster</title><path class="b" d="M300,164 h141.9 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-141.9 z"/></g>
+<text class="p" x="451.9" y="179.4" font-size="12" font-weight="600">3.66×</text>
+<text class="p" x="290" y="215.4" font-size="12" text-anchor="end">rootfind |F|=1024 hash/C16: base → main</text>
+<g><title>rootfind |F|=1024 hash/C16: base → main: 1.18× faster</title><path class="b" d="M300,200 h14.8 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-14.8 z"/></g>
+<text class="p" x="324.8" y="215.4" font-size="12" font-weight="600">1.18×</text>
+<text class="p" x="290" y="251.4" font-size="12" text-anchor="end">macaulay, batch 8192: base → main</text>
+<g><title>macaulay, batch 8192: base → main: 1.16× faster</title><path class="b" d="M300,236 h12.5 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-12.5 z"/></g>
+<text class="p" x="322.5" y="251.4" font-size="12" font-weight="600">1.16×</text>
+</svg>

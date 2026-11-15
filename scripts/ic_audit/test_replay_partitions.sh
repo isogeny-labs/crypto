@@ -34,7 +34,7 @@ for name in session.json spec.json plan.json host.json records.jsonl; do
 done
 jq -n --arg binary "$(sha256sum "$0"|cut -d' ' -f1)" --arg selection "$selection" \
   --arg zero "${METADATA_ZERO:-0}" \
-  --arg zero_sid "${METADATA_ZERO_SESSION_ID:-ECBS1h302934ff99ed}" \
+  --arg zero_sid "${METADATA_ZERO_SESSION_ID:-ECBS1h4c7b9db8a389}" \
   --argjson files "$files" --argjson candidates "$candidates" \
   --argjson seqs "$(printf '%s\n' "${seqs[@]}"|jq -s .)" '
   {schema:"ecbench.audit/v1",session_status:"complete",session_id:"metadata-control",
@@ -240,7 +240,7 @@ unset REPLAY_CHUNK_SIZE
 export REPLAY_PLAN="$tmp/zero-plan.json" METADATA_ZERO=1
 printf '%s\n' '{"schema":"ic-replay-plan/v1","sessions":[{"dir":"research/study/session","replay":"all","expect":"identical"}]}' > "$REPLAY_PLAN"
 cp research/study/session/records.jsonl positive-records.jsonl
-jq -c '.session_id="ECBS1h302934ff99ed" | .outcome.status="exhausted"' \
+jq -c '.session_id="ECBS1h4c7b9db8a389" | .outcome.status="exhausted"' \
   positive-records.jsonl > research/study/session/records.jsonl
 fail bash "$here/replay_partition.sh" ./fake-native "$tmp/unmarked-zero/0" 0 4
 ./fake-native verify --dir research/study/session --replay 1 --out "$tmp/zero-probe.json"

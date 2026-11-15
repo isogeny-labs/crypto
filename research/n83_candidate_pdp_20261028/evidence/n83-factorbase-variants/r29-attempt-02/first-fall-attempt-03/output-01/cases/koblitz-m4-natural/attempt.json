@@ -1,0 +1,49 @@
+{
+  "candidate_id": "spike29",
+  "certificate_sha256": "c76818924ff4a00e91af08f4cdcf8219170da3466967fec6d8e748a4a17f8f61",
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/koblitz-m4-natural/input",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/koblitz-m4-natural/output"
+  ],
+  "elapsed_seconds": 1.142,
+  "family": "koblitz",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "koblitz-m4-natural",
+  "input_row_sha256": "9c9f951f018f5a7ab4d0d6b9deba0f5c7c88510c69340c8cc48ceb104e189071",
+  "m": 4,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/koblitz-m4-natural/input",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/koblitz-m4-natural/output/koblitz-m4-natural.json"
+    ],
+    "elapsed_seconds": 0.274,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"koblitz-m4-natural\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "s3_readback_sha256": "c76818924ff4a00e91af08f4cdcf8219170da3466967fec6d8e748a4a17f8f61",
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":2,\"first_fall_lower_bound\":2,\"id\":\"koblitz-m4-natural\",\"status\":\"certified\"}\n",
+  "system_sha256": "d4f95f1f1e462152e0cc17cf9984912f1225dbeaef461c3798865c6bf9b377a1",
+  "target_kind": "natural"
+}

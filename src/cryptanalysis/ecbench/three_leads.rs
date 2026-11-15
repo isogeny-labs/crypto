@@ -17,7 +17,16 @@ use std::time::Instant;
 
 #[path = "pencil.rs"]
 mod pencil;
+pub(crate) use pencil::set_legacy_peval_sieve;
 pub(crate) use pencil::ScopedPencilProgress;
+
+/// The frozen pencil id and the id that reports the same solve with its
+/// ledger lifted into counters (README §9). Both run [`pencil`].
+pub(crate) const PENCIL_SYMBOLIC_V2: &str = "ic.three_leads_genus2_pencil_symbolic_v2";
+pub(crate) const PENCIL_SYMBOLIC_V3: &str = "ic.three_leads_genus2_pencil_symbolic_v3";
+pub(crate) fn is_pencil_symbolic(id: &str) -> bool {
+    id == PENCIL_SYMBOLIC_V2 || id == PENCIL_SYMBOLIC_V3
+}
 
 fn coefficients(mut x: u64, p: u64, n: usize) -> Vec<u64> {
     (0..n)
@@ -119,7 +128,7 @@ pub fn solve(
     seed: u64,
 ) -> Result<SolveReport, String> {
     applicable(m, inst)?;
-    if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+    if is_pencil_symbolic(&m.id) {
         if let Some(result) = pencil::with_active_progress(|sink| {
             pencil::solve_with_progress(m, inst, target, seed, Some(sink))
         })? {
@@ -340,7 +349,7 @@ pub fn solve(
 /// Refusals that are independent of the target and seed. The planner calls
 /// this before a session is admitted, and [`solve`] repeats it as a backstop.
 pub fn applicable(m: &ResolvedMethod, inst: &StudyInstance) -> Result<(), String> {
-    if m.id != "ic.three_leads_genus2_pencil_symbolic_v2" {
+    if !is_pencil_symbolic(&m.id) {
         m.params["trial_cap"]
             .parse::<u64>()
             .map_err(|_| "invalid trial_cap")?;
