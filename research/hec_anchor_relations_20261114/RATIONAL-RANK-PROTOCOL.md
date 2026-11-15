@@ -47,3 +47,16 @@ partial/censored result. Any failed principal identity, interpolation/division
 mismatch or excessive rank fails the screen. A useful successor should reach
 rank with smaller H without an explosion in visited/constructed functions;
 otherwise reject its small-anchor cost premise before timing integration.
+
+## Independent rank verification amendment (before verifier implementation)
+
+Keep the original36raw records unchanged. Re-execute the deterministic count
+screen, retaining every unique admitted modular row. Independently compute
+ordinary dense Gaussian ranks of the full relation matrix R and its off-anchor
+restriction R_off. The dimension of row(R) intersect the anchor coordinate
+space is rank(R)-rank(R_off), by the rank-nullity theorem applied to coordinate
+projection restricted to row(R). Require this difference to equal the forest
+and anchor-echelons' rank in every arm. Verify every original JSON field is
+unchanged, excluding the two new independent-rank fields. Preserve original
+stdout and publish verifier stdout separately. This is a second correctness
+gate; it does not select arms or revise cap/stop criteria.
