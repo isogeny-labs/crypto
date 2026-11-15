@@ -129,7 +129,12 @@ Every number is `[pcc:unverified]`.
 - Memory figures for this run: pilot `VmHWM` 63 MiB (used), cgroup `memory.peak` 104,304,640 bytes (recorded).
 - `lastStatusChange` at creation reads `Rented by User: <date>`, so the classifier's "by user" exclusion matches
   RunPod's text. Its value after a RunPod-side event was not observed (none happened).
-- `GET /pods/{id}` returns `env` (keys `PUBLIC_KEY`, `RUNNER_TOKEN`), so token recovery works; receipts drop `env`.
+- Host: `model name : AMD EPYC 9575F 64-Core Processor`, `MemTotal` 527,605,596 kB, `nproc` 16 in the container and
+  128 from the runner (`host.txt` in `admission-lines-1.txt`, `status-ready.json`). The first smoke ran on an AMD Ryzen
+  Threadripper 7960X, so the pinned flavor `cpu5m` does not pin the CPU model.
+- `GET /pods/{id}` was seen by the session to return `env` (keys `PUBLIC_KEY`, `RUNNER_TOKEN`). No committed receipt
+  shows it, since receipts drop `env`, and token recovery was not exercised on the pod: this is the session's
+  observation only.
 - Collection: one collection, transfer check true, outcome ADMITTED P2d; the offline classifier
   (`fetch.sh --classify-dir`) gives the same verdict. The raw tree was uploaded with `tools/benchrec.py`, and
   `fetch.sh --delete RECORD` confirmed the upload, deleted the pod (HTTP 204) and confirmed it gone. Pod lifetime 188 s,
