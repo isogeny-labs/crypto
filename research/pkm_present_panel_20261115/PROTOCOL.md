@@ -75,7 +75,7 @@ satisfied by making no cross-method ranking at all.
 ## 2. Instruments
 
 - **Native arm (primary):** `examples/pkm_present_panel.rs` (new; reuses `examples/pkm_m8_panel/*` and
-  `examples/pkm_oracle_program/algebra.rs`), engine `crypto_lib::cryptanalysis::f4_fp` (grevlex, 1 thread), counted
+  `examples/pkm_oracle_program/algebra.rs`), engine `crypto_lib::cryptanalysis::f4_fp` (grevlex; the probe showed the engine uses several threads: user 266 s against 77 s wall on the m = 4, t = 3 UNSAT call, so every native call runs with `RAYON_NUM_THREADS=1` and `taskset -c 0`, and the thread count actually used is recorded), counted
   field multiplications as the engine names them (`field_ops_total`), solving degree, degree reached, basis size,
   extraction counted separately, CPU seconds secondary. Deterministic: the same input gives the same count.
 - **msolve arm (secondary):** `/usr/bin/msolve` 0.6.5-1build2 (sha256 `c2722288…59fa`), `msolve -t 1 -v 2 -P 1`, one
@@ -181,8 +181,9 @@ interleaving of arms within an instance, permutation control for ordering effect
 
 ## 7. Budget, route and stop rules
 
-Local container, 1 thread, one call at a time; expected total 1–4 h (probe on seed 777: m ≤ 4, t ≤ 3 calls take
-0.1–3.2 s on both engines; m = 5 and t = 4 unknown, capped). Zero spend. Stop rules: a cell whose chain-tower
+Local container, 1 thread, one call at a time; expected total 2–8 h (probe on seed 777, chain-tower: m = 3 at t ≤ 3 and m = 4 at t = 2 take 0.1–3.2 s on
+both engines; the m = 4, t = 3 UNSAT call took 77 s wall / 266 CPU-s native (1.9 GB) and 75 s msolve; m = 4 at
+t = 4 and m = 5 are unknown and capped at 600 s). Zero spend. Stop rules: a cell whose chain-tower
 censors on more than half of its instances stops the remaining cells of that m (reported). No isolab, no pod.
 A follow-up at larger m or on a bigger host is a new protocol version.
 
