@@ -914,7 +914,11 @@ fn reconcile(
         match r.torsion.iter().find(|x| x.0 == l) {
             None => plan.inserts.push(row),
             Some((_, tn, ta)) => {
-                if tn.is_some_and(|x| x < 0 || x as usize != n) || ta.as_deref().is_some_and(|x| Some(x) != action) {
+                // A stored `jordan` (the DiSSECT and ell_torsion.rs label for any Jordan block) also
+                // covers this importer's finer `ramified` (a Jordan block with l not dividing v).
+                let action_conflict =
+                    ta.as_deref().is_some_and(|x| Some(x) != action && !(x == "jordan" && action == Some("ramified")));
+                if tn.is_some_and(|x| x < 0 || x as usize != n) || action_conflict {
                     return Err(format!(
                         "curve {}: stored curve_ell_torsion ({tn:?}, {ta:?}) at l = {l}, ecdb computes ({n}, {action:?})",
                         r.id

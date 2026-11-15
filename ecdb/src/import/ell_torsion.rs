@@ -61,7 +61,7 @@
 //! is checked, never changed. A rerun inserts nothing.
 
 use super::end_ring::{division_polys, is_fundamental, is_prime, monic, powmod, scalar_on, trim};
-use super::{bulk, Ctx, Report};
+use super::{bulk, bulk1, Ctx, Report};
 use anyhow::Result;
 use serde_json::json;
 use std::collections::{BTreeMap, BTreeSet};
@@ -128,6 +128,32 @@ SELECT r.curve_id, r.ell, r.action, r.rational_isogenies, r.point_degree, r.full
 FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, ell numeric, action text, rational_isogenies int,
      point_degree int, full_degree int, isogeny_degree int, all_isogenies_degree int, psi_degrees text)
 ON CONFLICT (curve_id, ell) DO NOTHING";
+
+/// Fill the NULL columns of a stored row that agreed with every computed column. The guard
+/// repeats the agreement, so a row changed since it was read is left alone (and reported).
+const TORSION_FILL_SQL: &str = "
+UPDATE ec.curve_ell_torsion t SET
+       frobenius_action = coalesce(t.frobenius_action, r.action),
+       rational_isogenies = coalesce(t.rational_isogenies, r.rational_isogenies),
+       torsion_point_degree = coalesce(t.torsion_point_degree, r.point_degree),
+       full_torsion_degree = coalesce(t.full_torsion_degree, r.full_degree),
+       isogeny_field_degree = coalesce(t.isogeny_field_degree, r.isogeny_degree),
+       all_isogenies_degree = coalesce(t.all_isogenies_degree, r.all_isogenies_degree),
+       division_poly_factor_degrees = coalesce(t.division_poly_factor_degrees, r.psi_degrees)
+FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, ell numeric, action text, rational_isogenies int,
+     point_degree int, full_degree int, isogeny_degree int, all_isogenies_degree int, psi_degrees text)
+WHERE t.curve_id = r.curve_id AND t.ell = r.ell
+  AND (t.frobenius_action IS NULL OR t.frobenius_action = r.action
+       OR (r.action = 'jordan' AND t.frobenius_action = 'ramified'))
+  AND (t.rational_isogenies IS NULL OR t.rational_isogenies = r.rational_isogenies)
+  AND (t.torsion_point_degree IS NULL OR t.torsion_point_degree = r.point_degree)
+  AND (t.full_torsion_degree IS NULL OR t.full_torsion_degree = r.full_degree)
+  AND (t.isogeny_field_degree IS NULL OR t.isogeny_field_degree = r.isogeny_degree)
+  AND (t.all_isogenies_degree IS NULL OR t.all_isogenies_degree = r.all_isogenies_degree)
+  AND (t.division_poly_factor_degrees IS NULL OR t.division_poly_factor_degrees = r.psi_degrees)
+  AND (t.frobenius_action IS NULL OR t.rational_isogenies IS NULL OR t.torsion_point_degree IS NULL
+       OR t.full_torsion_degree IS NULL OR t.isogeny_field_degree IS NULL OR t.all_isogenies_degree IS NULL
+       OR t.division_poly_factor_degrees IS NULL)";
 
 const FROB_ELL_SQL: &str = "
 INSERT INTO ec.frobenius_ell (isogeny_class_id, ell, volcano_depth, splitting, rational_isogenies,
@@ -637,6 +663,19 @@ pub struct ExistingRow {
     pub psi_degrees: Option<String>,
 }
 
+impl ExistingRow {
+    /// Whether a column this importer computes is still NULL in the stored row.
+    pub fn has_null(&self) -> bool {
+        self.action.is_none()
+            || self.rational_isogenies.is_none()
+            || self.point_degree.is_none()
+            || self.full_degree.is_none()
+            || self.isogeny_degree.is_none()
+            || self.all_isogenies_degree.is_none()
+            || self.psi_degrees.is_none()
+    }
+}
+
 /// The cross-checks against stored data; Ok(true) when a stored row agreed.
 pub fn cross_check(tor: &Torsion, known: &Known) -> Result<bool, String> {
     let l = tor.ell;
@@ -674,7 +713,11 @@ pub fn cross_check(tor: &Torsion, known: &Known) -> Result<bool, String> {
         _ => Ok(()),
     };
     if let Some(a) = &e.action {
-        if a != pr.action.as_str() {
+        // ell_isogenies.rs labels a Jordan block with l not dividing v `ramified`; this importer
+        // (like DiSSECT) calls every Jordan block `jordan`. Accept the finer label only when it is
+        // consistent with the verified depth.
+        let ramified_ok = a == "ramified" && pr.action == Action::Jordan && !known.depth.is_some_and(|d| d >= 1);
+        if a != pr.action.as_str() && !ramified_ok {
             return Err(format!("l = {l}: stored action {a}, ecdb computes {}", pr.action.as_str()));
         }
     }
@@ -807,6 +850,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     let class_vd = |r: &Row| -> Option<(u64, i64)> { verified_vd(r.supersingular, r.t, r.p, r.v, r.d_k) };
 
     let (mut ins_census, mut ins_other) = (Vec::new(), Vec::new());
+    let mut fills = Vec::new();
     // class -> l -> (all members fine, the per-curve isogeny counts)
     let mut class_ok: BTreeMap<(i64, u64), (bool, Vec<u64>)> = BTreeMap::new();
     let mut class_rep: BTreeMap<i64, &Row> = BTreeMap::new();
@@ -871,6 +915,9 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
                         "all_isogenies_degree": pr.all_isogenies_degree,
                         "psi_degrees": degrees_string(&pr.psi_degrees),
                     });
+                    if known.existing.as_ref().is_some_and(ExistingRow::has_null) {
+                        fills.push(row.clone());
+                    }
                     if known.existing.is_none() {
                         if r.census {
                             ins_census.push(row);
@@ -939,6 +986,17 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     }
     report.count("curve_ell_torsion_inserted_census_fp", bulk(client, TORSION_SQL, &ins_census, prov).await?);
     report.count("curve_ell_torsion_inserted_other", bulk(client, TORSION_SQL, &ins_other, prov).await?);
+    // Rows that agreed but have NULL columns (e.g. ell_isogenies.rs stores only the action and
+    // the count at l = 7, 11, 13): fill those columns. A row the guard turns away changed after
+    // it was read; it is reported, not overwritten.
+    let filled = bulk1(client, TORSION_FILL_SQL, &fills).await?;
+    report.count("curve_ell_torsion_filled_null_columns", filled);
+    if (filled as usize) < fills.len() {
+        report.problem(format!(
+            "curve_ell_torsion: {} agreeing rows with NULL columns were not filled (the stored row changed)",
+            fills.len() - filled as usize
+        ));
+    }
     report.count("frobenius_ell_inserted", bulk(client, FROB_ELL_SQL, &fe_rows, prov).await?);
     Ok(report)
 }
@@ -1233,6 +1291,35 @@ mod tests {
                 assert_eq!(cross_check(tor, &known), Ok(true));
             }
         }
+    }
+
+    /// ell_isogenies.rs stores `ramified` for a Jordan block with l not dividing v; this importer
+    /// says `jordan`. The finer label is accepted only when the depth does not contradict it.
+    #[test]
+    fn ramified_label_from_ell_isogenies() {
+        let (p, a, b, t) = (3529u64, 2574u64, 2980u64, -53i64);
+        let tor = curve_torsion(p, a, b, t).unwrap().into_iter().find(|x| x.ell == 3).unwrap();
+        assert_eq!(tor.pred.action, Action::Jordan);
+        let row = |act: &str| {
+            Some(ExistingRow { action: Some(act.into()), rational_isogenies: Some(1), ..Default::default() })
+        };
+        let known = |act: &str, depth: Option<u32>| Known { existing: row(act), depth, ..Default::default() };
+        assert_eq!(cross_check(&tor, &known("ramified", Some(0))), Ok(true));
+        assert_eq!(cross_check(&tor, &known("ramified", None)), Ok(true));
+        assert!(cross_check(&tor, &known("ramified", Some(1))).unwrap_err().contains("stored action"));
+        assert!(cross_check(&tor, &known("split", Some(0))).unwrap_err().contains("stored action"));
+        // a row with NULL columns is a fill candidate; a complete one is not
+        assert!(row("ramified").unwrap().has_null());
+        let full = ExistingRow {
+            action: Some("jordan".into()),
+            rational_isogenies: Some(1),
+            point_degree: Some(1),
+            full_degree: Some(1),
+            isogeny_degree: Some(1),
+            all_isogenies_degree: Some(1),
+            psi_degrees: Some("1".into()),
+        };
+        assert!(!full.has_null());
     }
 
     /// y^2 = x^3 + 2x + 3 over F_101 has Sage's rational 2- and 3-isogenies

@@ -4,9 +4,8 @@
 //! curve row (with its Jacobian) and a curve_morphism to E. Existence over the
 //! declared field only: no descent, subgroup-map or DLP-cost claim.
 //! The exact L-polynomial of each cover source's Jacobian is computed at the
-//! end of the import ([`super::cover_lpoly`]), and the Prym complement E' of
-//! each genus-2 source after it ([`super::cover_prym`]).
-//! end of the import ([`super::cover_lpoly`]), then their Richelot
+//! end of the import ([`super::cover_lpoly`]), the Prym complement E' of
+//! each genus-2 source after it ([`super::cover_prym`]), then the Richelot
 //! (2,2)-isogenous curves over small prime fields ([`super::richelot`]).
 
 use super::{bulk, bulk1, Ctx, Report};
