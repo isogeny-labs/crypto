@@ -347,7 +347,8 @@ extern "C" int rf64_session_create_pairs(uint64_t p, uint64_t curve_a, const uin
         rc = rf_cuda_session64_create_pairs(&s->f, a_m, s->fbx.data(), s->fby.data(), n_fb, s->chunk,
                                             max_targets, s->cap, &s->cuda, n_entries, &pb);
         if (rc == RF_OK) {
-            s->pairb.assign(pb, pb + *n_entries);
+            /* the device translates hits to build indices itself (pb is null) */
+            if (pb) s->pairb.assign(pb, pb + *n_entries);
             /* the probe set itself stays on the device; px only marks probe mode here */
             s->px.assign(1, 0);
         }

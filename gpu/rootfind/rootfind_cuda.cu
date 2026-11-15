@@ -362,6 +362,7 @@ struct RfCudaSession64 {
     uint64_t *d_fbx, *d_fby, *d_tx, *d_ty, *d_keys, *d_aux64, *d_px;
     uint32_t *d_idx, *d_aux32, *d_cnt;
     rf_relation *d_out;
+    uint32_t *d_pairb = nullptr;  /* pairs mode: probe index -> first pair's build index */
     SortedTable sview;
     HashTable hview;
     cudaEvent_t e0 = nullptr, e1 = nullptr;
@@ -373,7 +374,7 @@ extern "C" void rf_cuda_session64_destroy(void *h) {
     cudaGetLastError();
     cudaFree(s->d_fbx); cudaFree(s->d_fby); cudaFree(s->d_tx); cudaFree(s->d_ty);
     cudaFree(s->d_keys); cudaFree(s->d_aux64); cudaFree(s->d_idx); cudaFree(s->d_aux32);
-    cudaFree(s->d_cnt); cudaFree(s->d_out); cudaFree(s->d_px);
+    cudaFree(s->d_cnt); cudaFree(s->d_out); cudaFree(s->d_px); cudaFree(s->d_pairb);
     if (s->e0) cudaEventDestroy(s->e0);
     if (s->e1) cudaEventDestroy(s->e1);
     delete s;
@@ -522,6 +523,10 @@ extern "C" int rf_cuda_session64_run(void *h, const uint64_t *tx, const uint64_t
     CUS(cudaMemcpy(&found, s->d_cnt, sizeof(uint32_t), cudaMemcpyDeviceToHost));
     *n_found = found;
     nw = found < s->cap ? found : s->cap;
+    if (nw && s->d_pairb) {
+        k_pairb_translate<<<(nw + 255) / 256, 256>>>(s->d_out, nw, s->d_pairb);
+        CUS(cudaGetLastError());
+    }
     if (nw) CUS(cudaMemcpy(out, s->d_out, nw * sizeof(rf_relation), cudaMemcpyDeviceToHost));
     return RF_OK;
 fail:
@@ -561,6 +566,13 @@ __global__ void k_pair_keys_cell(Fp64Ctx f, uint64_t a_m, const uint64_t *x, con
     }
 }
 
+/* pairs mode: a hit's j is a probe index; report the first pair's build index instead */
+__global__ void k_pairb_translate(rf_relation *out, uint32_t n, const uint32_t *pairb) {
+    const uint64_t k = rf_global_tid();
+    if (k >= n || out[k].tau == 0) return;
+    out[k].j = pairb[out[k].j];
+}
+
 /* first pair per abscissa: hash on the key, keep the least build index */
 __global__ void k_pair_dedupe(const uint64_t *keys, uint64_t nb, unsigned long long *hkey, uint32_t *hval,
                               uint32_t mask) {
@@ -589,7 +601,8 @@ __global__ void k_pair_compact(const unsigned long long *hkey, const uint32_t *h
 }
 
 /* fb_x, fb_y: Montgomery form, every y non-zero.  On success *n_entries is the table's size
- * and *pairb_host (malloc'ed; the caller frees) maps probe index -> build index. */
+ * and *pairb_host is set to null: the probe index -> build index map stays on the device, where
+ * rf_cuda_session64_run translates every reported hit. */
 extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, const uint64_t *fb_x,
                                               const uint64_t *fb_y, uint32_t n_fb, uint32_t chunk,
                                               uint32_t max_targets, uint32_t cap, void **out,
@@ -669,14 +682,15 @@ extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, co
     rc = RF_ERR_BAD_ARG;
     goto fail;
 #endif
-    *pairb_host = static_cast<uint32_t *>(std::malloc((size_t)entries * sizeof(uint32_t) + 1));
-    if (!*pairb_host) { rc = RF_ERR_NOMEM; goto fail; }
-    CUS(cudaMemcpy(*pairb_host, d_pairb, (size_t)entries * sizeof(uint32_t), cudaMemcpyDeviceToHost));
+    /* the build-index map stays on the device: run() translates each hit there (no host copy) */
+    s->d_pairb = d_pairb;
+    d_pairb = nullptr;
+    *pairb_host = nullptr;
     mark();
     if (timing)
         std::fprintf(stderr, "rootfind_serve: timing pairs n_fb=%u keys %.4f dedupe %.4f compact %.4f probe %.4f copy %.4f s\n",
                      n_fb, stage_s[0], stage_s[1], stage_s[2], stage_s[3], stage_s[4]);
-    cudaFree(d_pairb); cudaFree(d_count);
+    cudaFree(d_count);
     CUS(rf_cu_event(&s->e0));
     CUS(rf_cu_event(&s->e1));
     *n_entries = entries;
