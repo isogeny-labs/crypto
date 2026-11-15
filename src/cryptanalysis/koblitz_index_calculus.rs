@@ -6219,6 +6219,8 @@ impl PairSumTable {
         let parts_per_run = parts.div_ceil(fill_runs);
         let mut bucket_start = vec![0u32; buckets + 1];
         let mut rests = vec![0u32; total];
+        advise_huge_pages(&bucket_start);
+        advise_huge_pages(&rests);
         let rp = rests.as_mut_ptr() as usize;
         // The harvest's side arrays, in the order of `rests`.
         let mut sorted_hash = vec![0u64; if harvest { total } else { 0 }];
@@ -6232,6 +6234,7 @@ impl PairSumTable {
             .enumerate()
             .map(|(run, run_starts)| {
                 let mut present = vec![0u64; filter_words];
+                advise_huge_pages(&present);
                 for (k, starts) in run_starts.chunks_mut(per_part).enumerate() {
                     let p = run * parts_per_run + k;
                     let first = p * per_part;
@@ -15533,6 +15536,13 @@ pub fn verify_collected_relation(
         {
             return false;
         }
+        if fast_verify_enabled() {
+            if let Some(sum) = FastCurve::new(&kc.curve)
+                .and_then(|fast| fast_relation_sum(&fast, fb, &rel.points).map(|s| s.infinity))
+            {
+                return sum;
+            }
+        }
         let mut sum = BinaryPoint::Infinity;
         for &i in &rel.points {
             sum = kc.add(&sum, &fb.points[i]);
@@ -15545,11 +15555,78 @@ pub fn verify_collected_relation(
     if rel.points.iter().any(|&i| i >= fb.points.len()) {
         return false;
     }
+    if fast_verify_enabled() {
+        if let Some(verdict) = FastCurve::new(&kc.curve)
+            .and_then(|fast| verify_probe_relation_fast(kc, fb, &fast, rel))
+        {
+            return verdict;
+        }
+    }
+    verify_probe_relation_generic(kc, fb, rel)
+}
+
+/// `[a]G == Σ P_i` (and the sum is not `O`) in the generic arithmetic.
+fn verify_probe_relation_generic(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    rel: &CollectedRelation,
+) -> bool {
     let mut sum = BinaryPoint::Infinity;
     for &i in &rel.points {
         sum = kc.add(&sum, &fb.points[i]);
     }
     sum != BinaryPoint::Infinity && sum == kc.mul(kc.generator(), &BigUint::from(rel.a))
+}
+
+/// Whether [`verify_collected_relation`] sums a probe relation in
+/// single-word arithmetic (`KIC_FAST_VERIFY`, default on).  The verdict
+/// and the counted additions and doublings are those of the generic
+/// route; `0` restores it for A/B timing.
+fn fast_verify_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_FAST_VERIFY").map_or(true, |v| v != "0"))
+}
+
+/// `[a]G == Σ P_i` (and the sum is not `O`) in [`FastCurve`] arithmetic,
+/// or `None` when a point does not round-trip through the single-word
+/// field, so the caller keeps the generic route.  `FastCurve::add` and
+/// `double` count exactly where `point_add` and `point_double` do, and
+/// the scalar multiple is the one [`KoblitzCurve::mul`] takes.
+fn verify_probe_relation_fast(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    fast: &FastCurve,
+    rel: &CollectedRelation,
+) -> Option<bool> {
+    let generator = fast_lift_exact(fast, kc.generator())?;
+    let sum = fast_relation_sum(fast, fb, &rel.points)?;
+    Some(!sum.infinity && sum == fast.mul(generator, &BigUint::from(rel.a)))
+}
+
+/// `p` in single-word coordinates, or `None` if it does not round-trip.
+fn fast_lift_exact(fast: &FastCurve, p: &BinaryPoint) -> Option<FastPoint> {
+    let lifted = fast.lift(p);
+    (fast.lower(lifted) == *p).then_some(lifted)
+}
+
+/// `Σ P_i` over `points`, added left to right from `O` as the generic
+/// route adds them (so the same additions and doublings are counted),
+/// or `None` if a summand does not round-trip.  No addition is counted
+/// before every summand has lifted.
+fn fast_relation_sum(
+    fast: &FastCurve,
+    fb: &FrobeniusFactorBase,
+    points: &[usize],
+) -> Option<FastPoint> {
+    let summands = points
+        .iter()
+        .map(|&i| fast_lift_exact(fast, &fb.points[i]))
+        .collect::<Option<Vec<_>>>()?;
+    let mut sum = FastPoint::INFINITY;
+    for p in summands {
+        sum = fast.add(sum, p);
+    }
+    Some(sum)
 }
 
 /// The relation rows of a logarithm precompute, dense or sparse per the
@@ -15567,6 +15644,54 @@ struct LogSystem<'a> {
     /// In the word width `r` needs; empty (and over a placeholder
     /// width) on the dense path.
     sparse_rows: SparseRows,
+    /// `λ^k mod r` for `k` in `0..=n`: the Frobenius column
+    /// coefficients, so a row needs no `modpow` per summand.
+    lambda_powers: Vec<BigUint>,
+}
+
+/// Whether the pair table asks the kernel for transparent huge pages on
+/// its large, randomly read arrays (`KIC_HUGE_PAGES`, default on).  The
+/// arrays and every answer and count are the same either way; only the
+/// page size behind them changes, and so the TLB misses of the scan's
+/// filter probes and run lookups and of the build's scatter.  `0` turns
+/// the advice off for A/B timing.
+fn huge_pages_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_HUGE_PAGES").map_or(true, |v| v != "0"))
+}
+
+/// Advise transparent huge pages for the 2 MiB-aligned span of `v`,
+/// before its pages are first written: a freshly zeroed large `Vec`
+/// comes from `mmap` untouched, so the advice decides how its pages are
+/// faulted in.  Small slices, other systems and a refused advice are
+/// left as they are; the advice never changes the contents.
+fn advise_huge_pages<T>(v: &[T]) {
+    const HUGE: usize = 2 << 20;
+    let bytes = std::mem::size_of_val(v);
+    if bytes < 2 * HUGE || !huge_pages_enabled() {
+        return;
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let start = v.as_ptr() as usize;
+        let (lo, hi) = (start.next_multiple_of(HUGE), (start + bytes) / HUGE * HUGE);
+        if hi > lo {
+            // SAFETY: `[lo, hi)` lies inside `v`'s allocation, and
+            // `MADV_HUGEPAGE` changes only how its pages are backed.
+            unsafe {
+                libc::madvise(lo as *mut libc::c_void, hi - lo, libc::MADV_HUGEPAGE);
+            }
+        }
+    }
+}
+
+/// Whether the sparse relation system builds each row straight from
+/// its summands (`KIC_DIRECT_ROWS`, default on) instead of through a
+/// dense big-integer row.  Both give the same row; `0` restores the
+/// dense route for A/B timing.
+fn direct_rows_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_DIRECT_ROWS").map_or(true, |v| v != "0"))
 }
 
 impl<'a> LogSystem<'a> {
@@ -15600,6 +15725,13 @@ impl<'a> LogSystem<'a> {
                 SparseRows::for_modulus(&BigUint::from(2u32)).expect("2 is supported"),
             ),
         };
+        let mut lambda_powers = Vec::with_capacity(kc.n as usize + 1);
+        let mut power = BigUint::one() % r;
+        for _ in 0..=kc.n {
+            let next = (&power * &kc.lambda) % r;
+            lambda_powers.push(power);
+            power = next;
+        }
         Some(Self {
             kc,
             fb,
@@ -15611,6 +15743,7 @@ impl<'a> LogSystem<'a> {
             dense_matrix: Vec::new(),
             dense_rhs: Vec::new(),
             sparse_rows,
+            lambda_powers,
         })
     }
 
@@ -15669,6 +15802,29 @@ impl<'a> LogSystem<'a> {
         let _matrix = measurement::scope(Phase::MatrixBuild);
         let r = &self.kc.subgroup_order;
         let a = BigUint::from(rel.a);
+        if self.sparse_opts.is_some() && direct_rows_enabled() {
+            let entries = self.direct_entries(&rel.points);
+            let rhs = (&self.h * &a) % r;
+            self.sparse_rows.push_entries(&entries, &rhs);
+            #[cfg(debug_assertions)]
+            {
+                let dense = relation_from_decomposition_with_mode(
+                    self.kc,
+                    self.fb,
+                    &rel.points,
+                    &a,
+                    &BigUint::zero(),
+                    self.opts.collapse_negation,
+                    Some(self.projected.as_ref()),
+                );
+                debug_assert_eq!(
+                    self.sparse_rows.last_dense(self.n_cols),
+                    Some(dense.row),
+                    "direct row differs from the dense route"
+                );
+            }
+            return;
+        }
         let relation = relation_from_decomposition_with_mode(
             self.kc,
             self.fb,
@@ -15680,6 +15836,30 @@ impl<'a> LogSystem<'a> {
         );
         let rhs = (&self.h * &a) % r;
         self.push_row(relation.row, rhs);
+    }
+
+    /// A relation's `(column, ±λ^k mod r)` pairs, one a summand, unsorted
+    /// and unmerged.  Through `SparseRows::push_entries` (which sorts,
+    /// adds per column mod `r` and drops zeros) they give the row of the
+    /// dense route, `relation_from_decomposition_with_mode`.
+    fn direct_entries(&self, points: &[usize]) -> Vec<(u32, BigUint)> {
+        let r = &self.kc.subgroup_order;
+        let mut entries = Vec::with_capacity(points.len());
+        for &i in points {
+            // `None`: [h]P = O, no column (as in the dense route).
+            let Some((o, k, negated)) = self.projected.orbit_of[i] else {
+                continue;
+            };
+            let mut coeff = match self.lambda_powers.get(k as usize) {
+                Some(c) => c.clone(),
+                None => self.kc.lambda.modpow(&BigUint::from(k), r),
+            };
+            if negated && !coeff.is_zero() {
+                coeff = r - coeff;
+            }
+            entries.push((o as u32, coeff));
+        }
+        entries
     }
 
     /// Store a row `Σ c_o x_o ≡ rhs` in the configured form (sparse in
@@ -20327,6 +20507,66 @@ mod tests {
     }
 
     #[test]
+    fn direct_sparse_rows_equal_the_dense_route() {
+        // Rows pushed straight from their summands must equal the rows
+        // the dense route builds, for repeated summands, a point with
+        // its negation, and on the 82-bit N83 order as well.
+        let n83 = KoblitzCurve::known_n83_k0().expect("public N83 curve fixture");
+        let BinaryPoint::Affine { x, .. } = n83.generator() else {
+            panic!("N83 generator must be affine");
+        };
+        let n83_fb = build_explicit_frobenius_orbit_factor_base(&n83, std::slice::from_ref(x))
+            .expect("complete signed orbit");
+        let small = KoblitzCurve::new(0, 13).unwrap();
+        let small_fb = build_frobenius_factor_base(&small, 0).unwrap();
+        for (kc, fb) in [(&small, &small_fb), (&n83, &n83_fb)] {
+            for collapse_negation in [true, false] {
+                let opts = KoblitzIcOptions {
+                    linear_algebra: LinearAlgebra::Sparse(SparseSolveOptions::default()),
+                    collapse_negation,
+                    ..KoblitzIcOptions::default()
+                };
+                let system = LogSystem::new(kc, fb, &opts).unwrap();
+                let r = &kc.subgroup_order;
+                let n = fb.points.len();
+                let mut state = 0x9e37_79b9_7f4a_7c15u64;
+                let mut rows = SparseRows::for_modulus(r).unwrap();
+                let mut cases: Vec<Vec<usize>> = vec![vec![0, 0], vec![0, n - 1], vec![]];
+                for _ in 0..200 {
+                    let len = 1 + (state % 6) as usize;
+                    let mut points = Vec::with_capacity(len);
+                    for _ in 0..len {
+                        state = state
+                            .wrapping_mul(6_364_136_223_846_793_005)
+                            .wrapping_add(1_442_695_040_888_963_407);
+                        points.push((state >> 33) as usize % n);
+                    }
+                    cases.push(points);
+                }
+                for (i, points) in cases.iter().enumerate() {
+                    let rhs = BigUint::from(i as u32);
+                    let dense = relation_from_decomposition_with_mode(
+                        kc,
+                        fb,
+                        points,
+                        &BigUint::zero(),
+                        &BigUint::zero(),
+                        collapse_negation,
+                        Some(system.projected.as_ref()),
+                    );
+                    rows.push_dense(&dense.row, &rhs);
+                    rows.push_entries(&system.direct_entries(points), &rhs);
+                    assert_eq!(
+                        rows.row_biguint(2 * i),
+                        rows.row_biguint(2 * i + 1),
+                        "summands {points:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
     fn an_underdetermined_sparse_attempt_keeps_its_report() {
         let kc = KoblitzCurve::new(0, 9).unwrap();
         let fb = build_frobenius_factor_base(&kc, 0).unwrap();
@@ -22355,6 +22595,78 @@ mod tests {
     /// relation for relation.  Without this, turning aiming on would
     /// change a run's first unit and the comparison with a swept run
     /// would not be controlled.
+    #[test]
+    fn fast_relation_checks_match_the_generic_verdicts_and_counts() {
+        // Valid relations, corrupted ones, a doubled summand and a point
+        // with its negation: the single-word check must give the generic
+        // verdict and count the same additions, doublings and scalar
+        // multiplications.
+        use crate::cryptanalysis::group_op_count::counted;
+        let kc = KoblitzCurve::new(0, 19).unwrap();
+        let fb = build_subgroup_orbit_factor_base(&kc, 3, 400).unwrap();
+        let pair = PairSumTable::build(&kc, &fb).unwrap();
+        let opts = windowed_options(fb.points.len() / 8);
+        let collector = RelationCollector::with_pair_table(&kc, &fb, &opts, Some(&pair)).unwrap();
+        let unit = RelationWorkUnit {
+            seed: 11,
+            start: 0,
+            count: 4096,
+        };
+        let (found, _) = collector.collect_aimed(unit, None);
+        assert!(!found.is_empty(), "no relations to check");
+        let fast = FastCurve::new(&kc.curve).expect("single-word field");
+        let negation = (0..fb.points.len())
+            .find(|&j| fb.points[j] == crate::binary_ecc::curve::point_neg(&fb.points[0]));
+        let mut cases = Vec::new();
+        for rel in found.iter().take(40) {
+            cases.push(rel.clone());
+            let mut wrong_a = rel.clone();
+            wrong_a.a = rel.a % 1000 + 1;
+            cases.push(wrong_a);
+            let mut doubled = rel.clone();
+            doubled.points[1] = doubled.points[0];
+            cases.push(doubled);
+            if let Some(j) = negation {
+                let mut cancelled = rel.clone();
+                cancelled.points[0] = 0;
+                cancelled.points[1] = j;
+                cases.push(cancelled);
+            }
+        }
+        // Free relations (`a = 0`): a point with its negation and a
+        // point with itself, through the public check.
+        if let Some(j) = negation {
+            let free = [vec![0, j], vec![0, 0], vec![0, j, 1, 1]];
+            for points in free {
+                let rel = CollectedRelation {
+                    trial: 0,
+                    a: 0,
+                    points,
+                };
+                let mut sum = BinaryPoint::Infinity;
+                let (generic, generic_ops) = counted(|| {
+                    for &i in &rel.points {
+                        sum = kc.add(&sum, &fb.points[i]);
+                    }
+                    sum == BinaryPoint::Infinity
+                });
+                let (quick, quick_ops) = counted(|| verify_collected_relation(&kc, &fb, 3, &rel));
+                assert_eq!(generic, quick, "free verdict differs for {rel:?}");
+                assert_eq!(generic_ops, quick_ops, "free counts differ for {rel:?}");
+            }
+        }
+        let mut accepted = 0;
+        for rel in &cases {
+            let (generic, generic_ops) = counted(|| verify_probe_relation_generic(&kc, &fb, rel));
+            let (quick, quick_ops) =
+                counted(|| verify_probe_relation_fast(&kc, &fb, &fast, rel).expect("round trip"));
+            assert_eq!(generic, quick, "verdict differs for {rel:?}");
+            assert_eq!(generic_ops, quick_ops, "counts differ for {rel:?}");
+            accepted += usize::from(quick);
+        }
+        assert!(accepted >= found.len().min(40), "valid relations rejected");
+    }
+
     #[test]
     fn aiming_at_every_column_is_the_sweep() {
         let kc = KoblitzCurve::new(0, 19).unwrap();
