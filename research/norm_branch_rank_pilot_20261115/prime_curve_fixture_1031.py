@@ -7,7 +7,6 @@ The comparison excludes both algorithms' point-verification costs, and
 excludes locus discovery from the sign method (favorable to the sign method).
 One cold target is not amortized across the 991-target correctness census.
 """
-from collections import Counter
 from math import isqrt
 import json
 from exact_integer_locus import matrix, rank_mod, P
