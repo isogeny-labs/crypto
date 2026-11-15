@@ -886,6 +886,132 @@ without the *presentation*.
 
 ---
 
+### A14. Hashed (affine-threshold) factor bases: Bochum v0.2 §3 and the tensor IC
+
+- **Definition.** No set `V` of abscissae: `m` ordered slot bases
+  `F_i = {P ∈ ⟨G⟩ : (α_i·encode(P) + β_i) mod s < τ}`, `s` the first prime in
+  `[2p, 4p]`, one independent `(α_i, β_i)` per slot, `τ` set so that
+  `E|F_i| = max(⌈r^{1/m}⌉, 10m)` (Lemma 13). A relation is
+  `R = P_1 + … + P_m` with `P_i ∈ F_i`. The `ecdl-tensor-ic` variant uses a
+  keyed SHA-256 predicate by default, a random affine hash on the gadget path
+  and an optional coordinate window `x(A) < p >> k`. Membership is an affine
+  map and a comparison, so it encodes as a low-degree predicate; there is no
+  smoothness notion, so decomposition is an unstructured `m`-list problem.
+- **Existence.** Any prime-field curve with a prime-order subgroup; a
+  cofactor `c > 1` is handled by free source points `S` with `A = [c]S`
+  (`ic.tensor_contraction_cofactor_v1`). The framework plug-in stops at
+  `p < 2^61`; the vendored crate is arbitrary precision.
+- **Build.** Inverse-hash enumeration: for each `t < τ`, decode
+  `α^{-1}(t − β) mod s` to a point and keep it if it is in the subgroup.
+  `O(τ)` decodes, no `O(p)` scan, no square-root table. Charged as curve
+  additions plus `hashed_tensor_steps` and `sqrt_solves`; the tensor-curve
+  certification is not charged, and `run_pipeline` says so in
+  `unpriced_work`.
+  - Plug-in: `hashed-affine:slots=m[,seed=…,tau=…,s=…,steps=…]`
+    (`src/cryptanalysis/ic_framework/hashed.rs`), paired with `hashed-tensor`
+    on the same parameters, which it refuses to run without.
+  - Crates: `crates/hashed-ecdl-tensor` (Bochum §3 reduction, Appendix D.4
+    recursion, certificates), `crates/ecdl-tensor-ic` (whole-point network,
+    ecbench `ic.tensor_contraction_v1` / `_cofactor_v1`, policy
+    `DiagnosticOnly`), `crates/hashed-ecdl-cpu` (MITM oracle over the same
+    slot bases, persistent tuple-sum tables, batch inversion).
+- **Fold.** Negation only: one column per `{P, −P}`; the slots stay ordered.
+- **Oracle.** Exact Boolean tensor contraction (`hashed-tensor`, the crate's
+  `SparseContractor`); meet-in-the-middle over the slots (`hashed-ecdl-cpu`,
+  `Solver::mitm`); plain enumeration in the bounded reference. Every witness is
+  re-added in the group before a row is accepted.
+- **Measured.** All `[pcc:unverified]`; nothing has reached the gate.
+  - Counts-only protocol v2, 2026-10-31
+    ([`research/hashed_ecdl_counts_20261031/`](../../../research/hashed_ecdl_counts_20261031/results/RESULTS-v2-superseding.md)):
+    `ic.tensor_contraction_v1`, `m = 2`, against `rho.negation` at 0, 0.1 and
+    1 GAE per unpriced operation: **4.3·10³–9.5·10³×** at 10 bits,
+    2.7·10⁴–5.0·10⁴× at 12, 1.7·10⁵–3.0·10⁵× at 14, **6.7·10⁵–1.2·10⁶×** at
+    16; the order holds across the band on every curve, and the ratio grows
+    about 5.1× per two bits (log-log slope 1.17, 95% interval 1.00–1.34).
+    Against the plain `prime-abscissa:size=32` + `mitm` baseline on the same
+    curves: 259× to 2.2·10⁵×. The native hashed arms (`ic.hashed_native_v1`,
+    branch `codex/hashed-ecdl-ecbench-e2e`) completed 3 of 16 cells, at
+    5·10²–2.8·10³× rho; the rest exhausted their budgets and are unknown.
+    The validator replayed all 416 executions and checked `[d]G = Q` on the
+    306 verified rows; one round, 8 targets per cell, A/A vacuous for counts.
+  - CPU oracle, L0 shared host
+    ([`research/hashed_ecdl_cpu_20261030/`](../../../research/hashed_ecdl_cpu_20261030/README.md)):
+    `p = 65521`, `m = 3`, `τ = 80`: complete recovery median 45.99 ms → 3.90 ms
+    with persistent tables and batch-64 inversion, 120 executions per panel,
+    byte-identical certificates across arms. No rho arm.
+  - Desk audit, 2026-11-07
+    ([`research/hashed_ecdl_tensor_audit_20261107/`](../../../research/hashed_ecdl_tensor_audit_20261107/README.md)):
+    reduction correct; encoding `s = a·m·b` edges with `a ≥ 5.3·10³` at
+    `b = 131`; the recursion is admitted only for `λ ≥ 2^17`
+    (`s ≥ 2^131072` edges), so every run so far is direct summation
+    (`root_u = 0`); the composed exponent is above rho by ≥ 120 bits at
+    `b = 128–256` even with `a = 1`; linear algebra alone exceeds rho for
+    every `m ≤ 6`. §7 item 1 applies as written: the hashed base behaves like
+    a random set of its size.
+- **Verdict.** Refuted at every measurable size, and closed as an experimental
+  lead (`closed_obstructed`; card
+  [`research/pdp_strategy_evaluation_20261031/cards/e4.md`](../../../research/pdp_strategy_evaluation_20261031/cards/e4.md)).
+  The asymptotic claim is conditional on OpenAI Theorem D.1 and stays a
+  watch item: revisit on an explicit-constants D.1 whose saving starts below
+  about `10^6` edges. The hash is an encoding device, not a yield device.
+- **Sources.** [`ECDLP_RESEARCH_TECHNIQUES.md`](../ECDLP_RESEARCH_TECHNIQUES.md)
+  ("Hashed factor bases"), [`FRAMEWORK.md`](../FRAMEWORK.md)
+  ("Hashed-affine / hashed-tensor"), `cryptanalysis/docs/hashed-ecdl.md`,
+  `research/hashed_ecdl_leads_20261030/`, `research/ic_prime_eth_leads_20261031/leads/L09/`.
+
+### A15. Other prime-field plug-in bases without their own entry (inventory of 2026-11-12)
+
+Bases that ship on `main` and had no entry above. Each line gives the
+definition, the build, the record and the verdict as the technique matrix
+([`ECDLP_RESEARCH_TECHNIQUES.md`](../ECDLP_RESEARCH_TECHNIQUES.md) §1)
+records them; all numbers `[pcc:unverified]`, none gate-validated unless
+said.
+
+- **`cm-multiplier:size=K,norm=N[,mult=M]`** (`ic_framework/plugins.rs`).
+  `Z[φ]` closure on a CM curve: `[a]P + [b]φ(P)` for every `α = a + bφ` of
+  norm `≤ N` on the seed's column with weight `a + bλ`; the prime twin of
+  D3. A precompute trade, the relation floor unchanged; no dedicated
+  record (the Koblitz analogue reads 4.5× rho). Engineering.
+- **`cm-scalar-orbit`** and the ecbench `ic.cm_folded_*` methods
+  (`ic_framework/cm_orbit.rs`, `ecbench/cm_folded.rs`): `columns` seeds
+  times `length` points under the CM scalar action for `D = −19` or `−43`,
+  a signed MITM2 in a hash-pinned native backend with independent Rust
+  replay. Floor/crater 0.98 [0.87, 1.11], "not an admitted IC/rho
+  comparison" (`research/conductor_gap_cm_orbits_20261015/`). Accounting.
+- **`known-log:size=B`** and `ic.known_log_mitm2_v1`, `ic.known_log_ksum_v1`
+  (`ecbench/known_log.rs`): the base `{±[s_i]G}` with known logarithms, so
+  no matrix; a Bernstein–Lange-shaped table. Cheaper than the abscissa
+  pipeline by 1.5 → 15.6× from 16 to 24 bits, but negation rho is cheaper
+  at every size (rho/known-log `S` 0.43 at 24 bits;
+  `research/ecbench_known_log_targets_20261021/`). Not an attack.
+- **`prime-interval:t=T[,lo=L]`** and the digit-set, Edwards-`y`,
+  `T0`-invariant and square-bits frames of `pkm_semaev.rs`: the sets the
+  bit-membership system of `pkm-semaev` describes; frames are Möbius
+  coordinates of one system. Frame choice moves F4 cost 3.3–4.7× at
+  `k = 20` (`research/curve25519_frame_search_20261103/`, `VALIDATION.json`
+  present but unable to pass for want of a same-unit rho row); square bits
+  closed; the greedy digit set is an open, not engine-confirmed lead.
+  Engineering.
+- **`archive:store=…,manifest=…,symmetry=…`** (`ic_framework/archive.rs`):
+  imports a content-addressed factory archive with certified negation,
+  cubic, quartic or Frobenius symmetry and the `useful_rank` audit; the
+  transport for the factor-base factory. "No candidate has been selected
+  by the comparison" (`ARCHIVE_FACTOR_BASE_COMPARISON.md`). Instrument.
+- **`explicit-x:xs=…`** (`ic_framework/explicit_base.rs`, ecbench only): an
+  exact abscissa list, both signs. Instrument.
+- **Prime-orbit index calculus** (`prime_orbit_index_calculus.rs`,
+  `ic prime-orbit`, `ic.prime_orbit_relations_v1`): `m` full `Aut`-orbits,
+  two-unknown relations solved as a gain graph, scaled curves to 40 bits;
+  5.42× negation rho on a 14-bit toy curve, 4.20× cubic rho on `j = 0`,
+  "rho-led". Engineering, the ancestor of A3.
+- **Small-x exact-yield instrument** (`prime_small_x.rs`, `secg_small_x.rs`,
+  `ic prime`): the exact two-sum yield of the smallest-abscissa base on
+  every SECG curve. Loses to rho by at least `2^40.9` in trials on every
+  curve; P-192 yield `2^{−175}`–`2^{−165}` (`research/secg_small_x_20261014/`).
+  Refuted, the A1 baseline at deployed size.
+- **Coordinate frames** (`coordinate_search.rs`, `coordinate_quotients.rs`):
+  the module-level mechanism behind B3; toy fields, constant factor.
+
 ## 3. Odd-characteristic extension fields `E(F_{p^k})`
 
 ### B1. Gaudry–Diem subfield base `{P : x(P) ∈ F_p}`
@@ -1310,6 +1436,57 @@ file is missing on `main`.
 
 ---
 
+### D11. Other Koblitz and binary plug-in bases and selection instruments (inventory of 2026-11-12)
+
+- **`generator_orbit=1`** on `compact-orbit-scan`: column 0 is the
+  generator's own orbit with known logarithm, one relation fewer. Nets
+  1.26–3.20× over the baseline on seven curves; at `n = 29` below the
+  matched rho-frob across the band (`S` 0.546 / 0.611 / 1.196 against
+  1.569), which the record itself reads as a Frobenius-folded BSGS at one
+  column on rho's fixed set-up; gap 1.15× at `n = 31`, 3.89× at 37
+  (`research/ecbench_generator_orbit_20261022/`, **validated**).
+  Engineering.
+- **`projected=1`** on `koblitz-orbit` and `koblitz-trace-zero`: folds
+  columns by the signed orbits of the cofactor projections `[h]P`, the
+  matrix's real column count; `no_fold=1` is the control. Accounting.
+- **Greedy and sampled coverage selection, pruning, frozen `explicit_orbits`
+  recipes, `subgroup_orbits`, 2-torsion saturation** (`koblitz_greedy_base.rs`,
+  `koblitz_greedy_sampled.rs`, `koblitz_factor_base_search.rs`, `ic search`):
+  expected trials at the best column count fall 1.08–1.18× at `r ≤ 2^17`,
+  the selector's advantage over random falling to 1.000 at `r = 2^39`
+  (`research/greedy_factor_base_yield_20261014/`). Engineering; past
+  `r ≈ 2^28` use `subgroup`.
+- **`binary-subspace … select=strict4e|gated-rank`**
+  (`ic_framework/subspace_select.rs`): a sieved subspace with every
+  abscissa in `4E`, or the best of several draws by a rank-aware key.
+  Unresolved: 2.11 bits fewer counted operations at `w = 0`, the order flips
+  inside the band, rho cheaper than both arms in every cell
+  (`research/fb_strict4e_20261027/`, gate refuses its `VALIDATION.json`).
+- **`binary-multiplier:size=K,mult=M`**: `[m]P` on the seed's column with
+  weight `m`, structure-free; 6.1× cheaper than the best subspace base at
+  degree 28 and still 6–12× rho (`research/ic_improve_20261023/`); "does not
+  transfer". Engineering.
+- **`explicit-x`** (binary): as A15. Instrument.
+- **λ-coordinate base** `{P : λ(P) ∈ W}` (`koblitz_ic_leads.rs`, lead L1): a
+  halved affine base, identity-checked on 182 subspaces, "L1 closed in
+  full", nothing moves an IC cost (`research/koblitz_ic_leads_build_20261024/`).
+  Closed.
+- **Binary small-x / SECG base** (`binary_small_x.rs`, `ic prime --curve
+  sect163r2`): yield `2B²/(n − 1)`, loses to rho by `≥ 2^40.9` in trials
+  (`research/secg_small_x_20261014/`). Refuted.
+- **Shantz–Teske δ method** (`delta_method.rs`, Sage `--delta-sweep`): a
+  dimension knob, `m·l = n − δ`; measured fractions track the prediction at
+  `n = 31`, net cost per relation 513 / 257 / 213 ms at `δ = +3 / +1 / −1`;
+  "constant-factor tuning knob, no exponent change". Engineering (C8 has
+  the clause).
+- **Selection and forecasting instruments**: the planner (`ic plan`,
+  `ic-planner/4`), the degree-of-regularity forecast (`dreg_forecast.rs`,
+  `factor-base-sweep`), relation-yield pruning
+  (`relation_yield_pruning.rs`), `ic fixed` and the 84 frozen
+  `ic workflow --params` documents under `docs/ic/params/`. None carries an
+  `S`; see the technique matrix §7.
+- **N83 frozen bases**: D8 above.
+
 ## 6. Jacobians and covers
 
 - **E1. Degree-1 places on genus 2–4 hyperelliptic Jacobians**
@@ -1625,6 +1802,17 @@ blockers are hardware and, for the shape card, pinning the merge commit.
   D9, D10 and E6, and `cost_vs_rho` gained band-priced rows (frontier
   campaign, supersingular auxiliary curve) and weight-0 or wall-clock rows
   (N83 cold, large primes, genus-3 cover), each labelled with its pricing.
+- **Third update round** (2026-11-12). Added A14, the hashed
+  (affine-threshold) factor bases of Bochum v0.2 §3 and the tensor IC
+  crates, from the counts-only record of 2026-10-31, the CPU panels of
+  2026-10-30 and the desk audit of 2026-11-07; one taxonomy box and one
+  cost row. The `research-kb` server and its CLI were unavailable in the
+  authoring container, so the sources were read from the tree directly.
+- **Fourth update round** (2026-11-12). Added A15 and D11, catch-all entries
+  for every plug-in base on `main` that had no family here, from the
+  module-by-module inventory behind the technique matrix revision of the
+  same date; two taxonomy boxes, no new cost row (their records are not
+  mutually comparable).
 - **What is not re-derived.** Entries condensed from long notes keep their
   source's status label and are not re-derived here. If a source and this page
   disagree, the source wins.

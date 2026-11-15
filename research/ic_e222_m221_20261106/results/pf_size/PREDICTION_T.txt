@@ -1,0 +1,2 @@
+Exploratory T-scaling at 35 bits (1 instance per residue, batched + bucketed): T = 10000, c in {1.0, 1.5}, vs the tuned multi-target BSGS on identical planted targets.
+Prediction written before the run: the T-independent setup (about 1.4 s at c = 1) amortizes, so IC/BSGS at T = 10000 is at most 2.0 for the better of c = 1.0 and 1.5 (against 4.0 at T = 1000). If the ratio stays above 3, the per-target phase, not the setup, becomes the wall at large T. All targets must verify.

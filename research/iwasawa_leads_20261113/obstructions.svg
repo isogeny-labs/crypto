@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" viewBox="0 0 980 560" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#222"/></marker>
+  </defs>
+  <rect width="980" height="560" fill="#ffffff"/>
+  <text x="490" y="32" text-anchor="middle" font-size="19" font-weight="bold">Iwasawa leads I-12..I-14 against the four obstructions (prime-field ECDLP, n = #E(F_p) prime)</text>
+  <text x="490" y="54" text-anchor="middle" font-size="13" fill="#444">Derivations only, no experiment. Each lead closes through the lemma on its arrow.</text>
+
+  <!-- leads -->
+  <rect x="30" y="100" width="320" height="86" rx="8" fill="#fff4e0" stroke="#b36b00" stroke-width="1.5"/>
+  <text x="190" y="128" text-anchor="middle" font-size="15" font-weight="bold">I-12  Signature calculus</text>
+  <text x="190" y="150" text-anchor="middle" font-size="12">Poitou–Tate + Kolyvagin / admissible classes</text>
+  <text x="190" y="170" text-anchor="middle" font-size="12">H¹_ur(Q_p, Ẽ[n]) ≅ E(F_p)</text>
+
+  <rect x="30" y="236" width="320" height="86" rx="8" fill="#fff4e0" stroke="#b36b00" stroke-width="1.5"/>
+  <text x="190" y="264" text-anchor="middle" font-size="15" font-weight="bold">I-13  Ulmer-section factor base</text>
+  <text x="190" y="286" text-anchor="middle" font-size="12">specialise explicit points of E/F_p(μ_d, t^(1/d))</text>
+  <text x="190" y="306" text-anchor="middle" font-size="12">rank d − 2, sp: Λ → E_t0(F_q)</text>
+
+  <rect x="30" y="372" width="320" height="86" rx="8" fill="#fff4e0" stroke="#b36b00" stroke-width="1.5"/>
+  <text x="190" y="400" text-anchor="middle" font-size="15" font-weight="bold">I-14  Function-field Iwasawa</text>
+  <text x="190" y="422" text-anchor="middle" font-size="12">non-constant Z_n-tower over F_p(t)</text>
+  <text x="190" y="442" text-anchor="middle" font-size="12">specialise Selmer to the fibre E</text>
+
+  <!-- walls -->
+  <rect x="660" y="84" width="290" height="70" rx="8" fill="#e8f0fb" stroke="#1f4e9a" stroke-width="1.5"/>
+  <text x="805" y="112" text-anchor="middle" font-size="14" font-weight="bold">W1  torsion wall</text>
+  <text x="805" y="134" text-anchor="middle" font-size="12">p-adic maps kill prime-to-p torsion</text>
+
+  <rect x="660" y="184" width="290" height="70" rx="8" fill="#e8f0fb" stroke="#1f4e9a" stroke-width="1.5"/>
+  <text x="805" y="212" text-anchor="middle" font-size="14" font-weight="bold">W2  MOV / embedding degree</text>
+  <text x="805" y="234" text-anchor="middle" font-size="12">constant n-adic tower = F_(p^k)</text>
+
+  <rect x="660" y="284" width="290" height="70" rx="8" fill="#e8f0fb" stroke="#1f4e9a" stroke-width="1.5"/>
+  <text x="805" y="312" text-anchor="middle" font-size="14" font-weight="bold">W3  lift freedom (xedni)</text>
+  <text x="805" y="334" text-anchor="middle" font-size="12">inverting a lift / specialisation = DLP</text>
+
+  <rect x="660" y="384" width="290" height="70" rx="8" fill="#e8f0fb" stroke="#1f4e9a" stroke-width="1.5"/>
+  <text x="805" y="412" text-anchor="middle" font-size="14" font-weight="bold">W4  field degree ≳ n</text>
+  <text x="805" y="434" text-anchor="middle" font-size="12">n-torsion fields, ring class layers</text>
+
+  <!-- arrows -->
+  <line x1="350" y1="150" x2="658" y2="410" stroke="#222" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="362" y="200" font-size="12" fill="#8a2be2">Lemma A: ℓ ≥ (√n − 1)²</text>
+
+  <line x1="350" y1="280" x2="658" y2="318" stroke="#222" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="362" y="270" font-size="12" fill="#8a2be2">Lemma B: logs = basis of ker sp</text>
+
+  <line x1="350" y1="404" x2="658" y2="226" stroke="#222" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="362" y="470" font-size="12" fill="#8a2be2">Lemma C: only Z_n-ext. is constant</text>
+
+  <line x1="350" y1="420" x2="658" y2="124" stroke="#999" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#a)"/>
+  <text x="540" y="150" font-size="11" fill="#666">ℓ = p (ASW) escape</text>
+
+  <text x="490" y="520" text-anchor="middle" font-size="12" fill="#444">Solid: main closure. Dashed: the ℓ = p escape route, closed by W1 in characteristic p. All claims [pcc:unverified].</text>
+</svg>
