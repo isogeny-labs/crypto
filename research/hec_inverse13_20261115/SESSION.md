@@ -53,3 +53,15 @@ equations vanish moduloelim (numeratorconvention126). No solverrerun.
 RSSfield is sampled250ms and missed shortchildpeak;32KiBis onlyobserved lower
 bound, NOT processpeak or hardmemorycertificate. No performanceclaim.
 Next target unchanged after checkpoint; class recovery/sign still required.
+
+## Target parametrization passed
+Sourcecollector b0e17847b341/checkpoint215830/head321ede0d14ba preceded one
+actual targetsolve, exit0. Independent verifier confirms dimension0/degree12,
+all12modularidentities, squarefreeelim/invertibledenom; convention126. No
+expecteddivisor provided. Actual closed-divisor/class/sign recovery next.
+
+## Recovery source prepared
+Built exactparametrization rechecker, boundedfactorization, extension-to-F127
+divisor reconstruction, centered class and adjacentKummer sign recovery.
+ExpectedBimage consulted onlyafter orientation/subtraction. No recoveryrun yet.
+Rawlogs/res nativewhitespace retained; attributes exclude onlyrawformat checks.
