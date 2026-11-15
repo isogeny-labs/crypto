@@ -1,3 +1,7 @@
+# Latest: FULL455-policy conditional collector analysis complete
+
+Read cm8-61-collector-full-20261115/README.md and SESSION.md. All4095 matched policy/cap pairs,29029 reachable state records,0 conditional dual rank wins vs two source attempts,0 strongest INITIAL source-degree frontier wins. Source6 span contains both lower-cap kernels for all3185 tested profiles; ONLY row/call proxy1vs2, not full-work/speed dominance. Both fresh streams/independent replay and12 changed controls complete. No same-panel/cap rerun; next work needs genuinely changed encoding or priced reduction. All raw/report assets local, samePRopen/autooff, no active full-state process. [pcc:unverified]
+
 # Latest: partial shared-collector state engineering completed
 
 Read cm8-61-collector-20261115/README.md and SESSION.md first. Policy0/matched columns,allcaps0..8,50 reachable state/cap records; two fresh streams and independent rank/state replay agree,26 stages/10 changed controls complete,0 conditional dual rank gains vs two iid source calls. Dual costs2. Existing parent certified kernels only: no fresh oracle/scalar execution, full455-policy collector or stationary/stopping-time/total-cost claim. Next separately freeze complete policy/cost/source-frontier collector, faithful actual iid bridge and original-source integration. [pcc:unverified]
