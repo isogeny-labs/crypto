@@ -23,7 +23,6 @@ from __future__ import annotations
 import argparse
 import contextlib
 import fnmatch
-import glob
 import hashlib
 import json
 import os
@@ -109,33 +108,59 @@ def rel(path: str) -> str:
     return os.path.relpath(path, ROOT)
 
 
+@lru_cache(maxsize=None)
+def _compile_glob(pattern: str):
+    """Compile the component matchers shared by every path in one scan."""
+    return tuple(
+        None
+        if part == "**"
+        else (part.startswith("."), re.compile(fnmatch.translate(part)))
+        for part in pattern.split("/")
+    )
+
+
 def _glob_match(path: str, pattern: str) -> bool:
-    """Match one repository path with Python glob's path-component rules."""
+    """Match one repository path with Python glob's path-component rules.
+
+    ``glob_files`` applies each of a small number of patterns to hundreds of
+    thousands of Git-index paths.  Compile each pattern once and use the usual
+    wildcard backtracking state for ``**`` instead of constructing a recursive
+    ``lru_cache`` for every path.
+    """
     path_parts = path.split("/")
-    pattern_parts = pattern.split("/")
+    pattern_parts = _compile_glob(pattern)
+    path_i = pattern_i = 0
+    star_pattern_i = star_path_i = -1
 
-    @lru_cache(maxsize=None)
-    def match(path_i: int, pattern_i: int) -> bool:
-        if pattern_i == len(pattern_parts):
-            return path_i == len(path_parts)
-        part = pattern_parts[pattern_i]
-        if part == "**":
-            return match(path_i, pattern_i + 1) or (
-                path_i < len(path_parts)
-                and not path_parts[path_i].startswith(".")
-                and match(path_i + 1, pattern_i)
-            )
-        return (
-            path_i < len(path_parts)
-            and (
-                not path_parts[path_i].startswith(".")
-                or part.startswith(".")
-            )
-            and fnmatch.fnmatchcase(path_parts[path_i], part)
-            and match(path_i + 1, pattern_i + 1)
-        )
+    while path_i < len(path_parts):
+        if pattern_i < len(pattern_parts):
+            matcher = pattern_parts[pattern_i]
+            if matcher is None:
+                star_pattern_i = pattern_i
+                star_path_i = path_i
+                pattern_i += 1
+                continue
+            allow_hidden, regex = matcher
+            component = path_parts[path_i]
+            if (allow_hidden or not component.startswith(".")) and regex.match(
+                component
+            ):
+                path_i += 1
+                pattern_i += 1
+                continue
 
-    return match(0, 0)
+        if star_pattern_i < 0:
+            return False
+        component = path_parts[star_path_i]
+        if component.startswith("."):
+            return False
+        star_path_i += 1
+        path_i = star_path_i
+        pattern_i = star_pattern_i + 1
+
+    while pattern_i < len(pattern_parts) and pattern_parts[pattern_i] is None:
+        pattern_i += 1
+    return pattern_i == len(pattern_parts)
 
 
 class RepositoryInputs:
@@ -204,16 +229,16 @@ class RepositoryInputs:
 
     def glob_files(self, pattern: str) -> list[str]:
         pattern = self._relative(pattern)
-        materialized = {
-            self._relative(path)
-            for path in glob.glob(os.path.join(self.root, pattern), recursive=True)
-            if (
-                os.path.isfile(path)
-                and self._relative(path) in self.tracked_files
-            )
-        }
-        materialized.update(path for path in self.sparse_files if _glob_match(path, pattern))
-        return sorted(materialized)
+        # ``tracked_files`` is already the complete source universe. Scanning
+        # that in-memory index once avoids recursively walking the 312k-file
+        # worktree for every pattern. ``exists`` retains the sparse overlay:
+        # sparse HEAD entries count, worktree modifications count, ordinary
+        # tracked deletions and untracked files do not.
+        return sorted(
+            path
+            for path in self.tracked_files
+            if _glob_match(path, pattern) and self.exists(path)
+        )
 
     def child_directories(self, base: str) -> list[str]:
         base = self._relative(base).rstrip("/")

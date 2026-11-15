@@ -161,3 +161,9 @@ Sources checked: `repo:research/curve25519_cofactor_algebraic_20261102/README.md
 `repo:research/curve25519_cofactor_shared_20261102/README.md` (head),
 `repo:research/lift_dense_torsion_pairing_20261106/README.md` (head; the characteristic-2
 analogue found a 2× effect from 2-torsion translation). research-kb unavailable.
+
+**Update 2026-11-11:** the premise above was checked on the k = 20 Curve25519 miniature and
+fails for the "bits" base: its points fall in both descent classes (36%/64% at t = 5, 40%/60% at
+t = 6, 47%/53% at t = 9), so no lift is excluded. Only a halving of candidate pairs per lift
+remains, of unmeasured value. See
+[`research/curve25519_miniature_descent_class_20261111`](../curve25519_miniature_descent_class_20261111/README.md).

@@ -1,0 +1,108 @@
+name: CT64 explicit genus-two elliptic quotients and Mumford transfer
+on:
+  push:
+    branches:
+      - research/ct51-crosschar-degree8-20261112
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct64/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct66/**'
+      - '.github/workflows/ct64-explicit-quotient.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct64/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct66/**'
+      - '.github/workflows/ct64-explicit-quotient.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ct64-quotient:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify independent quotients, encoded Mumford transport and toy DLP
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct64
+          python3 -B "$D/ct64_mumford_transport.py" > /tmp/ct64-python.json
+          python3 -O -B "$D/ct64_mumford_transport.py" > /tmp/ct64-python-opt.json
+          cmp /tmp/ct64-python.json /tmp/ct64-python-opt.json
+          node "$D/ct64_independent.js" > /tmp/ct64-js.json
+          node --no-opt "$D/ct64_independent.js" > /tmp/ct64-js-noopt.json
+          cmp /tmp/ct64-js.json /tmp/ct64-js-noopt.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('/tmp/ct64-python.json').read_text())
+          j=json.loads(Path('/tmp/ct64-js.json').read_text())
+          def check(expr,ctx):
+              if not expr: raise ValueError(ctx)
+          check(p['source_classes']==31 and p['homomorphism_pairs']==961,'source group')
+          check(p['destination_logs']==62,'encoded input toy logs')
+          check(p['generator_images']==[[0,0],[0,0]],'oriented generator')
+          check(p['source_support']=={'zero':1,'linear':6,'split':12,'repeated':6,'nonsplit':6},'divisor types')
+          check(p['quotients']==j['selected_quotients'],'independent quotient coefficients')
+          check(j['nonzero_translation_parameters']==15 and j['involutive_translation_parameters']==5 and j['order_four_translation_parameters']==10,'involutions and negative controls')
+          check(j['curve_affine_points']==896 and j['elliptic_points']==961,'group orders')
+          check(len(j['all_pair_ranks'])==10 and all(v[2]==4 for v in j['all_pair_ranks']),'full rank of all quotient pairs')
+          check(len(j['fixed_rank4_witness'])==4,'rank witness rows')
+          print('CT64 independent arithmetic and encoded toy DLP checks passed')
+          PY
+          sha256sum /tmp/ct64-python.json /tmp/ct64-js.json
+
+      - name: CT65 Frobenius Galois orbits and noninvertible 31-torsion trace projection
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct65
+          python3 -B "$D/ct65_galois_projector.py" > /tmp/ct65-python.json
+          python3 -O -B "$D/ct65_galois_projector.py" | cmp - /tmp/ct65-python.json
+          node "$D/ct65_independent.js" > /tmp/ct65-js.json
+          node --no-opt "$D/ct65_independent.js" | cmp - /tmp/ct65-js.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path("/tmp/ct65-python.json").read_text())
+          b=json.loads(Path("/tmp/ct65-js.json").read_text())
+          if a!=b:
+              raise ValueError((a,b))
+          if (a["trace_projector_rank"],a["trace_projector_kernel_rank"])!=(1,3):
+              raise ValueError("projection lost its kernel")
+          print("CT65 independent orbit and projector checks matched")
+          PY
+
+      - name: CT66 complementary elliptic quotient dual and independent 100 cross maps
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct66
+          python3 -B "$D/ct66_full_dual.py" > /tmp/ct66-full.json
+          python3 -O -B "$D/ct66_full_dual.py" | cmp - /tmp/ct66-full.json
+          python3 -B "$D/ct66_dual_crossfactor.py" > /tmp/ct66-py.json
+          python3 -O -B "$D/ct66_dual_crossfactor.py" | cmp - /tmp/ct66-py.json
+          node "$D/ct66_dual_crossfactor_independent.js" > /tmp/ct66-js.json
+          node --no-opt "$D/ct66_dual_crossfactor_independent.js" | cmp - /tmp/ct66-js.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('/tmp/ct66-full.json').read_text())
+          b=json.loads(Path('/tmp/ct66-py.json').read_text())
+          c=json.loads(Path('/tmp/ct66-js.json').read_text())
+          def ok(x,msg):
+              if not x:raise AssertionError(msg)
+          ok(a['source_31_classes']==31 and a['target_31_torsion_pairs_tested']==6,'full dual/inverse')
+          ok(a['dual_scalar']==2 and a['inverse_scalar_mod31']==16,'dual norm scalar')
+          ok(a['ramified_extension_order2'] is True,'F1024 ramified order-two divisor')
+          ok(a['types']=={'zero':1,'linear':6,'split':12,'repeated':6,'nonsplit':6},'F1024 divisor supports')
+          ok(a['quotients']==[[941,20,336],[941,20,714]],'complementary quotient equations')
+          ok(b['rank_matrix']==c['rank_matrix'],'independent ordered cross-factor ranks')
+          ok(b['noncomplementary_fullrank']==80 and b['complement_zero']==10,'rank census')
+          ok(c['complementary_phi_ranks']==[[20,4],[534,4],[619,4],[809,4],[832,4]],'product-rank controls')
+          ok(c['example_nonzero_cross'][2]==[[2,2],[25,20]],'nonzero cross-map orientation')
+          print('CT66 independent dual, inverse, F1024 Cantor and all 100 cross maps passed')
+          PY
+          sha256sum "$D/ct66_full_dual.py" "$D/ct66_dual_crossfactor.py" "$D/ct66_dual_crossfactor_independent.js"
