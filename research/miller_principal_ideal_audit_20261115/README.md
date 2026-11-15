@@ -40,3 +40,5 @@ Earlier `MillerCurve`, `MillerExpressions` and `TangentCertificate` were fully r
 This does not prove the projective infinity pole/valuation, canonical principal divisor, translation pullback, Weil reciprocity, isogeny/Lang/Cartier/Jacobian bridge or canonical Weil/Tate/MOV/Frey–Rück theorem. It does not complete all fourteen items. The same prover, Mathlib and host are used; this is not independent implementation or physical-host validation. No canonical corpus promotion or signed-standing claim is made. [pcc:unverified]
 
 Exact local **PCC-20261115-357b60** replay PASS at 2026-11-15T04:16:36Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `1d97f3f602ed8088993c84da0ae471b838a26d54` and local receipt `f934d24d30275b298913f23b23319a351beecb77` share tree `c0916904c71dba9574bbcfeb9c3f1d4ad447caa0`. Anonymous fetch completed; fresh PR head/body/open/ready check matched. This publication metadata is outside the frozen source plan. [pcc:unverified]
