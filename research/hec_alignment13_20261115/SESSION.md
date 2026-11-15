@@ -17,3 +17,9 @@ lifting/fullcost/genus2/4 remain open.
 
 ## Errors
 No build error. Sharedresume untouched.
+
+## Completed gate
+Sourcec99ae1c7dc89/checkpoint202001 preceded one exit0execution.
+29centered pairs pass, exclusionsn3/16/21retained,22irreducible/50nonsplit
+actual curve divisors,25wrongcenter disagreements. No scientific rerun,
+sourcealignment or timing result. Next source quotient calibration/holdout.
