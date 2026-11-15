@@ -709,7 +709,7 @@ Study: [research/mt_fieldops_v5_20261112/](../../research/mt_fieldops_v5_2026111
 
 ## 14 November live-source frontier reconciliation (diagnostic; no ranked-row change)
 
-The live source tree now exposes **104 top-level ECBench methods** and **33 nested algorithms** (20 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
+The live source tree now exposes **105 top-level ECBench methods** and **34 nested algorithms** (21 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
 
 ### Solver and GPU diagnostics
 
@@ -1286,10 +1286,10 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
 - `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
 - `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
-- `src/cryptanalysis/ecbench/methods.rs` — sha256 `ad7d431652524737…`
-- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `f8f9a75589e96902…`
-- `integrations/primo/README.md` — sha256 `4ec69082225f9f88…`
-- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `5df3bdcdde3f43a0…`
+- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `3dbda3647cb57390…`
+- `integrations/primo/README.md` — sha256 `c75c86afe2f82334…`
+- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `ad90945be0c09c37…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
