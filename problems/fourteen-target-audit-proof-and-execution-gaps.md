@@ -2410,3 +2410,39 @@ recorded. Ch26PDF2–6/printed574–578 text/visual scoped, notall16pages; Def26
 Ex26.3.5/Algorithm29/Ex26.3.6 and exactofficial/prior proofs credited. No novelty/
 canonicalpromotion/independentphysicalhost/frozenedits/cryptoPython/spend/upload.
 [pcc:unverified]
+
+
+### Actual general-function divisors and a rational-point-only scope counterexample
+
+The [actual general-function divisor audit](../research/function_divisor_finiteness_audit_20261115/README.md)
+now derives finite nonzero actual local orders for every nonzero actual
+Weierstrass rational function, not only constructed Miller functions. Actual
+evaluation zero implies actual nonzero norm-polynomial root; finite roots and
+monic quadratic fibers give finite affine zero sets. Actual nonvanishing local
+evaluation gives an actual local unit/official adic value1. Actual fractions
+therefore have support in numerator zeros/denominator zeros/infinity. General
+actual Finsupp principal point divisors/product-quotient laws/function-unit
+additive divisor homomorphism/principal subgroup range and all-n Miller
+compatibility are proved with no supplied finiteness premise.
+The actual nonsingular F3 curve y²=x³+x+1 has actual function
+f=(X²+1)/(X²+X+2), nonzero and nonconstant by actual polynomial embedding and
+coefficient comparison. All actual F3-rational point orders, including infinity,
+are0; the actual rational-point divisor is0 and the function is infinity-normalized.
+This refutes dropping geometric-point scope from zero-divisor-implies-constant;
+the source uses bar-k geometric points and its qualified statement is not refuted.
+Over arbitraryK these are nonsingularKpoint divisors; an elliptic model over
+algebraically closedK includes all geometric points. Geometric degreezero/
+constantkernel/uniqueness, algebraicclosurebasechange, separate Mathlib
+Scheme.localRing/Divisor APIcomparison, translation/reciprocity/isogeny/Lang/
+Cartier/Jacobian/canonical pairing/MOV-FR and complete14 remainopen.
+Exact local **PCC-20261115-c81d29** PASS at2026-11-15T07:24:51Z, signedunverified. Whole334/0fail/0trusted/
+standardfoundations;39modules33exactcredited+6new/42formal-config+14artifactpins;
+full1029-character bindingf4c0c971036efced202ba6da453857cdaaaa70f6e116619f5839ce5d10ad1b1b/native1complete/0prefix/0unresolved.
+Five snapshots/twofailures/threesuccesses, 220files/63objects/
+36076-byte losslessXZ/fivegate/onepagePDF46987fullread/visual/inbounds.
+Final05/projectlogs clean, inheritedauditordeprecation recorded. Galbraithch7
+Theorem7.7.1planeproof andfreshPDF13/16text/visual, prior exactnorm/valuation
+proofs credited. Full elliptic7.7.11/Lemma7.7.12/Cor7.7.13/7.7.14 newlytext-read
+ascontext afterprecedingpacketissue, notformallyproved; notall21pages.
+No novelty/canonicalpromotion/independentphysicalhost/frozenedits/cryptoPython/
+spend/upload. [pcc:unverified]
