@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0009Z-fes-k13-runpod",
+  "latest_record": "20261115T0239Z-ic-gpu-rootfind-m3",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 174,
+    "measured": 175,
     "open": 0
   },
   "repo": "crypto",
@@ -3938,6 +3938,62 @@
     },
     {
       "better": "lower",
+      "first": 0.004,
+      "latest": 0.004,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_rf2_daemon_setup_s_r31_f4096",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.004
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.214,
+      "latest": 0.214,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 44.032922
+      },
+      "metric": "ic_rf2_daemon_solve_s_r31_f4096",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 44.032922
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 0.00486,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.214
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.246,
       "latest": 0.246,
       "latest_derived": {
@@ -4022,6 +4078,64 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.249,
+      "latest": 0.249,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 27.513812
+      },
+      "metric": "ic_rf3_daemon_solve_s_r31_f1024",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 27.513812
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 0.00905,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.249
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 79.8,
+      "latest": 79.8,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 42.903226
+      },
+      "metric": "ic_rf3_s_r31_f1024",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 42.903226
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 1.86,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 79.8
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "S"
     },
     {
       "better": "lower",

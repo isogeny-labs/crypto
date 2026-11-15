@@ -19,10 +19,12 @@ specs/smoke.json, specs/rf3.json (30/32/34/36 bits; |F_x| 1024, 2048; rf3-cpu/gp
 specs/rf2d.json (28/30/32 bits; |F_x| 4096; rf2-cpu/gpu/gpud; rho). job.sh on one A100.
 
 ## State
-2026-11-15: code written; local tests running.
+2026-11-15 03:20Z: done; pod deleted. 232/232 verified+replayed, 128 pairs equal S. Daemon: m=2 solve
+20.8-127.8x CPU, 2.0-3.5x worker-per-run. m=3: correct, 0.41-0.86x CPU (device set-up). Amendment 1
+(rf3 curves 26-32 bits). Record closed. REPORT.md.
 
 ## Runs in flight
-None yet (pod icgpu-rm3 when launched; research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-rm3).
+None (icgpu-rm3 deleted 03:16Z).
 
 ## Stop and success conditions
 Any cpu/gpu S, relation or logarithm mismatch, or failed replay, voids that comparison. Wall gains
@@ -30,4 +32,4 @@ reported per workload with the CPU arm single-threaded; daemon start reported be
 Cap ~1 GPU-hour, $3. S3: same waiver as earlier rounds (session AWS keys rejected).
 
 ## Next steps
-Local tests -> commit -> pod -> analyze -> report/PDF/figure -> benchrec -> PR.
+Track the PR. Next: m = 3 probe table built on the device; prime_explicit curves > 32 bits; validator.
