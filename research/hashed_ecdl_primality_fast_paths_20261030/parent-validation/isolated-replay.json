@@ -1,0 +1,14 @@
+{
+  "purpose": "bounded development regression replay; not a timing benchmark",
+  "source_commit": "95cf0a81e9cb32fa8505c01cdecb2d05fe55940d",
+  "binary_sha256": "b1d584c5a85a4407e20731acc2978bca4fb8f93e06f6d1d3e5196ead5d328fe0",
+  "command": "{ time -p timeout --signal=TERM --kill-after=10s 180s ./target/release/deps/crypto_lib-cd696b7f650051ce --exact cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies --nocapture; }",
+  "cwd": "/workspace/crypto",
+  "deadline_seconds": 180,
+  "exit_code": 124,
+  "full_suite_pass": false,
+  "test_result_produced": false,
+  "stdout_stderr": "isolated-replay.txt",
+  "stdout_stderr_sha256": "2ec95e69463deec7bfd9e579e5656c060c597f563e367303bfebcab0bb0559ea",
+  "interpretation": "did not complete under the stated deadline; original SIGKILL cause remains unknown"
+}

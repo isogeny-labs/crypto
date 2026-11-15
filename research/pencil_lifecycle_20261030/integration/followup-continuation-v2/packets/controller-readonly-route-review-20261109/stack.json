@@ -1,0 +1,40 @@
+{
+  "StackName": "isolab-recovery-controller",
+  "StackStatus": "UPDATE_COMPLETE",
+  "Parameters": [
+    {
+      "ParameterKey": "ClusterSecurityGroup",
+      "ParameterValue": "sg-02a621bab6b0d9e64"
+    },
+    {
+      "ParameterKey": "PrivateSubnets",
+      "ParameterValue": "subnet-0ed67dc1e1b83132d,subnet-0fef4d36a1f2a37ff,subnet-023ccd74a57eb5a51"
+    },
+    {
+      "ParameterKey": "VpcId",
+      "ParameterValue": "vpc-04bee1e26f609d01c"
+    },
+    {
+      "ParameterKey": "LauncherVersion",
+      "ParameterValue": "tbptdGo2uMixArBkOl8H6XpsSEVsfkQV"
+    },
+    {
+      "ParameterKey": "LauncherKey",
+      "ParameterValue": "inputs/recovery-controllers/07fba4dd7127965796939af60e529c058a06c0d002f4d8551692b041d0e76668.zip"
+    },
+    {
+      "ParameterKey": "TriggerRoleName",
+      "ParameterValue": "isolab-remote-launcher-GitHubRole-FaCZneVBkF6D"
+    }
+  ],
+  "Outputs": [
+    {
+      "OutputKey": "ProjectName",
+      "OutputValue": "isolab-recovery-controller"
+    },
+    {
+      "OutputKey": "ControllerRoleArn",
+      "OutputValue": "arn:aws:iam::104186811093:role/isolab-recovery-controller-Role-L8mks6myTPFt"
+    }
+  ]
+}

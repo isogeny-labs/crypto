@@ -97,6 +97,12 @@ test('dependencies, workflow edits and frozen evidence remain applicable', () =>
   }
   assert.equal(classify(['taskq/deploy/eks-karpenter/validation/README.md']).ecbench_replay, false);
   assert.equal(classify(['taskq/deploy/example/session.json.bak']).ecbench_replay, false);
+  // Artifact-store pointers of sessions anywhere (SHF-20261106-a114e7, PPX-5).
+  for (const file of ['research/pkm_tower_rootfind_20261018/interrupted/P8-worker-restart-20261019/.artifacts.json',
+    '.artifacts.json']) {
+    assert.equal(classify([file]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['research/example/artifacts.json']).ecbench_replay, false);
   for (const file of ['analysis/src/coverage.rs', 'analysis/Cargo.toml',
     'analysis/Cargo.lock', 'runs.tar.xz', 'observations.json', 'exact-coverage.json']) {
     assert.equal(classify([`research/factor_base_shape_leads_20261018/${file}`]).ecbench_replay, true, file);

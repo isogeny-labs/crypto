@@ -2,6 +2,7 @@ name: H111 p2 halving Lean proof
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/p2_halving_carry_20261101/**'
       - '.github/workflows/h111-p2-halving-lean.yml'
@@ -16,6 +17,7 @@ concurrency:
 
 jobs:
   proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:

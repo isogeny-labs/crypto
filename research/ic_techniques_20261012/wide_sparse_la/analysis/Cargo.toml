@@ -1,0 +1,28 @@
+[package]
+name = "wide-sla-analysis"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Frozen analysis of the wide-modulus sparse linear algebra benchmark (PROTOCOL.md + PROTOCOL_AMENDMENT_1.md)"
+
+# Standalone package: the empty table keeps the repository's root workspace from claiming it.
+[workspace]
+
+[lib]
+name = "wide_sla"
+path = "src/lib.rs"
+
+[[bin]]
+name = "wide-sla-analysis"
+path = "src/main.rs"
+
+[[bin]]
+name = "wide-sla-crosscheck"
+path = "src/bin/crosscheck.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+
+[profile.release]
+opt-level = 3

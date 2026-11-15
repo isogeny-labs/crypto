@@ -1,10 +1,10 @@
 \chapter{Measuring index calculus against rho}\label{sec:method}
 
-The programme's first lesson was that index-calculus numbers from
-different studies did not compose: one study timed a decomposition, another
-a relation, a third a whole multi-target batch with shared tables, each on
-a different host and in a different unit. Four mechanisms, built in this
-order, fixed that.
+Index-calculus numbers from different studies did not compose at first:
+one study timed a decomposition, another a relation, a third a whole
+multi-target batch with shared tables, each on a different host and in a
+different unit. Four mechanisms, built in this order, fixed that.
+Table~\ref{tab:fm-standing} counts what they admitted by 6 November.
 
 \section{The boundary ledger (10 September)}
 
@@ -14,7 +14,7 @@ prime) and each pipeline stage (\texttt{factor\_base},
 \texttt{decomposition}, \texttt{relation\_yield}, \texttt{rank},
 \texttt{end\_to\_end\_dlp}, \texttt{vs\_rho}) a current record, a next
 target and acceptance gates. A row promotes only when its evidence JSON
-carries every field the measurement schema requires for that stage---for
+carries every field the measurement schema requires for that stage. For
 example, a \texttt{decomposition} claim that beats an algebraic frontier
 must report the first-fall degree, and a \texttt{vs\_rho} claim needs one
 target, the identical public point for both methods, verified scalars,
@@ -51,8 +51,8 @@ every record carries the one-target \emph{online window}, split for index
 calculus into the five exclusive phases \texttt{target\_query},
 \texttt{target\_PDP}, \texttt{target\_relation\_check},
 \texttt{target\_descent}, \texttt{target\_recovery\_check}. Targets are
-either planted or \emph{public}---hashed to the subgroup so that nobody
-knows the logarithm---and the runner verifies $[k]G=Q$ in its own process;
+either planted or \emph{public} (hashed to the subgroup so that nobody
+knows the logarithm), and the runner verifies $[k]G=Q$ in its own process;
 \texttt{ecbench verify} checks it again from the files. Failed, exhausted
 and timed-out runs are rows, never dropped.
 
@@ -85,13 +85,13 @@ checks determinism. A claim about scaling fits exponents over at least
 four sizes.
 
 \paragraph{Bounds and the frontier.} \texttt{ecbench} also records sealed
-\emph{bounds}---constant and exponent with intervals, per phase---and a
+\emph{bounds} (constant and exponent with intervals, per phase) and a
 challenge protocol whose verdict says whether a candidate advances,
 trades, matches or regresses an incumbent and at which level (exponent,
 constant, primitive). The incumbent for cold one-target Koblitz operations
 is \texttt{rho.signed\_frobenius\_strong} (bound
-\texttt{ECBND1h05a2ea918f3c}): $1.089\times$ the floor $[0.927,1.261]$,
-fitted exponent $\alpha=0.451$ $[0.399,0.512]$, 144 runs at six sizes
+\texttt{ECBND1hcf69c27b4978}, fit version 2): $1.089\times$ the floor $[0.927,1.261]$,
+fitted exponent $\alpha=0.451$ $[0.399,0.503]$, 144 runs at six sizes
 (\art{research/ecbench_frontier_20261013/}).
 
 \begin{definition}[comparability]\label{def:domain}
@@ -150,12 +150,29 @@ arm before any comparative statement. Blockers are recorded as named
 problems (\art{problems/}) with exit criteria rather than silently dropped.
 Measurement code is native (Rust); Python only lays out recorded values.
 
+\begin{table}[tbp]
+\centering\footnotesize
+\input{figures/tab-fm-standing.tex}
+\caption[]{Standing of the programme's records at \texttt{origin/main}
+\texttt{05f73826}, 6 November 2026. ``Running'' sessions were never
+finalised (a runner killed outright); \texttt{ecbench verify} audits them
+as interrupted. The \texttt{pcc} ledger began on 4 November and holds no
+verdict entry, so no claim record has a standing beyond ``unverified''.
+Counts by \art{figures/data-fm-glance.json}; table by
+\art{figures/make_tab_fm.py}.}
+\label{tab:fm-standing}
+\end{table}
+
 \paragraph{Generic baselines.} The rho, BSGS and Pohlig--Hellman
 references were engineered alongside index calculus, which is why each
 round's distance is quoted against the strongest reference at the time. On
 Koblitz curves the strong signed-Frobenius rho fell from 1{,}196 to 679.7
 instructions per step over four rounds with no established native-time gain
-(\S\ref{sec:ladder2}). On hyperelliptic Jacobians a negation fold and hash mixing each fell short
+(\S\ref{sec:ladder2}); on an L0 Apple host the tuned ecbench walk ran at
+$95.0$, $92.2$ and $102.5$\,ns per step at $n=41$, $53$ and $61$ against
+$519.9$, $861.5$ and $979.7$ for that strong reference, descriptive wall
+time (\art{benchmarks/20261026-r12-rho-ns-per-step/README.md}). On
+hyperelliptic Jacobians a negation fold and hash mixing each fell short
 of their registered gains, and full-width branch coefficients showed that
 the earlier 8-bit reference walk had been slow at large $N$
 (\art{benchmarks/20261018-hec-rho-negation/},
@@ -169,7 +186,11 @@ unvalidated (\art{research/generic_dlp_memory_parallelism_20261017/}).
 
 Building the harness and the ledger exposed errors in earlier claims,
 including our own. We list them because they change how earlier numbers
-must be read.
+must be read. Corrections that moved leaderboard rows (word-XOR pricing,
+cross-ISA drift, lopsided pricing, rule v8, the volcano and quartic
+withdrawals) are told in full in Chapter~\ref{ch:audit}, and items 5, 6, 8
+and 10 below only summarise them; the remaining corrections are in
+Appendix~\ref{ch:corrections}.
 \begin{enumerate}
 \item \emph{Results below rho that reversed against a stronger rho}
   (September; \S\ref{sec:koblitz-strong}). A tournament candidate at
@@ -197,42 +218,28 @@ must be read.
   can use fewer than linear field operations per ideal is too broad once a
   reusable pair table is allowed.
 \item \emph{Unpriced word XORs} (\art{research/ecbench_rootfind_faster_20261014/}).
-  Inherited F4's Boolean word XORs were counted but not charged, so its
-  $S=16.7$ at Koblitz $n=13$ was a lower bound that looked competitive
-  with rho ($14.4$). Pricing them gives $S=421.4$.
+  Inherited F4's counted but uncharged word XORs made its $S$ at Koblitz
+  $n=13$ look competitive with rho; priced, it is far above
+  (Chapter~\ref{ch:audit}, item~2).
 \item \emph{Cross-host counter drift}
   (\art{research/ecbench_frontier_20261013/audits/}): a replay-all audit
-  of the root-finder session on x86\_64 matched 120/168 records; all 48
-  inherited-F4 rows differed in solver word-XOR counts (e.g.\ 301{,}961
-  versus 300{,}531), with every scalar, trial count and charged GAE
-  unchanged. The failed receipt is kept; the F4 stage comparison is
-  historical until the drift is explained. A replay of the same session on
-  current \texttt{main} (20 October) matches only 72/168, with mismatches
-  in all four IC arms, root finding included. The cause was then isolated:
-  an x86-only BMI2 rewrite in inherited F4 counts word XORs differently from
-  the portable path; with it disabled the replay is 168/168 on x86 and on
-  emulated aarch64
-  (\art{research/validation_sweep_20261019/D-known-issues/item1_cross_isa_20261020/RESULT.md}).
-  F4 counts are comparable across instruction sets only when the path is
-  stated, which the method identity does not yet record.
+  of the root-finder session on x86\_64 matched 120/168 records, the
+  inherited-F4 rows differing in solver word-XOR counts. The 26 October
+  addendum states the cause precisely and closes it (Chapter~\ref{ch:audit},
+  item~4).
 \item \emph{A soundness bug} (\art{docs/ic/GROEBNER_F4F5F6_AUDIT_20261010.md}
   \S2.1): a degree-bounded \texttt{f4\_fp::solve} could certify solutions
   of an inconsistent system (over $\FF_5$, $\{x^3+1,xy-1,x+y\}$ returned
   two ``solutions''). Fixed by evaluating every candidate on the input.
 \item \emph{F6-IC charged cost} (\S\ref{sec:groebner}): a stage win in
   word XORs became a $64.6$--$1{,}353\times$ loss in charged $S$ once its
-  batched geometry was counted---recorded as an accounting result, not an
+  batched geometry was counted, recorded as an accounting result, not an
   advance. With inherited F4's own word XORs priced the $m=13$ loss is about
   $2.5\times$ (\S\ref{sec:groebner}).
 \item \emph{Lopsided pricing} (\S\ref{sec:band}): comparisons of a
-  calibration-priced index calculus with a lower-bound rho. On the
-  frontier campaign's train panel at Koblitz $n=13$ the compact-orbit arm,
-  earlier quoted at $1.08\times$ rho as a lower bound, is $0.93\times$,
-  $1.53\times$ and $5.7\times$ the strong rho at $w=0$, $0.1$ and $1$
-  (columns 2, four train targets,
-  \art{research/ic_frontier_campaign_20261015/select/SELECTION.md}): below
-  rho with native work free, above it otherwise, so the pair is unresolved
-  inside the band rather than a win for either side.
+  calibration-priced index calculus with a lower-bound rho. Priced on both
+  sides, the compact-orbit arm at Koblitz $n=13$ is unresolved inside the
+  band rather than a win for either side (Chapter~\ref{ch:audit}, item~2).
 \item \emph{Wall-time figures recomputed} (validation sweep). Recomputing
   from the committed per-target records gives $2{,}321\times$ for the
   $\ell=12$ binary MITM oracle (quoted $2{,}187\times$), $98.1\times$ for its
@@ -240,18 +247,13 @@ must be read.
   quartic solve at $d=6$ (quoted $6.4\times$ and 5.9\,s); all are shared-host
   wall times left unvalidated, and the counted evidence behind them stands
   (\art{research/validation_sweep_20261019/B-benchmarks/VERDICT_TABLE.md}).
-\item \emph{An unmatched rho reference} (21--24 October). The Koblitz
-  leaderboard's rule v3 priced its rho as built rather than at the canonical
-  batched step. Re-pricing rho in the same process raised the cold distance
-  $1.76$--$1.94\times$, to $9.9$--$43\times$
-  (\art{research/ic_tool_program/rule/v4/README.md}); the ledger's rule v8,
-  matching the reference its own way, raised it $1.30$--$1.58\times$ and found
-  that an apparent flattening of the gap's slope was mostly this artefact
-  (\art{papers/ecdlp-ic-improvement-ledger/}). The same week withdrew a
-  volcano-crater claim (IC 22--25\% cheaper) whose reference should have been
-  the cubic-automorphism rho, against which IC is $84.9\times$ rho, and marked
-  the plane-quartic $S$ values unverified because their degree-3 reduction
-  merges distinct classes. Canonical $\mathrm{Pic}^0$ keys later separated
-  those classes, and a re-run found that the earlier toy logarithms came from
-  enumerating the subgroup (\S\ref{sec:transfer}).
+\item \emph{An unmatched rho reference} (21--24 October). Matching the
+  Koblitz rule's rho (rule v4, then rule v8) raised the cold distance; the
+  same week withdrew a volcano-crater claim, whose matched reference puts
+  IC at $84.9\times$ rho at $w=0$ on the third volcano's $j=0$ crater, and
+  the plane-quartic $S$ values of the degree-3 reduction that merges
+  distinct classes (Chapter~\ref{ch:audit}, items~3 and~6). Canonical
+  $\mathrm{Pic}^0$ keys later separated those classes, and a re-run found
+  that the earlier toy logarithms came from enumerating the subgroup
+  (\S\ref{sec:transfer}).
 \end{enumerate}

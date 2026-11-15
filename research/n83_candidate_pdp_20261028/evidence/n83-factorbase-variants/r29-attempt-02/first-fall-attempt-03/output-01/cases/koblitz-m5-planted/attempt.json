@@ -1,0 +1,49 @@
+{
+  "candidate_id": "spike29",
+  "certificate_sha256": "21f07ad2bf2b33fd44f13c7607da7b9424a25fa5e66e3468488bd624dc990b33",
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/koblitz-m5-planted/input",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/koblitz-m5-planted/output"
+  ],
+  "elapsed_seconds": 1.431,
+  "family": "koblitz",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "koblitz-m5-planted",
+  "input_row_sha256": "ca745561754ebcbc4c07f3ce2d31ade709b0814020de392c859aa25fd1ec9fbe",
+  "m": 5,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/koblitz-m5-planted/input",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/koblitz-m5-planted/output/koblitz-m5-planted.json"
+    ],
+    "elapsed_seconds": 0.47,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"koblitz-m5-planted\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "s3_readback_sha256": "21f07ad2bf2b33fd44f13c7607da7b9424a25fa5e66e3468488bd624dc990b33",
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":2,\"first_fall_lower_bound\":2,\"id\":\"koblitz-m5-planted\",\"status\":\"certified\"}\n",
+  "system_sha256": "87103024aeb6488b72262cf393f9b8a4d861e877c1dbb95b1873b7f72885a84f",
+  "target_kind": "planted"
+}

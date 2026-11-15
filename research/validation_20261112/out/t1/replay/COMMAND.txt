@@ -1,0 +1,5 @@
+cwd: $SCR/exp_c5678a9/tree  (git archive of c5678a98aef6bbee34df3f277e618dd0a00f8ab1)
+build: cargo build --release --offline (rustc 1.97.0), CARGO_BUILD_JOBS=2
+run: chained_transfer_bench run --json $SCR/t1/replay/results_v3.json --certs $SCR/t1/replay/certs_v3.jsonl   (exit 0)
+     verify_certs research/chained_prime_transfer_20261111/certs_v3.jsonl   (exit 0)
+result: results_v3.json and certs_v3.jsonl byte-identical to the committed files (sha256 in outputs.sha256)

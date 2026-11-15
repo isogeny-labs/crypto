@@ -25,7 +25,7 @@ use crate::cryptanalysis::ecbench::methods::{
 };
 use crate::cryptanalysis::ecbench::spec::Level;
 use crate::cryptanalysis::ecbench::workload::{
-    legacy_automorphisms, CurveFacts, CurveSpec, TargetKind, Workload, FLOOR_RULE_V2,
+    legacy_automorphisms, CurveFacts, CurveSpec, Instance, TargetKind, Workload, FLOOR_RULE_V2,
 };
 use crate::cryptanalysis::ic_boundary::FieldOps;
 use crate::cryptanalysis::ic_measurement;
@@ -52,10 +52,48 @@ pub const F4_ACCOUNTING_KEY: &str = "inherited_f4_specialise";
 /// the code, so a change to what a unit counts is otherwise visible only as
 /// a different binary hash and, on replay, as bare count differences.
 pub fn current_accounting_versions() -> BTreeMap<String, u32> {
-    BTreeMap::from([(
-        F4_ACCOUNTING_KEY.to_string(),
-        crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION,
-    )])
+    BTreeMap::from([
+        (
+            F4_ACCOUNTING_KEY.to_string(),
+            crate::cryptanalysis::inherited_f4::INHERITED_F4_ACCOUNTING_VERSION,
+        ),
+        (F6_TREE_KEY.to_string(), F6_TREE_VERSION),
+    ])
+}
+
+/// The key under which a session records the version of the F6-IC search
+/// tree it was made under.
+pub const F6_TREE_KEY: &str = "f6_ic_tree";
+
+/// The version of the F6-IC search tree: which nodes the geometric gate
+/// closes.  The per-operation charge is [`F4_ACCOUNTING_KEY`]'s; this one
+/// moves when the gate closes nodes earlier or later, which changes how
+/// many specialisations and reductions an f6-ic record charges.
+///
+/// - **1** (never recorded; every session before the key): the gate closes
+///   a three-summand node once one summand is complete.
+/// - **2**: the few-candidate closure also closes a node once a summand's
+///   assigned bits leave at most `KIC_F6_FEW_CANDIDATES` (default 64) base
+///   codes (`research/f6_few_candidates_20261105`).  Same verdicts, same
+///   group operations, fewer word XORs.
+pub const F6_TREE_VERSION: u32 = 2;
+
+/// The F6-IC tree version a session recorded; a session without the key
+/// predates it and searched tree v1.
+pub fn f6_tree_version(recorded: &BTreeMap<String, u32>) -> u32 {
+    recorded.get(F6_TREE_KEY).copied().unwrap_or(1)
+}
+
+/// What to add to a failed replay of an F6-IC record, given the versions its
+/// session recorded; `None` when the tree version is the one charged now.
+pub fn f6_tree_note(recorded: &BTreeMap<String, u32>) -> Option<String> {
+    let v = f6_tree_version(recorded);
+    (v != F6_TREE_VERSION).then(|| {
+        format!(
+            "recorded under F6-IC tree v{v}, this binary closes nodes under v{F6_TREE_VERSION} \
+             (few-candidate closure): an f6-ic record's word XORs differ by construction"
+        )
+    })
 }
 
 /// When inherited-F4 specialisation became eager on every host (`#2043`,
@@ -262,7 +300,7 @@ pub fn with_diagnostic_lifecycle<T>(
         &diagnostic.lifecycle_directory(),
         diagnostic.envelope.prefix.identity.clone(),
     )?;
-    let prefix = if diagnostic.envelope.arm.method == "ic.three_leads_genus2_pencil_symbolic_v2" {
+    let prefix = if super::three_leads::is_pencil_symbolic(&diagnostic.envelope.arm.method) {
         match super::three_leads::ScopedPencilProgress::install(
             &diagnostic
                 .output_root
@@ -702,6 +740,22 @@ pub fn child_main(input: &str) -> ChildOutput {
             if profile_solve {
                 ic_measurement::callgrind_dump(b"ecbench_before_solve\0");
             }
+            // A method that queries a static-DH oracle gets the workload's
+            // server, which holds the planted scalar and answers [alpha]P; the
+            // scalar is not an argument of the solve.
+            let planted_oracle = match (
+                crate::cryptanalysis::ecbench::methods::needs_static_dh_oracle(&m.id),
+                &inst,
+                w.planted,
+            ) {
+                (true, Instance::Prime(i), Some(k)) => {
+                    Some(crate::cryptanalysis::ecbench::oracle::PlantedStaticDh::new(
+                        &i.curve,
+                        u64::try_from(k).map_err(|_| "planted scalar past one word".to_string())?,
+                    ))
+                }
+                _ => None,
+            };
             let method_call_start = std::time::Instant::now();
             let report = crate::cryptanalysis::ecbench::methods::solve_measured(
                 &m,
@@ -709,6 +763,9 @@ pub fn child_main(input: &str) -> ChildOutput {
                 &w.curve,
                 &w.target,
                 job.algorithm_seed,
+                planted_oracle
+                    .as_ref()
+                    .map(|o| o as &dyn crate::cryptanalysis::ecbench::oracle::StaticDhOracle),
             );
             if profile_solve {
                 ic_measurement::callgrind_dump(b"ecbench_solve\0");
@@ -2303,6 +2360,14 @@ mod grade_tests {
         assert_eq!(f4_accounting_note(&none, after, false), None, "after #2043");
     }
 
+    /// The F6-IC tree note names an older or missing tree version only.
+    #[test]
+    fn f6_tree_note_names_an_older_tree_only() {
+        assert_eq!(f6_tree_note(&current_accounting_versions()), None);
+        let note = f6_tree_note(&BTreeMap::new()).expect("no key is tree v1");
+        assert!(note.contains("v1") && note.contains(&format!("v{F6_TREE_VERSION}")));
+    }
+
     /// A session written before the field existed reads with no versions and
     /// is written back without the key, so it is byte for byte what it was.
     #[test]
@@ -2668,6 +2733,7 @@ mod diagnostic_child_v2_tests {
             target: ["0".into(), "0".into()],
             planted: None,
             target_counter: None,
+            representation: None,
         };
         let bytes = serde_json::to_vec(&serde_json::to_value(&workload).unwrap()).unwrap();
         let diagnostic = job.diagnostic_lifecycle.as_mut().unwrap();
