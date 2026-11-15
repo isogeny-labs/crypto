@@ -115,6 +115,44 @@ fn large_count(base: &Base, xs: &[u64]) -> usize {
     n
 }
 
+/// A relation kept for the end-to-end check: `Σ cᵢ·log Pᵢ − β·k ≡ α (mod ℓ)`
+/// over base and large-prime columns (as `ic.rs` / `sieve.rs` rows; the walk
+/// arm's step columns are base columns).
+#[derive(Clone, Debug, Default)]
+pub struct LpRow {
+    /// `(base index, coefficient)`.
+    pub base: Vec<(u32, i64)>,
+    /// `(large-prime x, coefficient)`.
+    pub large: Vec<(u32, i64)>,
+    pub alpha: u64,
+    pub beta: u64,
+}
+
+/// Row capture (adds no field products: only additions mod ℓ).
+pub struct Capture {
+    pub ell: u64,
+    pub rows: Vec<LpRow>,
+}
+
+/// `±1` for the point `(x, y)` against the column's representative
+/// `y ≤ (p−1)/2`.
+#[inline]
+fn sign_of(y: u64, p: u64) -> i64 {
+    if y <= (p - 1) / 2 {
+        1
+    } else {
+        -1
+    }
+}
+
+fn push_coef(v: &mut Vec<(u32, i64)>, col: u32, c: i64) {
+    if let Some(e) = v.iter_mut().find(|e| e.0 == col) {
+        e.1 += c;
+    } else {
+        v.push((col, c));
+    }
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct LpSieveReport {
     pub lines: u64,
@@ -158,6 +196,7 @@ pub fn lp_sieve(
     seed: u64,
     verify: u64,
     target: u64,
+    mut capture: Option<&mut Capture>,
 ) -> LpSieveReport {
     let t_all = std::time::Instant::now();
     let fp: &Fp = &curve.fp;
@@ -182,10 +221,18 @@ pub fn lp_sieve(
     let mut graph = Graph::default();
 
     let mut r = curve.add(d1, d2);
+    let fl = Fp::new(capture.as_ref().map_or(3, |c| c.ell));
+    let (mut al, mut be) = (1u64, 1u64);
     'lines: while rep.lines < lines {
         rep.lines += 1;
         if rep.lines > 1 {
-            r = if rng.below(2) == 0 { curve.add(&r, d1) } else { curve.add(&r, d2) };
+            r = if rng.below(2) == 0 {
+                al = fl.add(al, 1);
+                curve.add(&r, d1)
+            } else {
+                be = fl.add(be, 1);
+                curve.add(&r, d2)
+            };
         }
         if r.u.deg() != g as isize {
             rep.degenerate_lines += 1;
@@ -317,6 +364,31 @@ pub fn lp_sieve(
             for i in h..nx {
                 ys[i] = fp.add(v.eval(xs[i], fp), fp.mul(c, u.eval(xs[i], fp)));
             }
+            if let Some(cap) = capture.as_deref_mut() {
+                if large <= 2 {
+                    // D + Σ Pᵢ = 0  ⇒  −Σ cᵢ log Fᵢ − β k ≡ α.
+                    let mut row = LpRow {
+                        alpha: al,
+                        beta: be,
+                        ..LpRow::default()
+                    };
+                    for i in 0..nx {
+                        let (x, sgn) = if i < h {
+                            let js = grp[i];
+                            (base.b[(js / 2) as usize].0, if js % 2 == 0 { 1 } else { -1 })
+                        } else {
+                            (xs[i], sign_of(ys[i], p))
+                        };
+                        let j = base.in_b[x as usize];
+                        if j != u32::MAX {
+                            push_coef(&mut row.base, j, -sgn);
+                        } else {
+                            push_coef(&mut row.large, x as u32, -sgn);
+                        }
+                    }
+                    cap.rows.push(row);
+                }
+            }
             let cls = large.min(3);
             if cls < 3 && verified[cls] < verify {
                 let o0 = op_counts();
@@ -364,7 +436,16 @@ pub struct LpWalkReport {
 /// The engine's walk (as `ic::solve_dlp`: `d_step_in = 4`, 64 step places,
 /// here drawn from `B`) for `trials` trials; classify every split `u`.
 /// With `target > 0`, stop as soon as fulls + graph cycles reach `target`.
-pub fn lp_walk(curve: &Curve, d1: &Div, d2: &Div, base: &Base, trials: u64, seed: u64, target: u64) -> LpWalkReport {
+pub fn lp_walk(
+    curve: &Curve,
+    d1: &Div,
+    d2: &Div,
+    base: &Base,
+    trials: u64,
+    seed: u64,
+    target: u64,
+    mut capture: Option<&mut Capture>,
+) -> LpWalkReport {
     let t_all = std::time::Instant::now();
     let fp = &curve.fp;
     let mut rep = LpWalkReport::default();
@@ -381,15 +462,21 @@ pub fn lp_walk(curve: &Curve, d1: &Div, d2: &Div, base: &Base, trials: u64, seed
     let mut r = curve.add(d1, d2);
     let mut xs = [0u64; 8];
     let mut graph = Graph::default();
+    let fl = Fp::new(capture.as_ref().map_or(3, |c| c.ell));
+    let (mut al, mut be) = (1u64, 1u64);
+    let mut taken = vec![0i64; branches];
     while rep.trials < trials {
         rep.trials += 1;
         let roll = rng.below(4);
         r = if roll == 0 {
+            al = fl.add(al, 1);
             curve.add(&r, d1)
         } else if roll == 1 {
+            be = fl.add(be, 1);
             curve.add(&r, d2)
         } else {
             let s = rng.below(branches as u64) as usize;
+            taken[s] += 1;
             let (x, y) = base.b[steps[s] as usize];
             curve.add_place(&r, x, y)
         };
@@ -404,6 +491,34 @@ pub fn lp_walk(curve: &Curve, d1: &Div, d2: &Div, base: &Base, trials: u64, seed
         }
         let large = large_count(base, &xs[..n]);
         rep.classes.add(large);
+        if let Some(cap) = capture.as_deref_mut() {
+            if large <= 2 {
+                // r = αD₁ + βD₂ + Σ n_s F_s = Σ (x, v(x))·mult  ⇒
+                // Σ ±mult log F_x − Σ n_s log F_s − β k ≡ α (as ic.rs).
+                let mut row = LpRow {
+                    alpha: al,
+                    beta: be,
+                    ..LpRow::default()
+                };
+                for &(x, mult) in roots.as_slice() {
+                    // The row's sign needs v(x); counted, as `ic.rs` pays it.
+                    let vx = r.v.eval(x, fp);
+                    let c = sign_of(vx, fp.p) * mult as i64;
+                    let j = base.in_b[x as usize];
+                    if j != u32::MAX {
+                        push_coef(&mut row.base, j, c);
+                    } else {
+                        push_coef(&mut row.large, x as u32, c);
+                    }
+                }
+                for (s, &nn) in taken.iter().enumerate() {
+                    if nn != 0 {
+                        push_coef(&mut row.base, steps[s], -nn);
+                    }
+                }
+                cap.rows.push(row);
+            }
+        }
         if large == 1 || large == 2 {
             let (a, b) = edge(base, &xs[..n]).unwrap();
             rep.edges.push((a, b));
@@ -421,6 +536,86 @@ pub fn lp_walk(curve: &Curve, d1: &Div, d2: &Div, base: &Base, trials: u64, seed
     rep.ops_rel = op_counts().since(&o_start);
     rep.ns = t_all.elapsed().as_nanos();
     rep
+}
+
+/// End-to-end check of captured rows: drop rows holding a large prime seen
+/// once (repeat until none), make each remaining large prime a column after
+/// the base, `k` last, and solve.  Returns `(k, rows kept, large-prime
+/// columns)`.
+pub fn solve_captured(
+    rows: &[LpRow],
+    nb: usize,
+    ell: u64,
+    solver: crate::solve::Solver,
+    stats: &mut crate::solve::SolveStats,
+) -> (Option<u64>, usize, usize) {
+    use std::collections::HashMap;
+    let fl = Fp::new(ell);
+    let mut alive = vec![true; rows.len()];
+    loop {
+        let mut occ: HashMap<u32, u32> = HashMap::new();
+        for (i, r) in rows.iter().enumerate() {
+            if alive[i] {
+                for &(x, c) in &r.large {
+                    if c != 0 {
+                        *occ.entry(x).or_default() += 1;
+                    }
+                }
+            }
+        }
+        let mut changed = false;
+        for (i, r) in rows.iter().enumerate() {
+            if alive[i] && r.large.iter().any(|&(x, c)| c != 0 && occ[&x] < 2) {
+                alive[i] = false;
+                changed = true;
+            }
+        }
+        if !changed {
+            break;
+        }
+    }
+    let mut col: HashMap<u32, u32> = HashMap::new();
+    for (i, r) in rows.iter().enumerate() {
+        if alive[i] {
+            for &(x, c) in &r.large {
+                if c != 0 {
+                    let n = (nb + col.len()) as u32;
+                    col.entry(x).or_insert(n);
+                }
+            }
+        }
+    }
+    let m = nb + col.len();
+    let mut out: Vec<(crate::solve::Row, u64)> = Vec::new();
+    for (i, r) in rows.iter().enumerate() {
+        if !alive[i] {
+            continue;
+        }
+        let mut e: Vec<(u32, u64)> = Vec::new();
+        for &(j, c) in &r.base {
+            let v = fl.from_i64(c);
+            if v != 0 {
+                e.push((j, v));
+            }
+        }
+        for &(x, c) in &r.large {
+            let v = fl.from_i64(c);
+            if v != 0 {
+                e.push((col[&x], v));
+            }
+        }
+        e.sort_unstable_by_key(|t| t.0);
+        let kc = fl.neg(r.beta);
+        if kc != 0 {
+            e.push((m as u32, kc));
+        }
+        if !e.is_empty() {
+            out.push((e, r.alpha));
+        }
+    }
+    let kept = out.len();
+    let k = crate::solve::solve_for_last(&out, m, ell, solver, &[], stats);
+    (k, kept, col.len())
 }
 
 /// Incremental large-prime graph: `add` returns true when the edge closes
@@ -519,7 +714,7 @@ mod tests {
                 d1 = curve.add(&d1, &place(&mut rng));
                 d2 = curve.add(&d2, &place(&mut rng));
             }
-            let rep = lp_sieve(&curve, &d1, &d2, &base, 300, 1, u64::MAX, 0);
+            let rep = lp_sieve(&curve, &d1, &d2, &base, 300, 1, u64::MAX, 0, None);
             assert!(rep.classes.p2 > 0 && rep.classes.p1 > 0, "g={g}: {:?}", rep.classes);
             assert_eq!(rep.verified, rep.classes.full + rep.classes.p1 + rep.classes.p2);
         }

@@ -66,8 +66,8 @@ fn main() {
                 );
                 if to_target {
                     let tgt = base.b.len() as u64 + 10;
-                    let w = lp_walk(&curve, &d1, &d2, &base, trials, seed, tgt);
-                    let r = lp_sieve(&curve, &d1, &d2, &base, lines, seed, verify, tgt);
+                    let w = lp_walk(&curve, &d1, &d2, &base, trials, seed, tgt, None);
+                    let r = lp_sieve(&curve, &d1, &d2, &base, lines, seed, verify, tgt, None);
                     println!(
                         "JSON {{\"method\":\"target\",{head},\"target\":{tgt},\"walk_reached\":{},\"walk_trials\":{},\"walk_full\":{},\"walk_partials\":{},\"walk_useful\":{},\"walk_products\":{},\"walk_ms\":{:.3},\"sieve_reached\":{},\"sieve_lines\":{},\"sieve_full\":{},\"sieve_partials\":{},\"sieve_useful\":{},\"sieve_products\":{},\"sieve_verified\":{},\"sieve_ms\":{:.3}}}",
                         w.reached, w.trials, w.classes.full, w.edges.len(), w.useful, w.ops_rel.products, w.ns as f64 / 1e6,
@@ -75,7 +75,7 @@ fn main() {
                     );
                     continue;
                 }
-                let w = lp_walk(&curve, &d1, &d2, &base, trials, seed, 0);
+                let w = lp_walk(&curve, &d1, &d2, &base, trials, seed, 0, None);
                 println!(
                     "JSON {{\"method\":\"walk\",{head},\"trials\":{},\"split\":{},\"full\":{},\"p1\":{},\"p2\":{},\"discarded\":{},\
 \"ops_products\":{},\"ops_redc\":{},\"ops_inv\":{},\"ms\":{:.3}}}",
@@ -90,7 +90,7 @@ fn main() {
                     w.ops_rel.inv,
                     w.ns as f64 / 1e6
                 );
-                let r = lp_sieve(&curve, &d1, &d2, &base, lines, seed, verify, 0);
+                let r = lp_sieve(&curve, &d1, &d2, &base, lines, seed, verify, 0, None);
                 // Large-prime graph at an equal partial budget: the first
                 // n partials of each arm, n = the smaller arm's count.
                 let n = w.edges.len().min(r.edges.len());
