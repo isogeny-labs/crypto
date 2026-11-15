@@ -1,7 +1,7 @@
 # Kummer m = 3: how far the no-fall degree sits from d_F (2026-11-15)
 
 Status: research note. There is no `pcc` claim, so every number below is `[pcc:unverified]`. Everything ran locally on 4 vCPU.
-D9 and D10 are stated and proved in `research/prime_fall_degree_20261027/DERIVED.md`.
+D9 and D10 are stated and proved in `research/prime_fall_degree_20261027/DERIVED.md`. `[pcc:unverified]`
 
 ## Question
 
@@ -19,10 +19,10 @@ For the S3 chain on Kummer towers at m = 3 (towers of height t, K = 2^t), how la
 | 4 | 14 | not computed | 17 | 17 | – |
 | 5 | 16 | not computed | 20 | 20 | – |
 
-- **D9 (upper bound, proved).** The pointwise Bézout multipliers, summed with the grid indicators, give `d_F ≤ d_NS ≤ 3t+5`.
+- **D9 (upper bound, proved).** The pointwise Bézout multipliers, summed with the grid indicators, give `d_F ≤ d_NS ≤ 3t+5`. `[pcc:unverified]`
   - Checked independently on 24/24 instances. The identity is verified by explicit multiplication in `F_p[z]/(z^K−1)[u]`.
   - Within its own class (u-degree ≤ 1 multipliers) the bound is exact: N1 measures 3t+5 at t = 2…5.
-- **D10 (lower bound, proved, with a condition checked per instance).** An explicit dual functional
+- **D10 (lower bound, proved, with a condition checked per instance).** An explicit dual functional `[pcc:unverified]`
   `λ(g) = Σ_x x1·x2·x3·⟨u⟩(g·f1⁻¹ mod f2)` kills every column of degree ≤ 2t+5. So `λ(1) ≠ 0` gives `d_NS ≥ 2t+6`.
   - Certified on 32/32 valid instances (three primes, t = 2…5). The lead came from `NEW_LEADS.md` (KM3-LQR-NS); 2t+5 was sharpened to 2t+6.
 - **N1 (measurement).** Multipliers of u-degree 2 bring `d_NS` down to 3t+4 at t = 2 and 3.
@@ -37,7 +37,7 @@ For the S3 chain on Kummer towers at m = 3 (towers of height t, K = 2^t), how la
 - At m = 3 the no-fall degree grows linearly: `2t+6 ≤ d_NS ≤ 3t+5`. Measured `d_F` stays near 5.
   - As at m = 2, the fall mechanism accounts for everything above a constant.
 - Nothing here bounds `d_F` from below. The open item in DERIVED.md, "no growing lower bound on d_F", stands.
-- Not an improvement in cost. The success criterion concerns the IC baseline, and this changes no cost estimate or leaderboard row.
+- Not an improvement in cost. The success criterion concerns the IC baseline, and this changes no cost estimate or leaderboard row. `[pcc:unverified]`
 
 ## New leads (NEW_LEADS.md), ranked by information per CPU-hour
 
