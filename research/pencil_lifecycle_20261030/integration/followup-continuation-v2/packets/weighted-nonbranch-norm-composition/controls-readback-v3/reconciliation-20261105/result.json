@@ -1,0 +1,85 @@
+{
+  "schema": "research.reconciliation/v1",
+  "task": "T-1588",
+  "date": "2026-11-05",
+  "new_compiler_invocations": 0,
+  "new_scientific_runs": 0,
+  "phase7_native_status": "passed",
+  "all_started_children_reaped": true,
+  "cleanup_errors": [],
+  "native_receipt_sha256": "12f5cfaef562c36721b7c6c3334024a9040ddd1caa3690948315ca87313a4148",
+  "phase7_recipe_sha256": "79f11a6ce8f707af29d92ccd37ac6bc8a9d4e794838d7f0016a160cbe2dcc236",
+  "phase7_outer_phases": [
+    {
+      "phase": "pre",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/controls-readback-v3/custody-phase7.py",
+        "pre"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 106.9222030689998
+    },
+    {
+      "phase": "compiler",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "595s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/controls-readback-v3/compiler-phase7.py"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 131.6530344170169
+    },
+    {
+      "phase": "post",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/controls-readback-v3/custody-phase7.py",
+        "post"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 45.47050376801053
+    }
+  ],
+  "sequence_seconds_derived": 284.04574125402723,
+  "source_pin_checks": {
+    "compiler-phase7.py": true,
+    "custody-phase7.py": true,
+    "runtime-pins.json": true,
+    "Nonbranch.lean.txt": true,
+    "Controls.lean.txt": true,
+    "original-controls.lean.txt": true,
+    "Readback.lean.txt": true,
+    "ExpectedFailure.lean.txt": true,
+    "names.json": true
+  },
+  "reviewer_freeze_checks": {
+    "PLAN.md": true,
+    "REPLAY.md": true,
+    "replay.py": true,
+    "Nonbranch.lean.txt": true,
+    "IndependentControls.lean.txt": true,
+    "Readback.lean.txt": true,
+    "ExpectedFailure.lean.txt": true,
+    "names.json": true,
+    "runtime-pins.json": true,
+    "tactic-module-bindings.json": true
+  },
+  "raw_phase7_outputs_available": false,
+  "phase7_axiom_lines_freshly_recomputed": false,
+  "independent_review_machine_status": "prospective_unexecuted",
+  "independent_review_source_status": "provisionally_faithful_scoped_source",
+  "recovery_record_sha256": "307358cbec307618c7a6700808aa8fd14b755f7e81cc89d60c426fdb624f256f",
+  "trust": "Native runner reported pass; raw phase7 diagnostic outputs are missing and were not independently recomputed. Shared dependency caches were historically pinned before and after, not continuously observed."
+}

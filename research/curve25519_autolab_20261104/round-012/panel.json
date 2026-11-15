@@ -1,0 +1,84 @@
+{
+  "created": "2026-11-04T04:45:38Z",
+  "round": 12,
+  "rules": {
+    "exploration_slots": 2,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3s",
+      "ksum4s"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "24": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=17,scan_cap=272",
+            "family": "ksum3",
+            "n": 17,
+            "name": "ksum3-n17",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "alternative ksum3 (best S(0) 7.824 at N = 20): N = 0.85 x 20"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=28,scan_cap=448",
+            "family": "ksum3s",
+            "n": 28,
+            "name": "ksum3s-n28",
+            "oracle": "ksum:m=3",
+            "params": {
+              "targets": "stride"
+            }
+          },
+          "reason": "exploration: family ksum3s untried at k = 24, N = 0.344 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=12,scan_cap=192",
+            "family": "ksum4s",
+            "n": 12,
+            "name": "ksum4s-n12",
+            "oracle": "ksum:m=4",
+            "params": {
+              "targets": "stride"
+            }
+          },
+          "reason": "exploration: family ksum4s untried at k = 24, N = 0.148 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=12,scan_cap=192",
+        "family": "ksum4",
+        "n": 12,
+        "name": "ksum4-n12",
+        "oracle": "ksum:m=4"
+      },
+      "incumbent_s": [
+        6.984930113289382,
+        7.5135468001118415,
+        12.271096981514
+      ],
+      "tried_before": 23
+    }
+  },
+  "track": "generic"
+}

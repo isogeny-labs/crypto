@@ -1,0 +1,57 @@
+name: binary-merges
+# A binary file cannot be merged line by line: resolving a conflict on one by
+# keeping both sides glues the two versions together (#2674's merge 617a254f0
+# concatenated two PDFs this way, and nothing else failed). This fails a pull
+# request, or a push to main, whose merge commits leave a conflicted binary
+# file matching neither parent. A merge that rebuilt such a file from the merged
+# sources names it with a `Binary-Regenerated: <path>` trailer
+# (scripts/check_binary_merges.py). It runs no experiment.
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  merges:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      # Full commit history without blobs or a working tree: the check reads
+      # trees for blob ids and fetches only the blobs of conflicted files.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/check_binary_merges.py
+            /scripts/test_check_binary_merges.py
+      - name: Test the check
+        run: python3 scripts/test_check_binary_merges.py
+      - name: No merge commit combines two versions of a binary file
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.event.after }}
+        run: |
+          case "$EVENT" in
+            pull_request) base="$PR_BASE"; head="$PR_HEAD" ;;
+            push) base="$PUSH_BEFORE"; head="$PUSH_AFTER" ;;
+            *) base="$(git rev-parse HEAD~1)"; head="$(git rev-parse HEAD)" ;;
+          esac
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            echo "no base commit for this event; nothing to compare"
+            exit 0
+          fi
+          python3 scripts/check_binary_merges.py "$base" "$head"

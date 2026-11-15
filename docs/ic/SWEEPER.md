@@ -148,8 +148,8 @@ same unit, and a gain in one never ratchets the other.
 
 | track (2026-10-29) | spaces | counted? |
 |:--|:--|:--|
-| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`) | yes, within a scope; the headline track |
-| `generic` | `koblitz-table`, `prime-table`, `prime-rootfind` (`rootfind-subtract`) | yes, as generic decomposition (bounded by √r; cannot beat rho), never as algebraic progress |
+| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`), `prime-algebraic` (`pkm-semaev` F4, baseline the naive interval; see below) | yes, within a scope; the headline track |
+| `generic` | `koblitz-table`, `prime-table`, `prime-rootfind` (`rootfind-subtract`) | yes, as generic decomposition on its own track; a gain here is never ratcheted into the algebraic track |
 
 The `rootfind-*` oracles are generic. At m = 2, `rootfind-subtract` computes
 x(R ∓ F_i) for every base point and probes the base's hash index. It never
@@ -162,6 +162,132 @@ against the algebraic track. Until a build session adds `Track::Generic` and
 retires `Track::Unclassified`, read the sweeper's `table` and `unclassified`
 output as the generic track.
 
+## The prime algebraic space: auxiliary-curve factor bases
+
+`prime-algebraic` searches Petit–Kosters–Messeng's auxiliary-curve factor
+base on the algebraic track. Every trial runs `pkm-semaev`: S_{m+1} together
+with the base's membership written as low-degree equations, solved by F4 over
+the tower quotient ring, with F4's `F_p` multiply-adds counted as native work
+and priced across the §5a band.
+
+```bash
+ic sweep spaces --space prime-algebraic
+ic sweep run --space prime-algebraic --rungs 10,11,12,13 --target-log2r 24 \
+    --trials 40 --workers 2 --timeout-seconds 900 --store runs/prime-algebraic.jsonl
+```
+
+**Rung sizes.** F4 on these systems is slow. In a one-repeat development
+smoke on one host (2026-11-02, not a measurement), the baseline finished at
+10 bits in 2 s and at 12 bits in 26 s. At 14 bits it did not finish one
+repeat within 500 s. Keep rungs at about 13 bits or below until the oracle
+gets faster, or give each trial a long `--timeout-seconds`.
+
+| parameter | values | meaning |
+|:--|:--|:--|
+| `base` | `prime-isogeny`, `prime-abscissa-bits` | `V = x(R' + ⟨Q⟩)`, `Q` of order `2^t` on an ordinary auxiliary curve `E'/F_p` from a seeded search (charged to the factor-base phase), the zeros of `t` Vélu 2-isogeny x-maps; or the naive interval `[1, 2^t)` written in `t` bits |
+| `t_frac` | 0.2–0.6 | `t = round(t_frac · bits)`, clamped to `[2, 12]` |
+| `m`, `mode` | 2, 3; `chain`, `full` | summands; S3 chain or S4 at `m = 3` |
+| `degree` | 6–16 | F4 degree bound; an undecided system is decided on the counted grid |
+
+**Baseline.** Semaev's naive small-abscissa system on the same oracle and
+engine: `prime-abscissa:below=2^t` (every abscissa in `[1, 2^t)` carrying a
+point) with `pkm-semaev:m=2,bits=t`, `t = ⌈bits/2⌉`. The candidate and the
+incumbent differ only in the factor base and its membership equations, which
+is the question: does the auxiliary curve's tower buy anything over a plain
+interval? The baseline is
+provisional until the msolve reference arm
+(`research/prime_ic_program_20261029/reference_arm`) exists.
+
+**What is not offered, and why.**
+
+- `engine=exhaustive` counts `F_p multiplications (grid)`, a different unit
+  from F4's `F_p multiply-adds (elimination only)`, so a rung on it cannot be
+  ranked. Run it as a separate control.
+- The auxiliary-search seed is fixed at 0, because a seed is not a design
+  choice and searching it would select luck.
+- A supersingular `E'` (`aux=supersingular`, `#E' = p + 1`, no search) is not
+  offered. Its 2-Sylow has order `2^{v₂(p+1)}`, which on the primes `ic bench`
+  draws is usually below `2^t`, so most trials would be refused. A
+  development smoke saw `v₂(p + 1) = 2` at both rungs. Run it with `ic bench`
+  directly on a prime with large `v₂(p + 1)`.
+- `prime-kummer` is not offered. `ic bench` draws `p` without `2^t | p − 1`,
+  so most rungs would refuse it. It is available to `ic bench` directly.
+
+**What earlier measurements predict.** The isogeny base's relation yield
+matches a random base, and its presentation costs more than `μ_{2^t}`
+(`research/isogeny_vs_mu_factor_base_20261102`). F4's solving degree has grown
+with the tower at every measured `m` (lead
+`LEAD-ICP-pkm-tower-algebraic-oracle`). A configuration whose cost ratio to
+the naive interval falls with size would contradict those measurements.
+Confirm it with a frozen protocol before reporting it as an improvement.
+
+## The Curve25519 family
+
+`--family curve25519` points any prime space at the committed Curve25519-family
+miniatures (`curve25519_family_instance` in `src/cryptanalysis/ic_boundary.rs`,
+generated by `src/bin/curve25519_family.rs`). Each keeps every structural
+property an index calculus can see on Curve25519 itself — `p ≡ 5 (mod 8)`,
+Montgomery `A ≡ 2 (mod 4)` the smallest value with `#E = 8r` and
+`#E' = 4r'` (`r`, `r'` prime, `r > 2^(k−3)`), smallest base point of order `r`
+— at 20, 24, 28 and 32 bits, where the `u64` engine can still run. The curves
+are the same ones `research/curve25519_ic_baseline_20261102` measured.
+
+```bash
+ic bench --bits 20 --family curve25519 --auto
+ic sweep run --space prime-table --family curve25519 \
+    --rungs 20,24,28,32 --target-log2r 252 --trials 40 --store runs/c25519.jsonl
+ic sweep run --space prime-algebraic --family curve25519 \
+    --rungs 20,24 --target-log2r 252 --trials 10 --timeout-seconds 3600 \
+    --store runs/c25519-algebraic.jsonl
+```
+
+Curve25519 itself is 255 bits, so the objective is a projection from these
+rungs to `log2 r ≈ 252`; read it as a hypothesis (see "The projection amplifies
+noise"). `src/bin/ic_autolab.rs` is the frozen-protocol confirmation on fresh
+public targets for the same miniatures.
+
+### The full 255-bit field
+
+`src/cryptanalysis/curve25519_wide.rs` holds the real curve over the generic
+`Fp256` backend: `p = 2^255 − 19`, `A = 486662`, the short-Weierstrass law,
+scalar multiplication by the 252-bit subgroup order, and a counted bounded
+scan. `curve25519_family wide [base] [trials] [seed]` runs it:
+
+```bash
+cargo build --release --bin curve25519_family
+./target/release/curve25519_family wide 1024 1000000
+```
+
+The report checks `[ℓ]G = O`, `[ℓ+1]G = G` and `G` on the curve, then counts
+the group and field work of the base build and the probe stream. It does
+**not** claim a relation: at any feasible `N` and `T` the expected hits
+`T·N/ℓ` are zero, and the JSON says so.
+
+The same wide path is reachable through the ordinary bench and sweeper:
+
+```bash
+ic bench --bits 255 --family curve25519 \
+    --factor-base prime-abscissa:size=1024 --oracle mitm:negation_folded=1 \
+    --max-trials 100000
+ic sweep-trial --config-json '{"regime":"prime","degree":255,
+  "family":"curve25519","factor_base":"prime-abscissa:size=1024",
+  "oracle":"mitm:negation_folded=1","max_trials":100000}'
+```
+
+The row is `exhausted` (`0 of 1 repeats recovered the logarithm within
+max_trials`) and the sweep records that class, rather than refusing the curve.
+In a study, the 255-bit baseline rung is dropped for the same reason; a study
+still needs at least two scorable rungs.
+
+The three `u64` scalar paths have wide counterparts in
+`curve25519_wide.rs`: `WideInstanceCtx` (`r`, `cofactor`, `group_order` as
+`BigUint`), `Curve25519Wide::mul_biguint` (the group scalar), and `WideGauss`
+(incremental Gauss modulo the 252-bit `ℓ`). The default `ic_framework`
+pipeline keeps its `u64` types for the toy sizes it measures; the 255-bit
+route uses the wide ones. A complete solve at 255 bits is still not a
+measurement that exists anywhere: relation collection needs
+`T·N ≥ ℓ`, and no LA or descent follows from the zero relations.
+
 ## Scale-relative knobs
 
 A configuration tuned at one size must say something at the next. Base sizes
@@ -173,9 +299,13 @@ ratios, so the search space is the same on every rung. Absolute caps
 
 - **Sizes.** `ic bench` stops at n ≤ 63 (binary) and p < 2^62 (prime), and
   at `m ≤ 3`. The a = 0, n = 83 target is reached only by projection from
-  rungs below 63. Widening the framework is the next phase of the plan.
-- **No algebraic prime space.** The framework has no algebraic prime oracle;
-  `prime-table` is reference only.
+  rungs below 63, and Curve25519 (255 bits) only by projection from the
+  `--family curve25519` miniatures at 20, 24, 28 and 32 bits. Widening the
+  framework to the full 255-bit field is the next phase of the plan.
+- **The prime algebraic space is small and its baseline provisional.**
+  `prime-algebraic` (below) caps the tower at `t ≤ 12`, so the baseline's
+  `t = ⌈bits/2⌉` tracks size only to 24-bit rungs, and its baseline is not the
+  owner-approved msolve reference arm, which is not implemented.
 - **`m ≥ 4`.** `descent-algebraic` is `m ∈ {2, 3}`.
 - **Baselines.** Provisional, and not published index calculus. The algebraic
   baseline is inherited F4 on the S3 descent (`m = 2`) at `d = ⌊(n+1)/3⌋`: the
@@ -203,6 +333,17 @@ ratios, so the search space is the same on every rung. Absolute caps
   the baseline at every measured rung scored worse than it at the target.
   Treat a projected objective as a hypothesis and read the per-rung ratios
   beside it; a confidence interval on the slope is future work.
+
+## From a sweep to a ratchet
+
+A sweep's objective is a hypothesis on planted instances. The frozen-protocol
+confirmation on fresh public targets, with the matched rho, the A/A control
+and the band, is `ic_autolab` (`src/bin/ic_autolab.rs`): per curve family a
+ledger of incumbents per track and size, a candidate panel, a train screen,
+one challenger per size on a fresh holdout, the success-criterion
+classification and the ratchet. The first family is the Curve25519
+miniatures: `research/curve25519_autolab_20261104/README.md`. Chain them:
+sweep to propose, the loop to confirm and ratchet.
 
 ## Files
 

@@ -36,6 +36,18 @@ jobs:
           sparse-checkout: |
             tools/artifacts
             .artifacts
+            .github/scripts
+
+      # Stacked PR bases can predate helpers used by this workflow. Pin this
+      # helper to the immutable workflow revision, never to candidate code.
+      - name: Checkout prefetch helper from the workflow revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: workflow-tools
+          persist-credentials: false
+          sparse-checkout: |
+            .github/scripts
 
       - name: Checkout exact PR head without data blobs
         uses: actions/checkout@v4
@@ -52,6 +64,15 @@ jobs:
 
       - name: Require the trusted artifact destination and policy
         run: cmp trusted/.artifacts/config.json candidate/.artifacts/config.json
+
+      - name: Prefetch changed Git blobs in bounded batches
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          cd candidate
+          base=$(git merge-base "$BASE_SHA" HEAD)
+          python3 ../workflow-tools/.github/scripts/artifact_prefetch.py "$base" HEAD
 
       - name: Upload changed data and replay remote bytes
         env:

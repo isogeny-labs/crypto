@@ -23,9 +23,11 @@ use num_traits::ToPrimitive;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
-use super::counted_fp::{is_prime_u64, NoCount, OpCounter, OpTally, PolyMul, PrimeField};
+use super::counted_fp::{
+    is_prime_u64, CompleteTally, NoCount, OpCounter, OpTally, PolyMul, PrimeField,
+};
 use super::montgomery::{batch_to_affine, is_kernel_generator, ladder, xadd, MontgomeryCurve, XZ};
-use super::ntt::{mul_ntt, ntt_mul_cost, MAX_LOG2_LEN, NTT_PRIMES};
+use super::ntt::{mul_ntt, ntt_mul_add_cost, ntt_mul_cost, MAX_LOG2_LEN, NTT_PRIMES};
 use super::poly::{self, MonicDivisor, ProductTree};
 use super::small_degree::{
     isomorphisms, kernel_orbit, kernel_representatives, kernel_x_coordinates, ShortWeierstrass,
@@ -822,5 +824,154 @@ fn degree_five_and_seven_isogenies_and_certified_duals() {
                 }
             }
         }
+    }
+}
+
+// ------------------------------------------------- addition tally ----
+
+/// A mixed workload over `f` touching every counted code path: schoolbook,
+/// Karatsuba, the NTT (squares and products), Newton reciprocals and
+/// remainders, product and remainder trees, inversions, and √élu.
+fn addition_workload<C: OpCounter>(f: &PrimeField<C>, inst: &Inst) -> Vec<u64> {
+    let mut rng = StdRng::seed_from_u64(0xadd5);
+    let p = f.p();
+    let mut out = Vec::new();
+    for &(la, lb) in &[
+        (5usize, 7usize),
+        (40, 40),
+        (300, 280),
+        (600, 600),
+        (900, 40),
+    ] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        out.extend(poly::mul(f, &a, &b));
+        out.extend(poly::mul(f, &a, &a));
+        out.extend(poly::mul_karatsuba(f, &a, &b));
+        out.extend(mul_ntt(f, &a, &b));
+    }
+    let mut b: Vec<u64> = (0..150).map(|_| rng.gen_range(0..p)).collect();
+    b.push(1);
+    let a: Vec<u64> = (0..700).map(|_| rng.gen_range(0..p)).collect();
+    out.extend(MonicDivisor::new(b).unwrap().rem(f, &a));
+    let xs: Vec<u64> = (0..37).map(|_| rng.gen_range(0..p)).collect();
+    out.extend(ProductTree::new(f, &xs).evaluate(f, &a));
+    out.extend(poly::inv_series(f, &[3, 5, 7, 11], 200).unwrap());
+    let ximg = [12345u64, 678910];
+    let (ev, _) = sqrt_velu(f, &inst.curve, 101, inst.kernel_x, &ximg).unwrap();
+    out.extend(ev.images.iter().flatten().copied());
+    out
+}
+
+#[test]
+fn additions_are_opt_in_and_leave_frozen_counts_unchanged() {
+    let mut rng = StdRng::seed_from_u64(0xadd);
+    let inst = cm_instance(101, 61, &mut rng);
+    let plain = PrimeField::counted(inst.p).unwrap();
+    let with = PrimeField::counted_with_adds(inst.p).unwrap();
+    let none = PrimeField::new(inst.p).unwrap();
+    let r_plain = addition_workload(&plain, &inst);
+    let r_with = addition_workload(&with, &inst);
+    let r_none = addition_workload(&none, &inst);
+    // Same results, same M, W, I with and without additions requested.
+    assert_eq!(r_plain, r_with);
+    assert_eq!(r_plain, r_none);
+    let (t0, t1) = (plain.complete_tally(), with.complete_tally());
+    assert_eq!(t0.ops, t1.ops);
+    assert_eq!(t0.ops.mul_equivalents(91), t1.ops.mul_equivalents(91));
+    // Not requested: zero.  Requested: positive, in both domains.
+    assert_eq!((t0.adds.add, t0.adds.word_add), (0, 0));
+    assert!(t1.adds.add > 0 && t1.adds.word_add > 0);
+    assert!(t0.ops.word > 0, "the workload must reach the NTT");
+    // Deterministic.
+    let again = PrimeField::counted_with_adds(inst.p).unwrap();
+    let _ = addition_workload(&again, &inst);
+    assert_eq!(again.complete_tally(), t1);
+    // `a = 0` is Meq; the weight is linear in the additions.
+    assert_eq!(t1.weighted(91, 0.0), t1.ops.mul_equivalents(91) as f64);
+    assert_eq!(
+        t1.weighted(91, 0.5),
+        t1.ops.mul_equivalents(91) as f64 + 0.5 * (t1.adds.add + t1.adds.word_add) as f64
+    );
+    // reset clears the additions too.
+    with.reset_counts();
+    assert_eq!(with.complete_tally(), CompleteTally::default());
+}
+
+#[test]
+fn addition_counts_of_products_are_exact() {
+    let mut rng = StdRng::seed_from_u64(0xadd2);
+    // p < 2^61 < every NTT prime: no input reductions happen.
+    let p = random_prime(&mut rng, 60);
+    let f = PrimeField::counted_with_adds(p).unwrap();
+    // Schoolbook: la·lb − (la + lb − 1) additions, no word additions.
+    for (la, lb) in [(1usize, 1usize), (1, 9), (5, 7), (24, 24), (3, 100)] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = poly::mul_schoolbook(&f, &a, &b);
+        let t = f.add_tally();
+        assert_eq!((t.add, t.word_add), ((la * lb - (la + lb - 1)) as u64, 0));
+    }
+    // A hand count: (a0 + a1 Z)(b0 + b1 Z) = 4 products, 1 addition.
+    f.reset_counts();
+    let _ = poly::mul_schoolbook(&f, &[1, 2], &[3, 4]);
+    assert_eq!((f.tally().mul, f.add_tally().add), (4, 1));
+    // Karatsuba: its additions are the F_p add/sub calls plus the schoolbook
+    // leaves; a (25 × 25) product splits once and is recounted by hand:
+    // two sums of 12/13-term halves (12 + 13 adds), z0, z2, z1 schoolbooks,
+    // two subtractions of the length-(2·13−1) middle product from z1, and
+    // three add_into accumulations.
+    // Rather than restate the recursion, check the total is positive and
+    // equals the sum over an independent run.
+    let a: Vec<u64> = (0..64).map(|_| rng.gen_range(0..p)).collect();
+    f.reset_counts();
+    let r1 = poly::mul_karatsuba(&f, &a, &a);
+    let t1 = f.complete_tally();
+    let g = PrimeField::counted_with_adds(p).unwrap();
+    let r2 = poly::mul_karatsuba(&g, &a, &a);
+    assert_eq!(r1, r2);
+    assert_eq!(t1, g.complete_tally());
+    assert!(t1.adds.add > 0 && t1.adds.word_add == 0);
+    // NTT: exactly the data-independent formula, plus at most the 2n
+    // conditional Garner subtractions (p < 2^61, so inputs need none).
+    for (la, lb, sq) in [
+        (1usize, 1usize, false),
+        (3, 5, false),
+        (64, 64, true),
+        (100, 37, false),
+        (300, 300, false),
+        (513, 513, true),
+    ] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = if sq {
+            mul_ntt(&f, &a, &a)
+        } else {
+            mul_ntt(&f, &a, &b)
+        };
+        let t = f.add_tally();
+        let (wa, fa) = ntt_mul_add_cost(la, if sq { la } else { lb }, sq);
+        let n = (la + if sq { la } else { lb } - 1) as u64;
+        assert_eq!(t.add, fa, "{la}x{lb}");
+        assert!(
+            t.word_add >= wa && t.word_add <= wa + 2 * n,
+            "{la}x{lb}: {} not in [{wa}, {}]",
+            t.word_add,
+            wa + 2 * n
+        );
+    }
+    // Under PolyMul::Auto the choice of algorithm, hence M and W, does not
+    // depend on whether additions are counted.
+    for (la, lb) in [(255usize, 255usize), (256, 256), (600, 600), (2048, 300)] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        let c = PrimeField::counted(p).unwrap();
+        let d = PrimeField::counted_with_adds(p).unwrap();
+        assert_eq!(poly::mul(&c, &a, &b), poly::mul(&d, &a, &b));
+        let (tc, td) = (c.tally(), d.tally());
+        assert_eq!((tc.mul, tc.word, tc.inv), (td.mul, td.word, td.inv));
+        assert_eq!(c.add_tally(), Default::default());
     }
 }

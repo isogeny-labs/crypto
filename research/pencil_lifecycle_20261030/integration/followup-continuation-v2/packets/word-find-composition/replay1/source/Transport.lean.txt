@@ -1,0 +1,50 @@
+import BZero
+set_option autoImplicit false
+namespace MumfordNormalization
+open Polynomial
+variable {K : Type*} [Field K]
+noncomputable def affine (a b : K) : K[X] := C a*X+C b
+noncomputable def T (n : ℕ) (a b : K) (p : K[X]) : K[X] :=
+ C ((a^n)⁻¹)*p.comp (affine a b)
+
+theorem scaled_mul (c d : K) (p q : K[X]) :
+ (C c*p)*(C d*q)=C (c*d)*(p*q) := by rw [map_mul]; ring
+
+theorem square_compatible (a b : K) (v : K[X]) : (T 3 a b v)^2=T 6 a b (v^2) := by
+ have h : ((a^3)⁻¹)^2=(a^6)⁻¹ := by rw [← inv_pow]; congr 1; ring
+ simp only [T,mul_pow,← map_pow,pow_comp]
+ rw [h]
+
+theorem residual_compatible (a b : K) (f v : K[X]) :
+ T 6 a b (f-v^2)=T 6 a b f-(T 3 a b v)^2 := by
+ rw [square_compatible]
+ simp only [T,sub_comp,mul_sub]
+
+theorem witness_transport (a b : K) (ha : a≠0) (d : ℕ) (f u v q : K[X])
+ (hq : f-v^2=u*q) :
+ T 6 a b f-(T 3 a b v)^2=
+ T d a b u*(C (a^d/a^6)*q.comp (affine a b)) := by
+ have h : (a^d)⁻¹*(a^d/a^6)=(a^6)⁻¹ := by field_simp
+ rw [← residual_compatible,hq]
+ simp only [T,mul_comp]
+ rw [scaled_mul,h]
+
+theorem congruence_transport (a b : K) (ha : a≠0) (d : ℕ) (f u v : K[X])
+ (hv : u∣f-v^2) : T d a b u∣T 6 a b f-(T 3 a b v)^2 := by
+ obtain ⟨q,hq⟩:=hv
+ exact ⟨C (a^d/a^6)*q.comp (affine a b),witness_transport a b ha d f u v q hq⟩
+
+theorem eval_transport (n : ℕ) (a b x : K) (p : K[X]) :
+ (T n a b p).eval x=p.eval (a*x+b)/a^n := by
+ simp only [T, affine, eval_mul, eval_C, eval_comp, eval_add, eval_X]
+ rw [div_eq_mul_inv]
+ exact mul_comm _ _
+
+theorem root_transport (n : ℕ) (a b x : K) (ha : a≠0) (p : K[X]) :
+ (T n a b p).eval x=0 ↔ p.eval (a*x+b)=0 := by
+ rw [eval_transport]
+ simp [div_eq_zero_iff,pow_ne_zero n ha]
+
+theorem identity_support (a b : K) : T 0 a b (1:K[X])=1 := by simp [T]
+theorem zero_ordinate (a b : K) : T 3 a b (0:K[X])=0 := by simp [T]
+end MumfordNormalization

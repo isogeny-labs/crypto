@@ -1,0 +1,66 @@
+{
+  "kind": "formal-component-result",
+  "scope": "canonical native-order negation, padded addition, subtraction, and f-v^2 residual model",
+  "namespace": "ResidualWord",
+  "module": "Residual",
+  "main_declarations": 5,
+  "controls_and_evaluation_witnesses": 12,
+  "axiom_readbacks": 17,
+  "allowed_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "checks": {
+    "residual1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "residual2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "controls2": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "controls3": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "controls4": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "controls5": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "scientific_execution": false,
+  "compiled_equivalence": false,
+  "independent_lean_review": false,
+  "files": {
+    "Residual.lean": "5555e725708627edee6f9250bfe2c2fe36239be9275a9134c74669674b408f2a",
+    "ResidualControls.lean": "ac0e8b76d412b144f7f35bfdea3de9e8617c31273803cd5beba4191175a6737e",
+    "ResidualReadback.lean": "995ddcd9132054e3042a316a395fb9098433b9767ddc102da738bec1ae58a647",
+    "PLAN.md": "4edbd521e54df33c600c40768b6f84196852897bbb0c7dc7d853f4e3fa53fb2d",
+    "check.py": "26bdcd20cce7759693a956f6b6097b4413001031533870055864247f28059bff"
+  }
+}

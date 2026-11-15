@@ -1,0 +1,15 @@
+import Product
+open ProductPolynomial
+-- Unequal lengths and an internal zero exercise diagonal placement.
+theorem asymmetric_product : product 17 [16,0,2] [3,4] = [14,13,6,8] := by decide
+theorem swapped_asymmetric : product 17 [3,4] [16,0,2] = [14,13,6,8] := by decide
+theorem zero_nonempty_operand : product 17 [0,0] [3,4] = [] := by decide
+theorem empty_left : product 17 [] [3,4] = [] := by decide
+theorem empty_right : product 17 [3,4] [] = [] := by decide
+theorem canonical_boundary_update : ProductWord.addProduct 17 16 16 16 = 0 := by decide
+#print axioms asymmetric_product
+#print axioms swapped_asymmetric
+#print axioms zero_nonempty_operand
+#print axioms empty_left
+#print axioms empty_right
+#print axioms canonical_boundary_update

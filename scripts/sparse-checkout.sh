@@ -92,11 +92,49 @@ candidates() {
 }
 
 # Directories of the Cargo targets ([[bin]], [[bench]], ...) declared by path
-# in Cargo.toml: a target's sibling modules live beside it.
+# in Cargo.toml: a target's sibling modules live beside it. Both profiles use
+# them: a harness checkout had lost two [[bin]] sources under heavy research/
+# directories, which broke `cargo test` and `cargo clippy --tests`.
 cargo_targets() {
   [ -f Cargo.toml ] || return 0
   sed -nE 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' Cargo.toml |
     while IFS= read -r target; do echo "$(dirname "$target")/"; done | sort -u
+}
+
+# Rule lines for the crates the root Cargo.toml depends on by path
+# (`name = { path = "dir", ... }`), followed transitively. Cargo reads every
+# path dependency's manifest, optional ones included, so an excluded
+# Cargo.toml breaks `cargo build` for the whole workspace (2026-11-02: the
+# heavy research/pencil_large_prime_20261029 lost its manifest). Each crate
+# gets its manifest, lockfile, build script, src/ and the directories of
+# its declared target paths, not its data, so heavy crates stay light.
+cargo_path_deps() {
+  [ -f Cargo.toml ] || return 0
+  local queue=(.) seen=" " dir dep norm t
+  while [ ${#queue[@]} -gt 0 ]; do
+    dir=${queue[0]}
+    queue=("${queue[@]:1}")
+    [ -f "$dir/Cargo.toml" ] || continue
+    if [ "$dir" != . ]; then
+      echo "/$dir/Cargo.toml"
+      echo "/$dir/Cargo.lock"
+      echo "/$dir/build.rs"
+      echo "/$dir/src/"
+      sed -nE 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' "$dir/Cargo.toml" |
+        while IFS= read -r t; do
+          t=$(realpath -m --relative-to=. "$dir/$(dirname "$t")")
+          case "$t" in .|..*) ;; *) echo "/$t/" ;; esac
+        done
+    fi
+    while IFS= read -r dep; do
+      norm=$(realpath -m --relative-to=. "$dir/$dep")
+      case "$norm" in .|..*) continue ;; esac
+      case "$seen" in *" $norm "*) continue ;; esac
+      seen="$seen$norm "
+      queue+=("$norm")
+    done < <(grep -oE '\{[^}]*\bpath[[:space:]]*=[[:space:]]*"[^"]+"' "$dir/Cargo.toml" |
+      sed -E 's/.*path[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
+  done | sort -u
 }
 
 # Rule lines for the tracked paths among the candidates: a file, or dir/.
@@ -105,7 +143,7 @@ cargo_targets() {
 referenced() {
   local tracked=$1 cand keep='^research/'
   [ "$PROFILE" = minimal ] && keep='/'
-  { candidates; if [ "$PROFILE" = minimal ]; then cargo_targets; fi; } |
+  { candidates; cargo_targets; } |
     sed -E 's/[.,:;]+$//' | grep -- "$keep" | grep -vE '^[^/]+/?$' | sort -u |
     while IFS= read -r cand; do
       if grep -qxF -- "$cand" "$tracked"; then
@@ -173,6 +211,8 @@ render() {  # render [paths...]
   base_rules
   echo "# paths the Rust code and Cargo.toml compile in or read"
   referenced "$tracked"
+  echo "# crates Cargo.toml depends on by path (manifests and sources)"
+  cargo_path_deps
   if [ $# -gt 0 ]; then
     echo "# named paths"
     for p in "$@"; do include "$p"; done

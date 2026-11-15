@@ -1,0 +1,112 @@
+{
+  "schema": "aps-pcc-type-validation/v1",
+  "native_verifier_git_blob": "6bb390044068e20e4d87b1563b3bd5d39fb0fe82",
+  "scope": "PCC type correction only; assertions and identity artifact bytes unchanged; unsigned attestation establishes no independent verification",
+  "producer_standing": "unverified",
+  "outcomes": [
+    {
+      "claim_id": "PCC-20261105-6d30f5",
+      "classification": "historical",
+      "exit_code": 1,
+      "verdict": "fail",
+      "reasons": [],
+      "proof_verdicts": [
+        {
+          "kind": "certificate",
+          "verdict": "fail",
+          "reasons": [
+            "certificate: schema is not pcc.solve-certificate/v1"
+          ],
+          "notes": []
+        },
+        {
+          "kind": "certificate",
+          "verdict": "fail",
+          "reasons": [
+            "certificate: schema is not pcc.solve-certificate/v1"
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "claim_id": "PCC-20261105-ac1e93",
+      "classification": "replacement",
+      "exit_code": 2,
+      "verdict": "not_covered",
+      "reasons": [
+        "a statement claim has no proof kind and can never be verified"
+      ],
+      "proof_verdicts": [
+        {
+          "kind": "attestation",
+          "verdict": "not_covered",
+          "reasons": [],
+          "notes": [
+            "artifact: unsigned; independence needs a keyring signature"
+          ]
+        },
+        {
+          "kind": "attestation",
+          "verdict": "not_covered",
+          "reasons": [],
+          "notes": [
+            "artifact: unsigned; independence needs a keyring signature"
+          ]
+        }
+      ]
+    },
+    {
+      "claim_id": "PCC-20261105-a3310a",
+      "classification": "historical",
+      "exit_code": 1,
+      "verdict": "fail",
+      "reasons": [],
+      "proof_verdicts": [
+        {
+          "kind": "certificate",
+          "verdict": "fail",
+          "reasons": [
+            "certificate: schema is not pcc.solve-certificate/v1"
+          ],
+          "notes": []
+        },
+        {
+          "kind": "certificate",
+          "verdict": "fail",
+          "reasons": [
+            "certificate: schema is not pcc.solve-certificate/v1"
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "claim_id": "PCC-20261105-9d5a6d",
+      "classification": "replacement",
+      "exit_code": 2,
+      "verdict": "not_covered",
+      "reasons": [
+        "a statement claim has no proof kind and can never be verified"
+      ],
+      "proof_verdicts": [
+        {
+          "kind": "attestation",
+          "verdict": "not_covered",
+          "reasons": [],
+          "notes": [
+            "artifact: unsigned; independence needs a keyring signature"
+          ]
+        },
+        {
+          "kind": "attestation",
+          "verdict": "not_covered",
+          "reasons": [],
+          "notes": [
+            "artifact: unsigned; independence needs a keyring signature"
+          ]
+        }
+      ]
+    }
+  ]
+}

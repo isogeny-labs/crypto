@@ -1,0 +1,43 @@
+import Output
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace CZeroOutput
+open Polynomial CZeroInterpolation
+variable {K : Type*} [Field K]
+
+theorem support_nonzero (q r : K) : CZeroInterpolation.support q r≠0 := by
+ intro h
+ have hd:=support_degree q r
+ rw [h,natDegree_zero] at hd
+ omega
+
+theorem quotient_degree (f : K[X]) (q1 r1 s1 t1 q2 r2 a : K) (t : K[X])
+ (hf:f.natDegree=5)
+ (he:f-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1)^2=
+ CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2*t) : t.natDegree=1 := by
+ have hr:=residual_degree f q1 r1 s1 t1 a hf
+ have ht : t≠0 := by intro hz; rw [hz,mul_zero] at he; rw [he,natDegree_zero] at hr; omega
+ rw [he,natDegree_mul (mul_ne_zero (support_nonzero q1 r1) (support_nonzero q2 r2)) ht,
+   natDegree_mul (support_nonzero q1 r1) (support_nonzero q2 r2),support_degree,support_degree] at hr
+ omega
+
+theorem linear_expansion (t : K[X]) (ht:t.natDegree=1) :
+ t=C (t.coeff 0)+C (t.coeff 1)*X := by
+ have h:=t.as_sum_range_C_mul_X_pow
+ rw [ht] at h
+ simpa [Finset.sum_range_succ] using h
+
+theorem quotient_coefficients (f : K[X]) (q1 r1 s1 t1 q2 r2 a : K) (t : K[X])
+ (hf:f.natDegree=5) (h5:f.coeff 5=1) (h4:f.coeff 4=0)
+ (he:f-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1)^2=
+ CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2*t) :
+ t.coeff 1=1 ∧ t.coeff 0=-(q1+q2+a^2) := by
+ have ht:=linear_expansion t (quotient_degree f q1 r1 s1 t1 q2 r2 a t hf he)
+ have he5:=congrArg (fun z : K[X]=>z.coeff 5) he
+ have he4:=congrArg (fun z : K[X]=>z.coeff 4) he
+ rw [ht] at he5 he4
+ simp [CZeroInterpolation.support,ordinate,pow_two,coeff_X,coeff_mul,Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk,Finset.sum_range_succ,h5,h4] at he5 he4
+ exact ⟨he5.symm,by rw [←he5] at he4; apply eq_neg_iff_add_eq_zero.mpr; calc
+   t.coeff 0+(q1+q2+a^2) = (q1+q2+t.coeff 0)+a*a := by ring
+   _=0 := by rw [←he4]; ring⟩
+end CZeroOutput

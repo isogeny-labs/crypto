@@ -114,7 +114,7 @@ Counted operations are the unit; wall time is secondary.
 |:--|:--|
 | G0: `ig` reproduces the baseline row | **pass.** Both workloads are bit-identical to `k4-p29-d4cost`'s `ic-d4-chains` records: `S`, `total_gae`, every counter, the recovered log and the algorithm seed |
 | Every answer verified | **pass.** S1 20/20, S2 330/330 (`[d]G = Q`, equal to the planted `d`) |
-| Replay audit | S2: `ecbench verify --replay-all` OK, 330/330 replays (`sessions/prime-scaling.audit.json`). S1: AUDIT_S1 |
+| Replay audit | S2: `ecbench verify --replay-all` OK, 330/330 replays (`sessions/prime-scaling.audit.json`). S1: `ecbench verify --replay-all` OK, 20/20 replays reproduced, 0 problems (`sessions/fp4-p29-r2.audit.json`, card 4 receipt) |
 | A/A | **pass.** `sg-aa` equals `sg` in every count on all 38 workloads, and `filter-wiedemann` equals `sparse-cado` likewise. On wall time `ecbench compare` admits the A/A as 0.978 (L0, descriptive) |
 | Positive control | **pass.** `igfr` collects strictly more relations than `ig` on every S2 workload (median 341.5 against 62 at 128 columns, 18,885.5 against 1,794.5 at 4,096). On S1 it collects the same on `Wc87e324798ff` (9) and more on `W1016932647b2` (14 against 8) |
 
@@ -135,7 +135,7 @@ Counted operations are the unit; wall time is secondary.
 - **Totals.** Over the two pairs, every full-rank arm costs 1.2062× `ig`
   and `sg`. The arms are equal on `Wc87e324798ff` and 1.3977× on
   `W1016932647b2`. With two workloads, the paired interval is the two
-  ratios themselves, [1.000, 1.398] (FP4_COMPARE).
+  ratios themselves, [1.000, 1.398] (`sessions/fp4-p29-r2/comparisons/`).
 - **Where the cost is.** Linear algebra is at most 2·10⁻⁵ of `S`. The
   relation phase, which is the D₄ oracle, is all of it.
 - **Band (§5a).** `ecbench band` refuses this session: the records are
@@ -237,13 +237,29 @@ columns^1.16 under the full-rank rule.
     `receipts/run-prime-scaling.*` and `receipts/verify-prime-scaling.*`.
   - The killed S1 attempt is kept as `sessions/fp4-p29` (`interrupted`,
     2 records) and is not used.
-- **Cards 2–3.** S1 was re-run into `sessions/fp4-p29-r2` (card 2, receipt
-  `cards/CARD-sparse-la-timing-20261018-2.receipt.json`, exit 0, 4,113 s)
-  and audited by card 3.
+- **Cards 2–4.** S1 was re-run into `sessions/fp4-p29-r2` (card 2, receipt
+  `cards/CARD-sparse-la-timing-20261018-2.receipt.json`, exit 0, 4,113 s).
+  - Card 3 (the audit) was refused at start because it pinned a commit that
+    HEAD had since passed; nothing ran and it has no receipt.
+  - Card 4 is card 3 re-pinned to HEAD. A container restart killed its first
+    attempt before it wrote anything, and it was run again
+    (`cards/CARD-sparse-la-timing-20261018-4.receipt.json`, exit 0, 4,534 s):
+    20/20 replays reproduced.
   - The main session added one environment line outside the relayed card
     text: use the maximum background timeout.
-  - Card 2's executor stopped on an API usage limit before reporting. Its
+  - Card 2's executor stopped on an API usage limit before reporting, so its
     execution was assessed from the receipt (`cards/*assessment*`).
+- **Benchmarks row withheld by the validation gate.** The report, graphs and
+  PNG renders are copied to `benchmarks/20261018-sparse-la-timing/`, but there
+  is no row in `benchmarks/README.md`. Since 2026-10-19 a row needs an
+  independent replay certificate, a validator report and a matched-rho band
+  pinned by a `VALIDATION.json` (`docs/VALIDATION_GATE.md`). The audits here
+  are exact replays by the auditing binary on the measuring host class, which
+  the gate does not count as independent, and the owner's rule for this task
+  bars renting compute. The row can be added once a second host class replays
+  both sessions (`ecbench-independent-runner`) and the three files exist. The
+  band itself is already in `analysis/` and the matched `rho-neg` ran in
+  the same sessions and binary.
 - **Pilot.** Two scratch feasibility sessions (PROTOCOL §8) were run before
   freezing and are excluded.
 - **Conductor.** Task T-1 ran on a local control plane on port 8099, as

@@ -1,0 +1,63 @@
+{
+  "captured_utc": "2026-10-31T07:45:00Z",
+  "namespace": "isolab",
+  "node_pool": "cpu-spot",
+  "benchmark_node_pool": "cpu-l2-spot",
+  "configured_vcpu_limit": 64,
+  "pool_limits": {
+    "cpu-l2-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    },
+    "cpu-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    }
+  },
+  "active_or_pending_jobs": [
+    {
+      "job_name": "n83-fb-variants-r27-20261031-r4",
+      "state": "active",
+      "status": {
+        "active": 1,
+        "ready": 0,
+        "startTime": "2026-10-31T07:36:03Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "52ffebcf-d07b-44b4-a836-8181cc2b8b48"
+    },
+    {
+      "job_name": "sat-hpo-metal-qualification-20261030",
+      "state": "pending",
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": "2026-10-30T14:55:24Z",
+            "lastTransitionTime": "2026-10-30T14:55:24Z",
+            "message": "Job suspended",
+            "reason": "JobSuspended",
+            "status": "True",
+            "type": "Suspended"
+          }
+        ],
+        "ready": 0,
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "e83a3ba3-36c4-4958-8d04-20b78c44d3dc"
+    },
+    {
+      "job_name": "semaev-n47-rand03-d5-blocked-20261031-0100",
+      "state": "active",
+      "status": {
+        "active": 1,
+        "ready": 1,
+        "startTime": "2026-10-31T07:21:46Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "78fbd79f-4663-4d6f-a1ec-09d33f32b728"
+    }
+  ]
+}

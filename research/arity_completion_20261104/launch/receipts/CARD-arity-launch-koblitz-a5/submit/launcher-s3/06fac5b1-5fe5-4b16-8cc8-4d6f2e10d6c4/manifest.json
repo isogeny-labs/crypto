@@ -1,0 +1,180 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "arity-koblitz-m56-20261104-a5",
+    "namespace": "isolab",
+    "labels": {
+      "isolab.dev/job": "true"
+    }
+  },
+  "spec": {
+    "backoffLimit": 0,
+    "activeDeadlineSeconds": 64800,
+    "ttlSecondsAfterFinished": 86400,
+    "template": {
+      "metadata": {
+        "labels": {
+          "isolab.dev/job": "true"
+        },
+        "annotations": {
+          "karpenter.sh/do-not-disrupt": "true"
+        }
+      },
+      "spec": {
+        "restartPolicy": "Never",
+        "serviceAccountName": "runner",
+        "automountServiceAccountToken": false,
+        "terminationGracePeriodSeconds": 60,
+        "nodeSelector": {
+          "isolab.dev/pool": "cpu-l2-spot",
+          "isolab.dev/cpu-isolation": "v6",
+          "node.kubernetes.io/instance-type": "m7i.2xlarge"
+        },
+        "tolerations": [
+          {
+            "key": "isolab.dev/workload",
+            "value": "cpu",
+            "operator": "Equal",
+            "effect": "NoSchedule"
+          },
+          {
+            "key": "isolab.dev/measurement",
+            "value": "l2",
+            "operator": "Equal",
+            "effect": "NoSchedule"
+          }
+        ],
+        "affinity": {
+          "podAntiAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": [
+              {
+                "labelSelector": {
+                  "matchLabels": {
+                    "isolab.dev/job": "true"
+                  }
+                },
+                "topologyKey": "kubernetes.io/hostname"
+              }
+            ]
+          }
+        },
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 1000,
+          "runAsGroup": 1000,
+          "fsGroup": 1000,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "task",
+            "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05",
+            "command": [
+              "/opt/study/launch/job-koblitz.sh",
+              "s3://isolab-results-104186811093-us-east-2/runs/arity-koblitz-m56-20261104-a4/da7313ba-9482-4d84-b3cd-f87918674839/"
+            ],
+            "workingDir": "/work",
+            "env": [
+              {
+                "name": "HOME",
+                "value": "/work"
+              },
+              {
+                "name": "AWS_REGION",
+                "value": "us-east-2"
+              },
+              {
+                "name": "AWS_DEFAULT_REGION",
+                "value": "us-east-2"
+              },
+              {
+                "name": "POD_UID",
+                "valueFrom": {
+                  "fieldRef": {
+                    "fieldPath": "metadata.uid"
+                  }
+                }
+              },
+              {
+                "name": "NODE_NAME",
+                "valueFrom": {
+                  "fieldRef": {
+                    "fieldPath": "spec.nodeName"
+                  }
+                }
+              },
+              {
+                "name": "ISOLAB_JOB_ID",
+                "value": "arity-koblitz-m56-20261104-a5"
+              },
+              {
+                "name": "ISOLAB_OUTPUT_DIR",
+                "value": "/work/results"
+              },
+              {
+                "name": "ISOLAB_RESULTS_URI",
+                "value": "s3://isolab-results-104186811093-us-east-2/runs/arity-koblitz-m56-20261104-a5/$(POD_UID)/"
+              },
+              {
+                "name": "RAYON_NUM_THREADS",
+                "value": "4"
+              },
+              {
+                "name": "OMP_NUM_THREADS",
+                "value": "4"
+              }
+            ],
+            "resources": {
+              "requests": {
+                "cpu": "4",
+                "memory": "12Gi",
+                "ephemeral-storage": "10Gi"
+              },
+              "limits": {
+                "cpu": "4",
+                "memory": "12Gi",
+                "ephemeral-storage": "10Gi"
+              }
+            },
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "work",
+                "mountPath": "/work"
+              },
+              {
+                "name": "tmp",
+                "mountPath": "/tmp"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "work",
+            "emptyDir": {
+              "sizeLimit": "8Gi"
+            }
+          },
+          {
+            "name": "tmp",
+            "emptyDir": {
+              "sizeLimit": "1Gi"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

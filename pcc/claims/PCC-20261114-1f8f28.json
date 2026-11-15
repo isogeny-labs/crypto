@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:07:21Z",
+ "id": "PCC-20261114-1f8f28",
+ "kind": "theorem",
+ "producer": {
+  "commit": "85c57a726a644a6d2138a5c97785ab1119a06aff",
+  "model": "",
+  "session": "norm-target-grading-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "100852f691a7cb2ea8aa0e78eafa8bb1d306812759814e7ffc7e43f43ad114db",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormRowClosure.rowClosure"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact source declaration/context hypotheses. Field K, CommRing coefficient algebra A; Nontrivial A where monic degree guards need it. Curve equation, e!=0, d>=3 explicit for actual normalized binding. Full iterated closure with literal deg(a)+deg(f)<=D multiplier budget; requires both old/new input families admitted. No invariance below admission threshold, runtime impossibility, weighted-degree29, growing-family low closure or sub-exponential claim. Unsigned; fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormRowClosure.rowClosure: theorem rowClosure (deg : A \u2192 \u2115) (V : A[X]) (hV : V.natDegree\u22644) (q c : K) (hc : c\u22600) (D : \u2115) (hOld : \u2200 f\u2208oldRows V, deg f\u2264D) (hNew : \u2200 f\u2208newRows V q c, deg f\u2264D) (p : A) : InClosure K deg (oldRows V) D p \u2194 InClosure K deg (newRows V q c) D p"
+}

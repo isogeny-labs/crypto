@@ -1,0 +1,184 @@
+{
+  "schema": "aps.development-receipt/v1",
+  "source": {
+    "commit": "a6630cd83e25ca5eed3d88d64503f12b30402094",
+    "tree": "b8b38cf65e06319a22bf6c4547ccb75076d5ec93",
+    "base": "2d746d0577ddf797b8706de1f45489fb31ad3d31",
+    "manifest": "source-freeze-sha256.txt"
+  },
+  "standing": {
+    "claim_id": "PCC-20261104-56667f",
+    "status": "unverified"
+  },
+  "phases": [
+    {
+      "phase": "standalone-release",
+      "command": "cargo test --release --locked --manifest-path tools/aps-export/Cargo.toml",
+      "exit": 0,
+      "private_log_sha256": "a42ba5990fd73c47ceee65f32869841426edd96dae3ce033ca9e2d97420a0f3d"
+    },
+    {
+      "phase": "standalone-strict-stable",
+      "command": "cargo clippy --locked --all-targets --manifest-path tools/aps-export/Cargo.toml -- -D warnings",
+      "exit": 0,
+      "private_log_sha256": "04fd01bcf3f66a40f1418e3499a8ceca700997ef6cb57d5c67a28dabbdebe3c6"
+    },
+    {
+      "phase": "standalone-strict-1.98",
+      "command": "cargo +1.98.0 clippy --locked --all-targets --manifest-path tools/aps-export/Cargo.toml -- -D warnings",
+      "exit": 0,
+      "private_log_sha256": "2de4a368cf19be88524b7bc4d072e7ca2487ddf36e0cc1f369fe4cc943c503be"
+    },
+    {
+      "phase": "producer-bridge",
+      "command": "cargo test --release --locked --test aps_export_bridge",
+      "exit": 0,
+      "private_log_sha256": "c6b5897cf25ce9905ac5c2981e8702df66f6d625d9a011acaedf6ee08b5bdbdb"
+    },
+    {
+      "phase": "workflow-syntax",
+      "command": "actionlint .github/workflows/aps-export.yml .github/workflows/ecbench.yml",
+      "exit": 0,
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "source-size",
+      "command": "bash scripts/check-large-files.sh 2d746d0577ddf797b8706de1f45489fb31ad3d31 SOURCE_HEAD",
+      "exit": 0,
+      "private_log_sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec",
+      "source_head": "a6630cd83e25ca5eed3d88d64503f12b30402094"
+    },
+    {
+      "phase": "source-artifacts",
+      "command": "python3 tools/artifacts/artifacts.py check 2d746d0577ddf797b8706de1f45489fb31ad3d31 SOURCE_HEAD",
+      "exit": 0,
+      "private_log_sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "source_head": "a6630cd83e25ca5eed3d88d64503f12b30402094"
+    },
+    {
+      "phase": "artifact-policy-tests",
+      "command": "python3 -m unittest tools/artifacts/test_artifacts.py",
+      "exit": 0,
+      "private_log_sha256": "9abebb2a3bacf8b76c702e269031e7f2c4d10141e0b70ef7640d8ad038b5f9a6"
+    },
+    {
+      "phase": "benchmark-record-gate",
+      "command": "python3 tools/benchrec.py gate",
+      "exit": 0,
+      "private_log_sha256": "2ad50bd55569e6cdca9122687e1f2431bd6e9dfd9b67b886ac8221386f978659"
+    },
+    {
+      "phase": "standalone-format",
+      "command": "cargo fmt --check --manifest-path tools/aps-export/Cargo.toml",
+      "exit": 0,
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "standalone_library": {
+    "passed": 42,
+    "failed": 0,
+    "ignored": 0
+  },
+  "native_cli": {
+    "passed": 5,
+    "failed": 0,
+    "ignored": 0
+  },
+  "actual_producer_bridge": {
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "reader_bytes_unchanged": true,
+    "scope": "Six existing encodings, cubic orbit/pruning and first-informative partial output; public development fixtures only"
+  },
+  "artifact_policy_tests": {
+    "passed": 28,
+    "failed": 0
+  },
+  "root_library": {
+    "status": "in_progress_with_observed_failures",
+    "command": "cargo test --release --locked --lib",
+    "compiled_base": "2d746d0577ddf797b8706de1f45489fb31ad3d31",
+    "core_library_changed": false,
+    "final_exit": null,
+    "observed_failures": [
+      "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+      "cryptanalysis::ecbench::band::tests::memory_size_counters_are_listed_but_not_priced",
+      "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+      "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+      "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+      "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+      "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+      "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+      "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+      "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+      "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+      "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+      "cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars",
+      "cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure",
+      "cryptanalysis::gaudry_cubic::tests::arity_four_with_four_large_primes_recovers_the_planted_logarithm",
+      "cryptanalysis::ic_framework::archive::tests::wide_archive_is_rejected_without_truncation",
+      "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+      "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42",
+      "cryptanalysis::ic_framework::residual::tests::fused_residual_collector_recovers_and_halves_the_additions_per_step",
+      "cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline"
+    ],
+    "new_head_full_suite_pass": false
+  },
+  "local_workflow_artifact_wiring": {
+    "exit": 143,
+    "status": "stopped_missing_existing_sparse_manifest_blobs",
+    "assertions_changed": false,
+    "hosted_verdict": null
+  },
+  "failure_boundaries": [
+    {
+      "phase": "initial one-arm fixture",
+      "passed": 28,
+      "failed": 4,
+      "source_snapshot": null
+    },
+    {
+      "phase": "initial strict lint",
+      "exit": 101,
+      "reason": "Style and argument-count errors fixed without suppressions"
+    },
+    {
+      "phase": "initial producer bridge",
+      "exit": 101,
+      "reason": "Wrong crate import corrected"
+    },
+    {
+      "phase": "source-size initial",
+      "exit": 127,
+      "reason": "Missing tracked policy script; restored exactly"
+    },
+    {
+      "phase": "artifact-policy initial",
+      "passed": 27,
+      "failed": 1,
+      "reason": "Missing tracked .artifacts configuration; restored exactly"
+    },
+    {
+      "phase": "initial synthetic fixture selector",
+      "exit": 0,
+      "tests": 0,
+      "reason": "Exact filter lacked module prefix; corrected selector ran one test before full 42/5 suite"
+    }
+  ],
+  "publication": {
+    "historical_protocol_payloads_rejected": true,
+    "rejected_payloads_published": false,
+    "replacement": "Wholly synthetic schema-authored fixtures; separately accepted source blobs",
+    "private_logs_published": false,
+    "host_capsules_published": false,
+    "native_ledger_included": false,
+    "native_ledger_status": "withheld_pending_explicit_approval_after_publication_review_rejection",
+    "auto_merge_allowed": false
+  },
+  "performance_session_launched": false,
+  "execution_attested": false,
+  "costs_attested": false,
+  "wall_qualified": false,
+  "scope": "Producer-reported component correctness; no signed execution or performance attestation."
+}

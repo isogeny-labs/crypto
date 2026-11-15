@@ -1,0 +1,25 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-fast-crt-certificates-20261101-v1/FastCRTCertificates.lean:15:63: error: unsolved goals
+R : Type u_1
+inst✝ : CommRing R
+qa ra qb rb : R
+⊢ X * C qa * C qb ^ 2 * 2 - X * C qa ^ 2 * C qb - X * C qb ^ 3 + X ^ 2 * C qa * C qb * 2 - X ^ 2 * C qa ^ 2 -
+                    X ^ 2 * C qb ^ 2 -
+                  C qa * C ra * C qb +
+                C qa * C qb * C rb +
+              C ra * C qb ^ 2 -
+            C ra * C rb * 2 +
+          C ra ^ 2 -
+        C qb ^ 2 * C rb +
+      C rb ^ 2 =
+    X * C qa * C qb ^ 2 * 2 - X * C qa ^ 2 * C qb - X * C qb ^ 3 + X ^ 2 * C qa * C qb * 2 - X ^ 2 * C qa ^ 2 -
+              X ^ 2 * C qb ^ 2 +
+            C qa * C qb * C rb * 2 -
+          C qa ^ 2 * C rb -
+        C qb ^ 2 * C rb +
+      C (-(ra * rb * 2) - ra * qa * qb + ra * qb ^ 2 + ra ^ 2 - rb * qa * qb + rb * qa ^ 2 + rb ^ 2)

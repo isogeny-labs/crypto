@@ -1,0 +1,105 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+          "oracle": "ksum:m=4"
+        }
+      },
+      "name": "inc",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=15,scan_cap=240",
+          "oracle": "ksum:m=4,free=1"
+        }
+      },
+      "name": "ksum4f-n15",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=22,scan_cap=352",
+          "oracle": "ksum:m=4,free=1"
+        }
+      },
+      "name": "ksum4f-n22",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=26,scan_cap=416",
+          "oracle": "ksum:m=3,free=1"
+        }
+      },
+      "name": "ksum3f-n26",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=36,scan_cap=576",
+          "oracle": "ksum:m=3,free=1"
+        }
+      },
+      "name": "ksum3f-n36",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=16,scan_cap=256",
+          "oracle": "ksum:m=5"
+        }
+      },
+      "name": "ksum5-n16",
+      "role": "candidate"
+    }
+  ],
+  "description": "research/curve25519_autolab_20261104/round-015/PROTOCOL.md (frozen before data), train screen. Public synthetic Curve25519-family miniature and targets; no security claim. In-sample selection; promotion_eligible=false.",
+  "label": "ic_autolab round 15 train, generic track, k = 28",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate_measured",
+    "rounds": 1,
+    "seed": 2026125435,
+    "timeout_seconds": 1800,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 169487139,
+        "b": 71222779,
+        "group_order": 268462472,
+        "gx": 178958571,
+        "gy": 19523146,
+        "kind": "prime_explicit",
+        "p": 268435157,
+        "r": 33557809
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026125428,
+    "targets_per_curve": 32
+  }
+}

@@ -1,0 +1,5 @@
+# Frozen source implementation plan T1479
+
+2026-11-03, before implementation. Implement descriptor release design ../runtime-private-gate-release-fd/DESIGN.md SHA ed60668b4c86e4e7970b0d756968e4475a6b4db0719453ed4953cda0e2079f6b. Preserve predecessor v3 and gate6548 byte-for-byte. Source-only authorization by root. No proc writes, Docker, systemd, mount, container or cloud actions. Extend existing private_contract module so four-file source closure remains intact. Atomic staged renameat2 NOREPLACE, FD/PID/cgroup joins, no fallback or ambiguous retry. Failures retain receipts.
+
+One ordinary software test attempt: timeout TERM115s/KILL5s, RLIMIT_AS2GiB, child suite105s, process group cleanup. Original22 controls plus new real temporary-file publication tests and mocked kernel-custody/identity controls. No native gate execution. Freeze all implementation/test inputs before this single invocation. No test retries authorized. Render PDF/SVG separately as report generation. No staging until root explicit grant for both design and implementation scopes. Independent review follows source/tests; no runtime admission.

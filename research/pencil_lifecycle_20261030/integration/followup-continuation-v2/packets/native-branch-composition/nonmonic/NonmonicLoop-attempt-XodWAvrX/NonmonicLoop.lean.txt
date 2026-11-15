@@ -1,0 +1,74 @@
+import NonmonicStep
+set_option autoImplicit false
+namespace NonmonicDivision
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest NativeDivision
+theorem quotient_step (p a:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (q:(ZMod p.toNat)[X]) (r:List UInt64) (hr:r≠[]) (hl:b.length≤r.length)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0)
+ (hbs:Canon p b) (hrs:Canon p r) (hf:Fresh b r q) :
+ writeCoeff q (r.length-b.length) ((coefficient p a (r.getLast hr)).toNat:ZMod p.toNat)*wordsPoly p b+
+ wordsPoly p (selected p a b r hr hl)=q*wordsPoly p b+wordsPoly p r := by
+ rw [fresh_write q _ _ (hf _ (by omega)),(selected_correct p a b r hr hl hp hb ha hn hbs hrs).2]
+ ring
+noncomputable def qloop (p a:UInt64) (b:List UInt64) (fuel:Nat)
+ (q:(ZMod p.toNat)[X]) (r:List UInt64) : Option ((ZMod p.toNat)[X]×List UInt64) :=
+ if hr:r=[] then some (q,r) else
+ if hl:b.length≤r.length then
+  match fuel with
+  | 0=>none
+  | k+1=>qloop p a b k (writeCoeff q (r.length-b.length) ((coefficient p a (r.getLast hr)).toNat:ZMod p.toNat))
+    (selected p a b r hr hl)
+ else some (q,r)
+termination_by structural fuel
+
+theorem success_correct (p a:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0) (hbs:Canon p b) (hm:b.getLast?=some a)
+ (fuel:Nat) (q qo:(ZMod p.toNat)[X]) (r out:List UInt64)
+ (hc:Canon p r) (hf:Fresh b r q) (ho:qloop p a b fuel q r=some (qo,out)) :
+ Canon p out ∧ Fresh b out qo ∧
+ qo*wordsPoly p b+wordsPoly p out=q*wordsPoly p b+wordsPoly p r ∧
+ (out=[] ∨ out.length<b.length) := by
+ induction fuel generalizing q qo r out with
+ | zero =>
+   rw [qloop] at ho
+   split_ifs at ho with hr hl
+   · have he:=Option.some.inj ho
+     cases he
+     exact ⟨hc,hf,rfl,Or.inl hr⟩
+   · have he:=Option.some.inj ho
+     cases he
+     exact ⟨hc,hf,rfl,Or.inr (by omega)⟩
+ | succ fuel ih =>
+   rw [qloop] at ho
+   split_ifs at ho with hr hl
+   · have he:=Option.some.inj ho
+     cases he
+     exact ⟨hc,hf,rfl,Or.inl hr⟩
+   · have hs:=selected_correct p a b r hr hl hp hb ha hn hbs hc
+     have hd:=selected_shorter p a b r hr hl hp hb ha hn hbs hc hm
+     have hfr:=next_fresh b r (selected p a b r hr hl) q ((coefficient p a (r.getLast hr)).toNat:ZMod p.toNat) hl hd hf
+     obtain ⟨hco,hfo,he,ht⟩:=ih _ qo _ out hs.1 hfr ho
+     exact ⟨hco,hfo,he.trans (quotient_step p b r q hr hl hp hb ha hn hbs hc hf),ht⟩
+   · have he:=Option.some.inj ho
+     cases he
+     exact ⟨hc,hf,rfl,Or.inr (by omega)⟩
+
+theorem success_exists (p a:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0) (hbs:Canon p b) (hm:b.getLast?=some a)
+ (fuel:Nat) (q:(ZMod p.toNat)[X]) (r:List UInt64) (hc:Canon p r) (hlen:r.length≤fuel) :
+ ∃qo out,qloop p a b fuel q r=some (qo,out) := by
+ induction fuel generalizing q r with
+ | zero =>
+   have he:r=[]:=List.length_eq_zero_iff.mp (by omega)
+   subst r
+   exact ⟨q,[],by simp [qloop]⟩
+ | succ fuel ih =>
+   rw [qloop]
+   split_ifs with hr hl
+   · exact ⟨q,r,rfl⟩
+   · have hs:=selected_correct p a b r hr hl hp hb ha hn hbs hc
+     have hd:=selected_shorter p a b r hr hl hp hb ha hn hbs hc hm
+     exact ih _ _ hs.1 (by omega)
+   · exact ⟨q,r,rfl⟩
+
+end NonmonicDivision

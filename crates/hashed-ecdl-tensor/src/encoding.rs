@@ -1,10 +1,11 @@
 //! Linear-edge arithmetic and curve encodings from Bochum §2–3.
 
 use crate::arithmetic::inverse;
+use crate::canonical::{fourier_sum, PowerTable, PredicateProgram, TwistTable, ValueOperation};
 use crate::curve::{Curve, Point};
 use crate::finite::{Domain, PrimeDomain};
 use crate::network::{
-    Bit, FnPredicate, Network, Predicate, Program, Step, ValueFunction, Vertex, Word,
+    Bit, FnPredicate, Network, Predicate, PredicateTag, Program, Step, ValueFunction, Vertex, Word,
 };
 use crate::reduction::FactorBase;
 use crate::{integrity, invalid, overflow, BigUint, Meter, Result};
@@ -76,6 +77,16 @@ impl MultiplicationParameters {
     }
 }
 
+/// Integer multiplication gadget used inside `modular_multiply`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Multiplier {
+    /// Theorem 3's two-stage Fourier gadget: Θ(d) edges, vertex degree Θ(d^{3/4}).
+    #[default]
+    Fourier,
+    /// Schoolbook AND/ripple-adder gadget: Θ(d²) edges, every vertex of arity ≤ 5.
+    Schoolbook,
+}
+
 /// Words representing a point: one identity bit and canonical coordinates.
 #[derive(Clone, Debug)]
 pub struct PointWords {
@@ -93,14 +104,51 @@ pub struct PointWords {
 pub struct Encoder {
     vertices: Vec<Vertex>,
     uses: Vec<Vec<(usize, usize)>>,
+    signal_regions: Vec<Option<String>>,
     free: Vec<usize>,
     steps: Vec<Step>,
     interface: Vec<usize>,
+    semantic_region: Option<String>,
+    multiplier: Multiplier,
 }
 impl Encoder {
     /// Start an empty encoding.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Choose the integer multiplication gadget behind `modular_multiply`.
+    /// The default is the manuscript's Fourier gadget; the schoolbook gadget
+    /// exists for finite contraction-width comparisons and changes no language.
+    pub fn set_multiplier(&mut self, multiplier: Multiplier) {
+        self.multiplier = multiplier;
+    }
+
+    /// The integer multiplication gadget currently selected.
+    pub fn multiplier(&self) -> Multiplier {
+        self.multiplier
+    }
+
+    fn multiply(&mut self, a: &Word, b: &Word, meter: &Meter) -> Result<Word> {
+        match self.multiplier {
+            Multiplier::Fourier => self.integer_multiply(a, b, meter),
+            Multiplier::Schoolbook => self.schoolbook_multiply(a, b, meter),
+        }
+    }
+
+    pub(crate) fn set_semantic_region(&mut self, region: &str) -> Result<()> {
+        if region.is_empty() {
+            return Err(invalid("empty semantic region"));
+        }
+        self.semantic_region = Some(region.to_owned());
+        Ok(())
+    }
+
+    fn tagged_parameters(&self, mut parameters: Vec<(String, String)>) -> Vec<(String, String)> {
+        if let Some(region) = &self.semantic_region {
+            parameters.push(("semantic_region".into(), region.clone()));
+        }
+        parameters
     }
 
     fn fresh(&mut self, width: usize, free: bool, meter: &Meter) -> Result<Word> {
@@ -116,6 +164,7 @@ impl Encoder {
         for _ in 0..width {
             let signal = self.uses.len();
             self.uses.push(Vec::new());
+            self.signal_regions.push(self.semantic_region.clone());
             if free {
                 self.free.push(signal);
             }
@@ -175,10 +224,39 @@ impl Encoder {
             .flat_map(|w| w.0.iter().copied())
             .filter(|b| matches!(b, Bit::Signal(_)))
             .collect();
+        let widths = words
+            .iter()
+            .map(|word| word.width().to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+        let layout = words
+            .iter()
+            .map(|word| {
+                word.0
+                    .iter()
+                    .map(|bit| match bit {
+                        Bit::Constant(false) => '0',
+                        Bit::Constant(true) => '1',
+                        Bit::Signal(_) => 's',
+                    })
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join("/");
+        let tag = PredicateTag::new(
+            "encoder.constraint",
+            self.tagged_parameters(vec![
+                ("active_ports".into(), active.len().to_string()),
+                ("word_layout".into(), layout),
+                ("word_widths".into(), widths),
+            ]),
+        );
         meter.vector(self.vertices.len() + 1, "encoding vertices")?;
         let plan = words.to_vec();
-        let predicate: Arc<dyn Predicate> =
-            Arc::new(FnPredicate::new(active.len(), move |ports, work| {
+        let predicate: Arc<dyn Predicate> = Arc::new(FnPredicate::tagged(
+            active.len(),
+            tag,
+            move |ports, work| {
                 let mut cursor = 0;
                 let mut values = Vec::with_capacity(plan.len());
                 for word in &plan {
@@ -199,7 +277,56 @@ impl Encoder {
                     values.push(value);
                 }
                 function(&values, work)
-            }));
+            },
+        ));
+        let vertex = self.vertices.len();
+        self.vertices.push(Vertex {
+            predicate,
+            edges: vec![usize::MAX; active.len()],
+        });
+        for (port, bit) in active.iter().enumerate() {
+            let Bit::Signal(signal) = *bit else {
+                unreachable!()
+            };
+            self.uses[signal].push((vertex, port));
+        }
+        self.steps.push(Step::Check {
+            vertex,
+            ports: active,
+        });
+        Ok(())
+    }
+
+    fn programmed_constraint(
+        &mut self,
+        words: &[Word],
+        input_words: usize,
+        operation: ValueOperation,
+        meter: &Meter,
+    ) -> Result<()> {
+        let active: Vec<Bit> = words
+            .iter()
+            .flat_map(|word| word.0.iter().copied())
+            .filter(|bit| matches!(bit, Bit::Signal(_)))
+            .collect();
+        let widths = words
+            .iter()
+            .map(|word| word.width().to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+        let tag = PredicateTag::new(
+            "encoder.define_relation",
+            self.tagged_parameters(vec![
+                ("active_ports".into(), active.len().to_string()),
+                ("input_words".into(), input_words.to_string()),
+                ("operation".into(), operation.name().into()),
+                ("word_widths".into(), widths),
+            ]),
+        );
+        let program = PredicateProgram::define(words, input_words, operation)?;
+        meter.vector(self.vertices.len() + 1, "encoding vertices")?;
+        let predicate: Arc<dyn Predicate> =
+            Arc::new(FnPredicate::programmed(active.len(), tag, program));
         let vertex = self.vertices.len();
         self.vertices.push(Vertex {
             predicate,
@@ -223,6 +350,7 @@ impl Encoder {
         inputs: &[Word],
         widths: &[usize],
         function: ValueFunction,
+        canonical_operation: Option<ValueOperation>,
         checked: bool,
         meter: &Meter,
     ) -> Result<Vec<Word>> {
@@ -239,11 +367,15 @@ impl Encoder {
             let mut ports = inputs.to_vec();
             ports.extend(outputs.clone());
             let count = inputs.len();
-            self.constraint(
-                &ports,
-                move |values, work| Ok(function(&values[..count], work)? == values[count..]),
-                meter,
-            )?;
+            if let Some(operation) = canonical_operation {
+                self.programmed_constraint(&ports, count, operation, meter)?;
+            } else {
+                self.constraint(
+                    &ports,
+                    move |values, work| Ok(function(&values[..count], work)? == values[count..]),
+                    meter,
+                )?;
+            }
         }
         Ok(outputs)
     }
@@ -259,6 +391,9 @@ impl Encoder {
                         &[],
                         &[1],
                         Arc::new(move |_, _| Ok(vec![BigUint::from(u8::from(value))])),
+                        Some(ValueOperation::Constant(vec![BigUint::from(u8::from(
+                            value,
+                        ))])),
                         true,
                         meter,
                     )?;
@@ -321,6 +456,7 @@ impl Encoder {
                 std::slice::from_ref(bit),
                 &[1],
                 Arc::new(|v, _| Ok(vec![BigUint::from(u8::from(v[0].is_zero()))])),
+                Some(ValueOperation::Not),
                 true,
                 meter,
             )?
@@ -336,6 +472,7 @@ impl Encoder {
                 &[a.clone(), b.clone()],
                 &[1],
                 Arc::new(|v, _| Ok(vec![&v[0] * &v[1]])),
+                Some(ValueOperation::And),
                 true,
                 meter,
             )?
@@ -355,6 +492,7 @@ impl Encoder {
                         !v[0].is_zero() || !v[1].is_zero(),
                     ))])
                 }),
+                Some(ValueOperation::Or),
                 true,
                 meter,
             )?
@@ -386,6 +524,7 @@ impl Encoder {
                             BigUint::from(u8::from(v[0] < v[1]))
                         }])
                     }),
+                    Some(ValueOperation::LessThanBit),
                     true,
                     meter,
                 )?
@@ -414,6 +553,7 @@ impl Encoder {
                     let sum = v[0].to_u8().unwrap() + v[1].to_u8().unwrap() + v[2].to_u8().unwrap();
                     Ok(vec![BigUint::from(sum & 1), BigUint::from(sum >> 1)])
                 }),
+                Some(ValueOperation::IntegerAddBit),
                 true,
                 meter,
             )?;
@@ -435,58 +575,80 @@ impl Encoder {
     ) -> Result<Vec<Word>> {
         let width = params.j + 1;
         let mut middle = vec![Vec::<Word>::new(); params.second];
+        // Every column shares one root and stride, so one lazily built table
+        // of its powers serves all of them (see `PowerTable`).
+        let column_powers = Arc::new(PowerTable::default());
         for j2 in 0..params.second {
             let inputs: Vec<_> = (0..params.first)
                 .map(|j1| input[params.second * j1 + j2].clone())
                 .collect();
             let (omega, modulus, p) = (omega.clone(), modulus.clone(), params.clone());
+            let powers = column_powers.clone();
+            let twist_cache = TwistTable::default();
+            let operation = ValueOperation::FourierColumn {
+                omega: omega.clone(),
+                modulus: modulus.clone(),
+                first: p.first,
+                second: p.second,
+                column: j2,
+            };
             middle[j2] = self.define(
                 &inputs,
                 &vec![width; p.first],
                 Arc::new(move |v, work| {
+                    let table = powers.get(&omega, p.second, p.first, &modulus);
+                    let twists = twist_cache.get(&omega, j2, p.first, &modulus);
                     let mut out = Vec::with_capacity(p.first);
                     for t1 in 0..p.first {
-                        let mut sum = BigUint::zero();
-                        for j1 in 0..p.first {
-                            work.charge(1, "Fourier column transform")?;
-                            let exponent = BigUint::from(p.second * j1 * t1);
-                            sum = (sum + &v[j1] * omega.modpow(&exponent, &modulus)) % &modulus;
-                        }
-                        out.push(sum * omega.modpow(&BigUint::from(j2 * t1), &modulus) % &modulus);
+                        let sum =
+                            fourier_sum(v, p.first, t1, table, &omega, p.second, &modulus, || {
+                                work.charge(1, "Fourier column transform")
+                            })?;
+                        out.push(sum * &twists[t1] % &modulus);
                     }
                     Ok(out)
                 }),
+                Some(operation),
                 true,
                 meter,
             )?;
         }
         let mut out: Vec<Option<Word>> = vec![None; params.length];
+        let row_powers = Arc::new(PowerTable::default());
         for t1 in 0..params.first {
             let inputs: Vec<_> = (0..params.second)
                 .map(|j2| middle[j2][t1].clone())
                 .collect();
             let (omega, modulus, p) = (omega.clone(), modulus.clone(), params.clone());
+            let powers = row_powers.clone();
             let scale = if inverse_scale {
                 inverse(&BigUint::from(params.length), &modulus)?
             } else {
                 BigUint::one()
             };
+            let operation = ValueOperation::FourierRow {
+                omega: omega.clone(),
+                modulus: modulus.clone(),
+                first: p.first,
+                second: p.second,
+                scale: scale.clone(),
+            };
             let result = self.define(
                 &inputs,
                 &vec![width; p.second],
                 Arc::new(move |v, work| {
+                    let table = powers.get(&omega, p.first, p.second, &modulus);
                     let mut out = Vec::with_capacity(p.second);
                     for t2 in 0..p.second {
-                        let mut sum = BigUint::zero();
-                        for j2 in 0..p.second {
-                            work.charge(1, "Fourier row transform")?;
-                            let exponent = BigUint::from(p.first * j2 * t2);
-                            sum = (sum + &v[j2] * omega.modpow(&exponent, &modulus)) % &modulus;
-                        }
+                        let sum =
+                            fourier_sum(v, p.second, t2, table, &omega, p.first, &modulus, || {
+                                work.charge(1, "Fourier row transform")
+                            })?;
                         out.push(sum * &scale % &modulus);
                     }
                     Ok(out)
                 }),
+                Some(operation),
                 true,
                 meter,
             )?;
@@ -524,6 +686,9 @@ impl Encoder {
         let mut products = Vec::with_capacity(p.length);
         for i in 0..p.length {
             let modulus = modulus.clone();
+            let operation = ValueOperation::FourierPointwise {
+                modulus: modulus.clone(),
+            };
             products.push(
                 self.define(
                     &[fa[i].clone(), fb[i].clone()],
@@ -532,6 +697,7 @@ impl Encoder {
                         work.charge(1, "Fourier pointwise product")?;
                         Ok(vec![&v[0] * &v[1] % &modulus])
                     }),
+                    Some(operation),
                     true,
                     meter,
                 )?
@@ -573,6 +739,7 @@ impl Encoder {
                         sum >> k,
                     ])
                 }),
+                Some(ValueOperation::ProductCarry { limb_bits: k }),
                 true,
                 meter,
             )?;
@@ -611,6 +778,7 @@ impl Encoder {
                 &[x.clone(), y.clone()],
                 &[1],
                 Arc::new(move |v, _| Ok(vec![BigUint::from(u8::from(&v[0] + &v[1] >= modulus))])),
+                None,
                 false,
                 meter,
             )?
@@ -641,6 +809,7 @@ impl Encoder {
                 &[x.clone(), y.clone()],
                 &[x.width()],
                 Arc::new(move |v, _| Ok(vec![(&v[0] + &v[1]) % &modulus])),
+                None,
                 false,
                 meter,
             )?
@@ -667,6 +836,7 @@ impl Encoder {
                 &[x.clone(), y.clone()],
                 &[x.width()],
                 Arc::new(move |v, _| Ok(vec![(&v[0] + &modulus - &v[1]) % &modulus])),
+                None,
                 false,
                 meter,
             )?
@@ -696,15 +866,15 @@ impl Encoder {
                 let product = &v[0] * &v[1];
                 Ok(vec![&product % &modulus, product / &modulus])
             }),
+            None,
             false,
             meter,
         )?;
         let z = witnesses.remove(0);
         let theta = witnesses.remove(0);
         self.canonical(&z, q, meter)?;
-        let product = self.integer_multiply(x, y, meter)?;
-        let quotient_product =
-            self.integer_multiply(&theta, &Self::constant(x.width(), q)?, meter)?;
+        let product = self.multiply(x, y, meter)?;
+        let quotient_product = self.multiply(&theta, &Self::constant(x.width(), q)?, meter)?;
         let sum = self.integer_add(&quotient_product, &Self::pad(&z, 2 * x.width())?, meter)?;
         self.assert_equal(&Self::pad(&product, sum.width())?, &sum, meter)?;
         Ok(z)
@@ -725,11 +895,21 @@ impl Encoder {
         meter.vector(width, "schoolbook row")?;
         let mut sum = Self::constant(width, &BigUint::zero())?;
         for j in 0..b.width() {
+            // Constant bits fold: a zero multiplier bit contributes no row, a
+            // one bit copies the multiplicand, and only signal pairs need an AND.
+            if matches!(b.0[j], Bit::Constant(false)) {
+                continue;
+            }
             let mut row = vec![Bit::Constant(false); width];
             for i in 0..a.width() {
-                row[i + j] = self
-                    .and(&Self::slice(a, i, 1), &Self::slice(b, j, 1), meter)?
-                    .0[0];
+                row[i + j] = match (a.0[i], b.0[j]) {
+                    (Bit::Constant(false), _) | (_, Bit::Constant(false)) => Bit::Constant(false),
+                    (Bit::Constant(true), other) | (other, Bit::Constant(true)) => other,
+                    (Bit::Signal(_), Bit::Signal(_)) => {
+                        self.and(&Self::slice(a, i, 1), &Self::slice(b, j, 1), meter)?
+                            .0[0]
+                    }
+                };
             }
             let next = self.integer_add(&sum, &Word(row), meter)?;
             self.assert_equal(
@@ -772,6 +952,7 @@ impl Encoder {
                     _ => vec![BigUint::one(), BigUint::zero(), BigUint::zero()],
                 })
             }),
+            None,
             true,
             meter,
         )?;
@@ -807,6 +988,118 @@ impl Encoder {
         let point = PointWords { infinity, x, y };
         self.valid_point(curve, &point, meter)?;
         Ok(point)
+    }
+
+    /// Free affine point of the small-x factor base `x < 2^low_bits`: only the
+    /// low `low_bits` of the abscissa are free signals, the rest are constant
+    /// zero, the identity bit is constant zero, and the curve equation is
+    /// enforced. The free words are allocated as `x` low bits, then `y`.
+    pub fn input_point_small_x(
+        &mut self,
+        curve: &Curve,
+        low_bits: usize,
+        meter: &Meter,
+    ) -> Result<PointWords> {
+        let width = curve.modulus().bits() as usize;
+        if low_bits == 0 || low_bits > width {
+            return Err(invalid("small-x width"));
+        }
+        let low = self.input_word(low_bits, meter)?;
+        self.mark_interface(&low, meter)?;
+        let x = Self::pad(&low, width)?;
+        let y = self.input_word(width, meter)?;
+        self.mark_interface(&y, meter)?;
+        let point = PointWords {
+            infinity: Self::constant(1, &BigUint::zero())?,
+            x,
+            y,
+        };
+        self.valid_point(curve, &point, meter)?;
+        Ok(point)
+    }
+
+    /// Assert that a point is affine with `x < 2^low_bits` (small-x membership).
+    pub fn assert_small_x(
+        &mut self,
+        point: &PointWords,
+        low_bits: usize,
+        meter: &Meter,
+    ) -> Result<()> {
+        let width = point.x.width();
+        if low_bits == 0 || low_bits > width {
+            return Err(invalid("small-x width"));
+        }
+        self.assert_equal(
+            &point.infinity,
+            &Self::constant(1, &BigUint::zero())?,
+            meter,
+        )?;
+        let high = Self::slice(&point.x, low_bits, width - low_bits);
+        self.assert_equal(
+            &high,
+            &Self::constant(width - low_bits, &BigUint::zero())?,
+            meter,
+        )
+    }
+
+    /// Free abscissa of the small-x factor base, zero-padded to the field width
+    /// and marked as interface. No ordinate and no curve equation: the Semaev
+    /// gadgets below only need `x`.
+    pub fn input_small_x(&mut self, curve: &Curve, low_bits: usize, meter: &Meter) -> Result<Word> {
+        let width = curve.modulus().bits() as usize;
+        if low_bits == 0 || low_bits > width {
+            return Err(invalid("small-x width"));
+        }
+        let low = self.input_word(low_bits, meter)?;
+        self.mark_interface(&low, meter)?;
+        Self::pad(&low, width)
+    }
+
+    /// Assert Semaev's third summation polynomial
+    /// `S3(x1,x2,x3) = (x1-x2)^2 x3^2 - 2((x1+x2)(x1 x2 + a) + 2b) x3 + (x1 x2 - a)^2 - 4b(x1+x2) = 0`
+    /// over `F_p` for the curve `y^2 = x^3 + a x + b`. The words are field-width
+    /// abscissae (constants allowed); every modular product goes through
+    /// `modular_multiply`, so the selected multiplier gadget is used. Four of
+    /// the seven products have two signal operands; the other three multiply by
+    /// a constant (`x3^2`, `x3` or `4b`) when `x3` is constant.
+    pub fn semaev_s3_zero(
+        &mut self,
+        curve: &Curve,
+        x1: &Word,
+        x2: &Word,
+        x3: &Word,
+        meter: &Meter,
+    ) -> Result<()> {
+        let p = curve.modulus();
+        let width = p.bits() as usize;
+        if x1.width() != width || x2.width() != width || x3.width() != width {
+            return Err(invalid("summation polynomial word widths"));
+        }
+        let two_b = (curve.b() << 1) % p;
+        let four_b = (curve.b() << 2) % p;
+        let a = Self::constant(width, curve.a())?;
+        // (x1 - x2)^2 * x3^2
+        let difference = self.modular_subtract(x1, x2, p, meter)?;
+        let difference_square = self.modular_multiply(&difference, &difference, p, meter)?;
+        let x3_square = self.modular_multiply(x3, x3, p, meter)?;
+        let term1 = self.modular_multiply(&difference_square, &x3_square, p, meter)?;
+        // 2 * ((x1 + x2)(x1 x2 + a) + 2b) * x3
+        let sum = self.modular_add(x1, x2, p, meter)?;
+        let product = self.modular_multiply(x1, x2, p, meter)?;
+        let product_a = self.modular_add(&product, &a, p, meter)?;
+        let inner = self.modular_multiply(&sum, &product_a, p, meter)?;
+        let inner = self.modular_add(&inner, &Self::constant(width, &two_b)?, p, meter)?;
+        let inner_x3 = self.modular_multiply(&inner, x3, p, meter)?;
+        let term2 = self.modular_add(&inner_x3, &inner_x3, p, meter)?;
+        // (x1 x2 - a)^2
+        let product_minus_a = self.modular_subtract(&product, &a, p, meter)?;
+        let term3 = self.modular_multiply(&product_minus_a, &product_minus_a, p, meter)?;
+        // 4b (x1 + x2)
+        let term4 = self.modular_multiply(&sum, &Self::constant(width, &four_b)?, p, meter)?;
+        // term1 + term3 == term2 + term4
+        let left = self.modular_add(&term1, &term3, p, meter)?;
+        let right = self.modular_add(&term2, &term4, p, meter)?;
+        self.assert_equal(&left, &right, meter)
     }
 
     /// Hardcode a canonical curve point.
@@ -919,6 +1212,7 @@ impl Encoder {
                     Point::Affine { x, y } => Ok(vec![BigUint::zero(), x, y]),
                 }
             }),
+            None,
             false,
             meter,
         )?;
@@ -951,6 +1245,7 @@ impl Encoder {
                     };
                     Ok(vec![num * inverse(&den, p)? % p])
                 }),
+                None,
                 false,
                 meter,
             )?
@@ -1085,10 +1380,27 @@ impl Encoder {
     /// Freeze shared signals into ordinary edges and constant-degree equality
     /// trees. The optional witness metadata contains no user-supplied hints.
     pub fn finish(mut self, meter: &Meter) -> Result<Network> {
-        fn vertex(vertices: &mut Vec<Vertex>, arity: usize, equality: bool) -> usize {
+        fn vertex(
+            vertices: &mut Vec<Vertex>,
+            arity: usize,
+            equality: bool,
+            semantic_region: Option<&str>,
+        ) -> usize {
             let id = vertices.len();
+            let mut parameters = vec![("arity".into(), arity.to_string())];
+            if let Some(region) = semantic_region {
+                parameters.push(("semantic_region".into(), region.to_owned()));
+            }
+            let tag = PredicateTag::new(
+                if equality {
+                    "encoder.copy_equality"
+                } else {
+                    "encoder.endpoint"
+                },
+                parameters,
+            );
             vertices.push(Vertex {
-                predicate: Arc::new(FnPredicate::new(arity, move |bits, _| {
+                predicate: Arc::new(FnPredicate::tagged(arity, tag, move |bits, _| {
                     Ok(!equality || bits.windows(2).all(|w| w[0] == w[1]))
                 })),
                 edges: vec![usize::MAX; arity],
@@ -1118,9 +1430,17 @@ impl Encoder {
             vertices[b.0].edges[b.1] = edge;
             Ok(())
         }
+        if self.signal_regions.len() != self.uses.len() {
+            return Err(integrity("encoding semantic-region width"));
+        }
         let mut interface_vertices = Vec::new();
         for &signal in &self.interface {
-            let endpoint = vertex(&mut self.vertices, 1, false);
+            let endpoint = vertex(
+                &mut self.vertices,
+                1,
+                false,
+                self.signal_regions[signal].as_deref(),
+            );
             self.uses[signal].push((endpoint, 0));
             interface_vertices.push(endpoint);
         }
@@ -1128,7 +1448,12 @@ impl Encoder {
         let mut edge_signals = Vec::new();
         for (signal, uses) in self.uses.iter_mut().enumerate() {
             while uses.len() < 2 {
-                let endpoint = vertex(&mut self.vertices, 1, false);
+                let endpoint = vertex(
+                    &mut self.vertices,
+                    1,
+                    false,
+                    self.signal_regions[signal].as_deref(),
+                );
                 uses.push((endpoint, 0));
             }
             if uses.len() == 2 {
@@ -1143,7 +1468,12 @@ impl Encoder {
                         meter,
                     )?;
                 } else {
-                    let copy = vertex(&mut self.vertices, 2, true);
+                    let copy = vertex(
+                        &mut self.vertices,
+                        2,
+                        true,
+                        self.signal_regions[signal].as_deref(),
+                    );
                     connect(
                         &mut self.vertices,
                         &mut edges,
@@ -1164,7 +1494,12 @@ impl Encoder {
                     )?;
                 }
             } else {
-                let mut copy = vertex(&mut self.vertices, 3, true);
+                let mut copy = vertex(
+                    &mut self.vertices,
+                    3,
+                    true,
+                    self.signal_regions[signal].as_deref(),
+                );
                 connect(
                     &mut self.vertices,
                     &mut edges,
@@ -1195,7 +1530,12 @@ impl Encoder {
                             meter,
                         )?;
                     } else {
-                        let next = vertex(&mut self.vertices, 3, true);
+                        let next = vertex(
+                            &mut self.vertices,
+                            3,
+                            true,
+                            self.signal_regions[signal].as_deref(),
+                        );
                         connect(
                             &mut self.vertices,
                             &mut edges,
@@ -1232,6 +1572,7 @@ impl Encoder {
             signals: self.uses.len(),
             steps: self.steps,
             edge_signals,
+            signal_regions: self.signal_regions,
         };
         Ok(Network {
             vertices: self.vertices,

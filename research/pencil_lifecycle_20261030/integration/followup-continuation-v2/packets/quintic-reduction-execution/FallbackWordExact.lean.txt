@@ -1,0 +1,39 @@
+import PegcdWordOutput
+set_option autoImplicit false
+namespace FallbackWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest PencilWordRefinement
+
+def exactDiv (p : UInt64) (a b : List UInt64) : Option (List UInt64) :=
+ match b.getLast? with
+ | none => none
+ | some last => (NonmonicStorage.wordDiv p last b a a.length).bind
+   (fun z => if z.2=[] then some z.1 else none)
+
+theorem exact_total (p : UInt64) [Fact p.toNat.Prime] (a b : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (ha : Canon p a) (hc : Canon p b)
+ (hn : Normal b) (hbn : wordsPoly p b ≠ 0) (hd : wordsPoly p b ∣ wordsPoly p a) :
+ ∃ q, exactDiv p a b=some q ∧ Canon p q ∧
+ wordsPoly p a=wordsPoly p q*wordsPoly p b := by
+ have he : b ≠ [] := by intro h; apply hbn; simp [h,wordsPoly,listPoly]
+ have hl : (b.getLast he).toNat < p.toNat := hc _ (List.getLast_mem he)
+ have hln : b.getLast he ≠ 0 := by
+   intro h
+   exact hn (by simp [List.getLast?_eq_some_getLast he,h])
+ obtain ⟨w,hw⟩ := hd
+ have hw' : wordsPoly p a=w*wordsPoly p b := by simpa [mul_comm] using hw
+ obtain ⟨q,hq,hcq,hwq⟩ := NonmonicStorage.word_exact p (b.getLast he) b a hp hb hl hln hc ha
+   (List.getLast?_eq_some_getLast he) a.length le_rfl w hw'
+ refine ⟨q,?_,hcq,?_⟩
+ · simp [exactDiv,List.getLast?_eq_some_getLast he,hq]
+ · simpa [hwq] using hw'
+
+theorem add_normal (p : UInt64) (a b : List UInt64) : Normal (ResidualWord.padd p a b) :=
+ trim_finished _ _ le_rfl
+
+theorem product_normal (p : UInt64) (a b : List UInt64) : Normal (ProductPolynomial.product p a b) := by
+ unfold ProductPolynomial.product
+ split_ifs
+ · simp [Normal]
+ · simp [Normal]
+ · exact trim_finished _ _ le_rfl
+end FallbackWord

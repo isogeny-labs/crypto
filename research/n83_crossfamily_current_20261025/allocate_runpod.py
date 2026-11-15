@@ -22,15 +22,26 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 API_URL = "https://api.runpod.io/graphql"
 GPU_TYPES = ("NVIDIA GeForce RTX 4090", "NVIDIA GeForce RTX 4090")
+ADA_TYPES = ("NVIDIA RTX 2000 Ada Generation", "NVIDIA RTX 2000 Ada Generation")
 IMAGE = "runpod/base:1.0.2-ubuntu2404"
 CAP_SECONDS = 360 * 60
 PRICE_CAP_PER_HOUR = Decimal("0.34")
+ADA_PRICE_CAP_PER_HOUR = Decimal("0.25")
 TOTAL_CAP_USD = Decimal("4.20")
+ADA_TOTAL_CAP_USD = Decimal("3.10")
 CONTAINER_DISK_GB = 30
 CONTAINER_DISK_USD_PER_GB_MONTH = Decimal("0.10")
 MIN_BILLING_MONTH_HOURS = Decimal(28 * 24)
 READBACK_ATTEMPTS = 30
 READBACK_DELAY_SECONDS = 2
+HARDWARE_PROFILES = {
+    "rtx4090": (GPU_TYPES, PRICE_CAP_PER_HOUR),
+    "ada2000": (ADA_TYPES, ADA_PRICE_CAP_PER_HOUR),
+}
+PROFILE_TOTAL_CAPS = {
+    "rtx4090": TOTAL_CAP_USD,
+    "ada2000": ADA_TOTAL_CAP_USD,
+}
 
 
 def now():
@@ -158,7 +169,8 @@ def mutation(name, terminate_at, gpu_type):
         "createdAt podType machine { gpuTypeId } } }")
 
 
-def valid_pod(pod, expected_name, expected_gpu_type):
+def valid_pod(pod, expected_name, expected_gpu_type,
+              price_cap=PRICE_CAP_PER_HOUR):
     price = Decimal(str(pod.get("costPerHr")))
     if (pod.get("name") != expected_name or
             pod.get("desiredStatus") != "RUNNING" or
@@ -173,7 +185,7 @@ def valid_pod(pod, expected_name, expected_gpu_type):
             (pod.get("machine") or {}).get("gpuTypeId") != expected_gpu_type or
             int(pod.get("containerDiskInGb")) != CONTAINER_DISK_GB or
             Decimal(str(pod.get("volumeInGb") or 0)) != 0 or
-            price <= 0 or price > PRICE_CAP_PER_HOUR or
+            price <= 0 or price > price_cap or
             not pod.get("createdAt")):
         raise ValueError("RunPod allocation violates frozen host or price cap")
     return price
@@ -199,7 +211,10 @@ def frozen_head():
 
 
 def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
-             terminate_pod=terminate, guard=arm_guard):
+             terminate_pod=terminate, guard=arm_guard,
+             hardware_profile="rtx4090"):
+    gpu_types, price_cap = HARDWARE_PROFILES[hardware_profile]
+    total_cap = PROFILE_TOTAL_CAPS[hardware_profile]
     head = frozen_head()
     if (bundle_proof.get("source_head_sha") != head or
             not isinstance(bundle_proof.get("source_archive_sha256"), str) or
@@ -209,7 +224,8 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
         raise ValueError("source bundle differs from allocation head")
     if output.exists():
         raise ValueError("allocation output already exists")
-    names = [f"n83-crossfamily-{head[:12]}-s{i}" for i in range(2)]
+    label = "" if hardware_profile == "rtx4090" else f"-{hardware_profile}"
+    names = [f"n83-crossfamily{label}-{head[:12]}-s{i}" for i in range(2)]
     before = pods(key)
     if any(pod.get("name") in names for pod in before):
         raise ValueError("matching Pod already exists; inspect before retry")
@@ -219,18 +235,19 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
     write(output / "allocation_plan.json", {
         "schema": "n83.crossfamily-current-allocation-plan/v1",
         "source_head_sha": head, "names": names,
-        "gpu_types": list(GPU_TYPES),
+        "gpu_types": list(gpu_types),
+        "hardware_profile": hardware_profile,
         "started_utc": iso(started),
         "source_archive_sha256": bundle_proof["source_archive_sha256"],
         "source_manifest_sha256": bundle_proof["source_manifest_sha256"],
         "image_name": IMAGE, "min_memory_gb": 27, "min_vcpus": 4,
         "cap_seconds": CAP_SECONDS, "terminate_at_utc": terminate_at,
-        "price_cap_per_hour_usd": str(PRICE_CAP_PER_HOUR),
+        "price_cap_per_hour_usd": str(price_cap),
         "container_disk_gb_per_pod": CONTAINER_DISK_GB,
         "container_disk_usd_per_gb_month":
         str(CONTAINER_DISK_USD_PER_GB_MONTH),
         "minimum_billing_month_hours": int(MIN_BILLING_MONTH_HOURS),
-        "total_reserved_cap_usd": str(TOTAL_CAP_USD),
+        "total_reserved_cap_usd": str(total_cap),
         "existing_named_pods": [],
     })
     guard_process = guard(output)
@@ -243,7 +260,7 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
                 raise ValueError("local RunPod deadline guard exited")
             try:
                 response = api(mutation(name, terminate_at,
-                                        GPU_TYPES[stratum]), key)
+                                        gpu_types[stratum]), key)
                 raw = response["podFindAndDeployOnDemand"]
                 if not isinstance(raw, dict) or not raw.get("id"):
                     raise ValueError("RunPod mutation returned no Pod ID")
@@ -258,12 +275,12 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
                 except Exception:
                     pass
                 raise
-            price = valid_pod(pod, name, GPU_TYPES[stratum])
+            price = valid_pod(pod, name, gpu_types[stratum], price_cap)
             if pod["id"] != raw["id"]:
                 raise ValueError("RunPod mutation ID and readback differ")
             projected = projected_total(
                 [Decimal(str(p["costPerHr"])) for p in observed] + [price])
-            if projected > TOTAL_CAP_USD:
+            if projected > total_cap:
                 raise ValueError("two-Pod reservation exceeds total cap")
             observed.append(pod)
             write(output / f"provider_readback_s{stratum}.json", pod)
@@ -320,6 +337,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--source-bundle", type=Path)
+    parser.add_argument("--hardware-profile", choices=HARDWARE_PROFILES,
+                        default="rtx4090")
     parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
     head = frozen_head()
@@ -339,13 +358,16 @@ def main():
         print(json.dumps({"status": "READY_FOR_CREDENTIAL_AND_DISPATCH",
                           "source_head_sha": head,
                           "source_bundle_verified": bundle_proof is not None,
+                          "hardware_profile": args.hardware_profile,
+                          "total_cap_usd": str(PROFILE_TOTAL_CAPS[args.hardware_profile]),
                           "projected_max_usd": str(projected_total(
-                              [PRICE_CAP_PER_HOUR, PRICE_CAP_PER_HOUR]))},
+                              [HARDWARE_PROFILES[args.hardware_profile][1]] * 2))},
                          sort_keys=True))
         return
     if bundle_proof is None:
         raise ValueError("--source-bundle is required for allocation")
-    print(json.dumps(allocate(args.output.resolve(), configured_key(), bundle_proof),
+    print(json.dumps(allocate(args.output.resolve(), configured_key(), bundle_proof,
+                              hardware_profile=args.hardware_profile),
                      sort_keys=True))
 
 

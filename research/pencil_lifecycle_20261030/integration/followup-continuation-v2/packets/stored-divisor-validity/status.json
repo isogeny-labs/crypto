@@ -1,0 +1,77 @@
+{
+  "schema": "research.component-proof/v1",
+  "task": "T-1180",
+  "component": "stored-divisor-validity",
+  "date": "2026-10-31",
+  "producer_checks": "passed",
+  "independent_source_fidelity_review": "pending",
+  "main_declarations": 8,
+  "control_declarations": 10,
+  "axiom_readbacks": 18,
+  "accepted_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "checks": {
+    "stored2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "branch1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls4": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "claims": [
+    {
+      "id": "storage",
+      "result": "capacities 3 and 2; polynomial outputs T_d(u), T_3(v)"
+    },
+    {
+      "id": "validity",
+      "result": "four Mumford conditions transported to T_6(f), with degree d retained"
+    },
+    {
+      "id": "identity",
+      "result": "valid degree-zero input is (1,0); unchanged branch valid"
+    }
+  ],
+  "assumptions": [
+    "prime 1<p<2^31",
+    "canonical word inputs",
+    "a nonzero",
+    "recorded degree equals input u natDegree",
+    "input Mumford validity"
+  ],
+  "compiled_rust_equivalence": false,
+  "geometric_class_transport": false,
+  "scientific_executions": 0,
+  "cost_ratio": null,
+  "full_cohort_scope": 1260,
+  "failed_attempts": [
+    "stored1",
+    "controls1",
+    "controls2",
+    "controls3"
+  ],
+  "render_failure": "render-failed1.log",
+  "pdf_visual_inspection": "one page inspected; readable and unclipped",
+  "upstream_compiled_dependencies": "retained trust boundary",
+  "next_steps": [
+    "independent source fidelity review",
+    "geometric class transport"
+  ]
+}

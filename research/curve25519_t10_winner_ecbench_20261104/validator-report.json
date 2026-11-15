@@ -1,0 +1,589 @@
+{
+ "schema": "validator-report/v1 (validation-gate/v1 companion)",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_scope": "T12 end-to-end ecbench measurement only: 16 complete one-target chunk sessions (Addendum C) on the k=20 public synthetic prime curve icv1-fp20-tm1050-4295f05e, 5 arms (rho-neg reference, proj-a baseline, pkm-iso-t6-g4 seed 0, pkm-iso-t6-g4-s1308, pkm-iso-t5-g4-s1307), 160 verified records; the pooled band at w=0/0.1/1, its 10 verdicts, the 12 paired ratios with linearised-t intervals, per-target win counts, the charged/amortised seed-search rows, the distance-remaining figures and prediction verdicts Q1-Q5. Algebraic-track component result on a miniature: no leaderboard row, no vs_rho claim, no security claim; rho-neg and proj-a remain ahead of every PKM arm at every weight.",
+ "independent": true,
+ "validator": "validator subagent (session model claude-mythos-5-1, effort xhigh). Not the producer of T12. Recomputation code written by the validator (recompute.py, embedded below), not scripts/pooled_compare.py or ecbench band/compare.",
+ "date": "2026-11-04T07:19:29Z",
+ "validated_commit": "94555b5be5fc0d3cecd3e43ec068279d92a8cb96",
+ "study_tree_sha": "b1acfca9baea95da74592f2738fd9167257b1d8b",
+ "head_at_write": "f035d27f9380e6349f989cec884666777558f9e9",
+ "branch": "claude/curve25519-index-calculus-i674j4",
+ "protocol_freeze_commit": "91996ac7ef08cdfd89cdf6914a27940a9f33e992",
+ "addendum_c_freeze_commit": "4eddc74edc19edf23d0c873ce68e8e7f54a7a5a8",
+ "tree_state": "Validation ran at HEAD 94555b5be5 (06:26:33Z); while it ran other sessions committed 5a800bb3d0..f035d27f93 (06:32-07:15Z, wave-4 and T13 protocol files only). The study tree research/curve25519_t10_winner_ecbench_20261104 has the same git tree hash b1acfca9baea95da74592f2738fd9167257b1d8b at both commits (git diff 94555b5be5..HEAD -- study empty) and git status --porcelain is empty under it (164 tracked files = 164 present). PROTOCOL.md touched only by 91996ac7ef (01:47:12Z) and 4eddc74edc (02:26:29Z) and byte-identical to its 4eddc74edc blob. ecbench/spec.json unchanged since 91996ac7ef. Every file under ecbench/chunks/ (118 files incl. specs/ and interrupted/) first added in d6d502f4a5 at 05:51:28Z; first chunk session started 02:27:54.558Z (c00 session.json started_unix_ms 1793759274558; driver.log 02:27:47Z), 85 s after the Addendum C commit; all 16 sessions started after it.",
+ "artifact_hashes_at_validation": {
+  "PROTOCOL.md": "e47bbfe5152a3c86d292f9e291a9a63ecc702aa0237aca50a8d72b97a2e600a8",
+  "README.md": "3bd162b1b1af50badecd11a06a8f6f5fd9c8177eee1f8c05be2b4d4984fe9f0a",
+  "scripts/run.sh": "7cd98b13359597eb98c3210c08e1a69465e2a543f870d83edf20a0d0c2feb147",
+  "scripts/chunked_run.py": "e8edaa81515b400bcb29e402f6ff0d8548001498aef662c23f47daf3d19aabde",
+  "scripts/pooled_compare.py": "061b11b0eec670ee6160b60d1b821bf52a7af277d2d4adf342d6afee57d4fdf9",
+  "ecbench/SHA256SUMS": "31933c985a1753dab476b0961a75387312c2740be5e0038747ed06ac720fb3b8",
+  "ecbench/spec.json": "f86c2d2fc8c7c9eaf62e87ee630e428eacab334d3e5976f5ab21b6c5d2b41548",
+  "ecbench/binary.sha256": "384aba6056dd2056a4b9b64eb5a679a87fa40374082f3cd9950dcf4753bd7cac",
+  "ecbench/band_pooled.json": "b5dbb83daca1e08414b4007b0298a8b4b2708fdb56d30e8732a8ceb4c4ffb797",
+  "ecbench/band_pooled.txt": "42596e17a7bdec73d06b7c1c64d6cfaf6321d9a05d781a1417b6a85cdce7d615",
+  "ecbench/pooled_compare.jsonl": "74ed8efd5d1429c66664989b17e2e3580fad6efef7b659f472ccea929c9d269e",
+  "ecbench/plan.txt": "3b2438c210b7305b27785777f04ac34870de5e70f8fc5db8d5305c0b4a7dc65c",
+  "ecbench/run.log": "9d98a8f8bd253d2898cc0ebad0a12cdda1a16ee2a79ef59033d45e69cc49f52c",
+  "ecbench/chunks/driver.log": "95fbc22e65321e23600ba02a450f3d8f4743e3f890dbd54041ef691b0eada932"
+ },
+ "instrument": {
+  "ecbench": {
+   "path": "/home/user/ctarget/release/ecbench",
+   "sha256_rehashed": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b",
+   "frozen": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b",
+   "equal": true,
+   "mtime": "2026-11-03 16:39",
+   "version": "ecbench 0.1.0",
+   "same_binary_as_T9_validation": true,
+   "sessions_build_git_commit": null,
+   "note": "session.json/host.json build.git_commit and git_dirty are null: the binary is bound by hash, not to a source commit (erratum E4)."
+  }
+ },
+ "requirements": [
+  {
+   "id": "R1",
+   "name": "frozen committed artifact set",
+   "result": "pass",
+   "evidence": "git status --porcelain -- study (empty); git ls-files 164 == find 164; study tree b1acfca9baea identical at 94555b5be5 and HEAD f035d27f93"
+  },
+  {
+   "id": "R2",
+   "name": "protocol and Addendum C frozen before every chunk file",
+   "result": "pass",
+   "evidence": "git log --diff-filter=A on all 118 files under ecbench/chunks -> d6d502f4a5 2026-11-04T05:51:28Z; PROTOCOL.md log: 91996ac7ef 01:47:12Z, 4eddc74edc 02:26:29Z; c00/session.json started_unix_ms 1793759274558 (02:27:54Z) > 1793759189000 (02:26:29Z); ecbench/chunks/driver.log first line 02:27:47Z"
+  },
+  {
+   "id": "R3",
+   "name": "16 chunk sessions complete, 10 records each, all verified",
+   "result": "pass",
+   "evidence": "ecbench/chunks/c00..c15/session.json: status complete, executions_planned 10, records_written 10, status_counts {verified:10}, last_seq 9, warmup false; records.jsonl 10 lines each, outcome.status verified 160/160; 32 records per arm; 16 distinct workload ids, target_seed 2026110411+c, target_index 0"
+  },
+  {
+   "id": "R4",
+   "name": "SHA256SUMS and binary hash",
+   "result": "pass",
+   "evidence": "sha256sum -c ecbench/SHA256SUMS: 37/37 OK (16 records.jsonl, 16 verify/*.json, binary.sha256, band_pooled.{json,txt}, pooled_compare.jsonl, spec.json); binary rehash == binary.sha256 == every session.binary_sha256 == every receipt auditor_binary_sha256. session/host/plan/spec per chunk are not in SHA256SUMS but are bound by the 16 receipts files maps (80/80 match)"
+  },
+  {
+   "id": "R5",
+   "name": "chunk specs equal frozen spec except the four Addendum C fields",
+   "result": "pass",
+   "evidence": "flattened diff specs/cXX.json vs ecbench/spec.json: only /description suffix \" [chunk c of 16, Addendum C]\", /workloads/targets_per_curve 16->1, /workloads/target_seed 2026110411+c, /measurement/seed 2026110412+c; chunks/cXX/spec.json == specs/cXX.json for all 16; ecbench plan --spec specs/c00.json -> spec ECS1h85e6d985656b == c00 session spec_id (session spec_sha256 is the canonical-form hash, not the file hash)"
+  },
+  {
+   "id": "R6",
+   "name": "interrupted/ holds only non-cited killed attempts",
+   "result": "pass",
+   "evidence": "ecbench/chunks/interrupted/c12_0 only: session.interrupted.json status interrupted, stop {signal:15, seq:6}, 7 records (6 verified, 1 crashed with exit \"signal 15\"); 0 of its record ids and 0 lines with its session id ECBS1had9533443134 in any cited records.jsonl; driver.log 04:28:04Z moves c12 -> interrupted/c12_0 and restarts c12 from scratch (session ECBS1h8a2940941c19, 04:28:06-04:39:22Z)"
+  },
+  {
+   "id": "R7",
+   "name": "committed replay receipts",
+   "result": "pass",
+   "evidence": "ecbench/verify/c00..c15.json: ok true, problems [], 10 records/10 verified, 1 replay each reproduced \"identical\", auditor binary == run binary; receipt files hashes match committed chunk files 80/80; verify/*.txt receipt sha256 lines equal SHA256SUMS entries"
+  },
+  {
+   "id": "R8",
+   "name": "independent replays (validator)",
+   "result": "pass",
+   "evidence": "replay-certificate.json: c00 seed 6362358048927891589 -> seq 0 rho-neg R0, seq 4 pkm-iso-t5-g4-s1307 R0; c09 seed 3495043258409111723 -> seq 5 winner R1, seq 7 pkm-iso-t6-g4 R1; c12 seed 4173018781920288990 -> seq 5 winner R1, seq 9 rho-neg R1; 6/6 identical, 0 problems, in a fourth auditor env class ECBENV3h916b7c6ec9a2"
+  },
+  {
+   "id": "R9",
+   "name": "band means, sums and verdicts recomputed with own code",
+   "result": "pass",
+   "evidence": "per-arm mean S at w=0,0.1,1 equal band_pooled.json to <=2.2e-16 relative; charged_sum and native_sum equal exactly (winner 306055 / 11620096313; seed 0 358230 / 201106842256; s1308 192776 / 90598935963; proj-a 146434 / 114987; rho-neg 17892 / 12839); no unpriced counter lacks a count; no pinned calibration; 10/10 verdicts identical incl. \"unresolved inside the band\" for winner vs s1308"
+  },
+  {
+   "id": "R10",
+   "name": "paired ratios, linearised-t 95% intervals, win counts recomputed",
+   "result": "pass",
+   "evidence": "12 rows equal pooled_compare.jsonl to <=8.3e-15 relative; t_0.975(15)=2.1314495 by own Simpson integration of the t density; wins per target (b_k<a_k over 16 workloads) 11,16,16 / 2,16,16 / 1,0,0 / 0,0,0 as in the file; README paired table rounds correctly"
+  },
+  {
+   "id": "R11",
+   "name": "charged-search rows",
+   "result": "pass",
+   "evidence": "curve25519_isogeny_seed_20261103/analysis/summary.json k=20 t=5 search_group_ops 6935271 (README 6.94e6), t=6 13528559 (README 1.35e7); S_search 19146.6; charged rows 19173 / 119424 (0.0688x seed 0) / 1021681 (0.0589x) vs README 1.92e4 / 1.194e5 (0.069x) / 1.022e6 (0.059x); see erratum E2 on \"1.92e4 in S\""
+  },
+  {
+   "id": "R12",
+   "name": "distance remaining",
+   "result": "pass",
+   "evidence": "winner/rho-neg 17.106 (w=0), 60613 (w=0.1), 378133 (w=1); winner/proj-a 2.090, 7359.6, 44451; T9 4.73e5x confirmed at t9_seed_per_column/README.md lines 202-206"
+  },
+  {
+   "id": "R13",
+   "name": "prediction verdicts Q1-Q5 by the frozen rules",
+   "result": "pass",
+   "evidence": "Q1 32/32 winner verified + 0 problems (16 committed + 3 validator receipts); Q2 0.05779 and 0.05778 <= 0.15, upper 0.0716 < 1; Q3 0.12829 and 0.12826 <= 0.25, upper 0.169 < 1; Q4 1.5876 >= 1.2 at w=0; Q5 each PKM mean S > proj-a and > rho-neg at w=0.1 and w=1 (also at w=0). No prediction failed, so none could be misreported; README verdicts match"
+  },
+  {
+   "id": "R14",
+   "name": "recovered discrete logs verified with own curve arithmetic",
+   "result": "pass",
+   "evidence": "all 160 records (>= 20 required): p=1048573 and r=131203 prime, 8r = 1049624, 4a^3+27b^2 != 0 mod p, [r]G = O; each target on the curve and in the order-r subgroup, 0 <= d < r, [d]G == target by own affine double-and-add; the 10 records of a chunk agree on one log; 16 distinct logs"
+  },
+  {
+   "id": "R15",
+   "name": "scope: no leaderboard claim, rho ahead, failures reported",
+   "result": "pass",
+   "evidence": "README \"Class\" and \"Distance remaining\": no leaderboard row, rho remains ahead on every track; band verdicts rho-neg < and proj-a < every PKM arm; model-vs-measured deviations (1.07-1.19x) reported; Deviations section lists chunking, --allow-busy, no S3 checkpoint, missing visuals"
+  },
+  {
+   "id": "R16",
+   "name": "reporting contract (one table, one unit, ratio, phases, all arms priced, 5a list)",
+   "result": "pass_with_errata",
+   "evidence": "one S table incl. reference and baseline; ratio columns; band at 0/0.1/1 applied to every arm; rank only where order holds. Gap: README does not list each unpriced counter per arm with its count (5a first bullet); table supplied in this report (unpriced_counters_by_arm). Phase breakdown not tabulated in README but present in records; solver F4 mul-adds are 99.57% (winner) / 99.96% / 99.96% of each PKM arm native_sum"
+  }
+ ],
+ "predictions": {
+  "Q1": "held",
+  "Q2": "held",
+  "Q3": "held",
+  "Q4": "held",
+  "Q5": "held",
+  "failed": []
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "wording",
+   "where": "README.md \"Reading\", bullet 2",
+   "text": "\"t = 5 with G = 4 solves 16 small systems of about 52,816 mul-adds each per target\" reads as 16 x 52,816 per target. 52,816 is T10's per-target total across the ~16 guess branches; measured here the winner spends 51,207 F4 mul-adds per trial (185,587 solver calls / 12,116 trials = 15.3 calls per trial in c00 seq 4), seed 0 684,000 and s1308 695,411 per trial (T10 modelled 710,094). Suggested: \"about 16 guess-branch systems totalling about 51-53 k mul-adds per target\"."
+  },
+  {
+   "id": "E2",
+   "severity": "rounding",
+   "where": "README.md \"Costs\", first bullet and table",
+   "text": "6,935,271 / 362.2195 = 19,146.6 = 1.91e4 in S for the search alone; 1.92e4 is the search plus one amortised solve at w=0 (19,173), which is what the table row shows. Only the sentence \"which is 1.92e4 in S\" is off in the third digit."
+  },
+  {
+   "id": "E3",
+   "severity": "reporting (5a)",
+   "where": "README.md Results",
+   "text": "The unpriced counters of each arm are not listed by name with their counts. band_pooled.json carries only native_sum. Table added in this report under unpriced_counters_by_arm_sum_over_32_runs."
+  },
+  {
+   "id": "E4",
+   "severity": "binding gap",
+   "where": "ecbench/chunks/*/session.json and host.json build",
+   "text": "git_commit and git_dirty are null, so the measurement is bound to the binary hash 5473...641b (mtime 2026-11-03 16:39) but not to a source commit or dirty-tree state. Replays reproduce identically under this hash, so the measurement itself is reproducible; the source provenance of the binary should be recorded in the PR."
+  },
+  {
+   "id": "E5",
+   "severity": "interpretation caveat",
+   "where": "README.md \"Band ranks\", bullet 1",
+   "text": "\"winner < seed 0 at every weight\" is the band's point-estimate verdict. At w=0 the paired interval is [0.721, 1.013] (11/16 targets), so the w=0 order against seed 0 is not statistically resolved; at w >= 0.1 it is (16/16, upper 0.0716). The README prints the interval; the sentence should carry the caveat."
+  },
+  {
+   "id": "E6",
+   "severity": "rounding",
+   "where": "README.md \"Against the T10 model\"",
+   "text": "0.0578 / 0.054 = 1.070 uses the rounded model value; with the exact 1/18.65 = 0.05362 the factor is 1.078 (1.08x). s1308: 0.1283 / (1/9.28) = 1.191, as stated; w=0: 1.588 / 1.449 = 1.096."
+  },
+  {
+   "id": "E7",
+   "severity": "standing-rule gap (self-declared)",
+   "where": "README.md Deviations",
+   "text": "research-visuals report, graph and PDF not produced; no S3 resume checkpoint. Outside the validity of the measurement; to be closed in the landing PR."
+  }
+ ],
+ "notes": [
+  "The 16 committed receipts were produced under three auditor env/hardware classes (container restarts) and the validator's three under a fourth; every replay is count-identical, which is what a counted unit must do. No wall-time claim is made (isolation L0/L1, --allow-busy).",
+  "summary.json k=20 t=5 names seed 1550 (cov 214, 26 cols) as its coverage argmax; seed 1307 (22 cols, 210 covered) is T10's pick from the same 2,000-seed pool by its E-model, so charging that search's 6.94e6 group operations to the winner is the right cost.",
+  "Killed attempt c12_0: SIGTERM at seq 6 after 7 min 26 s (04:20:21-04:27:47Z) while the driver was relaunched at 04:28:04Z; the README's \"process time limit\" is consistent with the evidence. The first unchunked attempt (ecbench/run.log) died waiting for the lock with no records.",
+  "Addendum C replaced the frozen \"verify --replay 16 on one session\" with \"--replay 1 per chunk\" (16 replays over 160 records) before any chunk data; the validator added 6 more including 3 winner runs."
+ ],
+ "recompute_agrees": true,
+ "recompute_agrees_detail": {
+  "sqrt_r": 362.2195466840518,
+  "mean_s_by_arm": {
+   "pkm-iso-t5-g4-s1307": [
+    26.404479928142717,
+    100277.20902803019,
+    1002534.4499609486
+   ],
+   "pkm-iso-t6-g4": [
+    30.905807272086932,
+    1735052.9050429375,
+    17350250.898163926
+   ],
+   "pkm-iso-t6-g4-s1308": [
+    16.631487878412837,
+    781646.6607787317,
+    7816316.924396411
+   ],
+   "proj-a": [
+    12.633394696370425,
+    13.625429439634658,
+    22.55374212901275
+   ],
+   "rho-neg": [
+    1.5436080275582151,
+    1.6543747583083823,
+    2.6512753350598874
+   ]
+  },
+  "charged_sum": {
+   "pkm-iso-t5-g4-s1307": 306055.0,
+   "pkm-iso-t6-g4": 358230.0,
+   "pkm-iso-t6-g4-s1308": 192776.0,
+   "proj-a": 146434.0,
+   "rho-neg": 17892.0
+  },
+  "native_sum": {
+   "pkm-iso-t5-g4-s1307": 11620096313,
+   "pkm-iso-t6-g4": 201106842256,
+   "pkm-iso-t6-g4-s1308": 90598935963,
+   "proj-a": 114987,
+   "rho-neg": 12839
+  },
+  "band_verdicts": [
+   {
+    "a": "pkm-iso-t5-g4-s1307",
+    "b": "pkm-iso-t6-g4",
+    "verdict": "pkm-iso-t5-g4-s1307 < pkm-iso-t6-g4"
+   },
+   {
+    "a": "pkm-iso-t5-g4-s1307",
+    "b": "pkm-iso-t6-g4-s1308",
+    "verdict": "unresolved inside the band"
+   },
+   {
+    "a": "pkm-iso-t5-g4-s1307",
+    "b": "proj-a",
+    "verdict": "proj-a < pkm-iso-t5-g4-s1307"
+   },
+   {
+    "a": "pkm-iso-t5-g4-s1307",
+    "b": "rho-neg",
+    "verdict": "rho-neg < pkm-iso-t5-g4-s1307"
+   },
+   {
+    "a": "pkm-iso-t6-g4",
+    "b": "pkm-iso-t6-g4-s1308",
+    "verdict": "pkm-iso-t6-g4-s1308 < pkm-iso-t6-g4"
+   },
+   {
+    "a": "pkm-iso-t6-g4",
+    "b": "proj-a",
+    "verdict": "proj-a < pkm-iso-t6-g4"
+   },
+   {
+    "a": "pkm-iso-t6-g4",
+    "b": "rho-neg",
+    "verdict": "rho-neg < pkm-iso-t6-g4"
+   },
+   {
+    "a": "pkm-iso-t6-g4-s1308",
+    "b": "proj-a",
+    "verdict": "proj-a < pkm-iso-t6-g4-s1308"
+   },
+   {
+    "a": "pkm-iso-t6-g4-s1308",
+    "b": "rho-neg",
+    "verdict": "rho-neg < pkm-iso-t6-g4-s1308"
+   },
+   {
+    "a": "proj-a",
+    "b": "rho-neg",
+    "verdict": "rho-neg < proj-a"
+   }
+  ],
+  "paired_winner_over": {
+   "pkm-iso-t6-g4": {
+    "0.0": {
+     "ratio": 0.8543533484074477,
+     "ci95": [
+      0.7208982122249744,
+      1.0125141546435517
+     ],
+     "wins_targets_of_16": 11,
+     "wins_pairs_of_32": 21
+    },
+    "0.1": {
+     "ratio": 0.05779489993450582,
+     "ci95": [
+      0.04663566381149008,
+      0.07162437897188398
+     ],
+     "wins_targets_of_16": 16,
+     "wins_pairs_of_32": 32
+    },
+    "1.0": {
+     "ratio": 0.057782129828856874,
+     "ci95": [
+      0.04662494535800059,
+      0.07160918907084479
+     ],
+     "wins_targets_of_16": 16,
+     "wins_pairs_of_32": 32
+    }
+   },
+   "pkm-iso-t6-g4-s1308": {
+    "0.0": {
+     "ratio": 1.5876198281943807,
+     "ci95": [
+      1.2890471958725167,
+      1.9553486691151603
+     ],
+     "wins_targets_of_16": 2,
+     "wins_pairs_of_32": 4
+    },
+    "0.1": {
+     "ratio": 0.12828969157000805,
+     "ci95": [
+      0.09739814117305441,
+      0.1689790458514524
+     ],
+     "wins_targets_of_16": 16,
+     "wins_pairs_of_32": 32
+    },
+    "1.0": {
+     "ratio": 0.12826174522578818,
+     "ci95": [
+      0.0973762010999239,
+      0.1689434903245353
+     ],
+     "wins_targets_of_16": 16,
+     "wins_pairs_of_32": 32
+    }
+   },
+   "proj-a": {
+    "0.0": {
+     "ratio": 2.0900542223800485,
+     "ci95": [
+      1.7820448375432463,
+      2.451300079806583
+     ],
+     "wins_targets_of_16": 1,
+     "wins_pairs_of_32": 2
+    },
+    "0.1": {
+     "ratio": 7359.5631955890085,
+     "ci95": [
+      6042.684208577742,
+      8963.428926665129
+     ],
+     "wins_targets_of_16": 0,
+     "wins_pairs_of_32": 0
+    },
+    "1.0": {
+     "ratio": 44450.91392045781,
+     "ci95": [
+      36008.23811986037,
+      54873.102699077914
+     ],
+     "wins_targets_of_16": 0,
+     "wins_pairs_of_32": 0
+    }
+   },
+   "rho-neg": {
+    "0.0": {
+     "ratio": 17.10568969371786,
+     "ci95": [
+      13.324612992550758,
+      21.95970870308568
+     ],
+     "wins_targets_of_16": 0,
+     "wins_pairs_of_32": 0
+    },
+    "0.1": {
+     "ratio": 60613.35771984627,
+     "ci95": [
+      45546.484023949815,
+      80664.38524963093
+     ],
+     "wins_targets_of_16": 0,
+     "wins_pairs_of_32": 0
+    },
+    "1.0": {
+     "ratio": 378132.9070970681,
+     "ci95": [
+      278736.8125751609,
+      512973.1308494618
+     ],
+     "wins_targets_of_16": 0,
+     "wins_pairs_of_32": 0
+    }
+   }
+  },
+  "t975_df15": 2.13144954555983,
+  "charged_search": {
+   "0.0": {
+    "amortised": 26.404479928142717,
+    "charged": 19172.99958637427,
+    "ratio_to_seed0_charged": 620.3688328727354,
+    "ratio_to_seed0_amortised": 0.8543533484074477
+   },
+   "0.1": {
+    "amortised": 100277.20902803019,
+    "charged": 119423.80413447632,
+    "ratio_to_seed0_charged": 0.06883006494347844,
+    "ratio_to_seed0_amortised": 0.05779489993450582
+   },
+   "1.0": {
+    "amortised": 1002534.4499609486,
+    "charged": 1021681.0450673946,
+    "ratio_to_seed0_charged": 0.0588856640208882,
+    "ratio_to_seed0_amortised": 0.057782129828856874
+   }
+  },
+  "search_group_ops": 6935271,
+  "distance": {
+   "0.0": {
+    "rho_over_winner": 17.10568969371786,
+    "proja_over_winner": 2.0900542223800485
+   },
+   "0.1": {
+    "rho_over_winner": 60613.35771984627,
+    "proja_over_winner": 7359.5631955890085
+   },
+   "1.0": {
+    "rho_over_winner": 378132.9070970681,
+    "proja_over_winner": 44450.91392045781
+   }
+  },
+  "model_ratios": {
+   "seed0_w01": 0.05361930294906166,
+   "s1308_w01": 0.10775862068965518,
+   "seed0_w0": 0.7207619047619047,
+   "s1308_w0": 1.4492063492063494
+  },
+  "f4_per_trial": {
+   "pkm-iso-t5-g4-s1307": {
+    "ops_per_trial": 51207.15529404475,
+    "columns": [
+     22
+    ],
+    "trials_per_relation": 651.1585014409222,
+    "solver_ops_share_of_native": 0.9957197291089269
+   },
+   "pkm-iso-t6-g4": {
+    "ops_per_trial": 683999.386132415,
+    "columns": [
+     25
+    ],
+    "trials_per_relation": 787.9195710455764,
+    "solver_ops_share_of_native": 0.9995846652104772
+   },
+   "pkm-iso-t6-g4-s1308": {
+    "ops_per_trial": 695411.2685582646,
+    "columns": [
+     36
+    ],
+    "trials_per_relation": 277.0744680851064,
+    "solver_ops_share_of_native": 0.9995694925709069
+   }
+  },
+  "Q": {
+   "Q1_winner_verified": "32/32",
+   "Q2": true,
+   "Q3": true,
+   "Q4": true,
+   "Q5": true,
+   "Q5_full_band": true
+  },
+  "dlog_verified": {
+   "ok": 160,
+   "bad": [],
+   "one_log_per_chunk": true,
+   "logs_by_chunk": {
+    "0": 45433,
+    "1": 14385,
+    "2": 91664,
+    "3": 2203,
+    "4": 27784,
+    "5": 115955,
+    "6": 2185,
+    "7": 91192,
+    "8": 107336,
+    "9": 61539,
+    "10": 66863,
+    "11": 127966,
+    "12": 128396,
+    "13": 57843,
+    "14": 66541,
+    "15": 121970
+   }
+  }
+ },
+ "unpriced_counters_by_arm_sum_over_32_runs": {
+  "rho-neg": {
+   "canonicalisations_uncharged": 12839
+  },
+  "proj-a": {
+   "sqrt_solves_uncharged": 1024,
+   "lookups_uncharged": 49390,
+   "row_ops_uncharged": 8170,
+   "legendre_symbols_uncharged": 2592,
+   "target_guard_probes_uncharged": 49715,
+   "projected_base_column_map_entries_uncharged": 2048,
+   "projected_base_dedup_probes_uncharged": 1024,
+   "projected_base_membership_checks_uncharged": 1024
+  },
+  "pkm-iso-t6-g4": {
+   "solver_F_p_multiply-adds_(elimination_only)_uncharged": 201023315588,
+   "sqrt_solves_uncharged": 960,
+   "row_ops_uncharged": 3020,
+   "legendre_symbols_uncharged": 2336,
+   "target_guard_probes_uncharged": 293894,
+   "velu_evaluations_uncharged": 384,
+   "pkm_grid_fp_mults_uncharged": 1694912,
+   "pkm_system_fp_mults_uncharged": 81531162
+  },
+  "pkm-iso-t6-g4-s1308": {
+   "solver_F_p_multiply-adds_(elimination_only)_uncharged": 90559932448,
+   "sqrt_solves_uncharged": 1312,
+   "row_ops_uncharged": 4484,
+   "legendre_symbols_uncharged": 2304,
+   "target_guard_probes_uncharged": 130225,
+   "velu_evaluations_uncharged": 384,
+   "pkm_grid_fp_mults_uncharged": 2135680,
+   "pkm_system_fp_mults_uncharged": 36729126
+  },
+  "pkm-iso-t5-g4-s1307": {
+   "solver_F_p_multiply-adds_(elimination_only)_uncharged": 11570359153,
+   "sqrt_solves_uncharged": 1248,
+   "row_ops_uncharged": 3296,
+   "legendre_symbols_uncharged": 2112,
+   "target_guard_probes_uncharged": 225952,
+   "velu_evaluations_uncharged": 320,
+   "pkm_grid_fp_mults_uncharged": 433056,
+   "pkm_system_fp_mults_uncharged": 49071176
+  }
+ },
+ "headline": "Recomputed: at w=0.1 the T10 winner (pkm-iso-t5-g4-s1307) has mean S 100,277.2 against 1,735,052.9 for seed 0 (paired 0.0578 [0.0466, 0.0716], 16/16 targets) and 781,646.7 for seed 1308 (0.128 [0.097, 0.169], 16/16); at w=0 it is 26.40 against 30.91 (0.854 [0.721, 1.013]) and 16.63 (1.588 [1.289, 1.955]), so winner vs s1308 is unresolved inside the band. rho-neg 1.654 and proj-a 13.63 at w=0.1: the winner is 6.06e4x behind rho-neg and 7.36e3x behind proj-a. All 160 logs verified; 22 replays (16 committed + 6 validator) identical. Q1-Q5 held. Distance remaining stated; no leaderboard row.",
+ "raw_data": {
+  "records": [
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c00/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c01/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c02/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c03/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c04/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c05/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c06/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c07/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c08/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c09/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c10/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c11/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c12/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c13/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c14/records.jsonl",
+   "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c15/records.jsonl"
+  ],
+  "band": "research/curve25519_t10_winner_ecbench_20261104/ecbench/band_pooled.json",
+  "paired": "research/curve25519_t10_winner_ecbench_20261104/ecbench/pooled_compare.jsonl",
+  "receipts": "research/curve25519_t10_winner_ecbench_20261104/ecbench/verify/",
+  "validator_receipts": "research/curve25519_t10_winner_ecbench_20261104/replay-certificate.json"
+ },
+ "validator_scripts": {
+  "recompute.py": "import json, math, sys\nBASE='/home/user/crypto/research/curve25519_t10_winner_ecbench_20261104/ecbench'\nNONOP={'residual_table_bytes_uncharged','factor_base_vec_bytes_floor_uncharged','native_table_bytes_uncharged'}\nW=[0.0,0.1,1.0]\nWIN='pkm-iso-t5-g4-s1307'\nrecs=[]\nfor c in range(16):\n    for l in open(f'{BASE}/chunks/c{c:02d}/records.jsonl'):\n        r=json.loads(l); r['_chunk']=c; recs.append(r)\nassert len(recs)==160\nassert all(not r['warmup'] for r in recs)\nassert all(r['outcome']['status']=='verified' for r in recs)\nassert all(r['cost']['total_gae'] is not None for r in recs)\nrs={r['workload']['curve']['r'] for r in recs}; assert rs=={131203}, rs\nSQ=math.sqrt(131203)\nout={'sqrt_r':SQ}\ndef unpriced_ops(r):\n    tot=0; missing=[]\n    for name in r['cost']['unpriced']:\n        if name in NONOP: continue\n        base=name[:-len('_uncharged')] if name.endswith('_uncharged') else name\n        if name in r['counters']: tot+=r['counters'][name]; continue\n        found=False; sub=0\n        for p in r['phases']:\n            nat=p.get('native') or {}\n            if name in nat: sub+=nat[name]; found=True\n            elif base in nat: sub+=nat[base]; found=True\n        if found: tot+=sub; continue\n        if base.startswith('solver_') and r.get('solver'): tot+=r['solver']['ops']; continue\n        missing.append(name)\n    return tot, missing\nfor r in recs:\n    r['_G']=r['cost']['total_gae']; r['_U'],miss=unpriced_ops(r)\n    assert not miss,(r['arm'],miss)\n    assert abs(r['cost']['s']-r['_G']/SQ)<1e-9\ndef S(r,w): return (r['_G']+w*r['_U'])/SQ\narms=sorted({r['arm'] for r in recs})\nband=json.load(open(f'{BASE}/band_pooled.json'))\nbrow={x['arm']:x for x in band['rows']}\nprint('=== per-arm mean S (mine) vs band_pooled.json ===')\nmine={}\nfor a in arms:\n    rr=[r for r in recs if r['arm']==a]\n    means=[sum(S(r,w) for r in rr)/len(rr) for w in W]\n    cs=sum(r['_G'] for r in rr); ns=sum(r['_U'] for r in rr)\n    mine[a]={'runs':len(rr),'mean_s':means,'charged_sum':cs,'native_sum':ns}\n    b=brow[a]\n    rel=[abs(m/x-1) for m,x in zip(means,b['mean_s'])]\n    print(f\"{a:22s} n={len(rr)} mean_s={['%.6f'%m for m in means]} charged={cs} native={ns} | band: {['%.6f'%x for x in b['mean_s']]} charged={b['charged_sum']} native={b['native_sum']} maxrel={max(rel):.2e} sums_eq={cs==b['charged_sum'] and ns==b['native_sum']}\")\nout['band_rows']=mine\n# ranks\nprint('=== band ranks (mine) ===')\nranks=[]\nfor i,a in enumerate(arms):\n    for b in arms[i+1:]:\n        ma,mb=mine[a]['mean_s'],mine[b]['mean_s']\n        lt=all(x<y for x,y in zip(ma,mb)); gt=all(x>y for x,y in zip(ma,mb))\n        v=f'{a} < {b}' if lt else (f'{b} < {a}' if gt else 'unresolved inside the band')\n        ranks.append({'a':a,'b':b,'verdict':v})\nbv={(x['a'],x['b']):x['verdict'] for x in band['ranks']}\nfor x in ranks:\n    print(f\"{x['a']} vs {x['b']}: {x['verdict']}  | band file: {bv.get((x['a'],x['b']))}  match={bv.get((x['a'],x['b']))==x['verdict']}\")\nout['ranks']=ranks\n# t quantile by numeric integration of the Student-t density (own code)\ndef t_pdf(t,nu):\n    return math.exp(math.lgamma((nu+1)/2)-math.lgamma(nu/2))/math.sqrt(nu*math.pi)*(1+t*t/nu)**(-(nu+1)/2)\ndef t_cdf_half(x,nu,n=20000):  # integral 0..x by Simpson\n    h=x/n; s=t_pdf(0,nu)+t_pdf(x,nu)\n    for i in range(1,n): s+=(4 if i%2 else 2)*t_pdf(i*h,nu)\n    return s*h/3\ndef t975(nu):\n    lo,hi=0.0,10.0\n    for _ in range(80):\n        mid=(lo+hi)/2\n        if t_cdf_half(mid,nu)<0.475: lo=mid\n        else: hi=mid\n    return (lo+hi)/2\nT15=t975(15); print('t_0.975(15) =',T15, '(reference 2.1314495)')\nout['t975_df15']=T15\n# paired compare\nprint('=== paired ratios winner / comparator ===')\npc=[json.loads(l) for l in open(f'{BASE}/pooled_compare.jsonl')]\npcm={(x['a'],x['weight']):x for x in pc}\npaired={}\nfor A in ['pkm-iso-t6-g4','pkm-iso-t6-g4-s1308','proj-a','rho-neg']:\n    ia={(r['workload']['workload_id'],r['round']):r for r in recs if r['arm']==A}\n    ib={(r['workload']['workload_id'],r['round']):r for r in recs if r['arm']==WIN}\n    keys=sorted(set(ia)&set(ib)); assert len(keys)==32\n    for w in W:\n        cl={}\n        for k in keys:\n            cl.setdefault(k[0],[0.0,0.0]); cl[k[0]][0]+=S(ia[k],w); cl[k[0]][1]+=S(ib[k],w)\n        Ak=[v[0] for v in cl.values()]; Bk=[v[1] for v in cl.values()]; K=len(Ak); assert K==16\n        sa=sum(Ak); R=sum(Bk)/sa\n        u=[(b-R*a)/sa for a,b in zip(Ak,Bk)]; ub=sum(u)/K\n        se=math.sqrt(K/(K-1)*sum((x-ub)**2 for x in u))\n        half=T15*se/R; lo,hi=R*math.exp(-half),R*math.exp(half)\n        wins=sum(1 for a,b in zip(Ak,Bk) if b<a)\n        pairwins=sum(1 for k in keys if S(ib[k],w)<S(ia[k],w))\n        ref=pcm[(A,w)]\n        d=max(abs(R/ref['ratio']-1),abs(lo/ref['ci95'][0]-1),abs(hi/ref['ci95'][1]-1))\n        paired[f'{A}@{w}']={'ratio':R,'ci95':[lo,hi],'wins_targets':wins,'wins_pairs':pairwins,'K':K,'pairs':len(keys)}\n        print(f\"{A:22s} w={w:<4} R={R:.6g} CI=[{lo:.6g},{hi:.6g}] wins(targets)={wins}/16 wins(pairs)={pairwins}/32 | file R={ref['ratio']:.6g} CI={['%.6g'%x for x in ref['ci95']]} wins_b={ref['wins_b']} maxrel={d:.1e}\")\nout['paired']=paired\n# charged search\nSEARCH=6935271; Ss=SEARCH/SQ\nprint('=== charged search ===', 'S_search=',Ss)\ncs={}\nfor i,w in enumerate(W):\n    amort=mine[WIN]['mean_s'][i]; charged=amort+Ss; s0=mine['pkm-iso-t6-g4']['mean_s'][i]\n    cs[str(w)]={'amortised':amort,'charged':charged,'ratio_to_seed0_charged':charged/s0,'ratio_to_seed0_amortised':amort/s0}\n    print(f\"w={w}: amortised {amort:.6g}  charged {charged:.6g}  charged/seed0 {charged/s0:.4f}\")\nout['charged_search']=cs; out['search_group_ops']=SEARCH\n# distances\nm=mine; dist={}\nfor i,w in enumerate(W):\n    dist[str(w)]={'rho_over_winner':m[WIN]['mean_s'][i]/m['rho-neg']['mean_s'][i],'proja_over_winner':m[WIN]['mean_s'][i]/m['proj-a']['mean_s'][i]}\n    print(f\"w={w}: winner behind rho-neg by {dist[str(w)]['rho_over_winner']:.6g}x, behind proj-a by {dist[str(w)]['proja_over_winner']:.6g}x\")\nout['distance']=dist\n# model comparison\nr01=paired['pkm-iso-t6-g4@0.1']['ratio']; r11=paired['pkm-iso-t6-g4-s1308@0.1']['ratio']; r10=paired['pkm-iso-t6-g4-s1308@0.0']['ratio']\nmodel={'seed0_w01':1/18.65,'s1308_w01':1/9.28,'seed0_w0':(22/210)/(25/172),'s1308_w0':(22/210)/(36/498)}\nprint('=== vs T10 model ===', {k:round(v,4) for k,v in model.items()})\nprint(f\"measured/model: seed0 w0.1 {r01/model['seed0_w01']:.3f}; s1308 w0.1 {r11/model['s1308_w01']:.3f}; s1308 w0 {r10/model['s1308_w0']:.3f}; 1/ratio seed0 {1/r01:.2f}x, s1308 {1/r11:.2f}x\")\nout['model']=model\n# F4 per trial, columns\nprint('=== F4 mul-adds per trial and columns per PKM arm ===')\nf4={}\nfor a in arms:\n    rr=[r for r in recs if r['arm']==a]\n    if rr[0]['solver'] is None: continue\n    ops=sum(r['solver']['ops'] for r in rr); trials=sum(r['counters']['targets_tried'] for r in rr)\n    cols={r['factor_base']['columns'] for r in rr}; rel=sum(r['counters']['relations_found'] for r in rr)\n    f4[a]={'ops_per_trial':ops/trials,'columns':sorted(cols),'trials_per_relation':trials/rel,'solver_ops_share_of_native':ops/mine[a]['native_sum']}\n    print(a, {k:(round(v,4) if isinstance(v,float) else v) for k,v in f4[a].items()})\nout['f4']=f4\n# Q verdicts\nq={}\nq['Q1_winner_verified']=f\"{sum(1 for r in recs if r['arm']==WIN and r['outcome']['status']=='verified')}/32\"\np2=[paired['pkm-iso-t6-g4@0.1'],paired['pkm-iso-t6-g4@1.0']]\nq['Q2']=all(x['ratio']<=0.15 and x['ci95'][1]<1 for x in p2)\np3=[paired['pkm-iso-t6-g4-s1308@0.1'],paired['pkm-iso-t6-g4-s1308@1.0']]\nq['Q3']=all(x['ratio']<=0.25 and x['ci95'][1]<1 for x in p3)\nq['Q4']=paired['pkm-iso-t6-g4-s1308@0.0']['ratio']>=1.2\npk=[a for a in arms if a.startswith('pkm')]\nq['Q5']=all(mine[a]['mean_s'][i]>mine[ref]['mean_s'][i] for a in pk for ref in ['proj-a','rho-neg'] for i in (1,2))\nq['Q5_full_band']=all(mine[a]['mean_s'][i]>mine[ref]['mean_s'][i] for a in pk for ref in ['proj-a','rho-neg'] for i in (0,1,2))\nprint('=== Q verdicts ===', q)\nout['Q']=q\n# curve arithmetic\np,a,b=1048573,63700,872826; G=(349837,122); R=131203\nassert (4*a**3+27*b**2)%p!=0\ndef isprime(n): return n>1 and all(n%d for d in range(2,int(n**0.5)+1))\nassert isprime(p) and isprime(R) and 8*R==1049624\ndef on(P): return P is None or (P[1]*P[1]-(P[0]**3+a*P[0]+b))%p==0\ndef add(P,Q):\n    if P is None: return Q\n    if Q is None: return P\n    if P[0]==Q[0] and (P[1]+Q[1])%p==0: return None\n    if P==Q: l=(3*P[0]*P[0]+a)*pow(2*P[1],-1,p)%p\n    else: l=(Q[1]-P[1])*pow(Q[0]-P[0],-1,p)%p\n    x=(l*l-P[0]-Q[0])%p; return (x,(l*(P[0]-x)-P[1])%p)\ndef mul(k,P):\n    Rr=None\n    while k:\n        if k&1: Rr=add(Rr,P)\n        P=add(P,P); k>>=1\n    return Rr\nassert on(G) and mul(R,G) is None and mul(1,G)==G\nok=0; bad=[]; bychunk={}\nfor r in recs:\n    T=(int(r['workload']['target'][0],16),int(r['workload']['target'][1],16)); d=int(r['outcome']['recovered'])\n    good=on(T) and mul(R,T) is None and 0<=d<R and mul(d,T and G)==T\n    good=on(T) and mul(R,T) is None and 0<=d<R and mul(d,G)==T\n    ok+=good; bad.append(r['record_id']) if not good else None\n    bychunk.setdefault(r['_chunk'],set()).add(d)\nprint('=== curve arithmetic: recovered logs verified ===', ok,'/160; bad:',bad, '; one log per chunk:', all(len(v)==1 for v in bychunk.values()), '; distinct logs', len({next(iter(v)) for v in bychunk.values()}))\nout['dlog_verified']={'ok':ok,'bad':bad,'one_log_per_chunk':all(len(v)==1 for v in bychunk.values()),'logs_by_chunk':{str(k):sorted(v)[0] for k,v in bychunk.items()}}\njson.dump(out,open(sys.argv[1],'w'),indent=1)\n",
+  "run_replays.sh": "#!/usr/bin/env bash\nset -u\nSP=/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/replay\nE=/home/user/ctarget/release/ecbench\nD=/home/user/crypto/research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks\necho \"binary $(sha256sum $E)\" > $SP/log.txt\nfor c in c00 c09 c12; do\n  echo \"$(date -u +%FT%TZ) $c waiting for lock\" >> $SP/log.txt\n  flock -w 7000 /tmp/crypto-bench.lock bash -c \"echo \\\"\\$(date -u +%FT%TZ) $c lock acquired\\\" >> $SP/log.txt; $E verify --dir $D/$c --replay 2 --out $SP/verify_$c.json > $SP/verify_$c.txt 2>&1; echo \\\"\\$(date -u +%FT%TZ) $c rc=\\$?\\\" >> $SP/log.txt\"\ndone\necho \"$(date -u +%FT%TZ) ALL DONE\" >> $SP/log.txt\n"
+ }
+}

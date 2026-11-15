@@ -19,6 +19,8 @@ def guard(allocation_path, plan_path, receipt, clock=None, pause=time.sleep,
     plan = json.loads(plan_path.read_text())
     index = allocation.get('stratum')
     names = plan.get('names')
+    profile = plan.get('hardware_profile', 'rtx4090')
+    label = '' if profile == 'rtx4090' else f'-{profile}'
     if (plan.get('schema') != 'n83.crossfamily-current-allocation-plan/v1' or
             allocation.get('schema') != 'n83.crossfamily-current-runpod-allocation/v1' or
             allocation.get('source_head_sha') != plan.get('source_head_sha') or
@@ -27,7 +29,8 @@ def guard(allocation_path, plan_path, receipt, clock=None, pause=time.sleep,
             not isinstance(allocation.get('pod_id'), str) or
             not allocation['pod_id'].isalnum() or
             index not in (0, 1) or not isinstance(names, list) or len(names) != 2 or
-            names[index] != f"n83-crossfamily-{plan['source_head_sha'][:12]}-s{index}"):
+            profile not in ('rtx4090', 'ada2000') or
+            names[index] != f"n83-crossfamily{label}-{plan['source_head_sha'][:12]}-s{index}"):
         raise ValueError('Pod deadline identity differs')
     deadline = datetime.fromisoformat(plan['terminate_at_utc'].replace('Z', '+00:00'))
     if deadline.tzinfo is None:

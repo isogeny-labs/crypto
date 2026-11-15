@@ -2,6 +2,7 @@ name: Pencil early rejection software checks
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/pencil-early-rejection.yml'
       - 'research/pencil_early_rejection_20261030/src/**'
@@ -34,6 +35,7 @@ concurrency:
 
 jobs:
   software:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:

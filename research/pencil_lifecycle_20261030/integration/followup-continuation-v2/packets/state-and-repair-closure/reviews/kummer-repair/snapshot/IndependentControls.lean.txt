@@ -1,0 +1,18 @@
+import Repair
+set_option autoImplicit false
+namespace RepairReview
+open ProjectiveComparator RepairClosure
+def e (j : Fin 4) : V ℚ := fun i => if i=j then 1 else 0
+def collapse : Mat ℚ := fun i j => if i=0 then (if j=0 ∨ j=1 then 1 else 0) else 0
+theorem axes_distinct : ¬same (e 0) (e 1) := by
+ intro h; have hh := h 0 1; norm_num [e] at hh
+theorem collapse_matches : same (linear collapse (e 0)) (linear collapse (e 1)) := by
+ intro i j; fin_cases i <;> fin_cases j <;> norm_num [linear,collapse,e]
+theorem collapse_no_nonzero_square (c : ℚ) (hc : c≠0) : ¬squareScalar collapse c := by
+ intro h; have hh := h 1 1; simp [mm,collapse] at hh; exact hc hh.symm
+def lastRow : Mat ℚ := fun i j => if i=0 ∧ j=3 then 7 else 0
+theorem fourth_column : linear lastRow (e 3) 0=7 ∧ linear lastRow (e 0) 3=0 := by
+ norm_num [linear,lastRow,e]
+theorem wrong_transpose : linear lastRow (e 3) 0 ≠ linear (fun i j=>lastRow j i) (e 3) 0 := by
+ norm_num [linear,lastRow,e]
+end RepairReview

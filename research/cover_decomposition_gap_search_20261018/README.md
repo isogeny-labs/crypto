@@ -262,8 +262,9 @@ outcome, and what a surprise would mean. "Expected" is this note's reading, not 
 
 Items judged **not worth a search** after this round, with the reason: trace-zero transfers for `F_p`
 (the trace-zero part of `E(F_{p^k})` does not contain `E(F_p)`); Kani/`(N,N)`-gluing for `F_p` or
-Koblitz (same field; `h = 1`); xedni with modern lattices (JKSST's `C_0/p` bound is on the
-coefficients, not on the reduction quality); canonical-lift or `p`-adic ECDLP for `ℓ ≠ p`
+Koblitz (same field; `h = 1`); xedni with modern lattices (JKSST's conditional
+`C_0/p` success bound requires the displayed height and sampling premises);
+canonical-lift or `p`-adic ECDLP for `ℓ ≠ p`
 (`E(Z/p²)` is an extension by `F_p^+`, torsion prime to `p` lifts isomorphically); elliptic nets
 (Lauter–Stange equivalence); Drinfeld analogues (the linear structure that makes them easy is what
 `E` lacks); Belyi/Hurwitz/Chow constructions (zero literature hits and §2 applies).

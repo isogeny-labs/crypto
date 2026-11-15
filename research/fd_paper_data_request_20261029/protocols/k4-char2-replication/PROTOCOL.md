@@ -33,7 +33,7 @@
 
 ## Open prerequisite
 
-The frozen instrument refuses m = 16 and 17: `f2m4_torsion` and `gaudry_quartic_bin` take m <= 15 (u16 F_q elements, points packed in 4m <= 60 bits). The red team's m = 17 records came from commit `e403626c`, which is not in this repository. Widening the tower is an instrument change filed as an amendment before any m >= 16 row (invalidation rule in `protocol.json`).
+The m = 16 and 17 cells are now runnable. On main the tower already builds m <= 20 (u32 F_q elements, u128 orders and packed points), and `rho.negation_strong` takes two-word orders and 4m-bit point keys since branch `claude/f2m4-wide-tower-20261105`. Its one-word walks replay bit for bit (test `one_word_orders_replay_the_one_word_walk`). The red team's m = 17 records came from commit `e403626c`, which is not in this repository.
 
 ## Before the run
 

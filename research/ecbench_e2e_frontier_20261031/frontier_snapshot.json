@@ -1,7 +1,8 @@
 {
   "schema": "ecbench.frontier-snapshot/v1",
   "as_of": "2026-10-31",
-  "source_commit": "48c8a4767d2d1eed6a7b379f74410bc729239380",
+  "source_commit": "ff7ad61cfed11908fb79de9dd485b696d0ada779",
+  "evidence_binding": "This is a presentation snapshot. Every performance row remains bound to the source, binary, domain, and unit of its cited study; the snapshot commit does not relabel historical measurements.",
   "registry": {
     "methods": 74,
     "nested_solver_backends": 11,
@@ -30,6 +31,18 @@
       "reference": "matched plain rho",
       "unit": "Fq-multiplication equivalents",
       "evidence": "restricted-family counted E2E"
+    },
+    {
+      "label": "Koblitz generator-orbit, n=29, c=1",
+      "domain": "Koblitz one-column fixed setup",
+      "ratio": 0.366,
+      "ci95": [
+        0.241,
+        0.523
+      ],
+      "reference": "same-target rho-frob",
+      "unit": "S pricing band panel",
+      "evidence": "Frobenius-folded BSGS engineering crossover; not scaling IC"
     },
     {
       "label": "Inherited F4, random m=19",

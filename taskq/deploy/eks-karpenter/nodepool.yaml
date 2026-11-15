@@ -1,5 +1,5 @@
-# Ordinary and L2 pools share a fixed aggregate cap: 64 vCPUs / 256Gi.
-# Each gets 32 vCPUs / 128Gi; no cross-pool borrowing or implicit cap increase.
+# Owner cost ceiling, 2026-11-01: 24 vCPUs / 160Gi in aggregate.
+# Ordinary: 16 / 128Gi; L2: 8 / 32Gi. No implicit cap increases.
 apiVersion: karpenter.k8s.aws/v1
 kind: EC2NodeClass
 metadata:
@@ -187,7 +187,7 @@ spec:
       expireAfter: Never
       terminationGracePeriod: 1h
   limits:
-    cpu: "32"
+    cpu: '16'
     memory: 128Gi
   disruption:
     consolidationPolicy: WhenEmpty
@@ -432,8 +432,8 @@ spec:
       expireAfter: Never
       terminationGracePeriod: 1h
   limits:
-    cpu: '32'
-    memory: 128Gi
+    cpu: '8'
+    memory: 32Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 2m
