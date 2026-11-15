@@ -1,8 +1,9 @@
 # Closeout checks
 
 Producer checks only; no signed independent execution or numerical verdict.
-The release suite passes 26 tests both normally and with `count-field-ops`;
-the latter is a separate instrumented build and supplied no timing samples.
+The original closeout release suite passes 26 tests normally and 27 with
+`count-field-ops`; the latter adds a counter-specific test and supplied no
+timing samples. Subsequent lead checks live in `../quadratic-development/`.
 `cargo fmt --all -- --check` and strict all-target clippy pass. PCC prose lint
 passes, and the local append-only ledger chain verifies. Claim
 `PCC-20261115-66235b` remains unverified, as intended.

@@ -11,6 +11,12 @@ predeclared fresh four-variable cases pass the per-case tenfold rule, with
 These are local producer component observations, pending signed independent
 validation; mature CAS diagnostics are retained separately `[pcc:unverified]`.
 
+[LEADS.md](LEADS.md) records the next bounded work: a direct-quadratic
+projection with explicit certificates, a selectable strong native baseline,
+and a separately frozen [successor protocol](QPROJECTION_PROTOCOL.md).
+Development checks are under `quadratic-development/`. No successor timing
+has run: the required S3 checkpoint upload currently has no transport.
+
 ## Run
 
 From this directory, with a current stable Rust toolchain:

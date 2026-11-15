@@ -145,7 +145,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut args = std::env::args().skip(1);
     let (mut fixtures, mut out, mut binary, mut backend) = (None, None, None, None);
     let mut samples = 21usize;
+    let mut baseline_arm = "baseline".to_string();
     let mut candidate_arm = "candidate".to_string();
+    let mut protocol = "SPEED_PROTOCOL.md".to_string();
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--fixtures" => fixtures = Some(PathBuf::from(args.next().ok_or("missing fixtures")?)),
@@ -155,9 +157,11 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
             "--backend" => backend = Some(args.next().ok_or("missing backend label")?),
             "--candidate-arm" => candidate_arm = args.next().ok_or("missing candidate arm")?,
+            "--baseline-arm" => baseline_arm = args.next().ok_or("missing baseline arm")?,
+            "--protocol" => protocol = args.next().ok_or("missing protocol label")?,
             "--samples" => samples = args.next().ok_or("missing sample count")?.parse()?,
             "--help" => {
-                println!("campaign --fixtures DIR --out NEW_DIR --compare-bin EXE --backend local [--samples 21]");
+                println!("campaign --fixtures DIR --out NEW_DIR --compare-bin EXE --backend local [--samples 21] [--baseline-arm baseline] [--candidate-arm candidate] [--protocol SPEED_PROTOCOL.md]");
                 return Ok(());
             }
             _ => return Err(format!("unknown option {arg}").into()),
@@ -169,14 +173,21 @@ fn main() -> Result<(), Box<dyn Error>> {
     if backend.as_deref() != Some("local") {
         return Err("this driver supports an explicitly selected local L0 backend only; do not use to bypass IsoLab admission".into());
     }
-    if candidate_arm != "candidate"
-        && candidate_arm != "projection"
-        && candidate_arm != "interreduce"
-        && candidate_arm != "projection-interreduce"
-        && candidate_arm != "criteria"
-        && candidate_arm != "projection-criteria"
-    {
-        return Err("candidate arm must be candidate or projection".into());
+    let supported = |arm: &str| {
+        matches!(
+            arm,
+            "baseline"
+                | "candidate"
+                | "projection"
+                | "interreduce"
+                | "projection-interreduce"
+                | "criteria"
+                | "projection-criteria"
+                | "quadratic-projection-criteria"
+        )
+    };
+    if !supported(&baseline_arm) || !supported(&candidate_arm) {
+        return Err("unsupported baseline or candidate arm".into());
     }
     let fixtures = fixtures.ok_or("--fixtures required")?;
     let out = out.ok_or("--out required")?;
@@ -194,7 +205,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     fs::write(
         out.join("host.json"),
         serde_json::to_string_pretty(
-            &json!({"backend":"local L0, no L2 isolation claim","cpu_affinity":cpu,"cpuinfo":fs::read_to_string("/proc/cpuinfo")?,"worker_binary":binary,"protocol":"SPEED_PROTOCOL.md"}),
+            &json!({"backend":"local L0, no L2 isolation claim","cpu_affinity":cpu,"cpuinfo":fs::read_to_string("/proc/cpuinfo")?,"worker_binary":binary,"protocol":protocol,"baseline_arm":baseline_arm,"candidate_arm":candidate_arm}),
         )?,
     )?;
     let mut ordered = manifest["cases"]
@@ -245,7 +256,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     if arm == "candidate" {
                         &candidate_arm
                     } else {
-                        arm
+                        &baseline_arm
                     },
                     &directory.join(format!("sample-{sample:02}-{arm}")),
                     &cpu,
@@ -263,7 +274,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let first = worker(
                     &binary,
                     &fixture,
-                    "baseline",
+                    &baseline_arm,
                     &directory.join(format!("aa-{sample:02}-first")),
                     &cpu,
                     1,
@@ -272,7 +283,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let second = worker(
                     &binary,
                     &fixture,
-                    "baseline",
+                    &baseline_arm,
                     &directory.join(format!("aa-{sample:02}-second")),
                     &cpu,
                     1,
@@ -311,7 +322,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             && estimate["bootstrap_95"][0]
                 .as_f64()
                 .is_some_and(|x| x > 10.);
-        let summary = json!({"id":id,"complete":complete,"native_checked_wall_ratio":estimate,"aa_ratio":aa_estimate,"aa_admitted":controls,"candidate_arm":candidate_arm,
+        let summary = json!({"id":id,"complete":complete,"native_checked_wall_ratio":estimate,"aa_ratio":aa_estimate,"aa_admitted":controls,"baseline_arm":baseline_arm,"candidate_arm":candidate_arm,"protocol":protocol,
             "tenfold_native_criterion_met":tenfold,"external_comparisons":"pending separate supported CAS runs; no fastest claim", "claim_status":"producer observation, not independently signed","samples":raw});
         println!(
             "{id}: ratio={} complete={complete} A/A={controls} tenfold={tenfold}",
@@ -326,7 +337,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     fs::write(
         out.join("summary.json"),
         serde_json::to_string_pretty(
-            &json!({"protocol":"SPEED_PROTOCOL.md","campaign_complete":campaign_complete&&summaries.len()==manifest["cases"].as_array().unwrap().len(),"case_summaries":summaries,"elapsed_wall_seconds":started.elapsed().as_secs_f64()}),
+            &json!({"protocol":protocol,"baseline_arm":baseline_arm,"candidate_arm":candidate_arm,"campaign_complete":campaign_complete&&summaries.len()==manifest["cases"].as_array().unwrap().len(),"case_summaries":summaries,"elapsed_wall_seconds":started.elapsed().as_secs_f64()}),
         )? + "\n",
     )?;
     Ok(())

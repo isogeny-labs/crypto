@@ -335,3 +335,42 @@ once to merge the base without rewriting evidence; no reply has arrived.
 Main has now also appended a different hash-chained PCC history. That ledger
 conflict is reported, not resolved by selecting or rewriting either side.
 The study log here avoids concurrent edits to the root session log.
+
+## 2026-11-15 — Chase direct-quadratic and quotient-algebra leads
+
+LEADS.md records a division-free quadratic resultant identity on the original
+equations. Implemented as augment_quadratic with original-input certificates;
+small-prime/scaled/degenerate identity tests and full-ideal checks on both
+fields pass. On the fixed three-/four-variable development cases, the complete
+ordered augmented inputs equal the previous construction. Thus this lead
+targets construction/checking, without claiming different downstream degree
+or solver work `[pcc:unverified]`.
+
+The harness now selects the native baseline explicitly, applies it to A/A
+children too, and retains the actual protocol label. A fake-worker integration
+test checks all dispatches. The exporter accepts an explicit construction and
+frozen seed list without implying freshness. QPROJECTION_PROTOCOL.md is frozen
+before any successor timing, with the existing candidate as baseline and
+conditional fresh seeds 5003/7001/9001. No new scientific run has launched.
+
+The real sparse clone at /workspace/crypto-leads fixes the old API-staged
+directory's missing Git metadata. A complete resume note is in LEAD_RESUME.md
+and the local root checkpoint path. The actual checkpoint gate still cannot
+upload: no configured AWS profile or presigned upload token. AGENTS.md requires
+that gate to pass before launching, so timing remains blocked. Development
+continued with 29 normal tests, 30 counter-feature tests and strict clippy;
+receipts/source hashes are under quadratic-development/. Old raw evidence is
+unchanged. The earlier count-feature suite had 27 tests rather than 26; its
+validation README now states the actual count without rewriting the log.
+
+The stronger next lead is a certified quotient-algebra route: invert a linear
+subresultant modulo a certified vertex quartic, propagate coordinate maps and
+derive the complete grevlex basis by quotient linear dependence. Nonunit
+denominators, certification cost and full ideal equality must be checked.
+This remains a lead, not an implementation or timing result `[pcc:unverified]`.
+
+Current producer record: PCC-20261115-1f0cb7, unverified. The earlier mutable
+lead-note pin is explicitly documented as stale in quadratic-development/
+CLAIM_HISTORY.md, with its original bytes preserved. Ledger rows and frozen
+claims were not rewritten. Main's divergent ledger and root-log conflicts
+remain outside this development update.
