@@ -12,7 +12,7 @@ same pins, logarithm and S; structured-gauss measured without a prediction.
 specs/la.json; local ecbench (this container, L0; counts deterministic).
 
 ## State
-2026-11-15 16:50Z: protocol and spec frozen; building ecbench.
+2026-11-15 17:05Z: done. 42/42 verified+replayed; echelon 0.10-0.15x gauss row_ops, identical S; record closed; REPORT.md.
 
 ## Runs in flight
 None (local run, no pod).
@@ -21,4 +21,4 @@ None (local run, no pod).
 PROTOCOL.md "Predictions" and "Measurement and reading".
 
 ## Next steps
-Build -> run -> analyze -> report/figure/PDF -> benchrec -> PR.
+PR; GPU arms with linalg=incremental-gauss-echelon on a pod; validator.
