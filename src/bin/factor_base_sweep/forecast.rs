@@ -111,7 +111,9 @@ pub fn forecaster(
 }
 
 /// Smallest factor-base dimension at which the effective degree never fell below the
-/// measured solving degree (ml-cryptanalysis `experiments/dmut-mechanistic-20261114`).
+/// measured solving degree on the measured (random-target) systems. Not a guarantee:
+/// constructed targets with four or more decompositions break it at every `k`
+/// (ml-cryptanalysis `experiments/dmut-mechanistic-20261114/BOUND_ANALYSIS.md`).
 pub const MIN_EFFECTIVE_DIMENSION: u32 = 7;
 
 const FALLS_SOURCE: &str = "affine falls n - dim(V*V) + 1 of the binary-subspace factor base \
