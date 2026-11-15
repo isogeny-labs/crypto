@@ -35,7 +35,7 @@
       "description": "Byte-identical old linearized solver source snapshot",
       "instrument": {
         "repo": "crypto",
-        "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+        "commit": "902f78ccfce8ab09c42b5dd39f3e9bde103c35aa",
         "build": [
           [
             "cargo",
@@ -63,7 +63,7 @@
       "description": "Identical baseline in independently interleaved fresh processes",
       "instrument": {
         "repo": "crypto",
-        "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+        "commit": "902f78ccfce8ab09c42b5dd39f3e9bde103c35aa",
         "build": [
           [
             "cargo",
@@ -92,7 +92,7 @@
       "description": "Current production packed/batched solver with original replay",
       "instrument": {
         "repo": "crypto",
-        "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+        "commit": "902f78ccfce8ab09c42b5dd39f3e9bde103c35aa",
         "build": [
           [
             "cargo",
@@ -242,11 +242,11 @@
       "note": "Exact disclosed six-cell implementation comparison, paired five-repeat min/median/max and A/A; no population test or p-value."
     },
     "preflight_runtime": {
-      "fixed_seconds": 0,
-      "per_sample_seconds": 0,
+      "fixed_seconds": 25.60205841064453,
+      "per_sample_seconds": 2.5579209480000005,
       "threads": 1,
-      "estimated_total_seconds": 0,
-      "measured_on": "Pending12-call engineering pilot, frozen mapping per field/arm max of positive/uniform times15 calls; fill before primary freeze."
+      "estimated_total_seconds": 255.81494373064456,
+      "measured_on": "12-call CPU0/2GiB engineering pilot including both largest bases; fixed field/arm max of positive/uniform times15 calls. Planning only, not timing evidence."
     }
   },
   "metrics": {
@@ -420,11 +420,11 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": false
+    "status": "frozen",
+    "protocol_sha256": "4643a05317e1266df27e06984a03d0d9d4a5146b5f616c7f5b855ec97228ee00",
+    "commit": "902f78ccfce8ab09c42b5dd39f3e9bde103c35aa",
+    "frozen_at": "2026-11-15T21:11:16Z",
+    "filed_before_affected_data": true
   },
   "extensions": {
     "workload_path": "../trace_zero_linearized_20261115/workload.json",
