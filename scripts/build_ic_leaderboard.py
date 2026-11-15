@@ -176,7 +176,7 @@ SOURCES = {
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
     "ghs_weak_cd_chain": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
     "ghs_weak_relstage": "research/ic_gw_fasthash_20261114/analysis.json",
-    "ghs_weak_blreuse": "research/ic_gw_bl_reuse_20261115/analysis.json",
+    "ghs_weak_blreuse": "research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -2394,8 +2394,9 @@ def ghs_blreuse_md(g: dict) -> list[str]:
          "Same instances and configuration as the two sections above (c_D = 1.7, square-root chain, fast relation stage). "
          "The DL arm's block Lanczos (width 4) no longer computes MV_prev^T MV (it equals columns of this iteration's "
          "V^T MV by M-orthogonality, exact in every path) or V_i^T V_0 for i >= 2 (it follows from the three-term "
-         "recurrence's k x k coefficients while no column has been narrowed away; amendment 1 falls back to the direct "
-         "product after any narrowing, with identical counts on all 30 units). Every other counted field, the iteration "
+         "recurrence's k x k coefficients while no column has been narrowed away; the validator found the frozen guard "
+         "too weak in general, and amendment 1, used here, falls back to the direct product from any narrowing on, "
+         "costing at most 0.04% more). Every other counted field, the iteration "
          "count and every logarithm are unchanged. Cold M-eq of the DL arm divided by the previous configuration on the "
          "same instance, k = 18..22, seeds 1–6; geometric mean (worst seed) with additions priced at 0, 0.5 and 1 M-eq. "
          f"Pre-registered decision: {'improvement' if g['supported'] else 'not supported'}. Class: {g['class']}. "
