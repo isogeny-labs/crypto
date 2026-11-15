@@ -164,6 +164,14 @@ consecutive rungs ℓ ≥ 8 is read as the survey's falsifier firing (its
   construction. ℓ = 9 (4·10⁶ < C(512, 3) = 2.2·10⁷) is run as frozen and its
   native censoring is observed. Hashes: `FREEZE-am3.sha256`.
 
+- **AM4 (2026-11-15T06:05Z, execution only).** The session harness stops a
+  background command after 2 h, which will cut the ℓ = 7 rerun and the ℓ = 8 run
+  short. A detached watcher reruns a rung whose process ended with fewer than
+  20 rows, with the identical frozen binary, arguments and budget, into
+  `rows/l<ℓ>-run<k>.jsonl`; `analyze.py` merges by target (AM2). Counts are
+  deterministic per (target, arm), as the ℓ = 7 target-0 check showed. No data
+  is affected; some targets are computed twice. Hashes: `FREEZE-am4.sha256`.
+
 ## Inadmissible after the freeze
 
 Changing budget, seeds, target counts, symmetry-breaking setting, encoding, or

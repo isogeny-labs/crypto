@@ -384,6 +384,15 @@
    "reason": "At l = 10 the frozen budget (1.6e7 conflicts) is below the incumbent's deterministic cost (about one conflict per triple, C(1024, 3) = 1.78e8), so native and native-aa are censored by construction; observing that would cost about 40 machine-hours on this host and add no information. B1 is read on l = 7, 8 (l = 9 is censored for the same reason, at 4e6 < 2.2e7, and is run as frozen).",
    "change": "l = 10 runs oracle, lin, lin-nolex. native and native-aa at l = 10 are reported as 'censored by construction (budget below C(2^l, 3))'.",
    "data_affected": "native, native-aa at l = 10: not run. No other arm or rung."
+  },
+  {
+   "id": "AM4-rung-reruns-after-session-kill",
+   "filed": "2026-11-15T06:05Z",
+   "filed_before_affected_data": true,
+   "scope": "execution only; no budget, seed, target, arm, encoding or metric change",
+   "reason": "The session harness limits a background command to 2 h; the l = 7 rerun and the l = 8 run were started under it and will be stopped before their 20 targets finish.",
+   "change": "When a rung's process ends with fewer than 20 rows, a detached watcher reruns the rung with the identical frozen binary (sha256 in rows/binaries.sha256), identical arguments and budget, writing to rows/l<l>-run<k>.jsonl; analyze.py merges files of a rung by target (AM2), asserting the same x_R. Counted metrics are deterministic per (target, arm) and duplicates are identical, as the l = 7 target-0 check showed (all six arms equal to the conflict). Rungs l = 9 and l = 10 are started by the same watcher after l = 8 completes.",
+   "data_affected": "None; some targets are computed twice."
   }
  ],
  "freeze": {
