@@ -65,3 +65,9 @@ is empty for every arm, rho included.
 - No `S`, no single-target change, no BSGS result.
 - No leaderboard or `benchmarks/` row: there is no replay certificate or validator report.
 - Wall time on a shared cloud pod, one binary, read as paired ratios.
+
+## Amendment A1 (before any measured run)
+
+RunPod refused the pod ("account balance is too low"). The run moves to this session's container: Intel Xeon
+@ 2.30 GHz, 4 vCPU, 15 GB, pinned to one CPU, with the same order, repeats and binary as above. The only change is
+the host. Absolute times are not comparable to the RunPod rounds; ratios within this run are.
