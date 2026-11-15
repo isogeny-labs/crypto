@@ -17,6 +17,8 @@ The producer-local reference used independent standard C++ affine point addition
 
 These are local producer transcript hashes, **not independent signed replay certificates**; the transient transcripts are not checked in. The Rust program below is the exact-head reproducible version of the high-level counts.
 
+**Additional group-law replay:** a separate Python implementation reconstructed each factor base and recomputed **both** signed triple group sums for **every 8,379 recorded collision pair** (2,370 + 2,244 + 3,765). All 8,379 equalities passed. This is still an in-session, producer-operated cross-check, not independent PCC certification. It guards against treating modular-index coincidences as actual elliptic-curve relations.
+
 ## Exact finite-instance results [pcc:unverified]
 
 | Arm | Signed templates processed | Raw same-sum collisions | Distinct projective relation rows | Independent rank | Rank needed B−1 | Raw collisions per projective class |
