@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Reproducible toy rho comparator, not optimized negation-map rho.
 
-Runs on the prime-order curve in prime_signed_relation_pipeline.py. Exactly 977
-public DLP instances checked. Producer-local only.
+Runs on the prime-order curve in prime_signed_relation_pipeline.py. Exactly 977 public DLP instances checked. Producer-local only.
 """
 import json
 import random
