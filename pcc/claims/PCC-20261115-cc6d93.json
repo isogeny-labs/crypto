@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T04:01:35Z",
+ "id": "PCC-20261115-cc6d93",
+ "kind": "statement",
+ "producer": {
+  "commit": "2ef47dc5b46a5a9a58389a12d132165a4d1bb95e",
+  "model": "GPT-6",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/classification/results/smith-p256.json",
+    "sha256": "693bf02d4c630628ef40ac666612708b14673130fb27e8e8b47471ea85fcb5cf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/classification/results/reference-controls.json",
+    "sha256": "084f30d19f1a01b71a4402a1d82cee7519aabe49fdcb1d12c302606d81cca300"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_genus_dlp_20261115/classification",
+ "statement": "Producer prerequisite checks for the fixed P-256 C3 and H5 models enumerate all 105 pair partitions: C3 has three rational pair kernels with Smith matrix rank three; H5 has one rational pair kernel whose two pencil candidates have degree drop. This does not classify all isogenies or construct Smith codomains."
+}
