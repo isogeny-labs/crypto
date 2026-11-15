@@ -11,6 +11,7 @@ mod curve;
 mod dlpsummary;
 mod field;
 mod filter;
+mod filtersummary;
 mod ghsmagic;
 mod la;
 mod lpsummary;
@@ -45,6 +46,12 @@ fn main() {
         Some("summarize-dlp") => {
             if let Err(e) = dlpsummary::run(&args[2], &args[3..]) {
                 eprintln!("summarize-dlp: {e}");
+                std::process::exit(1);
+            }
+        }
+        Some("summarize-filter") => {
+            if let Err(e) = filtersummary::run(&args[2], &args[3..]) {
+                eprintln!("summarize-filter: {e}");
                 std::process::exit(1);
             }
         }
