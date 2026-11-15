@@ -1,0 +1,10 @@
+--- mllc_harness.py	2026-11-07 20:33:08.067631816 +0000
++++ mllc_harness_r2m16.py	2026-11-08 06:49:03.853574309 +0000
+@@ -69,6 +69,7 @@
+ 
+ def fpstar_arm(m, ks_seed, n, rng):
+     p, g = G.safe_prime_group(m, ks_seed); N = p-1
++    n = min(n, N-1)   # r2m16 amendment (AMENDMENT_R2_M16.md): cap at N_f - 1 = p - 2, the same cap the curve arms use on the curve group
+     ks = rng.choice(N, size=n, replace=False) + 0
+     h = G.fp_star_points(p, g, ks)
+     return N, ks, (G.bits(h, m), 'lsb')   # label k mod 2 == Legendre(h): smooth character r=2

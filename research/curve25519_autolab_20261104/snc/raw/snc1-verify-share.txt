@@ -1,0 +1,12 @@
+k=20 n=120 oracle=wsum:coef=15,free=1 mean S=2.852 mean collisions C=0.000 dist={0: 120}
+  box wsum:free=1 : oracle_setup.adds = table inserts + ?; see RESULTS.md
+  no variation in C, no regression
+k=24 n=120 oracle=wwalk:x=0.9,g=1,grow=2,seed=run mean S=2.134 mean collisions C=2.100 dist={1: 1, 2: 109, 3: 8, 4: 1, 5: 1}
+  OLS A = 242.6 + 46.51(se 2.58) * C  [adds per collision, 2 evals each]
+  derived verify share = 0.0674 sqrt(r)  (se 0.0012); share of S = 0.0316; with slope+-se: [0.0637,0.0712]
+k=28 n=120 oracle=wwalk:x=0.9,g=1,grow=2,seed=run mean S=1.832 mean collisions C=2.158 dist={1: 1, 2: 103, 3: 13, 4: 2, 5: 1}
+  OLS A = 278.6 + 61.48(se 2.79) * C  [adds per collision, 2 evals each]
+  derived verify share = 0.0229 sqrt(r)  (se 0.0005); share of S = 0.0125; with slope+-se: [0.0219,0.0239]
+k=32 n=120 oracle=wwalk:x=0.6,g=1,grow=2,seed=run mean S=1.874 mean collisions C=1.725 dist={0: 8, 1: 23, 2: 83, 3: 6}
+  OLS A = 332.0 + 65.54(se 2.21) * C  [adds per collision, 2 evals each]
+  derived verify share = 0.0049 sqrt(r)  (se 0.0002); share of S = 0.0026; with slope+-se: [0.0047,0.0050]

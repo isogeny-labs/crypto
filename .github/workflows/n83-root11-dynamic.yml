@@ -117,6 +117,6 @@ jobs:
           export PATH="$HOME/.elan/bin:$PATH"
           lean Root11DynamicCapacity.lean > /tmp/n83-root11-dynamic-proof-check.log
           diff -u proof_check.log /tmp/n83-root11-dynamic-proof-check.log
-          if rg -n '\b(sorry|admit|sorryAx)\b' Root11DynamicCapacity.lean; then
+          if grep -nE '\b(sorry|admit|sorryAx)\b' Root11DynamicCapacity.lean; then
             exit 1
           fi

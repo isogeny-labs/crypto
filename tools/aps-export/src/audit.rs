@@ -3,6 +3,8 @@
 use crate::{array, canonical, hash, integer, require, text, Result};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
+#[path = "audit/leads.rs"]
+mod leads;
 
 const PHASES: [&str; 6] = [
     "setup",
@@ -13,6 +15,19 @@ const PHASES: [&str; 6] = [
     "target_recovery_check",
 ];
 pub const MAX_ORACLE_CANDIDATES: u64 = 1_000_000;
+
+/// The separate scalar-check executable profiles this whole arithmetic body.
+/// Parsing the input record and serializing the receipt are outside its frame.
+/// This is independent ordinary-residue arithmetic, not producer execution
+/// attestation. Invalid/wrong recoveries never become accepted answers.
+pub fn scalar_record(r: &Value) -> Result<Value> {
+    let c = Curve::from_record(r)?;
+    let k = integer(&r["outcome"]["recovered"])?;
+    Ok(
+        json!({"schema":"aps.scalar-check/v1","record_id":r["record_id"],
+        "matches_target":k<c.n && c.scale(Some(c.g),k)==Some(c.q),"execution_attested":false}),
+    )
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct Point {
@@ -220,6 +235,9 @@ impl Base {
         Ok(())
     }
     fn parse(v: &Value, c: Curve) -> Result<Self> {
+        Self::parse_partial(v, c, false)
+    }
+    fn parse_partial(v: &Value, c: Curve, allow_empty: bool) -> Result<Self> {
         let entries = v["points"].as_object().ok_or("missing base points")?;
         require(
             !entries.is_empty() && entries.len() <= 32,
@@ -253,7 +271,7 @@ impl Base {
             .map(|p| array(p)?.iter().map(integer).collect())
             .collect::<Result<_>>()?;
         require(
-            matches!(parts.len(), 3 | 4) && parts.iter().all(|p| !p.is_empty()),
+            matches!(parts.len(), 3 | 4) && (allow_empty || parts.iter().all(|p| !p.is_empty())),
             "unsupported base partitions",
         )?;
         let flat: Vec<_> = parts.iter().flatten().copied().collect();
@@ -424,7 +442,8 @@ pub fn record_line(line: &str) -> Result<Value> {
 
 /// Recompute all exclusive clock totals. No field here qualifies an L2 clock.
 pub fn metrics(r: &Value) -> Result<Value> {
-    if r["detail"]["schema"] != "ecbench.aps/v1" {
+    let version = leads::version(r)?;
+    if version == 0 {
         return Ok(json!({"aps":false}));
     }
     let mut times = BTreeMap::new();
@@ -509,6 +528,9 @@ pub fn metrics(r: &Value) -> Result<Value> {
             "aggregate APS diagnostic differs from retained attempts",
         )?;
     }
+    if version == 3 {
+        leads::metrics(r)?;
+    }
     Ok(
         json!({"aps":true,"cold_ns":total,"online_ns":online,"setup_ns":times["setup"],"source_diagnostics_recomputed":diagnostic,"execution_attested":false,"wall_qualified":false}),
     )
@@ -583,10 +605,11 @@ pub fn mathematical(r: &Value, cap: u64) -> Result<Value> {
         cap > 0 && cap <= MAX_ORACLE_CANDIDATES,
         "invalid independent oracle work cap",
     )?;
-    if r["detail"]["schema"] != "ecbench.aps/v1" {
+    let version = leads::version(r)?;
+    if version == 0 {
         return Ok(json!({"aps":false,"witness_checked":false}));
     }
-    configuration(&r["method"]["params"])?;
+    let profile = leads::configuration(&r["method"]["params"], version)?;
     if !r["detail"]["target_error"].is_null() {
         require(
             array(&r["detail"]["attempts"])?.is_empty()
@@ -600,7 +623,12 @@ pub fn mathematical(r: &Value, cap: u64) -> Result<Value> {
     }
     let c = Curve::from_record(r)?;
     let params = &r["method"]["params"];
-    let enc = text(&params["encoding"])?;
+    let raw_encoding = text(&params["encoding"])?;
+    let enc = if version == 3 && raw_encoding == "line_chart3" {
+        "line3"
+    } else {
+        raw_encoding
+    };
     require(
         matches!(
             enc,
@@ -624,7 +652,11 @@ pub fn mathematical(r: &Value, cap: u64) -> Result<Value> {
     } else {
         4
     };
-    let size = integer(&params["subset_size"])?;
+    let size = if version == 3 {
+        profile[0] as u64
+    } else {
+        integer(&params["subset_size"])?
+    };
     require((1..=4).contains(&size), "unsupported subset size")?;
     let mut complete = 0;
     let mut partial = 0;
@@ -655,13 +687,26 @@ pub fn mathematical(r: &Value, cap: u64) -> Result<Value> {
             partial += 1;
             continue;
         }
-        let base = Base::parse(&a["base"], c)?;
+        let sampling_partial = version == 3
+            && a["lead"]["sampling_complete"] == false
+            && a["error_stage"] == "sampling";
+        let base = Base::parse_partial(&a["base"], c, sampling_partial)?;
+        let skipped = if version == 3 {
+            leads::attempt(r, i, c, &base, &profile)?
+        } else {
+            None
+        };
+        if sampling_partial {
+            partial += 1;
+            continue;
+        }
         let orbit_abort = orbit && a["error_stage"] == "orbit" && !a["error"].is_null();
         require(
             base.parts.len() == arity
-                && base.parts.iter().all(|part| {
-                    part.len() as u64 == size * if orbit && !orbit_abort { 3 } else { 1 }
-                }),
+                && (version == 3
+                    || base.parts.iter().all(|part| {
+                        part.len() as u64 == size * if orbit && !orbit_abort { 3 } else { 1 }
+                    })),
             "base partition size differs from method",
         )?;
         if orbit && !orbit_abort {
@@ -693,6 +738,12 @@ pub fn mathematical(r: &Value, cap: u64) -> Result<Value> {
                 base.member(xs, enc) && base.relation(c, xs, pruned),
                 "reported coordinate set is not an allowed relation",
             )?;
+            require(
+                skipped
+                    .as_ref()
+                    .is_none_or(|old| xs.iter().any(|x| !old.entries.contains_key(x))),
+                "old coordinate set re-emitted in a frontier-only plan",
+            )?;
         }
         reported += visited.len();
         require(
@@ -714,8 +765,14 @@ pub fn mathematical(r: &Value, cap: u64) -> Result<Value> {
                     a["algebra"]["timed_out"] == false,
                     "timed-out attempt claims completeness",
                 )?;
+                let mut expected = oracle(c, &base, enc, pruned, &mut remaining)?;
+                if let Some(old) = &skipped {
+                    for xs in oracle(c, old, enc, pruned, &mut remaining)? {
+                        expected.remove(&xs);
+                    }
+                }
                 require(
-                    emitted == oracle(c, &base, enc, pruned, &mut remaining)?,
+                    emitted == expected,
                     "complete root set differs from independent point enumeration",
                 )?;
                 complete += 1;
@@ -794,6 +851,10 @@ pub fn mathematical(r: &Value, cap: u64) -> Result<Value> {
         require(
             in_budget == 1 && r["detail"]["outcome"] == "verified",
             "record success is not backed by exactly one in-budget witness",
+        )?;
+        require(
+            scalar_record(r)?["matches_target"] == true,
+            "record scalar failed the separate arithmetic checker",
         )?;
     }
     Ok(

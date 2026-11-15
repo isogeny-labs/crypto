@@ -1,0 +1,127 @@
+{
+  "branch": "claude/novel-ecdlp-algorithm-iams4j",
+  "closed_utc": "2026-11-08T06:44:39+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/cards/p3-run-r2.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "launched detached (setsid nohup env BENCHREC=<this record> ...); started_utc approximate from the launch; wall_s = sum of receipt per-command seconds; exit from the receipt (status completed)",
+      "started_utc": "2026-11-08T05:46:00Z",
+      "wall_s": 3380.398
+    }
+  ],
+  "commit": "3c11bc13b9cbb491454f49487453e8fc2321cfca",
+  "commit_dirty": true,
+  "created_utc": "2026-11-08T05:45:47+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261108T0545Z-split-prime-p3-r2-walk-v2",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 7,
+      "name": "bonferroni_significant_rho_tests",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2000,
+      "name": "max_abs_rho_effect_pct",
+      "note": "p24 z_691 per SD, 95 % CI [-0.186, +0.011]; walk v2",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.087
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2000,
+      "name": "aa_rho_correlation_p28",
+      "note": "round 1 (walk v1): 0.986",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.009
+    }
+  ],
+  "problem": "ecdlp:split-prime-p3-cross-trace-census",
+  "raw": [
+    {
+      "bytes": 616890,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/rhoA.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/28/283b5199c7080f9a815e5ea1946f8b00094bfab5fd45137f5b4b9eab1f7b015d",
+      "sha256": "283b5199c7080f9a815e5ea1946f8b00094bfab5fd45137f5b4b9eab1f7b015d",
+      "uploaded": true
+    },
+    {
+      "bytes": 616890,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/rhoB.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cf/cf07b89421149850fdb53da3fbecd36f1f569958a8d06e136e0cf5ed6c2c641b",
+      "sha256": "cf07b89421149850fdb53da3fbecd36f1f569958a8d06e136e0cf5ed6c2c641b",
+      "uploaded": true
+    },
+    {
+      "bytes": 6856,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/analysis.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/78/78bb2f027e5dc36d9349c1e33cdc19db0fdf962dc9a59250f9bbd7e36ee1f6ff",
+      "sha256": "78bb2f027e5dc36d9349c1e33cdc19db0fdf962dc9a59250f9bbd7e36ee1f6ff",
+      "uploaded": true
+    },
+    {
+      "bytes": 626890,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/rhoA.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/80/80d23d0cb0a36b23a5491cdc51850241fedad326cc4c41989b51a76edcdc51d3",
+      "sha256": "80d23d0cb0a36b23a5491cdc51850241fedad326cc4c41989b51a76edcdc51d3",
+      "uploaded": true
+    },
+    {
+      "bytes": 626890,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/rhoB.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/37217da9fdfb499e6b1278d39f9164505baf1bfecd3880fc5c9b58d708f2ce83",
+      "sha256": "37217da9fdfb499e6b1278d39f9164505baf1bfecd3880fc5c9b58d708f2ce83",
+      "uploaded": true
+    },
+    {
+      "bytes": 5545,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/analysis.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4a/4aab0917b0835362b1d229ef1657218203c24860262b2174f4e50aac99d1d283",
+      "sha256": "4aab0917b0835362b1d229ef1657218203c24860262b2174f4e50aac99d1d283",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/report/REPORT.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "split-prime-p3-r2-walk-v2",
+  "status": "measured",
+  "summary": "P3 round 2: rho cost with the corrected walk independent of the split-prime and Frobenius-field covariates at 2^24 and 2^28 (0 of 7 tests; every CI within 0.19 %); A/A r 0.027 / 0.009",
+  "validation": null
+}

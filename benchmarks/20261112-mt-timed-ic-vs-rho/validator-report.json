@@ -1,0 +1,1547 @@
+{
+ "schema": "validator.report/v1",
+ "status": "pass",
+ "independent": true,
+ "verdict": "amended headline validated (re-issue at fd91337cce). RESULTS.md now carries the validator's accepted wording verbatim as its headline; raw data, harness, protocol and analysis code are byte-identical to 544f832063, so the replay certificate, every recompute and the timing reproduction stand. The first issue (status fail) judged the producer's original headline, which overstated the selection-bias control ('the same pattern') and priced two counted native operations as one. Non-blocking prose amendments remain in RESULTS.md (required_amendments).",
+ "disposition": "validated",
+ "validator": "independent validator subagent (claude-opus-5-5), 2026-11-12; validator code in validation/scripts/, not the producer's",
+ "validated_commit": "fd91337ccee71167f000e4ea254b10a3692e7216",
+ "protocol_commit": "a992ed6c807eee6fa713176412e6475e19db7946",
+ "claim_scope": "solve-phase wall time (ms_arm) on one CPU of the session VM; icbest = fastest of ic5, ic5ks, ic5w, ic5rw (mu = 1, k = 4), rhobest = fastest of rho2xks x 4 kappa and rhodpu x 6, bsgsbest = fastest of bsgs2 x 3; key time = median of 3 interleaved repeats; cell = 4 configurations; decision faster/slower if the protocol bootstrap 95% bound of the median ratio is on one side of 1",
+ "scoped_dispositions": {
+  "measurement (binary provenance, counter replay, scalars, recompute)": "validated: binary rebuilt bit-identical; 612/612 keys (1836 rows) replay exactly on a validator build; 17-key producer-binary sample and 35 v5 rows match; 319,488 recovered logs of 54 runs verified with the validator's EC code; 272/272 summary.json fields recompute exactly",
+  "2^24 faster and 2^32 slower (size level)": "validated: 12/12 configurations each side in the producer's data, 11/12 in validator round 1, 12/12 in round 2 and pooled; magnitudes 0.78-0.83 / 1.11-1.29 (producer) vs 0.77-0.84 / 1.11-1.22 (validator pooled)",
+  "per-cell decisions under the primary rule": "reproduced on the pooled 8-repeat rerun (9/9); round 1 alone 6/9, round 2 alone 8/9; each decision is a 4-of-4 sign rule (T-F4)",
+  "2^28 T = 1024 '0.93x faster'": "insufficient_evidence: unranked under the pre-registered fixed-key control, unranked in validator rounds 1 and 2 alone, 0.980 [0.959, 0.999] pooled",
+  "selection-bias control 'same pattern 0.75-1.28'": "range validated; at the decision level the control departs from the primary rule in 3 of 9 cells and is unranked in 5 of 9 (T-F1); the amended headline states this for the ends and for 28 b T = 1024",
+  "A/A intervals contain 1 in all 9 cells": "validated",
+  "IC 1.33-1.59x slower than BSGS": "validated (cell medians; per configuration 1.23-1.87; validator round 1 1.30-1.63)",
+  "opcost prices": "GAE 214-294 ns, I/M 23-31, std lookup 0.04-0.15 (2^10-2^16) and 0.27-0.85 (2^22-2^24) validated and reproduced within noise; 'native op 0.005-0.009 GAE' mislabelled (T-F2)",
+  "rhodpu fastest rho in 29/36": "validated (kappa 0; plus 1 at kappa 0.25; rho2xks 6, not 7 as RESULTS says)",
+  "interpretation (h_native about 0 favours DP rho; cache misses at 2^32)": "labelled interpretation in RESULTS; lookup-price account quantitatively consistent at 2^32, not at 2^24; cache misses unmeasured (T-F7)",
+  "amended headline (accepted_results_headline, carried verbatim by RESULTS.md at fd91337cce)": "validated (claim-report.json, status pass)"
+ },
+ "raw_data": [
+  {
+   "path": "../../research/mt_timed_20261112/results/holdout/runs.json",
+   "sha256": "fec25670306811f3af5e3441e2235ab10f95e6a38d5daf1f2efec5e04aabc3c6"
+  }
+ ],
+ "supporting_data": [
+  {
+   "path": "../results/holdout/runs.jsonl",
+   "sha256": "bdcfabf94f93c2a65f752fd00952f2abcad4cca701e26750f3c886d74ace2683",
+   "note": "full rows; replayed; in Git, not the artifact store (T-F13)"
+  },
+  {
+   "path": "../results/holdout/opcost.jsonl",
+   "sha256": "76bdb48972eb64872e5967d655edc7f9b86b5a8b9cde228e101ddb6e82eec702"
+  },
+  {
+   "path": "recompute.json",
+   "sha256": "6cd874818ad88486a4c992f10e7b3f972db235eec5f06db6e4fcdf2304fba93c"
+  },
+  {
+   "path": "results_check.json",
+   "sha256": "224a82c24191fe8b41c9ba897f21d20f8fa62a7ee585d1d43e99b0641ea390f8"
+  },
+  {
+   "path": "replay_check.json",
+   "sha256": "3d91e1b663746eded4fc5f08e35e9d4e594508ed18b6401e3ffc3eeaf974d2fb"
+  },
+  {
+   "path": "scalar_check.json",
+   "sha256": "847a65f32e892e2dff1ba7cdb6176f30ae4163ddd85f8d80f7ad666b06e575f9"
+  },
+  {
+   "path": "timing_reproduction.json",
+   "sha256": "cd46453cf40a5acb428382cbaae018627038ac8e7577ea42f9fc251b77bdaf41"
+  },
+  {
+   "path": "price_model.json",
+   "sha256": "c09fa3ae211c55bd1d38353a4ee4140933db3f9f1760ae5d7a9fedbe0b22f523"
+  }
+ ],
+ "checks": {
+  "design": {
+   "rows_jsonl": 1836,
+   "rows_json": 1836,
+   "runs_json_vs_runs_jsonl_field_mismatches": 0,
+   "runs_json_source_sha256_matches": true,
+   "design_keys": 612,
+   "seq_order_matches_seeded_shuffle": true,
+   "rows_out_of_design_order": 0,
+   "repeat_span_seq_min_median_max": [
+    652,
+    1219.5,
+    1816
+   ],
+   "rep_blocks_contiguous": true,
+   "errors": 0,
+   "ok_ne_targets": 0,
+   "targets_total": 13160448,
+   "targets_verified_total": 13160448,
+   "keys_with_counters_differing_across_repeats": 0,
+   "ms_arm_le_ms_all": true,
+   "ms_le_wall_all": true,
+   "loadavg_min_median_max": [
+    0.54833984375,
+    1.0,
+    1.080078125
+   ],
+   "loadavg_gt_1p5": 0,
+   "sum_wall_s": 1620.595382452994
+  },
+  "results_check": {
+   "summary_fields": 272,
+   "summary_mismatches": [],
+   "max_rel_diff": 0.0,
+   "quoted_failures": [
+    "fixed-key control 'the same pattern' (decisions equal to the primary rule)",
+    "rho2xks fastest rho (RESULTS: 7)",
+    "std lookup 2^18-2^20 0.12-0.42",
+    "fast hasher 2-5x cheaper"
+   ]
+  }
+ },
+ "recompute": {
+  "method": "scripts/recompute.py (validator's own code) from runs.jsonl/runs.json; protocol bootstrap (random.Random(1), B = 4000, order statistics 100 and 3899), the exact bootstrap over all 4^4 resamples and a numpy bootstrap (B = 20000, nonce-seeded): identical decisions in all 9 cells",
+  "cells": [
+   {
+    "bits": 24,
+    "T": 1024,
+    "ic_rho_solve": [
+     0.7776964862952125,
+     0.7650602409638553,
+     0.9223880597014925
+    ],
+    "decision": "faster",
+    "ic_rho_all": [
+     0.8177018425460636,
+     0.7914572864321608,
+     0.9425000000000001
+    ],
+    "ic_bsgs": 1.537266405910474,
+    "aa_rho": [
+     0.8633488234662081,
+     0.6666666666666666,
+     1.1454545454545453
+    ],
+    "fixed": [
+     0.8250411933682322,
+     0.6374045801526718,
+     0.9608127721335268
+    ],
+    "fixed_decision": "faster",
+    "loo_median": 0.6726434935566518,
+    "loo_below1": [
+     10,
+     12
+    ]
+   },
+   {
+    "bits": 24,
+    "T": 4096,
+    "ic_rho_solve": [
+     0.7923026353398502,
+     0.7528089887640449,
+     0.8208744710860366
+    ],
+    "decision": "faster",
+    "ic_rho_all": [
+     0.8516828043616309,
+     0.8158436213991769,
+     0.8781249999999999
+    ],
+    "ic_bsgs": 1.3264556516342325,
+    "aa_rho": [
+     0.9854879505821343,
+     0.8321596244131456,
+     1.3577844311377247
+    ],
+    "fixed": [
+     0.8179060889482725,
+     0.7312119160460393,
+     0.846571622539036
+    ],
+    "fixed_decision": "faster",
+    "loo_median": 0.7496125731996655,
+    "loo_below1": [
+     11,
+     12
+    ]
+   },
+   {
+    "bits": 24,
+    "T": 16384,
+    "ic_rho_solve": [
+     0.8288248547988808,
+     0.8110032362459547,
+     0.8719433719433719
+    ],
+    "decision": "faster",
+    "ic_rho_all": [
+     0.9216265096784477,
+     0.8848484848484848,
+     0.9440586419753086
+    ],
+    "ic_bsgs": 1.438241011636943,
+    "aa_rho": [
+     1.1133112704541275,
+     0.9745708836617928,
+     1.4207119741100325
+    ],
+    "fixed": [
+     0.7518252183013685,
+     0.6553932872149628,
+     1.2111942726976894
+    ],
+    "fixed_decision": "unranked",
+    "loo_median": 0.8017130734425455,
+    "loo_below1": [
+     11,
+     12
+    ]
+   },
+   {
+    "bits": 28,
+    "T": 1024,
+    "ic_rho_solve": [
+     0.9318617164586132,
+     0.8689604685212299,
+     0.9672006102212052
+    ],
+    "decision": "faster",
+    "ic_rho_all": [
+     0.92869178300929,
+     0.8577235772357723,
+     0.9658119658119657
+    ],
+    "ic_bsgs": 1.3739346345114483,
+    "aa_rho": [
+     0.9918418108024003,
+     0.8298906439854192,
+     1.042081101759755
+    ],
+    "fixed": [
+     0.9750929690477819,
+     0.8835370237239397,
+     1.1372251705837757
+    ],
+    "fixed_decision": "unranked",
+    "loo_median": 0.9457101129600709,
+    "loo_below1": [
+     7,
+     12
+    ]
+   },
+   {
+    "bits": 28,
+    "T": 4096,
+    "ic_rho_solve": [
+     1.0532513946390751,
+     0.9867904319885753,
+     1.100502512562814
+    ],
+    "decision": "unranked",
+    "ic_rho_all": [
+     1.0464549868606534,
+     0.9888712241653418,
+     1.0944479897894066
+    ],
+    "ic_bsgs": 1.544049814150191,
+    "aa_rho": [
+     0.9896194905126281,
+     0.8089595375722543,
+     1.0014545454545454
+    ],
+    "fixed": [
+     1.0307629917953804,
+     0.9669982630664772,
+     1.1427808438668328
+    ],
+    "fixed_decision": "unranked",
+    "loo_median": 1.0936286215081117,
+    "loo_below1": [
+     3,
+     12
+    ]
+   },
+   {
+    "bits": 28,
+    "T": 16384,
+    "ic_rho_solve": [
+     1.0072227455211964,
+     0.9535401750198885,
+     1.193046820405311
+    ],
+    "decision": "unranked",
+    "ic_rho_all": [
+     1.0246563838517297,
+     0.9760340162350213,
+     1.1587189616252822
+    ],
+    "ic_bsgs": 1.4431039489645678,
+    "aa_rho": [
+     0.8899750469388172,
+     0.724932614555256,
+     1.1500698812019567
+    ],
+    "fixed": [
+     1.0169665613523096,
+     0.9400103176357874,
+     1.0770769969585399
+    ],
+    "fixed_decision": "unranked",
+    "loo_median": 0.9869225297377483,
+    "loo_below1": [
+     6,
+     12
+    ]
+   },
+   {
+    "bits": 32,
+    "T": 1024,
+    "ic_rho_solve": [
+     1.1144071828980056,
+     1.0486237019943958,
+     1.2114891434433237
+    ],
+    "decision": "slower",
+    "ic_rho_all": [
+     1.1148170079795894,
+     1.0482591093117408,
+     1.2028042063094642
+    ],
+    "ic_bsgs": 1.4557475609004726,
+    "aa_rho": [
+     1.0343599196279034,
+     0.8944676894467691,
+     1.3444865666721608
+    ],
+    "fixed": [
+     1.0955537409788105,
+     0.9721960414703109,
+     1.3509957013773137
+    ],
+    "fixed_decision": "unranked",
+    "loo_median": 1.1583446337397008,
+    "loo_below1": [
+     2,
+     12
+    ]
+   },
+   {
+    "bits": 32,
+    "T": 4096,
+    "ic_rho_solve": [
+     1.202571211683814,
+     1.1160646945445403,
+     1.3032721468475659
+    ],
+    "decision": "slower",
+    "ic_rho_all": [
+     1.1954004021463485,
+     1.105432078953703,
+     1.2941478000854336
+    ],
+    "ic_bsgs": 1.421252675680126,
+    "aa_rho": [
+     0.9329205581483548,
+     0.8122494901905633,
+     1.1098696461824953
+    ],
+    "fixed": [
+     1.1802593936827914,
+     1.0515129682997117,
+     1.3047528817306173
+    ],
+    "fixed_decision": "slower",
+    "loo_median": 1.1830276768520531,
+    "loo_below1": [
+     0,
+     12
+    ]
+   },
+   {
+    "bits": 32,
+    "T": 16384,
+    "ic_rho_solve": [
+     1.2885020349125165,
+     1.2688365043277092,
+     1.3193581567578687
+    ],
+    "decision": "slower",
+    "ic_rho_all": [
+     1.2678314588015085,
+     1.2519194931047335,
+     1.2999692023406222
+    ],
+    "ic_bsgs": 1.5899351606584662,
+    "aa_rho": [
+     0.9751832690127816,
+     0.8459941290184004,
+     1.0559047579403071
+    ],
+    "fixed": [
+     1.2842975890130073,
+     1.2179968445677603,
+     1.3736860802875472
+    ],
+    "fixed_decision": "slower",
+    "loo_median": 1.3414888033981351,
+    "loo_below1": [
+     0,
+     12
+    ]
+   }
+  ],
+  "size_level": {
+   "24": {
+    "n": 12,
+    "below1": 12,
+    "above1": 0,
+    "min": 0.7528089887640449,
+    "max": 0.9223880597014925,
+    "median": 0.8056473907177295,
+    "sign_test_two_sided_p": 0.00048828125,
+    "per_rep_below1": 33,
+    "per_rep_n": 36,
+    "loo_below1": 32,
+    "loo_n": 36,
+    "loo_min": 0.5277777777777778,
+    "loo_max": 1.1908831908831907
+   },
+   "28": {
+    "n": 12,
+    "below1": 7,
+    "above1": 5,
+    "min": 0.8689604685212299,
+    "max": 1.193046820405311,
+    "median": 0.9862535051934531,
+    "sign_test_two_sided_p": 0.7744140625,
+    "per_rep_below1": 17,
+    "per_rep_n": 36,
+    "loo_below1": 16,
+    "loo_n": 36,
+    "loo_min": 0.701093560145808,
+    "loo_max": 1.4454614797864227
+   },
+   "32": {
+    "n": 12,
+    "below1": 0,
+    "above1": 12,
+    "min": 1.0486237019943958,
+    "max": 1.3193581567578687,
+    "median": 1.2323579450250177,
+    "sign_test_two_sided_p": 0.00048828125,
+    "per_rep_below1": 2,
+    "per_rep_n": 36,
+    "loo_below1": 2,
+    "loo_n": 36,
+    "loo_min": 0.7291896530587225,
+    "loo_max": 1.6876128566269413
+   }
+  },
+  "global_aa": {
+   "aa_median_abs_log_dev": 0.027666493636296738,
+   "aa_p95_abs_log_dev": 0.27665660244007323,
+   "n": 1836
+  },
+  "winners": {
+   "ic": {
+    "ic5w": 16,
+    "ic5": 20
+   },
+   "rho": {
+    "rho2xks k=0.5": 4,
+    "rho2xks k=0.25": 2,
+    "rhodpu k=0.0": 29,
+    "rhodpu k=0.25": 1
+   }
+  },
+  "opcost_ranges": {
+   "gae_ns": [
+    214.422,
+    293.751
+   ],
+   "I_over_M": [
+    22.970260710074676,
+    30.584976025572722
+   ],
+   "native_gae": [
+    0.004905515215267353,
+    0.00937403811176092
+   ],
+   "step_index_gae": [
+    0.002389779098624345,
+    0.005671059872587701
+   ],
+   "native_minus_baseline_gae": [
+    0.0024846567138822233,
+    0.006265328330815832
+   ],
+   "padd_vs_I_2M_S": [
+    0.9935741218495733,
+    1.2968051245149412
+   ],
+   "std_lookup_2p10_2p16": [
+    0.03754880834448223,
+    0.14790316555409377
+   ],
+   "std_lookup_2p18_2p20": [
+    0.11450854635388476,
+    0.42060828407726975
+   ],
+   "std_lookup_2p22_2p24": [
+    0.26836334174181536,
+    0.8527572072378106
+   ],
+   "std_lookup_all": [
+    0.03754880834448223,
+    0.8527572072378106
+   ],
+   "std_over_fast": [
+    1.2191620010836193,
+    6.100379094708875
+   ],
+   "counters_expected_param_0.25": {
+    "I": 1000006,
+    "M": 6500012,
+    "S": 6000009,
+    "H": 0,
+    "L": 0,
+    "N": 0
+   },
+   "counters_match_expected_all": true
+  }
+ },
+ "timing_reproduction": {
+  "note": "wall time does not replay exactly; this is a reproduction on the same host and the same bit-identical binary, pinned to CPU 2, sequential, with the producer's per-configuration keys (selected on the producer's medians, scored on new timings)",
+  "round1": {
+   "design": "part A: 36 configurations x producer's fastest IC, rho and bsgs2 key; part B: one nonce-drawn configuration per cell x all 17 keys; 3 repeats, nonce-seeded shuffle per round; opcost before and after",
+   "sampled_configurations": {
+    "24/1024": 1,
+    "24/4096": 2,
+    "24/16384": 3,
+    "28/1024": 3,
+    "28/4096": 1,
+    "28/16384": 2,
+    "32/1024": 3,
+    "32/4096": 2,
+    "32/16384": 2
+   },
+   "executions": 702,
+   "all_verified": true,
+   "counter_mismatches": 0,
+   "cells": [
+    {
+     "bits": 24,
+     "T": 1024,
+     "validator": [
+      0.8117,
+      0.7332,
+      0.8542
+     ],
+     "validator_decision": "faster",
+     "producer": [
+      0.7777,
+      0.7651,
+      0.9224
+     ],
+     "producer_decision": "faster"
+    },
+    {
+     "bits": 24,
+     "T": 4096,
+     "validator": [
+      0.7788,
+      0.7679,
+      0.7862
+     ],
+     "validator_decision": "faster",
+     "producer": [
+      0.7923,
+      0.7528,
+      0.8209
+     ],
+     "producer_decision": "faster"
+    },
+    {
+     "bits": 24,
+     "T": 16384,
+     "validator": [
+      0.9105,
+      0.8113,
+      1.0088
+     ],
+     "validator_decision": "unranked",
+     "producer": [
+      0.8288,
+      0.811,
+      0.8719
+     ],
+     "producer_decision": "faster"
+    },
+    {
+     "bits": 28,
+     "T": 1024,
+     "validator": [
+      0.9908,
+      0.9699,
+      1.0434
+     ],
+     "validator_decision": "unranked",
+     "producer": [
+      0.9319,
+      0.869,
+      0.9672
+     ],
+     "producer_decision": "faster"
+    },
+    {
+     "bits": 28,
+     "T": 4096,
+     "validator": [
+      0.979,
+      0.9426,
+      1.0021
+     ],
+     "validator_decision": "unranked",
+     "producer": [
+      1.0533,
+      0.9868,
+      1.1005
+     ],
+     "producer_decision": "unranked"
+    },
+    {
+     "bits": 28,
+     "T": 16384,
+     "validator": [
+      1.0155,
+      0.8883,
+      1.033
+     ],
+     "validator_decision": "unranked",
+     "producer": [
+      1.0072,
+      0.9535,
+      1.193
+     ],
+     "producer_decision": "unranked"
+    },
+    {
+     "bits": 32,
+     "T": 1024,
+     "validator": [
+      1.0718,
+      0.9543,
+      1.1087
+     ],
+     "validator_decision": "unranked",
+     "producer": [
+      1.1144,
+      1.0486,
+      1.2115
+     ],
+     "producer_decision": "slower"
+    },
+    {
+     "bits": 32,
+     "T": 4096,
+     "validator": [
+      1.1221,
+      1.0456,
+      1.1462
+     ],
+     "validator_decision": "slower",
+     "producer": [
+      1.2026,
+      1.1161,
+      1.3033
+     ],
+     "producer_decision": "slower"
+    },
+    {
+     "bits": 32,
+     "T": 16384,
+     "validator": [
+      1.2382,
+      1.147,
+      1.2566
+     ],
+     "validator_decision": "slower",
+     "producer": [
+      1.2885,
+      1.2688,
+      1.3194
+     ],
+     "producer_decision": "slower"
+    }
+   ],
+   "decisions_reproduced": 6,
+   "independent_best_of_partB": [
+    {
+     "cfg": [
+      24,
+      1024,
+      1,
+      43
+     ],
+     "validator": 0.7867,
+     "producer": 0.7688
+    },
+    {
+     "cfg": [
+      24,
+      4096,
+      2,
+      43
+     ],
+     "validator": 0.783,
+     "producer": 0.8003
+    },
+    {
+     "cfg": [
+      24,
+      16384,
+      3,
+      43
+     ],
+     "validator": 0.9216,
+     "producer": 0.8719
+    },
+    {
+     "cfg": [
+      28,
+      1024,
+      3,
+      43
+     ],
+     "validator": 1.0434,
+     "producer": 0.9118
+    },
+    {
+     "cfg": [
+      28,
+      4096,
+      1,
+      43
+     ],
+     "validator": 1.0344,
+     "producer": 1.0154
+    },
+    {
+     "cfg": [
+      28,
+      16384,
+      2,
+      43
+     ],
+     "validator": 0.9497,
+     "producer": 0.9535
+    },
+    {
+     "cfg": [
+      32,
+      1024,
+      3,
+      43
+     ],
+     "validator": 1.0893,
+     "producer": 1.2115
+    },
+    {
+     "cfg": [
+      32,
+      4096,
+      2,
+      43
+     ],
+     "validator": 1.1629,
+     "producer": 1.1519
+    },
+    {
+     "cfg": [
+      32,
+      16384,
+      2,
+      43
+     ],
+     "validator": 1.1525,
+     "producer": 1.2688
+    }
+   ],
+   "absolute_time_ratio_median": 1.00386557526822
+  },
+  "round2": {
+   "design": "added after round 1 (not pre-registered): 36 configurations x producer's fastest IC and rho key, 5 repeats",
+   "executions": 360,
+   "all_verified": true,
+   "cells": [
+    {
+     "bits": 24,
+     "T": 1024,
+     "validator": [
+      0.7986,
+      0.5724,
+      0.8567
+     ],
+     "decision": "faster"
+    },
+    {
+     "bits": 24,
+     "T": 4096,
+     "validator": [
+      0.7656,
+      0.6989,
+      0.9096
+     ],
+     "decision": "faster"
+    },
+    {
+     "bits": 24,
+     "T": 16384,
+     "validator": [
+      0.8274,
+      0.7814,
+      0.9028
+     ],
+     "decision": "faster"
+    },
+    {
+     "bits": 28,
+     "T": 1024,
+     "validator": [
+      0.9431,
+      0.9238,
+      1.1405
+     ],
+     "decision": "unranked"
+    },
+    {
+     "bits": 28,
+     "T": 4096,
+     "validator": [
+      1.0234,
+      0.9636,
+      1.1125
+     ],
+     "decision": "unranked"
+    },
+    {
+     "bits": 28,
+     "T": 16384,
+     "validator": [
+      0.9737,
+      0.9543,
+      1.0037
+     ],
+     "decision": "unranked"
+    },
+    {
+     "bits": 32,
+     "T": 1024,
+     "validator": [
+      1.0985,
+      1.0773,
+      1.1742
+     ],
+     "decision": "slower"
+    },
+    {
+     "bits": 32,
+     "T": 4096,
+     "validator": [
+      1.1222,
+      1.0506,
+      1.2018
+     ],
+     "decision": "slower"
+    },
+    {
+     "bits": 32,
+     "T": 16384,
+     "validator": [
+      1.2507,
+      1.123,
+      1.3026
+     ],
+     "decision": "slower"
+    }
+   ],
+   "decisions_reproduced": 8
+  },
+  "pooled": {
+   "repeats_per_key": 8,
+   "cells": [
+    {
+     "bits": 24,
+     "T": 1024,
+     "validator": [
+      0.8191,
+      0.6589,
+      0.8306
+     ],
+     "decision": "faster",
+     "producer_decision": "faster",
+     "producer_fixed_key_decision": "faster"
+    },
+    {
+     "bits": 24,
+     "T": 4096,
+     "validator": [
+      0.7684,
+      0.7552,
+      0.8141
+     ],
+     "decision": "faster",
+     "producer_decision": "faster",
+     "producer_fixed_key_decision": "faster"
+    },
+    {
+     "bits": 24,
+     "T": 16384,
+     "validator": [
+      0.8449,
+      0.7757,
+      0.9135
+     ],
+     "decision": "faster",
+     "producer_decision": "faster",
+     "producer_fixed_key_decision": "unranked"
+    },
+    {
+     "bits": 28,
+     "T": 1024,
+     "validator": [
+      0.9795,
+      0.9587,
+      0.9986
+     ],
+     "decision": "faster",
+     "producer_decision": "faster",
+     "producer_fixed_key_decision": "unranked"
+    },
+    {
+     "bits": 28,
+     "T": 4096,
+     "validator": [
+      1.0156,
+      0.9427,
+      1.0813
+     ],
+     "decision": "unranked",
+     "producer_decision": "unranked",
+     "producer_fixed_key_decision": "unranked"
+    },
+    {
+     "bits": 28,
+     "T": 16384,
+     "validator": [
+      0.9756,
+      0.9614,
+      1.0126
+     ],
+     "decision": "unranked",
+     "producer_decision": "unranked",
+     "producer_fixed_key_decision": "unranked"
+    },
+    {
+     "bits": 32,
+     "T": 1024,
+     "validator": [
+      1.1073,
+      1.0446,
+      1.1345
+     ],
+     "decision": "slower",
+     "producer_decision": "slower",
+     "producer_fixed_key_decision": "unranked"
+    },
+    {
+     "bits": 32,
+     "T": 4096,
+     "validator": [
+      1.1161,
+      1.089,
+      1.1623
+     ],
+     "decision": "slower",
+     "producer_decision": "slower",
+     "producer_fixed_key_decision": "slower"
+    },
+    {
+     "bits": 32,
+     "T": 16384,
+     "validator": [
+      1.2158,
+      1.191,
+      1.3008
+     ],
+     "decision": "slower",
+     "producer_decision": "slower",
+     "producer_fixed_key_decision": "slower"
+    }
+   ],
+   "decisions_reproduced": 9,
+   "size_level": {
+    "24": {
+     "below1": 12,
+     "n": 12,
+     "median": 0.809502933128044
+    },
+    "28": {
+     "below1": 9,
+     "n": 12,
+     "median": 0.985266287749524
+    },
+    "32": {
+     "below1": 0,
+     "n": 12,
+     "median": 1.1307388111042715
+    }
+   }
+  },
+  "interference": {
+   "round1": {
+    "executions": 702,
+    "opcost_runs": 7,
+    "total_wall_s": 633.9922445909974,
+    "steal_jiffies_pin_total": 469,
+    "steal_share_of_wall": 0.007397566831476975,
+    "executions_with_steal": 249,
+    "other_cpus_busy_jiffies_total": 1259,
+    "other_cpus_busy_share": 0.006619429026886646,
+    "loadavg_min_median_max": [
+     1.0,
+     1.00390625,
+     1.82861328125
+    ]
+   },
+   "round2": {
+    "executions": 360,
+    "all_verified": true,
+    "total_wall_s": 297.0929673139999,
+    "steal_share_of_wall": 0.00753972744710758,
+    "other_cpus_busy_share": 0.006227007043370099,
+    "loadavg_min_median_max": [
+     0.30908203125,
+     0.943359375,
+     0.99755859375
+    ]
+   }
+  },
+  "verdict": "directions reproduced (2^24 faster, 2^32 slower, 2^28 near parity); all 9 decisions reproduced on the pooled 8-repeat rerun and every producer interval overlaps the validator's; the three edge cells (24 b T = 16384, 28 b T = 1024, 32 b T = 1024) were unranked in the 3-repeat round 1, as in the producer's own fixed-key control; the 28 b T = 1024 magnitude is 0.98x, not 0.93x"
+ },
+ "price_model": {
+  "note": "validator diagnostic, not pre-registered (scripts/price_model.py)",
+  "per_cell": [
+   {
+    "bits": 24,
+    "T": 1024,
+    "measured_median": 0.7776964862952125,
+    "predicted_before_median": 0.9164218675217395,
+    "predicted_after_median": 0.8468359613416371,
+    "field_ops_only_median": 1.1703234163861065,
+    "ic_hash_share_median": 0.13532070749150998,
+    "rho_hash_share_median": 0.3212268848869691,
+    "ic_log2_table_median": 16.61619464830182,
+    "rho_log2_table_median": 17.117685387573843
+   },
+   {
+    "bits": 24,
+    "T": 4096,
+    "measured_median": 0.7923026353398502,
+    "predicted_before_median": 0.9608892428408128,
+    "predicted_after_median": 1.0175609645950194,
+    "field_ops_only_median": 0.8029505594456938,
+    "ic_hash_share_median": 0.1980650229423074,
+    "rho_hash_share_median": 0.039177110422659554,
+    "ic_log2_table_median": 17.512873148768186,
+    "rho_log2_table_median": 15.27462210607753
+   },
+   {
+    "bits": 24,
+    "T": 16384,
+    "measured_median": 0.8288248547988808,
+    "predicted_before_median": 0.9462576554363558,
+    "predicted_after_median": 1.0004535675148933,
+    "field_ops_only_median": 0.8567567731147909,
+    "ic_hash_share_median": 0.14922517121637296,
+    "rho_hash_share_median": 0.04183612591846386,
+    "ic_log2_table_median": 18.466661641242897,
+    "rho_log2_table_median": 16.670062397451822
+   },
+   {
+    "bits": 28,
+    "T": 1024,
+    "measured_median": 0.9318617164586132,
+    "predicted_before_median": 0.9962687860303494,
+    "predicted_after_median": 0.9175128641354335,
+    "field_ops_only_median": 0.7516209131784551,
+    "ic_hash_share_median": 0.2581119880550539,
+    "rho_hash_share_median": 0.007472837699566742,
+    "ic_log2_table_median": 18.498851120620017,
+    "rho_log2_table_median": 13.951826717347744
+   },
+   {
+    "bits": 28,
+    "T": 4096,
+    "measured_median": 1.0532513946390751,
+    "predicted_before_median": 1.2227108330597254,
+    "predicted_after_median": 1.0865404864123052,
+    "field_ops_only_median": 0.7598552397844616,
+    "ic_hash_share_median": 0.39962752691444914,
+    "rho_hash_share_median": 0.02860541564077237,
+    "ic_log2_table_median": 19.622264436843842,
+    "rho_log2_table_median": 16.376453629605763
+   },
+   {
+    "bits": 28,
+    "T": 16384,
+    "measured_median": 1.0072227455211964,
+    "predicted_before_median": 1.1493251417280195,
+    "predicted_after_median": 1.0440483745301372,
+    "field_ops_only_median": 0.7808878588012576,
+    "ic_hash_share_median": 0.3621678505365087,
+    "rho_hash_share_median": 0.06314519363870702,
+    "ic_log2_table_median": 20.56063461910339,
+    "rho_log2_table_median": 17.825585455970998
+   },
+   {
+    "bits": 32,
+    "T": 1024,
+    "measured_median": 1.1144071828980056,
+    "predicted_before_median": 1.2150928177134892,
+    "predicted_after_median": 1.0936534234781425,
+    "field_ops_only_median": 0.7571762656091957,
+    "ic_hash_share_median": 0.3893335233990881,
+    "rho_hash_share_median": 0.009985356613946152,
+    "ic_log2_table_median": 20.56950519780512,
+    "rho_log2_table_median": 15.955483803096147
+   },
+   {
+    "bits": 32,
+    "T": 4096,
+    "measured_median": 1.202571211683814,
+    "predicted_before_median": 1.1942119703287397,
+    "predicted_after_median": 1.1512656636571115,
+    "field_ops_only_median": 0.727268277518991,
+    "ic_hash_share_median": 0.3985845617477909,
+    "rho_hash_share_median": 0.007268710821136339,
+    "ic_log2_table_median": 21.590560781521226,
+    "rho_log2_table_median": 16.466252730510227
+   },
+   {
+    "bits": 32,
+    "T": 16384,
+    "measured_median": 1.2885020349125165,
+    "predicted_before_median": 1.1426321939106534,
+    "predicted_after_median": 1.103716018061403,
+    "field_ops_only_median": 0.7161502385647929,
+    "ic_hash_share_median": 0.3857600579586947,
+    "rho_hash_share_median": 0.015088559482829576,
+    "ic_log2_table_median": 22.545853311492664,
+    "rho_log2_table_median": 17.968411912897018
+   }
+  ]
+ },
+ "reporting_contract": {
+  "one_table_one_unit": true,
+  "ratio_reported": true,
+  "phases_separated": "solve (ms_arm) and solve + shared verification (ms) reported separately",
+  "reference_arm_priced": "in wall time every arm's work is inside ms_arm (no unpriced counter); the section 5a band of the counted study is v5's",
+  "null_A_A": true,
+  "cheaper_baseline": "bsgs2 reported (IC 1.33-1.59x slower)",
+  "frozen_benchmark": "v5 instances, seed 43",
+  "external_fastest_implementation": "not compared; the claim is scoped to this harness's implementation and says so",
+  "isolation": "not L2: one shared cloud VM, labelled diagnostic in PROTOCOL, RESULTS and the claim",
+  "m83_ecc2k130": "RESULTS Limits: says nothing about ECC2K-130 / m = 83"
+ },
+ "headline": [
+  {
+   "name": "ic/rho 2^24 min",
+   "claimed": 0.78,
+   "recomputed": 0.7776964862952125,
+   "rel_tol": 0.0064102564112564105
+  },
+  {
+   "name": "ic/rho 2^24 max",
+   "claimed": 0.83,
+   "recomputed": 0.8288248547988808,
+   "rel_tol": 0.006024096386542169
+  },
+  {
+   "name": "ic/rho 28/1024",
+   "claimed": 0.93,
+   "recomputed": 0.9318617164586132,
+   "rel_tol": 0.005376344087021505
+  },
+  {
+   "name": "ic/rho 2^32 min",
+   "claimed": 1.11,
+   "recomputed": 1.1144071828980056,
+   "rel_tol": 0.004504504505504505
+  },
+  {
+   "name": "ic/rho 2^32 max",
+   "claimed": 1.29,
+   "recomputed": 1.2885020349125165,
+   "rel_tol": 0.003875968993248062
+  },
+  {
+   "name": "fixed-key min",
+   "claimed": 0.75,
+   "recomputed": 0.7518252183013685,
+   "rel_tol": 0.0066666666676666675
+  },
+  {
+   "name": "fixed-key max",
+   "claimed": 1.28,
+   "recomputed": 1.2842975890130073,
+   "rel_tol": 0.003906250001
+  },
+  {
+   "name": "validator pooled 28/1024",
+   "claimed": 0.98,
+   "recomputed": 0.979529781603075,
+   "rel_tol": 0.0051020408173265315
+  },
+  {
+   "name": "validator pooled 2^24 min",
+   "claimed": 0.77,
+   "recomputed": 0.7683670572728882,
+   "rel_tol": 0.0064935064945064935
+  },
+  {
+   "name": "validator pooled 2^24 max",
+   "claimed": 0.84,
+   "recomputed": 0.8448628369148738,
+   "rel_tol": 0.005952380953380953
+  },
+  {
+   "name": "validator pooled 2^32 min",
+   "claimed": 1.11,
+   "recomputed": 1.1073011545965956,
+   "rel_tol": 0.004504504505504505
+  },
+  {
+   "name": "validator pooled 2^32 max",
+   "claimed": 1.22,
+   "recomputed": 1.2157749832986844,
+   "rel_tol": 0.0040983606567377056
+  },
+  {
+   "name": "ic/bsgs min",
+   "claimed": 1.33,
+   "recomputed": 1.3264556516342325,
+   "rel_tol": 0.0037593984972406013
+  },
+  {
+   "name": "ic/bsgs max",
+   "claimed": 1.59,
+   "recomputed": 1.5899351606584662,
+   "rel_tol": 0.003144654089050314
+  },
+  {
+   "name": "GAE ns min",
+   "claimed": 214,
+   "recomputed": 214.422,
+   "rel_tol": 0.002336448599130841
+  },
+  {
+   "name": "GAE ns max",
+   "claimed": 294,
+   "recomputed": 293.751,
+   "rel_tol": 0.0017006802731088435
+  },
+  {
+   "name": "I/M min",
+   "claimed": 23,
+   "recomputed": 22.970260710074676,
+   "rel_tol": 0.021739130435782607
+  },
+  {
+   "name": "I/M max",
+   "claimed": 31,
+   "recomputed": 30.584976025572722,
+   "rel_tol": 0.016129032259064514
+  },
+  {
+   "name": "canonicalisation+hash GAE min",
+   "claimed": 0.005,
+   "recomputed": 0.004905515215267353,
+   "rel_tol": 0.10000000000100001
+  },
+  {
+   "name": "canonicalisation+hash GAE max",
+   "claimed": 0.009,
+   "recomputed": 0.00937403811176092,
+   "rel_tol": 0.05555555555655556
+  },
+  {
+   "name": "step index GAE min",
+   "claimed": 0.002,
+   "recomputed": 0.002389779098624345,
+   "rel_tol": 0.250000000001
+  },
+  {
+   "name": "step index GAE max",
+   "claimed": 0.006,
+   "recomputed": 0.005671059872587701,
+   "rel_tol": 0.08333333333433333
+  },
+  {
+   "name": "std lookup GAE min",
+   "claimed": 0.04,
+   "recomputed": 0.03754880834448223,
+   "rel_tol": 0.125000000001
+  },
+  {
+   "name": "std lookup GAE max",
+   "claimed": 0.85,
+   "recomputed": 0.8527572072378106,
+   "rel_tol": 0.005882352942176471
+  },
+  {
+   "name": "configurations below 1 at 2^24",
+   "claimed": 12,
+   "recomputed": 12
+  },
+  {
+   "name": "configurations above 1 at 2^32",
+   "claimed": 12,
+   "recomputed": 12
+  },
+  {
+   "name": "validator pooled decisions reproduced",
+   "claimed": 9,
+   "recomputed": 9
+  }
+ ],
+ "headline_mismatches": [],
+ "findings": [
+  {
+   "id": "T-F1",
+   "severity": "blocking for the headline as stated (wording)",
+   "requirement": "selection-bias control",
+   "finding": "The producer's headline says the selection-bias control (keys fixed per cell on repeat 0, scored on repeats 1-2) shows 'the same pattern, 0.75-1.28x'. The range recomputes exactly (0.7518-1.2843), but the control's protocol decisions differ from the primary rule in 3 of 9 cells: 2^24 T = 16384 unranked (0.752 [0.655, 1.211]), 2^28 T = 1024 unranked (0.975 [0.884, 1.137]) and 2^32 T = 1024 unranked (1.096 [0.972, 1.351]). The control therefore supports 'faster' in 2 of 3 cells at 2^24, none at 2^28 and 'slower' in 2 of 3 at 2^32. Validator leave-one-repeat-out diagnostic: 32 of 36 ratios below 1 at 2^24, 2 of 36 at 2^32, and 7 of 12 at 2^28 T = 1024.",
+   "evidence": [
+    "recompute.json cells[].fixed_ic_rho_solve, verdict_fixed, loo_ic_rho_solve",
+    "results_check.json quoted[fixed-key control 'the same pattern']"
+   ]
+  },
+  {
+   "id": "T-F2",
+   "severity": "blocking for the claim wording (unit)",
+   "requirement": "opcost prices",
+   "finding": "'A native operation 0.005-0.009 GAE' is canon_hash_ns / padd_ns, and canon_hash_ns times a canonicalisation plus one hash of x, which the harness counts as TWO native operations (rhodpu's canon closure calls f.native() twice per generated point). Per counted native operation the measured price is 0.0025-0.0047 GAE; the step-index loop is 0.0024-0.0057 GAE, not 0.005-0.009 as RESULTS ('or a step index') says. Both include the loop overhead (loop baseline 0.61-0.88 ns, 0.0026-0.0041 GAE). The conclusion that native work is nearly free (h_native about 0) is unaffected.",
+   "evidence": [
+    "recompute.json opcost_ranges.native_gae, step_index_gae, native_minus_baseline_gae",
+    "examples/mt_fieldops.rs rhodpu canon closure (two f.native() calls)"
+   ]
+  },
+  {
+   "id": "T-F3",
+   "severity": "disclosure (robustness of the edge cells)",
+   "requirement": "timing reproducibility",
+   "finding": "Validator timing on the same host, the same bit-identical binary, pinned to CPU 2, with the producer's per-configuration keys (selected on the producer's medians, scored on new timings). Round 1 (3 repeats, part A all 36 configurations + part B one nonce-drawn configuration per cell x 17 keys): 6 of 9 decisions reproduced; 2^24 T = 16384 (0.911 [0.811, 1.009]), 2^28 T = 1024 (0.991 [0.970, 1.043]) and 2^32 T = 1024 (1.072 [0.954, 1.109]) unranked: the three cells where the producer's fixed-key control is also unranked. Round 2 (5 repeats, added after round 1 and reported separately): 8 of 9 (2^28 T = 1024 unranked, 0.943 [0.924, 1.140]). Pooled (8 repeats per key): 9 of 9 decisions reproduced; 2^24 0.768-0.845 (12 of 12 configurations below 1), 2^28 0.976-1.016 (T = 1024 0.980 [0.959, 0.999], faster by a hair), 2^32 1.107-1.216 (12 of 12 above 1). Every producer cell interval overlaps the pooled validator interval. Per-configuration ratios differ between sessions by a median of 5.1% (p90 14%, max 22%), more than the within-session A/A median single-repeat deviation (2.8%) and within the per-cell A/A rep0/rep1 intervals. The 2^24 'faster' and 2^32 'slower' directions reproduce; the 28 b T = 1024 magnitude does not (0.93 vs 0.98) and its decision is fragile.",
+   "evidence": [
+    "timing_reproduction.json analysis_round1.cells, analysis_rounds.rounds.{round1,round2,pooled}"
+   ]
+  },
+  {
+   "id": "T-F4",
+   "severity": "disclosure (statistics)",
+   "requirement": "decision rule",
+   "finding": "With n = 4 configurations per cell, the protocol's bootstrap 95% interval of the median equals [min, max] of the 4 configuration ratios in all 9 cells (a resample has median equal to the maximum with probability 13/256 > 2.5%; the exact bootstrap over all 256 resamples gives the same bounds). A 'faster'/'slower' decision therefore means all 4 configurations on one side of 1 (two-sided sign-test p = 0.125 for one cell); the '95%' label is nominal. The size-level evidence is the strong part: 12 of 12 configurations below 1 at 2^24 and 12 of 12 above 1 at 2^32 in the producer's data (two-sided sign test p = 0.00049 each), 11 of 12 in validator round 1 and 12 of 12 in round 2 and pooled.",
+   "evidence": [
+    "recompute.json cells[].ic_rho_solve.{lo,min,hi,max,exact_lo,exact_hi,p_median_eq_max}, size_level"
+   ]
+  },
+  {
+   "id": "T-F5",
+   "severity": "blocking for the claim wording",
+   "requirement": "instances",
+   "finding": "The claim says '12 fresh prime-order Weierstrass curves'. They are the v5 instances W{24,28,32}-{0..3} (first used in v5 with seeds 41 and 42; PROTOCOL.md says so). They are valid (p and n prime, cofactor 1 by Hasse, [n]G = O; n has 24-25, 28-29 and 32-33 bits) and were not tuned on in this study, but they are not fresh. The seed 43 is new.",
+   "evidence": [
+    "scalar_check.json instances",
+    "PROTOCOL.md Design"
+   ]
+  },
+  {
+   "id": "T-F6",
+   "severity": "non-blocking (RESULTS.md prose)",
+   "requirement": "reported numbers",
+   "finding": "(a) 'rho2xks (kappa 0.25-0.5) in 7' should be 6, and rhodpu at kappa 0.25 wins 1 (2^32, T = 16384, not mentioned); the distinguished-point rho is fastest in 30 of 36, 29 of them at kappa 0. (b) std lookup at 2^18-2^20 is 0.11-0.42 GAE, not 0.12-0.42 (28 b 'after', 2^18: 0.1145). (c) 'A fast multiplicative hasher is 2-5x cheaper': the std/fast lookup ratio is 1.2-6.1x over the 48 table entries (median 3.8, 10-90% 3.2-4.6). (d) 'although it never won in v5's counted model' is false: the validated, amended v5 RESULTS has rhodpu fastest in 4 of 198 configurations at h = 1 (I = 10 M).",
+   "evidence": [
+    "results_check.json quoted",
+    "recompute.json winners, opcost_ranges",
+    "../../mt_fieldops_v5_20261112/RESULTS.md line 49"
+   ]
+  },
+  {
+   "id": "T-F7",
+   "severity": "interpretation (label)",
+   "requirement": "interpretation",
+   "finding": "RESULTS labels 'Answer to the v5 question' as interpretation, correctly. Validator price model (not pre-registered; predicted ns = I inv + M mul + S sqr + H lookup(own table size) + N canon_hash/2 at the opcost prices): field operations alone favour the IC at 2^28-2^32 (IC/rho 0.72-0.78); adding the std-HashMap lookup price at each run's own table size predicts 1.14-1.22 at 2^32 ('before' prices; 1.09-1.15 'after') against 1.11-1.29 measured, with lookups about 39-40% of the IC's predicted time and 1-2% of rhodpu's. So 'the IC's large-table lookups cost it the 2^32 cells' is quantitatively consistent; 'lookups miss cache' is not measured (no PMU) and must stay interpretation. At 2^24 the price list predicts 0.85-1.02 against 0.78-0.83 measured, so it does not explain the 2^24 advantage. 'h_native about 0 favours the distinguished-point rho' is consistent (rhodpu's native work is under 1% of its predicted time) but untested as a cause.",
+   "evidence": [
+    "price_model.json per_cell"
+   ]
+  },
+  {
+   "id": "T-F8",
+   "severity": "pass, with method caveats to disclose",
+   "requirement": "opcost microbenchmark",
+   "finding": "No dead code: the mul, sqr, inv and padd loops are loop-carried dependency chains through black_box; the native and lookup loops accumulate into a value passed to black_box; at param 1.0 every loop runs 4x longer and the counters scale exactly (I 4,000,006, M 26,000,012, S 24,000,009 vs 1,000,006 / 6,500,012 / 6,000,009 at 0.25) while per-operation times stay nonzero and comparable. The padd chain is exactly one affine addition per step: the counters equal the expected I + 2M + S per step plus the two setup multiplications, so there was no doubling and no reset to G. Caveats: lookups are timed as independent probes (memory-level parallelism), not interleaved with dependent field arithmetic as in the harness; probes are 50% inserted keys and 50% uniform in [0, p), so at 24 bits with 2^22-2^24 inserted keys most 'misses' hit (2^24 random keys in [0, 2^24) are about 63% distinct) and the hit mix varies with size and curve; capacity is 2x the key count; single segments can be far off (validator run: one mul segment 28.8 ns against 7.3-7.8, giving I/M 6.0; producer 28 b 'after' padd 294 ns = 1.30x its I + 2M + S). The validator's 7 opcost runs reproduce the producer's ranges apart from that segment: GAE 209-267 ns, I/M 25-34, canonicalisation + hash 0.0055-0.0081 GAE, std lookup 0.047-0.144 (2^10-2^16) and 0.36-0.73 GAE (2^22-2^24).",
+   "evidence": [
+    "timing_reproduction.json opcost, analysis_round1.opcost",
+    "recompute.json opcost_ranges.counters_match_expected_all"
+   ]
+  },
+  {
+   "id": "T-F9",
+   "severity": "pass",
+   "requirement": "ms_arm timer placement",
+   "finding": "t0 is taken after the instance is parsed, after the targets are planted with an uncounted field copy and after the RNG is seeded; ms_arm is read immediately after the arm's match returns, before the shared counted verification; ms adds the verification and the output formatting. The same lines bracket every arm, and everything an arm does (factor base, tables, relations, walks, restarts, trials, log bookkeeping) is inside. Planting is excluded for every arm. The diff from the v5 harness (5aab996e55) adds only the opcost arm, the ms_arm variable and the ms_arm output field.",
+   "evidence": [
+    "examples/mt_fieldops.rs lines 295 and 2754-2755",
+    "git diff 5aab996e55 a992ed6c80 -- examples/mt_fieldops.rs"
+   ]
+  },
+  {
+   "id": "T-F10",
+   "severity": "pass",
+   "requirement": "provenance and counters",
+   "finding": "Protocol commit a992ed6c80 (04:22:59Z) contains PROTOCOL.md, run.py, analyze.py and the harness; the run started 04:23:14Z; rows record 298863e526 (bench-record-only commit); PROTOCOL.md, run.py and analyze.py are byte-identical at 544f832063. The measured binary (sha256 77bb5092...e52e4, in all 1836 rows and 6 opcost records) is reproduced bit for bit by a rebuild of the committed source in a separate target directory. All 612 run keys (1836 rows) replay exactly on the validator's standalone build of the frozen source (every printed field except ms_arm and ms), a 17-key nonce sample (51 rows) on the producer's binary matches, the counters are identical across the 3 repeats of every key, and 35 nonce-drawn v5 rows (5 per arm, seeds 41/42) replay with the timed binary with every counted field identical: no counted operation changed since v5.",
+   "evidence": [
+    "replay_check.json",
+    "replay-certificate.json binary"
+   ]
+  },
+  {
+   "id": "T-F11",
+   "severity": "pass",
+   "requirement": "correctness certificates",
+   "finding": "ok = targets in all 1836 rows (13,160,448 target verifications by the harness's counted double-and-add). Validator EC check (own affine code): 54 nonce-drawn run keys (162 rows; 30 configurations; all 7 arms; all 3 sizes) dumped by a build that only adds an output dump; 319,488 recovered logs, 147,422 distinct scalar multiplications; every Q_t on the curve, every log in [0, n), equal to the planted log, and [log]G = Q_t; planted lists identical across runs of a configuration; 0 failures. All 12 instances valid.",
+   "evidence": [
+    "scalar_check.json",
+    "recompute.json checks"
+   ]
+  },
+  {
+   "id": "T-F12",
+   "severity": "pass, with disclosure",
+   "requirement": "host state",
+   "finding": "Producer run: per-execution 1-minute load average 0.55-1.08 (median 1.00; the first executions read the pre-run average), so no competing CPU-bound process; CPU 2 recorded 1299 steal jiffies (13 s) from boot (about 04:16Z) to 04:54:51Z, a window containing the whole 1662 s run, so at most 0.8%. Validator rounds: steal on CPU 2 was 0.74% and 0.75% of wall time and the other three CPUs were 0.66% and 0.62% busy; per-key absolute times reproduce the producer's at a median ratio of 1.004 (range 0.70-1.39).",
+   "evidence": [
+    "timing_reproduction.json analysis_round1.interference, analysis_rounds.round2_interference",
+    "recompute.json checks.loadavg_min_median_max"
+   ]
+  },
+  {
+   "id": "T-F13",
+   "severity": "non-blocking (repository policy)",
+   "requirement": "AGENTS.md section 13",
+   "finding": "results/holdout/runs.jsonl (1,357,788 bytes) is a .jsonl over 64 KiB committed to Git instead of the artifact store with a .artifacts.json manifest (the same as V5-F7 in v5). runs.json is its exact projection (0 field mismatches; source_sha256 matches).",
+   "evidence": [
+    "recompute.json checks.runs_json_vs_runs_jsonl_field_mismatches"
+   ]
+  },
+  {
+   "id": "T-F14",
+   "severity": "non-blocking (preservation)",
+   "requirement": "raw evidence",
+   "finding": "The protocol's predictions come from a smoke run that run.py defines as W24-0, seed 43, T = 1024, which is also one of the 36 holdout configurations. The smoke output (results/smoke/) is not in the repository. No analysis choice depends on it, but the raw smoke data should be preserved or their absence stated.",
+   "evidence": [
+    "run.py keys('smoke')",
+    "PROTOCOL.md Predictions"
+   ]
+  },
+  {
+   "id": "T-F15",
+   "severity": "pass",
+   "requirement": "protocol",
+   "finding": "Frozen before data; seeds (planting 43, order 20261112) as declared; the execution order re-derived independently from run.py's rule matches all 1836 rows (rounds in sequence, a seeded shuffle inside each; repeats of a key 652-1816 executions apart); no post-hoc change to run.py, analyze.py or PROTOCOL.md; the wrong size prediction is reported as wrong; the limits (one shared VM, diagnostic seconds, no PMU, one implementation, std SipHash, 4 curves per size, one seed, nothing about single-target ECDLP or ECC2K-130 / m = 83) are stated. 'Faster/slower' is the protocol's 'cheaper/dearer' decision applied to wall time, so the wording follows the rule; the rule's strength is as in T-F4 and its edge cells as in T-F1 and T-F3. Add to the limits: between-session variation of a per-cell ratio (median 5%) exceeds the within-session A/A median (2.8%); std::collections::HashMap seeds SipHash per process (RandomState), one source of run-to-run variation.",
+   "evidence": [
+    "recompute.json checks",
+    "PROTOCOL.md",
+    "RESULTS.md Limits"
+   ]
+  }
+ ],
+ "required_amendments": [
+  "Non-blocking (T-F1 follow-up): in RESULTS 'Selection-bias control', 'unranked in 3 of 9 cells' should read 'unranked in 5 of 9 cells; it departs from the primary decision in 3 (24 b T = 16384, 28 b T = 1024, 32 b T = 1024)'.",
+  "Non-blocking (T-F6 follow-up): 'won only 4 of 198 configurations in v5's counted model' needs its scope: 4 of 198 at I = 10 M and h = 1 (27 of 198 at I = 3 M, h = 1; none at h = 0 and 0.1).",
+  "Non-blocking: 'both at the loop baseline' holds for the step index (1.05-1.38x the loop baseline), not for the canonicalisation + hash (1.9-3.2x).",
+  "Non-blocking: the price-model figure 1.14-1.22x at 2^32 uses the 'before' prices; with the 'after' prices it is 1.09-1.15x.",
+  "Non-blocking (T-F13): move runs.jsonl to the artifact store as RESULTS says."
+ ],
+ "accepted_results_headline": "On one CPU of a 4-vCPU cloud VM (Intel Xeon @ 2.10 GHz; not an isolated lab node, so the seconds are diagnostic), in this harness's implementation (std HashMap with SipHash), 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, with a new seed; T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats, every target verified: the fastest of four multi-target index-calculus variants per configuration takes 0.78-0.83x the solve-phase wall time of the fastest of ten multi-target rho runs at 2^24 (faster in all 3 cells; 12 of 12 configurations below 1), 0.93x at 2^28 with T = 1024 (faster under the primary rule, but unranked under the pre-registered fixed-key control and 0.98x in the validator's rerun), is unranked at 2^28 with T = 4096 and 16384, and takes 1.11-1.29x at 2^32 (slower in all 3 cells; 12 of 12 configurations above 1). Each cell decision is a 4-of-4 sign rule (the bootstrap interval of the median of 4 equals their range). The pre-registered fixed-key control (0.75-1.28x) is unranked in one cell at each end (2^24 with T = 16384, 2^32 with T = 1024); an independent pinned rerun with the same keys (8 repeats) reproduces all 9 decisions at 0.77-0.84x (2^24) and 1.11-1.22x (2^32). The IC takes 1.33-1.59x the time of a paired BSGS. Measured prices (opcost microbenchmarks; lookups and native operations timed as independent-iteration loops): one affine addition 214-294 ns, I/M 23-31, a canonicalisation plus one hash of x (two counted native operations) 0.005-0.009 GAE and a step index 0.002-0.006 GAE, a std HashMap lookup 0.04-0.85 GAE at 2^10-2^24 entries.",
+ "amendments_check": [
+  {
+   "id": "T-F1",
+   "applied": "partly",
+   "note": "RESULTS reports the control's decisions, but says it is 'unranked in 3 of 9 cells'; it is unranked in 5 of 9 (24/16384, 28/1024, 28/4096, 28/16384, 32/1024) and departs from the primary decision in 3 (24/16384, 28/1024, 32/1024)",
+   "correct": "selection-bias control: unranked in 5 of 9 cells; it departs from the primary decision in 3 (24 b T = 16384, 28 b T = 1024, 32 b T = 1024), and 28 b T = 4096 and 16384 are unranked under both. (The validator's first-issue verdict text said 'unranked in 3 of 9 cells'; that was imprecise and is corrected in this issue.)"
+  },
+  {
+   "id": "T-F2",
+   "applied": true,
+   "note": "native price stated per pair (two counted native operations), per operation 0.0025-0.0047, step index 0.002-0.006"
+  },
+  {
+   "id": "T-F3/T-F4",
+   "applied": true,
+   "note": "4-of-4 rule, 28/1024 fragility and the reproduction figures disclosed"
+  },
+  {
+   "id": "T-F5",
+   "applied": true,
+   "note": "'reuse the 12 v5 curves (not fresh)'"
+  },
+  {
+   "id": "T-F6",
+   "applied": "partly",
+   "note": "rho2xks 6 / rhodpu 30 (29 + 1), 0.11-0.42 and 1.2-6.1x corrected; 'won only 4 of 198 configurations in v5's counted model' needs its scope: 4 of 198 at I = 10 M and h = 1, 27 of 198 at I = 3 M and h = 1, none at h = 0 and 0.1 (v5 RESULTS 'Which arm wins')"
+  },
+  {
+   "id": "T-F7",
+   "applied": true,
+   "note": "cache misses labelled interpretation; price model quoted (1.14-1.22 at 2^32 is the 'before' prices; 1.09-1.15 with the 'after' prices)"
+  },
+  {
+   "id": "T-F13",
+   "applied": false,
+   "note": "runs.jsonl still in Git; RESULTS says it moves to the artifact store when the PR opens"
+  },
+  {
+   "id": "T-F14",
+   "applied": true,
+   "note": "smoke run's absence recorded in Limits"
+  },
+  {
+   "id": "new (minor)",
+   "applied": false,
+   "note": "'both at the loop baseline': the step index is 1.05-1.38x the loop baseline, the canonicalisation + hash 1.9-3.2x (0.0025-0.0063 GAE above it); 'h_native about 0' is unaffected"
+  }
+ ],
+ "history": [
+  {
+   "issue": 1,
+   "commit": "544f8320631c9d71b7636d0c51ae031472457cf7",
+   "status": "fail",
+   "disposition": "insufficient_evidence",
+   "sha256": "4e92ffe8a92df02886a5a826e2f1b1df039aa3a75a1b6cdd7e4d90f377c6e09c",
+   "judged": "the producer's original headline",
+   "correction": "its verdict said the control's decisions are 'unranked in 3 of 9 cells'; precisely, they depart from the primary decision in 3 of 9 cells and are unranked in 5 of 9"
+  }
+ ],
+ "path_rebase": {
+  "from": "research/mt_timed_20261112/validation/validator-report.json",
+  "from_sha256": "a5b49cf96079d8ec234c6632ad5a38b6a98d75746de715605cd929dc75fc6a6d",
+  "change": "raw_data paths rebased from the validation/ directory to this benchmarks directory; nothing else changed"
+ }
+}

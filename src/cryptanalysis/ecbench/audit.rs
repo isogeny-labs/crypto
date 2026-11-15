@@ -711,6 +711,12 @@ fn compare_replay(
                 .retain(|k, _| !legacy::is_setup_descriptor(k) || rec.native.contains_key(k));
         }
     }
+    // The three-lead adapters' cost-accounting counters are compared only
+    // where the record has them (`legacy::admits_pre_cost_accounting`).
+    if legacy::admits_pre_cost_accounting(r) {
+        rep.counters
+            .retain(|k, _| !legacy::is_cost_accounting_counter(k) || r.counters.contains_key(k));
+    }
     let rep = &rep;
     let mut diffs = Vec::new();
     if rep.recovered.map(|k| k.to_string()) != r.outcome.recovered {
@@ -980,6 +986,46 @@ pub struct AuditOptions {
     pub replay_seqs: Vec<u64>,
     /// Accept an `interrupted` (or never-finalised) session.
     pub allow_interrupted: bool,
+}
+
+/// A record `ecbench verify --replay-seq` may address, with the figures the
+/// replay-sentinel selection ranks by (`sentinels`).  The same predicate
+/// the audit applies: a measured record in its plan slot, of a
+/// deterministic method, with a replayable outcome ([`replayable`]).
+#[derive(Clone, Debug, PartialEq)]
+pub struct ReplayCandidate {
+    pub seq: u64,
+    pub record_id: String,
+    pub method_id: String,
+    pub solve_wall_ns: Option<u64>,
+    pub total_gae: Option<f64>,
+}
+
+/// The replayable records of the session in `dir` (`records.jsonl` and
+/// `plan.json` decompressed), in sequence order.  Reads, never replays;
+/// nothing is checked beyond what addressing a record needs.
+pub fn replay_candidates(dir: &Path) -> Result<Vec<ReplayCandidate>, String> {
+    let plan_path = dir.join("plan.json");
+    let plan_doc: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(&plan_path)
+            .map_err(|e| format!("{}: {e}", plan_path.display()))?,
+    )
+    .map_err(|e| format!("{}: {e}", plan_path.display()))?;
+    let planned = plan_doc["executions"].as_array().map_or(0, Vec::len);
+    let file = read_record_file(dir)?;
+    Ok(file
+        .lines
+        .iter()
+        .enumerate()
+        .filter(|(i, (_, r))| *i < planned && r.seq == *i as u64 && replayable(r))
+        .map(|(_, (_, r))| ReplayCandidate {
+            seq: r.seq,
+            record_id: r.record_id.clone(),
+            method_id: r.method.id.clone(),
+            solve_wall_ns: r.time.solve_wall_ns,
+            total_gae: r.cost.total_gae,
+        })
+        .collect())
 }
 
 /// Audit `dir`; replay up to `replay` deterministic measured runs
