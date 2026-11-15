@@ -274,9 +274,10 @@ struct Out {
     extra: String,
 }
 
-/// The table of ic5b, rho2xksp and rhodpup: std HashMap (exactly ic5's) or a flat open-addressed array of 8-byte slots
-/// (u32 x key, u32 index into `ents`), load factor at most 1/2, multiplicative hash, linear probing.
-/// The flat form needs x < 2^32 - 1 (p < 2^32); first insert of an x wins, as `entry().or_insert`.
+/// The table of ic5b, rho2xksp and rhodpup: std HashMap (exactly ic5's) or a flat open-addressed array of slots
+/// (x key, u32 index into `ents`), load factor at most 1/2, multiplicative hash, linear probing.
+/// For p < 2^32 the slots are 8 bytes (u32 key, `Flat`); for larger p they are 16 bytes (u64 key, `FlatW`,
+/// added for research/mt_ic_scale_20261115). First insert of an x wins, as `entry().or_insert`.
 enum Tab<V: Copy> {
     Std(HashMap<u64, V>),
     Flat {
@@ -285,26 +286,148 @@ enum Tab<V: Copy> {
         mask: usize,
         shift: u32,
     },
+    FlatW {
+        slots: Vec<(u64, u32)>,
+        ents: Vec<V>,
+        mask: usize,
+        shift: u32,
+    },
 }
 const FLAT_EMPTY: u32 = u32::MAX;
+/// A flat-table key: the x coordinate, narrowed to u32 when p < 2^32. `EMPTY` is never a valid x.
+trait FKey: Copy + Eq {
+    const EMPTY: Self;
+    fn of(x: u64) -> Self;
+    fn wide(self) -> u64;
+}
+impl FKey for u32 {
+    const EMPTY: u32 = u32::MAX;
+    #[inline]
+    fn of(x: u64) -> u32 {
+        x as u32
+    }
+    #[inline]
+    fn wide(self) -> u64 {
+        self as u64
+    }
+}
+impl FKey for u64 {
+    const EMPTY: u64 = u64::MAX;
+    #[inline]
+    fn of(x: u64) -> u64 {
+        x
+    }
+    #[inline]
+    fn wide(self) -> u64 {
+        self
+    }
+}
+#[inline]
+fn flat_home(x: u64, shift: u32) -> usize {
+    (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> shift) as usize
+}
+fn flat_insert<K: FKey, V>(
+    slots: &mut Vec<(K, u32)>,
+    ents: &mut Vec<V>,
+    mask: &mut usize,
+    shift: &mut u32,
+    x: u64,
+    e: V,
+) {
+    // keep the load factor at most 1/2: double and reinsert (never reached by ic5b, whose capacity bound is
+    // exact; rho databases grow with retained walks)
+    if 2 * ents.len() >= slots.len() {
+        let size = 2 * slots.len();
+        let nshift = 64 - size.trailing_zeros();
+        let mut ns = vec![(K::EMPTY, 0u32); size];
+        for &(k, v) in slots.iter() {
+            if k != K::EMPTY {
+                let mut j = flat_home(k.wide(), nshift);
+                while ns[j].0 != K::EMPTY {
+                    j = (j + 1) & (size - 1);
+                }
+                ns[j] = (k, v);
+            }
+        }
+        *slots = ns;
+        *mask = size - 1;
+        *shift = nshift;
+    }
+    let key = K::of(x);
+    let mut i = flat_home(x, *shift);
+    loop {
+        let (k, _) = slots[i];
+        if k == K::EMPTY {
+            slots[i] = (key, ents.len() as u32);
+            ents.push(e);
+            return;
+        }
+        if k == key {
+            return;
+        }
+        i = (i + 1) & *mask;
+    }
+}
+#[inline]
+fn flat_get<K: FKey, V: Copy>(
+    slots: &[(K, u32)],
+    ents: &[V],
+    mask: usize,
+    shift: u32,
+    x: u64,
+) -> Option<V> {
+    if x >= K::EMPTY.wide() {
+        return None;
+    }
+    let key = K::of(x);
+    let mut i = flat_home(x, shift);
+    loop {
+        let (k, v) = slots[i];
+        if k == K::EMPTY {
+            return None;
+        }
+        if k == key {
+            return Some(ents[v as usize]);
+        }
+        i = (i + 1) & mask;
+    }
+}
+#[inline]
+fn flat_prefetch<T>(slots: &[T], i: usize) {
+    #[cfg(target_arch = "x86_64")]
+    // SAFETY: `i` is masked into range by `flat_home` (the shift leaves log2(len) bits); a prefetch never faults.
+    unsafe {
+        std::arch::x86_64::_mm_prefetch(
+            slots.as_ptr().add(i) as *const i8,
+            std::arch::x86_64::_MM_HINT_T0,
+        );
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    let _ = (slots, i);
+}
 impl<V: Copy> Tab<V> {
     fn new(flat: bool, cap: usize, p: u64) -> Tab<V> {
         if flat {
-            assert!(p <= FLAT_EMPTY as u64, "flat table needs p < 2^32");
             let size = (2 * cap.max(1)).next_power_of_two();
-            Tab::Flat {
-                slots: vec![(FLAT_EMPTY, 0); size],
-                ents: Vec::with_capacity(cap),
-                mask: size - 1,
-                shift: 64 - size.trailing_zeros(),
+            let (mask, shift) = (size - 1, 64 - size.trailing_zeros());
+            if p <= FLAT_EMPTY as u64 {
+                Tab::Flat {
+                    slots: vec![(FLAT_EMPTY, 0); size],
+                    ents: Vec::with_capacity(cap),
+                    mask,
+                    shift,
+                }
+            } else {
+                Tab::FlatW {
+                    slots: vec![(u64::MAX, 0); size],
+                    ents: Vec::with_capacity(cap),
+                    mask,
+                    shift,
+                }
             }
         } else {
             Tab::Std(HashMap::with_capacity_and_hasher(cap, Default::default()))
         }
-    }
-    #[inline]
-    fn home(x: u64, shift: u32) -> usize {
-        (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> shift) as usize
     }
     fn insert_if_absent(&mut self, x: u64, e: V) {
         match self {
@@ -316,40 +439,13 @@ impl<V: Copy> Tab<V> {
                 ents,
                 mask,
                 shift,
-            } => {
-                // keep the load factor at most 1/2: double and reinsert (never reached by ic5b, whose
-                // capacity bound is exact; rho databases grow with retained walks)
-                if 2 * ents.len() >= slots.len() {
-                    let size = 2 * slots.len();
-                    let nshift = 64 - size.trailing_zeros();
-                    let mut ns = vec![(FLAT_EMPTY, 0u32); size];
-                    for &(k, v) in slots.iter() {
-                        if k != FLAT_EMPTY {
-                            let mut j = Self::home(k as u64, nshift);
-                            while ns[j].0 != FLAT_EMPTY {
-                                j = (j + 1) & (size - 1);
-                            }
-                            ns[j] = (k, v);
-                        }
-                    }
-                    *slots = ns;
-                    *mask = size - 1;
-                    *shift = nshift;
-                }
-                let mut i = Self::home(x, *shift);
-                loop {
-                    let (k, _) = slots[i];
-                    if k == FLAT_EMPTY {
-                        slots[i] = (x as u32, ents.len() as u32);
-                        ents.push(e);
-                        return;
-                    }
-                    if k as u64 == x {
-                        return;
-                    }
-                    i = (i + 1) & *mask;
-                }
-            }
+            } => flat_insert(slots, ents, mask, shift, x, e),
+            Tab::FlatW {
+                slots,
+                ents,
+                mask,
+                shift,
+            } => flat_insert(slots, ents, mask, shift, x, e),
         }
     }
     #[inline]
@@ -361,44 +457,27 @@ impl<V: Copy> Tab<V> {
                 ents,
                 mask,
                 shift,
-            } => {
-                if x >= FLAT_EMPTY as u64 {
-                    return None;
-                }
-                let mut i = Self::home(x, *shift);
-                loop {
-                    let (k, v) = slots[i];
-                    if k == FLAT_EMPTY {
-                        return None;
-                    }
-                    if k as u64 == x {
-                        return Some(ents[v as usize]);
-                    }
-                    i = (i + 1) & *mask;
-                }
-            }
+            } => flat_get(slots, ents, *mask, *shift, x),
+            Tab::FlatW {
+                slots,
+                ents,
+                mask,
+                shift,
+            } => flat_get(slots, ents, *mask, *shift, x),
         }
     }
     #[inline]
     fn prefetch(&self, x: u64) {
-        if let Tab::Flat { slots, shift, .. } = self {
-            let i = Self::home(x, *shift);
-            #[cfg(target_arch = "x86_64")]
-            // SAFETY: `i` is masked into range by `home` (the shift leaves log2(len) bits); a prefetch never faults.
-            unsafe {
-                std::arch::x86_64::_mm_prefetch(
-                    slots.as_ptr().add(i) as *const i8,
-                    std::arch::x86_64::_MM_HINT_T0,
-                );
-            }
-            #[cfg(not(target_arch = "x86_64"))]
-            let _ = (slots, i);
+        match self {
+            Tab::Std(_) => {}
+            Tab::Flat { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
+            Tab::FlatW { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
         }
     }
     fn len(&self) -> usize {
         match self {
             Tab::Std(m) => m.len(),
-            Tab::Flat { ents, .. } => ents.len(),
+            Tab::Flat { ents, .. } | Tab::FlatW { ents, .. } => ents.len(),
         }
     }
 }
@@ -1000,6 +1079,7 @@ fn main() {
                 }
             }
             snap.push(("fb".into(), take(&f)));
+            let ms_at_fb = t0.elapsed().as_secs_f64() * 1e3;
             // (k-1)-term full points: (point, indices, signs); first sign +1.
             let mut combos: Vec<(Pt, Vec<u16>, Vec<i8>)> = (0..m)
                 .map(|i| (Some(fb[i]), vec![i as u16], vec![1i8]))
@@ -1024,6 +1104,7 @@ fn main() {
                 combos = next;
             }
             snap.push(("combos".into(), take(&f)));
+            let ms_at_combos = t0.elapsed().as_secs_f64() * 1e3;
             // table: x -> (combo id, l, sign of F_l)
             let cap: usize = combos
                 .iter()
@@ -1043,6 +1124,7 @@ fn main() {
                 }
             }
             snap.push(("table".into(), take(&f)));
+            let ms_at_table = t0.elapsed().as_secs_f64() * 1e3;
             let entry_pt = |f: &F, e: (u32, u16, i8)| -> Pt {
                 let fl = Some(fb[e.1 as usize]);
                 f.padd(
@@ -1174,6 +1256,7 @@ fn main() {
                 ylog[c] = md(v, n);
             }
             snap.push(("relations".into(), take(&f)));
+            let ms_at_relations = t0.elapsed().as_secs_f64() * 1e3;
             let mut trials = 0u64;
             let t_tgt = Instant::now();
             // lock-step batches: act[j] = (target, kq); a finished slot takes the next target
@@ -1257,9 +1340,9 @@ fn main() {
             Out {
                 ok: 0,
                 extra: format!(
-                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"batch\":{},\"ms_targets\":{:.3}",
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"batch\":{},\"ms_targets\":{:.3},\"ms_at_fb\":{:.3},\"ms_at_combos\":{:.3},\"ms_at_table\":{:.3},\"ms_at_relations\":{:.3}",
                     k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len(),
-                    if flat { "flat" } else { "std" }, bsz, ms_targets
+                    if flat { "flat" } else { "std" }, bsz, ms_targets, ms_at_fb, ms_at_combos, ms_at_table, ms_at_relations
                 ),
             }
         }
