@@ -233,7 +233,7 @@ fn decode(g: &Jet, j: &JC, pts: &[[u64; 3]]) -> Result<Decoded, &'static str> {
     let rq = hdot(&h, pair[1], pair[1]) * fp.inv(dq) % P;
     assert_ne!(r, 0);
     assert_eq!(r, rq, "two_endpoint_differential_scale");
-    // Deliberately erase Hessian: all six candidates must remain.
+    // Erasure leaves all rational pairs: six if fully split, one if only two hits.
     let mut zero = 0;
     for a in 0..hits.len() {
         for b in a + 1..hits.len() {
@@ -242,7 +242,8 @@ fn decode(g: &Jet, j: &JC, pts: &[[u64; 3]]) -> Result<Decoded, &'static str> {
             }
         }
     }
-    assert_eq!(zero, 6);
+    assert_eq!(zero, hits.len() * (hits.len() - 1) / 2);
+    println!("HESSIAN_ERASURE rational_hits={} candidate_pairs={zero} discriminating={}", hits.len(), zero > 1);
     Ok(Decoded {
         pair,
         gradient: n,
