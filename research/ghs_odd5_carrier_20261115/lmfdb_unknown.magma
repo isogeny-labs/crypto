@@ -1,0 +1,35 @@
+SetSeed(20261115);
+F := GF(3);
+R<x> := PolynomialRing(F);
+K<a> := ext<F | x^5+2*x+1>;
+S<T> := PolynomialRing(Integers());
+rows := [<-26,1,2*a,28967,270>, <26,2,a,35518,218>];
+for row in rows do
+    trace := row[1];
+    E := EllipticCurve([K | 0,row[2],0,0,row[3]]);
+    assert #E eq row[5];
+    mask := row[4];
+    f := x^11;
+    for i in [0..10] do
+        f +:= (mask mod 3)*x^i;
+        mask := mask div 3;
+    end for;
+    assert mask eq 0 and GCD(f,Derivative(f)) eq 1;
+    Y := HyperellipticCurve(f);
+    assert Genus(Y) eq 5;
+    J := Jacobian(Y);
+    expected := 1-trace*T^5+3^5*T^10;
+    cpu := Cputime();
+    actual := EulerFactor(J);
+    print "trace", trace;
+    print "source", E;
+    print "source_order", #E;
+    print "target", Y;
+    print "target_genus", Genus(Y);
+    print "expected", expected;
+    print "actual", actual;
+    print "euler_cpu_sec", Cputime(cpu);
+    print "jacobian_order", #J;
+    print "polynomial_matches", actual eq expected;
+    assert actual eq expected and #J eq row[5] and Evaluate(actual,1) eq #E;
+end for;
