@@ -3,26 +3,27 @@
 # `hky_par ladder` (MODE=a: E14a draw 3 alone) or `dreg_linear_guess --engine pe` (MODE=b: E14b controls).
 # Env (set at pod creation by e14/launch_r3.sh):
 #   MODE (a|b), CAP_USD, MAX_HOURS, SRC_COMMIT, PATHS_SHA256, TREE_SHA256, OUT_TOKEN,
-#   POD_CTL_KEY (RunPod API key for self-stop), MAX_HOURS_FALLBACK. RunPod injects RUNPOD_POD_ID.
-# Amendment 31: /workspace is a persistent pod volume; at the end the pod STOPS itself (volume kept)
-# instead of deleting itself, and a restarted pod only serves its finished output.
+#   POD_CTL_KEY (RunPod API key for self-delete), POST_HOURS, MAX_HOURS_FALLBACK. RunPod injects RUNPOD_POD_ID.
+# Amendment 32: no persistent volume exists on RunPod CPU pods; after finishing the pod serves for POST_HOURS
+# (18 h) and then deletes itself; the controller deletes it earlier, after its pull.
 set -u
 W=/workspace; SRC=/root/src; OUT=$W/out; SERVE=$W/serve/$OUT_TOKEN
 mkdir -p "$SRC" "$OUT" "$SERVE"
 T0=$(date +%s)
 log() { echo "$(date -u +%FT%TZ) $*" | tee -a "$OUT/run.log"; }
 pack() { tar czf "$W/out.tgz.part" -C "$W" out 2>/dev/null && mv -f "$W/out.tgz.part" "$SERVE/out.tgz" && sha256sum "$SERVE/out.tgz" | cut -d' ' -f1 >"$SERVE/out.tgz.sha256"; }
-stop_self() {
+delete_self() {
   { set +x; } 2>/dev/null
   [ -n "${RUNPOD_POD_ID:-}" ] && [ -n "${POD_CTL_KEY:-}" ] && \
-    curl -sS -m 60 -X POST -H "Authorization: Bearer $POD_CTL_KEY" "https://rest.runpod.io/v1/pods/$RUNPOD_POD_ID/stop" >>"$OUT/run.log" 2>&1
+    curl -sS -m 60 -X DELETE -H "Authorization: Bearer $POD_CTL_KEY" "https://rest.runpod.io/v1/pods/$RUNPOD_POD_ID" >>"$OUT/run.log" 2>&1
   set -x
 }
 finish() {
   log "finish: $1"; echo "$1" >"$OUT/final_status"; pack; sync
-  # Amendment 31: serve 2 h for a prompt pull, then stop (not delete): the volume keeps out/ and the
-  # served out.tgz; the controller restarts the pod to pull and deletes it afterwards.
-  sleep 7200; stop_self; sleep infinity
+  # Amendment 32: RunPod CPU pods get no persistent volume, so a stopped pod would lose out/. Keep serving
+  # for POST_HOURS (default 18) so a late controller can still pull; the controller deletes the pod after
+  # its pull; only then, as a cost bound, the pod deletes itself.
+  sleep $(( ${POST_HOURS:-18} * 3600 )); delete_self; sleep infinity
 }
 ln -sfn "$OUT" "$SERVE/out"
 echo "$(date -u +%FT%TZ) boot: script started (pid $$)" >>"$OUT/run.log"

@@ -85,6 +85,10 @@
 //! match (`research/magma_f4_comparison_20261013/`).
 //!
 //! ```bash
+//! `--engine hky --hky-progress PATH` appends each closure `V_{F,c}` to PATH
+//! as it finishes (flushed and synced); a stopped run resumes with
+//! `--hky-cmin` at the first undecided degree.
+//!
 //! cargo run --release --example pkm_tower_pilot -- --out pilot.jsonl
 //! cargo run --release --example pkm_tower_pilot -- --kinds kummer --max-t 6 --budget 30
 //! # What F4 knows at degree 4 on one N = 16 system: its basis elements of
@@ -744,11 +748,174 @@ fn nonsingular(a: u64, b: u64, p: u64) -> bool {
     d != 0
 }
 
+/// How [`isogeny`] computes `#E'`. `Naive` is the frozen `O(p)` Legendre
+/// count (`PrimeCurve::point_count`), the default. `Mestre` is the exact
+/// `O(p^{1/4})` order of [`mestre_exact_order`]; it consumes no draw of the
+/// cell's random stream, so both methods select the same `E'`, `Q`, `R'`
+/// and `V` for the same seed whenever they agree on `#E'` (they must: both
+/// are exact). `--aux-order mestre` exists so the isogeny arm can run at
+/// primes where the naive count is too slow (P1 = 2013265921).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum AuxOrder {
+    Naive,
+    Mestre,
+}
+
+static AUX_ORDER_MESTRE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+fn aux_order_method() -> AuxOrder {
+    if AUX_ORDER_MESTRE.load(std::sync::atomic::Ordering::Relaxed) {
+        AuxOrder::Mestre
+    } else {
+        AuxOrder::Naive
+    }
+}
+
+fn isqrt_u64(n: u64) -> u64 {
+    let mut r = (n as f64).sqrt() as u64;
+    while r.saturating_mul(r) > n {
+        r -= 1;
+    }
+    while (r + 1).saturating_mul(r + 1) <= n {
+        r += 1;
+    }
+    r
+}
+
+fn distinct_prime_factors(mut n: u64) -> Vec<u64> {
+    let mut out = Vec::new();
+    let mut q = 2u64;
+    while q * q <= n {
+        if n.is_multiple_of(q) {
+            out.push(q);
+            while n.is_multiple_of(q) {
+                n /= q;
+            }
+        }
+        q += if q == 2 { 1 } else { 2 };
+    }
+    if n > 1 {
+        out.push(n);
+    }
+    out
+}
+
+fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a
+}
+
+/// Some `k ∈ [lo, hi]` with `[k]P = O`, by baby-step giant-step, or `None`.
+fn bsgs_multiple_in(
+    e: &PrimeCurve,
+    ops: &mut GroupOps,
+    pt: PrimePoint,
+    lo: u64,
+    hi: u64,
+) -> Option<u64> {
+    let len = hi - lo + 1;
+    let w = isqrt_u64(len) + 1;
+    let key = |q: &PrimePoint| (q.infinity, q.x, q.y);
+    let mut table = std::collections::HashMap::with_capacity(w as usize);
+    let mut acc = PrimePoint::INFINITY;
+    for j in 0..w {
+        table.entry(key(&acc)).or_insert(j);
+        acc = e.add(ops, acc, pt);
+    }
+    // acc = [w]P. Giant steps S_g = [lo + g·w]P; a hit is −S_g = [j]P.
+    let giant = acc;
+    let mut s = e.mul(ops, pt, lo);
+    let mut base = lo;
+    while base <= hi {
+        if let Some(&j) = table.get(&key(&e.neg(s))) {
+            if base + j <= hi {
+                return Some(base + j);
+            }
+        }
+        base += w;
+        s = e.add(ops, s, giant);
+    }
+    None
+}
+
+/// The exact order of `P`, from any `k` with `[k]P = O`.
+fn exact_point_order(e: &PrimeCurve, ops: &mut GroupOps, pt: PrimePoint, mut k: u64) -> u64 {
+    for q in distinct_prime_factors(k) {
+        while k.is_multiple_of(q) && e.mul(ops, pt, k / q).infinity {
+            k /= q;
+        }
+    }
+    k
+}
+
+/// `#E(F_p)` exactly, by Mestre's method on `E` and its quadratic twist
+/// `E^d` (`#E + #E^d = 2p + 2`): the least common multiples `L` and `L^d` of
+/// point orders on each narrow the Hasse interval until one `n` is left
+/// with `L | n` and `L^d | 2p + 2 − n` (unique for `p > 229`, Mestre).
+/// Points come from a private stream seeded by `(p, a, b)`, not from the
+/// cell's stream. Panics if 64 points leave it ambiguous.
+fn mestre_exact_order(e: &PrimeCurve, ops: &mut GroupOps) -> u64 {
+    let p = e.p;
+    assert!(p > 229, "Mestre's method needs p > 229");
+    let r = isqrt_u64(4 * p); // ⌊2√p⌋
+    let (lo, hi) = (p + 1 - r, p + 1 + r);
+    let d = (2..p)
+        .find(|&d| e.legendre(d) == -1)
+        .expect("a non-residue");
+    let tw = PrimeCurve {
+        p,
+        a: mulm(e.a, mulm(d, d, p), p),
+        b: mulm(e.b, mulm(d, mulm(d, d, p), p), p),
+    };
+    let mut rng =
+        StdRng::seed_from_u64(p ^ e.a.rotate_left(21) ^ e.b.rotate_left(42) ^ 0x4D45_5354_5245_u64);
+    let (mut l_e, mut l_t) = (1u64, 1u64);
+    for i in 0..64 {
+        let twist = i % 2 == 1;
+        let c = if twist { &tw } else { e };
+        let pt = random_point(c, &mut rng);
+        let k =
+            bsgs_multiple_in(c, ops, pt, lo, hi).expect("#E is a multiple in the Hasse interval");
+        let o = exact_point_order(c, ops, pt, k);
+        if twist {
+            l_t = l_t / gcd_u64(l_t, o) * o;
+        } else {
+            l_e = l_e / gcd_u64(l_e, o) * o;
+        }
+        let mut found = None;
+        let mut count = 0;
+        let mut n = lo.div_ceil(l_e) * l_e;
+        while n <= hi {
+            if (2 * p + 2 - n).is_multiple_of(l_t) {
+                count += 1;
+                found = Some(n);
+                if count > 1 {
+                    break;
+                }
+            }
+            n += l_e;
+        }
+        if count == 1 && i >= 1 {
+            return found.unwrap();
+        }
+    }
+    panic!(
+        "Mestre: #E ambiguous after 64 points (p = {p}, a = {}, b = {})",
+        e.a, e.b
+    );
+}
+
 /// A tower of 2-isogenies on an auxiliary curve `E'` with a rational
 /// point `Q` of order `2^t`; `V = x(R' + ⟨Q⟩)`.  The search for `E'` is
 /// the per-curve precomputation the oracle's base charges; here it is
 /// only reported.
 fn isogeny(p: u64, t: usize, rng: &mut StdRng) -> Tower {
+    isogeny_with(p, t, rng, aux_order_method())
+}
+
+fn isogeny_with(p: u64, t: usize, rng: &mut StdRng, method: AuxOrder) -> Tower {
     let two_t = 1u64 << t;
     let mut ops = GroupOps::default();
     let mut curves_tried = 0u64;
@@ -760,7 +927,10 @@ fn isogeny(p: u64, t: usize, rng: &mut StdRng) -> Tower {
             continue;
         }
         let e = PrimeCurve { p, a, b };
-        let n = e.point_count();
+        let n = match method {
+            AuxOrder::Naive => e.point_count(),
+            AuxOrder::Mestre => mestre_exact_order(&e, &mut ops),
+        };
         if !n.is_multiple_of(two_t) {
             continue;
         }
@@ -826,7 +996,11 @@ fn isogeny(p: u64, t: usize, rng: &mut StdRng) -> Tower {
         }
         // V itself, since it cannot be rebuilt from two numbers: the
         // exhaustive cross-check (`verify.py`) needs it.
-        let info = json!({"aux_a": a, "aux_b": b, "aux_order": n, "aux_curves_tried": curves_tried, "v": &v});
+        let mut info = json!({"aux_a": a, "aux_b": b, "aux_order": n, "aux_curves_tried": curves_tried, "v": &v});
+        if method == AuxOrder::Mestre {
+            // Only under `--aux-order mestre`, so default rows stay byte-identical.
+            info["aux_order_method"] = json!("mestre");
+        }
         return Tower {
             kind: Kind::Isogeny,
             t,
@@ -1877,6 +2051,7 @@ fn measure_hky(
     eqs: &[Pol],
     tower: &Tower,
     cell: &Cell,
+    target_index: usize,
     n: usize,
     p: u64,
     sol: Option<&[u64]>,
@@ -1904,7 +2079,38 @@ fn measure_hky(
         ..HkyLimits::default()
     };
     let started = Instant::now();
-    let fd = hky_fp_tower::fall_degrees(&ring, &gens, c_min, a.hky_cmax, &limits);
+    let progress = |cl: &hky_fp_tower::Closure| {
+        let Some(path) = a.hky_progress.as_deref() else {
+            return;
+        };
+        let line = json!({
+            "schema": "pkm_tower_pilot.hky_progress/v1",
+            "utc_unix_s": std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_secs())
+                .unwrap_or(0),
+            "p": p, "seed": a.seed, "kind": cell.kind.name(), "m": cell.m,
+            "control": cell.control.name(), "t": cell.t, "g": cell.g,
+            "null_width": a.null_width, "target_index": target_index,
+            "hky_cmin": c_min, "hky_cmax": a.hky_cmax,
+            "c": cl.c, "cols": cl.cols as u64, "dims": cl.dims, "one": cl.contains_one,
+            "censored": cl.censored, "rows_reduced": cl.rows_reduced,
+            "entries": cl.entries, "muladds": cl.muladds, "ms": cl.ms,
+        });
+        let mut f = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+            .unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        writeln!(f, "{line}").unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        f.sync_all()
+            .unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        eprintln!(
+            "hky progress: t={} target={} c={} one={} censored={:?} {:.0} ms",
+            cell.t, target_index, cl.c, cl.contains_one, cl.censored, cl.ms
+        );
+    };
+    let fd = hky_fp_tower::fall_degrees_with(&ring, &gens, c_min, a.hky_cmax, &limits, progress);
     let ms = started.elapsed().as_secs_f64() * 1e3;
     let closures: Vec<Value> = fd
         .closures
@@ -2378,6 +2584,11 @@ struct Args {
     hky_cmax: u32,
     hky_max_cols: u128,
     hky_max_entries: u64,
+    /// `--hky-progress PATH` (`--engine hky` only): append one JSON line per
+    /// closure `V_{F,c}` to PATH as soon as it is computed, flushed and
+    /// synced, so a run stopped during a later closure keeps every decided
+    /// degree. Resume with `--hky-cmin` at the first undecided degree.
+    hky_progress: Option<String>,
     /// `--radix 2^k` (`f4_fp_tower` only): grade every block of `k` tower
     /// levels with weights `1, 2, …, 2^{k−1}`, the radix-`2^k` presentation
     /// of the same tower (`TowerWeights`). `k = 1`, radix 2, is the unit
@@ -2561,6 +2772,7 @@ fn parse_args() -> Args {
         verify: false,
         hky_cmin: None,
         hky_cmax: 6,
+        hky_progress: None,
         hky_max_cols: 2_000_000,
         hky_max_entries: 600_000_000,
         radix_k: 1,
@@ -2639,6 +2851,11 @@ fn parse_args() -> Args {
                     })
                     .collect()
             }
+            "--aux-order" => match v.as_str() {
+                "naive" => AUX_ORDER_MESTRE.store(false, std::sync::atomic::Ordering::Relaxed),
+                "mestre" => AUX_ORDER_MESTRE.store(true, std::sync::atomic::Ordering::Relaxed),
+                other => panic!("unknown --aux-order `{other}` (naive, mestre)"),
+            },
             "--m" => a.ms = list(&v),
             "--cover-map" => {
                 a.cover = Some(match v.as_str() {
@@ -2708,6 +2925,7 @@ fn parse_args() -> Args {
                 a.radix_k = r.trailing_zeros();
             }
             "--hky-cmin" => a.hky_cmin = Some(v.parse().expect("--hky-cmin")),
+            "--hky-progress" => a.hky_progress = Some(v.clone()),
             "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
             "--hky-max-cols" => a.hky_max_cols = v.parse().expect("--hky-max-cols"),
             "--hky-max-entries" => a.hky_max_entries = v.parse().expect("--hky-max-entries"),
@@ -2940,7 +3158,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
                 (out, Dumpable::Ring(basis))
             }
             Engine::Hky => {
-                let out = measure_hky(&eqs, &tower, cell, n, p, sol.as_deref(), a);
+                let out = measure_hky(&eqs, &tower, cell, k, n, p, sol.as_deref(), a);
                 (out, Dumpable::Raw(Vec::new()))
             }
             Engine::Tower | Engine::Sig => {
@@ -3388,6 +3606,55 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// `--aux-order mestre` is exact: it equals the naive `O(p)` count on
+    /// random curves at small primes and at P0 = 786433 (both `≡ 1 mod 4`,
+    /// like P1, and one `≡ 3 mod 4`).
+    #[test]
+    fn mestre_exact_order_equals_point_count() {
+        let mut rng = StdRng::seed_from_u64(0x4D45_5354);
+        let mut ops = GroupOps::default();
+        for &(p, curves) in &[
+            (233u64, 300),
+            (1009, 300),
+            (40961, 100),
+            (65519, 60),
+            (786433, 12),
+        ] {
+            let mut done = 0;
+            while done < curves {
+                let (a, b) = (rng.gen_range(0..p), rng.gen_range(1..p));
+                if !nonsingular(a, b, p) {
+                    continue;
+                }
+                let e = PrimeCurve { p, a, b };
+                assert_eq!(
+                    mestre_exact_order(&e, &mut ops),
+                    e.point_count(),
+                    "p = {p}, a = {a}, b = {b}"
+                );
+                done += 1;
+            }
+        }
+    }
+
+    /// The same seed builds the same isogeny tower under both order
+    /// methods (Mestre draws from its own stream, not the cell's).
+    #[test]
+    fn mestre_and_naive_build_the_same_isogeny_tower() {
+        let p = 786433;
+        for t in 1..=5 {
+            for seed in 0..3u64 {
+                let a = isogeny_with(p, t, &mut StdRng::seed_from_u64(seed), AuxOrder::Naive);
+                let b = isogeny_with(p, t, &mut StdRng::seed_from_u64(seed), AuxOrder::Mestre);
+                assert_eq!(a.v, b.v, "t = {t}, seed = {seed}");
+                assert_eq!(a.c, b.c);
+                assert_eq!(a.info["aux_a"], b.info["aux_a"]);
+                assert_eq!(a.info["aux_b"], b.info["aux_b"]);
+                assert_eq!(a.info["aux_order"], b.info["aux_order"]);
+            }
+        }
+    }
 
     /// `7·2^21 − 1` and `61·2^25 − 1`, the torus primes of
     /// `research/pkm_dickson_torus_20261015/`.
