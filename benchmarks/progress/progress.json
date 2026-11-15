@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+  "latest_record": "20261115T2250Z-mt-lanes-2p32-2p36",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 8,
     "invalid": 4,
-    "measured": 200,
+    "measured": 201,
     "open": 1
   },
   "repo": "crypto",
@@ -15700,6 +15700,318 @@
         }
       ],
       "problem": "mt:ic-vs-rho-scale",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9956,
+      "latest": 0.9956,
+      "latest_derived": {},
+      "metric": "ic_tuned_over_rho_tuned_2p32_t1024",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9844,
+            1.0213
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9956
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9143,
+      "latest": 0.9143,
+      "latest_derived": {},
+      "metric": "ic_tuned_over_rho_tuned_2p32_t16384",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.866,
+            1.0335
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9143
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9426,
+      "latest": 0.9426,
+      "latest_derived": {},
+      "metric": "ic_tuned_over_rho_tuned_2p32_t4096",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9308,
+            1.0648
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9426
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2296,
+      "latest": 1.2296,
+      "latest_derived": {},
+      "metric": "ic_tuned_over_rho_tuned_2p36_t1024",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1118,
+            1.2696
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 1.2296
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1523,
+      "latest": 1.1523,
+      "latest_derived": {},
+      "metric": "ic_tuned_over_rho_tuned_2p36_t16384",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0267,
+            1.2776
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 1.1523
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0877,
+      "latest": 1.0877,
+      "latest_derived": {},
+      "metric": "ic_tuned_over_rho_tuned_2p36_t4096",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0171,
+            1.1239
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 1.0877
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9832,
+      "latest": 0.9832,
+      "latest_derived": {},
+      "metric": "rho_lane_tuning_gain_2p32_t1024",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9648,
+            0.9975
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9832
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9667,
+      "latest": 0.9667,
+      "latest_derived": {},
+      "metric": "rho_lane_tuning_gain_2p32_t16384",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9648,
+            0.9817
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9667
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9868,
+      "latest": 0.9868,
+      "latest_derived": {},
+      "metric": "rho_lane_tuning_gain_2p32_t4096",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9603,
+            0.9935
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9868
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9815,
+      "latest": 0.9815,
+      "latest_derived": {},
+      "metric": "rho_lane_tuning_gain_2p36_t1024",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9513,
+            1.0
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9815
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9671,
+      "latest": 0.9671,
+      "latest_derived": {},
+      "metric": "rho_lane_tuning_gain_2p36_t16384",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9439,
+            0.9944
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9671
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9651,
+      "latest": 0.9651,
+      "latest_derived": {},
+      "metric": "rho_lane_tuning_gain_2p36_t4096",
+      "points": [
+        {
+          "commit": "dc8ccb64de9e",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2250Z-mt-lanes-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9469,
+            0.9791
+          ],
+          "summary": "Both arms tuned (rho lanes 16-128, IC batch 32-256): IC / rho 0.91-1.00x at 2^32 with no cell 4 of 4 (memory round's IC-ahead cells do not hold), 1.09-1.23x at 2^36; 1944 executions, 0 errors [pcc:unverified]",
+          "value": 0.9651
+        }
+      ],
+      "problem": "mt:ic-vs-rho-tuning",
       "unit": "ratio"
     },
     {

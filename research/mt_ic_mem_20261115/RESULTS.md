@@ -84,3 +84,10 @@ is empty for every arm, rho included.
 
 No `S`, no single-target change, no BSGS result, no leaderboard or `benchmarks/` row (no replay certificate or
 validator report). Field arithmetic is unchanged for every arm.
+
+## Follow-up: the 2^32 "IC ahead" reading does not hold with rho tuned
+
+[`../mt_lanes_20261115/`](../mt_lanes_20261115/RESULTS.md) re-measured these configurations with rho's lane count
+(16–128) and the IC's batch (32–256) both tuned: the IC is level with rho at 2^32 (0.91–1.00×, every cell's
+per-instance range crossing 1) and 1.09–1.23× at 2^36 [pcc:unverified]. The untuned pair measured here moved by
+about 6 % between the two runs at T = 1024, the size of the lead reported above.
