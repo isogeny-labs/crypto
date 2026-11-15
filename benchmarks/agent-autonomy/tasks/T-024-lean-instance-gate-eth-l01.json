@@ -1,0 +1,34 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-024",
+  "title": "Write the instance statement for the prime-eth lead L01 proof",
+  "class": "lean",
+  "difficulty": 3,
+  "source": [
+    ".agents/skills/lean-instance-gate/SKILL.md",
+    "research/ic_prime_eth_leads_20261031/leads/L01/lean/",
+    "tools/lean/lean-health.sh"
+  ],
+  "prompt": "Apply the lean-instance-gate skill to the Lean sources under `research/ic_prime_eth_leads_20261031/leads/L01/lean/` (its `readoff` theorems form a family of size 2). Run `tools/lean/lean-health.sh --json` for that study and quote its numbers. Write `$T_OUT/PROOF_MAP.md` with the six fields and the inheritance table, and list any upstream candidate for crypto-lean. Do not edit the study. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout. No fixture; the study is read-only.",
+  "acceptance": [
+    "$T_OUT/PROOF_MAP.md has the six headings (see T-023)",
+    "the note quotes the study's files, theorems and top_family values from lean-health.sh",
+    "research/ic_prime_eth_leads_20261031/leads/L01 is unchanged"
+  ],
+  "check_command": "for h in 'Structure above' 'Theorem used as stated' 'The object as an instance' 'Assembly probe' 'Missing components' 'Inheritance table'; do grep -qi \"$h\" \"$T_OUT/PROOF_MAP.md\" || exit 1; done && grep -q 'top_family' \"$T_OUT/PROOF_MAP.md\" && git diff --quiet \"$T_BASE\" HEAD -- research/ic_prime_eth_leads_20261031/leads/L01",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "editing the study's Lean files"
+  ],
+  "max_wall_minutes": 35,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "lean-health.sh needs no Lean toolchain. Correctness of the table is judged by the validator."
+}
