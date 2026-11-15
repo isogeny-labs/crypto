@@ -47,7 +47,7 @@ std::vector<Poly> system(int g,int left,int right,P q){auto u=variable(0),v=vari
  std::vector<Poly>in;Poly xx[2];int branches[]={left,right};Poly ls[]={v,z},as[]={a0,a1};
  for(int i=0;i<2;i++){int br=branches[i];xx[i]=br?plusp(powp(ls[i],2),scalep(plusp(as[i],constant(gammas[g])),neg(2))):ls[i];auto y=plusp(timesp(u,plusp(xx[i],constant(neg(s)))),constant(neg(t)));auto curve=plusp(plusp(plusp(powp(y,2),powp(xx[i],3),neg(1)),scalep(xx[i],neg(AA))),constant(neg(BB)));in.push_back(curve);
   if(!br){in.push_back(fb(g,0,xx[i]));in.push_back(as[i]);}
-  else {F zz=scale(betas[g],br),dd=mul(delta,mul(zz,zz));auto f=plusp(powp(ls[i],4),scalep(timesp(xx[i],powp(ls[i],2)),neg(6)));f=plusp(f,scalep(powp(xx[i],2),neg(3)));f=plusp(f,scalep(timesp(y,ls[i]),neg(8)));f=plusp(f,constant(scale(add(AA,dd),-4)));in.push_back(f);in.push_back(plusp(powp(as[i],7),as[i],neg(1)));}}
+  else {F zz=scale(betas[g],br),dd=mul(delta,mul(zz,zz));auto f=plusp(powp(ls[i],4),scalep(timesp(xx[i],powp(ls[i],2)),neg(6)));f=plusp(f,scalep(powp(xx[i],2),neg(3)));f=plusp(f,scalep(timesp(y,ls[i]),neg(mod(8))));f=plusp(f,constant(scale(add(AA,dd),-4)));in.push_back(f);in.push_back(plusp(powp(as[i],7),as[i],neg(1)));}}
  in.push_back(plusp(plusp(xx[0],xx[1]),plusp(powp(u,2),constant(neg(s))),neg(1)));
  auto prod=plusp(plusp(scalep(powp(u,2),s),scalep(u,scale(t,2))),constant(add(mul(s,s),AA)));in.push_back(plusp(timesp(xx[0],xx[1]),prod,neg(1)));return in;
 }
