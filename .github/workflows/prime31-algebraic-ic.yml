@@ -69,6 +69,9 @@ jobs:
       - name: Measure all seven true collapsed-tower S3 F4 arms
         timeout-minutes: 2
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_collapsed_s3 -- --f4
+      - name: Probe target-dependent Rust S4 after algebraic fixed-pair elimination
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --preeliminate-w-f4
       - name: Independently replay the prime31 S3 pair-root elimination polynomial
         run: python3 research/prime31_ic_20261115/native/replay_pair_elimination_poly.py
       - name: Algebraically eliminate the fixed pair S3 using existing Rust prime31 arithmetic
