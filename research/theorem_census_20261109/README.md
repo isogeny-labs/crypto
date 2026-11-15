@@ -391,6 +391,47 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [general residue-weighted length proof](../residue_weighted_length_audit_20261115/README.md)
+derives scalar dimension as the actual finite prime sum of canonical local
+self-lengths times actual residue-field K-degrees for every finite-dimensional
+commutative algebra over a fieldK. It also proves the same formula with actual
+Spec structure-sheaf stalk self-lengths and actual stalk residueK-degrees.
+Actual coefficient algebra/tower and canonical-prime/stalk-residue K-linear
+comparison are derived; no desired decomposition/length/residue compatibility
+conclusion is supplied. Artinian/finiteprime/finite-localization data are derived
+from finite scalar dimension. Established local-ring extension/composition-series
+and Artinian decomposition methods are credited; no novel formula is claimed.
+Actual F2×GaloisField(2,2) has scalar dimension3/selflength2/two prime closed
+points, complete actual projection-kernel classification, local lengths1,1 and
+actual residue algebra isomorphisms/degrees1,2. Weighted3 versus unweighted2
+refutes dropping residue weights; the product is not local. These are actual
+prime/closed points overF2, not a new base-rational/geometric point population.
+Actual splitF2×F2 totals2; known actualJV weighted8/derived canonical residue
+ degree1/actualzerochart0 are calibrations, not new populations.
+Exact local **PCC-20261115-f28255** replay PASS at 2026-11-15T15:24:00Z; signed standing unverified.
+Fresh42theorems/7newmodules(6concrete1adapter)/0failures/0trusted-native/full
+transitive standardfoundations;28frozen local modules/0copies/prior21gate credited.
+59formal+18artifact=77pins; all67predecessor pins checked before/after nine
+states/gate. Six failures/three successes retained, including06default200000
+heartbeat timeout; smaller local-equivalence proof succeeded without raisedlimits.
+Setup01exact metadata path failure before project mutation retained/setup02correct.
+Full2033-character binding/native1complete/0prefix/0unresolved/empty suffix.
+185files/73objects/26216byte losslessXZ/five gate files.
+Valid first report draft retained8files48740byteXZ after wording clarification;
+finalonepage47955bytePDF/all5386textcharacters read/visual/inbounds.
+Zero new-source warnings;22inherited module advisories and1frozen auditor warning
+preserved. Fresh fulltext+visual DiemPDF18–19/printed91–92 section4.2/Prop4.4–Lemma4.7;
+cumulative6–8,18–19/not31. Current JV7/21 and actual F4/JV predecessor credits retained.
+Four correct KB calls/initial Conductor127 before processing/code; publication
+Conductor127 before maps is outside frozen pins. Bounded official/local/primary
+fallback/no absence or novelty claim. General Chow-cycle/intersection comparison,
+positive-dimensional isolated components/projective bounds, Rojas C refinement
+and the remaining fourteen-item obligations stay open. Qualified Diem n!dⁿ with
+multiplicities unrefuted; ordinary cone not its product-projective ambient.
+No new solver/curve/order/scalar/decomposition/host/compiler/canonical-promotion/
+full14 claim, cryptoPython/raisedlimits/flags/waivers/frozen edits/spend/upload. [pcc:unverified]
+
+
 The [actual JV scheme-stalk proof](../jv_scheme_stalk_audit_20261115/README.md)
 identifies the actual origin structure-sheaf stalk of Spec(A), for the literal
 first homogeneous F101 quotient, with its canonical prime localization. The
