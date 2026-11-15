@@ -100,6 +100,9 @@ pub struct LinCdcl {
     pub conflict_budget: u64,
     pub stats: Stats,
     pub restarts: bool,
+    /// Literals decided first, one per level, before any search decision (incremental use).
+    /// A refutation under assumptions returns `Unsat` without marking the solver inconsistent.
+    pub assumptions: Vec<i32>,
     ok: bool,
 }
 
@@ -134,6 +137,7 @@ impl LinCdcl {
             conflict_budget: u64::MAX,
             stats: Stats::default(),
             restarts: false,
+            assumptions: Vec::new(),
             ok: true,
         }
     }
@@ -714,10 +718,12 @@ impl LinCdcl {
         if !self.ok {
             return Result::Unsat;
         }
+        self.backtrack(0);
         if self.propagate().is_some() {
             self.ok = false;
             return Result::Unsat;
         }
+        let budget_end = self.stats.conflicts.saturating_add(self.conflict_budget);
         let mut conflicts_since_restart = 0u64;
         let mut restart_limit = 100u64;
         loop {
@@ -751,7 +757,7 @@ impl LinCdcl {
                     self.enqueue(assert_lit, Reason::Clause(idx));
                 }
                 self.var_inc *= 1.0 / 0.95;
-                if self.stats.conflicts >= self.conflict_budget {
+                if self.stats.conflicts >= budget_end {
                     return Result::Unknown;
                 }
             } else {
@@ -759,6 +765,24 @@ impl LinCdcl {
                     conflicts_since_restart = 0;
                     restart_limit = restart_limit * 3 / 2;
                     self.backtrack(0);
+                    continue;
+                }
+                // assumptions first, one level each
+                let mut next_assumption: Option<i32> = None;
+                while (self.decision_level() as usize) < self.assumptions.len() {
+                    let p = self.assumptions[self.decision_level() as usize];
+                    match self.value(p) {
+                        Val::True => self.trail_lim.push(self.trail.len()),
+                        Val::False => return Result::Unsat,
+                        Val::Undef => {
+                            next_assumption = Some(p);
+                            break;
+                        }
+                    }
+                }
+                if let Some(p) = next_assumption {
+                    self.trail_lim.push(self.trail.len());
+                    self.enqueue(p, Reason::None);
                     continue;
                 }
                 match self.pick_branch() {
@@ -794,10 +818,45 @@ pub struct ChainInstance {
     pub x2: Vec<u32>,
     pub x3: Vec<u32>,
     pub t: Vec<u32>,
+    /// Present when `x_R` is a variable block set per target through assumptions.
+    pub xr: Option<Vec<u32>>,
 }
 
 impl ChainInstance {
+    /// Fixed target: `x_R` folded into the constants (one solver per target).
     pub fn build(n: u32, l: u32, irr: u64, x_r: u64, b: u64, lex_pairs: bool) -> ChainInstance {
+        Self::build_inner(n, l, irr, Some(x_r), b, lex_pairs)
+    }
+
+    /// Parametrised target: `x_R` is a block fixed per solve by `set_target` (assumptions), so one
+    /// solver and its learnt clauses serve many targets of the same factor base.
+    pub fn build_param(n: u32, l: u32, irr: u64, b: u64, lex_pairs: bool) -> ChainInstance {
+        Self::build_inner(n, l, irr, None, b, lex_pairs)
+    }
+
+    pub fn set_target(&mut self, x_r: u64) {
+        let xr = self.xr.as_ref().expect("parametrised instance");
+        self.solver.assumptions = xr
+            .iter()
+            .enumerate()
+            .map(|(j, &v)| {
+                if (x_r >> j) & 1 == 1 {
+                    v as i32
+                } else {
+                    -(v as i32)
+                }
+            })
+            .collect();
+    }
+
+    fn build_inner(
+        n: u32,
+        l: u32,
+        irr: u64,
+        x_r: Option<u64>,
+        b: u64,
+        lex_pairs: bool,
+    ) -> ChainInstance {
         let nn = n as usize;
         let mut next = 1u32;
         let mut block = || {
@@ -816,10 +875,16 @@ impl ChainInstance {
             block(),
             block(),
         );
+        // parametrised target: blocks xr, b2 = t·xr, c = x3·xr, e = a·xr
+        let param = if x_r.is_none() {
+            Some((block(), block(), block(), block()))
+        } else {
+            None
+        };
         let n_vars = (next - 1) as usize + if lex_pairs { nn } else { 0 };
         let mut s = LinCdcl::new(n_vars, n, irr);
         let sq = s.sq_matrix();
-        let mr = s.mul_matrix(x_r);
+        let mr = s.mul_matrix(x_r.unwrap_or(0));
         // domain: summand bits ≥ ℓ are zero
         for blk in [&x1, &x2, &x3] {
             for j in l as usize..nn {
@@ -846,25 +911,43 @@ impl ChainInstance {
             }
             s.add_xor(vars, (b >> k) & 1 == 1);
         }
-        // S3b: sq(a ⊕ Mr t ⊕ Mr x3) ⊕ Mr a ⊕ b = 0
-        // inner_j = a_j ⊕ Σ_i Mr_ji t_i ⊕ Σ_i Mr_ji x3_i ; row k: Σ_j sq_kj inner_j ⊕ Σ_j Mr_kj a_j = b_k
-        for k in 0..nn {
-            let mut vars = Vec::new();
-            for j in 0..nn {
-                if (sq[j] >> k) & 1 == 1 {
-                    vars.push(a[j]);
-                    for i in 0..nn {
-                        if (mr[i] >> j) & 1 == 1 {
-                            vars.push(t[i]);
-                            vars.push(x3[i]);
-                        }
+        if let Some((xr, b2, c, e)) = &param {
+            // S3b with x_R a block: sq(a ⊕ b2 ⊕ c) ⊕ e ⊕ b = 0, gates b2 = t·xr, c = x3·xr, e = a·xr
+            s.add_gate(t.clone(), xr.clone(), b2.clone());
+            s.add_gate(x3.clone(), xr.clone(), c.clone());
+            s.add_gate(a.clone(), xr.clone(), e.clone());
+            for k in 0..nn {
+                let mut vars = vec![e[k]];
+                for j in 0..nn {
+                    if (sq[j] >> k) & 1 == 1 {
+                        vars.push(a[j]);
+                        vars.push(b2[j]);
+                        vars.push(c[j]);
                     }
                 }
-                if (mr[j] >> k) & 1 == 1 {
-                    vars.push(a[j]);
-                }
+                s.add_xor(vars, (b >> k) & 1 == 1);
             }
-            s.add_xor(vars, (b >> k) & 1 == 1);
+        } else {
+            // S3b: sq(a ⊕ Mr t ⊕ Mr x3) ⊕ Mr a ⊕ b = 0
+            // inner_j = a_j ⊕ Σ_i Mr_ji t_i ⊕ Σ_i Mr_ji x3_i ; row k: Σ_j sq_kj inner_j ⊕ Σ_j Mr_kj a_j = b_k
+            for k in 0..nn {
+                let mut vars = Vec::new();
+                for j in 0..nn {
+                    if (sq[j] >> k) & 1 == 1 {
+                        vars.push(a[j]);
+                        for i in 0..nn {
+                            if (mr[i] >> j) & 1 == 1 {
+                                vars.push(t[i]);
+                                vars.push(x3[i]);
+                            }
+                        }
+                    }
+                    if (mr[j] >> k) & 1 == 1 {
+                        vars.push(a[j]);
+                    }
+                }
+                s.add_xor(vars, (b >> k) & 1 == 1);
+            }
         }
         // optional lex ordering x1 ≤ x2 on the ℓ low bits (high bit most significant),
         // via a standard comparator chain with aux "equal-so-far" variables e_j.
@@ -908,6 +991,7 @@ impl ChainInstance {
             x2,
             x3,
             t,
+            xr: param.map(|p| p.0),
         }
     }
 }

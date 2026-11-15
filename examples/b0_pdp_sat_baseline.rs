@@ -317,6 +317,50 @@ fn run_lin(
     })
 }
 
+/// REUSE arm: one parametrised solver per rung; each target enters as assumptions on the `x_R`
+/// block, so learnt clauses persist across targets. Reports per-target deltas of the counters.
+fn run_lin_reuse(
+    inst: &mut ChainInstance,
+    l: u32,
+    irr: &IrreduciblePoly,
+    x_r: &F2mElement,
+    gf: &Gf2,
+    budget: u64,
+) -> Value {
+    let before = inst.solver.stats.clone();
+    inst.set_target(gf.from_element(x_r));
+    inst.solver.conflict_budget = budget;
+    let t = Instant::now();
+    let r = inst.solver.solve();
+    let wall_ms = t.elapsed().as_secs_f64() * 1e3;
+    let (status, verified) = match r {
+        LinResult::Sat => {
+            let xs = [
+                inst.solver.model_block(&inst.x1),
+                inst.solver.model_block(&inst.x2),
+                inst.solver.model_block(&inst.x3),
+            ];
+            let arr = [
+                gf.to_element(xs[0]),
+                gf.to_element(xs[1]),
+                gf.to_element(xs[2]),
+            ];
+            let in_base = xs.iter().all(|&x| x < (1u64 << l));
+            ("sat", Some(verify(&arr, x_r, irr) && in_base))
+        }
+        LinResult::Unsat => ("unsat", None),
+        LinResult::Unknown => ("unknown", None),
+    };
+    let st = &inst.solver.stats;
+    json!({
+        "status": status, "verified": verified,
+        "conflicts": st.conflicts - before.conflicts, "decisions": st.decisions - before.decisions,
+        "propagations": st.propagations - before.propagations, "xor_propagations": st.xor_propagations - before.xor_propagations,
+        "learnt_clauses": st.learnt_clauses - before.learnt_clauses, "cumulative_conflicts": st.conflicts,
+        "cumulative_learnt_clauses": st.learnt_clauses, "n_vars": inst.solver.n_vars, "wall_ms": wall_ms,
+    })
+}
+
 fn export_instance(
     n: u32,
     l: u32,
@@ -466,6 +510,15 @@ fn main() {
         targets.push(("planted".into(), p.x_r, Some(p.xs)));
     }
 
+    let irr_mask = irr
+        .low_terms
+        .iter()
+        .fold(1u64 << n, |m, &t| m | (1u64 << t));
+    let mut reuse_inst = if wants("lin-reuse") {
+        Some(ChainInstance::build_param(n, l, irr_mask, 1, true))
+    } else {
+        None
+    };
     let mut r_by_arm: std::collections::BTreeMap<String, Vec<f64>> = Default::default();
     let mut r3_by_arm: std::collections::BTreeMap<String, Vec<f64>> = Default::default();
     let mut disagreements = 0usize;
@@ -520,6 +573,12 @@ fn main() {
             arms.insert(
                 "lin".into(),
                 run_lin(n, l, &irr, x_r, &gf, cfg.budget, true),
+            );
+        }
+        if let Some(ri) = reuse_inst.as_mut() {
+            arms.insert(
+                "lin-reuse".into(),
+                run_lin_reuse(ri, l, &irr, x_r, &gf, cfg.budget),
             );
         }
         if wants("lin-nolex") {
