@@ -40,8 +40,9 @@ Same-agent exact checks and a separate parser share declared primitives;
 no external audit is claimed. See PROOF_MAP.md for the boundary between
 Lean proofs, native calculations and written global geometry. Run the
 pinned project with tools/lean/proof-gate.sh from the repository root.
-Install report-requirements.txt in a scratch environment and run
-python build_report.py to render frozen evidence only. All PDF pages are
+For current rendering use the patched isolated command below instead of
+executing the builder in this archived directory. The historical build used
+`build_report.py` to render frozen evidence only. All PDF pages are
 visually inspected. No background experiment is scheduled.
 
 

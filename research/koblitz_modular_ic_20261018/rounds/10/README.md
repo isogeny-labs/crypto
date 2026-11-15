@@ -50,8 +50,9 @@ cargo test --release --offline --locked --manifest-path research/koblitz_modular
 tools/lean/proof-gate.sh research/koblitz_modular_ic_20261018/lean
 ```
 
-Install report-requirements.txt in a scratch environment and run
-python build_report.py. Python only renders frozen ledger/report content.
+For current rendering use the patched isolated command below instead of
+executing the builder in this archived directory. The historical build used
+`build_report.py`. Python only renders frozen ledger/report content.
 Every PDF page is inspected. Same-agent replay/parser checks share declared
 primitives;no external audit or scheduled background experiment is claimed.
 

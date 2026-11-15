@@ -60,8 +60,9 @@ tar --sort=name --mtime='2026-10-19 00:00:00Z' --owner=0 --group=0 \
 cmp runs.tar.xz /tmp/koblitz-round07-runs.tar.xz
 ```
 
-Install report-requirements.txt in a scratch environment and run
-python build_report.py. Python lays out frozen results only. Every rendered
+For current rendering use the patched isolated command below instead of
+executing the builder in this archived directory. The historical build used
+`build_report.py`. Python lays out frozen results only. Every rendered
 PDF page was inspected. No background experiment is scheduled.
 
 
