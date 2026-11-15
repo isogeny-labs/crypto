@@ -208,3 +208,29 @@ python3 research/norm_branch_rank_pilot_20261115/prime_curve_fixture_1031.py
 **Next gated experiments:** (a) seek an arbitrary-seven symbolic determinant formula or a counterexample to the universal square-cubic conjecture; (b) compare genuine conditioned rank defects on preregistered growing-`k` holdouts with independent nonzero-coefficient nulls, both adjacent middle layers and exact positive-relation extraction; (c) put the native sparse PKM `m=8` natural-positive whole-call relation/rank panel on authorized EKS Spot and report full cold setup + relation finding + linear algebra + verified scalar recovery against matched rho. Do not promote a model from stage-only online costs.
 
 Literature scope: the prime-field algebraic context was cross-checked against Petit–Kosters–Messeng, *Algebraic Approaches for the Elliptic Curve Discrete Logarithm Problem over Prime Fields* (PKC 2016, DOI 10.1007/978-3-662-49387-8_1), and Amadori–Pintore–Sala, *On the discrete logarithm problem for prime-field elliptic curves* (Finite Fields Appl. 51, 2018, DOI 10.1016/j.ffa.2018.01.009). No priority or novel general theorem is claimed. Research-KB MCP, repo wrapper, Conductor and EKS are not available in this execution environment; code and sources were reviewed via the GitHub connector and public primary records. All numerical claims are producer-local [pcc:unverified].
+
+## 2026-11-15: unconditional collision-factor lemma and 7-point quotient interpolation [pcc:unverified]
+
+An additional **symbolic argument, valid for arbitrary eight independent abscissae over `Z`**, establishes the universal part of the earlier finite-field factorization that had been treated only as an observation.
+
+Write `K_(A,B)=Delta(x_(A union B))^2`, with `A` ranging over 2-subsets of indices 0..3 and `B` over 2-subsets of 4..7. Fix `j in {4,5,6}`, put `t=x_7-x_j`, and let `k,l` denote the other two right indices. The column for pair `{j,7}` is divisible by `t^2`, since every entry contains the factor `(x_7-x_j)^2`. Subtract column `{j,k}` from column `{7,k}` and, independently, column `{j,l}` from column `{7,l}`: both differences are divisible by `t` because the corresponding columns become equal upon specializing `x_7=x_j`. Thus the 6x6 determinant is divisible by `t^4`. The three monic irreducible differences `x_7-x_4`, `x_7-x_5`, `x_7-x_6` are pairwise relatively prime in `Z[x_0,...,x_7]`, so
+
+```text
+prod_(j=4..6) (x_7-x_j)^4  |  det K(x_0,...,x_7)
+                                      in Z[x_0,...,x_7].
+```
+
+Only the three columns for right pairs containing index 7 depend on `x_7`, and each entry has degree at most six in `x_7`. Therefore `deg_(x_7)(det K) <= 18`, and the **quotient by the proven degree-12 collision factor has degree at most six**. This argument holds in every characteristic after reduction and requires neither a nonzero determinant nor an elliptic curve. It does **not** prove that the degree-six quotient is the square of a cubic for arbitrary other seven abscissae; that stronger statement remains conjectural.
+
+The new `quotient_interpolate.py` determines the quotient from **seven** distinct noncollision field evaluations instead of 19 determinant samples. It retains the same 32 independent held-out determinant checks and compares its output with the original degree-18 interpolation/division path in a separate execution mode. `cubic_factor_fast.py` now uses the new routine in its selector, retains the exact polynomial-square assertion as a fail-closed gate, and reports `interpolation_points=7`, `quotient_degree` and the unchanged 32 holdouts. The determinant-evaluation count for interpolation + 32 checks drops from **51 to 39** (a source-level reduction in calls, not a measured runtime speedup or ECDLP cost change).
+
+A local standalone helper-equivalent replay reproduced the original quotient coefficients exactly on four fixed test families over F_1019, F_10007, F_(2^61-1), and F_(2^127-1), with degree six in all four, and exercised the new quotient at the 256-bit NIST prime modulus. These are [pcc:unverified] producer-local arithmetic checks; the exact checked-in integration still needs independent CI/repository replay.
+
+Run from repository root:
+
+```sh
+python3 research/norm_branch_rank_pilot_20261115/quotient_interpolate.py
+python3 research/norm_branch_rank_pilot_20261115/cubic_factor_fast.py --selftest
+```
+
+**Experiment decision:** the collision quartic is now a mathematically established factor, so future work should no longer spend time fitting or testing that component. The remaining novel algebraic question is whether the **degree-six quotient is generically a square of a cubic**, why noncollision roots yield corank two rather than just one, and whether either structure produces **positive algebraic ECDLP relations** on a growing-`k` held-out campaign. The fixed eight-sum support and cold-cost boundaries from the preceding sections are unchanged.
