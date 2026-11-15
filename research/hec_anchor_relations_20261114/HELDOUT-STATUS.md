@@ -49,3 +49,14 @@ comparison and mathematical novelty review remain outstanding. No leaderboard pr
 
 No experiment is running. Remaining operational work: commit/package evidence, extend PR4274,
 follow current-head CI/S3 custody, checkpoint this handoff. Never edit prior closed records/raw.
+
+## Unsigned claim receipt
+PCC-20261115-38951c records the held-out numerical assertions with a pinned compact raw
+observation table and a separate native jq recomputation. `pcc verify` returns not_covered;
+`pcc standing` returns unverified because the producer report has no independent signature.
+This adds custody and an explicit claim record; it does not promote any scientific standing.
+
+Before publication, the sparse-checkout ledger omission was corrected: all1057original ledger
+entries are preserved byte-for-byte, followed by the claim and an incident note. The captured
+unpublished erroneous entry is UNPUBLISHED-LEDGER-INCIDENT.jsonl. Shared ledger chain/prefix
+checks pass with1059entries. No previous claim or verdict was removed or changed.

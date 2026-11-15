@@ -58,3 +58,7 @@ and mathematical novelty remain unestablished. No default/index/leaderboard chan
 New scientific execution, custody collection, statistics and report generation are Rust/native
 jq/Typst. Historical Python visual-report sources and their frozen evidence remain preserved.
 Record20261115T0700Z-hec-heldout-scaling names the archive and independently hashed summary.
+
+Unsigned claim receipt: PCC-20261115-38951c, standing unverified/not_covered. Its native
+producer recomputation pins the compact raw observation table; independent signature/replay
+is absent. CI acceptance is separate from scientific verification.
