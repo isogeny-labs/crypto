@@ -2393,8 +2393,9 @@ def ghs_blreuse_md(g: dict) -> list[str]:
     L = ["", "## GHS-weak E0/F_{q^3}: block Lanczos without two redundant products, outside tables A–C", "",
          "Same instances and configuration as the two sections above (c_D = 1.7, square-root chain, fast relation stage). "
          "The DL arm's block Lanczos (width 4) no longer computes MV_prev^T MV (it equals columns of this iteration's "
-         "V^T MV by M-orthogonality) or V_i^T V_0 for i >= 2 (it follows from the three-term recurrence's k x k "
-         "coefficients); both fall back to the direct product after narrowing. Every other counted field, the iteration "
+         "V^T MV by M-orthogonality, exact in every path) or V_i^T V_0 for i >= 2 (it follows from the three-term "
+         "recurrence's k x k coefficients while no column has been narrowed away; amendment 1 falls back to the direct "
+         "product after any narrowing, with identical counts on all 30 units). Every other counted field, the iteration "
          "count and every logarithm are unchanged. Cold M-eq of the DL arm divided by the previous configuration on the "
          "same instance, k = 18..22, seeds 1–6; geometric mean (worst seed) with additions priced at 0, 0.5 and 1 M-eq. "
          f"Pre-registered decision: {'improvement' if g['supported'] else 'not supported'}. Class: {g['class']}. "
