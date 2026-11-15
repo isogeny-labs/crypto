@@ -1,0 +1,10 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-t1355-39d9b7fa | 23.11 | rho-neg | 2/2 | 1.197 | 1.304 | 2.272 | — |
+| icv1-fp24-t1355-39d9b7fa | 23.11 | sem-chain-t2 | 2/2 | 214.273 | 8049499.518 | 80493066.722 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-t1355-39d9b7fa | rho-neg vs sem-chain-t2 | rho-neg < sem-chain-t2 |
