@@ -1650,11 +1650,11 @@ mod tests {
             r
         }
         fn is_prime(n: u64) -> bool {
-            if n < 4 || n % 2 == 0 {
+            if n < 4 || n.is_multiple_of(2) {
                 return n == 2 || n == 3;
             }
             let (mut d, mut s) = (n - 1, 0);
-            while d % 2 == 0 {
+            while d.is_multiple_of(2) {
                 d /= 2;
                 s += 1;
             }
