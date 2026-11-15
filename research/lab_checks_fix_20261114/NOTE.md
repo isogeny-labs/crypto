@@ -173,3 +173,31 @@ leaderboard input is lost. The trade-off is that the job no longer runs on
 frontier changes outside `establishment/`. Those changes cannot alter the
 leaderboard. The missing figure itself is still missing: options (a)–(c)
 remain open for repairing the study's `figures/`.
+
+## Option (b) attempt (2026-11-15): re-render done, push refused
+
+All statements here are `[pcc:unverified]` assertions from this session's
+command output.
+
+- Rendered only `boundary_map()` from
+  `research/ecbench_e2e_frontier_20261031/render_figures.py`, with output in a
+  scratch directory. The install was matplotlib 3.10.8 (the version named in the
+  committed PDF), numpy 2.5.4 and freetype 2.6.1. The only input is the
+  committed `frontier_snapshot.json`, so nothing was pulled from the store.
+  Neither that file nor the script changed between db7f7d3e10 and the tree.
+- New `boundary-map.png`: sha256
+  `81594cf35637a60c23047b0f2cfc682bd0c2c9e770798356c7c2ffcdae22add6`,
+  193639 B, 2307 x 1148 px. The lost original was 169645 B (`06b915ab...`),
+  so the bytes differ. The original is gone, so the pixels cannot be compared.
+- The companion `boundary-map.pdf` from the same render is byte-identical to
+  the committed PDF except for `/CreationDate`. The plotted data and layout
+  therefore match. The PNG size difference most likely comes from the raster
+  stack (freetype or zlib build). This was not tested.
+- `python3 tools/artifacts/artifacts.py push .../figures/boundary-map.png`
+  exited 2: `` artifacts: `aws` not found; install the AWS CLI or set ARTIFACTS_AWS ``.
+  The pointer `figures/.artifacts.json` was left unchanged, still at `06b915ab...`.
+- Still open: an owner with store write credentials re-renders the figure (or
+  uses the PNG above), runs
+  `python3 tools/artifacts/artifacts.py push research/ecbench_e2e_frontier_20261031/figures/boundary-map.png`,
+  and commits the rewritten pointer as a reviewed change. The new bytes differ
+  from the lost original.

@@ -1,0 +1,34 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-030",
+  "title": "Repair dead links in the root README research index",
+  "class": "docs-tooling",
+  "difficulty": 2,
+  "source": [
+    "README.md (links to ./RESEARCH.md, ./RESEARCH_P256.md, ./RESEARCH_RESIDUAL_WALKS.md, ./RESEARCH_TII_MCELIECE.md, ./RESEARCH_EXOTIC_COORDINATES.md, ./DEFERRED.md, ./docs/RESEARCH_BENCH_LOG.md)",
+    "docs/DEFERRED.md"
+  ],
+  "prompt": "Seven relative links near the end of `README.md` point at files that are not in the repository root (`./RESEARCH.md`, `./RESEARCH_P256.md`, `./RESEARCH_RESIDUAL_WALKS.md`, `./RESEARCH_TII_MCELIECE.md`, `./RESEARCH_EXOTIC_COORDINATES.md`, `./DEFERRED.md`, `./docs/RESEARCH_BENCH_LOG.md`). Find where each document went, using git history, and repair each link. If a document is gone for good, say so and keep the entry as plain text with a note instead of a link. Leave every other link in README.md alone.",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- README.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
+  "acceptance": [
+    "none of the seven targets remains a dead relative link",
+    "README.md still lists all seven entries (as a link or as annotated plain text)",
+    "only README.md changed"
+  ],
+  "check_command": "python3 -c \"import re,os;f='README.md';t=open(f).read();bad=[x for x in re.findall(r'\\]\\((\\./[^)#\\s]+)',t) if re.search(r'RESEARCH|DEFERRED',x) and not os.path.exists(x)];print(bad);raise SystemExit(1 if bad else 0)\" && for n in RESEARCH_P256 RESEARCH_RESIDUAL_WALKS RESEARCH_TII_MCELIECE RESEARCH_EXOTIC_COORDINATES DEFERRED RESEARCH_BENCH_LOG; do grep -q \"$n\" README.md || exit 1; done && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc '^README.md$')\" = 0 ]",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "deleting entries to make the check pass",
+    "pointing links at files that do not exist"
+  ],
+  "max_wall_minutes": 25,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Dead links found by scanning relative link targets, 2026-11-15. ./RESEARCH.md matches the 'RESEARCH' filter; the check leaves false positives elsewhere in README.md (sessions/..., tables/) alone."
+}

@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0239Z-ic-gpu-rootfind-m3",
+  "latest_record": "20261115T0317Z-genus-ladder-scale",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 4,
-    "measured": 176,
-    "open": 0
+    "measured": 179,
+    "open": 2
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -2464,6 +2464,537 @@
     },
     {
       "better": "lower",
+      "first": 0.6677638364209324,
+      "latest": 0.6677638364209324,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6563666166577568,
+            0.6793589587206363
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.6677638364209324
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.6907608750588367,
+      "latest": 0.6907608750588367,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.676849629335083,
+            0.7049580376970707
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.6907608750588367
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5957548772263922,
+      "latest": 0.5957548772263922,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5836234323126437,
+            0.6081384915143417
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5957548772263922
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.8589768247986305,
+      "latest": 7.8589768247986305,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.696159
+      },
+      "metric": "fp20_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.696159
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.3796975073023274,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.8589768247986305
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 7.111354055695914,
+      "latest": 7.111354055695914,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.603242
+      },
+      "metric": "fp20_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.603242
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.2691499828475836,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.111354055695914
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.58758174672307,
+      "latest": 14.58758174672307,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.143109
+      },
+      "metric": "fp20_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.143109
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.3746252273950295,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.58758174672307
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.5732780016891322,
+      "latest": 0.5732780016891322,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5593052061836886,
+            0.5875998713889119
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5732780016891322
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5964883365746998,
+      "latest": 0.5964883365746998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5825048139389976,
+            0.6108075455440152
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5964883365746998
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5016278555270598,
+      "latest": 0.5016278555270598,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4913683767473674,
+            0.5121015461075353
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5016278555270598
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.390894343938431,
+      "latest": 7.390894343938431,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.776033
+      },
+      "metric": "fp22_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.776033
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.2795796107762163,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.390894343938431
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.64927952268661,
+      "latest": 6.64927952268661,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.674148
+      },
+      "metric": "fp22_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.674148
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.1718550848270417,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 6.64927952268661
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.065427735204743,
+      "latest": 14.065427735204743,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.253802
+      },
+      "metric": "fp22_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.253802
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.2491003443187934,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.065427735204743
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.4842625047788181,
+      "latest": 0.4842625047788181,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.47402810976282467,
+            0.4947178631494867
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.4842625047788181
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5010859114536607,
+      "latest": 0.5010859114536607,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4909425327970129,
+            0.5114388627663705
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5010859114536607
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.42610600569321144,
+      "latest": 0.42610600569321144,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.415640784782985,
+            0.4368347254050702
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.42610600569321144
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.157859173063904,
+      "latest": 7.157859173063904,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.041586
+      },
+      "metric": "fp24_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.041586
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.1847649638714108,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.157859173063904
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.383007476400372,
+      "latest": 6.383007476400372,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.870922
+      },
+      "metric": "fp24_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.870922
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.0872239713560443,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 6.383007476400372
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.13152444303565,
+      "latest": 14.13152444303565,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.851203
+      },
+      "metric": "fp24_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.851203
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.0626338965097077,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.13152444303565
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
       "first": 0.7081,
       "latest": 0.7081,
       "latest_derived": {
@@ -3430,6 +3961,70 @@
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 5.07,
+      "latest": 5.07,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.07
+      },
+      "metric": "fpm_mid_2lp_over_rho_g2_p16777259",
+      "points": [
+        {
+          "commit": "30e46a98d6b6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.07
+          },
+          "n": 6,
+          "record": "20261115T0317Z-genus-ladder-scale",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            2.43,
+            11.9
+          ],
+          "summary": "Genus ladder scaling: genus 2 to 2^24 (no crossing, both exponents 1), genus 3 to 2^15 (2LP exponent 1.344, 0.54 of rho at 32771); 234 runs all certified; unverified pre-gate.",
+          "value": 5.07
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.537,
+      "latest": 0.537,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.537
+      },
+      "metric": "fpm_mid_2lp_over_rho_g3_p32771",
+      "points": [
+        {
+          "commit": "30e46a98d6b6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.537
+          },
+          "n": 6,
+          "record": "20261115T0317Z-genus-ladder-scale",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.407,
+            0.686
+          ],
+          "summary": "Genus ladder scaling: genus 2 to 2^24 (no crossing, both exponents 1), genus 3 to 2^15 (2LP exponent 1.344, 0.54 of rho at 32771); 234 runs all certified; unverified pre-gate.",
+          "value": 0.537
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
     },
     {
       "better": "lower",
@@ -10197,6 +10792,126 @@
     },
     {
       "better": "higher",
+      "first": 0.991804565084696,
+      "latest": 0.991804565084696,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_setup_aa_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9378872415286191,
+            1.0129599415443826
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 0.991804565084696
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0046914203549053,
+      "latest": 1.0046914203549053,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_setup_aa_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9768508269034454,
+            1.0187328523500878
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.0046914203549053
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.7958690853222574,
+      "latest": 2.7958690853222574,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_setup_eager_over_lazy_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.6978782196249074,
+            2.8968500680872653
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 2.7958690853222574
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 3.0319161107087145,
+      "latest": 3.0319161107087145,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_setup_eager_over_lazy_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.831952070881805,
+            3.0887840199227785
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 3.0319161107087145
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
       "first": 0.9814972203776974,
       "latest": 0.9814972203776974,
       "latest_derived": {
@@ -10257,11 +10972,131 @@
     },
     {
       "better": "higher",
-      "first": 1.0050488198854794,
-      "latest": 1.0052391975524457,
+      "first": 1.000968636122419,
+      "latest": 1.000968636122419,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0189,
-        "improvement_vs_previous_percent": 1.3882
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "descent_setup_aa_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9594768879195211,
+            1.057082416023057
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.000968636122419
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9953119278862266,
+      "latest": 0.9953119278862266,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "descent_setup_aa_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9850382399038405,
+            1.0112179899757592
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 0.9953119278862266
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.486047500005094,
+      "latest": 1.486047500005094,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "descent_setup_eager_over_lazy_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.4459113529423155,
+            1.5467136083987132
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.486047500005094
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.5956690573808785,
+      "latest": 1.5956690573808785,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "descent_setup_eager_over_lazy_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.5541343389463467,
+            1.6184302283457912
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.5956690573808785
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0050488198854794,
+      "latest": 0.9954311801310548,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.9569,
+        "improvement_vs_previous_percent": -0.9757
       },
       "metric": "setup_aa_k0n53",
       "points": [
@@ -10317,6 +11152,24 @@
           ],
           "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
           "value": 1.0052391975524457
+        },
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.9569,
+            "improvement_vs_previous_percent": -0.9757
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.949128455168818,
+            1.0455779805345222
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 0.9954311801310548
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -10325,10 +11178,10 @@
     {
       "better": "higher",
       "first": 1.0032154840727214,
-      "latest": 1.0136484493851134,
+      "latest": 1.0127577015964162,
       "latest_derived": {
-        "improvement_vs_first_percent": 1.04,
-        "improvement_vs_previous_percent": 1.636
+        "improvement_vs_first_percent": 0.9512,
+        "improvement_vs_previous_percent": -0.0879
       },
       "metric": "setup_aa_k0n61",
       "points": [
@@ -10384,6 +11237,84 @@
           ],
           "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
           "value": 1.0136484493851134
+        },
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.9512,
+            "improvement_vs_previous_percent": -0.0879
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9922999561749404,
+            1.0319336815240008
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.0127577015964162
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0346014737017963,
+      "latest": 1.0346014737017963,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_eager_over_lazy_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9814945407392492,
+            1.0705957747507269
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.0346014737017963
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0149471493124298,
+      "latest": 1.0149471493124298,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_eager_over_lazy_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9944149171914297,
+            1.0389593408156936
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.0149471493124298
         }
       ],
       "problem": "ic:koblitz_setup_phase",
