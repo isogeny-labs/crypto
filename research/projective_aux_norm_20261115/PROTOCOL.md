@@ -55,6 +55,7 @@ artifact-store workflow, not shards. No adaptive target/cap/retry or backend
 schedule change, no scientific clocks, no paid job and no cold DLP claim are
 authorized by this panel. Independent OpenSSL replay of complete model sets
 requires a separate compiled replay interface and must use the same fixture.
+[pcc:unverified]
 
 Formal evidence: the shared CommRing/IsCoprime step law is being built before
 the short AdjoinRoot(F19) endpoint. Its assumptions are actual unit parameters,
@@ -175,6 +176,7 @@ the unchanged1M reduction cap, with entries below2M. Preserve all outcomes.
 The msolve oracle already returns complete verified model sets for all12
 targets. A selective relation procedure needs checked point witnesses; its
 correctness does not require trusting the solver's source-ideal claim.
+[pcc:unverified]
 
 Generalize the existing shared collector and scalar arithmetic to an explicit
 prime scalar order, retaining default19. Reuse its label-free query, signed-row,

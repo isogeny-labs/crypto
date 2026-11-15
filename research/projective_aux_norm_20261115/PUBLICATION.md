@@ -116,3 +116,34 @@ field/scalar orders and preserves default/full and one-target CLI bindings.
 Strict fresh cold-build006 passes. The frozen cold006 run and default18-target
 regression start only after committed source and pre-call hashes are recorded.
 No successful cold006 result is asserted before those calls complete.
+
+A5 completes: the auxiliary point-only candidate recovers scalar 11 for
+P=(4,3), Q=(18,1) on E/F19:y²=x³+2, using 13 attempts, 12 solver calls,
+9 misses, 4 relations, rank 2 and one kernel. Independent OpenSSL replay
+checks every query/row/kernel and the final main-curve answer. The fresh
+default F17 regression passes all 18 targets, 72 relations and 18 kernels;
+all 54 attempt/relation/kernel files are byte-identical to the saved parent.
+Whole cold006 evidence is 18388 bytes with normalized archive metadata and
+a SHA256 file. No growing-family degree/yield or speed claim follows.
+[pcc:unverified]
+
+The parent PR4285 merged before this continuation's later source commits; its
+daily-log conflict guard has ended. The task-wide D3 autonomy episode remains
+open. The new indexed005 whole archive is 688992 bytes and requires the
+documented same-repository artifact-autofix upload and complete-byte replay;
+remote custody is pending its receipt. No raw round is split.
+
+All six normalized whole archives pass their SHA256 checks and exact
+unpack/repack byte identity (checks/archive-identity.txt). The three-page
+Typst PDF was rendered and every page visually inspected, including the
+pipeline diagram, fixed outcomes, source commits and custody limitations.
+New scoped statement PCC-20261115-1f50be remains unverified, as does the
+parent statement; no signed result or execution standing is promoted.
+[pcc:unverified]
+
+Before choosing generated setup, read the existing auxiliary counting/search
+construction, MIT18.783 Lecture2 section2.2 and Lecture3 sections3.11–3.11.2,
+and the FLINT polynomial API. SETUP-REVIEW.md records fixed-degree rational
+point halving as a next candidate, with sampling-law, failed-path accounting
+and exact-order/trace replay obligations. No generated-setup code or run
+begins in this checkpoint. No prior-art absence or new complexity claim.
