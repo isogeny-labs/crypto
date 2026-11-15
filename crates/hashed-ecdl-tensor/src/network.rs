@@ -309,6 +309,12 @@ pub(crate) struct Program {
     pub steps: Vec<Step>,
     pub edge_signals: Vec<usize>,
     pub signal_regions: Vec<Option<String>>,
+    /// Steps that are the consistency check of the definition just before
+    /// them, on exactly that definition's inputs and outputs. Program
+    /// evaluation computes those outputs with the same function, so the check
+    /// holds by construction there and is skipped; every accepted assignment
+    /// is still verified against the whole graph. Empty means none.
+    pub implied: Vec<bool>,
 }
 
 /// Conservative dependence on enumeration digits (digit zero changes fastest).
@@ -576,6 +582,9 @@ impl Program {
         let mut bits: Vec<bool> = Vec::new();
         let mut input: Vec<BigUint> = Vec::new();
         for (index, step) in self.steps.iter().enumerate() {
+            if self.implied.get(index).copied().unwrap_or(false) {
+                continue;
+            }
             meter.charge(1, "parsimonious program evaluation")?;
             let cutoff = plan.map_or(0, |p| p.step_cutoffs[index]);
             match step {

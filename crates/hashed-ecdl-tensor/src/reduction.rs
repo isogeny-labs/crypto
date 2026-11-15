@@ -125,12 +125,13 @@ pub fn decomposition_network(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<Network> {
-    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Fourier, meter)?.0)
+    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Auto, meter)?.0)
 }
 
 /// The same language with the integer multiplication gadget chosen explicitly
-/// (`Multiplier::Fourier` reproduces `decomposition_network`). Only the Boolean
-/// graph changes: the accepted assignments, counts and witnesses do not.
+/// (`Multiplier::Auto` reproduces `decomposition_network`; `Fourier` is
+/// Theorem 3's gadget throughout). Only the Boolean graph changes: the accepted
+/// assignments, counts and witnesses do not.
 pub fn decomposition_network_with_multiplier(
     curve: &Curve,
     bases: &[FactorBase],

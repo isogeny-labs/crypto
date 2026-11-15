@@ -16,6 +16,9 @@ Study: `research/hashed_ecdl_dedupe_20261115/`. Tool: `native/`
 *Unit.* Step counts are the crate's `Meter` charges: deterministic diagnostics,
 not calibrated time. No wall-clock time is reported.
 
+*Result.* The final build uses at least 10x fewer charged steps than main on
+every one of the 36 recorded counts and 5 solves (table below).
+
 == The steps (cumulative)
 
 + *dedupe* (commit 1). `canonical(w)` and `valid_point(P)` are emitted once per
@@ -33,10 +36,25 @@ not calibrated time. No wall-clock time is reported.
   a valid point as valid. New exhaustive test: for every input pair on two tiny
   curves the graph accepts exactly one of all $2^(1+2w)$ output values, $a+b$;
   deleting one output constraint makes it fail.
-+ *final*. `modular_multiply` by a canonical constant with a double-and-add
++ *chains*. `modular_multiply` by a canonical constant with a double-and-add
   chain of at most four additions (e.g. the $3x^2$ of doubling) uses modular
   additions instead of two Fourier products. Tested against $x c mod 13$ for
   every $c$ and every 4-bit $x$.
++ *implied*. A checked definition emits a Define step and the Check of the
+  same function on exactly its inputs and outputs. Program evaluation computes
+  those outputs with that function, so the check holds there by construction
+  and is skipped (the graph keeps the vertex; every accepted assignment is
+  still verified against the whole graph, so a disagreement raises an
+  integrity error instead of a wrong count). Census rewiring, which can swap
+  endpoints, clears the marks.
++ *auto*. `Multiplier::Auto` (now `decomposition_network`'s default) builds
+  each product with whichever gadget, Fourier or schoolbook, has fewer graph
+  ports for those operand shapes, chosen once per shape by building both in a
+  scratch encoder. Schoolbook wins at these widths; Fourier still wins at
+  $d = 131$, so the ECCp-131 network keeps it.
++ *final*. A ripple-adder bit with two constant-zero inputs passes the third
+  through instead of emitting a full adder (shifted schoolbook rows and
+  constant multipliers have many such bits).
 
 The language is unchanged at every step: each removed piece is a duplicate of,
 or implied by, constraints that remain.
@@ -46,7 +64,7 @@ or implied by, constraints that remain.
 #table(
   columns: 5,
   [slots], [variant], [all = brute force, same counts and visited assignments], [charged steps, before / variant], [edges, variant / before],
-  ..(("2", C2), ("3", C3)).map(((m, C)) => ("skip_only", "memo_only", "dedupe", "fold", "valid", "final").map(v => (
+  ..(("2", C2), ("3", C3)).map(((m, C)) => ("skip_only", "memo_only", "dedupe", "fold", "valid", "chains", "implied", "auto", "final").map(v => (
     m, v,
     if C.at(v).at("all_match_brute_force") and C.at(v).at("same_counts_as_before") and C.at(v).at("same_functional_assignments_as_before") { "yes" } else { "NO" },
     sp(C.at(v).at("step_ratio_before_over_variant")), sp(C.at(v).at("edge_fraction_variant_over_before")),

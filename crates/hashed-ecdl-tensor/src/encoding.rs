@@ -86,6 +86,11 @@ pub enum Multiplier {
     Fourier,
     /// Schoolbook AND/ripple-adder gadget: Θ(d²) edges, every vertex of arity ≤ 5.
     Schoolbook,
+    /// Per product, whichever of the two gadgets has fewer graph ports for
+    /// these operands (their widths and which bits are constants); ties go to
+    /// Fourier. Schoolbook wins below roughly 20 bits, Fourier above, so large
+    /// fields keep Theorem 3's gadget. Same language either way.
+    Auto,
 }
 
 /// Words representing a point: one identity bit and canonical coordinates.
@@ -120,6 +125,10 @@ pub struct Encoder {
     /// determined by the inputs, so reusing them preserves every count.
     reused: HashMap<(Vec<Bit>, String, Option<String>), Word>,
     multiplier: Multiplier,
+    /// Indices of steps that only re-check the definition before them.
+    implied: Vec<usize>,
+    /// `Multiplier::Auto` choices by operand shape (None marks a signal bit).
+    multiplier_choice: HashMap<(Vec<Option<bool>>, Vec<Option<bool>>), Multiplier>,
 }
 impl Encoder {
     /// Start an empty encoding.
@@ -204,7 +213,56 @@ impl Encoder {
         match self.multiplier {
             Multiplier::Fourier => self.integer_multiply(a, b, meter),
             Multiplier::Schoolbook => self.schoolbook_multiply(a, b, meter),
+            Multiplier::Auto => match self.smaller_multiplier(a, b, meter)? {
+                Multiplier::Schoolbook => self.schoolbook_multiply(a, b, meter),
+                _ => self.integer_multiply(a, b, meter),
+            },
         }
+    }
+
+    /// Build both gadgets on fresh inputs of this shape in a scratch encoder
+    /// and return the one with fewer graph ports. Cached per shape.
+    fn smaller_multiplier(&mut self, a: &Word, b: &Word, meter: &Meter) -> Result<Multiplier> {
+        let shape = |word: &Word| -> Vec<Option<bool>> {
+            word.0
+                .iter()
+                .map(|bit| match bit {
+                    Bit::Constant(value) => Some(*value),
+                    Bit::Signal(_) => None,
+                })
+                .collect()
+        };
+        let key = (shape(a), shape(b));
+        if let Some(&choice) = self.multiplier_choice.get(&key) {
+            return Ok(choice);
+        }
+        let ports = |multiplier: Multiplier| -> Result<usize> {
+            let mut scratch = Encoder::new();
+            let word = |pattern: &[Option<bool>], scratch: &mut Encoder| -> Result<Word> {
+                let mut bits = Vec::with_capacity(pattern.len());
+                for bit in pattern {
+                    bits.push(match bit {
+                        Some(value) => Bit::Constant(*value),
+                        None => scratch.input_word(1, meter)?.0[0],
+                    });
+                }
+                Ok(Word(bits))
+            };
+            let a = word(&key.0, &mut scratch)?;
+            let b = word(&key.1, &mut scratch)?;
+            match multiplier {
+                Multiplier::Schoolbook => scratch.schoolbook_multiply(&a, &b, meter)?,
+                _ => scratch.integer_multiply(&a, &b, meter)?,
+            };
+            Ok(scratch.vertices.iter().map(|v| v.edges.len()).sum())
+        };
+        let choice = if ports(Multiplier::Schoolbook)? < ports(Multiplier::Fourier)? {
+            Multiplier::Schoolbook
+        } else {
+            Multiplier::Fourier
+        };
+        self.multiplier_choice.insert(key, choice);
+        Ok(choice)
     }
 
     pub(crate) fn set_semantic_region(&mut self, region: &str) -> Result<()> {
@@ -446,6 +504,7 @@ impl Encoder {
             function: function.clone(),
         });
         if checked {
+            let define_step = self.steps.len() - 1;
             let mut ports = inputs.to_vec();
             ports.extend(outputs.clone());
             let count = inputs.len();
@@ -457,6 +516,10 @@ impl Encoder {
                     move |values, work| Ok(function(&values[..count], work)? == values[count..]),
                     meter,
                 )?;
+            }
+            // Exactly one check pushed directly after this definition.
+            if self.steps.len() == define_step + 2 {
+                self.implied.push(define_step + 1);
             }
         }
         Ok(outputs)
@@ -657,6 +720,21 @@ impl Encoder {
         let mut carry = Self::constant(1, &BigUint::zero())?;
         let mut result = Vec::with_capacity(a.width() + 1);
         for i in 0..a.width() {
+            // x + 0 + 0 = x with no carry: two constant-zero addends need no
+            // full adder (an all-constant bit folds inside `define`).
+            let zeros = [a.0[i], b.0[i], carry.0[0]]
+                .iter()
+                .filter(|bit| matches!(bit, Bit::Constant(false)))
+                .count();
+            if zeros >= 2 {
+                let rest = [a.0[i], b.0[i], carry.0[0]]
+                    .into_iter()
+                    .find(|bit| !matches!(bit, Bit::Constant(false)))
+                    .unwrap_or(Bit::Constant(false));
+                result.push(rest);
+                carry = Self::constant(1, &BigUint::zero())?;
+                continue;
+            }
             let mut output = self.define(
                 &[Self::slice(a, i, 1), Self::slice(b, i, 1), carry],
                 &[1, 1],
@@ -1795,7 +1873,18 @@ impl Encoder {
         if self.vertices.iter().any(|v| v.edges.contains(&usize::MAX)) {
             return Err(integrity("unattached encoding port"));
         }
+        let mut implied = vec![false; self.steps.len()];
+        for &step in &self.implied {
+            // Only a check that directly follows its definition qualifies.
+            if matches!(self.steps.get(step), Some(Step::Check { .. }))
+                && step > 0
+                && matches!(self.steps[step - 1], Step::Define { .. })
+            {
+                implied[step] = true;
+            }
+        }
         let program = Program {
+            implied,
             free: self.free,
             signals: self.uses.len(),
             steps: self.steps,

@@ -9,23 +9,25 @@ import matplotlib.pyplot as plt
 H = os.path.dirname(os.path.abspath(__file__))
 R = json.load(open(os.path.join(H, "report.json")))
 fig, ax = plt.subplots(1, 3, figsize=(16, 4.4))
-order = ("skip_only", "memo_only", "dedupe", "fold", "valid", "final")
-names = {"skip_only": "skip O+A1 only", "memo_only": "check/op reuse only", "dedupe": "1: both",
-         "fold": "2: + constant folding", "valid": "3: + implied validity", "final": "4: + small-constant chains"}
-colors = {"skip_only": "#e69f00", "memo_only": "#56b4e9", "dedupe": "#009e73", "fold": "#cc79a7",
-          "valid": "#d55e00", "final": "#2a6fdb"}
+order = ("dedupe", "fold", "valid", "chains", "implied", "auto", "final")
+names = {"dedupe": "1: dedupe", "fold": "2: + constant folding", "valid": "3: + implied validity",
+         "chains": "4: + small-constant chains", "implied": "5: + skip implied checks",
+         "auto": "6: + smaller multiplier per width", "final": "7: + zero-addend adders (final)"}
+colors = {"dedupe": "#009e73", "fold": "#cc79a7", "valid": "#d55e00", "chains": "#e69f00",
+          "implied": "#56b4e9", "auto": "#999933", "final": "#2a6fdb"}
 
 for k, slots in enumerate((2, 3)):
     per = R["counts"][f"slots_{slots}"]
     for j, v in enumerate(order):
         ratios = [row["ratio"] for row in per[v]["table"]]
         xs = [j + (i - len(ratios) / 2) * 0.02 for i in range(len(ratios))]
-        ax[0].scatter([x + 7 * k for x in xs], ratios, s=10, color=colors[v],
+        ax[0].scatter([x + 8 * k for x in xs], ratios, s=10, color=colors[v],
                       label=names[v] if k == 0 else None)
 ax[0].axhline(1, color="#888", lw=1, ls=":")
-ax[0].set_xticks([2.5, 9.5]); ax[0].set_xticklabels(["m = 2 (24 counts)", "m = 3 (12 counts)"])
+ax[0].axhline(10, color="#c0392b", lw=1, ls="--")
+ax[0].set_xticks([3, 11]); ax[0].set_xticklabels(["m = 2 (24 counts)", "m = 3 (12 counts)"])
 ax[0].set_ylabel("charged steps: before / variant")
-ax[0].set_title("Exact count vs main, every row = brute force"); ax[0].legend(fontsize=7)
+ax[0].set_title("Exact count vs main, every row = brute force"); ax[0].legend(fontsize=7, loc="upper left", ncol=2); ax[0].set_ylim(0, 30)
 
 s = R["sizes"]
 for slots, mk in ((2, "o"), (3, "s")):

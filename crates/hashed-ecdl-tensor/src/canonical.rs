@@ -1622,9 +1622,16 @@ mod tests {
                 .unwrap()
             })
             .collect::<Vec<_>>();
-        let network =
-            crate::reduction::decomposition_network(&curve, &bases, curve.generator(), &mut work)
-                .unwrap();
+        // Fourier explicitly: its pointwise and transform vertices are the
+        // ones above the exact cap (the default picks schoolbook at this width).
+        let network = crate::reduction::decomposition_network_with_multiplier(
+            &curve,
+            &bases,
+            curve.generator(),
+            crate::encoding::Multiplier::Fourier,
+            &mut work,
+        )
+        .unwrap();
         let pins = vec![None; network.edge_count()];
         let snapshot = CanonicalNetwork::capture(
             &network,

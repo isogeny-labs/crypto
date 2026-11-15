@@ -25,9 +25,25 @@ record byte for byte, and built against the merged branch reproduces every
    a valid point instead of re-checking it: every case pins the result to the
    identity, a valid input, or the chord/tangent point of the unique slope.
    `negate_point` records (x, -y) of a valid point as valid.
-4. **final** (`encoding.rs`). `modular_multiply` by a canonical constant whose
+4. **chains** (`encoding.rs`). `modular_multiply` by a canonical constant whose
    double-and-add chain has at most four additions (such as the 3x^2 of
    doubling) uses modular additions instead of two Fourier products.
+5. **implied** (`network.rs`, `encoding.rs`, `census.rs`). A checked definition
+   emits a Define step and a Check of the same function on exactly its inputs
+   and outputs. Program evaluation computes those outputs with that function,
+   so the Check holds there by construction and is skipped. The graph keeps the
+   vertex, and every accepted assignment is still verified against the whole
+   graph, so a disagreement would raise an integrity error, not a wrong count.
+   Census rewiring (which can swap endpoints) clears the marks.
+6. **auto** (`encoding.rs`, `reduction.rs`). `Multiplier::Auto`, now the
+   default of `decomposition_network`, builds each product with whichever
+   gadget (Fourier or schoolbook) has fewer graph ports for those operand
+   shapes, decided once per shape in a scratch encoder. Schoolbook wins at the
+   recorded widths; Fourier still wins at d = 131, so ECCp-131 keeps it.
+   `decomposition_network_with_multiplier(.., Fourier, ..)` gives the
+   Theorem 3 gadget throughout.
+7. **final** (`encoding.rs`). A ripple-adder bit with two constant-zero inputs
+   passes the third through instead of emitting a full adder.
 
 New unit tests: memo emits nothing twice; `point_add`'s graph accepts exactly
 one of all 2^(1+2w) output values, a + b, for every input pair on two tiny
@@ -42,21 +58,26 @@ every constant c < 13 matches x*c mod 13 for every 4-bit x.
 | step 1 dedupe: charged steps before / after | 1.54–2.01 (median 1.77) | 2.49–2.87 (median 2.69) |
 | step 2 + fold | 1.99–2.96 (median 2.39) | 3.13–3.57 (median 3.36) |
 | step 3 + valid | 2.24–3.88 (median 2.86) | 3.47–4.05 (median 3.76) |
-| step 4 final | 3.01–5.65 (median 4.03) | 5.06–5.69 (median 5.39) |
-| edges, final / before | 0.12 | 0.17 |
+| step 4 + chains | 3.01–5.65 (median 4.03) | 5.06–5.69 (median 5.39) |
+| step 5 + implied | 3.79–6.78 (median 5.03) | 6.85–7.75 (median 7.27) |
+| step 6 + auto | 8.08–13.78 (median 9.96) | 11.19–15.07 (median 13.1) |
+| **step 7 final** | **12.32–19.10 (median 14.21)** | **15.08–20.95 (median 18.62)** |
+| edges, final / before | 0.04 | 0.06 |
 
 * Five seeded `reduction::solve` runs (p = 5, 7, 11, 13) recover the same scalar
   with the same relation count and pass `reduction::verify` at every recorded
-  step; final uses 3.53–5.56x fewer charged steps than before. [pcc:unverified]
+  step; final uses 12.29–16.73x fewer charged steps than before. [pcc:unverified]
 * The ECCp-131 decomposition network (bundled certified input) drops from
-  1,531,849 to 253,318 edges and from 225,617 to 43,540 vertices with two
-  slots; from 2,380,538 to 517,805 edges with three. Maximum degree is
-  unchanged (132 at small sizes, 1032 at d = 131).
+  1,531,849 to 252,526 edges and from 225,617 to 43,144 vertices with two
+  slots; from 2,380,538 to 517,003 edges with three. Maximum degree there is
+  unchanged (1032).
 
 These are constant factors in what every backend contracts. The exponent is
 unchanged: the `Functional` backend still visits 2^(free input bits)
 assignments, and the recursive backend still needs at least 2^131070 edges,
-against 2^18.0 for the two-slot ECCp-131 network now. No ECCp-131 scalar is
+against 2^18.0 for the two-slot ECCp-131 network now. Most of the 10x on the
+recorded toy curves (steps 6 and 7) comes from the multiplier choice at small
+widths, so it does not carry over to d = 131, where Fourier stays smaller. No ECCp-131 scalar is
 computed.
 
 ## Units and gates
@@ -88,5 +109,6 @@ typst compile runs/report.typ runs/report.pdf
 `network.rs`, from step 1. `dedupe`: the first commit of this change. `fold`
 and `valid`: the working tree after steps 2 and 3 (step 4's
 `multiply_by_small_constant`, and for `fold` also `proven_valid` /
-`negate_point`, absent). `mult` and `modops` modes print the multiplier and
+`negate_point`, absent). `chains`: commit e852145431. `implied`, `auto`: the
+working tree after steps 5 and 6 (counts only). `mult` and `modops` modes print the multiplier and
 modular-operation sizes used to choose the step-4 threshold.
