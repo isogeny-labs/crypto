@@ -1,0 +1,130 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "B1 LEAD-ICP-prime-ic-constant-engineering: factor-base size above 45 at 20 bits",
+  "description": "research/ic_lead_queue_20261114/B_sweep_followups/B1/PROTOCOL.md. Two fresh 20-bit prime_search curves (seeds from seeds.json); arms differ only in prime-abscissa:size. Derived with jq from research/prime_base_oracle_tuning_20261029/specs/holdout-P20.json. Public synthetic curves and targets; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 211747386521066
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 145169970934094
+      }
+    ],
+    "targets_per_curve": 96,
+    "target_seed": 242005234523932,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "inc-n32",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "n45",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "n45-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=45",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "n56",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=56",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "n64",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "n80",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=80",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    },
+    {
+      "name": "n91",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=91",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "1410236"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 270048475138877,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

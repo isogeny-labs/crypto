@@ -36,9 +36,30 @@ static int serve_main() {
   }
 }
 
+// Binary serve mode: the same walk, the protocol of fes_serve_bin_read.
+static int serve_bin_main() {
+  FesSystem sys;
+  std::vector<uint64_t> qsym, df, sols;
+  for (;;) {
+    const int r = fes_serve_bin_read(sys, 62);
+    if (r == 0) return 0;
+    if (r < 0) { fes_serve_bin_reply(nullptr, 0, 0, 1); return 2; }
+    qsym.assign((size_t)sys.n * sys.n, 0);
+    fes_build_qsym(sys.quad_tri.data(), sys.n, qsym.data());
+    df.assign(sys.n, 0);
+    sols.clear();
+    struct VecEmit { std::vector<uint64_t> *v; void operator()(uint64_t x) { v->push_back(x); } } emit{&sols};
+    fes_walk_block<6>(sys.cst, sys.lin.data(), sys.quad_tri.data(), qsym.data(), sys.n, sys.n, 0,
+                      df.data(), emit);
+    fes_serve_bin_reply(sols.data(), sols.size(), sols.size(), 0);
+  }
+}
+
 int main(int argc, char **argv) {
-  for (int i = 1; i < argc; ++i)
+  for (int i = 1; i < argc; ++i) {
     if (!strcmp(argv[i], "--serve")) return serve_main();
+    if (!strcmp(argv[i], "--serve-bin")) return serve_bin_main();
+  }
   // Accept `--in <file>` (the shared worker convention) or a bare positional
   // path, so every worker — fes_solve, fes_cuda, fes_metal — takes the same
   // arguments from the Rust driver.
