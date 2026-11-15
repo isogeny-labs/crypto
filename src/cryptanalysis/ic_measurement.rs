@@ -98,8 +98,7 @@ impl Clock {
             // across P-, C- and T-states, the `nonstop_tsc` flag on Linux).
             // `cpuid` exists on every x86-64 CPU (a safe intrinsic).
             let max_ext = std::arch::x86_64::__cpuid(0x8000_0000).eax;
-            if max_ext >= 0x8000_0007
-                && std::arch::x86_64::__cpuid(0x8000_0007).edx & (1 << 8) != 0
+            if max_ext >= 0x8000_0007 && std::arch::x86_64::__cpuid(0x8000_0007).edx & (1 << 8) != 0
             {
                 // CPUID 0x8000_0001 EDX bit 27: `rdtscp`.
                 return if std::arch::x86_64::__cpuid(0x8000_0001).edx & (1 << 27) != 0 {

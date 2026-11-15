@@ -90,9 +90,9 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations_touching_miss, price_phase, Calibration, CompletionRule, CountedGroup,
-    FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver, RestartPool,
-    TargetSource,
+    collect_and_solve_relations_touching_miss, price_phase, Calibration, CompletionRule,
+    CountedGroup, FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver,
+    RestartPool, TargetSource,
 };
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
