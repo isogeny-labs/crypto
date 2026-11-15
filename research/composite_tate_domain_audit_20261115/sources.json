@@ -1,0 +1,166 @@
+{
+  "schema": "known-composite-tate-source-plan/v1",
+  "created": "2026-11-15T03:40:26.089619+00:00",
+  "formal": {
+    "project": "research/composite_tate_domain_audit_20261115/lean",
+    "theorem": "CompositeTateDomainAudit.known_composite_tate_control_certificate",
+    "statement": "theorem known_composite_tate_control_certificate : LiteralGuard ∧ Nat.card G = 6 ∧ addOrderOf threePoint = 3 ∧ negativeUnit ≠ 1 ∧ negativeUnit ^ 6 = 1 ∧ orderOf negativeUnit = 2 ∧ (¬ ∃ u : Fˣ, IsPrimitiveRoot u 6) ∧ Nat.card LeftDomain = 6 ∧ Nat.card RightDomain = 6 ∧ Nat.card Target = 2 ∧ leftPoint ≠ 1 ∧ rightPoint ≠ 1 ∧ (∀ B : BilinearMap, (∀ Q : RightDomain, B leftPoint Q = 1) ∧ (∀ P : LeftDomain, B P rightPoint = 1) ∧ ¬ LeftNondegenerate B ∧ ¬ RightNondegenerate B) ∧ (¬ ∃ B : BilinearMap, LeftNondegenerate B ∧ RightNondegenerate B) ∧ (¬ (LiteralGuard → ∃ B : BilinearMap, LeftNondegenerate B ∧ RightNondegenerate B)) ∧ (∀ (M : Type) [CommMonoid M] (ell : ℕ), Nat.Prime ell → ∀ u : M, u ^ ell = 1 → u ≠ 1 → IsPrimitiveRoot u ell)",
+    "decl_sha256": "c0b96f82c9239660a8c2dd7e8d1f5eafad909f0cf6431d8a3a1cc3f49fda1371",
+    "scope": "Knownnegativecontrol/source reconstruction of alreadyrecordedPCC-20261110-5e63e9 F5/n6 Tate boundary, not newsourcecoverage/all14gapclosure. Actual E/F5:y²=x³+1 nonsingular/count6/P=(0,1)order3. Exact actualkernel[6]/curvequotientby6multiples/unitquotientby6thpowers, cardinalities6/6/2 derived. Actualnontrivial6throot -1order2/no primitive6root; gcd(6,5)=1/6dividesactualcount retained. Everyfunctiononexactdomains with bothmultiplicativebilinearitylaws hasexplicitactualnonzeroorder3left/rightpoints in itsradicals, bothnondegeneracyimpossible. Identity/powerlaws derived, no hiddenrank/root/NDpremise. Directnegation ofnecessarybilinear+NDexistence consequence ofliteralnontrivial-root sourcecondition. Genericcommutativemonoid prime nonidentityroot primitive arithmeticproved, notqualifiedTatepositiveproof. Fournewmodules/no priorcustomproofimports; samehost/prover/Mathlib, notindependentimplementation/physicalhostverification. Duplicate detectedat05, userinformed/protocolamended/oldREADMEfullread; originalprotocol/allfailuresretained. No canonicaldivisorMilleridentification/MOVFR/generalqualifiedTateduality/canonicalpromotion/novelty/full14completion.",
+    "sources": [
+      {
+        "path": "research/composite_tate_domain_audit_20261115/lean/CompositeTateCertificate.lean",
+        "bytes": 1801,
+        "sha256": "d164b62c391a39a683820d715bc6155bc6ac8bfbefb882f69909d937bcbd56a8"
+      },
+      {
+        "path": "research/composite_tate_domain_audit_20261115/lean/CurveDomain.lean",
+        "bytes": 4675,
+        "sha256": "a31303b566b1187f9df53a41e98bef835b05633d4915c574b4755e10992c7158"
+      },
+      {
+        "path": "research/composite_tate_domain_audit_20261115/lean/PairingObstruction.lean",
+        "bytes": 3789,
+        "sha256": "80a452e3fa4fd1129f89b5537a58162c4a98cd2e288d12182d136bbcd1d41d2e"
+      },
+      {
+        "path": "research/composite_tate_domain_audit_20261115/lean/UnitsQuotient.lean",
+        "bytes": 4077,
+        "sha256": "8ecb6a669f565dc294032876a1a449682ea60b1daf475fa40439cd5e57c3d5c3"
+      },
+      {
+        "path": "research/composite_tate_domain_audit_20261115/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "43ee88324dca002596005f7c1005219978550ceb943120936269363305b28563"
+      },
+      {
+        "path": "research/composite_tate_domain_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3178,
+        "sha256": "e32262bc82ed67d63327fd530cc1492fbaad4613637d8130ba50410e41a0ae07"
+      },
+      {
+        "path": "research/composite_tate_domain_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CompositeTateCertificate",
+    "CurveDomain",
+    "PairingObstruction",
+    "UnitsQuotient"
+  ],
+  "artifacts": [
+    {
+      "path": "research/composite_tate_domain_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 16304,
+      "sha256": "7b92d1180fda888425a68306c2f947196c15d85a0b5814f87be07a3e7205e319"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "09754a7131e31e9ad1c8bac5da5facd5db4532a971bdd8f2c6e357f19f7b20d6"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/evidence/attempts.json",
+      "bytes": 231,
+      "sha256": "92f7e5969f921dd5c9e09d45ce306dabd139b6f5992bba7534c09080e0ef3833"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 1375,
+      "sha256": "9f7c284a92cd9808e3925185e4f6cafd9d0d66d463e87dd36f49b8fff0b21dab"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/evidence/gate.json",
+      "bytes": 1253,
+      "sha256": "93908267f40b2f31c2b78c762ffeb75371722ad5186ec0c3a54b0de76d86bd6a"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/evidence/source-review.json",
+      "bytes": 3905,
+      "sha256": "e0d9953c37197d39f124134aec9be1577a51527b5336b4322f40c43799c13954"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/evidence/binding-check.json",
+      "bytes": 3995,
+      "sha256": "3104955737db8ce3184dec71c9eb0e0d55d319813b188816566c1baf38a8a823"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/proof-map.json",
+      "bytes": 4570,
+      "sha256": "7c289f54241991f68caebbb2aeeb20c5ca92bb8d9d3f80f491dba39965847d97"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/render_report.py",
+      "bytes": 7358,
+      "sha256": "b139fed89f0590f9af3cbd601203738cddd7cdd900e2ad60dd7889592a023db4"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/export_binding_input.py",
+      "bytes": 1764,
+      "sha256": "a0d98459c77d55fcf0973e16be47bf75e56159ba3a57dc587e254fdd1084a3a0"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/reports/known-control.svg",
+      "bytes": 1410,
+      "sha256": "fd37a05ed3ed6967a7847b011b16d96f97c2a0c241d5290a26d883eb862f33b0"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/reports/layout.json",
+      "bytes": 287,
+      "sha256": "781c8de9ebf58395ad09af664e5a9b9ee195b7326ac5f49f306b660d774c4821"
+    },
+    {
+      "path": "research/composite_tate_domain_audit_20261115/reports/report.pdf",
+      "bytes": 47274,
+      "sha256": "f1de36f1367da35347aacebbc9acd70532089975824e3d46d74ee8edcf704c90"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 53,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "known_negative_control_reconstruction": true,
+    "prior_claim": "PCC-20261110-5e63e9",
+    "new_source_coverage": false,
+    "new_all14_gap_closure": false,
+    "no_prior_customproof_modules_imported": true,
+    "independent_implementation_or_physicalhost_validation": false,
+    "actual_kernel_curvequotient_unitpowerquotient_defined": true,
+    "actual_domain_target_counts_derived": [
+      6,
+      6,
+      2
+    ],
+    "actual_both_nonzero_radical_witnesses_proved": true,
+    "prime_nonidentity_root_arithmetic_proved": true,
+    "general_primitive_root_qualified_Tate_positive_proof": false,
+    "canonical_divisor_Miller_identification_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

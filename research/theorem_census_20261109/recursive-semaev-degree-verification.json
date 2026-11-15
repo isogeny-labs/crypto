@@ -1,0 +1,47 @@
+{
+  "schema": "recursive-semaev-degree-verification/v1",
+  "created": "2026-11-09T19:00:18.942Z",
+  "formal_source_commit": "196d2fac3a78a514cbc7247bd5d8d8230c17ab08",
+  "formal_source": "research/theorem_census_20261109/lean/RecursiveSemaevDegree.lean",
+  "formal_source_sha256": "cea5acca394aa203c125416ce1d69247079749e48de38ce4d67faaf7a5ae9edf",
+  "binding": "RecursiveSemaevDegreeAudit.recursive_semaev_degree_audit_certificate",
+  "decl_sha256": "659172d7e674fc1681e87c55c4796f0db871784169e700f4d8369b9cf3506ea1",
+  "gate": {
+    "path": "evidence/recursive-semaev-degree-gate.log",
+    "declarations": 308,
+    "failing": 0,
+    "trusted_native": 0,
+    "tracked_modules_include": "RecursiveSemaevDegree",
+    "binding_present": true,
+    "sha256": "07c604ad6ed5328fdf49ffc277e481564344a0c4bb48c56d4d83b81a76ae045f"
+  },
+  "packet": {
+    "id": "PCC-20261109-3bc113",
+    "path": "evidence/pcc-recursive-semaev-degree-check.json",
+    "sha256": "dfaaa31c9f5d3c3e2ff0345d6004170770f3624d35d5644e3ea7b15471f54a6e",
+    "verdict": "pass",
+    "verified_at": "2026-11-09T18:58:23Z",
+    "standing": "Unsigned producer check; no signed or separate-host promotion"
+  },
+  "identity": {
+    "id": "IDC1h0872017c01480c3d",
+    "path": "recursive-semaev-degree-identity-certificate.json",
+    "sha256": "bb78ee8c280276f4cfa12a8231324f8e8d7631e53509941806365d70baed155f",
+    "source_sha256": "518ccfcce32ee3913827556eb67f30cd21dd42b4a0154e052b09632e9dac3225",
+    "variables": 10,
+    "degree_bound": 18,
+    "points": 32,
+    "extra_points": 11,
+    "seed_hex": "0x202611091850",
+    "extra_seed_hex": "0x5e4ae084",
+    "modulus_decimal": "2305843009213693951",
+    "proof_pointer_matches": true,
+    "issue_and_extra_check_exit": 0,
+    "scope": "Only fixedD8scalar monic-square resultant Res_(8,2)(sum a_i X^i,(X-z)^2)=(sum a_i z^i)^2, actual10x10determinant AST. No native all-arity coefficient/degree conclusion.",
+    "independence": "Producer-issued on one host with unchanged repository checker; no independent-host or signed standing"
+  },
+  "scope": "Every arity last input only; does not prove symmetry/every input, all-m zero-sum equivalence or irreducibility.",
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}
