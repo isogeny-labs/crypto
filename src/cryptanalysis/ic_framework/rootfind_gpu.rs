@@ -483,7 +483,11 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
         let rem = b - off(lo);
         let bi = (lo + rem / 2) as usize;
         let rb = reps.get(bi)?;
-        let j = if rem % 2 == 0 { rb.plus } else { rb.minus };
+        let j = if rem.is_multiple_of(2) {
+            rb.plus
+        } else {
+            rb.minus
+        };
         Some((reps[lo as usize].plus, j))
     }
 
