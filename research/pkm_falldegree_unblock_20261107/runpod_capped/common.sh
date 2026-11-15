@@ -18,11 +18,22 @@ GQL=https://api.runpod.io/graphql
 FLAVOR=cpu5m VCPU=16 RAM_GB=128           # the one pinned flavor (decision D8): 16 vCPU, 128 GB; no fallback
 INSTANCE="$FLAVOR-$VCPU-$RAM_GB"
 MEM_FLOOR_GB=61 MEM_FLOOR_M112_GB=121     # 56 GiB = 60.13 GB; 112 GiB = 120.26 GB (Amendment 14)
-HOURS=26 CEIL_USD=40 STUDY_CEIL_USD=400   # decision 4: price x 26 h <= US$40 per job; US$400 for the study
+WORST_HOURS=30 CEIL_USD=40 STUDY_CEIL_USD=400  # decision 4. One worst-case pod life for every cost figure (S7): the
+                                          # hard deadline (26 h) plus one reaper interval (4 h) = 30 h; US$31.20 at 1.04/h
 DEADLINE_S=90000                          # the registered job time limit (requests: seconds 90000), from the runner's start
 START_WITHIN_S=3300                       # the runner must start within 55 min of creation, so start + 25 h <= creation + 26 h
 HARD_S=93600                              # 26 h after creation: the reaper deletes any pkm-x- pod older than this
-UNREACH_GAP_S=3600                        # two unreachable check-ins at least 1 h apart (with an unhealthy REST record)
+UPLOAD_WAIT_S=7200                        # a completed run's pod waits at most 2 h for the raw upload (S8)
+CLASSIFIER_VERSION=a18-r4                 # recorded in every outcome.json with the SHA-256 of fetch.sh and common.sh (S3)
+# The frozen image, pinned here rather than read from the mutable image/*.json files (S3); run.sh checks they agree.
+LAYER_DIGEST=a0f7e28eb0759ddefc4b906974866d2a2215d4705e25e9fd1fca45513b8b1971
+BIN_SHA_PINS='pkm_tower_pilot f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7
+prime_fall_degree_tools 7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a
+hky_fp_tower_check c36d324e8a60b0d8e827982baf7e07e0ce155664c67ce8c11b4debc410b95c6e
+pfd_grid_zeros 962833611e13e78a3dc5fbb9ab6bfc498fde9cccab255c704ed6e2ff12a03354
+entry_r2.sh 25b01841573334d1942de72e84aa55f60d4f238682fba33a41aa2bcd8962ea49
+run.sh c35ea88e7007198b9e9a026812a9bcb0ce55bc4082ba3627564c67f0fbab6eeb'
+M112_LIMIT_BYTES=120259084288             # 112 GiB: the pod's cgroup memory.max must be at least this, or "max" (S4)
 LEDGER_FRESH_S=86400                      # the ledger's complete_as_of line must be at most 24 h old for a study launch
 POLL_S=${RPC_POLL_S:-10}                    # seconds between API polls (only the tests shorten it)
 RAYON=12                                  # Amendment 9; rp_pinned.sh start sends rayon 12
@@ -36,6 +47,15 @@ STUDY_NAMES=(pkm-x-t14-k0-c6 pkm-x-t14-k0-c6-r1 pkm-x-t14-k0-c6-m112 pkm-x-t14-k
              pkm-x-t13-k0-c6-r3 pkm-x-t13-k0-c6-m112)
 
 now() { date -u +%FT%TZ; }
+bin_sha() { awk -v f="$1" '$1 == f { print $2 }' <<<"$BIN_SHA_PINS"; }
+bin_sha_json() { awk '{ printf "%s\"%s\":\"%s\"", (NR > 1 ? "," : "{"), $1, $2 } END { print "}" }' <<<"$BIN_SHA_PINS"; }
+# frozen_ok FILE...: each route file's SHA-256 appears in the preregistration (the frozen Amendment 18 lists them; S3).
+frozen_ok() { local f; for f in "$@"; do grep -qF "$(sha256sum "$here/$f" | cut -d' ' -f1)" "$PREREG" || return 1; done; }
+# session_action REC ACTION POD REASON: every delete the session makes is logged with its reason before the API call
+# (RunPod keeps no independent record of who ended a pod; N3).
+session_action() { [ -d "$1" ] && jq -nc --arg at "$(now)" --arg a "$2" --arg p "$3" --arg r "$4" '{at:$at, action:$a, pod:$p, reason:$r}' >> "$1/session-actions.jsonl"; return 0; }
+# remind PATH...: the session commits and pushes these after every launch and every fetch.sh call (N6).
+remind() { echo "COMMIT AND PUSH NOW: $* runpod_capped/ledger.tsv (git add, commit, push; the session does this)" >&2; }
 epoch() { date -u -d "$1" +%s; }
 is_study() { local n; for n in "${STUDY_NAMES[@]}"; do [ "$1" = "$n" ] && return 0; done; return 1; }
 is_dev() { [[ $1 =~ ^pkm-x-dev-[a-z0-9]+(-[a-z0-9]+)*$ ]]; }
@@ -48,14 +68,15 @@ name_request() {
   if is_m112 "$1"; then echo "$here/requests_m112/pfd-x-$c-m112.json"; else echo "$study/requests_r2i/pfd-x-$c.json"; fi
 }
 # Amendment 14's -m112 request, derived from an r2i request: 112Gi, --max-dense 27900000000, job-name suffix -m112.
-# Every other field, provenance.protocol_sha256 included, is copied unchanged; the note is appended to.
+# Every other field, provenance.protocol_sha256 included, is copied unchanged; the note is appended to (the note stays
+# within the validator's 2048-character limit for provenance strings).
 m112_request() {
   local src=$1 rel; rel=${src#"$study/"}
   jq -e '.job.memory == "56Gi" and (.job.command[1] | test(":12800000000$"))' "$src" >/dev/null || return 1
   jq --arg rel "$rel" '.job.job_name |= sub("^(?<c>pfd-x-t[0-9]+-k[01]-c[0-9]+)"; "\(.c)-m112")
     | .job.memory = "112Gi"
     | .job.command[1] |= sub(":12800000000$"; ":27900000000")
-    | .provenance.note += " Amendment 14 -m112 re-run request (112Gi, --max-dense 27900000000, job-name suffix -m112), generated from \($rel) by research/pkm_falldegree_unblock_20261107/runpod_capped/make_requests_m112.sh for draft Amendment 18 (RunPod route); every other field is copied unchanged, including provenance.protocol_sha256."' "$src"
+    | .provenance.note += " Amendment 14 -m112 request (112Gi, --max-dense 27900000000, name suffix -m112), derived from \($rel) by runpod_capped/make_requests_m112.sh (draft Amendment 18); other fields unchanged."' "$src"
 }
 
 # Network setup. Called only by the modes that talk to RunPod (the offline classifier does not need it).
@@ -81,7 +102,8 @@ redact() { jq 'del(.env, .dockerStartCmd, .consumerUserId)'; }
 list_pkm() {
   local t; t=$(mktemp); local c; c=$(api_code GET "$API/pods" "$t")
   [ "$c" = 200 ] && jq -e 'type == "array"' "$t" >/dev/null || { rm -f "$t" "$t.err"; return 1; }
-  jq -c '.[] | select(.name | startswith("pkm-x-")) | {id,name,desiredStatus,costPerHr,createdAt,lastStartedAt}' "$t"
+  jq -c '.[] | select((.name // "") | startswith("pkm-x-")) | {id,name,desiredStatus,costPerHr,createdAt,lastStartedAt,lastStatusChange}' "$t" \
+    || { rm -f "$t" "$t.err"; return 1; }
   rm -f "$t" "$t.err"
 }
 
@@ -90,24 +112,33 @@ outcome_of() {
   local d="$REC_ROOT/$1"
   if [ ! -d "$d" ]; then echo NONE; elif [ -f "$d/outcome.json" ]; then jq -r '.class' "$d/outcome.json"; else echo INFLIGHT; fi
 }
-lostlike() { [ "$1" = LOST ] || [ "$1" = ABORTED ]; }
+# Relaunch accounting (owner decision 13, main-session decision N1): only a LOST whose outcome says relaunch "auto"
+# (positive host-side evidence) gets the cell's one relaunch; ABORTED, NO_EVIDENCE and a LOST with relaunch "owner"
+# resolve the cell for the owner.
+lostlike() { [ "$2" = LOST ] && jq -e '.relaunch == "auto"' "$REC_ROOT/$1/outcome.json" >/dev/null 2>&1; }
+# as_m112 NAME: the classifier counted this 56Gi attempt as the cell's -m112 attempt (peak > 56 GiB, row oversize false).
+as_m112() { jq -e '.memory.as_m112 == true and .row.oversize != true' "$REC_ROOT/$1/outcome.json" >/dev/null 2>&1; }
 needs_m112() { [ "$2" = OOM ] || { [ "$2" = ADMITTED ] && jq -e '.row.oversize == true' "$REC_ROOT/$1/outcome.json" >/dev/null 2>&1; }; }
 # cell_next CELL BASE RELAUNCH(0|1): the next name this cell needs, BLOCKED:<name>, or RESOLVED:<name>:<class>.
+# A 56Gi attempt with as_m112 occupies the cell's -m112 slot: no -m112 run follows it, and if it is LOST with relaunch
+# "auto" the -m112 relaunch (-m112-r1) follows when the cell's one relaunch is unused (Amendment 14's accounting).
 cell_next() {
   local c=$1 cur=$2 rl=$3 r1used=0 o
   o=$(outcome_of "$cur")
   case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
-  if lostlike "$o"; then
-    [ "$rl" = 1 ] || { echo "RESOLVED:$cur:$o"; return; }
+  if [ "$o" = LOST ] && ! as_m112 "$cur"; then
+    { [ "$rl" = 1 ] && lostlike "$cur" "$o"; } || { echo "RESOLVED:$cur:$o"; return; }
     cur="pkm-x-$c-r1"; r1used=1; o=$(outcome_of "$cur")
     case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
-    lostlike "$o" && { echo "RESOLVED:$cur:$o"; return; }
+    [ "$o" = LOST ] && ! as_m112 "$cur" && { echo "RESOLVED:$cur:$o"; return; }
   fi
-  needs_m112 "$cur" "$o" || { echo "RESOLVED:$cur:$o"; return; }
-  cur="pkm-x-$c-m112"; o=$(outcome_of "$cur")
-  case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
-  if lostlike "$o"; then
-    { [ "$rl" = 1 ] && [ "$r1used" = 0 ]; } || { echo "RESOLVED:$cur:$o"; return; }
+  if ! as_m112 "$cur"; then
+    needs_m112 "$cur" "$o" || { echo "RESOLVED:$cur:$o"; return; }
+    cur="pkm-x-$c-m112"; o=$(outcome_of "$cur")
+    case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
+  fi
+  if [ "$o" = LOST ]; then
+    { [ "$rl" = 1 ] && [ "$r1used" = 0 ] && lostlike "$cur" "$o"; } || { echo "RESOLVED:$cur:$o"; return; }
     cur="pkm-x-$c-m112-r1"; o=$(outcome_of "$cur")
     case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
   fi
@@ -131,6 +162,8 @@ ledger_sum() {
     NF != 6 || ($4 != "open" && $4 != "closed") || $5 !~ /^[0-9]+(\.[0-9]+)?$/ { bad = 1; print "malformed ledger line " NR ": " $0 > "/dev/stderr" }
     { s += $5; n++ } END { if (bad || n == 0) exit 1; printf "%.4f\n", s }' "$LEDGER"
 }
+# ledger_has NAME: any ledger row (any state) for this name (N6: a name with a row is never launched again).
+ledger_has() { awk -F'\t' -v n="$1" 'index($1, n "/") == 1 { f = 1 } END { exit !f }' "$LEDGER"; }
 ledger_asof() { awk -F'\t' '$1 == "# complete_as_of" { print $2 }' "$LEDGER" | tail -1; }
 ledger_add() { printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$1" runpod_capped "draft Amendment 18" open "$2" "$3" >> "$LEDGER"; }
 ledger_close() { # ledger_close JOB USD SOURCE: closes this route's open row for JOB with the actual (derived) cost,

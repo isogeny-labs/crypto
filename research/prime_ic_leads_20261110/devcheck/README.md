@@ -3,7 +3,7 @@
 Host: this Claude Code container (4 cores, 15 GB, no isolation tier, other jobs on
 the host during the run). Binary: `target/release/examples/pkm_tower_pilot` built from
 this branch. Closure engine (`--engine hky`), Kummer towers at `P1 = 2013265921`, the
-fall-degree study's seed `0x504B4D54` = 1347106132. Every value `[pcc:unverified]`.
+fall-degree study's seed 1347106132 = `0x504B3554` (passed explicitly; the pilot's default `0x504B4D54` = 1347112276 is not used). Every value `[pcc:unverified]`.
 
 - `run.sh`: the ladder (`--planted 0 --random 2`, as stage A/C): `m = 2` at `t = 2..10`
   (cmax 7), `m = 3, 4` at `t = 2, 3` (cmax 8), `m = 5` at `t = 2, 3` (cmax 9).

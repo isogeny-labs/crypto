@@ -1,0 +1,25 @@
+digraph Routes {
+  graph [rankdir=TB, bgcolor="white", pad=0.15, nodesep=0.25, ranksep=0.35, fontname="Helvetica", label="P-256 transfer search — bounded producer results\nNo measured speedup; orbit arithmetic and solver costs remain open", labelloc=t, fontsize=15];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fb", color="#3e6487", fontname="Helvetica", fontsize=11, margin="0.10,0.07"];
+  edge [fontname="Helvetica", fontsize=9, color="#5a7186"];
+  e [label="P-256 E / Fp\nicv1-fp256-t89188191154553853111372247798585809583\n-f188c491"];
+  canonical [label="Canonical image in J(C3)\nAll 9 rational induced (2,2,2) quotients split\n3 pair + 6 non-pair kernels",fillcolor="#fcf0df"];
+  mixed [label="Mixed E-factor image i_lambda in J(C3)\nNonzero order-n generator; rotation eigenvalue lambda\n6 distinct signed images checked over the actual field"];
+  gate [label="Candidate: automorphism-folded rho\nIdeal step ratio 1/sqrt(3) versus source negation\nNeed cycle-safe solver + full cost; measured gain unknown",fillcolor="#fff5ce"];
+  v3 [label="Vélu degree-3 E' / Fp\nUnregistered research model: exact a',b',r in audit.json\nForward/dual and n-order image checked\nStandard control; no faster solver supplied"];
+  c2 [label="J(C2): 1 rational Richelot kernel of 15\nSplit quotient E x F2",fillcolor="#fcf0df"];
+  f2 [label="F2: rational 3-torsion witness\nHasse excludes rational P-256-order subgroup",fillcolor="#fce8e8"];
+  e -> canonical [label="degree-2 cover pullback"];
+  e -> mixed [label="alpha0(P) - alpha1([lambda]P)"];
+  mixed -> gate;
+  e -> v3 [label="explicit degree-3 map"];
+  e -> c2 [label="degree-2 cover pullback"];
+  c2 -> f2 [style=dashed,label="companion projection is zero"];
+  { rank=same; canonical; mixed; }
+  { rank=same; v3; c2; }
+  { rank=same; gate; f2; }
+  canonical -> v3 [style=invis,weight=20];
+  mixed -> c2 [style=invis,weight=20];
+  v3 -> gate [style=invis,weight=20];
+  c2 -> gate [style=invis,weight=1];
+}

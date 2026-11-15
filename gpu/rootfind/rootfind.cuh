@@ -187,6 +187,37 @@ RF_HD void rf_prefetch(const void *p) {
 #define RF_EYT_PF(k) do { } while (0)
 #endif
 
+/* ---- negation-folded pair table, built from the base (RF_LOOKUP_PAIRS_DEVICE) ----
+ *
+ * The CPU build (ic_boundary PairTable::build_negation_folded) visits, for each
+ * abscissa index ai, the pairs (P_ai, Q) with Q in {+P_bi, -P_bi} for bi >= ai, in
+ * that order, and keeps the first pair seen for each abscissa of the sum.  Build
+ * index b = rf_pair_offset(ai, n) + 2 (bi - ai) + s, s = 0 for +P_bi, 1 for -P_bi;
+ * (ai, ai, 1) is P - P, the identity, which takes an index but makes no entry.
+ * x, y: the base's representatives (Montgomery form); a_m: the curve's a.       */
+RF_HD uint64_t rf_pair_offset(uint64_t ai, uint64_t n) { return 2 * (ai * n - ai * (ai - 1) / 2); }
+
+/* x(P_ai + s P_bi) into *out (Montgomery); 0 when the sum is the identity. */
+RF_HD int rf_pair_x(const Fp64Ctx &f, uint64_t a_m, const uint64_t *x, const uint64_t *y,
+                    uint32_t ai, uint32_t bi, int s, uint64_t *out) {
+    typedef FieldFp64 F;
+    const uint64_t x1 = x[ai], y1 = y[ai];
+    uint64_t lam;
+    if (bi == ai) {
+        if (s) return 0;                                         /* P - P */
+        const uint64_t x2 = F::sqr(f, x1);
+        const uint64_t num = F::add(f, F::add(f, F::add(f, x2, x2), x2), a_m);
+        lam = F::mul(f, num, F::inv(f, F::add(f, y1, y1)));     /* 2P (y != 0) */
+        *out = F::sub(f, F::sqr(f, lam), F::add(f, x1, x1));
+        return 1;
+    }
+    const uint64_t x2 = x[bi];
+    const uint64_t y2 = s ? F::sub(f, 0, y[bi]) : y[bi];
+    lam = F::mul(f, F::sub(f, y2, y1), F::inv(f, F::sub(f, x2, x1)));
+    *out = F::sub(f, F::sub(f, F::sqr(f, lam), x1), x2);
+    return 1;
+}
+
 struct SortedTable {
     const uint64_t *keys;   /* ascending */
     const uint32_t *idx;    /* factor-base index of keys[pos] */
@@ -325,6 +356,14 @@ struct DecompArgs {
     rf_relation *out;
     uint32_t *out_count;           /* atomic; may exceed out_cap */
     uint32_t out_cap;
+    /* Probe mode (probe_mode = 1): candidates are looked up in the set
+     * probe_x (Montgomery form; the lookup table is built on it) instead of
+     * the factor base, every hit is emitted whatever its index (no j >= i),
+     * and tau is +1 (the caller re-derives the summands).  This is the
+     * three-summand sweep against the abscissae of a pair table.  With
+     * probe_mode = 0, probe_x must equal fb_x. */
+    const typename F::elt *probe_x;
+    uint32_t probe_mode;
 };
 
 RF_HD uint32_t rf_atomic_inc(uint32_t *ctr) {
@@ -484,6 +523,11 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
             while (table.valid(pos, key)) {
                 const uint32_t j = table.index(pos);
                 pos = table.next(pos, key);
+                if (a.probe_mode) {
+                    if (!F::eq(f, x3, a.probe_x[j])) continue;   /* key collision */
+                    rf_emit(a.out, a.out_count, a.out_cap, k, i, j, eps, 1);
+                    continue;
+                }
                 if (j < i) continue;
                 if (!F::eq(f, x3, a.fb_x[j])) continue;   /* 64-bit key collision (P-256 only) */
                 const elt y3 = F::sub(f, F::mul(f, lam, F::sub(f, xr, x3)), yr);

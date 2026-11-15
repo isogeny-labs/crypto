@@ -1,4 +1,6 @@
-# Proposed atlas update: Iwasawa leads for prime-field ECDLP (not applied)
+# Proposed atlas update: Iwasawa leads for prime-field ECDLP (applied in crypto-autoresearcher#3300)
+
+Status (2026-11-15): applied in isogeny-labs/crypto-autoresearcher#3300 after mapping onto existing cards; cards 3, 4 and 5 became scoped evidence entries on existing leads, see REPORT.md §11 [pcc:unverified].
 
 Target: `crypto-autoresearcher/knowledge/leads/ecdlp/`. This session could not read or edit the atlas.
 The repository is vault-encrypted and `KEY` was not available. The card IDs below are therefore

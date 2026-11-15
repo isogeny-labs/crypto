@@ -634,3 +634,141 @@ narrowed to stage B, with the two changes listed under "Differences from R3". Ev
    MB (measured in `research/runpod_kit_20261112/README.md`). The SHA-256 check before `/start` is unchanged.
 
 Registered per the owner's choice above.
+
+## Amendment 17 (2026-11-14; stage B's binaries: identity by reproduction, not by hash; before any stage B row exists)
+
+This amends Amendment 16's binary rule. Every number is `[pcc:unverified]`.
+
+**What happened (measured).**
+- A rebuild of `f13a690df0` in this container used the recipe of `image/build_layer_r2.sh`: rustc 1.97.0, musl,
+  `-C target-cpu=x86-64`, `--locked`. `pfd_grid_zeros` came out bit-identical. `pkm_tower_pilot`,
+  `prime_fall_degree_tools` and `hky_fp_tower_check` did not.
+- The three that differ link C code built with this container's `musl-gcc`/gcc 13.3.0 (`ring`, `libsqlite3-sys`,
+  `blake3`); `pfd_grid_zeros` does not. The rebuild embeds no build path.
+- The frozen image cannot be copied out of ECR here (no AWS credentials). Hashes and toolchain:
+  `research/pkm_falldegree_unblock_20261107/runpod/gate17/`.
+
+**The rule, replacing Amendment 16's hash rule for stage B.** A rebuilt binary may stand in for the frozen one only if it
+reproduces committed rows of the frozen image exactly. That means every deterministic field: `x_R`, curve, last fall
+degree, `ffd`, the fall degrees, closure multiply-adds and column counts, F4 `D` and F4 multiply-adds. Timing is excluded.
+The gate runs the registered flags of `run.sh` (rayon 12):
+
+- **Stage A, Kummer `P1`, Kummer and isogeny `P0`, closure and F4, `t ≤ 8`** against
+  `results/R9/analysis/pfdA_summary.json`: **48 draws, 432 checks, 0 differences** (measured,
+  `gate17/stageA_compare.txt`). The null and naive arms were not run.
+- **Stage C, `t = 2`, `m = 3, 4, 5`, both primes, closure** against `results/C9/analysis/pfdC_summary.json`:
+  **18 draws, 126 checks, 0 differences** (measured, `gate17/stageC_compare_m3to5.txt`). These are the same systems as
+  stage B's `t = 2` points.
+- **The `m = 6` cells** were still running on this 4-vCPU host at registration. Their comparison is reported with the
+  stage B rows whatever it reads. A wall-budget censoring on this host is a host effect, not a binary difference, and is
+  reported as such.
+- **G1** passes on the rebuild: `G1: 6 cases pass`.
+
+**Consequences.**
+- The runner's SHA-256 gate checks the uploaded files against the gated rebuild's hashes (`gate17/rebuild_binaries.sha256`)
+  instead of `image/image.json`.
+- `entry_r2.sh` and `run.sh` still match `image/image.json` byte for byte.
+- `host.txt` will carry the rebuild's hashes, and RESULTS names them.
+- Any stage B row whose deterministic fields later disagree with a frozen-image row of the same system is a reproducibility
+  failure (Amendment 2's stop rule).
+- No hypothesis, §6 rule, reading, cell, seed, budget or limit changes.
+
+## Amendment 18 (2026-11-15; the `t = 13` draw 0 and `t = 14` capped cells on reserved RunPod pods; before any cap-6 row at `t = 13` draw 0 or at `t = 14` exists)
+
+Route only, for the cells that Amendment 16 left out. Every number is `[pcc:unverified]`.
+
+- **Owner instruction (2026-11-15, ~03:00Z, session 01TCbLH6osebpnEbutNogBzD).** "also launch the t=13/14 cells on
+  runpod". This is the non-Spot capacity named in owner decision 10 (PR #4156).
+- **Cells and their order.** These are the Amendment 7 B bracket steps, with Amendment 14's limits:
+  - `pfd-x-t13-k0-c6-rp`: `cap:13:0:6:12800000000`;
+  - `pfd-x-t14-k0-c6-rp` and `pfd-x-t14-k1-c6-rp`: `cap:14:K:6:12800000000`.
+  - Each runs `--budget 86400` with the frozen flags of the `cap:` stage.
+  - The next step of a bracket follows Amendment 7 B from the row, and is run the same way:
+    - cap 7 if cap 6 does not refute at `t = 14`;
+    - cap 5 is already measured.
+  - Amendment 14's re-run rule is unchanged: `oversize true` or a memory kill gives an `-m112` run with `--max-dense
+    27900000000`.
+- **Host.** One reserved RunPod CPU pod per cell, at least 56 GiB, `RAYON_NUM_THREADS = 12`. The binaries are those
+  admitted by Amendment 17. The runner and client are those of Amendment 16.
+  - The registered capped requests named `entry.sh`. The runner installs `entry_r2.sh`, which is `entry.sh` plus the
+    `m4n:` stage only.
+  - The `cap:` stage text is identical in the two files (checked with `diff` at registration).
+- **Cost.** Owner decision 4 applies: US$40 per job and US$400 for the study.
+  - Each pod's `costPerHr` is recorded at creation.
+  - A job reaching US$40 is stopped and recorded as censored-by-cost.
+  - At US$1.04/h the 86,400 s budget costs about US$25, so the cost stop should not bind.
+- **Disclosure.**
+  - The session registering this has seen the committed rows:
+    - `t = 13`: draw 1 `d_F = 6`; draw 0 cap 5 does not refute;
+    - `t = 14`: cap 5 does not refute on either draw (`RESULTS_T13_BRACKET.md`, `RESULTS.md`).
+  - The bracket is mechanical (Amendment 7 B), so that knowledge leaves no choice open.
+  - The Amendment 16 disclosure applies here too: the wall-clock budget makes censoring depend on the host.
+- **Unchanged.** No hypothesis, §6 rule, reading, cell, seed, cap, budget or `--max-dense` changes. The C-step reading
+  (Amendment 7 D.5) is applied to these rows as registered.
+
+## Amendment 19 (2026-11-15; the `m = 4` cells of Amendments 8 and 13 on reserved RunPod pods; before any `m = 4` row at `t ≥ 4` and before any `m = 4` null row exists)
+
+Route only, plus a study-level spend guard. Every number is `[pcc:unverified]`.
+
+- **Owner instruction (2026-11-15, ~04:20Z, session 01TCbLH6osebpnEbutNogBzD):** "also launch the m=4 cells on runpod".
+- **Cells.** Each runs its registered `entry_r2.sh` stage verbatim, with `--budget 172800` per closure:
+  - Kummer (Amendment 8): `m4:4:K:7:13958643712:4000000` and `m4:5:K:6:13958643712:4000000`, for `K = 0, 1`;
+  - shape-matched nulls (Amendment 13): `m4n:4:K:7:13958643712:4000000` and `m4n:5:K:6:13958643712:4000000`.
+- **Host and binaries.** One reserved RunPod CPU pod per cell, 16 vCPU / 128 GB. That is above the registered 112Gi
+  request, and `max_entries` is the registered value. `RAYON_NUM_THREADS = 12`. The binaries are those admitted by
+  Amendment 17; runner and client are as in Amendment 16.
+- **Order.** Amendment 13's order is kept for submission: each null is submitted after its Kummer counterpart of the same
+  `(t, K)`. Amendment 13's "serially" existed because the EKS pool admitted one job at a time. Here the eight jobs run
+  concurrently on separate pods, and no job's systems or limits depend on another's.
+- **Per-job cost.** US$40 per job (owner decision 4). At US$1.04/h that binds at about 38.5 h, before the 49 h job limit.
+  A job stopped by it is recorded as censored-by-cost.
+- **Study-level spend guard (owner decision 4: US$400 for the study).**
+  - The worst case of everything launched under Amendments 16, 18 and this one is US$435, if every job ran to its cost
+    stop. That exceeds the ceiling.
+  - So actual RunPod spend (`costPerHr ×` elapsed, summed over all pods of the study) is checked at every check-in.
+  - When it reaches US$370 (US$30 kept for the earlier EKS jobs, which together cost less than that), the running null
+    cells are stopped first, then the `t = 5` Kummer cells. Each stopped job is recorded as censored-by-cost, and the
+    owner is told.
+- **Disclosure.**
+  - No `m = 4` row at `t ≥ 4` and no `m = 4` null row has been seen by this session.
+  - The Amendment 16 disclosure applies: the wall-clock budget makes censoring depend on the host.
+- **Unchanged.** No hypothesis, §6 rule, reading, cell, seed, cap, budget, `max_entries` or `max_cols` changes. Amendment
+  8's readings and Amendment 13's H-null rule apply as registered. The `t = 5, c = 7` and `t = 6` cells stay out (a limit
+  change, R3 §3).
+
+## Amendment 20 (2026-11-15; resources only; the study's dollar ceiling)
+
+- **Owner instruction (2026-11-15, ~04:23Z, session 01TCbLH6osebpnEbutNogBzD):** "raise the ceiling to $500".
+- **Change.**
+  - The study ceiling of owner decision 4 rises from US$400 to US$500. The per-job ceiling stays at US$40.
+  - Amendment 19's spend-guard threshold rises from US$370 to US$470, keeping the same US$30 reserve for the earlier
+    EKS jobs.
+- **Effect (derived).** Every job launched under Amendments 16, 18 and 19 together costs at most US$435 at its per-job
+  stop, plus less than US$30 already spent on EKS. That is below US$470, so the guard cannot stop a running job.
+- **Recorded.** No row of any of these jobs existed when this was written.
+- No hypothesis, rule, cell, limit or budget changes.
+
+## Amendment 21 (2026-11-15; stage B's gate G3: a tool race, recorded and re-run with one worker; before any stage B rule is read)
+
+Procedure only. Every number is `[pcc:unverified]`.
+
+- **What happened (measured).**
+  - Stage B's job (`pfd-b-rp`, Amendment 16) ran `g1 hky-B d-B g3`. Every `hky-B` and `d-B` stage ended `exit 0`.
+  - `g3` (`prime_fall_degree_tools gate3 ... --max-n 20 --jobs 2 --budget 900`) panicked after 17 min, with exit 101 and
+    "capped rows: No such file or directory" at `examples/prime_fall_degree_tools.rs:524`.
+  - Before the panic it had written 122 capped comparisons to `gates/g3.jsonl`, all `agree`: 0 disagreements and no
+    `G3 DISAGREE` line.
+- **Cause (read from the frozen source, f13a690df0, lines 507–525).**
+  - `gate3` names each capped run's temporary file by `(p, kind, m, x_r, cap)` only.
+  - The `B-m3-null` systems share `p`, `kind`, `m` and `x_r` with their Kummer counterparts. With two workers, one worker
+    can delete the file the other is about to read.
+  - This is a defect in the tool, not a disagreement.
+- **Reading, following Amendment 11's precedent.** Stage B's `g3` stage is recorded as "not completed (tool race)", not as
+  a §4 gate failure. Its 122 rows are kept as evidence and are not used as the gate.
+- **Re-run.** `prime_fall_degree_tools gate3 <stage B directory> <pilot> --max-n 20 --jobs 1 --budget 900`.
+  - It uses the same binaries (Amendment 17), the stage B rows as fetched, and a fresh `gates/` directory.
+  - One worker removes the race. The capped runs are independent, so the worker count changes no computation.
+  - It runs on this session's host (4 vCPU), which is a host disclosure as in Amendment 16. A budget timeout still counts
+    as a disagreement, as `gate3` defines it.
+  - If any item disagrees, it goes to the owner with the rows, following Amendment 11's stop rule.
+- No hypothesis, §6 rule, cell, seed, budget or limit changes.

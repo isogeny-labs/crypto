@@ -61,7 +61,7 @@ Weil descent over $F_(2^n)$: one relation gives $n$ equations of degree 2 in $m 
 
 `examples/pkm_tower_pilot.rs --controls multiples` appends to the tower system the cleared $S_(m+1)(x([2]P_1), …, x([2]P_m), x([2]R)) = 0$, with $x([2]P) = N(x)\/D(x)$, $N = x^4 - 2 a x^2 - 8 b x + a^2$, $D = 4 (x^3 + a x + b)$ (for chains, doubled partial-sum unknowns linked by $D(u_k) u'_k - N(u_k) = 0$). Same cell seed, same tower, curve and targets as the tower control; every appended equation vanishes at planted solutions (asserted; 12/12 unit tests). It enters at multilinear degree 6, so at $m = 2$ the two presentations must agree wherever $d_F <= 5$ (P1, a built-in control); at cells with $d_F ("tower") >= 7$ the prediction was $d_F ("multiples") in {d_F - 1, d_F}$ with the slopes unchanged (P2). Falsifier: a drop of at least 2 at a cell with $d_F ("tower") >= 8$, or an $m$-ladder that reads flat.
 
-*Development check* (this host, closure engine, Kummer at $P_1$, seed `0x504B4D54`, two random targets per cell, both arms on the same targets; no isolation; every value `[pcc:unverified]`; rows and table in `devcheck/`). The tower arm reproduces stage A's medians at $t = 2..9$ and stage C's cells, the instrument check.
+*Development check* (this host, closure engine, Kummer at $P_1$, seed 1347106132 = `0x504B3554`, two random targets per cell, both arms on the same targets; no isolation; every value `[pcc:unverified]`; rows and table in `devcheck/`). The tower arm reproduces stage A's medians at $t = 2..9$ and stage C's cells, the instrument check.
 
 #table(
   columns: 5, inset: 4pt, stroke: 0.4pt,
