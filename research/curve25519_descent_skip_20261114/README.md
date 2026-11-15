@@ -101,3 +101,8 @@ point estimate (blind `bits`, 0.099); against `bits` blind the intervals overlap
 - No Conductor task, no isolab-eks run, no S3 resume checkpoint (the AWS route is absent in this container; counted
   mul-adds are deterministic), no research-kb query. A first Poisson-interval script overflowed at 107 hits; the log-space
   fix reproduced the Part C table byte for byte.
+
+**Update 2026-11-14:** the isogeny, edwards-bits, t0-bits and digits bases were then run in the engine:
+[`research/curve25519_engine_other_bases_20261114`](../curve25519_engine_other_bases_20261114/README.md). Lifts cost 8× on all of
+them and lowered hits per counted mul-add on 7 of the 8 bases measured so far (4 resolved); the isogeny base is neutral and has
+the highest hits per mul-add (F4 count only, seed 0).

@@ -1,0 +1,46 @@
+name: CT63 cyclotomic splitting and full-torsion audit
+on:
+  push:
+    branches:
+      - research/ct51-crosschar-degree8-20261112
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct63/**'
+      - '.github/workflows/ct63-geometric-splitting.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct63/**'
+      - '.github/workflows/ct63-geometric-splitting.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ct63-frobenius:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: F4 to F1024 direct point counts and independent Frobenius replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct63
+          python3 -B "$D/ct63_frobenius.py" > /tmp/ct63-py.json
+          python3 -O -B "$D/ct63_frobenius.py" > /tmp/ct63-py-O.json
+          node "$D/ct63_independent.js" > /tmp/ct63-js.json
+          node --no-opt "$D/ct63_independent.js" > /tmp/ct63-js-noopt.json
+          cmp /tmp/ct63-py.json /tmp/ct63-py-O.json
+          cmp /tmp/ct63-js.json /tmp/ct63-js-noopt.json
+          cmp /tmp/ct63-py.json /tmp/ct63-js.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          v=json.loads(Path('/tmp/ct63-py.json').read_text())
+          assert v['minimal_geometric_split_degree']==5
+          assert [e['curve_points'] for e in v['entries']]==[7,21,73,273,897]
+          assert [e['elliptic_points'] for e in v['entries']]==[1,9,49,225,961]
+          assert [e['jacobian_points'] for e in v['entries']]==[31,341,4681,69905,923521]
+          print('CT63 independent characteristic-two counts and quintic splitting certificate passed')
+          PY
+          sha256sum /tmp/ct63-py.json /tmp/ct63-js.json

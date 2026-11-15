@@ -1,15 +1,28 @@
-# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
-Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
+
+## Lead / hypothesis
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
-Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
-Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
 ## State
-2026-11-14: patch written, release build running. No rows yet.
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
-## Next
-Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.
+## Runs in flight
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
+
+## Stop and success conditions
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
+
+## Next steps
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.
