@@ -15,7 +15,7 @@ beyond depth 14, and Lean proofs.
 | # | statement | status |
 |---|---|---|
 | T1 | Quotient reduction: `V_{F,c} = NF(V_{F,c}) ⊕ J_{≤c}`, and `NF(V_{F,c}) = U_c`, the weight-`c` closure in `F_p[(ℤ/2^k)²]` | proved (§2, desk) |
-| T2 | For the unit ideal, pinned solving degree = degree-bounded refutation degree = Huang–Kosters–Yeo last fall degree: `sd(I_k) = ref(I_k) = d_F(I_k) = LFD(k)` | proved (§3; Lean `lastFallDegree_eq_solvingDegree`, reachability in §6) |
+| T2 | For the unit ideal, pinned solving degree = degree-bounded refutation degree = Huang–Kosters–Yeo last fall degree: `sd(I_k) = ref(I_k) = d_F(I_k) = LFD(k)` | proved (§3; Lean `lastFallDegree_eq_solvingDegree_chain` on the concrete chain algebra, reachability included) |
 | T3 | Admissible unit family: `p ≡ 1 (mod 2^(k+1))`, `E: y² = x³ + n²(n−1)x`, `t = n`, `n` a non-square; unit for every such `k`; infinitely many `p` for every `k` | proved (§4; Lean `family_S3_ne_zero`, `S3_ne_zero_of_cm`) |
 | T4 | Depth monotonicity: `LFD(k') ≤ LFD(k)` for `k' ≤ k`, same `(p, A, B, t)` | proved (§5; Lean `one_mem_closure_of_le`, `solvingDegree_mono`) |
 | T5 | ℤ-exponent (no-wrap) model: `π_k(W_c) ⊆ U_c(k)`; observed equality in all 6 tested cells | containment proved (§5), equality empirical |
@@ -119,10 +119,12 @@ the closure rule applied to `1` gives every monomial of degree `≤ d ≤ c`, he
 `ref ≤ d_F`: take `f = 1` (degree 0): `1 ∈ V_{F, max(d_F, 0)} = V_{F,d_F}`. ∎
 
 Lean: `ChainSd.ShiftSystem.lastFallDegrees_eq_refutationDegrees`,
-`lastFallDegree_eq_solvingDegree` (abstract shift system; the reachability hypothesis "`1 ∈ V_c`
-implies `V_{c'} = R_{≤c'}` for `c' ≥ c`" is the monomial-path argument above, §6 for the chain
-algebra), `lt_solvingDegree_of_not_mem`, `solvingDegree_le_of_mem` (what lower and upper
-certificates prove).
+`lastFallDegree_eq_solvingDegree` (abstract shift system, under the reachability hypothesis
+"`1 ∈ V_c` implies `V_{c'} = R_{≤c'}` for `c' ≥ c`"), and for the concrete chain algebra
+`ChainSd.lastFallDegree_eq_solvingDegree_chain` (file `Reach.lean`: the reachability hypothesis is
+proved by adding the bits of the two exponents in increasing order, `single_mem_closure_of_one_mem`,
+`weightSub_le_closure_of_one_mem`, using `popcount_add_pow_of_testBit_false`), plus
+`lt_solvingDegree_of_not_mem`, `solvingDegree_le_of_mem` (what lower and upper certificates prove).
 
 ## 4. Theorem 3: the admissible family and its unitness
 
@@ -345,7 +347,8 @@ Theorem 1 these are statements about the pinned polynomial-ring computation.
 | closure monotone in `c` | `ShiftSystem.closure_mono` | abstract shift system | kernel-checked, std axioms |
 | closure ⊆ weight-`c` part | `ShiftSystem.closure_le_F` | `g ∈ F c`, shifts raise weight ≤ 1 | checked |
 | transfer (T4, T5 engine) | `ShiftSystem.closure_transfer`, `not_mem_closure_of_transfer` | `φ` linear, weight-non-increasing, intertwines or trivialises shifts, `φ g ∈` target closure | checked |
-| T2 | `ShiftSystem.lastFallDegrees_eq_refutationDegrees`, `lastFallDegree_eq_solvingDegree` | `1 ∈ F 0`, reachability hypothesis | checked (reachability proved on paper, §6; not formalised) |
+| T2 (abstract) | `ShiftSystem.lastFallDegrees_eq_refutationDegrees`, `lastFallDegree_eq_solvingDegree` | `1 ∈ F 0`, reachability hypothesis | checked |
+| T2 (chain system) | `lastFallDegree_eq_solvingDegree_chain`, `single_mem_closure_of_one_mem`, `weightSub_le_closure_of_one_mem` (`Reach.lean`), `popcount_add_pow_of_testBit_false`, `popcount_mod_pow_le` (`Popcount.lean`) | none beyond `p` prime | checked |
 | certificates ⇒ bounds | `ShiftSystem.lt_solvingDegree_of_not_mem`, `solvingDegree_le_of_mem` | finiteness of the refutation degrees for the strict bound | checked |
 | T3 unitness | `S3_ne_zero_of_cm`, `family_S3_ne_zero`, `isSquare_of_pow_eq_one` | `p ≠ 2`, `a ≠ 0`, `¬IsSquare t`, `t³+at` nonzero square, `x_i` nonzero squares / `x_i^{2^k} = 1` with `2^(k+1) ∣ p−1` | checked |
 | T3 bridge grid ⇒ unit ideal | — | CRT for `x^N − 1` over `F_p` | paper only (§4) |
@@ -355,9 +358,12 @@ Theorem 1 these are statements about the pinned polynomial-ring computation.
 | T9 linear lower bound | — | | open |
 
 Build: `cd lean && lake build` (Lean 4.34.1, Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` = tag
-`v4.34.1`; `lakefile.toml`, `lake-manifest.json`, `lean-toolchain` pinned). Axioms: `lake env lean
-ChainSd/Axioms.lean` prints only `propext`, `Classical.choice`, `Quot.sound` for every listed theorem
-(recorded in `reports/axioms.txt`). No `sorry`, no `native_decide`.
+`v4.34.1`; `lakefile.toml`, `lake-manifest.json`, `lean-toolchain` pinned; "Build completed
+successfully (8931 jobs)"). Axioms: `lake env lean ChainSd/Axioms.lean` prints only `propext`,
+`Classical.choice`, `Quot.sound` for all 15 listed theorems (recorded in `reports/axioms.txt`). No
+`sorry`, no `native_decide`, no custom axiom. Files: `Closure.lean` (abstract), `Popcount.lean`,
+`GroupAlgebra.lean` (concrete algebra, depth monotonicity), `Reach.lean` (reachability, T2 concrete),
+`Unit.lean` (T3).
 
 ## 11. Reproduction
 

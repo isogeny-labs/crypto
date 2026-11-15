@@ -1,5 +1,6 @@
 import Mathlib
 import ChainSd.Closure
+import ChainSd.Popcount
 
 /-!
 # The chain algebra and depth monotonicity
@@ -23,9 +24,8 @@ open AddMonoidAlgebra
 /-- The exponent group of depth `k`. -/
 abbrev Expo (k : ℕ) := ZMod (2 ^ k) × ZMod (2 ^ k)
 
-/-- Binary weight of a residue: the number of set bits below `k` of its canonical value. -/
-def bitWeight (k : ℕ) (a : ZMod (2 ^ k)) : ℕ :=
-  ((Finset.range k).filter (fun i => a.val.testBit i)).card
+/-- Binary weight of a residue: the number of set bits of its canonical value. -/
+def bitWeight (k : ℕ) (a : ZMod (2 ^ k)) : ℕ := popcount a.val
 
 /-- Weight of an exponent pair. -/
 def wt (k : ℕ) (v : Expo k) : ℕ := bitWeight k v.1 + bitWeight k v.2
@@ -98,12 +98,7 @@ theorem castZ_val (a : ZMod (2 ^ k)) : (castZ hkk a).val = a.val % 2 ^ k' := by
 theorem bitWeight_castZ_le (a : ZMod (2 ^ k)) : bitWeight k' (castZ hkk a) ≤ bitWeight k a := by
   unfold bitWeight
   rw [castZ_val]
-  apply Finset.card_le_card
-  intro i hi
-  simp only [Finset.mem_filter, Finset.mem_range, Nat.testBit_mod_two_pow] at hi ⊢
-  obtain ⟨hik, hb⟩ := hi
-  refine ⟨lt_of_lt_of_le hik hkk, ?_⟩
-  simpa [hik] using hb
+  exact popcount_mod_pow_le _ _
 
 /-- The exponent reduction on pairs, as an additive monoid homomorphism. -/
 noncomputable def castExpo : Expo k →+ Expo k' :=

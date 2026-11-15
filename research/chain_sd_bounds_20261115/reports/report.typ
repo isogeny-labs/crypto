@@ -60,4 +60,4 @@ A linear lower bound needs a *locality* lemma: for $c <= alpha k - beta$, $1 in.
 
 = Files
 
-`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Unit,GroupAlgebra}.lean` (Lean 4.34.1, Mathlib v4.34.1), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).
+`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit}.lean` (Lean 4.34.1, Mathlib v4.34.1; 15 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).
