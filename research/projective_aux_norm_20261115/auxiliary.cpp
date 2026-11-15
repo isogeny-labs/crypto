@@ -18,7 +18,8 @@ struct Step {
 struct Tower {
     reference::Curve initial{19,2,2};Point generator{16,11,false},coset{12,5,false};
     std::vector<Step> steps;int terminal=0;
-    Tower(){
+    Tower(reference::Curve curve={19,2,2},Point subgroup={16,11,false},Point representative={12,5,false})
+        :initial(curve),generator(subgroup),coset(representative){
         check(initial.contains(generator)&&initial.contains(coset),"auxiliary point admission");
         check(multiply(initial,generator,8).infinity&&!multiply(initial,generator,4).infinity,"auxiliary exact order8");
         auto E=initial;auto T=generator,G=coset;

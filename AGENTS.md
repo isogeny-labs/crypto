@@ -825,6 +825,10 @@ verifiers, replay tools, and research result generation.
   Python provenance. Label historical Python timings accordingly and rerun
   matched native baseline/candidate measurements before making new performance
   claims.
+- For prime-field research, use distinct build, pre-call and post-call
+  manifest names, and refuse replacement of a pre-call manifest. Label any
+  later reconstruction as post-call evidence (adopted lesson
+  `L-b9df3560e3b1`, 2026-11-15).
 - Older instructions that name Python scripts describe legacy tooling; they
   do not grant an exception. Preserve their mathematical contracts, fixtures,
   and accounting requirements in the native replacement.
