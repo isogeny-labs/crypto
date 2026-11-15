@@ -62,3 +62,18 @@ Main advanced toe0e3725bac. The daily journal conflicts; one authorized
 Copilot request comment6898455027 is pending and that file is frozen. Keep
 incoming LA/GPU work untouched and preserve both full histories. These study
 changes can proceed independently. No numerical qualification is run.
+
+A2 scopeb1e8ecdd26 precedes the fixed-slope source assessment and shared laws.
+SELECTOR-JOINS.md gives the finite admission/conditioning bound and the exact
+point-independent-family limitation. The geometric fibre endpoint is checked
+at source867527c with canonical gate141/0/0; complete three-build/gate receipts
+are copied under checks/line-laws/. Shared PR14merged asf13359f; hosted
+43742865652ran zero steps with the explicit billing-lock annotation. Claim
+PCC-20261115-6186b7 is unverified. No general coordinate-selector lower bound
+or fast algorithm is claimed. [pcc:unverified]
+
+The three-page report and both editable diagrams were rendered and inspected.
+PROOF-MAP.md and the assembly probe document inheritance and the missing
+full probability/cost bridges. The instance-gate writeup was completed after
+the proof builds, a recorded ordering failure; do not label it prospective.
+Original failed builds and immutable source/gate identities are retained.

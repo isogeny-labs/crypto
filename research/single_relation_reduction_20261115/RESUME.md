@@ -29,11 +29,28 @@ Shared PR13 merged as865577b; hosted run43741500945 has zero steps with the
 explicit account billing lock. Claim950598 is unverified. Curve conditioning,
 labels, asymptotics and programs remain separately scoped.
 
-Wagner2002 full author version, sections2--3, supplies partial joins through
-scalar intervals or suitable group quotients, and the k-sum/DLP reduction.
-It does not give an elliptic-coordinate partial join. Check the explicit
-fixed-slope line-incidence route next, with all admissions and useful yield
-charged. This is source/theory work; do not run a native numerical panel.
+The fixed-slope line-incidence route is assessed in SELECTOR-JOINS.md.
+Point-independent slope families admit at most2s partners per fixed curve
+point. Jfirst joins and Wfresh clean bases have admission probability at most
+8WJb^2s/(3r), exponentially small at the specified balanced parameters with
+subexponential s,W. This rejects that schedule, not adaptive/other coordinate
+joins. Actual curve-fibre laws at867527c pass canonical gate141/0/0; shared
+PR14merged asf13359f. Hosted43742865652 has zero steps and the billing-lock
+annotation. Claim6186b7 is unverified. The probability/cost consequence is
+hand-derived, with explicit scope limits.
+
+The next algorithmic question is an adaptive coordinate-aware partial join
+with cheaply enumerable candidates and controlled distributions at every
+level, or another explicit selector mechanism. No such construction is
+supplied. Reusing a generic meet-in-the-middle backend or producing an
+existence count does not fill this contract. Read Wagner2002 sections2--3
+and the ROS subsection4 before proposing a birthday-tree transfer; its scalar
+ROS application is not an ECDLP solver.
+
+PROOF-MAP.md records actual inherited laws, hypotheses and partial formal
+scope. The assembly probe and explicit axiom prints pass, but the six-field
+instance-gate writeup was retrospective, violating its requested pre-edit
+ordering. Preserve this process gap and all original builds/source pins.
 
 The central next algorithmic step remains an explicit label-free selector
 with a known subexponential cap T and inverse useful yield. The direct complete

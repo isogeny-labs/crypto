@@ -169,7 +169,8 @@ CryptoLean.PartiteCoverage.coverage_count works over an actual finite additive
 commutative group G, with m,b>0. It constructs tuple sums on the assignment
 space Omega=(Fin m times Fin b)->G. Single and distinct-pair sum maps are
 surjective, giving exact event counts and both moments. Finite Cauchy--Schwarz
-on the actual support proves, with r=|G|, L=b^m and N=r^(mb),
+on the actual support proves the following, with r=|G|, L=b^m and N=r^(mb).
+[pcc:unverified]
 
     L*N <= (r+L-1) * |{x in Omega : exists a, sum_i x(i,a(i))=0}|.
 
@@ -192,3 +193,18 @@ Shared PR13 merged as865577bef93b64880cf6aba434f13c5b624488ac. Hosted
 run43741500945 executed zero steps in both jobs; its annotation explicitly
 reports the account billing lock. The local source/axiom pass is the evidence
 here, with no hosted pass asserted. [pcc:unverified]
+
+## A2. A concrete coordinate partial join
+
+[SELECTOR-JOINS.md](SELECTOR-JOINS.md) checks fixed point-independent slope
+buckets y-lambda*x as a candidate first merge for a birthday tree. For each
+known curve point and slope, at most two other distinct-abscissa curve points
+lie on the line. Therefore J first merges with list length b and s slopes
+have admission probability at most 2Jb^2s/r; after clean-base conditioning it
+is at most 8Jb^2s/(3r). With W fresh retained bases, the union bound is
+8WJb^2s/(3r). At the stated balanced parameters and subexponential s,W this
+is 2^(-n+o(n)). This rejects that small fixed-slope schedule's useful yield.
+Adaptive slopes and other join algorithms are outside this conclusion.
+The probability/cost argument is a hand derivation; actual curve-fibre counts
+are a separate shared formal target. No native numerical case is run.
+[pcc:unverified]

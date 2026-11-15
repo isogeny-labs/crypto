@@ -73,3 +73,39 @@ Definition1.2/Theorem1.3 charges a univariate polynomial's degree and separate
 elliptic preprocessing; it does not supply this multivariate selector. KB is
 unavailable. Exact links/hashes and all scope distinctions are in SCOPE.md,
 REPORT.md and checks/. No novelty or exhaustive-search claim is made.
+
+#pagebreak()
+#text(size:16pt,weight:"bold")[A fixed-slope coordinate join]
+#v(7pt)
+Wagner's birthday tree needs efficiently enumerable partial joins. As one
+elliptic-coordinate candidate, choose a family Λ of s slopes independently
+of the current random base and hash each list by y−λx. Equal buckets yield
+points on one nonvertical line. This is a concrete join; its first-stage
+admission must be charged.
+
+#align(center)[#image("joins.svg",width:78%)]
+
+Assume a nonsingular short-Weierstrass curve in characteristic >3 and
+independent uniform subgroup point records before rejection. A line through
+a known point leaves at most two other distinct-abscissa intersections.
+The finite slope-family count is checked on Mathlib's actual Weierstrass
+Equation and addition polynomial, without a new curve model.
+
+At b=2^(O(sqrt(n))), J≤m=O(sqrt(n)) and subexponential s,W, the displayed
+upper bound decays as 2^(−n+o(n)). It cannot supply inverse-subexponential
+useful yield for this fixed-slope schedule. The probability, conditioning
+and cost interpretation are hand arguments.
+
+*Scope matters.* Choosing a slope after seeing a pair always admits that
+pair; the fixed-family bound does not apply. Large implicit slope sets and
+other coordinate/adaptive joins also remain outside this assessment.
+
+*Formal evidence.* Shared source 867527c passes the canonical gate:
+141 theorems, 0 failures, 0 trusted native exceptions. All three builds and
+source hashes are retained. Hosted jobs ran zero steps due to the billing
+lock. Claim6186b7 is unverified. PROOF-MAP.md records hypotheses, inheritance
+and the retrospective instance-gate timing gap.
+
+Sources: Wagner2002 full author version, sections2–3 and the scalar ROS
+subsection4; Sutherland, MIT18.783 Spring2013 Lecture2, section2.1.2.
+SELECTOR-JOINS.md gives the full derivation, controls and exact limitations.

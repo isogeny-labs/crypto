@@ -6,7 +6,7 @@ It removes auxiliary setup/final matrix work but does not supply a fast
 selector or meet the complete subexponential algorithm criterion.
 PCC-20261115-3dfae3 remains unverified. [pcc:unverified]
 
-Read the [two-page report](report.pdf), starting at page1, and its editable
+Read the [three-page report](report.pdf), starting at page1, and its editable
 [diagram](pipeline.dot). [SCOPE.md](SCOPE.md) fixes the source/proof boundaries.
 No new native case, measurement or paid job was run. The earlier multiprecision
 qualification remains pending its required checkpoint upload access.
@@ -21,3 +21,11 @@ asymptotics and native programs remain outside these formal results. The
 direct dense-index assessment applies to the named Index architecture; no
 lower bound for every relation algorithm is claimed.
 [pcc:unverified]
+
+The [partial-join assessment](SELECTOR-JOINS.md) checks fixed point-independent
+slope buckets. Their first-merge yield decays too quickly at the stated
+balanced parameters. Shared source867527c checks the actual curve-fibre count
+with a141/0/0canonical gate; conditioning/cost remain hand arguments. Adaptive
+slopes and other joins are outside the conclusion. The [proof map](PROOF-MAP.md)
+records exact hypotheses, inheritance and the retrospective process gap.
+Claim6186b7 remains unverified. [pcc:unverified]
