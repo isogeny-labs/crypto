@@ -172,7 +172,7 @@ assert sum(expected.values()) == 14446377
 assert sum(rank_hist.values()) == 243
 print(json.dumps({
     'schema': 'ghs.odd5.degree5-screen/v1',
-    'source_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+    'source_sha256': hashlib.sha256(Path(__file__).with_suffix('').read_bytes()).hexdigest(),
     'field': 'F3[a]/(a^5+2a+1)', 'trace': 26,
     'denominator_count': 60269,
     'logical_assignment_count': sum(expected.values()),

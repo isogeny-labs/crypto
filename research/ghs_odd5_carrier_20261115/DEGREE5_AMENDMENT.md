@@ -1,0 +1,7 @@
+# Output-binding correction before the degree-five replay
+
+15 November 2026. The first frozen producer source was committed at SHA-256 `9e83d546e2514299a1e473de4fa20575f51eff4236cc125a049ae462b9218b2d` before execution. Its completed output is retained as `degree5_screen_first.json`, with the empty `degree5_screen_first.stderr`. The run exited successfully and counted 14,446,377 logical assignments, two degree-five interpolation survivors in the `QiQj` shape, and zero full-equation hits. [pcc:unverified]
+
+The receipt's `source_sha256` value `e738d753f9c3e6bb9b3b018c3afe561ae218a8554819527c8128c5b3f2958e5a` is **not** the committed `.sage` source hash. Sage preparsed the file before running it, so `Path(__file__).read_bytes()` hashed the generated execution file. This is a provenance-binding error in the output field, not a change to the finite search logic. The original receipt remains unchanged and must not be treated as properly source-bound. [pcc:unverified]
+
+The follow-up source changes only that expression to `Path(__file__).with_suffix('').read_bytes()`, matching the earlier degree-four producer's binding method. The corrected source SHA-256 is `3cf3888f8647eec45de2b2de51d0a7c398d94fe0b87568daae6f772b40d95af0`. Freeze this amendment and the corrected source in a commit before rerunning. Compare both outputs field by field except `source_sha256`; retain both. An independent necessary-condition replay and a separate full-equation check are still required before a degree-five exclusion can be reported as verified. [pcc:unverified]
