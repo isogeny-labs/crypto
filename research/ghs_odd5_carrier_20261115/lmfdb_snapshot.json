@@ -1,0 +1,69 @@
+{
+  "schema": "ghs-odd5-lmfdb-snapshot/v1",
+  "script_sha256": "007e557e65b97024ef0d4d13dce9f81dd6f39c584d3fe75e5bf8f85df061f21e",
+  "manifest_sha256": "2dd67b62852968cefe6e3a449b7aec994e7a11057cc6ab6943d19b497c63cb86",
+  "query": "SELECT label, poly_str, has_jacobian, is_simple, curve_count FROM av_fq WHERE g=5 AND q=3 AND poly_str IN ('1 0 0 0 0 26 0 0 0 0 243 ', '1 0 0 0 0 22 0 0 0 0 243 ', '1 0 0 0 0 14 0 0 0 0 243 ', '1 0 0 0 0 10 0 0 0 0 243 ', '1 0 0 0 0 -10 0 0 0 0 243 ', '1 0 0 0 0 -14 0 0 0 0 243 ', '1 0 0 0 0 -22 0 0 0 0 243 ', '1 0 0 0 0 -26 0 0 0 0 243 ') ORDER BY poly_str",
+  "helper": "/Volumes/data/workspaces/lmfdb-agent-query-20261019/query.py",
+  "helper_exit_code": 0,
+  "source": "postgresql://devmirror.lmfdb.xyz:5432/lmfdb/public.av_fq_isog",
+  "source_ended_utc": "2026-10-19T16:45:49.243703+00:00",
+  "source_row_count": 2945722,
+  "rows_by_trace": {
+    "-26": {
+      "label": "5.3.a_a_a_a_ba",
+      "poly_str": "1 0 0 0 0 26 0 0 0 0 243 ",
+      "has_jacobian": 0,
+      "is_simple": true,
+      "curve_count": 4
+    },
+    "-22": {
+      "label": "5.3.a_a_a_a_w",
+      "poly_str": "1 0 0 0 0 22 0 0 0 0 243 ",
+      "has_jacobian": 1,
+      "is_simple": true,
+      "curve_count": 4
+    },
+    "-14": {
+      "label": "5.3.a_a_a_a_o",
+      "poly_str": "1 0 0 0 0 14 0 0 0 0 243 ",
+      "has_jacobian": 1,
+      "is_simple": true,
+      "curve_count": 4
+    },
+    "-10": {
+      "label": "5.3.a_a_a_a_k",
+      "poly_str": "1 0 0 0 0 10 0 0 0 0 243 ",
+      "has_jacobian": 1,
+      "is_simple": true,
+      "curve_count": 4
+    },
+    "10": {
+      "label": "5.3.a_a_a_a_ak",
+      "poly_str": "1 0 0 0 0 -10 0 0 0 0 243 ",
+      "has_jacobian": 1,
+      "is_simple": true,
+      "curve_count": 4
+    },
+    "14": {
+      "label": "5.3.a_a_a_a_ao",
+      "poly_str": "1 0 0 0 0 -14 0 0 0 0 243 ",
+      "has_jacobian": 1,
+      "is_simple": true,
+      "curve_count": 4
+    },
+    "22": {
+      "label": "5.3.a_a_a_a_aw",
+      "poly_str": "1 0 0 0 0 -22 0 0 0 0 243 ",
+      "has_jacobian": 1,
+      "is_simple": true,
+      "curve_count": 4
+    },
+    "26": {
+      "label": "5.3.a_a_a_a_aba",
+      "poly_str": "1 0 0 0 0 -26 0 0 0 0 243 ",
+      "has_jacobian": 0,
+      "is_simple": true,
+      "curve_count": 4
+    }
+  }
+}
