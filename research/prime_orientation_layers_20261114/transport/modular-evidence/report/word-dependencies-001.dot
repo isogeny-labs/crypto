@@ -1,0 +1,13 @@
+digraph G {
+rankdir=LR; graph [bgcolor="transparent",nodesep=.3,ranksep=.4];
+node [shape=box,style="rounded,filled",fillcolor="#e8f0fa",fontname="Helvetica",fontsize=10];
+a [label="Full adder / ripple
+5q emitted gates"];
+b [label="Constructed q-bit word
+canonical modular value"];
+c [label="Explicit signed circuit
+negation6q gates"];
+d [label="OPEN: multiply / substitute
+all preparation and bit cost",style="rounded,dashed",fillcolor="white"];
+a->b; b->c; c->d [style=dashed];
+}
