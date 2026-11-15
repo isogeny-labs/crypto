@@ -31,7 +31,8 @@ Existing QUOTIENT_SPEED_PROTOCOL.md concerns the older standalone comparison;
 do not relabel its denominator or reuse its timing as root-API evidence.
 
 Publication uses codex/native-certified-relation-integration-20261115, stacked
-on the existing relation-degree-trace PR #4228. The parent advanced while the
+in [PR #4349](https://github.com/isogeny-labs/crypto/pull/4349) on the existing
+relation-degree-trace PR #4228. The parent advanced while the
 qualified source was being tested. Do not rebase, choose a ledger side or
 rewrite frozen claims to resolve that divergence. The pinned LEADS.md has been
 restored; evolving older notes are LEAD_STATUS.md. LEAD_RESUME.md describes
