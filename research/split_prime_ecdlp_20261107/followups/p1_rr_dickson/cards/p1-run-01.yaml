@@ -1,0 +1,90 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-p1-run-01
+experiment_id: split_prime_ecdlp_20261107-p1_rr_dickson-claim-run-01
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.receipt.json
+binds:
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/PROTOCOL.md
+  sha256: cc04efc932faeb97eaf55d3ae509f983f0f357bf2b07751f25ac46607e0ac1fc
+- path: research/split_prime_ecdlp_20261107/followups/README.md
+  sha256: aa622e0b61297bd71a55a30626e0a561c28281ed73fd26093a0267770a580af2
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/p1tool/README.md
+  sha256: c06c06db6038c7f1c04520c51b065386e8aa018b6476071282746e8bec57374c
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/p1tool/Cargo.toml
+  sha256: 238817f60f29314d345e1d3c67cf0d8e9ba07bce691a859a09216ae971c5d15d
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/p1tool/Cargo.lock
+  sha256: c8721b728aa7f3dee9c713c2b9e9d127d36a1525c8b1213b0b49c5521f80e4f2
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/p1tool/src/main.rs
+  sha256: 0d9fa76e0381167b8d3c6d4ec8033a8345204db9f7ad99190ff5828171954edd
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/calibration/msolve_cell.sh
+  sha256: df583d827af6abc10ca8273a36aabad996249369bd30ad40ef587d7d69d5f83b
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/calibration/run_cells.sh
+  sha256: 564629d1074a024e65bd57fe77725e1ef7c51978259fa0ea7defb44167719669
+- path: /usr/bin/msolve
+  sha256: c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa
+must_not_exist:
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.receipt.json
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.build.stdout
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.build.stderr
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.run.stdout
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.run.stderr
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.rustc.stdout
+commands:
+- id: rustc-version
+  argv:
+  - rustc
+  - --version
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.rustc.stdout
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.rustc.stdout
+- id: build-p1tool
+  argv:
+  - cargo
+  - build
+  - --release
+  - --locked
+  cwd: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/p1tool
+  env:
+    CARGO_TARGET_DIR: /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p1run
+  timeout_seconds: 1800
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.build.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.build.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.build.stdout
+- id: run-cells
+  argv:
+  - bash
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/calibration/run_cells.sh
+  env:
+    P1TOOL: /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p1run/release/p1tool
+    RUNS_ROOT: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs
+  timeout_seconds: 50000
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.run.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.run.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-01.run.stdout
+bus_address: executor-mechanical-p1-run-01
+background: true
+write_scope:
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/
+stop_when:
+- Any command in the card exits with a status other than 0, or reaches its timeout; report the printed
+  text verbatim, retry nothing and edit nothing.
+- The run-cells command prints a line starting with HARD_ERROR; report it verbatim.
+notes: Claim run for protocol P1 (PROTOCOL.md with Addendum A). The build writes only under CARGO_TARGET_DIR,
+  which is outside the repository. The run-cells command creates one new directory runs/run-YYYYmmddTHHMMSSZ/
+  (the UTC start time) and writes every plant JSON, emit record, msolve log, parsed JSON, skips.tsv, cells.tsv,
+  jobs.tsv, parsed.jsonl and provenance.txt there; it records msolve cap, timeout and not-admissible cells
+  and imputes nothing. It runs 40 msolve jobs, one at a time, cheapest cells first; the run-cells command
+  has a 50000 second limit. A job that reaches the memory cap or the 1200 second limit is a recorded result,
+  not a stop.

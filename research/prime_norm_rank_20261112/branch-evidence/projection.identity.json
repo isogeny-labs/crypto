@@ -1,0 +1,165 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h75cd0c4ee7db5e5d",
+  "statement": {
+    "name": "Universal branch-projection pairing identity",
+    "source": "NormBranchRadical.projectionIdentity; universal CommRing identity, not a radical or search-cost proof",
+    "variables": [
+      "A",
+      "B",
+      "f",
+      "Q",
+      "T",
+      "F",
+      "s"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "A"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "Q"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "s"
+                      },
+                      {
+                        "op": "var",
+                        "args": "F"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "f"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "B"
+                  },
+                  {
+                    "op": "var",
+                    "args": "T"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "A"
+                },
+                {
+                  "op": "var",
+                  "args": "Q"
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "f"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "B"
+                      },
+                      {
+                        "op": "var",
+                        "args": "T"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "F"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "s"
+                  },
+                  {
+                    "op": "var",
+                    "args": "A"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2026111307,
+  "value_digest": "de55a47aed9175e6f0d9158974682d0e2bf59d65a38d8c99fda70aa5dc1fe952",
+  "independence": "Unsigned universal expression check; branch guards, radical and norm transfer checked separately in Lean",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormBranchRadical.lean",
+    "sha256": "8efbd13ce7a17659952ac663ceb7cc3f19cc647e69161850bb752ec8a21519f1"
+  }
+}

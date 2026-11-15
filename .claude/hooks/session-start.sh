@@ -40,9 +40,9 @@ else
   echo "ECDLP lead atlas: clone aburan28/crypto-autoresearcher next to this checkout and run python3 tools/lead_atlas.py --brief. It records every lead already tried here, so check it before proposing an ECDLP idea."
 fi
 
-# The shared research KB indexes this repository and its siblings. Remind the
-# session before it starts a survey; the MCP server is registered globally.
-echo "Research KB: query it before a survey, lead proposal or novelty claim (AGENTS.md \"Knowledge base first\"; skill research-kb)."
+# Lessons ledger (AGENTS.md "Continuous learning loop"): what earlier sessions
+# learned, adopted lessons first. Never fatal.
+python3 "$(cd "$(dirname "$0")/../.." && pwd)/tools/lessons.py" brief --limit 10 2>/dev/null || true
 
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0

@@ -1,0 +1,395 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "inc",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.574232971511403,
+        2.823149687424155,
+        5.063400130638925
+      ],
+      "charged_sum": 14919.0,
+      "native_sum": 14426,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 480.0
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "rho-neg",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.6938967143459644,
+        1.819338591837002,
+        2.948315489256341
+      ],
+      "charged_sum": 9817.0,
+      "native_sum": 7270,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "tw2l-x10-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.2840084351428676,
+        2.448118159601912,
+        3.92510567973332
+      ],
+      "charged_sum": 13237.0,
+      "native_sum": 9511,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 555.1875
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "tw2l-x10-j8-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.40341115759651,
+        2.5919708325926667,
+        4.2890079075580765
+      ],
+      "charged_sum": 13929.0,
+      "native_sum": 10928,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 642.5
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "tw2l-x15-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.351646971561694,
+        2.5202429254770897,
+        4.037606510715652
+      ],
+      "charged_sum": 13629.0,
+      "native_sum": 9771,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 570.9375
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "tw2l-x20-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.4874416862596944,
+        2.6674430158314286,
+        4.2874549819770325
+      ],
+      "charged_sum": 14416.0,
+      "native_sum": 10432,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 613.5
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "tw2l-x20-j32-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.6416989606434464,
+        2.8097600179698157,
+        4.322309533907141
+      ],
+      "charged_sum": 15310.0,
+      "native_sum": 9740,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 570.375
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "tw2l-x20-j8-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.3633801870629183,
+        2.5449171874870187,
+        4.1787501913039184
+      ],
+      "charged_sum": 13697.0,
+      "native_sum": 10521,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 617.8125
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "tw2l-x30-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.4294657979007006,
+        2.603341698791648,
+        4.168224806810173
+      ],
+      "charged_sum": 14080.0,
+      "native_sum": 10077,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 591.1875
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "tw2l-x10-j16-n2",
+      "verdict": "tw2l-x10-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "tw2l-x10-j8-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x20-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "tw2l-x10-j16-n2",
+      "verdict": "rho-neg < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "rho-neg < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "rho-neg < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "rho-neg < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "rho-neg < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "rho-neg < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "rho-neg < tw2l-x30-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "tw2l-x10-j16-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x10-j16-n2 < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x10-j16-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x10-j16-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x10-j16-n2 < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x10-j16-n2 < tw2l-x30-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x10-j8-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x30-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j16-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x20-j32-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x20-j32-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw2l-x20-j8-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}

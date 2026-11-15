@@ -1,0 +1,658 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "disposition": "validated",
+ "session_ids": {
+  "prime": "ECBS1h288d047c6183",
+  "koblitz": "ECBS1h882e6d561549"
+ },
+ "validated_commit": "e3712a00366a1e02596acbb389f2c3aa26ccbdd9",
+ "evidence_commits": {
+  "study_committed": "4925cd0c9c04217df3dddca9dec69f7c1a70100d",
+  "records_moved_to_artifact_store": "2db24db1818b6395075c2057302db3952a61b38c"
+ },
+ "date": "2026-11-07",
+ "raw_data": [
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/prime/session.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/session.json",
+   "sha256": "174b45d769af4b546f05099f298aff1ef15e9332e789408be4304feb28cc5229",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/prime/spec.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/spec.json",
+   "sha256": "80aaad091420cc1ef4805917e9c7742d29cb13989632451e53c6e5732df036bf",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/prime/host.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/host.json",
+   "sha256": "c7803740354ed331add496ba4bd57d3b911b73dc9661cdbfc64051e4ef21ce64",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/prime/.artifacts.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/.artifacts.json",
+   "sha256": "0124baba2a6db4acfde13c51dbd644af9b7c4426e9407572511db13c96823b63",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/koblitz/session.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/koblitz/session.json",
+   "sha256": "bee61224e46d5f8d1bd420f1dc009305d35d9ceafedaa2899264c8dae8b1c030",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/koblitz/spec.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/koblitz/spec.json",
+   "sha256": "667de40e590e6b7bb5c9e72778db8488aff0249f0442c6e5bccf9c6a3c403e71",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/koblitz/host.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/koblitz/host.json",
+   "sha256": "2ff36ac61d9336f466baa9bedc62737b84900ff767beb9bf2d669bb45178ecfa",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/koblitz/.artifacts.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/koblitz/.artifacts.json",
+   "sha256": "f8227c79c75ba1f047aaf60f91774453aa30e4ca5264070ed3449d5fa4d64611",
+   "tracked_in_git": true
+  }
+ ],
+ "hashed_in_artifact_store": {
+  "note": "Hashed but stored in the artifact store (gitignored; bytes in s3 via tools/artifacts). Not in raw_data because a checkout without hydration does not have them. Each local copy validated matches the tracked .artifacts.json manifest and session.json, which are pinned in raw_data.",
+  "files": [
+   {
+    "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/plan.json",
+    "path_from_evidence_dir": "../../research/ecbench_rho_v5_20261107/sessions/prime/plan.json",
+    "sha256": "b5cfed41265d4429047ecef949afddf856856035f82324dc6ad11ff23b693789",
+    "bytes": 2527173,
+    "manifest": "research/ecbench_rho_v5_20261107/sessions/prime/.artifacts.json",
+    "manifest_sha256": "b5cfed41265d4429047ecef949afddf856856035f82324dc6ad11ff23b693789",
+    "manifest_bytes": 2527173,
+    "matches_manifest": true,
+    "pinned_by_session_json": "b5cfed41265d4429047ecef949afddf856856035f82324dc6ad11ff23b693789",
+    "matches_session_json": true,
+    "matches_validated_bytes": true,
+    "validated_from_local_copy": true
+   },
+   {
+    "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/records.jsonl",
+    "path_from_evidence_dir": "../../research/ecbench_rho_v5_20261107/sessions/prime/records.jsonl",
+    "sha256": "529115cf1ee383c4a80e799c987715e7d9b254fcc87b70d4ddd886f689d5c994",
+    "bytes": 90019192,
+    "manifest": "research/ecbench_rho_v5_20261107/sessions/prime/.artifacts.json",
+    "manifest_sha256": "529115cf1ee383c4a80e799c987715e7d9b254fcc87b70d4ddd886f689d5c994",
+    "manifest_bytes": 90019192,
+    "matches_manifest": true,
+    "pinned_by_session_json": "529115cf1ee383c4a80e799c987715e7d9b254fcc87b70d4ddd886f689d5c994",
+    "matches_session_json": true,
+    "matches_validated_bytes": true,
+    "validated_from_local_copy": true
+   },
+   {
+    "repo_path": "research/ecbench_rho_v5_20261107/sessions/koblitz/plan.json",
+    "path_from_evidence_dir": "../../research/ecbench_rho_v5_20261107/sessions/koblitz/plan.json",
+    "sha256": "0afc626548b9686fd78982b34f2e817667a27411f6789ee1e56b68fae0fdfd35",
+    "bytes": 1260283,
+    "manifest": "research/ecbench_rho_v5_20261107/sessions/koblitz/.artifacts.json",
+    "manifest_sha256": "0afc626548b9686fd78982b34f2e817667a27411f6789ee1e56b68fae0fdfd35",
+    "manifest_bytes": 1260283,
+    "matches_manifest": true,
+    "pinned_by_session_json": "0afc626548b9686fd78982b34f2e817667a27411f6789ee1e56b68fae0fdfd35",
+    "matches_session_json": true,
+    "matches_validated_bytes": true,
+    "validated_from_local_copy": true
+   },
+   {
+    "repo_path": "research/ecbench_rho_v5_20261107/sessions/koblitz/records.jsonl",
+    "path_from_evidence_dir": "../../research/ecbench_rho_v5_20261107/sessions/koblitz/records.jsonl",
+    "sha256": "3ae1d5907383af52e19901b8d458750cefd40fd7b36597cac2cae07829bdc5e5",
+    "bytes": 40823828,
+    "manifest": "research/ecbench_rho_v5_20261107/sessions/koblitz/.artifacts.json",
+    "manifest_sha256": "3ae1d5907383af52e19901b8d458750cefd40fd7b36597cac2cae07829bdc5e5",
+    "manifest_bytes": 40823828,
+    "matches_manifest": true,
+    "pinned_by_session_json": "3ae1d5907383af52e19901b8d458750cefd40fd7b36597cac2cae07829bdc5e5",
+    "matches_session_json": true,
+    "matches_validated_bytes": true,
+    "validated_from_local_copy": true
+   }
+  ]
+ },
+ "claim_sources": [
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/prime/comparisons/incumbent__candidate.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/comparisons/incumbent__candidate.json",
+   "sha256": "75306de629baa976fa0eedd3bd14391e358bf2c35f30b10178b0e33b7a95629a",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/prime/comparisons/plain-v3__plain-v5.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/comparisons/plain-v3__plain-v5.json",
+   "sha256": "cee04dadd410963ed99accf2b4dc1fb704c06d210a21730867ea48227a53a518",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/prime/comparisons/incumbent__incumbent-aa.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/prime/comparisons/incumbent__incumbent-aa.json",
+   "sha256": "320237e249fcf6ca7bb70fff8cc3c11549324ac642bd7f93ea6786e46c42326d",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/koblitz/comparisons/incumbent__candidate.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/koblitz/comparisons/incumbent__candidate.json",
+   "sha256": "626299e7702788ba40761278755505e458d3f2332a1b99e061c3242921a8164a",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/sessions/koblitz/comparisons/incumbent__incumbent-aa.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/sessions/koblitz/comparisons/incumbent__incumbent-aa.json",
+   "sha256": "4a53cc9af094e2acd34ea7e6b34e75aa117ce8c1267fc21d185ae1cd82551c8f",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/band-prime.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/band-prime.json",
+   "sha256": "b14415f8e55b12dd2ae12c4f48e3e1bc94facdc2b167966d4f259405f7618e4c",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/band-koblitz.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/band-koblitz.json",
+   "sha256": "1581c0616ca463709a165d8096cf5ab93909f05a362b0a95c0855efe9b1051de",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/audit-koblitz.json",
+   "repo_path": "research/ecbench_rho_v5_20261107/audit-koblitz.json",
+   "sha256": "fc251c79d2ee0c42e5566c362c80c96e56e94a7119154f1dfe0e20dd4f59b0c5",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_rho_v5_20261107/reports/run-20261107T0753Z/REPORT.md",
+   "repo_path": "research/ecbench_rho_v5_20261107/reports/run-20261107T0753Z/REPORT.md",
+   "sha256": "7a442afa31affef283775c27af6867351b2dfcc06ace4af94614113c76b6c415",
+   "tracked_in_git": true
+  }
+ ],
+ "headline": [
+  {
+   "name": "prime: pooled ratio of mean S, candidate rho.negation_v5 / incumbent rho.negation_v3",
+   "claimed": 0.9718,
+   "recomputed": 0.9717521307294268,
+   "rel_tol": 0.002,
+   "rel_diff": 4.925835621857241e-05,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "sum(cost.s, candidate) / sum(cost.s, incumbent) over 2304 non-warmup verified pairs matched by (workload_id, round)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/prime/records.jsonl"
+  },
+  {
+   "name": "prime: pooled ratio of mean S, plain-v5 rho.plain_v5 / plain-v3 rho.plain_v3",
+   "claimed": 0.9626,
+   "recomputed": 0.962630617007901,
+   "rel_tol": 0.002,
+   "rel_diff": 3.1805562133618406e-05,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "sum(cost.s, plain-v5) / sum(cost.s, plain-v3) over 2304 non-warmup verified pairs matched by (workload_id, round)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/prime/records.jsonl"
+  },
+  {
+   "name": "koblitz: pooled ratio of mean S, candidate rho.signed_frobenius_v4 / incumbent rho.signed_frobenius_v3",
+   "claimed": 0.9685,
+   "recomputed": 0.9684612458427992,
+   "rel_tol": 0.002,
+   "rel_diff": 4.0014617656976895e-05,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "sum(cost.s, candidate) / sum(cost.s, incumbent) over 1728 non-warmup verified pairs matched by (workload_id, round)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/koblitz/records.jsonl"
+  },
+  {
+   "name": "prime candidate/incumbent: section 5a band ratio at w = 0.1",
+   "claimed": 0.9759,
+   "recomputed": 0.975929731760191,
+   "rel_tol": 0.002,
+   "rel_diff": 3.046506241533366e-05,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "section 5a band at w = 0.1: sum over matched pairs of (total_gae + w * U) / sqrt(r), candidate over reference, U = sum of the counters named in the record's cost.unpriced (2304 pairs)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/prime/records.jsonl"
+  },
+  {
+   "name": "prime candidate/incumbent: section 5a band ratio at w = 1",
+   "claimed": 0.995,
+   "recomputed": 0.9949566008915948,
+   "rel_tol": 0.002,
+   "rel_diff": 4.361719437711433e-05,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "section 5a band at w = 1.0: sum over matched pairs of (total_gae + w * U) / sqrt(r), candidate over reference, U = sum of the counters named in the record's cost.unpriced (2304 pairs)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/prime/records.jsonl"
+  },
+  {
+   "name": "prime plain-v5/plain-v3: section 5a band ratio at w = 0.1",
+   "claimed": 0.9643,
+   "recomputed": 0.9642563383880536,
+   "rel_tol": 0.002,
+   "rel_diff": 4.527803789947746e-05,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "section 5a band at w = 0.1: sum over matched pairs of (total_gae + w * U) / sqrt(r), candidate over reference, U = sum of the counters named in the record's cost.unpriced (2304 pairs)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/prime/records.jsonl"
+  },
+  {
+   "name": "prime plain-v5/plain-v3: section 5a band ratio at w = 1",
+   "claimed": 0.9782,
+   "recomputed": 0.9781981060509596,
+   "rel_tol": 0.002,
+   "rel_diff": 1.936157268837533e-06,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "section 5a band at w = 1.0: sum over matched pairs of (total_gae + w * U) / sqrt(r), candidate over reference, U = sum of the counters named in the record's cost.unpriced (2304 pairs)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/prime/records.jsonl"
+  },
+  {
+   "name": "koblitz candidate/incumbent: section 5a band ratio at w = 0.1",
+   "claimed": 0.9694,
+   "recomputed": 0.969387357416412,
+   "rel_tol": 0.002,
+   "rel_diff": 1.3041658333008455e-05,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "section 5a band at w = 0.1: sum over matched pairs of (total_gae + w * U) / sqrt(r), candidate over reference, U = sum of the counters named in the record's cost.unpriced (1728 pairs)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/koblitz/records.jsonl"
+  },
+  {
+   "name": "koblitz candidate/incumbent: section 5a band ratio at w = 1",
+   "claimed": 0.9738,
+   "recomputed": 0.9737748002522404,
+   "rel_tol": 0.002,
+   "rel_diff": 2.587774466996073e-05,
+   "pass": true,
+   "rounds_to_claim": true,
+   "definition": "section 5a band at w = 1.0: sum over matched pairs of (total_gae + w * U) / sqrt(r), candidate over reference, U = sum of the counters named in the record's cost.unpriced (1728 pairs)",
+   "evidence": "research/ecbench_rho_v5_20261107/sessions/koblitz/records.jsonl"
+  }
+ ],
+ "supplementary_checks": {
+  "prime_candidate_over_incumbent": {
+   "pairs": 2304,
+   "unpaired": [
+    0,
+    0
+   ],
+   "same_seed_and_target": true,
+   "ratio_of_mean_S": 0.9717521307294268,
+   "mean_S": {
+    "candidate": 0.987478798861819,
+    "reference": 1.016183826754861
+   },
+   "band_declared_unpriced": {
+    "0.0": 0.9717521307294268,
+    "0.1": 0.975929731760191,
+    "1.0": 0.9949566008915948
+   },
+   "band_all_three_uncharged_counters": {
+    "0.0": 0.9717521307294268,
+    "0.1": 0.975929731760191,
+    "1.0": 0.9949566008915948
+   },
+   "band_order_holds": true,
+   "ratio_of_summed_total_gae": 0.987322366645313,
+   "per_curve": [
+    {
+     "log2_r": 17.696675535624497,
+     "mean_S_cand": 1.1278440285785685,
+     "mean_S_ref": 1.1666430474159817,
+     "pairs": 384,
+     "r": 212437,
+     "ratio": 0.9667430248495033
+    },
+    {
+     "log2_r": 19.101306328859888,
+     "mean_S_cand": 1.0080098552062227,
+     "mean_S_ref": 1.1304969701835705,
+     "pairs": 384,
+     "r": 562427,
+     "ratio": 0.8916519741247442
+    },
+    {
+     "log2_r": 21.215969580418946,
+     "mean_S_cand": 1.0232569830769598,
+     "mean_S_ref": 0.9796269405274343,
+     "pairs": 384,
+     "r": 2435809,
+     "ratio": 1.044537405765949
+    },
+    {
+     "log2_r": 23.974409950711376,
+     "mean_S_cand": 0.9513057329261922,
+     "mean_S_ref": 0.9804209945283745,
+     "pairs": 384,
+     "r": 16482251,
+     "ratio": 0.9703033066767527
+    },
+    {
+     "log2_r": 25.346175235828202,
+     "mean_S_cand": 0.8935903819205562,
+     "mean_S_ref": 0.9163380719187554,
+     "pairs": 384,
+     "r": 42653927,
+     "ratio": 0.975175439398074
+    },
+    {
+     "log2_r": 27.955005572422284,
+     "mean_S_cand": 0.9208658114624155,
+     "mean_S_ref": 0.92357693595505,
+     "pairs": 384,
+     "r": 260192759,
+     "ratio": 0.9970645385488855
+    }
+   ],
+   "unpriced_counter_totals": {
+    "reference": {
+     "canonicalisations_uncharged": 10340734,
+     "distinguished_point_table_inserts_uncharged": 131452,
+     "distinguished_point_table_queries_uncharged": 133757
+    },
+    "candidate": {
+     "canonicalisations_uncharged": 10291029,
+     "distinguished_point_table_inserts_uncharged": 252319,
+     "distinguished_point_table_queries_uncharged": 254637
+    }
+   }
+  },
+  "prime_plain_v5_over_plain_v3": {
+   "pairs": 2304,
+   "unpaired": [
+    0,
+    0
+   ],
+   "same_seed_and_target": true,
+   "ratio_of_mean_S": 0.962630617007901,
+   "mean_S": {
+    "candidate": 1.3680411704236581,
+    "reference": 1.421148617395814
+   },
+   "band_declared_unpriced": {
+    "0.0": 0.962630617007901,
+    "0.1": 0.9642563383880536,
+    "1.0": 0.9781981060509596
+   },
+   "band_all_three_uncharged_counters": {
+    "0.0": 0.962630617007901,
+    "0.1": 0.9642563383880536,
+    "1.0": 0.9781981060509596
+   },
+   "band_order_holds": true,
+   "ratio_of_summed_total_gae": 0.9888344866523608,
+   "per_curve": [
+    {
+     "log2_r": 17.696675535624497,
+     "mean_S_cand": 1.500166577628954,
+     "mean_S_ref": 1.549231770520186,
+     "pairs": 384,
+     "r": 212437,
+     "ratio": 0.9683293398541929
+    },
+    {
+     "log2_r": 19.101306328859888,
+     "mean_S_cand": 1.4038654037774838,
+     "mean_S_ref": 1.5335925719024122,
+     "pairs": 384,
+     "r": 562427,
+     "ratio": 0.9154096267146087
+    },
+    {
+     "log2_r": 21.215969580418946,
+     "mean_S_cand": 1.352022401987034,
+     "mean_S_ref": 1.4368330109325462,
+     "pairs": 384,
+     "r": 2435809,
+     "ratio": 0.940973927867604
+    },
+    {
+     "log2_r": 23.974409950711376,
+     "mean_S_cand": 1.3264904205702497,
+     "mean_S_ref": 1.35609767172187,
+     "pairs": 384,
+     "r": 16482251,
+     "ratio": 0.9781673165812406
+    },
+    {
+     "log2_r": 25.346175235828202,
+     "mean_S_cand": 1.3232126598965148,
+     "mean_S_ref": 1.3590055115273643,
+     "pairs": 384,
+     "r": 42653927,
+     "ratio": 0.9736624676447246
+    },
+    {
+     "log2_r": 27.955005572422284,
+     "mean_S_cand": 1.3024895586817131,
+     "mean_S_ref": 1.2921311677705063,
+     "pairs": 384,
+     "r": 260192759,
+     "ratio": 1.008016516565481
+    }
+   ],
+   "unpriced_counter_totals": {
+    "reference": {
+     "canonicalisations_uncharged": 0,
+     "distinguished_point_table_inserts_uncharged": 192197,
+     "distinguished_point_table_queries_uncharged": 194506
+    },
+    "candidate": {
+     "canonicalisations_uncharged": 0,
+     "distinguished_point_table_inserts_uncharged": 292061,
+     "distinguished_point_table_queries_uncharged": 294385
+    }
+   }
+  },
+  "koblitz_candidate_over_incumbent": {
+   "pairs": 1728,
+   "unpaired": [
+    0,
+    0
+   ],
+   "same_seed_and_target": true,
+   "ratio_of_mean_S": 0.9684612458427992,
+   "mean_S": {
+    "candidate": 0.28190898057316865,
+    "reference": 0.2910895833811487
+   },
+   "band_declared_unpriced": {
+    "0.0": 0.9684612458427992,
+    "0.1": 0.969387357416412,
+    "1.0": 0.9737748002522404
+   },
+   "band_all_three_uncharged_counters": {
+    "0.0": 0.9684612458427992,
+    "0.1": 0.969387357416412,
+    "1.0": 0.9737748002522404
+   },
+   "band_order_holds": true,
+   "ratio_of_summed_total_gae": 1.0545868372531955,
+   "per_curve": [
+    {
+     "log2_r": 15.373714813957372,
+     "mean_S_cand": 0.38673684525821145,
+     "mean_S_ref": 0.4022063190685401,
+     "pairs": 288,
+     "r": 42457,
+     "ratio": 0.9615384615384611
+    },
+    {
+     "log2_r": 16.001122266128682,
+     "mean_S_cand": 0.4080037118836229,
+     "mean_S_ref": 0.4244903537488574,
+     "pairs": 288,
+     "r": 65587,
+     "ratio": 0.9611613274138414
+    },
+    {
+     "log2_r": 16.997807964508816,
+     "mean_S_cand": 0.35414842103103444,
+     "mean_S_ref": 0.37422751737221627,
+     "pairs": 288,
+     "r": 130873,
+     "ratio": 0.9463452167222364
+    },
+    {
+     "log2_r": 20.999106101271966,
+     "mean_S_cand": 0.23287559042835668,
+     "mean_S_ref": 0.2479401311717574,
+     "pairs": 288,
+     "r": 2095853,
+     "ratio": 0.9392412165299495
+    },
+    {
+     "log2_r": 27.78083708554834,
+     "mean_S_cand": 0.16187139263813485,
+     "mean_S_ref": 0.15998089845032162,
+     "pairs": 288,
+     "r": 230603167,
+     "ratio": 1.0118169994425945
+    },
+    {
+     "log2_r": 32.112779548336775,
+     "mean_S_cand": 0.14781792219965068,
+     "mean_S_ref": 0.13769228047519888,
+     "pairs": 288,
+     "r": 4644189029,
+     "ratio": 1.073538194657729
+    }
+   ],
+   "unpriced_counter_totals": {
+    "reference": {
+     "canonicalisations_uncharged": 3451415,
+     "distinguished_point_table_inserts_uncharged": 80566,
+     "distinguished_point_table_queries_uncharged": 82363
+    },
+    "candidate": {
+     "canonicalisations_uncharged": 3670228,
+     "distinguished_point_table_inserts_uncharged": 83453,
+     "distinguished_point_table_queries_uncharged": 85259
+    }
+   }
+  },
+  "aa_controls": {
+   "prime": 1.0,
+   "koblitz": 1.0
+  },
+  "band_claimed": "comparisons/*.json ops.band: prime cand/inc [0.971752, 0.975930, 0.994957]; prime plain-v5/plain-v3 [0.962631, 0.964256, 0.978198]; koblitz cand/inc [0.968461, 0.969387, 0.973775]; recomputed agrees to 6 decimals",
+  "producer_reported_per_curve_ci95_not_recomputed": {
+   "prime_candidate_over_incumbent": {
+    "21.22": [
+     0.9789,
+     1.1145
+    ],
+    "27.96": [
+     0.9269,
+     1.0725
+    ],
+    "pooled": [
+     0.9453,
+     0.999
+    ]
+   },
+   "prime_plain_v5_over_plain_v3": {
+    "27.96": [
+     0.9394,
+     1.0817
+    ],
+    "pooled": [
+     0.9376,
+     0.9883
+    ]
+   },
+   "koblitz_candidate_over_incumbent": {
+    "27.78": [
+     0.9297,
+     1.1012
+    ],
+    "32.11": [
+     0.983,
+     1.1725
+    ],
+    "pooled": [
+     0.9434,
+     0.9942
+    ]
+   },
+   "source": "sessions/*/comparisons/*.json curves[].ci95 and ops.ci95 (linearised_t); point ratios per curve agree with the recomputed per_curve ratios"
+  }
+ },
+ "structure": {
+  "prime": {
+   "all_session_id": true,
+   "git_commit": "8b8d30884f6d7938f152f557081520fe9b3d650d",
+   "git_dirty": false,
+   "host_sha256_matches_session": true,
+   "n_records": 13440,
+   "plan_sha256_matches_session": true,
+   "records_sha256_matches_session": true,
+   "seq_contiguous": true,
+   "session_records_written": 13440,
+   "single_binary": [
+    "9fde9d8babe202901c390d3d4b3d77df65e4f44776294f8f3422b74a088549cf"
+   ],
+   "unique_record_ids": true
+  },
+  "koblitz": {
+   "all_session_id": true,
+   "git_commit": "9f6faa955388b65e06bf0e26b71b7945189751cb",
+   "git_dirty": true,
+   "host_sha256_matches_session": true,
+   "n_records": 6048,
+   "plan_sha256_matches_session": true,
+   "records_sha256_matches_session": true,
+   "seq_contiguous": true,
+   "session_records_written": 6048,
+   "single_binary": [
+    "9fde9d8babe202901c390d3d4b3d77df65e4f44776294f8f3422b74a088549cf"
+   ],
+   "unique_record_ids": true
+  }
+ },
+ "measured_verified_records_per_arm": {
+  "prime": {
+   "candidate": 2304,
+   "incumbent": 2304,
+   "incumbent-aa": 2304,
+   "plain-v3": 2304,
+   "plain-v5": 2304
+  },
+  "koblitz": {
+   "candidate": 1728,
+   "incumbent": 1728,
+   "incumbent-aa": 1728
+  }
+ },
+ "verifier_sha256": {
+  "validate_v5.py": "6621f15a17bc13ce4af798a9fee1d7ce903a23f5293e3437a8b60d44d361e110",
+  "validate.py": "da797c32ca0c9217b4886f050cacf350f3d7806785b7b7564c7f4198f75ede0f",
+  "validate_koblitz.py": "7564d478bba535a524d47f60c1ff8b61306b0940f819ed07ece2d8c68c8e42f5"
+ },
+ "notes": [
+  "Validated at HEAD e3712a00366a1e02596acbb389f2c3aa26ccbdd9. The study was committed in 4925cd0c9c04217df3dddca9dec69f7c1a70100d. records.jsonl and plan.json of both sessions moved to the artifact store in 2db24db1818b6395075c2057302db3952a61b38c. The local copies validated hash to the .artifacts.json manifests and to session.json records_sha256 / plan_sha256 (hashed_in_artifact_store). No other file under sessions/ changed between 4925cd0c9c04217df3dddca9dec69f7c1a70100d and HEAD. raw_data lists only files tracked in Git, with `path` relative to benchmarks/20261107-rho-v5 and `repo_path` repository-relative.",
+  "Independence: validate_v5.py reads records.jsonl directly. It reuses, unchanged, the arithmetic of the validator's earlier verifiers (validate.py: short-Weierstrass affine arithmetic over F_p; validate_koblitz.py: GF(2)[x] arithmetic and the Koblitz group law). No ecbench code is used. All three sources and their sha256 are embedded in replay-certificate.json. No keyring signature; no pcc claim registered by the validator.",
+  "Filter: non-warmup records with outcome.status == 'verified'. Every record's cost.s equals total_gae / sqrt(r), and its floor_s equals sqrt(pi / (2A)) (max relative error 0). Pairs are matched by (workload_id, round) and share algorithm_seed and target; there are no duplicates and no unpaired records.",
+  "Band rule: U = sum of the counters each record names in cost.unpriced. The plain arms name only the two distinguished-point counters; the rho arms with a negation or Frobenius fold also name canonicalisations_uncharged. Pricing all three counters for every arm gives the same band, because canonicalisations_uncharged is 0 on every plain-arm record. The order holds across the band in all three comparisons (every ratio < 1 at w = 0, 0.1 and 1).",
+  "Tolerances: rel_tol 0.002 for values printed to 4 significant figures, as instructed. Every recomputed value also rounds to its claimed 4-figure value (rounds_to_claim); the largest relative difference is 4.9e-05.",
+  "Controls: incumbent-aa / incumbent is exactly 1.0 in both sessions. Reference strength: prime curves have j not in {0, 1728} and A = 2, so rho.negation_v3 uses the full automorphism group. The Koblitz reference rho.signed_frobenius_v3 uses A = 2n (negation x Frobenius). The baseline arm plain-v3 is priced in the same band.",
+  "Source binding: the prime session ran at 8b8d30884f (git_dirty false). The Koblitz session ran at 9f6faa9553 with git_dirty true. `git diff 8b8d30884f 9f6faa9553` touches no src/ file (examples/rho_v3_diag.rs, the two specs and the benchmarks README only), and both sessions record the same binary sha256 9fde9d8babe2.... So the Koblitz binary is byte-identical to the clean-commit build; what made the tree dirty is not recorded. The producer's audits (audit-prime.json, now in the store; audit-koblitz.json) replayed 11520 and 5184 non-warmup records 'identical', with the same binary and hardware class ECBHW1he9e33daae9e7: not cross-host.",
+  "Scope disclosure (observation, not a discrepancy): each pooled ratio is a ratio of mean S, so every curve carries equal weight in S units. Koblitz candidate / incumbent per curve, by log2 r: 0.962 (15.37), 0.961 (16.00), 0.946 (17.00), 0.939 (21.00), 1.012 (27.78), 1.074 (32.11). The ratio of summed total GAE is 1.0546: the candidate spends more total group operations, because the two largest curves dominate total GAE. Prime candidate / incumbent per curve: 0.967, 0.892, 1.045, 0.970, 0.975, 0.997; summed-GAE ratio 0.9873. Plain-v5 / plain-v3 per curve: 0.968, 0.915, 0.941, 0.978, 0.974, 1.008; summed-GAE ratio 0.9888. The producer's per-curve intervals contain 1 at the largest sizes (supplementary_checks; not recomputed).",
+  "L0 isolation: counted GAE only; no wall-clock figure is validated.",
+  "Curve parameters: prime (a, b) were derived from G and a target point, then bound by the ICV1 model12 hash, the slug, j, the trace, docs/curves/registry.json, [r]G = O with r prime, and cofactor 1 from the Hasse bound. Each Koblitz modulus was found by searching trinomials and pentanomials for the ICV1 field tag (unique, irreducible, agrees with the registry). The order was checked by the Lucas recurrence; r is prime, r^2 does not divide #E, and [r]G = O.",
+  "m=83 / ECC2K-130: not applicable. These are rho measurements on prime curves of 18-28 bits and Koblitz curves over GF(2^17..2^43); REPORT.md makes no ECC2K-130 or m=83 claim.",
+  "The validator writes no VALIDATION.json."
+ ]
+}

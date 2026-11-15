@@ -1,0 +1,12 @@
+digraph auxiliary {
+ graph [rankdir=TB,bgcolor="white",pad="0.18",nodesep="0.3",ranksep="0.38"];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,fillcolor="#edf4fa",color="#557087",margin="0.13"];
+ edge [color="#557087",arrowsize=0.7];
+ {rank=same; aux [label="Validate auxiliary A,T,G\n3 Velu steps / 8 roots"]; norm [label="Projective norm equations\n14 variables / cubic"]; projection [label="Exact first-wrap graph\n8 variables / quartic"];}
+ {rank=same; witness [label="msolve + original lift\ncurve / membership / sum",fillcolor="#e5f3e9"]; recovery [label="Mixed queries / signed rows\nkernel over scalar F13",fillcolor="#e5f3e9"]; scalar [label="Scalar 11\nindependent OpenSSL replay",fillcolor="#e5f3e9"];}
+ aux -> norm -> projection -> witness -> recovery -> scalar;
+ formal [label="Shared Lean step law\ncoprime pair preserved",fillcolor="#f1edf9"];
+ formal -> norm [style=dashed];
+ pc [label="Indexed source-certificate controls\n6 empty ideals / 6 unknowns",fillcolor="#fff3d9"];
+ projection -> pc [style=dashed];
+}

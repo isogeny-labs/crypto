@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hb0d5644dc061",
+  "label": "collision floor and matched-rho decomposition, p36 (research/ic_rho_floor_20261109)",
+  "spec_id": "ECS1h78b71ead9214",
+  "spec_sha256": "78b71ead9214e2816226053f081aee1914b53af60a4ab84b04ac0dd7f86d73c5",
+  "env_class_id": "ECBENV3hfe10f980aacd",
+  "host_sha256": "655965a345fe54e75867d31e4a5e8dd1a1a734806271cdd1c1a90c1982984a6b",
+  "plan_sha256": "459cfd54ba496a68068a4010919ce72bfe1f335ef578585efd2638479ecaf462",
+  "binary_sha256": "30a2f8d9475b392a3ff17d04cf89e39e73caf5a9c55d436d0079f1c7b2409b6b",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794201478425,
+  "finished_unix_ms": 1794201624063,
+  "status": "complete",
+  "executions_planned": 1152,
+  "records_written": 1152,
+  "records_sha256": "5abfe13f55d156c937217cc8ab337e9f8de7981477d7cd711a55744e5b7420a4",
+  "status_counts": {
+    "verified": 1152
+  },
+  "last_seq": 1151
+}

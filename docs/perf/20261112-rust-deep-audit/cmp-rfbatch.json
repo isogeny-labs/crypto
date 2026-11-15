@@ -1,0 +1,8 @@
+{"schema":"ecbench.spec/v1","label":"r2 phase C: rootfind-mitm-prime-batch against rootfind-mitm",
+"description":"Paired comparison of the batched-inversion prime rootfind oracle against its parent on the same prime curves, base, targets and seeds. Local, unisolated (--cpus none): counted units are the result, wall is indicative only.",
+"workloads":{"curves":[{"kind":"prime_search","bits":24,"seed":59297},{"kind":"prime_search","bits":26,"seed":59297},{"kind":"prime_search","bits":28,"seed":59297}],"targets_per_curve":4,"target_seed":20261112},
+"arms":[
+ {"name":"rf","role":"baseline","method":{"id":"ic.pipeline","params":{"factor_base":"prime-abscissa:size=48","oracle":"rootfind-mitm:m=3","linalg":"structured-gauss"}}},
+ {"name":"rf-batch","role":"candidate","method":{"id":"ic.pipeline","params":{"factor_base":"prime-abscissa:size=48","oracle":"rootfind-mitm-prime-batch:m=3","linalg":"structured-gauss"}}}
+],
+"measurement":{"rounds":3,"warmup":1,"order":"alternate_measured","seed":20261112,"isolation_required":"L0","timeout_seconds":300}}

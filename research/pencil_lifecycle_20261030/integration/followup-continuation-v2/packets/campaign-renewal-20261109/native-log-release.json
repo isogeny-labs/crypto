@@ -1,0 +1,24 @@
+{
+  "schema": "pencil.coordinator-release/v1",
+  "released": true,
+  "utc": "2026-11-09T17:57:30.978406+00:00",
+  "scope": "single native log ownership qualification; no compiler",
+  "harness_sha256": "9bf9b24a6d0105060dbcb499350665cf229af1f3b20c48c1724e58ccb5952d21",
+  "review_sha256": "1a4faa92336ae4e8793c40eb3aabb0f5176dbab559475466908dd05d31e28a10",
+  "source_launcher_sha256": "da57c82264e5fab555526b772221f0933fb9d114d2cf2f2852f2189a7eef4aaf",
+  "max_seconds": 60,
+  "attempts": 1,
+  "automatic_retry": false,
+  "previous_payload_terminal": true,
+  "previous_completion_sha256": "5e93a54237f6de8e46bcb728615879875a4dc1654881db79791eff2a5c48993e",
+  "command": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "55s",
+    "/usr/bin/python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-log-qualification-20261109/qualify.py"
+  ],
+  "publication_required_before_execution": true
+}

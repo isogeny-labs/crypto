@@ -26,11 +26,19 @@ jobs:
             job_name: gh-41260778856-1
             launcher_id: 47bce409-b8ea-4c00-8660-c0bc989ecb02
             request_sha256: 0fc352b643f362f84fdc69c7d1062a1502dd228ae25b435ad72879c6b254ef55
+          # Trace-line MITM reference d5 (research/trace_c1_2lp_20261027/isolab-20261109/LAUNCH.md).
+          - workflow_run: '42639382601'
+            job_name: gh-42639382601-1
+            launcher_id: 8096a7db-d8a1-4b26-ba03-95e9defdaf3b
+            request_sha256: 31a58ab39a4e99981aafad4cdc861c24d7d469d1717ae91f8b7b2be9e1ea9220
+            source_revision: f07b6d3e4eb7501ed51271dcd69e06cb543af96d
+            ecbench_sha256: 25a1351c272d3c0d78e775e9296eefb9dc66938745a475f646e76697bfa578af
     env:
       AWS_REGION: ${{ vars.ISOLAB_AWS_REGION }}
       ISOLAB_BUCKET: ${{ vars.ISOLAB_RESULTS_BUCKET }}
-      SOURCE_REVISION: b4d751706eb2244314ebc9b84ba9545485ba4ac7
-      ECBENCH_SHA256: 0784fe47212d64dd2ee81510d3c28d2f604782086500135a3114c61738f854b7
+      # Entries without their own identity keep the original fixed build.
+      SOURCE_REVISION: ${{ matrix.source_revision || 'b4d751706eb2244314ebc9b84ba9545485ba4ac7' }}
+      ECBENCH_SHA256: ${{ matrix.ecbench_sha256 || '0784fe47212d64dd2ee81510d3c28d2f604782086500135a3114c61738f854b7' }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:

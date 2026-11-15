@@ -184,6 +184,8 @@ fn prepare(backend: &str) {
             r,
             cofactor: 1,
             generator: g0,
+
+            representation: None,
         };
         let map = derive_map(&inst, 19, &mut GroupOps::default())
             .unwrap_or_else(|e| panic!("map {id}: {e}"));
