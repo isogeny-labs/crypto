@@ -69,3 +69,11 @@ to billing. The local102-theorem full gate and actual2-theorem instance gate
 pass; no hosted-CI success is claimed. Task-wide autonomy accounting follows
 D3 (one task, several PRs, ended at its last merge); this research task and its
 parent PC PR remain open, so no completed-task autonomy success is recorded.
+
+A2 finishes exactly as registered: six small sets and old Kummer D4 pass,
+all12 auxiliary targets still hit124, independently replayed as unknowns.
+Kummer counters now2350 rows/1000 pivots/129061 producer reductions, with
+52263 checker reductions; do not infer whole-cost savings from one phase.
+The complete raw round is retained. A3 is frozen before coding first-wrap
+unit graph substitutions:8 variables/quartic input, D6 with3003 monomials,
+unchanged hard caps, same12 target/model/replay criteria. [pcc:unverified]

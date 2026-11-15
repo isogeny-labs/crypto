@@ -106,3 +106,31 @@ backend and all PC caps. No old degree5/6 or old PC arm is repeated. Preserve
 all unknowns, do not adapt the degree, schedule, targets or caps. This is a
 standard completion shortcut, not a new mathematical elimination method or
 a registered timing comparison. [pcc:unverified]
+
+## Amendment A3 — eliminate the public first-wrap graph
+
+A2 completes the six small controls and the old natural Kummer D4 control,
+but all12 auxiliary targets remain capped unknown. Preserve the whole round.
+Do not change those outcomes or rerun that representation.
+
+For m3 only, the first-wrap public numerator N2 is monic degree4 and the
+public denominator D2 is monic degree3. Monic division by cubic U forces
+qN_1=1, qN_0=coeff(N2,3)-U2, qD_0=1 and
+R_D_k=coeff(D2,k)-Uk for k0..2. Substitute these six exact graph coordinates,
+keeping the three numerator remainders. The planned system has8 variables,
+maximum degree4. Every assignment must lift and satisfy every original14-
+variable equation before point decoding. The converse follows uniqueness
+of monic division; finite target tests are not substituted for that argument.
+
+Freeze exactly one graph-004 panel: structural cancellation/shape8/degree4,
+then the same12 target census with msolve once and early-PC once at D6. All
+caps remain20s CPU/wall,2GiB, one thread,1M steps,2M entries,20k rows,40k DAG
+nodes,128 quotient/basis,1MiB proof. D6 is for the new quartic presentation:
+its monomial universe binom(8+6,6)=3003 is smaller than3060 for the old14-
+variable D4 presentation. This is a structural count, not a cost comparison.
+No old-presentation degree is increased or old failed call retried. Native
+complete-set comparisons, original lift checks and independent OpenSSL replay
+remain mandatory, with all unknowns retained. No target/cap/degree adapts
+after this panel starts. Use new binaries and a fresh frozen runner copy;
+capture source, all binary/script hashes and loader evidence before calls.
+[pcc:unverified]
