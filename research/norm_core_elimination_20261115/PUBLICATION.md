@@ -40,3 +40,18 @@ an executable conditional solver interface; a sufficient growing-family
 cost/yield theorem remains unproved. Existing scalar/torus domains and absent
 auxiliary rational-isogeny implementation also limit applicability.
 [pcc:unverified]
+
+Publication checks: merged main44766e55d6560543b0a6064d63ad4065cf276dbc
+normally after confirming the parent commit is an ancestor. Only the daily log
+conflicted; preserved every complete main/new section, then normalized its EOF
+blank line. Main's full1065-event ledger is unchanged and its prefix/chain
+check passes. Artifact/size gates and PCC prose lint pass. Native/whole-panel
+hash checks pass. No scientific measurements, source gate or immutable event
+was changed by integration. The final regular child PR is against main.
+[pcc:unverified]
+
+One integration check initially failed because merging reapplied sparse checkout
+and removed the new study from the working tree (its committed files remained
+intact). Added its exact directory to the sparse set, restored those tracked
+files and reran the same prose check successfully. The failed infrastructure
+receipt and final passing receipt are both retained in checks/.
