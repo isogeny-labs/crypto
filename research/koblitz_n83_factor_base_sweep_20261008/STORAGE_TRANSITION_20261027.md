@@ -110,3 +110,25 @@ Actual S3 publication, exact writer confirmation, historical mirroring,
 large-base memory behavior, and full cold same-target runtime comparisons
 remain open. The new command records construction and custody timings as
 informational L0 values only. No runtime graph or leaderboard row changes.
+
+## Native successor trial bridge — 2026-11-15 UTC
+
+`primary-store-v3-trial BASE_DIR FIXTURE_DIR K M MAX_TRIALS BUDGET_SECONDS
+NEW_RUN_DIR` connects the verified successor base to the existing native
+index-calculus enumerate path for `m=2..6`. It requires a clean, source-matched
+checkout; the v3 manifest, replay, fresh-download and store-index checks; an
+exact requested column count; and a separate public target corpus with a
+validation sidecar opened only after a candidate log. Each run has a new
+directory, an explicit wall cap, progress events and a result. The trial
+allows at most 1,000 queries and 7,200 seconds. It records the v3 store name
+and manifest SHA-256 instead of labeling that digest as the historical
+panel's BLAKE3.
+
+The local file-store control exercises a zero-trial preflight for a two-column
+base, preserving null total runtime and rejecting a mismatched requested
+column count. This is an input and solver-path integration control, not a
+relation-yield result. The trial interval starts after base construction and
+publication, and the current result still lacks a fully charged rank,
+descent and verification comparison. It cannot select a minimum-runtime
+factor base. The historical panel path and its old-bucket receipts continue
+unchanged. No S3 write or runtime graph change follows from this bridge.

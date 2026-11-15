@@ -4216,6 +4216,7 @@ pub(super) fn run_cli(
         budget_seconds,
         run_dir,
         None,
+        None,
     )
 }
 
@@ -4227,6 +4228,56 @@ struct ChainRunConfig<'a> {
     memory_limit_bytes: u64,
     source_commit: String,
     source_attestation_mode: &'static str,
+}
+
+struct StoreRunConfig<'a> {
+    store: &'a Store,
+    fixture_root: &'a Path,
+    source_commit: String,
+    source_attestation_mode: &'static str,
+}
+
+/// Run a bounded enumerate trial against a verified v3 artifact-store base.
+/// Base construction and publication are outside this diagnostic interval.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn run_store_trial_cli(
+    root: &Path,
+    fixture_root: &Path,
+    columns: usize,
+    m: usize,
+    max_trials: usize,
+    budget_seconds: u64,
+    run_dir: &Path,
+) -> Result<Value> {
+    if columns == 0
+        || !(2..=6).contains(&m)
+        || max_trials > 1000
+        || budget_seconds == 0
+        || budget_seconds > 7200
+        || !fixture_root.join("probe-corpus.json").is_file()
+        || !fixture_root.join("probe-validation.json").is_file()
+    {
+        return Err("v3 store trial caps or fixture inputs invalid".into());
+    }
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let store = Store::open_default()?;
+    let config = StoreRunConfig {
+        store: &store,
+        fixture_root,
+        source_commit,
+        source_attestation_mode,
+    };
+    run_with_config(
+        root,
+        columns,
+        m,
+        "enumerate",
+        max_trials,
+        budget_seconds,
+        run_dir,
+        None,
+        Some(&config),
+    )
 }
 
 /// Execute one replay-bound primary chained-S3 search only inside a verified
@@ -4303,6 +4354,7 @@ pub(super) fn run_chain_cli(
         budget_seconds,
         run_dir,
         Some(&config),
+        None,
     )
 }
 
@@ -4316,9 +4368,13 @@ fn run_with_config(
     budget_seconds: u64,
     run_dir: &Path,
     chain: Option<&ChainRunConfig<'_>>,
+    store: Option<&StoreRunConfig<'_>>,
 ) -> Result<Value> {
-    if ![64, 256, 600].contains(&columns) && !(chain.is_some() && V2_SIZES.contains(&columns))
+    if !(store.is_some()
+        || [64, 256, 600].contains(&columns)
+        || (chain.is_some() && V2_SIZES.contains(&columns)))
         || !(2..=6).contains(&m)
+        || (chain.is_some() && store.is_some())
     {
         return Err("unsupported primary K or summand count".into());
     }
@@ -4344,30 +4400,40 @@ fn run_with_config(
     }
     let start = Instant::now();
     fs::create_dir(run_dir)?;
-    write_new_json(
-        &run_dir.join("config.json"),
-        &json!({
-            "schema":"n83.primary-cold-config/v1", "study":STUDY,
-            "panel_dir":root.to_string_lossy(),
-            "fixture_dir":chain.map(|config| config.fixture_root.to_string_lossy().to_string()),
-            "curve_a":0, "fixture":0, "orbit_columns":columns,
-            "summands":m, "strategy":strategy_name, "max_trials":max_trials,
-            "budget_seconds":budget_seconds, "allow_direct_relation":false,
-            "source_adapter_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
-            "source_commit":chain.map(|config| config.source_commit.as_str()),
-            "source_attestation_mode":chain.map(|config| config.source_attestation_mode),
-            "policy":chain.map(|config| config.policy),
-            "seed":chain.map(|config| config.seed),
-            "chain_s3_limits":chain.map(|config| json!({
-                "max_variables":config.limits.max_variables,
-                "max_domain_clauses":config.limits.max_domain_clauses,
-                "max_models":config.limits.max_models,
-                "conflict_budget":config.limits.conflict_budget,
-            })),
-            "memory_cgroup_limit_bytes":chain.map(|config| config.memory_limit_bytes),
-            "memory_cgroup_swap_limit_bytes":chain.map(|_| 0),
-        }),
-    )?;
+    let mut config_record = json!({
+        "schema":"n83.primary-cold-config/v1", "study":STUDY,
+        "panel_dir":root.to_string_lossy(),
+        "input_kind":if store.is_some() { "artifact_store_v3" } else { "historical_panel_v1v2" },
+        "fixture_dir":chain.map(|config| config.fixture_root.to_string_lossy().to_string())
+            .or_else(|| store.map(|config| config.fixture_root.to_string_lossy().to_string())),
+        "curve_a":0, "fixture":0, "orbit_columns":columns,
+        "summands":m, "strategy":strategy_name, "max_trials":max_trials,
+        "budget_seconds":budget_seconds, "allow_direct_relation":false,
+        "source_adapter_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
+        "source_commit":chain.map(|config| config.source_commit.as_str())
+            .or_else(|| store.map(|config| config.source_commit.as_str())),
+        "source_attestation_mode":chain.map(|config| config.source_attestation_mode)
+            .or_else(|| store.map(|config| config.source_attestation_mode)),
+        "policy":chain.map(|config| config.policy),
+        "seed":chain.map(|config| config.seed),
+        "chain_s3_limits":chain.map(|config| json!({
+            "max_variables":config.limits.max_variables,
+            "max_domain_clauses":config.limits.max_domain_clauses,
+            "max_models":config.limits.max_models,
+            "conflict_budget":config.limits.conflict_budget,
+        })),
+        "memory_cgroup_limit_bytes":chain.map(|config| config.memory_limit_bytes),
+        "memory_cgroup_swap_limit_bytes":chain.map(|_| 0),
+    });
+    if store.is_some() {
+        config_record["schema"] = json!("n83.primary-store-trial-config/v1");
+        config_record["base_dir"] = json!(root.to_string_lossy().to_string());
+        config_record["panel_dir"] = Value::Null;
+        config_record["measurement_scope"] = json!(
+            "store import and bounded enumerate trial; base construction and publication are outside this interval"
+        );
+    }
+    write_new_json(&run_dir.join("config.json"), &config_record)?;
     let cap_path = run_dir.join("cap.json");
     let cap_strategy = strategy_name.to_owned();
     let deadline = start + Duration::from_secs(budget_seconds);
@@ -4387,14 +4453,24 @@ fn run_with_config(
     });
 
     let import_start = Instant::now();
-    let (base, row, manifest_hash) = if let Some(config) = chain {
+    let (base, row, manifest_hash) = if let Some(config) = store {
+        let (base, row) = load_store_primary_base(root, config.store)?;
+        if row["columns"].as_u64() != Some(columns as u64) {
+            return Err("v3 store base column count differs from requested workload".into());
+        }
+        let manifest_hash = sha256_hex(&fs::read(root.join("manifest.json"))?);
+        (base, row, manifest_hash)
+    } else if let Some(config) = chain {
         load_panel_selected(root, columns, config.policy, config.seed)?
     } else {
         load_panel(root, columns)?
     };
     let base_import_ms = import_start.elapsed().as_secs_f64() * 1000.0;
     let target_start = Instant::now();
-    let fixture_root = chain.map_or(root, |config| config.fixture_root);
+    let fixture_root = chain
+        .map(|config| config.fixture_root)
+        .or_else(|| store.map(|config| config.fixture_root))
+        .unwrap_or(root);
     let (target, corpus_hash) = public_target(fixture_root, &base.curve)?;
     let target_validation_ms = target_start.elapsed().as_secs_f64() * 1000.0;
 
@@ -4550,7 +4626,7 @@ fn run_with_config(
             })
         })
         .collect();
-    let summary = json!({
+    let mut summary = json!({
         "schema":"n83.primary-cold-result/v1", "study":STUDY,
         "status":status, "curve_a":0, "fixture":0,
         "object":row["object"], "point_set_blake3":row["point_set_blake3"],
@@ -4560,9 +4636,12 @@ fn run_with_config(
         "policy":row["policy"], "seed":row["seed"],
         "max_trials":max_trials, "sampler_seed":options.seed,
         "budget_seconds":budget_seconds,
-        "fixture_dir":chain.map(|config| config.fixture_root.to_string_lossy().to_string()),
-        "source_commit":chain.map(|config| config.source_commit.as_str()),
-        "source_attestation_mode":chain.map(|config| config.source_attestation_mode),
+        "fixture_dir":chain.map(|config| config.fixture_root.to_string_lossy().to_string())
+            .or_else(|| store.map(|config| config.fixture_root.to_string_lossy().to_string())),
+        "source_commit":chain.map(|config| config.source_commit.as_str())
+            .or_else(|| store.map(|config| config.source_commit.as_str())),
+        "source_attestation_mode":chain.map(|config| config.source_attestation_mode)
+            .or_else(|| store.map(|config| config.source_attestation_mode)),
         "source_chain_blake3":chain.map(|_| blake3::hash(include_bytes!("../../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string()),
         "source_index_calculus_blake3":chain.map(|_| blake3::hash(include_bytes!("../../src/cryptanalysis/koblitz_index_calculus.rs")).to_hex().to_string()),
         "chain_s3_limits":chain.map(|config| json!({
@@ -4588,6 +4667,19 @@ fn run_with_config(
         "total_index_calculus_runtime_ms":Value::Null,
         "selected_best_total_runtime":Value::Null
     });
+    if store.is_some() {
+        summary["schema"] = json!("n83.primary-store-trial/v1");
+        summary["input_kind"] = json!("artifact_store_v3");
+        summary["object"] = row["store_name"].clone();
+        summary["store_name"] = row["store_name"].clone();
+        summary["store_manifest_sha256"] = summary["panel_manifest_blake3"].clone();
+        summary["panel_manifest_blake3"] = Value::Null;
+        summary["measurement_scope"] = json!(
+            "bounded store import and enumerate trial only; base construction and publication are outside this interval; total cold index-calculus runtime remains unset"
+        );
+    } else {
+        summary["input_kind"] = json!("historical_panel_v1v2");
+    }
     write_new_json(&run_dir.join("summary.json"), &summary)?;
     if status == "PRODUCER_FAILURE" {
         Err("primary solver result failed verification; inspect summary.json".into())
@@ -4761,6 +4853,44 @@ mod tests {
         assert_eq!(imported.factor_base.points.len(), 332);
         assert_eq!(imported.factor_base.signed_orbits.len(), 2);
         assert_eq!(checked["point_set_blake3"], row["point_set_blake3"]);
+        let fixture_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/koblitz_n83_factor_base_sweep_20261008/pilot-01");
+        let config = StoreRunConfig {
+            store: &store,
+            fixture_root: &fixture_root,
+            source_commit: "a".repeat(40),
+            source_attestation_mode: "test_fixture",
+        };
+        let trial = run_with_config(
+            &bundle,
+            2,
+            2,
+            "enumerate",
+            0,
+            7200,
+            &root.join("trial"),
+            None,
+            Some(&config),
+        )
+        .unwrap();
+        assert_eq!(trial["input_kind"], "artifact_store_v3");
+        assert_eq!(trial["schema"], "n83.primary-store-trial/v1");
+        assert_eq!(trial["store_name"], name);
+        assert_eq!(trial["store_manifest_sha256"], manifest_sha256);
+        assert!(trial["panel_manifest_blake3"].is_null());
+        assert!(trial["total_index_calculus_runtime_ms"].is_null());
+        assert!(run_with_config(
+            &bundle,
+            3,
+            2,
+            "enumerate",
+            0,
+            7200,
+            &root.join("wrong-columns"),
+            None,
+            Some(&config),
+        )
+        .is_err());
         let mut bad = storage.clone();
         bad["fresh_download_sha256"] = json!("0");
         fs::write(
