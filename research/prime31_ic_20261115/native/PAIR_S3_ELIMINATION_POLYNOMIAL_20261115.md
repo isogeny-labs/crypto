@@ -217,3 +217,65 @@ finite-root catalogue demonstrated by producer arithmetic; Rust exact-head
 execution is separately gated by CI. It is a useful elimination component,
 not yet a natural-target m8 oracle, a prime31 scalar solver, or a
 cheaper-than-generic ECDLP result.
+
+
+## First actual target-dependent S4 pilot after exact pair elimination
+
+The focused [GitHub Actions run 43724705218](https://github.com/isogeny-labs/crypto/actions/runs/43724705218)
+successfully compiled and ran the new \`--preeliminate-w-f4\` mode of the
+[existing Rust balanced m8 example](examples/prime31_m8_balanced_f4_input.rs).
+The producer output and source pin are frozen in
+[M8_S4_AFTER_PAIR_ELIMINATION_CI_20261115.json](M8_S4_AFTER_PAIR_ELIMINATION_CI_20261115.json).
+This is **developer CI**, not ecbench/PCC certification.
+
+The experiment mathematically removes both fixed pair leaves and the fixed
+S3 equation, specializes \`w\` to a certified rational field root, and reuses
+the actual Rust \`f4_fp_tower.rs\` on the **remaining original three S4
+constraints**. The quotient has 36 Dickson tower variables and two free
+abscissae, rather than the former 48 and three. The eight frozen calls
+include **one known-natural-positive witness used strictly after F4 to
+validate polynomial soundness**, and seven preselected public-Q roots
+(one from each of the six first-collision branches and the diagonal).
+These do not constitute all 961 roots or a complete target oracle.
+
+| Frozen arm | Degree reached | F4 muladds charged before stop | Outcome |
+|---|---:|---:|---|
+| Known natural-positive soundness control | 10 | 56,211 | Oversize / undetermined |
+| Public Q, first collision j=0 | 10 | 56,211 | Oversize / undetermined |
+| Public Q, j=1 | 10 | 56,211 | Oversize / undetermined |
+| Public Q, j=2 | 10 | 56,211 | Oversize / undetermined |
+| Public Q, j=3 | 10 | 56,211 | Oversize / undetermined |
+| Public Q, j=4 | 10 | 56,211 | Oversize / undetermined |
+| Public Q, j=5 | 10 | 56,211 | Oversize / undetermined |
+| Public Q, diagonal | 10 | 56,211 | Oversize / undetermined |
+
+**8/8 censored; 0 extracted algebraic relations, 0 recovered logarithms.**
+The partial F4 multiply-add sum is **449,688** across these eight
+diagnostic calls, excluding root generation, polynomial construction and
+all other phases. The F4 report's \`max_dense_entries=10229\` is a
+previously *accepted* reducer peak, **not** the size of the attempted
+next reducer that triggered \`oversize\` under the 15,000 cap. The
+~9–10 ms per-call engine clocks are not complete process timings.
+
+**Interpretation and falsifier:** removing the fixed S3 bottleneck moved
+the observed stop from degree 6 to degree 10 but did not make the remaining
+S4 system soluble at the frozen cap, even for an independently witnessed
+positive case. Full 961-way specialization under this same cap is therefore
+**not a useful next step**: it would repeat an already-censored solver
+configuration. The identical counters suggest (but do not by themselves
+prove) an early target-independent S4 reducer; a pre-registered left/right
+single-constraint ablation can verify the precise cause. Prioritize a
+certified #4228 S4 quotient/extraction or a demonstrably stronger
+external algebraic engine before considering complete specialization.
+
+For the prior **all-eight-distinct-index** m8 benchmark, the diagonal
+branch is a deliberately overinclusive algebraic soundness control:
+its 31 values represent \`x(2P_i)\` and necessarily repeat a base index.
+If distinctness is imposed, the correct fixed pair polynomial is
+\`H_distinct = H / H_diagonal\`, exactly **degree 930** with branch factors
+j=0..5. Distinctness filtering is not optional when claiming usable
+eight-point relations. This refinement removes the 31 diagonal
+specializations from any subsequent *complete distinct-index* search.
+
+Even after this component improvement, no full cold prime31 scalar
+recovery or cheaper-than-matched-rho result has been measured.
