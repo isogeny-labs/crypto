@@ -10,7 +10,7 @@ Setup (`m4_sym.py p n [--ds]`): E: y^2 = x^3 + 5x + 7, target R decomposed as
 P1 + P2 + P3 via S4(X1,X2,X3,xR) = 0 (deg 4 per variable, 439 terms);
 p ~ n^3/3 with p = 1 mod n; 8 targets, arm order shuffled per target; time =
 min of 3 msolve wall times minus a trivial-system baseline. Checks asserted
-every target: symmetrization exact, Newton sums verified numerically, each
+every target: symmetrization exact, Newton sums checked numerically, each
 basis is [1] iff brute force finds no solution.
 
 Arms: D dense unsymmetrized; Bn binomial unsymmetrized; Bs binomial
