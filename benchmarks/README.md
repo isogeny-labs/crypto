@@ -90,6 +90,15 @@ slice. Record: `20261115T0426Z-hec-s3-inversion-hygiene`.
 - **Unvalidated.** This was a shared host. There is no `VALIDATION.json`, so the slice stays outside
   the admitted table. [pcc:unverified]
 
+The [15 November S4 line sieve](20261115-hec-s4-line-sieve/)
+([PDF](20261115-hec-s4-line-sieve/REPORT.pdf)) keeps documentary copies of the counted full-base
+line-sieve slice. Record: `20261115T0626Z-hec-s4-line-sieve`.
+
+- **Counts, all pre-registered expectations hold.** Field products per relation fall 5.8–16.9× at
+  genus 3 and 8.2–16.1× at genus 4 (p ≥ 127); end to end 5.5–10.9× at m ≤ 506.
+- **The limit.** At (3, 4001) the sieve's solve fills in, and end to end it loses (0.79).
+- **Unvalidated.** Shared host, no `VALIDATION.json`; outside the admitted table.
+
 Source of truth:
 [`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261115T0426Z/).
 

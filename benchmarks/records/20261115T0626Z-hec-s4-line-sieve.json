@@ -1,0 +1,395 @@
+{
+  "branch": "research/hec-sieve-s4-20261115",
+  "closed_utc": "2026-11-15T06:50:08+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/hec_ic_speedup_20261113/run_s4.sh",
+        "research/hec_ic_speedup_20261113/s4-20261115"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T06:27:00+00:00",
+      "wall_s": 1241.095
+    }
+  ],
+  "commit": "f9517dfb1e111a0ed7398996d962d285cb83d36f",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T06:26:54+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-s4-line-sieve"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit"
+  },
+  "id": "20261115T0626Z-hec-s4-line-sieve",
+  "metrics": [
+    {
+      "baseline": 1510.9,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g3_p61",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=5.82; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        221.5,
+        288.0
+      ],
+      "unit": "count",
+      "value": 259.4
+    },
+    {
+      "baseline": 71888.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g3_p61",
+      "note": "field products relation phase + solve; P3=6.17",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 11660.0
+    },
+    {
+      "baseline": 1735.3,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g3_p211",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=8.46; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        182.4,
+        208.0
+      ],
+      "unit": "count",
+      "value": 205.2
+    },
+    {
+      "baseline": 280644.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g3_p211",
+      "note": "field products relation phase + solve; P3=9.77",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 28725.0
+    },
+    {
+      "baseline": 1928.2,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g3_p401",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=11.00; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        162.2,
+        186.4
+      ],
+      "unit": "count",
+      "value": 175.3
+    },
+    {
+      "baseline": 524645.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g3_p401",
+      "note": "field products relation phase + solve; P3=9.73",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 53904.0
+    },
+    {
+      "baseline": 2475.9,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g3_p1021",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=15.54; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        147.4,
+        159.6
+      ],
+      "unit": "count",
+      "value": 159.4
+    },
+    {
+      "baseline": 1549319.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g3_p1021",
+      "note": "field products relation phase + solve; P3=5.50",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 281938.0
+    },
+    {
+      "baseline": 2451.7,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g3_p4001",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=16.95; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        144.5,
+        156.6
+      ],
+      "unit": "count",
+      "value": 144.7
+    },
+    {
+      "baseline": 6987875.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g3_p4001",
+      "note": "field products relation phase + solve; P3=0.79",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 8900121.0
+    },
+    {
+      "baseline": 6892.3,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g4_p31",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=1.35; no bar",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3055.4,
+        6773.9
+      ],
+      "unit": "count",
+      "value": 5090.8
+    },
+    {
+      "baseline": 168330.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g4_p31",
+      "note": "field products relation phase + solve; P3=1.37",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 122783.0
+    },
+    {
+      "baseline": 6881.1,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g4_p61",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=5.09; no bar",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1133.0,
+        1560.0
+      ],
+      "unit": "count",
+      "value": 1352.5
+    },
+    {
+      "baseline": 318945.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g4_p61",
+      "note": "field products relation phase + solve; P3=5.19",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 61466.0
+    },
+    {
+      "baseline": 10618.5,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g4_p127",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=8.22; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1057.8,
+        1346.1
+      ],
+      "unit": "count",
+      "value": 1291.9
+    },
+    {
+      "baseline": 862697.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g4_p127",
+      "note": "field products relation phase + solve; P3=8.56",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 100768.0
+    },
+    {
+      "baseline": 9827.7,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g4_p251",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=10.88; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        864.8,
+        923.9
+      ],
+      "unit": "count",
+      "value": 903.4
+    },
+    {
+      "baseline": 1503559.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g4_p251",
+      "note": "field products relation phase + solve; P3=10.07",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 149369.0
+    },
+    {
+      "baseline": 15992.1,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g4_p509",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=13.34; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1163.3,
+        1385.8
+      ],
+      "unit": "count",
+      "value": 1198.6
+    },
+    {
+      "baseline": 4033035.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g4_p509",
+      "note": "field products relation phase + solve; P3=10.87",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 371005.0
+    },
+    {
+      "baseline": 16432.4,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_prod_per_rel_g4_p1009",
+      "note": "field products per relation, relation phase; baseline = walk (Solver::Dense); P1=16.11; bar row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1004.9,
+        1079.0
+      ],
+      "unit": "count",
+      "value": 1019.9
+    },
+    {
+      "baseline": 8643237.0,
+      "better": "lower",
+      "n": 5,
+      "name": "sieve_total_prod_g4_p1009",
+      "note": "field products relation phase + solve; P3=8.37",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 1032686.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "s4_gates_runs",
+      "note": "G10/G11: 110 count + 110 timing lines, 0 failures; every sieve relation Jacobian-verified, every k verified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 110.0
+    }
+  ],
+  "problem": "hec:g234-native-relation",
+  "raw": [
+    {
+      "bytes": 83663,
+      "path": "research/hec_ic_speedup_20261113/s4-20261115/count.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/87/8796c45dfcd34922c34eead6afa10dfdc37525cefedd1f6e58257a392a6cd8fa",
+      "sha256": "8796c45dfcd34922c34eead6afa10dfdc37525cefedd1f6e58257a392a6cd8fa",
+      "uploaded": false
+    },
+    {
+      "bytes": 78578,
+      "path": "research/hec_ic_speedup_20261113/s4-20261115/time.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c7/c79ef31e5f9a5d626734da42aa6d1c2b255540e4a09e48bc52cc924a6175f998",
+      "sha256": "c79ef31e5f9a5d626734da42aa6d1c2b255540e4a09e48bc52cc924a6175f998",
+      "uploaded": false
+    },
+    {
+      "bytes": 340,
+      "path": "research/hec_ic_speedup_20261113/s4-20261115/host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f8/f80d6d09cde357b0eb24ca579fbc71b1f0da9e4acf810e0b01af0eb71dee3e6e",
+      "sha256": "f80d6d09cde357b0eb24ca579fbc71b1f0da9e4acf810e0b01af0eb71dee3e6e",
+      "uploaded": false
+    },
+    {
+      "bytes": 259,
+      "path": "research/hec_ic_speedup_20261113/s4-20261115/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f2/f20233af122e91f6ca02be8852a63dc8647cc90911d0032b9bb379cb51a21ec9",
+      "sha256": "f20233af122e91f6ca02be8852a63dc8647cc90911d0032b9bb379cb51a21ec9",
+      "uploaded": false
+    },
+    {
+      "bytes": 8338,
+      "path": "research/hec_ic_speedup_20261113/s4-20261115/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/38fb94f62c596a06c3a6a405da1b9264e039bafdb39518f4f9b90cc8987bc6f0",
+      "sha256": "38fb94f62c596a06c3a6a405da1b9264e039bafdb39518f4f9b90cc8987bc6f0",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/hec_ic_speedup_20261113/reports/run-20261115T0626Z/report.pdf",
+    "png": [],
+    "svg": [
+      "research/hec_ic_speedup_20261113/reports/run-20261115T0626Z/relcost.svg",
+      "research/hec_ic_speedup_20261113/reports/run-20261115T0626Z/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-s4-line-sieve",
+  "status": "measured",
+  "summary": "S4 (PLAN \u00a710): full-base line sieve vs walk at genus 3/4 in counted field products. E12-E16 all hold: P1 5.8-16.9 (g3), 8.2-16.1 (g4 p>=127); P3 5.5-10.9 at m<=506; at (3,4001) the sieve's solve fills in (P3 0.79). Engineering, shared host, unvalidated.",
+  "validation": null
+}
