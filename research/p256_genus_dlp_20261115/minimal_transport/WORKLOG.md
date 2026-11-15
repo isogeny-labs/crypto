@@ -129,3 +129,22 @@
 
 ### Errors (what went wrong, how it was handled)
 - None beyond the preserved source-review/build/administrative diagnostics.
+
+## 20:24Z — Explicit complete-cost acceptance and execution status
+
+### What was done (commands, files, features)
+- Re-reviewed Galbraith14.4.3/14.4.2, current measurement requirements, and actual solver/candidate source. KB status/search127, no MCP KB tools; fallback and scope recorded in SPEEDUP_CHECK.md.
+- Added an acceptance addendum with complete-cost inequality, strong source/A-A/generic/folded controls, replay/admission requirements and the distinction between toy recovery and actual-P-256 projections. Added sanitized access/readiness JSON.
+- Rechecked read-only RunPod access401 and the failed mandatory checkpoint upload gate. Zero new candidate cases or performance sessions; no pod or spend. [pcc:unverified]
+- Synced automated head2e25b4b78 and merged main b42bc6d1a after the Copilot wait/fallback notice. Journal receipt002 checks both parent block multisets; ledger prefix and frozen source digests pass. [pcc:unverified]
+
+### Decisions made (and why)
+- Treat sqrt(3) as the ideal orbit-count allowance. Accept a speedup only through the matched complete-cost comparison, including setup, folding, cycles and recovery.
+- Identify the remaining native ecbench integration/common-counter work explicitly. The qualifier does not implement an admitted performance session; authentication alone cannot establish a result.
+- Leave all frozen source/evidence and qualification limits unchanged. Keep the requested RunPod route and checkpoint gate in force.
+
+### Open threads (unfinished, pick up next time)
+- Upload/provider access; immutable qualification; native benchmark integration and frozen spec; then complete-cost execution, replay and current-head PR gates.
+
+### Errors (what went wrong, how it was handled)
+- Explicit remote refspec corrected the initial missing tracking ref. No numerical failure was hidden or relabeled; no numerical panel was executed.
