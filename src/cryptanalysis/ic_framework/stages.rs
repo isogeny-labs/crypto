@@ -272,6 +272,14 @@ pub trait DecompositionOracle<G: CountedGroup> {
         false
     }
 
+    /// A stored ladder `[2^i]G` (already paid for in `prepare`) that the
+    /// pipeline's recovery check `[d]G` may read instead of a
+    /// double-and-add, charged to the same verification ops.  `None` (the
+    /// default) keeps every recorded run's check.
+    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        None
+    }
+
     /// **The large-prime seam.**  Decompose `point = [a]G + [b]Q`, or
     /// store what partially decomposed and hand back whatever complete
     /// relations the stored partials now merge into.  The default is
