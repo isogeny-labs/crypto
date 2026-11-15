@@ -122,7 +122,7 @@ impl Field {
         if powers[degree as usize] != 2 {
             return false;
         }
-        for prime in [2, 7] {
+        for prime in [2, 3, 7] {
             if degree % prime == 0
                 && Self::polynomial_gcd(powers[(degree / prime) as usize] ^ 2, modulus) != 1
             {
@@ -142,26 +142,96 @@ fn exact_second_order(field: Field, q: u32, p: [bool; 4], gamma: u32) -> bool {
         && field.sigma_poly(field.pow(gamma, q) ^ gamma, q, p) == 0
 }
 
-fn subgroup_data(field: Field, q: u32, p: [bool; 4]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
-    let subfield: Vec<_> = (0..field.size).filter(|&x| field.pow(x, q) == x).collect();
-    let first: Vec<_> = (0..field.size)
-        .filter(|&x| field.sigma_poly(x, q, p) == 0)
-        .collect();
-    assert_eq!(subfield.len() as u32, q);
-    assert_eq!(first.len() as u32, q.pow(3));
-    let mut projective = BTreeSet::new();
-    for &v in first.iter().filter(|&&v| v != 0) {
-        projective.insert(
+fn binary_kernel(field: Field, map: impl Fn(u32) -> u32) -> Vec<u32> {
+    let mut pivot_values = [0_u32; 32];
+    let mut pivot_witnesses = [0_u32; 32];
+    let mut kernel = Vec::new();
+    for bit in 0..field.degree {
+        let mut value = map(1 << bit);
+        let mut witness = 1 << bit;
+        loop {
+            if value == 0 {
+                kernel.push(witness);
+                break;
+            }
+            let pivot = Field::polynomial_degree(value) as usize;
+            if pivot_values[pivot] == 0 {
+                pivot_values[pivot] = value;
+                pivot_witnesses[pivot] = witness;
+                break;
+            }
+            value ^= pivot_values[pivot];
+            witness ^= pivot_witnesses[pivot];
+        }
+    }
+    assert!(kernel.iter().all(|&x| map(x) == 0));
+    kernel
+}
+
+fn binary_span(basis: &[u32]) -> Vec<u32> {
+    (0..1 << basis.len())
+        .map(|mask| {
+            basis.iter().enumerate().fold(0, |sum, (bit, &value)| {
+                if mask & (1 << bit) != 0 {
+                    sum ^ value
+                } else {
+                    sum
+                }
+            })
+        })
+        .collect()
+}
+
+fn in_k_span(field: Field, candidate: u32, basis: &[u32], subfield: &[u32]) -> bool {
+    match basis {
+        [] => candidate == 0,
+        [v] => subfield.iter().any(|&c| field.mul(c, *v) == candidate),
+        [v, w] => subfield.iter().any(|&c| {
             subfield
                 .iter()
-                .filter(|&&c| c != 0)
-                .map(|&c| field.mul(c, v))
-                .min()
-                .unwrap(),
-        );
+                .any(|&d| field.mul(c, *v) ^ field.mul(d, *w) == candidate)
+        }),
+        _ => panic!("only two previously chosen vectors are needed"),
     }
+}
+
+fn subgroup_data(field: Field, q: u32, p: [bool; 4]) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
+    let subfield_basis = binary_kernel(field, |x| field.pow(x, q) ^ x);
+    let subfield = binary_span(&subfield_basis);
+    let first_binary_basis = binary_kernel(field, |x| field.sigma_poly(x, q, p));
+    assert_eq!(first_binary_basis.len() as u32, 3 * q.trailing_zeros());
+    let mut first_k_basis = Vec::new();
+    for candidate in first_binary_basis {
+        if !in_k_span(field, candidate, &first_k_basis, &subfield) {
+            first_k_basis.push(candidate);
+        }
+        if first_k_basis.len() == 3 {
+            break;
+        }
+    }
+    assert_eq!(first_k_basis.len(), 3);
+    let [v0, v1, v2] = [first_k_basis[0], first_k_basis[1], first_k_basis[2]];
+    let mut first = BTreeSet::new();
+    let mut projective = BTreeSet::new();
+    for &a in &subfield {
+        for &b in &subfield {
+            for &c in &subfield {
+                first.insert(field.mul(a, v0) ^ field.mul(b, v1) ^ field.mul(c, v2));
+            }
+            projective.insert(v0 ^ field.mul(a, v1) ^ field.mul(b, v2));
+        }
+        projective.insert(v1 ^ field.mul(a, v2));
+    }
+    projective.insert(v2);
+    assert_eq!(subfield.len() as u32, q);
+    assert_eq!(first.len() as u32, q.pow(3));
     assert_eq!(projective.len() as u32, q * q + q + 1);
-    (subfield, first, projective.into_iter().collect())
+    assert!(first.iter().all(|&x| field.sigma_poly(x, q, p) == 0));
+    (
+        subfield,
+        first.into_iter().collect(),
+        projective.into_iter().collect(),
+    )
 }
 
 fn projective_membership(field: Field, q: u32, p: [bool; 4], z: u32, inverses: &[u32]) -> bool {
@@ -206,6 +276,32 @@ fn curve_order(field: Field, a: u32, b: u32) -> u32 {
 }
 
 fn main() {
+    if std::env::args().any(|arg| arg == "--q8-direct") {
+        let q = 8;
+        let field = Field::new(21);
+        let mut union = BTreeSet::new();
+        for (index, p) in CUBICS.into_iter().enumerate() {
+            let (subfield, first, projective) = subgroup_data(field, q, p);
+            let direct = direct_locus(field, q, p, &subfield, &first);
+            assert!(direct.iter().all(|&z| field.relative_trace(z, q) == 0));
+            println!(
+                "q={q} modulus=0x{:x} cubic={} projective={} W1={}",
+                field.modulus,
+                index + 1,
+                projective.len(),
+                direct.len()
+            );
+            union.extend(direct);
+        }
+        let trace_zero_nonzero = q.pow(6) - 1;
+        let missing = trace_zero_nonzero - union.len() as u32;
+        println!(
+            "q={q} W1_union={} trace_zero_nonzero={trace_zero_nonzero} missing={missing} conjectured_missing={}",
+            union.len(),
+            (q - 1) * (q.pow(3) - 1)
+        );
+        return;
+    }
     for ell in [1, 2] {
         let q = 1 << ell;
         let field = Field::new(7 * ell);
