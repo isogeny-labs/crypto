@@ -58,6 +58,11 @@
 //! `negation_folded=1`.  Completeness is unchanged; cold `S` drops by the
 //! saved set-up.  `rootfind-window-negfold` is the windowed `m = 3` scan
 //! on that half table.
+//! `rootfind-negfold-batch` keeps the same ordered half table and probe,
+//! but shares an inversion over each binary table row's ordinary additions.
+//! Its abstract addition ledger is unchanged; any wall benefit needs a
+//! separate controlled measurement. It has a separate method identity so
+//! the scalar arm remains reproducible.
 //!
 //! ## The base
 //!
@@ -356,6 +361,9 @@ pub enum Pdp3Engine {
     /// Root finding on [`PairTable::build_negation_folded`]: about half
     /// the set-up additions of [`Self::Rootfind`], sign-recovering probe.
     RootfindNegfold,
+    /// The same negation-folded table and probe, with batched binary
+    /// additions during table construction.
+    RootfindNegfoldBatch,
     /// Windowed `m = 3` scan on the negation-folded [`PairTable`].
     RootfindWindowNegfold,
 }
@@ -371,11 +379,13 @@ impl Pdp3Engine {
             "rootfind" => Ok(Self::Rootfind),
             "rootfind-window" => Ok(Self::RootfindWindow),
             "rootfind-negfold" => Ok(Self::RootfindNegfold),
+            "rootfind-negfold-batch" => Ok(Self::RootfindNegfoldBatch),
             "rootfind-window-negfold" => Ok(Self::RootfindWindowNegfold),
             other => Err(format!(
                 "unknown engine `{other}`; try inherited-f4, f6-ic, f6-ic-pair, matrix-f4, \
                  matrix-f5, \
-                 rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold"
+                 rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch \
+                 or rootfind-window-negfold"
             )),
         }
     }
@@ -390,6 +400,7 @@ impl Pdp3Engine {
             Self::Rootfind => "rootfind",
             Self::RootfindWindow => "rootfind-window",
             Self::RootfindNegfold => "rootfind-negfold",
+            Self::RootfindNegfoldBatch => "rootfind-negfold-batch",
             Self::RootfindWindowNegfold => "rootfind-window-negfold",
         }
     }
@@ -407,13 +418,17 @@ impl Pdp3Engine {
             Self::Rootfind
                 | Self::RootfindWindow
                 | Self::RootfindNegfold
+                | Self::RootfindNegfoldBatch
                 | Self::RootfindWindowNegfold
         )
     }
 
     /// Whether set-up uses [`PairTable::build_negation_folded`].
     pub fn is_negfold(self) -> bool {
-        matches!(self, Self::RootfindNegfold | Self::RootfindWindowNegfold)
+        matches!(
+            self,
+            Self::RootfindNegfold | Self::RootfindNegfoldBatch | Self::RootfindWindowNegfold
+        )
     }
 
     /// Whether the `m = 3` third-summand scan is windowed.
@@ -433,6 +448,7 @@ impl Pdp3Engine {
             Self::Rootfind
             | Self::RootfindWindow
             | Self::RootfindNegfold
+            | Self::RootfindNegfoldBatch
             | Self::RootfindWindowNegfold => None,
         }
     }
@@ -498,6 +514,7 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
 /// `pdp3-koblitz:m=2|3,engine=rootfind`,
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
+/// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch`, or
 /// `pdp3-koblitz:m=3,engine=rootfind-window-negfold`.
 pub struct Pdp3KoblitzOracle<'i> {
     name: &'static str,
@@ -705,6 +722,12 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                  (m = {}); no Groebner search",
                 self.summands
             ),
+            Some("rootfind-negfold-batch") => format!(
+                "root finding over the standard subspace on a negation-folded PairTable \
+                 built with batched binary additions; the same probe as rootfind-negfold \
+                 (m = {}); no Groebner search",
+                self.summands
+            ),
             Some("rootfind-window-negfold") => format!(
                 "root finding with negation-folded PairTable and cyclic third-summand window \
                  of length ⌈|F|/window_div⌉ (div={}); m = {}; no Groebner search",
@@ -726,14 +749,16 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         &[
             (
                 "m",
-                "summands; #1333 ran 3 (Semaev S4); rootfind and rootfind-negfold take 2 or 3; \
+                "summands; #1333 ran 3 (Semaev S4); rootfind, rootfind-negfold and \
+                 rootfind-negfold-batch take 2 or 3; \
                  window engines take 3 only",
             ),
             (
                 "engine",
                 "inherited-f4 (the control), f6-ic, matrix-f4, matrix-f5, rootfind (full \
                  PairSumTable), rootfind-window (m = 3 cyclic ⌈|F|/3⌉ window), \
-                 rootfind-negfold (PairTable negation fold, ~half set-up), or \
+                 rootfind-negfold (PairTable negation fold, ~half set-up), \
+                 rootfind-negfold-batch (same table with batched binary additions), or \
                  rootfind-window-negfold (window + negation fold)",
             ),
             (
@@ -791,7 +816,8 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         // Parameters that change the search have no default.
         let engine = params.get("engine").ok_or(
             "missing parameter `engine`; try inherited-f4, f6-ic, matrix-f4, matrix-f5, \
-             rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold",
+             rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch \
+             or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
         if self.engine == Pdp3Engine::F6IcPair {
@@ -955,7 +981,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                         "engine=rootfind-negfold needs a factor base with abscissa grouping".into(),
                     );
                 }
-                let table = PairTable::build_negation_folded(ctx.group, fb);
+                let table = if self.engine == Pdp3Engine::RootfindNegfoldBatch {
+                    PairTable::build_negation_folded_binary_batch(ctx.group, fb)
+                } else {
+                    PairTable::build_negation_folded(ctx.group, fb)
+                };
                 ops.merge(table.build_ops);
                 self.pair_neg = Some(table);
                 self.pair = None;
@@ -1209,6 +1239,16 @@ mod engine_names {
         assert_eq!(engine.name(), "f6-ic-pair");
         assert!(engine.is_groebner());
         assert_eq!(engine.solver(3), Pdp3Engine::F6Ic.solver(3));
+    }
+
+    #[test]
+    fn binary_batch_table_engine_keeps_the_rootfind_contract() {
+        let engine = Pdp3Engine::parse("rootfind-negfold-batch").unwrap();
+        assert_eq!(engine.name(), "rootfind-negfold-batch");
+        assert!(engine.is_rootfind());
+        assert!(engine.is_negfold());
+        assert!(!engine.is_window());
+        assert_eq!(engine.solver(3), None);
     }
 }
 

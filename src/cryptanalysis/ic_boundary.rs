@@ -8673,6 +8673,66 @@ impl PairTable {
         }
     }
 
+    /// The binary negation-folded table in the scalar builder's exact pair
+    /// order. Each abscissa row shares one inversion across its ordinary
+    /// additions; exceptional doublings may need their own inversion.
+    /// The table stores full points only long enough to obtain their keys;
+    /// first-witness insertion and the abstract addition charge are unchanged.
+    pub fn build_negation_folded_binary_batch(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> Self {
+        let start = Instant::now();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
+        let mut ops = GroupOps::default();
+        let mut attempts = 0u64;
+        let mut scratch = BatchScratch::default();
+        let mut indices = Vec::new();
+        let mut addends = Vec::new();
+        let mut sums = Vec::new();
+        for ai in 0..a {
+            let i = groups[ai][0];
+            indices.clear();
+            addends.clear();
+            sums.clear();
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    indices.push(j);
+                    addends.push(fb.points[j]);
+                }
+            }
+            ops.adds += addends.len() as u64;
+            g.0.add_many(fb.points[i], &addends, &mut sums, &mut scratch);
+            for (&j, s) in indices.iter().zip(sums.iter()) {
+                if s.infinity {
+                    continue;
+                }
+                map.entry(s.pack() >> 1).or_insert((i as u32, j as u32));
+                attempts += 1;
+            }
+        }
+        Self {
+            kind: "negation_folded_binary_batch",
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+            filter_bit_sets: 0,
+        }
+    }
+
     /// The same negation-folded table and emission order as
     /// [`Self::build_negation_folded`], stored in cache-line buckets.
     /// The first witness emitted for each key wins in both layouts.
@@ -18634,6 +18694,45 @@ mod tests {
         assert_eq!(batch.build_ops.doubles, scalar.build_ops.doubles);
         assert_eq!(batch.build_ops.field_ops.invs, fb.abscissae as u64);
         assert!(batch.build_ops.field_ops.invs < scalar.build_ops.field_ops.invs);
+    }
+
+    #[test]
+    fn binary_batch_table_matches_scalar_table_and_witnesses() {
+        for (a, n, dimension) in [(0, 13, 5), (1, 17, 6)] {
+            let inst = koblitz_instance(a, n).expect("Koblitz fixture");
+            let basis: Vec<u64> = (0..dimension).map(|i| 1u64 << i).collect();
+            let fb = binary_subspace_factor_base(&inst, &basis);
+            let g = BinaryGroup(&inst.fast);
+            let scalar = PairTable::build_negation_folded(&g, &fb);
+            let batch = PairTable::build_negation_folded_binary_batch(&g, &fb);
+            assert_eq!(batch.map, scalar.map, "first witness at n={n}");
+            assert_eq!(batch.entries, scalar.entries);
+            assert_eq!(batch.insert_attempts, scalar.insert_attempts);
+            assert_eq!(batch.index_lookups, scalar.index_lookups);
+            assert_eq!(batch.build_ops, scalar.build_ops);
+            let mut scalar_ops = GroupOps::default();
+            let mut batch_ops = GroupOps::default();
+            let mut scalar_ctr = OracleCounters::default();
+            let mut batch_ctr = OracleCounters::default();
+            for k in 1..=200 {
+                let target = g.mul(&mut scalar_ops, inst.generator, k);
+                for m in [2, 3] {
+                    let lhs = decompose_mitm(
+                        &g,
+                        &fb,
+                        &scalar,
+                        m,
+                        &mut scalar_ops,
+                        &mut scalar_ctr,
+                        target,
+                    );
+                    let rhs =
+                        decompose_mitm(&g, &fb, &batch, m, &mut batch_ops, &mut batch_ctr, target);
+                    assert_eq!(rhs, lhs, "decomposition at n={n}, k={k}, m={m}");
+                }
+            }
+            assert_eq!(batch_ctr.lookups, scalar_ctr.lookups);
+        }
     }
 
     #[test]
