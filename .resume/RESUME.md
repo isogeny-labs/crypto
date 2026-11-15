@@ -1,3 +1,19 @@
+# Whole diagnostic CI contract normally published before code
+
+## What was done
+Prospective contract9aad0c/governance8cd2ad normally published consumer5f23dd29, actualpublisher0. All six fixture pins and exact historical capture receipt retained; Root literal mirror pcc/claims/PCC-20261115-fffb0f.json records this source and full original publication receipt. No new comparator, control generator or CI driver has yet been authored. [pcc:unverified]
+
+## Decisions made
+Implement the prospective strict whole Rust comparator and controls next, then the full diagnostic CI driver and original proof/runtime/prepared custody. Preserve every strict failure and publish any amendment before its code or rerun. [pcc:unverified]
+
+## Open threads
+Comparator/controls/full CI, prospective unassisted relation completion after primary review, all original model/global/numericLean/calibrated/admission/strongest-reference/merge requirements. Future whole custody NEW28. [pcc:unverified]
+
+## Errors
+KB all six calls127; conductor127; locked autoresearcher remains exact four-byte-header-only. Earlier GitHub draft TextEncoder error and accidental ciphertext read are recorded; emitted ciphertext is not republished. [pcc:unverified]
+
+---
+
 # Genuine27 settled; whole diagnostic fixtures published
 
 ## What was done
