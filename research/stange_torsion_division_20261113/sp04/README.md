@@ -52,6 +52,26 @@ decomposed (0 solutions in every arm), and these cells time a proof of
 infeasibility rather than a solve. A fair large-p test needs n near sqrt(p),
 far beyond sympy; that would be a msolve/Magma run under bench.record.
 
+## msolve at n ~ sqrt(p) (2026-11-15)
+
+`msolve_sp04.py p 11` (msolve 0.6.5, one thread; outputs `ms_p<p>.json`). Primes
+chosen with p = 1 mod floor(sqrt p) so arm B gets m = n. 8 targets, arm order
+shuffled per target; time = min of 3 msolve wall times minus a trivial-system
+baseline (~2 ms). Exploratory, not a bench.record run (no S3 credentials here).
+All numbers [pcc:unverified].
+
+| p | n | E plain small-x | I plain x(phi F1) | P pulled back | B binomial mu_n | relations E/I/P/B |
+|---|---|---|---|---|---|---|
+| 1123 | 33 | ~0.1 ms | ~0.1 ms | 1.1 ms | noise | 42/38/38/10 |
+| 10303 | 101 | ~0.2 ms | ~0.3 ms | 5.9 ms | noise | 38/38/40/8 |
+| 106277 | 326 | - | - | msolve segfault | - | - |
+| 1003003 | 1001 | 1.8 ms | 1.6 ms | 1148 ms | 0.45 ms | 38/48/48/8 |
+
+- The pulled-back arm's penalty grows with n: about 10x at n = 33, 20-30x at n = 101, 600x at n = 1001 [pcc:unverified]. SP-04 not falsified.
+- Arm B (multiplicative-subgroup factor base): about 4x less solve time than E at n = 1001 but about 5x fewer relations (only about half of mu_n are x-coordinates), so time per relation is about equal (E ~0.39 ms, B ~0.45 ms) [pcc:unverified]. No gain at m = 3; the symmetrized m >= 4 version is untested.
+- E, I and B times at p <= 10303 sit at the timing noise floor (some baseline-subtracted minima are negative); only the gap to P is meaningful there.
+- p = 106277: msolve 0.6.5 segfaults on the pulled-back system (also with the input pre-expanded); input saved as `fail_p106277.ms`. Cause not confirmed.
+
 ## Errors found while checking
 
 - An ad hoc point-count snippet (not in these scripts) reported #E1 != #E; it
@@ -63,6 +83,10 @@ far beyond sympy; that would be a msolve/Magma run under bench.record.
   phi_x(7) = phi_x(11) = 15; replaced by an exact identity assertion.
 - Solution counts for image vs pulled arms differ (4 vs 6 at n=16) because
   phi is 2:1 on x; explained and asserted, not an error.
+
+- First msolve attempt: p = 10007 gave arm B m = 2 (p-1 = 2*5003), invalid;
+  the harness now refuses primes without a divisor near n. Timings below the
+  process-start baseline were clamped to 0; now reported raw.
 
 ## Limits
 
