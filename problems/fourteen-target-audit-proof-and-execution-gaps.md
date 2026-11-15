@@ -3072,3 +3072,60 @@ local. Same host/prover/procedural header check; no independent compiler/parser
 or physical host assurance. No holes/custom axioms/native proof evaluation/
 raised limits/new global flags/waivers/frozen edits/cryptoPython/native crypto
 experiment/spend/upload/full fourteen-item completion claim. [pcc:unverified]
+
+
+### Actual elliptic Abel–Jacobi and principality bridge
+
+The [actual elliptic divisor-class bridge](../research/elliptic_picard_bridge_audit_20261115/README.md)
+now constructs **the actual elliptic Abel–Jacobi group equivalence**
+P ↦ class((P)−(O)) for every nonsingular general Weierstrass model over an
+algebraically closed field, in every characteristic including two and three.
+The quotient is actual finite integer point divisors of degree zero modulo
+divisors of actual full-function-field units. Both directions are proved,
+with no supplied Picard, genus, Riemann–Roch, normality, no-simple-pole or
+point-sum-zero premise. Weak Nullstellensatz identifies every affine maximal
+ideal with an actual nonsingular point. The actual denominator ideal and
+credited actual local DVR integer lift derive finite-regular iff actual
+coordinate-ring membership. Actual infinity order is negative norm degree;
+the official norm-degree-not-one theorem excludes a lone simple infinity pole,
+giving injectivity. Actual chord/vertical functions prove addition; actual
+finite integer-divisor reduction proves surjectivity and constructs an AddEquiv.
+An actual geometric divisor is principal iff its degree and actual point sum
+are both zero. Actual (P)−(Q) is principal iff P=Q, and every actual principal
+point sum is zero. The elliptic geometric point-divisor quotient bridge is
+closed; line-bundle/projective Scheme Picard comparison, quotient descent/
+basechange, translations, Weil reciprocity, isogeny/Lang/Jacobian and canonical
+Weil–Tate/MOV–FR remain open.
+
+The credited actual nonsingular F3 curve y²=x³+x+1 and unit X²+1 have
+rational-point-only divisor degree−4. Lean proves that the actual principal
+map cannot even be restricted to degree-zero rational-point divisors with
+unchanged values. Over the actual algebraic closure of F3, the credited mapped
+nonsingular curve has the actual bijection and a nonzero quotient class.
+This credits the old control, not a new population or qualified-source refutation.
+Established source divisor reduction, official affine norm method and prior
+actual DVR/divisor/chord proofs are credited; no novelty claim.
+
+Exact local **PCC-20261115-d00adb PASS at 2026-11-15T19:25:02Z**, signed standing unverified. Whole tracked/
+transitive gate35 theorems/eight new concrete modules/zero failures or trusted
+native;76 frozen modules/zero copies/79 old formal files/all96 old pins checked
+before/after13 states and gate. Six failed states retained, final13 clean;
+prior536 gate credited separately. All90 formal17 artifact107 pins match.
+Full1056-character SHA1d0707209326c4217584e719bcfaa2f2284a11b5d12e390a72c59c093d7ef9d4;
+native one complete/zero prefixes/zero unresolved/empty suffix after completed
+gate. Lossless226 files/83 objects/32044 bytes, roundtrip equal, five gate files.
+First report valid: one page47363 bytes/all4807 characters read/full-page visual
+inbounds. Final source warnings0, one frozen auditor deprecation retained.
+Fresh Galbraith correctedch7 PDF16–21 fulltext/individual visual16,20,21,
+printed138–143, Definition7.8.1/Theorems7.9.7–9. Freshch8 PDF17–18/19 fulltext
+and individual visual, printed161–162, Theorems8.6.1/8.6.4/Cor8.6.5. No whole-
+chapter read; copyright files local and excluded from archive. The source's
+genus/differential argument is distinct from this explicit norm proof.
+Official Point.toClass injection/norm proof read and credited; its affine
+ideal class group is not silently relabelled as the geometric quotient.
+Four correct KB calls and Conductor127 before code; publication Conductor127
+before maps/outside pins; bounded fallback/no absence claim. Same host/prover/
+procedural header check, no independent parser/compiler/physical host assurance.
+No holes/custom axioms/native proof evaluation/raised limits/new flags/waivers/
+frozen edits/cryptoPython/native crypto experiment/spend/upload/full fourteen-
+item completion claim. [pcc:unverified]
