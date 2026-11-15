@@ -25,6 +25,29 @@ theorem even_model_count : (3 : Nat)^12 = 531441 := by decide
 
 theorem even_to_odd_branch_maps : (84 : Nat) * 2 = 168 := by decide
 
+/- These are arithmetic inputs to the paper-level integral Tate argument. -/
+def primeCheck (n : Nat) : Bool :=
+  decide (n ≥ 2) && (List.range n).all (fun d => decide (d < 2 ∨ n % d ≠ 0))
+
+theorem selected_prime_subgroups :
+    primeCheck 19 = true ∧ 266 % 19 = 0 ∧ Nat.gcd 19 (15 * 488) = 1 ∧
+    primeCheck 43 = true ∧ 258 % 43 = 0 ∧ Nat.gcd 43 (15 * 776) = 1 ∧
+    primeCheck 127 = true ∧ 254 % 127 = 0 ∧ Nat.gcd 127 (15 * 872) = 1 ∧
+    primeCheck 13 = true ∧ 234 % 13 = 0 ∧ Nat.gcd 13 (15 * 872) = 1 ∧
+    primeCheck 23 = true ∧ 230 % 23 = 0 ∧ Nat.gcd 23 (15 * 776) = 1 ∧
+    primeCheck 37 = true ∧ 222 % 37 = 0 ∧ Nat.gcd 37 (15 * 488) = 1 ∧
+    primeCheck 109 = true ∧ 218 % 109 = 0 ∧ Nat.gcd 109 (15 * 296) = 1 := by decide
+
+/- Howe's gamma_10^10 < 5669 gives the four integer degree ceilings. -/
+theorem howe_degree_ceilings :
+    (5669 : Nat) * 872^5 < 4^5 * 36^10 ∧
+    (5669 : Nat) * 776^5 < 4^5 * 34^10 ∧
+    (5669 : Nat) * 488^5 < 4^5 * 27^10 ∧
+    (5669 : Nat) * 296^5 < 4^5 * 21^10 := by decide
+
+theorem selected_cover_primes_exceed_ceilings :
+    (43 : Nat) > 33 ∧ 127 > 35 ∧ 37 > 26 ∧ 109 > 20 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -33,4 +56,7 @@ theorem even_to_odd_branch_maps : (84 : Nat) * 2 = 168 := by decide
 #print axioms cubic_geometric_pole_pair_count
 #print axioms even_model_count
 #print axioms even_to_odd_branch_maps
+#print axioms selected_prime_subgroups
+#print axioms howe_degree_ceilings
+#print axioms selected_cover_primes_exceed_ceilings
 end GHSOdd5Ledger

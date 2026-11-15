@@ -16,6 +16,50 @@ The earlier exhaustive degree-five direct-cover census counted **122** ordinary 
 
 For every `s≥1` coprime to five, the base changes to `k_s=F_(3^s)` and `K_s=F_(3^(5s))` retain a simple degree-five restriction and a genus-five Jacobian carrier over `k_s`. The source curve has coefficients in the proper subfield `K` when `s>1`; this matters for attack-cost comparisons.
 
+### Exact field-extension and lower-genus gate
+
+More strongly, let `Y/F3` be **any** curve in one of the eight Jacobian isogeny classes above, and put `A=J(Y)`. For every `m≥1`, set `d=gcd(5,m)`. Then `A` over `F_(3^m)` is isogenous to the `d`-th power of a simple abelian variety of dimension `5/d`. In particular:
+
+- If `5∤m`, `A` remains simple of dimension five. There is **no nonconstant map defined over `F_(3^m)` from `Y` to any curve of positive genus below five**, including an elliptic curve. This applies to hyperelliptic and nonhyperelliptic genus-five carriers alike; maps to genus-zero curves are outside this statement.
+- If `5|m`, `A` is isogenous to the fifth power of an elliptic curve over `F_(3^m)`. An elliptic quotient, and hence a nonconstant curve map to an elliptic curve, exists abstractly over that field. This assertion does not give an evaluable quotient map or its degree. For the hyperelliptic carriers in the finite screen, every such elliptic map has geometric degree at least four by the separate cover theorem below.
+
+The proof is a root-power calculation. Write `P_t(X)=X^10−tX^5+3^5` and let `α,β` be the two roots of `Z²−tZ+3^5`. Since `3∤t`, one of `α,β` is a 3-adic unit and the other has 3-adic valuation five. The ten roots of `P_t` are the fifth roots of `α` and of `β`; irreducibility of `P_t` is certified below. Taking `m`-th powers identifies exactly `d` roots within each fifth-root cluster and never identifies roots across clusters, whose 3-adic valuations differ. The original Galois group acts transitively on the ten roots, hence also on their distinct `m`-th powers. Their irreducible polynomial has degree `10/d` and the base-changed Frobenius polynomial is its `d`-th power. The finite-field isogeny classification gives the stated simple factor. A nonconstant map to a curve of positive genus below `5/d` would induce a nonzero Jacobian homomorphism, which is impossible when the target Jacobian is too small to contain that simple factor. When `5|m`, the two distinct powered roots give the elliptic factor; the rational point at infinity on every listed `Y_t` supplies an Abel--Jacobi map through an elliptic quotient. This is an application of [Diem's Weil-restriction analysis](https://www.esaga.uni-due.de/f/ulrich.goertz/iem-archiv/dissertation_diem.pdf) and the [Waterhouse--Milne finite-field isogeny theorem](https://www.jmilne.org/math/articles/1971a.pdf), not a new attack construction. [pcc:unverified]
+
+### Prime-subgroup transfer exists abstractly in seven classes
+
+There is a stronger existence certificate for seven selected prime subgroups. The discriminant is
+
+`disc(P_t)=5^10·3^20·(t²−972)^5`.
+
+For a prime `r` coprime to this discriminant, `Z_r[X]/(P_t)` is a finite etale `Z_r`-algebra. The `r`-adic Tate modules of `Res E_t` and `J(Y_t)` are rank-one free modules over it, because each has characteristic polynomial `P_t` and the polynomial is irreducible over `Q`. They are therefore Frobenius-equivariantly isomorphic. [Tate's integral homomorphism theorem](https://pazuki.perso.math.cnrs.fr/index_fichiers/Tate66.pdf) lifts an isomorphism modulo `r` to an `F3`-isogeny `Res E_t → J(Y_t)` whose degree is coprime to `r`; the finite-etale lattice criterion is also explicit in [Poonen--Rybakov, Lemma 2.2(iii)](https://math.mit.edu/~poonen/papers/tate_modules.pdf). Such an isogeny is injective on every order-`r` subgroup. The following exact arithmetic is checked in `Odd5Ledger.lean`:
+
+| trace `t` | source order `244−t` | selected prime `r` | `gcd(r,disc(P_t))` |
+|---:|---:|---:|---:|
+| -22 | 266 | 19 | 1 |
+| -14 | 258 | 43 | 1 |
+| -10 | 254 | 127 | 1 |
+| +10 | 234 | 13 | 1 |
+| +14 | 230 | 23 | 1 |
+| +22 | 222 | 37 | 1 |
+| +26 | 218 | 109 | 1 |
+
+For `t=-26`, the odd prime divisors of the source order 270 are 3 and 5, both dividing the discriminant; this criterion is inconclusive there. The seven isogenies above are **existence results**. They do not specify computable formulas, map degree, image coordinates, or target recovery, so they are not executable subgroup transfers or measured vulnerabilities. [pcc:unverified]
+
+### A finite degree window for the first elliptic cover
+
+[Howe, Theorem 4.17 and Remark 4.18](https://arxiv.org/pdf/2110.04221) give an upper bound for a map from a curve to an ordinary elliptic factor of its Jacobian. Over `K=F243`, the real Weil polynomial of each `Y_t` is `(X−t)^5`. Also `t²−4·243` is one of `−872,−776,−488,−296`; each is a fundamental imaginary quadratic discriminant, so the endomorphism ring of every `E_t/K` in that isogeny class is `Z[π]`, as Howe's theorem requires. With `h0=1`, `b=1`, `n=5` and `γ_10^10<5669`, it gives a nonconstant `K`-map `Y_t→E_t` of integer degree no larger than the following bound. The geometric lower bound applies to every hyperelliptic carrier in this eight-trace slice:
+
+| `|t|` | `|t²−972|` | proven elliptic-cover degree window over `K` |
+|---:|---:|---:|
+| 10 | 872 | 4–35 |
+| 14 | 776 | 4–33 |
+| 22 | 488 | 4–26 |
+| 26 | 296 | 4–20 |
+
+The upper bounds follow from the strict integer checks `5669·D^5 < 4^5·(U+1)^10` for each row, where `D=|t²−972|` and `U` is the listed maximum. This reduces explicit cover search to finite degree windows; it does not construct the cover, provide its evaluable action on a chosen source subgroup, or price a transfer attack. The upper bound is a published theorem applied here to these exact curves, not a new cover theorem. [pcc:unverified]
+
+The degree ceiling gives a further **subgroup-preserving cover-existence** result in four traces. For `t=-14,-10,+22,+26`, choose `r=43,127,37,109`, respectively. Each `r` exceeds the corresponding ceiling `U=33,35,26,20`. Let `φ:Y_t,K→E_t` be the map supplied by Howe. The standard push-pull identity `φ_*φ^*=[deg φ]` on `E_t` implies that `φ^*:E_t[r]→J(Y_t,K)[r]` is injective because `0<deg φ<r`. Thus a nonzero subgroup-preserving **curve-induced** transfer exists for each of these four exact traces, including the `t=+26` catalog-uncertain class. This is stronger than the abstract isogeny existence argument above, but Howe's theorem still does not output the rational functions for `φ` or its pullback, so it is not an evaluable attack map. For the other four traces, this degree argument alone gives no injectivity guarantee. [pcc:unverified]
+
 ## Exact equations
 
 The coefficient `b` below is encoded as `b=sum_i d_i a^i`, where `d_i` are the base-three digits of its mask. Each source is `E_t:y²=x³+a2*x²+b` over `K`. Each target is `Y_t:y²=f_t(x)` over `k`, where `f_t=x^11+sum_(i=0)^10 c_i x^i` and `c_i` are the base-three digits of the target mask. All target masks are the first retained mask for that trace in the frozen enumeration.
