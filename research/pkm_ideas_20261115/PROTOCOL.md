@@ -40,3 +40,13 @@ planted. Smoke rows seen before the freeze, all small: `m = 2`, `S = 16` dense r
 `field_ops`, against the committed tower's 662,046; replay ÷ fresh 0.38; per-point and shared cosets identical; coverage
 at `S = 16` shared 99, per-point 308, random 201/400. The predictions above were written before these were seen and
 are left unchanged.
+
+### Amendment 1 (2026-11-15, after the frozen run)
+
+The frozen degree bound 64 censors every idea-1 `m = 2` dense cell at `S ≥ 64` before any work (`pairs_above_bound > 0`,
+`field_ops = 0`): the dense membership polynomial alone has degree `S`. These nine rows stay in `runs/` as censored and
+are reported. As a labelled extension, not a replacement, the instrument gains `--dmax` (default the frozen 64; rows now
+record `dmax`) and the cells `dense-m2-{random,coset}-S{64,128,256}` are run again with `--dmax 1024` into `runs/ext/`.
+Nothing else changes: same `p`, seeds, draws and budget. The idea-1 verdict is stated from the frozen rows first; the extension only adds `S`.
+Also disclosed: the merge of `main` during the run unlinked the output file of `replay-m2-A2-t8` while it ran (0 rows);
+the cell was rerun unchanged after the runner finished, by `run.sh`'s own skip rule.

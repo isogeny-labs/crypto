@@ -2,7 +2,7 @@
 //! smooth-map factor bases, one mode each. Counted metrics only (`F_p` multiplications, exact counts).
 //!
 //! ```text
-//! pkm_ideas dense    --p P --S S --m M --vkind random|coset [--draws K] [--seed S] [--budget SECS]
+//! pkm_ideas dense    --p P --S S --m M --vkind random|coset [--draws K] [--seed S] [--budget SECS] [--dmax D]
 //! pkm_ideas replay   --p P --degrees D --m M [--draws K] [--seed S] [--replay-seed S2] [--replay-p P2]
 //! pkm_ideas cosets   --p P --degrees D [--draws K] [--seed S]           (F4 count, shared vs per-point coset)
 //! pkm_ideas coverage --p P --S S [--seed S]                              (exact sums coverage, m = 2)
@@ -191,7 +191,8 @@ fn main() {
     let seed: u64 = arg(&o, "seed", "20261115").parse().unwrap();
     let budget: u64 = arg(&o, "budget", "1800").parse().unwrap();
     let draws: u64 = arg(&o, "draws", "3").parse().unwrap();
-    let dmax = 64;
+    // Amendment 1 (2026-11-15): --dmax, default the frozen 64.
+    let dmax: u32 = arg(&o, "dmax", "64").parse().unwrap();
     let threads = std::env::var("RAYON_NUM_THREADS").unwrap_or_default();
     match mode.as_str() {
         // ---------------- idea 1: random V written as one dense polynomial
@@ -268,7 +269,7 @@ fn main() {
                     json!({"schema": "pkm-ideas.dense/v1", "p": p, "S": s, "m": m, "vkind": vkind,
                     "draw": draw, "seed": seed, "target_x": xr, "n_vars": n, "nonzero_terms_membership": mpoly.iter().filter(|&&c| c != 0).count(),
                     "inconsistent": rep.inconsistent, "agree": !rep.timed_out && rep.inconsistent,
-                    "censored": rep.timed_out || rep.pairs_above_bound > 0, "field_ops": rep.field_ops,
+                    "censored": rep.timed_out || rep.pairs_above_bound > 0, "dmax": dmax, "field_ops": rep.field_ops,
                     "solving_degree_max": rep.solving_degree_max, "max_cols": rep.max_cols, "ms": rep.ms, "threads": threads})
                 );
             }
