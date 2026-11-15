@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T2258Z-ic-gpu-rootfind-ic",
+  "latest_record": "20261115T0031Z-genus-ladder-bound-r",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 171,
+    "measured": 172,
     "open": 0
   },
   "repo": "crypto",
@@ -3334,6 +3334,38 @@
           ],
           "summary": "Genus ladder: HCDLP at genus 2-5 on one field, plane quartics, Smith census; 1809 runs all certified; unverified (no validator replay), no leaderboard row.",
           "value": 0.0638
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0312,
+      "latest": 0.0312,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.0312
+      },
+      "metric": "fpm_mid_ic_over_rho_g4_p8209_c_pre",
+      "points": [
+        {
+          "commit": "e5e38c533efc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.0312
+          },
+          "n": 6,
+          "record": "20261115T0031Z-genus-ladder-bound-r",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.018,
+            0.0615
+          ],
+          "summary": "Genus ladder follow-up: r bound to p (h<=2), genus 4 and plane quartics at p=2053..8209; 108 runs all certified; replay by validator agent on the same shared host; pre-gate.",
+          "value": 0.0312
         }
       ],
       "problem": "hcdlp:genus_ladder",
