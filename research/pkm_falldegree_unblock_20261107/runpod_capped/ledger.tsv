@@ -1,0 +1,9 @@
+# Study-wide cost ledger of the PKM fall-degree study (owner decision 4: US$400 in total). Maintained by the main session.
+# One row per job on any route: EKS jobs, pfd-b-rp (Amendment 16), Amendment 17 work, and this route. usd is the actual
+# (or best derived) cost when state is closed and the worst case when open. run.sh adds and fetch.sh closes the rows of
+# this route's pods (job = NAME/podid). run.sh refuses a study launch unless the complete_as_of line below is at most
+# 24 h old: the session sets it after bringing every row up to date. Tab-separated; usd has no currency sign.
+# complete_as_of	never
+job	route	authority	state	usd	source
+pkm-x-dev-smoke1/gwfmrulvmua8ye	runpod_capped	development check	closed	0.0136	runpod_capped/smoke/receipts/cost.json
+pkm-x-dev-smoke2/bpxojdig3u54d4	runpod_capped	draft Amendment 18	closed	0.0543	receipts_dev/pkm-x-dev-smoke2/cost.json
