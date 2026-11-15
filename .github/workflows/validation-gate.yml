@@ -109,8 +109,8 @@ jobs:
         run: |
           git fetch --no-tags --depth=1 --filter=blob:none origin \
             "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
-          # validation_gate.py treats an unreadable base file as absent, so
-          # fail here rather than let the freeze comparison pass silently.
+          # validation_gate.py refuses a base ref that does not resolve; check
+          # it here too so the failure names the fetch.
           git rev-parse --verify "origin/$BASE_REF^{commit}"
       - uses: actions/setup-python@v5
         # EKS runners may default to Python 3.12; the dedicated local runner
