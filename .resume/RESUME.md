@@ -1,21 +1,21 @@
-# Resume: crypto @ claude/relation-finding-no-groebner-vrg7ec
+# Resume: crypto @ claude/leads-20261113 (PR #4065)
 
 ## Goal
-Owner (2026-11-13): "Relation finding that avoids Gröbner bases altogether (probabilistic, SAT or
-lattice-flavoured decomposition) is thinly explored and poorly benchmarked. This needs more exploration."
-Answered with (a) a map of what the repository already measured, and (b) one matched experiment: the
-table-free linear 2+1 decomposition (lin21, lin21-ht) on the frozen 2026-10-14 m=3 cells and targets.
+Owner (2026-11-15): "Pursue the leads" on the genus-5 twisted-Humbert cover. The double-large-prime
+campaign (dlp_20261113) showed full elimination doubles LA weight; this run tests filtered matrices
+(large primes kept as columns, singleton pruning, cost-guided merges) on the same relation set.
 
 ## Spec
-research/groebner_free_matched_20261113/PROTOCOL.md, frozen in commit c90b1d9d54 before any claim run.
-Instrument: examples/ic_algebraic_floor (arms lin21, lin21-ht; subcommands linpool, linsummary).
-Runner: research/groebner_free_matched_20261113/run_grid.sh (one cell per process, one job at a time).
+research/humbert_genus5_cover_20261021/dlp_filter_20261115/PROTOCOL.md, frozen before data.
+Binary: dlp_filter_20261115/bin/humbert-v4 (sha256 in BINARY.sha256; rebuild with
+`cargo build --release` at this commit). Runner: dlp_filter_20261115/run_v4.sh <new-dir>.
 
 ## State
-2026-11-13: pilot (seed 777) done, 0 disagreements with the floor. Claim grid launching; raw records go
-to research/groebner_free_matched_20261113/runs/. S3 checkpoint unavailable in this container (no AWS
-identity); the branch push is the durable copy.
+2026-11-15: code (src/filter.rs, dlpm/dlpf arms) and protocol committed; campaign launching into
+dlp_filter_20261115/campaign/ under bench record benchmarks/records/<stamp>-humbert-genus5-dlp-filter.json.
+S3 checkpoint unavailable (no AWS identity); the branch push is the durable copy.
+PR #4065: merges check fails on merge 5598316 (Binary-Regenerated trailer missing); waiting on the
+owner's choice (force-with-lease or a replacement PR). crypto-autoresearcher #3282 needs vault KEY.
 
 ## Next
-run_grid.sh; `ic_algebraic_floor analyze --dir runs --out ANALYSIS.json`; `linsummary --dir runs --out
-SUMMARY.json`; figures, REPORT.typ/pdf, README; benchrec close; session log; PR; red-team/validator pass.
+Summarize (C0, F1–F5), figures, REPORT.typ/pdf, benchmarks copy, benchrec close, session log, push.

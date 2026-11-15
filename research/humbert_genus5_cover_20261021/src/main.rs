@@ -10,6 +10,7 @@ mod cover;
 mod curve;
 mod dlpsummary;
 mod field;
+mod filter;
 mod ghsmagic;
 mod la;
 mod lpsummary;
@@ -149,13 +150,19 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         "iota" => (true, None),
         a if a.starts_with("lp:") => (true, Some(a[3..].parse().expect("lp:<alpha>"))),
         a if a.starts_with("dlp:") => (true, Some(a[4..].parse().expect("dlp:<alpha>"))),
-        _ => panic!("arm must be full, iota, lp:<alpha> or dlp:<alpha>"),
+        a if a.starts_with("dlpm:") || a.starts_with("dlpf:") => (true, Some(a[5..].parse().expect("dlpm|dlpf:<alpha>"))),
+        _ => panic!("arm must be full, iota, lp:<alpha>, dlp:<alpha>, dlpm:<alpha> or dlpf:<alpha>"),
     };
     // dlp: relations with up to two large primes, reduced by an incremental
     // elimination over the large-prime columns (one pivot row per large prime);
     // a row whose large primes all cancel is a full relation (a cycle in the
     // large-prime graph). lp keeps its single-large-prime pairing unchanged.
-    let dlp = arm.starts_with("dlp:");
+    // dlpm / dlpf (dlp_filter_20261115): the same collection and stopping rule as
+    // dlp (the reducer still runs, to count full relations), but the linear algebra
+    // gets the raw rows with the surviving large primes as columns (dlpm: singletons
+    // removed; dlpf: plus cost-guided merges, src/filter.rs)
+    let dlp_mode = if arm.starts_with("dlpm:") { 1u8 } else if arm.starts_with("dlpf:") { 2 } else { 0 };
+    let dlp = arm.starts_with("dlp:") || dlp_mode > 0;
     let mut rng = Rng(seed);
     let t_all = Instant::now();
     // ---- cover construction ------------------------------------------------
@@ -305,6 +312,12 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let mut pivot_order: Vec<usize> = Vec::new();
     let mut dlp_cycles = 0u64;
     let mut dlp_reductions = 0u64;
+    let mut raw_rows: Vec<Vec<(usize, u64)>> = Vec::new();
+    let mut t_reduce = 0.0;
+    let mut t_filter = 0.0;
+    let (mut la_cols, mut la_rows, mut la_nnz): (usize, usize, u64);
+    let (mut filt_pruned, mut filt_merges, mut filt_nnz_pre, mut filt_lp_cols) = (0u64, 0u64, 0u64, 0usize);
+    let mut filt_last: Option<filter::Filtered> = None;
     let mut target = ncols + 5;
     // HUMBERT_LA_PRECHECK=1: never start a Wiedemann solve while a column is empty
     let la_precheck = std::env::var("HUMBERT_LA_PRECHECK").map(|v| v == "1").unwrap_or(false);
@@ -348,6 +361,10 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
                         lp_dropped += 1;
                         continue;
                     }
+                    if dlp_mode > 0 {
+                        raw_rows.push(big.clone());
+                    }
+                    let tred = Instant::now();
                     let mut cur = big.clone();
                     let mut steps = 0;
                     let reduced = loop {
@@ -380,6 +397,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
                             }
                         }
                     };
+                    t_reduce += tred.elapsed().as_secs_f64();
                     match reduced {
                         None => continue,
                         Some(full) => {
@@ -433,11 +451,56 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
             rows.push(row);
         }
         t_rel += tr.elapsed().as_secs_f64();
-        if la_precheck && ncols > DENSE_MAX {
+        // the matrix handed to the linear algebra: the full relations, or (dlpm/dlpf)
+        // the raw rows with the surviving large primes as extra columns
+        let tf = Instant::now();
+        let built: Option<(Vec<Vec<(usize, u64)>>, usize)> = if dlp_mode > 0 {
+            let f = filter::build(&raw_rows, &|k| k < nx && !is_small[k], ncols, dlp_mode == 2, r);
+            let lp_index: std::collections::HashMap<usize, usize> = f.lp_cols.iter().enumerate().map(|(i, &k)| (k, ncols + i)).collect();
+            let m: Vec<Vec<(usize, u64)>> = f
+                .rows
+                .iter()
+                .map(|big| {
+                    let mut row = Vec::new();
+                    for &(k, v) in big {
+                        if k == big_c {
+                            row.push((c_col, v));
+                        } else if k == big_inf {
+                            row.push((inf_col, v));
+                        } else if k == pinned {
+                        } else if is_small[k] {
+                            row.push((small_col[k].unwrap(), v));
+                        } else {
+                            row.push((lp_index[&k], v));
+                        }
+                    }
+                    merge(row)
+                })
+                .filter(|row| !row.is_empty())
+                .collect();
+            let n = ncols + f.lp_cols.len();
+            filt_pruned = f.pruned_rows;
+            filt_merges = f.merges;
+            filt_nnz_pre = f.nnz_before_merge;
+            filt_lp_cols = f.lp_cols.len();
+            filt_last = Some(f);
+            Some((m, n))
+        } else {
+            None
+        };
+        t_filter += tf.elapsed().as_secs_f64();
+        let (mat, mcols): (&Vec<Vec<(usize, u64)>>, usize) = match &built {
+            Some((m, n)) => (m, *n),
+            None => (&rows, ncols),
+        };
+        la_cols = mcols;
+        la_rows = mat.len();
+        la_nnz = mat.iter().map(|x| x.len() as u64).sum();
+        if la_precheck && mcols > DENSE_MAX {
             // columns in no relation are certain extra corank: collect more relations
             // before paying for a Wiedemann solve that is bound to be rejected
-            let mut used = vec![false; ncols];
-            for row in &rows {
+            let mut used = vec![false; mcols];
+            for row in mat {
                 for &(c, _) in row {
                     used[c] = true;
                 }
@@ -451,12 +514,12 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         }
         let tl = Instant::now();
 
-        let solve = if ncols <= DENSE_MAX {
-            la::kernel_mod_r(&rows, ncols, r)
+        let solve = if mcols <= DENSE_MAX {
+            la::kernel_mod_r(mat, mcols, r)
         } else {
             // two independent Wiedemann solves; a corank > 1 shows up as disagreement
-            let a = la::kernel_wiedemann(&rows, ncols, r, seed ^ 0xA5A5 ^ la_rounds as u64);
-            let b = la::kernel_wiedemann(&rows, ncols, r, seed ^ 0x5A5A ^ (la_rounds as u64) << 8);
+            let a = la::kernel_wiedemann(mat, mcols, r, seed ^ 0xA5A5 ^ la_rounds as u64);
+            let b = la::kernel_wiedemann(mat, mcols, r, seed ^ 0x5A5A ^ (la_rounds as u64) << 8);
             let same = match (&a.x, &b.x) {
                 (Some(xa), Some(xb)) => {
                     let ia = invr(xa[inf_col], r);
@@ -467,8 +530,8 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
             };
             // a column in no relation is an undetermined unknown that Krylov methods
             // silently set to 0 under every scaling: count it as extra corank
-            let mut used = vec![false; ncols];
-            for row in &rows {
+            let mut used = vec![false; mcols];
+            for row in mat {
                 for &(c, _) in row {
                     used[c] = true;
                 }
@@ -508,6 +571,14 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
                 yv[k].unwrap()
             }
         };
+        // dlpm/dlpf: large primes kept as columns come from the solution; pruned
+        // singletons and merge pivots solve theirs by back substitution below
+        if let Some(f) = &filt_last {
+            for (i, &k) in f.lp_cols.iter().enumerate() {
+                yv[k] = Some(xv[ncols + i]);
+            }
+            partials = f.backsub.iter().cloned().collect();
+        }
         // a pivot row solves its own large prime once every other entry is known
         // (single large primes: always at once; dlp: iterate to a fixed point)
         loop {
@@ -615,7 +686,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     println!(
         "{{\"kind\":\"attack\",\"p\":{p},\"twist\":{twist},\"seed\":{seed},\"arm\":\"{arm}\",\"E_order\":{},\"r\":{r},\"D_order\":{},\
 \"fb_x\":{nx},\"fb_points\":{nfb},\"small_x\":{nsmall},\"lp_alpha\":{},\"lp_partials\":{},\"lp_combined\":{lp_combined},\"lp_dropped\":{lp_dropped},\"dlp\":{dlp},\"dlp_cycles\":{dlp_cycles},\"dlp_reductions\":{dlp_reductions},\"lp_known\":{lp_known},\"unknowns\":{ncols},\
-\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\
+\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\"la_cols\":{la_cols},\"la_rows\":{la_rows},\"la_nnz\":{la_nnz},\"dlp_mode\":{dlp_mode},\"filter_pruned_rows\":{filt_pruned},\"filter_merges\":{filt_merges},\"filter_nnz_before_merge\":{filt_nnz_pre},\"filter_lp_cols\":{filt_lp_cols},\"t_reduce\":{t_reduce:.4},\"t_filter\":{t_filter:.4},\
 \"target_multipliers\":{:?},\"place_degrees\":{:?},\"descent_candidates\":{},\"descent_relations\":{},\
 \"pushforward_8P\":{push_ok},\"T_P_nonzero\":{tp_nonzero},\"iota_pairs_constant\":{iota_pairs_const},\"x_inf_eq_4c\":{xinf_eq_4c},\
 \"x_true\":{x_true},\"x_recovered\":{x_rec},\"solved\":{solved},\
@@ -623,7 +694,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
 \"k4_muls_relations\":{},\"k4_muls_descent\":{},\"peak_rss_kb\":{rss_ic},\
 \"rho_skipped\":{skip_rho},\"rho_solved\":{rho_ok},\"rho_steps\":{},\"rho_seconds\":{:.4},\"rho_expected_steps\":{expected_rho_steps:.1},\"rho_expected_steps_negation\":{:.1},\"rho_k4_muls\":{},\
 \"ic_over_rho_time\":{:.4},\"ic_time_in_rho_steps\":{:.1}}}",
-        s.order, s.d_count, lp_alpha.unwrap_or(1.0), partials.len(), st.candidates, st.degenerate, st.symmetric, st.found, st.root_hist, rows.len(), if switch_at_rows == usize::MAX { -1 } else { switch_at_rows as i64 }, qst.candidates, qst.found, if ncols <= DENSE_MAX { "dense" } else { "wiedemann" }, sol.rank, multipliers, place_degs, dst.candidates, dst.found,
+        s.order, s.d_count, lp_alpha.unwrap_or(1.0), partials.len(), st.candidates, st.degenerate, st.symmetric, st.found, st.root_hist, rows.len(), if switch_at_rows == usize::MAX { -1 } else { switch_at_rows as i64 }, qst.candidates, qst.found, if la_cols <= DENSE_MAX { "dense" } else { "wiedemann" }, sol.rank, multipliers, place_degs, dst.candidates, dst.found,
         k4_after_rel - k4_after_setup, k4_after_desc - k4_after_rel,
         rho.steps, rho.seconds, expected_rho_steps / std::f64::consts::SQRT_2, rho.k4_muls, if skip_rho { 0.0 } else { t_ic / rho.seconds }, if skip_rho { 0.0 } else { t_ic / sec_per_step }
     );
