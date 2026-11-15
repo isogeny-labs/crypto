@@ -169,3 +169,21 @@ Complete the last full proof/control replay under remaining<=3600s proof-window 
 ### Errors
 
 The second source proof itself succeeds; the unexpected failure is strictly a report classifier case bug on a genuine mathematical Type mismatch (remV=0 versus1), not missing dependencies or a false theorem being accepted. The shared official audit emits an upstream String.mk deprecation warning; it is not patched or treated as mathematical failure. [pcc:unverified]
+
+## 2026-11-15T07:10Z — full eight-stage chord kernel plan complete
+
+### What was done
+
+At pre-data checkpoint97d61b44, version3 full8-stage replay exits0: three fresh true-source official gates PASS, each audits the SAME5 public theorems,0 failing,0 trusted. Five single-false-statement control gates reject1/FAIL_build by actual mathematical diagnostics. A/A source build/audit reports exact, positive audit identical. Only foundational propext,Classical.choice,Quot.sound appear. All first failed source and case-classifier attempts remain distinct/raw, not relabelled as passes. This is scoped Lean4.34.1/Mathlibd13f23 kernel/axiom observation, not signed PCC/global proof verdict or a new degree advantage. [pcc:unverified]
+
+### Decisions made
+
+Add an explicit pinned Lake project/manifest for this proof module so repository CI/reproducers do not depend on the session's manual LEAN_PATH. Same exact theorem source, compiler, Mathlib and8 dependency commits; default targetChord and every tracked Lean source must pass current unmodified PROJECT gate. This is reproducibility packaging/replay, not another mathematical claim or native solver run. Publish context before affected build; source code and old eight-gate plans remain unchanged. [pcc:unverified]
+
+### Open threads
+
+One bounded project-context replay under600s using exact public dependency cache, with LEAN_PATH unset so Lake supplies the environment; retain all results. Finish local report/export/archive and published source handoff. Original-source frontier/minimum-degree goal remains open; do not substitute another conditional transport lemma or count more witnesses as rank. No new paid/upload permission, raw archives stay local. [pcc:unverified]
+
+### Errors
+
+First attempt was a real diagonal tactic failure; second was a metadata case-classifier failure after all true proofs passed; third complete8-stage replay passes unchanged mathematics/criteria. Earlier v3 source-tree read was truncated by tool output budget before any mutation; larger metadata read succeeded, not a research retry. No gate/trust/keyring/ledger patch or skipped false control. [pcc:unverified]
