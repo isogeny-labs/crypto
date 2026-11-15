@@ -5,7 +5,7 @@
 standard foundations (`propext`, `Classical.choice`, `Quot.sound`); computed values carry replay
 certificates verified by an independent C checker where stated.
 
-**Task.** Rigorous bounds `ck − C ≤ sd(I_k) ≤ Ak + B` on the grevlex solving degree of the
+**Task.** Rigorous bounds `ck − C ≤ sd(I_k) ≤ Ak + B` on the grevlex solving degree of the [pcc:unverified]
 repository's normalized two-summand elliptic-curve chain systems (depth `k`, `2^(k+1) | p − 1`),
 with pinned definitions, an admissible unit family, proved transfers, finite-depth certificates
 beyond depth 14, and Lean proofs.
@@ -24,7 +24,7 @@ beyond depth 14, and Lean proofs.
 | T8 | Finite depths: exact `LFD(k) = 4, 4, 4, 4, 5, 5, 5, 5` for `k = 2..9` on the admissible instance `p = 12289, n = 11`, each with an upper and a lower replay certificate; `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on `p = 65537, n = 3` by one certified closure at `k = 10` plus T4 | certified (§8; all 17 certificates verified by the independent checker) |
 | T9 | Linear lower bound `ck − C ≤ LFD(k)` with `c > 0` | **open** (§7.3: the missing lemma is stated exactly; the lane-P slope-1/14 proof is not re-derived here) |
 
-Separate reports, as requested: finite-depth results in §8, constant bounds in §6–7 (`4 ≤ LFD(k) ≤ 2k + 1`), linear growth in §7.3 (open above; the proved linear *upper* growth is `2k + 1`).
+Separate reports, as requested: finite-depth results in §8, constant bounds in §6–7 (`4 ≤ LFD(k) ≤ 2k + 1`), linear growth in §7.3 (open above; the proved linear *upper* growth is `2k + 1`). [pcc:unverified]
 
 ## 1. The pinned objects
 
@@ -118,7 +118,7 @@ shifting one variable at a time, every intermediate `NF` has weight `≤ c − 1
 the closure rule applied to `1` gives every monomial of degree `≤ d ≤ c`, hence `f ∈ V_{F,c}`.
 `ref ≤ d_F`: take `f = 1` (degree 0): `1 ∈ V_{F, max(d_F, 0)} = V_{F,d_F}`. ∎
 
-Lean: `ChainSd.ShiftSystem.lastFallDegrees_eq_refutationDegrees`,
+Lean: `ChainSd.ShiftSystem.lastFallDegrees_eq_refutationDegrees`, [pcc:unverified]
 `lastFallDegree_eq_solvingDegree` (abstract shift system, under the reachability hypothesis
 "`1 ∈ V_c` implies `V_{c'} = R_{≤c'}` for `c' ≥ c`"), and for the concrete chain algebra
 `ChainSd.lastFallDegree_eq_solvingDegree_chain` (file `Reach.lean`: the reachability hypothesis is
@@ -189,7 +189,7 @@ exponents mod `N`.
 *Proof.* `π_k` is a ring homomorphism, weight-non-increasing, maps shifts to shifts or to `1`, and
 `π_k(S_3) = g`; apply `closure_transfer`. ∎
 
-**Observation (H-nowrap), not proved.** In every tested cell the containment is an equality:
+**Observation (H-nowrap), not proved.** In every tested cell the containment is an equality: [pcc:unverified]
 `rank π_k(W_c^{(k)}) = dim U_c(k)` for `(k, c) ∈ {(4,4), (5,4), (6,4), (7,4), (6,5), (7,5)}`
 (engine `nowrap`; `W_c^{(k)}` uses shifts `j < k` and exponent width `k + 2`; exponents up to
 `452 < 4N` occurred). The derivations in `Q_k` therefore never exploited the wrap `x^N = 1` beyond
@@ -254,13 +254,13 @@ with the same `(p, A, B, t)`. Table in §8.
 
 ### 7.3 The linear lower bound: open, and the exact missing lemma
 
-The primary theorem asks for `ck − C ≤ LFD(k)` with `c > 0`. **This is not proved here.** What is
+The primary theorem asks for `ck − C ≤ LFD(k)` with `c > 0`. **This is not proved here.** What is [pcc:unverified]
 established: `LFD` is nondecreasing in `k` on a fixed instance (T4); `LFD(k) ≥ 4` for `k ≥ 2` (T6);
 `LFD(k) ≥ 5` for `6 ≤ k ≤ 11` on `p = 12289, n = 11` and `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on
 `p = 65537, n = 3` (§8, certified); and the exact values
 `LFD(k) = ⌊(k + 14)/4⌋` for `k ≤ 9` here (and for `k ≤ 15` in lane P, not re-verified).
 
-**Missing Lemma (locality).** There are `α > 0`, `β` such that for every admissible unit instance and
+**Missing Lemma (locality).** There are `α > 0`, `β` such that for every admissible unit instance and [pcc:unverified]
 all `k`, `c` with `c ≤ αk − β`: `1 ∉ U_c(k)`. Any of the following would prove it:
 
 1. *Dual (co-closed) form.* A family `Λ_c ⊆ Q_{≤c}^*` of functionals with `λ(g) = 0` for all `λ ∈ Λ_c`,
@@ -283,12 +283,12 @@ all `k`, `c` with `c ≤ αk − β`: `1 ∉ U_c(k)`. Any of the following would
    `dim U_4(k) = 4k² + 172k − 571` (`k = 6..12`, exact on all seven values), while the ambient
    dimension is `C(2k, ≤c)`.
 
-Which `α` the data allow: the lane-P law gives slope `1/4`; the proved lower bounds here are
+Which `α` the data allow: the lane-P law gives slope `1/4`; the proved lower bounds here are [pcc:unverified]
 constant; the proved upper bound has slope 2.
 
 ## 8. Finite-depth results and certificates
 
-Instance **F1**: `p = 12289, n = 11` (`A = 1210, B = 0, t = 11`), admissible for `k ≤ 11`. Instance
+Instance **F1**: `p = 12289, n = 11` (`A = 1210, B = 0, t = 11`), admissible for `k ≤ 11`. Instance [pcc:unverified]
 **F2**: `p = 65537, n = 3` (`A = 18, B = 0, t = 3`), admissible for `k ≤ 15`. Both are unit by Theorem 3
 and by grid enumeration. `dim` = rank of the closure, `cols = C(2k, ≤D)`. Every row marked ✓ has a
 replay certificate in `certs/` verified by `native/checker/chaincheck` (independent C
@@ -313,7 +313,7 @@ Additional computed values without certificate files (engine runs, `verify_close
 16, 100, …, 1399 grid zeros for `k = 8..12`); LFD = 4, 4, 4, 4, 5, 5, 5 on F2 for `k = 2..8` (engine
 `lfd`), identical to F1.
 
-**Depth-15 milestone, honest statement.** For the same admissible instance F2 beyond depth 14:
+**Depth-15 milestone, honest statement.** For the same admissible instance F2 beyond depth 14: [pcc:unverified]
 lower certificate `LFD(15) ≥ 6` (the certified closure `1 ∉ V_5(10)` on F2 and Theorem 4, i.e. the
 reduction homomorphism `Q_15 → Q_10` which is Lean-proved to carry `V_5(15)` into `V_5(10)`);
 upper bound `LFD(15) ≤ 31` by Theorem 7 (a proof, not a computational certificate). The expected
@@ -324,7 +324,7 @@ dense closure at `k = 10, D = 5`, 21,700 columns, takes about an hour here), and
 found by back-tracing uses 75–85 % of the closure rows at `k ≤ 7`, so no short derivation is
 available either. Those two cells are the concrete next computations.
 
-**What a certificate proves.** `1 ∉ V_D` (checked closure) ⇒ `sd(I_k) > D` (Lean
+**What a certificate proves.** `1 ∉ V_D` (checked closure) ⇒ `sd(I_k) > D` (Lean [pcc:unverified]
 `lt_solvingDegree_of_not_mem`); `1 ∈ V_D` ⇒ `sd(I_k) ≤ D` (`solvingDegree_le_of_mem`); together with
 Theorem 1 these are statements about the pinned polynomial-ring computation.
 
