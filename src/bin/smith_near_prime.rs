@@ -30,8 +30,14 @@ fn main() -> ExitCode {
         eprintln!("usage: smith_near_prime run --primes P,... --admitted N --out F [--max-h 8] [--max-seeds 20000] [--threads 4]");
         return ExitCode::from(2);
     }
-    let (mut primes, mut admitted, mut max_h, mut max_seeds, mut threads, mut out) =
-        (Vec::<u64>::new(), 150usize, 8u64, 20_000u64, 4usize, String::new());
+    let (mut primes, mut admitted, mut max_h, mut max_seeds, mut threads, mut out) = (
+        Vec::<u64>::new(),
+        150usize,
+        8u64,
+        20_000u64,
+        4usize,
+        String::new(),
+    );
     let mut i = 1;
     while i + 1 < a.len() {
         match a[i].as_str() {
@@ -59,8 +65,10 @@ fn main() -> ExitCode {
         writeln!(g, "{v}").unwrap();
         g.flush().unwrap();
     };
-    emit(json!({"kind": "config", "primes": primes, "admitted": admitted, "max_h": max_h,
-        "max_seeds": max_seeds, "threads": threads}));
+    emit(
+        json!({"kind": "config", "primes": primes, "admitted": admitted, "max_h": max_h,
+        "max_seeds": max_seeds, "threads": threads}),
+    );
     let t0 = Instant::now();
     // Work items: (prime, seed block of 64 seeds); a prime stops once it has
     // its admitted quota, but every seed of a started block is finished so the
