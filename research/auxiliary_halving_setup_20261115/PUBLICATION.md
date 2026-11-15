@@ -30,6 +30,17 @@ pass is claimed. The original partial snapshot remains unchanged. All native
 and local Lean controls retain their previous scope and source bindings.
 [pcc:unverified]
 
+At14:34Z the PR still has head e8dfbee313, no Copilot response after more
+than62minutes, and only target-event review/migration results. Comment6896185966
+records use of the documented manual fallback. Merge ecb49efb2f takes
+main40eb9a1607 without rebase/force push, preserving all196 incoming complete
+journal blocks as an exact prefix and the one complete own13:10 block.
+The merge receipt checks overlapping own changes against the merge base;
+none are lost. All27 original source/binary bindings still match afterward.
+The PCC ledger has1080 entries with the main1077 prefix unchanged. New-head
+gate/size/artifacts and PCC results remain required; no old pass carries over.
+[pcc:unverified]
+
 Implementation is now present: fixed-degree preimages, generated order8/trace
 setup, public main-base filter, existing cold path and OpenSSL complete-set/
 transcript replay. No native qualification call has occurred. Strict build001
@@ -133,3 +144,11 @@ base merge preserving every complete entry. This worktree's journal stays
 untouched while the request is pending. This custody-only source commit must
 receive its own current-head gates; prior-head passes are not carried forward.
 [pcc:unverified]
+
+The first post-merge artifact check used defaults because the local sparse
+checkout omitted its tracked policy again, falsely selecting PDF and PCC
+ledger. Added .artifacts and src/hash to this worktree's sparse patterns;
+the exact tracked policy now loads, artifact check selects no data files,
+and all27 bindings pass in a distinct post-sparse receipt. No policy/source
+content or archived evidence changed. An irrelevant follow-up patch failed
+verification before editing; this append records the actual repair.
