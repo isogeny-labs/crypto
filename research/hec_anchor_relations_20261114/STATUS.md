@@ -62,3 +62,15 @@ Record20261115T0602Z-hec-signed-orbit and run/orbit-* retain all outputs.
 The shared report preserves the preceding negative pilots and separate comparison boundaries.
 The next research step is frozen-arm confirmation on held-out families and a phase-cost
 analysis of the remaining relation work. The10x mathematical goal remains active.
+
+## Compact high-coefficient quotient pilot
+Frozen protocol1a115ad302; sourceb2fddfd8b2. Local gates:22128exhaustive sign cases including
+branch places,8000random cases,110reference/compact solves with identical14field fingerprints.
+Every generated compact orbit equals reference;55compact cases check15115principal and1290
+projected anchor identities. All165timed solves pass. [pcc:unverified]
+Complete-cost gain vs orbit is0.83..1.32, with g2p101 regression; vs frozen table in this run
+1.22..2.98. Raw record20261115T0625Z-hec-compact-orbit, compact-run/ and separate report preserve
+all arms and losses.12library+10anchor tests passed in release;2compact tests passed in debug.
+Decision: retain optional compact kernel, change no defaults; stop equivalent arithmetic rewrites.
+Next discriminating action: freeze held-out dense polynomial families and a growing-size ladder,
+including all native/table controls, selection/resource caps, rank failures and full group gates.

@@ -88,3 +88,29 @@ was fast-forwarded locally; the report PNG now has an artifact-store manifest. N
 current-head CI and S3 custody checks; preserve
 independent replay, external comparison, held-out scaling and >=10x as outstanding research.
 Do not mark the goal complete based on this engineering/algebraic reuse pilot.
+
+## Compact high-coefficient quotient gate
+Previous goal turn was progress: signed-orbit code,55group gates,110cold solves,PR4274 and
+green CI/S3 custody on868eec5948. Current successor protocolCOMPACT-PROTOCOL.md committed
+1a115ad302 before implementation. Sourceb2fddfd8b2 retains exact signed relation stream and
+uses bounded coefficient arrays plus high norm coefficients only. Two kernel tests compare
+22128exhaustive and8000random (h,Q) pairs to reference/full Newton norm division; all10example
+tests passed, including integrated reference/compact group solves. [pcc:unverified]
+Record20261115T0625Z-hec-compact-orbit is open. Next commands: benchrec run HEC_GATE=1
+hec-followup-target/release/compact_bench to compact-run/gates.txt; require110 completed
+reference/compact solves, identical14field fingerprints and55fully checked compact cases.
+Only then run normal harness for165interleaved cold solves against frozen table control.
+Do not change earlier closed raw records or their report; use a separate compact addendum.
+Goal remains full mathematical>=10x, with independent replay/held-out scaling outstanding.
+
+## Compact pilot terminal result
+Gate110reference/compact runs passed (55compact group gates,15115raw/1290projected checks).
+All165timed cases passed. Reference-orbit/compact median total ratios0.83..1.32, including
+g2p101 loss; frozen-table/compact ratios1.22..2.98. [pcc:unverified]
+Record20261115T0625Z-hec-compact-orbit is closed, with compact-run raw files, standalone
+COMPACT-REPORT.pdf/compact.svg, and reproducible summarize_compact.jq/render_compact.py.
+12library+10anchor tests passed release;2compact tests passed debug (57.58seconds).
+Stop equivalent arithmetic rewrites. Do not call this a mathematical breakthrough.
+Next: held-out dense coefficient families and growing-size ladder under a fresh frozen protocol,
+all native/table controls, bounded instance selection and per-arm caps; preserve rank failures.
+No experiment is running. Current PR4274 must be extended with this commit and CI followed.

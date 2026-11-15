@@ -26,3 +26,18 @@ Sources and protocols:
 External comparison: not run. No fastest-implementation, asymptotic improvement, or novelty
 claim. Formal algebra receipts cover the identities named in the report, not the Rust program.
 This entry is kept out of the benchmark index and leaderboard until their validation gate is met.
+
+## Compact norm quotient addendum
+
+[Compact report](COMPACT-REPORT.pdf), [graph](compact.svg),
+[protocol](../../research/hec_anchor_relations_20261114/COMPACT-PROTOCOL.md) and
+[raw](../../research/hec_anchor_relations_20261114/compact-run/paired.txt).
+Sourceb2fddfd8b2 retains the signed relation stream while using only high norm coefficients
+and bounded interpolation arrays. All110 reference/compact gate solves and165interleaved
+timed solves pass local checks;22128exhaustive and8000random polynomial cases match reference
+and full Newton interpolation. Producer assertions [pcc:unverified].
+
+Reference-orbit/compact median cold ratios range0.83..1.32; the genus2p101 case regresses.
+Frozen-table/compact ratios in this separate run range1.22..2.98. No default change and no
+10x or novelty conclusion. Do not multiply ratios with earlier experiments. The next research
+step is held-out growing-size confirmation, rather than equivalent arithmetic rewrites.
