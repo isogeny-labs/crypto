@@ -113,3 +113,27 @@ exercised on a pod; offline tests only (`tests/README.md`):
   receipts and the ledger.
 - Facts about RunPod that the next development smoke should record: the cgroup files, what `lastStatusChange` reads,
   whether `GET /pods/{id}` returns `env`, and whether a pod sees `RUNPOD_POD_ID`.
+
+## Second development smoke (2026-11-15, revision a18-r3): what only a pod could show
+
+Pod `pkm-x-dev-smoke2` (id `bpxojdig3u54d4`), stage `cap:8:0:5:12800000000`, receipts in `receipts_dev/pkm-x-dev-smoke2/`,
+results in `results/pkm-x-dev-smoke2/collect-1/` (git-excluded; raw tree in S3 under bench record
+`benchmarks/records/20261115T0156Z-pkm-fd-rpc-dev-smoke2.json`, closed as `invalid`: a development check, not data).
+Every number is `[pcc:unverified]`.
+
+- Launch at commit fd5a92da08 with the a18-r3 scripts (hashes logged in `run.log`): price read, pod created on the
+  pinned flavor `cpu5m` (16 vCPU, 128 GB, US$1.04/h, data center EUR-IS-1, `secureCloud` true in the create response),
+  the new start command booted, the runner answered, the seven uploaded files' pod-side SHA-256 equal the local ones.
+- cgroup: version 2. `memory.max` reads 128,000,000,000 before start, so the pre-start check (at least 112 GiB) passes.
+  `memory.peak`, `memory.events` (`oom_kill 0`) and `memory.max` were copied into the results tree.
+- Memory figures for this run: pilot `VmHWM` 63 MiB (used), cgroup `memory.peak` 104,304,640 bytes (recorded).
+- `lastStatusChange` at creation reads `Rented by User: <date>`, so the classifier's "by user" exclusion matches
+  RunPod's text. Its value after a RunPod-side event was not observed (none happened).
+- `GET /pods/{id}` returns `env` (keys `PUBLIC_KEY`, `RUNNER_TOKEN`), so token recovery works; receipts drop `env`.
+- Collection: one collection, transfer check true, outcome ADMITTED P2d; the offline classifier
+  (`fetch.sh --classify-dir`) gives the same verdict. The raw tree was uploaded with `tools/benchrec.py`, and
+  `fetch.sh --delete RECORD` confirmed the upload, deleted the pod (HTTP 204) and confirmed it gone. Pod lifetime 188 s,
+  about US$0.054 (derived: costPerHr x lifetime).
+- `reap.sh` read the live list afterwards: no `pkm-x-` pod, nothing touched.
+- Not checked: whether `lastStartedAt` changes on a container restart (no restart was provoked), whether the pod sees
+  `RUNPOD_POD_ID` or a pod-scoped key (S12), and whether `GET /pods` is complete for large accounts.
