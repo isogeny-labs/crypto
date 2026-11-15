@@ -1,0 +1,421 @@
+warning: function `xor_words_plain` is never used
+    --> src/cryptanalysis/inherited_f4.rs:2022:4
+     |
+2022 | fn xor_words_plain(dst: &mut [u64], src: &[u64]) {
+     |    ^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `gfni` and `gfni_back` are never read
+   --> src/cryptanalysis/koblitz_fast.rs:773:5
+    |
+762 | pub struct FrobeniusCanon {
+    |            -------------- fields in this struct
+...
+773 |     gfni: [[u64; 8]; 8],
+    |     ^^^^
+...
+776 |     gfni_back: [[u64; 8]; 8],
+    |     ^^^^^^^^^
+    |
+    = note: `FrobeniusCanon` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: fields `pre` and `lanes` are never read
+    --> src/cryptanalysis/koblitz_fast.rs:1749:5
+     |
+1740 | pub struct BatchScratch {
+     |            ------------ fields in this struct
+...
+1749 |     pre: Vec<u64>,
+     |     ^^^
+1750 |     /// The folding kernel's lane products, inverted together.
+1751 |     lanes: Vec<u64>,
+     |     ^^^^^
+     |
+     = note: `BatchScratch` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: enum `ActivationPhase` is never used
+   --> src/ml_dataset/budget.rs:381:17
+    |
+381 | pub(super) enum ActivationPhase {
+    |                 ^^^^^^^^^^^^^^^
+
+warning: function `validate_launch_delivery` is never used
+   --> src/ml_dataset/budget.rs:857:15
+    |
+857 | pub(super) fn validate_launch_delivery(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `activation_phase` is never used
+    --> src/ml_dataset/budget.rs:1873:19
+     |
+1663 | impl BudgetSession {
+     | ------------------ method in this implementation
+...
+1873 |     pub(super) fn activation_phase(&self) -> Result<ActivationPhase, String> {
+     |                   ^^^^^^^^^^^^^^^^
+
+warning: constant `CONFIG_SCHEMA` is never used
+  --> src/ml_dataset/startup_gate.rs:19:7
+   |
+19 | const CONFIG_SCHEMA: &str = "crypto.ml-dataset.startup-config/v1";
+   |       ^^^^^^^^^^^^^
+
+warning: constant `BUNDLE_SCHEMA` is never used
+  --> src/ml_dataset/startup_gate.rs:20:7
+   |
+20 | const BUNDLE_SCHEMA: &str = "crypto.ml-dataset.startup-bundle/v1";
+   |       ^^^^^^^^^^^^^
+
+warning: constant `CONFIG_LIMIT` is never used
+  --> src/ml_dataset/startup_gate.rs:21:7
+   |
+21 | const CONFIG_LIMIT: u64 = 64 * 1024;
+   |       ^^^^^^^^^^^^
+
+warning: constant `BUNDLE_LIMIT` is never used
+  --> src/ml_dataset/startup_gate.rs:22:7
+   |
+22 | const BUNDLE_LIMIT: u64 = 256 * 1024;
+   |       ^^^^^^^^^^^^
+
+warning: constant `JOURNAL_LIMIT` is never used
+  --> src/ml_dataset/startup_gate.rs:23:7
+   |
+23 | const JOURNAL_LIMIT: u64 = 64 * 1024;
+   |       ^^^^^^^^^^^^^
+
+warning: constant `POLL_NANOS` is never used
+  --> src/ml_dataset/startup_gate.rs:24:7
+   |
+24 | const POLL_NANOS: u64 = 200_000_000;
+   |       ^^^^^^^^^^
+
+warning: struct `GateConfig` is never constructed
+  --> src/ml_dataset/startup_gate.rs:28:8
+   |
+28 | struct GateConfig {
+   |        ^^^^^^^^^^
+
+warning: struct `GateGenerate` is never constructed
+  --> src/ml_dataset/startup_gate.rs:39:8
+   |
+39 | struct GateGenerate {
+   |        ^^^^^^^^^^^^
+
+warning: struct `GateBundle` is never constructed
+  --> src/ml_dataset/startup_gate.rs:51:8
+   |
+51 | struct GateBundle {
+   |        ^^^^^^^^^^
+
+warning: function `invalid` is never used
+  --> src/ml_dataset/startup_gate.rs:95:4
+   |
+95 | fn invalid(message: impl ToString) -> GateError {
+   |    ^^^^^^^
+
+warning: function `authority` is never used
+  --> src/ml_dataset/startup_gate.rs:98:4
+   |
+98 | fn authority(message: impl ToString) -> GateError {
+   |    ^^^^^^^^^
+
+warning: function `persistence` is never used
+   --> src/ml_dataset/startup_gate.rs:101:4
+    |
+101 | fn persistence(message: impl ToString) -> GateError {
+    |    ^^^^^^^^^^^
+
+warning: struct `Paths` is never constructed
+   --> src/ml_dataset/startup_gate.rs:119:8
+    |
+119 | struct Paths {
+    |        ^^^^^
+
+warning: associated items `production`, `journal`, `marker`, and `budget_args` are never used
+   --> src/ml_dataset/startup_gate.rs:129:8
+    |
+128 | impl Paths {
+    | ---------- associated items in this implementation
+129 |     fn production() -> Self {
+    |        ^^^^^^^^^^
+...
+140 |     fn journal(&self) -> PathBuf {
+    |        ^^^^^^^
+...
+143 |     fn marker(&self) -> PathBuf {
+    |        ^^^^^^
+...
+146 |     fn budget_args(&self) -> BudgetArgs {
+    |        ^^^^^^^^^^^
+
+warning: struct `LocalIdentity` is never constructed
+   --> src/ml_dataset/startup_gate.rs:158:8
+    |
+158 | struct LocalIdentity {
+    |        ^^^^^^^^^^^^^
+
+warning: struct `VerifiedLocalInputs` is never constructed
+   --> src/ml_dataset/startup_gate.rs:167:8
+    |
+167 | struct VerifiedLocalInputs {
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `PreparedRun` is never constructed
+   --> src/ml_dataset/startup_gate.rs:172:8
+    |
+172 | struct PreparedRun {
+    |        ^^^^^^^^^^^
+
+warning: function `identifier` is never used
+   --> src/ml_dataset/startup_gate.rs:178:4
+    |
+178 | fn identifier(value: &str) -> Result<()> {
+    |    ^^^^^^^^^^
+
+warning: function `dns_label` is never used
+   --> src/ml_dataset/startup_gate.rs:189:4
+    |
+189 | fn dns_label(value: &str) -> Result<()> {
+    |    ^^^^^^^^^
+
+warning: function `pod_name` is never used
+   --> src/ml_dataset/startup_gate.rs:204:4
+    |
+204 | fn pod_name(value: &str) -> Result<()> {
+    |    ^^^^^^^^
+
+warning: function `sha` is never used
+   --> src/ml_dataset/startup_gate.rs:218:4
+    |
+218 | fn sha(value: &str) -> Result<()> {
+    |    ^^^
+
+warning: function `decode` is never used
+   --> src/ml_dataset/startup_gate.rs:228:4
+    |
+228 | fn decode<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T> {
+    |    ^^^^^^
+
+warning: function `multiply` is never used
+   --> src/ml_dataset/startup_gate.rs:233:4
+    |
+233 | fn multiply(value: &Resources, count: u64) -> Result<Resources> {
+    |    ^^^^^^^^
+
+warning: function `validate_config` is never used
+   --> src/ml_dataset/startup_gate.rs:247:4
+    |
+247 | fn validate_config(config: &GateConfig) -> Result<()> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `validate_remote` is never used
+   --> src/ml_dataset/startup_gate.rs:296:4
+    |
+296 | fn validate_remote(policy: &CampaignPolicy, uri: &str) -> Result<()> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `validate_delivery` is never used
+   --> src/ml_dataset/startup_gate.rs:311:4
+    |
+311 | fn validate_delivery(
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: struct `Moment` is never constructed
+   --> src/ml_dataset/startup_gate.rs:446:8
+    |
+446 | struct Moment {
+    |        ^^^^^^
+
+warning: trait `Clock` is never used
+   --> src/ml_dataset/startup_gate.rs:450:7
+    |
+450 | trait Clock {
+    |       ^^^^^
+
+warning: struct `NativeClock` is never constructed
+   --> src/ml_dataset/startup_gate.rs:454:8
+    |
+454 | struct NativeClock;
+    |        ^^^^^^^^^^^
+
+warning: function `ordinary` is never used
+   --> src/ml_dataset/startup_gate.rs:509:4
+    |
+509 | fn ordinary(_file: &File, _private: bool) -> Result<()> {
+    |    ^^^^^^^^
+
+warning: function `bounded` is never used
+   --> src/ml_dataset/startup_gate.rs:516:4
+    |
+516 | fn bounded(mut file: File, limit: u64) -> Result<Vec<u8>> {
+    |    ^^^^^^^
+
+warning: function `local_file` is never used
+   --> src/ml_dataset/startup_gate.rs:541:4
+    |
+541 | fn local_file(path: &Path, limit: u64, private: bool, frozen: bool) -> Result<Vec<u8>> {
+    |    ^^^^^^^^^^
+
+warning: trait `Delivery` is never used
+   --> src/ml_dataset/startup_gate.rs:597:7
+    |
+597 | trait Delivery {
+    |       ^^^^^^^^
+
+warning: struct `GateAuthority` is never constructed
+   --> src/ml_dataset/startup_gate.rs:691:8
+    |
+691 | struct GateAuthority {
+    |        ^^^^^^^^^^^^^
+
+warning: enum `Phase` is never used
+   --> src/ml_dataset/startup_gate.rs:700:6
+    |
+700 | enum Phase {
+    |      ^^^^^
+
+warning: struct `GateState` is never constructed
+   --> src/ml_dataset/startup_gate.rs:712:8
+    |
+712 | struct GateState {
+    |        ^^^^^^^^^
+
+warning: struct `Journal` is never constructed
+   --> src/ml_dataset/startup_gate.rs:726:8
+    |
+726 | struct Journal {
+    |        ^^^^^^^
+
+warning: function `check_private_path` is never used
+   --> src/ml_dataset/startup_gate.rs:732:4
+    |
+732 | fn check_private_path(path: &Path) -> Result<()> {
+    |    ^^^^^^^^^^^^^^^^^^
+
+warning: function `exists` is never used
+   --> src/ml_dataset/startup_gate.rs:742:4
+    |
+742 | fn exists(path: &Path) -> Result<bool> {
+    |    ^^^^^^
+
+warning: function `create_private` is never used
+   --> src/ml_dataset/startup_gate.rs:749:4
+    |
+749 | fn create_private(path: &Path, bytes: &[u8]) -> Result<()> {
+    |    ^^^^^^^^^^^^^^
+
+warning: function `private_directory` is never used
+   --> src/ml_dataset/startup_gate.rs:770:4
+    |
+770 | fn private_directory(path: &Path) -> Result<()> {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: associated items `open`, `persist`, `transition`, `terminal`, and `fail` are never used
+   --> src/ml_dataset/startup_gate.rs:807:8
+    |
+806 | impl Journal {
+    | ------------ associated items in this implementation
+807 |     fn open(
+    |        ^^^^
+...
+928 |     fn persist(&mut self) -> Result<()> {
+    |        ^^^^^^^
+...
+952 |     fn transition(&mut self, phase: Phase) -> Result<()> {
+    |        ^^^^^^^^^^
+...
+961 |     fn terminal(&self) -> Option<Result<GateOutcome>> {
+    |        ^^^^^^^^
+...
+977 |     fn fail(&mut self, error: GateError) -> GateError {
+    |        ^^^^
+
+warning: function `authority_error` is never used
+   --> src/ml_dataset/startup_gate.rs:995:4
+    |
+995 | fn authority_error(message: impl ToString) -> GateError {
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `validate_state` is never used
+   --> src/ml_dataset/startup_gate.rs:999:4
+    |
+999 | fn validate_state(state: &GateState) -> Result<()> {
+    |    ^^^^^^^^^^^^^^
+
+warning: function `immutable_inputs` is never used
+    --> src/ml_dataset/startup_gate.rs:1033:4
+     |
+1033 | fn immutable_inputs(
+     |    ^^^^^^^^^^^^^^^^
+
+warning: trait `Driver` is never used
+    --> src/ml_dataset/startup_gate.rs:1087:7
+     |
+1087 | trait Driver {
+     |       ^^^^^^
+
+warning: struct `NativeDriver` is never constructed
+    --> src/ml_dataset/startup_gate.rs:1093:8
+     |
+1093 | struct NativeDriver;
+     |        ^^^^^^^^^^^^
+
+warning: function `check_wait` is never used
+    --> src/ml_dataset/startup_gate.rs:1167:4
+     |
+1167 | fn check_wait(state: &GateState, now: Moment) -> Result<u64> {
+     |    ^^^^^^^^^^
+
+warning: function `drive` is never used
+    --> src/ml_dataset/startup_gate.rs:1179:4
+     |
+1179 | fn drive(
+     |    ^^^^^
+
+warning: function `local_inputs` is never used
+    --> src/ml_dataset/startup_gate.rs:1278:4
+     |
+1278 | fn local_inputs(
+     |    ^^^^^^^^^^^^
+
+warning: `crypto` (lib) generated 56 warnings
+   Compiling crypto v0.1.0 (/Volumes/SSD990-2/n83-a0-matched-solver-20261114)
+warning: stripping debug info with `rust-objcopy` failed: signal: 6 (SIGABRT)
+  |
+  = note: dyld[91761]: Library not loaded: @rpath/libLLVM.dylib
+            Referenced from: <D6B3C499-A2AF-3E42-8F77-C42BD658AAB5> /Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/rust-objcopy
+            Reason: tried: '/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/Volumes/SSD990-2/n83-a0-matched-solver-20261114/target/release/deps/libLLVM.dylib' (no such file), '/Users/adamburan/lib/libLLVM.dylib' (no such file), '/usr/local/lib/libLLVM.dylib' (no such file), '/usr/lib/libLLVM.dylib' (no such file, not in dyld cache)
+          
+
+warning: `crypto` (example "koblitz_n83_factor_base_export" test) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 3.93s
+     Running unittests examples/koblitz_n83_factor_base_export.rs (target/release/examples/koblitz_n83_factor_base_export-6100b607463e2a16)
+
+running 22 tests
+test compact_cold::wide::wide_json_tests::wide_point_parser_accepts_small_legacy_numeric_words ... ok
+test primary_adapter::tests::packed_model_uses_low_bit_first_and_zero_padding ... ok
+test compact_cold::wide::wide_json_tests::wide_point_list_preserves_infinity_entries ... ok
+test compact_cold::wide::wide_json_tests::wide_point_coordinates_round_trip_as_decimal_strings ... ok
+test tests::degree_83_cyclotomic_block_order_is_82 ... ok
+test primary_adapter::tests::cgroup_v2_membership_resolves_container_and_native_scope ... ok
+test tests::gray_order_visits_the_same_complete_subspace ... ok
+test tests::invalid_point_and_out_of_range_case_fail_closed ... ok
+test compact_cold::pinned_public_diagnostic_curve_has_exact_group_and_generator ... ok
+test primary_adapter::tests::v2_primary_selection_requires_replay_and_s3_receipts_before_object_import ... ok
+test tests::v2_object_gate_matches_the_frozen_size_receipt ... ok
+test tests::point_only_oracle_finds_a_verified_relation_and_retains_censoring ... ok
+test primary_adapter::tests::supervised_source_snapshot_rejects_a_changed_compiled_file ... ok
+test tests::subgroup_moduli_are_kept_separate ... ok
+test primary_adapter::tests::selector_and_phase_modes_preserve_small_chain_model_and_group_lift ... ok
+test compact_cold::wide::unordered_pair_index_retains_every_ordered_canonical_root_key ... ok
+test primary_adapter::tests::wide_enumerator_matches_generic_witness_order_on_primary_curve ... ok
+test primary_adapter::tests::public_target_and_post_solver_validation_bind_the_same_fixture ... ok
+test tests::small_export_replays_with_generic_arithmetic ... ok
+test primary_adapter::tests::small_primary_export_maps_to_generic_orbits_and_zero_trial_preflight ... ok
+test compact_cold::wide::wide_compact_extractor_lifts_public_four_sums_on_small_curve ... ok
+test tests::finite_grid_is_addressable_and_accounts_for_every_tuple ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+

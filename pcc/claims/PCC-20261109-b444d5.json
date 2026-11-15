@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-09T07:50:13Z",
+ "id": "PCC-20261109-b444d5",
+ "kind": "theorem",
+ "producer": {
+  "commit": "8e62d4dfc182ee3bd41765dda4847100ddf516f6",
+  "model": "",
+  "session": "buffer-budget-20261109"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ffd834e16b73bfb9019ee145d6607ad5c9bf1b2230a499fb357e96a4216cae86",
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "BufferBudget.actualBufferBitsLower"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "actual prescribed coefficient slot capacity; no measured RSS, unrestricted lower bound or full recursive cost theorem",
+ "statement": "For 0<u<=a, actual prescribed quotient coefficient slot capacity B is at least8h^2*u*4^a, where h is the actual source ceiling. This is capacity accounting for simultaneous fixed-width prescribed buffers, not an unrestricted memory or algorithm lower bound."
+}

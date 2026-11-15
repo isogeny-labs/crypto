@@ -1,0 +1,1 @@
+($a[0] | del(.job.job_name, .job.seconds, .provenance.note)) == ($b[0] | del(.job.job_name, .job.seconds, .provenance.note)) and $b[0].job.job_name == "sgsecant-panel-20261108-a3" and $b[0].job.seconds == 43200 and $b[0].job.cpu == 4 and $b[0].job.memory == "8Gi" and $a[0].job.job_name != $b[0].job.job_name

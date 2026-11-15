@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T07:57:30Z",
+ "id": "PCC-20261113-1ff151",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d42ef187472f366c32dada33a381abfa4eb6ba53",
+  "model": "",
+  "session": "prime-ic-cost-floor-20261113"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "bda311cf40720d3555981854678d95ce11223a48bc2e1cc4e96063dce98588ca",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "PrimeICCostFloor.floorsNoBeat"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "declared single-target cost-accounting model only; not a lower bound on an actual solver or ECDLP algorithm",
+ "statement": "For real p>1,b>=1,t>=0, the two explicit charges b^4<=t and p<=t*b^3 imply p<t^2."
+}

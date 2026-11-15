@@ -1,0 +1,14 @@
+{
+ "created_at": "2026-11-08T23:21:36Z",
+ "id": "PCC-20261108-bc796e",
+ "kind": "statement",
+ "producer": {
+  "commit": "fe1849358bd0ce5b16a4e99c4b95139e888fb5ec",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [],
+ "schema": "pcc.claim/v1",
+ "scope": "Curve25519-family miniatures k = 20 and 24, five fresh family curves per size, bsgs.negation vs rho.negation in ecbench counted GAE at w = 0, 0.1, 1, local route L1, 12 targets x 2 rounds per curve; no signed replay or recompute; baby-step giant-step is time-memory and excluded from the index-calculus ratchet",
+ "statement": "BSGS-class boundary panel (research/curve25519_autolab_20261104/bsgs): audit 540/540 records and 8 replays reproduced at each size. Mean per-curve S of bsgs.negation over rho.negation at k = 20 is 0.611 / 0.625 / 0.697 at w = 0 / 0.1 / 1 (worst single curve 0.743), below 0.75 across the band; at k = 24 it is 0.889 / 0.897 / 0.933 (range 0.79 to 1.00), above 0.75. The rho A/A arm equals rho-neg. This is a time-memory algorithm, not an index-calculus row; no index-calculus arm has a measured ratio below 1.40."
+}

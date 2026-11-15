@@ -1,0 +1,287 @@
+{
+ "seed_rule": [
+  {
+   "tag": "curve/bits=33/index=1",
+   "recorded": 201624291843241,
+   "recomputed": 201624291843241,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=33/index=2",
+   "recorded": 24642267360510,
+   "recomputed": 24642267360510,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=37/index=1",
+   "recorded": 18561872162765,
+   "recomputed": 18561872162765,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=37/index=2",
+   "recorded": 135799598603144,
+   "recomputed": 135799598603144,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=41/index=1",
+   "recorded": 119518173357916,
+   "recomputed": 119518173357916,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=41/index=2",
+   "recorded": 181458334271012,
+   "recomputed": 181458334271012,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=45/index=1",
+   "recorded": 185150999512726,
+   "recomputed": 185150999512726,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=45/index=2",
+   "recorded": 196853410870112,
+   "recomputed": 196853410870112,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=49/index=1",
+   "recorded": 40016877808970,
+   "recomputed": 40016877808970,
+   "ok": true
+  },
+  {
+   "tag": "curve/bits=49/index=2",
+   "recorded": 203571419754608,
+   "recomputed": 203571419754608,
+   "ok": true
+  },
+  {
+   "tag": "target_seed/block=A",
+   "recorded": 54849620745713,
+   "recomputed": 54849620745713,
+   "ok": true
+  },
+  {
+   "tag": "target_seed/block=B",
+   "recorded": 262858262117844,
+   "recomputed": 262858262117844,
+   "ok": true
+  },
+  {
+   "tag": "measurement_seed/job=J1",
+   "recorded": 107516164087790,
+   "recomputed": 107516164087790,
+   "ok": true
+  },
+  {
+   "tag": "measurement_seed/job=J2",
+   "recorded": 26995759977218,
+   "recomputed": 26995759977218,
+   "ok": true
+  },
+  {
+   "tag": "measurement_seed/job=J3",
+   "recorded": 166668755239101,
+   "recomputed": 166668755239101,
+   "ok": true
+  },
+  {
+   "tag": "measurement_seed/job=J4",
+   "recorded": 6472169882280,
+   "recomputed": 6472169882280,
+   "ok": true
+  },
+  {
+   "tag": "measurement_seed/job=J5",
+   "recorded": 54391810056847,
+   "recomputed": 54391810056847,
+   "ok": true
+  },
+  {
+   "tag": "measurement_seed/job=J6",
+   "recorded": 22552766203232,
+   "recomputed": 22552766203232,
+   "ok": true
+  },
+  {
+   "tag": "measurement_seed/job=SMOKE",
+   "recorded": 227095582935304,
+   "recomputed": 227095582935304,
+   "ok": true
+  }
+ ],
+ "jobs": {
+  "J1": {
+   "rounds": 6,
+   "warmup": 1,
+   "order": "alternate",
+   "isolation_required": "L2",
+   "timeout_seconds": 300,
+   "measurement_seed": 107516164087790,
+   "measurement_seed_ok": true,
+   "target_seed_ok": true,
+   "field_bits": [
+    33,
+    37,
+    41
+   ],
+   "field_bits_ok": true,
+   "curves": 6,
+   "targets_per_curve": [
+    8
+   ],
+   "targets_ok": true,
+   "arms": [
+    "rho-neg:rho.negation",
+    "rho-neg-aa:rho.negation",
+    "rho-plain:rho.plain",
+    "bsgs-neg:bsgs.negation",
+    "rho-neg-v2:rho.negation_v2"
+   ],
+   "arm_params_default": true
+  },
+  "J2": {
+   "rounds": 6,
+   "warmup": 1,
+   "order": "alternate",
+   "isolation_required": "L2",
+   "timeout_seconds": 300,
+   "measurement_seed": 26995759977218,
+   "measurement_seed_ok": true,
+   "target_seed_ok": true,
+   "field_bits": [
+    45
+   ],
+   "field_bits_ok": true,
+   "curves": 2,
+   "targets_per_curve": [
+    8
+   ],
+   "targets_ok": true,
+   "arms": [
+    "rho-neg:rho.negation",
+    "rho-neg-aa:rho.negation",
+    "rho-plain:rho.plain",
+    "bsgs-neg:bsgs.negation",
+    "rho-neg-v2:rho.negation_v2"
+   ],
+   "arm_params_default": true
+  },
+  "J3": {
+   "rounds": 6,
+   "warmup": 1,
+   "order": "alternate",
+   "isolation_required": "L2",
+   "timeout_seconds": 300,
+   "measurement_seed": 166668755239101,
+   "measurement_seed_ok": true,
+   "target_seed_ok": true,
+   "field_bits": [
+    49
+   ],
+   "field_bits_ok": true,
+   "curves": 1,
+   "targets_per_curve": [
+    4
+   ],
+   "targets_ok": true,
+   "arms": [
+    "rho-neg:rho.negation",
+    "rho-neg-aa:rho.negation",
+    "rho-plain:rho.plain",
+    "bsgs-neg:bsgs.negation",
+    "rho-neg-v2:rho.negation_v2"
+   ],
+   "arm_params_default": true
+  },
+  "J4": {
+   "rounds": 6,
+   "warmup": 1,
+   "order": "alternate",
+   "isolation_required": "L2",
+   "timeout_seconds": 300,
+   "measurement_seed": 6472169882280,
+   "measurement_seed_ok": true,
+   "target_seed_ok": true,
+   "field_bits": [
+    49
+   ],
+   "field_bits_ok": true,
+   "curves": 1,
+   "targets_per_curve": [
+    4
+   ],
+   "targets_ok": true,
+   "arms": [
+    "rho-neg:rho.negation",
+    "rho-neg-aa:rho.negation",
+    "rho-plain:rho.plain",
+    "bsgs-neg:bsgs.negation",
+    "rho-neg-v2:rho.negation_v2"
+   ],
+   "arm_params_default": true
+  },
+  "J5": {
+   "rounds": 6,
+   "warmup": 1,
+   "order": "alternate",
+   "isolation_required": "L2",
+   "timeout_seconds": 300,
+   "measurement_seed": 54391810056847,
+   "measurement_seed_ok": true,
+   "target_seed_ok": true,
+   "field_bits": [
+    49
+   ],
+   "field_bits_ok": true,
+   "curves": 1,
+   "targets_per_curve": [
+    4
+   ],
+   "targets_ok": true,
+   "arms": [
+    "rho-neg:rho.negation",
+    "rho-neg-aa:rho.negation",
+    "rho-plain:rho.plain",
+    "bsgs-neg:bsgs.negation",
+    "rho-neg-v2:rho.negation_v2"
+   ],
+   "arm_params_default": true
+  },
+  "J6": {
+   "rounds": 6,
+   "warmup": 1,
+   "order": "alternate",
+   "isolation_required": "L2",
+   "timeout_seconds": 300,
+   "measurement_seed": 22552766203232,
+   "measurement_seed_ok": true,
+   "target_seed_ok": true,
+   "field_bits": [
+    49
+   ],
+   "field_bits_ok": true,
+   "curves": 1,
+   "targets_per_curve": [
+    4
+   ],
+   "targets_ok": true,
+   "arms": [
+    "rho-neg:rho.negation",
+    "rho-neg-aa:rho.negation",
+    "rho-plain:rho.plain",
+    "bsgs-neg:bsgs.negation",
+    "rho-neg-v2:rho.negation_v2"
+   ],
+   "arm_params_default": true
+  }
+ },
+ "J3_J4_workloads_disjoint": true,
+ "J5_J6_workloads_disjoint": true,
+ "all_jobs_workloads_disjoint": true
+}

@@ -1,0 +1,175 @@
+{
+  "card_id": "CARD-prime-medium-rho-cpc-20261109-M1",
+  "card_path": "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.yaml",
+  "card_sha256": "b107ae355d83310ec3971c6f7a75873ea30eb15acde667582f73c12fc550b7ba",
+  "commands": [
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.241,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 1,
+      "outputs": {},
+      "seconds": 7.241,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "66b48a489becd447957c724498a5549b31c7a785637561b8b29d2ed87d35d2ee",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__rho-medium-cpc-20261109/20261109T055327Z-b77614b761ea/ (0 unpushed commit(s), 1 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_rho_cpc_20261109/requests/M1.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.013,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.013,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ed4805d95e99ec650e583064c5d51a96257590c9bed0e1e39ee50d684bf81c05",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 231691171589394,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_rho_cpc_20261109 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "research/prime_medium_rho_cpc_20261109/requests/M1.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 255,
+          "seconds": 3.867,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 255,
+      "id": "launch",
+      "index": 3,
+      "outputs": {
+        "research/prime_medium_rho_cpc_20261109/receipts/M1/result.json": null
+      },
+      "seconds": 3.867,
+      "stderr_sha256": "37fdee78a223bfef71a537673f5cdecd198507c0781f6e12d055241dfff4da00",
+      "stderr_tail": [
+        "",
+        "An error occurred (AccountLimitExceededException) when calling the StartBuild operation: Concurrent build limit exceeded. This build project has a limit of 2 concurrent build(s). Start the build again after other builds are complete, or edit project configuration."
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "b77614b761eae0a5b57fc51dae14a8172d109b82",
+  "dirty_after": [
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.checkpoint-gate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.checkpoint-gate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.launch.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.launch.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.validate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.validate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.yaml",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M2.checkpoint-gate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M2.checkpoint-gate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M2.validate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M2.validate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M2.yaml",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3.checkpoint-gate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3.checkpoint-gate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3.launch.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3.launch.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3.validate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3.validate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3.yaml",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M4.yaml",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.checkpoint-gate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.checkpoint-gate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.validate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.validate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.yaml",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/build-start.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/start-request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M2/build-start.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M2/build.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M2/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M2/start-request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M3/build-start.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M3/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M3/start-request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/build-start.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/build.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/start-request.json",
+    "resume/RESUME.md"
+  ],
+  "dirty_before": [
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M1.yaml",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M2.yaml",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3.yaml",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M4.yaml",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.checkpoint-gate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.checkpoint-gate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.validate.stderr",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.validate.stdout",
+    "research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-PC.yaml",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/build-start.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/build.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/start-request.json",
+    "resume/RESUME.md"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 3"
+}

@@ -707,6 +707,52 @@ pcc verdict exists.
   link is a rule that extends along the chain, and m = 4 is its test.
 - **What it is not.** Not shown to be better than S3. No row moves.
 
+## One invariant guess per link at m = 4, degree 3 (2026-11-06): no detected difference
+
+`research/dreg_m4_link_guess_d3_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`). Every m = 4 cell this host can hold refutes at degree 4 with
+no guess, so the per-link rule was tested at degree 3 with k = 10 guesses at
+ℓ = 5 (n = 11, 12), on all 1024 branches of 8 unsatisfiable draws.
+Unverified assertion until a pcc verdict exists.
+
+- **Result.** Invariant placement (four sums on `x₁ + x₂`, three guesses on
+  `e₁ + x₃`, three on `e₂ + x₄`) refutes on 1,888 of 8,192 branches; raw
+  placement in the same places on 1,312.
+  - By draw it is ahead on 4 and behind on 3. The registered two-sided sign
+    test gives p = 1.0: no detected difference.
+- **What it means.** The per-link rule is not established at m = 4 in the
+  regime this host reaches. The degree-4 three-guess regime at m = 4 needs a
+  larger host.
+- **What it is not.** A test of the m = 3 degree-4 regime. No row moves.
+
+## Which guesses decide refutation at m = 4 (2026-11-06): links 2 and 3, never link 1
+
+`research/dreg_m4_guess_bits_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`) reruns the ten-guess m = 4 design and reads, per arm and draw,
+the guesses whose value changes degree-3 refutation. Unverified assertion until
+a pcc verdict exists.
+
+- **Result.** No link-1 guess (pair sums or raw x₂) is essential on any of 16
+  arm-draws; essential guesses sit on link 3 (34) and link 2 (18). Guessing
+  only the essential set keeps every refutation on 7 of 13 tested arm-draws,
+  all with one to three guesses.
+- **What it means.** At m = 4, degree 3, guesses on the last links do the work,
+  the opposite of m = 3 at degree 4. A guess budget should go to links 2 and 3
+  first.
+- **What it is not.** A complete guess-and-determine. No row moves.
+
+## Two guesses at (22, 8) (2026-11-07): enough on 1 of 12 draws
+
+`research/dreg_two_guess_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`) drops `e₁[0]` from S3 and L3. Unverified assertion until a pcc
+verdict exists.
+
+- **Result.** Both two-guess sets suffice at degree 4 on draw 6 only and fail
+  at their first branch on the other 11; they never disagree.
+- **What it means.** Three guesses stay the floor for these guess kinds on 11
+  of 12 draws at ℓ = 8; there is no general halving of the branch count.
+- **What it is not.** A test of two-guess pairs that keep `e₁[0]`. No row moves.
+
 ## Reproducing
 
 ```sh

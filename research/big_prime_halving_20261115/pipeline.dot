@@ -1,0 +1,14 @@
+digraph setup {
+ graph [rankdir=TB,bgcolor="white",pad="0.12",nodesep="0.20",ranksep="0.26"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=11,margin="0.15,0.09"];
+ edge [color="#455566"];
+ input [label="Public prime p, depth t, fixed seed\nSoftware cap: 3..4096 bits; t = 3..12"];
+ sample [label="Sample a and nonzero rational 2-torsion model\nComplete quartic roots + ordinate lifts + doubling"];
+ order [label="Choose t−1 successive rational halves\nVerify exact order d = 2^t; reject bad cosets"];
+ tower [label="Build all t degree-two maps\nCodomain equations, point images, N/D composition"];
+ fibre [label="List the d coset abscissas\nCheck monic N−cD = product(X−root)"];
+ replay [label="Separate OpenSSL reference\nBN gcd completeness + EC_GROUP replay",fillcolor="#e7f4ed"];
+ pending [label="Numerical qualification: PENDING\nRequired S3 checkpoint upload is unavailable",fillcolor="#fbe8df"];
+ input -> sample -> order -> tower -> fibre -> replay;
+ replay -> pending [style=dashed,label="frozen controls not run",fontsize=10];
+}

@@ -1,0 +1,25 @@
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|
+| ECBS1h6400adb04d04 | rho | rho.negation | icv1-fp36-t454193-44a20818 | 36.00 | 16/16 | 1.161 | [0.935, 1.440] | 0.886 | 1.309 | 1.309 | 1.000 | yes | 75.902 | L0×16 |
+| ECBS1h6400adb04d04 | res2 | ic.pipeline | icv1-fp36-t454193-44a20818 | 36.00 | 16/16 | 2.980 | [2.419, 3.672] | – | – | 3.363 | 2.568 | yes | 221.958 | L0×16 |
+| ECBS1h6400adb04d04 | res2f | ic.pipeline | icv1-fp36-t454193-44a20818 | 36.00 | 16/16 | 1.739 | [1.495, 2.022] | – | – | 1.962 | 1.498 | yes | 224.708 | L0×16 |
+
+ops (ok): res2f / res2 = 0.5835 [0.426, 0.800] (linearised_t, df 7) over 16 pairs on 8 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.5835, w=0.1: 1.8089, w=1: 2.4232): unresolved inside the band; wall: admitted ns/GAE res2f/res2 1.5599 [1.431, 1.701], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 0.9102 [0.678, 1.222]; ns/GAE of res2, res2f is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 0 / 100; paired attempts 16, verified 16, admitted 0; levels {"L0": 16}; p95 foreign busy unknown%, p95 run queue 2.03%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm res2: verified 16/16 (0 censored); max/median S 1.53, top run 9% of total; unpriced: legendre_symbols_uncharged=112, lookups_uncharged=12468418, residual_table_bytes_uncharged=199493152, row_ops_uncharged=411, sqrt_solves_uncharged=32
+arm res2f: verified 16/16 (0 censored); max/median S 1.50, top run 9% of total; unpriced: legendre_symbols_uncharged=112, lookups_uncharged=14520624, residual_table_bytes_uncharged=522098640, row_ops_uncharged=416, sqrt_solves_uncharged=32
+| curve | log2 r | workloads | res2f / res2 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp36-t454193-44a20818 | 36.00 | 8 | 0.5835 | [0.4256, 0.7998] | linearised_t |
+
+| workload | curve | log2 r | res2 mean S | res2f mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W00d99e5783a9 | icv1-fp36-t454193-44a20818 | 36.00 | 2.3286 | 1.8854 | 0.8097 |
+| W5e93e06f1313 | icv1-fp36-t454193-44a20818 | 36.00 | 2.7979 | 1.9960 | 0.7134 |
+| W6a993d61d7a8 | icv1-fp36-t454193-44a20818 | 36.00 | 2.6850 | 1.9676 | 0.7328 |
+| Wb80e722e5a98 | icv1-fp36-t454193-44a20818 | 36.00 | 3.7772 | 1.8793 | 0.4975 |
+| Wbcceea54d40c | icv1-fp36-t454193-44a20818 | 36.00 | 3.0173 | 1.9408 | 0.6432 |
+| Wd168d6147398 | icv1-fp36-t454193-44a20818 | 36.00 | 4.3594 | 1.0957 | 0.2513 |
+| Wf1448231d8ca | icv1-fp36-t454193-44a20818 | 36.00 | 2.1233 | 1.6745 | 0.7887 |
+| Wf5ca874f0e0f | icv1-fp36-t454193-44a20818 | 36.00 | 2.7545 | 1.4722 | 0.5345 |

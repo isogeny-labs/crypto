@@ -240,6 +240,62 @@ pub fn build_factor_base(curve: &HyperellipticCurveP, max_size: usize) -> HecFac
     HecFactorBase { entries, by_x }
 }
 
+/// Gaudry's reduced-base heuristic for a prime-field Jacobian:
+/// `p^{2/(g+1)}`, clamped to a practical materialisation budget.
+pub fn suggested_prime_factor_base_size(curve: &HyperellipticCurveP) -> usize {
+    let p = curve
+        .p
+        .to_u64_digits()
+        .iter()
+        .rev()
+        .fold(0f64, |acc, &d| acc * 2f64.powi(64) + d as f64);
+    let g = curve.genus.max(1) as f64;
+    let b = p.powf(2.0 / (g + 1.0)).ceil();
+    (b as usize).clamp(8, 1_000_000)
+}
+
+/// Build a random reduced factor base without enumerating `F_p`.
+///
+/// This is the path for moduli wider than one word and for the reduced-base
+/// regime on any modulus.  It samples `x` uniformly, keeps the liftable
+/// ones, and stops at `max_size` or a bounded sampling budget.  Duplicates
+/// are rejected by the `x` map, so the base is a set.
+pub fn build_factor_base_sampled(
+    curve: &HyperellipticCurveP,
+    max_size: usize,
+    seed: u64,
+) -> HecFactorBase {
+    let wanted = if max_size == usize::MAX {
+        suggested_prime_factor_base_size(curve)
+    } else {
+        max_size.max(1)
+    };
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x51ed_270b_9f31_c4a7);
+    let mut entries = Vec::with_capacity(wanted);
+    let mut by_x = HashMap::new();
+    let budget = wanted.saturating_mul(24).saturating_add(512);
+    for _ in 0..budget {
+        if entries.len() >= wanted {
+            break;
+        }
+        let x = rand_below(&mut rng, &curve.p);
+        let key = x.to_u32_digits();
+        if by_x.contains_key(&key) {
+            continue;
+        }
+        let y_sq = curve.f.eval(&x);
+        let Some(y) = sqrt_mod_p_counted(&y_sq, &curve.p) else {
+            continue;
+        };
+        let half = (&curve.p - BigUint::one()) >> 1;
+        let y = if y > half { &curve.p - &y } else { y };
+        let divisor = mumford_of_place(curve, &x, &y);
+        by_x.insert(key, entries.len());
+        entries.push(HecFactorBaseEntry { x, y, divisor });
+    }
+    HecFactorBase { entries, by_x }
+}
+
 /// `[P] − [∞]` in Mumford form: `(x − x_0, y_0)`.
 ///
 /// Unlike [`MumfordDivisorP::from_point`] this also accepts the
@@ -1616,7 +1672,14 @@ pub fn hec_index_calculus_dlp(
     let mut report = HecIndexCalculusReport::default();
     let fb = {
         let _phase = ops::enter(Phase::Precompute);
-        build_factor_base(curve, params.fb_size)
+        if curve.p.bits() > 20 {
+            // The full-base builder enumerates F_p.  Above a million
+            // elements that is not a materialisation step but a hang, so
+            // the reduced base is sampled instead.
+            build_factor_base_sampled(curve, params.fb_size, params.seed)
+        } else {
+            build_factor_base(curve, params.fb_size)
+        }
     };
     report.factor_base_size = fb.len();
     if fb.is_empty() {
@@ -1985,7 +2048,23 @@ pub fn prime_order_of(
 /// subgroup, index calculus pays for a factor base sized by the whole
 /// curve, so a tiny subgroup in a large Jacobian flatters rho for a
 /// reason that has nothing to do with either algorithm.
+pub fn hasse_interval_big(curve: &HyperellipticCurveP) -> (BigUint, BigUint) {
+    let root = curve.p.sqrt();
+    let one = BigUint::one();
+    let g = curve.genus.max(1);
+    let lo = if root > one {
+        (&root - &one).pow(2 * g)
+    } else {
+        one.clone()
+    };
+    let hi = (&root + &one).pow(2 * g);
+    (lo.max(one), hi)
+}
+
 pub fn hasse_interval(curve: &HyperellipticCurveP) -> Option<(u128, u128)> {
+    // The frozen hyperelliptic rows use the real square root approximation
+    // on a word-sized modulus; keep that semantics so instance selection
+    // does not move.  Wider moduli use `hasse_interval_big`.
     let g = curve.genus as i32;
     let p_f = curve.p.to_u64_digits().first().copied()? as f64;
     let root = p_f.sqrt();
@@ -1994,13 +2073,29 @@ pub fn hasse_interval(curve: &HyperellipticCurveP) -> Option<(u128, u128)> {
     Some((lo, hi))
 }
 
+fn big_to_u128(n: &BigUint) -> Option<u128> {
+    match n.to_u64_digits().as_slice() {
+        [] => Some(0),
+        [v] => Some(*v as u128),
+        [low, high] => Some(*low as u128 | ((*high as u128) << 64)),
+        _ => None,
+    }
+}
+
 pub fn divisor_order_bsgs(
     curve: &HyperellipticCurveP,
     d: &MumfordDivisorP,
     max_baby_steps: usize,
 ) -> Option<BigUint> {
-    let (lo, hi) = hasse_interval(curve)?;
-    let width = hi.saturating_sub(lo).max(1);
+    let (lo_big, hi_big) = if curve.p.bits() <= 64 {
+        let (lo, hi) = hasse_interval(curve)?;
+        (BigUint::from(lo), BigUint::from(hi))
+    } else {
+        hasse_interval_big(curve)
+    };
+    let width_big = &hi_big - &lo_big;
+    let width = big_to_u128(&width_big)?;
+    let width = width.max(1);
 
     let steps = (width as f64).sqrt().ceil() as usize + 1;
     if steps > max_baby_steps {
@@ -2018,17 +2113,17 @@ pub fn divisor_order_bsgs(
 
     // Giant steps: (lo + i·steps)·D.
     let stride = d.scalar_mul(&BigUint::from(steps as u64), curve);
-    let mut cur = d.scalar_mul(&BigUint::from(lo), curve);
-    let giant_max = (width as usize) / steps + 2;
+    let mut cur = d.scalar_mul(&lo_big, curve);
+    let giant_max = width as usize / steps + 2;
     for i in 0..=giant_max {
         if let Some(&j) = table.get(&divisor_key(&cur)) {
             // (lo + i·steps)·D = −j·D  ⟹  (lo + i·steps + j)·D = 0.
-            let m = BigUint::from(lo) + BigUint::from((i * steps + j) as u64);
+            let m = &lo_big + BigUint::from((i * steps + j) as u128);
             if m.is_zero() {
                 continue;
             }
             if !d.scalar_mul(&m, curve).is_identity() {
-                continue; // f64 interval arithmetic slipped; keep going
+                continue;
             }
             return Some(exact_order_from_multiple(curve, d, &m));
         }
@@ -2118,6 +2213,30 @@ mod tests {
             p.clone(),
         );
         HyperellipticCurveP::new(p, f, 2)
+    }
+
+    #[test]
+    fn sampled_factor_base_works_on_a_wide_prime() {
+        let p = (BigUint::one() << 64usize) + BigUint::from(13u32);
+        let f = FpPoly::from_coeffs(
+            vec![
+                BigUint::one(),
+                BigUint::one(),
+                BigUint::zero(),
+                BigUint::zero(),
+                BigUint::zero(),
+                BigUint::one(),
+            ],
+            p.clone(),
+        );
+        let curve = HyperellipticCurveP::try_new(p, f, 2).expect("wide prime curve");
+        let fb = build_factor_base_sampled(&curve, 4, 7);
+        assert_eq!(fb.len(), 4);
+        for entry in &fb.entries {
+            assert!(curve.is_on_curve(&entry.x, &entry.y));
+        }
+        let (lo, hi) = hasse_interval_big(&curve);
+        assert!(lo <= hi);
     }
 
     #[test]

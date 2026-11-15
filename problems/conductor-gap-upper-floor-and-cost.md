@@ -162,3 +162,21 @@ must preserve the archived inputs and producer provenance, use a native
 execution path for new research, and retain fresh construction, transport and
 matched endpoint receipts. The historical archive alone does not satisfy that
 condition or any performance-promotion gate.
+
+### Published large-prime comparison revisited, 2026-11-13
+
+The [source review and fixed-instance replay](../research/prime_conductor_gap80_20261031/record-search-20261113/README.md)
+recover the exact 263-bit K-571 conductor factor from Koblitz–Koblitz–Menezes,
+with a saved PARI ECPP certificate and changed-subject rejection control.
+This is arithmetic evidence for a published isogeny-class factor; an endpoint
+with conductor ratio exactly that prime, the explicit map, and paired timings
+are not supplied. PCC records are statements with verdict `not_covered`;
+independent review remains required. [pcc:unverified]
+
+Galbraith–Gilchrist–Robert's ascending recovery takes both curves as input.
+Its extra discriminant-divisor mechanism has only 1 and 7 available at our
+maximal discriminant -7 endpoint. The ordinary non-invertible ideal evaluation
+problem remains listed in *The Isogeny Problems*, Problem 5.2. These scoped
+source assessments do not establish infeasibility or complete the existing
+80-bit candidate. The next action remains complete quotient and non-kernel
+images, then the frozen matched endpoint protocol. [pcc:unverified]
