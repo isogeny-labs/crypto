@@ -32,3 +32,5 @@ The primary source is Galbraith chapter 26, <https://www.math.auckland.ac.nz/~sg
 General all-function divisor finiteness, translation pullback, Weil reciprocity, isogeny/Lang/Cartier/Jacobian, canonical Weil/Tate/MOV/Frey–Rück and full original fourteen-item completion remain open. The same host, prover and Mathlib are used; no new independent implementation or physical-host assurance, canonical corpus promotion or signed-standing claim is made. [pcc:unverified]
 
 Exact local **PCC-20261115-529612** replay PASS at 2026-11-15T06:52:24Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `0a8d9dff3cac788a9a04e632dd6719a01a98ee86` and local receipt `344a957c81c7dcd6e4ba4083ac5673514225837e` share tree `21aa83f876a3dc293997b59d88113944b1758c7b`. Anonymous fetch completed; fresh PR head/body/open/ready check matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
