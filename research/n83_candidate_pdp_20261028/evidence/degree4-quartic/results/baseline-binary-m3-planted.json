@@ -1,0 +1,769 @@
+{
+  "assignments_checked": 0,
+  "complete_v4_normal_forms": false,
+  "contains_one": false,
+  "exhaustive_affine_completion": null,
+  "independent_review": false,
+  "inherited_last_fall_lower_bound": 4,
+  "input_binding": {
+    "arm": "baseline-binary",
+    "complete_v3_rank": 36159,
+    "dataset": "baseline",
+    "directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/inputs/baseline-binary/binary-m3-planted",
+    "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+    "family": "binary",
+    "id": "binary-m3-planted",
+    "input_json_sha256": "e9619e308ad1b19155551c3a80fc1c9a6c49faaeb080bee68e500797fef4894a",
+    "key": "baseline-binary-m3-planted",
+    "parent_files": {
+      "basis.rows.u64le": {
+        "bytes": 3011772444,
+        "sha256": "ccd811d265a8dd71afc38139a5ac58b4f821a9787d054cb15d2a241809378ac2"
+      },
+      "closure_state.json": {
+        "bytes": 244,
+        "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+      },
+      "operations.jsonl": {
+        "bytes": 12758352,
+        "sha256": "54665f9c52ba907a52c658dac36cfd0296eae44cf81f57af8a76e2ec1da6688c"
+      },
+      "result.json": {
+        "bytes": 40000,
+        "sha256": "61a7ac12c5a882195daf35c795635d84f36a5e8d391b2cee14efac76e72ac3fa"
+      }
+    },
+    "parent_state": {
+      "complete": false,
+      "max_operations": 131072,
+      "max_rows": 32768,
+      "next_source": {
+        "parent": 13674,
+        "variable": 2
+      },
+      "pending_candidates": 3442,
+      "processed_candidates": 46416,
+      "rank": 32768,
+      "stop_reason": "row_cap"
+    },
+    "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/baseline-binary-m3-planted",
+    "propagation_case": {
+      "arm": "baseline-binary",
+      "complete_v3_rank": 36159,
+      "dataset": "baseline",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/inputs/baseline-binary/binary-m3-planted",
+      "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+      "family": "binary",
+      "id": "binary-m3-planted",
+      "input_json_sha256": "e9619e308ad1b19155551c3a80fc1c9a6c49faaeb080bee68e500797fef4894a",
+      "key": "baseline-binary-m3-planted",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "ccd811d265a8dd71afc38139a5ac58b4f821a9787d054cb15d2a241809378ac2"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 12758352,
+          "sha256": "54665f9c52ba907a52c658dac36cfd0296eae44cf81f57af8a76e2ec1da6688c"
+        },
+        "result.json": {
+          "bytes": 40000,
+          "sha256": "61a7ac12c5a882195daf35c795635d84f36a5e8d391b2cee14efac76e72ac3fa"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/baseline-binary-m3-planted",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "6f5722f6321af53577815545902424ef73b8bfeb808f9645be8bc46684302318"
+        },
+        "result.json": {
+          "bytes": 41111,
+          "sha256": "9460ac8e55bf393f5197c4c7b122bb9450f844a573dc6fd7ccaee503e73d01e3"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5549233,
+          "sha256": "b7fd8101a96d973fa0c5a6ede5ac61e116591e26271f9ffefa26eb9ae2f19889"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 311673636,
+          "sha256": "df11288a00e138546f171a39dfed5efc4b0a72a79e1dce66642cc1c8631d768b"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/baseline-binary-m3-planted",
+      "system_sha256": "f6261f88dba5334afba16b1871dc58875bebbb77d89999a654b21fc8211d4abf",
+      "target_kind": "planted",
+      "v2": {
+        "operations_sha256": "0a1a6afcd3ccdeb698bb40ae0dccf0371099d95cf16d72f9cf75d1ef9543c560",
+        "result_sha256": "b73944055778003fd9f5baefb541fc8993c9ea95ad678693234026752c46cb31",
+        "rows_sha256": "b8af172df76259ebb6424987b79fd75cfde566cdd213ba7dd71bbf9f16640e82"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/v2/baseline-binary/binary-m3-planted",
+      "witness_case": {
+        "arm": "baseline-binary",
+        "complete_v3_rank": 36159,
+        "dataset": "baseline",
+        "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/baseline-binary/binary-m3-planted",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "family": "binary",
+        "id": "binary-m3-planted",
+        "input_json_sha256": "e9619e308ad1b19155551c3a80fc1c9a6c49faaeb080bee68e500797fef4894a",
+        "key": "baseline-binary-m3-planted",
+        "parent_files": {
+          "basis.rows.u64le": {
+            "bytes": 3011772444,
+            "sha256": "ccd811d265a8dd71afc38139a5ac58b4f821a9787d054cb15d2a241809378ac2"
+          },
+          "closure_state.json": {
+            "bytes": 244,
+            "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+          },
+          "operations.jsonl": {
+            "bytes": 12758352,
+            "sha256": "54665f9c52ba907a52c658dac36cfd0296eae44cf81f57af8a76e2ec1da6688c"
+          },
+          "result.json": {
+            "bytes": 40000,
+            "sha256": "61a7ac12c5a882195daf35c795635d84f36a5e8d391b2cee14efac76e72ac3fa"
+          }
+        },
+        "parent_state": {
+          "complete": false,
+          "max_operations": 131072,
+          "max_rows": 32768,
+          "next_source": {
+            "parent": 13674,
+            "variable": 2
+          },
+          "pending_candidates": 3442,
+          "processed_candidates": 46416,
+          "rank": 32768,
+          "stop_reason": "row_cap"
+        },
+        "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/baseline-binary-m3-planted",
+        "suffix_files": {
+          "closure_state.json": {
+            "bytes": 208,
+            "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+          },
+          "continuation.json": {
+            "bytes": 981,
+            "sha256": "6f5722f6321af53577815545902424ef73b8bfeb808f9645be8bc46684302318"
+          },
+          "result.json": {
+            "bytes": 41111,
+            "sha256": "9460ac8e55bf393f5197c4c7b122bb9450f844a573dc6fd7ccaee503e73d01e3"
+          },
+          "suffix.operations.jsonl": {
+            "bytes": 5549233,
+            "sha256": "b7fd8101a96d973fa0c5a6ede5ac61e116591e26271f9ffefa26eb9ae2f19889"
+          },
+          "suffix.rows.u64le": {
+            "bytes": 311673636,
+            "sha256": "df11288a00e138546f171a39dfed5efc4b0a72a79e1dce66642cc1c8631d768b"
+          }
+        },
+        "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/baseline-binary-m3-planted",
+        "system_sha256": "f6261f88dba5334afba16b1871dc58875bebbb77d89999a654b21fc8211d4abf",
+        "target_kind": "planted",
+        "v2": {
+          "operations_sha256": "0a1a6afcd3ccdeb698bb40ae0dccf0371099d95cf16d72f9cf75d1ef9543c560",
+          "result_sha256": "b73944055778003fd9f5baefb541fc8993c9ea95ad678693234026752c46cb31",
+          "rows_sha256": "b8af172df76259ebb6424987b79fd75cfde566cdd213ba7dd71bbf9f16640e82"
+        },
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/baseline-binary/binary-m3-planted"
+      },
+      "witness_files": {
+        "U.normal.fieldpoly": {
+          "bytes": 5697139,
+          "sha256": "e538d3cb4099b71870e657728304b8a9c6e260110443dd7989dce7896aefb8ae"
+        },
+        "U.ordinary.fieldpoly": {
+          "bytes": 7235545,
+          "sha256": "750ea1e941cc0543ff7481cc1018d74a6975bd387852f58f5e5d66cc703b1333"
+        },
+        "X0.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "6a69aa91b1eaed817ab7fec6cbcdb5e38c244679bf5a4d115a339febf070fa6b"
+        },
+        "X0.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "7cdf51b4e28944ae3ce8f5d92436da63d31c9203f37a63e6ebff902a8d7f886e"
+        },
+        "X1.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "f1eaddcf958d39ee48bf0975e515c26c435485249900711d4a55d07e34cfbe90"
+        },
+        "X1.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "6e226bdf283899d5bb068bad9dc4840aa4adf3c6d53366086a834513512084f2"
+        },
+        "candidates.jsonl": {
+          "bytes": 95557,
+          "sha256": "460d1282ce1414fea99e141ab241cdf705fe11858a767bc27c43e2498fde660b"
+        },
+        "candidates.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "33c8773ad963db86418f226a184f95156a90f2acd76191e33db004bd2671bee8"
+        },
+        "family.json": {
+          "bytes": 13368,
+          "sha256": "34168dceed5c19c9d291fd3ab03e3346f18e27c899af5888d72aff4b693c15f7"
+        },
+        "partial-083.json": {
+          "bytes": 91,
+          "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+        },
+        "partial-166.json": {
+          "bytes": 93,
+          "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+        },
+        "partial-249.json": {
+          "bytes": 93,
+          "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+        },
+        "remainders.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "ca999f89921c75391f8e1d5516ff7761103c6e952639ace30cae046c59b4d560"
+        },
+        "result.json": {
+          "bytes": 21064,
+          "sha256": "2571bb2e74b0c3adb04859c80062bcb8b28167be86e5f6e254b0f0a8a0ddf4cc"
+        },
+        "source.fieldpoly": {
+          "bytes": 1501129,
+          "sha256": "29f2d785a8eb4a51e2456e7c535cf3695ab7f0a61b38132bbf32fafda1a34be5"
+        }
+      },
+      "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/baseline-binary-m3-planted"
+    },
+    "propagation_files": {
+      "added.rows.u64le": {
+        "bytes": 22886132,
+        "sha256": "1a3951cb512adabc20fbecbf2c90c16e0ad414132c1972827cf13b7f8d9f4735"
+      },
+      "affine.json": {
+        "bytes": 1629,
+        "sha256": "13775189aef5a6e0888a7036ccea4049b60fc88807b57b3382c770a9bdc7bd87"
+      },
+      "operations.jsonl": {
+        "bytes": 113608,
+        "sha256": "e4d63bcb27b600635fb409e3a55f6fc7cdfe180e601ebc0140787d6121939f8b"
+      },
+      "pending.json": {
+        "bytes": 3,
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "progress.jsonl": {
+        "bytes": 470,
+        "sha256": "b66c3c38818319cc2b0a2a6fe400362ebd14c2ccd866d46bfbd4c17729233b8a"
+      },
+      "propagation.json": {
+        "bytes": 1045,
+        "sha256": "503262f3593a4e50e81331b580d76b471e2d128ae2b131cf2d695114e800cd09"
+      },
+      "result.json": {
+        "bytes": 9710,
+        "sha256": "9f7eb56d7848552fd894ea17cbd02eb29a6928c7a5081ca89db6171cd94de83e"
+      },
+      "state.json": {
+        "bytes": 453,
+        "sha256": "2613d59c8efc4355fad3e6db1f7ef74d0dd62e749951e2a7ff0849d56c1decad"
+      }
+    },
+    "propagationdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/cases/baseline-binary-m3-planted",
+    "suffix_files": {
+      "closure_state.json": {
+        "bytes": 208,
+        "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+      },
+      "continuation.json": {
+        "bytes": 981,
+        "sha256": "6f5722f6321af53577815545902424ef73b8bfeb808f9645be8bc46684302318"
+      },
+      "result.json": {
+        "bytes": 41111,
+        "sha256": "9460ac8e55bf393f5197c4c7b122bb9450f844a573dc6fd7ccaee503e73d01e3"
+      },
+      "suffix.operations.jsonl": {
+        "bytes": 5549233,
+        "sha256": "b7fd8101a96d973fa0c5a6ede5ac61e116591e26271f9ffefa26eb9ae2f19889"
+      },
+      "suffix.rows.u64le": {
+        "bytes": 311673636,
+        "sha256": "df11288a00e138546f171a39dfed5efc4b0a72a79e1dce66642cc1c8631d768b"
+      }
+    },
+    "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/baseline-binary-m3-planted",
+    "system_sha256": "f6261f88dba5334afba16b1871dc58875bebbb77d89999a654b21fc8211d4abf",
+    "target_kind": "planted",
+    "v2": {
+      "operations_sha256": "0a1a6afcd3ccdeb698bb40ae0dccf0371099d95cf16d72f9cf75d1ef9543c560",
+      "result_sha256": "b73944055778003fd9f5baefb541fc8993c9ea95ad678693234026752c46cb31",
+      "rows_sha256": "b8af172df76259ebb6424987b79fd75cfde566cdd213ba7dd71bbf9f16640e82"
+    },
+    "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/v2/baseline-binary/binary-m3-planted",
+    "witness_case": {
+      "arm": "baseline-binary",
+      "complete_v3_rank": 36159,
+      "dataset": "baseline",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/baseline-binary/binary-m3-planted",
+      "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+      "family": "binary",
+      "id": "binary-m3-planted",
+      "input_json_sha256": "e9619e308ad1b19155551c3a80fc1c9a6c49faaeb080bee68e500797fef4894a",
+      "key": "baseline-binary-m3-planted",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "ccd811d265a8dd71afc38139a5ac58b4f821a9787d054cb15d2a241809378ac2"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 12758352,
+          "sha256": "54665f9c52ba907a52c658dac36cfd0296eae44cf81f57af8a76e2ec1da6688c"
+        },
+        "result.json": {
+          "bytes": 40000,
+          "sha256": "61a7ac12c5a882195daf35c795635d84f36a5e8d391b2cee14efac76e72ac3fa"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/baseline-binary-m3-planted",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "6f5722f6321af53577815545902424ef73b8bfeb808f9645be8bc46684302318"
+        },
+        "result.json": {
+          "bytes": 41111,
+          "sha256": "9460ac8e55bf393f5197c4c7b122bb9450f844a573dc6fd7ccaee503e73d01e3"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5549233,
+          "sha256": "b7fd8101a96d973fa0c5a6ede5ac61e116591e26271f9ffefa26eb9ae2f19889"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 311673636,
+          "sha256": "df11288a00e138546f171a39dfed5efc4b0a72a79e1dce66642cc1c8631d768b"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/baseline-binary-m3-planted",
+      "system_sha256": "f6261f88dba5334afba16b1871dc58875bebbb77d89999a654b21fc8211d4abf",
+      "target_kind": "planted",
+      "v2": {
+        "operations_sha256": "0a1a6afcd3ccdeb698bb40ae0dccf0371099d95cf16d72f9cf75d1ef9543c560",
+        "result_sha256": "b73944055778003fd9f5baefb541fc8993c9ea95ad678693234026752c46cb31",
+        "rows_sha256": "b8af172df76259ebb6424987b79fd75cfde566cdd213ba7dd71bbf9f16640e82"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/baseline-binary/binary-m3-planted"
+    },
+    "witness_files": {
+      "U.normal.fieldpoly": {
+        "bytes": 5697139,
+        "sha256": "e538d3cb4099b71870e657728304b8a9c6e260110443dd7989dce7896aefb8ae"
+      },
+      "U.ordinary.fieldpoly": {
+        "bytes": 7235545,
+        "sha256": "750ea1e941cc0543ff7481cc1018d74a6975bd387852f58f5e5d66cc703b1333"
+      },
+      "X0.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "6a69aa91b1eaed817ab7fec6cbcdb5e38c244679bf5a4d115a339febf070fa6b"
+      },
+      "X0.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "7cdf51b4e28944ae3ce8f5d92436da63d31c9203f37a63e6ebff902a8d7f886e"
+      },
+      "X1.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "f1eaddcf958d39ee48bf0975e515c26c435485249900711d4a55d07e34cfbe90"
+      },
+      "X1.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "6e226bdf283899d5bb068bad9dc4840aa4adf3c6d53366086a834513512084f2"
+      },
+      "candidates.jsonl": {
+        "bytes": 95557,
+        "sha256": "460d1282ce1414fea99e141ab241cdf705fe11858a767bc27c43e2498fde660b"
+      },
+      "candidates.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "33c8773ad963db86418f226a184f95156a90f2acd76191e33db004bd2671bee8"
+      },
+      "family.json": {
+        "bytes": 13368,
+        "sha256": "34168dceed5c19c9d291fd3ab03e3346f18e27c899af5888d72aff4b693c15f7"
+      },
+      "partial-083.json": {
+        "bytes": 91,
+        "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+      },
+      "partial-166.json": {
+        "bytes": 93,
+        "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+      },
+      "partial-249.json": {
+        "bytes": 93,
+        "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+      },
+      "remainders.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "ca999f89921c75391f8e1d5516ff7761103c6e952639ace30cae046c59b4d560"
+      },
+      "result.json": {
+        "bytes": 21064,
+        "sha256": "2571bb2e74b0c3adb04859c80062bcb8b28167be86e5f6e254b0f0a8a0ddf4cc"
+      },
+      "source.fieldpoly": {
+        "bytes": 1501129,
+        "sha256": "29f2d785a8eb4a51e2456e7c535cf3695ab7f0a61b38132bbf32fafda1a34be5"
+      }
+    },
+    "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/baseline-binary-m3-planted"
+  },
+  "key": "baseline-binary-m3-planted",
+  "last_fall_degree": null,
+  "last_fall_lower_bound": 4,
+  "last_fall_upper_bound": null,
+  "linear_rank": 1,
+  "membership_degree_bound": 4,
+  "propagation_parent_result_sha256": "9f7eb56d7848552fd894ea17cbd02eb29a6928c7a5081ca89db6171cd94de83e",
+  "schema": "n83.degree-four-quartic/v1",
+  "state": {
+    "added_rows": 4302,
+    "added_rows_by_degree": [
+      0,
+      0,
+      0,
+      0,
+      4302
+    ],
+    "attempted_products": 4303,
+    "blocked_candidate": {
+      "quartic_nonzeros": 544793,
+      "record_bytes": 2271100,
+      "reduction_complete": true,
+      "remainder_sha256": "fd357579b8572d72b357738677b36b62e291943aa86f7e35ef1cb18af1443132",
+      "source_kind": "initial_added",
+      "source_row": 36228,
+      "stop_reason": "basis_payload_cap",
+      "variable": 17,
+      "xor_basis_rows": [
+        37920,
+        37173,
+        36924,
+        36457,
+        36671,
+        36422,
+        37914,
+        37167,
+        36918,
+        36669,
+        36420,
+        36667,
+        36418,
+        37932,
+        37185,
+        36936,
+        36444,
+        36942,
+        36707,
+        36959,
+        36710,
+        37938,
+        37726,
+        36730,
+        36977,
+        36728,
+        37224,
+        36975,
+        36477,
+        37455,
+        37206,
+        36956,
+        36706,
+        36471,
+        36455,
+        36961,
+        36712,
+        40671,
+        38434,
+        36960,
+        36711,
+        40669,
+        38677,
+        38455,
+        38206,
+        37970,
+        37721,
+        36725,
+        40676,
+        38436,
+        38218,
+        37720,
+        37222,
+        36727,
+        40706,
+        38216,
+        37967,
+        37220,
+        36971,
+        40705,
+        38215,
+        37966,
+        36721,
+        36472,
+        40704,
+        37218,
+        40454,
+        40205,
+        39956,
+        39707,
+        38960,
+        38711,
+        38462,
+        37964,
+        37217,
+        36968,
+        40407,
+        40204,
+        39955,
+        39706,
+        39457,
+        39208,
+        38710,
+        38461,
+        38212,
+        37714,
+        37216,
+        36718,
+        40156,
+        39456,
+        39207,
+        38958,
+        37713,
+        37464,
+        36468,
+        39905,
+        39704,
+        39206,
+        38957,
+        38708,
+        38459,
+        38210,
+        37961,
+        37712,
+        36716,
+        39654,
+        39454,
+        38707,
+        38458,
+        38209,
+        37960,
+        37711,
+        36964,
+        36715,
+        38472,
+        38223,
+        37725,
+        37476,
+        37227,
+        36483,
+        39155,
+        37958,
+        37460,
+        37211,
+        36962,
+        36464,
+        38704,
+        38221,
+        37723,
+        37225,
+        36486,
+        38454,
+        37971,
+        37722,
+        37473,
+        37231,
+        36733,
+        38453,
+        37724,
+        37478,
+        36980,
+        36731,
+        36482,
+        37727,
+        37483,
+        37234,
+        36736,
+        37953,
+        37232,
+        36734,
+        37454,
+        36981,
+        37057,
+        37700,
+        37203,
+        36953,
+        36808,
+        36454,
+        37040,
+        36791,
+        36542,
+        40703,
+        40652,
+        40648,
+        40677,
+        40696,
+        40695,
+        40694,
+        40693,
+        40691,
+        40689,
+        40651,
+        40453,
+        40399,
+        40400,
+        40447,
+        40445,
+        40444,
+        40410,
+        40402,
+        40154,
+        40152,
+        40151,
+        40197,
+        40192,
+        40191,
+        40153,
+        40159,
+        39901,
+        39902,
+        39949,
+        39947,
+        39941,
+        39703,
+        39681,
+        39696,
+        39695,
+        39694,
+        39657,
+        39404,
+        39432,
+        39449,
+        39447,
+        39446,
+        39203,
+        39183,
+        39201,
+        39199,
+        39197,
+        39196,
+        39181,
+        39433,
+        38951,
+        38950,
+        38949,
+        38948,
+        38946,
+        38945,
+        38717,
+        38701,
+        38698,
+        38967,
+        38469,
+        38452,
+        38450,
+        38448,
+        38721,
+        38475,
+        38200,
+        38198,
+        37975,
+        37977,
+        38225,
+        37976,
+        37728,
+        37702,
+        38196,
+        37981,
+        37554,
+        37451,
+        37730,
+        37305,
+        37450,
+        37482,
+        37233,
+        36951,
+        36452,
+        40702,
+        40657,
+        40675,
+        40678,
+        40708
+      ]
+    },
+    "complete_v3_rows": 36159,
+    "complete_v4_normal_forms": false,
+    "completed_products": 4302,
+    "initial_rows": 36408,
+    "max_new_basis_payload_bytes": 2147483648,
+    "max_new_rows": 16384,
+    "max_product_attempts": 131072,
+    "max_quartic_nonzeros": 1048576,
+    "new_basis_payload_bytes": 2145966168,
+    "next_source": [
+      36228,
+      17,
+      "initial_added"
+    ],
+    "peak_quartic_nonzeros": 739766,
+    "pending_products": 5916918,
+    "rank": 40710,
+    "stop_reason": "basis_payload_cap",
+    "zero_remainders": 0
+  },
+  "upper_bound_argument": "No global upper certificate. Neither complete V4 nor a cap implies a global upper or lower5.",
+  "working_degree": 4
+}

@@ -1,0 +1,15 @@
+digraph repair {
+ graph [rankdir=TB,bgcolor="white",pad="0.15",ranksep="0.28",nodesep="0.18"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=11,margin="0.14,0.09"];
+ edge [fontname="Helvetica",fontsize=10,color="#526273"];
+ public [label="Actual public curve branches\nz(x)²=f(x), cubic degree window"];
+ line [label="Singular public Hankel matrix\nKernel is one scalar line; corank exactly1",fillcolor="#e9f5ee"];
+ higher [label="Higher-corank destination\nexcluded in this stated family",fillcolor="#ffe9e5"];
+ continuous [label="Continuous field correction\ncan make determinant zero"];
+ curve [label="Must also satisfy point equation\nDelta=0 or Delta=-2z"];
+ off [label="Frozen F17 control:4 off-curve repairs\nRank1 passes; full norm fails",fillcolor="#ffe9e5"];
+ valid [label="1 valid repair restores known fixture\nGeneral discrete search remains open",fillcolor="#fff2da"];
+ public -> line; line -> higher;
+ public -> continuous; continuous -> curve;
+ curve -> off; curve -> valid;
+}

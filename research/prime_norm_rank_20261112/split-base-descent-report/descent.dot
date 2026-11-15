@@ -1,0 +1,14 @@
+digraph descent {
+  graph [rankdir=TB, bgcolor="white", ranksep=0.3];
+  node [shape=box,style="rounded,filled",fillcolor="#edf4ff",color="#355f85",fontname="Helvetica",fontsize=12];
+  edge [color="#355f85",fontname="Helvetica",fontsize=10];
+  base [label="Public rational-point base\nFixed abscissas AND fixed square roots"];
+  norm [label="Actual monic norm N = A^2 - f B^2\nN divides the public nodal product"];
+  support [label="Derive successful support S from N\nSplit, separable, |S| = 2a\nPCC-20261114-20a4bc (unsigned)",fillcolor="#e7f3e7"];
+  cross [label="Derive either sign at each selected node\nLow-degree cross product vanishes"];
+  fixed [label="Same norm + monic normalization\nA and B fixed by endomorphism\nPCC-20261114-8c21e7 (unsigned)",fillcolor="#e7f3e7"];
+  prime [label="Frobenius fixed coefficients lie in prime subfield\nActual core: PCC-20261114-5d35b3 (unsigned)",fillcolor="#e7f3e7"];
+  next [label="Open: coverage, public finder, full closure\nExtraction and complete expected bit cost",fillcolor="#fff2d7",color="#ad7a20"];
+  base -> norm -> support -> cross -> fixed -> prime;
+  prime -> next [style=dashed,color="#ad7a20",label="no solver-cost inference"];
+}

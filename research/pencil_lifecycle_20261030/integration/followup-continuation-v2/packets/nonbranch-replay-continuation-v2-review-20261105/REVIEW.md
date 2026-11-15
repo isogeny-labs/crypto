@@ -1,0 +1,13 @@
+# V2 prospective operational source review
+
+Disposition: source adequate for the proposed bounded attempt. Exact published revision 7ff045f7d0957dfe0ae27f2f31297509ada53c91; freeze 8a4966a5579fc01f739dd727a9c8c6248caf4f5ef497897bac7279f7ce4edba9. Independent inspection followed the immutable preread plan; producer implemented changes after the original findings, so this is not blind design. No execution or new mathematical/kernel claim.
+
+R1 is addressed: receipt read, JSON decoding and status validation are guarded. Malformed, null, wrong-shape, missing-file and missing-status receipts produce a failed row. The outer loop proceeds from failed compiler to post only if terminal ownership is confirmed and remaining allowance permits. Unconfirmed termination blocks overlap. Errors writing durable records or insufficient remaining budget still make custody incomplete, never passed.
+
+R2 is addressed at source scope: the client wait ends twelve seconds before phase end; service RuntimeMax is fifteen seconds below the ceiling, stop grace is explicitly five seconds, and GNU timeout sends TERM twenty seconds before ceiling with five-second kill grace. Queries and stop requests are bounded. Captured InvocationID must agree before cleanup and during reconciliation; terminal state and empty/released cgroup are required before advancing. Reaping the client does not itself certify service termination.
+
+Every frozen file hash and exact published Git object matched. Four Lean texts, thirty names, runtime bindings and closure/baseline/root metadata remain identical. Native replay differs solely in workspace identity. Full fresh pre/post dictionaries, all axiom and negative controls remain. The six producer mock cases were source-inspected, not independently run; they exercise receipt failures and ownership gates but do not qualify live systemd or actual blocked-I/O behavior.
+
+Remaining operational assumptions: local filesystem reads/fsync/cgroup walks are not hard realtime primitives; uninterruptible I/O cannot be guaranteed terminated. An unknown owner must stop overlap and require reconciliation. Invocation check then stop is not an atomic compare-and-stop API; unique unit names require exclusive ownership. These are explicit runtime custody dependencies, not claims of machine evidence from this source review.
+
+Preserve the earlier failed pre and its 300-second charge. Campaign remains 46,800 seconds, with 46,500 before this attempt, ceiling 2,400 seconds, one CPU, 8 GiB, no retries and deadline 2026-11-06 04:00 UTC. Dollar-facts waiver changes no other limit. Parent must publish review and admit the attempt; actual three-phase receipts determine passage.

@@ -16,6 +16,8 @@ fn main() {
         r: 7,
         cofactor: 1,
         generator: (0, 1),
+
+        representation: None,
     };
     let mut ops = GroupOps::default();
     let generator = inst.generator_point();

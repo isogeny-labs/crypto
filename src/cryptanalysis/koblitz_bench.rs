@@ -1845,6 +1845,12 @@ pub fn sparse_closure_refutes(
         max_weight: 0,
     };
     let mut queue: Vec<Vec<Mask>> = Vec::new();
+    // `DREG_SPARSE_PROGRESS=1`: one stderr line every 2^20 inserts (rows
+    // offered, stored rank, falls, queue length, stored entries), so a long
+    // run can be projected.  Off by default; it changes nothing else.
+    let progress = std::env::var_os("DREG_SPARSE_PROGRESS").is_some();
+    let started = std::time::Instant::now();
+    let mut offered = 0u64;
 
     // Insert one row; a new fall goes on the queue.  `false` on the cap.
     let mut insert = |mut row: Vec<Mask>,
@@ -1852,6 +1858,19 @@ pub fn sparse_closure_refutes(
                       queue: &mut Vec<Vec<Mask>>,
                       out: &mut SparseClosure|
      -> bool {
+        offered += 1;
+        if progress && offered.is_multiple_of(1 << 20) {
+            eprintln!(
+                "sparse closure: {:.0}s offered {} rank {} falls {} queue {} entries {} products {}",
+                started.elapsed().as_secs_f64(),
+                offered,
+                out.rank,
+                out.falls,
+                queue.len(),
+                entries,
+                out.products
+            );
+        }
         row.sort_unstable_by(cmp);
         // Boolean products can repeat a monomial; equal pairs cancel.
         let mut dedup: Vec<Mask> = Vec::with_capacity(row.len());

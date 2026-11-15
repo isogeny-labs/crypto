@@ -1,0 +1,11 @@
+digraph setup {
+ graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.2",ranksep="0.34"];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=10,fillcolor="#eaf2f8",color="#557087",margin="0.12"];
+ edge [color="#557087",arrowsize=0.7];
+ {rank=same; sample [label="Draw a,x0; reject singular\n2 rational-halving choices"]; subgroup [label="Check exact order eight\nsample trace-good G"]; base [label="Actual eight-root fibre\npublic three-base filter"];}
+ {rank=same; oracle [label="Point-only norm queries\noriginal/witness checks",fillcolor="#e5f3e9"]; rows [label="Four signed relations\nkernel over scalar F13",fillcolor="#e5f3e9"]; answer [label="Scalar 11\nOpenSSL replay",fillcolor="#e5f3e9"];}
+ sample -> subgroup -> base -> oracle -> rows -> answer;
+ reference [label="Separate OpenSSL reference\n14,754 complete doubling fibres\nfull setup-decision replay",fillcolor="#f1edf9"];
+ reference -> sample [style=dashed];
+ reference -> answer [style=dashed];
+}

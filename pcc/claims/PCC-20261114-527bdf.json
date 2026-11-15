@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T06:18:06Z",
+ "id": "PCC-20261114-527bdf",
+ "kind": "theorem",
+ "producer": {
+  "commit": "740732e95389e5185ed9a6547c18d8d889a6c580",
+  "model": "",
+  "session": "norm-weighted-count-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "40043ddd7e9ba0a2e1299613a1787258d19128d9afe129ff35f717b3ce0c2d27",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormWeightedCount.consecutive_sum_bound"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Positive natural weights for completeness and radix bounds; all exponent vectors counted via explicit finite box and degree filter; exact slack multiset injection and mixed-radix encoding. Consecutive weights include zero variables and zero budget. No actual growing norm input grading, closure cutoff, finder, asymptotic specialization or total expected bit-cost theorem. Unsigned; independent gate and fresh replay pending at creation.",
+ "statement": "Exact finite combinatorial declaration NormWeightedCount.consecutive_sum_bound: theorem consecutive_sum_bound (v : \u2115) : (\u2211 i : Fin v, (i.val+1)) \u2264 v^2"
+}

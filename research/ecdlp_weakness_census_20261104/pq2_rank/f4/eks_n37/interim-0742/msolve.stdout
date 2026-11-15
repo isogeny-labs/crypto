@@ -1,0 +1,25 @@
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  2      32      52      37 x 400        50.17%       32 new       0 zero         0.00 | 0.00         
+  2       2     382      85 x 594        12.81%        1 new       1 zero         0.00 | 0.00         
+  3     399     399    2895 x 9110        0.97%      380 new      19 zero         0.12 | 0.18         
+  3     601    3211    4607 x 10344       2.94%      601 new       0 zero         0.48 | 0.79         
+  4   14845   14845   83256 x 102267      1.05%     6585 new    8260 zero       196.70 | 557.23       
+  4   17858   99793   90520 x 95887       2.07%     5463 new   12395 zero       359.81 | 966.20       
+  4    4884  227933   64505 x 76431       3.24%     3404 new    1812 zero       229.17 | 457.08       
+  4    5180  301368   82992 x 91251       2.73%     3404 new    1807 zero       292.29 | 537.47       
+  5  416918  416918 1016044 x 610665      0.77%

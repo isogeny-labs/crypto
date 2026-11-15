@@ -1,0 +1,883 @@
+{
+  "abstract_factors": [
+    {
+      "curve_model": null,
+      "dimension": "3",
+      "id": "A3"
+    },
+    {
+      "curve_model": null,
+      "dimension": "2",
+      "id": "Prym(D3/E)"
+    },
+    {
+      "curve_model": null,
+      "dimension": "3",
+      "id": "Prym(D4/E)"
+    },
+    {
+      "curve_model": null,
+      "dimension": "4",
+      "id": "Prym(D5/E)"
+    }
+  ],
+  "companion_curves": [
+    {
+      "P256_embedding": "not_established",
+      "equation": "v^2=u^3-3u^2+b^2",
+      "genus": "1",
+      "geometry": "elliptic",
+      "id": "F2",
+      "origin": "quotient of C2: (u,v)=(b/t^2,b*z/t^3)"
+    },
+    {
+      "P256_embedding": "excluded over Fp by point-order parity: F3 has rational two-torsion and E has odd order",
+      "equation": "v^2=u^3+b*u^2+u",
+      "genus": "1",
+      "geometry": "elliptic",
+      "id": "F3",
+      "origin": "quotient of C3: (u,v)=(t^3,t*z)"
+    },
+    {
+      "P256_embedding": "not_established; the standard C5 image has zero projection to this complementary factor",
+      "equation": "v^2=u^7-3u^3+b*u",
+      "genus": "3",
+      "geometry": "hyperelliptic",
+      "id": "H5",
+      "origin": "quotient of C5: (u,v)=(t^2,t*z)",
+      "smith_audit": {
+        "all_pair_partitions_checked": 105,
+        "b": "41058363725152142129326129780047268409114441015993725554835256314039467401291",
+        "extension_degree_used": 6,
+        "factor_degrees_affine": [
+          1,
+          6
+        ],
+        "field_prime": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+        "frobenius_permutation": [
+          0,
+          1,
+          3,
+          4,
+          5,
+          6,
+          7,
+          2
+        ],
+        "model": "H5",
+        "stable_all_lagrangians": 1,
+        "stable_non_pair_lagrangians": 0,
+        "stable_pair_partitions": 1,
+        "standing": "producer exact prerequisite check; no signed verdict; no Smith codomain constructed",
+        "subgroups": [
+          {
+            "candidate_maps": [
+              {
+                "basepoint_at_infinity": false,
+                "denominator_binary_cubic_desc": [
+                  "0",
+                  "0",
+                  "1",
+                  "0"
+                ],
+                "gcd_degree": 1,
+                "genuine_degree_three": false,
+                "numerator_binary_cubic_desc": [
+                  "1",
+                  "0",
+                  "0",
+                  "0"
+                ],
+                "prop4_status": "not_reached_degree_drop",
+                "uncancelled_pair_conditions": true
+              },
+              {
+                "basepoint_at_infinity": true,
+                "denominator_binary_cubic_desc": [
+                  "0",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "gcd_degree": 0,
+                "genuine_degree_three": false,
+                "numerator_binary_cubic_desc": [
+                  "0",
+                  "1",
+                  "0",
+                  "0"
+                ],
+                "prop4_status": "not_reached_degree_drop",
+                "uncancelled_pair_conditions": true
+              }
+            ],
+            "discriminant_squareclass": 1,
+            "matching": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                5
+              ],
+              [
+                3,
+                6
+              ],
+              [
+                4,
+                7
+              ]
+            ],
+            "matrix_rank": 4,
+            "status": "degree_drop",
+            "valid_degree_three_maps": 0
+          }
+        ],
+        "weierstrass_cycle_type": [
+          1,
+          1,
+          6
+        ]
+      }
+    }
+  ],
+  "direct_covers": [
+    {
+      "base_field": {
+        "absolute_degree": "1",
+        "characteristic": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+        "constant_field_verified": null
+      },
+      "evidence": {
+        "claim_id": null,
+        "scope": "Mathematical geometry and transfer traits, with producer checks as marked. Solver checks are toy known-answer images only; no P-256 DLP run. General norm is unimplemented even where image decoding exists.",
+        "sources": [
+          "FRAMEWORK.md",
+          "results/smith-p256.json",
+          "../results/native-p256.json"
+        ],
+        "standing": "producer_assertion"
+      },
+      "id": "C2",
+      "object_kind": "finite_cover",
+      "representation": {
+        "equivalence": "isomorphism_over_fixed_E",
+        "quadratic_squareclass": "X",
+        "rational_map": "(t^2,z)"
+      },
+      "schema": "p256-cover-traits/v1",
+      "source": {
+        "equation": "z^2=f(t^2)",
+        "genus": "2",
+        "geometry": "hyperelliptic",
+        "normalization_required": true,
+        "rational_infinity_points": "2"
+      },
+      "target": "E: Y^2=X^3-3X+b (standard P-256)",
+      "traits": {
+        "degree": {
+          "inseparable_exponent": "0",
+          "separable": "2",
+          "total": "2"
+        },
+        "full_automorphism_group": null,
+        "galois": {
+          "arithmetic_monodromy": "C2",
+          "geometric": true,
+          "known_base_deck_group": "C2",
+          "known_geometric_deck_group": "C2",
+          "over_base": true
+        },
+        "gonality": {
+          "geometric_exact": "2"
+        },
+        "implementation": {
+          "arithmetic": "not_implemented",
+          "geometry": "implemented_producer_checked",
+          "norm": "not_implemented",
+          "pullback": "not_implemented",
+          "solver": "not_implemented"
+        },
+        "jacobian": {
+          "dimension": "2",
+          "exact_point_order": null,
+          "frobenius_polynomial": null,
+          "known_isogeny_factors": [
+            "E",
+            "F2"
+          ],
+          "p_rank": {
+            "exact": null,
+            "lower_bound": "1",
+            "upper_bound": "2"
+          },
+          "polarization": "The Jacobian is principally polarized; displayed factorization is only up to isogeny."
+        },
+        "known_automorphisms": [
+          "(t,z)->(-t,z)",
+          "(t,z)->(t,-z)"
+        ],
+        "ramification": {
+          "different_degree": "2",
+          "geometric_branch_points": "2",
+          "inertia_and_jumps": [
+            {
+              "geometric_points": "2",
+              "index": "2"
+            }
+          ],
+          "type": "tame"
+        },
+        "smith": {
+          "input_gate": "wrong_genus",
+          "obligation": "The standard forward Smith construction requires a genus-3 hyperelliptic input.",
+          "status": "not_applicable"
+        },
+        "transfer": {
+          "degree_coprime": true,
+          "inverse_on_image": "[d^-1 mod n] times the norm; for C3/C4 explicit coefficient decoding is implemented",
+          "kernel_intersection": "trivial by degree coprimality",
+          "map_kind": "cover_pullback",
+          "status": "theoretical",
+          "subgroup_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369"
+        }
+      }
+    },
+    {
+      "base_field": {
+        "absolute_degree": "1",
+        "characteristic": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+        "constant_field_verified": null
+      },
+      "evidence": {
+        "claim_id": null,
+        "scope": "Mathematical geometry and transfer traits, with producer checks as marked. Solver checks are toy known-answer images only; no P-256 DLP run. General norm is unimplemented even where image decoding exists.",
+        "sources": [
+          "FRAMEWORK.md",
+          "results/smith-p256.json",
+          "../results/native-p256.json"
+        ],
+        "standing": "producer_assertion"
+      },
+      "id": "C3",
+      "object_kind": "finite_cover",
+      "representation": {
+        "equivalence": "isomorphism_over_fixed_E",
+        "quadratic_squareclass": "X^2-4",
+        "rational_map": "(t+1/t,z/t^2)"
+      },
+      "schema": "p256-cover-traits/v1",
+      "source": {
+        "equation": "z^2=t^7+b*t^4+t",
+        "genus": "3",
+        "geometry": "hyperelliptic",
+        "normalization_required": true,
+        "rational_infinity_points": "1"
+      },
+      "target": "E: Y^2=X^3-3X+b (standard P-256)",
+      "traits": {
+        "degree": {
+          "inseparable_exponent": "0",
+          "separable": "2",
+          "total": "2"
+        },
+        "full_automorphism_group": null,
+        "galois": {
+          "arithmetic_monodromy": "C2",
+          "geometric": true,
+          "known_base_deck_group": "C2",
+          "known_geometric_deck_group": "C2",
+          "over_base": true
+        },
+        "gonality": {
+          "geometric_exact": "2"
+        },
+        "implementation": {
+          "arithmetic": "implemented_producer_checked",
+          "geometry": "implemented_producer_checked",
+          "norm": "not_implemented",
+          "pullback": "implemented_producer_checked",
+          "solver": "implemented_producer_checked"
+        },
+        "jacobian": {
+          "dimension": "3",
+          "exact_point_order": null,
+          "frobenius_polynomial": null,
+          "known_isogeny_factors": [
+            "E",
+            "E",
+            "F3"
+          ],
+          "p_rank": {
+            "exact": null,
+            "lower_bound": "2",
+            "upper_bound": "3"
+          },
+          "polarization": "The Jacobian is principally polarized; displayed factorization is only up to isogeny."
+        },
+        "known_automorphisms": [
+          "(t,z)->(1/t,z/t^4)",
+          "(t,z)->(zeta*t,zeta^2*z), zeta^3=1",
+          "(t,z)->(t,-z)"
+        ],
+        "ramification": {
+          "different_degree": "4",
+          "geometric_branch_points": "4",
+          "inertia_and_jumps": [
+            {
+              "geometric_points": "4",
+              "index": "2"
+            }
+          ],
+          "type": "tame"
+        },
+        "smith": {
+          "input_gate": "genus3_hyperelliptic",
+          "obligation": "All three rational pair kernels are rank-degenerate. Non-pair kernels, other source models and extension fields are separate routes.",
+          "stable_non_pair_kernels": "6",
+          "stable_pair_kernels": "3",
+          "status": "direct_smith_excluded",
+          "weierstrass_cycle_type": [
+            1,
+            1,
+            3,
+            3
+          ]
+        },
+        "transfer": {
+          "degree_coprime": true,
+          "inverse_on_image": "[d^-1 mod n] times the norm; for C3/C4 explicit coefficient decoding is implemented",
+          "kernel_intersection": "trivial by degree coprimality",
+          "map_kind": "cover_pullback",
+          "status": "theoretical",
+          "subgroup_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369"
+        }
+      }
+    },
+    {
+      "base_field": {
+        "absolute_degree": "1",
+        "characteristic": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+        "constant_field_verified": null
+      },
+      "evidence": {
+        "claim_id": null,
+        "scope": "Mathematical geometry and transfer traits, with producer checks as marked. Solver checks are toy known-answer images only; no P-256 DLP run. General norm is unimplemented even where image decoding exists.",
+        "sources": [
+          "FRAMEWORK.md",
+          "results/smith-p256.json",
+          "../results/native-p256.json"
+        ],
+        "standing": "producer_assertion"
+      },
+      "id": "C4",
+      "object_kind": "finite_cover",
+      "representation": {
+        "equivalence": "isomorphism_over_fixed_E",
+        "quadratic_squareclass": null,
+        "rational_map": "(t^3,z)"
+      },
+      "schema": "p256-cover-traits/v1",
+      "source": {
+        "equation": "z^2=f(t^3)",
+        "genus": "4",
+        "geometry": "hyperelliptic",
+        "normalization_required": true,
+        "rational_infinity_points": "1"
+      },
+      "target": "E: Y^2=X^3-3X+b (standard P-256)",
+      "traits": {
+        "degree": {
+          "inseparable_exponent": "0",
+          "separable": "3",
+          "total": "3"
+        },
+        "full_automorphism_group": null,
+        "galois": {
+          "arithmetic_monodromy": "C3",
+          "geometric": true,
+          "known_base_deck_group": "C3",
+          "known_geometric_deck_group": "C3",
+          "over_base": true
+        },
+        "gonality": {
+          "geometric_exact": "2"
+        },
+        "implementation": {
+          "arithmetic": "implemented_producer_checked",
+          "geometry": "implemented_producer_checked",
+          "norm": "not_implemented",
+          "pullback": "implemented_producer_checked",
+          "solver": "implemented_producer_checked"
+        },
+        "jacobian": {
+          "dimension": "4",
+          "exact_point_order": null,
+          "frobenius_polynomial": null,
+          "known_isogeny_factors": [
+            "E",
+            "A3"
+          ],
+          "p_rank": {
+            "exact": null,
+            "lower_bound": "1",
+            "upper_bound": "4"
+          },
+          "polarization": "The Jacobian is principally polarized; displayed factorization is only up to isogeny."
+        },
+        "known_automorphisms": [
+          "(t,z)->(zeta*t,z), zeta^3=1",
+          "(t,z)->(t,-z)"
+        ],
+        "ramification": {
+          "different_degree": "6",
+          "geometric_branch_points": "3",
+          "inertia_and_jumps": [
+            {
+              "geometric_points": "3",
+              "index": "3"
+            }
+          ],
+          "type": "tame"
+        },
+        "smith": {
+          "input_gate": "wrong_genus",
+          "obligation": "The standard forward Smith construction requires a genus-3 hyperelliptic input.",
+          "status": "not_applicable"
+        },
+        "transfer": {
+          "degree_coprime": true,
+          "inverse_on_image": "[d^-1 mod n] times the norm; for C3/C4 explicit coefficient decoding is implemented",
+          "kernel_intersection": "trivial by degree coprimality",
+          "map_kind": "cover_pullback",
+          "status": "theoretical",
+          "subgroup_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369"
+        }
+      }
+    },
+    {
+      "base_field": {
+        "absolute_degree": "1",
+        "characteristic": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+        "constant_field_verified": null
+      },
+      "evidence": {
+        "claim_id": null,
+        "scope": "Mathematical geometry and transfer traits, with producer checks as marked. Solver checks are toy known-answer images only; no P-256 DLP run. General norm is unimplemented even where image decoding exists.",
+        "sources": [
+          "FRAMEWORK.md",
+          "results/smith-p256.json",
+          "../results/native-p256.json"
+        ],
+        "standing": "producer_assertion"
+      },
+      "id": "C5",
+      "object_kind": "finite_cover",
+      "representation": {
+        "equivalence": "isomorphism_over_fixed_E",
+        "quadratic_squareclass": null,
+        "rational_map": "(t^4,z)"
+      },
+      "schema": "p256-cover-traits/v1",
+      "source": {
+        "equation": "z^2=f(t^4)",
+        "genus": "5",
+        "geometry": "hyperelliptic",
+        "normalization_required": true,
+        "rational_infinity_points": "2"
+      },
+      "target": "E: Y^2=X^3-3X+b (standard P-256)",
+      "traits": {
+        "degree": {
+          "inseparable_exponent": "0",
+          "separable": "4",
+          "total": "4"
+        },
+        "full_automorphism_group": null,
+        "galois": {
+          "arithmetic_monodromy": null,
+          "geometric": true,
+          "known_base_deck_group": "C2",
+          "known_geometric_deck_group": "C4",
+          "over_base": false
+        },
+        "gonality": {
+          "geometric_exact": "2"
+        },
+        "implementation": {
+          "arithmetic": "not_implemented",
+          "geometry": "implemented_producer_checked",
+          "norm": "not_implemented",
+          "pullback": "not_implemented",
+          "solver": "not_implemented"
+        },
+        "jacobian": {
+          "dimension": "5",
+          "exact_point_order": null,
+          "frobenius_polynomial": null,
+          "known_isogeny_factors": [
+            "E",
+            "F2",
+            "J(H5)"
+          ],
+          "p_rank": {
+            "exact": null,
+            "lower_bound": "1",
+            "upper_bound": "5"
+          },
+          "polarization": "The Jacobian is principally polarized; displayed factorization is only up to isogeny."
+        },
+        "known_automorphisms": [
+          "over Fp: (t,z)->(-t,z)",
+          "(t,z)->(t,-z)",
+          "over Fp2: (t,z)->(i*t,z), i^2=-1"
+        ],
+        "ramification": {
+          "different_degree": "8",
+          "geometric_branch_points": "3",
+          "inertia_and_jumps": [
+            {
+              "geometric_points": "2",
+              "index": "4"
+            },
+            {
+              "geometric_points": "2",
+              "index": "2"
+            }
+          ],
+          "type": "tame"
+        },
+        "smith": {
+          "input_gate": "wrong_genus",
+          "obligation": "The standard forward Smith construction requires a genus-3 hyperelliptic input.",
+          "status": "not_applicable"
+        },
+        "transfer": {
+          "degree_coprime": true,
+          "inverse_on_image": "[d^-1 mod n] times the norm; for C3/C4 explicit coefficient decoding is implemented",
+          "kernel_intersection": "trivial by degree coprimality",
+          "map_kind": "cover_pullback",
+          "status": "theoretical",
+          "subgroup_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369"
+        }
+      }
+    },
+    {
+      "base_field": {
+        "absolute_degree": "1",
+        "characteristic": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+        "constant_field_verified": null
+      },
+      "evidence": {
+        "claim_id": null,
+        "scope": "Mathematical geometry and transfer traits, with producer checks as marked. Solver checks are toy known-answer images only; no P-256 DLP run. General norm is unimplemented even where image decoding exists.",
+        "sources": [
+          "FRAMEWORK.md",
+          "results/smith-p256.json",
+          "../results/native-p256.json"
+        ],
+        "standing": "producer_assertion"
+      },
+      "id": "D3",
+      "object_kind": "finite_cover",
+      "representation": {
+        "equivalence": "isomorphism_over_fixed_E",
+        "quadratic_squareclass": "Y",
+        "rational_map": "(t,s^2)"
+      },
+      "schema": "p256-cover-traits/v1",
+      "source": {
+        "equation": "s^4=f(t)",
+        "genus": "3",
+        "geometry": "nonhyperelliptic",
+        "normalization_required": true,
+        "rational_infinity_points": "1"
+      },
+      "target": "E: Y^2=X^3-3X+b (standard P-256)",
+      "traits": {
+        "degree": {
+          "inseparable_exponent": "0",
+          "separable": "2",
+          "total": "2"
+        },
+        "full_automorphism_group": null,
+        "galois": {
+          "arithmetic_monodromy": "C2",
+          "geometric": true,
+          "known_base_deck_group": "C2",
+          "known_geometric_deck_group": "C2",
+          "over_base": true
+        },
+        "gonality": {
+          "base_field_exact": null,
+          "geometric_exact": "3"
+        },
+        "implementation": {
+          "arithmetic": "not_implemented",
+          "geometry": "theoretical",
+          "norm": "not_implemented",
+          "pullback": "not_implemented",
+          "solver": "not_implemented"
+        },
+        "jacobian": {
+          "dimension": "3",
+          "exact_point_order": null,
+          "frobenius_polynomial": null,
+          "known_isogeny_factors": [
+            "E",
+            "Prym_dimension_2"
+          ],
+          "p_rank": {
+            "exact": null,
+            "lower_bound": "1",
+            "upper_bound": "3"
+          },
+          "polarization": "The Jacobian is principally polarized; displayed factorization is only up to isogeny."
+        },
+        "known_automorphisms": [
+          "over Fp: (t,s)->(t,-s)",
+          "over Fp2: (t,s)->(t,i*s), i^2=-1"
+        ],
+        "ramification": {
+          "different_degree": "4",
+          "geometric_branch_points": "4",
+          "inertia_and_jumps": [
+            {
+              "geometric_points": "4",
+              "index": "2"
+            }
+          ],
+          "type": "tame"
+        },
+        "smith": {
+          "input_gate": "already_nonhyperelliptic",
+          "obligation": "The standard forward Smith construction requires a genus-3 hyperelliptic input.",
+          "status": "not_applicable"
+        },
+        "transfer": {
+          "degree_coprime": true,
+          "inverse_on_image": "[d^-1 mod n] times the norm; for C3/C4 explicit coefficient decoding is implemented",
+          "kernel_intersection": "trivial by degree coprimality",
+          "map_kind": "cover_pullback",
+          "status": "theoretical",
+          "subgroup_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369"
+        }
+      }
+    },
+    {
+      "base_field": {
+        "absolute_degree": "1",
+        "characteristic": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+        "constant_field_verified": null
+      },
+      "evidence": {
+        "claim_id": null,
+        "scope": "Mathematical geometry and transfer traits, with producer checks as marked. Solver checks are toy known-answer images only; no P-256 DLP run. General norm is unimplemented even where image decoding exists.",
+        "sources": [
+          "FRAMEWORK.md",
+          "results/smith-p256.json",
+          "../results/native-p256.json"
+        ],
+        "standing": "producer_assertion"
+      },
+      "id": "D4",
+      "object_kind": "finite_cover",
+      "representation": {
+        "equivalence": "isomorphism_over_fixed_E",
+        "quadratic_squareclass": "X*Y",
+        "rational_map": "(t,s^2/t)"
+      },
+      "schema": "p256-cover-traits/v1",
+      "source": {
+        "equation": "s^4=t^2*f(t)",
+        "genus": "4",
+        "geometry": "nonhyperelliptic",
+        "normalization_required": true,
+        "rational_infinity_points": "1"
+      },
+      "target": "E: Y^2=X^3-3X+b (standard P-256)",
+      "traits": {
+        "degree": {
+          "inseparable_exponent": "0",
+          "separable": "2",
+          "total": "2"
+        },
+        "full_automorphism_group": null,
+        "galois": {
+          "arithmetic_monodromy": "C2",
+          "geometric": true,
+          "known_base_deck_group": "C2",
+          "known_geometric_deck_group": "C2",
+          "over_base": true
+        },
+        "gonality": {
+          "base_field_exact": null,
+          "geometric_exact": "3"
+        },
+        "implementation": {
+          "arithmetic": "not_implemented",
+          "geometry": "theoretical",
+          "norm": "not_implemented",
+          "pullback": "not_implemented",
+          "solver": "not_implemented"
+        },
+        "jacobian": {
+          "dimension": "4",
+          "exact_point_order": null,
+          "frobenius_polynomial": null,
+          "known_isogeny_factors": [
+            "E",
+            "Prym_dimension_3"
+          ],
+          "p_rank": {
+            "exact": null,
+            "lower_bound": "1",
+            "upper_bound": "4"
+          },
+          "polarization": "The Jacobian is principally polarized; displayed factorization is only up to isogeny."
+        },
+        "known_automorphisms": [
+          "over Fp: (t,s)->(t,-s)",
+          "over Fp2: (t,s)->(t,i*s), i^2=-1"
+        ],
+        "ramification": {
+          "different_degree": "6",
+          "geometric_branch_points": "6",
+          "inertia_and_jumps": [
+            {
+              "geometric_points": "6",
+              "index": "2"
+            }
+          ],
+          "type": "tame"
+        },
+        "smith": {
+          "input_gate": "wrong_genus",
+          "obligation": "The standard forward Smith construction requires a genus-3 hyperelliptic input.",
+          "status": "not_applicable"
+        },
+        "transfer": {
+          "degree_coprime": true,
+          "inverse_on_image": "[d^-1 mod n] times the norm; for C3/C4 explicit coefficient decoding is implemented",
+          "kernel_intersection": "trivial by degree coprimality",
+          "map_kind": "cover_pullback",
+          "status": "theoretical",
+          "subgroup_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369"
+        }
+      }
+    },
+    {
+      "base_field": {
+        "absolute_degree": "1",
+        "characteristic": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+        "constant_field_verified": null
+      },
+      "evidence": {
+        "claim_id": null,
+        "scope": "Mathematical geometry and transfer traits, with producer checks as marked. Solver checks are toy known-answer images only; no P-256 DLP run. General norm is unimplemented even where image decoding exists.",
+        "sources": [
+          "FRAMEWORK.md",
+          "results/smith-p256.json",
+          "../results/native-p256.json"
+        ],
+        "standing": "producer_assertion"
+      },
+      "id": "D5",
+      "object_kind": "finite_cover",
+      "representation": {
+        "equivalence": "isomorphism_over_fixed_E",
+        "quadratic_squareclass": "X*(X-1)*Y",
+        "rational_map": "(t,s^2/(t*(t-1)))"
+      },
+      "schema": "p256-cover-traits/v1",
+      "source": {
+        "equation": "s^4=t^2*(t-1)^2*f(t)",
+        "genus": "5",
+        "geometry": "nonhyperelliptic",
+        "normalization_required": true,
+        "rational_infinity_points": "1"
+      },
+      "target": "E: Y^2=X^3-3X+b (standard P-256)",
+      "traits": {
+        "degree": {
+          "inseparable_exponent": "0",
+          "separable": "2",
+          "total": "2"
+        },
+        "full_automorphism_group": null,
+        "galois": {
+          "arithmetic_monodromy": "C2",
+          "geometric": true,
+          "known_base_deck_group": "C2",
+          "known_geometric_deck_group": "C2",
+          "over_base": true
+        },
+        "gonality": {
+          "base_field_upper": "4",
+          "geometric_lower": "3",
+          "geometric_upper": "4"
+        },
+        "implementation": {
+          "arithmetic": "not_implemented",
+          "geometry": "theoretical",
+          "norm": "not_implemented",
+          "pullback": "not_implemented",
+          "solver": "not_implemented"
+        },
+        "jacobian": {
+          "dimension": "5",
+          "exact_point_order": null,
+          "frobenius_polynomial": null,
+          "known_isogeny_factors": [
+            "E",
+            "Prym_dimension_4"
+          ],
+          "p_rank": {
+            "exact": null,
+            "lower_bound": "1",
+            "upper_bound": "5"
+          },
+          "polarization": "The Jacobian is principally polarized; displayed factorization is only up to isogeny."
+        },
+        "known_automorphisms": [
+          "over Fp: (t,s)->(t,-s)",
+          "over Fp2: (t,s)->(t,i*s), i^2=-1"
+        ],
+        "ramification": {
+          "different_degree": "8",
+          "geometric_branch_points": "8",
+          "inertia_and_jumps": [
+            {
+              "geometric_points": "8",
+              "index": "2"
+            }
+          ],
+          "type": "tame"
+        },
+        "smith": {
+          "input_gate": "wrong_genus",
+          "obligation": "The standard forward Smith construction requires a genus-3 hyperelliptic input.",
+          "status": "not_applicable"
+        },
+        "transfer": {
+          "degree_coprime": true,
+          "inverse_on_image": "[d^-1 mod n] times the norm; for C3/C4 explicit coefficient decoding is implemented",
+          "kernel_intersection": "trivial by degree coprimality",
+          "map_kind": "cover_pullback",
+          "status": "theoretical",
+          "subgroup_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369"
+        }
+      }
+    }
+  ],
+  "parameters": {
+    "b": "41058363725152142129326129780047268409114441015993725554835256314039467401291",
+    "n": "115792089210356248762697446949407573529996955224135760342422259061068512044369",
+    "p": "115792089210356248762697446949407573530086143415290314195533631308867097853951"
+  },
+  "schema": "p256-cover-catalogue/v1",
+  "scope": "Seven worked representatives within an unbounded complete representation framework; not a complete list of covers or isomorphism classes.",
+  "unknowns_policy": "Null means not computed or not established; a known automorphism subgroup is not the full automorphism group."
+}

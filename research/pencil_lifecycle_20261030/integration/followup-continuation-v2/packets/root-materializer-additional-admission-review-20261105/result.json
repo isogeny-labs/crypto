@@ -1,0 +1,58 @@
+{
+  "schema": "prospective-inert-proposal-review/v1",
+  "task": "T-1706",
+  "created_utc": "2026-11-05T19:41:12.706650+00:00",
+  "producer_commit": "714e95ca6113706f7d85739166dc8bc8e4beeaf8",
+  "plan_sha256": "f39a177116fbde5302287d2983f799753d51bb1fae4e6c44dfdc9b05d0930b8d",
+  "disposition": "inert_proposal_consistent_runtime_admission_not_cleared",
+  "findings": [
+    {
+      "id": "R1",
+      "scope": "future runtime admission",
+      "status": "qualification_gap",
+      "finding": "Effective inherited RLIMIT_AS/RLIMIT_DATA are neither read nor guarded by the worker before child commands. Manual postlaunch PID readback can race completion or first Git mapping. Manager defaults do not prove child-effective limits.",
+      "remedy": "Add versioned native pre-child getrlimit and /proc/self/limits receipt under matched worker identity; evaluate an explicit independently reviewed policy before first findmnt/Git child. Unknown or incompatible limits must stop, without raising limits. Bind corrected source and fresh concrete admission before an approved attempt. No current runtime observation is claimed."
+    },
+    {
+      "id": "R2",
+      "scope": "authorization and frozen admission",
+      "status": "correctly_pending",
+      "finding": "Additional attempt remains unapproved; worker preparation has published_github_commit=null, reviewed=false, lease=null. Descriptive approval_required/launch_disabled flags are not enforced by worker; existing assertion gates reject unchanged configuration before output creation.",
+      "remedy": "Preserve proposal unchanged. Future successor must bind explicit one-attempt approval, exact publication/review, current budget and a live lease; no silent flag toggles."
+    }
+  ],
+  "checks": [
+    {
+      "joint": "binding",
+      "finding": "All proposal files matched Git commit714e95; manifest hashes/bytes valid. All nine referenced input files matched their expected hashes. Materializer and cleanup helper match pinned corrected hashes."
+    },
+    {
+      "joint": "resource bounds",
+      "finding": "2 CPU,4 GiB physical RAM,0 swap,512 tasks,concurrency1,880 inner,885 unit+5stop,895 timeout+5kill,900 total unchanged. RemainAfterExit requires explicit owned stop and empty cgroup confirmation."
+    },
+    {
+      "joint": "accounting",
+      "finding": "46800-4500=42300 seconds; proposed900 would leave41400; separate1800 validation would leave39600. Deadline2026-11-06 04:00 UTC unchanged. This is recorded arithmetic, not a fresh allocation."
+    },
+    {
+      "joint": "ownership",
+      "finding": "Fresh unit/workspace/output names, refusal of existing paths, captured invocation and cgroup, no automatic retry. Proposed null lease is correctly not a runtime lease; future single-owner/no-overlap readbacks remain required."
+    },
+    {
+      "joint": "waiver delta",
+      "finding": "Patch preserves test list,attempt1,publication/input/recipe/lease and cleanup checks while changing dollar facts to hash-bound owner waiver and fixed deadline/remaining-worker checks. It does not approve another attempt or establish a live budget ledger; future concrete validation admission remains separate."
+    },
+    {
+      "joint": "evidence",
+      "finding": "Consumed first attempt and mapping failure remain recorded. No native input manifest is fabricated. Exact failing mapping size and current inherited limits remain unknown."
+    }
+  ],
+  "additional_attempt_approved": false,
+  "runtime_admission": false,
+  "compiler_invoked": false,
+  "tests_executed": 0,
+  "worker_executed": false,
+  "independence": "Reviewer did not author candidate. Parent disclosed prior failure and admission concerns; preread plan saved before inspection.",
+  "knowledge": "Published primary packets and exact local source APIs; KB tools/catalog unavailable.",
+  "required_next": "Source-level pre-child effective-limit qualification, independent review and explicit additional-attempt authorization; no renewal of existing campaign requested."
+}

@@ -1,0 +1,50 @@
+--- phase3-original
++++ phase4-proposed
+@@ -33,12 +33,18 @@
+  germEval a3 a2 a1 a0 x0 y0 h (quintic a3 a2 a1 a0) := by
+  simpa [germEval,rho,pointY] using congrArg (rho a3 a2 a1 a0 x0 y0 h) (affine_curve a3 a2 a1 a0)
+ 
++theorem point_scalar (a3 a2 a1 a0 x0 y0 k : K) (h : y0^2 = fAt a3 a2 a1 a0 x0) :
++ pointEval a3 a2 a1 a0 x0 y0 h (algebraMap K (A a3 a2 a1 a0) k) = k := by
++ change pointEval a3 a2 a1 a0 x0 y0 h
++  (Ideal.Quotient.mk (affineIdeal a3 a2 a1 a0) (MvPolynomial.C k)) = k
++ simp [pointEval,pointPreEval]
++
+ theorem point_affine_eval (a3 a2 a1 a0 x0 y0 : K) (h : y0^2 = fAt a3 a2 a1 a0 x0) (n : K[X]) :
+  pointEval a3 a2 a1 a0 x0 y0 h (affineEval a3 a2 a1 a0 n) = n.eval x0 := by
+  have hh : (pointEval a3 a2 a1 a0 x0 y0 h).comp (affineEval a3 a2 a1 a0) = evalRingHom x0 := by
+   apply Polynomial.ringHom_ext
+   · intro k
+-    simp [affineEval,pointEval,pointPreEval]
++    simpa [affineEval] using point_scalar a3 a2 a1 a0 x0 y0 k h
+   · simp [affineEval,pointEval,pointPreEval,xbar]
+  exact congrArg (fun f : K[X] →+* K => f n) hh
+ 
+@@ -56,7 +62,8 @@
+   change pointEval a3 a2 a1 a0 x0 y0 h t = 0
+   dsimp [t]
+   rw [map_sub,map_mul,point_affine_eval,pointEval_ybar]
+-  simp [pointEval,pointPreEval,hn]
++  rw [point_scalar]
++  simp [hn]
+  have hnloc : ¬ IsUnit (algebraMap (A a3 a2 a1 a0) (L a3 a2 a1 a0 x0 y0 h) t) := by
+   intro hu
+   have hc := (IsLocalization.AtPrime.isUnit_to_map_iff
+@@ -75,7 +82,7 @@
+  (germEval a3 a2 a1 a0 x0 y0 h n+iota a3 a2 a1 a0 x0 y0 h b*pointY a3 a2 a1 a0 x0 y0 h)=
+  germEval a3 a2 a1 a0 x0 y0 h u1*germEval a3 a2 a1 a0 x0 y0 h u2*germEval a3 a2 a1 a0 x0 y0 h U := by
+  have hh := congrArg (germEval a3 a2 a1 a0 x0 y0 h) hnorm
+- have hc : germEval a3 a2 a1 a0 x0 y0 h (C (b^2)) = iota a3 a2 a1 a0 x0 y0 h b ^ 2 := by
++ have hc : germEval a3 a2 a1 a0 x0 y0 h (C b) = iota a3 a2 a1 a0 x0 y0 h b := by
+   simp [germEval,affineEval,iota]
+  simp only [map_sub,map_pow,map_mul,hc] at hh
+  rw [←germ_curve] at hh
+@@ -98,7 +105,7 @@
+  letI := Common22SeparableAffineDomain.projective_point_domain_of_separable a3 a2 a1 a0 x0 y0 h hs
+  letI := WeightedProjNonbranchDVR.projective_point_dvr a3 a2 a1 a0 x0 y0 h hs (mul_ne_zero h2 hy)
+  apply point_norm_order a3 a2 a1 a0 x0 y0 h hy
+- · simpa using scalar_unit a3 a2 a1 a0 x0 y0 2 h h2
++ · simpa only [map_ofNat] using scalar_unit a3 a2 a1 a0 x0 y0 2 h h2
+  · exact scalar_unit a3 a2 a1 a0 x0 y0 b h hb
+  · exact numerator_nonunit a3 a2 a1 a0 x0 y0 b h n hn
+  · exact stalk_norm a3 a2 a1 a0 x0 y0 b h n u1 u2 U hnorm

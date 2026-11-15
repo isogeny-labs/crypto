@@ -1,0 +1,46 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"job\":{\"created_at\":\"2026-10-31T08:50:03Z\",\"job_name\":\"n83-fb-variants-r27-20261031-r7\",\"state\":\"active\",\"status\":{\"active\":1,\"ready\":0,\"startTime\":\"2026-10-31T08:50:03Z\",\"terminating\":0,\"uncountedTerminatedPods\":{}},\"uid\":\"cede27a2-cdc3-4b86-87e5-0f0ebae38ab6\"},\"pods\":[{\"name\":\"n83-fb-variants-r27-20261031-r7-mb6mp\",\"node\":null,\"status\":{\"conditions\":[{\"lastProbeTime\":null,\"lastTransitionTime\":\"2026-10-31T08:50:03Z\",\"message\":\"0/2 nodes are available: 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/2 nodes are available: 2 Preemption is not helpful for scheduling.\",\"observedGeneration\":1,\"reason\":\"Unschedulable\",\"status\":\"False\",\"type\":\"PodScheduled\"}],\"phase\":\"Pending\",\"qosClass\":\"Guaranteed\"},\"uid\":\"aa3e4eef-fd14-45dd-8220-3c7b83174d55\"}]}"
+    }
+  ],
+  "structuredContent": {
+    "job": {
+      "created_at": "2026-10-31T08:50:03Z",
+      "job_name": "n83-fb-variants-r27-20261031-r7",
+      "state": "active",
+      "status": {
+        "active": 1,
+        "ready": 0,
+        "startTime": "2026-10-31T08:50:03Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+      },
+      "uid": "cede27a2-cdc3-4b86-87e5-0f0ebae38ab6"
+    },
+    "pods": [
+      {
+        "name": "n83-fb-variants-r27-20261031-r7-mb6mp",
+        "node": null,
+        "status": {
+          "conditions": [
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-31T08:50:03Z",
+              "message": "0/2 nodes are available: 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/2 nodes are available: 2 Preemption is not helpful for scheduling.",
+              "observedGeneration": 1,
+              "reason": "Unschedulable",
+              "status": "False",
+              "type": "PodScheduled"
+            }
+          ],
+          "phase": "Pending",
+          "qosClass": "Guaranteed"
+        },
+        "uid": "aa3e4eef-fd14-45dd-8220-3c7b83174d55"
+      }
+    ]
+  },
+  "isError": false
+}

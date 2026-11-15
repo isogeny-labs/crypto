@@ -1,0 +1,665 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/hilbert_v2.rs",
+      "kind": "analysis",
+      "bytes": 18172,
+      "sha256": "d27baad8ebfcebf296db3baa8f8f03425abd2071ddb9fbe53e15dcb10a792b32"
+    },
+    "outputs": [
+      {
+        "path": "evidence/hilbert/verified-summary.json",
+        "kind": "summary",
+        "bytes": 3930,
+        "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+      },
+      {
+        "path": "evidence/hilbert/hilbert.json",
+        "kind": "summary",
+        "bytes": 146762,
+        "sha256": "2a3fc5721b35b81978a6e25cf558441380b7b664166585cabba04a3253ed3830"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "commit": "64e06657f1a2e6df003130fa7f4e9a034d44b826",
+      "binary_sha256": "1dd096607147b74c025d5cf82a3e531b6426603cb6c8abe34fd38584d9fa491f",
+      "image_digest": null
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "commit": "64e06657f1a2e6df003130fa7f4e9a034d44b826",
+      "binary_sha256": "1dd096607147b74c025d5cf82a3e531b6426603cb6c8abe34fd38584d9fa491f",
+      "image_digest": null
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "commit": "64e06657f1a2e6df003130fa7f4e9a034d44b826",
+      "binary_sha256": "1dd096607147b74c025d5cf82a3e531b6426603cb6c8abe34fd38584d9fa491f",
+      "image_digest": null
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-28T16:40:33Z",
+  "export_id": "n83-prime-m2-hilbert-20261028-r2",
+  "files": [
+    {
+      "path": "evidence/hilbert/baseline-prime-m2-natural.json",
+      "kind": "raw",
+      "bytes": 9497,
+      "sha256": "bba0524e1c4aff11e2e100aa63d591a51b523dd3bbb2d3a00a5b7543a778e8d4"
+    },
+    {
+      "path": "evidence/hilbert/baseline-prime-m2-planted.json",
+      "kind": "raw",
+      "bytes": 10140,
+      "sha256": "dc865ff49890f20c8e59036aef811e2fa94e1e9fd530f18de01a70246d90c5fb"
+    },
+    {
+      "path": "evidence/hilbert/controls.json",
+      "kind": "raw",
+      "bytes": 24985,
+      "sha256": "4a1478fd764954997894b45a4ff9513cc4dc185b0e579f89117d9c40717238ec"
+    },
+    {
+      "path": "evidence/hilbert/hilbert.json",
+      "kind": "raw",
+      "bytes": 146762,
+      "sha256": "2a3fc5721b35b81978a6e25cf558441380b7b664166585cabba04a3253ed3830"
+    },
+    {
+      "path": "evidence/hilbert/host.txt",
+      "kind": "raw",
+      "bytes": 3504,
+      "sha256": "773aa1ae9fd8c38357c4afc12f513340e413b777f82301fa7366dfa7c2c7ee87"
+    },
+    {
+      "path": "evidence/hilbert/manifest.sha256",
+      "kind": "raw",
+      "bytes": 4904,
+      "sha256": "39d3a021ca38f8879315347d723292759c7c094342a89cdaaf9fa3b18fca5c13"
+    },
+    {
+      "path": "evidence/hilbert/original-prime-m2-natural.json",
+      "kind": "raw",
+      "bytes": 8958,
+      "sha256": "ef188e98e2681f5801f06c9d80ed50f82a4776aec6417adb2bd3221937483c4f"
+    },
+    {
+      "path": "evidence/hilbert/original-prime-m2-planted.json",
+      "kind": "raw",
+      "bytes": 9554,
+      "sha256": "045ede44d70baf615b62ab2da360d89f30c4eade0555f18607d95902daf33b45"
+    },
+    {
+      "path": "evidence/hilbert/primality.json",
+      "kind": "raw",
+      "bytes": 811,
+      "sha256": "b2d36b46d4ff8600a6dd248817a093f04e1adabe2294916c99f11cc4595790e4"
+    },
+    {
+      "path": "evidence/hilbert/producer.log",
+      "kind": "raw",
+      "bytes": 214,
+      "sha256": "a6941dd0af749b1bcae5f49b00ef45f453816b7d241d801057dcd7e5f1cf8cc0"
+    },
+    {
+      "path": "evidence/hilbert/replay.json",
+      "kind": "raw",
+      "bytes": 164,
+      "sha256": "6bad72faf94778a4f5daca8e8029c2723196836846bc6017f6a42aba513ca9d8"
+    },
+    {
+      "path": "evidence/hilbert/replay.log",
+      "kind": "raw",
+      "bytes": 208,
+      "sha256": "ee3c892f7cc52be024a02c577703c7bd2271b03761232a9366b9e180b318d722"
+    },
+    {
+      "path": "evidence/hilbert/spike40-prime-m2-natural.json",
+      "kind": "raw",
+      "bytes": 9504,
+      "sha256": "8eb34c64cb54c759d10b57e4d948298daf8df8cf134f16a108b7ef6188663c7b"
+    },
+    {
+      "path": "evidence/hilbert/spike40-prime-m2-planted.json",
+      "kind": "raw",
+      "bytes": 10147,
+      "sha256": "d199c43fe7a352fc052f5322f12d488111713be496d3bf57b7c41a148a8434e2"
+    },
+    {
+      "path": "evidence/hilbert/status.json",
+      "kind": "raw",
+      "bytes": 55,
+      "sha256": "3d25e3ede527345e9e78b08da5161c9414bb92b9b5cc9f9a406f64941266bb1c"
+    },
+    {
+      "path": "evidence/hilbert/summary.json",
+      "kind": "raw",
+      "bytes": 3831,
+      "sha256": "c7b02866b15f9f9012931e901c82bfcd339abecf208b837afd14d4ee9d3ffffc"
+    },
+    {
+      "path": "evidence/hilbert/terminal.json",
+      "kind": "raw",
+      "bytes": 203,
+      "sha256": "61d34c24bd13773e0641a1e9f3ad0e244df99eed0278eadbfd689f2cc11a6ab4"
+    },
+    {
+      "path": "evidence/hilbert/verified-summary.json",
+      "kind": "raw",
+      "bytes": 3930,
+      "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+    },
+    {
+      "path": "hilbert-archives/runs.tar.xz",
+      "kind": "raw",
+      "bytes": 279528,
+      "sha256": "af7fa7768900e74e89ea429db6ea6c35f8d7a9a8cfbcdc5db7ca795a1855d0cc"
+    },
+    {
+      "path": "protocol-hilbert-v2.json",
+      "kind": "protocol",
+      "bytes": 17046,
+      "sha256": "1bc401c4b4d23ff03cf808cfe84edacf9f69e9cdbb8597269c7d16104ca178e5"
+    },
+    {
+      "path": "HILBERT_FORMAT.json",
+      "kind": "other",
+      "bytes": 2266,
+      "sha256": "03c3f7f15e68e05f9f933776c585abeba2884d939ffa77abc5fb390bc7f6a265"
+    },
+    {
+      "path": "HILBERT_DESIGN.md",
+      "kind": "other",
+      "bytes": 5165,
+      "sha256": "99b4666ed5e77a5b7704e1a99fc0d9007cc1f93c0ef183d8a211102deb23b378"
+    },
+    {
+      "path": "HilbertArithmetic.lean",
+      "kind": "other",
+      "bytes": 863,
+      "sha256": "2d09d3c1bb868063cca0e62dcf47fcfe5167067aaa0a093c29c1b229acb32d8a"
+    },
+    {
+      "path": "HILBERT_PROOF_MAP.json",
+      "kind": "other",
+      "bytes": 940,
+      "sha256": "c67420febfb51df5ece9c10bb83f60677e190f028ce9a507417d5b2a4eb8d2ea"
+    }
+  ],
+  "flow": {
+    "planned": 6,
+    "attempted": 6,
+    "completed": 6,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "class_id": "existing-spot-L0",
+    "path": "evidence/hilbert/host.txt",
+    "sha256": "773aa1ae9fd8c38357c4afc12f513340e413b777f82301fa7366dfa7c2c7ee87",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "Amazon EC2",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux ip-172-31-17-173.us-east-2.compute.internal 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Six retained source identities; natural sources can coincide, not six independent samples."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Exact original-top graded-vanishing degree only; no solving degree or LFD inference."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Six producer and six fresh-process replay checks passed."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Lean checks finite arithmetic only; full algebraic bridge is unformalized."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Existing-host fallback after retained EKS shared-bucket denial; no timing comparison."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Preceding r1 failed its first source-template check; five cases were not reached. All r1 data and failed export are retained."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "role": "producer",
+    "model": null,
+    "session": "n83-prime-m2-hilbert-20261028-r2"
+  },
+  "protocol": {
+    "path": "protocol-hilbert-v2.json",
+    "protocol_id": "N83-PRIME-M2-HILBERT-20261028",
+    "version": 2,
+    "sha256": "97da83f16a1a375a486546970b5b95c3313a63f838b366d07ff504209323a32b"
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert/original-prime-m2-planted.json",
+          "kind": "other",
+          "bytes": 9554,
+          "sha256": "045ede44d70baf615b62ab2da360d89f30c4eade0555f18607d95902daf33b45"
+        },
+        {
+          "path": "evidence/hilbert/hilbert.json",
+          "kind": "summary",
+          "bytes": 146762,
+          "sha256": "2a3fc5721b35b81978a6e25cf558441380b7b664166585cabba04a3253ed3830"
+        },
+        {
+          "path": "evidence/hilbert/verified-summary.json",
+          "kind": "summary",
+          "bytes": 3930,
+          "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r2/local/certificates/original-prime-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T16:40:33Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 42,
+          "last_nonzero_degree": 41,
+          "total_dimension": 9159376218609600
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T16:40:30Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, primality, explicit controls, Wilson ranks and Hilbert recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert/original-prime-m2-natural.json",
+          "kind": "other",
+          "bytes": 8958,
+          "sha256": "ef188e98e2681f5801f06c9d80ed50f82a4776aec6417adb2bd3221937483c4f"
+        },
+        {
+          "path": "evidence/hilbert/hilbert.json",
+          "kind": "summary",
+          "bytes": 146762,
+          "sha256": "2a3fc5721b35b81978a6e25cf558441380b7b664166585cabba04a3253ed3830"
+        },
+        {
+          "path": "evidence/hilbert/verified-summary.json",
+          "kind": "summary",
+          "bytes": 3930,
+          "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r2/local/certificates/original-prime-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T16:40:33Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 42,
+          "last_nonzero_degree": 41,
+          "total_dimension": 9159376218609600
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T16:40:30Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, primality, explicit controls, Wilson ranks and Hilbert recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert/baseline-prime-m2-planted.json",
+          "kind": "other",
+          "bytes": 10140,
+          "sha256": "dc865ff49890f20c8e59036aef811e2fa94e1e9fd530f18de01a70246d90c5fb"
+        },
+        {
+          "path": "evidence/hilbert/hilbert.json",
+          "kind": "summary",
+          "bytes": 146762,
+          "sha256": "2a3fc5721b35b81978a6e25cf558441380b7b664166585cabba04a3253ed3830"
+        },
+        {
+          "path": "evidence/hilbert/verified-summary.json",
+          "kind": "summary",
+          "bytes": 3930,
+          "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r2/local/certificates/baseline-prime-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T16:40:33Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 42,
+          "last_nonzero_degree": 41,
+          "total_dimension": 9159376218609600
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T16:40:30Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, primality, explicit controls, Wilson ranks and Hilbert recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert/baseline-prime-m2-natural.json",
+          "kind": "other",
+          "bytes": 9497,
+          "sha256": "bba0524e1c4aff11e2e100aa63d591a51b523dd3bbb2d3a00a5b7543a778e8d4"
+        },
+        {
+          "path": "evidence/hilbert/hilbert.json",
+          "kind": "summary",
+          "bytes": 146762,
+          "sha256": "2a3fc5721b35b81978a6e25cf558441380b7b664166585cabba04a3253ed3830"
+        },
+        {
+          "path": "evidence/hilbert/verified-summary.json",
+          "kind": "summary",
+          "bytes": 3930,
+          "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r2/local/certificates/baseline-prime-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T16:40:33Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 42,
+          "last_nonzero_degree": 41,
+          "total_dimension": 9159376218609600
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T16:40:30Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, primality, explicit controls, Wilson ranks and Hilbert recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert/spike40-prime-m2-planted.json",
+          "kind": "other",
+          "bytes": 10147,
+          "sha256": "d199c43fe7a352fc052f5322f12d488111713be496d3bf57b7c41a148a8434e2"
+        },
+        {
+          "path": "evidence/hilbert/hilbert.json",
+          "kind": "summary",
+          "bytes": 146762,
+          "sha256": "2a3fc5721b35b81978a6e25cf558441380b7b664166585cabba04a3253ed3830"
+        },
+        {
+          "path": "evidence/hilbert/verified-summary.json",
+          "kind": "summary",
+          "bytes": 3930,
+          "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r2/local/certificates/spike40-prime-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T16:40:33Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 42,
+          "last_nonzero_degree": 41,
+          "total_dimension": 9159376218609600
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T16:40:30Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, primality, explicit controls, Wilson ranks and Hilbert recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40",
+      "artifacts": [
+        {
+          "path": "evidence/hilbert/spike40-prime-m2-natural.json",
+          "kind": "other",
+          "bytes": 9504,
+          "sha256": "8eb34c64cb54c759d10b57e4d948298daf8df8cf134f16a108b7ef6188663c7b"
+        },
+        {
+          "path": "evidence/hilbert/hilbert.json",
+          "kind": "summary",
+          "bytes": 146762,
+          "sha256": "2a3fc5721b35b81978a6e25cf558441380b7b664166585cabba04a3253ed3830"
+        },
+        {
+          "path": "evidence/hilbert/verified-summary.json",
+          "kind": "summary",
+          "bytes": 3930,
+          "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r2/local/certificates/spike40-prime-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T16:40:33Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 42,
+          "last_nonzero_degree": 41,
+          "total_dimension": 9159376218609600
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T16:40:30Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, primality, explicit controls, Wilson ranks and Hilbert recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "64e06657f1a2e6df003130fa7f4e9a034d44b826",
+    "dirty": false
+  }
+}
