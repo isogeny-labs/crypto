@@ -158,17 +158,19 @@ void model_replay(const std::filesystem::path&root,const std::filesystem::path&s
             throw std::runtime_error("missing frozen model-control case");
     std::cout<<"PASS OpenSSL complete model cases="<<rows.size()<<" models="<<models<<'\n';
 }
-void cold_replay(const std::filesystem::path&root,const std::filesystem::path&summary) {
-    Group group;const auto all=group.all();std::vector<Point> base;
-    for(Point p:all)if(p.second<=8&&group.membership(p.first,3,1))base.push_back(p);
-    if(base.size()!=3)throw std::runtime_error("OpenSSL base dimension");
+template<class GroupType,class Membership>
+void cold_replay_rows(const std::filesystem::path&root,const std::filesystem::path&summary,
+    GroupType&group,const std::vector<Point>&base,int field_modulus,int scalar_order,
+    const std::set<Point>&wanted,Membership member) {
+    auto reduce=[scalar_order](int x){x%=scalar_order;return x<0?x+scalar_order:x;};
     const auto targets=table(summary,"target_x\ttarget_y\trecovered_scalar\tattempts\tbackend_calls\tmisses\trank");
-    if(targets.size()!=18)throw std::runtime_error("cold target census incomplete");
+    if(targets.size()!=wanted.size())throw std::runtime_error("cold target census incomplete");
     std::size_t relation_total=0,kernel_total=0;
     std::set<Point> census;
     for(const auto&row:targets) {
         if(row.size()!=7)throw std::runtime_error("invalid cold summary");
         const Point Q{number(row[0]),number(row[1])};
+        if(!wanted.count(Q))throw std::runtime_error("cold target binding mismatch");
         if(!census.insert(Q).second)throw std::runtime_error("duplicate cold target");
         const auto directory=root/("target-x"+row[0]+"-y"+row[1]);
         const auto attempts=table(directory/"cold-attempts.tsv","attempt\tbatch\ta\tb\trx\try\tstatus\tbackend_call");
@@ -201,13 +203,13 @@ void cold_replay(const std::filesystem::path&root,const std::filesystem::path&su
             if(!seen_relations.insert(number(r[0])).second)throw std::runtime_error("duplicate relation attempt");
             if(a==accepted.end()||!std::equal(r.begin(),r.begin()+6,a->second.begin()))throw std::runtime_error("relation labels mismatch");
             const Point R{number(r[4]),number(r[5])};auto points=model_points(r[7]);
-            std::vector<int> coefficients(3);
+            std::vector<int> coefficients(base.size());
             for(Point p:points) {
-                if(p.first==R.first||!group.membership(p.first,3,1))throw std::runtime_error("cold model chart");
+                if(p.first==R.first||!member(p.first))throw std::runtime_error("cold model chart");
                 const auto b=std::find_if(base.begin(),base.end(),[&](Point v){return v.first==p.first;});
                 if(b==base.end()||coefficients[b-base.begin()]!=0)throw std::runtime_error("cold base binding");
                 if(p.second==b->second)coefficients[b-base.begin()]=1;
-                else if(p.second==17-b->second)coefficients[b-base.begin()]=18;
+                else if(p.second==field_modulus-b->second)coefficients[b-base.begin()]=scalar_order-1;
                 else throw std::runtime_error("cold sign binding");
             }
             if(coefficients!=vector_read(r[6]))throw std::runtime_error("signed row mismatch");
@@ -218,30 +220,40 @@ void cold_replay(const std::filesystem::path&root,const std::filesystem::path&su
             if(k.size()!=6)throw std::runtime_error("bad kernel row");
             const auto batch=batches.find(number(k[0]));if(batch==batches.end())throw std::runtime_error("missing kernel batch");
             const auto w=vector_read(k[2]);
-            if(w.size()!=batch->second.size()||w.size()!=4||std::all_of(w.begin(),w.end(),[](int v){return v==0;}))
+            if(w.size()!=batch->second.size()||w.size()!=base.size()+1||std::all_of(w.begin(),w.end(),[](int v){return v==0;}))
                 throw std::runtime_error("invalid kernel dimension/zero vector");
-            std::vector<int> combined(3);int alpha=0,beta=0;
+            std::vector<int> combined(base.size());int alpha=0,beta=0;
             for(std::size_t i=0;i<w.size();++i) {
-                if(w[i]>=19)throw std::runtime_error("noncanonical kernel coefficient");
+                if(w[i]>=scalar_order)throw std::runtime_error("noncanonical kernel coefficient");
                 const auto&r=batch->second[i];const auto c=vector_read(r[6]);
-                for(std::size_t j=0;j<3;++j)combined[j]=mod(combined[j]+w[i]*c[j]);
-                alpha=mod(alpha+w[i]*number(r[2]));beta=mod(beta+w[i]*number(r[3]));
+                if(c.size()!=base.size())throw std::runtime_error("kernel row width");
+                for(std::size_t j=0;j<base.size();++j)combined[j]=reduce(combined[j]+w[i]*c[j]);
+                alpha=reduce(alpha+w[i]*number(r[2]));beta=reduce(beta+w[i]*number(r[3]));
             }
-            if(combined!=std::vector<int>(3)||alpha!=number(k[3])||beta!=number(k[4]))throw std::runtime_error("kernel arithmetic mismatch");
+            if(combined!=std::vector<int>(base.size())||alpha!=number(k[3])||beta!=number(k[4]))throw std::runtime_error("kernel arithmetic mismatch");
             if(beta==0) { if(alpha!=0||k[5]!="retry")throw std::runtime_error("bad zero-denominator retry"); }
-            else if(k[5]!="return"||mod(alpha+number(row[2])*beta)!=0)throw std::runtime_error("scalar-label recovery mismatch");
+            else if(k[5]!="return"||reduce(alpha+number(row[2])*beta)!=0)throw std::runtime_error("scalar-label recovery mismatch");
             ++kernel_total;
         }
         const auto actual=group.mixed(Q,number(row[2]),0),target=group.point(Q);
         if(!group.equal(actual.get(),target.get()))throw std::runtime_error("OpenSSL final scalar mismatch");
     }
+    if(census!=wanted)throw std::runtime_error("missing cold targets");
     std::cout<<"PASS OpenSSL cold targets="<<targets.size()<<" relations="<<relation_total<<" kernels="<<kernel_total<<'\n';
+}
+void cold_replay(const std::filesystem::path&root,const std::filesystem::path&summary,bool one=false) {
+    Group group;const auto all=group.all();std::vector<Point> base;
+    for(Point p:all)if(p.second<=8&&group.membership(p.first,3,1))base.push_back(p);
+    if(base.size()!=3)throw std::runtime_error("OpenSSL base dimension");
+    const auto wanted=one?std::set<Point>{{0,6}}:std::set<Point>(all.begin(),all.end());
+    cold_replay_rows(root,summary,group,base,17,19,wanted,[&](int x){return group.membership(x,3,1);});
 }
 int main(int argc,char**argv) {
     try {
-        if(argc!=4)throw std::runtime_error("usage: replay --models|--cold ROOT SUMMARY.tsv");
+        if(argc!=4)throw std::runtime_error("usage: replay --models|--cold|--cold-one ROOT SUMMARY.tsv");
         if(std::string(argv[1])=="--models")model_replay(argv[2],argv[3]);
         else if(std::string(argv[1])=="--cold")cold_replay(argv[2],argv[3]);
+        else if(std::string(argv[1])=="--cold-one")cold_replay(argv[2],argv[3],true);
         else throw std::runtime_error("unknown replay command");
         return 0;
     }catch(const std::exception&e){std::cerr<<"REJECT: "<<e.what()<<'\n';return 2;}
