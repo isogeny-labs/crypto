@@ -87,3 +87,32 @@ on revision9141e386254340a9bdba3036f2bb706a produced no direct relevant decoder;
 that does not establish absence. Web searches found Gauss-map material but no
 primary result used beyond these identities. Repo source: geometry13 proof,
 transport13 pinned section-space arithmetic and its explicit raw receipts.
+
+## Global difference-divisor specialization argument
+
+Here is the additional argument needed above, separate from the destination-only
+execution. Take the smooth canonical quartic lift over the Witt DVR used in
+geometry13's reconstruction proof. Its relative Jacobian is smooth. Lift the
+symmetric theta characteristic (2 is invertible), its eight second-order sections,
+and the origin parameters. The rank7 special jet matrix has an invertible minor,
+so its kernel has a primitive rank1 lift whose reduction is the known Gamma00
+section. On the generic characteristic0 fiber Fay's identity makes that section
+vanish on every [P-Q]. Pull back to the relative product of the lifted curve with
+itself: a section zero generically is zero everywhere, since this smooth product
+is flat over the DVR and its invertible sheaf has no uniformizer torsion.
+Consequently the special section vanishes on C-C, as a scheme pullback.
+
+The difference map CxC -> C-C has generic degree1: two ordered representations
+P-Q=P'-Q' would give a degree2 pencil unless the pairs agree (or the zero case).
+The image is irreducible. The class of its divisor is2Theta: the Pontryagin
+product [C]*[-C] equals [C]*[C], as [-1] fixes the cohomological curve class;
+the latter is twice[W2]=2Theta since the generic sum map to W2 has degree2.
+One can compute this in characteristic0 and specialize intersection numbers
+through the same smooth family; no identification of rational cycles is needed.
+Thus C-C and the Gamma00 divisor both have intersection degree12 with Theta²
+in dimension3. Their effective residual divisor would have zero intersection
+with the square of an ample class, impossible unless empty. The multiplicity
+along C-C is exactly1 by the same argument. Hence the special section defines
+the reduced difference surface, and its generic local jets are legitimate input
+to this decoder. This proves a geometric prerequisite, not execution of source
+jet evaluation, nor a general-public-input transport algorithm.
