@@ -3,7 +3,7 @@ use super::*;
 fn neg(a: &Poly) -> Poly {
     scale(a, P - 1)
 }
-fn norm(f: &Poly, a: &Poly, b: &Poly) -> Poly {
+pub(super) fn norm(f: &Poly, a: &Poly, b: &Poly) -> Poly {
     ps(&pm(a, a), &pm(f, &pm(b, b)))
 }
 fn derivative(a: &Poly) -> Poly {
@@ -15,7 +15,7 @@ fn derivative(a: &Poly) -> Poly {
             .collect(),
     )
 }
-fn interpolate(points: &[(u64, u64)]) -> Poly {
+pub(super) fn interpolate(points: &[(u64, u64)]) -> Poly {
     let mut s = vec![];
     for (i, (x, y)) in points.iter().enumerate() {
         let mut l = vec![1];
@@ -34,7 +34,7 @@ fn interpolate(points: &[(u64, u64)]) -> Poly {
     }
     s
 }
-fn kernel(mut m: Mat) -> Vec<Vec<u64>> {
+pub(super) fn kernel(mut m: Mat) -> Vec<Vec<u64>> {
     let cols = m[0].len();
     let mut pivots = vec![];
     for c in 0..cols {

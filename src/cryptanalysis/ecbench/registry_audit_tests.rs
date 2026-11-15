@@ -215,6 +215,28 @@ const APS: P = &[
     ("lambda", "0"),
     ("prune", "false"),
 ];
+const APS_V3: P = &[
+    ("encoding", "line_chart3"),
+    ("roots", "exact"),
+    ("stop", "first_informative"),
+    ("labels", "guaranteed"),
+    ("subset_size", "0"),
+    ("subset_profile", "2,2,2"),
+    ("attempts", "8"),
+    ("degree", "24"),
+    ("budget_ms", "10000"),
+    ("sampling_draws", "1000"),
+    ("orbit", "none"),
+    ("beta", "0"),
+    ("lambda", "0"),
+    ("prune", "false"),
+    ("guess", "none"),
+    ("trace", "certified"),
+    ("trace_entries", "8"),
+    ("trace_words", "100000"),
+    ("growth", "none"),
+    ("growth_ceiling", "4"),
+];
 const LARGE_PRIME: P = &[
     ("small_dimension", "3"),
     ("envelope_dimension", "4"),
@@ -320,6 +342,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ),
     ("ic.aps_v1", Fx::Aps101, APS),
     ("ic.aps_v2", Fx::Aps101, APS),
+    ("ic.aps_v3", Fx::Aps101, APS_V3),
     ("transfer.isogeny", Fx::Prime14, &[("ell", "3")]),
     ("transfer.quartic_cover", Fx::Prime14, &[]),
     ("transfer.quartic_cover_v2", Fx::Prime14, &[]),
@@ -353,7 +376,25 @@ const CASES: &[(&str, Fx, P)] = &[
         ],
     ),
     (
+        "ic.koblitz_descent_v2",
+        Fx::K1n17,
+        &[
+            ("descent_summands", "2"),
+            ("collection_window", "64"),
+            ("factor_base_points", "256"),
+            ("unit_trials", "64"),
+            ("units", "1"),
+            ("max_trials", "100000"),
+            ("seed", "7"),
+        ],
+    ),
+    (
         "ic.koblitz_batched",
+        Fx::K1n17,
+        &[("factor_base_points", "102")],
+    ),
+    (
+        "ic.koblitz_batched_v2",
         Fx::K1n17,
         &[("factor_base_points", "102")],
     ),
@@ -493,6 +534,7 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("rho.preprocessing", "internal_verification"),
     ("rho.negation_strong", "check"),
     ("ic.koblitz_batched", "verify"),
+    ("ic.koblitz_batched_v2", "verify"),
 ];
 
 fn phase_gap(rep: &SolveReport) -> f64 {
