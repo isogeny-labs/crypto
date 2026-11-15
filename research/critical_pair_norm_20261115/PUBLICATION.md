@@ -50,3 +50,32 @@ pair receives a status. Reducers prefer lower leading degree, then column
 and creation id. The same build/qualifier and unchanged checker are reused;
 fresh strict build003 passes all five executables. No002 call has occurred.
 The next source commit freezes this version before its own immutable wrapper.
+
+Qualification002 at96f1cc3b7a passes all six small controls and the Kummer
+norm; all12 auxiliary calls remain unknown at stored-entry/active-S-row caps.
+OpenSSL reports12targets,0completed,12unknown,0models. The two schedule
+changes are jointly worse in completed-target count on this fixed panel;
+there is no runtime comparison or single-change attribution. All19 plus nine
+bindings match at round completion. No cap or degree was raised. [pcc:unverified]
+
+The separate whole002 archive is82016 bytes, SHA256
+1ff6979f864247b4aceb3d0f15e712ad073eb4e3ed48343bc8246d8f7f4cce80;
+normalized unpack/repack is byte-identical. Both raw rounds are immutable.
+Their two-page reports were rendered and all four pages visually inspected;
+the initial layout spilled a short paragraph onto a third page, then reducing
+the diagram width yielded the final readable two-page reports. Plotting copies
+the recorded complete/unknown counts only. No native computation was rerun.
+
+Frozen-wrapper lesson L-9d758ede7873 has a second distinct confirmation
+T-1914785be71e and is adopted. Its narrow rule is folded into the existing
+root native-work instructions. The task-wide goal remains active; no new
+autonomy completion, scientific claim tier or leaderboard value is created.
+
+The parent artifact head ba62e3ae93 and run43717663512 are inspected: two
+objects uploaded and complete-byte replayed. Parent4302 is dirty against
+main40eb9a1607; its one Copilot request comment6895067091 is at13:31:44Z.
+Its journal stays untouched while pending. Parent custody-only README/report
+updates are outside that conflicted file; they require a new-head check.
+Synchronize the descendant with those pointer/docs commits before publishing,
+so it neither re-adds parent raw files nor races their existing migration.
+[pcc:unverified]
