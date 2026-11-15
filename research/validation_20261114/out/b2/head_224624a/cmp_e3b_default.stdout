@@ -1,0 +1,217 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1h86d8d56d9297",
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "resample_seed": 20261002,
+  "a": {
+    "session_id": "ECBS1h305ebf1e98d2",
+    "arm": "rho-neg",
+    "method_id": "ECM1hefea4e0ebe79",
+    "method": "rho.negation",
+    "measured": 2,
+    "verified": 2,
+    "statuses": {
+      "verified": 2
+    },
+    "mean_s": 1.196520938516613,
+    "mean_ratio_to_floor": 1.350129300015717,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 2,
+      "median_s": 1.196520938516613,
+      "max_s": 2.0435374962698005,
+      "max_over_median": 1.7078994863251424,
+      "top_run_share": 0.8539497431625712,
+      "top_run_id": "ECM1hefea4e0ebe79W6755265b1e04R1",
+      "heavy_tail": false
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 6477
+    }
+  },
+  "b": {
+    "session_id": "ECBS1h305ebf1e98d2",
+    "arm": "sem-chain-t2",
+    "method_id": "ECM1hb638e4e2e774",
+    "method": "ic.pipeline",
+    "measured": 2,
+    "verified": 2,
+    "statuses": {
+      "verified": 2
+    },
+    "mean_s": 214.2729298021352,
+    "mean_ratio_to_floor": 241.78111006124857,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 2,
+      "median_s": 214.2729298021352,
+      "max_s": 280.2154695055752,
+      "max_over_median": 1.3077502126112381,
+      "top_run_share": 0.6538751063056191,
+      "top_run_id": "ECM1hb638e4e2e774W6755265b1e04R1",
+      "heavy_tail": false
+    },
+    "unpriced_counts": {
+      "legendre_symbols_uncharged": 8,
+      "pkm_base_check_fp_mults_uncharged": 12,
+      "pkm_grid_fp_mults_uncharged": 1464,
+      "pkm_system_fp_mults_uncharged": 12399130,
+      "row_ops_uncharged": 41,
+      "solver_F_p_multiply-adds_(elimination_only)_uncharged": 484549514877,
+      "sqrt_solves_uncharged": 4,
+      "target_guard_probes_uncharged": 1285598
+    }
+  },
+  "workloads": [
+    {
+      "workload_id": "W6755265b1e04",
+      "slug": "icv1-fp24-t1355-39d9b7fa",
+      "r": 9059959,
+      "floor_s": 0.8862269254527579,
+      "pairs": 1,
+      "a_mean_s": 2.0435374962698005,
+      "b_mean_s": 280.2154695055752,
+      "ratio_b_over_a": 137.1227442692245,
+      "censored_pairs": 0
+    },
+    {
+      "workload_id": "Wa46506aae62c",
+      "slug": "icv1-fp24-t1355-39d9b7fa",
+      "r": 9059959,
+      "floor_s": 0.8862269254527579,
+      "pairs": 1,
+      "a_mean_s": 0.3495043807634255,
+      "b_mean_s": 148.33039009869518,
+      "ratio_b_over_a": 424.4020912547528,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-fp24-t1355-39d9b7fa",
+      "log2_r": 23.11107309082852,
+      "workloads": 2,
+      "pairs": 2,
+      "ratio_b_over_a": 179.07996668054977,
+      "ci95": [
+        1.10899461260755,
+        28917.75496627736
+      ],
+      "ci_method": "linearised_t",
+      "indicative": true,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        137.1227442692245,
+        424.4020912547528
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 179.07996668054977,
+    "ci95": [
+      1.10899461260755,
+      28917.75496627736
+    ],
+    "ci_method": "linearised_t",
+    "pairs": 2,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 4000,
+    "workloads": 2,
+    "dof": 1.0,
+    "indicative": true,
+    "interval_scope": "workloads",
+    "ci95_bootstrap": [
+      137.1227442692245,
+      424.4020912547528
+    ],
+    "ci_bootstrap_method": "cluster",
+    "censored_pairs": 0,
+    "verified_only_ratio": 179.07996668054977,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        179.07996668054977,
+        6172393.547887449,
+        35421380.924488306
+      ],
+      "order": "sem-chain-t2 > rho-neg at every weight",
+      "pairs": 2,
+      "note": "point ratios of totals; rank only where the order holds at every weight; counted table work priced in U with the unpriced counters: table_insert_attempts",
+      "priced_table_work": [
+        "table_insert_attempts"
+      ]
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "2 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L0",
+    "pairs": 2,
+    "pairs_below_level": 0,
+    "median_ratio": 44974536.71780876,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 69734.22041733601,
+    "ns_per_gae_a": 206.16992919616825,
+    "ns_per_gae_b": 14377099.285992157,
+    "ns_per_gae_upper_bound_arms": [
+      "rho-neg",
+      "sem-chain-t2"
+    ],
+    "process_wall_ratio": 110829.6572221044,
+    "process_wall_ci95": [
+      35378.94946413772,
+      347189.87154833926
+    ],
+    "process_wall_ci95_bootstrap": [
+      104285.12508558137,
+      131661.35390369376
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 2,
+    "verified_pairs": 2,
+    "admitted_pairs": 0,
+    "levels": {
+      "L0": 2
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": null,
+    "contention_observed_runs": 0,
+    "notes": [
+      "A/A bonus unavailable: the spec permits wall runs below L2",
+      "contention telemetry is incomplete"
+    ]
+  },
+  "verdict": "ops (ok): sem-chain-t2 / rho-neg = 179.0800 [1.109, 28917.755] (linearised_t, df 1) over 2 pairs on 2 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 179.0800, w=0.1: 6172393.5479, w=1: 35421380.9245): sem-chain-t2 > rho-neg at every weight; wall: descriptive (ns/GAE 69734.2204, not a result: 2 admitted pairs; at least 5 are needed); ns/GAE of rho-neg, sem-chain-t2 is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1hac6639debac9",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

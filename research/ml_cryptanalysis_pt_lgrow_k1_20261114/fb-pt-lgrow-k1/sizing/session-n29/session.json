@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hefca86f152eb",
+  "label": "l-sweep sizing n=29 (not used in any protocol)",
+  "spec_id": "ECS1h95b74e96c57d",
+  "spec_sha256": "95b74e96c57d51c3fef958479740ead2624063147c317dfaf1f97c9ed5bd4969",
+  "env_class_id": "ECBENV3h3de7e7eb2a6e",
+  "host_sha256": "617d57315ae0e6bf5e0f219a74c119ae7c41b0515778896936a7d065dd2515f2",
+  "plan_sha256": "29d915d9f82fe0f9ce300f666817b18dc2f302d54b812ddd2851208987674551",
+  "binary_sha256": "a0be1b2a3a02f5385c9b9654622b01923f3f54a52904bd157861e0cbe8796d29",
+  "git_commit": "21f663511f140bb9c4649e9b98a6678297582063",
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794636240517,
+  "finished_unix_ms": 1794636248890,
+  "status": "complete",
+  "executions_planned": 16,
+  "records_written": 16,
+  "records_sha256": "32e7a8e042ab634654466e0b773fe77d0e6128e5485c7d043def2211dee393b9",
+  "status_counts": {
+    "exhausted": 2,
+    "verified": 14
+  },
+  "last_seq": 15
+}
