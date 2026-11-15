@@ -73,6 +73,17 @@ class AutonomyTest(unittest.TestCase):
     def state(self, eid: str, at=NOW) -> str:
         return ar.episode_state(eid, ar.load(self.d), at)["state"]
 
+    def test_supersedes_replaces_episode_in_summary(self):
+        a = self.episode("--pr", "7", result="partial", merged=False)
+        b = self.episode("--pr", "7", "--supersedes", a)
+        s = ar.summarize(ar.load(self.d), None, NOW)
+        self.assertEqual(s["episodes"], 1)
+        code, _ = run(self.d, "add-episode", "--session", "s", "--task", "t", "--task-class", "other",
+                      "--started", "2026-11-15T00:00:00Z", "--ended", "2026-11-15T01:00:00Z",
+                      "--result", "success", "--supersedes", "E-000000000000", "--evidence", "e")
+        self.assertNotEqual(code, 0)
+        self.assertTrue(b.startswith("E-"))
+
     def test_evidence_required(self):
         code, _ = run(self.d, "add-episode", "--session", "s", "--task", "t", "--task-class", "other",
                       "--started", "2026-11-15T00:00:00Z", "--ended", "2026-11-15T01:00:00Z",

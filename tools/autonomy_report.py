@@ -57,7 +57,7 @@ PREFIX = {"episode": "E", "intervention": "I", "check": "C"}
 TASK_CLASSES = ("ci-repair", "measurement", "lean", "docs-tooling", "research", "blocked", "other")
 RESULTS = ("success", "partial", "fail", "blocked", "abandoned")
 CLASSES = ("redirect", "unblock", "approve", "new_task", "question", "hook")
-CLASSIFIERS = ("haiku", "sonnet", "human", "rule")
+CLASSIFIERS = ("haiku", "sonnet", "opus", "human", "rule")
 CHECKS = ("reverted", "validator_blocking")
 RECOVERY = ("SELF", "HUMAN")
 REVERT_WINDOW_DAYS = 14
@@ -210,7 +210,10 @@ def rate_row(states: list[str]) -> dict:
 
 def summarize(entries: dict[str, dict], since: str | None = None, at: dt.datetime | None = None,
               until: str | None = None) -> dict:
+    superseded = {e.get("supersedes") for e in entries.values()
+                  if e.get("kind") == "episode" and e.get("supersedes")}
     eps = {eid: e for eid, e in entries.items() if e.get("kind") == "episode"
+           and eid not in superseded
            and (since is None or e["ended"][:10] >= since)
            and (until is None or e["ended"][:10] <= until)}
     st = {eid: episode_state(eid, entries, at) for eid in eps}
@@ -435,6 +438,9 @@ def cmd_add_episode(a, d: Path) -> int:
             "result": a.result, "ci_green_at_merge": bool(a.ci_green_at_merge),
             "merged": bool(a.merged), "incidents": [parse_incident(i) for i in a.incident],
             "tokens": a.tokens, "usd": a.usd, "evidence": need_evidence(a.evidence)}
+    if a.supersedes:
+        require_episode(a.supersedes, load(d))
+        body["supersedes"] = a.supersedes
     print(write(d, body))
     return 0
 
@@ -596,6 +602,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--incident", action="append", default=[])
     s.add_argument("--tokens", type=int); s.add_argument("--usd", type=float)
     s.add_argument("--evidence", action="append", default=[])
+    s.add_argument("--supersedes", help="episode id this one replaces (e.g. a partial record of a PR that later merged)")
 
     s = sub.add_parser("add-intervention"); s.add_argument("--episode", required=True)
     s.add_argument("--ts", required=True)
