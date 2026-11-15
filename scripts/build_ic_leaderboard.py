@@ -2331,14 +2331,16 @@ def ghs_relstage_md(g: dict) -> list[str]:
          "Same instances and configuration as the section above (c_D = 1.7, square-root chain): the relation stage "
          "rewritten with open-addressing hash tables, no per-candidate allocation, prefetch of large-prime vertex slots "
          "and a compiled square-root chain. Every counted field is identical to v3, so cold M-eq and the distance to rho "
-         "do not move; the gain is CPU time. Ratio of relations-stage CPU (and total CPU) to v3 on the same unit, one "
+         "do not move; the gain is CPU time. Ratio of relations-stage CPU (and DL phase-sum CPU) to v3 on the same unit, one "
          f"unit at a time on a shared 4-vCPU container (L0), two passes in reversed order; A/A floor {g['aa_floor']:.3f}. "
          f"Pre-registered decision: {g['decision']}. Class: {g['class']}. {g['validation']}.", "",
-         "| k | relations CPU (geomean over seeds) | worst seed | total CPU |", "|--:|--:|--:|--:|"]
+         "| k | relations CPU (geomean over seeds) | worst seed | DL phase-sum CPU |", "|--:|--:|--:|--:|"]
     for r in g["rows"]:
         L.append(f"| {r['k']} | {r['relations_geomean']:.3f} | {r['relations_max']:.3f} | {r['total_cpu_geomean']:.3f} |")
     L += ["", f"Study: [{g['study']}](../../{g['study']}); [report](../../{g['report']}); source `{g['source']}`. "
-          "Times are L0 (local container, not an isolated host).", ""]
+          "Times are L0 (local container, not an isolated host). The DL phase sum leaves out the instance search and the "
+          "D and DL1 linear algebra; whole-process CPU fell only to 0.90–0.96 of v3 in the validator's timing replay "
+          "(relation stage 0.43–0.50 there).", ""]
     return L
 
 
