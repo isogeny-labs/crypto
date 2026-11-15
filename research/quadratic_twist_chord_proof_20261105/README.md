@@ -1,5 +1,7 @@
 # Chord algebra and auxiliary-twist experiments
 
+Latest: the [trace-chart quartic](trace-quartic-20261115/README.md) passes3 new Lean lemmas and all47 native source queries. Bare quartic membership admits36 points; the intended subfield factor base contains10. Complete degree accounting retains the degree14 subfield pullback; no low-degree solver gain is claimed. [pcc:unverified]
+
 New native auxiliary fixture: [proper-extension trace screen](trace-fixture-20261115/README.md) checks all2491 source–twist pairs over F2401 for an actual E/F49 of order47 and nonsquare twist of order53. Six altered payloads reject. This is finite source-preserving geometry, not a solving-degree gain. [pcc:unverified]
 
 Current status, 2026-11-15: five chord algebra declarations pass the pinned Lean build and unmodified scoped axiom gate; five false-statement controls reject. The native partial-chord study remains a fixed-cap admission improvement with no minimum-degree or strongest-source-frontier gain. See [kernel component](kernel-20261115/README.md) for exact scope, preserved failures and next experiment. [pcc:unverified]

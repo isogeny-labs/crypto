@@ -243,3 +243,21 @@ Full three-theorem/three-false-proof plus47-query native chart/point-reference/A
 ### Errors
 
 Pre-data else4/else5 metadata syntax corrected with originals retained, before any execution. The mathematical failure is a Lean rewriting surface mismatch (expanded expression versus imagY definition), not a changed assumption. Current curve-algebra skill/contract read and adopted lessons brief applied; KB tools unavailable, known primary/parent sources reused without novelty claim. [pcc:unverified]
+
+## 2026-11-15T09:06Z — complete trace-quartic proof and native chart check
+
+### What was done
+
+At corrected pre-data8ed91e4d, all15 stages complete: official scoped gate accepts3 new algebra lemmas (standard axioms,0 failing/0 trusted native);3 false equations reject1/FAIL_build. Native C++/independent Rust agree on all47 source queries:60 fixed-chart lifts over36 points,10 restricted lifts over10 source points, identity chart empty. Two audit receipts equal; six genuinely changed payloads reject101/no receipt. Source-root extraction scans49 field values; no point-reference answers feed it. [pcc:unverified]
+
+### Decisions made
+
+The bare quartic is insufficient for structured factor-base membership: it admits26 other source points. Track degree4 quartic, degree6 reconstructed curve and degree14 direct subfield pullback separately. Restricted source factor base has5 signed pairs (x codes5,8,26,33,40), direct source polynomial degree5. No lower full solver degree, useful-rank/scalar or speed claim from this fixed chart. Publish reproducible Lake target for the new module; then next discriminating finite screen is ALL56 affine prime-subfield grids with complete axis/nonzero branches before a new capped full solver contract. [pcc:unverified]
+
+### Open threads
+
+Ordinary pinned PROJECT replay of unchanged5 old plus3 new declarations, expected8 unique, not11. Full56-grid family screen, genuine expanded polynomial certificates, original-source public setup/scalar recovery and strongest source frontier remain separate. Existing local resources only; raw/report assets local; PR open/autooff, automation paused. [pcc:unverified]
+
+### Errors
+
+Original proof rewrite failure and both pre-execution Python syntax errors retained. Single dsimp tactic correction preserves hypotheses/statements. Packaging script also had a pre-execution ternary spacing typo; original retained, corrected/compiled before file operations. Local104-file raw archive10372bytes checks every hash and deterministic repack; one-page report rendered/inspected after diagram legibility revision. No gate/verifier/trust/ledger patch, new IDC1 or signed PCC standing. KB unavailable; reviewed current curve-algebra skill, known primary/parent sources and exact pinned official tools. [pcc:unverified]
