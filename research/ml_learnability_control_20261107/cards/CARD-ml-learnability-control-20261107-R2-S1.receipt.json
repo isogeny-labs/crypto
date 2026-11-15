@@ -1,0 +1,243 @@
+{
+  "card_id": "CARD-ml-learnability-control-20261107-R2-S1",
+  "card_path": "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-R2-S1.yaml",
+  "card_sha256": "1ac336a121abbc91fe7b404405f8641bf73d0f1afd8e3228ed1aec70ed637268",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "5f72e0806c76d845da45ec65aa4f9179284e3a9e",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "5f72e0806c76d845da45ec65aa4f9179284e3a9e",
+        "HEAD",
+        "--",
+        "research/ml_learnability_control_20261107",
+        ":(exclude)research/ml_learnability_control_20261107/cards",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/ml_learnability_control_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.115,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.115,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "950a8d0c12ee97f06a3d8da5472288d67463d3eceabf1cafef2c63dbc94418ed",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/ml_learnability_control_20261107/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "674d224c94b5653265534f19bdebbdced1249b2a6ef8a7afa091496cb438e6e2",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/ml_learnability_control_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "674d224c94b5653265534f19bdebbdced1249b2a6ef8a7afa091496cb438e6e2",
+        ".provenance.protocol_sha256 == $h",
+        "research/ml_learnability_control_20261107/eks/requests/mllc-all-20261108.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "job",
+        "mllc-all-20261108",
+        ".job_name == $job and (.job_uid | length) > 0 and (.state == \"submitted\" or .state == \"active\" or .state == \"succeeded\")",
+        "research/ml_learnability_control_20261107/receipts/R2/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-receipt-exists",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/ml_learnability_control_20261107/cards/wait_command_status.sh",
+        "research/ml_learnability_control_20261107/cards/status_request.json",
+        "mllc-all-20261108",
+        "research/ml_learnability_control_20261107/receipts/R2/status-s1",
+        "1",
+        "1",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 41,
+          "seconds": 2.999,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 41,
+      "id": "status-once",
+      "index": 7,
+      "outputs": {
+        "research/ml_learnability_control_20261107/receipts/R2/status-s1/final-status.json": null
+      },
+      "seconds": 2.999,
+      "stderr_sha256": "294409c1c33ecb5d137a0676a49c7d5e4135c91fb17e2b2e37495f5339ff118f",
+      "stderr_tail": [
+        "FAIL: no terminal state within 1 seconds (last state none)"
+      ],
+      "stdout_sha256": "7f4a7a7ea6290c83caae85a94baf2659bf49a5fa03e36a6e9450fd255f99f60f",
+      "stdout_tail": [
+        "2026-11-08T06:50:13Z poll 1 launcher_exit 255 state none"
+      ],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 11,
+  "commit": "16bb0f2cd1406b0e1ca6cbb58797dc144887c06f",
+  "dirty_after": [],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 7"
+}

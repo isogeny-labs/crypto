@@ -1,0 +1,14 @@
+ops (ok): bsgs-neg / rho-neg = 1.1311 [0.538, 2.379] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.1311, w=0.1: 1.1311, w=1: 1.1311): bsgs-neg > rho-neg at every weight; wall: admitted ns/GAE bsgs-neg/rho-neg 1.2066 [1.178, 1.236], bias-corrected 1.2083 [1.179, 1.238] (A/A 0.9986, includes arm A), outside noise; end-to-end wall 1.5577 [1.023, 2.372]; ns/GAE of rho-neg, bsgs-neg is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 70 / 100; paired attempts 24, verified 24, admitted 14; levels {"L1": 10, "L2": 14}; p95 foreign busy 0.00%, p95 run queue 0.00%
+arm rho-neg: verified 24/24 (0 censored); max/median S 2.13, top run 8% of total; unpriced: canonicalisations_uncharged=447871879
+arm bsgs-neg: verified 24/24 (0 censored); max/median S 1.36, top run 6% of total; unpriced: inserts_uncharged=229528824, lookups_uncharged=277057152
+| curve | log2 r | workloads | bsgs-neg / rho-neg | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 1.1311 | [0.5377, 2.3794] | linearised_t |
+
+| workload | curve | log2 r | rho-neg mean S | bsgs-neg mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W58f361e18cbf | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9845 | 0.8043 | 0.8170 |
+| W6d043f4973dc | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8276 | 1.3789 | 1.6660 |
+| Wa0edbed91337 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9320 | 1.4861 | 1.5945 |
+| Wcd0026d0cfda | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.1585 | 0.7449 | 0.6430 |

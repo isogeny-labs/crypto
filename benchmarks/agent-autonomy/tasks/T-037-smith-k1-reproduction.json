@@ -1,0 +1,40 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-037",
+  "title": "Reproduce the committed claim that k = 1 never passes Smith's conditions",
+  "class": "research",
+  "difficulty": 2,
+  "source": [
+    "research/smith_near_prime_20261114/RESULTS.md (k = 1 row)",
+    "research/smith_near_prime_20261114/PROTOCOL.md",
+    "src/bin/smith_near_prime.rs",
+    "docs/session-logs/2026-11-14.md (23:40Z)"
+  ],
+  "prompt": "The research-kb server may be unreachable in this environment; if so, record that under 'Sources checked' and use the repository's own files. Every number you report is an unverified assertion unless a pcc claim says otherwise; tag it. The committed census says that when `f` is irreducible (`k = 1`), Smith's conditions never pass. Reproduce that at smaller scale: build and run `smith_near_prime run --primes 67,131,257 --admitted 60 --max-h 8 --threads 2 --out $T_OUT/np.jsonl`, then count the pass rate of the `k = 1` curves. Write `$T_OUT/repro.md`: what you ran, the counts, whether the claim reproduced, and what this sample cannot say. Do not edit the study. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout; no fixture. cargo available.",
+  "acceptance": [
+    "$T_OUT/np.jsonl exists with kind=curve rows",
+    "at least 50 curves with k = 1 in the run, and none has smith.full_success true",
+    "$T_OUT/repro.md exists, carries [pcc:unverified], has a 'Sources checked' line, and passes lint-prose",
+    "research/smith_near_prime_20261114 is unchanged"
+  ],
+  "check_command": "python3 -c \"import json,os;rows=[json.loads(l) for l in open(os.environ['T_OUT']+'/np.jsonl') if l.strip()];C=[r for r in rows if r['kind']=='curve' and r.get('squarefree') and r.get('smith') is not None];k1=[r for r in C if r['k']==1];assert len(k1)>=50,len(k1);assert not any(r['smith']['full_success'] for r in k1)\" && python3 tools/pcc/pcc.py lint-prose \"$T_OUT/repro.md\" && grep -q 'pcc:unverified' \"$T_OUT/repro.md\" && grep -qi 'sources checked' \"$T_OUT/repro.md\" && git diff --quiet \"$T_BASE\" HEAD -- research/smith_near_prime_20261114",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "citing a result as verified without a pcc claim id (use [pcc:unverified])",
+    "editing the study or evidence you are checking",
+    "inventing a source id, claim id or number"
+  ],
+  "max_wall_minutes": 60,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [
+    "cargo"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": "JSON field names (kind, k, smith.full_success) read from render.py. The census data file is not committed (only its hash), so reproduction means a fresh run. A fresh run may use different seeds than the committed one."
+}

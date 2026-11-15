@@ -1464,7 +1464,7 @@
    ],
    "standard_names": [],
    "sources": [
-    "prose, by the constructor rule: research/arity_completion_20261104/koblitz_m5_m6/PROTOCOL.md"
+    "prose, by the constructor rule: docs/ic-leaderboard.html"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -17333,11 +17333,11 @@
    "standard_names": [],
    "sources": [
     "docs/curves/sources/generated.json",
+    "docs/ecbench/specs/tensor-ic-cofactor-c4-16-s1.json",
+    "docs/ecbench/specs/tensor-ic-cofactor-c4-16-s2.json",
     "research/ecbench_known_log_targets_20261021/fixtures.json",
     "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/plan.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/spec.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0643Z-cofactor-v2/plan.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0643Z-cofactor-v2/spec.json"
+    "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/spec.json"
    ],
    "representations": [
     {
@@ -17395,11 +17395,11 @@
    "standard_names": [],
    "sources": [
     "docs/curves/sources/generated.json",
+    "docs/ecbench/specs/tensor-ic-cofactor-c2-16-s1.json",
+    "docs/ecbench/specs/tensor-ic-cofactor-c2-16-s2.json",
     "research/ecbench_known_log_targets_20261021/fixtures.json",
     "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/plan.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/spec.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0643Z-cofactor-v2/plan.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0643Z-cofactor-v2/spec.json"
+    "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/spec.json"
    ],
    "representations": [
     {
@@ -17457,11 +17457,11 @@
    "standard_names": [],
    "sources": [
     "docs/curves/sources/generated.json",
+    "docs/ecbench/specs/tensor-ic-cofactor-c8-16-s1.json",
+    "docs/ecbench/specs/tensor-ic-cofactor-c8-16-s2.json",
     "research/ecbench_known_log_targets_20261021/fixtures.json",
     "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/plan.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/spec.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0643Z-cofactor-v2/plan.json",
-    "research/ecbench_known_log_targets_20261021/sessions/20261021T0643Z-cofactor-v2/spec.json"
+    "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-cofactor/spec.json"
    ],
    "representations": [
     {
@@ -17725,8 +17725,8 @@
     "research/ecbench_calibration_20261002/sessions/prime/plan.json",
     "research/ecbench_calibration_20261002/sessions/prime/spec.json",
     "research/ecbench_calibration_20261002/specs/prime.json",
-    "research/ic_planner_exhaustive_20261026/sessions/R-p18/plan.json",
-    "research/ic_planner_exhaustive_20261026/sessions/R-p18/spec.json"
+    "research/ic_gauss_echelon_20261027/specs/R-p18.json",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p18/plan.json"
    ],
    "representations": [
     {
@@ -236109,12 +236109,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/ic-representative-selection_20261105/native/testdata/class-l2-s1001/spec.json",
     "research/isogeny-volcano-cost-v2_20261017/classes/l2-s1001/spec-aa.json",
     "research/isogeny-volcano-cost-v2_20261017/classes/l2-s1001/spec-bsgs.json",
     "research/isogeny-volcano-cost-v2_20261017/classes/l2-s1001/spec-icctl.json",
     "research/isogeny-volcano-cost-v2_20261017/classes/l2-s1001/spec.json",
-    "research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1001/spec-aa/spec.json",
-    "research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1001/spec-bsgs/spec.json"
+    "research/isogeny-volcano-cost-v2_20261017/sessions/l2-s1001/spec-aa/spec.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -478650,12 +478650,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-plus.json",
     "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P32Cfph9a107ad5dda4",
+     "curve_uid": "urn:ec-record:1:sha256:9a107ad5dda4a83880081db6962768d276421b3dd0cad0a7bcf67a19ac4c7e28",
+     "field_sha256": "8d107a2abe620377ac90564da524263cf05535c444a21495608fbf9ef1786d97",
+     "field": {
+      "characteristic": 3221225473,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       1650266196,
+       921941151
+      ],
+      "subgroup_order": "3221175689",
+      "cofactor": 1,
+      "generator": [
+       "0x4",
+       "0x5d378fc"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp32-tm30063-42a4d230",
@@ -478674,12 +478708,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-minus-naive.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P32Cfphd4c73aaaf2dd",
+     "curve_uid": "urn:ec-record:1:sha256:d4c73aaaf2dd4ab4ab4b89adfe896c82f07bb1c7223b1c82ac817e454750c7d1",
+     "field_sha256": "8d107a2abe620377ac90564da524263cf05535c444a21495608fbf9ef1786d97",
+     "field": {
+      "characteristic": 3221225473,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       1276370223,
+       3125933284
+      ],
+      "subgroup_order": "3221255537",
+      "cofactor": 1,
+      "generator": [
+       "0x2",
+       "0x19d0ef70"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp32-tm36084-1e321273",
@@ -491022,6 +491090,128 @@
    ]
   },
   {
+   "slug": "icv1-fp33-t65189-eee04389",
+   "icv1": "ICV1:fp-5557729739:65189:5557664551:5152215729:unk:unk:r:eee043893fe0",
+   "family": "prime",
+   "params": {
+    "p": "5557729739",
+    "a": "2036002406",
+    "b": "2773982840",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 33, 201624291843241)"
+   },
+   "model_json": "{\"a\":\"2036002406\",\"b\":\"2773982840\",\"field\":\"fp-5557729739\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"5557729739\",\"v\":\"1\"}",
+   "trace": 65189,
+   "order": "5557664551",
+   "j": "5152215729",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp33-t65189-eee04389"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P33Cfph4fe62754fc13",
+     "curve_uid": "urn:ec-record:1:sha256:4fe62754fc138a160efed54e8a267711161389733af944603e3413ffa5750d58",
+     "field_sha256": "6ab23562990eb631ee6898fd0c237ee964e8d21eaa68c7a89e997223901d7a17",
+     "field": {
+      "characteristic": 5557729739,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       2036002406,
+       2773982840
+      ],
+      "subgroup_order": "5557664551",
+      "cofactor": 1,
+      "generator": [
+       "0x3",
+       "0x35911abc"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp33-tm43469-ac81a6df",
+   "icv1": "ICV1:fp-7183145327:-43469:7183188797:5590928872:unk:unk:r:ac81a6df5b6f",
+   "family": "prime",
+   "params": {
+    "p": "7183145327",
+    "a": "4546663450",
+    "b": "440691422",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 33, 24642267360510)"
+   },
+   "model_json": "{\"a\":\"4546663450\",\"b\":\"440691422\",\"field\":\"fp-7183145327\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"7183145327\",\"v\":\"1\"}",
+   "trace": -43469,
+   "order": "7183188797",
+   "j": "5590928872",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp33-tm43469-ac81a6df"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P33Cfph63ce06f35917",
+     "curve_uid": "urn:ec-record:1:sha256:63ce06f359178aa876fe4ae5fb53c2ee713166d9aafb40fab579b92ddefecce0",
+     "field_sha256": "3c2e02b930b4d3e9da4cc4e05284c789bbe61d221a0e438b54704213c11b3205",
+     "field": {
+      "characteristic": 7183145327,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       4546663450,
+       440691422
+      ],
+      "subgroup_order": "7183188797",
+      "cofactor": 1,
+      "generator": [
+       "0x3",
+       "0x1846069db"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp33-tm78373-cca7741c",
    "icv1": "ICV1:fp-8589934583:-78373:8590012957:1585834068:unk:unk:r:cca7741c6ebe",
    "family": "prime",
@@ -491299,12 +491489,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-minus-naive.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P36Cfphebdd1480f976",
+     "curve_uid": "urn:ec-record:1:sha256:ebdd1480f976096acd61fa4e1abad3d1e6237baac2148f288b9bf567a838897b",
+     "field_sha256": "9cd8f154d9b668a0b726c3229937ae859d5048551464d0be4d6086cc7ad9a5fc",
+     "field": {
+      "characteristic": 51539607599,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       42839962887,
+       20874427050
+      ],
+      "subgroup_order": "51539573731",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0x18dc1830e"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp36-tm129119-ba25e086",
@@ -491323,12 +491547,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-plus.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/plan.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/spec.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P36Cfphffaadd09d324",
+     "curve_uid": "urn:ec-record:1:sha256:ffaadd09d324533c2ad1fb3b5cc75092bed1dd47d93b92f0883347b49bd8bfe8",
+     "field_sha256": "9cd8f154d9b668a0b726c3229937ae859d5048551464d0be4d6086cc7ad9a5fc",
+     "field": {
+      "characteristic": 51539607599,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       42563202063,
+       36790426922
+      ],
+      "subgroup_order": "51539736719",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0x18adcd278"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp36-t45050-0075b5e7",
@@ -491559,6 +491817,67 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp37-tm218953-61268c9f",
+   "icv1": "ICV1:fp-70093240733:-218953:70093459687:32334281039:unk:unk:r:61268c9f8b52",
+   "family": "prime",
+   "params": {
+    "p": "70093240733",
+    "a": "34866272438",
+    "b": "47397029180",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 37, 18561872162765)"
+   },
+   "model_json": "{\"a\":\"34866272438\",\"b\":\"47397029180\",\"field\":\"fp-70093240733\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"70093240733\",\"v\":\"1\"}",
+   "trace": -218953,
+   "order": "70093459687",
+   "j": "32334281039",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp37-tm218953-61268c9f"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P37Cfph2122d4ac6950",
+     "curve_uid": "urn:ec-record:1:sha256:2122d4ac695045a96c794470043f28e2eacee443c23eb7aec877740967845f42",
+     "field_sha256": "74663dc83f339a547faf9fd1451cd0195b07fc03d7df68c82d7704bdf103a6e7",
+     "field": {
+      "characteristic": 70093240733,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       34866272438,
+       47397029180
+      ],
+      "subgroup_order": "70093459687",
+      "cofactor": 1,
+      "generator": [
+       "0x9",
+       "0x7cf3caeb6"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp37-t277-090dc414",
    "icv1": "ICV1:fp-81640512137:277:81640511861:15573395165:unk:unk:r:090dc4148486",
    "family": "prime",
@@ -491657,6 +491976,67 @@
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp37-t160405-998ed0ab",
+   "icv1": "ICV1:fp-92849827471:160405:92849667067:6295185958:unk:unk:r:998ed0ab801c",
+   "family": "prime",
+   "params": {
+    "p": "92849827471",
+    "a": "41216192137",
+    "b": "53376697970",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 37, 135799598603144)"
+   },
+   "model_json": "{\"a\":\"41216192137\",\"b\":\"53376697970\",\"field\":\"fp-92849827471\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"92849827471\",\"v\":\"1\"}",
+   "trace": 160405,
+   "order": "92849667067",
+   "j": "6295185958",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp37-t160405-998ed0ab"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P37Cfphea5cbbdb98f4",
+     "curve_uid": "urn:ec-record:1:sha256:ea5cbbdb98f4137cf74f1bdfc56d4a8d741ddf01a4beccc04a282ef338435723",
+     "field_sha256": "37d515873449b0d1305d162559f3dd3094832a7bb3a3706bcb76de210ff9abff",
+     "field": {
+      "characteristic": 92849827471,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       41216192137,
+       53376697970
+      ],
+      "subgroup_order": "92849667067",
+      "cofactor": 1,
+      "generator": [
+       "0x2",
+       "0xa3c80a736"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp37-t428317-60c650c8",
@@ -491832,12 +492212,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-minus-naive.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P40Cfph507057b3cde2",
+     "curve_uid": "urn:ec-record:1:sha256:507057b3cde27d25deebee4acb9dd939fc60233776ecb3b5bef5353a189a1007",
+     "field_sha256": "0952420e81ed76489dc367a56b17bfe5fd69a1654a976c532b435fde7b000c89",
+     "field": {
+      "characteristic": 824633720837,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       631256874754,
+       396321534139
+      ],
+      "subgroup_order": "824632004309",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0x53955357d6"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp40-t361865-3168d4f0",
@@ -491856,12 +492270,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-plus.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/plan.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/spec.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P40Cfpha7693fa8b308",
+     "curve_uid": "urn:ec-record:1:sha256:a7693fa8b3080689d81e476ae5c42fa7362a144a1f3cf0ba9e60c86a9073d2d9",
+     "field_sha256": "0952420e81ed76489dc367a56b17bfe5fd69a1654a976c532b435fde7b000c89",
+     "field": {
+      "characteristic": 824633720837,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       549438520351,
+       720403155216
+      ],
+      "subgroup_order": "824633358973",
+      "cofactor": 1,
+      "generator": [
+       "0x3",
+       "0x3ad4b6a215"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp40-t1467058-e505eb31",
@@ -492320,6 +492768,67 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp41-tm405553-81153b6e",
+   "icv1": "ICV1:fp-1495523448539:-405553:1495523854093:47688710942:unk:unk:r:81153b6ea065",
+   "family": "prime",
+   "params": {
+    "p": "1495523448539",
+    "a": "640197488525",
+    "b": "566237084442",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 41, 119518173357916)"
+   },
+   "model_json": "{\"a\":\"640197488525\",\"b\":\"566237084442\",\"field\":\"fp-1495523448539\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1495523448539\",\"v\":\"1\"}",
+   "trace": -405553,
+   "order": "1495523854093",
+   "j": "47688710942",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp41-tm405553-81153b6e"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P41Cfph69b2ea6ae79e",
+     "curve_uid": "urn:ec-record:1:sha256:69b2ea6ae79ed8a40c3f05fe5dba534e4b8e87a4261b6bed55d0793db590c1cc",
+     "field_sha256": "f4339c191645dac3179e8554fd80fde13d33e0eeb20bcae6d7fedf70ff9a789b",
+     "field": {
+      "characteristic": 1495523448539,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       640197488525,
+       566237084442
+      ],
+      "subgroup_order": "1495523854093",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0xdcf9e7cf02"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp41-tm1140372-49d402e6",
    "icv1": "ICV1:fp-1498933511111:-1140372:1498934651484:402055951078:unk:unk:r:49d402e6b73e",
    "family": "prime",
@@ -492368,6 +492877,67 @@
      },
      "sources": [
       "research/isogeny_fibers_20261010/round7/r7_6_r62_batch/runs/batch_r36_sym1_v1.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp41-tm886935-baa24912",
+   "icv1": "ICV1:fp-1930433675293:-886935:1930434562229:1063871090303:unk:unk:r:baa249122058",
+   "family": "prime",
+   "params": {
+    "p": "1930433675293",
+    "a": "28146981299",
+    "b": "897732060440",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 41, 181458334271012)"
+   },
+   "model_json": "{\"a\":\"28146981299\",\"b\":\"897732060440\",\"field\":\"fp-1930433675293\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1930433675293\",\"v\":\"1\"}",
+   "trace": -886935,
+   "order": "1930434562229",
+   "j": "1063871090303",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp41-tm886935-baa24912"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P41Cfphbb8de82d8722",
+     "curve_uid": "urn:ec-record:1:sha256:bb8de82d8722d04045f9cc083b4208c2b7ab7d7657a093832818b44012915809",
+     "field_sha256": "b9ac96c1a34e778d553cc397c623c528681ad9190799ea3f84333c0e053d8a70",
+     "field": {
+      "characteristic": 1930433675293,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       28146981299,
+       897732060440
+      ],
+      "subgroup_order": "1930434562229",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0xe1b858afc0"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
      ]
     }
    ]
@@ -492623,12 +493193,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-plus.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/plan.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/spec.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P44Cfph507b06613222",
+     "curve_uid": "urn:ec-record:1:sha256:507b06613222d9a859f237a70ff3705f582f9dc6ea5941d1693aea8ebfdc6c0c",
+     "field_sha256": "7dfc86e5740a5ed6a4fb4728d5bb8c8ad56797545c17454a190ab2fd0a55e5ac",
+     "field": {
+      "characteristic": 13194139533349,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       10139896036112,
+       12540980411941
+      ],
+      "subgroup_order": "13194137032873",
+      "cofactor": 1,
+      "generator": [
+       "0x4",
+       "0x1ef2c44b036"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp44-tm299397-25170a45",
@@ -492647,12 +493251,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-minus-naive.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P44Cfphd8ba42366fc7",
+     "curve_uid": "urn:ec-record:1:sha256:d8ba42366fc76613f2d6ea5809e1ee4494d2e83f9be2e4542c1a38ecf76f2065",
+     "field_sha256": "7dfc86e5740a5ed6a4fb4728d5bb8c8ad56797545c17454a190ab2fd0a55e5ac",
+     "field": {
+      "characteristic": 13194139533349,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       4446846082295,
+       8537060969387
+      ],
+      "subgroup_order": "13194139832747",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0x266983fadc8"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp44-tm1269095-f56aca35",
@@ -492818,6 +493456,128 @@
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp45-t1999407-5563cb34",
+   "icv1": "ICV1:fp-25361112161527:1999407:25361110162121:15844329353952:unk:unk:r:5563cb340e2b",
+   "family": "prime",
+   "params": {
+    "p": "25361112161527",
+    "a": "20787366627629",
+    "b": "12019143787601",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 45, 196853410870112)"
+   },
+   "model_json": "{\"a\":\"20787366627629\",\"b\":\"12019143787601\",\"field\":\"fp-25361112161527\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"25361112161527\",\"v\":\"1\"}",
+   "trace": 1999407,
+   "order": "25361110162121",
+   "j": "15844329353952",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp45-t1999407-5563cb34"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J2/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J2.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J2.request.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J2.pod/input-spec.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J2.pod/session/plan.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P45Cfph7e3991b617f2",
+     "curve_uid": "urn:ec-record:1:sha256:7e3991b617f2a977d502b2a3b37d881b659ade315737e641b72340a2d9d09264",
+     "field_sha256": "3fb4301ac6832bf715bc93d10267caae8c50403e6229a90feec777355dca4eb7",
+     "field": {
+      "characteristic": 25361112161527,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       20787366627629,
+       12019143787601
+      ],
+      "subgroup_order": "25361110162121",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0xa34bc268d98"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp45-tm6458695-fe3d5bd2",
+   "icv1": "ICV1:fp-27611383581911:-6458695:27611390040607:8633169496635:unk:unk:r:fe3d5bd294ab",
+   "family": "prime",
+   "params": {
+    "p": "27611383581911",
+    "a": "12878670601399",
+    "b": "4914515096856",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 45, 185150999512726)"
+   },
+   "model_json": "{\"a\":\"12878670601399\",\"b\":\"4914515096856\",\"field\":\"fp-27611383581911\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"27611383581911\",\"v\":\"1\"}",
+   "trace": -6458695,
+   "order": "27611390040607",
+   "j": "8633169496635",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp45-tm6458695-fe3d5bd2"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J2/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J2.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J2.request.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J2.pod/input-spec.json",
+    "research/prime_medium_tier_rho_20261107/sessions/J2.pod/session/plan.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P45Cfphab4d7ee13e50",
+     "curve_uid": "urn:ec-record:1:sha256:ab4d7ee13e50126973ffed264b889d461cc7857d97103bb58b5dd2c4094a301e",
+     "field_sha256": "4f1903c729fa83b9a725897517f3e9eb1c7db2a8a5d1c1c41510bbd1706303d3",
+     "field": {
+      "characteristic": 27611383581911,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       12878670601399,
+       4914515096856
+      ],
+      "subgroup_order": "27611390040607",
+      "cofactor": 1,
+      "generator": [
+       "0x4",
+       "0x6e44c7eca86"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp46-t12700806-02bc716a",
@@ -502601,12 +503361,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-minus-naive.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P48Cfph8f19e4089e55",
+     "curve_uid": "urn:ec-record:1:sha256:8f19e4089e55c8a82d1c0fadf197a238e01481afa3a344c715741a7a448d89d2",
+     "field_sha256": "98513d9f1da74eb7461baf1219d19390dbce1201aea1c9cd4ba70d8bc634b3b9",
+     "field": {
+      "characteristic": 211106232533047,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       39641408782314,
+       41864005889039
+      ],
+      "subgroup_order": "211106219695673",
+      "cofactor": 1,
+      "generator": [
+       "0x6",
+       "0x2af9334cb4af"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp48-tm12411381-a81a3368",
@@ -502625,12 +503419,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-plus.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/plan.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/spec.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P48Cfph68589d850e19",
+     "curve_uid": "urn:ec-record:1:sha256:68589d850e19b6b0198cb96a62c708b402413e26085d4e01f01ef7db20ebe3f6",
+     "field_sha256": "98513d9f1da74eb7461baf1219d19390dbce1201aea1c9cd4ba70d8bc634b3b9",
+     "field": {
+      "characteristic": 211106232533047,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       149792481057423,
+       201282812286566
+      ],
+      "subgroup_order": "211106244944429",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0x5ae03fb9557d"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp48-tm19626194-3ed443e7",
@@ -502770,6 +503598,128 @@
    ]
   },
   {
+   "slug": "icv1-fp49-tm10234315-a355a6d8",
+   "icv1": "ICV1:fp-365857381347911:-10234315:365857391582227:349157465401026:unk:unk:r:a355a6d85b9d",
+   "family": "prime",
+   "params": {
+    "p": "365857381347911",
+    "a": "265803930896159",
+    "b": "186608017781445",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 49, 40016877808970)"
+   },
+   "model_json": "{\"a\":\"265803930896159\",\"b\":\"186608017781445\",\"field\":\"fp-365857381347911\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"365857381347911\",\"v\":\"1\"}",
+   "trace": -10234315,
+   "order": "365857391582227",
+   "j": "349157465401026",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp49-tm10234315-a355a6d8"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J3/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J4/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J3.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J4.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J3.request.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P49Cfph1eb0c064125d",
+     "curve_uid": "urn:ec-record:1:sha256:1eb0c064125d60f632364a5e63e977f4b864820dcc503a9516c30a9580405d38",
+     "field_sha256": "2b92f30cf11bb72851bed091a728516c4996872c285109b626321d8b2166fedc",
+     "field": {
+      "characteristic": 365857381347911,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       265803930896159,
+       186608017781445
+      ],
+      "subgroup_order": "365857391582227",
+      "cofactor": 1,
+      "generator": [
+       "0x2",
+       "0xbe3b48b778a2"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "icv1-fp49-tm34125029-11a5de23",
+   "icv1": "ICV1:fp-561006233595917:-34125029:561006267720947:271044822089073:unk:unk:r:11a5de235244",
+   "family": "prime",
+   "params": {
+    "p": "561006233595917",
+    "a": "429062284978109",
+    "b": "409501054401560",
+    "generator_call": "prime_orbit_index_calculus::generate_instance(generic, 49, 203571419754608)"
+   },
+   "model_json": "{\"a\":\"429062284978109\",\"b\":\"409501054401560\",\"field\":\"fp-561006233595917\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"561006233595917\",\"v\":\"1\"}",
+   "trace": -34125029,
+   "order": "561006267720947",
+   "j": "271044822089073",
+   "end": "unk",
+   "aliases": [
+    "icv1-fp49-tm34125029-11a5de23"
+   ],
+   "standard_names": [],
+   "sources": [
+    "research/prime_medium_tier_rho_20261107/curves.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J5/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J6/request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J5.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/J6.request.json",
+    "research/prime_medium_tier_rho_20261107/requests/final/J5.request.json"
+   ],
+   "representations": [
+    {
+     "ec1": "EC1P49Cfphf02b8bf5fcc2",
+     "curve_uid": "urn:ec-record:1:sha256:f02b8bf5fcc24cd00b3720437e411642e34fd20af05488571c6686b0b04bfeab",
+     "field_sha256": "1e5b56b303b25093f6aabcb160130dc2e3149e1169f7cc0adf94c84497e6eae9",
+     "field": {
+      "characteristic": 561006233595917,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       429062284978109,
+       409501054401560
+      ],
+      "subgroup_order": "561006267720947",
+      "cofactor": 1,
+      "generator": [
+       "0x2",
+       "0xbff4a9423a7"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/prime_medium_tier_rho_20261107/curves.json"
+     ]
+    }
+   ]
+  },
+  {
    "slug": "icv1-fp52-t13351431-b09ac3d1",
    "icv1": "ICV1:fp-3377699720527897:13351431:3377699707176467:2578591932377781:unk:unk:r:b09ac3d18f87",
    "family": "prime",
@@ -502786,12 +503736,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-plus.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/plan.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/spec.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P52Cfpha01f80306e05",
+     "curve_uid": "urn:ec-record:1:sha256:a01f80306e05d85a7124d34ff044facafecb3c1a16faaefe6c9e2031bfcf9354",
+     "field_sha256": "5af75815b7f89b04bbcfd4aafb7e26ca553cf672738e38b5c14a68637cd23a62",
+     "field": {
+      "characteristic": 3377699720527897,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       675828149500061,
+       1658838600702915
+      ],
+      "subgroup_order": "3377699707176467",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0x128f89632dff8"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp52-tm60133899-e028287d",
@@ -502810,12 +503794,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-naive-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-minus-naive.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P52Cfph2aeeb2d6eb16",
+     "curve_uid": "urn:ec-record:1:sha256:2aeeb2d6eb16c007b28e340f2e8cea81a4a113f16abe35f1f68e31401d907c55",
+     "field_sha256": "5af75815b7f89b04bbcfd4aafb7e26ca553cf672738e38b5c14a68637cd23a62",
+     "field": {
+      "characteristic": 3377699720527897,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       1295299755018450,
+       2616635297825668
+      ],
+      "subgroup_order": "3377699780661797",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0x218841f4c98a"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp52-tm131765273-051185e0",
@@ -523086,12 +524104,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/minus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-minus.json",
+    "research/cheon_ecbench_medium_20261106/sessions/minus-20261106/plan.json",
+    "research/cheon_ecbench_medium_20261106/sessions/minus-20261106/spec.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P56Cfphffa4e7dffbc0",
+     "curve_uid": "urn:ec-record:1:sha256:ffa4e7dffbc01aaa8f3da4ed7b31675bb82ea3d1798da50c3259e59ce428b545",
+     "field_sha256": "29b72df26ff112f8ba3129dd2450505cadd2d379149b380bb2c3e83ea4c13723",
+     "field": {
+      "characteristic": 54043195528445957,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       8102277897249688,
+       3876574820001616
+      ],
+      "subgroup_order": "54043195377297631",
+      "cofactor": 1,
+      "generator": [
+       "0x1",
+       "0x203f65455f8ee0"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp56-t278109415-2d6157a8",
@@ -523110,12 +524162,46 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "research/cheon_p224_shape_20261022/ecbench-spec.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/plan.json",
-    "research/cheon_p224_shape_20261022/sessions/rho-20261022/spec.json"
+    "research/cheon_ecbench_20261022/curves.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/plan.json",
+    "research/cheon_ecbench_20261022/sessions/plus-20261022/spec.json",
+    "research/cheon_ecbench_20261022/spec-plus.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/plan.json",
+    "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/spec.json"
    ],
-   "representations": [],
-   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+   "representations": [
+    {
+     "ec1": "EC1P56Cfphdd555037df7f",
+     "curve_uid": "urn:ec-record:1:sha256:dd555037df7fdd204c3070e70429dc30ed92139c19c919e71c1ff4ebfb6575c9",
+     "field_sha256": "29b72df26ff112f8ba3129dd2450505cadd2d379149b380bb2c3e83ea4c13723",
+     "field": {
+      "characteristic": 54043195528445957,
+      "degree": 1,
+      "representation": "prime",
+      "element_encoding": "hex integer modulo the characteristic"
+     },
+     "curve": {
+      "model": "short Weierstrass",
+      "coefficients": [
+       0,
+       0,
+       0,
+       51670185159952162,
+       44313559061370316
+      ],
+      "subgroup_order": "54043195250336543",
+      "cofactor": 1,
+      "generator": [
+       "0x4",
+       "0x52e263e90abf2"
+      ],
+      "target_group": "prime-order subgroup"
+     },
+     "sources": [
+      "research/cheon_ecbench_20261022/curves.json"
+     ]
+    }
+   ]
   },
   {
    "slug": "icv1-fp56-t480116866-0fb69978",

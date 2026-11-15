@@ -4,6 +4,8 @@
 """
 
 import base64
+import shlex
+from unittest import mock
 import hashlib
 import json
 import os
@@ -132,6 +134,56 @@ class RoundTrip(unittest.TestCase):
         self.art("pull")
         self.assertEqual((self.repo / "research/r1/runs/a.jsonl").read_bytes(), self.big)
         self.assertEqual(self.git("status", "--porcelain"), "")
+
+    def install_content_filter(self):
+        # Public reversible fixture exercises Git's filter contract, not AES.
+        script = Path(self.tmp.name) / "content_filter.py"
+        script.write_text("import sys\nraw=sys.stdin.buffer.read()\n"
+                          "if sys.argv[1]=='clean': out=b'FILTERED:'+raw.hex().encode()\n"
+                          "else: out=bytes.fromhex(raw[9:].decode()) if raw.startswith(b'FILTERED:') else raw\n"
+                          "sys.stdout.buffer.write(out)\n")
+        command = shlex.quote(sys.executable) + " " + shlex.quote(str(script))
+        self.git("config", "filter.fixture.clean", command + " clean")
+        self.git("config", "filter.fixture.smudge", command + " smudge")
+        self.git("config", "filter.fixture.required", "true")
+        (self.repo / '.gitattributes').write_text('research/** filter=fixture\n')
+        self.git('add', '.gitattributes')
+        self.git('add', '--renormalize', 'research')
+        self.git('commit', '-qm', 'public filter fixture')
+
+    def test_sparse_offload_uses_filtered_plaintext_size_and_preserves_ignore(self):
+        (self.repo / 'research/r1/runs/.gitignore').write_text('/keep-me/\n')
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'ignore fixture')
+        self.install_content_filter()
+        self.git('sparse-checkout', 'set', '--no-cone', '/*', '!/research/')
+        self.art('push', 'research/r1/runs/a.jsonl')
+        digest = hashlib.sha256(self.big).hexdigest()
+        self.assertEqual((self.remote/'sha256'/digest[:2]/digest).read_bytes(), self.big)
+        manifest=json.loads((self.repo/'research/r1/runs/.artifacts.json').read_text())
+        self.assertEqual(manifest['files']['a.jsonl'], {'sha256':digest,'bytes':len(self.big)})
+        self.assertTrue((self.repo/'research/r1/runs/.gitignore').read_text().startswith('/keep-me/\n'))
+
+    def test_required_filter_failure_cannot_upload_raw_staged_bytes(self):
+        self.install_content_filter()
+        self.git('sparse-checkout', 'set', '--no-cone', '/*', '!/research/')
+        self.git('config', 'filter.fixture.smudge', 'false')
+        result=self.art('push', 'research/r1/runs/a.jsonl', check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.repo/'research/r1/runs/.artifacts.json').exists())
+        self.assertFalse(list(self.remote.rglob('*')) if self.remote.exists() else [])
+        self.assertFalse(list((self.cache/'tmp').glob('*')))
+
+    def test_staged_metadata_filter_failure_is_not_absence(self):
+        (self.repo / 'research/r1/runs/.gitignore').write_text('/keep-me/\n')
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'ignore fixture')
+        self.install_content_filter()
+        self.git('sparse-checkout', 'set', '--no-cone', '/*', '!/research/')
+        self.git('config', 'filter.fixture.smudge', 'false')
+        with mock.patch.object(artifacts, 'repo_root', return_value=self.repo):
+            with self.assertRaises(subprocess.CalledProcessError):
+                artifacts.read_text_or_index(self.repo/'research/r1/runs/.gitignore')
 
     def test_check_asks_git_for_full_object_ids(self):
         """A blobless sparse checkout can fetch a missing blob by full id, not by the
@@ -376,6 +428,82 @@ class WorkflowPullStep(unittest.TestCase):
         self.assertEqual(wire_workflows.wire(once, ["docs/x"])[0], once)
         stale = once.replace("pull --jobs 16 docs/x", "pull docs/old")
         self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
+
+
+class WorkflowStalePullEntries(unittest.TestCase):
+    """The generated pull line is output, not a reference: entries it names
+    must go once the rest of the workflow stops naming them."""
+
+    MOVED = {"research/study_a_20261031/establishment/certificate.json",
+             "research/study_b_20261031/data.bin"}
+    BEFORE = ("on:\n  push:\n    paths:\n"
+              "      - 'research/study_a_20261031/**'\n"
+              "      - 'research/study_b_20261031/**'\n"
+              "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n"
+              "      - run: python3 build.py\n")
+
+    def _paths(self, text):
+        return wire_workflows.needed(text, self.MOVED, wire_workflows.moved_dirs(self.MOVED))
+
+    def _main(self, wf: Path, *extra: str) -> subprocess.CompletedProcess:
+        script = ("import sys, wire_workflows as w\n"
+                  "w.moved_paths = lambda root: set(%r)\n"
+                  "sys.argv = ['wire_workflows.py', *sys.argv[1:]]\n"
+                  "sys.exit(w.main())\n" % sorted(self.MOVED))
+        return subprocess.run([sys.executable, "-c", script, *extra, str(wf)],
+                              cwd=str(TOOL.parent), capture_output=True, text=True)
+
+    def _wired(self):
+        old = self._paths(self.BEFORE)
+        self.assertEqual(old, ["research/study_a_20261031", "research/study_b_20261031"])
+        return wire_workflows.wire(self.BEFORE, old)[0]
+
+    def test_moved_directory_is_dropped_on_regeneration(self):
+        # The paths: glob narrows to study_a only; the old pull line still names study_b.
+        stale = self._wired().replace("      - 'research/study_b_20261031/**'\n", "")
+        self.assertIn("research/study_b_20261031", stale)
+        self.assertEqual(self._paths(stale), ["research/study_a_20261031"])
+        regenerated = wire_workflows.wire(stale, self._paths(stale))[0]
+        self.assertNotIn("research/study_b_20261031", regenerated)
+        self.assertIn("pull --jobs 16 research/study_a_20261031\n", regenerated)
+
+    def test_check_flags_and_regeneration_fixes_the_stale_entry(self):
+        stale = self._wired().replace("      - 'research/study_b_20261031/**'\n", "")
+        with tempfile.TemporaryDirectory() as d:
+            wf = Path(d) / "wf.yml"
+            wf.write_text(stale)
+            r = self._main(wf, "--check")
+            self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+            self.assertIn("wf.yml: needs", r.stdout)
+            self.assertEqual(wf.read_text(), stale)
+            r = self._main(wf)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertNotIn("research/study_b_20261031", wf.read_text())
+            self.assertEqual(self._main(wf, "--check").returncode, 0)
+
+    def test_declared_runtime_inputs_survive_and_stale_declarations_do_not(self):
+        bare = ("# tools/artifacts pull: research/study_b_20261031 research/gone_20261031\n"
+                "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n")
+        self.assertEqual(self._paths(bare), ["research/study_b_20261031"])
+        wired = wire_workflows.wire(bare, self._paths(bare))[0]
+        self.assertEqual(self._paths(wired), ["research/study_b_20261031"])
+        self.assertEqual(wire_workflows.wire(wired, self._paths(wired))[0], wired)
+
+    def test_step_is_removed_when_nothing_is_named(self):
+        wired = self._wired()
+        bare = wired.replace("      - 'research/study_a_20261031/**'\n", "").replace(
+            "      - 'research/study_b_20261031/**'\n", "")
+        self.assertEqual(self._paths(bare), [])
+        with tempfile.TemporaryDirectory() as d:
+            wf = Path(d) / "wf.yml"
+            wf.write_text(bare)
+            r = self._main(wf, "--check")
+            self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+            self.assertIn("stale", r.stdout)
+            self.assertEqual(self._main(wf).returncode, 0)
+            text = wf.read_text()
+            self.assertNotIn(wire_workflows.STEP_NAME, text)
+            self.assertIn("      - uses: actions/checkout@v4\n      - run: python3 build.py\n", text)
 
 
 class S3Argv(unittest.TestCase):

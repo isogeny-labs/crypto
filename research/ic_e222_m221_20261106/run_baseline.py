@@ -7,7 +7,7 @@ import json, os, subprocess, sys, random, glob, statistics, argparse
 ap=argparse.ArgumentParser()
 ap.add_argument("--inst");ap.add_argument("--out");ap.add_argument("--ic",default="target/release/ic")
 ap.add_argument("--seeds",type=int,default=3);ap.add_argument("--fb",type=int,default=8)
-ap.add_argument("--rho-steps",type=int,default=0)
+ap.add_argument("--rho-steps",type=int,default=0);ap.add_argument("--extra",default="")
 a=ap.parse_args()
 os.makedirs(a.out,exist_ok=True)
 jobs=[]
@@ -21,7 +21,7 @@ for f,d,s in jobs:
     t=os.path.join(a.out,"_t.json")
     json.dump({k:int(v) for k,v in dict(p=d["field"]["modulus"],a=d["a"],b=d["b"],n=d["subgroup_order"],gx=d["generator"]["x"],gy=d["generator"]["y"],qx=d["point"]["x"],qy=d["point"]["y"]).items()},open(t,"w"))
     r=subprocess.run([a.ic,"--json","solve-prime-file","--input",t,"--seed",str(s),"--fb-size",str(a.fb),"--rho-steps",str(a.rho_steps),
-                      "--max-trials-per-relation","200000","--max-relation-attempts","512"],capture_output=True,text=True)
+                      "--max-trials-per-relation","200000","--max-relation-attempts","512"]+a.extra.split(),capture_output=True,text=True)
     try: o=json.loads(r.stdout)
     except Exception: o={"status":"crash","err":r.stderr[-200:]}
     st=(o.get("ic") or {}).get("stages",{})

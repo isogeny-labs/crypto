@@ -1,0 +1,60 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "echelon twin of B-hb19",
+  "description": "research/ic_gauss_echelon_20261027/README.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_random",
+        "n": 19,
+        "seed": 59297,
+        "max_cofactor": 8
+      }
+    ],
+    "targets_per_curve": 16,
+    "target_seed": 20261105
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "plan",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "linalg": "incremental-gauss-echelon",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "plan_ech",
+      "role": "candidate"
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261106,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

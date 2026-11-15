@@ -1,0 +1,38 @@
+{
+ "note": "Engineering wall-time measurement of three merged PRs (merge vs first parent); counted results unchanged in all 18 pairs. The rho reference is the reference arm every session runs beside every other arm. RunPod shared host, L0, [pcc:unverified].",
+ "replay_certificate": {
+  "path": "../../research/wallfix_runpod_20261114/replay-certificate.json",
+  "sha256": "1af1bacf4f9ebadfae8f4b648a4bdebc36ffb9cad8c8d450168cbf624efcf0de"
+ },
+ "rho_reference": {
+  "band_source": "../../research/wallfix_runpod_20261114/band/pr4009-tensor-B.json (ic-tensor vs rho-neg on icv1-fp14-tm143-dec4cf6b, 3 sessions); every PR/spec/arm band in ../../research/wallfix_runpod_20261114/band/, identical for A and B",
+  "binary_or_process": "each session's own ecbench binary (A or B); every arm of a session runs in that binary",
+  "gae_band": {
+   "0": {
+    "ic": 269097.58533881174,
+    "rho": 2.2388512907697202
+   },
+   "0.1": {
+    "ic": 323102.7537787748,
+    "rho": 2.400771917653103
+   },
+   "1": {
+    "ic": 809149.2697384426,
+    "rho": 3.858057559603546
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "each spec's rho reference arm (role reference): rho.negation on the prime and tensor specs' prime-order curves (automorphism group of order 2, so negation is the strongest symmetry available), rho-strong on the Koblitz spec; run in every session on the same curves and targets as every other arm",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r))"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/wallfix_runpod_20261114/validator/validator-report.json",
+  "sha256": "e102f224e0349e0bed22728a343b21bf46d9f0ad3fb7ae939169813f1f6165c8"
+ }
+}
