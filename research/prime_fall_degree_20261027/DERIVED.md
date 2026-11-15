@@ -336,3 +336,12 @@ where `⟨u⟩` takes the `u`-coefficient of the residue, which has degree `≤ 
 - "What is not derived" is unchanged. Its open item is a growing lower bound on
   **`d_F`**, a proof system with falls, and `λ` is not a closure pseudo-solution.
   Whether a variant of `λ` is one is lead KM3-LQR-CLOSURE in `NEW_LEADS.md`.
+
+*Measured* (`research/kummer_m3_ns_degree_20261115/RESULTS.md`, lab N1, protocol frozen with sha256 `b790f8bd…`). `[pcc:unverified]`
+- **Same instances, two measurements.** Primes 40961 and 12289, three instances each, all six agreeing.
+  - With multipliers restricted to `u`-degree `≤ 1` (D9's class), `d_NS = 3t + 5` at `t = 2 … 5`.
+  - With no restriction, `d_NS = 10` at `t = 2`.
+  - At `t = 3` with `u`-degree caps 2–4, `d_NS ≤ 13`.
+- **D10 is attained at `t = 2`**: `10 = 2t + 6`.
+- **D9 is not tight for `d_NS`.** Its value 3t+5 is exact only within the `u`-degree `≤ 1` class.
+- **Control:** m = 2 reproduces `2t + 2` on 24/24 instances.
