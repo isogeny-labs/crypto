@@ -21,10 +21,16 @@ theorem cubic_finite_candidate_count : (84 : Nat) * 5 * 243 = 102060 := by decid
 
 theorem cubic_geometric_pole_pair_count : (84 : Nat) * 55 = 4620 := by decide
 
+theorem even_model_count : (3 : Nat)^12 = 531441 := by decide
+
+theorem even_to_odd_branch_maps : (84 : Nat) * 2 = 168 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
 #print axioms example_trace_ten
 #print axioms cubic_finite_candidate_count
 #print axioms cubic_geometric_pole_pair_count
+#print axioms even_model_count
+#print axioms even_to_odd_branch_maps
 end GHSOdd5Ledger
