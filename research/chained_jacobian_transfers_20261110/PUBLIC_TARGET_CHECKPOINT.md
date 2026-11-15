@@ -1,3 +1,21 @@
+# Unique original kernel-compatible candidate mirrored
+
+pcc/claims/PCC-20261115-83885c.json: exactpublished consumerfb40449 exports retain native88f828, independentfiniteproof29e535 andinspectedreportcd8173. All18vertices72pairs216triples/311whole records/allmalformed-omissioncontrols/1172hashes/actualbinaries pass. Exactlyone supported compatibletriple4-1-4, cases(2,0)/(0,1)/(2,0), D116/39/36. BothoriginalLean gates6roots0trusted/all6localbindings; entireproofsource/literaldata preserved in rootmirror. [pcc:unverified]
+
+## What was done
+Entire oldcoordinate certificates, all12compatibleedges includingineligibleendpoints andeveryrejectedtriple/reason retained. IndependentLeancore recomputes eligibility and64membershipbits perpair pluscoverage/uniqueverdict; first Array reductionfailure69d82d retained. The graphreport hasbothactualfinal pagesopened. [pcc:unverified]
+
+## Decisions made
+Publish rootmetadata withall343producer scientificinputs unchanged, then separateprospective full-group original-source evaluator protocol forunique casesbeforecode. Strict fullcofactor-halves-corrections/norm-inverse/wholecontrols, actualprime/quadraticbackends, stronger knowninitialpoint andcompleteprimitive comparison remainrequired. [pcc:unverified]
+
+## Open threads
+Newfulloriginal-group protocol/implementation/checkpoint/native; no fullJacobianmap fornewmodels yet. Existingprime-only976f50 cases andfixedD12-D24-D67 negatives stayfrozen. FuturelargecustodyNEW24 preservesallsource/raw/executables/fullcopies/checkpoints/proofs/reportdrafts/failures. [pcc:unverified]
+
+## Errors
+All oldnative/source/proof/format/infrastructure/math failuresretained. KB unavailable, vaultlockedunchanged. ActualHLP-field-geometry-program andcalibratedmeasurement/signing/review/conflict obligations remainopen. [pcc:unverified]
+
+---
+
 # Original-prime native result mirrored; full-group kernel census next
 
 pcc/claims/PCC-20261115-ea9174.json: exact published consumer7a600a2 exports retain native976f50 and inspected two-page report1f3c4c. One unfiltered test0/worker0/supervisor0/all13phases; whole1077orderedrecords/fouractualwhole-class omissions101-nooutput/all1131guards/actualbinarycustody pass. Seven conditional proofroots remain6d8c42, original failed101e62fb2 andformatter-onlycorrectiona3c6eb preserved. [pcc:unverified]
