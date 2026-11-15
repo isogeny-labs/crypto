@@ -2600,3 +2600,43 @@ andprioractualgeometry/scalarcriterion credited. FivecorrectKBcalls127beforequer
 processing/twoConductor127fallback; datedprecodeprotocolrefinements/samebudget.
 No novelty/canonicalpromotion/newphysicalhost/frozenedit/cryptoPython/spend/upload.
 [pcc:unverified]
+
+
+### Actual binary Miller state and intermediate numerical-domain counter
+
+The [actual binary Miller audit](../research/binary_miller_audit_20261115/README.md)
+proves the carried point/function state is (nP,chosen f_n) for every field with
+actual DecidableEq operation data and actual nonzero discriminant, including
+characteristics2/3 and the source zero/vertical branches. The implementation
+carries the point; it does not recompute scalar multiples inside each iteration.
+Exactly Nat.log2(n) bit rounds and at most that many conditional additions are
+proved as structural counts. Actual numerator/denominator principal-support
+unit guards generate a carried mathematical numerical execution relation.
+Every recursively admissible input has a run for every n; every run erases to
+the actual binary state and its numerical recurrence equals actual divisor
+evaluation. No correctness/commutation premise is supplied. A concrete numerical
+backend/compiler/runtime refinement remains separate.
+On actual E/F5:y²=x³+1, P=(0,1) has exact order3. For D=(0,4)−(4,0), degree0
+and actual full geometric final support disjointness hold over actual AC(F5).
+The normalized chosen f3=y−1 has actual proper value2. Intermediate f2=(y−1)/x
+has actual order−1 at Q=(0,4), also after geometric embedding. Strict numerical
+trace rejects and the totalized raw trace returns0≠2; the generic trace guard
+fails. The correct final sum-zero vertical multiplication by x is retained.
+Safe D=(2,2)−(4,0) satisfies each actual factor guard and the generic trace
+domain; strict/proper final values agree at4. The literal unconditional numerical
+Algorithm29 domain needs intermediate-factor guards. Qualified function-field
+recursion/guarded numerical algorithm survive. Original Miller paper unread;
+no novelty/original-paper/canonical-pairing/runtime refutation is claimed.
+Exact local **PCC-20261115-16a863** PASS at2026-11-15T12:31:28Z; signedunverified. Whole679/0fail/
+0trusted/standardfoundations;87modules76exactcredited+11new/107pins.
+Full2123-character binding/native1complete/0prefix/0unresolved.
+Sixteenstates/sixfailures/tensuccesses;210files/95objects/
+29656byte losslessXZ/fivegatefiles/PDF47749fulltextread/visual/inbounds.
+All failures/advisories retained; final16project clean, inherited frozen-auditor
+String.mk deprecation. Ch26 fresh fulltext+visualPDF6/printed578 and partialPDF5,
+credited cumulative1–6/notall16. Six correct KB calls/two Conductor calls127
+beforeprocessing/edits; bounded fallback. Prior actual geometry/evaluation and
+official log2/order APIs credited. No holes/customaxioms/nativeproofeval/raised
+limits/globalflags/waivers/frozenedits/cryptoPython/newhost/spend/upload.
+General scheme/divisor basechange/descent, translation/reciprocity/isogeny/Lang/
+Cartier/Jacobian/canonical Weil–Tate/MOV–FR and full14 remain open. [pcc:unverified]
