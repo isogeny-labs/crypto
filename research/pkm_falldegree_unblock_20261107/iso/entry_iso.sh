@@ -9,6 +9,7 @@
 #   g3                gate G3 over the A-m2-iso-p1* rows, through the wrapper (Amendment 11 scope)
 #   cert              decomposability certificate of every m = 2 isogeny row in runs/ (certify_m2.py)
 #   cap-A             capped F4 at D - 1 for t = 11..13, both draws, D from DA-m2-iso-p1 (run.sh cap-A rule)
+#   A-14, DA-14, cap-14   the t = 14 cell of Amendment 19 (closure cmax 5, F4, capped F4 at D - 1)
 #   x:T:K:C:DENSE     ONE Amendment 7 B bracket run (budget 86400, --max-dense DENSE, --trace), then cert of its row
 # Results: $ISOLAB_RESULTS_URI (runs/, gates/, progress.txt, binary.sha256, host.txt), synced every 300 s and at exit.
 # A Mestre panic ("Mestre: #E ambiguous") in any log stops the job with exit 3 (edit E4.7).
@@ -62,12 +63,19 @@ for s in "$@"; do
     A) run A-m2-iso-p1 "${c1[@]}" "${hky[@]}" --t-min 1 --max-t 10 ;;
     A-big) run A-m2-iso-p1-big "${c1[@]}" "${hky[@]}" --hky-cmax 5 --t-min 11 --max-t 13 ;;
     DA) run DA-m2-iso-p1 "${c1[@]}" "${f4[@]}" --t-min 1 --max-t 13 ;;
+    A-14) run A-m2-iso-p1-t14 "${c1[@]}" "${hky[@]}" --hky-cmax 5 --t-min 14 --max-t 14 ;;     # Amendment 19
+    DA-14) run DA-m2-iso-p1-t14 "${c1[@]}" "${f4[@]}" --t-min 14 --max-t 14 ;;               # Amendment 19
+    cap-14) for k in 0 1; do                                                                  # Amendment 19
+          D=$(grep -h "\"t\":14," runs/DA-m2-iso-p1-t14.jsonl | grep "\"target_index\":$k," | sed 's/.*"solving_degree_max":\([0-9]*\).*/\1/' | head -1)
+          [ -n "$D" ] || continue
+          run CAP-iso-m2-t14-k$k-c$((D-1)) "${c1[@]}" "${f4[@]}" --t-min 14 --max-t 14 --targets $k --cap $((D-1))
+        done ;;
     g3) log "start g3"; mkdir -p gates/g3dir/runs; cp runs/A-m2-iso-p1*.jsonl gates/g3dir/runs/
         /usr/local/bin/prime_fall_degree_tools gate3 "$S/gates/g3dir" "$BIN" --max-n 20 --jobs 2 --budget 900 \
           > gates/g3.log 2>&1; rc=$?
         grep -q ', 0 disagreements' gates/g3.log || { [ "$rc" = 0 ] && rc=1; }; log "end g3 exit $rc"
         [ "$rc" = 0 ] || { fail=1; break; } ;;
-    cert) log "start cert"; python3 "$R/iso/certify_m2.py" runs/CERT-m2-iso-p1.jsonl runs/A-m2-iso-p1*.jsonl runs/DA-m2-iso-p1.jsonl \
+    cert) log "start cert"; python3 "$R/iso/certify_m2.py" runs/CERT-m2-iso-p1.jsonl runs/A-m2-iso-p1*.jsonl runs/DA-m2-iso-p1*.jsonl \
           > runs/CERT.log 2>&1; log "end cert exit $?" ;;
     cap-A) for t in 11 12 13; do for k in 0 1; do
           D=$(grep -h "\"t\":$t," runs/DA-m2-iso-p1.jsonl | grep "\"target_index\":$k," | sed 's/.*"solving_degree_max":\([0-9]*\).*/\1/' | head -1)

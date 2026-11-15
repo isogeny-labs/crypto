@@ -26,8 +26,12 @@ case "$1" in
   pod) curl -sS "$API/pods/$2" "${H[@]}" | jq '{id,name,desiredStatus,costPerHr,vcpuCount,memoryInGb,interruptible,lastStartedAt,machine}' ;;
   upload) for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh run.sh build-info.json; do
       [ -f "$3/$f" ] || continue; curl -sS -f -X PUT -H "X-Token: $(tok $2)" --data-binary "@$3/$f" "$(url $2)/upload/$f"; echo; done ;;
-  start) shas=$(jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json")
-      jq -n --argjson s "$3" --argjson h "$shas" '{stages:$s,sha256:$h,rayon:12}' |
+  start) # Kummer jobs on the frozen binaries (Amendments 15, 19); same guards as start-iso
+      shas=$(jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json")
+      cph=$(curl -sS "$API/pods/$2" "${H[@]}" | jq -r .costPerHr)
+      jq -n --argjson s "$3" --argjson h "$shas" --argjson sec "${SECONDS_LIMIT:?}" --argjson cph "$cph" \
+        --argjson mx "${MAX_USD:-40}" --argjson mf "${MEMORY_FLOOR_GIB:-56}" \
+        '{stages:$s,sha256:$h,rayon:12,seconds:$sec,cost_per_hr:$cph,max_usd:$mx,memory_floor_gib:$mf}' |
       curl -sS -X POST -H "X-Token: $(tok $2)" -H "Content-Type: application/json" --data-binary @- "$(url $2)/start"; echo ;;
   upload-iso) # rp.sh upload-iso ID BINDIR COMMIT : the R4 binaries from BINDIR, and repo.tar = git archive COMMIT of iso/BUNDLE_PATHS
       repo=$(cd "$here/../../.." && pwd); tar=$(mktemp)

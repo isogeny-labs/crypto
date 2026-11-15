@@ -606,3 +606,47 @@ Nothing else changes.
 - **Unchanged:** every per-system budget (1,800 s; 86,400 s for X), every cell, seed, cap and rule.
 - **If the limit is reached.** A job stopped at its time limit has exit `deadline`. Its rows up to the last fetch are kept.
   Systems not reached are reported as not run, not as censored. The projected wall time is 2–6 h (Amendment 16 §6, heuristic).
+
+## Amendment 19 (2026-11-15; before any row of the jobs it adds): isogeny `t = 14`, two Kummer retries, stage B as two jobs
+
+Owner decisions 13–15 (`research/open_leads_execution_20261108/DECISIONS.md`). Route, storage and resources follow
+Amendments 15, 17 and 18: 16-vCPU reserved RunPod pods, git storage, the US$40 per-job refusal including 4 hours of idle billing.
+
+**Disclosure.** Decision 14 was given after the isogeny `P1` closure rows `t = 1..9` of job `iso-a` had been fetched and seen,
+unscored (`results/ISO/iso-a/fetch-20261115T0423Z/`): `last_fall_degree` 3 at `t = 1`, and 5 at `t = 2..9`, on both draws.
+So the `t = 14` cell does not enter P-ISO-2, whose range stays `t = 9..13` as frozen. It gets its own reading below.
+
+1. **Isogeny `t = 14`** (job `iso-14`, limit 90,000 s, US$30.16 at the limit).
+   - New stages of `iso/entry_iso.sh` (new bundle pins, hashes below):
+     - `A-14`: closure, cmax 5, budget 1,800 s, output `A-m2-iso-p1-t14`;
+     - `DA-14`: F4, budget 1,800 s, output `DA-m2-iso-p1-t14`;
+     - `cap-14`: capped F4 at `D − 1` (the `run.sh cap-A` rule);
+     - `cert` as before;
+     - the `x:14:K:C:DENSE` bracket only if `d_F` is still undecided.
+   - Every draw is certified (λ = 0.133 ≥ 0.1, so decomposable draws are expected more often than at `t ≤ 13`); decomposable
+     draws are excluded.
+   - **Reading P-ISO-3 (descriptive, fixed now).** The `t = 14` median under the same rules as §5 of Amendment 16:
+     "grows" (exact `> 5`, or censored `≥ 6` with the remaining draws certified), "flat at 5", "below 5" or "undecided". It is
+     reported beside P-ISO-2 and never changes P-ISO-2's reading.
+2. **Kummer `pfd-x-t13-k0-c6`, attempt 4** (job `pfd-x-t13-k0-c6-rp`, frozen binaries and `entry_r2.sh`).
+   - Stages: `cap:12:0:5:12800000000 cap:12:0:6:12800000000 cap:13:0:6:12800000000`.
+   - The first two are Amendment 15's positive control (E3.7). They must equal the admitted X1/X3 rows on `inconsistent`,
+     `basis_len`, `max_cols` and `muladds`, with the wall time recorded against 1,824 s. Otherwise the third stage's row is not
+     admitted.
+   - Limit 90,000 s. US$30.16 at the limit, so the control's 30 minutes fit.
+3. **Stage B, attempt 3**, packaged as two jobs instead of one, because 172,800 s costs US$54.08.
+   - `pfd-b-rp-1`: `g1 hky-B g3`, limit 120,000 s.
+   - `pfd-b-rp-2`: `g1 d-B`, limit 120,000 s.
+   - The systems, per-system budgets, seeds and rows are those of `run.sh hky-B` and `d-B`, unchanged. The `B-*` and `DB-*`
+     row files are the same files the single job would write, and G3 runs over the `hky-B` rows as Amendment 11 says.
+   - Each job's first stage is the E3.7 control as in item 2.
+   - A job stopped at its limit has exit `deadline`. Its finished invocations are kept; systems not reached are "not run".
+   - R2-G stays unfrozen and unused.
+4. **`m = 4` cells**: on the plan, not started (decision 15). They need the owner to raise the per-job ceiling for them.
+
+The study's running total is checked against US$400 before each pod is created.
+
+**Amendment 19 pins.** The `iso-14` job uses `iso/BUNDLE.sha256` with SHA-256 `ea826e48c1984a9364d59e1a812a777f7af47cb64ad8245f919cea8103d306cf` and `iso/PINS.json` with SHA-256 `f02c03dd95a861c51cd30d4dc0ff941590ee3880f18016092d3d33af1778a6da`
+(binaries unchanged from Amendment 16). The Kummer jobs use the frozen binaries, `entry_r2.sh` and `run.sh` of
+`image/image.json` (all hashes checked 2026-11-15). The R3 client `runpod/rp.sh start` now sends the same guard fields as
+`start-iso`.

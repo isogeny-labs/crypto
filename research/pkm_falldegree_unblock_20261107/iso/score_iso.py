@@ -18,7 +18,7 @@ Readings (E4.4) follow AMENDMENT_R4_ISOGENY_P1.md section 5 exactly.
 import glob, json, os, re, sys
 
 P0_MEDIANS = {1: 3, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5, 8: 5}  # admitted, results/R9/analysis/pfdA_summary.json
-T_ALL, T_P1, T_P2 = range(1, 14), range(1, 9), range(9, 14)
+T_ALL, T_P1, T_P2 = range(1, 15), range(1, 9), range(9, 14)  # t = 14: Amendment 19, P-ISO-3 only
 P1 = 2013265921
 
 
@@ -77,7 +77,7 @@ def score(runs):
             if x["closure"][1] == "":
                 x["refuted"] = True
             src(x, p, r, "closure " + "".join(map(str, x["closure"][::-1])))
-    for p in sorted(glob.glob(os.path.join(runs, "DA-m2-iso-p1.jsonl"))):
+    for p in sorted(glob.glob(os.path.join(runs, "DA-m2-iso-p1*.jsonl"))):
         for r in rows_of(p):
             x = d(r["t"], r["target_index"])
             if f4_done(r) and r.get("inconsistent"):
@@ -177,6 +177,17 @@ def readings(draws):
     vals = set(per.values())
     p2 = ("grows" if "grows" in vals else "below 5" if "below 5" in vals
           else "flat at 5" if vals == {"flat at 5"} else "undecided")
+    m14 = med.get(14)
+    if not complete.get(14) or m14 is None:
+        p3 = "undecided"
+    elif (m14[1] == "" and m14[0] > 5) or (m14[1] == ">=" and m14[0] >= 6):
+        p3 = "grows"
+    elif m14[1] == "" and m14[0] < 5:
+        p3 = "below 5"
+    elif m14[1] == "" and m14[0] == 5:
+        p3 = "flat at 5"
+    else:
+        p3 = "undecided"
     g2 = [x for x in draws if x["g2"] is not None]
     g2v = sum(1 for x in g2 if not x["g2"])
     stop = bool(conflicts) or g2v > 0
@@ -184,6 +195,7 @@ def readings(draws):
             "medians": {t: (None if med[t] is None else f"{med[t][1]}{med[t][0]}") for t in T_ALL},
             "cell_complete": complete, "draws_dF_ge_6": n_ge6, "decomposable_draws": n_dec,
             "P_ISO_1": "STOPPED" if stop else p1, "P_ISO_2_per_t": per, "P_ISO_2": "STOPPED" if stop else p2,
+            "P_ISO_3_t14": "STOPPED" if stop else p3,
             "G2": {"checked": len(g2), "violations": g2v}}
 
 
