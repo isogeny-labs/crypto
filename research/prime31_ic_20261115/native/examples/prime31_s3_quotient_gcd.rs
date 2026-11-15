@@ -103,6 +103,123 @@ fn s3_scalar(x: u64, t: u64) -> Pol {
 trait TrimPol { fn pipe_trim(self) -> Self; }
 impl TrimPol for Pol { fn pipe_trim(self) -> Self { trim(self) } }
 
+// Coordinate-only m=4 pilot. K(U) is the finite pair-sum x-support
+// polynomial. Its factors use S3(x_i,x_j,U) and no point ordinates.
+// Deliberately NOT a fast or complete index-calculus oracle.
+fn m4_pair_support(xs: &[u64]) -> Result<Pol,String> {
+    let mut k=vec![1];
+    for (i,&x) in xs.iter().enumerate() {
+        for &y in &xs[i..] {
+            let f=s3_scalar(x,y);
+            if f.len()<2 { return Err("degenerate S3 pair factor".into()); }
+            k=prod(&k,&f);
+        }
+    }
+    if k.is_empty() { return Err("zero pair-support polynomial".into()); }
+    let leading=*k.last().unwrap();
+    Ok(scale(&k,power(leading,P-2)))
+}
+
+// Project the S3(U,V,t) intersection of the finite pair-support K(U),
+// K(V) onto U via the same quadratic quotient norm as the m=2 oracle.
+// This is a membership eliminant only: no factorization, sign lifts,
+// rank extraction or complete ECDLP recovery is hidden in this function.
+// With naive polynomial arithmetic its worst-case cost is cubic in deg K.
+// The exceptional U=t factor is separated before quotient inversion.
+fn m4_first_eliminant(k: &[u64], t: u64) -> Result<(Pol,bool),String> {
+    if k.is_empty() || *k.last().unwrap()!=1 {
+        return Err("expected monic pair support".into());
+    }
+    let exceptional=eval(k,t)==0;
+    let regular=if exceptional {
+        let (q,r)=divrem(k,&[sub(0,t),1]);
+        if !r.is_empty() { return Err("exceptional pair factor division failed".into()); }
+        q
+    } else { k.to_vec() };
+    let mut d=vec![1];
+    if regular.len()>1 {
+        let (aa,bb,cc)=s3_y(&[0,1],t);
+        let ia=invert(&aa,&regular)?;
+        let beta=mprod(&bb,&ia,&regular);
+        let gamma=mprod(&cc,&ia,&regular);
+        let (mut r0,mut r1)=(vec![],vec![]);
+        for &c in k.iter().rev() {
+            let nr0=diff(&[c],&mprod(&gamma,&r1,&regular));
+            let nr1=diff(&r0,&mprod(&beta,&r1,&regular));
+            r0=rem(&nr0,&regular);
+            r1=rem(&nr1,&regular);
+        }
+        let r01=mprod(&r0,&r1,&regular);
+        let norm=sum(
+            &diff(&mprod(&r0,&r0,&regular),&mprod(&beta,&r01,&regular)),
+            &mprod(&gamma,&mprod(&r1,&r1,&regular),&regular));
+        d=gcd(regular.clone(),rem(&norm,&regular));
+    }
+    if exceptional {
+        // The omitted specialization U=t is a linear/constant S3 in V.
+        // Include its factor iff it has a common finite root with K(V).
+        let common=gcd(k.to_vec(),s3_scalar(t,t));
+        if common.len()>1 { d=prod(&d,&[sub(0,t),1]); }
+    }
+    Ok((d,exceptional))
+}
+
+fn m4_preview(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
+    use std::time::Instant;
+    if base.points.len()<4 { return Err("m4 preview requires B>=4".into()); }
+    let xs:Vec<u64>=base.points.iter().map(|v|v.0).collect();
+    let started=Instant::now();
+    let k31=m4_pair_support(&xs)?;
+    let b31_support_ns=started.elapsed().as_nanos();
+    if k31.len()!=962 { return Err("B31 pair-support degree changed".into()); }
+    let derivative:Pol=trim(k31.iter().enumerate().skip(1)
+        .map(|(i,&v)| mul((i as u64)%P,v)).collect());
+    if gcd(k31.clone(),derivative).len()!=1 {
+        return Err("B31 pair-support lost squarefreeness".into());
+    }
+    let k4=m4_pair_support(&xs[..4])?;
+    if k4.len()!=17 { return Err("B4 pair-support degree changed".into()); }
+    // Test-only construction is not an input to the polynomial discovery.
+    let left=ar.add(PRIME31,Some(base.points[0]),Some(base.points[1]));
+    let right=ar.add(PRIME31,Some(base.points[2]),Some(base.points[3]));
+    let planted=ar.add(PRIME31,left,right)
+        .ok_or("unexpected identity planted m4 relation")?;
+    let public=ar.scalar(PRIME31,17,Some(PRIME31.g))
+        .ok_or("unexpected zero public target")?;
+    let started=Instant::now();
+    let (positive,positive_exception)=m4_first_eliminant(&k4,planted.0)?;
+    let positive_ns=started.elapsed().as_nanos();
+    let started=Instant::now();
+    let (negative,negative_exception)=m4_first_eliminant(&k4,public.0)?;
+    let negative_ns=started.elapsed().as_nanos();
+    if positive.len()!=7 || negative.len()!=1 {
+        return Err("frozen m4 B4 projection positive/negative degrees changed".into());
+    }
+    println!("{}",json!({
+        "standing":"[pcc:unverified]",
+        "study":"m4 finite pair-support resultant; algebraic membership only",
+        "curve":"ordinary full-prime-order F_(2^31-1)",
+        "pair_support_B31_degree":k31.len()-1,
+        "pair_support_B31_squarefree":true,
+        "pair_support_B31_build_ns":b31_support_ns,
+        "pair_support_B4_degree":k4.len()-1,
+        "positive_eliminant_degree":positive.len()-1,
+        "positive_target":planted,
+        "positive_exceptional":positive_exception,
+        "positive_eliminant_ns":positive_ns,
+        "public_17G_target":public,
+        "public_eliminant_degree":negative.len()-1,
+        "public_exceptional":negative_exception,
+        "public_eliminant_ns":negative_ns,
+        "known_ordinates_in_polynomial_stage":false,
+        "known_group_sums_in_polynomial_stage":false,
+        "candidate_factorization_performed":false,
+        "signed_relation_extraction_performed":false,
+        "complete_ECDLP_recovery":false
+    }));
+    Ok(())
+}
+
 #[derive(Debug)]
 struct Algebraic {
     // Candidate abscissa index pairs only. No ordinates are supplied.
@@ -230,6 +347,9 @@ fn main() -> Result<(),String> {
         "polynomial_input_uses_known_ordinates":false,
         "polynomial_input_uses_EC_group_sums":false,
         "full_ECDLP_recovery":false,"samples":samples}));
+    if std::env::args().any(|arg| arg == "--m4-preview") {
+        m4_preview(&base,&mut ar)?;
+    }
     if std::env::args().any(|arg| arg == "--compare") {
         // Diagnostic A/B only: same Rust host/inputs, fixed base constructed
         // before timings. A bounded F4 "undetermined" is not a timed loss.
@@ -306,6 +426,43 @@ mod tests {
         }
         all.sort_unstable();all.dedup();all
     }
+    #[test]
+    fn m4_pair_support_resultant_on_same_prime31_curve() {
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let base=Base::build(PRIME31,6,&mut ar).unwrap();
+        let xs:Vec<u64>=base.points[..4].iter().map(|v|v.0).collect();
+        let k=m4_pair_support(&xs).unwrap();
+        assert_eq!(k.len()-1,16);
+        let mut support=std::collections::BTreeSet::new();
+        // Post-hoc verifier only; no point arithmetic enters the eliminant.
+        for i in 0..4 {
+            for j in i..4 {
+                for sign in [-1,1] {
+                    if i==j && sign<0 { continue; }
+                    let q=if sign<0 {
+                        ar.neg(PRIME31,Some(base.points[j]))
+                    } else { Some(base.points[j]) };
+                    if let Some(v)=ar.add(PRIME31,Some(base.points[i]),q) {
+                        assert_eq!(eval(&k,v.0),0);
+                        support.insert(v.0);
+                    }
+                }
+            }
+        }
+        assert_eq!(support.len(),16);
+        let l=ar.add(PRIME31,Some(base.points[0]),Some(base.points[1]));
+        let r=ar.add(PRIME31,Some(base.points[2]),Some(base.points[3]));
+        let t=ar.add(PRIME31,l,r).unwrap();
+        let (d,exc)=m4_first_eliminant(&k,t.0).unwrap();
+        assert!(!exc);
+        assert_eq!(d.len()-1,6);
+        let public=ar.scalar(PRIME31,17,Some(PRIME31.g)).unwrap();
+        let (d,exc)=m4_first_eliminant(&k,public.0).unwrap();
+        assert!(!exc);
+        assert_eq!(d.len()-1,0);
+    }
+
     #[test]
     fn symbolic_oracle_matches_independent_generic_control() {
         let mut ar=Arithmetic::default();
