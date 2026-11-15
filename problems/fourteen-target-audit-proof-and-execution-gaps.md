@@ -3307,3 +3307,69 @@ waivers/frozen edits/cryptoPython/native crypto experiment/spend/upload.
 Separate Scheme/line-bundle comparison, general geometric divisor/Picard/Galois
 descent, reciprocity, isogeny/Lang/Jacobian and canonical Weil–Tate/MOV–FR remain
 open. The fourteen-item request remains active. [pcc:unverified]
+
+
+### Actual auxiliary independence and divisor-formula three pairing
+
+The [actual auxiliary Weil proof](../research/weil_auxiliary_ratio_audit_20261115/README.md)
+now constructs the exact Galbraith26.1 divisor-formula pairing at three and
+proves it equals the inverse of the credited explicit tangent pairing for
+every geometric three-torsion pair. Actual zero, equal, opposite and distinct-x
+branches are all proved. The actual source representatives have derived
+degreezero/disjointness and both required principal-divisor equations; their
+class correction is the actual divisor of1/stepFunction. Both proper evaluation
+domains are derived. Every auxiliary choice and every valid full geometric
+function choice agrees, with no normalization premise.
+
+The underlying actual all-n chosen Miller auxiliary quotient is a nonzero
+coefficient scalar, from actual translation/negation divisor cancellation and
+the credited geometric constant-kernel theorem. Actual local-unit evaluations
+agree and actual admissible points exist, including simultaneous translated
+domains, from quadratic fibers/finite actual divisor support. No reciprocity,
+constancy, auxiliary independence, alternation or point-avoidance premise.
+The actual infinity quotient of a negated y-monic line and another line has
+residue−1; actual square/cube products give diagonal1, same-divisor cancellation
+gives opposite1 and zero-point functions give1. The actual curve equation
+classifies equal-x ordinates. All statements use every algebraically closed
+coefficient field/every nonsingular general model/every characteristic.
+
+The constructed divisor-formula pairing is alternating and has cube1. Both
+bilinear/zero-radical laws have explicit nonzero3 guard. The credited actual
+BinaryClosureF2 curve y²+y=x³+1 has Char2/nonzero3/nonsingular/nontrivialcube
+and source inverse different from tangent/sourcevalue not1: omission of
+inversion is false. The concrete actual AlgebraicClosureF3 ordinary curve
+y²+xy+y=x³ has nonzero discriminant/nonzero radical when coprimality is
+deleted. Actual restriction to a nonzero cyclic torsion line is degenerate.
+Known methods/curves credited; no new population, qualified-source refutation
+or novelty. Multiplication-isogeny definition26.2.2 comparison, arbitrary
+divisor representatives beyond the translated family, general reciprocity,
+general geometric divisor/Picard/Galois descent/canonical Tate/general MOV-FR
+and full14 remain open. The all-n result is auxiliary independence, not a
+complete all-n pairing construction/nondegeneracy theorem.
+
+Exact local **PCC-20261115-004f3b PASS at 2026-11-15T23:22:08Z**, signed standing unverified.
+Final wholetracked/transitive gate101/17newconcrete/0failures/0trusted-native;
+160frozenmodules0copies0hydration/199oldformal/all233oldpins match before-after
+38states/bothgates/22packages/no lakeupdate.219formal19artifact238pins/177custom
+imports; full2925-character headerSHA
+ac22919aa0acb5570a8c11ac17484c04af34ab74b4c4a5f36b45716c783f18dd,
+native1complete0prefix0unresolved/empty suffix after completed finalgate02.
+Lossless935files226objects80192B logicalXZ/two bounded parts64000/16192B/
+roundtrip and actual restore equal/five finalgate files. Firstvalidonepage47591B
+PDF/all5324characters read/individual fullpagevisual/inbounds/no draft.
+24failed states14successes/default200000heartbeat failures retained; exact
+current roots every state from01. Firstgate101PASS had5unused header-name
+warnings; preflight aborted initializer but shell without errexit continued
+staging/gate. Actualeffects recovered before formaledit. Final38 prefixes only
+those names, samehypotheses/proof; newsourcewarnings0/39frozen inherited per
+build/one auditor deprecation. New preparation wrappers use errexit.
+Fresh Galbraithch26PDF1–4/16 printed573–576 fulltext/every individualvisual,
+reciprocity sketch/definition/exact26.1/inversion footnote; referenced complete
+external reciprocity/isogeny equivalence proofs notread/no wholechapter/book.
+Five correct KB calls/Conductor127 before respective routes/code, expanded
+publicationConductor127beforemaps/outsidepins; bounded fallback/noabsence.
+Copyright local/excluded; no regenerablePNG archive. Same host/prover/procedural
+header check, no independent parser/compiler/physical-host assurance. Standard
+foundations/defaultlimits/no holes/customaxioms/nativeproofeval/newglobalflags/
+waivers/frozenedits/cryptoPython/newnativecryptoexperiment/spend/upload.
+[pcc:unverified]
