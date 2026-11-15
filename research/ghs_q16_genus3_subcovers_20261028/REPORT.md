@@ -137,6 +137,28 @@ covers, zeros or poles away from the four branch points, other curve
 models, or isogeny correspondences. It narrows the next search without
 asserting a global vulnerability classification.
 
+### Degree-five branch-supported obstruction
+
+There is a field-independent next bound. Suppose the same four nonzero
+simple branch residues are supported at four distinct roots, all zeros
+and poles of an involution-compatible elliptic `X=R(x)` lie at those
+roots, and `deg R=5`. Each root must be a zero or pole. A zero or pole
+of odd order greater than one leaves an unremovable odd Artin–Schreier
+pole, so the positive and negative orders must each partition five as
+`4+1`. The only exponent vectors are the 24 permutations of
+`(4,1,-4,-1)`.
+
+At the order-four pole `r`, write its Laurent leading term as
+`c*t^-4`. The coefficient of `t^-3` is
+`c*(1/(r-r_+) + 1/(r-r_-))`, where `r_+` and `r_-` are the distinct
+roots carrying exponents `1` and `-1`. In characteristic two this sum is
+`(r_+ + r_-)/((r-r_+)(r-r_-))`, which is nonzero. A coboundary
+`H^2+H` cannot remove that order-three term while keeping conductor one.
+Thus **no branch-supported degree-five map of this form exists over any
+characteristic-two field** with four distinct nonzero simple branch
+residues. `BranchPole.lean` checks the nonzero inverse-sum algebra; the
+Laurent and divisor argument is stated here and is not Lean-formalized.
+
 ### Two 409-order nonzero-trace representatives
 
 The table gives exact source curves using polynomial-basis masks for `u,b`

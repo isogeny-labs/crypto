@@ -21,6 +21,9 @@ theorem degree_three_full_catalog_accounting :
 theorem degree_four_full_catalog_accounting :
     10664 * 6 = 63984 ∧ 1020 ≤ 63984 ∧ 510 * 2 = 1020 := by decide
 
+theorem degree_five_branch_pattern_count :
+    4 * 3 * 2 = 24 ∧ 4 + 1 = 5 := by decide
+
 theorem nonzero_trace_source_subgroup_order :
     4090 = 10 * 409 ∧ 409 > 1 := by decide
 
