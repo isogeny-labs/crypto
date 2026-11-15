@@ -2,7 +2,7 @@
 both counted in elliptic-curve point additions (group ops) on the same prime-order curve.
 Exploratory; not a bench.record run. Usage: ic_mt.py p seed n1,n2,...  (n = factor-base size)"""
 import sys, random, json, math, time
-p=int(sys.argv[1]); SEED=int(sys.argv[2]); NS=[int(v) for v in sys.argv[3].split(',')]
+p=int(sys.argv[1]); SEED=int(sys.argv[2]); NS=[int(v) for v in sys.argv[3].split(',')]; LP='--lp' in sys.argv
 rng=random.Random(SEED)
 def legendre(a): a%=p; return 0 if a==0 else (1 if pow(a,(p-1)//2,p)==1 else -1)
 def isprime(n): return n>1 and all(n%k for k in range(2,int(n**.5)+1))
@@ -62,7 +62,7 @@ def rho():
     if (hb-tb)%r==0: return None,OPS[0]
     return (ta-ha)*pow(hb-tb,-1,r)%r, OPS[0]
 # ---------- index calculus with hash-table 3-decomposition ----------
-def ic(n):
+def ic(n, lp=False):
     OPS[0]=0
     FB=[]; x=1
     while len(FB)<n:
@@ -80,42 +80,60 @@ def ic(n):
     K=20; coef=[(rng.randrange(r),rng.randrange(r)) for _ in range(K)]
     sv=OPS[0]; M=[add(mul(a,P),mul(b,Q)) for a,b in coef]; OPS[0]=sv
     a,b=rng.randrange(r),rng.randrange(r); sv=OPS[0]; R_=add(mul(a,P),mul(b,Q)); OPS[0]=sv
-    rows=[]; targets=0; need=n+5
-    while len(rows)<need:
-        k=rng.randrange(K); R_=add(R_,M[k]); a=(a+coef[k][0])%r; b=(b+coef[k][1])%r; targets+=1
-        if R_ is None: continue
-        found=None
-        for kk in range(n):
-            for s3 in (1,-1):
-                T=add(R_, neg(FB[kk]) if s3==1 else FB[kk])   # T = R - s3*F_k
-                key='O' if T is None else T[0]
-                for (i,j,sj) in tab.get(key,()):
-                    # x(F_i + sj F_j) = x(T): so F_i + sj F_j = +-T ; resolve sign (no extra ops counted: one compare)
-                    S=add(FB[i],FB[j] if sj==1 else neg(FB[j]))
-                    sg=1 if S==T else -1
-                    e=[0]*n; e[i]+=sg; e[j]+=sg*sj; e[kk]+=s3
-                    found=e; break
-                if found: break
-            if found: break
-        if found: rows.append((found,a,b))
-    walk_ops=OPS[0]-table_ops
-    # linear algebra mod r (not counted in group ops; reported separately as row ops)
-    m=len(rows); Mx=[[c%r for c in e]+[1 if t==k else 0 for t in range(m)] for k,(e,_,_) in enumerate(rows)]
-    piv=0
-    for col in range(n):
-        pr=next((i for i in range(piv,m) if Mx[i][col]),None)
-        if pr is None: continue
-        Mx[piv],Mx[pr]=Mx[pr],Mx[piv]; inv=pow(Mx[piv][col],-1,r)
-        Mx[piv]=[v*inv%r for v in Mx[piv]]
-        for i in range(m):
-            if i!=piv and Mx[i][col]:
-                f=Mx[i][col]; Mx[i]=[(vi-f*vp)%r for vi,vp in zip(Mx[i],Mx[piv])]
-        piv+=1
-    for i in range(piv,m):
-        lam=Mx[i][n:]
-        sa=sum(l*rows[k][1] for k,l in enumerate(lam))%r; sb=sum(l*rows[k][2] for k,l in enumerate(lam))%r
-        if sb: return (-sa*pow(sb,-1,r))%r, table_ops, walk_ops, targets, len(rows)
-    return None, table_ops, walk_ops, targets, len(rows)
+    rows=[]; targets=0; need=n+5; partial={}; nlp=0; retries=0
+    while True:
+        while len(rows)<need:
+            k=rng.randrange(K); R_=add(R_,M[k]); a=(a+coef[k][0])%r; b=(b+coef[k][1])%r; targets+=1
+            if R_ is None: continue
+            found=None
+            for kk in range(n):
+                for s3 in (1,-1):
+                    T=add(R_, neg(FB[kk]) if s3==1 else FB[kk])   # T = R - s3*F_k
+                    key='O' if T is None else T[0]
+                    if T is None:   # R = s3*F_k exactly
+                        e=[0]*n; e[kk]+=s3; found=e; break
+                    if lp:
+                        hit=partial.get(key)
+                        if hit is not None and hit[0]!=targets:
+                            _,L0,a0,b0,k0,sg0=hit
+                            e=[0]*n
+                            if L0==T:   # R - s3 F_kk = R0 - sg0 F_k0
+                                e[kk]+=s3; e[k0]-=sg0; ra,rb=(a-a0)%r,(b-b0)%r
+                            else:       # R - s3 F_kk = -(R0 - sg0 F_k0)
+                                e[kk]+=s3; e[k0]+=sg0; ra,rb=(a+a0)%r,(b+b0)%r
+                            rows.append((e,ra,rb)); nlp+=1
+                            partial[key]=(targets,T,a,b,kk,s3)
+                            if len(rows)>=need: break
+                        elif hit is None:
+                            partial[key]=(targets,T,a,b,kk,s3)
+                    for (i,j,sj) in tab.get(key,()):
+                        # x(F_i + sj F_j) = x(T): so F_i + sj F_j = +-T ; resolve sign (no extra ops counted: one compare)
+                        S=add(FB[i],FB[j] if sj==1 else neg(FB[j]))
+                        sg=1 if S==T else -1
+                        e=[0]*n; e[i]+=sg; e[j]+=sg*sj; e[kk]+=s3
+                        found=e; break
+                    if found: break
+                if found or len(rows)>=need: break
+            if found and len(rows)<need: rows.append((found,a,b))
+        walk_ops=OPS[0]-table_ops
+        # linear algebra mod r (not counted in group ops; reported separately as row ops)
+        m=len(rows); Mx=[[c%r for c in e]+[1 if t==k else 0 for t in range(m)] for k,(e,_,_) in enumerate(rows)]
+        piv=0
+        for col in range(n):
+            pr=next((i for i in range(piv,m) if Mx[i][col]),None)
+            if pr is None: continue
+            Mx[piv],Mx[pr]=Mx[pr],Mx[piv]; inv=pow(Mx[piv][col],-1,r)
+            Mx[piv]=[v*inv%r for v in Mx[piv]]
+            for i in range(m):
+                if i!=piv and Mx[i][col]:
+                    f=Mx[i][col]; Mx[i]=[(vi-f*vp)%r for vi,vp in zip(Mx[i],Mx[piv])]
+            piv+=1
+        for i in range(piv,m):
+            lam=Mx[i][n:]
+            sa=sum(l*rows[k][1] for k,l in enumerate(lam))%r; sb=sum(l*rows[k][2] for k,l in enumerate(lam))%r
+            if sb: return (-sa*pow(sb,-1,r))%r, table_ops, walk_ops, targets, len(rows), nlp, retries
+        need+=5; retries+=1   # no usable dependency yet: collect more relations (ops keep counting)
+        if retries>50: return None, table_ops, OPS[0]-table_ops, targets, len(rows), nlp, retries
 out={'p':p,'r':r,'seed':SEED,'curve':[A,B]}
 rr=[]
 for _ in range(5):
@@ -123,7 +141,7 @@ for _ in range(5):
 out['rho_ops_mean']=sum(rr)/len(rr); out['rho_ops_runs']=rr; out['sqrt_r']=math.isqrt(r)
 out['ic']=[]
 for n in NS:
-    t0=time.time(); wi,to,wo,tg,nr=ic(n)
+    t0=time.time(); wi,to,wo,tg,nr,nl,rt=ic(n, LP)
     assert wi==w, ('ic wrong', n, wi, w)
-    out['ic'].append({'n':n,'table_ops':to,'walk_ops':wo,'total_ops':to+wo,'targets':tg,'relations':nr,'seconds':round(time.time()-t0,2)})
+    out['ic'].append({'n':n,'large_prime':LP,'table_ops':to,'walk_ops':wo,'total_ops':to+wo,'targets':tg,'relations':nr,'lp_relations':nl,'la_retries':rt,'seconds':round(time.time()-t0,2)})
 print(json.dumps(out))
