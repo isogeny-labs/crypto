@@ -405,7 +405,25 @@ fn main() {
 
         let mut opts = F4Options::new(Ordering::Grevlex, dmax);
         opts.deadline = Some(Instant::now() + Duration::from_secs(budget));
+        // --trace 1: per-step diagnostics (free in the counted multiplications); diagnostic rows only.
+        let trace = o.get("trace").map(|v| v == "1").unwrap_or(false);
+        if trace {
+            opts = opts.capturing_run_log();
+        }
         let rep = f4_fp::f4(&input, n_vars, p, &opts);
+        let steps_log: Vec<serde_json::Value> = if trace {
+            f4_fp::take_run_log()
+                .steps
+                .iter()
+                .map(|st| {
+                    json!({"degree": st.degree, "pairs": st.pairs, "rows": st.rows,
+                    "all_rows": st.all_rows, "ops": st.ops, "new_polys": st.new_polys,
+                    "staircase": st.staircase})
+                })
+                .collect()
+        } else {
+            vec![]
+        };
         let agree = !rep.timed_out && rep.inconsistent == !decomp;
         let row = json!({
             "schema": "pkm-odd-tower-f4.row/v1", "cell": cell, "p": p, "m": m,
@@ -422,7 +440,7 @@ fn main() {
             "max_cols": rep.max_cols, "max_rows": rep.max_rows,
             "max_cols_to_solution": rep.max_cols_to_solution, "steps": rep.steps,
             "steps_to_solution": rep.steps_to_solution, "pairs_above_bound": rep.pairs_above_bound,
-            "dmax": dmax, "budget_s": budget, "threads": threads, "ms": rep.ms,
+            "dmax": dmax, "budget_s": budget, "threads": threads, "ms": rep.ms, "steps_log": steps_log,
         });
         let line = row.to_string();
         println!("{line}");
