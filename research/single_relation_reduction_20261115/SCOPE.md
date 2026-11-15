@@ -104,3 +104,37 @@ algorithms are outside its proposed upper bound. Reuse existing polynomial
 root counts; if a missing support law is needed, add it in crypto-lean on the
 existing polynomial/curve semantics before making a formal claim. No native
 numeric case, paid job or change to the frozen multiprecision panel.
+
+## A3: implicit coordinate intervals and uniform-list closure
+
+Review large implicitly represented coordinate filters, which are outside A2.
+For S={P in G\{O}:x(P) in I}, check whether independent uniform S-points
+remain in S after addition with the near-certain retention used in an XOR
+tree. Competing hypotheses are strong retention or return near the ambient
+density |S|/r. State the exact model; do not extend it to correlated/adaptive
+lists merely from their individual supports.
+
+Literature first (KB remains unavailable): read Kohel--Shparlinski, On
+Exponential Sums and Group Generators for Elliptic Curves over Finite Fields,
+ANTS-IV2000, sections3--4, Theorem1/Corollary1/Lemma3:
+https://www.i2m.univ-amu.fr/perso/david.kohel/pub/character.pdf . Read
+Kim--Tibouchi, Equidistribution Among Cosets of Elliptic Curve Points in
+Intervals, conference manuscript at
+https://nutmic2019.imj-prg.fr/confpapers/Coset.pdf , section2 and Lemma3.1.
+Use only the x-coordinate case in characteristic>3, whose pole order2 is
+coprime to the characteristic, and separate nontrivial additive characters
+from the trivial term. Do not apply a broad character-sum statement to an
+Artin--Schreier-exceptional rational function.
+
+The generic target is a finite-group triple-count inequality, conditional on
+an explicit bound M for every nontrivial character sum of the actual subset.
+The curve character estimate is an external analytic input, not an axiom to
+be labelled as a complete formal curve theorem. A source-only derivation may
+remain partial formalization; name its concrete missing bridge. No numerical
+case, experiment, paid job, cap/seed change or new empirical scaling fit.
+
+Before any A3 Lean edit, complete the six-field instance plan/proof chain and
+type-check a floor-law assembly probe. Reuse existing AddChar orthogonality,
+Pontryagin duality, polynomial/curve semantics and finite-sum/norm laws. Build
+only the missing generic assembly in crypto-lean; preserve statements,
+failures, exact sources and canonical source/axiom gate receipts.

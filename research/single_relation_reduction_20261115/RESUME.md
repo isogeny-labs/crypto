@@ -68,6 +68,15 @@ journal until a response or the documented no-response fallback; keep both
 complete histories and multiplicities. Other study files may progress.
 PCC history stays append-only; no force push or ledger rechain.
 
+A one-time safety-net PR follow-up is scheduled for18:41:51Z under the
+standing check-in instruction. It inherits the source environment selection;
+the service did not expose concrete environment details, so this is not a
+receipt that the future command has executed. Avoid duplicate journal
+resolvers. A3 now scopes implicit coordinate-interval closure; its prospective
+six-field proof plan precedes any new Lean edit. The original numerical
+checkpoint capability recheck still finds no AWS CLI/ambient pair or upload
+token file/environment; no failed upload gate was repeated.
+
 No native job is running. Paths: /workspace/scratch/big-prime-halving-build002
 (unrun controls); /workspace/scratch/crypto-lean (shared proof repository);
 /workspace/scratch/cover-transfer-literature (primary PDFs). Keep the old

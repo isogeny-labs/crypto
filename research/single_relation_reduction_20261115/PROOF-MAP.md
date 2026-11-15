@@ -107,3 +107,58 @@ covers the specific addition output x-coordinate and does not state this
 arbitrary-evaluation bridge. The subsequent root/count endpoints use that
 named bridge and the existing degree/root laws, rather than unfolding the
 curve equation again.
+
+## Prospective A3: finite subset return count
+
+This plan is written before the first A3 Lean edit, distinct from the
+retrospective A1/A2 review above.
+
+1. Structure above: Mathlib finite AddCommGroup G; AddChar G complex-valued
+   characters; Finset subsets/products; complex finite sums, conjugation and
+   norms. The curve remains the existing Weierstrass model only in the hand
+   analytic application.
+2. Laws used as stated: AddChar.sum_apply_eq_ite and card_eq (finite Pontryagin
+   duality); map_add_eq_mul/map_neg_eq_inv/norm_apply; finite sum distribution,
+   norm_sum_le and multiplication of nonnegative real inequalities.
+3. Instance: Fourier coefficient of an actual finite subset S is the finite
+   sum of a character over S. Return count is the number of actual triples
+   x,y,z in S with x+y=z, equivalently the existing addConvolution summed on S.
+   No new group representation or elliptic curve is introduced.
+4. Assembly probe: before the generic implementation, type-check applications
+   of existing character orthogonality/cardinality, norm and finite-sum laws.
+   Retain source/log under checks/interval-laws/. Then instantiate the generic
+   target at semantic subsets. This probe alone is not the target theorem.
+5. Missing generic assembly: finite-subset Parseval, Fourier representation of
+   the actual triple count, and a norm bound on its nontrivial-character sum.
+   These belong in a shared crypto-lean module, not a study-specific law.
+   The Kohel--Shparlinski x-coordinate analytic input is not in these inspected
+   Mathlib sources and remains an explicit unformalized curve bridge.
+6. Inheritance/statement table and proof chain follow. No limit override or
+   native evaluation. Do not present a conditional Fourier theorem as a full
+   formalized elliptic mixing result.
+
+| Proposed component | Kind / owner | Inheritance or hypotheses |
+|---|---|---|
+| Group, characters, subset | Existing Mathlib objects | AddCommGroup/Fintype, AddChar, Finset |
+| Character sum | Generic definition, shared | Existing finite sum of actual character values |
+| Orthogonality and character cardinality | Inherited laws | AddChar.sum_apply_eq_ite/card_eq; no re-proof |
+| Subset Parseval | Missing generic assembly, shared | Expand two finite sums, use conjugation/map_sub and the existing orthogonality law |
+| Triple Fourier identity | Missing generic assembly, shared | Expand three finite sums, replace character sum by existing orthogonality; count actual x+y=z triples |
+| Flatness-conditioned return bound | Generic endpoint, shared | Explicit M>=0 and norm(character sum)<=M for all nontrivial characters |
+| x-interval flatness and subset size | External analytic bridge, hand | Kohel--Shparlinski Theorem1/Corollary1 and interval L1 Lemma3, only f=x and p>3 |
+| Tree interpretation | Model-specific hand consequence | Independent uniform subset points; no claim for correlated lists or adaptive selection |
+
+Proof chain: expand the finite character coefficients; use existing
+orthogonality to replace the character sum by the zero-test/cardinality;
+restructure to the actual pair/triple counts. In the triple formula isolate
+the trivial coefficient |S|^3. Bound the remaining norm by the sum of cubed
+coefficient norms; replace one factor by M; replace the squared-norm sum by
+the derived finite-subset Parseval identity. Cancel only the positive group
+cardinality. The curve character input and sampling interpretation are not
+silently imported into this algebraic theorem.
+
+Composite opening: the new generic subset coefficient is a finite sum by
+definition; its owning Parseval/triple assembly lemmas open it to connect
+with existing orthogonality. No curve equation, character internals or
+external analytic bound is unfolded or axiomatized. The consumer will apply
+the resulting endpoint rather than copying the finite Fourier proof.
