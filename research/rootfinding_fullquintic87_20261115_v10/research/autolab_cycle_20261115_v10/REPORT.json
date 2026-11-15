@@ -1,0 +1,183 @@
+{
+  "result": {
+    "evidence": {
+      "complete_conditional_compiler": true,
+      "complete_global_root_search": false,
+      "details": {
+        "controls": {
+          "all_r_s_states": 13008,
+          "nonzero_k_exercised": true,
+          "repeated_H_observations": 1715,
+          "synthetic_AS_cases": [
+            {
+              "C": 0,
+              "allowed": [
+                0
+              ],
+              "solutions": [
+                0,
+                1
+              ]
+            },
+            {
+              "C": 1,
+              "allowed": [
+                0
+              ],
+              "solutions": []
+            },
+            {
+              "C": 0,
+              "allowed": [
+                0,
+                1
+              ],
+              "solutions": [
+                0,
+                1
+              ]
+            },
+            {
+              "C": 1,
+              "allowed": [
+                0,
+                1
+              ],
+              "solutions": [
+                0,
+                1
+              ]
+            }
+          ]
+        },
+        "profile": {
+          "complete_equivalent_relaxation": true,
+          "internal_total_ratios": {
+            "baseline166_over_new87": 0.997473685575118,
+            "frozen104_over_new87": 1.0434190657387963
+          },
+          "median_total_seconds": {
+            "baseline166": 0.34127674599949387,
+            "frozen104": 0.35699654900054156,
+            "new87": 0.3421411020008236
+          },
+          "original_global_complete": false,
+          "records": [
+            {
+              "compile_seconds": 0.03496007700050541,
+              "method": "baseline166",
+              "rep": 0,
+              "serialization_seconds": 0.00013358199976210017,
+              "setup_seconds": 0.6625260499986325,
+              "total_seconds": 0.7175188669989438,
+              "verify_seconds": 0.019893650998710655
+            },
+            {
+              "compile_seconds": 0.05285134500081767,
+              "method": "frozen104",
+              "rep": 0,
+              "serialization_seconds": 7.148800068534911e-05,
+              "setup_seconds": 0.3199640240000008,
+              "total_seconds": 0.39217762800035416,
+              "verify_seconds": 0.019286385000668815
+            },
+            {
+              "compile_seconds": 0.0363411719990836,
+              "method": "new87",
+              "rep": 0,
+              "serialization_seconds": 6.37360008113319e-05,
+              "setup_seconds": 0.2926962399997137,
+              "total_seconds": 0.34817907700016804,
+              "verify_seconds": 0.019073622999712825
+            },
+            {
+              "compile_seconds": 0.053144388999498915,
+              "method": "frozen104",
+              "rep": 1,
+              "serialization_seconds": 7.022599857009482e-05,
+              "setup_seconds": 0.28425559700008307,
+              "total_seconds": 0.35699654900054156,
+              "verify_seconds": 0.019522320000760374
+            },
+            {
+              "compile_seconds": 0.03529002599861997,
+              "method": "new87",
+              "rep": 1,
+              "serialization_seconds": 6.985599975450896e-05,
+              "setup_seconds": 0.2840186690009432,
+              "total_seconds": 0.338933070001076,
+              "verify_seconds": 0.019550834000256145
+            },
+            {
+              "compile_seconds": 0.033635159001278225,
+              "method": "baseline166",
+              "rep": 1,
+              "serialization_seconds": 0.0001115180002670968,
+              "setup_seconds": 0.28857851099928666,
+              "total_seconds": 0.34127674599949387,
+              "verify_seconds": 0.018948535000163247
+            },
+            {
+              "compile_seconds": 0.035867627999323304,
+              "method": "new87",
+              "rep": 2,
+              "serialization_seconds": 6.503900112875272e-05,
+              "setup_seconds": 0.2873967180003092,
+              "total_seconds": 0.3421411020008236,
+              "verify_seconds": 0.0188093150009081
+            },
+            {
+              "compile_seconds": 0.033042482999007916,
+              "method": "baseline166",
+              "rep": 2,
+              "serialization_seconds": 0.00014784300037717912,
+              "setup_seconds": 0.28276524800094194,
+              "total_seconds": 0.3352153300002101,
+              "verify_seconds": 0.019256519999544253
+            },
+            {
+              "compile_seconds": 0.05165689400018891,
+              "method": "frozen104",
+              "rep": 2,
+              "serialization_seconds": 7.284999992407393e-05,
+              "setup_seconds": 0.2804201889994147,
+              "total_seconds": 0.3521514179992664,
+              "verify_seconds": 0.019997478999357554
+            }
+          ],
+          "surviving_parameter_bits": 73,
+          "timing": "3rotatingSAMEPROCESSreps; paidparse/setup/conversion/compile/verify/output; notcold/genuineGB"
+        }
+      },
+      "error": null,
+      "novelty_claim": false,
+      "original_root_count_exact": null,
+      "peak_process_rss_kib": 160332,
+      "predicates": 39753,
+      "qualified_speedup": null,
+      "raw_bytes": 16166,
+      "raw_path": "research/full_quintic_87_20261115_v10/raw.json.gz",
+      "raw_sha256": "c01327bb67cef302f7a3dda0b14895f381ee8559eaa23915c091014c54ee28cf",
+      "raw_uncompressed_bytes": 42306,
+      "release_gate_claim": false
+    },
+    "experiment_id": "full-quintic-87-20261115-v10",
+    "next_actions": [
+      "Review exact mapped coset/kernel equality and paid total costs; use measured failure/gain to design a changed shared-k compiler workload with all setup paid, while full support and original-root obligations remain open."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "passed",
+    "summary": "Exact87-coordinate any-fixed-k full-quintic compiler versus strong166 and frozen104; unchanged73-bit relaxation, no root search."
+  },
+  "process": {
+    "wall_seconds": 4.621354945000348,
+    "peak_process_rss_kib": 160332,
+    "measurement_scope": "development diagnostic; isolation must be established separately"
+  },
+  "decision": "Exact87-family equivalence passed; total neutral against strong166 and no promotion. Next amortize fixed-h setup and compare exact Gray updates against BOTH optimized Gray166 and cached87.",
+  "requested_speed_target": 8,
+  "scientific_goal_complete": false,
+  "qualified_speedup": null,
+  "new_theory": "Outer-k matrix affine and RHS quadratic; no pruning, no rank-one claim. Independent hand-derived positive GF9/GF25 fixtures pending bounded executable controls.",
+  "novelty": "Primary-source overlap inspected; no novelty clearance."
+}
