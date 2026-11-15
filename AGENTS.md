@@ -2276,3 +2276,49 @@ experiment or action, and the specific input or condition needed to resume.
 Never claim success from effort alone or claim that every avenue is exhausted
 without evidence. Apply this loop proportionately: routine edits need direct
 checks; substantive research needs an explicit experimental record.
+
+## Continuous learning loop
+
+Owner instruction, 2026-11-15: agents and skills run continuously, learn from
+what they observe, adapt their own instructions from evidence, and resolve
+what they can without waiting for a person. The persistent research loop above
+governs a single effort; this loop carries what one effort learned into the
+next. The ledger is `docs/lessons/` (`tools/lessons.py`, schema
+`crypto.lesson/v1`; guide: [`docs/lessons/README.md`](docs/lessons/README.md)).
+
+1. **Read before acting.** Every skill and agent starts with
+   `python3 tools/lessons.py brief --scope <its name>`; the session-start hook
+   prints the global brief. Adopted lessons are applied; candidates are
+   hypotheses the run can test.
+2. **Act on your own, within authority.** Diagnose a blocker, try the
+   documented remedy, then a materially different approach, before escalating
+   (persistent loop, "Recover, adapt and continue"). Escalate only what needs
+   authority, access, budget or an owner decision you do not have. The loop
+   adds no authority: model tiers, admission, sabotage and budget rules hold.
+3. **Record after acting.** One `outcome` per finished task, with evidence
+   (receipt, commit, PR, job or session-log path). One `test` per lesson the
+   task applied, `confirm` or `refute`. A surprise that would change what the
+   next run does becomes a new `lesson`: a trigger, an action, and the evidence
+   that showed it.
+4. **Promote only on evidence.** A lesson is *adopted* after two confirmations
+   with distinct evidence and more than twice as many confirmations as
+   refutations; *contested* once refuted; *retired* by a `retire` entry or two
+   more refutations than confirmations. Status is derived from the entries,
+   never stored, so it cannot be asserted.
+5. **Adapt the instructions.** An adopted lesson is folded into the skill or
+   agent file it is scoped to (or into this file, for scope `*`) by a PR that
+   cites the lesson id. A retired lesson's text is removed the same way. A
+   rule from the owner is never changed by a lesson; a lesson that contradicts
+   one is reported to the owner ("What supersedes what").
+6. **Measure the skills.** `python3 tools/lessons.py stats` gives each skill's
+   and agent's outcome counts with a Wilson 95% interval. A scope with at least
+   8 outcomes whose success interval lies wholly below 0.5 is reviewed: its
+   failure outcomes are read together and the cause becomes a lesson or a fix.
+7. **Integrity.** Entries are content-addressed and append-only; the
+   `agent-learning` workflow fails an edited, removed or unevidenced entry.
+   Every entry is `[pcc:unverified]` until a pcc claim cites it, and a lesson
+   never stands in for a measurement or a proof.
+
+Lean work adds one measured signal: `tools/lean/lean-health.sh` (advisory)
+reports crypto-lean use, limit overrides, `native_decide` and theorem families
+per study; the baseline is `docs/lean-health/BASELINE-20261115.md`.

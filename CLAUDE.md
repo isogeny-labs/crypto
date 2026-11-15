@@ -150,6 +150,12 @@ benchmark launchers and unrecorded pushes; the `bench-records` check fails
 the PR. AGENTS.md, "Benchmark records: data in S3, metadata in Git, one
 progress report"; [docs/benchmark-records.md](docs/benchmark-records.md).
 
+**Continuous learning** (owner, 2026-11-15): every skill and agent reads
+`python3 tools/lessons.py brief --scope <name>` before acting, records an
+evidenced outcome and lesson tests after, and folds adopted lessons back into
+its own instructions by PR. Ledger: `docs/lessons/`. Rule: AGENTS.md
+"Continuous learning loop".
+
 ## Persistent scientific research loop
 
 Read and follow [AGENTS.md](AGENTS.md#persistent-scientific-research-loop).
