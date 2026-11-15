@@ -34,3 +34,25 @@ wall-time claim. Copy original output to GATE-RETAIN-ALL.txt before rerun.
 Implement this change and rerun exactness in debug and optimized native builds.
 ### Errors
 None; this amendment follows the observed retained-memory issue explicitly.
+
+## Corrected gate and joint cost derivation
+### What was done
+Native gate.sh rebuilds/discovers the rlib and runs default/optimized tests;
+both pass4tests, with216streams/110592prefixes in the differential gate.
+Twelve release library tests pass. Native counts.jq emits COUNTS.json and
+source.sha256 pins source/library. RESULTS.md retains all memory regressions.
+JOINT-COST.md derives sparse a,b challenge labels without per-batch auxiliary
+unknowns, and the known sieve's conditional supply/cost balance; read primary
+Section2.2/2.3with explicit key sign, distinct-root and touched-bucket rules.
+### Decisions made
+Scratch truncation is safe only after endpoint compression. Retained storage
+improves4.30..11.68atH127in synthetic streams, loses at smallH; no speed claim.
+Real-stream expansion/rank/cost gates are required before a timing experiment.
+Class engineering prerequisite; no record/default/leaderboard promotion.
+### Open threads
+Publish/checkpoint these source-linked gates, then implement the established
+point sieve with sparse public labels under a separate exactness protocol.
+Keep the mathematical10xobjective intact and test joint downstream costs.
+### Errors
+No gate failed. The first retained-arena inefficiency and scoped correction
+remain reproducible; no historical run or closed record was edited.

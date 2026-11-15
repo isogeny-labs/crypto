@@ -147,8 +147,7 @@ impl LazyForest {
 
     pub fn insert(&mut self, off: &[(usize, u64)], on: &Row) -> Option<Row> {
         assert!(off.len() <= 2);
-        let leaf = self.leaf(on);
-        let mut terms = vec![(leaf, 1)];
+        let mut terms = Vec::new();
         let mut roots: Vec<(usize, u64)> = Vec::new();
         for &(node, c) in off {
             assert!(node < self.parent.len() && c < self.f.p);
@@ -164,9 +163,16 @@ impl LazyForest {
             }
         }
         roots.retain(|&(_, c)| c != 0);
+        // Find compression may publish expression IDs into beta. Everything
+        // created after this watermark is temporary if this insertion emits.
+        let watermark = self.arena.len();
+        let leaf = self.leaf(on);
+        terms.push((leaf, 1));
         let hot = self.sum(&terms);
         if roots.is_empty() {
-            return Some(self.expand(hot));
+            let row = self.expand(hot);
+            self.arena.truncate(watermark);
+            return Some(row);
         }
         if roots.len() == 2 && self.size[roots[0].0] > self.size[roots[1].0] {
             roots.swap(0, 1);
