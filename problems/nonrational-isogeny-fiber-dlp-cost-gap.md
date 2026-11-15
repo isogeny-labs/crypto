@@ -763,15 +763,38 @@ calls inside counted group operations and 29,140 outside them; its 34
 outside square-root calls still have unexpanded internals. These counts
 locate work but are not a complete portable `S` conversion.
 
+The [projected factor-base grid V2](../research/isogeny_torsion_fibers_20261012/factor_base_grid_20261016/RESULTS_V2.md)
+completed 384 cold children and independent replays, with the same
+relation rows across inverse-Vélu and destination-direct controls.
+The [explicit dual-transport V1](../research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/RESULTS_V1.md)
+then completed 480 cold children and independent checker replays on
+the fixed witness-free destination projected base. Its independent
+map gate checked both degree-three composition identities on all
+44,655 rational points of each curve; 96 paired dual/inverse cells
+and 13,482 relation witnesses had zero mismatches. At B=64, mean
+whole-child counted `S_group` was 2,492.134 direct dual,
+2,559.868 direct inverse, 2,431.537 destination direct, 4.361 BSGS
+and 7.979 signed rho. The inverse/dual counted-group ratio is
+1.027179, while dual/rho is 312.322. The measured direct dual and
+inverse CPU means were 9.006 and 15.557 ms on shared Darwin L0.
+These are partial operation and descriptive CPU comparisons, not a
+complete portable or isolated wall result. Transport of the same
+columns did not change useful relation support, rows, rank or scalar.
+
 The remaining exit criteria are a disjoint count and calibrated conversion
 of every native primitive (including square-root internals, polynomial
 and table work, allocation and I/O), an independent counter checker,
 an admitted L2 paired wall session, and a memory-bounded larger-order
 full-image constructor or a recorded infeasibility bound for the stated
-cap. The next discriminating relation experiment should freeze a
-projected destination-base selection rule and compare complete verified
-solves to the existing inverse, destination-direct, BSGS and rho controls.
-A changed factor base must be treated as a new arm, with its own support
-and costs. The Linux L1 replay and hard-cap resource questions are
-resolved within their frozen bounds; they do not resolve the remaining
-portable-price or isolation requirements.
+cap. The projected-base paired comparison has now met its order-229
+correctness and relation-equality gates. Its complete portable price
+remains blocked by unconverted primitive and process costs; the next
+discriminating gate is a disjoint native counter census with an
+independent counter checker and calibrated conversion on this exact
+480-child workload. The separately frozen 64-target genuinely
+reused-setup panel and a larger-order dual-versus-inverse comparison
+are still unexecuted; the latter needs a versioned parameter/cap
+amendment. A changed factor base must remain a new arm with its own
+support and costs. The Linux L1 replay and hard-cap resource questions
+are resolved within their frozen bounds; they do not resolve the
+remaining portable-price or isolation requirements.
