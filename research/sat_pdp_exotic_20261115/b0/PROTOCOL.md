@@ -156,6 +156,14 @@ consecutive rungs ℓ ≥ 8 is read as the survey's falsifier firing (its
   censored, and B5 reads "not supported, censored". Other arms' counted metrics
   are deterministic per target and unaffected. Hashes: `FREEZE-am2.sha256`.
 
+- **AM3 (2026-11-15T06:00Z, before any ℓ = 10 data; ℓ = 10 only).** The frozen
+  budget 1.6·10⁷ is below the incumbent's deterministic cost at ℓ = 10 (one
+  conflict per triple, C(1024, 3) = 1.78·10⁸), so `native` and `native-aa` would be
+  censored by construction at ≈ 40 machine-hours of cost and no information.
+  ℓ = 10 runs oracle, lin, lin-nolex; the native arms are reported as censored by
+  construction. ℓ = 9 (4·10⁶ < C(512, 3) = 2.2·10⁷) is run as frozen and its
+  native censoring is observed. Hashes: `FREEZE-am3.sha256`.
+
 ## Inadmissible after the freeze
 
 Changing budget, seeds, target counts, symmetry-breaking setting, encoding, or

@@ -288,7 +288,7 @@
  },
  "stopping_rules": [
   {
-   "rule": "Fixed grid: l in {7, 8, 9, 10}, 20 targets each, every arm except chain-p12 (l = 7 only) and cms/cadical (l <= 9; at l = 10 only if the l = 9 rung finished inside 6 h wall). [AM1: cms and cadical at l = 7 only; rungs may run concurrently on the frozen binaries.]",
+   "rule": "Fixed grid: l in {7, 8, 9, 10}, 20 targets each, every arm except chain-p12 (l = 7 only) and cms/cadical (l <= 9; at l = 10 only if the l = 9 rung finished inside 6 h wall). [AM1: cms and cadical at l = 7 only; rungs may run concurrently on the frozen binaries.] [AM3: at l = 10 only oracle, lin, lin-nolex; native arms censored by construction.]",
    "kind": "fixed_n",
    "preregistered": true
   },
@@ -375,6 +375,15 @@
    "reason": "In the l = 7 row run the chain-p12 arm hit its 4e6 conflict budget on target 0 after 1282 s wall (R > 484, outside the predicted 100-300), making the rung about 11 h; the bench record cannot close before the rung ends and an open record fails the repository's records check for every PR. The arm's role (B5) is answered by that censored target together with the l = 5 check.",
    "change": "The l = 7 run was stopped after its first complete target (all eight arms); that row is kept unchanged as rows/l7-run1-chain-p12-partial.jsonl. The rung is rerun with the arms oracle, native, lin, lin-nolex, native-aa, cms, cadical into rows/l7.jsonl. analyze.py merges files of the same rung by (l, idx), asserting the same target, so chain-p12 at l = 7 is reported as 1 target (censored) and B5 reads 'not supported, censored'. Counted metrics of the other arms are deterministic per (target, arm) and unaffected by the restart.",
    "data_affected": "chain-p12 at l = 7: 1 of 20 targets instead of 20. No other arm or rung."
+  },
+  {
+   "id": "AM3-l10-incumbent-arms-dropped",
+   "filed": "2026-11-15T06:00Z",
+   "filed_before_affected_data": true,
+   "scope": "stopping rule 1 at l = 10 only; no budget, seed, target, encoding or metric change",
+   "reason": "At l = 10 the frozen budget (1.6e7 conflicts) is below the incumbent's deterministic cost (about one conflict per triple, C(1024, 3) = 1.78e8), so native and native-aa are censored by construction; observing that would cost about 40 machine-hours on this host and add no information. B1 is read on l = 7, 8 (l = 9 is censored for the same reason, at 4e6 < 2.2e7, and is run as frozen).",
+   "change": "l = 10 runs oracle, lin, lin-nolex. native and native-aa at l = 10 are reported as 'censored by construction (budget below C(2^l, 3))'.",
+   "data_affected": "native, native-aa at l = 10: not run. No other arm or rung."
   }
  ],
  "freeze": {
