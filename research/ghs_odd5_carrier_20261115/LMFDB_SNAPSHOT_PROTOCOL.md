@@ -1,0 +1,3 @@
+# Frozen local database collision check
+
+15 November 2026 UTC. Query the complete local `av_fq` index extracted on 19 October 2026 from LMFDB `public.av_fq_isog` with the exact eight `g=5,q=3` sparse Weil polynomials `1−tT^5+243T^10`, `t∈{-26,-22,-14,-10,10,14,22,26}`. Use the documented local query helper and verified SSD cache. Require exactly eight rows, exact polynomial-to-trace mapping, `is_simple=true`, flags `0` at ±26 and `1` at the other six. Record the SQL, source extraction timestamp, full rows, manifest SHA-256 and helper exit code in an immutable JSON receipt. This is a collision check against a dated index, not a live database query or a publication-priority proof. [pcc:unverified]
