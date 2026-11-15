@@ -2918,3 +2918,52 @@ sourcewarnings0/38inherited exactbaseline+1auditor advisory retained. No holes/
 customaxioms/nativeproofeval/raisedlimits/newglobalflags/waivers/frozenedits/
 cryptoPython/nativecryptoexperiment/spend/upload/newphysicalhost/compiler/
 canonicalpairing or full14 claim. [pcc:unverified]
+
+
+### Actual three-torsion pairing and general determinant at3
+
+The [actual three-torsion tangent pairing](../research/three_tangent_pairing_audit_20261115/README.md)
+is now proved bilinear in both arguments, alternating and nondegenerate on the
+actual geometric kernel of every nonsingular general Weierstrass curve in
+characteristic other than3, including2. Its explicit value is1 at infinity or
+equal x-coordinates; otherwise it is −ℓP(Q)/ℓQ(P), with tangent coefficient1 on y.
+Actual outside-domain tangents are proved nonzero. Actual normalization at P
+identifies this ratio with the credited cubic character. Both zero radicals,
+actual field-map covariance and the coordinate determinant identity are proved.
+They force **det(actual q-Frobenius)=q mod3 in every actual basis**, without a
+rational fixed point, point-count divisibility or normal-form-family premise.
+Thus the general all-model determinant gap **at prime3** is closed. Every
+compatible chosen finite field of sizeq^k containing full geometric3-torsion
+must satisfy3|q^k−1, without a rational point-count premise. Earlier actual
+rank3/basis, normalized character, point-group transport and Frobenius/descent
+are credited. This does not identify the tangent formula with a canonical
+Weil-function/divisor definition; that comparison and primes≥5 remain open.
+
+Actual controls prove failure after deleting the characteristic guard on the
+nonsingular ordinary char3 curve y²+xy+y=x³: a nonzero actual point killedby3
+pairs to1 with every actual killedby3 point. Its earlier coordinates/kernel3
+are credited. Restriction to the actual cyclic submodule spanned by any
+nonzero three-torsion point also gives a nonzero radical. The credited actual
+char2 curve y²+y=x³+1 has an actual nontrivial cube-root pairing value. These
+are explicit domain controls, not refutations of qualified source theorems.
+
+Exact local **PCC-20261115-8c0b5f PASS at 2026-11-15T17:46:05Z**; signed standing unverified. Whole tracked
+and transitive gate43 theorems,10 new concrete modules,0 failures/0 trusted native;
+33 frozen custom modules,0 copies,54 old formal configurations and65 old pins
+checked before/after13 states and gate. Nine failed states and four successes
+are retained. Prior50 gate is credited separately. All67 formal and17 artifact
+pins match. Complete2174-character header SHA0315aa3c3afc383f33716cf70c3ccd8fc73b92aaec58f2b5a1d71baaf12990e5;
+native1 complete/0 prefixes/0 unresolved/empty suffix after completed gate.
+Lossless archive259 files/94 objects/29664 bytes, roundtrip equal; five gate files.
+First report valid: one page47626 bytes, all4994 characters read and full-page
+visual inspection inbounds. Final new-source warnings0;39 inherited advisories
+and1 frozen auditor deprecation retained. Fresh selected ElkiesIII.8 passages
+and Galbraithch26 PDF3/16, printed575, were read; the latter also individually
+viewed. Formula26.1 has disjoint-divisor conditions, not silently imported as
+our pointwise identity. Four correct KB calls and initial Conductor127 before
+processing/code; publication Conductor127 before maps/outside frozen pins.
+Bounded fallback/no absence or novelty claim; copyright primary files local.
+No holes/custom axioms/native proof evaluation/raised limits/new global flags/
+waivers/frozen edits/cryptographic Python/native crypto experiment/spend/upload/
+new physical host/compiler or full fourteen-item completion claim.
+[pcc:unverified]
