@@ -47,3 +47,30 @@ new-bucket write or historical mirroring. The owner has been asked to confirm
 the exact destination, writer identity and mirror preference. The storage
 diagram and runtime graphs are unchanged because no N83 object moved and no
 algorithm arm ran.
+
+## Native successor reader — 2026-11-15 UTC
+
+The `primary-store-v3-check BASE_DIR NEW_OUTPUT_JSON` Rust command now imports
+one primary signed-Frobenius base from a `store:` name. Its new
+`n83.factor-base-panel/v3-artifact-store` manifest binds the primary ICV1
+curve, producer commit, remote, policy, seed, column and point counts,
+point-set hash, store name, compressed SHA-256/BLAKE3 and uncompressed
+BLAKE3/byte count. Separate `replay.json` and `storage.json` receipts must
+bind the manifest SHA-256; storage must also state the exact fresh-download
+SHA-256 and byte count. The reader requires the configured native store
+remote to match the manifest, checks the tracked store index, fetches or
+rehashes cached bytes through `Store::ensure`, verifies both compressed and
+plain hashes, then independently reconstructs every subgroup point and
+signed-Frobenius orbit/label through the existing primary importer. It
+writes a fresh `n83.factor-base-store-import/v3` receipt only on success.
+
+The release example suite passed 25/25 tests on macOS arm64 with Rust 1.99.1.
+Its v3 control published a public two-column N83 base to a temporary
+`file://` content-addressed store, forced a fresh pull, verified the import,
+and rejected a changed fresh-download digest and a v1 manifest at the v3
+entry point. The historical v1/v2 reader and old-bucket keys were not
+changed. This is a native reader and local custody control, not a new S3
+publication, a new base in the sweep, or a relation/runtime measurement.
+The producer-side v3 publisher, independently checked S3 write/fresh GET,
+exact authorized destination and writer, and integration into the full IC
+pipeline remain open.

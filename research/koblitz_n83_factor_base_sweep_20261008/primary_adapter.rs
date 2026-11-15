@@ -25,12 +25,14 @@ use crypto_lib::cryptanalysis::sat::{
     to_dimacs_xor, RootPropagationResult, SolveResult, SolverProgress, SolverStats,
 };
 use crypto_lib::hash::sha256;
+use crypto_lib::store::{backend::RemoteSpec, Store};
+use flate2::read::GzDecoder;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashSet};
 use std::fs::{self, File, OpenOptions};
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 use std::path::{Component, Path, PathBuf};
 use std::sync::{mpsc, Arc};
 use std::thread;
@@ -369,6 +371,132 @@ fn load_panel_selected(
 
 fn load_panel(root: &Path, columns: usize) -> Result<(PrimaryBase, Value, String)> {
     load_panel_selected(root, columns, "public_x_hash", SEEDS[0])
+}
+
+/// Successor custody path for a newly published primary base. The historical
+/// panel reader above remains bound to its original S3 bucket and receipts.
+fn load_store_primary_base(root: &Path, store: &Store) -> Result<(PrimaryBase, Value)> {
+    let manifest_bytes = fs::read(root.join("manifest.json"))?;
+    let manifest_sha256 = sha256_hex(&manifest_bytes);
+    let manifest: Value = serde_json::from_slice(&manifest_bytes)?;
+    let replay: Value = serde_json::from_slice(&fs::read(root.join("replay.json"))?)?;
+    let storage: Value = serde_json::from_slice(&fs::read(root.join("storage.json"))?)?;
+    let row = &manifest["base"];
+    let remote = manifest["remote"].as_str().ok_or("store remote missing")?;
+    let store_name = row["store_name"].as_str().ok_or("store name missing")?;
+    let digest = row["compressed_sha256"]
+        .as_str()
+        .ok_or("compressed SHA-256 missing")?;
+    let bytes = row["bytes"].as_u64().ok_or("compressed size missing")?;
+    let plain_bytes = row["plain_bytes"].as_u64().ok_or("plain size missing")?;
+    let columns = row["columns"].as_u64().ok_or("orbit columns missing")?;
+    let source_commit = manifest["source_commit"]
+        .as_str()
+        .ok_or("source commit missing")?;
+    if manifest["schema"] != "n83.factor-base-panel/v3-artifact-store"
+        || manifest["status"] != "completed_factor_base_object"
+        || manifest["study"] != STUDY
+        || manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || source_commit.len() != 40
+        || !source_commit.bytes().all(|b| b.is_ascii_hexdigit())
+        || row["a"] != 0
+        || row["closure"] != "signed_frobenius"
+        || ![
+            "public_x_sequential",
+            "public_x_hash",
+            "public_x_gray_prefix",
+        ]
+        .iter()
+        .any(|policy| row["policy"] == *policy)
+        || columns == 0
+        || row["points"].as_u64() != columns.checked_mul(166)
+        || bytes == 0
+        || plain_bytes == 0
+        || !store_name.starts_with("factor-bases/icv1-f2m83-tm6151469093347-debefd74/")
+        || !store_name.ends_with(".jsonl.gz")
+        || store.cfg.remote.as_ref() != Some(&RemoteSpec::parse(remote)?)
+    {
+        return Err("successor primary base manifest differs from custody contract".into());
+    }
+    if replay["schema"] != "n83.factor-base-replay/v3-artifact-store"
+        || replay["status"] != "PASS"
+        || replay["manifest_sha256"] != manifest_sha256
+        || replay["store_name"] != store_name
+        || replay["point_set_blake3"] != row["point_set_blake3"]
+        || replay["points_checked"].as_u64() != row["points"].as_u64()
+        || replay["representatives_checked"].as_u64() != Some(columns)
+        || storage["schema"] != "n83.factor-base-storage/v3-artifact-store"
+        || storage["status"] != "PASS"
+        || storage["manifest_sha256"] != manifest_sha256
+        || storage["remote"] != remote
+        || storage["store_name"] != store_name
+        || storage["sha256"] != digest
+        || storage["bytes"].as_u64() != Some(bytes)
+        || storage["fresh_download_sha256"] != digest
+        || storage["fresh_download_bytes"].as_u64() != Some(bytes)
+    {
+        return Err("successor primary base lacks replay or fresh-download custody".into());
+    }
+    let (indexed_name, indexed_digest, indexed_bytes) = store.lookup(store_name)?;
+    if indexed_name.as_deref() != Some(store_name)
+        || indexed_digest != digest
+        || indexed_bytes != Some(bytes)
+    {
+        return Err("artifact-store index differs from successor manifest".into());
+    }
+    let resolved = store.ensure(store_name)?;
+    if resolved.sha256 != digest || resolved.bytes != bytes {
+        return Err("resolved artifact differs from successor manifest".into());
+    }
+    let compressed = fs::read(&resolved.path)?;
+    if compressed.len() as u64 != bytes
+        || sha256_hex(&compressed) != digest
+        || blake3::hash(&compressed).to_hex().as_str()
+            != row["compressed_blake3"]
+                .as_str()
+                .ok_or("compressed BLAKE3 missing")?
+    {
+        return Err("successor compressed object differs".into());
+    }
+    let mut plain = Vec::new();
+    GzDecoder::new(&compressed[..])
+        .take(plain_bytes.checked_add(1).ok_or("plain size overflow")?)
+        .read_to_end(&mut plain)?;
+    if plain.len() as u64 != plain_bytes
+        || blake3::hash(&plain).to_hex().as_str()
+            != row["plain_blake3"].as_str().ok_or("plain BLAKE3 missing")?
+    {
+        return Err("successor decompressed object differs".into());
+    }
+    let base = from_record(row, &plain)?;
+    if row["point_set_blake3"]
+        .as_str()
+        .is_none_or(|value| value.len() != 64)
+        || base.factor_base.points.len() as u64 != row["points"].as_u64().unwrap_or(0)
+    {
+        return Err("successor factor-base point count or digest differs".into());
+    }
+    Ok((base, row.clone()))
+}
+
+pub(super) fn check_store_v3_cli(root: &Path, output: &Path) -> Result<Value> {
+    if output.exists() {
+        return Err("successor import output already exists".into());
+    }
+    let store = Store::open_default()?;
+    let (base, row) = load_store_primary_base(root, &store)?;
+    let receipt = json!({
+        "schema":"n83.factor-base-store-import/v3",
+        "status":"PASS","curve_id":base.curve.label(),
+        "store_name":row["store_name"],
+        "compressed_sha256":row["compressed_sha256"],
+        "point_set_blake3":row["point_set_blake3"],
+        "points_checked":base.factor_base.points.len(),
+        "orbit_columns_checked":base.factor_base.signed_orbits.len(),
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &receipt)?;
+    Ok(receipt)
 }
 
 const FULL_D18_MANIFEST: &[u8] =
@@ -4461,6 +4589,8 @@ mod tests {
         enumerate_decompose, koblitz_index_calculus_dlp_with_factor_base, KoblitzIcOptions,
     };
     use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
+    use crypto_lib::store::{Config as StoreConfig, PushMeta};
+    use flate2::{write::GzEncoder, Compression};
     use std::collections::HashMap;
     use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
@@ -4525,6 +4655,120 @@ mod tests {
         let mut bad = positive;
         bad["indices"][5] = json!(0);
         assert!(verify_k600_positive_witness(kc, fb, &sum, &bad).is_err());
+    }
+
+    #[test]
+    fn successor_store_import_checks_index_bytes_replay_and_custody() {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!("n83-store-v3-{nonce}"));
+        let bundle = root.join("bundle");
+        let remote = root.join("remote");
+        fs::create_dir_all(&bundle).unwrap();
+        fs::create_dir_all(&remote).unwrap();
+        let (plain, mut row) = construct(
+            0,
+            "public_x_hash",
+            2,
+            SEEDS[0],
+            Instant::now() + Duration::from_secs(60),
+        )
+        .unwrap();
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(&plain).unwrap();
+        let compressed = encoder.finish().unwrap();
+        let object = root.join("base.jsonl.gz");
+        fs::write(&object, &compressed).unwrap();
+        let cfg = StoreConfig {
+            index_path: root.join("index.json"),
+            cache_dir: root.join("cache"),
+            remote: Some(RemoteSpec::Dir(remote.clone())),
+            endpoint: None,
+            aws: "aws".into(),
+        };
+        let mut store = Store::open(cfg).unwrap();
+        let name = "factor-bases/icv1-f2m83-tm6151469093347-debefd74/control-k2.jsonl.gz";
+        let pushed = store
+            .push(
+                name,
+                &object,
+                PushMeta {
+                    description: "N83 native store control".into(),
+                    provenance: "release test".into(),
+                    no_cache: true,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        assert!(pushed.uploaded);
+        let pulled = store.ensure(name).unwrap();
+        assert!(pulled.fetched);
+        assert_eq!(pulled.sha256, pushed.sha256);
+        row["closure"] = json!("signed_frobenius");
+        row["store_name"] = json!(name);
+        row["compressed_sha256"] = json!(pushed.sha256);
+        row["compressed_blake3"] = json!(blake3::hash(&compressed).to_hex().to_string());
+        row["plain_blake3"] = json!(blake3::hash(&plain).to_hex().to_string());
+        row["bytes"] = json!(compressed.len());
+        row["plain_bytes"] = json!(plain.len());
+        let remote_uri = format!("file://{}", remote.display());
+        write_new_json(
+            &bundle.join("manifest.json"),
+            &json!({
+                "schema":"n83.factor-base-panel/v3-artifact-store",
+                "status":"completed_factor_base_object","study":STUDY,
+                "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
+                "source_commit":"a".repeat(40),"remote":remote_uri,"base":row,
+            }),
+        )
+        .unwrap();
+        let manifest_sha256 = sha256_hex(&fs::read(bundle.join("manifest.json")).unwrap());
+        write_new_json(
+            &bundle.join("replay.json"),
+            &json!({
+                "schema":"n83.factor-base-replay/v3-artifact-store","status":"PASS",
+                "manifest_sha256":manifest_sha256,"store_name":name,
+                "point_set_blake3":row["point_set_blake3"],
+                "points_checked":332,"representatives_checked":2,
+            }),
+        )
+        .unwrap();
+        let storage = json!({
+            "schema":"n83.factor-base-storage/v3-artifact-store","status":"PASS",
+            "manifest_sha256":manifest_sha256,"remote":remote_uri,
+            "store_name":name,"sha256":pushed.sha256,"bytes":compressed.len(),
+            "fresh_download_sha256":pushed.sha256,"fresh_download_bytes":compressed.len(),
+        });
+        write_new_json(&bundle.join("storage.json"), &storage).unwrap();
+        let (imported, checked) = load_store_primary_base(&bundle, &store).unwrap();
+        assert_eq!(imported.factor_base.points.len(), 332);
+        assert_eq!(imported.factor_base.signed_orbits.len(), 2);
+        assert_eq!(checked["point_set_blake3"], row["point_set_blake3"]);
+        let mut bad = storage.clone();
+        bad["fresh_download_sha256"] = json!("0");
+        fs::write(
+            bundle.join("storage.json"),
+            serde_json::to_vec(&bad).unwrap(),
+        )
+        .unwrap();
+        assert!(load_store_primary_base(&bundle, &store).is_err());
+        fs::write(
+            bundle.join("storage.json"),
+            serde_json::to_vec(&storage).unwrap(),
+        )
+        .unwrap();
+        let mut old: Value =
+            serde_json::from_slice(&fs::read(bundle.join("manifest.json")).unwrap()).unwrap();
+        old["schema"] = json!("n83.factor-base-panel/v1");
+        fs::write(
+            bundle.join("manifest.json"),
+            serde_json::to_vec(&old).unwrap(),
+        )
+        .unwrap();
+        assert!(load_store_primary_base(&bundle, &store).is_err());
+        fs::remove_dir_all(root).unwrap();
     }
 
     #[test]

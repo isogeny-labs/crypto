@@ -1339,6 +1339,11 @@ fn main() -> Result<()> {
             )?;
             println!("{receipt}");
         },
+        Some("primary-store-v3-check")=>{
+            if args.len()!=4 { return Err("primary-store-v3-check BASE_DIR NEW_OUTPUT_JSON (verify a successor content-addressed primary base against its replay and fresh-download receipts)".into()); }
+            let receipt=primary_adapter::check_store_v3_cli(Path::new(&args[2]),Path::new(&args[3]))?;
+            println!("{receipt}");
+        },
         Some("primary-full-d18-m4-l0-xcnf-witness")=>{
             if args.len()!=5 { return Err("primary-full-d18-m4-l0-xcnf-witness BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound constructed XCNF and native assignment; 300-s internal cap)".into()); }
             let receipt=primary_adapter::full_d18_m4_l0_xcnf_witness_cli(
