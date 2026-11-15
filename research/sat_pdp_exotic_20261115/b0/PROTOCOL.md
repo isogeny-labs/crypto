@@ -1,8 +1,11 @@
 # B0 — re-measured PDP SAT baseline: protocol
 
-**Status: DRAFT.** Not frozen. The instrument is being validated at ℓ = 5, 6 (dry
-run); the protocol is frozen (hash and commit recorded in `protocol.json`
-`freeze`) before the first row at ℓ ≥ 7 is taken. Everything in the parent
+**Status: FROZEN** at the commit recorded in `FREEZE.sha256` (hashes of this
+file, `protocol.json`, `analyze.py` and `run_rows.sh`), after instrument checks
+at ℓ = 5 and 6 (all arms, 0 disagreements, 0 unverified models), none of which
+is a row; an ℓ = 7 fast-arm check (oracle, native, lin, lin-nolex) was running
+at the freeze and is reported in the session log as a check, not a row. Rows
+are ℓ = 7…10 taken after the freeze commit. Everything in the parent
 `PLAN.md` §2 applies; this file fixes the details the plan left open.
 
 ## Question
@@ -46,6 +49,9 @@ per conflict while the oracle refutes `2^ℓ` triples per pair by root-finding.
 | native-aa | native with `scramble_saved_phases(seed ^ 0xA5A55A5A ^ idx)` | A/A arm (the solver's only seed knob) |
 | cms | CryptoMiniSat 5.8.0 (crates.io, `third_party/cryptominisat-rs-patches`), XOR-DIMACS of the native encoding, 1 thread | external XOR-aware reference |
 | cadical | CaDiCaL 3.0.1 (`cadical-sys 0.8.0`), CNF of the Tseitin-XOR encoding | plain-CDCL control |
+| chain-p12 | repository chained-S₃ encoder (`binary_semaev_chain_sat.rs`, AND-gate products, native XOR rows, `x₁ ≤ x₂ ≤ x₃`), branch priority on `x₁, x₂` bits; both identity patterns | existing chain implementation (ℓ ≤ 7 only; 4·10⁶ budget) |
+| lin | **new solver** `examples/pdp_lin_cdcl.rs`: CDCL + XOR engine with field-product gates that linearise when one operand block is assigned; chained S₃ with full-width `t`; `x₁ ≤ x₂` lex; priority on `x₁, x₂` bits | candidate |
+| lin-nolex | `lin` without the lex constraint | candidate control (pair-ordering effect) |
 
 Conflict budget: 4·10⁶ per target per arm at ℓ ≤ 9; 1.6·10⁷ at ℓ = 10. A
 budgeted-out solve is `unknown` and is reported censored, never imputed and never
@@ -90,6 +96,16 @@ counted in a median.
 4. A/A relative spread `|R_native − R_aa| / R_native` median below 0.05.
 5. Every planted target decided SAT by every arm within budget, each model passing the `S′₄` check.
 6. Zero verdict disagreements with the oracle.
+7. `lin` median `R ∈ [1.0, 1.7]` at every rung, trending to ≈ 1.5 as ℓ grows
+   (ℓ = 5 dry run 1.20, ℓ = 6 check 1.46): for a pair whose quadratic in `t`
+   has no root the engine refutes in one conflict, for a pair with two roots
+   each root's `x₃` fails separately, and about half the pairs have roots, so
+   ≈ 1.5 conflicts per ordered pair; `lin-nolex ∈ [1.5, 2] × lin`. The new
+   solver spends about one conflict per `(x₁ ≤ x₂, t-root)` and no fewer. Its
+   learnt-clause priority-width histogram shows whether any clause excludes more
+   than one pair; the prediction is that conflicts never fall below the oracle's
+   pair count on a refutation (`R ≥ 1` on every uniform UNSAT target).
+8. `chain-p12` median `R` between 100 and 300 at ℓ = 7 (ℓ = 5: 160).
 
 If (1) fails downward (`R₃ < 0.9` at any rung), the instrument is inspected
 before anything else: count `T_enum` and the conflict counter definitions

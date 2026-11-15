@@ -15,6 +15,7 @@
 //! --budget 4000000 --arms oracle,native,native-aa,cms,cadical --export /tmp/b0
 //! --ext-bin tools/b0-ext-solvers/target/release/b0-ext-solvers`
 use crypto_lib::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly};
+use crypto_lib::cryptanalysis::binary_semaev_chain_sat::{chain_s3_max_variables, ChainedS3Encoding};
 use crypto_lib::cryptanalysis::binary_semaev_s4::{elementary_symmetric_3, symmetrised_s4_eval};
 use crypto_lib::cryptanalysis::ic_corpus::plant_nondegenerate;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{find_irreducible_sparse, points_with_x};
@@ -26,6 +27,10 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use serde_json::{json, Value};
 use std::io::Write;
+
+#[path = "pdp_lin_cdcl.rs"]
+mod pdp_lin_cdcl;
+use pdp_lin_cdcl::{ChainInstance, Result as LinResult};
 use std::process::Command;
 use std::time::Instant;
 
@@ -142,6 +147,103 @@ fn run_native(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2,
     })
 }
 
+/// Chained-S₃ arm: `S₃(x₁,x₂,t) = 0`, `S₃(t,x₃,x_R) = 0` with a full-width intermediate `t`,
+/// summands confined to the subspace by domain clauses, `x₁ ≤ x₂ ≤ x₃` lex symmetry breaking,
+/// both identity patterns solved (a refutation needs both UNSAT). `priority_first_pair` puts
+/// only the `x₁, x₂` bits ahead of VSIDS, so `t` and `x₃` are reached by propagation.
+fn run_chain(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2, budget: u64, priority_first_pair: bool) -> Value {
+    let one = F2mElement::one(n);
+    let codes: Vec<BigUint> = (0..(1u64 << l)).map(BigUint::from).collect();
+    let maxv = (chain_s3_max_variables(n, 3).expect("chain size") * 2 + 10_000) as u32;
+    let (mut conflicts, mut decisions, mut propagations, mut xor_props, mut learnt, mut learnt_lits, mut wall_ms, mut n_vars) = (0u64, 0u64, 0u64, 0u64, 0u64, 0u64, 0f64, 0u64);
+    let mut status = "unsat";
+    let mut verified: Option<bool> = None;
+    let mut patterns_run = 0;
+    for pattern in 0..2u32 {
+        let mut enc = match ChainedS3Encoding::build(3, irr, &one, Some(x_r), pattern, maxv) {
+            Ok(e) => e,
+            Err(e) => return json!({"status": "error", "error": format!("{e:?}")}),
+        };
+        if let Err(e) = enc.constrain_summands(&codes, 50_000_000) {
+            return json!({"status": "error", "error": format!("{e:?}")});
+        }
+        if let Err(e) = enc.order_all_summands(maxv) {
+            return json!({"status": "error", "error": format!("{e:?}")});
+        }
+        if priority_first_pair {
+            let v: Vec<u32> = (1..=2 * n).collect();
+            enc.solver.set_branch_priority(&v);
+        }
+        enc.solver.conflict_budget = budget.saturating_sub(conflicts);
+        let t = Instant::now();
+        let r = enc.solver.solve();
+        wall_ms += t.elapsed().as_secs_f64() * 1e3;
+        patterns_run += 1;
+        let st = &enc.solver.stats;
+        conflicts += st.conflicts;
+        decisions += st.decisions;
+        propagations += st.propagations;
+        xor_props += st.xor_propagations;
+        learnt += st.learnt_clauses;
+        learnt_lits += st.learnt_lits_kept;
+        n_vars = n_vars.max(enc.solver.n_vars() as u64);
+        match r {
+            SolveResult::Sat => {
+                let xs = enc.decode_summands();
+                let arr = [xs[0].clone(), xs[1].clone(), xs[2].clone()];
+                let in_base = arr.iter().all(|x| gf.from_element(x) < (1u64 << l));
+                verified = Some(enc.verify_model() && verify(&arr, x_r, irr) && in_base);
+                status = "sat";
+                break;
+            }
+            SolveResult::Unknown => {
+                status = "unknown";
+                break;
+            }
+            SolveResult::Unsat => {}
+        }
+    }
+    json!({
+        "status": status, "verified": verified, "patterns_run": patterns_run,
+        "conflicts": conflicts, "decisions": decisions, "propagations": propagations,
+        "xor_propagations": xor_props, "learnt_clauses": learnt, "learnt_lits_kept": learnt_lits,
+        "n_vars": n_vars, "wall_ms": wall_ms,
+    })
+}
+
+/// New solver: CDCL + XOR engine with field-product gates (`pdp_lin_cdcl.rs`) on the chained-S₃
+/// system; `lex` adds `x₁ ≤ x₂` so the pair count matches the oracle's `X₁ ≤ X₂` scan.
+fn run_lin(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2, budget: u64, lex: bool) -> Value {
+    let irr_mask = irr.low_terms.iter().fold(1u64 << n, |m, &t| m | (1u64 << t));
+    let xr = gf.from_element(x_r);
+    let t_build = Instant::now();
+    let mut inst = ChainInstance::build(n, l, irr_mask, xr, 1, lex);
+    let build_ms = t_build.elapsed().as_secs_f64() * 1e3;
+    inst.solver.conflict_budget = budget;
+    let t = Instant::now();
+    let r = inst.solver.solve();
+    let wall_ms = t.elapsed().as_secs_f64() * 1e3;
+    let (status, verified, model) = match r {
+        LinResult::Sat => {
+            let xs = [inst.solver.model_block(&inst.x1), inst.solver.model_block(&inst.x2), inst.solver.model_block(&inst.x3)];
+            let arr = [gf.to_element(xs[0]), gf.to_element(xs[1]), gf.to_element(xs[2])];
+            let in_base = xs.iter().all(|&x| x < (1u64 << l));
+            ("sat", Some(verify(&arr, x_r, irr) && in_base), Some(xs))
+        }
+        LinResult::Unsat => ("unsat", None, None),
+        LinResult::Unknown => ("unknown", None, None),
+    };
+    let st = &inst.solver.stats;
+    json!({
+        "status": status, "verified": verified, "model_xs": model,
+        "conflicts": st.conflicts, "decisions": st.decisions, "propagations": st.propagations,
+        "xor_propagations": st.xor_propagations, "gje_calls": st.gje_calls,
+        "gate_linearisations": st.gate_linearisations, "learnt_clauses": st.learnt_clauses,
+        "learnt_lits": st.learnt_lits, "learnt_priority_width": st.learnt_priority_width,
+        "n_vars": inst.solver.n_vars, "build_ms": build_ms, "wall_ms": wall_ms,
+    })
+}
+
 fn export_instance(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, dir: &str, idx: usize) -> (String, String) {
     let one = F2mElement::one(n);
     let enc_x = encode_semaev_s4_with(n, l, irr, &one, x_r, S4Options { encoding: XorEncoding::Native, break_symmetry: true });
@@ -252,6 +354,18 @@ fn main() {
         let mut arms = serde_json::Map::new();
         if wants("native") {
             arms.insert("native".into(), run_native(n, l, &irr, x_r, &gf, cfg.budget, None));
+        }
+        if wants("chain") {
+            arms.insert("chain".into(), run_chain(n, l, &irr, x_r, &gf, cfg.budget, false));
+        }
+        if wants("chain-p12") {
+            arms.insert("chain-p12".into(), run_chain(n, l, &irr, x_r, &gf, cfg.budget, true));
+        }
+        if wants("lin") {
+            arms.insert("lin".into(), run_lin(n, l, &irr, x_r, &gf, cfg.budget, true));
+        }
+        if wants("lin-nolex") {
+            arms.insert("lin-nolex".into(), run_lin(n, l, &irr, x_r, &gf, cfg.budget, false));
         }
         if wants("native-aa") {
             arms.insert("native-aa".into(), run_native(n, l, &irr, x_r, &gf, cfg.budget, Some(cfg.seed ^ 0xA5A5_5A5A ^ idx as u64)));
