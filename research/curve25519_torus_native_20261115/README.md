@@ -1,5 +1,38 @@
 # Curve25519 torus/S4: native Rust qualification
 
+## Current four-point follow-up
+
+The [four-point report](reports/four-point-v1/REPORT.md),
+[diagram](reports/four-point-v1/pipeline.svg) and
+[inspected PDF](reports/four-point-v1/report.pdf) describe the new
+[Rust summation-tree crate](../../tools/torus-s4-tree/README.md).
+The actual-field, four-coset construction has 454 variables and 455 quadratic
+constraints; its known witness and all eight raw cofactor sections pass
+producer checks. No large-base solver was run. PCC-20261115-02fa5a.
+[pcc:unverified]
+
+The [frozen geometric draft](theory-v1/energy-lemma.md) proposes an average
+four-sum collision bound under random admissible base shifts. Its
+[source addendum](theory-v1/SOURCE_ADDENDUM.md) identifies the degree theorem
+and related prior work. [Lean arithmetic](lean/PROOF_MAP.md) discharges only
+four concrete numerical dependencies; geometric formalization and independent
+review remain open. PCC-20261115-1ea4c1 and PCC-20261115-2deca4.
+[pcc:unverified]
+
+The conditional cost target is D=soft-O(B^gamma), gamma<1, plus complete
+distribution/rank/family/phase bounds. The
+[named proof/cost obstruction](../../problems/curve25519-torus-four-point-decomposition.md)
+and [isolated runner gate](../../problems/curve25519-singular-isolated-runner.md)
+give explicit acceptance conditions. The broader library check is
+[incomplete](root-library-compatibility/STATUS.md), not a pass.
+[pcc:unverified]
+
+## Historical three-leaf qualification, revision 2
+
+The text and original report below describe the preceding three-leaf scope.
+Later root recovery is in the cryptanalysis consumer; the current report
+above supersedes its earlier pending-implementation statements.
+
 This change ports the compact Chebyshev/Edwards-y S4 circuit into a standalone
 [reusable Rust crate](../../tools/torus-s4/README.md) and supplies development
 correctness controls for the actual Curve25519 field. The consuming harness
