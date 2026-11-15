@@ -1,0 +1,14 @@
+# Actual shared matching first moment
+
+1.Structures:existing actual OrientationBivariate row polynomials and Matrix factors over Q[X],Mathlib Polynomial maps/coefficients and the owner CryptoLean.PolynomialFirstMoment generic finite-product coefficient law.
+2.Theorems used as stated:owner coeff_one_prod_linear_powers and coeff_zero_prod_linear_powers;existing OrientationActualZeroModes.diagonal_row_first and actual_node_constant;Polynomial.coeff_map,mul_coeff_one,map_prod,map_pow. Actual k2 geometric sum reduces using Finset.sum_range_succ and ring laws,not a new generic series lemma.
+3.Instance:matching residue r and classPort r at actual negative polei,arbitrary m,i<u<=a,k2,b1. The actual mask is rangeu,actual slopes reduce to pairSlopeu j. Same common m at all selected i.
+4.Assembly:owner generic law compiled002 warning-free,standard printed axioms;target build only creates import artifact. Consumer draft098 imports that owner law through explicit experimental LEAN_PATH overlay,new owner file only. Existing consumer manifest and dependency pin untouched;no shared/fresh module coverage claimed.
+5.Missing instance equalities only:actual denominator mapped by constantCoeff equals node linear factor times actual anchor powers;actual numerator constant0/first1;geometric k2 normalization. The predicted matching coefficient must be derived before using it.
+6.Inheritance:actual anchor product uses Finset.prod;coefficient map law coeff_map;generic product endpoints inherited from owning module;actual numerator first1 inherited from diagonal_row_first;actual node constant0 from actual_node_constant;right normalization from polyRight. No new syntax,group bound or copied generic product induction.
+
+One permitted composite opening:denom_matching opens denomRows/anchorRows exactly once to establish map-to-generic-product instance,using definitions because no existing arbitrary-m denominator map equality exists. Existing singleMultiplicity equality cannot apply to arbitrary m. Later coefficient proofs use this one equality,not repeated expansion. ApproxRows/polyRight opening is only the final instance equality joining existing coefficient contracts and k2;no generic law re-derived.
+
+Source versioning:098 retains byte-identical432-statement historical prefix except adding one owner import. New claimed statements are ONLY the appended actual endpoints,not copied parents. Limits inherited from frozen prefix are not raised;new proofs should use explicit components and remain focused.
+
+Quantification:matching right factors only. A=u makes higher left moments zero;joint mode use requires a>u and actual nonzero left witness,which is a separate endpoint. Even an all-node right-content obstruction is not an algorithm or all-factorization lower bound. Exceptional highest-node cost route remains open. [pcc:unverified]
