@@ -43,6 +43,9 @@ jobs:
       - name: Bounded existing Rust F4 pilot on positive and public-Q targets
         timeout-minutes: 2
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --probe-f4
+      - name: Freeze-test 16 natural prime31 masks with actual S4/S3 Rust F4
+        timeout-minutes: 3
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --panel-f4
       - name: Replay balanced S4/S3 public prime31 equations independently
         run: python3 research/prime31_ic_20261115/native/replay_balanced_m8_s4.py
       - name: Count balanced m8 ordered rational roots using reused Rust arithmetic
