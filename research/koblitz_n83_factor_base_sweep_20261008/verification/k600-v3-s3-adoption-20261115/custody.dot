@@ -1,0 +1,16 @@
+digraph custody {
+  graph [rankdir=TB, bgcolor="white", label="K600 native read-only S3 adoption — 2026-11-15", labelloc=t, fontsize=20, fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#e9f0f8", color="#4a6a92", fontname="Helvetica", fontsize=12];
+  edge [fontname="Helvetica", fontsize=11, color="#536a87"];
+  original [label="Frozen local v3 manifest\n438cd804… | 600 columns\n99,600 points"];
+  pointer [label="Artifact pointer\n432355b8… | 3,025,798 bytes"];
+  s3 [label="S3 content-addressed object\n3e85c9e4… | GET only", fillcolor="#e3f4e9", color="#42835b"];
+  native [label="Native Store::ensure\nempty cache | SHA-256 + BLAKE3"];
+  replay [label="Generic curve replay\n99,600 points | 600 labels"];
+  receipt [label="New S3-bound v3 receipts\n2 independent PASS imports\nuploaded=false", fillcolor="#e3f4e9", color="#42835b"];
+  original -> native [label="pinned manifest + index"];
+  pointer -> s3 [label="pinned digest + length"];
+  s3 -> native [label="fresh GET x2"];
+  native -> replay [label="gzip/plain bytes"];
+  replay -> receipt [label="v3 reader validation"];
+}

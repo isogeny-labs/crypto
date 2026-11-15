@@ -63,6 +63,18 @@ The repository bot subsequently archived the object and PNG to its configured
 S3 artifact store; the [fresh GET and hash addendum](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-local-custody-20261115/S3_CUSTODY_ADDENDUM_20261115.md)
 records that later custody event without changing the run's scope.
 
+The [15 November K600 native read-only S3 adoption](20261115-k600-s3-adoption/)
+([PDF](20261115-k600-s3-adoption/RUN_REPORT.pdf),
+[SVG](20261115-k600-s3-adoption/timings.svg),
+[150 dpi PNG](20261115-k600-s3-adoption/timings.png)) preserves the separate
+custody control against the exact 3,025,798-byte archived object. Two fresh
+GETs from distinct empty caches and native v3 imports passed, each replaying
+99,600 points and 600 representatives. Shared Darwin arm64 L0 diagnostics:
+S3 pulls 2099.774 and 2166.021 ms; generic replays 767.248 and 765.460 ms;
+in-process walls 2907.904 and 2973.111 ms. The [study report and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-s3-adoption-20261115/RUN_REPORT.md)
+are authoritative. This custody measurement has no relation, rank, descent,
+cold IC total or matched rho, so it remains outside the admitted results table.
+
 The [10 November tm1514 recheck at k = 24](20261110-tm1514-recheck/)
 ([PDF](20261110-tm1514-recheck/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a
 frozen re-measurement of the ledger incumbent (`wwalkGg-x09-sr-n2`) against matched
