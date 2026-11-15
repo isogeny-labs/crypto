@@ -173,3 +173,34 @@ strongest cold matched rho**. This control makes the absence of a generic
 group table and the use of the actual target-dependent equations an
 explicit, testable requirement. No claimed completion, rho win, spend,
 EKS run or leaderboard change follows from this audit.
+
+## Executed Rust development gate (2026-11-15, [pcc:unverified])
+
+[GitHub Actions run 43735784837](https://github.com/isogeny-labs/crypto/actions/runs/43735784837),
+job `132877986877`, passed all steps on exact source/workflow commit
+`6a6bdff372e9d2c3fa26cef4b2e4989eee018b6b`.
+The new Rust example test passed `1/1`; the release binary returned:
+
+```json
+{
+  "pairs": 465,
+  "triple_s3_calls": 8990,
+  "rational_quadratic_calls": 9455,
+  "distinct_triple_abscissae": 17980,
+  "root_fnv1a_le32": "cc15d719e3eaf8c2",
+  "ec_group_additions_post_root_identity": 18910,
+  "classification": "generic decomposition; ordinate inputs and EC law reveal signed sums",
+  "target_dependent_polynomial_solver": false,
+  "cold_ECDLP_solve": false
+}
+```
+
+Exact original output and source-run identification are preserved in
+[`S3_DISCRIMINANT_CI_EVIDENCE_20261115.json`](S3_DISCRIMINANT_CI_EVIDENCE_20261115.json).
+The 18,910 counted group additions are the **semantics-control** computation
+(930 pair additions plus 17,980 triple additions); the check does not establish
+that this amount is minimal or that it is a cheap complete ECDLP pipeline.
+The complete focused CI job passed including inherited source reuse and
+focused Clippy; it does not establish a passing full root-release library
+suite. This is developer execution evidence **only**, not a signed PCC or
+independent scientific validator receipt.
