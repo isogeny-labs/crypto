@@ -1,0 +1,9 @@
+Validator confirmation sessions F4-F6 (pre-declared 2026-11-15T22:46:35Z, before running them).
+Selection on F1-F3: the cheapest existing IC arm on K1 n23 at every w was gen-layout-c4
+(mitm-frobenius-layout-counted:m=2, compact-orbit-scan:columns=4,raw_x_cap=1e8,generator_orbit=1, targets=stride-generator).
+Cheapest rho at every w: rho-frob-v5 (rho.signed_frobenius_v5).
+Confirmation test (no reselection): R_w = kf3-c1g-sr / gen-layout-c4, pooled over F4-F6, linearised t 95 % interval,
+w in {0, 0.1, 1}. Upper < 1: candidate improves on it; lower > 1: regression; else null.
+Also reported: kf3-c1g-sr / gen-lazy-c4-sr (like-for-like base and targets), kf3-c1g-sr / lazy-c4 (registered),
+kf3-c1g-sr / rho-strong, kf3-c1g-sr / rho-frob-v5, rho-strong-aa / rho-strong.
+Seeds: target_seed_i = int(nonce[8*i:8*i+12],16) mod 10^12, i = 3,4,5 (nonce in nonce.txt).
