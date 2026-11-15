@@ -715,9 +715,9 @@ The table-free `lin21-ht` collector uses 15.7 MB at n=41 versus 2558.1 MB for th
 - `k0n53` folded-pair construction: 34.58 ns/pair; streaming plus sort/fill is 26.70 ns/pair (77.2% of the whole).
 - `k0n61` folded-pair construction: 35.48 ns/pair; streaming plus sort/fill is 26.73 ns/pair (75.4% of the whole).
 
-The current Top filter layout is identity-equivalent in these A/B rounds but slower to build than the frozen Low layout:
+The current Top filter layout is identity-equivalent in these A/B rounds and faster to build than the frozen Low layout (Low build time over Top build time; above 1 means Top builds faster):
 
-| cell | Top / Low build [95%] | rounds | dropped | identity mismatches |
+| cell | Low / Top build time [95%] | rounds | dropped | identity mismatches |
 |:--|--:|--:|--:|--:|
 | k0n53 | 1.104 [1.070, 1.143] | 41 | 1 | 0 |
 | k0n61 | 1.142 [1.098, 1.165] | 42 | 0 | 0 |
