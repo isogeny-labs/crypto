@@ -391,6 +391,64 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual local translation proof](../local_translation_audit_20261115/README.md)
+closes the all-local compatibility gap left by the actual function-field
+translation construction. For every nonsingular general Weierstrass model
+over an algebraically closed field, every characteristic including two and
+three, Lean proves actual normalized valuation/order identity
+v_P(φ_Qf)=v_(P+Q)(f), including all exceptional points. Actual regular rings
+are isomorphic with explicit negative-point field inverse; actual residue
+evaluation commutes. Local preservation, valuation/residue invariance and
+ramification index one are derived, not supplied premises.
+
+Actual shifted curve cancellation gives strict infinity-small coordinate
+differences and exact actual point-uniformizer value exp(−1). The actual
+coordinate/residue diagram proves localization denominators units; the actual
+local map commutes with the full field and residues. Actual units and official
+DVR factorization give all-function infinity equality. The actual previously
+proved field composition law then gives every point. The actual principal
+divisor of φ_Qf equals point pushforward through negative Q. Actual local-unit
+character and divisor evaluation transport with actual support-disjointness
+equivalence derived. Product-helper defaults outside the local-unit domain are
+not claimed as meromorphic residues.
+
+The actual ACF5/CharP5/nonsingular scalar extension of the credited F5 curve
+y²=x³+1 has actual nonzero 3-torsion P distinct from negative P and a nonzero
+actual tangent with divisor3P−3O. Its orders at P/−P are3/0; the pullback through
+P has infinity order3, while positive-P pushforward has coefficient0. Lean
+disproves that wrong sign and proves the negative sign. Known finite control
+and source methods credited; no new population, qualified-source refutation
+or novelty claim. Separate projective Scheme.localRing/line-bundle comparison,
+general base-field descent, reciprocity, isogeny/Lang/Jacobian and canonical
+Weil–Tate/MOV–FR remain open; the full14 request remains active.
+
+Exact local **PCC-20261115-67cf17 PASS at 2026-11-15T21:07:29Z**, signed standing unverified.
+Whole tracked/transitive gate78/nine new concrete modules/zero failures or
+trusted-native exemptions.96 frozen modules/zero copies/105 old formal files/
+all124 old pins checked before/after21states and gate; prior82/536 gates
+credited separately.117 formal17 artifact134 pins/full2102-character
+SHA77d0bb9d6c1b5941dec62869d0023c6bb2917322004d870fc762d26ffcc50dc0;
+native one complete/zero prefixes/zero unresolved/empty suffix after completed
+gate. Lossless418files/120objects/41704B XZ/roundtrip equal/five gate files.
+First valid report onepage47202B/all4515characters read/individual full-page
+visual/inbounds; no draft. Fourteen failed states/seven successes retained.
+Early latest-only Lake roots could reuse old oleans:17 fixed roots and rebuilt
+all seven current modules; exact root assertion from18/final21 all nine/whole
+source gate passed. Missing imports caused retained default200000-heartbeat
+failures; explicit imports/concrete regular-ring interfaces fixed them.
+Final/source-build warnings0/one frozen auditor deprecation. Fresh corrected
+Galbraithch7PDF10–11 printed132–133 fulltext/individual visuals; relevant
+uniformizer/valuation lemmas and beginning7.5.1 only, no whole7.5.2 claim.
+Ch9PDF3–4 text reread/prior visuals credited/Q/O exclusions retained. Official
+DVR/adic and prior actual local/residue/translation proofs read and reused;
+copyright local/excluded. Four correct KB calls/Conductor127 before code and
+expanded publication Conductor127 before maps/outside pins; bounded fallback/
+no absence claim. Same host/prover/procedural header check, no independent
+parser/compiler/physical-host assurance. No holes/custom axioms/native proof
+evaluation/raised limits/new global flags/waivers/frozen edits/cryptoPython/
+native crypto experiment/spend/upload. [pcc:unverified]
+
+
 The [actual elliptic translation proof](../elliptic_translation_audit_20261115/README.md)
 constructs coefficient-fixing automorphisms of the actual full function field
 for every nonsingular general Weierstrass model over an algebraically closed
