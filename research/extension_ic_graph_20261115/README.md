@@ -6,6 +6,23 @@ with a protected target logarithm and protected constant coordinate. [pcc:unveri
 
 [Implementation report (PDF)](report.pdf) · [Frozen protocol](protocol.json)
 
+## Authorized local measurements
+
+The user selected **local or Runpod** after the lab-access question. The
+continuation now uses the local backend, a local checkpoint and published
+source/spec; [Amendment 2](AMENDMENT_2_LOCAL.md) supersedes the earlier blocked
+EKS route for this work. The first frozen pilot is `p=67`, seed `3`, all five
+oracles, one warmup and five measured rounds under a 900-second bound. It has
+not run yet. Standard lab admission and S3 custody are not asserted.
+[pcc:unverified]
+
+The [native Rust analysis](native_analysis/README.md) checks the full planned
+schedule, provenance/instance identity, graph/pivot fingerprints, scalar
+replays and A/A controls. It retains failed/incomplete cases, produces paired
+bootstrap intervals and a Plotters SVG, and prevents the small pilot from
+triggering the large-subgroup reference-parity field. Five analysis tests and
+its warnings-denied Clippy check pass locally. [pcc:unverified]
+
 ## Rust continuation toward the rho comparison
 
 [Amendment 1](AMENDMENT_1.md) adds a native symmetric-coordinate S3 pair

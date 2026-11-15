@@ -103,15 +103,15 @@ pub(super) fn pair_test(
             }
             stats.symmetric_candidates += 1;
             let roots = ring.roots(&UPoly(vec![t, (f.p - s) % f.p, 1]), rng);
-            let (x1, x2) = match roots.as_slice() {
-                &[r] => {
+            let (x1, x2) = match *roots.as_slice() {
+                [r] => {
                     ring.count(1);
                     if am(r, r, f.p) != s || mm(r, r, f.p) != t {
                         continue;
                     }
                     (r, r)
                 }
-                &[a, b] => (a, b),
+                [a, b] => (a, b),
                 _ => continue,
             };
             let (Some(&i), Some(&j)) = (base.by_x.get(&x1), base.by_x.get(&x2)) else {

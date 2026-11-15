@@ -8,7 +8,7 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 use std::time::Instant;
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use crypto_lib::cryptanalysis::gaudry_cubic::{
     generate_instance3, run_gaudry_with_eliminator, run_rho3, GaudryOptions, LargePrimeBackend,
     Solver, SubspaceBase,
@@ -27,6 +27,13 @@ struct Args {
     rounds: usize,
     #[arg(long, default_value_t = 1)]
     warmup_rounds: usize,
+    #[arg(
+        long,
+        value_enum,
+        value_delimiter = ',',
+        default_value = "mitm,groebner,pair,symmetric-pair,symmetric-mitm"
+    )]
+    oracles: Vec<Oracle>,
     #[arg(long, default_value_t = 10_000)]
     max_residuals: u64,
     /// Frozen source commit, externally checked against binary/build receipt.
@@ -36,12 +43,34 @@ struct Args {
     out: std::path::PathBuf,
 }
 
+#[derive(Clone, Copy, ValueEnum)]
+enum Oracle {
+    Mitm,
+    Groebner,
+    Pair,
+    SymmetricPair,
+    SymmetricMitm,
+}
+
+impl Oracle {
+    fn solver(self) -> Solver {
+        match self {
+            Self::Mitm => Solver::MeetInTheMiddle,
+            Self::Groebner => Solver::Groebner,
+            Self::Pair => Solver::PairOnly,
+            Self::SymmetricPair => Solver::SymmetricPairOnly,
+            Self::SymmetricMitm => Solver::SymmetricMeetInTheMiddle,
+        }
+    }
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     if args.rounds < 5
         || args.warmup_rounds == 0
         || args.primes.is_empty()
         || args.seeds.is_empty()
+        || args.oracles.is_empty()
         || args.source_revision.len() != 40
         || !args.source_revision.bytes().all(|c| c.is_ascii_hexdigit())
     {
@@ -69,13 +98,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         for &seed in &args.seeds {
             let inst = generate_instance3(p, seed);
-            for solver in [
-                Solver::MeetInTheMiddle,
-                Solver::Groebner,
-                Solver::PairOnly,
-                Solver::SymmetricPairOnly,
-                Solver::SymmetricMeetInTheMiddle,
-            ] {
+            for &oracle in &args.oracles {
+                let solver = oracle.solver();
                 for iteration in 0..total_rounds {
                     let (phase, round) = if iteration < args.warmup_rounds {
                         ("warmup", iteration)

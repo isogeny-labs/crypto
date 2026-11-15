@@ -1,0 +1,570 @@
+//! Native analysis of retained matched IC/rho executions. Failures, incomplete
+//! plans and warmups remain visible; none can generate a parity acceptance.
+use plotters::prelude::*;
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
+use std::error::Error;
+use std::fs::{self, OpenOptions};
+use std::io::{BufRead, BufReader, Write};
+use std::path::Path;
+
+const ARMS: [&str; 5] = ["pivot_a", "graph", "pivot_b", "rho_a", "rho_b"];
+type Key = (u64, u64, String, String, u64, String);
+
+fn number(row: &Value, key: &str) -> Result<f64, String> {
+    row[key]
+        .as_f64()
+        .filter(|n| n.is_finite() && *n > 0.0)
+        .ok_or_else(|| format!("invalid positive {key}"))
+}
+
+fn identity(row: &Value) -> Value {
+    json!([
+        row["field"],
+        row["a"],
+        row["b"],
+        row["generator"],
+        row["target"],
+        row["subgroup_order"],
+        row["known_answer_scalar"]
+    ])
+}
+
+fn signature(row: &Value, rho: bool) -> Value {
+    let report = &row["report"];
+    if rho {
+        json!([
+            report["steps"],
+            report["group_ops"],
+            report["recovered_scalar"]
+        ])
+    } else {
+        json!([
+            report["residuals"],
+            report["relations_verified"],
+            report["oracle_fp_muls"],
+            report["group_ops"],
+            report["lp_histogram"],
+            report["recovered_scalar"],
+            report["lp_input_digest"]
+        ])
+    }
+}
+
+fn median(values: &[f64]) -> f64 {
+    let mut values = values.to_vec();
+    values.sort_by(f64::total_cmp);
+    let n = values.len();
+    if n % 2 == 1 {
+        values[n / 2]
+    } else {
+        (values[n / 2 - 1] + values[n / 2]) / 2.0
+    }
+}
+
+fn estimate(log_ratios: &[f64], draws: usize, mut state: u64) -> Value {
+    if log_ratios.is_empty() {
+        return Value::Null;
+    }
+    let n = log_ratios.len();
+    let mean = (log_ratios.iter().sum::<f64>() / n as f64).exp();
+    let mut bootstrap = Vec::with_capacity(draws);
+    for _ in 0..draws {
+        let mut sum = 0.0;
+        for _ in 0..n {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            sum += log_ratios[state as usize % n];
+        }
+        bootstrap.push((sum / n as f64).exp());
+    }
+    bootstrap.sort_by(f64::total_cmp);
+    json!({"geometric_mean":mean,"bootstrap_95":[bootstrap[draws * 25 / 1000],bootstrap[(draws * 975 / 1000).min(draws - 1)]],"rounds":n})
+}
+
+fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Value, String> {
+    let source = plan["source_revision"]
+        .as_str()
+        .filter(|s| s.len() == 40)
+        .ok_or("runtime plan must pin source SHA")?;
+    let primes = plan["primes"]
+        .as_array()
+        .filter(|a| !a.is_empty())
+        .ok_or("missing primes")?;
+    let seeds = plan["seeds"]
+        .as_array()
+        .filter(|a| !a.is_empty())
+        .ok_or("missing seeds")?;
+    let oracles = plan["oracles"]
+        .as_array()
+        .filter(|a| !a.is_empty())
+        .ok_or("missing oracles")?;
+    let rounds = plan["rounds"]
+        .as_u64()
+        .filter(|n| *n >= 5)
+        .ok_or("need five rounds")?;
+    let warmups = plan["warmup_rounds"]
+        .as_u64()
+        .filter(|n| *n > 0)
+        .ok_or("need warmup")?;
+    let draws = plan["bootstrap_draws"]
+        .as_u64()
+        .filter(|n| *n >= 1000)
+        .ok_or("need bootstrap draws")? as usize;
+    let seed = plan["bootstrap_seed"]
+        .as_u64()
+        .filter(|n| *n != 0)
+        .ok_or("need bootstrap seed")?;
+    let tolerance = plan["aa_tolerance"]
+        .as_f64()
+        .filter(|n| *n >= 1.0)
+        .ok_or("invalid AA tolerance")?;
+    let mut executions = BTreeMap::<Key, Value>::new();
+    let mut duplicate = BTreeSet::new();
+    let mut problems = Vec::new();
+    let mut identities = BTreeMap::new();
+    let mut phase_counts = BTreeMap::<String, usize>::new();
+    let mut actual_order = Vec::new();
+    for row in rows {
+        if row["record_type"] != "execution" {
+            continue;
+        }
+        let p = row["p"].as_u64().ok_or("row missing p")?;
+        let fixture_seed = row["seed"].as_u64().ok_or("row missing seed")?;
+        let oracle = row["oracle_block"]
+            .as_str()
+            .ok_or("row missing oracle")?
+            .to_owned();
+        let phase = row["phase"].as_str().ok_or("row missing phase")?.to_owned();
+        let round = row["round"].as_u64().ok_or("row missing round")?;
+        let arm = row["arm"].as_str().ok_or("row missing arm")?.to_owned();
+        *phase_counts.entry(phase.clone()).or_default() += 1;
+        if row["schema"] != "gaudry.cubic.graph-comparison/v2" || row["source_revision"] != source {
+            problems.push(format!(
+                "source/schema mismatch p={p} seed={fixture_seed} {oracle} {arm}"
+            ));
+        }
+        if !primes.contains(&json!(p))
+            || !seeds.contains(&json!(fixture_seed))
+            || !oracles.contains(&json!(oracle))
+            || !ARMS.contains(&arm.as_str())
+            || !matches!(phase.as_str(), "warmup" | "measurement")
+            || round >= if phase == "warmup" { warmups } else { rounds }
+        {
+            problems.push(format!(
+                "unexpected execution p={p} seed={fixture_seed} {oracle} {phase} {round} {arm}"
+            ));
+        }
+        let id = identity(&row);
+        let old = identities
+            .entry((p, fixture_seed))
+            .or_insert_with(|| id.clone());
+        if old != &id {
+            problems.push(format!("instance mismatch p={p} seed={fixture_seed}"));
+        }
+        let key = (p, fixture_seed, oracle, phase, round, arm);
+        actual_order.push(key.clone());
+        if executions.insert(key.clone(), row).is_some() {
+            duplicate.insert(key);
+        }
+    }
+    if !duplicate.is_empty() {
+        problems.push(format!("{} duplicate execution keys", duplicate.len()));
+    }
+    if parse_failures != 0 {
+        problems.push(format!("{parse_failures} malformed raw lines retained"));
+    }
+    let mut expected_order = Vec::new();
+    for p in primes {
+        for fixture_seed in seeds {
+            for oracle in oracles {
+                for (phase, count) in [("warmup", warmups), ("measurement", rounds)] {
+                    for round in 0..count {
+                        let mut arms = ARMS;
+                        if round % 2 == 1 {
+                            arms.reverse();
+                        }
+                        for arm in arms {
+                            expected_order.push((
+                                p.as_u64().ok_or("invalid prime")?,
+                                fixture_seed.as_u64().ok_or("invalid seed")?,
+                                oracle.as_str().ok_or("invalid oracle")?.to_owned(),
+                                phase.to_owned(),
+                                round,
+                                arm.to_owned(),
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if actual_order.len() > expected_order.len()
+        || actual_order != expected_order[..actual_order.len().min(expected_order.len())]
+    {
+        problems.push("execution order differs from the frozen interleaved schedule".to_owned());
+    }
+    let mut strata = Vec::new();
+    for p in primes {
+        let p = p.as_u64().ok_or("invalid prime")?;
+        for fixture_seed in seeds {
+            let fixture_seed = fixture_seed.as_u64().ok_or("invalid seed")?;
+            for oracle in oracles {
+                let oracle = oracle.as_str().ok_or("invalid oracle")?;
+                let mut reasons = Vec::new();
+                let mut graph = Vec::new();
+                let mut pivot = Vec::new();
+                let mut graph_cost = Vec::new();
+                let mut pivot_aa = Vec::new();
+                let mut rho_aa = Vec::new();
+                let mut complete = 0;
+                let mut correct = 0;
+                let mut n = 0;
+                let mut group_share = Vec::new();
+                let mut oracle_share = Vec::new();
+                for (phase, count) in [("warmup", warmups), ("measurement", rounds)] {
+                    for round in 0..count {
+                        let mut block = Vec::new();
+                        for arm in ARMS {
+                            let key = (
+                                p,
+                                fixture_seed,
+                                oracle.to_owned(),
+                                phase.to_owned(),
+                                round,
+                                arm.to_owned(),
+                            );
+                            if let Some(row) = executions.get(&key) {
+                                block.push(row);
+                            }
+                        }
+                        if block.len() != ARMS.len() {
+                            reasons.push(format!(
+                                "{phase} round {round}: incomplete block ({}/5 arms)",
+                                block.len()
+                            ));
+                            continue;
+                        }
+                        if phase == "measurement" {
+                            complete += 1;
+                        }
+                        let pa = block[0];
+                        let g = block[1];
+                        let pb = block[2];
+                        let ra = block[3];
+                        let rb = block[4];
+                        n = g["subgroup_order"].as_u64().unwrap_or(0);
+                        let solved = block.iter().all(|r| {
+                            r["group_replay"] == true
+                                && r["report"]["correct"] == true
+                                && r["report"]["solved"] == true
+                                && r["report"]["recovered_scalar"] == r["known_answer_scalar"]
+                        });
+                        let same_input = signature(pa, false) == signature(g, false)
+                            && signature(pa, false) == signature(pb, false)
+                            && !g["report"]["lp_input_digest"].is_null()
+                            && signature(ra, true) == signature(rb, true);
+                        if !solved || !same_input {
+                            reasons.push(format!(
+                                "{phase} round {round}: solve/input/control failure"
+                            ));
+                        } else if phase == "measurement" {
+                            correct += 1;
+                        }
+                        if phase == "warmup" {
+                            continue;
+                        }
+                        // Ineligible blocks still contribute spent-work diagnostics.
+                        let times = block
+                            .iter()
+                            .map(|r| number(r, "unadmitted_wall_ns"))
+                            .collect::<Result<Vec<_>, _>>()?;
+                        let costs = block
+                            .iter()
+                            .map(|r| number(r, "legacy_model_cold_gae"))
+                            .collect::<Result<Vec<_>, _>>()?;
+                        let rho_time = (times[3].ln() + times[4].ln()) / 2.0;
+                        graph.push(times[1].ln() - rho_time);
+                        pivot.push((times[0].ln() + times[2].ln()) / 2.0 - rho_time);
+                        graph_cost.push(costs[1].ln() - (costs[3].ln() + costs[4].ln()) / 2.0);
+                        pivot_aa.push((times[0] / times[2]).ln());
+                        rho_aa.push((times[3] / times[4]).ln());
+                        let total = number(&g["report"], "total_ops")?;
+                        let fp_price = number(&g["report"], "fp_muls_per_add")?;
+                        group_share.push(g["report"]["group_ops"].as_f64().unwrap_or(0.0) / total);
+                        oracle_share.push(
+                            g["report"]["oracle_fp_muls"].as_f64().unwrap_or(0.0)
+                                / fp_price
+                                / total,
+                        );
+                    }
+                }
+                let aa_pass = !rho_aa.is_empty()
+                    && median(&rho_aa).abs() <= tolerance.ln()
+                    && median(&pivot_aa).abs() <= tolerance.ln();
+                if !aa_pass {
+                    reasons.push("local median AA tolerance failed or unavailable".to_owned());
+                }
+                let eligible = reasons.is_empty()
+                    && problems.is_empty()
+                    && complete == rounds
+                    && correct == rounds;
+                let graph_estimate = estimate(&graph, draws, seed);
+                let min_n = plan["parity_min_subgroup_order"]
+                    .as_u64()
+                    .ok_or("missing minimum order")?;
+                let local_parity = eligible
+                    && n >= min_n
+                    && graph_estimate["bootstrap_95"][1]
+                        .as_f64()
+                        .is_some_and(|x| x <= 1.0);
+                strata.push(json!({"p":p,"seed":fixture_seed,"oracle":oracle,"subgroup_order":n,
+                    "planned_rounds":rounds,"complete_rounds":complete,"correct_rounds":correct,
+                    "eligible_local_controlled_comparison":eligible,"invalid_reasons":reasons,
+                    "diagnostic_graph_wall_over_rho":graph_estimate,"diagnostic_pivot_wall_over_rho":estimate(&pivot,draws,seed),
+                    "diagnostic_graph_legacy_cost_over_rho":estimate(&graph_cost,draws,seed),
+                    "median_pivot_aa_ratio":if pivot_aa.is_empty(){Value::Null}else{json!(median(&pivot_aa).exp())},
+                    "median_rho_aa_ratio":if rho_aa.is_empty(){Value::Null}else{json!(median(&rho_aa).exp())},
+                    "diagnostic_legacy_group_share":if group_share.is_empty(){Value::Null}else{json!(median(&group_share))},
+                    "diagnostic_legacy_oracle_share":if oracle_share.is_empty(){Value::Null}else{json!(median(&oracle_share))},
+                    "large_order_local_reference_parity":local_parity}));
+            }
+        }
+    }
+    Ok(
+        json!({"schema":"gaudry.cubic.local-analysis/v1","source_revision":source,"backend":"local_user_authorized",
+        "standard_lab_admission":false,"reference_scope":plan["reference_scope"],"raw_execution_count":actual_order.len(),
+        "unique_execution_count":executions.len(),"planned_execution_count":expected_order.len(),
+        "phase_counts":phase_counts,"global_problems":problems,"strata":strata,
+        "interval_scope":"deterministic round bootstrap; timing repeat variation, not independent curve samples",
+        "cost_scope":"legacy multiplication-equivalent diagnostics with unpriced work",
+        "failed_blocks":"retained in spent-work diagnostics; invalidate their stratum"}),
+    )
+}
+
+fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
+    let strata = result["strata"].as_array().ok_or("missing strata")?;
+    let max = strata
+        .iter()
+        .flat_map(|s| {
+            [
+                "diagnostic_graph_wall_over_rho",
+                "diagnostic_pivot_wall_over_rho",
+            ]
+            .map(|k| s[k]["bootstrap_95"][1].as_f64().unwrap_or(1.0))
+        })
+        .fold(2.0_f64, f64::max)
+        * 1.4;
+    let min = strata
+        .iter()
+        .flat_map(|s| {
+            [
+                "diagnostic_graph_wall_over_rho",
+                "diagnostic_pivot_wall_over_rho",
+            ]
+            .map(|k| s[k]["bootstrap_95"][0].as_f64().unwrap_or(1.0))
+        })
+        .fold(0.1_f64, f64::min)
+        * 0.7;
+    let root = SVGBackend::new(path, (1200, 620)).into_drawing_area();
+    root.fill(&WHITE)?;
+    let mut chart = ChartBuilder::on(&root)
+        .caption(
+            "Local cold wall time / same-instance rho",
+            ("sans-serif", 24),
+        )
+        .margin(25)
+        .x_label_area_size(90)
+        .y_label_area_size(70)
+        .build_cartesian_2d(0f64..strata.len().max(1) as f64, (min..max).log_scale())?;
+    chart
+        .configure_mesh()
+        .x_labels(strata.len())
+        .x_label_formatter(&|x| {
+            strata
+                .get(x.floor() as usize)
+                .map(|s| format!("p{} {}", s["p"], s["oracle"].as_str().unwrap_or("?")))
+                .unwrap_or_default()
+        })
+        .x_label_style(("sans-serif", 11))
+        .y_desc("ratio, log scale (lower costs less)")
+        .draw()?;
+    chart.draw_series(LineSeries::new(
+        [(0.0, 1.0), (strata.len() as f64, 1.0)],
+        &BLACK,
+    ))?;
+    for (i, s) in strata.iter().enumerate() {
+        for (j, key, color) in [
+            (0, "diagnostic_pivot_wall_over_rho", BLUE),
+            (1, "diagnostic_graph_wall_over_rho", RED),
+        ] {
+            if let Some(value) = s[key]["geometric_mean"].as_f64() {
+                let color = if s["eligible_local_controlled_comparison"] == true {
+                    color.mix(0.8)
+                } else {
+                    RGBColor(140, 140, 140).mix(0.8)
+                };
+                chart.draw_series([Rectangle::new(
+                    [
+                        (i as f64 + 0.12 + j as f64 * 0.38, min),
+                        (i as f64 + 0.43 + j as f64 * 0.38, value.max(min)),
+                    ],
+                    color.filled(),
+                )])?;
+                if let (Some(lo), Some(hi)) = (
+                    s[key]["bootstrap_95"][0].as_f64(),
+                    s[key]["bootstrap_95"][1].as_f64(),
+                ) {
+                    let center = i as f64 + 0.275 + j as f64 * 0.38;
+                    chart.draw_series([
+                        PathElement::new(vec![(center, lo), (center, hi)], BLACK),
+                        PathElement::new(vec![(center - 0.05, lo), (center + 0.05, lo)], BLACK),
+                        PathElement::new(vec![(center - 0.05, hi), (center + 0.05, hi)], BLACK),
+                    ])?;
+                }
+            }
+        }
+    }
+    root.draw(&Text::new("Blue: pivot; red: graph; gray: failed controls/incomplete case. Ratios remain diagnostics for those cases.",(35,600),("sans-serif",14)))?;
+    root.present()?;
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let args: Vec<_> = std::env::args_os().collect();
+    if args.len() != 4 {
+        return Err(
+            "usage: cubic-graph-analysis RAW.jsonl RUNTIME-PLAN.json NEW-OUTPUT-DIR".into(),
+        );
+    }
+    let plan: Value = serde_json::from_slice(&fs::read(&args[2])?)?;
+    let mut rows = Vec::new();
+    let mut failures = 0;
+    for line in BufReader::new(fs::File::open(&args[1])?).lines() {
+        match serde_json::from_str(&line?) {
+            Ok(row) => rows.push(row),
+            Err(_) => failures += 1,
+        }
+    }
+    let result = analyze(&plan, rows, failures)?;
+    let dir = Path::new(&args[3]);
+    fs::create_dir(dir)?;
+    let mut out = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(dir.join("summary.json"))?;
+    serde_json::to_writer_pretty(&mut out, &result)?;
+    writeln!(out)?;
+    plot(&result, &dir.join("ratios.svg"))?;
+    for s in result["strata"].as_array().unwrap() {
+        println!(
+            "p={} seed={} {} graph/rho={} pivot/rho={} controlled={} correct={}/{}",
+            s["p"],
+            s["seed"],
+            s["oracle"],
+            s["diagnostic_graph_wall_over_rho"]["geometric_mean"],
+            s["diagnostic_pivot_wall_over_rho"]["geometric_mean"],
+            s["eligible_local_controlled_comparison"],
+            s["correct_rounds"],
+            s["planned_rounds"]
+        );
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn fixture() -> (Value, Vec<Value>) {
+        let source = "1234567890123456789012345678901234567890";
+        let plan = json!({"source_revision":source,"primes":[67],"seeds":[3],"oracles":["PairOnly"],"rounds":5,"warmup_rounds":1,"bootstrap_draws":1000,"bootstrap_seed":7,"aa_tolerance":1.1,"parity_min_subgroup_order":1073741824});
+        let mut rows = Vec::new();
+        for (phase, count) in [("warmup", 1), ("measurement", 5)] {
+            for round in 0..count {
+                let mut arms = ARMS;
+                if round % 2 == 1 {
+                    arms.reverse();
+                }
+                for arm in arms {
+                    rows.push(json!({"schema":"gaudry.cubic.graph-comparison/v2","record_type":"execution","source_revision":source,"p":67,"seed":3,"oracle_block":"PairOnly","phase":phase,"round":round,"arm":arm,"field":{"p":67},"a":[1],"b":[2],"generator":[3],"target":[4],"subgroup_order":300001,"known_answer_scalar":13,"group_replay":true,"unadmitted_wall_ns":if arm=="graph"{50}else{100},"legacy_model_cold_gae":100,"report":{"correct":true,"solved":true,"recovered_scalar":13,"steps":4,"group_ops":10,"oracle_fp_muls":100,"relations_verified":2,"residuals":3,"lp_histogram":[1],"lp_input_digest":"same","total_ops":100,"fp_muls_per_add":60}}));
+                }
+            }
+        }
+        (plan, rows)
+    }
+    #[test]
+    fn complete_case_counts_warmups_and_rejects_tiny_parity() {
+        let (p, r) = fixture();
+        let s = analyze(&p, r, 0).unwrap();
+        assert_eq!(s["phase_counts"]["warmup"], 5);
+        assert_eq!(s["strata"][0]["eligible_local_controlled_comparison"], true);
+        assert!(
+            (s["strata"][0]["diagnostic_graph_wall_over_rho"]["geometric_mean"]
+                .as_f64()
+                .unwrap()
+                - 0.5)
+                .abs()
+                < 1e-12
+        );
+        assert_eq!(s["strata"][0]["large_order_local_reference_parity"], false);
+    }
+    #[test]
+    fn a_failed_execution_invalidates_case_without_dropping_spent_work() {
+        let (p, mut r) = fixture();
+        r[6]["report"]["correct"] = json!(false);
+        let s = analyze(&p, r, 0).unwrap();
+        assert_eq!(
+            s["strata"][0]["eligible_local_controlled_comparison"],
+            false
+        );
+        assert_eq!(s["strata"][0]["complete_rounds"], 5);
+        assert_eq!(
+            s["strata"][0]["diagnostic_graph_wall_over_rho"]["rounds"],
+            5
+        );
+    }
+    #[test]
+    fn incomplete_cohort_never_accepts() {
+        let (p, mut r) = fixture();
+        r.pop();
+        let s = analyze(&p, r, 0).unwrap();
+        assert_eq!(s["strata"][0]["complete_rounds"], 4);
+        assert_eq!(
+            s["strata"][0]["eligible_local_controlled_comparison"],
+            false
+        );
+    }
+    #[test]
+    fn source_identity_and_duplicate_failures_remain_global() {
+        let (p, mut r) = fixture();
+        let mut copy = r[0].clone();
+        copy["target"] = json!([99]);
+        r.push(copy);
+        r[9]["source_revision"] = json!("other");
+        let s = analyze(&p, r, 1).unwrap();
+        assert_eq!(s["raw_execution_count"], 31);
+        assert_eq!(s["unique_execution_count"], 30);
+        assert!(s["global_problems"].as_array().unwrap().len() >= 4);
+        assert_eq!(
+            s["strata"][0]["eligible_local_controlled_comparison"],
+            false
+        );
+    }
+    #[test]
+    fn input_mismatch_and_aa_timing_failure_are_rejected() {
+        let (p, mut r) = fixture();
+        for row in &mut r {
+            if row["arm"] == "rho_b" {
+                row["unadmitted_wall_ns"] = json!(200);
+            }
+        }
+        r[6]["report"]["lp_input_digest"] = json!("different");
+        let s = analyze(&p, r, 0).unwrap();
+        assert_eq!(
+            s["strata"][0]["eligible_local_controlled_comparison"],
+            false
+        );
+        assert!(s["strata"][0]["invalid_reasons"].as_array().unwrap().len() >= 2);
+    }
+}
