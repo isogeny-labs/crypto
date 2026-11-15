@@ -29,6 +29,7 @@ pub mod pack;
 pub mod registry;
 pub mod results;
 pub mod richelot;
+pub mod schoof;
 pub mod siblings;
 pub mod traits;
 pub mod transfers;
