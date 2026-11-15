@@ -214,9 +214,10 @@ print "relation_attempts", attempts;
 print "smooth_relations", #rows;
 print "factor_base_classes", #fb_keys;
 print "reconstruction_failures", reconstruction_failures;
-for i in [1..#fb] do
-    print "factor_base", i, fb[i];
-end for;
+if #fb gt 0 then
+    print "factor_base_first", fb[1];
+    print "factor_base_last", fb[#fb];
+end if;
 for i in [1..#rows] do
     print "relation", rhs[i], rows[i];
 end for;
@@ -246,12 +247,22 @@ linear_wall := Realtime(linear_wall_start);
 print "linear_rank", linear_rank;
 print "linear_solved", solved;
 if solved then
+    in_subgroup := 0;
+    r_annihilated := 0;
+    projection_checks := 0;
     for i in [1..#fb] do
-        print "factor_base_in_source_subgroup", i, fb[i] eq (Integers()!logs[i])*G;
-        print "factor_base_r_annihilated", i, r*fb[i] eq J!0;
+        if fb[i] eq (Integers()!logs[i])*G then
+            in_subgroup +:= 1;
+        end if;
+        if r*fb[i] eq J!0 then
+            r_annihilated +:= 1;
+        end if;
         assert cofactor*fb[i] eq (cofactor*Integers()!logs[i])*G;
-        print "factor_base_projected_check", i, true;
+        projection_checks +:= 1;
     end for;
+    print "factor_base_in_source_subgroup_count", in_subgroup;
+    print "factor_base_r_annihilated_count", r_annihilated;
+    print "factor_base_projected_checks", projection_checks;
 end if;
 print "linear_cpu_sec", linear_cpu;
 print "linear_wall_sec", linear_wall;
