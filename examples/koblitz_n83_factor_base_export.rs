@@ -1331,6 +1331,14 @@ fn main() -> Result<()> {
             )?;
             println!("{receipt}");
         },
+        Some("primary-k600-m6-replay")=>{
+            if args.len()!=10 { return Err("primary-k600-m6-replay BASE_DIR EXPORT_JSON XCNF SOLVER_RECEIPT SOLVER_STDOUT SOURCE_COMMIT EXPORT_BINARY_SHA NEW_OUTPUT_JSON".into()); }
+            let receipt=primary_adapter::k600_m6_replay_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
+                Path::new(&args[5]),Path::new(&args[6]),&args[7],&args[8],Path::new(&args[9]),
+            )?;
+            println!("{receipt}");
+        },
         Some("primary-full-d18-m4-l0-xcnf-witness")=>{
             if args.len()!=5 { return Err("primary-full-d18-m4-l0-xcnf-witness BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound constructed XCNF and native assignment; 300-s internal cap)".into()); }
             let receipt=primary_adapter::full_d18_m4_l0_xcnf_witness_cli(

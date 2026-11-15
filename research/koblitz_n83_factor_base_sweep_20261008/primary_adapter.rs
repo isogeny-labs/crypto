@@ -863,6 +863,351 @@ pub(super) fn k600_m6_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result
     Ok(result)
 }
 
+/// Parse a complete DIMACS model. Zero is the unused index; 1 and 2 encode
+/// true and false so duplicate and missing assignments cannot be hidden.
+fn k600_model_values(stdout: &str, variables: usize) -> Result<Vec<u8>> {
+    let mut values = vec![0u8; variables.checked_add(1).ok_or("model size overflow")?];
+    let mut statuses = 0usize;
+    for line in stdout.lines() {
+        if line.starts_with("s ") {
+            if line != "s SATISFIABLE" {
+                return Err("solver status is not SAT".into());
+            }
+            statuses += 1;
+        } else if let Some(rest) = line.strip_prefix("v ") {
+            for token in rest.split_whitespace() {
+                let literal: i64 = token.parse()?;
+                if literal == 0 {
+                    continue;
+                }
+                let index = usize::try_from(literal.unsigned_abs())?;
+                if index == 0 || index > variables || values[index] != 0 {
+                    return Err("model variable out of range or repeated".into());
+                }
+                values[index] = if literal > 0 { 1 } else { 2 };
+            }
+        }
+    }
+    if statuses != 1 || values[1..].contains(&0) {
+        return Err("solver model is absent, partial, or ambiguous".into());
+    }
+    Ok(values)
+}
+
+/// Check the original XCNF, including parity of signed XOR literals.
+fn k600_check_xcnf(formula: &str, values: &[u8], cnf: usize, xor: usize) -> Result<()> {
+    let mut lines = formula.lines();
+    let header = lines.next().ok_or("empty XCNF")?;
+    if header
+        != format!(
+            "p cnf {} {}",
+            values.len() - 1,
+            cnf.checked_add(xor).ok_or("row count overflow")?
+        )
+    {
+        return Err("XCNF header differs".into());
+    }
+    let (mut seen_cnf, mut seen_xor) = (0usize, 0usize);
+    for (offset, line) in lines.enumerate() {
+        if line.starts_with("c ") {
+            continue;
+        }
+        let (is_xor, body) = if let Some(body) = line.strip_prefix("x ") {
+            (true, body)
+        } else {
+            (false, line)
+        };
+        let tokens: Vec<_> = body.split_whitespace().collect();
+        if tokens.len() < 2 || tokens.last() != Some(&"0") {
+            return Err(format!("unterminated XCNF row {}", offset + 2).into());
+        }
+        let mut parity = false;
+        let mut satisfied = false;
+        for token in &tokens[..tokens.len() - 1] {
+            let literal: i64 = token.parse()?;
+            let index = usize::try_from(literal.unsigned_abs())?;
+            if literal == 0 || index >= values.len() {
+                return Err(format!("invalid XCNF literal at row {}", offset + 2).into());
+            }
+            let truth = (values[index] == 1) == (literal > 0);
+            parity ^= truth;
+            satisfied |= truth;
+        }
+        if is_xor {
+            seen_xor += 1;
+            if !parity {
+                return Err(format!("XOR row {} fails", offset + 2).into());
+            }
+        } else {
+            seen_cnf += 1;
+            if !satisfied {
+                return Err(format!("CNF row {} fails", offset + 2).into());
+            }
+        }
+    }
+    if (seen_cnf, seen_xor) != (cnf, xor) {
+        return Err("XCNF row counts differ".into());
+    }
+    Ok(())
+}
+
+fn k600_model_x(values: &[u8], block: usize) -> BigUint {
+    let mut x = BigUint::zero();
+    for bit in 0..83usize {
+        if values[block * 83 + bit + 1] == 1 {
+            x |= BigUint::one() << bit;
+        }
+    }
+    x
+}
+
+/// Independently replay a solver model against the saved formula and the
+/// exact retained point base. This command does not perform SAT search.
+pub(super) fn k600_m6_replay_cli(
+    root: &Path,
+    export_path: &Path,
+    xcnf_path: &Path,
+    receipt_path: &Path,
+    stdout_path: &Path,
+    source_commit: &str,
+    exporter_binary_sha256: &str,
+    output: &Path,
+) -> Result<Value> {
+    const OBJECT: &str =
+        "objects/b4dda45e6c3edfca673db6f3f82c16cce8c860f5e62c092155258df399a0363e.jsonl.gz";
+    const OBJECT_SHA256: &str = "3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf";
+    const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f0731247f9ee3759dcbd";
+    if output.exists() {
+        return Err("K600 replay output already exists".into());
+    }
+    for (name, expected) in [
+        (
+            "manifest.json",
+            "5bd862987844f709e03beeab9fd265e3d2024011bcadcb82f5af9c72018df6a6",
+        ),
+        (
+            "replay.json",
+            "fa5e545c27dd64c32a47ddae05a2a0b3a031545d700897f3e0e34f59abc0d72e",
+        ),
+        (
+            "upload-receipt.json",
+            "0eae40ffa0e938470671cf796633c1e47b61ff676df0807e7a7e8592e56bb828",
+        ),
+        ("probe-corpus.json", CORPUS_SHA256),
+        (
+            "probe-validation.json",
+            "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f",
+        ),
+    ] {
+        if sha256_hex(&fs::read(root.join(name))?) != expected {
+            return Err(format!("K600 replay input {name} differs from frozen SHA-256").into());
+        }
+    }
+    let export: Value = serde_json::from_slice(&fs::read(export_path)?)?;
+    let receipt: Value = serde_json::from_slice(&fs::read(receipt_path)?)?;
+    let mode = export["mode"].as_str().ok_or("K600 export mode missing")?;
+    if export["schema"] != "n83.k600-m6-xcnf-export/v1"
+        || export["status"] != "PASS_XCNF_EXPORT_ONLY"
+        || !["positive-pinned", "positive-unpinned", "natural"].contains(&mode)
+        || export["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || export["curve_a"] != 0
+        || export["source_commit"] != source_commit
+        || export["source_attestation_mode"] != "clean_checkout"
+        || export["binary_sha256"] != exporter_binary_sha256
+        || export["object"] != OBJECT
+        || export["object_sha256"] != OBJECT_SHA256
+        || receipt["exit_code"] != 10
+        || !["SAT_PENDING_REPLAY", "SAT_PENDING_XCNF_REPLAY"]
+            .iter()
+            .any(|s| receipt["status"] == *s)
+        || receipt["xcnf_sha256"] != export["xcnf_sha256"]
+    {
+        return Err("K600 export, source, or SAT receipt binding differs".into());
+    }
+    let shape = &export["shape"];
+    if shape["summands"] != 6
+        || shape["identity_mask"] != 0
+        || shape["root_encoding"] != "per_representative"
+        || shape["domain_representatives"] != 600
+        || shape["summand_ordering"] != "none"
+        || shape["positive_x_pins"] != if mode == "positive-pinned" { 913 } else { 0 }
+    {
+        return Err("K600 XCNF search policy differs".into());
+    }
+    let variables = shape["variables"].as_u64().ok_or("variable count")? as usize;
+    let clauses = shape["clauses"].as_u64().ok_or("clause count")? as usize;
+    let xors = shape["xor_rows"].as_u64().ok_or("XOR count")? as usize;
+    if variables < 913 || variables > 125_000 || clauses > 2_000_000 || xors > 2_000_000 {
+        return Err("K600 XCNF shape exceeds frozen bounds".into());
+    }
+    let xcnf = fs::read(xcnf_path)?;
+    if xcnf.len() > 200_000_000
+        || export["xcnf_bytes"].as_u64() != Some(xcnf.len() as u64)
+        || export["xcnf_sha256"] != sha256_hex(&xcnf)
+    {
+        return Err("original XCNF bytes differ".into());
+    }
+    let stdout = fs::read(stdout_path)?;
+    if stdout.len() > 20_000_000 || receipt["stdout_sha256"] != sha256_hex(&stdout) {
+        return Err("solver output bytes differ".into());
+    }
+    let values = k600_model_values(std::str::from_utf8(&stdout)?, variables)?;
+    k600_check_xcnf(std::str::from_utf8(&xcnf)?, &values, clauses, xors)?;
+    if sha256_hex(&fs::read(root.join(OBJECT))?) != OBJECT_SHA256 {
+        return Err("retained K600 factor-base bytes differ".into());
+    }
+    let (base, row, manifest_blake3) = load_panel_selected(root, 600, "public_x_hash", SEEDS[0])?;
+    let fb = &base.factor_base;
+    if fb.points.len() != 99_600
+        || fb.signed_orbits.len() != 600
+        || row["point_set_blake3"]
+            != "ac664f5f0c7122c52a08c0a288b543efb709111a99dc2a5cb2bef025ffffee21"
+        || row["point_set_blake3"] != export["point_set_blake3"]
+        || export["panel_manifest_blake3"] != manifest_blake3
+    {
+        return Err("retained K600 factor-base identity differs".into());
+    }
+    let (_, corpus_blake3) = public_target_fixture(root, &base.curve, 0)?;
+    if export["public_corpus_blake3"] != corpus_blake3 {
+        return Err("K600 public corpus binding differs".into());
+    }
+    let target = general(Some(
+        parse_point(&export["target"])?.ok_or("identity target")?,
+    ));
+    if !base.curve.curve.is_on_curve(&target)
+        || base.curve.mul(&target, &base.curve.subgroup_order) != BinaryPoint::Infinity
+    {
+        return Err("K600 target fails curve or subgroup check".into());
+    }
+    if mode == "natural" {
+        if !export["positive"].is_null()
+            || export["public_fixture"] != 0
+            || sha256_hex(&fs::read(root.join("probe-corpus.json"))?) != CORPUS_SHA256
+        {
+            return Err("natural public fixture identity differs".into());
+        }
+        let (public, _) = public_target_fixture(root, &base.curve, 0)?;
+        if target != public {
+            return Err("natural target differs from public fixture".into());
+        }
+    } else {
+        let positive = &export["positive"];
+        let indices = positive["indices"].as_array().ok_or("positive indices")?;
+        let points = positive["points"].as_array().ok_or("positive points")?;
+        let partial = positive["partial_sums"]
+            .as_array()
+            .ok_or("positive partial sums")?;
+        if indices.len() != 6 || points.len() != 6 || partial.len() != 6 {
+            return Err("positive witness length differs".into());
+        }
+        let mut sum = BinaryPoint::Infinity;
+        let mut selected = Vec::with_capacity(6);
+        for i in 0..6 {
+            let index = indices[i].as_u64().ok_or("positive index")? as usize;
+            let point = fb
+                .points
+                .get(index)
+                .ok_or("positive index outside archive")?;
+            if points[i] != planted_point_json(point) {
+                return Err("positive point differs from archive".into());
+            }
+            sum = base.curve.add(&sum, point);
+            if partial[i] != planted_point_json(&sum) {
+                return Err("positive partial sum differs".into());
+            }
+            selected.push(index);
+        }
+        if selected.iter().collect::<HashSet<_>>().len() != 6 || sum != target {
+            return Err("positive witness is repeated or misses target".into());
+        }
+        let row = checked_primary_relation_row(&base.curve, fb, &selected, &target)?;
+        let row_bytes =
+            serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>())?;
+        if positive["relation_row_decimal_blake3"] != blake3::hash(&row_bytes).to_hex().to_string()
+        {
+            return Err("positive relation-row hash differs".into());
+        }
+    }
+    let xs: Vec<_> = (0..6).map(|block| k600_model_x(&values, block)).collect();
+    let intermediate: Vec<_> = (6..10).map(|block| k600_model_x(&values, block)).collect();
+    if k600_model_x(&values, 10)
+        != match &target {
+            BinaryPoint::Affine { x, .. } => x.to_biguint(),
+            BinaryPoint::Infinity => unreachable!(),
+        }
+    {
+        return Err("model target block differs".into());
+    }
+    let candidates: Vec<Vec<usize>> = xs
+        .iter()
+        .map(|x| {
+            fb.points
+                .iter()
+                .enumerate()
+                .filter_map(|(i, p)| match p {
+                    BinaryPoint::Affine { x: px, .. } if px.to_biguint() == *x => Some(i),
+                    _ => None,
+                })
+                .collect()
+        })
+        .collect();
+    if candidates.iter().any(|c| c.is_empty() || c.len() > 2) {
+        return Err("model x-coordinate has no bounded archive lift".into());
+    }
+    let mut chosen = None;
+    for mask in 0..64usize {
+        let mut indices = Vec::with_capacity(6);
+        let mut sum = BinaryPoint::Infinity;
+        let mut valid = true;
+        for (j, lifts) in candidates.iter().enumerate() {
+            let bit = (mask >> j) & 1;
+            if bit >= lifts.len() {
+                valid = false;
+                break;
+            }
+            let index = lifts[bit];
+            sum = base.curve.add(&sum, &fb.points[index]);
+            indices.push(index);
+            if (1..=4).contains(&j) {
+                match &sum {
+                    BinaryPoint::Affine { x, .. } if x.to_biguint() == intermediate[j - 1] => (),
+                    _ => {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if valid && sum == target {
+            chosen = Some(indices);
+            break;
+        }
+    }
+    let chosen = chosen.ok_or("SAT model has no checked six-point relation lift")?;
+    let relation = checked_primary_relation_row(&base.curve, fb, &chosen, &target)?;
+    let chosen_points: Vec<_> = chosen
+        .iter()
+        .map(|&i| point_json(words(&fb.points[i])))
+        .collect();
+    let columns: Vec<_> = chosen.iter().map(|&i| fb.signed_orbit_of[i].0).collect();
+    let result = json!({
+        "schema":"n83.k600-m6-model-replay/v2", "status":"PASS_ORIGINAL_XCNF_GROUP_AND_ROW_REPLAY",
+        "mode":mode,"source_commit":source_commit,"export_binary_sha256":exporter_binary_sha256,
+        "replay_binary_sha256":sha256_hex(&fs::read(std::env::current_exe()?)?),
+        "xcnf_sha256":export["xcnf_sha256"],"solver_stdout_sha256":receipt["stdout_sha256"],
+        "object_sha256":OBJECT_SHA256,"model_values_sha256":sha256_hex(&values),
+        "checked_cnf_clauses":clauses,"checked_xor_rows":xors,"target":export["target"],
+        "x_coordinates":xs.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "intermediate_x_coordinates":intermediate.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "chosen_indices":chosen,"chosen_points":chosen_points,"columns":columns,
+        "relation_row_decimal":relation.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "subgroup_order":base.curve.subgroup_order.to_string(),
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &result)?;
+    Ok(result)
+}
+
 pub(super) fn check_full_d18_export(root: &Path) -> Result<Value> {
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
@@ -4111,6 +4456,21 @@ mod tests {
     use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
     use std::collections::HashMap;
     use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn k600_native_replay_rejects_partial_and_false_xcnf_models() {
+        let formula = "p cnf 3 3\n1 -2 0\n3 0\nx -1 2 3 0\n";
+        let model = k600_model_values("s SATISFIABLE\nv 1 -2 3 0\n", 3).unwrap();
+        assert_eq!(model, [0, 1, 2, 1]);
+        k600_check_xcnf(formula, &model, 2, 1).unwrap();
+        assert!(k600_model_values("s SATISFIABLE\nv 1 -2 0\n", 3).is_err());
+        assert!(k600_model_values("s SATISFIABLE\nv 1 -2 3 3 0\n", 3).is_err());
+        assert!(k600_model_values("s UNSATISFIABLE\nv 1 -2 3 0\n", 3).is_err());
+        assert!(k600_check_xcnf(formula, &[0, 2, 2, 1], 2, 1).is_err());
+        assert!(k600_check_xcnf(formula, &[0, 1, 1, 1], 2, 1).is_err());
+        assert!(k600_check_xcnf(formula, &model, 3, 0).is_err());
+        assert!(k600_check_xcnf("p cnf 3 3\n1 -2 0\n3 0\nx -1 2 3\n", &model, 2, 1).is_err());
+    }
 
     #[test]
     fn packed_model_uses_low_bit_first_and_zero_padding() {
