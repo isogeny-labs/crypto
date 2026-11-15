@@ -1,3 +1,21 @@
+# Complete downstream fixed Jacobian chain; genuine22 and cost successor next
+
+pcc/claims/PCC-20261115-db6ba2.json: exact committedconsumer67a90fd7 mirrors fullnativeed33ef at161c5bab/exactcheckpoint12; all13phases/testworker/supervisor0/all695whole records/fourwholeomissions101/noacceptedoutputs/all1080guards/actualbytes. Full672exceptional×twooutgoing/all4halves/cofactorsectors/144mixed/120public/96additionpairsperundirectedpair/fullnorm13-169/inverses/independentellipticchecks pass. All3route outputs exact, retainedlift removes apparentdirect halvinggain;48selectedcounts unpriced. [pcc:unverified]
+
+## What was done
+Consumer67a publishes actualnativeed33ef and inspected report7e4229(58,309B/two pages), earliergeometrysnapshot67ab12(52,872B/two pages), conditional13roots/bothoriginalgates/allbindings e89f97/3805e2 and exact24thCIab17f7(182memberZIP/fulljoblog/all37phases/20roots20bindings/actualCIauditor). Rootoriginal343core inputs remainimmutable. Original D12/D24/D67/oldprime/coldcensus/root-main negatives preserved. [pcc:unverified]
+
+## Decisions made
+25d29e NORM_POINT_REUSE_PROTOCOL_01 is publishedBEFORE optimizedcode: retainfinalellipticpointZ and useN(Phi(Z))=[2]Z; full695whole parity exceptexactprospective48countertransforms/allfiniteinputs unchanged. Jacobian norm13/169 is not geometricdegree13/169; underHLPquotient/descent the geometricdegreesare13³/169³. Fullprimitiveaccounting/calibratedadmission/actualgeometry-program bridges remainopen; no oldprime twistlog or advantageclaim. [pcc:unverified]
+
+## Open threads
+Prepare genuineNEW22 overall14wholeclosedct82scientificroots andallclosedcontrols, actualsource/exes/fullpreparedcopies/failures/whole695fixture-stdout/CI/checkpoints/reports/drafts, retaining all42866previouskeys162links withdeclared releasedmetadata+appendonlyledgerprefix. Ordered32MiBparts beforeGit100MiB; excludealreadygenuine21archive/parts fromrecursivecapture, preservepublicationmetadata. Original publisherreplays BEFOREbot/exactchangedpaths/wholeguard+ownedbytes/normalFF-artifact-wiring required beforeholdrelease. Then additive25fullreplay(old24unchanged), additive norm-point reuse under25d29e, completeprimitive setup/reusecensus andseparateendpoint/factorbase/original-prime primaryreviews. No optimizedcodewrittenyet. [pcc:unverified]
+
+## Errors
+Original19GH001/EOFcached-whitespace2/proofabsolute-pathFAIL_build/fourE0599testcalls/PDFtextclassification2 andallfailurebytes preserved; correctedbuilds/reportattributes/originalchecks pass. Closedexacthardlinks preservebytes/path/modes afterindependentchecks; obsolete rootthirdpartyrmeta only50entries269026419B removedoutsideallguards/PCCsubjects, currentct57/ct80/raw/exes/preparedcopies preserved. CI logTransportClosed×2/job403 recoveredviawhole-run-logZIP0, no privateURLs published. Mainledger/signing/review/conflict/clock-rootCI/KB-vault/calibratedbenchmarkadmission remainopen; continuequeue. [pcc:unverified]
+
+---
+
 # Genuine21 settled; complete fixed Jacobian-chain implementation next
 
 pcc/claims/PCC-20261115-2e7b0f.json/pcc/claims/PCC-20261115-991276.json: original43661406081/job132651320244SUCCESS/FIVEremote replays BEFOREdb435e1b/direct43996852/exact7paths. ALL42866guards/162links/ownedbytes andwhole61501328Barchive/all1662members/14declaredwholesci roots preserved; normalfetch-FF-artifact-wiring0/HOLD21RELEASED. All40443prior keys/150oldlinks/old2850ledgerprefix retained withdeclaredmetadataupdates, prior20genuinepayloads remainexactwithoutrecursivecapture. TWOexactcanonicalmanifestentries/ONEplainGitwholefive-recordcontrol/THREErelativealiases. [pcc:unverified]
