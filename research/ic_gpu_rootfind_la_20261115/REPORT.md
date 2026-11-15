@@ -30,7 +30,10 @@ The first launch (17:07Z) failed at pod creation (account balance; record
 `20261115T1854Z-ic-gpu-rootfind-la-r2`, two launches failed at the upload (HTTP 404 just after the pod
 reported ready; each pod deleted at once, nothing ran); the launcher then waited and retried
 (`8c5ae6a512`, measured commit), and the third ran: one A100 80GB PCIe pod, cgroup quota 13.6 CPUs,
-19:16–19:39Z, deleted. Daemon start 0.242 s. Raw `raw/out_rla.tgz` (sha256 in `raw/out_rla.tgz.sha256`);
+19:16–19:39Z, deleted. Daemon start 0.242 s. `benchrec` refuses "measured" for a record holding failed
+commands, so `20261115T1854Z-ic-gpu-rootfind-la-r2` is closed censored and the measurement is recorded
+in `20261115T2002Z-ic-gpu-rootfind-la-r3`, whose command is the analysis of the sha256-checked tarball
+(r2's summary names that record "1955Z", which is wrong; it cannot be amended). Raw `raw/out_rla.tgz` (sha256 in `raw/out_rla.tgz.sha256`);
 tables `RESULTS.md`, `results.json`; `band.json` (`ecbench band`, default reading); `analyze.py`.
 
 ## Results [pcc:unverified]
