@@ -8,9 +8,9 @@ Let E/F128 be ordinary, let t=129-#E(F128), and set A=Res_(F128/F2) E. A smooth 
 
 `t ∈ {-15,-13,-9,-1,1,9,13,15}`.
 
-For each of these eight traces, the census finds exactly one F2-isomorphism class. In the published n=7 W1 source family, the trace set is `{-17,-15,-9,-7,-1,1,7,9,15,17}`. Hence its genus-seven hyperelliptic route exists at `±15, ±9, ±1` and is excluded at `±17, ±7`. The `±9` source classes occur only in the nonclassical W1 coefficient slice of the q=2 census; they are new **geometry candidates in this bounded audit**, not a new GHS family or a demonstrated vulnerability. The `±13` hyperelliptic classes are outside the observed W1 source trace set.
+For each of these eight traces, the census finds exactly one F2-isomorphism class. In the published n=7 W1 source family, `Tr(a)=1`; the q=2 W1 trace set is `{-17,-9,-1,7,15}`. Its genus-seven hyperelliptic isogeny-class screen passes at `{-9,-1,15}` and excludes `{-17,7}`. The trace `+9` comes from `a=0`, so it is a published W0 source with a direct genus-seven Hess descent witness. The `−9` W1 class remains an isogeny-class geometry lead, not a new GHS family or a demonstrated vulnerability. The `±13` hyperelliptic classes are outside the observed W1 source trace set.
 
-In the frozen 112-equation source census, the trace bins have 14 equations at `±15` combined, 42 at `±9`, 28 at `±1`, and 28 at `±17,±7` combined. Thus 84 of 112 exact source equations pass this genus-seven hyperelliptic **isogeny-class existence** screen, while 28 fail it. These are equation counts in the fixed field representation, not counts of distinct isomorphism classes or curves with an explicit subgroup transfer.
+The frozen 112-equation census paired each of 56 coefficient values with both `a=0` and `a=1`; it was not a 112-equation W1 census. Exactly 56 rows have `Tr(a)=1` and are W1. Among these, 42 pass the genus-seven hyperelliptic **isogeny-class existence** screen (21 with trace −9, 14 with trace −1, and 7 with trace +15), and 14 fail it (7 each with trace −17 and +7). These are equation counts in the fixed field representation, not counts of distinct isomorphism classes or curves with an explicit subgroup transfer.
 
 ## Reduction and proof boundary
 
@@ -28,14 +28,14 @@ The seven point counts determine a genus-seven zeta numerator by Newton identiti
 
 Bits of each hexadecimal polynomial encode coefficients of x^i. All models are over F2, have `y²+v(x)y=u(x)`, and have the displayed `N_7`; their `N_m` for m=1,...,6 are 3,5,9,17,33,65.
 
-| t | v | u | N7 | W1 source trace |
+| t | v | u | N7 | Paired-census source status |
 |---:|:---|:---|---:|:---|
-| −15 | `0xab` | `0x800b` | 234 | yes, classical |
+| −15 | `0xab` | `0x800b` | 234 | a=0 twist; not W1 |
 | −13 | `0xb9` | `0xc020` | 220 | no |
-| −9 | `0x8f` | `0xc07a` | 192 | yes, nonclassical only |
+| −9 | `0x8f` | `0xc07a` | 192 | W1; nonclassical coefficient slice |
 | −1 | `0x91` | `0xc02d` | 136 | yes, shared |
-| 1 | `0x91` | `0x800a` | 122 | yes, shared |
-| 9 | `0x8f` | `0x802f` | 66 | yes, nonclassical only |
+| 1 | `0x91` | `0x800a` | 122 | a=0 twist; not W1 |
+| 9 | `0x8f` | `0x802f` | 66 | W0; direct Hess genus-seven route |
 | 13 | `0xb9` | `0x8051` | 38 | no |
 | 15 | `0xab` | `0xc004` | 24 | yes, classical |
 
@@ -47,7 +47,7 @@ This classification concerns exact seven-dimensional hyperelliptic Jacobian isog
 
 ## Prior-work and proof map
 
-The source **W1 family** and its classical genus-seven GHS slice are in [Menezes–Teske (2004/2006), Section 5.2](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf). The finite hyperelliptic enumeration method and smoothness criterion are in [Borodin–May (2025), Section 4](https://arxiv.org/pdf/2508.16886); their [code repository](https://github.com/bmatvey/char_2_hyperelliptics) gives a general enumeration implementation. The local research corpus already posed genus-n Jacobians in the Weil-restriction isogeny class as `LEAD-TRF-weil-restriction-jacobian-class`. An earlier internal study at `origin/main:research/ic_next10_20261014/10-torelli-toy/README.md` explicitly listed the +13 genus-seven witness `v=0xb9,u=0x8051`, so the ±13 carrier class is a rediscovery. Focused searches of the primary sources, local corpus, and exact polynomial/trace web queries found no prior statement of the **±9 F2 W1 trace split**; this is a bounded search, not proof of publication priority. The predecessor's all-model enumeration may have traversed the ±9 equations without identifying their W1 source trace. The ±9 equations could be new exact models or alternate coordinates for previously known models. Their isogeny class is a geometry candidate within the existing W1 family, not a new eligible family or attack method.
+The source **W0 and W1 families** and their genus-seven and genus-fourteen direct GHS curves are in [Menezes–Teske (2004/2006), Sections 5.1–5.2](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf). The finite hyperelliptic enumeration method and smoothness criterion are in [Borodin–May (2025), Section 4](https://arxiv.org/pdf/2508.16886); their [code repository](https://github.com/bmatvey/char_2_hyperelliptics) gives a general enumeration implementation. The local research corpus already posed genus-n Jacobians in the Weil-restriction isogeny class as `LEAD-TRF-weil-restriction-jacobian-class`. An earlier internal study at `origin/main:research/ic_next10_20261014/10-torelli-toy/README.md` explicitly listed the +13 genus-seven witness `v=0xb9,u=0x8051`, so the ±13 carrier class is a rediscovery. Focused searches of the primary sources, local corpus, and exact polynomial/trace web queries found no prior statement of the **−9 F2 W1 hyperelliptic isogeny-class match**; this is a bounded search, not proof of publication priority. The predecessor's all-model enumeration may have traversed the ±9 equations without identifying the −9 W1 source trace. The +9 direct descent is already published W0. The −9 equation could be a new exact model or alternate coordinates for a previously known model. Its isogeny-class match is a geometry candidate within the existing W1 family, not a new eligible family or attack method.
 
 | Statement | Lean declaration or evidence | Status |
 |:---|:---|:---|

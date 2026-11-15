@@ -1,0 +1,26 @@
+P<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^7+x+1>;
+E := EllipticCurve([K | 1, 0, 0, 0, z^3]);
+assert #E eq 120;
+assert WeilDescentGenus(E, GF(2), z) eq 7;
+C, h := WeilDescent(E, GF(2), z);
+print "curve_type", Type(C);
+print "curve_genus", Genus(C);
+print "curve", C;
+found := false;
+for pt in Points(E) do
+    if Order(pt) eq 5 then
+        image := h(pt);
+        print "point", pt;
+        print "point_order", Order(pt);
+        print "image_type", Type(image);
+        if Type(C) eq CrvHyp then
+            J := Jacobian(C);
+            print "five_image_zero", 5*image eq J!0;
+            print "image_zero", image eq J!0;
+        end if;
+        found := true;
+        break;
+    end if;
+end for;
+assert found;
