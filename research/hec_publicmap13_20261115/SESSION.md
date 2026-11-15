@@ -18,3 +18,9 @@ and complete cost comparison, retaining genus2/4 scope.
 
 ## Errors
 None so far. Scoped taskT-6235 epoch1; shared resume untouched.
+
+## V1 execution failure
+Frozenb20b27da82a9/checkpoint163337 ran once, exit101: B=2*(0,44) equals fixtureD1.
+JET controls passed; no mapping executed. RUN.txt/RUN.stderr preserved, not rerun.
+Decision: separateV2source/protocol uses2*factor_base[1] with inequivalence
+assertion, fixed before its execution. No mapper/formula change.
