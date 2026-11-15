@@ -4,7 +4,7 @@
 - **Kind:** unresolved algorithm and complexity proof; separate cloud execution limit
 - **Affected work:** [prime-field research continuation](../research/prime_one_shot_20261029/continuation/README.md)
 - **Next action owner:** prime-field divisor-system research lane
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-15
 
 ## Problem
 
@@ -25,11 +25,22 @@ precomputation advantage or fixed-size speed claim.
 
 ## Evidence and uncertainty
 
+- **New algebraic implementation (2026-11-15):** the
+  [shared norm prototype](../research/shared_norm_algebraic_20261115/README.md)
+  replaces the old coefficient census with native msolve/FLINT solving and
+  successive-coordinate dual-quotient extraction. Both the original and
+  witness-pruned encodings match90 complete tiny model sets (400 models)
+  and recover18 cold point-only targets with separate OpenSSL replay.
+  The m5,t3 control completes; denser m5/t4 and m7/t4 controls remain unknown
+  at their frozen20s caps in both encodings. These exact software controls
+  establish neither an efficient growing-family solver nor useful-target
+  yield. PCC-20261115-be28ec is unverified. [pcc:unverified]
 - **Observed:** [native solver](../research/prime_one_shot_20261029/continuation/solver/README.md)
   exactly matches90 complete model sets/400 models on E/F17 of order19.
   Actual direct mixed-target IC solves all18 nonzero targets through both
   point-only API and separate CLI. Independent native record replay passes.
-  The current PDP visits p(p-1) coefficient pairs; it is exponential.
+  That earlier PDP visits p(p-1) coefficient pairs; it is exponential. The new
+  algebraic prototype removes that loop but has no adequate proved cost bound.
 - **Derived:** scoped rationality, selected-chart coverage, finite reducedness
   and mixed-target nullspace recovery are supported by the continuation's
   written proofs and independent reviews. They leave a precise conditional
@@ -112,6 +123,12 @@ asymptotic proof.
   construction, or verified scientific compute availability.
 
 ## Resolution and history
+
+2026-11-15: added the complete fixed-fixture algebraic path, independent
+arithmetic replay and a witness-pruned encoding. The supporting separability
+and norm-coprimality laws were built in the shared Lean library; degree-bounded
+witness lifting and the full circuit endpoint remain outside that formalization.
+No source-ideal/cost/yield contract closes this problem. [pcc:unverified]
 
 2026-10-30: recorded after complete tiny unknown solving and supporting coverage
 proofs. Subsequently weakened the sufficient solver contract to permit selective

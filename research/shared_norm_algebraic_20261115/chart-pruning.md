@@ -55,6 +55,7 @@ remain scoped and unresolved. Qi Cheng's [primary paper](https://arxiv.org/abs/c
 proves randomized subset-sum hardness for particular elliptic AG-code families
 with exponential alphabet size. It is not a barrier for the structured PKM
 factor bases, nor a proof that every decoding approach fails.
+[pcc:unverified]
 
 ## Formalization map / instance gate
 
@@ -76,3 +77,42 @@ No `lake build`, axiom audit or independently certified theorem is reported.
 The written projection argument and complete-set software controls are the
 current evidence; general solver complexity and the original goal remain open.
 [pcc:unverified]
+
+### Declaration search and pinned formalization attempt
+
+Inspected shared library commit818752990869b72a89d236bd28eb1e148cc7b424,
+Mathlibcfc55fc58714a59dc06e6e79edc6d1d95140d3c2 and its toolchain
+leanprover/lean4:v4.35.0. Existing declarations to instantiate are
+`Polynomial.separable_X_pow_sub_C`, `Polynomial.Separable.of_dvd`,
+`Polynomial.separable_X_sub_C`, `Polynomial.Separable.mul`,
+`Polynomial.Separable.squarefree`, `Squarefree.squarefree_of_dvd`,
+`Squarefree.dvd_pow_iff_dvd` and `isRelPrime_iff_isCoprime`.
+
+The assembly probe first targets separability of U and (X-r)U from actual
+membership and target separation, using these laws unchanged. The one missing
+shared-law candidate is: a squarefree divisor U of a squarefree norm
+A^2-f C^2 is relatively prime to C. It is to live in
+`CryptoLean.Polynomial.NormCharts` over `Polynomial K`, not as a study copy.
+Its consumer is the witness-pruning chart discharge. Only the `Squarefree`
+and `IsRelPrime` predicates are opened once in that generic law; their
+contracts are common-square-factor cancellation and common-divisor units.
+No monic-division or curve internals need unfolding. Degree-bounded Bezout
+witness lifting and the complete retained-chain endpoint remain separate
+unformalized obligations even if that central law checks.
+
+### Completed supporting-law check
+
+Shared source `ad93dea` (full pin in proof-dependencies.json),
+[crypto-lean PR6](https://github.com/aburan28/crypto-lean/pull/6), now supplies
+`CryptoLean.Polynomial.isRelPrime_of_squarefree_norm` and
+`CryptoLean.Polynomial.kummer_norm_charts`. Focused build and axiom audit pass;
+the unchanged full-library proof gate passes98 theorems, zero failing and zero
+trusted native proofs. Both new laws use only propext,Classical.choice,Quot.sound.
+The actual membership, nonzero c/d and target separation imply the supporting
+charts; the endpoint does not assume those conclusions. [pcc:unverified]
+
+This completes the generic separability/coprimality part of the attempt. It
+supersedes the earlier pending tool/declaration status, while preserving it as
+history. The bounded Bezout-coordinate lifting and retained-chain assembly are
+still written arguments here, not completed Lean endpoints. The full projection,
+backend cost and end-to-end research theorem remain open. [pcc:unverified]
