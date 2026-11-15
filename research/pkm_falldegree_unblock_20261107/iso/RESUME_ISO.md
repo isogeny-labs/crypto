@@ -24,8 +24,7 @@ Exact rules: `research/pkm_falldegree_unblock_20261107/AMENDMENT_R4_ISOGENY_P1.m
 - Local integration of `g1 gaux` passes on pre-guard runners; a tampered pin is refused.
 - Owner decisions, 2026-11-14 ("Yes to all"): decision 4's ceilings (US$40 per job, US$400 for the study) apply to reserved
   pods, and the RunPod balance covers the spend.
-- Blocked: S3. This session has no working AWS credentials, so the checkpoint push and the artifact upload of `705b151b…`
-  cannot happen.
+- S3 replaced by git (owner decision 12, Amendment 17). 16-vCPU pods and a 120,000 s limit (Amendment 18).
 
 ## Next steps
 1. With S3 working: upload `705b151b…` to the artifact store; push this checkpoint; `benchrec.py init` a record for `iso-a`.
@@ -35,7 +34,11 @@ Exact rules: `research/pkm_falldegree_unblock_20261107/AMENDMENT_R4_ISOGENY_P1.m
 5. Run `iso/recount.py` with a naive_count build; run `iso/score_iso.py`. Run the X bracket jobs only where `d_F` is undecided.
 
 ## Runs in flight
-None. No pod has been created and no `P1` isogeny row exists.
+- `iso-a`: pod `w3ao0j8mfsiasz` (16 vCPU, reserved, EU-RO-1, US$1.04/h), started 2026-11-15 04:21:38Z, limit 120,000 s
+  (Amendment 18). Stages `g1 gaux A A-big DA g3 cert cap-A`. `g1` and `gaux` passed on the pod by 04:21:53Z.
+- Pod token: in the session scratchpad, not in git. A fresh session cannot reach this pod's runner. It can only watch the pod
+  with the RunPod API (`rp.sh pod`) and delete it.
+- Receipt: `results/ISO/iso-a/LAUNCH.md`. Fetches go to `results/ISO/iso-a/` (Amendment 17).
 
 ## Stop and success conditions
 Stop on: any gate failure (G-AUX, G1, G2, G3); a Mestre panic; a scorer STOP (exit 2); a recount mismatch; a cost refusal.
