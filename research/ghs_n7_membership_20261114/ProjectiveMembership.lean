@@ -14,13 +14,14 @@ namespace GHSN7
 
 variable {K C : Type}
 variable (mul : K → K → K) (scale : C → K → K)
-variable (First Second Representative UnitScalar : K → Prop)
+variable (First Second Representative : K → Prop)
 variable (ScalarUnit : C → Prop)
 
-def Direct (z : K) : Prop :=
+def Direct (mul : K → K → K) (First Second : K → Prop) (z : K) : Prop :=
   ∃ v w, First v ∧ Second w ∧ z = mul v w
 
-def Projective (z : K) : Prop :=
+def Projective (mul : K → K → K)
+    (Representative Second : K → Prop) (z : K) : Prop :=
   ∃ r w, Representative r ∧ Second w ∧ z = mul r w
 
 theorem projective_iff_direct
@@ -30,7 +31,7 @@ theorem projective_iff_direct
     (second_scaled : ∀ c w, ScalarUnit c → Second w →
       ∃ w', Second w' ∧ ∀ r, mul (scale c r) w = mul r w')
     (z : K) :
-    Projective mul Second Representative z ↔
+    Projective mul Representative Second z ↔
       Direct mul First Second z := by
   constructor
   · rintro ⟨r, w, hr, hw, hz⟩
