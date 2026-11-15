@@ -164,6 +164,108 @@ fn m4_first_eliminant(k: &[u64], t: u64) -> Result<(Pol,bool),String> {
     Ok((d,exceptional))
 }
 
+// Deterministic, capped Cantor-Zassenhaus style splitting for known
+// squarefree, completely Fp-split gcd factors. A cap is an explicit failure,
+// not a zero-relation result. Input factors come from the coordinate algebra.
+fn powmod_poly(mut b: Pol, mut e: u64, f: &[u64]) -> Pol {
+    let mut r=vec![1];
+    b=rem(&b,f);
+    while e>0 {
+        if e&1!=0 { r=mprod(&r,&b,f); }
+        b=mprod(&b,&b,f);
+        e>>=1;
+    }
+    r
+}
+fn split_linear_roots(f: &[u64], remaining_depth: usize) -> Result<Vec<u64>,String> {
+    if f.len()<=1 { return Ok(Vec::new()); }
+    if f.len()==2 {
+        return Ok(vec![mul(sub(0,f[0]),power(f[1],P-2))]);
+    }
+    if remaining_depth==0 { return Err("m4 root factorization depth cap".into()); }
+    let deriv:Pol=trim(f.iter().enumerate().skip(1)
+        .map(|(i,&v)| mul((i as u64)%P,v)).collect());
+    if gcd(f.to_vec(),deriv).len()>1 {
+        return Err("m4 root factor has repeated roots".into());
+    }
+    for shift in 0..128u64 {
+        let xshift=vec![shift,1];
+        let z=powmod_poly(xshift.clone(),(P-1)/2,f);
+        // Include zero, nonzero squares and non-squares. Any nontrivial
+        // factor is valid; retaining every branch makes splitting exact.
+        for divisor in [&xshift[..], &diff(&z,&[1]), &sum(&z,&[1])] {
+            let g=gcd(f.to_vec(),divisor.to_vec());
+            if g.len()<=1 || g.len()>=f.len() { continue; }
+            let (q,r)=divrem(f,&g);
+            if !r.is_empty() { return Err("nonexact m4 factor split".into()); }
+            let mut roots=split_linear_roots(&g,remaining_depth-1)?;
+            roots.extend(split_linear_roots(&q,remaining_depth-1)?);
+            roots.sort_unstable();
+            roots.dedup();
+            return Ok(roots);
+        }
+    }
+    Err("m4 root split cap reached; undetermined".into())
+}
+
+fn m4_extract_pairs(xs: &[u64], k: &[u64], t: u64)
+    -> Result<(Vec<(u64,u64)>,Vec<[usize;4]>),String>
+{
+    let (d,_)=m4_first_eliminant(k,t)?;
+    let u_roots=split_linear_roots(&d,32)?;
+    let mut uv=Vec::new();
+    let mut raw=Vec::new();
+    for u in u_roots {
+        let vpoly=gcd(k.to_vec(),s3_scalar(u,t));
+        for v in split_linear_roots(&vpoly,32)? {
+            if eval(&s3_scalar(u,v),t)!=0 {
+                return Err("m4 resultants emitted invalid central S3 root".into());
+            }
+            uv.push((u,v));
+            let left:Vec<(usize,usize)>=(0..xs.len())
+                .flat_map(|i| (i..xs.len()).map(move |j| (i,j)))
+                .filter(|&(i,j)| eval(&s3_scalar(xs[i],xs[j]),u)==0)
+                .collect();
+            let right:Vec<(usize,usize)>=(0..xs.len())
+                .flat_map(|i| (i..xs.len()).map(move |j| (i,j)))
+                .filter(|&(i,j)| eval(&s3_scalar(xs[i],xs[j]),v)==0)
+                .collect();
+            for &(i,j) in &left {
+                for &(l,m) in &right { raw.push([i,j,l,m]); }
+            }
+        }
+    }
+    uv.sort_unstable();uv.dedup();
+    raw.sort_unstable();raw.dedup();
+    Ok((uv,raw))
+}
+
+// All ordinate/group operations are quarantined to this final semantic
+// verifier. The algebraic discovery above receives only (K, xs, x_R).
+fn m4_signed_lifts(base: &Base,target: Point,tuples: &[[usize;4]],
+                   ar: &mut Arithmetic)->Vec<Vec<(usize,i32)>>
+{
+    let mut rows=Vec::new();
+    for ids in tuples {
+        for mask in 0..16u8 {
+            let mut sum=None;
+            let mut entries=Vec::new();
+            for (j,&i) in ids.iter().enumerate() {
+                let sign=if mask&(1<<j)==0 {1} else {-1};
+                let mut pt=Some(base.points[i]);
+                if sign<0 {pt=ar.neg(PRIME31,pt);}
+                sum=ar.add(PRIME31,sum,pt);
+                entries.push((i,sign));
+            }
+            if sum==target {
+                entries.sort_unstable();
+                rows.push(entries);
+            }
+        }
+    }
+    rows.sort_unstable();rows.dedup();rows
+}
+
 fn m4_preview(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
     use std::time::Instant;
     if base.points.len()<4 { return Err("m4 preview requires B>=4".into()); }
@@ -195,6 +297,15 @@ fn m4_preview(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
     if positive.len()!=7 || negative.len()!=1 {
         return Err("frozen m4 B4 projection positive/negative degrees changed".into());
     }
+    let (uvpos,rawpos)=m4_extract_pairs(&xs[..4],&k4,planted.0)?;
+    let validation_start=ar.counts.group_additions;
+    let rowspos=m4_signed_lifts(base,Some(planted),&rawpos,ar);
+    let validation_adds=ar.counts.group_additions-validation_start;
+    let (uvneg,rawneg)=m4_extract_pairs(&xs[..4],&k4,public.0)?;
+    let rowsneg=m4_signed_lifts(base,Some(public),&rawneg,ar);
+    if uvpos.len()!=6 || rowspos.len()!=1 || !rowsneg.is_empty() {
+        return Err("m4 algebraic extraction or signed EC replay mismatch".into());
+    }
     println!("{}",json!({
         "standing":"[pcc:unverified]",
         "study":"m4 finite pair-support resultant; algebraic membership only",
@@ -204,17 +315,24 @@ fn m4_preview(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
         "pair_support_B31_build_ns":b31_support_ns,
         "pair_support_B4_degree":k4.len()-1,
         "positive_eliminant_degree":positive.len()-1,
+        "positive_ordered_uv":uvpos.len(),
+        "positive_four_index_tuples":rawpos.len(),
+        "positive_signed_rows":rowspos.len(),
+        "positive_validation_group_additions":validation_adds,
         "positive_target":planted,
         "positive_exceptional":positive_exception,
         "positive_eliminant_ns":positive_ns,
         "public_17G_target":public,
         "public_eliminant_degree":negative.len()-1,
+        "public_ordered_uv":uvneg.len(),
+        "public_four_index_tuples":rawneg.len(),
+        "public_signed_rows":rowsneg.len(),
         "public_exceptional":negative_exception,
         "public_eliminant_ns":negative_ns,
         "known_ordinates_in_polynomial_stage":false,
         "known_group_sums_in_polynomial_stage":false,
-        "candidate_factorization_performed":false,
-        "signed_relation_extraction_performed":false,
+        "candidate_factorization_performed":true,
+        "signed_relation_extraction_performed":true,
         "complete_ECDLP_recovery":false
     }));
     Ok(())
@@ -457,6 +575,10 @@ mod tests {
         let (d,exc)=m4_first_eliminant(&k,t.0).unwrap();
         assert!(!exc);
         assert_eq!(d.len()-1,6);
+        let (uv,tuples)=m4_extract_pairs(&xs,&k,t.0).unwrap();
+        assert_eq!(uv.len(),6);
+        let rows=m4_signed_lifts(&base,Some(t),&tuples,&mut ar);
+        assert_eq!(rows,vec![vec![(0,1),(1,1),(2,1),(3,1)]]);
         let public=ar.scalar(PRIME31,17,Some(PRIME31.g)).unwrap();
         let (d,exc)=m4_first_eliminant(&k,public.0).unwrap();
         assert!(!exc);
