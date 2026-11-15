@@ -1,4 +1,8 @@
 #[allow(dead_code)]
+mod weil_recovery {
+    include!("weil_recovery.rs");
+}
+#[allow(dead_code)]
 mod previous {
     include!("../hec_weil13_20261115/main.rs");
     include!("../hec_theta13_20261115/gate.rs");
@@ -9,7 +13,7 @@ mod previous {
     include!("../hec_coldbuild13_20261115/map_dynamic.rs");
     include!("../hec_coldbuild13_20261115/pipeline_dynamic.rs");
     include!("../hec_coldbuild13_20261115/pair_dynamic.rs");
-    include!("../hec_coldcost13_20261115/builder_bench.rs");
+    include!("builder.rs");
     include!("cold_api.rs");
 }
 #[allow(dead_code)]
