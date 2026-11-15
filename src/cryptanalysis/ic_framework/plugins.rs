@@ -2986,6 +2986,10 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         }
         m
     }
+
+    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        WWalkOracle::recovery_ladder(self)
+    }
 }
 
 /// `wwalk`'s `cv` parameter: absent or `1` recomputes every key collision
@@ -3154,10 +3158,6 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
 
     fn line_guard(&self) -> bool {
         self.lines
-    }
-
-    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
-        WWalkOracle::recovery_ladder(self)
     }
 }
 
