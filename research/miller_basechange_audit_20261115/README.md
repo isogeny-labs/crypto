@@ -33,3 +33,5 @@ This closes the actual constant-field function embedding, infinity normalization
 Both report drafts are retained in the [lossless report-draft archive](evidence/report-drafts.tar.xz) with its [inventory](evidence/report-drafts.json): the first spills onto a second page; the second one-page draft used stale archive statistics after an over-limit metadata packaging attempt. The final report has corrected statistics. These are report/provenance errors, not additional formal build states. [pcc:unverified]
 
 Exact local **PCC-20261115-b11451** replay PASS at 2026-11-15T10:06:31Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `dc1cf3f4886d783e729157ec4d2dc16f72cc9f3d` and local receipt `346bac2254996a66e5a6a17d1499926c90f68912` share tree `092458c6f03f22115a22c239311bed5930df9b3a`. Anonymous fetch completed; fresh PR head/body/open/ready check matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
