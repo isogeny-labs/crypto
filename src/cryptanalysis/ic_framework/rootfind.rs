@@ -278,7 +278,12 @@ impl<E> Default for RowBufs<E> {
 /// pairs: `R − P_k` carries `k`'s own index, `R + P_k` the index of `−P_k`,
 /// so that `R = P_{index} + (the returned point)` in both cases.  The
 /// pairs are left in `bufs.out`.
-fn row_points<G: PairedAdd>(
+///
+/// `BATCHED` selects the adder at compile time: a runtime flag here made
+/// every instantiation reach both `add_many` and `add_many_batched`, which
+/// cost the serial oracles about 0.9% more instructions in the pairs solve
+/// (crypto #3991, Callgrind on `ic-rf-pairs`, audit-ir seq 41/51/61).
+fn row_points<G: PairedAdd, const BATCHED: bool>(
     g: &G,
     reps: &Reps<G::Elt>,
     fb: &FactorBase<G::Elt>,
@@ -288,13 +293,12 @@ fn row_points<G: PairedAdd>(
     from: usize,
     to: usize,
     bufs: &mut RowBufs<G::Elt>,
-    batched: bool,
 ) {
     let add = |ops: &mut GroupOps,
                counters: &mut OracleCounters,
                qs: &[G::Elt],
                out: &mut Vec<G::Elt>| {
-        if batched {
+        if BATCHED {
             g.add_many_batched(ops, counters, r, qs, out);
         } else {
             g.add_many(ops, counters, r, qs, out);
@@ -463,18 +467,11 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
         let mut from = 0;
         while from < a {
             let to = (from + BLOCK).min(a);
-            row_points(
-                g,
-                reps,
-                fb,
-                ops,
-                counters,
-                point,
-                from,
-                to,
-                &mut self.bufs,
-                self.batched,
-            );
+            if self.batched {
+                row_points::<G, true>(g, reps, fb, ops, counters, point, from, to, &mut self.bufs);
+            } else {
+                row_points::<G, false>(g, reps, fb, ops, counters, point, from, to, &mut self.bufs);
+            }
             for &(k, s) in &self.bufs.out {
                 if g.is_identity(&s) {
                     continue;
@@ -586,35 +583,13 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindPairsOracle<G::Elt> {
         let g = ctx.group;
         let reps = self.reps.as_ref()?;
         let a = reps.index.len();
-        row_points(
-            g,
-            reps,
-            fb,
-            ops,
-            counters,
-            point,
-            0,
-            a,
-            &mut self.rows,
-            false,
-        );
+        row_points::<G, false>(g, reps, fb, ops, counters, point, 0, a, &mut self.rows);
         for &(si, u) in &self.rows.out {
             if g.is_identity(&u) {
                 continue;
             }
             let from = self.position[&si];
-            row_points(
-                g,
-                reps,
-                fb,
-                ops,
-                counters,
-                u,
-                from,
-                a,
-                &mut self.cands,
-                false,
-            );
+            row_points::<G, false>(g, reps, fb, ops, counters, u, from, a, &mut self.cands);
             for &(sj, c) in &self.cands.out {
                 counters.lookups += 1;
                 if g.is_identity(&c) {

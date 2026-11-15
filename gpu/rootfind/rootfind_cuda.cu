@@ -251,6 +251,7 @@ static int run_device(const typename F::ctx &f,
 
     a.f = f;
     a.fb_x = d_fbx; a.fb_y = d_fby; a.n_fb = n_fb;
+    a.probe_x = d_fbx; a.probe_mode = 0;
     a.t_x = d_tx; a.t_y = d_ty; a.n_targets = n_targets;
     a.out = d_out; a.out_count = d_cnt; a.out_cap = cap;
 
@@ -332,8 +333,8 @@ extern "C" int rf_cuda_decompose256(const Fp256Ctx *f,
 struct RfCudaSession64 {
     Fp64Ctx f;
     int lookup;
-    uint32_t chunk, n_fb, max_targets, cap, hcap;
-    uint64_t *d_fbx, *d_fby, *d_tx, *d_ty, *d_keys, *d_aux64;
+    uint32_t chunk, n_fb, max_targets, cap, hcap, n_probe;
+    uint64_t *d_fbx, *d_fby, *d_tx, *d_ty, *d_keys, *d_aux64, *d_px;
     uint32_t *d_idx, *d_aux32, *d_cnt;
     rf_relation *d_out;
     SortedTable sview;
@@ -347,7 +348,7 @@ extern "C" void rf_cuda_session64_destroy(void *h) {
     cudaGetLastError();
     cudaFree(s->d_fbx); cudaFree(s->d_fby); cudaFree(s->d_tx); cudaFree(s->d_ty);
     cudaFree(s->d_keys); cudaFree(s->d_aux64); cudaFree(s->d_idx); cudaFree(s->d_aux32);
-    cudaFree(s->d_cnt); cudaFree(s->d_out);
+    cudaFree(s->d_cnt); cudaFree(s->d_out); cudaFree(s->d_px);
     if (s->e0) cudaEventDestroy(s->e0);
     if (s->e1) cudaEventDestroy(s->e1);
     delete s;
@@ -365,8 +366,11 @@ extern "C" void rf_cuda_session64_destroy(void *h) {
     } while (0)
 
 /* fb_x, fb_y: Montgomery form.  Returns RF_OK and *out = session. */
+/* probe_x (Montgomery form, n_probe entries) non-null: probe mode, the table is
+ * built on probe_x; null: the factor base, as rf64_decompose. */
 extern "C" int rf_cuda_session64_create(const Fp64Ctx *f, const uint64_t *fb_x, const uint64_t *fb_y,
-                                        uint32_t n_fb, int lookup, uint32_t chunk,
+                                        uint32_t n_fb, const uint64_t *probe_x, uint32_t n_probe,
+                                        int lookup, uint32_t chunk,
                                         uint32_t max_targets, uint32_t cap, void **out) {
     int rc = RF_OK;
     if (!rf::chunk_ok(chunk)) return RF_ERR_BAD_CHUNK;
@@ -374,11 +378,18 @@ extern "C" int rf_cuda_session64_create(const Fp64Ctx *f, const uint64_t *fb_x, 
     RfCudaSession64 *s = new RfCudaSession64();
     s->f = *f; s->lookup = lookup; s->chunk = chunk; s->n_fb = n_fb;
     s->max_targets = max_targets; s->cap = cap ? cap : 1;
+    s->n_probe = probe_x ? n_probe : 0;
     {
+        const uint64_t *tx_keys = s->n_probe ? probe_x : fb_x;
+        const uint32_t n_keys = s->n_probe ? s->n_probe : n_fb;
         rf::SortedTableHost sorted;
         rf::HashTableHost hash;
-        if (lookup == RF_LOOKUP_SORTED) sorted = rf::build_sorted<FieldFp64>(*f, fb_x, n_fb);
-        else hash = rf::build_hash<FieldFp64>(*f, fb_x, n_fb);
+        if (lookup == RF_LOOKUP_SORTED) sorted = rf::build_sorted<FieldFp64>(*f, tx_keys, n_keys);
+        else hash = rf::build_hash<FieldFp64>(*f, tx_keys, n_keys);
+        if (s->n_probe) {
+            CUS(rf_cu_alloc(&s->d_px, s->n_probe * sizeof(uint64_t)));
+            CUS(cudaMemcpy(s->d_px, probe_x, s->n_probe * sizeof(uint64_t), cudaMemcpyHostToDevice));
+        }
         CUS(rf_cu_alloc(&s->d_fbx, n_fb * sizeof(uint64_t)));
         CUS(rf_cu_alloc(&s->d_fby, n_fb * sizeof(uint64_t)));
         CUS(rf_cu_alloc(&s->d_tx, max_targets * sizeof(uint64_t)));
@@ -388,15 +399,15 @@ extern "C" int rf_cuda_session64_create(const Fp64Ctx *f, const uint64_t *fb_x, 
         CUS(cudaMemcpy(s->d_fbx, fb_x, n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
         CUS(cudaMemcpy(s->d_fby, fb_y, n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
         if (lookup == RF_LOOKUP_SORTED) {
-            CUS(rf_cu_alloc(&s->d_keys, n_fb * sizeof(uint64_t)));
-            CUS(rf_cu_alloc(&s->d_idx, n_fb * sizeof(uint32_t)));
-            CUS(rf_cu_alloc(&s->d_aux64, (n_fb + 1) * sizeof(uint64_t)));
-            CUS(rf_cu_alloc(&s->d_aux32, (n_fb + 1) * sizeof(uint32_t)));
-            CUS(cudaMemcpy(s->d_keys, sorted.keys.data(), n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
-            CUS(cudaMemcpy(s->d_idx, sorted.idx.data(), n_fb * sizeof(uint32_t), cudaMemcpyHostToDevice));
-            CUS(cudaMemcpy(s->d_aux64, sorted.eyt.data(), (n_fb + 1) * sizeof(uint64_t), cudaMemcpyHostToDevice));
-            CUS(cudaMemcpy(s->d_aux32, sorted.eyt_rank.data(), (n_fb + 1) * sizeof(uint32_t), cudaMemcpyHostToDevice));
-            s->sview.keys = s->d_keys; s->sview.idx = s->d_idx; s->sview.n = n_fb;
+            CUS(rf_cu_alloc(&s->d_keys, n_keys * sizeof(uint64_t)));
+            CUS(rf_cu_alloc(&s->d_idx, n_keys * sizeof(uint32_t)));
+            CUS(rf_cu_alloc(&s->d_aux64, (n_keys + 1) * sizeof(uint64_t)));
+            CUS(rf_cu_alloc(&s->d_aux32, (n_keys + 1) * sizeof(uint32_t)));
+            CUS(cudaMemcpy(s->d_keys, sorted.keys.data(), n_keys * sizeof(uint64_t), cudaMemcpyHostToDevice));
+            CUS(cudaMemcpy(s->d_idx, sorted.idx.data(), n_keys * sizeof(uint32_t), cudaMemcpyHostToDevice));
+            CUS(cudaMemcpy(s->d_aux64, sorted.eyt.data(), (n_keys + 1) * sizeof(uint64_t), cudaMemcpyHostToDevice));
+            CUS(cudaMemcpy(s->d_aux32, sorted.eyt_rank.data(), (n_keys + 1) * sizeof(uint32_t), cudaMemcpyHostToDevice));
+            s->sview.keys = s->d_keys; s->sview.idx = s->d_idx; s->sview.n = n_keys;
             s->sview.eyt = s->d_aux64; s->sview.eyt_rank = s->d_aux32;
         } else {
             s->hcap = hash.capacity();
@@ -440,6 +451,7 @@ extern "C" int rf_cuda_session64_run(void *h, const uint64_t *tx, const uint64_t
 #endif
     a.f = s->f;
     a.fb_x = s->d_fbx; a.fb_y = s->d_fby; a.n_fb = s->n_fb;
+    a.probe_x = s->n_probe ? s->d_px : s->d_fbx; a.probe_mode = s->n_probe ? 1u : 0u;
     a.t_x = s->d_tx; a.t_y = s->d_ty; a.n_targets = n_targets;
     a.out = s->d_out; a.out_count = s->d_cnt; a.out_cap = s->cap;
     CUS(cudaMemcpy(s->d_tx, tx, n_targets * sizeof(uint64_t), cudaMemcpyHostToDevice));
@@ -476,6 +488,11 @@ fail:
     return rc;
 }
 #undef CUS
+
+/* Create this process's CUDA context now (the daemon does, before it listens). */
+extern "C" int rf_cuda_warmup(void) {
+    return cudaFree(0) == cudaSuccess ? 0 : -1;
+}
 
 /* RF_PROFILE builds: reset and read the sampled phase cycles of
  * rf_decompose_thread (rootfind.cuh).  Return 0 on success, -1 when the
