@@ -230,6 +230,42 @@ fn main() -> Result<(),String> {
         "polynomial_input_uses_known_ordinates":false,
         "polynomial_input_uses_EC_group_sums":false,
         "full_ECDLP_recovery":false,"samples":samples}));
+    if std::env::args().any(|arg| arg == "--compare") {
+        // Diagnostic A/B only: same Rust host/inputs, fixed base constructed
+        // before timings. A bounded F4 "undetermined" is not a timed loss.
+        use prime31_algebraic_ic::{decompose, Limits};
+        use std::time::Instant;
+        let positive=ar.add(PRIME31,Some(base.points[3]),Some(base.points[9]))
+            .ok_or("missing positive target")?;
+        let public=ar.scalar(PRIME31,17,Some(PRIME31.g))
+            .ok_or("missing public target")?;
+        let mut controls=vec![];
+        for (kind,target) in [("positive",positive),("public",public)] {
+            let started=Instant::now();
+            let (algebra,rows,valid_adds)=evaluate(&base,Some(target),&mut ar)?;
+            let gcd_ns=started.elapsed().as_nanos();
+            let started=Instant::now();
+            let old=decompose(PRIME31,&base,Some(target),
+                Limits {degree:12,seconds:1,dense_entries:15_000,
+                        extraction_nodes:50_000},&mut ar);
+            let f4_ns=started.elapsed().as_nanos();
+            if old.status=="complete" && old.relations!=rows {
+                return Err("existing F4 and exact quotient give different signed relations".into());
+            }
+            controls.push(json!({
+                "kind":kind, "fixed_base_excluded_from_both_stage_intervals":true,
+                "gcd_stage_ns":gcd_ns, "algebraic_xy_pairs":algebra.pairs.len(),
+                "gcd_post_extraction_validation_group_additions":valid_adds,
+                "new_relations":rows.len(),
+                "f4_stage_ns":f4_ns, "f4_status":old.status,
+                "f4_relations":old.relations.len(),"f4_partial_muladds":old.f4_muladds,
+                "f4_solving_degree":old.solving_degree,
+                "stage_only_not_cold_solver":true
+            }));
+        }
+        println!("{}",json!({"standing":"[pcc:unverified]","study":"paired developmental S3 oracle stages, NOT full ECDLP costs",
+            "same_rust_host":true,"B":base.points.len(),"rows":controls}));
+    }
     Ok(())
 }
 #[cfg(test)]
