@@ -249,12 +249,89 @@ and aimed-gather components): the prime-field base-size tuning and the post-Grö
 \end{table}
 Validation says the numbers are what the archive says, and that the
 reference is fair. \textbf{No validated leaderboard row is below its
-reference.} The one validated measurement below a matched rho is the
+reference.} Two validated measurements outside Tables~A--C are
+below a matched rho, both on restricted weak families. The first is the
 Joux--Vitse sieve route on the \texttt{jv\_cover} weak class
 ($0.0065\times$, $p=1511$, \texttt{VAL-20261103-c31c76};
-\S\ref{sec:jac-jv}). It is not a leaderboard row, never has prime order,
-and has no pcc claim. The 19 validated board rows each have a pcc
-measurement claim, of standing unverified.
+\S\ref{sec:jac-jv}); it is not a leaderboard row, never has prime order,
+and has no pcc claim. The second, validated on 14 November, is the
+double-large-prime plane-quartic arm on the GHS-weak family
+$E_0/\FF_{q^3}$ with $\#E_0(K)=4\ell$: $0.0027$, $0.0025$ and $0.0018$ of
+negation-map rho at $k=22$ across the band
+(\art{research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json}).
+The 19 validated board rows each
+have a pcc measurement claim, of standing unverified.
+
+\paragraph{Validator dispositions, 12--15 November.}
+Table~\ref{tab:audit-nov} lists the validator passes and gate files that
+landed on \texttt{origin/main} after 12 November, 19:20Z. On 15 November
+the board's counts are unchanged: 19 rows validated and 9 unvalidated
+(pre-gate) (\art{docs/ic/leaderboard.json},
+\texttt{validation\_gate.status\_counts}). Table~A now carries rule v9,
+admitted with caveats, at $4.08$--$11.1\times$ a matched rho
+(\S\ref{sec:tablea}). Every disposition below is a validator pass without a
+keyring signature, so its pcc standing is unverified.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.26\linewidth}>{\raggedright}p{0.2\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Target & Disposition & What decided it \\
+\midrule
+Chained transfers v3, \texttt{tower\_large}, \texttt{cover\_pushforward} & not admitted & data reproduce; the rho reference is plain ($A=1$) where negation is available, and rho's native work is not emitted \\
+\texttt{small\_de\_endo\_fb} & admitted with caveats & IC above the best matched rho in 120 of 120 arm-cells at 0, 0.1 and 1 GAE (minimum $2.325$, $7.616$, $40.156$) \\
+Negation re-measurement of the three transfers & validated (second pass) & 0 of 162 rows below rho, 156 above, 6 unresolved lower bounds; first pass failed only on commit binding \\
+Joux--Vitse Nagao--Hilbert & not validated & no independent certificate for 8 of 9 cover solves and 252 rho solves; cover native count a lower bound \\
+FES then batched & gate evidence, no row & $0.739$--$0.889\times$ inherited F4, $35.24$--$3012.56\times$ matched rho; order against inherited F4 unresolved across the band \\
+FES at $n=13$, Koblitz descent & gate evidence & FES below inherited F4 across the band not supported; no wall figure admissible \\
+GHS-weak $c_D=1.7$ with square-root chain & validated & DL against the frozen DL $0.681$--$0.737$ at $w=0$; against negation-map rho at $k=22$: $0.0027$, $0.0025$, $0.0018$ \\
+GHS-weak relation stage, open-addressing tables & validated & identical counted work; relation-stage CPU $0.463$--$0.545$ of v3, whole process $0.90$--$0.96$ \\
+K1 pair-table base sized for $n$ & validated & \texttt{VAL-20261114-d9190c}: $1.32$ and $0.89$ bits over dimension 7 at $w=0$; rho cheaper at every weight (\S\ref{sec:tablea}) \\
+Whole-Jacobian IC against negation rho & admitted with caveats & 2{,}057 values recompute, 0 mismatches; eight reporting errors corrected in \texttt{ERRATA.md}; result unresolved by the frozen slope rule \\
+ecbench $w_{\mathrm{cal}}$ wiring & admitted with caveats (tooling) & 21 of 23 outputs byte-identical before and after; five findings, among them a pre-existing procedure-1 verdict that no longer re-derives \\
+Wall-only fixes, merge against first parent & validated (engineering) & counted results unchanged in 18 of 18 pairs \\
+$j=2$ percolation factor-base size & insufficient evidence & --- \\
+\bottomrule
+\end{tabularx}
+\caption[]{Validator dispositions on \texttt{origin/main} between 12
+November, 19:20Z, and 15 November. Sources:
+\art{research/validation_20261112/REPORT.md},
+\art{research/validation_20261113/REPORT.md},
+\art{research/validation_20261114/REPORT.md} and the
+\texttt{VALIDATION.json} files of
+\art{research/jv_nagao_hilbert_20261112/validation/},
+\art{research/fes_then_batched_20261112/},
+\art{research/fes_k13_validated_20261112/runpod-a1/},
+\art{research/quartic_dl1_cd_sqrt_20261113/combo/validation/},
+\art{research/ic_gw_fasthash_20261114/validation/},
+\art{research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/},
+\art{benchmarks/20261114-wallfix-runpod-abab/} and
+\art{research/leads_followup_20261114/item03_j2_validation/}; the FES
+then batched and GHS-weak figures as \art{docs/ic/LEADERBOARD.md} states
+them.}
+\label{tab:audit-nov}
+\end{table}
+
+None of the binary or Koblitz work of the same days carries a validation
+file beyond the K1 rows and the two FES gate files: the 14 November
+ECC2K-130 sweep (\S\ref{sec:bt-open7}), the $n=83$ solver gates
+(\S\ref{sec:n83l-gates}) and the Table~A set-up records
+(Table~\ref{tab:prog_koblitz-setupab}) are producer-reported and
+\texttt{[pcc:unverified]}. The separate-host replay of the S3 arithmetic
+(two languages, a fixed six-field known-answer population) is frozen and
+prepared as a workflow on \texttt{main}, and no hosted run has occurred
+(\art{research/s3_host_replay_20261113/README.md}).
+
+\paragraph{A misread ratio on the board.} The leaderboard's 14 November
+reconciliation printed the filter-layout A/B ratios $1.104$ and $1.142$ as
+``Top/Low build'' and concluded that the \texttt{Top} layout builds more
+slowly. The source defines its ratios as old (\texttt{Low}) over new
+(\texttt{Top}), and its sort-and-fill step falls from $10.69$ to $7.86$\,ns
+per stored pair, so \texttt{Top} builds faster
+(\art{research/ic_tool_program/explorations/filter-layout-20261113/README.md}).
+No row or ranking depends on the sentence. The generator and the board were
+corrected on 15 November (PR~\#4262): the column now reads Low/Top build time.
+
 
 \paragraph{The benchmarks table.} \art{benchmarks/README.md} on
 \texttt{origin/main} (\texttt{05f7382689}) admits 145 rows
