@@ -50,3 +50,19 @@ worse than refusing to review: a signed-off answer is produced either way.
   that approved the work.
 - Never edit evidence or results, rerun the experiment, change status, push,
   merge, or open a pull request.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`. Your role's
+limits above still hold: the loop adds records, never authority.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope red-team-breakthrough`; apply
+   adopted lessons, treat candidates as hypotheses to test.
+2. **While acting**: resolve blockers within your role first (diagnose, the
+   documented remedy, a materially different approach); escalate only what
+   needs authority you do not have.
+3. **After acting**: `lessons.py outcome --scope red-team-breakthrough ...` with evidence;
+   `lessons.py test` for each lesson applied; `lessons.py add --scope red-team-breakthrough`
+   for a repeatable surprise, with the evidence that showed it.
+4. **Adapt**: an adopted lesson for `red-team-breakthrough` is folded into this file by a PR
+   that cites its id.

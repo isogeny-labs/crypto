@@ -1,0 +1,40 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-038",
+  "title": "Apply the cost-chain rule to the J2 improvement claim",
+  "class": "research",
+  "difficulty": 3,
+  "source": [
+    "AGENTS.md section 3a and section 3",
+    "research/leads_followup_20261114/item03_j2_validation/RESULTS.md",
+    "research/leads_followup_20261114/README.md (item 3)"
+  ],
+  "prompt": "The research-kb server may be unreachable in this environment; if so, record that under 'Sources checked' and use the repository's own files. Every number you report is an unverified assertion unless a pcc claim says otherwise; tag it. Apply AGENTS.md section 3a to the J2 claim (`c_D = 1.60` against the frozen `2.00`, N4v2 DL1) as validated in `research/leads_followup_20261114/item03_j2_validation/`. Write `$T_OUT/cost-chain-j2.md`: the chain from the incumbent to the candidate in the counted unit, each line labelled RESTRUCTURE or REPLACE, the section 3 class (advance, engineering, relabelling or accounting) with the reason, the section 5a band at 0, 0.1 and 1 per native operation as far as the evidence allows, and the distance remaining to the matched rho if the evidence gives it. Do not edit the study. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout; no fixture.",
+  "acceptance": [
+    "$T_OUT/cost-chain-j2.md has lines beginning RESTRUCTURE and REPLACE",
+    "contains exactly one of the class words advance, engineering, relabelling, accounting, in a line starting 'Class:'",
+    "mentions 1.60, 2.00 and the weights 0, 0.1 and 1",
+    "carries [pcc:unverified], passes lint-prose and has a 'Sources checked' line",
+    "no change under research/leads_followup_20261114"
+  ],
+  "check_command": "F=\"$T_OUT/cost-chain-j2.md\"; grep -q '^RESTRUCTURE' \"$F\" && grep -q '^REPLACE' \"$F\" && [ \"$(grep -cE '^Class: *(advance|engineering|relabelling|accounting)\\b' \"$F\")\" = 1 ] && grep -q '1\\.60' \"$F\" && grep -q '2\\.00' \"$F\" && grep -q '0\\.1' \"$F\" && grep -q 'pcc:unverified' \"$F\" && grep -qi 'sources checked' \"$F\" && python3 tools/pcc/pcc.py lint-prose \"$F\" && git diff --quiet \"$T_BASE\" HEAD -- research/leads_followup_20261114",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "citing a result as verified without a pcc claim id (use [pcc:unverified])",
+    "editing the study or evidence you are checking",
+    "inventing a source id, claim id or number",
+    "a RESTRUCTURE line that changes the total",
+    "a line that both restructures and replaces"
+  ],
+  "max_wall_minutes": 50,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Format gate only. The class and the chain are judged by the blinded validator: the committed validation says the gain exists in the unit that leaves additions unpriced and the disposition is insufficient_evidence."
+}

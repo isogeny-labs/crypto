@@ -252,3 +252,22 @@ what was established. Preserve failures and remaining gaps. For substantive
 research, follow the repository's research-visuals and report-evidence rules
 where present. Refer to the [integration report](../../../docs/ecdlp-surfaces/REPORT.md)
 and [protocol](../../../docs/ecdlp-surfaces/PROTOCOL.md) for the existing evidence.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope ecdlp-surfaces`. Apply the
+   adopted lessons; treat candidates as hypotheses this run can test.
+2. **While acting**: resolve a blocker yourself within your authority
+   (diagnose the cause, try the documented remedy, then a materially different
+   approach) before escalating; AGENTS.md "Persistent scientific research loop".
+   Persistence grants no extra execution or spending authority.
+3. **After acting**: record the outcome with evidence,
+   `python3 tools/lessons.py outcome --scope ecdlp-surfaces --task "..." --result success|partial|fail|blocked --evidence <receipt|commit|job> [--applied L-...]`,
+   and `lessons.py test --lesson L-... --outcome confirm|refute --evidence ...`
+   for each lesson you applied. A surprise that would change what the next run
+   does becomes `lessons.py add --scope ecdlp-surfaces --trigger "..." --action "..." --evidence ...`.
+4. **Adapt**: when a lesson scoped to `ecdlp-surfaces` is adopted (two distinct
+   confirmations), propose the edit to this file in a PR that cites the lesson
+   id; when one is refuted twice more than confirmed, it retires itself.

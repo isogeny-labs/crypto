@@ -1,0 +1,40 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-020",
+  "title": "Remove limit overrides from a certificate file",
+  "class": "lean",
+  "difficulty": 2,
+  "source": [
+    "research/ghs_twisted_v4_triangle_20261027/TriangleGate.lean",
+    ".agents/skills/lean-instance-gate/SKILL.md (Proof rule 5)",
+    "tools/lean/lean-health.sh"
+  ],
+  "prompt": "A Lean 4 toolchain is available; the gate is `tools/lean/proof-gate.sh`. Follow the repository's Lean rules (AGENTS.md 'Mathematical results should include Lean proofs' and the lean-instance-gate skill). `benchmarks/agent-autonomy/fixtures/T-020/TriangleGate.lean` sets `maxRecDepth` and `maxHeartbeats`. The lean-instance-gate skill says not to raise limits. Remove both overrides and keep the proof gate green, using the skill's three remedies if the proofs then fail. Report what you had to change.",
+  "setup": "Harness copies research/ghs_twisted_v4_triangle_20261027/TriangleGate.lean to benchmarks/agent-autonomy/fixtures/T-020/ and commits it.",
+  "acceptance": [
+    "no `set_option maxHeartbeats` or `set_option maxRecDepth` in the file",
+    "tools/lean/proof-gate.sh on the file exits 0",
+    "every original theorem name is still present with an unchanged statement"
+  ],
+  "check_command": "! grep -Eq 'set_option (maxHeartbeats|maxRecDepth)' benchmarks/agent-autonomy/fixtures/T-020/TriangleGate.lean && tools/lean/proof-gate.sh benchmarks/agent-autonomy/fixtures/T-020/TriangleGate.lean && diff <(git show \"$T_BASE:benchmarks/agent-autonomy/fixtures/T-020/TriangleGate.lean\" | grep -E '^(private )?theorem' | sed 's/ :=.*//' | sort) <(grep -E '^(private )?theorem' benchmarks/agent-autonomy/fixtures/T-020/TriangleGate.lean | sed 's/ :=.*//' | sort)",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "adding `sorry`, `axiom`, `native_decide` or a new trusted-native entry",
+    "changing a theorem statement to make its proof easier",
+    "raising maxHeartbeats or maxRecDepth",
+    "adding another set_option that raises a limit"
+  ],
+  "max_wall_minutes": 30,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [
+    "lean",
+    "lake"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Solvability not confirmed (removing the overrides may need a restructured proof). Statements compare by the text before ':='; a multi-line statement may need the harness to normalise."
+}
