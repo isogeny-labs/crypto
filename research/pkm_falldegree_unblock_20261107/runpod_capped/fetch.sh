@@ -52,9 +52,9 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 # Positive loss evidence: the runner, reachable, reports idle or a start other than s0; the REST record (HTTP 200)
 # shows desiredStatus other than RUNNING; the pod is missing from a successful list AND its GET returns 404; the tree
 # shows a second start. A changed lastStartedAt alone is recorded but is not evidence. A LOST is relaunched
-# automatically (relaunch "auto") only when a check-in recorded a RunPod-side status change: a lastStatusChange that
-# differs from its value at start, does not name the user ("by User"), and comes before any action the session logged
-# for the pod; every other LOST has relaunch "owner" (owner decision 13).
+# automatically (relaunch "auto") only on host-side evidence recorded before any action the session logged for the pod
+# (owner decision 13): a lastStatusChange that differs from its value at start and does not name the user ("by User"),
+# or the pod gone from a successful list with GET 404. Every other LOST has relaunch "owner".
 # The memory peak is the pilot's own field (largest "memory R MB (peak P MB)" in runs/<cell>.log: VmHWM in MiB,
 # x 1,048,576), else the cgroup figure (v2 memory.peak, else v1 memory.max_usage_in_bytes). Both are recorded.
 # ---------------------------------------------------------------------------------------------------------------------
@@ -175,12 +175,16 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
        + (if $f.collect != null and $f.tree.runner_state != null and $f.tree.runner_state.started != null and $f.tree.runner_state.started != $s0
           then [{at:$f.collect.at, why:"runner_state.json start differs from start.json"}] else [] end)
       ) as $ev
-    # host-side evidence: a RunPod-side status change recorded before any action the session logged for this pod
+    # host-side evidence (owner decision 13), recorded before any action the session logged for this pod (every session
+    # delete is logged before its API call): a RunPod-side status change, or the pod gone from the list with GET 404
     | ([ $f.actions[] | .at | ep ] | min) as $act0
-    | ([ $ck[] | select(.rest != null and .rest.http == 200 and .rest.lastStatusChange != null and .rest.lastStatusChange != $f.LSC0
-           and (.rest.lastStatusChange | test("by user"; "i") | not) and ($act0 == null or (.at | ep) < $act0)) ] | first) as $hs
-    | (if $hs != null then {relaunch:"auto", host_side:"lastStatusChange \"\($hs.rest.lastStatusChange)\" at \($hs.at)"}
-       else {relaunch:"owner", host_side:null} end) as $rl
+    | ([ $ck[] | select(($act0 == null or (.at | ep) < $act0) and .rest != null and
+           ((.rest.http == 200 and .rest.lastStatusChange != null and .rest.lastStatusChange != $f.LSC0
+             and (.rest.lastStatusChange | test("by user"; "i") | not))
+            or (.listed == false and .rest.http == 404))) ] | first) as $hs
+    | (if $hs == null then {relaunch:"owner", host_side:null}
+       elif $hs.rest.http == 404 then {relaunch:"auto", host_side:"pod gone from the list and GET 404 at \($hs.at), before any logged session action"}
+       else {relaunch:"auto", host_side:"lastStatusChange \"\($hs.rest.lastStatusChange)\" at \($hs.at)"} end) as $rl
     | ($f.collect.prefetch // null) as $pre
     | ($f.collect != null and $f.collect.reason == "done" and $f.collect.transfer_ok == true and $pre != null
        and $pre.live != null and $pre.live.state == "done" and $pre.live.started == $s0

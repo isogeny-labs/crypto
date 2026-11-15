@@ -268,8 +268,8 @@ startrun C12 1000; E=$(iso $(( $(epoch "$S0") + 60 ))); mktree "$ST/tree" cap:8:
 rc=$(fetch pkm-x-dev-c); [ "$rc" = 6 ] && [ -f "$D/collect-started-1.json" ] && [ ! -f "$D/collect-1.json" ] && [ "$(pods)" = 1 ] && [ ! -e "$RD/collect-1" ]
 rec C12 $? "exit 6, pod kept, collection 1 abandoned, nothing kept" "exit $rc" "N2: the two fetches differ while the runner is done (no information)"
 startrun C13; jq --arg i stubpod1 'map(select(.id != $i))' "$ST/pods.json" > "$SB/x" && mv "$SB/x" "$ST/pods.json"; rm -f "$ST/pod-stubpod1.json.rec"; touch "$ST/unreachable"
-rc=$(fetch pkm-x-dev-c); [ "$rc" = 0 ] && [ "$(cls "$D")" = "LOST P3" ] && [ "$(rl "$D")" = owner ] && jq -e '.deleted_time_is_upper_bound == true' "$D/cost.json" >/dev/null
-rec C13 $? "exit 0, LOST P3, relaunch owner, cost upper bound" "exit $rc $(cls "$D") $(rl "$D")" "N3a: pod gone (not listed, 404) with no RunPod-side status change recorded"
+rc=$(fetch pkm-x-dev-c); [ "$rc" = 0 ] && [ "$(cls "$D")" = "LOST P3" ] && [ "$(rl "$D")" = auto ] && jq -e '.deleted_time_is_upper_bound == true' "$D/cost.json" >/dev/null
+rec C13 $? "exit 0, LOST P3, relaunch auto, cost upper bound" "exit $rc $(cls "$D") $(rl "$D")" "owner decision 13: pod gone (not listed, GET 404) before any logged session action"
 startrun C14; rest_set '.lastStartedAt = "2026-11-15 01:00:00.000 +0000 UTC"'
 rc=$(fetch pkm-x-dev-c); [ "$rc" = 41 ] && [ "$(pods)" = 1 ]
 rec C14 $? "exit 41, pod kept" "exit $rc" "S1: lastStartedAt changed while the runner reports running under s0"
@@ -355,7 +355,9 @@ nd D20; mktree "$TD" cap:8:0:5:12800000000 "$(iso $((S0E + 30)))" "$okE" 0 0 0; 
 nd D21; mktree "$TD" cap:8:0:5:12800000000 "$S0" "$okE" 0 0 0; ck "$DR" $((S0E + 93600)) prefetch done "$S0" "$okE" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" hard false $((S0E + 93610)); dcase D21 "NO_EVIDENCE P7" "N2: completed in time but the transfer check still failed at the hard deadline"
 nd D22; done_set; echo tampered >> "$TD/host.txt"; dcase D22 "NOT_ADMITTED P2e" "a file of the kept tree changed after collection (rule 6)"
 nd D23; done_set; jq '.machine.secureCloud = false' "$DR/pod-create.json" > "$DR/c" && mv "$DR/c" "$DR/pod-create.json"; dcase D23 "NOT_ADMITTED P2e" "create response not in the reserved tier (rule 7)"
-nd D24; ck "$DR" $((S0E + 4000)) regular null "" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D24 "LOST P3" "N3a: pod missing from the list and GET 404, no status change recorded" owner
+nd D24; ck "$DR" $((S0E + 4000)) regular null "" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D24 "LOST P3" "owner decision 13: pod gone from the list and GET 404, before any logged session action" auto
+nd D24c; printf '{"at":"%s","action":"DELETE","pod":"p1","reason":"x"}\n' "$(iso $((S0E + 3000)))" > "$DR/session-actions.jsonl"; ck "$DR" $((S0E + 4000)) regular null "" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D24c "LOST P3" "pod gone and GET 404 after a logged session delete" owner
+nd D24d; ck "$DR" $((S0E + 4000)) regular null "" "" null 200 RUNNING "$L0" false; dcase D24d "PENDING P8" "pod absent from the list but GET returns a healthy RUNNING record: no loss evidence, wait"
 nd D24b; ck "$DR" $((S0E + 4000)) regular null "" "" null 0 "" "" false; dcase D24b "PENDING P8" "S6: missing from the list but GET unreadable (not corroborated)"
 P2E=$(( okEe + 100 )); PCOL=$(( okEe + 200 ))
 mcase() { # mcase ID STAGE PILOT_EXIT OOM CG_PEAK LOG EXPECTED DESCRIPTION [EXPECTED_AS_M112] [EXPECTED_SOURCE_USED] [OVERSIZE]

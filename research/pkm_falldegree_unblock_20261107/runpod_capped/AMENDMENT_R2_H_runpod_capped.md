@@ -354,13 +354,14 @@ What this settles, case by case (each is an offline test, `tests/README.md`):
 
 **One relaunch per t = 14 cell, on positive host-side evidence of loss only; an abort, a NO_EVIDENCE outcome or a loss
 without host-side evidence goes to the owner; t = 13 gets none (owner decision 13).** In the route:
-- **Host-side evidence** is a RunPod-side status change recorded by a check-in: a REST `lastStatusChange` that differs
-  from its value right after start, does not name the user ("by User"), and was recorded before any action the session
-  logged for the pod. A LOST with such a record has `relaunch: auto`; every other LOST has `relaunch: owner`. This is
-  stricter than the owner's question, which also named "pod gone from the list": a pod that disappears with no RunPod
-  status change recorded could have been deleted with the shared account key, and RunPod keeps no record of who did
-  it, so that case goes to the owner (main-session decision N3a). The text of RunPod's status changes is not known yet
-  beyond "Rented by User: …"; the development smoke records what it can (section 9).
+- **Host-side evidence** takes two forms, as the owner's question named them: (1) a RunPod-side status change recorded
+  by a check-in, that is a REST `lastStatusChange` that differs from its value right after start and does not name the
+  user ("by User"); (2) the pod gone from a successful list with its GET returning 404. Either counts only when recorded
+  before any action the session logged for the pod. Both rest on the caveat the owner accepted: RunPod keeps no
+  independent record of who ended a pod, so the route relies on the session logging every delete, stop or restart
+  (in `session-actions.jsonl`, by `run.sh`, `fetch.sh` and `reap.sh`) before the API call (section 3). A LOST with such
+  a record has `relaunch: auto`; every other LOST has `relaunch: owner`. The text of RunPod's status changes is not
+  known yet beyond "Rented by User: …"; the development smoke records what it can (section 9).
 - t = 14 cells: one relaunch per cell, across both sizes (as Amendment 14 counts it): `-r1` after a base LOST with
   `relaunch: auto`, or `-m112-r1` after an `-m112` attempt LOST with `relaunch: auto` if `-r1` was not used. Both
   attempts are kept.
