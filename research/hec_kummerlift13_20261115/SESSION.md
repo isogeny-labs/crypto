@@ -15,3 +15,8 @@ chart completeness, actual input lift and full cost/genus2/4 remain open.
 
 ## Errors
 No build failures. Scientific worker not yet executed.
+
+## Completed exact basis
+Sourcea423521ebe50/checkpoint195733 preceded one exit0execution.
+Ranks18/112,8sections, corruption rejected. Original rawoutcome retained.
+Next independent gate adds quotient-algebra trace evaluation without point roots.
