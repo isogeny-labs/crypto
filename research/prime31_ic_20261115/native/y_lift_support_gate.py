@@ -54,6 +54,12 @@ def run():
     assert set(points).issubset(lifted)
     def signed(points):
         return sorted({q for p in points for q in (p, neg(p))})
+    _, base7 = base(7)
+    assert len(base7) == 64
+    injective7 = [q for q in base7 if len(oriented_y_fiber(q)) == 1]
+    assert len(injective7) == 39
+    depth7_support, depth7_identities = support(signed(injective7[:31]))
+    assert len(depth7_support) == 1922 and depth7_identities == 31
     so, si = support(signed(points))
     sl, sli = support(signed(lifted))
     su, sui = support(signed(unique))
@@ -68,6 +74,9 @@ def run():
         "p": P, "a": A, "b": B, "n": 2147446831, "seed": seed,
         "canonical_base": len(points), "y_fiber_size_histogram": dict(sorted(hist.items())),
         "lifted_rational_points": len(lifted),
+        "depth7_full_base": len(base7),
+        "depth7_injective_y_base": len(injective7),
+        "depth7_first31_injective_y_signed_pair_support": len(depth7_support),
         "oriented_pair_support_canonical": len(oo),
         "oriented_pair_support_y_lifted": len(ol),
         "signed_pair_support_canonical": len(so),
