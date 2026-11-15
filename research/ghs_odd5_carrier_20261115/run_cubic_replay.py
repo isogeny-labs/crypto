@@ -10,7 +10,7 @@ import certifi
 
 P = Path(__file__).resolve().parent
 source = (P / 'cubic_replay.magma').read_bytes()
-target = P / 'cubic_replay.json'
+target = P / 'cubic_replay2.json'
 if target.exists():
     raise SystemExit('refusing to overwrite immutable receipt')
 url = 'https://calculator.magma-maths.org/execute'

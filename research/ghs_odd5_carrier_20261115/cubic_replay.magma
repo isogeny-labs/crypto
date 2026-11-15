@@ -23,7 +23,7 @@ for row in rows do
         assert pair[2] eq 1;
         C := f div B;
         assert C*B eq f;
-        A0 := PowerMod(C,3^9,B);
+        A0 := Modexp(C,3^9,B);
         assert (A0^3-C) mod B eq 0;
         for v in K do
             trials +:= 1;

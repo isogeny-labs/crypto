@@ -9,3 +9,5 @@ For each degree-two divisor `B` of each fixed `f`, the congruence `(f/B) ≡ A³
 The script `cubic_screen.sage` is the frozen source. Run with `sage -python cubic_screen.sage` and preserve stdout and a source hash. If any candidate appears, verify its point map on the exact source subgroup before attempting a GHS/rho comparison. [pcc:unverified]
 
 Amendment after the first Sage run: independently replay only the two catalog-uncertain traces with `cubic_replay.magma` on the public Magma 2.30-1 service. Preserve the entire response and source hash through `run_cubic_replay.py`. This is a second implementation of polynomial arithmetic and exhaustive candidate evaluation, not a broader base-change or attack benchmark. The Magma source and this amendment must be committed before the call. [pcc:unverified]
+
+Execution amendment: the first public call (`cubic_replay.json`) failed immediately because Magma has no `PowerMod` polynomial intrinsic. Its official polynomial intrinsic is `Modexp(f,n,g)`. Preserve that failed receipt, change only that call to `Modexp`, and write the second public response to `cubic_replay2.json`. [pcc:unverified]
