@@ -248,6 +248,16 @@ fn from_record(row: &Value, bytes: &[u8]) -> Result<PrimaryBase> {
     Ok(PrimaryBase { curve, factor_base })
 }
 
+/// Replay a newly constructed object with the generic binary-curve path
+/// before it is admitted to the artifact store.
+pub(super) fn replay_constructed_primary(row: &Value, bytes: &[u8]) -> Result<(usize, usize)> {
+    let base = from_record(row, bytes)?;
+    Ok((
+        base.factor_base.points.len(),
+        base.factor_base.signed_orbits.len(),
+    ))
+}
+
 fn load_panel_selected(
     root: &Path,
     columns: usize,
@@ -479,12 +489,8 @@ fn load_store_primary_base(root: &Path, store: &Store) -> Result<(PrimaryBase, V
     Ok((base, row.clone()))
 }
 
-pub(super) fn check_store_v3_cli(root: &Path, output: &Path) -> Result<Value> {
-    if output.exists() {
-        return Err("successor import output already exists".into());
-    }
-    let store = Store::open_default()?;
-    let (base, row) = load_store_primary_base(root, &store)?;
+pub(super) fn verify_store_v3(root: &Path, store: &Store) -> Result<Value> {
+    let (base, row) = load_store_primary_base(root, store)?;
     let receipt = json!({
         "schema":"n83.factor-base-store-import/v3",
         "status":"PASS","curve_id":base.curve.label(),
@@ -495,6 +501,15 @@ pub(super) fn check_store_v3_cli(root: &Path, output: &Path) -> Result<Value> {
         "orbit_columns_checked":base.factor_base.signed_orbits.len(),
         "selected_best_total_runtime":Value::Null,
     });
+    Ok(receipt)
+}
+
+pub(super) fn check_store_v3_cli(root: &Path, output: &Path) -> Result<Value> {
+    if output.exists() {
+        return Err("successor import output already exists".into());
+    }
+    let store = Store::open_default()?;
+    let receipt = verify_store_v3(root, &store)?;
     write_new_json(output, &receipt)?;
     Ok(receipt)
 }
@@ -2672,7 +2687,7 @@ fn checked_primary_probe_source(root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn frozen_primary_probe_source() -> Result<(String, &'static str)> {
+pub(super) fn frozen_primary_probe_source() -> Result<(String, &'static str)> {
     if let Some(path) = std::env::var_os("ICV1_FROZEN_SOURCE_DIR") {
         let root = std::path::PathBuf::from(path);
         let attestation: Value = serde_json::from_slice(&fs::read(root.join("attestation.json"))?)?;

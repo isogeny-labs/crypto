@@ -74,3 +74,39 @@ publication, a new base in the sweep, or a relation/runtime measurement.
 The producer-side v3 publisher, independently checked S3 write/fresh GET,
 exact authorized destination and writer, and integration into the full IC
 pipeline remain open.
+
+## Native successor producer — 2026-11-15 UTC
+
+The new `primary-store-v3-construct-publish NEW_DIRECTORY POLICY K SEED
+CONSTRUCTION_BUDGET_SECONDS EXACT_REMOTE` Rust command accepts one primary
+curve (`a=0`) signed-Frobenius public-X specification. It requires a clean,
+source-matched checkout and an exact match between `EXACT_REMOTE` and the
+configured native artifact-store remote. It creates a fresh directory and
+`attempt.json`, streams one gzip object, checks the stream hashes, and replays
+every point, subgroup membership, Frobenius phase, sign and coefficient with
+the generic curve implementation. Only after replay passes does it write the
+v3 manifest and replay receipt and call the native store's conditional,
+content-addressed `push`. It then opens a separate empty cache, downloads
+the object from the configured remote, checks its SHA-256 and size, writes
+`storage.json`, and invokes the v3 reader to produce `import.json`. A later
+error leaves the partial attempt in its unique directory and writes
+`failure.json` when possible; a retry needs a new directory. The tracked
+`store/index.json` is changed by a successful push and must be committed
+with the manifest and receipts.
+
+The construction budget is 1–7,200 seconds and governs factor-base
+construction and gzip finalization through a process watchdog. A cap leaves
+`construction-cap.json` with `UNKNOWN_budget` and the partial object. It does
+not bound remote network waits or the full index-calculus pipeline.
+The CLI is a publication command: use it only with the intended remote and
+writer identity. The local positive control uses a temporary `file://` store,
+two signed orbits (332 points), a fresh download, and an import; controls
+reject a reused evidence directory and a corrupted fresh-download digest.
+`RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc
+cargo test --release --example koblitz_n83_factor_base_export --locked --offline`
+passed 26/26 on macOS arm64. The repository release library gate is recorded
+separately in the PR validation notes.
+Actual S3 publication, exact writer confirmation, historical mirroring,
+large-base memory behavior, and full cold same-target runtime comparisons
+remain open. The new command records construction and custody timings as
+informational L0 values only. No runtime graph or leaderboard row changes.
