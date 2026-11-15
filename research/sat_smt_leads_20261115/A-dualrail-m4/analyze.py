@@ -191,6 +191,7 @@ if default:
               ("ctl", "#6250d6", "X", "discard control (fresh solver per call)")]
     fig, ax = plt.subplots(figsize=(9, 5.6), facecolor=SURF)
     ax.set_facecolor(SURF)
+    ends = []
     for a, col, mk, lab in series:
         if a == "ctl":
             pts = []
@@ -205,8 +206,12 @@ if default:
             continue
         ax.plot([p[0] for p in pts], [p[1] for p in pts], color=col, marker=mk, ms=8, lw=2, label=lab,
                 mec=SURF, mew=1.5, ls="--" if a == "ctl" else "-")
-        ax.annotate(fmt(pts[-1][1]), (pts[-1][0], pts[-1][1]), xytext=(8, 0), textcoords="offset points",
-                    color=INK, fontsize=9, va="center")
+        ends.append((pts[-1][1], pts[-1][0], a))
+    ends.sort()
+    ly = None
+    for v, x, a in ends:          # end labels, pushed apart so they do not collide
+        ly = math.log10(v) if ly is None else max(math.log10(v), ly + 0.14)
+        ax.annotate(fmt(v), (x, v), xytext=(x + 0.12, 10 ** ly), textcoords="data", color=INK, fontsize=9, va="center")
     ax.axhline(1.0, color=INK, lw=1.2)
     ax.text(Ls[0], 1.0, "pair scan, 2^(2l)/2 leaf solves = 1", color=INK, fontsize=9, va="bottom")
     ax.axhline(0.7, color=MUTE, lw=1, ls=":")
@@ -224,7 +229,7 @@ if default:
     for s in ("left", "bottom"):
         ax.spines[s].set_color(MUTE)
     ax.tick_params(colors=MUTE)
-    ax.legend(frameon=False, fontsize=9, loc="upper left", bbox_to_anchor=(1.0, 1.0), labelcolor=INK)
+    ax.legend(frameon=False, fontsize=9, handlelength=3.2, loc="upper left", bbox_to_anchor=(1.0, 1.0), labelcolor=INK)
     fig.tight_layout()
     fig.savefig(os.path.join(HERE, "ratio_vs_l.svg"), facecolor=SURF)
     fig.savefig(os.path.join(HERE, "ratio_vs_l.png"), dpi=150, facecolor=SURF)
