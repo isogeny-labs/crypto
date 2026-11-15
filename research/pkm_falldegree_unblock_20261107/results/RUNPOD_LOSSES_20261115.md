@@ -20,3 +20,12 @@ Measured, as far as it goes. `[pcc:unverified]`. Amendment 15 §7 loss rule.
   - Isogeny null: attempt 1 lost.
   
   Each may be relaunched once, with the owner's authority.
+
+## Cause (owner, 2026-11-15)
+
+The owner, on being told of the loss: "Damnit I think budget ran out". The most likely cause is that the RunPod account balance
+ran out, so RunPod terminated the pods. That is consistent with all 11 disappearing together.
+- **Lesson for the route.** Amendment 15 §6 relied on a single balance confirmation ("a few tens of dollars", decision 10).
+  Launching 11 pods (about US$11.40/h, about US$717 at their limits) needed a balance check sized to the batch.
+- **Rule from here (plan; to be frozen with the relaunch).** Before each batch, the owner confirms the balance covers the batch's
+  spend at the limits, or the batch is sized to the confirmed balance. Fetches happen every 15 minutes, so a stop loses little.
