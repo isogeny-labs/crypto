@@ -1,5 +1,7 @@
 # Primitive rational solver continuation
 
+Latest continuation: LINEAR-HANDOFF.md (complete cold screen now terminal).
+
 ## Goal
 Establish a mathematical >=10x full cold index-calculus improvement at genus2+.
 Active. No such speedup or novelty result has been established by these gates.

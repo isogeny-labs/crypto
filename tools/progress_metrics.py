@@ -33,6 +33,8 @@ Sources (all committed, read at --ref unless noted):
                                 exact recovery counts and bounded two-target frontier; no L0 timing rank
   research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json
                                 bounded D18 solver-policy gate on the a=0 N83 curve; no complete-cost rank
+  benchmarks/records/20261115T0930Z-hec-linear-cold.json
+                                copies native-computed cold ratio observations; L0 producer evidence
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -824,6 +826,20 @@ def n83_d18_vsids_gate(ref, since):
              source=source)
 
 
+def hec_linear_cold_record(ref, since):
+    """Registry metadata only: copy recorded values, never execute or reduce a study."""
+    path = "benchmarks/records/20261115T0930Z-hec-linear-cold.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "bench.record/v1" or record.get("status") != "measured":
+            continue
+        for metric in record.get("metrics", []):
+            emit(f"hec.linear_cold.{metric['name']}", metric.get("value"), date=date,
+                 problem=record["problem"], unit=metric["unit"], better=metric["better"],
+                 label="Recorded three-target cold median; reused curves, L0, producer unverified",
+                 source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -861,6 +877,7 @@ def main():
     explicit_gpu_profile(a.ref, a.since)
     explicit_gpu_fullcache(a.ref, a.since)
     n83_d18_vsids_gate(a.ref, a.since)
+    hec_linear_cold_record(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

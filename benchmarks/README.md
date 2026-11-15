@@ -1,5 +1,12 @@
 # Benchmarks
 
+The [15 November linear-denominator hyperelliptic cold screen](20261115-hec-linear-cold/)
+([PDF](20261115-hec-linear-cold/REPORT.pdf)) is retained outside the admitted table.
+All18target gates and288cold cells pass; exact-work specialization/generic median
+runtime ratios are1.46–3.02x, while ratios against the fastest existing arm are
+0.70–1.43x. The10xpilot criterion fails. Local ARM L0, A/Amax2.55x; producer
+observations pending independent validation [pcc:unverified].
+
 The visual record of every performance measurement and speedup: report PDFs,
 graphs (SVG) and PNG renders, one directory per entry
 (`<YYYYMMDD>-<slug>/`). The study directory linked from each row holds the
