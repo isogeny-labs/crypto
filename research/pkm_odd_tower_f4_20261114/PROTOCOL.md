@@ -267,3 +267,7 @@ recorded on the 15 GiB host: `M3-A23-n4` (tower draws 1–2, null), `B-M3-A23-n4
 `M3-A23-n4-tower` is kept. The first start of `run_extension_remote.sh` ended at once with no rows: an extra
 `shift` inside `sh -c` dropped the binary path. The script was fixed (and now keeps each job's stderr) and restarted.
 
+*Correction (2026-11-15).* §7 says the checkpoint opt-out "appends a bypass entry to `pcc/ledger.jsonl`". The
+hook's automatic entry was never written (no such entry existed on the branch or on `main`). The bypass was
+recorded retroactively as ledger entry 1059 (`1864f22b619a`), with this explanation in its reason.
+
