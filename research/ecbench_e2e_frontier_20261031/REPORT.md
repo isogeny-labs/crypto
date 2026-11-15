@@ -66,7 +66,10 @@ clear:
    the N4-v2 double-large-prime arm reaches 0.00523× negation-map rho at
    $q=2{,}097{,}091$. This is a real restricted-family result. It is **not** a
    generic-curve, standard-curve, prime-order $E/\mathbb F_{q^3}$, or
-   ECC2K-130 result.
+   ECC2K-130 result. This is the historically admitted boundary. A stronger
+   same-family rho implementation is now frozen for re-establishment, but has
+   no primary measurement yet and therefore neither displaces nor upgrades
+   the historical row `[pcc:unverified]`.
 3. **The best newly validated factor-base change is engineering progress, not a
    frontier crossing.** On the 20-bit prime holdout, the selected low-x base
    grows from $N=32$ to $N=45$ and costs 0.836, 0.817, and 0.746 of the
@@ -110,6 +113,17 @@ clear:
    binary-field descent but has no matched performance record and no
    prime-field route; it changes the census, not the measured frontier.
    None of these observations moves Tables A--C in the canonical leaderboard.
+7. **The restricted-family exception now has a fail-closed re-establishment
+   round.** PR #4171 merged a same-target rho control with six-product cubic
+   multiplication, the negation quotient, 32 partitions, eight lockstep
+   walks, and Montgomery batch inversion. The primary grid covers q=4,051
+   through 4,194,271 with three instance seeds and prices historical IC and
+   new rho from the same new-host calibration. A prospective duration-only
+   amendment retains every scientific parameter and uses two launch waves.
+   No build or Job has run: current budget, checkpoint, and all-tenant pool
+   admission are unavailable in this runtime. Consequently this is an
+   implemented control and frozen measurement path, not a new performance
+   result `[pcc:unverified]`.
 
 ![Boundary markers. A ratio is meaningful only inside its row's exact domain and unit.](figures/boundary-map.png){width=100%}
 
@@ -316,7 +330,7 @@ their source hashes without promoting them into its priced tables.
 | Prime-field generic ECDLP | closest recent IC marker 2.59× matched rho; P20 validated base row 7.95–9.62× | generic algorithms | rho remains lower; BSGS can beat rho on several toy bitop cells |
 | Random-binary generic ECDLP | inherited F4 2.28× rho on the tiny m=19 diagnostic; admitted ladder 10.6–38.2× | generic algorithms | no IC win |
 | Koblitz generic ECDLP | admitted medium/scaling cold IC 3.43–11.5× matched rho; separate n=29 one-column fixed-setup ratio 0.366 [0.241, 0.523] | signed-Frobenius generic walk on the scaling object | no uniform-target/scaling IC win; fixed-setup BSGS engineering crossover retained separately |
-| Special GHS-weak $E_0/\mathbb F_{q^3}$ | B0 0.735× at q=4051; N4-v2 DL 0.00523× negation rho at q=2,097,091 | plane-quartic IC | restricted-family IC win |
+| Special GHS-weak $E_0/\mathbb F_{q^3}$ | historical B0 0.735× at q=4051; N4-v2 DL 0.00523× negation rho at q=2,097,091; optimized `strong-b8` re-establishment pending | plane-quartic IC on the admitted historical protocol | restricted-family IC win; stronger matched control not yet measured |
 | Hyperelliptic Jacobians | genus-4 toy row 0.114× rho in bitop/v1 | Jacobian IC | not an elliptic-curve result |
 | Standard cryptographic curves / ECC2K-130 | no complete break or scaling evidence | generic security boundary | unresolved by experiment; no claim of a break |
 
@@ -620,6 +634,30 @@ $\#E_0(\mathbb F_{q^3})=4\ell$. The comparison is a whole cold one-target
 pipeline in $\mathbb F_q$-multiplication equivalents, with no subgroup
 enumeration hidden outside the interval.
 
+## Establishment status on 14 November
+
+The claim above remains the historical admitted frontier for its exact frozen
+protocol. It is not being silently relabelled as a comparison against code
+that did not exist when those records were taken. The new
+[`strong-b8`](../quartic_ghs_strong_rho_20261114/README.md) comparator is a
+strictly stronger implementation obligation: the same curve, subgroup,
+planted target, cold accounting, and native-work pricing band are retained,
+while rho gains the negation quotient, six-product $\mathbb F_{q^3}$
+multiplication, eight-way Montgomery batch inversion, 32 partitions, cycle
+escape, and full setup/walk/verification counters.
+
+Its [frozen protocol](../quartic_ghs_strong_rho_20261114/PROTOCOL.md) and
+[round-A duration amendment](../quartic_ghs_strong_rho_20261114/ROUND_A.md)
+cover eleven sizes through q=4,194,271, seeds 1--3, and 10,000 clustered
+bootstrap resamples at weights 0, 0.1, and 1. The scientific Rust source is
+merged and hash-pinned. Primary EKS data do not exist yet: the selected
+runtime cannot read live AWS budget balances, perform the required all-tenant
+pool check, or upload the mandatory checkpoint. The exact exit conditions are
+tracked in the [execution-admission problem](../../problems/ghs-strong-rho-measurement-admission.md).
+Until those gates pass, the correct label is **historically admitted IC-led
+exception; optimized matched-rho re-establishment pending**
+`[pcc:unverified]`.
+
 ![The GHS-weak curve family has its own, separate frontier.](figures/ghs-weak-frontier.png){width=92%}
 
 The earlier N4 B0 arm crosses below plain rho at $q=4051$, where its ratio is 0.735
@@ -636,9 +674,10 @@ This result must travel with four restrictions:
 4. the result cannot be transported to another curve without an explicit,
    subgroup-preserving, costed map.
 
-The correct synthesis is therefore not “IC never beats rho” and not “ECDLP is
-broken.” It is: **IC beats rho on one special weak family; generic ECC remains
-rho-led in the measured envelope.**
+The correct synthesis is therefore not “IC is never below rho” and does not say
+that ECDLP is generally easy. It is: **the admitted historical evidence has IC below rho on one
+special weak family; generic ECC remains rho-led in the measured envelope;
+the new optimized same-family rho comparison is still an open measurement.**
 
 # F4, F5, F6, SAT, WDSAT, and FES
 
@@ -1004,8 +1043,9 @@ The highest-value next work is therefore:
 6. specify and information-rank a mechanism-distinct N83 growing-degree or
    target-local router before any collector run;
 7. prove or falsify the production tensor-family rank-growth obligation;
-8. preserve the GHS-weak win as a separate domain rather than using it to
-   headline generic curves.
+8. execute and independently validate the frozen GHS `strong-b8` round, while
+   preserving the historical GHS-weak win as a separate domain rather than
+   using it to headline generic curves;
 9. optimize folded-pair streaming and sort/fill behind explicit versioned
    method IDs; do not silently replace the faster frozen Low layout.
 
@@ -1036,6 +1076,9 @@ sources are:
 - [PFDR structured-factor-base screen](../pfdr_other_families_20261101/README.md);
 - [N83 four-byte paired root-index replay](../n83_fourbyte_pair_20261027/README.md);
 - [N83 degree-two image-calculus rejection](../n83_image_closed_degree2_20261101/RESULTS.md);
+- [GHS strong-rho protocol](../quartic_ghs_strong_rho_20261114/PROTOCOL.md),
+  [duration amendment](../quartic_ghs_strong_rho_20261114/ROUND_A.md), and
+  [execution-admission problem](../../problems/ghs-strong-rho-measurement-admission.md);
 - [rigorous tensor boundary-rank report](../tensor_boolean_breakthrough_20261031/BOUNDS_REPORT.md);
 - [GPU explicit-relations result](../explicit_relations_e2e_20261030/RESULTS.md);
 - [literature and prior-evidence ledger](LITERATURE.md);
