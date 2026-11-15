@@ -18,6 +18,8 @@ quadratic instead of being discarded. The new filtered release run reports
 the protected graph/pivot recovery test. These are producer-run development
 checks, not admitted performance observations. [pcc:unverified]
 The continuation's release example type check also passed locally. [pcc:unverified]
+Its [merged-head release example test target](validation/symmetric-merged-example-tests.log)
+compiled successfully and ran zero example-local tests. [pcc:unverified]
 
 The Rust comparison driver now records one warmup plus five measured rounds,
 includes same-instance `run_rho3` A/A arms, and labels raw execution rows and
@@ -110,6 +112,9 @@ The symmetric continuation's [30-test release output](validation/symmetric-targe
 and [source hashes](validation/symmetric-component-source.sha256) identify the
 new source. Its [initial sparse-fixture compile failure](validation/symmetric-sparse-fixture-compile-failure.log)
 is retained separately from the passing retry. [pcc:unverified]
+The [continuation's administrative-gate snapshot](validation/symmetric-administrative-gates.txt)
+records the inherited global bench-record failure without changing historical
+records or progress reports.
 
 The pre-fingerprint full default-feature library run was interrupted after
 reported failures outside the touched module and more than twelve minutes in
