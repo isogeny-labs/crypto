@@ -7,9 +7,12 @@
 //! ```text
 //! full_jacobian_ic [--primes 211,...] [--stage2 25601,51203,102407]
 //!                  [--out-dir DIR] [--threads 4] [--budget-s 3600]
+//!                  [--min-r-frac F] [--max-prime-hops 20] [--protocol PATH]
 //! ```
 //!
-//! Protocol (frozen by hash): `research/full_jacobian_ic_20261113/PROTOCOL.md`.
+//! Protocol (frozen by hash): `research/full_jacobian_ic_20261113/PROTOCOL.md`;
+//! with `--min-r-frac`, `research/full_jacobian_ic_rp_20261114/PROTOCOL.md`
+//! (covers with `r >= ceil(F p)`, next prime when a prime has none).
 //! Writes `full_jacobian.json`; the table, the SVG and the verdict text are
 //! `render.py`.  Exit status 0 only when every log of every arm was certified
 //! by the independent `[k]G == T` on `E1` and `[k]phi^*G == phi^*T` on `J_C`.
@@ -23,14 +26,15 @@ use rayon::prelude::*;
 use serde_json::{json, Value};
 
 use crypto_lib::cryptanalysis::chained_transfer::full_jacobian_ic::{
-    certify_both, cover_instance, fit_loglog, run_full_ic, selection_skips, CoverInstance, Source,
+    certify_both, cover_instance, cover_select_rp, fit_loglog, min_r_for, run_full_ic,
+    selection_skips_min_r, CoverInstance, Source,
 };
 use crypto_lib::cryptanalysis::chained_transfer::hyper64::{H64Curve, H64Div};
 use crypto_lib::cryptanalysis::chained_transfer::ic_control::{Arm as IcArm, IcParams, IcResult};
 use crypto_lib::cryptanalysis::chained_transfer::instrument::{fb_size_g, ic_on_rung};
 use crypto_lib::cryptanalysis::chained_transfer::negation_remeasure::{
-    best_of, cover_select, mean_rho, measure_class_times, report_arm, rho_full, rho_full_ec, Arm,
-    Class, ClassTimes, RefSet, RhoFull, BAND, CAL_FACTORS, TIMING_BATCHES, TIMING_BATCH_LEN,
+    best_of, mean_rho, measure_class_times, report_arm, rho_full, rho_full_ec, Arm, Class,
+    ClassTimes, RefSet, RhoFull, BAND, CAL_FACTORS, TIMING_BATCHES, TIMING_BATCH_LEN,
 };
 
 #[derive(Parser, Debug)]
@@ -69,6 +73,23 @@ struct Args {
     /// Smoke run: unit class times, no calibration (the part says so).
     #[arg(long, default_value_t = false)]
     no_calibration: bool,
+    /// Accept only covers with `r >= ceil(F p)` (`r` the largest prime with
+    /// `r || #E1`).  0 (default) is the 2026-11-13 selection, unchanged.
+    #[arg(long, default_value_t = 0.0)]
+    min_r_frac: f64,
+    /// With `--min-r-frac > 0`: when a prime has no such cover, try the next
+    /// prime above it, at most this many times (frozen fallback of
+    /// `research/full_jacobian_ic_rp_20261114/PROTOCOL.md`).
+    #[arg(long, default_value_t = 20)]
+    max_prime_hops: u32,
+    /// Print the selected cover of every prime (p used, r, #E1 / r, h,
+    /// candidate, skips) as JSON lines and exit: no arm is run, no file is
+    /// written.
+    #[arg(long, default_value_t = false)]
+    select_only: bool,
+    /// Protocol path written into the output (provenance only).
+    #[arg(long, default_value = "research/full_jacobian_ic_20261113/PROTOCOL.md")]
+    protocol: String,
 }
 
 fn host() -> Value {
@@ -168,18 +189,31 @@ fn unit_times() -> ClassTimes {
 }
 
 /// One prime: all arms, references, calibration.  `None` if no admissible cover.
-fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
+fn run_prime(a: &Args, i: usize, p_req: u64, stage: u8) -> (Option<Value>, bool) {
     let t0 = Instant::now();
-    let Some(ci) = cover_select(p, i) else {
-        println!("p={p}: no admissible cover");
+    let hops = if a.min_r_frac > 0.0 {
+        a.max_prime_hops
+    } else {
+        0
+    };
+    let Some((p, passed_over, ci)) = cover_select_rp(p_req, i, a.min_r_frac, hops) else {
+        println!("p={p_req}: no admissible cover");
         return (
             Some(
-                json!({"p": p, "stage": stage, "skipped": "no admissible cover candidate in 4000"}),
+                json!({"p": p_req, "stage": stage, "min_r_frac": a.min_r_frac,
+                        "skipped": format!("no admissible cover candidate in 4000 at p and {hops} next primes")}),
             ),
             false,
         );
     };
-    let skips = selection_skips(p, i, ci.candidate);
+    let min_r = min_r_for(p, a.min_r_frac);
+    if p != p_req {
+        println!(
+            "p={p_req}: no cover with r >= {:.4} p; next prime used: {p}",
+            a.min_r_frac
+        );
+    }
+    let skips = selection_skips_min_r(p, i, ci.candidate, min_r);
     let (ninst, nseeds) = if stage == 1 {
         (a.instances, a.ic_seeds)
     } else {
@@ -391,6 +425,9 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
         .collect();
     let row = json!({
         "p": p, "stage": stage, "r": r, "x": insts.iter().map(|c| c.x).collect::<Vec<_>>(),
+        "p_requested": p_req, "primes_passed_over": passed_over,
+        "min_r_frac": a.min_r_frac, "min_r": min_r, "r_over_p": r as f64 / p as f64,
+        "e1_cofactor": e1.order() / r,
         "candidate": ci.candidate, "seed0": ci.seed0,
         "skipped_candidates": serde_json::to_value(&skips).unwrap(),
         "e1_order": e1.order(), "e2_order": b.e2.order(), "jac_order": jac_order, "h": h,
@@ -525,6 +562,29 @@ fn main() -> ExitCode {
         |s: &str| -> Vec<u64> { s.split(',').filter_map(|x| x.trim().parse().ok()).collect() };
     let s1 = parse(&a.primes);
     let s2 = parse(&a.stage2);
+    if a.select_only {
+        for (i, &p) in s1.iter().chain(&s2).enumerate() {
+            let hops = if a.min_r_frac > 0.0 {
+                a.max_prime_hops
+            } else {
+                0
+            };
+            let row = cover_select_rp(p, i, a.min_r_frac, hops).map_or_else(
+                || json!({"p_requested": p, "selected": null}),
+                |(q, passed, ci)| {
+                    let (n1, n2) = (ci.b.e1.order(), ci.b.e2.order());
+                    let min_r = min_r_for(q, a.min_r_frac);
+                    json!({"p_requested": p, "p": q, "primes_passed_over": passed,
+                           "r": ci.r, "min_r": min_r, "r_over_p": ci.r as f64 / q as f64,
+                           "e1_order": n1, "e1_cofactor": n1 / ci.r, "e2_order": n2,
+                           "h": n1 * n2 / ci.r, "candidate": ci.candidate, "seed0": ci.seed0,
+                           "skipped_candidates": selection_skips_min_r(q, i, ci.candidate, min_r)})
+                },
+            );
+            println!("{row}");
+        }
+        return ExitCode::SUCCESS;
+    }
     let mut rows: Vec<Value> = vec![];
     let mut all_ok = true;
     for (i, &p) in s1.iter().enumerate() {
@@ -559,7 +619,7 @@ fn main() -> ExitCode {
     let f_all = fits(&both, "stage 1 and 2 primes");
     let v = verdict(&stage1_rows, &f1);
     let out = json!({
-        "protocol": "research/full_jacobian_ic_20261113/PROTOCOL.md",
+        "protocol": a.protocol,
         "args": format!("{a:?}"),
         "host": host(),
         "calibration": {

@@ -8,6 +8,7 @@
 //! The lever under test is "P +- Q with one inversion": x(P+Q) and x(P-Q) share the denominator
 //! x_Q - x_P, so both x-coordinates cost I + 2M + 2S (one affine addition costs I + 2M + S).
 //! Arms:
+//!   ic5b  ic5 with a std or flat target table and lock-step batched, prefetched probes (same counted ops).
 //!   ic4   index calculus: factor base = m smallest-x points (logs unknown), x-only pair-sum table
 //!         {x(F_i +- F_j)} built with shared inversions, factor-base logs from relations
 //!         V_j +- W_k = +-(F_i +- F_j), then per target paired trials x(Q_t +- W_k) against the table.
@@ -270,6 +271,116 @@ fn resolve(f: &F, q: Pt, w_pt: Pt, s_w: i64, w: u64, d_pt: Pt, dl: u64, n: u64) 
 struct Out {
     ok: usize,
     extra: String,
+}
+
+/// ic5b's table: std HashMap (exactly ic5's) or a flat open-addressed array of 8-byte slots
+/// (u32 x key, u32 index into `ents`), load factor at most 1/2, multiplicative hash, linear probing.
+/// The flat form needs x < 2^32 - 1 (p < 2^32); first insert of an x wins, as `entry().or_insert`.
+enum Tab {
+    Std(HashMap<u64, (u32, u16, i8)>),
+    Flat {
+        slots: Vec<(u32, u32)>,
+        ents: Vec<(u32, u16, i8)>,
+        mask: usize,
+        shift: u32,
+    },
+}
+const FLAT_EMPTY: u32 = u32::MAX;
+impl Tab {
+    fn new(flat: bool, cap: usize, p: u64) -> Tab {
+        if flat {
+            assert!(p <= FLAT_EMPTY as u64, "flat table needs p < 2^32");
+            let size = (2 * cap.max(1)).next_power_of_two();
+            Tab::Flat {
+                slots: vec![(FLAT_EMPTY, 0); size],
+                ents: Vec::with_capacity(cap),
+                mask: size - 1,
+                shift: 64 - size.trailing_zeros(),
+            }
+        } else {
+            Tab::Std(HashMap::with_capacity_and_hasher(cap, Default::default()))
+        }
+    }
+    #[inline]
+    fn home(x: u64, shift: u32) -> usize {
+        (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> shift) as usize
+    }
+    fn insert_if_absent(&mut self, x: u64, e: (u32, u16, i8)) {
+        match self {
+            Tab::Std(m) => {
+                m.entry(x).or_insert(e);
+            }
+            Tab::Flat {
+                slots,
+                ents,
+                mask,
+                shift,
+            } => {
+                let mut i = Self::home(x, *shift);
+                loop {
+                    let (k, _) = slots[i];
+                    if k == FLAT_EMPTY {
+                        slots[i] = (x as u32, ents.len() as u32);
+                        ents.push(e);
+                        return;
+                    }
+                    if k as u64 == x {
+                        return;
+                    }
+                    i = (i + 1) & *mask;
+                }
+            }
+        }
+    }
+    #[inline]
+    fn get(&self, x: u64) -> Option<(u32, u16, i8)> {
+        match self {
+            Tab::Std(m) => m.get(&x).copied(),
+            Tab::Flat {
+                slots,
+                ents,
+                mask,
+                shift,
+            } => {
+                if x >= FLAT_EMPTY as u64 {
+                    return None;
+                }
+                let mut i = Self::home(x, *shift);
+                loop {
+                    let (k, v) = slots[i];
+                    if k == FLAT_EMPTY {
+                        return None;
+                    }
+                    if k as u64 == x {
+                        return Some(ents[v as usize]);
+                    }
+                    i = (i + 1) & *mask;
+                }
+            }
+        }
+    }
+    #[inline]
+    fn prefetch(&self, x: u64) {
+        if let Tab::Flat { slots, shift, .. } = self {
+            let i = Self::home(x, *shift);
+            #[cfg(target_arch = "x86_64")]
+            // SAFETY: `i` is masked into range by `home` (the shift leaves log2(len) bits); a prefetch never faults.
+            unsafe {
+                std::arch::x86_64::_mm_prefetch(
+                    slots.as_ptr().add(i) as *const i8,
+                    std::arch::x86_64::_MM_HINT_T0,
+                );
+            }
+            #[cfg(not(target_arch = "x86_64"))]
+            let _ = (slots, i);
+        }
+    }
+    fn len(&self) -> usize {
+        match self {
+            Tab::Std(m) => m.len(),
+            Tab::Flat { ents, .. } => ents.len(),
+        }
+    }
 }
 
 fn main() {
@@ -820,6 +931,315 @@ fn main() {
                 extra: format!(
                     "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{}",
                     k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len()
+                ),
+            }
+        }
+        "ic5b" => {
+            // ic5 with a choice of target-phase table and probe order (research/mt_table_layout_20261114):
+            //   args[8] = "std" (std HashMap, as ic5) | "flat" (open-addressed array of 8-byte slots, x < 2^32);
+            //   args[9] = B, targets processed in lock-step batches of B with each batch's probe slots prefetched.
+            // Every target's trial sequence is ic5's, so the recovered logs and every counted operation equal ic5's;
+            // only the order of memory accesses differs. "std", B = 1 is ic5 itself.
+            // k-term index calculus: table of x(F_{i1} + s2 F_{i2} + ... + s_k F_{ik}), i1 < ... < ik,
+            // built as x(P +- F_l) from full (k-1)-term points P (shared inversion per pair);
+            // factor-base logs by incremental Gaussian elimination mod n (every mod-n product counted
+            // as M, every mod-n inverse as I); targets by paired trials x(Q +- W_k) as in ic4.
+            let mu = param;
+            let k: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(3);
+            let gfac: f64 = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(1.2);
+            let flat = match args.get(8).map(|s| s.as_str()).unwrap_or("std") {
+                "std" => false,
+                "flat" => true,
+                o => panic!("ic5b table mode {o}"),
+            };
+            let bsz: usize = args.get(9).map(|s| s.parse().unwrap()).unwrap_or(1).max(1);
+            assert!((2..=4).contains(&k));
+            let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
+            let classes = |m: usize| -> f64 {
+                let mut c = 1.0;
+                for i in 0..k {
+                    c *= (m - i) as f64 / (i + 1) as f64;
+                }
+                c * (1u64 << (k - 1)) as f64
+            };
+            let mut m = k + 1;
+            while classes(m) < kstar {
+                m += 1;
+            }
+            let mut fb: Vec<(u64, u64)> = Vec::with_capacity(m);
+            let mut x = 0u64;
+            while fb.len() < m {
+                x += 1;
+                let xx = f.sqr(x);
+                let rhs = f.add(f.add(f.mul(xx, x), f.mul(f.a, x)), f.b);
+                if rhs == 0 {
+                    continue;
+                }
+                if let Some(y) = f.sqrt(rhs) {
+                    fb.push((x, y));
+                }
+            }
+            snap.push(("fb".into(), take(&f)));
+            // (k-1)-term full points: (point, indices, signs); first sign +1.
+            let mut combos: Vec<(Pt, Vec<u16>, Vec<i8>)> = (0..m)
+                .map(|i| (Some(fb[i]), vec![i as u16], vec![1i8]))
+                .collect();
+            for _ in 2..k {
+                let mut next = Vec::new();
+                for (p, idx, sg) in &combos {
+                    let last = *idx.last().unwrap() as usize;
+                    for l in (last + 1)..m {
+                        let (sum, dif) = f.padd_with_sibling(*p, Some(fb[l]));
+                        for (pt, s) in [(sum, 1i8), (dif, -1i8)] {
+                            if pt.is_some() {
+                                let mut i2 = idx.clone();
+                                i2.push(l as u16);
+                                let mut s2 = sg.clone();
+                                s2.push(s);
+                                next.push((pt, i2, s2));
+                            }
+                        }
+                    }
+                }
+                combos = next;
+            }
+            snap.push(("combos".into(), take(&f)));
+            // table: x -> (combo id, l, sign of F_l)
+            let cap: usize = combos
+                .iter()
+                .map(|(_, idx, _)| 2 * (m - 1 - *idx.last().unwrap() as usize))
+                .sum::<usize>()
+                .max(kstar as usize + 16);
+            let mut table = Tab::new(flat, cap, p);
+            for (ci_, (p, idx, _)) in combos.iter().enumerate() {
+                let last = *idx.last().unwrap() as usize;
+                for l in (last + 1)..m {
+                    if let Some((xp, xm)) = f.xpair(*p, Some(fb[l])) {
+                        f.hash();
+                        table.insert_if_absent(xp, (ci_ as u32, l as u16, 1));
+                        f.hash();
+                        table.insert_if_absent(xm, (ci_ as u32, l as u16, -1));
+                    }
+                }
+            }
+            snap.push(("table".into(), take(&f)));
+            let entry_pt = |f: &F, e: (u32, u16, i8)| -> Pt {
+                let fl = Some(fb[e.1 as usize]);
+                f.padd(
+                    combos[e.0 as usize].0,
+                    if e.2 > 0 { fl } else { f.pneg(fl) },
+                )
+            };
+            // coefficient vector of an entry: (index, sign) pairs
+            let entry_terms = |e: (u32, u16, i8)| -> Vec<(usize, i64)> {
+                let (_, idx, sg) = &combos[e.0 as usize];
+                let mut v: Vec<(usize, i64)> = idx
+                    .iter()
+                    .zip(sg)
+                    .map(|(&i, &s)| (i as usize, s as i64))
+                    .collect();
+                v.push((e.1 as usize, e.2 as i64));
+                v
+            };
+            // counted arithmetic mod n
+            let mulm = |a: u64, b: u64| -> u64 {
+                f.cm.set(f.cm.get() + 1);
+                ((a as u128 * b as u128) % n as u128) as u64
+            };
+            let invm = |a: u64| -> u64 {
+                f.ci.set(f.ci.get() + 1);
+                let (mut r0, mut r1) = (n as i128, a as i128);
+                let (mut t0, mut t1) = (0i128, 1i128);
+                while r1 != 0 {
+                    let q = r0 / r1;
+                    (r0, r1) = (r1, r0 - q * r1);
+                    (t0, t1) = (t1, t0 - q * t1);
+                }
+                t0.rem_euclid(n as i128) as u64
+            };
+            let w0 = rng.gen_range(1..n);
+            let dd = rng.gen_range(1..n);
+            let dpt = f.smul(g, dd);
+            let mut w_pts: Vec<Pt> = vec![f.smul(g, w0)];
+            let mut w_log: Vec<u64> = vec![w0];
+            let ensure_w = |f: &F, kk: usize, w_pts: &mut Vec<Pt>, w_log: &mut Vec<u64>| {
+                while w_pts.len() <= kk {
+                    let last = *w_pts.last().unwrap();
+                    w_pts.push(f.padd(last, dpt));
+                    w_log.push((w_log.last().unwrap() + dd) % n);
+                }
+            };
+            let kw = 64usize;
+            ensure_w(&f, kw, &mut w_pts, &mut w_log);
+            let e_log = rng.gen_range(1..n);
+            let e_pt = f.smul(g, e_log);
+            let v0 = rng.gen_range(1..n);
+            let mut v_pt = f.smul(g, v0);
+            let mut v_log = v0;
+            // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
+            let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
+            let mut rank = 0usize;
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
+            let mut nrel = 0usize;
+            let budget_rel = (gfac * m as f64).ceil() as usize;
+            let mut p1_trials = 0u64;
+            let mut kk = 0usize;
+            while rank < m {
+                if kk == kw {
+                    kk = 0;
+                    v_pt = f.padd(v_pt, e_pt);
+                    v_log = (v_log + e_log) % n;
+                }
+                p1_trials += 2;
+                if let Some((xp, xm)) = f.xpair(v_pt, w_pts[kk]) {
+                    for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                        f.hash();
+                        if let Some(e) = table.get(xx) {
+                            f.hash();
+                            if seen.insert(e, ()).is_some() {
+                                continue;
+                            }
+                            let wp = if sw > 0 { w_pts[kk] } else { f.pneg(w_pts[kk]) };
+                            let r = f.padd(v_pt, wp);
+                            let eps: i64 = if r == entry_pt(&f, e) { 1 } else { -1 };
+                            let mut row = vec![0u64; m + 1];
+                            for (i, s) in entry_terms(e) {
+                                row[i] = md((row[i] as i128) + (eps * s) as i128, n);
+                            }
+                            row[m] = md(v_log as i128 + sw as i128 * w_log[kk] as i128, n);
+                            nrel += 1;
+                            // reduce against pivots
+                            for c in 0..m {
+                                if row[c] == 0 {
+                                    continue;
+                                }
+                                if let Some(pr) = &pivots[c] {
+                                    let fct = row[c];
+                                    for j in c..=m {
+                                        if pr[j] != 0 {
+                                            row[j] =
+                                                md(row[j] as i128 - mulm(fct, pr[j]) as i128, n);
+                                        }
+                                    }
+                                } else {
+                                    let iv = invm(row[c]);
+                                    for j in c..=m {
+                                        if row[j] != 0 {
+                                            row[j] = mulm(row[j], iv);
+                                        }
+                                    }
+                                    pivots[c] = Some(row.clone());
+                                    rank += 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                kk += 1;
+                if nrel > 50 * budget_rel + 1000 {
+                    panic!("relation budget");
+                }
+            }
+            // back substitution
+            let mut ylog: Vec<u64> = vec![0; m];
+            for c in (0..m).rev() {
+                let pr = pivots[c].as_ref().unwrap();
+                let mut v = pr[m] as i128;
+                for j in (c + 1)..m {
+                    if pr[j] != 0 {
+                        v -= mulm(pr[j], ylog[j]) as i128;
+                    }
+                }
+                ylog[c] = md(v, n);
+            }
+            snap.push(("relations".into(), take(&f)));
+            let mut trials = 0u64;
+            let t_tgt = Instant::now();
+            // lock-step batches: act[j] = (target, kq); a finished slot takes the next target
+            let mut act: Vec<(usize, usize)> = Vec::with_capacity(bsz);
+            let mut next_t = 0usize;
+            while act.len() < bsz && next_t < targets {
+                act.push((next_t, 0));
+                next_t += 1;
+            }
+            // per slot: Err(log) = solved by the x(Q) = x(W_k) shortcut; Ok(None) = degenerate pair; Ok(Some(x pair))
+            let mut prob: Vec<Result<Option<(u64, u64)>, u64>> = Vec::with_capacity(bsz);
+            while !act.is_empty() {
+                let kmax = act.iter().map(|a| a.1).max().unwrap();
+                ensure_w(&f, kmax, &mut w_pts, &mut w_log);
+                prob.clear();
+                for &(t, kq) in &act {
+                    let q = qs[t];
+                    trials += 2;
+                    if q.unwrap().0 == w_pts[kq].unwrap().0 {
+                        prob.push(Err(if q == w_pts[kq] {
+                            w_log[kq]
+                        } else {
+                            (n - w_log[kq]) % n
+                        }));
+                        continue;
+                    }
+                    let pr = f.xpair(q, w_pts[kq]);
+                    if let Some((xp, xm)) = pr {
+                        table.prefetch(xp);
+                        table.prefetch(xm);
+                    }
+                    prob.push(Ok(pr));
+                }
+                let mut nact: Vec<(usize, usize)> = Vec::with_capacity(bsz);
+                for (j, &(t, kq)) in act.iter().enumerate() {
+                    let mut solved: Option<u64> = None;
+                    match prob[j] {
+                        Err(v) => solved = Some(v),
+                        Ok(Some((xp, xm))) => {
+                            for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                                f.hash();
+                                if let Some(e) = table.get(xx) {
+                                    let dl = md(
+                                        entry_terms(e)
+                                            .iter()
+                                            .map(|&(i, s)| s as i128 * ylog[i] as i128)
+                                            .sum(),
+                                        n,
+                                    );
+                                    let dpt2 = entry_pt(&f, e);
+                                    solved = Some(resolve(
+                                        &f, qs[t], w_pts[kq], sw, w_log[kq], dpt2, dl, n,
+                                    ));
+                                    break;
+                                }
+                            }
+                        }
+                        Ok(None) => {}
+                    }
+                    match solved {
+                        Some(v) => {
+                            found[t] = v;
+                            if next_t < targets {
+                                nact.push((next_t, 0));
+                                next_t += 1;
+                            }
+                        }
+                        None => {
+                            if kq + 1 > 50_000_000 {
+                                panic!("budget");
+                            }
+                            nact.push((t, kq + 1));
+                        }
+                    }
+                }
+                act = nact;
+            }
+            let ms_targets = t_tgt.elapsed().as_secs_f64() * 1e3;
+            snap.push(("targets".into(), take(&f)));
+            let _ = budget_rel;
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"batch\":{},\"ms_targets\":{:.3}",
+                    k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len(),
+                    if flat { "flat" } else { "std" }, bsz, ms_targets
                 ),
             }
         }

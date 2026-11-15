@@ -1,11 +1,9 @@
 # DRAFT Amendment R2-G (proposed number 15): stage B as resumable units
 
-**Status: draft (fifth version, after three independent reviews and a re-check of the runner: "freeze with edits", the edits are applied here), NOT applied, NOT frozen. The freeze waits for the owner's answer named in rule 5.** Written 2026-11-10 by the main
-session for owner decision 8 of `research/open_leads_execution_20261108/DECISIONS.md` ("split stage B into short jobs under a
-dated amendment, reviewed before it is frozen; readings and rules stay as registered"). Target when frozen:
-`research/prime_fall_degree_20261027/PREREGISTRATION.md`, appended as "Amendment 15". It changes execution and procedure: how
-stage B's registered systems are packed into jobs, and what is done when a job is interrupted. No reading changes. Every number
-is `[pcc:unverified]`; each is marked measured, cited or derived.
+**Status: FROZEN 2026-11-14 as Amendment 15 of `research/prime_fall_degree_20261027/PREREGISTRATION.md`, before any stage B
+row exists and before any unit job is submitted.** Fifth draft after three independent reviews and a re-check of the runner
+(verdict "freeze with edits", the edits applied); the owner's answer on the lost `pfd-b` attempts (rule 5) is owner decision
+9.
 
 ## 1. Why (measured, derived)
 
@@ -101,9 +99,8 @@ unit list from this table and refuses to start if the counts differ.
    `abort <unit>` line (rule 6 writes `abort` when an upload failed). The count is mechanical: it does not depend on why the
    job ended. The cause of each job's end is still read from the EKS audit log and recorded.
    - The two lost `pfd-b` attempts count toward no unit: owner decision 8 replaced the unsplit job, and the count starts with
-     the first unit job. That is the main session's reading of decision 8. It is put to the owner before the first unit job
-     and the owner's answer is recorded here at the freeze; it is fixed after that. Their partial files stay unread and
-     unscored.
+     the first unit job. The owner confirmed this on 2026-11-14 (owner decision 9, `DECISIONS.md`), before any unit job
+     existed; it is fixed. Their partial files stay unread and unscored.
    - The owner has two answers to a lost unit, and only these. **Accept the loss**: the next job is given `close:<ladder>:<T>`;
      no level of that ladder from `T` on runs, in that job or any later one, and the ladder is reported as "lost at t = T"
      with no row there. **Allow further attempts**: the next job is given `allow:<unit>:<K>` with `K` at least 3; the unit
