@@ -274,6 +274,14 @@ struct MixedState {
     bloom_false_positive: u64,
     duplicates: u64,
     hashes: BTreeMap<u64, Vec<usize>>,
+    /// `mixed-peel-lazy`: no matching until every column is covered; then
+    /// one batch matching over the stored rows, incremental afterwards;
+    /// the square solve uses worklist peeling and a bucket-queue pivot.
+    lazy: bool,
+    covered: Vec<bool>,
+    uncovered: usize,
+    bookkeeping: u64,
+    arithmetic: u64,
 }
 
 /// `mixed-peel`: see the module documentation.
@@ -308,8 +316,29 @@ impl MixedPeel {
         self.state.borrow().attempts
     }
 
+    /// `mixed-peel-lazy` (amendment A2 of the study): the same solver with
+    /// the gate built only once every column occurs in some row (a
+    /// necessary condition, checked for one count per non-zero), worklist
+    /// peeling and a bucket-queue Markowitz pivot.
+    pub fn lazy(cols: usize, modulus: u64) -> Self {
+        Self {
+            modulus,
+            cols,
+            state: RefCell::new(MixedState {
+                gate: None,
+                next_attempt: cols,
+                lazy: true,
+                covered: vec![false; cols],
+                uncovered: cols,
+                ..MixedState::default()
+            }),
+        }
+    }
+
     fn try_solve(&self, st: &mut MixedState) {
-        let gate = st.gate.as_ref().expect("gate");
+        let Some(gate) = st.gate.as_ref() else {
+            return;
+        };
         if st.solution.is_some() || gate.size() < self.cols || st.rows.len() < st.next_attempt {
             return;
         }
@@ -317,8 +346,15 @@ impl MixedPeel {
         let matched: Vec<usize> = (0..self.cols)
             .map(|c| gate.row_of(c).expect("full matching"))
             .collect();
-        match solve_square(&st.rows, &matched, self.cols, self.modulus) {
+        let solved = if st.lazy {
+            solve_square_fast(&st.rows, &matched, self.cols, self.modulus)
+        } else {
+            solve_square(&st.rows, &matched, self.cols, self.modulus)
+        };
+        match solved {
             Ok((x, rep)) => {
+                st.bookkeeping += rep.book;
+                st.arithmetic += rep.row_ops - rep.book;
                 st.row_ops += rep.row_ops;
                 st.inversions += rep.inversions;
                 st.peeled_forward += rep.forward;
@@ -336,6 +372,7 @@ impl MixedPeel {
                         continue;
                     }
                     st.row_ops += e.len() as u64;
+                    st.arithmetic += e.len() as u64;
                     let lhs = e
                         .iter()
                         .fold(0u64, |acc, &(c, v)| addmod(acc, mulmod(v, x[c as usize], m), m));
@@ -348,6 +385,8 @@ impl MixedPeel {
                 st.solution = Some(x);
             }
             Err(rep) => {
+                st.bookkeeping += rep.book;
+                st.arithmetic += rep.row_ops - rep.book;
                 st.row_ops += rep.row_ops;
                 st.inversions += rep.inversions;
                 st.failed_attempts += 1;
@@ -361,7 +400,11 @@ impl MixedPeel {
 
 #[derive(Default, Debug, Clone, Copy)]
 struct SquareReport {
+    /// Everything charged, bookkeeping included.
     row_ops: u64,
+    /// The bookkeeping part of `row_ops` (weight updates, queue operations,
+    /// incidence scans); `solve_square_fast` only.
+    book: u64,
     inversions: u64,
     forward: u64,
     backward: u64,
@@ -561,6 +604,254 @@ fn solve_square(
     Ok((x, rep))
 }
 
+/// [`solve_square`] with worklists: peeling driven by queues of weight-one
+/// rows and columns (as an invertible Bloom lookup table is decoded) and
+/// Markowitz pivots taken from a bucket queue keyed by live column weight,
+/// so no step scans every column.  Exact column weights are maintained;
+/// every queue push or pop, weight update and incidence entry read is
+/// charged as bookkeeping (in `row_ops` and in `book`).
+fn solve_square_fast(
+    rows: &[(Vec<(u32, u64)>, u64)],
+    matched: &[usize],
+    n: usize,
+    m: u64,
+) -> Result<(Vec<u64>, SquareReport), SquareReport> {
+    let mut rep = SquareReport::default();
+    macro_rules! book {
+        ($k:expr) => {{
+            rep.book += $k as u64;
+            rep.row_ops += $k as u64;
+        }};
+    }
+    let mut w: Vec<BTreeMap<u32, u64>> = matched
+        .iter()
+        .map(|&r| rows[r].0.iter().copied().collect())
+        .collect();
+    let mut rhs: Vec<u64> = matched.iter().map(|&r| rows[r].1).collect();
+    let mut col_rows: Vec<Vec<u32>> = vec![Vec::new(); n];
+    for (i, row) in w.iter().enumerate() {
+        for &c in row.keys() {
+            col_rows[c as usize].push(i as u32);
+        }
+        book!(row.len());
+    }
+    let mut row_alive = vec![true; n];
+    let mut col_alive = vec![true; n];
+    let mut col_w: Vec<usize> = col_rows.iter().map(|v| v.len()).collect();
+    let mut x = vec![0u64; n];
+    let mut stack: Vec<(u32, u32)> = Vec::new();
+    let mut frozen: Vec<Option<(BTreeMap<u32, u64>, u64)>> = vec![None; n];
+    let live_rows = |c: usize,
+                     col_rows: &Vec<Vec<u32>>,
+                     w: &Vec<BTreeMap<u32, u64>>,
+                     row_alive: &Vec<bool>,
+                     rep: &mut SquareReport|
+     -> Vec<u32> {
+        rep.book += col_rows[c].len() as u64;
+        rep.row_ops += col_rows[c].len() as u64;
+        let mut v: Vec<u32> = col_rows[c]
+            .iter()
+            .copied()
+            .filter(|&i| row_alive[i as usize] && w[i as usize].contains_key(&(c as u32)))
+            .collect();
+        v.sort_unstable();
+        v.dedup();
+        v
+    };
+    let mut row_q: Vec<u32> = (0..n as u32).filter(|&i| w[i as usize].len() == 1).collect();
+    let mut col_q: Vec<u32> = (0..n as u32).filter(|&c| col_w[c as usize] == 1).collect();
+    book!(2 * n);
+    loop {
+        if let Some(i) = row_q.pop() {
+            book!(1);
+            let i = i as usize;
+            if !row_alive[i] || w[i].len() != 1 {
+                continue;
+            }
+            let (&c, &a) = w[i].iter().next().expect("one entry");
+            let c = c as usize;
+            let inv = invmod(a, m).ok_or(rep)?;
+            rep.inversions += 1;
+            rep.row_ops += 1;
+            let v = mulmod(rhs[i], inv, m);
+            x[c] = v;
+            row_alive[i] = false;
+            col_alive[c] = false;
+            rep.forward += 1;
+            for j in live_rows(c, &col_rows, &w, &row_alive, &mut rep) {
+                let j = j as usize;
+                let a_jc = w[j].remove(&(c as u32)).expect("live");
+                rep.row_ops += 1;
+                rhs[j] = submod(rhs[j], mulmod(a_jc, v, m), m);
+                if w[j].len() == 1 {
+                    row_q.push(j as u32);
+                    book!(1);
+                }
+            }
+            continue;
+        }
+        if let Some(c) = col_q.pop() {
+            book!(1);
+            let c = c as usize;
+            if !col_alive[c] || col_w[c] != 1 {
+                continue;
+            }
+            let live = live_rows(c, &col_rows, &w, &row_alive, &mut rep);
+            let Some(&i) = live.first() else {
+                return Err(rep);
+            };
+            let i = i as usize;
+            row_alive[i] = false;
+            col_alive[c] = false;
+            rep.backward += 1;
+            for &k in w[i].keys() {
+                let k = k as usize;
+                if k != c {
+                    book!(1);
+                    col_w[k] -= 1;
+                    if col_w[k] == 1 {
+                        col_q.push(k as u32);
+                        book!(1);
+                    }
+                }
+            }
+            frozen[i] = Some((std::mem::take(&mut w[i]), rhs[i]));
+            stack.push((i as u32, c as u32));
+            continue;
+        }
+        break;
+    }
+
+    // ── Markowitz on the core, pivots from a bucket queue ──
+    let mut buckets: Vec<Vec<u32>> = vec![Vec::new(); n + 2];
+    let mut remaining = 0usize;
+    let mut lo = usize::MAX;
+    for c in 0..n {
+        if col_alive[c] {
+            let wc = col_w[c].min(n + 1);
+            buckets[wc].push(c as u32);
+            lo = lo.min(wc);
+            remaining += 1;
+            book!(1);
+        }
+    }
+    rep.core_dim = remaining as u64;
+    while remaining > 0 {
+        // Lowest non-empty bucket holding a fresh entry.
+        let c = loop {
+            while lo < buckets.len() && buckets[lo].is_empty() {
+                lo += 1;
+            }
+            if lo >= buckets.len() {
+                return Err(rep);
+            }
+            let c = buckets[lo].pop().expect("non-empty") as usize;
+            book!(1);
+            if col_alive[c] && col_w[c].min(n + 1) == lo {
+                break c;
+            }
+        };
+        if col_w[c] == 0 {
+            return Err(rep);
+        }
+        let live = live_rows(c, &col_rows, &w, &row_alive, &mut rep);
+        if live.is_empty() {
+            return Err(rep);
+        }
+        let p = *live
+            .iter()
+            .min_by_key(|&&i| w[i as usize].len())
+            .expect("non-empty") as usize;
+        book!(live.len());
+        let a_pc = w[p][&(c as u32)];
+        let inv = invmod(a_pc, m).ok_or(rep)?;
+        rep.inversions += 1;
+        let prow: Vec<(u32, u64)> = w[p].iter().map(|(&k, &v)| (k, v)).collect();
+        let mut touched: Vec<u32> = Vec::new();
+        for &j in &live {
+            let j = j as usize;
+            if j == p {
+                continue;
+            }
+            let a_jc = w[j][&(c as u32)];
+            let f = mulmod(a_jc, inv, m);
+            rep.row_ops += 1;
+            for &(k, v) in &prow {
+                if k as usize == c {
+                    w[j].remove(&k);
+                    continue;
+                }
+                rep.row_ops += 1;
+                let mut filled = false;
+                let e = w[j].entry(k).or_insert_with(|| {
+                    filled = true;
+                    0
+                });
+                *e = submod(*e, mulmod(f, v, m), m);
+                let zero = *e == 0;
+                if zero {
+                    w[j].remove(&k);
+                }
+                if filled && !zero {
+                    rep.fill += 1;
+                    col_rows[k as usize].push(j as u32);
+                    col_w[k as usize] += 1;
+                    touched.push(k);
+                    book!(2);
+                } else if !filled && zero {
+                    col_w[k as usize] -= 1;
+                    touched.push(k);
+                    book!(1);
+                }
+            }
+            rhs[j] = submod(rhs[j], mulmod(f, rhs[p], m), m);
+            rep.row_ops += 1;
+        }
+        row_alive[p] = false;
+        col_alive[c] = false;
+        for &(k, _) in &prow {
+            if k as usize != c {
+                col_w[k as usize] -= 1;
+                touched.push(k);
+                book!(1);
+            }
+        }
+        touched.sort_unstable();
+        touched.dedup();
+        for k in touched {
+            let k = k as usize;
+            if col_alive[k] {
+                let wk = col_w[k].min(n + 1);
+                buckets[wk].push(k as u32);
+                lo = lo.min(wk);
+                book!(1);
+            }
+        }
+        frozen[p] = Some((std::mem::take(&mut w[p]), rhs[p]));
+        stack.push((p as u32, c as u32));
+        remaining -= 1;
+    }
+
+    for &(i, c) in stack.iter().rev() {
+        let (row, b) = frozen[i as usize].as_ref().expect("frozen");
+        let mut acc = *b;
+        let mut a_c = 0;
+        for (&k, &v) in row {
+            if k == c {
+                a_c = v;
+                continue;
+            }
+            rep.row_ops += 1;
+            acc = submod(acc, mulmod(v, x[k as usize], m), m);
+        }
+        let inv = invmod(a_c, m).ok_or(rep)?;
+        rep.inversions += 1;
+        rep.row_ops += 1;
+        x[c as usize] = mulmod(acc, inv, m);
+    }
+    Ok((x, rep))
+}
+
 impl RelationSolver for MixedPeel {
     fn add_row(&mut self, dense: Vec<u64>, rhs: u64) -> RowStatus {
         let m = self.modulus;
@@ -630,13 +921,40 @@ impl RelationSolver for MixedPeel {
             st.hashes.entry(h).or_default().push(st.rows.len());
         }
         let cols: Vec<u32> = entries.iter().map(|e| e.0).collect();
+        st.rows.push((entries, rhs));
+        if st.lazy {
+            for &c in &cols {
+                st.row_ops += 1;
+                st.bookkeeping += 1;
+                if !st.covered[c as usize] {
+                    st.covered[c as usize] = true;
+                    st.uncovered -= 1;
+                }
+            }
+            if st.gate.is_none() {
+                if st.uncovered > 0 || st.rows.len() < self.cols {
+                    return RowStatus::Independent;
+                }
+                // Build the matching once, over every stored row.
+                let mut gate = MatchGate::new(self.cols);
+                for (e, _) in &st.rows {
+                    let cs: Vec<u32> = e.iter().map(|x| x.0).collect();
+                    gate.add_row(&cs);
+                }
+                st.covered_gate_visits += gate.visits;
+                st.row_ops += gate.visits;
+                st.bookkeeping += gate.visits;
+                st.gate = Some(gate);
+                return RowStatus::Independent;
+            }
+        }
         let gate = st.gate.as_mut().expect("gate");
         let before = gate.visits;
         gate.add_row(&cols);
         let visits = gate.visits - before;
         st.covered_gate_visits += visits;
         st.row_ops += visits;
-        st.rows.push((entries, rhs));
+        st.bookkeeping += visits;
         RowStatus::Independent
     }
 
@@ -677,6 +995,10 @@ impl RelationSolver for MixedPeel {
         out.insert("mixed_peeled_backward".into(), st.peeled_backward);
         out.insert("mixed_core_dim".into(), st.core_dim);
         out.insert("mixed_core_fill".into(), st.core_fill);
+        if st.lazy {
+            out.insert("mixed_bookkeeping".into(), st.bookkeeping);
+            out.insert("mixed_arithmetic".into(), st.arithmetic);
+        }
         if st.bloom.is_some() {
             out.insert("mixed_bloom_positive".into(), st.bloom_positive);
             out.insert("mixed_bloom_false_positive".into(), st.bloom_false_positive);
@@ -782,11 +1104,11 @@ mod tests {
             let m = [1_000_003u64, 4_294_967_291, (1u64 << 61) - 1][(seed % 3) as usize];
             let cols = [5usize, 17, 60, 150][(seed / 3 % 4) as usize];
             let (x, mut gen) = planted(seed, cols, m, (2, 4));
-            for bloom in [false, true] {
-                let mut s = if bloom {
-                    MixedPeel::with_bloom(cols, m, 10, 4)
-                } else {
-                    MixedPeel::new(cols, m)
+            for variant in 0..3 {
+                let mut s = match variant {
+                    0 => MixedPeel::new(cols, m),
+                    1 => MixedPeel::with_bloom(cols, m, 10, 4),
+                    _ => MixedPeel::lazy(cols, m),
                 };
                 let mut done = false;
                 for _ in 0..20 * cols {
@@ -798,7 +1120,7 @@ mod tests {
                         break;
                     }
                 }
-                assert!(done, "seed {seed}: not solved");
+                assert!(done, "seed {seed} variant {variant}: not solved");
                 assert_eq!(s.rank(), cols);
                 for c in 0..cols {
                     assert_eq!(s.pinned(c), Some(x[c]), "seed {seed} col {c}");

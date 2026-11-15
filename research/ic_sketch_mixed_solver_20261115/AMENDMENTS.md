@@ -21,3 +21,32 @@ Two changes, both to the implementation, none to the predictions:
 The v1 records are kept as observed. Part A is re-run in full (v2) with the fixed
 binary; the predictions are scored on v2 only, and v1's gate figures are reported
 beside them as the cost of the unamortized gate.
+
+## A2 (2026-11-15, after scoring Part A v2; before any `mixed-peel-lazy` data)
+
+Part A v2 scored: P1 failed (the gate reads the same rows as `filter+wiedemann` on
+98.75 % of streams and its visits raise row_ops), P2 held (100 %), P3 held only at
+|F| ≤ 64 against `filter+wiedemann` and only at m = 3 against
+`incremental-gauss-full-rank`, P4 held (no duplicates; Bloom pure overhead).
+
+The `mixed-peel` breakdown showed its work is bookkeeping, not arithmetic: at m = 2 the
+2-core has 16–24 columns, and the gate (one search a row) and full-sweep peeling
+dominate; at m = 3, |F| = 512, an O(core²) pivot scan dominates. A new arm,
+`mixed-peel-lazy`, keeps the algorithm and changes those data structures:
+- the matching is built once, when every column is covered (coverage is necessary
+  for full rank and costs one count a non-zero), then maintained incrementally;
+- peeling runs from queues of weight-one rows and columns (IBLT decoding);
+- Markowitz pivots come from a bucket queue keyed by exact live column weight.
+Every queue operation, weight update and incidence read is charged in row_ops, and
+split out as `mixed_bookkeeping` / `mixed_arithmetic`. `mixed-peel` is unchanged.
+
+Predictions for the new arm (exploratory; scored separately from P1–P6):
+- **Q1.** It reads exactly the rows of `incremental-gauss-full-rank` on every stream.
+- **Q2.** Its median row_ops are below `mixed-peel`'s in all 10 cells.
+- **Q3.** Its median row_ops are below the cheapest existing full-rank arm
+  (min of `incremental-gauss-full-rank`, `filter+wiedemann`, `filter+lanczos`) in at
+  least 6 of the 10 cells.
+- **Q4.** Existing arms reproduce their v2 records exactly (determinism check).
+
+Part A v3 runs all 11 arms; Part B specs gain the `mixed-peel-lazy` arm before any
+Part B run.

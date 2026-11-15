@@ -1233,6 +1233,10 @@ pub const MATRIX_NAMES: &[(&str, &str)] = &[
         "structural-rank gate, then the matched square system: two-sided peeling, Markowitz elimination of the 2-core, back-substitution; rank certified by non-zero pivots (one solve), surplus rows checked; full-rank completion; row_ops as sparse-cado plus gate visits and peeling weight updates",
     ),
     (
+        "mixed-peel-lazy",
+        "mixed-peel with the gate built only after every column is covered, worklist peeling and a bucket-queue Markowitz pivot; every queue, weight and incidence operation charged in row_ops",
+    ),
+    (
         "mixed-peel+bloom",
         "mixed-peel with a Bloom duplicate screen (10 bits a row, 4 probes) in front of an exact check on arriving rows; hash evaluations and probes charged in row_ops",
     ),
@@ -1251,6 +1255,7 @@ pub fn is_deferred_sparse(name: &str) -> bool {
             | "filter+wiedemann+match"
             | "filter+lanczos+match"
             | "mixed-peel"
+            | "mixed-peel-lazy"
             | "mixed-peel+bloom"
     )
 }
@@ -1294,6 +1299,7 @@ pub fn matrix_by_name(
                 .with_match_gate(),
         )),
         "mixed-peel" => Ok(Box::new(super::linalg_mixed::MixedPeel::new(cols, modulus))),
+        "mixed-peel-lazy" => Ok(Box::new(super::linalg_mixed::MixedPeel::lazy(cols, modulus))),
         "mixed-peel+bloom" => Ok(Box::new(super::linalg_mixed::MixedPeel::with_bloom(
             cols, modulus, 10, 4,
         ))),
@@ -1682,6 +1688,7 @@ mod tests {
                         | "filter+wiedemann+match"
                         | "filter+lanczos+match"
                         | "mixed-peel"
+                        | "mixed-peel-lazy"
                         | "mixed-peel+bloom"
                 )
             );

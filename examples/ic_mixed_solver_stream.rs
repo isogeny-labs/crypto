@@ -24,7 +24,7 @@ use crypto_lib::cryptanalysis::ic_framework::linalg::{is_deferred_sparse, matrix
 
 const MODULUS: u64 = (1u64 << 61) - 1;
 
-const ARMS: [&str; 10] = [
+const ARMS: [&str; 11] = [
     "incremental-gauss",
     "incremental-gauss-full-rank",
     "structured-gauss",
@@ -34,6 +34,7 @@ const ARMS: [&str; 10] = [
     "filter+lanczos+match",
     "mixed-peel",
     "mixed-peel+bloom",
+    "mixed-peel-lazy",
     "incremental-gauss-echelon",
 ];
 
