@@ -11,6 +11,7 @@
 We cannot establish the requested novel sub-exponential prime-field ECDLP
 algorithm because no fixed-base divisor procedure with a proved sufficient
 sub-exponential cost and success probability has been constructed.
+[pcc:unverified]
 
 The selected construction uses odd prime whole-order E/Fp, odd arity
 m=Theta(sqrt(log r)), and a power of two d. The original scalar/torus
@@ -83,7 +84,7 @@ precomputation advantage or fixed-size speed claim.
   either uniform complete exp(o(n)) cost, or a capped exp(o(n)) procedure with
   verified success probability at least exp(-o(n)). Include construction,
   failed calls, root extraction, verification and restarts. A low first-fall
-  degree or a fitted timing exponent is insufficient.
+  degree or a fitted timing exponent is insufficient. [pcc:unverified]
 - [x] Supply a supporting construction/bound without requiring a large2-power
   divisor of p-1 or p+1, while retaining the main odd-prime-whole-order input
   hypothesis. See the reviewed auxiliary-curve note and its classical sources.
@@ -107,7 +108,7 @@ asymptotic proof.
   arity. Focus on positive-target first-witness cost; complete UNSAT cost is
   optional. Keep membership implicit rather than materializing binom(d,m)
   states. Small quotient degree on enough positive targets is now proved in
-  the continuation; it does not bound initial elimination.
+  the continuation; it does not bound initial elimination. [pcc:unverified]
 - **Inputs and controls:** natural targets; selected-chart satisfiable and
   nonempty-chart unsatisfiable cases; rational/nonrational regressions; norm
   remainder and original per-root/Graeffe circuits on identical domains.
