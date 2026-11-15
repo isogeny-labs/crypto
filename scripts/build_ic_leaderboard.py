@@ -1599,7 +1599,10 @@ def tableb_ksum_text(k: dict) -> dict:
              "in-session incumbent, matched negation-map rho (rho-neg) and BSGS (bsgs-neg), same ecbench session "
              "and binary. Unit: " + k["unit"] + ". Table B's recorded before-mark is another harness's figure: "
              "it is shown for reference and never divided into the new S. S, ratios and the distance remaining "
-             "to rho (ksum5 S / rho-neg S) are in the new unit only; the distance remaining is not a pass/fail gate.")
+             "to rho (ksum5 S / rho-neg S) are in the new unit only; the distance remaining is not a pass/fail gate. "
+             "It is read under the section 5a band: the independent validator found it depends on how uncharged "
+             "native work is priced (bitop/v1: 5.6-5.8x; all work_native priced at w: 3.0-3.2x at w = 0.1 and "
+             "1.4x at w = 1); rho stays ahead in every reading.")
     rp = k["replay"]
     scope = [
         "Unit: " + k["unit"] + ".",

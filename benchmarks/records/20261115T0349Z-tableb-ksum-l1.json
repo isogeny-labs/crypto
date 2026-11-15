@@ -1,6 +1,6 @@
 {
   "branch": "claude/nice-babbage-bn0fn0",
-  "closed_utc": null,
+  "closed_utc": "2026-11-15T04:43:27+00:00",
   "commands": [
     {
       "argv": [
@@ -300,14 +300,16 @@
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "benchmarks/20261115-tableb-ksum/report.pdf",
     "png": [],
-    "svg": []
+    "svg": [
+      "benchmarks/20261115-tableb-ksum/l1-ratios.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "tableb-ksum-l1",
-  "status": "open",
-  "summary": "",
-  "validation": null
+  "status": "measured",
+  "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+  "validation": "benchmarks/20261115-tableb-ksum/VALIDATION.json"
 }
