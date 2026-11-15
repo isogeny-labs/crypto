@@ -318,7 +318,7 @@ delete_phase() { # $1 reason. Log the action, delete, confirm by listing, write 
 
 verify_upload() { # every file of the classified tree is in RECORD's raw[] with uploaded true (benchrec add-raw + upload)
   local miss K
-  K=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1)
+  K=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1 || true)
   [ -f "$RECORD" ] && [ -n "$K" ] && [ -f "$REC/local-sha256-$K.txt" ] || return 1
   miss=$(comm -23 <(awk '{ print $1 }' "$REC/local-sha256-$K.txt" | sort -u) \
                   <(jq -r '.raw[]? | select(.uploaded == true) | .sha256' "$RECORD" | sort -u))
@@ -349,7 +349,7 @@ last=$(checkin regular)
 dl=""; [ -n "$s0" ] && dl=$(( $(epoch "$s0") + DEADLINE_S ))
 
 # --- collected with the runner done: wait for the raw upload (at most UPLOAD_WAIT_S, never past the hard deadline)
-lastK=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1)
+lastK=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1 || true)
 if [ -n "$lastK" ] && jq -e '.reason == "done" and .transfer_ok == true' "$REC/collect-$lastK.json" >/dev/null 2>&1; then
   [ -f "$REC/outcome.json" ] || { classify "$REC" "$RES" > "$REC/outcome.json"; log "OUTCOME (late) $(jq -c '{class,rule,why}' "$REC/outcome.json")"; }
   if [ "$MODE" = --delete ]; then
@@ -413,7 +413,7 @@ if [ "$lstate" != unreachable ]; then
     cp "$wd/$keep.sha256" "$REC/local-sha256-$k.txt"; (cd "$wd" && sha256sum "$keep.tar.gz") > "$REC/tarball-$k.sha256"
     mkdir -p "$RES"; mv "$wd/$keep/results" "$RES/collect-$k"
     cmp -s "$REC/local-sha256-$k.txt" <(manifest "$RES/collect-$k") || { log "kept tree differs from its fetched manifest"; tok=false; }
-    o="$RES/collect-$k"; cl=$(sed -n 's/^.*start \(X-m2-[^ ]*\)$/\1/p' "$o/progress.txt" 2>/dev/null | head -1)
+    o="$RES/collect-$k"; cl=$(sed -n 's/^.*start \(X-m2-[^ ]*\)$/\1/p' "$o/progress.txt" 2>/dev/null | head -1 || true)
     { echo "--- binary.sha256"; cat "$o/binary.sha256" 2>/dev/null || echo MISSING
       echo "--- host.txt (first 7 lines)"; head -7 "$o/host.txt" 2>/dev/null || echo MISSING
       echo "--- progress.txt"; cat "$o/progress.txt" 2>/dev/null || echo MISSING

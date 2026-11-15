@@ -497,5 +497,5 @@ INTRO
     echo; echo "Summary of this run (image layer available: $HAVE_LAYER): $npass passed, $nfail failed, $nskip SKIP-NEEDS-LAYER (run $(date -u +%FT%TZ))."; } > "$T/README.md"
 fi
 echo "passed $npass, failed $nfail, SKIP-NEEDS-LAYER $nskip (layer-dependent cases: $nlayer of $ntot)"
-rm -rf "$WORK"
+if [ -n "${KEEP:-}" ]; then echo "kept $WORK"; else rm -rf "${WORK:?}"; fi
 [ "$nfail" = 0 ]
