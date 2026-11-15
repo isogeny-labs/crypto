@@ -3,8 +3,10 @@
 **Class:**
 - An exact census, an engine check, and an end-to-end ecbench session with
   full discrete-log solves.
-- A measured improvement of the best algebraic arm. It does not change the
-  order against the generic baseline or rho.
+- A point-estimate improvement screen of the best algebraic arm: the 6-target
+  interval [0.379, 1.084] still includes 1 and V2 failed, so this session
+  alone does not establish the gain. T9 later replicated it on 16 targets.
+  It does not change the order against the generic baseline or rho.
 
 Protocol: [PROTOCOL.md](PROTOCOL.md), frozen at `27482d63a0`; the T5 addendum
 was frozen at `a0e3605125`.

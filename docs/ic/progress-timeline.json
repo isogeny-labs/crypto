@@ -17,6 +17,15 @@
    "source": "https://github.com/aburan28/crypto/blob/main/research/ic_m3_algebraic_vs_mitm_20261014/amendment-2/ANALYSIS.md",
    "status": "F4 and F6-IC finish n = 23 and n = 29 (70 and 90 unknowns), n = 31 censored; slope 0.644 / 0.645 on n = 11-29 against 0.298 for the floor on the same cells; SAT undetermined",
    "value": null
+  },
+  {
+   "anchor": "#lab-ecbench-all",
+   "date": "2026-11-05",
+   "label": "Membership filter on the packed pair table (mitm-prime-blocked:m=2,filter=1 vs m=2), 32-bit prime curves, whole-solve wall per charged GAE",
+   "reason_not_plotted": "A wall-clock component speed-up at identical charged GAE: the counted IC/rho ratio does not move (S' dgbf/dgb 1.0 at w = 0, costlier at w > 0), so there is no new IC/rho value to plot. Engineering; generic decomposition track; moves no baseline.",
+   "source": "https://github.com/aburan28/crypto/blob/main/research/ic_packed_filter_20261029/README.md",
+   "status": "corrected wall dgbf/dgb 0.9601 [0.9569, 0.9633] (-3.99%) at b = 32, one session, 288 pairs, validated with caveats (TASK-20261029-654f73); bitop/v1 +0.301%; S' dgbf/dgb 1.0 / 1.0505 / 1.3586 at w = 0 / 0.1 / 1; distance remaining dgbf/rho-neg 31.47 / 31.50 / 31.63. 24 bits: regression 1.0032 [1.0006, 1.0058]; 28 bits undecidable (infrastructure).",
+   "value": null
   }
  ],
  "question": "Verified index-calculus cost over matched Pollard rho (IC / rho), by date landed on main. Below 1 means index calculus is cheaper. The barrier is rho's own cost, 1.",
@@ -1219,5 +1228,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-11-01"
+ "updated": "2026-11-05"
 }

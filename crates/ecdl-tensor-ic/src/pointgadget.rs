@@ -4,6 +4,7 @@ use std::rc::Rc;
 
 use num_bigint::{BigInt, BigUint};
 
+use crate::cofactor::CofactorCurve;
 use crate::curve::{Curve, Point};
 use crate::gadgets::{bits_uint, bool_int, ArithRef, Builder, Operand, Term, Var};
 use crate::relation::FactorBases;
@@ -367,6 +368,110 @@ pub fn gadget_relation_network(
     b.equals_const(ar, &s.x, &bi64(r.x));
     b.equals_const(ar, &s.y, &bi64(r.y));
     (b.finalize(), a)
+}
+
+impl Builder {
+    /// ScalarMulConst returns [k]P for a constant k ≥ 1 by left-to-right
+    /// double-and-add with complete additions, so doubling, O (a 2-torsion
+    /// P doubles to O) and P + (−P) are all handled: about 2·log2 k complete
+    /// additions (Rust only; the cofactor clearing of the fixed-cofactor
+    /// setting). For k = 1 it returns P itself.
+    pub fn scalar_mul_const(
+        &mut self,
+        ar: &ArithRef,
+        c: &Curve,
+        k: u64,
+        p: &FieldPoint,
+    ) -> FieldPoint {
+        assert!(k >= 1, "ecdl: ScalarMulConst needs k >= 1");
+        let mut acc = p.clone();
+        for i in (0..63 - k.leading_zeros()).rev() {
+            acc = self.complete_add(ar, c, &acc, &acc);
+            if (k >> i) & 1 == 1 {
+                acc = self.complete_add(ar, c, &acc, p);
+            }
+        }
+        acc
+    }
+}
+
+/// GadgetCofactorRelationNetwork is [`gadget_relation_network`] for a
+/// fixed-cofactor curve: each slot takes a free valid point S_i ∈ E (proposed
+/// by a hint listing every preimage of every member of F_i), computes
+/// A_i = [c]S_i with [`Builder::scalar_mul_const`], forces A_i ≠ O and checks
+/// A_i ∈ F_i. Partial sums and the target are as in the prime-order network,
+/// so the count is c^m times that of the subgroup network (Rust only).
+/// Returns the network, the S_i and the A_i.
+pub fn gadget_cofactor_relation_network(
+    cc: &CofactorCurve,
+    ar: &ArithRef,
+    fb: &FactorBases,
+    r: Point,
+) -> (Network, Vec<FieldPoint>, Vec<FieldPoint>) {
+    let c = &cc.curve;
+    let mut b = Builder::default();
+    let mut srcs: Vec<FieldPoint> = Vec::with_capacity(fb.sets.len());
+    let mut a: Vec<FieldPoint> = Vec::with_capacity(fb.sets.len());
+    for (i, set) in fb.sets.iter().enumerate() {
+        let s = FieldPoint {
+            x: b.field_var(ar, "sx"),
+            y: b.field_var(ar, "sy"),
+            inf: None,
+        };
+        let pre: Vec<Point> = match fb.preimages.get(i) {
+            Some(pre) => pre.clone(),
+            None => set.iter().flat_map(|&q| cc.preimages(q)).collect(),
+        };
+        b.hint(&[], &[s.x.clone(), s.y.clone()], move |_| {
+            pre.iter().map(|q| vec![bi64(q.x), bi64(q.y)]).collect()
+        });
+        b.validity_check(ar, c, &s);
+        let pt = b.scalar_mul_const(ar, c, cc.cofactor, &s);
+        if let Some(inf) = &pt.inf {
+            b.equals_const(ar, inf, &bool_int(false));
+        }
+        b.membership_check(ar, fb, i, &pt);
+        srcs.push(s);
+        a.push(pt);
+    }
+    let mut s = a[0].clone();
+    for k in 1..a.len() {
+        s = b.complete_add(ar, c, &s, &a[k]);
+    }
+    b.equals_const(
+        ar,
+        s.inf.as_ref().expect("ecdl: sum has no infinity flag"),
+        &bool_int(r.inf),
+    );
+    b.equals_const(ar, &s.x, &bi64(r.x));
+    b.equals_const(ar, &s.y, &bi64(r.y));
+    (b.finalize(), srcs, a)
+}
+
+/// CofactorShape builds, without evaluating, the per-slot cofactor clearing
+/// of the fixed-cofactor network (validity of S plus [c]S) for ar's modulus
+/// and returns its statistics (Rust only).
+pub fn cofactor_shape(ar: &ArithRef, cofactor: u64) -> NetworkStats {
+    let curve = Curve {
+        a: 3,
+        b: 7,
+        ..Default::default()
+    };
+    let mut b = Builder::default();
+    let s = FieldPoint {
+        x: b.field_var(ar, "sx"),
+        y: b.field_var(ar, "sy"),
+        inf: None,
+    };
+    b.hint_nil(&[], &[s.x.clone(), s.y.clone()]);
+    b.validity_check(ar, &curve, &s);
+    let a = b.scalar_mul_const(ar, &curve, cofactor, &s);
+    if let Some(inf) = &a.inf {
+        b.equals_const(ar, inf, &bool_int(false));
+    }
+    b.equals_const(ar, &a.x, &BigUint::from(0u32));
+    b.equals_const(ar, &a.y, &BigUint::from(0u32));
+    b.finalize().stats()
 }
 
 /// GadgetShapes builds, without evaluating, a field multiplication, a

@@ -9,6 +9,7 @@
 //! ecbench run    --spec S --out D      run a session (pinned, interleaved, sealed records)
 //! ecbench verify --dir D [--replay N]  re-derive a session; replay runs exactly
 //! ecbench compare --dir D --a X --b Y  paired ratio with a bootstrap interval
+//! ecbench compare --dir D1 --dir D2 ... --a X --b Y  pooled over sessions (pairs stay within each)
 //! ecbench table  --dir D... [--reference ARM]   the one-unit table AGENTS.md §2 asks for
 //! ecbench resources --dir D [--out F]   cold native-work, memory and PMU vectors
 //! ecbench fb --curve C --factor-base F a factor base with its points
@@ -230,6 +231,13 @@ enum Cmd {
         #[arg(long, allow_hyphen_values = true, default_value_t = -0.5)]
         gamma: f64,
     },
+    /// The frozen replay sentinels (`docs/ecbench/replay-sentinels.json`):
+    /// one cheap committed record per method id that a pull request replays
+    /// with `verify --replay-seq`.
+    Sentinels {
+        #[command(subcommand)]
+        cmd: SentinelCmd,
+    },
     /// Print the host capsule.
     Host {
         /// Print the capsule as JSON.
@@ -254,6 +262,18 @@ enum Cmd {
         /// Explicit diagnostic launch provenance (producer activation pending).
         #[arg(long)]
         diagnostic_launch: Option<PathBuf>,
+        /// Calibrated weight of AGENTS.md §5a (from `ecbench wcal` or a
+        /// perf-ipc reading), recorded in `session.json` (`options.w_cal`)
+        /// and read by `band`, `compare`, `challenge` and `bound fit`.
+        /// Needs --w-cal-method and --w-cal-host.
+        #[arg(long, requires_all = ["w_cal_method", "w_cal_host"])]
+        w_cal: Option<f64>,
+        /// `perf-ipc` or `best-of-N timing`.
+        #[arg(long)]
+        w_cal_method: Option<String>,
+        /// The host `w_cal` was measured on.
+        #[arg(long)]
+        w_cal_host: Option<String>,
         /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
@@ -359,9 +379,12 @@ enum Cmd {
     },
     /// Compare arm B against arm A.
     Compare {
-        /// The session directory.
-        #[arg(long)]
-        dir: PathBuf,
+        /// The session directory. Repeat it (`--dir A --dir B`, or
+        /// `--dir A B`) to pool the pairs of several sessions: pairs stay
+        /// within each session, and the ratio is of total cost (`S·√r`)
+        /// over them all (`compare::compare_pooled`).
+        #[arg(long, required = true, num_args = 1..)]
+        dir: Vec<PathBuf>,
         /// The baseline arm's name (the ratio's denominator).
         #[arg(long)]
         a: String,
@@ -391,6 +414,26 @@ enum Cmd {
         /// the comparison, which is then not admissible).
         #[arg(long)]
         allow_interrupted: bool,
+        /// Price, in the §5a band and under --weight, the per-step table
+        /// inserts the IC table oracles count in `work_native`
+        /// (`table_insert_attempts` behind its `counted:` marker), which
+        /// `cost.unpriced` never lists. The default since 2026-11-08;
+        /// accepted for compatibility.
+        #[arg(long, conflicts_with = "no_price_table_work")]
+        price_table_work: bool,
+        /// The pre-2026-11-08 reading: charge `cost.unpriced` alone and
+        /// leave the counted table work listed but unpriced. Reproduces
+        /// every comparison saved before that date, `comparison_id` and
+        /// plain file name included.
+        #[arg(long)]
+        no_price_table_work: bool,
+        /// Pair each run's recorded bitop/v1 price (`work.bitops_per_sqrt_r`)
+        /// instead of its S: `bitop/v1` is the only value. Not with
+        /// `--weight` or several `--dir`; the §5a band is not computed.
+        #[arg(long)]
+        unit: Option<String>,
+        #[command(flatten)]
+        w_cal: WCalOverride,
     },
     /// The one-unit table: every arm on every curve, mean S, ratio to the
     /// floor and to the reference arm.
@@ -418,6 +461,54 @@ enum Cmd {
         /// Print the pairwise verdicts after the table.
         #[arg(long)]
         ranks: bool,
+        /// Price the per-step table inserts the IC table oracles count in
+        /// `work_native` (`table_insert_attempts` behind its `counted:`
+        /// marker), which `cost.unpriced` never lists, at w per operation
+        /// like rho's canonicalisations. The default since 2026-11-08
+        /// (AGENTS.md §5a); accepted for compatibility. The record format
+        /// is unchanged.
+        #[arg(long, conflicts_with = "no_price_table_work")]
+        price_table_work: bool,
+        /// The pre-2026-11-08 reading: charge `cost.unpriced` alone and
+        /// list the counted table work without pricing it. Reproduces the
+        /// band files written before that date.
+        #[arg(long)]
+        no_price_table_work: bool,
+        /// Calibrated weight of AGENTS.md §5a (2026-11-12): time of one
+        /// native mulmod over time of one group addition on the same curve
+        /// and host. Adds the additive `calibrated` block (field-arithmetic
+        /// counters ordered at 0, w_cal, 10*w_cal); without it the output
+        /// is unchanged. Needs --w-cal-method and --w-cal-host.
+        #[arg(long, requires_all = ["w_cal_method", "w_cal_host"])]
+        w_cal: Option<f64>,
+        /// `perf-ipc` or `best-of-N timing`.
+        #[arg(long)]
+        w_cal_method: Option<String>,
+        /// The host `w_cal` was measured on.
+        #[arg(long)]
+        w_cal_host: Option<String>,
+    },
+    /// Measure w_cal (AGENTS.md §5a) by best-of-N timing of a mulmod and a
+    /// group addition on y^2 = x^3 + a x + b over F_p; prints JSON labelled
+    /// `best-of-N timing`, never perf-ipc.
+    Wcal {
+        #[arg(long)]
+        p: u64,
+        #[arg(long, default_value_t = 0)]
+        a: u64,
+        #[arg(long)]
+        b: u64,
+        #[arg(long, default_value_t = 15)]
+        rounds: usize,
+        #[arg(long, default_value_t = 200_000)]
+        ops: u64,
+        /// Host name to record with the reading.
+        #[arg(long)]
+        host: String,
+        /// Also attach the reading to this session directory as the
+        /// sidecar `w_cal.json` (`session.json` is not rewritten).
+        #[arg(long)]
+        session: Option<PathBuf>,
     },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
@@ -528,6 +619,31 @@ enum Cmd {
     },
 }
 
+/// A `w_cal` override (AGENTS.md §5a, 2026-11-12) for `compare`,
+/// `challenge verdict` and `bound fit`: takes precedence over the sessions'
+/// own reading (`options.w_cal` or the `w_cal.json` sidecar), is recorded as
+/// `source: "override"`, and is refused unless positive and finite.
+#[derive(clap::Args, Clone, Debug, Default)]
+struct WCalOverride {
+    /// Calibrated weight overriding the sessions' own: time of one native
+    /// mulmod over time of one group addition on the same curve and host.
+    /// Needs --w-cal-method and --w-cal-host.
+    #[arg(long, requires_all = ["w_cal_method", "w_cal_host"])]
+    w_cal: Option<f64>,
+    /// `perf-ipc` or `best-of-N timing`.
+    #[arg(long)]
+    w_cal_method: Option<String>,
+    /// The host `w_cal` was measured on.
+    #[arg(long)]
+    w_cal_host: Option<String>,
+}
+
+impl WCalOverride {
+    fn get(self) -> Result<Option<crypto_lib::cryptanalysis::ecbench::band::WCal>, String> {
+        wcal_from_flags(self.w_cal, self.w_cal_method, self.w_cal_host)
+    }
+}
+
 #[derive(clap::Args)]
 struct OptimizeArgs {
     #[command(subcommand)]
@@ -602,11 +718,17 @@ enum BoundCmd {
         /// the rule text enters the bound's method identity.
         #[arg(long)]
         param_rule: Option<String>,
+        /// Name the static-DH oracle of the domain (an arm that queries
+        /// one must; a reference that does not may, to share the domain).
+        #[arg(long)]
+        oracle: Option<String>,
         /// The fit procedure (`docs/bounds/README.md` §3a).  Version 1
         /// re-derives records fitted before the version-2 refusals; new
         /// bounds are version 2.
         #[arg(long, default_value_t = bounds::FIT_VERSION)]
         fit_version: u32,
+        #[command(flatten)]
+        w_cal: WCalOverride,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -647,6 +769,7 @@ enum FrontierCmd {
 }
 
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum ChallengeCmd {
     /// Validate a drafted challenge (its curves build, lie in its domain,
     /// and number enough sizes) and seal it.
@@ -752,6 +875,8 @@ enum ChallengeCmd {
         /// Exit 1 when the verdict is inadmissible.
         #[arg(long)]
         exit_code: bool,
+        #[command(flatten)]
+        w_cal: WCalOverride,
     },
 }
 
@@ -882,6 +1007,66 @@ fn report_problems(problems: &[String]) {
     }
 }
 
+#[derive(clap::Subcommand, Debug)]
+enum SentinelCmd {
+    /// Print, as JSON lines, the cheapest replayable records per method
+    /// of one hydrated session (records.jsonl and plan.json decompressed).
+    Scan {
+        #[arg(long)]
+        dir: PathBuf,
+        /// The session's path in the repository (default: --dir).
+        #[arg(long)]
+        label: Option<String>,
+        /// Records kept per method.
+        #[arg(long, default_value_t = 3)]
+        keep: usize,
+    },
+    /// Write the manifest from a session list and `scan` outputs.
+    Build {
+        /// One committed session directory per line.
+        #[arg(long)]
+        list: PathBuf,
+        /// Files of `scan` output.
+        #[arg(long, num_args = 1.., required = true)]
+        candidates: Vec<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
+        /// Sentinels per method id, from distinct sessions.
+        #[arg(long, default_value_t = 1)]
+        per_method: usize,
+        /// A manifest whose `known_failures` are carried over.
+        #[arg(long)]
+        previous: Option<PathBuf>,
+        /// A record that already does not replay, `SESSION:SEQ:REASON`
+        /// (repeatable); skipped for the next-cheapest record.
+        #[arg(long = "known-failure")]
+        known_failure: Vec<String>,
+    },
+    /// Fail unless the manifest covers every method id of the listed
+    /// sessions and names only sessions as committed.
+    Check {
+        #[arg(long)]
+        list: PathBuf,
+        #[arg(long, default_value = "docs/ecbench/replay-sentinels.json")]
+        manifest: PathBuf,
+    },
+    /// Print the manifest's sessions and `seq` arguments for the replay
+    /// script: `session<TAB>seq,seq,...`, one session per line.
+    Plan {
+        #[arg(long, default_value = "docs/ecbench/replay-sentinels.json")]
+        manifest: PathBuf,
+    },
+}
+
+fn methods_len(m: &crypto_lib::cryptanalysis::ecbench::sentinels::Manifest) -> usize {
+    m.sentinels
+        .iter()
+        .map(|s| s.method.as_str())
+        .collect::<std::collections::BTreeSet<_>>()
+        .len()
+        + m.unreplayable.len()
+}
+
 fn print_json(v: &impl serde::Serialize) -> Result<(), String> {
     println!(
         "{}",
@@ -922,6 +1107,86 @@ fn emit_claim(
     if exit_code && !problems.is_empty() {
         return Ok(ExitCode::from(1));
     }
+    Ok(ExitCode::SUCCESS)
+}
+
+/// `compare` with several `--dir`: the pairs of every session pooled.
+#[allow(clippy::too_many_arguments)]
+fn compare_pooled_cmd(
+    dirs: &[PathBuf],
+    a: &str,
+    b: &str,
+    has_b_dir: bool,
+    save: bool,
+    json: bool,
+    opts: &compare::CompareOptions,
+    weight: Option<f64>,
+) -> Result<ExitCode, String> {
+    if has_b_dir {
+        return Err(
+            "--b-dir takes one session; with several --dir every session holds both arms".into(),
+        );
+    }
+    if save {
+        return Err("--save writes into one session; keep a pooled comparison with --json".into());
+    }
+    let c = compare::compare_pooled(dirs, a, b, opts, weight)?;
+    if json {
+        print_json(&c)?;
+        return Ok(ExitCode::SUCCESS);
+    }
+    println!("{}", c.verdict);
+    if let Some(weight) = c.pricing_weight {
+        println!("pricing weight: {weight} GAE per native operation");
+    }
+    if let Some(band) = &c.band {
+        let r: Vec<String> = band
+            .weights
+            .iter()
+            .zip(&band.ratio_b_over_a)
+            .map(|(w, r)| match r {
+                Some(r) => format!("w={w}: {r:.4}"),
+                None => format!("w={w}: n/a"),
+            })
+            .collect();
+        println!(
+            "band ({} pairs, total cost): {}; {}",
+            band.pairs,
+            r.join(", "),
+            band.order
+        );
+    }
+    if let Some(cal) = &c.calibrated {
+        match &cal.declined {
+            Some(why) => println!("calibrated (pooled): declined: {why}"),
+            None => println!(
+                "calibrated (pooled, {}, w_cal {}..{}): {}; ranked at calibrated price: {}",
+                cal.rule,
+                cal.w_cal_min.unwrap_or(f64::NAN),
+                cal.w_cal_max.unwrap_or(f64::NAN),
+                cal.order_at
+                    .iter()
+                    .map(|(k, v)| format!("{k}: {v}"))
+                    .collect::<Vec<_>>()
+                    .join(", "),
+                cal.ranked_at_calibrated_price
+            ),
+        }
+    }
+    for s in &c.sessions {
+        println!(
+            "  {} {} [{}]: {} pairs, {} workloads, ratio {}",
+            s.session_id,
+            s.dir,
+            s.status,
+            s.pairs,
+            s.workloads,
+            s.ratio_b_over_a
+                .map(|r| format!("{r:.4}"))
+                .unwrap_or_else(|| "n/a".into())
+        );
+    }
+    println!("comparison id: {}", c.comparison_id);
     Ok(ExitCode::SUCCESS)
 }
 
@@ -1190,6 +1455,109 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
             print_json(&serde_json::json!({ "curves": rows }))?;
         }
+        Cmd::Sentinels { cmd } => {
+            use crypto_lib::cryptanalysis::ecbench::sentinels;
+            match cmd {
+                SentinelCmd::Scan { dir, label, keep } => {
+                    let label = label.unwrap_or_else(|| dir.display().to_string());
+                    for c in sentinels::scan_session(&dir, &label, keep)? {
+                        println!("{}", serde_json::to_string(&c).map_err(|e| e.to_string())?);
+                    }
+                }
+                SentinelCmd::Build {
+                    list,
+                    candidates,
+                    out,
+                    per_method,
+                    previous,
+                    known_failure,
+                } => {
+                    let mut known: Vec<sentinels::KnownFailure> = match previous {
+                        Some(p) => {
+                            serde_json::from_str::<sentinels::Manifest>(&read(&p)?)
+                                .map_err(|e| format!("{}: {e}", p.display()))?
+                                .known_failures
+                        }
+                        None => Vec::new(),
+                    };
+                    for k in &known_failure {
+                        let mut it = k.splitn(3, ':');
+                        let (Some(session), Some(seq), Some(reason)) =
+                            (it.next(), it.next(), it.next())
+                        else {
+                            return Err(format!("--known-failure {k}: want SESSION:SEQ:REASON"));
+                        };
+                        known.push(sentinels::KnownFailure {
+                            session: session.to_string(),
+                            seq: seq
+                                .parse()
+                                .map_err(|e| format!("--known-failure {k}: {e}"))?,
+                            reason: reason.to_string(),
+                        });
+                    }
+                    let list_text = read(&list)?;
+                    let (plans, _, skipped) = sentinels::load_sessions(Path::new("."), &list_text)?;
+                    let methods = plans
+                        .iter()
+                        .flat_map(|p| p.methods.iter().cloned())
+                        .collect();
+                    let mut cs = Vec::new();
+                    for f in &candidates {
+                        for line in read(f)?.lines().filter(|l| !l.trim().is_empty()) {
+                            cs.push(
+                                serde_json::from_str::<sentinels::Candidate>(line)
+                                    .map_err(|e| format!("{}: {e}", f.display()))?,
+                            );
+                        }
+                    }
+                    let man = sentinels::build(&methods, &cs, per_method, &known);
+                    let text =
+                        serde_json::to_string_pretty(&man).map_err(|e| e.to_string())? + "\n";
+                    std::fs::write(&out, text).map_err(|e| format!("{}: {e}", out.display()))?;
+                    eprintln!(
+                        "{} sentinels over {} method ids ({} unreplayable); {} sessions without a spec skipped",
+                        man.sentinels.len(),
+                        methods_len(&man),
+                        man.unreplayable.len(),
+                        skipped.len()
+                    );
+                }
+                SentinelCmd::Check { list, manifest } => {
+                    let man: sentinels::Manifest = serde_json::from_str(&read(&manifest)?)
+                        .map_err(|e| format!("{}: {e}", manifest.display()))?;
+                    let (plans, ids, skipped) =
+                        sentinels::load_sessions(Path::new("."), &read(&list)?)?;
+                    let problems = sentinels::check(&man, &plans, &ids);
+                    for p in &problems {
+                        eprintln!("problem: {p}");
+                    }
+                    eprintln!(
+                        "replay sentinels {}: {} sentinels, {} unreplayable, {} planned sessions, {} without a spec",
+                        if problems.is_empty() { "OK" } else { "FAILED" },
+                        man.sentinels.len(),
+                        man.unreplayable.len(),
+                        plans.len(),
+                        skipped.len()
+                    );
+                    if !problems.is_empty() {
+                        std::process::exit(1);
+                    }
+                }
+                SentinelCmd::Plan { manifest } => {
+                    let man: sentinels::Manifest = serde_json::from_str(&read(&manifest)?)
+                        .map_err(|e| format!("{}: {e}", manifest.display()))?;
+                    let mut by: std::collections::BTreeMap<&str, Vec<u64>> = Default::default();
+                    for s in &man.sentinels {
+                        by.entry(&s.session).or_default().push(s.seq);
+                    }
+                    for (session, mut seqs) in by {
+                        seqs.sort_unstable();
+                        let seqs: Vec<String> = seqs.iter().map(u64::to_string).collect();
+                        println!("{session}\t{}", seqs.join(","));
+                    }
+                }
+            }
+        }
         Cmd::Trend {
             compare,
             beta,
@@ -1335,6 +1703,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         }
         Cmd::Run {
             diagnostic_launch,
+            w_cal,
+            w_cal_method,
+            w_cal_host,
             spec: path,
             out,
             cpus,
@@ -1356,7 +1727,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 eprintln!("ecbench: no CPU topology on this OS; running with --cpus none (every run is recorded at L0, operation counts unaffected)");
                 req = isolation::CpuRequest::None;
             }
+            let w_cal = wcal_from_flags(w_cal, w_cal_method, w_cal_host)?;
             let opts = runner::RunOptions {
+                w_cal,
                 diagnostic_launch: diagnostic_launch
                     .as_deref()
                     .map(crypto_lib::cryptanalysis::ecbench::diagnostic_launch::DiagnosticLaunch::load)
@@ -1582,26 +1955,60 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             save,
             json,
             allow_interrupted,
+            price_table_work: _,
+            no_price_table_work,
+            unit,
+            w_cal,
         } => {
-            let c = compare::compare_weighted_with(
-                &dir,
-                &a,
-                b_dir.as_deref(),
-                &b,
-                &compare::CompareOptions {
-                    resamples,
-                    seed,
-                    allow_interrupted,
+            let w_cal = w_cal.get()?;
+            let bitop = match unit.as_deref() {
+                None => false,
+                Some("bitop/v1") => true,
+                Some(u) => return Err(format!("no unit `{u}`; compare knows bitop/v1")),
+            };
+            if bitop && dir.len() > 1 {
+                return Err("--unit bitop/v1 compares one session (one --dir)".into());
+            }
+            let opts = compare::CompareOptions {
+                resamples,
+                seed,
+                allow_interrupted,
+                pricing: crypto_lib::cryptanalysis::ecbench::band::Pricing {
+                    table_work: !no_price_table_work,
                 },
-                weight,
-            )?;
+                bitop,
+                w_cal,
+            };
+            if dir.len() > 1 {
+                return compare_pooled_cmd(
+                    &dir,
+                    &a,
+                    &b,
+                    b_dir.is_some(),
+                    save,
+                    json,
+                    &opts,
+                    weight,
+                );
+            }
+            let dir = dir.into_iter().next().ok_or("--dir is required")?;
+            let c = compare::compare_weighted_with(&dir, &a, b_dir.as_deref(), &b, &opts, weight)?;
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
-                let suffix = c
-                    .pricing_weight
-                    .map(|_| format!("__{}", c.comparison_id))
-                    .unwrap_or_default();
+                // The plain `a__b.json` name is pinned to the unweighted
+                // pre-2026-11-08 reading, which every comparison saved
+                // before that date is; a weighted or table-work-priced
+                // comparison (the default since then) carries its id, so a
+                // new reading never overwrites an old file.
+                let suffix = if c.pricing_weight.is_some()
+                    || !c.priced_table_work.is_empty()
+                    || c.ops.unit == "bitop/v1"
+                {
+                    format!("__{}", c.comparison_id)
+                } else {
+                    String::new()
+                };
                 let f = d.join(format!("{a}__{b}{suffix}.json"));
                 std::fs::write(
                     &f,
@@ -1616,6 +2023,16 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 println!("{}", c.verdict);
                 if let Some(weight) = c.pricing_weight {
                     println!("pricing weight: {weight} GAE per native operation");
+                }
+                if c.priced_table_work.is_empty() {
+                    println!(
+                        "table work listed, not priced: the pre-2026-11-08 reading (--no-price-table-work)"
+                    );
+                } else {
+                    println!(
+                        "table work priced with the unpriced counters (the default since 2026-11-08): {}",
+                        c.priced_table_work.join(", ")
+                    );
                 }
                 if let Some(q) = &c.quality {
                     println!(
@@ -1666,9 +2083,29 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                             .collect::<Vec<_>>()
                             .join(", ")
                     };
+                    let table_work = if arm.table_work_counts.is_empty() {
+                        "none".to_string()
+                    } else {
+                        arm.table_work_counts
+                            .iter()
+                            .map(|(k, v)| format!("{k}={v}"))
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    };
                     println!(
-                        "arm {}: verified {}/{} ({} censored); {}; unpriced: {}",
-                        arm.arm, arm.verified, arm.measured, arm.censored, tail, unpriced
+                        "arm {}: verified {}/{} ({} censored); {}; unpriced: {}; table work ({}): {}",
+                        arm.arm,
+                        arm.verified,
+                        arm.measured,
+                        arm.censored,
+                        tail,
+                        unpriced,
+                        if c.priced_table_work.is_empty() {
+                            "listed, not priced"
+                        } else {
+                            "priced"
+                        },
+                        table_work
                     );
                 }
                 let o = |v: Option<f64>| v.map(|x| format!("{x:.4}")).unwrap_or_else(|| "–".into());
@@ -1711,7 +2148,60 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             weights,
             json,
             ranks,
-        } => band_cmd(&dir, &weights, json.as_deref(), ranks)?,
+            price_table_work: _,
+            no_price_table_work,
+            w_cal,
+            w_cal_method,
+            w_cal_host,
+        } => {
+            // The flags override; without them the sessions' own w_cal is read.
+            let wcal = match wcal_from_flags(w_cal, w_cal_method, w_cal_host)? {
+                Some(w) => Some(w),
+                None => runner::shared_wcal(&dir)?,
+            };
+            band_cmd(
+                &dir,
+                &weights,
+                json.as_deref(),
+                ranks,
+                !no_price_table_work,
+                wcal.as_ref(),
+            )?
+        }
+        Cmd::Wcal {
+            p,
+            a,
+            b,
+            rounds,
+            ops,
+            host,
+            session,
+        } => {
+            let m = crypto_lib::cryptanalysis::ecbench::wcal::measure(p, a, b, rounds, ops)?;
+            let w = m.to_wcal(&host);
+            let doc = serde_json::json!({
+                    "schema": "ecbench.wcal/v1",
+                    "w_cal": w.w_cal, "method": w.method, "host": w.host,
+                    "curve": {"p": p, "a": a, "b": b},
+                    "rounds": m.rounds, "ops_per_round": m.ops_per_round,
+                    "mul_ns": m.mul_ns, "add_ns": m.add_ns,
+                    "mul_spread": m.mul_spread, "add_spread": m.add_spread,
+                    "note": "wall-clock minimum of N rounds, same process; not perf-ipc",
+            });
+            if let Some(d) = session {
+                let f = d.join(runner::WCAL_SIDECAR);
+                if f.exists() {
+                    return Err(format!("{} exists; not overwriting", f.display()));
+                }
+                std::fs::write(
+                    &f,
+                    serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n",
+                )
+                .map_err(|e| format!("{}: {e}", f.display()))?;
+                eprintln!("attached w_cal to {}", f.display());
+            }
+            println!("{doc}");
+        }
         Cmd::Resources { dir, out } => {
             let report = resources::session(&dir)?;
             if let Some(path) = out {
@@ -1924,9 +2414,12 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 unit,
                 weight,
                 param_rule,
+                oracle,
                 fit_version,
+                w_cal,
                 out,
             } => {
+                let w_cal = w_cal.get()?;
                 let b = bounds::bound_from_sessions(&bounds::FitInputs {
                     dirs: &dir,
                     arm: &arm,
@@ -1942,7 +2435,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         unit,
                         weight,
                         param_rule,
+                        oracle,
                         fit_version,
+                        w_cal,
                     },
                     audit_refs: &[],
                 })?;
@@ -2219,7 +2714,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 bound_out,
                 audit_out,
                 exit_code,
+                w_cal,
             } => {
+                let w_cal = w_cal.get()?;
                 let c = challenge::Challenge::read(&path)?;
                 let cm = commitment
                     .as_deref()
@@ -2254,6 +2751,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     root: &root,
                     resamples,
                     seed,
+                    w_cal: w_cal.as_ref(),
                 })?;
                 if let Some(a) = &audit_out {
                     std::fs::write(a, &o.audit_text)
@@ -2387,6 +2885,22 @@ fn audit_ir_one(
     }))
 }
 
+/// The `--w-cal*` flags as a validated [`WCal`], `None` without `--w-cal`.
+fn wcal_from_flags(
+    w_cal: Option<f64>,
+    method: Option<String>,
+    host: Option<String>,
+) -> Result<Option<crypto_lib::cryptanalysis::ecbench::band::WCal>, String> {
+    let Some(w) = w_cal else { return Ok(None) };
+    let w = crypto_lib::cryptanalysis::ecbench::band::WCal {
+        w_cal: w,
+        method: method.unwrap_or_default(),
+        host: host.unwrap_or_default(),
+    };
+    w.validate()?;
+    Ok(Some(w))
+}
+
 fn write_or_print(out: Option<&Path>, text: &str) -> Result<(), String> {
     match out {
         Some(o) => {
@@ -2415,6 +2929,8 @@ fn band_cmd(
     weights: &str,
     json: Option<&std::path::Path>,
     ranks: bool,
+    price_table_work: bool,
+    wcal: Option<&crypto_lib::cryptanalysis::ecbench::band::WCal>,
 ) -> Result<(), String> {
     let weights: Vec<f64> = weights
         .split(',')
@@ -2428,7 +2944,11 @@ fn band_cmd(
     for d in dirs {
         recs.extend(runner::read_records(d)?);
     }
-    let rep = crypto_lib::cryptanalysis::ecbench::band::band(&recs, &weights)?;
+    let pricing = crypto_lib::cryptanalysis::ecbench::band::Pricing {
+        table_work: price_table_work,
+    };
+    let rep =
+        crypto_lib::cryptanalysis::ecbench::band::band_with_wcal(&recs, &weights, pricing, wcal)?;
     print!(
         "{}",
         crypto_lib::cryptanalysis::ecbench::band::markdown(&rep)

@@ -1,0 +1,22 @@
+frozen {'A': 8, 'B': 128, 'C': 128, 'Bh': 256, 'Eh': 256, 'D': 32}
+verified 720 / 720
+pairs 120 instances 60
+A shipped default fb 8 solver ms 708.5 process ms 733.9 trials 18818.0
+B sweep extra64 fb 128 solver ms 46.3 process ms 68.8 trials 304.0
+C sweep extra2 fb 128 solver ms 35.6 process ms 60.7 trials 206.5
+Bh hoisted sweep extra64 fb 256 solver ms 33.7 process ms 57.0 trials 325.0
+Eh hoisted sweep extra2 fb 256 solver ms 26.9 process ms 50.6 trials 262.0
+D pair-sum table extra2 fb 32 solver ms 16.7 process ms 40.2 trials 542.0
+ratio (median [boot95])  solver_ms | process_ms
+D / B 0.347 [0.322,0.370] | 0.559 [0.501,0.595]
+D / Bh 0.446 [0.410,0.470] | 0.664 [0.609,0.688]
+D / Eh 0.531 [0.509,0.574] | 0.737 [0.712,0.763]
+D / A 0.024 [0.023,0.025] | 0.056 [0.049,0.063]
+Bh / B 0.762 [0.734,0.844] | 0.846 [0.811,0.902]
+Eh / Bh 0.799 [0.775,0.829] | 0.864 [0.833,0.911]
+Eh / C 0.905 [0.812,0.997] | 0.928 [0.867,0.989]
+D beats Bh in 120/120 pairs (solver); 116/120 (process)
+r_bits 14 n 22 D/Bh solver 0.373
+r_bits 15 n 38 D/Bh solver 0.458
+r_bits 16 n 30 D/Bh solver 0.439
+r_bits 17 n 30 D/Bh solver 0.453

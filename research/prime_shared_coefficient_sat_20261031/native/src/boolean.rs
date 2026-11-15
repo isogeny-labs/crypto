@@ -4,6 +4,7 @@
 //! auxiliary bit is therefore uniquely determined by the semantic field bits.
 
 use crate::{CanonicalIr, Term};
+use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
@@ -69,6 +70,26 @@ pub struct BooleanEncoding {
     pub max_boolean_variable: u32,
     gates: Vec<Gate>,
     assertions: Vec<Lit>,
+}
+
+/// Exact deterministic size statistics for both Boolean renderings.
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct EncodingStatistics {
+    pub semantic_field_variables: usize,
+    pub projected_field_variables: usize,
+    pub field_bit_width: usize,
+    pub boolean_variables: u32,
+    pub and_gates: usize,
+    pub xor_gates: usize,
+    pub assertions: usize,
+    pub ordinary_cnf_clauses: usize,
+    pub ordinary_cnf_bytes: usize,
+    pub ordinary_cnf_sha256: String,
+    pub cnf_xor_ordinary_clauses: usize,
+    pub cnf_xor_rows: usize,
+    pub cnf_xor_total_constraints: usize,
+    pub cnf_xor_bytes: usize,
+    pub cnf_xor_sha256: String,
 }
 
 #[derive(Default)]
@@ -401,6 +422,55 @@ impl BooleanEncoding {
         let cnf = Sha256::digest(self.to_cnf().as_bytes());
         let xor = Sha256::digest(self.to_cnf_xor().as_bytes());
         (format!("{cnf:x}"), format!("{xor:x}"))
+    }
+
+    /// Return exact circuit, constraint, byte and digest counts.
+    #[must_use]
+    pub fn statistics(&self) -> EncodingStatistics {
+        let and_gates = self
+            .gates
+            .iter()
+            .filter(|gate| matches!(gate.kind, GateKind::And(_, _)))
+            .count();
+        let xor_gates = self.gates.len() - and_gates;
+        let (ordinary_clauses, ordinary_xors) = self.constraints(false);
+        debug_assert!(ordinary_xors.is_empty());
+        let (xor_clauses, xor_rows) = self.constraints(true);
+        let (ordinary_cnf_bytes, ordinary_cnf_sha256) = {
+            let output = self.render(false, &[]);
+            (
+                output.len(),
+                format!("{:x}", Sha256::digest(output.as_bytes())),
+            )
+        };
+        let (cnf_xor_bytes, cnf_xor_sha256) = {
+            let output = self.render(true, &[]);
+            (
+                output.len(),
+                format!("{:x}", Sha256::digest(output.as_bytes())),
+            )
+        };
+        EncodingStatistics {
+            semantic_field_variables: self.field_variables.len(),
+            projected_field_variables: self
+                .field_variables
+                .iter()
+                .filter(|field| field.projected)
+                .count(),
+            field_bit_width: self.bit_width,
+            boolean_variables: self.max_boolean_variable,
+            and_gates,
+            xor_gates,
+            assertions: self.assertions.len(),
+            ordinary_cnf_clauses: ordinary_clauses.len(),
+            ordinary_cnf_bytes,
+            ordinary_cnf_sha256,
+            cnf_xor_ordinary_clauses: xor_clauses.len(),
+            cnf_xor_rows: xor_rows.len(),
+            cnf_xor_total_constraints: xor_clauses.len() + xor_rows.len(),
+            cnf_xor_bytes,
+            cnf_xor_sha256,
+        }
     }
 
     /// Evaluate the functional circuit for one complete field assignment.
@@ -952,6 +1022,41 @@ mod tests {
         assert!(validate_dimacs(&xnf, false).is_err());
         assert!(validate_dimacs(&cnf.replacen(" 0\n", "\n", 1), false).is_err());
         assert!(validate_dimacs(&(cnf + "1 0\n"), false).is_err());
+    }
+
+    #[test]
+    fn exact_statistics_match_the_rendered_constraints_and_hashes() {
+        let encoding = BooleanEncoding::from_ir(&m3_ir()).unwrap();
+        let statistics = encoding.statistics();
+        let (ordinary_clauses, ordinary_xors) = encoding.constraints(false);
+        let (xor_clauses, xor_rows) = encoding.constraints(true);
+        let cnf = encoding.to_cnf();
+        let xnf = encoding.to_cnf_xor();
+
+        assert_eq!(
+            statistics.and_gates + statistics.xor_gates,
+            encoding.gates.len()
+        );
+        assert_eq!(statistics.ordinary_cnf_clauses, ordinary_clauses.len());
+        assert!(ordinary_xors.is_empty());
+        assert_eq!(statistics.cnf_xor_ordinary_clauses, xor_clauses.len());
+        assert_eq!(statistics.cnf_xor_rows, xor_rows.len());
+        assert_eq!(
+            statistics.cnf_xor_total_constraints,
+            xor_clauses.len() + xor_rows.len()
+        );
+        assert_eq!(statistics.ordinary_cnf_bytes, cnf.len());
+        assert_eq!(statistics.cnf_xor_bytes, xnf.len());
+        assert_eq!(
+            statistics.ordinary_cnf_sha256,
+            format!("{:x}", Sha256::digest(cnf.as_bytes()))
+        );
+        assert_eq!(
+            statistics.cnf_xor_sha256,
+            format!("{:x}", Sha256::digest(xnf.as_bytes()))
+        );
+        validate_dimacs(&cnf, false).unwrap();
+        validate_dimacs(&xnf, true).unwrap();
     }
 
     #[test]

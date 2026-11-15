@@ -3,7 +3,7 @@
 use super::{Point, Request, Witness};
 use std::collections::BTreeSet;
 
-#[derive(Clone, Copy, Default, Debug, serde::Serialize)]
+#[derive(Clone, Copy, Default, Debug, PartialEq, Eq, serde::Serialize)]
 pub(super) struct Counts {
     pub field_additions: u64,
     pub field_subtractions: u64,
@@ -13,6 +13,19 @@ pub(super) struct Counts {
     pub point_tests: u64,
     pub membership_tests: u64,
     pub signed_tuples: u64,
+}
+
+impl Counts {
+    pub fn merge(&mut self, other: Self) {
+        self.field_additions += other.field_additions;
+        self.field_subtractions += other.field_subtractions;
+        self.field_multiplications += other.field_multiplications;
+        self.inverse_calls += other.inverse_calls;
+        self.point_additions += other.point_additions;
+        self.point_tests += other.point_tests;
+        self.membership_tests += other.membership_tests;
+        self.signed_tuples += other.signed_tuples;
+    }
 }
 
 pub(super) struct Curve {

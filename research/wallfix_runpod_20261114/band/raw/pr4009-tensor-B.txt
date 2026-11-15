@@ -1,0 +1,19 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp12-tm53-6c9ff4bb | 11.81 | ic-tensor | 30/30 | 66674.195 | 80102.143 | 200953.675 | — |
+| icv1-fp12-tm53-6c9ff4bb | 11.81 | rho-neg | 30/30 | 2.755 | 2.921 | 4.412 | — |
+| icv1-fp12-tm53-6c9ff4bb | 11.81 | rho-neg-aa | 30/30 | 2.755 | 2.921 | 4.412 | — |
+| icv1-fp14-tm143-dec4cf6b | 13.83 | ic-tensor | 30/30 | 269097.585 | 323102.754 | 809149.270 | — |
+| icv1-fp14-tm143-dec4cf6b | 13.83 | rho-neg | 30/30 | 2.239 | 2.401 | 3.858 | — |
+| icv1-fp14-tm143-dec4cf6b | 13.83 | rho-neg-aa | 30/30 | 2.239 | 2.401 | 3.858 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp12-tm53-6c9ff4bb | ic-tensor vs rho-neg | rho-neg < ic-tensor |
+| icv1-fp12-tm53-6c9ff4bb | ic-tensor vs rho-neg-aa | rho-neg-aa < ic-tensor |
+| icv1-fp12-tm53-6c9ff4bb | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp14-tm143-dec4cf6b | ic-tensor vs rho-neg | rho-neg < ic-tensor |
+| icv1-fp14-tm143-dec4cf6b | ic-tensor vs rho-neg-aa | rho-neg-aa < ic-tensor |
+| icv1-fp14-tm143-dec4cf6b | rho-neg vs rho-neg-aa | unresolved inside the band |

@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 608,
-    "frontier": 392,
+    "nodes": 613,
+    "frontier": 395,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -17,16 +17,16 @@
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 89,
-      "measured": 29,
-      "proved_internal_unreviewed": 68,
+      "measured": 31,
+      "proved_internal_unreviewed": 70,
       "open": 70,
       "heuristic": 71,
-      "refuted": 32,
+      "refuted": 33,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 556,
-      "kernel_checked": 44,
+      "none": 560,
+      "kernel_checked": 45,
       "stated_open": 3,
       "lean_written_unchecked": 1,
       "native_exact": 4
@@ -87,6 +87,10 @@
         },
         {
           "from": "MEAS-PF-YIELD-CENSUS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-SUBFIELD-FACTOR-BASE",
           "relation": "qualifies"
         }
       ]
@@ -566,7 +570,12 @@
         "RT-BK-BOOK-INVENTORY",
         "RT-BK-DECOMP-MEASURE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-SUBFIELD-FACTOR-BASE",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "HEUR-GB-PQ-ASSUMPTION-2",
@@ -616,6 +625,10 @@
         {
           "from": "MEAS-PQ2-DLIN-CENSUS",
           "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-PQ2-MSOLVE-F4",
+          "relation": "qualifies"
         }
       ]
     },
@@ -1716,6 +1729,10 @@
         {
           "from": "HEUR-DECOMPOSITION-PROBABILITY",
           "relation": "qualifies"
+        },
+        {
+          "from": "CEX-SUBFIELD-FACTOR-BASE",
+          "relation": "qualifies"
         }
       ]
     },
@@ -1764,6 +1781,10 @@
         {
           "from": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
           "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-PQ2-MSOLVE-N37-STEP5",
+          "relation": "obstructs"
         }
       ]
     },
@@ -2385,6 +2406,20 @@
       "pressure": []
     },
     {
+      "id": "THM-F4-CONTAINMENT",
+      "label": "F4 runs with step degree <= D stay in every D-closed subspace containing the generators",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "MEAS-PQ2-DLIN-CENSUS"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "THM-GB-PQ-FIRST-FALL-BOUND",
       "label": "Petit-Quisquater: first fall degree of descended S_{m+1} <= m^2 + 1",
       "status": "proved_external_unread",
@@ -2728,6 +2763,23 @@
       "pressure": [
         {
           "from": "FACT-GG-WALK-CLASS-WELLDEFINED",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-JV-ASSUMPTION1-ALL-CURVES",
+      "label": "'Omega(q^(n-1)/(n-1)!) decomposable points whenever #F in Omega(q)', over all E/F_{q^n}",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-SUBFIELD-FACTOR-BASE",
           "relation": "refutes"
         }
       ]
@@ -5910,6 +5962,18 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "CEX-SUBFIELD-FACTOR-BASE",
+      "label": "Subfield curve, odd n: every sum of x in F_q factor-base points lies in E(F_q), at most 2q + 1 points (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "CEX-TRANSPARENT-ENCODING",

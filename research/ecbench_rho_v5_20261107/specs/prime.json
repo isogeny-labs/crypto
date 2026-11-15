@@ -1,0 +1,86 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "rho v5 (two-rung jumps) against rho v3, prime ladder 2^18..2^28",
+  "description": "Do two-rung jumps (rho.negation_v5, rho.plain_v5: RhoV3::v4 options plus weight 2) lower rho.negation_v3 / rho.plain_v3? Incumbent rho.negation_v3 with an A/A control, interleaved on the six prime curves of the v3 session, 64 planted targets each. Counted GAE; local L0 host.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 18,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 22,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 64,
+    "target_seed": 20261112
+  },
+  "arms": [
+    {
+      "name": "incumbent",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_v3"
+      }
+    },
+    {
+      "name": "candidate",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v5"
+      }
+    },
+    {
+      "name": "incumbent-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_v3"
+      }
+    },
+    {
+      "name": "plain-v3",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain_v3"
+      }
+    },
+    {
+      "name": "plain-v5",
+      "role": "candidate",
+      "method": {
+        "id": "rho.plain_v5"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261112,
+    "isolation_required": "L0",
+    "timeout_seconds": 300
+  }
+}

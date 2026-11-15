@@ -1,0 +1,102 @@
+{
+  "schema": "ic-acct.audit-ir/v1",
+  "study": "research/ic_acct1_cover_bitop_20261021",
+  "date": "2026-11-07",
+  "status": "fail (IC not admitted); rho reference reproduces and shows no sign of uncounted work",
+  "tool": "examples/jv_cover_ic_vs_rho_bitops.rs --callgrind 1 [--count 0] under valgrind-3.22.0 --tool=callgrind --cache-sim=no --branch-sim=no --dump-instr=no; examples/jv_cover_audit_ir.rs",
+  "criterion": "BITOPS.md: re-execution reproduces the recorded bitop/v1 count exactly; instructions per counted gate not far above the reference walk on the same curve (the bitop_unit_20261016 panel admitted arms within 2x of rho)",
+  "reproduction": {
+    "ic_at_study_commit_b4eb521af1": {
+      "rows": 16,
+      "reproduce_total": 16,
+      "reproduce_every_count": 16,
+      "of_committed": 16
+    },
+    "ic_at_main_a2be660914": {
+      "rows": 2,
+      "reproduce_total": 0,
+      "differing_counts": [
+        "descent.field_add",
+        "descent.field_inv",
+        "descent.field_mul"
+      ]
+    },
+    "rho_at_main_a2be660914": {
+      "rows": 3,
+      "reproduce_total": 3,
+      "reproduce_every_count": 3,
+      "of_committed": 48
+    }
+  },
+  "callgrind_pilot": {
+    "code": "origin/main a2be660914 + this branch",
+    "note": "committed rows are 5e12-2e14 gates, out of Callgrind reach on this host; pilot rows of the protocol (p = 503, 251), same code paths",
+    "ic_p503_counting_on": {
+      "bitops": "8448135554907",
+      "charged_ir": 1485605481066,
+      "ir_per_kilo_bitop": 175.85009987240363,
+      "reproduces_native_counts": true
+    },
+    "ic_p503_counting_off_control": {
+      "bitops": "8448135554907",
+      "charged_ir": 664875598299,
+      "ir_per_kilo_bitop": 78.7008676621926,
+      "phases": [
+        {
+          "phase": "descent",
+          "ir": 48867498300,
+          "ir_per_kilo_bitop": 30.468965045498308
+        },
+        {
+          "phase": "factor_base",
+          "ir": 9774735,
+          "ir_per_kilo_bitop": 37.867045342737356
+        },
+        {
+          "phase": "linear_algebra",
+          "ir": 114232781,
+          "ir_per_kilo_bitop": 1.5725876136438202
+        },
+        {
+          "phase": "model",
+          "ir": 22392574,
+          "ir_per_kilo_bitop": 43.94725913778155
+        },
+        {
+          "phase": "relations",
+          "ir": 615827207733,
+          "ir_per_kilo_bitop": 90.96355744894383
+        },
+        {
+          "phase": "transport",
+          "ir": 97712,
+          "ir_per_kilo_bitop": 40.8175200532693
+        },
+        {
+          "phase": "verification",
+          "ir": 2829301,
+          "ir_per_kilo_bitop": 41.64084075937631
+        },
+        {
+          "phase": "walk",
+          "ir": 31289348,
+          "ir_per_kilo_bitop": 40.66887296455523
+        }
+      ]
+    },
+    "rho_r3_p503": {
+      "bitops": "7078037796982",
+      "ir": 69146454290,
+      "ir_per_kilo_bitop": 9.769155841394817,
+      "reproduces_native_counts": true
+    },
+    "rho_r3_p251": {
+      "bitops": "2140817394244",
+      "ir": 26042248045,
+      "ir_per_kilo_bitop": 12.164628386811318,
+      "reproduces_native_counts": true
+    },
+    "ic_over_rho_counting_on": 18.000541984116428,
+    "ic_over_rho_counting_off": 8.056056115791872
+  }
+}

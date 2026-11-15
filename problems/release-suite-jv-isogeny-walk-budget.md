@@ -63,3 +63,39 @@ backlog validation and library build pass on that source. They do not replace
 a full-library pass. All earlier receipts/logs remain separate and unchanged.
 This repeated validation limit remains unresolved; no duplicate attempt is
 launched merely to repeat the same cap. Scientific G1–G6 is also incomplete.
+
+## Scalar-certificate continuation at sourcefaade165a (2026-10-30)
+
+Fresh5646-case serial execution ran16:47:54–17:27:54UTC and hit the40-minute
+cap:2208observed passes,0observed failures,47ignored,one same unchangedJV
+case active and3390not reached. The wrapper/supervisor exit124; direct Cargo
+exit remains unknown, with no final full-suite summary. Source blob568a67fb
+is unchanged. All23example tests and scoped checks pass on that source.
+
+The new214615-byte raw log is NOT_UPLOADED, SHA256
+`34fdd95ea133361298e8911f9a5899c431a5e9af97b73e7828e1b5289cdf87bd`.
+[Final receipt](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/native-final-faade/receipt.json)
+reconciles all cases, including should-panic annotations, binds original source
+and binaries, and retains a bounded excerpt. Older same-size logs with other
+hashes are distinct frozen evidence. No test/assertion/ignore was changed.
+Cause remains unknown and full-library validation remains incomplete; remote
+source/dependency changes require fresh affected validation.
+
+## Repaired-source terminal collection2026-11-05
+
+Sourceb022 declares5848cases:2272passed,1inheritedchain-boundfailure,48ignored,
+one unchangedJV caseactive and3526not reached at40minutes. Wrapper124 is
+not Cargoexit; [new receipt](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/repaired-main-cc5addeba/final-20261105/receipt.json)
+retains raw221629bytes/SHA25641ca32cee963b13adb6b5638abc52191de20f676b038874957a6b06e5e5ebebf
+NOT_UPLOADED. Earlier logs remain distinct and immutable. No duplicate suite
+was launched. Cause ofJV duration remains unknown; full-suite pass absent.
+
+## Current6168-case collection2026-11-05: different active case
+
+Current bbf/d30 run capped at40minutes with2166passes,2clock-control failures,
+45ignored,1PKM shared_lift_system_matches_lifts_one_and_the_brute_force_fiber
+case unfinished,3954not reached. This is not evidence that the historical JV
+case was active in this run. It had not been reached. Cause of the PKM case's
+duration remains unknown. Wrapper124/Cargoexitunknown, no final summary.
+[Final receipt](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/main-d30b9e0db-20261105/library-final-20261105T1134Z/receipt.json).
+Earlier JV caps remain immutable and unresolved. [pcc:unverified]

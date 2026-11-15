@@ -1,0 +1,509 @@
+{
+  "card_id": "CARD-sat-ladder-scaling-20261110-F4-RUN-01",
+  "card_path": "research/sat_ladder_scaling_20261110/cards/F4-RUN-01.json",
+  "card_sha256": "c86083697284603783db8bf3be0f838b89da0d8ed974520228896d99dacd1642",
+  "commands": [
+    {
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/sat_ladder_scaling_20261110",
+      "exit_code": 0,
+      "id": "verify-freeze",
+      "index": 1,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.verify-freeze.stdout": "00790b2bf36c168ad9eee6d96ed7d87cc21185746fbb2d4a175c7fb564174aec"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "00790b2bf36c168ad9eee6d96ed7d87cc21185746fbb2d4a175c7fb564174aec",
+      "stdout_tail": [
+        "PROTOCOL.md: OK",
+        "tool/src/main.rs: OK",
+        "tool/Cargo.toml: OK",
+        "tool/Cargo.lock: OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-head",
+      "index": 2,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.git-head.stdout": "0dbd3172c4e75a305c9c4245aa7eaaf2319b717e9cf49bebf9131cf7d0b721fd"
+      },
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0dbd3172c4e75a305c9c4245aa7eaaf2319b717e9cf49bebf9131cf7d0b721fd",
+      "stdout_tail": [
+        "7a35fad51d24c3183cf626bb9817280865e4e61b"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.097,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rustc-version",
+      "index": 3,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.rustc-version.stdout": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8"
+      },
+      "seconds": 0.097,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8",
+      "stdout_tail": [
+        "rustc 1.97.0 (2d8144b78 2026-07-07)",
+        "binary: rustc",
+        "commit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3",
+        "commit-date: 2026-07-07",
+        "host: x86_64-unknown-linux-gnu",
+        "release: 1.97.0",
+        "LLVM version: 22.1.6"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.045,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cargo-version",
+      "index": 4,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.cargo-version.stdout": "f4f564f8936fa8eb53bca8bbe50666489252bbcbeaae0cb0dd54682444697e52"
+      },
+      "seconds": 0.045,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f4f564f8936fa8eb53bca8bbe50666489252bbcbeaae0cb0dd54682444697e52",
+      "stdout_tail": [
+        "cargo 1.97.0 (c980f4866 2026-06-30)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "nproc"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "nproc",
+      "index": 5,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.nproc.stdout": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d"
+      },
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+      "stdout_tail": [
+        "4"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "uname",
+      "index": 6,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.uname.stdout": "87acb6d8e0df581dcd096927bca215414185c23d0a6daacf339ad54b1e8f3676"
+      },
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "87acb6d8e0df581dcd096927bca215414185c23d0a6daacf339ad54b1e8f3676",
+      "stdout_tail": [
+        "Linux vm 6.18.44-fc-v338 #1 SMP @0 x86_64 x86_64 x86_64 GNU/Linux"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "lscpu"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cpu-model",
+      "index": 7,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.cpu-model.stdout": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1",
+      "stdout_tail": [
+        "NUMA node0 CPU(s):                       0-3",
+        "Vulnerability Gather data sampling:      Not affected",
+        "Vulnerability Ghostwrite:                Not affected",
+        "Vulnerability Indirect target selection: Not affected",
+        "Vulnerability Itlb multihit:             Not affected",
+        "Vulnerability L1tf:                      Not affected",
+        "Vulnerability Mds:                       Not affected",
+        "Vulnerability Meltdown:                  Not affected",
+        "Vulnerability Mmio stale data:           Not affected",
+        "Vulnerability Old microcode:             Not affected",
+        "Vulnerability Reg file data sampling:    Not affected",
+        "Vulnerability Retbleed:                  Not affected",
+        "Vulnerability Spec rstack overflow:      Not affected",
+        "Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl",
+        "Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization",
+        "Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable",
+        "Vulnerability Srbds:                     Not affected",
+        "Vulnerability Tsa:                       Not affected",
+        "Vulnerability Tsx async abort:           Not affected",
+        "Vulnerability Vmscape:                   Not affected"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/Cargo.toml"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.115,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "build",
+      "index": 8,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "pid_file": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/08-build.pid.json",
+      "seconds": 0.115,
+      "stderr_sha256": "9576f1f7e73fc2bb1ec2336aae60cb485c591eadc60a1b998573411c34057e08",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized] target(s) in 0.03s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/Cargo.toml"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 267.023,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "test",
+      "index": 9,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.test.stdout": "e2418e76adcb4b68f67190622f026750d05d2e91168bafbfc081c484082e33bc"
+      },
+      "pid_file": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/09-test.pid.json",
+      "seconds": 267.023,
+      "stderr_sha256": "bf0fa13d84a40288eac67e39e757ba08f5753969dd5549d214d51199ee33592c",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized] target(s) in 0.03s",
+        "     Running unittests src/main.rs (research/sat_ladder_scaling_20261110/tool/target/release/deps/sat_ladder_scaling-1a04a3d620410597)"
+      ],
+      "stdout_sha256": "e2418e76adcb4b68f67190622f026750d05d2e91168bafbfc081c484082e33bc",
+      "stdout_tail": [
+        "",
+        "running 8 tests",
+        "test tests::field_circuits_random_inputs ... ok",
+        "test tests::planted_k_recovered_n6 ... ignored, n=6 FRESH needs ~3e5 conflicts (about 1 min)",
+        "test tests::planted_k_recovered_small_n ... ok",
+        "test tests::sha256_known ... ok",
+        "test tests::tiny_budget_is_censored ... ok",
+        "test tests::ladder_fixed_k_reproduces_x_of_kg has been running for over 60 seconds",
+        "test tests::planted_k_recovered_hinted_n10 has been running for over 60 seconds",
+        "test tests::planted_k_recovered_hinted_n12 has been running for over 60 seconds",
+        "test tests::planted_k_recovered_hinted_n10 ... ok",
+        "test tests::ladder_fixed_k_reproduces_x_of_kg ... ok",
+        "test tests::planted_k_recovered_hinted_n12 ... ok",
+        "",
+        "test result: ok. 7 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 266.92s",
+        ""
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/target/release/sat_ladder_scaling"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "binary-sha256",
+      "index": 10,
+      "outputs": {
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.binary-sha256.stdout": "fb75b6a83fc71d140b33637955fcb216519ddfebcddddaa98c689c498e9f685c"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "fb75b6a83fc71d140b33637955fcb216519ddfebcddddaa98c689c498e9f685c",
+      "stdout_tail": [
+        "8e6cc0b7945ee2658ec2f92bb4a7a56ec7d2e79edb02316e8e2332792aef0ca0  /home/user/crypto/research/sat_ladder_scaling_20261110/tool/target/release/sat_ladder_scaling"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/target/release/sat_ladder_scaling",
+        "--protocol",
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/PROTOCOL.md",
+        "--n",
+        "4,5,6,7,8,9",
+        "--targets",
+        "10",
+        "--budget",
+        "4000000",
+        "--threads",
+        "2",
+        "--out",
+        "research/sat_ladder_scaling_20261110/results/run.json"
+      ],
+      "cwd": ".",
+      "id": "run-full",
+      "index": 11,
+      "pid": 29413,
+      "pid_file": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/11-run-full.pid.json",
+      "started_at": "2026-11-10T20:18:48Z",
+      "status": "detached",
+      "stderr": "research/sat_ladder_scaling_20261110/results/run.stderr.txt",
+      "stdout": "research/sat_ladder_scaling_20261110/results/run.stdout.txt"
+    }
+  ],
+  "commands_total": 13,
+  "commit": "7a35fad51d24c3183cf626bb9817280865e4e61b",
+  "detached": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/11-run-full.pid.json",
+  "dirty_before": [
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.receipt.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.exit.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.exit.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/11-run-full.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/11-run-full.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/11-run-full.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/11-run-full.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stdout",
+    "research/coord_spectrum_20261110/results/run.stderr.txt",
+    "research/coord_spectrum_20261110/results/run.stdout.txt",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.receipt.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.exit.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.exit.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stdout",
+    "research/p2_lift_linear_complexity_20261110/results/run.stderr.txt",
+    "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt",
+    "research/sat_ladder_scaling_20261110/cards/F4-RUN-01.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.receipt.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.child.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.exit.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.pid.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.spec.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.supervisor.log",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.child.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.exit.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.pid.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.spec.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.supervisor.log",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.child.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.pid.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.spec.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.supervisor.log",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stdout",
+    "research/semaev_qubo_annealing_20261110/results/run.stderr.txt",
+    "research/semaev_qubo_annealing_20261110/results/run.stdout.txt",
+    "resume/RESUME.md"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "detached"
+}

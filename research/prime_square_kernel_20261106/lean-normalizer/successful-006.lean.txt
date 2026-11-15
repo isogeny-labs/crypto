@@ -1,0 +1,146 @@
+module
+public import Mathlib.Data.Nat.Choose.Lucas
+public import Mathlib.NumberTheory.Padics.PadicVal.Basic
+public import Mathlib.Tactic
+public section
+namespace CauchyNormalizer
+instance : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+
+/-- Every binomial coefficient in an all-ones binary row is odd. -/
+theorem choose_all_ones (a k : ℕ) (hk : k < 2^a) :
+    (((2^a-1).choose k : ℕ) : ZMod 2) = 1 := by
+  induction a generalizing k with
+  | zero =>
+    have : k = 0 := by simpa using hk
+    subst k
+    simp
+  | succ a ih =>
+    have hp : 0 < 2^a := by positivity
+    have hshape : 2^(a+1)-1 = 2*(2^a-1)+1 := by rw [pow_succ]; omega
+    have hdiv : (2^(a+1)-1)/2 = 2^a-1 := by rw [hshape]; omega
+    have hmod : (2^(a+1)-1)%2 = 1 := by rw [hshape]; omega
+    have hhalf : k/2 < 2^a := by rw [pow_succ] at hk; omega
+    have hsmall : (1 : ℕ).choose (k%2) = 1 := by
+      have : k%2 < 2 := Nat.mod_lt _ (by decide)
+      interval_cases h : k%2 <;> simp
+    have h : (((2^(a+1)-1).choose k : ℕ) : ZMod 2) =
+        ((((2^(a+1)-1)%2).choose (k%2) *
+          ((2^(a+1)-1)/2).choose (k/2) : ℕ) : ZMod 2) := by
+      exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr
+        (Choose.choose_modEq_choose_mod_mul_choose_div_nat (p := 2))
+    rw [h, hmod, hdiv, hsmall, one_mul, ih (k/2) hhalf]
+
+theorem choose_unit (a k : ℕ) (hk : k < 2^a) :
+    padicValRat 2 (((2^a-1).choose k : ℕ) : ℚ) = 0 := by
+  have hn : ¬ 2 ∣ (2^a-1).choose k := by
+    intro hd
+    have hz : (((2^a-1).choose k : ℕ) : ZMod 2) = 0 := by
+      exact (CharP.cast_eq_zero_iff (ZMod 2) 2 _).mpr hd
+    rw [choose_all_ones a k hk] at hz
+    exact one_ne_zero hz
+  simp only [padicValRat.of_nat, padicValNat.eq_zero_of_not_dvd hn, Nat.cast_zero]
+
+def weight (a k : ℕ) : ℕ := k.factorial * (2^a-1-k).factorial
+
+theorem weight_ne_zero (a k : ℕ) : weight a k ≠ 0 := by
+  exact mul_ne_zero (Nat.factorial_ne_zero _) (Nat.factorial_ne_zero _)
+
+theorem weight_valuation (a k : ℕ) (hk : k < 2^a) :
+    padicValRat 2 ((weight a k : ℕ) : ℚ) =
+      padicValRat 2 (((2^a-1).factorial : ℕ) : ℚ) := by
+  have hkn : k ≤ 2^a-1 := by omega
+  have hchoose : (((2^a-1).choose k : ℕ) : ℚ) ≠ 0 := by
+    exact_mod_cast Nat.choose_ne_zero hkn
+  have hw : ((weight a k : ℕ) : ℚ) ≠ 0 := by
+    exact_mod_cast weight_ne_zero a k
+  have heq : (((2^a-1).choose k : ℕ) : ℚ) * (weight a k : ℚ) =
+      (((2^a-1).factorial : ℕ) : ℚ) := by
+    have h := Nat.choose_mul_factorial_mul_factorial hkn
+    simpa only [weight, Nat.cast_mul, mul_assoc] using
+      congrArg (fun x : ℕ => (x : ℚ)) h
+  have hv := padicValRat.mul (p := 2) hchoose hw
+  rw [heq, choose_unit a k hk, zero_add] at hv
+  exact hv.symm
+
+def signedWeight (a k : ℕ) : ℚ := (-1 : ℚ)^(2^a-1-k) * (weight a k : ℚ)
+
+theorem signedWeight_ne_zero (a k : ℕ) : signedWeight a k ≠ 0 := by
+  unfold signedWeight
+  exact mul_ne_zero (pow_ne_zero _ (by norm_num)) (by exact_mod_cast weight_ne_zero a k)
+
+theorem signedWeight_valuation (a k : ℕ) (hk : k < 2^a) :
+    padicValRat 2 (signedWeight a k) =
+      padicValRat 2 (((2^a-1).factorial : ℕ) : ℚ) := by
+  unfold signedWeight
+  rw [padicValRat.mul (pow_ne_zero _ (by norm_num))
+    (by exact_mod_cast weight_ne_zero a k)]
+  simp only [padicValRat.pow, padicValRat.neg, padicValRat.one, mul_zero, zero_add]
+  exact weight_valuation a k hk
+
+theorem signedWeight_ratio_unit (a k m : ℕ) (hk : k < 2^a) (hm : m < 2^a) :
+    padicValRat 2 (signedWeight a k / signedWeight a m) = 0 := by
+  rw [padicValRat.div (signedWeight_ne_zero a k) (signedWeight_ne_zero a m),
+    signedWeight_valuation a k hk, signedWeight_valuation a m hm, sub_self]
+
+/-- Actual punctured product on nodes0,...,n, as used by the native kernel. -/
+def puncture (n k : ℕ) : ℚ :=
+  ∏ j ∈ Finset.range (n+1), if j=k then 1 else (k : ℚ)-(j : ℚ)
+
+theorem puncture_zero (n : ℕ) : puncture n 0 = (-1 : ℚ)^n * (n.factorial : ℚ) := by
+  induction n with
+  | zero => simp [puncture]
+  | succ n ih =>
+    unfold puncture at *
+    rw [Finset.prod_range_succ]
+    simp only [Nat.succ_ne_zero, ite_false, Nat.cast_zero, zero_sub]
+    have hi := ih
+    simp only [Nat.cast_zero, zero_sub] at hi
+    rw [hi, Nat.factorial_succ, Nat.cast_mul, pow_succ]
+    push_cast
+    ring
+
+theorem puncture_shift (n k : ℕ) :
+    puncture (n+1) (k+1) = (k+1 : ℚ) * puncture n k := by
+  unfold puncture
+  rw [Finset.prod_range_succ']
+  simp only [Nat.zero_ne_add_one, ite_false, Nat.cast_zero, sub_zero]
+  have h : (∏ j ∈ Finset.range (n+1),
+      if j+1=k+1 then (1 : ℚ) else (k+1 : ℕ)-(j+1 : ℕ)) =
+      ∏ j ∈ Finset.range (n+1), if j=k then 1 else (k : ℚ)-(j : ℚ) := by
+    apply Finset.prod_congr rfl
+    intro j hj
+    split_ifs with h <;> simp_all <;> push_cast <;> ring
+  rw [h]
+  push_cast
+  ring
+
+theorem puncture_formula (n k : ℕ) (hk : k ≤ n) :
+    puncture n k = (-1 : ℚ)^(n-k) * (k.factorial : ℚ) * ((n-k).factorial : ℚ) := by
+  induction k generalizing n with
+  | zero => simpa using puncture_zero n
+  | succ k ih =>
+    cases n with
+    | zero => omega
+    | succ n =>
+      rw [puncture_shift, ih n (by omega)]
+      simp only [Nat.succ_sub_succ_eq_sub, Nat.factorial_succ, Nat.cast_mul]
+      push_cast
+      ring
+
+theorem puncture_eq_signedWeight (a k : ℕ) (hk : k < 2^a) :
+    puncture (2^a-1) k = signedWeight a k := by
+  rw [puncture_formula _ _ (by omega)]
+  simp only [signedWeight, weight, Nat.cast_mul, mul_assoc]
+
+theorem puncture_normalizer_unit (a k m : ℕ) (hk : k < 2^a) (hm : m < 2^a) :
+    padicValRat 2 (puncture (2^a-1) k / puncture (2^a-1) m) = 0 := by
+  rw [puncture_eq_signedWeight a k hk, puncture_eq_signedWeight a m hm]
+  exact signedWeight_ratio_unit a k m hk hm
+
+end CauchyNormalizer
+#print axioms CauchyNormalizer.choose_all_ones
+#print axioms CauchyNormalizer.choose_unit
+#print axioms CauchyNormalizer.weight_valuation
+#print axioms CauchyNormalizer.signedWeight_ratio_unit
+#print axioms CauchyNormalizer.puncture_formula
+#print axioms CauchyNormalizer.puncture_normalizer_unit
