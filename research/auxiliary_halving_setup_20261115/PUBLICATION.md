@@ -61,3 +61,43 @@ from a separate copied file; exact build and pre-call manifests have distinct
 names. Its raw round retains every arm exit and complete setup history. The
 new scoped statement PCC-20261115-a14c8e remains unverified. No source-model,
 setup or recovery result is asserted before those calls complete.
+
+Qualification001 completes at source 2ca55a9c9f: all 25 exits are zero.
+Native/OpenSSL preimage sets match 14,754 cases; eight setup transcripts
+match; legacy F19 summary and three traces are byte-identical; generated cold
+returns 11 after 70 setup trials, eight calls, four relations and one kernel.
+Cold reaches the old A2,2/fibre with generated T16,8 and G11,14; unfiltered
+F19 instead has A12,10 after nine trials. No input/cap retry or cost comparison.
+The whole 99,856-byte archive passes exact unpack/repack identity, and all
+source/build/script hashes remain unchanged. The temporary repack directory
+is retained: cleanup was rejected before execution, then packaging finished
+without deletion. PCC-20261115-3ff0b8 remains unverified. [pcc:unverified]
+
+Conrad primary source re-opened: Theorem 4.2.1(2)/Remark 4.2.2, matching
+SHA256 f53e4ff819d534926e6ee59874cbce4e7bad4a315cbd6d05984b8405b11f15d8.
+Pointed model orbits have p-1 members because pointed automorphisms are
+trivial. SETUP-BOUND.md derives the conditional 1/d² subgroup-trial bound,
+charging all paths under the existing #Y_1>=p/2 premise and exact uniform
+root choices. This is a hand argument without a formal program proof or
+native large-parameter validation. PCC-20261115-4b68b3 is unverified.
+[pcc:unverified]
+
+The four-page PDF is rendered and every page visually inspected, including
+recorded counts, pipeline and conditional argument. Initial render diagnostics
+were markup delimiters in raw notation; corrected before publication. Two
+metadata-writer submissions failed JS parsing before command execution and
+were corrected without touching frozen code or evidence. No post-call native
+source, script, build file or binary changed. Plotting copies recorded TSV
+values only. Canonical performance/leaderboard values remain unchanged.
+
+Parent PR4300 merged at its final head d52528ddc4 with all required head gates
+passing. The manual main merge and custody/report update are documented in
+its comment6894447316. The task-wide D3 autonomy episode remains active;
+no whole-goal success or per-component completed-task episode is created.
+New evidence/result/conditional statements stay unverified. [pcc:unverified]
+
+Applied manifest-custody lesson L-b9df3560e3b1 has two distinct confirmations
+and is adopted. No agent file named prime-field-research exists here; its
+narrow evidence rule is folded into the existing native-work instructions
+in root AGENTS.md, with the lesson id. The frozen-wrapper lesson gets its
+first confirmation from this round; no speculative promotion.
