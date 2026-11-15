@@ -306,3 +306,59 @@ New atlas cards from this study (crypto-autoresearcher#3300):
 
 - `LEAD-TRF-signature-calculus-euler-system` (Lemma A);
 - `LEAD-STR-function-field-iwasawa-tower` (Lemma C).
+
+## 12. R1c: scale-up and multi-bit leakage of ψ (measured, 2026-11-15)
+
+All results are unverified assertions by the producing session [pcc:unverified].
+
+**Protocol and code.**
+- Protocol: `r1_carry/PROTOCOL_R1C.md`, frozen before data at commit `ac299c6c`.
+- Tool: `r1_carry/src/bin/r1c.rs`. Static binaries were built from that commit (r1c sha256
+  `1b3837bd…22c2`).
+- Owner budget: $20.
+
+**Hosts.** [pcc:unverified]
+- The Iso Lab route was prepared: image `isolab/tasks@sha256:d6b31c88…`, request committed at
+  `629b20a8`, checkpoint pushed. It was not launched, because the account's monthly Iso Lab budget
+  was already exhausted ($1,851 against $1,300) and the owner chose not to override it.
+- The same binaries, verified by hash, then ran on two hosts:
+  - **This container:** Intel Xeon, 4 vCPU.
+  - **RunPod CPU pod** `o7cujyw0f3pxbt`: cpu5c, 8 vCPU, AMD EPYC 4564P, about 2.5 min, about $0.01.
+    The pod was deleted afterwards (HTTP 204).
+- Raw outputs: `r1_carry/results_r1c/{local,runpod}/`.
+
+**Reproducibility.** [pcc:unverified]
+- The Arm A files are byte-identical across the two hosts.
+- The Arm B files agree on every value. Only the reported S6 argmax masks differ, because of ties:
+  on the half range H < 2²¹, so bit 21 of x is always 0, and a mask with bit 21 has the same parity
+  set as the mask without it. The tie is broken by thread chunking, with 4 threads on one host
+  and 8 on the other.
+
+**Arm A (replication with a fresh seed).** R1 and R1b meet every frozen bound:
+- R1: S1 ≤ 5; S2 ≤ 14 against a bound of 24; zero cocycles ≤ 4; χ² ≤ 27.05 against 37.7.
+- R1b: S4 ≤ 16.73 against 20.8; deficit 0.
+- Positive controls pass.
+
+**Arm B (six curves, p ∈ [2²¹, 2²²], |H| = 1.17–2.07 × 10⁶, T = 64,009 mask pairs).**
+
+| Statistic | Test | Shuffled | Positive P1 (affine) | Frozen bound |
+|---|---|---|---|---|
+| S6 max χ² (weight ≤ 2 masks) | 16.02–26.31 | 18.67–28.58 | 742.86–25,462.95 | ≤ 33.0 |
+| S7 max lag-difference bin | 8–9 | 8–9 | = \|H\| on all six | ≤ 30, ≤ 2× shuffled |
+| S3 zero cocycles / 10⁶ | 0–1 | — | — | ≤ 10 |
+
+**Deviation: the positive control P2 was degenerate.** The plant points x ≡ 0 (mod 100) are all
+divisible by 4, so bit₀(x) ⊕ bit₁(x) = 0 on every one of them.
+- **What it planted:** a single-bit bias, not a weight-2 one.
+- **What S6 showed:** χ² = 130.00–216.36, but at mask (1, 1), not at the named pair (3, 1). So the
+  frozen P2 criterion ("exceed 33.0 at that mask pair") cannot be confirmed as specified.
+- **Post-hoc instrument check** (not preregistered: `src/bin/r1c_p2.rs`, local run on the same six
+  curves, output `results_r1c/posthoc_p2_mod101_local.jsonl`): a non-degenerate 1% plant at
+  x ≡ 0 (mod 101). There S6 is maximal exactly at (3, 1), with χ² = 124.35–192.17. The instrument
+  does detect a 1% weight-2 bias.
+
+**Verdict.**
+- Every test curve meets every frozen null bound in S3, S6 and S7, and Arm A meets its bounds.
+- By the decision rule, the lead stays closed at this scope. The P2 caveat above applies.
+- This is consistent with `LEAD-TRF-padic-canonical-section`.
+- Untested: masks of weight ≥ 3, and sizes at cryptographic scale.
