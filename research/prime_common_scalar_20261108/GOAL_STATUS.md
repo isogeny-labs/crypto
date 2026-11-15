@@ -93,3 +93,22 @@ retaining unsigned producer standing and no timing/asymptotic inference.
 The checkpoint admission is resolved under the explicit owner substitution;
 next refinement is the distinct scaled modular accumulator and its costs
 [pcc:unverified].
+
+## Nov9 actual finite chart units and exact unresolved theorem
+
+ChartUnits removes the assumed-unit premise for the actual finite denominator,
+old normalizer and common comparison factor at arbitrary target interpolation
+values when2 is nilpotent. Its normalized-entry identity and divisibility
+comparison are actual constructed-object statements. See the new chart-units
+report for canonical pins and reviewed alternatives [pcc:unverified].
+
+The standing goal remains incomplete in both directions. No complete prime-field
+ECDLP program with a proved uniform total exp(o(n)) bit-cost bound is supplied.
+No unrestricted non-generic algorithm lower bound is supplied. The exact missing
+existence contract needs correctness/success and all input/entry/construction,
+precision, failed-attempt and verification costs for the stated input family;
+its network-size parameter must be related to n=ceil(log2 p). The nonexistence
+contract cannot follow from failure of a selected normalization family.
+This is a mathematical dependency; the native admission issue is resolved and
+neither another permission prompt nor CPU isolation fills this theorem gap
+[pcc:unverified].
