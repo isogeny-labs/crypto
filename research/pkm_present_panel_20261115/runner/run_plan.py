@@ -24,8 +24,9 @@ from pathlib import Path
 ROW_SCHEMA = "pkm.present-panel.row/v1"
 CENSOR_CLASSES = ("timeout", "as_rlimit", "crash")
 NATIVE_REQUIRED = ["solve_field_multiplications", "extract_field_multiplications", "solving_degree", "degree_reached",
-                   "basis_size", "threads_used", "cpu_s", "censored", "verified_real_decompositions",
-                   "unlifted_solutions", "fp_rational_solutions"]
+                   "basis_size", "threads_used", "cpu_s", "censored"]
+# present in the JSON (key must exist) but null when extraction was skipped or censored, or the F4 run was censored
+NATIVE_NULLABLE = ["verified_real_decompositions", "unlifted_solutions", "fp_rational_solutions"]
 SYSTEM_REQUIRED = ["construction_field_multiplications", "nterms_total", "max_total_degree", "solution_semantics",
                    "nvars", "nequations"]
 MSOLVE_TOTALS_REQUIRED = ["sum_rows_x_cols_x_density", "max_round_degree", "rounds", "passes", "completed"]
@@ -186,7 +187,8 @@ def run_call(row, root, results, a, lost_count):
     so, se = (stem + ".stdout", stem + ".stderr") if row["engine"] == "native" else (stem + ".log", stem + ".err")
     base = {k: row[k] for k in ("cell", "m", "t", "curve", "p", "instance", "label", "planted", "draw_index",
                                 "algebraic_count", "real_count", "real_count_distinct", "B", "B_real",
-                                "sym_applicable", "arm", "engine", "system", "out", "cap_wall_s", "as_gb") if k in row}
+                                "sym_applicable", "arm", "engine", "system", "out", "cap_wall_s", "as_gb", "planted_abscissae",
+                                "predicted_fp_rational", "ordered_algebraic_solutions") if k in row}
     base.update(schema=ROW_SCHEMA, seq=row["seq"], rerun=lost_count == 1, lost_count=lost_count,
                 started_utc=utcnow(), cmd=" ".join(shlex.quote(c) for c in cmd))
     t0 = time.monotonic()
@@ -232,6 +234,8 @@ def native_fields(base, row, root, out, cens):
     need(sysdoc, SYSTEM_REQUIRED, str(sj))
     for k in SYSTEM_REQUIRED:
         base[k] = sysdoc[k]
+    if "construction_cell_field_multiplications" in sysdoc:  # per-cell part: reported per cell, never added to w^+
+        base["construction_cell_field_multiplications"] = sysdoc["construction_cell_field_multiplications"]
     prog = load_progress(str(out) + ".progress.json")
     if prog is not None:
         base["progress_last"] = {k: prog.get(k) for k in ("ops", "degree", "step", "elapsed_s")}
@@ -242,18 +246,40 @@ def native_fields(base, row, root, out, cens):
             raise ContractError(f"{out}: rc 0 but no solve JSON")
         doc = json.loads(out.read_text())
         need(doc, NATIVE_REQUIRED, str(out))
-        if not isinstance(doc["verified_real_decompositions"], list):
-            raise ContractError(f"{out}: verified_real_decompositions must be a list, got "
-                                f"{type(doc['verified_real_decompositions']).__name__}")
-        for k in NATIVE_REQUIRED:
+        absent = [k for k in NATIVE_NULLABLE if k not in doc]
+        if absent:
+            raise ContractError(f"{out}: missing field(s) {absent}")
+        if doc["censored"] not in ("no", "timeout"):
+            raise ContractError(f"{out}: censored must be 'no' or 'timeout', got {doc['censored']!r}")
+        for k in NATIVE_REQUIRED + NATIVE_NULLABLE:
             if k != "censored":  # the row's `censored` is the runner's classification; the flag goes to instrument_censored
                 base[k] = doc[k]
+        v = doc["verified_real_decompositions"]
+        if v is not None and not isinstance(v, list):
+            raise ContractError(f"{out}: verified_real_decompositions must be a list or null, got {type(v).__name__}")
+        base["instrument_censored"] = doc["censored"]
+        base["censored_reason"] = doc.get("censored_reason")
+        ext = doc.get("extraction") or {}
+        base["extraction_status"] = ext.get("status")
+        if v is None and doc["censored"] == "no":
+            # --extract is always passed.  null is legitimate only when the instrument says why (skipped / censored);
+            # otherwise the extraction output is missing and the contract is broken.
+            st = str(ext.get("status") or "")
+            if not ("skipped" in st or "censored" in st):
+                raise ContractError(f"{out}: --extract was passed but verified_real_decompositions is null "
+                                    f"without a skipped/censored extraction status (status={st!r})")
+            base["extraction_incomplete"] = True
+        else:
+            base["extraction_incomplete"] = False
         for k in ("nvars", "nequations"):
             if k in doc and doc[k] != sysdoc[k]:
                 raise ContractError(f"{out}: {k} {doc[k]} != system.json {sysdoc[k]}")
-        base["instrument_censored"] = doc["censored"]
-        if doc["censored"]:  # the instrument stopped itself (its --deadline)
-            base["censored"], base["censor_basis"] = "timeout", "instrument censored flag (deadline)"
+        for k in ("D", "solving_degree_max", "field_ops", "construction_cell_field_multiplications"):
+            if k in doc:
+                base[k] = doc[k]
+        if doc["censored"] == "timeout":  # the instrument stopped itself (its --deadline or the degree bound)
+            base["censored"] = "timeout"
+            base["censor_basis"] = f"instrument censored flag ({doc.get('censored_reason')})"
             base["w_lo"] = max([x for x in (doc["solve_field_multiplications"],
                                             (base["progress_last"] or {}).get("ops")) if x is not None] or [None])
         else:

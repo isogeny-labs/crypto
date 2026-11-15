@@ -2,20 +2,22 @@
 """Build the frozen call plan of panel P (PROTOCOL.md v1, sections 3, 4, 8) from cells/ and protocol.json.
 
 Usage:  build_plan.py [--study DIR] [--cells DIR] [--protocol FILE] [--out plan.json]
-                      [--native-deadline-s 86400] [--allow-missing-curves]
+                      [--native-deadline-s S] [--allow-missing-curves]
 
 Writes plan.json (one row per call, frozen order) and plan.sha256 ("<hex>  plan.json").
 Order (section 3): cells in table order (m = 3 block, m = 4 block, m4t4 last); within a cell the curves in
 protocol.json order; within a curve the instances in draw order (planted last); within an instance the arms in
 table order, then `aa`; for each arm the native call, then the msolve call.
 Symmetric arms on a (cell, curve) with B_real < m + 1 get pre-written rows with censored = "not_applicable".
+Caps per m come from protocol.json caps.m3 / caps.m4 (v1.2); arms: chain-tower, tree-tower (m = 4), chain-direct,
+mono-tower and mono-direct (m = 3 only), sym-tower, sym-direct, then aa.
 Paths in the plan are relative to the directory that holds plan.json (the study directory by default).
 Everything here is [pcc:unverified] bookkeeping; nothing is computed from solver output.
 """
 import argparse, hashlib, json, sys
 from pathlib import Path
 
-ARM_ORDER = ["chain-tower", "tree-tower", "chain-direct", "mono-direct", "sym-tower", "sym-direct"]
+ARM_ORDER = ["chain-tower", "tree-tower", "chain-direct", "mono-tower", "mono-direct", "sym-tower", "sym-direct"]
 SYM_ARMS = ("sym-tower", "sym-direct")
 ENGINES = ("native", "msolve")
 PLAN_SCHEMA = "pkm.present-panel.plan/v1"
@@ -32,10 +34,15 @@ def arms_for(m):
     for a in ARM_ORDER:
         if a == "tree-tower" and m != 4:
             continue
-        if a == "mono-direct" and m != 3:
+        if a in ("mono-tower", "mono-direct") and m != 3:  # monolithic arms never at m = 4
             continue
         out.append(a)
     return out
+
+
+def rel(p, study):
+    p = Path(p)
+    return str(p.relative_to(study)) if p.is_relative_to(study) else str(p)
 
 
 def sha256_file(p):
@@ -49,14 +56,28 @@ def load_json(p):
         raise PlanError(f"cannot read {p}: {e}")
 
 
-def cell_json_path(cells, curve, t):
-    cands = [cells / f"{curve}t{t}" / "cell.json"]
-    if t == 4:  # section 3: the t = 4 cell is built as cells/<curve> (slug c<k>)
-        cands.append(cells / curve / "cell.json")
-    for c in cands:
-        if c.is_file():
-            return c
+def cell_dir_for(cells, curve, t):
+    """Directory holding cell.json of (curve, t), as written by `pkm_present_panel cell --nested-ts`:
+    cells/<curve>/cell.json (the pinned t) and cells/<curve>/nested_t<t>/cell.json, located through
+    cells/<curve>/cell.present.json when present.  Legacy layouts are accepted last."""
+    base = cells / curve
+    rec = base / "cell.present.json"
+    if rec.is_file():
+        for c in load_json(rec).get("cells", []):
+            if c.get("t") == t:
+                d = (base / c["path"]).parent
+                if (d / "cell.json").is_file():
+                    return d
+        raise PlanError(f"{rec} lists no cell for t={t}")
+    cands = [base / f"nested_t{t}", base, cells / f"{curve}t{t}"]
+    for d in cands:
+        if (d / "cell.json").is_file() and load_json(d / "cell.json").get("T") == t:
+            return d
     raise PlanError(f"no cell.json for curve {curve} t={t}; tried {[str(c) for c in cands]}")
+
+
+def cell_json_path(cells, curve, t):
+    return cell_dir_for(cells, curve, t) / "cell.json"
 
 
 def targets_path(cells, curve, t, m):
@@ -64,8 +85,8 @@ def targets_path(cells, curve, t, m):
     if t == 4:
         dirs.append(cells / curve)
     cands = []
-    for d in dirs:
-        cands += [d / f"targets_m{m}" / "targets.json", d / f"m{m}" / "targets.json", d / f"targets_m{m}.json",
+    for d in dirs:  # protocol layout first: cells/<curve>t<t>/m<M>/targets.json
+        cands += [d / f"m{m}" / "targets.json", d / f"targets_m{m}" / "targets.json", d / f"targets_m{m}.json",
                   d / "targets.json"]
     for c in cands:
         if c.is_file():
@@ -84,13 +105,17 @@ def instance_order(targets):
     return sorted(targets, key=key)
 
 
-def build(study, cells, protocol_path, native_deadline_s=86400, allow_missing=False):
+def build(study, cells, protocol_path, native_deadline_s=None, allow_missing=False):
     prot = load_json(protocol_path)
     known = set(ARM_ORDER) | {"aa"}
     ids = {a["id"] for a in prot["arms"]}
     if ids != known:
         raise PlanError(f"protocol.json arms {sorted(ids)} differ from the planner's {sorted(known)}")
     caps = prot["caps"]
+    for mm in (3, 4):
+        if f"m{mm}" not in caps:
+            raise PlanError(f"protocol.json caps lacks 'm{mm}' (protocol v1.2 caps per m)")
+    native_deadline_s = native_deadline_s if native_deadline_s is not None else caps.get("native_deadline_s", 86400)
     # cell order: protocol.json order, with the exploratory runs_last block moved to the end (stable)
     cl = prot["cells"]
     cl = [c for c in cl if not c.get("runs_last")] + [c for c in cl if c.get("runs_last")]
@@ -115,9 +140,17 @@ def build(study, cells, protocol_path, native_deadline_s=86400, allow_missing=Fa
             if not isinstance(b_real, int):
                 raise PlanError(f"{cp}: B_real missing")
             sym_ok = b_real >= m + 1
+            if "b_real" in tdoc and tdoc["b_real"] != b_real:
+                raise PlanError(f"{tp}: b_real {tdoc['b_real']} != cell.json B_real {b_real}")
+            if "sym_applicable" in tdoc and bool(tdoc["sym_applicable"]) != sym_ok:
+                raise PlanError(f"{tp}: sym_applicable {tdoc['sym_applicable']} contradicts B_real {b_real}, m {m}")
             targets = instance_order(tdoc["targets"])
+            miss = [x.get("name") for x in targets if "real_count_distinct" not in x or "real_count" not in x]
+            if miss:
+                raise PlanError(f"{tp}: real_count / real_count_distinct missing on {miss[:3]}")
             csum["curves"].append({"curve": curve, "p": cdoc.get("p"), "B": cdoc.get("B"), "B_real": b_real,
                                    "sym_applicable": sym_ok, "n_instances": len(targets),
+                                   "cell_dir": rel(cp.parent, study), "targets_dir": rel(tp.parent, study),
                                    "cell_json": str(cp.relative_to(study)) if cp.is_relative_to(study) else str(cp),
                                    "targets_json": str(tp.relative_to(study)) if tp.is_relative_to(study) else str(tp)})
             for tg in targets:
@@ -137,9 +170,9 @@ def build(study, cells, protocol_path, native_deadline_s=86400, allow_missing=Fa
                             "arm": arm, "engine": eng,
                             "system": None if na else sysd + (".system.json" if eng == "native" else ".ms"),
                             "out": base + (".json" if eng == "native" else ".out"),
-                            "cap_wall_s": caps[eng]["wall_s"], "as_gb": caps[eng]["as_gb"],
+                            "cap_wall_s": caps[f"m{m}"][eng]["wall_s"], "as_gb": caps[f"m{m}"][eng]["as_gb"],
                         }
-                        for opt in ("ordered_algebraic_solutions", "algebraic_count_distinct", "predicted_fp_rational"):
+                        for opt in ("ordered_algebraic_solutions", "algebraic_count_distinct", "predicted_fp_rational", "planted_abscissae"):
                             if opt in tg:
                                 row[opt] = tg[opt]
                         if eng == "native":
@@ -172,8 +205,9 @@ def main(argv=None):
     ap.add_argument("--cells", type=Path)
     ap.add_argument("--protocol", type=Path)
     ap.add_argument("--out", type=Path)
-    ap.add_argument("--native-deadline-s", type=float, default=86400,
-                    help="--deadline passed to `solve`; non-binding by design (B4): the external timeout is the only stop")
+    ap.add_argument("--native-deadline-s", type=float, default=None,
+                    help="--deadline passed to `solve` (default: protocol.json caps.native_deadline_s = 86400); "
+                         "non-binding by design (B4): the external timeout is the only stop")
     ap.add_argument("--allow-missing-curves", action="store_true",
                     help="drop (and record) curves without cell/targets files (M8 draw-cap exhaustion)")
     a = ap.parse_args(argv)
