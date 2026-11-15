@@ -871,6 +871,233 @@ fn construct_store_v3_one(
     Ok(import)
 }
 
+/// Adopt an already archived v3 object from a different remote without a PUT.
+/// The source manifest and artifact pointer are pinned by caller-supplied
+/// SHA-256 values. A fresh remote download and generic curve replay create
+/// new receipts; the earlier local-store receipt is never relabelled as S3.
+#[allow(clippy::too_many_arguments)]
+fn adopt_store_v3_readonly(
+    source_root: &Path,
+    artifact_pointer: &Path,
+    expected_source_manifest_sha256: &str,
+    expected_pointer_sha256: &str,
+    remote: &str,
+    budget_seconds: u64,
+    adopter_source_commit: &str,
+    root: &Path,
+    store: &Store,
+) -> Result<Value> {
+    if budget_seconds == 0
+        || budget_seconds > 300
+        || [expected_source_manifest_sha256, expected_pointer_sha256]
+            .iter()
+            .any(|digest| digest.len() != 64 || !digest.bytes().all(|b| b.is_ascii_hexdigit()))
+        || adopter_source_commit.len() != 40
+        || !adopter_source_commit.bytes().all(|b| b.is_ascii_hexdigit())
+        || store.cfg.remote.as_ref() != Some(&RemoteSpec::parse(remote)?)
+        || root.exists()
+    {
+        return Err("read-only v3 adoption input, source, remote or output invalid".into());
+    }
+    let source_manifest_bytes = fs::read(source_root.join("manifest.json"))?;
+    let source_manifest_sha256 = hex::encode(sha256(&source_manifest_bytes));
+    if source_manifest_sha256 != expected_source_manifest_sha256 {
+        return Err("source v3 manifest differs from frozen SHA-256".into());
+    }
+    let source_manifest: Value = serde_json::from_slice(&source_manifest_bytes)?;
+    let source_replay: Value = serde_json::from_slice(&fs::read(source_root.join("replay.json"))?)?;
+    let source_storage: Value =
+        serde_json::from_slice(&fs::read(source_root.join("storage.json"))?)?;
+    let row = &source_manifest["base"];
+    let store_name = row["store_name"]
+        .as_str()
+        .ok_or("source store name missing")?;
+    let digest = row["compressed_sha256"]
+        .as_str()
+        .ok_or("source compressed digest missing")?;
+    let bytes = row["bytes"]
+        .as_u64()
+        .ok_or("source compressed size missing")?;
+    let plain_bytes = row["plain_bytes"]
+        .as_u64()
+        .ok_or("source plain size missing")?;
+    let columns = row["columns"].as_u64().ok_or("source columns missing")?;
+    let points = row["points"].as_u64().ok_or("source point count missing")?;
+    if source_manifest["schema"] != "n83.factor-base-panel/v3-artifact-store"
+        || source_manifest["status"] != "completed_factor_base_object"
+        || source_manifest["study"] != STUDY
+        || source_manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || source_manifest["source_commit"]
+            .as_str()
+            .is_none_or(|value| value.len() != 40 || !value.bytes().all(|b| b.is_ascii_hexdigit()))
+        || row["a"] != 0
+        || row["closure"] != "signed_frobenius"
+        || ![
+            "public_x_sequential",
+            "public_x_hash",
+            "public_x_gray_prefix",
+        ]
+        .iter()
+        .any(|policy| row["policy"] == *policy)
+        || columns == 0
+        || points
+            != columns
+                .checked_mul(166)
+                .ok_or("source point count overflow")?
+        || bytes == 0
+        || plain_bytes == 0
+        || !store_name.starts_with("factor-bases/icv1-f2m83-tm6151469093347-debefd74/")
+        || store_name
+            != format!("factor-bases/icv1-f2m83-tm6151469093347-debefd74/{digest}.jsonl.gz")
+        || source_replay["schema"] != "n83.factor-base-replay/v3-artifact-store"
+        || source_replay["status"] != "PASS"
+        || source_replay["manifest_sha256"] != source_manifest_sha256
+        || source_replay["store_name"] != store_name
+        || source_replay["point_set_blake3"] != row["point_set_blake3"]
+        || source_replay["points_checked"].as_u64() != Some(points)
+        || source_replay["representatives_checked"].as_u64() != Some(columns)
+        || source_storage["schema"] != "n83.factor-base-storage/v3-artifact-store"
+        || source_storage["status"] != "PASS"
+        || source_storage["manifest_sha256"] != source_manifest_sha256
+        || source_storage["remote"] != source_manifest["remote"]
+        || source_storage["store_name"] != store_name
+        || source_storage["sha256"] != digest
+        || source_storage["bytes"].as_u64() != Some(bytes)
+        || source_storage["fresh_download_sha256"] != digest
+        || source_storage["fresh_download_bytes"].as_u64() != Some(bytes)
+    {
+        return Err("source v3 manifest, replay or storage differs from custody contract".into());
+    }
+    let pointer_bytes = fs::read(artifact_pointer)?;
+    let pointer_sha256 = hex::encode(sha256(&pointer_bytes));
+    if pointer_sha256 != expected_pointer_sha256 {
+        return Err("archive artifact pointer differs from frozen SHA-256".into());
+    }
+    let pointer: Value = serde_json::from_slice(&pointer_bytes)?;
+    let object_name = format!("{digest}.jsonl.gz");
+    if pointer["schema"] != "artifacts.manifest/v1"
+        || pointer["files"]
+            .as_object()
+            .is_none_or(|files| files.len() != 1)
+        || pointer["files"][&object_name]["sha256"] != digest
+        || pointer["files"][&object_name]["bytes"].as_u64() != Some(bytes)
+    {
+        return Err("archive artifact pointer differs from source object".into());
+    }
+    let (indexed_name, indexed_digest, indexed_bytes) = store.lookup(store_name)?;
+    if indexed_name.as_deref() != Some(store_name)
+        || indexed_digest != digest
+        || indexed_bytes != Some(bytes)
+    {
+        return Err("read-only adoption index differs from source object".into());
+    }
+    fs::create_dir(root)?;
+    let total_start = Instant::now();
+    write_new_json(
+        &root.join("attempt.json"),
+        &json!({"schema":"n83.factor-base-adoption-attempt/v1",
+            "status":"STARTED","source_manifest_sha256":source_manifest_sha256,
+            "artifact_pointer_sha256":pointer_sha256,"adopter_source_commit":adopter_source_commit,
+            "remote":remote,"store_name":store_name,"sha256":digest,"bytes":bytes,
+            "budget_seconds":budget_seconds,"selected_best_total_runtime":Value::Null}),
+    )?;
+    let finished = Arc::new(AtomicBool::new(false));
+    struct FinishOnDrop(Arc<AtomicBool>);
+    impl Drop for FinishOnDrop {
+        fn drop(&mut self) {
+            self.0.store(true, Ordering::Release);
+        }
+    }
+    let _finish_on_drop = FinishOnDrop(Arc::clone(&finished));
+    let watchdog_finished = Arc::clone(&finished);
+    let cap_path = root.join("cap.json");
+    std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_secs(budget_seconds));
+        if !watchdog_finished.load(Ordering::Acquire) {
+            let _ = write_new_json(
+                &cap_path,
+                &json!({"schema":"n83.factor-base-adoption-cap/v1",
+                    "status":"UNKNOWN_budget","budget_seconds":budget_seconds,
+                    "elapsed_process_wall_ms":total_start.elapsed().as_secs_f64()*1000.0,
+                    "selected_best_total_runtime":Value::Null}),
+            );
+            std::process::exit(124);
+        }
+    });
+    let mut fresh_cfg = store.cfg.clone();
+    fresh_cfg.cache_dir = root.join(".fresh-cache");
+    let fresh_store = Store::open(fresh_cfg)?;
+    let pull_start = Instant::now();
+    let pulled = fresh_store.ensure(store_name)?;
+    let pull_ms = pull_start.elapsed().as_secs_f64() * 1000.0;
+    let (fresh_sha256, fresh_bytes) = hash_file(&pulled.path)?;
+    if !pulled.fetched || fresh_sha256 != digest || fresh_bytes != bytes {
+        return Err("read-only adoption did not freshly fetch the pinned object".into());
+    }
+    let compressed = fs::read(&pulled.path)?;
+    if compressed.len() as u64 != bytes
+        || blake3::hash(&compressed).to_hex().as_str()
+            != row["compressed_blake3"]
+                .as_str()
+                .ok_or("compressed BLAKE3 missing")?
+    {
+        return Err("read-only adoption compressed object differs".into());
+    }
+    let mut plain = Vec::new();
+    GzDecoder::new(&compressed[..])
+        .take(plain_bytes.checked_add(1).ok_or("plain size overflow")?)
+        .read_to_end(&mut plain)?;
+    if plain.len() as u64 != plain_bytes
+        || blake3::hash(&plain).to_hex().as_str()
+            != row["plain_blake3"].as_str().ok_or("plain BLAKE3 missing")?
+    {
+        return Err("read-only adoption plain object differs".into());
+    }
+    let replay_start = Instant::now();
+    let (points_checked, representatives_checked) =
+        primary_adapter::replay_constructed_primary(row, &plain)?;
+    let replay_ms = replay_start.elapsed().as_secs_f64() * 1000.0;
+    write_new_json(
+        &root.join("manifest.json"),
+        &json!({"schema":"n83.factor-base-panel/v3-artifact-store",
+            "status":"completed_factor_base_object","study":STUDY,
+            "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
+            "source_commit":source_manifest["source_commit"],
+            "remote":remote,"base":row,
+            "custody_mode":"read_only_adoption",
+            "source_manifest_sha256":source_manifest_sha256,
+            "artifact_pointer_sha256":pointer_sha256,
+            "adopter_source_commit":adopter_source_commit,
+            "selected_best_total_runtime":Value::Null,
+            "measurement_scope":"read-only artifact custody and generic replay; no relation, rank, individual log or total runtime"}),
+    )?;
+    let manifest_sha256 = hex::encode(sha256(&fs::read(root.join("manifest.json"))?));
+    write_new_json(
+        &root.join("replay.json"),
+        &json!({"schema":"n83.factor-base-replay/v3-artifact-store","status":"PASS",
+            "manifest_sha256":manifest_sha256,"store_name":store_name,
+            "point_set_blake3":row["point_set_blake3"],
+            "points_checked":points_checked,"representatives_checked":representatives_checked,
+            "generic_replay_wall_ms_informational_L0":replay_ms}),
+    )?;
+    write_new_json(
+        &root.join("storage.json"),
+        &json!({"schema":"n83.factor-base-storage/v3-artifact-store","status":"PASS",
+            "manifest_sha256":manifest_sha256,"remote":remote,"store_name":store_name,
+            "sha256":digest,"bytes":bytes,"uploaded":false,
+            "custody_mode":"read_only_adoption",
+            "source_manifest_sha256":source_manifest_sha256,
+            "artifact_pointer_sha256":pointer_sha256,
+            "fresh_download_sha256":fresh_sha256,"fresh_download_bytes":fresh_bytes,
+            "fresh_pull_wall_ms_informational_L0":pull_ms,
+            "elapsed_process_wall_ms_informational_L0":total_start.elapsed().as_secs_f64()*1000.0,
+            "selected_best_total_runtime":Value::Null}),
+    )?;
+    let import = primary_adapter::verify_store_v3(root, &fresh_store)?;
+    write_new_json(&root.join("import.json"), &import)?;
+    Ok(import)
+}
+
 fn replay_v2_one_bounded(root: &Path, budget_seconds: u64) -> Result<()> {
     if budget_seconds == 0 || budget_seconds > 7200 {
         return Err("v2 replay wall cap must be 1..7200 seconds".into());
@@ -1393,6 +1620,22 @@ fn main() -> Result<()> {
             if let Err(error)=&result {
                 if root.is_dir() {
                     let _=write_new_json(&root.join("failure.json"),&json!({"schema":"n83.factor-base-attempt-failure/v3-artifact-store","status":"FAILED","error":error.to_string(),"selected_best_total_runtime":Value::Null}));
+                }
+            }
+            println!("{}",result?);
+        },
+        Some("primary-store-v3-adopt-readonly")=>{
+            if args.len()!=9 { return Err("primary-store-v3-adopt-readonly SOURCE_BASE_DIR ARTIFACT_POINTER EXPECTED_SOURCE_MANIFEST_SHA256 EXPECTED_POINTER_SHA256 EXACT_REMOTE BUDGET_SECONDS NEW_DIRECTORY (fresh read-only remote fetch and generic replay; no PUT)".into()); }
+            let (adopter_source_commit, _mode)=primary_adapter::frozen_primary_probe_source()?;
+            let store=Store::open_default()?;
+            let root=Path::new(&args[8]);
+            let result=adopt_store_v3_readonly(
+                Path::new(&args[2]),Path::new(&args[3]),&args[4],&args[5],
+                &args[6],args[7].parse()?,&adopter_source_commit,root,&store,
+            );
+            if let Err(error)=&result {
+                if root.is_dir() && !root.join("cap.json").exists() {
+                    let _=write_new_json(&root.join("failure.json"),&json!({"schema":"n83.factor-base-adoption-failure/v1","status":"FAILED","error":error.to_string(),"selected_best_total_runtime":Value::Null}));
                 }
             }
             println!("{}",result?);
@@ -1991,6 +2234,164 @@ mod tests {
         )
         .unwrap();
         assert!(primary_adapter::verify_store_v3(&bundle, &fresh).is_err());
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn read_only_adoption_replays_a_remote_copy_and_rejects_changed_bindings() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!("n83-v3-adoption-{nonce}"));
+        let source_remote = root.join("source-remote");
+        let archive_remote = root.join("archive-remote");
+        fs::create_dir_all(&source_remote).unwrap();
+        fs::create_dir_all(&archive_remote).unwrap();
+        let source_uri = format!("file://{}", source_remote.display());
+        let source_cfg = crypto_lib::store::Config {
+            index_path: root.join("source-index.json"),
+            cache_dir: root.join("source-cache"),
+            remote: Some(RemoteSpec::Dir(source_remote)),
+            endpoint: None,
+            aws: "aws".into(),
+        };
+        let mut source_store = Store::open(source_cfg).unwrap();
+        let source_bundle = root.join("source-bundle");
+        construct_store_v3_one(
+            &source_bundle,
+            "public_x_hash",
+            2,
+            SEEDS[0],
+            60,
+            &"a".repeat(40),
+            &source_uri,
+            &mut source_store,
+        )
+        .unwrap();
+        let source_manifest = fs::read(source_bundle.join("manifest.json")).unwrap();
+        let source_manifest_hash = hex::encode(sha256(&source_manifest));
+        let source_value: Value = serde_json::from_slice(&source_manifest).unwrap();
+        let name = source_value["base"]["store_name"].as_str().unwrap();
+        let digest = source_value["base"]["compressed_sha256"].as_str().unwrap();
+        let bytes = source_value["base"]["bytes"].as_u64().unwrap();
+        let key = format!("sha256/{}/{digest}", &digest[..2]);
+        let object = archive_remote.join(&key);
+        fs::create_dir_all(object.parent().unwrap()).unwrap();
+        fs::copy(
+            source_bundle
+                .join("objects")
+                .join(format!("{digest}.jsonl.gz")),
+            &object,
+        )
+        .unwrap();
+        let pointer_path = root.join("artifact-pointer.json");
+        write_new_json(
+            &pointer_path,
+            &json!({"schema":"artifacts.manifest/v1","files":{
+                format!("{digest}.jsonl.gz"):{"sha256":digest,"bytes":bytes}
+            }}),
+        )
+        .unwrap();
+        let pointer_hash = hex::encode(sha256(&fs::read(&pointer_path).unwrap()));
+        fs::copy(
+            root.join("source-index.json"),
+            root.join("archive-index.json"),
+        )
+        .unwrap();
+        let archive_uri = format!("file://{}", archive_remote.display());
+        let archive_cfg = crypto_lib::store::Config {
+            index_path: root.join("archive-index.json"),
+            cache_dir: root.join("archive-normal-cache"),
+            remote: Some(RemoteSpec::Dir(archive_remote)),
+            endpoint: None,
+            aws: "aws".into(),
+        };
+        let archive_store = Store::open(archive_cfg.clone()).unwrap();
+        for (label, source_hash, artifact_hash, selected_remote) in [
+            (
+                "wrong-source",
+                "0".repeat(64),
+                pointer_hash.clone(),
+                archive_uri.clone(),
+            ),
+            (
+                "wrong-pointer",
+                source_manifest_hash.clone(),
+                "0".repeat(64),
+                archive_uri.clone(),
+            ),
+            (
+                "wrong-remote",
+                source_manifest_hash.clone(),
+                pointer_hash.clone(),
+                source_uri.clone(),
+            ),
+        ] {
+            let output = root.join(label);
+            assert!(adopt_store_v3_readonly(
+                &source_bundle,
+                &pointer_path,
+                &source_hash,
+                &artifact_hash,
+                &selected_remote,
+                60,
+                &"b".repeat(40),
+                &output,
+                &archive_store,
+            )
+            .is_err());
+            assert!(!output.exists());
+        }
+        let mut wrong_index: Value =
+            serde_json::from_slice(&fs::read(root.join("archive-index.json")).unwrap()).unwrap();
+        wrong_index["entries"][name]["sha256"] = json!("0".repeat(64));
+        let wrong_index_path = root.join("wrong-index.json");
+        fs::write(&wrong_index_path, serde_json::to_vec(&wrong_index).unwrap()).unwrap();
+        let mut wrong_cfg = archive_cfg.clone();
+        wrong_cfg.index_path = wrong_index_path;
+        let wrong_store = Store::open(wrong_cfg).unwrap();
+        let wrong_output = root.join("wrong-index-output");
+        assert!(adopt_store_v3_readonly(
+            &source_bundle,
+            &pointer_path,
+            &source_manifest_hash,
+            &pointer_hash,
+            &archive_uri,
+            60,
+            &"b".repeat(40),
+            &wrong_output,
+            &wrong_store,
+        )
+        .is_err());
+        assert!(!wrong_output.exists());
+        let adopted = root.join("adopted");
+        let result = adopt_store_v3_readonly(
+            &source_bundle,
+            &pointer_path,
+            &source_manifest_hash,
+            &pointer_hash,
+            &archive_uri,
+            60,
+            &"b".repeat(40),
+            &adopted,
+            &archive_store,
+        )
+        .unwrap();
+        assert_eq!(result["status"], "PASS");
+        assert_eq!(result["points_checked"], 332);
+        assert_eq!(result["orbit_columns_checked"], 2);
+        let storage: Value =
+            serde_json::from_slice(&fs::read(adopted.join("storage.json")).unwrap()).unwrap();
+        assert_eq!(storage["uploaded"], false);
+        assert_eq!(storage["custody_mode"], "read_only_adoption");
+        assert_eq!(storage["fresh_download_sha256"], digest);
+        let second_reader = Store::open(archive_cfg).unwrap();
+        assert_eq!(
+            primary_adapter::verify_store_v3(&adopted, &second_reader).unwrap()["status"],
+            "PASS"
+        );
+        assert!(object.is_file());
         fs::remove_dir_all(root).unwrap();
     }
 }
