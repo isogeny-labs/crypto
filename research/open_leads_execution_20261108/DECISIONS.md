@@ -47,3 +47,18 @@ executor.
 
 Fix it on `main` through this branch's next PR with the least invasive of the three proposed fixes
 that works with the artifact store. The study's evidence is not edited, and no session is relabelled.
+
+### Owner decisions of 2026-11-14 (PKM fall-degree study, Amendments 15 and 16)
+
+| # | date | question put to the owner | answer | what it authorizes |
+|---|---|---|---|---|
+| 9 | 2026-11-14 | "Confirm that the $40-per-job and $400-study ceilings also apply to reserved pods" | "Yes to all" | Decision 4's ceilings (US$40 per job including 4 h idle, US$400 for the study) apply to reserved RunPod pods (Amendment 15). |
+| 10 | 2026-11-14 | "Confirm once that the RunPod balance covers a few tens of dollars" | "Yes to all" | The one-time balance confirmation Amendment 15 §6 requires. |
+| 11 | 2026-11-14 | "S3 access: an AWS profile here or a presign-upload token" | "Yes to all" | Read as willingness to provide access. It is not access itself: on 2026-11-14 22:13Z `scripts/checkpoint.sh push` failed with `InvalidAccessKeyId`, so S3 stays blocked until a working credential exists. |
+| 12 | 2026-11-15 | S3 is unavailable to this session (`InvalidAccessKeyId`); options were a working AWS key, or RunPod storage without S3 | "store in git. do 1-5" | Git replaces S3 as the durable store for the Amendment 16 jobs (Amendment 17). Results, manifests, the resume note and the receipts are committed. The checkpoint hook cannot push to S3, so launch commands carry its recorded opt-out (`CHECKPOINT_SKIP`, which writes a pcc ledger entry) citing this decision. |
+| 13 | 2026-11-15 | "Should I retry t = 13 draw-0 cap-6 (a fourth attempt) and stage B on RunPod?" | "yes to all three" | Attempt 4 of `pfd-x-t13-k0-c6` and attempt 3 of stage B, on the RunPod route (Amendment 19). |
+| 14 | 2026-11-15 | "t = 14 for the isogeny arm … Should I add it after t = 13?" | "yes to all three" | The isogeny `P1` cell `t = 14`, certified by `iso/certify_m2.py` (Amendment 19). Given after isogeny `P1` closure rows `t = 1..9` had been seen (disclosed in Amendment 19). |
+| 15 | 2026-11-15 | "The m = 4 cells … Should I put them on the plan?" | "yes to all three" | The `m = 4` cells go on the plan. Their registered budgets (176,400 s) cost US$55 per job (16 vCPU) or US$110 (32 vCPU, 256 GB) at the limit, above the US$40 ceiling (decisions 4 and 9). They run only after the owner raises the ceiling for them. |
+| 16 | 2026-11-15 | "To run them I need a ceiling for those jobs. For example, $60 per 112 GB job and $120 per 256 GB job would allow them, with the study total then going past $400." | "yes to the m=4 ceiling" | Per-job ceilings for the `m = 4` and `m4n` jobs: US$60 (112 GB class) and US$120 (256 GB class). The study ceiling rises by the sum of those jobs at their limits. Not yet used: no `m = 4` job has been started. |
+| 17 | 2026-11-15 | "run locally" → asked: RunPod, a local smoke test, or something else | "Local smoke test only" | One local feasibility probe of `m = 4`, `t = 4`, `c = 7`, draw 0 on the session machine (4 vCPU, 15 GB), with a reduced entry cap. **Not a registered row**: it enters no reading, gate or median, and lives under `results/SMOKE/`. |
+| 18 | 2026-11-15 | After the 11-pod loss (likely a RunPod balance stop): "relaunch the cheap three" (about US$100 of balance) or "relaunch all" | "relaunch the cheap three" | Attempt 2 of the isogeny null and of Kummer `t = 14` cap 6 (draws 0, 1). The owner did not state the balance. The instruction is read as confirming it covers this batch at its limits (US$99.15). The 8 `m = 4` cells wait. |
