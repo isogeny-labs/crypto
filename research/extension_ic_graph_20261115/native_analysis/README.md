@@ -25,7 +25,11 @@ restricted to the existing cubic r-adding reference; it does not establish
 fastest-external comparison, standard EKS/L2 admission or a general crossover.
 Small fixtures cannot trigger that field. [pcc:unverified]
 
-Five tests cover retained warmups, rejection of tiny-instance parity,
+Seven tests cover retained warmups, rejection of tiny-instance parity,
 failed/incomplete cohorts, source/instance/duplicate/parse problems, and
-fingerprint/A/A failures. Numerical estimator assertions use a floating-point
+fingerprint/A/A failures, sampler metadata and paired-oracle stream identity.
+An optional frozen `paired_oracles` list checks equal input digests, group work,
+residual counts and recovered scalars across arithmetic implementations while
+allowing different field-work counts. Per-oracle SVGs accompany the complete
+plot. Numerical estimator assertions use a floating-point
 tolerance; scientific acceptance thresholds are unchanged. [pcc:unverified]

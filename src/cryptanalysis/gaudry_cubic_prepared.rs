@@ -1,0 +1,253 @@
+//! The same symmetric S3 equations with cached curve constants and a
+//! stack-sized polynomial workspace. Generic/exceptional root recovery is
+//! shared with the reference oracle; most rejected residuals allocate nothing.
+use super::*;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct Poly5 {
+    c: [u64; 5],
+    len: usize,
+}
+
+impl Poly5 {
+    fn new(values: &[u64]) -> Self {
+        assert!(values.len() <= 5);
+        let mut out = Self {
+            c: [0; 5],
+            len: values.len(),
+        };
+        out.c[..values.len()].copy_from_slice(values);
+        out.trim();
+        out
+    }
+
+    fn trim(&mut self) {
+        while self.len > 0 && self.c[self.len - 1] == 0 {
+            self.len -= 1;
+        }
+    }
+
+    fn add(self, rhs: Self, ring: &PolyRing) -> Self {
+        let mut out = Self::new(&[]);
+        out.len = self.len.max(rhs.len);
+        for i in 0..out.len {
+            out.c[i] = am(self.c[i], rhs.c[i], ring.p);
+        }
+        out.trim();
+        out
+    }
+
+    fn sub(self, rhs: Self, ring: &PolyRing) -> Self {
+        let mut out = Self::new(&[]);
+        out.len = self.len.max(rhs.len);
+        for i in 0..out.len {
+            out.c[i] = sm(self.c[i], rhs.c[i], ring.p);
+        }
+        out.trim();
+        out
+    }
+
+    fn mul(self, rhs: Self, ring: &PolyRing) -> Self {
+        if self.len == 0 || rhs.len == 0 {
+            return Self::new(&[]);
+        }
+        let len = self.len + rhs.len - 1;
+        assert!(len <= 5, "S3 polynomial workspace degree exceeded");
+        let mut out = Self { c: [0; 5], len };
+        ring.count((self.len * rhs.len) as u64);
+        for i in 0..self.len {
+            for j in 0..rhs.len {
+                out.c[i + j] = am(out.c[i + j], mm(self.c[i], rhs.c[j], ring.p), ring.p);
+            }
+        }
+        out.trim();
+        out
+    }
+
+    fn rem(mut self, rhs: Self, ring: &PolyRing) -> Self {
+        assert!(rhs.len > 0);
+        let inv = inv_mod(rhs.c[rhs.len - 1], ring.p);
+        while self.len >= rhs.len {
+            let coef = mm(self.c[self.len - 1], inv, ring.p);
+            let shift = self.len - rhs.len;
+            ring.count(rhs.len as u64 + 1);
+            for i in 0..rhs.len {
+                self.c[shift + i] = sm(self.c[shift + i], mm(coef, rhs.c[i], ring.p), ring.p);
+            }
+            self.trim();
+        }
+        self
+    }
+
+    fn gcd(mut self, mut rhs: Self, ring: &PolyRing) -> Self {
+        while rhs.len > 0 {
+            // A nonzero constant proves coprimality; no remaining polynomial
+            // division or finite-field root extraction is needed.
+            if rhs.len == 1 {
+                return Self::new(&[1]);
+            }
+            let rem = self.rem(rhs, ring);
+            self = rhs;
+            rhs = rem;
+        }
+        if self.len > 0 {
+            let inv = inv_mod(self.c[self.len - 1], ring.p);
+            ring.count(self.len as u64);
+            for c in &mut self.c[..self.len] {
+                *c = mm(*c, inv, ring.p);
+            }
+        }
+        self
+    }
+
+    fn upoly(self) -> UPoly {
+        UPoly(self.c[..self.len].to_vec())
+    }
+}
+
+pub(super) struct PreparedSymmetricPair {
+    aa: E3,
+    a2: E3,
+    b4: E3,
+}
+
+impl PreparedSymmetricPair {
+    pub fn new(inst: &Instance3) -> Self {
+        let f = &inst.curve.field;
+        Self {
+            aa: f.sq(&inst.curve.a),
+            a2: f.scale(&inst.curve.a, 2),
+            b4: f.scale(&inst.curve.b, 4),
+        }
+    }
+
+    pub fn pair_test(
+        &self,
+        inst: &Instance3,
+        base: &SubspaceBase,
+        y: &Pt3,
+        rng: &mut StdRng,
+        stats: &mut SymmetricPairStats,
+    ) -> (Vec<Vec<(usize, i64)>>, u64) {
+        stats.calls += 1;
+        if y.inf {
+            return (vec![], 0);
+        }
+        let f = &inst.curve.field;
+        let before = f.muls();
+        let x2 = f.sq(&y.x);
+        let uc = f.neg(&f.add(&f.scale(&x2, 4), &self.a2));
+        let us = f.neg(&f.scale(&y.x, 2));
+        let vc = f.sub(&self.aa, &f.mul(&self.b4, &y.x));
+        let vs = f.neg(&f.add(&f.mul(&self.a2, &y.x), &self.b4));
+        let component_muls = f.muls() - before;
+        let u: [Poly5; 3] = std::array::from_fn(|k| Poly5::new(&[uc.0[k], us.0[k]]));
+        let v: [Poly5; 3] = std::array::from_fn(|k| Poly5::new(&[vc.0[k], vs.0[k], x2.0[k]]));
+        let ring = PolyRing::new(f.p);
+        let eliminant = u[1].mul(v[2], &ring).sub(u[2].mul(v[1], &ring), &ring);
+        if eliminant.len == 0 {
+            stats.degenerate_scans += 1;
+            return (
+                symmetric::scan_pairs(inst, base, y),
+                component_muls + ring.muls.get(),
+            );
+        }
+        stats.cubic_eliminations += 1;
+        let pivot = if u[1].len > 0 { 1 } else { 2 };
+        let compatibility = v[pivot]
+            .mul(v[pivot], &ring)
+            .sub(u[pivot].mul(u[0], &ring).mul(v[pivot], &ring), &ring)
+            .add(u[pivot].mul(u[pivot], &ring).mul(v[0], &ring), &ring);
+        let common = eliminant.gcd(compatibility, &ring);
+        if common.len == 1 {
+            stats.constant_gcd_rejections += 1;
+            return (vec![], component_muls + ring.muls.get());
+        }
+        let u = u.map(Poly5::upoly);
+        let v = v.map(Poly5::upoly);
+        let found =
+            symmetric::finish_candidates(inst, base, y, rng, stats, &u, &v, &common.upoly(), &ring);
+        (found, component_muls + ring.muls.get())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bounded_polynomials_match_reference_including_zero_and_degree_drops() {
+        let ring = PolyRing::new(7);
+        let mut rng = StdRng::seed_from_u64(29);
+        for _ in 0..300 {
+            let a = Poly5::new(
+                &(0..rng.gen_range(0..=5))
+                    .map(|_| rng.gen_range(0..7))
+                    .collect::<Vec<_>>(),
+            );
+            let b = Poly5::new(
+                &(0..rng.gen_range(0..=5))
+                    .map(|_| rng.gen_range(0..7))
+                    .collect::<Vec<_>>(),
+            );
+            assert_eq!(a.add(b, &ring).upoly(), ring.add(&a.upoly(), &b.upoly()));
+            assert_eq!(a.sub(b, &ring).upoly(), ring.sub(&a.upoly(), &b.upoly()));
+            assert_eq!(a.gcd(b, &ring).upoly(), ring.gcd(&a.upoly(), &b.upoly()));
+            if b.len > 0 {
+                assert_eq!(a.rem(b, &ring).upoly(), ring.rem(&a.upoly(), &b.upoly()));
+            }
+        }
+    }
+
+    #[test]
+    fn prepared_matches_all_tiny_targets_and_general_cubic() {
+        let mut instances = vec![generate_instance3(7, 3), generate_instance3(7, 7)];
+        let field = Fp3::with_irreducible_cubic(11, [1, 0, 4]).unwrap();
+        let curve = Curve3::new(field, E3([1, 1, 0]), E3([2, 0, 1]), 5, Pt3::INFINITY);
+        instances.push(Instance3 {
+            curve,
+            q: Pt3::INFINITY,
+            d: 0,
+        });
+        for inst in instances {
+            let mut rng = StdRng::seed_from_u64(31);
+            let base = SubspaceBase::build(&inst, &mut rng);
+            let prepared = PreparedSymmetricPair::new(&inst);
+            let mut points = Vec::new();
+            if !inst.curve.g.inf {
+                for d in 1..inst.curve.n {
+                    points.push(inst.curve.mul(&inst.curve.g, d));
+                }
+            }
+            for a in &base.points {
+                for b in &base.points {
+                    points.push(inst.curve.add(a, b));
+                    points.push(inst.curve.sub(a, b));
+                }
+            }
+            for point in points {
+                let mut a = StdRng::seed_from_u64(37);
+                let mut b = a.clone();
+                let got = prepared
+                    .pair_test(
+                        &inst,
+                        &base,
+                        &point,
+                        &mut a,
+                        &mut SymmetricPairStats::default(),
+                    )
+                    .0;
+                let expected = symmetric::pair_test(
+                    &inst,
+                    &base,
+                    &point,
+                    &mut b,
+                    &mut SymmetricPairStats::default(),
+                )
+                .0;
+                assert_eq!(got, expected, "point={point:?}");
+                assert_eq!(a.gen::<u64>(), b.gen::<u64>(), "root RNG stream changed");
+            }
+        }
+    }
+}

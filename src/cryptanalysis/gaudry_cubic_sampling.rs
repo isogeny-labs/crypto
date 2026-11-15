@@ -16,7 +16,7 @@ pub(super) struct RAddingSampler {
 }
 
 impl RAddingSampler {
-    pub fn new(inst: &Instance3, seed: u64) -> Self {
+    pub fn new(inst: &Instance3, seed: u64, max_epoch: usize) -> Self {
         let c = &inst.curve;
         // Separate RNG domain: the fresh sampler and its oracle stream stay
         // byte-for-byte unchanged when this treatment is not selected.
@@ -43,7 +43,7 @@ impl RAddingSampler {
             started: false,
             rng,
             visited,
-            epoch_limit: (c.n as f64).sqrt().ceil().clamp(2.0, 1024.0) as usize,
+            epoch_limit: (c.n as f64).sqrt().ceil().clamp(2.0, max_epoch as f64) as usize,
             restarts: 0,
         }
     }
@@ -92,7 +92,7 @@ mod tests {
     #[test]
     fn incremental_residuals_keep_exact_group_invariant() {
         let inst = generate_instance3(7, 3);
-        let mut sampler = RAddingSampler::new(&inst, 3);
+        let mut sampler = RAddingSampler::new(&inst, 3, 1024);
         for _ in 0..200 {
             let before = inst.curve.ops();
             let restarts_before = sampler.restarts;
@@ -176,6 +176,50 @@ mod tests {
                     <= g.residuals + g.sampler_restarts.unwrap() * (4 * bits + 2)
             );
             assert!(g.sampler_setup_group_ops.unwrap() > 0);
+        }
+    }
+
+    #[test]
+    fn prepared_oracle_preserves_walk_stream_and_long_epochs_recover() {
+        let inst = generate_instance3(127, 37);
+        let base = SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(37));
+        for sampler in [ResidualSampler3::RAdding32, ResidualSampler3::RAddingLong] {
+            let mut opts = GaudryOptions {
+                max_residuals: 100000,
+                solver: Solver::SymmetricPairOnly,
+                small_base: (base.len() as f64).powf(2.0 / 3.0).ceil() as usize,
+                max_large_primes: 2,
+                ..GaudryOptions::default()
+            };
+            let reference = run_gaudry_with_sampler(
+                &inst,
+                &base,
+                37,
+                &opts,
+                LargePrimeBackend::SymbolicGraph,
+                sampler,
+            );
+            opts.solver = Solver::PreparedSymmetricPairOnly;
+            let prepared = run_gaudry_with_sampler(
+                &inst,
+                &base,
+                37,
+                &opts,
+                LargePrimeBackend::SymbolicGraph,
+                sampler,
+            );
+            assert_eq!(reference.correct, Some(true));
+            assert_eq!(prepared.correct, Some(true));
+            assert_eq!(reference.lp_input_digest, prepared.lp_input_digest);
+            assert_eq!(reference.group_ops, prepared.group_ops);
+            assert_eq!(reference.residuals, prepared.residuals);
+            assert!(prepared.oracle_fp_muls < reference.oracle_fp_muls);
+            assert!(prepared.precompute_fp_muls > reference.precompute_fp_muls);
+            let stats = prepared.relation_point_stats.unwrap();
+            assert_eq!(
+                stats.decomposed_residuals,
+                stats.distinct_abscissae + stats.repeated_abscissae
+            );
         }
     }
 }

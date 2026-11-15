@@ -27,7 +27,7 @@ jq --arg source "$source_revision" --arg binary "$binary_sha" --arg cpu "$cpu" \
 cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
 /usr/bin/git ls-files -z -- Cargo.toml Cargo.lock src/cryptanalysis/gaudry_cubic.rs \
   src/cryptanalysis/gaudry_cubic_graph.rs src/cryptanalysis/gaudry_cubic_symmetric.rs \
-  src/cryptanalysis/gaudry_cubic_sampling.rs \
+  src/cryptanalysis/gaudry_cubic_sampling.rs src/cryptanalysis/gaudry_cubic_prepared.rs \
   src/cryptanalysis/residual_walk.rs src/cryptanalysis/jv_bitops.rs \
   examples/gaudry_cubic_graph_compare.rs research/pencil_large_prime_20261029/Cargo.toml \
   research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \

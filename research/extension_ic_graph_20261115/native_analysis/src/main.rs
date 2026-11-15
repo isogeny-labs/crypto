@@ -211,6 +211,38 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
     {
         problems.push("execution order differs from the frozen interleaved schedule".to_owned());
     }
+    if let Some(pairs) = plan["paired_oracles"].as_array() {
+        for pair in pairs {
+            let reference = pair[0].as_str().ok_or("invalid paired oracle")?;
+            let candidate = pair[1].as_str().ok_or("invalid paired oracle")?;
+            if !oracles.contains(&json!(reference)) || !oracles.contains(&json!(candidate)) {
+                return Err("paired oracle is outside frozen oracle set".into());
+            }
+            for (key, row) in &executions {
+                if key.2 != reference || key.5.starts_with("rho_") {
+                    continue;
+                }
+                let mut candidate_key = key.clone();
+                candidate_key.2 = candidate.to_owned();
+                let stream = |r: &Value| {
+                    json!([
+                        identity(r),
+                        r["report"]["residuals"],
+                        r["report"]["relations_verified"],
+                        r["report"]["group_ops"],
+                        r["report"]["recovered_scalar"],
+                        r["report"]["lp_input_digest"]
+                    ])
+                };
+                if executions
+                    .get(&candidate_key)
+                    .is_none_or(|other| stream(row) != stream(other))
+                {
+                    problems.push(format!("paired oracle stream mismatch {key:?}"));
+                }
+            }
+        }
+    }
     let mut strata = Vec::new();
     for p in primes {
         let p = p.as_u64().ok_or("invalid prime")?;
@@ -373,7 +405,8 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
         })
         .fold(0.1_f64, f64::min)
         * 0.7;
-    let root = SVGBackend::new(path, (1200, 620)).into_drawing_area();
+    let width = 1200u32.max(strata.len() as u32 * 125);
+    let root = SVGBackend::new(path, (width, 620)).into_drawing_area();
     root.fill(&WHITE)?;
     let mut chart = ChartBuilder::on(&root)
         .caption(
@@ -401,6 +434,7 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
             "Groebner" => "S4",
             "PairOnly" => "Pair",
             "SymmetricPairOnly" => "Symmetric pair",
+            "PreparedSymmetricPairOnly" => "Prepared pair",
             "SymmetricMeetInTheMiddle" => "Symmetric triple",
             other => other,
         };
@@ -408,7 +442,7 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
             .into_text_style(&root)
             .pos(Pos::new(HPos::Center, VPos::Top));
         root.draw(&Text::new(
-            format!("p{} / seed{}", s["p"], s["seed"]),
+            format!("p{} s{}", s["p"], s["seed"]),
             (x, y + 10),
             label_style.clone(),
         ))?;
@@ -475,6 +509,22 @@ fn main() -> Result<(), Box<dyn Error>> {
     serde_json::to_writer_pretty(&mut out, &result)?;
     writeln!(out)?;
     plot(&result, &dir.join("ratios.svg"))?;
+    let names: BTreeSet<_> = result["strata"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|s| s["oracle"].as_str())
+        .collect();
+    for name in names {
+        let mut subset = result.clone();
+        subset["strata"] = json!(result["strata"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|s| s["oracle"] == name)
+            .collect::<Vec<_>>());
+        plot(&subset, &dir.join(format!("ratios-{name}.svg")))?;
+    }
     for s in result["strata"].as_array().unwrap() {
         println!(
             "p={} seed={} {} graph/rho={} pivot/rho={} controlled={} correct={}/{}",
@@ -581,6 +631,35 @@ mod tests {
         assert!(!s["global_problems"].as_array().unwrap().is_empty());
         assert_eq!(
             s["strata"][0]["eligible_local_controlled_comparison"],
+            false
+        );
+    }
+
+    #[test]
+    fn paired_oracles_must_preserve_relation_streams() {
+        let (mut p, mut rows) = fixture();
+        p["oracles"] = json!(["PairOnly", "PreparedSymmetricPairOnly"]);
+        p["paired_oracles"] = json!([["PairOnly", "PreparedSymmetricPairOnly"]]);
+        let mut candidate = rows.clone();
+        for r in &mut candidate {
+            r["oracle_block"] = json!("PreparedSymmetricPairOnly");
+            // Genuine arithmetic savings are allowed; the admitted relation
+            // stream, group work and recovered scalar must still agree.
+            r["report"]["oracle_fp_muls"] = json!(75);
+        }
+        rows.extend(candidate);
+        assert!(analyze(&p, rows.clone(), 0).unwrap()["global_problems"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+        rows[36]["report"]["lp_input_digest"] = json!("changed");
+        let s = analyze(&p, rows, 0).unwrap();
+        assert!(s["global_problems"].as_array().unwrap().iter().any(|p| p
+            .as_str()
+            .unwrap()
+            .contains("paired oracle stream mismatch")));
+        assert_eq!(
+            s["strata"][1]["eligible_local_controlled_comparison"],
             false
         );
     }

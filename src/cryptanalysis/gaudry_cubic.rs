@@ -66,6 +66,8 @@ mod graph;
 #[path = "gaudry_cubic_symmetric.rs"]
 mod symmetric;
 pub use symmetric::{weil_s3_pair_test_symmetric, SymmetricPairStats};
+#[path = "gaudry_cubic_prepared.rs"]
+mod prepared;
 #[path = "gaudry_cubic_sampling.rs"]
 mod sampling;
 
@@ -3169,6 +3171,18 @@ pub struct GaudryReport {
     pub sampling_group_ops: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sampler_restarts: Option<u64>,
+    /// Diagnostic only: repetition of x among decomposable residuals. This
+    /// stores no scalar coefficients and never supplies a recovery equation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub relation_point_stats: Option<RelationPointStats>,
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct RelationPointStats {
+    pub decomposed_residuals: u64,
+    pub distinct_abscissae: u64,
+    pub repeated_abscissae: u64,
+    pub first_repeat_residual: Option<u64>,
 }
 
 /// Auxiliary-column elimination for the protected-target comparison path.
@@ -3186,6 +3200,9 @@ pub enum ResidualSampler3 {
     FreshScalar,
     #[serde(rename = "r-adding")]
     RAdding32,
+    /// Same sampler with epochs up to ceil(sqrt(n)), capped at one million.
+    #[serde(rename = "r-adding-long")]
+    RAddingLong,
 }
 
 /// Options of a Gaudry-style run; see [`run_gaudry_opts`].
@@ -3710,6 +3727,8 @@ pub enum Solver {
     /// Pair-only channel using elementary symmetric coordinates and a
     /// degree-at-most-three eliminant. Degenerate systems use a counted scan.
     SymmetricPairOnly,
+    /// Same pair equations with charged cached constants and stack workspace.
+    PreparedSymmetricPairOnly,
     /// The existing hybrid triple scan, using the symmetric S3 pair oracle.
     SymmetricMeetInTheMiddle,
 }
@@ -3866,11 +3885,17 @@ fn run_gaudry_impl(
     } else {
         None
     };
+    let prepared_pair = (solver == Solver::PreparedSymmetricPairOnly)
+        .then(|| prepared::PreparedSymmetricPair::new(inst));
     let precompute_muls = curve.field.muls();
     curve.reset();
-    let mut walk_sampler =
-        (sampler == ResidualSampler3::RAdding32).then(|| sampling::RAddingSampler::new(inst, seed));
+    let mut walk_sampler = match sampler {
+        ResidualSampler3::FreshScalar => None,
+        ResidualSampler3::RAdding32 => Some(sampling::RAddingSampler::new(inst, seed, 1024)),
+        ResidualSampler3::RAddingLong => Some(sampling::RAddingSampler::new(inst, seed, 1_000_000)),
+    };
     let sampler_setup_group_ops = curve.ops();
+    let mut decomposed_x = backend.map(|_| std::collections::HashSet::new());
     let mut stats = SolveStats::default();
     let mut system = RelationSystem::new(n, unknowns);
     let mut eliminator = LargePrimeEliminator::with_cap(
@@ -3975,6 +4000,7 @@ fn run_gaudry_impl(
         sampler_setup_group_ops: backend.map(|_| sampler_setup_group_ops),
         sampling_group_ops: backend.map(|_| 0),
         sampler_restarts: backend.map(|_| 0),
+        relation_point_stats: backend.map(|_| RelationPointStats::default()),
     };
     let mut la = std::time::Duration::ZERO;
     while rep.residuals < max_residuals {
@@ -4064,6 +4090,18 @@ fn run_gaudry_impl(
                 rep.pair_tests = stats.calls;
                 decs
             }
+            Solver::PreparedSymmetricPairOnly => {
+                let stats = rep
+                    .symmetric_pair_stats
+                    .get_or_insert_with(SymmetricPairStats::default);
+                let (decs, muls) = prepared_pair
+                    .as_ref()
+                    .unwrap()
+                    .pair_test(inst, base, &r, &mut rng, stats);
+                rep.oracle_fp_muls += muls;
+                rep.pair_tests = stats.calls;
+                decs
+            }
         };
         if cross_check {
             let other = match solver {
@@ -4084,7 +4122,9 @@ fn run_gaudry_impl(
                     )
                 }
                 Solver::Groebner => subspace_triple_oracle(inst, base, &r, &mut rng).0,
-                Solver::SymmetricPairOnly => weil_s3_pair_test(inst, base, &r, &mut rng).0,
+                Solver::SymmetricPairOnly | Solver::PreparedSymmetricPairOnly => {
+                    weil_s3_pair_test(inst, base, &r, &mut rng).0
+                }
                 Solver::SymmetricMeetInTheMiddle => {
                     subspace_triple_oracle(inst, base, &r, &mut rng).0
                 }
@@ -4094,7 +4134,10 @@ fn run_gaudry_impl(
             let filt = |v: &Vec<Vec<(usize, i64)>>| -> Vec<Vec<(usize, i64)>> {
                 v.iter().filter(|t| t.len() != 2).cloned().collect()
             };
-            let mismatch = if solver == Solver::SymmetricPairOnly {
+            let mismatch = if matches!(
+                solver,
+                Solver::SymmetricPairOnly | Solver::PreparedSymmetricPairOnly
+            ) {
                 decs != other
             } else {
                 filt(&decs) != filt(&other)
@@ -4109,6 +4152,17 @@ fn run_gaudry_impl(
                 }
             }
             rep.cross_checked += 1;
+        }
+        if !decs.is_empty() {
+            if let (Some(xs), Some(stats)) = (&mut decomposed_x, &mut rep.relation_point_stats) {
+                stats.decomposed_residuals += 1;
+                if xs.insert(r.x) {
+                    stats.distinct_abscissae += 1;
+                } else {
+                    stats.repeated_abscissae += 1;
+                    stats.first_repeat_residual.get_or_insert(rep.residuals);
+                }
+            }
         }
         for terms in decs {
             rep.decompositions += 1;

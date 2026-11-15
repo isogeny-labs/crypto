@@ -81,8 +81,25 @@ pub(super) fn pair_test(
     if PolyRing::deg(&common) == 0 {
         stats.constant_gcd_rejections += 1;
     }
+    let found = finish_candidates(inst, base, y, rng, stats, &u, &v, &common, &ring);
+    (found, component_muls + ring.muls.get())
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn finish_candidates(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    y: &Pt3,
+    rng: &mut StdRng,
+    stats: &mut SymmetricPairStats,
+    u: &[UPoly; 3],
+    v: &[UPoly; 3],
+    common: &UPoly,
+    ring: &PolyRing,
+) -> Vec<Vec<(usize, i64)>> {
+    let f = &inst.curve.field;
     let mut found = Vec::new();
-    for s in ring.roots(&common, rng) {
+    for s in ring.roots(common, rng) {
         let us: [u64; 3] = std::array::from_fn(|k| ring.eval(&u[k], s));
         let vs: [u64; 3] = std::array::from_fn(|k| ring.eval(&v[k], s));
         let products = if let Some(k) = (1..3).find(|&k| us[k] != 0) {
@@ -122,7 +139,7 @@ pub(super) fn pair_test(
     }
     found.sort();
     found.dedup();
-    (found, component_muls + ring.muls.get())
+    found
 }
 
 fn append_signs(
@@ -151,7 +168,7 @@ fn append_signs(
     }
 }
 
-fn scan_pairs(inst: &Instance3, base: &SubspaceBase, y: &Pt3) -> Vec<Vec<(usize, i64)>> {
+pub(super) fn scan_pairs(inst: &Instance3, base: &SubspaceBase, y: &Pt3) -> Vec<Vec<(usize, i64)>> {
     let c = &inst.curve;
     let mut found = Vec::new();
     for (i, point) in base.points.iter().enumerate() {

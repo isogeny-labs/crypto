@@ -51,6 +51,7 @@ enum Oracle {
     Groebner,
     Pair,
     SymmetricPair,
+    PreparedPair,
     SymmetricMitm,
 }
 
@@ -58,6 +59,7 @@ enum Oracle {
 enum Sampler {
     Fresh,
     RAdding,
+    RAddingLong,
 }
 
 impl Sampler {
@@ -65,6 +67,7 @@ impl Sampler {
         match self {
             Self::Fresh => ResidualSampler3::FreshScalar,
             Self::RAdding => ResidualSampler3::RAdding32,
+            Self::RAddingLong => ResidualSampler3::RAddingLong,
         }
     }
 }
@@ -76,6 +79,7 @@ impl Oracle {
             Self::Groebner => Solver::Groebner,
             Self::Pair => Solver::PairOnly,
             Self::SymmetricPair => Solver::SymmetricPairOnly,
+            Self::PreparedPair => Solver::PreparedSymmetricPairOnly,
             Self::SymmetricMitm => Solver::SymmetricMeetInTheMiddle,
         }
     }
