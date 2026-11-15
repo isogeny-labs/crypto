@@ -77,3 +77,30 @@ reference. Keep the 20s/2GiB backend limits, staircase cap128 and reduction
 cap unchanged. A backend error, resource cap, nonzero-dimensional output or
 staircase cap is unknown and preserved, never certified nonexistence. Limit
 this amendment to those three calls. Do not expand caps adaptively.
+
+## Amendment A2 — remove the cold setup's field-point census
+
+The first cold fixture still used exhaustive public curve-point enumeration
+for order admission and factor-base construction. That is acceptable as a
+reference but cannot be part of a prospective efficient candidate. Replace
+candidate setup by factoring X^8-1 and the quadratic lift equations with FLINT;
+admit the fixed whole order19 from a nonidentity order19 point and Hasse's
+interval [10,26] for p=17 (19 is its unique multiple of19). Do not compute base
+logs. The independent OpenSSL reference remains exhaustive at this fixed size.
+
+After this meaningful setup change, repeat exactly the 18 frozen point-only
+cold controls once in a new write-once cold-002 directory, replay every query,
+relation, kernel and final scalar, and run negative replay controls. Preserve
+cold-001 as the earlier software version. No repeated arity calls, cap change,
+scientific timing comparison or inferred speedup is authorized by A2.
+
+## Amendment A3 — source/binary custody confirmation
+
+The first 90-case model run preceded cold trace instrumentation; its exact
+binary was not retained before that subsequent rebuild. Preserve that run as
+historical development evidence, without fabricating an execution digest.
+Repeat exactly those 90 model controls once as models-002 with the final
+source/binary hashes captured before launch. The final cold-002 run used that
+same unchanged final binary and source; retain both its exact input/output
+records and the observed binary digest. Do not repeat the three arity calls.
+This is a custody correction, not a new performance experiment.

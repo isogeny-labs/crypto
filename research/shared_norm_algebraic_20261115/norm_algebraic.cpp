@@ -227,11 +227,31 @@ ColdResult cold_solve(Point Q,std::uint64_t seed,Oracle&oracle) {
     const reference::Curve E{17,2,2};const Point P{5,1,false};
     if(Q.infinity||!E.contains(Q)||Q.x<0||Q.x>=17||Q.y<0||Q.y>=17)
         throw std::invalid_argument("canonical nonzero public target required");
-    if(E.points().size()!=18||!multiply(E,P,19).infinity||!multiply(E,Q,19).infinity)
+    // Nonzero P has exact prime order19. Hasse's interval for this fixed F17
+    // curve is [10,26], containing exactly one multiple of19. No point census.
+    if(!reference::isprime(19)||P.infinity||!E.contains(P)
+       ||!multiply(E,P,19).infinity||!multiply(E,Q,19).infinity
+       ||((10+18)/19)!=26/19)
         throw std::runtime_error("fixture group admission failed");
     std::vector<Point> base;
-    for(const auto&point:E.points())if(point.y<=8&&E.powmod(point.x,8)==1)base.push_back(point);
+    coeff::Poly membership_polynomial(9,0);membership_polynomial[0]=16;membership_polynomial[8]=1;
+    const auto abscissae=roots(membership_polynomial,17);
+    for(int x:abscissae) {
+        const int rhs=E.residue(x*x*x+2*x+2);
+        for(int y:roots(coeff::Poly{E.residue(-rhs),0,1},17))if(y<=8) {
+            Point point{x,y,false};
+            if(!E.contains(point)||!multiply(E,point,19).infinity)
+                throw std::runtime_error("algebraic factor-base point admission");
+            base.push_back(point);
+        }
+    }
     if(base.size()!=3)throw std::runtime_error("base dimension mismatch");
+    {
+        std::ofstream setup(oracle.root/"cold-setup.tsv");
+        setup<<"order_admission\tprime_order19_and_Hasse_10_26\n";
+        setup<<"abscissa_roots\t"<<abscissae.size()<<'\n';
+        for(Point point:base)setup<<"base\t"<<point.x<<'\t'<<point.y<<'\n';
+    }
     std::mt19937_64 rng(seed);
     std::ofstream attempts_log(oracle.root/"cold-attempts.tsv");
     std::ofstream relations_log(oracle.root/"cold-relations.tsv");
@@ -349,11 +369,32 @@ int main(int argc,char**argv) {
             }
             std::cout<<"PASS cold point-only IC targets=18\n";return 0;
         }
+        if(argc==5&&std::string(argv[1])=="--qualify-arity") {
+            Oracle oracle(argv[2],argv[3]);std::ofstream log(argv[4]);
+            log<<"m\tt\tc\treference_models\tcandidate_models\tquotient_dimension\tstatus\n";
+            const std::vector<std::array<int,3>> cells{{5,3,16},{5,4,1},{7,4,1}};
+            for(const auto&cell:cells) {
+                const coeff::Config cfg{{17},2,2,cell[1],cell[2],0,6};
+                const auto reference=point_reference(cfg,cell[0]);
+                try {
+                    const auto out=oracle.solve(cfg,cell[0]);
+                    if(out.models!=reference)throw std::runtime_error("arity complete-model mismatch");
+                    log<<cell[0]<<'\t'<<cell[1]<<'\t'<<cell[2]<<'\t'<<reference.size()<<'\t'<<out.models.size()<<'\t'<<out.extraction.dimension<<"\tmatch\n";
+                }catch(const std::exception&e) {
+                    // Controls preserve an unknown result, never infer UNSAT.
+                    log<<cell[0]<<'\t'<<cell[1]<<'\t'<<cell[2]<<'\t'<<reference.size()<<"\t-\t-\tunknown: "<<e.what()<<'\n';
+                    log.flush();
+                    if(std::string(e.what())=="arity complete-model mismatch")throw;
+                }
+                log.flush();
+            }
+            std::cout<<"Completed three capped arity controls; see TSV for match/unknown\n";return 0;
+        }
         if(argc==7&&std::string(argv[1])=="--solve") {
             Oracle oracle(argv[2],argv[3]);
             const auto out=cold_solve({reference::read_int(argv[4]),reference::read_int(argv[5]),false},std::stoull(argv[6]),oracle);
             std::cout<<"{\"scalar\":"<<out.scalar<<",\"attempts\":"<<out.attempts<<",\"backend_calls\":"<<out.calls<<",\"misses\":"<<out.misses<<",\"rank\":"<<out.rank<<"}\n";return 0;
         }
-        throw std::invalid_argument("usage: norm_algebraic --selftest | --retained BASIS | --qualify-models MSOLVE OUTDIR TSV | --qualify-cold MSOLVE OUTDIR TSV | --solve MSOLVE OUTDIR Qx Qy SEED");
+        throw std::invalid_argument("usage: norm_algebraic --selftest | --retained BASIS | --qualify-models MSOLVE OUTDIR TSV | --qualify-cold MSOLVE OUTDIR TSV | --qualify-arity MSOLVE OUTDIR TSV | --solve MSOLVE OUTDIR Qx Qy SEED");
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<'\n';return 2;}
 }
