@@ -233,20 +233,40 @@ fn main() {
         }
     }
     let root = std::env::args().nth(1).unwrap();
-    for (g, p) in [
-        (2, 1009),
-        (2, 16381),
-        (3, 127),
-        (3, 1009),
-        (4, 31),
-        (4, 127),
-    ] {
+    let heldout = std::env::args().nth(2).as_deref() == Some("--heldout");
+    let mut cohort = Vec::new();
+    if heldout {
+        for (g, primes) in [
+            (2, &[1009, 4001, 16381, 65537][..]),
+            (3, &[127, 503, 1009][..]),
+            (4, &[31, 61, 127][..]),
+        ] {
+            for &p in primes {
+                for family in 0..2 {
+                    cohort.push((g, p, family));
+                }
+            }
+        }
+    } else {
+        cohort.extend([
+            (2, 1009, 0),
+            (2, 16381, 0),
+            (3, 127, 0),
+            (3, 1009, 0),
+            (4, 31, 0),
+            (4, 127, 0),
+        ]);
+    }
+    let fixture_count = cohort.len();
+    for (g, p, family) in cohort {
         let text =
-            fs::read_to_string(Path::new(&root).join(format!("select-g{g}-p{p}-f0.out"))).unwrap();
+            fs::read_to_string(Path::new(&root).join(format!("select-g{g}-p{p}-f{family}.out")))
+                .unwrap();
         let t: Vec<_> = text.split_whitespace().collect();
         assert_eq!(t[0], "FIXTURE");
         assert_eq!(t[1].parse::<usize>().unwrap(), g);
         assert_eq!(t[2].parse::<u64>().unwrap(), p);
+        assert_eq!(t[3].parse::<u64>().unwrap(), family);
         let n: usize = t[6].parse().unwrap();
         assert_eq!(n, 2 * g + 2);
         let coeff: Vec<u64> = t[7..7 + n].iter().map(|s| s.parse().unwrap()).collect();
@@ -255,11 +275,11 @@ fn main() {
         c.push(1);
         c.sort();
         let (all, parts) = &caches[g - 1];
-        let (_, _, dim) = report(&c, g, all, parts, &format!("fixture-p{p}"));
+        let (_, _, dim) = report(&c, g, all, parts, &format!("fixture-p{p}-f{family}"));
         assert_eq!(dim, r - 1);
     }
     println!(
-        "TERMINAL geometric_genera=4 genus3_cycle_types={} fixtures=6",
+        "TERMINAL geometric_genera=4 genus3_cycle_types={} fixtures={fixture_count}",
         types.len()
     );
 }
