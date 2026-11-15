@@ -1,3 +1,19 @@
+# Genuine27 settled; whole diagnostic fixtures published
+
+## What was done
+pcc/claims/PCC-20261115-cef18c.json / pcc/claims/PCC-20261115-277e77.json: original run43745805865/job132908716494 replayed eleven remote objects BEFORE actual bot0b2bee203a, direct parent00800a2b, exact thirteen changed paths. All 65,886 content keys and 179 literal links/full target states/owned bytes/ledger checks retained; exact normal FF and original artifact/wiring checks exit0. HOLD27 RELEASED. Whole 125,663,108-byte archive, 7,005 members, 59 closed roots, all 3,578 consumer/622 producer delta paths retained. Five exact original canonical entry dictionaries and six relative aliases roundtrip the complete passive/rank/character fixtures; small rank verdict and full inspected PDF retain ordinary Git policy. [pcc:unverified]
+
+## Decisions made
+Publish custody settlement, then freeze and normally publish the whole diagnostic CI comparison contract BEFORE comparator/driver code. Require the entire population, all mathematical controls, both original conditional Lean gates, original engine/runtime/fullprepared custody and complete artifacts. Future whole custody is NEW28. [pcc:unverified]
+
+## Open threads
+Whole diagnostic CI; primary-source/KB review and prospective unassisted relation-completion successor. The finite character separator3a7d56, exact rankc0479c and conditional proof19c467 retain their original scope. Actual global character/program/numeric Lean bridges, complete setup/primitive/strongest-reference calibrated costs and original merge gates remain open. Vault8edec422 remains locked with four-byte VLT1 checks only; KB127 remains an availability gap. [pcc:unverified]
+
+## Errors
+All prior archive/governance/source/native/proof/control/report/transport failures remain complete. Conductor is unavailable (actual127). An initial broad AGENTS read accidentally included the locked autoresearcher ciphertext, repeating the recorded access error; no plaintext/key/decryption/execution or file modification occurred. No emitted ciphertext is republished. Future reads obey the exact four-byte-only restriction. [pcc:unverified]
+
+---
+
 # Whole relation-character custody27: inputs HELD
 
 ## What was done
