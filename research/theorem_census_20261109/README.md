@@ -391,6 +391,30 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual Miller norm valuation/DVR bridge](../miller_norm_valuation_audit_20261115/README.md)
+constructs a valuation on the actual curve function field from the actual rank-two
+algebra norm degree, deriving multiplicativity, ultrametricity and zero support.
+Actual X/Y is a uniformizer of its actual DVR and generates its maximal ideal;
+values exp2 and exp3 for X and Y, exp3/exp2 for lines/verticals, and exp(-1)
+for the parameter are derived. Actual normalized lines/verticals reduce to1
+under the actual residue map. Reciprocal X is not a uniformizer and its
+substitution makes normalized-line difference value1. No valuation, DVR,
+coordinate-weight or normalization premise is supplied. **Canonical projective
+infinity local-ring identification, full canonical principal divisor and
+pairing/MOV-FR/all14 completion remain open.** This advances the constructed
+valuation/normalization portion, not that geometric identification.
+Exact local **PCC-20261115-c0e6db** PASS at 2026-11-15T04:43:54Z, signed unverified. Whole gate57/0fail/
+0trusted/standardfoundations; full1108-character binding9e902bb2a63699a532e54ad1d475b5c8e1fb224ab597a92cc49f98ee0ca43dc9;
+native1complete/0prefix/0unresolved;7newmodules/10formal-config+14artifactpins.
+Fourteen states/nine failures/success03,05,08,12,14,151files/54objects/15848-byte
+losslessXZ/fivegate/one-page46894-bytePDF fullread/visual/inbounds. Final14/project
+logs clean; auditoroneinheritedString.mkdeprecation retained. Four exit-file
+writes skipped by set-e were recovered from actual retained PTY completions,
+eachactualexit1, without rerunsmanufacturingrecords. Official norm-degree and
+DVR/uniformizer proofs credited; samehost/prover/Mathlib, not independentphysical
+validation/newprimarypapercoverage/novelty/canonicalpromotion. [pcc:unverified]
+
+
 The [actual Miller affine ideal bridge](../miller_principal_ideal_audit_20261115/README.md)
 proves the generic coordinate-ring chord principal ideal and actual three-torsion
 tangent cube, nonzero regular/function-field line, and actual ring-hom evaluation
