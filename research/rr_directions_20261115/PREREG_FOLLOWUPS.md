@@ -80,3 +80,19 @@ conflicts from the panel as the third column.
 
 Changing a system, the seed scheme, or the budget between arms of the same comparison;
 counting a timeout as a refutation; reporting any of this as an ECDLP speedup.
+
+## Amendment 3 (2026-11-15T08:58Z, before the affected cells ran)
+
+- **F1, `s4` under F4 at ℓ ≥ 6.** The ℓ = 6 F1 process was killed by the container's
+  memory cgroup at both m = 13 and m = 17 on the same step (row 6 of draw 0: `s4`, F4,
+  > 10 GB virtual), after `norm` and `rr4` under both solvers and `s4` under SAT had
+  completed for that draw. This is recorded as the outcome of that cell ("F4 on S₄ at
+  ℓ = 6: killed above 10 GB"). The remaining ℓ = 6 draws (1–7) and all of ℓ = 7 run `norm`
+  and `rr4` under SAT and F4 and `s4` under SAT only.
+- **F4 sample size.** At m = 11 the warm and cold_sym arms take up to ≈ 150 s per
+  unsatisfiable target, about 40 min per draw, so the registered 8 draws × 64 targets at
+  m = 11 and m = 13 do not fit the session. Reduced to m = 11: draws 0–3 × 64 targets;
+  m = 13: draws 0–3 × 16 targets. Decided after two m = 11 draws had been summarised
+  (cold_sym/warm conflicts 1.023 and 1.394; cold/cold_sym 0.019 and 0.021). Those two
+  values were seen before this amendment, which is stated here; the threshold of P4 is
+  unchanged.
