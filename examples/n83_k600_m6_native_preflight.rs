@@ -69,11 +69,31 @@ fn write_new_json(path: &Path, value: &Value) -> Result<()> {
     Ok(())
 }
 
-fn command_output(program: &str, args: &[&str], root: &Path) -> Result<String> {
-    let output = Command::new(program)
+fn command_output_bounded(
+    program: &str,
+    args: &[&str],
+    root: &Path,
+    timeout: Duration,
+) -> Result<String> {
+    let mut child = Command::new(program)
         .args(args)
         .current_dir(root)
-        .output()?;
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()?;
+    let deadline = Instant::now() + timeout;
+    loop {
+        if child.try_wait()?.is_some() {
+            break;
+        }
+        if Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(format!("{program} {:?} exceeded the command timeout", args).into());
+        }
+        thread::sleep(Duration::from_millis(10));
+    }
+    let output = child.wait_with_output()?;
     if !output.status.success() {
         return Err(format!(
             "{program} {:?} failed with {}: {}",
@@ -84,6 +104,10 @@ fn command_output(program: &str, args: &[&str], root: &Path) -> Result<String> {
         .into());
     }
     Ok(String::from_utf8(output.stdout)?.trim().to_owned())
+}
+
+fn command_output(program: &str, args: &[&str], root: &Path) -> Result<String> {
+    command_output_bounded(program, args, root, Duration::from_secs(15))
 }
 
 fn clean_commit(repo: &Path) -> Result<String> {
@@ -481,14 +505,17 @@ fn run(args: &[String]) -> Result<Value> {
         .stderr(Stdio::from(stderr))
         .spawn()?;
     let deadline = Instant::now() + Duration::from_secs(outer_seconds);
+    let mut kill_error = None;
     let (exit, timed_out) = loop {
         if let Some(status) = child.try_wait()? {
             break (status.code(), false);
         }
         if Instant::now() >= deadline {
-            let _ = Command::new("docker")
-                .args(["kill", "n83-k600-m6-native-preflight"])
-                .status();
+            if let Err(error) =
+                command_output("docker", &["kill", "n83-k600-m6-native-preflight"], &repo)
+            {
+                kill_error = Some(error.to_string());
+            }
             let _ = child.kill();
             break (child.wait()?.code(), true);
         }
@@ -506,6 +533,9 @@ fn run(args: &[String]) -> Result<Value> {
     )
     .ok();
     let mut failure = Vec::new();
+    if kill_error.is_some() {
+        failure.push("container kill failed");
+    }
     if remaining.as_deref().is_none_or(|value| !value.is_empty()) {
         failure.push("container cleanup unverified");
     }
@@ -565,10 +595,9 @@ fn run(args: &[String]) -> Result<Value> {
     if !valid_preflight(summary.as_ref(), config.as_ref(), &lock) {
         failure.push("worker preflight receipt invalid");
     }
-    let status = if failure
-        .iter()
-        .any(|reason| *reason == "container cleanup unverified")
-    {
+    let status = if failure.iter().any(|reason| {
+        *reason == "container cleanup unverified" || *reason == "container kill failed"
+    }) {
         "PRODUCER_FAILURE_container_cleanup"
     } else if failure
         .iter()
@@ -600,6 +629,7 @@ fn run(args: &[String]) -> Result<Value> {
     };
     let outer = json!({"schema":"n83.k600-m6-native-outer/v1","status":status,
         "failure_reasons":failure,"worker_exit_code":exit,"timed_out":timed_out,
+        "kill_error":kill_error,
         "lock_sha256":sha256_file(&lock_path)?,"stdout_sha256":sha256_file(&out.join("stdout.log"))?,
         "stderr_sha256":sha256_file(&out.join("stderr.log"))?,
         "worker_config_sha256":if config.is_some(){Some(sha256_file(&config_path)?)}else{None},
@@ -705,6 +735,28 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn bounded_command_terminates_a_hung_child() {
+        assert_eq!(
+            command_output_bounded(
+                "/bin/echo",
+                &["ready"],
+                Path::new("/"),
+                Duration::from_secs(1),
+            )
+            .unwrap(),
+            "ready"
+        );
+        let start = Instant::now();
+        let result = command_output_bounded(
+            "/bin/sleep",
+            &["2"],
+            Path::new("/"),
+            Duration::from_millis(40),
+        );
+        assert!(result.is_err());
+        assert!(start.elapsed() < Duration::from_secs(1));
+    }
     #[test]
     fn preflight_receipt_requires_peak_and_zero_solver_work() {
         let limits = json!({"max_variables":125000,"max_domain_clauses":350000,"max_models":1,"conflict_budget":10000});
