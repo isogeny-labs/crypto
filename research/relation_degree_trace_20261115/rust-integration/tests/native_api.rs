@@ -101,3 +101,22 @@ fn six_variable_breadth_first_basis_passes_on_both_fields() {
         eprintln!("six-variable development outcome: complete checked breadth-first basis, p={p}, depths={:?}, basis_degree={}, stored_certificate_product_degree={}, max_stored_basis_proof_terms={}",report.quotient.derivation_depths,report.quotient.basis_polynomial_degree,report.quotient.basis_certificate_product_degree,report.certificates.iter().map(|r|r.proof.len()).max().unwrap_or(0));
     }
 }
+
+#[test]
+fn compact_chain_crosses_native_boundary_and_rejects_mutation() {
+    for p in [2147483647, 9007199254740881] {
+        let input = fixture(6, p);
+        let mut report = try_compact_quotient_basis(&input, 6, p).unwrap();
+        assert!(verify_compact_basis(&report, &input));
+        assert_eq!(report.observed_solving_degree, None);
+        assert!(report.native_checks.certification_pairs > 0);
+        eprintln!("compact native fixed case p={p}: stored_proof_terms={}, definition_nodes={}, local_product_degree={}, expanded_original_product_degree_upper_bound={}",report.info.stored_proof_terms,report.info.definition_nodes,report.info.max_local_certificate_product_degree,report.info.expanded_original_product_degree_upper_bound);
+        let certificate = report.certificate.clone();
+        report.certificate.definitions[0].proof =
+            std::collections::BTreeMap::from([((input.len(), vec![0; 6]), 1)]);
+        assert!(!verify_compact_basis(&report, &input));
+        report.certificate = certificate;
+        report.basis[0][0].1 = (report.basis[0][0].1 + 1) % p;
+        assert!(!verify_compact_basis(&report, &input));
+    }
+}

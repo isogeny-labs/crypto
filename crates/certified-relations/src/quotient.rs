@@ -2,6 +2,7 @@
 //! No witness or reference Groebner basis is used by construction.
 use super::projection::times;
 use super::*;
+pub mod compact;
 const POLY_CAP: usize = 5000;
 const PROOF_CAP: usize = 50000;
 const REDUCTION_CAP: usize = 100000;

@@ -34,13 +34,17 @@ fn actual_root_arms_agree_on_complete_development_basis() {
     let system = workload::generate(2147483647, 3, 7).unwrap().system;
     let (control_ok, control) = call("f4", &system, &[]);
     let (candidate_ok, candidate) = call("certified", &system, &[]);
-    assert!(control_ok && candidate_ok);
+    let (compact_ok, compact) = call("compact", &system, &[]);
+    assert!(control_ok && candidate_ok && compact_ok);
     assert_eq!(control["status"], "complete");
     assert_eq!(candidate["status"], "complete");
     assert!(control["observed_solving_degree"].is_u64());
     assert!(candidate["observed_solving_degree"].is_null());
     assert!(!control["basis"].as_array().unwrap().is_empty());
     assert_eq!(control["basis"], candidate["basis"]);
+    assert_eq!(control["basis"], compact["basis"]);
+    assert!(compact["observed_solving_degree"].is_null());
+    assert!(compact["quotient_info"]["stored_proof_terms"].is_u64());
     assert!(candidate["quotient_info"].is_object());
     assert_eq!(candidate["requires_matched_external_basis_check"], true);
     // Clocks exist for later protocol use, but their values are not compared.

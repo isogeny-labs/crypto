@@ -5,8 +5,22 @@
 //! is unchanged. All conversion and checking belongs to this API's cost.
 use super::{normalise, F4Options, Ordering, Poly, TraceStats};
 use ::certified_relations as algebra;
+pub use algebra::quotient::compact::{Certificate as CompactCertificate, Info as CompactInfo};
 pub use algebra::quotient::Info as QuotientInfo;
 pub use algebra::Row as CertificateRow;
+
+/// Complete basis with an acyclic chain of checked local membership identities.
+/// Local stored term counts are a different representation from expanded
+/// original-input cofactors; neither is a runtime or regularity observation.
+pub struct CompactCertifiedBasis {
+    pub basis: Vec<Poly>,
+    pub certificate: CompactCertificate,
+    pub info: CompactInfo,
+    pub native_checks: TraceStats,
+    pub observed_solving_degree: Option<u32>,
+    prime: u64,
+    variables: usize,
+}
 
 /// A complete monic reduced grevlex basis and original-input certificates.
 /// `verify_basis` rechecks a mutated/retained result against the supplied input.
@@ -150,6 +164,78 @@ pub fn verify_basis(report: &CertifiedBasis, input: &[Poly]) -> bool {
         return false;
     };
     if expected != report.basis || expected.is_empty() {
+        return false;
+    }
+    let Ok(native_input) = original
+        .iter()
+        .map(|f| native_polynomial(f, report.prime))
+        .collect::<Result<Vec<_>, _>>()
+    else {
+        return false;
+    };
+    super::reuse::certify(
+        &native_input,
+        &report.basis,
+        report.prime,
+        &F4Options::new(Ordering::Grevlex, 8),
+        &mut TraceStats::default(),
+    )
+}
+
+/// Opt-in compact membership certificates. All local identities, original
+/// input containment, reducedness and S-pairs are checked before exporting;
+/// the native F4 boundary checker also checks the exported representation.
+pub fn try_compact_quotient_basis(
+    input: &[Poly],
+    n: usize,
+    p: u64,
+) -> Result<CompactCertifiedBasis, String> {
+    let original = canonical_input(input, n, p)?;
+    let native_input = original
+        .iter()
+        .map(|f| native_polynomial(f, p))
+        .collect::<Result<Vec<_>, _>>()?;
+    let output = algebra::quotient::compact::solve(&original, n, p)?;
+    let basis = export(&output.certificate.basis, p)?;
+    let mut native_checks = TraceStats::default();
+    if !super::reuse::certify(
+        &native_input,
+        &basis,
+        p,
+        &F4Options::new(Ordering::Grevlex, 8),
+        &mut native_checks,
+    ) {
+        return Err("compact certificate basis failed native F4 boundary checks".into());
+    }
+    Ok(CompactCertifiedBasis {
+        basis,
+        certificate: output.certificate,
+        info: output.info,
+        native_checks,
+        observed_solving_degree: None,
+        prime: p,
+        variables: n,
+    })
+}
+
+/// Recheck membership/basis arithmetic and native representation after public
+/// certificate mutation. Construction diagnostics are not a signed verdict.
+pub fn verify_compact_basis(report: &CompactCertifiedBasis, input: &[Poly]) -> bool {
+    let Ok(original) = canonical_input(input, report.variables, report.prime) else {
+        return false;
+    };
+    if !algebra::quotient::compact::verify(
+        &report.certificate,
+        &original,
+        report.variables,
+        report.prime,
+    ) {
+        return false;
+    }
+    let Ok(expected) = export(&report.certificate.basis, report.prime) else {
+        return false;
+    };
+    if expected != report.basis {
         return false;
     }
     let Ok(native_input) = original
