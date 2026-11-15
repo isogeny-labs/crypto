@@ -113,7 +113,7 @@ def fit_block(l, num, den, metric, hi, seed):
 
 def clean(o):
     if isinstance(o, dict):
-        return {k: clean(v) for k, v in o.items() if not k.startswith('_')}
+        return {k: clean(v) for k, v in o.items() if not str(k).startswith('_')}
     if isinstance(o, list):
         return [clean(v) for v in o]
     if isinstance(o, float) and math.isinf(o):
