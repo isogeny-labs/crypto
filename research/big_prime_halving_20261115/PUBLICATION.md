@@ -31,3 +31,26 @@ size/artifacts are main-only. Earlier continuation notes loosely grouped all
 three as main-only. Only the latter two wait for the main retargeting. The
 conflicted parent's target workflows ran while ordinary PR workflows were
 absent; merging main restored its required head checks. [pcc:unverified]
+
+2026-11-15T15:08Z: shared source b38b6b4 compiles all four proposed semantic
+identities on its first build; build001 is retained outside the repository.
+The canonical all-source/axiom gate is running in fresh proofgate001. No
+native qualification has started. The consumer protocol bd458ef4e2 is pushed
+and its remote branch object matches. Conductor remains absent; no file
+reservation is claimed. PR4304's single Copilot request is
+https://github.com/isogeny-labs/crypto/pull/4304#issuecomment-6896438066 at
+14:55:21Z; its shared journal remains untouched. [pcc:unverified]
+
+2026-11-15T15:16Z: the canonical shared gate at b38b6b4712 passes106
+theorems with0failures/0trusted-native exceptions. Shared publication5e26040
+retains first-build, all-source, axiom and source-binding logs. The four actual
+semantic statements are unchanged from the prospective source. [pcc:unverified]
+
+Native implementation now uses a separate GMP/FLINT candidate, OpenSSL-only
+BN polynomial/EC_GROUP replayer, native adverse writer and frozen wrapper.
+Build001 failed for missing explicit FLINT headers and strict indentation
+warnings; its full diagnostic is retained. Added the declarations, marked the
+third-party include directory as system headers and clarified the flagged
+control-flow layout without disabling project warnings. Fresh build002 passes
+with -Wall/-Wextra/-Wpedantic/-Werror; no numerical case has run. The old word-
+prime code and both critical-pair raw rounds remain unchanged. [pcc:unverified]
