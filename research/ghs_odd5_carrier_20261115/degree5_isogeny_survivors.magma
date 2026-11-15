@@ -1,0 +1,150 @@
+// Independent Magma full-equation check of thirteen alternate-target survivors.
+F := GF(3);
+R0<z> := PolynomialRing(F);
+K<a> := ext<F | z^5+2*z+1>;
+R<x> := PolynomialRing(K);
+f := x^11+x^9+2*x^8+x^7+2*x^5+x^3+x^2+x+1;
+assert GCD(f,Derivative(f)) eq 1;
+// b-mask 27, survivor 1
+b := K!(a^3);
+A := R!((2*a^4 + a^3 + a^2 + 2*a + 2)*x^5 + (2*a^4 + 2*a + 1)*x^4 + (a^3 + a^2 + a + 1)*x^3 + (2*a^4 + 2*a^3 + a^2 + a)*x^2 + (a^4 + a^3 + 2*a^2 + 2*a)*x + a^4 + 2*a^3 + 2*a + 2);
+B := R!(x^4 + (2*a^4 + a^3 + a^2 + 1)*x^3 + (2*a^2 + 1)*x^2 + (2*a^4 + 2*a^3 + 2*a^2)*x + 2*a^3 + a);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",27,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 27, survivor 2
+b := K!(a^3);
+A := R!((a^4 + 2*a^3 + 2)*x^5 + (2*a^3 + a^2)*x^4 + (a^4 + 2*a^3 + 2*a^2 + 2*a + 2)*x^3 + (a^4 + a^2 + a)*x^2 + (2*a^4 + 2*a^3 + 2*a)*x + 2*a^4 + 2*a^3 + 1);
+B := R!(x^4 + (2*a^4 + a^3 + a^2 + 1)*x^3 + (2*a^2 + 1)*x^2 + (2*a^4 + 2*a^3 + 2*a^2)*x + 2*a^3 + a);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",27,"survivor",2,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 30, survivor 1
+b := K!(a^3 + a);
+A := R!((2*a^4 + 2*a^3 + 2)*x^5 + (2*a^4 + 2*a^2 + 2*a)*x^4 + (a^3 + 2*a^2)*x^3 + (a^3 + 2*a^2)*x^2 + (2*a^4 + a^2)*x + a^4 + 2);
+B := R!(x^4 + (2*a^2 + 2*a + 2)*x^3 + (2*a^4 + a^3 + 2*a + 2)*x^2 + (a^2 + a + 2)*x + 2*a^4 + 2*a^3 + 2*a^2 + a + 2);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",30,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 103, survivor 1
+b := K!(a^4 + 2*a^2 + a + 1);
+A := R!((a^4 + 2*a^3 + 2*a^2 + 1)*x^5 + (a^4 + 2)*x^4 + (2*a^4 + a^3 + a^2 + a + 2)*x^3 + (2*a^4 + a^3 + a^2 + a + 2)*x^2 + (a^3 + 2*a^2 + 2*a + 1)*x + a^3 + 2*a^2 + 1);
+B := R!(x^4 + (a^4 + a^3 + 2*a^2)*x^3 + (2*a^3 + 2*a)*x^2 + (2*a^4 + 2*a^3 + a^2 + 1)*x + a^2 + 2*a);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",103,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 139, survivor 1
+b := K!(a^4 + 2*a^3 + a + 1);
+A := R!((2*a^4 + a^3 + 2)*x^5 + (a^4 + a^3 + a^2 + 2)*x^4 + (a^4 + 1)*x^3 + (a^4 + 1)*x^2 + (2*a^4 + 2*a^3 + 2*a^2 + 2*a)*x + 2*a^4 + 2*a^2 + 2*a);
+B := R!(x^4 + (a^3 + 2*a + 2)*x^3 + (a^4 + 2*a^3 + 2*a + 1)*x^2 + (2*a^3 + a + 2)*x + 2*a^3 + a^2 + 2*a);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",139,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 167, survivor 1
+b := K!(2*a^4 + a + 2);
+A := R!((a^4 + a^3 + 1)*x^5 + (2*a^4 + a^3 + 2*a^2 + 1)*x^4 + (2*a^4 + a^3 + a^2)*x^3 + (a + 1)*x^2 + (2*a + 2)*x + 2*a^4 + a^2 + 2*a);
+B := R!(x^4 + (a^4 + 2*a^3)*x^3 + (2*a^2 + a + 1)*x^2 + (2*a^3 + a^2 + 1)*x + a^4 + a^3 + 2*a + 1);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",167,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 167, survivor 2
+b := K!(2*a^4 + a + 2);
+A := R!((2*a^4 + a^3 + a^2 + 2*a)*x^5 + (a^4 + a^2 + a + 1)*x^4 + 2*a^4*x^3 + (a^4 + 2*a^3 + 2*a^2 + 2*a)*x^2 + (a^3 + 2*a^2 + 2*a + 1)*x + 2*a^3 + 2*a^2 + 2*a + 2);
+B := R!(x^4 + (a^4 + 2*a^3)*x^3 + (2*a^2 + a + 1)*x^2 + (2*a^3 + a^2 + 1)*x + a^4 + a^3 + 2*a + 1);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",167,"survivor",2,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 182, survivor 1
+b := K!(2*a^4 + 2*a^2 + 2);
+A := R!((a^4 + a^3 + 2)*x^5 + (a^4 + 2*a^3 + 2*a^2 + 2*a + 1)*x^4 + (2*a^4 + 2*a^3 + 2*a^2)*x^3 + (2*a^4 + 1)*x^2 + (2*a^4 + 2*a^3 + 2*a^2 + 2*a)*x + a^4 + 2*a^3 + 2*a^2);
+B := R!(x^4 + (2*a^4 + a^3 + a^2 + 2*a + 1)*x^3 + (a^3 + 2*a^2 + a + 1)*x^2 + (a^4 + a^2 + a + 2)*x + a^2 + a);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",182,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 182, survivor 2
+b := K!(2*a^4 + 2*a^2 + 2);
+A := R!((a^3 + a^2 + a)*x^5 + (a^4 + 2*a^3 + a^2 + 2*a)*x^4 + (a^4 + 2*a^3 + 2)*x^3 + (a^3 + 1)*x^2 + (2*a^3 + 2)*x + 2*a^4 + a^3 + 2*a);
+B := R!(x^4 + (2*a^4 + a^3 + a^2 + 2*a + 1)*x^3 + (a^3 + 2*a^2 + a + 1)*x^2 + (a^4 + a^2 + a + 2)*x + a^2 + a);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",182,"survivor",2,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 194, survivor 1
+b := K!(2*a^4 + a^3 + a + 2);
+A := R!((2*a^3 + 2*a^2 + 2*a)*x^5 + (2*a^4 + a^3 + a^2 + a)*x^4 + (2*a^4 + 2*a^2 + 2*a + 2)*x^3 + (2*a^4 + 2*a^2 + 2*a + 2)*x^2 + (2*a^4 + 2*a^3 + 2*a)*x + a^4 + a^3 + a^2 + 2);
+B := R!(x^4 + (2*a^3 + 2*a^2 + a + 2)*x^3 + (a^4 + a^3 + 2*a^2 + a + 1)*x^2 + (a^3 + a^2 + 2*a + 2)*x + a^2);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",194,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 230, survivor 1
+b := K!(2*a^4 + 2*a^3 + a^2 + a + 2);
+A := R!((2*a^4 + a^3 + a^2 + 2)*x^5 + (2*a^4 + 2*a^2 + a + 1)*x^4 + (2*a^4 + a^3 + a^2 + 2*a)*x^3 + (2*a^4 + a)*x^2 + (a^4 + 2*a)*x + a^4 + a^3 + 2*a^2 + a + 2);
+B := R!(x^4 + (a^4 + a^3)*x^3 + (2*a^4 + a^3 + 2*a^2 + 2*a)*x^2 + (a^4 + 2*a^3 + 2*a^2 + 2*a + 2)*x + a^3 + a^2 + 2*a);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",230,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 230, survivor 2
+b := K!(2*a^4 + 2*a^3 + a^2 + a + 2);
+A := R!((a^3 + a^2 + a + 1)*x^5 + (2*a^4 + 2)*x^4 + (2*a^3 + a^2 + 1)*x^3 + (2*a^4 + 2*a^3 + 2*a^2 + 1)*x^2 + (a^3 + a^2 + 1)*x + 2*a^4 + a^3 + 1);
+B := R!(x^4 + (a^4 + a^3)*x^3 + (2*a^4 + a^3 + 2*a^2 + 2*a)*x^2 + (a^4 + 2*a^3 + 2*a^2 + 2*a + 2)*x + a^3 + a^2 + 2*a);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",230,"survivor",2,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);
+// b-mask 233, survivor 1
+b := K!(2*a^4 + 2*a^3 + a^2 + 2*a + 2);
+A := R!((a^4 + 2*a^3 + 2*a^2 + a + 1)*x^5 + (a^3 + 2*a^2 + 1)*x^4 + (a^4 + a^3 + a^2 + 1)*x^3 + (a^4 + a^3 + a^2 + 1)*x^2 + (a^3 + a^2 + 1)*x + 2*a^4 + a^3 + a^2 + a);
+B := R!(x^4 + (2*a^4 + 2*a^3 + a + 1)*x^3 + (2*a^4 + a^2 + 2*a + 2)*x^2 + (a^4 + a^3 + 2*a)*x + a^4 + 2*a^3 + a^2 + a + 1);
+assert Degree(A) eq 5 and Degree(B) eq 4 and GCD(A,B) eq 1;
+N := B*(A^3+2*A^2*B+b*B^3);
+assert N mod f eq 0;
+Q := N div f;
+print "mask",233,"survivor",1,"quotient_degree",Degree(Q),"square",IsSquare(Q);
+print "factor_degrees",[<Degree(t[1]),t[2]> : t in Factorization(Q)];
+assert not IsSquare(Q);

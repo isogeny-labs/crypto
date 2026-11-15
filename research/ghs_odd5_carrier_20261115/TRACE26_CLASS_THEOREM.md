@@ -1,0 +1,95 @@
+# Ten-target trace +26 cover-degree bound
+
+15 November 2026. This is a finite-class statement for one explicit carrier,
+not a new infinite family of vulnerable elliptic curves. The finite-search
+records and geometric reduction remain `[pcc:unverified]` until an independent
+PCC theorem verdict is signed.
+
+Let `K=F3[a]/(a^5+2a+1)` and
+
+`Y/F3: y²=x¹¹+x⁹+2x⁸+x⁷+2x⁵+x³+x²+x+1`.
+
+The directly checked Weil numerator is `1−26T⁵+243T¹⁰`. Consider the ten
+K-curves `E_b: v²=u³+2u²+b` in the table. The b-mask is the base-three encoding
+of the five coefficients of b in the basis `1,a,a²,a³,a⁴`.
+
+| b-mask | Exact b | Degree-four candidates | Degree-five interpolation survivors | Degree-five maps |
+|---:|---|---:|---:|---:|
+| 3 | a | 0 | 2 | 0 |
+| 27 | a³ | 0 | 2 | 0 |
+| 30 | a³+a | 0 | 1 | 0 |
+| 103 | a⁴+2a²+a+1 | 0 | 1 | 0 |
+| 139 | a⁴+2a³+a+1 | 0 | 1 | 0 |
+| 167 | 2a⁴+a+2 | 0 | 2 | 0 |
+| 182 | 2a⁴+2a²+2 | 0 | 2 | 0 |
+| 194 | 2a⁴+a³+a+2 | 0 | 1 | 0 |
+| 230 | 2a⁴+2a³+a²+a+2 | 0 | 2 | 0 |
+| 233 | 2a⁴+2a³+a²+2a+2 | 0 | 1 | 0 |
+
+Each E_b has `#E_b(K)=218=2·109` and trace +26. The ordinary trace
+discriminant `26²−4·243=−296` is fundamental, so each has the maximal order
+`Z[π]` as endomorphism ring. The ten entries are the ten normal-form
+K-isomorphism classes in the trace +26 census `class_count.json`.
+
+**Theorem.** For each E_b in the table, no K-morphism `Y_K→E_b` has degree
+at most five. A K-morphism of degree at most twenty exists. Thus the minimum
+degree is in **[6,20]** for each exact target. Any such cover has degree
+coprime to 109, and `φ_*φ^*=[deg φ]` makes pullback injective on the chosen
+order-109 subgroup of E_b(K). This gives an existence and subgroup-preservation
+bound into `J(Y)(K)`, not an evaluable map into `J(Y)(F3)`.
+
+## Proof and finite receipts
+
+The earlier `CUBIC_PROTOCOL.md` and `cubic_geometric_all_magma.json` exclude
+degree-two and degree-three maps from this Y to **any** elliptic curve over the
+algebraic closure; degree one is impossible by genus. That certificate is
+geometric, so it applies to all ten targets and all base changes. The complete
+degree-four pole-shape proof is in `DEGREE4_ALL_PROTOCOL.md`: 249 denominators,
+59,697 assignments. The b-mask 3 producer and independent direct-linear replay
+are in `degree4_all.json` and `degree4_linear_replay.json`. For each of the
+remaining nine, `degree4_isogeny_all.sage` and
+`degree4_isogeny_linear_replay.sage` independently test the same complete
+shapes. Their per-mask JSON/stderr and `degree4_isogeny_manifest.json` show
+exactly zero degree-four candidates, with every count and source hash checked.
+
+For degree five, the complete six-shape denominator proof is in
+`DEGREE5_THEOREM.md`: 60,269 denominators and 14,446,377 logical assignments
+per target. Since every E_b has exactly one K-rational nonzero 2-torsion point
+and a conjugate quadratic pair, each unpoled quadratic branch pair has three
+Galois-compatible x-coordinate choices. The rational branch point `x=-1`
+maps to the unique rational 2-torsion coordinate. The b-mask 3 producer,
+direct-linear replay and Magma quotient check are in `degree5_screen.json`,
+`degree5_linear_replay.json` and `degree5_survivors_magma.json`. The nine other
+targets have separate source-bound CRT producer and direct-linear replay
+receipts plus manifests. Both methods agree on the exact unordered `(A,B)`
+set for each target: thirteen alternate-target degree-five interpolation
+survivors in total. Every survivor fails the exact equation
+`f C²=B(A³+2A²B+bB³)`, so no degree-five morphism exists. The order and
+complete search space were checked separately for every b-mask.
+
+[Howe, Theorem 4.17 and Remark 4.18](https://arxiv.org/pdf/2110.04221)
+give a K-map of degree at most twenty to each E_b, since `J(Y)_K` lies in
+the isogeny class of `E_b^5` and `End(E_b)=Z[π]`. This completes the interval.
+
+## Prior work and limits
+
+The isogeny-assisted extension of GHS is established by
+[Galbraith and Smart](https://www.cryptrec.go.jp/exreport/cryptrec-ex-1029-2001.pdf)
+and discussed by [Karabina et al.](https://math.dartmouth.edu/~carlp/WeilDescent-Product.pdf).
+[Tian](https://arxiv.org/pdf/2012.07173) gives a distinct explicit isogeny
+transfer in degree three. The earlier repository
+`research/ghs_cover_census_n5_20261013/README.md` excludes low-genus direct
+`(2,...,2)` covers for the relevant order class, but does not give these exact
+maps. The local LMFDB snapshot already lists the Weil-polynomial isogeny class
+with uncertain Jacobian status; the explicit Y identification is a potential
+catalog correction, not established publication priority. The KB revision
+`9141e386254340a9bdba3036f2bb706a` predates this branch. These checks
+support a new exact finite-class cover obstruction relative to the inspected
+records; they do not certify a new attack family or method.
+
+The theorem covers this one Y, these ten E_b, and K-defined curve morphisms.
+It leaves degrees six to twenty, other carriers in the same Weil-restriction
+class, correspondences, maps over larger fields, explicit E-to-E isogenies,
+an F3-rational subgroup transfer, and full same-target attack costs open.
+The 15 axiom-free declarations in `Odd5Ledger.lean` check arithmetic counts
+and degree ceilings only; they do not formalize geometry or exhaustiveness.
