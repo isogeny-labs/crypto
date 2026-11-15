@@ -2240,3 +2240,24 @@ full-five-page read claimed. Generalprime≥5/canonicalWeil/rank/determinant sou
 proof/full-populationallkcensus/other14 gaps remain. No canonicalpromotion/
 full14closure/cryptoPython/nativeproofeval/limits/flags/waivers/spend/upload.
 [pcc:unverified]
+
+
+### Known composite Tate control reconstruction: coverage unchanged
+
+The [known composite Tate control reconstruction](../research/composite_tate_domain_audit_20261115/README.md)
+rechecks the F5/n6 result already covered by PCC-20261110-5e63e9/gate50;
+**no new source coverage or original fourteen-item gap closure** is claimed.
+Actual kernel/rightquotient/unitpowerquotient cardinalities6/6/2, both explicit
+nonzero3-torsion radicals and the literal nontrivial-root counterconsequence
+are proved, with generic prime-root arithmetic. Four new modules import no
+priorcustomproofmodules, but share prover/Mathlib/host; this is not independent
+implementation/physicalhost validation or the original degree negativecontrol.
+The duplicate was detected at05 after too-narrowinitialpriorsearch, userinformed,
+protocolamended; all states retained. Exactlocal **PCC-20261115-e2a305** PASS at2026-11-15T03:43:24Z, signed
+unverified; whole53/0/0/full738-character bindingc0b96f82…/native1complete/0prefix/
+0unresolved;7formal-config+14artifactpins;109files/46objects/16304-byte losslessXZ/
+fivegatefiles/one-page47274-bytePDF fullread/visual/inbounds. Eight snapshots/six
+failed states/APIprobe/threeprotocolsamendments retained, final08/gate full logs
+no warnings/errors. Qualified generalTate/canonicaldivisor/MOVFR and all original
+remaining gaps unchanged. No novelty/canonicalpromotion/newnativecrypto/spend/
+upload. [pcc:unverified]

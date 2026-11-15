@@ -1,0 +1,36 @@
+{
+  "schema": "native-known-composite-tate-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "known-composite-tate-control",
+      "expected_decl_sha256": "c0b96f82c9239660a8c2dd7e8d1f5eafad909f0cf6431d8a3a1cc3f49fda1371",
+      "full_characters": 738,
+      "full_decl_sha256": "c0b96f82c9239660a8c2dd7e8d1f5eafad909f0cf6431d8a3a1cc3f49fda1371",
+      "full_normalized_signature": "theorem known_composite_tate_control_certificate : LiteralGuard ∧ Nat.card G = 6 ∧ addOrderOf threePoint = 3 ∧ negativeUnit ≠ 1 ∧ negativeUnit ^ 6 = 1 ∧ orderOf negativeUnit = 2 ∧ (¬ ∃ u : Fˣ, IsPrimitiveRoot u 6) ∧ Nat.card LeftDomain = 6 ∧ Nat.card RightDomain = 6 ∧ Nat.card Target = 2 ∧ leftPoint ≠ 1 ∧ rightPoint ≠ 1 ∧ (∀ B : BilinearMap, (∀ Q : RightDomain, B leftPoint Q = 1) ∧ (∀ P : LeftDomain, B P rightPoint = 1) ∧ ¬ LeftNondegenerate B ∧ ¬ RightNondegenerate B) ∧ (¬ ∃ B : BilinearMap, LeftNondegenerate B ∧ RightNondegenerate B) ∧ (¬ (LiteralGuard → ∃ B : BilinearMap, LeftNondegenerate B ∧ RightNondegenerate B)) ∧ (∀ (M : Type) [CommMonoid M] (ell : ℕ), Nat.Prime ell → ∀ u : M, u ^ ell = 1 → u ≠ 1 → IsPrimitiveRoot u ell)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "known_composite_tate_control_certificate",
+        "end_byte": 1125,
+        "file": "/workspace/scratch/composite-tate-binding-input01/CompositeTateCertificate.lean",
+        "qualified_decl_id": "CompositeTateDomainAudit.known_composite_tate_control_certificate",
+        "signature": "theorem known_composite_tate_control_certificate :\n    LiteralGuard ∧ Nat.card G = 6 ∧ addOrderOf threePoint = 3 ∧\n    negativeUnit ≠ 1 ∧ negativeUnit ^ 6 = 1 ∧ orderOf negativeUnit = 2 ∧\n    (¬ ∃ u : Fˣ, IsPrimitiveRoot u 6) ∧\n    Nat.card LeftDomain = 6 ∧ Nat.card RightDomain = 6 ∧ Nat.card Target = 2 ∧\n    leftPoint ≠ 1 ∧ rightPoint ≠ 1 ∧\n    (∀ B : BilinearMap,\n      (∀ Q : RightDomain, B leftPoint Q = 1) ∧\n      (∀ P : LeftDomain, B P rightPoint = 1) ∧\n      ¬ LeftNondegenerate B ∧ ¬ RightNondegenerate B) ∧\n    (¬ ∃ B : BilinearMap, LeftNondegenerate B ∧ RightNondegenerate B) ∧\n    (¬ (LiteralGuard → ∃ B : BilinearMap, LeftNondegenerate B ∧ RightNondegenerate B)) ∧\n    (∀ (M : Type) [CommMonoid M] (ell : ℕ), Nat.Prime ell →\n      ∀ u : M, u ^ ell = 1 → u ≠ 1 → IsPrimitiveRoot u ell)",
+        "start_byte": 247
+      },
+      "recorded_statement": "theorem known_composite_tate_control_certificate : LiteralGuard ∧ Nat.card G = 6 ∧ addOrderOf threePoint = 3 ∧ negativeUnit ≠ 1 ∧ negativeUnit ^ 6 = 1 ∧ orderOf negativeUnit = 2 ∧ (¬ ∃ u : Fˣ, IsPrimitiveRoot u 6) ∧ Nat.card LeftDomain = 6 ∧ Nat.card RightDomain = 6 ∧ Nat.card Target = 2 ∧ leftPoint ≠ 1 ∧ rightPoint ≠ 1 ∧ (∀ B : BilinearMap, (∀ Q : RightDomain, B leftPoint Q = 1) ∧ (∀ P : LeftDomain, B P rightPoint = 1) ∧ ¬ LeftNondegenerate B ∧ ¬ RightNondegenerate B) ∧ (¬ ∃ B : BilinearMap, LeftNondegenerate B ∧ RightNondegenerate B) ∧ (¬ (LiteralGuard → ∃ B : BilinearMap, LeftNondegenerate B ∧ RightNondegenerate B)) ∧ (∀ (M : Type) [CommMonoid M] (ell : ℕ), Nat.Prime ell → ∀ u : M, u ^ ell = 1 → u ≠ 1 → IsPrimitiveRoot u ell)",
+      "recorded_text_sha256": "c0b96f82c9239660a8c2dd7e8d1f5eafad909f0cf6431d8a3a1cc3f49fda1371",
+      "source_plan": "research/composite_tate_domain_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "CompositeTateDomainAudit.known_composite_tate_control_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

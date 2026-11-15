@@ -59,3 +59,5 @@ provenance and original degree-control map. Fresh KB discovery/status/two
 scope/negative queries/theorem query were unavailable; exact repository
 sources were used as fallback. No new mathematical result, experiment,
 literature-reading promotion or novelty claim is made. [pcc:unverified]
+
+The [known composite Tate reconstruction](../composite_tate_domain_audit_20261115/README.md) rechecks the already-covered F5/n6 source counterexample. It adds no new source coverage or closure to the table above, and is neither the original solving-degree negative control nor independent implementation/physical-host validation. [pcc:unverified]
