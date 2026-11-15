@@ -123,9 +123,10 @@ fn main() -> Result<(), String> {
     if fb.terminal != 933_677_148 || fb.points.len() != 31 {
         return Err("Dickson depth-six base drift".into());
     }
-    let triples: Vec<(usize, usize, usize)> = (0..fb.points.len())
-        .flat_map(|i| (i + 1..fb.points.len()).flat_map(move |j|
-            (j + 1..fb.points.len()).map(move |k| (i, j, k))))
+    let base_size = fb.points.len();
+    let triples: Vec<(usize, usize, usize)> = (0..base_size)
+        .flat_map(|i| (i + 1..base_size).flat_map(move |j|
+            (j + 1..base_size).map(move |k| (i, j, k))))
         .collect();
     if triples.len() != 4_495 { return Err("triple count drift".into()); }
     let pair_indices: Vec<(usize, usize)> = (0..fb.points.len())
