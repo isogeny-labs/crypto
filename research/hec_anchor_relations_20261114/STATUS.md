@@ -74,3 +74,13 @@ all arms and losses.12library+10anchor tests passed in release;2compact tests pa
 Decision: retain optional compact kernel, change no defaults; stop equivalent arithmetic rewrites.
 Next discriminating action: freeze held-out dense polynomial families and a growing-size ladder,
 including all native/table controls, selection/resource caps, rank failures and full group gates.
+
+## Held-out scaling terminal result
+See HELDOUT-STATUS.md for the authoritative handoff.20dense curves,100single-target gates,
+1500interleaved timed cells completed correctly;265559raw and4449projected identities checked.
+Five-target curve median ratios against per-target fastest of12controls range0.94..3.17;
+individual target maximum4.15. The g3p1009 family0 median is0.94. A/A maximum spread3.09.
+These remain L0 producer assertions [pcc:unverified]. No10x or novelty established.
+Record20261115T0700Z-hec-heldout-scaling closed with complete raw archive and separate native
+Rust/jq/Typst report. Next step needs a mathematical cost case spanning relation generation,
+sparse recombination and anchor algebra; stop equivalent arithmetic rewrites.

@@ -28,5 +28,7 @@ jobs:
       - run: cargo fmt --manifest-path crates/hec-native-ic/Cargo.toml -- --check
       - run: cargo test --manifest-path crates/hec-native-ic/Cargo.toml
       - run: cargo test --release --manifest-path crates/hec-native-ic/Cargo.toml
-      - run: cargo test --release --manifest-path crates/hec-native-ic/Cargo.toml --example principal_relations --example table_oracle --example anchor_relations
+      - run: cargo test --release --manifest-path crates/hec-native-ic/Cargo.toml --example principal_relations --example table_oracle --example anchor_relations --example heldout
       - run: cargo build --release --examples --manifest-path crates/hec-native-ic/Cargo.toml
+      - name: Held-out receipt controls (includes expected identity rejection)
+        run: crates/hec-native-ic/target/release/examples/heldout --runner-self-test "$RUNNER_TEMP/hec-heldout-receipts"

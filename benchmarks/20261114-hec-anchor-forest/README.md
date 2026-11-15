@@ -41,3 +41,20 @@ Reference-orbit/compact median cold ratios range0.83..1.32; the genus2p101 case 
 Frozen-table/compact ratios in this separate run range1.22..2.98. No default change and no
 10x or novelty conclusion. Do not multiply ratios with earlier experiments. The next research
 step is held-out growing-size confirmation, rather than equivalent arithmetic rewrites.
+
+## Held-out dense curves and growing-size screen
+
+[Report](HELDOUT-REPORT.pdf), [graph](heldout.svg), [editable native report source](HELDOUT-REPORT.typ),
+[protocol](../../research/hec_anchor_relations_20261114/HELDOUT-PROTOCOL.md),
+[raw archive](../../research/hec_anchor_relations_20261114/HELDOUT-RAW.tar.gz) and
+[handoff](../../research/hec_anchor_relations_20261114/HELDOUT-STATUS.md).
+
+All20dense fixtures,100group gates and1500timed cells passed local checks. Primary per-target
+ratio is fastest of12controls / compact cold total. Five-target curve medians range0.94..3.17,
+including a g3p1009 median below parity; individual targets reach4.15. A/A spread reaches3.09.
+These are exploratory L0 observations with producer checks [pcc:unverified]. The10x objective
+and mathematical novelty remain unestablished. No default/index/leaderboard change.
+
+New scientific execution, custody collection, statistics and report generation are Rust/native
+jq/Typst. Historical Python visual-report sources and their frozen evidence remain preserved.
+Record20261115T0700Z-hec-heldout-scaling names the archive and independently hashed summary.
