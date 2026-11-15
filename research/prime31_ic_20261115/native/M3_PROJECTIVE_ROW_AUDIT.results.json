@@ -77,5 +77,18 @@
     "The B256 record is an early prefix, not a full m3 enumeration",
     "No new cold solve speed or algebraic F4 witness measurement was made",
     "Raw collision multiplicity does not measure independent useful relation yield"
-  ]
+  ],
+  "independent_producer_group_replay": {
+    "language": "Python",
+    "method": "separate modular EC addition and Dickson/plain-x lift",
+    "all_pairs_checked": true,
+    "total_replayed_equalities": 8379,
+    "per_arm": [
+      2370,
+      2244,
+      3765
+    ],
+    "standing": "[pcc:unverified]",
+    "note": "Producer-local independent implementation, not independently signed PCC"
+  }
 }
