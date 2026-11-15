@@ -51,12 +51,15 @@ complete native-cost ranking, external-tool comparison or speedup is claimed.
 No leaderboard measurement changes are supported by this packet.
 
 == Local development checks
-The filtered release-library run reports 24 passing Gaudry/cubic-graph tests,
-including the target-boundary regression and actual-oracle prefix/scalar
-comparisons, before the input-fingerprint control was added. The touched example
-compiled in its Cargo test target before that control; it defines no
-example-local tests. Final control reruns and full default-feature library
-validation are pending.
+The final filtered release-library run reports 24 passing Gaudry/cubic-graph
+tests, including the target-boundary regression, actual-oracle prefix/scalar
+comparisons and input-fingerprint equality. The touched example compiled in its
+Cargo test target before that control; it defines no example-local tests.
+The current-head example also passes its release type check. The earlier full default-feature library
+run reported failures outside the touched module and was interrupted after
+more than twelve minutes of test execution; it is not a passing whole-library
+result. A missing archived fixture was reproduced, and one device case passed
+after restoring tracked emulator assets. Other failures remain unclassified.
 These are producer-run checks, not independent signed verdicts.
 [pcc:unverified]
 

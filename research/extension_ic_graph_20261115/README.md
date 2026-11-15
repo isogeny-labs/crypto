@@ -10,12 +10,13 @@ with a protected target logarithm and protected constant coordinate. [pcc:unveri
 
 | Requirement | State | Evidence / remaining step |
 | --- | --- | --- |
-| Native Rust integration with other IC code | Initial targeted tests pass; fingerprint-control rerun pending | `src/cryptanalysis/gaudry_cubic_graph.rs`; `run_gaudry_with_eliminator` |
+| Native Rust integration with other IC code | Final targeted tests pass locally | `src/cryptanalysis/gaudry_cubic_graph.rs`; `run_gaudry_with_eliminator` |
 | Extension-field algebraic relation finding | Existing native engines reused | Weil-restricted S3 pair test, symmetrised S4, and hybrid scan/S3 |
 | Named baseline/candidate comparison | Driver implemented, run pending | `examples/gaudry_cubic_graph_compare.rs`, `protocol.json` |
 | Preserve historical default behavior | Targeted regression passes locally | Legacy entry point and optional report-key regression |
 | Numerical performance result | Not measured | S3 checkpoint/EKS submission access and admission required |
 | Complete native-cost ranking | Not implemented | Legacy pivot/dense counters omit additions, inversions and native collection work |
+| Full parent-library validation | Incomplete, interrupted | Reported failures outside the touched module and long inherited PKM cases; see validation record |
 
 ## Two separate changes
 
@@ -67,16 +68,28 @@ duplicate auxiliary coefficients, nonzero right-hand sides, invalid columns, and
 actual cubic instances under all three native oracles. These are development
 correctness checks, not admitted benchmark measurements. [pcc:unverified]
 
-The local filtered release-library run reports **24 passing tests**, including
-six adapter/integration tests, before the input-fingerprint control was added.
-The touched example compiled in its Cargo test target before that control
-(it defines no example-local tests). The final control rerun and full
-default-feature library validation are pending. These are producer-run development checks, with no
-independent signed verdict. [pcc:unverified]
+The final local filtered release-library run reports **24 passing tests**, including
+six adapter/integration tests and the input-fingerprint comparisons. The touched
+example compiled in its Cargo test target before that control (it defines no
+example-local tests); the current-head example also passes its release type check. These are producer-run
+development checks, with no independent signed verdict. [pcc:unverified]
 
-Raw development output: [targeted library](validation/targeted-library-tests.log),
+Raw development output: [final targeted library](validation/final-targeted-library-tests.log),
+[earlier targeted library](validation/targeted-library-tests.log),
 [example compilation](validation/example-build-tests.log), and
 [checkpoint gate](validation/checkpoint-gate.log).
+The [current-head example check](validation/current-head-example-check.log) and
+[component source hashes](validation/component-source.sha256) distinguish the
+final code checks from the earlier pre-fingerprint development runs.
+
+The pre-fingerprint full default-feature library run was interrupted after
+reported failures outside the touched module and more than twelve minutes in
+test execution. It is **not a passing whole-library result**. A focused case
+reproduced a missing archived session; a device case passed after its tracked
+emulator assets were restored. Other failing causes are not all classified.
+The [incomplete-run record](validation/full-library-interrupted.txt) pins the
+raw local output; durable upload of that larger raw file is still pending.
+[pcc:unverified]
 
 The checkpoint gate reports no configured AWS profile or upload token. This
 shares the existing [launch-gate access obstruction](../../problems/arity-completion-launch-gates.md#2026-11-15-cubic-extension-symbolic-graph-comparison).
