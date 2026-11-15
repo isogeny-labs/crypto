@@ -35,3 +35,19 @@ Freeze and execute new-target cold study, retaining caps/losses/A/Aand all
 setup/verification. Full genus2/3/4goal remains unchanged.
 ### Errors
 No exactness error or cap; no prior scientific stream or closed record changed.
+
+## PR preparation
+### What was done
+Reviewed the frozen protocol, real-prefix receipts and new cold worker/collector.
+Collector success, rejected-child and owned-timeout controls pass in CONTROLS.txt.
+Added reproducible worker/collector build commands alongside the exact gate.
+### Decisions made
+Publish the exact solver gate and the prepared cold harness for review. Cold
+timing remains pending; storage estimates do not establish a runtime speedup.
+The existing dirty shared resume file remains untouched.
+### Open threads
+Execute COLD-PROTOCOL.md from a separately frozen build/checkpoint and retain
+all terminal outcomes; follow current PR CI independently of scientific gates.
+### Errors
+Conductor MCP used HTTPS against the HTTP service; CLI confirmed the existing
+T-6123 claim and its exact study-directory scope. No competing path was edited.
