@@ -195,4 +195,4 @@ client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.ts
 | G-curl_stub.sh | PASS | syntax of tests/curl_stub.sh | bash -n ok | rc 0 |
 | G-pin | PASS | pinned client copy unchanged | rp_pinned.sh sha256 b4b60199... | b4b60199 |
 
-Summary of this run (image layer available: 1): 169 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-15T02:31:20Z).
+Summary of this run (image layer available: 1): 169 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-15T03:38:33Z).
