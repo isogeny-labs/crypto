@@ -14,7 +14,8 @@ files are re-included by `../.gitignore`).
 binary check) need the image layer: `RPC_LAYER_SRC` (the layer tarball, SHA-256 `a0f7e28e…`, `image.json`
 `layer.digest`) and `RPC_BIN_SRC` (its `usr/local/bin`; defaults in the session scratchpad). Without them those
 cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 115 results and 46 skips; a run with
-it gives 161 results. The layer can be fetched from the study image by its digest (`image/image.json`).
+it gives 161 results. The layer is the study layer of the image `image/image.json` names (ECR); fetching it
+by digest needs read access to that registry, which this container does not have.
 
 Groups: A refusals before any API call; B launch paths; C `fetch.sh` flows; D the outcome classifier alone
 (`fetch.sh --classify-dir`) on synthetic receipt sets: one per class, the review's conflicting cases, the memory rule
@@ -186,4 +187,4 @@ client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.ts
 | G-curl_stub.sh | PASS | syntax of tests/curl_stub.sh | bash -n ok | rc 0 |
 | G-pin | PASS | pinned client copy unchanged | rp_pinned.sh sha256 b4b60199... | b4b60199 |
 
-Summary of this run (image layer available: 1): 161 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-15T01:42:30Z).
+Summary of this run (image layer available: 1): 161 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-15T01:44:38Z).

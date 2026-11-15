@@ -477,10 +477,10 @@ otherwise.
 
 | file | SHA-256 |
 |:--|:--|
-| `common.sh` | `@COMMON@` |
-| `run.sh` | `@RUN@` |
-| `fetch.sh` | `@FETCH@` |
-| `reap.sh` | `@REAP@` |
-| `make_requests_m112.sh` | `@MAKE@` |
+| `common.sh` | `1e76af7340193abab2734130d26345ff08244185dcb106e0b98fae959b11ccfa` |
+| `run.sh` | `c6a191f57e51402f681a2c2826f1f43b765e81ac088afd215ff5d2cc414b7bfb` |
+| `fetch.sh` | `304bf29abfbe07867ec80ce0b65c6a145c70218b862e50050af82cc8a78f6bf9` |
+| `reap.sh` | `19c444605c767ecf9ef5c2b2ca403aae63255d4b32cdbc3e9ba034f092361227` |
+| `make_requests_m112.sh` | `1459e3d3ee821133e936cc40671946b94b6304413325d4d247e29c234e16d58b` |
 | `rp_pinned.sh` | `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d` (= main's `runpod/rp.sh` at `d2a16c723d`) |
 | `runpod/server.py` (pinned, not copied) | `f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550` |
