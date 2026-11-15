@@ -313,6 +313,7 @@ fn run_lin(
         "xor_propagations": st.xor_propagations, "gje_calls": st.gje_calls,
         "gate_linearisations": st.gate_linearisations, "learnt_clauses": st.learnt_clauses,
         "conflicts_t_stage": st.conflicts_stage_open, "conflicts_x3_stage": st.conflicts_stage_assigned,
+        "ns_gje": st.ns_gje, "ns_clause_prop": st.ns_clause_prop, "ns_analyze": st.ns_analyze,
         "learnt_lits": st.learnt_lits, "learnt_priority_width": st.learnt_priority_width,
         "n_vars": inst.solver.n_vars, "build_ms": build_ms, "wall_ms": wall_ms,
     })

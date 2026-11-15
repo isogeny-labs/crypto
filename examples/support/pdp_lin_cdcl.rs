@@ -68,6 +68,10 @@ pub struct Stats {
     pub conflicts_stage_assigned: u64,
     pub conflicts_stage_open: u64,
     pub forgotten_clauses: u64,
+    /// Wall nanoseconds inside the XOR engine, the clause propagation loop and conflict analysis.
+    pub ns_gje: u64,
+    pub ns_clause_prop: u64,
+    pub ns_analyze: u64,
     /// Histogram of learnt-clause literals that fall in the "priority" (summand) blocks:
     /// index = count of priority literals, value = clauses. Width `< 2ℓ` means the clause
     /// excludes more than one pair.
@@ -349,6 +353,7 @@ impl LinCdcl {
     fn propagate(&mut self) -> Option<Vec<i32>> {
         loop {
             // 1. clause propagation (two watched literals)
+            let t_cp = std::time::Instant::now();
             while self.qhead < self.trail.len() {
                 let l = self.trail[self.qhead];
                 self.qhead += 1;
@@ -398,9 +403,11 @@ impl LinCdcl {
                 }
                 self.watches[code] = keep;
                 if let Some(c) = conflict {
+                    self.stats.ns_clause_prop += t_cp.elapsed().as_nanos() as u64;
                     return Some(c);
                 }
             }
+            self.stats.ns_clause_prop += t_cp.elapsed().as_nanos() as u64;
             // 2. gate linearisation
             let mut added = false;
             for gi in 0..self.gates.len() {
@@ -462,6 +469,13 @@ impl LinCdcl {
     }
 
     fn gje(&mut self) -> GjeOutcome {
+        let t0 = std::time::Instant::now();
+        let r = self.gje_inner();
+        self.stats.ns_gje += t0.elapsed().as_nanos() as u64;
+        r
+    }
+
+    fn gje_inner(&mut self) -> GjeOutcome {
         self.stats.gje_calls += 1;
         let nv = self.n_vars + 1;
         let vw = nv.div_ceil(64);
@@ -749,7 +763,9 @@ impl LinCdcl {
                     self.ok = false;
                     return Result::Unsat;
                 }
+                let t_an = std::time::Instant::now();
                 let (learnt, bt) = self.analyze(confl);
+                self.stats.ns_analyze += t_an.elapsed().as_nanos() as u64;
                 self.backtrack(bt);
                 let pw = learnt
                     .iter()

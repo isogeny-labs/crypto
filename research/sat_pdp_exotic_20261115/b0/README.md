@@ -146,6 +146,24 @@ honest statement of the SAT route after this work is therefore: a measured
 parity with the pairs-and-solve oracle in counts, a factor `2^ℓ` behind the pair
 table, and the distance to rho unchanged in exponent.
 
+## 7a. Where the wall time goes, and what it means for "speed"
+
+One ℓ = 7 refutation with `lin` (dev binary, shared host, descriptive only):
+10,474 conflicts, 44,063 XOR-engine calls (4.2 per conflict), 2.98 s; 79 % of
+the wall is the XOR engine (53 µs per call: a full re-elimination of ≈ 250 rows
+over ≈ 190 variables), 15 % clause propagation, 2 % analysis; 285 µs per
+conflict. An incremental engine (RREF maintained across calls, re-pivoting on
+assignment, as CryptoMiniSat's Gauss–Jordan does) would remove most of the 79 %
+and is the next engineering step. It would not change the conclusion on speed:
+the pairs-and-solve oracle refutes a pair in about 10 ns of carry-less
+multiplication, so the solver is four orders of magnitude slower per pair, and
+even a 10× engine would leave three. The new solver's value is in the counted
+metric (it reaches the pair count, 2^ℓ/3 ahead of every existing SAT
+implementation here), in the REUSE amortisation (0.55–1.0 of the pair count
+per target), and in being a general CDCL solver whose every SAT answer passes the `S′₄` check — not in
+wall-clock parity with a specialised enumerator, and not in
+distance to rho, which this route does not change in exponent.
+
 ## 8. Sources checked
 
 KB unavailable in this container (no `research-kb` MCP or CLI; lead atlas
