@@ -27,3 +27,11 @@ A subsequent primary-source check of [Hess, *Generalising the GHS Attack*, Secti
 ## Amendment D: correct the Hess kernel exponent
 
 The first report gave `2^m−1=7` for m=3. Hess's Theorems 7 and 14 give `2^(m−1)=4` torsion under the non-subfield and rational-base hypotheses. Here `j=z^124∉F2`, so the degree-seven source is not a subfield curve, and gcd(5,4)=1. The subgroup preservation conclusion remains valid. The corrected report and kernel receipt replace the bound, while the original prediction remains in Amendment B.
+
+## Amendment E: plane-curve class-group verification
+
+The Magma handbook's [linear-equivalence section](https://docs.magma-maths.org/AlgebraicGeometry/AlgebraicCurves/linear-equivalence.html) provides `ClassGroup(C)` for a curve over a finite field, with a map from divisors to the class group, even when C is a plane curve. Before calling it, predict class number 120 from the source order and Hess transfer's source factor, but do not assert it as a theorem for the full Jacobian until computed. Reconstruct the exact W0 `C,h`, select the same first order-five source point, form the degree-zero divisor `h(P)-h(O)`, map it through the class-group map, and test its exact order five. Bound the public call to 120 seconds and preserve success, timeout, or error as an exact receipt. A successful class-order check verifies the map's action on this subgroup; it still does not measure a complete GHS index calculus or rho comparison.
+
+## Amendment F: direct class-order result
+
+The bounded Magma call succeeded. `ClassGroup(C)` returned `Z/120+Z`, the degree-zero divisor `h(P)-h(O)` mapped to `24*Cl.1`, and Magma computed its exact order as five. The class number is 120. This directly verifies the evaluated map on the selected order-five subgroup, strengthening the theorem-based kernel check. Preserve the full response in `w0_class_receipt.json`. This is a published W0 construction on a small subgroup; no relation/decomposition and matched rho total-cost result has been measured.

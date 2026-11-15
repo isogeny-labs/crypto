@@ -1,0 +1,30 @@
+P<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^7+x+1>;
+E := EllipticCurve([K | 1, 1, 0, 0, z^3]);
+assert #E eq 138;
+c := z^94;
+assert WeilDescentGenus(E, GF(2), c) eq 14;
+C, h := WeilDescent(E, GF(2), c);
+assert Genus(C) eq 14;
+O := E!0;
+found := false;
+for pt in Points(E) do
+    if Order(pt) eq 23 then
+        D := h(2*pt) - h(pt);
+        print "point", pt;
+        print "degree_hP", Degree(h(pt));
+        print "degree_h2P", Degree(h(2*pt));
+        print "divisor_degree", Degree(D);
+        assert Degree(D) eq 0;
+        Cl, rep, phi := ClassGroup(C);
+        print "class_group", Cl;
+        print "class_number", ClassNumber(C);
+        g := phi(D);
+        print "image_class", g;
+        print "image_order", Order(g);
+        assert Order(g) eq 23;
+        found := true;
+        break;
+    end if;
+end for;
+assert found;
