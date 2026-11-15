@@ -32,6 +32,7 @@ pub mod results;
 pub mod richelot;
 pub mod schoof;
 pub mod siblings;
+pub mod supersingular;
 pub mod traits;
 pub mod transfers;
 pub mod volcano;
@@ -227,6 +228,8 @@ pub enum Selection {
     Levels57,
     /// Genus-2 (2,2)-gluings of census-fp pairs with full rational 2-torsion (src/import/gluing.rs).
     Gluings,
+    /// End(E) of every supersingular curve over F_p, p < 2^10 (Delfs-Galbraith; Deuring for j = 0, 1728).
+    SupersingularEndRings,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
     /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10 (curve_ell_torsion, frobenius_ell).
@@ -308,6 +311,9 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // After the census: it reads the census-fp curves and their traces.
     if all || what == Selection::Gluings {
         reports.push(gluing::import(ctx).await?);
+    }
+    if all || what == Selection::SupersingularEndRings {
+        reports.push(supersingular::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {

@@ -126,7 +126,7 @@ ON CONFLICT (curve_id, ell) DO NOTHING";
 
 // ------------------------------------------------------------- polynomials over F_p
 
-type Poly = Vec<u64>; // ascending coefficients in [0, p)
+pub(crate) type Poly = Vec<u64>; // ascending coefficients in [0, p)
 
 pub(super) fn trim(mut a: Poly) -> Poly {
 }
@@ -273,6 +273,7 @@ pub(crate) fn division_polys(n: usize, a: u64, b: u64, p: u64) -> Vec<Poly> {
 
 /// Whether pi acts on E[N] as the scalar ±a (a a unit mod N, 1 <= a < N).
 pub(super) fn scalar_on(
+pub(crate) fn scalar_on(
     n: u64,
     a: u64,
     xp_cache: &mut BTreeMap<u64, Poly>,

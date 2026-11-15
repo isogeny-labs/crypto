@@ -193,6 +193,8 @@ enum ImportWhat {
     /// Genus-2 curves glued from census-fp pairs along their 2-torsion, with the two degree-2 maps
     /// and L(Jac C) (Howe–Leprévost–Poonen Prop. 4, src/import/gluing.rs).
     Gluings,
+    /// End(E) of every supersingular curve over F_p, p < 2^10 (Delfs-Galbraith, src/import/supersingular.rs).
+    SupersingularEndRings,
     /// Factor bases of the IC work: FB1/FBM1 from ecbench records, the catalog and dumps,
     /// large-prime and SECG small-x results, the cryptanalysis archive (src/import/factor_bases.rs).
     FactorBases,
@@ -305,6 +307,7 @@ async fn main() -> Result<()> {
                 ImportWhat::EllTorsion => import::run(&ctx, Selection::EllTorsion, None).await?,
                 ImportWhat::Levels57 => import::run(&ctx, Selection::Levels57, None).await?,
                 ImportWhat::Gluings => import::run(&ctx, Selection::Gluings, None).await?,
+                ImportWhat::SupersingularEndRings => import::run(&ctx, Selection::SupersingularEndRings, None).await?,
                 ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
                 ImportWhat::ClassGroups => import::run(&ctx, Selection::ClassGroups, None).await?,
                 ImportWhat::CianiQuartics => import::run(&ctx, Selection::CianiQuartics, None).await?,
