@@ -391,6 +391,41 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [two-choice random-support proof](../rho_twochoice_collision_audit_20261115/README.md)
+defines the actual first-repeat mean E over uniform ordered distinct increments
+in Z/p and independent fair static binary vertex labels, starting at0. Individual
+zero increments are allowed; equal increments are excluded. Lean proves
+E≥m²/2 whenever p≥4m²(4m+1), and for every naturalC some primep has E²>Cp;
+no nonnegative real constant bounds E≤K√p for allprimes. Actual uniform-support
+PMF/bijection, iid-word maximal imbalance, chronological paths, exact shortrelation
+mass1/p and finite union bound are derived; credited deferred-decisions survival
+and postcollision-word counter are retained. This averages the support table;
+the prior fixed20 Sidon counterfamily did not. Established methods/prior results
+are credited, no novelty claim. This is r2 negativecalibration of an unqualified
+extension, not refutation of source-qualified nS≥8/20 conjectures, and not Floyd,
+cyclelengthalone, scalar-recovery or practicalhash runtime.
+Exact local **PCC-20261115-db512a** replay PASS at 2026-11-15T16:05:42Z; signed standing unverified.
+Fresh70theorems/7newmodules(6concrete1adapter)/0fail0trusted/fulltransitive
+foundations;10frozenlocalmodules0copies/prior37gate credited.32formal19artifact51pins;
+all36predecessor pins checked before/after13states/twogates. Sevenfailedstates/six
+successes retained. First native exit0 recorded435characters of actual1134 before
+inline letI; it was not accepted as complete. Final explicit primeFact header
+1090characters/SHAce864beb518e06e523e89e965cc96ef0d00e05836cae76e1e4d229659cb0d339/
+native1complete0prefix0unresolved/empty suffix, after completed finalgate.
+245files91objects29268byte losslessXZ/fivefinalgatefiles/roundtrip equal;
+valid first report draft7files48140byteXZ, regenerable raster local after initial
+oversize archive; premature unissued seal preserved/corrected before producer.
+Finalonepage48131PDF/all4973textcharacters read/visual/inbounds; zero new-source
+warnings/4inheritedmodule+1frozen auditor advisory preserved. Fresh Galbraith
+ch14PDF4,5,12,13/38 and Bernstein–LangePDF11,12/28 fulltext+visual; original Teske
+paper unread thisstage. Four correct KB calls/initialConductor127 before processing/
+code; publicationConductor127 outside frozenpins. Bounded fallback/noabsenceclaim.
+Larger-partition collision penalty/limitingconstants/practicalhash and remaining14
+obligations stayopen. No holes/customaxioms/nativeproofeval/raisedlimits/flags/
+waivers/frozenedits/cryptoPython/solverrun/spend/upload/newhost/compiler/full14claim.
+[pcc:unverified]
+
+
 The [general residue-weighted length proof](../residue_weighted_length_audit_20261115/README.md)
 derives scalar dimension as the actual finite prime sum of canonical local
 self-lengths times actual residue-field K-degrees for every finite-dimensional
