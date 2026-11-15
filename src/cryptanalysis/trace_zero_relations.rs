@@ -166,6 +166,20 @@ pub fn decompose_full_trace_zero_with_encoding(
     limits: TraceZeroRelationLimits,
     encoding: TraceZeroMembershipEncoding,
 ) -> TraceZeroRelationReport {
+    decompose_with_admission(variety, base, target, m, limits, encoding, false)
+}
+
+// Only the prepared residual path calls this with admitted=true, after
+// validating immutable original inputs and computing residuals in T_n.
+fn decompose_with_admission(
+    variety: &TraceZeroVariety,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+    m: usize,
+    limits: TraceZeroRelationLimits,
+    encoding: TraceZeroMembershipEncoding,
+    admitted: bool,
+) -> TraceZeroRelationReport {
     let mut report = TraceZeroRelationReport::default();
     if !(2..=9).contains(&m) {
         report.reason = Some("unsupported arity");
@@ -181,13 +195,14 @@ pub fn decompose_full_trace_zero_with_encoding(
         report.reason = Some("terminal specialization requires m3");
         return report;
     }
-    if !variety.contains(target) {
+    if !admitted && !variety.contains(target) {
         report.reason = Some("target is not a trace-zero rational point");
         return report;
     }
-    if base
-        .iter()
-        .any(|p| matches!(p, BinaryPoint::Infinity) || !variety.contains(p))
+    if !admitted
+        && base
+            .iter()
+            .any(|p| matches!(p, BinaryPoint::Infinity) || !variety.contains(p))
     {
         report.reason = Some("invalid or non-trace-zero factor-base point");
         return report;
@@ -427,6 +442,26 @@ pub fn decompose_trace_zero_terminal_slices(
     target: &BinaryPoint,
     limits: TraceZeroRelationLimits,
 ) -> TraceZeroRelationReport {
+    terminal_slices(variety, base, target, limits, false)
+}
+
+/// Same complete residual search, with base/target admission charged once
+/// per outer query. Residuals are computed from admitted T_n points.
+pub fn decompose_trace_zero_terminal_slices_prepared(
+    variety: &TraceZeroVariety,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+    limits: TraceZeroRelationLimits,
+) -> TraceZeroRelationReport {
+    terminal_slices(variety, base, target, limits, true)
+}
+fn terminal_slices(
+    variety: &TraceZeroVariety,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+    limits: TraceZeroRelationLimits,
+    prepared: bool,
+) -> TraceZeroRelationReport {
     let mut out = TraceZeroRelationReport::default();
     if !variety.contains(target)
         || base
@@ -461,7 +496,7 @@ pub fn decompose_trace_zero_terminal_slices(
         let wall = deadline.map(|d| {
             d.saturating_duration_since(Instant::now()) / (count.min(u32::MAX as u64) as u32)
         });
-        let r = decompose_full_trace_zero_with_encoding(
+        let r = decompose_with_admission(
             variety,
             base,
             residual,
@@ -473,6 +508,7 @@ pub fn decompose_trace_zero_terminal_slices(
                 ..limits
             },
             TraceZeroMembershipEncoding::CertifiedDomainWithConstants,
+            prepared,
         );
         out.conflicts = out.conflicts.saturating_add(r.conflicts);
         out.models = out.models.saturating_add(r.models);

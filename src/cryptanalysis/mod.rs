@@ -216,6 +216,7 @@ pub mod hash_attacks;
 pub mod hashed_ecdl;
 pub mod trace_zero_point_chain;
 pub mod trace_zero_relations;
+pub mod trace_zero_linearized;
 pub mod trace_zero_subspace_relations;
 /// Toy index calculus with tensor-contraction relation finding
 /// (`crates/ecdl-tensor-ic`, Rust port of the Go `ecdltensor` prototype).
