@@ -2,7 +2,11 @@
 
 Constant-factor reductions to `crates/hashed-ecdl-tensor`, measured against
 `origin/main` 23cf569058 (*before*) on the same instances with the same tool,
-after each cumulative step.
+after each cumulative step. After merging `main` b8cd452f3f (which adds the
+`Multiplier` choice, Fourier power tables and treewidth tooling, Fourier stays
+the default), the tool built against that `main` reproduces every `*_before`
+record byte for byte, and built against the merged branch reproduces every
+`*_final` record byte for byte; so the comparison holds against current `main`.
 
 ## The steps
 
