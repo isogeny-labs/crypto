@@ -178,6 +178,7 @@ SOURCES = {
     "ghs_weak_cd_chain": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
     "ghs_weak_relstage": "research/ic_gw_fasthash_20261114/analysis.json",
     "ghs_weak_blreuse": "research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json",
+    "ghs_weak_nrmlz": "research/ic_gw_nrm_lz_20261115/analysis.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -521,6 +522,7 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "research/quartic_dl1_cd_sqrt_20261113/combo/validation",
                            "research/ic_gw_fasthash_20261114/validation",
                            "research/ic_gw_bl_reuse_20261115/validation",
+                           "research/ic_gw_nrm_lz_20261115/validation",
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
                            "benchmarks/20261115-tableb-ksum")
 
@@ -2549,6 +2551,76 @@ def ghs_blreuse_html(g: dict) -> str:
             gh(SOURCES["ghs_weak_blreuse"], "Analysis") + '</section>')
 
 
+GHS_NRMLZ_EVIDENCE = "research/ic_gw_nrm_lz_20261115/validation"
+
+
+def ghs_weak_nrmlz() -> dict:
+    """Relation stage without the products by the normalised coordinate 1 (NRM) and scalar Lanczos with two reused dot
+    products (LZ), together, against the previous best configuration on the GHS-weak instances, c_D = 1.7, k = 18..22,
+    seeds 1-6 (research/ic_gw_nrm_lz_20261115). Ratios copied from analysis.json (cold M-eq, geometric mean and max over
+    seeds; additions priced at 0, 0.5 and 1 M-eq; hash/cmp at 0). Standing from validation/VALIDATION.json."""
+    a = load(SOURCES["ghs_weak_nrmlz"])
+    errs = checked_evidence_dir(REPO / GHS_NRMLZ_EVIDENCE, REPO)
+    qs = (262111, 524287, 1048507, 2097091, 4194271)
+    rows = []
+    for y in ("DL", "DL1", "D"):
+        for q in qs:
+            r = {"arm": y, "q": q, "k": q.bit_length()}
+            for w in ("0.0", "0.5", "1.0"):
+                x = a["ratios"][f"BOTH/{y}/{q}/{w}/0.0"]
+                r[w] = {"geomean": x["geomean"], "max": x["max"]}
+            rows.append(r)
+    g = a["gap_k22"]["ic_mean_meq"]
+    manifest = json.loads((REPO / GHS_NRMLZ_EVIDENCE / gate.MANIFEST).read_text()) if not errs else {}
+    band = manifest.get("rho_reference", {}).get("gae_band", {})
+    return {"rows": rows, "decision": a["decision"]["BOTH"] if "BOTH" in a["decision"] else a["decision"],
+            "rho_band_k22": band, "ic_k22": g,
+            "study": "research/ic_gw_nrm_lz_20261115/", "report": "research/ic_gw_nrm_lz_20261115/REPORT.pdf",
+            "source": SOURCES["ghs_weak_nrmlz"],
+            "class": "component improvement (relation stage; scalar linear algebra) over the previous GHS-weak configuration; "
+                     "GHS-weak family only",
+            "validation": (f"validated: replay certificate, validator report and the negation-map rho reference with the "
+                           f"§5a band ({GHS_NRMLZ_EVIDENCE}/VALIDATION.json)") if not errs else (
+                "not validated: " + "; ".join(errs)),
+            "validated": not errs}
+
+
+def ghs_nrmlz_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3}: normalised-coordinate relation stage and scalar Lanczos dot reuse, outside tables A–C", "",
+         "Same instances and configuration as the sections above. (1) Factor-base and residual points have first coordinate 1, "
+         "so the relation stage no longer multiplies by that coordinate (or by its square) and forms 4·g1 by two additions: "
+         "waste removed from the baseline rather than a new algorithm, and the operations are really not executed. (2) Scalar "
+         "Lanczos (arms D and DL1) takes v^T v_prev = s from local A-orthogonality and w^T y from the three-term recurrence "
+         "(exact: scalar Lanczos never narrows). Same relations, graph, matrix, iterates and logarithms. Cold M-eq with both "
+         "changes divided by the previous configuration on the same instance, k = 18..22, seeds 1–6; geometric mean (worst "
+         "seed), additions priced at 0, 0.5 and 1 M-eq. The headline DL arm gains from (1) only. "
+         f"Class: {g['class']}. {g['validation']}.", "",
+         "| IC arm | k | additions 0 | 0.5 | 1 |", "|:--|--:|--:|--:|--:|"]
+    f = lambda x: f"{x['geomean']:.3f} ({x['max']:.3f})"
+    for r in g["rows"]:
+        L.append(f"| {r['arm']} | {r['k']} | {f(r['0.0'])} | {f(r['0.5'])} | {f(r['1.0'])} |")
+    b = g["rho_band_k22"]
+    if b:
+        L += ["", "DL against the frozen negation-map rho at k = 22 (mean cold M-eq over seeds 1–3, §5a band): "
+              + ", ".join(f"w = {w}: {b[w]['ic'] / b[w]['rho']:.5f}" for w in ("0", "0.1", "1"))
+              + " (before: " + ", ".join(f"{g['ic_k22']['REF/DL/' + w] / b[w]['rho']:.5f}" for w in ("0", "0.1", "1")) + ")."]
+    L += ["", f"Study: [{g['study']}](../../{g['study']}); [report](../../{g['report']}); source `{g['source']}`. "
+          "Counted operations (host-independent); local L0 runs.", ""]
+    return L
+
+
+def ghs_nrmlz_html(g: dict) -> str:
+    md = ghs_nrmlz_md(g)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    tr = [x for x in md if x.startswith("| ") and not x.startswith("| IC arm")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ghs-weak-nrmlz-20261115"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub>: normalised-coordinate relation '
+            'stage and scalar Lanczos dot reuse</h2>' + body +
+            '<div class="scroll"><table><thead><tr><th>IC arm</th><th>k</th><th>additions 0</th><th>0.5</th><th>1</th>'
+            '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            gh(SOURCES["ghs_weak_nrmlz"], "Analysis") + '</section>')
+
+
 def _ci(v, lo, hi, i):
     return f"{v[i]:.3g} [{lo[i]:.3g}, {hi[i]:.3g}]"
 
@@ -3376,6 +3448,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "ghs_weak_cd_chain_component": ghs_weak_cd_chain(),
         "ghs_weak_relstage_component": ghs_weak_relstage(),
         "ghs_weak_blreuse_component": ghs_weak_blreuse(),
+        "ghs_weak_nrmlz_component": ghs_weak_nrmlz(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -4616,6 +4689,7 @@ def markdown(doc: dict) -> str:
     L += ghs_cd_chain_md(doc["ghs_weak_cd_chain_component"])
     L += ghs_relstage_md(doc["ghs_weak_relstage_component"])
     L += ghs_blreuse_md(doc["ghs_weak_blreuse_component"])
+    L += ghs_nrmlz_md(doc["ghs_weak_nrmlz_component"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -6462,6 +6536,7 @@ def page(doc: dict, standalone: bool) -> str:
     P.append(ghs_cd_chain_html(doc["ghs_weak_cd_chain_component"]))
     P.append(ghs_relstage_html(doc["ghs_weak_relstage_component"]))
     P.append(ghs_blreuse_html(doc["ghs_weak_blreuse_component"]))
+    P.append(ghs_nrmlz_html(doc["ghs_weak_nrmlz_component"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]
