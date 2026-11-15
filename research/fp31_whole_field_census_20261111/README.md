@@ -96,3 +96,30 @@ director and run by the executor; its receipt and the director's assessment ("ex
   - Regenerate the root streams with `fp31-class-census roots` and check them against `phase2/ROOTS.sha256`.
   - Run `phase2/run_phase2.sh target/release/isoclass-rho phase2/manifest.json <dir> 200 40`.
   - Or unpack `phase2/runs_phase2.tar.gz` (sha256 `450d8ea9…a2291e`) and run `fp31-class-census analyze`.
+
+## Phase 3: index-calculus relation yield across 48 classes (run 2026-11-12)
+
+Report: [`phase3/REPORT_PHASE3.pdf`](phase3/REPORT_PHASE3.pdf). Protocol, frozen before data:
+[`phase3/PROTOCOL.md`](phase3/PROTOCOL.md) (sha256 `572f7dfb…eeea`). Instrument: the P2 instrument of
+`research/isogeny_class_ic_yield_20261102`, unchanged (`p2tool` + `ecbench`). Cross-class tests:
+`fp31-class-census ic-analyze`. Benchmark record:
+`benchmarks/records/20261112T0103Z-fp31-ic-yield-across-classes.json`.
+
+- **Population.** The 48 prime-order classes of phase 2:
+  - 332 curves reached by their isogeny walks;
+  - 96 isomorphic models.
+- **Measurement.** m = 3 and m = 2, with a prime-abscissa factor base of one size per m in every class
+  (378 and 1448), and a planted +20% arm.
+- **Scale.** 526,111 relations in 143.9 M attempts.
+- **Execution.**
+  - Attempt 1 was lost to a container restart after 37 of 96 cells. It is recorded in `benchmarks/losses/` and
+    described in `phase3/RESTART_NOTE.md`.
+  - Attempt 2 resumed with identical bound inputs. 96/96 cells finished; 0 failed.
+- **Result** ([pcc:unverified]): **null supported for both m.**
+  - All 14 tests have p > 0.05/14. The smallest is the m = 3 within-class over-dispersion test, p = 0.028.
+  - Normalized yield does not depend on the class (Kruskal–Wallis p 0.58 and 0.64), nor on class size,
+    conductor, number of endomorphism rings or |D_K| (Spearman p ≥ 0.33).
+  - It does not depend on the curve within a class (KS p 0.87 and 0.38).
+  - The planted +20% arm reads 1.198 and 1.200.
+- **Reading.** Over F_{2^31−1}, neither rho (phase 2) nor this IC decomposition distinguishes isogenous curves or
+  depends on the class beyond n.
