@@ -43,3 +43,21 @@ First report build lacked amssymb, so mathbb failed; exact source/log retained, 
 The fixed run's generated report/evidence package is now retained at /workspace/twist-fixed-pending-publication-20261115/{reports,validation}, with before/after file manifests proving exact relocation. Original native raw output remains /workspace/twist-fixed-github-20261115. No denied archive was uploaded, converted or deleted. The source checkout contains only committed scientific source plus this journal update. [pcc:unverified]
 
 Automatic review twice rejected the exact archive publication; the specific question remains pending. This affects publishing those assets, not the already requested bounded local computation. Continue the separately frozen nineteen-query protocol after recording this source/journal checkpoint on GitHub. Do not change its native algorithms, binary pins, clean committed-source guard, coverage or acceptance. Keep new raw outputs outside the checkout and all false payloads intact. [pcc:unverified]
+
+## 2026-11-15T04:57Z — full nineteen-query replay finished
+
+### What was done
+
+At pre-data GitHub source checkpoint b62e8c5974c9a15122cd58664ca34c372ef64b42, ran the frozen v2 launcher once. All25 native stages completed, outer exit0. The19 queries include O and all18 nonidentity points. Both fresh Rust datasets retain26,011 attempted outcomes and722 admitted point/query records,38 per query. Independent C++ enumeration of1444 extension-curve points matches all fibers/inverse-twist coordinates. All ten changed/rehashed false payloads reject101 with no receipt. A/A data/receipts and the positive receipt are byte-identical. These are unsigned replay observations. [pcc:unverified]
+
+### Decisions made
+
+Stop geometry repetition: the full declared geometry census is finished. Next discriminate structured trace-projected membership against the entire source-policy frontier and the identical lifted source baseline. Retain projected-row deduplication, legitimate public-log setup, expanded witnesses and original-source scalar recovery as acceptance conditions. No useful-yield/solver-degree advantage or signed verdict is inferred from geometry. [pcc:unverified]
+
+### Open threads
+
+All raw data, false payloads, canonical export and inspected one-page report remain outside checkout at /workspace/twist-full-pending-publication-20261115. The116 raw files restore/hash/repack exactly from22744bytes. Canonical export check reports zero findings,25 completed/no excluded or resumed rows. Result-asset archive publication remains separate; respect the prior automatic review denial and pending specific question. Keep PR3560 open/auto-merge off and the existing automation paused. [pcc:unverified]
+
+### Errors
+
+CLI Git authentication failed before full data, so protocol v2 was separately frozen/published before execution and checks a fresh connected GitHub ref receipt. Native algorithms/binaries/scope/control predicates were unchanged; original v1 is preserved. Report generation had a font-cache warning and normal first-pass cross-reference warning; PDF rendered and its only page was visually inspected. No native rerun, proof attempt, new IDC1, paid resource or denied asset upload. [pcc:unverified]
