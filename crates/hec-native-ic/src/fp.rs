@@ -127,20 +127,28 @@ impl Fp {
         r
     }
 
-    /// Inverse by the extended Euclidean algorithm.  Panics on zero.
+    /// Inverse by the extended Euclidean algorithm on `u64` remainders with
+    /// `i64` cofactors (S3; it was i128).  The cofactors stay within `±p`
+    /// and `|q·t₁| ≤ |t₀| + |t₂| ≤ 2p < 2^63`, so nothing overflows for
+    /// `p < 2^62`.  Panics on zero.
     pub fn inv(&self, a: u64) -> u64 {
         #[cfg(feature = "count-inv")]
         INV_CALLS.with(|c| c.set(c.get() + 1));
-        assert!(a % self.p != 0, "Fp::inv(0)");
-        let (mut r0, mut r1) = (self.p as i128, (a % self.p) as i128);
-        let (mut t0, mut t1) = (0i128, 1i128);
+        let a = a % self.p;
+        assert!(a != 0, "Fp::inv(0)");
+        let (mut r0, mut r1) = (self.p, a);
+        let (mut t0, mut t1) = (0i64, 1i64);
         while r1 != 0 {
             let q = r0 / r1;
             (r0, r1) = (r1, r0 - q * r1);
-            (t0, t1) = (t1, t0 - q * t1);
+            (t0, t1) = (t1, t0 - q as i64 * t1);
         }
         debug_assert_eq!(r0, 1);
-        t0.rem_euclid(self.p as i128) as u64
+        if t0 < 0 {
+            (t0 + self.p as i64) as u64
+        } else {
+            t0 as u64
+        }
     }
 
     /// Legendre symbol: 0, 1 or −1.
@@ -215,6 +223,54 @@ mod tests {
                     None => assert_eq!(f.legendre(a), -1),
                 }
             }
+        }
+    }
+
+    /// The pre-S3 inverse (i128 extended Euclid), kept as G7's reference.
+    fn inv_ref(f: &Fp, a: u64) -> u64 {
+        let (mut r0, mut r1) = (f.p as i128, (a % f.p) as i128);
+        let (mut t0, mut t1) = (0i128, 1i128);
+        while r1 != 0 {
+            let q = r0 / r1;
+            (r0, r1) = (r1, r0 - q * r1);
+            (t0, t1) = (t1, t0 - q * t1);
+        }
+        t0.rem_euclid(f.p as i128) as u64
+    }
+
+    /// G7 (PLAN.md §9): the u64 inverse equals the i128 one on every row
+    /// prime and on primes near 2^31, 2^32, 2^61 and 2^62.
+    #[test]
+    fn inv_matches_reference() {
+        let primes = [
+            31u64,
+            61,
+            101,
+            211,
+            251,
+            401,
+            503,
+            1009,
+            2003,
+            4001,
+            65537,
+            (1u64 << 31) - 1,
+            (1u64 << 32) - 5,
+            (1u64 << 61) - 1,
+            (1u64 << 62) - 57,
+        ];
+        let mut rng = crate::rng::Rng::new(20261115);
+        for &p in &primes {
+            let f = Fp::new(p);
+            let edge = [1, 2, 3, p - 1, p - 2, p / 2, p / 2 + 1];
+            let rand = (0..20_000).map(|_| 1 + rng.below(p - 1));
+            for a in edge.into_iter().chain(rand) {
+                let x = f.inv(a);
+                assert_eq!(x, inv_ref(&f, a), "p={p} a={a}");
+                assert_eq!(f.mul(a, x), 1, "p={p} a={a}");
+            }
+            // Arguments ≥ p reduce first, as before.
+            assert_eq!(f.inv(p + 2), inv_ref(&f, p + 2));
         }
     }
 }
