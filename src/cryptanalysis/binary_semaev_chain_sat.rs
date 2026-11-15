@@ -370,6 +370,7 @@ pub struct ChainedS3Encoding {
     intermediate_trace_enforced: bool,
     kummer_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
     subspace_kummer: Option<(TraceZeroKummerSystem, Vec<Vec<u32>>)>,
+    terminal_pairs: Option<Vec<BigUint>>,
 }
 
 impl ChainedS3Encoding {
@@ -648,6 +649,7 @@ impl ChainedS3Encoding {
             intermediate_trace_enforced: false,
             kummer_trace_zero: None,
             subspace_kummer: None,
+            terminal_pairs: None,
         })
     }
 
@@ -1060,6 +1062,43 @@ impl ChainedS3Encoding {
         Ok(required)
     }
 
+    /// Exact allowed (x(P3),x(P1+P2)) pairs for a finite m3 intermediate.
+    /// The caller supplies pairs from actual T-P3 group points, not an
+    /// independently combined pair of coordinate lists. Infinity is handled
+    /// by its separate identity mask, never encoded as affine x=0.
+    pub fn constrain_terminal_pair_domain(
+        &mut self,
+        codes: &[BigUint],
+        max_domain_clauses: usize,
+    ) -> Result<usize, ChainBuildError> {
+        if self.m != 3
+            || self.identity_mask != 0
+            || !self.domain_installed
+            || self.terminal_pairs.is_some()
+        {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let mut codes = codes.to_vec();
+        codes.sort_unstable();
+        codes.dedup();
+        let required = finite_domain_clause_count(&codes, 2 * self.n, 1)
+            .ok_or(ChainBuildError::Unsupported)?;
+        if required > max_domain_clauses {
+            return Err(ChainBuildError::DomainClauseCap {
+                required,
+                maximum: max_domain_clauses,
+            });
+        }
+        let wires: Vec<_> = self.blocks[2]
+            .iter()
+            .chain(&self.blocks[3])
+            .copied()
+            .collect();
+        add_coordinate_domain(&mut self.solver, &wires, &codes, 2 * self.n as usize);
+        self.terminal_pairs = Some(codes);
+        Ok(required)
+    }
+
     /// Keep one representative of every summand permutation:
     /// `x_1 <= x_2 <= ... <= x_m` as unsigned codes. A decomposition
     /// `R = P_1 + ... + P_m` has a chain witness in every summand order, its
@@ -1204,6 +1243,12 @@ impl ChainedS3Encoding {
             .iter()
             .map(|block| self.decode_block(block, model))
             .collect();
+        if let Some(codes) = &self.terminal_pairs {
+            let code = values[2].to_biguint() | (values[3].to_biguint() << self.n as usize);
+            if codes.binary_search(&code).is_err() {
+                return false;
+            }
+        }
         if self.intermediate_trace_enforced {
             for step in 1..self.m - 1 {
                 if self.identity_mask & (1 << (step - 1)) == 0

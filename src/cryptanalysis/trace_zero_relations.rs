@@ -4,8 +4,13 @@
 //! supplied by explicit affine witnesses or by the checked finite domain.
 //! A model is still checked in the original group; caps never imply refutation.
 
-use crate::binary_ecc::{curve::point_add, BinaryPoint, F2mElement, TraceZeroVariety};
-use crate::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
+use crate::binary_ecc::{
+    curve::{point_add, point_neg},
+    BinaryPoint, F2mElement, TraceZeroVariety,
+};
+use crate::cryptanalysis::binary_semaev_chain_sat::{
+    finite_domain_clause_count, ChainedS3Encoding,
+};
 use crate::cryptanalysis::sat::SolveResult;
 use num_bigint::BigUint;
 use std::time::{Duration, Instant};
@@ -22,6 +27,12 @@ pub enum TraceZeroMembershipEncoding {
     CertifiedDomain,
     /// Same admitted finite domain with target/common-bit constant folding.
     CertifiedDomainWithConstants,
+    /// m3 only: same complete masks, identity intermediate searched first.
+    CertifiedDomainIdentityFirst,
+    /// m3 only: finite partial sum constrained to actual x(T-B).
+    CertifiedDomainWithTail,
+    /// m3 only: preserve the actual (last x, partial-sum x) correlation.
+    CertifiedDomainWithTailPairs,
     /// Certified finite domain plus the necessary trace bit on each
     /// finite partial sum. No restriction to the original subspace.
     CertifiedDomainWithPartialTrace,
@@ -160,6 +171,16 @@ pub fn decompose_full_trace_zero_with_encoding(
         report.reason = Some("unsupported arity");
         return report;
     }
+    let terminal = matches!(
+        encoding,
+        TraceZeroMembershipEncoding::CertifiedDomainIdentityFirst
+            | TraceZeroMembershipEncoding::CertifiedDomainWithTail
+            | TraceZeroMembershipEncoding::CertifiedDomainWithTailPairs
+    );
+    if terminal && m != 3 {
+        report.reason = Some("terminal specialization requires m3");
+        return report;
+    }
     if !variety.contains(target) {
         report.reason = Some("target is not a trace-zero rational point");
         return report;
@@ -195,16 +216,35 @@ pub fn decompose_full_trace_zero_with_encoding(
     };
     let all_patterns = 1usize << (m - 2);
     let deadline = limits.wall_budget.map(|d| Instant::now() + d);
-    for mask in 0..all_patterns {
-        if mask >= limits.max_patterns {
+    // Computed from the actual supplied signs; no pair-sum truth table.
+    let tail: Vec<_> = if matches!(
+        encoding,
+        TraceZeroMembershipEncoding::CertifiedDomainWithTail
+            | TraceZeroMembershipEncoding::CertifiedDomainWithTailPairs
+    ) {
+        base.iter()
+            .map(|p| point_add(curve, target, &point_neg(p)))
+            .collect()
+    } else {
+        Vec::new()
+    };
+    let constants =
+        encoding == TraceZeroMembershipEncoding::CertifiedDomainWithConstants || terminal;
+    for ordinal in 0..all_patterns {
+        if ordinal >= limits.max_patterns {
             report.reason = Some("identity-pattern budget");
             return report;
         }
+        let mask = if encoding == TraceZeroMembershipEncoding::CertifiedDomainIdentityFirst {
+            all_patterns - 1 - ordinal
+        } else {
+            ordinal
+        };
         if deadline.is_some_and(|d| Instant::now() >= d) {
             report.reason = Some("deadline");
             return report;
         }
-        let built = if encoding == TraceZeroMembershipEncoding::CertifiedDomainWithConstants {
+        let built = if constants {
             ChainedS3Encoding::build_for_domain(
                 m,
                 &curve.irreducible,
@@ -232,13 +272,47 @@ pub fn decompose_full_trace_zero_with_encoding(
                 return report;
             }
         };
-        if encoding != TraceZeroMembershipEncoding::CertifiedDomainWithConstants
+        if !constants
             && enc
                 .constrain_summands(&codes, limits.max_domain_clauses)
                 .is_err()
         {
             report.reason = Some("finite factor-base domain cap");
             return report;
+        }
+        if mask == 0 && !tail.is_empty() {
+            let used = finite_domain_clause_count(&codes, curve.m, m).expect("admitted domain");
+            let Some(remaining_clauses) = limits.max_domain_clauses.checked_sub(used) else {
+                report.reason = Some("terminal total domain clause cap");
+                return report;
+            };
+            let installed = if encoding == TraceZeroMembershipEncoding::CertifiedDomainWithTailPairs
+            {
+                let pairs: Vec<_> = base
+                    .iter()
+                    .zip(&tail)
+                    .filter_map(|(p, s)| match (p, s) {
+                        (BinaryPoint::Affine { x: r, .. }, BinaryPoint::Affine { x: s, .. }) => {
+                            Some(r.to_biguint() | (s.to_biguint() << curve.m as usize))
+                        }
+                        _ => None,
+                    })
+                    .collect();
+                enc.constrain_terminal_pair_domain(&pairs, remaining_clauses)
+            } else {
+                let xs: Vec<_> = tail
+                    .iter()
+                    .filter_map(|s| match s {
+                        BinaryPoint::Affine { x, .. } => Some(x.to_biguint()),
+                        _ => None,
+                    })
+                    .collect();
+                enc.constrain_intermediate(1, &xs, remaining_clauses)
+            };
+            if installed.is_err() {
+                report.reason = Some("terminal domain admission or clause cap");
+                return report;
+            }
         }
         if encoding == TraceZeroMembershipEncoding::ExplicitPoints {
             match enc.constrain_full_trace_zero_summands(
@@ -342,4 +416,93 @@ pub fn decompose_full_trace_zero_with_encoding(
     }
     report.disposition = TraceZeroRelationDisposition::Refuted;
     report
+}
+
+/// Enumerate only the final actual base point and solve P1+P2=T-P3 by
+/// constant-target S3. Every residual shares the total conflict/model/deadline
+/// budget; a capped residual prevents Refuted unless a later slice finds a sum.
+pub fn decompose_trace_zero_terminal_slices(
+    variety: &TraceZeroVariety,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+    limits: TraceZeroRelationLimits,
+) -> TraceZeroRelationReport {
+    let mut out = TraceZeroRelationReport::default();
+    if !variety.contains(target)
+        || base
+            .iter()
+            .any(|p| matches!(p, BinaryPoint::Infinity) || !variety.contains(p))
+    {
+        out.reason = Some("invalid terminal-slice target/base");
+        return out;
+    }
+    if limits.conflict_budget == 0 || limits.max_models == 0 || limits.max_patterns == 0 {
+        out.reason = Some("zero terminal-slice budget");
+        return out;
+    }
+    if base.is_empty() {
+        out.disposition = TraceZeroRelationDisposition::Refuted;
+        return out;
+    }
+    let deadline = limits.wall_budget.map(|d| Instant::now() + d);
+    let residuals: Vec<_> = base
+        .iter()
+        .map(|p| point_add(variety.curve(), target, &point_neg(p)))
+        .collect();
+    let mut capped = false;
+    for (k, residual) in residuals.iter().enumerate() {
+        let remaining = limits.conflict_budget.saturating_sub(out.conflicts);
+        let models = limits.max_models.saturating_sub(out.models);
+        if remaining == 0 || models == 0 || deadline.is_some_and(|d| Instant::now() >= d) {
+            out.reason = Some("terminal-slice total budget");
+            return out;
+        }
+        let count = (base.len() - k) as u64;
+        let wall = deadline.map(|d| {
+            d.saturating_duration_since(Instant::now()) / (count.min(u32::MAX as u64) as u32)
+        });
+        let r = decompose_full_trace_zero_with_encoding(
+            variety,
+            base,
+            residual,
+            2,
+            TraceZeroRelationLimits {
+                conflict_budget: (remaining / count).max(1),
+                max_models: models,
+                wall_budget: wall,
+                ..limits
+            },
+            TraceZeroMembershipEncoding::CertifiedDomainWithConstants,
+        );
+        out.conflicts = out.conflicts.saturating_add(r.conflicts);
+        out.models = out.models.saturating_add(r.models);
+        out.patterns_attempted += r.patterns_attempted;
+        out.patterns_refuted += r.patterns_refuted;
+        out.peak_variables = out.peak_variables.max(r.peak_variables);
+        match r.disposition {
+            TraceZeroRelationDisposition::Found => {
+                let mut indices = r.indices.expect("Found inner witness");
+                indices.push(k);
+                if indices.len() != 3
+                    || indices.iter().fold(BinaryPoint::Infinity, |s, &i| {
+                        point_add(variety.curve(), &s, &base[i])
+                    }) != *target
+                {
+                    out.reason = Some("terminal-slice original replay failed");
+                    return out;
+                }
+                out.indices = Some(indices);
+                out.disposition = TraceZeroRelationDisposition::Found;
+                return out;
+            }
+            TraceZeroRelationDisposition::Refuted => {}
+            TraceZeroRelationDisposition::Inconclusive => capped = true,
+        }
+    }
+    if capped {
+        out.reason = Some("one or more terminal slices capped");
+    } else {
+        out.disposition = TraceZeroRelationDisposition::Refuted;
+    }
+    out
 }
