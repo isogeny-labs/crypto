@@ -230,7 +230,8 @@ Point multiply(const reference::Curve&E,Point point,int k) {
     return out;
 }
 struct ColdResult {int scalar;std::size_t attempts,calls,misses,rank;};
-ColdResult cold_solve(Point Q,std::uint64_t seed,Oracle&oracle) {
+template<class OracleType>
+ColdResult cold_solve(Point Q,std::uint64_t seed,OracleType&oracle) {
     const reference::Curve E{17,2,2};const Point P{5,1,false};
     if(Q.infinity||!E.contains(Q)||Q.x<0||Q.x>=17||Q.y<0||Q.y>=17)
         throw std::invalid_argument("canonical nonzero public target required");
@@ -324,6 +325,7 @@ ColdResult cold_solve(Point Q,std::uint64_t seed,Oracle&oracle) {
 }
 } // namespace algebraic
 
+#ifndef NORM_ALGEBRAIC_NO_MAIN
 int main(int argc,char**argv) {
     try {
         using namespace algebraic;
@@ -415,3 +417,4 @@ int main(int argc,char**argv) {
         throw std::invalid_argument("usage: norm_algebraic --selftest | --retained BASIS | --qualify-models MSOLVE OUTDIR TSV | --qualify-cold MSOLVE OUTDIR TSV | --qualify-arity MSOLVE OUTDIR TSV | --qualify-pruned-{models,cold,arity} MSOLVE OUTDIR TSV | --solve[-pruned] MSOLVE OUTDIR Qx Qy SEED");
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<'\n';return 2;}
 }
+#endif

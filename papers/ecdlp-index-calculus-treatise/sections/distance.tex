@@ -5,7 +5,7 @@ by family, each with its reference, its boundary and its validation status.
 A ratio is IC over rho: greater than 1 means rho is cheaper.
 Chapter~\ref{sec:frontier} gives the frontier campaign, the improvement
 ladders of 14--24 October and the three frontiers (cold, online, stage);
-this chapter adds the work of 25 October to 12 November. Under the
+this chapter adds the work of 25 October to 15 November. Under the
 proof-carrying-claims rule every leaderboard row named here has a
 \texttt{pcc} measurement claim, and every such claim has standing
 \emph{unverified} (\texttt{pcc.py standing}, 6 November). A figure without
@@ -32,7 +32,10 @@ The index-calculus leaderboard (\art{docs/ic/leaderboard.json} at
 \texttt{origin/main} \texttt{05f7382689}) has 28 board rows in three tables.
 Each table has its own unit, reference and floor, so a ratio is compared
 within its table only. Nineteen rows are validated and nine are unvalidated
-(pre-gate) (\texttt{validation\_gate.status\_counts}).
+(pre-gate) (\texttt{validation\_gate.status\_counts}). At
+\texttt{origin/main} \texttt{ec3b88e2c4} (15 November) the three tables and
+the counts are unchanged; the sections added since 12 November lie outside
+Tables~A--C (\S\ref{sec:ladder5}).
 Figure~\ref{fig:fr-leaderboard} plots every row against its reference, and
 Tables~\ref{tab:fr-boardB}--\ref{tab:fr-boardC} list every row.
 
@@ -186,6 +189,20 @@ at the canonical step. Source:
 \art{research/ic_tool_program/rule/v8/README.md}.}
 \label{fig:koblitz}
 \end{figure}
+
+\paragraph{K1 pair tables sized for $n$.} A validated ecbench experiment
+copied from the sibling \texttt{ml-cryptanalysis} repository measures the
+K1 pair-table pipeline cold, one target per process, against strong
+signed-Frobenius rho in the same session and binary, 8 targets $\times$ 5
+rounds (\art{research/ml_cryptanalysis_pt_lgrow_k1_20261114/README.md};
+\texttt{VAL-20261114-d9190c}; claim \texttt{PCC-20261114-8ba038},
+unverified). Raising the pair-table dimension from 7 to 9 at $n=23$
+($r=2^{22.00}$) and to 10 at $n=29$ ($r=2^{15.37}$, cofactor 12646) gives
+gaps of $5.59$, $5.66$, $5.95$ bits and $9.47$, $9.52$, $9.86$ bits at
+$w=0$, $0.1$, $1$, against $6.91$, $6.94$, $7.09$ and $10.36$, $10.46$,
+$11.06$ with dimension 7. Rho is cheaper at every weight and in
+\texttt{bitop/v1}. The rows are an engineering re-selection at fixed $n$
+and rank only against their own before mark, not against Tables~A or~C.
 
 \paragraph{Every rule version, cell by cell.} Rule versions v3, v4, v6,
 v7, v8 and the v8 same-binary control v8c are on \texttt{main}; there is no
@@ -406,7 +423,16 @@ collisions where rho needs one, so it stores about $1.95\times$ rho's steps
 before the cost per point is counted, and at $w=1$ no change that stores a
 point per operation can close it
 (\art{research/curve25519_autolab_20261104/siblings/stage5-design/README.md};
-desk note, unverified).
+desk note, unverified). The wave-6 schedules lane of 14 November puts the
+same gap as a floor: in an oblivious walk, collisions with independent
+difference functionals are independent events, so the stored entries of a
+$K=3$ walk cannot fall below the Poisson floor $1.662$ per $\sqrt r$,
+against $0.886$ for rho-neg, a ratio of $1.876$; \texttt{tw2cj-lazy}'s
+entries sit $0.9$--$4.6\%$ above that floor at $k=20$--$32$. Interleaved
+grumpy giants, shared tables, adaptive table size, kangaroo and
+Gaudry--Schost variants and tag tracing were each rejected with numbers
+(\art{research/curve25519_leads_wave6_20261114/lanes/schedules.md};
+analytic, no simulation, unverified).
 
 \begin{table}[t]
 \centering\small
@@ -488,11 +514,17 @@ $p=1009$--$1823$) are the only ones validated
 (Chapter~\ref{sec:transfer}, \S\ref{sec:jac-jv}). They have no pcc claim, so
 their statements are unverified assertions under the proof-carrying-claims
 rule. With the Hilbert early stop, the Joux--Vitse Nagao arm is below a
-matched negation rho across the band at $p=1451$ and $1601$, on a local,
-unvalidated run (\S\ref{sec:ext-jv-nov}). The plane-quartic row uses double large
+matched negation rho at $w=0$ at $p=1451$ and $1601$ on a local run; its
+validation returned insufficient evidence, and the order across the band
+is not established, because the cover's native count is a lower bound
+(\S\ref{sec:ext-jv-nov}). The plane-quartic row uses double large
 primes, structured elimination and Lanczos; its 501 IC units and 2{,}442
 rho runs are all verified, and it is a measurement of a known result
-(Diem, Diem--Thomé).
+(Diem, Diem--Thomé). Since 14 November one change to it is validated: with
+$c_D=1.7$ and a fixed square-root chain, DL at $k=22$ is $0.0027$, $0.0025$
+and $0.0018$ of the frozen negation-map rho at $w=0$, $0.1$ and $1$, and
+$0.848$--$0.877$ of the frozen DL at $k=18$--$22$ with $\FF_q$ and
+mod-$\ell$ additions priced at one M-eq each (\S\ref{sec:ladder5}).
 
 \begin{table}[t]
 \centering\small
@@ -507,7 +539,11 @@ Genus 3, cubic GHS, plane quartic (Diem) & $q=2{,}097{,}091$ & $0.005$
   $[0.004,0.008]$ & negation rho & $0.983$ $[0.975,0.993]$ against $1.543$
   & interpolated crossover $q^*=555$ $[389,752]$; L0; no validation file;
   to $k=25$ ($q=33{,}554{,}383$): $0.0021$ $[0.0017,0.0026]$ against a
-  calibrated rho model, not a measured rho \\
+  calibrated rho model, not a measured rho; to $k=26$ on one pod:
+  $0.00162$ $[0.00129,0.00199]$ against the model \\
+Plane quartic, DL with $c_D=1.7$ and square-root chain & $k=22$ &
+  $0.0027$, $0.0025$, $0.0018$ at $w=0$, $0.1$, $1$ & frozen negation rho &
+  & validated (component section outside Tables~A--C); no pcc claim \\
 \addlinespace
 Joux--Vitse cover, sieve route & $p=1511$ & $0.00647$ $[0.00545,0.00799]$
   (U1); $0.0156$ (U2); $0.107$--$0.123$ at $w=0.1$, 1 & matched negation rho
@@ -520,9 +556,10 @@ Joux--Vitse cover, sieve route, table line (arm U) & $p=1009$--$1823$,
   $[0.0125,0.0200]$ (unverified, \S\ref{sec:ext-jv-nov}) \\
 Joux--Vitse cover, Nagao arm, line search and Hilbert stop & $p=1301$,
   $1451$, $1601$ & $1.003$, $0.837$, $0.695$ (U2); $0.417$, $0.348$, $0.289$
-  (U1) & matched negation rho (126 pooled runs) & & below across the band at
-  1451 and 1601, not at 1301; lower bound; local; unverified
-  (\S\ref{sec:ext-jv-nov}) \\
+  (U1); fresh rho: $1.050$, $0.876$, $0.728$ (U2) & matched negation rho
+  (126 pooled runs; 126 fresh) & & below at $w=0$ at 1451 and 1601, not
+  resolved at 1301; band order not established (lower bound); validator:
+  insufficient evidence (\S\ref{sec:ext-jv-nov}) \\
 \addlinespace
 $k=4$ over $\FF_{(2^m)^4}$ & $m=15$ & $5.2$ & & & after corrections;
   crossover unsupported \\
@@ -546,6 +583,9 @@ preregistration), and no row has a pcc claim.
 Sources: Chapter~\ref{sec:transfer};
 \art{research/quartic_n4v2_20261020/};
 \art{research/leads_20261111/runs/C_quartic_k26/RESULT.md};
+\art{research/leads_20261111/runs/C_quartic_k26/runpod/RESULT.md};
+\art{research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json};
+\art{research/jv_nagao_hilbert_20261112/validation/RESULT.md};
 \art{research/jv_sieve_negrho_20261102/VALIDATION.json};
 \art{research/jv_sieve_line_vs_rho_20261103/VALIDATION.json};
 \art{research/jv_walk_charge_20261111/README.md};
@@ -566,9 +606,10 @@ Family & IC/rho & Qualifier \\
 \midrule
 Joux--Vitse cover, sieve route, $p=1511$ & $0.0065$ & matched negation rho; weak class; validated (\texttt{VAL-20261103-c31c76}); no pcc claim \\
 Joux--Vitse cover, sieve route, table line, pooled & $0.0141$ & U2; validated 11 November; walk into the class charged: $0.0155$ (unverified) \\
+Plane quartic via cubic GHS, DL with $c_D=1.7$ and square-root chain, $k=22$ & $0.0027$ & frozen negation rho; $0.0018$ at $w=1$; weak family; validated component; no pcc claim \\
 Plane quartic via cubic GHS, $q\approx2^{21}$ & $0.005$ & negation rho; weak family; L0; no validation file; producer-reported \\
 Genus-3 hyperelliptic via GHS, $q=2^{16}$ & $0.70$ & ideal strong rho; one size of seven; pricing-sensitive; producer-reported \\
-Joux--Vitse cover, Nagao arm with Hilbert stop, $p=1601$ & $0.695$ & U2, matched negation rho; below across the band at 1451 and 1601, level at 1301; lower bound; local; unverified \\
+Joux--Vitse cover, Nagao arm with Hilbert stop, $p=1601$ & $0.695$ & U2, matched negation rho ($0.728$ with a fresh rho sample); below at $w=0$ at 1451 and 1601, level at 1301; lower bound; validator: insufficient evidence \\
 Prime $j=0$ miniatures, sibling walk with \texttt{aut=3}, 37 bits & $0.875$ & $w=0$ against rho-cubic; $1.200$ at $w=0.1$, $2.663$ at $w=1$; unresolved in the band; validated GAE comparison; no pcc claim \\
 Curve25519 miniatures, \texttt{twcj-cv0}, $k=20$ & $1.217$ & F$=1$ walk, not decomposition-based; rho-neg ahead at every weight (table work priced); unverified \\
 Koblitz, lazy orbit-member index, $n=29$ & $1.27$ $[0.77,1.80]$ & fully priced; component, not a board row; not validated \\
