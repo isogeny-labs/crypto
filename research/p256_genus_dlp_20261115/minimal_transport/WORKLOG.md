@@ -148,3 +148,17 @@
 
 ### Errors (what went wrong, how it was handled)
 - Explicit remote refspec corrected the initial missing tracking ref. No numerical failure was hidden or relabeled; no numerical panel was executed.
+
+## 20:28Z — Acceptance addendum publication
+
+### What was done (commands, files, features)
+- Published9fcc4853e in PR4313 and updated its body with the full-cost contract and implementation/access gaps. Metadata/prose/digest and ledger-prefix checks pass; all four original claim files remain unchanged. [pcc:unverified]
+
+### Decisions made (and why)
+- Leave queued current-head checks/review and the subsequent-main conflict to normal reconciliation; ordinary MERGE auto-merge remains enabled. No net measured gain is asserted.
+
+### Open threads (unfinished, pick up next time)
+- Same access, qualification, native benchmark and complete-cost obligations. No new candidate cases, timed sessions or paid allocations.
+
+### Errors (what went wrong, how it was handled)
+- gh pr edit hit Projects classic deprecation; REST PATCH published the exact linted body successfully.
