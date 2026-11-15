@@ -81,3 +81,15 @@ branch, frozen evidence, scalar result or general-audit standing was changed.
 - [HAC chapter14, Algorithm14.88 and Note14.90, pp617–618](https://cacr.uwaterloo.ca/hac/about/chap14.pdf): established simultaneous multiplication, precomputation and zero-column costs.
 - Native `curve.rs`, `reduction.rs`, `prepared.rs` and existing pair controls: validation, lifecycle, randomness, selector ordering and replay contracts.
 - Sources checked (KB): KB unavailable; no MCP tools loaded and repository wrapper status/three mechanism, negative and batch-inversion queries fail for missing executable. Lead atlas fails for missing orchestration module; narrow native paths and the primary HAC text are the fallback. No novelty/absence claim.
+
+## Canonical registration remains separate
+
+The existing [canonical-ledger storage dependency](../../problems/prepared-point-tables-ledger-artifact-policy.md)
+also affects this source. Exact proposal `b99780d512ee7b407c72a7c14edf0377e2d9b27e`,
+retained on `codex/point-table-joint-registration-20261115`, contains the normal
+producer statement PCC-20261115-21bbde and its full append-only ledger prefix.
+Its artifact check selects the696074-byte canonical ledger for migration;
+[original output](registration-policy.stdout.log) is retained. No waiver,
+canonical ledger rewrite or registration/verification claim is made on the
+code PR. Its canonical ledger remains byte-identical to the parent.
+[pcc:unverified]
