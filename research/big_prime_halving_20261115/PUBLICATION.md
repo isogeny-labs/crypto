@@ -54,3 +54,22 @@ third-party include directory as system headers and clarified the flagged
 control-flow layout without disabling project warnings. Fresh build002 passes
 with -Wall/-Wextra/-Wpedantic/-Werror; no numerical case has run. The old word-
 prime code and both critical-pair raw rounds remain unchanged. [pcc:unverified]
+
+2026-11-15T15:27Z: frozen native source f5b318b482 is pushed. Before any
+case, scripts/checkpoint.sh gate fails for unavailable AWS/profile/upload-
+token access. Preserved the exact diagnostic as checks/checkpoint001.log;
+no qualification directory or numerical output exists. No CHECKPOINT_SKIP,
+credential extraction or workflow repurposing is used. The current task
+resume note is saved locally; the tracked base note describes an unrelated
+historical task and will be restored after preserving this continuation's
+own resume record. Checkpoint access was requested without credentials in
+chat. [pcc:unverified]
+
+Independent proof continuation: shared source7364d8dab7014a8bc610ed6911e7fb0839f6d47d
+proves complete_roots_of_gcd and complete_roots_of_frobenius_gcd on semantic
+polynomials. Both compile first try; the canonical local all-source gate
+passes108theorems/0failures/0trusted-native exceptions. Publication8b2840b
+contains full logs/source bindings and ready shared PR10. This is independent
+of native execution and leaves its frozen protocol/caps untouched. Source
+audit and the two-page visual report record the new obligations and exact
+pending status. Data claim PCC-20261115-261591 remains unverified. [pcc:unverified]
