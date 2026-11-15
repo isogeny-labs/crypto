@@ -5,6 +5,8 @@ aux_pc=$(realpath "${2:?existing certified PC build}")
 aux_msolve=$(realpath "${3:?pinned msolve}")
 aux_root=$(realpath -m "${4:?new output root}")
 aux_study=$(cd "$(dirname "$0")" && pwd)
+aux_native_lib=$(realpath "$(dirname "$aux_msolve")/../lib/x86_64-linux-gnu")
+export LD_LIBRARY_PATH="$aux_native_lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 mkdir "$aux_root"
 cp "$aux_build/build-source-binary.sha256" "$aux_root/build-source-binary.sha256"
 cp "$aux_build/compiler.txt" "$aux_root/compiler.txt"

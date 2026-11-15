@@ -65,3 +65,20 @@ General-prime auxiliary curve search/point counting, large-prime arithmetic,
 admissible growing-family degree/yield and full cold cost remain unimplemented
 here. Existing supporting auxiliary probability bounds are reused as stated,
 not newly claimed or inferred from these tiny fixtures. [pcc:unverified]
+
+## Amendment A1 — repair native loader, preserve first arm
+
+The structural controls pass with14 variables and cubic equations. Every
+first msolve invocation exits127 before algorithm startup: the preserved
+stderr identifies missing libneogb.so.0. The wrapper omitted the pinned
+backend's required library path. Preserve all12 launch failures and the
+entire first panel; the original PC arm continues its fixed target census.
+
+After the first panel finishes, permit exactly one msolve-only repetition of
+the same12 targets in fresh loader-002. Export the pinned native prefix's
+usr/lib/x86_64-linux-gnu as LD_LIBRARY_PATH, record loader/linker evidence and
+new pre-call hashes before invoking. No new PC call, algorithm, target,
+degree, memory, time, schedule or verification criterion changes. Retain
+all completed/unknown outcomes and replay any completed models with the
+same independent OpenSSL executable. This repairs process startup, not a
+failed mathematical conjecture or a performance result.
