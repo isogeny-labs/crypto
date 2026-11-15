@@ -1,5 +1,10 @@
 # Native K600 m6 arm-input staging component
 
+The [native precharge child-interval amendment](PRECHARGE_CHILD_INTERVAL_AMENDMENT.md)
+adds bounded wrappers and a four-phase receipt chain. Its tests are
+implementation controls; the full-invocation cold runtime and real K600
+host preflight remain open.
+
 The [outer arm budget controller amendment](ARM_BUDGET_CONTROLLER_AMENDMENT.md)
 records the native nine-phase ordering and its current accounting limit.
 It is implementation evidence only; the K600 execution and full cold budget

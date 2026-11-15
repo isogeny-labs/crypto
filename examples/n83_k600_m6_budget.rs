@@ -1,6 +1,6 @@
 //! One-process, cumulative wall guard for the frozen K600 m6 arm sequence.
-//! Build, staging, freeze and zero-trial preflight require a separate audited
-//! outer precharge receipt; this runner never creates or trusts one by itself.
+//! Build, staging, freeze and zero-trial preflight require native outer child
+//! interval receipts. The later full-invocation audit remains separate.
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::error::Error;
@@ -25,6 +25,11 @@ const PHASES: [&str; 9] = [
     "natural-replay",
 ];
 const PRECHARGE: [&str; 4] = ["build", "stage", "freeze", "preflight"];
+
+fn ceil_elapsed_ms(start: Instant) -> u64 {
+    let nanos = start.elapsed().as_nanos();
+    u64::try_from(nanos.saturating_add(999_999) / 1_000_000).unwrap_or(u64::MAX)
+}
 
 fn sha256(path: &Path) -> Result<String> {
     let bytes = fs::read(path)?;
@@ -69,12 +74,16 @@ fn clean_source(repo: &Path) -> Result<String> {
 fn precharge_ms(
     precharge: &Value,
     source: &str,
+    build_source: &str,
+    controller_sha: &str,
     arm_lock: &Path,
     preflight_run: &Path,
 ) -> Result<u64> {
-    if precharge["schema"] != "n83.k600-m6-outer-precharge/v1"
-        || precharge["status"] != "PASS_AUDITED_PRECHARGE"
+    if precharge["schema"] != "n83.k600-m6-outer-precharge/v2"
+        || precharge["status"] != "PASS_BOUND_CHILD_INTERVALS"
         || precharge["source_commit"] != source
+        || precharge["build_source_commit"] != build_source
+        || precharge["controller_sha256"] != controller_sha
         || precharge["allowance_ms"] != ALLOWANCE_MS
     {
         return Err("precharge identity or allowance differs".into());
@@ -85,21 +94,85 @@ fn precharge_ms(
     if phases.len() != PRECHARGE.len() {
         return Err("precharge phase count differs".into());
     }
+    let arm: Value = serde_json::from_slice(&fs::read(arm_lock)?)?;
+    if arm["schema"] != "n83.k600-m6-native-arms-lock/v1"
+        || arm["source_commit"] != source
+        || arm["build_source_commit"] != build_source
+    {
+        return Err("precharge arm lock identity differs".into());
+    }
     let mut total = 0u64;
     for (entry, name) in phases.iter().zip(PRECHARGE) {
-        let path = field_path(entry, "receipt_path")?;
+        let outer_path = field_path(entry, "outer_receipt_path")?;
+        let child_path = field_path(entry, "child_receipt_path")?;
+        let outer: Value = serde_json::from_slice(&fs::read(&outer_path)?)?;
+        let child: Value = serde_json::from_slice(&fs::read(&child_path)?)?;
         let wall = entry["outer_wall_ms"]
             .as_u64()
             .filter(|n| *n > 0)
             .ok_or("precharge outer wall missing")?;
-        if entry["phase"] != name || entry["receipt_sha256"] != sha256(&path)? {
+        let phase_source = if name == "build" {
+            build_source
+        } else {
+            source
+        };
+        if entry["phase"] != name
+            || entry["outer_receipt_sha256"] != sha256(&outer_path)?
+            || entry["child_receipt_sha256"] != sha256(&child_path)?
+            || outer["schema"] != "n83.k600-m6-native-child-interval/v1"
+            || outer["status"] != "PASS_CHILD_INTERVAL"
+            || outer["phase"] != name
+            || outer["source_commit"] != phase_source
+            || outer["controller_sha256"] != controller_sha
+            || outer["allowance_ms"] != ALLOWANCE_MS
+            || outer["child_exit_code"] != 0
+            || outer["wall_capped"] != false
+            || outer["cleanup_ok"] != true
+            || outer["child_receipt_path"] != child_path.to_string_lossy().as_ref()
+            || outer["child_receipt_sha256"] != entry["child_receipt_sha256"]
+            || outer["outer_wall_to_receipt_start_ms"] != wall
+        {
             return Err(format!("precharge {name} receipt differs").into());
         }
-        if name == "freeze" && path != arm_lock {
+        if name == "freeze" && child_path != arm_lock {
             return Err("freeze precharge must name the arm lock".into());
         }
-        if name == "preflight" && path != preflight_run.join("outer.json") {
+        if name == "preflight" && child_path != preflight_run.join("outer.json") {
             return Err("preflight precharge must name its outer receipt".into());
+        }
+        let child_ok = match name {
+            "build" => {
+                child["schema"] == "n83.k600-m6-linux-build/v1"
+                    && child["status"] == "PASS_SOURCE_MATCHED_BUILD"
+                    && child["source_commit"] == build_source
+                    && child["image_id"] == arm["image_id"]
+                    && child["exporter_replayer_sha256"] == arm["exporter_replayer_sha256"]
+                    && child["solver_sha256"] == arm["solver_sha256"]
+                    && child["supervisor_sha256"] == arm["supervisor_sha256"]
+            }
+            "stage" => {
+                child["schema"] == "n83.k600-m6-native-arm-staging/v1"
+                    && child["status"] == "PASS_READ_ONLY_STAGE"
+                    && child["source_commit"] == source
+                    && entry["child_receipt_sha256"] == arm["staging_receipt_sha256"]
+            }
+            "freeze" => {
+                child["schema"] == "n83.k600-m6-native-arms-lock/v1"
+                    && child["status"] == "PREPARED_ONLY"
+                    && child["source_commit"] == source
+                    && child["build_source_commit"] == build_source
+            }
+            "preflight" => {
+                child["schema"] == "n83.k600-m6-native-outer/v1"
+                    && child["status"] == "PREFLIGHT_ONLY"
+                    && child["worker_exit_code"] == 0
+                    && child["timed_out"] == false
+                    && child["lock_sha256"] == arm["preflight_lock_sha256"]
+            }
+            _ => false,
+        };
+        if !child_ok {
+            return Err(format!("precharge {name} child identity differs").into());
         }
         total = total.checked_add(wall).ok_or("precharge wall overflow")?;
     }
@@ -297,6 +370,207 @@ fn docker_cleanup(pid: u32) -> Result<()> {
     Ok(())
 }
 
+fn preflight_containers() -> Result<Vec<String>> {
+    let filter = "name=^n83-k600-m6-native-preflight$";
+    let mut list = Command::new("docker");
+    list.args(["ps", "-aq", "--filter", filter]);
+    let ids = bounded_output(list)?;
+    if !ids.status.success() {
+        return Err("preflight Docker cleanup inspection failed".into());
+    }
+    Ok(String::from_utf8(ids.stdout)?
+        .lines()
+        .filter(|s| !s.is_empty())
+        .map(str::to_owned)
+        .collect())
+}
+
+fn preflight_cleanup() -> Result<()> {
+    for id in preflight_containers()? {
+        let mut kill = Command::new("docker");
+        kill.args(["kill", &id]);
+        if !bounded_output(kill)?.status.success() {
+            return Err("preflight Docker cleanup kill failed".into());
+        }
+    }
+    if !preflight_containers()?.is_empty() {
+        return Err("preflight Docker child remains".into());
+    }
+    Ok(())
+}
+
+fn charge(
+    repo: &Path,
+    phase: &str,
+    child_receipt: &Path,
+    output: &Path,
+    seconds: u64,
+    program: &Path,
+    args: &[String],
+) -> Result<Value> {
+    if !PRECHARGE.contains(&phase)
+        || seconds == 0
+        || seconds > ALLOWANCE_MS / 1_000
+        || !output.is_absolute()
+        || output.exists()
+        || !child_receipt.is_absolute()
+        || child_receipt.exists()
+    {
+        return Err(
+            "new absolute precharge output, child receipt and bounded phase required".into(),
+        );
+    }
+    let repo = fs::canonicalize(repo)?;
+    let parent = fs::canonicalize(output.parent().ok_or("output parent missing")?)?;
+    if parent.starts_with(&repo) {
+        return Err("precharge output must be outside source".into());
+    }
+    let source = clean_source(&repo)?;
+    if phase == "preflight" && !preflight_containers()?.is_empty() {
+        return Err("another fixed-name K600 preflight container exists".into());
+    }
+    let program = fs::canonicalize(program)?;
+    let program_sha = sha256(&program)?;
+    let controller_sha = sha256(&std::env::current_exe()?)?;
+    fs::create_dir(output)?;
+    let output = fs::canonicalize(output)?;
+    let stdout = output.join("child.stdout");
+    let stderr = output.join("child.stderr");
+    let started = Instant::now();
+    let result: Result<Value> = (|| {
+        let mut child = Command::new(&program)
+            .args(args)
+            .current_dir(&repo)
+            .stdout(Stdio::from(
+                File::options().write(true).create_new(true).open(&stdout)?,
+            ))
+            .stderr(Stdio::from(
+                File::options().write(true).create_new(true).open(&stderr)?,
+            ))
+            .spawn()?;
+        let deadline = Duration::from_secs(seconds);
+        let (exit, capped) = loop {
+            match child.try_wait() {
+                Ok(Some(status)) => break (status.code(), false),
+                Ok(None) if started.elapsed() < deadline => {
+                    thread::sleep(Duration::from_millis(100))
+                }
+                Ok(None) => {
+                    let _ = child.kill();
+                    child.wait()?;
+                    break (None, true);
+                }
+                Err(error) => {
+                    let _ = child.kill();
+                    let _ = child.wait();
+                    return Err(error.into());
+                }
+            }
+        };
+        let cleanup = if phase == "preflight" {
+            preflight_cleanup()
+        } else {
+            Ok(())
+        };
+        let receipt = fs::canonicalize(child_receipt).ok();
+        let receipt_sha = receipt.as_ref().map(|path| sha256(path)).transpose()?;
+        let source_after = clean_source(&repo);
+        let status = if exit == Some(0)
+            && !capped
+            && cleanup.is_ok()
+            && receipt_sha.is_some()
+            && source_after.ok().as_deref() == Some(source.as_str())
+            && sha256(&program)? == program_sha
+        {
+            "PASS_CHILD_INTERVAL"
+        } else {
+            "STOPPED_CHILD_INTERVAL"
+        };
+        let outer = json!({
+            "schema":"n83.k600-m6-native-child-interval/v1","status":status,
+            "phase":phase,"source_commit":source,"controller_sha256":controller_sha,
+            "allowance_ms":ALLOWANCE_MS,"child_exit_code":exit,"wall_capped":capped,
+            "cleanup_ok":cleanup.is_ok(),"cleanup_error":cleanup.err().map(|e|e.to_string()),
+            "child_receipt_path":receipt.as_ref().map(|p|p.to_string_lossy().into_owned()),
+            "child_receipt_sha256":receipt_sha,
+            "program":program,"program_sha256":program_sha,"arguments":args,
+            "stdout_sha256":sha256(&stdout)?,"stderr_sha256":sha256(&stderr)?,
+            "outer_wall_to_receipt_start_ms":ceil_elapsed_ms(started),
+            "receipt_write_and_process_exit_charged":false,
+            "total_index_calculus_runtime_ms":Value::Null,
+        });
+        write_new(&output.join("outer.json"), &outer)?;
+        Ok(outer)
+    })();
+    if let Err(error) = &result {
+        let _ = write_new(
+            &output.join("failure.json"),
+            &json!({
+                "schema":"n83.k600-m6-native-child-interval-failure/v1",
+                "phase":phase,"status":"CONTROLLER_FAILURE","reason":error.to_string(),
+                "elapsed_before_failure_receipt_ms":started.elapsed().as_millis(),
+            }),
+        );
+    }
+    result
+}
+
+fn assemble(
+    outer_paths: &[PathBuf; 4],
+    arm_lock: &Path,
+    preflight_run: &Path,
+    output: &Path,
+) -> Result<Value> {
+    if !output.is_absolute() || output.exists() {
+        return Err("new absolute precharge manifest path required".into());
+    }
+    let repo = fs::canonicalize(env!("CARGO_MANIFEST_DIR"))?;
+    let parent = fs::canonicalize(output.parent().ok_or("manifest parent missing")?)?;
+    if parent.starts_with(&repo) {
+        return Err("precharge manifest must be outside source".into());
+    }
+    let source = clean_source(&repo)?;
+    let arm_lock = fs::canonicalize(arm_lock)?;
+    let preflight_run = fs::canonicalize(preflight_run)?;
+    let arm: Value = serde_json::from_slice(&fs::read(&arm_lock)?)?;
+    let build_source = arm["build_source_commit"]
+        .as_str()
+        .ok_or("build source missing")?;
+    let controller_sha = sha256(&std::env::current_exe()?)?;
+    let mut phases = Vec::new();
+    let mut total = 0u64;
+    for (name, path) in PRECHARGE.into_iter().zip(outer_paths) {
+        let path = fs::canonicalize(path)?;
+        let outer: Value = serde_json::from_slice(&fs::read(&path)?)?;
+        let child = field_path(&outer, "child_receipt_path")?;
+        let wall = outer["outer_wall_to_receipt_start_ms"]
+            .as_u64()
+            .filter(|n| *n > 0)
+            .ok_or("outer wall missing")?;
+        total = total.checked_add(wall).ok_or("precharge total overflow")?;
+        phases.push(json!({"phase":name,"outer_receipt_path":path,
+            "outer_receipt_sha256":sha256(&path)?,"child_receipt_path":child,
+            "child_receipt_sha256":sha256(&child)?,"outer_wall_ms":wall}));
+    }
+    let value = json!({"schema":"n83.k600-m6-outer-precharge/v2",
+        "status":"PASS_BOUND_CHILD_INTERVALS","source_commit":source,
+        "build_source_commit":build_source,"controller_sha256":controller_sha,
+        "allowance_ms":ALLOWANCE_MS,"phases":phases,"total_outer_wall_ms":total,
+        "receipt_write_and_process_exit_charged":false,
+        "total_index_calculus_runtime_ms":Value::Null,
+    });
+    precharge_ms(
+        &value,
+        &source,
+        build_source,
+        &controller_sha,
+        &arm_lock,
+        &preflight_run,
+    )?;
+    write_new(output, &value)?;
+    Ok(value)
+}
+
 fn run(plan_path: &Path, output: &Path) -> Result<Value> {
     let start = Instant::now();
     if !output.is_absolute() || output.exists() {
@@ -328,7 +602,18 @@ fn run(plan_path: &Path, output: &Path) -> Result<Value> {
     {
         return Err("budget plan, source, binary or frozen input differs".into());
     }
-    let precharged = precharge_ms(&precharge, &source, &lock, &prerun)?;
+    let controller_sha = sha256(&std::env::current_exe()?)?;
+    let build_source = lock_json["build_source_commit"]
+        .as_str()
+        .ok_or("build source commit missing")?;
+    let precharged = precharge_ms(
+        &precharge,
+        &source,
+        build_source,
+        &controller_sha,
+        &lock,
+        &prerun,
+    )?;
     fs::create_dir(output)?;
     let output = fs::canonicalize(output)?;
     write_new(
@@ -496,8 +781,41 @@ fn run(plan_path: &Path, output: &Path) -> Result<Value> {
 
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
+    if args.len() >= 7 && args[1] == "charge" {
+        let seconds: u64 = args[5].parse()?;
+        let result = charge(
+            &fs::canonicalize(env!("CARGO_MANIFEST_DIR"))?,
+            &args[2],
+            Path::new(&args[3]),
+            Path::new(&args[4]),
+            seconds,
+            Path::new(&args[6]),
+            &args[7..],
+        )?;
+        println!("{result}");
+        if result["status"] != "PASS_CHILD_INTERVAL" {
+            return Err("precharge child failed; inspect outer receipt".into());
+        }
+        return Ok(());
+    }
+    if args.len() == 9 && args[1] == "assemble" {
+        let paths = [
+            PathBuf::from(&args[2]),
+            PathBuf::from(&args[3]),
+            PathBuf::from(&args[4]),
+            PathBuf::from(&args[5]),
+        ];
+        let result = assemble(
+            &paths,
+            Path::new(&args[6]),
+            Path::new(&args[7]),
+            Path::new(&args[8]),
+        )?;
+        println!("{result}");
+        return Ok(());
+    }
     if args.len() != 4 || args[1] != "run" {
-        return Err("usage: run PLAN_JSON NEW_OUTPUT_DIR".into());
+        return Err("usage: charge build|stage|freeze|preflight NEW_CHILD_RECEIPT NEW_OUTPUT_DIR OUTER_SECONDS PROGRAM [ARG...] | assemble BUILD_OUTER STAGE_OUTER FREEZE_OUTER PREFLIGHT_OUTER ARM_LOCK PREFLIGHT_RUN NEW_PRECHARGE_JSON | run PLAN_JSON NEW_OUTPUT_DIR".into());
     }
     println!("{}", run(Path::new(&args[2]), Path::new(&args[3]))?);
     Ok(())
@@ -528,12 +846,15 @@ mod tests {
     #[test]
     fn precharge_rejects_missing_or_exhausted_phases() {
         let source = "a".repeat(40);
-        let empty = json!({"schema":"n83.k600-m6-outer-precharge/v1",
-            "status":"PASS_AUDITED_PRECHARGE","source_commit":source,
+        let empty = json!({"schema":"n83.k600-m6-outer-precharge/v2",
+            "status":"PASS_BOUND_CHILD_INTERVALS","source_commit":source,
+            "build_source_commit":"b".repeat(40),"controller_sha256":"digest",
             "allowance_ms":ALLOWANCE_MS,"phases":[],"total_outer_wall_ms":0});
         assert!(precharge_ms(
             &empty,
             &source,
+            &"b".repeat(40),
+            "digest",
             Path::new("/missing-lock"),
             Path::new("/missing-preflight")
         )
@@ -579,5 +900,169 @@ mod tests {
             assert!(receipt_identity(phase, &receipt, &source, "deadbeef"));
             assert!(!receipt_identity(phase, &receipt, &source, "wrong"));
         }
+    }
+    #[test]
+    fn native_charge_measures_child_through_receipt_creation() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root =
+            std::env::temp_dir().join(format!("n83-precharge-{}-{nonce}", std::process::id()));
+        let repo = root.join("repo");
+        fs::create_dir_all(&repo).unwrap();
+        let git = |args: &[&str]| {
+            let out = Command::new("git")
+                .args(args)
+                .current_dir(&repo)
+                .output()
+                .unwrap();
+            assert!(
+                out.status.success(),
+                "{}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+        };
+        git(&["init", "-q"]);
+        git(&["config", "user.name", "N83 Test"]);
+        git(&["config", "user.email", "n83@example.invalid"]);
+        fs::write(repo.join("source.txt"), b"source").unwrap();
+        git(&["add", "source.txt"]);
+        git(&["commit", "-qm", "source"]);
+        let receipt = root.join("child.json");
+        let args = vec![
+            "-c".into(),
+            "printf '{\"status\":\"PASS\"}\\n' > \"$1\"".into(),
+            "sh".into(),
+            receipt.to_string_lossy().into_owned(),
+        ];
+        let outer = charge(
+            &repo,
+            "build",
+            &receipt,
+            &root.join("outer"),
+            5,
+            Path::new("/bin/sh"),
+            &args,
+        )
+        .unwrap();
+        assert_eq!(outer["status"], "PASS_CHILD_INTERVAL");
+        assert_eq!(outer["child_receipt_sha256"], sha256(&receipt).unwrap());
+        assert!(outer["outer_wall_to_receipt_start_ms"].as_u64().unwrap() >= 1);
+        let missing = root.join("missing.json");
+        let failed = charge(
+            &repo,
+            "build",
+            &missing,
+            &root.join("missing-outer"),
+            5,
+            Path::new("/bin/sh"),
+            &["-c".into(), ":".into()],
+        )
+        .unwrap();
+        assert_eq!(failed["status"], "STOPPED_CHILD_INTERVAL");
+        fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
+    fn precharge_binds_four_native_outer_and_child_receipts() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "n83-precharge-chain-{}-{nonce}",
+            std::process::id()
+        ));
+        fs::create_dir(&root).unwrap();
+        let source = "a".repeat(40);
+        let build_source = "b".repeat(40);
+        let controller = "controller-digest";
+        let image = format!("sha256:{}", "c".repeat(64));
+        let stage_path = root.join("stage/staging.json");
+        fs::create_dir_all(stage_path.parent().unwrap()).unwrap();
+        write_new(
+            &stage_path,
+            &json!({"schema":"n83.k600-m6-native-arm-staging/v1",
+            "status":"PASS_READ_ONLY_STAGE","source_commit":source}),
+        )
+        .unwrap();
+        let arm_path = root.join("arm-lock.json");
+        let arm = json!({"schema":"n83.k600-m6-native-arms-lock/v1",
+            "status":"PREPARED_ONLY","source_commit":source,"build_source_commit":build_source,
+            "image_id":image,"exporter_replayer_sha256":"exporter","solver_sha256":"solver",
+            "supervisor_sha256":"supervisor","staging_receipt_sha256":sha256(&stage_path).unwrap(),
+            "preflight_lock_sha256":"preflight-lock"});
+        write_new(&arm_path, &arm).unwrap();
+        let build_path = root.join("build/build.json");
+        fs::create_dir_all(build_path.parent().unwrap()).unwrap();
+        write_new(
+            &build_path,
+            &json!({"schema":"n83.k600-m6-linux-build/v1",
+            "status":"PASS_SOURCE_MATCHED_BUILD","source_commit":build_source,
+            "image_id":image,"exporter_replayer_sha256":"exporter","solver_sha256":"solver",
+            "supervisor_sha256":"supervisor"}),
+        )
+        .unwrap();
+        let preflight_root = root.join("preflight");
+        fs::create_dir(&preflight_root).unwrap();
+        let preflight_path = preflight_root.join("outer.json");
+        write_new(
+            &preflight_path,
+            &json!({"schema":"n83.k600-m6-native-outer/v1",
+            "status":"PREFLIGHT_ONLY","worker_exit_code":0,"timed_out":false,
+            "lock_sha256":"preflight-lock"}),
+        )
+        .unwrap();
+        let children = [&build_path, &stage_path, &arm_path, &preflight_path];
+        let mut entries = Vec::new();
+        for (name, child) in PRECHARGE.into_iter().zip(children) {
+            let outer_path = root.join(format!("{name}-outer.json"));
+            let wall = 7u64;
+            let child_sha = sha256(child).unwrap();
+            write_new(
+                &outer_path,
+                &json!({
+                    "schema":"n83.k600-m6-native-child-interval/v1",
+                    "status":"PASS_CHILD_INTERVAL","phase":name,
+                    "source_commit":if name=="build" {&build_source} else {&source},
+                    "controller_sha256":controller,"allowance_ms":ALLOWANCE_MS,
+                    "child_exit_code":0,"wall_capped":false,"cleanup_ok":true,
+                    "child_receipt_path":child,"child_receipt_sha256":child_sha,
+                    "outer_wall_to_receipt_start_ms":wall,
+                }),
+            )
+            .unwrap();
+            entries.push(json!({"phase":name,"outer_receipt_path":outer_path,
+                "outer_receipt_sha256":sha256(&outer_path).unwrap(),
+                "child_receipt_path":child,"child_receipt_sha256":child_sha,
+                "outer_wall_ms":wall}));
+        }
+        let precharge = json!({"schema":"n83.k600-m6-outer-precharge/v2",
+            "status":"PASS_BOUND_CHILD_INTERVALS","source_commit":source,
+            "build_source_commit":build_source,"controller_sha256":controller,
+            "allowance_ms":ALLOWANCE_MS,"phases":entries,"total_outer_wall_ms":28});
+        assert_eq!(
+            precharge_ms(
+                &precharge,
+                &source,
+                &build_source,
+                controller,
+                &arm_path,
+                &preflight_root
+            )
+            .unwrap(),
+            28
+        );
+        fs::write(root.join("build-outer.json"), b"changed").unwrap();
+        assert!(precharge_ms(
+            &precharge,
+            &source,
+            &build_source,
+            controller,
+            &arm_path,
+            &preflight_root
+        )
+        .is_err());
+        fs::remove_dir_all(root).unwrap();
     }
 }
