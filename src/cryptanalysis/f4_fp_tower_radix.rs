@@ -1864,6 +1864,63 @@ mod tests {
         ]
     }
 
+    /// Runs both engines on the same system over the same radix-2 ring and
+    /// asserts the same run: every step's counts, the counters, the basis.
+    fn assert_same_run(
+        nring: &narrow::TowerRing,
+        xring: &RadixRing,
+        ninput: &[narrow::RPoly],
+        xinput: &[XPoly],
+        opts: &narrow::TowerF4Options,
+        tag: &str,
+    ) {
+        let nrep = f4_tower(ninput, nring, opts);
+        let xrep = f4_radix(xinput, xring, opts);
+        println!(
+            "identity {tag}: steps {}, tower pairs {}, muladds {}, inconsistent {}, D {}",
+            xrep.steps,
+            xrep.tower_pairs_reduced,
+            xrep.muladds,
+            xrep.inconsistent,
+            xrep.solving_degree_max
+        );
+        assert_eq!(nrep.inconsistent, xrep.inconsistent, "{tag}");
+        assert_eq!(nrep.steps, xrep.steps, "{tag}");
+        assert_eq!(nrep.solving_degree_max, xrep.solving_degree_max, "{tag}");
+        assert_eq!(nrep.degree_reached, xrep.degree_reached, "{tag}");
+        assert_eq!(nrep.pairs_above_bound, xrep.pairs_above_bound, "{tag}");
+        assert_eq!(nrep.muladds, xrep.muladds, "{tag}");
+        assert_eq!(nrep.critical_pairs_reduced, xrep.critical_pairs_reduced, "{tag}");
+        assert_eq!(nrep.tower_pairs_reduced, xrep.tower_pairs_reduced, "{tag}");
+        assert_eq!(nrep.pairs_chain_skipped, xrep.pairs_chain_skipped, "{tag}");
+        assert_eq!(nrep.pairs_product_skipped, xrep.pairs_product_skipped, "{tag}");
+        assert_eq!(nrep.reducer_rows, xrep.reducer_rows, "{tag}");
+        assert_eq!(nrep.max_cols, xrep.max_cols, "{tag}");
+        assert_eq!(nrep.max_rows, xrep.max_rows, "{tag}");
+        assert_eq!(nrep.max_nnz, xrep.max_nnz, "{tag}");
+        assert_eq!(nrep.trace.len(), xrep.trace.len(), "{tag}");
+        for (a, b) in nrep.trace.iter().zip(&xrep.trace) {
+            assert_eq!(trace_fields(a), trace_fields(b), "{tag}");
+        }
+        // The basis is the same, element for element.
+        assert_eq!(nrep.basis.len(), xrep.basis.len(), "{tag}");
+        for (a, b) in nrep.basis.iter().zip(&xrep.basis) {
+            let am: Vec<(Vec<u32>, u32)> = a
+                .monos
+                .iter()
+                .zip(&a.coefs)
+                .map(|(&m, &c)| (narrow_exps(nring, m), c))
+                .collect();
+            let bm: Vec<(Vec<u32>, u32)> = b
+                .monos
+                .iter()
+                .zip(&b.coefs)
+                .map(|(&m, &c)| (x_exponents(m, xring.n_tower(), xring.n_free), c))
+                .collect();
+            assert_eq!(am, bm, "{tag}");
+        }
+    }
+
     #[test]
     fn a_radix_2_ring_gives_the_radix_2_engines_run_step_for_step() {
         let mut rng = rand::rngs::StdRng::seed_from_u64(77);
@@ -1928,53 +1985,15 @@ mod tests {
                 for (a, b) in ninput.iter().zip(&xinput) {
                     assert_eq!(&xring.xpoly_from_rpoly(a), b);
                 }
-                let opts = narrow::TowerF4Options::new(7);
-                let nrep = f4_tower(&ninput, &nring, &opts);
-                let xrep = f4_radix(&xinput, &xring, &opts);
                 let tag = format!("p {p} blocks {blocks} t {t} free {n_free} trial {trial}");
-                println!(
-                    "identity {tag}: steps {}, tower pairs {}, muladds {}, inconsistent {}, D {}",
-                    xrep.steps,
-                    xrep.tower_pairs_reduced,
-                    xrep.muladds,
-                    xrep.inconsistent,
-                    xrep.solving_degree_max
+                assert_same_run(
+                    &nring,
+                    &xring,
+                    &ninput,
+                    &xinput,
+                    &narrow::TowerF4Options::new(7),
+                    &tag,
                 );
-                assert_eq!(nrep.inconsistent, xrep.inconsistent, "{tag}");
-                assert_eq!(nrep.steps, xrep.steps, "{tag}");
-                assert_eq!(nrep.solving_degree_max, xrep.solving_degree_max, "{tag}");
-                assert_eq!(nrep.degree_reached, xrep.degree_reached, "{tag}");
-                assert_eq!(nrep.pairs_above_bound, xrep.pairs_above_bound, "{tag}");
-                assert_eq!(nrep.muladds, xrep.muladds, "{tag}");
-                assert_eq!(nrep.critical_pairs_reduced, xrep.critical_pairs_reduced, "{tag}");
-                assert_eq!(nrep.tower_pairs_reduced, xrep.tower_pairs_reduced, "{tag}");
-                assert_eq!(nrep.pairs_chain_skipped, xrep.pairs_chain_skipped, "{tag}");
-                assert_eq!(nrep.pairs_product_skipped, xrep.pairs_product_skipped, "{tag}");
-                assert_eq!(nrep.reducer_rows, xrep.reducer_rows, "{tag}");
-                assert_eq!(nrep.max_cols, xrep.max_cols, "{tag}");
-                assert_eq!(nrep.max_rows, xrep.max_rows, "{tag}");
-                assert_eq!(nrep.max_nnz, xrep.max_nnz, "{tag}");
-                assert_eq!(nrep.trace.len(), xrep.trace.len(), "{tag}");
-                for (a, b) in nrep.trace.iter().zip(&xrep.trace) {
-                    assert_eq!(trace_fields(a), trace_fields(b), "{tag}");
-                }
-                // The basis is the same, element for element.
-                assert_eq!(nrep.basis.len(), xrep.basis.len(), "{tag}");
-                for (a, b) in nrep.basis.iter().zip(&xrep.basis) {
-                    let am: Vec<(Vec<u32>, u32)> = a
-                        .monos
-                        .iter()
-                        .zip(&a.coefs)
-                        .map(|(&m, &c)| (narrow_exps(&nring, m), c))
-                        .collect();
-                    let bm: Vec<(Vec<u32>, u32)> = b
-                        .monos
-                        .iter()
-                        .zip(&b.coefs)
-                        .map(|(&m, &c)| (x_exponents(m, xring.n_tower(), xring.n_free), c))
-                        .collect();
-                    assert_eq!(am, bm, "{tag}");
-                }
             }
         }
     }
@@ -2279,6 +2298,58 @@ mod tests {
             assert_eq!(minimal(&mine), g, "{tag}: leading monomial ideals differ");
         }
         (sols.len(), rep.solving_degree_max)
+    }
+
+    /// The same comparison on consistent systems with planted solutions
+    /// over Kummer towers (complete runs, then a degree-cut run), where the
+    /// F4 reaches a non-trivial Groebner basis instead of a refutation.
+    #[test]
+    fn a_radix_2_ring_gives_the_radix_2_engines_run_on_planted_systems() {
+        let mut rng = rand::rngs::StdRng::seed_from_u64(78);
+        for (p, radices, m, n_eq) in [
+            (97u64, vec![2u8, 2, 2], 2usize, 1usize),
+            (97, vec![2, 2, 2], 3, 2),
+            (193, vec![2, 2, 2, 2], 2, 1),
+            (257, vec![2, 2, 2, 2, 2], 2, 1),
+            (193, vec![2, 2, 2], 3, 3),
+        ] {
+            for trial in 0..3 {
+                let d = Decomp::new(&mut rng, p, &radices, m, n_eq, 2, 5, true);
+                let nring = narrow::TowerRing {
+                    p,
+                    rules: d
+                        .ring
+                        .rules
+                        .iter()
+                        .map(|r| narrow::SquareRule {
+                            next: r.next,
+                            a: r.b[1],
+                            b: r.b[0],
+                            c: r.c[1],
+                            d: r.c[0],
+                        })
+                        .collect(),
+                    n_free: 0,
+                };
+                let raws = d.raw_y();
+                let ninput: Vec<narrow::RPoly> = raws.iter().map(|r| nring.from_raw(r)).collect();
+                let xinput: Vec<XPoly> = raws.iter().map(|r| d.ring.from_raw(r)).collect();
+                for max_degree in [200u32, 4] {
+                    let tag = format!(
+                        "planted p {p} t {} m {m} eq {n_eq} trial {trial} cut {max_degree}",
+                        radices.len()
+                    );
+                    assert_same_run(
+                        &nring,
+                        &d.ring,
+                        &ninput,
+                        &xinput,
+                        &narrow::TowerF4Options::new(max_degree),
+                        &tag,
+                    );
+                }
+            }
+        }
     }
 
     #[test]
