@@ -25,8 +25,12 @@ The fixed field representation is F2[z]/(z^7+z+1), with E(a,b): `y^2+xy=x^3+a x^
 
 The classical W1 slice has traces `{-15,-1,1,15}`. Every observed trace is ordinary and outside the ±13 exceptional subfield-isogeny traces, so the genus-seven floor applies to all 112 curves. The degree-seven place bound `18-t>=0` is met in every row. The six nonclassical-only trace classes are a concrete *arithmetic search subset* of the **published** W1 family. The equations and subset do not constitute a new vulnerable family; the orders here are small and this run has no attack-cost measurement.
 
+A second native program [replayed all 112 orders](reports/replay-20261115T0833Z/RUN.md) by directly testing every (x,y) pair in the fixed field, with a separate carryless multiplication routine. It matched the CSV orders, traces and place-count values. This is a local algorithmic cross-check; a PCC signed verdict and independent geometric review remain open.
+
+[`TraceExceptions.lean`](TraceExceptions.lean) checks the five q=2 base-trace evaluations in Lean 4.35.0; `#print axioms` reports none. This finite theorem does not cover the geometric transfer or Diem's theorem.
+
 ## Next discriminating step
 
 For a nonclassical-only trace class, construct a genus-seven Y over F2 with L-polynomial `1-tT^7+128T^14`, or exclude that Jacobian isogeny class. If Y exists, construct an explicit k-rational algebraic correspondence from A to J_Y and evaluate it on a chosen prime-order source subgroup. Then run complete relation/decomposition, linear algebra, target recovery and matched rho with setup charged. A point-count match alone does not supply a map or a lower-cost logarithm algorithm.
 
-![Trace classes of classical and nonclassical W1 coefficients](trace-classes.svg)
+![Trace classes of classical and nonclassical W1 coefficients](trace-classes.svg){width=80%}

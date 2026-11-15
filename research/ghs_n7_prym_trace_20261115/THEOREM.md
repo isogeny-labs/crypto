@@ -12,6 +12,8 @@ Define `S_0(u)=2`, `S_1(u)=u`, and `S_m(u)=u S_(m-1)(u)-q S_(m-2)(u)`. Then A is
 
 For q=2, the exceptional traces are `0, ±13, ±16`; ordinarity makes t odd, leaving `±13`. For q=4, the exceptional traces are `0, ±87, ±128, ±251, ±256`; ordinarity again leaves `±87, ±251`.
 
+[`TraceExceptions.lean`](TraceExceptions.lean) kernel-checks the five q=2 evaluations of `S_7(u)` and reports no axioms for that finite theorem. It does not formalize the prime-degree irreducibility criterion, Diem's simplicity theorem, or any curve geometry.
+
 **Argument.** Let pi be a root of `X^2-tX+q^ell`. It is nonreal for ordinary E. By the binomial irreducibility criterion for odd prime ell, `F_A` is reducible exactly when pi is an ell-th power `beta^ell` in `Q(pi)`. Such beta is an algebraic integer with conjugates of complex absolute value `sqrt(q)`, norm q, and integer trace u in the Hasse interval. Then `t=beta^ell+bar(beta)^ell=S_ell(u)`. Conversely, such a u gives a quadratic factor `X^2-uX+q` of `F_A`, because its roots have ell-th powers among the roots of `X^2-tX+q^ell`. Irreducibility of the Frobenius polynomial is equivalent to simplicity for this ordinary abelian variety. Diem's theorem supplies the same conclusion through the endomorphism algebra of the Weil restriction.
 
 If `t` is not exceptional and an algebraic homomorphism `phi:A -> J_Y` over k is nonzero, simplicity makes `ker(phi)` finite and `dim image(phi)=ell`. Hence `genus(Y)>=ell`. In particular, any GHS conorm-norm transfer that is nonzero on a source subgroup has genus at least ell. The implication does not cover arbitrary abstract homomorphisms between groups of rational points, nor does it say a genus-ell Jacobian or efficient attack exists.
