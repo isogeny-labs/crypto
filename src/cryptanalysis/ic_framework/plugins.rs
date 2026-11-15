@@ -2606,6 +2606,9 @@ pub struct WWalkOracle<E> {
     free_checked: u64,
     free_emitted: u64,
     probe_hits: u64,
+    /// `lcheck=1` (with `tw=1|2`): both `[d]G = Q` checks read the target
+    /// walk's stored `[2^i]G` ladder.
+    lcheck: bool,
 }
 
 impl<E> WWalkOracle<E> {
@@ -2617,6 +2620,7 @@ impl<E> WWalkOracle<E> {
             free_checked: 0,
             free_emitted: 0,
             probe_hits: 0,
+            lcheck: false,
         }
     }
 
@@ -2628,6 +2632,22 @@ impl<E> WWalkOracle<E> {
     /// The `tw=1` walk of the last `prepare`, for reports and tests.
     pub fn target_walk(&self) -> Option<&TargetWalk<E>> {
         self.tw_table.as_ref()
+    }
+
+    /// With `lcheck=1`: the target walk's `[2^i]G` chain
+    /// ([`TargetWalk::g_ladder`], already paid for in `prepare`), for the
+    /// pipeline's recovery check
+    /// ([`collect_and_solve_relations_touching_ladder`]); `None` otherwise.
+    ///
+    /// [`collect_and_solve_relations_touching_ladder`]: crate::cryptanalysis::ic_boundary::collect_and_solve_relations_touching_ladder
+    pub fn recovery_ladder(&self) -> Option<Vec<E>>
+    where
+        E: Copy + PartialEq,
+    {
+        self.tw_table
+            .as_ref()
+            .filter(|_| self.lcheck)
+            .map(TargetWalk::g_ladder)
     }
 }
 
@@ -2664,6 +2684,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T; 2 (needs g=1, grow=2 and a two-seed base in distinct columns): jumps [α]P1 + [α']P2 + [γ]G + [β]Q, every collision a row du1·s1 + du2·s2 + db·log Q = −dz (rows with du1 = du2 = 0 mod r dropped), stop at rank 3, cap 3T (default 0)"),
             ("cj", "1 (needs tw=1 or tw=2): build the jumps by chained additions from two base combinations [γ]G + [β]Q (the seed parts from the doubled multiples) instead of independent scalar multiplications (default 0)"),
             ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
+            ("lcheck", "1 (needs tw=1 or tw=2): the [d]G = Q checks (the build's lazy final check, charged as tw_lazy_check_*, and the pipeline's recovery check, charged to the verification phase's group ops, where the pipeline reads the oracle's recovery ladder) compute [d]G from the [2^i]G ladder (i < bits(r)) that the target walk's set-up already doubled and paid for, one addition per set bit of d (the first free) instead of a double-and-add; the ladder is retained at no group operation; walk, stream, collisions, rows and entries are unchanged, only the check counts move (default 0)"),
             ("sib", "1 to 16 (needs tw=1 or tw=2 and pool=M; default off): sibling points.  Every parent P draws its own random m-subset of a pool of M jump points (a product set J = A_i + K_j: a = 4 seed parts, or 8 from M = 256, and M/a chained parts K_j = K_(j-1) + K_(j-2), built as cj=1 chains them; set-up about a·popcount + M/a + M additions), and for each chosen J forms the two x-only children x(P ± J) from ONE inversion 1/(x_J − x_P); all 2m children are keyed (negation folded) with coefficient vectors c_P ± c_J and a key collision among any stored points is a row as in the target walk (lazy applies); the walk continues from P + J_h with h the first of the subset; the two known-copy minus children are not formed; stored points are capped at 3T.  Charging: a pair performs inv + 2 mul + 2 sqr + 8 add; it is charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add, the difference), so its bitop/v1 price equals its field work, and the band prices the second point at w; the continuing child's y (mul + 2 add) is the counter sibling_lift_products, once a parent; a pair whose minus child is skipped is the addition alone (one mul and two adds above what it performs); field_ops are counted as performed, never through the addition; a collision's x-only point gets its sign resolved at that time (one more addition, charged)"),
             ("pool", "sib to 512 (needs sib): the sibling pool's size M (default off)"),
             ("aut", "3 (needs tw=1 or tw=2; j = 0 prime curves over p ≡ 1 mod 3 with 3 | r − 1): orbit-canonical keys under the order-3 automorphism ζ₃(x, y) = (ωx, y) = [κ](x, y) and negation (A = 6): each stored or probed point is keyed by min(x, ωx, ω²x), two field multiplications, listed as the unpriced counter aut_canonicalisations_uncharged exactly as rho.cubic lists its canonicalisations_uncharged (the §5a band charges it at w; bitop/v1 prices it as 2 field multiplications and 2 word compares); the rotation is stored with the entry, and a collision at rotation difference d is the row of E_t = ±[κ^d]E_s (the kept coefficients scaled by κ^d mod r), with lazy, cv=0, sib and the verified recomputation unchanged; the [κ]G = ζ₃(G) check is charged to the set-up (default off)"),
@@ -2713,6 +2734,11 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         if cj && tw == 0 {
             return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
         }
+        let lcheck = params.flag("lcheck");
+        if lcheck && tw == 0 {
+            return Err("wwalk: lcheck=1 needs tw=1 or tw=2".into());
+        }
+        self.lcheck = lcheck;
         if lazy && !opts.g_jumps {
             return Err("wwalk: lazy=1 needs g=1".into());
         }
@@ -2757,7 +2783,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                 return Err("wwalk: sib with cv=0 is not supported".into());
             }
             let walk = if aut {
-                TargetWalk::build_ext_aut(
+                TargetWalk::build_lcheck(
                     ctx.group,
                     ctx.generator,
                     ctx.target,
@@ -2773,12 +2799,14 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                     cv,
                     sib,
                     true,
+                    lcheck,
                 )?
             } else if sib.is_some() {
                 if !cv {
                     return Err("wwalk: sib with cv=0 is not supported".into());
                 }
-                TargetWalk::build_ext_sib(
+                // `build_ext_sib` (chained jumps) with `lcheck`.
+                TargetWalk::build_lcheck(
                     ctx.group,
                     ctx.generator,
                     ctx.target,
@@ -2787,14 +2815,18 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                     ctx.cofactor,
                     x,
                     jumps,
+                    true,
                     seed,
                     lazy,
                     tw,
                     cv,
                     sib,
+                    false,
+                    lcheck,
                 )?
             } else {
-                TargetWalk::build_ext_cv(
+                // `build_ext_cv` with `lcheck`.
+                TargetWalk::build_lcheck(
                     ctx.group,
                     ctx.generator,
                     ctx.target,
@@ -2808,6 +2840,9 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                     lazy,
                     tw,
                     cv,
+                    None,
+                    false,
+                    lcheck,
                 )?
             };
             self.free_pending = true;

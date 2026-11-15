@@ -10351,6 +10351,12 @@ pub struct TargetWalk<E> {
     pub lazy_checks: u64,
     pub lazy_failures: u64,
     pub lazy_dropped_rows: u64,
+    /// `lcheck=1`: the in-build final check (with `lazy`) computes `[d]G`
+    /// with [`ladder_mul`] over the set-up's `[2^i]G` chain
+    /// ([`TargetWalk::g_ladder`]) instead of `g.mul`, charged to the same
+    /// `lazy_check_ops`; the pipeline's recovery check reads the same
+    /// ladder.  Not emitted as a counter: only the check counts move.
+    pub lcheck: bool,
     /// `sib=m,pool=M` ([`TargetWalk`] sibling walk): `Some((m, M))`.
     pub sib: Option<(usize, usize)>,
     /// With `sib`: parents expanded, sibling pairs formed (each one group
@@ -10593,6 +10599,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             None,
             None,
             false,
+            false,
         )
     }
 
@@ -10631,6 +10638,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             verify_collisions,
             None,
             sib,
+            false,
             false,
         )
     }
@@ -10673,7 +10681,61 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             None,
             sib,
             aut,
+            false,
         )
+    }
+
+    /// [`TargetWalk::build_ext_aut`] with `lcheck` (`wwalk:...,lcheck=1`):
+    /// the in-build final `[d]G = Q` check of a `lazy` walk computes `[d]G`
+    /// with [`ladder_mul`] over the set-up's stored `[2^i]G` chain
+    /// (`i < bits(r)`, already paid for), charged as `tw_lazy_check_*`
+    /// exactly as before.  The walk, its stream, its collisions, rows and
+    /// entries are unchanged; `lcheck = false` is `build_ext_aut` exactly.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_lcheck<G: CountedGroup<Elt = E>>(
+        g: &G,
+        generator: E,
+        target: E,
+        fb: &FactorBase<G::Elt>,
+        r: u64,
+        h: u64,
+        x: f64,
+        jumps: usize,
+        cheap: bool,
+        seed: u64,
+        lazy: bool,
+        seeds: usize,
+        verify_collisions: bool,
+        sib: Option<(usize, usize)>,
+        aut: bool,
+        lcheck: bool,
+    ) -> Result<Self, String> {
+        Self::build_inner(
+            g,
+            generator,
+            target,
+            fb,
+            r,
+            h,
+            x,
+            jumps,
+            cheap || sib.is_some(),
+            seed,
+            lazy,
+            seeds,
+            verify_collisions,
+            None,
+            sib,
+            aut,
+            lcheck,
+        )
+    }
+
+    /// `[2^i]G` for `i < bits(r)`: the generator chain the set-up doubled
+    /// (and charged) for the jumps, cut at the first identity.  Reading it
+    /// costs no group operation.
+    pub fn g_ladder(&self) -> Vec<E> {
+        self.pows[1].iter().map_while(|p| *p).collect()
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -10694,6 +10756,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         fault: Option<u64>,
         sib: Option<(usize, usize)>,
         aut: bool,
+        lcheck: bool,
     ) -> Result<Self, String> {
         let opts = WalkOpts {
             g_jumps: true,
@@ -10865,6 +10928,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             lazy_checks: 0,
             lazy_failures: 0,
             lazy_dropped_rows: 0,
+            lcheck,
             sib,
             sib_parents: 0,
             sib_pairs: 0,
@@ -10906,6 +10970,9 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let mut verify_ops = GroupOps::default();
         let mut check_ops = GroupOps::default();
         let mut lazy_active = lazy;
+        // `lcheck=1`: the final check reads the set-up's `[2^i]G` chain
+        // (copied, no group operation); empty otherwise.
+        let check_ladder: Vec<E> = if lcheck { tw.g_ladder() } else { Vec::new() };
         // `cv=0` and `lazy=1` store the key's sign bit in bit 127 of `u`.
         let store_sign = lazy || !verify_collisions;
         let _ = fault;
@@ -11046,7 +11113,14 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             // and test [d]G = Q.
             tw.lazy_checks += 1;
             let d = tw.solve_log_q(r, h);
-            let ok = d.is_some_and(|d| g.mul(&mut check_ops, generator, d) == target);
+            let ok = d.is_some_and(|d| {
+                let check = if check_ladder.is_empty() {
+                    g.mul(&mut check_ops, generator, d)
+                } else {
+                    ladder_mul(g, &mut check_ops, &check_ladder, d)
+                };
+                check == target
+            });
             if ok {
                 break;
             }
@@ -13207,6 +13281,36 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
     touch: impl Fn(&G::Elt),
     line_guard: bool,
 ) -> PipelineOutcome {
+    collect_and_solve_relations_touching_ladder(
+        g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
+        oracle, touch, line_guard, None,
+    )
+}
+
+/// [`collect_and_solve_relations_touching`] whose recovery check `[d]G`
+/// reads a stored ladder `[2^i]G` ([`ladder_mul`]) when `verify_ladder` is
+/// a nonempty ladder, charged to the same verification ops; `None` (or an
+/// empty ladder) is `collect_and_solve_relations_touching` bit for bit.
+/// The `wwalk` oracle hands its target walk's ladder here with `lcheck=1`.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching_ladder<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    line_guard: bool,
+    verify_ladder: Option<&[G::Elt]>,
+) -> PipelineOutcome {
     let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
     if line_guard {
         collect_and_solve_relations_scaled_touching(
@@ -13226,6 +13330,7 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
             oracle,
             touch,
             GuardLineSet::with_capacity(capacity),
+            verify_ladder,
         )
     } else {
         collect_and_solve_relations_scaled_touching(
@@ -13245,6 +13350,7 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
             oracle,
             touch,
             fast_map(capacity),
+            verify_ladder,
         )
     }
 }
@@ -13287,6 +13393,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         oracle,
         |_| {},
         fast_map(if targets.is_guarded() { 1 << 12 } else { 0 }),
+        None,
     )
 }
 
@@ -13312,6 +13419,7 @@ fn collect_and_solve_relations_scaled_touching<
     mut oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
     touch: impl Fn(&G::Elt),
     mut seen: R,
+    verify_ladder: Option<&[G::Elt]>,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
     let mut rel = PhaseCost::default();
@@ -13861,7 +13969,12 @@ fn collect_and_solve_relations_scaled_touching<
                 la_timed = true;
                 measurement::mark(measurement::Phase::RecoveryCheck);
                 let v_start = Instant::now();
-                let check = g.mul(&mut ver.group_ops, generator, d);
+                let check = match verify_ladder {
+                    Some(ladder) if !ladder.is_empty() => {
+                        ladder_mul(g, &mut ver.group_ops, ladder, d)
+                    }
+                    _ => g.mul(&mut ver.group_ops, generator, d),
+                };
                 ver.wall_ns = v_start.elapsed().as_nanos() as u64;
                 if check == target {
                     recovered = Some(d);
@@ -20756,6 +20869,176 @@ mod wwalk_table_tests {
         }
     }
 
+    /// `lcheck`: [`ladder_mul`] over the target walk's stored `[2^i]G`
+    /// chain ([`TargetWalk::g_ladder`]) and `g.mul` agree on `[d]G` for 50
+    /// random `d` on a 20-bit prime-order curve, and the ladder charges no
+    /// more group operations than the double-and-add (no doubling at all
+    /// with a full ladder); a short ladder's high-bit path agrees too.
+    #[test]
+    fn lcheck_ladder_mul_agrees_with_mul_and_charges_no_more() {
+        let inst = prime_instance_for(20, 3);
+        let g = &inst.curve;
+        let (r, h) = (inst.r, inst.cofactor);
+        let gen = inst.generator_point();
+        let mut cops = GroupOps::default();
+        let q = g.mul(&mut cops, gen, 1 + r / 3);
+        let fb = prime_factor_base(&inst, 1);
+        let tw = TargetWalk::build_lcheck(
+            g, gen, q, &fb, r, h, 1.5, 16, true, 5, true, 1, true, None, false, true,
+        )
+        .unwrap();
+        let ladder = tw.g_ladder();
+        let rbits = (64 - (r - 1).leading_zeros()) as usize;
+        assert_eq!(ladder.len(), rbits);
+        assert_eq!(ladder[0], gen);
+        for w in ladder.windows(2) {
+            assert_eq!(g.double(&mut cops, w[0]), w[1]);
+        }
+        let mut rng = StdRng::seed_from_u64(0x1C4E_C4);
+        let (mut lad_total, mut mul_total) = (0u64, 0u64);
+        for _ in 0..50 {
+            let d = rng.gen_range(0..r);
+            let (mut lo, mut mo) = (GroupOps::default(), GroupOps::default());
+            let a = ladder_mul(g, &mut lo, &ladder, d);
+            let b = g.mul(&mut mo, gen, d);
+            assert_eq!(a, b, "d = {d}");
+            assert_eq!(lo.scalar_mults, mo.scalar_mults);
+            assert_eq!(lo.doubles, 0);
+            assert!(lo.adds + lo.doubles <= mo.adds + mo.doubles, "d = {d}");
+            assert!(lo.gae() <= mo.gae(), "d = {d}");
+            lad_total += lo.adds + lo.doubles;
+            mul_total += mo.adds + mo.doubles;
+            // A ladder shorter than bits(r): the high bits by double-and-add.
+            let mut so = GroupOps::default();
+            assert_eq!(ladder_mul(g, &mut so, &ladder[..rbits / 2], d), b);
+        }
+        assert!(lad_total < mul_total);
+    }
+
+    /// `lcheck=1` against `lcheck=0` (same seed, lazy, one and two seeds,
+    /// plain and chained jumps): the walk, its collisions, rows, entries,
+    /// rank and every counter but `tw_lazy_check_adds|doubles` are equal;
+    /// the final check runs as often, succeeds as often, and charges no
+    /// more.  `lcheck=0` is `build_ext` exactly.  The pipeline's recovery
+    /// check over the walk's rows recovers the same log with the ladder,
+    /// charging no more verification ops.
+    #[test]
+    fn lcheck_changes_only_the_check_counters() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let (r, h) = (inst.r, inst.cofactor);
+        let gen = inst.generator_point();
+        let mut cops = GroupOps::default();
+        let mut checks = 0u64;
+        let mut pipeline_runs = 0u64;
+        for seeds in [1usize, 2] {
+            let fb = prime_factor_base(&inst, seeds);
+            for cheap in [false, true] {
+                for seed in 0..16u64 {
+                    let k = 1 + (seed * 7919 + 13) % (r - 1);
+                    let q = g.mul(&mut cops, gen, k);
+                    let build = |lcheck| {
+                        TargetWalk::build_lcheck(
+                            g, gen, q, &fb, r, h, 1.5, 16, cheap, seed, true, seeds, true, None,
+                            false, lcheck,
+                        )
+                        .unwrap()
+                    };
+                    let (a, b) = (build(false), build(true));
+                    let base = TargetWalk::build_ext(
+                        g, gen, q, &fb, r, h, 1.5, 16, cheap, seed, true, seeds,
+                    )
+                    .unwrap();
+                    assert_eq!(base.work_counters(), a.work_counters());
+                    assert_eq!(base.build_ops, a.build_ops);
+                    assert_eq!(base.lazy_check_ops, a.lazy_check_ops);
+                    assert_eq!((a.lcheck, b.lcheck), (false, true));
+                    assert_eq!(a.steps, b.steps);
+                    assert_eq!(a.entries, b.entries);
+                    assert_eq!(a.collisions, b.collisions);
+                    assert_eq!(a.rows, b.rows);
+                    assert_eq!((a.rank, a.zero_rows), (b.rank, b.zero_rows));
+                    assert_eq!(a.jump_coefs, b.jump_coefs);
+                    assert_eq!(
+                        (a.setup_ops, a.walk_ops, a.verify_ops),
+                        (b.setup_ops, b.walk_ops, b.verify_ops)
+                    );
+                    assert_eq!(
+                        (a.lazy_checks, a.lazy_failures, a.lazy_dropped_rows),
+                        (b.lazy_checks, b.lazy_failures, b.lazy_dropped_rows)
+                    );
+                    assert_eq!(a.lazy_check_ops.scalar_mults, b.lazy_check_ops.scalar_mults);
+                    assert!(
+                        b.lazy_check_ops.adds + b.lazy_check_ops.doubles
+                            <= a.lazy_check_ops.adds + a.lazy_check_ops.doubles
+                    );
+                    assert_eq!(b.lazy_check_ops.doubles, 0);
+                    checks += b.lazy_checks;
+                    let (ca, cb) = (a.work_counters(), b.work_counters());
+                    assert_eq!(ca.keys().collect::<Vec<_>>(), cb.keys().collect::<Vec<_>>());
+                    for (name, v) in &ca {
+                        if !name.starts_with("tw_lazy_check_") {
+                            assert_eq!(Some(v), cb.get(name), "{name}");
+                        }
+                    }
+                    // The pipeline's recovery check over the walk's rows.
+                    if b.rank < b.need() {
+                        continue;
+                    }
+                    let run = |ladder: Option<&[PrimePoint]>| {
+                        let mut matrix = IncrementalGauss::new(fb.columns + 1, r);
+                        let mut first = true;
+                        collect_and_solve_relations_touching_ladder(
+                            g,
+                            gen,
+                            q,
+                            r,
+                            h,
+                            &fb,
+                            seed,
+                            64,
+                            TargetSource::Random,
+                            RestartPool::Lazy,
+                            &mut matrix,
+                            CompletionRule::TargetPinned,
+                            |_, _, _, _, _| {
+                                if !std::mem::take(&mut first) {
+                                    return Vec::new();
+                                }
+                                b.rows
+                                    .iter()
+                                    .map(|row| Relation::Row {
+                                        columns: row.columns.clone(),
+                                        a: row.a,
+                                        b: row.b,
+                                    })
+                                    .collect()
+                            },
+                            |_| {},
+                            false,
+                            ladder,
+                        )
+                    };
+                    let ladder = b.g_ladder();
+                    let (pa, pb, pn) = (run(None), run(Some(&ladder)), run(Some(&[])));
+                    assert_eq!(pa.recovered, Some(k));
+                    assert!(pa.verified && pb.verified);
+                    assert_eq!(pa.recovered, pb.recovered);
+                    assert_eq!(pa.verify.group_ops, pn.verify.group_ops);
+                    assert_eq!(pa.trials, pb.trials);
+                    assert_eq!(pa.relations.group_ops, pb.relations.group_ops);
+                    assert_eq!(pb.verify.group_ops.doubles, 0);
+                    assert!(
+                        pb.verify.group_ops.adds + pb.verify.group_ops.doubles
+                            <= pa.verify.group_ops.adds + pa.verify.group_ops.doubles
+                    );
+                    pipeline_runs += 1;
+                }
+            }
+        }
+        assert!(checks > 0 && pipeline_runs > 0);
+    }
+
     /// Fault injection: one stored coefficient (`z` of the first collision's
     /// kept entry) is corrupted.  The verified build rejects the collision.
     /// The lazy target walk keeps the row, its in-build final check fails,
@@ -20793,6 +21076,7 @@ mod wwalk_table_tests {
                         Some(0),
                         None,
                         false,
+                        false,
                     )
                     .unwrap();
                     let lazy = TargetWalk::build_inner(
@@ -20811,6 +21095,7 @@ mod wwalk_table_tests {
                         true,
                         Some(0),
                         None,
+                        false,
                         false,
                     )
                     .unwrap();
