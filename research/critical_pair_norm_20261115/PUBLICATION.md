@@ -157,3 +157,39 @@ plain notation fixed both before the final readable render. Existing native
 round reports, source bindings and archives stay unchanged. The PR title/body
 are rewritten around both the native qualification and this cover-cost review.
 The new scoped statement is PCC-20261115-c4aaf8, unverified.
+
+2026-11-15T15:32Z metadata correction: parent4302 merged as230dfbc408
+at14:49:04Z, final head2da6eb137f. Its current validation43725611298,
+size43725611269, artifacts43725611200 and latest PCC43725611409 pass;
+the earlier same-head PCC run was superseded/cancelled, not called a pass.
+PR4304 is retargeted to main with auto-merge, with its own single Copilot
+request at14:55:21Z:
+https://github.com/isogeny-labs/crypto/pull/4304#issuecomment-6896438066 .
+The shared daily journal remains untouched while pending; this paragraph and
+the corrected body replace stale stacked-parent status only. Native sources,
+both archives/proofs and all report bytes remain unchanged. [pcc:unverified]
+
+Workflow correction: validation-gate runs on unfiltered pull_request; only
+size/artifacts are main-only among those three. Earlier continuation notes
+grouped them loosely as main-only. The parent's ordinary PR workflows were
+absent while its merge conflict persisted; after the normal main merge its
+required head checks ran. No credential change or CI retry was needed.
+[pcc:unverified]
+
+2026-11-15T15:57Z: after an hour without a Copilot response, fallback comment
+https://github.com/isogeny-labs/crypto/pull/4304#issuecomment-6897216934
+precedes a normal merge of freshly fetched unchanged main230dfbc408 into
+6bc637d2ad. Only the daily journal conflicts. The corrected source-pinned
+preview preserves all198incoming and205own complete blocks as a multiset,
+including26historical duplicate headings; their union is206blocks before
+one new handoff entry. The first preview's uniqueness assumption failed
+before any journal write. Both preview sources and the actual pins/receipt
+are retained; no heading-based content selection or history rewrite.
+[pcc:unverified]
+
+All19qualification002 build/source/binary and9copied-wrapper bindings match
+post-merge. Both whole raw SHA256identities are unchanged. PCC1084 retains
+main1080 as an exact prefix; lessons58entries/0errors locally. No new native
+run, cap change, proof/report rewrite or PCC append is introduced. This head
+requires its own current validation/size/artifact/PCC checks after push;
+previous passes and cancelled runs are not carried forward. [pcc:unverified]
