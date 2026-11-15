@@ -21841,6 +21841,13 @@ mod tests {
                 continue;
             };
             checked += 1;
+            // The orbit-by-orbit route must answer here, not fall back.
+            let fc = FastCurve::new(&kc.curve).expect("these fields fit in a word");
+            let (projected, _) = project_by_frobenius_orbits(&kc, &fc, &fb);
+            assert!(
+                signed_orbit_map_by_orbits(&kc, &fc, &fb, &projected).is_some(),
+                "degree {degree}: the orbit-by-orbit map fell back"
+            );
             let fast =
                 projected_signed_orbit_map_fast(&kc, &fb).expect("these fields fit in a word");
             let (orbit_of, representatives) = projected_signed_orbit_map_general(&kc, &fb);
