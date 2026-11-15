@@ -10,9 +10,9 @@ or other Jacobian, a finite field, an isogenous curve) is accepted.
 It sits on top of AGENTS.md "Success criterion", "Tracks of index calculus",
 "The rule: boundary, table, ratio" (§1 to §15), "IC measurement rules",
 `docs/VALIDATION_GATE.md` and `docs/bounds/README.md`, and changes none of
-them. **For tier claims the cold end-to-end interval of section 1 governs.**
-Another reading in those documents (the online interval of "IC measurement
-rules") is reported beside it, never instead of it. Any other disagreement is
+them. **For tier claims the cold end-to-end interval of section 1 governs**,
+as AGENTS.md "IC measurement rules" now also states (owner, 2026-11-15); the
+online interval is reported beside it, never instead of it. Any other disagreement is
 fixed in this file by the PR that finds it, and no claim relies on the
 disagreement in the meantime.
 

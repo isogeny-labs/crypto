@@ -883,6 +883,15 @@ follows the PR until it lands, under the check-in and merge rules below.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
+- **Record the episode when the PR merges or closes** (owner, 2026-11-15).
+  The session that owned the PR runs `python3 tools/autonomy_report.py
+  add-episode` (task, class, PR, start and end, result, merged, CI state, each
+  incident with whether it was fixed without a human) and one `add-intervention`
+  per human message after the first prompt, classed by the rules in
+  `benchmarks/agent-autonomy/README.md` (store the text's SHA-256, never the
+  text). It records the matching `lessons.py outcome`. Both land with the next
+  PR or a small follow-up. Fourteen days later any session records
+  `set-check --check reverted` from `git log`.
 - **Check in on PRs you opened.** Follow the PR's activity: CI results, review
   comments, merge-state changes, and merges or closes. Where the runtime
   provides PR-activity subscriptions (`subscribe_pr_activity`), use them. Where
@@ -2167,6 +2176,16 @@ exactly one target and pair IC with Pollard rho on that same point under the
 same resource envelope. A panel of independent points is a set of separate
 one-target workloads, with one result row per point; do not combine them into
 a multi-target DLP run or replace the per-target results with a batch average.
+
+**Cold interval governs the primary comparison** (owner, 2026-11-15). The
+primary IC-vs-rho comparison, every leaderboard ratio and every claim tier of
+[`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md) use the cold
+end-to-end cost in counted operations: from the instance to a verified scalar,
+with all target-independent setup charged in full to the one target ("Success
+criterion", §2, §8). The online interval defined below is reported beside it as
+a separate row labelled `online-only`; it never replaces the cold cost and never
+supports a claim to beat rho on its own. Operation counts are the metric and
+wall time a practicality note (§6), for both rows.
 
 Start the IC online clock when target-dependent computation begins, after
 reusable target-independent base, index, relation-log, or solver setup is
