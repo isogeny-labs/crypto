@@ -1,3 +1,18 @@
+# Original fixed-prime IC solves all15 public cases; next paired sampler
+
+pcc/claims/PCC-20261115-61fcae.json: exactpublishedconsumerba1fae2 mirrorsnative7df2ae/reportab5c32. All60attempts/whole100records/all15publiccases/45verifiedFB36-48-64/15retainedrejectedFB30; all30phases/sevenwholeomissions101-nooutput/1465guards/exactbinaries-fullpreparedreuse/checkpoint20all28+remote-localgate0. Both63791BresultPDFpagesopened/all12partialcountergroupsretainallattempts. All343producer scientificinputs remainunchanged. [pcc:unverified]
+
+## What was done
+ActualopaqueJacobianchainpacketsexactindependentsourcepoint-Phi paths onfixedD116-39-36/originalell2773073/fullorder11092292. EntireoldICsolverliteral/contextonlyadapter/no scalar-lift-DLPfallback. BothoriginalNewTargetIC2roots0trusted/twooriginalbindingspass, abstractInducedproofsourcebridgesexplicit. Wholedata/setup/constructors/rejectedreports/firstCargo101typeerrors/source/exes/preparedcopies preservedforNEW26. [pcc:unverified]
+
+## Next work
+Adaptoldnormassistedsamplertothesamefixedmodels andrunwholepairedreports/samplingcontrols, preservingallsharedfailures. Completeprimitive/setup/knownpoint/strongreference/liveadmissioncostcensus; genuineNEW26 beforecanonicalfixtures/additiveICCI. Space~61MiB; examineonlyunheldderivedcaches/wholeidenticalclosedbytes, no researchraw/source/exes/preparedcopydeletion. [pcc:unverified]
+
+## Boundaries
+No calibratedratio/newasymptotic/novelty/ECDLPadvantage/globalCI/signedpromotion. Cold12018complete102missing/124/root124/clock101/mainledger/livebudget-capacity-isolation-image/review/signingremainopen. Vault8edec422 lockedclean/KB127. FullCI41jobSUCCESSmetadatahasseparateuncollectedartifact; scientifica93f80at258/proofCI39bb46at41 staypreciselyscoped. [pcc:unverified]
+
+---
+
 # Induced quotient-transfer proof and complete original CI accepted
 
 pcc/claims/PCC-20261115-78eb79.json: exactconsumer41e35d8 exportsproofeddc37/resultd90ad1, CI03a93f80 andnewproofCIsourced3a769. OriginalresearchbranchnormallyFF258→41 withwholeledgerprefixpreserved; soleconsumerledgerwriterisnoworiginalbranch. No force/rebase/rechain/mergerequirementwaiver. [pcc:unverified]
