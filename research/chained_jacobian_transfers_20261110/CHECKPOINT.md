@@ -1,3 +1,13 @@
+# Fresh IC/sampler CI source and prospective relation-kernel protocol published
+
+pcc/claims/PCC-20261115-043401.json: exactconsumerCBC/localf5b20f all102phases1503guards/two whole100-101 populations/15omissions/eight historicalnegatives/two timingpositives/runtime-fullpreparedclosure/both26declarationgates14bindings/independentIOverdict0. Actual local provenanceproducer3d49/consumerparent549 plus exact precommit driver manifest; CBC publishes those bytes. All343producer scientificinputs unchanged. [pcc:unverified]
+
+Prospective8e7e1c/full60originalICcalls/four passive stages/exact rank certificates/post-solver independent normBSGS/conditional Lean implications/53395Btwoopenedpageproposal is published before code. No diagnostic implementation, rank or character result yet. New separate historical verifier follows prospectiveb5e431-normal549; all raw times/counters and failedCI01-02/publication/authoring attempts preserved. [pcc:unverified]
+
+Nextcollectfresh43726524795/job132849545337 atCBC while implement published rank protocol. CBCpccledger-claims passed; bodylinttwo historicalmissingtags corrected/local lint0, failed event preserved/required nextmeaningfulsourcegate pending. Genuine26released; futureNEW27 retainsallct99postpublication/ct100-101source-native-control-failure-fullprepared-roots/reportdrafts. Fullprimitive/setup/knownpoint/strongest-reference cost/liveadmission remainsopen. [pcc:unverified]
+
+---
+
 # Paired original-model sampling complete; stronger known-point reference retained
 
 pcc/claims/PCC-20261115-bd3afc.json: exactconsumer41247ff/native4fd903/prospectiveabf432/compiled033a84. All225samples1125triples60pairs120FULLreports15jointcases45verifiedpairs90answers15sharedFB30pairs30rejections; whole101records87new14old/all33phases/eightomissions/1487guards/exactruntime-preparedcustody/checkpoint21all28remote-localgate0. All343producer scientificinputsunchanged. [pcc:unverified]
