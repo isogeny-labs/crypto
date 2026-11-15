@@ -1,5 +1,37 @@
 # Resume: native certified-relation integration
 
+## Current compact-chain follow-up
+
+Source 96f0c814d928f07e96e15361cc43a35fe7306377 adds the opt-in compact
+constructor, checked local-identity chain and third actual-root worker arm.
+Read COMPACT_REPORT.md and compact-development/ before repeating checks.
+Fixed n=6 seed-7 certificates store 442 local terms including nodes/final rows,
+versus 20852 terms in expanded final-basis certificates on both fields, with
+the same complete basis. Local product degree 14 is not a solving degree;
+the expanded-original product-degree upper bound remains 40
+`[pcc:unverified]`.
+
+Frozen qualifications pass 30 shared release tests, 31 counter-feature tests,
+six actual-root API tests, three native CLI tests and three optimized CLI
+tests. Every executed copied qualifier and child-worker hash matches before/
+after. Claims 39655c/e806a2/a014f5/3f31f7 are producer records, unverified.
+Archives/envelopes retain the executables and raw compiler output
+`[pcc:unverified]`.
+
+COMPACT_SPEED_PROTOCOL.md and claim 228ef7 preregister the requested 15x
+validation-inclusive target against both optimized F4 and the expanded route.
+No scientific timing is admitted; current checkpoint token/env/AWS transport
+are absent. An async question requests an already configured environment,
+without asking for credentials in chat. Native F4 remains unsupported on the
+53-bit prime. Do not infer runtime gains from unit clocks or cofactor counts.
+
+The following sections describe the preceding expanded integration and its
+historical immutable receipts. Those files and frozen claim subjects remain
+unchanged; debug build cache was reclaimed through Cargo while copied
+qualifiers and archived execution bytes were preserved.
+
+## Preceding expanded integration
+
 The current source is 0eb68e7d47b34793b3700ad3619a573e848508cb, built and
 qualified through the real root Rust library. Read INTEGRATION_REPORT.md and
 integration-development/rust-{build,pre-call,post-call}-03.json before

@@ -5,7 +5,14 @@ The active path has no Python dependency. It imports custom equations, builds
 certified redundant consequences, and traces individual additions, removals,
 and greedy selection on the same affine ideal.
 
-The completed follow-up is in [FINAL_REPORT.md](FINAL_REPORT.md). Five of six
+The current [compact-certificate follow-up](COMPACT_REPORT.md) integrates the
+real Rust F4 codebase and freezes a [three-arm 15x target](COMPACT_SPEED_PROTOCOL.md).
+The existing six-variable case retains 442 local cofactor terms instead of
+20852 expanded final-basis terms, with the same complete basis on both fields.
+This is a storage/correctness observation; the new runtime comparison has not
+run `[pcc:unverified]`.
+
+The earlier standalone result is in [FINAL_REPORT.md](FINAL_REPORT.md). Five of six
 predeclared fresh four-variable cases pass the per-case tenfold rule, with
 23.4–23.9× native checked-wall median ratios. One failed A/A control is excluded.
 These are local producer component observations, pending signed independent
