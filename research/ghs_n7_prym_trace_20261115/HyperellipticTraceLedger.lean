@@ -9,17 +9,18 @@ and the witness point-count arithmetic, with no axiom added for the inputs.
 
 namespace GHSN7HyperellipticTraceLedger
 
-def w1Traces : List Int := [-17, -15, -9, -7, -1, 1, 7, 9, 15, 17]
+def pairedCoefficientTraces : List Int := [-17, -15, -9, -7, -1, 1, 7, 9, 15, 17]
+def w1Traces : List Int := [-17, -9, -1, 7, 15]
 def hyperellipticTraces : List Int := [-15, -13, -9, -1, 1, 9, 13, 15]
 
 theorem w1_hyperelliptic_intersection :
     (w1Traces.filter fun t => hyperellipticTraces.contains t) =
-      [-15, -9, -1, 1, 9, 15] := by
+      [-9, -1, 15] := by
   decide
 
 theorem excluded_w1_traces :
     (w1Traces.filter fun t => !(hyperellipticTraces.contains t)) =
-      [-17, -7, 7, 17] := by
+      [-17, 7] := by
   decide
 
 theorem witness_seventh_counts :
