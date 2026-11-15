@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0449Z-ic-lazy-index-ab",
+  "latest_record": "20261115T0532Z-j0-multirho-vs-bsgs-interleaved-40",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 4,
-    "measured": 178,
-    "open": 1
+    "measured": 182,
+    "open": 2
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -1180,6 +1180,276 @@
           ],
           "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
           "value": 0.593
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.658,
+      "latest": 0.658,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_36b_t1000",
+      "points": [
+        {
+          "commit": "ec3b88e2c430",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0416Z-j0-multirho-vs-bsgs-interleaved-36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.633,
+            0.677
+          ],
+          "summary": "Interleaved at 36 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.85, 0.66, 0.58); ratio flat vs 34 bits",
+          "value": 0.658
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.849,
+      "latest": 0.849,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_36b_t200",
+      "points": [
+        {
+          "commit": "ec3b88e2c430",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0416Z-j0-multirho-vs-bsgs-interleaved-36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.803,
+            0.902
+          ],
+          "summary": "Interleaved at 36 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.85, 0.66, 0.58); ratio flat vs 34 bits",
+          "value": 0.849
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.577,
+      "latest": 0.577,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_36b_t3000",
+      "points": [
+        {
+          "commit": "ec3b88e2c430",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0416Z-j0-multirho-vs-bsgs-interleaved-36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.561,
+            0.59
+          ],
+          "summary": "Interleaved at 36 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.85, 0.66, 0.58); ratio flat vs 34 bits",
+          "value": 0.577
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.618,
+      "latest": 0.618,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_38b_t1000",
+      "points": [
+        {
+          "commit": "48b71cd6aef9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0434Z-j0-multirho-vs-bsgs-interleaved-38",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.599,
+            0.637
+          ],
+          "summary": "Interleaved at 38 bits: rho faster at T=200 (0.72) and T=1000 (0.62); T=3000 reads 0.47 but fails A/A; 36-bit plateau reading withdrawn",
+          "value": 0.618
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.724,
+      "latest": 0.724,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_38b_t200",
+      "points": [
+        {
+          "commit": "48b71cd6aef9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0434Z-j0-multirho-vs-bsgs-interleaved-38",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.687,
+            0.774
+          ],
+          "summary": "Interleaved at 38 bits: rho faster at T=200 (0.72) and T=1000 (0.62); T=3000 reads 0.47 but fails A/A; 36-bit plateau reading withdrawn",
+          "value": 0.724
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.467,
+      "latest": 0.467,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_38b_t3000",
+      "points": [
+        {
+          "commit": "48b71cd6aef9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0434Z-j0-multirho-vs-bsgs-interleaved-38",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.448,
+            0.486
+          ],
+          "summary": "Interleaved at 38 bits: rho faster at T=200 (0.72) and T=1000 (0.62); T=3000 reads 0.47 but fails A/A; 36-bit plateau reading withdrawn",
+          "value": 0.467
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.549,
+      "latest": 0.549,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_40b_t1000",
+      "points": [
+        {
+          "commit": "a3f018d66572",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0532Z-j0-multirho-vs-bsgs-interleaved-40",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.532,
+            0.569
+          ],
+          "summary": "Interleaved at 40 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.71, 0.55, 0.45), all A/A pass",
+          "value": 0.549
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.714,
+      "latest": 0.714,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_40b_t200",
+      "points": [
+        {
+          "commit": "a3f018d66572",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0532Z-j0-multirho-vs-bsgs-interleaved-40",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.685,
+            0.744
+          ],
+          "summary": "Interleaved at 40 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.71, 0.55, 0.45), all A/A pass",
+          "value": 0.714
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.449,
+      "latest": 0.449,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_40b_t3000",
+      "points": [
+        {
+          "commit": "a3f018d66572",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0532Z-j0-multirho-vs-bsgs-interleaved-40",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.439,
+            0.46
+          ],
+          "summary": "Interleaved at 40 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.71, 0.55, 0.45), all A/A pass",
+          "value": 0.449
         }
       ],
       "problem": "ecdlp-prime-multi-target",
@@ -3961,6 +4231,70 @@
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 5.07,
+      "latest": 5.07,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.07
+      },
+      "metric": "fpm_mid_2lp_over_rho_g2_p16777259",
+      "points": [
+        {
+          "commit": "30e46a98d6b6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.07
+          },
+          "n": 6,
+          "record": "20261115T0317Z-genus-ladder-scale",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            2.43,
+            11.9
+          ],
+          "summary": "Genus ladder scaling: genus 2 to 2^24 (no crossing, both exponents 1), genus 3 to 2^15 (2LP exponent 1.344, 0.54 of rho at 32771); 234 runs all certified; unverified pre-gate.",
+          "value": 5.07
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.537,
+      "latest": 0.537,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.537
+      },
+      "metric": "fpm_mid_2lp_over_rho_g3_p32771",
+      "points": [
+        {
+          "commit": "30e46a98d6b6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.537
+          },
+          "n": 6,
+          "record": "20261115T0317Z-genus-ladder-scale",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.407,
+            0.686
+          ],
+          "summary": "Genus ladder scaling: genus 2 to 2^24 (no crossing, both exponents 1), genus 3 to 2^15 (2LP exponent 1.344, 0.54 of rho at 32771); 234 runs all certified; unverified pre-gate.",
+          "value": 0.537
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
     },
     {
       "better": "lower",
