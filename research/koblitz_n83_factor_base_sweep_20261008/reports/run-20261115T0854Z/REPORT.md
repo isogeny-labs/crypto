@@ -23,7 +23,7 @@ These are lower bounds on query counts under the fixed oracle model; they are no
 
 ## Validation and claim boundary
 
-Native Rust release tests: 3 passed, 0 failed. The checks include small exact multiset arithmetic, the threshold, pinned source digests, 77+1 object counts, duplicate rejection, and all 30 historical cases. The native release binary wrote `results.json` once; repeat execution checks byte identity. The graph renderer reads only that file and also enforces write-once identity. Run commands:
+Local host: Darwin 27.2.0 arm64, macOS 27.2. The nested native crate used Homebrew Rust 1.93.1 in release mode. Native Rust release tests: 3 passed, 0 failed. They check small exact multiset arithmetic, the threshold, pinned source digests with a changed-byte rejection, 77+1 object counts, and all 30 historical cases. The runner also rejects duplicate object keys and zero sizes. The native release binary wrote `results.json` once; repeat execution checks byte identity. The graph renderer reads only that file and also enforces write-once identity. Run commands:
 
 ```sh
 cargo test --manifest-path research/koblitz_n83_factor_base_sweep_20261008/native_rank_query_census/Cargo.toml --release --locked --offline

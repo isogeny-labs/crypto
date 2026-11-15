@@ -256,7 +256,21 @@ mod tests {
     #[test]
     fn changed_source_rejected() {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        let path = root.join("PROTOCOL.md");
+        let source =
+            root.join("../verification/live-s3-manifest-census-20261025/evidence-01/catalog.json");
+        let mut changed = fs::read(&source).unwrap();
+        changed[0] ^= 1;
+        let path = std::env::temp_dir().join(format!(
+            "n83-rqc-{}-changed-catalog.json",
+            std::process::id()
+        ));
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .unwrap();
+        file.write_all(&changed).unwrap();
         assert!(checked_json(&path, CATALOG_SHA256).is_err());
+        fs::remove_file(path).unwrap();
     }
 }
