@@ -64,6 +64,23 @@ def coeffs(Ps, p, target_sign=1):
     return co
 
 
+
+def check_squared_vandermonde(Ps, p, C):
+    """Independently evaluate the closed-form coefficient identity."""
+    d = len(Ps); v=(d-1)//2
+    xs=[x for x,y in Ps]
+    delta=vand(xs,range(d),p)
+    scale=delta*(-1 if (v*(v-1)//2)%2 else 1)%p
+    deriv=[math.prod((xs[i]-xs[j])%p for j in range(d) if i!=j)%p
+           for i in range(d)]
+    for T,c in C.items():
+        S=T if len(T)==v else T+(d-1,)
+        z=scale*pow(vand(xs,S,p),2,p)%p
+        for i in S:
+            z=z*Ps[i][1]*pow(deriv[i],-1,p)%p
+        assert z==c
+
+
 def matrix(Ps, signs, p, target_sign=1):
     d = len(Ps); u = d//2+1; v=(d-1)//2
     return [[pow(x,j,p) for j in range(u)] +
@@ -129,6 +146,7 @@ def semantic(seed=19):
         seed+=1
     Ps.append(target)
     C=coeffs(Ps,p)
+    check_squared_vandermonde(Ps,p,C)
     models=[]
     for s in it.product((-1,1),repeat=k):
         group=signed_sum(Ps,s+(1,),p,a) is None
@@ -158,6 +176,7 @@ def census(seed=19,max_k=18):
     for k in range(6,max_k+1,2):
         Ps=points(p,a,b,k+1,rng)
         C=coeffs(Ps,p)
+        check_squared_vandermonde(Ps,p,C)
         ms=[rng.randrange(1,p) for _ in Ps]
         D=coeffs([(x,y*m%p) for (x,y),m in zip(Ps,ms)],p)
         v=k//2
