@@ -64,5 +64,10 @@ jobs:
       - name: Test all fixed-S3 algebraic quotient branches with reused Rust F4
         timeout-minutes: 2
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_pair_branches -- --f4
+      - name: Replay collapsed Dickson first-collision S3 quotient identities
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_collapsed_s3
+      - name: Measure all seven true collapsed-tower S3 F4 arms
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_collapsed_s3 -- --f4
       - name: Lint adapter and CLI
         run: cargo +1.100.0 clippy --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib --bin prime31-algebraic-ic -- -D warnings
