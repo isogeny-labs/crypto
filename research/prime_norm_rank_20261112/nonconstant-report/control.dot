@@ -1,0 +1,13 @@
+digraph control {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,margin="0.13",fillcolor="#e8f5ed"];
+ edge [fontname="Helvetica",fontsize=10];
+ lines [label="Known line inputs over F17\nL=2X+8; M=4X+6; f=X^3+2X+2",fillcolor="#fff1d5"];
+ norm [label="Exact two-line product norm\nA=f+LM; B=L+M=6(X+8)\nA^2-fB^2=G with six distinct nodes"];
+ data [label="Actual nonconstant chart a=3,b=1,d=6\nExplicit UF+V(fH)=1; target Q=(0,6)"];
+ moment [label="Actual quotient functional from V mod F\nDerive mu(G)=0"];
+ matrix [label="General canonical matrix-pencil theorem\nAll hypotheses instantiated; dimension6\nKnown-answer correctness control"];
+ open [label="Still separate: restricted rank/corank,\nadjugate recovery and public-input finder\nNo runtime or scaling result",fillcolor="#fff1d5"];
+ lines -> norm -> data -> moment -> matrix;
+ matrix -> open [style=dashed];
+}

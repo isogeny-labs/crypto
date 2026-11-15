@@ -1,0 +1,2216 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass_with_errata",
+ "verdict": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_meaning": "Certificates 4,410/4,410 and replays 3,780/3,780 identical; every number in results.json, band-*.json and scaling.json and every figure in the README recomputes from the committed raw data with independent code. The w = 0 headline (0.886 [0.808, 0.971] / 0.901 [0.811, 1.000] / 0.929 [0.847, 1.020]) and the verdict 'unresolved in the 5a band' are validated. The reported band values at w = 0.1 and w = 1 are not: they leave the aut=3 canonicalisations unpriced while pricing rho-cubic's (E1); the symmetric band is 1.21-1.28 at w = 0.1 and 2.68-2.84 at w = 1.",
+ "gate_note": "docs/VALIDATION_GATE.md accepts only status pass/passed. This report deliberately carries pass_with_errata, so scripts/validation_gate.py keeps this directory closed until E1 is corrected in the producer's README, results and bench record and a validator re-issues the report. The VALIDATION.json beside it pins the three artifacts and carries the symmetric band.",
+ "independent": true,
+ "validator": "validator subagent (Claude Opus 5.5) dispatched by the main session; produced none of the producer's artifacts; no edit to README, records, specs, results, band or protocol files; no git mutation; scratch work under the session scratchpad; outputs only in this evidence directory",
+ "validated_at_utc": "2026-11-11T05:57:08Z",
+ "validated_commit": "011e143f0056249db57abf920dbe5f33cf96bd7b",
+ "head_when_written": "e513eaa2975d1932ab9a46aff0446461c1d56618",
+ "head_note": "HEAD advanced during validation (f0471f24b4 store move of the three records.jsonl.gz, e513eaa297 stage5 design note); the validated content of this directory is identical at both commits (check C0).",
+ "tree_clean": true,
+ "claim_under_validation": "On j = 0, b = 7 prime-order prime-field curves at p = 34, 37, 40 bits (five curves each), sib8-p512-aut3 costs 0.886 [0.808, 0.971] / 0.901 [0.811, 1.000] / 0.929 [0.847, 1.020] of rho-cubic in GAE at w = 0 and is unresolved in the 5a band (about 1.05-1.11 at w = 0.1, 1.81-1.91 at w = 1). Secondary: tw2cj-lazy-aut3 / tw2cj-lazy 0.52-0.58, sib8-p512-aut3 / sib8-p512 0.57-0.60. [pcc:unverified]",
+ "raw_data": [
+  {
+   "path": "sessions/j0b7-34/.artifacts.json",
+   "sha256": "1e1f818cc49bf1a4aa965e571c7f98780cdc0dd4e11bc85bec7978f5fe407534"
+  },
+  {
+   "path": "sessions/j0b7-34/plan.json.gz",
+   "sha256": "5fa112ac362a7b22b000b4187204062387d060efc5e62e3627c9bb830a8757fa"
+  },
+  {
+   "path": "sessions/j0b7-34/session.json",
+   "sha256": "1e31d71a44616dd96296d2f8456364382e35f50c0a2706333158e1b579abdd5d"
+  },
+  {
+   "path": "sessions/j0b7-34/spec.json",
+   "sha256": "112dc7dcb2593df652fc76884240c71c437d05f54d4ce239dec18ec2db7f4ea4"
+  },
+  {
+   "path": "sessions/j0b7-34/host.json",
+   "sha256": "6f50242c2c64f3b59bd3fa69390631f3f7acb036fc026fe30513164d65e3948b"
+  },
+  {
+   "path": "sessions/j0b7-37/.artifacts.json",
+   "sha256": "dc74e2a8c20b3cdf1c38daf333293e4be4655684a87fc405de13d1a2132a8e66"
+  },
+  {
+   "path": "sessions/j0b7-37/plan.json.gz",
+   "sha256": "415f3838942d9b821caf904611f6d337e02ddf400f8ea3f811592838f4fc90f4"
+  },
+  {
+   "path": "sessions/j0b7-37/session.json",
+   "sha256": "3522fef8cb39935ce67f039f21bc7336d7ac4fd90053ba2d7aebb073bab575cc"
+  },
+  {
+   "path": "sessions/j0b7-37/spec.json",
+   "sha256": "7fde488e69e1838aca89649b900e37e1835de170ecf10905ad1e534bc8f754a4"
+  },
+  {
+   "path": "sessions/j0b7-37/host.json",
+   "sha256": "8e92843edf25c09cda64c1370fe8af363c3361fe04dcd8c02aa2f7669cfeab8e"
+  },
+  {
+   "path": "sessions/j0b7-40/.artifacts.json",
+   "sha256": "b54e762eafce4656494777a4a6e9c9dac32fd1836468dcdd149c897ddd79fc1f"
+  },
+  {
+   "path": "sessions/j0b7-40/plan.json.gz",
+   "sha256": "ba8304adbf0d88782262a972b921c60037328da0325c5bc65bdcbd46c6ab470d"
+  },
+  {
+   "path": "sessions/j0b7-40/session.json",
+   "sha256": "b555096224d946b5c586881eced9d8a3f50ed04b9bc2146589c75ea2ed9291da"
+  },
+  {
+   "path": "sessions/j0b7-40/spec.json",
+   "sha256": "5da033996b391d909d15882b73881efa0250225cd1ed6af465895f3e967977f8"
+  },
+  {
+   "path": "sessions/j0b7-40/host.json",
+   "sha256": "12b64c827be1ddd390d9941cddd49f2a7f870b385921c255e02fcb0421b8afd3"
+  },
+  {
+   "path": "PROTOCOL.md",
+   "sha256": "cb13ba9d8b9dff669a58beded18e76be4b715f8bde32cc48570a289f685efd96"
+  },
+  {
+   "path": "frozen.sha256",
+   "sha256": "b012bb70fe9cd495a96f4542d838ad860f18c239cab92780c70cb1954d8d45af"
+  },
+  {
+   "path": "sessions/raw.sha256",
+   "sha256": "2b550490ba2fb5dfe9995aa56a6f521a24fae760f247b819156b0f7d78847ed6"
+  },
+  {
+   "path": "results.json",
+   "sha256": "324ed96e67c7e5526ff8d487bf88e92c8235d69d4c6c77d2ebded8b2b04d7cbd"
+  },
+  {
+   "path": "scaling.json",
+   "sha256": "d01bfaa036526d59424fa3ea31dbbcc5f32e7160b4ef24f4f7eee2fb91e80690"
+  },
+  {
+   "path": "band-j0b7-34.json",
+   "sha256": "988d6abe742be2a98449544c378afbb0b4e8f5f034f4f7c1b90b647ef15b22ac"
+  },
+  {
+   "path": "band-j0b7-37.json",
+   "sha256": "8cbf88a9648202b6a73b7f5b19455376af3f89b29a12a40b59ab5945a2d5b760"
+  },
+  {
+   "path": "band-j0b7-40.json",
+   "sha256": "bf9daab51abbb958408c854286490e86853c68904c0f5b1b401b9288ec5a56d9"
+  }
+ ],
+ "raw_data_note": "records.jsonl and plan.json are gitignored. The records' compressed bytes are pinned by sessions/*/.artifacts.json (records.jsonl.gz cc02b9cc..., fdd10da9..., 636fbfd2...; the same blobs are in Git at 011e143f00) and decompress to sessions/raw.sha256 (records 6a9a3d0a..., 227ab8f6..., 63d0076d...); plan.json.gz is still committed and decompresses to 55769160..., aa73f0bf..., 9fdc0337.... The validator read the local uncompressed files after checking those digests.",
+ "headline": [
+  {
+   "name": "j0b7-34: sib8-p512-aut3 / rho-cubic w=0 ratio",
+   "claimed": 0.8856167442727894,
+   "recomputed": 0.8856167442727891,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: sib8-p512-aut3 / rho-cubic w=0.1 ratio (committed band.rs reading; understated, erratum E1)",
+   "claimed": 1.052465506224507,
+   "recomputed": 1.0524655062245067,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: sib8-p512-aut3 / rho-cubic w=1 ratio (committed band.rs reading; understated, erratum E1)",
+   "claimed": 1.8058932490144795,
+   "recomputed": 1.8058932490144806,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: sib8-p512-aut3 / rho-cubic w=0 ci95 low",
+   "claimed": 0.8079880176613664,
+   "recomputed": 0.8079880176613665,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: sib8-p512-aut3 / rho-cubic w=0 ci95 high",
+   "claimed": 0.9707037735614632,
+   "recomputed": 0.9707037735614633,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: tw2cj-lazy-aut3 / tw2cj-lazy w=0 ratio",
+   "claimed": 0.5170870317506917,
+   "recomputed": 0.5170870317506917,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: sib8-p512-aut3 / sib8-p512 w=0 ratio",
+   "claimed": 0.5947148093359599,
+   "recomputed": 0.59471480933596,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: sib8-p512 / rho-cubic w=0 ratio",
+   "claimed": 1.4891452682364534,
+   "recomputed": 1.489145268236453,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: tw2cj-lazy-aut3 / rho-cubic w=0 ratio",
+   "claimed": 1.6713849701220682,
+   "recomputed": 1.6713849701220689,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: rho-cubic / rho-neg w=0 ratio",
+   "claimed": 0.5722709999999249,
+   "recomputed": 0.5722709999999247,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-34: rho-neg-aa / rho-neg w=0 ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: sib8-p512-aut3 / rho-cubic w=0 ratio",
+   "claimed": 0.9006470972971283,
+   "recomputed": 0.9006470972971286,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: sib8-p512-aut3 / rho-cubic w=0.1 ratio (committed band.rs reading; understated, erratum E1)",
+   "claimed": 1.0726990300462296,
+   "recomputed": 1.0726990300462296,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: sib8-p512-aut3 / rho-cubic w=1 ratio (committed band.rs reading; understated, erratum E1)",
+   "claimed": 1.8480427510545567,
+   "recomputed": 1.8480427510545563,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: sib8-p512-aut3 / rho-cubic w=0 ci95 low",
+   "claimed": 0.810935672320704,
+   "recomputed": 0.8109356723207037,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: sib8-p512-aut3 / rho-cubic w=0 ci95 high",
+   "claimed": 1.0002830329912396,
+   "recomputed": 1.0002830329912393,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: tw2cj-lazy-aut3 / tw2cj-lazy w=0 ratio",
+   "claimed": 0.5788305650386815,
+   "recomputed": 0.578830565038682,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: sib8-p512-aut3 / sib8-p512 w=0 ratio",
+   "claimed": 0.5872013050287439,
+   "recomputed": 0.5872013050287439,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: sib8-p512 / rho-cubic w=0 ratio",
+   "claimed": 1.533796143816542,
+   "recomputed": 1.5337961438165422,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: tw2cj-lazy-aut3 / rho-cubic w=0 ratio",
+   "claimed": 1.7931099556847945,
+   "recomputed": 1.7931099556847958,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: rho-cubic / rho-neg w=0 ratio",
+   "claimed": 0.541544431271724,
+   "recomputed": 0.5415444312717245,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-37: rho-neg-aa / rho-neg w=0 ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: sib8-p512-aut3 / rho-cubic w=0 ratio",
+   "claimed": 0.9294636450522799,
+   "recomputed": 0.9294636450522804,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: sib8-p512-aut3 / rho-cubic w=0.1 ratio (committed band.rs reading; understated, erratum E1)",
+   "claimed": 1.1080022136431875,
+   "recomputed": 1.1080022136431884,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: sib8-p512-aut3 / rho-cubic w=1 ratio (committed band.rs reading; understated, erratum E1)",
+   "claimed": 1.9118967357741923,
+   "recomputed": 1.9118967357741912,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: sib8-p512-aut3 / rho-cubic w=0 ci95 low",
+   "claimed": 0.8472559658751609,
+   "recomputed": 0.8472559658751606,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: sib8-p512-aut3 / rho-cubic w=0 ci95 high",
+   "claimed": 1.01964778327824,
+   "recomputed": 1.0196477832782398,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: tw2cj-lazy-aut3 / tw2cj-lazy w=0 ratio",
+   "claimed": 0.5796673795281412,
+   "recomputed": 0.5796673795281408,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: sib8-p512-aut3 / sib8-p512 w=0 ratio",
+   "claimed": 0.5684919361637827,
+   "recomputed": 0.5684919361637829,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: sib8-p512 / rho-cubic w=0 ratio",
+   "claimed": 1.634963639632878,
+   "recomputed": 1.6349636396328782,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: tw2cj-lazy-aut3 / rho-cubic w=0 ratio",
+   "claimed": 1.894587426437057,
+   "recomputed": 1.8945874264370575,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: rho-cubic / rho-neg w=0 ratio",
+   "claimed": 0.515070862871021,
+   "recomputed": 0.5150708628710207,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "j0b7-40: rho-neg-aa / rho-neg w=0 ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "slope ln(sib8-p512-aut3 / rho-cubic) on ln r, w=0, 90 workloads",
+   "claimed": 0.012062058455738794,
+   "recomputed": 0.012062058455738787,
+   "rel_tol": 1e-09
+  }
+ ],
+ "checks": [
+  {
+   "id": "C0",
+   "requirement": "Frozen, committed artifact set; clean tree",
+   "command": "git -C /home/user/crypto rev-parse HEAD; git status --short",
+   "result": "Validation started at HEAD 011e143f0056249db57abf920dbe5f33cf96bd7b with no tracked changes. During validation HEAD advanced (05:38:14Z, by the main session) to e513eaa2975d1932ab9a46aff0446461c1d56618: f0471f24b4 fast-forward 'Move PR data files to the artifact store' deletes the three sessions/*/records.jsonl.gz from Git and adds .artifacts.json manifests pinning the same bytes (cc02b9cc..., fdd10da9..., 636fbfd2... = the blobs at 011e143f00); e513eaa297 adds siblings/stage5-design/README.md outside this directory. No other file of this directory changed. The validated content is identical at both commits; this report is bound to 011e143f0056249db57abf920dbe5f33cf96bd7b. records.jsonl and plan.json are gitignored; the validator read the local files, which hash to sessions/raw.sha256.",
+   "pass": true
+  },
+  {
+   "id": "C1a",
+   "requirement": "Raw-data identity",
+   "command": "cd sessions && sha256sum -c raw.sha256; git show 011e143f00:<...>/{records.jsonl,plan.json}.gz | gzip -dc | sha256sum (each file); sessions/*/.artifacts.json; python3 tools/artifacts/artifacts.py verify --remote sessions/j0b7-{34,37,40}",
+   "result": "6/6 OK (3 records.jsonl, 3 plan.json); the .gz blobs committed at 011e143f00 decompress to the same 6 digests; the .artifacts.json manifests at HEAD pin those .gz blobs byte for byte; session.json records_sha256 and plan_sha256 equal them; bench record raw[].sha256 equal the three records.jsonl digests (it lists no plan.json digests). Store presence could not be confirmed from this session: artifacts verify --remote got HTTP 403 on head-object (absent key or no permission); the bytes remain in Git history at 011e143f00.",
+   "pass": true
+  },
+  {
+   "id": "C1b",
+   "requirement": "Spec and protocol hashes; frozen before data",
+   "command": "sha256sum -c frozen.sha256; git show 4ae92d4a40:<file> | sha256sum; git diff --stat 4ae92d4a40 HEAD -- <frozen files>",
+   "result": "4/4 OK; identical to the blobs committed at 4ae92d4a40; unchanged since. sessions/*/spec.json equal the frozen specs. Freeze commit 4ae92d4a40 at 03:48:41Z; bench run started 03:48:53Z; first session started 03:48:56.588Z (p34), 03:50:30Z (p37), 03:54:31Z (p40); every session.json records git_commit 4ae92d4a40, git_dirty false, so the freeze commit existed when the data began.",
+   "pass": true
+  },
+  {
+   "id": "C1c",
+   "requirement": "Binary identity",
+   "command": "sha256sum target/release/ecbench; session.json binary_sha256; independent rebuild (see binary_provenance in replay-certificate.json)",
+   "result": "target/release/ecbench sha256 cb49203e769721be2da6347ecb778e5e8933761c6ce91e29b2e33e8197a76846 equals binary_sha256 of all three sessions and of all 4,410 records (one env class ECBENV3h019d40ac615e). Binary mtime 03:47:16Z precedes commit b460422af6 (03:48:23Z). Rebuild: a fresh build into a separate target directory is byte-identical to the session binary (sha256 cb49203e769721be2da6347ecb778e5e8933761c6ce91e29b2e33e8197a76846), so the binary is the build of the source at b460422af6 (= 4ae92d4a40 = 011e143f00 for src/ and Cargo files); the mtime ordering is not a provenance defect",
+   "pass": true
+  },
+  {
+   "id": "C2",
+   "requirement": "Replay certificate: ecbench verify --replay-all on all three sessions",
+   "command": "ecbench verify --dir sessions/<s> --replay-all --out <receipt>",
+   "result": "j0b7-34: ok=True, 1470 records, 1470 verified, 1260/1260 replays identical, 0 problems, receipt sha256 8d63c8d08c4e17dbac9f69d4bd878db3894a3fc56c8bb50a61925f344c361206; j0b7-37: ok=True, 1470 records, 1470 verified, 1260/1260 replays identical, 0 problems, receipt sha256 bd487e56cd45daddc2c7634e89167387504f836a34a7c7e2f8fa7aedcb111dbf; j0b7-40: ok=True, 1470 records, 1470 verified, 1260/1260 replays identical, 0 problems, receipt sha256 2ad786e51f0c37396e3fd7ff9f1a73d6e68263727d9f92fb2c51fdc9008d84a1",
+   "pass": true
+  },
+  {
+   "id": "C3",
+   "requirement": "Every recovered log satisfies [d]G = Q (validator's own arithmetic)",
+   "command": "python3 -I indep_check.py sessions/j0b7-34 sessions/j0b7-37 sessions/j0b7-40; python3 -I cert_runs.py ...",
+   "result": "4410/4410 records verify (all, warm-ups included), 4410/4410 negative controls [d+1]G != Q rejected; 0 mismatches. 15 curves (5 per size): y^2 = x^3 + 7, p = 1 mod 3, r = 1 mod 3, p and r prime, r = p + 1 - t, rG = O, cofactor 1; every workload has one target across all 7 arms; rQ = O for every target.",
+   "pass": true
+  },
+  {
+   "id": "C4a",
+   "requirement": "Headline ratios recomputed from records.jsonl (paired by workload and round, ratio of totals of S)",
+   "command": "python3 -I indep_check.py ... (own pricing from the AGENTS.md 5a text and band.rs semantics; own pairing)",
+   "result": "Every ratio of results.json (8 pairs x 3 sizes x 3 weights = 72) reproduced; max relative difference 1.1e-15. 180 pairs per comparison, 0 unpaired, same algorithm seeds across paired arms. The estimand is the ratio of summed S = GAE/sqrt(r) over pairs (ecbench compare), not of summed GAE (differs in the 3rd decimal, e.g. p34 0.8856 vs 0.8868).",
+   "pass": true
+  },
+  {
+   "id": "C4b",
+   "requirement": "Confidence intervals",
+   "command": "own delta-method log-scale t interval over 30 workload clusters (df 29); own cluster bootstrap, seed 0x7568A667, 10,000 resamples",
+   "result": "Delta-method bounds equal results.json ci95 to 7.8e-16 (all 72). Own-seed cluster bootstrap for sib8-p512-aut3 / rho-cubic at w = 0: p34 [0.810, 0.965], p37 [0.816, 0.992], p40 [0.852, 1.011]; H3 (upper end < 1.05) holds under both intervals.",
+   "pass": true
+  },
+  {
+   "id": "C4c",
+   "requirement": "5a band at w = 0, 0.1, 1 (committed reading) and per-curve band",
+   "command": "python3 -I band_check.py <evidence>  (all 315 mean_s values of band-j0b7-*.json)",
+   "result": "315/315 band means equal to 0.0 relative difference. Band order of sib8-p512-aut3 vs rho-cubic: unresolved at all three sizes; per curve 13/15 unresolved, 2/15 rho-cubic lower at every weight (icv1-fp37-tm403199-03bfe7fd, icv1-fp40-tm315245-337a1f69), as README states.",
+   "pass": true
+  },
+  {
+   "id": "C4d",
+   "requirement": "Pre-registered H1-H4",
+   "command": "indep_check.py; slope_check.py",
+   "result": "H1 0.517/0.579/0.580 in [0.50, 0.66]: holds. H2 0.595/0.587/0.568: holds. H3 CI upper 0.971/1.000/1.020 < 1.05: holds. H4 slope +0.0121, own bootstrap by workload [-0.021, +0.044], by curve (15 clusters) [-0.013, +0.041]: contains 0, holds (three sizes only; fewer than the four AGENTS.md 5 asks for an exponent, and the producer makes no exponent claim).",
+   "pass": true
+  },
+  {
+   "id": "C5a",
+   "requirement": "Charging audit: aut=3 canonicalisation",
+   "command": "git show b460422af6 -- src/cryptanalysis/ic_boundary.rs src/cryptanalysis/ic_framework/plugins.rs; records' phases, work.unpriced and work.phases[].prims",
+   "result": "TargetWalk::canon_key does two mulmod(omega, .) and ops.field_ops.muls += 2 per canonicalisation, and counts tw_aut_canonicalisations; probe() does the same two multiplications uncounted (2 lookups a run, negligible); rotate_kept does up to 5 mod-r multiplications per rotated collision, unlisted (about 2 a run, negligible); the [kappa]G = zeta3(G) check is charged to set-up as group operations. But the two multiplications reach no priced reading: the GAE charges group operations only (oracle_setup gae = adds + doubles exactly); tw_aut_canonicalisations sits in the relations phase native map and is NOT in cost.unpriced, so the 5a band does not charge it; bitop/v1 lists it in work.unpriced and charges no field_mul for it (tw2cj-lazy-aut3 oracle_setup prims are group_add, group_double, hash_probe only); for non-sib walks walk_ops.field_ops is not even emitted (tw_walk_muls only exists with sib). tw_aut_canonicalisations equals table_insert_attempts on every aut3 record. The code comment 'Counted, not priced in GAE ... (as rho.cubic)' and the commit message 'charges two field multiplications, as rho.cubic charges its rotations' hold for the internal field_ops tally only. Nothing else is hidden: 0 lazy failures, 0 dropped rows on 1,260 aut3 runs; rotated collisions are 0.66-0.69 of collisions on tw2cj-lazy-aut3 (theory 2/3).",
+   "pass": false
+  },
+  {
+   "id": "C5b",
+   "requirement": "Charging audit: rho-cubic rotations",
+   "command": "src/cryptanalysis/ic_boundary.rs CubicClasses::canon; records",
+   "result": "CubicClasses::canon does the same two multiplications by omega (ops.field_ops.muls += 2) and its canonicalisations are emitted as canonicalisations_uncharged and listed in cost.unpriced: the band charges rho-cubic w per canonicalisation (mean 68,072 / 177,602 / 440,418 per run at p34/37/40). bitop/v1 charges them too (natives field_mul = 2 x canonicalisations on 630/630 measured-or-warm-up rho-cubic records; modr_mul = 3 x, plus 1 on 15). rho-cubic GAE = group operations only (total_gae = bitop group_add + group_double on 630/630; every IC phase has gae = adds + doubles exactly). So rho-cubic's rotations are priced in the band and in bitop/v1, the IC arm's identical rotations in neither: an asymmetry of AGENTS.md 5a (erratum E1).",
+   "pass": false
+  },
+  {
+   "id": "C5c",
+   "requirement": "A/A arm",
+   "command": "indep_check.py (rho-neg-aa vs rho-neg)",
+   "result": "180/180 pairs identical in GAE and priced cost at every size; ratio exactly 1. rho-neg-aa is rho.negation with the same seeds, so the A/A tests determinism and pairing, not run-to-run noise (counts are deterministic; no wall time is claimed).",
+   "pass": true
+  },
+  {
+   "id": "C6",
+   "requirement": "Matched-rho fairness",
+   "command": "src/cryptanalysis/ecbench/methods.rs rho method list; comparisons/*.json a.mean_ratio_to_floor",
+   "result": "PROTOCOL.md names rho-cubic as the matched rho. rho.cubic (A = 6, {+-zeta3^i P}) is the only single-target automorphism-fold rho the planner offers for j = 0 prime curves (rho.multitarget_pooled and rho.preprocessing are other problems, at A = 2), so it is the strongest available. It runs at 1.085 / 1.065 / 1.006 x its own A = 6 floor sqrt(pi r / 12) at w = 0 (p34/37/40), no heavy tail, same binary, same sessions, same workloads and seeds, same unit: not a weak reference. Its unpriced canonicalisations are listed and counted.",
+   "pass": true
+  },
+  {
+   "id": "C7",
+   "requirement": "Blockers, hidden assumptions, instrument defects",
+   "command": "review of the above",
+   "result": "See errata E1 to E8. No certificate failure, no replay drift, no data edit, no protocol change after data. The w = 0 headline and the 'unresolved in the band' verdict stand; the reported band values at w = 0.1 and w = 1 do not (E1).",
+   "pass": true
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "changes reported numbers, not the verdict",
+   "location": "README.md results table and 'What this means' (1.05-1.11 at w = 0.1, 1.8-1.9 at w = 1); results.json and band-*.json w = 0.1 / w = 1 values; bench record metric sib8_p512_aut3_over_rho_cubic_gae_w1_p40 = 1.912; commit message of 011e143f00; engine b460422af6 (tw_aut_canonicalisations not in cost.unpriced)",
+   "issue": "The 5a band charges rho-cubic w per canonicalisation (canonicalisations_uncharged, in cost.unpriced) but does not charge the aut=3 IC arms for the same operation (two multiplications by omega per stored or probed point, counted as tw_aut_canonicalisations, kept out of cost.unpriced and out of every counted: marker). AGENTS.md 5a requires the band to be applied the same way to every arm, and the 2026-11-08 table-work rule closed the same kind of asymmetry. Pricing one native operation per aut=3 canonicalisation, as rho-cubic's are priced, gives sib8-p512-aut3 / rho-cubic = 0.886 / 1.210 / 2.677 (p34), 0.901 / 1.235 / 2.742 (p37), 0.929 / 1.276 / 2.838 (p40) at w = 0 / 0.1 / 1, against the reported 0.886 / 1.052 / 1.806, 0.901 / 1.073 / 1.848, 0.929 / 1.108 / 1.912. w = 0 is unchanged; the order is still unresolved in the band at every size; per curve still 13 unresolved and 2 rho-cubic lower.",
+   "fix": "Restate the band values as lower bounds for the IC arm, or rerun the band after listing tw_aut_canonicalisations as unpriced (an engine change and a new record format, so a new frozen stage); correct the w1_p40 bench metric; do not cite 1.05-1.11 / 1.8-1.9 as the band."
+  },
+  {
+   "id": "E2",
+   "severity": "secondary claims: numbers at w > 0 change, order does not",
+   "location": "README 'band order: aut3 lower at every weight' for the two aut3 / non-aut3 rows; results.json",
+   "issue": "Under the symmetric reading the aut3 / non-aut3 ratios rise with w: tw2cj-lazy-aut3 / tw2cj-lazy 0.517-0.580 at w = 0, 0.564-0.632 at w = 0.1, 0.774-0.869 at w = 1; sib8-p512-aut3 / sib8-p512 0.568-0.595, 0.655-0.683, 0.843-0.876. 'aut3 lower at every weight' still holds at every size. The README quotes the w = 0 values (0.52-0.60), which are unaffected; the near-constant w = 1 values in results.json (0.516-0.591) are not supported.",
+   "fix": "Say the 0.52-0.60 is the w = 0 ratio; quote 0.77-0.88 at w = 1 under symmetric pricing."
+  },
+  {
+   "id": "E3",
+   "severity": "unclaimed rows in results.json",
+   "location": "results.json 'j0b7-37/40: sib8-p512-aut3 / rho-neg' band_order 'sib8-p512-aut3 < rho-neg at every weight'",
+   "issue": "Under symmetric pricing both become unresolved (w = 1: 1.484 and 1.461). Not cited in the README.",
+   "fix": "Do not cite those orders."
+  },
+  {
+   "id": "E4",
+   "severity": "instrument note",
+   "location": "README Bit-ops paragraph; scaling.json [bitops] rows; stats_bitops.py",
+   "issue": "Part of the bitop/v1 vs GAE disagreement on rho-cubic that the producer flagged is this same asymmetry: bitop/v1 charges rho-cubic's rotations (field_mul 2x, modr_mul 3x per canonicalisation) and leaves the aut3 arms' identical rotations in work.unpriced. The bit-op ratio sib8-p512-aut3 / rho-cubic (0.555 / 0.561 / 0.580 by the validator's totals) is therefore biased toward the IC arm. The producer correctly did not use it.",
+   "fix": "Price tw_aut_canonicalisations as two field multiplications in bitop/v1 before any bit-op comparison against rho-cubic."
+  },
+  {
+   "id": "E5",
+   "severity": "interpretation guard",
+   "location": "headline w = 0 ratio",
+   "issue": "At w = 0 sib8-p512-aut3 runs at 0.961 / 0.959 / 0.935 x the A = 6 generic floor sqrt(pi r / 12) (rho-cubic 1.085 / 1.065 / 1.006). It is below the floor because each sibling pair's second point and each lift are native operations priced at 0 when w = 0. The w = 0 ratio is a lower bound for the IC arm and must not be cited without the band; the README does not, and calls it 'not a win'.",
+   "fix": "Keep citing the w = 0 figure only together with the band."
+  },
+  {
+   "id": "E6",
+   "severity": "note (resolved by the validator's rebuild)",
+   "location": "target/release/ecbench; session.json git_commit",
+   "issue": "The binary's mtime (03:47:16Z) precedes commit b460422af6 (03:48:23Z), and the sessions record the freeze commit 4ae92d4a40 as git_commit, not a build commit. The validator's fresh build of the same source is byte-identical (binary_provenance in replay-certificate.json), so there is no provenance defect; the records simply do not name the build commit.",
+   "fix": "Record the build commit and tree state in the bench record or session."
+  },
+  {
+   "id": "E7",
+   "severity": "process (not a validity issue)",
+   "location": "sessions/*/records.jsonl.gz, benchmarks/records/20261111T0348Z-sib-stage4-aut3.json, stats_bitops.py, scaling_fit.py",
+   "issue": "At 011e143f00 the .gz raw data (about 1 MB each) was committed to Git against AGENTS.md 13; f0471f24b4 has since moved it to the artifact store with manifests (store presence not confirmable here, HTTP 403). The bench record still has raw[].uploaded = false for all three files, lists no plan.json digests, and records no p37 metric. stats_bitops.py and scaling_fit.py are Python result generators, against AGENTS.md 'Implementation language: no Python' (the headline numbers come from ecbench, in Rust).",
+   "fix": "Confirm the store upload and update the bench record; add the p37 metrics; port the two statistics to Rust or label them."
+  },
+  {
+   "id": "E8",
+   "severity": "wording",
+   "location": "README 'paired GAE ratios'",
+   "issue": "The ratio is of summed S = GAE / sqrt(r) over pairs (ecbench compare), not of summed GAE; the two differ in the 3rd decimal.",
+   "fix": "Say 'paired ratio of S (GAE / sqrt r)'."
+  }
+ ],
+ "band_both_readings": {
+  "j0b7-34": {
+   "sib8-p512-aut3 / rho-cubic": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.8856167442727891,
+      "ci95_delta_log_t": [
+       0.8079880176613665,
+       0.9707037735614633
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.8097760005836122,
+       0.9646466241664238
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.0524655062245067,
+      "ci95_delta_log_t": [
+       0.9600635664098218,
+       1.1537607305885107
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.9652596121006284,
+       1.1486589945285937
+      ]
+     },
+     "w=1": {
+      "ratio": 1.8058932490144806,
+      "ci95_delta_log_t": [
+       1.646625363188952,
+       1.980566132250111
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.656933389886542,
+       1.9689445611739553
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.8856167442727891,
+      "ci95_delta_log_t": [
+       0.8079880176613665,
+       0.9707037735614633
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.8103473827870814,
+       0.9619181888360459
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.2104588455824412,
+      "ci95_delta_log_t": [
+       1.1041314269009752,
+       1.3270255525297938
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.1075084996809397,
+       1.3179981364047693
+      ]
+     },
+     "w=1": {
+      "ratio": 2.677326494403875,
+      "ci95_delta_log_t": [
+       2.4411037185161915,
+       2.936408274366159
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       2.454034762799217,
+       2.912575557351504
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    }
+   },
+   "sib8-p512-aut3 / sib8-p512": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.59471480933596,
+      "ci95_delta_log_t": [
+       0.5712717510627924,
+       0.6191198913398245
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5723149541548113,
+       0.6174307411240774
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.5935706546452624,
+      "ci95_delta_log_t": [
+       0.5700952257930629,
+       0.6180127566686466
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5715406774975528,
+       0.6167380915253478
+      ]
+     },
+     "w=1": {
+      "ratio": 0.5910525460894817,
+      "ci95_delta_log_t": [
+       0.5675059994338065,
+       0.6155760689532692
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5687717096456052,
+       0.6141170323152982
+      ]
+     },
+     "band_order": "b<a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.59471480933596,
+      "ci95_delta_log_t": [
+       0.5712717510627924,
+       0.6191198913398245
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5725845431069327,
+       0.617755554454398
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6826759120790158,
+      "ci95_delta_log_t": [
+       0.655655755821879,
+       0.7108095929833127
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.656847909241052,
+       0.7093228906578594
+      ]
+     },
+     "w=1": {
+      "ratio": 0.8762647748386084,
+      "ci95_delta_log_t": [
+       0.8413335859816535,
+       0.9126462659006471
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.8434389622577655,
+       0.9099984051546003
+      ]
+     },
+     "band_order": "b<a at every weight"
+    }
+   },
+   "tw2cj-lazy-aut3 / tw2cj-lazy": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.5170870317506917,
+      "ci95_delta_log_t": [
+       0.48983313440003645,
+       0.5458573126790113
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.49093283806121646,
+       0.5436095794402496
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.5169529757186629,
+      "ci95_delta_log_t": [
+       0.48969749770589516,
+       0.545725433265091
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.4910043558633965,
+       0.544255601478902
+      ]
+     },
+     "w=1": {
+      "ratio": 0.516349039930808,
+      "ci95_delta_log_t": [
+       0.4890864499933607,
+       0.5451312974241803
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.49056105587673277,
+       0.5438593177878593
+      ]
+     },
+     "band_order": "b<a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.5170870317506917,
+      "ci95_delta_log_t": [
+       0.48983313440003645,
+       0.5458573126790113
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.49083775412946706,
+       0.5435762004366917
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.563714134495489,
+      "ci95_delta_log_t": [
+       0.5339879757512148,
+       0.5950950955083848
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5353617337180426,
+       0.5929098015743979
+      ]
+     },
+     "w=1": {
+      "ratio": 0.7737738804495614,
+      "ci95_delta_log_t": [
+       0.732902802940827,
+       0.8169241755708117
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.7355230626480479,
+       0.8136572643434067
+      ]
+     },
+     "band_order": "b<a at every weight"
+    }
+   },
+   "sib8-p512-aut3 / rho-neg": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.5068127798616667,
+      "ci95_delta_log_t": [
+       0.46848154751652354,
+       0.5482802795387597
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.4708694795051145,
+       0.546928671278602
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6020995382501688,
+      "ci95_delta_log_t": [
+       0.5564959739726563,
+       0.651440209662468
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5610493664736353,
+       0.6499808425943401
+      ]
+     },
+     "w=1": {
+      "ratio": 1.0316085696629784,
+      "ci95_delta_log_t": [
+       0.9531864297535917,
+       1.1164827863497875
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.960010621272934,
+       1.1135179314547323
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.5068127798616667,
+      "ci95_delta_log_t": [
+       0.46848154751652354,
+       0.5482802795387597
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.4717858950624338,
+       0.5470877256749094
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6924851291426103,
+      "ci95_delta_log_t": [
+       0.640007681710812,
+       0.7492654663172249
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.6439936921048621,
+       0.7479594796903811
+      ]
+     },
+     "w=1": {
+      "ratio": 1.5294109753829812,
+      "ci95_delta_log_t": [
+       1.4130946782637568,
+       1.6553016351996512
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.4210890374516472,
+       1.6509712545936355
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    }
+   },
+   "tw2cj-lazy-aut3 / rho-cubic": {
+    "priced": {
+     "w=0": {
+      "ratio": 1.6713849701220689,
+      "ci95_delta_log_t": [
+       1.5473387360437927,
+       1.805375677139958
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.5580147688405255,
+       1.7972762429839009
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.6716599658728575,
+      "ci95_delta_log_t": [
+       1.5475222762758307,
+       1.8057556161498254
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.5583977722588915,
+       1.8006837972459675
+      ]
+     },
+     "w=1": {
+      "ratio": 1.6729017457061013,
+      "ci95_delta_log_t": [
+       1.5483508455205044,
+       1.8074716456435456
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.5585514047153959,
+       1.799481441539031
+      ]
+     },
+     "band_order": "b>a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 1.6713849701220689,
+      "ci95_delta_log_t": [
+       1.5473387360437927,
+       1.805375677139958
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.5590241862023648,
+       1.8016803994953359
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.8228705416053503,
+      "ci95_delta_log_t": [
+       1.6874949067368905,
+       1.9691063944471345
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.6967152625189592,
+       1.9629445032894997
+      ]
+     },
+     "w=1": {
+      "ratio": 2.5069237575406635,
+      "ci95_delta_log_t": [
+       2.3202484828936543,
+       2.7086179659016505
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       2.331021092138102,
+       2.70107949464685
+      ]
+     },
+     "band_order": "b>a at every weight"
+    }
+   },
+   "per_curve sib8-p512-aut3 / rho-cubic": {
+    "icv1-fp34-t235855-87821c5f": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.8529531156364423,
+       1.013915746182072,
+       1.7403923341497058
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.8529531156364423,
+       1.1663027849684204,
+       2.5805515323045287
+      ]
+     }
+    },
+    "icv1-fp34-t237115-1d5f056c": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.9464424948220288,
+       1.124570862633141,
+       1.9293358889000976
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.9464424948220288,
+       1.2932506113470694,
+       2.860092807424594
+      ]
+     }
+    },
+    "icv1-fp34-t36955-65b984b5": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.929244917497094,
+       1.1044238566091653,
+       1.8956436787261672
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.929244917497094,
+       1.2702507835751224,
+       2.8104507760325483
+      ]
+     }
+    },
+    "icv1-fp34-tm143051-871a23f1": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.7467152930112906,
+       0.8868166714735235,
+       1.5194320166015358
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.7467152930112906,
+       1.0196587427347914,
+       2.252110675345924
+      ]
+     }
+    },
+    "icv1-fp34-tm243689-63e51148": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.9765729514896904,
+       1.160966287468849,
+       1.9935767607257713
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.9765729514896904,
+       1.3354527117641777,
+       2.9559399460655587
+      ]
+     }
+    }
+   }
+  },
+  "j0b7-37": {
+   "sib8-p512-aut3 / rho-cubic": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.9006470972971286,
+      "ci95_delta_log_t": [
+       0.8109356723207037,
+       1.0002830329912393
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.8159649537408067,
+       0.9922261825837311
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.0726990300462296,
+      "ci95_delta_log_t": [
+       0.9657933227777276,
+       1.191438356347951
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.9720324209093186,
+       1.182223615764052
+      ]
+     },
+     "w=1": {
+      "ratio": 1.8480427510545563,
+      "ci95_delta_log_t": [
+       1.6635670548981976,
+       2.0529752616039216
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.6706084349386519,
+       2.039965610887004
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.9006470972971286,
+      "ci95_delta_log_t": [
+       0.8109356723207037,
+       1.0002830329912393
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.8158973493683643,
+       0.9928409067691132
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.235108201491519,
+      "ci95_delta_log_t": [
+       1.1119991914081766,
+       1.3718465635391446
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.1180971502951316,
+       1.3580060916230967
+      ]
+     },
+     "w=1": {
+      "ratio": 2.74234100565185,
+      "ci95_delta_log_t": [
+       2.468562706300852,
+       3.0464829481884976
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       2.483278283614737,
+       3.0259806078590645
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    }
+   },
+   "sib8-p512-aut3 / sib8-p512": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.5872013050287439,
+      "ci95_delta_log_t": [
+       0.5580460670869577,
+       0.617879764707186
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5592057249394825,
+       0.6146962067898855
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.5867320635969676,
+      "ci95_delta_log_t": [
+       0.5575606033022171,
+       0.6174297689145698
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5582778536123061,
+       0.6150947188598646
+      ]
+     },
+     "w=1": {
+      "ratio": 0.5857041301810189,
+      "ci95_delta_log_t": [
+       0.5564970991212319,
+       0.6164440545203475
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5579753156495805,
+       0.6136236925874596
+      ]
+     },
+     "band_order": "b<a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.5872013050287439,
+      "ci95_delta_log_t": [
+       0.5580460670869577,
+       0.617879764707186
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5588036224954737,
+       0.6146568979486622
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6755646863924423,
+      "ci95_delta_log_t": [
+       0.641962558693975,
+       0.7109256440578178
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.6426085291979112,
+       0.7072427684147808
+      ]
+     },
+     "w=1": {
+      "ratio": 0.8691359831684112,
+      "ci95_delta_log_t": [
+       0.8257804285832258,
+       0.914767813684008
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.8268783563911555,
+       0.9108316431590505
+      ]
+     },
+     "band_order": "b<a at every weight"
+    }
+   },
+   "tw2cj-lazy-aut3 / tw2cj-lazy": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.578830565038682,
+      "ci95_delta_log_t": [
+       0.5565661947928583,
+       0.6019855789978337
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5575713622521392,
+       0.6004276601447677
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.5787747882411473,
+      "ci95_delta_log_t": [
+       0.556508679568375,
+       0.6019317717800801
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5567993468929417,
+       0.6002806640380314
+      ]
+     },
+     "w=1": {
+      "ratio": 0.5785236672634202,
+      "ci95_delta_log_t": [
+       0.5562497267858766,
+       0.601689524447627
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5576129899294548,
+       0.6000108655871155
+      ]
+     },
+     "band_order": "b<a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.578830565038682,
+      "ci95_delta_log_t": [
+       0.5565661947928583,
+       0.6019855789978337
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5576543997105793,
+       0.6005485411977461
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6312856552224357,
+      "ci95_delta_log_t": [
+       0.6069958109123494,
+       0.6565474939450064
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.6080380106736168,
+       0.6552266046687303
+      ]
+     },
+     "w=1": {
+      "ratio": 0.8674514825180281,
+      "ci95_delta_log_t": [
+       0.8340420406188034,
+       0.9021992152391273
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.8358029631261075,
+       0.9000124016430028
+      ]
+     },
+     "band_order": "b<a at every weight"
+    }
+   },
+   "sib8-p512-aut3 / rho-neg": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.487740420082303,
+      "ci95_delta_log_t": [
+       0.43628383571260165,
+       0.545265943656849
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.43922957796831424,
+       0.5429947919612631
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.580829762195926,
+      "ci95_delta_log_t": [
+       0.5195068201121832,
+       0.6493913065082093
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5240255718884077,
+       0.6473513878796471
+      ]
+     },
+     "w=1": {
+      "ratio": 0.9999968969973143,
+      "ci95_delta_log_t": [
+       0.8942312002756435,
+       1.1182720908150068
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.900691776585638,
+       1.1134950787164408
+      ]
+     },
+     "band_order": "b<a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.487740420082303,
+      "ci95_delta_log_t": [
+       0.43628383571260165,
+       0.545265943656849
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.4385618856890944,
+       0.542516870012489
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6687687625928401,
+      "ci95_delta_log_t": [
+       0.5981408596435278,
+       0.7477363410459968
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.602288839786053,
+       0.7448566116670422
+      ]
+     },
+     "w=1": {
+      "ratio": 1.4839118275783802,
+      "ci95_delta_log_t": [
+       1.3269272415911086,
+       1.6594687658884841
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.3366548723915574,
+       1.6480702452372842
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    }
+   },
+   "tw2cj-lazy-aut3 / rho-cubic": {
+    "priced": {
+     "w=0": {
+      "ratio": 1.7931099556847958,
+      "ci95_delta_log_t": [
+       1.6060446416306253,
+       2.001963849467769
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.6161674978644132,
+       1.9887409066750008
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.7932411799063004,
+      "ci95_delta_log_t": [
+       1.6061185100968152,
+       2.0021647898933064
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.6189062481380758,
+       1.9922653987170393
+      ]
+     },
+     "w=1": {
+      "ratio": 1.793832535519469,
+      "ci95_delta_log_t": [
+       1.6064513375621565,
+       2.0030704262547907
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.6163592127671196,
+       1.9917742115508945
+      ]
+     },
+     "band_order": "b>a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 1.7931099556847958,
+      "ci95_delta_log_t": [
+       1.6060446416306253,
+       2.001963849467769
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.6218965822248166,
+       1.9866048745892797
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.9559377088093437,
+      "ci95_delta_log_t": [
+       1.751831696668545,
+       2.183824124211051
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.7621433743262598,
+       2.169321746533511
+      ]
+     },
+     "w=1": {
+      "ratio": 2.6897131100721454,
+      "ci95_delta_log_t": [
+       2.4087299031918814,
+       3.00347357539226
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       2.434252453334132,
+       2.983039459591996
+      ]
+     },
+     "band_order": "b>a at every weight"
+    }
+   },
+   "per_curve sib8-p512-aut3 / rho-cubic": {
+    "icv1-fp37-t313207-15fde43c": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.987800745406121,
+       1.1767792990848154,
+       2.0282672980379477
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.987800745406121,
+       1.3551005578914521,
+       3.0100575689433104
+      ]
+     }
+    },
+    "icv1-fp37-t67477-b7de45d5": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.9239332667081084,
+       1.100243716448558,
+       1.8949674518460113
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.9239332667081084,
+       1.26670534612436,
+       2.811759015629801
+      ]
+     }
+    },
+    "icv1-fp37-tm403199-03bfe7fd": {
+     "priced": {
+      "order": "b>a",
+      "ratios": [
+       1.0334265020430922,
+       1.2306510653833647,
+       2.11982038341366
+      ]
+     },
+     "priced_sym": {
+      "order": "b>a",
+      "ratios": [
+       1.0334265020430922,
+       1.416831268031911,
+       3.145377390938854
+      ]
+     }
+    },
+    "icv1-fp37-tm639959-9b99b18c": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.9486843194344361,
+       1.1300670808721125,
+       1.947445791204288
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.9486843194344361,
+       1.301240594974561,
+       2.8899913204370757
+      ]
+     }
+    },
+    "icv1-fp37-tm91079-10484075": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.6895620698641451,
+       0.8212559543019545,
+       1.4145246276801022
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.6895620698641451,
+       0.9456041998810875,
+       2.099050128312184
+      ]
+     }
+    }
+   }
+  },
+  "j0b7-40": {
+   "sib8-p512-aut3 / rho-cubic": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.9294636450522804,
+      "ci95_delta_log_t": [
+       0.8472559658751606,
+       1.0196477832782398
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.851820489901358,
+       1.0114603645256999
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.1080022136431884,
+      "ci95_delta_log_t": [
+       1.0099812597872022,
+       1.2155363216312243
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.0168222635433486,
+       1.208065529925028
+      ]
+     },
+     "w=1": {
+      "ratio": 1.9118967357741912,
+      "ci95_delta_log_t": [
+       1.742643813405119,
+       2.0975882163329005
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.7504904662730538,
+       2.0930148342089048
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.9294636450522804,
+      "ci95_delta_log_t": [
+       0.8472559658751606,
+       1.0196477832782398
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.8532809215670109,
+       1.0138809112335936
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.276327934702753,
+      "ci95_delta_log_t": [
+       1.1634085650770074,
+       1.4002071549084467
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.1692652860926749,
+       1.3933619680735327
+      ]
+     },
+     "w=1": {
+      "ratio": 2.838132224798739,
+      "ci95_delta_log_t": [
+       2.586869958759033,
+       3.1137995546189585
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       2.598875031384769,
+       3.096363742830932
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    }
+   },
+   "sib8-p512-aut3 / sib8-p512": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.5684919361637829,
+      "ci95_delta_log_t": [
+       0.5355846889211534,
+       0.6034210614464077
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5374907006055862,
+       0.6022713858014438
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.5683032825959249,
+      "ci95_delta_log_t": [
+       0.5353931304226955,
+       0.6032363933289886
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5374619934263,
+       0.6009140883022632
+      ]
+     },
+     "w=1": {
+      "ratio": 0.5678907668612851,
+      "ci95_delta_log_t": [
+       0.5349742707338215,
+       0.6028325860305899
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5372707627130328,
+       0.600535352057322
+      ]
+     },
+     "band_order": "b<a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.5684919361637829,
+      "ci95_delta_log_t": [
+       0.5355846889211534,
+       0.6034210614464077
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5373218450229277,
+       0.6010910383761887
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6546389041728347,
+      "ci95_delta_log_t": [
+       0.6167261685886549,
+       0.6948822940938739
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.6180294107304537,
+       0.6919328915051409
+      ]
+     },
+     "w=1": {
+      "ratio": 0.8430105326488934,
+      "ci95_delta_log_t": [
+       0.7941442731669702,
+       0.8948836907466459
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.7966974598120193,
+       0.8921878387783828
+      ]
+     },
+     "band_order": "b<a at every weight"
+    }
+   },
+   "tw2cj-lazy-aut3 / tw2cj-lazy": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.5796673795281408,
+      "ci95_delta_log_t": [
+       0.5519880363678044,
+       0.6087346984910492
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.554576839390179,
+       0.607184383081781
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.5796451285448183,
+      "ci95_delta_log_t": [
+       0.5519650706302378,
+       0.6087132916981591
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5537011105274254,
+       0.607294496999827
+      ]
+     },
+     "w=1": {
+      "ratio": 0.5795449786598973,
+      "ci95_delta_log_t": [
+       0.5518617035727373,
+       0.6086169417364393
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5535827183922885,
+       0.6063206666728285
+      ]
+     },
+     "band_order": "b<a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.5796673795281408,
+      "ci95_delta_log_t": [
+       0.5519880363678044,
+       0.6087346984910492
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.554070005331516,
+       0.6065051501201568
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6322977802229364,
+      "ci95_delta_log_t": [
+       0.602102095223976,
+       0.6640077921106238
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.6039853684265921,
+       0.6625592459949896
+      ]
+     },
+     "w=1": {
+      "ratio": 0.869182977453046,
+      "ci95_delta_log_t": [
+       0.827660441607957,
+       0.9127886392956238
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.829882097562683,
+       0.911803729975972
+      ]
+     },
+     "band_order": "b<a at every weight"
+    }
+   },
+   "sib8-p512-aut3 / rho-neg": {
+    "priced": {
+     "w=0": {
+      "ratio": 0.47873964166432215,
+      "ci95_delta_log_t": [
+       0.44528146703390437,
+       0.5147118428879786
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.44744650455415025,
+       0.5136290124179931
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.5706646382216394,
+      "ci95_delta_log_t": [
+       0.5307819674514443,
+       0.6135440713637763
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.5339952855648145,
+       0.6122527474342547
+      ]
+     },
+     "w=1": {
+      "ratio": 0.9844298973057392,
+      "ci95_delta_log_t": [
+       0.9156223597498789,
+       1.0584082098804555
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.9201783262965122,
+       1.0553768725921304
+      ]
+     },
+     "band_order": "b<a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 0.47873964166432215,
+      "ci95_delta_log_t": [
+       0.44528146703390437,
+       0.5147118428879786
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.4486691695466179,
+       0.5139233858571983
+      ]
+     },
+     "w=0.1": {
+      "ratio": 0.6573589927356156,
+      "ci95_delta_log_t": [
+       0.6114182797992084,
+       0.7067515964231442
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       0.6151875112433193,
+       0.7055084302476733
+      ]
+     },
+     "w=1": {
+      "ratio": 1.4613457737127056,
+      "ci95_delta_log_t": [
+       1.3592052233423313,
+       1.5711619067329967
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.3670474574668339,
+       1.5707374391264894
+      ]
+     },
+     "band_order": "unresolved inside the band"
+    }
+   },
+   "tw2cj-lazy-aut3 / rho-cubic": {
+    "priced": {
+     "w=0": {
+      "ratio": 1.8945874264370575,
+      "ci95_delta_log_t": [
+       1.740257311211362,
+       2.06260389960082
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.7518883356919637,
+       2.060223819420139
+      ]
+     },
+     "w=0.1": {
+      "ratio": 1.894646145919995,
+      "ci95_delta_log_t": [
+       1.7402964292453105,
+       2.0626853896414525
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.753132251074062,
+       2.055227838383334
+      ]
+     },
+     "w=1": {
+      "ratio": 1.8949105384882137,
+      "ci95_delta_log_t": [
+       1.7404725540888117,
+       2.0630523247483907
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.751710203284494,
+       2.057879547812298
+      ]
+     },
+     "band_order": "b>a at every weight"
+    },
+    "priced_sym": {
+     "w=0": {
+      "ratio": 1.8945874264370575,
+      "ci95_delta_log_t": [
+       1.740257311211362,
+       2.06260389960082
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.7544523389062077,
+       2.055332189624456
+      ]
+     },
+     "w=0.1": {
+      "ratio": 2.0667482453974015,
+      "ci95_delta_log_t": [
+       1.898376262770023,
+       2.250053581907171
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       1.9111087900877504,
+       2.2440331370179782
+      ]
+     },
+     "w=1": {
+      "ratio": 2.8419260704472205,
+      "ci95_delta_log_t": [
+       2.6102993723299694,
+       3.094106321865452
+      ],
+      "ci95_cluster_bootstrap_validator_seed": [
+       2.630349123677594,
+       3.0948530653783703
+      ]
+     },
+     "band_order": "b>a at every weight"
+    }
+   },
+   "per_curve sib8-p512-aut3 / rho-cubic": {
+    "icv1-fp40-t1488487-9502a4d3": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.9348637853706939,
+       1.11455529946657,
+       1.9235722039335552
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.9348637853706939,
+       1.2839420756676432,
+       2.855581333390092
+      ]
+     }
+    },
+    "icv1-fp40-tm1049837-6b76d8ca": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.9553282999859295,
+       1.1387359332507951,
+       1.9646601181546792
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.9553282999859295,
+       1.3116681797017327,
+       2.916343620216248
+      ]
+     }
+    },
+    "icv1-fp40-tm126551-e9d48089": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.9031744769358413,
+       1.076590354788849,
+       1.857465789612473
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.9031744769358413,
+       1.2401023775903104,
+       2.7572571167358197
+      ]
+     }
+    },
+    "icv1-fp40-tm1284971-7fcf908a": {
+     "priced": {
+      "order": "unresolved",
+      "ratios": [
+       0.8618121847066641,
+       1.027368590229283,
+       1.7727500489583699
+      ]
+     },
+     "priced_sym": {
+      "order": "unresolved",
+      "ratios": [
+       0.8618121847066641,
+       1.183458799512871,
+       2.6316022415180034
+      ]
+     }
+    },
+    "icv1-fp40-tm315245-337a1f69": {
+     "priced": {
+      "order": "b>a",
+      "ratios": [
+       1.0021635884156488,
+       1.1946968683287704,
+       2.061598833038095
+      ]
+     },
+     "priced_sym": {
+      "order": "b>a",
+      "ratios": [
+       1.0021635884156488,
+       1.376208384194539,
+       3.0603856261567413
+      ]
+     }
+    }
+   }
+  }
+ },
+ "band_means_S_per_run": {
+  "j0b7-34": {
+   "rho-neg-aa": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.9697872379658309,
+     1.0664414483487834,
+     1.936329341795357
+    ],
+    "mean_S_symmetric": [
+     0.9697872379658309,
+     1.0664414483487834,
+     1.936329341795357
+    ]
+   },
+   "sib8-p512-aut3": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.4915005659478305,
+     0.6421039036216438,
+     1.9975339426859642
+    ],
+    "mean_S_symmetric": [
+     0.4915005659478305,
+     0.7384948440828394,
+     2.9614433472979234
+    ]
+   },
+   "sib8-p512": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.8264474975772423,
+     1.0817649063284414,
+     3.37962158508924
+    ],
+    "mean_S_symmetric": [
+     0.8264474975772423,
+     1.0817649063284414,
+     3.37962158508924
+    ]
+   },
+   "tw2cj-lazy-aut3": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.9275870900637113,
+     1.019871324301642,
+     1.8504294324430166
+    ],
+    "mean_S_symmetric": [
+     0.9275870900637113,
+     1.1121241348426827,
+     2.772957537853423
+    ]
+   },
+   "tw2cj-lazy": {
+    "runs": 180,
+    "mean_S_committed": [
+     1.7938703411748642,
+     1.9728512499300874,
+     3.583679428727083
+    ],
+    "mean_S_symmetric": [
+     1.7938703411748642,
+     1.9728512499300874,
+     3.583679428727083
+    ]
+   },
+   "rho-cubic": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.554981112457871,
+     0.610094962565617,
+     1.106119613535333
+    ],
+    "mean_S_symmetric": [
+     0.554981112457871,
+     0.610094962565617,
+     1.106119613535333
+    ]
+   },
+   "rho-neg": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.9697872379658309,
+     1.0664414483487834,
+     1.936329341795357
+    ],
+    "mean_S_symmetric": [
+     0.9697872379658309,
+     1.0664414483487834,
+     1.936329341795357
+    ]
+   }
+  },
+  "j0b7-37": {
+   "rho-neg-aa": {
+    "runs": 180,
+    "mean_S_committed": [
+     1.0063142853391445,
+     1.106818428523021,
+     2.0113557171779073
+    ],
+    "mean_S_symmetric": [
+     1.0063142853391445,
+     1.106818428523021,
+     2.0113557171779073
+    ]
+   },
+   "sib8-p512-aut3": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.49082015226613673,
+     0.6428730846330946,
+     2.0113494759357176
+    ],
+    "mean_S_symmetric": [
+     0.49082015226613673,
+     0.7402055908582923,
+     2.984674538187695
+    ]
+   },
+   "sib8-p512": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.8358635242510415,
+     1.0956842561014206,
+     3.4340708427548305
+    ],
+    "mean_S_symmetric": [
+     0.8358635242510415,
+     1.0956842561014206,
+     3.4340708427548305
+    ]
+   },
+   "tw2cj-lazy-aut3": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.9771801897994564,
+     1.0746970553033601,
+     1.952348844838497
+    ],
+    "mean_S_symmetric": [
+     0.9771801897994564,
+     1.1722017760734433,
+     2.9273960525393323
+    ]
+   },
+   "tw2cj-lazy": {
+    "runs": 180,
+    "mean_S_committed": [
+     1.6881972874638254,
+     1.8568484272946366,
+     3.3747086857719353
+    ],
+    "mean_S_symmetric": [
+     1.6881972874638254,
+     1.8568484272946366,
+     3.3747086857719353
+    ]
+   },
+   "rho-cubic": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.5449638973345986,
+     0.5993042471618433,
+     1.0883673956070403
+    ],
+    "mean_S_symmetric": [
+     0.5449638973345986,
+     0.5993042471618433,
+     1.0883673956070403
+    ]
+   },
+   "rho-neg": {
+    "runs": 180,
+    "mean_S_committed": [
+     1.0063142853391445,
+     1.106818428523021,
+     2.0113557171779073
+    ],
+    "mean_S_symmetric": [
+     1.0063142853391445,
+     1.106818428523021,
+     2.0113557171779073
+    ]
+   }
+  },
+  "j0b7-40": {
+   "rho-neg-aa": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.9989766715332296,
+     1.0988247118018548,
+     1.9974570742194804
+    ],
+    "mean_S_symmetric": [
+     0.9989766715332296,
+     1.0988247118018548,
+     1.9974570742194804
+    ]
+   },
+   "sib8-p512-aut3": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.47824973376083557,
+     0.6270604066294029,
+     1.9663564624465042
+    ],
+    "mean_S_symmetric": [
+     0.47824973376083557,
+     0.7223223057430705,
+     2.918975453583182
+    ]
+   },
+   "sib8-p512": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.8412603650776356,
+     1.1033904357636013,
+     3.462561071937294
+    ],
+    "mean_S_symmetric": [
+     0.8412603650776356,
+     1.1033904357636013,
+     3.462561071937294
+    ]
+   },
+   "tw2cj-lazy-aut3": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.9748481687298101,
+     1.0722519937690433,
+     1.9488864191221464
+    ],
+    "mean_S_symmetric": [
+     0.9748481687298101,
+     1.1696510884199767,
+     2.922877365631478
+    ]
+   },
+   "tw2cj-lazy": {
+    "runs": 180,
+    "mean_S_committed": [
+     1.6817371533367167,
+     1.849842155080126,
+     3.3627871707708112
+    ],
+    "mean_S_symmetric": [
+     1.6817371533367167,
+     1.849842155080126,
+     3.3627871707708112
+    ]
+   },
+   "rho-cubic": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.5145437761946405,
+     0.56593786448096,
+     1.0284846590578338
+    ],
+    "mean_S_symmetric": [
+     0.5145437761946405,
+     0.56593786448096,
+     1.0284846590578338
+    ]
+   },
+   "rho-neg": {
+    "runs": 180,
+    "mean_S_committed": [
+     0.9989766715332296,
+     1.0988247118018548,
+     1.9974570742194804
+    ],
+    "mean_S_symmetric": [
+     0.9989766715332296,
+     1.0988247118018548,
+     1.9974570742194804
+    ]
+   }
+  }
+ },
+ "slope_check": {
+  "sib8-p512-aut3 / rho-cubic": {
+   "slope": 0.012062058455738787,
+   "workloads": 90,
+   "ci95_boot_by_workload": [
+    -0.020667349671764416,
+    0.04443813286245034
+   ],
+   "clusters_workload": 90,
+   "ci95_boot_by_curve": [
+    -0.013100387172260355,
+    0.040749216570969415
+   ],
+   "clusters_curve": 15
+  },
+  "sib8-p512-aut3 / sib8-p512": {
+   "slope": -0.012157699096873992,
+   "workloads": 90,
+   "ci95_boot_by_workload": [
+    -0.030095595512443053,
+    0.006463415185968987
+   ],
+   "clusters_workload": 90,
+   "ci95_boot_by_curve": [
+    -0.0347282582838043,
+    0.011972758599882945
+   ],
+   "clusters_curve": 15
+  },
+  "tw2cj-lazy-aut3 / tw2cj-lazy": {
+   "slope": 0.02893184730271119,
+   "workloads": 90,
+   "ci95_boot_by_workload": [
+    0.0099976687865723,
+    0.04822128726011395
+   ],
+   "clusters_workload": 90,
+   "ci95_boot_by_curve": [
+    0.010211136896393833,
+    0.0476456782453695
+   ],
+   "clusters_curve": 15
+  }
+ },
+ "validator_tools_sha256": {
+  "indep_check.py": "6fd624d4999f9027cd415b73f3b9257bcc037e293404a6e639a470d3f9dc2f98",
+  "cert_runs.py": "ea19fb7d6a60033d410ac659db2eaaeb102290a4890b98e98b8856ada1ec5e5b",
+  "slope_check.py": "fe676b4ad4595a282e82ff76afe107323491018e98de6174273cddff131941f7",
+  "band_check.py": "ec5a6bc45f9327eb5fedbb8826bd6dad9f90ef428f9257d660ff3dff9761b53c",
+  "assemble.py": "0987aed8e7b92f548bf4432c82b93470249821d43fa40e18aff7030cb8f1b1c3"
+ },
+ "validator_tools_note": "The validator's checks are Python in the session scratchpad (the dispatch allowed Python for the [d]G = Q check). They are not landed in the repository, per AGENTS.md 'Implementation language: no Python'; their digests are recorded here.",
+ "not_done": [
+  "No replay on another host class (same VM class; independent process).",
+  "No validation/v1 record: the 15 curves have curve_uid null (not registered in ecdb), and validation/v1 requires inputs.curve_uid = urn:ec-record:1:sha256:<hex>; the validator did not invent one.",
+  "No pcc claim filed or verified; every number here stays [pcc:unverified] until CI signs a verdict.",
+  "No wall-time validation (L0 local run; no wall-time claim was made).",
+  "The ecdb and research-kb MCP servers were not available to the validator in this session."
+ ]
+}

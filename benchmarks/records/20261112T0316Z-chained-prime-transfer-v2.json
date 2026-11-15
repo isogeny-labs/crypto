@@ -1,0 +1,155 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-12T03:18:12+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/chained_transfer_bench",
+        "run",
+        "--json",
+        "research/chained_prime_transfer_20261111/results_v2.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T03:16:55+00:00",
+      "wall_s": 0.175
+    }
+  ],
+  "commit": "c211ce17a4df22ec452d9e437250dd666e06605c",
+  "commit_dirty": false,
+  "created_utc": "2026-11-12T03:16:51+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T0316Z-chained-prime-transfer-v2",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_p211",
+      "note": "genus-2 IC relation collection on J(C), corrected counter (replay F1); LA = 14633 mulmods unpriced; rho recovered planted log",
+      "reference": 428.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 3700.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_p419",
+      "note": "genus-2 IC relation collection on J(C), corrected counter (replay F1); LA = 51976 mulmods unpriced; rho recovered planted log",
+      "reference": 357.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 8315.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_p821",
+      "note": "genus-2 IC relation collection on J(C), corrected counter (replay F1); LA = 164828 mulmods unpriced; rho recovered planted log",
+      "reference": 370.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 11596.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_p1619",
+      "note": "genus-2 IC relation collection on J(C), corrected counter (replay F1); LA = 603721 mulmods unpriced; rho recovered planted log",
+      "reference": 847.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 33196.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_la_mulmods_p211",
+      "note": "IC linear algebra over Z/r in mulmods, unpriced native work (AGENTS 5a)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 14633.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_la_mulmods_p419",
+      "note": "IC linear algebra over Z/r in mulmods, unpriced native work (AGENTS 5a)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 51976.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_la_mulmods_p821",
+      "note": "IC linear algebra over Z/r in mulmods, unpriced native work (AGENTS 5a)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 164828.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_la_mulmods_p1619",
+      "note": "IC linear algebra over Z/r in mulmods, unpriced native work (AGENTS 5a)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 603721.0
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 1756,
+      "path": "research/chained_prime_transfer_20261111/results_v2.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cb/cb0c37315851cacd27d16707eeeb982f267f8404ed04f1ffbd2798efe642053c",
+      "sha256": "cb0c37315851cacd27d16707eeeb982f267f8404ed04f1ffbd2798efe642053c",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-chained-prime-transfer/REPORT_v2.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-chained-prime-transfer/band-v2.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "chained-prime-transfer-v2",
+  "status": "measured",
+  "summary": "Corrected rerun after independent replay: IC/rho 8.6-39.2x at 0 GAE, 12-110x at 0.1, 43-752x at 1 GAE; rho and IC recover the planted log; no advantage [pcc:unverified]",
+  "validation": null
+}
