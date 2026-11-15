@@ -62,7 +62,7 @@
 //! A polynomial equal to the constant 1 is written as the empty clause `0`.
 //!
 //!     rr_quadratic_panel --out DIR [--m 7,9,11,13] [--ell-offset 0] [--planted 4]
-//!         [--unplanted 4] [--budget-s 600] [--sat-conflicts N] [--arms incidence,norm]
+//!         [--unplanted 4] [--first-draw 0] [--budget-s 600] [--sat-conflicts N] [--arms incidence,norm]
 //!         [--solvers f4,sat] [--seed 20261115] [--jobs 1]
 //!
 //! `ℓ = (m + 2) / 3 + offset` (integer division; `--ell-offset` takes a comma list).
@@ -594,6 +594,9 @@ fn main() {
     let num = |name: &str, d: &str| get(name).unwrap_or_else(|| d.to_string());
     let planted: u32 = num("--planted", "4").parse().expect("--planted");
     let unplanted: u32 = num("--unplanted", "4").parse().expect("--unplanted");
+    // Draws below this index are drawn (the RNG stream is unchanged) but not solved,
+    // so a cell can be resumed or split across processes with identical instances.
+    let first_draw: u32 = num("--first-draw", "0").parse().expect("--first-draw");
     let budget_s: f64 = num("--budget-s", "600").parse().expect("--budget-s");
     let sat_conflicts: Option<u64> = get("--sat-conflicts").map(|s| s.parse().expect("--sat-conflicts"));
     let arms = list("--arms", "incidence,norm");
@@ -627,6 +630,9 @@ fn main() {
             for d in 0..planted + unplanted {
                 let is_planted = d < planted;
                 let dr = draw_instance(&curve, ell, &mut rng, is_planted);
+                if d < first_draw {
+                    continue;
+                }
                 let base = factor_base(&curve, &dr.span);
                 let (total, distinct, nbase) = count_truth(&curve, &base, &dr.target);
                 // Diagnostic only: the systems admit x_i = 0 (0 ∈ V), i.e. the 2-torsion
