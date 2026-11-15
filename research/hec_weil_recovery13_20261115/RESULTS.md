@@ -25,3 +25,13 @@ This establishes the bounded source-recovery prerequisite, not a production
 replacement or timing result. General clustered/repeated-root and ambiguous
 lifts stop unsupported. Current cold benchmark and failed10xgate remain fixed.
 Genus2/4 and scalable transfer/LA remain open. Both source-frozen gates retained.
+
+## Arithmetic cost clarification
+The frozen protocol's O(p) ring-operation shorthand counts unit inversion as
+an arithmetic primitive. More precisely, this code performs O(p) recurrence
+steps, each with bounded products and one extended-Euclidean unit inverse on
+O(log p)-bit integers; the latter's work must also be charged. Thus fixed-genus
+coefficient extraction is p times a polylogarithmic bit-cost, not a claimed
+O(p) count of additions/multiplications with inversions free. The independent
+quadratic reference remains inside the correctness worker only. No timing
+measurement, asymptotic empirical fit or change to frozen source/protocol.
