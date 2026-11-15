@@ -123,7 +123,6 @@ def solve(group, target):
         relation_trials+=1
         for s in table.get(step,()):
             verified_relation_count+=1
-            assert group.mul(0,G) is None  # public-input correctness guard
             if row_rank(rows+[s])>len(rows):
                 rows.append(s); rhs.append(a)
         if len(rows)==len(BASE): break
@@ -131,7 +130,8 @@ def solve(group, target):
     if len(rows)!=len(BASE):
         raise RuntimeError('rank-deficient factor-base relation set')
     logs=solve_linear(rows,rhs)
-    assert all(group.mul(v,G)==pt for v,pt in zip(logs,BASE))
+    if not all(group.mul(v,G)==pt for v,pt in zip(logs,BASE)):
+        raise AssertionError("factor-base log certificate failed")
     prep_ops=group.ctr.ops-start
     state=target
     shift=0
@@ -139,7 +139,7 @@ def solve(group, target):
         signs=table.get(state,())
         if signs:
             d=(sum(e*v for e,v in zip(signs[0],logs))-shift)%R
-            assert group.mul(d,G)==target
+            if group.mul(d,G)!=target: raise AssertionError("target replay failed")
             return d,dict(total_ops=group.ctr.ops-start,
                           table_ops=table_ops, relation_ops=prep_ops-table_ops,
                           witness_ops=group.ctr.ops-start-prep_ops,
@@ -164,7 +164,7 @@ def bsgs(group,target):
     for i in range(m+1):
         if state in baby:
             d=(i*m+baby[state])%R
-            assert group.mul(d,G)==target
+            if group.mul(d,G)!=target: raise AssertionError("target replay failed")
             return d, group.ctr.ops-before
         state=group.add(state,step)
     raise RuntimeError('BSGS failure')
