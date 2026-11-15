@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0735Z-ic-direct-rows-ab",
+  "latest_record": "20261115T0947Z-ic-fast-verify-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 4,
-    "measured": 188,
+    "measured": 189,
     "open": 1
   },
   "repo": "crypto",
@@ -11604,10 +11604,10 @@
     {
       "better": "higher",
       "first": 1.0050488198854794,
-      "latest": 1.0220510342223998,
+      "latest": 0.9893389421171053,
       "latest_derived": {
-        "improvement_vs_first_percent": 1.6917,
-        "improvement_vs_previous_percent": 2.6742
+        "improvement_vs_first_percent": -1.5631,
+        "improvement_vs_previous_percent": -3.2006
       },
       "metric": "setup_aa_k0n53",
       "points": [
@@ -11699,6 +11699,24 @@
           ],
           "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
           "value": 1.0220510342223998
+        },
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -1.5631,
+            "improvement_vs_previous_percent": -3.2006
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9471262090668178,
+            1.015578565191985
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 0.9893389421171053
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -11707,10 +11725,10 @@
     {
       "better": "higher",
       "first": 1.0032154840727214,
-      "latest": 0.9955174479165319,
+      "latest": 1.0029183117812122,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.7673,
-        "improvement_vs_previous_percent": -1.7023
+        "improvement_vs_first_percent": -0.0296,
+        "improvement_vs_previous_percent": 0.7434
       },
       "metric": "setup_aa_k0n61",
       "points": [
@@ -11802,6 +11820,24 @@
           ],
           "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
           "value": 0.9955174479165319
+        },
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0296,
+            "improvement_vs_previous_percent": 0.7434
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9680435549897459,
+            1.025189548828425
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 1.0029183117812122
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -11922,6 +11958,66 @@
           ],
           "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
           "value": 1.0149471493124298
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.979895283457205,
+      "latest": 0.979895283457205,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_generic_over_fast_k0n53",
+      "points": [
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9522491599746913,
+            0.9988902154555943
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 0.979895283457205
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.00839738470753,
+      "latest": 1.00839738470753,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_generic_over_fast_k0n61",
+      "points": [
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9780631227958366,
+            1.0230564234275799
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 1.00839738470753
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -12170,7 +12266,7 @@
     {
       "better": "neutral",
       "first": 1.0201610621017192,
-      "latest": 1.0201610621017192,
+      "latest": 1.0061915322424906,
       "latest_derived": {},
       "metric": "verify_aa_k0n53",
       "points": [
@@ -12188,6 +12284,21 @@
           ],
           "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
           "value": 1.0201610621017192
+        },
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9454740959768334,
+            1.030848611028784
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 1.0061915322424906
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -12196,7 +12307,7 @@
     {
       "better": "neutral",
       "first": 0.9936539710474812,
-      "latest": 0.9936539710474812,
+      "latest": 0.9976828415923339,
       "latest_derived": {},
       "metric": "verify_aa_k0n61",
       "points": [
@@ -12214,6 +12325,21 @@
           ],
           "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
           "value": 0.9936539710474812
+        },
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9812001828168794,
+            1.0155561043581394
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 0.9976828415923339
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -12274,6 +12400,66 @@
           ],
           "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
           "value": 2.4369374151316916
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.0988447957077296,
+      "latest": 2.0988447957077296,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verify_generic_over_fast_k0n53",
+      "points": [
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.0472090771182962,
+            2.177246542472667
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 2.0988447957077296
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.2684197260732395,
+      "latest": 2.2684197260732395,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verify_generic_over_fast_k0n61",
+      "points": [
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.2060185240135626,
+            2.308714039186569
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 2.2684197260732395
         }
       ],
       "problem": "ic:koblitz_setup_phase",

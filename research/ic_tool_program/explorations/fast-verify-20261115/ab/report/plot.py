@@ -23,6 +23,6 @@ for ax, (metric, kb, sb, kq, sq, ylim) in zip(axes, panels):
     ax.set_title(f"{metric}: per-round ratio, median, 95% bootstrap", fontsize=8)
     ax.set_ylim(*ylim); ax.grid(alpha=0.25); ax.legend(fontsize=6.5, loc="upper left")
 axes[0].set_ylabel("generic / fast time (above 1: fast faster)")
-fig.text(0.01, 0.01, "24 rounds a row, labels a q f cycled over six orders; one binary (frozen protocol commit); Intel Xeon container", fontsize=6)
+fig.text(0.01, 0.01, "24 rounds a row, labels a q f cycled over six orders; one binary (d1290ca405); Intel Xeon container", fontsize=6)
 fig.tight_layout(rect=(0, 0.03, 1, 1))
 fig.savefig(f"{here}/report/ab.svg"); fig.savefig(f"{here}/report/ab.png", dpi=150)
