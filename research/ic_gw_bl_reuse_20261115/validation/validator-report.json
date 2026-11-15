@@ -1,0 +1,817 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/ic_gw_bl_reuse_20261115",
+ "status": "pass",
+ "independent": true,
+ "independence_note": "Validator subagent with its own context, nonce, sample, runner, comparator, oracle build, stress harness and recompute script; the producer's analyze.py and plot.py were not read or imported (analyze.py only hashed). It runs in the same Claude Code session and container as the producer, so independence is of reasoning and code, not of host or organization; no keyring signature.",
+ "validated_snapshot": {
+  "repository": "/home/user/crypto (branch claude/f4-f5-algorithm-speed-bvp7qd)",
+  "head": "c5bf40cee6f291a301f7384dd941751c8622af28",
+  "data_commit": "c5bf40cee6 (ic_gw_bl_reuse_20261115: results, report, benchmark record)",
+  "protocol_freeze_commit": "5c9dc91c48 (PROTOCOL.md, analyze.py, make-units.sh, run-local.sh, units.tsv, src/ added before data; committed 04:32:34Z, run.log start 04:32:47Z)",
+  "freeze_integrity": "git diff 5c9dc91c48..HEAD is empty for PROTOCOL.md, src/, units.tsv, make-units.sh, run-local.sh, analyze.py and for ../ic_gw_fasthash_20261114/src; BLR src/ differs from ../ic_gw_fasthash_20261114/src only in la2.rs (ic2.rs, rho2.rs, solver2.rs, summ2.rs, v3.rs byte-identical); the shared includes research/quartic_n4_20261019/{common,ghs,ic,solver}.rs and src/cryptanalysis/plane_quartic_pic.rs are clean in the work tree and are bound by the bit-identical REF rebuild",
+  "dirty_paths_under_study_before_validation": [],
+  "remote_main_at_nonce_time": "34a4f6f2904396635bb935e1c02220ffa86661f9 (git ls-remote; not fetched)",
+  "amendment_1": {
+   "head": "69e368d44bafbc1f96581d9d668e66355d9eb74c",
+   "amendment_freeze_commit": "98a4fc6639 (AMENDMENT.md and amendment-1/src, 2026-11-15T05:01:37Z; amendment run.log starts 05:06:26Z)",
+   "analysis_commit": "ad67c57e1f (amendment-1/analyze.py = ../analyze.py with one line changed: R = HERE/../.. instead of HERE/..; committed 05:08:35Z, after the runs started, but it is the frozen script)",
+   "data_commit": "69e368d44b (runs-blr1-20261115.tar.gz, analysis.json, tables.md, RESULT.md)",
+   "source_diff": "amendment-1/src vs src: la2.rs 3 lines (narrowed0 -> narrowed_any, set on every narrowing, guard of the V_i^T V0 recurrence); v3.rs only the 5 #[path] includes gain one ../; ic2.rs, rho2.rs, solver2.rs, summ2.rs byte-identical",
+   "dirty_paths_before_validation": [],
+   "remote_main_at_nonce_time": "e7cf50b2f07106e0bf5a7011be52a3ac0d30e8ca (git ls-remote; not fetched)",
+   "observation": "the amendment run.log has two 'start' lines (05:06:26Z, 05:08:20Z) and one 'done'; run-local.sh skips finished units, and all 30 BLR1 units carry their unit record with rc 0; RESULT.md states an earlier ad-hoc rerun without unit records was discarded. Counted output is deterministic and every BLR1 record was re-derived here (oracle build on all 30 cells), so the restart has no bearing on the numbers."
+  }
+ },
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "e898e032dfc121ae72e51764944ef25b174c6b153f5b54fe2b819b9e9bfb4914"
+ },
+ "raw_data_path_base": "paths in raw_data[].path are relative to research/ic_gw_bl_reuse_20261115/validation/ (the directory of this report); repo_path is repository-relative",
+ "raw_data": [
+  {
+   "path": "../runs-blreuse-20261115.tar.gz",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/runs-blreuse-20261115.tar.gz",
+   "sha256": "e24e4050ae88418fc16e3c7434109de23b72779409fc33a915f4191f5a22c3e7",
+   "role": "round 1: producer raw JSONL of the 60 units + binary.sha256, host.txt, run.log, SHA256SUMS (123/123 inner OK)"
+  },
+  {
+   "path": "../units.tsv",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/units.tsv",
+   "sha256": "d2421d7c12188cac86444186f1927c7676715b140149154339ec73aa3fa102ec",
+   "role": "round 1: frozen unit list (5c9dc91c48)"
+  },
+  {
+   "path": "../PROTOCOL.md",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/PROTOCOL.md",
+   "sha256": "e80f3879ad0e536cb622e38e352df7522dff84e1021f9f84722650d76f43fc62",
+   "role": "round 1: frozen protocol (5c9dc91c48)"
+  },
+  {
+   "path": "../analysis.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/analysis.json",
+   "sha256": "162ab32713dd12b5f41660e456d3ad641fd3f139960591a5152cd8183386c69e",
+   "role": "round 1: producer analysis output (claimed values, read by key)"
+  },
+  {
+   "path": "../src/la2.rs",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/src/la2.rs",
+   "sha256": "c613cb2d241931622b13ecae69171be612f7c7de8e95f425ace69266c1fdcff8",
+   "role": "round 1: BLR change set (the only file differing from ../../ic_gw_fasthash_20261114/src)"
+  },
+  {
+   "path": "../../ic_gw_fasthash_20261114/src/la2.rs",
+   "repo_path": "research/ic_gw_fasthash_20261114/src/la2.rs",
+   "sha256": "93c6fecc133d87bb4e421c6f7e4672e8e876bd67961f0c4d6b027447c063ff82",
+   "role": "round 1: REF la2.rs"
+  },
+  {
+   "path": "../../ic_gw_fasthash_20261114/runs-fasthash-20261114.tar.gz",
+   "repo_path": "research/ic_gw_fasthash_20261114/runs-fasthash-20261114.tar.gz",
+   "sha256": "d9d301a42050b5073f10a8f330eb8e31cbc3c4144bc71dbf9706d2482c01b897",
+   "role": "round 1: committed fasthash COMBO records (G4 and replay REF comparison)"
+  },
+  {
+   "path": "../../quartic_n4v2_20261020/results/summary.json",
+   "repo_path": "research/quartic_n4v2_20261020/results/summary.json",
+   "sha256": "a8d6c823f4b90829f409ef20e51df7de70fae6789a6458e272a730e71483ad7c",
+   "role": "round 1: frozen r_inv, r_lmul, gae per size"
+  },
+  {
+   "path": "../../quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json",
+   "repo_path": "research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json",
+   "sha256": "c9d0df20e93acfcbb758985305ef31a8423bc267d1ef13a43266e6945615a686",
+   "role": "round 1: frozen negation-map rho band (gae_band)"
+  },
+  {
+   "path": "replay/replay-runs-20261115.tar.gz",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/replay/replay-runs-20261115.tar.gz",
+   "sha256": "001139a7760740e7012dd64b9dadfa7c6bb7f1ffcf3a188a0ae2ae2fde7a19fe",
+   "role": "round 1: validator replay JSONL (34 + 26 runs, stderr incl. BLAUDIT oracle lines), plan, nonce, run log, stress-harness outputs"
+  },
+  {
+   "path": "recompute.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/recompute.json",
+   "sha256": "155621c682811ac127ab40ec663fdb9b139bece97a67b15c98b92bed0f2576e0",
+   "role": "round 1: validator recompute (scripts/recompute.py)"
+  },
+  {
+   "path": "replay-compare.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/replay-compare.json",
+   "sha256": "225283ce4816abe86d52030bea2788700b01bf47f0fea896328b247eff3c8621",
+   "role": "round 1: validator replay comparison (scripts/compare.py)"
+  },
+  {
+   "path": "stress-summary.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/stress-summary.json",
+   "sha256": "3ba2a5165394bc45fd394dead4697f4e0c715d5dea9628d1428017bdc21eb424",
+   "role": "round 1: validator block_lanczos stress comparison (scripts/stress_compare.py)"
+  },
+  {
+   "path": "../amendment-1/runs-blr1-20261115.tar.gz",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/amendment-1/runs-blr1-20261115.tar.gz",
+   "sha256": "bb2969c06e1617edc09081a0a5b6aa44b8183ea22d28253b54077562d97ca761",
+   "role": "amendment 1 raw JSONL: 30 BLR1 units + 30 REF units (byte-identical to the round-1 REF files) + binary.sha256, run.log, SHA256SUMS (123/123 inner OK); the headline's BLR1 side"
+  },
+  {
+   "path": "../amendment-1/AMENDMENT.md",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/amendment-1/AMENDMENT.md",
+   "sha256": "07330ce26d3af51dfb76ca879b4ea0ffccddacb7e9ba227056d62723fe5551a9",
+   "role": "amendment 1, frozen before its runs (98a4fc6639)"
+  },
+  {
+   "path": "../amendment-1/analysis.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json",
+   "sha256": "d8db1947a8082a941f623dd42acafbb0587f3a57993d1b50a41422d333a46f31",
+   "role": "amendment 1 analysis output (claimed values, read by key)"
+  },
+  {
+   "path": "../amendment-1/src/la2.rs",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/amendment-1/src/la2.rs",
+   "sha256": "6c3cc9ab851bd373e7a6fad9addad444bf271cfe8f8284eb456ef07e5aed4238",
+   "role": "BLR1 change set (narrowed_any guard)"
+  },
+  {
+   "path": "amendment-1/replay/replay-runs-amd1-20261115.tar.gz",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/amendment-1/replay/replay-runs-amd1-20261115.tar.gz",
+   "sha256": "1f0ac6c3c2ae682c0ed86d97f8458ac8c6e52560af93d650530bef65c0bd5bf4",
+   "role": "validator amendment replay JSONL (46 runs, stderr with BLAUDIT oracle lines), plan, nonce (and the void derivation), run log, stress outputs digests"
+  },
+  {
+   "path": "amendment-1/recompute-amd1.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/amendment-1/recompute-amd1.json",
+   "sha256": "2245566c6fac3315beae2fd0f1b96b3847fce78f9156aeef08bdb3fff15baab5",
+   "role": "validator recompute of the amended headline (scripts/recompute.py on the amendment tarball)"
+  },
+  {
+   "path": "amendment-1/replay-compare-amd1.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/amendment-1/replay-compare-amd1.json",
+   "sha256": "5ddd1ed6ac3eeff2b35404e27b2c3ec860dd16a88660420dd6d892744743aec3",
+   "role": "validator amendment replay comparison (amendment-1/scripts/compare_amd1.py)"
+  },
+  {
+   "path": "amendment-1/stress-summary-amd1.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/amendment-1/stress-summary-amd1.json",
+   "sha256": "6e4ed27de6d78d62922b0be605bb5daacd719d4d8fc9643038f43ccc59a7563d",
+   "role": "validator stress comparison REF vs BLR1 vs AUD1 (scripts/stress_compare.py)"
+  },
+  {
+   "path": "amendment-1/delta-amd1.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/amendment-1/delta-amd1.json",
+   "sha256": "b39ca4180aafc0601ac668cbe026b379769eff880a3a548332a92023d99d93ee",
+   "role": "BLR1 vs frozen BLR per cell (amendment-1/scripts/delta_amd1.py)"
+  }
+ ],
+ "headline": [
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=262111, w_add=0.0, w_h=0",
+   "claimed": 0.8184385506497883,
+   "recomputed": 0.8184385506497883,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=262111, w_add=0.0, w_h=0",
+   "claimed": 0.8223141186697291,
+   "recomputed": 0.8223141186697291,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8223",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=524287, w_add=0.0, w_h=0",
+   "claimed": 0.8105347299649033,
+   "recomputed": 0.8105347299649033,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=524287, w_add=0.0, w_h=0",
+   "claimed": 0.8136452622698872,
+   "recomputed": 0.8136452622698872,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8136",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=1048507, w_add=0.0, w_h=0",
+   "claimed": 0.8152077511214297,
+   "recomputed": 0.8152077511214297,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=1048507, w_add=0.0, w_h=0",
+   "claimed": 0.8163072524393469,
+   "recomputed": 0.8163072524393469,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8163",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=2097091, w_add=0.0, w_h=0",
+   "claimed": 0.8189374362240878,
+   "recomputed": 0.8189374362240878,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=2097091, w_add=0.0, w_h=0",
+   "claimed": 0.8193562859666033,
+   "recomputed": 0.8193562859666033,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8194",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=4194271, w_add=0.0, w_h=0",
+   "claimed": 0.8126594525783308,
+   "recomputed": 0.8126594525783308,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=4194271, w_add=0.0, w_h=0",
+   "claimed": 0.8128736680729121,
+   "recomputed": 0.8128736680729121,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8129",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL ratio min over the 30 (q, seed) cells, w_add=0.0",
+   "claimed": 0.8092929605759078,
+   "recomputed": 0.8092929605759078,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL ratio max over the 30 (q, seed) cells, w_add=0.0",
+   "claimed": 0.8223141186697291,
+   "recomputed": 0.8223141186697291,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=262111, w_add=0.5, w_h=0",
+   "claimed": 0.8635339497408379,
+   "recomputed": 0.8635339497408379,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=262111, w_add=0.5, w_h=0",
+   "claimed": 0.8655952148370627,
+   "recomputed": 0.8655952148370627,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8656",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=524287, w_add=0.5, w_h=0",
+   "claimed": 0.8622448212069278,
+   "recomputed": 0.8622448212069278,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=524287, w_add=0.5, w_h=0",
+   "claimed": 0.8650747976289801,
+   "recomputed": 0.8650747976289801,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8651",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=1048507, w_add=0.5, w_h=0",
+   "claimed": 0.8655628158368011,
+   "recomputed": 0.8655628158368011,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=1048507, w_add=0.5, w_h=0",
+   "claimed": 0.8663148833042159,
+   "recomputed": 0.8663148833042159,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8663",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=2097091, w_add=0.5, w_h=0",
+   "claimed": 0.8688407588108968,
+   "recomputed": 0.8688407588108968,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=2097091, w_add=0.5, w_h=0",
+   "claimed": 0.870004885607046,
+   "recomputed": 0.870004885607046,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8700",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=4194271, w_add=0.5, w_h=0",
+   "claimed": 0.8676953273265562,
+   "recomputed": 0.8676953273265562,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=4194271, w_add=0.5, w_h=0",
+   "claimed": 0.8686999172050819,
+   "recomputed": 0.8686999172050819,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8687",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL ratio min over the 30 (q, seed) cells, w_add=0.5",
+   "claimed": 0.8606011881199473,
+   "recomputed": 0.8606011881199473,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL ratio max over the 30 (q, seed) cells, w_add=0.5",
+   "claimed": 0.870004885607046,
+   "recomputed": 0.870004885607046,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=262111, w_add=1.0, w_h=0",
+   "claimed": 0.8833932116886917,
+   "recomputed": 0.8833932116886917,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=262111, w_add=1.0, w_h=0",
+   "claimed": 0.8859415571447757,
+   "recomputed": 0.8859415571447757,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8859",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=524287, w_add=1.0, w_h=0",
+   "claimed": 0.8837103378478449,
+   "recomputed": 0.8837103378478449,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=524287, w_add=1.0, w_h=0",
+   "claimed": 0.8862988468227541,
+   "recomputed": 0.8862988468227541,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8863",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=1048507, w_add=1.0, w_h=0",
+   "claimed": 0.8864068492264996,
+   "recomputed": 0.8864068492264996,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=1048507, w_add=1.0, w_h=0",
+   "claimed": 0.8870258131311629,
+   "recomputed": 0.8870258131311629,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8870",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=2097091, w_add=1.0, w_h=0",
+   "claimed": 0.889271486460952,
+   "recomputed": 0.889271486460952,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=2097091, w_add=1.0, w_h=0",
+   "claimed": 0.8905497925351555,
+   "recomputed": 0.8905497925351555,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8905",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF geomean over seeds 1-6, q=4194271, w_add=1.0, w_h=0",
+   "claimed": 0.8893988041088208,
+   "recomputed": 0.8893988041088208,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL cold M-eq BLR1/REF max over seeds 1-6, q=4194271, w_add=1.0, w_h=0",
+   "claimed": 0.8905229824965997,
+   "recomputed": 0.8905229824965997,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 0.8905",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL ratio min over the 30 (q, seed) cells, w_add=1.0",
+   "claimed": 0.881674550977628,
+   "recomputed": 0.881674550977628,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL ratio max over the 30 (q, seed) cells, w_add=1.0",
+   "claimed": 0.8905497925351555,
+   "recomputed": 0.8905497925351555,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL ratio geomean k=22, w_add=0, hash+cmp at 0.1 GAE",
+   "claimed": 0.8390234734023766,
+   "recomputed": 0.8390234734023766,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL ratio geomean k=22, w_add=0, hash+cmp at 1.0 GAE",
+   "claimed": 0.9289772495761552,
+   "recomputed": 0.9289772495761552,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] max DL ratio over every cell, w_add and w_h",
+   "claimed": 0.9332000446999063,
+   "recomputed": 0.9332000446999063,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL linear_algebra.lmul BLR1/REF geomean, q=262111",
+   "claimed": 0.7386930456149259,
+   "recomputed": 0.7386930456149259,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL linear_algebra.lmul BLR1/REF geomean, q=524287",
+   "claimed": 0.7350854472968616,
+   "recomputed": 0.7350854472968616,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL linear_algebra.lmul BLR1/REF geomean, q=1048507",
+   "claimed": 0.731767932731111,
+   "recomputed": 0.731767932731111,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL linear_algebra.lmul BLR1/REF geomean, q=2097091",
+   "claimed": 0.7301880685344848,
+   "recomputed": 0.7301880685344848,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] DL linear_algebra.lmul BLR1/REF geomean, q=4194271",
+   "claimed": 0.7287906767791542,
+   "recomputed": 0.7287906767791542,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC REF mean cold M-eq (seeds 1-3, w_add 0, hash+cmp at 0*gae)",
+   "claimed": 1038514332.4152999,
+   "recomputed": 1038514332.4152999,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC BLR1 mean cold M-eq (seeds 1-3, w_add 0, hash+cmp at 0*gae)",
+   "claimed": 844014769.0560999,
+   "recomputed": 844014769.0560999,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 8.4401e8",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 rho/IC BLR1 at w=0",
+   "claimed": 449.7450920491764,
+   "recomputed": 449.7450920491764,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC/rho BLR1 at w=0",
+   "claimed": 0.0022234817403869686,
+   "recomputed": 0.002223481740386968,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 frozen band ic reproduced by REF at w=0",
+   "claimed": 1038514332.4152999,
+   "recomputed": 1038514332.4152999,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC REF mean cold M-eq (seeds 1-3, w_add 0, hash+cmp at 0.1*gae)",
+   "claimed": 1208511467.8152997,
+   "recomputed": 1208511467.8152997,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC BLR1 mean cold M-eq (seeds 1-3, w_add 0, hash+cmp at 0.1*gae)",
+   "claimed": 1014011904.4561,
+   "recomputed": 1014011904.4561,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 1.01401e9",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 rho/IC BLR1 at w=0.1",
+   "claimed": 484.13021370130605,
+   "recomputed": 484.13021370130605,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC/rho BLR1 at w=0.1",
+   "claimed": 0.0020655599912980647,
+   "recomputed": 0.002065559991298065,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 frozen band ic reproduced by REF at w=0.1",
+   "claimed": 1208511467.8152997,
+   "recomputed": 1208511467.8152997,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC REF mean cold M-eq (seeds 1-3, w_add 0, hash+cmp at 1*gae)",
+   "claimed": 2738485686.4153,
+   "recomputed": 2738485686.4153,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC BLR1 mean cold M-eq (seeds 1-3, w_add 0, hash+cmp at 1*gae)",
+   "claimed": 2543986123.0560994,
+   "recomputed": 2543986123.0560994,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 2.54399e9",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 rho/IC BLR1 at w=1",
+   "claimed": 586.8011568422697,
+   "recomputed": 586.8011568422697,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 IC/rho BLR1 at w=1",
+   "claimed": 0.0017041547862333148,
+   "recomputed": 0.0017041547862333146,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] k=22 frozen band ic reproduced by REF at w=1",
+   "claimed": 2738485686.4153,
+   "recomputed": 2738485686.4153,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] BLR1 - BLR DL linear_algebra.lmul, min over the 23 narrowing cells",
+   "claimed": 3352,
+   "recomputed": 3352,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 3,352",
+   "agrees": true
+  },
+  {
+   "name": "[amendment 1] BLR1 - BLR DL linear_algebra.lmul, max over the 23 narrowing cells",
+   "claimed": 13800,
+   "recomputed": 13800,
+   "rel_tol": 1e-09,
+   "readme": "RESULT.md 13,800",
+   "agrees": true
+  }
+ ],
+ "decisions": {
+  "SUPPORTED_recomputed": true,
+  "SUPPORTED_claimed": true,
+  "holds_all_w_h": true,
+  "D_DL1_exactly_1": true,
+  "ref_reproduces_frozen_band_1e9": true,
+  "gates": {
+   "G1": true,
+   "G2": true,
+   "G3": true,
+   "G4": true
+  },
+  "analysis_json_cells_equal": "405 ratio cells + per-seed values, max relative difference 0.0; LA ratios 0.0",
+  "amendment_pre_registered_rule": "AMENDMENT.md: pass iff every BLR1 unit identical to BLR, else re-derive the numbers from BLR1; not identical (23/30), so re-derived, as RESULT.md states",
+  "round_1_decision": {
+   "SUPPORTED_recomputed": true,
+   "SUPPORTED_claimed": true,
+   "holds_all_w_h": true,
+   "D_DL1_exactly_1": true,
+   "ref_reproduces_frozen_band_1e9": true,
+   "gates": {
+    "G1": true,
+    "G2": true,
+    "G3": true,
+    "G4": true
+   },
+   "gate_counts": {
+    "G1_fields": 8580,
+    "G1_records": 90,
+    "G4_files": 30,
+    "G4_records": 90
+   },
+   "analysis_json_cells_equal": "405 ratio cells + per-seed values, max relative difference 0.0; LA ratios max relative difference 0.0"
+  }
+ },
+ "checks": {
+  "artifacts": "runs tarball sha256 e24e4050... = README; 123/123 inner SHA256SUMS OK; 60 units, 120 files + 3; binary.sha256 inside equals the recorded REF/BLR hashes; fasthash tarball d9d301a4... with 0 inner failures",
+  "build": "REF and BLR rebuilt with rustc 1.97.0 to the recorded sha256 (bit-identical)",
+  "freeze": "git diff 5c9dc91c48..HEAD is empty for PROTOCOL.md, src/, units.tsv, make-units.sh, run-local.sh, analyze.py and for ../ic_gw_fasthash_20261114/src; BLR src/ differs from ../ic_gw_fasthash_20261114/src only in la2.rs (ic2.rs, rho2.rs, solver2.rs, summ2.rs, v3.rs byte-identical); the shared includes research/quartic_n4_20261019/{common,ghs,ic,solver}.rs and src/cryptanalysis/plane_quartic_pic.rs are clean in the work tree and are bound by the bit-identical REF rebuild",
+  "timing_of_freeze": "protocol commit 2026-11-15T04:32:34Z precedes run.log start 04:32:47Z",
+  "gates_recomputed": "G1 (30 pairs, 90 records, 8,580 counted fields, 0 mismatches, LA differs in all 30), G2, G3 (all ok, k_found == k, rc 0, one attempt each), G4 (30 fasthash COMBO files, 90 records, 0 mismatches)",
+  "replay": "56 runs, 21164 counted-field comparisons, 0 mismatches; seeds 9, 10 outside 1-6; q = 2097091 and 4194271; block widths 1, 2, 3, 8",
+  "identities": "proved in the replay certificate (identity_proofs); oracle: both exact at every iteration of every real run; identity 2 inexact after mid-run narrowing (D1)",
+  "counting": "The recurrence uses lm2/la2/ls2 (counted as lmul/ladd by the same global counters as every other mod-ell operation); identity 1 is copies only (uncounted, as copies are in REF). No counted work moves out of block_lanczos: REF - BLR equals the skipped direct grams minus the recurrence exactly in every audited run (lmul and ladd), and in all 17,920 stress calls where identity 2 was exact.",
+  "real_work_removed_not_relabelled": "the reuse path performs no gram (copies only, or a k x b x 2k recurrence); diagnostic DL linear_algebra.cpu BLR/REF from the committed records is below 1 in 30/30 cells (0.71-0.96; L0, concurrent, not a claim)",
+  "amendment_1": {
+   "artifacts": "amendment tarball sha256 bb2969c06e1617edc09081a0a5b6aa44b8183ea22d28253b54077562d97ca761, 123/123 inner OK; 60 REF files byte-identical to round 1; 30 BLR1 units rc 0",
+   "build": "BLR1 rebuilt bit-identically (e236855d7fef...); REF 00355034924e...",
+   "freeze": "amendment-1/src vs src: la2.rs 3 lines (narrowed0 -> narrowed_any, set on every narrowing, guard of the V_i^T V0 recurrence); v3.rs only the 5 #[path] includes gain one ../; ic2.rs, rho2.rs, solver2.rs, summ2.rs byte-identical; amendment frozen 05:01:37Z before the runs (05:06:26Z); analyze.py differs from the frozen one in the repository path only",
+   "replay": "46 runs (12 REF/BLR1, 34 AUD1), 15444 counted-field comparisons, 0 mismatches; seeds outside 1-6 and block widths 8, 2",
+   "identity_2": "With narrowed_any set inside the narrowing block (before vt0 is formed), the recurrence is used at iteration i only if no iteration 0..i narrowed. Then V_j = V_{j,full} for every j <= i, so V_a^T M V_b = V_{a+1}^T M V_{b-1} = ... = 0 for all a < b <= i (each chain step uses an unnarrowed V_{a+1}), in particular V_{i-1}^T M V_0 = 0 and v0 = V_0; and sel_used is the identity. So V_i^T V_0 = -c1^T (V_{i-1}^T V0) - c2^T (V_{i-2}^T V0) exactly, in every path. Once set, the flag stays set and the direct gram is used for the rest of the call. The guard is conservative: it also uses the direct gram in the narrowing iteration itself, where the recurrence was still exact; that is the whole BLR1 - BLR difference.",
+   "stress": "0 inexact uses of identity 2 (was 19,631 in 1,922 calls), 0 of identity 1, 0 REF/BLR1 differences in kernel vector, iterations or narrowing in all 20,000 trials incl. the 2,990 mid-run narrowings (was 24 kernel differences); count reconciliation exact in all 19,842 audited calls (was 18,813)",
+   "reconciliation": "REF - BLR1 = skipped grams - recurrence exactly in 34 audited runs",
+   "blr1_vs_blr": "23/23 narrowing cells differ, only in DL linear_algebra lmul/ladd (+3352..13800 lmul, max rel 4.06e-04); 0/7 unnarrowed cells differ; largest ratio change 0.00021"
+  }
+ },
+ "discrepancies": [
+  {
+   "id": "D1",
+   "severity": "substantive for the mathematical claim; no effect on any measured number",
+   "what": "Identity 2 is not an exact identity of this implementation. Its derivation needs V_{i-1}^T M V_0 = 0, which holds unconditionally only for i <= 3; for i >= 4 it needs long-range M-orthogonality, which a narrowing at an iteration j >= 1 that drops columns can destroy for later iterations. The guard (!narrowed0) excludes only narrowing at iteration 0. PROTOCOL.md H_blr ('as V_{i-1}^T M V_0 = 0') and README ('direct grams otherwise') state it as exact.",
+   "evidence": "stress harness, 20,000 block_lanczos calls: 2990 calls narrowed before their final iteration (all at ell <= 101; none at ell = 65537 or 4.5e15); in 1922 of them identity 2 was inexact at one or more iterations (19631 inexact uses), and in 24 the kernel vector BLR returned differs from REF's (examples in the replay certificate; all 24 in replay/.../stress/divergent-trials.jsonl). Zero inexact uses in the calls without narrowing, with narrowing at iteration 0 (fallback), or with narrowing only in the final iteration or the terminating check.",
+   "scope_effect": "None on this study: in all 30 producer cells and all replayed configurations the oracle found 0 inexact uses of either identity; narrowing occurs only in the final iteration, so no reuse follows a narrowing (id2_reuse_after_a_narrowing = 0). A guard that disables identity 2 in every iteration after any narrowing would give the same counts on every measured cell.",
+   "required_correction": "Before BLR is cited as exact or reused outside k = 18..22 of this family (other ell, block widths, matrices that narrow mid-run): disable the V_i^T V_0 recurrence after any narrowing (not only at iteration 0), and state identity 2 as conditional in README/PROTOCOL successors. Identity 1 needs no change.",
+   "status": "resolved by amendment 1",
+   "resolution": "amendment-1 (98a4fc6639, data 69e368d44b): the guard is narrowed_any, set on every narrowing before vt0 is formed, so identity 2 is used only while no iteration has narrowed, where it is exact (proof in the replay certificate, amendment_1.identity_2_after_guard). Stress harness on the amended la2.rs: 0 inexact uses in 80,955, 0 kernel/iteration/narrowing differences from REF in 20,000 trials incl. all 2,990 mid-run narrowings. The study's numbers are now BLR1's: they differ from the frozen BLR only in DL linear_algebra lmul/ladd of the 23 narrowing cells (+3,352..13,800 lmul, <= 0.041%), largest ratio change 0.00021; the headline below is BLR1's."
+  },
+  {
+   "id": "D2",
+   "severity": "minor",
+   "what": "The identity-1 fallback condition vpr.k == k_full is always true (V_full has k_{i-1} columns by construction), so gram(mvpr, mv) is dead code; 'when the dimensions match' in PROTOCOL.md is vacuous. Identity 1 is exact in every path (proof in the replay certificate; 142,892 stress uses and every real-run use, 0 mismatches)."
+  },
+  {
+   "id": "D3",
+   "severity": "minor (disclosed by the producer)",
+   "what": "The prediction window (0.80-0.84 / 0.87-0.90) was written after a pilot on seed 1 at k = 18, 20, 22, so it is not independent of 3 of the 30 cells; the linear-algebra lmul prediction (0.75-0.80) missed (0.729-0.738), as README reports."
+  },
+  {
+   "id": "D4",
+   "status": "open (coordinator record)",
+   "severity": "record consistency; no effect on the validated numbers",
+   "what": "VALIDATION.json in both directories (a1e16d39e4) predates the amendment results: (a) its sha256 pins name the round-1 report/certificate and no longer match the amended files; (b) binary_or_process says the amendment-1 guarded build is 'identical in every counted field on all 30 units', which RESULT.md and this validation contradict (23 cells differ in DL linear_algebra lmul/ladd); (c) gae_band ic holds the frozen-BLR k = 22 means (843987004.8361, 1013984140.2361, 2543958358.8361) while the amended study's IC side is BLR1's (844014769.0561, 1014011904.4561, 2543986123.0561; relative change 3.3e-5, 2.7e-5, 1.1e-5). The validator did not edit VALIDATION.json (outside this task); it needs the new pins, the BLR1 binary (e236855d...) and the BLR1 band values."
+  }
+ ],
+ "null_object_control": "The claim is a deterministic counted-work ratio, not a statistical signal. Nulls of the same shape: (a) REF replay = committed REF = fasthash COMBO bit for bit (A/A on counted fields, ratio exactly 1); (b) the untouched D and DL1 arms give BLR/REF exactly 1.000 at every cell and w; (c) negative controls: MUT_C2 and MUT_PM, each on 2 configurations, are flagged by the same comparator (LA fails, 6 DL attempts), so G1-style equality has power against an inexact reuse. Mechanism check in place of a decay parameter: the saving should shrink as the block width falls (the removed products are n k^2 and n k b per iteration vs the sparse matvec) and does: DL ratio at w_add 0 = 0.909, 0.861, 0.833, 0.815 at b = 1, 2, 3, 4 (q = 1048507) and 0.774 at b = 8 (q = 524287); LA lmul ratio 0.770, 0.745, 0.737, 0.732, 0.728 toward the dense-only limit 5/7.",
+ "validation_ladder_checks": {
+  "step1_assumptions_isolated": "the claim rests on M-orthogonality (identity 1: distance 1 and 2; identity 2: to V_0 at every distance). Measured separately per iteration by the oracle build on all 30 cells, and stressed at small ell where narrowing is frequent; failure mode hunted: an inexact reuse that leaves counts equal or changes the solution. Found for identity 2 after mid-run narrowing only (D1).",
+  "step2_measured_ratio_on_full_pipeline": "the ratio is measured on the full pipeline against REF at every size claimed (k = 18..22, 30 cells), re-measured on new seeds (9, 10) and other block widths; predicted negative cases (D, DL1 = 1) checked. No extrapolation beyond k = 22 is claimed.",
+  "step3_cheats": "not applicable (no real-scale partial run)",
+  "step4_reproducibility_pointer": "both binaries rebuilt from the committed sources to the recorded hashes and replayed; scripts and raw replay data committed under validation/"
+ },
+ "heuristic_validation_checks": "not applicable: no heuristic distribution is validated (deterministic counted operations).",
+ "cost_model_checks": {
+  "unit": "cold F_q-multiplication equivalents (M-eq): mul + r_inv inv + r_lmul lmul + w_add (add + ladd) + w_h gae (hash + cmp), frozen r_inv, r_lmul, gae per size from research/quartic_n4v2_20261020/results/summary.json (DL, kind ic_size)",
+  "optimistic_assumptions": "r_lmul (2.01-2.18) and r_inv are time ratios frozen from an earlier grid, not re-measured; additions free in the primary cell and in the rho band (the band is at w_add 0); hash/cmp priced at 0, 0.1, 1 GAE (section 5a)",
+  "memory": "not reported by the study; BLR keeps W_full (k^2), two V^T V0 blocks (2 k b) and c1, c2 (2 k^2) extra words per call, negligible next to the n x k blocks; no time-memory trade-off",
+  "success_probability": "every ic record ok at attempt 1 in all 60 producer units and all replays; the M-eq sums over all attempt records, so a retry would be charged"
+ },
+ "limitations": [
+  "L0: session container (4 vCPU), units up to 3 concurrent; only counted fields are claimed and compared. No EKS route, no native L2/replay/A/A admission.",
+  "Scope: GHS-weak family E0/F_{q^3}, driver ic <q> <seed> D 3.0 1.7, k = 18..22, seeds 1-6 (producer) plus seeds 9 and 10 and block widths 1, 2, 3, 8 (replay). Identity 2 is exact on these instances (oracle) but not in general (D1).",
+  "The rho side is the frozen negation-map band of research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json; this validation re-measured no rho. The band prices additions at 0; at w_add = 1 the IC side is larger (ratios 0.88-0.89).",
+  "Validated snapshot c5bf40cee6. Remote main was at 34a4f6f290 at nonce time and was not fetched.",
+  "Independence: subagent of the producer's session on the same container; own scripts and builds; analyze.py and plot.py not read.",
+  "A passed report means the receipt is admissible evidence for the counted-cost numbers at k = 18..22 in this family. It does not support an ECDLP claim, demonstrate an asymptotic speedup, or authorize promotion; the leaderboard row additionally needs VALIDATION.json with the matched rho reference.",
+  "Amendment 1 is validated on the same L0 container and session; its runs and this replay are counted-work comparisons only."
+ ],
+ "method": "scripts/: select.py (nonce sample), make_plan.py, replay.sh, make_audit_la2.py (oracle and mutant builds), compare.py (replay comparison and reconciliation), bltest.rs.in + stress_compare.py (block_lanczos stress), recompute.py (headline from the raw tarball), make_reports.py (this file and the certificate). Amendment 1: amendment-1/scripts/ (select_amd1.py, replay_amd1.sh, compare_amd1.py, make_audit_la2_v2.py, delta_amd1.py, make_reports_amd1.py); scripts/recompute.py and scripts/stress_compare.py reused unchanged.",
+ "validation_report": {
+  "id": "VAL-20261115-755b33",
+  "task_id": "none named by the task card (main-session validation-gate request)",
+  "run_ids": [
+   "research/ic_gw_bl_reuse_20261115 runs-blreuse-20261115 (60 units, c5bf40cee6)",
+   "research/ic_gw_bl_reuse_20261115/amendment-1 runs-blr1-20261115 (30 BLR1 units, 69e368d44b)"
+  ],
+  "artifact_checks": [
+   "tarball sha256 + 123/123 inner checksums",
+   "60/60 units rc 0",
+   "binaries rebuilt bit-identically",
+   "freeze unchanged since 5c9dc91c48"
+  ],
+  "metric_recomputations": [
+   "amended: 405 cells = amendment-1/analysis.json (rel diff 0), SUPPORTED, k=22 BLR1 means equal RESULT.md",
+   "405 ratio cells and per-seed values equal analysis.json (max rel diff 0)",
+   "decision SUPPORTED",
+   "k = 22 band numbers equal"
+  ],
+  "control_checks": [
+   "REF = committed REF = fasthash COMBO (A/A, counted)",
+   "D, DL1 exactly 1",
+   "2 mutants x 2 configurations detected",
+   "oracle 0 inexact uses in real runs",
+   "block-width dose-response as the mechanism predicts"
+  ],
+  "heuristic_validation_checks": [],
+  "cost_model_checks": [
+   "unit declared",
+   "optimistic constants flagged",
+   "memory not reported (negligible change)",
+   "success 1 at attempt 1"
+  ],
+  "proof_architecture_checks": [
+   "identity 1 exact in all paths",
+   "identity 2 exact in every path under the amendment-1 guard (D1 resolved)"
+  ],
+  "verdict": "passed",
+  "limitations": [
+   "see limitations and discrepancies D1-D3"
+  ],
+  "artifact_paths": [
+   "research/ic_gw_bl_reuse_20261115/validation/replay-certificate.json",
+   "research/ic_gw_bl_reuse_20261115/validation/validator-report.json",
+   "research/ic_gw_bl_reuse_20261115/validation/replay/replay-runs-20261115.tar.gz",
+   "research/ic_gw_bl_reuse_20261115/validation/amendment-1/replay/replay-runs-amd1-20261115.tar.gz"
+  ],
+  "supersedes": "VAL-20261115-b1e7a3"
+ },
+ "review_attestation": {
+  "review_plan": "none attached to the task card; no joints assigned, so this report verdicts receipt admissibility",
+  "joints_owned": [],
+  "sources_read": [
+   "crypto-autoresearcher/docs/agent-runtime-core.md",
+   "crypto-autoresearcher/agents/validator.md",
+   "crypto-autoresearcher/AGENTS.md (Review architecture; Curve identity and measured bounds)",
+   "crypto-autoresearcher/docs/inventor-protocol.md sections 3 and 6",
+   "crypto/docs/VALIDATION_GATE.md",
+   "research/ic_gw_bl_reuse_20261115/PROTOCOL.md",
+   "research/ic_gw_bl_reuse_20261115/README.md",
+   "research/ic_gw_bl_reuse_20261115/tables.md",
+   "research/ic_gw_bl_reuse_20261115/analysis.json (by key)",
+   "research/ic_gw_bl_reuse_20261115/make-units.sh",
+   "research/ic_gw_bl_reuse_20261115/run-local.sh",
+   "research/ic_gw_bl_reuse_20261115/src/la2.rs (diff and block Lanczos section)",
+   "research/ic_gw_bl_reuse_20261115/src/ic2.rs (la2/ls2/lm2/linv)",
+   "research/ic_gw_bl_reuse_20261115/src/solver2.rs (linear-algebra dispatch)",
+   "research/ic_gw_bl_reuse_20261115/src/v3.rs (ic_cmd, argument parsing)",
+   "research/quartic_n4_20261019/common.rs (counters)",
+   "research/ic_gw_fasthash_20261114/validation/ (format only)",
+   "research/quartic_dl1_cd_sqrt_20261113/combo/analyze.py (model)",
+   "research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json",
+   "research/quartic_n4v2_20261020/results/summary.json (DL ic_size rows)",
+   "scripts/validation_gate.py (check functions)",
+   "research/ic_gw_bl_reuse_20261115/amendment-1/AMENDMENT.md",
+   "research/ic_gw_bl_reuse_20261115/amendment-1/RESULT.md",
+   "research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json (by key)",
+   "research/ic_gw_bl_reuse_20261115/amendment-1/src/la2.rs and v3.rs (diff against src/)",
+   "research/ic_gw_bl_reuse_20261115/amendment-1/analyze.py (diff against ../analyze.py only)",
+   "research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json and benchmarks/20261115-ic-gw-bl-reuse/VALIDATION.json"
+  ],
+  "not_read": [
+   "research/ic_gw_bl_reuse_20261115/analyze.py",
+   "research/ic_gw_bl_reuse_20261115/plot.py",
+   "research/ic_gw_bl_reuse_20261115/amendment-1/analyze.py body (only its one-line diff)",
+   "research/ic_gw_bl_reuse_20261115/amendment-1/tables.md"
+  ],
+  "read_sibling_reports": false,
+  "verdict": "passed"
+ },
+ "headline_note": "Headline items are the amended (BLR1) values: claimed from amendment-1/analysis.json (and RESULT.md where marked), recomputed by the validator from amendment-1/runs-blr1-20261115.tar.gz. The round-1 (frozen BLR) headline is in the superseded report (sha256 3ad84134ba6b63447880ad140a32f4922f81e3bcd3d0706e51a424dfe959db08, commit a1e16d39e4); it agreed exactly as well.",
+ "supersedes": {
+  "sha256": "3ad84134ba6b63447880ad140a32f4922f81e3bcd3d0706e51a424dfe959db08",
+  "commit": "a1e16d39e4"
+ }
+}
