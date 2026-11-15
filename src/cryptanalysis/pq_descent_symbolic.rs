@@ -118,7 +118,7 @@ impl DescentWork {
             ("bitop_word_ops", self.word_ops),
         ] {
             if v != 0 {
-                *extra.entry(k.to_string()).or_insert(0) += v;
+                crate::cryptanalysis::ic_boundary::bump_counter(extra, k, v);
             }
         }
     }
