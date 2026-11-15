@@ -47,3 +47,26 @@ Source and reproduction:
 - No EKS experiment, checkpoint admission, signed independent PCC verification or benchmark ranking was performed; the GitHub Actions job is a development diagnostic.
 
 **Decision:** Test the mathematically exact seven-way first-collision preconditioner before increasing the unchanged F4 matrix cap; do not equate factor-base algebraic support with useful independent relation rank.
+
+
+## GitHub Actions seven-arm result — full two-tower branch constraints (2026-11-15)
+
+Actual Rust workflow [43721541632](https://github.com/isogeny-labs/crypto/actions/runs/43721541632) passed all development checks. The [exact-source, raw-counter evidence](DICKSON_FIRST_COLLISION_S3_CI_EVIDENCE_20261115.json) pins head 71328023788fc86f1904eb3c3381d9370914a877 and job 132834395751. The independent Python replay and the same-fibre Rust branch replay also passed. **Standing remains [pcc:unverified], not independent scientific validation.**
+
+| First-collision arm | F4 degree | Max dense B' | F4 multiply-adds | Outcome at 15k cap |
+|---|---:|---:|---:|---|
+| j=0 | 7 | 4,056 | 40,966 | Basis, no extraction |
+| j=1 | 6 | 19,473 | 52,688 | Oversize |
+| j=2 | 6 | 22,619 | 47,543 | Oversize |
+| j=3 | 6 | 27,727 | 30,820 | Oversize |
+| j=4 | 6 | 26,618 | 30,947 | Oversize |
+| j=5 | 6 | 26,618 | 30,944 | Oversize |
+| Diagonal | 6 | 7,886 | 304,781 | Basis, no extraction |
+
+All seven: **538,689 measured F4 multiply-adds**, including work on censored branches, and 16.385 ms summed internal F4 clocks, excluding polynomial construction, cold setup, allocation, lifts and scalar recovery. Five arms remain undetermined and zero roots were extracted. This **falsifies a cheap seven-arm complete fixed-S3 preconditioner under the original full-two-tower encoding and 15k cap**; completion of individual branches does not make the required union complete.
+
+### Next exact algebraic reduction: remove redundant fibre towers
+
+For j>=1, rather than add T_j(x)+T_j(y)=0 to two complete depth-six towers, retain one complete six-level x chain and only j y-variables, with terminal y_(j-1)^2 = 2-x_j. All original levels y_j through y_5 become consequences of the branch and the x chain. This yields 6+j tower variables, versus 12. For j=0 and the diagonal, use y=-x and y=x directly, requiring only six tower variables. Feed the **same S3** into this smaller quotient ring. The union of seven branch solution sets is exactly the rational finite pair fibre (with the stated first-collision/separability and identity exclusions); unlike simply dropping equations, this is an algebraically constrained presentation, not a group enumerator.
+
+A new source file [prime31_dickson_collapsed_s3.rs](examples/prime31_dickson_collapsed_s3.rs) and focused workflow gate compare all seven quotients with the same Rust F4 engine and 15k cap. This is a distinct proposed encoding test, not yet a benchmark. No end-to-end ECDLP or matched-rho performance inference is justified from its development counters.
