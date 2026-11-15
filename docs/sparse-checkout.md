@@ -62,6 +62,11 @@ CI work and for any study whose directory you name.
 transitive targets, compile-time fixtures and working-tree manifest changes
 in a temporary local Git repository. It needs neither network nor a Rust build.
 
+The Certicom device tests compile the tracked CPU emulator at runtime. Before
+running the full library suite in a minimal checkout, materialize its source
+and headers with `scripts/sparse-checkout.sh add --path gpu/certicom/`.
+This default test backend does not require GPU hardware.
+
 ## The equivalent with plain git
 
 ```sh
