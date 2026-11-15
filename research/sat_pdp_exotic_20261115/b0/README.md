@@ -37,6 +37,11 @@ subspace with `S′₄ = 0`; a refutation must match the oracle.
 | **lin** | new solver `examples/pdp_lin_cdcl.rs` (§3), chained S₃, `x₁ ≤ x₂` | candidate |
 | lin-nolex | lin without the lex constraint | pair-ordering control |
 
+Exported instances: `inst/l<ℓ>/t<idx>.xnf` (XOR-DIMACS of the native encoding,
+tracked) and `t<idx>.cnf` (Tseitin CNF for CaDiCaL, 0.9–5 MB each, not tracked;
+regenerated deterministically from the seed by the frozen binary, or fetched from
+the artifact store where the repository's workflow moved one).
+
 Instrument: `examples/b0_pdp_sat_baseline.rs`; external arms through
 `tools/b0-ext-solvers`; rows by `run_rows.sh` under the bench record
 `benchmarks/records/20261115T0359Z-b0-pdp-sat-baseline.json`; binaries' sha256 in

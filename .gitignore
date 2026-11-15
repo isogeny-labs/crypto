@@ -145,3 +145,7 @@ tools/b0-ext-solvers/target/
 
 # second cargo target dir for solver development while frozen row binaries run
 target-dev/
+
+# B0 exported CNF instances (0.9-5 MB each) are regenerated deterministically by the frozen
+# binary from the seed; the smaller XOR-DIMACS (.xnf) files stay tracked.
+research/sat_pdp_exotic_20261115/b0/inst/**/*.cnf
