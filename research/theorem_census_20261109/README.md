@@ -391,6 +391,43 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual geometric principal-divisor audit](../geometric_principal_divisor_audit_20261115/README.md)
+proves degreezero for every actual nonzero elliptic rational function under
+actual IsAlgClosed K and nonzero-discriminant guards, including characteristics2/3.
+Actual polynomial factorization/vertical divisors and actual full-field norm/
+negation give integer degreezero without a supplied degree premise or division
+by2 inK. Actual infinity residue/local-ring maps plus no-poles/degreezero give
+no-poles iff nonzero constant, zero actual divisor iff nonzero constant and
+equal actual divisors iff a nonzero scalar multiple, without assuming global
+regularity classification. Leading-residue-one normalization gives actual
+uniqueness, any valid Miller function equals the chosen function and exact
+chosen all-n i+j addition holds in every zero/vertical/nonvertical branch.
+These conclusions retain geometric scope. On actual E/F3:y²=x³+x+1,
+the nonzero polynomial X²+1 has rational-only divisor−4(O), degree−4.
+The credited prior normalized nonconstant zero-rational-divisor ratio versus1
+reconstructs a counter to rational-only normalized uniqueness. An actual mapped
+elliptic model over actual AlgebraicClosureF3 has Δnonzero/verticaldegree0,
+realizing the geometric hypotheses. Elliptic geometric cases of source
+Theorem7.7.11/Cor7.7.13/7.7.14 survive, not the all-curve theorem.
+General function-field/divisor basechange-descent, separate Scheme.localRing/
+Divisor APIcomparison, translations/reciprocity/isogeny/Lang/Cartier/Jacobian/
+canonical pairings/MOV-FR/binary runtime and full14 remain open.
+Exact local **PCC-20261115-9eb5c1** PASS at2026-11-15T08:50:29Z; signedunverified. Whole428/0fail/0trusted/
+standardfoundations;58modules47exactcredited+11new/61formal-config+15artifactpins;
+full1883-character binding87af23f53b8644b39d35a8d39e7b83e65d5a5c4e15b785494cadc5bab49e10dd/native1complete/0prefix/0unresolved.
+Tenstates/fivefailures/fivesuccesses;156files/68objects/
+20220byte losslessXZ/fivegate/onepagePDF47263fulltextread/visual/inbounds.
+09seven named-binder advisories retained;10logicalguards anonymous/proofnamed
+below, no hypothesis deleted/waiver/flag.10projectlogs clean, inheritedauditor
+String.mk deprecation retained. Full elliptic7.7.11proof/Cor7.7.13/14/PDF15–16/
+printed137–138 text reread, cumulative partial chapter coverage credited,
+notall21pages. Established source norm/regular-function methods and official
+roots/Finsupp/local-residue APIs credited. KB8calls127(initial4wronginterface,
+corrected4documentedCLI; no arguments/query processed), Conductor127 fallback.
+No novelty/canonicalpromotion/independentphysicalhost/frozenedits/cryptoPython/
+spend/upload. [pcc:unverified]
+
+
 The [actual negation pullback audit](../negation_pullback_audit_20261115/README.md)
 constructs the actual coordinate involution, full FunctionField automorphism and
 actual point-localization isomorphism. Actual evaluation identifies allowed
