@@ -2837,3 +2837,39 @@ Larger-partition collision penalty/limitingconstants/practicalhash and remaining
 obligations stayopen. No holes/customaxioms/nativeproofeval/raisedlimits/flags/
 waivers/frozenedits/cryptoPython/solverrun/spend/upload/newhost/compiler/full14claim.
 [pcc:unverified]
+
+
+### Two-choice calibration with both increments nonzero
+
+The [both-nonzero two-choice refinement](../research/rho_nonzero_support_audit_20261115/README.md)
+derives an actual uniform ordered-distinct support PMF with both increments
+nonzero and the actual fair static-vertex-label first-repeat mean from0. Actual
+discarded zero-containing support mass2/p and actual0≤tablemean≤p, plus a proved
+finite conditional-mean/cardinality bound, give E_all≤E_nonzero+2. The credited
+old lowerbound therefore yields E_nonzero≥m²/2−2 atp≥4m²(4m+1),m>0, and≥m²/4
+form≥3. For every naturalC some primep>2 has E_nonzero²>Cp; no nonnegative real
+uniformsqrtconstant exists. Actual coordinate/nonzeroembedding bijection and
+p>2population witness are derived; kernelcheckedp2empty/p3exacttwo-support
+controls prevent treating an empty finite sum as a normalizedPMF. This closes
+the zero-step qualification for the r2 calibration, not the qualified nS≥8/20
+larger-partition conjectures. Established conditioning and preceding actual
+maximal/path/counting/deferred-decisions/Bertrand proofs are credited; this is a
+domain refinement without novelty or an independentnewcounterfamily claim.
+Exact local **PCC-20261115-f8a8f9** replay PASS at 2026-11-15T16:23:38Z; signed standing unverified.
+Fresh20theorems/4newconcretemodules/0fail0trusted/fulltransitivefoundations;
+17frozenlocalmodules0copies/prior70gate credited.39formal19artifact58pins;
+all51predecessorpins checked before/after3states/gate,1failed2success retained.
+Full827-character SHA29cb895f96ba2ac7281a8b977ab8fe18e9dadb2d4502b638f4003e4a2bfb51b5/
+native1complete0prefix0unresolved/empty suffix after actualgatecompletion.
+78files38objects18216byte losslessXZ/roundtrip equal/fivegatefiles; validfirst
+reportdraft7files47780byteXZ after prosewrap improvement. Finalonepage47827PDF/
+all4665charsread/visual/inbounds. Zero new-source warnings/4inheritedmodule+
+1frozen auditor advisory retained. Primary qualifications credited exactly from
+preceding GalbraithPDF4,5,12,13/38 and BL11,12/28 fulltext+visual, no broader
+reading/originalTeske claim. FourfreshcorrectKBcalls/initialConductor127 before
+processing/code, publicationConductor127 beforemaps/outsidefrozenpins. Bounded
+localofficial fallback/noabsenceclaim. No Floyd/cyclealone/scalarrecovery/
+practicalhashruntime conclusion. Largerpartitionconstants/practicalhash/full14
+remainopen. No holes/customaxioms/nativeproofeval/raisedlimits/flags/waivers/
+frozenedits/cryptoPython/solverrun/spend/upload/newhost/compiler/full14claim.
+[pcc:unverified]
