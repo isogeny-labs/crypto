@@ -6,6 +6,12 @@ was executed once at source `3ff510d8a280`. Its
 record a 6 GiB Docker OOM while compiling the `crypto` library with
 two Cargo jobs; all five requested executables remain absent. This is
 a failed engineering build control, not a K600 relation or runtime result.
+The separately frozen [single-job retry](LINUX_ARM64_BUILD_SMOKE_ATTEMPT2_PROTOCOL.md)
+reused the partial target and also reached a
+[recorded Docker OOM](LINUX_ARM64_BUILD_SMOKE_ATTEMPT2.md) while compiling
+the same library. A larger-memory Linux arm64 host is required to test
+the complete build path under a fresh target; these two runs do not
+establish its exact minimum RAM.
 
 The [Linux build producer amendment](LINUX_BUILD_PRODUCER_AMENDMENT.md)
 adds a source-bound native build receipt for the existing `charge build`
