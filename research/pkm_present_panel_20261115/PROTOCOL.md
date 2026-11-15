@@ -250,6 +250,41 @@ log y, per m and label, censoring marks); `REPORT.typ` (`REPORT.pdf` if Typst is
 derivation, C1 and each C2 verdict; session-log entries; PR with auto-merge. The metric is not comparable with the
 F_{p^3} predecessor's matrix cells and the report says so (M5).
 
+## 9a. Pre-freeze clarifications (v1.1, 2026-11-15; seen: the seed-777 probe and smoke, runner and analysis stub tests; no data row)
+
+Resolved while the runner and analysis were built (`runner/`, `analysis/`), before the freeze:
+
+1. Layout: `cells/<curve>/cell.json` (curve derived at t = 4); `cells/<curve>t<t>/m<M>/{targets.json,hidden.json}`
+   (targets depend on m and t); systems under `systems/<cell>/<curve>/<instance>/<arm>.{ms,system.json}`.
+2. Instance order within a (cell, curve): by `draw_index`, planted last. In m4t2 the symmetric arms are
+   `not_applicable` (B_real ≤ 4 < 5) by construction.
+3. Strata are the **real** labels (SAT, UNSAT); the split by `algebraic_count` (0 vs > 0) is descriptive.
+4. Sign-flip statistic: the **sum** of the paired `d_i` (Fisher's exact randomisation over sign flips; at n = 10
+   the smallest attainable p is 2/1024), with ±∞ imputed lexicographically; exact zeros count as 0 in the median
+   and are dropped from the test. The verdict's median condition and the test are separate clauses.
+5. Censored pairs enter as +∞ (candidate censored) or −∞ (baseline censored) regardless of the bound; pairs whose
+   lower bound does not already exceed the completed side are counted and reported (`n_lb_not_exceeding`), and
+   the analysis is re-run with them dropped as a sensitivity reading.
+6. k for Bonferroni = the candidate arms applicable in the cell, `mono-direct` included.
+7. The positive control (`mono-direct`) gates per (cell, stratum) at m = 3; the m = 4 cells have no control arm
+   and their verdicts are reported without that gate, stated in RESULTS.md.
+8. `|median| > D_AA` uses the largest per-curve `D_AA`; `within_control_distribution` uses per-curve medians.
+9. The stop rule counts native chain-tower censoring only.
+10. Per-arm variety gate: equality of `fp_rational_solutions` within the chain group (chain-tower, tree-tower,
+    chain-direct, aa) and within the symmetric pair, and against the classifier's ordered / distinct counts where
+    the instrument records them; the monolithic arm's excess is explained by `unlifted_solutions`.
+11. Decompositions are exchanged as sorted lists of `[x, sign]`; "planted found" means the public
+    `planted_abscissae` set of the target appears in the arm's verified list (hidden.json is never read).
+12. `construction_field_multiplications` is per-target only; the per-cell part is a separate field and is
+    reported per cell, not added to `w^+`.
+13. C3 pairs instances by (curve, label, draw rank) across t on the same curve; the targets themselves differ
+    between t (a target's SAT status depends on the base), which is why the pairing is by rank and the spread is
+    reported. "Nested bases" means the same curve and g, not the same target.
+14. The native `--deadline` is 86,400 s (non-binding); the external 600 s wall cap is the only stop.
+15. Failure classification without a marker (exit 134/137/139 with RSS ≥ 50 % of the cap → `as_rlimit`,
+    otherwise `crash`) is a recorded heuristic (`censor_basis`).
+16. `verify-msolve` is not run (`-g 2` has no parametrisation); the msolve arm is the F4 proxy only.
+
 ## 9. Freeze
 
 Frozen by the commit recorded in `FREEZE.json` (written in the following commit, with the SHA-256 of this file,

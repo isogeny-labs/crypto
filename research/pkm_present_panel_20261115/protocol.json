@@ -1,7 +1,7 @@
 {
  "schema": "experiment.protocol/v1",
  "protocol_id": "PKM-PRESENT-PANELP-20261115",
- "version": 1,
+ "version": "1.1",
  "created": "2026-11-15",
  "repository": "isogeny-labs/crypto",
  "study_dir": "research/pkm_present_panel_20261115",
@@ -202,7 +202,7 @@
  ],
  "decision_rule": {
   "statistic": "median of paired log2 ratios, per cell, per label stratum, pooled over the cell's curves",
-  "test": "exact paired sign-flip, p <= 0.05/k (k = candidate arms in the cell)",
+  "test": "exact paired sign-flip on the SUM of d_i, p <= 0.05/k; zeros dropped from the test, counted as 0 in the median",
   "interval": "percentile bootstrap of the median, 20000 resamples, level 1-0.05/k",
   "supported_within_scope": "p <= 0.05/k AND interval excludes 0 AND same sign of per-curve medians on every curve AND |median| > D_AA AND same sign on w_plus and w_solve AND msolve proxy median same sign",
   "within_control_distribution": "|median| <= D_AA on every curve",
@@ -301,5 +301,11 @@
    "M9",
    "M10"
   ]
+ },
+ "clarifications": "PROTOCOL.md §9a items 1-16",
+ "layout": {
+  "cell": "cells/<curve>/cell.json",
+  "targets": "cells/<curve>t<t>/m<M>/targets.json",
+  "systems": "systems/<cell>/<curve>/<instance>/<arm>.{ms,system.json}"
  }
 }
