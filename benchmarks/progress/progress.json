@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0239Z-ic-gpu-rootfind-m3",
+  "latest_record": "20261115T0349Z-tableb-ksum-l1",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 4,
-    "measured": 176,
-    "open": 0
+    "measured": 177,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -2460,6 +2460,537 @@
         }
       ],
       "problem": "ecdlp:curve25519-family-k32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.6677638364209324,
+      "latest": 0.6677638364209324,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6563666166577568,
+            0.6793589587206363
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.6677638364209324
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.6907608750588367,
+      "latest": 0.6907608750588367,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.676849629335083,
+            0.7049580376970707
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.6907608750588367
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5957548772263922,
+      "latest": 0.5957548772263922,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5836234323126437,
+            0.6081384915143417
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5957548772263922
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.8589768247986305,
+      "latest": 7.8589768247986305,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.696159
+      },
+      "metric": "fp20_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.696159
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.3796975073023274,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.8589768247986305
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 7.111354055695914,
+      "latest": 7.111354055695914,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.603242
+      },
+      "metric": "fp20_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.603242
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.2691499828475836,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.111354055695914
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.58758174672307,
+      "latest": 14.58758174672307,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.143109
+      },
+      "metric": "fp20_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.143109
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.3746252273950295,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.58758174672307
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.5732780016891322,
+      "latest": 0.5732780016891322,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5593052061836886,
+            0.5875998713889119
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5732780016891322
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5964883365746998,
+      "latest": 0.5964883365746998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5825048139389976,
+            0.6108075455440152
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5964883365746998
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5016278555270598,
+      "latest": 0.5016278555270598,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4913683767473674,
+            0.5121015461075353
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5016278555270598
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.390894343938431,
+      "latest": 7.390894343938431,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.776033
+      },
+      "metric": "fp22_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.776033
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.2795796107762163,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.390894343938431
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.64927952268661,
+      "latest": 6.64927952268661,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.674148
+      },
+      "metric": "fp22_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.674148
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.1718550848270417,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 6.64927952268661
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.065427735204743,
+      "latest": 14.065427735204743,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.253802
+      },
+      "metric": "fp22_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.253802
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.2491003443187934,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.065427735204743
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.4842625047788181,
+      "latest": 0.4842625047788181,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.47402810976282467,
+            0.4947178631494867
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.4842625047788181
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5010859114536607,
+      "latest": 0.5010859114536607,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4909425327970129,
+            0.5114388627663705
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5010859114536607
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.42610600569321144,
+      "latest": 0.42610600569321144,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.415640784782985,
+            0.4368347254050702
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.42610600569321144
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.157859173063904,
+      "latest": 7.157859173063904,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.041586
+      },
+      "metric": "fp24_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.041586
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.1847649638714108,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.157859173063904
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.383007476400372,
+      "latest": 6.383007476400372,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.870922
+      },
+      "metric": "fp24_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.870922
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.0872239713560443,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 6.383007476400372
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.13152444303565,
+      "latest": 14.13152444303565,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.851203
+      },
+      "metric": "fp24_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.851203
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.0626338965097077,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.13152444303565
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
       "unit": "S"
     },
     {
