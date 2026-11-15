@@ -120,17 +120,23 @@ inform which presentation any future m = 8 plan should use, and nothing more (S8
 ## 3. Cells, instances, order
 
 **Curves (nested bases, S11):** one curve per prime serves every t: p is prime with `16 | p − 1`, not Fermat,
-prime-order curve from the seeded search, and `B_real(t = 4) ≥ 5` (so that the symmetric arms apply at m = 4,
-t = 4). Two primes: `p1` = least such prime ≥ 2^18, `p2` = least such prime ≥ 2^20 (a third, ≥ 2^22, for m = 3
+prime-order curve from the seeded search, and the nested bases are all eligible cells: `B_real(t = 4) ≥ 8`,
+`B_real(t = 3) ≥ 4`, `B_real(t = 2) ≥ 2` (each at least half of B, the inherited eligibility rule; it also gives
+the symmetric arms their `B_real ≥ m + 1` at t = 4 for m = 4 and at t = 3 for m = 3). Two primes: `p1` = least such prime ≥ 2^18, `p2` = least such prime ≥ 2^20 (a third, ≥ 2^22, for m = 3
 only). Bases `g·μ_4 ⊂ g·μ_8 ⊂ g·μ_16` on the same curve with the same g. Exact commands (every flag explicit,
 `--no-l1-reuse` always; the instrument records the rule it applied and refuses an L1 reuse):
 
 ```
-pkm_present_panel cell --t 4 --min-prime 262144  --require-breal 5 --master-seed 20261115 --slug c1 --out cells/c1
-pkm_present_panel cell --t 4 --min-prime 1048576 --require-breal 5 --master-seed 20261115 --slug c2 --out cells/c2
-pkm_present_panel cell --t 4 --min-prime 4194304 --require-breal 5 --master-seed 20261115 --slug c3 --out cells/c3
-pkm_present_panel cell --prime <p_k> --t 2 ... --slug c<k>t2   and   --t 3 ... --slug c<k>t3   (same curve, same g)
+pkm_present_panel cell --t 4 --ratio 5 --min-prime <2^18|2^20|2^22> --require-breal 8 --require-breal-nested 2:2,3:4 --seed 20261115 --slug c<k> --out cells/c<k>
+pkm_present_panel cell --t 4 --ratio 5 --prime <p_k> --require-breal 8 --require-breal-nested 2:2,3:4 --seed 20261115 --slug c<k> --nested-ts 2,3 --out cells/c<k>
+pkm_present_panel targets --cell cells/c<k>[/nested_t<t>] --n-sat 5 --n-unsat 5 --planted 0 --planted-distinct 1 --max-draws 1000000 --seed 20261115 --m <m> --out cells/c<k>t<t>/m<m>
 ```
+
+Derived (commit `81242d990e`): c1 `p = 262321` (B_real 8 / 4 / 2 at t = 4 / 3 / 2; one prime rejected, 262193),
+c2 `p = 1048721` (11 / 5 / 2; rejected 1048609), c3 `p = 4194433` (8 / 5 / 3; rejected 4194353); `g = 4` on all three.
+The t = 2 cells have `B_real < m`, so their planted target is a plain planted decomposition (`--planted 1
+--planted-distinct 0`): the symmetric arms do not run at t = 2 and a distinct planting is impossible there.
+Symmetric arms therefore run at m3t3 and m3t4 on every curve, at m4t4 on c1 and c2, and at m4t3 on c2 only.
 
 | cell | m | t | B | curves | arms |
 |---|---|---|---|---|---|
@@ -294,6 +300,8 @@ Resolved while the runner and analysis were built (`runner/`, `analysis/`), befo
     Both run at m = 3 only. m = 4 caps 1,800 s. `tree-tower` semantics noted. The instrument's construction counter
     also counts the scaling inside subtractions (over-counts negations); stated with `w^+`. Symmetric arms at
     m = 4, t = 3 run only on curves with `B_real(t = 3) ≥ 5` (the curve rule guarantees it at t = 4 only).
+18. (v1.2) The wrapper's `--min-prime` was not honoured in its first build (every curve landed on p = 1048609);
+    fixed in `81242d990e` before any target was used, and the curves re-derived from scratch under the rule above.
 
 ## 9. Freeze
 

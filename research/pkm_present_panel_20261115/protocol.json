@@ -107,8 +107,44 @@
   "host": "this container, 4 vCPU, 15 GB, one call at a time"
  },
  "curves": {
-  "rule": "16 | p-1, not Fermat, prime-order curve, B_real(t=4) >= 5, least such prime >= 2^18 (c1), >= 2^20 (c2), >= 2^22 (c3, m = 3 only); nested bases g*mu_4 ⊂ g*mu_8 ⊂ g*mu_16 on one curve",
-  "commands_in": "PROTOCOL.md §3"
+  "rule": "16 | p-1, not Fermat, prime-order curve, B_real(t=4)>=8, B_real(t=3)>=4, B_real(t=2)>=2; least such prime >= 2^18 (c1), 2^20 (c2), 2^22 (c3, m=3 only); nested bases on one curve, g shared",
+  "derived": {
+   "c1": {
+    "p": 262321,
+    "B_real": [
+     2,
+     4,
+     8
+    ],
+    "rejected": [
+     262193
+    ]
+   },
+   "c2": {
+    "p": 1048721,
+    "B_real": [
+     2,
+     5,
+     11
+    ],
+    "rejected": [
+     1048609
+    ]
+   },
+   "c3": {
+    "p": 4194433,
+    "B_real": [
+     3,
+     5,
+     8
+    ],
+    "rejected": [
+     4194353
+    ]
+   }
+  },
+  "g": 4,
+  "commit": "81242d990e"
  },
  "cells": [
   {
@@ -175,7 +211,7 @@
   "natural_sat": 5,
   "natural_unsat": 5,
   "planted": 1,
-  "planted_distinct": true,
+  "planted_distinct": "1 where B_real >= m (t = 3, 4); plain planted 1 at t = 2",
   "draw_cap": 1000000,
   "labels_public": true,
   "hidden": "k and decompositions in hidden.json"
