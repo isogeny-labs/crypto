@@ -201,6 +201,11 @@ pub struct F4Stats {
     pub timed_out: bool,
     /// A matrix would have exceeded [`MAX_MATRIX_WORDS`].
     pub oversize: bool,
+    /// The refused matrix: its rows, columns and the step degree it belonged
+    /// to (zero unless `oversize`).
+    pub oversize_rows: u64,
+    pub oversize_cols: u64,
+    pub oversize_degree: u32,
     pub pairs_left: u64,
 }
 
@@ -2040,6 +2045,9 @@ pub fn groebner_basis_f4(
         let words = cols.words() as u64;
         if words * n_rows as u64 > max_matrix_words() {
             st.oversize = true;
+            st.oversize_rows = n_rows as u64;
+            st.oversize_cols = cols.monos.len() as u64;
+            st.oversize_degree = d;
             st.build_ns += t.elapsed().as_nanos() as u64;
             s.pairs.extend_from_slice(&selected);
             break;
