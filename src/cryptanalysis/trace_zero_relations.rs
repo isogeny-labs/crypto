@@ -20,6 +20,8 @@ pub enum TraceZeroMembershipEncoding {
     /// Its two affine lifts differ by negation, so both lie in the kernel.
     /// Keep the finite x domain and replay actual supplied base lifts.
     CertifiedDomain,
+    /// Same admitted finite domain with target/common-bit constant folding.
+    CertifiedDomainWithConstants,
     /// Certified finite domain plus the necessary trace bit on each
     /// finite partial sum. No restriction to the original subspace.
     CertifiedDomainWithPartialTrace,
@@ -202,23 +204,38 @@ pub fn decompose_full_trace_zero_with_encoding(
             report.reason = Some("deadline");
             return report;
         }
-        let mut enc = match ChainedS3Encoding::build(
-            m,
-            &curve.irreducible,
-            &curve.b,
-            target_x,
-            mask as u32,
-            limits.max_variables,
-        ) {
+        let built = if encoding == TraceZeroMembershipEncoding::CertifiedDomainWithConstants {
+            ChainedS3Encoding::build_for_domain(
+                m,
+                &curve.irreducible,
+                &curve.b,
+                target_x,
+                mask as u32,
+                limits.max_variables,
+                &codes,
+                limits.max_domain_clauses,
+            )
+        } else {
+            ChainedS3Encoding::build(
+                m,
+                &curve.irreducible,
+                &curve.b,
+                target_x,
+                mask as u32,
+                limits.max_variables,
+            )
+        };
+        let mut enc = match built {
             Ok(e) => e,
             Err(_) => {
                 report.reason = Some("S3 encoding admission or variable cap");
                 return report;
             }
         };
-        if enc
-            .constrain_summands(&codes, limits.max_domain_clauses)
-            .is_err()
+        if encoding != TraceZeroMembershipEncoding::CertifiedDomainWithConstants
+            && enc
+                .constrain_summands(&codes, limits.max_domain_clauses)
+                .is_err()
         {
             report.reason = Some("finite factor-base domain cap");
             return report;
