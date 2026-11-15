@@ -59,3 +59,10 @@ Launch with `MODE=a research/fall_degree_bounds_20261008/e14/launch_r3.sh` (dry 
 deletes the pod after `final_status`. Pods stop themselves 2 h after finishing; they never delete
 themselves. Expected: part a about 11 h (USD 23), part b at most about 7 h (USD 15).
 Status at 19:40 UTC: the launch was blocked by the session's permission check; it waits for the owner.
+
+## E14 r3 part a running (2026-11-15)
+Pod `5nxsdf6du9au1i` (`fd-e14-r3a-20261115T0033Z`, 32 vCPU, 256 GB, USD 2.08/h), launched 00:33:09Z, deadline 12:33Z.
+Gates passed by 00:41:49 (input sha256 0c6437f9… as registered; GL equal to E10 draw 3). Draw 3 started
+00:41:49 and is expected about 11:20Z. After finishing, the pod serves for 18 h (Amendment 32) and then
+deletes itself. Pull with `MODE=a research/fall_degree_bounds_20261008/e14/pull_r3.sh`, which deletes
+the pod after `final_status`. Part b launches when its admission passes (balance USD 106.77 at 00:33).

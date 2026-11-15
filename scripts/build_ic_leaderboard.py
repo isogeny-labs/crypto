@@ -519,6 +519,67 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1")
 
 
+def gate_inputs(evidence: Path) -> set[str]:
+    """Repository paths the validation gate reads for `evidence`: its manifest,
+    certificate, validator report and the report's raw data."""
+    manifest = evidence / gate.MANIFEST
+    needed = {str(manifest.relative_to(REPO))}
+    if not manifest.is_file():
+        return needed
+    document = json.loads(manifest.read_text())
+    for key in ("replay_certificate", "validator_report"):
+        spec = document.get(key)
+        if not isinstance(spec, dict) or not isinstance(spec.get("path"), str):
+            continue
+        path = (evidence / spec["path"]).resolve()
+        if not path.is_relative_to(REPO):
+            continue  # validation_gate reports the invalid path
+        needed.add(str(path.relative_to(REPO)))
+        if key == "validator_report" and path.is_file():
+            report = json.loads(path.read_text())
+            for item in report.get("raw_data", []):
+                name = item.get("path") if isinstance(item, dict) else item
+                if isinstance(name, str):
+                    raw_path = (evidence / name).resolve()
+                    if raw_path.is_relative_to(REPO):
+                        needed.add(str(raw_path.relative_to(REPO)))
+    return needed
+
+
+def refuse_unpulled_store_inputs(needed: set[str]) -> None:
+    """Do not demote validated rows because their inputs are still in the artifact store.
+
+    tools/artifacts moves data files out of Git and leaves a `.artifacts.json`
+    pointer beside them.  A checkout that has not pulled them would otherwise
+    see "not a file" gate errors and demote a validated row (or abort on a
+    component that refuses to render unvalidated), so the generated page would
+    disagree with CI, which pulls first.
+    """
+    stored = []
+    for path in sorted(needed):
+        local = REPO / path
+        pointer = local.parent / ".artifacts.json"
+        if local.is_file() or not pointer.is_file():
+            continue
+        try:
+            files = json.loads(pointer.read_text()).get("files", {})
+        except (OSError, ValueError, AttributeError):
+            continue
+        if isinstance(files, dict) and local.name in files:
+            stored.append(path)
+    if stored:
+        raise SystemExit("leaderboard validation inputs live in the artifact store and are not "
+                         "pulled here; run `python3 tools/artifacts/artifacts.py pull` on these "
+                         "paths (as .github/workflows/ic-leaderboard.yml does) before generating:\n"
+                         + "\n".join(stored))
+
+
+def checked_evidence_dir(evidence: Path, repo: Path | None = None, *args) -> list[str]:
+    """gate.check_evidence_dir, after refusing unpulled artifact-store inputs."""
+    refuse_unpulled_store_inputs(gate_inputs(evidence))
+    return gate.check_evidence_dir(evidence, REPO if repo is None else repo, *args)
+
+
 def require_materialized_gate_inputs(board: list[dict]) -> None:
     """Do not demote validated rows because their certificates are sparse-excluded.
 
@@ -532,32 +593,12 @@ def require_materialized_gate_inputs(board: list[dict]) -> None:
     needed = {gate.PRE_GATE_LEADERBOARD, gate.SWEEPS["leaderboard"]}
     evidence_dirs = {gate.board_evidence_dir(row) for row in board} | set(COMPONENT_EVIDENCE_DIRS)
     for directory in sorted(evidence_dirs):
-        evidence = REPO / directory
-        manifest = evidence / gate.MANIFEST
-        needed.add(str(manifest.relative_to(REPO)))
-        if not manifest.is_file():
-            continue
-        document = json.loads(manifest.read_text())
-        for key in ("replay_certificate", "validator_report"):
-            spec = document.get(key)
-            if not isinstance(spec, dict) or not isinstance(spec.get("path"), str):
-                continue
-            path = (evidence / spec["path"]).resolve()
-            if not path.is_relative_to(REPO):
-                continue  # validation_gate reports the invalid path
-            needed.add(str(path.relative_to(REPO)))
-            if key == "validator_report" and path.is_file():
-                report = json.loads(path.read_text())
-                for item in report.get("raw_data", []):
-                    name = item.get("path") if isinstance(item, dict) else item
-                    if isinstance(name, str):
-                        raw_path = (evidence / name).resolve()
-                        if raw_path.is_relative_to(REPO):
-                            needed.add(str(raw_path.relative_to(REPO)))
+        needed |= gate_inputs(REPO / directory)
     missing = sorted(path for path in needed & sparse if not (REPO / path).is_file())
     if missing:
         raise SystemExit("leaderboard validation inputs are sparse-excluded; hydrate these "
                          "committed paths before generating:\n" + "\n".join(missing))
+    refuse_unpulled_store_inputs(needed)
 
 
 # ---------------------------------------------------------------------------
@@ -904,7 +945,7 @@ def prime_base_size_component() -> dict:
                    "identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent "
                    + " / ".join(f"{sh[w]['ratio_b_over_a']:.3f}" for w in ("0", "0.1", "1"))
                    + f" at w = 0 / 0.1 / 1 ({sh['0']['pairs']} pairs); report {study}/second-host/README.pdf.")
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
             "second_host": second_host,
             "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
@@ -948,7 +989,7 @@ def prime_ksum_component() -> dict:
                 acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
             cmps[name] = acc
         rows.append({"bits": bits, "mean_s": means, **cmps})
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/report.pdf",
             "readme": study + "/README.md",
             "track": "generic decomposition, bounded by sqrt(r), cannot beat rho",
@@ -987,7 +1028,7 @@ def packed_filter_component() -> dict:
     if not (j4["dgb/rho-neg"]["strict_same_order_across_band_every_curve"]
             and j4["dgbf/rho-neg"]["strict_same_order_across_band_every_curve"]):
         raise SystemExit(f"{study}: rho-neg order does not hold across the band")
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"study": study + "/", "readme": study + "/README.md", "report": study + "/REPORT.pdf",
             "class": "engineering", "track": "generic (prime-table; docs/ic/SWEEPER.md, Tracks)",
             "label": "whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table",
@@ -1048,7 +1089,7 @@ def generator_orbit_component() -> dict:
                      "lazy_over_layout": cmp(c, layout, lazy), "layout_over_gen": cmp(c, gen, layout),
                      "lazy_over_gen": cmp(c, gen, lazy), "gen_over_rho_frob": cmp(c, "rho-frob", gen),
                      "band_gen": band(c, gen), "band_lazy": band(c, lazy), "band_rho_frob": band(c, "rho-frob")})
-    errors = gate.check_evidence_dir(REPO / study)
+    errors = checked_evidence_dir(REPO / study)
     validation = ("Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study "
                   "directory: replay certificate, validator report, §5a-banded rho-frob reference)."
                   if not errors else NOT_VALIDATED + " Gate: " + "; ".join(errors) + ".")
@@ -1102,25 +1143,25 @@ def k4_v4_component() -> dict:
     e27_study = "research/e27_walk_20261030"
     if (e27.get("experiment") != "e27" or e27.get("all_walks_identical") is not True
             or not all(z["other_fields_equal"] for z in e27["rows"])
-            or gate.check_evidence_dir(REPO / e27_study, REPO)):
+            or checked_evidence_dir(REPO / e27_study, REPO)):
         raise SystemExit("review the E27 walk summary and its VALIDATION.json before updating the leaderboard")
     span = lambda key, i: [min(z[key][i] for z in e27["rows"]), max(z[key][i] for z in e27["rows"])]
     e30 = load(SOURCES["glv_e30"])
     e30_study = "research/e30_invariants_lite_20261030"
     if (e30.get("experiment") != "e30" or not all(z["other_fields_equal"] for z in e30["rows"])
-            or gate.check_evidence_dir(REPO / e30_study, REPO)):
+            or checked_evidence_dir(REPO / e30_study, REPO)):
         raise SystemExit("review the E30 audit summary and its VALIDATION.json before updating the leaderboard")
     span30 = lambda f: [min(f(z) for z in e30["rows"]), max(f(z) for z in e30["rows"])]
     e32 = load(SOURCES["glv_e32"])
     e32_study = "research/e32_handover_ladder_20261031"
     if (e32.get("experiment") != "e32" or e32.get("rows_at_or_below_rho_any_weight") != 0
             or not all(c["ic_correct"] and c["walks_correct"] for c in e32["curves"])
-            or gate.check_evidence_dir(REPO / e32_study, REPO)):
+            or checked_evidence_dir(REPO / e32_study, REPO)):
         raise SystemExit("review the E32 ladder summary and its VALIDATION.json before updating the leaderboard")
     e33 = load(SOURCES["glv_e33"])
     e33_study = "research/e33_solver_b_pivot_count_20261031"
     if (e33.get("experiment") != "e33" or e33.get("e2e_identity_ok") is not True
-            or gate.check_evidence_dir(REPO / e33_study, REPO)):
+            or checked_evidence_dir(REPO / e33_study, REPO)):
         raise SystemExit("review the E33 pivot-count summary and its VALIDATION.json before updating the leaderboard")
     e34 = load(SOURCES["glv_e34"])
     e34_study = "research/e34_twist24_cheap_rep_20261031"
@@ -1132,7 +1173,7 @@ def k4_v4_component() -> dict:
     v40 = e40.get("verdict", {})
     if (not v40.get("V_ranked_vs_A_registered_rule") or not v40.get("e2e_identity")
             or v40.get("G2.208_kill_fired") is not False
-            or gate.check_evidence_dir(REPO / e40_study, REPO)):
+            or checked_evidence_dir(REPO / e40_study, REPO)):
         raise SystemExit("review the E40 Macaulay-entries summary and its VALIDATION.json before updating the leaderboard")
     e41 = load(SOURCES["glv_e41"])
     e41_study = "research/e41_twist24_shortfall_20261102"
@@ -1144,7 +1185,7 @@ def k4_v4_component() -> dict:
     e39_study = "research/e39_pivot_rules_confirm3_20261102"
     if (e39.get("experiment") != "e39" or e39.get("e2e_identity_ok") is not True
             or not all(ok for _, ok in e39["verdict_checks"]["G2.201_rank_with_gates"])
-            or gate.check_evidence_dir(REPO / e39_study, REPO)):
+            or checked_evidence_dir(REPO / e39_study, REPO)):
         raise SystemExit("review the E39 pivot-rule summary and its VALIDATION.json before updating the leaderboard")
     rho39 = {}
     for r in e39["rho_ranges"]:
@@ -1249,7 +1290,7 @@ def postgb_linear_stage_component() -> dict:
     if d.get("schema") != "postgb_linear_stage.summary/v1" or not d["gates"]["pass"]:
         raise SystemExit(f"{SOURCES['postgb_linear_stage']}: unexpected schema or a failed correctness gate")
     study = "research/postgb_linear_stage_20261026"
-    errs = gate.check_evidence_dir(REPO / study / "validation", REPO)
+    errs = checked_evidence_dir(REPO / study / "validation", REPO)
     fams = []
     for f, v in d["sparse_over_fast"].items():
         dn = d["dense_over_fast"].get(f)
@@ -1310,7 +1351,7 @@ def ic_cover_weakclass_component() -> dict:
                      "ratio_min": per_p[p]["ratio_S_A_over_S_B"]["min"],
                      "ratio_max": per_p[p]["ratio_S_A_over_S_B"]["max"],
                      "before": band(base), "after": band(lever)})
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"rows": rows, "slope": d["slope_A"][0], "slope_engineer": d["slope_B"][0],
             "class": "engineering",
             "unit": "S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread",
@@ -1344,7 +1385,7 @@ def jv_sieve_line_vs_rho_component() -> dict:
                          "s": cell("S/rho U2")["point"], "lo": cell("S/rho U2")["lo"], "hi": cell("S/rho U2")["hi"],
                          "band": [b["point"] for b in band], "band_hi": max(b["hi"] for b in band),
                          "below": all(b["verdict"] == "below" for b in band)})
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     walk = load("research/jv_walk_charge_20261111/analysis.json")
     w512 = walk["by_M"]["512"]["pooled"]
     walk_note = (f"The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in "
@@ -1379,7 +1420,7 @@ def k1_pt_lgrow_component(names: Names) -> dict:
     calibration, prime and random-binary curves, negation rho) or table C's (32-target batch), so
     the rows sit in their own section outside tables A-C and are never ranked against them."""
     summ = load(SOURCES["k1_pt_lgrow"])
-    errs = gate.check_evidence_dir(REPO / K1_PT_LGROW_EVIDENCE, REPO)
+    errs = checked_evidence_dir(REPO / K1_PT_LGROW_EVIDENCE, REPO)
     if errs:
         raise SystemExit(f"{K1_PT_LGROW_EVIDENCE}: not validated; the K1 pair-table rows cannot be shown: "
                          + "; ".join(errs))
@@ -1498,7 +1539,7 @@ def d4_char2_frob_roots_component() -> dict:
         if o.get("status") != "ok" or not o.get("same_seeds"):
             raise SystemExit(f"{SOURCES[key]}: comparison not ok or seeds differ")
         paired[m] = {"ratio": o["ratio_b_over_a"], "ci95": o["ci95"], "pairs": o["pairs"]}
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"rows": rows, "paired": paired, "class": "engineering",
             "unit": "S = counted cost in GAE per sqrt(r), ecbench",
             "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["d4_char2_m12"],
@@ -1546,7 +1587,7 @@ def aimed_gather_component() -> dict:
         raise SystemExit(f"{SOURCES['aimed_gather_corrected']}: unexpected schema")
     if not d.get("identity_ok") or d.get("rounds_kept") != 42:
         raise SystemExit(f"{SOURCES['aimed_gather']}: an identity failure or an incomplete session")
-    errs = gate.check_evidence_dir(REPO / AIMED_GATHER_EVIDENCE, REPO)
+    errs = checked_evidence_dir(REPO / AIMED_GATHER_EVIDENCE, REPO)
 
     def pick(s, metric):
         def one(q):
@@ -1964,7 +2005,7 @@ def mt_fieldops_component() -> dict:
     (analyze.py); I/M = 10, h in {0, 0.1, 1}. A multi-target regime outside tables A-C; its standing comes from the
     benchmarks directory's VALIDATION.json."""
     summary = load(SOURCES["mt_fieldops_component"])
-    errs = gate.check_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
+    errs = checked_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
     cells = sorted({(x["bits"], x["T"]) for x in summary})
     rows = []
     for bits, t in cells:
@@ -2202,7 +2243,7 @@ def ghs_weak_cd_chain() -> dict:
     seeds 1..3 of the per-seed cold M-eq ratio, frozen grid constants; additions priced at 0, 0.5 and 1 M-eq). Its
     standing comes from combo/validation/VALIDATION.json."""
     a = load(SOURCES["ghs_weak_cd_chain"])
-    errs = gate.check_evidence_dir(REPO / GHS_CD_CHAIN_EVIDENCE, REPO)
+    errs = checked_evidence_dir(REPO / GHS_CD_CHAIN_EVIDENCE, REPO)
     qs = (262111, 524287, 1048507, 2097091, 4194271)
     rows = []
     for y in ("DL", "DL1", "D"):

@@ -521,6 +521,72 @@ text, with its evidence, its disclosure and the independent review, is
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (decisions 3, 4 and 6).
 
+## Amendment 15 (2026-11-14; execution and procedure of stage B: resumable unit jobs; before any stage B row exists)
+
+Stage B's registered invocations are run as short units in numbered, resumable jobs instead of one 48-hour job. The full
+text, with its evidence, its disclosure, the runner, its tests and the independent reviews, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_G_stageB_units.md` (R2-G). The binding parts are restated here. Every
+number is `[pcc:unverified]`.
+
+- **Why.** `pfd-b` (`g1 hky-B d-B g3`, time limit 172,800 s) was killed twice by EC2 Spot interruptions, 16 and 31 minutes in
+  (`STAGE_B_LOST.md`); no stage B row is admitted. The longest uninterrupted run of this study on the pool since 2026-11-09
+  20:00Z is 3.2 hours; a 3.85-hour run was interrupted (`SPOT_LOSSES.md`). Owner decision 8: split stage B into short jobs;
+  readings and rules stay as registered.
+- **Disclosure.** No stage B row exists or has been seen. When this was written the main session had seen all of stages A and C
+  and the `t = 12, 13` capped rows; none enters a rule here.
+- **Same systems.** A cell's random stream depends on `(seed, kind, m, t)` only, budgets are per system (F4) or per closure, and
+  no state is carried between levels (`examples/pkm_tower_pilot.rs` at f13a690df0). A pilot invocation pinned to one `t`
+  computes the systems the registered invocation computes at that `t`, provided the ladder stop is applied between levels.
+- **Unit.** One pilot invocation for one `(ladder, t)`: the flags of the ladder's `run.sh` line with
+  `--t-min T --max-t-m3 T --max-t-m4 T --max-t T`, and for the `P0` ladders one kind in `--kinds`. Both draws run in the unit.
+  25 ladders, 91 units (hky-B 13 and 49; d-B 12 and 42); the table is in R2-G section 3.
+- **Rules, fixed before any stage B row.**
+  1. Order: levels in increasing `t` within a ladder; ladders in `run.sh`'s order.
+  2. Ladder stop: a ladder is closed when a unit's log has the pilot's own line "every run at t = T timed out; stopping". The
+     runner makes no judgment of its own.
+  3. A unit is done when the pilot exited 0, its files were uploaded and the job's `progress.txt` in S3 has
+     `end <unit> exit 0`. A done unit is never run again. A unit found done in two jobs stops stage B (owner).
+  4. Resume: unit jobs are numbered and run one at a time; each request is submitted once, and a job that must be repeated
+     gets the next number and the earlier one a skip. Two pods under one job name stop stage B (owner). Job `N` is given the result prefix of every earlier job or a
+     `skip:<n>:costguard` / `skip:<n>:neverran` for it, each skip with a status receipt. The runner checks that the jobs given
+     and the skips (carried forward from earlier jobs) are exactly 1 to `N - 1`, and that each earlier job's runner hash,
+     binary hashes and recorded pilot command lines equal its own; otherwise it runs nothing (exit 12). The runner is not
+     changed once the first unit job has run.
+  5. Interruption: only the unit in flight is lost and it is run again by the next job. "In flight in a job" is a `start`
+     line with no `end` and no `abort` line in that job's `progress.txt`; the count does not depend on why the job ended. A
+     unit in flight in two earlier jobs is reported lost and goes to the owner (owner decision 3, per unit); the job that
+     finds it runs no unit (exit 75). The owner's two answers, and only these: `close:<ladder>:<T>` (the ladder is closed
+     there, reported as "lost at t = T") or `allow:<unit>:<K>` with `K >= 3` (lost only when in flight in `K` or more jobs).
+     The runner accepts either only for a unit that is lost by the count, and carries both forward.
+     The two lost `pfd-b` attempts count toward no unit (owner decision 9, 2026-11-14); each unit starts with a clean count.
+  6. Non-zero exit and upload failures, handled mechanically. A unit whose pilot exits non-zero gets one rerun in the next
+     job; a second non-zero exit closes its ladder at that level by the runner itself ("tool failure at t = T"). A failed
+     upload stops the job; if its `abort` line reaches S3 the unit does not count as in flight. A `P0` isogeny ladder runs
+     even if its kummer sibling ended by a tool failure.
+  7. Gates: G1 at the start of every job. The `g3` stage is one G3-only job after the last unit: Amendment 11's G3-only
+     command with work directory `/work/g3b` and `gate3 /work/g3b pkm_tower_pilot --max-n 20 --jobs 2 --budget 900`; 12 vCPU,
+     56Gi, 57,600 s. Its inputs are the row files of the done units of the jobs that count: the last unit job and the jobs
+     named in its `prev:` line, never a skipped job; `progress.txt` decides which units are done. Amendment 11's scope and
+     stop rule apply.
+  8. Stage C repeats: for the units that repeat a stage C cell, `x_r`, `curve` and `tower` of every row must equal stage C's
+     admitted row; a difference stops stage B. The outcome comparison is the frozen scorer's, with no exception added.
+  9. Cost guard: Amendment 12 applies to every unit job. A job stopped by the cost guard is skipped (`skip:<n>:costguard`),
+     never given to a later job, and nothing from it is admitted.
+  10. Resources and limits: 12 vCPU, 56Gi, no pin, 172,800 s. US$40 per job and US$400 in total are unchanged. At most 12 unit
+      jobs without going back to the owner.
+- **Runner.** `research/pkm_falldegree_unblock_20261107/stageb_units_runner.sh`, SHA-256
+  `1c2229386976e8d6f22e5f243b269a5d23d588d0e105d6cb530c9a5488157a79`. Each job's command carries the runner text in pieces
+  behind a one-line start command (SHA-256 `572ce3fb23e57416732a64a7cc25523c5ff84bd8496a7dd59455e07b1b6bcade`) that
+  rebuilds the file and checks the runner's SHA-256 before running it; the launch card checks the start command's hash.
+- **Scoring.** For the jobs that count (rule 7), a ladder's unit files are concatenated in increasing `t` into the registered
+  file name (for `P0`: kummer units, then isogeny units); the per-invocation summary lines are dropped. No hypothesis, §6
+  rule, cell, seed, flag, limit, budget, image or binary changes.
+- **What is different.** Each unit is a separate process, so wall seconds near a budget can differ from a long-lived process;
+  rows of one stage can come from several jobs and nodes; ladders can be closed by rules 5 and 6, which the registered job
+  cannot do because it has no resume. These are stated in R2-G section 5 and get no special treatment in scoring.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (decisions 3, 4, 6, 8 and 9).
+
 ## Amendment 16 (2026-11-14; stage B's execution route: one reserved RunPod CPU pod; before any stage B row exists)
 
 Route only. The text is the R3 draft (`research/pkm_falldegree_unblock_20261107/AMENDMENT_R3_RUNPOD.md`, commit 218b1226d1)
