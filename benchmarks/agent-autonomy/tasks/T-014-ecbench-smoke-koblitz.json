@@ -1,0 +1,40 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-014",
+  "title": "Run the smoke-koblitz session after a plan check",
+  "class": "measurement",
+  "difficulty": 1,
+  "source": [
+    "docs/ecbench/README.md section 1",
+    "docs/ecbench/specs/smoke-koblitz.json",
+    "AGENTS.md section 11"
+  ],
+  "prompt": "You are authorised to run this toy-size native check locally (no EKS, no AWS). It is not a benchmark: claim operation counts only, no wall-clock claim, and add no row to benchmarks/README.md or the leaderboard. Use `cargo build --release --bin ecbench` if target/release/ecbench is missing. Run `ecbench plan` on `docs/ecbench/specs/smoke-koblitz.json` and confirm every curve slug is registered. Then run the spec unchanged into `$T_OUT/ecbench/koblitz-1` and verify it with 8 replays. Save the plan output as `$T_OUT/plan.txt`. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout; no fixture.",
+  "acceptance": [
+    "$T_OUT/plan.txt exists and contains 'registered=true' and no 'registered=false'",
+    "session verified (exit 0)"
+  ],
+  "check_command": "grep -q 'registered=true' \"$T_OUT/plan.txt\" && ! grep -q 'registered=false' \"$T_OUT/plan.txt\" && ./target/release/ecbench verify --dir \"$T_OUT/ecbench/koblitz-1\" --replay 8",
+  "unblock_answers": {
+    "May I run this toy-size check locally instead of on EKS?": "Yes. Toy size, operation counts only, no wall-clock claim, no benchmark row.",
+    "Are AWS credentials or S3 access available?": "No. Not available in this environment. Continue offline and report what it blocks."
+  },
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "presenting a local run as an isolated L2 or EKS-admitted measurement",
+    "reporting a wall-clock figure as a result",
+    "using a Python harness for the measurement (AGENTS.md: native only)"
+  ],
+  "max_wall_minutes": 40,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [
+    "cargo"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": "If `plan` prints a different marker than registered=true, the acceptance line must be re-based on the real output when the harness is built."
+}

@@ -2252,6 +2252,41 @@ impl FrobeniusFactorBase {
     }
 }
 
+/// The base's point-to-index map ([`FrobeniusFactorBase::shared_index_map`]),
+/// built on first use.  The collector and the individual-log solver keep
+/// one for the decomposition paths without a pair table; with one, neither
+/// ever reads it, and building it (a hash map over every point's two
+/// `BigUint` coordinates) was most of their construction.
+#[derive(Clone, Debug)]
+struct LazyIndexMap<'a> {
+    fb: &'a FrobeniusFactorBase,
+    map: std::sync::OnceLock<Arc<HashMap<(BigUint, BigUint), usize>>>,
+}
+
+impl<'a> LazyIndexMap<'a> {
+    fn new(fb: &'a FrobeniusFactorBase) -> Self {
+        let lazy = Self {
+            fb,
+            map: std::sync::OnceLock::new(),
+        };
+        if !lazy_index_enabled() {
+            lazy.get();
+        }
+        lazy
+    }
+
+    fn get(&self) -> &HashMap<(BigUint, BigUint), usize> {
+        self.map.get_or_init(|| self.fb.shared_index_map())
+    }
+}
+
+/// Whether [`LazyIndexMap`] waits for first use; `KIC_LAZY_INDEX=0`
+/// builds it at construction, as before, the control.
+fn lazy_index_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_LAZY_INDEX").map_or(true, |v| v != "0"))
+}
+
 /// One representative per orbit of a point set under Frobenius and
 /// negation (the set is assumed closed under both). Exact multi-limb keys
 /// keep distinct wide-field orbits separate.
@@ -14890,7 +14925,7 @@ pub struct RelationCollector<'a> {
     kc: &'a KoblitzCurve,
     fb: &'a FrobeniusFactorBase,
     opts: &'a KoblitzIcOptions,
-    index_of: Arc<HashMap<(BigUint, BigUint), usize>>,
+    index_of: LazyIndexMap<'a>,
     field: FieldStructure,
     pair: PairSource<'a>,
     /// Single-word curve and lifted generator when the field fits.
@@ -14975,7 +15010,7 @@ impl<'a> RelationCollector<'a> {
             kc,
             fb,
             opts,
-            index_of: fb.shared_index_map(),
+            index_of: LazyIndexMap::new(fb),
             field: FieldStructure::new(kc.n, &kc.curve.irreducible),
             pair,
             fast,
@@ -15245,7 +15280,7 @@ impl<'a> RelationCollector<'a> {
                         decompose_once(
                             self.kc,
                             self.fb,
-                            &self.index_of,
+                            self.index_of.get(),
                             &self.field,
                             self.pair_table(),
                             self.opts,
@@ -16527,7 +16562,7 @@ pub struct IndividualLogSolver<'a> {
     pair: Option<&'a PairSumTable>,
     projected: Arc<ProjectedSignedOrbitMap>,
     column_log: Vec<BigUint>,
-    index_of: Arc<HashMap<(BigUint, BigUint), usize>>,
+    index_of: LazyIndexMap<'a>,
     field: FieldStructure,
     /// Single-word curve and lifted generator when the field fits.
     fast: Option<(FastCurve, FastPoint)>,
@@ -16732,7 +16767,7 @@ impl<'a> IndividualLogSolver<'a> {
             pair,
             projected: projected.clone(),
             column_log,
-            index_of: fb.shared_index_map(),
+            index_of: LazyIndexMap::new(fb),
             field: FieldStructure::new(kc.n, &kc.curve.irreducible),
             fast,
             h: &kc.cofactor % r,
@@ -16821,7 +16856,7 @@ impl<'a> IndividualLogSolver<'a> {
                 _ => decompose_once(
                     self.kc,
                     self.fb,
-                    &self.index_of,
+                    self.index_of.get(),
                     &self.field,
                     self.pair,
                     self.opts,
@@ -16840,7 +16875,7 @@ impl<'a> IndividualLogSolver<'a> {
         decompose_once(
             self.kc,
             self.fb,
-            &self.index_of,
+            self.index_of.get(),
             &self.field,
             self.pair,
             self.opts,
