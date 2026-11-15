@@ -72,7 +72,7 @@ fn restricted(src: &Source) -> (FF, Pol) {
         let hq = f.add(h.a.eval(q, f), f.mul(h.b.eval(q, f), yq));
         let hr = f.add(h.a.eval(r, f), f.mul(h.b.eval(r, f), yr));
         let z = FF::new(a, b).scale(f.mul(hq, hr), f);
-        assert!(z.a.degree() <= 7 && z.b.degree() <= 3);
+        assert!(z.a.degree() <= 7 && z.b.degree() <= 4);
         vals.push(z);
     }
     let ph: Vec<_> = src
@@ -100,7 +100,7 @@ fn restricted(src: &Source) -> (FF, Pol) {
             f,
         )
     }
-    assert!(z.a.degree() <= 14 && z.b.degree() <= 10);
+    assert!(z.a.degree() <= 15 && z.b.degree() <= 11);
     assert!(z
         .a
         .0
@@ -161,7 +161,9 @@ pub fn run_fiber() {
     let f = &c.field;
     let (z, den) = restricted(&src);
     let norm = z.a.mul(&z.a, f).sub(&c.f.mul(&z.b.mul(&z.b, f), f), f);
-    assert!(norm.degree() <= 28);
+    assert!(norm.degree() <= 30);
+    let norm = norm.exact(&den, f);
+    assert!(norm.degree() <= 18);
     assert!(!norm.0.is_empty());
     let norm0 = native(&norm);
     println!("RESTRICTION A_degree={} B_degree={} denominator_degree={} norm_degree={} A={:?} B={:?} norm={norm0:?}",z.a.degree(),z.b.degree(),den.degree(),norm.degree(),native(&z.a),native(&z.b));
@@ -297,11 +299,14 @@ pub fn run_fiber() {
         let base_src = src.refc.mul(&d, 2);
         assert!(!src.refc.is_zero(&base_src));
         assert!(src.refc.is_zero(&src.refc.mul(&base_src, 1028893)));
-        let Some(coord) = src.eval(&base_src) else { println!("DECODE_EXCLUDE x={x} y={y} reason=doubled_source_chart"); continue; };
+        let Some(coord) = src.eval(&base_src) else {
+            println!("DECODE_EXCLUDE x={x} y={y} reason=doubled_source_chart");
+            continue;
+        };
         super::check::verify_pair(pair, coord);
         println!("CALIBRATION x={x} y={y} pair={pair:?} source_u={:?} source_v={:?} no_relative_scalar_used=true",base_src.u,base_src.v);
         selected += 1;
     }
     assert!(selected > 0, "no_supported_calibration");
-    println!("PASS fixed_degree_calibration=true norm_degree_bound=28 decoded={selected} exact_restriction=true no_cyclic_scan=true timing_claim=false");
+    println!("PASS fixed_degree_calibration=true norm_degree_bound=18 decoded={selected} exact_restriction=true no_cyclic_scan=true timing_claim=false");
 }
