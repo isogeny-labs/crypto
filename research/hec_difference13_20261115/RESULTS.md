@@ -30,7 +30,7 @@ Hessian vanishes on the actual pair. For the complementary pair the value is
 chords in odd characteristic. The four pairs sharing an endpoint also give
 nonzero values. Multiplying the local equation by a unit only rescales the
 restricted Hessian. A post-run written specialization argument establishes the
-Gamma00 divisor as the reduced C-C; it does not alter the executed test.
+Gamma00 divisor as the reduced translate psi(T)+(C-C); it does not alter the executed test.
 
 This makes the next source gate concrete: translate the inversion-symmetric
 Mumford chart to a source point on the pulled-back Gamma00 divisor, evaluate

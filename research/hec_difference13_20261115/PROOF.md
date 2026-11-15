@@ -51,15 +51,15 @@ standalone destination-only gate; choosing the opposite normal reverses all.
 
 ## Application to the existing quotient and remaining proof obligations
 
-Geometry13 supplies a Gamma00 section whose divisor contains C-C. To use the
+Geometry13 supplies a translated Gamma00 section centered at the rational two-torsion image S=psi(T). Its divisor contains S+(C-C), not generally C-C itself. Translate by S before using the following origin-centered argument. To use the
 algorithm, verify that the actual characteristic127 section defines the reduced
 difference surface globally (not only its tangent cone): lift the identity with
 the rank7 unit minor as in RECONSTRUCTION-PROOF.md, and compare divisor class
 [C-C]=2Theta to exclude extra effective components. This last class comparison
-and relative specialization must be recorded before interpreting source zeros.
+and relative specialization must be recorded before interpreting source zeros; the final section below supplies that argument.
 No empirical target-only decoder can replace that obligation.
 
-For a source point x with isogeny image on D, translate the rational2torsion
+For a source zero x, the decoded difference is psi(x-T), since the section is centered at psi(T). Translate the rational2torsion
 Mumford chart to x before taking derivatives of the pulled-back section. Its
 origin parameters have inversion t->-t; in a commutative formal group over
 char!=2, the quadratic group-law term vanishes (a symmetric bilinear term has
@@ -70,7 +70,7 @@ Check this construction and its jet regularity explicitly on the source.
 
 This decoder alone maps only the difference surface. To map general public
 inputs one must construct a decomposition into difference-surface points, recover
-consistent signs and verify addition. Random intersection/decomposition cost,
+consistent signs and verify addition. Because 2T=0, zeros x and y=D-x decode to images summing to psi(D). Random intersection/decomposition cost,
 exceptional chords, denominators, descent and verification must all be charged.
 No 10x or end-to-end claim follows from this lemma or the destination-only gate.
 
@@ -90,7 +90,7 @@ transport13 pinned section-space arithmetic and its explicit raw receipts.
 
 ## Global difference-divisor specialization argument
 
-Here is the additional argument needed above, separate from the destination-only
+Throughout this argument translate the target origin to S=psi(T); translate back at the end, giving S+(C-C). Here is the additional argument needed above, separate from the destination-only
 execution. Take the smooth canonical quartic lift over the Witt DVR used in
 geometry13's reconstruction proof. Its relative Jacobian is smooth. Lift the
 symmetric theta characteristic (2 is invertible), its eight second-order sections,

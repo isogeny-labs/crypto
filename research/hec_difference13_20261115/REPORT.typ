@@ -30,7 +30,7 @@ Hessians use the proved target derivative formula. No timing comparison or
 independent derivative implementation is asserted.
 
 *Connection to the quotient.* A separate written specialization and divisor-class
-argument identifies the Gamma00 divisor with the reduced C − C. The next gate
+argument identifies the translated Gamma00 divisor with ψ(T) + (C − C), where T is the registered rational two-torsion point. A source zero x therefore decodes ψ(x − T). The next gate
 must evaluate the actual translated source-section jets, check their constants
 and derivative conventions, and apply this decoder. General public inputs still
 need a decomposition into difference-surface points and consistent signs.
