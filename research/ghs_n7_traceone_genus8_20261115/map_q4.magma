@@ -1,0 +1,49 @@
+SetSeed(20261115);
+R<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^14+x^5+1>;
+k := GF(4);
+Embed(k, K);
+a := z^12+z^9+z^8+z^7+z^6+z^5+z^4+z+1;
+b := z^8+z^7+z^6+z^5+z+1;
+assert a^4 eq a;
+assert a^2+a eq K!1;
+assert b^2 ne b and b^4 ne b and b^128 ne b;
+E := EllipticCurve([K | 1, a, 0, 0, b]);
+assert #E eq 16634;
+assert IsPrime(8317);
+assert WeilDescentGenus(E, k, K!1) eq 8;
+C, h := WeilDescent(E, k, K!1);
+assert Type(C) eq CrvHyp;
+assert Genus(C) eq 8;
+J := Jacobian(C);
+P := E!0;
+for trial in [1..32] do
+    P := 2*Random(E);
+    if P ne E!0 then
+        break;
+    end if;
+end for;
+assert P ne E!0;
+assert 8317*P eq E!0;
+image := h(P);
+assert image ne J!0;
+assert 8317*image eq J!0;
+target := h(7*P);
+assert target eq 7*image;
+recovered := -1;
+for scalar in [0..10] do
+    if scalar*image eq target then
+        recovered := scalar;
+        break;
+    end if;
+end for;
+assert recovered eq 7;
+print "source_point", P;
+print "source_order", Order(P);
+print "source_cardinality", #E;
+print "target_type", Type(C);
+print "target_genus", Genus(C);
+print "image_type", Type(image);
+print "image_nonzero", image ne J!0;
+print "image_8317_zero", 8317*image eq J!0;
+print "recovered_scalar", recovered;
