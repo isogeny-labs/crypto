@@ -391,6 +391,45 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual local/divisor evaluation audit](../finite_point_evaluation_audit_20261115/README.md)
+constructs actual finitepoint-local residue evaluation/kernelmax/residueFieldK/unitcriterion,
+and applies the official DVR integer-lift theorem to the actual proved point DVR/full
+function field to identify the actual regular domain with the official finite adic
+valuation subring. Actual finite/infinity maps give residue evaluation at every
+actual point, coefficient identity and nonzero value iff valuation1, with actual
+nonzero-function order0 iff valuation1. Actual coordinate fractions have numerical
+value pointEval(a)/pointEval(b) under the nonzero-denominator guard; actual unit
+values agree. The actual principal-support disjointness/local-unit-domain bridge
+is proved. Actual unit-valued divisor products satisfy function multiplicativity,
+common-support divisor additivity, the factor c^degree(D) and degreezero scalar
+invariance. Prior actual geometric scalar classification gives choice invariance
+for equal geometric principal divisors under actual IsAlgClosedK/WΔneq0/degree0/
+disjoint guards: the elliptic geometric forward Exercise26.1.1 case, not its converse,
+allcurves or reciprocity. Actual nonzero X−x precludes total coefficientfixing
+FF→K point evaluation; its inverse has no local representative and adicvalue>1,
+while its actual local value is0. Singleton±1divisors cancel, but totalizedzero
+negative powers break the product/add law. On actual prior E/F3:y²=x³+x+1,
+P=(0,1)NS/Δneq0, the vertical has order1atP/−2atO; singleton and actualprincipal
+supports are unequal yet overlap. The intended disjoint source qualification
+survives; merelyunequal or deleted-domain readings fail. No arbitrary evaluation
+outside the tested singleton is inferred. Full scheme/localRing/Divisor APIs,
+finitepoint divisor basechange/tensor/Galois descent, translation/reciprocity/
+isogeny/Lang/Cartier/Jacobian/canonicalpairing/MOVFR/binaryruntime remainopen.
+Exact local **PCC-20261115-1a1570** PASS at2026-11-15T11:01:06Z; signedunverified. Whole536/0fail/0trusted/
+standardfoundations;76modules67exactcredited+9new/96formal-artifactpins;
+full3887-character native1complete/0prefix/0unresolved. Fourteenstates/fivefailures/
+ninesuccesses;174files/81objects/25172byte losslessXZ/
+fivegate/PDF47985fulltextread/visual/inbounds.13four namedlogicalguard advisories;
+14allguards retained anonymously/projectlogs clean, inherited frozenauditor
+String.mk deprecation retained. Failedcompilerplaceholders are diagnostics,
+notacceptedproofs. Ch26newfulltextvisualPDF1/printed573/cumulative1–6/notall16;
+ch7partial1–72rereadwithinpriorcoverage/notall21. OfficialDVR/unit/Finsupp APIs
+andprioractualgeometry/scalarcriterion credited. FivecorrectKBcalls127beforequery
+processing/twoConductor127fallback; datedprecodeprotocolrefinements/samebudget.
+No novelty/canonicalpromotion/newphysicalhost/frozenedit/cryptoPython/spend/upload.
+[pcc:unverified]
+
+
 The [actual Miller basechange audit](../miller_basechange_audit_20261115/README.md)
 constructs an injective actual function-field embedding under field extensions,
 proves actual norm/infinity valuation and leading-residue-one compatibility,
