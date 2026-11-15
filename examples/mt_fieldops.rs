@@ -8,6 +8,7 @@
 //! The lever under test is "P +- Q with one inversion": x(P+Q) and x(P-Q) share the denominator
 //! x_Q - x_P, so both x-coordinates cost I + 2M + 2S (one affine addition costs I + 2M + S).
 //! Arms:
+//!   rho2xksp, rhodpup  rho2xks / rhodpu with a flat table and pipelined or prefetched lookups.
 //!   ic5b  ic5 with a std or flat target table and lock-step batched, prefetched probes (same counted ops).
 //!   ic4   index calculus: factor base = m smallest-x points (logs unknown), x-only pair-sum table
 //!         {x(F_i +- F_j)} built with shared inversions, factor-base logs from relations
@@ -273,21 +274,21 @@ struct Out {
     extra: String,
 }
 
-/// ic5b's table: std HashMap (exactly ic5's) or a flat open-addressed array of 8-byte slots
+/// The table of ic5b, rho2xksp and rhodpup: std HashMap (exactly ic5's) or a flat open-addressed array of 8-byte slots
 /// (u32 x key, u32 index into `ents`), load factor at most 1/2, multiplicative hash, linear probing.
 /// The flat form needs x < 2^32 - 1 (p < 2^32); first insert of an x wins, as `entry().or_insert`.
-enum Tab {
-    Std(HashMap<u64, (u32, u16, i8)>),
+enum Tab<V: Copy> {
+    Std(HashMap<u64, V>),
     Flat {
         slots: Vec<(u32, u32)>,
-        ents: Vec<(u32, u16, i8)>,
+        ents: Vec<V>,
         mask: usize,
         shift: u32,
     },
 }
 const FLAT_EMPTY: u32 = u32::MAX;
-impl Tab {
-    fn new(flat: bool, cap: usize, p: u64) -> Tab {
+impl<V: Copy> Tab<V> {
+    fn new(flat: bool, cap: usize, p: u64) -> Tab<V> {
         if flat {
             assert!(p <= FLAT_EMPTY as u64, "flat table needs p < 2^32");
             let size = (2 * cap.max(1)).next_power_of_two();
@@ -305,7 +306,7 @@ impl Tab {
     fn home(x: u64, shift: u32) -> usize {
         (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> shift) as usize
     }
-    fn insert_if_absent(&mut self, x: u64, e: (u32, u16, i8)) {
+    fn insert_if_absent(&mut self, x: u64, e: V) {
         match self {
             Tab::Std(m) => {
                 m.entry(x).or_insert(e);
@@ -316,6 +317,25 @@ impl Tab {
                 mask,
                 shift,
             } => {
+                // keep the load factor at most 1/2: double and reinsert (never reached by ic5b, whose
+                // capacity bound is exact; rho databases grow with retained walks)
+                if 2 * ents.len() >= slots.len() {
+                    let size = 2 * slots.len();
+                    let nshift = 64 - size.trailing_zeros();
+                    let mut ns = vec![(FLAT_EMPTY, 0u32); size];
+                    for &(k, v) in slots.iter() {
+                        if k != FLAT_EMPTY {
+                            let mut j = Self::home(k as u64, nshift);
+                            while ns[j].0 != FLAT_EMPTY {
+                                j = (j + 1) & (size - 1);
+                            }
+                            ns[j] = (k, v);
+                        }
+                    }
+                    *slots = ns;
+                    *mask = size - 1;
+                    *shift = nshift;
+                }
                 let mut i = Self::home(x, *shift);
                 loop {
                     let (k, _) = slots[i];
@@ -333,7 +353,7 @@ impl Tab {
         }
     }
     #[inline]
-    fn get(&self, x: u64) -> Option<(u32, u16, i8)> {
+    fn get(&self, x: u64) -> Option<V> {
         match self {
             Tab::Std(m) => m.get(&x).copied(),
             Tab::Flat {
@@ -953,7 +973,7 @@ fn main() {
                 o => panic!("ic5b table mode {o}"),
             };
             let bsz: usize = args.get(9).map(|s| s.parse().unwrap()).unwrap_or(1).max(1);
-            assert!((2..=4).contains(&k));
+            assert!((2..=5).contains(&k)); // k = 5 added for research/mt_ic_retune_20261115
             let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
             let classes = |m: usize| -> f64 {
                 let mut c = 1.0;
@@ -2504,6 +2524,180 @@ fn main() {
             }
         }
 
+        "rho2xksp" => {
+            // rho2xks with the treatment ic5b's arm B got (research/mt_rho_rematch_20261115): the database is
+            // a flat open-addressed table (Tab, as ic5b "flat"), and the target phase is pipelined by one step:
+            // after a step its two probe slots are prefetched, the next step's arithmetic is done, and only then
+            // are the previous step's lookups made. Targets stay sequential, so the retention of solved walks is
+            // rho2xks's. A hit is therefore seen one step late: at most one extra step per target (counted).
+            const ARMS: usize = 32;
+            const RESTART: usize = 32;
+            const BANK: usize = 64;
+            const NOY: u64 = u64::MAX;
+            let kappa = param;
+            let mut bank: Vec<(Pt, u64)> = Vec::new();
+            for _ in 0..BANK {
+                let k = rng.gen_range(1..n);
+                bank.push((f.smul(g, k), k));
+            }
+            let arms: Vec<(Pt, u64)> = (0..ARMS).map(|_| bank[rng.gen_range(0..BANK)]).collect();
+            let hidx = |pt: Pt| -> usize {
+                f.native();
+                pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0)
+            };
+            // full P + A and x(P - A) with one inversion: I + 3M + 2S
+            let step_x = |f: &F, p: Pt, q: Pt| -> (Pt, Option<u64>) {
+                if let (Some((x1, y1)), Some((x2, y2))) = (p, q) {
+                    if x1 != x2 {
+                        let d = f.inv(f.sub(x2, x1));
+                        let lam = f.mul(f.sub(y2, y1), d);
+                        let x3 = f.sub(f.sub(f.sqr(lam), x1), x2);
+                        let y3 = f.sub(f.mul(lam, f.sub(x1, x3)), y1);
+                        let lm = f.mul(f.neg(f.add(y2, y1)), d);
+                        let xm = f.sub(f.sub(f.sqr(lm), x1), x2);
+                        return (Some((x3, y3)), Some(xm));
+                    }
+                }
+                (f.padd(p, q), None)
+            };
+            // db: x -> (log, y or NOY, (prev_x, prev_y, arm)) ; a NOY entry is prev - arms[arm], recomputed on a hit (counted)
+            let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
+            // capacity: the build fills db_target entries; retention adds up to the target trails
+            let mut db: Tab<(u64, u64, (u64, u64, usize))> = Tab::new(true, db_target * 2, f.p);
+            let mut cur: Pt = None;
+            let mut ca = 0u64;
+            let mut st = RESTART;
+            let mut db_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
+            while db.len() < db_target {
+                if st >= RESTART || cur.is_none() {
+                    // chained starts s <- s + B_k: one addition per restart and unboundedly many distinct
+                    // starts (a fixed-bank triple sum capped the walks at C(66, 3) and could not fill large dbs)
+                    let k1 = rng.gen_range(0..BANK);
+                    sp = f.padd(sp, bank[k1].0);
+                    sa = (sa + bank[k1].1) % n;
+                    cur = sp;
+                    ca = sa;
+                    st = 0;
+                }
+                let h = hidx(cur);
+                let prev = cur;
+                let (nx, sx) = step_x(&f, prev, arms[h].0);
+                cur = nx;
+                if let Some(xm) = sx {
+                    let (px, py) = prev.unwrap();
+                    f.hash();
+                    db.insert_if_absent(xm, ((ca + n - arms[h].1) % n, NOY, (px, py, h)));
+                }
+                ca = (ca + arms[h].1) % n;
+                st += 1;
+                db_steps += 1;
+                if let Some((x, y)) = cur {
+                    f.hash();
+                    db.insert_if_absent(x, (ca, y, (0, 0, 0)));
+                }
+            }
+            snap.push(("db".into(), take(&f)));
+            let full_y = |f: &F, y2: u64, aux: (u64, u64, usize)| -> u64 {
+                if y2 != NOY {
+                    return y2;
+                }
+                f.padd(Some((aux.0, aux.1)), f.pneg(arms[aux.2].0))
+                    .unwrap()
+                    .1
+            };
+            let mut steps_total = 0u64;
+            for t in 0..targets {
+                let q = qs[t];
+                let mut cur: Pt = None;
+                let mut ca = 0u64;
+                let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
+                let mut trail: Vec<(u64, u64, u64, (u64, u64, usize))> = Vec::new();
+                // the previous step's lookups, made one step late: (x, y, ca) of the new point and
+                // (xm, prev, pa, h) of its x-only sibling
+                let mut prev_look: Option<(
+                    Option<(u64, u64, u64)>,
+                    Option<(u64, Pt, u64, usize)>,
+                )> = None;
+                let v = loop {
+                    if st >= RESTART || cur.is_none() {
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
+                        st = 0;
+                    }
+                    let h = hidx(cur);
+                    let prev = cur;
+                    let pa = ca;
+                    let (nx, sx) = step_x(&f, prev, arms[h].0);
+                    cur = nx;
+                    ca = (ca + arms[h].1) % n;
+                    st += 1;
+                    steps_total += 1;
+                    if let Some((x, y)) = cur {
+                        trail.push((x, ca, y, (0, 0, 0)));
+                    }
+                    if let (Some(xm), Some((px, py))) = (sx, prev) {
+                        trail.push((xm, (pa + n - arms[h].1) % n, NOY, (px, py, h)));
+                    }
+                    if let Some((x, _)) = cur {
+                        db.prefetch(x);
+                    }
+                    if let Some(xm) = sx {
+                        db.prefetch(xm);
+                    }
+                    let this_look = (cur.map(|(x, y)| (x, y, ca)), sx.map(|xm| (xm, prev, pa, h)));
+                    if let Some((cl, sl)) = prev_look.take() {
+                        if let Some((x, y, cca)) = cl {
+                            f.hash();
+                            if let Some((a2, y2, aux)) = db.get(x) {
+                                let y2 = full_y(&f, y2, aux);
+                                let eps: i128 = if y == y2 { 1 } else { -1 };
+                                break md(eps * a2 as i128 - cca as i128, n);
+                            }
+                        }
+                        if let Some((xm, sprev, spa, sh)) = sl {
+                            f.hash();
+                            if let Some((a2, y2, aux)) = db.get(xm) {
+                                let ym = f.padd(sprev, f.pneg(arms[sh].0)).unwrap().1;
+                                let y2 = full_y(&f, y2, aux);
+                                let eps: i128 = if ym == y2 { 1 } else { -1 };
+                                break md(
+                                    eps * a2 as i128
+                                        - md(spa as i128 - arms[sh].1 as i128, n) as i128,
+                                    n,
+                                );
+                            }
+                        }
+                    }
+                    prev_look = Some(this_look);
+                    if steps_total > 4_000_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (x, off, y, aux) in trail {
+                    f.hash();
+                    db.insert_if_absent(x, ((off + v) % n, y, aux));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"db_steps\":{},\"target_steps\":{}",
+                    db.len(),
+                    db_steps,
+                    steps_total
+                ),
+            }
+        }
+
         "rhoseq" => {
             // validator control: anchored rho with a sequential phase-1 database {G, 2G, ..., NG} (no walk waste, no restarts);
             // phase 2 identical to "rho".
@@ -2905,6 +3099,186 @@ fn main() {
                     f.hash();
                     db.entry(x)
                         .or_insert(md(a as i128 + b as i128 * v as i128, n));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"d\":{},\"pre_steps\":{},\"target_steps\":{},\"walks\":{},\"abandoned\":{}",
+                    db.len(),
+                    d,
+                    pre_steps,
+                    steps_total,
+                    walks,
+                    abandoned
+                ),
+            }
+        }
+        "rhodpup" => {
+            // rhodpu with the treatment ic5b's arm B got (research/mt_rho_rematch_20261115): the database and
+            // each target's pending table are flat open-addressed tables (Tab, as ic5b "flat"), and each lookup
+            // slot is prefetched as soon as the distinguished point is known. Everything else is rhodpu's: the
+            // walks, the counted operations and the recovered logs are identical.
+            // Multi-target distinguished-point rho on {P, -P} classes (Kuhn-Struik with retention of solved
+            // walks, optional precomputation). Walk: P -> canon(P + A_h(P)), R = 1024 steps A_i = B_j + B_k from
+            // the 64-point bank; if the next point would use the same step index (a fruitless 2-cycle risk),
+            // the step A_(h+1) is used instead (the extra addition is counted). A point is distinguished when
+            // d hash bits are zero (theta = 2^d steps per walk on average); walks longer than 20 theta are
+            // abandoned (their steps stay counted). param = kappa: precomputation walks from known-log starts
+            // until kappa sqrt(nT) steps are spent; args[6] = offset of d from d0 = round(log2(n/T)/4).
+            // Each target walks from chained starts Q + s G until a distinguished point is found in the
+            // database (solved) or in its own earlier walks with the opposite Q sign (solved); otherwise it is
+            // kept pending. After a target is solved, its pending distinguished points are inserted with known
+            // logs. Every addition is counted; every database or pending lookup and insert is one hash op.
+            const BANK: usize = 64;
+            const R: usize = 1024;
+            let kappa = param;
+            let doff: i32 = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(0);
+            let d0 = (0.25 * ((n as f64) / targets as f64).log2()).round() as i32;
+            let d = (d0 + doff).max(1) as u32;
+            let mask = (1u64 << d) - 1;
+            let theta = 1u64 << d;
+            let maxwalk = 20 * theta;
+            let half = f.p / 2;
+            let mut bank: Vec<(Pt, u64)> = Vec::new();
+            for _ in 0..BANK {
+                let k = rng.gen_range(1..n);
+                bank.push((f.smul(g, k), k));
+            }
+            let mut arms: Vec<(Pt, u64)> = Vec::with_capacity(R);
+            let mut used = std::collections::HashSet::new();
+            while arms.len() < R {
+                let (i, j) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
+                if i == j || !used.insert((i.min(j), i.max(j))) {
+                    continue;
+                }
+                arms.push((f.padd(bank[i].0, bank[j].0), (bank[i].1 + bank[j].1) % n));
+            }
+            let mix = |x: u64| -> u64 { x.wrapping_mul(0x9E37_79B9_7F4A_7C15) };
+            let idx = |p: Pt| -> usize { p.map(|(x, _)| (mix(x) >> 40) as usize % R).unwrap_or(0) };
+            let is_dp =
+                |p: Pt| -> bool { p.map(|(x, _)| (mix(x) >> 8) & mask == 0).unwrap_or(false) };
+            // canonical class representative (y <= p/2); returns the sign applied
+            // native work per generated point: one canonicalisation and one hash of x (the step index and the
+            // distinguished-point test are bits of that one hash, so they are not counted again)
+            let canon = |p: Pt| -> (Pt, i64) {
+                f.native();
+                f.native();
+                match p {
+                    Some((x, y)) if y > half => (Some((x, f.p - y)), -1),
+                    _ => (p, 1),
+                }
+            };
+            // one walk step on (point, a, b) with point = a G + b Q canonical
+            let step = |f: &F, p: Pt, a: u64, b: i64| -> (Pt, u64, i64) {
+                let h = idx(p);
+                let (mut q1, mut s1) = canon(f.padd(p, arms[h].0));
+                let mut hh = h;
+                if q1.is_some() && idx(q1) == h {
+                    hh = (h + 1) % R;
+                    let r = canon(f.padd(p, arms[hh].0));
+                    q1 = r.0;
+                    s1 = r.1;
+                }
+                let a1 = md(s1 as i128 * ((a + arms[hh].1) % n) as i128, n);
+                (q1, a1, s1 * b)
+            };
+            let db_cap = ((kappa * ((n as f64) * targets as f64).sqrt()) as usize >> d).max(1024)
+                + 4 * targets;
+            let mut db: Tab<u64> = Tab::new(true, db_cap, f.p);
+            let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
+            let mut pre_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
+            while pre_steps < pre_budget {
+                let k1 = rng.gen_range(0..BANK);
+                sp = f.padd(sp, bank[k1].0);
+                sa = (sa + bank[k1].1) % n;
+                let (mut p, s0) = canon(sp);
+                let mut a = md(s0 as i128 * sa as i128, n);
+                let mut len = 0u64;
+                while p.is_some() && len < maxwalk {
+                    let r = step(&f, p, a, 0);
+                    p = r.0;
+                    a = r.1;
+                    len += 1;
+                    if is_dp(p) {
+                        f.hash();
+                        db.insert_if_absent(p.unwrap().0, a);
+                        break;
+                    }
+                }
+                pre_steps += len;
+            }
+            snap.push(("db".into(), take(&f)));
+            let mut steps_total = 0u64;
+            let mut walks = 0u64;
+            let mut abandoned = 0u64;
+            let inv2 = n.div_ceil(2);
+            for t in 0..targets {
+                let q = qs[t];
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
+                let mut pending: Vec<(u64, (u64, i64))> = Vec::new();
+                let mut ptab: Tab<(u64, i64)> = Tab::new(true, 64, f.p);
+                let v = 'tgt: loop {
+                    let k1 = rng.gen_range(0..BANK);
+                    tp = f.padd(tp, bank[k1].0);
+                    ta = (ta + bank[k1].1) % n;
+                    let (mut p, s0) = canon(tp);
+                    let mut a = md(s0 as i128 * ta as i128, n);
+                    let mut b = s0;
+                    let mut len = 0u64;
+                    walks += 1;
+                    while p.is_some() && len < maxwalk {
+                        let r = step(&f, p, a, b);
+                        p = r.0;
+                        a = r.1;
+                        b = r.2;
+                        len += 1;
+                        if is_dp(p) {
+                            let x = p.unwrap().0;
+                            db.prefetch(x);
+                            ptab.prefetch(x);
+                            f.hash();
+                            if let Some(a2) = db.get(x) {
+                                // a G + b Q = a2 G
+                                break 'tgt md(b as i128 * (a2 as i128 - a as i128), n);
+                            }
+                            f.hash();
+                            if let Some((a2, b2)) = ptab.get(x) {
+                                if b2 != b {
+                                    // a + b q = a2 + b2 q, b2 = -b: q = (a2 - a) / (2 b)
+                                    let num = md(a2 as i128 - a as i128, n);
+                                    let qv = md(
+                                        b as i128
+                                            * ((num as u128 * inv2 as u128) % n as u128) as i128,
+                                        n,
+                                    );
+                                    f.cm.set(f.cm.get() + 1);
+                                    break 'tgt qv;
+                                }
+                            } else {
+                                f.hash();
+                                ptab.insert_if_absent(x, (a, b));
+                                pending.push((x, (a, b)));
+                            }
+                            break;
+                        }
+                    }
+                    steps_total += len;
+                    if len >= maxwalk {
+                        abandoned += 1;
+                    }
+                    if steps_total > 4_000_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (x, (a, b)) in pending {
+                    f.hash();
+                    db.insert_if_absent(x, md(a as i128 + b as i128 * v as i128, n));
                 }
             }
             snap.push(("targets".into(), take(&f)));
