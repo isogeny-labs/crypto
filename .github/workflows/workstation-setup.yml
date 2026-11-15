@@ -14,6 +14,8 @@ on:
       - 'scripts/cairn-node.sh'
       - 'scripts/setup-workstation.sh'
       - 'scripts/cloud-setup.sh'
+      - 'scripts/sparse-checkout.sh'
+      - 'scripts/test-sparse-checkout.sh'
       - 'scripts/test_cloud_setup.py'
       - 'scripts/test_setup_workstation_go.py'
       - 'scripts/test_setup_workstation_github.py'
@@ -45,6 +47,8 @@ jobs:
             /scripts/cairn-node.sh
             /scripts/setup-workstation.sh
             /scripts/cloud-setup.sh
+            /scripts/sparse-checkout.sh
+            /scripts/test-sparse-checkout.sh
             /scripts/test_cloud_setup.py
             /scripts/test_setup_workstation_go.py
             /scripts/test_setup_workstation_github.py
@@ -67,6 +71,11 @@ jobs:
           jq -e '.mcpServers.isolab.type == "stdio" and .mcpServers["isolab-eks"].type == "stdio"' .mcp.json
           python3 -c 'import tomllib; c = tomllib.load(open(".codex/config.toml", "rb")); assert {"isolab", "isolab-eks"} <= c["mcp_servers"].keys()'
           bash scripts/test-isolab-agent.sh
+      - name: Check cold sparse path dependencies
+        run: |
+          bash -n scripts/sparse-checkout.sh scripts/test-sparse-checkout.sh
+          shellcheck -S warning scripts/test-sparse-checkout.sh
+          bash scripts/test-sparse-checkout.sh
       - name: Exercise native Linux installer transactions
         run: |
           command -v flock
