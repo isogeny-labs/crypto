@@ -1,4 +1,4 @@
-# Interleaved multi-target rho vs folded multi-target BSGS on j=0 curves, 26-34 bits (2026-11-14) — `[pcc:unverified]`
+# Interleaved multi-target rho vs folded multi-target BSGS on j=0 curves, 26-36 bits (2026-11-14/15) — `[pcc:unverified]`
 
 Protocol: [`PROTOCOL.md`](PROTOCOL.md), committed in `a8cc24a6fe` before any row. Runner `run.sh`, analysis `analyse.py` (as the protocol fixes it), graph `plot.py` → `rho_vs_bsgs.{svg,png,pdf}`, raw rows `rows/`, summary `summary.json`. Bench record `benchmarks/records/20261114T2202Z-j0-multirho-vs-bsgs-interleaved.json`.
 
@@ -49,6 +49,22 @@ Frozen in `e8c0fd72da` before any 32/34-bit row (PROTOCOL.md, addendum A); same 
 - Across all 15 cells the ratio falls with size: BSGS ahead by 1.3-2.0x at 26-28 bits, level at 30, rho ahead by 1.3-1.7x at 32-34 bits once T ≥ 1000. A plausible mechanism, not measured here: the BSGS table (13-byte slots, `m` up to 2.9M) outgrows the cache, so each giant-step probe gets slower, while rho's state stays small. Memory traffic was not profiled.
 - This changes nothing for index calculus: both generic methods are well ahead of it at every size measured.
 
+## Addendum B: 36 bits [pcc:unverified]
+
+Frozen in `f533b67618` before any 36-bit row (PROTOCOL.md, addendum B); same arms, settings, rounds, rule and binaries. Record `benchmarks/records/20261115T0416Z-j0-multirho-vs-bsgs-interleaved-36.json`. Every row recovered all T logs; no round excluded; every A/A interval contains 1.
+
+| bits | T | rounds | rho ms/problem | BSGS ms/problem | rho/BSGS [95%] | A/A [95%] | verdict | rho steps/W |
+|---|---|---|---|---|---|---|---|---|
+| 36 | 200 | 6 | 223.3 | 266.8 | 0.85 [0.80, 0.90] | 1.00 [0.94, 1.06] | rho faster | 1.96 |
+| 36 | 1000 | 6 | 422.2 | 650.7 | 0.66 [0.63, 0.68] | 0.98 [0.97, 1.00] | rho faster | 1.66 |
+| 36 | 3000 | 6 | 697.0 | 1197.0 | 0.58 [0.56, 0.59] | 1.00 [0.96, 1.04] | rho faster | 1.48 |
+
+BSGS table entries `m`: 1.51M / 3.38M / 5.86M at T = 200 / 1000 / 3000.
+
+- **Rho is faster in all three 36-bit cells**: 0.85 [0.80, 0.90] at T = 200, 0.66 [0.63, 0.68] at T = 1000, 0.58 [0.56, 0.59] at T = 3000. [pcc:unverified]
+- **The gap stops widening.** At T = 3000 the ratio is 0.75, 0.59, 0.58 at 32, 34, 36 bits; at T = 1000 it is 0.61 at 34 and 0.66 at 36; at T = 200, 0.81 at 34 and 0.85 at 36. Both methods are `O(sqrt(nT))` in group operations, so a constant ratio is what the asymptotics allow once the BSGS table is out of cache; the 26-30-bit BSGS lead and the 32-34-bit swing look like a constant-factor (memory-hierarchy) effect, not a change in growth rate. Not profiled. [pcc:unverified]
+- Memory, not time, is the real limit for BSGS: its table grows as `sqrt(nT)` (5.9M entries here) while rho stores only distinguished points.
+
 ## Not done
 
-No §5a band (wall time only), no isolated host, no sizes above 34 bits, no cache/memory profile, the S3 checkpoint and raw upload skipped (no AWS credentials in this container).
+No §5a band (wall time only), no isolated host, no sizes above 36 bits, no cache/memory profile, the S3 checkpoint and raw upload skipped (no AWS credentials in this container).
