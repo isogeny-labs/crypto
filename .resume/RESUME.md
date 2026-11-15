@@ -1,3 +1,21 @@
+# Whole scientific handoff22 ready; inputs HELD
+
+pcc/claims/PCC-20261115-6a361a.json: all42866prior keys/162links/c031ledgerprefix/ownedscience retained; all14wholeclosedct82scientificroots/closedct82-83controls/source-exes-librarycopies/failures/proofs/checkpoints/wholeCI/reportroots/drafts and67abase+fourpendingmetadatafiles. Exact32MiBarchiveparts/allmembersroundtripped, originalpolicyselects7objects. HOLD allscience/raw/source/aliases/ownedbytes/consumerledger until ORIGINALremote replays BEFOREactualbot/exactFF/wholeordered reassembly/terminal22checks. Nativeed33ef/full695records/13rootconditionalproofs/24CIab17f7/reports/negativecomparison andprospective25d29e scopesunchanged. No optimizedcode orpricedoutcome. [pcc:unverified]
+
+## What was done
+Complete wholedeclaredclosedscience andcurrentguard, oldgenuine21manifest/publicationmetadata withoutrecursivepayloadcapture, current67aGitbase andwholepending4metadata. [pcc:unverified]
+
+## Decisions made
+Originalpolicy only, exactwholebyteparts notsinglefakeentry, everyrecordoccurrence/source/exe/fullcopy/failure retained. [pcc:unverified]
+
+## Open threads
+Genuinepublication22/exactFF/release/canonical695+geometry13fixtures/stdout, thenadditive25strictreplay(old24unchanged), norm-point reuseunderpublished25d29e/fullparity-explicitcountertransforms, completeprimitivecensus andseparateprimaryleads. [pcc:unverified]
+
+## Errors
+All originalscientific/root-main/coldcensus/source/proofpath/PDF-Gitwhitespace/logdownload failures preserved. No paidlaunch/waiver/novelty/pricedadvantage/signedpromotion. [pcc:unverified]
+
+---
+
 # Complete downstream fixed Jacobian chain; genuine22 and cost successor next
 
 pcc/claims/PCC-20261115-db6ba2.json: exact committedconsumer67a90fd7 mirrors fullnativeed33ef at161c5bab/exactcheckpoint12; all13phases/testworker/supervisor0/all695whole records/fourwholeomissions101/noacceptedoutputs/all1080guards/actualbytes. Full672exceptional×twooutgoing/all4halves/cofactorsectors/144mixed/120public/96additionpairsperundirectedpair/fullnorm13-169/inverses/independentellipticchecks pass. All3route outputs exact, retainedlift removes apparentdirect halvinggain;48selectedcounts unpriced. [pcc:unverified]
