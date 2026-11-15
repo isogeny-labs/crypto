@@ -15,3 +15,9 @@ Freeze/checkpoint, execute once; actual inverse lift afterward if alignment hold
 
 ## Errors
 No build failure. Sourcepathlocalized to copied arith.rs; original unchanged.
+
+## First fit gate failed and retained
+Source6d012eba2099/checkpoint202911 preceded one exit101execution.
+Rank63/invertibleM,12training/4scalarholdouts andfirst3mixedinputs pass.
+Fourth B+2D1target chart unsupported. No fit-input replacement or rerun.
+Next diagnostic on exactly this target class, before corrective amendment.
