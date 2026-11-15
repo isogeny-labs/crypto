@@ -76,6 +76,7 @@ pub mod prime_tower;
 pub mod recursive_adapter;
 pub mod residual;
 pub mod rootfind;
+pub mod rootfind_gpu;
 pub mod shared_rank;
 pub mod solver_units;
 pub mod solvers;
@@ -563,6 +564,14 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         },
         Targets::WalkPrimeBatch16 => TargetSource::WalkPrimeLanes {
             lanes: 16,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch256 => TargetSource::WalkPrimeLanes {
+            lanes: 256,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch1024 => TargetSource::WalkPrimeLanes {
+            lanes: 1024,
             batched: true,
         },
     };

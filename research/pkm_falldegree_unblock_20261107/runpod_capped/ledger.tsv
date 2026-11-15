@@ -1,0 +1,32 @@
+# Study-wide cost ledger of the PKM fall-degree study (owner decision 4: US$400 in total). Maintained by the main session.
+# One row per job on any route: EKS jobs, pfd-b-rp (Amendment 16), Amendment 17 work, and this route. usd is the actual
+# (or best derived) cost when state is closed and the worst case when open. run.sh adds and fetch.sh closes the rows of
+# this route's pods (job = NAME/podid). run.sh refuses a study launch unless the complete_as_of line below is at most
+# 24 h old: the session sets it after bringing every row up to date. Tab-separated; usd has no currency sign.
+# EKS rows are named JOB/eks (no pod id is part of the job name); an EKS row's usd is a worst-case bound unless ledger_SOURCES.md says recorded. Drafted 2026-11-15 from repository evidence.
+# complete_as_of	never
+job	route	authority	state	usd	source
+pkm-x-dev-smoke1/gwfmrulvmua8ye	runpod_capped	development check	closed	0.0136	runpod_capped/smoke/receipts/cost.json
+pkm-x-dev-smoke2/bpxojdig3u54d4	runpod_capped	draft Amendment 18	closed	0.0543	receipts_dev/pkm-x-dev-smoke2/cost.json
+pfd-a-20261108/eks	eks_spot	requests_r2c (Amendments 1-9)	closed	3.6923	RESULTS.md:36
+pfd-c-20261108/eks	eks_spot	requests_r2c (Amendments 1-9)	closed	3.9398	RESULTS_STAGE_C.md:43
+pfd-g3c-20261109/eks	eks_spot	requests_r2e (Amendment 11)	closed	0.2535	RESULTS_STAGE_C.md:112
+pfd-b-20261108/eks	eks_spot	requests_r2e (Amendment 9 pin)	closed	0.5056	STAGE_B_LOST.md:9
+pfd-b-20261109-r1/eks	eks_spot	requests_r2f (Amendment 12); lost to Spot	closed	0.1900	receipts/BR/price-guard/check-20261109T2340Z.json:11
+pfd-x-t12-k0-c5-20261108/eks	eks_spot	requests_r2f (Amendment 12)	closed	0.2457	RESULTS_T12_BRACKET.md:28
+pfd-x-t12-k1-c5-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.2459	RESULTS_T12_BRACKET.md:28
+pfd-x-t12-k0-c6-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.7346	RESULTS_T12_BRACKET.md:28
+pfd-x-t12-k1-c6-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.7179	RESULTS_T12_BRACKET.md:28
+pfd-x-t13-k0-c5-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.2473	RESULTS_T13_BRACKET.md:33
+pfd-x-t13-k1-c5-20261108/eks	eks_spot	requests_r2g (Amendment 13)	closed	0.2473	RESULTS_T13_BRACKET.md:34
+pfd-x-t13-k0-c6-20261108/eks	eks_spot	requests_r2g (Amendment 13); lost to Spot	closed	0.4102	SPOT_LOSSES.md:10
+pfd-x-t13-k0-c6-20261110-r1/eks	eks_spot	requests_r2g (owner decision 3 relaunch); lost to Spot	closed	0.5612	SPOT_LOSSES.md:11
+pfd-x-t13-k1-c6-20261108/eks	eks_spot	requests_r2h (Amendment 14)	closed	3.3627	RESULTS_T13_BRACKET.md:35
+pfd-x-t13-k0-c6-20261110-r2/eks	eks_spot	requests_r2h (owner decision 7); lost to Spot	closed	3.9784	SPOT_LOSSES.md:12
+pfd-b-rp/6m9ewd49m2ivbn	runpod_reserved	Amendment 16 (owner choice 2026-11-14)	open	40.0000	research/prime_fall_degree_20261027/PREREGISTRATION.md:617
+#
+# UNKNOWN items (not rows; no price recorded in the repository, none guessed). The sum above excludes them:
+# UNKNOWN-1: isolab-experiment-launcher CodeBuild builds (BUILD_GENERAL1_SMALL, aws/codebuild/standard:7.0), one per EKS job launch: 15 launches, summed wall_s of the launch-remote-command calls in the study's bench records 4723.086 s (78.7 min) incl. queue/poll; no CodeBuild price is recorded anywhere in the repository (grep of taskq/deploy/eks-karpenter finds only quota text, HARNESS.md:231). Also the CodeBuild concurrent-build limit was later 0 (card U1-1).
+# UNKNOWN-2: EKS cluster control plane, EBS volumes actually attached (80 GiB gp3 is an assumption, AMENDMENT_R2_C_cpu12.md:174), S3 storage/requests, ECR, CloudWatch audit-log reads, data transfer for the study's runs: no price or bill recorded; shared lab infrastructure, not attributable per job in the repository.
+# UNKNOWN-3: Actual Spot node billing per job (node lifetime incl. Karpenter 2 min consolidateAfter, taskq/deploy/eks-karpenter/nodepool.yaml:194,439; node start-up): no node lifetime or invoice recorded; the +0.25 h margin of the bound stands in for it.
+# UNKNOWN-4: pfd-b-rp actual spend to date and pod end: not in the repository (see row).

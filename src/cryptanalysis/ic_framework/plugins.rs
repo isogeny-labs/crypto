@@ -3165,11 +3165,11 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
 /// coordinates of its positive representative in Montgomery form, and the
 /// indices of `P` and `−P` in the run's base.
 #[derive(Clone, Copy, Debug)]
-struct SweepRep {
-    x: u64,
-    y: u64,
-    plus: usize,
-    minus: usize,
+pub(crate) struct SweepRep {
+    pub(crate) x: u64,
+    pub(crate) y: u64,
+    pub(crate) plus: usize,
+    pub(crate) minus: usize,
 }
 
 /// Direct-subtraction root finding on a prime curve: the decomposition
@@ -3418,9 +3418,37 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
 }
 
 impl RootfindSubtractOracle<'_> {
+    /// The prepared sweep: the field and one representative per abscissa,
+    /// in the order `decompose` walks them (`rootfind-subtract-gpu`).
+    pub(crate) fn sweep(&self) -> Option<(Fp64, &[SweepRep])> {
+        Some((self.field?, &self.reps))
+    }
+
+    /// What `decompose` charges for a target before its first candidate:
+    /// the two conversions into Montgomery form and the batched inversion
+    /// over the `k` abscissae.
+    pub(crate) fn charge_sweep_setup(&mut self, ops: &mut GroupOps, counters: &mut OracleCounters) {
+        let k = self.reps.len() as u64;
+        ops.field_ops.muls += 2;
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * k;
+        self.sweep_field_muls += 2 + 3 * k;
+        self.sweep_field_adds += k;
+    }
+
+    /// What `decompose` charges per non-degenerate candidate point, before
+    /// its lookup.
+    pub(crate) fn charge_candidate(ops: &mut GroupOps) {
+        ops.adds += 1;
+        ops.field_ops.muls += 4;
+        ops.field_ops.sqrs += 1;
+    }
+
     /// Is `t = R − F_summand` a base point (`m = 2`), or a pair sum
     /// (`m = 3`)?  A hit is re-added in the group before it is returned.
-    fn lookup(
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn lookup(
         &mut self,
         ctx: &InstanceCtx<PrimeCurve>,
         fb: &FactorBase<PrimePoint>,

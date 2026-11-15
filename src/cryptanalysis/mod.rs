@@ -386,6 +386,7 @@ pub mod six_class_rho;
 pub mod smith_elliptic_walk;
 pub mod smith_kernel_coverage;
 pub mod smith_prop24;
+pub mod smith_trigonal;
 pub mod smt_oracle;
 pub mod solinas_correlations;
 pub mod sparse_macaulay;

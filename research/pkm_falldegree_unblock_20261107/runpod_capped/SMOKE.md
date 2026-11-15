@@ -12,7 +12,7 @@ median or reading.
 | stage | `cap:8:0:5:12800000000` (Kummer m = 2, P1, t = 8, draw 0, cap 5): **development check, not data**; t = 8 is not an Amendment 7 B cell |
 | pod name | `pkm-x-dev-smoke1` |
 | pod id | `gwfmrulvmua8ye` |
-| flavor and size (API pod record) | `cpu5m` (Memory-Optimized), 16 vCPU, `memoryInGb` 128, `costPerHr` 1.04, `machine.secureCloud` true, data center `EU-RO-1` |
+| flavor and size (create response, `pod-create.json`; the later GET record `pod-record.json` has `machine: {}`) | `cpu5m` (Memory-Optimized), 16 vCPU, `memoryInGb` 128, `costPerHr` 1.04, `machine.secureCloud` true, data center `EU-RO-1` |
 | reserved | request body had `interruptible: false`; the pod record returns `interruptible: null` (the API does not echo the field) |
 | image | `python:3.12-slim`, running Amendment 16's `runpod/server.py` (SHA-256 `f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550`) unchanged |
 | client | Amendment 16's `runpod/rp.sh` (SHA-256 `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d`) unchanged, for upload, start, status and fetch |
@@ -79,7 +79,66 @@ API call that creates anything.
 
 ## Changed after the smoke
 
-- `run.sh` now also writes `pod-request.json` (the create body with the runner token and the base64 runner withheld),
-  so that `interruptible: false` and `cloudType: SECURE` are on record even though the pod record returns
-  `interruptible: null`. The change is one `jq` line. It was checked offline on a sample body, and `bash -n` passes.
-  It was **not** exercised on a pod: a second smoke pod was not started, because the task allowed one.
+Revision 1 (before the review):
+- `run.sh` also writes `pod-request.json` (the create body with the runner token and the base64 runner withheld), so that
+  `interruptible: false` and the reserved-tier `cloudType` are on record even though the pod record returns
+  `interruptible: null`. The change is one `jq` line, checked offline on a sample body; not exercised on a pod.
+
+Revision 2 (after the independent review of `59e487150f`; draft Amendment 18 sections 2-6). None of this was exercised
+on a pod; it is covered by the offline tests in `tests/README.md` and needs one more development smoke before the
+freeze (amendment section 9, point 5):
+- the pod's start command is now `bash -c` with a cgroup copy loop before the unchanged runner. **Which cgroup files a
+  RunPod CPU pod exposes is not known**: this smoke did not read `/sys/fs/cgroup`. The loop copies the v2 files or the
+  v1 files, whichever exist, and records which;
+- one pinned flavor (`cpu5m`, 16 vCPU, 128 GB) with no fallback, checked on the create response (reserved tier, flavor,
+  size, `costPerHr` equal to the price read before create);
+- the client is a pinned copy (`rp_pinned.sh`, unchanged, SHA-256 `b4b60199…`), and `run.sh` checks both pins;
+- the allow-list, the registered order, the receipts and results directories that are never reused, the study ledger,
+  the protocol check, the layer check, the cleanup trap set before create, the deadlines written before start, the
+  outcome classifier in `fetch.sh`, the raw-upload gate before delete, and the backstop `reap.sh`;
+- receipts and results now live at fixed paths (`receipts/`, `receipts_dev/`, `results/`): the `RPC_RECEIPTS` and
+  `RPC_RESULTS` overrides used in the command above were removed, so they cannot bypass the reuse checks;
+- new API records drop `consumerUserId`. The smoke receipts above are left as committed (the field is an account
+  identifier, not a credential, and it is already in the history).
+
+Revision 3 (after the second independent review of `7305d2ee8d`; `DECISIONS_ROUTE.md` lists the decisions). Also not
+exercised on a pod; offline tests only (`tests/README.md`):
+- `run.sh` now fetches the pod's `/results` once before `/start`, to read the cgroup memory limit the boot loop copied
+  there, and refuses a limit below 112 GiB or a missing limit file;
+- the classifier counts only positive evidence of loss, retries "no information" until the hard deadline (class
+  NO_EVIDENCE then), routes a LOST to an automatic relaunch only on a recorded RunPod-side status change, and fails
+  closed on unparsable receipts;
+- collections are numbered and never overwritten; the reaper deletes only past the hard deadline;
+- `fetch.sh` recovers a missing pod token from the REST record; the scripts print a reminder to commit and push the
+  receipts and the ledger.
+- Facts about RunPod that the next development smoke should record: the cgroup files, what `lastStatusChange` reads,
+  whether `GET /pods/{id}` returns `env`, and whether a pod sees `RUNPOD_POD_ID`.
+
+## Second development smoke (2026-11-15, revision a18-r3): what only a pod could show
+
+Pod `pkm-x-dev-smoke2` (id `bpxojdig3u54d4`), stage `cap:8:0:5:12800000000`, receipts in `receipts_dev/pkm-x-dev-smoke2/`,
+results in `results/pkm-x-dev-smoke2/collect-1/` (git-excluded; raw tree in S3 under bench record
+`benchmarks/records/20261115T0156Z-pkm-fd-rpc-dev-smoke2.json`, closed as `invalid`: a development check, not data).
+Every number is `[pcc:unverified]`.
+
+- Launch at commit fd5a92da08 with the a18-r3 scripts (hashes logged in `run.log`): price read, pod created on the
+  pinned flavor `cpu5m` (16 vCPU, 128 GB, US$1.04/h, data center EUR-IS-1, `secureCloud` true in the create response),
+  the new start command booted, the runner answered, the seven uploaded files' pod-side SHA-256 equal the local ones.
+- cgroup: version 2. `memory.max` reads 128,000,000,000 before start, so the pre-start check (at least 112 GiB) passes.
+  `memory.peak`, `memory.events` (`oom_kill 0`) and `memory.max` were copied into the results tree.
+- Memory figures for this run: pilot `VmHWM` 63 MiB (used), cgroup `memory.peak` 104,304,640 bytes (recorded).
+- `lastStatusChange` at creation reads `Rented by User: <date>`, so the classifier's "by user" exclusion matches
+  RunPod's text. Its value after a RunPod-side event was not observed (none happened).
+- Host: `model name : AMD EPYC 9575F 64-Core Processor`, `MemTotal` 527,605,596 kB, `nproc` 16 in the container and
+  128 from the runner (`host.txt` in `admission-lines-1.txt`, `status-ready.json`). The first smoke ran on an AMD Ryzen
+  Threadripper 7960X, so the pinned flavor `cpu5m` does not pin the CPU model.
+- `GET /pods/{id}` was seen by the session to return `env` (keys `PUBLIC_KEY`, `RUNNER_TOKEN`). No committed receipt
+  shows it, since receipts drop `env`, and token recovery was not exercised on the pod: this is the session's
+  observation only.
+- Collection: one collection, transfer check true, outcome ADMITTED P2d; the offline classifier
+  (`fetch.sh --classify-dir`) gives the same verdict. The raw tree was uploaded with `tools/benchrec.py`, and
+  `fetch.sh --delete RECORD` confirmed the upload, deleted the pod (HTTP 204) and confirmed it gone. Pod lifetime 188 s,
+  about US$0.054 (derived: costPerHr x lifetime).
+- `reap.sh` read the live list afterwards: no `pkm-x-` pod, nothing touched.
+- Not checked: whether `lastStartedAt` changes on a container restart (no restart was provoked), whether the pod sees
+  `RUNPOD_POD_ID` or a pod-scoped key (S12), and whether `GET /pods` is complete for large accounts.

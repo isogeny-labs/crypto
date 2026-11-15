@@ -12885,7 +12885,7 @@ pub enum TargetSource {
     WalkPrimeFast,
     /// Synchronized independent prime walks; `batched` controls only the
     /// field inversion schedule, not the generated lane requests.
-    WalkPrimeLanes { lanes: u8, batched: bool },
+    WalkPrimeLanes { lanes: u16, batched: bool },
     /// The walk as the Round-2 ladder first ran it: one jump table for
     /// every segment and no guard, so segments merge as rho's walks do.
     /// For the diagnostic of §10.2 only.
