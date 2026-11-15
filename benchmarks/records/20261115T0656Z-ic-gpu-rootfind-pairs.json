@@ -1,0 +1,104 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-15T07:56:24+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/ic_gpu_rootfind_pairs_20261115/analyze.py",
+        "/tmp/claude-0/-home-user/648c3177-6621-55ff-b9d8-09ead07ab678/scratchpad/rpairres"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T07:56:24+00:00",
+      "wall_s": 0.086
+    }
+  ],
+  "commit": "5142615e5d83c6528bbb7df20e8933f384678cc7",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T06:56:59+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0656Z-ic-gpu-rootfind-pairs",
+  "metrics": [
+    {
+      "baseline": 21.099,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_gpup_solve_s_r39_f2048",
+      "note": "complete m=3 solve with the pair table built on the device (rootfind-subtract-gpu probe_build=pairs, daemon, cuda) vs rootfind-subtract (1 thread), log2 r=39.3, |F_x|=2048: 57.3x; GPU with CPU-built table 0.949 s; 14-thread CPU arm 4.00 s; identical S 565.7 (569x matched rho); rho median 108 ms",
+      "reference": 0.10842,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.368
+    },
+    {
+      "baseline": 2.918,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_gpup_setup_s_r39_f4096",
+      "note": "m=3 oracle set-up with the pair table built on the device vs the CPU build, log2 r=39.3, |F_x|=4096 (charged identically)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.122
+    },
+    {
+      "baseline": 33.972,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf2_mt_pool_vs_cpu_r31",
+      "note": "m=2 complete solve, pooled emulation on 14 threads (cgroup quota 13.6 CPUs) vs 1 CPU thread, log2 r=31.3: 10.5x; GPU 0.282 s",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 3.238
+    },
+    {
+      "baseline": 565.7,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_s_r39_f2048",
+      "note": "counted S identical on all arms incl. the device-built pair table; 569x the matched rho mean S",
+      "reference": 0.9942,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 565.7
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 231629,
+      "path": "research/ic_gpu_rootfind_pairs_20261115/raw/out_rpair.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/85/852cbf70b3a131ea9c18066e365ccd8dcb74e29fd1e9a750dd2978f892dcd694",
+      "sha256": "852cbf70b3a131ea9c18066e365ccd8dcb74e29fd1e9a750dd2978f892dcd694",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_rootfind_pairs_20261115/REPORT.md",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_rootfind_pairs_20261115/fig_pairs.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-rootfind-pairs",
+  "status": "measured",
+  "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+  "validation": null
+}

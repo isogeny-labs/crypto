@@ -1,0 +1,18 @@
+[package]
+name = "p256-transfer-search"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87"
+
+[workspace]
+
+[dependencies]
+p256-genus-check = { path = "../native" }
+p256-cover-classification = { path = "../classification" }
+smith-reference = { path = "../classification/reference" }
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = "1"
+
+[profile.release]
+overflow-checks = true

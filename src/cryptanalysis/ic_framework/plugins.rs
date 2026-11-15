@@ -3211,6 +3211,11 @@ pub struct RootfindSubtractOracle<'i> {
     /// each is charged as.
     sweep_field_muls: u64,
     sweep_field_adds: u64,
+    /// `m = 3` with the pair table built elsewhere (`rootfind-subtract-gpu`,
+    /// `probe_build=pairs`): `prepare` builds no table, and the builder
+    /// charges the build and supplies its work counters here.
+    defer_table: bool,
+    deferred_table_work: BTreeMap<String, u64>,
 }
 
 impl<'i> RootfindSubtractOracle<'i> {
@@ -3227,7 +3232,20 @@ impl<'i> RootfindSubtractOracle<'i> {
             mismatches: 0,
             sweep_field_muls: 0,
             sweep_field_adds: 0,
+            defer_table: false,
+            deferred_table_work: BTreeMap::new(),
         }
+    }
+
+    /// Build no pair table in `prepare` (`m = 3`); the caller builds it,
+    /// charges it, and passes its [`PairTable::work_counters`] to
+    /// [`Self::set_deferred_table_work`].
+    pub(crate) fn defer_pair_table(&mut self) {
+        self.defer_table = true;
+    }
+
+    pub(crate) fn set_deferred_table_work(&mut self, work: BTreeMap<String, u64>) {
+        self.deferred_table_work = work;
     }
 }
 
@@ -3312,7 +3330,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
         self.degenerate = vec![false; reps.len()];
         self.reps = reps;
         self.field = Some(f);
-        if self.m == 3 {
+        if self.m == 3 && !self.defer_table {
             let table = PairTable::build_negation_folded(ctx.group, fb);
             ops.merge(table.build_ops);
             self.table = Some(table);
@@ -3325,7 +3343,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
             .table
             .as_ref()
             .map(PairTable::work_counters)
-            .unwrap_or_default();
+            .unwrap_or_else(|| self.deferred_table_work.clone());
         // The sweep's `x_index` read per abscissa, and its two
         // conversions into Montgomery form.
         let k = self.reps.len() as u64;
