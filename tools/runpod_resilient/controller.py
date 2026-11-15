@@ -40,7 +40,8 @@ def api(method, path, body=None):
     req = urllib.request.Request(API + path, method=method,
                                  data=None if body is None else json.dumps(body).encode(),
                                  headers={"Authorization": "Bearer " + os.environ.get("RUNPOD_API_KEY", "dummy"),
-                                          "Content-Type": "application/json"})
+                                          "Content-Type": "application/json",
+                                          "User-Agent": "runpod-resilient/1.0"})  # Cloudflare 1010s urllib's
     try:
         with urllib.request.urlopen(req, timeout=60) as r:
             raw = r.read()
@@ -52,7 +53,8 @@ def api(method, path, body=None):
 
 
 def pod_get(url, token, path, timeout=60):
-    req = urllib.request.Request(url + path, headers={"Authorization": "Bearer " + token})
+    req = urllib.request.Request(url + path, headers={"Authorization": "Bearer " + token,
+                                                      "User-Agent": "runpod-resilient/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read()
 
@@ -149,7 +151,12 @@ class Controller:
             health = json.loads(pod_get(self.url(), self.token(), "/health"))
             self.last_ok = time.time()
             n = self.sync()
-            prog = pod_get(self.url(), self.token(), "/file?path=" + self.a.progress).decode()
+            try:
+                prog = pod_get(self.url(), self.token(), "/file?path=" + self.a.progress).decode()
+            except urllib.error.HTTPError as e:
+                if e.code != 404:  # no progress file yet: the job has not started
+                    raise
+                prog = ""
         except Exception as e:  # noqa: BLE001
             if time.time() - self.last_ok > self.a.grace:
                 self.replace(f"unreachable {int(time.time() - self.last_ok)}s: {type(e).__name__}")
