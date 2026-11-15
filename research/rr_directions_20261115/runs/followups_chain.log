@@ -253,3 +253,10 @@ m17_l6_d0_norm f4 nv=52 np=68 deg=3 truth_tot=15 truth_dist=12 truth0_tot=15 tru
 m17_l6_d0_rr4 sat nv=19 np=35 deg=4 truth_tot=15 truth_dist=12 truth0_tot=15 truth0_dist=12 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=647 wall=0.04 tfa=15 ndx=null xlc=null xlcomplete=null skipped=null
 m17_l6_d0_rr4 f4 nv=19 np=35 deg=4 truth_tot=15 truth_dist=12 truth0_tot=15 truth0_dist=12 decided=false sd=6 dr=7 rows=70101 nsol=null ver=null status=null model_ok=null confl=null wall=76.70 tfa=15 ndx=null xlc=null xlcomplete=null skipped=null
 m17_l6_d0_s4 sat nv=18 np=17 deg=6 truth_tot=15 truth_dist=12 truth0_tot=15 truth0_dist=12 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=2075 wall=1.04 tfa=15 ndx=null xlc=null xlcomplete=null skipped=null
+./runs/followups_chain.sh: line 7: 21643 Killed                  $P --out runs/f1_ladder_20261115 --m 17 --ell 4,5,6,7 --arms norm,rr4,s4 --solvers sat,f4 --planted 4 --unplanted 4 --budget-s 600 --seed 20261115
++ for m in 13 15 17
++ l=3
++ /home/user/crypto/target/release/examples/rr_quadratic_panel --out runs/f3_norm4_20261115 --m 13 --ell 3,4 --arms norm4 --solvers sat,f4 --planted 4 --unplanted 4 --budget-s 600 --seed 20261115
+MASK_BITS = 128
+m13_l3_d0_norm4 sat nv=51 np=65 deg=4 truth_tot=0 truth_dist=0 truth0_tot=0 truth0_dist=0 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=25591 wall=0.48 tfa=24 ndx=null xlc=null xlcomplete=null skipped=null
+m13_l3_d0_norm4 f4 nv=51 np=65 deg=4 truth_tot=0 truth_dist=0 truth0_tot=0 truth0_dist=0 decided=false sd=3 dr=4 rows=7700 nsol=null ver=null status=null model_ok=null confl=null wall=1.37 tfa=24 ndx=null xlc=null xlcomplete=null skipped=null
