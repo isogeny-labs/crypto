@@ -1,0 +1,169 @@
+{
+  "cells": [
+    {
+      "B_real": 8,
+      "p": 4194433,
+      "path": "cell.json",
+      "sha256": "2d9bdbaf0076659216efb9e1742b8d0744b50bab27d9d0906b6911c14d71b86f",
+      "slug": "c3",
+      "t": 4
+    },
+    {
+      "B_real": 3,
+      "p": 4194433,
+      "path": "nested_t2/cell.json",
+      "sha256": "2ccad1a6b86f1d29a1f1e8432bffa50267eee36c783568a3fb0b112fa11257ca",
+      "slug": "c3-nested-t2",
+      "t": 2
+    },
+    {
+      "B_real": 5,
+      "p": 4194433,
+      "path": "nested_t3/cell.json",
+      "sha256": "77078cfada0006c03f57f2c2e0eeacffaab965c2db6f54d182f9bb417d0ada96",
+      "slug": "c3-nested-t3",
+      "t": 3
+    }
+  ],
+  "doc": "[pcc:unverified] instrument output; no claim",
+  "flags": {
+    "min_prime": null,
+    "nested_ts": [
+      2,
+      3
+    ],
+    "no_l1_reuse": true,
+    "prime": 4194433,
+    "ratio": 5,
+    "require_breal": 8,
+    "require_breal_nested": [
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        4
+      ]
+    ],
+    "seed": 20261115,
+    "slug": "c3",
+    "t": 4
+  },
+  "require_breal_rejections": [],
+  "rule": "p runs over the primes >= 2^(T*R) (T*R >= 16) with 2^T | p-1, in increasing order; a prime is ELIGIBLE iff it is not a Fermat prime (p-1 not a power of two), a prime-order curve y^2=x^3+ax+b is found within 400 attempts, and a base with B_real >= ceil(B/2) exists under the g rule; the first eligible prime is used and every rejected prime is recorded. Curve search: StdRng (rand 0.8, ChaCha12) seeded by SHA-256('pkm.m8-panel/v1|curve|<slug>|<seed>|<p>'), a, b uniform in [1,p), skip singular, #E counted natively (exhaustive Legendre sum for p < 2^20, else Hasse-interval baby-step giant-step of a random point whose unique candidate is #E), first prime #E; r*Pv = O is checked for a random point. zeta = h^((p-1)>>T) for the least h >= 2 with zeta^(2^(T-1)) != 1. g rule: the least integer g in [2, 20000) outside mu_(2^T) (g^(2^T) != 1) with B_real >= ceil(2^T/2). V = { g*zeta^k }. Real base = { x in V : x^3+ax+b is a non-zero square }, positive sign = the point with y <= (p-1)/2. Generator P = point with the least x >= 1, y <= (p-1)/2. Exception: T=3, R=8 reuses the L1 decisive cell (p=16801793; a, b, g reconstructed by a native port of CPython random.Random(str) following gen.py, no eligibility rule applied; see l1_reuse).",
+  "schema": "pkm.present-panel.cell/v1",
+  "sha256": "69f909679e6faed9934414de532402ea7a02d1ce6a76d00f9f3ceb8ecfd9374f",
+  "sym_applicability": [
+    {
+      "B_real": 8,
+      "sym_applicable_m": [
+        {
+          "applicable": true,
+          "m": 2
+        },
+        {
+          "applicable": true,
+          "m": 3
+        },
+        {
+          "applicable": true,
+          "m": 4
+        },
+        {
+          "applicable": true,
+          "m": 5
+        },
+        {
+          "applicable": true,
+          "m": 6
+        },
+        {
+          "applicable": true,
+          "m": 7
+        },
+        {
+          "applicable": false,
+          "m": 8
+        }
+      ],
+      "t": 4
+    },
+    {
+      "B_real": 3,
+      "sym_applicable_m": [
+        {
+          "applicable": true,
+          "m": 2
+        },
+        {
+          "applicable": false,
+          "m": 3
+        },
+        {
+          "applicable": false,
+          "m": 4
+        },
+        {
+          "applicable": false,
+          "m": 5
+        },
+        {
+          "applicable": false,
+          "m": 6
+        },
+        {
+          "applicable": false,
+          "m": 7
+        },
+        {
+          "applicable": false,
+          "m": 8
+        }
+      ],
+      "t": 2
+    },
+    {
+      "B_real": 5,
+      "sym_applicable_m": [
+        {
+          "applicable": true,
+          "m": 2
+        },
+        {
+          "applicable": true,
+          "m": 3
+        },
+        {
+          "applicable": true,
+          "m": 4
+        },
+        {
+          "applicable": false,
+          "m": 5
+        },
+        {
+          "applicable": false,
+          "m": 6
+        },
+        {
+          "applicable": false,
+          "m": 7
+        },
+        {
+          "applicable": false,
+          "m": 8
+        }
+      ],
+      "t": 3
+    }
+  ],
+  "sym_applicable_rule": "B_real >= m + 1",
+  "tool": {
+    "git_commit": "5a57d3830e20afb179d1a6d2b6f5b36dce5889c6",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "e8335b88f3866d8deb5316a329f71a689cbc8d678f1f968bbee8d0647a8089a2"
+  },
+  "wrapper_rule": "derive_from(t, ratio, seed, no_l1_reuse = true, min_prime = prime); --prime P pins the prime (error if the eligibility rule steps off P); --require-breal N steps to the next eligible prime while B_real < N (each rejection recorded; error with --prime); --slug NAME replaces the cell slug that seeds the targets/planted RNG streams (derivation_slug keeps the one that seeded the curve); --nested-ts reuses p, a, b, r, g, generator at smaller t with zeta_t' = zeta_t^(2^(t-t')) and slug <slug>-nested-t<t'>"
+}

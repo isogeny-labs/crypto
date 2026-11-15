@@ -1,0 +1,230 @@
+{
+  "Q": {
+    "x": 109585,
+    "y": 153845
+  },
+  "b_real": 2,
+  "cell_sha256": "1206e1174db10a5d822ffeb0a613177d321cd1609cd2c1835ac4dd0fa1d5a61f",
+  "draws": {
+    "draws_total": 74084,
+    "empirical_natural_sat_rate": 0.00006749095621186761,
+    "identity_draws": 0,
+    "real_sat_draw_indices": [
+      26864,
+      36951,
+      40313,
+      62417,
+      74083
+    ],
+    "real_sat_draws": 5,
+    "selected_draw_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      26864,
+      36951,
+      40313,
+      62417,
+      74083
+    ],
+    "stopping_rule": "draw in order until 5 real-SAT and 5 real-UNSAT are kept; SAT = at least one real signed multiset of size 3 sums to R"
+  },
+  "enumeration": {
+    "alg_entries": 28,
+    "alg_leaves": 120,
+    "definition": "real decomposition = signed multiset of m real base points with sum exactly R; algebraic = signed multisets over the 2B lifts of V to E(F_{p^2}) whose sum has abscissa x_R; algebraic_count = distinct unsigned multisets of V among them (gen.py decomposable); ordered_algebraic_solutions = sequences with no identity prefix (formula: targets.rs enumerate_alg)",
+    "real_entries": 10,
+    "real_leaves": 20,
+    "seconds": 0.000043386,
+    "total_seconds": 0.318752152
+  },
+  "hidden_present_sha256": "1ddb3cf452e44c84afeed232f2ef3c182751ad02e97ce609d44434360ad3a19b",
+  "hidden_sha256": "3516e0ac6690f04ab8e1c6b873cffbac5d8fe90cbd38185c92c823ebfdab4cb3",
+  "label_leak_note": "label (sat/unsat/planted) and the real/algebraic counts are classifier metadata needed for the panel's stratification; they are NOT inputs to a solver. a, b are the attacker's own multipliers of R = aP + bQ (needed to form relation rows), k is hidden.",
+  "m": 3,
+  "present_note": "superset of targets.m8.json: real_count_distinct per target, planted-distinct targets (plantedD*), slug; [pcc:unverified]",
+  "schema": "pkm.m8-panel.targets/v1",
+  "seed": 20261115,
+  "sha256": "dba72721c2eec7e58419d2026387db4be292a29dd53f42a9784bd81cfb4b90ed",
+  "slug": "c1-nested-t2",
+  "sym_applicable": false,
+  "sym_applicable_rule": "B_real >= m + 1",
+  "targets": [
+    {
+      "a": 2324,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 45066,
+      "draw_index": 0,
+      "label": "unsat",
+      "name": "d000000",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "real_count_distinct": 0,
+      "x_r": 205230
+    },
+    {
+      "a": 241414,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 70643,
+      "draw_index": 1,
+      "label": "unsat",
+      "name": "d000001",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "real_count_distinct": 0,
+      "x_r": 71599
+    },
+    {
+      "a": 229984,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 18401,
+      "draw_index": 2,
+      "label": "unsat",
+      "name": "d000002",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "real_count_distinct": 0,
+      "x_r": 112662
+    },
+    {
+      "a": 200281,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 216847,
+      "draw_index": 3,
+      "label": "unsat",
+      "name": "d000003",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "real_count_distinct": 0,
+      "x_r": 98006
+    },
+    {
+      "a": 106834,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 20146,
+      "draw_index": 4,
+      "label": "unsat",
+      "name": "d000004",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "real_count_distinct": 0,
+      "x_r": 80325
+    },
+    {
+      "a": 87840,
+      "algebraic_count": 1,
+      "algebraic_signed_classes": 1,
+      "b": 63054,
+      "draw_index": 26864,
+      "label": "sat",
+      "name": "d026864",
+      "ordered_algebraic_solutions": 1,
+      "planted": false,
+      "real_count": 1,
+      "real_count_distinct": 0,
+      "x_r": 124074
+    },
+    {
+      "a": 77691,
+      "algebraic_count": 1,
+      "algebraic_signed_classes": 1,
+      "b": 133118,
+      "draw_index": 36951,
+      "label": "sat",
+      "name": "d036951",
+      "ordered_algebraic_solutions": 1,
+      "planted": false,
+      "real_count": 1,
+      "real_count_distinct": 0,
+      "x_r": 124074
+    },
+    {
+      "a": 137653,
+      "algebraic_count": 4,
+      "algebraic_signed_classes": 4,
+      "b": 213210,
+      "draw_index": 40313,
+      "label": "sat",
+      "name": "d040313",
+      "ordered_algebraic_solutions": 13,
+      "planted": false,
+      "real_count": 2,
+      "real_count_distinct": 0,
+      "x_r": 18888
+    },
+    {
+      "a": 121228,
+      "algebraic_count": 1,
+      "algebraic_signed_classes": 1,
+      "b": 206780,
+      "draw_index": 62417,
+      "label": "sat",
+      "name": "d062417",
+      "ordered_algebraic_solutions": 3,
+      "planted": false,
+      "real_count": 1,
+      "real_count_distinct": 0,
+      "x_r": 146539
+    },
+    {
+      "a": 10472,
+      "algebraic_count": 1,
+      "algebraic_signed_classes": 1,
+      "b": 58105,
+      "draw_index": 74083,
+      "label": "sat",
+      "name": "d074083",
+      "ordered_algebraic_solutions": 3,
+      "planted": false,
+      "real_count": 1,
+      "real_count_distinct": 0,
+      "x_r": 98602
+    },
+    {
+      "a": null,
+      "algebraic_count": 4,
+      "algebraic_signed_classes": 4,
+      "b": null,
+      "draw_index": null,
+      "label": "planted",
+      "name": "planted0",
+      "ordered_algebraic_solutions": 13,
+      "planted": true,
+      "planted_abscissae": [
+        [
+          18888,
+          1
+        ],
+        [
+          262317,
+          -1
+        ],
+        [
+          262317,
+          1
+        ]
+      ],
+      "real_count": 2,
+      "real_count_distinct": 0,
+      "x_r": 18888
+    }
+  ],
+  "tool": {
+    "git_commit": "5a57d3830e20afb179d1a6d2b6f5b36dce5889c6",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "e8335b88f3866d8deb5316a329f71a689cbc8d678f1f968bbee8d0647a8089a2"
+  }
+}

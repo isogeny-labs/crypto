@@ -1,0 +1,97 @@
+{
+  "B": 4,
+  "B_real": 2,
+  "R": 5,
+  "T": 2,
+  "V": [
+    4,
+    243433,
+    262317,
+    18888
+  ],
+  "V_real": [
+    262317,
+    18888
+  ],
+  "a": 154718,
+  "b": 4644,
+  "curve_search_attempts": 46,
+  "derivation_rule": "p runs over the primes >= 2^(T*R) (T*R >= 16) with 2^T | p-1, in increasing order; a prime is ELIGIBLE iff it is not a Fermat prime (p-1 not a power of two), a prime-order curve y^2=x^3+ax+b is found within 400 attempts, and a base with B_real >= ceil(B/2) exists under the g rule; the first eligible prime is used and every rejected prime is recorded. Curve search: StdRng (rand 0.8, ChaCha12) seeded by SHA-256('pkm.m8-panel/v1|curve|<slug>|<seed>|<p>'), a, b uniform in [1,p), skip singular, #E counted natively (exhaustive Legendre sum for p < 2^20, else Hasse-interval baby-step giant-step of a random point whose unique candidate is #E), first prime #E; r*Pv = O is checked for a random point. zeta = h^((p-1)>>T) for the least h >= 2 with zeta^(2^(T-1)) != 1. g rule: the least integer g in [2, 20000) outside mu_(2^T) (g^(2^T) != 1) with B_real >= ceil(2^T/2). V = { g*zeta^k }. Real base = { x in V : x^3+ax+b is a non-zero square }, positive sign = the point with y <= (p-1)/2. Generator P = point with the least x >= 1, y <= (p-1)/2. Exception: T=3, R=8 reuses the L1 decisive cell (p=16801793; a, b, g reconstructed by a native port of CPython random.Random(str) following gen.py, no eligibility rule applied; see l1_reuse).",
+  "derivation_slug": "c1",
+  "eligibility": {
+    "b_real_min": 8,
+    "curve_attempt_bound": 400,
+    "g_bound": 20000
+  },
+  "g": 4,
+  "generator": {
+    "x": 6,
+    "y": 42373
+  },
+  "group_order": 262877,
+  "l1_reuse": {
+    "requested": false
+  },
+  "master_seed": 20261115,
+  "min_prime_override": 262321,
+  "nested_from": {
+    "cell_sha256": "1e650bbc4279af578ddc811ab806c0ac1efb554e58f81c4f5b7b48ebc424b0c2",
+    "rule": "same p, a, b, r, g, generator; zeta_t' = zeta_t^(2^(t-t')); V_t' = g*mu_(2^t') is a subset of V_t; real base re-derived (x^3+ax+b a non-zero square)",
+    "t": 4
+  },
+  "p": 262321,
+  "point_count_method": "legendre_sum",
+  "present_wrapper": {
+    "flags": {
+      "min_prime": null,
+      "nested_ts": [
+        2,
+        3
+      ],
+      "no_l1_reuse": true,
+      "prime": 262321,
+      "ratio": 5,
+      "require_breal": 8,
+      "require_breal_nested": [
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "seed": 20261115,
+      "slug": "c1",
+      "t": 4
+    },
+    "require_breal_rejections": []
+  },
+  "r": 262877,
+  "real_base": [
+    {
+      "v_index": 2,
+      "x": 262317,
+      "y": 43416
+    },
+    {
+      "v_index": 3,
+      "x": 18888,
+      "y": 4068
+    }
+  ],
+  "rejected_primes": [],
+  "schema": "pkm.m8-panel.cell/v1",
+  "seed": 20261115,
+  "sha256": "1206e1174db10a5d822ffeb0a613177d321cd1609cd2c1835ac4dd0fa1d5a61f",
+  "signed_points": 4,
+  "slug": "c1-nested-t2",
+  "tool": {
+    "git_commit": "5a57d3830e20afb179d1a6d2b6f5b36dce5889c6",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "e8335b88f3866d8deb5316a329f71a689cbc8d678f1f968bbee8d0647a8089a2"
+  },
+  "zeta": 257599
+}

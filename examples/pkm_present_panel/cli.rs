@@ -108,8 +108,22 @@ pub fn run_cell(args: &[String]) -> Result<(), String> {
     if prime.is_none() && !nested.is_empty() {
         return Err("--nested-ts needs --prime (one pinned curve)".into());
     }
+    // --min-prime N: start the eligibility walk at N instead of 2^(t*ratio) (ignored when --prime pins the curve).
+    let min_prime: Option<u64> = crate::arg_opt(args, "--min-prime").map(|s| s.parse()).transpose().map_err(|_| "--min-prime")?;
+    // --require-breal-nested t:N,t:N : the candidate curve must also have B_real >= N at the nested base g*mu_{2^t}
+    // (checked on the same curve with zeta_t = zeta^(2^(T-t))); a failing prime is rejected and recorded like --require-breal.
+    let req_nested: Vec<(usize, usize)> = match crate::arg_opt(args, "--require-breal-nested") {
+        Some(s) => s
+            .split(',')
+            .map(|x| {
+                let (a, b) = x.trim().split_once(':').ok_or_else(|| "--require-breal-nested wants t:N".to_string())?;
+                Ok((a.parse().map_err(|_| "--require-breal-nested t")?, b.parse().map_err(|_| "--require-breal-nested N")?))
+            })
+            .collect::<Result<_, String>>()?,
+        None => vec![],
+    };
     let mut rejections: Vec<Value> = Vec::new();
-    let mut lo = prime;
+    let mut lo = prime.or(min_prime);
     let mut tries = 0;
     let d = loop {
         tries += 1;
@@ -130,6 +144,23 @@ pub fn run_cell(args: &[String]) -> Result<(), String> {
             lo = Some(d.cell.p + 1);
             continue;
         }
+        let mut nested_short: Option<String> = None;
+        for &(t2, n) in &req_nested {
+            let nj = cell_json_nested(&d.json, t2, "probe")?;
+            let br = nj["B_real"].as_u64().unwrap_or(0) as usize;
+            if br < n {
+                nested_short = Some(format!("B_real(t = {t2}) = {br} < {n}"));
+                break;
+            }
+        }
+        if let Some(reason) = nested_short {
+            if prime.is_some() {
+                return Err(format!("pinned prime {} fails --require-breal-nested: {reason}", d.cell.p));
+            }
+            rejections.push(json!({"p": d.cell.p, "reason": reason}));
+            lo = Some(d.cell.p + 1);
+            continue;
+        }
         break d;
     };
     let mut j = d.json.clone();
@@ -138,7 +169,7 @@ pub fn run_cell(args: &[String]) -> Result<(), String> {
         j["slug"] = json!(s);
     }
     j["present_wrapper"] = json!({
-        "flags": {"no_l1_reuse": true, "prime": prime, "require_breal": req_b, "slug": slug_over, "nested_ts": nested, "ratio": ratio, "seed": seed, "t": t},
+        "flags": {"no_l1_reuse": true, "prime": prime, "require_breal": req_b, "min_prime": min_prime, "require_breal_nested": req_nested, "slug": slug_over, "nested_ts": nested, "ratio": ratio, "seed": seed, "t": t},
         "require_breal_rejections": rejections,
     });
     let j = seal(j);
@@ -164,7 +195,7 @@ pub fn run_cell(args: &[String]) -> Result<(), String> {
         "rule": RULE_TEXT,
         "wrapper_rule": "derive_from(t, ratio, seed, no_l1_reuse = true, min_prime = prime); --prime P pins the prime (error if the eligibility rule steps off P); --require-breal N steps to the next eligible prime while B_real < N (each rejection recorded; error with --prime); --slug NAME replaces the cell slug that seeds the targets/planted RNG streams (derivation_slug keeps the one that seeded the curve); --nested-ts reuses p, a, b, r, g, generator at smaller t with zeta_t' = zeta_t^(2^(t-t')) and slug <slug>-nested-t<t'>",
         "sym_applicable_rule": "B_real >= m + 1",
-        "flags": {"no_l1_reuse": true, "prime": prime, "require_breal": req_b, "slug": slug_over, "nested_ts": nested, "ratio": ratio, "seed": seed, "t": t},
+        "flags": {"no_l1_reuse": true, "prime": prime, "require_breal": req_b, "min_prime": min_prime, "require_breal_nested": req_nested, "slug": slug_over, "nested_ts": nested, "ratio": ratio, "seed": seed, "t": t},
         "require_breal_rejections": rejections,
         "cells": cells, "sym_applicability": sym,
         "tool": crate::tool_info(),
