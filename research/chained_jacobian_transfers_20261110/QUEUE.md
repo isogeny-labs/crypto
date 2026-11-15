@@ -1,3 +1,21 @@
+# Genuine23 settled; corrected original-prime source ready for checkpoint
+
+pcc/claims/PCC-20261115-e722f6.json/pcc/claims/PCC-20261115-845245.json: original43683583068/job132719230311SUCCESS, sevenremoteobjects replayed BEFOREbotf55ad14c/direct38344f9/exact9paths. All47225heldinputs/169links/ownedbytes and ordered89375812Barchive/all1100nonsecretmembers/23closedroots preserved; normalFF-artifact-wiring0/HOLD23RELEASED. All44386prior22keys/165links and67a90fd7ledgerprefix retained. Three exact canonicalmanifestentries andthree transparentrelativealiases; no new consumerremote read claimed. [pcc:unverified]
+
+## What was done
+Preserved full norm-point reuse native46008b/695records/reportf8d381, strict25CI0f3ea8, original-prime native01failed101/eightcompletedrecords/e62fb2, correctedcompiled03a3c6eb/sevenconditionalproofroots, wholeclosedsource/executables/preparedcopies/failures/CI/checkpoints/reports. Failure attestation4575215B changed fromregularfile tocanonicalrelative symlink only after entirebytecomparison; subjecthashunchanged. [pcc:unverified]
+
+## Decisions made
+Publish correctedcompiled03source andcanonicalprojection, require fresh exact originalcheckpoint15 andimmediateoriginalgate0, then ONE unfiltered original-prime native02 with unchanged900s/2GiB bounds, all1077whole records/fouractualwhole-classomissions/1131guards/actualbinarycustody. Actualfirstnativefailure is diagnostic Fp6formatter assertion; no1077fixture or mathematical acceptance yet. [pcc:unverified]
+
+## Open threads
+Original-prime native02; then prospective finite18vertex/72edge/216triple full originalkernelcompatibility census before computing masks, preserving allfixednegative results andcurrentprime-only models. Completeprimitive andknown-initial-point comparisons/prime-fielddescent leads remainqueued. FuturelargecustodyNEW24. [pcc:unverified]
+
+## Errors
+All prior scientific/cold/source/proofpath/staging/PDF/logdownload/root-main failures retained; no CIwide, calibratedperformance, novelty or signedpromotion. KB unavailable andvaultlocked. The session read vaultAGENTSciphertext accidentally; no plaintext/key/decryption accessed; future reads checkVLT1header. [pcc:unverified]
+
+---
+
 # Whole research handoff23 prepared; science and consumer ledger HELD
 
 pcc/claims/PCC-20261115-a1e903.json: all44386 prior keys/165links/67aledgerprefix and all pendingconsumer bytes retained. Complete norm-point46008b/full695, exact25 CI0f3ea8/full294members/15runlogs, proofs/builds/checkpoints13-14/reports and FAILED original-prime native01e62fb2/whole completed records are archived. Corrected03a3c6eb compiled, native02 NOTRUN/full1077unmet. Exact32MiBparts/all scientific members roundtripped; private transport exclusions explicit/localonly. Original policy selects7objects. HOLD until actual original remote replays BEFOREactualpublisher/exactFF/reassembly/terminal23guards. [pcc:unverified]
