@@ -41,6 +41,17 @@ Checked in this session (2026-11-15, this container):
   can both be linked from Rust without a GitHub fetch. Xorricane, SATIC and
   Bosphorus still cannot; an XOR-learning solver has to be written in
   `src/cryptanalysis/sat.rs` (§3.1) or the sources vendored by the owner.
+- **Build check (this session, scratch crate, `cargo build --release`) `[pcc:unverified]`:**
+  `cadical-sys 0.8.0` builds unchanged. `cryptominisat 5.8.0-rust1` needs two
+  local fixes: its tarball omits `scripts/xxd-alike.py` and
+  `cmsat_tablestructure.sql`, which the CMake build only touches when it finds
+  sqlite3, so add `.define("NOSQLITE", "ON")` to the crate's `build.rs` through
+  a `[patch.crates-io]` path override; and the 2020 C++ source lacks
+  `<cstdint>` includes for current GCC, so build with
+  `CXXFLAGS="-include cstdint"`. With both, a 3-variable XOR instance
+  (`a ⊕ b ⊕ c = 1`, `¬a`, `¬b`) returns SAT with `c = true` through
+  `add_xor_literal_clause`. Build time ≈ 85 s. The patched crate copy goes in
+  `third_party/` when B0 is implemented, beside the existing `m4gb-patches`.
 
 Sources checked (KB): **KB unavailable** in this container (`research-kb` MCP not
 loaded; `scripts/research-kb` has no executable; lead atlas in
@@ -271,9 +282,10 @@ fires.
 
 ## 7. Immediate next steps (in order)
 
-1. Add `cryptominisat` and `cadical-sys` as optional, feature-gated
-   dependencies; confirm both build through the crates.io path in this
-   container (the only unblocked channel).
+1. Add `cryptominisat` (patched copy under `third_party/`, `NOSQLITE=ON`,
+   `-include cstdint`) and `cadical-sys` as optional, feature-gated
+   dependencies. Both are confirmed to build and run through the crates.io
+   path in this container (§0, "Build check").
 2. Write `PROTOCOL.md` for B0 from §2 and commit it (freeze).
 3. Dry-run all five arms at ℓ = 5, 6 locally; check verdict agreement with arm A
    on every target; fix the instrument before any rung ≥ 8 runs.
