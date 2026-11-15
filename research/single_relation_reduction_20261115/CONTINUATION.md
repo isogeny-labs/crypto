@@ -237,3 +237,35 @@ unavailable unrelated submodule. A focused fetch with recursion disabled
 succeeded; no source or scientific-input change was made for that error.
 The new merge has only the expected journal conflict. Main's existing stray
 marker is explicitly recorded in checks/journal-source002.json.
+
+## 2026-11-15T19:52:37Z — PR4311 follow-up: reconcile main's publication-time journal update
+
+### What was done (commands, files, features)
+
+Main advanced to75e0ba5257 while95b191429c was being published. Its only
+new overlap is the shared daily journal. The original Copilot request is
+still unanswered; continuation fallback6900314788 records the next normal
+merge. Fresh003 receipts preserve233incoming/234own complete blocks,
+a237block union and both source sequences; this handoff makes238blocks.
+All001/002 receipts, mathematical/report/native files, frozen controls and
+PCC ledger remain unchanged. [pcc:unverified]
+
+### Decisions made (and why)
+
+Retain full-block multiplicities and the stray marker already committed on
+main, with its source pin/raw hash. Use a normal merge; no rebase, force push,
+ledger rechain or scientific execution. Earlier check results do not qualify
+the new head. No native qualification, paid job or new research is authorized.
+
+### Open threads (unfinished, pick up next time)
+
+Read required validation/size/artifacts/latest PCC on the actual new head.
+Auto-merge remains enabled; re-arm a50minute safety-net, obey the unchanged
+check-in limit and disable on merge/close. Complete algorithm criterion is
+unmet; the frozen multiprecision panel still needs checkpoint upload access.
+
+### Errors (what went wrong, how it was handled)
+
+GitHub correctly kept95b conflicted after the concurrent main advance;
+required gates had not started. Fetched the new base once and prepared fresh
+source-pinned receipts. No previous receipt was overwritten.

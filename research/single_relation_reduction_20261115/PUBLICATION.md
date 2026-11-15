@@ -114,3 +114,12 @@ source block and identified in journal-source002.json. Head2497's four
 required gates passed; a new head must receive its own gates. Existing
 mathematics, report PDF, native sources, frozen controls and PCC ledger are
 unchanged. No scientific or paid execution was started. [pcc:unverified]
+
+Main advanced again to75e0ba5257 during publication of95b191429c, leaving
+another journal-only overlap. Continuation fallback6900314788 documents the
+new normal merge under the unanswered original Copilot request. Fresh003
+receipts preserve233incoming/234own blocks, a237block union plus one handoff
+and both source orders; all001/002 receipts remain intact. Existing study
+sources/report/frozen controls/PCC history stay unchanged. Required gates
+must assess the resulting head;95b was still conflicted and had no required
+gate qualification. No research/native/paid execution. [pcc:unverified]

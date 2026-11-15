@@ -70,31 +70,32 @@ the growing algorithm. Sparse/circuit selectors are not ruled out. Forcing the
 last labelled point to close a relation gives alpha=beta=0and is not a solver.
 
 ## Publication and controls
-PR4311 is regular on main with auto-merge enabled. Head2497e4d969 passed
-validation43748933569, size43748933543, artifacts43748933530 and latest
-PCC43748941582; earlier PCC43748933557 was cancelled, not a pass.
-Those results do not carry to a new head.
+PR4311 remains regular with auto-merge enabled. Main advanced again during
+publication, to75e0ba5257944a74b3be459ac2636021e5b2c5f1. Head95b191429c
+therefore had another journal-only overlap; required gates had not started.
+The original17:31:48Z Copilot request6898455027 remains unanswered.
+Continuation fallback6900314788 documents the next normal merge. Never redo
+or overwrite the001/002 resolutions, receipts, checkers or original logs.
 
-Main advanced to910700d9064ccbc69c3629689c2408ba4c5f5797. The only overlap
-is the daily journal. The original17:31:48Z Copilot request6898455027 still
-has no response; continuation fallback6900245256 documents the new normal
-merge. Do not redo the old a6b170b388 resolution or overwrite its001 receipts.
-New002 receipts/checkers preserve230incoming/228own complete normalized
-blocks, a233block union and both source sequences; the final handoff adds one
-block. Repeated full blocks retain their multiplicities. Main already has
-one trailing `>>>>>>> origin/main` at source line5825; it remains part of its
-complete source block and is recorded in journal-source002.json.
-Existing mathematical/report/native files and frozen inputs remain unchanged.
-PCC history stays append-only; no force push, keyring change or ledger rechain.
-Review validation/size/artifacts/latest PCC on the resulting head itself.
+Fresh003 receipts preserve233incoming/234own complete normalized blocks,
+a237block union and both source sequences; one final handoff makes238blocks.
+Repeated full blocks keep their multiplicities. Main's existing trailing
+`>>>>>>> origin/main` remains in its complete source block; source line5867
+and raw-source hash are recorded in journal-source003.json.
+Existing mathematical/report/native files, frozen controls, raw evidence and
+PCC ledger remain unchanged. No force push, keyring change or ledger rechain.
+Head2497 passed validation43748933569, size43748933543,
+artifacts43748933530 and latest PCC43748941582; earlier PCC43748933557
+was cancelled. None of those results carry to the new head. Check the
+actual resulting head's validation/size/artifacts/latest PCC gates.
 [pcc:unverified]
 
-The safety-net automation is paused during this resolution. Re-arm about
-50minutes after the final push, then roughly4hours for unchanged checks;
-stop after3 unchanged checks or disable when PR4311 merges/closes.
-Never run a second resolver. No new research or native/paid execution is
-authorized by this follow-up. The complete algorithm criterion is unmet;
-the frozen multiprecision panel still needs checkpoint upload access.
+The safety-net automation is paused during resolution. Re-arm about50minutes
+after the final push, then roughly4hours for unchanged checks; stop after3
+unchanged checks or disable when PR4311 merges/closes. Never run a second
+resolver. No new research or native/paid execution is authorized by this
+follow-up. Complete algorithm criterion remains unmet; checkpoint upload
+access still blocks the frozen multiprecision panel.
 
 A3's prospective six-field proof plan and floor probe precede its first Lean
 edit. The original numerical checkpoint capability recheck still finds no AWS CLI/ambient pair or upload
