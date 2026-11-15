@@ -40,6 +40,9 @@ jobs:
         run: python3 research/prime31_ic_20261115/native/replay_m8_split_control.py
       - name: Build balanced m8 algebraic S4 F4 input and validate 32 public witness certificates
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input
+      - name: Bounded existing Rust F4 pilot on positive and public-Q targets
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --probe-f4
       - name: Replay balanced S4/S3 public prime31 equations independently
         run: python3 research/prime31_ic_20261115/native/replay_balanced_m8_s4.py
       - name: Lint adapter and CLI
