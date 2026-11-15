@@ -67,7 +67,8 @@ def generator(p,k):
 
 def binary_ph(group,G,Q,k):
     base=group.mul(1<<(k-1),G)
-    assert base is not None and group.add(base,base) is None
+    if base is None or group.add(base,base) is not None:
+        raise AssertionError("generator order certificate failed")
     R=Q;P=G;d=0
     for i in range(k):
         T=R
@@ -79,8 +80,8 @@ def binary_ph(group,G,Q,k):
             d|=1<<i
             R=group.add(R,group.neg(P))
         P=group.add(P,P)
-    assert R is None
-    assert group.mul(d,G)==Q
+    if R is not None: raise AssertionError("residual not zero")
+    if group.mul(d,G)!=Q: raise AssertionError("target replay failed")
     return d
 
 
@@ -96,7 +97,7 @@ def bsgs(group,G,Q,n):
     for j in range(m+1):
         if s in table:
             d=(j*m+table[s])%n
-            assert group.mul(d,G)==Q
+            if group.mul(d,G)!=Q: raise AssertionError("BSGS replay failed")
             return d
         s=group.add(s,step)
     raise ValueError('BSGS failed')
