@@ -79,3 +79,13 @@ Predictions, frozen with this amendment before any row:
   dense count is reported beside `P1`'s.
 
 A cell that hits its budget or the pod's memory is censored and reported as a lower bound.
+
+### Amendment 2 (2026-11-15T08:05Z, during the pod run): stopping rule
+
+Seen before writing this: the first `P3`, `m = 2`, `S = 2^13` dense target hit the 1,800 s budget (censored, 8.4·10⁹
+multiplications at the cutoff). Wall time per target has grown ≈ 7.4× per doubling of `S` (42 s at `2^11`, 310 s at
+`2^12`), faster than the counted metric (4×), so every remaining `m = 2` cell at `S ≥ 2^13` is projected to be censored.
+The pod supervisor cannot stop one lane. Rule, fixed now, before any further row of those cells is seen: the pod is
+deleted as soon as the `m = 3`, `S = 2^7` cell ends (completed or censored at its 86,400 s budget). Any `m = 2` cell
+not finished by then is reported as *not run*, never imputed. Rows already written stay and are reported. No other
+change.
