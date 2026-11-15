@@ -1,0 +1,16 @@
+✖ [1609/1610] Building UnitCertificate (2.1s)
+warning: UnitCertificate.lean: imports `Mathlib.RingTheory.Ideal.Span` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: UnitCertificate.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: UnitCertificate.lean: imports `Mathlib.Algebra.Polynomial.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: UnitCertificate.lean: imports `Mathlib.RingTheory.Polynomial.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: UnitCertificate.lean: imports `Mathlib.Tactic.Ring` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/scratch/mathlib4/.lake/packages/Cli/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/batteries/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/Qq/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/aesop/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/plausible/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/build/lib/lean:/workspace/crypto-audit/research/macaulay_provenance_20261115/lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/crypto-audit/research/macaulay_provenance_20261115/lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/crypto-audit/research/macaulay_provenance_20261115/lean/UnitCertificate.lean -o /workspace/crypto-audit/research/macaulay_provenance_20261115/lean/.lake/build/lib/lean/UnitCertificate.olean -i /workspace/crypto-audit/research/macaulay_provenance_20261115/lean/.lake/build/lib/lean/UnitCertificate.ilean -c /workspace/crypto-audit/research/macaulay_provenance_20261115/lean/.lake/build/ir/UnitCertificate.c --setup /workspace/crypto-audit/research/macaulay_provenance_20261115/lean/.lake/build/ir/UnitCertificate.setup.json --json
+error: UnitCertificate.lean:16:18: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ↑5
+in the target expression
+  5 * (X - 1) + 1 = 1
+
+⊢ 5 * (X - 1) + 1 = 1
+Some required targets logged failures:
+- UnitCertificate
+error: build failed

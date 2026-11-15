@@ -1,0 +1,40 @@
+{
+ "schema": "validation-gate/v1",
+ "status_note": "Admitted with caveats by Validator V on 2026-11-14 (independent of the producers), from origin/main 224624a91a97639781ff336f2e8dc9a0738035b3; the target files are byte-equal to f1997205729b506658fadbaebfab7de84ba91aca (PR #4071). Checks, caveats and findings: research/validation_20261114/REPORT.md. Toy sizes (p <= 51,203), one session on one shared VM with no isolation. This is a negative/unresolved result, not an improvement and not a leaderboard row. [pcc:unverified]: no pcc claim id, no keyring signature.",
+ "replay_certificate": {
+  "path": "../validation_20261114/out/gate/replay-certificate.json",
+  "sha256": "6f55af0c7bcd891c078da5fbc3d8b3fc58b35a63934fb8921feebac1a72bfd9a"
+ },
+ "validator_report": {
+  "path": "../validation_20261114/out/gate/validator-report.json",
+  "sha256": "12dee605388af52d83aa862f7f087e582cabee34fdda5a502d0d7357217372cf"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "kind_note": "tuned negation-map rho on E1 (rho_full_ec, RhoWalk::negation), the protocol's primary reference; E1 is a prime-field curve, so no Frobenius; no E1 has j = 0 or 1728 (validator-checked for all 9 curves: j = 63, 357, 678, 1157, 2166, 1504, 2341, 17901, 22722), so no larger automorphism fold exists",
+  "protocol": "research/full_jacobian_ic_20261113/PROTOCOL.md (frozen.sha256 7cdbad9d...), 'Matched references, same process'",
+  "unit": "group operations of the arm's own group (1 GAE each) + w x native operations (IC: rel.mul + la.mul; rho: canonicalisations + partition hashes + DP lookups + DP inserts + word ops). An IC operation is a Cantor step on the word Jacobian, 4.3 to 5.7 E1 additions in best-of-N time, so every IC/rho ratio is understated; IC additions and the uncounted IC walk hash, HashMap and RNG work would only raise the IC side, so the 'above' order is conservative",
+  "binary_or_process": "src/bin/full_jacobian_ic.rs: one process runs every IC arm, the subgroup controls and the rho on E1 of a prime",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "cell": "p = 12841 (largest stage-1 prime), arm B (cheapest whole-J arm at w >= 0.1); all 36 IC cells in ../validation_20261114/out/recompute_fj.json",
+  "gae_band": {
+   "0": {
+    "ic": 8675.083333333334,
+    "rho": 161.27083333333334
+   },
+   "0.1": {
+    "ic": 204121.49166666667,
+    "rho": 231.64375
+   },
+   "1": {
+    "ic": 1963139.1666666665,
+    "rho": 865.0
+   }
+  },
+  "order_holds_across_band": true,
+  "order_note": "IC above the negation rho on E1 at 0, 0.1 and 1 GAE and at the calibrated reading (0, w_cal, 10 w_cal) in all 36 IC cells (A, B, A_S, B_S at 9 primes); no cell below or unresolved. The frozen decision rule's verdict is 'unresolved' (ratio-slope 95% lower bounds -0.070 for A and -0.654 for B at the producer's t = 2.571; -0.0698 and -0.6540 at the exact t), not 'closed by data'."
+ }
+}
