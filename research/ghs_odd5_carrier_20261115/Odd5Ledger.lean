@@ -54,6 +54,13 @@ theorem degree_four_denominator_count :
 theorem degree_four_assignment_count :
     (5 : Nat) * 3^4 + 244 * 3^5 = 59697 := by decide
 
+theorem degree_five_denominator_count :
+    (1 : Nat) + 5 + 242 + 10 + 1210 + 58801 = 60269 := by decide
+
+theorem degree_five_assignment_count :
+    (1 : Nat) * 3^5 + 5 * 3^4 + 242 * 3^5 +
+    10 * 3^3 + 1210 * 3^4 + 58801 * 3^5 = 14446377 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -67,4 +74,6 @@ theorem degree_four_assignment_count :
 #print axioms selected_cover_primes_exceed_ceilings
 #print axioms degree_four_denominator_count
 #print axioms degree_four_assignment_count
+#print axioms degree_five_denominator_count
+#print axioms degree_five_assignment_count
 end GHSOdd5Ledger
