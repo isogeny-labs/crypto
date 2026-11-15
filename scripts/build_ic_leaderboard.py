@@ -2692,6 +2692,53 @@ def tableb_binary_ksum_html(k: dict) -> str:
             '</tbody></table></div>' + gh(SOURCES["tableb_binary_ksum"], "Analysis") + '</section>')
 
 
+def ghs_weak_headline_dl1() -> dict:
+    """Owner decision 2026-11-15: the GHS-weak headline arm is DL1 (SGE + scalar Lanczos), not DL (block Lanczos,
+    width 4). An arm choice, not an improvement: both arms are measured in every study unit. DL1's k = 22 mean cold
+    M-eq comes from research/ic_gw_nrm_lz_20261115/analysis.json (recomputed by its validator, VAL-20261115-5c7af8);
+    the rho band and the study's standing come from that study's VALIDATION.json."""
+    a = load(SOURCES["ghs_weak_nrmlz"])
+    errs = checked_evidence_dir(REPO / GHS_NRMLZ_EVIDENCE, REPO)
+    man = json.loads((REPO / GHS_NRMLZ_EVIDENCE / gate.MANIFEST).read_text()) if not errs else {}
+    band = man.get("rho_reference", {}).get("gae_band", {})
+    g = a["gap_k22"]["ic_mean_meq"]
+    rows = []
+    if band:
+        for w in ("0", "0.1", "1"):
+            rows.append({"w": w, "dl": g[f"BOTH/DL/{w}"], "dl1": g[f"BOTH/DL1/{w}"], "rho": band[w]["rho"]})
+    return {"rows": rows, "validated": not errs,
+            "validation": (f"evidence: {GHS_NRMLZ_EVIDENCE}/VALIDATION.json (validated)") if not errs else
+                          ("not validated: " + "; ".join(errs))}
+
+
+def ghs_headline_dl1_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3}: headline arm DL1 (owner decision 2026-11-15), outside tables A–C", "",
+         "The double-large-prime IC on this family is measured with three linear-algebra arms in every unit: D (plain "
+         "Lanczos), DL1 (structured Gaussian elimination + scalar Lanczos) and DL (structured Gaussian elimination + block "
+         "Lanczos of width 4). Block Lanczos's vector work grows with its width while its matrix work is the same, so under "
+         "the counted model DL1 is cheaper than DL at every size and addition price; block width buys parallel wall time, "
+         "which the counted model does not value. By owner decision (2026-11-15) the headline arm of the GHS-weak sections "
+         "is DL1 from now on. This is an arm choice, not an improvement: no cost changed, and the earlier sections keep "
+         f"their DL figures. {g['validation']}.", "",
+         "| w | DL, mean cold M-eq (k = 22) | DL1 | rho-neg (frozen band) | DL / rho | DL1 / rho |", "|--:|--:|--:|--:|--:|--:|"]
+    for r in g["rows"]:
+        L.append(f"| {r['w']} | {r['dl']:.4g} | {r['dl1']:.4g} | {r['rho']:.4g} | {r['dl'] / r['rho']:.5f} | {r['dl1'] / r['rho']:.5f} |")
+    L += ["", "Configuration: the latest GHS-weak configuration (c_D = 1.7, square-root chain, fast relation stage, block "
+          "Lanczos reuse, normalised-coordinate relation stage, scalar Lanczos reuse); seeds 1–3; [pcc:unverified].", ""]
+    return L
+
+
+def ghs_headline_dl1_html(g: dict) -> str:
+    md = ghs_headline_dl1_md(g)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    tr = [x for x in md if x.startswith("| ") and not x.startswith("| w ")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ghs-weak-headline-dl1"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub>: headline arm DL1 (owner decision '
+            '2026-11-15)</h2>' + body + '<div class="scroll"><table><thead><tr><th>w</th><th>DL</th><th>DL1</th>'
+            '<th>rho-neg</th><th>DL / rho</th><th>DL1 / rho</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            gh(SOURCES["ghs_weak_nrmlz"], "Analysis") + '</section>')
+
+
 def _ci(v, lo, hi, i):
     return f"{v[i]:.3g} [{lo[i]:.3g}, {hi[i]:.3g}]"
 
@@ -3521,6 +3568,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "ghs_weak_relstage_component": ghs_weak_relstage(),
         "ghs_weak_blreuse_component": ghs_weak_blreuse(),
         "ghs_weak_nrmlz_component": ghs_weak_nrmlz(),
+        "ghs_weak_headline_dl1": ghs_weak_headline_dl1(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -4763,6 +4811,7 @@ def markdown(doc: dict) -> str:
     L += ghs_relstage_md(doc["ghs_weak_relstage_component"])
     L += ghs_blreuse_md(doc["ghs_weak_blreuse_component"])
     L += ghs_nrmlz_md(doc["ghs_weak_nrmlz_component"])
+    L += ghs_headline_dl1_md(doc["ghs_weak_headline_dl1"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -6611,6 +6660,7 @@ def page(doc: dict, standalone: bool) -> str:
     P.append(ghs_relstage_html(doc["ghs_weak_relstage_component"]))
     P.append(ghs_blreuse_html(doc["ghs_weak_blreuse_component"]))
     P.append(ghs_nrmlz_html(doc["ghs_weak_nrmlz_component"]))
+    P.append(ghs_headline_dl1_html(doc["ghs_weak_headline_dl1"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]

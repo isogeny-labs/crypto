@@ -1024,6 +1024,19 @@ DL against the frozen negation-map rho at k = 22 (mean cold M-eq over seeds 1–
 Study: [research/ic_gw_nrm_lz_20261115/](../../research/ic_gw_nrm_lz_20261115/); [report](../../research/ic_gw_nrm_lz_20261115/REPORT.pdf); source `research/ic_gw_nrm_lz_20261115/analysis.json`. Counted operations (host-independent); local L0 runs.
 
 
+## GHS-weak E0/F_{q^3}: headline arm DL1 (owner decision 2026-11-15), outside tables A–C
+
+The double-large-prime IC on this family is measured with three linear-algebra arms in every unit: D (plain Lanczos), DL1 (structured Gaussian elimination + scalar Lanczos) and DL (structured Gaussian elimination + block Lanczos of width 4). Block Lanczos's vector work grows with its width while its matrix work is the same, so under the counted model DL1 is cheaper than DL at every size and addition price; block width buys parallel wall time, which the counted model does not value. By owner decision (2026-11-15) the headline arm of the GHS-weak sections is DL1 from now on. This is an arm choice, not an improvement: no cost changed, and the earlier sections keep their DL figures. evidence: research/ic_gw_nrm_lz_20261115/validation/VALIDATION.json (validated).
+
+| w | DL, mean cold M-eq (k = 22) | DL1 | rho-neg (frozen band) | DL / rho | DL1 / rho |
+|--:|--:|--:|--:|--:|--:|
+| 0 | 8.077e+08 | 4.413e+08 | 3.796e+11 | 0.00213 | 0.00116 |
+| 0.1 | 9.777e+08 | 6.113e+08 | 4.909e+11 | 0.00199 | 0.00125 |
+| 1 | 2.508e+09 | 2.141e+09 | 1.493e+12 | 0.00168 | 0.00143 |
+
+Configuration: the latest GHS-weak configuration (c_D = 1.7, square-root chain, fast relation stage, block Lanczos reuse, normalised-coordinate relation stage, scalar Lanczos reuse); seeds 1–3; [pcc:unverified].
+
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
