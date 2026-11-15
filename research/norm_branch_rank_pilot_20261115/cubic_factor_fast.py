@@ -11,8 +11,8 @@ This locates a *toy coefficient-rank defect*, not an ECDLP relation or solver.
 import argparse
 import json
 import random
-from locus_selector import (interpolate, mul, divide, square_cubic_from_monic,
-                            matrix)
+from locus_selector import (mul, divide, square_cubic_from_monic, matrix)
+from quotient_interpolate import interpolate_quotient
 from run import elimination
 
 
@@ -88,20 +88,19 @@ def select(p,fixed,seed=1):
     if p<=50 or p%2==0 or len(fixed)!=7 or len(set(v%p for v in fixed))!=7:
         raise ValueError('odd prime p>50 and seven distinct residues required')
     fixed=[v%p for v in fixed]
-    poly=interpolate(fixed,p)  # 19 values and 32 out-of-sample checks
-    collision=[1]
-    for x in fixed[4:]:
-        for _ in range(4): collision=mul(collision,[-x%p,1],p)
-    q,r=divide(poly,collision,p)
-    if r!=[0]: raise AssertionError('collision-factor conjecture fails')
-    cubic=square_cubic_from_monic(q,p)  # fails closed if not a square
+    # Universal column-operation argument: (z-x_j)^4 divides det K for
+    # each j=4,5,6 over Z[x_0,...,x_7]. The quotient has degree <=6 in z,
+    # so seven noncollision determinant evaluations suffice for interpolation.
+    q=interpolate_quotient(fixed,p,heldout_checks=32)
+    cubic=square_cubic_from_monic(q,p)  # remaining cubic-square hypothesis; fails closed
     roots=all_roots(cubic,p,seed=seed)
     good=[z for z in roots if z not in fixed]
     ranks=[len(elimination(matrix(fixed+[z],p),p)[1]) for z in good]
     if any(x>=6 for x in ranks): raise AssertionError('noncollision root retained full rank')
     return {'p':p,'fixed':fixed,'cubic':cubic,'noncollision_roots':good,
             'ranks':ranks,'root_count':len(roots),'gcd_root_count':len(roots),
-            'det_degree':len(poly)-1,'heldout_determinant_checks':32,
+            'det_degree':12+len(q)-1,'quotient_degree':len(q)-1,
+            'interpolation_points':7,'heldout_determinant_checks':32,
             'scope':'coefficient-matrix diagnostic only'}
 
 
