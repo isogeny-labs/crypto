@@ -211,6 +211,7 @@ impl<'a> Ctx<'a> {
             beta,
             beta2,
         };
+        let norow = std::env::var_os("NOROWBATCH").is_some();
         let mut ents = Vec::new();
         let mut dd = Vec::new();
         let mut sc = Vec::new();
@@ -228,21 +229,31 @@ impl<'a> Ctx<'a> {
                     ents.push((kk, i as u32, i as u32, 0, 0, se as u8));
                 }
             }
+            // One batched inversion per i (all j, m) instead of one per (i, j).
+            dd.clear();
             for j in i..b_size {
-                dd.clear();
                 let ms: &[usize] = if j == i { &[1, 2] } else { &[0, 1, 2] };
                 for &m in ms {
                     let dx = f.sub(me.cand[3 * j + m].x, fi.x);
                     dd.push(if dx == 0 { f.one } else { dx });
                 }
+            }
+            if !norow {
                 f.batch_inv(&mut dd, &mut sc);
+            }
+            let mut pos = 0usize;
+            for j in i..b_size {
+                let ms: &[usize] = if j == i { &[1, 2] } else { &[0, 1, 2] };
+                if norow {
+                    f.batch_inv(&mut dd[pos..pos + ms.len()], &mut sc);
+                }
                 for (t, &m) in ms.iter().enumerate() {
                     let qj = me.cand[3 * j + m];
                     if f.sub(qj.x, fi.x) == 0 {
                         continue;
                     }
-                    let sx = c.add_x_with_inv(fi, qj, dd[t]);
-                    let dx2 = c.add_x_with_inv(fi, c.neg(qj), dd[t]);
+                    let sx = c.add_x_with_inv(fi, qj, dd[pos + t]);
+                    let dx2 = c.add_x_with_inv(fi, c.neg(qj), dd[pos + t]);
                     if rot {
                         let mut a1 = sx;
                         let mut a2 = dx2;
@@ -259,6 +270,7 @@ impl<'a> Ctx<'a> {
                         ents.push((k2, i as u32, j as u32, m as u8, 1, s2 as u8));
                     }
                 }
+                pos += ms.len();
             }
         }
         let hs = (ents.len() * 2).next_power_of_two().max(16);
