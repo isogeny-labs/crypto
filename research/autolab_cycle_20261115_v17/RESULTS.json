@@ -1,0 +1,336 @@
+{
+  "e2-fiber-preparation-20261115-v17": {
+    "evidence": {
+      "actual": {
+        "cells": []
+      },
+      "checks": 117,
+      "complete_global_root_search": false,
+      "controls": [
+        {
+          "E2_rank": 2,
+          "assignments": 16,
+          "inner_bits": 2,
+          "moment_models": 8,
+          "n": 2
+        },
+        {
+          "E2_rank": 3,
+          "assignments": 16,
+          "inner_bits": 1,
+          "moment_models": 4,
+          "n": 3
+        },
+        {
+          "E2_rank": 3,
+          "assignments": 16,
+          "inner_bits": 1,
+          "moment_models": 2,
+          "n": 4
+        }
+      ],
+      "error": "UnboundLocalError: cannot access local variable 'actual' where it is not associated with a value",
+      "external_reviewer": false,
+      "original_root_count_exact": null,
+      "peak_process_rss_kib": 24196,
+      "qualified_speedup": null,
+      "raw_bytes": 206,
+      "raw_sha256": "7d944bf1538854928f875229f64134f5669b38548b944aea66ec447190b211f0",
+      "release_gate_claim": false,
+      "worker_seconds": 0.003025874997547362
+    },
+    "experiment_id": "e2-fiber-preparation-20261115-v17",
+    "next_actions": [
+      "If cells close cheaply, derive whole-outer-cell polynomial inconsistency certificates or a stronger batching rule; do not mistake eight cells for2^E2rank coverage. If postlinear nullity cap fails, change the chosen coefficient projection before retry."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "inconclusive",
+    "summary": "Exact E2-fiber linear elimination followed by bounded complete quadratic-moment cell enumeration; conditional necessary-condition certificates only."
+  },
+  "e2-fiber-repair-preparation-20261115-v17": {
+    "evidence": {
+      "actual": {
+        "E2_rank": 34,
+        "all_E2_cells": 17179869184,
+        "cells": [
+          {
+            "E2": 25876607751,
+            "complete_moment_cell": true,
+            "enumerated": 4096,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.07031636700048693,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 8220704066,
+            "complete_moment_cell": true,
+            "enumerated": 4096,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06783684599940898,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 7861155248,
+            "complete_moment_cell": true,
+            "enumerated": 4096,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06759609300206648,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 14693259938,
+            "complete_moment_cell": true,
+            "enumerated": 4096,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06780553799762856,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 15101837610,
+            "complete_moment_cell": true,
+            "enumerated": 4096,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06688417999976082,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 28003257284,
+            "complete_moment_cell": true,
+            "enumerated": 4096,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06845260399859399,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 18557387893,
+            "complete_moment_cell": true,
+            "enumerated": 4096,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06768684900089283,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 27111207235,
+            "complete_moment_cell": true,
+            "enumerated": 4096,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06500677700023516,
+            "syndrome_terms": 79
+          }
+        ],
+        "coverage_scope": "Only explicitly fixed E2 cells of one exposed h/k chart; no global source or original-chain completion.",
+        "inner_bits": 35,
+        "parameter_bits": 69,
+        "rejected_cells": 8,
+        "tested_E2_cells": 8
+      },
+      "checks": 233,
+      "complete_global_root_search": false,
+      "controls": [
+        {
+          "E2_rank": 2,
+          "assignments": 16,
+          "inner_bits": 2,
+          "moment_models": 8,
+          "n": 2
+        },
+        {
+          "E2_rank": 3,
+          "assignments": 16,
+          "inner_bits": 1,
+          "moment_models": 4,
+          "n": 3
+        },
+        {
+          "E2_rank": 3,
+          "assignments": 16,
+          "inner_bits": 1,
+          "moment_models": 2,
+          "n": 4
+        }
+      ],
+      "error": null,
+      "external_reviewer": false,
+      "original_root_count_exact": null,
+      "peak_process_rss_kib": 26300,
+      "qualified_speedup": null,
+      "raw_bytes": 13803,
+      "raw_sha256": "1785cf211fe87fba0ef1272f2799645892a49bb96132e9063a237e254f76c2bd",
+      "release_gate_claim": false,
+      "worker_seconds": 0.5479252099976293
+    },
+    "experiment_id": "e2-fiber-repair-preparation-20261115-v17",
+    "next_actions": [
+      "If cells close cheaply, derive whole-outer-cell polynomial inconsistency certificates or a stronger batching rule; do not mistake eight cells for2^E2rank coverage. If postlinear nullity cap fails, change the chosen coefficient projection before retry."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "passed",
+    "summary": "Exact E2-fiber linear elimination followed by bounded complete quadratic-moment cell enumeration; conditional necessary-condition certificates only."
+  },
+  "e2-certificate-preparation-20261115-v17": {
+    "evidence": {
+      "actual": {
+        "E2_rank": 34,
+        "all_E2_cells": 17179869184,
+        "cells": [
+          {
+            "E2": 25876607751,
+            "certificate_seconds": 0.01939197100000456,
+            "complete_moment_cell": true,
+            "enumerated": 0,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06772922800155357,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 8220704066,
+            "certificate_seconds": 0.019231750000471948,
+            "complete_moment_cell": true,
+            "enumerated": 0,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06891499700213899,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 7861155248,
+            "certificate_seconds": 0.02089030200295383,
+            "complete_moment_cell": true,
+            "enumerated": 0,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06897859200034873,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 14693259938,
+            "certificate_seconds": 0.019555586997739738,
+            "complete_moment_cell": true,
+            "enumerated": 0,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06836077999832924,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 15101837610,
+            "certificate_seconds": 0.020612471998902038,
+            "complete_moment_cell": true,
+            "enumerated": 0,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06873496399930445,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 28003257284,
+            "certificate_seconds": 0.01944840600117459,
+            "complete_moment_cell": true,
+            "enumerated": 0,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06885068900010083,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 18557387893,
+            "certificate_seconds": 0.02037909999853582,
+            "complete_moment_cell": true,
+            "enumerated": 0,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06971039599739015,
+            "syndrome_terms": 79
+          },
+          {
+            "E2": 27111207235,
+            "certificate_seconds": 0.01938340699780383,
+            "complete_moment_cell": true,
+            "enumerated": 0,
+            "moment_count_exact": 0,
+            "rejected_supported_norm_cell": true,
+            "remaining_bits": 12,
+            "seconds": 0.06814428299912834,
+            "syndrome_terms": 79
+          }
+        ],
+        "coverage_scope": "Only explicitly fixed E2 cells of one exposed h/k chart; no global source or original-chain completion.",
+        "inner_bits": 35,
+        "parameter_bits": 69,
+        "rejected_cells": 8,
+        "tested_E2_cells": 8
+      },
+      "certificate_controls": {
+        "all_unordered_two_variable_polynomial_pairs": 136,
+        "certified": 41,
+        "nonconstant_positive_control": true,
+        "unsatisfiable": 41
+      },
+      "checks": 646,
+      "complete_global_root_search": false,
+      "controls": [
+        {
+          "E2_rank": 2,
+          "assignments": 16,
+          "inner_bits": 2,
+          "moment_models": 8,
+          "n": 2
+        },
+        {
+          "E2_rank": 3,
+          "assignments": 16,
+          "inner_bits": 1,
+          "moment_models": 4,
+          "n": 3
+        },
+        {
+          "E2_rank": 3,
+          "assignments": 16,
+          "inner_bits": 1,
+          "moment_models": 2,
+          "n": 4
+        }
+      ],
+      "error": null,
+      "external_reviewer": false,
+      "original_root_count_exact": null,
+      "peak_process_rss_kib": 28192,
+      "qualified_speedup": null,
+      "raw_bytes": 15874,
+      "raw_sha256": "0662164f932e28afbce12b66ff09ff283799c6ea49e25ff684f7297c8af5864a",
+      "release_gate_claim": false,
+      "worker_seconds": 0.559001169000112
+    },
+    "experiment_id": "e2-certificate-preparation-20261115-v17",
+    "next_actions": [
+      "Lift normalized certificate pivots to guarded outer-E2 parameter cells, preserving all exceptional pivot-zero branches; test whole-cell guards instead of enumerating2^34outer coefficients. Degree3 Boolean identities are established proof machinery, not a novelty claim."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "passed",
+    "summary": "Exact E2-fiber elimination plus replayed low-degree Boolean inconsistency identities, with bounded enumeration fallback; conditional norm cells only."
+  }
+}
