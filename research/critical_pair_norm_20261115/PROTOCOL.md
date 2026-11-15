@@ -78,3 +78,40 @@ This worktree begins at source79045b80da. Its no-checkout creation needed a
 worktree restore after sparse patterns were inherited; all tracked bytes now
 match that head and no implementation/call preceded this protocol. The
 requested complete general prime-field algorithm remains the active goal.
+
+## Amendment A1 — chain-pair filtering and reducer ordering
+
+Qualification001 completes the six small controls and natural Kummer case,
+then all eight empty auxiliary ideals; all four positive cases hit the fixed
+1M reduction cap. Preserve the entire round and source7f7ce5112e. Pending
+queues contain tens of thousands of pairs. This is an observed schedule/cap
+outcome, not a degree lower bound. [pcc:unverified]
+
+Before new calls, add standard chain-pair filtering from the primary msolve
+paper's section3.1 discussion. A pair (a,b) may be skipped only if a third
+current basis polynomial h has LT(h) dividing LCM(LT(a),LT(b)) and both
+unordered pairs (a,h),(b,h) already have standard representations: either
+coprime-leading-term skips, previously processed reductions (including a
+nonzero remainder installed into the basis), or an earlier justified chain
+skip. Record those statuses in a charged set; deferred pairs have no status.
+The standard-representation induction expresses S(a,b) as monomial multiples
+of the two known S-polynomials, with every represented leading term strictly
+below the original LCM. A processed nonzero remainder supplies such a
+representation once installed; no zero-remainder assertion is fabricated.
+The unchanged final checker still checks every exported-basis S-pair.
+[pcc:unverified]
+
+For reduction, prefer a divisor with the lowest leading-monomial degree,
+then monomial index/creation order. Keep the same pair priority, equations,
+degree deferrals, source DAG, verifier and all caps. Chain-skipped pairs are
+counted separately and do not materialize a source/S row; charge all status
+set entries and reducer-order bookkeeping. This jointly tests the two
+standard scheduling changes and cannot attribute a result to either alone.
+
+Exactly one fresh qualification002 repeats the same six exact controls,
+natural Kummer D4 and all twelve auxiliary D6 targets. No old producer or
+msolve run, cold recovery, cap/degree ladder or scientific timing is added.
+Build fresh binaries, freeze a new source commit before calls and use a new
+immutable copied wrapper. Preserve every unknown and all complete-set,
+original-equation and OpenSSL checks, with distinct manifests and a separate
+whole write-once archive. No later amendment is authorized by an UNKNOWN.

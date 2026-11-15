@@ -26,3 +26,19 @@ after this merge. The prospective protocol clarification precedes any call.
 The final source commit will bind the immutable qualification001 wrapper.
 An irrelevant follow-up patch looked for a line in the wrong note and failed
 verification before editing anything; the intended publication append is here.
+
+Qualification001 at source7f7ce5112e finishes with all six small controls and
+the natural Kummer D4 system matching. At auxiliary D6, eight empty ideals
+complete with source-DAG proofs and four positive targets hit the1M reduction
+cap; their queues have tens of thousands of pending pairs. OpenSSL reports
+12 targets,8 completed,4 unknown,0 completed models. There is no positive
+auxiliary source-certificate result. All19 build bindings and nine wrapper/
+source/binary bindings remain unchanged at round completion. [pcc:unverified]
+
+The whole round is314744 bytes, SHA256
+bedb93ed6cdfd9c259d1a85e804d5454228289ef2920439ad773b917855021fa.
+Normalized unpack/repack is byte-identical. Preserve it before any source
+change; no old producer is rerun. The failed status read first used stdout.log
+instead of the backend's actual backend.stdout name; no computation was
+repeated, and the actual four stderr files report the reduction cap.
+[pcc:unverified]
