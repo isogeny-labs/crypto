@@ -61,6 +61,15 @@ theorem degree_five_assignment_count :
     (1 : Nat) * 3^5 + 5 * 3^4 + 242 * 3^5 +
     10 * 3^3 + 1210 * 3^4 + 58801 * 3^5 = 14446377 := by decide
 
+theorem trace26_ten_target_count : (1 : Nat) + 9 = 10 := by decide
+
+theorem trace26_class_screen_sizes :
+    (10 : Nat) * 59697 = 596970 ∧
+    (10 : Nat) * 14446377 = 144463770 := by decide
+
+theorem trace26_cover_degrees_coprime_to_109 :
+    (List.range 21).all (fun d => decide (d < 6 ∨ Nat.gcd d 109 = 1)) = true := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -76,4 +85,7 @@ theorem degree_five_assignment_count :
 #print axioms degree_four_assignment_count
 #print axioms degree_five_denominator_count
 #print axioms degree_five_assignment_count
+#print axioms trace26_ten_target_count
+#print axioms trace26_class_screen_sizes
+#print axioms trace26_cover_degrees_coprime_to_109
 end GHSOdd5Ledger

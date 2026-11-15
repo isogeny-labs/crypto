@@ -66,6 +66,13 @@ set for each target: thirteen alternate-target degree-five interpolation
 survivors in total. Every survivor fails the exact equation
 `f C²=B(A³+2A²B+bB³)`, so no degree-five morphism exists. The order and
 complete search space were checked separately for every b-mask.
+The frozen `degree5_isogeny_survivors.magma` submits all thirteen exact
+alternate-target pairs to public Magma 2.30-1. Its retained response
+`degree5_isogeny_survivors_magma.json` reports HTTP 200, successful exit,
+untruncated stdout, and a degree-eight nonsquare quotient for every pair;
+all listed irreducible factors have exponent one. Magma independently checks
+the full-equation obstruction; the two Sage constructions check the complete
+branch interpolation and exact candidate sets.
 
 [Howe, Theorem 4.17 and Remark 4.18](https://arxiv.org/pdf/2110.04221)
 give a K-map of degree at most twenty to each E_b, since `J(Y)_K` lies in
@@ -86,10 +93,13 @@ catalog correction, not established publication priority. The KB revision
 `9141e386254340a9bdba3036f2bb706a` predates this branch. These checks
 support a new exact finite-class cover obstruction relative to the inspected
 records; they do not certify a new attack family or method.
+All ten targets share the same LMFDB isogeny-class flag, so that catalog check
+applies to every table row; targeted individual-equation searches returned
+irrelevant matches and cannot establish priority for any row.
 
 The theorem covers this one Y, these ten E_b, and K-defined curve morphisms.
 It leaves degrees six to twenty, other carriers in the same Weil-restriction
 class, correspondences, maps over larger fields, explicit E-to-E isogenies,
 an F3-rational subgroup transfer, and full same-target attack costs open.
-The 15 axiom-free declarations in `Odd5Ledger.lean` check arithmetic counts
+The 18 axiom-free declarations in `Odd5Ledger.lean` check arithmetic counts
 and degree ceilings only; they do not formalize geometry or exhaustiveness.
