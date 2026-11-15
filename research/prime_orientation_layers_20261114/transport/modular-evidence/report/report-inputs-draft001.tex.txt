@@ -1,0 +1,96 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref}
+\usepackage[margin=.74in]{geometry}
+\setlength{\parindent}{0pt}\setlength{\parskip}{7pt}
+\begin{document}
+\begin{center}{\Large Actual integer-cast payload correspondence}\\[4pt]
+Local successor --- 15 November 2026\end{center}
+\textbf{Result and evidence.} Local draft041 elaborates225 theorem statements
+including prior218,exit0/no warnings. Data PCC-20261115-3ef69a and receipt021
+pin exact source,compiler log and exit. A literal primitive records its actual
+integer argument alongside the previous primitive event trace. The recursive
+materialized evaluator combines child input lists in evaluation order.
+All records are unsigned/defaultnot\_covered; this is local evidence outside
+shared Transport53/57/fresh [pcc:unverified].
+
+\textbf{Exact correspondence.} Write $E(h,z,e)$ for the previous event evaluator
+and $E_I(h,z,e)$ for the payload-instrumented evaluator. Its outcome field
+contains the complete old value and old event list. The source proves
+\[
+ E_I(h,z,e).\mathrm{outcome}=E(h,z,e),\qquad
+ E_I(h,z,e).\mathrm{inputs}=\mathrm{literals}(e).
+\]
+The equalities hold for every commutative ring, every rectangle dimension,
+and every expression, including zero dimensions and signed/zero literals.
+Literal arguments are recorded at the cast call; their identity is not inferred
+from an operation-count equality. Addition, negation and convolution reuse the
+prior materialized primitive helpers. Exact outcome erasure concerns semantics,
+not a compiler theorem eliminating instrumentation work [pcc:unverified].
+
+\textbf{Recorded size.} Input-list length equals the number of explicit literal
+cast events. With sign/magnitude width
+$\mathrm{width}(n)=\mathrm{Nat.size}(|n|)+1$, the recorded volume equals the
+previous static input volume. For actual Packed approximation and its derived
+node bound $N_*$ and literal budget $B_A$,
+\[
+ \sum_{n\in E_I(h,z,e).\mathrm{inputs}}\mathrm{width}(n)
+ =\mathrm{inputVolume}(e)\le N_*(B_A+2).
+\]
+Repeated literal occurrences are retained. Actual signed-grid, bounded-port,
+node and scalar premises remain unchanged. This is an input representation
+bound, not the cost of constructing, reading or reducing the inputs
+[pcc:unverified].
+
+\textbf{Scope retained.} Old literal casts were opaque ring operations. The
+next component separately implements binary evaluation from an already available
+bit list; it is not retroactively substituted into the prior interpreter.
+Neither result prices scalar/rational normalization, input-list production,
+indices, arrays, expression/denominator construction, trace/logging, inversion,
+memory, recursion or public recovery [pcc:unverified].
+
+\newpage
+\begin{center}{\Large Signed binary input: explicit ring calls}\end{center}
+\textbf{Result and evidence.} Local draft043 elaborates235 statements including
+prior225,exit0/no warnings. Data PCC-20261115-1f242e and receipt022 pin failed042
+and accepted043 with all raw logs/exits. A positive constructor cast mismatch
+was repaired by the exact Int.ofNat-to-natural-cast identity; no premise or
+count changed. Failed dependent output containing sorryAx is retained as a
+failure and is not accepted evidence [pcc:unverified].
+
+\textbf{Actual recursion.} On an LSB-first Boolean list, recurse on its tail,
+then call the existing addition primitive twice:
+\[
+ v'=v+v,\qquad v''=v'+\begin{cases}1&b=\mathrm{true},\\0&b=\mathrm{false}.\end{cases}
+\]
+Append the two actual addition events and record the bit read. The empty list
+returns zero. The signed routine folds the magnitude bits, then invokes one
+negation for a negative constructor. It returns the ring cast of the original
+integer, including zero and negative values. Exact source results are
+\[
+ \#\mathrm{reads}=\mathrm{Nat.size}(|n|),\qquad
+ \#\mathrm{additions}=2\,\mathrm{Nat.size}(|n|),\qquad
+ \#\mathrm{negations}\le1.
+\]
+For $|n|\le2^B$, these imply reads$\le B+1$ and additions$\le2(B+1)$.
+Read order is the reverse of the supplied LSB-first list, matching the recursive
+value computation. Primary sources are the pinned Mathlib Nat Bits, BinaryRec
+and Size implementations and their exact bit-length identities. Standard binary
+evaluation is reused without a novelty claim [pcc:unverified].
+
+\begin{center}\includegraphics[width=.98\linewidth]{input-dependencies-001.pdf}\end{center}
+
+\textbf{Open composition.} The binary routine begins with an available bit list;
+its extraction, allocation and traversal costs remain charged. Ring addition
+is not one bit operation. Fixed constants, Boolean selection, word-width
+reduction, trace concatenation, signed input preparation and substitution into
+the actual evaluator remain separate obligations. The two components do not
+constitute total bit runtime [pcc:unverified].
+
+\textbf{Next discriminating proof.} Construct a fixed-width Boolean ripple
+adder, retaining overflow carry and width zero. Prove its arithmetic identity
+and emitted gate counts from actual recursion, then connect it to residues
+modulo $2^q$ and the recorded inputs. Preserve all preparation and original
+creation/mode/elliptic relation/finder/extraction/expected-cost obligations
+[pcc:unverified].
+\end{document}
