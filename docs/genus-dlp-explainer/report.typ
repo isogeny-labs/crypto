@@ -299,7 +299,7 @@ Every non-hyperelliptic curve of genus $g >= 3$ has a plane model of degree $g +
 #caption[Diagram 5. Three published routes into the higher-genus regime, and the prime-field case that has none of them. Every arrow is a group homomorphism that is efficiently computable in the forward direction, which is all a transfer needs.]
 
 == Large genus: the function-field regime
-When $g$ grows with $log q$ the Jacobian behaves like the class group of a function field, and the degree-$g$ divisors are "smooth" over degree-1 places with Dickman-type probability in the ratio $g \/ (text("smoothness degree"))$. Adleman, DeMarrais and Huang (1994) first made this subexponential; Enge and Gaudry (2002) proved
+When $g$ grows with $log q$ the Jacobian behaves like the class group of a function field, and the degree-$g$ divisors are "smooth" over degree-1 places with Dickman-type probability in the ratio $g \/ (text("smoothness degree"))$. Adleman, DeMarrais and Huang (1994) first made this subexponential; Enge and Gaudry (2002) give the bound
 
 $ L_(q^g)(1\/2, sqrt(2)) = exp((sqrt(2) + o(1)) sqrt(g log q dot log(g log q))) quad "for" g \/ log q arrow.r infinity, $
 
