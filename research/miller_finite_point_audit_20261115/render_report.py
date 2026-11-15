@@ -1,0 +1,34 @@
+"""Render proof results/provenance only; no research arithmetic."""
+from pathlib import Path
+import html,json,fitz
+from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib import colors
+from reportlab.graphics.shapes import Drawing,Rect,String
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+r=Path(__file__).resolve().parent;o=r/'reports';o.mkdir(exist_ok=True)
+pdfmetrics.registerFont(TTFont('DV','/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'))
+pdfmetrics.registerFont(TTFont('DVB','/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'))
+pdfmetrics.registerFontFamily('DV',normal='DV',bold='DVB')
+b=ParagraphStyle('b',fontName='DV',fontSize=8.7,leading=11.5,spaceAfter=8)
+t=ParagraphStyle('t',fontName='DVB',fontSize=17,leading=22,spaceAfter=14)
+def p(s):return Paragraph(s,b)
+d=Drawing(500,120);svg=['<svg xmlns="http://www.w3.org/2000/svg" width="500" height="120" viewBox="0 0 500 120">']
+rows=[(81,'Local rings','Actual evaluation kernel, localized maximal ideal','Shifted equation + nonzero partial derive actual DVR'),(42,'Orders','Full actual function field and official normalized adic','Actual ideal powers count all repeated intersections'),(3,'Divisors','Line P+Q+(-P-Q)-3O; vertical P+(-P)-2O','Three-torsion tangent 3P-3O; actual guard countercontrols')]
+for yy,title,a,c in rows:
+ d.add(Rect(0,yy,500,34,fillColor=colors.HexColor('#eaf2f6'),strokeColor=colors.HexColor('#2c788e')))
+ svg.append(f'<rect x="0" y="{120-yy-34}" width="500" height="34" fill="#eaf2f6" stroke="#2c788e"/>')
+ for xx,y,txt,size in [(9,yy+17,title,8.1),(104,yy+21,a,7.6),(104,yy+7,c,7.4)]:
+  d.add(String(xx,y,txt,fontName='DV',fontSize=size));svg.append(f'<text x="{xx}" y="{120-y}" font-size="{size}" font-family="DejaVu Sans,sans-serif">{html.escape(txt)}</text>')
+svg.append('</svg>');(o/'local-divisor.svg').write_text('\n'.join(svg)+'\n')
+g=json.loads((r/'evidence/gate.json').read_text());a=json.loads((r/'evidence/attempts.json').read_text());binding=json.loads((r/'evidence/binding-check.json').read_text())['observations'][0];size=(r/'evidence/attempts.tar.xz').stat().st_size
+flow=[Paragraph('Actual finite local rings and Miller divisors',t),p('<b>Result.</b> Lean derives the actual finite-point local DVRs and normalized local zero orders of the chord/tangent and vertical functions. Together with the proved infinity chart orders, it proves finite support and the corresponding principal point-divisor identities. Actual point orders define the divisor; intersection multiplicities and local regularity are not postulated. [pcc:unverified]'),d,Spacer(1,9),p('<b>Local geometry.</b> Actual coordinate-ring evaluation is surjective with kernel the actual point ideal (X−xP,Y−yP). Its localization is a Noetherian local domain. For U=X−xP,V=Y−yP, the exact shifted relation is V(V+a1U+A)=U(U²+(3xP+a2)U+B), where A=2yP+a1xP+a3 and B=3xP²+2a2xP+a4−a1yP. Nonsingularity gives A≠0 or B≠0. The corresponding bracket is a unit after localization, so U or V generates its nonzero maximal ideal and the actual DVR structure is derived. An explicit injective localization map identifies the full actual curve FunctionField as its fraction field. [pcc:unverified]'),p('<b>Orders and principal point divisors.</b> The official normalized height-one adic valuation gives order n whenever an actual principal ideal equals the nth power of the local maximal ideal. An actual point ideal localizes to that maximal ideal at the same point and to the unit ideal at every other point. Applying the previously proved chord and negative-pair ideal equalities derives all finite zero orders, including repeated points and tangencies. Actual infinity pole orders are −3 and −2. Lean proves finite support and div(line)=(P)+(Q)+(−P−Q)−3(O), div(vertical)=(P)+(−P)−2(O), and div(three-torsion tangent)=3(P)−3(O). These are Finsupps built from the actual normalized local valuations. [pcc:unverified]'),p('<b>Skeptical controls.</b> On the actual nonsingular F5 curve y²=x³+1, (4,0) is a two-torsion point: its vertical function has order2 and X−4 fails to generate the actual local maximal ideal. At the actual non-three-torsion point (2,2), the tangent has order2 and an additional simple zero at (0,1). Lean proves its actual principal point divisor differs from 3(P)−3(O). These counterexamples target deletion of the exceptions; the qualified source statements survive. [pcc:unverified]'),p(f'<b>Verification.</b> Whole tracked project gate {g["declarations"]}/0 failures/0 trusted native, only propext/Classical.choice/Quot.sound. Twenty-seven modules: nineteen byte-identical credited earlier modules and eight new ones. Complete {binding["full_characters"]}-character written binding {binding["full_decl_sha256"]}; native1complete/0prefix/0unresolved. Twelve snapshots/seven failures/five successes, setup/KB/Conductor/protocol/control amendment retained: {a["files"]}files/{a["unique_objects"]}objects/{size}-byte losslessXZ plus five gate files. Final12/project logs have no warnings/errors; frozen auditor has one inherited String.mk deprecation. No holes/custom axioms/nativeproofeval/raisedlimits/globalflags/waivers/frozenedits/cryptoPython/spend/upload. [pcc:unverified]'),p('<b>Source scope and remaining bridges.</b> Galbraith chapter7, extended corrected v2.0: primary281643bytes/21pages/SHA c5b9a25e…; PDF1–2,7–10,14–15 text-read, PDF2,8,9,15 visually inspected, not all21pages. Fresh finite-point Example7.3.4 and full Lemma7.7.10 proof text reread; Def7.7.2 gives the divisor convention. Chapter26 prior printed574–577/PDF2–5 read, not all16pages. Exact official APIs and reused Lean cores credited. KB/Conductor127, explicit fallback; no novelty claim. Over arbitraryK the Finsupp is on nonsingular K-points; for a smooth elliptic model over algebraically closedK these are all geometric points. Separate Mathlib projective Scheme.localRing/Divisor interoperability, general all-function divisor finiteness, translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonical pairing/MOV-FR/all14 remain open. Same host/prover/Mathlib, header check procedural, signed standing unverified. [pcc:unverified]')]
+SimpleDocTemplate(str(o/'report.pdf'),pagesize=(595,842),leftMargin=44,rightMargin=44,topMargin=36,bottomMargin=36).build(flow)
+doc=fitz.open(o/'report.pdf');pages=[]
+for i,page in enumerate(doc):
+ blocks=page.get_text('blocks');rect=page.rect
+ pages.append(dict(page=i+1,text_within_page=all(rect.contains(fitz.Rect(x[:4]))for x in blocks),text_characters=len(page.get_text())))
+ page.get_pixmap(matrix=fitz.Matrix(1.5,1.5)).save('/workspace/scratch/miller-finite-report-page'+str(i+1)+'.png')
+(o/'layout.json').write_text(json.dumps(dict(pages=pages,visual_inspection='pending'),indent=2)+'\n')
+print(json.dumps(dict(pages=len(pages),bytes=(o/'report.pdf').stat().st_size,layout=pages)))

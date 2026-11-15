@@ -391,6 +391,38 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual finite-point local-ring and divisor audit](../miller_finite_point_audit_20261115/README.md)
+now derives actual nonsingular-point local DVRs, full actual FunctionField fraction
+rings and official normalized adic valuations. Actual evaluation kernel is the
+coordinate point ideal; the exact shifted equation and a nonzero partial derive
+the local uniformizer/DVR rather than assuming regularity. Actual point ideals
+localize to the maximal ideal at the same point and to the unit ideal elsewhere.
+The proved actual chord/negative-pair ideal equalities yield every finite zero
+order, including repeated intersections. Combining the actual infinity orders
+proves finite support and actual Finsupp principal point divisors:
+line=(P)+(Q)+(−P−Q)−3(O), vertical=(P)+(−P)−2(O), and actual three-torsion
+tangent=3(P)−3(O). Actual F5 controls show X−4 is not a local uniformizer at
+(4,0), while the ordinary tangent at(2,2) has order2 there and another simple
+zero at(0,1), with actual divisor unequal to3(P)−3(O). Countercontrols delete
+hypotheses; the qualified source statements survive. Over arbitraryK these
+Finsupps are on nonsingularKpoints; for an elliptic model over algebraically
+closedK they include all geometric points. Separate Mathlib projective
+Scheme.localRing/Divisor interoperability, general all-function divisor
+finiteness/general-n Miller recursion, translation/reciprocity/isogeny/Lang/
+Cartier/Jacobian/canonical pairing/MOV-FR and all14 completion remain open.
+Exact local **PCC-20261115-bb5771** PASS at 2026-11-15T06:18:06Z, signed unverified. Whole224/0fail/0trusted/
+standardfoundations;27modules=19byte-identicalcreditedcores+8new; full1652-character
+binding140ca58f39c177a432e21f1aee49ae26a9e3075c50cced761301751b1db04b09/native1complete/0prefix/0unresolved;
+30formal-config+14artifactpins. Twelve snapshots/seven failures/five successes,
+344files/69objects/31408-byte losslessXZ/fivegate/one-page47123-bytePDF fully
+text-read/visual/inbounds. Final12/projectlogs clean; auditoroneinheriteddeprecation.
+Primary Galbraith chapter7 finite-point Example7.3.4/Lemma7.7.10 proof freshly
+text-read, prior scopedvisuals/Def7.7.2 retained, not all21pages/fullTheorem7.7.11.
+Chapter26 and officialMathlib/prior proof credits retained. No novelty/canonical
+promotion/newphysical-hostvalidation/frozenedits/cryptoPython/spend/upload.
+[pcc:unverified]
+
+
 The [actual infinity chart localization audit](../miller_infinity_chart_audit_20261115/README.md)
 now identifies the actual origin-localized chart-function image algebra in
 X/Y and1/Y with the norm-degree DVR by an explicit RingEquiv preserving actual

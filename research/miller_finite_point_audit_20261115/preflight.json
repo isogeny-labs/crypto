@@ -1,0 +1,91 @@
+{
+  "schema": "miller-finite-point-preflight/v1",
+  "build_snapshots": 12,
+  "failed_build_states": [
+    "miller-finite-build01.exit",
+    "miller-finite-build02.exit",
+    "miller-finite-build05.exit",
+    "miller-finite-build07.exit",
+    "miller-finite-build08.exit",
+    "miller-finite-build09.exit",
+    "miller-finite-build10.exit"
+  ],
+  "successful_builds": [
+    "03",
+    "04",
+    "06",
+    "11",
+    "12"
+  ],
+  "final_build": "12, full project build logs no warnings/errors; one inherited frozen-auditor String.mk deprecation",
+  "gate": {
+    "archive": "research/miller_finite_point_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_miller_finite_point_audit_20261115_lean/audit.log",
+        "bytes": 21370,
+        "sha256": "076c4683cb24b2e4ff4f0d858ac6d9b715dea02f446dfb05fbb477fe3e146f59"
+      },
+      {
+        "member": "research_miller_finite_point_audit_20261115_lean/build.log",
+        "bytes": 9047,
+        "sha256": "227ead7bbdd761d5bb76dabe3bac18afd9dc36d600adcc664d2b86e285369462"
+      },
+      {
+        "member": "research_miller_finite_point_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_miller_finite_point_audit_20261115_lean/source-build.log",
+        "bytes": 9047,
+        "sha256": "c962d3d68895364bc7c223174c650cbda8a15026ef800f8f9c6dee6dfac97883"
+      },
+      {
+        "member": "research_miller_finite_point_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 224,
+    "failing": 0,
+    "trusted_native": 0,
+    "inherited_audit_tool_deprecation_warnings": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ]
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/miller_finite_point_audit_20261115/evidence/attempts.tar.xz",
+    "files": 344,
+    "unique_objects": 69,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "exact_reused_modules": 19,
+  "new_modules": 8,
+  "actual_finite_point_local_DVR_derived": true,
+  "actual_full_function_field_fraction_ring_proved": true,
+  "actual_normalized_finite_adic_multiplicities": true,
+  "actual_chord_vertical_three_torsion_point_divisors": true,
+  "actual_tangent_guard_divisor_counterexample": true,
+  "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+  "general_all_function_divisor_finiteness": false,
+  "full_pairing_or_original14_completion": false,
+  "independent_implementation_or_physicalhost_validation": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}
