@@ -192,8 +192,9 @@ factor base guarantees at degree 2 (`dreg_forecast::effective_degree`,
 its record). In ml-cryptanalysis `experiments/dmut-mechanistic-20261114` it was
 never below the measured MutantXL solving degree on any of 15,543 systems with
 `k ≥ 7`, including 640/640 pre-registered fresh systems at n = 47–61. That is
-empirical, not proved; below `k = 7` it failed on 44 small systems, so it is not
-used there.
+empirical, not proved `[pcc:unverified]`; below `k = 7` it failed on 44 small
+systems, so it is not used there.
+
 The semi-regular degree is also the yardstick: `structural_gain` is `true`
 when the whole band lies below it, `false` when it lies on or above it.
 
