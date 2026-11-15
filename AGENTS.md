@@ -829,6 +829,9 @@ verifiers, replay tools, and research result generation.
   manifest names, and refuse replacement of a pre-call manifest. Label any
   later reconstruction as post-call evidence (adopted lesson
   `L-b9df3560e3b1`, 2026-11-15).
+- For prime-field research, execute a separately copied immutable qualifier
+  and capture its hash before calls. Edit a different template for later
+  work (adopted lesson `L-9d758ede7873`, 2026-11-15).
 - Older instructions that name Python scripts describe legacy tooling; they
   do not grant an exception. Preserve their mathematical contracts, fixtures,
   and accounting requirements in the native replacement.
