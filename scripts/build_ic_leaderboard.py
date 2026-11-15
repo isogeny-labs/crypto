@@ -2251,7 +2251,7 @@ def nov13_frontier_diagnostics() -> dict:
                            "stream_and_sort_share": (med["stream_push"] + med["sort_fill"]) / med["whole"]})
 
     layout = load(SOURCES["folded_filter_layout"])
-    layout_rows = [{"cell": cell, "top_over_low_build": rec["ab_build"],
+    layout_rows = [{"cell": cell, "low_over_top_build": rec["ab_build"],
                     "rounds": rec["rounds"], "dropped": rec["dropped"],
                     "identity_mismatches": rec["identity_mismatches"]}
                    for cell, rec in sorted(layout.items()) if cell != "keep_top_default"]
@@ -4434,12 +4434,12 @@ def markdown(doc: dict) -> str:
         L.append(f"- `{s['cell']}` folded-pair construction: {s['whole_ns_per_pair']:.2f} ns/pair; streaming plus "
                  f"sort/fill is {s['stream_and_sort_ns_per_pair']:.2f} ns/pair "
                  f"({100*s['stream_and_sort_share']:.1f}% of the whole).")
-    L += ["", "The current Top filter layout is identity-equivalent in these A/B rounds but slower to build than the "
-          "frozen Low layout:", "",
-          "| cell | Top / Low build [95%] | rounds | dropped | identity mismatches |",
+    L += ["", "The current Top filter layout is identity-equivalent in these A/B rounds and faster to build than the "
+          "frozen Low layout (Low build time over Top build time; above 1 means Top builds faster):", "",
+          "| cell | Low / Top build time [95%] | rounds | dropped | identity mismatches |",
           "|:--|--:|--:|--:|--:|"]
     for r in folded["layout"]:
-        q = r["top_over_low_build"]
+        q = r["low_over_top_build"]
         L.append(f"| {r['cell']} | {q['median']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}] | "
                  f"{r['rounds']} | {r['dropped']} | {r['identity_mismatches']} |")
     L += ["", "The old ECBench IDs therefore remain frozen on Low while the explicit `_v2` IDs name Top; this "
@@ -5932,10 +5932,10 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<li><code>{esc(s["cell"])}</code>: {s["whole_ns_per_pair"]:.2f} ns/pair; streaming plus '
                  f'sort/fill is {s["stream_and_sort_ns_per_pair"]:.2f} ns/pair '
                  f'({100*s["stream_and_sort_share"]:.1f}%).</li>')
-    P.append('</ul><table><thead><tr><th>cell</th><th>Top / Low build [95%]</th><th>rounds</th>'
+    P.append('</ul><table><thead><tr><th>cell</th><th>Low / Top build time [95%]</th><th>rounds</th>'
              '<th>dropped</th><th>identity mismatches</th></tr></thead><tbody>')
     for r in folded["layout"]:
-        q = r["top_over_low_build"]
+        q = r["low_over_top_build"]
         P.append(f'<tr><td><code>{esc(r["cell"])}</code></td><td>{q["median"]:.3f} '
                  f'[{q["ci95"][0]:.3f}, {q["ci95"][1]:.3f}]</td><td>{r["rounds"]}</td>'
                  f'<td>{r["dropped"]}</td><td>{r["identity_mismatches"]}</td></tr>')
