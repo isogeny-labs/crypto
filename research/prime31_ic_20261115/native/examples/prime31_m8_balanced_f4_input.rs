@@ -140,6 +140,17 @@ fn summands(ar:&mut Arithmetic,ps:&[(u64,u64)],start:usize,end:usize)->Point {
 }
 #[derive(Deserialize)]
 struct Transcript { witnesses:Vec<[u64;4]> }
+#[derive(Deserialize)]
+struct Panel { rows:Vec<PanelRow> }
+#[derive(Deserialize)]
+struct PanelRow {
+    index:usize,
+    a:u64,
+    b:u64,
+    target:[u64;2],
+    split_witness_count:usize,
+    first_witness_codes:Option<[u64;2]>,
+}
 // Exact expected raw eight-summand witness count on a uniformly random
 // prime-order public mask: each signed template maps to exactly one target.
 // This counts templates WITH multiplicity, not distinct points or row rank.
@@ -183,10 +194,12 @@ fn capped_f4(input:&[RPoly],ring:&TowerRing,known_witness:Option<&[u64]>)->Resul
 }
 fn main()->Result<(),String>{
     let args:Vec<_>=std::env::args().skip(1).collect();
-    if args.len()>1 || (!args.is_empty() && args[0]!="--probe-f4") {
-        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4]".into());
+    if args.len()>1 || (!args.is_empty()
+        && args[0]!="--probe-f4" && args[0]!="--panel-f4") {
+        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4]".into());
     }
-    let probe_f4=!args.is_empty();
+    let probe_f4=args.first().is_some_and(|v|v=="--probe-f4");
+    let panel_f4=args.first().is_some_and(|v|v=="--panel-f4");
     let e=PRIME31;
     let mut ar=Arithmetic::default();
     check_curve(e,&mut ar)?;
@@ -206,6 +219,93 @@ fn main()->Result<(),String>{
     let polys:Vec<_>=fixed.iter().map(|p|ring.from_raw(&p.raw_tower())).collect();
     let nf_terms:Vec<_>=polys.iter().map(|p|p.len()).collect();
     if nf_terms!=[526,526,16] {return Err(format!("F4 tower input terms changed: {nf_terms:?}"));}
+    // Prospective naturally sampled F4 panel: source labels are checked only
+    // AFTER the algebraic oracle has received the public R coordinates.
+    // A "split miss" says NOTHING about the unrestricted m8 ideal: other
+    // partitions can contain valid relations. Never infer UNSAT from a miss.
+    if panel_f4 {
+        let panel:Panel=serde_json::from_str(
+            include_str!("../M8_NATURAL_F4_PANEL_20261115.json"))
+            .map_err(|err|err.to_string())?;
+        if panel.rows.len()!=16
+            || panel.rows.iter().filter(|r|r.split_witness_count>0).count()!=5
+            || panel.rows.iter().map(|r|r.split_witness_count).sum::<usize>()!=6 {
+            return Err("natural panel size/support totals changed".into());
+        }
+        if !ar.on_curve(e,Q) {return Err("public Q fails the curve equation".into());}
+        let mut probes=Vec::with_capacity(panel.rows.len());
+        for (i,row) in panel.rows.iter().enumerate() {
+            if row.index!=i || row.a>=e.n || row.b==0 || row.b>=e.n {
+                return Err(format!("invalid frozen mask at row {i}"));
+            }
+            let ag=ar.scalar(e,row.a,Some(e.g));
+            let bq=ar.scalar(e,row.b,Q);
+            let r=ar.add(e,ag,bq).ok_or("frozen public mask is identity")?;
+            if [r.0,r.1]!=row.target {return Err(format!("public R changed at {i}"));}
+            let mut input=polys.clone();
+            let term=s4(&u,&v,&w,&Polynomial::constant(r.0));
+            input.push(ring.from_raw(&term.raw_tower()));
+            // The independent generic diagnostic labels do not drive F4.
+            // A known witness is used solely for post-F4 soundness checking.
+            let known=if let Some([lc,rc])=row.first_witness_codes {
+                if row.split_witness_count==0 {
+                    return Err(format!("label/certificate disagreement at {i}"));
+                }
+                let ps=witness_points(lc,rc,&fb,&ar)?;
+                let mut sum=None;
+                for &pt in &ps {sum=ar.add(e,sum,Some(pt));}
+                if sum!=Some(r) {return Err(format!("bad full-point certificate at {i}"));}
+                let u_pt=summands(&mut ar,&ps,0,3).ok_or("panel u=O")?;
+                let v_pt=summands(&mut ar,&ps,3,6).ok_or("panel v=O")?;
+                let w_pt=summands(&mut ar,&ps,6,8).ok_or("panel w=O")?;
+                let mut xs=[0u64;NV];
+                for j in 0..8 {
+                    xs[j*DEPTH]=ps[j].0;
+                    for k in 1..DEPTH {
+                        let t=xs[j*DEPTH+k-1];
+                        xs[j*DEPTH+k]=sub(mul(t,t),2);
+                    }
+                }
+                xs[TOWER]=u_pt.0;
+                xs[TOWER+1]=v_pt.0;
+                xs[TOWER+2]=w_pt.0;
+                if input.iter().any(|poly|ring.eval(poly,&xs)!=0) {
+                    return Err(format!("panel polynomial witness invalid at {i}"));
+                }
+                Some(xs)
+            } else {
+                if row.split_witness_count!=0 {
+                    return Err(format!("missing positive certificate at {i}"));
+                }
+                None
+            };
+            let f4=capped_f4(&input,&ring,known.as_ref().map(|xs|xs.as_slice()))?;
+            if known.is_some() && f4["verdict"]=="complete_refutation" {
+                return Err(format!("false completed refutation on witnessed row {i}"));
+            }
+            probes.push(json!({
+                "index":i,"public_a":row.a,"public_b":row.b,"public_R":row.target,
+                "split_support_label":if known.is_some() {
+                    "witnessed_positive"
+                } else {
+                    "outside_registered_split; unrestricted_m8_unknown"
+                },
+                "generic_split_witness_count_validation_only":row.split_witness_count,
+                "f4":f4
+            }));
+        }
+        println!("{}",json!({
+            "standing":"[pcc:unverified]",
+            "scope":"16 precommitted naturally sampled prime31 public masks; existing Rust S4/S3 F4; NO extraction or DLP recovery",
+            "oracle_input":"four quotient-normal-form algebraic polynomials only; no generic group fallback",
+            "positive_split_controls":5,
+            "outside_split_not_proven_unsat":11,
+            "per_query_f4_budget_seconds":5,
+            "per_query_nnz_cap":15_000,
+            "probes":probes
+        }));
+        return Ok(());
+    }
     let mut checked=0;
     let mut mutated=0;
     let mut f4_probe_records=Vec::new();
