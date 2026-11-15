@@ -209,6 +209,17 @@ controller, natural model replay, rank/logs and full cold-runtime selection
 remain open. No graph changed because this revision contains no K600
 measurement.
 
+The [natural model replay amendment](NATURAL_REPLAY_AMENDMENT.md) adds
+`replay-natural` after a SAT natural solver receipt, original XCNF export,
+and both constructed-control replays. It records a distinct passing row or
+terminal failure, while leaving useful rank and total IC runtime unset.
+The release example passed **13/13** tests and the production release build
+exited 0; [test](natural-replay-test.log.gz) and
+[build](natural-replay-build.log.gz) logs preserve results. No K600 natural
+model was replayed. A source-matched image/build receipt, cumulative budget
+controller, real arm run, rank/logs and full cold-runtime selection remain
+open. No graph changed because this revision contains no K600 measurement.
+
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
 
