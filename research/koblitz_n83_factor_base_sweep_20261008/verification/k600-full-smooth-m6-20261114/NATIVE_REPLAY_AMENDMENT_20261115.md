@@ -35,3 +35,7 @@ points as `{x_decimal, y_decimal}` objects; the historical Python replayer
 expects two-element arrays, so it cannot faithfully verify those exports.
 The native replayer compares the actual object encoding against the imported
 archive and checks the archived relation-row hash.
+
+The still-open [total-runtime selection problem](../../../../problems/n83-mixed-orbit-factor-base-selection.md)
+tracks the later positive/natural execution, relation yield, rank, linear
+algebra, target descent, and matched rho obligations.

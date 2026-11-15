@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck and implementation gap
 - **Affected work:** [N83 factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/), [K2048 native XCNF gate](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-xcnf-20261114/RESULT.md), [full-D18 native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PROTOCOL.md), [separate a=1 cross-family panel](../research/n83_crossfamily_current_20261025/native/README.md)
 - **Next action owner:** N83 factor-base research task
-- **Last updated:** 2026-11-14 UTC; the same-public-point D18/K2048 solver pair and independent raw audit merged in [PR #4131](https://github.com/isogeny-labs/crypto/pull/4131). The earlier K2048 native [PR #4126](https://github.com/isogeny-labs/crypto/pull/4126) and [D18 ordered solver result](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md) remain separate cells.
+- **Last updated:** 2026-11-15 UTC; the exact rank-query census and native K600 model verifier are in open [PR #4295](https://github.com/isogeny-labs/crypto/pull/4295). The same-public-point D18/K2048 solver pair and independent raw audit merged in [PR #4131](https://github.com/isogeny-labs/crypto/pull/4131). The earlier K2048 native [PR #4126](https://github.com/isogeny-labs/crypto/pull/4126) and [D18 ordered solver result](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md) remain separate cells.
 
 ## Problem
 
@@ -27,6 +27,8 @@ requested selection criterion is minimum total index-calculus runtime,
 including setup and online phases, over the finite declared design grid.
 
 ## Evidence and uncertainty
+
+- **2026-11-15 exact screen and verifier, open PR [pcc:unverified]:** The [native rank-query census](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261115T0854Z/REPORT.md) covers 78 retained objects and 390 `m=2..6` rows with exact combinatorial necessary counts. It reproduces all 30 frozen historical cases but measures no natural relation yield or cold runtime. The [K600 native replay amendment](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-full-smooth-m6-20261114/NATIVE_REPLAY_AMENDMENT_20261115.md) adds original-XCNF, point-lift, subgroup, and relation-row verification; the touched release example suite passed 23/23. No full K600 solver model has passed that verifier. The frozen K600 m6 search still needs a qualified Linux ARM host, exact inputs, and a new budget allowance. Proposed new factor-base storage at `s3://setec-astronomy-artifacts/store` still needs an authorized writer identity; this code PR writes no S3 objects. These are execution and access gaps, not a negative relation-yield result.
 
 - **2026-11-14 same-point D18/K2048 pair [pcc:unverified]:** The
   [frozen result](../research/koblitz_n83_factor_base_sweep_20261008/verification/a0-matched-public-solver-20261114/RESULT.md)
