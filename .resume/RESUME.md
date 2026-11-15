@@ -1,14 +1,28 @@
-# Resume: crypto @ claude/zealous-meitner-85ipb5
+# Resume: crypto @ claude/index-calculus-gpu-optimization-otouqv (round 5: GPU m = 3 with incremental-gauss-echelon)
 
 ## Goal
-Owner (2026-11-14): run the frozen degree-13 fes-f2 vs inherited-f4 measurement (research/fes_k13_validated_20261112) on Runpod instead of isolab (AWS budget exhausted). Leaderboard rows only if the validation gate passes.
+User (2026-11-15), "Keep working on open leads". Lead from research/ic_la_m3_20261115 (PR #4310):
+incremental-gauss-echelon matches incremental-gauss (trials, relations, logarithm, S) with 0.10-0.15x the
+row_ops. Measure the whole-solve effect on the round-4 GPU arm (probe_build=pairs, daemon, cuda).
+
+## Lead / hypothesis
+PROTOCOL.md: identity across IC arms; at |F_x| = 4096 the GPU arm's median solve with echelon <= 0.5x
+with gauss; row_ops ratio 0.10-0.20.
 
 ## Spec
-Frozen: research/fes_k13_validated_20261112/spec.json (sha256 327e0bb4...a9d76c, = protocol links.spec_sha256), protocol.json. Binary: ecbench built from e9d5dbdccd, sha256 8f9576b5bf81819274cc6049eb671c6d97f0bc6660f99d0445448edb4e5130f4 (smoke/build.json).
-Route: Runpod CPU pod (ubuntu:24.04, glibc 2.39), binary+spec fetched from S3 presigned GET (s3://isolab-results-104186811093-us-east-2/runpod/fes-k13-validated-20261112-a1/), results tarball PUT back to the same prefix. Pod runs: ecbench host --json; ecbench run --spec spec.json --out session; ecbench verify --dir session --replay-all --exit-code.
+specs/smoke.json, specs/rf3la.json (38/40-bit prime_explicit curves, |F_x| 2048/4096, 3 targets, 2
+rounds; CPU and GPU arms x gauss/echelon; GPU echelon A/A at 4096; rho and rho A/A). job.sh on one A100,
+launched by run_pod.sh under benchrec run.
 
 ## State
-2026-11-15: staging inputs, then pod launch. Deviation from protocol: Runpod is not an L2-isolated host (no isolab admission); S counts are deterministic, the wall figures are not admitted.
+2026-11-15: protocol and specs frozen; pod not yet launched.
 
-## Next
-Download results, check hashes, independent replay here (different host class) + validator report + band, VALIDATION.json, then report/PDF/benchmarks/benchrec/session log/PR. Terminate the pod after the upload.
+## Runs in flight
+None yet (pod icgpu-rla; cleanup: research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-rla).
+
+## Stop and success conditions
+Any S/relation/logarithm mismatch or failed replay voids that comparison. Wall L0, A/A floor. Cap
+~1.5 GPU-hours, $4. S3: same waiver as earlier rounds (session AWS keys rejected).
+
+## Next steps
+Commit+push protocol -> record init -> ecbench release build -> run_pod.sh -> analyze -> report -> PR.

@@ -257,3 +257,55 @@ reason.
   reading and by the bounds test of the same option, not by its own test.
 
 Evidence is by these tests; none has a pcc claim. [pcc:unverified]
+
+## Follow-up 2026-11-15: validator findings B (research/validation_20261114/REPORT.md)
+
+Three open findings from the independent validation are fixed in
+`src/cryptanalysis/ecbench/challenge.rs`.
+
+1. **Procedure 1 no longer reads `w_cal.json`.** `verdict` called
+   `runner::read_wcal` for every procedure, so a malformed or invalid
+   sidecar made a procedure-1 verdict fail although procedure 1 has no
+   calibrated block. The verdict's paired comparisons (`compare`, for ops
+   and the A/A control) also read it. Procedure 1 now reads no `w_cal`
+   anywhere: its comparisons run on the session the verdict loaded, with
+   `options.w_cal` cleared (`procedure_1_compare`).
+   Procedure 2 is unchanged: it still reads, validates and refuses a bad
+   sidecar. Test:
+   `challenge::tests::an_invalid_w_cal_sidecar_leaves_a_procedure_1_verdict_unchanged`
+   copies the `prime-toy-reference-e1` session to a temporary root at the
+   same relative path, writes an invalid sidecar, and checks that the
+   procedure-1 verdict text is identical to the one without it and that
+   procedure 2 refuses the sidecar.
+2. **Procedure-2 calibrated block, end to end.** Test
+   `challenge::tests::a_procedure_2_verdict_carries_the_calibrated_block_only_with_w_cal`
+   builds procedure-2 verdicts of the same committed session. Each uses a
+   synthetic commitment and beacon, so the verdict is inadmissible: the
+   spec does not match, and the block is computed anyway. The test covers
+   three cases: no `w_cal` (no block), a `--w-cal` override (source
+   `override`) and a sidecar (no source). With `w_cal = 0.1` the field
+   weights are `[0, 0.1, 1]`, equal to the band weights. The grid's
+   diagonal is then checked against a hand computation over pairs matched
+   by workload and round: `Σ S_B / Σ S_A` and `priced_s` at 0.1 and 1.
+   The block changes no axis or outcome.
+3. **The committed procedure-1 verdicts re-derive again.** Commit
+   `c7ae83ee81` (2026-10-23, "honest intervals ... in compare") moved
+   `compare` to `ecbench.comparison/v2`. That commit made the linearised
+   `t` interval primary (`ci_method` `linearised_t`) and kept the old
+   percentile two-stage bootstrap beside it as `ci95_bootstrap`, with the
+   same statistic, resamples and seed. It did not touch `challenge.rs`,
+   so procedure-1 verdicts silently took the new ops interval and
+   per-curve intervals. The re-derived id for `prime-toy-reference-e1`
+   became `ECVD1he794a2187563` instead of the committed
+   `ECVD1h0b0f5e0d7f67`. A procedure-1 verdict is frozen, so the fix reads
+   the comparison's bootstrap interval back for procedure 1
+   (`procedure_1_compare`, for the ops and control comparisons).
+   Procedure 2 keeps the linearised interval. The committed records are
+   not edited. Test
+   `challenge::tests::the_committed_procedure_1_verdicts_re_derive_byte_for_byte`
+   re-derives both committed verdicts (`prime-toy-reference-e1` and
+   `koblitz-toy-reference-e1`) with every run replayed and `--bounds
+   docs/bounds/records`, as `docs/bounds/refit.sh` does. It checks each
+   verdict file and the bound it wrote byte for byte.
+
+Evidence is by these tests; none has a pcc claim. [pcc:unverified]

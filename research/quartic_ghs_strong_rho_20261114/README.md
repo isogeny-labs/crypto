@@ -1,7 +1,10 @@
 # Strong-rho control for the GHS-weak plane-quartic frontier
 
-Status: implementation and protocol frozen; measurement pending. There is no
-measured result, frontier change, or leaderboard row yet.
+Status: implementation and protocol frozen; measurement pending. The
+[round-A amendment](ROUND_A.md) changes only the high/top active deadlines and
+was frozen before primary output. There is no measured result, frontier
+change, or leaderboard row yet. The live execution-admission gap is tracked in
+[the problem record](../../problems/ghs-strong-rho-measurement-admission.md).
 
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
 specific obligation: compare its end-to-end index-calculus result with a rho
@@ -17,10 +20,41 @@ collision work, so batch 64 was not retained as the reference
 escapes residual cycles by doubling the cycle's canonical minimum.
 
 The scope remains public synthetic known-answer instances in the special GHS
-family. It says nothing about generic, standard, or deployed curves. The
-protocol, EKS request, benchmark records, visual report, validation receipt,
-and any dashboard update will be added before a performance conclusion is
-made [pcc:unverified].
+family. It says nothing about generic, standard, or deployed curves. Live
+requests, benchmark records, a validation receipt, and any dashboard update
+will be added only after their gates pass and before a performance conclusion
+is made [pcc:unverified].
+
+## Package map
+
+- [`PROTOCOL.md`](PROTOCOL.md) freezes the scientific question, grid, arms,
+  estimator, cost model, admission interval, and publication gates.
+- [`ROUND_A.md`](ROUND_A.md) is the prospective deadline-only amendment.
+- `main.rs` and `strong_rho.rs` are the source-hash-pinned measurement code;
+  [`pod_run.sh`](pod_run.sh) compiles it for the worker and seals each split.
+- [`build_context.sh`](build_context.sh) and [`Dockerfile`](Dockerfile) create
+  the exact-revision private image; [`LAUNCH.md`](LAUNCH.md) specifies the
+  operator receipts and two-wave submission sequence.
+- [`make_requests.py`](make_requests.py) refuses incomplete or stale live
+  admission evidence and emits no request until budget arithmetic, all-tenant
+  capacity, checkpoint, Git custody, image digest, and source bindings pass.
+- [`analyze.py`](analyze.py) audits the historical archive and, once all four
+  raw split manifests exist, recomputes the frozen producer table. Its output
+  remains unverified until the separate validation/PCC chain admits it.
+
+Focused development checks are in `test_make_requests.py` and
+`test_analyze.py`. The exact historical input can be checked without making a
+performance claim:
+
+```sh
+python3 analyze.py audit-historical \
+  --archive ../quartic_n4v2_20261020/results/grid-20261025/units.tar.gz
+```
+
+The 2026-11-14 local audit read 63 archive members, 261 successful arm units,
+and 33 common targets; q = 4,194,271 intentionally has no B0 unit
+`[pcc:unverified]`. This is an input-census check, not the pending strong-rho
+measurement.
 
 Development checks:
 
