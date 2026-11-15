@@ -390,7 +390,7 @@ fn cold_full_log(q:(u64,u64), cap:usize)->Result<Option<u64>,String>{
     let mut replay_additions=0u64;
     let mut seen=BTreeSet::new();
     let mut duplicate_targets=0usize;
-    for turn in 0..cap {
+    'walk: for turn in 0..cap {
         let choice=(splitmix64_next(&mut walk_seed) as usize)&63;
         let (step,da,db)=steps[choice];
         let timer=Instant::now();
@@ -436,7 +436,9 @@ fn cold_full_log(q:(u64,u64), cap:usize)->Result<Option<u64>,String>{
                     return Err("external Q discrete log verification failed".into());
                 }
                 final_log=Some(sol[31]);
-                break;
+                // Stop the OUTER target-collection loop at full verified rank;
+                // breaking only the inner row loop overcharged the cold cost.
+                break 'walk;
             }
         }
     }
