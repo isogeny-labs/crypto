@@ -17,7 +17,7 @@ use crate::cryptanalysis::sat::Solver;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 use std::collections::{BTreeMap, BTreeSet};
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TraceZeroError {
@@ -132,7 +132,7 @@ pub struct TraceZeroVariety {
     curve: BinaryCurve,
     trace_bits: Vec<bool>,
     /// Quadratic/linear monomials of Tr(x H(x)) in the raw x bits.
-    q: TraceZeroPolynomial,
+    q: Arc<OnceLock<TraceZeroPolynomial>>,
     reductions: Arc<Vec<Vec<usize>>>,
     order: BigUint,
 }
@@ -314,25 +314,6 @@ impl TraceZeroVariety {
         if !trace_bits[0] {
             return Err(TraceZeroError::InvalidField);
         }
-        let half: Vec<_> = basis
-            .iter()
-            .map(|b| b.half_trace(&curve.irreducible).expect("odd degree"))
-            .collect();
-        let mut q = TraceZeroPolynomial::default();
-        for i in 0..n as usize {
-            for j in 0..n as usize {
-                if basis[i]
-                    .mul(&half[j], &curve.irreducible)
-                    .trace(&curve.irreducible)
-                    != 0
-                {
-                    let mut monomial = vec![i as u32, j as u32];
-                    monomial.sort_unstable();
-                    monomial.dedup();
-                    q.toggle(monomial);
-                }
-            }
-        }
         let z = F2mElement::from_bit_positions(&[1], n);
         let mut power = F2mElement::one(n);
         let mut reductions = Vec::new();
@@ -344,13 +325,47 @@ impl TraceZeroVariety {
         Ok(Self {
             curve: curve.clone(),
             trace_bits,
-            q,
+            q: Arc::new(OnceLock::new()),
             reductions: Arc::new(reductions),
             order,
         })
     }
     pub fn curve(&self) -> &BinaryCurve {
         &self.curve
+    }
+
+    /// Materialize the symbolic trace quadratic once, shared by clones.
+    /// Numeric membership and relation queries need no symbolic equations.
+    /// Symbolic model builders call this automatically on first use; callers
+    /// can request eager preparation explicitly for predictable setup costs.
+    pub fn prepare_symbolic_models(&self) {
+        self.symbolic_quadratic();
+    }
+
+    fn symbolic_quadratic(&self) -> &TraceZeroPolynomial {
+        self.q.get_or_init(|| {
+            let n = self.curve.m;
+            let irr = &self.curve.irreducible;
+            let basis: Vec<_> = (0..n)
+                .map(|i| F2mElement::from_bit_positions(&[i], n))
+                .collect();
+            let half: Vec<_> = basis
+                .iter()
+                .map(|b| b.half_trace(irr).expect("odd degree"))
+                .collect();
+            let mut q = TraceZeroPolynomial::default();
+            for i in 0..n as usize {
+                for j in 0..n as usize {
+                    if basis[i].mul(&half[j], irr).trace(irr) != 0 {
+                        let mut monomial = vec![i as u32, j as u32];
+                        monomial.sort_unstable();
+                        monomial.dedup();
+                        q.toggle(monomial);
+                    }
+                }
+            }
+            q
+        })
     }
 
     /// X-only full-kernel membership. The inverse trace supplies rational
@@ -658,7 +673,7 @@ impl TraceZeroVariety {
         cap: usize,
     ) -> Result<TraceZeroPolynomial, TraceZeroError> {
         let mut q = TraceZeroPolynomial::default();
-        for t in &self.q.terms {
+        for t in &self.symbolic_quadratic().terms {
             let term = if t.len() == 1 {
                 x[t[0] as usize].clone()
             } else {
@@ -1278,5 +1293,40 @@ impl TraceZeroAffineSystem {
             solver.add_xor(&row, rhs);
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod lazy_symbolic_tests {
+    use super::*;
+    #[test]
+    fn numeric_queries_defer_symbolic_quadratic_and_clones_share_exact_materialization() {
+        let c = BinaryCurve {
+            m: 5,
+            irreducible: super::super::IrreduciblePoly {
+                degree: 5,
+                low_terms: vec![0, 2],
+            },
+            a: F2mElement::zero(5),
+            b: F2mElement::one(5),
+            generator: BinaryPoint::Infinity,
+            order: 11u32.into(),
+            cofactor: 4u32.into(),
+        };
+        let v = TraceZeroVariety::new(&c).unwrap();
+        assert!(v.q.get().is_none());
+        assert!(v.contains(&BinaryPoint::Infinity));
+        assert!(v.q.get().is_none());
+        let clone = v.clone();
+        assert!(Arc::ptr_eq(&v.q, &clone.q));
+        std::thread::spawn(move || clone.prepare_symbolic_models())
+            .join()
+            .unwrap();
+        let q = v.q.get().expect("shared materialization");
+        for code in 0..32u32 {
+            let x = F2mElement::from_biguint(&code.into(), 5);
+            let bits: Vec<_> = (0..5).map(|i| code >> i & 1 != 0).collect();
+            assert_eq!(q.evaluate(&bits), Some(v.q_value(&x)));
+        }
     }
 }

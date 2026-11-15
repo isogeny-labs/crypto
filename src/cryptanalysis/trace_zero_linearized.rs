@@ -24,6 +24,189 @@ pub struct TraceZeroLinearizedReport {
     pub systems: usize,
     pub maximum_rank: usize,
     pub maximum_nullity: usize,
+    pub projected_columns: usize,
+    pub projected_systems: usize,
+    pub projected_rows: usize,
+    pub projected_inconsistent: usize,
+}
+
+type WordMask = [u64; 3];
+
+fn words(x: &F2mElement) -> WordMask {
+    let mut a = [0; 3];
+    a[..x.raw_bits().len()].copy_from_slice(x.raw_bits());
+    a
+}
+
+fn parity(a: &WordMask, b: &WordMask) -> u64 {
+    (((a[0] & b[0]) ^ (a[1] & b[1]) ^ (a[2] & b[2])).count_ones() & 1) as u64
+}
+
+enum ProjectedResult {
+    Inconsistent,
+    Unique(F2mElement, F2mElement),
+    Deficient,
+}
+
+/// Eliminate v by Artin--Schreier before solving. For the actual residual
+/// (z,y), t=y+zH(z) satisfies t²+zt=1. Since Tr(u)=0, every S3 candidate is
+/// v=t+zH(u²)+epsilon*z. Membership v in W supplies only d+1 unknown bits.
+/// Maps z -> L_j(zH(x_i²)) are precomputed; rows cost packed parity tests.
+struct ProductProjection {
+    equations: Vec<Vec<WordMask>>,
+    rhs: Vec<WordMask>,
+    w_pivots: Vec<(usize, WordMask)>,
+    halves: Vec<F2mElement>,
+    w_support: WordMask,
+}
+impl ProductProjection {
+    fn reduce_with(pivots: &[(usize, WordMask)], mut a: WordMask) -> WordMask {
+        for (bit, row) in pivots {
+            if a[bit / 64] & (1u64 << (bit % 64)) != 0 {
+                for j in 0..3 {
+                    a[j] ^= row[j];
+                }
+            }
+        }
+        a
+    }
+    fn new(xs: &[F2mElement], ws: &[F2mElement], c: &BinaryCurve) -> Self {
+        assert!(xs.len() < 63 && c.m <= 192);
+        let pivots: Vec<_> = ws
+            .iter()
+            .rev()
+            .map(|w| (w.degree().unwrap() as usize, words(w)))
+            .collect();
+        let coordinates: Vec<_> = (0..c.m as usize)
+            .filter(|i| !pivots.iter().any(|(p, _)| p == i))
+            .collect();
+        let mut rhs = vec![[0; 3]; coordinates.len()];
+        for bit in 0..c.m as usize {
+            let mut unit = [0; 3];
+            unit[bit / 64] = 1u64 << (bit % 64);
+            let projected = Self::reduce_with(&pivots, unit);
+            for (j, &coord) in coordinates.iter().enumerate() {
+                if projected[coord / 64] & (1u64 << (coord % 64)) != 0 {
+                    rhs[j][bit / 64] |= 1u64 << (bit % 64);
+                }
+            }
+        }
+        let halves: Vec<_> = xs
+            .iter()
+            .map(|x| {
+                x.square(&c.irreducible)
+                    .half_trace(&c.irreducible)
+                    .expect("odd field")
+            })
+            .collect();
+        let mut equations = vec![vec![[0; 3]; xs.len() + 1]; coordinates.len()];
+        for (i, h) in halves.iter().enumerate() {
+            for bit in 0..c.m as usize {
+                let unit = F2mElement::from_bit_positions(&[bit as u32], c.m);
+                let image = Self::reduce_with(&pivots, words(&unit.mul(h, &c.irreducible)));
+                for (j, &coord) in coordinates.iter().enumerate() {
+                    if image[coord / 64] & (1u64 << (coord % 64)) != 0 {
+                        equations[j][i][bit / 64] |= 1u64 << (bit % 64);
+                    }
+                }
+            }
+        }
+        for (row, mask) in equations.iter_mut().zip(&rhs) {
+            row[xs.len()] = *mask;
+        }
+        let mut w_support = [0; 3];
+        for (_, w) in &pivots {
+            for i in 0..3 {
+                w_support[i] |= w[i];
+            }
+        }
+        Self {
+            equations,
+            rhs,
+            w_pivots: pivots,
+            halves,
+            w_support,
+        }
+    }
+
+    fn solve(
+        &self,
+        xs: &[F2mElement],
+        c: &BinaryCurve,
+        z: &F2mElement,
+        y: &F2mElement,
+    ) -> (ProjectedResult, usize) {
+        let width = xs.len() + 1;
+        let coefficient_mask = (1u64 << width) - 1;
+        let mut pivots = [0u64; 64];
+        let mut rank = 0;
+        let zw = words(z);
+        let offset = y.add(&z.mul(
+            &z.half_trace(&c.irreducible).expect("odd field"),
+            &c.irreducible,
+        ));
+        let target = words(&offset);
+        for (j, (columns, rhs)) in self.equations.iter().zip(&self.rhs).enumerate() {
+            let mut row = parity(rhs, &target) << width;
+            for (i, col) in columns.iter().enumerate() {
+                row |= parity(col, &zw) << i;
+            }
+            loop {
+                let coefficients = row & coefficient_mask;
+                if coefficients == 0 {
+                    if row >> width != 0 {
+                        return (ProjectedResult::Inconsistent, j + 1);
+                    }
+                    break;
+                }
+                let bit = 63 - coefficients.leading_zeros() as usize;
+                if pivots[bit] == 0 {
+                    pivots[bit] = row;
+                    rank += 1;
+                    break;
+                }
+                row ^= pivots[bit];
+            }
+            if rank == width {
+                // These independent rows force one coefficient vector. Check
+                // ALL remaining W conditions with one exact remainder test.
+                let mut solution = 0u64;
+                for (i, &pivot) in pivots.iter().enumerate().take(width) {
+                    if ((pivot >> width) ^ ((pivot & solution).count_ones() as u64)) & 1 != 0 {
+                        solution |= 1u64 << i;
+                    }
+                }
+                let mut h = if solution & (1u64 << xs.len()) != 0 {
+                    F2mElement::one(c.m)
+                } else {
+                    F2mElement::zero(c.m)
+                };
+                for (i, hi) in self.halves.iter().enumerate() {
+                    if solution & (1u64 << i) != 0 {
+                        h = h.add(hi);
+                    }
+                }
+                let product = offset.add(&z.mul(&h, &c.irreducible));
+                let product_words = words(&product);
+                if product_words
+                    .iter()
+                    .zip(&self.w_support)
+                    .any(|(v, s)| *v & !*s != 0)
+                    || Self::reduce_with(&self.w_pivots, product_words) != [0; 3]
+                {
+                    return (ProjectedResult::Inconsistent, j + 1);
+                }
+                let mut u = F2mElement::zero(c.m);
+                for (i, x) in xs.iter().enumerate() {
+                    if solution & (1u64 << i) != 0 {
+                        u = u.add(x);
+                    }
+                }
+                return (ProjectedResult::Unique(u, product), j + 1);
+            }
+        }
+        (ProjectedResult::Deficient, self.equations.len())
+    }
 }
 
 fn basis(values: impl IntoIterator<Item = BigUint>, n: u32) -> Vec<F2mElement> {
@@ -222,6 +405,140 @@ mod tests {
     }
 
     #[test]
+    fn shared_x_admission_rejects_other_ordinates_and_wrong_coordinate_widths() {
+        let c = small_curve();
+        let v = TraceZeroVariety::new(&c).unwrap();
+        let mut point = None;
+        for x in 0..32u32 {
+            for y in 0..32u32 {
+                let p = BinaryPoint::Affine {
+                    x: F2mElement::from_biguint(&x.into(), 5),
+                    y: F2mElement::from_biguint(&y.into(), 5),
+                };
+                if v.contains(&p) {
+                    point = Some(p);
+                    break;
+                }
+            }
+            if point.is_some() {
+                break;
+            }
+        }
+        let p = point.unwrap();
+        let BinaryPoint::Affine { x, y } = &p else {
+            unreachable!()
+        };
+        for bad in [
+            BinaryPoint::Affine {
+                x: x.clone(),
+                y: y.add(&F2mElement::one(5)),
+            },
+            BinaryPoint::Affine {
+                x: F2mElement::from_biguint(&x.to_biguint(), 7),
+                y: y.clone(),
+            },
+            BinaryPoint::Affine {
+                x: x.clone(),
+                y: F2mElement::from_biguint(&y.to_biguint(), 7),
+            },
+        ] {
+            let r = decompose_trace_zero_linearized(&v, &[p.clone(), bad], &p, Limits::default());
+            assert_eq!(r.relation.disposition, Disposition::Inconclusive);
+            assert_eq!(r.relation.reason, Some("invalid linearized target/base"));
+        }
+    }
+
+    #[test]
+    fn projected_unique_inconsistent_and_deficient_results_match_complete_s3_spaces() {
+        let c = small_curve();
+        let variety = TraceZeroVariety::new(&c).unwrap();
+        let mut points = Vec::new();
+        for x in 0..32u32 {
+            for y in 0..32u32 {
+                let p = BinaryPoint::Affine {
+                    x: F2mElement::from_biguint(&x.into(), 5),
+                    y: F2mElement::from_biguint(&y.into(), 5),
+                };
+                if variety.contains(&p) {
+                    points.push(p);
+                }
+            }
+        }
+        let mut classifications = [0usize; 3];
+        for count in [1, 2, 3] {
+            let xs = basis(
+                points
+                    .iter()
+                    .filter_map(|p| {
+                        if let BinaryPoint::Affine { x, .. } = p {
+                            Some(x.to_biguint())
+                        } else {
+                            None
+                        }
+                    })
+                    .take(count),
+                5,
+            );
+            let products: Vec<_> = xs
+                .iter()
+                .flat_map(|x| xs.iter().map(|y| x.mul(y, &c.irreducible).to_biguint()))
+                .collect();
+            let ws = basis(products, 5);
+            let projector = ProductProjection::new(&xs, &ws, &c);
+            for p in &points {
+                let BinaryPoint::Affine { x: z, y } = p else {
+                    unreachable!()
+                };
+                let mut expected = Vec::new();
+                for ubits in 0..1usize << xs.len() {
+                    for vbits in 0..1usize << ws.len() {
+                        let u = xs
+                            .iter()
+                            .enumerate()
+                            .filter(|(i, _)| ubits >> i & 1 != 0)
+                            .fold(F2mElement::zero(5), |a, (_, x)| a.add(x));
+                        let product = ws
+                            .iter()
+                            .enumerate()
+                            .filter(|(i, _)| vbits >> i & 1 != 0)
+                            .fold(F2mElement::zero(5), |a, (_, x)| a.add(x));
+                        if product
+                            .square(&c.irreducible)
+                            .add(&z.mul(&product, &c.irreducible))
+                            .add(
+                                &z.square(&c.irreducible)
+                                    .mul(&u.square(&c.irreducible), &c.irreducible),
+                            )
+                            .add(&c.b)
+                            .is_zero()
+                        {
+                            expected.push((u, product));
+                        }
+                    }
+                }
+                match projector.solve(&xs, &c, z, y).0 {
+                    ProjectedResult::Inconsistent => {
+                        classifications[0] += 1;
+                        assert!(expected.is_empty());
+                    }
+                    ProjectedResult::Unique(u, v) => {
+                        classifications[1] += 1;
+                        assert_eq!(expected, vec![(u, v)]);
+                    }
+                    ProjectedResult::Deficient => {
+                        classifications[2] += 1;
+                        assert!(expected.len() > 1);
+                    }
+                }
+            }
+        }
+        assert!(
+            classifications.iter().all(|n| *n > 0),
+            "exercise every classification: {classifications:?}"
+        );
+    }
+
+    #[test]
     fn packed_elimination_matches_generic_solutions_kernels_and_inconsistency() {
         let mut seed = 20261115u64;
         for n in [5, 7, 9, 83, 131, 192] {
@@ -355,16 +672,21 @@ pub fn decompose_trace_zero_linearized(
 ) -> TraceZeroLinearizedReport {
     let mut out = TraceZeroLinearizedReport::default();
     let deadline = limits.wall_budget.map(|d| Instant::now() + d);
-    if !v.contains(target)
-        || base
-            .iter()
-            .any(|p| matches!(p, BinaryPoint::Infinity) || !v.contains(p))
-    {
+    if !v.contains(target) {
         out.relation.reason = Some("invalid linearized target/base");
         return out;
     }
     if limits.max_models == 0 || limits.max_patterns == 0 || limits.max_variables == 0 {
-        out.relation.reason = Some("zero linearized budget");
+        out.relation.reason = Some(
+            if base
+                .iter()
+                .any(|p| matches!(p, BinaryPoint::Infinity) || !v.contains(p))
+            {
+                "invalid linearized target/base"
+            } else {
+                "zero linearized budget"
+            },
+        );
         return out;
     }
     if base.is_empty() {
@@ -375,7 +697,28 @@ pub fn decompose_trace_zero_linearized(
     let mut by_x: BTreeMap<BigUint, Vec<usize>> = BTreeMap::new();
     let mut by_point = BTreeMap::new();
     for (i, p) in base.iter().enumerate() {
+        let BinaryPoint::Affine { x: fx, y: fy } = p else {
+            out.relation.reason = Some("invalid linearized target/base");
+            return out;
+        };
+        if fx.m_value() != c.m || fy.m_value() != c.m {
+            out.relation.reason = Some("invalid linearized target/base");
+            return out;
+        }
         let (x, y) = point_key(p);
+        let known_sign = by_x.get(&x).is_some_and(|ids| {
+            let BinaryPoint::Affine { y: known, .. } = &base[ids[0]] else {
+                unreachable!()
+            };
+            fy == known || *fy == known.add(fx)
+        });
+        // is_in_4e performs the field-width and curve-equation checks itself.
+        // Once one ordinate is admitted, its identical/opposite lift is also
+        // admitted; every supplied sign/index is still retained below.
+        if !known_sign && c.is_in_4e(p) != Some(true) {
+            out.relation.reason = Some("invalid linearized target/base");
+            return out;
+        }
         by_x.entry(x.clone()).or_default().push(i);
         by_point.entry((x, y)).or_insert(i);
     }
@@ -404,6 +747,9 @@ pub fn decompose_trace_zero_linearized(
     let batch_size = if base.len() >= 64 { 32 } else { 1 };
     let mut residuals = Vec::new();
     let mut residual_start = 0;
+    let use_projection =
+        c.m >= 31 && base.len() >= 64 && xs.len() < 63 && out.linear_columns < c.m as usize;
+    let mut projection = None;
     let mut incomplete = false;
     for (r, p) in base.iter().enumerate() {
         if deadline.is_some_and(|d| Instant::now() >= d) {
@@ -427,23 +773,48 @@ pub fn decompose_trace_zero_linearized(
                 .enumerate()
                 .find_map(|(i, q)| by_point.get(&point_key(&point_neg(q))).map(|&j| (i, j)))
         } else {
-            let BinaryPoint::Affine { x: z, .. } = &residual else {
+            let BinaryPoint::Affine { x: z, y: zy } = &residual else {
                 unreachable!()
             };
-            let z2 = z.square(&c.irreducible);
-            let columns: Vec<_> = xs_squared
-                .iter()
-                .map(|x2| z2.mul(x2, &c.irreducible))
-                .chain(
-                    ws.iter()
-                        .zip(&ws_squared)
-                        .map(|(w, w2)| w2.add(&z.mul(w, &c.irreducible))),
-                )
-                .collect();
             out.systems += 1;
-            let Some((solution, kernel, rank)) = linear_solutions(&columns, &c.b, c.m) else {
-                out.relation.patterns_refuted += 1;
-                continue;
+            let projected = if r > 0 && use_projection {
+                let p = projection.get_or_insert_with(|| ProductProjection::new(&xs, &ws, c));
+                out.projected_columns = xs.len() + 1;
+                out.projected_systems += 1;
+                let (answer, rows) = p.solve(&xs, c, z, zy);
+                out.projected_rows += rows;
+                Some(answer)
+            } else {
+                None
+            };
+            let mut unique_pair = None;
+            let (solution, kernel, rank) = match projected {
+                Some(ProjectedResult::Inconsistent) => {
+                    out.projected_inconsistent += 1;
+                    out.relation.patterns_refuted += 1;
+                    continue;
+                }
+                Some(ProjectedResult::Unique(u, v)) => {
+                    unique_pair = Some((u, v));
+                    (BigUint::default(), Vec::new(), out.linear_columns)
+                }
+                Some(ProjectedResult::Deficient) | None => {
+                    let z2 = z.square(&c.irreducible);
+                    let columns: Vec<_> = xs_squared
+                        .iter()
+                        .map(|x2| z2.mul(x2, &c.irreducible))
+                        .chain(
+                            ws.iter()
+                                .zip(&ws_squared)
+                                .map(|(w, w2)| w2.add(&z.mul(w, &c.irreducible))),
+                        )
+                        .collect();
+                    let Some(answer) = linear_solutions(&columns, &c.b, c.m) else {
+                        out.relation.patterns_refuted += 1;
+                        continue;
+                    };
+                    answer
+                }
             };
             out.maximum_rank = out.maximum_rank.max(rank);
             out.maximum_nullity = out.maximum_nullity.max(kernel.len());
@@ -466,18 +837,23 @@ pub fn decompose_trace_zero_linearized(
                         coefficients ^= k;
                     }
                 }
-                let mut u = F2mElement::zero(c.m);
-                let mut product = F2mElement::zero(c.m);
-                for (j, x) in xs.iter().enumerate() {
-                    if coefficients.bit(j as u64) {
-                        u = u.add(x);
+                let (u, product) = if let Some(pair) = &unique_pair {
+                    pair.clone()
+                } else {
+                    let mut u = F2mElement::zero(c.m);
+                    let mut product = F2mElement::zero(c.m);
+                    for (j, x) in xs.iter().enumerate() {
+                        if coefficients.bit(j as u64) {
+                            u = u.add(x);
+                        }
                     }
-                }
-                for (j, w) in ws.iter().enumerate() {
-                    if coefficients.bit((xs.len() + j) as u64) {
-                        product = product.add(w);
+                    for (j, w) in ws.iter().enumerate() {
+                        if coefficients.bit((xs.len() + j) as u64) {
+                            product = product.add(w);
+                        }
                     }
-                }
+                    (u, product)
+                };
                 out.relation.models += 1;
                 let roots = monic_roots(&u, &product, c.m, &c.irreducible);
                 for x in roots {
