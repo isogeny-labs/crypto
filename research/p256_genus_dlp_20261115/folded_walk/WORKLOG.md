@@ -119,3 +119,33 @@
   before publication: preserve main's full existing sequence and every repeated
   section, insert only the three new task sections. Final main-log diff only adds.
 - No frozen evidence or immutable claim file needed a conflict resolution.
+
+## 06:49Z — Published continuation and latest-main log reconciliation
+
+### What was done (commands, files, features)
+- Published a569095c to PR4258 with updated title/body, passing local body lint,
+  and retained MERGE auto-merge. The old gh edit command hit deprecated classic
+  Projects GraphQL; REST PATCH updated the exact prepared body successfully.
+- Built /workspace/p256-runpod-replay-ready from the published source commit,
+  including toolchain, clean source state, binary/archive digests and expected
+  outputs. A downloadable tarball is outside Git; no cloud allocation exists.
+- Main advanced to9e95f832 while CI started. Merged it; only the shared log
+  conflicted. Preserved all126 latest-main sections and inserted the three
+  unchanged task sections. Main ledger prefix remains valid; source closure
+  hashes are unchanged, so no extra solver run is needed for this log-only merge.
+
+### Decisions made (and why)
+- Continue using the exact published binary/source package; the subsequent
+  merge changes shared metadata, not solver source or compile-time inputs.
+- Await authenticated RunPod access for execution and current-head CI for merge.
+
+### Open threads (unfinished, pick up next time)
+- Required checks/review and auto-merge; RunPod credential/access; complete cost.
+- No pod, timed run or background research job is active.
+
+### Errors (what went wrong, how it was handled)
+- A broad whitespace diff included inherited main SVG output; restricted it
+  to this PR's changes. Artifact checker initially used defaults because sparse
+  policy config was absent; materialized the current config and it passed.
+- Restored repeated main log sections removed by the initial administrative
+  deduplication before publication. Final shared-log diff is additions only.
