@@ -104,3 +104,45 @@ hosted run43729911221 also has zero executed steps; the check annotation says
 the job was not started because the account is locked due to billing. This
 does not change either local proof receipt or supply a hosted pass.
 [pcc:unverified]
+
+## Relation-solver checkpoint, 15:50Z
+
+KB discovery still returns no tools and the repository wrapper still has no
+executable. Re-opened the precise initial-elimination, selective-oracle and
+code/guessing reviews, plus the November7 elliptic-code RESULTS. Downloaded
+and read [PKM2016](https://christophe.petit.web.ulb.be/files/16PKC_primeECDLP.pdf)
+sections3.1--3.5/5 from the author's site; the separate
+checks/oracle-review-sources.sha256 binds that PDF. Its auxiliary-kernel
+factor-base framework is prior work, and its generalized-root-finding cost
+remains an explicit dependency. The present setup is not a new relation
+solver or an asymptotic improvement claim. [pcc:unverified]
+
+The existing selective reduction needs a label-free positive oracle with a
+known per-call cap T and known success lower bound theta on a constant fraction
+of sampled bases. For Bmax bounded globally, collect B+1 answers in a block
+of ceil(4(Bmax+1)/theta) attempts, choose a nonzero left-kernel vector from the
+relation matrix alone and recover from the random labels if its denominator
+is nonzero. Every failed call and base block is charged. Both T and theta^-1,
+setup, base size and final linear algebra need effective subexponential bounds.
+The existing review supplies this conditional reduction, not the oracle.
+[pcc:unverified]
+
+The two bounded critical-pair panels do not establish a sufficient degree or
+positive yield; their capped outcomes are not degree lower bounds. The coding
+review's exact m-column singularity predicate still needs a column-selection
+algorithm. Its almost-complete support guess reduces to group completion and
+membership; November7's toy decoder verdict is UNRESOLVED, not a general
+impossibility result. The explicit cover review scopes full materialization,
+without excluding smaller implicit bases. No one of these documents supplies
+the missing complete classical algorithm. No new solver/model computation or
+scientific measurement was run during this source checkpoint. [pcc:unverified]
+
+Next discriminating mathematical work is an explicit positive-only algorithm
+with a provable cost/yield contract, or a sufficient degree bound for the
+actual source-provenanced norm system. The frozen multiprecision controls
+would qualify software only. They remain pending the unchanged upload gate;
+additional setup lemmas or larger implementation caps do not resolve this
+oracle obligation. [pcc:unverified]
+
+Source checkpoint claim PCC-20261115-b6065a remains unverified. The four exact
+repository blob identities are retained in checks/oracle-review-source-blobs.txt.

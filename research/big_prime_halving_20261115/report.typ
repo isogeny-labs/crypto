@@ -76,3 +76,11 @@ Primary sources: MIT18.783 Fall2023 Lectures2--5 (Lecture5 Theorem5.13);
 FLINT upstream v3.1.3 root, sqrt and primality code; pinned mathlib field
 division/finite-field laws. KB access is unavailable. Exact links/hashes and
 scope are in PROTOCOL.md, SOURCE-AUDIT.md and checks/primary-sources.sha256.
+
+*Relation-solver checkpoint.* Re-read PKM2016 sections3.1--3.5/5 and the
+repository's selective-oracle and code/guessing reviews. The auxiliary-kernel
+framework is prior work. A positive-only solver still needs a known cost cap
+and effective useful yield on enough bases; small quotient dimension or the
+coding predicate alone supplies neither. No new solver or numerical result
+is claimed. The exact obligation and source hash are in SOURCE-AUDIT.md and
+checks/oracle-review-sources.sha256.

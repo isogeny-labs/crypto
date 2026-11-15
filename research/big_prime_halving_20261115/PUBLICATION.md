@@ -97,3 +97,15 @@ Its hosted run43729911221 has zero executed steps and the same explicit
 billing-lock annotation as PR9; no hosted proof pass is asserted. The next
 numerical action is still the original frozen wrapper after successful
 checkpoint upload, not a changed panel or another seed. [pcc:unverified]
+
+2026-11-15T15:51Z: reviewed the existing selective-positive-oracle,
+initial-elimination and code/guessing obligations, the November7 code panel
+and the primary PKM2016 sections3.1--3.5/5. Exact repository blob identities
+and author-PDF SHA256a53030a6cde720c354aebfb65b1eb01e07766ce2d26e543d77f2516c0a49ef5b
+are retained separately from the frozen pre-code source manifest. This source
+checkpoint supplies no new algorithmic/numerical result. The report's second
+page now states the missing effective positive-only cost/yield contract; it
+was visually inspected and page1is pixel-identical. Claim
+PCC-20261115-b6065a remains unverified. Native code, wrappers, parameters and
+build002 bindings remain untouched; qualification001 remains unrun.
+[pcc:unverified]
