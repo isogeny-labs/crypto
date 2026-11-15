@@ -72,3 +72,22 @@ has *exactly degree 17,980*. It is an explicit finite-instance result, and any m
 4. **Gate D: complete solver and cost.** Only after Gate C yields genuine extracted natural relations: Rust sparse relation accumulation and linear algebra, unknown public Q recovery (point check), setup, all failures, full cold wall/GAE/memory, and matched optimized rho and BSGS on the identical ordinary prime-order curve. Include heldouts, independent validation and growth checks. **Do not promote a leaderboard or claim a cheaper non-generic ECDLP solver from this component.**
 
 **Classification:** The S4/S3 finite-field projection is algebraic preprocessing. A subsequent generic x-table join or group enumeration would belong to the repository's **generic decomposition** track, even if fed by this algebraic component. Only a true target-dependent polynomial solver with measured complete costs can satisfy the headline algebraic track. [pcc:unverified]
+
+
+## Exact-source Rust development CI result (source `9074471be1ad`, 2026-11-15)
+
+[Successful CI run 43730061804](https://github.com/isogeny-labs/crypto/actions/runs/43730061804), job `132860334673`, compiled and ran the original repository Rust engine adapter, the standalone Python replay, the new Rust triple projection and the focused strict lint. All 29 job steps succeeded. [Archived machine-readable original outputs](S4_TRIPLE_CI_EVIDENCE_20261115.json). Standing remains **[pcc:unverified]** (GitHub development CI is not independently signed PCC).
+
+| Actual Rust development value | Result |
+|---|---:|
+| S4 projected rational roots | 17,980 (all distinct) |
+| Nested S3 quadratics (scalar replayed) | 9,455 |
+| Batched field inversions | 2 |
+| Scalar reference inversions | 9,455 |
+| Group additions for **post-discovery validation only** | 26,970 |
+| Batched field-projection phase | 2.913431 ms |
+| Scalar inversion reference phase | 4.773699 ms |
+
+The two reported clocks come from a single unpaired **development** run, with batch first and scalar second and no A/A randomization, no full cold setup, memory pricing or exclusive host control. Therefore the measured ratio is *not* a qualified speedup, and the 26,970 validation group additions cannot be treated as relation discovery work or elided from an eventual end-to-end independent replay. The Python check matched the Rust FNV and independently recomputed the SHA-256 root corpus.
+
+**New whole-pipeline design constraint:** naive enumeration of the two triple side projections and one admissible distinct-index pair projection requires `17980² × 930 = 300,650,772,000` tuple candidates per target before any central S4 predicate. This exact Cartesian-product count is not a group-operation count or a lower bound on algebraic elimination. It rules out *that particular unstructured enumeration* as the next algorithm; the target-dependent quotient/subresultant intersection and its complete rank-and-cost gate are the next experiment.
