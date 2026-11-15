@@ -52,9 +52,9 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 # Positive loss evidence: the runner, reachable, reports idle or a start other than s0; the REST record (HTTP 200)
 # shows desiredStatus other than RUNNING; the pod is missing from a successful list AND its GET returns 404; the tree
 # shows a second start. A changed lastStartedAt alone is recorded but is not evidence. A LOST is relaunched
-# automatically (relaunch "auto") only when a check-in recorded a RunPod-side status change: a lastStatusChange that
-# differs from its value at start, does not name the user ("by User"), and comes before any action the session logged
-# for the pod; every other LOST has relaunch "owner" (owner decision 13).
+# automatically (relaunch "auto") only on host-side evidence recorded before any action the session logged for the pod
+# (owner decision 13): a lastStatusChange that differs from its value at start and does not name the user ("by User"),
+# or the pod gone from a successful list with GET 404. Every other LOST has relaunch "owner".
 # The memory peak is the pilot's own field (largest "memory R MB (peak P MB)" in runs/<cell>.log: VmHWM in MiB,
 # x 1,048,576), else the cgroup figure (v2 memory.peak, else v1 memory.max_usage_in_bytes). Both are recorded.
 # ---------------------------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ facts() {
   acts='[]'; [ -s "$R/session-actions.jsonl" ] && acts=$(jq -cs '.' "$R/session-actions.jsonl" 2>/dev/null || echo '[]')
   # The collections: complete ones have collect-<k>.json. The one classified is the latest whose fetches agreed with the
   # runner done; otherwise the latest complete one.
-  cols=$(for f in "$R"/collect-[0-9]*.json; do [ -e "$f" ] && jq -c --arg k "$(basename "$f" .json | sed 's/collect-//')" '. + {k:($k|tonumber)}' "$f" 2>/dev/null; done | jq -cs 'sort_by(.k)')
+  cols=$(for f in "$R"/collect-[0-9]*.json; do [ -e "$f" ] && jq -c --arg k "$(basename "$f" .json | sed 's/collect-//')" '. + {k:($k|tonumber)}' "$f" 2>/dev/null || true; done | jq -cs 'sort_by(.k)')
   [ -n "$cols" ] || cols='[]'
   K=$(jq -r '([.[] | select(.fetched == true and .transfer_ok == true and .prefetch.live.state == "done")] | last | .k) // (last | .k) // empty' <<<"$cols")
   col=null; O=/nonexistent
@@ -87,7 +87,7 @@ facts() {
   # P0b: complete collections made with the runner done must have the same tree.
   disagree=false
   local mans; mans=$(for k in $(jq -r '.[] | select(.prefetch.live.state == "done") | .k' <<<"$cols"); do
-    [ -d "$RES/collect-$k" ] && manifest "$RES/collect-$k" | sha256sum | cut -d' ' -f1; done | sort -u | wc -l)
+    if [ -d "$RES/collect-$k" ]; then manifest "$RES/collect-$k" | sha256sum | cut -d' ' -f1; fi; done | sort -u | wc -l)
   [ "$mans" -gt 1 ] && disagree=true
   s0=$(jq -r 'select(.state == "running") | .started // empty' "$R/start.json" 2>/dev/null || true)
   [ -n "$s0" ] || s0=$(jq -r '[.[] | .live.started // empty] | first // empty' <<<"$ck")
@@ -175,12 +175,16 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
        + (if $f.collect != null and $f.tree.runner_state != null and $f.tree.runner_state.started != null and $f.tree.runner_state.started != $s0
           then [{at:$f.collect.at, why:"runner_state.json start differs from start.json"}] else [] end)
       ) as $ev
-    # host-side evidence: a RunPod-side status change recorded before any action the session logged for this pod
+    # host-side evidence (owner decision 13), recorded before any action the session logged for this pod (every session
+    # delete is logged before its API call): a RunPod-side status change, or the pod gone from the list with GET 404
     | ([ $f.actions[] | .at | ep ] | min) as $act0
-    | ([ $ck[] | select(.rest != null and .rest.http == 200 and .rest.lastStatusChange != null and .rest.lastStatusChange != $f.LSC0
-           and (.rest.lastStatusChange | test("by user"; "i") | not) and ($act0 == null or (.at | ep) < $act0)) ] | first) as $hs
-    | (if $hs != null then {relaunch:"auto", host_side:"lastStatusChange \"\($hs.rest.lastStatusChange)\" at \($hs.at)"}
-       else {relaunch:"owner", host_side:null} end) as $rl
+    | ([ $ck[] | select(($act0 == null or (.at | ep) < $act0) and .rest != null and
+           ((.rest.http == 200 and .rest.lastStatusChange != null and .rest.lastStatusChange != $f.LSC0
+             and (.rest.lastStatusChange | test("by user"; "i") | not))
+            or (.listed == false and .rest.http == 404))) ] | first) as $hs
+    | (if $hs == null then {relaunch:"owner", host_side:null}
+       elif $hs.rest.http == 404 then {relaunch:"auto", host_side:"pod gone from the list and GET 404 at \($hs.at), before any logged session action"}
+       else {relaunch:"auto", host_side:"lastStatusChange \"\($hs.rest.lastStatusChange)\" at \($hs.at)"} end) as $rl
     | ($f.collect.prefetch // null) as $pre
     | ($f.collect != null and $f.collect.reason == "done" and $f.collect.transfer_ok == true and $pre != null
        and $pre.live != null and $pre.live.state == "done" and $pre.live.started == $s0
@@ -318,7 +322,7 @@ delete_phase() { # $1 reason. Log the action, delete, confirm by listing, write 
 
 verify_upload() { # every file of the classified tree is in RECORD's raw[] with uploaded true (benchrec add-raw + upload)
   local miss K
-  K=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1)
+  K=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1 || true)
   [ -f "$RECORD" ] && [ -n "$K" ] && [ -f "$REC/local-sha256-$K.txt" ] || return 1
   miss=$(comm -23 <(awk '{ print $1 }' "$REC/local-sha256-$K.txt" | sort -u) \
                   <(jq -r '.raw[]? | select(.uploaded == true) | .sha256' "$RECORD" | sort -u))
@@ -349,7 +353,7 @@ last=$(checkin regular)
 dl=""; [ -n "$s0" ] && dl=$(( $(epoch "$s0") + DEADLINE_S ))
 
 # --- collected with the runner done: wait for the raw upload (at most UPLOAD_WAIT_S, never past the hard deadline)
-lastK=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1)
+lastK=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1 || true)
 if [ -n "$lastK" ] && jq -e '.reason == "done" and .transfer_ok == true' "$REC/collect-$lastK.json" >/dev/null 2>&1; then
   [ -f "$REC/outcome.json" ] || { classify "$REC" "$RES" > "$REC/outcome.json"; log "OUTCOME (late) $(jq -c '{class,rule,why}' "$REC/outcome.json")"; }
   if [ "$MODE" = --delete ]; then
@@ -413,7 +417,7 @@ if [ "$lstate" != unreachable ]; then
     cp "$wd/$keep.sha256" "$REC/local-sha256-$k.txt"; (cd "$wd" && sha256sum "$keep.tar.gz") > "$REC/tarball-$k.sha256"
     mkdir -p "$RES"; mv "$wd/$keep/results" "$RES/collect-$k"
     cmp -s "$REC/local-sha256-$k.txt" <(manifest "$RES/collect-$k") || { log "kept tree differs from its fetched manifest"; tok=false; }
-    o="$RES/collect-$k"; cl=$(sed -n 's/^.*start \(X-m2-[^ ]*\)$/\1/p' "$o/progress.txt" 2>/dev/null | head -1)
+    o="$RES/collect-$k"; cl=$(sed -n 's/^.*start \(X-m2-[^ ]*\)$/\1/p' "$o/progress.txt" 2>/dev/null | head -1 || true)
     { echo "--- binary.sha256"; cat "$o/binary.sha256" 2>/dev/null || echo MISSING
       echo "--- host.txt (first 7 lines)"; head -7 "$o/host.txt" 2>/dev/null || echo MISSING
       echo "--- progress.txt"; cat "$o/progress.txt" 2>/dev/null || echo MISSING
