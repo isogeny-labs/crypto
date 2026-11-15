@@ -1,0 +1,212 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "log2_r": 21.000262077754154,
+      "arm": "ksum4",
+      "runs": 432,
+      "verified": 432,
+      "mean_s": [
+        6.576620363781898,
+        7.333381646730422,
+        14.14423319326713
+      ],
+      "charged_sum": 4114726.0,
+      "native_sum": 4734750,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 3960.0
+      }
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "log2_r": 21.000262077754154,
+      "arm": "ksum4-p",
+      "runs": 432,
+      "verified": 432,
+      "mean_s": [
+        6.395716896757779,
+        7.152478179706301,
+        13.96332972624301
+      ],
+      "charged_sum": 4001542.0,
+      "native_sum": 4734750,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 3960.0
+      }
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "log2_r": 21.000262077754154,
+      "arm": "ksum5",
+      "runs": 432,
+      "verified": 432,
+      "mean_s": [
+        6.990527509119595,
+        7.8724947245660095,
+        15.810199663583747
+      ],
+      "charged_sum": 4373691.0,
+      "native_sum": 5518113,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2016.0
+      }
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "log2_r": 21.000262077754154,
+      "arm": "ksum5-p",
+      "runs": 432,
+      "verified": 432,
+      "mean_s": [
+        6.5168642328656,
+        7.398831448312022,
+        15.336536387329756
+      ],
+      "charged_sum": 4077339.0,
+      "native_sum": 5518113,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2016.0
+      }
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "log2_r": 21.000262077754154,
+      "arm": "rho-neg",
+      "runs": 432,
+      "verified": 432,
+      "mean_s": [
+        1.2105239631119267,
+        1.3198095785686537,
+        2.3033801176792212
+      ],
+      "charged_sum": 757376.0,
+      "native_sum": 683756,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "log2_r": 21.000262077754154,
+      "arm": "rho-neg-aa",
+      "runs": 432,
+      "verified": 432,
+      "mean_s": [
+        1.2105239631119267,
+        1.3198095785686537,
+        2.3033801176792212
+      ],
+      "charged_sum": 757376.0,
+      "native_sum": 683756,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4",
+      "b": "ksum4-p",
+      "verdict": "ksum4-p < ksum4"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4",
+      "b": "ksum5",
+      "verdict": "ksum4 < ksum5"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4",
+      "b": "ksum5-p",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < ksum4"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4-p",
+      "b": "ksum5",
+      "verdict": "ksum4-p < ksum5"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4-p",
+      "b": "ksum5-p",
+      "verdict": "ksum4-p < ksum5-p"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4-p",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-p"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum4-p",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < ksum4-p"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum5",
+      "b": "ksum5-p",
+      "verdict": "ksum5-p < ksum5"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum5",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum5"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum5",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < ksum5"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum5-p",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum5-p"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "ksum5-p",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < ksum5-p"
+    },
+    {
+      "curve": "icv1-f2m24-tm3047-2d0c0e8c",
+      "a": "rho-neg",
+      "b": "rho-neg-aa",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}

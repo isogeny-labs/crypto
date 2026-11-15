@@ -132,13 +132,13 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2010Z-ic-native-ifma",
+  "latest_record": "20261115T2211Z-ksum-prune-tableb",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 8,
     "invalid": 4,
-    "measured": 200,
-    "open": 1
+    "measured": 201,
+    "open": 2
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -10160,6 +10160,870 @@
       ],
       "problem": "ic:koblitz_setup_phase",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 10.552,
+      "latest": 10.552,
+      "latest_derived": {
+        "value_over_reference": 5.367243
+      },
+      "metric": "s_ksum4p_w0_b15",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.367243
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.966,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 10.552
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 9.3358,
+      "latest": 9.3358,
+      "latest_derived": {
+        "value_over_reference": 4.973788
+      },
+      "metric": "s_ksum4p_w0_b18",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 4.973788
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.877,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 9.3358
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.5535,
+      "latest": 6.5535,
+      "latest_derived": {
+        "value_over_reference": 5.197478
+      },
+      "metric": "s_ksum4p_w0_b21",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.197478
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.2609,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.5535
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.3957,
+      "latest": 6.3957,
+      "latest_derived": {
+        "value_over_reference": 5.283519
+      },
+      "metric": "s_ksum4p_w0_b24",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.283519
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.2105,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.3957
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.6012,
+      "latest": 6.6012,
+      "latest_derived": {
+        "value_over_reference": 6.17685
+      },
+      "metric": "s_ksum4p_w0_b27",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 6.17685
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.0687,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.6012
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.4613,
+      "latest": 6.4613,
+      "latest_derived": {
+        "value_over_reference": 5.091246
+      },
+      "metric": "s_ksum4p_w0_p20",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.091246
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.2691,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.4613
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.1395,
+      "latest": 6.1395,
+      "latest_derived": {
+        "value_over_reference": 5.238928
+      },
+      "metric": "s_ksum4p_w0_p22",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.238928
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.1719,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.1395
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.2556,
+      "latest": 6.2556,
+      "latest_derived": {
+        "value_over_reference": 5.753863
+      },
+      "metric": "s_ksum4p_w0_p24",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.753863
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.0872,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.2556
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 11.1984,
+      "latest": 11.1984,
+      "latest_derived": {
+        "value_over_reference": 5.696033
+      },
+      "metric": "s_ksum5p_w0_b15",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.696033
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.966,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 11.1984
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 9.6538,
+      "latest": 9.6538,
+      "latest_derived": {
+        "value_over_reference": 5.143207
+      },
+      "metric": "s_ksum5p_w0_b18",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.143207
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.877,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 9.6538
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.3367,
+      "latest": 6.3367,
+      "latest_derived": {
+        "value_over_reference": 5.025537
+      },
+      "metric": "s_ksum5p_w0_b21",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.025537
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.2609,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.3367
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.5169,
+      "latest": 6.5169,
+      "latest_derived": {
+        "value_over_reference": 5.383643
+      },
+      "metric": "s_ksum5p_w0_b24",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.383643
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.2105,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.5169
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.038,
+      "latest": 6.038,
+      "latest_derived": {
+        "value_over_reference": 5.649855
+      },
+      "metric": "s_ksum5p_w0_b27",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.649855
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.0687,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.038
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.4409,
+      "latest": 6.4409,
+      "latest_derived": {
+        "value_over_reference": 5.075171
+      },
+      "metric": "s_ksum5p_w0_p20",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.075171
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.2691,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.4409
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.1113,
+      "latest": 6.1113,
+      "latest_derived": {
+        "value_over_reference": 5.214865
+      },
+      "metric": "s_ksum5p_w0_p22",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.214865
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.1719,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.1113
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5.9784,
+      "latest": 5.9784,
+      "latest_derived": {
+        "value_over_reference": 5.498896
+      },
+      "metric": "s_ksum5p_w0_p24",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.498896
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.0872,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 5.9784
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 11.9155,
+      "latest": 11.9155,
+      "latest_derived": {
+        "value_over_reference": 5.657882
+      },
+      "metric": "s_ksum5p_w0p1_b15",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.657882
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 2.106,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 11.9155
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 10.378,
+      "latest": 10.378,
+      "latest_derived": {
+        "value_over_reference": 5.131019
+      },
+      "metric": "s_ksum5p_w0p1_b18",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.131019
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 2.0226,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 10.378
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 7.0626,
+      "latest": 7.0626,
+      "latest_derived": {
+        "value_over_reference": 5.15255
+      },
+      "metric": "s_ksum5p_w0p1_b21",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.15255
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.3707,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 7.0626
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 7.3988,
+      "latest": 7.3988,
+      "latest_derived": {
+        "value_over_reference": 5.606001
+      },
+      "metric": "s_ksum5p_w0p1_b24",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.606001
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.3198,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 7.3988
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.7914,
+      "latest": 6.7914,
+      "latest_derived": {
+        "value_over_reference": 5.816049
+      },
+      "metric": "s_ksum5p_w0p1_b27",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.816049
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.1677,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.7914
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 7.1886,
+      "latest": 7.1886,
+      "latest_derived": {
+        "value_over_reference": 5.210263
+      },
+      "metric": "s_ksum5p_w0p1_p20",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.210263
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.3797,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 7.1886
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.8529,
+      "latest": 6.8529,
+      "latest_derived": {
+        "value_over_reference": 5.355502
+      },
+      "metric": "s_ksum5p_w0p1_p22",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.355502
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.2796,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.8529
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.7532,
+      "latest": 6.7532,
+      "latest_derived": {
+        "value_over_reference": 5.699865
+      },
+      "metric": "s_ksum5p_w0p1_p24",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.699865
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 1.1848,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 6.7532
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 18.3695,
+      "latest": 18.3695,
+      "latest_derived": {
+        "value_over_reference": 5.458179
+      },
+      "metric": "s_ksum5p_w1_b15",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.458179
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 3.3655,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 18.3695
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 16.8951,
+      "latest": 16.8951,
+      "latest_derived": {
+        "value_over_reference": 5.069037
+      },
+      "metric": "s_ksum5p_w1_b18",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.069037
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 3.333,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 16.8951
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 13.5961,
+      "latest": 13.5961,
+      "latest_derived": {
+        "value_over_reference": 5.764479
+      },
+      "metric": "s_ksum5p_w1_b21",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.764479
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 2.3586,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 13.5961
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 15.3365,
+      "latest": 15.3365,
+      "latest_derived": {
+        "value_over_reference": 6.658201
+      },
+      "metric": "s_ksum5p_w1_b24",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 6.658201
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 2.3034,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 15.3365
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 13.572,
+      "latest": 13.572,
+      "latest_derived": {
+        "value_over_reference": 6.59251
+      },
+      "metric": "s_ksum5p_w1_b27",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 6.59251
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 2.0587,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 13.572
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 13.9172,
+      "latest": 13.9172,
+      "latest_derived": {
+        "value_over_reference": 5.860861
+      },
+      "metric": "s_ksum5p_w1_p20",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 5.860861
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 2.3746,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 13.9172
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 13.5275,
+      "latest": 13.5275,
+      "latest_derived": {
+        "value_over_reference": 6.014628
+      },
+      "metric": "s_ksum5p_w1_p22",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 6.014628
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 2.2491,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 13.5275
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 13.7269,
+      "latest": 13.7269,
+      "latest_derived": {
+        "value_over_reference": 6.655144
+      },
+      "metric": "s_ksum5p_w1_p24",
+      "points": [
+        {
+          "commit": "fff219f63f8e",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 6.655144
+          },
+          "n": 432,
+          "record": "20261115T2211Z-ksum-prune-tableb",
+          "reference": 2.0626,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+          "value": 13.7269
+        }
+      ],
+      "problem": "ic:ksum_prune_tableb",
+      "unit": "S"
     },
     {
       "better": "lower",

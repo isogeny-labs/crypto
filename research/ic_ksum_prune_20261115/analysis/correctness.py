@@ -11,7 +11,8 @@ def key(d): return (d["round"], d["workload"]["target_index"])
 def ph(d): return {p["name"]: p for p in d["phases"]}
 for sd in sorted(glob.glob(os.path.join(sess, "*-r[0-9]"))):
     name = os.path.basename(sd); recs = {}
-    for l in gzip.open(os.path.join(sd, "records.jsonl.gz"), "rt"):
+    f = os.path.join(sd, "records.jsonl"); fh = open(f) if os.path.exists(f) else gzip.open(f + ".gz", "rt")
+    for l in fh:
         d = json.loads(l); recs[(d["arm"],) + key(d)] = d
     n = 0
     for k in (4, 5):
