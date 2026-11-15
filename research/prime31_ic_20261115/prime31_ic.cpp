@@ -1,7 +1,7 @@
 // Complete three-summand factor-base index-calculus pilot on ordinary prime-order E/F_(2^31-1).
 // The pair-table method is not novel or subgeneric; it is an honest index-calculus baseline.
-// C++17. compile: g++ -O3 -std=c++17 -DNDEBUG -o prime31_ic prime31_ic.cpp
 #include <cmath>
+// C++17. compile: g++ -O3 -std=c++17 -DNDEBUG -o prime31_ic prime31_ic.cpp
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
@@ -175,7 +175,8 @@ int main(int argc,char**argv){
   }
   auto after_rel=chrono::steady_clock::now();
   if(linear.rank<base_size){
-   cout<<"{\"status\":\"censored\",\"rank\":"<<linear.rank<<",\"factor_base\":"<<base_size<<",\"trials\":"<<trials<<",\"group_adds\":"<<cost.adds<<"}\n";return 2;
+   cout<<"{\"status\":\"censored\",\"rank\":"<<linear.rank<<",\"target\":["<<Q.x<<","<<Q.y<<"]"
+  <<",\"factor_base\":"<<base_size<<",\"trials\":"<<trials<<",\"group_adds\":"<<cost.adds<<"}\n";return 2;
   }
   auto logs=linear.solve();
   for(size_t i=0;i<base_size;i++)if(!(scalar(G,logs[i])==fb[i]))throw runtime_error("factor base log verification fail");
