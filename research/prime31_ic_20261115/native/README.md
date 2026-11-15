@@ -154,3 +154,10 @@ HTTP 403 in the browsing tool; their contents are not claimed to have been read.
 Diagram: [pipeline.svg](pipeline.svg). Printable report: [REPORT.pdf](REPORT.pdf).
 No leaderboard, scoreboard, timeline or browser measurement row changes: this
 continuation adds no eligible cost measurement or registry change. [pcc:unverified]
+
+
+## New exact prime31 two-summand yield preflight (2026-11-15) [pcc:unverified]
+
+[Mathematical gate, prior-lead assessment and proposed experiments](TWO_SUM_YIELD_GATE.md) · [Rust-native executable replay](examples/prime31_two_sum_gate.rs). This deterministic development preflight imports this crate's actual `Base`, `Arithmetic`, and `PRIME31`; it **does not call F4** and must not be cited as a solver performance measurement. An independent producer-local modular arithmetic implementation counted actual curve-liftable base sizes **B=135,256,509** at Dickson depths 8,9,10 and exact distinct signed two-point target supports **36,451; 131,067; 518,085**. The Rust executable asserts these expected results; exact-head GitHub Actions replay is pending. A uniform fixed-base query has exact positive probability support/n, and a restricted full-(B+1)-rank collector has an idealized calls floor in the report; this is not a lower bound on early scalar-solving cycles or target-adaptive algebraic methods.
+
+The cross-repository survey also found [#4275](https://github.com/isogeny-labs/crypto/pull/4275): on its measured planted-positive systems, dense-membership polynomial extraction outperforms the prior tower solver while enumeration remains less expensive. Prioritize a **prospective natural-positive dense-versus-tower Rust A/B** (same public inputs, failed calls, useful rank, complete costs) before expensive m8 extension. This remains a proposed test, not a frozen protocol or a demonstrated cold prime31 advantage.
