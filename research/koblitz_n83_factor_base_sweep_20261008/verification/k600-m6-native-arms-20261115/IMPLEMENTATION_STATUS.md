@@ -148,6 +148,19 @@ the solver, a real preflight or any K600 XCNF. The image/build receipt,
 cumulative approved-budget controller, pinned model replay, unpinned and
 natural arms, useful rank and full cold runtime selection remain open.
 
+The [pinned replay amendment](PINNED_REPLAY_AMENDMENT.md) adds a source,
+input, solver-output and image-bound `replay-pinned` command. Its isolated
+native replayer checks the original XCNF, six point lifts, group equation and
+signed-Frobenius relation row before a terminal passing stage receipt can be
+written. The release example passed **11/11** tests and its production build
+exited 0; [test](pinned-replay-test.log.gz) and
+[build](pinned-replay-build.log.gz) logs are retained. This component has not
+run on the real K600 input or a Docker host. The image/build receipt,
+cumulative approved-budget controller, real pinned positive control,
+unpinned and natural arms, useful rank and full cold runtime selection remain
+open. No performance graph changed because this step produced no K600
+measurement.
+
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
 
