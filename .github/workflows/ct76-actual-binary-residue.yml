@@ -1,0 +1,28 @@
+name: CT76 actual 11a1 binary Frobenius and field-degree gate
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct76/**'
+      - '.github/workflows/ct76-actual-binary-residue.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct76-binary-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent point-count and Frobenius gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct76
+          python3 -B "$D/ct76_binary_field.py" > ct76-py.jsonl
+          python3 -O -B "$D/ct76_binary_field.py" > ct76-pyopt.jsonl
+          node "$D/ct76_binary_independent.js" > ct76-js.jsonl
+          node --no-opt "$D/ct76_binary_independent.js" > ct76-jsopt.jsonl
+          cmp ct76-py.jsonl ct76-pyopt.jsonl
+          cmp ct76-py.jsonl ct76-js.jsonl
+          cmp ct76-py.jsonl ct76-jsopt.jsonl
+          echo '921ad2167c532288f3ee2b1bad2c42fc8d9073aac1be875f649ed765f91fb006  ct76-py.jsonl' | sha256sum -c

@@ -1,0 +1,43 @@
+{
+  "schema": "n83.attempt-reconciliation/v1",
+  "attempt": "spike38-attempt-06",
+  "classification": "verified-shard acquisition completed; PDP generation failed before system output",
+  "runner_exit_code": 101,
+  "runner_failure": {
+    "schema": "n83.runner-error/v1",
+    "exit_code": 101,
+    "line": 76,
+    "command": "timeout --signal=TERM --kill-after=30 12400 \"$BIN/pdp\" generate \"$INPUTS\" \"$BASE_LOCAL/data\" \"$MATCHED\" spike38 > \"$HERE/generate.log\" 2>&1",
+    "utc": "2026-11-05T18:12:02.201781+00:00"
+  },
+  "failure_detail": "\nthread 'main' (990080) panicked at src/bin/pdp.rs:338:5:\nfresh output required\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n",
+  "protocol_hash_check": {
+    "schema": "n83.protocol-hash-check/v1",
+    "expected_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "actual_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "match": true
+  },
+  "verified_shards": {
+    "count": 384,
+    "total_bytes": 4576000923,
+    "manifest": "ATTEMPT-06-VERIFIED-SHARDS.json",
+    "manifest_sha256": "38e0f39bc2f3157eb6b2cb99ca5dc2a40ad48ff67ed2986071b950238af5f8b5"
+  },
+  "candidate_input_systems": 0,
+  "top_certificates": 0,
+  "cause": "The runner created candidate-inputs and top-certificates directories before calling pdp generate. The generator requires a nonexistent output path and panicked with fresh output required.",
+  "preserved_source_data_path": "/tmp/n83-candidate-bases/r38-attempt-06/data",
+  "controller_attempt_label_correction": {
+    "observed": "05",
+    "expected": "06",
+    "note": "launch.sh and output-index generation were copied with attempt 05 labels; terminal record and run path establish the actual attempt as 06. Preserve original receipts and this correction."
+  },
+  "s3_results_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-06/results/",
+  "results_indexed_files": 423,
+  "results_readback_verified": true,
+  "next_action": "For attempt07, leave candidate output paths nonexistent before pdp generate. Reuse the locally preserved 384 verified shards with independent rehash, and correct launch/controller/index attempt labels.",
+  "results_indexed_files_readback_byte_identical": 423,
+  "results_index_sha256": "a019654a2cf9eb6de8f06c54b4b12e92e5390d8c59adfb7cef344316f8a9d72e",
+  "results_total_bytes_readback": 4771192,
+  "readback_utc": "2026-11-05T18:20:00Z"
+}
