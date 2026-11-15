@@ -1,0 +1,19 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "smoke: rootfind-subtract-gpu beside rootfind-subtract (m = 2, the same lane targets) on a 20-bit prime-order curve",
+  "description": "Plumbing and identity check of the GPU-batched rootfind-subtract oracle (research/ic_gpu_rootfind_ic_20261114). The two IC arms must report the same relations, logarithm and counted cost; rho.negation is the reference. Public synthetic curve; no security claim.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 20, "seed": 59297}],
+    "targets_per_curve": 2,
+    "target_seed": 20261114
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "rf2-cpu", "role": "baseline", "method": {"id": "ic.pipeline", "params": {
+      "factor_base": "prime-abscissa:size=64", "oracle": "rootfind-subtract:m=2", "targets": "walk-prime-batch-256"}}},
+    {"name": "rf2-gpu", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+      "factor_base": "prime-abscissa:size=64", "oracle": "rootfind-subtract-gpu:m=2", "targets": "walk-prime-batch-256"}}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}
+  ],
+  "measurement": {"rounds": 2, "warmup": 0, "order": "alternate", "seed": 1, "isolation_required": "L0", "timeout_seconds": 300}
+}

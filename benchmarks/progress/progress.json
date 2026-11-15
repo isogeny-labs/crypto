@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T2126Z-k1-pair-table-dimension",
+  "latest_record": "20261114T2258Z-ic-gpu-rootfind-ic",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 164,
+    "measured": 168,
     "open": 0
   },
   "repo": "crypto",
@@ -880,6 +880,306 @@
           "spread": null,
           "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
           "value": 0.34
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.757,
+      "latest": 1.757,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_26b_t1000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.679,
+            1.813
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.757
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.43,
+      "latest": 1.43,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_28b_t3000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.349,
+            1.541
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.43
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.988,
+      "latest": 0.988,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_30b_t1000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.925,
+            1.044
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 0.988
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0,
+      "latest": 1.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_30b_t3000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.931,
+            1.07
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.0
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.808,
+      "latest": 0.808,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t1000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.754,
+            0.845
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.808
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.989,
+      "latest": 0.989,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t200",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.911,
+            1.068
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.989
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.745,
+      "latest": 0.745,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t3000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.711,
+            0.785
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.745
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.606,
+      "latest": 0.606,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t1000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.564,
+            0.642
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.606
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.809,
+      "latest": 0.809,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t200",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.759,
+            0.869
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.809
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.593,
+      "latest": 0.593,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t3000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.566,
+            0.624
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.593
         }
       ],
       "problem": "ecdlp-prime-multi-target",
@@ -3009,6 +3309,68 @@
     },
     {
       "better": "lower",
+      "first": 0.0638,
+      "latest": 0.0638,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.0638
+      },
+      "metric": "fpm_mid_ic_over_rho_g4_p4099_c_pre",
+      "points": [
+        {
+          "commit": "360fe03360a3",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.0638
+          },
+          "n": 12,
+          "record": "20261114T2047Z-genus-ladder",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.033,
+            0.135
+          ],
+          "summary": "Genus ladder: HCDLP at genus 2-5 on one field, plane quartics, Smith census; 1809 runs all certified; unverified (no validator replay), no leaderboard row.",
+          "value": 0.0638
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.64,
+      "latest": 0.64,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prefilter_rel_mul_ratio_g5",
+      "points": [
+        {
+          "commit": "360fe03360a3",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 60,
+          "record": "20261114T2047Z-genus-ladder",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.612,
+            0.673
+          ],
+          "summary": "Genus ladder: HCDLP at genus 2-5 on one field, plane quartics, Smith census; 1809 runs all certified; unverified (no validator replay), no leaderboard row.",
+          "value": 0.64
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 0.0006,
       "latest": 0.0006,
       "latest_derived": {
@@ -3420,6 +3782,93 @@
     },
     {
       "better": "lower",
+      "first": 0.246,
+      "latest": 0.246,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.217314
+      },
+      "metric": "ic_rf2_relations_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.217314
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.246
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 26009.6,
+      "latest": 26009.6,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 22976.678445
+      },
+      "metric": "ic_rf2_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 22976.678445
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 26009.6
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.643,
+      "latest": 0.643,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.568021
+      },
+      "metric": "ic_rf2_solve_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.568021
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.643
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.1769,
       "latest": 0.1769,
       "latest_derived": {
@@ -3552,6 +4001,33 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.312,
+      "latest": 1.312,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_eyt_prefetch_d5_sorted_c16_ratio",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 1.312
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
     },
     {
       "better": "lower",
