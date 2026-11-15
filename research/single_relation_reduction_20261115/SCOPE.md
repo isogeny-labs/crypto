@@ -75,3 +75,32 @@ pins, and use the same canonical proof/axiom gate. This target formalizes
 unconditioned coverage; elliptic clean-base loss, label conditioning, native
 execution and a fast selector remain distinct. No cap/field/seed or numerical
 qualification is introduced by this proof continuation.
+
+## A2: fixed-slope elliptic partial-join assessment
+
+After A1, check a concrete non-tensor selector component: for a fixed set of s
+field slopes, hash y-lambda*x on two independent random point lists and retain
+distinct-abscissa collisions. Competing hypotheses are that this can populate
+the first merge at balanced b, or that the cubic line-intersection bound makes
+the useful yield too small. Derive a finite upper bound before implementing.
+Use the actual short-Weierstrass line equation and the uniform subgroup point
+law; charge clean-base conditioning separately. Acceptance is an effective
+population/yield bound at growing parameters, not an empty tiny fixture.
+
+Literature first (KB remains unavailable): read Wagner2002 full author version
+sections2--3 and the blind-signature subsection of4, from
+https://people.eecs.berkeley.edu/~daw/papers/genbday.html (long-version link).
+It permits scalar-interval joins and suitable group-quotient chains and gives
+the cyclic k-sum/DLP reduction. Its blind-signature example concerns scalar
+ROS arithmetic, not an ECDLP solver. Read Sutherland MIT18.783 Spring2013
+Lecture2, section2.1.2, for the line/cubic substitution and slope formula:
+https://math.mit.edu/classes/18.783/2013/LectureNotes2.pdf . The partial mirror
+Wagner PDF timed out; the complete author PostScript and converted PDF are
+available. Source hashes/links will be retained with the assessment.
+
+This target concerns a priori point-independent slope sets. Adaptive slopes,
+large implicitly described slope sets, other coordinates and all partial-join
+algorithms are outside its proposed upper bound. Reuse existing polynomial
+root counts; if a missing support law is needed, add it in crypto-lean on the
+existing polynomial/curve semantics before making a formal claim. No native
+numeric case, paid job or change to the frozen multiprecision panel.
