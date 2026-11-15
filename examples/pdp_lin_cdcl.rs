@@ -911,3 +911,8 @@ impl ChainInstance {
         }
     }
 }
+
+/// This file is a module shared by `b0_pdp_sat_baseline.rs` through `#[path]`; cargo also
+/// compiles every file under `examples/` as an example binary, so it needs an entry point.
+#[allow(dead_code)]
+fn main() {}
