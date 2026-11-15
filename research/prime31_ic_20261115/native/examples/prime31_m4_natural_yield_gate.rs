@@ -106,7 +106,6 @@ fn run()->Result<serde_json::Value,String>{
              "four_support_additions":adds}));
     }
     let depth7=Base::build(e,7,&mut ar)?;
-    let inv2=(e.p+1)/2;
     let mut injective=Vec::new();
     for &(x,y) in &depth7.points {
         let disc=(e.p-((3*((x as u128*x as u128 % e.p as u128) as u64)+4*e.a)%e.p))%e.p;
