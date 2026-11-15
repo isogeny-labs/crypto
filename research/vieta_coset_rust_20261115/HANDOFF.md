@@ -15,9 +15,12 @@ Vieta deadlines and twelve original missing three-term calls remain recorded.
 The proposed last-fall-degree bound is a hand argument awaiting independent
 or formal validation, not a running-time claim.
 
-Remaining publication work: reconcile main/shared metadata, register pending
-claims, push and open regular results PR with auto-merge subject to gates.
-Old follow-up automation was paused when this active work resumed.
+Results PR [4358](https://github.com/isogeny-labs/crypto/pull/4358) is regular,
+mergeable and auto-merge enabled subject to gates. Shared metadata were
+reconciled, statements registered (6a8b11, 74f8a5; both unverified), and reports
+pushed. Check current-head CI/review and required gates on the bounded cadence;
+do not rerun the finished benchmarks. Old follow-up automation was paused when
+this active work resumed and is repurposed for the results PR at handoff.
 
 ## Historical receipt
 
