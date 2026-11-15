@@ -5,6 +5,7 @@ All EC additions here are generic *support enumeration* and are NOT an
 algebraic IC oracle or a complete ECDLP solver. Standing [pcc:unverified].
 """
 import json
+import hashlib
 from collections import Counter
 from y_fiber_probe import P, A, B, base, add, sqrt
 
@@ -74,6 +75,14 @@ def run():
     oo, oi = support(points)
     ol, oli = support(lifted)
     assert so.issubset(sl)
+    def digest(rows):
+        raw = "".join(f"{x},{y}\\n" for x, y in sorted(rows)).encode()
+        return hashlib.sha256(raw).hexdigest()
+    fingerprints = {"canonical1922":digest(so), "lifted8450":digest(sl)}
+    assert fingerprints == {
+        "canonical1922":"4fcd2507f91d2c80707e5b8b34f45dad1ac69c67d32d51e9c5a186b0fe795716",
+        "lifted8450":"7638f8d3de56842d1a715d98b860a0c12f7df59d4d841e8741b32c92dc8d4974"
+    }
     assert (len(so), len(sl), len(su), len(oo), len(ol)) == (1922, 8450, 392, 496, 2145)
     assert (si, sli, sui, oi, oli) == (31, 65, 14, 0, 0)
     return {
@@ -92,6 +101,7 @@ def run():
         "signed_pair_support_y_lifted": len(sl),
         "signed_pair_support_injective_y_subset": len(su),
         "y_lift_spurious_signed_targets_against_original_factor_base": len(sl-so),
+        "support_sha256": fingerprints,
         "extra_fraction_of_lifted_support": len(sl-so)/len(sl),
         "identity_exception_counts": {"canonical_signed":si, "lifted_signed":sli,
                                       "injective_signed":sui}
