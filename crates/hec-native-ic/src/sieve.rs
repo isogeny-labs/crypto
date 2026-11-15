@@ -73,6 +73,8 @@ pub struct SieveReport {
     pub solve_rounds: u32,
     pub solve: SolveStats,
     pub relations_verified: u64,
+    /// Building the factor base (as `IcReport::fb_ns`).
+    pub fb_ns: u128,
     pub sieve_ns: u128,
     pub solve_ns: u128,
     pub total_ns: u128,
@@ -90,9 +92,11 @@ pub fn solve_dlp_sieve(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &Sie
     let mut rep = SieveReport::default();
     let mut rng = Rng::new(params.seed);
 
+    let t = Instant::now();
     let fb = factor_base(curve);
     let m = fb.len();
     rep.m = m;
+    rep.fb_ns = t.elapsed().as_nanos();
 
     // Bucket state, reset through `touched` after each line.
     let mut cnt = vec![0u8; p as usize];

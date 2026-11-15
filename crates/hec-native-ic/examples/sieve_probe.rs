@@ -73,7 +73,7 @@ fn main() {
                 println!(
                     "JSON {{\"method\":\"walk\",\"genus\":{g},\"p\":{p},\"c\":{},\"ell\":{},\"m\":{},\"seed\":{seed},\
 \"trials\":{},\"relations\":{},\"group_ops\":{},\"oracle_calls\":{},\"solve_rounds\":{},\
-\"trials_per_rel\":{:.3},\"solve_ms\":{:.4},\"total_ms\":{:.4},\"pick_ms\":{pick_ms:.1},\"correct\":{}}}",
+\"trials_per_rel\":{:.3},\"fb_ms\":{:.4},\"solve_ms\":{:.4},\"total_ms\":{:.4},\"solve_mulmods\":{},\"pick_ms\":{pick_ms:.1},\"correct\":{}}}",
                     inst.c,
                     inst.ell,
                     rep.m,
@@ -83,8 +83,10 @@ fn main() {
                     rep.oracle.calls,
                     rep.solve_rounds,
                     rep.trials as f64 / rep.relations.max(1) as f64,
+                    rep.fb_ns as f64 / 1e6,
                     rep.solve_ns as f64 / 1e6,
                     rep.total_ns as f64 / 1e6,
+                    rep.solve.mulmods,
                     rep.k == Some(k_true)
                 );
             }
@@ -110,8 +112,8 @@ fn main() {
                 "JSON {{\"method\":\"sieve\",\"genus\":{g},\"p\":{p},\"c\":{},\"ell\":{},\"m\":{},\"seed\":{seed},\
 \"lines\":{},\"degenerate_lines\":{},\"relations\":{},\"verified\":{},\"group_ops\":{},\"solve_rounds\":{},\
 \"rel_per_line\":{:.3},\"expected_rel_per_line\":{:.3},\"rel_over_m\":{:.4},\
-\"field_mults\":{},\"field_invs\":{},\"mults_per_rel\":{:.2},\"sieve_points_per_line\":{:.1},\
-\"sieve_ms\":{:.4},\"solve_ms\":{:.4},\"total_ms\":{:.4},\"solve_mulmods\":{},\"solve_row_ops\":{},\"correct\":{}}}",
+\"field_mults\":{},\"field_invs\":{},\"mults_per_rel\":{:.2},\"line_adds_per_rel\":{:.4},\"sieve_points_per_line\":{:.1},\
+\"fb_ms\":{:.4},\"sieve_ms\":{:.4},\"solve_ms\":{:.4},\"total_ms\":{:.4},\"solve_mulmods\":{},\"solve_row_ops\":{},\"correct\":{}}}",
                 inst.c,
                 inst.ell,
                 rep.m,
@@ -127,7 +129,9 @@ fn main() {
                 rep.field_mults,
                 rep.field_invs,
                 rep.field_mults as f64 / rep.relations.max(1) as f64,
+                rep.group_ops as f64 / rep.relations.max(1) as f64,
                 rep.sieve_points as f64 / good,
+                rep.fb_ns as f64 / 1e6,
                 rep.sieve_ns as f64 / 1e6,
                 rep.solve_ns as f64 / 1e6,
                 rep.total_ns as f64 / 1e6,
