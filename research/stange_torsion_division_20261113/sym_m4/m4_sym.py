@@ -11,6 +11,7 @@ import sys, time, subprocess, random, statistics as st, tempfile, os, json, iter
 from sympy import symbols, resultant, Poly, expand
 from sympy.polys.polyfuncs import symmetrize
 p=int(sys.argv[1]); n=int(sys.argv[2]); DS='--ds' in sys.argv; SEED=11
+ARMS=next((a.split('=',1)[1].split(',') for a in sys.argv if a.startswith('--arms=')),['D','Bn','Bs']+(['Ds'] if DS else []))
 assert (p-1)%n==0
 A,B=5,7; assert (4*A**3+27*B*B)%p
 x1,x2,x3,x4,X,e1,e2,e3=symbols('x1 x2 x3 x4 X e1 e2 e3')
@@ -74,7 +75,7 @@ def rand_xE():
     while True:
         z=R.randrange(p)
         if issq(z**3+A*z+B): return z
-T={k:[] for k in (['D','Bn','Bs']+(['Ds'] if DS else []))}; REL={'D':0,'Bn':0,'Bs':0}; MS={'dense':0,'binomial':0}; SOLS={}
+T={k:[] for k in ARMS}; REL={'D':0,'Bn':0,'Bs':0}; MS={'dense':0,'binomial':0}; SOLS={}
 if DS:
     FX=lambda v: eval('*'.join(f'({v}-{c})' for c in FD))
 for ti in range(8):
@@ -92,9 +93,15 @@ for ti in range(8):
     arms=[('D',[ms(S4R,['x1','x2','x3']),uniD('x1'),uniD('x2'),uniD('x3')],['x1','x2','x3'],bool(solD)),
           ('Bn',[ms(S4R,['x1','x2','x3'])]+[f"{v}^{n}-1" for v in ('x1','x2','x3')],['x1','x2','x3'],bool(solB)),
           ('Bs',[ms(S4sym,['e1','e2','e3'])]+[ms(c,['e1','e2','e3']) for c in bs_cons],['e1','e2','e3'],bool(solB))]
+    Yv=symbols('Y')
+    S3a=Poly(expand(S3(x1,x2,Yv)),x1,x2,x3,Yv,modulus=p); S3b=Poly(expand(S3(x3,xR,Yv)),x1,x2,x3,Yv,modulus=p)
+    V4=['x1','x2','x3','Y']
+    arms+=[('Dy',[ms(S3a,V4),ms(S3b,V4),uniD('x1'),uniD('x2'),uniD('x3')],V4,bool(solD)),
+           ('By',[ms(S3a,V4),ms(S3b,V4)]+[f"{v}^{n}-1" for v in ('x1','x2','x3')],V4,bool(solB))]
     if DS:
         sig=[esym(expand(FX('x1')+FX('x2')+FX('x3'))), esym(expand(FX('x1')*FX('x2')+FX('x1')*FX('x3')+FX('x2')*FX('x3'))), esym(expand(FX('x1')*FX('x2')*FX('x3')))]
         arms.append(('Ds',[ms(S4sym,['e1','e2','e3'])]+[ms(Poly(s,e1,e2,e3,modulus=p),['e1','e2','e3']) for s in sig],['e1','e2','e3'],bool(solD)))
+    arms=[a for a in arms if a[0] in ARMS]
     R.shuffle(arms)
     for k,polys,vs,has in arms:
         dt,trivial=run(polys,vs); T[k].append(dt-base)
