@@ -370,11 +370,89 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
             }
         }
     }
+    let mut oracle_comparisons = Vec::new();
+    if let Some(pairs) = plan["paired_oracles"].as_array() {
+        for pair in pairs {
+            let reference = pair[0].as_str().ok_or("invalid paired oracle")?;
+            let candidate = pair[1].as_str().ok_or("invalid paired oracle")?;
+            for p in primes {
+                for fixture_seed in seeds {
+                    let mut log_ratios = Vec::new();
+                    for round in 0..rounds {
+                        let key = |oracle: &str| {
+                            (
+                                p.as_u64().unwrap(),
+                                fixture_seed.as_u64().unwrap(),
+                                oracle.to_owned(),
+                                "measurement".to_owned(),
+                                round,
+                                "graph".to_owned(),
+                            )
+                        };
+                        if let (Some(a), Some(b)) = (
+                            executions.get(&key(reference)),
+                            executions.get(&key(candidate)),
+                        ) {
+                            log_ratios.push(
+                                number(b, "unadmitted_wall_ns")?.ln()
+                                    - number(a, "unadmitted_wall_ns")?.ln(),
+                            );
+                        }
+                    }
+                    let eligible = log_ratios.len() == rounds as usize
+                        && [reference, candidate].iter().all(|oracle| {
+                            strata.iter().any(|s| {
+                                s["p"] == *p
+                                    && s["seed"] == *fixture_seed
+                                    && s["oracle"] == *oracle
+                                    && s["eligible_local_controlled_comparison"] == true
+                            })
+                        });
+                    oracle_comparisons.push(json!({"p":p,"seed":fixture_seed,"reference":reference,"candidate":candidate,
+                        "candidate_graph_wall_over_reference":estimate(&log_ratios,draws,seed),"eligible_local_controlled_comparison":eligible}));
+                }
+            }
+        }
+    }
+    let mut mechanism_targets = Vec::new();
+    let reference_oracle = oracles[0].as_str().ok_or("invalid reference oracle")?;
+    for p in primes {
+        for fixture_seed in seeds {
+            let key = (
+                p.as_u64().unwrap(),
+                fixture_seed.as_u64().unwrap(),
+                reference_oracle.to_owned(),
+                "measurement".to_owned(),
+                0,
+                "graph".to_owned(),
+            );
+            if let Some(row) = executions.get(&key) {
+                let report = &row["report"];
+                let counters = &report["relation_point_stats"];
+                if counters.is_object() {
+                    mechanism_targets.push(json!({"p":p,"seed":fixture_seed,"oracle":reference_oracle,
+                        "residuals":report["residuals"],"group_ops":report["group_ops"],"oracle_fp_muls":report["oracle_fp_muls"],
+                        "sampler_setup_group_ops":report["sampler_setup_group_ops"],"sampling_group_ops":report["sampling_group_ops"],
+                        "sampler_restarts":report["sampler_restarts"],"relation_point_stats":counters,
+                        "first_repeat_at_recovery":!counters["first_repeat_residual"].is_null()
+                            && counters["first_repeat_residual"] == report["residuals"] && report["correct"] == true}));
+                }
+            }
+        }
+    }
+    let repeat_at_recovery = mechanism_targets
+        .iter()
+        .filter(|r| r["first_repeat_at_recovery"] == true)
+        .count();
     Ok(
         json!({"schema":"gaudry.cubic.local-analysis/v1","source_revision":source,"backend":"local_user_authorized",
         "standard_lab_admission":false,"reference_scope":plan["reference_scope"],"sampler":plan["sampler"],"raw_execution_count":actual_order.len(),
         "unique_execution_count":executions.len(),"planned_execution_count":expected_order.len(),
         "phase_counts":phase_counts,"global_problems":problems,"strata":strata,
+        "oracle_comparisons":oracle_comparisons,
+        "relation_mechanism":{"targets":mechanism_targets,"first_repeat_at_recovery_count":repeat_at_recovery,
+            "scope":"first measured graph row of the first declared oracle per target; diagnostic counters, not a causal proof"},
+        "extended_summary_status":"post-call summary of the predeclared paired-oracle and epoch controls; original acceptance fields unchanged",
         "interval_scope":"deterministic round bootstrap; timing repeat variation, not independent curve samples",
         "cost_scope":"legacy multiplication-equivalent diagnostics with unpriced work",
         "failed_blocks":"retained in spent-work diagnostics; invalidate their stratum"}),
@@ -640,18 +718,30 @@ mod tests {
         let (mut p, mut rows) = fixture();
         p["oracles"] = json!(["PairOnly", "PreparedSymmetricPairOnly"]);
         p["paired_oracles"] = json!([["PairOnly", "PreparedSymmetricPairOnly"]]);
+        rows[6]["report"]["relation_point_stats"] = json!({"decomposed_residuals":2,
+            "distinct_abscissae":1,"repeated_abscissae":1,"first_repeat_residual":3});
         let mut candidate = rows.clone();
         for r in &mut candidate {
             r["oracle_block"] = json!("PreparedSymmetricPairOnly");
             // Genuine arithmetic savings are allowed; the admitted relation
             // stream, group work and recovered scalar must still agree.
             r["report"]["oracle_fp_muls"] = json!(75);
+            if r["arm"] == "graph" {
+                r["unadmitted_wall_ns"] = json!(75);
+            }
         }
         rows.extend(candidate);
-        assert!(analyze(&p, rows.clone(), 0).unwrap()["global_problems"]
-            .as_array()
-            .unwrap()
-            .is_empty());
+        let good = analyze(&p, rows.clone(), 0).unwrap();
+        assert!(good["global_problems"].as_array().unwrap().is_empty());
+        let ratio = good["oracle_comparisons"][0]["candidate_graph_wall_over_reference"]
+            ["geometric_mean"]
+            .as_f64()
+            .unwrap();
+        assert!((ratio - 1.5).abs() < 1e-12);
+        assert_eq!(
+            good["relation_mechanism"]["first_repeat_at_recovery_count"],
+            1
+        );
         rows[36]["report"]["lp_input_digest"] = json!("changed");
         let s = analyze(&p, rows, 0).unwrap();
         assert!(s["global_problems"].as_array().unwrap().iter().any(|p| p

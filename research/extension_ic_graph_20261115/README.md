@@ -74,10 +74,25 @@ subgroup orders exceed 2^30 and graph/rho is 5.36–14.27. One p127/seed23
 A/A failure remains an inconclusive diagnostic. No measurement was retried.
 [pcc:unverified]
 
-The next [prepared-oracle and epoch controls](AMENDMENT_5_PREPARED_EPOCH.md)
-test cheaper arithmetic on an identical stream and whether trajectory
-coalescence explains the walk's low relation counts. Implementation checks
-are in progress; these treatments have not been measured. [pcc:unverified]
+The [prepared-oracle and epoch controls](AMENDMENT_5_PREPARED_EPOCH.md)
+completed on source `5f575deda`: 1080 executions recover and all paired
+oracle streams match. [Short 06](local-prepared-short-20261115-06/report.pdf)
+and [long 07](local-prepared-long-20261115-07/report.pdf) retain every timing
+and control failure. Prepared arithmetic costs 0.67–0.84 times the reference
+graph wall time in eligible comparisons; one comparison interval includes 1.
+No graph/rho interval reaches 1. [pcc:unverified]
+
+In 17 of 18 target/sampler cases, recovery coincides with the first repeated
+decomposable abscissa. This is consistent with coalescing trails and a
+distinguished-point-like use of smooth points. It does not establish improved
+independent IC relation density. The exception recovers with 23 distinct
+decomposable abscissae and no repeat. Native post-call summaries preserve
+the original acceptance strata exactly. The next distinct lead is the
+existing native F4 solver for three-point S4. [pcc:unverified]
+
+Current checks report 36 passing cubic release tests and seven passing
+native-analysis tests, plus release example build/test target and both
+warnings-denied Clippy checks. [pcc:unverified]
 
 Exact visual copies are under `benchmarks/20261115-cubic-graph-*`. The
 admitted benchmark index and leaderboard remain unchanged: independent

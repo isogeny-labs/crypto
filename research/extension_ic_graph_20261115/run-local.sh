@@ -17,8 +17,27 @@ component_hashes=$(jq -er '.component_hashes // "validation/local-pilot-componen
 sha256sum -c "$here/$component_hashes" || exit 2
 mkdir "$1" || exit 2
 run_dir=$(cd "$1" && pwd)
-cp target/release/examples/gaudry_cubic_graph_compare "$run_dir/driver" || exit 2
-cp "$here/native_analysis/target/release/cubic-graph-analysis" "$run_dir/analyzer" || exit 2
+driver_kind=$(jq -r '.driver_kind // "graph-ic"' "$plan")
+case "$driver_kind" in
+  graph-ic)
+    driver_binary=target/release/examples/gaudry_cubic_graph_compare
+    analyzer_binary=$here/native_analysis/target/release/cubic-graph-analysis
+    ;;
+  s4-f4-component)
+    driver_binary=target/release/examples/gaudry_cubic_s4_f4_probe
+    analyzer_binary=$here/native_analysis/target/release/s4-component-analysis
+    # Pin the documented native defaults rather than inherit another study's
+    # engine overrides. SIMD selection uses the captured CPU automatically.
+    export F4_FP_THREAD_OPS=0 F4_STAIR=counter F4_FP_NARROW=2 F4_FP_SYMBOLIC_PAR=1
+    export F4_FP_PACKED=1 F4_FP_GM=1 F4_FP_DEFERRED_PAR=1 F4_FP_FL=1
+    export F4_FP_FL_BLOCKED=1 F4_FP_LINEAR_INTERREDUCE=1
+    unset F4_DEBUG F4_FP_LAZY_SIMD F4_FP_LAZY_AVX512 F4_FP_LAZY_AVX2
+    unset GAUDRY_DEBUG GAUDRY_DEBUG_SOLVE GAUDRY_LAZY_ELIM GAUDRY_LAZY_VERIFY GAUDRY_BORDER_RETRY
+    ;;
+  *) echo 'Unknown frozen driver kind.' >&2; exit 2;;
+esac
+cp "$driver_binary" "$run_dir/driver" || exit 2
+cp "$analyzer_binary" "$run_dir/analyzer" || exit 2
 binary_sha=$(sha256sum "$run_dir/driver" | cut -d ' ' -f1)
 cpu=$(awk '/^Cpus_allowed_list:/{split($2,a,/[,-]/); print a[1]}' /proc/self/status)
 jq --arg source "$source_revision" --arg binary "$binary_sha" --arg cpu "$cpu" \
@@ -29,7 +48,9 @@ cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
   src/cryptanalysis/gaudry_cubic_graph.rs src/cryptanalysis/gaudry_cubic_symmetric.rs \
   src/cryptanalysis/gaudry_cubic_sampling.rs src/cryptanalysis/gaudry_cubic_prepared.rs \
   src/cryptanalysis/residual_walk.rs src/cryptanalysis/jv_bitops.rs \
-  examples/gaudry_cubic_graph_compare.rs research/pencil_large_prime_20261029/Cargo.toml \
+  src/cryptanalysis/f4_fp.rs src/cryptanalysis/f4_fp src/cryptanalysis/groebner_f4.rs src/cryptanalysis/fx_hash.rs \
+  examples/gaudry_cubic_graph_compare.rs examples/gaudry_cubic_s4_f4_probe.rs \
+  research/pencil_large_prime_20261029/Cargo.toml \
   research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \
   research/pencil_large_prime_20261029/src/sparse.rs research/extension_ic_graph_20261115 \
   | tar --null -T - -cf "$run_dir/source-checkpoint.tar" || exit 2
@@ -39,16 +60,26 @@ lscpu -J > "$run_dir/cpu.json"
 "${HOME}/.cargo/bin/rustc" -Vv > "$run_dir/rustc.txt"
 primes=$(jq -er '.primes|map(tostring)|join(",")' "$run_dir/runtime-plan.json")
 seeds=$(jq -er '.seeds|map(tostring)|join(",")' "$run_dir/runtime-plan.json")
-oracles=$(jq -er .oracle_cli "$run_dir/runtime-plan.json")
-sampler=$(jq -r '.sampler // "fresh"' "$run_dir/runtime-plan.json")
 rounds=$(jq -er .rounds "$run_dir/runtime-plan.json")
 warmups=$(jq -er .warmup_rounds "$run_dir/runtime-plan.json")
-cap=$(jq -er .max_residuals "$run_dir/runtime-plan.json")
 seconds=$(jq -er .timeout_seconds "$run_dir/runtime-plan.json")
 memory_kib=$(( $(jq -er .memory_gib "$run_dir/runtime-plan.json") * 1024 * 1024 ))
-argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" --oracles "$oracles" --sampler "$sampler" \
-  --warmup-rounds "$warmups" --rounds "$rounds" --max-residuals "$cap" \
+argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" \
+  --warmup-rounds "$warmups" --rounds "$rounds" \
   --source-revision "$source_revision" --out "$run_dir/raw.jsonl")
+if [[ "$driver_kind" == graph-ic ]]; then
+  oracles=$(jq -er .oracle_cli "$run_dir/runtime-plan.json")
+  sampler=$(jq -r '.sampler // "fresh"' "$run_dir/runtime-plan.json")
+  cap=$(jq -er .max_residuals "$run_dir/runtime-plan.json")
+  argv+=(--oracles "$oracles" --sampler "$sampler" --max-residuals "$cap")
+else
+  residual_count=$(jq -er .residuals_per_instance "$run_dir/runtime-plan.json")
+  batch_count=$(jq -er .batch_iterations "$run_dir/runtime-plan.json")
+  f4_degree=$(jq -er .f4_max_degree "$run_dir/runtime-plan.json")
+  f4_deadline=$(jq -er .f4_deadline_ms "$run_dir/runtime-plan.json")
+  argv+=(--residuals-per-instance "$residual_count" --batch-iterations "$batch_count" \
+    --f4-max-degree "$f4_degree" --f4-deadline-ms "$f4_deadline")
+fi
 jq -n --args '$ARGS.positional' -- "${argv[@]}" > "$run_dir/argv.json" || exit 2
 sha256sum "$run_dir/driver" "$run_dir/analyzer" "$run_dir/runtime-plan.json" \
   "$run_dir/argv.json" "$run_dir/source-checkpoint.tar" "$run_dir/RESUME-before.md" \
