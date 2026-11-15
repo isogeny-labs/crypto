@@ -12,7 +12,7 @@ A separate Rust checker imports no production field/group/solver code: it uses
 schoolbook binary polynomials and Euclid inversion, validates all coordinates
 and known witnesses, proves small negatives with complete pair tables and
 large negatives through independent inconsistency of every necessary residual
-linear system. Producer-written checking is not independently signed review.
+linear system. Producer-written checking is not independently signed review [pcc:unverified].
 
 Primary comparison: six existing d12 controls (n83 and n131, each with
 `distinct-planted-0`, `uniform`, `cancellation`), three arms (`baseline`,
