@@ -161,7 +161,13 @@ fn main() {
         if *e == 1 && q.bits() > 20 {
             continue; // a large prime dividing h once: cyclic of order q, nothing to enumerate
         }
-        let inv = sylow_invariants(&all_forms, &h, q, *e);
+        // q dividing h exactly once: the q-Sylow is Z/q, so its invariants are [1]
+        // without enumerating its q elements (q = 851761 took over an hour).
+        let inv = if *e == 1 {
+            Some(vec![1u32])
+        } else {
+            sylow_invariants(&all_forms, &h, q, *e)
+        };
         sylow.push(format!(
             "{{\"q\": {}, \"e\": {}, \"invariant_exponents\": {}}}",
             q,
