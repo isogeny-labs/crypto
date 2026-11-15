@@ -6,6 +6,8 @@ For q=2^ell, K=F_(q^7), and either cubic p in T^7+1, let V_p=ker p(sigma) for si
 
 The geometric argument in [THEOREM.md](THEOREM.md) gives a **necessary bound**: if D is hyperelliptic, then b belongs to V_p. Every nonzero b in V_p has a symmetric W1 presentation whose D is hyperelliptic, and Menezes--Teske already gives that source a classical genus-seven GHS presentation. Across both cubic arms the hyperelliptic coefficient locus therefore has exactly `2(q^3-1)` nonzero b values, subject to independent review of the geometric descent step. This is a bound on one natural quotient construction. It does not exclude other covers or correspondences.
 
+The same argument extends to any odd extension degree `n` and irreducible factor `p` of degree `s>=2` in `T^n+1`: the corresponding Hess cover has genus `2^(s+1)-2`, its natural quotient has genus `2^s-1`, and at most `q^s-1` nonzero coefficients can give that quotient a hyperelliptic presentation. A symmetric presentation attains the coefficient-locus bound. See [GENERAL_BOUND.md](GENERAL_BOUND.md) for the proof and its assumptions. This generalization is a structural screen, not a new vulnerability family.
+
 The q=2 and q=4 native census tested the algebraic pole-swap condition on every exact W1 presentation. It matched the prior independent W1 counts and found the swap only on classical coefficients:
 
 | q | W1 coefficients per arm | Classical/swap coefficients per arm | W1 union | Classical union |
