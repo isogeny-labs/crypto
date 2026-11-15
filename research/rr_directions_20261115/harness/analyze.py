@@ -20,6 +20,13 @@ def main():
     ap.add_argument('--md')
     args = ap.parse_args()
     rows = [json.loads(l) for l in open(os.path.join(args.rundir, 'results.jsonl'))]
+    rows = [r for r in rows if 'skipped' not in r['result']]
+    # the Rust panel records the base with the 2-torsion point included; the
+    # Python cross-check recorded the x != 0 count (see PREREGISTRATION amendment 1)
+    for r in rows:
+        for k in ('truth_ordered_total', 'truth_ordered_distinct'):
+            if k + '_incl_2torsion' in r:
+                r[k] = r[k + '_incl_2torsion']
     cells = {}
     for r in rows:
         key = (r['m'], r['ell'], r['arm'], r['solver'])
