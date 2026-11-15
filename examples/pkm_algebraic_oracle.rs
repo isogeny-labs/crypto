@@ -8,8 +8,13 @@
 //! pkm_algebraic_oracle --p P --degrees 3,3 [--form kummer|isogeny] [--m 2|3]
 //!     [--planted K] [--random K] [--seed S] [--budget SECS] [--dmax D]
 //!     [--cell NAME] [--out FILE.jsonl]
-//!     [--membership tower|dense|both] [--vkind coset|random]
+//!     [--membership tower|dense|both] [--vkind coset|random] [--resume 1]
 //! ```
+//! `--resume 1` (with `--out`) skips every target whose `index` already has a
+//! row in `--out` for this `--cell`. Targets are still drawn in the same order
+//! from the same seed, so a resumed run computes exactly the rows a run without
+//! interruption would have (used to survive pod loss; EXP-PKM-DENSE-DEC-001
+//! Amendment 3).
 //! `--membership dense` writes membership in `V` as one polynomial
 //! `∏(x − v)` (`algebraic_decompose_dense`); `both` solves every target both
 //! ways (EXP-PKM-DENSE-DEC-001). `--vkind random` replaces the tower's coset
@@ -22,7 +27,7 @@ use crypto_lib::cryptanalysis::pkm_smooth_tower::{
     kummer_tower, search_aux_exact, sqrtm, Curve, Rng,
 };
 use serde_json::json;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::time::Duration;
 
@@ -101,6 +106,16 @@ fn main() {
         .iter()
         .filter_map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
         .collect();
+    let done: HashSet<u64> = match (get("resume", "0").as_str(), o.get("out")) {
+        ("1", Some(f)) => std::fs::read_to_string(f)
+            .unwrap_or_default()
+            .lines()
+            .filter_map(|l| serde_json::from_str::<serde_json::Value>(l).ok())
+            .filter(|r| r["cell"] == cell.as_str())
+            .filter_map(|r| r["index"].as_u64())
+            .collect(),
+        _ => HashSet::new(),
+    };
     let mut out = o.get("out").map(|f| {
         std::fs::OpenOptions::new()
             .create(true)
@@ -124,6 +139,10 @@ fn main() {
             } else {
                 e.random_point(&mut trng).unwrap()
             };
+            if done.contains(&k) {
+                k += 1;
+                continue;
+            }
             let (en, en_ops) = enumerate_decompositions(&e, &v, m, r);
             let dense = (membership != "tower").then(|| {
                 algebraic_decompose_dense(&e, &v, m, r, dmax, Duration::from_secs(budget))
