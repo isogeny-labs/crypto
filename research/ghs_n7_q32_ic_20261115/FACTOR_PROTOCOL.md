@@ -1,0 +1,5 @@
+# Frozen exact q32 full-Euler-factor check
+
+15 November 2026 UTC, after the map receipt and before any q32 attack measurement. Hess's published Theorem 15 specialized in `../ghs_n7_factorization_20261115/REPORT.md` predicts `L_C(T)=(1-11T+32T²)(1+155709T⁷+32⁷T¹⁴)` for the exact mapped genus-eight curve. This gives `#J=34359894078*22=755917669716=132*5726649013`. The map receipt verifies the source, genus and nonzero selected subgroup, but has not computed the full Euler factor.
+
+Commit `factor.magma` before calling the public calculator. Reconstruct the exact source and `WeilDescent(E,F32,1)`, compute `EulerFactor(Jacobian(C))` independently, and assert equality with the predicted entire degree-16 polynomial and both order evaluations. Preserve source hash, CPU, HTTP status and complete response in immutable `receipts/factor1.json`. Stop on transport error, timeout at 180 seconds, a mismatch, or truncation. If it fails, do not use the predicted cofactor in a costed attack until the discrepancy is resolved. This is a per-curve cross-check of a published theorem, not a new-family proof.
