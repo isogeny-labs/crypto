@@ -137,7 +137,8 @@ fn main() -> Result<(), String> {
             pair_count += 1;
             let arm = branch(x, y)?;
             let roots = s3_roots(x, y)?;
-            if roots.len() != if i == j { 1 } else { 2 } {
+            let expected_roots = if i == j { 1 } else { 2 };
+            if roots.len() != expected_roots {
                 return Err("S3 degree/diagonal root count changed".into());
             }
             for (k, &w) in roots.iter().enumerate() {
