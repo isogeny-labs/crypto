@@ -306,7 +306,7 @@ fn docker_args(lock: &Value, out: &Path, source: &Path) -> Vec<String> {
         "--mount".into(),
         mount(&format!("{out_text}/fresh-cache"), "/cache", true),
         "--mount".into(),
-        mount(&out_text, "/out", false),
+        mount(&format!("{out_text}/worker-output"), "/out", false),
         "--env".into(),
         "ICV1_FROZEN_SOURCE_DIR=/source".into(),
         "--env".into(),
@@ -448,6 +448,7 @@ fn run(args: &[String]) -> Result<Value> {
     if !fetched.fetched || fetched.sha256 != OBJECT_SHA || fetched.bytes != 3_025_798 {
         return Err("fresh S3 object fetch differs".into());
     }
+    fs::create_dir(out.join("worker-output"))?;
     let args = docker_args(&lock, &out, &source);
     let occupied = command_output(
         "docker",
@@ -546,9 +547,9 @@ fn run(args: &[String]) -> Result<Value> {
     {
         failure.push("frozen source/input/binary changed");
     }
-    let summary_path = out.join("run/summary.json");
-    let config_path = out.join("run/config.json");
-    let worker_cap_path = out.join("run/cap.json");
+    let summary_path = out.join("worker-output/run/summary.json");
+    let config_path = out.join("worker-output/run/config.json");
+    let worker_cap_path = out.join("worker-output/run/cap.json");
     let worker_capped = worker_cap_path.exists();
     let summary = read_json(&summary_path).ok();
     let config = read_json(&config_path).ok();
@@ -761,5 +762,9 @@ mod tests {
             assert!(args.iter().any(|arg| arg == expected), "missing {expected}");
         }
         assert!(args.windows(3).any(|window| window == ["600", "6", "0"]));
+        assert!(args
+            .iter()
+            .any(|arg| arg == "type=bind,src=/out/worker-output,dst=/out"));
+        assert!(!args.iter().any(|arg| arg == "type=bind,src=/out,dst=/out"));
     }
 }
