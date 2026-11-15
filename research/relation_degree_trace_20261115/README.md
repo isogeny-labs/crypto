@@ -11,7 +11,7 @@ predeclared fresh four-variable cases pass the per-case tenfold rule, with
 These are local producer component observations, pending signed independent
 validation; mature CAS diagnostics are retained separately `[pcc:unverified]`.
 
-[LEADS.md](LEADS.md) records the next bounded work: a direct-quadratic
+[LEAD_STATUS.md](LEAD_STATUS.md) records the next bounded work: a direct-quadratic
 projection with explicit certificates, a selectable strong native baseline,
 and a separately frozen [successor protocol](QPROJECTION_PROTOCOL.md).
 Development checks are under `quadratic-development/`. No successor timing

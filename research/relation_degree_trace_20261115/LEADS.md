@@ -6,8 +6,7 @@ or mature-CAS advantage has been established `[pcc:unverified]`.
 The first study found a native reference improvement but also a much stronger
 external baseline. Keep those distinct. The next lead must charge construction
 and certification, compare the best existing native route to its successor,
-and retain an external full-cost comparison before any practical claim
-`[pcc:unverified]`.
+and retain an external full-cost comparison before any practical claim.
 
 ## Lead 1: project the original quadratics directly
 
@@ -29,8 +28,7 @@ Expanding the right side proves membership without dividing by A or D.
 It is the standard quadratic resultant identity, not a novelty claim. The
 identity remains valid at specializations with a zero leading coefficient;
 such a specialization is not automatically an exact root-existence test.
-Only append consequences; never replace the original ideal by a resultant
-`[pcc:unverified]`.
+Only append consequences; never replace the original ideal by a resultant.
 Require nonzero output before monic normalization and check certificates.
 
 Use the original inputs, so scaled equations are handled without assuming
@@ -46,7 +44,7 @@ provide another drastic native gain. It is also worth testing only as a
 full-cost external candidate, since preprocessing was previously unpaid in
 the CAS diagnostic. These are hypotheses `[pcc:unverified]`.
 
-## Further leads and development status
+## Leads not yet promoted to experiments
 
 1. Use a certified univariate quotient instead of general Buchberger on the
    structured four-solution family. Starting with a certified vertex quartic
@@ -56,10 +54,8 @@ the CAS diagnostic. These are hypotheses `[pcc:unverified]`.
    across the connected shared-point graph, checking every inversion and
    retaining a failure rather than dividing by a zero divisor. Generate the
    reduced grevlex basis by linear dependence in the small quotient algebra,
-   with ideal equality and every final S-pair checked. The prototype is now
-   implemented, with exact development checks under quotient-development/.
-   Whether this removes substantial solve/check cost remains unmeasured;
-   expanded certificate work may offset the algebraic shortcut
+   with ideal equality and every final S-pair checked. This could remove the
+   dominant solve/check work; no implementation or timing is claimed yet
    `[pcc:unverified]`.
 2. Keep original-input provenance as a DAG and verify shared subexpressions,
    instead of repeatedly expanding coefficient maps. Preserve exact checks
