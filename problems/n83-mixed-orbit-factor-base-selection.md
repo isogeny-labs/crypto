@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck and implementation gap
 - **Affected work:** [N83 factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/), [K2048 native XCNF gate](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-xcnf-20261114/RESULT.md), [full-D18 native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PROTOCOL.md), [separate a=1 cross-family panel](../research/n83_crossfamily_current_20261025/native/README.md)
 - **Next action owner:** N83 factor-base research task
-- **Last updated:** 2026-11-15 UTC; the exact rank-query census and native K600 model verifier are in open [PR #4295](https://github.com/isogeny-labs/crypto/pull/4295). The same-public-point D18/K2048 solver pair and independent raw audit merged in [PR #4131](https://github.com/isogeny-labs/crypto/pull/4131). The earlier K2048 native [PR #4126](https://github.com/isogeny-labs/crypto/pull/4126) and [D18 ordered solver result](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md) remain separate cells.
+- **Last updated:** 2026-11-15 UTC; the exact rank-query census, native K600 model verifier, v3 base producer and bounded v3 trial bridge are in open [PR #4295](https://github.com/isogeny-labs/crypto/pull/4295). The same-public-point D18/K2048 solver pair and independent raw audit merged in [PR #4131](https://github.com/isogeny-labs/crypto/pull/4131). The earlier K2048 native [PR #4126](https://github.com/isogeny-labs/crypto/pull/4126) and [D18 ordered solver result](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md) remain separate cells.
 
 ## Problem
 
@@ -32,7 +32,9 @@ including setup and online phases, over the finite declared design grid.
 
 - **2026-11-15 storage access update:** A [fresh read-only check](../research/koblitz_n83_factor_base_sweep_20261008/STORAGE_TRANSITION_20261027.md#read-only-access-update--2026-11-15-utc) used `ecc-challenges-new` to GET and hash a 14,861,500-byte known store object from `s3://setec-astronomy-artifacts/store`; the SHA-256 matched its prior publication receipt. IAM simulation allows object GET and PUT on a placeholder store key, but no new N83 write/fresh-pull has been attempted. Owner confirmation of the exact new-bucket writer and historical-mirror policy remains pending. The old-bucket D18 input keys stay frozen.
 
-- **2026-11-15 successor import gate:** The [v3 native store reader](../research/koblitz_n83_factor_base_sweep_20261008/STORAGE_TRANSITION_20261027.md#native-successor-reader--2026-11-15-utc) checks an indexed content-addressed object, exact compressed and plain hashes, bound replay/fresh-download receipts, and every primary point and orbit label. Its local `file://` control and rejection tests pass. Producer-side v3 publication, an actual N83 new-bucket write/fresh GET, full IC integration and runtime selection remain open.
+- **2026-11-15 successor import gate:** The [v3 native store reader](../research/koblitz_n83_factor_base_sweep_20261008/STORAGE_TRANSITION_20261027.md#native-successor-reader--2026-11-15-utc) checks an indexed content-addressed object, exact compressed and plain hashes, bound replay/fresh-download receipts, and every primary point and orbit label. Its local `file://` control and rejection tests pass. This was a reader-only checkpoint; later implementation status follows.
+
+- **2026-11-15 successor producer and trial bridge, open PR [pcc:unverified]:** The [native v3 producer](../research/koblitz_n83_factor_base_sweep_20261008/STORAGE_TRANSITION_20261027.md#native-successor-producer--2026-11-15-utc) constructs a primary public-X base, replays every point and orbit with the generic curve implementation, publishes through the content-addressed store, and verifies an independent fresh pull. Its two-orbit, 332-point local `file://` control produced a 12,601-byte gzip object with SHA-256 `3805cf6e445967f1f867352368acddfd0e484318860bd94a8d3c0e63d86e6154`; the touched release example passed 26/26. The [v3 trial bridge](../research/koblitz_n83_factor_base_sweep_20261008/STORAGE_TRANSITION_20261027.md#native-successor-trial-bridge--2026-11-15-utc) imports that checked base into the bounded native enumerate path for `m=2..6`. Its zero-trial local control ended `PREFLIGHT_ONLY` with zero queries, relations and rank; total runtime stayed null. The control does not measure natural yield. Actual N83 S3 publication and fresh GET, larger-base resource behavior, SAT/WDSat/FES combinations, useful rank, target descent, and fully charged same-target selection remain open.
 
 - **2026-11-14 same-point D18/K2048 pair [pcc:unverified]:** The
   [frozen result](../research/koblitz_n83_factor_base_sweep_20261008/verification/a0-matched-public-solver-20261114/RESULT.md)
@@ -108,10 +110,11 @@ including setup and online phases, over the finite declared design grid.
 
 ## What would unblock it
 
+- [ ] Confirm the exact authorized new S3 bucket/prefix and writer identity, then publish at least one primary public-X base, verify an independent fresh GET and store index/manifest, and retain the write-once custody receipts. Keep the frozen old-bucket D18 keys unchanged unless an explicit mirror decision is recorded.
 - [ ] Independently replay natural partials against the exact S3 base/pool bytes, public target stream, original CNF/XOR/field equations, and original curve group.
 - [ ] Collect enough checked rows to measure useful rank and solve full-width column logs; record failed attempts and charged setup cost.
 - [ ] Complete and verify a previously unseen public target with all five online phases and run a same-target rho reference under matching resource envelopes.
-- [ ] Apply the frozen finite-grid coverage and unsupported-combination dispositions, and compare total cost with uncertainty before filling `selected_best_total_runtime`.
+- [ ] Execute or explicitly disposition the frozen finite grid, including the SAT/WDSat/FES, splitting, symmetry, Gray and double-large-prime combinations, and compare fully charged total cost with uncertainty before filling `selected_best_total_runtime`.
 
 These checks are jointly needed to select a factor base on the requested
 criterion. A checked partial relation would resolve only the first gate.
