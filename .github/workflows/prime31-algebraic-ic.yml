@@ -47,5 +47,7 @@ jobs:
         run: python3 research/prime31_ic_20261115/native/replay_balanced_m8_s4.py
       - name: Count balanced m8 ordered rational roots using reused Rust arithmetic
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_permutation_orbit_gate
+      - name: Rust-native exact split-m8 reachability prefix (100 left blocks)
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_exact_support
       - name: Lint adapter and CLI
         run: cargo +1.100.0 clippy --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib --bin prime31-algebraic-ic -- -D warnings
