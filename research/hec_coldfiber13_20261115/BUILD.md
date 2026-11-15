@@ -17,3 +17,9 @@ HEC_SOLVER_MANIFEST=$PWD/solver.sha256
 ./tmp/target/release/driver13 PUBLIC.txt run > DRIVER.txt 2> DRIVER.stderr
 Both environment variables must be exported. Driver sets each fresh worker's
 HEC_SETUP_DIR and HEC_PUBLIC_INPUT; loadernegativecontrol removes the former.
+
+V2 executable hashes are in solver-v2.sha256; keep solver.sha256 unchanged for
+V1 provenance. V2 driver uses that new manifest and a fresh run-v2/ directory.
+Report rendering: typst compile REPORT.typ REPORT.pdf; per-run PDFs use
+typst compile --root . reports/<run>/REPORT.typ reports/<run>/REPORT.pdf.
+Both per-run PDFs and results PDF are one page and visually inspected.
