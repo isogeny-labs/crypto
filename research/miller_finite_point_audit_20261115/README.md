@@ -46,3 +46,5 @@ Primary source: Galbraith chapter 7, extended corrected version 2.0, <https://ww
 General all-function divisor finiteness, translation pullback, Weil reciprocity, isogeny/Lang/Cartier/Jacobian, canonical Weil/Tate/MOV/Frey–Rück and the complete original fourteen-item request remain open. The same host, prover and Mathlib are used; this is not new independent implementation or physical-host assurance. No canonical corpus promotion or signed-standing claim is made. [pcc:unverified]
 
 Exact local **PCC-20261115-bb5771** replay PASS at 2026-11-15T06:18:06Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `756c274a6b75323069fcab94a37343f44e4b1238` and local receipt `d9313b0d2e5af5d77a603065340589b8bb148f43` share tree `e94b5985dd3763904f6c08a27f6ebdd358e2783a`. Anonymous fetch completed; fresh PR head/body/open/ready check matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
