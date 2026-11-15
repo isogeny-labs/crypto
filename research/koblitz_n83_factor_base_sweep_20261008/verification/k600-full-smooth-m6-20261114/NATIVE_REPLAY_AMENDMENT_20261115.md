@@ -27,8 +27,11 @@ source and native replayer binary before any timed stage, and its report must
 retain failed or incomplete SAT models as failures.
 
 Validation on macOS arm64 with Rust 1.99.1: the release example suite passed
-23/23 tests, including a new parser test that rejects partial, duplicate,
-non-SAT, false CNF, false XOR, wrong-row-count, and unterminated assignments.
+24/24 tests. The parser test rejects partial, duplicate, non-SAT, false CNF,
+false XOR, wrong-row-count, and unterminated assignments. A constructed
+six-point witness on the same N83 curve checks the export's point-object
+encoding, each partial sum, and the exact relation-row hash; changed point,
+partial sum, row hash, and index inputs are rejected.
 The full K600 replay command has not consumed a solver model; that end-to-end
 verification remains pending. The exporter serializes constructed witness
 points as `{x_decimal, y_decimal}` objects; the historical Python replayer

@@ -961,6 +961,48 @@ fn k600_model_x(values: &[u8], block: usize) -> BigUint {
     x
 }
 
+fn verify_k600_positive_witness(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    positive: &Value,
+) -> Result<Vec<usize>> {
+    let indices = positive["indices"].as_array().ok_or("positive indices")?;
+    let points = positive["points"].as_array().ok_or("positive points")?;
+    let partial = positive["partial_sums"]
+        .as_array()
+        .ok_or("positive partial sums")?;
+    if indices.len() != 6 || points.len() != 6 || partial.len() != 6 {
+        return Err("positive witness length differs".into());
+    }
+    let mut sum = BinaryPoint::Infinity;
+    let mut selected = Vec::with_capacity(6);
+    for i in 0..6 {
+        let index = indices[i].as_u64().ok_or("positive index")? as usize;
+        let point = fb
+            .points
+            .get(index)
+            .ok_or("positive index outside archive")?;
+        if points[i] != planted_point_json(point) {
+            return Err("positive point differs from archive".into());
+        }
+        sum = kc.add(&sum, point);
+        if partial[i] != planted_point_json(&sum) {
+            return Err("positive partial sum differs".into());
+        }
+        selected.push(index);
+    }
+    if selected.iter().collect::<HashSet<_>>().len() != 6 || sum != *target {
+        return Err("positive witness is repeated or misses target".into());
+    }
+    let row = checked_primary_relation_row(kc, fb, &selected, target)?;
+    let row_bytes = serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>())?;
+    if positive["relation_row_decimal_blake3"] != blake3::hash(&row_bytes).to_hex().to_string() {
+        return Err("positive relation-row hash differs".into());
+    }
+    Ok(selected)
+}
+
 /// Independently replay a solver model against the saved formula and the
 /// exact retained point base. This command does not perform SAT search.
 pub(super) fn k600_m6_replay_cli(
@@ -1091,42 +1133,7 @@ pub(super) fn k600_m6_replay_cli(
             return Err("natural target differs from public fixture".into());
         }
     } else {
-        let positive = &export["positive"];
-        let indices = positive["indices"].as_array().ok_or("positive indices")?;
-        let points = positive["points"].as_array().ok_or("positive points")?;
-        let partial = positive["partial_sums"]
-            .as_array()
-            .ok_or("positive partial sums")?;
-        if indices.len() != 6 || points.len() != 6 || partial.len() != 6 {
-            return Err("positive witness length differs".into());
-        }
-        let mut sum = BinaryPoint::Infinity;
-        let mut selected = Vec::with_capacity(6);
-        for i in 0..6 {
-            let index = indices[i].as_u64().ok_or("positive index")? as usize;
-            let point = fb
-                .points
-                .get(index)
-                .ok_or("positive index outside archive")?;
-            if points[i] != planted_point_json(point) {
-                return Err("positive point differs from archive".into());
-            }
-            sum = base.curve.add(&sum, point);
-            if partial[i] != planted_point_json(&sum) {
-                return Err("positive partial sum differs".into());
-            }
-            selected.push(index);
-        }
-        if selected.iter().collect::<HashSet<_>>().len() != 6 || sum != target {
-            return Err("positive witness is repeated or misses target".into());
-        }
-        let row = checked_primary_relation_row(&base.curve, fb, &selected, &target)?;
-        let row_bytes =
-            serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>())?;
-        if positive["relation_row_decimal_blake3"] != blake3::hash(&row_bytes).to_hex().to_string()
-        {
-            return Err("positive relation-row hash differs".into());
-        }
+        verify_k600_positive_witness(&base.curve, fb, &target, &export["positive"])?;
     }
     let xs: Vec<_> = (0..6).map(|block| k600_model_x(&values, block)).collect();
     let intermediate: Vec<_> = (6..10).map(|block| k600_model_x(&values, block)).collect();
@@ -4470,6 +4477,54 @@ mod tests {
         assert!(k600_check_xcnf(formula, &[0, 1, 1, 1], 2, 1).is_err());
         assert!(k600_check_xcnf(formula, &model, 3, 0).is_err());
         assert!(k600_check_xcnf("p cnf 3 3\n1 -2 0\n3 0\nx -1 2 3\n", &model, 2, 1).is_err());
+    }
+
+    #[test]
+    fn k600_positive_witness_checks_exported_objects_and_relation_row() {
+        let (bytes, manifest_row) = construct(
+            0,
+            "public_x_hash",
+            2,
+            17,
+            Instant::now() + Duration::from_secs(60),
+        )
+        .unwrap();
+        let base = from_record(&manifest_row, &bytes).unwrap();
+        let kc = &base.curve;
+        let fb = &base.factor_base;
+        let indices = [0usize, 2, 4, 6, 8, 10];
+        let mut sum = BinaryPoint::Infinity;
+        let mut partial_sums = Vec::new();
+        for &index in &indices {
+            sum = kc.add(&sum, &fb.points[index]);
+            assert!(matches!(sum, BinaryPoint::Affine { .. }));
+            partial_sums.push(planted_point_json(&sum));
+        }
+        let row = checked_primary_relation_row(kc, fb, &indices, &sum).unwrap();
+        let row_bytes =
+            serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>()).unwrap();
+        let positive = json!({
+            "indices":indices,
+            "points":indices.iter().map(|&i| planted_point_json(&fb.points[i])).collect::<Vec<_>>(),
+            "partial_sums":partial_sums,
+            "relation_row_decimal_blake3":blake3::hash(&row_bytes).to_hex().to_string(),
+        });
+        assert_eq!(
+            verify_k600_positive_witness(kc, fb, &sum, &positive).unwrap(),
+            indices
+        );
+        let mut bad = positive.clone();
+        bad["points"][0] = point_json(words(&fb.points[0]));
+        assert!(verify_k600_positive_witness(kc, fb, &sum, &bad).is_err());
+        let mut bad = positive.clone();
+        bad["partial_sums"][4]["x_decimal"] = json!("0");
+        assert!(verify_k600_positive_witness(kc, fb, &sum, &bad).is_err());
+        let mut bad = positive.clone();
+        bad["relation_row_decimal_blake3"] = json!("0");
+        assert!(verify_k600_positive_witness(kc, fb, &sum, &bad).is_err());
+        let mut bad = positive;
+        bad["indices"][5] = json!(0);
+        assert!(verify_k600_positive_witness(kc, fb, &sum, &bad).is_err());
     }
 
     #[test]
