@@ -123,6 +123,57 @@ class FrozenEngineeringComponent(unittest.TestCase):
         self.assertIn("Frozen engineering summary", html)
         self.assertIn("no recovered-scalar certificate for an independent replay", html)
 
+class TableBKsumComponent(unittest.TestCase):
+    """The k = 5 sum-table section renders from the frozen summary; the gate-dependent
+    build is exercised only once benchmarks/20261115-tableb-ksum/VALIDATION.json exists."""
+
+    def component(self):
+        summ = builder.load(builder.SOURCES["tableb_ksum"])
+        builder.check_tableb_ksum_summary(summ)
+        return {"rows": summ["rows"], "source": builder.SOURCES["tableb_ksum"],
+                "study": builder.TABLEB_KSUM_STUDY + "/", "report": builder.TABLEB_KSUM_STUDY + "/report.pdf",
+                "protocol": summ["protocol"], "unit": summ["unit"], "isolation": summ["isolation"],
+                "track": summ["track"], "binary_sha256": summ["binary_sha256"], "commit": summ["commit"],
+                "registered_at": summ["registered_at"], "replay": summ["replay"], "sessions": summ["sessions"],
+                "targets_per_curve": summ["targets_per_curve"], "rounds": summ["rounds"],
+                "replicates": summ["replicates"],
+                "l1_holds_on_a_primary_row": summ["l1_holds_on_a_primary_row"],
+                "l1_falsified": summ["l1_falsified"], "title": builder.TABLEB_KSUM_TITLE,
+                "validation": "validated: test fixture"}
+
+    def test_section_text_copies_the_summary(self):
+        k = self.component()
+        text = builder.tableb_ksum_text(k)
+        self.assertEqual(len(text["cells"]), 9)
+        self.assertIn("l1_holds_on_a_primary_row = true", text["rule"])
+        self.assertIn("l1_falsified = false", text["rule"])
+        self.assertTrue(any(k["binary_sha256"] in x for x in text["scope"]))
+        self.assertTrue(any("wall time is not claimed" in x for x in text["scope"]))
+        md = "\n".join(builder.tableb_ksum_markdown({"tableb_ksum_component": k}))
+        self.assertIn("## Table B prime rows re-measured with the k = 5 sum table", md)
+        self.assertIn("research/ic_tableb_ksum_20261115/report.pdf", md)
+        self.assertIn("another harness", md)
+
+    def test_summary_checks_fail_closed(self):
+        summ = builder.load(builder.SOURCES["tableb_ksum"])
+        for mutate in (lambda d: d.update(schema="other"),
+                       lambda d: d.update(l1_holds_on_a_primary_row=False),
+                       lambda d: d["rows"].pop()):
+            bad = copy.deepcopy(summ)
+            mutate(bad)
+            with self.assertRaises(SystemExit):
+                builder.check_tableb_ksum_summary(bad)
+
+    def test_component_requires_validation_json(self):
+        if (builder.REPO / builder.TABLEB_KSUM_EVIDENCE / builder.gate.MANIFEST).is_file():
+            self.skipTest("VALIDATION.json exists; the end-to-end build covers this")
+        with self.assertRaises(SystemExit):
+            builder.tableb_ksum_component()
+
+    def test_evidence_dir_is_gated(self):
+        self.assertIn(builder.TABLEB_KSUM_EVIDENCE, builder.COMPONENT_EVIDENCE_DIRS)
+
+
 class Roster(unittest.TestCase):
     def names_with(self, params):
         row = {"slug": "ext", "family": "extension", "params": params,

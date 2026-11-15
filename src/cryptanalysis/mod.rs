@@ -181,6 +181,7 @@ pub mod endo_rho;
 pub mod ext_curve;
 pub mod f4_fp;
 pub mod f4_fp_tower;
+pub mod f4_fp_tower_radix;
 pub mod f4_tower_generic;
 pub mod f6_wide_geometry;
 pub mod fes_gpu;
