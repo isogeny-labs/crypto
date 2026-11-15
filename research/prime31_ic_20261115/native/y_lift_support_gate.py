@@ -48,6 +48,14 @@ def run():
     fibers = [oriented_y_fiber(q) for q in points]
     hist = Counter(len(v) for v in fibers)
     assert hist == {1:14, 3:17}, hist
+    projection_hist = Counter()
+    for i, fi in enumerate(fibers):
+        for fj in fibers[i+1:]:
+            values = {add(a,b)[1] for a in fi for b in fj}
+            expected = len(fi)*len(fj)
+            assert len(values) == expected
+            projection_hist[len(values)] += 1
+    assert projection_hist == {1:91, 3:238, 9:136}
     lifted = sorted({p for fiber in fibers for p in fiber})
     unique = sorted(p for p, fiber in zip(points, fibers) if len(fiber) == 1)
     assert len(lifted) == 65 and len(unique) == 14
@@ -74,6 +82,7 @@ def run():
         "p": P, "a": A, "b": B, "n": 2147446831, "seed": seed,
         "canonical_base": len(points), "y_fiber_size_histogram": dict(sorted(hist.items())),
         "lifted_rational_points": len(lifted),
+        "distinct_y_pair_output_root_histogram":dict(sorted(projection_hist.items())),
         "depth7_full_base": len(base7),
         "depth7_injective_y_base": len(injective7),
         "depth7_first31_injective_y_signed_pair_support": len(depth7_support),
