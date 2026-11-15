@@ -1,0 +1,76 @@
+{
+  "schema": "procyclic-galois-cocycle-verification/v1",
+  "source_commit": "d91db8708c4241999cc4d35c9beb1cecac7b97db",
+  "claim_id": "PCC-20261115-ed6495",
+  "declaration_sha256": "4f6948a2e69332e5f2a6f72ef7a13f751e3653bda1dbfa30f90482305c59c613",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 9,
+  "gate_declarations": 36,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 106,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-ed6495",
+    "claim_sha256": "251afb08a88a7870b4360c362c43a4d071cdf9b894d3c7891b5444909b523923",
+    "commit": "d91db8708c4241999cc4d35c9beb1cecac7b97db",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/procyclic_galois_cocycle_audit_20261115/lean (ProcyclicCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T00:25:12Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-ed6495",
+    "claim_sha256": "251afb08a88a7870b4360c362c43a4d071cdf9b894d3c7891b5444909b523923",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47416,
+    "sha256": "873215ba3d5e5807f434c7d0187ae325bb46f9ce95706f31e8143c7a53059771",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 36,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_Krull_Galois_Frobenius_density_derived": true,
+    "actual_finite_target_pointed_universal_property_derived": true,
+    "all_continuous_cocycles_classified": true,
+    "all_principal_cocycle_class_quotient_formula_proved": true,
+    "finite_guard_integer_negative_control_proved": true,
+    "canonical_continuous_homogeneous_complex_H1_comparison_proved": false,
+    "full_Bruin_Tate_pairing_proved": false,
+    "original_FR_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

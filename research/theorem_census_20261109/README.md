@@ -391,6 +391,36 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [finite continuous-cocycle audit](../procyclic_galois_cocycle_audit_20261115/README.md)
+proves the finite-coefficient functionalformula behindBruin2011Eq2.1.
+For everyfinitefieldK, actualKrullGal/qFrobenius/fixedfielddescent/infinite
+Galoiscorrespondence deriveFrobeniusdensity. Actualfinitefieldextensions/
+intermediatefieldrestriction/cyclicGaloisgroups deriveuniquefinite-target
+continuoushomwithanyprescribedFrobeniusvalue. For everyfiniteAbelianM/
+continuousactualaction, actualfinite semidirectproducts/graphhom yield
+allcontinuouscrossedcocycles/evaluationMulEquivtoM. Actualallprincipal
+continuouscocycles/wholeimage andactualstandardall-cocycleclassquotient
+haveaMulEquivtoFrobeniuscoinvariants with exactrepresentativeformula and
+principalclassrelation. Noassumedprocyclic/H1value/duality/NDconclusion
+orrestrictedrepresentatives. Everyfinitebasefield/integertrivialaction
+hasallcontinuouscocycleszero/nonzeroactualcoinvariantclass1/sameactual
+classevaluationnonsurjective, generalizingcreditedearlierF2control.
+Qualifiedfinitecaseproved/notrefuted. Comparison to separateMathlib
+continuoushomogeneouscomplexH1/Lang/Cartier/Jacobian/divisor/fullTate/
+MOV/FRbridgesremainopen; originalFR94primary stillunread afterbounded
+publisher403/sixarchive503routes. No novelty/canonicalpromotion/full14
+closure; previousfullBruinprimary/selectedfreshreading credited.
+Exactlocal **PCC-20261115-ed6495** PASS at 2026-11-15T00:25:12Z, signedstandingunverified;
+whole36/0/0/full953-character binding
+`4f6948a2e69332e5f2a6f72ef7a13f751e3653bda1dbfa30f90482305c59c613`,
+independentnative1complete/0prefix/0unresolved;6custom/9formal-config+
+14artifactpins;106files/44objects/17160-byte losslessXZ/fivegate and
+visuallyinspectedone-page47416byte report. Eleven snapshots/sevenfailed
+states incl08Leanpanic/fullbacktrace retained; final11advisoryfree.
+No limits/options/waivers/nativecrypto/cryptoPython/spend/upload.
+[pcc:unverified]
+
+
 The [Diem cyclic-module audit](../diem_cyclic_module_audit_20261114/README.md)
 recovers the archivedMarch24,2003 original odd-GHS draft,33pages.
 All33OCRpages inclappendix/references read; PDF8/10/13/18/23 visuallychecked.
