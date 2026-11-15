@@ -1,0 +1,18 @@
+DEVELOPMENT CHECK, NOT DATA. Local host (isolation L0 requested), one round, no warm-up, smallest curve, few targets; written 2026-11-14. Nothing here enters any analysis.
+ecbench binary: target/release/ecbench, sha256 73c4f66bdbd1b7d795ab142fea18dafbb3476d876a8f9f81fde4aeb4f9e581e7 (built by track A at HEAD 0c2cc1b408, 2026-11-14; this is NOT the pinned production image, see PROTOCOL.md section 12)
+
+smoke specs: B2/smoke-spec-K1.json (first curve, 2 targets) and B2/smoke-spec-PC.json (first curve, 2 targets), rounds 1, warmup 0, isolation L0
+$ target/release/ecbench run --spec research/ic_lead_queue_20261114/B_sweep_followups/B2/smoke-spec-K1.json --out <scratch>/run-K1
+exit 0; 3.1 s wall; 10 records, 10 verified (2 targets x 5 arms)
+$ target/release/ecbench run --spec research/ic_lead_queue_20261114/B_sweep_followups/B2/smoke-spec-PC.json --out <scratch>/run-PC
+exit 0; 2.9 s wall; 6 records, 6 verified (2 targets x 3 arms)
+$ target/release/ecbench verify --dir <scratch>/run-K1 --replay-all --exit-code
+exit 0; audit OK: 10 records, 10 verified, 10 replays reproduced, 0 problems
+$ target/release/ecbench verify --dir <scratch>/run-PC --replay-all --exit-code
+exit 0; audit OK: 6 records, 6 verified, 6 replays reproduced, 0 problems
+$ target/release/ecbench compare --dir <scratch>/run-K1 --a rho-plain --b kang --weight 0
+exit 0
+$ target/release/ecbench table --dir <scratch>/run-K1
+exit 0 (median wall of rho.negation at 32.37 bits: 27.6 ms, used for the cost estimate)
+
+One-line summary: both specs run end to end, replays reproduce every record, and the analysis commands accept their flags.
