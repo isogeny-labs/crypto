@@ -49,6 +49,7 @@ struct Args {
 enum Oracle {
     Mitm,
     Groebner,
+    F4,
     Pair,
     SymmetricPair,
     PreparedPair,
@@ -77,6 +78,7 @@ impl Oracle {
         match self {
             Self::Mitm => Solver::MeetInTheMiddle,
             Self::Groebner => Solver::Groebner,
+            Self::F4 => Solver::F4Groebner,
             Self::Pair => Solver::PairOnly,
             Self::SymmetricPair => Solver::SymmetricPairOnly,
             Self::PreparedPair => Solver::PreparedSymmetricPairOnly,

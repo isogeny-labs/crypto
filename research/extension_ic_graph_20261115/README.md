@@ -90,9 +90,26 @@ decomposable abscissae and no repeat. Native post-call summaries preserve
 the original acceptance strata exactly. The next distinct lead is the
 existing native F4 solver for three-point S4. [pcc:unverified]
 
-Current checks report 36 passing cubic release tests and seven passing
+The [S4/F4 basis probe](local-s4-f4-probe-20261115-08/report.pdf) retains all
+864 eight-call batches. Thirty-three of 36 systems pass all local controls,
+with basis/full-reference wall ratios 0.135–0.173. Two reference closure
+failures and one A/A rejection remain invalid/inconclusive; both reference
+failures have finite dimension-60 native quotients. This is a basis-phase
+comparison with extraction still outside that measured boundary.
+[pcc:unverified]
+
+Native F4 quotient/action-matrix extraction is now integrated as
+`Solver::F4Groebner` and comparison CLI `--oracles f4`. It reuses group sign
+settlement, preserves charged fallbacks and labels the native field counter's
+unpriced scalar housekeeping. The two observed reference failures recover
+without fallback in the new coordinate tests. Full cold pipeline trials are
+frozen by [Amendment 7](AMENDMENT_7_F4_FULL_IC.md) and have not run yet.
+[pcc:unverified]
+
+Current checks report 39 passing cubic release tests and seven passing
 native-analysis tests, plus release example build/test target and both
-warnings-denied Clippy checks. [pcc:unverified]
+warnings-denied Clippy checks. The separate S4 probe example and analysis
+each have two passing tests and warnings-denied Clippy checks. [pcc:unverified]
 
 Exact visual copies are under `benchmarks/20261115-cubic-graph-*`. The
 admitted benchmark index and leaderboard remain unchanged: independent

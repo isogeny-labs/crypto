@@ -274,6 +274,9 @@ fn plot(summary: &Value, p: u64, path: &Path) -> Result<(), Box<dyn Error>> {
     chart
         .configure_mesh()
         .y_desc("batch wall ratio; extraction still missing")
+        .y_labels(6)
+        .max_light_lines(2)
+        .y_label_formatter(&|v| format!("{v:.2}"))
         .x_labels(0)
         .draw()?;
     chart.draw_series(LineSeries::new(

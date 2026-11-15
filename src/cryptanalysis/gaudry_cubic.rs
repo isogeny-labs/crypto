@@ -68,6 +68,9 @@ mod symmetric;
 pub use symmetric::{weil_s3_pair_test_symmetric, SymmetricPairStats};
 #[path = "gaudry_cubic_prepared.rs"]
 mod prepared;
+#[path = "gaudry_cubic_s4_f4.rs"]
+mod s4_f4;
+pub use s4_f4::{solve_s4_f4, S4F4Stats};
 #[path = "gaudry_cubic_sampling.rs"]
 mod sampling;
 
@@ -3025,6 +3028,17 @@ pub fn subspace_triple_oracle_groebner(
         stats.fp_muls += muls;
         return decs;
     };
+    settle_triple_signs(inst, base, r, triples, found)
+}
+
+fn settle_triple_signs(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    r: &Pt3,
+    triples: Vec<[u64; 3]>,
+    mut found: Vec<Vec<(usize, i64)>>,
+) -> Vec<Vec<(usize, i64)>> {
+    let curve = &inst.curve;
     for [x1, x2, x3] in triples {
         let idx: Option<Vec<usize>> = [x1, x2, x3]
             .iter()
@@ -3175,6 +3189,8 @@ pub struct GaudryReport {
     /// stores no scalar coefficients and never supplies a recovery equation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relation_point_stats: Option<RelationPointStats>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub s4_f4_stats: Option<S4F4Stats>,
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
@@ -3705,6 +3721,8 @@ pub enum Solver {
     MeetInTheMiddle,
     /// Gaudry's `O(1)` symmetrised-`S₄` solve per residual.
     Groebner,
+    /// Native F4 basis and counted finite-quotient extraction for S4.
+    F4Groebner,
     /// **Joux–Vitse**: look for decompositions into `k − 1 = 2` base
     /// points instead of `k = 3`, with one Weil-restricted `S₃` pair
     /// test on the residual itself.
@@ -3880,7 +3898,7 @@ fn run_gaudry_impl(
         curve.reset();
         m
     };
-    let pre = if solver == Solver::Groebner || cross_check {
+    let pre = if matches!(solver, Solver::Groebner | Solver::F4Groebner) || cross_check {
         Some(SymmetrisedS4::precompute(curve))
     } else {
         None
@@ -4001,6 +4019,7 @@ fn run_gaudry_impl(
         sampling_group_ops: backend.map(|_| 0),
         sampler_restarts: backend.map(|_| 0),
         relation_point_stats: backend.map(|_| RelationPointStats::default()),
+        s4_f4_stats: None,
     };
     let mut la = std::time::Duration::ZERO;
     while rep.residuals < max_residuals {
@@ -4068,6 +4087,21 @@ fn run_gaudry_impl(
                 rep.oracle_fp_muls += stats.fp_muls - before;
                 decs
             }
+            Solver::F4Groebner => {
+                let before = stats.fp_muls;
+                let work = rep.s4_f4_stats.get_or_insert_with(S4F4Stats::default);
+                let decs = s4_f4::triple_oracle(
+                    inst,
+                    base,
+                    pre.as_ref().unwrap(),
+                    &r,
+                    &mut rng,
+                    &mut stats,
+                    work,
+                );
+                rep.oracle_fp_muls += stats.fp_muls - before;
+                decs
+            }
             Solver::PairOnly => {
                 // One pair test on the residual itself: `R = ±P_i ±P_j`.
                 let (decs, muls) = weil_s3_pair_test(inst, base, &r, &mut rng);
@@ -4121,7 +4155,9 @@ fn run_gaudry_impl(
                         &mut st,
                     )
                 }
-                Solver::Groebner => subspace_triple_oracle(inst, base, &r, &mut rng).0,
+                Solver::Groebner | Solver::F4Groebner => {
+                    subspace_triple_oracle(inst, base, &r, &mut rng).0
+                }
                 Solver::SymmetricPairOnly | Solver::PreparedSymmetricPairOnly => {
                     weil_s3_pair_test(inst, base, &r, &mut rng).0
                 }

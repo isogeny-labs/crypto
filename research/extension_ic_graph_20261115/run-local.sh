@@ -26,16 +26,16 @@ case "$driver_kind" in
   s4-f4-component)
     driver_binary=target/release/examples/gaudry_cubic_s4_f4_probe
     analyzer_binary=$here/native_analysis/target/release/s4-component-analysis
-    # Pin the documented native defaults rather than inherit another study's
-    # engine overrides. SIMD selection uses the captured CPU automatically.
-    export F4_FP_THREAD_OPS=0 F4_STAIR=counter F4_FP_NARROW=2 F4_FP_SYMBOLIC_PAR=1
-    export F4_FP_PACKED=1 F4_FP_GM=1 F4_FP_DEFERRED_PAR=1 F4_FP_FL=1
-    export F4_FP_FL_BLOCKED=1 F4_FP_LINEAR_INTERREDUCE=1
-    unset F4_DEBUG F4_FP_LAZY_SIMD F4_FP_LAZY_AVX512 F4_FP_LAZY_AVX2
-    unset GAUDRY_DEBUG GAUDRY_DEBUG_SOLVE GAUDRY_LAZY_ELIM GAUDRY_LAZY_VERIFY GAUDRY_BORDER_RETRY
     ;;
   *) echo 'Unknown frozen driver kind.' >&2; exit 2;;
 esac
+# Pin the documented native defaults rather than inherit another study's
+# engine overrides. SIMD selection uses the captured CPU automatically.
+export F4_FP_THREAD_OPS=0 F4_STAIR=counter F4_FP_NARROW=2 F4_FP_SYMBOLIC_PAR=1
+export F4_FP_PACKED=1 F4_FP_GM=1 F4_FP_DEFERRED_PAR=1 F4_FP_FL=1
+export F4_FP_FL_BLOCKED=1 F4_FP_LINEAR_INTERREDUCE=1
+unset F4_DEBUG F4_FP_LAZY_SIMD F4_FP_LAZY_AVX512 F4_FP_LAZY_AVX2
+unset GAUDRY_DEBUG GAUDRY_DEBUG_SOLVE GAUDRY_LAZY_ELIM GAUDRY_LAZY_VERIFY GAUDRY_BORDER_RETRY
 cp "$driver_binary" "$run_dir/driver" || exit 2
 cp "$analyzer_binary" "$run_dir/analyzer" || exit 2
 binary_sha=$(sha256sum "$run_dir/driver" | cut -d ' ' -f1)
@@ -47,6 +47,7 @@ cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
 /usr/bin/git ls-files -z -- Cargo.toml Cargo.lock src/cryptanalysis/gaudry_cubic.rs \
   src/cryptanalysis/gaudry_cubic_graph.rs src/cryptanalysis/gaudry_cubic_symmetric.rs \
   src/cryptanalysis/gaudry_cubic_sampling.rs src/cryptanalysis/gaudry_cubic_prepared.rs \
+  src/cryptanalysis/gaudry_cubic_s4_f4.rs \
   src/cryptanalysis/residual_walk.rs src/cryptanalysis/jv_bitops.rs \
   src/cryptanalysis/f4_fp.rs src/cryptanalysis/f4_fp src/cryptanalysis/groebner_f4.rs src/cryptanalysis/fx_hash.rs \
   examples/gaudry_cubic_graph_compare.rs examples/gaudry_cubic_s4_f4_probe.rs \

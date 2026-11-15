@@ -513,6 +513,7 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
             "PairOnly" => "Pair",
             "SymmetricPairOnly" => "Symmetric pair",
             "PreparedSymmetricPairOnly" => "Prepared pair",
+            "F4Groebner" => "Native F4",
             "SymmetricMeetInTheMiddle" => "Symmetric triple",
             other => other,
         };
