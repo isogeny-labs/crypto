@@ -2,6 +2,7 @@ import ChainSd.Closure
 import ChainSd.Unit
 import ChainSd.GroupAlgebra
 import ChainSd.Reach
+import ChainSd.LowerThree
 #print axioms ChainSd.ShiftSystem.closure_transfer
 #print axioms ChainSd.ShiftSystem.closure_mono
 #print axioms ChainSd.ShiftSystem.closure_le_F
@@ -17,3 +18,5 @@ import ChainSd.Reach
 #print axioms ChainSd.single_mem_closure_of_one_mem
 #print axioms ChainSd.weightSub_le_closure_of_one_mem
 #print axioms ChainSd.lastFallDegree_eq_solvingDegree_chain
+#print axioms ChainSd.one_not_mem_closure_two
+#print axioms ChainSd.two_lt_solvingDegree

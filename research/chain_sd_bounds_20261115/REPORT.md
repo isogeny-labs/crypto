@@ -19,7 +19,7 @@ beyond depth 14, and Lean proofs.
 | T3 | Admissible unit family: `p ≡ 1 (mod 2^(k+1))`, `E: y² = x³ + n²(n−1)x`, `t = n`, `n` a non-square; unit for every such `k`; infinitely many `p` for every `k` | proved (§4; Lean `family_S3_ne_zero`, `S3_ne_zero_of_cm`) |
 | T4 | Depth monotonicity: `LFD(k') ≤ LFD(k)` for `k' ≤ k`, same `(p, A, B, t)` | proved (§5; Lean `one_mem_closure_of_le`, `solvingDegree_mono`) |
 | T5 | ℤ-exponent (no-wrap) model: `π_k(W_c) ⊆ U_c(k)`; observed equality in all 6 tested cells | containment proved (§5), equality empirical |
-| T6 | Constant lower bound `LFD(k) ≥ 4` for all `k ≥ 2` (needs `t ≠ 0`, `A ≠ −3t²`); `LFD(k) ≥ 3` for `k ≥ 2` | proved (§7, desk) |
+| T6 | Constant lower bound `LFD(k) ≥ 4` for all `k ≥ 2` (needs `t ≠ 0`, `A ≠ −3t²`); `LFD(k) ≥ 3` for `k ≥ 2` and all `(A, B, t)` | `≥ 4` proved (§7, desk); `≥ 3` Lean (`one_not_mem_closure_two`, `two_lt_solvingDegree`) |
 | T7 | Upper bound `LFD(k) ≤ 2k + 1` for every unit instance, `k ≥ 1`: `A = 2, B = 1` | proved (§6, desk) |
 | T8 | Finite depths: exact `LFD(k) = 4, 4, 4, 4, 5, 5, 5, 5` for `k = 2..9` on the admissible instance `p = 12289, n = 11`, each with an upper and a lower replay certificate; `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on `p = 65537, n = 3` by one certified closure at `k = 10` plus T4 | certified (§8; k = 10 cell ⟨pending: see §8⟩) |
 | T9 | Linear lower bound `ck − C ≤ LFD(k)` with `c > 0` | **open** (§7.3: the missing lemma is stated exactly; the lane-P slope-1/14 proof is not re-derived here) |
@@ -354,16 +354,17 @@ Theorem 1 these are statements about the pinned polynomial-ring computation.
 | T3 bridge grid ⇒ unit ideal | — | CRT for `x^N − 1` over `F_p` | paper only (§4) |
 | T4 depth monotonicity | `one_mem_closure_of_le`, `solvingDegree_mono` (concrete chain algebra, `AddMonoidAlgebra (ZMod p) (ZMod 2^k × ZMod 2^k)`, weight via `Nat.testBit`) | `k' ≤ k`, same `A B t` | checked |
 | T1 quotient reduction | — | Gröbner basis of the tower ideal | paper only (§2) |
-| T6, T7 | — | | paper only (§6, §7.1) |
+| T6, weak form `1 ∉ V_2` (`LFD ≥ 3`) | `one_not_mem_closure_two`, `two_lt_solvingDegree` (`LowerThree.lean`) | `k ≥ 2`, any `A B t` | checked |
+| T6 (`LFD ≥ 4`), T7 (`LFD ≤ 2k+1`) | — | | paper only (§6, §7.1) |
 | T9 linear lower bound | — | | open |
 
 Build: `cd lean && lake build` (Lean 4.34.1, Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` = tag
 `v4.34.1`; `lakefile.toml`, `lake-manifest.json`, `lean-toolchain` pinned; "Build completed
 successfully (8931 jobs)"). Axioms: `lake env lean ChainSd/Axioms.lean` prints only `propext`,
-`Classical.choice`, `Quot.sound` for all 15 listed theorems (recorded in `reports/axioms.txt`). No
+`Classical.choice`, `Quot.sound` for all 17 listed theorems (recorded in `reports/axioms.txt`). No
 `sorry`, no `native_decide`, no custom axiom. Files: `Closure.lean` (abstract), `Popcount.lean`,
 `GroupAlgebra.lean` (concrete algebra, depth monotonicity), `Reach.lean` (reachability, T2 concrete),
-`Unit.lean` (T3).
+`Unit.lean` (T3), `LowerThree.lean` (`1 ∉ V_2`).
 
 ## 11. Reproduction
 
