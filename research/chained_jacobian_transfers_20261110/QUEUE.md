@@ -1,3 +1,21 @@
+# Whole scientific handoff21 ready; inputs HELD
+
+pcc/claims/PCC-20261115-4bef42.json: all40443prior keys/150oldlinks/2850ledgerprefix/ownedscience retained; allfourteenwholeclosedct81scientificroots, actualsource-exes-librarycopies/failures/proofs/checkpoints/wholeCI/reportroots andc031base+fourpendingmetadatafiles. Complete archive usesexact32MiBbyteparts beforeGitlimit; each member roundtripped, originalpolicy selects5objects. HOLD allinputs/aliases/consumerledger until originalactualremote replays BEFORErealpublisher/exactFF/orderedarchive reassembly/terminal21checks. Native75338a originalD67negative/separateD39positive; proofs2735b3/5d647c/report e26218 andprospective5caf67 remainunsigned. No newJacobian evaluatorcode/outcome yet. [pcc:unverified]
+
+## What was done
+Capturedall declaredwholeclosedscience andcurrentguard, includingfirstfailures andwholedata; prior20genuinepayloads stayheld/exact and are referencedwithoutrecursivearchivecapture. [pcc:unverified]
+
+## Decisions made
+Keep bytepartsgeneric originalpolicy/wholearchive identity, alloldrecordoccurrences andsourcehashes; no truncation oracceptance relaxation. [pcc:unverified]
+
+## Open threads
+Genuine originalpublication/exactFF/HOLD21release/canonical16recordfixture, thenimplementcompletefixednewinstanceJacchainunderpublished5caf67/fullfrozenvalidation andunpricedsourcevectors. [pcc:unverified]
+
+## Errors
+Allsource-materialization/PATH/Typst/disk/original19GH001 andoldcold/root-main failures retained; no paidlaunch/waiver/novelty/advantage. [pcc:unverified]
+
+---
+
 # Whole fixed-twist and negative-census bytes genuinely published through transport20
 
 Actualpcc/claims/PCC-20261114-ccd0a6.json/pcc/claims/PCC-20261114-0ed674.json: original43652162428/job132622813840SUCCESS/SEVENremote replays BEFORE52a6443b5/direct88345729/exact9paths. ALL40443heldinputs/150links/ownedbytes preserved, fetch-FF-artifact-wiring0, exacttwo-bytepart reassembly retains original150067144B/archiveSHA/all7359members. HOLD20RELEASED. Original925a2b44/GH001 attempt19 staysFAILED/singleobjectcriterionUNMET; completefailedcommit/archive/claimedsubjects/rejection retained, no publishedhistory rewrite/force/rebase. [pcc:unverified]
