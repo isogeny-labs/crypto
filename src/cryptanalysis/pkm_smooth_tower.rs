@@ -84,11 +84,11 @@ pub fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
     r
 }
 pub fn invm(a: u64, p: u64) -> u64 {
-    assert!(a % p != 0, "inverse of zero");
+    assert!(!a.is_multiple_of(p), "inverse of zero");
     powm(a, p - 2, p)
 }
 pub fn is_square(a: u64, p: u64) -> bool {
-    a % p == 0 || powm(a, (p - 1) / 2, p) == 1
+    a.is_multiple_of(p) || powm(a, (p - 1) / 2, p) == 1
 }
 /// Tonelli–Shanks; `None` for a non-residue.
 pub fn sqrtm(a: u64, p: u64) -> Option<u64> {
@@ -133,7 +133,7 @@ pub fn is_prime(n: u64) -> bool {
         return false;
     }
     for q in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % q == 0 {
+        if n.is_multiple_of(q) {
             return n == q;
         }
     }
@@ -164,7 +164,7 @@ pub fn smooth_split(mut n: u64, bound: u64) -> (Vec<u64>, u64) {
     let mut f = vec![];
     let mut q = 2;
     while q <= bound && q <= n {
-        while n % q == 0 {
+        while n.is_multiple_of(q) {
             f.push(q);
             n /= q;
         }
