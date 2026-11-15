@@ -19,6 +19,7 @@ pub mod derive;
 pub mod ecbench;
 pub mod ell_torsion;
 pub mod ell_isogenies;
+pub mod embedding;
 pub mod end_ring;
 pub mod enrich;
 pub mod factor_bases;
