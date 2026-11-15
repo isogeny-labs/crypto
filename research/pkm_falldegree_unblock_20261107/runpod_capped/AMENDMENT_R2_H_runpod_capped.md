@@ -1,7 +1,8 @@
 # DRAFT Amendment R2-H (proposed number 18): the capped runs at t = 14 and the further t = 13 draw 0 attempt on reserved RunPod CPU pods
 
-**Status: draft revision 3, NOT frozen.** Revised 2026-11-15 after the second independent review (round 2, of commit
-`7305d2ee8d`; blocking items N1-N6, advice S1-S14). Revision 2 answered the first review (`59e487150f`, M1-M7). When
+**Status: draft revision 4, NOT frozen.** Revised 2026-11-15 after the third independent review (round 3, of commit
+`a1c9a4b79c`; verdict "freeze with corrections"; corrections R1-R3 and the reaper lock, S1). Revision 3 answered the
+second review (`7305d2ee8d`, N1-N6), revision 2 the first (`59e487150f`, M1-M7). When
 frozen it is appended to `research/prime_fall_degree_20261027/PREREGISTRATION.md` as Amendment 18, with the SHA-256 of
 the four route scripts (section 10), before any job named below is started. Every number is `[pcc:unverified]`. The
 decisions this text relies on, with their dates and reasons, are listed in `runpod_capped/DECISIONS_ROUTE.md`.
@@ -105,8 +106,9 @@ names below can be launched (decision D2), each at most once, in this order: cel
      has cgroup v1, `memory.limit_in_bytes`, `memory.max_usage_in_bytes`, `memory.oom_control`, `memory.failcnt`; it
      also records `/proc/self/cgroup` and the cgroup file-system type;
    - then `exec`s the unchanged runner, exactly as Amendment 16's start command did.
-   Whether a RunPod CPU pod exposes the v2 or the v1 files is **not known**: the smoke pod did not read them
-   (`SMOKE.md`). The loop tolerates either and records which.
+   The second development smoke (`receipts_dev/pkm-x-dev-smoke2/`) shows cgroup v2 on a RunPod CPU pod: file-system
+   type `cgroup2fs`, `memory.max` 128,000,000,000 bytes before start (`cgroup-prestart.json`) and in the results, and
+   `memory.events` (`oom_kill 0`) and `memory.peak` copied (`admission-lines-1.txt`). The loop still tolerates v1.
 5. **Results path and durability (S2, S8).**
    - `entry_r2.sh`'s `aws s3` calls go to the runner's shim, which copies into the pod's `/results` (Amendment 16).
    - Each collection attempt `k` first writes an intent record `collect-started-<k>.json` (time, reason, the pre-fetch
@@ -129,15 +131,21 @@ names below can be launched (decision D2), each at most once, in this order: cel
      after the run deadline, until the hard deadline. A healthy `RUNNING` REST record with unchanged `lastStartedAt`
      always means "wait". At the hard deadline the pod is deleted for cost after one more collection attempt; with no
      evidence the class is NO_EVIDENCE (section 4).
-   - Check-ins: one about 4 h after start, then at most every 4 h, one at the run deadline, and at least one in the
-     hour between the run deadline and the hard deadline.
+   - Check-ins: one about 4 h after start, then at intervals of at most 4 h, one at the run deadline, and at least one
+     between the run deadline and the hard deadline (an interval of 5 to 60 minutes, depending on when the runner
+     started).
    - **Backstop: `reap.sh`.** It lists the account's pods and deletes a `pkm-x-` pod only when it is past its hard
      deadline (from its receipts' `pod-state.json`, or creation + 26 h when none was recorded); never earlier, whatever
      `fetch.sh` reports (main-session decision N3c). For such a pod it first runs `fetch.sh` (collect what can be
      collected, classify, delete) and deletes directly if the pod is still listed. A pod whose deadline cannot be read
      is not deleted but reported (exit 1). It is idempotent, touches no other pod, logs every delete with its reason
      before the API call, and appends one JSON line per `pkm-x-` pod to `reaper/reap-YYYYMMDD.jsonl`. The main session
-     schedules it as a scheduled check-in at most every 4 h while any study pod exists.
+     schedules it as a scheduled check-in at intervals of at most 4 h while any study pod exists. It takes the same
+     per-name lock as `run.sh` and `fetch.sh`; a pod whose lock is held is skipped for that pass, and the skip is
+     recorded (review round 3, S1). A pass that skipped a due pod for a held lock still exits 0 (the pod is not
+     counted as left over); the skip is visible only on stderr and as a "skipped: lock held" line in the reaper's JSONL.
+     The session therefore reads that JSONL after every reaper pass and runs the pass again once the lock is free; a due
+     pod skipped this way is never left until the next scheduled pass (validator observation, revision 4).
    - **One worst-case pod life, used everywhere (S7).** A pod lives at most until its hard deadline (26 h) plus one
      reaper interval (4 h): **30 h, US$31.20 at US$1.04/h.** The per-run guard (price × 30 h ≤ US$40), the open ledger
      rows and the US$400 check all use these 30 h.
@@ -147,9 +155,11 @@ names below can be launched (decision D2), each at most once, in this order: cel
      recorded at the next development smoke (section 9), but it is not required.
 7. **Host lines and memory.** `host.txt` is the frozen script's, so it has no RunPod pod id.
    - The pod id, flavor, `costPerHr`, data center, machine id and CPU model are recorded in the receipts and with the
-     row. The smoke pod's host was an AMD Ryzen Threadripper 7960X (24 cores, 48 threads).
+     row. **Pinning `cpu5m` does not pin the CPU model:** the two development smokes ran on two models, an AMD Ryzen
+     Threadripper 7960X (smoke 1, `SMOKE.md`) and an AMD EPYC 9575F 64-Core Processor (smoke 2, `host.txt` in
+     `receipts_dev/pkm-x-dev-smoke2/admission-lines-1.txt`).
    - On RunPod `nproc` reads the pod's affinity (16), while `MemTotal` reads the host's memory (263,400,384 kB on the
-     smoke pod). The API's `memoryInGb` is RunPod's figure for the pod, not a measurement. The memory limit is read
+     first smoke host, 527,605,596 kB on the second). The API's `memoryInGb` is RunPod's figure for the pod, not a measurement. The memory limit is read
      before start (item 1) and copied again with the results. The memory peak used by the memory rule of section 4.2 is
      the pilot's own `VmHWM` field, else the cgroup's (`memory.peak`, or v1 `memory.max_usage_in_bytes`).
 
@@ -217,14 +227,15 @@ same run at once.
   it is not in this side's argv for create. Exposures that remain: (1) `rp_pinned.sh` (unchanged, pinned) sends it as
   `-H "X-Token: …"` in curl's argv, visible only to processes of this single-user session container; (2) it sits in
   the pod's environment, readable by anyone holding the shared RunPod account key, through the REST record. With it,
-  anyone can read `/status` and `/results.tar.gz` at any time; before `/start` such a holder could upload files, but
-  `/start` refuses any hash other than the frozen ones; after `/start` the runner refuses every upload and every
-  second start. Anyone with the account key can already delete or create pods.
+  anyone can read `/status` and `/results.tar.gz` at any time. Before `/start` such a holder could upload files, and the
+  runner compares the uploads only with the hashes sent in the `/start` request (review round 3, S7); the protection is
+  that `run.sh` calls `/start` right after its own upload check, and admission rules 1 and 5 check the pinned hashes.
+  After `/start` the runner refuses every upload and every second start. Anyone with the account key can already delete or create pods.
 - **Not built:** a pod-side job script; the runner already runs the frozen script unchanged.
 
 ## 4. Outcome classes, relaunches and limits
 
-### 4.1 One outcome table (decision D1; classifier version `a18-r3`)
+### 4.1 One outcome table (decision D1; classifier version `a18-r4`)
 
 `fetch.sh` holds the only classifier. It reads receipts only: `start.json` (the runner's recorded start `s0`; a
 zero-byte file means the start call got no response and is read as absent), the REST record right after start
@@ -339,14 +350,18 @@ What this settles, case by case (each is an offline test, `tests/README.md`):
     `source_used` and `peak_bytes_used`.
 - **LOST** is the analogue of a Spot loss: nothing from the run is admitted or analysed, even if a partial tree was
   fetched. Each loss is recorded with its reason in `RUNPOD_LOSSES.md`, as in `SPOT_LOSSES.md`. A LOST carries
-  `relaunch: auto` or `relaunch: owner` (section 4.3).
+  `relaunch: auto` or `relaunch: owner` (section 4.3). Partial trees of a LOST run are never read for any rule, its
+  memory peak included (review round 3, S8): a LOST 56Gi attempt does not become an `-m112` attempt.
 - **ABORTED** (a session abort of a running run) uses the attempt and grants no relaunch; any further attempt of the
   cell needs a new owner decision (main-session decision N1, owner decision 13). `run.sh` refuses the `-r1` after an
   abort.
 - **NO_EVIDENCE** (P0, P0b, P7): no row and no automatic relaunch; the case goes to the owner (decision N2).
 - **NOT_AN_ATTEMPT** (a failure before the runner starts) uses no relaunch. Before the start the session can see the
-  pod's data center and the host's thread count and memory (not its CPU model), so a deliberate pre-start abort could
-  re-draw the host (S11). Since a pre-start failure that created a pod leaves a ledger row, the name cannot be
+  pod's data center and, from the runner's ready status, the host's thread count and memory, which tell the observed
+  hosts apart (48 threads and 263 GB on the first smoke host, 128 threads and 527 GB on the second;
+  `status-ready.json`). A deliberate pre-start abort could therefore aim at a host class (S11). The lever stays closed:
+  an abort after start uses the attempt (N1), and a pre-start failure leaves a ledger row so the name is not launched
+  again (N6). Since a pre-start failure that created a pod leaves a ledger row, the name cannot be
   launched again (N6): any such failure sends the cell to the owner. Only a create that left no pod
   (`<name>.nocreate-*`) can be retried under the same name.
 
@@ -357,11 +372,17 @@ without host-side evidence goes to the owner; t = 13 gets none (owner decision 1
 - **Host-side evidence** takes two forms, as the owner's question named them: (1) a RunPod-side status change recorded
   by a check-in, that is a REST `lastStatusChange` that differs from its value right after start and does not name the
   user ("by User"); (2) the pod gone from a successful list with its GET returning 404. Either counts only when recorded
-  before any action the session logged for the pod. Both rest on the caveat the owner accepted: RunPod keeps no
+  before any action the session logged for the pod, and only when tied to the loss (review round 3, R1): from a
+  check-in after the last check-in that saw the runner alive under `s0`, or from the check-in that carries the first
+  loss evidence, and at or before that first loss. If the status at the first-loss check-in names the user, the
+  relaunch goes to the owner. If any check-in before the first loss saw the runner `done` under `s0`, the relaunch goes
+  to the owner too, before or after the run deadline (R2): the session had seen the completion before the loss. Both
+  forms rest on the caveat the owner accepted: RunPod keeps no
   independent record of who ended a pod, so the route relies on the session logging every delete, stop or restart
   (in `session-actions.jsonl`, by `run.sh`, `fetch.sh` and `reap.sh`) before the API call (section 3). A LOST with such
-  a record has `relaunch: auto`; every other LOST has `relaunch: owner`. The text of RunPod's status changes is not
-  known yet beyond "Rented by User: …"; the development smoke records what it can (section 9).
+  a record has `relaunch: auto`; every other LOST has `relaunch: owner`. The "by User" test is a deny-list built on the
+  one status text observed so far, "Rented by User: …" (both smokes); a session stop whose text does not contain it
+  would read as RunPod-side (review round 3, S4).
 - t = 14 cells: one relaunch per cell, across both sizes (as Amendment 14 counts it): `-r1` after a base LOST with
   `relaunch: auto`, or `-m112-r1` after an `-m112` attempt LOST with `relaunch: auto` if `-r1` was not used. Both
   attempts are kept.
@@ -426,9 +447,12 @@ director's launch and verify cards, and their receipts.
   wall time went from 1,762.8 s at t = 12 (Xeon 8488C) to 11,570 s at t = 13 (Xeon 6975P-C), a factor of 6.56 across
   different hosts, and the same factor gives about 75,900 s at t = 14, within 12% of 86,400 s (derived, from the
   first review).
-- That is why one flavor is pinned for every study run, with no fallback (section 2.1). RunPod may still place a
-  flavor on different CPU models. The CPU model of each run is recorded from `host.txt`; if the two t = 14 draws ran on
-  different CPU models, the report says so next to the bracket reading. No rule changes because of it.
+- One flavor is pinned for every study run, with no fallback (section 2.1), **but the flavor does not pin the CPU
+  model**: the two development smokes on `cpu5m` ran on an AMD Ryzen Threadripper 7960X and on an AMD EPYC 9575F. The
+  two t = 14 draws, and any `-r1`, may land on different CPU models, and at t = 14 the CPU model can decide whether a
+  run reaches its budget (`timed_out`), since the projected wall time (about 75,900 s, a derived estimate) is within
+  12% of 86,400 s. The CPU model of each run is recorded from `host.txt`, and the report states it next to the bracket
+  reading for every row. No rule changes because of it.
 - **The t = 13 median mixes hosts (S10).** Its draw 1 is the EKS row (Xeon 6975P-C, 12-CPU pod, Y4); its draw 0 would
   be this route's `-r3` row (a RunPod `cpu5m` host, 12 threads on 16 vCPU). The report states both hosts next to the
   t = 13 reading.
@@ -457,16 +481,15 @@ director's launch and verify cards, and their receipts.
 4. The memory rule (section 4.2): the main session's decisions of 2026-11-15 (the rule, the pilot `VmHWM` as the
    primary peak source, and N4 for `oversize true` rows); P2p, the 112 GiB step for `-m112` attempts, confirmed by
    owner decision 15, 2026-11-15.
-5. Checks that need a pod (one more development smoke, `pkm-x-dev-*`, t ≤ 10, after this revision is reviewed):
-   - the new start command (`bash -c`, cgroup copy loop, then the runner) boots and the runner answers;
-   - which cgroup files a RunPod CPU pod has, and what `memory.max` reads (the pre-start check of section 2.1 depends
-     on it);
-   - what `lastStatusChange` reads after creation and after the session's own delete;
+5. Checks made on a pod. The second development smoke (2026-11-15, scripts `a18-r3`; `SMOKE.md`) showed: the new
+   start command boots and the runner answers; cgroup v2 with `memory.max` 128,000,000,000; `lastStatusChange` at
+   creation reads "Rented by User: …"; the create response carries `machine.secureCloud` and `costPerHr`; the
+   `--delete RECORD` path after a `benchrec` upload; `reap.sh` on the live list. Still not observed:
    - whether `lastStartedAt` changes on a container restart;
-   - whether `GET /pods/{id}` returns `env` (the token recovery depends on it) and whether `GET /pods` is complete;
-   - whether the pod sees `RUNPOD_POD_ID` and a pod-scoped key (S12; recorded only);
-   - the create response still carries `machine.secureCloud` and `costPerHr` as in the smoke;
-   - the end-to-end path with `--delete RECORD` after a `benchrec` upload, and `reap.sh` listing the pod.
+   - what `GET /pods/{id}` returns for a deleted pod (form 2 of section 4.3 assumes 404) and for a live pod's `env`
+     (the token recovery assumes it; no receipt shows it, `SMOKE.md`), and whether `GET /pods` is complete;
+   - the text of a RunPod-side status change;
+   - whether the pod sees `RUNPOD_POD_ID` and a pod-scoped key (S12; recorded only).
 6. Offline tests: `tests/README.md` (every refusal path, the classifier on synthetic receipt sets for each class and
    for both reviews' conflicting cases, the order, the reaper), with the count of cases that need the image layer.
 
@@ -478,10 +501,10 @@ otherwise.
 
 | file | SHA-256 |
 |:--|:--|
-| `common.sh` | `1e76af7340193abab2734130d26345ff08244185dcb106e0b98fae959b11ccfa` |
+| `common.sh` | `5c29eb2ab71ed4a33aed5d9d1d88664ab8726fa94cd493e03704971c3df68f24` |
 | `run.sh` | `c6a191f57e51402f681a2c2826f1f43b765e81ac088afd215ff5d2cc414b7bfb` |
-| `fetch.sh` | `75d4de3a4133ed0d027b058cccd62f44e3652f8b4138a317612d1675c4888f9e` |
-| `reap.sh` | `19c444605c767ecf9ef5c2b2ca403aae63255d4b32cdbc3e9ba034f092361227` |
+| `fetch.sh` | `cec7c7b734d9a55de3c53df5baf0a7c9318424d0280f58083c1a846db6933a19` |
+| `reap.sh` | `686307f32a84a268183959345b4f6ecd21ba772fc77f3c01cb06fee9d1e77d3a` |
 | `make_requests_m112.sh` | `1459e3d3ee821133e936cc40671946b94b6304413325d4d247e29c234e16d58b` |
 | `rp_pinned.sh` | `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d` (= main's `runpod/rp.sh` at `d2a16c723d`) |
 | `runpod/server.py` (pinned, not copied) | `f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550` |
