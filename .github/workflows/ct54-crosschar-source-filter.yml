@@ -1,0 +1,36 @@
+name: CT54 cross-characteristic Frobenius source filter
+on:
+  pull_request:
+    paths:
+      - "research/cross_characteristic_global_torsion_20261112/ct54/**"
+      - ".github/workflows/ct54-crosschar-source-filter.yml"
+  push:
+    branches:
+      - "research/ct51-crosschar-degree8-20261112"
+    paths:
+      - "research/cross_characteristic_global_torsion_20261112/ct54/**"
+      - ".github/workflows/ct54-crosschar-source-filter.yml"
+permissions:
+  contents: read
+jobs:
+  independent-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python independent fixed-vector and curve census
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B research/cross_characteristic_global_torsion_20261112/ct54/ct54_primes.py | tee /tmp/ct54-python
+          python3 -O -B research/cross_characteristic_global_torsion_20261112/ct54/ct54_primes.py > /tmp/ct54-python-opt
+          cmp /tmp/ct54-python /tmp/ct54-python-opt
+          printf '95bbe8f1094c3765828fdb322208a0d083f93617d9979678b72d2c443e96e43b  /tmp/ct54-python\n' | sha256sum -c -
+      - name: JavaScript independent characteristic-polynomial and curve census
+        shell: bash
+        run: |
+          set -euo pipefail
+          node research/cross_characteristic_global_torsion_20261112/ct54/ct54_independent.js | tee /tmp/ct54-js
+          node --no-opt research/cross_characteristic_global_torsion_20261112/ct54/ct54_independent.js > /tmp/ct54-js-noopt
+          cmp /tmp/ct54-js /tmp/ct54-js-noopt
+          printf 'f49f74e28e0896faa927315d0f39d46341a5c0fc1ec84885bb8043f0e2bc4a7d  /tmp/ct54-js\n' | sha256sum -c -
