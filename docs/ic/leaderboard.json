@@ -506,6 +506,10 @@
    "path": "research/ic_gw_fasthash_20261114/analysis.json",
    "sha256": "504ae961cf2d994b0b188eb3ff0faae897c53bc988195420b6ea2985059594be"
   },
+  "ghs_weak_blreuse": {
+   "path": "research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json",
+   "sha256": "d8db1947a8082a941f623dd42acafbb0587f3a57993d1b50a41422d333a46f31"
+  },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
    "sha256": "0bc0d0f4401846519ff915db5cfb1f90ee638ba46555736de8a29e9e2888be7b"
@@ -347253,6 +347257,124 @@
   "source": "research/ic_gw_fasthash_20261114/analysis.json",
   "class": "phase speed-up (relation stage, CPU time) at identical counted work; GHS-weak family only",
   "validation": "validated: replay certificate (counted replay and an independent timing replay), validator report and the negation-map rho reference (research/ic_gw_fasthash_20261114/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "ghs_weak_blreuse_component": {
+  "rows": [
+   {
+    "q": 262111,
+    "k": 18,
+    "la_lmul": 0.738693045615,
+    "0.0": {
+     "geomean": 0.81843855065,
+     "max": 0.82231411867
+    },
+    "0.5": {
+     "geomean": 0.863533949741,
+     "max": 0.865595214837
+    },
+    "1.0": {
+     "geomean": 0.883393211689,
+     "max": 0.885941557145
+    }
+   },
+   {
+    "q": 524287,
+    "k": 19,
+    "la_lmul": 0.735085447297,
+    "0.0": {
+     "geomean": 0.810534729965,
+     "max": 0.81364526227
+    },
+    "0.5": {
+     "geomean": 0.862244821207,
+     "max": 0.865074797629
+    },
+    "1.0": {
+     "geomean": 0.883710337848,
+     "max": 0.886298846823
+    }
+   },
+   {
+    "q": 1048507,
+    "k": 20,
+    "la_lmul": 0.731767932731,
+    "0.0": {
+     "geomean": 0.815207751121,
+     "max": 0.816307252439
+    },
+    "0.5": {
+     "geomean": 0.865562815837,
+     "max": 0.866314883304
+    },
+    "1.0": {
+     "geomean": 0.886406849226,
+     "max": 0.887025813131
+    }
+   },
+   {
+    "q": 2097091,
+    "k": 21,
+    "la_lmul": 0.730188068534,
+    "0.0": {
+     "geomean": 0.818937436224,
+     "max": 0.819356285967
+    },
+    "0.5": {
+     "geomean": 0.868840758811,
+     "max": 0.870004885607
+    },
+    "1.0": {
+     "geomean": 0.889271486461,
+     "max": 0.890549792535
+    }
+   },
+   {
+    "q": 4194271,
+    "k": 22,
+    "la_lmul": 0.728790676779,
+    "0.0": {
+     "geomean": 0.812659452578,
+     "max": 0.812873668073
+    },
+    "0.5": {
+     "geomean": 0.867695327327,
+     "max": 0.868699917205
+    },
+    "1.0": {
+     "geomean": 0.889398804109,
+     "max": 0.890522982497
+    }
+   }
+  ],
+  "supported": true,
+  "rho_band_k22": {
+   "0": {
+    "ic": 844014769.056,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 1014011904.46,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2543986123.06,
+    "rho": 1492814000000.0
+   }
+  },
+  "ref_k22": {
+   "REF/0": 1038514332.42,
+   "REF/0.1": 1208511467.82,
+   "REF/1": 2738485686.42,
+   "BLR/0": 844014769.056,
+   "BLR/0.1": 1014011904.46,
+   "BLR/1": 2543986123.06
+  },
+  "study": "research/ic_gw_bl_reuse_20261115/",
+  "report": "research/ic_gw_bl_reuse_20261115/REPORT.pdf",
+  "source": "research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json",
+  "class": "component improvement (linear algebra) over the previous GHS-weak DL configuration; GHS-weak family only",
+  "validation": "validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json)",
   "validated": true
  },
  "phases": [
