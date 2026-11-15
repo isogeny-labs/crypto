@@ -48,7 +48,7 @@ Even a zero-cost algebraic solver cannot increase the probability that a fixed s
 
 ## Prior-lead and cross-repository check: do not retest an already settled axis
 
-Checked the GitHub PR records in `isogeny-labs/crypto`, `crypto-autoresearcher` and `cryptanalysis`, the 304-row [prime IC heat map](../..//prime_ic_lead_heatmap_20261114/TABLES.md), and the native README's prior-work table. Selected consequences:
+Checked the GitHub PR records in `isogeny-labs/crypto`, `crypto-autoresearcher` and `cryptanalysis`, the 304-row [prime IC heat map](../../prime_ic_lead_heatmap_20261114/TABLES.md), and the native README's prior-work table. Selected consequences:
 
 | Prior work | Existing evidence at the cited scope | What to do instead |
 |---|---|---|
@@ -63,7 +63,7 @@ Checked the GitHub PR records in `isogeny-labs/crypto`, `crypto-autoresearcher` 
 
 Primary source scope: Petit–Kosters–Messeng, *Algebraic Approaches for ECDLP over Prime Fields* (PKC 2016, DOI 10.1007/978-3-662-49387-8_1); Diem, *On the discrete logarithm problem in elliptic curves* (Compositio 2011), especially its extension-field qualifications; Shoup's generic lower bound (EUROCRYPT 1997) only rules out *generic* speedups. The shared research-KB MCP and repository wrapper were unavailable; GitHub source/PR tables and primary literature metadata were used as a documented fallback. No exhaustive search or novelty claim.
 
-## Next preregistered candidate experiments
+## Next proposed candidate experiments (not yet frozen)
 
 1. **Algebraic dense-vs-tower paired oracle on the same prime31 curve.** Reuse the existing `pkm_smooth_tower.rs` dense relation equations and test them against this native Dickson baseline. At each matched liftable B, feed identical `R=[a]G+[b]Q` public target coordinates, some planted controls held separate from the primary random panel. Count every positive, failed, undetermined and time-capped call; independently replay witnesses; measure F4 wall/CPU/RSS, field operations, and incremental relation rank, not just degree. This is the first discriminating experiment given #4275, rather than relaunching the same tower-only probe.
 2. **Sparse m8 over prime31.** On this field `v2(p-1)=1`, so *split binary Kummer* size 8/16/32 is invalid; `v2(p+1)=31` permits the already implemented nonsplit Dickson fibre. The current packed native two-summand F4 adapter does not represent six free abscissae for an m8 chain. Extend and audit this representation (or reuse the existing generic Rust exponent-vector F4 system) before any natural-positive m8 scaling claim. Keep #4077's `gamma<3+delta/2` necessary gate and at least two held-out larger sizes.
