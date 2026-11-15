@@ -650,3 +650,25 @@ The study's running total is checked against US$400 before each pod is created.
 (binaries unchanged from Amendment 16). The Kummer jobs use the frozen binaries, `entry_r2.sh` and `run.sh` of
 `image/image.json` (all hashes checked 2026-11-15). The R3 client `runpod/rp.sh start` now sends the same guard fields as
 `start-iso`.
+
+## Amendment 20 (2026-11-15; procedure only; before stage B is scored): stage B's G3 rerun with `--jobs 1`
+
+- **What happened** (measured; `results/KUMMER/pfd-b-rp-1/fetch-20261115T1055Z/gates/`).
+  - The `g3` stage of `pfd-b-rp-1` panicked 14 s in (exit 101) at `examples/prime_fall_degree_tools.rs:524`
+    (f13a690df0): "capped rows: … No such file or directory".
+  - Before the panic, 22 G3 runs were written. **All 22 agree** (0 disagreements).
+- **Cause** (derived from the source and the rows).
+  - `gate3` names each worker's temporary output `g3-{p}-{kind}-{m}-{x_r}-{cap}.jsonl`, without the control.
+  - Stage B's `B-m3-tower` and `B-m3-null` rows share `(p, kind, m, x_r)` on 10 systems.
+  - With `--jobs 2`, a tower run and a null run can write and delete the same file, so one worker finds it missing.
+  - This is a tool defect, not a disagreement. Stage A's G3 also mixed tower and null rows and passed; the race is timing-dependent.
+- **Change.**
+  - Stage B's G3 is rerun once, in full, as `prime_fall_degree_tools gate3 DIR /usr/local/bin/pkm_tower_pilot --max-n 20 --jobs 1 --budget 900`
+    (stage `g3-b` of `iso/entry_iso.sh`). With one worker, no two runs exist at once.
+  - Binaries: the frozen `prime_fall_degree_tools` (`7e8a6703…`) and the frozen `pkm_tower_pilot` (`f78f3959…`).
+  - Rows: the 9 `B-*.jsonl` files of `pfd-b-rp-1` (fetch `20261115T1055Z`), listed with SHA-256 in
+    `results/KUMMER/pfd-b-rp-1/G3B_ROWS.sha256`. They are uploaded as `rows.tar` and hash-checked by the runner.
+  - Pod: a reserved 16-vCPU pod, under Amendments 15, 17 and 18. Bundle pins: `iso/BUNDLE.sha256` SHA-256 `d832b57a6391eeb0af3967cf797946de13c681c21f8cc829daf44ddf8240741e`.
+- **Unchanged:** the systems, caps, `--max-n`, budget, the agree rule, and Amendment 11's stop rule. A disagreement or timeout
+  in the rerun stops stage B as Amendment 11 says.
+- **Consistency check.** The 22 runs already written must come out the same in the rerun (same system, cap, refutation).

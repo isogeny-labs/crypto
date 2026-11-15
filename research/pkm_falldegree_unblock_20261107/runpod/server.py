@@ -21,7 +21,8 @@ STUDY = ["run.sh", "build-info.json"]
 # paths entry_iso.sh needs (unpacked at /opt/repo, so the scripts run from their committed bytes).
 ISO_BIN = ["pkm_tower_pilot_r4", "prime_fall_degree_tools", "hky_fp_tower_check"]
 ISO_ENTRY = "/opt/repo/research/pkm_falldegree_unblock_20261107/iso/entry_iso.sh"
-ALLOWED = set(BIN + STUDY + ISO_BIN + ["repo.tar"])
+ISO_OPTIONAL = ["pkm_tower_pilot", "rows.tar"]   # Amendment 20: frozen Kummer pilot and stage B rows for g3-b
+ALLOWED = set(BIN + STUDY + ISO_BIN + ["repo.tar"] + ISO_OPTIONAL)
 SHIM = """#!/bin/bash
 # aws shim: `aws s3 sync|cp SRC s3://local/PATH` -> copy into /results/PATH (entry_r2.sh stays byte-identical)
 [ "$1" = s3 ] || exit 0
@@ -148,10 +149,18 @@ class H(BaseHTTPRequestHandler):
             return self.reply(409, {"error": "fewer than 12 vCPU", "cpus": cpus})
         required = set(ISO_BIN) | {"repo.tar"} if iso else set(BIN) | {"run.sh"}  # build-info.json: recorded only
         bad = {n: [req["sha256"].get(n), got.get(n)] for n in required if not got.get(n) or req["sha256"].get(n) != got.get(n)}
+        if iso:   # optional iso uploads must match the hash the request names for them
+            bad.update({n: [req["sha256"].get(n), got.get(n)] for n in ISO_OPTIONAL
+                        if n in req["sha256"] and req["sha256"][n] != got.get(n)})
         if bad: return self.reply(409, {"error": "sha256 mismatch", "detail": bad})
         os.makedirs("/opt/study", exist_ok=True); os.makedirs("/opt/shim", exist_ok=True); os.makedirs("/work", exist_ok=True)
         if iso:
             for n in ISO_BIN: subprocess.check_call(["install", "-m755", f"{IN}/{n}", f"/usr/local/bin/{n}"])
+            if "pkm_tower_pilot" in req["sha256"]:
+                subprocess.check_call(["install", "-m755", f"{IN}/pkm_tower_pilot", "/usr/local/bin/pkm_tower_pilot"])
+            if "rows.tar" in req["sha256"]:
+                os.makedirs("/work/rows_in", exist_ok=True)
+                subprocess.check_call(["tar", "-xf", f"{IN}/rows.tar", "-C", "/work/rows_in"])
             os.makedirs("/opt/repo", exist_ok=True)
             subprocess.check_call(["tar", "-xf", f"{IN}/repo.tar", "-C", "/opt/repo"])
             # R2-E5: every bundled file must match the committed pins sent with the request (iso/BUNDLE.sha256 at `commit`).

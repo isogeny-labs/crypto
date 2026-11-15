@@ -10,6 +10,7 @@
 #   cert              decomposability certificate of every m = 2 isogeny row in runs/ (certify_m2.py)
 #   cap-A             capped F4 at D - 1 for t = 11..13, both draws, D from DA-m2-iso-p1 (run.sh cap-A rule)
 #   A-14, DA-14, cap-14   the t = 14 cell of Amendment 19 (closure cmax 5, F4, capped F4 at D - 1)
+#   g3-b              Amendment 20: stage B gate G3 rerun with --jobs 1 on the frozen Kummer pilot over /work/rows_in/B-*.jsonl
 #   x:T:K:C:DENSE     ONE Amendment 7 B bracket run (budget 86400, --max-dense DENSE, --trace), then cert of its row
 # Results: $ISOLAB_RESULTS_URI (runs/, gates/, progress.txt, binary.sha256, host.txt), synced every 300 s and at exit.
 # A Mestre panic ("Mestre: #E ambiguous") in any log stops the job with exit 3 (edit E4.7).
@@ -38,7 +39,7 @@ run() {  # run NAME ARGS... : one pilot invocation, rows to runs/NAME.jsonl
   "$BIN" "$@" --out "runs/$name.jsonl" > "runs/$name.out" 2> "runs/$name.log"
   log "end $name exit $?"
 }
-sha256sum /usr/local/bin/pkm_tower_pilot_r4 /usr/local/bin/prime_fall_degree_tools /usr/local/bin/hky_fp_tower_check \
+sha256sum /usr/local/bin/pkm_tower_pilot_r4 $(ls /usr/local/bin/pkm_tower_pilot 2>/dev/null) /usr/local/bin/prime_fall_degree_tools /usr/local/bin/hky_fp_tower_check \
   "$BIN" "$0" "$R/iso/certify_m2.py" "$R/../pkm_tower_pilot_20260924/verify.py" > "$S/binary.sha256"
 { echo "argv: $*"; echo "nproc: $(nproc)"; echo "rayon: $RAYON_NUM_THREADS"
   grep -m1 'model name' /proc/cpuinfo; grep MemTotal /proc/meminfo; uname -r
@@ -74,6 +75,11 @@ for s in "$@"; do
         /usr/local/bin/prime_fall_degree_tools gate3 "$S/gates/g3dir" "$BIN" --max-n 20 --jobs 2 --budget 900 \
           > gates/g3.log 2>&1; rc=$?
         grep -q ', 0 disagreements' gates/g3.log || { [ "$rc" = 0 ] && rc=1; }; log "end g3 exit $rc"
+        [ "$rc" = 0 ] || { fail=1; break; } ;;
+    g3-b) log "start g3-b"; mkdir -p gates/g3b/runs; cp /work/rows_in/B-*.jsonl gates/g3b/runs/   # Amendment 20
+        /usr/local/bin/prime_fall_degree_tools gate3 "$S/gates/g3b" /usr/local/bin/pkm_tower_pilot --max-n 20 --jobs 1 \
+          --budget 900 > gates/g3b.log 2>&1; rc=$?
+        grep -q ', 0 disagreements' gates/g3b.log || { [ "$rc" = 0 ] && rc=1; }; log "end g3-b exit $rc"
         [ "$rc" = 0 ] || { fail=1; break; } ;;
     cert) log "start cert"; python3 "$R/iso/certify_m2.py" runs/CERT-m2-iso-p1.jsonl runs/A-m2-iso-p1*.jsonl runs/DA-m2-iso-p1*.jsonl \
           > runs/CERT.log 2>&1; log "end cert exit $?" ;;

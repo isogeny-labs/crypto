@@ -42,6 +42,12 @@ case "$1" in
       echo "repo.tar $(sha256sum "$tar" | cut -c1-64) commit $4" | tee "$TOKDIR/$2.repo.tar.sha256"; rm -f "$tar" ;;
   start-iso) # rp.sh start-iso ID STAGES_JSON : pins from iso/PINS.json, repo.tar hash from upload-iso
       shas=$(jq --arg t "$(cut -d' ' -f2 "$TOKDIR/$2.repo.tar.sha256")" '.sha256 + {"repo.tar":$t}' "$here/../iso/PINS.json")
+      for opt in pkm_tower_pilot rows.tar; do   # Amendment 20 optional uploads, from $ISO_OPT_DIR when set
+        if [ -n "${ISO_OPT_DIR:-}" ] && [ -f "$ISO_OPT_DIR/$opt" ]; then
+          curl -sS -f -X PUT -H "X-Token: $(tok $2)" --data-binary "@$ISO_OPT_DIR/$opt" "$(url $2)/upload/$opt" >/dev/null
+          shas=$(jq --arg n "$opt" --arg h "$(sha256sum "$ISO_OPT_DIR/$opt" | cut -c1-64)" '. + {($n):$h}' <<<"$shas")
+        fi
+      done
       commit=$(cut -d' ' -f4 "$TOKDIR/$2.repo.tar.sha256"); repo=$(cd "$here/../../.." && pwd)
       pins=$(git -C "$repo" show "$commit:research/pkm_falldegree_unblock_20261107/iso/BUNDLE.sha256" |
         jq -R 'split("  ") | {(.[1]): .[0]}' | jq -s add)
