@@ -157,3 +157,21 @@ plain notation fixed both before the final readable render. Existing native
 round reports, source bindings and archives stay unchanged. The PR title/body
 are rewritten around both the native qualification and this cover-cost review.
 The new scoped statement is PCC-20261115-c4aaf8, unverified.
+
+2026-11-15T15:32Z metadata correction: parent4302 merged as230dfbc408
+at14:49:04Z, final head2da6eb137f. Its current validation43725611298,
+size43725611269, artifacts43725611200 and latest PCC43725611409 pass;
+the earlier same-head PCC run was superseded/cancelled, not called a pass.
+PR4304 is retargeted to main with auto-merge, with its own single Copilot
+request at14:55:21Z:
+https://github.com/isogeny-labs/crypto/pull/4304#issuecomment-6896438066 .
+The shared daily journal remains untouched while pending; this paragraph and
+the corrected body replace stale stacked-parent status only. Native sources,
+both archives/proofs and all report bytes remain unchanged. [pcc:unverified]
+
+Workflow correction: validation-gate runs on unfiltered pull_request; only
+size/artifacts are main-only among those three. Earlier continuation notes
+grouped them loosely as main-only. The parent's ordinary PR workflows were
+absent while its merge conflict persisted; after the normal main merge its
+required head checks ran. No credential change or CI retry was needed.
+[pcc:unverified]
