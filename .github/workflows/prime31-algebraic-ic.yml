@@ -76,5 +76,10 @@ jobs:
         run: python3 research/prime31_ic_20261115/native/replay_pair_elimination_poly.py
       - name: Algebraically eliminate the fixed pair S3 using existing Rust prime31 arithmetic
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_pair_elimination_poly
+      - name: Independently replay full prime31 S4 triple-arm field projection
+        run: python3 research/prime31_ic_20261115/native/replay_s4_triple_projection.py
+      - name: Run reused-Rust S4 triple-arm root extraction with batched inversion
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s4_triple_projection
       - name: Lint adapter and CLI
         run: cargo +1.100.0 clippy --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib --bin prime31-algebraic-ic -- -D warnings
