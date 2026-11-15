@@ -175,3 +175,21 @@ grouped them loosely as main-only. The parent's ordinary PR workflows were
 absent while its merge conflict persisted; after the normal main merge its
 required head checks ran. No credential change or CI retry was needed.
 [pcc:unverified]
+
+2026-11-15T15:57Z: after an hour without a Copilot response, fallback comment
+https://github.com/isogeny-labs/crypto/pull/4304#issuecomment-6897216934
+precedes a normal merge of freshly fetched unchanged main230dfbc408 into
+6bc637d2ad. Only the daily journal conflicts. The corrected source-pinned
+preview preserves all198incoming and205own complete blocks as a multiset,
+including26historical duplicate headings; their union is206blocks before
+one new handoff entry. The first preview's uniqueness assumption failed
+before any journal write. Both preview sources and the actual pins/receipt
+are retained; no heading-based content selection or history rewrite.
+[pcc:unverified]
+
+All19qualification002 build/source/binary and9copied-wrapper bindings match
+post-merge. Both whole raw SHA256identities are unchanged. PCC1084 retains
+main1080 as an exact prefix; lessons58entries/0errors locally. No new native
+run, cap change, proof/report rewrite or PCC append is introduced. This head
+requires its own current validation/size/artifact/PCC checks after push;
+previous passes and cancelled runs are not carried forward. [pcc:unverified]
