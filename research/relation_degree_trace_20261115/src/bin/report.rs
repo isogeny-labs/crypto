@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "local-run-20261115T0521",
         "projection-run-20261115T0537",
         "engine-run-20261115T0544",
-        "combined-run-20261115T0546",
+        "combined-run-20261115T0546","criteria-raw-run-20261115T0612","criteria-projection-run-20261115T0613","confirmation-run-20261115",
     ];
     let mut records = Vec::new();
     let mut md=String::from("# Local component observations\n\nProducer-only, exploratory L0 measurements; no signed independent validation. Ratios compare the same native full-basis computation and include candidate construction/checking. Missing or failed-control cases are never wins. `[pcc:unverified]`\n\n");
@@ -36,7 +36,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             continue;
         }
         md+=&format!("## {run}\n\n| Case | Median ratio | 95% paired bootstrap | A/A admitted | Samples complete | Baseline ms | Candidate ms | Tenfold criterion |\n|---|---:|---|---|---|---:|---:|---|\n");
-        for c in manifest["cases"].as_array().ok_or("bad manifest")? {
+        let custom_manifest=root.join(run).join("fixture-manifest.json");
+        let case_manifest:Value=if custom_manifest.exists(){serde_json::from_str(&fs::read_to_string(custom_manifest)?)?}else{manifest.clone()};
+        for c in case_manifest["cases"].as_array().ok_or("bad manifest")? {
             let id = c["id"].as_str().ok_or("bad ID")?;
             let path = root.join(run).join(id).join("summary.json");
             if !path.exists() {
@@ -90,7 +92,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     )?;
     let selected: Vec<_> = records
         .iter()
-        .filter(|r| r["run"] == "combined-run-20261115T0546")
+        .filter(|r| r["run"] == "criteria-projection-run-20261115T0613")
         .collect();
     let top = selected
         .iter()
@@ -99,7 +101,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         * 1.1;
     let width = 1100;
     let height = 820;
-    let mut svg=format!("<svg xmlns='http://www.w3.org/2000/svg' width='{width}' height='{height}'><rect width='100%' height='100%' fill='white'/><g font-family='sans-serif' font-size='12'><text x='15' y='20'>Combined arm: matched native wall ratio (producer L0 observation)</text>");
+    let mut svg=format!("<svg xmlns='http://www.w3.org/2000/svg' width='{width}' height='{height}'><rect width='100%' height='100%' fill='white'/><g font-family='sans-serif' font-size='12'><text x='15' y='20'>Final projected-criterion arm: matched native wall ratio (producer L0 observation)</text>");
     for (i, r) in selected.iter().enumerate() {
         let y = 55 + i * 28;
         svg += &format!("<text x='10' y='{y}'>{}</text>", r["id"].as_str().unwrap());

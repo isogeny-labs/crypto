@@ -296,3 +296,14 @@ producer check, not an independent verdict `[pcc:unverified]`. A final harness
 review also stops a case on any failed exact-basis/counter-build eligibility
 check, not only a failed process status. External-parser clippy requested the
 standard divisibility method; no lint or correctness gate is disabled.
+
+## 2026-11-15T06:20Z — Fresh confirmation preregistration
+
+CONFIRMATION_PROTOCOL.md fixes fresh seeds 1009/2003/3001 for the four-variable
+family on both fields, before the final projected arm's results. The native
+exporter does not call a solver. Its complete six-case panel will be used only
+if the final exploratory arm has an admitted tenfold observation. Failed
+controls/seeds will not be replaced, and no old/fresh samples are pooled.
+The raw-input criterion control remains a measured regression on completed
+four-variable cases; the projected comparison is queued, not yet interpreted
+`[pcc:unverified]`.
