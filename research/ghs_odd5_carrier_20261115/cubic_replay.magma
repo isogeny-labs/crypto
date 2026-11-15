@@ -1,0 +1,49 @@
+SetSeed(20261115);
+F := GF(3);
+R0<z> := PolynomialRing(F);
+K<a> := ext<F | z^5+2*z+1>;
+R<x> := PolynomialRing(K);
+rows := [<-26,28967>, <26,35518>];
+for row in rows do
+    trace := row[1];
+    mask := row[2];
+    f := x^11;
+    for i in [0..10] do
+        f +:= (mask mod 3)*x^i;
+        mask := mask div 3;
+    end for;
+    assert mask eq 0 and GCD(f,Derivative(f)) eq 1;
+    fac := Factorization(f);
+    assert #fac eq 6;
+    trials := 0;
+    hits := 0;
+    for pair in fac do
+        B := pair[1];
+        if Degree(B) ne 2 then continue; end if;
+        assert pair[2] eq 1;
+        C := f div B;
+        assert C*B eq f;
+        A0 := PowerMod(C,3^9,B);
+        assert (A0^3-C) mod B eq 0;
+        for v in K do
+            trials +:= 1;
+            A := A0+B*(x+v);
+            assert Degree(A) eq 3 and GCD(A,B) eq 1;
+            Q := (C-A^3) div B;
+            assert (C-A^3) mod B eq 0;
+            c2 := Coefficient(Q,6);
+            Q -:= c2*A^2;
+            c1 := Coefficient(Q,5);
+            Q -:= c1*A*B;
+            c0 := Coefficient(Q,4);
+            if Q ne c0*B^2 then continue; end if;
+            E := EllipticCurve([K | 0,c2,0,c1,c0]);
+            if Discriminant(E) eq 0 then continue; end if;
+            assert #E eq 244-trace;
+            hits +:= 1;
+            print "map",trace,A,B,c2,c1,c0;
+        end for;
+    end for;
+    assert trials eq 1215;
+    print "trace",trace,"trials",trials,"maps",hits;
+end for;
