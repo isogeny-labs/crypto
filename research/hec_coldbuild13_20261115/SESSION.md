@@ -22,3 +22,12 @@ Initial compile found missing dynamic-lambda fields in historical unused entry
 points; adapters corrected before science. Removed stale reference diagnostics.
 WebPDF screenshot unavailable; original Oort–Ueno theorem page viewed locally.
 Scoped taskT-6250 epoch1. No scientific execution yet.
+
+## Registered execution
+Sourcea6e57ffc2e39/checkpoint184509 preceded cold/native one-shot executions,
+both exit0/stderr empty, fresh input-only directory /tmp/hec-coldbuild13-input.MUKyWP.
+L/field/54kernel points/27alpha/HC/QF all regenerated; exact POINT/ALPHA comparisons
+with old outputs pass. Quadratic61rows rank36, Gamma00rank7, source sign smooth
+Q1 pass. Runtime lambda10. All81LP recovered; k183049 source/destination verified.
+Native optimized-oracle fast control agrees,407trials/72relations. No timings.
+Decision: now execute separately frozen complete-cost benchmark; no setup omission.
