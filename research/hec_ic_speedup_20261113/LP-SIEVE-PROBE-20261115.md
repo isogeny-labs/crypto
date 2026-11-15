@@ -115,7 +115,7 @@ comparison to their published cost is made.
   base point is flat except for its Legendre symbols. The trend is reported, not extrapolated.
 - **The walk is untuned.** The Tier-2 levers of `LEADS-20261114.md` (fixed-degree oracle with root
   reuse, closed-form discriminant, one-inversion Cantor) might make a walk trial about 2× cheaper.
-  That would leave roughly 7–23×.
+  That would leave roughly 7–23×. [pcc:unverified]
 - **κ is not bracketed.** Both arms get cheaper from κ = 0.5 to κ = 1 at most rows, and the linear
   algebra, which grows with κ and with the sieve's row weight `g + 1`, is not in these counts.
 
@@ -130,7 +130,7 @@ also tried and dropped: no usable instance within the 2,000,000-step BSGS budget
 - each arm runs to `⌈μ·(#B + 10)⌉` fulls + cycles, keeping its rows;
 - rows holding a large prime seen only once are dropped, repeatedly;
 - each remaining large prime becomes a column, and `Solver::Fast` solves for `k`, which is checked
-  against `k·D₁ = D₂`;
+  against `k·D₁ = D₂` [pcc:unverified];
 - μ = 1, 1.1, 1.25, 1.5, 2 is tried in turn until it works.
 
 | g | p | ℓ | #B | k recovered (seeds) | μ needed walk / sieve | relation products walk / sieve (ratio) | matrix rows × cols walk / sieve | solve mulmods walk / sieve | relation + solve walk / sieve (ratio) |
@@ -152,7 +152,7 @@ matrices (`solve-sgebw.txt`, `summary-solve-sgebw.md`), every run still ends wit
 but one walk run at (4, 509) (seed 20261117, μ = 1) returned a *wrong* `k` that `Fast` solved
 correctly; the `k·D₁ = D₂` check caught it and μ = 1.1 succeeded. Cause not investigated. And the solve costs more, not less: 5.91M against 2.87M mulmods for the
 sieve at (3, 8191), 0.80M against 0.19M at (3, 2039). At these sizes SGE leaves too large a
-residual for Wiedemann to pay off, so B does not yet relieve the 2LP solve.
+residual for Wiedemann to pay off, so B does not yet relieve the 2LP solve. [pcc:unverified]
 
 ## What this decides
 
@@ -173,7 +173,7 @@ residual for Wiedemann to pay off, so B does not yet relieve the 2LP solve.
 ## Limits
 
 - Not under protocol; these numbers chose the next protocol and must be declared there.
-- The walk arm is this engine's untuned walk. A 2× faster walk would leave roughly 7–23×.
+- The walk arm is this engine's untuned walk. A 2× faster walk would leave roughly 7–23×. [pcc:unverified]
 - Wall clock is from a shared host at load average 55–215, descriptive only.
 - Full texts of Sarkar–Singh and Vitse–Wallet were not read; nothing here claims novelty.
 - The large-prime graph counts cycles as GTTD do; the end-to-end check covers three rows only, at

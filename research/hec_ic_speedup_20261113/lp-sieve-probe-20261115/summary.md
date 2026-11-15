@@ -17,7 +17,7 @@ Totals per arm (all seeds): g3 p2039 κ0.5: walk F/1P/2P 50/1685/20373, sieve 10
 
 Large-prime graph at an equal partial count (the first n partials of each arm; cycles are GTTD's
 2LP full-relation count). The time-to-target comparison is `summarise_target.py`; an
-equal-products cycle count is not reported, because cycles grow faster than linearly in partials.
+equal-products cycle count is not reported, because cycles grow faster than linearly in partials. [pcc:unverified]
 
 | g | p | κ | partials n | cycles walk / sieve |
 |--:|--:|--:|--:|--:|
