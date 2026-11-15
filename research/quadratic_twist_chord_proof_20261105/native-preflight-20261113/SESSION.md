@@ -97,3 +97,21 @@ Version2 needs new source/binary pins, pre-data amendment, exact GitHub publicat
 ### Errors
 
 Overall launcher101 is a real unmet mandatory control, not a null or verification pass. The zero-remainder stopping issue is source review supported by that inapplicable control; correcting it requires a separately frozen instrument. Previously observed241920 unmatched actual degree/rank pairs and0 strongest-source frontier extensions remain observations of the first instrument, not a claim that it passed every control. [pcc:unverified]
+
+## 2026-11-15T05:48Z — corrected partial-chord full run finished
+
+### What was done
+
+Published b3aa71b3 source and871f14d6 full protocol BEFORE corrected data. All34 native processes complete, launcher0. Scope unchanged3024 configs/57456 diagnostic cells/54432 cold repeated-target attempts. Native independent replay observes24840 original-source recovery records and29592 blocked setups. All13 original genuinely changed/rehashed false payloads plus false baseline binding reject101/no receipt. A/A data and three positive receipts agree byte-for-byte. Canonical corrected export0 findings. Original first failed run retained with four canonical missing-arm findings; no fabricated row. [pcc:unverified]
+
+### Decisions made
+
+The native comparison reports6048 additional same-policy/cap recoveries and5584 useful-rank gain cells,0 losses. Minimum ACTUAL named cold Bezout degree unchanged for1512 policy/target records per role;0 strongest-source frontier extensions. Report this as a stopping/admission correction, NOT a lower-minimum-degree or twist-specific win. Degree scope is H membership in CHORD generators, not S3 pullback or recursively expanded helper-verification cost. Keep original goal active; next lane is structured trace-projected membership in a proper extension field with a fresh actual fixture, source baseline and original-point recovery. Do not repeat this completed full experiment or merely retune the same complete witness count. [pcc:unverified]
+
+### Open threads
+
+Scientific processes ended. Full local evidence/report/export remains /workspace/twist-chord-partial-evidence-20261115; original raw runs and all altered payloads intact. Narrative/source/protocol are published; result assets are NOT uploaded while prior archive scope review remains unresolved. Existing source-publication permission suffices; no repeated question or alternate upload attempted. Two-page report rendered/visually inspected; All129 original raw paths restore/repack exactly from5763672bytes; all147 corrected raw paths restore/repack exactly from8639832bytes. Keep PR3560 open/auto-merge off and existing automation paused. No signed-verdict/global proof/root-library/registry/old-study changes. [pcc:unverified]
+
+### Errors
+
+Original mandatory diagonal-control inapplicability remains a real failed full plan, not relabelled as pass. Corrected study is an openly unblinded amendment, full replication, not a blinded confirmation. First report command selected its output directory before creating it, so no command ran; created directory then generated report. First report had2.54pt prose overflow/fused spacing; original source/PDF/log retained, presentation-only spacing correction yields two inspected pages without overflow. Native data were never rerun for export/presentation fixes. Artifact/size/whitespace checks pass at source scope using current official helper/policy; no whole-CI pass claimed. [pcc:unverified]
