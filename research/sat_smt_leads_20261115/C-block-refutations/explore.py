@@ -7,7 +7,7 @@ that the ancestors' failed attempts (about 1.1 conflicts per leaf at budget 3) a
   j2only : budget 3 at nodes of dimension 2 only; no call at any other internal node
   jle2   : budget 3 at dimensions 1 and 2
   jle3   : budget 3 at dimensions 1, 2 and 3
-Run through run.py (phase `explore`)."""
+Run through cmeasure.py (phase `explore`)."""
 import time
 import lib
 
