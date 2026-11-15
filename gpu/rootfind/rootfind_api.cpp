@@ -208,7 +208,7 @@ extern "C" int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint6
     if ((p & 1) == 0 || p <= 3 || p >= (1ull << 62)) return RF_ERR_BAD_ARG;
     if (opt.chunk == 0) opt.chunk = RF_DEFAULT_CHUNK_64;
     if (!rf::chunk_ok(opt.chunk)) return RF_ERR_BAD_CHUNK;
-    if (opt.lookup != RF_LOOKUP_AUTO && opt.lookup != RF_LOOKUP_SORTED && opt.lookup != RF_LOOKUP_HASH) return RF_ERR_BAD_ARG;
+    if (opt.lookup < RF_LOOKUP_AUTO || opt.lookup > RF_LOOKUP_HASH_DEVICE) return RF_ERR_BAD_ARG;
     if (opt.backend != RF_BACKEND_AUTO && opt.backend != RF_BACKEND_EMULATE && opt.backend != RF_BACKEND_CUDA) return RF_ERR_BAD_ARG;
     for (uint32_t i = 0; i < n_fb; i++) if (fb_x[i] >= p || fb_y[i] >= p) return RF_ERR_BAD_ARG;
     if (probe_x && n_probe == 0) return RF_ERR_BAD_ARG;
@@ -235,7 +235,7 @@ extern "C" int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint6
 #else
         rc = RF_ERR_NO_CUDA;
 #endif
-    } else if (s->lookup == RF_LOOKUP_HASH) {
+    } else if (s->lookup == RF_LOOKUP_HASH || s->lookup == RF_LOOKUP_HASH_DEVICE) {
         s->hash = rf::build_hash<FieldFp64>(s->f, keys, n_keys);
     } else {
         s->sorted = rf::build_sorted<FieldFp64>(s->f, keys, n_keys);
@@ -297,7 +297,7 @@ extern "C" int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const
     a.out = out; a.out_cap = cap;
     a.out_count = &found;
     double t0 = rf::now_seconds();
-    if (s->lookup == RF_LOOKUP_HASH) rf::emulate_chunk<FieldFp64, HashTable>(a, s->hash.view(), s->chunk);
+    if (s->lookup != RF_LOOKUP_SORTED) rf::emulate_chunk<FieldFp64, HashTable>(a, s->hash.view(), s->chunk);
     else rf::emulate_chunk<FieldFp64, SortedTable>(a, s->sorted.view(), s->chunk);
     res->seconds = rf::now_seconds() - t0;
     res->n_found = found;

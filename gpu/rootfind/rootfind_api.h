@@ -44,7 +44,11 @@ typedef struct rf_relation {
 } rf_relation;   /* 16 bytes */
 
 enum rf_backend { RF_BACKEND_AUTO = 0, RF_BACKEND_EMULATE = 1, RF_BACKEND_CUDA = 2 };
-enum rf_lookup  { RF_LOOKUP_AUTO = 0, RF_LOOKUP_SORTED = 1, RF_LOOKUP_HASH = 2 };
+/* RF_LOOKUP_HASH_DEVICE (sessions only): the hash table of the lookup set is built on the
+ * device (CUDA backend; packed slots, one atomicCAS insert per key) instead of on the host.
+ * The table answers the same lookups; only slot order may differ.  Emulation builds it on
+ * the host. */
+enum rf_lookup  { RF_LOOKUP_AUTO = 0, RF_LOOKUP_SORTED = 1, RF_LOOKUP_HASH = 2, RF_LOOKUP_HASH_DEVICE = 3 };
 
 /* Library default for chunk == 0, per field.  The slice length sets the
  * per-thread register footprint (2 * chunk field elements live during

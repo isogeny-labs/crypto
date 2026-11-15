@@ -32,6 +32,7 @@
 #include <cerrno>
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <vector>
@@ -44,6 +45,11 @@
 
 static const uint32_t MAGIC_INIT = 0x32534652u;  /* "RFS2" */
 static const uint32_t MAGIC_BATCH = 0x31424652u; /* "RFB1" */
+
+static double now_s();
+/* RF_SERVE_TIMING=1: print each INIT's receive and session-create times to stderr.
+ * Off by default, so a worker's stderr stays deterministic. */
+static const bool g_timing = std::getenv("RF_SERVE_TIMING") != nullptr;
 
 static bool read_all(FILE *in, void *buf, size_t n) { return n == 0 || std::fread(buf, 1, n, in) == n; }
 static void write_all(FILE *out, const void *buf, size_t n) { if (n) std::fwrite(buf, 1, n, out); }
@@ -58,6 +64,7 @@ static void serve(FILE *in, FILE *out) {
         uint32_t magic = 0;
         if (!read_all(in, &magic, 4)) break;
         if (magic == MAGIC_INIT) {
+            const double ti0 = now_s();
             uint32_t n_fb = 0, w[4], n_probe = 0;
             uint64_t p = 0;
             if (!read_all(in, &n_fb, 4) || !read_all(in, &p, 8) || !read_all(in, w, 16)) break;
@@ -71,8 +78,12 @@ static void serve(FILE *in, FILE *out) {
             const uint32_t max_targets = w[3];
             cap = 4u * max_targets + 4096u;
             rf_result info{};
+            const double ti1 = now_s();
             int rc = rf64_session_create(p, x.data(), y.data(), n_fb, n_probe ? px.data() : nullptr, n_probe,
                                          max_targets, cap, &opt, &s, &info);
+            if (g_timing)
+                std::fprintf(stderr, "rootfind_serve: timing init n_probe=%u lookup=%d receive %.4f s create %.4f s\n",
+                             n_probe, info.lookup_used, ti1 - ti0, now_s() - ti1);
             if (rc == RF_OK) {
                 std::fprintf(stderr, "rootfind_serve: %s; n_fb=%u n_probe=%u lookup=%d chunk=%u max_targets=%u\n",
                              rf_backend_info(), n_fb, n_probe, info.lookup_used, info.chunk_used, max_targets);

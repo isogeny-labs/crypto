@@ -202,12 +202,22 @@ impl RootfindWorker {
     /// Load a factor base (canonical coordinates) and, for probe mode, the
     /// abscissae candidates are looked up in instead (`probe` non-empty: a
     /// pair table's sums).  Lookup and chunk 0 let the library choose.
-    pub fn init(&mut self, p: u64, xs: &[u64], ys: &[u64], probe: &[u64]) -> Result<(), String> {
+    /// `backend`: 0 any, 1 host emulation, 2 CUDA (`rf_backend`); `lookup`: 0 the
+    /// library's choice, 3 a hash table built on the device (`rf_lookup`).
+    pub fn init(
+        &mut self,
+        p: u64,
+        xs: &[u64],
+        ys: &[u64],
+        probe: &[u64],
+        backend: u32,
+        lookup: u32,
+    ) -> Result<(), String> {
         let mut req = Vec::with_capacity(40 + 16 * xs.len() + 8 * probe.len());
         req.extend_from_slice(&MAGIC_INIT.to_le_bytes());
         req.extend_from_slice(&(xs.len() as u32).to_le_bytes());
         req.extend_from_slice(&p.to_le_bytes());
-        for w in [0u32, 0, 0, MAX_BATCH as u32] {
+        for w in [backend, lookup, 0, MAX_BATCH as u32] {
             req.extend_from_slice(&w.to_le_bytes());
         }
         for v in xs.iter().chain(ys) {
@@ -357,6 +367,8 @@ pub struct RootfindSubtractGpuOracle<'i> {
     cpu: RootfindSubtractOracle<'i>,
     m: u32,
     mode: WorkerMode,
+    backend: u32,
+    lookup: u32,
     pending: RefCell<Vec<PrimePoint>>,
     swept: HashMap<(u64, u64), Hits>,
     counters: BTreeMap<String, u64>,
@@ -368,6 +380,8 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
             cpu: RootfindSubtractOracle::new(m, instance),
             m,
             mode: WorkerMode::Spawn,
+            backend: 0,
+            lookup: 0,
             pending: RefCell::new(Vec::new()),
             swept: HashMap::new(),
             counters: BTreeMap::new(),
@@ -459,6 +473,15 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
                 "spawn (default: a worker process per run, which creates its CUDA context) or \
                  daemon (connect to rootfind_serve --daemon; its start is a one-time host cost)",
             ),
+            (
+                "backend",
+                "any (default: the device if the worker has one), cuda (fail without one) or \
+                 emulate (the same kernel code on every host thread: a multi-threaded CPU sweep)",
+            ),
+            (
+                "probe_build",
+                "device (default for m = 3: the lookup table built on the device) or host",
+            ),
         ]
     }
 
@@ -476,17 +499,50 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             ));
         }
         for key in params.0.keys() {
-            if key != "m" && key != "worker" {
+            if !["m", "worker", "backend", "probe_build"].contains(&key.as_str()) {
                 return Err(format!(
-                    "rootfind-subtract-gpu reads only `m` and `worker`; `{key}` is unknown"
+                    "rootfind-subtract-gpu reads only `m`, `worker`, `backend` and `probe_build`; \
+                     `{key}` is unknown"
                 ));
             }
         }
         self.mode = WorkerMode::parse(params.0.get("worker").map_or("spawn", |s| s.as_str()))?;
+        // `backend=cuda` fails closed when the worker has no device; `emulate`
+        // runs the same kernel code on every host thread (a multi-threaded CPU
+        // sweep); `any` (the default) takes the device when there is one.
+        self.backend = match params.0.get("backend").map_or("any", |s| s.as_str()) {
+            "any" => 0,
+            "emulate" => 1,
+            "cuda" => 2,
+            other => {
+                return Err(format!(
+                    "rootfind-subtract-gpu: backend must be any, cuda or emulate, got `{other}`"
+                ))
+            }
+        };
+        // `probe_build=device` (the default for m = 3): the probe set's hash
+        // table is built on the device; `host`: the library's host-built table
+        // (sorted for large sets), the first m = 3 measurement's path.
+        let default_build = if self.m == 3 { "device" } else { "host" };
+        self.lookup = match params
+            .0
+            .get("probe_build")
+            .map_or(default_build, |s| s.as_str())
+        {
+            "host" => 0,
+            "device" => 3,
+            other => {
+                return Err(format!(
+                    "rootfind-subtract-gpu: probe_build must be host or device, got `{other}`"
+                ))
+            }
+        };
         // The CPU oracle sees only `m`: the worker changes where the sweep
         // runs, not the search.
         let mut cpu_params = params.clone();
-        cpu_params.0.remove("worker");
+        for k in ["worker", "backend", "probe_build"] {
+            cpu_params.0.remove(k);
+        }
         self.cpu.prepare(ctx, fb, &cpu_params, ops)?;
         let (f, reps) = self
             .cpu
@@ -531,7 +587,8 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         } else {
             Vec::new()
         };
-        with_worker(self.mode, |w| w.init(p, &xs, &ys, &probe))?;
+        let (backend, lookup) = (self.backend, self.lookup);
+        with_worker(self.mode, |w| w.init(p, &xs, &ys, &probe, backend, lookup))?;
         self.swept.clear();
         self.pending.borrow_mut().clear();
         self.counters.clear();
@@ -765,6 +822,12 @@ mod tests {
         let out = std::panic::catch_unwind(|| {
             run_equality(2, "daemon", &[Targets::WalkPrimeBatch256]);
             run_equality(3, "daemon", &[Targets::WalkPrimeBatch256]);
+            run_equality_with(
+                3,
+                "daemon",
+                &[Targets::WalkPrimeBatch256],
+                &[("probe_build", "host")],
+            );
         });
         let _ = daemon.kill();
         let _ = daemon.wait();
@@ -774,7 +837,33 @@ mod tests {
         }
     }
 
+    /// The emulation backend asked for by name, and both probe-table builds.
+    #[test]
+    fn gpu_oracle_backend_and_probe_build_match() {
+        if !worker_present() {
+            return;
+        }
+        run_equality_with(
+            2,
+            "spawn",
+            &[Targets::WalkPrimeBatch256],
+            &[("backend", "emulate")],
+        );
+        for build in ["host", "device"] {
+            run_equality_with(
+                3,
+                "spawn",
+                &[Targets::WalkPrimeBatch256],
+                &[("backend", "emulate"), ("probe_build", build)],
+            );
+        }
+    }
+
     fn run_equality(m: u32, worker: &str, sources: &[Targets]) {
+        run_equality_with(m, worker, sources, &[]);
+    }
+
+    fn run_equality_with(m: u32, worker: &str, sources: &[Targets], extra: &[(&str, &str)]) {
         let calib = Calibration::default();
         let mut solved = 0;
         for (inst, size) in [
@@ -806,6 +895,9 @@ mod tests {
                             .unwrap();
                         spec.oracle = "rootfind-subtract-gpu".into();
                         spec.oracle_params.set("worker", worker);
+                        for (k, v) in extra {
+                            spec.oracle_params.set(k, *v);
+                        }
                         let mut gpu_o = RootfindSubtractGpuOracle::new(m, &inst);
                         let gpu = run_pipeline(&c, &spec, &base, &mut gpu_o, planted, &calib, None)
                             .unwrap();
@@ -857,5 +949,13 @@ mod tests {
         let mut o = RootfindSubtractGpuOracle::new(2, &inst);
         let r = run_pipeline(&c, &spec, &base, &mut o, 1, &Calibration::default(), None);
         assert!(r.is_err());
+        for (k, v) in [("backend", "tpu"), ("probe_build", "elsewhere")] {
+            spec.oracle_params.0.remove("worker");
+            spec.oracle_params.set(k, v);
+            let mut o = RootfindSubtractGpuOracle::new(2, &inst);
+            let r = run_pipeline(&c, &spec, &base, &mut o, 1, &Calibration::default(), None);
+            assert!(r.is_err(), "{k}={v}");
+            spec.oracle_params.0.remove(k);
+        }
     }
 }

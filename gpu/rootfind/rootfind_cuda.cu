@@ -322,6 +322,29 @@ extern "C" int rf_cuda_decompose256(const Fp256Ctx *f,
     return run_device<FieldP256>(*f, fb_x, fb_y, n_fb, tx, ty, n_targets, lookup, chunk, out, cap, n_found, seconds);
 }
 
+/* Device-built packed hash slots (RF_LOOKUP_HASH_DEVICE): empty slots are
+ * (tag 0, RF_NO_INDEX), as the host builder leaves them; each key j is inserted
+ * by linear probing from rf_hash64 with one atomicCAS per attempt.  The probe
+ * path (HashTable with RF_HASH_PACKED) reads nothing else. */
+__global__ void k_slots_fill(uint64_t *slots, uint32_t cap) {
+    const uint64_t i = rf_global_tid();
+    if (i < cap) slots[i] = (uint64_t)RF_NO_INDEX;
+}
+
+__global__ void k_slots_insert(Fp64Ctx f, uint64_t *slots, uint32_t mask, const uint64_t *keys, uint32_t n) {
+    const uint64_t j = rf_global_tid();
+    if (j >= n) return;
+    const uint64_t key = FieldFp64::key(f, keys[j]);
+    const unsigned long long v = ((unsigned long long)HashTable::tag(key) << 32) | (unsigned long long)j;
+    uint32_t slot = rf_hash64(key, mask);
+    for (;;) {
+        const unsigned long long old =
+            atomicCAS(reinterpret_cast<unsigned long long *>(slots + slot), (unsigned long long)RF_NO_INDEX, v);
+        if (old == (unsigned long long)RF_NO_INDEX) return;
+        slot = (slot + 1) & mask;
+    }
+}
+
 /* ------------------------------------------------------------------ *
  * Persistent Fp64 session (rootfind_serve): the factor base, its table and
  * the target/output buffers stay on the device across calls, so a batch
@@ -385,7 +408,7 @@ extern "C" int rf_cuda_session64_create(const Fp64Ctx *f, const uint64_t *fb_x, 
         rf::SortedTableHost sorted;
         rf::HashTableHost hash;
         if (lookup == RF_LOOKUP_SORTED) sorted = rf::build_sorted<FieldFp64>(*f, tx_keys, n_keys);
-        else hash = rf::build_hash<FieldFp64>(*f, tx_keys, n_keys);
+        else if (lookup == RF_LOOKUP_HASH) hash = rf::build_hash<FieldFp64>(*f, tx_keys, n_keys);
         if (s->n_probe) {
             CUS(rf_cu_alloc(&s->d_px, s->n_probe * sizeof(uint64_t)));
             CUS(cudaMemcpy(s->d_px, probe_x, s->n_probe * sizeof(uint64_t), cudaMemcpyHostToDevice));
@@ -409,6 +432,22 @@ extern "C" int rf_cuda_session64_create(const Fp64Ctx *f, const uint64_t *fb_x, 
             CUS(cudaMemcpy(s->d_aux32, sorted.eyt_rank.data(), (n_keys + 1) * sizeof(uint32_t), cudaMemcpyHostToDevice));
             s->sview.keys = s->d_keys; s->sview.idx = s->d_idx; s->sview.n = n_keys;
             s->sview.eyt = s->d_aux64; s->sview.eyt_rank = s->d_aux32;
+        } else if (lookup == RF_LOOKUP_HASH_DEVICE) {
+#if RF_HASH_PACKED
+            /* the keys are already on the device: the probe set, or the factor base */
+            s->hcap = rf::hash_capacity_for(n_keys);
+            CUS(rf_cu_alloc(&s->d_aux64, s->hcap * sizeof(uint64_t)));
+            k_slots_fill<<<(s->hcap + 255) / 256, 256>>>(s->d_aux64, s->hcap);
+            k_slots_insert<<<(n_keys + 255) / 256, 256>>>(*f, s->d_aux64, s->hcap - 1,
+                                                         s->n_probe ? s->d_px : s->d_fbx, n_keys);
+            CUS(cudaGetLastError());
+            CUS(cudaDeviceSynchronize());
+            s->hview.keys = nullptr; s->hview.vals = nullptr; s->hview.mask = s->hcap - 1;
+            s->hview.slots = s->d_aux64;
+#else
+            rc = RF_ERR_BAD_ARG;   /* device build fills packed slots only */
+            goto fail;
+#endif
         } else {
             s->hcap = hash.capacity();
             CUS(rf_cu_alloc(&s->d_keys, s->hcap * sizeof(uint64_t)));
