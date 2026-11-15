@@ -11,7 +11,7 @@ crates). Every number below is [pcc:unverified]: no validator has run and no pcc
 | invariant | definition | unit prime chain, m summands, depth k |
 |---|---|---|
 | d_ff | first strict fall of the iterated closure V_{F,D} | 4 (m = 2, measured k = 3..9); 7 (m = 3, k = 2, 3) |
-| d_lf | last fall degree (Huang–Kosters–Yeo); equals Caminata–Gorla's solving degree for a unit ideal (their Thm 3.1: sd^CG = max(d_lf, max.GB.deg), re-read) | ⌊(k−10)/14⌋+1 ≤ d_lf ≤ k+2 (proof: N8, U1); measured 4,4,4,5,5,5 at k = 3..8; law ⌊(k+14)/4⌋ |
+| d_lf | last fall degree (Huang–Kosters–Yeo); equals Caminata–Gorla's solving degree for a unit ideal (their Thm 3.1: sd^CG = max(d_lf, max.GB.deg), re-read) | ⌊(k−10)/14⌋+1 ≤ d_lf ≤ k+2 (proof: N8, U1); measured 4,4,4,5,5,5 at k = 3..8 (lane A); recorded exact 5 at k = 9 (ic-bounds-exact10), 6 at k = 10..13 and 7 at k = 14 (ic-bounds-k14 unit p = 65537 runs: 1 ∉ V_5 / 1 ∈ V_6, resp. 1 ∉ V_6 / 1 ∈ V_7); law ⌊(k+14)/4⌋ matches all of them |
 | sd^stat | static (XL, no-mutant) Macaulay degree: least D with 1 ∈ span{m·f : deg(m f) ≤ D} | **= δ + maxwt(supp g^{-1})** (proof, SD1 §3); = δ + mk iff c_top ≠ 0; measured 2k+2 (m = 2), 3k+6 (m = 3) |
 
 Proof sketch (SD1, lane D red-team found no gap): the chains are a Gröbner basis with coprime
@@ -29,7 +29,7 @@ O(1/p) at fixed k only. δ is the ordinary degree of ĝ (2 for the normalized S_
 |---|---|---|
 | P1 | brute-force ordinary-ring sd^stat = 2 + maxwt(supp g^{-1}) | **held**: 18,828/18,828 instances, k = 3..6 (lane A); independent brute force 174/174 incl. raw S_3 and random generators (lane D); m = 3: 40/40 at k = 2, 3 (lane B) |
 | P2 | fraction with sd^stat = 2k+2 ≥ 1 − 3/p at k = 3..12 | **held** in every (k, p) cell with unit instances; exceptions only at k = 3, 4 (159 of 29,775 rows), rate ≈ 1/p (p = 73: 40/3060 = 1.31% vs 1/p = 1.37%), all with c_top = 0 and sd^stat = 2k+1; none at k = 5..13 (1/p too small to see). Rust: p = 17, k = 3: 112/1983 exceptions, 0 at p ≥ 257 |
-| P3 | d_lf ≤ k+2 < sd^stat, gap ≥ k | **held**: gap 4, 6, 8, 9, 11, 13 at k = 3..8 (measured d_lf); equality gap = k only on the k = 3 exceptions |
+| P3 | d_lf ≤ k+2 < sd^stat, gap ≥ k | **held**: gap 4, 6, 8, 9, 11, 13 at k = 3..8 (measured d_lf), 15, 16, 18, 20, 22 at k = 9..13 (recorded exact d_lf 5, 6, 6, 6, 6); equality gap = k only on the k = 3 exceptions |
 | P4 | m = 3: sd^stat = δ₃ + 3k, δ₃ = 6 | **held**: 6 + 3k on all generic unit instances k = 2..8 at p ≥ 1153; exceptions (≈ 1/p) at p ≤ 113 with sd = 3k + 5; locus δ = 5 |
 | P5 | binary: d_full ≥ d_lf on every row; d_full grows, d_lf does not | **held**: 0 rows with d_full < LFD or D* > d_full; on proper m = 2 systems d_full = k+1 or k+2 on 185/185 exact rows (k = 2..8; LFD 3 → k+2, LFD 4 → k+1 at k = 7, 8), ≥ 8 at k = 9, ≥ 7 at k = 10; LFD ∈ {3,4,5}, d_ff ∈ {2,3} |
 | P6 | the written proof survives an adversarial read | **held**, with qualifiers: δ = ordinary degree of ĝ; no lower bound without genericity (ĝ = u_{1,k−1} has sd^stat = 2); the O(1/p) bound is vacuous once 4^k ≥ p |
@@ -57,7 +57,7 @@ exception; the k = 1 case with the four coefficients 91, 81, 81, 95).
 * No Lean statement of SD1 (no Lean toolchain in this container); the chain-to-group-algebra
   bridge it needs exists in `formal/ICFallDegrees/ChainTranslation.lean`.
 * c_top ≢ 0 for every nonsingular curve is open (candidate certificate: the 1/t coefficient at t = ∞).
-* d_lf at k ≥ 9 (prime) is the law, not measured; binary d_full exact only to k = 8.
+* d_lf at k = 9..14 (prime) is taken from the repository's recorded exact runs, not re-measured here; binary d_full exact only to k = 8 (k = 9 extension running).
 * No validator report, no pcc claim id; no leaderboard or benchmarks rows (no cost measurement).
 * Research-kb: catalog snapshot (sha256 8bc55122…, revision a340f056…) queried by FTS for "solving
   degree", "static Macaulay", "group algebra inverse": prior entries KR-IC-58213c (CG Thm 3.1) and
