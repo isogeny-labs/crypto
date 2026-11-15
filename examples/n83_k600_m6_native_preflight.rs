@@ -735,6 +735,72 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn committed_lock_rejects_changed_source_before_launch() {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root =
+            std::env::temp_dir().join(format!("n83-k600-lock-{}-{nonce}", std::process::id()));
+        let repo = root.join("repo");
+        let base = root.join("base");
+        let fixtures = root.join("fixtures");
+        let binary = root.join("worker");
+        let index = root.join("index.json");
+        let out = root.join("out");
+        fs::create_dir_all(&repo).unwrap();
+        fs::create_dir_all(&base).unwrap();
+        fs::create_dir_all(&fixtures).unwrap();
+        fs::write(&binary, b"worker").unwrap();
+        fs::write(&index, b"{}").unwrap();
+        command_output("git", &["init", "-q"], &repo).unwrap();
+        command_output("git", &["config", "user.name", "N83 Test"], &repo).unwrap();
+        command_output(
+            "git",
+            &["config", "user.email", "n83-test@example.invalid"],
+            &repo,
+        )
+        .unwrap();
+        for name in SOURCE_FILES {
+            let path = repo.join(name);
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::write(path, name.as_bytes()).unwrap();
+        }
+        command_output("git", &["add", "."], &repo).unwrap();
+        command_output("git", &["commit", "-qm", "source"], &repo).unwrap();
+        let source_commit = command_output("git", &["rev-parse", "HEAD"], &repo).unwrap();
+        let lock_path = repo.join("lock.json");
+        write_new_json(
+            &lock_path,
+            &json!({
+                "schema":"n83.k600-m6-native-preflight-lock/v1",
+                "status":"PREPARED_ONLY", "source_commit":source_commit,
+                "source_root":repo, "base_dir":base, "fixture_dir":fixtures,
+                "worker_elf":binary, "store_index":index, "worker_seconds":20,
+                "source_sha256":exact_hashes(&repo,SOURCE_FILES).unwrap(),
+            }),
+        )
+        .unwrap();
+        command_output("git", &["add", "lock.json"], &repo).unwrap();
+        command_output("git", &["commit", "-qm", "lock"], &repo).unwrap();
+        fs::write(repo.join(SOURCE_FILES[0]), b"changed and committed").unwrap();
+        command_output("git", &["add", "."], &repo).unwrap();
+        command_output("git", &["commit", "-qm", "source changed"], &repo).unwrap();
+        let args = vec![
+            "run".to_owned(),
+            lock_path.to_string_lossy().into_owned(),
+            out.to_string_lossy().into_owned(),
+            "21".to_owned(),
+        ];
+        let error = run(&args).unwrap_err().to_string();
+        assert!(error.contains("frozen input hash changed"), "{error}");
+        assert!(!out.exists());
+        fs::remove_dir_all(root).unwrap();
+    }
+
     #[test]
     fn bounded_command_terminates_a_hung_child() {
         assert_eq!(
