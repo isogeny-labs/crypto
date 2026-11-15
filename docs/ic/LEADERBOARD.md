@@ -321,6 +321,40 @@ ecbench now runs the generic `ksum` oracle (one probe a target into a negation-f
 
 Study: [research/ic_tableb_binary_ksum_20261115/](../../research/ic_tableb_binary_ksum_20261115/); [report](../../research/ic_tableb_binary_ksum_20261115/report.pdf); source `research/ic_tableb_binary_ksum_20261115/summary.json`. Counted cost (L0), 15 sessions, one ecbench binary (sha256 bc96a44a3342…). [pcc:unverified]
 
+
+## k-sum table build without dead-end partial sums (2026-11-15, component speed-up, outside tables A-C)
+
+`ksum:m=k,prune=1` (commit 6d6aa93b8f) stops each lower level of the k-sum table build where too few abscissae remain to complete k summands, so no add is spent on a partial sum that can never be inserted. The table, its keys, inserts, collisions and probes are unchanged; only build adds drop. Default off, so recorded sessions replay. Measured on Table B's eight k-sum rows (the prime and random-binary studies' curves, seeds and sizes), 24 sessions, 48 targets × 3 rounds, pruned and unpruned arms paired by target; 9216 target pairs recover the same log with identical counters outside the table build. Track: generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS). validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-ksum-prune-tableb/VALIDATION.json). Headline: the cheapest k-sum arm before (ksum4 or ksum5, unpruned) against the cheapest after, since unpruned ksum4 is the cheaper arm at w = 0 on 7 of 8 rows; the saving is a constant factor that shrinks as the base grows (about 1/a² of the build), no exponent changes.
+
+| curve | w | S rho-neg | best k-sum before → after | best after / before | distance remaining: best k-sum / rho-neg, before → after | S ksum5 → pruned | ksum5 pruned / unpruned [95%] | S ksum4 → pruned | ksum4 ratio | build adds saved (ksum5) |
+|:--|--:|--:|:--|--:|:--|:--|:--|:--|--:|--:|
+| `icv1-fp20-t1293-3c2999ba` (P20) | 0 | 1.269 | 6.64 → 6.44 | 0.971 | 5.23 → 5.07 | 7.11 → 6.44 | 0.906 [0.905, 0.907] | 6.64 → 6.46 | 0.974 | 20% |
+| `icv1-fp20-t1293-3c2999ba` (P20) | 0.1 | 1.380 | 7.47 → 7.19 | 0.963 | 5.41 → 5.21 | 7.86 → 7.19 | 0.915 [0.914, 0.916] | 7.47 → 7.29 | 0.977 | 20% |
+| `icv1-fp20-t1293-3c2999ba` (P20) | 1 | 2.375 | 14.59 → 13.92 | 0.954 | 6.14 → 5.86 | 14.59 → 13.92 | 0.954 [0.953, 0.955] | 14.96 → 14.79 | 0.988 | 20% |
+| `icv1-fp22-tm1267-a5acaf6d` (P22) | 0 | 1.172 | 6.28 → 6.11 | 0.973 | 5.36 → 5.22 | 6.65 → 6.11 | 0.919 [0.918, 0.920] | 6.28 → 6.14 | 0.977 | 16% |
+| `icv1-fp22-tm1267-a5acaf6d` (P22) | 0.1 | 1.280 | 7.09 → 6.85 | 0.967 | 5.54 → 5.36 | 7.39 → 6.85 | 0.927 [0.926, 0.928] | 7.09 → 6.95 | 0.980 | 16% |
+| `icv1-fp22-tm1267-a5acaf6d` (P22) | 1 | 2.249 | 14.07 → 13.53 | 0.962 | 6.25 → 6.01 | 14.07 → 13.53 | 0.962 [0.961, 0.962] | 14.34 → 14.20 | 0.990 | 16% |
+| `icv1-fp24-t1577-77336155` (P24) | 0 | 1.087 | 6.37 → 5.98 | 0.939 | 5.85 → 5.50 | 6.38 → 5.98 | 0.937 [0.936, 0.937] | 6.37 → 6.26 | 0.983 | 12% |
+| `icv1-fp24-t1577-77336155` (P24) | 0.1 | 1.185 | 7.16 → 6.75 | 0.943 | 6.04 → 5.70 | 7.16 → 6.75 | 0.943 [0.943, 0.944] | 7.22 → 7.11 | 0.985 | 12% |
+| `icv1-fp24-t1577-77336155` (P24) | 1 | 2.063 | 14.13 → 13.73 | 0.971 | 6.85 → 6.66 | 14.13 → 13.73 | 0.971 [0.971, 0.972] | 14.95 → 14.85 | 0.993 | 12% |
+| `icv1-f2m15-t131-ed7256f0` (B15) | 0 | 1.966 | 11.19 → 10.55 | 0.943 | 5.69 → 5.37 | 13.47 → 11.20 | 0.831 [0.830, 0.832] | 11.19 → 10.55 | 0.943 | 36% |
+| `icv1-f2m15-t131-ed7256f0` (B15) | 0.1 | 2.106 | 11.89 → 11.25 | 0.946 | 5.65 → 5.34 | 14.19 → 11.92 | 0.840 [0.839, 0.841] | 11.89 → 11.25 | 0.946 | 36% |
+| `icv1-f2m15-t131-ed7256f0` (B15) | 1 | 3.365 | 18.17 → 17.53 | 0.965 | 5.40 → 5.21 | 20.64 → 18.37 | 0.890 [0.889, 0.891] | 18.17 → 17.53 | 0.965 | 36% |
+| `icv1-f2m18-t393-d2c04152` (B18) | 0 | 1.877 | 9.79 → 9.34 | 0.954 | 5.22 → 4.97 | 11.26 → 9.65 | 0.858 [0.856, 0.859] | 9.79 → 9.34 | 0.954 | 36% |
+| `icv1-f2m18-t393-d2c04152` (B18) | 0.1 | 2.023 | 10.52 → 10.07 | 0.957 | 5.20 → 4.98 | 11.98 → 10.38 | 0.866 [0.865, 0.868] | 10.52 → 10.07 | 0.957 | 36% |
+| `icv1-f2m18-t393-d2c04152` (B18) | 1 | 3.333 | 17.12 → 16.67 | 0.974 | 5.14 → 5.00 | 18.50 → 16.90 | 0.913 [0.912, 0.915] | 17.12 → 16.67 | 0.974 | 36% |
+| `icv1-f2m21-t2591-de54d72e` (B21) | 0 | 1.261 | 6.73 → 6.34 | 0.942 | 5.34 → 5.03 | 7.01 → 6.34 | 0.904 [0.903, 0.905] | 6.73 → 6.55 | 0.974 | 20% |
+| `icv1-f2m21-t2591-de54d72e` (B21) | 0.1 | 1.371 | 7.57 → 7.06 | 0.933 | 5.52 → 5.15 | 7.73 → 7.06 | 0.913 [0.912, 0.914] | 7.57 → 7.40 | 0.977 | 20% |
+| `icv1-f2m21-t2591-de54d72e` (B21) | 1 | 2.359 | 14.27 → 13.60 | 0.953 | 6.05 → 5.76 | 14.27 → 13.60 | 0.953 [0.952, 0.954] | 15.16 → 14.98 | 0.989 | 20% |
+| `icv1-f2m24-tm3047-2d0c0e8c` (B24) | 0 | 1.211 | 6.58 → 6.40 | 0.972 | 5.43 → 5.28 | 6.99 → 6.52 | 0.932 [0.931, 0.934] | 6.58 → 6.40 | 0.972 | 20% |
+| `icv1-f2m24-tm3047-2d0c0e8c` (B24) | 0.1 | 1.320 | 7.33 → 7.15 | 0.975 | 5.56 → 5.42 | 7.87 → 7.40 | 0.940 [0.939, 0.941] | 7.33 → 7.15 | 0.975 | 20% |
+| `icv1-f2m24-tm3047-2d0c0e8c` (B24) | 1 | 2.303 | 14.14 → 13.96 | 0.987 | 6.14 → 6.06 | 15.81 → 15.34 | 0.970 [0.969, 0.971] | 14.14 → 13.96 | 0.987 | 20% |
+| `icv1-f2m27-t12543-569dca8b` (B27) | 0 | 1.069 | 6.41 → 6.04 | 0.941 | 6.00 → 5.65 | 6.41 → 6.04 | 0.941 [0.941, 0.942] | 6.70 → 6.60 | 0.985 | 10% |
+| `icv1-f2m27-t12543-569dca8b` (B27) | 0.1 | 1.168 | 7.17 → 6.79 | 0.947 | 6.14 → 5.82 | 7.17 → 6.79 | 0.947 [0.947, 0.948] | 7.58 → 7.48 | 0.987 | 10% |
+| `icv1-f2m27-t12543-569dca8b` (B27) | 1 | 2.059 | 13.95 → 13.57 | 0.973 | 6.78 → 6.59 | 13.95 → 13.57 | 0.973 [0.973, 0.973] | 15.46 → 15.36 | 0.993 | 10% |
+
+Study: [research/ic_ksum_prune_20261115/](../../research/ic_ksum_prune_20261115/); [report](../../research/ic_ksum_prune_20261115/report.pdf); source `research/ic_ksum_prune_20261115/summary.json`. Counted cost (L0), one ecbench binary (sha256 6c60b4c93129…). [pcc:unverified]
+
 ## Table C: Koblitz, 32-target batch (§19–§22)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r, per target.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit (§20, §22 isolated re-run).
@@ -1229,6 +1263,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json` — sha256 `06b648eb1b7beacb…`
 - `research/ic_tableb_ksum_20261115/summary.json` — sha256 `12e525b585794584…`
 - `research/ic_tableb_binary_ksum_20261115/summary.json` — sha256 `adaee4d13ea5575f…`
+- `research/ic_ksum_prune_20261115/summary.json` — sha256 `31f140297b9e4bd6…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`

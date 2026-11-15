@@ -112,6 +112,7 @@ SOURCES = {
     "k1_pt_lgrow": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
     "tableb_ksum": "research/ic_tableb_ksum_20261115/summary.json",
     "tableb_binary_ksum": "research/ic_tableb_binary_ksum_20261115/summary.json",
+    "ksum_prune": "research/ic_ksum_prune_20261115/summary.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -525,6 +526,7 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "research/ic_gw_bl_reuse_20261115/validation",
                            "research/ic_gw_nrm_lz_20261115/validation",
                            "benchmarks/20261115-tableb-binary-ksum",
+                           "benchmarks/20261115-ksum-prune-tableb",
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
                            "benchmarks/20261115-tableb-ksum")
 
@@ -2692,6 +2694,79 @@ def tableb_binary_ksum_html(k: dict) -> str:
             '</tbody></table></div>' + gh(SOURCES["tableb_binary_ksum"], "Analysis") + '</section>')
 
 
+KSUM_PRUNE_EVIDENCE = "benchmarks/20261115-ksum-prune-tableb"
+KSUM_PRUNE_STUDY = "research/ic_ksum_prune_20261115"
+
+
+def ksum_prune_component() -> dict:
+    """ksum:m=k,prune=1 against the same table unpruned on Table B's eight k-sum rows (frozen study
+    research/ic_ksum_prune_20261115; prune added in 6d6aa93b8f): the build skips the adds of partial sums
+    that cannot reach k summands, so the table, inserts and probes are identical and only build adds drop.
+    Copied from summary.json; requires the validation gate's VALIDATION.json."""
+    summ = load(SOURCES["ksum_prune"])
+    errs = checked_evidence_dir(REPO / KSUM_PRUNE_EVIDENCE, REPO)
+    if errs:
+        raise SystemExit(f"{KSUM_PRUNE_EVIDENCE}: not validated: " + "; ".join(errs))
+    v = summ.get("verdict", {})
+    if (summ.get("schema") != "crypto.ic_ksum_prune_summary/v1" or v.get("ksum5_p_holds_all_rows") is not True
+            or v.get("correctness_ok") is not True or v.get("correctness_mismatches") != 0):
+        raise SystemExit(f"{SOURCES['ksum_prune']}: review the summary (schema, verdict, correctness)")
+    rows = []
+    for r in summ["rows"]:
+        for w in ("0", "0.1", "1"):
+            b = r["weights"][w]
+            k5, k4 = b["ksum5"], b["ksum4"]
+            rows.append({"id": r["id"], "slug": r["slug"], "field": r["field"], "w": w, "s_rho": b["s_rho_neg"],
+                         "s5": k5["s_unpruned"], "s5p": k5["s_pruned"], "r5": k5["ratio"], "ci5": k5["ci95"],
+                         "s4": k4["s_unpruned"], "s4p": k4["s_pruned"], "r4": k4["ratio"],
+                         "gap": k5["gap_to_rho_unpruned"], "gap_p": k5["gap_to_rho_pruned"],
+                         "saved": r["build_adds"]["ksum5"]["saved_fraction"],
+                         # Cheapest k-sum arm before against cheapest after (the validator's framing).
+                         "best": min(k5["s_unpruned"], k4["s_unpruned"]),
+                         "best_p": min(k5["s_pruned"], k4["s_pruned"])})
+    return {"rows": rows, "study": KSUM_PRUNE_STUDY + "/", "report": KSUM_PRUNE_STUDY + "/report.pdf",
+            "source": SOURCES["ksum_prune"], "binary_sha256": summ["binary_sha256"], "sessions": summ["sessions"],
+            "targets_per_curve": summ["targets_per_curve"], "rounds": summ["rounds"], "track": summ["track"],
+            "pairs": v["correctness_pairs_checked"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference with "
+                           f"the section 5a band ({KSUM_PRUNE_EVIDENCE}/VALIDATION.json)"),
+            "validated": True}
+
+
+def ksum_prune_md(k: dict) -> list[str]:
+    L = ["", "## k-sum table build without dead-end partial sums (2026-11-15, component speed-up, outside tables A-C)", "",
+         "`ksum:m=k,prune=1` (commit 6d6aa93b8f) stops each lower level of the k-sum table build where too few abscissae "
+         "remain to complete k summands, so no add is spent on a partial sum that can never be inserted. The table, its keys, "
+         "inserts, collisions and probes are unchanged; only build adds drop. Default off, so recorded sessions replay. "
+         "Measured on Table B's eight k-sum rows (the prime and random-binary studies' curves, seeds and sizes), "
+         f"{k['sessions']} sessions, {k['targets_per_curve']} targets × {k['rounds']} rounds, pruned and unpruned arms paired "
+         f"by target; {k['pairs']} target pairs recover the same log with identical counters outside the table build. "
+         f"Track: {k['track']}. {k['validation']}. Headline: the cheapest k-sum arm before (ksum4 or ksum5, unpruned) "
+         "against the cheapest after, since unpruned ksum4 is the cheaper arm at w = 0 on 7 of 8 rows; the saving is a "
+         "constant factor that shrinks as the base grows (about 1/a² of the build), no exponent changes.", "",
+         "| curve | w | S rho-neg | best k-sum before → after | best after / before | distance remaining: best k-sum / rho-neg, before → after | S ksum5 → pruned | ksum5 pruned / unpruned [95%] | S ksum4 → pruned | ksum4 ratio | build adds saved (ksum5) |",
+         "|:--|--:|--:|:--|--:|:--|:--|:--|:--|--:|--:|"]
+    for r in k["rows"]:
+        L.append(f"| `{r['slug']}` ({r['id']}) | {r['w']} | {r['s_rho']:.3f} | {r['best']:.2f} → {r['best_p']:.2f} | "
+                 f"{r['best_p'] / r['best']:.3f} | {r['best'] / r['s_rho']:.2f} → {r['best_p'] / r['s_rho']:.2f} | "
+                 f"{r['s5']:.2f} → {r['s5p']:.2f} | {r['r5']:.3f} [{r['ci5'][0]:.3f}, {r['ci5'][1]:.3f}] | "
+                 f"{r['s4']:.2f} → {r['s4p']:.2f} | {r['r4']:.3f} | {100 * r['saved']:.0f}% |")
+    L += ["", f"Study: [{k['study']}](../../{k['study']}); [report](../../{k['report']}); source `{k['source']}`. "
+          f"Counted cost (L0), one ecbench binary (sha256 {k['binary_sha256'][:12]}…). [pcc:unverified]", ""]
+    return L
+
+
+def ksum_prune_html(k: dict) -> str:
+    md = ksum_prune_md(k)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    hdr = [c.strip() for c in md[4].strip("|").split("|")]
+    tr = [x for x in md if x.startswith("| `")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip().strip('`'))}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ksum-prune-20261115"><h2>k-sum table build without dead-end partial sums</h2>' + body +
+            '<div class="scroll"><table><thead><tr>' + "".join(f"<th>{esc(h)}</th>" for h in hdr) + '</tr></thead><tbody>' + rows +
+            '</tbody></table></div>' + gh(SOURCES["ksum_prune"], "Analysis") + '</section>')
+
+
 def ghs_weak_headline_dl1() -> dict:
     """Owner decision 2026-11-15: the GHS-weak headline arm is DL1 (SGE + scalar Lanczos), not DL (block Lanczos,
     width 4). An arm choice, not an improvement: both arms are measured in every study unit. DL1's k = 22 mean cold
@@ -3547,6 +3622,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # Table B prime rows re-measured with the k = 5 sum table, copied from the study's frozen summary.
         "tableb_ksum_component": tableb_ksum_component(),
         "tableb_binary_ksum_component": tableb_binary_ksum_component(),
+        "ksum_prune_component": ksum_prune_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -4004,6 +4080,7 @@ def markdown(doc: dict) -> str:
         if code == "C":
             L += tableb_ksum_markdown(doc)
             L += tableb_binary_ksum_md(doc["tableb_binary_ksum_component"])
+            L += ksum_prune_md(doc["ksum_prune_component"])
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
         multi = len(f["regimes"]) > 1
@@ -6339,6 +6416,7 @@ def page(doc: dict, standalone: bool) -> str:
         P.append('</section>')
 
     P.append(tableb_binary_ksum_html(doc["tableb_binary_ksum_component"]))
+    P.append(ksum_prune_html(doc["ksum_prune_component"]))
     # Table B prime rows re-measured with the k = 5 sum table (outside tables A-C).
     tk = doc["tableb_ksum_component"]
     tt = tableb_ksum_text(tk)
