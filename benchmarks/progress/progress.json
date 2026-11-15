@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0656Z-ic-gpu-rootfind-pairs",
+  "latest_record": "20261115T0735Z-ic-direct-rows-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 4,
-    "measured": 185,
+    "measured": 186,
     "open": 1
   },
   "repo": "crypto",
@@ -11604,10 +11604,10 @@
     {
       "better": "higher",
       "first": 1.0050488198854794,
-      "latest": 0.9954311801310548,
+      "latest": 1.0220510342223998,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.9569,
-        "improvement_vs_previous_percent": -0.9757
+        "improvement_vs_first_percent": 1.6917,
+        "improvement_vs_previous_percent": 2.6742
       },
       "metric": "setup_aa_k0n53",
       "points": [
@@ -11681,6 +11681,24 @@
           ],
           "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
           "value": 0.9954311801310548
+        },
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 1.6917,
+            "improvement_vs_previous_percent": 2.6742
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.970473742768882,
+            1.0541950165164686
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 1.0220510342223998
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -11689,10 +11707,10 @@
     {
       "better": "higher",
       "first": 1.0032154840727214,
-      "latest": 1.0127577015964162,
+      "latest": 0.9955174479165319,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.9512,
-        "improvement_vs_previous_percent": -0.0879
+        "improvement_vs_first_percent": -0.7673,
+        "improvement_vs_previous_percent": -1.7023
       },
       "metric": "setup_aa_k0n61",
       "points": [
@@ -11766,6 +11784,84 @@
           ],
           "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
           "value": 1.0127577015964162
+        },
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.7673,
+            "improvement_vs_previous_percent": -1.7023
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9562389801585633,
+            1.0336934843357273
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 0.9955174479165319
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0468890915350375,
+      "latest": 1.0468890915350375,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_dense_over_direct_k0n53",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9993842258726253,
+            1.0819876003696842
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 1.0468890915350375
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0106113742345832,
+      "latest": 1.0106113742345832,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_dense_over_direct_k0n61",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9701177863916193,
+            1.0636248939840773
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 1.0106113742345832
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -12066,6 +12162,118 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 0.9957773313797067
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.0201610621017192,
+      "latest": 1.0201610621017192,
+      "latest_derived": {},
+      "metric": "verify_aa_k0n53",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0070554772428848,
+            1.046877693168568
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 1.0201610621017192
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.9936539710474812,
+      "latest": 0.9936539710474812,
+      "latest_derived": {},
+      "metric": "verify_aa_k0n61",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9605829368577055,
+            1.0340838518097166
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 0.9936539710474812
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.682466051167795,
+      "latest": 2.682466051167795,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verify_dense_over_direct_k0n53",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.5848661375625612,
+            2.821338868026479
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 2.682466051167795
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.4369374151316916,
+      "latest": 2.4369374151316916,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verify_dense_over_direct_k0n61",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.37318937684302,
+            2.499423959634571
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 2.4369374151316916
         }
       ],
       "problem": "ic:koblitz_setup_phase",
