@@ -91,3 +91,15 @@ stage diagnostic, AGENTS.md §2/§5).
   result that is still undecided then reports which of the two limits stopped it.
 - **F4 budget overrun.** F4 checks its deadline between matrices, so a step can overrun it
   (85 s against a 60 s budget in the smoke run); reported wall is the true wall.
+
+## Amendment 2 (2026-11-15T07:10Z, additive, recorded during the m ≥ 11 cells)
+
+- **Incidence F4 at m ≥ 11 runs under the default 1 GiB cap** (no `F4_F2_MAX_MATRIX_WORDS`).
+  Reason: the 8 GiB-cap processes were killed twice by the container's memory cgroup
+  (dmesg: `Memory cgroup out of memory: Killed process … rr_quadratic_pa`, 6.7 GB RSS),
+  and all four m = 11 incidence draws already measured under the 8 GiB cap were undecided
+  at the 600 s budget. Under either cap the outcome recorded is "undecided", with the
+  limit that stopped it (`oversize` with the refused matrix, or `timed_out`). The cap in
+  force is recorded per row by run directory (`rust_panel_20261115_incf4`: m = 11 draws
+  0–3 at 8 GiB are in `rust_panel_20261115`; draws 4–7 and m = 13 at 1 GiB).
+- **Norm F4 at m = 13** keeps the 8 GiB cap and runs alone, with no concurrent build.
