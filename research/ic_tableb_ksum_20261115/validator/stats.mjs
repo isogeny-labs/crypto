@@ -113,6 +113,10 @@ export function analyzeCurve(C, b) {
     for (const [name, ss, off] of scopes) W.ksum5_over_incumbent[name] = intervals(cv, "ksum5", I, w, ss, off + Math.round(w * 10) * 1000 + b);
     // per-replicate argmin (would a replicate-alone incumbent differ?)
     W.per_replicate_argmin = REPS.map((rep, si) => incs.map((a) => [a, out.mean_S_by_replicate[a][wkey(w)][si]]).sort((x, y) => x[1] - y[1])[0][0]);
+    // every incumbent, every scope: the largest pair-bootstrap upper end (covers the per-replicate-argmin reading of "each replicate alone")
+    W.upper_each_incumbent_each_scope = {};
+    for (const [name, ss, off] of scopes) { W.upper_each_incumbent_each_scope[name] = {}; for (const a of incs) { const iv = intervals(cv, "ksum5", a, w, ss, off + 500 + incs.indexOf(a) * 37 + Math.round(w * 10) * 1000 + b); W.upper_each_incumbent_each_scope[name][a] = { ratio: iv.ratio, upper_pair_bootstrap: iv.pair_bootstrap.hi }; } }
+    W.per_replicate_argmin_reading = REPS.map((rep, si) => ({ replicate: `r${rep}`, incumbent: W.per_replicate_argmin[si], ratio: W.upper_each_incumbent_each_scope[`r${rep}`][W.per_replicate_argmin[si]].ratio, upper_pair_bootstrap: W.upper_each_incumbent_each_scope[`r${rep}`][W.per_replicate_argmin[si]].upper_pair_bootstrap }));
     // leave-one-replicate-out selection: choose I on the other two replicates, evaluate on the held-out one
     W.leave_one_replicate_out = REPS.map((rep, si) => {
       const other = REPS.map((_, j) => j).filter((j) => j !== si);

@@ -169,7 +169,7 @@ export function loadAll(log = () => {}) {
       // ---- parse records
       const lines = raw.toString("utf8").split("\n").filter((l) => l.length);
       const recs = [];
-      let methodBad = 0, tseedBad = 0, sealBad = 0, binBad = 0, sessBad = 0, notVerified = 0, notMatch = 0, certBad = 0, onCurveBad = 0, warm = 0, sumBad = 0, slugBad = 0, specBad = 0, sBad = 0, noCost = 0, zeroCost = 0, planted = 0;
+      let autBad = 0, methodBad = 0, tseedBad = 0, sealBad = 0, binBad = 0, sessBad = 0, notVerified = 0, notMatch = 0, certBad = 0, onCurveBad = 0, warm = 0, sumBad = 0, slugBad = 0, specBad = 0, sBad = 0, noCost = 0, zeroCost = 0, planted = 0;
       for (const line of lines) {
         const r = JSON.parse(line);
         const field = `"record_id":"${r.record_id}"`;
@@ -180,6 +180,7 @@ export function loadAll(log = () => {}) {
         if (r.outcome.status !== "verified") notVerified++;
         if (r.outcome.matches_target !== true) notMatch++;
         if (r.workload.curve.slug !== e.slug) slugBad++;
+        if ((r.arm === "rho-neg" || r.arm === "rho-neg-aa" || r.arm === "bsgs-neg") && r.boundaries?.automorphisms_used !== 2) autBad++;
         if (r.workload.target_seed !== wl.target_seed || r.workload.target_law !== "hash_to_subgroup_v1") tseedBad++;
         { const sa = spec.arms.find((x) => x.name === r.arm); const rp2 = r.method.params || {};
           if (!sa || r.method.id !== sa.method.id || Object.entries(sa.method.params || {}).some(([k, v]) => String(rp2[k]) !== String(v))) methodBad++; }
@@ -202,8 +203,8 @@ export function loadAll(log = () => {}) {
       ck.seal_failures = sealBad; ck.binary_sha_mismatches = binBad; ck.session_id_mismatches = sessBad;
       ck.not_verified = notVerified; ck.matches_target_not_true = notMatch; ck.certificate_failures = certBad;
       ck.target_off_curve = onCurveBad; ck.curve_slug_mismatches = slugBad; ck.curve_spec_mismatches = specBad;
-      ck.method_or_params_differ_from_spec = methodBad; ck.target_seed_differs_from_spec = tseedBad; ck.phase_sum_ne_total = sumBad; ck.cost_s_ne_total_over_sqrt_r = sBad; ck.no_cost = noCost; ck.nonpositive_cost = zeroCost; ck.matches_planted_non_null = planted;
-      for (const [f, bad] of [["seal", sealBad], ["binary_sha", binBad], ["session_id", sessBad], ["unverified", notVerified], ["matches_target", notMatch], ["certificate", certBad], ["off_curve", onCurveBad], ["slug", slugBad], ["curve_spec", specBad], ["method_vs_spec", methodBad], ["target_seed", tseedBad], ["no_cost", noCost], ["nonpositive_cost", zeroCost]]) if (bad) fail(`${name}: ${bad} record(s) fail ${f}`);
+      ck.negation_arms_not_using_2_automorphisms = autBad; ck.method_or_params_differ_from_spec = methodBad; ck.target_seed_differs_from_spec = tseedBad; ck.phase_sum_ne_total = sumBad; ck.cost_s_ne_total_over_sqrt_r = sBad; ck.no_cost = noCost; ck.nonpositive_cost = zeroCost; ck.matches_planted_non_null = planted;
+      for (const [f, bad] of [["seal", sealBad], ["binary_sha", binBad], ["session_id", sessBad], ["unverified", notVerified], ["matches_target", notMatch], ["certificate", certBad], ["off_curve", onCurveBad], ["slug", slugBad], ["curve_spec", specBad], ["negation_automorphisms", autBad], ["method_vs_spec", methodBad], ["target_seed", tseedBad], ["no_cost", noCost], ["nonpositive_cost", zeroCost]]) if (bad) fail(`${name}: ${bad} record(s) fail ${f}`);
       S.recs = recs;
       // ---- structure: arms x targets x rounds
       const armNames = spec.arms.map((a) => a.name);
@@ -247,6 +248,13 @@ export function loadAll(log = () => {}) {
       // pricing decomposition (all records)
       const calRow = C.curves[b].cal;
       S.dec = recs.map((r) => decompose(r, calRow));
+      { let ic = 0, nonint = 0, maxfrac = 0, missingCounts = 0, noMarker = 0;
+        recs.forEach((r, i) => { const d = S.dec[i]; if (d.missing.length) missingCounts++;
+          if (d.nC > 0 || r.method.id === "ic.pipeline") { ic++; const g = d.G - d.C, fr = Math.abs(g - Math.round(g)); maxfrac = Math.max(maxfrac, fr); if (fr > 1e-6) nonint++; if (d.tableWork.table_insert_attempts === undefined) noMarker++; } });
+        ck.ic_records_incl_warmup = ic; ck.ic_records_with_nonintegral_G_minus_C = nonint; ck.ic_max_fractional_part_G_minus_C = maxfrac; ck.records_with_uncounted_unpriced_counter = missingCounts; ck.ic_records_without_table_insert_marker = noMarker;
+        if (nonint) fail(`${name}: ${nonint} IC records with non-integral G - C (wrong calibration row?)`);
+        if (missingCounts) fail(`${name}: ${missingCounts} records name an unpriced counter without a count`);
+        if (noMarker) fail(`${name}: ${noMarker} IC records lack the counted:table_insert_attempts marker`); }
       C.sessions[name] = S;
       log(`${name}: ${recs.length} records, cert failures ${certBad}, seal failures ${sealBad}`);
     }
