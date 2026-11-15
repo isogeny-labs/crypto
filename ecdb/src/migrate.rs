@@ -39,6 +39,8 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 13,
         name: "frobenius_ell_charpoly",
         sql: include_str!("../migrations/0013_frobenius_ell_charpoly.sql"),
+        name: "order_class_groups",
+        sql: include_str!("../migrations/0014_order_class_groups.sql"),
     },
 ];
 

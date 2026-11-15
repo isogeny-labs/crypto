@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 use tokio_postgres::Client;
 
 pub mod certs;
+pub mod class_group;
 pub mod cover_lpoly;
 pub mod covers;
 pub mod derive;
@@ -220,6 +221,8 @@ pub enum Selection {
     FactorBases,
     /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10 (curve_ell_torsion, frobenius_ell).
     EllTorsion,
+    /// Cl(End(E)) of the census-fp curves and the orders of the l-classes, l = 2, 3, 5, 7.
+    ClassGroups,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -278,6 +281,10 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // End(E) rows they stored (two independent methods), then fills in what is missing.
     if all || what == Selection::Levels57 {
         reports.push(levels57::import(ctx).await?);
+    }
+    // After end-rings and volcanoes: it reads End(E) and cross-checks the craters.
+    if all || what == Selection::ClassGroups {
+        reports.push(class_group::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {

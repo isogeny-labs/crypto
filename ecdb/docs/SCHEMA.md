@@ -328,6 +328,13 @@ bits) and 163 genus-3 sources over GF(2^m), m = 13 to 577.
   and pass counts, the geometric mean of the online speedup and of the cold
   ratio, and mean S per phase.
 
+### Class groups of imaginary quadratic orders (`0013`)
+
+| Table | What it holds |
+|:--|:--|
+| `order_class_group` | one row per discriminant D = f² d_K of an order O (End(E) of an ordinary curve): h(D), Cl(O) as invariant factors n₁ \| n₂ \| … (ascending, `{}` when trivial), d_K, f, h(d_K), [O_K* : O*], the 2-rank, the independent identities that held (`cross_checks`) and the status. Join on `endomorphism_ring.discriminant` |
+| `order_ell_class` | per (D, ℓ) with ℓ prime to f and split or ramified in O: the splitting, the form (ℓ, b, c) of a prime above ℓ, the order of its class in Cl(O) (the crater size of the ℓ-volcano of a curve with End(E) = O) and its `cross_checks` |
+
 ## 4. Coverage of the brief
 
 | Asked for | Where it lives |
@@ -451,6 +458,23 @@ No record was refused. The full run in a 4-CPU container took under an hour; ecd
   - Unit tests: the kernels equal a brute-force search (every monic divisor of ψ_ℓ of degree (ℓ − 1)/2 closed under x ↦ x([2]P)) for every curve over 11 ≤ p < 48 at ℓ = 5 and over p ≤ 29 plus the 7-deep classes over F_43 at ℓ = 7, covering 0, 1, 2 and ℓ + 1 isogenies; the walk levels equal BFS-from-the-floor levels on complete brute-force graphs for 19 ≤ p < 140 and a depth-2 5-volcano over F_499; the 5-torsion kernel of 11a1 (LMFDB 11.a2) and the Sage 3-isogeny codomain pinned in generated.rs are reproduced; a wrong order or depth and a codomain outside the class are refused.
   - End to end, on a throwaway database with a census of every curve over 5 ≤ p < 200 and p = 499, 541, 641 (11,944 curves, 1,850 ordinary classes), after `end-rings`: every class passed at both ℓ (1,842 at ℓ = 5, 1,840 at ℓ = 7; F_5 and F_7 skipped), 0 problems, all 22,950 levels agree with the end_ring.rs conductors (Kohel's torsion test, an independent method), 22,936 isogenies checked, 40 planted `level_at_most` rows were replaced by exact levels, and a second run wrote 0. In the other order, end_ring.rs agreed with all 22,950 levels written here. A stored level changed by hand and a corrupted census coefficient were each refused with their class. Depth is at most 2 at ℓ = 5 (only for D_K ∈ {−3, −4}) and at most 1 at ℓ = 7 in the census.
   - Independent review (2026-11-14): a separate Python computation (sympy factorisation of ψ_ℓ from the standard recursion, kernels as Galois-stable doubling orbits, Vélu codomains, levels by BFS from the floor, depth from its own t² − 4p = v² D_K) agrees with this importer on every curve of the census over 5 ≤ p < 140 and p = 499 at ℓ = 5 and 7 (10,134 curve-ℓ pairs, including j = 0 and 1728, p = 5 at ℓ = 7, p = 7 at ℓ = 5 and the depth-2 5-volcano over F_499), and end to end on a throwaway database (census over 5 ≤ p ≤ 73, 2,421 levels, 0 mismatches). The review added the invariant check and the depth guard: before it, a `level_at_most` row with a conflicting stored depth had its depth silently overwritten.
+**Class groups of End(E)** (`ecdb import class-groups`, `src/import/class_group.rs`; also part of `ecdb import all`, after `end-rings`). For every ordinary census-fp curve with End(E) known (`endomorphism_ring` with a conductor), Cl(End(E)) and, for ℓ ∈ {2, 3, 5, 7} split or ramified in End(E) with ℓ ∤ f, the order of the class of a prime above ℓ. Cl(O) depends only on D = f² d_K, so the rows are per discriminant (`order_class_group`, `order_ell_class`).
+
+- **Rule.** Cl(O) is the form class group: the h(D) primitive reduced forms of discriminant D under Dirichlet composition and reduction (Cohen, Alg. 5.4.2, 5.4.7). The invariant factors come from the q-power maps: N_j = #{x : x^(q^j) = 1} = q^(Σ min(e_i, j)) for each q | h. The prime above ℓ is the form (ℓ, b, c), b² ≡ D (mod 4ℓ), 0 ≤ b ≤ ℓ; its conjugate is its inverse, so its order is one number.
+- **Checks.** Each one runs before any write; a failure is a reported problem and nothing is written for that discriminant:
+  - D = f² d_K with d_K fundamental and one (f, d_K) per D;
+  - every composition lands on a reduced form of discriminant D, x · x⁻¹ is principal, each N_j is a power of q and the q-parts multiply to h;
+  - the class number formula for orders, h(D) = h(d_K) f / [O_K* : O*] · Π_{q | f} (1 − (d_K/q)/q) with h(d_K) counted separately, equals #Cl(O) (listed as `class_number_formula` when f > 1, where it is not a tautology);
+  - h(d_K) equals the stored `frobenius_genus1.class_number` where that is `proved` (`stored_h_dK`);
+  - genus theory: the 2-rank of the invariant factors is μ − 1 (Cox, Prop. 3.11, Thm 3.15) (`genus_theory_2rank`);
+  - the ℓ-class: the form is primitive, its order divides the exponent and is ≤ 2 when ℓ ramifies; independently, ℓ^k has a primitive representation 4ℓ^k = X² − D y² by the principal form iff ord | k (split) or ord = 1 (ramified, k = 1), tested for every k ≤ ord with ℓ^k ≤ 10¹⁰ (`norm_equation`; `norm_equation_partial` when ℓ^ord exceeds the bound, so only k below it were tested);
+  - where ecdb holds the ℓ-volcano (ℓ = 2, 3, 5): every census curve with End(E) = O and ℓ ∤ f is at level 0 and its crater size equals the order, or 1 when ℓ is inert (`volcano_crater`);
+  - stored `order_class_group` / `order_ell_class` rows must agree exactly in every value column (d_K, f, h, Cl, h(d_K), unit index, 2-rank; splitting, prime form, class order), and a stored `number_field` class number and group must agree; any conflict refuses the discriminant as a problem (no silent `ON CONFLICT DO NOTHING` skip). A filled `number_field.class_group` keeps that row's existing provenance (no per-column provenance); the same value is in `order_class_group` under this importer's provenance.
+- **Writes.** `order_class_group` and `order_ell_class` (status `proved`), and `number_field.class_group` where it is NULL, f = 1 and the stored class number is NULL or agrees. Insert or fill only; a rerun inserts nothing.
+- **Report.** `class_group_discriminants`, `class_group_curves`, `class_groups_inserted`, `ell_classes_inserted`, `class_groups_refused`, `ell_orders_norm_full` / `_partial`, `ell_orders_volcano_agree` (pairs (D, ℓ)), `volcano_curves_agree`, `stored_h_dk_agree`, `existing_rows_agree`, `number_field_class_groups_filled`.
+- **Verified so far (no deployed run yet).**
+  - Without a database: Cl(D) for every discriminant −4100 < D < 0 matches the class numbers `end_ring.rs` uses and genus theory; the class number formula holds for every order with |D| < 4100; literature values Cl(−23) = Z/3, Cl(−56) = Z/4, Cl(−84) = (Z/2)², Cl(−420) = (Z/2)³, Cl(−3299) = Z/3 × Z/9, Cl(−4027) = (Z/3)² (Buell's first 3-rank-2 discriminants); composition is commutative and associative and the element-order statistics match the invariant factors on twelve discriminants; and on every F_p, 5 ≤ p < 110, the horizontal ℓ-isogeny component (Vélu, ℓ = 2, 3) through each curve has exactly as many curves as the order of the ℓ-class (or 1 when ℓ is inert).
+  - End to end, on a throwaway database with every curve over 5 ≤ p < 140 and its ℓ = 2, 3, 5 isogenies, after `volcanoes` and `end-rings`: 202 discriminants covering all 4,090 ordinary census curves, 202 class groups and 399 ℓ-class orders inserted, 0 problems. All 202 stored h(d_K) agree, 398 orders are fully confirmed by the norm equation (1 partially), and all 290 (D, ℓ) pairs with ℓ = 2, 3, 5 agree with the craters of 5,586 curve-volcano incidences. A second run inserted 0. A crater size corrupted by one was refused with its discriminant, and two stored quadratic fields had their NULL class group filled.
 
 These tables exist and still wait for a producer:
 
@@ -513,6 +537,14 @@ SELECT s.icv1_slug, s.cm_discriminant, l.depth, l.level
 FROM v_curve_summary s JOIN endomorphism_level l ON l.curve_id = s.id
 WHERE s.class_number = 1 AND l.ell = 2 AND l.depth >= 3
 ORDER BY l.depth DESC LIMIT 20;
+
+-- census curves whose End(E) has a non-cyclic class group, with the order of the class above 3
+SELECT c.icv1_slug, g.discriminant, g.class_group, e.class_order AS ord_3
+FROM curve c JOIN endomorphism_ring er ON er.curve_id = c.id
+JOIN order_class_group g ON g.discriminant = er.discriminant
+LEFT JOIN order_ell_class e ON e.discriminant = g.discriminant AND e.ell = 3
+WHERE c.family = 'census-fp' AND cardinality(g.class_group) >= 2
+ORDER BY g.class_number DESC LIMIT 20;
 
 -- curves whose quadratic twist is weaker than the curve itself
 SELECT s.icv1_slug, s.subgroup_bits, s.twist_largest_prime_bits
