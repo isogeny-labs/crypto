@@ -9006,26 +9006,46 @@ impl PairTable {
     }
 }
 
-/// Largest arity a [`KSumTable`] builds, and the bits each packed summand
-/// index takes in an entry (`KSUM_MAX_K · KSUM_INDEX_BITS ≤ 64`).
-pub const KSUM_MAX_K: u32 = 5;
+/// Largest arity a [`KSumTable`] builds, and the most bits a packed summand
+/// index takes in an entry.  A `k`-sum entry packs `k` indices into one
+/// `u64`; [`ksum_index_bits`] gives the width per `k` (`k · bits ≤ 64`), so
+/// `KSUM_MAX_K · 7 ≤ 64` fixes the largest arity at 9.
+pub const KSUM_MAX_K: u32 = 9;
 pub const KSUM_INDEX_BITS: u32 = 12;
+/// Most entries a [`KSumTable`] agrees to reserve (a guard against a base
+/// whose `2^{k−1}·C(A, k)` table would not fit in memory).
+pub const KSUM_MAX_ENTRIES: u64 = 1 << 31;
 
-/// **A table of every signed `k`-sum of a base** (`k = 3`, `4` or `5`), keyed by
+/// Bits one packed summand index takes in a `k`-sum entry: [`KSUM_INDEX_BITS`]
+/// (12) for `k ≤ 5`, the layout every `k ≤ 5` table was recorded with, and
+/// `⌊64/k⌋` above it (10, 9, 8, 7 for `k = 6..9`).  The base then has at most
+/// `2^bits` points: 4096 for `k ≤ 5`, 1024, 512, 256, 128 for `k = 6..9`.
+pub const fn ksum_index_bits(k: u32) -> u32 {
+    if k == 0 || 64 / k > KSUM_INDEX_BITS {
+        KSUM_INDEX_BITS
+    } else {
+        64 / k
+    }
+}
+
+/// **A table of every signed `k`-sum of a base** (`k = 3` to `9`), keyed by
 /// the sum's abscissa as [`PairTable`] is, so one probe decides a
 /// `k`-summand decomposition.  The pair table's two-summand search costs a
 /// table of `|F|²` entries and needs about `0.4·|F|` relations; this one
 /// trades a smaller base for a table of about `2^{k−1}·C(|F|, k)` entries,
 /// so the generic cost `|F|^k + |F|·p/|F|^k` falls from `p^{2/3}` (pairs)
-/// to `p^{3/5}` (`k = 3`), `p^{4/7}` (`k = 4`) and `p^{5/9}` (`k = 5`).  Still generic: as `k`
+/// to `p^{3/5}` (`k = 3`), `p^{4/7}` (`k = 4`), `p^{5/9}` (`k = 5`) and
+/// `p^{k/(2k−1)}` beyond.  Still generic: as `k`
 /// grows it approaches baby-step giant-step, never below it.
 ///
 /// One sum per orbit under negation: summands above strictly increasing
 /// abscissae, the first with a fixed sign.  Each partial sum is one
 /// addition, reused by every completion below it.
 pub struct KSumTable {
-    /// The summands of each kept sum, [`KSUM_INDEX_BITS`] bits apiece.
+    /// The summands of each kept sum, [`ksum_index_bits`]`(k)` bits apiece.
     map: FastMap<u64>,
+    /// Bits per packed summand index, `ksum_index_bits(k)`.
+    bits: u32,
     pub k: u32,
     pub entries: u64,
     pub build_ops: GroupOps,
@@ -9062,12 +9082,16 @@ impl KSumTable {
         keep_collisions: bool,
     ) -> Result<Self, String> {
         if !(3..=KSUM_MAX_K).contains(&k) {
-            return Err(format!("a k-sum table needs k = 3, 4 or 5, not {k}"));
-        }
-        if fb.points.len() >= 1 << KSUM_INDEX_BITS {
             return Err(format!(
-                "a k-sum table packs base indices in {KSUM_INDEX_BITS} bits; the base has {} points",
-                fb.points.len()
+                "a k-sum table needs k = 3 to {KSUM_MAX_K}, not {k}"
+            ));
+        }
+        let bits = ksum_index_bits(k);
+        if fb.points.len() >= 1 << bits {
+            return Err(format!(
+                "a k-sum table with k = {k} packs base indices in {bits} bits; the base has {} points (fewer than {} are allowed)",
+                fb.points.len(),
+                1u64 << bits
             ));
         }
         let start = Instant::now();
@@ -9077,10 +9101,22 @@ impl KSumTable {
             .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
             .collect();
         let a = groups.len() as u64;
-        let combinations = (0..u64::from(k)).fold(1u64, |c, i| c * (a - i) / (i + 1));
-        let estimate = (1u64 << (k - 1)) * combinations;
+        let combinations = (0..u64::from(k))
+            .try_fold(1u64, |c, i| {
+                c.checked_mul(a.saturating_sub(i)).map(|c| c / (i + 1))
+            })
+            .ok_or_else(|| {
+                format!("a {k}-sum table over {a} abscissae has too many sums to count")
+            })?;
+        let estimate = (1u64 << (k - 1)).saturating_mul(combinations);
+        if estimate > KSUM_MAX_ENTRIES {
+            return Err(format!(
+                "a {k}-sum table over {a} abscissae would hold about {estimate} sums, above the limit {KSUM_MAX_ENTRIES}"
+            ));
+        }
         let mut t = Self {
             map: fast_map(estimate as usize + 1),
+            bits,
             k,
             entries: 0,
             build_ops: GroupOps::default(),
@@ -9122,10 +9158,11 @@ impl KSumTable {
                 }
                 idx[depth] = j as u32;
                 if last {
+                    let bits = self.bits;
                     let packed = idx[..self.k as usize]
                         .iter()
                         .rev()
-                        .fold(0u64, |w, &i| (w << KSUM_INDEX_BITS) | u64::from(i));
+                        .fold(0u64, |w, &i| (w << bits) | u64::from(i));
                     match self.map.entry(g.key(&s) >> 1) {
                         std::collections::hash_map::Entry::Vacant(v) => {
                             v.insert(packed);
@@ -9158,9 +9195,9 @@ impl KSumTable {
     }
 
     fn unpack(&self, packed: u64) -> Vec<usize> {
-        let mask = (1u64 << KSUM_INDEX_BITS) - 1;
+        let mask = (1u64 << self.bits) - 1;
         (0..self.k)
-            .map(|d| ((packed >> (d * KSUM_INDEX_BITS)) & mask) as usize)
+            .map(|d| ((packed >> (d * self.bits)) & mask) as usize)
             .collect()
     }
 
@@ -9227,10 +9264,7 @@ impl KSumTable {
     ) -> Option<Vec<usize>> {
         *lookups += 1;
         let packed = *self.map.get(&(g.key(&target) >> 1))?;
-        let mask = (1u64 << KSUM_INDEX_BITS) - 1;
-        let summands: Vec<usize> = (0..self.k)
-            .map(|d| ((packed >> (d * KSUM_INDEX_BITS)) & mask) as usize)
-            .collect();
+        let summands = self.unpack(packed);
         let mut s = fb.points[summands[0]];
         for &i in &summands[1..] {
             s = g.add(ops, s, fb.points[i]);
@@ -21587,5 +21621,130 @@ mod solver_unit_key_tests {
         let mut both = phase;
         price_phase(&mut both, &c);
         assert_eq!(both.gae, 5.0 + 250.0 + 64.0 * 4.0 / 2.0);
+    }
+}
+
+#[cfg(test)]
+mod ksum_wide_index_tests {
+    use super::*;
+
+    /// k ≤ 5 keeps the 12-bit layout every recorded table used; above it the
+    /// width fills a `u64`.
+    #[test]
+    fn index_width_is_twelve_bits_up_to_k5_and_fills_a_u64_above() {
+        for k in 3..=5 {
+            assert_eq!(ksum_index_bits(k), KSUM_INDEX_BITS, "k = {k}");
+        }
+        assert_eq!([6, 7, 8, 9].map(ksum_index_bits), [10, 9, 8, 7]);
+        for k in 3..=KSUM_MAX_K {
+            assert!(k * ksum_index_bits(k) <= 64, "k = {k}");
+        }
+        assert_eq!(KSUM_MAX_K, 9);
+    }
+
+    fn is_sum_of_base<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        summands: &[usize],
+        target: G::Elt,
+    ) -> bool {
+        let mut ops = GroupOps::default();
+        let mut s = fb.points[summands[0]];
+        for &i in &summands[1..] {
+            s = g.add(&mut ops, s, fb.points[i]);
+        }
+        s == target
+    }
+
+    /// Tables for k = 3..9 hold every signed k-sum: a probe of a sum of k
+    /// base points at distinct abscissae (not an identity) answers with k
+    /// summands that add to it; the entry layout of k = 3, 4, 5 is the old
+    /// 12-bit one (`i0 | i1 << 12 | …`).
+    #[test]
+    fn tables_up_to_k9_answer_every_sum_of_distinct_abscissae() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        for (k, a) in [
+            (3u32, 14usize),
+            (4, 12),
+            (5, 11),
+            (6, 12),
+            (7, 11),
+            (8, 10),
+            (9, 10),
+        ] {
+            let fb = prime_factor_base(&inst, a);
+            let t = KSumTable::build_negation_folded(g, &fb, k).expect("table builds");
+            assert_eq!(t.k, k);
+            assert!(t.entries > 0 && t.entries <= t.insert_attempts);
+            // One insert per signed k-sum of distinct abscissae, minus identities.
+            let sums = (1u64 << (k - 1))
+                * (0..u64::from(k)).fold(1u64, |c, i| c * (a as u64 - i) / (i + 1));
+            assert!(
+                t.insert_attempts <= sums && t.insert_attempts + 8 >= sums,
+                "k = {k}"
+            );
+            let bits = ksum_index_bits(k);
+            for &packed in t.map.values().take(2000) {
+                if bits * k < 64 {
+                    assert_eq!(packed >> (bits * k), 0, "k = {k}: stray high bits");
+                }
+                let idx = t.unpack(packed);
+                assert_eq!(idx.len(), k as usize);
+                // Re-pack with the documented layout: first summand lowest.
+                let repacked = idx.iter().rev().fold(0u64, |w, &i| (w << bits) | i as u64);
+                assert_eq!(repacked, packed);
+                if k <= 5 {
+                    assert_eq!(packed & 0xfff, idx[0] as u64, "12-bit layout, k = {k}");
+                }
+            }
+            // Probe sums built from signed points at strictly increasing abscissae.
+            let groups: Vec<&Vec<usize>> = fb
+                .abscissa_list
+                .iter()
+                .map(|x| fb.x_index.get(x).unwrap())
+                .collect();
+            let mut probed = 0;
+            for start in 0..groups.len().saturating_sub(k as usize - 1) {
+                let pick: Vec<usize> = (0..k as usize)
+                    .map(|d| groups[start + d][(start + d) % groups[start + d].len()])
+                    .collect();
+                let mut ops = GroupOps::default();
+                let mut target = fb.points[pick[0]];
+                for &i in &pick[1..] {
+                    target = g.add(&mut ops, target, fb.points[i]);
+                }
+                if g.is_identity(&target) {
+                    continue;
+                }
+                let mut lookups = 0;
+                let mut cops = GroupOps::default();
+                let found = t
+                    .probe(g, &fb, &mut cops, &mut lookups, target)
+                    .unwrap_or_else(|| panic!("k = {k}: a sum of base points is missing"));
+                assert_eq!(found.len(), k as usize);
+                assert!(is_sum_of_base(g, &fb, &found, target), "k = {k}");
+                probed += 1;
+            }
+            assert!(probed > 0, "k = {k}: nothing probed");
+        }
+    }
+
+    /// The packed index limits and the entry guard refuse with a clear error.
+    #[test]
+    fn too_large_a_base_or_arity_is_refused() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        let big = prime_factor_base(&inst, 520); // 1040 signed points
+        let msg = |r: Result<KSumTable, String>| r.err().expect("must be refused");
+        assert!(msg(KSumTable::build_negation_folded(g, &big, 6)).contains("10 bits"));
+        let mid = prime_factor_base(&inst, 70); // 140 signed points: too many for k = 9 (7 bits)
+        assert!(msg(KSumTable::build_negation_folded(g, &mid, 9)).contains("7 bits"));
+        let small = prime_factor_base(&inst, 10);
+        assert!(msg(KSumTable::build_negation_folded(g, &small, 2)).contains("k = 3 to 9"));
+        assert!(msg(KSumTable::build_negation_folded(g, &small, 10)).contains("k = 3 to 9"));
+        // 1000 points fit 10 bits, but 2^5 C(500, 6) sums are far above the entry limit.
+        let wide = prime_factor_base(&inst, 500);
+        assert!(msg(KSumTable::build_negation_folded(g, &wide, 6)).contains("above the limit"));
     }
 }

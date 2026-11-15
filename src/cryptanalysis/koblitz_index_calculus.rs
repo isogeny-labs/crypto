@@ -15533,6 +15533,13 @@ pub fn verify_collected_relation(
         {
             return false;
         }
+        if fast_verify_enabled() {
+            if let Some(sum) = FastCurve::new(&kc.curve)
+                .and_then(|fast| fast_relation_sum(&fast, fb, &rel.points).map(|s| s.infinity))
+            {
+                return sum;
+            }
+        }
         let mut sum = BinaryPoint::Infinity;
         for &i in &rel.points {
             sum = kc.add(&sum, &fb.points[i]);
@@ -15545,11 +15552,78 @@ pub fn verify_collected_relation(
     if rel.points.iter().any(|&i| i >= fb.points.len()) {
         return false;
     }
+    if fast_verify_enabled() {
+        if let Some(verdict) = FastCurve::new(&kc.curve)
+            .and_then(|fast| verify_probe_relation_fast(kc, fb, &fast, rel))
+        {
+            return verdict;
+        }
+    }
+    verify_probe_relation_generic(kc, fb, rel)
+}
+
+/// `[a]G == Σ P_i` (and the sum is not `O`) in the generic arithmetic.
+fn verify_probe_relation_generic(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    rel: &CollectedRelation,
+) -> bool {
     let mut sum = BinaryPoint::Infinity;
     for &i in &rel.points {
         sum = kc.add(&sum, &fb.points[i]);
     }
     sum != BinaryPoint::Infinity && sum == kc.mul(kc.generator(), &BigUint::from(rel.a))
+}
+
+/// Whether [`verify_collected_relation`] sums a probe relation in
+/// single-word arithmetic (`KIC_FAST_VERIFY`, default on).  The verdict
+/// and the counted additions and doublings are those of the generic
+/// route; `0` restores it for A/B timing.
+fn fast_verify_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_FAST_VERIFY").map_or(true, |v| v != "0"))
+}
+
+/// `[a]G == Σ P_i` (and the sum is not `O`) in [`FastCurve`] arithmetic,
+/// or `None` when a point does not round-trip through the single-word
+/// field, so the caller keeps the generic route.  `FastCurve::add` and
+/// `double` count exactly where `point_add` and `point_double` do, and
+/// the scalar multiple is the one [`KoblitzCurve::mul`] takes.
+fn verify_probe_relation_fast(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    fast: &FastCurve,
+    rel: &CollectedRelation,
+) -> Option<bool> {
+    let generator = fast_lift_exact(fast, kc.generator())?;
+    let sum = fast_relation_sum(fast, fb, &rel.points)?;
+    Some(!sum.infinity && sum == fast.mul(generator, &BigUint::from(rel.a)))
+}
+
+/// `p` in single-word coordinates, or `None` if it does not round-trip.
+fn fast_lift_exact(fast: &FastCurve, p: &BinaryPoint) -> Option<FastPoint> {
+    let lifted = fast.lift(p);
+    (fast.lower(lifted) == *p).then_some(lifted)
+}
+
+/// `Σ P_i` over `points`, added left to right from `O` as the generic
+/// route adds them (so the same additions and doublings are counted),
+/// or `None` if a summand does not round-trip.  No addition is counted
+/// before every summand has lifted.
+fn fast_relation_sum(
+    fast: &FastCurve,
+    fb: &FrobeniusFactorBase,
+    points: &[usize],
+) -> Option<FastPoint> {
+    let summands = points
+        .iter()
+        .map(|&i| fast_lift_exact(fast, &fb.points[i]))
+        .collect::<Option<Vec<_>>>()?;
+    let mut sum = FastPoint::INFINITY;
+    for p in summands {
+        sum = fast.add(sum, p);
+    }
+    Some(sum)
 }
 
 /// The relation rows of a logarithm precompute, dense or sparse per the
@@ -22482,6 +22556,79 @@ mod tests {
     /// relation for relation.  Without this, turning aiming on would
     /// change a run's first unit and the comparison with a swept run
     /// would not be controlled.
+    #[test]
+    fn fast_relation_checks_match_the_generic_verdicts_and_counts() {
+        // Valid relations, corrupted ones, a doubled summand and a point
+        // with its negation: the single-word check must give the generic
+        // verdict and count the same additions, doublings and scalar
+        // multiplications.
+        use crate::cryptanalysis::group_op_count::counted;
+        let kc = KoblitzCurve::new(0, 19).unwrap();
+        let fb = build_subgroup_orbit_factor_base(&kc, 3, 400).unwrap();
+        let pair = PairSumTable::build(&kc, &fb).unwrap();
+        let opts = windowed_options(fb.points.len() / 8);
+        let collector = RelationCollector::with_pair_table(&kc, &fb, &opts, Some(&pair)).unwrap();
+        let unit = RelationWorkUnit {
+            seed: 11,
+            start: 0,
+            count: 4096,
+        };
+        let (found, _) = collector.collect_aimed(unit, None);
+        assert!(!found.is_empty(), "no relations to check");
+        let fast = FastCurve::new(&kc.curve).expect("single-word field");
+        let negation = (0..fb.points.len()).find_map(|j| {
+            (fb.points[j] == crate::binary_ecc::curve::point_neg(&fb.points[0])).then_some(j)
+        });
+        let mut cases = Vec::new();
+        for rel in found.iter().take(40) {
+            cases.push(rel.clone());
+            let mut wrong_a = rel.clone();
+            wrong_a.a = rel.a % 1000 + 1;
+            cases.push(wrong_a);
+            let mut doubled = rel.clone();
+            doubled.points[1] = doubled.points[0];
+            cases.push(doubled);
+            if let Some(j) = negation {
+                let mut cancelled = rel.clone();
+                cancelled.points[0] = 0;
+                cancelled.points[1] = j;
+                cases.push(cancelled);
+            }
+        }
+        // Free relations (`a = 0`): a point with its negation and a
+        // point with itself, through the public check.
+        if let Some(j) = negation {
+            let free = [vec![0, j], vec![0, 0], vec![0, j, 1, 1]];
+            for points in free {
+                let rel = CollectedRelation {
+                    trial: 0,
+                    a: 0,
+                    points,
+                };
+                let mut sum = BinaryPoint::Infinity;
+                let (generic, generic_ops) = counted(|| {
+                    for &i in &rel.points {
+                        sum = kc.add(&sum, &fb.points[i]);
+                    }
+                    sum == BinaryPoint::Infinity
+                });
+                let (quick, quick_ops) = counted(|| verify_collected_relation(&kc, &fb, 3, &rel));
+                assert_eq!(generic, quick, "free verdict differs for {rel:?}");
+                assert_eq!(generic_ops, quick_ops, "free counts differ for {rel:?}");
+            }
+        }
+        let mut accepted = 0;
+        for rel in &cases {
+            let (generic, generic_ops) = counted(|| verify_probe_relation_generic(&kc, &fb, rel));
+            let (quick, quick_ops) =
+                counted(|| verify_probe_relation_fast(&kc, &fb, &fast, rel).expect("round trip"));
+            assert_eq!(generic, quick, "verdict differs for {rel:?}");
+            assert_eq!(generic_ops, quick_ops, "counts differ for {rel:?}");
+            accepted += usize::from(quick);
+        }
+        assert!(accepted >= found.len().min(40), "valid relations rejected");
+    }
+
     #[test]
     fn aiming_at_every_column_is_the_sweep() {
         let kc = KoblitzCurve::new(0, 19).unwrap();
