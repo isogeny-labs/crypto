@@ -185,15 +185,152 @@ fn stage(source: &Path, output: &Path) -> Result<Value> {
     Ok(receipt)
 }
 
+fn staged_panel(stage_root: &Path, commit: &str) -> Result<(PathBuf, Value)> {
+    let stage_root = fs::canonicalize(stage_root)?;
+    let receipt_path = stage_root.join("staging.json");
+    let receipt: Value = serde_json::from_slice(&fs::read(&receipt_path)?)?;
+    let panel = stage_root.join("panel");
+    let source = fs::canonicalize(
+        receipt["source_metadata_root"]
+            .as_str()
+            .ok_or("staging metadata root missing")?,
+    )?;
+    let expected_source = fs::canonicalize(
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/koblitz_n83_factor_base_sweep_20261008/pilot-01"),
+    )?;
+    if receipt["schema"] != "n83.k600-m6-native-arm-staging/v1"
+        || receipt["status"] != "PASS_READ_ONLY_STAGE"
+        || receipt["source_commit"] != commit
+        || receipt["panel_root"] != panel.to_string_lossy().as_ref()
+        || receipt["remote"] != REMOTE
+        || receipt["store_name"] != STORE_NAME
+        || receipt["object_sha256"] != OBJECT_SHA
+        || receipt["object_bytes"] != 3_025_798
+        || receipt["point_set_blake3"] != POINT_SET
+        || receipt["fresh_s3_get"] != true
+        || receipt["uploaded"] != false
+        || receipt["solver_executed"] != false
+        || receipt["total_index_calculus_runtime_ms"] != Value::Null
+        || receipt["selected_best_total_runtime"] != Value::Null
+        || source != expected_source
+    {
+        return Err("staging receipt differs from frozen read-only input".into());
+    }
+    validate_metadata(&source)?;
+    validate_metadata(&panel)?;
+    for (name, sha, bytes) in META {
+        check_file(&panel.join(name), sha, *bytes)?;
+    }
+    check_file(&panel.join(OBJECT), OBJECT_SHA, 3_025_798)?;
+    let cfg = crypto_lib::store::Config::discover()?;
+    if cfg.remote.as_ref() != Some(&RemoteSpec::parse(REMOTE)?)
+        || sha256_file(&cfg.index_path)?
+            != receipt["store_index_sha256"]
+                .as_str()
+                .ok_or("staging index digest missing")?
+    {
+        return Err("store remote or index changed after staging".into());
+    }
+    Ok((panel, receipt))
+}
+
+fn freeze(
+    stage_root: &Path,
+    exporter: &Path,
+    solver: &Path,
+    image: &str,
+    output: &Path,
+) -> Result<Value> {
+    if !output.is_absolute() || output.exists() {
+        return Err("new absolute lock path required".into());
+    }
+    let repo = fs::canonicalize(env!("CARGO_MANIFEST_DIR"))?;
+    let parent = fs::canonicalize(output.parent().ok_or("lock parent missing")?)?;
+    if parent.starts_with(&repo) {
+        return Err("lock must be outside source checkout".into());
+    }
+    let commit = clean_source_commit(&repo)?;
+    let (panel, receipt) = staged_panel(stage_root, &commit)?;
+    let exporter = fs::canonicalize(exporter)?;
+    let solver = fs::canonicalize(solver)?;
+    for binary in [&exporter, &solver] {
+        if !binary.is_file() || fs::metadata(binary)?.len() == 0 {
+            return Err(format!("binary missing or empty: {}", binary.display()).into());
+        }
+    }
+    if !image.starts_with("sha256:")
+        || image.len() != 71
+        || !image[7..].bytes().all(|b| b.is_ascii_hexdigit())
+    {
+        return Err("full Docker image ID required".into());
+    }
+    let inspected = Command::new("docker")
+        .args(["image", "inspect", "--format", "{{.Id}}", image])
+        .output()?;
+    if !inspected.status.success() || String::from_utf8(inspected.stdout)?.trim() != image {
+        return Err("Docker image ID does not resolve exactly".into());
+    }
+    let exporter_sha = sha256_file(&exporter)?;
+    let solver_sha = sha256_file(&solver)?;
+    let supervisor = fs::canonicalize(std::env::current_exe()?)?;
+    let supervisor_sha = sha256_file(&supervisor)?;
+    let receipt_sha = sha256_file(&fs::canonicalize(stage_root)?.join("staging.json"))?;
+    if clean_source_commit(&repo)? != commit {
+        return Err("source changed while freezing arms".into());
+    }
+    let (panel_after, _) = staged_panel(stage_root, &commit)?;
+    if panel_after != panel
+        || sha256_file(&fs::canonicalize(stage_root)?.join("staging.json"))? != receipt_sha
+        || sha256_file(&exporter)? != exporter_sha
+        || sha256_file(&solver)? != solver_sha
+        || sha256_file(&supervisor)? != supervisor_sha
+    {
+        return Err("input or binary changed while freezing arms".into());
+    }
+    let lock = json!({
+        "schema":"n83.k600-m6-native-arms-lock/v1", "status":"PREPARED_ONLY",
+        "source_commit":commit, "source_root":repo, "staging_receipt_sha256":receipt_sha,
+        "panel_root":panel, "store_index_sha256":receipt["store_index_sha256"],
+        "remote":REMOTE, "store_name":STORE_NAME, "object_sha256":OBJECT_SHA,
+        "object_bytes":3_025_798, "point_set_blake3":POINT_SET,
+        "exporter_replayer_binary":exporter, "exporter_replayer_sha256":exporter_sha,
+        "solver_binary":solver, "solver_sha256":solver_sha, "image_id":image,
+        "supervisor_binary":supervisor, "supervisor_sha256":supervisor_sha,
+        "max_variables":125_000, "max_domain_clauses":350_000,
+        "max_conflicts":10_000, "max_models":1,
+        "memory_limit_bytes":4_294_967_296u64, "swap_limit_bytes":0,
+        "cpus":1, "pids_limit":64, "network":"none",
+        "positive_executed":false, "natural_executed":false,
+        "worker_launch_admitted":false,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &lock)?;
+    Ok(lock)
+}
+
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() != 4 || args[1] != "stage" {
-        return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR".into());
-    }
-    let output = PathBuf::from(&args[3]);
-    let result = stage(Path::new(&args[2]), &output);
+    let (output, result, stage_created_output) = match args.get(1).map(String::as_str) {
+        Some("stage") if args.len() == 4 => {
+            let output = PathBuf::from(&args[3]);
+            let stage_created_output = !output.exists();
+            let result = stage(Path::new(&args[2]), &output);
+            (output, result, stage_created_output)
+        }
+        Some("freeze") if args.len() == 7 => {
+            let output = PathBuf::from(&args[6]);
+            let result = freeze(
+                Path::new(&args[2]), Path::new(&args[3]), Path::new(&args[4]),
+                &args[5], &output,
+            );
+            (output, result, false)
+        }
+        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON".into()),
+    };
     if let Err(error) = &result {
-        if output.is_dir() && !output.join("staging.json").exists() {
+        if stage_created_output && output.is_dir() && !output.join("staging.json").exists() {
             let _ = write_new_json(
                 &output.join("failure.json"),
                 &json!({
@@ -235,5 +372,36 @@ mod tests {
         fs::write(tmp.join("manifest.json"), changed).unwrap();
         assert!(validate_metadata(&tmp).is_err());
         fs::remove_dir_all(tmp).unwrap();
+    }
+
+    #[test]
+    fn staged_receipt_cannot_hide_a_changed_object() {
+        let source = fs::canonicalize(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("research/koblitz_n83_factor_base_sweep_20261008/pilot-01"),
+        )
+        .unwrap();
+        let root =
+            std::env::temp_dir().join(format!("n83-k600-m6-arm-object-{}", std::process::id()));
+        let panel = root.join("panel");
+        fs::create_dir_all(panel.join("objects")).unwrap();
+        for (name, _, _) in META {
+            fs::copy(source.join(name), panel.join(name)).unwrap();
+        }
+        fs::write(panel.join(OBJECT), b"changed").unwrap();
+        let commit = "a".repeat(40);
+        let receipt = json!({
+            "schema":"n83.k600-m6-native-arm-staging/v1", "status":"PASS_READ_ONLY_STAGE",
+            "source_commit":commit, "source_metadata_root":source, "panel_root":panel,
+            "remote":REMOTE, "store_name":STORE_NAME, "store_index_sha256":"unused",
+            "object_sha256":OBJECT_SHA, "object_bytes":3_025_798,
+            "point_set_blake3":POINT_SET, "fresh_s3_get":true, "uploaded":false,
+            "solver_executed":false, "total_index_calculus_runtime_ms":Value::Null,
+            "selected_best_total_runtime":Value::Null,
+        });
+        write_new_json(&root.join("staging.json"), &receipt).unwrap();
+        let error = staged_panel(&root, &commit).unwrap_err().to_string();
+        assert!(error.contains("frozen input differs"), "{error}");
+        fs::remove_dir_all(root).unwrap();
     }
 }
