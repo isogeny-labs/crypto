@@ -17,3 +17,11 @@ construct full public-input transport with consistent difference decompositions.
 
 ## Errors
 None so far; scoped taskT-6233 epoch1. Shared resume untouched.
+
+## Registered execution
+Source2bafe6f049a9/checkpoint162927 preceded one release run, exit0/stderr empty.
+16translation controls,2022regular of2048trials,26scalar-chart exclusions,
+11zeros,6nonsplit exclusions,5decodedn853/938/943/1831/1998. Allactual jets,
+endpoint scales±10, negations and target annihilations pass. Rawfull jets retained.
+Decision: next map arbitrary ell-subgroup D by finding zero[n]D, doubling its
+mapped difference to cancelT, then dividing by known2n moduloell. No DLP input.
