@@ -285,6 +285,17 @@ pub trait DecompositionOracle<G: CountedGroup> {
         false
     }
 
+    /// The pair table behind [`certain_miss`], when `certain_miss(point)`
+    /// is exactly `table.misses(group, point)`: the relation loop's
+    /// parallel lane workers (`threads > 1`) then probe it read-only, off
+    /// the committing thread.  `None` keeps every miss check on
+    /// [`certain_miss`].
+    ///
+    /// [`certain_miss`]: DecompositionOracle::certain_miss
+    fn miss_table(&self) -> Option<std::sync::Arc<crate::cryptanalysis::ic_boundary::PairTable>> {
+        None
+    }
+
     /// **The large-prime seam.**  Decompose `point = [a]G + [b]Q`, or
     /// store what partially decomposed and hand back whatever complete
     /// relations the stored partials now merge into.  The default is
@@ -756,6 +767,8 @@ pub enum Targets {
     WalkPrimeBatch4,
     WalkPrimeBatch8,
     WalkPrimeBatch16,
+    WalkPrimeBatch32,
+    WalkPrimeBatch64,
     /// Wide lane schedules: enough targets per round to fill a GPU batch
     /// (`rootfind-subtract-gpu`).  The same walk per lane.
     WalkPrimeBatch256,
@@ -800,6 +813,8 @@ impl Targets {
             Targets::WalkPrimeBatch4 => "walk-prime-batch-4",
             Targets::WalkPrimeBatch8 => "walk-prime-batch-8",
             Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
+            Targets::WalkPrimeBatch32 => "walk-prime-batch-32",
+            Targets::WalkPrimeBatch64 => "walk-prime-batch-64",
             Targets::WalkPrimeBatch256 => "walk-prime-batch-256",
             Targets::WalkPrimeBatch1024 => "walk-prime-batch-1024",
             Targets::Residual => "residual",
@@ -825,6 +840,8 @@ impl Targets {
             "walk-prime-batch-4" => Ok(Targets::WalkPrimeBatch4),
             "walk-prime-batch-8" => Ok(Targets::WalkPrimeBatch8),
             "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
+            "walk-prime-batch-32" => Ok(Targets::WalkPrimeBatch32),
+            "walk-prime-batch-64" => Ok(Targets::WalkPrimeBatch64),
             "walk-prime-batch-256" => Ok(Targets::WalkPrimeBatch256),
             "walk-prime-batch-1024" => Ok(Targets::WalkPrimeBatch1024),
             "residual" => Ok(Targets::Residual),
@@ -837,7 +854,7 @@ impl Targets {
             "stride-generator" => Ok(Targets::StrideGenerator),
             "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16/256/1024, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16/32/64/256/1024, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }

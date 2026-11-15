@@ -1446,6 +1446,21 @@ pub trait CountedGroup {
     fn supports_native_lane_walk(&self) -> bool {
         false
     }
+    /// The multi-threaded form of [`CountedGroup::native_lane_walk_adder`]
+    /// ([`LaneSpeculator`]): `threads` workers step the lanes ahead with
+    /// the fixed `jumps`, and the committing thread replays the steps and
+    /// tallies them as the counting adder would.  `None` by default.
+    #[allow(clippy::type_complexity)]
+    fn lane_speculator<'a>(
+        &'a self,
+        _threads: usize,
+        _batched: bool,
+        _jumps: &[(Self::Elt, u64, u64)],
+        _r: u64,
+        _miss: Option<std::sync::Arc<PairTable>>,
+    ) -> Option<Box<dyn LaneSpeculator<Self::Elt> + 'a>> {
+        None
+    }
     /// Whether `add` and `double` tally the field operations behind them
     /// into the ledger's `field_ops`.  `false` by default, and then the
     /// tally stays at zero and means *unknown*, never "no field work":
@@ -6336,6 +6351,22 @@ impl CountedGroup for PrimeCurve {
     fn supports_native_lane_walk(&self) -> bool {
         self.p < (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS)
     }
+    fn lane_speculator<'a>(
+        &'a self,
+        threads: usize,
+        batched: bool,
+        jumps: &[(PrimePoint, u64, u64)],
+        r: u64,
+        miss: Option<std::sync::Arc<PairTable>>,
+    ) -> Option<Box<dyn LaneSpeculator<PrimePoint> + 'a>> {
+        let _ = batched; // the workers only classify; `LaneTally` counts
+        if !self.supports_native_lane_walk() || jumps.len() != LANE_JUMPS || threads < 2 {
+            return None;
+        }
+        Some(Box::new(PrimeLaneSpeculator::new(
+            self, threads, jumps, r, miss,
+        )?))
+    }
 }
 
 /// A prime-field instance: curve, prime-order subgroup, generator.
@@ -8308,6 +8339,42 @@ impl GuardLineSet {
         false
     }
 
+    /// Whether `key` is present (no insert).
+    #[inline]
+    fn contains(&self, key: u64) -> bool {
+        if key == 0 {
+            return self.has_zero;
+        }
+        let mut line_index = self.home(key);
+        loop {
+            let line = &self.lines[line_index].0;
+            for &slot in line {
+                if slot == key {
+                    return true;
+                }
+                if slot == 0 {
+                    return false;
+                }
+            }
+            line_index = (line_index + 1) & self.mask;
+        }
+    }
+
+    /// Grow now, if `additional` more keys would make
+    /// [`Self::insert`] grow (so that prefetched lines stay valid).
+    fn reserve(&mut self, additional: usize) {
+        while (self.len + additional) * 4 > self.lines.len() * 8 * 3 {
+            self.grow();
+        }
+    }
+
+    /// Empty the set, keeping its lines.
+    fn clear(&mut self) {
+        self.lines.fill(GuardLine::default());
+        self.len = 0;
+        self.has_zero = false;
+    }
+
     fn grow(&mut self) {
         let line_count = self.lines.len() * 2;
         let old = std::mem::replace(&mut self.lines, vec![GuardLine::default(); line_count]);
@@ -8831,6 +8898,14 @@ impl PairTable {
         }
     }
 
+    /// [`Self::prefetch`] for a known key.
+    #[inline]
+    pub fn prefetch_key(&self, key: u64) {
+        if let Some(lines) = &self.lines {
+            lines.prefetch(key >> 1);
+        }
+    }
+
     pub fn cost(&self) -> TableCost {
         TableCost {
             kind: self.kind,
@@ -8846,6 +8921,12 @@ impl PairTable {
     #[inline]
     pub fn misses<G: CountedGroup>(&self, g: &G, target: &G::Elt) -> bool {
         self.get(g.key(target) >> 1).is_none()
+    }
+
+    /// [`Self::misses`] for an element whose key `g.key(target)` is known.
+    #[inline]
+    pub fn misses_key(&self, key: u64) -> bool {
+        self.get(key >> 1).is_none()
     }
 
     /// Indices `(i, j)` with `P_i + P_j = target`, if the table holds a
@@ -13180,6 +13261,650 @@ struct PrimeWalkLane<E> {
     permutation: Vec<usize>,
 }
 
+/// Jumps of a lane walk: the hash of a lane's point selects one of these
+/// sixteen through the lane's permutation.
+pub const LANE_JUMPS: usize = 16;
+
+/// A lane's state at the start of a speculative block: the lane takes
+/// ordinary jump steps from `point` until a step lands on the identity or
+/// `steps_left` steps are taken (its segment cap).
+#[derive(Clone, Copy, Debug)]
+pub struct LaneSeed<E> {
+    pub point: E,
+    pub a: u64,
+    pub b: u64,
+    pub steps_left: u64,
+    pub permutation: [u8; LANE_JUMPS],
+}
+
+/// One speculative lane step: the new point with its coefficients and
+/// key, the jump slot taken, and the read-only pair-table answer.
+#[derive(Clone, Copy, Debug)]
+pub struct LaneStep<E> {
+    pub point: E,
+    pub a: u64,
+    pub b: u64,
+    pub key: u64,
+    pub slot: u8,
+    /// [`LANE_MAY_HIT`], [`LANE_CERTAIN_MISS`] or [`LANE_MISS_UNKNOWN`].
+    pub miss: u8,
+    /// The addition's [`LaneTally`] class (`LANE_CLASS_*` bits).
+    pub class: u8,
+    /// [`LANE_SEEN_NO`] or [`LANE_SEEN_YES`]: whether the key was in the
+    /// speculator's guard when the step was looked up; or
+    /// [`LANE_SEEN_UNKNOWN`] for a step formed on the committing thread.
+    pub seen: u8,
+}
+
+pub const LANE_SEEN_NO: u8 = 0;
+pub const LANE_SEEN_YES: u8 = 1;
+pub const LANE_SEEN_UNKNOWN: u8 = 2;
+
+/// `p` is not the identity (a conversion to Montgomery form if uncached).
+pub const LANE_CLASS_P: u8 = 1;
+/// `q` is not the identity.
+pub const LANE_CLASS_Q: u8 = 2;
+/// An ordinary addition (`x_p != x_q`): one denominator of the batch.
+pub const LANE_CLASS_ORDINARY: u8 = 4;
+/// A doubling (`p = q`, `y != 0`): its own inversion.
+pub const LANE_CLASS_DOUBLING: u8 = 8;
+/// The result is not the identity (two reductions back to canonical).
+pub const LANE_CLASS_OUT: u8 = 16;
+
+/// The counting lane adder's tallies, replayed from committed requests
+/// ([`CountedGroup::native_lane_walk_adder`]): per request one addition,
+/// a conversion of `p` unless it is the lane's previous output, of `q`
+/// unless its slot already holds it, the class's field operations and
+/// the reductions of the output; per round the batched inversion.
+struct LaneTally<E> {
+    batched: bool,
+    prev_out: Vec<Option<E>>,
+    slot_q: Vec<Option<E>>,
+    /// adds, muls, sqrs, invs, reductions, ordinary
+    round: [u64; 6],
+}
+
+impl<E: Copy + PartialEq> LaneTally<E> {
+    fn new(batched: bool, lanes: usize, slots: usize) -> Self {
+        Self {
+            batched,
+            prev_out: vec![None; lanes],
+            slot_q: vec![None; slots],
+            round: [0; 6],
+        }
+    }
+
+    #[inline]
+    fn request(
+        &mut self,
+        lane: usize,
+        p: &E,
+        q: &E,
+        slot: usize,
+        out: &E,
+        class: u8,
+        chained: bool,
+    ) {
+        let t = &mut self.round;
+        t[0] += 1;
+        debug_assert!(!chained || self.prev_out[lane] == Some(*p));
+        if class & LANE_CLASS_P != 0 && !chained && self.prev_out[lane] != Some(*p) {
+            t[1] += 2;
+        }
+        if self.slot_q[slot] != Some(*q) {
+            if class & LANE_CLASS_Q != 0 {
+                t[1] += 2;
+            }
+            self.slot_q[slot] = Some(*q);
+        }
+        if class & LANE_CLASS_ORDINARY != 0 {
+            t[1] += 2;
+            t[2] += 1;
+            t[5] += 1;
+            if !self.batched {
+                t[3] += 1;
+                t[1] += 1;
+            }
+        } else if class & LANE_CLASS_DOUBLING != 0 {
+            t[1] += 3;
+            t[2] += 2;
+            t[3] += 1;
+        }
+        if class & LANE_CLASS_OUT != 0 {
+            t[4] += 2;
+        }
+        self.prev_out[lane] = Some(*out);
+    }
+
+    fn end_round(&mut self, ops: &mut GroupOps) {
+        let [adds, mut muls, sqrs, mut invs, reductions, ordinary] = self.round;
+        if self.batched && ordinary > 0 {
+            invs += 1;
+            muls += 3 * ordinary + 1;
+        }
+        ops.adds += adds;
+        ops.field_ops.muls += muls;
+        ops.field_ops.sqrs += sqrs;
+        ops.field_ops.invs += invs;
+        ops.montgomery_reductions += reductions;
+        self.round = [0; 6];
+    }
+}
+
+/// The pair table holds the step's key: the oracle is called.
+pub const LANE_MAY_HIT: u8 = 0;
+/// The pair table does not hold the key: exactly the oracle's miss.
+pub const LANE_CERTAIN_MISS: u8 = 1;
+/// No table was given: the loop asks its `certain_miss` predicate.
+pub const LANE_MISS_UNKNOWN: u8 = 2;
+
+/// **Speculative parallel lane steps** for the lane walks
+/// (`TargetSource::WalkPrimeLanes`) with `threads > 1`.
+///
+/// Between restarts a lane's walk is a pure function of its own state and
+/// the fixed jump table, so workers can run every lane many rounds ahead.
+/// The relation loop then replays the rounds in exactly the one-thread
+/// order (round by round, lane by lane), doing everything that reads or
+/// writes shared state itself: restarts (the shared RNG, the restart
+/// pool), the guard, the counters, the oracle and the matrix.  A lane that
+/// restarts drops the rest of its speculative chain and is stepped
+/// serially until the next block.  Speculation the run does not reach is
+/// discarded uncounted.
+///
+/// Counting is the committing thread's: [`LaneTally`] adds, per
+/// committed request, exactly what the counting lane adder
+/// ([`CountedGroup::native_lane_walk_adder`]) adds for it, including its
+/// per-lane and per-slot conversion caches, and per round the batched
+/// inversion; the workers only classify each addition.
+pub trait LaneSpeculator<E> {
+    /// Start, in the background, adding `committed` (keys the loop
+    /// committed, none of them present) to the speculator's guard and
+    /// then stepping each seeded lane up to `depth` steps, each looked up
+    /// in that guard and in the pair table.
+    fn launch(&mut self, seeds: &[Option<LaneSeed<E>>], depth: usize, committed: &[u64]);
+    /// Wait for the launched block; [`Self::chain`] then reads it.
+    fn wait(&mut self);
+    /// The steps of the last waited-for block for `lane`.
+    fn chain(&self, lane: usize) -> &[LaneStep<E>];
+    /// Whether `key` is in the speculator's guard (which holds at least
+    /// every key passed to [`Self::launch`] before the latest call).
+    fn guard_contains(&self, key: u64) -> bool;
+    /// `p + q`, uncounted, with its `LANE_CLASS_*` bits (a lane stepped
+    /// on the committing thread; the loop's [`LaneTally`] counts it).
+    fn add_uncounted(&self, p: E, q: E) -> (E, u8);
+    /// Pair-table answer for a key, if a table was given.
+    fn miss_of_key(&self, key: u64) -> u8;
+}
+
+/// One worker's reusable buffers (cache-line aligned: a worker updates
+/// its buffers' lengths every step, and must not share lines).
+#[derive(Default)]
+#[repr(align(128))]
+struct PrimeLaneScratch {
+    batch: crate::cryptanalysis::prime_fast::BatchAddScratch,
+    left: Vec<Option<FastPrimePoint>>,
+    right: Vec<Option<FastPrimePoint>>,
+    /// Active lanes of the chunk: (chunk-local lane, a, b, key, steps left).
+    active: Vec<(usize, u64, u64, u64, u64)>,
+    slots: Vec<u8>,
+    prev: Vec<PrimePoint>,
+    mine: Vec<u64>,
+}
+
+/// One shard of the speculator's guard, on lines of its own.
+#[repr(align(128))]
+struct GuardShard(GuardLineSet);
+
+/// The guard shard of a key.
+#[inline]
+fn guard_shard(key: u64, shards: usize) -> usize {
+    ((mix(key) >> 40) as usize) % shards
+}
+
+/// What every worker reads.
+struct PrimeLaneShared {
+    curve: PrimeCurve,
+    fast: FastPrimeCurve,
+    jumps: Vec<(PrimePoint, Option<FastPrimePoint>, u64, u64)>,
+    r: u64,
+    miss: Option<std::sync::Arc<PairTable>>,
+    /// The guard of every key the loop handed over, one shard per worker
+    /// (each worker extends its own shard, then all read all shards).
+    guard: Vec<std::sync::RwLock<GuardShard>>,
+    barrier: std::sync::Barrier,
+}
+
+/// A worker's block: its lanes `lo..lo + lengths.len()`, lane `i`'s chain
+/// at `steps[(i - lo) * stride..][..lengths[i - lo]]`.
+#[derive(Default)]
+struct PrimeLaneOut {
+    worker: usize,
+    lo: usize,
+    stride: usize,
+    steps: Vec<LaneStep<PrimePoint>>,
+    lengths: Vec<usize>,
+    scratch: PrimeLaneScratch,
+}
+
+struct PrimeLaneJob {
+    seeds: std::sync::Arc<Vec<Option<LaneSeed<PrimePoint>>>>,
+    committed: std::sync::Arc<Vec<u64>>,
+    depth: usize,
+    lo: usize,
+    hi: usize,
+    out: PrimeLaneOut,
+}
+
+/// [`LaneSpeculator`] for prime curves below `2^MAX_BITS`: `threads - 1`
+/// persistent workers (the committing thread is the `threads`-th), each
+/// owning a contiguous chunk of the lanes.
+struct PrimeLaneSpeculator {
+    shared: std::sync::Arc<PrimeLaneShared>,
+    jobs: Vec<std::sync::mpsc::Sender<PrimeLaneJob>>,
+    results: std::sync::mpsc::Receiver<PrimeLaneOut>,
+    handles: Vec<std::thread::JoinHandle<()>>,
+    current: Vec<PrimeLaneOut>,
+    spare: Vec<PrimeLaneOut>,
+    chunk: usize,
+    in_flight: usize,
+}
+
+impl PrimeLaneSpeculator {
+    fn new(
+        curve: &PrimeCurve,
+        threads: usize,
+        jumps: &[(PrimePoint, u64, u64)],
+        r: u64,
+        miss: Option<std::sync::Arc<PairTable>>,
+    ) -> Option<Self> {
+        let workers = threads.max(2) - 1;
+        let fast = FastPrimeCurve::new("relation-lanes-par", curve.p, curve.a, curve.b, 1);
+        let jumps = jumps
+            .iter()
+            .map(|&(q, a, b)| {
+                let native = (!q.infinity).then(|| fast.point(q.x, q.y));
+                (q, native, a, b)
+            })
+            .collect();
+        let shared = std::sync::Arc::new(PrimeLaneShared {
+            curve: curve.clone(),
+            fast,
+            jumps,
+            r,
+            miss,
+            guard: (0..workers)
+                .map(|_| std::sync::RwLock::new(GuardShard(GuardLineSet::with_capacity(1 << 16))))
+                .collect(),
+            barrier: std::sync::Barrier::new(workers),
+        });
+        let (result_tx, results) = std::sync::mpsc::channel();
+        let mut jobs = Vec::with_capacity(workers);
+        let mut handles = Vec::with_capacity(workers);
+        for w in 0..workers {
+            let (tx, rx) = std::sync::mpsc::channel::<PrimeLaneJob>();
+            let shared = shared.clone();
+            let result_tx = result_tx.clone();
+            let handle = std::thread::Builder::new()
+                .name(format!("ic-lanes-{w}"))
+                .spawn(move || prime_lane_worker(w, &shared, rx, result_tx))
+                .ok()?;
+            jobs.push(tx);
+            handles.push(handle);
+        }
+        Some(Self {
+            shared,
+            jobs,
+            results,
+            handles,
+            current: Vec::new(),
+            spare: Vec::new(),
+            chunk: 1,
+            in_flight: 0,
+        })
+    }
+}
+
+impl Drop for PrimeLaneSpeculator {
+    fn drop(&mut self) {
+        // Closing the job channels ends the workers once any block in
+        // flight is done (its result is dropped with `results`).
+        self.jobs.clear();
+        for handle in self.handles.drain(..) {
+            let _ = handle.join();
+        }
+    }
+}
+
+/// The `LANE_CLASS_*` bits of `p + q = out` (canonical coordinates; the
+/// Montgomery map fixes 0 and is a bijection, so the comparisons are the
+/// adder's).
+#[inline]
+fn prime_lane_class(p: &PrimePoint, q: &PrimePoint, out: &PrimePoint) -> u8 {
+    let mut class = 0u8;
+    if !p.infinity {
+        class |= LANE_CLASS_P;
+    }
+    if !q.infinity {
+        class |= LANE_CLASS_Q;
+    }
+    if !p.infinity && !q.infinity {
+        if p.x != q.x {
+            class |= LANE_CLASS_ORDINARY;
+        } else if p.y == q.y && p.y != 0 {
+            class |= LANE_CLASS_DOUBLING;
+        }
+    }
+    if !out.infinity {
+        class |= LANE_CLASS_OUT;
+    }
+    class
+}
+
+/// A worker: per block, extend its guard shard with the committed keys
+/// of its shard, wait for every shard, step its lanes `depth` rounds
+/// ahead (each round's additions batched over its active lanes), then
+/// look every step up in the guard and the pair table with the lines
+/// requested a few lookups ahead.
+fn prime_lane_worker(
+    w: usize,
+    shared: &PrimeLaneShared,
+    jobs: std::sync::mpsc::Receiver<PrimeLaneJob>,
+    results: std::sync::mpsc::Sender<PrimeLaneOut>,
+) {
+    use std::sync::atomic::Ordering::Relaxed;
+    const AHEAD: usize = 16;
+    let shards = shared.guard.len();
+    while let Ok(job) = jobs.recv() {
+        let PrimeLaneJob {
+            seeds,
+            committed,
+            depth,
+            lo,
+            hi,
+            mut out,
+        } = job;
+        let t0 = lane_profile_on().then(Instant::now);
+        {
+            // In batches, so that the committing thread's own lookups
+            // (`guard_contains`) never wait long for this shard.
+            const BATCH: usize = 512;
+            let mine = &mut out.scratch.mine;
+            mine.clear();
+            mine.extend(
+                committed
+                    .iter()
+                    .copied()
+                    .filter(|&k| guard_shard(k, shards) == w),
+            );
+            shared.guard[w]
+                .write()
+                .expect("guard shard")
+                .0
+                .reserve(mine.len());
+            for batch in mine.chunks(BATCH) {
+                let mut shard = shared.guard[w].write().expect("guard shard");
+                let set = &mut shard.0;
+                for &key in batch.iter().take(AHEAD) {
+                    set.prefetch(key);
+                }
+                for (k, &key) in batch.iter().enumerate() {
+                    if let Some(&next) = batch.get(k + AHEAD) {
+                        set.prefetch(next);
+                    }
+                    let present = set.insert(key);
+                    debug_assert!(!present, "committed keys are new");
+                }
+            }
+        }
+        shared.barrier.wait();
+        let t1 = t0.map(|_| Instant::now());
+        out.worker = w;
+        out.lo = lo;
+        out.stride = depth;
+        let lanes = hi - lo;
+        out.lengths.clear();
+        out.lengths.resize(lanes, 0);
+        if out.steps.len() < lanes * depth {
+            out.steps.resize(
+                lanes * depth,
+                LaneStep {
+                    point: PrimePoint::INFINITY,
+                    a: 0,
+                    b: 0,
+                    key: 0,
+                    slot: 0,
+                    miss: LANE_MISS_UNKNOWN,
+                    class: 0,
+                    seen: LANE_SEEN_UNKNOWN,
+                },
+            );
+        }
+        prime_lane_steps(shared, &seeds[lo..hi], &mut out, depth);
+        let t2 = t0.map(|_| Instant::now());
+        {
+            let guards: Vec<_> = shared
+                .guard
+                .iter()
+                .map(|g| g.read().expect("guard shard"))
+                .collect();
+            let shard_of = |key: u64| &guards[guard_shard(key, shards)].0;
+            for i in 0..lanes {
+                let len = out.lengths[i];
+                let chain = &mut out.steps[i * depth..i * depth + len];
+                for step in chain.iter().take(AHEAD) {
+                    shard_of(step.key).prefetch(step.key);
+                    if let Some(table) = shared.miss.as_deref() {
+                        table.prefetch_key(step.key);
+                    }
+                }
+                for k in 0..len {
+                    if let Some(next) = chain.get(k + AHEAD) {
+                        shard_of(next.key).prefetch(next.key);
+                        if let Some(table) = shared.miss.as_deref() {
+                            table.prefetch_key(next.key);
+                        }
+                    }
+                    let step = &mut chain[k];
+                    if step.point.infinity {
+                        continue;
+                    }
+                    step.seen = if shard_of(step.key).contains(step.key) {
+                        LANE_SEEN_YES
+                    } else {
+                        LANE_SEEN_NO
+                    };
+                    if let Some(table) = shared.miss.as_deref() {
+                        step.miss = if table.misses_key(step.key) {
+                            LANE_CERTAIN_MISS
+                        } else {
+                            LANE_MAY_HIT
+                        };
+                    }
+                }
+            }
+        }
+        if let (Some(t0), Some(t1), Some(t2)) = (t0, t1, t2) {
+            LANE_PROF_MERGE_NS.fetch_add(t1.duration_since(t0).as_nanos() as u64, Relaxed);
+            LANE_PROF_ARITH_NS.fetch_add(t2.duration_since(t1).as_nanos() as u64, Relaxed);
+            LANE_PROF_PROBE_NS.fetch_add(t2.elapsed().as_nanos() as u64, Relaxed);
+        }
+        if results.send(out).is_err() {
+            return;
+        }
+    }
+}
+
+/// Step one chunk of lanes `depth` rounds ahead, batching each round's
+/// additions over the chunk's active lanes.
+fn prime_lane_steps(
+    shared: &PrimeLaneShared,
+    seeds: &[Option<LaneSeed<PrimePoint>>],
+    out: &mut PrimeLaneOut,
+    depth: usize,
+) {
+    let (curve, fast, jumps, r) = (&shared.curve, &shared.fast, &shared.jumps[..], shared.r);
+    let PrimeLaneOut {
+        steps,
+        lengths,
+        scratch: sc,
+        ..
+    } = out;
+    sc.active.clear();
+    sc.left.clear();
+    sc.prev.clear();
+    for (i, seed) in seeds.iter().enumerate() {
+        if let Some(seed) = seed {
+            if seed.point.infinity || seed.steps_left == 0 {
+                continue;
+            }
+            sc.active
+                .push((i, seed.a, seed.b, curve.key(&seed.point), seed.steps_left));
+            sc.left.push(Some(fast.point(seed.point.x, seed.point.y)));
+            sc.prev.push(seed.point);
+        }
+    }
+    // `left` holds each active lane's current native point, in `active`
+    // order; the batched addition overwrites it with the next one.
+    for _ in 0..depth {
+        if sc.active.is_empty() {
+            break;
+        }
+        sc.right.clear();
+        sc.slots.clear();
+        for &(i, _, _, key, _) in &sc.active {
+            let perm = &seeds[i]
+                .as_ref()
+                .expect("active lanes are seeded")
+                .permutation;
+            let j = perm[((mix(key) >> 24) as usize) % LANE_JUMPS] as usize;
+            sc.right.push(jumps[j].1);
+            sc.slots.push(j as u8);
+        }
+        fast.add_many_batched(&mut sc.left, &sc.right, &mut sc.batch);
+        let mut keep = 0usize;
+        for idx in 0..sc.active.len() {
+            let (i, a, b, _, left) = sc.active[idx];
+            let j = sc.slots[idx] as usize;
+            let (q, _, aj, bj) = jumps[j];
+            let (a, b) = (addmod(a, aj, r), addmod(b, bj, r));
+            let native = sc.left[idx];
+            let point = match native {
+                Some(pt) => {
+                    let (x, y) = fast.canonical(pt);
+                    PrimePoint::affine(x, y)
+                }
+                None => PrimePoint::INFINITY,
+            };
+            let key = curve.key(&point);
+            let class = prime_lane_class(&sc.prev[idx], &q, &point);
+            steps[i * depth + lengths[i]] = LaneStep {
+                point,
+                a,
+                b,
+                key,
+                slot: j as u8,
+                miss: LANE_MISS_UNKNOWN,
+                class,
+                seen: LANE_SEEN_UNKNOWN,
+            };
+            lengths[i] += 1;
+            let left = left - 1;
+            if !point.infinity && left > 0 {
+                sc.active[keep] = (i, a, b, key, left);
+                sc.left[keep] = native;
+                sc.prev[keep] = point;
+                keep += 1;
+            }
+        }
+        sc.active.truncate(keep);
+        sc.left.truncate(keep);
+        sc.prev.truncate(keep);
+    }
+}
+
+/// `IC_LANE_PROFILE` diagnostics (stderr only; never in a record).
+static LANE_PROF_ARITH_NS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+static LANE_PROF_PROBE_NS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+static LANE_PROF_MERGE_NS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+fn lane_profile_on() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var_os("IC_LANE_PROFILE").is_some())
+}
+
+impl LaneSpeculator<PrimePoint> for PrimeLaneSpeculator {
+    fn launch(&mut self, seeds: &[Option<LaneSeed<PrimePoint>>], depth: usize, committed: &[u64]) {
+        assert_eq!(self.in_flight, 0, "one block in flight");
+        let workers = self.jobs.len();
+        let lanes = seeds.len();
+        self.chunk = lanes.div_ceil(workers).max(1);
+        let seeds = std::sync::Arc::new(seeds.to_vec());
+        let committed = std::sync::Arc::new(committed.to_vec());
+        for (w, tx) in self.jobs.iter().enumerate() {
+            let lo = (w * self.chunk).min(lanes);
+            let hi = (lo + self.chunk).min(lanes);
+            let out = self.spare.pop().unwrap_or_default();
+            tx.send(PrimeLaneJob {
+                seeds: seeds.clone(),
+                committed: committed.clone(),
+                depth,
+                lo,
+                hi,
+                out,
+            })
+            .expect("lane worker alive");
+        }
+        self.in_flight = workers;
+    }
+
+    fn wait(&mut self) {
+        let mut done: Vec<PrimeLaneOut> = Vec::with_capacity(self.in_flight);
+        for _ in 0..self.in_flight {
+            done.push(self.results.recv().expect("lane worker result"));
+        }
+        self.in_flight = 0;
+        done.sort_by_key(|out| out.worker);
+        self.spare.append(&mut self.current);
+        self.current = done;
+    }
+
+    fn chain(&self, lane: usize) -> &[LaneStep<PrimePoint>] {
+        let out = &self.current[lane / self.chunk];
+        let i = lane - out.lo;
+        &out.steps[i * out.stride..i * out.stride + out.lengths[i]]
+    }
+
+    fn guard_contains(&self, key: u64) -> bool {
+        let shards = self.shared.guard.len();
+        self.shared.guard[guard_shard(key, shards)]
+            .read()
+            .expect("guard shard")
+            .0
+            .contains(key)
+    }
+
+    fn add_uncounted(&self, p: PrimePoint, q: PrimePoint) -> (PrimePoint, u8) {
+        let fast = &self.shared.fast;
+        let native = |pt: PrimePoint| (!pt.infinity).then(|| fast.point(pt.x, pt.y));
+        let out = match fast.add(native(p), native(q)) {
+            Some(pt) => {
+                let (x, y) = fast.canonical(pt);
+                PrimePoint::affine(x, y)
+            }
+            None => PrimePoint::INFINITY,
+        };
+        (out, prime_lane_class(&p, &q, &out))
+    }
+
+    fn miss_of_key(&self, key: u64) -> u8 {
+        match self.shared.miss.as_deref() {
+            None => LANE_MISS_UNKNOWN,
+            Some(table) if table.misses_key(key) => LANE_CERTAIN_MISS,
+            Some(_) => LANE_MAY_HIT,
+        }
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
     g: &G,
@@ -13225,8 +13950,22 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
     line_guard: bool,
 ) -> PipelineOutcome {
     collect_and_solve_relations_touching_miss(
-        g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
-        oracle, touch, |_| false, line_guard,
+        g,
+        generator,
+        target,
+        r,
+        h,
+        fb,
+        seed,
+        max_trials,
+        targets,
+        pool_mode,
+        matrix,
+        completion,
+        oracle,
+        touch,
+        |_| false,
+        line_guard,
     )
 }
 
@@ -13255,6 +13994,60 @@ pub fn collect_and_solve_relations_touching_miss<G: CountedGroup, L: RelationSol
     certain_miss: impl Fn(&G::Elt) -> bool,
     line_guard: bool,
 ) -> PipelineOutcome {
+    collect_and_solve_relations_touching_miss_threads(
+        g,
+        generator,
+        target,
+        r,
+        h,
+        fb,
+        seed,
+        max_trials,
+        targets,
+        pool_mode,
+        matrix,
+        completion,
+        oracle,
+        touch,
+        certain_miss,
+        line_guard,
+        1,
+        None,
+    )
+}
+
+/// [`collect_and_solve_relations_touching_miss`] on `threads` workers.
+/// With lane targets (`TargetSource::WalkPrimeLanes`) and `threads > 1`
+/// the lane steps, their keys and, given `miss_table` (the table behind
+/// `certain_miss`, see `DecompositionOracle::miss_table`), their probes
+/// run speculatively on the workers ([`LaneSpeculator`]); everything else
+/// is committed on this thread in the one-thread order, so the outcome,
+/// every counter and every tally equal `threads = 1`'s and only wall
+/// times move.  Other target sources ignore `threads`.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching_miss_threads<
+    G: CountedGroup,
+    L: RelationSolver + ?Sized,
+>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    certain_miss: impl Fn(&G::Elt) -> bool,
+    line_guard: bool,
+    threads: usize,
+    miss_table: Option<std::sync::Arc<PairTable>>,
+) -> PipelineOutcome {
     let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
     if line_guard {
         collect_and_solve_relations_scaled_touching(
@@ -13275,6 +14068,8 @@ pub fn collect_and_solve_relations_touching_miss<G: CountedGroup, L: RelationSol
             touch,
             certain_miss,
             GuardLineSet::with_capacity(capacity),
+            threads,
+            miss_table,
         )
     } else {
         collect_and_solve_relations_scaled_touching(
@@ -13295,6 +14090,8 @@ pub fn collect_and_solve_relations_touching_miss<G: CountedGroup, L: RelationSol
             touch,
             certain_miss,
             fast_map(capacity),
+            threads,
+            miss_table,
         )
     }
 }
@@ -13338,6 +14135,8 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         |_| {},
         |_| false,
         fast_map(if targets.is_guarded() { 1 << 12 } else { 0 }),
+        1,
+        None,
     )
 }
 
@@ -13364,6 +14163,8 @@ fn collect_and_solve_relations_scaled_touching<
     touch: impl Fn(&G::Elt),
     certain_miss: impl Fn(&G::Elt) -> bool,
     mut seen: R,
+    threads: usize,
+    miss_table: Option<std::sync::Arc<PairTable>>,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
     let mut rel = PhaseCost::default();
@@ -13560,6 +14361,57 @@ fn collect_and_solve_relations_scaled_touching<
         }
     }
 
+    // `threads > 1` on lane targets: speculative lane steps on workers,
+    // committed below in this loop's order ([`LaneSpeculator`]).  `None`
+    // is the one-thread loop, untouched.
+    let mut speculator = match lane_config {
+        Some((_, batched)) if threads > 1 && jumps.len() == LANE_JUMPS => {
+            g.lane_speculator(threads, batched, &jumps, r, miss_table)
+        }
+        _ => None,
+    };
+    // Rounds per speculative block (wall only): enough lane steps per
+    // block to amortise waking the workers.
+    let spec_depth = std::env::var("IC_LANE_DEPTH")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .filter(|&d| d > 0)
+        .unwrap_or_else(|| (2048 / lanes.len().max(1)).clamp(16, 256));
+    let mut spec_t = spec_depth;
+    let mut spec_start = vec![0usize; lanes.len()];
+    let mut spec_valid = vec![false; lanes.len()];
+    let mut spec_pre = vec![false; lanes.len()];
+    let mut lane_keys: Vec<u64> = Vec::with_capacity(lanes.len());
+    let mut lane_miss: Vec<u8> = Vec::with_capacity(lanes.len());
+    let mut tally = LaneTally::new(
+        lane_config.is_some_and(|(_, batched)| batched),
+        lanes.len(),
+        2 * jump_count,
+    );
+    // The guard of a speculated run: keys committed before the open block
+    // live in the speculator's sharded guard (looked up by the workers),
+    // the block's own in `block_guard`; `committed_keys` go to the
+    // speculator at the next block.  A key is a repeat exactly when the
+    // one-thread guard would call it one.
+    let mut committed_keys: Vec<u64> = Vec::new();
+    let block_capacity = if speculator.is_some() {
+        lanes.len() * spec_depth
+    } else {
+        0
+    };
+    let mut block_guard = GuardLineSet::with_capacity(block_capacity);
+    let mut prev_guard = GuardLineSet::with_capacity(block_capacity);
+    let mut spec_launched = false;
+    let mut spec_own = vec![true; lanes.len()];
+    let mut own_chains: Vec<Vec<LaneStep<G::Elt>>> = vec![Vec::new(); lanes.len()];
+    let mut pred_seeds: Vec<Option<LaneSeed<G::Elt>>> = vec![None; lanes.len()];
+    let mut next_seeds: Vec<Option<LaneSeed<G::Elt>>> = Vec::with_capacity(lanes.len());
+    let mut prof_own_ns = 0u64;
+    let mut prof_locked = 0u64;
+    let mut lane_seen: Vec<u8> = Vec::with_capacity(lanes.len());
+    let lane_profile = speculator.is_some() && std::env::var_os("IC_LANE_PROFILE").is_some();
+    let (mut prof_spec_ns, mut prof_round_ns, mut prof_blocks) = (0u64, 0u64, 0u64);
+
     while trials < max_trials {
         // Exclusive phase marks (no-ops without an `ic_measurement`
         // session): drawing the target-dependent query point.  The mark
@@ -13568,7 +14420,277 @@ fn collect_and_solve_relations_scaled_touching<
         // whichever phase the previous trial ended in (`target_pdp`
         // after a miss).  Only wall fields move.
         measurement::mark(measurement::Phase::TargetQuery);
-        if lane_config.is_some() && lane_head == lane_queue.len() {
+        if let (Some(spec), true) = (speculator.as_deref_mut(), lane_head == lane_queue.len()) {
+            // The parallel form of the round below: the same requests, in
+            // the same order, with the same tallies (see `LaneSpeculator`).
+            lane_queue.clear();
+            lane_head = 0;
+            lane_keys.clear();
+            lane_miss.clear();
+            lane_seen.clear();
+            let round_started = lane_profile.then(Instant::now);
+            // A restart, exactly the one-thread round's (shared RNG and
+            // pool); its pool addition is computed here and tallied.
+            macro_rules! par_restart {
+                ($index:expr) => {{
+                    let index = $index;
+                    let lane = &mut lanes[index];
+                    if lane.restarts == 0 {
+                        rng_draws += 2;
+                        lane.a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                        lane.b = rng.gen_range(1..r);
+                        let ag = g.mul(&mut rel.group_ops, generator, lane.a);
+                        let bq = g.mul(&mut rel.group_ops, target, lane.b);
+                        lane.point = g.add(&mut rel.group_ops, ag, bq);
+                    } else {
+                        let pool_index = (pool_taken as usize) % pool_count;
+                        pool_taken += 1;
+                        if pool_index == pool.len() {
+                            let off = draw_pool_offset(
+                                g,
+                                generator,
+                                target,
+                                r,
+                                &mut pool_rng,
+                                &mut rel.group_ops,
+                                &mut pool_ops,
+                                &mut scale,
+                            );
+                            pool.push(off);
+                        }
+                        let (offset, oa, ob) = pool[pool_index];
+                        let (out, class) = spec.add_uncounted(lane.point, offset);
+                        let slot = jump_count + pool_index;
+                        tally.request(index, &lane.point, &offset, slot, &out, class, false);
+                        native_walk_calls += 1;
+                        lane.point = out;
+                        lane.a = addmod(lane.a, oa, r);
+                        lane.b = addmod(lane.b, ob, r);
+                        walk_modr_adds += 2;
+                        for i in (1..jump_count).rev() {
+                            lane.permutation.swap(i, rng.gen_range(0..i + 1));
+                        }
+                        rng_draws += jump_count as u64 - 1;
+                    }
+                    lane.fresh = false;
+                    lane.restarts += 1;
+                    walk_restarts += 1;
+                    lane.segment_steps = 0;
+                }};
+            }
+            if spec_t >= spec_depth {
+                // A new block opens with this round.  Its restarts are the
+                // round's first users of the RNG, in lane order, so they
+                // are done now (while the workers finish the block's
+                // chains) and the restarted lanes step from round 1 on.
+                for index in 0..lanes.len() {
+                    let lane = &lanes[index];
+                    spec_pre[index] = lane.fresh || lane.segment_steps >= segment_cap;
+                    if spec_pre[index] {
+                        par_restart!(index);
+                    }
+                }
+                // The workers' chains for this block, launched at the last
+                // block's start from that block's predicted ends.
+                let wait_started = lane_profile.then(Instant::now);
+                if spec_launched {
+                    spec.wait();
+                }
+                if let Some(t0) = wait_started {
+                    prof_spec_ns += t0.elapsed().as_nanos() as u64;
+                    prof_blocks += 1;
+                }
+                // A lane whose state is not the predicted one (it
+                // restarted, or this is the first block) gets its chain
+                // formed here, from its state, the same way.
+                let own_started = lane_profile.then(Instant::now);
+                for index in 0..lanes.len() {
+                    spec_start[index] = usize::from(spec_pre[index]);
+                    let lane = &lanes[index];
+                    let predicted = spec_launched
+                        && !spec_pre[index]
+                        && pred_seeds[index].is_some_and(|seed: LaneSeed<G::Elt>| {
+                            seed.point == lane.point && seed.a == lane.a && seed.b == lane.b
+                        });
+                    spec_own[index] = !predicted;
+                    spec_valid[index] = true;
+                    if predicted {
+                        continue;
+                    }
+                    let chain = &mut own_chains[index];
+                    chain.clear();
+                    if g.is_identity(&lane.point) || lane.segment_steps >= segment_cap {
+                        continue;
+                    }
+                    let steps = (spec_depth - spec_start[index])
+                        .min((segment_cap - lane.segment_steps) as usize);
+                    let (mut point, mut pa, mut pb) = (lane.point, lane.a, lane.b);
+                    for _ in 0..steps {
+                        let j =
+                            lane.permutation[((mix(g.key(&point)) >> 24) as usize) % jump_count];
+                        let (jump, aj, bj) = jumps[j];
+                        let (out, class) = spec.add_uncounted(point, jump);
+                        pa = addmod(pa, aj, r);
+                        pb = addmod(pb, bj, r);
+                        let key = g.key(&out);
+                        let identity = g.is_identity(&out);
+                        chain.push(LaneStep {
+                            point: out,
+                            a: pa,
+                            b: pb,
+                            key,
+                            slot: j as u8,
+                            miss: if identity {
+                                LANE_MISS_UNKNOWN
+                            } else {
+                                spec.miss_of_key(key)
+                            },
+                            class,
+                            // No block is in flight here (the last one was
+                            // waited for, the next is not launched), so the
+                            // guard is read without waiting on a worker.
+                            seen: if identity {
+                                LANE_SEEN_UNKNOWN
+                            } else if spec.guard_contains(key) {
+                                LANE_SEEN_YES
+                            } else {
+                                LANE_SEEN_NO
+                            },
+                        });
+                        if identity {
+                            break;
+                        }
+                        point = out;
+                    }
+                }
+                // The next block's seeds: each lane's state after this
+                // block, if this block's chain reaches its end.
+                next_seeds.clear();
+                for (index, lane) in lanes.iter().enumerate() {
+                    let chain = if spec_own[index] {
+                        &own_chains[index][..]
+                    } else {
+                        spec.chain(index)
+                    };
+                    let need = spec_depth - spec_start[index];
+                    let seed = (need > 0 && chain.len() >= need)
+                        .then(|| chain[need - 1])
+                        .filter(|last| !g.is_identity(&last.point))
+                        .and_then(|last| {
+                            let segment = lane.segment_steps + need as u64;
+                            (segment < segment_cap).then(|| {
+                                let mut permutation = [0u8; LANE_JUMPS];
+                                for (slot, &j) in permutation.iter_mut().zip(&lane.permutation) {
+                                    *slot = j as u8;
+                                }
+                                LaneSeed {
+                                    point: last.point,
+                                    a: last.a,
+                                    b: last.b,
+                                    steps_left: segment_cap - segment,
+                                    permutation,
+                                }
+                            })
+                        });
+                    next_seeds.push(seed);
+                }
+                if let Some(t0) = own_started {
+                    prof_own_ns += t0.elapsed().as_nanos() as u64;
+                }
+                // The workers take the next block while this one is
+                // committed, and with it the keys of the last block.
+                spec.launch(&next_seeds, spec_depth, &committed_keys);
+                spec_launched = true;
+                committed_keys.clear();
+                std::mem::swap(&mut pred_seeds, &mut next_seeds);
+                std::mem::swap(&mut prev_guard, &mut block_guard);
+                block_guard.clear();
+                spec_t = 0;
+            }
+            let t = spec_t;
+            spec_t += 1;
+            // Each lane's step (or restart), then at once its queue entry:
+            // the round's trials start only after every lane, and the
+            // queue order is the lane order, as in the one-thread round.
+            for index in 0..lanes.len() {
+                let (key, miss, was_seen) = if t == 0 && spec_pre[index] {
+                    (None, LANE_MISS_UNKNOWN, LANE_SEEN_UNKNOWN)
+                } else if lanes[index].fresh || lanes[index].segment_steps >= segment_cap {
+                    spec_valid[index] = false;
+                    par_restart!(index);
+                    (None, LANE_MISS_UNKNOWN, LANE_SEEN_UNKNOWN)
+                } else {
+                    let lane = &mut lanes[index];
+                    let out = if spec_valid[index] {
+                        let k = t - spec_start[index];
+                        let chain = if spec_own[index] {
+                            &own_chains[index][..]
+                        } else {
+                            spec.chain(index)
+                        };
+                        let step = *chain.get(k).expect("a valid chain covers its block");
+                        let slot = step.slot as usize;
+                        // Past a chain's first step, `p` is the lane's
+                        // previous output by construction.
+                        tally.request(
+                            index,
+                            &lane.point,
+                            &jumps[slot].0,
+                            slot,
+                            &step.point,
+                            step.class,
+                            k > 0,
+                        );
+                        lane.point = step.point;
+                        lane.a = step.a;
+                        lane.b = step.b;
+                        (Some(step.key), step.miss, step.seen)
+                    } else {
+                        let j = lane.permutation
+                            [((mix(g.key(&lane.point)) >> 24) as usize) % jump_count];
+                        let (jump, aj, bj) = jumps[j];
+                        let (out, class) = spec.add_uncounted(lane.point, jump);
+                        tally.request(index, &lane.point, &jump, j, &out, class, false);
+                        lane.point = out;
+                        lane.a = addmod(lane.a, aj, r);
+                        lane.b = addmod(lane.b, bj, r);
+                        (None, LANE_MISS_UNKNOWN, LANE_SEEN_UNKNOWN)
+                    };
+                    native_walk_calls += 1;
+                    walk_modr_adds += 2;
+                    walk_mix_hashes += 1;
+                    lane.segment_steps += 1;
+                    walk_steps += 1;
+                    out
+                };
+                let lane = &mut lanes[index];
+                if g.is_identity(&lane.point) {
+                    lane.fresh = true;
+                    direct_skipped += 1;
+                } else {
+                    let (key, miss) = match key {
+                        Some(key) => (key, miss),
+                        None => {
+                            let key = g.key(&lane.point);
+                            (key, spec.miss_of_key(key))
+                        }
+                    };
+                    lane_queue.push((index, lane.point, lane.a, lane.b));
+                    lane_keys.push(key);
+                    lane_miss.push(miss);
+                    lane_seen.push(was_seen);
+                    lane_prepared += 1;
+                    if R::PREFETCH && miss != LANE_CERTAIN_MISS {
+                        touch(&lane.point);
+                    }
+                }
+            }
+            tally.end_round(&mut rel.group_ops);
+            lane_rounds += 1;
+            if let Some(t0) = round_started {
+                prof_round_ns += t0.elapsed().as_nanos() as u64;
+            }
+        } else if lane_config.is_some() && lane_head == lane_queue.len() {
             lane_queue.clear();
             lane_head = 0;
             lane_requests.clear();
@@ -13653,6 +14775,43 @@ fn collect_and_solve_relations_scaled_touching<
             }
             lane_rounds += 1;
         }
+        // The speculated round's run of certain misses, in a tight loop:
+        // each is exactly the trial below (count, guard, one lookup)
+        // without the per-trial dispatch.  A target the oracle must see,
+        // or one whose answer is not known, goes the general way.
+        if let Some(spec) = speculator.as_deref() {
+            while lane_head < lane_queue.len()
+                && lane_miss[lane_head] == LANE_CERTAIN_MISS
+                && trials < max_trials
+            {
+                let slot = lane_head;
+                lane_head += 1;
+                trials += 1;
+                guard_probes += 1;
+                let key = lane_keys[slot];
+                let before = match lane_seen[slot] {
+                    LANE_SEEN_NO => false,
+                    LANE_SEEN_YES => true,
+                    _ => {
+                        prof_locked += 1;
+                        spec.guard_contains(key)
+                    }
+                };
+                if before || prev_guard.contains(key) || block_guard.insert(key) {
+                    repeats_skipped += 1;
+                    lanes[lane_queue[slot].0].fresh = true;
+                    continue;
+                }
+                committed_keys.push(key);
+                ctr.lookups += 1;
+            }
+            if lane_head == lane_queue.len() || trials >= max_trials {
+                continue;
+            }
+        }
+        // The queued slot of a speculated lane target: its key and table
+        // answer were formed by the workers.
+        let mut par_slot: Option<usize> = None;
         let (point, a, b, lane_id) = match targets {
             TargetSource::Random | TargetSource::RandomUnguarded => {
                 rng_draws += 2;
@@ -13795,6 +14954,9 @@ fn collect_and_solve_relations_scaled_touching<
             }
             TargetSource::WalkPrimeLanes { .. } => {
                 let (lane, point, a, b) = *lane_queue.get(lane_head).expect("nonempty lane round");
+                if speculator.is_some() {
+                    par_slot = Some(lane_head);
+                }
                 lane_head += 1;
                 (point, a, b, Some(lane))
             }
@@ -13805,7 +14967,26 @@ fn collect_and_solve_relations_scaled_touching<
         // pin the logarithm by collision rather than by relation.
         if guarded && !defer_guard {
             guard_probes += 1;
-            if seen.insert_duplicate(g.key(&point)) {
+            let repeat = match (par_slot, speculator.as_deref()) {
+                (Some(slot), Some(spec)) => {
+                    let key = lane_keys[slot];
+                    let before = match lane_seen[slot] {
+                        LANE_SEEN_NO => false,
+                        LANE_SEEN_YES => true,
+                        _ => {
+                            prof_locked += 1;
+                            spec.guard_contains(key)
+                        }
+                    };
+                    let repeat = before || prev_guard.contains(key) || block_guard.insert(key);
+                    if !repeat {
+                        committed_keys.push(key);
+                    }
+                    repeat
+                }
+                _ => seen.insert_duplicate(g.key(&point)),
+            };
+            if repeat {
                 repeats_skipped += 1;
                 if let Some(index) = lane_id {
                     lanes[index].fresh = true;
@@ -13817,8 +14998,21 @@ fn collect_and_solve_relations_scaled_touching<
                 continue;
             }
         }
+        // A speculated target the workers already probed and found absent
+        // is the miss below without its phase boundary: its probe's wall
+        // was spent in the block (`target_query`), so this trial never
+        // enters `target_pdp`.  Counters as below.
+        if let Some(LANE_CERTAIN_MISS) = par_slot.map(|slot| lane_miss[slot]) {
+            ctr.lookups += 1;
+            continue;
+        }
         measurement::mark(measurement::Phase::TargetPdp);
-        if certain_miss(&point) {
+        let missed = match par_slot.map(|slot| lane_miss[slot]) {
+            Some(LANE_CERTAIN_MISS) => true,
+            Some(LANE_MAY_HIT) => false,
+            _ => certain_miss(&point),
+        };
+        if missed {
             // Exactly the oracle call's effect on a miss.
             ctr.lookups += 1;
             continue;
@@ -13950,6 +15144,21 @@ fn collect_and_solve_relations_scaled_touching<
         }
     }
     rel.wall_ns = rel_start.elapsed().as_nanos() as u64 - la_ns - ver.wall_ns;
+    if lane_profile {
+        let rel_ns = rel.wall_ns;
+        eprintln!(
+            "ic-lanes threads={threads} lanes={} depth={spec_depth} blocks={prof_blocks} \
+             relations_ns={rel_ns} speculate_ns={prof_spec_ns} \
+             own_chain_ns={prof_own_ns} locked_lookups={prof_locked} round_commit_ns={} trial_commit_ns={} \
+             worker_arith_ns={} worker_probe_ns={} guard_merge_ns={}",
+            lanes.len(),
+            prof_round_ns.saturating_sub(prof_spec_ns + prof_own_ns),
+            rel_ns.saturating_sub(prof_round_ns),
+            LANE_PROF_ARITH_NS.load(std::sync::atomic::Ordering::Relaxed),
+            LANE_PROF_PROBE_NS.load(std::sync::atomic::Ordering::Relaxed),
+            LANE_PROF_MERGE_NS.load(std::sync::atomic::Ordering::Relaxed),
+        );
+    }
     rel.count("trials", trials);
     rel.count("relations", found);
     rel.count("lookups", ctr.lookups);
@@ -13989,7 +15198,10 @@ fn collect_and_solve_relations_scaled_touching<
             rel.count("lane_batch_inversion", u64::from(batched));
             rel.count("lane_rounds", lane_rounds);
             rel.count("lane_prepared", lane_prepared);
-            rel.count("lane_unused_prepared", (lane_queue.len() - lane_head) as u64);
+            rel.count(
+                "lane_unused_prepared",
+                (lane_queue.len() - lane_head) as u64,
+            );
             let reductions = rel.group_ops.montgomery_reductions;
             rel.count("montgomery_reductions", reductions);
             rel.count(
@@ -18305,6 +19517,101 @@ mod tests {
                 "{label}"
             );
         }
+    }
+
+    /// `threads > 1` on lane targets (speculative lane steps, serial
+    /// commit) changes no decision and no tally: the oracle sees the same
+    /// stream and every counter, ledger and answer equals one thread's, for
+    /// both guards, with and without the workers' table probes, batched and
+    /// serial lanes, and a lane count that does not divide by the workers.
+    #[test]
+    fn lane_threads_keep_every_counted_output() {
+        let inst = prime_instance_for(20, 59297);
+        let curve = &inst.curve;
+        let generator = inst.generator_point();
+        let mut setup = GroupOps::default();
+        let target = curve.mul(&mut setup, generator, 4321);
+        let fb = prime_factor_base(&inst, 64);
+        let map = std::sync::Arc::new(PairTable::build_negation_folded(curve, &fb));
+        let lines = std::sync::Arc::new(PairTable::build_negation_folded_lines(curve, &fb));
+        let mut repeats_seen = 0u64;
+        for (lanes, batched) in [(16u16, true), (16, false), (5, true), (64, true)] {
+            let source = TargetSource::WalkPrimeLanes { lanes, batched };
+            for (table, line_guard) in [(&map, false), (&lines, true)] {
+                for probe_on_workers in [false, true] {
+                    let run = |threads: usize| {
+                        let mut stream = Vec::new();
+                        let mut matrix = IncrementalGauss::new(fb.columns + 1, inst.r);
+                        let outcome = collect_and_solve_relations_touching_miss_threads(
+                            curve,
+                            generator,
+                            target,
+                            inst.r,
+                            inst.cofactor,
+                            &fb,
+                            20261031,
+                            1 << 22,
+                            source,
+                            RestartPool::Lazy,
+                            &mut matrix,
+                            CompletionRule::TargetPinned,
+                            |ops, counters, point, a, b| {
+                                stream.push((point, a, b));
+                                decompose_mitm(curve, &fb, table, 2, ops, counters, point)
+                                    .map(|summands| vec![Relation::Summands(summands)])
+                                    .unwrap_or_default()
+                            },
+                            |point| table.prefetch(curve, point),
+                            |point| table.misses(curve, point),
+                            line_guard,
+                            threads,
+                            probe_on_workers.then(|| table.clone()),
+                        );
+                        (stream, outcome)
+                    };
+                    let (one_stream, one) = run(1);
+                    repeats_seen += one
+                        .relations
+                        .native
+                        .get("repeated_targets_skipped")
+                        .copied()
+                        .unwrap_or(0);
+                    assert!(one.verified, "lanes={lanes} batched={batched}");
+                    for threads in [2, 4] {
+                        let tag = format!(
+                            "lanes={lanes} batched={batched} lines={line_guard} \
+                             probe={probe_on_workers} threads={threads}"
+                        );
+                        let (stream, par) = run(threads);
+                        assert_eq!(stream, one_stream, "{tag}: oracle stream");
+                        assert_eq!(par.recovered, one.recovered, "{tag}");
+                        assert_eq!(par.verified, one.verified, "{tag}");
+                        assert_eq!(par.trials, one.trials, "{tag}");
+                        assert_eq!(par.relations_found, one.relations_found, "{tag}");
+                        assert_eq!(par.independent, one.independent, "{tag}");
+                        assert_eq!(par.rank, one.rank, "{tag}");
+                        assert_eq!(par.relations.native, one.relations.native, "{tag}");
+                        assert_eq!(
+                            par.relations.work_native, one.relations.work_native,
+                            "{tag}"
+                        );
+                        assert_eq!(par.relations.group_ops, one.relations.group_ops, "{tag}");
+                        assert_eq!(
+                            par.linear_algebra.native, one.linear_algebra.native,
+                            "{tag}"
+                        );
+                        assert_eq!(
+                            par.linear_algebra.work_native, one.linear_algebra.work_native,
+                            "{tag}"
+                        );
+                        assert_eq!(par.verify.group_ops, one.verify.group_ops, "{tag}");
+                        assert_eq!(par.counters.lookups, one.counters.lookups, "{tag}");
+                    }
+                }
+            }
+        }
+        // The runs above exercise the guard's repeat path (restarted lanes).
+        assert!(repeats_seen > 0, "no repeated target in any run");
     }
 
     #[test]

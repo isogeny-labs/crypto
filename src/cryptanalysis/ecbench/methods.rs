@@ -1780,6 +1780,32 @@ fn normalise_param(name: &str, default: Option<&str>, value: &str) -> String {
     }
 }
 
+/// `ic.pipeline`'s execution-only parameter: worker threads for the lane
+/// relation walks (`targets=walk-prime-batch-K` / `walk-prime-serial-K`),
+/// default 1.  Lane steps and pair-table probes run speculatively on that
+/// many workers and are committed in the one-thread order, so every
+/// counted output is the one-thread run's and only wall fields move
+/// (`ic_boundary::LaneSpeculator`).  It is not part of the method id.
+pub const EXECUTION_THREADS_PARAM: &str = "threads";
+const MAX_EXECUTION_THREADS: u64 = 256;
+
+/// The `threads` value of a method that takes it (`None` for one that
+/// does not, which then refuses the parameter as unknown).
+fn execution_threads(id: &str, params: &BTreeMap<String, String>) -> Result<Option<u64>, String> {
+    if id != "ic.pipeline" {
+        return Ok(None);
+    }
+    match params.get(EXECUTION_THREADS_PARAM) {
+        None => Ok(Some(1)),
+        Some(v) => match v.trim_start_matches('+').parse::<u64>() {
+            Ok(n) if (1..=MAX_EXECUTION_THREADS).contains(&n) => Ok(Some(n)),
+            _ => Err(format!(
+                "method `{id}`: threads must be an integer in 1..={MAX_EXECUTION_THREADS}, not `{v}`"
+            )),
+        },
+    }
+}
+
 /// Fill defaults, normalise integer-valued parameters to canonical
 /// decimal, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
@@ -1801,7 +1827,14 @@ pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
         let ids: Vec<&str> = registry().iter().map(|m| m.id).collect();
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
+    // Execution-only parameters change where the work runs, never what
+    // is computed or counted, so they stay out of the identity: the
+    // method id, its hash and the algorithm seed are the one-thread run's.
+    let threads = execution_threads(d.id, &spec.params)?;
     for k in spec.params.keys() {
+        if threads.is_some() && k == EXECUTION_THREADS_PARAM {
+            continue;
+        }
         if !d.params.iter().any(|p| p.name == k) {
             return Err(format!("method `{}` has no parameter `{k}`", d.id));
         }
@@ -1827,6 +1860,11 @@ pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
         "ECM1",
         &json!({"schema": "ecbench.method/v1", "id": d.id, "params": params}),
     )?;
+    // Carried to the child (and shown in the record) only when it is not
+    // the default, so a one-thread method resolves exactly as before.
+    if let Some(n) = threads.filter(|&n| n != 1) {
+        params.insert(EXECUTION_THREADS_PARAM.to_string(), n.to_string());
+    }
     Ok(ResolvedMethod {
         id: d.id.into(),
         family: d.family.into(),
@@ -6660,6 +6698,11 @@ fn pipeline_spec(m: &ResolvedMethod, seed: u64) -> Result<(PipelineSpec, String,
         seed,
         solver_budget_seconds: param_u64(m, "solver_budget_seconds")?,
     };
+    // Execution only (see `EXECUTION_THREADS_PARAM`): the next pipeline
+    // run on this thread takes it.
+    crate::cryptanalysis::ic_framework::set_relation_threads(
+        execution_threads(&m.id, &m.params)?.unwrap_or(1) as usize,
+    );
     Ok((spec, fb_name, or_name))
 }
 

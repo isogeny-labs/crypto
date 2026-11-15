@@ -2197,7 +2197,9 @@ impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
 pub struct MitmOracle {
     m: u32,
     lines: bool,
-    table: Option<PairTable>,
+    /// Shared so that the relation loop's parallel lane workers can probe
+    /// it read-only ([`DecompositionOracle::miss_table`]).
+    table: Option<std::sync::Arc<PairTable>>,
 }
 
 impl MitmOracle {
@@ -2267,14 +2269,14 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
         };
         // The table's construction is part of the pipeline's cost.
         ops.merge(table.build_ops);
-        self.table = Some(table);
+        self.table = Some(std::sync::Arc::new(table));
         Ok(())
     }
 
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
         table_counted(
             self.table
-                .as_ref()
+                .as_deref()
                 .map(PairTable::work_counters)
                 .unwrap_or_default(),
         )
@@ -2312,6 +2314,14 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
 
     fn line_guard(&self) -> bool {
         self.lines
+    }
+
+    fn miss_table(&self) -> Option<std::sync::Arc<PairTable>> {
+        if self.m == 2 {
+            self.table.clone()
+        } else {
+            None
+        }
     }
 }
 
@@ -2982,7 +2992,7 @@ pub fn wwalk_cv(params: &Params) -> Result<bool, String> {
 pub struct PrimeBatchMitmOracle {
     blocked: bool,
     lines: bool,
-    table: Option<PairTable>,
+    table: Option<std::sync::Arc<PairTable>>,
 }
 
 impl PrimeBatchMitmOracle {
@@ -3099,14 +3109,14 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
             PairTable::build_negation_folded_prime_batch(ctx.group, fb)?
         };
         ops.merge(table.build_ops);
-        self.table = Some(table);
+        self.table = Some(std::sync::Arc::new(table));
         Ok(())
     }
 
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
         table_counted(
             self.table
-                .as_ref()
+                .as_deref()
                 .map(PairTable::work_counters)
                 .unwrap_or_default(),
         )
@@ -3120,7 +3130,15 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         counters: &mut OracleCounters,
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
-        decompose_mitm(ctx.group, fb, self.table.as_ref()?, 2, ops, counters, point)
+        decompose_mitm(
+            ctx.group,
+            fb,
+            self.table.as_deref()?,
+            2,
+            ops,
+            counters,
+            point,
+        )
     }
 
     fn touch(&self, ctx: &InstanceCtx<PrimeCurve>, point: &PrimePoint) {
@@ -3129,8 +3147,20 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         }
     }
 
+    /// `decompose` is one [`PairTable::probe`] (`m = 2` always): an
+    /// absent key is exactly "no relation, one lookup", as for `mitm`.
+    fn certain_miss(&self, ctx: &InstanceCtx<PrimeCurve>, point: &PrimePoint) -> bool {
+        self.table
+            .as_ref()
+            .is_some_and(|table| table.misses(ctx.group, point))
+    }
+
     fn line_guard(&self) -> bool {
         self.lines
+    }
+
+    fn miss_table(&self) -> Option<std::sync::Arc<PairTable>> {
+        self.table.clone()
     }
 }
 

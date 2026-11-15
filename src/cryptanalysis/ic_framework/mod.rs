@@ -90,7 +90,7 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations_touching_miss, price_phase, Calibration, CompletionRule,
+    collect_and_solve_relations_touching_miss_threads, price_phase, Calibration, CompletionRule,
     CountedGroup, FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver,
     RestartPool, TargetSource,
 };
@@ -384,6 +384,26 @@ pub fn run_pipeline<G: CountedGroup>(
         .map(|(report, _)| report)
 }
 
+thread_local! {
+    static RELATION_THREADS: std::cell::Cell<usize> = const { std::cell::Cell::new(1) };
+}
+
+/// Worker threads for the **next** `run_pipeline*` call on this thread
+/// (ecbench's `ic.pipeline` parameter `threads`, default 1).  Only the
+/// lane walks (`walk-prime-batch-K`, `walk-prime-serial-K`) use it: their
+/// lane steps and table probes are computed speculatively on `n` workers
+/// and committed in the one-thread order, so every counted output (rows,
+/// counters, cost, `recovered`) is the `n = 1` run's and only wall fields
+/// move.  The run takes the value and resets it to 1, so it cannot leak
+/// into a later run.
+pub fn set_relation_threads(n: usize) {
+    RELATION_THREADS.with(|c| c.set(n.max(1)));
+}
+
+fn take_relation_threads() -> usize {
+    RELATION_THREADS.with(|c| c.replace(1))
+}
+
 /// [`run_pipeline`], also returning the factor base it built and used,
 /// for a caller that describes the base afterwards (its point digest,
 /// column count): rebuilding it would repeat the whole build outside the
@@ -399,6 +419,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     rho_s: Option<f64>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
+    let relation_threads = take_relation_threads();
 
     // ── Stage 1: the factor base ───────────────────────────────────
     //
@@ -566,6 +587,14 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             lanes: 16,
             batched: true,
         },
+        Targets::WalkPrimeBatch32 => TargetSource::WalkPrimeLanes {
+            lanes: 32,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch64 => TargetSource::WalkPrimeLanes {
+            lanes: 64,
+            batched: true,
+        },
         Targets::WalkPrimeBatch256 => TargetSource::WalkPrimeLanes {
             lanes: 256,
             batched: true,
@@ -637,8 +666,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         // recorded run took; the large-prime collector returns merged
         // rows through the same call.
         let line_guard = oracle.line_guard();
+        let miss_table = oracle.miss_table();
         let oracle_cell = std::cell::RefCell::new(&mut *oracle);
-        collect_and_solve_relations_touching_miss(
+        collect_and_solve_relations_touching_miss_threads(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -659,6 +689,8 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             |point| oracle_cell.borrow().touch(ctx, point),
             |point| oracle_cell.borrow().certain_miss(ctx, point),
             line_guard,
+            relation_threads,
+            miss_table,
         )
     };
     for (name, value) in oracle.relation_counters() {
