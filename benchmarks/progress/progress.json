@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0031Z-genus-ladder-bound-r",
+  "latest_record": "20261114T2258Z-ic-gpu-rootfind-ic",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 168,
+    "measured": 171,
     "open": 0
   },
   "repo": "crypto",
@@ -3341,38 +3341,6 @@
     },
     {
       "better": "lower",
-      "first": 0.0312,
-      "latest": 0.0312,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 0.0312
-      },
-      "metric": "fpm_mid_ic_over_rho_g4_p8209_c_pre",
-      "points": [
-        {
-          "commit": "e5e38c533efc",
-          "date": "2026-11-15",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 0.0312
-          },
-          "n": 6,
-          "record": "20261115T0031Z-genus-ladder-bound-r",
-          "reference": 1.0,
-          "reference_kind": "matched_rho",
-          "spread": [
-            0.018,
-            0.0615
-          ],
-          "summary": "Genus ladder follow-up: r bound to p (h<=2), genus 4 and plane quartics at p=2053..8209; 108 runs all certified; replay by validator agent on the same shared host; pre-gate.",
-          "value": 0.0312
-        }
-      ],
-      "problem": "hcdlp:genus_ladder",
-      "unit": "ratio"
-    },
-    {
-      "better": "lower",
       "first": 0.64,
       "latest": 0.64,
       "latest_derived": {
@@ -3814,6 +3782,93 @@
     },
     {
       "better": "lower",
+      "first": 0.246,
+      "latest": 0.246,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.217314
+      },
+      "metric": "ic_rf2_relations_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.217314
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.246
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 26009.6,
+      "latest": 26009.6,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 22976.678445
+      },
+      "metric": "ic_rf2_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 22976.678445
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 26009.6
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.643,
+      "latest": 0.643,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.568021
+      },
+      "metric": "ic_rf2_solve_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.568021
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.643
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.1769,
       "latest": 0.1769,
       "latest_derived": {
@@ -3946,6 +4001,33 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.312,
+      "latest": 1.312,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_eyt_prefetch_d5_sorted_c16_ratio",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 1.312
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
     },
     {
       "better": "lower",
@@ -7636,6 +7718,243 @@
       ],
       "problem": "ic:ghs-weak-quartic-dl-k12-22",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 94.42,
+      "latest": 94.42,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_g155_over_ref_w0_h0_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            93.21,
+            95.41
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 94.42
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 101.94,
+      "latest": 101.94,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_g155_over_ref_w1_h0.1_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            101.06,
+            103.1
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 101.94
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 99.5,
+      "latest": 99.5,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_g160_over_ref_w0_h0_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            98.04,
+            104.18
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 99.5
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 100.43,
+      "latest": 100.43,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_g160_over_ref_w1_h0.1_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            99.95,
+            100.77
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 100.43
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 113.32,
+      "latest": 113.32,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "total_cpu_dl_g155_over_ref_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            105.86,
+            119.14
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 113.32
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 112.66,
+      "latest": 112.66,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "total_cpu_dl_g160_over_ref_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            103.86,
+            128.08
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 112.66
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 84.74,
+      "latest": 84.74,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "relations_cpu_chain_over_ref_geomean",
+      "points": [
+        {
+          "commit": "7f8e80c1f38f",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2206Z-ic-gw-sqrt-compiled",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            65.45,
+            94.38
+          ],
+          "summary": "compiled sqrt chain at c_D=1.7, L0: relations.cpu 0.65-0.94 of REF in 15/15 cells (geomean 0.847), A/A floor 0.16 so not separated from noise; counted fields identical (8580); total DL CPU 0.96; pcc:unverified",
+          "value": 84.74
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-sqrt-compiled",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 96.09,
+      "latest": 96.09,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "total_cpu_dl_chain_over_ref_geomean",
+      "points": [
+        {
+          "commit": "7f8e80c1f38f",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T2206Z-ic-gw-sqrt-compiled",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "compiled sqrt chain at c_D=1.7, L0: relations.cpu 0.65-0.94 of REF in 15/15 cells (geomean 0.847), A/A floor 0.16 so not separated from noise; counted fields identical (8580); total DL CPU 0.96; pcc:unverified",
+          "value": 96.09
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-sqrt-compiled",
+      "unit": "percent"
     },
     {
       "better": "neutral",
@@ -13694,6 +14013,141 @@
       ],
       "problem": "ic:primefield-shapes-scaling",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 46.3,
+      "latest": 46.3,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "combo_relations_cpu_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 46.3
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 79.6,
+      "latest": 79.6,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "combo_total_cpu_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 79.6
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 62.9,
+      "latest": 62.9,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "hash_relations_cpu_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 62.9
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 100.0,
+      "latest": 100.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "hash_rss_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 100.0
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 85.8,
+      "latest": 85.8,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "hash_total_cpu_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 85.8
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
     },
     {
       "better": "lower",
