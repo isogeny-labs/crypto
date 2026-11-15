@@ -1,0 +1,29 @@
+# EXP-R31-O: Complete native Rust prime31 log and generic-cost comparator
+
+Date: 2026-11-15. Evidence **[pcc:unverified]** producer GitHub Actions, not independent replay. This is the same ordinary cofactor-one curve `p=2,147,483,647; a=847,514,846; b=2,087,444,724; n=2,147,446,831; G=(625037715,2100627251)`, never a deliberately weak curve.
+
+## Complete algorithm and independently replayed target equation
+
+The checked-in Rust `examples/prime31_s3_root_index.rs` exposes `--solve-one`: it receives only the public target point `Q=(1477799919,824532935)`, constructed by the known-answer *caller* as `[1038579171]G`. The source scalar is **never passed to the algebraic discovery oracle or solver**. The solver constructs the canonical B31 Dickson factor base and the algebraic split-S3 x-support index cold, generates public mixed-walk points `R=A G+B Q` with tracked `A,B`, then obtains true signed four-point equations `sum_i c_i P_i=R` using coordinate-only Semaev S3 membership with **no ordinates and no EC sums in discovery**. Group arithmetic checks each candidate identity AFTER discovery, not before. Incremental Gaussian elimination modulo prime n solves `sum_i c_i log_G(P_i)-B log_G(Q)=A`. At rank 32, code independently checks every factor-base logarithm and the recovered target logarithm using Rust EC scalar multiplication.
+
+This is **a complete factor-base relation-collection plus linear algebra solver for the witnessed target**. But the algebraic coordinate-root index enumerates all two-point sums/differences; it is mathematically **generic meet-in-the-middle equivalent**, NOT a new non-generic / subgeneric prime-field attack. This explicit classification prevents claiming the original top-level goal has been met. A complete result on one target also does not prove lower cold cost than optimized rho.
+
+## First source-specific CI: completed but overcharged measurement
+
+[GitHub Actions #43775662865](https://github.com/isogeny-labs/crypto/actions/runs/43775662865), job `133001256603`, source `83aba43bf7c5a2bca861de3d51ae54b49795559c`, pinned Rust 1.100.0 Ubuntu 24.04 release, passed **40/40** reused-library tests, **3/3** S3/m4 and **3/3** new index/LA tests, the 16,384 target panel, and `--solve-one` verification:
+
+- Full 31 factor-base logs plus public target logarithm internally recovered and verified, `verified_complete_log=1038579171`, `complete_ECDLP_recovery=true`.
+- `coefficient_rank=32`, `independent_equation_rows=32`, `algebraic_nonempty_targets=86`, `verified_relation_rows=86`, `dependent_rows=54`, `visited_distinct_targets=249987`.
+- `full_cold_wall_ns=136479297327` (136.479 s), `algebraic_discovery_ns=136212043740` (136.212 s), `cold_setup_ns=799343`, `step_setup_ns=1698845`, `linear_algebra_ns=394100`. Target-generation and verification are separately charged in the source output; fixed base construction is included in cold wall.
+
+**Detected measurement defect immediately after checking logs**: when rank 32 and full independent replay succeeded, an unlabeled `break` exited only the inner signed-row loop, not the outer target-collection loop. Thus the 136.479s measurement continued scanning to the entire 250,000 cap **after a verified solution already existed**. It is a correct upper-cost execution record but **not an actual time-to-first-complete-log benchmark**. No speedup or competitiveness inference may be drawn from it. Source fix `9996fa009442b881eb915853d7392842d8a06a4f` introduces `'walk: for turn ...` and `break 'walk;` after the full replay. Record final source-specific measured new cold wall and stop count ONLY after the new GitHub Actions CI passes.
+
+## Matched generic benchmark predeclared
+
+New Rust flag `--bsgs-one` solves exactly the **same public Q** with full cold HashMap baby-step/giant-step using the existing Rust `Arithmetic` over the same curve, checks the discrete log and reports setup, baby/giant intervals, memory entries and full cold wall. This is **plain BSGS**; it is *not* the strongest optimized negation-map rho. It is a necessary generic sanity control, not an acceptance-quality final optimized-rho comparison. Side-by-side same-runner evidence needs to show the true cold ratio; do not extrapolate ratios from separated hosts. The source branch commits the two implementations and single Rust CI workflow before the paired result; no Python or C++ implementation.
+
+## Research assessment and next non-generic experiment
+
+The S3 pair-root index is an engineering reference, not novel IC: its degree-961 support is just finitely many algebraic x-coordinates of pair sums, equivalent to a generic table. The 16,384 scalar-fixture panel produced exactly 7 signed four-point relations of coefficient rank seven. To be truly non-generic the attack must extract relations from target-dependent algebraic S4/S3/F4 or certified-quotient identities **without enumerating enough finite pair/sum support to reproduce MITM**.
+
+Previous lead files and PRs checked: #4188 m4 algebraic factorized S4, #4228 certified quotient/subresultants, #4349 real native worker (bounded F4 incomplete), #4275 dense-vs-tower F4, #4077 complete m8 cost gate, #4338 no-hidden-label selector, #3877 chained transfer, cryptanalysis #1536 auxiliary IC, PKM 2016 and APS 2018 published index calculus. Repository research-KB was unavailable. The next executable threshold is full **m8 target-dependent** extraction on naturally sampled public points with rank ≥ B+1 on 12 independent target scalars, full cold time against optimized negation rho, independent PCC. Distinguish cap from actual no-relation outcomes.
