@@ -267,6 +267,71 @@ fn m4_signed_lifts(base: &Base,target: Point,tuples: &[[usize;4]],
     rows.sort_unstable();rows.dedup();rows
 }
 
+// Frozen, bounded developmental scaling on the SAME prime31 curve and
+// Dickson depth-six factor base. Fixed B=4/8/16 slices and identical two
+// public target encodings. It is NOT the full ECDLP workload or a rho A/B.
+fn m4_scale(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
+    use std::time::Instant;
+    let left=ar.add(PRIME31,Some(base.points[0]),Some(base.points[1]));
+    let right=ar.add(PRIME31,Some(base.points[2]),Some(base.points[3]));
+    let positive=ar.add(PRIME31,left,right)
+        .ok_or("unexpected planted m4 identity")?;
+    let public=ar.scalar(PRIME31,17,Some(PRIME31.g))
+        .ok_or("unexpected public [17]G identity")?;
+    let mut panel=Vec::new();
+    for size in [4usize,8,16] {
+        let xs:Vec<u64>=base.points[..size].iter().map(|p|p.0).collect();
+        let start=Instant::now();
+        let k=m4_pair_support(&xs)?;
+        let support_ns=start.elapsed().as_nanos();
+        if k.len()-1!=size*size {
+            return Err("m4 pair support degree/collision changed".into());
+        }
+        for (label,target) in [("planted-positive",positive),("fixed-public",public)] {
+            let start=Instant::now();
+            let (d,exceptional)=m4_first_eliminant(&k,target.0)?;
+            let membership_ns=start.elapsed().as_nanos();
+            let start=Instant::now();
+            let (uv,raw)=m4_extract_pairs(&xs,&k,target.0)?;
+            let algebraic_extraction_ns=start.elapsed().as_nanos();
+            let additions_before=ar.counts.group_additions;
+            let start=Instant::now();
+            let rows=m4_signed_lifts(base,Some(target),&raw,ar);
+            let validation_ns=start.elapsed().as_nanos();
+            let validation_group_additions=ar.counts.group_additions-additions_before;
+            if label=="planted-positive" && rows.is_empty() {
+                return Err("m4 algebraic positive extraction failed".into());
+            }
+            panel.push(json!({
+                "base_size":size, "target_kind":label, "public_target":target,
+                "pair_support_degree":k.len()-1,
+                "precomputed_pair_support_build_ns":support_ns,
+                "eliminant_degree":d.len()-1,
+                "exceptional_target_abscissa":exceptional,
+                "target_dependent_eliminant_ns":membership_ns,
+                "target_dependent_algebraic_root_extraction_ns":algebraic_extraction_ns,
+                "ordered_uv":uv.len(),"ordered_pair_index_tuples":raw.len(),
+                "post_extraction_signed_validation_ns":validation_ns,
+                "post_extraction_validation_group_additions":validation_group_additions,
+                "projectively_normalized_signed_rows":rows.len(),
+                "complete_ecdpl_recovery":false
+            }));
+        }
+    }
+    println!("{}",json!({
+        "standing":"[pcc:unverified]",
+        "study":"frozen m4 coordinate-only index-calculus relation extraction B4/B8/B16",
+        "curve":"ordinary full-prime-order F_(2^31-1)",
+        "source_ordinate_or_group_sum_used_in_polynomial_stage":false,
+        "cold_factor_base_construction_charged":false,
+        "amortized_pair_support_precompute_reported_separately":true,
+        "end_to_end_ECDLP_recovery":false,
+        "matched_rho_reference_run":false,
+        "rows":panel
+    }));
+    Ok(())
+}
+
 fn m4_preview(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
     use std::time::Instant;
     if base.points.len()<4 { return Err("m4 preview requires B>=4".into()); }
@@ -468,6 +533,9 @@ fn main() -> Result<(),String> {
         "full_ECDLP_recovery":false,"samples":samples}));
     if std::env::args().any(|arg| arg == "--m4-preview") {
         m4_preview(&base,&mut ar)?;
+    }
+    if std::env::args().any(|arg| arg == "--m4-scale") {
+        m4_scale(&base,&mut ar)?;
     }
     if std::env::args().any(|arg| arg == "--compare") {
         // Diagnostic A/B only: same Rust host/inputs, fixed base constructed
