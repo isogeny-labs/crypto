@@ -5,6 +5,11 @@ records the native nine-phase ordering and its current accounting limit.
 It is implementation evidence only; the K600 execution and full cold budget
 receipt remain pending.
 
+The [preflight lock/arm commit-cycle problem](../../../../problems/n83-k600-preflight-lock-commit-cycle.md)
+records a source-identity admission conflict found in the unexecuted native
+path. A versioned two-revision or detached-ref lock contract and negative
+controls are required before the Linux zero-trial and arm gates can run.
+
 **Status: implemented and locally tested, not run against S3 for this arm pair.**
 The Rust `examples/n83_k600_m6_native_arms.rs` `stage` command bridges the
 already verified read-only astronomy-store K600 object to the original
