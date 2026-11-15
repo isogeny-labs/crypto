@@ -145,6 +145,12 @@ also tried and dropped: no usable instance within the 2,000,000-step BSGS budget
   there is 8.8×, down from 27.5× in the relation phase. A solver for these rows (follow-up B) and a
   κ chosen for the combined cost are the levers.
 
+With `Solver::SgeBw` (follow-up B, `sieve-solve-20261115/`) instead of `Solver::Fast` on the same
+matrices (`solve-sgebw.txt`, `summary-solve-sgebw.md`), every run still recovers `k` (one walk seed
+at (4, 509) needed μ = 1.1), but the solve costs more, not less: 5.91M against 2.87M mulmods for the
+sieve at (3, 8191), 0.80M against 0.19M at (3, 2039). At these sizes SGE leaves too large a
+residual for Wiedemann to pay off, so B does not yet relieve the 2LP solve.
+
 ## What this decides
 
 1. **The relation source for T1 (2LP at genus 3/4) should be the line sieve, not the walk.** To GTTD's

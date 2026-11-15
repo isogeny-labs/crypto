@@ -30,6 +30,11 @@ fn main() {
     let seeds: u64 = env("HEC_SEEDS", 3);
     let bsgs: usize = env("HEC_BSGS_MAX", 2_000_000);
     let mus = [1.0f64, 1.1, 1.25, 1.5, 2.0];
+    // HEC_LP_SOLVER=sgebw solves the pruned 2LP matrices with Solver::SgeBw.
+    let solver = match std::env::var("HEC_LP_SOLVER").as_deref() {
+        Ok("sgebw") => Solver::SgeBw,
+        _ => Solver::Fast,
+    };
     for (g, p) in rows {
         let t = std::time::Instant::now();
         let Some(inst) = pick_instance_with_budget(p, g, bsgs) else {
@@ -62,7 +67,7 @@ fn main() {
                         (r.reached, r.ops_rel.products, r.edges.len(), r.useful)
                     };
                     let mut st = SolveStats::default();
-                    let (k, kept, lpc) = solve_captured(&cap.rows, nb, inst.ell, Solver::Fast, &mut st);
+                    let (k, kept, lpc) = solve_captured(&cap.rows, nb, inst.ell, solver, &mut st);
                     let ok = k.is_some_and(|k| curve.mul(&inst.d1, k) == d2);
                     println!(
                         "# {arm} g={g} p={p} seed={seed} mu={mu} target={tgt} reached={reached} rows={} kept={kept} lp_cols={lpc} cols={} useful={useful} partials={partials} k={k:?} ok={ok}",
@@ -77,7 +82,7 @@ fn main() {
                 match done {
                     Some((mu, tgt, products, captured, kept, lpc, partials, mm)) => println!(
                         "JSON {{\"arm\":\"{arm}\",\"genus\":{g},\"p\":{p},\"ell\":{},\"kappa\":{kappa},\"nb\":{nb},\"seed\":{seed},\"pick_s\":{pick_s:.1},\
-\"mu\":{mu},\"target\":{tgt},\"products\":{products},\"rows_captured\":{captured},\"rows_kept\":{kept},\"lp_cols\":{lpc},\"partials\":{partials},\"solve_mulmods\":{mm},\"k_ok\":true}}",
+\"mu\":{mu},\"target\":{tgt},\"products\":{products},\"rows_captured\":{captured},\"rows_kept\":{kept},\"lp_cols\":{lpc},\"partials\":{partials},\"solve_mulmods\":{mm},\"solver\":\"{solver:?}\",\"k_ok\":true}}",
                         inst.ell
                     ),
                     None => println!(
