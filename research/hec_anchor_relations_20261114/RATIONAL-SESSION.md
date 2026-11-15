@@ -85,3 +85,37 @@ No mathematical assertion failed. Twelve exhausted families and one tuple cap
 are retained rather than retried/replaced. Compile warnings are unused helper
 methods in the shared modules, not failed gates. Shared log and resume remain
 untouched because another task holds them.
+
+## Independent verification and report
+
+### What was done (commands, files, features)
+Independent Gaussian rank(R)-rank(R_off) agrees with all36forest ranks.
+Native replay script rebuilds from Cargo's actual emitted library path and
+reproduces the verified JSONL byte-for-byte. All17heldout-example tests pass.
+Added9evaluated identity certificates using the existing native issuer, each
+32points plus16extra producer recheck points. Added Rust-rendered graph and
+two-page Typst PDF; rendered both pages with Poppler and visually inspected.
+Source/library/binary hashes and raw command outputs accompany the results.
+
+### Decisions made (and why)
+Retain the smaller-anchor construction as algebra/rank progress. Its runtime
+cost is unmeasured. For g3/g4, a dimension count shows increasing pole degree
+alone leaves the same g-2 dependency requirement when prescribing all but two
+zeros. A successor must exploit that structure or change recombination.
+The official Magma Riemann-Roch convention was read as the dimension source;
+primary D'Andrea-Krick-Szanto formulas remain the interpolation source.
+Existing held-out timing graphs remain unchanged: no compatible runtime
+observations were added. These are correctness/count gates, not benchmarks.
+
+### Open threads (unfinished, pick up next time)
+Build a complete cold-cost case on identical inputs before timing integration.
+Charge normalization/orientation, all constructed outputs, target handling and
+rank processing. Keep the full mathematical10x objective active. Publish this
+gate/report extension and follow its current-head CI; no merge requested.
+
+### Errors (what went wrong, how it was handled)
+The initial certificate compile chose a cached serde_json built by rustc1.94;
+the1.99compiler rejected it. Selecting the matching cached1.99library fixed
+the compile. No dependency/source was deleted or rebuilt to mask the error.
+Certificates are producer-issued/rechecked finite-field evaluations; no
+independent signature, formal proof or novelty standing is claimed.

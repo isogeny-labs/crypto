@@ -20,6 +20,40 @@ fn choose(n: usize, k: usize) -> usize {
     v
 }
 
+// Independent dense Gaussian rank; no forest or anchor Echelon methods.
+fn gaussian_rank(rows: &[Row], columns: usize, skip: usize, f: &Fp) -> usize {
+    let mut basis: Vec<Option<Vec<u64>>> = vec![None; columns];
+    let mut rank = 0;
+    for row in rows {
+        let mut v = vec![0; columns];
+        for &(j, x) in row {
+            if j as usize >= skip {
+                v[j as usize] = x;
+            }
+        }
+        for j in skip..columns {
+            if v[j] == 0 {
+                continue;
+            }
+            if let Some(b) = &basis[j] {
+                let scale = v[j];
+                for k in j..columns {
+                    v[k] = f.sub(v[k], f.mul(scale, b[k]));
+                }
+            } else {
+                let scale = f.inv(v[j]);
+                for x in &mut v[j..] {
+                    *x = f.mul(*x, scale);
+                }
+                basis[j] = Some(v);
+                rank += 1;
+                break;
+            }
+        }
+    }
+    rank
+}
+
 fn lower_pair(points: &[(u64, u64)], signs: usize, f: &Fp) -> (Poly, Poly) {
     let mut a = Poly::zero();
     let mut basis = Poly::one();
@@ -70,6 +104,7 @@ fn main() {
                 let max_tuples = choose(h, m).min(1024);
                 let mut tuples = HashSet::new();
                 let mut relations = HashSet::new();
+                let mut admitted_rows = Vec::new();
                 let mut forest = dense::DenseForest::new(fb.len(), h, ell);
                 let mut echelon = dense::Echelon::new(h, ell);
                 let (
@@ -212,6 +247,7 @@ fn main() {
                         }
                         assert!(c.is_zero(&sum), "principal g={g} h={h} d={d} signs={s}");
                         admitted += 1;
+                        admitted_rows.push(row.clone());
                         let mut off = Vec::new();
                         let mut on = Row::new();
                         for (j, v) in row {
@@ -228,7 +264,14 @@ fn main() {
                         }
                     }
                 }
-                println!("{{\"g\":{g},\"p\":{p},\"c\":{},\"ell\":{ell},\"fb\":{},\"h\":{h},\"d\":{d},\"m\":{m},\"tuples\":{},\"constructed\":{constructed},\"visited\":{visited},\"zero\":{zero},\"nonprimitive\":{nonprimitive},\"degree_drop\":{degree_drop},\"nonsplit\":{nonsplit},\"many_off\":{many_off},\"empty\":{empty},\"duplicate\":{duplicate},\"admitted\":{admitted},\"projected\":{projected},\"rank\":{},\"status\":\"{status}\"}}",inst.c,fb.len(),tuples.len(),echelon.rank);
+                let full_rank = gaussian_rank(&admitted_rows, fb.len(), 0, &lf);
+                let off_rank = gaussian_rank(&admitted_rows, fb.len(), h, &lf);
+                assert_eq!(
+                    full_rank - off_rank,
+                    echelon.rank,
+                    "independent anchor-intersection rank"
+                );
+                println!("{{\"g\":{g},\"p\":{p},\"c\":{},\"ell\":{ell},\"fb\":{},\"h\":{h},\"d\":{d},\"m\":{m},\"tuples\":{},\"constructed\":{constructed},\"visited\":{visited},\"zero\":{zero},\"nonprimitive\":{nonprimitive},\"degree_drop\":{degree_drop},\"nonsplit\":{nonsplit},\"many_off\":{many_off},\"empty\":{empty},\"duplicate\":{duplicate},\"admitted\":{admitted},\"projected\":{projected},\"rank\":{},\"full_rank\":{full_rank},\"off_rank\":{off_rank},\"status\":\"{status}\"}}",inst.c,fb.len(),tuples.len(),echelon.rank);
             }
         }
     }
