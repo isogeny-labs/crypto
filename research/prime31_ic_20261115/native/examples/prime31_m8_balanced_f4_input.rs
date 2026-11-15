@@ -116,6 +116,42 @@ fn ring(terminal:u64)->TowerRing {
     }
     TowerRing{p:P,rules,n_free:3}
 }
+// R31-F target-dependent development pilot: S3(x6,x7,w) was eliminated
+// algebraically into a finite-root polynomial. With a fixed certified
+// w-specialization, the other six leaves still use the inherited Dickson
+// tower and the original S4 equations/engine. No generic group join is
+// used to propose solutions; fixed positive fixtures validate soundness only.
+fn six_ring(terminal:u64)->TowerRing {
+    let mut rules=Vec::with_capacity(6*DEPTH);
+    for block in 0..6 {
+        for level in 0..DEPTH {
+            let last=level+1==DEPTH;
+            rules.push(SquareRule{
+                next:(!last).then_some((block*DEPTH+level+1) as u8),
+                a:0,b:u64::from(!last),c:0,
+                d:if last {(terminal+2)%P} else {2},
+            });
+        }
+    }
+    TowerRing{p:P,rules,n_free:2}
+}
+fn six_input(poly:&Polynomial,ring:&TowerRing)->Result<RPoly,String> {
+    let mut raw=Vec::new();
+    for (monomial,&c) in &poly.0 {
+        if monomial[6]!=0 || monomial[7]!=0 || monomial[10]!=0 {
+            return Err("six-block polynomial retained eliminated x6/x7/w".into());
+        }
+        let mut powers=vec![0u32;6*DEPTH+2];
+        for i in 0..6 {
+            powers[i*DEPTH]=u32::from(monomial[i]);
+        }
+        powers[6*DEPTH]=u32::from(monomial[8]);
+        powers[6*DEPTH+1]=u32::from(monomial[9]);
+        raw.push((powers,c));
+    }
+    Ok(ring.from_raw(&raw))
+}
+
 fn four(code:u64)->[(usize,i8);4] {
     std::array::from_fn(|j| (
         ((code>>(6*j))&63) as usize,
@@ -196,12 +232,13 @@ fn main()->Result<(),String>{
     let args:Vec<_>=std::env::args().skip(1).collect();
     if args.len()>1 || (!args.is_empty()
         && args[0]!="--probe-f4" && args[0]!="--panel-f4"
-        && args[0]!="--ablate-f4") {
-        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4|--ablate-f4]".into());
+        && args[0]!="--ablate-f4" && args[0]!="--preeliminate-w-f4") {
+        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4|--ablate-f4|--preeliminate-w-f4]".into());
     }
     let probe_f4=args.first().is_some_and(|v|v=="--probe-f4");
     let panel_f4=args.first().is_some_and(|v|v=="--panel-f4");
     let ablate_f4=args.first().is_some_and(|v|v=="--ablate-f4");
+    let preeliminate_w=args.first().is_some_and(|v|v=="--preeliminate-w-f4");
     let e=PRIME31;
     let mut ar=Arithmetic::default();
     check_curve(e,&mut ar)?;
@@ -221,6 +258,81 @@ fn main()->Result<(),String>{
     let polys:Vec<_>=fixed.iter().map(|p|ring.from_raw(&p.raw_tower())).collect();
     let nf_terms:Vec<_>=polys.iter().map(|p|p.len()).collect();
     if nf_terms!=[526,526,16] {return Err(format!("F4 tower input terms changed: {nf_terms:?}"));}
+    if preeliminate_w {
+        // Frozen selection: one previously documented positive control and
+        // seven deterministic first roots (one per first-collision arm).
+        // All seven public-Q controls run, regardless of outcome. This is a
+        // bounded *one-root-per-branch* F4 diagnostic, not a 961-root oracle.
+        let r6=six_ring(fb.terminal);
+        r6.check();
+        let left=six_input(&fixed[0],&r6)?;
+        let right=six_input(&fixed[1],&r6)?;
+        let first=*transcript.witnesses.first().ok_or("no natural certificate")?;
+        let ps=witness_points(first[2],first[3],&fb,&ar)?;
+        let aux_w=summands(&mut ar,&ps,6,8).ok_or("known pair sum is identity")?;
+        let aux_u=summands(&mut ar,&ps,0,3).ok_or("known left sum is identity")?;
+        let aux_v=summands(&mut ar,&ps,3,6).ok_or("known right sum is identity")?;
+        let r=ar.add(e,ar.scalar(e,first[0],Some(e.g)),
+            ar.scalar(e,first[1],Q)).ok_or("known R is identity")?;
+        if (aux_u.0,aux_v.0,aux_w.0,r.0)
+            != (803_189_040,898_740_481,729_813_404,903_384_438) {
+            return Err("known positive auxiliary witness changed".into());
+        }
+        let mut known=vec![0u64;6*DEPTH+2];
+        for (i,point) in ps.iter().enumerate().take(6) {
+            known[i*DEPTH]=point.0;
+            for j in 1..DEPTH {
+                let prev=known[i*DEPTH+j-1];
+                known[i*DEPTH+j]=sub(mul(prev,prev),2);
+            }
+        }
+        known[6*DEPTH]=aux_u.0;
+        known[6*DEPTH+1]=aux_v.0;
+        let cases=[
+            ("known_positive_validator_only",aux_w.0,r.0,true),
+            ("public_Q_branch_0",2_438_837,Q.unwrap().0,false),
+            ("public_Q_branch_1",60_956_599,Q.unwrap().0,false),
+            ("public_Q_branch_2",10_280_552,Q.unwrap().0,false),
+            ("public_Q_branch_3",7_087_371,Q.unwrap().0,false),
+            ("public_Q_branch_4",9_730_781,Q.unwrap().0,false),
+            ("public_Q_branch_5",2_344_949,Q.unwrap().0,false),
+            ("public_Q_diagonal",19_657_426,Q.unwrap().0,false),
+        ];
+        let mut outcomes=Vec::new();
+        for (label,wx,rx,positive) in cases {
+            let final_s4=s4(&u,&v,&Polynomial::constant(wx),
+                &Polynomial::constant(rx));
+            let final_input=six_input(&final_s4,&r6)?;
+            let system=vec![left.clone(),right.clone(),final_input];
+            let witness=if positive {
+                if system.iter().any(|poly|r6.eval(poly,&known)!=0) {
+                    return Err("six-block specialization lost known positive root".into());
+                }
+                Some(known.as_slice())
+            } else { None };
+            let result=capped_f4(&system,&r6,witness)?;
+            outcomes.push(json!({
+                "arm":label, "public_r_x":rx,"certified_pair_w":wx,
+                "known_positive_validator_only":positive,
+                "polynomial_count":system.len(),
+                "f4":result
+            }));
+        }
+        println!("{}",json!({
+            "standing":"[pcc:unverified]",
+            "scope":"eight finite fixed-w S4 F4 development calls; no full 961-way search, no root extraction or ECDLP",
+            "reused":"existing Arithmetic, Base, and f4_fp_tower.rs",
+            "towers_before":48,"towers_after":36,
+            "free_variables_before":3,"free_variables_after":2,
+            "fixed_pair_s3":"replaced by exact Fp polynomial root catalogue; selected w values only",
+            "source":"PAIR_S3_ELIMINATION_POLYNOMIAL_20261115.md",
+            "full_root_catalogue_size":961,
+            "original_fixed_s3_bottleneck_dense_entries":26_618,
+            "comparability":"only full 961-root/all-branch runs could be a complete oracle",
+            "outcomes":outcomes
+        }));
+        return Ok(());
+    }
     if ablate_f4 {
         // Isolate which set of inherited fixed and target Semaev constraints
         // first exceeds the F4 dense-reducer B' limit. These separate ideals
