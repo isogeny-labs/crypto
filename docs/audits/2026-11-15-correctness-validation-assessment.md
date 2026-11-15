@@ -333,6 +333,7 @@ Updated as repairs land; the finding text above is left as first written.
 | V-18 unresolvable base in the validation gate | Repaired: `check --base` exits non-zero when the ref is not a commit. The freeze still has no expiry |
 | C-4 exit status lost through `tee` | Repaired in the 20 workflows the audit listed (13 cryptanalysis, 7 crypto): `set -o pipefail` on each step that pipes into `tee` |
 | C-5 `rg` not installed | Repaired: the five Lean hole checks use `grep -E` |
+| V-19 result-switch test | Repaired: the 18 unrecorded environment switches are now recorded (two credentials are exempt and never recorded), the test runs as a script, and it runs on every PR in `lab-parity.yml` together with the task-card and loss-ledger tests (part of C-2) |
 | V-2 no signing key | Owner action: generate the CI key, add it to `pcc/keyring.json`, set `PCC_KEYRING_SHA256` and `PCC_SIGNING_KEY` |
 | V-8, V-9, V-11, V-14 | Not started here: `tools/benchrec.py`, `tools/task_card.py` and `benchrec-hook.sh` are owned by `crypto-autoresearcher` under the shared-code lock, and that repository is not in this session's scope |
 | pcc copy in `crypto-autoresearcher` | Needs the same `tools/pcc/pcc.py`, `test_pcc.py`, `docs/SABOTAGE_RESISTANCE.md` and lock digests; until then its copy differs from the owner copy in crypto |
