@@ -134,6 +134,17 @@ consecutive rungs ℓ ≥ 8 is read as the survey's falsifier firing (its
   first ℓ ≥ 7 row; raw JSONL goes to S3 by sha256.
 - Validator: independent build, replay of ℓ = 8 and 9, field-by-field compare.
 
+## Amendments
+
+- **AM1 (2026-11-15T04:50Z, before any ℓ ≥ 8 data; stopping rule only).** `cms`
+  and `cadical` run at ℓ = 7 only: the ℓ = 7 row run measured about 25 min of
+  wall for one CryptoMiniSat refutation on this host, so ℓ ≥ 8 would exceed
+  24 h per rung. Rungs ℓ = 8, 9, 10 run oracle, native, native-aa, lin,
+  lin-nolex, and rungs may run concurrently on the same frozen binaries
+  (counted metrics unaffected). Budget unchanged; the incumbent is therefore
+  expected to be censored at ℓ = 9, 10 and that is reported as censoring.
+  Hashes after the amendment: `FREEZE-am1.sha256`.
+
 ## Inadmissible after the freeze
 
 Changing budget, seeds, target counts, symmetry-breaking setting, encoding, or
