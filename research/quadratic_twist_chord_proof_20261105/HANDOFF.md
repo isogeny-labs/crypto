@@ -1,24 +1,7 @@
-# Current handoff — 2026-11-15
+# Current handoff: trace-grid screen completed
 
-Latest actual component: trace-quartic-20261115/README.md. Full15-stage proof/chart/control plan passed;3 new unique lemmas,47 queries,60 lifts,10 restricted source points. Preserve the first failed source/gate. Bare degree4 omits essential degree14 subfield membership; projected source base has degree5. Next full56-grid screen is proposed, not run. The ordinary pinned-project replay completed with8 unique declarations (5 prior+3 new),0 failing/0 trusted-native, LEAN_PATH unset. [pcc:unverified]
+Read trace-grid-20261115/README.md and its pre-data PROTOCOL/PINS. At checkpoint66358c40, all56 grids×47 source queries match separately written native enumeration; seven semantic controls reject. Grids12/37/42 retain15/15/16 signed source pairs. All12 stages complete. No actual full solver degree, useful rank, public-log setup or source scalar result is inferred. [pcc:unverified]
 
-The bounded proof run is complete. Official source gate:5 unique public theorems,0 failing/0 trusted-native axioms; final full8-stage plan exits0 with all5 false-statement controls rejected. Pinned Lake PROJECT replay also exits0. Raw outputs, failed sources and incomplete attempts remain local. These are scoped kernel/audit observations, not signed PCC standing, new IDC1s or a solver-degree result. [pcc:unverified]
+Next implement a genuinely capped S3+complete-membership solver probe against identical projected-source controls. All nonzero and axis branches and expanded witnesses must remain charged; no repeat of the completed census. Existing LOCAL resources only,600s stages/two workers/3600s window. No science process in flight. PR3560 stays open/autooff; automation paused. [pcc:unverified]
 
-Read trace-fixture-20261115/README.md and kernel-20261115/README.md before any new work. The proper-extension fixture screen has now executed:47×53=2491 finite trace pairs checked in two native implementations, six false payloads rejected. Do not rerun that screen. [pcc:unverified] No rerun of the completed proof/native census is needed. Next research lane: actual proper-extension trace-projected membership with a checked source reduction and full strongest-source frontier. New fixture/source/independent native audit and pre-data contract required. Keep PR3560 open/auto-merge off; automation paused. No process in flight. Result assets remain local under the existing upload boundary.
-
-## Preserved historical handoff
-
-## Goal
-Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
-## Lead / hypothesis
-The accepted target-aware chord proposal, merged PR3450, needs faithful distinct-root and diagonal algebra before any native solver admission. Sources and prior work are linked in research/quadratic_twist_chord_preflight_20261105/ALGORITHM.md.
-## Spec
-research/quadratic_twist_chord_proof_20261105/PROTOCOL.md and Chord.lean. Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612; Lean4.34.1. Existing LOCAL resources only, two workers max,600s stage caps,3600s iteration.
-## State
-New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
-## Next steps
-Commit exact source, pass current official checkpoint gate, then run pinned lake env lean on Chord.lean with600s cap; retain raw output and failed sources. Review axioms and declaration fidelity. Complete group coverage/native census only in later explicitly frozen stages.
-## Runs in flight
-None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
-## Stop and success conditions
-Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
+Raw/report assets and complete journals remain local; only concise source/protocol/component narratives are published. Earlier complete handoff is preserved in immutable Git at bb9fedd294324e1db1a3efe0be63a9266509aa0d:research/quadratic_twist_chord_proof_20261105/HANDOFF.md. Old source/proofs/receipts are unchanged. No signed PCC/IDC/global inventory promotion. [pcc:unverified]
