@@ -6,7 +6,7 @@
 
 Field p=2,147,483,647; E: y^2=x^3+847514846x+2087444724, full prime order n=2,147,446,831, cofactor 1. G=(625037715,2100627251), public Q=(1547953785,1667575595). The native Rust depth-six Dickson base contains B=31 usable nonzero-y points, terminal 933677148; this is **not** the deliberately weak smooth-order curve.
 
-Use the *first previously recorded* natural-positive witness from M8_SPLIT_CONTROL.results.json: public masks a=806206853, b=542783019, packed four-list words (18903234,258036944). Its eight distinct signed base indices are 2(-), 3(+), 7(+), 8(+), 16(-), 19(-), 21(-), 24(-); their public group sum R=[a]G+[b]Q=(903384438,1336077056).
+Use the *first two previously recorded* natural-positive witnesses from M8_SPLIT_CONTROL.results.json, with the **same public masks** a=806206853, b=542783019 and group sum R=[a]G+[b]Q=(903384438,1336077056). Packed four-list codes are (18903234,258036944) and (37012034,107578577). They have **two distinct eight-element index sets**: {2,3,7,8,16,19,21,24} and {2,9,12,13,17,19,24,26}, with each recorded sign orientation retained.
 
 For an ordering (P0,...,P7) of these eight signed points define U=P0+P1+P2, V=P3+P4+P5, W=P6+P7. The four balanced equations are
 
@@ -15,17 +15,17 @@ For an ordering (P0,...,P7) of these eight signed points define U=P0+P1+P2, V=P3
     S3(x6,x7,x(W)) = 0
     S4(x(U),x(V),x(W),x(R)) = 0.
 
-Every permutation preserves U+V+W=R. An independently authored, producer-local finite-field replay checked **all 8! = 40,320 permutations**: no U,V,W or R was infinity and **161,280 polynomial residuals were zero**. The eight leaf x-coordinates are distinct, so these are **40,320 different ordered rational solutions** of the balanced ideal, not 40,320 independent relations. The reusable Rust reproduction is [prime31_m8_permutation_orbit_gate.rs](examples/prime31_m8_permutation_orbit_gate.rs); its exact-head compilation/execution is pending.
+Every permutation preserves U+V+W=R. An independently authored producer-local replay checked **all 8! = 40,320 permutations of each of the two witness sets**: no U,V,W or R was infinity and all **322,560 polynomial residuals were zero**. Because the leaf abscissae within each set and the two eight-element sets are distinct, this establishes **at least 80,640 different ordered rational solutions for the same public target**. These are not 80,640 independent relations. The reusable Rust reproduction is [prime31_m8_permutation_orbit_gate.rs](examples/prime31_m8_permutation_orbit_gate.rs); its exact-head compilation/execution is pending.
 
 ## Mathematical consequence and limits
 
 Let R0 be the Dickson tower-coordinate ring over Fp with eight independent depth-six blocks and free u,v,w, and let I be the four balanced S4/S3 polynomials. Each ordered witness gives an Fp-valued evaluation homomorphism R0/I -> Fp. Distinct leaf-coordinate assignments distinguish the corresponding maximal ideals; they are pairwise comaximal. By the Chinese remainder theorem,
 
-    R0/I --> (Fp)^(40320)
+    R0/I --> (Fp)^(80640)
 
-is surjective, hence **dim_Fp(R0/I) >= 40,320**, even when the left side is infinite-dimensional. This is a positive-target, unsaturated, labeled ideal statement, not a theorem that bounded-degree F4 must enumerate every root or allocate >=40,320 columns. It identifies an all-roots multiplicity burden; a first-root algorithm can potentially avoid that cost.
+is surjective, hence **dim_Fp(R0/I) >= 80,640**, even when the left side is infinite-dimensional. This is a positive-target, unsaturated, labeled ideal statement, not a theorem that bounded-degree F4 must enumerate every root or allocate >=40,320 columns. It identifies an all-roots multiplicity burden; a first-root algorithm can potentially avoid that cost.
 
-The displayed system has manifest relabeling symmetry: 3! within the first triple, 3! within the second, 2! within the pair and a swap of the two triples accompanied by u/v swap. Group order is **144**. Canonicalizing the triples and pair produces **280 orbits**, each with 144 permutations. These are duplicate *representations* of one signed group relation, not independent relation rows; **no 144x F4 speedup is asserted**. There can be additional x-only sign roots and repeated-index roots beyond this lower bound.
+The displayed system has manifest relabeling symmetry: 3! within the first triple, 3! within the second, 2! within the pair and a swap of the two triples accompanied by u/v swap. Group order is **144**. For each distinct witness set, canonicalizing the triples and pair produces **280 orbits** of size 144; for the two witness sets together there are **560 such orbits**. These are duplicate *representations* of one signed group relation, not independent relation rows; **no 144x F4 speedup is asserted**. There can be additional x-only sign roots and repeated-index roots beyond this lower bound.
 
 ## Next discriminating Rust experiment
 
@@ -45,4 +45,4 @@ The displayed system has manifest relabeling symmetry: 3! within the first tripl
 
     cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_permutation_orbit_gate
 
-Python finite-field producer-local replay tested 40,320 labeled witnesses and 161,280 exact polynomial residuals, 0 failures and 280 classes of 144. This is **not** a newly extracted relation, successful Rust CI, a signed PCC verdict or a cheaper complete prime-field ECDLP algorithm. [pcc:unverified]
+Python finite-field producer-local replay tested **80,640 labeled solutions and 322,560 exact polynomial residuals**, 0 failures, and 560 disjoint block-orbits of 144. The two index sets have the same public masks and target. This is **not** a newly extracted relation, successful Rust CI, a signed PCC verdict or a cheaper complete prime-field ECDLP algorithm. [pcc:unverified]
