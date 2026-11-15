@@ -93,3 +93,17 @@ At source commit [`4ecd0327b43c`](https://github.com/isogeny-labs/crypto/commit/
 The B4 quotient stage times **exclude** factorization, candidate reconstruction, final group validation, K construction and cold base construction. The B31 K construction interval **does not** include a B31 m4 target membership query. These single-run stage timings cannot be compared with cold rho. Full frozen machine-readable source and output: [`M4_PAIR_SUPPORT_CI_EVIDENCE_20261115.json`](M4_PAIR_SUPPORT_CI_EVIDENCE_20261115.json).
 
 Next paired predeclared development probe: `--m4-scale` on B4/B8/B16 prefixes of this *same* B31 Dickson factor base, using identical full public positive and [17]G targets, with separately measured support build, target-dependent norm/GCD, algebraic root splitting, signed validation and completed/censored outcomes. Its commit/workflow is distinct; its actual results must be inspected and recorded before interpretation.
+
+## Source-bound B4/B8/B16 scaling: a negative cost signal
+
+The preregistered `--m4-scale` experiment [GitHub Actions 43747237466](https://github.com/isogeny-labs/crypto/actions/runs/43747237466) at source/workflow commit `ebb2c345ae0c00d5ea69e1e433540f4466217305` PASSED in the development workflow. Same existing ordinary prime31 curve and B31 Dickson fibre, sliced deterministically to B4, B8, B16. Planted-positive `P0+P1+P2+P3` has one canonical signed four-point relation for every slice; the fixed unrelated public `[17]G` has zero. Frozen per-target output: [`M4_PAIR_SUPPORT_SCALE_CI_20261115.json`](M4_PAIR_SUPPORT_SCALE_CI_20261115.json). Producer-only development evidence, **[pcc:unverified]**.
+
+| B | degree K | K build, ms | target quotient norm/GCD, planted ms | target quotient norm/GCD, public [17]G ms | canonical positive rows |
+|---:|---:|---:|---:|---:|---:|
+| 4 | 16 | 0.012 | 0.141 | 0.142 | 1 |
+| 8 | 64 | 0.053 | 3.553 | 3.195 | 1 |
+| 16 | 256 | 0.234 | 191.769 | 192.243 | 1 |
+
+**Material negative scaling:** doubling B8→B16 makes the quotient norm/GCD about 54× slower despite its still sparse positive output. The naive high-degree polynomial representation is a substantial cost blocker; do not project small-slice success to B31 or claim cold-rho advantage. Not shown: a natural-positive random-target success rate, independent relation-rank growth, ordinary B31 target-dependent quotient, complete scalar recovery, or any paired external CAS/rho benchmark.
+
+**Source-head accounting correction:** in the `ebb2c345` probe, `m4_extract_pairs` called `m4_first_eliminant` a *second* time, so the reported `algebraic_root_extraction_ns` also includes a redundant full quotient norm/GCD. Those two ns fields were not disjoint phases and **must not be added** to quote a baseline one-pass pipeline. Source commit `f1944c706e27d4662047f7e8deab17f1831e976d` replaces that duplicate call with `m4_extract_from_eliminant` and adds a wrapper/parity test; the corrected executable needs its own successful CI and frozen output before a revised performance conclusion. This eliminates redundant computational work, not the `B²` degree and steep observed one-pass norm scaling. Keep the original measurements rather than overwriting them.
