@@ -107,6 +107,16 @@ exceed it at small r and approach it as r grows.
 Changing the curves, seeds, targets, arms, methods, unit, accounting
 version, rounds or any threshold above after a session has run.
 
+## Plan check (done before commit)
+
+`ecbench plan --spec specs/prime-medium.json` (output in
+[`plan.txt`](plan.txt)) gives spec `ECS1he8e77a3c8c63` with 480
+executions. All six arms resolve to method ids; the A/A control shares
+`ECM1hefea4e0ebe79` with the reference. There are 40 workloads (5 curves × 8
+targets), and every curve reads A = 2, matching the `√(π/4)` floor above.
+All five curve slugs read `registered=false`, which is the first step of the
+run route below.
+
 ## Run route (not taken here)
 
 1. Register the five curves (AGENTS.md §11) and run
