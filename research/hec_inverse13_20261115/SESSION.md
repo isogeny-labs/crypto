@@ -65,3 +65,12 @@ Built exactparametrization rechecker, boundedfactorization, extension-to-F127
 divisor reconstruction, centered class and adjacentKummer sign recovery.
 ExpectedBimage consulted onlyafter orientation/subtraction. No recoveryrun yet.
 Rawlogs/res nativewhitespace retained; attributes exclude onlyrawformat checks.
+
+## Recovery completed and report inspected
+Source569ce35e4511/checkpoint220449 preceded one exit0 recovery execution.
+Four irreducible cubics, exact product; all four yield F127 divisors and one
+oriented Bimage. Adjacent public Kummer input alone chooses sign; expected B
+certificate checked afterward. Corruption rejected; no group enumeration.
+RESULTS.md, flow.svg and one-page REPORT.pdf record checks and retained failures.
+PDF rendered and visually inspected. No timing comparison or changed cold gate.
+Next integrated cold pipeline and scalable destination LA; genus2/4 remain open.
