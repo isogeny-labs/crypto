@@ -72,3 +72,31 @@ and DAG entries in s,v,M. This is a per-attempt envelope only. Neither a
 uniform sufficient D nor useful relation yield is established. Arbitrary-prime
 arithmetic, all cold phases and growing-family cost remain separate work.
 [pcc:unverified]
+
+## Amendment A1 — first complete cold recovery control
+
+The first panel is complete: D4 passes source/completion/original checks and
+the exact single-model comparison; D5 hits the outer cap and D6 the reduction
+cap. Preserve all outcomes. Do not rerun the panel or change the producer.
+
+Freeze one first cold control, public input Q=(0,6) on E/F17:y²=x³+2x+2,
+P=(5,1), order19, seed1234. Reuse the unchanged core oracle and cold_solve:
+algebraic factor-base construction, mixed point queries, signed relations,
+left kernel, scalar recovery and final group check. Set PC_DEGREE_CAP=4 and
+PC_VERIFIER to the separately compiled checker. No scalar, base logs, reference
+models or decomposition assignments enter the candidate. This is one finite
+software control, not an 18-target census or a public challenge/tier dataset.
+
+The driver records the same seven-column summary and complete existing traces.
+Extend the independent OpenSSL replayer with an explicit --cold-one mode
+requiring exactly this single fixed target; leave full --cold census semantics
+unchanged. Replay the preserved parent18-target traces once as a regression
+check of that refactor, without producer/backend reruns.
+
+Exactly one cold invocation in fresh cold-001, no retries on unknown. Preserve
+all backend inputs, bases, DAGs, errors/statuses and group/kernel traces. Each
+backend retains its20s CPU/wall and2GiB bounds. Whole cold driver gets1200s wall
+and2GiB address space; stop on any unknown/mismatch. Replay successful output
+with the independent OpenSSL binary. Capture source/binary hashes beforehand.
+Large evidence uses the existing artifact store; never split a raw round to
+fit Git. No clocks or query counts become comparative performance claims.
