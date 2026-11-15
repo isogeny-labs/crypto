@@ -1150,10 +1150,14 @@ impl FrobeniusCanon {
 
     /// The normal coordinates of a field element.
     #[inline]
-    pub fn coords(&self, x: u64) -> u64 {
+    pub fn coords(&self, mut x: u64) -> u64 {
+        // The low byte is consumed and `x` shifted by a constant eight,
+        // rather than shifting by `8 * i`: no per-byte variable shift or
+        // index to keep.  At most eight tables, so `x` is spent by then.
         let mut acc = 0u64;
-        for (i, table) in self.tables.iter().enumerate() {
-            acc ^= table[((x >> (8 * i)) & 0xff) as usize];
+        for table in &self.tables {
+            acc ^= table[(x & 0xff) as usize];
+            x >>= 8;
         }
         acc
     }
@@ -1279,7 +1283,7 @@ impl FrobeniusCanon {
     /// well — 90% of random words have at most two — and only the rest
     /// loop.  The lanes advance in lockstep so their chains overlap.  Only
     /// the word is returned; ties between rotations do not change it.
-    #[inline]
+    #[inline(always)]
     fn least_rotations<const L: usize>(&self, words: [u64; L]) -> [u64; L] {
         let (n, mask) = (self.n, self.mask);
         // `rotl^t` for any `0 ≤ t < n` without a branch on `t = 0`:
@@ -1294,10 +1298,38 @@ impl FrobeniusCanon {
         let levels = (u32::BITS - (n - 1).leading_zeros()) as usize;
         let mut pow = [[0u64; L]; 6];
         pow[0] = std::array::from_fn(|l| !c[l] & mask);
-        for k in 1..levels {
+        // With five or more levels, build only `Z_1 … Z_16` first: a
+        // random word's longest zero run is a handful of bits, so `Z_16`
+        // is empty in every lane of nearly every block, and then the
+        // levels above `Z_8` have nothing to lift.  The branch is taken
+        // about once in four hundred blocks, so it predicts.  Where it is
+        // not taken the lift below visits `Z_8 … Z_1` only, reaching run
+        // lengths up to 16, which no lane has: the same `run` the full
+        // lift ends on.
+        let shallow = levels >= 5;
+        let built = if shallow { 5 } else { levels };
+        for k in 1..built {
             let w = 1u32 << (k - 1);
             for l in 0..L {
                 pow[k][l] = pow[k - 1][l] & rot(pow[k - 1][l], w);
+            }
+        }
+        let mut top = built;
+        if shallow {
+            let mut deep = 0u64;
+            for l in 0..L {
+                deep |= pow[4][l];
+            }
+            if deep == 0 {
+                top = 4;
+            } else {
+                for k in built..levels {
+                    let w = 1u32 << (k - 1);
+                    for l in 0..L {
+                        pow[k][l] = pow[k - 1][l] & rot(pow[k - 1][l], w);
+                    }
+                }
+                top = levels;
             }
         }
         // Lift from `Z_1`.  A longer run implies a shorter one, so taking
@@ -1305,7 +1337,7 @@ impl FrobeniusCanon {
         // powers below `n` sum past any `L ≤ n − 1`; `len < n` throughout.
         let mut run = pow[0];
         let mut len = [1u32; L];
-        for k in (0..levels).rev() {
+        for k in (0..top).rev() {
             for l in 0..L {
                 let next = run[l] & rot(pow[k][l], len[l]);
                 let longer = next != 0;
@@ -1315,7 +1347,9 @@ impl FrobeniusCanon {
         }
         // `run` marks the top bit `p` of every longest zero run, and the
         // rotation starting there is `rotl^{n − 1 − p}`.
-        std::array::from_fn(|l| {
+        // A plain loop over the lanes, like the stages above.
+        let mut out = [0u64; L];
+        for l in 0..L {
             let (r, c) = (run[l], c[l]);
             let p1 = 63 - r.leading_zeros();
             let rest = r & !(1u64 << p1);
@@ -1327,12 +1361,9 @@ impl FrobeniusCanon {
                 tops &= !(1u64 << p);
                 best = best.min(rot(c, n - 1 - p));
             }
-            if flat[l] {
-                words[l]
-            } else {
-                best
-            }
-        })
+            out[l] = if flat[l] { words[l] } else { best };
+        }
+        out
     }
 
     /// [`Self::canon`] of every element of `xs`, appended to `out` in
@@ -1411,6 +1442,30 @@ impl FrobeniusCanon {
             }
             return;
         }
+        #[cfg(target_arch = "x86_64")]
+        if canon_bmi2_enabled() {
+            // SAFETY: `canon_bmi2_enabled` checked BMI1, BMI2 and LZCNT.
+            return unsafe { self.canon_scalar_bmi2(xs) };
+        }
+        self.canon_scalar(xs);
+    }
+
+    /// [`Self::canon_scalar`] compiled with BMI2 and LZCNT: the rotations'
+    /// variable shifts are `shlx`/`shrx` and the leading-zero counts one
+    /// `lzcnt`, where the baseline target spends a `cl` move and a
+    /// `bsr`/`xor` pair on each.
+    ///
+    /// # Safety
+    ///
+    /// The CPU must support BMI1, BMI2 and LZCNT.
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "bmi1,bmi2,lzcnt")]
+    unsafe fn canon_scalar_bmi2(&self, xs: &mut [u64]) {
+        self.canon_scalar(xs);
+    }
+
+    #[inline(always)]
+    fn canon_scalar(&self, xs: &mut [u64]) {
         const LANES: usize = 8;
         let mut chunks = xs.chunks_exact_mut(LANES);
         for chunk in &mut chunks {
@@ -1516,6 +1571,21 @@ fn canon_simd_enabled() -> bool {
     static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ON.get_or_init(|| {
         is_x86_feature_detected!("avx512f") && std::env::var("KIC_SCAN_SIMD").as_deref() != Ok("0")
+    })
+}
+
+/// Whether the scalar [`FrobeniusCanon::canon_in_place`] runs compiled
+/// with BMI2 and LZCNT: the CPU has BMI1, BMI2 and LZCNT, and
+/// `KIC_CANON_BMI2=0` has not asked for the baseline build, which stays as
+/// the same-binary control.  The words computed are the same either way.
+#[cfg(target_arch = "x86_64")]
+fn canon_bmi2_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| {
+        is_x86_feature_detected!("bmi1")
+            && is_x86_feature_detected!("bmi2")
+            && is_x86_feature_detected!("lzcnt")
+            && std::env::var("KIC_CANON_BMI2").as_deref() != Ok("0")
     })
 }
 
@@ -3239,6 +3309,39 @@ mod tests {
                     .chain(xs[..len].iter().map(|&x| canon.canon(x)))
                     .collect();
                 assert_eq!(out, want, "degree {n}, {len} keys");
+            }
+        }
+    }
+
+    #[test]
+    fn the_scalar_bulk_keys_agree_with_and_without_bmi2() {
+        // The BMI2/LZCNT build of the scalar bulk key and the baseline
+        // build must give `canon` word for word, on blocks that take the
+        // shallow lift (random words) and the full one (a lane with a
+        // zero run of 16 or more).
+        for n in NB_DEGREES {
+            let f = nb_field(n);
+            let canon = FrobeniusCanon::new(&f, n).unwrap();
+            let mask = (1u64 << n) - 1;
+            let mut rng = StdRng::seed_from_u64(0xB312_0000 + n as u64);
+            let mut xs: Vec<u64> = (0..1000).map(|_| rng.gen::<u64>() & mask).collect();
+            for k in 0..n.min(40) {
+                // Sparse words in the normal basis: a long run of zeros
+                // in the coordinates, pulled back to the field element.
+                xs.push(canon.element_of_coords((1u64 << k) & mask));
+                xs.push(canon.element_of_coords(((1u64 << k) | 1) & mask));
+            }
+            let want: Vec<u64> = xs.iter().map(|&x| canon.canon(x)).collect();
+            let mut plain = xs.clone();
+            canon.canon_scalar(&mut plain);
+            assert_eq!(plain, want, "degree {n}, baseline build");
+            #[cfg(target_arch = "x86_64")]
+            if is_x86_feature_detected!("bmi2") && is_x86_feature_detected!("lzcnt") {
+                let mut fast = xs.clone();
+                // SAFETY: BMI1, BMI2 and LZCNT were just detected (BMI1
+                // accompanies BMI2 on every CPU that has it).
+                unsafe { canon.canon_scalar_bmi2(&mut fast) };
+                assert_eq!(fast, want, "degree {n}, BMI2 build");
             }
         }
     }

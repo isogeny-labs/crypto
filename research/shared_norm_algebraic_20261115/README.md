@@ -208,3 +208,12 @@ PCC-20261115-be28ec is a statement with no proof artifacts or signed verdict.
 The two supporting shared Lean laws have a focused build and axiom audit;
 they do not formalize the solver, projection endpoint or ECDLP cost theorem.
 [pcc:unverified]
+
+## Subsequent core variant
+
+The [core graph-elimination study](../norm_core_elimination_20261115/README.md)
+adds exact target/support and public-prefix substitutions, preserving this
+study's frozen records and original modes. Its report gives the complete new
+controls and the dense backend allocation/cap outcomes. The generic oracle
+adapter changes the source execution identity; archived parent hashes bind
+their recorded historical commits, not a later working tree. [pcc:unverified]
