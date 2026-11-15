@@ -1,0 +1,26 @@
+{
+  "name": "pkm-x-dev-smoke2",
+  "computeType": "CPU",
+  "cloudType": "SECURE",
+  "cpuFlavorIds": [
+    "cpu5m"
+  ],
+  "cpuFlavorPriority": "custom",
+  "vcpuCount": 16,
+  "interruptible": false,
+  "imageName": "python:3.12-slim",
+  "containerDiskInGb": 20,
+  "ports": [
+    "8000/http"
+  ],
+  "dockerEntrypoint": [
+    "bash",
+    "-c"
+  ],
+  "env": {
+    "RUNNER_TOKEN": "<withheld>"
+  },
+  "dockerStartCmd": [
+    "<boot script: cgroup copy loop, then server.py; template sha256 97c97909a45017a1b12af5ebb55022fd58d69d5a1cac465bade79436fac04dd1>"
+  ]
+}

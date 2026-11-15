@@ -2,3 +2,4 @@
 == nullw1_m2_t12_k0: --controls null --null-width 1 --m 2 --t-min 12 --max-t 12 --targets 0 --hky-cmax 6 --hky-max-entries 600000000 --budget 6500 (2026-11-13T04:01:02Z)
 == nullw1_m2_t12_k0: --controls null --null-width 1 --m 2 --t-min 12 --max-t 12 --targets 0 --hky-cmax 5 --hky-max-entries 400000000 --budget 6000 (2026-11-14T19:10:24Z)
 == nullw1_m2_t12_k1: --controls null --null-width 1 --m 2 --t-min 12 --max-t 12 --targets 1 --hky-cmax 5 --hky-max-entries 400000000 --budget 6000 (2026-11-14T19:18:43Z)
+Note (2026-11-15): The lines above list only the varying flags; the full invocation is falsify_cell.sh (committed alongside), i.e. CHECKPOINT_SKIP=devcheck target/release/examples/pkm_tower_pilot --engine hky --kinds kummer --controls null --planted 0 --random 2 --ladder-t none --p 2013265921 --seed 1347106132 --null-width $W --m 2 --t-min $T --max-t $T --max-t-m3 $T --targets $K --hky-cmax ${CMAX:-7} --hky-max-entries $E --budget $B --out $OUT/$NAME.jsonl
