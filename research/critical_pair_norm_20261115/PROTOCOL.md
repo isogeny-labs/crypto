@@ -42,8 +42,9 @@ criterion changes, no trusted execution standing or formal-program claim.
 Use the same public p<2^31, at most20 variables and D<=6 admission. Caps:
 20s CPU/wall for producer plus verifier, 2GiB address space, one thread,
 20,000 attempted source/pair rows, 1,000,000 reduction steps, 2,000,000
-stored/work coefficient and bookkeeping slots, 40,000 DAG nodes, 128 basis
-polynomials and 1MiB exported certificate. Charge index/work arrays, proof
+stored/work coefficient and bookkeeping slots, 40,000 DAG nodes, 128 exported
+basis polynomials and 1MiB exported certificate. The working basis is bounded
+by the row/entry caps, like the parent's internal pivots. Charge index/work arrays, proof
 links, cached products, pair queue and final remapping/export. Count rows,
 reductions, products, field updates, pairs processed/skipped/deferred, basis
 and proof nodes. The outer panel has1200s wall; these are protection caps,
