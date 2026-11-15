@@ -234,3 +234,41 @@ python3 research/norm_branch_rank_pilot_20261115/cubic_factor_fast.py --selftest
 ```
 
 **Experiment decision:** the collision quartic is now a mathematically established factor, so future work should no longer spend time fitting or testing that component. The remaining novel algebraic question is whether the **degree-six quotient is generically a square of a cubic**, why noncollision roots yield corank two rather than just one, and whether either structure produces **positive algebraic ECDLP relations** on a growing-`k` held-out campaign. The fixed eight-sum support and cold-cost boundaries from the preceding sections are unchanged.
+
+
+## 2026-11-15: universal eight-variable negative-square identity [pcc:unverified]
+
+**This section supersedes the historically preserved conjecture** about the balanced 6-by-6 determinant's square-cubic quotient. The following is an exact **computer-assisted polynomial identity certificate** in the ring of integer polynomials, not an accepted Lean theorem or a signed independent PCC verdict. Its mathematical degree argument explains why the finite tests establish an infinite identity if the implementation is correct.
+
+Let L={0,1,2,3}, R={4,5,6,7}, and K have rows I in binom(L,2), columns J in binom(R,2), with K[I,J]=Delta(x_(I union J))^2. Put V_L=prod_(i<j in L)(x_j-x_i), and V_R similarly. Define C[i,j]=(x_(j+4)-x_i)^2 (0<=i,j<4) and N[I,J]=prod_(i in I,j in J) C[i,j] (right pairs reindexed 0..3). Then
+
+    det K = V_L^2 V_R^2 det N .
+
+The previous universal **collision quartic** argument works for every pair on each four-element side by exchanging rows or columns. Thus V_L^4 V_R^4 divides det K over Z[x0,...,x7], and Q=det N/(V_L^2 V_R^2) is an integer polynomial. Each x_i occurs in precisely three rows or columns of N, each with degree <=4 in that variable. Therefore deg_(x_i) det N <=12, and removal of the three internal squared differences yields **deg_(x_i) Q <=6**. Q is translation-invariant and homogeneous of total degree 24.
+
+The executable [universal_square_certificate.py](universal_square_certificate.py) does:
+
+1. Normalize x0=0, x1=1 by an affine action over a rational-function field; set (x2,...,x7)=(10+t0,20+t1,30+t2,40+t3,50+t4,60+t5).
+2. Evaluate 4^6=4,096 exact integer values of Q at t_i in {0,1,2,3}; at each, -Q is a positive integer square. Choose the positive roots and tensor-interpolate the unique H of degree <=3 separately in each t_i.
+3. At all 7^6=117,649 grid points t_i in {0,...,6}, evaluate the determinant Q independently and check Q=-H^2 using the *previously interpolated* polynomial. Both sides have degree <=6 in each variable, so successive univariate root bounds prove the identity in Q[t0,...,t5].
+4. Convert H to ordinary monomial coefficients with exact fractions. All **3,326 nonzero coefficients are integers** and the **total degree is 12**. Coefficient-stream SHA-256: **3a3bbd39a96a7e185eb84126bcff98812aaca6290325398dece037ee7c8b8ada**. Also cross-check original K, factored N, and a separate 720-term Leibniz determinant at two integer inputs.
+5. Let d=x1-x0. Because H has integer coefficients and total degree <=12, the explicit homogenization d^12 H((x2-x0)/d-10,...,(x7-x0)/d-60) is an integer polynomial. Affine covariance and degree-24 homogeneity of Q extend the normalized identity to eight formal variables; polynomial continuation covers collisions.
+
+**Result (exact producer-local computer-assisted identity):**
+
+    det K = -[ V_L^2 V_R^2 S(x0,...,x7) ]^2
+
+for some S in Z[x0,...,x7] of total degree 12. The identity remains valid after reduction into any field. For seven fixed abscissae, the degree-six noncollision quotient in the eighth variable is minus the square of a polynomial of degree <=3 (possibly degenerate); normalization to a monic cubic is valid in odd prime characteristic when the leading coefficient is nonzero. This resolves the k=8 algebraic square-cubic conjecture, not higher-k rank growth, sign positivity, exact corank at a cubic root, coverage beyond the fixed 256 signed sums, or cheaper ECDLP.
+
+**Reproduce:** python3 research/norm_branch_rank_pilot_20261115/universal_square_certificate.py
+
+Local output reported seed_checks=4096, polynomial_identity_checks=117649, nonzero_integer_coefficients=3326, max_total_degree=12 and independent_leibniz_checks=2. Those are producer-local **[pcc:unverified]** observations pending independent replay and signed PCC. The original one-parameter examples and 991-order cold-cost control remain preserved.
+
+### Lead assessment and next registered tests
+
+- **Sparse PKM m=8** (highest direct cost priority, #4077): run a natural-positive relation extractor and record failures, complete invocation costs, useful independent relation/rank increments, setup, linear algebra and individual log recovery against the strongest matched rho. Optimistic full-output whole-call exponent gamma must be below 3.5 (below 3 for one-output). Cheap stages or algebraic rank alone cannot pass.
+- **Norm-branch rank-to-positivity**: preregister held-out growing-k distinct-x/characteristic panels, both sign layers and support-matched independent-coefficient nulls. Separately measure how often noncollision k=8 cubic roots yield *positive* EC sign witnesses, conditioned vs unconditioned hit rates, target-independent sampling, curve/point selection costs, and actual recovered relations. Do not confuse this universal structural square with a growing-k compression law.
+- **Transfer chains** (#3877): require scalar-blind public-point transport and an explicit cheaper final complete solve. A changed prime-field fixture or a torsion lift presuming the original log does not meet that gate.
+- **Whole-solver accounting**: record memory, all failed candidates, field operations, useful relation ranks, generator/factor-base precomputation, cold single-target and amortized multi-target costs separately, and post-verified scalar answers.
+
+**Sources checked:** root AGENTS.md; #4077 prospective PKM/tensor protocol; #4161 304-lead heat map; #4188 polynomial and toy controls; #3877 transfer status; Petit–Kosters–Messeng, *Algebraic Approaches for the ECDLP over Prime Fields*, PKC 2016, DOI 10.1007/978-3-662-49387-8_1; Shoup, *Lower Bounds for Discrete Logarithms and Related Problems*, EUROCRYPT 1997, DOI 10.1007/3-540-69053-0_18. Web search for an exact rank-three compound determinant-square precedent was inconclusive: **no novelty/priority claim**. Research-KB MCP tools and wrapper were unavailable; GitHub primary sources and the repository atlas were the fallback. No Conductor/EKS benchmark, full Rust workspace, independent PCC signature or leaderboard promotion is claimed.
