@@ -1,0 +1,21 @@
+digraph TupleAudit {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.35", ranksep="0.50",
+    label="Tuple-to-row source audit | 2026-11-05\nUnverified review argument; no execution or theorem verdict", labelloc="t", fontsize=18, fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12, fillcolor="#e4eef9", color="#46617e", margin="0.13,0.10"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#61758a"];
+  init [label="Initialize beta, usage, weight = 0\nP > 0; legal mode/group indices"];
+  try [label="next_tuple: strict increment test\nw_i < P-W and U_g < B_g"];
+  add [label="Increment matching coordinate/counters\nW = sum(beta_i*w_i); U_g = sum(beta_i)"];
+  reset [label="Blocked: remove coordinate contribution\nClear beta_i; carry to next index"];
+  end [label="All indices exhausted: false\nStop; do not re-emit zero tuple", fillcolor="#fff0cf"];
+  join [label="evaluate_at cap = child selected rows\nIncoming degree E = U_g <= R; q <= E", fillcolor="#e1f0e6"];
+  next [label="Next: coefficient-DFS refinement\nThen preparation + bit cost + retained state", fillcolor="#eee3f7"];
+  init -> join [label="evaluate initial zero tuple"];
+  try -> add [label="accepted"];
+  try -> reset [label="blocked"];
+  reset -> try [label="next index", constraint=false];
+  reset -> end [label="no next index"];
+  add -> join [constraint=false];
+  join -> try [label="after tuple contribution"];
+  join -> next;
+}

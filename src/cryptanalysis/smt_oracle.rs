@@ -322,6 +322,11 @@ pub struct SmtSolveOptions {
     /// Keep the generated script under this path instead of a temporary file
     /// (each enumeration round appends `.k` for its blocking depth).
     pub keep_script: Option<PathBuf>,
+    /// Feed the script on standard input when it does not need to be retained.
+    /// Solvers that do not accept stdin keep the file-based default.
+    pub use_stdin: bool,
+    /// Interval between nonblocking child-completion checks.
+    pub poll_interval: Duration,
     /// Boolean or one-bit bit-vector encoding.
     pub encoding: SmtEncoding,
     /// Add the Kosters–Yeo trace row, as the native path does by default.
@@ -342,6 +347,8 @@ impl SmtSolveOptions {
             work_dir: None,
             timeout: Duration::from_secs(600),
             keep_script: None,
+            use_stdin: false,
+            poll_interval: Duration::from_millis(5),
             encoding: SmtEncoding::Bool,
             trace_constraint: true,
             macaulay_degree: Some(2),
@@ -458,29 +465,36 @@ pub fn harvest_counters(text: &str) -> (Option<u64>, Option<u64>) {
 
 /// Run the solver once on a script.
 pub fn run_smt(script: &str, round: usize, options: &SmtSolveOptions) -> Result<SmtRun, String> {
-    let path = match &options.keep_script {
-        Some(path) => {
-            let path = if round == 0 {
-                path.clone()
-            } else {
-                path.with_extension(format!("{round}.smt2"))
-            };
-            if let Some(parent) = path.parent() {
-                fs::create_dir_all(parent).map_err(|e| format!("create script parent: {e}"))?;
+    let use_stdin = options.use_stdin && options.keep_script.is_none();
+    let path = if use_stdin {
+        None
+    } else {
+        Some(match &options.keep_script {
+            Some(path) => {
+                let path = if round == 0 {
+                    path.clone()
+                } else {
+                    path.with_extension(format!("{round}.smt2"))
+                };
+                if let Some(parent) = path.parent() {
+                    fs::create_dir_all(parent).map_err(|e| format!("create script parent: {e}"))?;
+                }
+                path
             }
-            path
-        }
-        None => {
-            let dir = options.work_dir.clone().unwrap_or_else(std::env::temp_dir);
-            fs::create_dir_all(&dir).map_err(|e| format!("create work dir: {e}"))?;
-            let script_id = NEXT_SCRIPT_ID.fetch_add(1, Ordering::Relaxed);
-            dir.join(format!(
-                "smt-pdp-{}-{script_id}-{round}.smt2",
-                std::process::id()
-            ))
-        }
+            None => {
+                let dir = options.work_dir.clone().unwrap_or_else(std::env::temp_dir);
+                fs::create_dir_all(&dir).map_err(|e| format!("create work dir: {e}"))?;
+                let script_id = NEXT_SCRIPT_ID.fetch_add(1, Ordering::Relaxed);
+                dir.join(format!(
+                    "smt-pdp-{}-{script_id}-{round}.smt2",
+                    std::process::id()
+                ))
+            }
+        })
     };
-    fs::write(&path, script).map_err(|e| format!("write script {}: {e}", path.display()))?;
+    if let Some(path) = &path {
+        fs::write(path, script).map_err(|e| format!("write script {}: {e}", path.display()))?;
+    }
 
     let args = options
         .args
@@ -490,20 +504,50 @@ pub fn run_smt(script: &str, round: usize, options: &SmtSolveOptions) -> Result<
     let mut command = Command::new(&options.binary);
     command
         .args(&args)
-        .arg(&path)
-        .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+    if let Some(path) = &path {
+        command.arg(path).stdin(Stdio::null());
+    } else {
+        command.stdin(Stdio::piped());
+    }
     if let Some(dir) = &options.work_dir {
         command.current_dir(dir);
     }
-    let mut child = command.spawn().map_err(|e| {
-        format!(
-            "spawn {} {}: {e}",
-            options.kind.name(),
-            options.binary.display()
-        )
-    })?;
+    let cleanup_script = || {
+        if options.keep_script.is_none() {
+            if let Some(path) = &path {
+                let _ = fs::remove_file(path);
+            }
+        }
+    };
+    let mut child = match command.spawn() {
+        Ok(child) => child,
+        Err(error) => {
+            cleanup_script();
+            return Err(format!(
+                "spawn {} {}: {error}",
+                options.kind.name(),
+                options.binary.display()
+            ));
+        }
+    };
+    if use_stdin {
+        let write_result = child
+            .stdin
+            .take()
+            .ok_or_else(|| format!("open {} stdin", options.kind.name()))
+            .and_then(|mut stdin| {
+                std::io::Write::write_all(&mut stdin, script.as_bytes())
+                    .map_err(|e| format!("write {} stdin: {e}", options.kind.name()))
+            });
+        if let Err(error) = write_result {
+            let _ = child.kill();
+            let _ = child.wait();
+            cleanup_script();
+            return Err(error);
+        }
+    }
     let deadline = started + options.timeout;
     let timed_out = loop {
         match child.try_wait() {
@@ -512,17 +556,25 @@ pub fn run_smt(script: &str, round: usize, options: &SmtSolveOptions) -> Result<
                 let _ = child.kill();
                 break true;
             }
-            Ok(None) => std::thread::sleep(Duration::from_millis(5)),
-            Err(e) => return Err(format!("wait {}: {e}", options.kind.name())),
+            Ok(None) if options.poll_interval.is_zero() => std::thread::yield_now(),
+            Ok(None) => std::thread::sleep(options.poll_interval),
+            Err(error) => {
+                let _ = child.kill();
+                let _ = child.wait();
+                cleanup_script();
+                return Err(format!("wait {}: {error}", options.kind.name()));
+            }
         }
     };
-    let output = child
-        .wait_with_output()
-        .map_err(|e| format!("collect {} output: {e}", options.kind.name()))?;
+    let output = match child.wait_with_output() {
+        Ok(output) => output,
+        Err(error) => {
+            cleanup_script();
+            return Err(format!("collect {} output: {error}", options.kind.name()));
+        }
+    };
     let elapsed = started.elapsed();
-    if options.keep_script.is_none() {
-        let _ = fs::remove_file(&path);
-    }
+    cleanup_script();
     if timed_out {
         return Err(format!(
             "{} timed out after {} ms",

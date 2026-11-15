@@ -1,0 +1,41 @@
+name: CT71 point-field stabilizer and Galois normalizer audit
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct71/**'
+      - '.github/workflows/ct71-pointfield-normalizer.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct71-normalizer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent exact GL2 normalizer and CT69 global negation controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct71
+          python3 -B "$D/ct71_point_field_stabilizer.py" > ct71-py.json
+          python3 -O -B "$D/ct71_point_field_stabilizer.py" > ct71-py-opt.json
+          node "$D/ct71_point_field_stabilizer_independent.js" > ct71-js.json
+          node --no-opt "$D/ct71_point_field_stabilizer_independent.js" > ct71-js-noopt.json
+          cmp ct71-py.json ct71-py-opt.json
+          cmp ct71-py.json ct71-js.json
+          cmp ct71-py.json ct71-js-noopt.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          lines=Path('ct71-py.json').read_text().splitlines()
+          assert len(lines)==6
+          for row in map(json.loads,lines[:4]):
+              ell=row['ell']
+              assert row['point_field_degree']==ell**2-1
+              assert row['K_rational_ell_torsion_size']==ell
+              assert row['K_field_automorphisms']==ell-1
+          assert lines[4:] == ['ct69_negation_verified=true','ct71_verified=true']
+          print('CT71 point-field normalizer verified; no input-uniform cross-char lift claimed')
+          PY
+          echo '81f1f52a0590419718084e9a85f33839051a00a603ceb7cec2416b20182a5db9  ct71-py.json' | sha256sum -c
