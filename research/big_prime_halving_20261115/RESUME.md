@@ -30,7 +30,8 @@ at /workspace/scratch/aux-halving-qualification001. After an hour without a
 Copilot response, critical PR4304 resolved its journal with normal merge
 417dd19e294627188355d5f56d46b5064bad4c08. This branch inherits it asf421e30bc1;
 all original blocks/multiplicities and native bindings were preserved. Parent
-current-head required gates remain pending; do not carry earlier passes.
+4304 then merged as90b684a712 at16:07:05Z with its actual required gates
+passing. This branch merges that main as2390f73f57;4305is now based on main.
 
 ## Next steps
 From /workspace/scratch/big-prime-halving, commit/push all native source and
@@ -44,19 +45,20 @@ that neither its output directory nor its outer log already exists:
 
 Do not replace any existing output. Retain the outer status and full log.
 Inspect every exit, retain failures, archive whole raw round, publish report/PR.
-After4304lands, retarget4305to main and enable auto-merge under its review/
-validation requirements. Keep the missing numerical qualification explicit.
+Enable4305auto-merge on main after the final handoff push, under its review/
+validation requirements. Keep the missing numerical qualification explicit;
+source publication is not numerical validation or whole-goal completion.
 
 ## Runs in flight
 None. The shared local gate is complete. No native case or paid job is running.
 At16:06:45Z the CLI, token file/environment and AWS key pair remain unavailable;
-no qualification directory exists. Parent4304 head417dd19e29 has pending
-required CI as last read16:03Z (next normal unchanged-head check about16:53Z).
-Its older PCC43732872143 was cancelled for a higher-priority request, while
-replacement43732981463 was running; do not call the cancellation a pass.
-Child4305 headddba0d7b00 was last read16:04:48Z with validation/PCC/learning
-pending. The new handoff-only head needs its own eventual status; never carry
-those earlier passes forward. The research goal is paused at this documented
+no qualification directory exists. A further standard-path metadata check
+also confirms absent AWS config/credential files and no off-PATH CLI.
+New activity then confirmed4304merged: validation43732872044,size43732871953,
+artifacts43732872057 and replacement PCC43732981463 pass on417dd19e29.
+Older PCC43732872143 was cancelled for concurrency, not counted as a pass.
+Prototype4305's final handoff head needs its own eventual main checks; do not
+carry its earlier feature-base passes forward. The research goal is paused at this documented
 external-access dependency after independent work; its algorithm criterion
 has not been met.
 
