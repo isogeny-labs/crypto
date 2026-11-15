@@ -1,0 +1,36 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "identity gate: wall-only Rust fixes 2026-11-10, tensor contraction",
+  "description": "Baseline binary (4e909cd242) against the candidate binary on the same spec and seeds: every counter, steps, gae, recovered and replay digest must be identical. Not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 12,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261110
+  },
+  "arms": [
+    {
+      "name": "ic-tensor",
+      "role": "candidate",
+      "method": {
+        "id": "ic.tensor_contraction_v1",
+        "params": {
+          "m": "2"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261110,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}
