@@ -30,5 +30,7 @@ jobs:
         run: rustup toolchain install 1.100.0 --profile minimal --component clippy
       - name: Test reused engines and adapter
         run: cargo +1.100.0 test --locked --release --lib --manifest-path research/prime31_ic_20261115/native/Cargo.toml
+      - name: Exact prime31 native two-sum coverage preflight
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_two_sum_gate
       - name: Lint adapter and CLI
         run: cargo +1.100.0 clippy --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib --bin prime31-algebraic-ic -- -D warnings
