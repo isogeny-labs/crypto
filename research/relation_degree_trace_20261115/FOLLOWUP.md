@@ -205,3 +205,40 @@ native suite and clippy passed as producer development checks `[pcc:unverified]`
 Source and successor protocol are published before the next timed run. The
 failure-stop correction now applies to either candidate arm, not just the
 successor. No old raw result or frozen binary is rewritten.
+
+## 2026-11-15T05:39Z — Projection observation and solver ablation
+
+The first completed four-variable projection cases have producer median ratios
+about 4.9 against the frozen native solver. The 31-bit seed-101 A/A control is
+admitted; the 53-bit seed-101 control is not. This is not the tenfold target
+and not a statement about remaining cases `[pcc:unverified]`.
+
+Next ablation, frozen before timing: interreduce the initial generator set
+before making S-pairs. This is standard Buchberger housekeeping; it can expose
+cheap consequences and discard obsolete generators. Preserve the original
+reference routine as the timing baseline and compare both raw-input and
+projection-input variants of the improved routine. Report the engine effect
+separately from any relation contribution. All final bases and original-input
+certificates must pass the existing check. No running worker binary is changed.
+
+## Failure-stop review before engine comparison
+
+Static review found the successor stopped failed pairs only after entering an
+A/A block on sample zero. That would launch two more timed-out baselines.
+Correct it to admit controls only when both arms completed, and add a regression
+test. The currently running projection campaign's completed four-variable
+observations remain preserved; stop it before entering the known problematic
+six-variable failure path, rather than launch unchanged failures again. The
+full projection panel will be marked incomplete, never silently promoted.
+The corrected engine campaign will retain all 24 planned cases and stop after
+a first failed pair without A/A retries. All revised decisions are explicit.
+
+## 2026-11-15T05:43Z — Engine ablation readiness
+
+The initial-interreduction routine passed original-input certificate, complete
+basis and projection/raw equality tests on both fields. The corrected control
+eligibility has a regression test: failed pairs cannot launch A/A retries.
+Full native tests and clippy passed as producer checks `[pcc:unverified]`.
+The previous projection interruption records the stop race and orphan-worker
+cleanup explicitly. No timed process or build remains before the next launch.
+Publish the engine/control fix and its protocol before running both ablations.

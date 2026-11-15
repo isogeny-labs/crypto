@@ -132,6 +132,15 @@ fn checked_ratio(left: &Value, right: &Value) -> Option<(f64, u128)> {
         Some((a / b, replay_ns))
     }
 }
+fn controls_eligible(sample: usize, arms: &serde_json::Map<String, Value>) -> bool {
+    sample.is_multiple_of(3)
+        && arms
+            .get("baseline")
+            .is_some_and(|v| v["status"] == "complete")
+        && arms
+            .get("candidate")
+            .is_some_and(|v| v["status"] == "complete")
+}
 fn main() -> Result<(), Box<dyn Error>> {
     let mut args = std::env::args().skip(1);
     let (mut fixtures, mut out, mut binary, mut backend) = (None, None, None, None);
@@ -160,7 +169,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     if backend.as_deref() != Some("local") {
         return Err("this driver supports an explicitly selected local L0 backend only; do not use to bypass IsoLab admission".into());
     }
-    if candidate_arm != "candidate" && candidate_arm != "projection" {
+    if candidate_arm != "candidate"
+        && candidate_arm != "projection"
+        && candidate_arm != "interreduce"
+        && candidate_arm != "projection-interreduce"
+    {
         return Err("candidate arm must be candidate or projection".into());
     }
     let fixtures = fixtures.ok_or("--fixtures required")?;
@@ -186,7 +199,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .as_array()
         .ok_or("missing manifest cases")?
         .clone();
-    if candidate_arm == "projection" {
+    if candidate_arm != "candidate" {
         ordered.sort_by_key(|e| {
             (
                 e["variables"].as_u64(),
@@ -244,7 +257,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 ratios.push(r);
             }
             let mut record = json!({"sample":sample,"order":order,"arms":arms,"checked_ratio":ratio.map(|r|r.0),"equality_replay_ns_charged_to_each":ratio.map(|r|r.1)});
-            if sample % 3 == 0 {
+            if controls_eligible(sample, &arms) {
                 let first = worker(
                     &binary,
                     &fixture,
@@ -318,6 +331,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn failed_pair_does_not_launch_control_retries() {
+        let arms = serde_json::Map::from_iter([
+            ("baseline".to_string(), json!({"status":"timeout"})),
+            ("candidate".to_string(), json!({"status":"complete"})),
+        ]);
+        assert!(!controls_eligible(0, &arms));
+    }
     #[test]
     fn paired_bootstrap_keeps_the_declared_ratio() {
         let x = interval(&[12.; 21]);

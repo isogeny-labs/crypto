@@ -122,7 +122,12 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
     let inputs = system.decode()?;
     let n = system.variables.len();
     let p = system.prime;
-    if arm != "baseline" && arm != "candidate" && arm != "projection" {
+    if arm != "baseline"
+        && arm != "candidate"
+        && arm != "projection"
+        && arm != "interreduce"
+        && arm != "projection-interreduce"
+    {
         return Err("arm must be baseline, candidate or projection".into());
     }
     let (mut preprocessing_ns, mut solving_ns) = (0u128, 0u128);
@@ -137,7 +142,7 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         let charged_start = Instant::now();
         reset_counters();
         let start = Instant::now();
-        let augmented = if arm == "projection" {
+        let augmented = if arm == "projection" || arm == "projection-interreduce" {
             let (a, info) =
                 relation_degree_trace::projection::augment(std::hint::black_box(&inputs), n, p);
             pairs = info.len();
@@ -154,7 +159,11 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         preprocess_products += counters().modular_products;
         reset_counters();
         let start = Instant::now();
-        basis = reference(std::hint::black_box(&augmented), n, p)?;
+        basis = if arm == "interreduce" || arm == "projection-interreduce" {
+            relation_degree_trace::reference_interreduce(std::hint::black_box(&augmented), n, p)?
+        } else {
+            reference(std::hint::black_box(&augmented), n, p)?
+        };
         drop(augmented);
         solving_ns += start.elapsed().as_nanos();
         charged_ns += charged_start.elapsed().as_nanos();
