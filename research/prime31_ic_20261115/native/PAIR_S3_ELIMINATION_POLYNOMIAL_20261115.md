@@ -279,3 +279,36 @@ specializations from any subsequent *complete distinct-index* search.
 
 Even after this component improvement, no full cold prime31 scalar
 recovery or cheaper-than-matched-rho result has been measured.
+
+
+## S4 ablation: the remaining stop occurs in each side separately (Rust CI)
+
+[Actual Rust CI run 43725152557](https://github.com/isogeny-labs/crypto/actions/runs/43725152557),
+head \`7bdd55c0425048fb64c0b46bf432c6f03e9b72f3\`,
+passed the focused development job. Its exact six reduced-ideal records are
+preserved at [M8_S4_SIX_TOWER_ABLATION_CI_20261115.json](M8_S4_SIX_TOWER_ABLATION_CI_20261115.json).
+The frozen natural-positive witness was checked against each ideal before
+calling the same shared Rust F4. These **reduced ideals are diagnostic
+subsystems, not usable m8 relation oracles**.
+
+| Six-block original-curve S4 ideal | Degree reached | F4 muladds before stop | Outcome |
+|---|---:|---:|---|
+| Left S4 only | 10 | 14,129 | Oversize |
+| Right S4 only | 10 | 14,129 | Oversize |
+| Target S4 only | 0 | 0 | Basis, no extraction |
+| Left + right | 10 | 56,211 | Oversize |
+| Left + target | 10 | 14,129 | Oversize |
+| Right + target | 10 | 14,129 | Oversize |
+
+Each individual left/right S4 already hits the **15k reduced-matrix cap**.
+All eight previously run full remaining-S4 specializations had the same
+56,211 partial muladds. This isolates a **target-independent S4-side
+bottleneck after removal of fixed S3**, not a dependence on the chosen w or
+public target. No roots and no public discrete logs were extracted.
+
+The next minimally confounded experiment is a **single S4 with only three
+Dickson six-level towers plus one free abscissa**, removing the unused other
+three blocks. If the single-block S4 is still oversize under identical limits,
+the actionable next lever is the S4 resultant representation or a certified
+quotient/#4228 or mature solver, not additional target/pair specializations.
+No full-cost or rho advantage is inferred from these partial counters.
