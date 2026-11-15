@@ -2967,3 +2967,56 @@ No holes/custom axioms/native proof evaluation/raised limits/new global flags/
 waivers/frozen edits/cryptographic Python/native crypto experiment/spend/upload/
 new physical host/compiler or full fourteen-item completion claim.
 [pcc:unverified]
+
+
+### Actual general-model geometric five-torsion rank
+
+The [actual five-torsion rank proof](../research/five_torsion_rank_audit_20261115/README.md)
+now derives25 actual geometric points killedby5,24 points of exactorder5 and an
+actual Fin2 basis over ZMod5 for every nonsingular general Weierstrass model
+over every algebraically closed field with5 nonzero, including characteristics
+2 and3. The literal pinned-library W.preΨ5 point criterion is proved in every
+characteristic: actual5P=0 iff Ψ5(x)=0. Actual duplication/equal-x classification
+and coprime2/5,3/5 annihilation prove both directions. With D=Ψ2Sq,T=Ψ3,
+H=preΨ4,C=6X²+b2X+b4, universal kernel-checked identities H=TC−D²,
+U=D²H−T³,Uprime=5D(CH−T²),T²H=D²(CH−T²)−CU derive separability; actual
+nonsingularity excludes D/T zeros. The official degree theorem gives12 distinct
+roots, actual ordinate fibers have two points each, and an explicit actual
+point/fiber equivalence gives12×2+identity=25. Actual annihilation/cardinality
+then gives the module rank and basis. No kernel count, rank, separability or
+polynomial/group equivalence is supplied as a premise. Thus the general-model
+**rank gap at prime5 is closed**; determinant at5, general rank/determinant for
+primes≥7, canonical Weil and the full all-k p<500 census remain open.
+
+Credited actual binary/ternary curves now have five-kernel25/rank2. In every
+characteristic5 field, the actual curve y²=x³+1 has discriminant3, literal
+fifth polynomial evaluating to−1 everywhere and whole five-kernel1. This
+refutes deleting coprimality from the rank/count claim. It is not a BK
+point-count-divisibility counterexample, a nonreduced group-scheme length or
+supersingularity-definition claim. The earlier ordinary characteristic-five
+kernel5 control is credited separately. Actual three-torsion/root/ordinate/
+fiber methods and official degrees/duplication are credited; established
+methods, no novelty or qualified-source refutation claim.
+
+Exact local **PCC-20261115-2cfd10 PASS at 2026-11-15T18:18:29Z**, signed standing unverified. Whole tracked
+and transitive gate50 theorems/10 new concrete modules/0 failures/0 trusted native;
+12 frozen custom modules,0 copies,15 old formal configurations and31 old pins
+checked before/after10 states and gate. Six failures/four successes retained,
+including09 internal exception#3 and recovery errors, never accepted. Final10
+uses an explicit Unit equivalence and passes. Prior77 gate credited separately.
+All28 formal17 artifact45 pins match. Full1281-character header
+SHA7cf18bb12120869fac57c17df562ecbdb06329a691fd1ae4446fe7ce97cc10df;
+native1 complete/0 prefixes/0 unresolved/empty suffix after completed gate.
+Lossless archive197 files/80 objects/23824 bytes, exact roundtrip and five gate
+files. First report valid: one page48116 bytes, all5052 characters read and
+full-page visual inbounds. Final new-source warnings0;7 inherited advisories
+and1 frozen auditor deprecation retained. Fresh Galbraithch9 PDF16–17/36,
+printed180–181 §9.8/Def9.8.5/Lemma9.8.6/Thm9.8.7 fulltext and individual visual;
+its stated polynomial theorem uses short models/char!=2,3, so this n5 general
+extension is proved directly rather than attributed to that passage. Earlier
+BK printed142–143 review credited, not broadened. Four correct KB calls and
+Conductor127 before processing/code, publication Conductor127 before maps/
+outside pins; bounded fallback/no absence claim. Copyright primary files local.
+No holes/custom axioms/native proof evaluation/raised limits/new global flags/
+waivers/frozen edits/cryptoPython/native crypto experiment/spend/upload/new
+physical host/compiler or full fourteen-item completion claim. [pcc:unverified]
