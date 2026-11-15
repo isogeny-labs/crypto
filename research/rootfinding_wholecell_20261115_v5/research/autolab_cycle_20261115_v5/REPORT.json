@@ -1,0 +1,74 @@
+{
+  "runner_result": {
+    "next_actions": [
+      "Repair quintic-boolean-cell-20261115-v5 artifact collection and register a new experiment."
+    ],
+    "status": "error",
+    "summary": "artifact capture failed: declared artifact missing: research/quintic_boolean_20261115_v5/raw-controls.json.gz"
+  },
+  "worker_observation": {
+    "schema": "scientific_result_v1",
+    "experiment_id": "quintic-boolean-cell-20261115-v5",
+    "status": "passed",
+    "summary": "Bounded exact Boolean-ANF support certificates on actual shared73bit norm cell; capped leaves remain UNKNOWN.",
+    "evidence": {
+      "details": {
+        "field_degree": 83,
+        "shared_parameter_bits": 73,
+        "processed_nodes": 31,
+        "rejected_leaves": 0,
+        "rejected_parameter_mass": 0,
+        "unresolved_parameter_mass": 9444732965739290427392,
+        "cover_mass": 9444732965739290427392,
+        "whole_fixed_norm_cell_rejected": false,
+        "original_global_complete": false,
+        "budget": {
+          "products": 998588,
+          "node_products": 13162,
+          "max_terms": 2702,
+          "max_active": 20105,
+          "max_degree": 2,
+          "stage": "power_X_8",
+          "max_allocated_terms": 65532
+        },
+        "stopped": "global product budget",
+        "enumerated_2_to_73": false,
+        "control_truth_states": 75,
+        "frontier_depth_counts": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 1,
+          "5": 30,
+          "6": 0,
+          "7": 0,
+          "8": 0
+        }
+      },
+      "error": null,
+      "predicates": 795,
+      "raw_sha256": "670fe62545959b08cb9ac6c2c33d31dbb03153e971aaded9d32a6798f6b446bb",
+      "raw_bytes": 13858,
+      "raw_uncompressed_bytes": 45302,
+      "peak_process_rss_kib": 156320,
+      "exact_prefix_cover_completed": true,
+      "complete_global_root_search": false,
+      "original_root_count_exact": null,
+      "qualified_speedup": null,
+      "release_gate_claim": false,
+      "novelty_claim": false
+    },
+    "next_actions": [
+      "If cap/no-refutation occurs, use recorded first growth stage and shared coefficients to devise a different cell invariant or restricted multiplication closure; do not retry identical symbolic traversal. Preserve rank4/all-distinct and global-original obligations."
+    ]
+  },
+  "process": {
+    "wall_seconds": 6.884612324000045,
+    "peak_process_rss_kib": 156320
+  },
+  "scientific_goal_complete": false,
+  "requested_speed_target": 8,
+  "qualified_speedup": null,
+  "decision": "No actual exclusion; preserve artifact-registration ERROR and orphan raw separately; next exact dual obstruction tests certificate class without ANF expansion."
+}
