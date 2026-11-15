@@ -515,6 +515,21 @@ fn main()->Result<(),String>{
 mod tests{
     use super::*;
     #[test]
+    fn mod_n_full_rank_recovers_factor_base_and_target_unknowns(){
+        let mut system=System32::new();
+        for i in 0..31 {
+            assert!(system.include(&[(i,1)],(i+1) as u64,0).unwrap());
+        }
+        const HIDDEN: u64 = 1_038_579_171;
+        assert!(system.include(&[(0,1)],(1+N-HIDDEN)%N,1).unwrap());
+        assert_eq!(system.rank,32);
+        let values=system.solve().unwrap();
+        for (i,&v) in values[..31].iter().enumerate() {
+            assert_eq!(v,(i+1) as u64);
+        }
+        assert_eq!(values[31],HIDDEN);
+    }
+    #[test]
     fn s3_quadratic_roots_and_complete_signed_b4_targets(){
         let mut ar=Arithmetic::default();
         check_curve(PRIME31,&mut ar).unwrap();
