@@ -57,7 +57,7 @@ for mca_case in wrong-coefficient forged-unit missing-original incomplete-gb; do
         cp "$mca_study/fixtures/xy.ms" "$mca_dir/input.ms"
         printf '#field characteristic: 5\n#variable order: x,y\n#monomial order: graded reverse lexicographical\n[x]:\n' > "$mca_dir/basis.gb"
         printf 'MCAULAY-CERT-1 5 2 2 1 1\n0 0 0\n1 0 1\n' > "$mca_dir/basis.gb.cert"
-        mca_expected='original generator not included';;
+        mca_expected='original generator does not reduce to zero';;
     incomplete-gb)
         cp "$mca_study/fixtures/non-gb.ms" "$mca_dir/input.ms"
         printf '#field characteristic: 5\n#variable order: x,y\n#monomial order: graded reverse lexicographical\n[x^2-y,x*y-1]:\n' > "$mca_dir/basis.gb"
