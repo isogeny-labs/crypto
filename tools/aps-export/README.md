@@ -10,6 +10,7 @@ cargo build --release --locked --manifest-path tools/aps-export/Cargo.toml
 tools/aps-export/target/release/aps-measurement-export build EVIDENCE_ROOT request.json --out NEW_EXPORT.json
 tools/aps-export/target/release/aps-measurement-export check EVIDENCE_ROOT NEW_EXPORT.json
 tools/aps-export/target/release/aps-measurement-export audit-record EVIDENCE_ROOT one-record.json
+tools/aps-export/target/release/aps-measurement-export audit-inclusive EVIDENCE_ROOT one-record.json inclusive-ir.json
 ```
 
 The build target can be changed with normal Cargo settings. Every evidence
@@ -74,6 +75,20 @@ the literal record seal, native counters and evidence hashes/sizes; arithmetic
 reads the explicit curve and target without the producer's Montgomery code.
 See [CONTRACT.md](CONTRACT.md) for the exact scope. All exported clocks retain
 `wall_valid: false`. Unknown native work is never promoted to complete `S`.
+
+APS v3 adds explicit profiles, line-chart cells, coordinate guesses, checked
+trace histories and retained-base full/frontier coverage. The point oracle
+subtracts old solutions only when the prior complete traversal authorizes
+that frontier. It checks a partial traversal as a subset instead.
+
+Optional inclusive instruction evidence is described in
+[the accounting contract](../../research/aps_cost_leads_20261106/ACCOUNTING.md).
+The frozen protocol controls `extensions.aps_export.require_inclusive_ir`.
+The request may bind `inclusive_profiles: [{"seq": 0, "path": "ir.json"}]`;
+each packet pins separately sealed replay and scalar-check frames. Missing
+required evidence preserves the execution row and prevents `check` from
+qualifying the export. `audit-inclusive` checks one such packet without
+launching a profiler. It does not attest execution or supply GAE prices.
 
 Development commands:
 
