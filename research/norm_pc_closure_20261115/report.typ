@@ -67,9 +67,10 @@ There is no new Lean proof of the native parser, order or verifier program.
 *Custody.* Producer/checker bf6d29e42d; cold driver/include guard/replayer
 b31a2ca3a9. Hashes precede affected calls. Deterministic raw archives retain
 all successful/unknown outcomes and initial build/setup failures. Qualification
-archive: 40784 bytes, directly tracked. Cold archive: 283208 bytes, requiring the
-documented artifact-store migration; remote custody stays pending until its
-upload/download receipt. A post-run qualification-manifest overwrite and the
+archive: 40784 bytes, directly tracked. Cold archive: 283208 bytes, uploaded and
+downloaded successfully by artifact-autofix run 43690919442. Its manifest and
+ignore rules land in bot commit dcc5c0c677; local hydrated verification passes.
+A post-run qualification-manifest overwrite and the
 labelled reconstruction are disclosed in the archive's custody note.
 
 *Sources.* PROTOCOL.md, README.md, COST.md and the parent selective-oracle and

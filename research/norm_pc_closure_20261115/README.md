@@ -59,10 +59,13 @@ Each raw round has a deterministic `runs.tar.xz` under evidence/. Check its
 SHA256 file in that directory, then extract there with `tar -xJf runs.tar.xz`.
 The whole qualification archive is40784 bytes and committed directly. Cold002
 is283208 bytes: use `python3 tools/artifacts/artifacts.py pull
-research/norm_pc_closure_20261115/evidence/cold-002` after its verified manifest
-lands. Local AWS CLI is absent; docs/artifacts.md specifies the same-repository
-artifact-autofix workflow for upload, byte replay and pointer commit. Remote
-custody is pending until that workflow succeeds. No archive is split.
+research/norm_pc_closure_20261115/evidence/cold-002` to hydrate its manifest.
+Local AWS CLI is absent; the documented same-repository artifact-autofix
+[run43690919442](https://github.com/isogeny-labs/crypto/actions/runs/43690919442)
+uploaded and downloaded the bytes successfully. Bot commit dcc5c0c677 retains
+the manifest, ignore rules and SHA256
+629341e03334c65633c3fb68fe55d06dad7487b1ea5786948504f11e5c76ee4f.
+Local hydrated verification also passes. No archive is split.
 [pcc:unverified]
 
 Qualification hashes: the runner manifest was overwritten post-run by the
