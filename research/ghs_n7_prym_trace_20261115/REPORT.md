@@ -1,6 +1,6 @@
 # n=7 GHS Prym trace-class screen
 
-15 November 2026. Source and protocol: [PROTOCOL.md](PROTOCOL.md), [THEOREM.md](THEOREM.md). Raw results: [successful CSV](reports/run-20261115T0821Z/curves.csv) and [summary](reports/run-20261115T0821Z/summary.txt). The first run stopped on a signed-remainder assertion error; see [AMENDMENT_1.md](AMENDMENT_1.md) and its preserved [failure output](reports/run-20261115T0820Z/summary.txt). All derived and measured statements in this report await an independent PCC verdict. [pcc:unverified]
+15 November 2026. Source and protocol: [PROTOCOL.md](PROTOCOL.md), [THEOREM.md](THEOREM.md), and the new [complete hyperelliptic classification](HYPERELLIPTIC_CLASSIFICATION.md). Raw results: [successful CSV](reports/run-20261115T0821Z/curves.csv), [summary](reports/run-20261115T0821Z/summary.txt), [hyperelliptic census](reports/hyp-census-20261115T0855Z-result.txt), and [independent replay](reports/hyp-replay-20261115T0853Z/result.txt). Earlier stopped runs and amendments are preserved. All derived and measured statements in this report await an independent PCC verdict. [pcc:unverified]
 
 ## What the bound says
 
@@ -33,10 +33,24 @@ A second native program [replayed all 112 orders](reports/replay-20261115T0833Z/
 
 ## Hyperelliptic target geometry
 
-The [characteristic-two parity lemmas of Borodin–May](https://arxiv.org/pdf/2508.16886) give a sharper necessary screen: an ordinary genus-seven hyperelliptic Y with this sparse L-polynomial must have exactly one F2-rational branch point and one Frobenius orbit of seven branch points. Up to `PGL_2(F_2)`, there are [nine possible branch supports](BRANCH_SUPPORT_BOUND.md). This is a finite search reduction, not a count of curves or an existence result. Nonhyperelliptic genus-seven targets remain outside this screen.
+The [characteristic-two parity lemmas of Borodin–May](https://arxiv.org/pdf/2508.16886) give a sharper necessary screen: an ordinary genus-seven hyperelliptic Y with this sparse L-polynomial must have exactly one F2-rational branch point and one Frobenius orbit of seven branch points. Up to `PGL_2(F_2)`, there are [nine possible branch supports](BRANCH_SUPPORT_BOUND.md).
+
+The [same proof for any even q](BRANCH_SUPPORT_BOUND.md) gives an exact branch-support count up to `PGL₂(F_q)`: with `S=1+q+q²+q³+q⁴+q⁵`, the count is `S/7` when `7∤(q−1)` and `(S+36)/7` when `7|(q−1)`. For example, it is 9 at q=2, 195 at q=4, and 5355 at q=8. This bounds the shape of a genus-seven hyperelliptic target; it does not count vulnerable elliptic curves. The three sample arithmetic values are checked in the Lean ledger, while the general orbit proof remains paper-level.
+
+The [complete finite census](HYPERELLIPTIC_CLASSIFICATION.md) tested 294,912 normalized equations over those supports. A separate direct `(x,y)` program reproduced every stage count and trace bin. The only genus-seven hyperelliptic Jacobian traces are `±15, ±13, ±9, ±1`, with one F2-isomorphism class per trace in this normalized search. Intersecting with the W1 source traces gives:
+
+The trace-set intersection and witness seventh-count arithmetic were checked in [`HyperellipticTraceLedger.lean`](HyperellipticTraceLedger.lean). The Lean input lists come from the native census; the geometric completeness theorem and Jacobian isogeny application remain paper-level and require independent review. The [proof map and prior-work check](HYPERELLIPTIC_CLASSIFICATION.md) give the exact scope.
+
+| W1 trace class | genus-seven hyperelliptic target with the required Weil polynomial | source status |
+|:---|:---|:---|
+| `±15`, `±1` | exists | classical or shared W1 slice |
+| `±9` | exists, with explicit equations | nonclassical W1 slice only |
+| `±17`, `±7` | excluded by complete F2 census | nonclassical W1 slice only |
+
+For example, `E(1,8)/F128` has trace −9, and `Y/F2: y²+(x⁷+x³+x²+x+1)y = x¹⁵+x¹⁴+x⁶+x⁵+x⁴+x³+x` has the required genus-seven Weil polynomial; the bit encodings are `v=0x8f, u=0xc07a`. This is an isogeny-class match. An explicit correspondence from this E to J_Y, its subgroup action, and complete attack cost are not yet established. Nonhyperelliptic genus-seven targets remain outside this census.
 
 ![One rational branch point and one orbit of seven](branch-support.svg){width=75%}
 
 ## Next discriminating step
 
-For a nonclassical-only trace class, search the nine hyperelliptic branch-support classes for a genus-seven Y with L-polynomial `1-tT^7+128T^14`, or exclude that hyperelliptic route; also examine nonhyperelliptic Jacobians. If Y exists, construct an explicit k-rational algebraic correspondence from A to J_Y and evaluate it on a chosen prime-order source subgroup. Then run complete relation/decomposition, linear algebra, target recovery and matched rho with setup charged. A point-count match alone does not supply a map or a lower-cost logarithm algorithm.
+The ±9 isogeny-class witness is the most focused follow-up: construct an explicit k-rational algebraic correspondence from A to J_Y and evaluate it on a chosen prime-order source subgroup. Also examine nonhyperelliptic genus-seven targets for the excluded hyperelliptic traces. Then run complete relation/decomposition, linear algebra, target recovery and matched rho with setup charged. A point-count match alone does not supply a map or a lower-cost logarithm algorithm.
