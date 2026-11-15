@@ -132,13 +132,13 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2211Z-ksum-prune-tableb",
+  "latest_record": "20261115T2224Z-koblitz-ksum-fold-study",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 8,
     "invalid": 4,
-    "measured": 201,
-    "open": 2
+    "measured": 202,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -8694,6 +8694,60 @@
       ],
       "problem": "ic:koblitz-chain-s3-arity-m5m6",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 1.05,
+      "latest": 1.05,
+      "latest_derived": {
+        "value_over_reference": 1.105263
+      },
+      "metric": "s_kf3_n23_w0p1",
+      "points": [
+        {
+          "commit": "9fa38942e40f",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 1.105263
+          },
+          "n": 432,
+          "record": "20261115T2224Z-koblitz-ksum-fold-study",
+          "reference": 0.95,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "kf3-c1g-sr vs lazy orbit-member incumbent, band-priced pooled R: K1 n23 0.784/0.799/0.832 at w=0/0.1/1 (improves), K1 n29 5.30/5.62/6.31 (regresses); local L0; pcc:unverified",
+          "value": 1.05
+        }
+      ],
+      "problem": "ic:koblitz-ksum-fold-n23-n29",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 11.597,
+      "latest": 11.597,
+      "latest_derived": {
+        "value_over_reference": 2.475347
+      },
+      "metric": "s_kf3_n29_w0p1",
+      "points": [
+        {
+          "commit": "9fa38942e40f",
+          "date": "2026-11-15",
+          "derived": {
+            "value_over_reference": 2.475347
+          },
+          "n": 432,
+          "record": "20261115T2224Z-koblitz-ksum-fold-study",
+          "reference": 4.685,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "kf3-c1g-sr vs lazy orbit-member incumbent, band-priced pooled R: K1 n23 0.784/0.799/0.832 at w=0/0.1/1 (improves), K1 n29 5.30/5.62/6.31 (regresses); local L0; pcc:unverified",
+          "value": 11.597
+        }
+      ],
+      "problem": "ic:koblitz-ksum-fold-n23-n29",
+      "unit": "S"
     },
     {
       "better": "higher",
