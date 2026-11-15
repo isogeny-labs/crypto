@@ -85,6 +85,10 @@
 //! match (`research/magma_f4_comparison_20261013/`).
 //!
 //! ```bash
+//! `--engine hky --hky-progress PATH` appends each closure `V_{F,c}` to PATH
+//! as it finishes (flushed and synced); a stopped run resumes with
+//! `--hky-cmin` at the first undecided degree.
+//!
 //! cargo run --release --example pkm_tower_pilot -- --out pilot.jsonl
 //! cargo run --release --example pkm_tower_pilot -- --kinds kummer --max-t 6 --budget 30
 //! # What F4 knows at degree 4 on one N = 16 system: its basis elements of
@@ -2047,6 +2051,7 @@ fn measure_hky(
     eqs: &[Pol],
     tower: &Tower,
     cell: &Cell,
+    target_index: usize,
     n: usize,
     p: u64,
     sol: Option<&[u64]>,
@@ -2074,7 +2079,38 @@ fn measure_hky(
         ..HkyLimits::default()
     };
     let started = Instant::now();
-    let fd = hky_fp_tower::fall_degrees(&ring, &gens, c_min, a.hky_cmax, &limits);
+    let progress = |cl: &hky_fp_tower::Closure| {
+        let Some(path) = a.hky_progress.as_deref() else {
+            return;
+        };
+        let line = json!({
+            "schema": "pkm_tower_pilot.hky_progress/v1",
+            "utc_unix_s": std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_secs())
+                .unwrap_or(0),
+            "p": p, "seed": a.seed, "kind": cell.kind.name(), "m": cell.m,
+            "control": cell.control.name(), "t": cell.t, "g": cell.g,
+            "null_width": a.null_width, "target_index": target_index,
+            "hky_cmin": c_min, "hky_cmax": a.hky_cmax,
+            "c": cl.c, "cols": cl.cols as u64, "dims": cl.dims, "one": cl.contains_one,
+            "censored": cl.censored, "rows_reduced": cl.rows_reduced,
+            "entries": cl.entries, "muladds": cl.muladds, "ms": cl.ms,
+        });
+        let mut f = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+            .unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        writeln!(f, "{line}").unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        f.sync_all()
+            .unwrap_or_else(|e| panic!("--hky-progress {path}: {e}"));
+        eprintln!(
+            "hky progress: t={} target={} c={} one={} censored={:?} {:.0} ms",
+            cell.t, target_index, cl.c, cl.contains_one, cl.censored, cl.ms
+        );
+    };
+    let fd = hky_fp_tower::fall_degrees_with(&ring, &gens, c_min, a.hky_cmax, &limits, progress);
     let ms = started.elapsed().as_secs_f64() * 1e3;
     let closures: Vec<Value> = fd
         .closures
@@ -2548,6 +2584,11 @@ struct Args {
     hky_cmax: u32,
     hky_max_cols: u128,
     hky_max_entries: u64,
+    /// `--hky-progress PATH` (`--engine hky` only): append one JSON line per
+    /// closure `V_{F,c}` to PATH as soon as it is computed, flushed and
+    /// synced, so a run stopped during a later closure keeps every decided
+    /// degree. Resume with `--hky-cmin` at the first undecided degree.
+    hky_progress: Option<String>,
     /// `--radix 2^k` (`f4_fp_tower` only): grade every block of `k` tower
     /// levels with weights `1, 2, …, 2^{k−1}`, the radix-`2^k` presentation
     /// of the same tower (`TowerWeights`). `k = 1`, radix 2, is the unit
@@ -2731,6 +2772,7 @@ fn parse_args() -> Args {
         verify: false,
         hky_cmin: None,
         hky_cmax: 6,
+        hky_progress: None,
         hky_max_cols: 2_000_000,
         hky_max_entries: 600_000_000,
         radix_k: 1,
@@ -2883,6 +2925,7 @@ fn parse_args() -> Args {
                 a.radix_k = r.trailing_zeros();
             }
             "--hky-cmin" => a.hky_cmin = Some(v.parse().expect("--hky-cmin")),
+            "--hky-progress" => a.hky_progress = Some(v.clone()),
             "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
             "--hky-max-cols" => a.hky_max_cols = v.parse().expect("--hky-max-cols"),
             "--hky-max-entries" => a.hky_max_entries = v.parse().expect("--hky-max-entries"),
@@ -3115,7 +3158,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
                 (out, Dumpable::Ring(basis))
             }
             Engine::Hky => {
-                let out = measure_hky(&eqs, &tower, cell, n, p, sol.as_deref(), a);
+                let out = measure_hky(&eqs, &tower, cell, k, n, p, sol.as_deref(), a);
                 (out, Dumpable::Raw(Vec::new()))
             }
             Engine::Tower | Engine::Sig => {
