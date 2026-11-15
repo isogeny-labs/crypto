@@ -147,3 +147,15 @@ and the FLINT polynomial API. SETUP-REVIEW.md records fixed-degree rational
 point halving as a next candidate, with sampling-law, failed-path accounting
 and exact-order/trace replay obligations. No generated-setup code or run
 begins in this checkpoint. No prior-art absence or new complexity claim.
+
+Root tooling: the full Rust library test binary builds successfully, with no
+Rust/package changes since source 2fd16de7ca. The running 6593-test suite has
+39 failures in untouched areas so far. A focused replay confirms the missing
+sparse gpu/certicom source (device_tests.rs:32, exit101); other failures are
+not fully diagnosed. checks/root-rust-snapshot001 retains the initial sparse
+compile diagnostics, timestamped partial run and focused failure. It is not a
+passing or completed suite receipt. The original full run continues. All62
+PCC sabotage classes pass locally; native/Lean evidence remains separately
+scoped. Merge 0dc7866eb1 preserves all178 main journal entries plus both unique
+09:09/10:12 sections; PCC ledger remains1077 with an exact main1076 prefix.
+[pcc:unverified]
