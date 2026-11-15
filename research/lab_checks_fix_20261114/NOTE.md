@@ -155,3 +155,21 @@ $ python3 tools/benchrec.py check
 benchrec: ...registry-binding-20261105.json: original raw bytes verified from local archive cache for docs/curves/registry.json; differing checkout bytes are not validated here
 benchrec: OK, 173 record(s), progress report current
 ```
+
+## Decision (2026-11-15): option (d)
+
+Main's `ic-leaderboard` job still failed on the missing object `06b915ab…`
+(runs 43658606351, 43664870758, 43664888784). The owner asked for the
+remaining items to be done, so option (d) was taken:
+- The `paths:` glob `research/ecbench_e2e_frontier_20261031/**` became
+  `research/ecbench_e2e_frontier_20261031/establishment/**`.
+- `research/ecbench_e2e_frontier_20261031` was dropped from the pull step.
+  The generator reads its own pull line as a path reference, so the old entry
+  kept itself alive until it was removed by hand.
+- `wire_workflows.py --check` agrees with the result.
+
+The builder reads only `establishment/certificate.json` in that study, so no
+leaderboard input is lost. The trade-off is that the job no longer runs on
+frontier changes outside `establishment/`. Those changes cannot alter the
+leaderboard. The missing figure itself is still missing: options (a)–(c)
+remain open for repairing the study's `figures/`.
