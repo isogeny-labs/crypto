@@ -5,6 +5,12 @@ The active path has no Python dependency. It imports custom equations, builds
 certified redundant consequences, and traces individual additions, removals,
 and greedy selection on the same affine ideal.
 
+The completed follow-up is in [FINAL_REPORT.md](FINAL_REPORT.md). Five of six
+predeclared fresh four-variable cases pass the per-case tenfold rule, with
+23.4–23.9× native checked-wall median ratios. One failed A/A control is excluded.
+These are local producer component observations, pending signed independent
+validation; mature CAS diagnostics are retained separately `[pcc:unverified]`.
+
 ## Run
 
 From this directory, with a current stable Rust toolchain:
@@ -77,13 +83,14 @@ It is **not** Castelnuovo–Mumford regularity of the affine ideal or its
 saturated homogenization. Adding a redundant equation preserves the affine
 ideal but can change this generator-dependent top ideal and the solver work.
 
-No solver wall-time speed ratio is produced. The reference construction timer
+The original degree-tracing CLI produces no solver wall-time speed ratio. Its reference construction timer
 is diagnostic only. The closure reports deterministic row counts and degrees;
 they include provenance work conceptually but are not complete field-operation
 or pipeline cost accounting. In the initial scout mode, discovery is the whole baseline closure; its
 rows and peak matrix degree remain visible beside downstream selection.
-The follow-up direct constructor avoids that scout; its actual cost is not
-yet established by a timed campaign.
+The follow-up direct constructor avoids that scout. Its separate full-basis
+timing campaign is reported in FINAL_REPORT.md; degree alone does not predict
+that campaign's cost.
 
 ## Fixed elliptic-curve fixtures and observed development checks
 
@@ -165,7 +172,7 @@ Sources checked (KB): unavailable (MCP not loaded and repository wrapper exits
 | Requested fields | fixed fixtures at 2^31-1 and the stated 53-bit prime |
 | Native path and certificate checks | Rust library/CLI; no runtime Python |
 | Independent signed verdict | pending; producer observations remain unverified |
-| Direct discovery of the cubic for recognized f3 pairs | implemented without a scout; exact development checks; timing pending |
+| Direct discovery of the cubic for recognized f3 pairs | implemented without a scout; timed follow-up in FINAL_REPORT.md |
 | Hook into factor-base/P,Q collection | follow-up; not supplied by this fixture harness |
 
 The stand-alone crate avoids changing the repository's production library,
@@ -182,12 +189,13 @@ tracing. Closure limits are 5,000 columns, 2,000 sources and 200,000 submitted
 rows per run; interruption reports no completed threshold. Greedy selection
 is bounded, lexicographic, and does not certify a globally best subset.
 
-## Direct-construction speed experiment (not yet measured)
+## Direct-construction speed experiment
 
 [FOLLOWUP.md](FOLLOWUP.md) derives the short pair syzygy and records native
 development checks. [SPEED_PROTOCOL.md](SPEED_PROTOCOL.md) freezes a tenfold
 target, matched accounting, held-out shared-point fixtures, A/A controls and
-failure rules. No timed campaign or speedup is established `[pcc:unverified]`.
+failure rules. Successor protocols, all losses and fresh confirmation are
+linked in [FINAL_REPORT.md](FINAL_REPORT.md) `[pcc:unverified]`.
 
 ```sh
 cargo build --release --locked --bin compare --bin campaign
@@ -197,8 +205,8 @@ target/release/compare --prepare /tmp/relation-speed-new-fixtures
 The `compare` worker computes a full Gröbner basis from scratch; it does not
 use the tracer's completion oracle as a free solver. `campaign` preserves
 all attempts, pins one CPU, enforces worker time/address-space limits, and
-checks exact returned-basis equality. The code and protocol are prepared;
-execution awaits the requested backend choice because IsoLab's remaining
-budget is unknown/exhausted. The current native driver is not a completed
-external-reference campaign; matching CAS input scripts are exported, and
-those supported reference runs remain required before any fastest claim.
+checks exact returned-basis equality. Execution used the offered local L0
+backend after the user's instruction to continue. No cloud run was launched.
+Supported Singular and msolve basis replays are complete on the fresh panel;
+their diagnostic clocks and checking obligations differ from native charged
+wall intervals. No fastest-solver claim is made.

@@ -1,0 +1,435 @@
+{
+  "cases": [
+    {
+      "aa_admitted": false,
+      "baseline_median_ms": 1152.12138,
+      "candidate_median_ms": 48.464227,
+      "high": 24.349923975884316,
+      "id": "p2147483647-cycle4-seed1009",
+      "low": 23.262830143595053,
+      "ratio": 24.098778834997944,
+      "run": "confirmation-run-20261115",
+      "samples_complete": true,
+      "status": "observed",
+      "tenfold": false
+    },
+    {
+      "aa_admitted": true,
+      "baseline_median_ms": 1160.832824,
+      "candidate_median_ms": 48.987185,
+      "high": 24.013699154176752,
+      "id": "p2147483647-cycle4-seed2003",
+      "low": 22.882543215801327,
+      "ratio": 23.46349004896612,
+      "run": "confirmation-run-20261115",
+      "samples_complete": true,
+      "status": "observed",
+      "tenfold": true
+    },
+    {
+      "aa_admitted": true,
+      "baseline_median_ms": 1137.058688,
+      "candidate_median_ms": 48.99807,
+      "high": 23.87678519649002,
+      "id": "p2147483647-cycle4-seed3001",
+      "low": 23.09715809208552,
+      "ratio": 23.43416022372191,
+      "run": "confirmation-run-20261115",
+      "samples_complete": true,
+      "status": "observed",
+      "tenfold": true
+    },
+    {
+      "aa_admitted": true,
+      "baseline_median_ms": 1141.804974,
+      "candidate_median_ms": 48.493918,
+      "high": 24.18036560141715,
+      "id": "p9007199254740881-cycle4-seed1009",
+      "low": 23.589599526965355,
+      "ratio": 23.87699574373331,
+      "run": "confirmation-run-20261115",
+      "samples_complete": true,
+      "status": "observed",
+      "tenfold": true
+    },
+    {
+      "aa_admitted": true,
+      "baseline_median_ms": 1177.271823,
+      "candidate_median_ms": 49.980153,
+      "high": 24.232915013285375,
+      "id": "p9007199254740881-cycle4-seed2003",
+      "low": 23.408685144730427,
+      "ratio": 23.89216656984913,
+      "run": "confirmation-run-20261115",
+      "samples_complete": true,
+      "status": "observed",
+      "tenfold": true
+    },
+    {
+      "aa_admitted": true,
+      "baseline_median_ms": 1167.886795,
+      "candidate_median_ms": 49.343178,
+      "high": 23.906170795394225,
+      "id": "p9007199254740881-cycle4-seed3001",
+      "low": 23.13178608342628,
+      "ratio": 23.657291170692677,
+      "run": "confirmation-run-20261115",
+      "samples_complete": true,
+      "status": "observed",
+      "tenfold": true
+    }
+  ],
+  "external": {
+    "rows": [
+      {
+        "algorithm": "std",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed1009",
+        "native_basis_equal": true,
+        "other_external_basis_equal": null,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 116721800,
+        "solver_cpu_microseconds_100_solves": 46847,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed1009",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 79331249,
+        "solver_cpu_microseconds_100_solves": 67227,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "std",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed1009",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 28525253,
+        "solver_cpu_microseconds_100_solves": 17373,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed1009",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 41445765,
+        "solver_cpu_microseconds_100_solves": 29864,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "baseline",
+        "id": "p2147483647-cycle4-seed1009",
+        "native_basis_equal": true,
+        "process_wall_ns": 24538359,
+        "status": "checked_against_native_basis",
+        "timing_scope": "single CLI whole-process wall; no comparison to native solver-only wall"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "candidate",
+        "id": "p2147483647-cycle4-seed1009",
+        "native_basis_equal": true,
+        "process_wall_ns": 14492832,
+        "status": "checked_against_native_basis",
+        "timing_scope": "single CLI whole-process wall; no comparison to native solver-only wall"
+      },
+      {
+        "algorithm": "std",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed2003",
+        "native_basis_equal": true,
+        "other_external_basis_equal": null,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 62945565,
+        "solver_cpu_microseconds_100_solves": 51396,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed2003",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 81542045,
+        "solver_cpu_microseconds_100_solves": 69286,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "std",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed2003",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 29230261,
+        "solver_cpu_microseconds_100_solves": 16951,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed2003",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 40779084,
+        "solver_cpu_microseconds_100_solves": 30377,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "baseline",
+        "id": "p2147483647-cycle4-seed2003",
+        "native_basis_equal": true,
+        "process_wall_ns": 15091892,
+        "status": "checked_against_native_basis",
+        "timing_scope": "single CLI whole-process wall; no comparison to native solver-only wall"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "candidate",
+        "id": "p2147483647-cycle4-seed2003",
+        "native_basis_equal": true,
+        "process_wall_ns": 15292213,
+        "status": "checked_against_native_basis",
+        "timing_scope": "single CLI whole-process wall; no comparison to native solver-only wall"
+      },
+      {
+        "algorithm": "std",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed3001",
+        "native_basis_equal": true,
+        "other_external_basis_equal": null,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 67797466,
+        "solver_cpu_microseconds_100_solves": 55071,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed3001",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 84376659,
+        "solver_cpu_microseconds_100_solves": 71553,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "std",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed3001",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 29603523,
+        "solver_cpu_microseconds_100_solves": 17496,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p2147483647-cycle4-seed3001",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 43699117,
+        "solver_cpu_microseconds_100_solves": 31664,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "baseline",
+        "id": "p2147483647-cycle4-seed3001",
+        "native_basis_equal": true,
+        "process_wall_ns": 16042197,
+        "status": "checked_against_native_basis",
+        "timing_scope": "single CLI whole-process wall; no comparison to native solver-only wall"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "candidate",
+        "id": "p2147483647-cycle4-seed3001",
+        "native_basis_equal": true,
+        "process_wall_ns": 15838412,
+        "status": "checked_against_native_basis",
+        "timing_scope": "single CLI whole-process wall; no comparison to native solver-only wall"
+      },
+      {
+        "algorithm": "std",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p9007199254740881-cycle4-seed1009",
+        "native_basis_equal": true,
+        "other_external_basis_equal": null,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 93884785,
+        "solver_cpu_microseconds_100_solves": 81216,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "baseline",
+        "id": "p9007199254740881-cycle4-seed1009",
+        "status": "unsupported_coefficient_ring"
+      },
+      {
+        "algorithm": "std",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p9007199254740881-cycle4-seed1009",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 90178348,
+        "solver_cpu_microseconds_100_solves": 77748,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "candidate",
+        "id": "p9007199254740881-cycle4-seed1009",
+        "status": "unsupported_coefficient_ring"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "baseline",
+        "id": "p9007199254740881-cycle4-seed1009",
+        "status": "unsupported_prime_by_documented_limit"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "candidate",
+        "id": "p9007199254740881-cycle4-seed1009",
+        "status": "unsupported_prime_by_documented_limit"
+      },
+      {
+        "algorithm": "std",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p9007199254740881-cycle4-seed2003",
+        "native_basis_equal": true,
+        "other_external_basis_equal": null,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 89953776,
+        "solver_cpu_microseconds_100_solves": 77451,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "baseline",
+        "id": "p9007199254740881-cycle4-seed2003",
+        "status": "unsupported_coefficient_ring"
+      },
+      {
+        "algorithm": "std",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p9007199254740881-cycle4-seed2003",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 89150715,
+        "solver_cpu_microseconds_100_solves": 76613,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "candidate",
+        "id": "p9007199254740881-cycle4-seed2003",
+        "status": "unsupported_coefficient_ring"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "baseline",
+        "id": "p9007199254740881-cycle4-seed2003",
+        "status": "unsupported_prime_by_documented_limit"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "candidate",
+        "id": "p9007199254740881-cycle4-seed2003",
+        "status": "unsupported_prime_by_documented_limit"
+      },
+      {
+        "algorithm": "std",
+        "arm": "baseline",
+        "basis_polynomials": 7,
+        "id": "p9007199254740881-cycle4-seed3001",
+        "native_basis_equal": true,
+        "other_external_basis_equal": null,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 93266983,
+        "solver_cpu_microseconds_100_solves": 80886,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "baseline",
+        "id": "p9007199254740881-cycle4-seed3001",
+        "status": "unsupported_coefficient_ring"
+      },
+      {
+        "algorithm": "std",
+        "arm": "candidate",
+        "basis_polynomials": 7,
+        "id": "p9007199254740881-cycle4-seed3001",
+        "native_basis_equal": true,
+        "other_external_basis_equal": true,
+        "preprocessing_and_external_membership_cost": "not charged by this solver-only diagnostic; not an end-to-end speed ratio",
+        "process_wall_ns": 91333742,
+        "solver_cpu_microseconds_100_solves": 77934,
+        "status": "checked_against_native_basis"
+      },
+      {
+        "algorithm": "slimgb",
+        "arm": "candidate",
+        "id": "p9007199254740881-cycle4-seed3001",
+        "status": "unsupported_coefficient_ring"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "baseline",
+        "id": "p9007199254740881-cycle4-seed3001",
+        "status": "unsupported_prime_by_documented_limit"
+      },
+      {
+        "algorithm": "msolve-f4",
+        "arm": "candidate",
+        "id": "p9007199254740881-cycle4-seed3001",
+        "status": "unsupported_prime_by_documented_limit"
+      }
+    ],
+    "schema": "external-solver-diagnostic/v1",
+    "scope": "single 100-solve CPU batches; no native wall/CPU mixed ratios; no fastest claim"
+  },
+  "preregistered_confirmation_commit": "4418b8da6ed9604d15ffce7034c208429000a131",
+  "schema": "relation-speed-closeout/v1",
+  "scope": "native full reduced grevlex GB component on controlled four-variable paired-f3 cycle fixtures; not ECDLP or fastest solver",
+  "source_commit": "2471e4c16bbcb85410017bf8ea5d05703f5ce215",
+  "standing": "producer L0 observation; pcc unverified; no signed independent replay"
+}

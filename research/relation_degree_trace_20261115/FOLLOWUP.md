@@ -217,7 +217,7 @@ Next ablation, frozen before timing: interreduce the initial generator set
 before making S-pairs. This is standard Buchberger housekeeping; it can expose
 cheap consequences and discard obsolete generators. Preserve the original
 reference routine as the timing baseline and compare both raw-input and
-projection-input variants of the improved routine. Report the engine effect
+projection-input variants of the interreduced routine. Report the engine effect
 separately from any relation contribution. All final bases and original-input
 certificates must pass the existing check. No running worker binary is changed.
 
@@ -307,3 +307,31 @@ controls/seeds will not be replaced, and no old/fresh samples are pooled.
 The raw-input criterion control remains a measured regression on completed
 four-variable cases; the projected comparison is queued, not yet interpreted
 `[pcc:unverified]`.
+
+## 2026-11-15 — Fresh confirmation and external closeout
+
+The frozen six-case confirmation completed all 21 paired samples and seven
+A/A pairs per case with byte-identical source-2471e4c workers. Five cases are
+admitted at 23.4–23.9× median checked native wall ratios; p31 seed1009 fails
+its A/A control and is excluded. No replacement, pooling or rerun was used.
+All 24 supported external arm/algorithm basis checks match exactly, with 12
+documented unsupported combinations. CAS solver-only diagnostics are much
+smaller than native charged intervals and do not establish a native advantage
+over mature solvers. Full scope, limits and earlier losses are in
+FINAL_REPORT.md `[pcc:unverified]`.
+
+No timed workload remains running. Native release tests, counter-feature
+tests, formatting and lint receipts are under validation/. Final analysis
+uses standard Plotters SVG output; the plotting dependency and formatting
+changes were made after the immutable timed workers finished. Historical
+development receipts retain their original sources. Raw runs, exact CAS
+inputs and measured binaries are archived with hashes under artifacts/.
+The full root repository suite is outside this partial source checkout.
+
+The study remains local L0 without independently signed replay or matched-rho
+validation. No accepted performance/leaderboard or DLP standing is promoted.
+PR #4228 retains a concurrent root-session-log conflict. Copilot was asked
+once to merge the base without rewriting evidence; no reply has arrived.
+Main has now also appended a different hash-chained PCC history. That ledger
+conflict is reported, not resolved by selecting or rewriting either side.
+The study log here avoids concurrent edits to the root session log.
