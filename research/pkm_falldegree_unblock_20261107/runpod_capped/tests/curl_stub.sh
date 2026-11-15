@@ -38,10 +38,12 @@ case $url in
       name=$(jq -r .name "$S/create-body.json"); id=${STUB_POD_ID:-stubpod1}
       ca=$(( $(date +%s) - ${STUB_CREATED_AGO:-0} ))
       jq --arg id "$id" --arg n "$name" --arg ca "$(rpdate "$ca")" \
-        '. + {id:$id, name:$n, createdAt:$ca, lastStartedAt:$ca, desiredStatus:"RUNNING", consumerUserId:"user_stub", env:{RUNNER_TOKEN:"x"}}' \
+        --slurpfile b "$S/create-body.json" \
+        '. + {id:$id, name:$n, createdAt:$ca, lastStartedAt:$ca, lastStatusChange:("Rented by User: " + $ca), desiredStatus:"RUNNING", consumerUserId:"user_stub", env:$b[0].env}' \
         "$S/create-template.json" > "$S/pod-$id.json"
       jq --slurpfile p "$S/pod-$id.json" '. + [$p[0] | del(.machine) | . + {machine:{}}]' "$S/pods.json" > "$S/pods.tmp" && mv "$S/pods.tmp" "$S/pods.json"
       jq '.machine = {}' "$S/pod-$id.json" > "$S/pod-$id.rec" && mv "$S/pod-$id.rec" "$S/pod-$id.json.rec"
+      jq 'del(.env)' "$S/pod-$id.json" > "$S/pod-$id.tmp" && mv "$S/pod-$id.tmp" "$S/pod-$id.json"   # the create response omits env
       if [ -e "$S/create-timeout" ]; then sleep 0; echo "curl: (28) Operation timed out" >&2; exit 28; fi
       if [ -e "$S/create-error" ]; then rm -f "$S/pod-$id.json" "$S/pod-$id.json.rec"; echo '[]' > "$S/pods.json"
         emit 400 - <<<'{"error":"no instances available"}'; fi
@@ -83,10 +85,11 @@ case $url in
         jq -nc --arg s "$st" --slurpfile b "$S/start-body.json" '{state:"running",exit:null,started:$s,ended:null,stages:$b[0].stages}' > "$S/status.json"
         emit 200 "$S/status.json" ;;
       /results.tar.gz)
-        [ -d "$S/tree" ] || { emit 404 - <<<'{"error":"path"}'; }
-        n=0; [ -f "$S/fetchcount" ] && n=$(cat "$S/fetchcount"); n=$((n + 1)); echo "$n" > "$S/fetchcount"
-        [ -e "$S/tree-varies" ] && echo "$n" > "$S/tree/varying.txt"
-        tmp=$(mktemp -d); cp -a "$S/tree" "$tmp/results"; tar -czf "$tmp/r.tgz" -C "$tmp" results
+        src="$S/tree"; [ -d "$src" ] || src="$S/pretree"   # before start the pod's /results holds only the cgroup copy
+        [ -d "$src" ] || { emit 404 - <<<'{"error":"path"}'; }
+        if [ "$src" = "$S/tree" ]; then n=0; [ -f "$S/fetchcount" ] && n=$(cat "$S/fetchcount"); n=$((n + 1)); echo "$n" > "$S/fetchcount"
+          [ -e "$S/tree-varies" ] && echo "$n" > "$S/tree/varying.txt"; fi
+        tmp=$(mktemp -d); cp -a "$src" "$tmp/results"; tar -czf "$tmp/r.tgz" -C "$tmp" results
         emit 200 "$tmp/r.tgz" ;;
     esac ;;
 esac

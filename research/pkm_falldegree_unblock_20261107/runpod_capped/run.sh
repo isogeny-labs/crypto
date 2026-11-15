@@ -28,6 +28,7 @@ id="" started=0 created_rec=0 upd="" q="" tokf="" bodyf=""
 [ ! -e "$OUT" ] || refuse "results directory $OUT already exists (never overwritten)"
 npre=$(compgen -G "$REC.prestart-*" | wc -l || true)
 [ "$npre" -lt 2 ] || refuse "$NAME already had $npre pre-start failures; a third goes to the owner"
+[ -f "$LEDGER" ] && ledger_has "$NAME" && refuse "$NAME already has a row in $LEDGER (any state): a further attempt needs the owner (N6)"
 
 # 1. Name, stage, order.
 [[ $STAGE =~ ^cap:([0-9]+):([01]):([0-9]+):([0-9]+)$ ]] || refuse "stage $STAGE is not cap:T:K:C:DENSE"
@@ -47,6 +48,7 @@ if is_study "$NAME"; then
   nxt=$(next_allowed)
   [ "$nxt" = "$NAME" ] || refuse "order: the next study run allowed now is '$nxt', not $NAME (receipts: $REC_ROOT)"
   grep -q "^$AMENDMENT_HEADING\b" "$PREREG" || refuse "'$AMENDMENT_HEADING' is not in $PREREG (freeze the amendment first)"
+  frozen_ok common.sh run.sh fetch.sh reap.sh || refuse "a route script's SHA-256 is not in the frozen amendment in $PREREG (S3)"
 else
   [ "$T" -le 10 ] || refuse "development check with t = $T > 10"
   [ "$DENSE" = 12800000000 ] || refuse "development check with --max-dense $DENSE (use 12800000000)"
@@ -63,10 +65,17 @@ for p in "$RP:$RP_SHA" "$SERVER:$SERVER_SHA"; do
   log "pin ok ${f#"$study/"} $g"
 done
 
-# 3. Binary hashes against image/binaries.sha256, build-info.json against image.json, and the image layer (S12).
+# 3. Binary hashes against the pins in common.sh (and image/binaries.sha256, image.json, which must agree with them),
+#    build-info.json against image.json, and the image layer (S3, S12).
+for f in $(awk '{ print $1 }' <<<"$BIN_SHA_PINS"); do
+  [ "$(awk -v f="$f" '$2==f{print $1}' "$study/image/binaries.sha256")" = "$(bin_sha "$f")" ] \
+    && [ "$(jq -r --arg f "$f" '.study_binary_sha256[$f]' "$study/image/image.json")" = "$(bin_sha "$f")" ] \
+    || refuse "image/binaries.sha256 or image.json disagrees with the pinned hash of $f"
+done
+[ "$(jq -r '.layer.digest' "$study/image/image.json")" = "sha256:$LAYER_DIGEST" ] || refuse "image.json layer.digest disagrees with the pinned $LAYER_DIGEST"
 upd=$(mktemp -d); trap 'rm -rf "$upd" "$STAGELOG"' EXIT
 for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh run.sh; do
-  want=$(awk -v f="$f" '$2==f{print $1}' "$study/image/binaries.sha256")
+  want=$(bin_sha "$f")
   case $f in run.sh) src="$study/../prime_fall_degree_20261027/run.sh" ;; *) src="$RPC_BIN/$f" ;; esac
   got=$(sha256sum "$src" 2>/dev/null | cut -d' ' -f1 || true)
   [ -n "$want" ] && [ "$got" = "$want" ] || refuse "sha256 $f got ${got:-missing} want $want"
@@ -75,7 +84,7 @@ done
 install -m644 "$study/image/build-info.json" "$upd/build-info.json"
 jq -e --slurpfile b <(jq '.study_binary_sha256' "$study/image/image.json") '.sha256 == $b[0]' "$upd/build-info.json" >/dev/null \
   || refuse "build-info.json hashes differ from image.json"
-ldig=$(jq -r '.layer.digest' "$study/image/image.json"); ldig=${ldig#sha256:}
+ldig=$LAYER_DIGEST
 if [ -n "${RPC_LAYER:-}" ]; then
   [ "$(sha256sum "$RPC_LAYER" | cut -d' ' -f1)" = "$ldig" ] || refuse "RPC_LAYER sha256 differs from image.json layer.digest $ldig"
   for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh; do
@@ -97,6 +106,7 @@ log "ledger sum US\$$lsum (complete_as_of $asof)"
 
 # 5. RunPod: no live pkm-x- pod (serial rule), then the price and stock of the one pinned flavor.
 rpc_init; trap 'rm -rf "$upd" "$STAGELOG"; rpc_cleanup' EXIT
+exec 9>"$RPC_STATE/$NAME.lock"; flock -n 9 || refuse "another run.sh, fetch.sh or reap.sh holds $NAME"
 live=$(list_pkm) || refuse "pod list not readable"
 [ -z "$live" ] || refuse "a pkm-x- pod is live: $(tr '\n' ' ' <<<"$live")"
 q=$(mktemp); trap 'rm -rf "$upd" "$STAGELOG" "$q"; rpc_cleanup' EXIT
@@ -109,9 +119,9 @@ log "price $price_line"
 jq -e '(.stockStatus // "") != "" and .stockStatus != "None" and (.securePrice // 0) > 0' <<<"$price_line" >/dev/null 2>&1 \
   || { log "NOT IN STOCK or no price: $INSTANCE ($price_line). Nothing created; no attempt."; exit 10; }
 price=$(jq -r '.securePrice' <<<"$price_line")
-jq -e --argjson h $HOURS --argjson c $CEIL_USD '.securePrice * $h <= $c' <<<"$price_line" >/dev/null \
-  || refuse "cost guard: $INSTANCE $price/h x $HOURS h > US\$$CEIL_USD"
-worst=$(awk -v p="$price" -v h=$HOURS 'BEGIN{printf "%.4f", p * h}')
+jq -e --argjson h $WORST_HOURS --argjson c $CEIL_USD '.securePrice * $h <= $c' <<<"$price_line" >/dev/null \
+  || refuse "cost guard: $INSTANCE $price/h x $WORST_HOURS h > US\$$CEIL_USD"
+worst=$(awk -v p="$price" -v h=$WORST_HOURS 'BEGIN{printf "%.4f", p * h}')
 awk -v s="$lsum" -v w="$worst" -v c=$STUDY_CEIL_USD 'BEGIN{exit !(s + w <= c)}' \
   || refuse "study ceiling: ledger US\$$lsum + this run's worst case US\$$worst > US\$$STUDY_CEIL_USD"
 
@@ -120,13 +130,15 @@ awk -v s="$lsum" -v w="$worst" -v c=$STUDY_CEIL_USD 'BEGIN{exit !(s + w <= c)}' 
 precleanup() {
   local rc=$? ids="" i n gone=0 c
   rm -rf "$upd"; rm -f "$bodyf" "$q"
-  if [ "$started" = 1 ] || [ "$created_rec" = 0 ]; then rpc_cleanup; return; fi
+  if [ "$started" = 1 ]; then rpc_cleanup; remind "${REC#"$here/"}"; return; fi
+  if [ "$created_rec" = 0 ]; then rpc_cleanup; return; fi
   [ -n "$id" ] && ids=$id
   for i in 1 2 3 4 5 6; do   # a timed-out create can appear late: look for the name a few times
     n=$(list_pkm 2>/dev/null | jq -r --arg n "$NAME" 'select(.name == $n) | .id' | tr '\n' ' ' || true)
     ids=$(echo "$ids $n" | tr ' ' '\n' | sort -u | tr '\n' ' '); [ -n "${ids// /}" ] && break; [ -n "$id" ] && break; sleep "$POLL_S"
   done
-  for i in $ids; do c=$(api_code DELETE "$API/pods/$i" "$REC/predelete-$i.response"); log "pre-start delete pod $i: HTTP $c"; done
+  for i in $ids; do session_action "$REC" DELETE "$i" "pre-start failure (exit $rc)"
+    c=$(api_code DELETE "$API/pods/$i" "$REC/predelete-$i.response"); log "pre-start delete pod $i: HTTP $c"; done
   for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
     n=$(list_pkm 2>/dev/null) || { sleep "$POLL_S"; continue; }
     if [ -z "$(jq -r --arg n "$NAME" 'select(.name == $n) | .id' <<<"$n")" ]; then gone=1; break; fi; sleep "$POLL_S"
@@ -135,7 +147,7 @@ precleanup() {
   if [ -z "${ids// /}" ]; then
     log "no pod named $NAME was created (create failed: exit $rc); receipts kept aside, no attempt"
     jq -n --arg r "create failed, no pod found" '{class:"NOT_AN_ATTEMPT",rule:"P1",reason:$r}' > "$REC/outcome.json"
-    rpc_cleanup; mv "$REC" "$REC.nocreate-$(date -u +%Y%m%dT%H%M%SZ)"; exit 4
+    local nc; nc="$REC.nocreate-$(date -u +%Y%m%dT%H%M%SZ)"; rpc_cleanup; mv "$REC" "$nc"; remind "${nc#"$here/"}"; exit 4
   fi
   local p cr s usd; p=$(jq -r '.costPerHr // empty' "$REC/pod-create.json" 2>/dev/null || true); p=${p:-$price}
   cr=$(jq -r '.createdAt // empty' "$REC/pod-create.json" 2>/dev/null | sed 's/ UTC$//' || true)
@@ -143,11 +155,13 @@ precleanup() {
   usd=$(awk -v p="$p" -v s="$s" 'BEGIN{printf "%.4f", p * s / 3600}')
   jq -n --arg ids "$ids" --arg d "$deleted" --argjson s "$s" --argjson p "$p" --argjson u "$usd" --argjson g "$gone" --argjson rc "$rc" \
     '{pods:($ids|split(" ")|map(select(length>0))),deleted:$d,seconds_at_least:$s,costPerHr:$p,usd_derived:$u,reason:"pre-start failure",exit:$rc,confirmed_gone:($g==1)}' > "$REC/cost.json"
-  jq -n --argjson rc "$rc" '{class:"NOT_AN_ATTEMPT",rule:"P1",reason:"failure before the runner started",exit:$rc}' > "$REC/outcome.json"
+  jq -n --argjson rc "$rc" '{class:"NOT_AN_ATTEMPT",rule:"P1",reason:"failure before the runner started",exit:$rc,ended_by_signal:($rc >= 128)}' > "$REC/outcome.json"
   local k=1; while [ -e "$REC.prestart-$k" ]; do k=$((k + 1)); done
-  ledger_close "$NAME/${id:-${ids// /}}" "$usd" "${REC#"$here/"}.prestart-$k/cost.json" 2>/dev/null || true
+  # S7: the ledger row is closed only when the deletion is confirmed; otherwise it stays open at the worst case.
+  if [ "$gone" = 1 ]; then ledger_close "$NAME/${id:-${ids// /}}" "$usd" "${REC#"$here/"}.prestart-$k/cost.json" 2>/dev/null || true
+  elif [ -z "$id" ]; then ledger_add "$NAME/${ids// /}" "$(awk -v p="$p" -v h=$WORST_HOURS 'BEGIN{printf "%.4f", p * h}')" "${REC#"$here/"}.prestart-$k (deletion not confirmed)"; fi
   log "pre-start failure (exit $rc): pod(s) $ids deleted, confirmed gone: $gone; receipts moved to $REC.prestart-$k (not an attempt)"
-  rpc_cleanup; mv "$REC" "$REC.prestart-$k"
+  rpc_cleanup; mv "$REC" "$REC.prestart-$k"; remind "${REC#"$here/"}.prestart-$k"
   [ "$gone" = 1 ] || exit 11
 }
 
@@ -197,7 +211,7 @@ id=$(jq -r '.id // empty' <<<"$out" 2>/dev/null || true)
 [ -n "$id" ] || { log "create failed or timed out: $(jq -c 'del(.env?, .dockerStartCmd?)' <<<"$out" 2>/dev/null || head -c 500 <<<"$out")"; exit 4; }
 cp "$tokf" "$RPC_STATE/$id.token"
 redact <<<"$out" > "$REC/pod-create.json"
-ledger_add "$NAME/$id" "$(awk -v p="$(jq -r '.costPerHr // 0' "$REC/pod-create.json")" -v h=$HOURS 'BEGIN{printf "%.4f", (p > 0 ? p : 1) * h}')" "${REC#"$here/"}"
+ledger_add "$NAME/$id" "$(awk -v p="$(jq -r '.costPerHr // 0' "$REC/pod-create.json")" -v h=$WORST_HOURS 'BEGIN{printf "%.4f", (p > 0 ? p : 1) * h}')" "${REC#"$here/"}"
 log "created pod $id ($NAME) at $(jq -r .createdAt "$REC/pod-create.json")"
 
 # 9. Reserved tier, flavor, size and price from the create response (decision D7), the request from pod-request.json.
@@ -226,6 +240,23 @@ for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zer
     || { log "upload sha256 mismatch or missing: $f"; exit 5; }
 done
 log "pod-side sha256 of the 7 uploaded files equal the local ones"
+
+# 10b. The pod's cgroup memory limit, read before start (S4): the boot loop has copied it into /results/cgroup, which
+#      holds nothing else yet. It must be "max" or at least 112 GiB, so that an OOM kill here means what it means at
+#      Amendment 14's -m112 size. Otherwise the pod is deleted before start (the case goes to the owner).
+mm=""
+for i in 1 2 3; do
+  pre="$RPC_STATE/$NAME.precheck"; rm -rf "$pre"; mkdir -p "$pre"
+  if timeout 120 "$RP" fetch "$id" "$pre/p.tar.gz" >/dev/null 2>&1 && tar -xzf "$pre/p.tar.gz" -C "$pre" 2>/dev/null; then
+    for f in memory.max memory_memory.limit_in_bytes; do [ -z "$mm" ] && [ -s "$pre/results/cgroup/$f" ] && mm=$(tr -d '\n' < "$pre/results/cgroup/$f") && mmsrc=$f; done
+    find "$pre/results" -type f -printf '%P\n' | LC_ALL=C sort > "$REC/prestart-results-files.txt"
+  fi
+  rm -rf "$pre"; [ -n "$mm" ] && break; sleep "$POLL_S"
+done
+jq -n --arg v "$mm" --arg s "${mmsrc:-none}" '{cgroup_memory_limit:$v, source:$s}' > "$REC/cgroup-prestart.json"
+{ [ "$mm" = max ] || { [[ $mm =~ ^[0-9]+$ ]] && [ "$mm" -ge "$M112_LIMIT_BYTES" ]; }; } \
+  || { log "REFUSED cgroup memory limit '${mm:-unobservable}' (${mmsrc:-no file}): must be max or >= $M112_LIMIT_BYTES bytes; owner"; exit 4; }
+log "cgroup memory limit $mm ($mmsrc)"
 
 # 11. Deadlines written before start (S6, decision D3), then start.
 cr=$(jq -r '.createdAt' "$REC/pod-create.json" | sed 's/ UTC$//'); ce=$(epoch "$cr")

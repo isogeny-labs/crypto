@@ -1,14 +1,28 @@
-# Resume: crypto @ claude/ecstatic-edison-cgo57l
+# Resume: crypto @ claude/index-calculus-gpu-optimization-otouqv (round 5: GPU m = 3 with incremental-gauss-echelon)
 
 ## Goal
-Owner (2026-11-14): work on hyperelliptic index calculus and make cross-genus statistical experiments possible: HCDLP at genus 2, 3, 4, 5 on one field, difficulty differences, Smith's isogeny, non-hyperelliptic curves.
+User (2026-11-15), "Keep working on open leads". Lead from research/ic_la_m3_20261115 (PR #4310):
+incremental-gauss-echelon matches incremental-gauss (trials, relations, logarithm, S) with 0.10-0.15x the
+row_ops. Measure the whole-solve effect on the round-4 GPU arm (probe_build=pairs, daemon, cuda).
+
+## Lead / hypothesis
+PROTOCOL.md: identity across IC arms; at |F_x| = 4096 the GPU arm's median solve with echelon <= 0.5x
+with gauss; row_ops ratio 0.10-0.20.
 
 ## Spec
-Frozen protocol: research/genus_ladder_20261114/PROTOCOL.md (frozen.sha256 beside it). Code: src/cryptanalysis/genus_ladder.rs, src/cryptanalysis/quartic_ladder.rs, src/bin/genus_ladder.rs, src/bin/genus_ladder_analyze.rs.
-Run (section 6 of the protocol): two `genus_ladder run` invocations -> part_a.jsonl, part_b.jsonl -> ladder.jsonl; then `genus_ladder_analyze ladder.jsonl analysis.json`; then `python3 render.py analysis.json` in the study directory.
+specs/smoke.json, specs/rf3la.json (38/40-bit prime_explicit curves, |F_x| 2048/4096, 3 targets, 2
+rounds; CPU and GPU arms x gauss/echelon; GPU echelon A/A at 4096; rho and rho A/A). job.sh on one A100,
+launched by run_pod.sh under benchrec run.
 
 ## State
-2026-11-14: code and unit tests done (5 ladder tests pass), protocol frozen, grid launched locally (4 vCPU container, no AWS identity, so no isolab-eks and no S3 push).
+2026-11-15: protocol and specs frozen; pod not yet launched.
 
-## Next
-Collect part_a/part_b, analyze, RESULTS.md with the H1..H9 scorecard, figures, PDF, bench record, session log, PR.
+## Runs in flight
+None yet (pod icgpu-rla; cleanup: research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-rla).
+
+## Stop and success conditions
+Any S/relation/logarithm mismatch or failed replay voids that comparison. Wall L0, A/A floor. Cap
+~1.5 GPU-hours, $4. S3: same waiver as earlier rounds (session AWS keys rejected).
+
+## Next steps
+Commit+push protocol -> record init -> ecbench release build -> run_pod.sh -> analyze -> report -> PR.

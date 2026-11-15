@@ -1,7 +1,7 @@
 # Genus ladder, follow-up 1: `r` bound to `p`, genus 4 and plane quartics to p = 8209 — results (2026-11-15)
 
-Status: `[pcc:unverified]`; independent replay by a validator agent on the same shared
-host is in `VALIDATION_REPORT.md` (see "Validation" below). No isolated host, so no row
+Status: `[pcc:unverified]` as a claim; counted fields of the `p = 2053, 4099` cells replayed
+identically by a validator agent on the same shared host (`VALIDATION_REPORT.md`, "Validation" below). No isolated host, so no row
 reaches the IC leaderboard or `benchmarks/README.md`. Protocol: [`PROTOCOL.md`](PROTOCOL.md)
 (frozen before data, `frozen.sha256`); binary `binary.sha256` (sha 61ccabd2…, source
 commit `14ab74ec8b`); data `bound_r.jsonl`, `analysis.json`, `data.sha256`; tables
@@ -58,12 +58,32 @@ overlaps 2.0 ± 0.25; a weak test); B3 held (FPM band below at all three primes;
 
 ## Validation
 
-`VALIDATION_REPORT.md` is written by a separate validator agent that builds its own
-binary from the stated commit, replays cells of the protocol's command and compares
-every counted field with `bound_r.jsonl`, and recomputes the cell means from the raw
-data. The host is this same shared 4-vCPU container: that replay is a reproducibility
+[`VALIDATION_REPORT.md`](VALIDATION_REPORT.md), by a separate validator agent: it built its
+own binary from the tree (sha `29a7ca87…`, a real recompile), replayed the protocol's
+command for `p = 2053, 4099` (12 instances, 72 runs, 22 minutes) and compared with
+`bound_r.jsonl`: **12/12 instances and 72/72 runs identical on all 1,752 counted fields**
+(everything but `wall_ns`); its own per-cell means agree with `analysis.json` on 48/48
+fields to four significant digits; its own factorisation confirms B5. Disposition:
+`validated` for the 12 replayed cells, `insufficient_evidence` for the 6 cells at
+`p = 8209` (not replayed, budget). The replay is `validator_replay.jsonl` (hash in
+`data.sha256`).
+
+Corrections the validator made to this write-up's framing, adopted here:
+
+- Certificates: the hyperelliptic index-calculus arms certify `[t]G = T` twice (two
+  independent scalar multiplications); hyperelliptic rho and both quartic arms certify
+  once, plus the driver's check `recovered == planted t`. `t` is not in the JSONL, so a
+  reader cannot re-derive the certificate from the data alone.
+- Provenance: the binary (built 22:02 UTC from the working tree) predates the commit
+  `14ab74ec8b` it is attributed to; the validator's `git diff` of the six ladder sources
+  between that commit and the tree is empty, so the attribution is to identical sources,
+  but the stated order was wrong. The protocol's content was fixed at 23:18 UTC, the run
+  started at 23:19, and the commit carrying the protocol landed at 23:33, during the run.
+
+Host: the same shared 4-vCPU container as the producer. The replay is a reproducibility
 check of the counted units on one machine, not the isolated-host measurement the
-validation gate asks for. Standing after the replay: see the report's verdict.
+validation gate asks for; the study stays pre-gate and no leaderboard or
+`benchmarks/README.md` row follows.
 
 ## Deviations
 
