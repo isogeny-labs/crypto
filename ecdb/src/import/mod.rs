@@ -19,6 +19,7 @@ pub mod end_ring;
 pub mod enrich;
 pub mod factor_bases;
 pub mod generated;
+pub mod levels57;
 pub mod lmfdb;
 pub mod pack;
 pub mod registry;
@@ -213,6 +214,8 @@ pub enum Selection {
     Volcanoes,
     /// End(E) of every ordinary curve over F_p, p < 2^10, by Kohel's l^k-torsion criterion.
     EndRings,
+    /// Certified l = 5, 7 volcano levels from computed rational isogenies (census-fp).
+    Levels57,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
     /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10 (curve_ell_torsion, frobenius_ell).
@@ -270,6 +273,11 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // After volcanoes and end-rings: it cross-checks the census graph and the stored levels.
     if all || what == Selection::EllTorsion {
         reports.push(ell_torsion::import(ctx).await?);
+    }
+    // After volcanoes and end-rings: it checks its l = 5, 7 levels against the levels and
+    // End(E) rows they stored (two independent methods), then fills in what is missing.
+    if all || what == Selection::Levels57 {
+        reports.push(levels57::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {

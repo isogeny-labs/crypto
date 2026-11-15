@@ -53,6 +53,9 @@ It holds:
   (action, rational ℓ-isogenies, torsion and isogeny field degrees, ψ_ℓ
   factor degrees) and `frobenius_ell` (characteristic polynomial mod ℓ,
   depth, splitting), from `ecdb import ell-torsion`.
+  `ecdb import levels57` certifies the ℓ = 5, 7 levels of every ordinary
+  census curve from rational isogenies it computes, replacing upper bounds
+  (`level_at_most`) with exact levels.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).

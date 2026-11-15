@@ -185,6 +185,9 @@ enum ImportWhat {
     /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10: action, isogeny count, torsion and
     /// isogeny field degrees, psi_l factor degrees (src/import/ell_torsion.rs).
     EllTorsion,
+    /// Certified ℓ = 5, 7 volcano levels of the census-fp curves from computed rational isogenies
+    /// (src/import/levels57.rs).
+    Levels57,
     /// Factor bases of the IC work: FB1/FBM1 from ecbench records, the catalog and dumps,
     /// large-prime and SECG small-x results, the cryptanalysis archive (src/import/factor_bases.rs).
     FactorBases,
@@ -288,6 +291,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Volcanoes => import::run(&ctx, Selection::Volcanoes, None).await?,
                 ImportWhat::EndRings => import::run(&ctx, Selection::EndRings, None).await?,
                 ImportWhat::EllTorsion => import::run(&ctx, Selection::EllTorsion, None).await?,
+                ImportWhat::Levels57 => import::run(&ctx, Selection::Levels57, None).await?,
                 ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
                 ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
