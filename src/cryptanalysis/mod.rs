@@ -224,6 +224,7 @@ pub use ecdl_tensor_ic as tensor_ic;
 pub mod dreg_forecast;
 pub mod dreg_prior_table;
 pub mod genus_ladder;
+pub mod genus_ladder_harvest;
 pub mod hec_dlp;
 pub mod hilbert_class_poly;
 pub mod hky_fp_tower;
