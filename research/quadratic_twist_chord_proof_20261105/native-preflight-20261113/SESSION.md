@@ -115,3 +115,21 @@ Scientific processes ended. Full local evidence/report/export remains /workspace
 ### Errors
 
 Original mandatory diagonal-control inapplicability remains a real failed full plan, not relabelled as pass. Corrected study is an openly unblinded amendment, full replication, not a blinded confirmation. First report command selected its output directory before creating it, so no command ran; created directory then generated report. First report had2.54pt prose overflow/fused spacing; original source/PDF/log retained, presentation-only spacing correction yields two inspected pages without overflow. Native data were never rerun for export/presentation fixes. Artifact/size/whitespace checks pass at source scope using current official helper/policy; no whole-CI pass claimed. [pcc:unverified]
+
+## 2026-11-15T06:40Z — exact Lean environment restored, first chord gate still unlaunched
+
+### What was done
+
+Restored official Lean4.34.1 from public release, verified published archive SHA47bf4b... and actual binary SHAe8baaa.... Retrieved exact Mathlibd13f23 Git source, all8 locked dependency revisions and official public Mathlib/Tactic cache.40078 compiled-library files bind to inventory SHAea34f2.... Current official proof-gate c0ee51e... and AuditAxioms5d346e... restored byte-identically outside checkout, no shared-tool patch. Existing five original Chord.lean declarations remain UNELABORATED, exact source4d288b3... unchanged. Upstream dependency/cache-tool compilation is setup, not this task's theorem execution. [pcc:unverified]
+
+### Decisions made
+
+Run the exact original source FIRST through unmodified current repository gate with pinned Lean4.34.1, native trustLevel0 import audit and zero extra/trusted axioms. Separately pre-file all5 false-statement sources and8-stage full proof/control contract; all outputs outside checkout. Generated negative .lean inputs are literal copies in an ignored private input directory solely for explicit negative calls; tracked .lean.txt templates preserve their content without creating deliberately false global proof targets. User-selected GitHub source checkpoint applies on SAME approved branch; no S3 success/skip/patch. [pcc:unverified]
+
+### Open threads
+
+Publish source/protocol/pins and fresh clean-head receipt, then actual600s bounded gate. Preserve first exact failure, no tactic correction before first attempt. Any later correction must preserve theorem statements and be separately filed/checkpointed. The native iteration is finished; a NEW<=3600s proof window starts only at first target gate. No new native recovery rerun, signed verdict, IDC1 or global theorem inventory claim. [pcc:unverified]
+
+### Errors
+
+Default sandbox public HTTPS could not reach managed proxy; approved same-destination outer request succeeded, with inherited proxy/CA unchanged. Public Git dependency fetch works; no AWS/auth probes or secret reads. Earlier Mathlib cache source is not substituted: exact old pin verified, source Git diff unchanged. No current toolchain availability block remains and no repeated upload approval is requested. [pcc:unverified]
