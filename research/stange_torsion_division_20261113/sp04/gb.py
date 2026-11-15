@@ -1,11 +1,14 @@
 import time, random, statistics as st
 from sympy import symbols, groebner, expand, Poly
-p=1009; a=5; x0=3; b=(-x0**3-a*x0)%p; t=(3*x0*x0+a)%p; w=x0*t%p; A=(a-5*t)%p; B=(b-7*w)%p
+import sys
+p=int(sys.argv[1]) if len(sys.argv)>1 else 1009; a=int(sys.argv[2]) if len(sys.argv)>2 else 5; x0=int(sys.argv[3]) if len(sys.argv)>3 else 3; b=(-x0**3-a*x0)%p; t=(3*x0*x0+a)%p; w=x0*t%p; A=(a-5*t)%p; B=(b-7*w)%p
 u,v=symbols('u v')
 def S3(X1,X2,X3,a_,b_): return (X1-X2)**2*X3**2-2*((X1+X2)*(X1*X2+a_)+2*b_)*X3+(X1*X2-a_)**2-4*b_*(X1+X2)
 issq=lambda z: z%p==0 or pow(z,(p-1)//2,p)==1
-xs1=[x for x in range(p) if x!=x0 and issq(x**3+a*x+b)]           # x-coords on E1
-xsE=[x for x in range(p) if issq(x**3+A*x+B)]                      # x-coords on E
+import itertools
+assert t and (4*a**3+27*b*b)%p and (4*A**3+27*B*B)%p
+xs1=list(itertools.islice((x for x in range(p) if x!=x0 and issq(x**3+a*x+b)),40))           # x-coords on E1
+xsE=list(itertools.islice((x for x in range(p) if issq(x**3+A*x+B)),40))                      # x-coords on E
 phix=lambda x:(x*x-x0*x+t)*pow(x-x0,-1,p)%p
 def plain_sys(F,xR):
     fF=lambda z: expand(eval('*'.join(f'(z-{c})' for c in F)) if F else 1)
@@ -27,7 +30,11 @@ assert len(xs1)>=16
 for n in (4,8,12,16):
     F1=xs1[:n]; FI=sorted({phix(x) for x in F1}); FE=xsE[:len(FI)]
     T={'E':[],'I':[],'P':[]}; sol=[0,0,0]
-    targets=[R.choice(xsE) for _ in range(6)]
+    def rand_xE():
+        while True:
+            z=R.randrange(p)
+            if issq(z**3+A*z+B): return z
+    targets=[rand_xE() for _ in range(6)]
     for xR in targets:
         arms=[('E',plain_sys(FE,xR),nsol_plain(FE,xR)),('I',plain_sys(FI,xR),nsol_plain(FI,xR)),('P',pulled_sys(F1,xR),nsol_pulled(F1,xR))]
         from collections import Counter

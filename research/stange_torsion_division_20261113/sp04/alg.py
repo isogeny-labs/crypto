@@ -1,6 +1,6 @@
 import sys, time
 from sympy import symbols, Poly, expand, GF
-p=1009
+p=int(sys.argv[1]) if len(sys.argv)>1 else 1009
 x1,x2,x3,y1,y2,y3=symbols('x1 x2 x3 y1 y2 y3')
 # E1: y^2=x^3+a x+b with 2-torsion x0; E = Velu codomain
 a=5; x0=3; b=(-x0**3-a*x0)%p; t=(3*x0*x0+a)%p; w=x0*t%p

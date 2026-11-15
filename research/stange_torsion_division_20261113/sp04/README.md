@@ -33,6 +33,25 @@ exactly the image arm's relations weighted by phi's 2:1 x-multiplicity
 solution (asserted). Prediction of SP-04 holds at this scale; the record is not
 falsified [pcc:unverified].
 
+## Larger primes (2026-11-15)
+
+`gb.py p 5 3` (curve family a = 5, x0 = 3; outputs `gb_p<p>.out`) and
+`alg.py 1000003` (`alg_p1000003.out`; all identities hold exactly) [pcc:unverified].
+Median seconds at n = 16 (6 targets):
+
+| p | plain small-x on E | plain x(phi(F1)) | pulled back | ratio pulled/plain |
+|---|---|---|---|---|
+| 1009 | 0.059 | 0.060 | 0.654 | 11x |
+| 10007 | 0.076 | 0.081 | 0.683 | 9x |
+| 100003 | 0.075 | 0.080 | 0.704 | 9x |
+| 1000003 | 0.075 | 0.077 | 0.663 | 9x |
+
+The ratio is flat in p and grows with n (about 2x at n = 4) [pcc:unverified]. Caveat: at fixed
+n the expected number of relations falls like n^2/p, so for p >= 10^5 no target
+decomposed (0 solutions in every arm), and these cells time a proof of
+infeasibility rather than a solve. A fair large-p test needs n near sqrt(p),
+far beyond sympy; that would be a msolve/Magma run under bench.record.
+
 ## Errors found while checking
 
 - An ad hoc point-count snippet (not in these scripts) reported #E1 != #E; it
