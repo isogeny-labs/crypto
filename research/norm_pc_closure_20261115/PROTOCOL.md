@@ -64,6 +64,7 @@ No field enumeration, guessed witness, scalar, planted norm assignment or
 reference basis enters the producer or verifier. No clocks become measurements.
 No cold ECDLP, useful random-target yield, T1/T2/T3 or speedup claim follows
 from this panel. A new protocol is needed before plugging into cold recovery.
+[pcc:unverified]
 
 For v variables and degree D, rank is at most M=binom(v+D,D); each admitted
 independent pivot queues at most v products. Ignoring implementation caps,
