@@ -1,13 +1,28 @@
-# Resume: crypto @ claude/cool-davinci-szm3om
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
-Owner (2026-11-15): establish a rigorous solving degree and growth formula alongside d_ff and d_lf for the ECDLP index-calculus systems, prime (two- and three-summand chains) and binary.
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
+
+## Lead / hypothesis
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-Frozen protocol: research/solving_degree_20261115/PROTOCOL.md (predictions P1–P6). Claim: for a unit prime chain instance the static Macaulay solving degree is sd = δ + maxwt(supp g^{-1}), g^{-1} the inverse in F_p[(Z/2^k)^m]; hence d_lf ≤ sd ≤ δ + mk with generic equality.
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
 ## State
-2026-11-15 02:10Z: four lanes running locally (4 vCPU, no AWS identity): A prime m=2 (brute force k=3,4; inverse scan k=3..12), B prime m=3, C binary static degrees from the ic-bounds-binary records, D proof note SD1 plus red-team. Outputs under research/solving_degree_20261115/lane*/.
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
-## Next
-Collect lane RESULTS.md, assemble RESULTS.md and REPORT (research-visuals), copy SD1-solving-degree.md to ml-cryptanalysis docs/proofs on claude/lfd-proofs-20261108, session log, PR with auto-merge.
+## Runs in flight
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
+
+## Stop and success conditions
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
+
+## Next steps
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.

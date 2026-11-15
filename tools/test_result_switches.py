@@ -1,6 +1,6 @@
 """R9: result-affecting switches must reach the run records.
 
-Run: python3 -m pytest tools/test_result_switches.py
+Run: python3 tools/test_result_switches.py   (or python3 -m pytest tools/test_result_switches.py)
 """
 import ast
 import json
@@ -104,3 +104,29 @@ def test_ic_tool_program_records_carry_the_switches():
     assert '"result_switches": result_switches.record(ENV)' in manifest
     iso = (ROOT / "tools/isolated_bench.py").read_text()
     assert "record['result_switches'] = result_switches.record(os.environ)" in iso
+
+
+def test_credentials_are_never_recorded():
+    doc = rs.record({"GH_TOKEN": "x", "GITHUB_TOKEN": "y", "KIC_FREE_RELATIONS": "1"})
+    assert doc["env"] == {"KIC_FREE_RELATIONS": "1"}
+
+
+if __name__ == "__main__":
+    # No pytest needed: run every test_* function, giving tmp_path a scratch directory.
+    import inspect
+    import tempfile
+    failed = 0
+    tests = [(n, f) for n, f in sorted(globals().items()) if n.startswith("test_") and callable(f)]
+    for name, fn in tests:
+        try:
+            if "tmp_path" in inspect.signature(fn).parameters:
+                with tempfile.TemporaryDirectory() as td:
+                    fn(Path(td))
+            else:
+                fn()
+            print(f"ok   {name}")
+        except Exception as exc:  # noqa: BLE001 - report every failure, then exit non-zero
+            failed += 1
+            print(f"FAIL {name}: {exc}")
+    print(f"{len(tests) - failed}/{len(tests)} passed")
+    sys.exit(1 if failed else 0)

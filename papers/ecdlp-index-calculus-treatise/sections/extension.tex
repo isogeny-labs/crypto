@@ -254,9 +254,18 @@ trial, so the lead is closed (\art{research/leads_20261111/probes/CHAIN_VARIABLE
 The 21 carrying monomials have $\FF_2$-rank of differences 4 on 300 of
 300 instances, so they lie in no index-2 coset, and that lead is closed.
 The quadratic part has rank 2, not 3, on 300 of 300 targets, so the
-constant-quadratic elimination is falsified as written; its rank-2 variant
-is untested (\art{research/leads_20261111/runs/B_d4bin_probes/RESULT.md}).
-None of the three moves the distances of Table~\ref{tab:pf-d4}.
+constant-quadratic elimination is falsified as written
+(\art{research/leads_20261111/runs/B_d4bin_probes/RESULT.md}). Its rank-2
+variant, preregistered the same evening, row-reduces the two square
+coefficients, solves the two linear rows by Cramer's rule and takes a
+resultant in $s_4$. At $m=12$ it costs $0.6891$ $[0.6885,0.6896]$ of the
+current solve in counted $\FF_q$ multiplications with the semilinear root
+finder ($0.727$ with the Newton nodes' inverses charged), cheaper on 300 of
+300 targets with identical solution sets, and $1.0069$ with the baseline
+root finder; the preregistered central value was $1.15$
+(\art{research/leads_20261111/runs/B_d4bin_probes/rank2/RESULT.md}; local,
+unverified). At $m=8$ the current solver misses three solutions with
+$s_4=0$. None of the four moves the distances of Table~\ref{tab:pf-d4}.
 
 \section{The Joux--Vitse cover, 11--12 November}\label{sec:ext-jv-nov}
 
@@ -286,8 +295,9 @@ fall to $0.3894$--$0.3895$; the emitted native F4 counter falls to
 $0.983$; about $0.08\%$ of systems fall back. All four preregistered
 falsifiers pass. Re-scored with the unchanged tool against the pooled
 matched negation rho (126 runs), the arm moves below rho in U2 at
-$p=1451$ and $1601$ at every weight of the band
-(Table~\ref{tab:ext-jv-hilbert}). At $p=1301$ it is level with rho at
+$p=1451$ and $1601$ at every weight of the band on its emitted counters
+(Table~\ref{tab:ext-jv-hilbert}); the validation below does not admit that
+order. At $p=1301$ it is level with rho at
 $w=0$ ($1.003$ $[0.916,1.104]$), so the order does not hold across the
 band there. The cover's native count omits its $\FF_p$ additions, so a
 ``below'' could narrow under complete counts. The source classifies the
@@ -317,10 +327,73 @@ cover seeds and the 126 pooled rho runs (estimator b). Band: verdict
 across $w\in\{0,0.1,1\}$ in U2 (``no'': not the same at every weight).
 The cover's native count is a lower bound. Modelled U2 crossover
 $p^*=1327$ $[1278,1381]$, U1 $874$ $[842,910]$, on the crossover study's
-slope $-2.10$ (not re-fitted). Local L0, no validation file, unverified.
+slope $-2.10$ (not re-fitted). Local L0; the validation of
+Table~\ref{tab:ext-jv-hilbert-val} returned insufficient evidence; unverified.
 Sources: \art{research/jv_nagao_hilbert_20261112/results/paired.txt},
 \art{research/jv_nagao_hilbert_20261112/rescore/table.md}.}
 \label{tab:ext-jv-hilbert}
+\end{table}
+
+\paragraph{The validation attempt.} The same evening the Hilbert-stop
+records went through as much of the validation gate as one session could
+reach (\art{research/jv_nagao_hilbert_20261112/validation/RESULT.md}). A
+32-vCPU pod replayed the drift control and the nine Hilbert instances; every
+counted field, relation digest and logarithm is identical in 10 of 10
+records. Rho re-run with the study binary on the same pod reproduced all
+126 pooled walks except their wall time, so the pooled rescore is a
+same-binary replay. A fresh sample of 126 walks (run indices 14--27) is
+cheaper than the pooled reference and raises each ratio
+(Table~\ref{tab:ext-jv-hilbert-val}). The verdicts per prime do not change:
+not resolved at $p=1301$ at $w=0$, below at $1451$ and $1601$ in the
+emitted counts. In U1 every cell is below at every weight. The modelled U2
+crossover is $p^*=1356$ $[1305,1413]$ with the fresh sample and $1342$
+$[1305,1382]$ combined.
+
+The independent validator returned \emph{insufficient evidence}. Its
+blocking findings: 8 of the 9 cover solves and all rho solves have no
+independent certificate (\texttt{correct: true} is the solver checking
+itself); the cover's native count omits $\FF_p$ additions, F4 pair
+selection and matrix assembly, and with an addition proxy U2 at
+$p=1451$ and $1601$ would be above rho at $w=0.1$ and $1$; the
+preregistered Hilbert/plain band of $[0.50,0.62]$ at $w=0.1$ and $1$ was
+missed, at $0.821$ and $0.959$, so the stop's gain is $1.90\times$ at
+$w=0$ and $1.04\times$ at $w=1$; and there is no S3 benchmark record.
+\texttt{VALIDATION.json} records \texttt{order\_holds\_across\_band: false}
+(\art{research/jv_nagao_hilbert_20261112/validation/VALIDATION.json}). The
+replay also found that the recorded \texttt{hilbert\_check\_muls} is
+inflated by concurrency ($6.4\cdot10^{10}$ recorded, $8.875\cdot10^9$ on one
+thread, $11.1\%$ of the F4 multiplications); it enters neither $S$ nor the
+rescore.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Rho reference & $p$ & $w=0$ [95\%] & $w=0.1$ & $w=1$ & Band \\
+\midrule
+pooled, runs 0--13 (126) & 1301 & $1.003$ $[0.916,1.104]$ & $0.861$ & $0.831$ & no \\
+ & 1451 & $0.837$ $[0.771,0.910]$ & $0.718$ & $0.693$ & below \\
+ & 1601 & $0.695$ $[0.642,0.756]$ & $0.597$ & $0.576$ & below \\
+\addlinespace
+fresh, runs 14--27 (126) & 1301 & $1.050$ $[0.957,1.155]$ & $0.901$ & $0.870$ & no \\
+ & 1451 & $0.876$ $[0.807,0.956]$ & $0.752$ & $0.725$ & below \\
+ & 1601 & $0.728$ $[0.672,0.793]$ & $0.625$ & $0.603$ & below \\
+\addlinespace
+combined, runs 0--27 (252) & 1301 & $1.026$ $[0.955,1.108]$ & $0.881$ & $0.850$ & no \\
+ & 1451 & $0.856$ $[0.805,0.912]$ & $0.735$ & $0.709$ & below \\
+ & 1601 & $0.711$ $[0.670,0.756]$ & $0.611$ & $0.589$ & below \\
+\bottomrule
+\end{tabular}
+\caption[]{The Nagao arm with Hilbert stop against three samples of the
+matched negation rho, all run with the study binary on one pod: U2
+(textbook $\FF_p$ multiplications), cover over rho at $w=0$, $0.1$ and $1$
+GAE per emitted native operation, 95\% bootstrap intervals at $w=0$
+(estimator b). Band: on emitted counters only; the validator does not
+admit the order across the band, because the cover's native count is a
+lower bound. Disposition: insufficient evidence. Every value is
+\texttt{[pcc:unverified]}; no pcc claim. Source:
+\art{research/jv_nagao_hilbert_20261112/validation/RESULT.md}.}
+\label{tab:ext-jv-hilbert-val}
 \end{table}
 
 \paragraph{The same stop in the sieve's descent: killed.} The sieve route's

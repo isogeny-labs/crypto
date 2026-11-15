@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/workspace/crypto-audit/tools/pcc/pcc.py", line 2073, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/crypto-audit/tools/pcc/pcc.py", line 2060, in main
+    findings += [f"{f}: {x}" for x in lint_prose(f.read_text(encoding="utf-8", errors="replace"), standings)]
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/crypto-audit/research/norm_core_elimination_20261115/README.md'

@@ -57,3 +57,16 @@ Runtime (1 core, shared host): m = 3 t = 2 about 0.3 s per cell; t = 3 50 to 72 
 ## What is and is not shown
 Shown, on these cells only: at m = 3, t = 2 and 3, both primes, 3 draws each, (a) d_F^(f2) = d_F; (b) lambda3 vanishes on V_{F,c} for every c < d_F with lambda3(1) != 0, i.e. lambda3 acts as a closure pseudo-solution at exactly these cells; (c) the same holds for lambda_f at m = 2, t = 2 to 7 (28 cells). Ground truth is the Python closure, validated only against d_F values.
 Not shown: anything at t >= 4 for m = 3; any proof; behaviour for other primes or non-Kummer towers; that the equality persists as t grows (d_F is only 5 and 6 here, and the closure's structure at these small c may be degenerate: at t = 2, rank of pi(V_4) is 1). The Python closure was not compared row by row with the Rust echelon, only through d_F.
+
+
+## Addendum: m = 3, t = 4, one draw (main session, after the lab finished) [pcc:unverified]
+
+`OMP_NUM_THREADS=1 LQR_OUT=<dir> python3 run_cells.py m3 40961 4 0`. This is the same code and the same N1 instance generator as the table above. Raw output is in `raw/m3_p40961_t4_i0.json`, log in `m3_t4_main_session.log`; runtime 3561 s.
+
+| p | t | draw | d_F | d_F^(f2) | c* | c* = d_F − 1 |
+|---|---|---|---|---|---|---|
+| 40961 | 4 | 0 | 6 | 6 | 5 | yes |
+
+- λ vanishes on V_{F,c} for c = 2…5, and 1 ∈ V_{F,6}. `dim V_5` = 348 and `rank π(V_5)` = 132.
+- d_F stays at 6 going from t = 3 to t = 4.
+- One draw only. The t = 4 prediction held on it; the other draws and t ≥ 5 were not run.

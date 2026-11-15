@@ -1,0 +1,15 @@
+{
+  "action": "at dispatch, before anything rebuilds it, hash and copy target/release/ecbench and compare with the sessions' binary_sha256; if it already differs, report the binary-to-commit binding as unverifiable and replay worker-free records with a binary from a clean known commit",
+  "created": "2026-11-15T20:36:59Z",
+  "evidence": [
+    "research/ic_gpu_rootfind_la_20261115/VALIDATION_REVIEW.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "validating a pod run whose launcher copies target/release/ecbench (not built from REV on the pod; sessions record git_commit null)",
+  "why": "round 5: measured binary 0742b939 was gone within about 1.5 h (target rebuilt 20:10Z); round 4's validator could still copy its binary"
+}
