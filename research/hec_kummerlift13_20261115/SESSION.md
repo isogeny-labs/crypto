@@ -33,3 +33,10 @@ source freeze/execution; space returned externally, nothing deleted.
 Implemented Hensel lift modulo u², exact common-base-factor division and
 independent point derivative oracle. Same4triples, no filtering. Source built
 without errors, not executed. Freeze/checkpoint next; repeated support excluded.
+
+## V3completed
+Source228cd63f6cca/checkpoint201024 preceded one exit0execution, emptystderr.
+All480norm/determinant and480corrected split tensor comparisons pass. Same4
+triples nonzero; g=x-101forfirst3and1forfourth. Derivativeoracle agrees with
+root-free thickened-divisor cancellation. OriginalV1,V2,V3protocols/workers/raw
+retained. No timing, complete mapper, independent replay or10xclaim.
