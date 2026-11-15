@@ -42,3 +42,15 @@ pairs-law ratio observed/expected.
 ## Out of scope
 lifts arms, t = 5 or 6, k other than 20, seeds chosen after the fact, a rho run (see Matched rho), ecbench replay audits, a Conductor task, isolab and S3
 checkpoints (counted mul-adds are deterministic; AWS identity is invalid here). Not a leaderboard or `benchmarks/` row.
+
+## Amendment A1 (before any engine arm; pilots discarded, they had 0 hits)
+The engine requires guess G < t ("pkm-semaev: guess must be below the tower height"), so G = 4 cannot run at t = 4 or t = 3. Cells become:
+t = 4 at G = 3 (primary) and G = 2; t = 3 at G = 2 (primary; G = 3 is invalid). H29, H30, H33 use t = 4 G = 3; H31 compares t = 3 G = 2 with
+t = 4 G = 3. H32 becomes: t = 4, pooled over the 8 seeds, G = 3 rate exceeds G = 2 rate, one-sided exact conditional binomial p < 0.05.
+H29 at t = 3 uses G = 2. H34 uses the best cell over all valid cells. A G = 4 test needs t >= 5 and is out of scope here.
+
+## Amendment A2 (before any engine arm; wall time)
+The pilot measured about 15 ms of wall time per target at t = 4 (17,592 mul-adds per target, 29.4 s for 2,000 targets), so 1,000,000 targets would take about
+4 hours per arm. Targets per arm are lowered to 100,000 at t = 4 (G = 3 and G = 2) and 200,000 at t = 3 (G = 2 only); the expected hit counts from the
+pairs law are recorded in the analysis script. Arm count: 16 at t = 4, 8 at t = 3 = 24. Hit counts in the bottom groups will be small (b = 2 to 10);
+that limits the power of H33 and H31 and is stated here rather than discovered later.
