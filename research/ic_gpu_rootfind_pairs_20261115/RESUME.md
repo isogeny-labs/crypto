@@ -24,11 +24,12 @@ rf3-gpup; cpu A/A; rho, rho A/A), specs/rf2mt2.json (28-32 bits; rf2-cpu, rf2-mt
 job.sh on one A100 (daemon with RF_SERVE_TIMING=1; kills the daemon on every exit path).
 
 ## State
-2026-11-15 07:00Z: code + local tests done (7 pass; pairs positive control fails as it must). The CUDA
-pairs build is compiled for the first time on the pod.
+2026-11-15 08:00Z: done; pod deleted. 260/260 verified+replayed, 156 pairs equal S. Pair table on the
+device: m=3 set-up 0.02-0.12 s; solve 4.0-57.3x one CPU thread, 4.7-10.9x a 14-thread arm (cgroup
+quota 13.6 CPUs confirmed). m=2 pooled multi-thread 7.5-10.5x one thread. REPORT.md; record closed.
 
 ## Runs in flight
-None yet (pod icgpu-rpair when launched; research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-rpair).
+None (icgpu-rpair deleted 07:55Z).
 
 ## Stop and success conditions
 Any S/relation/logarithm/ledger mismatch or failed replay voids that comparison (the smoke session's
@@ -36,4 +37,4 @@ rf3-gpup arm is the first CUDA check of the pairs build). Wall figures L0, descr
 the floor. Cap ~2.5 GPU-hours, $6. S3: same waiver as earlier rounds.
 
 ## Next steps
-Tests -> commit+push specs -> record init -> ecbench build -> local smoke -> pod -> analyze -> report -> PR.
+Track PR #4276. Next: linear algebra (now dominant at |F_x| = 4096); a vectorised CPU sweep; validator.

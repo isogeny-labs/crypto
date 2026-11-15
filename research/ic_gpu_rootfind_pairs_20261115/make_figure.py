@@ -39,6 +39,8 @@ for sess, x in rows:
             continue
         k += 1
         v = x["arms"][a]["solve_s"]; yy = y + k * (bar + gap)
+        if x["m"] == 2 and a == "gpud":
+            cls = "c3"  # m = 2 has no pair table: its GPU arm is the GPU daemon
         o.append(f'<g><title>{a}: {v:.3f} s</title><rect class="{cls}" x="{left}" y="{yy}" width="{max(X(v) - left, 2):.1f}" height="{bar}" rx="2"/></g>')
         lab = f'{v:.3g} s' + ("" if a == "cpu" else f' ({x["arms"][a]["solve_speedup"]:.1f}× CPU)')
         o.append(f'<text class="{"q" if a == "cpu" else "p"}" x="{X(v) + 6:.1f}" y="{yy + bar * 0.85:.1f}" font-size="11">{lab}</text>')
