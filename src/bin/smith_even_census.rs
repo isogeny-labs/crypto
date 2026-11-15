@@ -67,7 +67,7 @@ impl Ext {
                 // An irreducible cubic w³ + a w + b: irreducible iff no root.
                 'search: for a in 0..p {
                     for b in 1..p {
-                        if (0..p).all(|x| (x * x % p * x + a * x + b) % p != 0) {
+                        if (0..p).all(|x| !(x * x % p * x + a * x + b).is_multiple_of(p)) {
                             m = [b, a, 0];
                             break 'search;
                         }
@@ -250,7 +250,7 @@ fn pow_mod(b: u64, e: u64, p: u64) -> u64 {
 /// `g(u) = u⁸ f(r + 1/u)`).
 fn odd_model(f: &[u64], r: u64, p: u64) -> Vec<u64> {
     // g(u) = Σ_i f_i (r u + 1)^i u^(8 − i)
-    let mut g = vec![0u64; 9];
+    let mut g = [0u64; 9];
     let mut pw = vec![1u64]; // (r u + 1)^i
     for (i, &fi) in f.iter().enumerate() {
         for (j, &cj) in pw.iter().enumerate() {
