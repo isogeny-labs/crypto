@@ -1,5 +1,19 @@
 //! Prime field `F_p`, `2 < p < 2^62`, residues in `[0, p)` as `u64`.
 
+// `Fp::inv` calls on this thread (feature `count-inv` only).
+#[cfg(feature = "count-inv")]
+thread_local! {
+    pub static INV_CALLS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// `Fp::inv` calls on this thread so far; 0 without feature `count-inv`.
+pub fn inv_calls() -> u64 {
+    #[cfg(feature = "count-inv")]
+    return INV_CALLS.with(|c| c.get());
+    #[cfg(not(feature = "count-inv"))]
+    0
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Fp {
     pub p: u64,
@@ -115,6 +129,8 @@ impl Fp {
 
     /// Inverse by the extended Euclidean algorithm.  Panics on zero.
     pub fn inv(&self, a: u64) -> u64 {
+        #[cfg(feature = "count-inv")]
+        INV_CALLS.with(|c| c.set(c.get() + 1));
         assert!(a % self.p != 0, "Fp::inv(0)");
         let (mut r0, mut r1) = (self.p as i128, (a % self.p) as i128);
         let (mut t0, mut t1) = (0i128, 1i128);

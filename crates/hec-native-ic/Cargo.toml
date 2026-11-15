@@ -10,5 +10,9 @@ publish = false
 
 [dependencies]
 
+[features]
+# Count `Fp::inv` calls (T2 orientation and gates). Off in timed builds.
+count-inv = []
+
 [profile.release]
 debug = 1
