@@ -34,6 +34,6 @@ continuation branch have a semantic common prefix of 1,088 entries; main has
 fails at entry 1,088. Both histories and claim bodies remain unchanged.
 [Current receipt](../research/binary_subtract_frontier_20261115/evidence/ledger-prefix-check.txt).
 No conflict-side selection, rechaining or waiver was performed. This also
-blocks crypto PR 4335's production continuation from being merged under the
+blocks crypto PR 4344's production continuation from being merged under the
 existing gate. The paired cryptanalysis ledger still passes its prefix check.
 Producer observation. [pcc:unverified]
