@@ -764,6 +764,10 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
+        let mut rootfind_gpu =
+            crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
+                m, inst,
+            );
         let mut hashed = HashedTensorOracle::new();
         // Built on the base's own tower, so it refuses any other base.
         let mut pkm = match or_name {
@@ -777,11 +781,13 @@ fn run_prime(
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
+            "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, hashed-tensor or pkm-semaev"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-subtract-gpu, \
+                     hashed-tensor or pkm-semaev"
                 ))
             }
         };
@@ -878,9 +884,9 @@ fn run_binary(
         };
         let mut algebraic = match or_name {
             "descent-algebraic" => {
-                let raw = spec.solver.as_deref().ok_or(
-                    "descent-algebraic needs --solver (try buchberger-f2, sat-cdcl or exhaustive)",
-                )?;
+                let raw = spec.solver.as_deref().unwrap_or(
+                    crypto_lib::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER,
+                );
                 let (sname, sparams) = parse_plugin(raw)?;
                 let budget = (spec.solver_budget_seconds > 0)
                     .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));

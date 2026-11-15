@@ -65,7 +65,7 @@ use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
     ic_residual_batch_with, native_is_pinned, price_phase, rho_batch_with, rho_cap, rho_reference,
-    rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
+    rho_walk_lanes, rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
     signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3, BinaryGroup, BinaryInstance,
     Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
     PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
@@ -218,7 +218,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
@@ -296,6 +296,19 @@ const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     default: Some("64"),
     help: "step budget as a multiple of √r before the run counts as exhausted",
 }];
+
+const RHO_LANES_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "cap_multiple",
+        default: Some("64"),
+        help: "step budget as a multiple of √r before the run counts as exhausted",
+    },
+    ParamDecl {
+        name: "lanes",
+        default: None,
+        help: "walks advanced in lock-step, one batched field inversion a round (1..=4096)",
+    },
+];
 
 const POOLED_PARAMS: &[ParamDecl] = &[
     ParamDecl {
@@ -506,6 +519,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::prime_orbit::solve",
             applies: Applies::PrimeOnly,
             params: super::prime_orbit::PARAMS,
+        },
+        MethodDecl {
+            id: super::aps::ID_V3,
+            family: "ic",
+            summary: "APS explicit profiles, hybrid variable, two-parameter line chart, certified trace reuse and new-tuple growth; complete pricing is unestablished",
+            entry: "ecbench::aps::solve",
+            applies: Applies::PrimeOnly,
+            params: super::aps::PARAMS_V3,
         },
         MethodDecl {
             id: super::aps::ID_V2,
@@ -1194,12 +1215,12 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.known_log_ksum_v1",
             family: "ic",
-            summary: "ic.known_log_mitm2_v1 with a negation-folded table of every signed k-sum (k = 3, 4, 5) of the seeded known-log base in place of the pair table; a hit's log is the sum of k known logs",
+            summary: "ic.known_log_mitm2_v1 with a negation-folded table of every signed k-sum (k = 3 to 9) of the seeded known-log base in place of the pair table; a hit's log is the sum of k known logs",
             entry: "ecbench::known_log::{prepare_ksum,recover}",
             applies: Applies::PrimeOnly,
             params: &[
                 ParamDecl { name: "size", default: None, help: "unsigned base points; signed point count is twice this (at most 2047)" },
-                ParamDecl { name: "k", default: None, help: "summands, 3, 4 or 5" },
+                ParamDecl { name: "k", default: None, help: "summands, 3 to 9" },
                 ParamDecl { name: "base_seed", default: None, help: "target-independent base seed" },
                 ParamDecl { name: "base_multiplier", default: Some("1"), help: "H=[u]G; use c^-1 when transporting a base to generator [c]G" },
                 ParamDecl { name: "max_sums", default: None, help: "hard bound on the table's 2^(k-1)·C(size,k) sums, checked before any work" },
@@ -1295,6 +1316,22 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "ic",
             summary: "the candidate tournament worker's pair-table pipeline (examples/ic_tournament_worker.rs): subgroup-orbit base, signed-Frobenius pair table, relation collection in batch_trials queries with a rank check after each batch, sparse logs, one-target descent; every stage charged by counted point additions and doublings (group_op_count), native work unpriced; exists so the tournament's batch_trials candidates can be measured on an isolated host with L2, replay and A/A",
             entry: "ecbench::koblitz_batched::run",
+            applies: Applies::KoblitzOnly,
+            params: KOBLITZ_BATCHED_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.koblitz_descent_v2",
+            family: "ic",
+            summary: "ic.koblitz_descent with the current partition-local Top filter layout for folded pair tables; the algorithm and counted group-operation contract are unchanged, while filter false positives and their unpriced bucket reads belong to this versioned identity",
+            entry: "ecbench::koblitz_descent::run_top",
+            applies: Applies::KoblitzOnly,
+            params: KOBLITZ_DESCENT_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.koblitz_batched_v2",
+            family: "ic",
+            summary: "ic.koblitz_batched with the current partition-local Top filter layout for folded pair tables; the algorithm and counted group-operation contract are unchanged, while filter false positives and their unpriced bucket reads belong to this versioned identity",
+            entry: "ecbench::koblitz_batched::run_top",
             applies: Applies::KoblitzOnly,
             params: KOBLITZ_BATCHED_PARAMS,
         },
@@ -1406,6 +1443,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_boundary::rho_walk_with_policy(NegationClasses, RhoWalk::negation(), WalkPolicy::chained())",
             applies: Applies::Any,
             params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.negation_lanes_v1",
+            family: "rho",
+            summary: "rho.negation's set-up and walk (A = 2, look-ahead, cycle window, escapes) in `lanes` lock-step walks whose additions share one Montgomery-batched field inversion a round (prime curves, p < 2^62); S charged as rho.negation (one group operation a step, look-ahead addition and escape), field tally the batched one; distinguished points arrive in lane order, so a seed's S differs from rho.negation's; expected S ≈ √(π/4)",
+            entry: "ic_boundary::rho_walk_lanes(NegationClasses, RhoWalk::negation(), lanes)",
+            applies: Applies::PrimeOnly,
+            params: RHO_LANES_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic_v2",
@@ -1613,6 +1658,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         "rho.negation"
         | "rho.negation_v2"
         | "rho.negation_chained"
+        | "rho.negation_lanes_v1"
         | "rho.negation_v3"
         | "rho.negation_v4"
         | "rho.negation_v5"
@@ -2703,6 +2749,23 @@ fn solve_generic<G: CountedGroup>(
             let o = kangaroo(g, gen, target, r, seed, cap()?);
             generic(o, t.elapsed().as_nanos() as u64, 1)
         }
+        "rho.negation_lanes_v1" => {
+            let lanes = param_u64(m, "lanes")?;
+            let lanes =
+                usize::try_from(lanes).map_err(|_| "lanes does not fit usize".to_string())?;
+            let res = rho_walk_lanes(
+                g,
+                &NegationClasses { r },
+                gen,
+                target,
+                r,
+                seed,
+                cap()?,
+                RhoWalk::negation(),
+                lanes,
+            )?;
+            rho(res, t.elapsed().as_nanos() as u64)
+        }
         "rho.negation_chained" => {
             let res = rho_walk_with_policy(
                 g,
@@ -3016,14 +3079,22 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             "`{id}` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
         )),
-        Instance::Binary(i) if id == "ic.koblitz_descent" => koblitz_descent_applicable(m, i),
-        _ if id == "ic.koblitz_descent" => Err(format!(
-            "`ic.koblitz_descent` runs on one-word Koblitz curves only; {} is {}",
+        Instance::Binary(i)
+            if matches!(id, "ic.koblitz_descent" | "ic.koblitz_descent_v2") =>
+        {
+            koblitz_descent_applicable(m, i)
+        }
+        _ if matches!(id, "ic.koblitz_descent" | "ic.koblitz_descent_v2") => Err(format!(
+            "`{id}` runs on one-word Koblitz curves only; {} is {}",
             curve.slug, curve.family
         )),
-        Instance::Binary(i) if id == "ic.koblitz_batched" => koblitz_batched_applicable(m, i),
-        _ if id == "ic.koblitz_batched" => Err(format!(
-            "`ic.koblitz_batched` runs on one-word Koblitz curves only; {} is {}",
+        Instance::Binary(i)
+            if matches!(id, "ic.koblitz_batched" | "ic.koblitz_batched_v2") =>
+        {
+            koblitz_batched_applicable(m, i)
+        }
+        _ if matches!(id, "ic.koblitz_batched" | "ic.koblitz_batched_v2") => Err(format!(
+            "`{id}` runs on one-word Koblitz curves only; {} is {}",
             curve.slug, curve.family
         )),
         _ => Ok(()),
@@ -3742,10 +3813,20 @@ fn solve_inner(
         (Instance::Binary(i), _) if m.id == "ic.shared_rank" => {
             solve_shared_rank(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
-        (Instance::Binary(i), _) if m.id == "ic.koblitz_descent" => {
+        (Instance::Binary(i), _)
+            if matches!(
+                m.id.as_str(),
+                "ic.koblitz_descent" | "ic.koblitz_descent_v2"
+            ) =>
+        {
             solve_koblitz_descent(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
-        (Instance::Binary(i), _) if m.id == "ic.koblitz_batched" => {
+        (Instance::Binary(i), _)
+            if matches!(
+                m.id.as_str(),
+                "ic.koblitz_batched" | "ic.koblitz_batched_v2"
+            ) =>
+        {
             solve_koblitz_batched(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _)
@@ -6659,8 +6740,11 @@ fn solve_ic_prime(
     let mut prime_blocked = PrimeBatchMitmOracle::blocked();
     let mut mitm_fiber = FiberMitmOracle::new(ms);
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
+    let mut rootfind_mitm_batch = RootfindMitmOracle::new_prime_batch(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut rootfind_gpu =
+        crate::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
     // `pkm-semaev` writes its system on the base's own tower; the shared
     // constructor rebuilds it from the base's spec (`ic bench` uses the same).
@@ -6683,8 +6767,10 @@ fn solve_ic_prime(
         "mitm-prime-blocked" => &mut prime_blocked,
         "mitm-fiber" => &mut mitm_fiber,
         "rootfind-mitm" => &mut rootfind_mitm,
+        "rootfind-mitm-prime-batch" => &mut rootfind_mitm_batch,
         "rootfind-pairs" => &mut rootfind_pairs,
         "rootfind-subtract" => &mut rootfind,
+        "rootfind-subtract-gpu" => &mut rootfind_gpu,
         other => match plugin_oracle.as_deref_mut() {
             Some(o) => o,
             None => return Err(format!("oracle `{other}` does not run on a prime curve")),
@@ -7751,10 +7837,15 @@ fn solve_koblitz_descent(
     let p = KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, seed)?;
     let q = inst.fast.lower(target);
     let started = Instant::now();
-    let out = koblitz_descent::run(kc, &q, &p)?;
+    let top_layout = m.id == "ic.koblitz_descent_v2";
+    let out = if top_layout {
+        koblitz_descent::run_top(kc, &q, &p)?
+    } else {
+        koblitz_descent::run(kc, &q, &p)?
+    };
     let wall = started.elapsed().as_nanos() as u64;
     if !out.single_thread {
-        return Err("ic.koblitz_descent did not run on its one counting thread".into());
+        return Err(format!("{} did not run on its one counting thread", m.id));
     }
     let phases: Vec<PhaseRecord> = out
         .phases
@@ -7832,7 +7923,7 @@ fn solve_koblitz_descent(
         p.seed,
     )?;
     let online = match &out.snapshot {
-        Ok(snap) => koblitz_descent_online(snap),
+        Ok(snap) => koblitz_descent_online(&m.id, snap),
         Err(_) => None,
     };
     let online_error = match (&out.snapshot, &online) {
@@ -7859,7 +7950,7 @@ fn solve_koblitz_descent(
         nondeterminism: Vec::new(),
         solve_wall_ns: wall,
         factor_base: Some(facts),
-        detail: koblitz_descent::detail_of(&out, &p),
+        detail: koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout),
         online,
         online_error,
         solver: None,
@@ -7869,8 +7960,8 @@ fn solve_koblitz_descent(
 
 /// The descent's online window from the session the pipeline ran under:
 /// the five claim phases, which sum to the interval.
-fn koblitz_descent_online(snap: &Snapshot) -> Option<OnlineWindow> {
-    let mut w = online_window("ic", "ic.koblitz_descent", snap)?;
+fn koblitz_descent_online(method_id: &str, snap: &Snapshot) -> Option<OnlineWindow> {
+    let mut w = online_window("ic", method_id, snap)?;
     w.start_event = "the descent's first target-dependent operation ([a0]G + [b]Q, the walks' start), after the factor base, pair table and every column log are ready".into();
     w.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
     w.mapping = "one-target descent over a solved log table: building the walks and stepping them by G is target_query, keying each state and probing the pair table is target_PDP, the witness re-check is target_relation_check, combining the column logs into d is target_descent, and the descent's [d]G = Q is target_recovery_check; the relations and logs are target-independent set-up outside the window".into();
@@ -7893,10 +7984,15 @@ fn solve_koblitz_batched(
     let p = KoblitzBatchedParams::from_method(&m.params, seed)?;
     let q = inst.fast.lower(target);
     let started = Instant::now();
-    let out = koblitz_batched::run(kc, &q, &p)?;
+    let top_layout = m.id == "ic.koblitz_batched_v2";
+    let out = if top_layout {
+        koblitz_batched::run_top(kc, &q, &p)?
+    } else {
+        koblitz_batched::run(kc, &q, &p)?
+    };
     let wall = started.elapsed().as_nanos() as u64;
     if !out.single_thread {
-        return Err("ic.koblitz_batched did not run on its one counting thread".into());
+        return Err(format!("{} did not run on its one counting thread", m.id));
     }
     let phases: Vec<PhaseRecord> = out
         .phases
@@ -7968,7 +8064,7 @@ fn solve_koblitz_batched(
         p.fb_seed,
     )?;
     let online = match &out.snapshot {
-        Ok(snap) => koblitz_batched_online(snap),
+        Ok(snap) => koblitz_batched_online(&m.id, snap),
         Err(_) => None,
     };
     let online_error = match (&out.snapshot, &online) {
@@ -7995,7 +8091,7 @@ fn solve_koblitz_batched(
         nondeterminism: Vec::new(),
         solve_wall_ns: wall,
         factor_base: Some(facts),
-        detail: koblitz_batched::detail_of(&out, &p),
+        detail: koblitz_filter_detail(koblitz_batched::detail_of(&out, &p), top_layout),
         online,
         online_error,
         solver: None,
@@ -8005,12 +8101,21 @@ fn solve_koblitz_batched(
 
 /// The batched pipeline's online window: the same interval and phases as
 /// `ic.koblitz_descent`'s, the descent over a solved log table.
-fn koblitz_batched_online(snap: &Snapshot) -> Option<OnlineWindow> {
-    let mut w = online_window("ic", "ic.koblitz_batched", snap)?;
+fn koblitz_batched_online(method_id: &str, snap: &Snapshot) -> Option<OnlineWindow> {
+    let mut w = online_window("ic", method_id, snap)?;
     w.start_event = "the descent's first target-dependent operation ([a0]G + [b]Q, the walks' start), after the factor base, pair table and every column log are ready".into();
     w.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
     w.mapping = "one-target descent over a solved log table: building the walks and stepping them by G is target_query, keying each state and probing the pair table is target_PDP, the witness re-check is target_relation_check, combining the column logs into d is target_descent, and the descent's [d]G = Q is target_recovery_check; the relations and logs are target-independent set-up outside the window".into();
     (w.phases_ns.values().sum::<u64>() == w.wall_ns).then_some(w)
+}
+
+/// Add the layout tag only to the new method identities. Historical report
+/// bytes stay unchanged for replay.
+fn koblitz_filter_detail(mut detail: Value, top_layout: bool) -> Value {
+    if top_layout {
+        detail["pair_filter_layout"] = json!("top");
+    }
+    detail
 }
 
 #[cfg(test)]
@@ -8018,7 +8123,7 @@ mod koblitz_batched_tests {
     use super::*;
     use crate::cryptanalysis::ecbench::workload::CurveSpec;
 
-    fn method(batch: &str) -> ResolvedMethod {
+    fn method_with_id(id: &str, batch: &str) -> ResolvedMethod {
         let params: BTreeMap<String, String> = [
             ("factor_base_points", "78"),
             ("batch_trials", batch),
@@ -8028,17 +8133,21 @@ mod koblitz_batched_tests {
         .map(|(k, v)| (k.to_string(), v.to_string()))
         .collect();
         resolve(&MethodSpec {
-            id: "ic.koblitz_batched".into(),
+            id: id.into(),
             params,
         })
         .unwrap()
     }
 
-    fn solve_at(batch: &str, scalar: u64) -> SolveReport {
+    fn method(batch: &str) -> ResolvedMethod {
+        method_with_id("ic.koblitz_batched", batch)
+    }
+
+    fn solve_at_with_id(id: &str, batch: &str, scalar: u64) -> SolveReport {
         let spec = CurveSpec::Koblitz { a: 0, n: 13 };
         let inst = spec.build().unwrap();
         let facts = inst.facts(&spec);
-        let m = method(batch);
+        let m = method_with_id(id, batch);
         applicable(&m, &inst, &facts).unwrap();
         let Instance::Binary(bi) = &inst else {
             unreachable!()
@@ -8052,6 +8161,10 @@ mod koblitz_batched_tests {
             3,
         )
         .unwrap()
+    }
+
+    fn solve_at(batch: &str, scalar: u64) -> SolveReport {
+        solve_at_with_id("ic.koblitz_batched", batch, scalar)
     }
 
     #[test]
@@ -8095,6 +8208,14 @@ mod koblitz_batched_tests {
     }
 
     #[test]
+    fn the_v2_top_layout_identity_resolves_and_solves() {
+        let rep = solve_at_with_id("ic.koblitz_batched_v2", "64", 1_234);
+        assert_eq!(rep.recovered, Some(ExactScalar::from(1_234u128)));
+        assert_eq!(rep.detail["pair_filter_layout"], json!("top"));
+        assert!(rep.online.is_some());
+    }
+
+    #[test]
     fn the_worker_limits_are_enforced() {
         let spec = CurveSpec::Koblitz { a: 0, n: 13 };
         let inst = spec.build().unwrap();
@@ -8118,7 +8239,7 @@ mod koblitz_descent_tests {
     use super::*;
     use crate::cryptanalysis::ecbench::workload::CurveSpec;
 
-    fn method(explicit: bool) -> ResolvedMethod {
+    fn method_with_id(id: &str, explicit: bool) -> ResolvedMethod {
         let params: BTreeMap<String, String> = if explicit {
             [
                 ("descent_summands", "2"),
@@ -8136,10 +8257,14 @@ mod koblitz_descent_tests {
             BTreeMap::new()
         };
         resolve(&MethodSpec {
-            id: "ic.koblitz_descent".into(),
+            id: id.into(),
             params,
         })
         .unwrap()
+    }
+
+    fn method(explicit: bool) -> ResolvedMethod {
+        method_with_id("ic.koblitz_descent", explicit)
     }
 
     #[test]
@@ -8214,6 +8339,31 @@ mod koblitz_descent_tests {
         assert_eq!(ints(&rep), ints(&again));
         assert_eq!(rep.counters, again.counters);
         assert_eq!(rep.factor_base, again.factor_base);
+    }
+
+    #[test]
+    fn the_v2_top_layout_identity_resolves_and_solves() {
+        let spec = CurveSpec::Koblitz { a: 0, n: 23 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let m = method_with_id("ic.koblitz_descent_v2", true);
+        applicable(&m, &inst, &facts).unwrap();
+        let Instance::Binary(bi) = &inst else {
+            unreachable!()
+        };
+        let scalar = 777_777 % bi.r;
+        let target = bi.fast.mul_u64(bi.generator, scalar);
+        let rep = solve(
+            &m,
+            &inst,
+            &facts,
+            &[format!("0x{:x}", target.x), format!("0x{:x}", target.y)],
+            3,
+        )
+        .unwrap();
+        assert_eq!(rep.recovered, Some(ExactScalar::from(u128::from(scalar))));
+        assert_eq!(rep.detail["pair_filter_layout"], json!("top"));
+        assert!(rep.online.is_some());
     }
 
     #[test]
@@ -10691,7 +10841,9 @@ mod accounting_rules_tests {
             "ic.hyperelliptic_thread", // hyper_ic tests
             "ic.known_log_mitm2_v1",
             "ic.koblitz_batched", // koblitz_batched tests
+            "ic.koblitz_batched_v2",
             "ic.koblitz_descent", // koblitz_descent tests
+            "ic.koblitz_descent_v2",
             "ic.pipeline_wordram",
             "ic.trace_line_2lp",
             "rho.best2_model_v1", // best2_model tests
@@ -11074,8 +11226,8 @@ mod accounting_tests {
         )
         .unwrap();
         for (params, needle) in [
-            (ksum("12", "2", "1", "100000"), "k = 3, 4 or 5"),
-            (ksum("12", "6", "1", "100000"), "k = 3, 4 or 5"),
+            (ksum("12", "2", "1", "100000"), "k = 3 to 9"),
+            (ksum("12", "10", "1", "100000"), "k = 3 to 9"),
             (ksum("12", "3", "1", "10"), "above max_sums"),
             (ksum("0", "3", "1", "100000"), "size must lie in"),
             (ksum("999999999", "3", "1", "100000"), "size must lie in"),
@@ -11730,6 +11882,87 @@ mod engine_items_tests {
             );
             let su = |c: &BTreeMap<String, u64>| c["setup_additions"] + c["setup_doublings"];
             assert!(su(&res.counters) < su(&legacy.counters));
+        }
+    }
+}
+
+/// `rho.negation_lanes_v1` (docs/perf/20261112-rust-deep-audit.md): with one
+/// lane it is `rho.negation`'s walk exactly (same steps, walks, distinguished
+/// points, group operations and counters, plus its own three); with more it
+/// recovers the logarithm, shares inversions, and charges the same kinds of
+/// operation.
+#[cfg(test)]
+mod rho_lanes_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn curve() -> (Instance, CurveFacts) {
+        let spec = CurveSpec::PrimeSearch {
+            bits: 22,
+            seed: 59297,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        (inst, facts)
+    }
+
+    fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn one_lane_is_the_serial_walk_and_more_lanes_recover() {
+        let (inst, facts) = curve();
+        let serial = method("rho.negation", &[]);
+        let one = method("rho.negation_lanes_v1", &[("lanes", "1")]);
+        let many = method("rho.negation_lanes_v1", &[("lanes", "16")]);
+        assert_ne!(serial.method_id, one.method_id);
+        assert_ne!(one.method_id, many.method_id);
+        let own = ["lanes", "lane_rounds", "montgomery_conversions_uncharged"];
+        for seed in 0..8u64 {
+            let k = 1 + (seed as u128 * 104_729 + 11) % (facts.r - 1);
+            let target = inst.mul_generator_hex(k).expect("a nonzero target");
+            let a = solve(&serial, &inst, &facts, &target, seed).unwrap();
+            let b = solve(&one, &inst, &facts, &target, seed).unwrap();
+            let c = solve(&many, &inst, &facts, &target, seed).unwrap();
+            for rep in [&a, &b, &c] {
+                assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "seed {seed}");
+                assert_eq!(rep.automorphisms_used, 2);
+            }
+            assert_eq!(a.total_gae, b.total_gae, "seed {seed}");
+            let mut bc = b.counters.clone();
+            for key in own {
+                assert!(bc.remove(key).is_some(), "seed {seed}: {key}");
+            }
+            assert_eq!(a.counters, bc, "seed {seed}");
+            assert_eq!(c.counters.get("lanes"), Some(&16));
+            // Batched: fewer inversions than additions on the 16-lane walk;
+            // one lane pays one inversion a round, as the serial law does.
+            let (fb, fc) = (b.field_ops.unwrap(), c.field_ops.unwrap());
+            let fa = a.field_ops.unwrap();
+            assert_eq!(fa.invs, fb.invs, "seed {seed}");
+            assert!(fc.invs * 4 < fa.invs, "seed {seed}: {fc:?} vs {fa:?}");
+        }
+        assert_eq!(
+            expected_s("rho.negation_lanes_v1", 2),
+            expected_s("rho.negation", 2)
+        );
+    }
+
+    #[test]
+    fn lanes_out_of_range_and_other_groups_are_refused() {
+        let (inst, facts) = curve();
+        let target = inst.mul_generator_hex(12345).unwrap();
+        for bad in ["0", "4097"] {
+            let m = method("rho.negation_lanes_v1", &[("lanes", bad)]);
+            assert!(solve(&m, &inst, &facts, &target, 1).is_err(), "lanes={bad}");
         }
     }
 }

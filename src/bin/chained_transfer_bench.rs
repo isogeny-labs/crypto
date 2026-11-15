@@ -16,19 +16,33 @@
 //! - `ic_jac`: counted genus-2 index calculus on the same `J(C)` instance.
 //!
 //! Every chain is verified to preserve the discrete logarithm before it is
-//! measured, and the index-calculus output is cross-checked against the known
-//! log. No result here is a verified claim until CI's pcc gate signs it; the
+//! measured. Version 3 differs from version 2 in three ways:
+//! - the genus-2 instance solved is the real pulled-back pair
+//!   `(φ^*(P), φ^*([x]P))`, not a surrogate from `jac_instance` (F5);
+//! - the index-calculus elimination is oracle-free: it returns whatever it
+//!   finds and the claim is judged afterwards (F4);
+//! - every solve claim, for all four arms, is written as a
+//!   `chained.solve.certificate/v1` record (`--certs FILE`, JSON lines) and
+//!   re-checked in process; `verify_certs` re-checks the file on its own (F14).
+//!
+//! The transfer (building the cover or isogeny and evaluating `φ^*`) is a
+//! one-time cost and is not part of any per-instance figure here.
+//! No result here is a verified claim until CI's pcc gate signs it; the
 //! numbers below are `[pcc:unverified]` assertions.
 
 use std::process::ExitCode;
 
 use crypto_lib::cryptanalysis::chained_transfer::bielliptic::{Bielliptic, Quotient};
+use crypto_lib::cryptanalysis::chained_transfer::certify::{
+    self, div_elem, ec_group, jac_group, pt_elem, Cert, Transfer,
+};
 use crypto_lib::cryptanalysis::chained_transfer::chain::{Chain, Elt, Hop};
 use crypto_lib::cryptanalysis::chained_transfer::ec::{Curve, Pt, VeluIsogeny};
 use crypto_lib::cryptanalysis::chained_transfer::measure::{
-    genus2_index_calculus, jac_instance, rho_on_ec, rho_on_jac,
+    genus2_index_calculus, rho_on_ec, rho_on_jac,
 };
 use crypto_lib::cryptanalysis::genus2_fp::Genus2Curve;
+use std::collections::BTreeMap;
 
 /// Largest prime `r` with `r² ∤ n` (a usable cyclic subgroup).
 fn largest_cyclic_prime(mut n: u64) -> u64 {
@@ -70,7 +84,7 @@ fn ec_instance(e: &Curve, r: u64, x: u64) -> Option<(Pt, Pt)> {
 }
 
 /// Find a prime-degree isogeny `E → E'` from a rational `ell`-torsion point.
-fn find_isogeny(e: &Curve, r: u64) -> Option<VeluIsogeny> {
+fn find_isogeny(e: &Curve, r: u64) -> Option<(VeluIsogeny, Pt)> {
     let order = e.order();
     for ell in [2u64, 3, 5, 7] {
         if !order.is_multiple_of(ell) || r == ell {
@@ -86,7 +100,7 @@ fn find_isogeny(e: &Curve, r: u64) -> Option<VeluIsogeny> {
                 continue;
             }
             if let Some(iso) = VeluIsogeny::from_generator(e, &g) {
-                return Some(iso);
+                return Some((iso, g));
             }
         }
     }
@@ -115,10 +129,60 @@ struct Row {
     /// Z/r multiplications in the IC's linear algebra (unpriced work).
     ic_jac_la_mulmods: u64,
     chain_verified: bool,
+    /// Which instance the genus-2 arms solved: `pullback` is
+    /// `(φ^*(P), φ^*([x]P))` itself.
+    instance_type: &'static str,
+    /// The log the index calculus returned, right or wrong.
+    ic_claimed_log: Option<u64>,
+    /// Certificates issued for this row (one per arm) and how many passed the
+    /// in-process re-check.
+    certs_issued: u64,
+    certs_verified: u64,
+    /// Index of the candidate curve (the search counter) this row came from.
+    candidate: u64,
 }
 
-fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
-    let b = Bielliptic::new(p, c).ok()?;
+/// Why a candidate curve produced no row.
+type Skip = &'static str;
+
+fn cert(
+    arm: &str,
+    instance_type: &str,
+    p: u64,
+    group: certify::GroupData,
+    r: u64,
+    (g, t): (certify::Elem, certify::Elem),
+    claimed_k: Option<u64>,
+    transfer: Option<Transfer>,
+    seed: u64,
+    solver_ops: u64,
+) -> Cert {
+    Cert {
+        schema: certify::SCHEMA.into(),
+        arm: arm.into(),
+        instance_type: instance_type.into(),
+        p,
+        group,
+        r,
+        g,
+        t,
+        claimed_k,
+        transfer,
+        seed,
+        solver_ops,
+    }
+}
+
+/// Measure one candidate curve. `Err` names why it was skipped before any
+/// solver ran; once the structural checks pass the row is reported whatever
+/// the solvers return (no selection on solver success).
+fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Result<(Row, Vec<Cert>), Skip> {
+    let b = Bielliptic::new(p, c).map_err(|e| match e {
+        crypto_lib::cryptanalysis::chained_transfer::bielliptic::BiellipticError::Genus2(_) => {
+            "bielliptic_rejected_genus2_model"
+        }
+        _ => "bielliptic_rejected_degenerate_or_no_rational_weierstrass_point",
+    })?;
     let e1 = *b.curve(Quotient::E1);
     let e2 = *b.curve(Quotient::E2);
     let jac: Genus2Curve = b.jac.clone();
@@ -128,79 +192,132 @@ fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
     // is not capped by the O(p²) counter).
     let jac_order = e1_order * e2_order;
     let r = largest_cyclic_prime(e1_order);
-    // Need r ∥ #J, i.e. r ∤ #E2, for a cyclic r-part.
-    if r < 50 || e2_order.is_multiple_of(r) {
-        return None;
+    if r < 50 {
+        return Err("r_below_50");
+    }
+    // The order-r part of J(C) is cyclic iff r² ∤ #J(C) = #E1·#E2. r² ∤ #E1
+    // by the choice of r, so the condition is r ∤ #E2.
+    if e2_order.is_multiple_of(r) {
+        return Err("r_divides_e2_order_so_r_part_of_J_not_cyclic");
+    }
+    if jac_order.is_multiple_of(r * r) {
+        return Err("r_squared_divides_jac_order");
     }
     let x = (seed.wrapping_mul(2_246_822_519).wrapping_add(7)) % r;
-    let (gen, target) = ec_instance(&e1, r, x)?;
+    let (gen, target) = ec_instance(&e1, r, x).ok_or("no_order_r_point_on_E1")?;
+    let src_g = pt_elem(&gen).map_err(|_| "non_rational_point")?;
+    let src_t = pt_elem(&target).map_err(|_| "non_rational_point")?;
+    let mut certs: Vec<Cert> = vec![];
 
     // --- direct cost: rho on the source curve ---
     let rho_src = rho_on_ec(&e1, gen, target, r, seed);
     let mut rho_ok = rho_src.recovered == Some(x);
+    let rho_src_ops = rho_src.group_ops.adds + rho_src.group_ops.doubles;
+    certs.push(cert(
+        "rho_e1",
+        "direct",
+        p,
+        ec_group(&e1),
+        r,
+        (src_g.clone(), src_t.clone()),
+        rho_src.recovered,
+        None,
+        seed,
+        rho_src_ops,
+    ));
 
     // --- chain 1: isogeny hop E1 → E1', then rho ---
-    let (rho_isog_ops, isog_degree, isog_ok) = match find_isogeny(&e1, r) {
-        Some(iso) => {
-            let e_prime = iso.codomain;
-            let deg = iso.degree() as u64;
-            match Hop::isogeny(iso, &gen, &target, r) {
-                Ok(hop) => {
-                    let ch = Chain::new(vec![hop]);
-                    let ok = ch.verify(&Elt::E(gen), r, x as u128);
-                    let (gp, tp) = match (ch.transport(&Elt::E(gen)), ch.transport(&Elt::E(target)))
-                    {
-                        (Elt::E(a), Elt::E(b)) => (a, b),
-                        _ => (None, None),
-                    };
-                    let rho = rho_on_ec(&e_prime, gp, tp, r, seed ^ 0xA5);
-                    rho_ok &= rho.recovered == Some(x);
-                    (rho.group_ops.adds + rho.group_ops.doubles, deg, ok)
-                }
-                Err(_) => (0, deg, false),
-            }
-        }
-        None => (0, 0, false),
+    let (iso, kernel) = find_isogeny(&e1, r).ok_or("no_rational_small_isogeny")?;
+    let e_prime = iso.codomain;
+    let isog_degree = iso.degree() as u64;
+    let hop = Hop::isogeny(iso, &gen, &target, r).map_err(|_| "isogeny_hop_failed")?;
+    let ch = Chain::new(vec![hop]);
+    if !ch.verify(&Elt::E(gen), r, x as u128) {
+        return Err("isogeny_chain_unverified");
+    }
+    let (gp, tp) = match (ch.transport(&Elt::E(gen)), ch.transport(&Elt::E(target))) {
+        (Elt::E(a), Elt::E(b)) => (a, b),
+        _ => (None, None),
     };
+    let rho_i = rho_on_ec(&e_prime, gp, tp, r, seed ^ 0xA5);
+    rho_ok &= rho_i.recovered == Some(x);
+    let rho_isog_ops = rho_i.group_ops.adds + rho_i.group_ops.doubles;
+    certs.push(cert(
+        "rho_e1prime",
+        "isogeny",
+        p,
+        ec_group(&e_prime),
+        r,
+        (
+            pt_elem(&gp).map_err(|_| "non_rational_point")?,
+            pt_elem(&tp).map_err(|_| "non_rational_point")?,
+        ),
+        rho_i.recovered,
+        Some(Transfer::Isogeny {
+            src: ec_group(&e1),
+            kernel: pt_elem(&kernel).map_err(|_| "non_rational_point")?,
+            src_g: src_g.clone(),
+            src_t: src_t.clone(),
+        }),
+        seed ^ 0xA5,
+        rho_isog_ops,
+    ));
 
-    // --- chain 2: pull-back E1 → J(C), then rho and index calculus ---
-    let pull_hop = Hop::pullback(&b, Quotient::E1, &gen, r);
-    let (rho_jac_ops, ic, chain_verified) = match pull_hop {
-        Ok(hop) => {
-            let ch = Chain::new(vec![hop]);
-            let chain_ok = ch.verify(&Elt::E(gen), r, x as u128);
-            // Use a clean cyclic J(C) instance of order r for the solver
-            // comparison (the pulled generator has order r but need not be a
-            // subgroup generator when φ^* lands in a non-cyclic r-torsion;
-            // jac_instance guarantees a cyclic order-r pair carrying the same x).
-            match jac_instance(&jac, jac_order, r, x, seed) {
-                Some((dg, dt)) => {
-                    let rho = rho_on_jac(&jac, dg, dt, r, seed ^ 0x5A);
-                    rho_ok &= rho.recovered == Some(x);
-                    // Full degree-1 factor base (≈ p/2 places): genus-2 IC uses
-                    // every rational place, so smoothness ≈ 1/2.
-                    let ic = genus2_index_calculus(&jac, &dg, &dt, r, p as usize, 50_000_000, seed);
-                    (
-                        rho.group_ops.adds + rho.group_ops.doubles,
-                        Some(ic),
-                        chain_ok,
-                    )
-                }
-                None => (0, None, chain_ok),
-            }
-        }
-        Err(_) => (0, None, false),
+    // --- chain 2: pull-back E1 → J(C); solve the pulled-back pair itself ---
+    let hop = Hop::pullback(&b, Quotient::E1, &gen, r).map_err(|_| "pullback_hop_failed")?;
+    let ch = Chain::new(vec![hop]);
+    let pull_ok = ch.verify(&Elt::E(gen), r, x as u128);
+    if !pull_ok {
+        return Err("pullback_chain_unverified");
+    }
+    let (dg, dt) = match (ch.transport(&Elt::E(gen)), ch.transport(&Elt::E(target))) {
+        (Elt::J(a), Elt::J(b)) => (a, b),
+        _ => return Err("pullback_not_a_divisor"),
     };
-
-    let ic = ic?;
-    Some(Row {
+    let transfer = Transfer::Pullback {
+        c: b.c,
+        src_g: src_g.clone(),
+        src_t: src_t.clone(),
+    };
+    let rho = rho_on_jac(&jac, dg, dt, r, seed ^ 0x5A);
+    rho_ok &= rho.recovered == Some(x);
+    let rho_jac_ops = rho.group_ops.adds + rho.group_ops.doubles;
+    certs.push(cert(
+        "rho_jc",
+        "pullback",
+        p,
+        jac_group(&jac),
+        r,
+        (div_elem(&dg), div_elem(&dt)),
+        rho.recovered,
+        Some(transfer.clone()),
+        seed ^ 0x5A,
+        rho_jac_ops,
+    ));
+    // Full degree-1 factor base (≈ p/2 places): genus-2 IC uses every
+    // rational place, so smoothness ≈ 1/2.
+    let ic = genus2_index_calculus(&jac, &dg, &dt, r, p as usize, 50_000_000, seed);
+    certs.push(cert(
+        "ic_jc",
+        "pullback",
+        p,
+        jac_group(&jac),
+        r,
+        (div_elem(&dg), div_elem(&dt)),
+        ic.recovered,
+        Some(transfer),
+        seed,
+        ic.group_ops,
+    ));
+    let certs_verified = certs.iter().filter(|c| certify::verify(c).ok).count() as u64;
+    let row = Row {
         p,
         r,
         e1_order,
         e2_order,
         jac_order,
         x,
-        rho_src_ops: rho_src.group_ops.adds + rho_src.group_ops.doubles,
+        rho_src_ops,
         rho_isog_ops,
         isog_degree,
         rho_jac_ops,
@@ -211,8 +328,14 @@ fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
         ic_recovered_ok: ic.recovered == Some(x),
         rho_recovered_ok: rho_ok,
         ic_jac_la_mulmods: ic.la_field_ops,
-        chain_verified: chain_verified && isog_ok,
-    })
+        chain_verified: true,
+        instance_type: "pullback",
+        ic_claimed_log: ic.recovered,
+        certs_issued: certs.len() as u64,
+        certs_verified,
+        candidate: 0,
+    };
+    Ok((row, certs))
 }
 
 /// Log–log figure of counted group operations against `p`, every coordinate
@@ -292,8 +415,12 @@ fn main() -> ExitCode {
     // keeps the top size modest). Coefficients searched deterministically.
     let primes = [211u64, 419, 821, 1619];
     let mut rows = vec![];
+    let mut all_certs: Vec<Cert> = vec![];
+    // Per p: candidates tried and, per reason, how many were skipped.
+    let mut skipped: BTreeMap<u64, BTreeMap<&'static str, u64>> = BTreeMap::new();
+    let mut tried: BTreeMap<u64, u64> = BTreeMap::new();
     for (i, &p) in primes.iter().enumerate() {
-        let mut found = None;
+        let mut found = false;
         for s in 0..4000u64 {
             let c = [
                 1 + (s.wrapping_mul(2_654_435_761) >> 3) % (p - 1),
@@ -301,22 +428,27 @@ fn main() -> ExitCode {
                 (s.wrapping_mul(2_246_822_519) >> 7) % p,
                 1 + (s.wrapping_mul(3_266_489_917) >> 9) % (p - 1),
             ];
-            if let Some(row) = measure_curve(p, c, 0xC0FFEE + i as u64 * 101 + s) {
-                if row.ic_recovered_ok && row.rho_recovered_ok && row.chain_verified {
-                    found = Some(row);
+            *tried.entry(p).or_default() += 1;
+            match measure_curve(p, c, 0xC0FFEE + i as u64 * 101 + s) {
+                Ok((mut row, certs)) => {
+                    row.candidate = s;
+                    all_certs.extend(certs);
+                    rows.push(row);
+                    found = true;
                     break;
                 }
-                // A measured candidate that failed a check is reported, not
-                // silently replaced.
-                eprintln!(
-                    "p = {p}: measured candidate rejected (ic_ok={}, rho_ok={}, chain_ok={})",
-                    row.ic_recovered_ok, row.rho_recovered_ok, row.chain_verified
-                );
+                Err(reason) => {
+                    *skipped.entry(p).or_default().entry(reason).or_default() += 1;
+                }
             }
         }
-        match found {
-            Some(row) => rows.push(row),
-            None => eprintln!("no suitable bielliptic curve found at p = {p}"),
+        let n_tried = tried.get(&p).copied().unwrap_or(0);
+        eprintln!(
+            "p = {p}: {n_tried} candidate(s) tried, skipped by reason: {:?}",
+            skipped.get(&p).cloned().unwrap_or_default()
+        );
+        if !found {
+            eprintln!("no suitable bielliptic curve found at p = {p}");
         }
     }
 
@@ -334,6 +466,17 @@ fn main() -> ExitCode {
     );
     for row in &rows {
         let ratio = row.ic_jac_group_ops as f64 / row.rho_src_ops.max(1) as f64;
+        let tail = format!(
+            "{} ic_log={} certs={}/{}",
+            if row.chain_verified { "ok" } else { "FAIL" },
+            if row.ic_recovered_ok {
+                "right"
+            } else {
+                "WRONG"
+            },
+            row.certs_verified,
+            row.certs_issued
+        );
         println!(
             "{:>7} {:>8} {:>10} {:>8}({}) {:>12} {:>7} {:>10} {:>12} {:>10.1}x  {}",
             row.p,
@@ -346,7 +489,7 @@ fn main() -> ExitCode {
             row.ic_jac_group_ops,
             row.ic_jac_trials,
             ratio,
-            if row.chain_verified { "ok" } else { "FAIL" },
+            tail,
         );
     }
     println!(
@@ -367,9 +510,33 @@ fn main() -> ExitCode {
         eprintln!("wrote {path}");
     }
 
+    if let Some(path) = args
+        .iter()
+        .position(|a| a == "--certs")
+        .and_then(|i| args.get(i + 1))
+    {
+        let mut out = String::new();
+        for c in &all_certs {
+            out.push_str(&serde_json::to_string(c).unwrap());
+            out.push('\n');
+        }
+        std::fs::write(path, out).expect("write certs");
+        eprintln!("wrote {path} ({} certificates)", all_certs.len());
+    }
+
     if let Some(path) = json_path {
-        let j = serde_json::to_string_pretty(&rows).unwrap();
-        std::fs::write(path, j).expect("write json");
+        let j = serde_json::json!({
+            "schema": "chained.transfer.bench/v3",
+            "instance_type": "pullback",
+            "oracle_free_elimination": true,
+            "transfer_cost": "one-time, excluded from every per-instance figure",
+            "candidates_tried": tried,
+            "candidates_skipped_by_reason": skipped,
+            "certificates_issued": all_certs.len(),
+            "certificates_verified_in_process": rows.iter().map(|r| r.certs_verified).sum::<u64>(),
+            "rows": rows,
+        });
+        std::fs::write(path, serde_json::to_string_pretty(&j).unwrap()).expect("write json");
         eprintln!("wrote {path}");
     }
     ExitCode::SUCCESS

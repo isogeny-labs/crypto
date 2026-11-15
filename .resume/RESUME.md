@@ -1,34 +1,28 @@
-# Resume: crypto @ claude/zealous-meitner-85ipb5
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
-Owner (2026-11-11): "Any other perf optimizations here? Can we use tricks like dynamic programming
-or things that I'm not aware of for grobner base" — then "Go". Catalogue the levers
-(docs/ic/GROEBNER_PERF_LEVERS_20261111.md) and measure the first one: a persistent M4GB server
-process (patch 0003 `--serve`, Rust `m4gb-f2-server`).
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
 ## Lead / hypothesis
-Per-call fixed cost (process start, field tables, thread pool, pipes) is 5 to 15 ms and dominates
-decomposition calls at 12 to 16 unknowns. Expectation and falsifier: research/m4gb_persistent_server_20261111/README.md.
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-research/m4gb_persistent_server_20261111/run_ab.sh under tools/benchrec.py run
-(record benchmarks/records/20261111T1946Z-m4gb-persistent-server.json): ic descent --solver
-inherited-f4 --solver m4gb-f2 --solver m4gb-f2-server, K and R, m=2 n=11..23, m=3 n=11,13,15,
-6 targets x 3 repeats, 60 s budget, one thread. Binaries: scripts/m4gb/build.sh n{16,20,24,28,32}_gf2
-with patches 0001-0003 (scratchpad prefix m4gb-prefix-v3). Local container, unisolated (stage
-diagnostic, no leaderboard row).
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
 ## State
-Patch 0003 written and clean-built; Rust client in progress (subagent); record open; run next.
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
 ## Runs in flight
-None yet.
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
 
 ## Stop and success conditions
-All cells finish or fail individually; summarize.py -> RESULTS.md/results.json/svg; make_report.sh;
-benchrec add-raw/metric/close; session-log entry; PR on the branch (PR #3936 is the open
-predecessor, auto-merge enabled).
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
 ## Next steps
-1. cargo build --release --bin ic with m4gb-f2-server; cargo test --lib m4gb_oracle.
-2. Run run_ab.sh under the record; summarize; report; close record; benchmarks entry; session log; push; PR.
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.
