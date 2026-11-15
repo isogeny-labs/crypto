@@ -97,3 +97,5 @@ procedural written-header checks do not establish parser/compiler or physical
 host independence. Signed standing remains unverified. [pcc:unverified]
 
 Exact local **PCC-20261115-8c0b5f** replay PASS at 2026-11-15T17:46:05Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `c7aaf01d6b16ee861076eda3b521a1eb81444ba4` and local receipt `7c72171e7133e5ff6bad59e3d39d4e381ed249ef` share tree `c6f73a488320c71f39d92526e59d1bbbfdfc19a8`. Anonymous fetch completed; fresh PR head/body/open/ready matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
