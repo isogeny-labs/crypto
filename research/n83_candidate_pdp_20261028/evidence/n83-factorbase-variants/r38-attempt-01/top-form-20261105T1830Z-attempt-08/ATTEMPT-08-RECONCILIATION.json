@@ -1,0 +1,38 @@
+{
+  "schema": "n83.attempt-reconciliation/v1",
+  "attempt": "spike38-attempt-08",
+  "classification": "PDP aborted before candidate-output generation; path-level cause identified",
+  "runner_exit_code": 101,
+  "runner_error": {
+    "schema": "n83.runner-error/v1",
+    "exit_code": 101,
+    "line": 99,
+    "command": "RUST_BACKTRACE=1 strace -f -e trace=openat,openat2 -s 256 -o \"$HERE/pdp-openat.log\" timeout --signal=TERM --kill-after=30 12400 \"$BIN/pdp\" generate \"$INPUTS\" \"$BASE_LOCAL/data\" \"$MATCHED\" spike38 > \"$HERE/generate.log\" 2>&1",
+    "utc": "2026-11-05T18:36:59.461767+00:00"
+  },
+  "generate_log": "\nthread 'main' (1033630) panicked at src/bin/pdp.rs:339:63:\ncalled `Result::unwrap()` on an `Err` value: Os { code: 20, kind: NotADirectory, message: \"Not a directory\" }\nstack backtrace:\n   0: __rustc::rust_begin_unwind\n   1: core::panicking::panic_fmt\n   2: core::result::unwrap_failed\n   3: pdp::generate\n   4: pdp::main\nnote: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.\n",
+  "openat_trace_sha256": "a7fa7af71488334e39c892f91b5ca16e04faf37be41871f8c266f148d9559367",
+  "openat_failed_path": "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/pdp/baseline/inputs.json/inputs.json",
+  "openat_errno": "ENOTDIR",
+  "cause": "The runner passed the file .../baseline/inputs.json as MATCHED, but pdp::generate expects a directory and appends inputs.json. The attempted open therefore became .../baseline/inputs.json/inputs.json.",
+  "reused_shards_check": {
+    "schema": "n83.reused-shards-check/v1",
+    "attempt": "08",
+    "source_path": "/tmp/n83-candidate-bases/r38-attempt-06/data",
+    "shard_index_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+    "verified_shards": 384,
+    "verified_bytes": 4576000923,
+    "reused_existing_shards": 384,
+    "downloaded_missing_shards": 0,
+    "all_hashes_match": true
+  },
+  "candidate_input_systems": 0,
+  "top_certificates": 0,
+  "generator_output_directories_created": false,
+  "s3_results_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-08/results/",
+  "results_indexed_files": 431,
+  "results_index_sha256": "d925dcf38d5a491853324dfdfbbf10f7ac3e1388d29a66e41bf94362ce8e58cf",
+  "results_total_bytes": 4975552,
+  "results_readback_byte_identical": true,
+  "next_action": "Split MATCHED_DIR=/.../baseline and MATCHED_FILE=/.../baseline/inputs.json; verify the file hash and pass MATCHED_DIR to pdp. Preserve all other frozen inputs and use a fresh attempt09 prefix."
+}

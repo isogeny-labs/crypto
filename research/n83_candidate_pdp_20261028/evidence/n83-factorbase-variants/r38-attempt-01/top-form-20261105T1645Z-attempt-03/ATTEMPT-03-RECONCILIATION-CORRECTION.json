@@ -1,0 +1,19 @@
+{
+  "schema": "n83.attempt-reconciliation-correction/v1",
+  "attempt": "03",
+  "correction_utc": "2026-11-05T17:17:37.199627+00:00",
+  "replaces_statement": "Next step was described as avoiding a 4.576 GB recovered local shard tree copy.",
+  "corrected_fact": "The recovered local family directories contain JSON selector-part files and zero .zst shards. The 4.576 GB compressed shard payload is separately fetched from S3 using s3-file-index.json. Attempt 04 keeps the selector metadata copy and downloads the compressed shards.",
+  "evidence": {
+    "recovered_json_parts_per_family": {
+      "binary": 129,
+      "koblitz": 129,
+      "prime": 129
+    },
+    "recovered_zst_parts_per_family": {
+      "binary": 0,
+      "koblitz": 0,
+      "prime": 0
+    }
+  }
+}
