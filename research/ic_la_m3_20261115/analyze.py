@@ -18,16 +18,32 @@ med = statistics.median
 def phase(r, n):
     return next((p for p in r["phases"] if p["name"] == n), {})
 
+NON_OPERATION = {"residual_table_bytes_uncharged", "factor_base_vec_bytes_floor_uncharged",
+                 "native_table_bytes_uncharged"}
+TABLE_WORK = ["table_insert_attempts"]
+
 def unpriced_total(r):
-    """The record's unpriced native operations: each name in cost.unpriced ("<counter>_uncharged")
-    names a native counter; its count is summed over every phase's `native` block."""
+    """The band's U for one record, as `ecbench band` (src/cryptanalysis/ecbench/band.rs) reads it:
+    each counter named in cost.unpriced from the top-level counters, else summed over the phases'
+    `native` maps as `X_uncharged` or `X`; memory-size counters excluded; plus the table work
+    (`table_insert_attempts` in `work_native`) where a phase carries its `counted:` marker.
+    (Corrected after the validator review: the first version read the phases' native maps only, so
+    rho's `canonicalisations_uncharged`, a top-level counter, counted as zero.)"""
     tot = 0
     for name in r["cost"].get("unpriced", []):
+        if name in NON_OPERATION:
+            continue
+        if name in r.get("counters", {}):
+            tot += r["counters"][name]; continue
         base = name[: -len("_uncharged")] if name.endswith("_uncharged") else name
         for p in r["phases"]:
-            v = p.get("native", {}).get(base)
+            nat = p.get("native", {})
+            v = nat.get(name, nat.get(base))
             if isinstance(v, (int, float)):
                 tot += v
+    for name in TABLE_WORK:
+        if any(f"counted:{name}" in p.get("work_native", {}) for p in r["phases"]):
+            tot += sum(p.get("work_native", {}).get(name, 0) for p in r["phases"])
     return tot
 
 def la_row_ops(r):
