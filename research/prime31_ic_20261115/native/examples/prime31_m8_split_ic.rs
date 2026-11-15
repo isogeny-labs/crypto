@@ -236,7 +236,8 @@ fn main() -> Result<(), String> {
         calls += 1;
         let mut hit = false;
         for term in &right {
-            let needed = ar.add(e, r, ar.neg(e, term.point));
+            let negative_right = ar.neg(e, term.point);
+            let needed = ar.add(e, r, negative_right);
             let Some(&code) = first.get(&point_key(needed)) else {
                 continue;
             };
