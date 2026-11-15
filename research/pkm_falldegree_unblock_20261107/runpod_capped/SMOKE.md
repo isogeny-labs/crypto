@@ -100,3 +100,16 @@ freeze (amendment section 9, point 5):
   `RPC_RESULTS` overrides used in the command above were removed, so they cannot bypass the reuse checks;
 - new API records drop `consumerUserId`. The smoke receipts above are left as committed (the field is an account
   identifier, not a credential, and it is already in the history).
+
+Revision 3 (after the second independent review of `7305d2ee8d`; `DECISIONS_ROUTE.md` lists the decisions). Also not
+exercised on a pod; offline tests only (`tests/README.md`):
+- `run.sh` now fetches the pod's `/results` once before `/start`, to read the cgroup memory limit the boot loop copied
+  there, and refuses a limit below 112 GiB or a missing limit file;
+- the classifier counts only positive evidence of loss, retries "no information" until the hard deadline (class
+  NO_EVIDENCE then), routes a LOST to an automatic relaunch only on a recorded RunPod-side status change, and fails
+  closed on unparsable receipts;
+- collections are numbered and never overwritten; the reaper deletes only past the hard deadline;
+- `fetch.sh` recovers a missing pod token from the REST record; the scripts print a reminder to commit and push the
+  receipts and the ledger.
+- Facts about RunPod that the next development smoke should record: the cgroup files, what `lastStatusChange` reads,
+  whether `GET /pods/{id}` returns `env`, and whether a pod sees `RUNPOD_POD_ID`.

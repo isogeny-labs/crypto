@@ -482,7 +482,8 @@ files are re-included by \`../.gitignore\`).
 binary check) need the image layer: \`RPC_LAYER_SRC\` (the layer tarball, SHA-256 \`a0f7e28e…\`, \`image.json\`
 \`layer.digest\`) and \`RPC_BIN_SRC\` (its \`usr/local/bin\`; defaults in the session scratchpad). Without them those
 cases print \`SKIP-NEEDS-LAYER\`: a run without the layer gives $((ntot - nlayer)) results and $nlayer skips; a run with
-it gives $ntot results. The layer can be fetched from the study image by its digest (\`image/image.json\`).
+it gives $ntot results. The layer is the study layer of the image \`image/image.json\` names (ECR); fetching it
+by digest needs read access to that registry, which this container does not have.
 
 Groups: A refusals before any API call; B launch paths; C \`fetch.sh\` flows; D the outcome classifier alone
 (\`fetch.sh --classify-dir\`) on synthetic receipt sets: one per class, the review's conflicting cases, the memory rule
