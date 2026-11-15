@@ -1,0 +1,9 @@
+# Guarded four-equation Gold3 compression
+
+For fixed h/r/w, conditional k=K0+u retains35unknowns and45coefficient-span equations. Write a=E1=h2+h+z. The necessary five-source Gold3 moment is g3=a*E2+E3. Its k increment is u2+(a+z+r)u, hence F2linear. The Gold3 image is the span of v_i2*v_j+v_i*v_j2. At d18 it has rank48 inside W3dimension52.
+
+First retain the centroid guard a inV. Given E2 inW2 and E3 inW3, multiplication a*E2 stays inW3, so g3 is inW3. Its image membership then requires only the4quotient coordinates insideW3. Before solving coefficient guards, individual base/column g3 values may have highbits: truncate only for these4new equations, and retain every originalE3highbit equation. A generic35-coordinate Gold quotient yields80rows total; the guarded equivalent has49. If centroid admission fails, add a literal inconsistent guard and return an emptyfiber; coefficientmatrix ranks may then differ without affecting empty solution equivalence.
+
+The compressed andgeneric systems must have identical consistency and full affine solutions, and equal ranks on admitted centroid charts. No kernel vector is dropped. Tiny literal norms plus an exhaustively generated small Gold image check every k of every declared small instance, including centroid failures and h0. Actual220Gold69positive singular points compare whole affine fibers, keep knownk0, and independently check literalGold membership ofk=u. Onlyfirst4full systems are materialized inraw, allpoint results retained.
+
+This is necessary conditional root filtering, not source-support/global all-roots completion or a novelty/speedclaim. One90s/4GiB/onecore worker, final84s, raw512KiB/stdout8KiB, unchanged norm-helper caps. Source/input/selection/budget freeze before resume/run-ready. Sole-model preparation review and independent oracle algorithms, no external promotion.

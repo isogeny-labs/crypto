@@ -1,0 +1,9 @@
+# Conditional kernel cells and exact Gold filtering
+
+The fixed-k0 coefficient-span relaxation contains singular conditional k fibers. Across 64 frozen kernel directions, both the pre-Gold73 and Gold69 families had 55 consistent and nine inconsistent affine intersections. Consistent cells had 28 and 24 parameters respectively. Their union may overlap; these are not distinct-root counts. Literal norm checks verified both k=0 and k=u at 220 points per family. Independent complete tiny guards matched 59,904 norm-difference evaluations, alongside the earlier 25,088 all-k checks.
+
+The necessary Gold3 condition is affine in k. After preserving centroid and coefficient-span guards, its image has codimension four inside W3: the generic 80-row formulation is exactly equivalent to 49 rows. Complete affine fibers matched 3,200 tiny systems and 57,856 literal norm evaluations over GF4/GF8/GF16/GF32. On 220 sampled actual singular points, the filter retained known k=0 throughout, left a unique relaxed k candidate at 202 points, and retained a two-candidate kernel at 18. Every remaining kernel is preserved. These are necessary filters, not supported-source roots.
+
+Workers took 4.446265s/3.143108s and peaked at 154096/154092KiB RSS. No matched timing ratio or original all-roots completion is claimed. Source review is sole-model preparation with independent oracle algorithms; external admission remains pending.
+
+Next: substitute complete small k kernels into the four Gold equations, then solve their affine guards over whole 24-parameter incidence cells. A rank-minor guard is needed before treating the full coefficient-span fiber as only {0,u}; exceptional branches must remain. The 166 outer r/w bits and full source/ghost/all-field closure remain unresolved. The requested 8x objective and immutable genuine-F4/F5/F6 release gate remain open.
