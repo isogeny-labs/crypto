@@ -7,6 +7,7 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::time::Instant;
 
 pub mod cheap;
+pub mod projection;
 pub mod workload;
 
 #[derive(Clone, Copy, Debug, Default, Serialize)]

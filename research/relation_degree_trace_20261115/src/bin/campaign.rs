@@ -136,6 +136,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut args = std::env::args().skip(1);
     let (mut fixtures, mut out, mut binary, mut backend) = (None, None, None, None);
     let mut samples = 21usize;
+    let mut candidate_arm = "candidate".to_string();
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--fixtures" => fixtures = Some(PathBuf::from(args.next().ok_or("missing fixtures")?)),
@@ -144,6 +145,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 binary = Some(PathBuf::from(args.next().ok_or("missing worker binary")?))
             }
             "--backend" => backend = Some(args.next().ok_or("missing backend label")?),
+            "--candidate-arm" => candidate_arm = args.next().ok_or("missing candidate arm")?,
             "--samples" => samples = args.next().ok_or("missing sample count")?.parse()?,
             "--help" => {
                 println!("campaign --fixtures DIR --out NEW_DIR --compare-bin EXE --backend local [--samples 21]");
@@ -157,6 +159,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
     if backend.as_deref() != Some("local") {
         return Err("this driver supports an explicitly selected local L0 backend only; do not use to bypass IsoLab admission".into());
+    }
+    if candidate_arm != "candidate" && candidate_arm != "projection" {
+        return Err("candidate arm must be candidate or projection".into());
     }
     let fixtures = fixtures.ok_or("--fixtures required")?;
     let out = out.ok_or("--out required")?;
@@ -177,10 +182,20 @@ fn main() -> Result<(), Box<dyn Error>> {
             &json!({"backend":"local L0, no L2 isolation claim","cpu_affinity":cpu,"cpuinfo":fs::read_to_string("/proc/cpuinfo")?,"worker_binary":binary,"protocol":"SPEED_PROTOCOL.md"}),
         )?,
     )?;
-    for entry in manifest["cases"]
+    let mut ordered = manifest["cases"]
         .as_array()
         .ok_or("missing manifest cases")?
-    {
+        .clone();
+    if candidate_arm == "projection" {
+        ordered.sort_by_key(|e| {
+            (
+                e["variables"].as_u64(),
+                e["seed"].as_u64(),
+                e["prime"].as_u64(),
+            )
+        });
+    }
+    for entry in &ordered {
         if started.elapsed() > Duration::from_secs(1200) {
             campaign_complete = false;
             break;
@@ -212,7 +227,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let value = worker(
                     &binary,
                     &fixture,
-                    arm,
+                    if arm == "candidate" {
+                        &candidate_arm
+                    } else {
+                        arm
+                    },
                     &directory.join(format!("sample-{sample:02}-{arm}")),
                     &cpu,
                     1,
@@ -254,7 +273,12 @@ fn main() -> Result<(), Box<dyn Error>> {
                 directory.join(format!("sample-{sample:02}.json")),
                 serde_json::to_string_pretty(&record)? + "\n",
             )?;
+            let failed = record["arms"]["baseline"]["status"] != "complete"
+                || record["arms"]["candidate"]["status"] != "complete";
             raw.push(record);
+            if failed {
+                break;
+            }
         }
         let estimate = interval(&ratios);
         let aa_estimate = interval(&aa);
@@ -271,7 +295,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             && estimate["bootstrap_95"][0]
                 .as_f64()
                 .is_some_and(|x| x > 10.);
-        let summary = json!({"id":id,"complete":complete,"native_checked_wall_ratio":estimate,"aa_ratio":aa_estimate,"aa_admitted":controls,
+        let summary = json!({"id":id,"complete":complete,"native_checked_wall_ratio":estimate,"aa_ratio":aa_estimate,"aa_admitted":controls,"candidate_arm":candidate_arm,
             "tenfold_native_criterion_met":tenfold,"external_comparisons":"pending separate supported CAS runs; no fastest claim", "claim_status":"producer observation, not independently signed","samples":raw});
         println!(
             "{id}: ratio={} complete={complete} A/A={controls} tenfold={tenfold}",

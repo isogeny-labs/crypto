@@ -129,3 +129,79 @@ required. Existing IsoLab notes report exhausted monthly spend; no live budget
 headroom or AWS identity is available in this runtime. The explicit local-vs-
 IsoLab question remains pending. No default-backend or spending control is
 bypassed, and no favorable ratio is invented from the degree reduction.
+
+## 2026-11-15T05:20Z — Continue with local L0 execution
+
+The user's "Continue" is taken as direction to proceed with the previously
+offered local workspace option. No cloud resource is launched. All observations
+will retain the local L0 label; the frozen cases, tenfold criterion, controls,
+cost intervals and failure rules remain unchanged. The original protocol's
+backend-pending text is historical and is resolved by this execution note.
+
+Before launch: verify staged source hashes, build the uninstrumented release
+workers, regenerate and compare all fixed inputs, then run the bounded native
+campaign. Preserve every failure and use its outputs to select the next step;
+no speed ratio is assumed. Supported external CAS runs remain required.
+
+## 2026-11-15T05:25Z — First local observations and next construction
+
+The in-progress frozen native campaign reports only modest changes in the
+completed two-/three-/four-variable cases; the tenfold criterion has not been
+met there, and failed A/A controls are retained. These are partial producer
+observations, not a conclusion about uncompleted cases `[pcc:unverified]`.
+
+Next falsifiable construction: project each paired-f3 edge to a univariate
+polynomial using the Sylvester resultant of its certified cubics. Cofactors
+supply explicit original-input membership certificates. Shared vertices then
+admit extended-Euclidean GCDs of their incident projections, with certificates
+inherited by linear combination. Prepend these consequences before the same
+full solver. This uses input overlap, not an observed answer or per-instance
+scout. The baseline, all fixed seeds/cases, time/memory limits and accounting
+stay fixed in a separately labelled successor comparison; original results
+are not overwritten or pooled with it.
+
+Prediction: shared-variable projections remove work from the global solver.
+Counterprediction: construction and certificate growth dominate. Both costs
+must be charged, and incomplete baselines cannot become numeric wins. The
+small-case field/cancellation tests precede any new timed comparison. This is
+standard resultant/cofactor and Euclidean elimination, no novelty claim.
+
+## Successor implementation prepared while original run continues
+
+Implemented sparse Sylvester cofactors, exact original-input projection rows,
+and inherited extended-GCD certificates. The original timed workers are still
+the frozen binaries; no active worker binary is overwritten. Compilation and
+new tests will wait until the original run ends, to avoid a competing build
+load on the measurement host.
+
+The successor dispatch and deterministic-failure rule are frozen in
+PROJECTION_PROTOCOL.md. Singular output replay will require an exact match to
+a completed native basis; an unsupported ring, parse failure, missing marker,
+or absent native reference remains explicitly unverified. Solver-only external
+CPU batches are diagnostic, not a mixed-unit or uncharged end-to-end ratio.
+
+## 2026-11-15T05:34Z — Original run stopped for repeated-timeout defect
+
+The six-variable case has repeated 30-second worker timeouts (empty worker
+outputs; timeout status retained in per-sample records). The original driver
+continued the frozen repetition schedule after deterministic failure. This
+conflicts with the no-unchanged-retry rule and wastes the campaign budget.
+Stop that defective campaign; preserve all completed cases and partial files,
+and explicitly mark the overall comparison incomplete. Do not turn the
+censored six-variable baseline into a numeric speed ratio. The successor
+already stops a case after its first failed pair and interleaves fields.
+
+This is a disclosed harness correction, not an outcome-based exclusion or a
+claim that every frozen case was measured. Completed native observations are
+producer-only `[pcc:unverified]`; the remaining 53-bit cases still need their
+matched baseline measurements.
+
+## 2026-11-15T05:35Z — Successor correctness checks
+
+Projection and shared-vertex gcd construction passed exact original-input
+certificate checks on both primes; the three-variable development gcds are
+quartic and the complete reduced bases match the raw-system bases. The full
+native suite and clippy passed as producer development checks `[pcc:unverified]`.
+Source and successor protocol are published before the next timed run. The
+failure-stop correction now applies to either candidate arm, not just the
+successor. No old raw result or frozen binary is rewritten.

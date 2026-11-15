@@ -50,7 +50,7 @@ fn singular(
     code+="for(i=1;i<=size(G);i++){print(\"POLY\");f=G[i];while(f!=0){print(\"TERM:\"+string(leadcoef(f))+\":\"+string(leadexp(f)));f=f-lead(f);}print(\"ENDPOLY\");}\nprint(\"DONE\");\nquit;\n";
     code
 }
-fn export(directory: &Path) -> Result<(), Box<dyn Error>> {
+fn export(directory: &Path, projection: bool) -> Result<(), Box<dyn Error>> {
     if directory.exists() {
         return Err("fixture directory already exists".into());
     }
@@ -61,7 +61,11 @@ fn export(directory: &Path) -> Result<(), Box<dyn Error>> {
             for seed in [101, 307, 911] {
                 let fixture = generate(p, n, seed)?;
                 let f = fixture.system.decode()?;
-                let (augmented, _) = cheap::augment(&f, n, p);
+                let augmented = if projection {
+                    relation_degree_trace::projection::augment(&f, n, p).0
+                } else {
+                    cheap::augment(&f, n, p).0
+                };
                 let root = directory.join(&fixture.id);
                 fs::create_dir(&root)?;
                 fs::write(
@@ -118,8 +122,8 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
     let inputs = system.decode()?;
     let n = system.variables.len();
     let p = system.prime;
-    if arm != "baseline" && arm != "candidate" {
-        return Err("arm must be baseline or candidate".into());
+    if arm != "baseline" && arm != "candidate" && arm != "projection" {
+        return Err("arm must be baseline, candidate or projection".into());
     }
     let (mut preprocessing_ns, mut solving_ns) = (0u128, 0u128);
     let mut charged_ns = 0u128;
@@ -128,11 +132,18 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
     let mut basis: Vec<Row> = Vec::new();
     let mut prior: Option<Vec<Poly>> = None;
     let mut pairs = 0;
+    let mut projection_info = Vec::new();
     for _ in 0..repetitions {
         let charged_start = Instant::now();
         reset_counters();
         let start = Instant::now();
-        let augmented = if arm == "candidate" {
+        let augmented = if arm == "projection" {
+            let (a, info) =
+                relation_degree_trace::projection::augment(std::hint::black_box(&inputs), n, p);
+            pairs = info.len();
+            projection_info = info;
+            a
+        } else if arm == "candidate" {
             let (a, c) = cheap::augment(std::hint::black_box(&inputs), n, p);
             pairs = c.len();
             a
@@ -160,7 +171,7 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         json!({"schema":"relation-speed-worker/v1","id":fixture.id,"arm":arm,"prime":p,"variables":n,"repetitions":repetitions,
         "preprocessing_ns":preprocessing_ns,"solve_and_internal_certificate_checks_ns":solving_ns,"charged_ns":charged_ns,
         "modular_products_preprocess":preprocess_products,"modular_products_solve":solve_products,"counter_build":cfg!(feature="count-field-ops"),
-        "recognized_pairs":pairs,"basis":basis.iter().map(|r|terms(&r.poly)).collect::<Vec<_>>(),
+        "preprocessed_components":pairs,"projection_vertices":projection_info,"basis":basis.iter().map(|r|terms(&r.poly)).collect::<Vec<_>>(),
         "completion":"Buchberger criterion, original-input membership and all input normal forms checked by the producer's native reference path",
         "excluded":"fixture construction, input parsing and primality validation, process launch, inter-repetition consistency checks; external replay is separately charged by the driver",
         "claim_status":"unverified producer observation"}),
@@ -174,6 +185,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut reps = 1;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--prepare-projection" => {
+                arm = "projection".to_string();
+                prepare = Some(PathBuf::from(
+                    args.next().ok_or("missing fixture directory")?,
+                ));
+            }
             "--prepare" => {
                 prepare = Some(PathBuf::from(
                     args.next().ok_or("missing fixture directory")?,
@@ -193,7 +210,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Err("repetitions must be 1..10000".into());
     }
     if let Some(path) = prepare {
-        export(&path)?;
+        export(&path, arm == "projection")?;
     } else if let Some(path) = worker {
         println!("{}", execute(&path, &arm, reps)?);
     } else {
