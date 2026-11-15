@@ -35,6 +35,7 @@ theorem reconstructed_curve (A B delta s t l : K) (h2 : (2:K) ≠ 0)
   have hr := real_redundancy A B delta (realPart s l) s t l
   change (imagY s t l)^2+delta*l^2-(realPart s l)^3-
     3*(realPart s l)*delta-A*(realPart s l)-B = _ at hr
+  dsimp only [imagY] at hi
   rw [hi, hd, ht] at hr
   linear_combination hr
 #print axioms real_redundancy

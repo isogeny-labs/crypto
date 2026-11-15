@@ -225,3 +225,21 @@ Algebraic membership with source-identical extended controls, legitimate public 
 ### Errors
 
 Static JSON field-count correction13 preceded compilation; initial source/pins retained. Successful C++ build emits compact-indentation warnings, preserved without rerun. Report first launched with nonexistent workdir, then required amssymb/amsmath; failed source/logs retained and final one-page PDF rendered/inspected. Local70-file raw archive7136bytes restores hashes/repack exactly. Sources checked(KB unavailable): prior trace geometry/README, Gorla–Massierer §2.2; no novelty or higher-dimensional complexity claim. [pcc:unverified]
+
+## 2026-11-15 — trace-chart quartic first attempt
+
+### What was done
+
+Derived/froze generic quartic and real-curve algebra with actual fixed-chart C++/Rust coverage instruments at5d0c8abb. Thin orchestration source checkpointfe4db3fa followed two pre-execution syntax errors; no native/Lean command ran during those parser failures. The first actual proof gate rejects the reconstruction tactic's definitional rewrite. First two identities elaborate/print only foundational axioms, third sorryAx-bearing artifact is UNACCEPTED. False controls and native census are unstarted. All exact source/log outputs retained under twist-trace-quartic-run01-20261115. [pcc:unverified]
+
+### Decisions made
+
+Unfold only imagY in the existing intermediate equality before rewriting. Statements/hypotheses are unchanged. Publish corrected source, matched single-false-equation controls, fresh wrapper/output path and pins before the affected full replay. Unmodified official gate/auditor/trust and prior sources unchanged. Check quartic degree4 separately from expanded reconstructed curve degree6; no regularity/DLP gain claim. [pcc:unverified]
+
+### Open threads
+
+Full three-theorem/three-false-proof plus47-query native chart/point-reference/A-A/six-corruption plan. All stage caps600s/max2LOCALworkers, original focused window<=3600s; result assets local. Next solver/frontier/source-log setup remains distinct, not replaced by chart validation. [pcc:unverified]
+
+### Errors
+
+Pre-data else4/else5 metadata syntax corrected with originals retained, before any execution. The mathematical failure is a Lean rewriting surface mismatch (expanded expression versus imagY definition), not a changed assumption. Current curve-algebra skill/contract read and adopted lessons brief applied; KB tools unavailable, known primary/parent sources reused without novelty claim. [pcc:unverified]
