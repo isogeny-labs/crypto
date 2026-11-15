@@ -196,3 +196,83 @@ form of the "pseudo-solution near the top" hint above); the generic value of `d_
 `S₃` filling the width-2 box; and `ffd = 3, 4, 5, 5` for the width-`W` boxes, `W = 1 … 4`. The growth
 in `t` is still only fitted there (`d_F = ffd(W) + max(0, ⌊(t − s_W)/4⌋)`), so the first item of
 "What is not derived" stays open.
+
+## D9. Theorem (selector upper bound, Kummer chain, any `m`). Added 2026-11-15; nothing above is changed
+
+**Setting.** A Kummer tower of height `t ≥ 2` in each of the `m` factor-base
+coordinates, the `S₃` chain with `m − 2` free unknowns `u_1, …, u_{m−2}`:
+`F_1 = S₃(x_1, x_2, u_1)`, `F_k = S₃(u_{k−1}, x_{k+1}, u_k)`,
+`F_{m−1} = S₃(u_{m−2}, x_m, x_R)`.
+
+**Hypothesis.** `1 ∈ ⟨F⟩` in `R`. By D1, `R ≅ Π_{x∈V^m} F_p[u]`, so this holds
+iff `1 ∈ ⟨φ_x F⟩ ⊂ F_p[u]` at every grid point `x`. By the Nullstellensatz, that
+means the residual chain `φ_x F` has no common zero over `F̄_p` at any `x`. This is
+exactly the condition for `d_F < ∞`, since `V_{F,c} ⊆ ⟨F⟩`. It is stronger than
+"no `F_p`-relation". At `m = 3` the two differ only when, at some grid point,
+`f_1, f_2` are proportional irreducible quadratics.
+
+**Statement.**
+- (a) `m = 3`: `d_F ≤ 3t + 5`.
+- (b) `m ≥ 3`: `d_F ≤ m·t + 4^{m−2} + 4`.
+- (c) `m = 2`: the same construction is D4, `d_F ≤ 2t + 2`.
+
+**Degrees of the chain in `R`.** With `x_i = g·y_{i,0}`, `x_i² = g²·y_{i,1}` and
+each `u_k` of degree 1, expanding `S₃` gives `deg F_1 = 4`, `deg F_k ≤ 4` (middle),
+and `deg F_{m−1} = 3`. In each monomial, an `x` contributes at most degree 1.
+
+**Proof.**
+1. *Pointwise certificate.* At each `x`, `1 ∈ ⟨φ_x F⟩`, so there are `h_i^x ∈ F_p[u]`
+   with `Σ_i h_i^x·φ_x F_i = 1`.
+   - At `m = 3`, `f_1 = φ_x F_1` and `f_2 = φ_x F_2` are univariate of degree `≤ 2`.
+     The extended Euclidean algorithm gives `deg h_i^x ≤ 1` (Bézout).
+   - For general `m`, Kollár's effective Nullstellensatz applies to `m − 1`
+     polynomials of total `u`-degree `≤ 4` in `n = m − 2` variables. It gives
+     `deg(h_i^x φ_x F_i) ≤ max(3, 4)^n = 4^{m−2}`, so `deg h_i^x ≤ 4^{m−2}`.
+   - Kollár's bound is stated over `F̄_p`. A bounded-degree linear system over
+     `F_p` has a solution over `F_p` iff it has one over `F̄_p`, so the `h_i^x`
+     can be taken in `F_p[u]`.
+2. *Selector sum.* Let `δ_x ∈ F_p[y]/T` be the indicator of `x` (D1), and put
+   `G_i = Σ_x δ_x·h_i^x(u)`. Then `φ_x(Σ_i G_i F_i) = 1` at every `x`, so
+   `Σ_i G_i F_i = 1` in `R` (D1).
+   - In normal form, `G_i` is spanned by `z^k u^e` with
+     `popcount(k) = Σ_j popcount(k_j) ≤ m·t`.
+   - Its `u`-degree is `≤ 1` (`m = 3`) or `≤ 4^{m−2}` (general `m`).
+3. *Closure degree, as in D4.* Build `z^k u^e·F_i` from `F_i` by multiplying by
+   one variable at a time.
+   - Rewriting never raises degree (D2), and `u` is free.
+   - So after `j` steps the product has degree `≤ deg F_i + j`.
+   - Every step starts from degree `< c` when `c = deg F_i + popcount(k) + e`.
+   - Hence `1 = Σ coeff·(z^k u^e F_i) ∈ V_{F,c}` with
+     `c = max_i (deg F_i) + m·t + max deg_u G_i`:
+     - `m = 3`: `c = 4 + 3t + 1 = 3t + 5`;
+     - general `m`: `c ≤ 4 + m·t + 4^{m−2}`. ∎
+
+**What this does and does not say.**
+- **Not a cost improvement.** At the operating point `K^m ≍ p`, `m·t ≈ log₂ p`.
+  The bound is in the brute-force regime, which is worse than rho, and it changes
+  no cost estimate.
+- **No lower bound.** The construction always reaches its full degree (the check
+  below), but that says nothing about whether `d_F` itself is tight.
+- **Measured `d_F` is far below the bound.** At `m = 3` it is about 5, as at
+  `m = 2`, where falls take `2t + 2` down to 4–6. `[pcc:unverified]`
+- **"What is not derived" is unchanged.** Its open item is a growing *lower*
+  bound.
+- The minimum degree of a no-fall certificate at `m = 3` (is it `3t + 5`?) is
+  being measured separately in `research/kummer_m3_ns_degree_20261115/`.
+
+**Check** (`d9_check.py`, stdlib only; output in `d9/d9_check.json`,
+`d9/d9_check.log`, `d9/d9_control.log`). `[pcc:unverified]`
+- **Instances:** `m = 3`, `p ∈ {998244353, 2013265921}`, `t = 2 … 5`, three seeded
+  draws each, 24 instances.
+- **On every instance:**
+  - every one of the `K³` grid pairs is coprime;
+  - `max deg_u h ≤ 1`;
+  - `deg F_1 = 4` and `deg F_2 = 3`, computed from the symbolic expansion;
+  - `G_1F_1 + G_2F_2 = 1` holds by **explicit multiplication** in
+    `F_p[z_1,z_2,z_3]/(z_i^K − 1)[u]`, with `F_i` built symbolically, not
+    pointwise, so the check does not rest on D1's evaluation map;
+  - changing one coefficient of `G_1` breaks the identity;
+  - the certificate degree equals `3t + 5`: 11, 14, 17 and 20 at `t = 2 … 5`.
+- **Negative control** (`--control`): a target with a common root planted at
+  one grid point is rejected in 6/6 cases.
+- **Result:** 24/24 pass. Runtime 36 s on one core.
