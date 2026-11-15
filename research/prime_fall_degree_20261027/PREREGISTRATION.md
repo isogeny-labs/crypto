@@ -606,3 +606,36 @@ The gate runs the registered flags of `run.sh` (rayon 12):
 - Any stage B row whose deterministic fields later disagree with a frozen-image row of the same system is a reproducibility
   failure (Amendment 2's stop rule).
 - No hypothesis, §6 rule, reading, cell, seed, budget or limit changes.
+
+## Amendment 18 (2026-11-15; the `t = 13` draw 0 and `t = 14` capped cells on reserved RunPod pods; before any cap-6 row at `t = 13` draw 0 or at `t = 14` exists)
+
+Route only, for the cells that Amendment 16 left out. Every number is `[pcc:unverified]`.
+
+- **Owner instruction (2026-11-15, ~03:00Z, session 01TCbLH6osebpnEbutNogBzD).** "also launch the t=13/14 cells on
+  runpod". This is the non-Spot capacity named in owner decision 10 (PR #4156).
+- **Cells and their order.** These are the Amendment 7 B bracket steps, with Amendment 14's limits:
+  - `pfd-x-t13-k0-c6-rp`: `cap:13:0:6:12800000000`;
+  - `pfd-x-t14-k0-c6-rp` and `pfd-x-t14-k1-c6-rp`: `cap:14:K:6:12800000000`.
+  - Each runs `--budget 86400` with the frozen flags of the `cap:` stage.
+  - The next step of a bracket follows Amendment 7 B from the row, and is run the same way:
+    - cap 7 if cap 6 does not refute at `t = 14`;
+    - cap 5 is already measured.
+  - Amendment 14's re-run rule is unchanged: `oversize true` or a memory kill gives an `-m112` run with `--max-dense
+    27900000000`.
+- **Host.** One reserved RunPod CPU pod per cell, at least 56 GiB, `RAYON_NUM_THREADS = 12`. The binaries are those
+  admitted by Amendment 17. The runner and client are those of Amendment 16.
+  - The registered capped requests named `entry.sh`. The runner installs `entry_r2.sh`, which is `entry.sh` plus the
+    `m4n:` stage only.
+  - The `cap:` stage text is identical in the two files (checked with `diff` at registration).
+- **Cost.** Owner decision 4 applies: US$40 per job and US$400 for the study.
+  - Each pod's `costPerHr` is recorded at creation.
+  - A job reaching US$40 is stopped and recorded as censored-by-cost.
+  - At US$1.04/h the 86,400 s budget costs about US$25, so the cost stop should not bind.
+- **Disclosure.**
+  - The session registering this has seen the committed rows:
+    - `t = 13`: draw 1 `d_F = 6`; draw 0 cap 5 does not refute;
+    - `t = 14`: cap 5 does not refute on either draw (`RESULTS_T13_BRACKET.md`, `RESULTS.md`).
+  - The bracket is mechanical (Amendment 7 B), so that knowledge leaves no choice open.
+  - The Amendment 16 disclosure applies here too: the wall-clock budget makes censoring depend on the host.
+- **Unchanged.** No hypothesis, §6 rule, reading, cell, seed, cap, budget or `--max-dense` changes. The C-step reading
+  (Amendment 7 D.5) is applied to these rows as registered.
