@@ -1,5 +1,34 @@
 # Benchmarks
 
+The [15 November complete-cold genus-3 quotient comparison](20261115-hec-coldcost13/)
+([PDF](20261115-hec-coldcost13/REPORT.pdf)) remains outside the admitted table.
+All 20 cells recover and verify scalar 183049. Cold median 1.780975 s versus
+best existing Compact median 0.797166 ms gives best/cold 0.000447601; the
+registered 10x criterion fails. Local ARM L0, unisolated producer observations
+pending independent validation. [Record](records/20261115T1859Z-hec-coldcost13.json)
+[pcc:unverified].
+
+The [15 November zero-core genus-2 cold pilot](20261115-hec-zero-core-cold/)
+([PDF](20261115-hec-zero-core-cold/REPORT.pdf)) remains outside the admitted table.
+Six targets recover; six gates and 102 cold timed children pass. Z1 passes and
+the Z2 10x criterion fails. Fastest-existing/zero-core fixture medians are
+0.245 and 0.362, favoring existing controls. Local ARM L0, A/A maximum 1.091;
+producer observations pending independent validation [pcc:unverified].
+
+The [15 November complete point-sieve cold pilot](20261115-hec-point-cold/)
+([PDF](20261115-hec-point-cold/REPORT.pdf)) remains outside the admitted table.
+All18targets recover and18gates/306cold cells pass checks; E8passes and E9fails.
+Fastest-existing/point-lazy fixture medians0.066–0.430favor existing controls.
+Local ARM L0, A/Amax2.923; producer observations pending independent validation
+[pcc:unverified].
+
+The [15 November linear-denominator hyperelliptic cold screen](20261115-hec-linear-cold/)
+([PDF](20261115-hec-linear-cold/REPORT.pdf)) is retained outside the admitted table.
+All18target gates and288cold cells pass; exact-work specialization/generic median
+runtime ratios are1.46–3.02x, while ratios against the fastest existing arm are
+0.70–1.43x. The10xpilot criterion fails. Local ARM L0, A/Amax2.55x; producer
+observations pending independent validation [pcc:unverified].
+
 The visual record of every performance measurement and speedup: report PDFs,
 graphs (SVG) and PNG renders, one directory per entry
 (`<YYYYMMDD>-<slug>/`). The study directory linked from each row holds the
