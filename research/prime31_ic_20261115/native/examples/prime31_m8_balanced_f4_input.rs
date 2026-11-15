@@ -244,6 +244,41 @@ fn main()->Result<(),String>{
             outcomes.push(json!({"arm":name,"input_polynomials":input.len(),
                 "result":result}));
         }
+        // The six arms above keep all eight 6-level Dickson blocks even
+        // when an ideal references only the last two leaves. Check whether
+        // this unused ring dimension, rather than the intrinsic S3 relation,
+        // is the actual source of the early matrix oversize stop.
+        let mut pair_rules=Vec::with_capacity(2*DEPTH);
+        for block in 0..2 {
+            for level in 0..DEPTH {
+                let terminal=level+1==DEPTH;
+                pair_rules.push(SquareRule{
+                    next:(!terminal).then_some((block*DEPTH+level+1) as u8),
+                    a:0,b:u64::from(!terminal),c:0,
+                    d:if terminal {(fb.terminal+2)%P} else {2}
+                });
+            }
+        }
+        let small_ring=TowerRing{p:P,rules:pair_rules,n_free:1};
+        small_ring.check();
+        let mut short_raw=Vec::new();
+        for (old,c) in s3(&leaf[6],&leaf[7],&w).raw_tower() {
+            if old.iter().enumerate().any(|(i,&v)|v!=0
+                && i!=6*DEPTH && i!=7*DEPTH && i!=TOWER+2) {
+                return Err("pair-only S3 depends on unexpected variable".into());
+            }
+            let mut ex=vec![0_u32;2*DEPTH+1];
+            ex[0]=old[6*DEPTH];
+            ex[DEPTH]=old[7*DEPTH];
+            ex[2*DEPTH]=old[TOWER+2];
+            short_raw.push((ex,c));
+        }
+        let small_pair=small_ring.from_raw(&short_raw);
+        let small_result=capped_f4(&[small_pair],&small_ring,None)?;
+        outcomes.push(json!({"arm":"pair_s3_minimal_two_tower_blocks",
+            "input_polynomials":1,
+            "tower_blocks":2,"free_variables":1,
+            "result":small_result}));
         println!("{}",json!({
             "standing":"[pcc:unverified]",
             "scope":"F4 matrix-stop ablation only; reduced ideals NOT an m8 relation oracle, no ECDLP",
