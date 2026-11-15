@@ -33,3 +33,6 @@ Also recorded per row: BSGS table size `m` (its memory grows as sqrt(Tn)), to re
 
 ## Addendum B (2026-11-15, frozen before any 36-bit row): 36 bits
 Owner request: "run it at 36 bits". Same arms, settings (rho `DPRULE=ks DPDIV=1.5`, BSGS `MC=1`), rounds (r = 0..5, `INST0 = 100 + r`, 2 curves x 2 instances), order rotation, metric, bootstrap and decision rule as above, on cells 36 bits x T = 200, 1000, 3000 (`run.sh "36 200" "36 1000" "36 3000"`), same binaries as addendum A (source unchanged since `a8cc24a6fe`). No retuning. Reported alongside the earlier cells, not pooled. BSGS table size `m` recorded as in addendum A.
+
+## Addendum C (2026-11-15, frozen before any 38-bit row): 38 bits
+Owner request: "run it at 38 bits". Same arms, settings (rho `DPRULE=ks DPDIV=1.5`, BSGS `MC=1`), rounds (r = 0..5, `INST0 = 100 + r`, 2 curves x 2 instances), order rotation, metric, bootstrap and decision rule as above, on cells 38 bits x T = 200, 1000, 3000 (`run.sh "38 200" "38 1000" "38 3000"`), same binaries (source unchanged since `a8cc24a6fe`). No retuning. Reported alongside the earlier cells, not pooled. BSGS table size `m` recorded.
