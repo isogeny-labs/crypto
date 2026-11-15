@@ -1,0 +1,15 @@
+\documentclass[tikz,border=6pt]{standalone}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[ybar,bar width=40pt,width=11cm,height=7cm,ymin=0,ymax=9.5,
+ ylabel={Usable rational abscissas},ytick={0,2,4,6,8},
+ symbolic x coords={reference,cubic},xtick=data,
+ nodes near coords,every node near coord/.append style={font=\large},
+ title={Two frozen inputs: different curves and targets},
+ enlarge x limits=0.65,axis lines*=left]
+\addplot[fill=teal!55,draw=teal!80!black] table[x=role,y=usable_abscissas,col sep=comma]{base-counts.csv};
+\end{axis}
+\end{tikzpicture}
+\end{document}

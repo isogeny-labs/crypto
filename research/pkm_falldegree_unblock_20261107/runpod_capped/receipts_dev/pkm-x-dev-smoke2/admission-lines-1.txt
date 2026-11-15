@@ -1,0 +1,40 @@
+--- binary.sha256
+f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7  /usr/local/bin/pkm_tower_pilot
+7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a  /usr/local/bin/prime_fall_degree_tools
+c36d324e8a60b0d8e827982baf7e07e0ce155664c67ce8c11b4debc410b95c6e  /usr/local/bin/hky_fp_tower_check
+962833611e13e78a3dc5fbb9ab6bfc498fde9cccab255c704ed6e2ff12a03354  /usr/local/bin/pfd_grid_zeros
+--- host.txt (first 7 lines)
+argv: cap:8:0:5:12800000000
+nproc: 16
+rayon: 12
+seed: 1347112276
+model name	: AMD EPYC 9575F 64-Core Processor
+MemTotal:       527605596 kB
+6.8.0-147-generic
+--- progress.txt
+2026-11-15T01:54:16Z start X-m2-t8-k0-c5
+2026-11-15T01:54:17Z end X-m2-t8-k0-c5 exit 0
+2026-11-15T01:54:17Z end X-m2-t8-k0-c5.gridzeros exit 0
+--- runner_state.json
+{"state": "done", "exit": 0, "started": "2026-11-15T01:54:16Z", "ended": "2026-11-15T01:54:17Z", "stages": ["cap:8:0:5:12800000000"]}--- largest pilot memory peak line (VmHWM, MiB)
+tower step 17: degree 4, 4589 critical + 1059 tower pairs, 5648 S-rows + 534 reducers + 1609 promoted x 2357 cols, nnz 2978810, residue 214 x 214, fresh 214 (lowest degree 0), basis 456, pairs left 896, 117.5 ms (rows 92, A 12, B 12, update 0), B' 458414 entries, kept 1534 elements with 892663 entries, muladds 223172746, full rank after 214 of 5648 S-rows (5434 skipped), memory 10 MB (peak 63 MB)
+--- cgroup
+final-at:
+2026-11-15T01:54:18Z
+fstype:
+cgroup2fs
+memory.events:
+low 0
+high 0
+max 0
+oom 0
+oom_kill 0
+oom_group_kill 0
+memory.max:
+128000000000
+memory.peak:
+104304640
+proc-self-cgroup:
+0::/
+snapshot-at:
+2026-11-15T01:54:18Z

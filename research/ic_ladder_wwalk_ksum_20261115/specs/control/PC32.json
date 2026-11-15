@@ -1,0 +1,80 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_ladder_wwalk_ksum_20261115 positive control, autolab k = 32 curve",
+ "description": "Generic decomposition track (bounded by sqrt(r); cannot beat rho or BSGS). PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "a": 1173263412,
+    "b": 337904346,
+    "group_order": 4295077112,
+    "gx": 1431665017,
+    "gy": 592057774,
+    "p": 4294967197,
+    "r": 536884639
+   }
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 20261115301,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "wwalk-c2-x06",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run"
+    }
+   }
+  },
+  {
+   "name": "wwalk-c2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run"
+    }
+   }
+  },
+  {
+   "name": "wwalk-c1",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,jumps=16,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261115801,
+  "isolation_required": "L0",
+  "timeout_seconds": 86400
+ }
+}
