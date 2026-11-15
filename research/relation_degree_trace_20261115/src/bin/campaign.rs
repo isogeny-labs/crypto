@@ -132,8 +132,13 @@ fn checked_ratio(left: &Value, right: &Value) -> Option<(f64, u128)> {
         Some((a / b, replay_ns))
     }
 }
-fn controls_eligible(sample: usize, arms: &serde_json::Map<String, Value>) -> bool {
-    sample.is_multiple_of(3)
+fn controls_eligible(
+    sample: usize,
+    arms: &serde_json::Map<String, Value>,
+    pair_eligible: bool,
+) -> bool {
+    pair_eligible
+        && sample.is_multiple_of(3)
         && arms
             .get("baseline")
             .is_some_and(|v| v["status"] == "complete")
@@ -184,6 +189,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 | "criteria"
                 | "projection-criteria"
                 | "quadratic-projection-criteria"
+                | "quotient"
         )
     };
     if !supported(&baseline_arm) || !supported(&candidate_arm) {
@@ -270,7 +276,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 ratios.push(r);
             }
             let mut record = json!({"sample":sample,"order":order,"arms":arms,"checked_ratio":ratio.map(|r|r.0),"equality_replay_ns_charged_to_each":ratio.map(|r|r.1)});
-            if controls_eligible(sample, &arms) {
+            if controls_eligible(sample, &arms, ratio.is_some()) {
                 let first = worker(
                     &binary,
                     &fixture,
@@ -351,7 +357,7 @@ mod tests {
             ("baseline".to_string(), json!({"status":"timeout"})),
             ("candidate".to_string(), json!({"status":"complete"})),
         ]);
-        assert!(!controls_eligible(0, &arms));
+        assert!(!controls_eligible(0, &arms, false));
     }
     #[test]
     fn paired_bootstrap_keeps_the_declared_ratio() {

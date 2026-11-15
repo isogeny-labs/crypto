@@ -1,4 +1,4 @@
-//! Fresh, predeclared four-variable confirmation fixtures; no solver calls.
+//! Explicitly seeded shared-point fixture/CAS exporter; no solver calls.
 use relation_degree_trace::{projection, workload::generate, Poly};
 use serde_json::json;
 use std::{error::Error, fs, path::PathBuf};
@@ -21,8 +21,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let out = PathBuf::from(args.next().ok_or("fresh output directory required")?);
     let mut quadratic = false;
     let mut seeds = vec![1009u64, 2003, 3001];
+    let mut variables = 4usize;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--variables" => variables = args.next().ok_or("missing variable count")?.parse()?,
             "--projection" => {
                 quadratic = match args.next().as_deref() {
                     Some("quadratic") => true,
@@ -40,6 +42,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
             _ => return Err(format!("unknown option {arg}").into()),
         }
+    }
+    if !(3..=8).contains(&variables) {
+        return Err("variable count must be 3..8".into());
     }
     if seeds.is_empty()
         || seeds.len() > 16
@@ -60,7 +65,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut cases = Vec::new();
     for p in [2147483647, 9007199254740881] {
         for &seed in &seeds {
-            let fixture = generate(p, 4, seed)?;
+            let fixture = generate(p, variables, seed)?;
             let root = out.join(&fixture.id);
             fs::create_dir(&root)?;
             fs::write(
@@ -69,9 +74,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             )?;
             let f = fixture.system.decode()?;
             let a = if quadratic {
-                projection::augment_quadratic(&f, 4, p).0
+                projection::augment_quadratic(&f, variables, p).0
             } else {
-                projection::augment(&f, 4, p).0
+                projection::augment(&f, variables, p).0
             };
             for (arm, polys) in [("baseline", f), ("candidate", a)] {
                 let expr = polys
@@ -94,13 +99,13 @@ fn main() -> Result<(), Box<dyn Error>> {
                     fs::write(root.join(format!("{arm}-{algorithm}.sing")), script)?;
                 }
             }
-            cases.push(json!({"id":fixture.id,"prime":p,"variables":4,"seed":seed,"fixture":format!("{}/fixture.json",fixture.id)}));
+            cases.push(json!({"id":fixture.id,"prime":p,"variables":variables,"seed":seed,"fixture":format!("{}/fixture.json",fixture.id)}));
         }
     }
     fs::write(
         out.join("manifest.json"),
         serde_json::to_string_pretty(
-            &json!({"schema":"relation-speed-confirmation/v1","cases":cases,"seeds":seeds,"projection_construction":if quadratic{"direct-quadratic"}else{"sylvester-cubics"},"scope":"four-variable exported panel; freshness depends on the frozen study protocol, not this exporter"}),
+            &json!({"schema":"relation-speed-confirmation/v1","cases":cases,"seeds":seeds,"projection_construction":if quadratic{"direct-quadratic"}else{"sylvester-cubics"},"scope":"explicit shared-point exported panel; freshness depends on the frozen study protocol, not this exporter"}),
         )? + "\n",
     )?;
     Ok(())

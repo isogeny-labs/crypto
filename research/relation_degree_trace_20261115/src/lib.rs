@@ -8,6 +8,7 @@ use std::time::Instant;
 
 pub mod cheap;
 pub mod projection;
+pub mod quotient;
 pub mod workload;
 
 #[derive(Clone, Copy, Debug, Default, Serialize)]

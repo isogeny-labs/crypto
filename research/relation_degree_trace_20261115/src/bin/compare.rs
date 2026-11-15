@@ -130,8 +130,9 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         && arm != "criteria"
         && arm != "projection-criteria"
         && arm != "quadratic-projection-criteria"
+        && arm != "quotient"
     {
-        return Err("arm must be baseline, candidate or projection".into());
+        return Err("unsupported solver arm".into());
     }
     let (mut preprocessing_ns, mut solving_ns) = (0u128, 0u128);
     let mut charged_ns = 0u128;
@@ -141,6 +142,7 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
     let mut prior: Option<Vec<Poly>> = None;
     let mut pairs = 0;
     let mut projection_info = Vec::new();
+    let mut quotient_info = None;
     for _ in 0..repetitions {
         let charged_start = Instant::now();
         reset_counters();
@@ -174,7 +176,12 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         preprocess_products += counters().modular_products;
         reset_counters();
         let start = Instant::now();
-        basis = if arm == "criteria"
+        basis = if arm == "quotient" {
+            let (result, info) =
+                relation_degree_trace::quotient::solve(std::hint::black_box(&augmented), n, p)?;
+            quotient_info = Some(info);
+            result
+        } else if arm == "criteria"
             || arm == "projection-criteria"
             || arm == "quadratic-projection-criteria"
         {
@@ -200,7 +207,8 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         json!({"schema":"relation-speed-worker/v1","id":fixture.id,"arm":arm,"prime":p,"variables":n,"repetitions":repetitions,
         "preprocessing_ns":preprocessing_ns,"solve_and_internal_certificate_checks_ns":solving_ns,"charged_ns":charged_ns,
         "modular_products_preprocess":preprocess_products,"modular_products_solve":solve_products,"counter_build":cfg!(feature="count-field-ops"),
-        "preprocessed_components":pairs,"projection_vertices":projection_info,"basis":basis.iter().map(|r|terms(&r.poly)).collect::<Vec<_>>(),
+        "counter_scope":"modular products and nontrivial inversions; coefficient updates cover sparse axpy only, excluding dense quotient/linear-algebra writes; not full operations or GAE",
+        "preprocessed_components":pairs,"projection_vertices":projection_info,"quotient_info":quotient_info,"quotient_phase_scope":"quotient arm includes projection construction, coordinate construction, change of order and all checks in the solve interval","basis":basis.iter().map(|r|terms(&r.poly)).collect::<Vec<_>>(),
         "completion":"Buchberger criterion, original-input membership and all input normal forms checked by the producer's native reference path",
         "excluded":"fixture construction, input parsing and primality validation, process launch, inter-repetition consistency checks; external replay is separately charged by the driver",
         "claim_status":"unverified producer observation"}),

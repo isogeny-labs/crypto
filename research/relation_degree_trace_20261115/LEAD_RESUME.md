@@ -6,11 +6,12 @@ Seek matched full-cost changes; do not infer ECDLP, fastest-solver or
 regularity results from a weak native denominator or sparsity alone.
 
 ## Lead / hypothesis
-Use the division-free resultant identity for the two original quadratics
-instead of a five-by-five determinant of derived cubics. Source and exact
-Bezout identity are in research/relation_degree_trace_20261115/LEADS.md.
-The likely effect is preprocessing/certificate work, not a new drastic solver
-gain if the ordered augmented input list is identical `[pcc:unverified]`.
+Two leads are implemented: the division-free original-quadratic resultant,
+and a certified quotient-algebra solver that constructs coordinate maps and
+the complete grevlex basis without a reference oracle. Source and assumptions
+are in research/relation_degree_trace_20261115/LEADS.md and QUOTIENT_PROTOCOL.md.
+Both have producer correctness checks, but no successor timing. Expanded
+certificates may offset a quotient-algebra shortcut `[pcc:unverified]`.
 
 ## Spec
 research/relation_degree_trace_20261115/QPROJECTION_PROTOCOL.md freezes
@@ -20,6 +21,11 @@ is the native baseline; quadratic-projection-criteria is the new candidate.
 21 paired samples, 7 A/A pairs, fixed bootstrap; no failed-case replacements.
 External preprocessing and verification must be paid before a practical claim.
 
+QUOTIENT_SPEED_PROTOCOL.md separately freezes the old best native route versus
+quotient on the 18 exploratory 3/4/6-variable cases, in three bounded panels.
+Conditional fresh seeds are 11003/13001/17011, independent of the quadratic
+lead's holdouts; do not generate them before the stated admission condition.
+
 ## State
 PR #4228 at a857edd9 contains the completed earlier component study: five
 fresh cases with producer median native ratios 23.4–23.9 against a textbook
@@ -27,20 +33,25 @@ baseline; one failed A/A control excluded. All supported CAS bases matched,
 but mature solver-only diagnostics were much smaller. Full raw archives are
 in content-addressed S3, with manifests under the study's artifacts directory.
 No signed independent performance verdict exists `[pcc:unverified]`.
-New quadratic code and a configurable-baseline harness are under development,
-with no new timing run. The real sparse Git checkout is /workspace/crypto-leads;
+Quadratic code and the configurable-baseline harness are committed in 4e187669.
+The quotient prototype's final checks pass 35 normal and 36 counter-feature
+tests plus strict clippy. Only fixed development fixtures were used; no new
+timing or six-variable validation is asserted `[pcc:unverified]`.
+The real sparse Git checkout is /workspace/crypto-leads;
 older staged source and raw local outputs remain in /workspace/crypto-review.
 
 ## Next steps
-From research/relation_degree_trace_20261115, finish cargo test --release
---locked, cargo test --release --locked --features count-field-ops and strict
-clippy. Preserve receipts under quadratic-development; commit source and the
-frozen protocol to the existing PR without editing conflicted evidence.
+Inspect quotient-development/{tests,count-tests,clippy,count-clippy}.log and
+source hashes before repeating checks. Inspect the PR head and Git status to
+confirm whether the quotient source/protocols have been published; publish
+only missing work, without editing conflicted evidence.
 From the repository root run scripts/checkpoint.sh gate before any experiment.
 It must upload to S3 and pass; no token or AWS upload transport is configured.
-After credentials are restored, use the protocol and tools/isolated_bench.py
-reserve to run newly frozen same-binary native pairs. Do not use the old weak
-denominator to claim an incremental result, or combine clock scopes.
+After credentials are restored, use the applicable frozen speed protocol and
+tools/isolated_bench.py reserve to run same-binary native pairs. Quotient-arm
+construction is included in its solve/check interval. Do not use the old weak
+denominator or combine clock scopes. Stop after the bounded panels/conditional
+confirmation and report actual losses or failure to meet tenfold.
 
 ## Runs in flight
 No research measurement is running. Local compilation/tests may be active;

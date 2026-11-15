@@ -1,14 +1,14 @@
 //! Certified edge resultants and shared-vertex univariate gcd consequences.
 //! No Groebner basis or witness is used in construction.
 use super::*;
-fn product(a: &Poly, b: &Poly, p: u64) -> Poly {
+pub(super) fn product(a: &Poly, b: &Poly, p: u64) -> Poly {
     let mut out = Poly::new();
     for (m, c) in a {
         axpy(&mut out, &shift(b, m), *c, p);
     }
     out
 }
-fn times(row: &Row, f: &Poly, p: u64) -> Row {
+pub(super) fn times(row: &Row, f: &Poly, p: u64) -> Row {
     let mut out = Row {
         poly: Poly::new(),
         proof: Proof::new(),
@@ -186,14 +186,27 @@ pub struct Vertex {
     pub certificate_product_degree: usize,
 }
 pub fn augment(inputs: &[Poly], n: usize, p: u64) -> (Vec<Poly>, Vec<Vertex>) {
-    augment_impl(inputs, n, p, false)
+    augment_impl(inputs, n, p, false, None)
 }
 /// Alternative construction from original quadratic equations. No solver,
 /// witness, division by a polynomial, or saturated-ideal replacement is used.
 pub fn augment_quadratic(inputs: &[Poly], n: usize, p: u64) -> (Vec<Poly>, Vec<Vertex>) {
-    augment_impl(inputs, n, p, true)
+    augment_impl(inputs, n, p, true, None)
 }
-fn augment_impl(inputs: &[Poly], n: usize, p: u64, quadratic: bool) -> (Vec<Poly>, Vec<Vertex>) {
+/// Preserve the same augmented rows' original-input certificates for quotient
+/// construction. The polynomial-only interfaces retain their previous output.
+pub fn certified_quadratic(inputs: &[Poly], n: usize, p: u64) -> (Vec<Row>, Vec<Vertex>) {
+    let mut rows = Vec::new();
+    let (_, info) = augment_impl(inputs, n, p, true, Some(&mut rows));
+    (rows, info)
+}
+fn augment_impl(
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    quadratic: bool,
+    mut certified: Option<&mut Vec<Row>>,
+) -> (Vec<Poly>, Vec<Vertex>) {
     let pairs = cheap::consequences(inputs, n, p);
     let mut incidence = BTreeMap::<usize, usize>::new();
     for pair in &pairs {
@@ -262,13 +275,23 @@ fn augment_impl(inputs: &[Poly], n: usize, p: u64, quadratic: bool) -> (Vec<Poly
             certificate_terms: r.proof.len(),
             certificate_product_degree: certificate_degree(&r, inputs),
         });
+        if let Some(rows) = certified.as_mut() {
+            rows.push(r.clone());
+        }
         prefix.push(r.poly);
     }
     for pair in pairs {
+        if let Some(rows) = certified.as_mut() {
+            rows.push(pair.cubic_difference.clone());
+            rows.push(pair.cubic_syzygy.clone());
+        }
         prefix.push(pair.cubic_difference.poly);
         prefix.push(pair.cubic_syzygy.poly);
     }
     prefix.extend_from_slice(inputs);
+    if let Some(rows) = certified.as_mut() {
+        rows.extend(input_rows(inputs, n));
+    }
     (prefix, info)
 }
 #[cfg(test)]

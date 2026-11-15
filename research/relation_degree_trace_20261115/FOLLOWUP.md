@@ -374,3 +374,35 @@ lead-note pin is explicitly documented as stale in quadratic-development/
 CLAIM_HISTORY.md, with its original bytes preserved. Ledger rows and frozen
 claims were not rewritten. Main's divergent ledger and root-log conflicts
 remain outside this development update.
+
+## 2026-11-15 — Certified quotient prototype
+
+Implemented quotient::solve: a certified vertex polynomial, Euclidean unit
+inverses of linear subresultants, graph propagation of coordinate maps,
+original-input vanishing under those maps, and grevlex change of order by
+exact quotient linear dependence. Final basis rows retain original-input
+certificates; monicity/reducedness, input normal forms and all S-pairs are
+checked. No witness, reference-basis oracle or hidden Buchberger fallback is
+used by the constructor. Exact bases match the reference on the fixed
+three-/four-variable seed-7 cases over both fields `[pcc:unverified]`.
+
+The QUOTIENT_PROTOCOL.md development protocol preceded implementation.
+QUOTIENT_SPEED_PROTOCOL.md separately freezes a future comparison against
+the best measured native arm, including all construction/checking cost and
+conditional fresh seeds 11003/13001/17011. No quotient timing, six-variable
+validation, degree-of-regularity change or practical CAS advantage is claimed.
+Unit-test elapsed times are not benchmark results `[pcc:unverified]`.
+
+Final development checks pass 35 normal tests and 36 counter-feature tests,
+plus strict all-target clippy in both modes. Nonunit, missing/forged-rule and
+exact dependence tests are retained. Harness eligibility now stops a completed
+but basis-mismatched pair before any A/A children; a fake-worker integration
+test covers that case. Initial warning/lint receipts are retained separately
+from the final passes under quotient-development/ `[pcc:unverified]`.
+
+The worker's quotient_info reports stored certificate product degrees and
+final basis degree, not a measured solving threshold or paid maximum degree.
+Dense quotient writes are explicitly outside the sparse coefficient-update
+counter; modular-product/inversion counters are not GAE. Original raw evidence
+and prior standings are unchanged. Timing remains blocked by the required
+S3 checkpoint upload; the complete nonsecret handoff is in LEAD_RESUME.md.

@@ -46,7 +46,7 @@ provide another drastic native gain. It is also worth testing only as a
 full-cost external candidate, since preprocessing was previously unpaid in
 the CAS diagnostic. These are hypotheses `[pcc:unverified]`.
 
-## Leads not yet promoted to experiments
+## Further leads and development status
 
 1. Use a certified univariate quotient instead of general Buchberger on the
    structured four-solution family. Starting with a certified vertex quartic
@@ -56,8 +56,10 @@ the CAS diagnostic. These are hypotheses `[pcc:unverified]`.
    across the connected shared-point graph, checking every inversion and
    retaining a failure rather than dividing by a zero divisor. Generate the
    reduced grevlex basis by linear dependence in the small quotient algebra,
-   with ideal equality and every final S-pair checked. This could remove the
-   dominant solve/check work; no implementation or timing is claimed yet
+   with ideal equality and every final S-pair checked. The prototype is now
+   implemented, with exact development checks under quotient-development/.
+   Whether this removes substantial solve/check cost remains unmeasured;
+   expanded certificate work may offset the algebraic shortcut
    `[pcc:unverified]`.
 2. Keep original-input provenance as a DAG and verify shared subexpressions,
    instead of repeatedly expanding coefficient maps. Preserve exact checks

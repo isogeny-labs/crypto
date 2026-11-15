@@ -17,6 +17,13 @@ and a separately frozen [successor protocol](QPROJECTION_PROTOCOL.md).
 Development checks are under `quadratic-development/`. No successor timing
 has run: the required S3 checkpoint upload currently has no transport.
 
+The stronger [quotient-algebra prototype](QUOTIENT_PROTOCOL.md) is now
+implemented and passes exact development checks. It constructs coordinate
+maps and the complete basis without a reference-basis oracle. Its
+[future timing protocol](QUOTIENT_SPEED_PROTOCOL.md) uses the best existing
+native route as baseline. No quotient speed ratio has been measured; see
+`quotient-development/` for the checked scope and limits `[pcc:unverified]`.
+
 ## Run
 
 From this directory, with a current stable Rust toolchain:
