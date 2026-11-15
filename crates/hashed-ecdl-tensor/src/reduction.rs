@@ -162,7 +162,7 @@ fn derived_last_slot_network(
         .split_last()
         .ok_or_else(|| invalid("decomposition target or arity"))?;
     let mut encoder = Encoder::new();
-    let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
+    let mut sum: Option<PointWords> = None;
     for base in free {
         let point = encoder.input_point(curve, false, meter)?;
         encoder.hash_member(
@@ -175,8 +175,14 @@ fn derived_last_slot_network(
             meter,
         )?;
         encoder.mark_point_interface(&point, meter)?;
-        sum = encoder.point_add(curve, &sum, &point, meter)?;
+        // O + A_1 = A_1: the first free point starts the sum directly instead
+        // of passing through a whole addition network with a constant identity.
+        sum = Some(match sum {
+            None => point,
+            Some(sum) => encoder.point_add(curve, &sum, &point, meter)?,
+        });
     }
+    let sum = sum.ok_or_else(|| invalid("decomposition target or arity"))?;
     let width = curve.modulus().bits() as usize;
     let negated = PointWords {
         infinity: sum.infinity.clone(),
