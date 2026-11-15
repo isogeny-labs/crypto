@@ -78,7 +78,7 @@ def entry_id(body: dict) -> str:
 
 
 def now() -> str:
-    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return dt.datetime.now(dt.timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z")
 
 
 def parse_ts(s: str) -> dt.datetime:
@@ -151,13 +151,15 @@ def effective_interventions(entries: dict[str, dict], eid: str) -> list[dict]:
 
 
 def latest_checks(entries: dict[str, dict], eid: str) -> dict[str, bool]:
-    best: dict[str, tuple[str, str, bool]] = {}
+    # Latest by `created` wins. Two checks with the same timestamp resolve to
+    # the adverse value (true), so a tie can never manufacture a success.
+    best: dict[str, tuple[str, int, str]] = {}
     for cid, e in entries.items():
         if e.get("kind") == "check" and e.get("episode") == eid:
-            key = (e.get("created", ""), cid)
-            if e["check"] not in best or key > best[e["check"]][:2]:
-                best[e["check"]] = (*key, bool(e["value"]))
-    return {k: v[2] for k, v in best.items()}
+            key = (e.get("created", ""), int(bool(e["value"])), cid)
+            if e["check"] not in best or key > best[e["check"]]:
+                best[e["check"]] = key
+    return {k: bool(v[1]) for k, v in best.items()}
 
 
 def episode_state(eid: str, entries: dict[str, dict], at: dt.datetime | None = None) -> dict:

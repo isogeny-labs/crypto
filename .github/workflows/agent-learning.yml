@@ -28,6 +28,14 @@ jobs:
           fetch-depth: 0
       - name: Lessons tool tests
         run: python3 tools/test_lessons.py
+      - name: Autonomy tool tests and records
+        run: |
+          python3 tools/test_autonomy_report.py
+          if [ -n "${{ github.base_ref }}" ]; then
+            python3 tools/autonomy_report.py verify --base "origin/${{ github.base_ref }}"
+          else
+            python3 tools/autonomy_report.py verify
+          fi
       - name: Lessons ledger is append-only and evidenced
         env:
           BASE_REF: ${{ github.base_ref }}
