@@ -1,6 +1,6 @@
 # Current handoff — 2026-11-15
 
-Latest actual component: trace-quartic-20261115/README.md. Full15-stage proof/chart/control plan passed;3 new unique lemmas,47 queries,60 lifts,10 restricted source points. Preserve the first failed source/gate. Bare degree4 omits essential degree14 subfield membership; projected source base has degree5. Next full56-grid screen is proposed, not run. One ordinary pinned-project replay expected8 unique declarations follows the Lake target update. [pcc:unverified]
+Latest actual component: trace-quartic-20261115/README.md. Full15-stage proof/chart/control plan passed;3 new unique lemmas,47 queries,60 lifts,10 restricted source points. Preserve the first failed source/gate. Bare degree4 omits essential degree14 subfield membership; projected source base has degree5. Next full56-grid screen is proposed, not run. The ordinary pinned-project replay completed with8 unique declarations (5 prior+3 new),0 failing/0 trusted-native, LEAN_PATH unset. [pcc:unverified]
 
 The bounded proof run is complete. Official source gate:5 unique public theorems,0 failing/0 trusted-native axioms; final full8-stage plan exits0 with all5 false-statement controls rejected. Pinned Lake PROJECT replay also exits0. Raw outputs, failed sources and incomplete attempts remain local. These are scoped kernel/audit observations, not signed PCC standing, new IDC1s or a solver-degree result. [pcc:unverified]
 

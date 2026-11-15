@@ -8,6 +8,8 @@ Corrected checkpoint8ed91e4d: unmodified official scoped gate audits THREE new d
 
 Native C++ emits all47 original source queries, includingO. Independent Rust reconstructs all source points and enumerates117649 candidate chart points without using candidate roots. Complete sorted quartic root sets agree on every row:60 chart lifts over36 positive source queries;11 empty queries includeO. The restricted a∈F7 family has10 lifts over10 source points. Two native audit receipts agree exactly. Six changed header/query/root/subfield/missing-query payloads reject101 with no receipt. Full15-stage wrapper exits0. [pcc:unverified]
 
+The published two-library Lake context at ac37368e also passes the unmodified PROJECT gate with LEAN_PATH unset:8 unique audited declarations (5 prior chord+3 new quartic),0 failing/0 trusted-native. This is a reproducibility replay, not another set of8 new theorems. [pcc:unverified]
+
 ## Degree guard: bare quartic is not the full membership system
 
 Quartic degree4 alone admits36 source points; only10 belong to the intended prime-subfield-restricted factor base. Dropping the subfield condition would admit26 unwanted source points. The reconstructed real curve equation expands to degree6; the direct condition ((l²−s)/2)^7−((l²−s)/2)=0 has degree14 in l. Keeping a as a variable gives an unweighted degree7 condition but weight(a)=2 recovers degree14. Do not hide this by quoting4 or7 as an expanded bound. [pcc:unverified]
