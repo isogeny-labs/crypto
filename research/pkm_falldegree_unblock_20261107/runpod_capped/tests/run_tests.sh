@@ -43,7 +43,7 @@ study_ready() { fresh_ledger; freeze; }
 run() { ( cd "$R" && "$@" ) > "$OUTD/$ID.txt" 2>&1; echo $?; }
 calls() { if [ -f "$ST/calls.log" ]; then wc -l < "$ST/calls.log"; else echo 0; fi; }
 creates() { if [ -f "$ST/calls.log" ]; then grep -c -- '-X POST https://rest.runpod.io/v1/pods ' "$ST/calls.log" || true; else echo 0; fi; }
-outcome() { mkdir -p "$R/receipts/$1"; jq -n --arg c "$2" --argjson o "${3:-false}" '{class:$c, row:{oversize:$o, timed_out:false}}' > "$R/receipts/$1/outcome.json"; }
+outcome() { mkdir -p "$R/receipts/$1"; jq -n --arg c "$2" --argjson o "${3:-false}" --argjson m "${4:-false}" '{class:$c, row:{oversize:$o, timed_out:false}, memory:{as_m112:$m}}' > "$R/receipts/$1/outcome.json"; }
 ORIGPATH=$PATH
 
 # ===================================================================== A. refusals before any network call (deny mode)
@@ -164,8 +164,8 @@ sed -n '1,/^exec python3/p' "$WORK/boot.sh" | sed '$d' | sed "s#/sys/fs/cgroup#$
 rec B13 $? "memory.max, memory.events and final-at copied" "$(ls "$L/res/cgroup" 2>/dev/null | tr '\n' ' ')" "the boot loop copies cgroup v2 files and writes its final copy after runner_state.json"
 
 # ===================================================================== C. fetch.sh flows against the stub
-mktree() { # mktree DIR STAGE STARTED ENDED PILOT_EXIT GZ_EXIT OOM_KILL|none [START_LINES]
-  local d=$1 st=$2 s0=$3 en=$4 pe=$5 ge=$6 ok=$7 n=${8:-1} t k c
+mktree() { # mktree DIR STAGE STARTED ENDED PILOT_EXIT GZ_EXIT OOM_KILL|none [START_LINES] [CG_PEAK_BYTES|v1:BYTES|-] [LOG: keep|strip|MiB]
+  local d=$1 st=$2 s0=$3 en=$4 pe=$5 ge=$6 ok=$7 n=${8:-1} cgpk=${9:--} lg=${10:-keep} t k c
   IFS=: read -r _ t k c _ <<<"$st"; local cell="X-m2-t$t-k$k-c$c"
   rm -rf "$d"; cp -a "$T/fixtures/smoke_tree" "$d"
   sed -i "s/^argv: .*/argv: $st/" "$d/host.txt"
@@ -175,6 +175,9 @@ mktree() { # mktree DIR STAGE STARTED ENDED PILOT_EXIT GZ_EXIT OOM_KILL|none [ST
   jq -nc --arg s "$s0" --arg e "$en" --arg st "$st" --argjson x $rx '{state:"done",exit:$x,started:$s,ended:$e,stages:[$st]}' > "$d/runner_state.json"
   jq --arg st "$st" '.stages = [$st]' "$d/runner_request.json" > "$d/rr" && mv "$d/rr" "$d/runner_request.json"
   if [ "$ok" != none ]; then mkdir -p "$d/cgroup"; echo max > "$d/cgroup/memory.max"; printf 'low 0\nhigh 0\nmax 0\noom %s\noom_kill %s\n' "$ok" "$ok" > "$d/cgroup/memory.events"; echo "$en" > "$d/cgroup/final-at"; fi
+  case $cgpk in -) ;; v1:*) mkdir -p "$d/cgroup"; echo "${cgpk#v1:}" > "$d/cgroup/memory_memory.max_usage_in_bytes" ;; *) mkdir -p "$d/cgroup"; echo "$cgpk" > "$d/cgroup/memory.peak" ;; esac
+  case $lg in keep) ;; strip) sed -i -E 's/, memory [0-9]+ MB \(peak [0-9]+ MB\)//' "$d/runs/$cell.log" ;;
+    *) echo "tower step 99: degree 6, synthetic test line, memory 100 MB (peak $lg MB)" >> "$d/runs/$cell.log" ;; esac
 }
 status_done() { jq -nc --arg s "$1" --arg e "$2" --argjson x "$3" '{state:"done",exit:$x,started:$s,ended:$e,stages:["cap:8:0:5:12800000000"],progress:"",meminfo:[],nproc:48}' > "$ST/status.json"; }
 fetch() { ( cd "$R" && ./fetch.sh "$@" ) >> "$OUTD/$ID.txt" 2>&1; echo $?; }
@@ -293,12 +296,32 @@ nd D20; mktree "$DO" cap:8:0:5:12800000000 "$(iso $((S0E + 30)))" "$okE" 0 0 0; 
 nd D21; mktree "$DO" cap:8:0:5:12800000000 "$S0" "$okE" 0 0 0; ck "$DR" $((DLE + 100)) prefetch done "$S0" "$okE" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" done false $((DLE + 200)); dcase D21 "LOST P6" "completed in time but the transfer check failed past the deadline"
 nd D22; mktree "$DO" cap:8:0:5:12800000000 "$S0" "$okE" 0 0 0; ck "$DR" $((okEe + 100)) prefetch done "$S0" "$okE" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $((okEe + 200)); echo tampered >> "$DO/host.txt"; dcase D22 "NOT_ADMITTED P2e" "a file of the kept tree changed after collection (rule 6)"
 nd D23; mktree "$DO" cap:8:0:5:12800000000 "$S0" "$okE" 0 0 0; ck "$DR" $((okEe + 100)) prefetch done "$S0" "$okE" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $((okEe + 200)); jq '.machine.secureCloud = false' "$DR/pod-create.json" > "$DR/c" && mv "$DR/c" "$DR/pod-create.json"; dcase D23 "NOT_ADMITTED P2e" "create response not in the reserved tier (rule 7)"
+P2E=$(( okEe + 100 )); PCOL=$(( okEe + 200 ))
+mcase() { # mcase ID STAGE PILOT_EXIT OOM CG_PEAK LOG EXPECTED DESCRIPTION [EXPECTED_AS_M112] [EXPECTED_SOURCE]
+  nd "$1"; local rx=0; [ "$3" = 0 ] || rx=1
+  mktree "$DO" "$2" "$S0" "$okE" "$3" 0 "$4" 1 "$5" "$6"; jq --arg st "$2" '.stage = $st' "$DR/pod-state.json" > "$DR/x" && mv "$DR/x" "$DR/pod-state.json"
+  ck "$DR" $P2E prefetch done "$S0" "$okE" $rx 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $PCOL
+  local got; got=$( (cd "$RC" && ./fetch.sh --classify-dir "$DR" "$DO") 2> "$OUTD/$1.err" | tee "$OUTD/$1.txt" | jq -r '.class + " " + .rule + " as_m112=" + ((.memory.as_m112 // false) | tostring) + " source=" + (.memory.source // "none")')
+  local want="$7 as_m112=${9:-false} source=${10:-cgroup_v2_memory.peak}"; [ "$got" = "$want" ]; rec "$1" $? "$want" "$got" "$8"
+}
+G=1073741824; S56=cap:8:0:5:12800000000; S112=cap:8:0:5:27900000000
+mcase D25 $S56 0 0 $((30 * G)) keep "ADMITTED P2d" "memory: cgroup peak 30 GiB (below 56 GiB)"
+mcase D26 $S56 0 0 $((70 * G)) keep "ADMITTED P2m3" "memory: cgroup peak 70 GiB (between 56 and 112 GiB): the cell's -m112 row" true
+mcase D27 $S56 0 0 $((125 * G)) keep "OOM P2m1" "memory: cgroup peak 125 GiB (above 112 GiB): OOM at -m112" true
+mcase D28 $S56 0 0 - keep "ADMITTED P2d" "memory: no cgroup peak, pilot VmHWM field present (64 MiB)" false pilot_log_VmHWM_MiB
+mcase D28b $S56 0 0 - 70000 "ADMITTED P2m3" "memory: no cgroup peak, pilot VmHWM field 70,000 MiB (> 56 GiB)" true pilot_log_VmHWM_MiB
+mcase D29 $S56 0 0 - strip "NOT_ADMITTED P2u" "memory: neither a cgroup peak nor a pilot field" false none
+mcase D30 $S56 0 0 v1:$((60 * G)) keep "ADMITTED P2m3" "memory: cgroup v1 max_usage_in_bytes 60 GiB" true cgroup_v1_memory.max_usage_in_bytes
+mcase D31 $S112 0 0 $((113 * G)) keep "OOM P2p" "memory: an -m112 attempt with peak 113 GiB" false
+mcase D32 $S112 0 0 $((100 * G)) keep "ADMITTED P2d" "memory: an -m112 attempt with peak 100 GiB" false
+mcase D33 $S56 0 0 60129542144 keep "ADMITTED P2d" "memory: peak exactly 56 GiB (not above)" false
+mcase D34 $S56 137 0 $((70 * G)) keep "LOST P2m2" "memory: peak 70 GiB and exit 137 without oom: a lost -m112 attempt" true
 nd D24; ck "$DR" $((S0E + 4000)) regular running "$S0" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D24 "LOST P3" "pod no longer listed (deleted outside the route)"
 
 # ===================================================================== E. the registered order (next_allowed)
 ecase() { # ecase ID EXPECTED DESCRIPTION outcome-specs... (name:class[:oversize])
   local id=$1 want=$2 desc=$3; shift 3; mksb; local s n c o
-  for s in "$@"; do IFS=: read -r n c o <<<"$s"; if [ "$c" = INFLIGHT ]; then mkdir -p "$R/receipts/$n"; else outcome "$n" "$c" "${o:-false}"; fi; done
+  for s in "$@"; do IFS=: read -r n c o m <<<"$s"; if [ "$c" = INFLIGHT ]; then mkdir -p "$R/receipts/$n"; else outcome "$n" "$c" "${o:-false}" "${m:-false}"; fi; done
   local got; got=$(cd "$R" && bash -c '. ./common.sh; next_allowed' 2>&1); [ "$got" = "$want" ]; rec "$id" $? "$want" "$got" "$desc"
 }
 ecase E01 pkm-x-t14-k0-c6 "nothing run yet"
@@ -316,6 +339,11 @@ ecase E12 ALL_RESOLVED "t13 -r3 LOST: no relaunch" pkm-x-t14-k0-c6:ADMITTED pkm-
 ecase E13 pkm-x-t13-k0-c6-m112 "t13 -r3 OOM" pkm-x-t14-k0-c6:ADMITTED pkm-x-t14-k1-c6:ADMITTED pkm-x-t13-k0-c6-r3:OOM
 ecase E14 BLOCKED:pkm-x-t14-k0-c6 "base in flight" pkm-x-t14-k0-c6:INFLIGHT
 ecase E15 ALL_RESOLVED "t13 -m112 LOST: no relaunch for t13" pkm-x-t14-k0-c6:ADMITTED pkm-x-t14-k1-c6:ADMITTED pkm-x-t13-k0-c6-r3:OOM pkm-x-t13-k0-c6-m112:LOST
+ecase E16 pkm-x-t14-k1-c6 "base ADMITTED as the -m112 attempt (peak 56-112 GiB): cell resolved" pkm-x-t14-k0-c6:ADMITTED:false:true
+ecase E17 pkm-x-t14-k1-c6 "base OOM as the -m112 attempt (peak > 112 GiB): censored, no -m112 run" pkm-x-t14-k0-c6:OOM:false:true
+ecase E18 pkm-x-t14-k0-c6-m112-r1 "base LOST as the -m112 attempt: the -m112 relaunch follows" pkm-x-t14-k0-c6:LOST:false:true
+ecase E19 pkm-x-t14-k1-c6 "base LOST, -r1 LOST as the -m112 attempt: relaunch used" pkm-x-t14-k0-c6:LOST pkm-x-t14-k0-c6-r1:LOST:false:true
+ecase E20 ALL_RESOLVED "t13 -r3 LOST as the -m112 attempt: no relaunch" pkm-x-t14-k0-c6:ADMITTED pkm-x-t14-k1-c6:ADMITTED pkm-x-t13-k0-c6-r3:LOST:false:true
 
 # ===================================================================== F. reap.sh against the stub
 ID=F01; mksb; old=$(rpd $(( $(date +%s) - 27 * 3600 ))); young=$(rpd $(( $(date +%s) - 3600 )))
@@ -356,7 +384,7 @@ from the image layer (`RPC_BIN_SRC`, `RPC_LAYER_SRC`, defaults in the session sc
 
 Groups: A refusals before any API call; B launch paths against the stub; C `fetch.sh` flows against the stub; D the
 outcome classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets, one per class plus the conflicting cases
-of the review's M1; E the registered order (`next_allowed`); F `reap.sh`; G syntax and the client pin.
+of the review's M1, and the memory rule of amendment section 4.2 (D25-D34); E the registered order (`next_allowed`); F `reap.sh`; G syntax and the client pin.
 Per-case output: `out/<id>.txt`. Machine-readable table: `results.tsv`. Every result here is `[pcc:unverified]`.
 
 Run: `bash tests/run_tests.sh` from `runpod_capped/` (about one minute).

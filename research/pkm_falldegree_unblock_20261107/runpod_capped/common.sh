@@ -48,14 +48,15 @@ name_request() {
   if is_m112 "$1"; then echo "$here/requests_m112/pfd-x-$c-m112.json"; else echo "$study/requests_r2i/pfd-x-$c.json"; fi
 }
 # Amendment 14's -m112 request, derived from an r2i request: 112Gi, --max-dense 27900000000, job-name suffix -m112.
-# Every other field, provenance.protocol_sha256 included, is copied unchanged; the note is appended to.
+# Every other field, provenance.protocol_sha256 included, is copied unchanged; the note is appended to (the note stays
+# within the validator's 2048-character limit for provenance strings).
 m112_request() {
   local src=$1 rel; rel=${src#"$study/"}
   jq -e '.job.memory == "56Gi" and (.job.command[1] | test(":12800000000$"))' "$src" >/dev/null || return 1
   jq --arg rel "$rel" '.job.job_name |= sub("^(?<c>pfd-x-t[0-9]+-k[01]-c[0-9]+)"; "\(.c)-m112")
     | .job.memory = "112Gi"
     | .job.command[1] |= sub(":12800000000$"; ":27900000000")
-    | .provenance.note += " Amendment 14 -m112 re-run request (112Gi, --max-dense 27900000000, job-name suffix -m112), generated from \($rel) by research/pkm_falldegree_unblock_20261107/runpod_capped/make_requests_m112.sh for draft Amendment 18 (RunPod route); every other field is copied unchanged, including provenance.protocol_sha256."' "$src"
+    | .provenance.note += " Amendment 14 -m112 request (112Gi, --max-dense 27900000000, name suffix -m112), derived from \($rel) by runpod_capped/make_requests_m112.sh (draft Amendment 18); other fields unchanged."' "$src"
 }
 
 # Network setup. Called only by the modes that talk to RunPod (the offline classifier does not need it).
@@ -91,21 +92,27 @@ outcome_of() {
   if [ ! -d "$d" ]; then echo NONE; elif [ -f "$d/outcome.json" ]; then jq -r '.class' "$d/outcome.json"; else echo INFLIGHT; fi
 }
 lostlike() { [ "$1" = LOST ] || [ "$1" = ABORTED ]; }
+# as_m112 NAME: true when the classifier counted this 56Gi attempt as the cell's -m112 attempt (memory peak > 56 GiB).
+as_m112() { jq -e '.memory.as_m112 == true' "$REC_ROOT/$1/outcome.json" >/dev/null 2>&1; }
 needs_m112() { [ "$2" = OOM ] || { [ "$2" = ADMITTED ] && jq -e '.row.oversize == true' "$REC_ROOT/$1/outcome.json" >/dev/null 2>&1; }; }
 # cell_next CELL BASE RELAUNCH(0|1): the next name this cell needs, BLOCKED:<name>, or RESOLVED:<name>:<class>.
+# A 56Gi attempt with .memory.as_m112 true occupies the cell's -m112 slot: no -m112 run follows it, and if it is LOST or
+# ABORTED the -m112 relaunch (-m112-r1) follows when the cell's one relaunch is unused (Amendment 14's accounting).
 cell_next() {
   local c=$1 cur=$2 rl=$3 r1used=0 o
   o=$(outcome_of "$cur")
   case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
-  if lostlike "$o"; then
+  if lostlike "$o" && ! as_m112 "$cur"; then
     [ "$rl" = 1 ] || { echo "RESOLVED:$cur:$o"; return; }
     cur="pkm-x-$c-r1"; r1used=1; o=$(outcome_of "$cur")
     case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
-    lostlike "$o" && { echo "RESOLVED:$cur:$o"; return; }
+    lostlike "$o" && ! as_m112 "$cur" && { echo "RESOLVED:$cur:$o"; return; }
   fi
-  needs_m112 "$cur" "$o" || { echo "RESOLVED:$cur:$o"; return; }
-  cur="pkm-x-$c-m112"; o=$(outcome_of "$cur")
-  case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
+  if ! as_m112 "$cur"; then
+    needs_m112 "$cur" "$o" || { echo "RESOLVED:$cur:$o"; return; }
+    cur="pkm-x-$c-m112"; o=$(outcome_of "$cur")
+    case $o in NONE) echo "$cur"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$cur"; return ;; esac
+  fi
   if lostlike "$o"; then
     { [ "$rl" = 1 ] && [ "$r1used" = 0 ]; } || { echo "RESOLVED:$cur:$o"; return; }
     cur="pkm-x-$c-m112-r1"; o=$(outcome_of "$cur")

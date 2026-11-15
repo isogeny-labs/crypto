@@ -24,10 +24,21 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 #   P2 completion secured (collect reason done, two identical fetches, a pre-fetch check-in with the runner done under
 #      the recorded start, no loss evidence up to that check-in, the tree's runner_state agreeing, one start line):
 #      P2a ended after the run deadline           -> LIMIT
+#      P2m a 56Gi attempt whose memory peak exceeds 56 GiB: the 56Gi attempt counts as OOM (Amendment 14) and this
+#          run is classified as the cell's -m112 attempt (outcome .memory.as_m112 true):
+#          P2m1 peak > 112 GiB, or exit 137 with oom_kill > 0     -> OOM (at -m112: censored)
+#          P2m2 exit 137 without oom evidence                     -> LOST
+#          P2m3 admission rules 1-7 hold                          -> ADMITTED (the cell's -m112 row)
+#          P2m4 otherwise                                         -> NOT_ADMITTED
 #      P2b an end line exit 137 and oom_kill > 0  -> OOM   (Amendment 14's OOMKilled)
 #      P2c an end line exit 137, no oom evidence  -> LOST
+#      P2p an -m112 attempt whose peak exceeds 112 GiB -> OOM (censored)
+#      P2u no memory peak observable              -> NOT_ADMITTED
 #      P2d admission rules 1-7 hold               -> ADMITTED
 #      P2e otherwise                              -> NOT_ADMITTED
+#   The memory peak is the cgroup's (v2 memory.peak, else v1 memory.max_usage_in_bytes, bytes), else the pilot's own
+#   field: the largest "memory R MB (peak P MB)" value in runs/<cell>.log (VmHWM, MiB), the source RESULTS_T13_BRACKET.md
+#   §2b used for the t = 13 run's 20,618 MB.
 #   P3 loss evidence dated before the run deadline -> LOST
 #   P4 a check-in at or after the deadline shows the runner running (or done after the deadline) under the recorded start
 #                                                  -> LIMIT
@@ -66,6 +77,17 @@ facts() {
   [ -f "$O/cgroup/memory.max" ] && mmax=$(jq -Rn --rawfile f "$O/cgroup/memory.max" '$f | rtrimstr("\n")')
   [ "$mmax" = null ] && [ -f "$O/cgroup/memory_memory.limit_in_bytes" ] && mmax=$(jq -Rn --rawfile f "$O/cgroup/memory_memory.limit_in_bytes" '$f | rtrimstr("\n")')
   [ -f "$O/cgroup/memory.peak" ] && mpeak=$(jq -Rn --rawfile f "$O/cgroup/memory.peak" '$f | rtrimstr("\n")')
+  # The memory peak for the comparability rule (P2m, P2p, P2u): cgroup v2 memory.peak, else cgroup v1
+  # memory.max_usage_in_bytes (bytes), else the pilot's VmHWM field in its F4 log (MiB).
+  local cgb=null cgsrc=null logmib=null limit=null
+  for f in memory.peak:cgroup_v2_memory.peak memory_memory.max_usage_in_bytes:cgroup_v1_memory.max_usage_in_bytes; do
+    if [ "$cgb" = null ] && [ -f "$O/cgroup/${f%%:*}" ] && grep -qxE '[0-9]+' "$O/cgroup/${f%%:*}"; then cgb=$(cat "$O/cgroup/${f%%:*}"); cgsrc="\"${f#*:}\""; fi
+  done
+  if [ -n "$cell" ] && [ -f "$O/runs/$cell.log" ]; then
+    logmib=$(grep -oE 'memory [0-9]+ MB \(peak [0-9]+ MB\)' "$O/runs/$cell.log" | sed -E 's/.*peak ([0-9]+) MB\)/\1/' | sort -n | tail -1 || true)
+    [ -n "$logmib" ] || logmib=null
+  fi
+  case $stage in *:12800000000) limit='"56Gi"' ;; *:27900000000) limit='"112Gi"' ;; esac
   # Admission rules 1-7 (section 6).
   r1=false r2=false r3=false r4=false r5=false r6=false r7=false
   if [ -f "$O/binary.sha256" ] && cmp -s <(awk 'NR <= 4 { print $1 "  /usr/local/bin/" $2 }' "$study/image/binaries.sha256") "$O/binary.sha256"; then r1=true; fi
@@ -89,11 +111,12 @@ facts() {
   jq -n --arg stage "$stage" --arg cell "$cell" --arg s0 "$s0" --arg L0 "$L0" --argjson ck "$ck" --argjson col "$col" \
     --argjson rs "$rs" --argjson nstart "$nstart" --argjson pexit "$pexit" --argjson gexit "$gexit" --argjson oom "$oom" \
     --argjson cgp "$cgp" --argjson mmax "$mmax" --argjson mpeak "$mpeak" --argjson row "$row" --argjson dls $DEADLINE_S \
-    --argjson gap $UNREACH_GAP_S \
+    --argjson gap $UNREACH_GAP_S --argjson cgb "$cgb" --argjson cgsrc "$cgsrc" --argjson logmib "$logmib" --argjson size "$limit" \
     --argjson adm "{\"r1\":$r1,\"r2\":$r2,\"r3\":$r3,\"r4\":$r4,\"r5\":$r5,\"r6\":$r6,\"r7\":$r7}" \
     '{stage:$stage, cell:$cell, s0:(if $s0 == "" then null else $s0 end), L0:(if $L0 == "" then null else $L0 end),
       checkins:$ck, collect:$col, tree:{runner_state:$rs, start_lines:$nstart, pilot_exit:$pexit, gridzeros_exit:$gexit,
       cgroup_present:$cgp, oom_kill:$oom, memory_max:$mmax, memory_peak:$mpeak}, row:$row, admission:$adm,
+      mem:{size:$size, cgroup_peak_bytes:$cgb, cgroup_peak_source:$cgsrc, pilot_peak_mib:$logmib},
       deadline_s:$dls, unreach_gap_s:$gap}'
 }
 
@@ -131,13 +154,27 @@ decide() { jq -c '
        and $f.tree.runner_state != null and $f.tree.runner_state.state == "done" and $f.tree.runner_state.started == $s0
        and $f.tree.runner_state.exit == $pre.live.exit and $f.tree.start_lines == 1) as $secured
     | ($f.tree.pilot_exit == 137 or $f.tree.gridzeros_exit == 137) as $k137
+    | 60129542144 as $G56 | 120259084288 as $G112
+    | (if $f.mem.cgroup_peak_bytes != null then {peak_bytes:$f.mem.cgroup_peak_bytes, source:$f.mem.cgroup_peak_source}
+       elif $f.mem.pilot_peak_mib != null then {peak_bytes:($f.mem.pilot_peak_mib * 1048576), source:"pilot_log_VmHWM_MiB"}
+       else {peak_bytes:null, source:null} end) as $pk
+    | ($pk + {size:$f.mem.size, as_m112:false}) as $mem
+    | (($f.tree.oom_kill // 0) > 0) as $oomk
     | {deadline:($dl | todate), secured:$secured} as $base
     | if $secured then
-        if ($f.tree.runner_state.ended | ep) > $dl then $base + {class:"LIMIT", rule:"P2a", why:"the runner ended at \($f.tree.runner_state.ended), after the run deadline"}
-        elif $k137 and (($f.tree.oom_kill // 0) > 0) then $base + {class:"OOM", rule:"P2b", why:"exit 137 with cgroup oom_kill \($f.tree.oom_kill) (Amendment 14 OOMKilled)"}
+        if ($f.tree.runner_state.ended | ep) > $dl then $base + {class:"LIMIT", rule:"P2a", why:"the runner ended at \($f.tree.runner_state.ended), after the run deadline", memory:$mem}
+        elif $f.mem.size == "56Gi" and $pk.peak_bytes != null and $pk.peak_bytes > $G56 then
+          ($base + {memory:($mem + {as_m112:true}), why56:"the 56Gi attempt counts as OOM (Amendment 14): memory peak \($pk.peak_bytes) bytes (\($pk.source)) > 56 GiB"})
+          + (if $pk.peak_bytes > $G112 or ($k137 and $oomk) then {class:"OOM", rule:"P2m1", why:"classified as the cell'"'"'s -m112 attempt: OOM at -m112 (peak \($pk.peak_bytes) bytes, oom_kill \($f.tree.oom_kill // "absent")); censored"}
+             elif $k137 then {class:"LOST", rule:"P2m2", why:"classified as the cell'"'"'s -m112 attempt: exit 137 without oom evidence"}
+             elif ($f.admission | all(.[]; . == true)) then {class:"ADMITTED", rule:"P2m3", why:"classified as the cell'"'"'s -m112 attempt: peak within 112 GiB, admission rules 1-7 hold", row:$f.row}
+             else {class:"NOT_ADMITTED", rule:"P2m4", why:"classified as the cell'"'"'s -m112 attempt: admission rules failed: \([$f.admission | to_entries[] | select(.value != true) | .key] | join(","))"} end)
+        elif $k137 and $oomk then $base + {class:"OOM", rule:"P2b", why:"exit 137 with cgroup oom_kill \($f.tree.oom_kill) (Amendment 14 OOMKilled)"}
         elif $k137 then $base + {class:"LOST", rule:"P2c", why:"exit 137 without oom evidence (oom_kill \($f.tree.oom_kill // "absent"))"}
-        elif ($f.admission | all(.[]; . == true)) then $base + {class:"ADMITTED", rule:"P2d", why:"completed; admission rules 1-7 hold", row:$f.row}
-        else $base + {class:"NOT_ADMITTED", rule:"P2e", why:"completed, but admission rules failed: \([$f.admission | to_entries[] | select(.value != true) | .key] | join(","))"}
+        elif $f.mem.size == "112Gi" and $pk.peak_bytes != null and $pk.peak_bytes > $G112 then $base + {class:"OOM", rule:"P2p", why:"-m112 attempt with memory peak \($pk.peak_bytes) bytes (\($pk.source)) > 112 GiB; censored", memory:$mem}
+        elif $pk.peak_bytes == null then $base + {class:"NOT_ADMITTED", rule:"P2u", why:"no memory peak observable (no cgroup peak file, no pilot VmHWM field)", memory:$mem}
+        elif ($f.admission | all(.[]; . == true)) then $base + {class:"ADMITTED", rule:"P2d", why:"completed; admission rules 1-7 hold", row:$f.row, memory:$mem}
+        else $base + {class:"NOT_ADMITTED", rule:"P2e", why:"completed, but admission rules failed: \([$f.admission | to_entries[] | select(.value != true) | .key] | join(","))", memory:$mem}
         end
       elif ([ $ev[] | select((.at | ep) < $dl) ] | length) > 0 then
         $base + {class:"LOST", rule:"P3", why:([ $ev[] | select((.at | ep) < $dl) ] | first | "\(.why) at \(.at)")}
@@ -151,7 +188,7 @@ decide() { jq -c '
       else $base + {class:"PENDING", rule:"P7", why:"not collected yet"}
       end
     end
-  + {facts:{tree:$f.tree, admission:$f.admission, L0:$f.L0, s0:$f.s0, cell:$f.cell}}'; }
+  + {facts:{tree:$f.tree, admission:$f.admission, mem:$f.mem, L0:$f.L0, s0:$f.s0, cell:$f.cell}}'; }
 classify() { facts "$1" "$2" | decide; }
 
 if [ "${1:-}" = --classify-dir ]; then

@@ -39,11 +39,11 @@ names below can be launched (decision D2), each at most once, in this order: cel
 |:--|:--|:--|:--|
 | `pkm-x-t14-k0-c6` | first | `requests_r2i/pfd-x-t14-k0-c6.json` (frozen) | `cap:14:0:6:12800000000` |
 | `pkm-x-t14-k0-c6-r1` | the base is LOST or ABORTED | same | same |
-| `pkm-x-t14-k0-c6-m112` | the cell's 56Gi attempt is OOM, or ADMITTED with `oversize true` | `runpod_capped/requests_m112/pfd-x-t14-k0-c6-m112.json` | `cap:14:0:6:27900000000` |
-| `pkm-x-t14-k0-c6-m112-r1` | the `-m112` run is LOST or ABORTED and the cell's relaunch is unused | same | same |
+| `pkm-x-t14-k0-c6-m112` | the cell's 56Gi attempt is OOM, or ADMITTED with `oversize true`, and was not itself counted as the `-m112` attempt (section 4.2, memory rule) | `runpod_capped/requests_m112/pfd-x-t14-k0-c6-m112.json` | `cap:14:0:6:27900000000` |
+| `pkm-x-t14-k0-c6-m112-r1` | the `-m112` attempt (the `-m112` run, or a 56Gi run counted as the `-m112` attempt) is LOST or ABORTED and the cell's relaunch is unused | same | same |
 | `pkm-x-t14-k1-c6`, `-r1`, `-m112`, `-m112-r1` | after cell t14-k0 is resolved; same rules | `requests_r2i/pfd-x-t14-k1-c6.json`, `requests_m112/pfd-x-t14-k1-c6-m112.json` | `cap:14:1:6:…` |
 | `pkm-x-t13-k0-c6-r3` (the further attempt; decision 10) | after both t = 14 cells are resolved | `requests_r2i/pfd-x-t13-k0-c6.json` (frozen) | `cap:13:0:6:12800000000` |
-| `pkm-x-t13-k0-c6-m112` | the `-r3` run is OOM, or ADMITTED with `oversize true` | `requests_m112/pfd-x-t13-k0-c6-m112.json` | `cap:13:0:6:27900000000` |
+| `pkm-x-t13-k0-c6-m112` | the `-r3` run is OOM, or ADMITTED with `oversize true`, and was not itself counted as the `-m112` attempt | `requests_m112/pfd-x-t13-k0-c6-m112.json` | `cap:13:0:6:27900000000` |
 
 - Every stage is Kummer m = 2, P1, cap 6, `--budget 86400` (Amendment 7 B), `RAYON_NUM_THREADS = 12` (Amendment 9).
   The 56Gi stages use `--max-dense 12800000000` and the `-m112` stages `--max-dense 27900000000` (Amendment 14).
@@ -51,7 +51,10 @@ names below can be launched (decision D2), each at most once, in this order: cel
   as Amendment 14 says: memory 112Gi, `--max-dense 27900000000`, job-name suffix `-m112`, a sentence appended to the
   provenance note; every other field is copied, including `provenance.protocol_sha256`. Its output
   (`make_requests_m112_output.txt`) lists exactly those four changed paths for each file. `run.sh` re-derives the
-  request and refuses if the file differs. The t = 13 draw 0 cell is covered because Amendment 14 says a further
+  request and refuses if the file differs. The three requests pass the repository's request validator, the one the
+  `requests_r2i` requests passed (`validate_command_request.sh`; output in `requests_m112_validate_output.txt`). A first
+  run failed them because the appended note made `provenance.note` 2,088 characters, over the validator's limit of
+  2,048; the sentence was shortened and the requests regenerated. The t = 13 draw 0 cell is covered because Amendment 14 says a further
   attempt of it "runs under it".
 - **A cell's row is its earliest admissible attempt.** With the order above, a cell has at most one admissible attempt
   per size, and an `-m112` row replaces the 56Gi attempt only as Amendment 14 says.
@@ -127,7 +130,8 @@ names below can be launched (decision D2), each at most once, in this order: cel
      row.
    - On RunPod `nproc` reads the pod's affinity (16), while `MemTotal` reads the host's memory (263,400,384 kB on the
      smoke pod). The API's `memoryInGb` is RunPod's figure for the pod, not a measurement. The memory limit a run had
-     is recorded from the cgroup copy (`memory.max`, or the v1 limit), with `memory.peak` where present.
+     is recorded from the cgroup copy (`memory.max`, or the v1 limit). The memory peak used by the memory rule of
+     section 4.2 is the cgroup's (`memory.peak`, or v1 `memory.max_usage_in_bytes`), else the pilot's own field.
 
 ## 3. Route files
 
@@ -164,6 +168,14 @@ and `requests_m112/`, `ledger.tsv`, `tests/` (offline tests). `SMOKE.md` records
   writes `collect.json` and `outcome.json` once, waits for the raw upload when the run completed, and deletes. It
   refuses (exit 9) when `cost.json` exists, and never removes an existing results tree. A delete that could not be
   confirmed is resumed by the next call (exit 7 until then). Exit codes are listed in the script.
+- **Manual recovery if `fetch.sh` stops mid-collection.** If `fetch.sh` dies after keeping the tree in
+  `results/<name>/` but before writing `collect.json`, later calls refuse (exit 9: the tree exists), and `reap.sh`
+  deletes the pod directly once it is due. The session then: (1) changes no receipt; (2) moves the orphan tree to
+  `results/<name>.orphan-<UTC time>/`, where it is kept but never used as a row; (3) writes one line in `run.log`
+  saying so; (4) runs `fetch.sh <name>` again. If the pod is still there, `fetch.sh` takes a new check-in and two new
+  fetches and classifies as usual; if it is gone, the classifier sees the loss in the receipts (P3, or P4/P6 at the
+  deadline). Either way the class comes only from the receipts and the newly kept tree; the orphan tree enters no
+  rule. A completed run's tree is the same in both fetches, so the move cannot change a class.
 - **Tokens and keys (S4).** The API key is in a mode-0600 header file in `RPC_STATE`, removed on exit; it is never in
   argv or receipts. The pod token is written to a 0600 file and passed to the create call inside a 0600 body file, so
   it is not in this side's argv for create. Two exposures remain, both accepted: (1) `rp_pinned.sh` (unchanged, pinned)
@@ -196,8 +208,14 @@ Precedence, first match wins:
 |:--|:--|:--|
 | P1 | no receipt shows a runner start | NOT_AN_ATTEMPT |
 | P2a | completion secured, runner ended after the run deadline | LIMIT |
+| P2m1 | completion secured, a 56Gi attempt with memory peak > 56 GiB (counted as the `-m112` attempt), and peak > 112 GiB or exit 137 with `oom_kill` > 0 | OOM (at `-m112`) |
+| P2m2 | as P2m1's first part, exit 137 without oom evidence | LOST (the `-m112` attempt) |
+| P2m3 | as P2m1's first part, admission rules 1-7 hold | ADMITTED (the cell's `-m112` row) |
+| P2m4 | as P2m1's first part, otherwise | NOT_ADMITTED |
 | P2b | completion secured, an `end` line of the cell has exit 137, cgroup `oom_kill` > 0 | OOM |
 | P2c | completion secured, an `end` line has exit 137, `oom_kill` 0 or no cgroup file | LOST |
+| P2p | completion secured, an `-m112` attempt whose memory peak exceeds 112 GiB | OOM |
+| P2u | completion secured, no memory peak observable | NOT_ADMITTED |
 | P2d | completion secured, admission rules 1-7 hold (section 6) | ADMITTED |
 | P2e | completion secured, otherwise | NOT_ADMITTED |
 | P3 | loss evidence dated before the run deadline | LOST |
@@ -233,6 +251,26 @@ What this settles, case by case (each is an offline test, `tests/README.md`):
   once at the `-m112` size under the `-m112` name; that run's row is the cell's row and it uses no relaunch. An `-m112`
   run that is OOM, or ADMITTED with `oversize true`, is censored (Amendment 7 B). Exit 137 is classified by the cgroup
   evidence, never by the exit code alone: `oom_kill` > 0 is OOM; `oom_kill` 0, or no cgroup file, is LOST.
+- **Memory rule (main session decision of 2026-11-15, fixed before any data).** Every run here has a 128 GB pod, so a
+  56Gi run could finish here with more memory than its registered request; on EKS it would have been `OOMKilled`.
+  - The run's memory peak is the cgroup's: v2 `memory.peak`, else v1 `memory.max_usage_in_bytes` (bytes). If neither
+    file exists, it is the pilot's own field: the largest `memory R MB (peak P MB)` value in `runs/<cell>.log`, which
+    is the process's `VmHWM` in MiB (`examples/pkm_tower_pilot.rs`, `memory_mb`, at `f13a690df0`). That is the source
+    of the 20,618 MB peak of the t = 13 draw 1 cap 6 run (`RESULTS_T13_BRACKET.md` §2b; the largest such value in that
+    log is 20,618). The pilot samples it when each F4 step ends.
+  - A 56Gi attempt whose peak exceeds 56 GiB (60,129,542,144 bytes) counts as `OOMKilled` under Amendment 14, and the
+    run itself is classified as the cell's `-m112` attempt (`outcome.json` `memory.as_m112` true). It is ADMITTED, as
+    the cell's `-m112` row, when the peak is at most 112 GiB (120,259,084,288 bytes) and every other rule holds; it is
+    OOM at `-m112` (censored) above 112 GiB or with exit 137 and `oom_kill` > 0; LOST with exit 137 and no oom evidence.
+    It takes the `-m112` slot and Amendment 14's relaunch accounting: no `-m112` run follows it; if it is LOST or
+    ABORTED, `-m112-r1` follows when the cell's relaunch is unused. It keeps its own stage (`--max-dense 12800000000`);
+    if its row has `oversize true`, it is censored as an `-m112` run stopped on its limit.
+  - An `-m112` attempt whose peak exceeds 112 GiB is OOM (P2p), by the same reading at the larger size.
+  - If no peak is observable (no cgroup peak file and no pilot field), the run is NOT_ADMITTED (P2u) and goes to the
+    owner.
+  - The cgroup peak counts the whole container (the runner, the file cache of written files) and the pilot field only
+    the pilot process up to its last step line, so the two sources can differ; the source used is recorded in
+    `outcome.json` (`memory.source`).
 - **LOST** is the analogue of a Spot loss: nothing from the run is admitted or analysed, even if a partial tree was
   fetched. Each loss is recorded with its reason in `RUNPOD_LOSSES.md`, as in `SPOT_LOSSES.md`.
 - **ABORTED** counts as an attempt and is charged exactly like LOST for relaunch accounting, so an abort cannot buy a
@@ -269,8 +307,8 @@ on a reserved pod is the main session's reading of decision 3, for the owner to 
 
 ## 6. Admission and receipts
 
-A run is ADMITTED only through P2d, that is when its completion is secured and all of these hold (the first four are
-the EKS verify-card pairs):
+A run is ADMITTED only through P2d or P2m3, that is when its completion is secured, a memory peak is observable and
+within the limit of section 4.2, and all of these hold (the first four are the EKS verify-card pairs):
 
 1. `binary.sha256` has the four lines of `image/binaries.sha256` at `/usr/local/bin/…`.
 2. `host.txt` has `argv: <stage>` and `rayon: 12`.
@@ -310,9 +348,8 @@ checkpoint before launch, the director's launch and verify cards, and their rece
   thread count (Amendment 9); the thread count here is 12.
 - **Memory request versus pod memory.** Every run here has a 128 GB pod, whereas the registered request of the 56Gi
   runs is 56Gi. `--max-dense` stops a run at the same point as on EKS. A 56Gi run whose peak lies between 56 GiB and
-  the pod's limit completes here where EKS would have killed it (`OOMKilled`). The recorded `memory.peak` (where the
-  pod has it) shows whether that happened; such a row is reported with that fact. This amendment adds no rule for it
-  (section 9, point 4).
+  the pod's limit would complete here where EKS would have killed it; the memory rule of section 4.2 classifies such a
+  run as the cell's `-m112` attempt.
 
 ## 8. Unchanged
 
@@ -327,10 +364,11 @@ checkpoint before launch, the director's launch and verify cards, and their rece
 ## 9. Points for the reviewer before freezing
 
 1. The relaunch reading of section 4.3 needs the owner's confirmation.
-2. NOT_ADMITTED is a class added for completed runs that fail an admission rule (section 4.1).
+2. NOT_ADMITTED is a class added for completed runs that fail an admission rule (section 4.1); accepted by the main
+   session on 2026-11-15.
 3. The ceiling relies on the session or the scheduled `reap.sh` (section 2.6).
-4. A 56Gi run can complete here with a peak above 56 GiB where EKS would have killed it (section 7). Options: report
-   only (as written), or count a recorded `memory.peak` above 56 GiB as Amendment 14's `OOMKilled`.
+4. The memory rule (section 4.2) was decided by the main session on 2026-11-15. Applying the 112 GiB limit to an
+   `-m112` run (P2p) is this revision's reading of that decision, for the reviewer to check.
 5. Checks that need a pod (one more development smoke, `pkm-x-dev-*`, t ≤ 10):
    - the new start command (`bash -c`, cgroup copy loop, then the runner) boots and the runner answers;
    - which cgroup files a RunPod CPU pod has, and what `memory.max` reads;
@@ -346,9 +384,9 @@ Recorded again at the freeze, after the development smoke (any edit made after i
 
 | file | SHA-256 |
 |:--|:--|
-| `common.sh` | `b1ede220b2cb71b74193d2a9c00b585a46997a21c17c402b6e3a38b34a376a0a` |
+| `common.sh` | `d36c08529db4dd0cdc539e3fa374ed789088a44507067bef29350495425a80d6` |
 | `run.sh` | `294c017735c5d6815c582ffe2e2f66f261dfb039c2192d00b57e840a1d0983ed` |
-| `fetch.sh` | `8f09c51c71310cdb3147ea37fbdf547d5fea283fc03dfd75dcea93da482eb29d` |
+| `fetch.sh` | `9bcbb41a24e851b3b93fe03ba37e37f78fe9c907dff7c56bd761d8a3883e50d1` |
 | `reap.sh` | `165d6ccc5ed67bece87c8cd7a5665fe609267f042144fb0c977d1ea4485eb202` |
 | `make_requests_m112.sh` | `1459e3d3ee821133e936cc40671946b94b6304413325d4d247e29c234e16d58b` |
 | `rp_pinned.sh` | `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d` (= main's `runpod/rp.sh` at `d2a16c723d`) |
