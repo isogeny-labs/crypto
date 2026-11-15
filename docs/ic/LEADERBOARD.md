@@ -268,6 +268,34 @@ validated with caveats: replay certificate, validator report and the matched rho
 | Random binary | `icv1-f2m24-tm3047-2d0c0e8c` | 21.0 | folded, walked, base at the family optimum, m = 2 | 134 | 67 | 2^15.27 GAE | 2^10.74 GAE | 27.2 | 1.18 | **23×** | 0.886 | 30.7× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial) |
 | Random binary | `icv1-f2m27-t12543-569dca8b` | 24.4 | folded, walked, base at the family optimum, m = 2 | 254 | 127 | 2^17.41 GAE | 2^12.16 GAE | 36.9 | 0.966 | **38.2×** | 0.886 | 41.7× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial) |
 
+## Table B prime rows re-measured with the k = 5 sum table (2026-11-15, counted component improvement, outside tables A-C)
+
+Three Table B prime rows re-measured with the k = 5 sum table (ksum5) against the strictest in-session incumbent, matched negation-map rho (rho-neg) and BSGS (bsgs-neg), same ecbench session and binary. Unit: ecbench counted GAE per sqrt(r), native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a). Table B's recorded before-mark is another harness's figure: it is shown for reference and never divided into the new S. S, ratios and the distance remaining to rho (ksum5 S / rho-neg S) are in the new unit only; the distance remaining is not a pass/fail gate. It is read under the section 5a band: the independent validator found it depends on how uncharged native work is priced (bitop/v1: 5.6-5.8x; all work_native priced at w: 3.0-3.2x at w = 0.1 and 1.4x at w = 1); rho stays ahead in every reading.
+
+| curve | role | w | Table B before-mark (another harness) | strictest incumbent: S | S, ksum5 | ksum5 / incumbent [95%] | per-replicate ratios | S, rho-neg | distance remaining: ksum5 / rho-neg | ksum5 / bsgs-neg |
+|:--|:--|:--|:--|:--|--:|:--|:--|--:|--:|--:|
+| `icv1-fp20-t1293-3c2999ba` | primary | 0 | S_IC 10.723, S_rho 1.292 | inc-tb: 10.295 | 7.111 | **0.6908** [0.6768, 0.7050] | 0.6835 / 0.7015 / 0.6876 | 1.269 | 5.603 | 6.727 |
+| `icv1-fp20-t1293-3c2999ba` | primary | 0.1 | S_IC 10.723, S_rho 1.292 | inc-sel: 11.769 | 7.859 | **0.6678** [0.6564, 0.6794] | 0.6717 / 0.6623 / 0.6693 | 1.380 | 5.696 | 6.764 |
+| `icv1-fp20-t1293-3c2999ba` | primary | 1 | S_IC 10.723, S_rho 1.292 | inc-sel: 24.486 | 14.588 | **0.5958** [0.5836, 0.6081] | 0.6006 / 0.5892 / 0.5974 | 2.375 | 6.143 | 6.928 |
+| `icv1-fp22-tm1267-a5acaf6d` | secondary | 0 | S_IC 12.770, S_rho 1.216 | inc-tb: 11.147 | 6.649 | **0.5965** [0.5825, 0.6108] | 0.5951 / 0.5831 / 0.6120 | 1.172 | 5.674 | 6.745 |
+| `icv1-fp22-tm1267-a5acaf6d` | secondary | 0.1 | S_IC 12.770, S_rho 1.216 | inc-tb: 12.892 | 7.391 | **0.5733** [0.5593, 0.5876] | 0.5719 / 0.5601 / 0.5886 | 1.280 | 5.776 | 6.820 |
+| `icv1-fp22-tm1267-a5acaf6d` | secondary | 1 | S_IC 12.770, S_rho 1.216 | inc-hi: 28.040 | 14.065 | **0.5016** [0.4914, 0.5121] | 0.4917 / 0.5005 / 0.5130 | 2.249 | 6.254 | 7.160 |
+| `icv1-fp24-t1577-77336155` | primary | 0 | S_IC 13.966, S_rho 1.038 | inc-w0: 12.738 | 6.383 | **0.5011** [0.4909, 0.5114] | 0.5072 / 0.5009 / 0.4951 | 1.087 | 5.871 | 6.100 |
+| `icv1-fp24-t1577-77336155` | primary | 0.1 | S_IC 13.966, S_rho 1.038 | inc-w0: 14.781 | 7.158 | **0.4843** [0.4740, 0.4947] | 0.4905 / 0.4842 / 0.4780 | 1.185 | 6.042 | 6.222 |
+| `icv1-fp24-t1577-77336155` | primary | 1 | S_IC 13.966, S_rho 1.038 | inc-w0: 33.164 | 14.132 | **0.4261** [0.4156, 0.4368] | 0.4327 / 0.4265 / 0.4191 | 2.063 | 6.851 | 6.768 |
+
+Registered rule L1 (PROTOCOL.md): L1 holds on a row if the upper end of the 95% interval of R_w = cost(ksum5) / cost(strictest incumbent) is below 1 at all three weights, pooled and in each replicate session alone, and the improvement exceeds the replicate noise delta (1 - max_w R_w(upper) > delta - 1); L1 is falsified if on both primary rows the pooled upper bound is at or above 1 at any weight. Result: l1_holds_on_a_primary_row = true, l1_falsified = false; replicate noise delta per row: icv1-fp20-t1293-3c2999ba (primary) 1.0392; icv1-fp22-tm1267-a5acaf6d (secondary) 1.0521; icv1-fp24-t1577-77336155 (primary) 1.0623.
+
+- Unit: ecbench counted GAE per sqrt(r), native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a).
+- Isolation: L0 (counted cost; wall time not claimed); wall time is not claimed.
+- Track: generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS); it cannot beat rho or BSGS.
+- Binary sha256 `7d46e5ee0778a741193c4af08274fa4861406182e479b06770f5dd8303c5c9cb`, commit `7b3c057e1cef83ccf5712950473ef91e10153499`, registered at 2026-11-15T03:46:33Z.
+- 9 sessions, 48 targets per curve, 3 rounds, 3 replicates; replay: 13824 records, 10368 replays (second host class (Intel Xeon 2.10 GHz container); recorded on a RunPod pod (AMD EPYC)).
+
+[Report](../../research/ic_tableb_ksum_20261115/report.pdf) · [protocol](../../research/ic_tableb_ksum_20261115/PROTOCOL.md) · [data](../../research/ic_tableb_ksum_20261115/summary.json).
+
+validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-tableb-ksum/VALIDATION.json)
+
 ## Table C: Koblitz, 32-target batch (§19–§22)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r, per target.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit (§20, §22 isolated re-run).
@@ -1117,6 +1145,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
 - `research/jv_sieve_line_vs_rho_20261103/fit.json` — sha256 `0a83239fe76f0502…`
 - `research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json` — sha256 `06b648eb1b7beacb…`
+- `research/ic_tableb_ksum_20261115/summary.json` — sha256 `12e525b585794584…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`
