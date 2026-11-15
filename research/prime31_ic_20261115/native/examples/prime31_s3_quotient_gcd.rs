@@ -164,6 +164,78 @@ fn m4_first_eliminant(k: &[u64], t: u64) -> Result<(Pol,bool),String> {
     Ok((d,exceptional))
 }
 
+// A division-free factorized S4 resultant. Reuses the same coordinate-only
+// pair support K and S3 coefficients; no group operation/ordinate is an input.
+//
+// Res_V(S3(U,V,t), product_ij S3(xi,xj,V)) is multiplicative. Since both
+// quadratics have degree <= 2 in V, each individual Sylvester determinant
+// is a polynomial of degree <= 4 in U. Multiplying those short polynomials
+// modulo K(U) avoids Horner evaluation of a degree-B^2 K(V) in a quadratic
+// quotient over Fp[U]/K(U). At U=t, leading (U-t)^2 vanishes, so split this
+// branch before evaluating the regular quotient and replay it separately.
+// For diagonal i=j, the padded quadratic resultant includes a factor
+// (U-t)^2; this is a unit in the regular quotient and hence harmless.
+fn m4_first_eliminant_factorized(
+    xs: &[u64], k: &[u64], t: u64,
+) -> Result<(Pol, bool, usize, usize), String> {
+    if k.is_empty() || *k.last().unwrap() != 1 {
+        return Err("factorized S4 expects monic pair support".into());
+    }
+    let exceptional = eval(k, t) == 0;
+    let regular = if exceptional {
+        let (q, r) = divrem(k, &[sub(0, t), 1]);
+        if !r.is_empty() {
+            return Err("factorized S4 exceptional division failed".into());
+        }
+        q
+    } else {
+        k.to_vec()
+    };
+    let (a, b, c) = s3_y(&[0, 1], t);
+    let mut product = vec![1];
+    let mut factors = 0usize;
+    let mut max_factor_degree = 0usize;
+    if regular.len() > 1 {
+        for (i, &xi) in xs.iter().enumerate() {
+            for &xj in &xs[i..] {
+                let g = s3_scalar(xi, xj);
+                if g.len() < 2 || g.len() > 3 {
+                    return Err("invalid degree of S3 pair factor".into());
+                }
+                let (d0, d1, d2) = (g[0], g[1], *g.get(2).unwrap_or(&0));
+                // Res of a V^2 + b V + c and d2 V^2 + d1 V + d0:
+                // (a*d0-c*d2)^2 - (a*d1-b*d2)*(b*d0-c*d1).
+                let ad0_cd2 = diff(&scale(&a, d0), &scale(&c, d2));
+                let ad1_bd2 = diff(&scale(&a, d1), &scale(&b, d2));
+                let bd0_cd1 = diff(&scale(&b, d0), &scale(&c, d1));
+                let resultant = diff(
+                    &prod(&ad0_cd2, &ad0_cd2),
+                    &prod(&ad1_bd2, &bd0_cd1),
+                );
+                let degree = resultant.len().saturating_sub(1);
+                if degree > 4 {
+                    return Err("unexpected S4 quartic degree".into());
+                }
+                max_factor_degree = max_factor_degree.max(degree);
+                product = mprod(&product, &resultant, &regular);
+                factors += 1;
+            }
+        }
+    }
+    let mut d = if regular.len() > 1 {
+        gcd(regular, product)
+    } else {
+        vec![1]
+    };
+    if exceptional {
+        let common = gcd(k.to_vec(), s3_scalar(t, t));
+        if common.len() > 1 {
+            d = prod(&d, &[sub(0, t), 1]);
+        }
+    }
+    Ok((d, exceptional, factors, max_factor_degree))
+}
+
 // Deterministic, capped Cantor-Zassenhaus style splitting for known
 // squarefree, completely Fp-split gcd factors. A cap is an explicit failure,
 // not a zero-relation result. Input factors come from the coordinate algebra.
@@ -335,6 +407,94 @@ fn m4_scale(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
         "end_to_end_ECDLP_recovery":false,
         "matched_rho_reference_run":false,
         "rows":panel
+    }));
+    Ok(())
+}
+
+// Paired Rust-only A/B on the SAME K(U) and SAME public target, with
+// algebraic discovery separated from any signed EC witness verification.
+// B31 original Horner is omitted because it scales prohibitively.
+fn m4_factorized_scale(base: &Base, ar: &mut Arithmetic) -> Result<(), String> {
+    use std::time::Instant;
+    let l = ar.add(PRIME31, Some(base.points[0]), Some(base.points[1]));
+    let r = ar.add(PRIME31, Some(base.points[2]), Some(base.points[3]));
+    let positive = ar.add(PRIME31, l, r)
+        .ok_or("factorized positive fixture is identity")?;
+    let exceptional = l.ok_or("factorized exceptional fixture is identity")?;
+    let public = ar.scalar(PRIME31, 17, Some(PRIME31.g))
+        .ok_or("public fixture is identity")?;
+    let mut records = Vec::new();
+    for size in [4usize, 8, 16, 31] {
+        let xs: Vec<u64> = base.points[..size].iter().map(|q| q.0).collect();
+        let begin = Instant::now();
+        let k = m4_pair_support(&xs)?;
+        let support_build_ns = begin.elapsed().as_nanos();
+        if k.len() != size * size + 1 {
+            return Err(format!("factorized K degree changed at B={size}"));
+        }
+        for (kind, target) in [
+            ("planted-four", positive),
+            ("public-17G", public),
+            ("exceptional-two", exceptional),
+        ] {
+            let started = Instant::now();
+            let (fast, exc, factors, maximum_degree) =
+                m4_first_eliminant_factorized(&xs, &k, target.0)?;
+            let factorized_ns = started.elapsed().as_nanos();
+            let reference_ns = if size <= 16 {
+                let started = Instant::now();
+                let (old, old_exc) = m4_first_eliminant(&k, target.0)?;
+                let elapsed = started.elapsed().as_nanos();
+                if fast != old || exc != old_exc {
+                    return Err(format!("factorized/reference mismatch at B={size} kind={kind} (fast_degree={} old_degree={})",
+                        fast.len().saturating_sub(1), old.len().saturating_sub(1)));
+                }
+                Some(elapsed)
+            } else {
+                None
+            };
+            if maximum_degree > 4 {
+                return Err("factorized S4 quartic bound broken".into());
+            }
+            if size == 31 && factors != size * (size + 1) / 2 {
+                return Err("factorized B31 factor count changed".into());
+            }
+            // Only inspect full signed lifts on the smallest case, where
+            // root splitting is already bounded and independently tested.
+            let verified_signed_rows = if size == 4 {
+                let (_, tuples) = m4_extract_from_eliminant(&xs, &k, target.0, &fast)?;
+                let rows = m4_signed_lifts(base, Some(target), &tuples, ar);
+                if kind == "planted-four" && rows.is_empty() {
+                    return Err("factorized S4 lost planted four-term relation".into());
+                }
+                Some(rows.len())
+            } else {
+                None
+            };
+            records.push(json!({
+                "B":size, "target_kind":kind, "target_x":target.0,
+                "pair_support_degree":k.len()-1, "pair_support_precompute_ns":support_build_ns,
+                "short_resultant_factors":factors,
+                "max_short_resultant_degree":maximum_degree,
+                "factorized_target_dependent_ns":factorized_ns,
+                "reference_target_dependent_ns":reference_ns,
+                "same_monic_eliminant_as_reference":reference_ns.is_some(),
+                "exceptional_u_equals_target_x":exc,
+                "gcd_degree":fast.len().saturating_sub(1),
+                "post_extraction_signed_rows_b4_only":verified_signed_rows,
+                "measured_cold_ECDLP":false
+            }));
+        }
+    }
+    println!("{}",json!({
+        "standing":"[pcc:unverified]",
+        "method":"multiplicative short-quartic S4 resultants modulo algebraic pair support",
+        "curve_p":PRIME31.p,"curve_order":PRIME31.n,
+        "no_group_sums_or_ordinates_in_discovery":true,
+        "no_generic_table_used_by_algebraic_oracle":true,
+        "reference_B31_excluded_from_censored_comparison":true,
+        "same_Rust_process_matched_inputs":true,
+        "full_ECDLP_solution":false,"rows":records
     }));
     Ok(())
 }
@@ -544,6 +704,9 @@ fn main() -> Result<(),String> {
     if std::env::args().any(|arg| arg == "--m4-scale") {
         m4_scale(&base,&mut ar)?;
     }
+    if std::env::args().any(|arg| arg == "--m4-factorized") {
+        m4_factorized_scale(&base, &mut ar)?;
+    }
     if std::env::args().any(|arg| arg == "--compare") {
         // Diagnostic A/B only: same Rust host/inputs, fixed base constructed
         // before timings. A bounded F4 "undetermined" is not a timed loss.
@@ -662,6 +825,40 @@ mod tests {
         let (d,exc)=m4_first_eliminant(&k,public.0).unwrap();
         assert!(!exc);
         assert_eq!(d.len()-1,0);
+    }
+
+    #[test]
+    fn factorized_s4_matches_quotient_horner_and_exceptional_branch() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).unwrap();
+        let base = Base::build(PRIME31, 6, &mut ar).unwrap();
+        let left = ar.add(PRIME31, Some(base.points[0]), Some(base.points[1]));
+        let right = ar.add(PRIME31, Some(base.points[2]), Some(base.points[3]));
+        let positive = ar.add(PRIME31, left, right).unwrap();
+        let public = ar.scalar(PRIME31, 17, Some(PRIME31.g)).unwrap();
+        let exception = left.unwrap();
+        for size in [4usize, 8, 16] {
+            let xs: Vec<u64> = base.points[..size].iter().map(|pt| pt.0).collect();
+            let k = m4_pair_support(&xs).unwrap();
+            for (kind, target) in [
+                ("planted", positive),
+                ("public", public),
+                ("exceptional", exception),
+            ] {
+                let (fast, exc, count, maximum_degree) =
+                    m4_first_eliminant_factorized(&xs, &k, target.0).unwrap();
+                let (old, reference_exceptional) = m4_first_eliminant(&k, target.0).unwrap();
+                assert_eq!(exc, reference_exceptional, "exception kind={kind} B={size}");
+                assert_eq!(fast, old, "exact monic eliminant kind={kind} B={size}");
+                assert_eq!(count, size * (size + 1) / 2);
+                assert!(maximum_degree <= 4);
+                if kind == "planted" && size == 4 {
+                    let (_, tuples) = m4_extract_from_eliminant(&xs, &k, target.0, &fast).unwrap();
+                    let rows = m4_signed_lifts(&base, Some(target), &tuples, &mut ar);
+                    assert!(!rows.is_empty());
+                }
+            }
+        }
     }
 
     #[test]
