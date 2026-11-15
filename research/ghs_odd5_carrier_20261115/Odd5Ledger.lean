@@ -17,8 +17,14 @@ theorem all_eight_orders_two_mod_four :
 
 theorem example_trace_ten : (244 : Nat) - 234 = 10 := by decide
 
+theorem cubic_finite_candidate_count : (84 : Nat) * 5 * 243 = 102060 := by decide
+
+theorem cubic_geometric_pole_pair_count : (84 : Nat) * 55 = 4620 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
 #print axioms example_trace_ten
+#print axioms cubic_finite_candidate_count
+#print axioms cubic_geometric_pole_pair_count
 end GHSOdd5Ledger
