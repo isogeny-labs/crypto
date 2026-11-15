@@ -1,28 +1,29 @@
-# Resume: crypto @ claude/index-calculus-gpu-optimization-otouqv (round 5: GPU m = 3 with incremental-gauss-echelon)
+# Resume: crypto @ claude/bloom-hyperloglog-index-calculus-kh3pgr (sketches + mixed relation solver)
 
 ## Goal
-User (2026-11-15), "Keep working on open leads". Lead from research/ic_la_m3_20261115 (PR #4310):
-incremental-gauss-echelon matches incremental-gauss (trials, relations, logarithm, S) with 0.10-0.15x the
-row_ops. Measure the whole-solve effect on the round-4 GPU arm (probe_build=pairs, daemon, cuda).
+User (2026-11-15): integrate Bloom / HyperLogLog / count-min sketch or algorithmic tricks into the IC
+relation-solving step; then "yes for both" (structural-rank matching gate; Bloom large-prime sketch null)
+"and try to find novel way to integrate these into a combined/mixed solver".
 
 ## Lead / hypothesis
-PROTOCOL.md: identity across IC arms; at |F_x| = 4096 the GPU arm's median solve with echelon <= 0.5x
-with gauss; row_ops ratio 0.10-0.20.
+research/ic_sketch_mixed_solver_20261115/PROTOCOL.md (frozen in 735883bee6): P1-P6. Gate removes doomed
+deferred solves; mixed-peel (gate + matched square system + two-sided IBLT-style peel + Markowitz core,
+one certified solve) cuts row_ops; Bloom screen is pure overhead; nothing moves S at w = 0 except rows read.
 
 ## Spec
-specs/smoke.json, specs/rf3la.json (38/40-bit prime_explicit curves, |F_x| 2048/4096, 3 targets, 2
-rounds; CPU and GPU arms x gauss/echelon; GPU echelon A/A at 4096; rho and rho A/A). job.sh on one A100,
-launched by run_pod.sh under benchrec run.
+Part A: examples/ic_mixed_solver_stream.rs -> research/ic_sketch_mixed_solver_20261115/partA/stream.jsonl.
+Part B: specs/partB-p24.json, specs/partB-p28.json (ecbench run, local, L0). Part C: ic.large_prime spec
+from research/ecbench_accounting_v2_20261023/specs/frozen-large-prime.json.
 
 ## State
-2026-11-15: protocol and specs frozen; pod not yet launched.
+Code + protocol committed (735883bee6). Release build of ecbench in progress; no data yet.
 
 ## Runs in flight
-None yet (pod icgpu-rla; cleanup: research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-rla).
+None (all local to this container).
 
 ## Stop and success conditions
-Any S/relation/logarithm mismatch or failed replay voids that comparison. Wall L0, A/A floor. Cap
-~1.5 GPU-hours, $4. S3: same waiver as earlier rounds (session AWS keys rejected).
+Any arm returning a wrong logarithm voids it. Results reported against predictions, success or not.
 
 ## Next steps
-Commit+push protocol -> record init -> ecbench release build -> run_pod.sh -> analyze -> report -> PR.
+unit tests (cargo test --release --lib linalg_mixed) -> Part A -> Part B ecbench run/verify/compare ->
+Part C -> REPORT + figures + PDF -> session log -> PR (ready, auto-merge) -> subscribe.
