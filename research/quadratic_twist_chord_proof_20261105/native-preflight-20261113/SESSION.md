@@ -61,3 +61,21 @@ All raw data, false payloads, canonical export and inspected one-page report rem
 ### Errors
 
 CLI Git authentication failed before full data, so protocol v2 was separately frozen/published before execution and checks a fresh connected GitHub ref receipt. Native algorithms/binaries/scope/control predicates were unchanged; original v1 is preserved. Report generation had a font-cache warning and normal first-pass cross-reference warning; PDF rendered and its only page was visually inspected. No native rerun, proof attempt, new IDC1, paid resource or denied asset upload. [pcc:unverified]
+
+## 2026-11-15T05:18Z — partial chord source prepared, no new arithmetic data
+
+### What was done
+
+Implemented a NEW C++ bounded univariate chord solver and separate Rust polynomial/point-pair/scalar auditor. Scope is336 native/matched/pulled-back policies x caps0..8;57456 diagnostic query cells and54432 separately cold original-target attempts. DISTINCT and DIAGONAL branches certify separately with expanded Bezout witnesses, permitting explicitly partial valid rows. Actual r19 F37 phi/inverse is checked on the subgroup; public logs come only from admitted setup relations. Sources compile with C++ warnings-as-errors and offline pinned Rust dependencies; help paths pass. No produce/audit/mutation study path executed yet. [pcc:unverified]
+
+### Decisions made
+
+A complete lifted-slice row enumeration would be contained in the source row set and cannot supply extra rank merely from witness multiplicity. Do not spend another census on that predetermined criterion. Test early certified branches under the SAME solver/degree definition on source and twist, with full source-policy Pareto controls. The degree is expanded Bezout degree in CHORD generators, not original S3 pullback or intrinsic regularity. New scientific window<=3600s begins at first affected launch after exact GitHub source publication. [pcc:unverified]
+
+### Open threads
+
+Publish exact source then rebind canonical frozen protocol to its actual source commit, publish protocol/pins before data, run complete declared scope with all13 changed/rehashed controls. Retain all blocked setups/losses/failed queries. No paid resources, denied archive uploads or old-source changes. No new Lean theorem/IDC1/signed verification. Conductor127 and KB wrapper127; existing literature/chord/map source reviewed as fallback. [pcc:unverified]
+
+### Errors
+
+Initial C++ build failed misleading-indentation Werror; braces corrected without reducing warnings. Pre-data review removed an inadvertently premature redundant witness multiplication before the cap check; exact draft retained locally. First canonical metadata estimate1800s exceeded the checker's600s per-instance threshold; explicit UNMEASURED conservative estimate300s now validates, with real600s stage/3600s outer caps unchanged. No timing/performance claim or scientific rerun. Build/protocol drafts/logs are retained outside the checkout. [pcc:unverified]
