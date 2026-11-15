@@ -1,0 +1,7 @@
+# Independent static code review
+
+Full worker body and project runtime closure were read before these pins. Author fixes requested before freeze: independent ordered-source oracle and identical paid timing payload for direct4+1; recursive late-result demotion; explicit affine-rank overlap. Final changed bodies and full proofs/input rules/closure were reread. Imported Gaussian eliminates exact row combinations, verifies particular and full independent kernel; finite candidate caps precede enumeration. BinaryField uses polynomial-basis exact arithmetic and irreducibility validation. No unbounded actual83 source enumeration occurs.
+
+External runner must enforce90seconds,4GiB and one core. Internal80second predicate boundary and84/88second report boundaries are present. External six-field scientific_result_v1 is authoritative; compressed raw evidence is serialized before a possible final deadline demotion and may be provisional. Inconclusive status must never be promoted from nested raw completion flags. Peak process RSS is self-process high-water memory, not aggregate process-tree RSS.
+
+Admission is COMPONENT ONLY, conditional on recorded oracle success and immutable bytes. No scientific execution or compilation by this reviewer; static hashes verified only. This does not authorize extrapolation to full original root sets, odd characteristic, all fields, qualified isolation/cold repetitions or fastest matching genuine baseline.
