@@ -1,3 +1,19 @@
+# Genuine26 settled; whole100/101 fixtures and complete PDF published
+
+## What was done
+pcc/claims/PCC-20261115-0c13e6.json / pcc/claims/PCC-20261115-86ddc2.json: original43720549312/job132831389944SUCCESS, nine remote objects replayed BEFORE actualbotb7bc54fcba/direct99cb2b204d/exact11paths; two plain Git objects unchanged. All58919heldinputs177linksownedbytes and whole136572156Barchive7357members68roots/3777consumerdeltafiles preserved. NormalFF-artifact-wiring0/HOLD26RELEASED. All51583prior25keys176links/both exactledgerprefixes/oldarchives held. Two exact original manifest entry dictionaries and two relative aliases roundtrip to the entire actualIC100/sampler101 populations. Full69112BPDF unchanged in ordinary producer Git; additive publication link replaces pending status without rewriting prior attested receipts. [pcc:unverified]
+
+## Decisions made
+Normal-publish custody settlement and consumer fixture projection, then add a fresh CI workflow covering the two new native populations with exact source/runtime/prepared custody and actual whole-class omissions. Preserve all prior source guards, workflows, reports, proofs and failed controls. Future whole custody is NEW27. [pcc:unverified]
+
+## Open threads
+Fresh IC/sampler CI; prospective FB30 relation-matrix/kernel-rank discriminator after primary-source/KB review; complete primitive/setup/known-point/strongest-reference cost census and live admission. All three norm-prepared points equal already available sourceGpoints; preserve the stronger-reference negative result. [pcc:unverified]
+
+## Errors
+First custody governor EOF-whitespace failure and FF01 lazy-fetch128 before merge; exact three-blob hydration preserves refs/HEAD/status, then explicit no-rename path comparison and FF02. Earlier ENOSPC/FUSE/history-inventory and every build/proof/recorder/import/native/control failure retained. FullCI41 artifact remains separate/uncollected, while a93f80 is exact258 and proofCI39bb46 exact41. [pcc:unverified]
+
+---
+
 # Whole IC, paired sampler and induced-proof custody26: inputs HELD
 
 ## What was done
