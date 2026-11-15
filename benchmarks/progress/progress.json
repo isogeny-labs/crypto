@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261113T1712Z-ic-build-steps",
+  "latest_record": "20261115T0731Z-humbert-genus5-dlp-filter",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 148,
+    "measured": 149,
     "open": 0
   },
   "repo": "crypto",
@@ -6200,6 +6200,32 @@
       "unit": "S"
     },
     {
+      "better": "neutral",
+      "first": 0.968,
+      "latest": 0.968,
+      "latest_derived": {},
+      "metric": "aa_dlpf50_median_q24001",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 5,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.962,
+            1.002
+          ],
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 0.968
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
       "better": "lower",
       "first": 0.5126,
       "latest": 0.5126,
@@ -6221,6 +6247,35 @@
           "spread": null,
           "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
           "value": 0.5126
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.21,
+      "latest": 1.21,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.21
+      },
+      "metric": "dlpf50_ic_over_rho_exp_median_q24001",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.21
+          },
+          "n": 5,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 1.21
         }
       ],
       "problem": "ic:humbert-genus5-toy",
@@ -6304,6 +6359,117 @@
           "spread": null,
           "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
           "value": 0.967
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.02,
+      "latest": 1.02,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "lp50_over_dlpf50_t_ic_median_q24001",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 5,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.89,
+            1.07
+          ],
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 1.02
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.773,
+      "latest": 0.773,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "mm_dlpf50_over_dlp50_max",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 20,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 0.773
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.688,
+      "latest": 0.688,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "mm_dlpf50_over_dlpm50_max",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 20,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 0.688
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.627,
+      "latest": 1.627,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "mm_dlpf50_over_lp50_median_q24001",
+      "points": [
+        {
+          "commit": "05713d335bf4",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261115T0731Z-humbert-genus5-dlp-filter",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Filtered dlp matrices on the genus-5 cover, toy q 8009-24001, L0: dlpf cuts LA mulmods 25% vs full elimination (20/20) and beats lp:0.5 on wall time 14/15 at q>=12007, but its LA is still 1.6x lp and the lead falls 1.31->1.02; rho faster everywhere (best 1.21x). Runner hit the 2 h limit at 117/120; last 3 arms resumed with the same binary.",
+          "value": 1.627
         }
       ],
       "problem": "ic:humbert-genus5-toy",
