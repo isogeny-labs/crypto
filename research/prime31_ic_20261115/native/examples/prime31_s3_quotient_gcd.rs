@@ -266,6 +266,32 @@ fn main() -> Result<(),String> {
         println!("{}",json!({"standing":"[pcc:unverified]","study":"paired developmental S3 oracle stages, NOT full ECDLP costs",
             "same_rust_host":true,"B":base.points.len(),"rows":controls}));
     }
+    if std::env::args().any(|arg| arg == "--depth8") {
+        use std::time::Instant;
+        let b8=Base::build(PRIME31,8,&mut ar)?;
+        if b8.points.len()!=135 {return Err("registered depth8 base changed".into());}
+        let planted=ar.add(PRIME31,Some(b8.points[0]),Some(b8.points[14]))
+            .ok_or("unexpected depth8 identity")?;
+        let public=ar.scalar(PRIME31,17,Some(PRIME31.g))
+            .ok_or("unexpected zero public")?;
+        let mut panel=vec![];
+        for (kind,target) in [("positive",planted),("public",public)] {
+            let start=Instant::now();
+            let (algebra,rows,valid_adds)=evaluate(&b8,Some(target),&mut ar)?;
+            let stage_ns=start.elapsed().as_nanos();
+            if kind=="positive" && rows.is_empty() {
+                return Err("depth8 positive algebraic quotient oracle missed".into());
+            }
+            panel.push(json!({"kind":kind,"stage_ns":stage_ns,
+              "algebraic_candidate_pairs":algebra.pairs.len(),
+              "gcd_degree":algebra.first_eliminant_degree,
+              "signed_rows":rows.len(),"validation_group_additions":valid_adds}));
+        }
+        println!("{}",json!({"standing":"[pcc:unverified]",
+            "study":"depth8 B135 exact S3 quotient positive/public stage only",
+            "same_prime31_curve":true,"no_target_scalar_in_oracle":true,
+            "B":b8.points.len(),"not_cold_ECDLP":true,"rows":panel}));
+    }
     Ok(())
 }
 #[cfg(test)]
