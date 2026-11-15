@@ -912,6 +912,21 @@ DL with both changes against the frozen negation-map rho at k = 22 (mean cold M-
 Study: [research/quartic_dl1_cd_sqrt_20261113/](../../research/quartic_dl1_cd_sqrt_20261113/); [report](../../research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf); source `research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json`. Wall time is not claimed (local L0 runs; CPU diagnostic in the study).
 
 
+## GHS-weak E0/F_{q^3}: relation-stage speed-up at identical counted work, outside tables A–C
+
+Same instances and configuration as the section above (c_D = 1.7, square-root chain): the relation stage rewritten with open-addressing hash tables, no per-candidate allocation, prefetch of large-prime vertex slots and a compiled square-root chain. Every counted field is identical to v3, so cold M-eq and the distance to rho do not move; the gain is CPU time. Ratio of relations-stage CPU (and DL phase-sum CPU) to v3 on the same unit, one unit at a time on a shared 4-vCPU container (L0), two passes in reversed order; A/A floor 0.207. Pre-registered decision: SUPPORTED. Class: phase speed-up (relation stage, CPU time) at identical counted work; GHS-weak family only. validated: replay certificate (counted replay and an independent timing replay), validator report and the negation-map rho reference (research/ic_gw_fasthash_20261114/validation/VALIDATION.json).
+
+| k | relations CPU (geomean over seeds) | worst seed | DL phase-sum CPU |
+|--:|--:|--:|--:|
+| 18 | 0.493 | 0.521 | 0.838 |
+| 19 | 0.545 | 0.561 | 0.884 |
+| 20 | 0.500 | 0.509 | 0.881 |
+| 21 | 0.467 | 0.496 | 0.874 |
+| 22 | 0.463 | 0.470 | 0.796 |
+
+Study: [research/ic_gw_fasthash_20261114/](../../research/ic_gw_fasthash_20261114/); [report](../../research/ic_gw_fasthash_20261114/REPORT.pdf); source `research/ic_gw_fasthash_20261114/analysis.json`. Times are L0 (local container, not an isolated host). The DL phase sum leaves out the instance search and the D and DL1 linear algebra; whole-process CPU fell only to 0.90–0.96 of v3 in the validator's timing replay (relation stage 0.43–0.50 there).
+
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -1159,7 +1174,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
 - `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
 - `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
-- `src/cryptanalysis/ecbench/methods.rs` — sha256 `1452c4c7672603e5…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `2e884c247357af60…`
 - `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `f8f9a75589e96902…`
 - `integrations/primo/README.md` — sha256 `4ec69082225f9f88…`
 - `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`
@@ -1167,6 +1182,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
 - `research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json` — sha256 `d363ee50d3da05c2…`
+- `research/ic_gw_fasthash_20261114/analysis.json` — sha256 `504ae961cf2d994b…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
