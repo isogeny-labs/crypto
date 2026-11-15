@@ -1,5 +1,34 @@
 # Worked Lean example: cross-characteristic subgroup transfer
 
+## Concrete cover route to a smaller, solvable target
+
+The clarified request is now addressed by a concrete toy construction from
+the order-seven subgroup over `F_65537` to a four-element binary field. The
+degree-three covers have equations
+`v²-u³v-4v=u⁹-4u⁶` and `v²+ωv=u⁹+ωu⁶`, with map `(u,v)↦(u³,v)`.
+The common torsion-marked family supplies the cross-characteristic bridge;
+cover then norm contributes multiplication by three. [pcc:unverified]
+
+The resulting target generator is `(1,ω+1)`, and source challenge `(2,2)` maps
+to `(ω,ω)`, preserving scalar `3 mod 7`. The seven-element target is solved
+by enumeration. The source subgroup is also small; no large-order reduction,
+GHS vulnerability, or computational advantage is claimed. [pcc:unverified]
+
+- [Concrete construction and written geometric proof](COVER-CONSTRUCTION.md).
+- [Lean module](CoverDecodeExample.lean), [formalization map](COVER-PROOF-MAP.md),
+  [report](cover-report.html), [PDF](cover-report.pdf) and [diagram](cover-transfer.svg).
+- [Fixed integral lift](CoverIntegralLift.lean): two ring specializations from
+  `Z[z]/(z²+z+1)` with parameter `2+65537z`, and nonsingular reduced models.
+- [New raw receipts](receipts/cover-20261115T2113Z/), including identity certificates.
+
+Lean checks the fields, elliptic points, cubic affine maps, rank-three cover
+algebras and concrete scalar transfer. Genus, Jacobian pull/push and divisor
+specialization are covered by the written proof and remain outside the full
+Lean formalization. The common seven-section lift is essential; the cover
+alone does not change characteristic. [pcc:unverified]
+
+## Earlier field-size examples
+
 The examples cover three field pairs. The third increases both ambient field
 sizes and the subgroup order; its order-7 subgroup remains small. [pcc:unverified]
 
