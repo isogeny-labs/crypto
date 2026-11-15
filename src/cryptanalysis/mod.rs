@@ -406,6 +406,7 @@ pub mod twist24_rep;
 pub mod twist24_shortfall;
 pub mod two_rank_null;
 pub mod two_sylow_search;
+pub mod vieta_coset;
 pub mod visual_demos;
 pub mod visualize;
 pub mod volcano;
