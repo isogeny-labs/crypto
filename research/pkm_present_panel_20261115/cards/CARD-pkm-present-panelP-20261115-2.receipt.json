@@ -1,0 +1,132 @@
+{
+  "card_id": "CARD-pkm-present-panelP-20261115-2",
+  "card_path": "research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-2.yaml",
+  "card_sha256": "0208cba823559516f3b1ef9b021eafe65c4eb2b3c3fd00c5ccffd8b0c57a318a",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "770e0fa632b2cca3f1059b2393d693c632a1ff7c",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "research/pkm_present_panel_20261115/plan.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-sha",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "74bac2debae62ea0f1b99d116f18b1a9e7d7b55408172ac8563566fd2a4559ba",
+      "stdout_tail": [
+        "0d04d98490ab4c99608a195afdf2ec4cd64a6f18a53dc8dbd1f2bdb676c5a31f  research/pkm_present_panel_20261115/plan.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "pytest",
+        "research/pkm_present_panel_20261115/runner/tests",
+        "research/pkm_present_panel_20261115/analysis/tests",
+        "-q"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 42.775,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "tests",
+      "index": 3,
+      "outputs": {},
+      "pid_file": "research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-2.run/03-tests.pid.json",
+      "seconds": 42.775,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ddff165d1a7d4e6c039ef5adf07197690cd3136932760a0274e722ca7f043ca0",
+      "stdout_tail": [
+        "....................................                                     [100%]",
+        "36 passed in 42.10s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261115T0345Z-pkm-present-panel.json",
+        "--",
+        "python3",
+        "research/pkm_present_panel_20261115/runner/run_plan.py",
+        "--plan",
+        "research/pkm_present_panel_20261115/plan.json",
+        "--out",
+        "research/pkm_present_panel_20261115/results/20261115T0535Z"
+      ],
+      "cwd": ".",
+      "id": "run",
+      "index": 4,
+      "pid": 12020,
+      "pid_file": "research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-2.run/04-run.pid.json",
+      "started_at": "2026-11-15T05:36:57Z",
+      "status": "detached",
+      "stderr": "research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-2.run.stderr",
+      "stdout": "research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-2.run.stdout"
+    }
+  ],
+  "commands_total": 4,
+  "commit": "e6f900706b77465055aae13e7d52a5a079b4e6ff",
+  "detached": "research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-2.run/04-run.pid.json",
+  "dirty_before": [
+    "research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-2.yaml",
+    "resume/RESUME.md"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "detached"
+}
