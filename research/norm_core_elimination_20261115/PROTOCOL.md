@@ -80,3 +80,23 @@ This bounded software crash diagnosis is not a timing/performance experiment.
 Preserve the original139 outcome, whichever diagnostic outcome follows. A
 successful basis still requires bounded extraction and original/group checks
 before it can supply any model claim; those are separate from backend exit.
+
+## Amendment D2 — discriminate allocation failure and bounded pair batching
+
+Both D1 modes exit139. Their logs progress through F4 degree6; the default
+method next selects33764 pairs at degree7 and then crashes before a matrix
+line is printed. This suggests a resource/large-matrix failure, but does not
+establish its cause. Freeze exactly two further diagnostic calls on that same
+preserved public input, with the identical20s/2GiB/one-thread limits:
+
+1. Default exact-sparse configuration under strace restricted to memory syscalls
+   and SIGSEGV, to record whether an allocation fails before the crash.
+2. Exact-sparse configuration with `-m 512`, the backend's explicit maximum
+   pair batch, to test a smaller-matrix execution route without raising memory
+   or time. This changes the algorithm's batching, not the relation equations.
+
+Retain all flags, backend/input digests, raw trace/stdout/stderr/basis/exit in
+new diagnostic-002 paths. No extra fixture or adaptive cap. These are software
+failure diagnostics, not scientific timing or comparative performance results.
+A backend completion alone is not a point-model claim. Original001 and D1
+unknown/crash statuses remain immutable. No other retry is permitted by D2.
