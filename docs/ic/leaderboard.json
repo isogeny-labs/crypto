@@ -238,6 +238,10 @@
    "path": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
    "sha256": "06b648eb1b7beacbe379d1db6a56b72c58fdf7e57ff9a875a9111a9bddea2573"
   },
+  "tableb_ksum": {
+   "path": "research/ic_tableb_ksum_20261115/summary.json",
+   "sha256": "12e525b5857945847a94f9cf57ae8e6c647371c943cbab2ce421804148c42e07"
+  },
   "d4_char2_m12": {
    "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
    "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
@@ -468,7 +472,7 @@
   },
   "ecbench_methods_source": {
    "path": "src/cryptanalysis/ecbench/methods.rs",
-   "sha256": "1452c4c7672603e52c2ee7e0538d7ca0a15fdc0b291230de47f7eb6274a4a6b8"
+   "sha256": "2e884c247357af60f3098638e378c3993731a8b67a5eb395af0b2d5dc57bf588"
   },
   "solver_registry_source": {
    "path": "src/cryptanalysis/ic_framework/solvers.rs",
@@ -497,6 +501,18 @@
   "ghs_weak_cd_chain": {
    "path": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
    "sha256": "d363ee50d3da05c23085ae383ffadc61bcfe77e77711e756559ae79ed3656c79"
+  },
+  "ghs_weak_relstage": {
+   "path": "research/ic_gw_fasthash_20261114/analysis.json",
+   "sha256": "504ae961cf2d994b0b188eb3ff0faae897c53bc988195420b6ea2985059594be"
+  },
+  "ghs_weak_blreuse": {
+   "path": "research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json",
+   "sha256": "d8db1947a8082a941f623dd42acafbb0587f3a57993d1b50a41422d333a46f31"
+  },
+  "ghs_weak_nrmlz": {
+   "path": "research/ic_gw_nrm_lz_20261115/analysis.json",
+   "sha256": "340a83a64dbc12490a41cfa0a43108516c5ae285e43420b9aa864c1e0248b3ae"
   },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -338684,6 +338700,395 @@
   "validation": "validated: replay certificate, validator report (VAL-20261114-d9190c) and the matched strong signed-Frobenius rho reference with the §5a band (research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/VALIDATION.json)",
   "validated": true
  },
+ "tableb_ksum_component": {
+  "rows": [
+   {
+    "slug": "icv1-fp20-t1293-3c2999ba",
+    "role": "primary",
+    "incumbents": [
+     "inc-rec",
+     "inc-sel",
+     "inc-tb"
+    ],
+    "table_b": {
+     "variant": "mitm_m2_negfold_walk_balanced",
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 51,
+     "signed_points": 102,
+     "s_ic": 10.7228719576,
+     "s_rho": 1.29190608779,
+     "ic_over_rho": 8.30003980861,
+     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json"
+    },
+    "weights": {
+     "0": {
+      "strictest_incumbent": "inc-tb",
+      "s": {
+       "rho-neg": 1.26914998285,
+       "bsgs-neg": 1.05712389442,
+       "inc-rec": 10.8535444994,
+       "inc-sel": 10.3561203421,
+       "inc-tb": 10.2949577958,
+       "ksum4": 6.63524946621,
+       "ksum5": 7.1113540557
+      },
+      "ksum5_over_incumbent": 0.690760875059,
+      "ci95": [
+       0.676849629335,
+       0.704958037697
+      ],
+      "ci95_bootstrap": [
+       0.673183057088,
+       0.709613529146
+      ],
+      "upper": 0.709613529146,
+      "per_replicate": [
+       0.683547006175,
+       0.701469350592,
+       0.687637998509
+      ],
+      "ksum4_over_incumbent": 0.644514489311,
+      "ksum5_over_bsgs": 6.72707720753,
+      "gap_to_rho": 5.60324165922
+     },
+     "1": {
+      "strictest_incumbent": "inc-sel",
+      "s": {
+       "rho-neg": 2.3746252274,
+       "bsgs-neg": 2.10545210975,
+       "inc-rec": 27.4504887289,
+       "inc-sel": 24.4858788478,
+       "inc-tb": 25.3913360966,
+       "ksum4": 14.9637214525,
+       "ksum5": 14.5875817467
+      },
+      "ksum5_over_incumbent": 0.595754877226,
+      "ci95": [
+       0.583623432313,
+       0.608138491514
+      ],
+      "ci95_bootstrap": [
+       0.579727525418,
+       0.611604167397
+      ],
+      "upper": 0.611604167397,
+      "per_replicate": [
+       0.600601541012,
+       0.589240280799,
+       0.597446309467
+      ],
+      "ksum4_over_incumbent": 0.611116372238,
+      "ksum5_over_bsgs": 6.92847948391,
+      "gap_to_rho": 6.14310905925
+     },
+     "0.1": {
+      "strictest_incumbent": "inc-sel",
+      "s": {
+       "rho-neg": 1.3796975073,
+       "bsgs-neg": 1.16195671595,
+       "inc-rec": 12.5132389223,
+       "inc-sel": 11.7690961926,
+       "inc-tb": 11.8045956259,
+       "ksum4": 7.46809666484,
+       "ksum5": 7.8589768248
+      },
+      "ksum5_over_incumbent": 0.667763836421,
+      "ci95": [
+       0.656366616658,
+       0.679358958721
+      ],
+      "ci95_bootstrap": [
+       0.652800372566,
+       0.682945891475
+      ],
+      "upper": 0.682945891475,
+      "per_replicate": [
+       0.671740840757,
+       0.662252466895,
+       0.669306772626
+      ],
+      "ksum4_over_incumbent": 0.634551416915,
+      "ksum5_over_bsgs": 6.76357106672,
+      "gap_to_rho": 5.6961593271
+     }
+    },
+    "replicate_spread": {
+     "inc-tb": 1.03917210058,
+     "rho-neg": 1.02720069467,
+     "ksum5": 1.01868203186
+    },
+    "delta": 1.03917210058,
+    "max_upper_pooled": 0.709613529146,
+    "max_upper_replicate": 0.733295445727,
+    "holds": true
+   },
+   {
+    "slug": "icv1-fp22-tm1267-a5acaf6d",
+    "role": "secondary",
+    "incumbents": [
+     "inc-hi",
+     "inc-lo",
+     "inc-tb"
+    ],
+    "table_b": {
+     "variant": "mitm_m2_negfold_walk_balanced",
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 74,
+     "signed_points": 148,
+     "s_ic": 12.7702224719,
+     "s_rho": 1.21605771181,
+     "ic_over_rho": 10.5013292937,
+     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json"
+    },
+    "weights": {
+     "0": {
+      "strictest_incumbent": "inc-tb",
+      "s": {
+       "rho-neg": 1.17185508483,
+       "bsgs-neg": 0.985845531125,
+       "inc-hi": 11.8303900653,
+       "inc-lo": 12.9200623297,
+       "inc-tb": 11.1473755897,
+       "ksum4": 6.28389750767,
+       "ksum5": 6.64927952269
+      },
+      "ksum5_over_incumbent": 0.596488336575,
+      "ci95": [
+       0.582504813939,
+       0.610807545544
+      ],
+      "ci95_bootstrap": [
+       0.579005934215,
+       0.61529666457
+      ],
+      "upper": 0.61529666457,
+      "per_replicate": [
+       0.595079898016,
+       0.583141650321,
+       0.611965763897
+      ],
+      "ksum4_over_incumbent": 0.563710934209,
+      "ksum5_over_bsgs": 6.74474784614,
+      "gap_to_rho": 5.67414828743
+     },
+     "1": {
+      "strictest_incumbent": "inc-hi",
+      "s": {
+       "rho-neg": 2.24910034432,
+       "bsgs-neg": 1.96452575836,
+       "inc-hi": 28.039566743,
+       "inc-lo": 35.2158610011,
+       "inc-tb": 28.5970097783,
+       "ksum4": 14.3408007236,
+       "ksum5": 14.0654277352
+      },
+      "ksum5_over_incumbent": 0.501627855527,
+      "ci95": [
+       0.491368376747,
+       0.512101546108
+      ],
+      "ci95_bootstrap": [
+       0.488415793869,
+       0.515348993785
+      ],
+      "upper": 0.515348993785,
+      "per_replicate": [
+       0.491723859889,
+       0.500512498282,
+       0.512974733027
+      ],
+      "ksum4_over_incumbent": 0.51144872726,
+      "ksum5_over_bsgs": 7.15970644585,
+      "gap_to_rho": 6.25380177934
+     },
+     "0.1": {
+      "strictest_incumbent": "inc-tb",
+      "s": {
+       "rho-neg": 1.27957961078,
+       "bsgs-neg": 1.08371355385,
+       "inc-hi": 13.4513077331,
+       "inc-lo": 15.1496421969,
+       "inc-tb": 12.8923390086,
+       "ksum4": 7.08958782926,
+       "ksum5": 7.39089434394
+      },
+      "ksum5_over_incumbent": 0.573278001689,
+      "ci95": [
+       0.559305206184,
+       0.587599871389
+      ],
+      "ci95_bootstrap": [
+       0.555723333277,
+       0.592067324002
+      ],
+      "upper": 0.592067324002,
+      "per_replicate": [
+       0.571875435068,
+       0.560087237988,
+       0.588604670327
+      ],
+      "ksum4_over_incumbent": 0.549907028084,
+      "ksum5_over_bsgs": 6.8199703858,
+      "gap_to_rho": 5.77603322349
+     }
+    },
+    "replicate_spread": {
+     "inc-tb": 1.05211796341,
+     "rho-neg": 1.01852577377,
+     "ksum5": 1.01182910577
+    },
+    "delta": 1.05211796341,
+    "max_upper_pooled": 0.61529666457,
+    "max_upper_replicate": 0.649432984173,
+    "holds": true
+   },
+   {
+    "slug": "icv1-fp24-t1577-77336155",
+    "role": "primary",
+    "incumbents": [
+     "inc-rec",
+     "inc-tb",
+     "inc-w0"
+    ],
+    "table_b": {
+     "variant": "mitm_m2_negfold_walk_balanced",
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 111,
+     "signed_points": 222,
+     "s_ic": 13.9656576304,
+     "s_rho": 1.03794226057,
+     "ic_over_rho": 13.4551392317,
+     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json"
+    },
+    "weights": {
+     "0": {
+      "strictest_incumbent": "inc-w0",
+      "s": {
+       "rho-neg": 1.08722397136,
+       "bsgs-neg": 1.04634711049,
+       "inc-rec": 14.0693897384,
+       "inc-tb": 12.8243511637,
+       "inc-w0": 12.7383495135,
+       "ksum4": 6.3650769899,
+       "ksum5": 6.3830074764
+      },
+      "ksum5_over_incumbent": 0.501085911454,
+      "ci95": [
+       0.490942532797,
+       0.511438862766
+      ],
+      "ci95_bootstrap": [
+       0.488337925342,
+       0.515579445448
+      ],
+      "upper": 0.515579445448,
+      "per_replicate": [
+       0.507243453452,
+       0.500922339127,
+       0.495060818674
+      ],
+      "ksum4_over_incumbent": 0.499678312574,
+      "ksum5_over_bsgs": 6.10027725258,
+      "gap_to_rho": 5.87092231644
+     },
+     "1": {
+      "strictest_incumbent": "inc-w0",
+      "s": {
+       "rho-neg": 2.06263389651,
+       "bsgs-neg": 2.08785544681,
+       "inc-rec": 33.410007883,
+       "inc-tb": 33.6800488644,
+       "inc-w0": 33.1643399864,
+       "ksum4": 14.9549813182,
+       "ksum5": 14.131524443
+      },
+      "ksum5_over_incumbent": 0.426106005693,
+      "ci95": [
+       0.415640784783,
+       0.436834725405
+      ],
+      "ci95_bootstrap": [
+       0.412951063146,
+       0.440992092677
+      ],
+      "upper": 0.440992092677,
+      "per_replicate": [
+       0.432717598872,
+       0.426475712755,
+       0.419076064661
+      ],
+      "ksum4_over_incumbent": 0.450935592999,
+      "ksum5_over_bsgs": 6.76844005874,
+      "gap_to_rho": 6.85120343797
+     },
+     "0.1": {
+      "strictest_incumbent": "inc-w0",
+      "s": {
+       "rho-neg": 1.18476496387,
+       "bsgs-neg": 1.15049794412,
+       "inc-rec": 16.0034515528,
+       "inc-tb": 14.9099209338,
+       "inc-w0": 14.7809485608,
+       "ksum4": 7.22406742272,
+       "ksum5": 7.15785917306
+      },
+      "ksum5_over_incumbent": 0.484262504779,
+      "ci95": [
+       0.474028109763,
+       0.494717863149
+      ],
+      "ci95_bootstrap": [
+       0.471415227653,
+       0.498927321792
+      ],
+      "upper": 0.498927321792,
+      "per_replicate": [
+       0.490527852163,
+       0.484197656155,
+       0.478027613611
+      ],
+      "ksum4_over_incumbent": 0.488741801178,
+      "ksum5_over_bsgs": 6.22153147657,
+      "gap_to_rho": 6.0415857924
+     }
+    },
+    "replicate_spread": {
+     "inc-tb": 1.00678241569,
+     "rho-neg": 1.06226159886,
+     "ksum5": 1.0302528723
+    },
+    "delta": 1.06226159886,
+    "max_upper_pooled": 0.515579445448,
+    "max_upper_replicate": 0.534032812754,
+    "holds": true
+   }
+  ],
+  "source": "research/ic_tableb_ksum_20261115/summary.json",
+  "study": "research/ic_tableb_ksum_20261115/",
+  "report": "research/ic_tableb_ksum_20261115/report.pdf",
+  "protocol": "research/ic_tableb_ksum_20261115/PROTOCOL.md",
+  "unit": "ecbench counted GAE per sqrt(r), native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a)",
+  "isolation": "L0 (counted cost; wall time not claimed)",
+  "track": "generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS)",
+  "binary_sha256": "7d46e5ee0778a741193c4af08274fa4861406182e479b06770f5dd8303c5c9cb",
+  "commit": "7b3c057e1cef83ccf5712950473ef91e10153499",
+  "registered_at": "2026-11-15T03:46:33Z",
+  "replay": {
+   "records": 13824,
+   "replays": 10368,
+   "host": "second host class (Intel Xeon 2.10 GHz container); recorded on a RunPod pod (AMD EPYC)"
+  },
+  "sessions": 9,
+  "targets_per_curve": 48,
+  "rounds": 3,
+  "replicates": 3,
+  "l1_holds_on_a_primary_row": true,
+  "l1_falsified": false,
+  "class": "counted component improvement",
+  "title": "Table B prime rows re-measured with the k = 5 sum table (2026-11-15, counted component improvement, outside tables A-C)",
+  "validation": "validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-tableb-ksum/VALIDATION.json)",
+  "validated": true
+ },
  "d4_char2_frob_roots_component": {
   "rows": [
    {
@@ -339995,7 +340400,7 @@
    "layout": [
     {
      "cell": "k0n53",
-     "top_over_low_build": {
+     "low_over_top_build": {
       "median": 1.10429633148,
       "ci95": [
        1.06965866175,
@@ -340008,7 +340413,7 @@
     },
     {
      "cell": "k0n61",
-     "top_over_low_build": {
+     "low_over_top_build": {
       "median": 1.14223295907,
       "ci95": [
        1.09819061843,
@@ -346809,6 +347214,484 @@
   "source": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
   "class": "component improvement over the frozen N4 v2 DL (restricted to the GHS-weak family)",
   "validation": "validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "ghs_weak_relstage_component": {
+  "rows": [
+   {
+    "q": 262111,
+    "k": 18,
+    "relations_geomean": 0.492803796134,
+    "relations_max": 0.520966422729,
+    "total_cpu_geomean": 0.837851611422
+   },
+   {
+    "q": 524287,
+    "k": 19,
+    "relations_geomean": 0.544969851752,
+    "relations_max": 0.560582611265,
+    "total_cpu_geomean": 0.884396105086
+   },
+   {
+    "q": 1048507,
+    "k": 20,
+    "relations_geomean": 0.499731564547,
+    "relations_max": 0.508559515242,
+    "total_cpu_geomean": 0.881365764525
+   },
+   {
+    "q": 2097091,
+    "k": 21,
+    "relations_geomean": 0.466641942657,
+    "relations_max": 0.495537277756,
+    "total_cpu_geomean": 0.873888693091
+   },
+   {
+    "q": 4194271,
+    "k": 22,
+    "relations_geomean": 0.462585907394,
+    "relations_max": 0.470161970366,
+    "total_cpu_geomean": 0.795803823852
+   }
+  ],
+  "decision": "SUPPORTED",
+  "aa_floor": 0.206941887983,
+  "study": "research/ic_gw_fasthash_20261114/",
+  "report": "research/ic_gw_fasthash_20261114/REPORT.pdf",
+  "source": "research/ic_gw_fasthash_20261114/analysis.json",
+  "class": "phase speed-up (relation stage, CPU time) at identical counted work; GHS-weak family only",
+  "validation": "validated: replay certificate (counted replay and an independent timing replay), validator report and the negation-map rho reference (research/ic_gw_fasthash_20261114/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "ghs_weak_blreuse_component": {
+  "rows": [
+   {
+    "q": 262111,
+    "k": 18,
+    "la_lmul": 0.738693045615,
+    "0.0": {
+     "geomean": 0.81843855065,
+     "max": 0.82231411867
+    },
+    "0.5": {
+     "geomean": 0.863533949741,
+     "max": 0.865595214837
+    },
+    "1.0": {
+     "geomean": 0.883393211689,
+     "max": 0.885941557145
+    }
+   },
+   {
+    "q": 524287,
+    "k": 19,
+    "la_lmul": 0.735085447297,
+    "0.0": {
+     "geomean": 0.810534729965,
+     "max": 0.81364526227
+    },
+    "0.5": {
+     "geomean": 0.862244821207,
+     "max": 0.865074797629
+    },
+    "1.0": {
+     "geomean": 0.883710337848,
+     "max": 0.886298846823
+    }
+   },
+   {
+    "q": 1048507,
+    "k": 20,
+    "la_lmul": 0.731767932731,
+    "0.0": {
+     "geomean": 0.815207751121,
+     "max": 0.816307252439
+    },
+    "0.5": {
+     "geomean": 0.865562815837,
+     "max": 0.866314883304
+    },
+    "1.0": {
+     "geomean": 0.886406849226,
+     "max": 0.887025813131
+    }
+   },
+   {
+    "q": 2097091,
+    "k": 21,
+    "la_lmul": 0.730188068534,
+    "0.0": {
+     "geomean": 0.818937436224,
+     "max": 0.819356285967
+    },
+    "0.5": {
+     "geomean": 0.868840758811,
+     "max": 0.870004885607
+    },
+    "1.0": {
+     "geomean": 0.889271486461,
+     "max": 0.890549792535
+    }
+   },
+   {
+    "q": 4194271,
+    "k": 22,
+    "la_lmul": 0.728790676779,
+    "0.0": {
+     "geomean": 0.812659452578,
+     "max": 0.812873668073
+    },
+    "0.5": {
+     "geomean": 0.867695327327,
+     "max": 0.868699917205
+    },
+    "1.0": {
+     "geomean": 0.889398804109,
+     "max": 0.890522982497
+    }
+   }
+  ],
+  "supported": true,
+  "rho_band_k22": {
+   "0": {
+    "ic": 844014769.056,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 1014011904.46,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2543986123.06,
+    "rho": 1492814000000.0
+   }
+  },
+  "ref_k22": {
+   "REF/0": 1038514332.42,
+   "REF/0.1": 1208511467.82,
+   "REF/1": 2738485686.42,
+   "BLR/0": 844014769.056,
+   "BLR/0.1": 1014011904.46,
+   "BLR/1": 2543986123.06
+  },
+  "study": "research/ic_gw_bl_reuse_20261115/",
+  "report": "research/ic_gw_bl_reuse_20261115/REPORT.pdf",
+  "source": "research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json",
+  "class": "component improvement (linear algebra) over the previous GHS-weak DL configuration; GHS-weak family only",
+  "validation": "validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "ghs_weak_nrmlz_component": {
+  "rows": [
+   {
+    "arm": "DL",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 0.961393045026,
+     "max": 0.962397040284
+    },
+    "0.5": {
+     "geomean": 0.979485643111,
+     "max": 0.979854665068
+    },
+    "1.0": {
+     "geomean": 0.986868805584,
+     "max": 0.987200092142
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 0.957660753288,
+     "max": 0.958502841791
+    },
+    "0.5": {
+     "geomean": 0.978594799506,
+     "max": 0.979098363769
+    },
+    "1.0": {
+     "geomean": 0.986565589378,
+     "max": 0.986901035967
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 0.958523948094,
+     "max": 0.958828594492
+    },
+    "0.5": {
+     "geomean": 0.979033915362,
+     "max": 0.979170521244
+    },
+    "1.0": {
+     "geomean": 0.986841913449,
+     "max": 0.986923575084
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 0.958883426325,
+     "max": 0.958999100281
+    },
+    "0.5": {
+     "geomean": 0.979360395203,
+     "max": 0.979570765251
+    },
+    "1.0": {
+     "geomean": 0.987080934081,
+     "max": 0.98724828181
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 0.95690284668,
+     "max": 0.956970804974
+    },
+    "0.5": {
+     "geomean": 0.979070525603,
+     "max": 0.979260023613
+    },
+    "1.0": {
+     "geomean": 0.987058427593,
+     "max": 0.987210509175
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 0.850255392831,
+     "max": 0.856341502657
+    },
+    "0.5": {
+     "geomean": 0.916599000781,
+     "max": 0.918601454912
+    },
+    "1.0": {
+     "geomean": 0.939036028875,
+     "max": 0.940995811817
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 0.835344825249,
+     "max": 0.840725907139
+    },
+    "0.5": {
+     "geomean": 0.914780284926,
+     "max": 0.91754827498
+    },
+    "1.0": {
+     "geomean": 0.939090281304,
+     "max": 0.941068262545
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 0.843378360289,
+     "max": 0.845198108188
+    },
+    "0.5": {
+     "geomean": 0.9181913008,
+     "max": 0.918912614315
+    },
+    "1.0": {
+     "geomean": 0.941339688223,
+     "max": 0.941806321269
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 0.848668957111,
+     "max": 0.849335885696
+    },
+    "0.5": {
+     "geomean": 0.921011361662,
+     "max": 0.922093625824
+    },
+    "1.0": {
+     "geomean": 0.94334515707,
+     "max": 0.944282572086
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 0.838242508093,
+     "max": 0.838606878664
+    },
+    "0.5": {
+     "geomean": 0.91996277229,
+     "max": 0.920906810398
+    },
+    "1.0": {
+     "geomean": 0.943488724639,
+     "max": 0.944311212393
+    }
+   },
+   {
+    "arm": "D",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 0.971331625286,
+     "max": 0.972775084841
+    },
+    "0.5": {
+     "geomean": 0.974230156741,
+     "max": 0.975522520188
+    },
+    "1.0": {
+     "geomean": 0.976227583437,
+     "max": 0.977416487498
+    }
+   },
+   {
+    "arm": "D",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 0.971638115342,
+     "max": 0.972311942381
+    },
+    "0.5": {
+     "geomean": 0.97463588637,
+     "max": 0.975261067381
+    },
+    "1.0": {
+     "geomean": 0.976675512905,
+     "max": 0.977264431814
+    }
+   },
+   {
+    "arm": "D",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 0.972472984482,
+     "max": 0.972564311051
+    },
+    "0.5": {
+     "geomean": 0.975347294904,
+     "max": 0.975438453222
+    },
+    "1.0": {
+     "geomean": 0.977305092272,
+     "max": 0.977394876708
+    }
+   },
+   {
+    "arm": "D",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 0.973316385788,
+     "max": 0.973876031049
+    },
+    "0.5": {
+     "geomean": 0.976101245734,
+     "max": 0.976608169551
+    },
+    "1.0": {
+     "geomean": 0.97799512957,
+     "max": 0.978465442545
+    }
+   },
+   {
+    "arm": "D",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 0.973678513952,
+     "max": 0.974128225939
+    },
+    "0.5": {
+     "geomean": 0.976487289695,
+     "max": 0.976893433313
+    },
+    "1.0": {
+     "geomean": 0.978387818284,
+     "max": 0.978763853295
+    }
+   }
+  ],
+  "decision": {
+   "DL": {
+    "improvement": true,
+    "all_cells_below_1": true,
+    "band_below_1": true,
+    "max_ratio": 0.98724828181
+   },
+   "DL1": {
+    "improvement": true,
+    "all_cells_below_1": true,
+    "band_below_1": true,
+    "max_ratio": 0.944311212393
+   },
+   "D": {
+    "improvement": true,
+    "all_cells_below_1": true,
+    "band_below_1": true,
+    "max_ratio": 0.978763853295
+   }
+  },
+  "rho_band_k22": {
+   "0": {
+    "ic": 807657140.723,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 977654276.123,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2507628494.72,
+    "rho": 1492814000000.0
+   }
+  },
+  "ic_k22": {
+   "REF/DL/0": 844014769.056,
+   "REF/DL/0.1": 1014011904.46,
+   "REF/DL/1": 2543986123.06,
+   "REF/DL1/0": 526400229.721,
+   "REF/DL1/0.1": 696397365.121,
+   "REF/DL1/1": 2226371583.72,
+   "BOTH/DL/0": 807657140.723,
+   "BOTH/DL/0.1": 977654276.123,
+   "BOTH/DL/1": 2507628494.72,
+   "BOTH/DL1/0": 441298773.056,
+   "BOTH/DL1/0.1": 611295908.456,
+   "BOTH/DL1/1": 2141270127.06
+  },
+  "study": "research/ic_gw_nrm_lz_20261115/",
+  "report": "research/ic_gw_nrm_lz_20261115/REPORT.pdf",
+  "source": "research/ic_gw_nrm_lz_20261115/analysis.json",
+  "class": "component improvement (relation stage; scalar linear algebra) over the previous GHS-weak configuration; GHS-weak family only",
+  "validation": "validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_gw_nrm_lz_20261115/validation/VALIDATION.json)",
   "validated": true
  },
  "phases": [

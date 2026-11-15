@@ -4,13 +4,14 @@
 - **Kind:** unresolved algorithm and complexity proof; separate cloud execution limit
 - **Affected work:** [prime-field research continuation](../research/prime_one_shot_20261029/continuation/README.md)
 - **Next action owner:** prime-field divisor-system research lane
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-15
 
 ## Problem
 
 We cannot establish the requested novel sub-exponential prime-field ECDLP
 algorithm because no fixed-base divisor procedure with a proved sufficient
 sub-exponential cost and success probability has been constructed.
+[pcc:unverified]
 
 The selected construction uses odd prime whole-order E/Fp, odd arity
 m=Theta(sqrt(log r)), and a power of two d. The original scalar/torus
@@ -25,11 +26,31 @@ precomputation advantage or fixed-size speed claim.
 
 ## Evidence and uncertainty
 
+- **Core graph elimination (2026-11-15):** the
+  [core study](../research/norm_core_elimination_20261115/README.md) removes
+  norm graph and public pre-wrap coordinates, giving15/18/22 variables at
+  depth4 and arities3/5/7, degree at most3. Complete m3 sets and18 cold targets
+  still replay. Dense m5 fails with an allocation/segfault diagnostic; pair
+  batching reaches its fixed cap, and dense m7 remains capped. None produces
+  a basis. Shared Lean support now derives membership/charts from actual
+  retained transitions. The initial-basis cost/yield requirement stays open.
+  PCC-20261115-be28ec is unverified. [pcc:unverified]
+- **New algebraic implementation (2026-11-15):** the
+  [shared norm prototype](../research/shared_norm_algebraic_20261115/README.md)
+  replaces the old coefficient census with native msolve/FLINT solving and
+  successive-coordinate dual-quotient extraction. Both the original and
+  witness-pruned encodings match90 complete tiny model sets (400 models)
+  and recover18 cold point-only targets with separate OpenSSL replay.
+  The m5,t3 control completes; denser m5/t4 and m7/t4 controls remain unknown
+  at their frozen20s caps in both encodings. These exact software controls
+  establish neither an efficient growing-family solver nor useful-target
+  yield. PCC-20261115-be28ec is unverified. [pcc:unverified]
 - **Observed:** [native solver](../research/prime_one_shot_20261029/continuation/solver/README.md)
   exactly matches90 complete model sets/400 models on E/F17 of order19.
   Actual direct mixed-target IC solves all18 nonzero targets through both
   point-only API and separate CLI. Independent native record replay passes.
-  The current PDP visits p(p-1) coefficient pairs; it is exponential.
+  That earlier PDP visits p(p-1) coefficient pairs; it is exponential. The new
+  algebraic prototype removes that loop but has no adequate proved cost bound.
 - **Derived:** scoped rationality, selected-chart coverage, finite reducedness
   and mixed-target nullspace recovery are supported by the continuation's
   written proofs and independent reviews. They leave a precise conditional
@@ -72,7 +93,7 @@ precomputation advantage or fixed-size speed claim.
   either uniform complete exp(o(n)) cost, or a capped exp(o(n)) procedure with
   verified success probability at least exp(-o(n)). Include construction,
   failed calls, root extraction, verification and restarts. A low first-fall
-  degree or a fitted timing exponent is insufficient.
+  degree or a fitted timing exponent is insufficient. [pcc:unverified]
 - [x] Supply a supporting construction/bound without requiring a large2-power
   divisor of p-1 or p+1, while retaining the main odd-prime-whole-order input
   hypothesis. See the reviewed auxiliary-curve note and its classical sources.
@@ -96,7 +117,7 @@ asymptotic proof.
   arity. Focus on positive-target first-witness cost; complete UNSAT cost is
   optional. Keep membership implicit rather than materializing binom(d,m)
   states. Small quotient degree on enough positive targets is now proved in
-  the continuation; it does not bound initial elimination.
+  the continuation; it does not bound initial elimination. [pcc:unverified]
 - **Inputs and controls:** natural targets; selected-chart satisfiable and
   nonempty-chart unsatisfiable cases; rational/nonrational regressions; norm
   remainder and original per-root/Graeffe circuits on identical domains.
@@ -112,6 +133,12 @@ asymptotic proof.
   construction, or verified scientific compute availability.
 
 ## Resolution and history
+
+2026-11-15: added the complete fixed-fixture algebraic path, independent
+arithmetic replay and a witness-pruned encoding. The supporting separability
+and norm-coprimality laws were built in the shared Lean library; degree-bounded
+witness lifting and the full circuit endpoint remain outside that formalization.
+No source-ideal/cost/yield contract closes this problem. [pcc:unverified]
 
 2026-10-30: recorded after complete tiny unknown solving and supporting coverage
 proofs. Subsequently weakened the sufficient solver contract to permit selective

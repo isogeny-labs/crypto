@@ -156,6 +156,68 @@ RF_HD int rf_ffs32(uint32_t v) {   /* 1-based index of the lowest set bit, 0 for
 #endif
 }
 
+/* RF_EYT_PREFETCH = d > 0: while the Eytzinger descent is at node k, prefetch
+ * eyt[k << d], the first of the 2^d nodes d levels down.  d = 4 is one 128-byte
+ * line of 16 keys (eyt[16k .. 16k+15]; the device copy is 256-byte aligned).
+ * RF_EYT_PREFETCH_L2 = 1 prefetches into L2 only.  0 = off (default). */
+#ifndef RF_EYT_PREFETCH
+#define RF_EYT_PREFETCH 0
+#endif
+#ifndef RF_EYT_PREFETCH_L2
+#define RF_EYT_PREFETCH_L2 0
+#endif
+RF_HD void rf_prefetch(const void *p) {
+#if defined(__CUDA_ARCH__)
+#if RF_EYT_PREFETCH_L2
+    asm volatile("prefetch.global.L2 [%0];" ::"l"(p));
+#else
+    asm volatile("prefetch.global.L1 [%0];" ::"l"(p));
+#endif
+#else
+    __builtin_prefetch(p);
+#endif
+}
+#if RF_EYT_PREFETCH
+#define RF_EYT_PF(k)                                                             \
+    do {                                                                         \
+        uint32_t q_ = (k) << RF_EYT_PREFETCH;                                    \
+        if (q_ <= n && q_ > (k)) rf_prefetch(eyt + q_);                          \
+    } while (0)
+#else
+#define RF_EYT_PF(k) do { } while (0)
+#endif
+
+/* ---- negation-folded pair table, built from the base (RF_LOOKUP_PAIRS_DEVICE) ----
+ *
+ * The CPU build (ic_boundary PairTable::build_negation_folded) visits, for each
+ * abscissa index ai, the pairs (P_ai, Q) with Q in {+P_bi, -P_bi} for bi >= ai, in
+ * that order, and keeps the first pair seen for each abscissa of the sum.  Build
+ * index b = rf_pair_offset(ai, n) + 2 (bi - ai) + s, s = 0 for +P_bi, 1 for -P_bi;
+ * (ai, ai, 1) is P - P, the identity, which takes an index but makes no entry.
+ * x, y: the base's representatives (Montgomery form); a_m: the curve's a.       */
+RF_HD uint64_t rf_pair_offset(uint64_t ai, uint64_t n) { return 2 * (ai * n - ai * (ai - 1) / 2); }
+
+/* x(P_ai + s P_bi) into *out (Montgomery); 0 when the sum is the identity. */
+RF_HD int rf_pair_x(const Fp64Ctx &f, uint64_t a_m, const uint64_t *x, const uint64_t *y,
+                    uint32_t ai, uint32_t bi, int s, uint64_t *out) {
+    typedef FieldFp64 F;
+    const uint64_t x1 = x[ai], y1 = y[ai];
+    uint64_t lam;
+    if (bi == ai) {
+        if (s) return 0;                                         /* P - P */
+        const uint64_t x2 = F::sqr(f, x1);
+        const uint64_t num = F::add(f, F::add(f, F::add(f, x2, x2), x2), a_m);
+        lam = F::mul(f, num, F::inv(f, F::add(f, y1, y1)));     /* 2P (y != 0) */
+        *out = F::sub(f, F::sqr(f, lam), F::add(f, x1, x1));
+        return 1;
+    }
+    const uint64_t x2 = x[bi];
+    const uint64_t y2 = s ? F::sub(f, 0, y[bi]) : y[bi];
+    lam = F::mul(f, F::sub(f, y2, y1), F::inv(f, F::sub(f, x2, x1)));
+    *out = F::sub(f, F::sub(f, F::sqr(f, lam), x1), x2);
+    return 1;
+}
+
 struct SortedTable {
     const uint64_t *keys;   /* ascending */
     const uint32_t *idx;    /* factor-base index of keys[pos] */
@@ -168,7 +230,10 @@ struct SortedTable {
         /* Eytzinger lower_bound: descend, then strip the trailing ones of k
          * (the right turns taken after the last left turn). */
         uint32_t k = 1;
-        while (k <= n) k = 2 * k + (eyt[k] < key ? 1u : 0u);
+        while (k <= n) {
+            RF_EYT_PF(k);
+            k = 2 * k + (eyt[k] < key ? 1u : 0u);
+        }
         k >>= rf_ffs32(~k);
         return k ? eyt_rank[k] : n;
 #else
@@ -192,8 +257,8 @@ struct SortedTable {
          * while it is inside. */
         uint32_t a = 1, b = 1;
         while (a <= n || b <= n) {
-            if (a <= n) a = 2 * a + (eyt[a] < k0 ? 1u : 0u);
-            if (b <= n) b = 2 * b + (eyt[b] < k1 ? 1u : 0u);
+            if (a <= n) { RF_EYT_PF(a); a = 2 * a + (eyt[a] < k0 ? 1u : 0u); }
+            if (b <= n) { RF_EYT_PF(b); b = 2 * b + (eyt[b] < k1 ? 1u : 0u); }
         }
         a >>= rf_ffs32(~a);
         b >>= rf_ffs32(~b);
@@ -291,6 +356,14 @@ struct DecompArgs {
     rf_relation *out;
     uint32_t *out_count;           /* atomic; may exceed out_cap */
     uint32_t out_cap;
+    /* Probe mode (probe_mode = 1): candidates are looked up in the set
+     * probe_x (Montgomery form; the lookup table is built on it) instead of
+     * the factor base, every hit is emitted whatever its index (no j >= i),
+     * and tau is +1 (the caller re-derives the summands).  This is the
+     * three-summand sweep against the abscissae of a pair table.  With
+     * probe_mode = 0, probe_x must equal fb_x. */
+    const typename F::elt *probe_x;
+    uint32_t probe_mode;
 };
 
 RF_HD uint32_t rf_atomic_inc(uint32_t *ctr) {
@@ -450,6 +523,11 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
             while (table.valid(pos, key)) {
                 const uint32_t j = table.index(pos);
                 pos = table.next(pos, key);
+                if (a.probe_mode) {
+                    if (!F::eq(f, x3, a.probe_x[j])) continue;   /* key collision */
+                    rf_emit(a.out, a.out_count, a.out_cap, k, i, j, eps, 1);
+                    continue;
+                }
                 if (j < i) continue;
                 if (!F::eq(f, x3, a.fb_x[j])) continue;   /* 64-bit key collision (P-256 only) */
                 const elt y3 = F::sub(f, F::mul(f, lam, F::sub(f, xr, x3)), yr);

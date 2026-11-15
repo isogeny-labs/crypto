@@ -2348,7 +2348,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
-            ("m", "summands, 3, 4 or 5"),
+            ("m", "summands, 3 to 9 (the packed index is 12 bits for m <= 5, 64/m bits above: bases of up to 1023, 511, 255, 127 points for m = 6..9)"),
             ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
         ]
     }
@@ -2606,6 +2606,9 @@ pub struct WWalkOracle<E> {
     free_checked: u64,
     free_emitted: u64,
     probe_hits: u64,
+    /// `lcheck=1` (with `tw=1|2`): both `[d]G = Q` checks read the target
+    /// walk's stored `[2^i]G` ladder.
+    lcheck: bool,
 }
 
 impl<E> WWalkOracle<E> {
@@ -2617,6 +2620,7 @@ impl<E> WWalkOracle<E> {
             free_checked: 0,
             free_emitted: 0,
             probe_hits: 0,
+            lcheck: false,
         }
     }
 
@@ -2628,6 +2632,22 @@ impl<E> WWalkOracle<E> {
     /// The `tw=1` walk of the last `prepare`, for reports and tests.
     pub fn target_walk(&self) -> Option<&TargetWalk<E>> {
         self.tw_table.as_ref()
+    }
+
+    /// With `lcheck=1`: the target walk's `[2^i]G` chain
+    /// ([`TargetWalk::g_ladder`], already paid for in `prepare`), for the
+    /// pipeline's recovery check
+    /// ([`collect_and_solve_relations_touching_ladder`]); `None` otherwise.
+    ///
+    /// [`collect_and_solve_relations_touching_ladder`]: crate::cryptanalysis::ic_boundary::collect_and_solve_relations_touching_ladder
+    pub fn recovery_ladder(&self) -> Option<Vec<E>>
+    where
+        E: Copy + PartialEq,
+    {
+        self.tw_table
+            .as_ref()
+            .filter(|_| self.lcheck)
+            .map(TargetWalk::g_ladder)
     }
 }
 
@@ -2664,6 +2684,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T; 2 (needs g=1, grow=2 and a two-seed base in distinct columns): jumps [α]P1 + [α']P2 + [γ]G + [β]Q, every collision a row du1·s1 + du2·s2 + db·log Q = −dz (rows with du1 = du2 = 0 mod r dropped), stop at rank 3, cap 3T (default 0)"),
             ("cj", "1 (needs tw=1 or tw=2): build the jumps by chained additions from two base combinations [γ]G + [β]Q (the seed parts from the doubled multiples) instead of independent scalar multiplications (default 0)"),
             ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
+            ("lcheck", "1 (needs tw=1 or tw=2): the [d]G = Q checks (the build's lazy final check, charged as tw_lazy_check_*, and the pipeline's recovery check, charged to the verification phase's group ops, where the pipeline reads the oracle's recovery ladder) compute [d]G from the [2^i]G ladder (i < bits(r)) that the target walk's set-up already doubled and paid for, one addition per set bit of d (the first free) instead of a double-and-add; the ladder is retained at no group operation; walk, stream, collisions, rows and entries are unchanged, only the check counts move (default 0)"),
             ("sib", "1 to 16 (needs tw=1 or tw=2 and pool=M; default off): sibling points.  Every parent P draws its own random m-subset of a pool of M jump points (a product set J = A_i + K_j: a = 4 seed parts, or 8 from M = 256, and M/a chained parts K_j = K_(j-1) + K_(j-2), built as cj=1 chains them; set-up about a·popcount + M/a + M additions), and for each chosen J forms the two x-only children x(P ± J) from ONE inversion 1/(x_J − x_P); all 2m children are keyed (negation folded) with coefficient vectors c_P ± c_J and a key collision among any stored points is a row as in the target walk (lazy applies); the walk continues from P + J_h with h the first of the subset; the two known-copy minus children are not formed; stored points are capped at 3T.  Charging: a pair performs inv + 2 mul + 2 sqr + 8 add; it is charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add, the difference), so its bitop/v1 price equals its field work, and the band prices the second point at w; the continuing child's y (mul + 2 add) is the counter sibling_lift_products, once a parent; a pair whose minus child is skipped is the addition alone (one mul and two adds above what it performs); field_ops are counted as performed, never through the addition; a collision's x-only point gets its sign resolved at that time (one more addition, charged)"),
             ("pool", "sib to 512 (needs sib): the sibling pool's size M (default off)"),
             ("aut", "3 (needs tw=1 or tw=2; j = 0 prime curves over p ≡ 1 mod 3 with 3 | r − 1): orbit-canonical keys under the order-3 automorphism ζ₃(x, y) = (ωx, y) = [κ](x, y) and negation (A = 6): each stored or probed point is keyed by min(x, ωx, ω²x), two field multiplications, listed as the unpriced counter aut_canonicalisations_uncharged exactly as rho.cubic lists its canonicalisations_uncharged (the §5a band charges it at w; bitop/v1 prices it as 2 field multiplications and 2 word compares); the rotation is stored with the entry, and a collision at rotation difference d is the row of E_t = ±[κ^d]E_s (the kept coefficients scaled by κ^d mod r), with lazy, cv=0, sib and the verified recomputation unchanged; the [κ]G = ζ₃(G) check is charged to the set-up (default off)"),
@@ -2713,6 +2734,11 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         if cj && tw == 0 {
             return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
         }
+        let lcheck = params.flag("lcheck");
+        if lcheck && tw == 0 {
+            return Err("wwalk: lcheck=1 needs tw=1 or tw=2".into());
+        }
+        self.lcheck = lcheck;
         if lazy && !opts.g_jumps {
             return Err("wwalk: lazy=1 needs g=1".into());
         }
@@ -2757,7 +2783,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                 return Err("wwalk: sib with cv=0 is not supported".into());
             }
             let walk = if aut {
-                TargetWalk::build_ext_aut(
+                TargetWalk::build_lcheck(
                     ctx.group,
                     ctx.generator,
                     ctx.target,
@@ -2773,12 +2799,14 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                     cv,
                     sib,
                     true,
+                    lcheck,
                 )?
             } else if sib.is_some() {
                 if !cv {
                     return Err("wwalk: sib with cv=0 is not supported".into());
                 }
-                TargetWalk::build_ext_sib(
+                // `build_ext_sib` (chained jumps) with `lcheck`.
+                TargetWalk::build_lcheck(
                     ctx.group,
                     ctx.generator,
                     ctx.target,
@@ -2787,14 +2815,18 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                     ctx.cofactor,
                     x,
                     jumps,
+                    true,
                     seed,
                     lazy,
                     tw,
                     cv,
                     sib,
+                    false,
+                    lcheck,
                 )?
             } else {
-                TargetWalk::build_ext_cv(
+                // `build_ext_cv` with `lcheck`.
+                TargetWalk::build_lcheck(
                     ctx.group,
                     ctx.generator,
                     ctx.target,
@@ -2808,6 +2840,9 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                     lazy,
                     tw,
                     cv,
+                    None,
+                    false,
+                    lcheck,
                 )?
             };
             self.free_pending = true;
@@ -2950,6 +2985,10 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             }
         }
         m
+    }
+
+    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        WWalkOracle::recovery_ladder(self)
     }
 }
 
@@ -3126,11 +3165,11 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
 /// coordinates of its positive representative in Montgomery form, and the
 /// indices of `P` and `−P` in the run's base.
 #[derive(Clone, Copy, Debug)]
-struct SweepRep {
-    x: u64,
-    y: u64,
-    plus: usize,
-    minus: usize,
+pub(crate) struct SweepRep {
+    pub(crate) x: u64,
+    pub(crate) y: u64,
+    pub(crate) plus: usize,
+    pub(crate) minus: usize,
 }
 
 /// Direct-subtraction root finding on a prime curve: the decomposition
@@ -3172,6 +3211,11 @@ pub struct RootfindSubtractOracle<'i> {
     /// each is charged as.
     sweep_field_muls: u64,
     sweep_field_adds: u64,
+    /// `m = 3` with the pair table built elsewhere (`rootfind-subtract-gpu`,
+    /// `probe_build=pairs`): `prepare` builds no table, and the builder
+    /// charges the build and supplies its work counters here.
+    defer_table: bool,
+    deferred_table_work: BTreeMap<String, u64>,
 }
 
 impl<'i> RootfindSubtractOracle<'i> {
@@ -3188,7 +3232,20 @@ impl<'i> RootfindSubtractOracle<'i> {
             mismatches: 0,
             sweep_field_muls: 0,
             sweep_field_adds: 0,
+            defer_table: false,
+            deferred_table_work: BTreeMap::new(),
         }
+    }
+
+    /// Build no pair table in `prepare` (`m = 3`); the caller builds it,
+    /// charges it, and passes its [`PairTable::work_counters`] to
+    /// [`Self::set_deferred_table_work`].
+    pub(crate) fn defer_pair_table(&mut self) {
+        self.defer_table = true;
+    }
+
+    pub(crate) fn set_deferred_table_work(&mut self, work: BTreeMap<String, u64>) {
+        self.deferred_table_work = work;
     }
 }
 
@@ -3273,7 +3330,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
         self.degenerate = vec![false; reps.len()];
         self.reps = reps;
         self.field = Some(f);
-        if self.m == 3 {
+        if self.m == 3 && !self.defer_table {
             let table = PairTable::build_negation_folded(ctx.group, fb);
             ops.merge(table.build_ops);
             self.table = Some(table);
@@ -3286,7 +3343,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
             .table
             .as_ref()
             .map(PairTable::work_counters)
-            .unwrap_or_default();
+            .unwrap_or_else(|| self.deferred_table_work.clone());
         // The sweep's `x_index` read per abscissa, and its two
         // conversions into Montgomery form.
         let k = self.reps.len() as u64;
@@ -3379,9 +3436,42 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
 }
 
 impl RootfindSubtractOracle<'_> {
+    /// The prepared sweep: the field and one representative per abscissa,
+    /// in the order `decompose` walks them (`rootfind-subtract-gpu`).
+    pub(crate) fn sweep(&self) -> Option<(Fp64, &[SweepRep])> {
+        Some((self.field?, &self.reps))
+    }
+
+    /// The pair table's abscissae (`m = 3`), for the device probe set.
+    pub(crate) fn pair_abscissae(&self) -> Option<Vec<u64>> {
+        self.table.as_ref()?.map_abscissae()
+    }
+
+    /// What `decompose` charges for a target before its first candidate:
+    /// the two conversions into Montgomery form and the batched inversion
+    /// over the `k` abscissae.
+    pub(crate) fn charge_sweep_setup(&mut self, ops: &mut GroupOps, counters: &mut OracleCounters) {
+        let k = self.reps.len() as u64;
+        ops.field_ops.muls += 2;
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * k;
+        self.sweep_field_muls += 2 + 3 * k;
+        self.sweep_field_adds += k;
+    }
+
+    /// What `decompose` charges per non-degenerate candidate point, before
+    /// its lookup.
+    pub(crate) fn charge_candidate(ops: &mut GroupOps) {
+        ops.adds += 1;
+        ops.field_ops.muls += 4;
+        ops.field_ops.sqrs += 1;
+    }
+
     /// Is `t = R − F_summand` a base point (`m = 2`), or a pair sum
     /// (`m = 3`)?  A hit is re-added in the group before it is returned.
-    fn lookup(
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn lookup(
         &mut self,
         ctx: &InstanceCtx<PrimeCurve>,
         fb: &FactorBase<PrimePoint>,

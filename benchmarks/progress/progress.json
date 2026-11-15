@@ -4,9 +4,9 @@
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
-    "invalid": 3,
-    "measured": 165,
-    "open": 0
+    "invalid": 4,
+    "measured": 191,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -880,6 +880,576 @@
           "spread": null,
           "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
           "value": 0.34
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.757,
+      "latest": 1.757,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_26b_t1000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.679,
+            1.813
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.757
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.43,
+      "latest": 1.43,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_28b_t3000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.349,
+            1.541
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.43
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.988,
+      "latest": 0.988,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_30b_t1000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.925,
+            1.044
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 0.988
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0,
+      "latest": 1.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_30b_t3000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.931,
+            1.07
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.0
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.808,
+      "latest": 0.808,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t1000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.754,
+            0.845
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.808
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.989,
+      "latest": 0.989,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t200",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.911,
+            1.068
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.989
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.745,
+      "latest": 0.745,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t3000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.711,
+            0.785
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.745
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.606,
+      "latest": 0.606,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t1000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.564,
+            0.642
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.606
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.809,
+      "latest": 0.809,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t200",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.759,
+            0.869
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.809
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.593,
+      "latest": 0.593,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t3000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.566,
+            0.624
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.593
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.658,
+      "latest": 0.658,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_36b_t1000",
+      "points": [
+        {
+          "commit": "ec3b88e2c430",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0416Z-j0-multirho-vs-bsgs-interleaved-36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.633,
+            0.677
+          ],
+          "summary": "Interleaved at 36 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.85, 0.66, 0.58); ratio flat vs 34 bits",
+          "value": 0.658
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.849,
+      "latest": 0.849,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_36b_t200",
+      "points": [
+        {
+          "commit": "ec3b88e2c430",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0416Z-j0-multirho-vs-bsgs-interleaved-36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.803,
+            0.902
+          ],
+          "summary": "Interleaved at 36 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.85, 0.66, 0.58); ratio flat vs 34 bits",
+          "value": 0.849
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.577,
+      "latest": 0.577,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_36b_t3000",
+      "points": [
+        {
+          "commit": "ec3b88e2c430",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0416Z-j0-multirho-vs-bsgs-interleaved-36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.561,
+            0.59
+          ],
+          "summary": "Interleaved at 36 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.85, 0.66, 0.58); ratio flat vs 34 bits",
+          "value": 0.577
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.618,
+      "latest": 0.618,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_38b_t1000",
+      "points": [
+        {
+          "commit": "48b71cd6aef9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0434Z-j0-multirho-vs-bsgs-interleaved-38",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.599,
+            0.637
+          ],
+          "summary": "Interleaved at 38 bits: rho faster at T=200 (0.72) and T=1000 (0.62); T=3000 reads 0.47 but fails A/A; 36-bit plateau reading withdrawn",
+          "value": 0.618
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.724,
+      "latest": 0.724,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_38b_t200",
+      "points": [
+        {
+          "commit": "48b71cd6aef9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0434Z-j0-multirho-vs-bsgs-interleaved-38",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.687,
+            0.774
+          ],
+          "summary": "Interleaved at 38 bits: rho faster at T=200 (0.72) and T=1000 (0.62); T=3000 reads 0.47 but fails A/A; 36-bit plateau reading withdrawn",
+          "value": 0.724
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.467,
+      "latest": 0.467,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_38b_t3000",
+      "points": [
+        {
+          "commit": "48b71cd6aef9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0434Z-j0-multirho-vs-bsgs-interleaved-38",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.448,
+            0.486
+          ],
+          "summary": "Interleaved at 38 bits: rho faster at T=200 (0.72) and T=1000 (0.62); T=3000 reads 0.47 but fails A/A; 36-bit plateau reading withdrawn",
+          "value": 0.467
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.549,
+      "latest": 0.549,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_40b_t1000",
+      "points": [
+        {
+          "commit": "a3f018d66572",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0532Z-j0-multirho-vs-bsgs-interleaved-40",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.532,
+            0.569
+          ],
+          "summary": "Interleaved at 40 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.71, 0.55, 0.45), all A/A pass",
+          "value": 0.549
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.714,
+      "latest": 0.714,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_40b_t200",
+      "points": [
+        {
+          "commit": "a3f018d66572",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0532Z-j0-multirho-vs-bsgs-interleaved-40",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.685,
+            0.744
+          ],
+          "summary": "Interleaved at 40 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.71, 0.55, 0.45), all A/A pass",
+          "value": 0.714
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.449,
+      "latest": 0.449,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_40b_t3000",
+      "points": [
+        {
+          "commit": "a3f018d66572",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0532Z-j0-multirho-vs-bsgs-interleaved-40",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.439,
+            0.46
+          ],
+          "summary": "Interleaved at 40 bits: tuned multi-target rho faster than folded BSGS in all three cells (0.71, 0.55, 0.45), all A/A pass",
+          "value": 0.449
         }
       ],
       "problem": "ecdlp-prime-multi-target",
@@ -2164,6 +2734,661 @@
     },
     {
       "better": "lower",
+      "first": 0.6677638364209324,
+      "latest": 0.6677638364209324,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6563666166577568,
+            0.6793589587206363
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.6677638364209324
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.6907608750588367,
+      "latest": 0.6907608750588367,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.676849629335083,
+            0.7049580376970707
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.6907608750588367
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5957548772263922,
+      "latest": 0.5957548772263922,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5836234323126437,
+            0.6081384915143417
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5957548772263922
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.8589768247986305,
+      "latest": 7.8589768247986305,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.696159
+      },
+      "metric": "fp20_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.696159
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.3796975073023274,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.8589768247986305
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 7.111354055695914,
+      "latest": 7.111354055695914,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.603242
+      },
+      "metric": "fp20_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.603242
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.2691499828475836,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.111354055695914
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.58758174672307,
+      "latest": 14.58758174672307,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.143109
+      },
+      "metric": "fp20_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.143109
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.3746252273950295,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.58758174672307
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.5732780016891322,
+      "latest": 0.5732780016891322,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5593052061836886,
+            0.5875998713889119
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5732780016891322
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5964883365746998,
+      "latest": 0.5964883365746998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5825048139389976,
+            0.6108075455440152
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5964883365746998
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5016278555270598,
+      "latest": 0.5016278555270598,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4913683767473674,
+            0.5121015461075353
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5016278555270598
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.390894343938431,
+      "latest": 7.390894343938431,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.776033
+      },
+      "metric": "fp22_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.776033
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.2795796107762163,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.390894343938431
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.64927952268661,
+      "latest": 6.64927952268661,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.674148
+      },
+      "metric": "fp22_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.674148
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.1718550848270417,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 6.64927952268661
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.065427735204743,
+      "latest": 14.065427735204743,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.253802
+      },
+      "metric": "fp22_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.253802
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.2491003443187934,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.065427735204743
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.4842625047788181,
+      "latest": 0.4842625047788181,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.47402810976282467,
+            0.4947178631494867
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.4842625047788181
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5010859114536607,
+      "latest": 0.5010859114536607,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4909425327970129,
+            0.5114388627663705
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5010859114536607
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.42610600569321144,
+      "latest": 0.42610600569321144,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.415640784782985,
+            0.4368347254050702
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.42610600569321144
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.157859173063904,
+      "latest": 7.157859173063904,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.041586
+      },
+      "metric": "fp24_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.041586
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.1847649638714108,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.157859173063904
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.383007476400372,
+      "latest": 6.383007476400372,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.870922
+      },
+      "metric": "fp24_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.870922
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.0872239713560443,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 6.383007476400372
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.13152444303565,
+      "latest": 14.13152444303565,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.851203
+      },
+      "metric": "fp24_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.851203
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.0626338965097077,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.13152444303565
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.7081,
+      "latest": 0.7081,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_fes_over_inherited",
+      "points": [
+        {
+          "commit": "b61a431d279d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261115T0009Z-fes-k13-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6683,
+            0.7503
+          ],
+          "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+          "value": 0.7081
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 86.067,
+      "latest": 86.067,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 33.307663
+      },
+      "metric": "s_ic_descent_fes_f2",
+      "points": [
+        {
+          "commit": "b61a431d279d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 33.307663
+          },
+          "n": 48,
+          "record": "20261115T0009Z-fes-k13-runpod",
+          "reference": 2.584,
+          "reference_kind": "matched_rho",
+          "spread": [
+            78.914,
+            93.868
+          ],
+          "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+          "value": 86.067
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 121.544,
+      "latest": 121.544,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 47.037152
+      },
+      "metric": "s_ic_descent_inherited_f4",
+      "points": [
+        {
+          "commit": "b61a431d279d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 47.037152
+          },
+          "n": 48,
+          "record": "20261115T0009Z-fes-k13-runpod",
+          "reference": 2.584,
+          "reference_kind": "matched_rho",
+          "spread": [
+            106.689,
+            138.468
+          ],
+          "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+          "value": 121.544
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.584,
+      "latest": 2.584,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "s_rho_sfstrong_v2",
+      "points": [
+        {
+          "commit": "b61a431d279d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 48,
+          "record": "20261115T0009Z-fes-k13-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.512,
+            2.659
+          ],
+          "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+          "value": 2.584
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
       "first": 49.3937,
       "latest": 49.3937,
       "latest_derived": {
@@ -3009,6 +4234,164 @@
     },
     {
       "better": "lower",
+      "first": 5.07,
+      "latest": 5.07,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.07
+      },
+      "metric": "fpm_mid_2lp_over_rho_g2_p16777259",
+      "points": [
+        {
+          "commit": "30e46a98d6b6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.07
+          },
+          "n": 6,
+          "record": "20261115T0317Z-genus-ladder-scale",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            2.43,
+            11.9
+          ],
+          "summary": "Genus ladder scaling: genus 2 to 2^24 (no crossing, both exponents 1), genus 3 to 2^15 (2LP exponent 1.344, 0.54 of rho at 32771); 234 runs all certified; unverified pre-gate.",
+          "value": 5.07
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.537,
+      "latest": 0.537,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.537
+      },
+      "metric": "fpm_mid_2lp_over_rho_g3_p32771",
+      "points": [
+        {
+          "commit": "30e46a98d6b6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.537
+          },
+          "n": 6,
+          "record": "20261115T0317Z-genus-ladder-scale",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.407,
+            0.686
+          ],
+          "summary": "Genus ladder scaling: genus 2 to 2^24 (no crossing, both exponents 1), genus 3 to 2^15 (2LP exponent 1.344, 0.54 of rho at 32771); 234 runs all certified; unverified pre-gate.",
+          "value": 0.537
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0638,
+      "latest": 0.0638,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.0638
+      },
+      "metric": "fpm_mid_ic_over_rho_g4_p4099_c_pre",
+      "points": [
+        {
+          "commit": "360fe03360a3",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.0638
+          },
+          "n": 12,
+          "record": "20261114T2047Z-genus-ladder",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.033,
+            0.135
+          ],
+          "summary": "Genus ladder: HCDLP at genus 2-5 on one field, plane quartics, Smith census; 1809 runs all certified; unverified (no validator replay), no leaderboard row.",
+          "value": 0.0638
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0312,
+      "latest": 0.0312,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.0312
+      },
+      "metric": "fpm_mid_ic_over_rho_g4_p8209_c_pre",
+      "points": [
+        {
+          "commit": "e5e38c533efc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.0312
+          },
+          "n": 6,
+          "record": "20261115T0031Z-genus-ladder-bound-r",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.018,
+            0.0615
+          ],
+          "summary": "Genus ladder follow-up: r bound to p (h<=2), genus 4 and plane quartics at p=2053..8209; 108 runs all certified; replay by validator agent on the same shared host; pre-gate.",
+          "value": 0.0312
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.64,
+      "latest": 0.64,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prefilter_rel_mul_ratio_g5",
+      "points": [
+        {
+          "commit": "360fe03360a3",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 60,
+          "record": "20261114T2047Z-genus-ladder",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.612,
+            0.673
+          ],
+          "summary": "Genus ladder: HCDLP at genus 2-5 on one field, plane quartics, Smith census; 1809 runs all certified; unverified (no validator replay), no leaderboard row.",
+          "value": 0.64
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 0.0006,
       "latest": 0.0006,
       "latest_derived": {
@@ -3420,6 +4803,448 @@
     },
     {
       "better": "lower",
+      "first": 0.004,
+      "latest": 0.004,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_rf2_daemon_setup_s_r31_f4096",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.004
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.214,
+      "latest": 0.214,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 44.032922
+      },
+      "metric": "ic_rf2_daemon_solve_s_r31_f4096",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 44.032922
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 0.00486,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.214
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.323,
+      "latest": 0.323,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 22.291235
+      },
+      "metric": "ic_rf2_gpu_vs_mt_solve_s_r31",
+      "points": [
+        {
+          "commit": "7417c99292c9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 22.291235
+          },
+          "n": 4,
+          "record": "20261115T0432Z-ic-gpu-rootfind-big",
+          "reference": 0.01449,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100, round 3: 240/240 records verified and replayed, 136 pair checks equal S. m=3 above 32 bits (prime_explicit 34-40 bits): GPU daemon with a device-built probe table solves 11.1x faster than one CPU thread and 2.6x than the multi-threaded arm at log2 r=39.3, |F_x|=2048 (relation phase 123x); at |F_x|=4096 the CPU pair table and LA bound the solve (0.97-2.72x). Device-built table cuts set-up by 0.46-0.77 s. m=2: GPU 4.1-24.2x the multi-threaded CPU arm (a weak baseline). S unchanged (m=3 107-521x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.323
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 3.238,
+      "latest": 3.238,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_rf2_mt_pool_vs_cpu_r31",
+      "points": [
+        {
+          "commit": "5142615e5d83",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261115T0656Z-ic-gpu-rootfind-pairs",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 3.238
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.246,
+      "latest": 0.246,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.217314
+      },
+      "metric": "ic_rf2_relations_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.217314
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.246
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 26009.6,
+      "latest": 26009.6,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 22976.678445
+      },
+      "metric": "ic_rf2_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 22976.678445
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 26009.6
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.643,
+      "latest": 0.643,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.568021
+      },
+      "metric": "ic_rf2_solve_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.568021
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.643
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.249,
+      "latest": 0.249,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 27.513812
+      },
+      "metric": "ic_rf3_daemon_solve_s_r31_f1024",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 27.513812
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 0.00905,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.249
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.285,
+      "latest": 1.285,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_rf3_device_table_setup_s_f2048",
+      "points": [
+        {
+          "commit": "7417c99292c9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261115T0432Z-ic-gpu-rootfind-big",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100, round 3: 240/240 records verified and replayed, 136 pair checks equal S. m=3 above 32 bits (prime_explicit 34-40 bits): GPU daemon with a device-built probe table solves 11.1x faster than one CPU thread and 2.6x than the multi-threaded arm at log2 r=39.3, |F_x|=2048 (relation phase 123x); at |F_x|=4096 the CPU pair table and LA bound the solve (0.97-2.72x). Device-built table cuts set-up by 0.46-0.77 s. m=2: GPU 4.1-24.2x the multi-threaded CPU arm (a weak baseline). S unchanged (m=3 107-521x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 1.285
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.245,
+      "latest": 0.245,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_rf3_gpu_relations_s_r39_f2048",
+      "points": [
+        {
+          "commit": "7417c99292c9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261115T0432Z-ic-gpu-rootfind-big",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100, round 3: 240/240 records verified and replayed, 136 pair checks equal S. m=3 above 32 bits (prime_explicit 34-40 bits): GPU daemon with a device-built probe table solves 11.1x faster than one CPU thread and 2.6x than the multi-threaded arm at log2 r=39.3, |F_x|=2048 (relation phase 123x); at |F_x|=4096 the CPU pair table and LA bound the solve (0.97-2.72x). Device-built table cuts set-up by 0.46-0.77 s. m=2: GPU 4.1-24.2x the multi-threaded CPU arm (a weak baseline). S unchanged (m=3 107-521x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.245
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 2.929,
+      "latest": 2.929,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 7.017754
+      },
+      "metric": "ic_rf3_gpu_solve_s_r39_f2048",
+      "points": [
+        {
+          "commit": "7417c99292c9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 7.017754
+          },
+          "n": 4,
+          "record": "20261115T0432Z-ic-gpu-rootfind-big",
+          "reference": 0.41737,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100, round 3: 240/240 records verified and replayed, 136 pair checks equal S. m=3 above 32 bits (prime_explicit 34-40 bits): GPU daemon with a device-built probe table solves 11.1x faster than one CPU thread and 2.6x than the multi-threaded arm at log2 r=39.3, |F_x|=2048 (relation phase 123x); at |F_x|=4096 the CPU pair table and LA bound the solve (0.97-2.72x). Device-built table cuts set-up by 0.46-0.77 s. m=2: GPU 4.1-24.2x the multi-threaded CPU arm (a weak baseline). S unchanged (m=3 107-521x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 2.929
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.122,
+      "latest": 0.122,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_rf3_gpup_setup_s_r39_f4096",
+      "points": [
+        {
+          "commit": "5142615e5d83",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261115T0656Z-ic-gpu-rootfind-pairs",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.122
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.368,
+      "latest": 0.368,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 3.394208
+      },
+      "metric": "ic_rf3_gpup_solve_s_r39_f2048",
+      "points": [
+        {
+          "commit": "5142615e5d83",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 3.394208
+          },
+          "n": 4,
+          "record": "20261115T0656Z-ic-gpu-rootfind-pairs",
+          "reference": 0.10842,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.368
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 79.8,
+      "latest": 79.8,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 42.903226
+      },
+      "metric": "ic_rf3_s_r31_f1024",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 42.903226
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 1.86,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 79.8
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 567.3,
+      "latest": 565.7,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.282,
+        "improvement_vs_previous_percent": 0.282,
+        "value_over_reference": 569.000201
+      },
+      "metric": "ic_rf3_s_r39_f2048",
+      "points": [
+        {
+          "commit": "7417c99292c9",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 520.936639
+          },
+          "n": 4,
+          "record": "20261115T0432Z-ic-gpu-rootfind-big",
+          "reference": 1.089,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100, round 3: 240/240 records verified and replayed, 136 pair checks equal S. m=3 above 32 bits (prime_explicit 34-40 bits): GPU daemon with a device-built probe table solves 11.1x faster than one CPU thread and 2.6x than the multi-threaded arm at log2 r=39.3, |F_x|=2048 (relation phase 123x); at |F_x|=4096 the CPU pair table and LA bound the solve (0.97-2.72x). Device-built table cuts set-up by 0.46-0.77 s. m=2: GPU 4.1-24.2x the multi-threaded CPU arm (a weak baseline). S unchanged (m=3 107-521x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 567.3
+        },
+        {
+          "commit": "5142615e5d83",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.282,
+            "improvement_vs_previous_percent": 0.282,
+            "value_over_reference": 569.000201
+          },
+          "n": 4,
+          "record": "20261115T0656Z-ic-gpu-rootfind-pairs",
+          "reference": 0.9942,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 565.7
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
       "first": 0.1769,
       "latest": 0.1769,
       "latest_derived": {
@@ -3552,6 +5377,33 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.312,
+      "latest": 1.312,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_eyt_prefetch_d5_sorted_c16_ratio",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 1.312
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
     },
     {
       "better": "lower",
@@ -7244,6 +9096,243 @@
       "unit": "ratio"
     },
     {
+      "better": "lower",
+      "first": 94.42,
+      "latest": 94.42,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_g155_over_ref_w0_h0_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            93.21,
+            95.41
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 94.42
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 101.94,
+      "latest": 101.94,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_g155_over_ref_w1_h0.1_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            101.06,
+            103.1
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 101.94
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 99.5,
+      "latest": 99.5,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_g160_over_ref_w0_h0_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            98.04,
+            104.18
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 99.5
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 100.43,
+      "latest": 100.43,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_g160_over_ref_w1_h0.1_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            99.95,
+            100.77
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 100.43
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 113.32,
+      "latest": 113.32,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "total_cpu_dl_g155_over_ref_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            105.86,
+            119.14
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 113.32
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 112.66,
+      "latest": 112.66,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "total_cpu_dl_g160_over_ref_geomean",
+      "points": [
+        {
+          "commit": "0402ffb5c124",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2308Z-ic-gw-fbgrow",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            103.86,
+            128.08
+          ],
+          "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+          "value": 112.66
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-fbgrow",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 84.74,
+      "latest": 84.74,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "relations_cpu_chain_over_ref_geomean",
+      "points": [
+        {
+          "commit": "7f8e80c1f38f",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 15,
+          "record": "20261114T2206Z-ic-gw-sqrt-compiled",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            65.45,
+            94.38
+          ],
+          "summary": "compiled sqrt chain at c_D=1.7, L0: relations.cpu 0.65-0.94 of REF in 15/15 cells (geomean 0.847), A/A floor 0.16 so not separated from noise; counted fields identical (8580); total DL CPU 0.96; pcc:unverified",
+          "value": 84.74
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-sqrt-compiled",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 96.09,
+      "latest": 96.09,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "total_cpu_dl_chain_over_ref_geomean",
+      "points": [
+        {
+          "commit": "7f8e80c1f38f",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T2206Z-ic-gw-sqrt-compiled",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "compiled sqrt chain at c_D=1.7, L0: relations.cpu 0.65-0.94 of REF in 15/15 cells (geomean 0.847), A/A floor 0.16 so not separated from noise; counted fields identical (8580); total DL CPU 0.96; pcc:unverified",
+          "value": 96.09
+        }
+      ],
+      "problem": "ic:gw-quartic-dl-sqrt-compiled",
+      "unit": "percent"
+    },
+    {
       "better": "neutral",
       "first": 148.0,
       "latest": 148.0,
@@ -7269,9 +9358,10 @@
     {
       "better": "higher",
       "first": 1.0044447074829879,
-      "latest": 1.0044447074829879,
+      "latest": 1.0078455598240346,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 0.3386,
+        "improvement_vs_previous_percent": 0.3386
       },
       "metric": "build_aa_k0n53",
       "points": [
@@ -7291,6 +9381,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 1.0044447074829879
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.3386,
+            "improvement_vs_previous_percent": 0.3386
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9907661242917067,
+            1.0334314937393239
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0078455598240346
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -7299,9 +9407,10 @@
     {
       "better": "higher",
       "first": 0.9971213805255936,
-      "latest": 0.9971213805255936,
+      "latest": 0.9996278829608752,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 0.2514,
+        "improvement_vs_previous_percent": 0.2514
       },
       "metric": "build_aa_k0n61",
       "points": [
@@ -7321,6 +9430,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9971213805255936
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.2514,
+            "improvement_vs_previous_percent": 0.2514
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9791123960695629,
+            1.018036352744864
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 0.9996278829608752
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -7388,10 +9515,71 @@
     },
     {
       "better": "higher",
-      "first": 0.9924685457673248,
-      "latest": 0.9924685457673248,
+      "first": 0.9971339316979637,
+      "latest": 0.9971339316979637,
       "latest_derived": {
         "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_perkey_over_block_k0n53",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9632026218580793,
+            1.0231939360358027
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 0.9971339316979637
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9960893763849149,
+      "latest": 0.9960893763849149,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_perkey_over_block_k0n61",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9827033865164593,
+            1.014037830348502
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 0.9960893763849149
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9924685457673248,
+      "latest": 1.0023916522832244,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.9998,
+        "improvement_vs_previous_percent": 0.9998
       },
       "metric": "collect_aa_k0n53",
       "points": [
@@ -7411,6 +9599,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9924685457673248
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.9998,
+            "improvement_vs_previous_percent": 0.9998
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9802366855329098,
+            1.0419932530914249
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0023916522832244
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -7419,9 +9625,10 @@
     {
       "better": "higher",
       "first": 0.9932761800741537,
-      "latest": 0.9932761800741537,
+      "latest": 1.0073627441780668,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 1.4182,
+        "improvement_vs_previous_percent": 1.4182
       },
       "metric": "collect_aa_k0n61",
       "points": [
@@ -7441,6 +9648,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9932761800741537
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 1.4182,
+            "improvement_vs_previous_percent": 1.4182
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9852365025911541,
+            1.0226772064734977
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0073627441780668
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -7501,6 +9726,66 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 1.0192706170412436
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.08696182728291,
+      "latest": 1.08696182728291,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_perkey_over_block_k0n53",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.07103909677251,
+            1.1219648460806706
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.08696182728291
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0973715992842736,
+      "latest": 1.0973715992842736,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_perkey_over_block_k0n61",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0764954488212193,
+            1.1153249815280666
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0973715992842736
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -7569,9 +9854,10 @@
     {
       "better": "higher",
       "first": 0.9996021703604971,
-      "latest": 0.9996021703604971,
+      "latest": 1.012385271861417,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 1.2788,
+        "improvement_vs_previous_percent": 1.2788
       },
       "metric": "setup_aa_k0n53",
       "points": [
@@ -7591,6 +9877,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9996021703604971
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 1.2788,
+            "improvement_vs_previous_percent": 1.2788
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9911321548920167,
+            1.043940505766153
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.012385271861417
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -7599,9 +9903,10 @@
     {
       "better": "higher",
       "first": 0.9963203913163303,
-      "latest": 0.9963203913163303,
+      "latest": 1.0076386870057852,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 1.136,
+        "improvement_vs_previous_percent": 1.136
       },
       "metric": "setup_aa_k0n61",
       "points": [
@@ -7621,6 +9926,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9963203913163303
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 1.136,
+            "improvement_vs_previous_percent": 1.136
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9922168023869545,
+            1.0205471333823364
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0076386870057852
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -7681,6 +10004,66 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 1.0167528869791844
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0498267124210316,
+      "latest": 1.0498267124210316,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_perkey_over_block_k0n53",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.027452527399568,
+            1.074113536385307
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0498267124210316
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.08604487469524,
+      "latest": 1.08604487469524,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_perkey_over_block_k0n61",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0565446962704201,
+            1.1026041652376894
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.08604487469524
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -8920,6 +11303,126 @@
     },
     {
       "better": "higher",
+      "first": 0.991804565084696,
+      "latest": 0.991804565084696,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_setup_aa_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9378872415286191,
+            1.0129599415443826
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 0.991804565084696
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0046914203549053,
+      "latest": 1.0046914203549053,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_setup_aa_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9768508269034454,
+            1.0187328523500878
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.0046914203549053
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.7958690853222574,
+      "latest": 2.7958690853222574,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_setup_eager_over_lazy_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.6978782196249074,
+            2.8968500680872653
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 2.7958690853222574
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 3.0319161107087145,
+      "latest": 3.0319161107087145,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_setup_eager_over_lazy_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.831952070881805,
+            3.0887840199227785
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 3.0319161107087145
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
       "first": 0.9814972203776974,
       "latest": 0.9814972203776974,
       "latest_derived": {
@@ -8980,11 +11483,131 @@
     },
     {
       "better": "higher",
-      "first": 1.0050488198854794,
-      "latest": 1.0052391975524457,
+      "first": 1.000968636122419,
+      "latest": 1.000968636122419,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0189,
-        "improvement_vs_previous_percent": 1.3882
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "descent_setup_aa_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9594768879195211,
+            1.057082416023057
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.000968636122419
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9953119278862266,
+      "latest": 0.9953119278862266,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "descent_setup_aa_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9850382399038405,
+            1.0112179899757592
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 0.9953119278862266
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.486047500005094,
+      "latest": 1.486047500005094,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "descent_setup_eager_over_lazy_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.4459113529423155,
+            1.5467136083987132
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.486047500005094
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.5956690573808785,
+      "latest": 1.5956690573808785,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "descent_setup_eager_over_lazy_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.5541343389463467,
+            1.6184302283457912
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.5956690573808785
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0050488198854794,
+      "latest": 0.9893389421171053,
+      "latest_derived": {
+        "improvement_vs_first_percent": -1.5631,
+        "improvement_vs_previous_percent": -3.2006
       },
       "metric": "setup_aa_k0n53",
       "points": [
@@ -9040,6 +11663,60 @@
           ],
           "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
           "value": 1.0052391975524457
+        },
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.9569,
+            "improvement_vs_previous_percent": -0.9757
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.949128455168818,
+            1.0455779805345222
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 0.9954311801310548
+        },
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 1.6917,
+            "improvement_vs_previous_percent": 2.6742
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.970473742768882,
+            1.0541950165164686
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 1.0220510342223998
+        },
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -1.5631,
+            "improvement_vs_previous_percent": -3.2006
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9471262090668178,
+            1.015578565191985
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 0.9893389421171053
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9048,10 +11725,10 @@
     {
       "better": "higher",
       "first": 1.0032154840727214,
-      "latest": 1.0136484493851134,
+      "latest": 1.0029183117812122,
       "latest_derived": {
-        "improvement_vs_first_percent": 1.04,
-        "improvement_vs_previous_percent": 1.636
+        "improvement_vs_first_percent": -0.0296,
+        "improvement_vs_previous_percent": 0.7434
       },
       "metric": "setup_aa_k0n61",
       "points": [
@@ -9107,6 +11784,240 @@
           ],
           "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
           "value": 1.0136484493851134
+        },
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.9512,
+            "improvement_vs_previous_percent": -0.0879
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9922999561749404,
+            1.0319336815240008
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.0127577015964162
+        },
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.7673,
+            "improvement_vs_previous_percent": -1.7023
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9562389801585633,
+            1.0336934843357273
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 0.9955174479165319
+        },
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0296,
+            "improvement_vs_previous_percent": 0.7434
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9680435549897459,
+            1.025189548828425
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 1.0029183117812122
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0468890915350375,
+      "latest": 1.0468890915350375,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_dense_over_direct_k0n53",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9993842258726253,
+            1.0819876003696842
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 1.0468890915350375
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0106113742345832,
+      "latest": 1.0106113742345832,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_dense_over_direct_k0n61",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9701177863916193,
+            1.0636248939840773
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 1.0106113742345832
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0346014737017963,
+      "latest": 1.0346014737017963,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_eager_over_lazy_k0n53",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9814945407392492,
+            1.0705957747507269
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.0346014737017963
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0149471493124298,
+      "latest": 1.0149471493124298,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_eager_over_lazy_k0n61",
+      "points": [
+        {
+          "commit": "58295b01c801",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 23,
+          "record": "20261115T0449Z-ic-lazy-index-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9944149171914297,
+            1.0389593408156936
+          ],
+          "summary": "Lazy point-index map: collect-setup eager/lazy 2.80 [2.70,2.90] (k0n53), 3.03 [2.83,3.09] (k0n61); descent-setup 1.49, 1.60; all established; whole set-up not established. Kept as default.",
+          "value": 1.0149471493124298
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.979895283457205,
+      "latest": 0.979895283457205,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_generic_over_fast_k0n53",
+      "points": [
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9522491599746913,
+            0.9988902154555943
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 0.979895283457205
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.00839738470753,
+      "latest": 1.00839738470753,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_generic_over_fast_k0n61",
+      "points": [
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9780631227958366,
+            1.0230564234275799
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 1.00839738470753
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9347,6 +12258,208 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 0.9957773313797067
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.0201610621017192,
+      "latest": 1.0061915322424906,
+      "latest_derived": {},
+      "metric": "verify_aa_k0n53",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0070554772428848,
+            1.046877693168568
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 1.0201610621017192
+        },
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9454740959768334,
+            1.030848611028784
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 1.0061915322424906
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.9936539710474812,
+      "latest": 0.9976828415923339,
+      "latest_derived": {},
+      "metric": "verify_aa_k0n61",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9605829368577055,
+            1.0340838518097166
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 0.9936539710474812
+        },
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9812001828168794,
+            1.0155561043581394
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 0.9976828415923339
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.682466051167795,
+      "latest": 2.682466051167795,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verify_dense_over_direct_k0n53",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.5848661375625612,
+            2.821338868026479
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 2.682466051167795
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.4369374151316916,
+      "latest": 2.4369374151316916,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verify_dense_over_direct_k0n61",
+      "points": [
+        {
+          "commit": "66e84494c876",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0735Z-ic-direct-rows-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.37318937684302,
+            2.499423959634571
+          ],
+          "summary": "Direct sparse relation rows: verify dense/direct 2.68 [2.58,2.82] (k0n53), 2.44 [2.37,2.50] (k0n61); both established; whole set-up not established. Kept as default.",
+          "value": 2.4369374151316916
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.0988447957077296,
+      "latest": 2.0988447957077296,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verify_generic_over_fast_k0n53",
+      "points": [
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.0472090771182962,
+            2.177246542472667
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 2.0988447957077296
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.2684197260732395,
+      "latest": 2.2684197260732395,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verify_generic_over_fast_k0n61",
+      "points": [
+        {
+          "commit": "d1290ca4053b",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261115T0947Z-ic-fast-verify-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.2060185240135626,
+            2.308714039186569
+          ],
+          "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+          "value": 2.2684197260732395
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -12607,6 +15720,190 @@
     },
     {
       "better": "lower",
+      "first": 0.93,
+      "latest": 0.93,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ksum6_over_ksum5_w0_b36",
+      "points": [
+        {
+          "commit": "d60365f004ea",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 48,
+          "record": "20261115T0958Z-ic-ladder-wwalk-ksum",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.884,
+            0.979
+          ],
+          "summary": "Ladder panel (frozen protocol, RunPod pod 23hrxqj6cngzmc): wwalk C=2 at 1.66-1.69x matched rho-neg at 36/40 bits (0.21-0.24x ksum5); ksum6/ksum5 0.93 and 0.87, ksum7/ksum5 0.94 and 0.86 at 36/40 bits, w=0; 44/48 refused (32-bit wwalk packing); unvalidated. Recorded command = result retrieval and digest check; the pod launch is in research/ic_ladder_wwalk_ksum_20261115/results/RUN.json",
+          "value": 0.93
+        }
+      ],
+      "problem": "ic:prime-ladder-36-40",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.868,
+      "latest": 0.868,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ksum6_over_ksum5_w0_b40",
+      "points": [
+        {
+          "commit": "d60365f004ea",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 48,
+          "record": "20261115T0958Z-ic-ladder-wwalk-ksum",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.829,
+            0.911
+          ],
+          "summary": "Ladder panel (frozen protocol, RunPod pod 23hrxqj6cngzmc): wwalk C=2 at 1.66-1.69x matched rho-neg at 36/40 bits (0.21-0.24x ksum5); ksum6/ksum5 0.93 and 0.87, ksum7/ksum5 0.94 and 0.86 at 36/40 bits, w=0; 44/48 refused (32-bit wwalk packing); unvalidated. Recorded command = result retrieval and digest check; the pod launch is in research/ic_ladder_wwalk_ksum_20261115/results/RUN.json",
+          "value": 0.868
+        }
+      ],
+      "problem": "ic:prime-ladder-36-40",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.856,
+      "latest": 0.856,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ksum7_over_ksum5_w0_b40",
+      "points": [
+        {
+          "commit": "d60365f004ea",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 48,
+          "record": "20261115T0958Z-ic-ladder-wwalk-ksum",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.82,
+            0.893
+          ],
+          "summary": "Ladder panel (frozen protocol, RunPod pod 23hrxqj6cngzmc): wwalk C=2 at 1.66-1.69x matched rho-neg at 36/40 bits (0.21-0.24x ksum5); ksum6/ksum5 0.93 and 0.87, ksum7/ksum5 0.94 and 0.86 at 36/40 bits, w=0; 44/48 refused (32-bit wwalk packing); unvalidated. Recorded command = result retrieval and digest check; the pod launch is in research/ic_ladder_wwalk_ksum_20261115/results/RUN.json",
+          "value": 0.856
+        }
+      ],
+      "problem": "ic:prime-ladder-36-40",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.212,
+      "latest": 0.212,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "wwalk_c2_over_ksum5_w0_b40",
+      "points": [
+        {
+          "commit": "d60365f004ea",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 48,
+          "record": "20261115T0958Z-ic-ladder-wwalk-ksum",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.194,
+            0.231
+          ],
+          "summary": "Ladder panel (frozen protocol, RunPod pod 23hrxqj6cngzmc): wwalk C=2 at 1.66-1.69x matched rho-neg at 36/40 bits (0.21-0.24x ksum5); ksum6/ksum5 0.93 and 0.87, ksum7/ksum5 0.94 and 0.86 at 36/40 bits, w=0; 44/48 refused (32-bit wwalk packing); unvalidated. Recorded command = result retrieval and digest check; the pod launch is in research/ic_ladder_wwalk_ksum_20261115/results/RUN.json",
+          "value": 0.212
+        }
+      ],
+      "problem": "ic:prime-ladder-36-40",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.66,
+      "latest": 1.66,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.66
+      },
+      "metric": "wwalk_c2_over_rho_neg_w0_b36",
+      "points": [
+        {
+          "commit": "d60365f004ea",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.66
+          },
+          "n": 48,
+          "record": "20261115T0958Z-ic-ladder-wwalk-ksum",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.358,
+            2.082
+          ],
+          "summary": "Ladder panel (frozen protocol, RunPod pod 23hrxqj6cngzmc): wwalk C=2 at 1.66-1.69x matched rho-neg at 36/40 bits (0.21-0.24x ksum5); ksum6/ksum5 0.93 and 0.87, ksum7/ksum5 0.94 and 0.86 at 36/40 bits, w=0; 44/48 refused (32-bit wwalk packing); unvalidated. Recorded command = result retrieval and digest check; the pod launch is in research/ic_ladder_wwalk_ksum_20261115/results/RUN.json",
+          "value": 1.66
+        }
+      ],
+      "problem": "ic:prime-ladder-36-40",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.685,
+      "latest": 1.685,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.685
+      },
+      "metric": "wwalk_c2_over_rho_neg_w0_b40",
+      "points": [
+        {
+          "commit": "d60365f004ea",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.685
+          },
+          "n": 48,
+          "record": "20261115T0958Z-ic-ladder-wwalk-ksum",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.386,
+            2.093
+          ],
+          "summary": "Ladder panel (frozen protocol, RunPod pod 23hrxqj6cngzmc): wwalk C=2 at 1.66-1.69x matched rho-neg at 36/40 bits (0.21-0.24x ksum5); ksum6/ksum5 0.93 and 0.87, ksum7/ksum5 0.94 and 0.86 at 36/40 bits, w=0; 44/48 refused (32-bit wwalk packing); unvalidated. Recorded command = result retrieval and digest check; the pod launch is in research/ic_ladder_wwalk_ksum_20261115/results/RUN.json",
+          "value": 1.685
+        }
+      ],
+      "problem": "ic:prime-ladder-36-40",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 1.356014292071472,
       "latest": 1.356014292071472,
       "latest_derived": {
@@ -13303,6 +16600,386 @@
     },
     {
       "better": "lower",
+      "first": 46.3,
+      "latest": 46.3,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "combo_relations_cpu_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 46.3
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 79.6,
+      "latest": 79.6,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "combo_total_cpu_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 79.6
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 83.82,
+      "latest": 83.82,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl1_meq_ratio_both_wadd0_k22",
+      "points": [
+        {
+          "commit": "851b8da62983",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0539Z-ic-gw-nrm-lz",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "NRM (normalised points) + LZ_REUSE (scalar Lanczos dots) vs BLR1: BOTH DL cold M-eq ratio 0.957-0.962 (w_add 0), 0.987 (w_add 1); DL1 0.835-0.850 / 0.939-0.944; D 0.971-0.978; gates G0-G3 pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 83.82
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 94.35,
+      "latest": 94.35,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl1_meq_ratio_both_wadd1_k22",
+      "points": [
+        {
+          "commit": "851b8da62983",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0539Z-ic-gw-nrm-lz",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "NRM (normalised points) + LZ_REUSE (scalar Lanczos dots) vs BLR1: BOTH DL cold M-eq ratio 0.957-0.962 (w_add 0), 0.987 (w_add 1); DL1 0.835-0.850 / 0.939-0.944; D 0.971-0.978; gates G0-G3 pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 94.35
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 95.69,
+      "latest": 95.69,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_ratio_both_wadd0_k22",
+      "points": [
+        {
+          "commit": "851b8da62983",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0539Z-ic-gw-nrm-lz",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "NRM (normalised points) + LZ_REUSE (scalar Lanczos dots) vs BLR1: BOTH DL cold M-eq ratio 0.957-0.962 (w_add 0), 0.987 (w_add 1); DL1 0.835-0.850 / 0.939-0.944; D 0.971-0.978; gates G0-G3 pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 95.69
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 98.71,
+      "latest": 98.71,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_ratio_both_wadd1_k22",
+      "points": [
+        {
+          "commit": "851b8da62983",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0539Z-ic-gw-nrm-lz",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "NRM (normalised points) + LZ_REUSE (scalar Lanczos dots) vs BLR1: BOTH DL cold M-eq ratio 0.957-0.962 (w_add 0), 0.987 (w_add 1); DL1 0.835-0.850 / 0.939-0.944; D 0.971-0.978; gates G0-G3 pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 98.71
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 81.82,
+      "latest": 81.82,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_ratio_wadd0_k18",
+      "points": [
+        {
+          "commit": "5c9dc91c484d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0432Z-ic-gw-bl-reuse",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Exact block-Lanczos gram reuse (BLR) vs fasthash COMBO: DL cold M-eq ratio 0.81-0.82 (w_add 0), 0.88-0.89 (w_add 1), k=18..22, seeds 1-6; all gates pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 81.82
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 81.26,
+      "latest": 81.26,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_ratio_wadd0_k22",
+      "points": [
+        {
+          "commit": "5c9dc91c484d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0432Z-ic-gw-bl-reuse",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Exact block-Lanczos gram reuse (BLR) vs fasthash COMBO: DL cold M-eq ratio 0.81-0.82 (w_add 0), 0.88-0.89 (w_add 1), k=18..22, seeds 1-6; all gates pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 81.26
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 88.94,
+      "latest": 88.94,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_ratio_wadd1_k22",
+      "points": [
+        {
+          "commit": "5c9dc91c484d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0432Z-ic-gw-bl-reuse",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Exact block-Lanczos gram reuse (BLR) vs fasthash COMBO: DL cold M-eq ratio 0.81-0.82 (w_add 0), 0.88-0.89 (w_add 1), k=18..22, seeds 1-6; all gates pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 88.94
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 62.9,
+      "latest": 62.9,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "hash_relations_cpu_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 62.9
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 100.0,
+      "latest": 100.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "hash_rss_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 100.0
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 85.8,
+      "latest": 85.8,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "hash_total_cpu_pct_q4194271",
+      "points": [
+        {
+          "commit": "9d4e6aebc5f9",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2208Z-ic-gw-fasthash",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fast hashing (HASH) and HASH + compiled sqrt (COMBO) at c_D=1.7, L0: counted fields identical; relations.cpu COMBO 0.43-0.56 of REF (supported, A/A floor 0.207), HASH 0.59-0.92 (not supported under the frozen floor); total CPU at k=22 COMBO 0.80, HASH 0.86; pcc:unverified",
+          "value": 85.8
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 0.222,
+      "latest": 0.222,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.00222
+      },
+      "metric": "ic_over_rho_neg_k22_w0",
+      "points": [
+        {
+          "commit": "5c9dc91c484d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.00222
+          },
+          "n": 3,
+          "record": "20261115T0432Z-ic-gw-bl-reuse",
+          "reference": 100.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Exact block-Lanczos gram reuse (BLR) vs fasthash COMBO: DL cold M-eq ratio 0.81-0.82 (w_add 0), 0.88-0.89 (w_add 1), k=18..22, seeds 1-6; all gates pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 0.222
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 72.88,
+      "latest": 72.88,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "la_lmul_ratio_k22",
+      "points": [
+        {
+          "commit": "5c9dc91c484d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261115T0432Z-ic-gw-bl-reuse",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Exact block-Lanczos gram reuse (BLR) vs fasthash COMBO: DL cold M-eq ratio 0.81-0.82 (w_add 0), 0.88-0.89 (w_add 1), k=18..22, seeds 1-6; all gates pass; L0 counted-cost, pcc:unverified, S3 upload not done",
+          "value": 72.88
+        }
+      ],
+      "problem": "ic:quartic-dl-ghs-weak",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
       "first": 8.0,
       "latest": 2.0,
       "latest_derived": {
@@ -13775,6 +17452,186 @@
       ],
       "problem": "kernel:c25519_family_bsgs_vs_rho",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9771584596548346,
+      "latest": 0.9771584596548346,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr3850.koblitz.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9726330396687172,
+            0.9810499006498247
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.9771584596548346
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9049709086110559,
+      "latest": 0.9049709086110559,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr3850.prime.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9046475878158163,
+            0.9052548891637372
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.9049709086110559
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9635473542464292,
+      "latest": 0.9635473542464292,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr3850.tensor.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9584804715070011,
+            0.9677433998961907
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.9635473542464292
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0133224951978266,
+      "latest": 1.0133224951978266,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr3991.prime.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0114613899962586,
+            1.0145893917751176
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 1.0133224951978266
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9258217129328429,
+      "latest": 0.9258217129328429,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr4009.koblitz.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9246861417296337,
+            0.9269698139656425
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.9258217129328429
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.6535928517571333,
+      "latest": 0.6535928517571333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr4009.tensor.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6451017052237096,
+            0.6640905408191071
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.6535928517571333
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
     },
     {
       "better": "neutral",
@@ -14924,6 +18781,102 @@
         }
       ],
       "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.3111,
+      "latest": 0.3111,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.140814
+      },
+      "metric": "ic_chosen_wall_t1024",
+      "points": [
+        {
+          "commit": "05c0deda0aee",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.140814
+          },
+          "n": 4,
+          "record": "20261115T0629Z-mt-ic-retune-2p32",
+          "reference": 0.2727,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.3075,
+            0.3167
+          ],
+          "summary": "multi-target IC at 2^32, ic5b flat 32: retune (k, mu) 4,1.0 -> 4,0.85 on W32-0..3; holdout W32-4..7: whole solve 0.86-0.995x of the old setting, 1.06-1.15x the best rho on the same host [pcc:unverified]",
+          "value": 0.3111
+        }
+      ],
+      "problem": "mt:ic-vs-rho-2p32",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.2559,
+      "latest": 1.2559,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.072411
+      },
+      "metric": "ic_chosen_wall_t16384",
+      "points": [
+        {
+          "commit": "05c0deda0aee",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.072411
+          },
+          "n": 4,
+          "record": "20261115T0629Z-mt-ic-retune-2p32",
+          "reference": 1.1711,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.2234,
+            1.2996
+          ],
+          "summary": "multi-target IC at 2^32, ic5b flat 32: retune (k, mu) 4,1.0 -> 4,0.85 on W32-0..3; holdout W32-4..7: whole solve 0.86-0.995x of the old setting, 1.06-1.15x the best rho on the same host [pcc:unverified]",
+          "value": 1.2559
+        }
+      ],
+      "problem": "mt:ic-vs-rho-2p32",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.6161,
+      "latest": 0.6161,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.091022
+      },
+      "metric": "ic_chosen_wall_t4096",
+      "points": [
+        {
+          "commit": "05c0deda0aee",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.091022
+          },
+          "n": 4,
+          "record": "20261115T0629Z-mt-ic-retune-2p32",
+          "reference": 0.5647,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.6006,
+            0.623
+          ],
+          "summary": "multi-target IC at 2^32, ic5b flat 32: retune (k, mu) 4,1.0 -> 4,0.85 on W32-0..3; holdout W32-4..7: whole solve 0.86-0.995x of the old setting, 1.06-1.15x the best rho on the same host [pcc:unverified]",
+          "value": 0.6161
+        }
+      ],
+      "problem": "mt:ic-vs-rho-2p32",
       "unit": "wall_s"
     },
     {

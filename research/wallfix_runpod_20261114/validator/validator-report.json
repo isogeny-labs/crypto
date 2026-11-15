@@ -1,0 +1,2808 @@
+{
+ "schema": "validation-gate.validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "validator": {
+  "role": "Validator",
+  "model": "claude-opus-5-5",
+  "code": "research/wallfix_runpod_20261114/validator/validator.py",
+  "code_sha256": "9c5d71402a991429daf8631e490ffeb028920196bb36e707baaa381b3eeea17f",
+  "producer_code_read": false,
+  "python": "3.13.18"
+ },
+ "subject": "wallfix RunPod session-level ABAB (PRs 3850, 3991, 4009), solve_cpu and solve_wall B/A",
+ "method": "Independent stdlib recompute from the 36 run2 records.jsonl files: per session, sum over records with warmup == false of time.schedstat_solve.cpu_ns and time.solve_wall_ns over all arms; per (PR, spec, round) B/A; per (PR, spec) geometric mean (exp of mean log), min, max; aa_spread = max/min of A sums. Compared with results-ab.json at rel_tol 1e-9 (sums exactly). Checks: output identity of A vs B after dropping timing fields; every record verified with matches_target true; binary_sha256 bound to runlog-run2.tsv and binaries-run2.sha256 and A = first parent of merge B in git; hazards (warmup, cpu_ns quantisation, dominance, order, A/A control, isolation, self-audit). The producer's analysis code was not read.",
+ "artifact_binding": {
+  "repo_head_at_validation": "3674b7141a0e73e1e33423f19aba29df21db416d",
+  "records_jsonl_tracked_in_git": false,
+  "records_bound_by_committed_artifacts_manifest": 36,
+  "tracked_inputs_missing": [],
+  "input_paths_dirty_vs_head": [],
+  "ok": true,
+  "note": "session.json, spec.json, .artifacts.json, runlog, binaries list, results-*.json and specs are tracked at repo_head_at_validation and clean; records.jsonl live in the artifact store and are bound by the committed .artifacts.json sha256, re-checked here."
+ },
+ "raw_data": [
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-koblitz-r1-A/records.jsonl",
+   "sha256": "2087de971e980bc20bf9ef24cb950dcddbc9c54d7cbc964e7abde0031f412fd1"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-koblitz-r1-B/records.jsonl",
+   "sha256": "b62d4a59f502ccd44aea2594cdc39fba2ad7c620aae5b403963af25e5101012f"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-koblitz-r2-A/records.jsonl",
+   "sha256": "ee68126adce91cbdf57610d2f0268a14dd4285c252bac20f6063b8bfe68f9712"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-koblitz-r2-B/records.jsonl",
+   "sha256": "0750f772bfd21b84a8b89f13924e288ded69dfe7b981e459686898283e3ebc67"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-koblitz-r3-A/records.jsonl",
+   "sha256": "e454d91875215ced5df0c223c72ffa6570265f7b3ea28781727dc009e299656e"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-koblitz-r3-B/records.jsonl",
+   "sha256": "9ab44f4fe3e1c88ded989ea7cdc2280380068bc314cfd66259ba35c8a89f74bd"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-prime-r1-A/records.jsonl",
+   "sha256": "06cad8cfda1f4c91e5aedc75c32e80d28bc3b26bdcd771139ba48e110f6ca886"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-prime-r1-B/records.jsonl",
+   "sha256": "f5b041ed15e384dcd621ffcb4527833b10171909ed92b4a02948d8e223f1b6d1"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-prime-r2-A/records.jsonl",
+   "sha256": "80e4c0803a6f42b327ab20a9b72e0f5f31a441c06cfc94add7ac6446b6e68956"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-prime-r2-B/records.jsonl",
+   "sha256": "8843e54f76b17240869ddd6418074b3b3d32a075536eab4450b63eae1197a312"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-prime-r3-A/records.jsonl",
+   "sha256": "75432ee0918aebc2fcd0d50a92d7bf3fa463ba21f933fc4252fbd73661e79749"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-prime-r3-B/records.jsonl",
+   "sha256": "84b8d7b9507965987fd57003989ce49750efb2e36cfc4d126f1bf30856ffac08"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-tensor-r1-A/records.jsonl",
+   "sha256": "11647f6879d55f448a55b398036037ef26888753b53794cbf4326619a365e1a1"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-tensor-r1-B/records.jsonl",
+   "sha256": "8bbbfd65e45676dad660540fa799c0ab95f693785d9882cefc1e953e6a1be840"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-tensor-r2-A/records.jsonl",
+   "sha256": "b85b1a4c460a86a0ee3868e19d87b2381967b6369bedb7c20a77c34e2a3a32c1"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-tensor-r2-B/records.jsonl",
+   "sha256": "105ae84b38c10c8f1c5bc3d9ccff3bcf64b648813a7b9cfd9e2ae301360a9541"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-tensor-r3-A/records.jsonl",
+   "sha256": "9c08f48bf455dac09bccea8d269ab16e701feb5f9d597ca3f4a28f9e242758d0"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3850-tensor-r3-B/records.jsonl",
+   "sha256": "9d6f0831ad45d5a0ee78af25afd31c079295d208e2ed924cf64dd61936f1120f"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3991-prime-r1-A/records.jsonl",
+   "sha256": "8cfd037ccf936fbaba19ec0a3297ae08108a49026480bff5c91d024b4bb18a5d"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3991-prime-r1-B/records.jsonl",
+   "sha256": "b4c442a69b7ce3e9bdaeb338383c146ec3b196d6fd1051868394f26479bd9528"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3991-prime-r2-A/records.jsonl",
+   "sha256": "7e02573aff496c552f699e0930fde6bfe6664e507be922cd98f786119d7d634a"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3991-prime-r2-B/records.jsonl",
+   "sha256": "e0083a87df6a7b0ee9ed3ca496fae8dfc589167b7777a1376ba5f01de3cca4d7"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3991-prime-r3-A/records.jsonl",
+   "sha256": "b7f7329bbfc7f7e7473a3e237f0ae6cdb9970f0542762bea80ca8c464da2037c"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr3991-prime-r3-B/records.jsonl",
+   "sha256": "0c3be91bc9edcff76b5e21b93e2c6227e69322c1e46817a4ed88c0fede222597"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-koblitz-r1-A/records.jsonl",
+   "sha256": "cfa5484e637f7c6ff4a4ec9635e6b1e1be78ad0f07199a5c8a3ec9a31135a7b6"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-koblitz-r1-B/records.jsonl",
+   "sha256": "143889e29f059338a2956473a35ddae38a15a6f757962dd3ebd7056fa55dc3f2"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-koblitz-r2-A/records.jsonl",
+   "sha256": "b5773780c5742a3937d228ac72955c1dc9cbdb6fea5e521b4161c5911a768e92"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-koblitz-r2-B/records.jsonl",
+   "sha256": "d091e4d317a19f81269d474d6ff9b90b709a1a2e8ee74abba6f57211a3d64dc2"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-koblitz-r3-A/records.jsonl",
+   "sha256": "b13c45b93f36769ef05533d7a82c5e11eee0d8ca6ee3e8374384796a399352c1"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-koblitz-r3-B/records.jsonl",
+   "sha256": "7ed20627c6d81f350e1da988cc66f1364d8d525138fe5462c98b717ded0efafa"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-tensor-r1-A/records.jsonl",
+   "sha256": "4262de29d29f28b703194f0b0e22a9f575acb28ebf875e397b98a2643e945cdc"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-tensor-r1-B/records.jsonl",
+   "sha256": "0c07cbf2b95a336a6a234e7ce885204e21d7623c4235c80ada1f22a8b0a4ac17"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-tensor-r2-A/records.jsonl",
+   "sha256": "6263f147fe27c79bd60c9cd3167f824f48114e4b31b99dd9f65ab4ef619a1ba4"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-tensor-r2-B/records.jsonl",
+   "sha256": "84510a86a54fc84ce4718d01c161073a864605b5c499d37d04ea59cd86824674"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-tensor-r3-A/records.jsonl",
+   "sha256": "dca94a14feaa20090aad2a407bf1270757443a54095a4ec371138e6df21d9e87"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run2/pr4009-tensor-r3-B/records.jsonl",
+   "sha256": "cb7747415204f6ea2c479d8fe0b650261f83c581dc64d5e46f8d0d937dc8f0e9"
+  }
+ ],
+ "control_data": [
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-koblitz-r1-A/records.jsonl",
+   "sha256": "7ab2a263fc75e798a1f1b512e61212b7b466c0adc2dd0206a81ed3cf836f2d2a"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-koblitz-r1-B/records.jsonl",
+   "sha256": "9024f4fbd3ac8c8ad0d490ba42599dc4cdfe90b881371083facd0c30628fb509"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-koblitz-r2-A/records.jsonl",
+   "sha256": "16956c70288c9a57a8b0a80d4b86ddb1003041314ad021a3e476ad4030d0a702"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-koblitz-r2-B/records.jsonl",
+   "sha256": "7160ec3ec3a052bd60fc68b82b3a2b3d08445e468cad7830da1797b805a69d3d"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-koblitz-r3-A/records.jsonl",
+   "sha256": "8d37d45a13356fc0d22907d080f89cbf9c2e42231f87cc5e98c0ef2532982a68"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-koblitz-r3-B/records.jsonl",
+   "sha256": "b09bbd96787a8a12527ebf534c0f013707110b6b14c11ac2e1159c5fe0ab788b"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-prime-r1-A/records.jsonl",
+   "sha256": "3233c13c7a54066d3242813596f0dda18dc32890d0d55321284d049b229e1a91"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-prime-r1-B/records.jsonl",
+   "sha256": "3438172e58c81973fa72ba4268ce3cff3edfd3d045b8b3523642a2064d1ffc29"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-prime-r2-A/records.jsonl",
+   "sha256": "778237ee7ad28d8643d88b2c4a95a06de4a4d320707348ad6d40616e6c5e250b"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-prime-r2-B/records.jsonl",
+   "sha256": "4b29458a50d2f7f31fa37618c226a7f8305db1c9b4669d33d815bde58b061d53"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-prime-r3-A/records.jsonl",
+   "sha256": "17861ebfe21558713c8a089ef208edbd542994b29d230e961f2c64e4d525ba71"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-prime-r3-B/records.jsonl",
+   "sha256": "f99d03d2aaf3c6304d83b22571f6679d531770ac46fb8deb773e78d590cc5b30"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-tensor-r1-A/records.jsonl",
+   "sha256": "d69ac7dd383e054347c8202a8fe7b0bc550f13cc26a5c51e12ff4dcca2eab2d8"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-tensor-r1-B/records.jsonl",
+   "sha256": "b9bff68ce0bd8e4b190af0d3beed5b8a95d91689480ab8df147ee58ec909e90a"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-tensor-r2-A/records.jsonl",
+   "sha256": "d510770714ac686d5b35268ceb3d3ee30287d9bc4666ad4989ee0bece7294cfe"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-tensor-r2-B/records.jsonl",
+   "sha256": "5d4e05c63687675d6465de9421c96f69c6e88724021e69ae2871add8e5127962"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-tensor-r3-A/records.jsonl",
+   "sha256": "4926a227a0d253ad857e5ff899c146c7927b588b23dfde7753b4b5f173cf8040"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3850-tensor-r3-B/records.jsonl",
+   "sha256": "5a1122cd8d4f807385d4e653330dcb4d8e6f8b912cb2271840418c1ca85382e5"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3991-prime-r1-A/records.jsonl",
+   "sha256": "86401e505c4f69c4ebacfd829bb5600a09909cecbd6fb62cf9326ab0165782d5"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3991-prime-r1-B/records.jsonl",
+   "sha256": "07070ddb982fc41b1da927218c9d73ea009bd4b43327866ba97ba35b29d87f4d"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3991-prime-r2-A/records.jsonl",
+   "sha256": "afc879a636dfa44326a6ea65a21138543a234686f3a6bb07a4d3a64e284f47f1"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3991-prime-r2-B/records.jsonl",
+   "sha256": "6fa3facef1c9859a0760ec1de2fa6d6271187da5aad1624d1ab188934781d47a"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3991-prime-r3-A/records.jsonl",
+   "sha256": "b6e7e98066c07ca2d6ccb6cd3cee68cbb948a60f1986164d04fe9e47053d2a54"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr3991-prime-r3-B/records.jsonl",
+   "sha256": "691b3623f8373ef041ae5018696a5bc27bbdadeced0e454b37ceb0e874612561"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-koblitz-r1-A/records.jsonl",
+   "sha256": "3db816f6d8332098ebb7fc2bbd5b694c94bf807f9d35a349fe5d56d02b29d7ef"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-koblitz-r1-B/records.jsonl",
+   "sha256": "127db0eaa5f0705a38104ef8da4473abe87ce5cb6d7629e088ae0a82a565794b"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-koblitz-r2-A/records.jsonl",
+   "sha256": "5da9c891ed57f31eb4a3e037a28b65373c9ea76388873368f55b256c32a5d187"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-koblitz-r2-B/records.jsonl",
+   "sha256": "71fd481c3d54572ea4885f175803c95fd8466a9f2dcbf8c8a1b7c9ac95fd0322"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-koblitz-r3-A/records.jsonl",
+   "sha256": "e545107e52adc91e32199708fc39de228ca56f6c11e6823015d96366542f26ce"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-koblitz-r3-B/records.jsonl",
+   "sha256": "5d380a1e42770aa7082e082e139aa8ebbd4b6c888989687a5a5df0c80f787776"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-tensor-r1-A/records.jsonl",
+   "sha256": "7c6b33fd279aa528039f9c5fbf0b858cab28a5b55d37d91a2db201c2f92b82c2"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-tensor-r1-B/records.jsonl",
+   "sha256": "d37e965bc9860a6e738cf42e08cd6c4ec24761006a2b6cdcf2aa77f2f21878d9"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-tensor-r2-A/records.jsonl",
+   "sha256": "a0a843607b6fee43d9d2ff86678845a488a0215ffcc25c1524397e030f85993a"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-tensor-r2-B/records.jsonl",
+   "sha256": "8b009fa1ab2210f868b3fc4f3a9c80c39bac33cf0eeb908549a2005dfd8f551e"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-tensor-r3-A/records.jsonl",
+   "sha256": "cdcf65a20bba676835fa857a385c82f9ddd3c634d66deb5ab060febf2da13063"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/sessions/run1-aa/pr4009-tensor-r3-B/records.jsonl",
+   "sha256": "e47ce89a81090dacd28ec9a54a5cc3a199f86416cbe8fbf781734fdde7bd05c5"
+  }
+ ],
+ "inputs": [
+  {
+   "path": "../../research/wallfix_runpod_20261114/reports/run-20261114T2240Z/data/runlog-run2.tsv",
+   "sha256": "1d5e97035d8fae63736f85f4050b8a119b24affe2df1e61090f163fc7770b1b6"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/reports/run-20261114T2240Z/data/binaries-run2.sha256",
+   "sha256": "56b5363c60bc19290bc470c325ab5ce55227a4d65aab54999871b6dcc8a55dae"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/reports/run-20261114T2240Z/data/results-ab.json",
+   "sha256": "15e6756afbe2f2a48ff32e03531272e8af7ca71a34ac98329f3432051334b0c8"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/reports/run-20261114T2240Z/data/runlog-run1-aa.tsv",
+   "sha256": "7a1ce5422de8d0cebd373000d5c1bff66be654ce445221bf4ae70744a6eb369d"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/reports/run-20261114T2240Z/data/results-aa.json",
+   "sha256": "6be23050e4b1a475313306f1594f749f21c31f43d87fccfe54df1cd264eef9f2"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/specs/koblitz.json",
+   "sha256": "d6cf979353ebdbf68483982d27841f8891cc3825573c0b79ca0b0189d0a02956"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/specs/prime.json",
+   "sha256": "88e236c6d028beb60fc9e2441faad61eb010a0d5151f5de185f67ac458aad086"
+  },
+  {
+   "path": "../../research/wallfix_runpod_20261114/specs/tensor.json",
+   "sha256": "246068f883ccbb667734cc9956780d05756efb41ea5ca0b4827696857d30c4b3"
+  }
+ ],
+ "headline": [
+  {
+   "name": "pr3850/koblitz/solve_cpu_ba_geomean",
+   "claimed": 0.9771584596548346,
+   "recomputed": 0.9771584596548346,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr3850/koblitz/solve_wall_ba_geomean",
+   "claimed": 0.9755733824037407,
+   "recomputed": 0.9755733824037407,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr3850/prime/solve_cpu_ba_geomean",
+   "claimed": 0.9049709086110559,
+   "recomputed": 0.9049709086110559,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr3850/prime/solve_wall_ba_geomean",
+   "claimed": 0.9053413796437298,
+   "recomputed": 0.9053413796437298,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr3850/tensor/solve_cpu_ba_geomean",
+   "claimed": 0.9635473542464292,
+   "recomputed": 0.9635473542464292,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr3850/tensor/solve_wall_ba_geomean",
+   "claimed": 0.963547828128939,
+   "recomputed": 0.963547828128939,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr3991/prime/solve_cpu_ba_geomean",
+   "claimed": 1.0133224951978266,
+   "recomputed": 1.0133224951978266,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr3991/prime/solve_wall_ba_geomean",
+   "claimed": 1.0130579478943678,
+   "recomputed": 1.0130579478943678,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr4009/koblitz/solve_cpu_ba_geomean",
+   "claimed": 0.9258217129328429,
+   "recomputed": 0.9258217129328429,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr4009/koblitz/solve_wall_ba_geomean",
+   "claimed": 0.9283906056205298,
+   "recomputed": 0.9283906056205298,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr4009/tensor/solve_cpu_ba_geomean",
+   "claimed": 0.6535928517571333,
+   "recomputed": 0.6535928517571333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "pr4009/tensor/solve_wall_ba_geomean",
+   "claimed": 0.6536009749965445,
+   "recomputed": 0.6536009749965445,
+   "rel_tol": 1e-09
+  }
+ ],
+ "checks": {
+  "design": {
+   "expected_sessions": 36,
+   "run2_sessions_found": 36,
+   "run2_missing": [],
+   "run2_unexpected": [],
+   "run1_aa_sessions_found": 36,
+   "run1_aa_missing": [],
+   "ok": true
+  },
+  "session_integrity": {
+   "ok": true,
+   "problems": [],
+   "artifact_manifests_checked": 36,
+   "git_commit_in_sessions": [
+    "None"
+   ],
+   "git_dirty_in_sessions": [
+    "None"
+   ]
+  },
+  "producer_table_recompute": {
+   "all_agree": true,
+   "dispatch_rounded_values_agree": true,
+   "fields": [
+    {
+     "name": "pr3850/koblitz/solve_cpu_ba_min",
+     "claimed": 0.9726330396687172,
+     "recomputed": 0.9726330396687172,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_cpu_ba_max",
+     "claimed": 0.9810499006498247,
+     "recomputed": 0.9810499006498247,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_cpu_aa_spread",
+     "claimed": 1.001159403154784,
+     "recomputed": 1.001159403154784,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_cpu_bb_spread",
+     "claimed": 1.0096145899059976,
+     "recomputed": 1.0096145899059976,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_cpu_A_ns",
+     "claimed": [
+      874041558,
+      873861065,
+      873029365
+     ],
+     "recomputed": [
+      874041558,
+      873861065,
+      873029365
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_cpu_B_ns",
+     "claimed": [
+      854647359,
+      857301311,
+      849137205
+     ],
+     "recomputed": [
+      854647359,
+      857301311,
+      849137205
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_cpu_ba_per_round",
+     "claimed": [
+      0.9778108960352203,
+      0.9810499006498247,
+      0.9726330396687172
+     ],
+     "recomputed": [
+      0.9778108960352203,
+      0.9810499006498247,
+      0.9726330396687172
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_wall_ba_min",
+     "claimed": 0.9730560616561041,
+     "recomputed": 0.9730560616561041,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_wall_ba_max",
+     "claimed": 0.9777896983942013,
+     "recomputed": 0.9777896983942013,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_wall_aa_spread",
+     "claimed": 1.0027837158493782,
+     "recomputed": 1.0027837158493782,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_wall_bb_spread",
+     "claimed": 1.0021117850246042,
+     "recomputed": 1.0021117850246042,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_wall_A_ns",
+     "claimed": [
+      897402922,
+      894944398,
+      894911742
+     ],
+     "recomputed": [
+      897402922,
+      894944398,
+      894911742
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_wall_B_ns",
+     "claimed": [
+      873223353,
+      875067413,
+      873326652
+     ],
+     "recomputed": [
+      873223353,
+      875067413,
+      873326652
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/koblitz/solve_wall_ba_per_round",
+     "claimed": [
+      0.9730560616561041,
+      0.9777896983942013,
+      0.9758802024971084
+     ],
+     "recomputed": [
+      0.9730560616561041,
+      0.9777896983942013,
+      0.9758802024971084
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_cpu_ba_min",
+     "claimed": 0.9046475878158163,
+     "recomputed": 0.9046475878158163,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_cpu_ba_max",
+     "claimed": 0.9052548891637372,
+     "recomputed": 0.9052548891637372,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_cpu_aa_spread",
+     "claimed": 1.0013185137314937,
+     "recomputed": 1.0013185137314937,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_cpu_bb_spread",
+     "claimed": 1.0010480268650495,
+     "recomputed": 1.0010480268650495,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_cpu_A_ns",
+     "claimed": [
+      17804851046,
+      17798809722,
+      17781406018
+     ],
+     "recomputed": [
+      17804851046,
+      17798809722,
+      17781406018
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/prime/solve_cpu_B_ns",
+     "claimed": [
+      16113574513,
+      16101650281,
+      16096704734
+     ],
+     "recomputed": [
+      16113574513,
+      16101650281,
+      16096704734
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/prime/solve_cpu_ba_per_round",
+     "claimed": [
+      0.9050103520310012,
+      0.9046475878158163,
+      0.9052548891637372
+     ],
+     "recomputed": [
+      0.9050103520310012,
+      0.9046475878158163,
+      0.9052548891637372
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_wall_ba_min",
+     "claimed": 0.9050964138177249,
+     "recomputed": 0.9050964138177249,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_wall_ba_max",
+     "claimed": 0.905605359677585,
+     "recomputed": 0.905605359677585,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_wall_aa_spread",
+     "claimed": 1.001207110939612,
+     "recomputed": 1.001207110939612,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_wall_bb_spread",
+     "claimed": 1.0008943213411523,
+     "recomputed": 1.0008943213411523,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/prime/solve_wall_A_ns",
+     "claimed": [
+      17854719345,
+      17848340628,
+      17833192703
+     ],
+     "recomputed": [
+      17854719345,
+      17848340628,
+      17833192703
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/prime/solve_wall_B_ns",
+     "claimed": [
+      16164278034,
+      16154469095,
+      16149834892
+     ],
+     "recomputed": [
+      16164278034,
+      16154469095,
+      16149834892
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/prime/solve_wall_ba_per_round",
+     "claimed": [
+      0.9053224372595143,
+      0.9050964138177249,
+      0.905605359677585
+     ],
+     "recomputed": [
+      0.9053224372595143,
+      0.9050964138177249,
+      0.905605359677585
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_cpu_ba_min",
+     "claimed": 0.9584804715070011,
+     "recomputed": 0.9584804715070011,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_cpu_ba_max",
+     "claimed": 0.9677433998961907,
+     "recomputed": 0.9677433998961907,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_cpu_aa_spread",
+     "claimed": 1.0253213081181602,
+     "recomputed": 1.0253213081181602,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_cpu_bb_spread",
+     "claimed": 1.034068770189841,
+     "recomputed": 1.034068770189841,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_cpu_A_ns",
+     "claimed": [
+      234172315598,
+      240101864954,
+      234435329381
+     ],
+     "recomputed": [
+      234172315598,
+      240101864954,
+      234435329381
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/tensor/solve_cpu_B_ns",
+     "claimed": [
+      225845402073,
+      232356995112,
+      224701685043
+     ],
+     "recomputed": [
+      225845402073,
+      232356995112,
+      224701685043
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/tensor/solve_cpu_ba_per_round",
+     "claimed": [
+      0.9644410847467781,
+      0.9677433998961907,
+      0.9584804715070011
+     ],
+     "recomputed": [
+      0.9644410847467781,
+      0.9677433998961907,
+      0.9584804715070011
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_wall_ba_min",
+     "claimed": 0.9584862483419544,
+     "recomputed": 0.9584862483419544,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_wall_ba_max",
+     "claimed": 0.9677371360557783,
+     "recomputed": 0.9677371360557783,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_wall_aa_spread",
+     "claimed": 1.0253142259743915,
+     "recomputed": 1.0253142259743915,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_wall_bb_spread",
+     "claimed": 1.0340545594455892,
+     "recomputed": 1.0340545594455892,
+     "agrees": true
+    },
+    {
+     "name": "pr3850/tensor/solve_wall_A_ns",
+     "claimed": [
+      234184456242,
+      240112654487,
+      234446155678
+     ],
+     "recomputed": [
+      234184456242,
+      240112654487,
+      234446155678
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/tensor/solve_wall_B_ns",
+     "claimed": [
+      225857544885,
+      232365932584,
+      224713416194
+     ],
+     "recomputed": [
+      225857544885,
+      232365932584,
+      224713416194
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3850/tensor/solve_wall_ba_per_round",
+     "claimed": [
+      0.9644429374578337,
+      0.9677371360557783,
+      0.9584862483419544
+     ],
+     "recomputed": [
+      0.9644429374578337,
+      0.9677371360557783,
+      0.9584862483419544
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_cpu_ba_min",
+     "claimed": 1.0114613899962586,
+     "recomputed": 1.0114613899962586,
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_cpu_ba_max",
+     "claimed": 1.0145893917751176,
+     "recomputed": 1.0145893917751176,
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_cpu_aa_spread",
+     "claimed": 1.004397529398969,
+     "recomputed": 1.004397529398969,
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_cpu_bb_spread",
+     "claimed": 1.0067586387064307,
+     "recomputed": 1.0067586387064307,
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_cpu_A_ns",
+     "claimed": [
+      15815619565,
+      15885169217,
+      15816871868
+     ],
+     "recomputed": [
+      15815619565,
+      15885169217,
+      15816871868
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3991/prime/solve_cpu_B_ns",
+     "claimed": [
+      16046359835,
+      16106280956,
+      15998155205
+     ],
+     "recomputed": [
+      16046359835,
+      16106280956,
+      15998155205
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3991/prime/solve_cpu_ba_per_round",
+     "claimed": [
+      1.0145893917751176,
+      1.0139193820336123,
+      1.0114613899962586
+     ],
+     "recomputed": [
+      1.0145893917751176,
+      1.0139193820336123,
+      1.0114613899962586
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_wall_ba_min",
+     "claimed": 1.0113226854209791,
+     "recomputed": 1.0113226854209791,
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_wall_ba_max",
+     "claimed": 1.014084470012568,
+     "recomputed": 1.014084470012568,
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_wall_aa_spread",
+     "claimed": 1.0040013022245178,
+     "recomputed": 1.0040013022245178,
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_wall_bb_spread",
+     "claimed": 1.0064298525431026,
+     "recomputed": 1.0064298525431026,
+     "agrees": true
+    },
+    {
+     "name": "pr3991/prime/solve_wall_A_ns",
+     "claimed": [
+      15870023281,
+      15927940986,
+      15864462477
+     ],
+     "recomputed": [
+      15870023281,
+      15927940986,
+      15864462477
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3991/prime/solve_wall_B_ns",
+     "claimed": [
+      16093544148,
+      16147251933,
+      16044090795
+     ],
+     "recomputed": [
+      16093544148,
+      16147251933,
+      16044090795
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr3991/prime/solve_wall_ba_per_round",
+     "claimed": [
+      1.014084470012568,
+      1.0137689452260505,
+      1.0113226854209791
+     ],
+     "recomputed": [
+      1.014084470012568,
+      1.0137689452260505,
+      1.0113226854209791
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_cpu_ba_min",
+     "claimed": 0.9246861417296337,
+     "recomputed": 0.9246861417296337,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_cpu_ba_max",
+     "claimed": 0.9269698139656425,
+     "recomputed": 0.9269698139656425,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_cpu_aa_spread",
+     "claimed": 1.0151298181892103,
+     "recomputed": 1.0151298181892103,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_cpu_bb_spread",
+     "claimed": 1.0138968851826786,
+     "recomputed": 1.0138968851826786,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_cpu_A_ns",
+     "claimed": [
+      860026131,
+      873038170,
+      861107282
+     ],
+     "recomputed": [
+      860026131,
+      873038170,
+      861107282
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_cpu_B_ns",
+     "claimed": [
+      796221301,
+      807286297,
+      798220457
+     ],
+     "recomputed": [
+      796221301,
+      807286297,
+      798220457
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_cpu_ba_per_round",
+     "claimed": [
+      0.9258105914458545,
+      0.9246861417296337,
+      0.9269698139656425
+     ],
+     "recomputed": [
+      0.9258105914458545,
+      0.9246861417296337,
+      0.9269698139656425
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_wall_ba_min",
+     "claimed": 0.9276344193165585,
+     "recomputed": 0.9276344193165585,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_wall_ba_max",
+     "claimed": 0.9292966987238528,
+     "recomputed": 0.9292966987238528,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_wall_aa_spread",
+     "claimed": 1.0118736927439382,
+     "recomputed": 1.0118736927439382,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_wall_bb_spread",
+     "claimed": 1.012445008080275,
+     "recomputed": 1.012445008080275,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_wall_A_ns",
+     "claimed": [
+      880334040,
+      890706928,
+      880255050
+     ],
+     "recomputed": [
+      880334040,
+      890706928,
+      880255050
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_wall_B_ns",
+     "claimed": [
+      816628156,
+      826791100,
+      818018112
+     ],
+     "recomputed": [
+      816628156,
+      826791100,
+      818018112
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr4009/koblitz/solve_wall_ba_per_round",
+     "claimed": [
+      0.9276344193165585,
+      0.9282414608096548,
+      0.9292966987238528
+     ],
+     "recomputed": [
+      0.9276344193165585,
+      0.9282414608096548,
+      0.9292966987238528
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_cpu_ba_min",
+     "claimed": 0.6451017052237096,
+     "recomputed": 0.6451017052237096,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_cpu_ba_max",
+     "claimed": 0.6640905408191071,
+     "recomputed": 0.6640905408191071,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_cpu_aa_spread",
+     "claimed": 1.0124041951675113,
+     "recomputed": 1.0124041951675113,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_cpu_bb_spread",
+     "claimed": 1.0168225483955007,
+     "recomputed": 1.0168225483955007,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_cpu_A_ns",
+     "claimed": [
+      225857597621,
+      225249811799,
+      228043854426
+     ],
+     "recomputed": [
+      225857597621,
+      225249811799,
+      228043854426
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr4009/tensor/solve_cpu_B_ns",
+     "claimed": [
+      147197726211,
+      149586269337,
+      147111479356
+     ],
+     "recomputed": [
+      147197726211,
+      149586269337,
+      147111479356
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr4009/tensor/solve_cpu_ba_per_round",
+     "claimed": [
+      0.6517280258067959,
+      0.6640905408191071,
+      0.6451017052237096
+     ],
+     "recomputed": [
+      0.6517280258067959,
+      0.6640905408191071,
+      0.6451017052237096
+     ],
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_wall_ba_min",
+     "claimed": 0.6451058263778502,
+     "recomputed": 0.6451058263778502,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_wall_ba_max",
+     "claimed": 0.6640941974277907,
+     "recomputed": 0.6640941974277907,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_wall_aa_spread",
+     "claimed": 1.0124165519911705,
+     "recomputed": 1.0124165519911705,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_wall_bb_spread",
+     "claimed": 1.0168092407825051,
+     "recomputed": 1.0168092407825051,
+     "agrees": true
+    },
+    {
+     "name": "pr4009/tensor/solve_wall_A_ns",
+     "claimed": [
+      225869607211,
+      225261200371,
+      228058167777
+     ],
+     "recomputed": [
+      225869607211,
+      225261200371,
+      228058167777
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr4009/tensor/solve_wall_B_ns",
+     "claimed": [
+      147209290943,
+      149594656072,
+      147121652786
+     ],
+     "recomputed": [
+      147209290943,
+      149594656072,
+      147121652786
+     ],
+     "agrees": true,
+     "exact_integer": true
+    },
+    {
+     "name": "pr4009/tensor/solve_wall_ba_per_round",
+     "claimed": [
+      0.651744574051886,
+      0.6640941974277907,
+      0.6451058263778502
+     ],
+     "recomputed": [
+      0.651744574051886,
+      0.6640941974277907,
+      0.6451058263778502
+     ],
+     "agrees": true
+    }
+   ]
+  },
+  "1_output_identity": {
+   "pass": true,
+   "per_pair": [
+    {
+     "n_a": 120,
+     "n_b": 120,
+     "identical": true,
+     "pair": "pr3850-koblitz-r1"
+    },
+    {
+     "n_a": 120,
+     "n_b": 120,
+     "identical": true,
+     "pair": "pr3850-koblitz-r2"
+    },
+    {
+     "n_a": 120,
+     "n_b": 120,
+     "identical": true,
+     "pair": "pr3850-koblitz-r3"
+    },
+    {
+     "n_a": 240,
+     "n_b": 240,
+     "identical": true,
+     "pair": "pr3850-prime-r1"
+    },
+    {
+     "n_a": 240,
+     "n_b": 240,
+     "identical": true,
+     "pair": "pr3850-prime-r2"
+    },
+    {
+     "n_a": 240,
+     "n_b": 240,
+     "identical": true,
+     "pair": "pr3850-prime-r3"
+    },
+    {
+     "n_a": 72,
+     "n_b": 72,
+     "identical": true,
+     "pair": "pr3850-tensor-r1"
+    },
+    {
+     "n_a": 72,
+     "n_b": 72,
+     "identical": true,
+     "pair": "pr3850-tensor-r2"
+    },
+    {
+     "n_a": 72,
+     "n_b": 72,
+     "identical": true,
+     "pair": "pr3850-tensor-r3"
+    },
+    {
+     "n_a": 240,
+     "n_b": 240,
+     "identical": true,
+     "pair": "pr3991-prime-r1"
+    },
+    {
+     "n_a": 240,
+     "n_b": 240,
+     "identical": true,
+     "pair": "pr3991-prime-r2"
+    },
+    {
+     "n_a": 240,
+     "n_b": 240,
+     "identical": true,
+     "pair": "pr3991-prime-r3"
+    },
+    {
+     "n_a": 120,
+     "n_b": 120,
+     "identical": true,
+     "pair": "pr4009-koblitz-r1"
+    },
+    {
+     "n_a": 120,
+     "n_b": 120,
+     "identical": true,
+     "pair": "pr4009-koblitz-r2"
+    },
+    {
+     "n_a": 120,
+     "n_b": 120,
+     "identical": true,
+     "pair": "pr4009-koblitz-r3"
+    },
+    {
+     "n_a": 72,
+     "n_b": 72,
+     "identical": true,
+     "pair": "pr4009-tensor-r1"
+    },
+    {
+     "n_a": 72,
+     "n_b": 72,
+     "identical": true,
+     "pair": "pr4009-tensor-r2"
+    },
+    {
+     "n_a": 72,
+     "n_b": 72,
+     "identical": true,
+     "pair": "pr4009-tensor-r3"
+    }
+   ],
+   "cross_round": [
+    {
+     "pair": "pr3850-koblitz r1A vs r1B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-koblitz r1A vs r2A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-koblitz r1A vs r2B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-koblitz r1A vs r3A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-koblitz r1A vs r3B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-prime r1A vs r1B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-prime r1A vs r2A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-prime r1A vs r2B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-prime r1A vs r3A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-prime r1A vs r3B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-tensor r1A vs r1B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-tensor r1A vs r2A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-tensor r1A vs r2B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-tensor r1A vs r3A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-tensor r1A vs r3B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3991-prime r1A vs r1B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3991-prime r1A vs r2A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3991-prime r1A vs r2B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3991-prime r1A vs r3A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3991-prime r1A vs r3B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-koblitz r1A vs r1B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-koblitz r1A vs r2A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-koblitz r1A vs r2B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-koblitz r1A vs r3A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-koblitz r1A vs r3B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-tensor r1A vs r1B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-tensor r1A vs r2A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-tensor r1A vs r2B",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-tensor r1A vs r3A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-tensor r1A vs r3B",
+     "identical": true,
+     "differing_paths": null
+    }
+   ],
+   "run1_aa": [
+    {
+     "pair": "pr3850-koblitz run1-aa r1A vs run2 r1A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-prime run1-aa r1A vs run2 r1A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3850-tensor run1-aa r1A vs run2 r1A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr3991-prime run1-aa r1A vs run2 r1A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-koblitz run1-aa r1A vs run2 r1A",
+     "identical": true,
+     "differing_paths": null
+    },
+    {
+     "pair": "pr4009-tensor run1-aa r1A vs run2 r1A",
+     "identical": true,
+     "differing_paths": null
+    }
+   ],
+   "pairs_identical": 18,
+   "pairs_total": 18,
+   "cross_round_identical": 30,
+   "cross_round_total": 30,
+   "dropped_fields": "keys ending _ns or _ms at any depth; keys starting ns_per_; started_at; finished_at; top-level time, isolation, binary_sha256, record_id, session_id; online.phases_ns"
+  },
+  "2_outcome_verified": {
+   "pass": true,
+   "run2": {
+    "records": 5184,
+    "status_not_verified": 0,
+    "matches_target_not_true": 0,
+    "matches_planted_not_true": 0,
+    "examples": []
+   },
+   "run1_aa": {
+    "records": 5184,
+    "status_not_verified": 0,
+    "matches_target_not_true": 0,
+    "matches_planted_not_true": 0,
+    "examples": []
+   }
+  },
+  "3_binary_identity": {
+   "pass": true,
+   "per_session": [
+    {
+     "session": "pr3850-koblitz-r1-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-koblitz-r1-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3850-koblitz-r2-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-koblitz-r2-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3850-koblitz-r3-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-koblitz-r3-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3850-prime-r1-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-prime-r1-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3850-prime-r2-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-prime-r2-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3850-prime-r3-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-prime-r3-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3850-tensor-r1-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-tensor-r1-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3850-tensor-r2-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-tensor-r2-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3850-tensor-r3-A",
+     "runlog_commit": "5382b439bc",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "session_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "listed_binary_sha256": "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155",
+     "ok": true
+    },
+    {
+     "session": "pr3850-tensor-r3-B",
+     "runlog_commit": "43e68a1d56",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "session_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "listed_binary_sha256": "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242",
+     "ok": true
+    },
+    {
+     "session": "pr3991-prime-r1-A",
+     "runlog_commit": "6745ba0a5f",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d"
+     ],
+     "session_binary_sha256": "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d",
+     "listed_binary_sha256": "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d",
+     "ok": true
+    },
+    {
+     "session": "pr3991-prime-r1-B",
+     "runlog_commit": "94c682e021",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09"
+     ],
+     "session_binary_sha256": "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09",
+     "listed_binary_sha256": "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09",
+     "ok": true
+    },
+    {
+     "session": "pr3991-prime-r2-A",
+     "runlog_commit": "6745ba0a5f",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d"
+     ],
+     "session_binary_sha256": "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d",
+     "listed_binary_sha256": "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d",
+     "ok": true
+    },
+    {
+     "session": "pr3991-prime-r2-B",
+     "runlog_commit": "94c682e021",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09"
+     ],
+     "session_binary_sha256": "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09",
+     "listed_binary_sha256": "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09",
+     "ok": true
+    },
+    {
+     "session": "pr3991-prime-r3-A",
+     "runlog_commit": "6745ba0a5f",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d"
+     ],
+     "session_binary_sha256": "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d",
+     "listed_binary_sha256": "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d",
+     "ok": true
+    },
+    {
+     "session": "pr3991-prime-r3-B",
+     "runlog_commit": "94c682e021",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09"
+     ],
+     "session_binary_sha256": "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09",
+     "listed_binary_sha256": "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09",
+     "ok": true
+    },
+    {
+     "session": "pr4009-koblitz-r1-A",
+     "runlog_commit": "2c1dc30e16",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd"
+     ],
+     "session_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "listed_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "ok": true
+    },
+    {
+     "session": "pr4009-koblitz-r1-B",
+     "runlog_commit": "21f21a45a3",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8"
+     ],
+     "session_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "listed_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "ok": true
+    },
+    {
+     "session": "pr4009-koblitz-r2-A",
+     "runlog_commit": "2c1dc30e16",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd"
+     ],
+     "session_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "listed_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "ok": true
+    },
+    {
+     "session": "pr4009-koblitz-r2-B",
+     "runlog_commit": "21f21a45a3",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8"
+     ],
+     "session_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "listed_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "ok": true
+    },
+    {
+     "session": "pr4009-koblitz-r3-A",
+     "runlog_commit": "2c1dc30e16",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd"
+     ],
+     "session_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "listed_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "ok": true
+    },
+    {
+     "session": "pr4009-koblitz-r3-B",
+     "runlog_commit": "21f21a45a3",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8"
+     ],
+     "session_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "listed_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "ok": true
+    },
+    {
+     "session": "pr4009-tensor-r1-A",
+     "runlog_commit": "2c1dc30e16",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd"
+     ],
+     "session_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "listed_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "ok": true
+    },
+    {
+     "session": "pr4009-tensor-r1-B",
+     "runlog_commit": "21f21a45a3",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8"
+     ],
+     "session_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "listed_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "ok": true
+    },
+    {
+     "session": "pr4009-tensor-r2-A",
+     "runlog_commit": "2c1dc30e16",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd"
+     ],
+     "session_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "listed_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "ok": true
+    },
+    {
+     "session": "pr4009-tensor-r2-B",
+     "runlog_commit": "21f21a45a3",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8"
+     ],
+     "session_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "listed_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "ok": true
+    },
+    {
+     "session": "pr4009-tensor-r3-A",
+     "runlog_commit": "2c1dc30e16",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd"
+     ],
+     "session_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "listed_binary_sha256": "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd",
+     "ok": true
+    },
+    {
+     "session": "pr4009-tensor-r3-B",
+     "runlog_commit": "21f21a45a3",
+     "runlog_rc": 0,
+     "record_binary_sha256": [
+      "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8"
+     ],
+     "session_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "listed_binary_sha256": "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8",
+     "ok": true
+    }
+   ],
+   "per_pr": [
+    {
+     "pr": "3850",
+     "A_commits": [
+      "5382b439bc"
+     ],
+     "B_commits": [
+      "43e68a1d56"
+     ],
+     "A_binaries": [
+      "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+     ],
+     "B_binaries": [
+      "04207d957eb75dc013574cbeb11c600e572a9ab033dd2b95203896bcd0c5f242"
+     ],
+     "one_commit_per_arm": true,
+     "one_binary_per_arm": true,
+     "A_binary_differs_from_B": true,
+     "A_full": "5382b439bca6a0cd7f35ad6ed34735e5c6fd6a33",
+     "B_full": "43e68a1d567635b05601fdd6335d7aea0b543a82",
+     "B_first_parent": "5382b439bca6a0cd7f35ad6ed34735e5c6fd6a33",
+     "A_is_first_parent_of_B": true,
+     "tarball_commit_A": "5382b439bca6a0cd7f35ad6ed34735e5c6fd6a33",
+     "tarball_commit_B": "43e68a1d567635b05601fdd6335d7aea0b543a82",
+     "tarball_matches_git": true,
+     "ok": true
+    },
+    {
+     "pr": "3991",
+     "A_commits": [
+      "6745ba0a5f"
+     ],
+     "B_commits": [
+      "94c682e021"
+     ],
+     "A_binaries": [
+      "2747072a8b27cfc793c2939064ef14b43e023ae5e94d722105e75c351827371d"
+     ],
+     "B_binaries": [
+      "bc655426800cc122310b324fc0984055d7f2c1abfd670c8eba56c320ee789b09"
+     ],
+     "one_commit_per_arm": true,
+     "one_binary_per_arm": true,
+     "A_binary_differs_from_B": true,
+     "A_full": "6745ba0a5fed7d55a7005c6ed12d5c5298fb3e0f",
+     "B_full": "94c682e0218189a546b3b663e50497b3da9bf616",
+     "B_first_parent": "6745ba0a5fed7d55a7005c6ed12d5c5298fb3e0f",
+     "A_is_first_parent_of_B": true,
+     "tarball_commit_A": "6745ba0a5fed7d55a7005c6ed12d5c5298fb3e0f",
+     "tarball_commit_B": "94c682e0218189a546b3b663e50497b3da9bf616",
+     "tarball_matches_git": true,
+     "ok": true
+    },
+    {
+     "pr": "4009",
+     "A_commits": [
+      "2c1dc30e16"
+     ],
+     "B_commits": [
+      "21f21a45a3"
+     ],
+     "A_binaries": [
+      "4319fe112e2900e4a90d0c46f0a415e3041e7771bb3455572b59c14060bf8afd"
+     ],
+     "B_binaries": [
+      "f50b46ce8eae304f4a18db0df54a5fb23a9044ca21f6925e78ef77f78132f0a8"
+     ],
+     "one_commit_per_arm": true,
+     "one_binary_per_arm": true,
+     "A_binary_differs_from_B": true,
+     "A_full": "2c1dc30e16f5337fd0afaade871d996dfe2e6274",
+     "B_full": "21f21a45a3149fc926a62fb27a17d337dd066595",
+     "B_first_parent": "2c1dc30e16f5337fd0afaade871d996dfe2e6274",
+     "A_is_first_parent_of_B": true,
+     "tarball_commit_A": "2c1dc30e16f5337fd0afaade871d996dfe2e6274",
+     "tarball_commit_B": "21f21a45a3149fc926a62fb27a17d337dd066595",
+     "tarball_matches_git": true,
+     "ok": true
+    }
+   ],
+   "problems": [],
+   "listed_binaries_distinct": true
+  },
+  "4_hazards": {
+   "warmup_filtering": {
+    "warmup_round_mismatch": 0,
+    "warmup_not_bool": 0,
+    "warmup_records": 864,
+    "measured_records": 4320,
+    "sensitivity_including_warmup": {
+     "pr3850/koblitz": {
+      "solve_cpu_ba_geomean": 0.9760600348270921,
+      "solve_wall_ba_geomean": 0.974438231399021
+     },
+     "pr3850/prime": {
+      "solve_cpu_ba_geomean": 0.9051065970507637,
+      "solve_wall_ba_geomean": 0.9053853452096349
+     },
+     "pr3850/tensor": {
+      "solve_cpu_ba_geomean": 0.9653468581315451,
+      "solve_wall_ba_geomean": 0.9653469963658714
+     },
+     "pr3991/prime": {
+      "solve_cpu_ba_geomean": 1.0127968217879701,
+      "solve_wall_ba_geomean": 1.0125988020797043
+     },
+     "pr4009/koblitz": {
+      "solve_cpu_ba_geomean": 0.9258216038624079,
+      "solve_wall_ba_geomean": 0.9279749095053006
+     },
+     "pr4009/tensor": {
+      "solve_cpu_ba_geomean": 0.6528085092894482,
+      "solve_wall_ba_geomean": 0.65281639317851
+     }
+    }
+   },
+   "cpu_ns": {
+    "cpu_ns_missing_or_null": 0,
+    "solve_wall_ns_missing_or_null": 0,
+    "measured_records_with_cpu_ns_zero": 2131,
+    "measured_records": 4320,
+    "wall_share_of_cpu_zero_records": 0.00011541257023214781,
+    "per_arm_cpu_over_wall": {
+     "koblitz/da-f4": 0.9914135907533635,
+     "koblitz/rf-mitm": 0.4014128523993174,
+     "koblitz/rf-pairs": 0.9028639403237175,
+     "koblitz/rho-strong": 0.08901804416466307,
+     "koblitz/rho-strong-aa": 0.08950818550740725,
+     "prime/bsgs": 0.24565759911535773,
+     "prime/bsgs-neg": 0.2043637248511328,
+     "prime/ic-mitm-igauss": 0.975314568770354,
+     "prime/ic-mitm-sgauss": 0.9717281668196315,
+     "prime/ic-rf-mitm-sgauss": 0.9845821944825158,
+     "prime/ic-rf-pairs": 0.999534754520368,
+     "prime/kangaroo": 0.40335802315418406,
+     "prime/rho-neg": 0.2143199020305741,
+     "prime/rho-neg-aa": 0.2243124538971418,
+     "prime/rho-plain": 0.23479410487206442,
+     "tensor/ic-tensor": 0.99995259990836,
+     "tensor/rho-neg": 0.12202211803540958,
+     "tensor/rho-neg-aa": 0.10455756528451714
+    }
+   },
+   "dominance": {
+    "pr3850/koblitz": {
+     "dominant_arm": "da-f4",
+     "dominant_cpu_share": 0.9254922406275773,
+     "dominant_arm_cpu_ba_per_round": [
+      0.9961456091064239,
+      0.9954928653754256,
+      0.9931451178523781
+     ],
+     "dominant_arm_cpu_ba_geomean": 0.9949270294138148,
+     "rest_cpu_ba_per_round": [
+      0.7733308558374206,
+      0.8204073266181586,
+      0.7473988053238418
+     ]
+    },
+    "pr3850/prime": {
+     "dominant_arm": "ic-rf-pairs",
+     "dominant_cpu_share": 0.9432999962437809,
+     "dominant_arm_cpu_ba_per_round": [
+      0.9012908235995468,
+      0.9008600371580932,
+      0.9016083521286465
+     ],
+     "dominant_arm_cpu_ba_geomean": 0.901253018787099,
+     "rest_cpu_ba_per_round": [
+      0.9688259540006887,
+      0.9699647475725354,
+      0.9682950834519902
+     ]
+    },
+    "pr3850/tensor": {
+     "dominant_arm": "ic-tensor",
+     "dominant_cpu_share": 0.9999994954346494,
+     "dominant_arm_cpu_ba_per_round": [
+      0.964441275387549,
+      0.9677430457878035,
+      0.9584795752683645
+     ],
+     "dominant_arm_cpu_ba_geomean": 0.9635469998845313,
+     "rest_cpu_ba_per_round": [
+      0.35323110624315446,
+      1.5105989018005364,
+      null
+     ]
+    },
+    "pr3991/prime": {
+     "dominant_arm": "ic-rf-pairs",
+     "dominant_cpu_share": 0.9401511443088656,
+     "dominant_arm_cpu_ba_per_round": [
+      1.0142947451050597,
+      1.0140258234443267,
+      1.0114661834212468
+     ],
+     "dominant_arm_cpu_ba_geomean": 1.0132614483399918,
+     "rest_cpu_ba_per_round": [
+      1.0192748636043734,
+      1.0122632137910896,
+      1.0113861674221736
+     ]
+    },
+    "pr4009/koblitz": {
+     "dominant_arm": "da-f4",
+     "dominant_cpu_share": 0.9310427808878253,
+     "dominant_arm_cpu_ba_per_round": [
+      0.9224782245129023,
+      0.9227143382835634,
+      0.9194840142436821
+     ],
+     "dominant_arm_cpu_ba_geomean": 0.9215576852526122,
+     "rest_cpu_ba_per_round": [
+      0.9725997723797702,
+      0.9511966024454189,
+      1.0347595642786243
+     ]
+    },
+    "pr4009/tensor": {
+     "dominant_arm": "ic-tensor",
+     "dominant_cpu_share": 0.9999988922268708,
+     "dominant_arm_cpu_ba_per_round": [
+      0.6517280598292806,
+      0.6640891789193126,
+      0.6451025823945031
+     ],
+     "dominant_arm_cpu_ba_geomean": 0.653592712578148,
+     "rest_cpu_ba_per_round": [
+      0.622462581406863,
+      3.201015539070964,
+      0.0
+     ]
+    }
+   },
+   "order_effects": {
+    "runlog_order_counterbalanced": true,
+    "session_start_order_counterbalanced": true,
+    "adjacent_pairs": true,
+    "per_row": {
+     "pr3850/koblitz/solve_cpu": {
+      "a_first_ratio_geomean": 0.9752185314235616,
+      "b_first_ratio": 0.9810499006498247,
+      "second_slot_factor_est": 0.9970235660287856,
+      "order_balanced_ratio": 0.978129870398074,
+      "residual_bias_of_3round_geomean": 0.9990068693609734
+     },
+     "pr3850/koblitz/solve_wall": {
+      "a_first_ratio_geomean": 0.9744671089831599,
+      "b_first_ratio": 0.9777896983942013,
+      "second_slot_factor_est": 0.9982995235002633,
+      "order_balanced_ratio": 0.9761269899903973,
+      "residual_bias_of_3round_geomean": 0.9994328529050692
+     },
+     "pr3850/prime/solve_cpu": {
+      "a_first_ratio_geomean": 0.9051326123391306,
+      "b_first_ratio": 0.9046475878158163,
+      "second_slot_factor_est": 1.0002680378172113,
+      "order_balanced_ratio": 0.9048900675806,
+      "residual_bias_of_3round_geomean": 1.0000893379575622
+     },
+     "pr3850/prime/solve_wall": {
+      "a_first_ratio_geomean": 0.9054638874182617,
+      "b_first_ratio": 0.9050964138177249,
+      "second_slot_factor_est": 1.0002029818610891,
+      "order_balanced_ratio": 0.9052801319722668,
+      "residual_bias_of_3round_geomean": 1.0000676560429198
+     },
+     "pr3850/tensor/solve_cpu": {
+      "a_first_ratio_geomean": 0.9614561589842854,
+      "b_first_ratio": 0.9677433998961907,
+      "second_slot_factor_est": 0.9967463038417383,
+      "order_balanced_ratio": 0.9645946569137654,
+      "residual_bias_of_3round_geomean": 0.9989142562009549
+     },
+     "pr3850/tensor/solve_wall": {
+      "a_first_ratio_geomean": 0.9614599798555596,
+      "b_first_ratio": 0.9677371360557783,
+      "second_slot_factor_est": 0.9967515102024826,
+      "order_balanced_ratio": 0.9645934518426225,
+      "residual_bias_of_3round_geomean": 0.9989159954261704
+     },
+     "pr3991/prime/solve_cpu": {
+      "a_first_ratio_geomean": 1.0130241835614384,
+      "b_first_ratio": 1.0139193820336123,
+      "second_slot_factor_est": 0.99955844805317,
+      "order_balanced_ratio": 1.0134716839565467,
+      "residual_bias_of_3round_geomean": 0.999852794349283
+     },
+     "pr3991/prime/solve_wall": {
+      "a_first_ratio_geomean": 1.0127026362446285,
+      "b_first_ratio": 1.0137689452260505,
+      "second_slot_factor_est": 0.9994739484144789,
+      "order_balanced_ratio": 1.0132356504650624,
+      "residual_bias_of_3round_geomean": 0.9998246187146959
+     },
+     "pr4009/koblitz/solve_cpu": {
+      "a_first_ratio_geomean": 0.9263900213840741,
+      "b_first_ratio": 0.9246861417296337,
+      "second_slot_factor_est": 1.0009209046093333,
+      "order_balanced_ratio": 0.925537689459739,
+      "residual_bias_of_3round_geomean": 1.0003068740218128
+     },
+     "pr4009/koblitz/solve_wall": {
+      "a_first_ratio_geomean": 0.9284651870121443,
+      "b_first_ratio": 0.9282414608096548,
+      "second_slot_factor_est": 1.0001205035181306,
+      "order_balanced_ratio": 0.9283533171713569,
+      "residual_bias_of_3round_geomean": 1.0000401662260294
+     },
+     "pr4009/tensor/solve_cpu": {
+      "a_first_ratio_geomean": 0.6484064009477742,
+      "b_first_ratio": 0.6640905408191071,
+      "second_slot_factor_est": 0.9881207050872903,
+      "order_balanced_ratio": 0.6562016134359762,
+      "residual_bias_of_3round_geomean": 0.9960244509836192
+     },
+     "pr4009/tensor/solve_wall": {
+      "a_first_ratio_geomean": 0.6484167040037,
+      "b_first_ratio": 0.6640941974277907,
+      "second_slot_factor_est": 0.988125835181768,
+      "order_balanced_ratio": 0.6562086334727016,
+      "residual_bias_of_3round_geomean": 0.9960261746902699
+     }
+    }
+   },
+   "aa_control": {
+    "binaries_identical_per_pair": true,
+    "binary_pairs": [
+     {
+      "pair": "pr3850-koblitz-r1",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3850-koblitz-r2",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3850-koblitz-r3",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3850-prime-r1",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3850-prime-r2",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3850-prime-r3",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3850-tensor-r1",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3850-tensor-r2",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3850-tensor-r3",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3991-prime-r1",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3991-prime-r2",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr3991-prime-r3",
+      "A": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "B": [
+       "4bf2d623cb414128f326535258c6e70a8611fb2061b8504f3d0f012b31b00155"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr4009-koblitz-r1",
+      "A": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "B": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr4009-koblitz-r2",
+      "A": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "B": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr4009-koblitz-r3",
+      "A": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "B": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr4009-tensor-r1",
+      "A": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "B": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr4009-tensor-r2",
+      "A": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "B": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "identical": true
+     },
+     {
+      "pair": "pr4009-tensor-r3",
+      "A": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "B": [
+       "7a1224edd67f1938eda31fb978cda3298d9cc27ec6efbed8b52ce55abf9ed9b7"
+      ],
+      "identical": true
+     }
+    ],
+    "per_row": {
+     "pr3850/koblitz": {
+      "solve_cpu": {
+       "aa_ba_per_round": [
+        1.0190896717382023,
+        0.9977899905210752,
+        0.9874322292019809
+       ],
+       "aa_ba_geomean": 1.001350872186928,
+       "aa_max_abs_log_dev": 0.01890975011192123,
+       "ab_ba_geomean": 0.9771584596548346,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      },
+      "solve_wall": {
+       "aa_ba_per_round": [
+        1.0158029007286595,
+        0.9939932785400062,
+        0.992169620791133
+       ],
+       "aa_ba_geomean": 1.0005979463643333,
+       "aa_max_abs_log_dev": 0.01567933499095153,
+       "ab_ba_geomean": 0.9755733824037407,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      }
+     },
+     "pr3850/prime": {
+      "solve_cpu": {
+       "aa_ba_per_round": [
+        1.004755305804403,
+        0.9983401385253646,
+        1.0037505078268314
+       ],
+       "aa_ba_geomean": 1.002278019650163,
+       "aa_max_abs_log_dev": 0.004744035054208809,
+       "ab_ba_geomean": 0.9049709086110559,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      },
+      "solve_wall": {
+       "aa_ba_per_round": [
+        1.0045935489868103,
+        0.9982642034769763,
+        1.0034707675612569
+       ],
+       "aa_ba_geomean": 1.0021057087050007,
+       "aa_max_abs_log_dev": 0.004583030838782108,
+       "ab_ba_geomean": 0.9053413796437298,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      }
+     },
+     "pr3850/tensor": {
+      "solve_cpu": {
+       "aa_ba_per_round": [
+        0.965892755034354,
+        1.4277877734380138,
+        1.0066952148619785
+       ],
+       "aa_ba_geomean": 1.1155700782999833,
+       "aa_max_abs_log_dev": 0.3561262348320307,
+       "ab_ba_geomean": 0.9635473542464292,
+       "ab_outside_aa_band": false,
+       "ab_all_rounds_outside_aa_band": false,
+       "matches_results_aa_json": true
+      },
+      "solve_wall": {
+       "aa_ba_per_round": [
+        0.9659090159506231,
+        1.4277163032524547,
+        1.0067036012416255
+       ],
+       "aa_ba_geomean": 1.1155608219707756,
+       "aa_max_abs_log_dev": 0.35607617699029454,
+       "ab_ba_geomean": 0.963547828128939,
+       "ab_outside_aa_band": false,
+       "ab_all_rounds_outside_aa_band": false,
+       "matches_results_aa_json": true
+      }
+     },
+     "pr3991/prime": {
+      "solve_cpu": {
+       "aa_ba_per_round": [
+        1.0028218642189588,
+        1.0016876217261734,
+        1.0013706621623908
+       ],
+       "aa_ba_geomean": 1.0019598557415363,
+       "aa_max_abs_log_dev": 0.0028178902343981875,
+       "ab_ba_geomean": 1.0133224951978266,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      },
+      "solve_wall": {
+       "aa_ba_per_round": [
+        1.0028270432463906,
+        1.0016692573062185,
+        1.0012486420898445
+       ],
+       "aa_ba_geomean": 1.0019147586484864,
+       "aa_max_abs_log_dev": 0.002823054675106165,
+       "ab_ba_geomean": 1.0130579478943678,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      }
+     },
+     "pr4009/koblitz": {
+      "solve_cpu": {
+       "aa_ba_per_round": [
+        1.0051273433024983,
+        1.0041505899867038,
+        1.0023749666828214
+       ],
+       "aa_ba_geomean": 1.0038836533105868,
+       "aa_max_abs_log_dev": 0.00511424323776595,
+       "ab_ba_geomean": 0.9258217129328429,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      },
+      "solve_wall": {
+       "aa_ba_per_round": [
+        1.0017536639861728,
+        1.0015499621867823,
+        0.9982372756568588
+       ],
+       "aa_ba_geomean": 1.0005123347246767,
+       "aa_max_abs_log_dev": 0.0017642797698238654,
+       "ab_ba_geomean": 0.9283906056205298,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      }
+     },
+     "pr4009/tensor": {
+      "solve_cpu": {
+       "aa_ba_per_round": [
+        1.082799327862211,
+        0.9972193856669331,
+        0.9984786733276827
+       ],
+       "aa_ba_geomean": 1.0253980669272167,
+       "aa_max_abs_log_dev": 0.07954965801733895,
+       "ab_ba_geomean": 0.6535928517571333,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      },
+      "solve_wall": {
+       "aa_ba_per_round": [
+        1.0828036905308194,
+        0.9972155841574354,
+        0.9984563999494613
+       ],
+       "aa_ba_geomean": 1.0253905163940085,
+       "aa_max_abs_log_dev": 0.07955368707397704,
+       "ab_ba_geomean": 0.6536009749965445,
+       "ab_outside_aa_band": true,
+       "ab_all_rounds_outside_aa_band": true,
+       "matches_results_aa_json": true
+      }
+     }
+    },
+    "run1_load1_range": [
+     10.07,
+     41.39
+    ],
+    "run2_load1_range": [
+     4.25,
+     21.81
+    ]
+   },
+   "isolation": {
+    "record_isolation_levels": {
+     "L0": 5184
+    },
+    "session_preflight_quiet": {
+     "False": 36
+    },
+    "allow_busy": [
+     "True"
+    ]
+   },
+   "producer_per_arm_cpu_inconsistent": [
+    {
+     "row": "pr3850/koblitz",
+     "arm": "rho-strong",
+     "ba_geomean": 1.0891872452649245,
+     "ba_min": 0.0,
+     "ba_max": 1.0891872452649245,
+     "aa_spread": 144950.0,
+     "validator_recomputed": {
+      "A_cpu_ns_per_round": [
+       144950,
+       0,
+       41710
+      ],
+      "B_cpu_ns_per_round": [
+       0,
+       250311,
+       45430
+      ]
+     },
+     "note": "a geometric mean cannot lie outside [min, max], and a zero ratio forces it to zero; short-arm cpu_ns is tick-quantised (mostly 0), so these per-arm figures carry no signal"
+    },
+    {
+     "row": "pr4009/tensor",
+     "arm": "rho-neg",
+     "ba_geomean": 2.3519400336767395,
+     "ba_min": 0.0,
+     "ba_max": 2.3519400336767395,
+     "aa_spread": 4.783183357172602,
+     "validator_recomputed": {
+      "A_cpu_ns_per_round": [
+       209960,
+       55231,
+       264180
+      ],
+      "B_cpu_ns_per_round": [
+       0,
+       129900,
+       0
+      ]
+     },
+     "note": "a geometric mean cannot lie outside [min, max], and a zero ratio forces it to zero; short-arm cpu_ns is tick-quantised (mostly 0), so these per-arm figures carry no signal"
+    },
+    {
+     "row": "pr4009/tensor",
+     "arm": "rho-neg-aa",
+     "ba_geomean": 3.4874303873719885,
+     "ba_min": 0.0,
+     "ba_max": 3.9149033338407673,
+     "aa_spread": 1.4311546840958607,
+     "validator_recomputed": {
+      "A_cpu_ns_per_round": [
+       52610,
+       65690,
+       45900
+      ],
+      "B_cpu_ns_per_round": [
+       163440,
+       257170,
+       0
+      ]
+     },
+     "note": "a geometric mean cannot lie outside [min, max], and a zero ratio forces it to zero; short-arm cpu_ns is tick-quantised (mostly 0), so these per-arm figures carry no signal"
+    }
+   ],
+   "on_pod_verify": {
+    "ok": 36,
+    "auditor_binary_equals_producer_binary": 36
+   },
+   "runlog_process_wall_ba": {
+    "pr3850/koblitz": {
+     "runlog_wall_ba_per_round": [
+      0.8859071452090879,
+      1.1284265865565153,
+      0.999809885931559
+     ],
+     "geomean": 0.9998303453585399
+    },
+    "pr3850/prime": {
+     "runlog_wall_ba_per_round": [
+      0.8965576238707911,
+      0.9103462705303902,
+      0.922919435365109
+     ],
+     "geomean": 0.9098773882477255
+    },
+    "pr3850/tensor": {
+     "runlog_wall_ba_per_round": [
+      0.9792140882677942,
+      0.9585605529772967,
+      0.9606583126810709
+     ],
+     "geomean": 0.9660999293637536
+    },
+    "pr3991/prime": {
+     "runlog_wall_ba_per_round": [
+      1.0140371456500488,
+      1.0669292844303362,
+      0.9912047918720146
+     ],
+     "geomean": 1.023570193919249
+    },
+    "pr4009/koblitz": {
+     "runlog_wall_ba_per_round": [
+      0.9747899159663865,
+      0.98918139199423,
+      1.0634657836644592
+     ],
+     "geomean": 1.0084092693001812
+    },
+    "pr4009/tensor": {
+     "runlog_wall_ba_per_round": [
+      0.6547150371454911,
+      0.6670744419028868,
+      0.6502407554914498
+     ],
+     "geomean": 0.6573049980147339
+    }
+   }
+  }
+ },
+ "findings": []
+}
