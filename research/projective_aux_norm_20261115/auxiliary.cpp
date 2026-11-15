@@ -109,6 +109,49 @@ struct Generator:algebraic::Generator {
         check(reference::equal(sum,{cfg.rx,cfg.ry,false}),"auxiliary model group sum");return coeff::key(points);
     }
 };
+struct Eliminated {
+    Generator full;System system;std::vector<Polynomial> images;
+    unsigned max_degree=0;std::size_t zero_equations=0;
+    Polynomial constant(U value)const{return Polynomial::constant(system.names.size(),system.p,value);}
+    Polynomial substitute(const Polynomial&f)const{
+        auto out=constant(0);
+        for(const auto&term:f.terms){auto product=constant(term.second);
+            for(std::size_t i=0;i<term.first.size();++i)if(term.first[i])product=product.times(images.at(i).power(term.first[i]));
+            out=out.plus(product);
+        }return out;
+    }
+    Eliminated(coeff::Config cfg,unsigned arity,const Tower&tower):full(cfg,arity,tower){
+        check(arity==3&&full.qp[1].size()==2&&full.qd[1].size()==1&&full.rd[1].size()==3,"first-wrap graph shape");
+        std::vector<bool> removed(full.system.names.size(),false);
+        for(auto id:full.qp[1])removed.at(id)=true;
+        for(auto id:full.qd[1])removed.at(id)=true;
+        for(auto id:full.rd[1])removed.at(id)=true;
+        system.p=full.system.p;std::vector<std::size_t> kept;
+        for(std::size_t i=0;i<removed.size();++i)if(!removed[i]){
+            system.variables.emplace(full.system.names[i],system.names.size());system.names.push_back(full.system.names[i]);kept.push_back(i);}
+        images.assign(removed.size(),constant(0));
+        for(std::size_t i=0;i<kept.size();++i)images[kept[i]]=Polynomial::variable(kept.size(),system.p,i);
+        coeff::Poly P{0,1},Q{1};
+        for(std::size_t j=0;j<2;++j){const auto&s=tower.steps[j];const auto&f=cfg.field;
+            const auto PQ=coeff::mul(f,P,Q),QQ=coeff::mul(f,Q,Q);
+            const auto N=coeff::add(f,coeff::add(f,coeff::mul(f,P,P),coeff::scale(f,PQ,s.xi),-1),coeff::scale(f,QQ,s.tau));
+            const auto D=coeff::add(f,PQ,coeff::scale(f,QQ,s.xi),-1);P=N;Q=D;
+        }
+        check(P.size()==5&&P.back()==1&&Q.size()==4&&Q.back()==1,"public first-wrap degree/monicity");
+        images[full.qp[1][1]]=constant(1);images[full.qd[1][0]]=constant(1);
+        images[full.qp[1][0]]=constant(P[3]).plus(substitute(full.U0[2]),true);
+        for(std::size_t k=0;k<3;++k)images[full.rd[1][k]]=constant(Q[k]).plus(substitute(full.U0[k]),true);
+        for(const auto&eq:full.system.equations){auto projected=substitute(eq);
+            if(projected.terms.empty()){++zero_equations;continue;}
+            max_degree=std::max(max_degree,projected.largest_degree());system.equations.push_back(std::move(projected));}
+        check(system.names.size()==8&&max_degree<=4&&zero_equations==6,"projected graph shape/cancellation");
+    }
+    std::string decode(const std::vector<U>&assignment)const{
+        for(const auto&eq:system.equations)check(eq.evaluate(assignment)==0,"projected original equation failed");
+        std::vector<U> lifted;for(const auto&image:images)lifted.push_back(image.evaluate(assignment));
+        return full.decode(lifted);
+    }
+};
 std::set<std::string> reference_models(const Tower&tower,Point R){
     const reference::Curve E{19,0,2};std::vector<Point> base;
     for(const auto&P:E.points())if(P.x!=R.x&&tower.member(P.x))base.push_back(P);
@@ -143,37 +186,43 @@ void selftest(const Tower&tower,std::ostream&log){
     const Generator gen({{19},0,2,3,15,4,3},3,tower);
     check(gen.system.names.size()==14&&gen.max_degree<=3,"auxiliary shape");
     log<<"shape\t"<<gen.system.names.size()<<'\t'<<gen.max_degree<<'\n';
+    const Eliminated projected({{19},0,2,3,15,4,3},3,tower);
+    log<<"projected_shape\t"<<projected.system.names.size()<<'\t'<<projected.max_degree<<'\t'<<projected.zero_equations<<'\n';
 }
 } // namespace auxiliary
 int main(int argc,char**argv){
     try{
         const auxiliary::Tower tower;
         if(argc==2&&std::string(argv[1])=="--selftest"){auxiliary::selftest(tower,std::cout);return 0;}
-        if(argc==5&&std::string(argv[1])=="--qualify"){
+        if(argc==5&&(std::string(argv[1])=="--qualify"||std::string(argv[1])=="--qualify-eliminated")){
+            const bool eliminated=std::string(argv[1])=="--qualify-eliminated";
             const auto root=std::filesystem::absolute(argv[3]);auxiliary::check(std::filesystem::create_directory(root),"reused auxiliary root");
             std::ofstream log(argv[4]);log<<"rx\try\treference\tmodels\tquotient\tstatus\n";
             const reference::Curve E{19,0,2};const auto targets=E.points();auxiliary::check(targets.size()==12,"main curve census");
             std::size_t id=0;
             for(const auto&R:targets){const auto dir=root/("call-"+std::to_string(++id));std::filesystem::create_directory(dir);
                 const auto expected=auxiliary::reference_models(tower,R);const auto input=dir/"input.ms",gb=dir/"basis.gb";
-                auxiliary::Generator gen({{19},0,2,3,15,R.x,R.y},3,tower);canonical::write_system(input,gen.system,false);
+                auto solve=[&](const auto&gen){canonical::write_system(input,gen.system,false);
                 const int status=algebraic::backend(std::filesystem::absolute(argv[2]),input,gb,dir);
                 {std::ofstream out(dir/"exit.txt");out<<status<<'\n';}
-                if(status!=0){log<<R.x<<'\t'<<R.y<<'\t'<<expected.size()<<"\t-\t-\tunknown exit"<<status<<'\n';log.flush();continue;}
+                if(status!=0){log<<R.x<<'\t'<<R.y<<'\t'<<expected.size()<<"\t-\t-\tunknown exit"<<status<<'\n';log.flush();return;}
                 quotient::Result result;std::set<std::string> models;bool duplicate=false;
                 try{
                     result=quotient::Extractor(gen.system,quotient::read_basis(gb,gen.system),128).run();
                     for(const auto&point:result.points)if(!models.insert(gen.decode(point)).second)duplicate=true;
                 }catch(const std::exception&e){
                     std::ofstream error(dir/"extraction-unknown.txt");error<<e.what()<<'\n';
-                    log<<R.x<<'\t'<<R.y<<'\t'<<expected.size()<<"\t-\t-\tunknown extraction: "<<e.what()<<'\n';log.flush();continue;
+                    log<<R.x<<'\t'<<R.y<<'\t'<<expected.size()<<"\t-\t-\tunknown extraction: "<<e.what()<<'\n';log.flush();return;
                 }
                 auxiliary::check(!duplicate,"duplicate auxiliary witness");
                 std::ofstream out(dir/"models.tsv");for(const auto&model:models)out<<model<<'\n';
                 auxiliary::check(models==expected,"complete auxiliary model mismatch");
                 log<<R.x<<'\t'<<R.y<<'\t'<<expected.size()<<'\t'<<models.size()<<'\t'<<result.dimension<<"\tmatch\n";log.flush();
+                };
+                if(eliminated){const auxiliary::Eliminated gen({{19},0,2,3,15,R.x,R.y},3,tower);solve(gen);}
+                else{const auxiliary::Generator gen({{19},0,2,3,15,R.x,R.y},3,tower);solve(gen);}
             }return 0;
         }
-        throw std::invalid_argument("usage: auxiliary --selftest | --qualify BACKEND NEW_ROOT TSV");
+        throw std::invalid_argument("usage: auxiliary --selftest | --qualify[-eliminated] BACKEND NEW_ROOT TSV");
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<'\n';return 2;}
 }

@@ -77,3 +77,12 @@ Kummer counters now2350 rows/1000 pivots/129061 producer reductions, with
 The complete raw round is retained. A3 is frozen before coding first-wrap
 unit graph substitutions:8 variables/quartic input, D6 with3003 monomials,
 unchanged hard caps, same12 target/model/replay criteria. [pcc:unverified]
+
+A3 implementation adds an explicit first-wrap graph projection with six
+removed coordinates. The projected oracle lifts to the full original generator
+and checks every original equation before decoding. The original --qualify
+interface is retained; --qualify-eliminated selects the new presentation.
+Strict native build004 passes; no original build directory is overwritten.
+The prospective graph-004 panel runs only after its source commit and hashes
+are captured, using a separate frozen runner file. Runtime shape and all
+model/certificate checks remain acceptance conditions, not assumed results.
