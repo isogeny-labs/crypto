@@ -1,3 +1,13 @@
+# Accepted CI, passive capture and complete finite relation ranks
+
+pcc/claims/PCC-20261115-719d74.json: exact normallypublished consumer4ec3401 mirror. Fresh GitHub CI0b4ddb/whole43MB474member artifact/102phases1503guards/two100-101populations/allcontrols/both26declarationgates14bindings/fullruntime-preparedclosure/fulljob-runlogs and actual downloadedRust replays; passive captured118b9/full100native60calls660events28phases/allnon-time reports-counters/scalar/inputparity/fourwhole-stage omissions101. [pcc:unverified]
+
+Rankc0479c:360full-active training/training+heldout/allavailable certificates and1440470independentlyreplayedrowoperations. FB30nullities6/10/13 byside; FB36/48/64nullity1 throughout allfive targets. Conditionalproof19c467/bothoriginalgates27declarations0trusted/allnineexactbindings; two faileddevelopmentattempts retained. No numericLean specialization/globalcharacter or causal theorem. All343producer scientific hashes unchanged. [pcc:unverified]
+
+Next: separate post-solver actualnorm/cofactor4/BSGS whole60call source-character/known-log/fullsplitwalk-descent checks and scalar-witness control underprospective8e7e1c. Character tools compiled6dd355 and normallypublished5408b9db; exact originalcheckpoint24 imported and whole native running, with no character result accepted yet. Fullvisual/PDF and genuineNEW27 remain queued for allpost26 source/build/raw/wholeGitHub artifacts-logs/runtime/fullprepared/failure/control/draft roots. Vaultlocked8edec422/VLT1 only, KB127, fullcost/liveadmission/reference and merge requirements remain open. [pcc:unverified]
+
+---
+
 # Fresh IC/sampler CI source and prospective relation-kernel protocol published
 
 pcc/claims/PCC-20261115-043401.json: exactconsumerCBC/localf5b20f all102phases1503guards/two whole100-101 populations/15omissions/eight historicalnegatives/two timingpositives/runtime-fullpreparedclosure/both26declarationgates14bindings/independentIOverdict0. Actual local provenanceproducer3d49/consumerparent549 plus exact precommit driver manifest; CBC publishes those bytes. All343producer scientificinputs unchanged. [pcc:unverified]
