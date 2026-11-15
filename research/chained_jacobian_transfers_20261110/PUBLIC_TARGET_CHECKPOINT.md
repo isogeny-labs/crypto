@@ -1,3 +1,21 @@
+# Whole research handoff24 prepared; scientific inputs HELD
+
+pcc/claims/PCC-20261115-c0dd25.json: all47225prior keys/169links/exactledgerprefixes andALLpendingconsumer bytes retained,33wholeclosedct87-ct88roots/allscientificmembers andboth complete reports/source-exes-fullpreparedcopies/proofs/checkpoints/failures roundtripped. Originalprime976f50/full1077, census88f828/full311/proof29e535/reportcd8173 andoriginalgeometry0976e9/full16 retainunsignedfinite acceptance. PhaseBnotwritten. Originalpolicy selects6objects. HOLDuntiloriginalremote replays BEFOREactualbot/exactFF/wholeorderedarchive/terminal24guards-links-ownedbytes. [pcc:unverified]
+
+## What was done
+Wholeclosedscience andallpending607consumer delta preserved. Alreadygenuine23archive/parts remainexact/held, wholeoriginalguard/manifest/publicationmetadata retainedwithoutrecursivepayloadcopy. Onlyprivate transportmetadata excludedandretainedlocally. Fourcanonicalscientificobjects includeimmutable87720B geometrysubject. [pcc:unverified]
+
+## Decisions made
+Normalpublish originalpolicy payload; exactoriginalpublisher/FF/replay/guard release beforeany scientific/consumerledger/ownedbyte mutation. Thenexactcanonicalprojection/consumerpublication andPhaseB701fullgroup evaluator under1539b6. [pcc:unverified]
+
+## Open threads
+Genuine24publication/release/canonicalpositive1077-311-16/geometrysubject; PhaseBimplementationnotesct88-full-evaluator-implementation-notes-01.md. Fullprimitive/strongknownpoint/primefielddescent/freshadditiveCI remainqueued. [pcc:unverified]
+
+## Errors
+Allformatter101/source-brace/Arrayproofreduction/EOF/controlcoverage/artifact/cold/root-main/mathfailures retained. No waiver/signing/globalCI/calibrated/mergepromotion. [pcc:unverified]
+
+---
+
 # Unique original kernel-compatible candidate mirrored
 
 pcc/claims/PCC-20261115-83885c.json: exactpublished consumerfb40449 exports retain native88f828, independentfiniteproof29e535 andinspectedreportcd8173. All18vertices72pairs216triples/311whole records/allmalformed-omissioncontrols/1172hashes/actualbinaries pass. Exactlyone supported compatibletriple4-1-4, cases(2,0)/(0,1)/(2,0), D116/39/36. BothoriginalLean gates6roots0trusted/all6localbindings; entireproofsource/literaldata preserved in rootmirror. [pcc:unverified]
