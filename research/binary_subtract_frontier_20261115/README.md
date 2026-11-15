@@ -76,3 +76,5 @@ No leaderboard or canonical timing graph changes: no admitted timing dataset exi
 ## Publication qualification
 
 The append-only PCC ledger now diverges from fetched main after the common 1,088-entry prefix. Both histories remain unchanged; the official prefix check fails. See evidence/ledger-prefix-check.txt and the existing [ledger reconciliation obstruction](../../problems/pkm-pcc-ledger-divergence.md). This is a merge gate, not a waived or repaired check. [pcc:unverified]
+
+Final canonical-wiring qualification: crypto's post-relocation focused audit rebuild also reached its 900-second compilation bound before tests ran. The earlier actual-library audit passed with identical test bodies and production behavior; its raw log stays unchanged. Cryptanalysis's canonical tests pass in the full suite. See evidence/crypto-canonical-rebuild-status.txt; neither build bound is an algorithm timing result. [pcc:unverified]
