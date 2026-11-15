@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0317Z-genus-ladder-scale",
+  "latest_record": "20261115T0629Z-mt-ic-retune-2p32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 4,
-    "measured": 179,
+    "measured": 180,
     "open": 2
   },
   "repo": "crypto",
@@ -17447,6 +17447,102 @@
         }
       ],
       "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.3111,
+      "latest": 0.3111,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.140814
+      },
+      "metric": "ic_chosen_wall_t1024",
+      "points": [
+        {
+          "commit": "05c0deda0aee",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.140814
+          },
+          "n": 4,
+          "record": "20261115T0629Z-mt-ic-retune-2p32",
+          "reference": 0.2727,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.3075,
+            0.3167
+          ],
+          "summary": "multi-target IC at 2^32, ic5b flat 32: retune (k, mu) 4,1.0 -> 4,0.85 on W32-0..3; holdout W32-4..7: whole solve 0.86-0.995x of the old setting, 1.06-1.15x the best rho on the same host [pcc:unverified]",
+          "value": 0.3111
+        }
+      ],
+      "problem": "mt:ic-vs-rho-2p32",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.2559,
+      "latest": 1.2559,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.072411
+      },
+      "metric": "ic_chosen_wall_t16384",
+      "points": [
+        {
+          "commit": "05c0deda0aee",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.072411
+          },
+          "n": 4,
+          "record": "20261115T0629Z-mt-ic-retune-2p32",
+          "reference": 1.1711,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.2234,
+            1.2996
+          ],
+          "summary": "multi-target IC at 2^32, ic5b flat 32: retune (k, mu) 4,1.0 -> 4,0.85 on W32-0..3; holdout W32-4..7: whole solve 0.86-0.995x of the old setting, 1.06-1.15x the best rho on the same host [pcc:unverified]",
+          "value": 1.2559
+        }
+      ],
+      "problem": "mt:ic-vs-rho-2p32",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.6161,
+      "latest": 0.6161,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.091022
+      },
+      "metric": "ic_chosen_wall_t4096",
+      "points": [
+        {
+          "commit": "05c0deda0aee",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.091022
+          },
+          "n": 4,
+          "record": "20261115T0629Z-mt-ic-retune-2p32",
+          "reference": 0.5647,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.6006,
+            0.623
+          ],
+          "summary": "multi-target IC at 2^32, ic5b flat 32: retune (k, mu) 4,1.0 -> 4,0.85 on W32-0..3; holdout W32-4..7: whole solve 0.86-0.995x of the old setting, 1.06-1.15x the best rho on the same host [pcc:unverified]",
+          "value": 0.6161
+        }
+      ],
+      "problem": "mt:ic-vs-rho-2p32",
       "unit": "wall_s"
     },
     {
