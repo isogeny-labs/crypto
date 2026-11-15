@@ -29,6 +29,10 @@ Every entry has four headings:
 - Errors (what went wrong, how it was handled)
 
 Commit project handoffs with the related PR so they survive across sessions.
+Several sessions append to the same day's file, so a PR that touches it goes
+`dirty` on `main` often (lesson `L-1e09e78e395f`, adopted 2026-11-15). Fetch
+`origin/main` before appending, and when the file conflicts, merge `main` and
+keep both sides in time order; never drop another session's entry.
 Keep entries about this project; do not copy private global logs or chat transcripts.
 
 <!-- END SHARED SESSION LOG -->
@@ -299,6 +303,25 @@ descriptive investigations report their own technical outcomes and next steps.
   that comparison.
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
+
+**Claim tiers** (owner, 2026-11-15): "below rho", "smaller exponent" and
+"subexponential" are defined in
+[`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md) (checklist
+`docs/ic/success_criteria.json`; red-team review in `docs/ic/reviews/`).
+Every tier claim uses the cold end-to-end interval (the online interval of
+"IC measurement rules" is reported beside it, never instead), public targets,
+no uncounted work, the cheapest registered rho at each weight, and a
+preregistration committed as a pcc claim before the first run, with Holm
+correction over the thread's attempts. T0 is a gain over the IC baseline; T1
+is below that rho at a stated size (band and calibrated readings, growing-size
+trend, controls, cross-host audit); T2 is a smaller exponent on a declared path
+(the largest per-phase upper limit, six or more sizes over 24+ bits, a
+beacon-derived held-out size); T3 is subexponential (an argument with named,
+numerically tested heuristics; data can only falsify). A transfer to another
+group counts at every tier when the map is charged on every instance, certified
+independently, the answer checked on `E`, and applicability and literature
+status are preregistered. Each tier is reported as the distance remaining,
+never as a gate on the work.
 
 ## Tracks of index calculus
 
@@ -864,6 +887,20 @@ follows the PR until it lands, under the check-in and merge rules below.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
+- **Lint the PR body before submitting it** (lesson `L-77b44d3fe205`, adopted
+  2026-11-15). `pcc-gate` runs `python3 tools/pcc/pcc.py lint-prose --stdin` on
+  the PR body and fails the required `gate` check on a strong-claim word
+  without `[pcc:ID]` or `[pcc:unverified]`. Run it locally first; reword words
+  that describe proposals, and cite or tag those that describe results.
+- **Record the episode when the PR merges or closes** (owner, 2026-11-15).
+  The session that owned the PR runs `python3 tools/autonomy_report.py
+  add-episode` (task, class, PR, start and end, result, merged, CI state, each
+  incident with whether it was fixed without a human) and one `add-intervention`
+  per human message after the first prompt, classed by the rules in
+  `benchmarks/agent-autonomy/README.md` (store the text's SHA-256, never the
+  text). It records the matching `lessons.py outcome`. Both land with the next
+  PR or a small follow-up. Fourteen days later any session records
+  `set-check --check reverted` from `git log`.
 - **Check in on PRs you opened.** Follow the PR's activity: CI results, review
   comments, merge-state changes, and merges or closes. Where the runtime
   provides PR-activity subscriptions (`subscribe_pr_activity`), use them. Where
@@ -2149,6 +2186,16 @@ same resource envelope. A panel of independent points is a set of separate
 one-target workloads, with one result row per point; do not combine them into
 a multi-target DLP run or replace the per-target results with a batch average.
 
+**Cold interval governs the primary comparison** (owner, 2026-11-15). The
+primary IC-vs-rho comparison, every leaderboard ratio and every claim tier of
+[`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md) use the cold
+end-to-end cost in counted operations: from the instance to a verified scalar,
+with all target-independent setup charged in full to the one target ("Success
+criterion", §2, §8). The online interval defined below is reported beside it as
+a separate row labelled `online-only`; it never replaces the cold cost and never
+supports a claim to beat rho on its own. Operation counts are the metric and
+wall time a practicality note (§6), for both rows.
+
 Start the IC online clock when target-dependent computation begins, after
 reusable target-independent base, index, relation-log, or solver setup is
 ready. Include all target-dependent attempts and point-query generation, and
@@ -2276,3 +2323,49 @@ experiment or action, and the specific input or condition needed to resume.
 Never claim success from effort alone or claim that every avenue is exhausted
 without evidence. Apply this loop proportionately: routine edits need direct
 checks; substantive research needs an explicit experimental record.
+
+## Continuous learning loop
+
+Owner instruction, 2026-11-15: agents and skills run continuously, learn from
+what they observe, adapt their own instructions from evidence, and resolve
+what they can without waiting for a person. The persistent research loop above
+governs a single effort; this loop carries what one effort learned into the
+next. The ledger is `docs/lessons/` (`tools/lessons.py`, schema
+`crypto.lesson/v1`; guide: [`docs/lessons/README.md`](docs/lessons/README.md)).
+
+1. **Read before acting.** Every skill and agent starts with
+   `python3 tools/lessons.py brief --scope <its name>`; the session-start hook
+   prints the global brief. Adopted lessons are applied; candidates are
+   hypotheses the run can test.
+2. **Act on your own, within authority.** Diagnose a blocker, try the
+   documented remedy, then a materially different approach, before escalating
+   (persistent loop, "Recover, adapt and continue"). Escalate only what needs
+   authority, access, budget or an owner decision you do not have. The loop
+   adds no authority: model tiers, admission, sabotage and budget rules hold.
+3. **Record after acting.** One `outcome` per finished task, with evidence
+   (receipt, commit, PR, job or session-log path). One `test` per lesson the
+   task applied, `confirm` or `refute`. A surprise that would change what the
+   next run does becomes a new `lesson`: a trigger, an action, and the evidence
+   that showed it.
+4. **Promote only on evidence.** A lesson is *adopted* after two confirmations
+   with distinct evidence and more than twice as many confirmations as
+   refutations; *contested* once refuted; *retired* by a `retire` entry or two
+   more refutations than confirmations. Status is derived from the entries,
+   never stored, so it cannot be asserted.
+5. **Adapt the instructions.** An adopted lesson is folded into the skill or
+   agent file it is scoped to (or into this file, for scope `*`) by a PR that
+   cites the lesson id. A retired lesson's text is removed the same way. A
+   rule from the owner is never changed by a lesson; a lesson that contradicts
+   one is reported to the owner ("What supersedes what").
+6. **Measure the skills.** `python3 tools/lessons.py stats` gives each skill's
+   and agent's outcome counts with a Wilson 95% interval. A scope with at least
+   8 outcomes whose success interval lies wholly below 0.5 is reviewed: its
+   failure outcomes are read together and the cause becomes a lesson or a fix.
+7. **Integrity.** Entries are content-addressed and append-only; the
+   `agent-learning` workflow fails an edited, removed or unevidenced entry.
+   Every entry is `[pcc:unverified]` until a pcc claim cites it, and a lesson
+   never stands in for a measurement or a proof.
+
+Lean work adds one measured signal: `tools/lean/lean-health.sh` (advisory)
+reports crypto-lean use, limit overrides, `native_decide` and theorem families
+per study; the baseline is `docs/lean-health/BASELINE-20261115.md`.

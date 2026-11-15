@@ -5,6 +5,13 @@ edition = "2021"
 default-run = "crypto"
 description = "Educational comprehensive cryptography library: ECC, RSA, AES, ChaCha20, SHA, KDF, PQC"
 
+# Helper module of b0_pdp_sat_baseline (included there with #[path]); built as a
+# library example so Cargo's example discovery does not require a `main`.
+[[example]]
+name = "pdp_lin_cdcl"
+path = "examples/pdp_lin_cdcl.rs"
+crate-type = ["lib"]
+
 [[example]]
 name = "performance_gains_audit"
 path = "examples/performance_gains_audit.rs"
@@ -76,6 +83,10 @@ path = "src/bin/generator_n0.rs"
 [[bin]]
 name = "pkm-aux-search"
 path = "src/bin/pkm_aux_search.rs"
+
+[[bin]]
+name = "pkm-smooth-tower"
+path = "src/bin/pkm_smooth_tower.rs"
 
 [[bin]]
 name = "quartic-ic"

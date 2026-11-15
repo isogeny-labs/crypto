@@ -1457,12 +1457,12 @@ mod tests {
             low_terms: vec![0, 1],
         };
         let a = F2mElement::from_bit_positions(&[0, 1, 3], 7);
-        let tally = crate::binary_ecc::operation_tally::OperationTally::begin();
+        let tally = super::super::operation_tally::OperationTally::begin();
         let _ = a.square_k_times(5, &irr);
         let counts = tally.finish();
         assert_eq!(counts.get("f2m7_square"), Some(&5));
 
-        let tally = crate::binary_ecc::operation_tally::OperationTally::begin();
+        let tally = super::super::operation_tally::OperationTally::begin();
         let _ = a.flt_inverse(&irr).unwrap();
         let counts = tally.finish();
         assert_eq!(counts.get("f2m7_inverse_informational"), Some(&1));

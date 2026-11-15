@@ -6,6 +6,14 @@
 
 Add a family with its field/subgroup domain, necessary or sufficient predicates, a construction or finite enumeration description, completeness boundary, source and validation status. Add an instance under its existing ICV1/EC1 identity with immutable evidence; assign each property independently.
 
+The [genus 2–8 criteria audit](../../../research/weak_curve_criteria_20261114/REPORT.md)
+adds an exact bounded embedding-degree test for MOV/Frey–Rück screening and
+cross-checks the current registry's model-bound cover certificates against
+selected subgroup orders. Its [command-line checker](../../../research/weak_curve_criteria_20261114/audit.py)
+filters by genus, ICV1/EC1 identity, or a supplied field size and subgroup
+order. The output distinguishes a pairing divisibility witness, a same-field
+cover, a conditional subgroup transfer, and a proposed descent route.
+
 [Conjectures and discovery methodology](../../../research/weak_curve_conjectures_20261012/README.md)
 tracks seven open hypotheses, a refuted screening hypothesis, the published-class
 backlog and a staged protocol for additional families and 192–252-bit structural
