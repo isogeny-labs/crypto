@@ -1,0 +1,37 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-029",
+  "title": "Regenerate a stale generated corpus file",
+  "class": "docs-tooling",
+  "difficulty": 2,
+  "source": [
+    "docs/ecdlp-hardness-corpus/render.mjs",
+    "docs/ecdlp-hardness-corpus/attack-graph.mjs",
+    ".github/workflows/claim-corpus.yml"
+  ],
+  "prompt": "`node docs/ecdlp-hardness-corpus/attack-graph.mjs --check` fails. Find the cause and repair it with the corpus tooling, not by hand. Report the command you used.",
+  "setup": "Harness truncates docs/ecdlp-hardness-corpus/attack-graph.json to `{}` and commits it as the setup commit.",
+  "acceptance": [
+    "node docs/ecdlp-hardness-corpus/attack-graph.mjs --check exits 0",
+    "node docs/ecdlp-hardness-corpus/validate.mjs exits 0",
+    "docs/ecdlp-hardness-corpus/corpus.json is unchanged"
+  ],
+  "check_command": "node docs/ecdlp-hardness-corpus/attack-graph.mjs --check && node docs/ecdlp-hardness-corpus/validate.mjs && git diff --quiet \"$T_BASE\" HEAD -- docs/ecdlp-hardness-corpus/corpus.json",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "hand-writing attack-graph.json",
+    "editing corpus.json to match"
+  ],
+  "max_wall_minutes": 15,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [
+    "node"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Fixture not executed; whether render.mjs alone restores attack-graph.json was read from claim-corpus.yml, not run."
+}
