@@ -1,0 +1,20 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | inc | 32/32 | 6.857 | 7.359 | 11.877 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | ksum3-n17 | 32/32 | 7.931 | 8.861 | 17.222 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | ksum3s-n28 | 32/32 | 12.164 | 12.642 | 16.940 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | ksum4s-n12 | 32/32 | 7.413 | 8.176 | 15.041 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 32/32 | 1.238 | 1.350 | 2.358 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | inc vs ksum3-n17 | inc < ksum3-n17 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs ksum3s-n28 | inc < ksum3s-n28 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs ksum4s-n12 | inc < ksum4s-n12 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n17 vs ksum3s-n28 | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n17 vs ksum4s-n12 | ksum4s-n12 < ksum3-n17 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n17 vs rho-neg | rho-neg < ksum3-n17 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3s-n28 vs ksum4s-n12 | ksum4s-n12 < ksum3s-n28 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3s-n28 vs rho-neg | rho-neg < ksum3s-n28 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum4s-n12 vs rho-neg | rho-neg < ksum4s-n12 |

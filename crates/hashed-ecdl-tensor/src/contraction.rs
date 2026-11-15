@@ -6,6 +6,7 @@
 //! same kernel, modes, children and reconstruction used by the general branch.
 
 mod deformation;
+pub mod guards;
 mod packing;
 mod recursive;
 

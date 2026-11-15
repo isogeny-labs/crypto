@@ -53,7 +53,7 @@ inline bool prime(U n) {
   return true;
 }
 inline Curve curve(U p, U a, U b) {
-  if (p < 5 || p >= (U(1) << 62) || !prime(p) || a >= p || b >= p)
+  if (p < 5 || p >= (U(1) << 63) || !prime(p) || a >= p || b >= p)
     throw std::runtime_error("invalid prime-field curve");
   if ((modmul(4, modmul(modmul(a, a, p), a, p), p) +
        modmul(27, modmul(b, b, p), p)) %
@@ -70,14 +70,14 @@ inline U product(U a, U b) {
 }
 struct Plan {
   std::vector<Point> points;
-  U offsets[9]{};
+  U offsets[MAX_SLOTS + 1]{};
   unsigned slots = 0, split = 0;
   U left = 0, right = 0;
   Bases view(const Point *p) const {
     Bases b{};
     b.points = p;
     b.slots = slots;
-    std::copy(offsets, offsets + 9, b.offset);
+    std::copy(offsets, offsets + MAX_SLOTS + 1, b.offset);
     return b;
   }
   std::vector<U> indices(U l, U r) const {
@@ -97,7 +97,7 @@ struct Plan {
 };
 inline Plan plan(Curve c, const std::vector<std::vector<Point>> &bases,
                  U max_rows) {
-  if (bases.size() < 2 || bases.size() > 8 || !max_rows)
+  if (bases.size() < 2 || bases.size() > MAX_SLOTS || !max_rows)
     throw std::runtime_error("invalid base slots or row cap");
   Plan p;
   p.slots = (unsigned)bases.size();
@@ -170,10 +170,10 @@ inline void verify(Curve c, const Plan &p, Point target, const Result &r) {
     throw std::runtime_error("invalid GPU witness sum");
 }
 inline void hash_parameters(Curve c, U s, U alpha, U beta, U tau, U cap) {
-  if (s >= (U(1) << 63) || s < 2 * c.f.p || s > 4 * c.f.p || !prime(s) ||
+  if (s < 2 * c.f.p || (unsigned __int128)s > 4 * (unsigned __int128)c.f.p || !prime(s) ||
       !alpha || alpha >= s || beta >= s || !tau || tau > s)
     throw std::runtime_error(
-        "invalid hash parameters (hash modulus must be below 2^63)");
+        "invalid hash parameters (u64 prime in [2p,4p] required)");
   if (tau > cap)
     throw std::runtime_error("LIMIT hash candidates exceed row cap");
 }
@@ -234,7 +234,7 @@ public:
     U inv = modpow(alpha, s - 2, s);
     std::vector<Point> out;
     for (U t = 0; t < tau; ++t) {
-      U z = modmul(inv, (t + s - beta) % s, s);
+      U z = modmul(inv, t >= beta ? t - beta : s - (beta - t), s);
       Point q;
       if (z < 2 * c.f.p && c.lift(z / 2, z & 1, q))
         out.push_back(q);

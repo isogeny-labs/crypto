@@ -1,0 +1,38 @@
+{
+ "schema": "e2x-validator-build/v1",
+ "repository_head_at_start": "f23c53871 (branch claude/glv-endomorphism-index-calculus-pe7ige, PR #2152); working tree clean except .resume/ (gitignored)",
+ "source": "git archive <commit> of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, crates/, tools/, isogeny_algos/, benches/, research/pencil_large_prime_20261029, every explicit [[bin]]/[[example]]/[[bench]] path of Cargo.toml, and the 58 include_str!/include_bytes! targets of the library present at the commit (under docs/, research/, tests/). Every exported file was checked equal to its blob at the commit (git hash-object): 789dc2ff6 tree 4,591 files, 0e4fccce1 tree 4,594 files, 0 mismatches each.",
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+ "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, not isolab-eks. The replay admits operation counts only (no wall time is compared or claimed), so a local run suffices.",
+ "flags": "CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline",
+ "recorded_binary_commits": {
+  "all": "0e4fccce1ad1baf7ace18a550483771f02315838"
+ },
+ "builds": [
+  {
+   "commit": "0e4fccce1ad1baf7ace18a550483771f02315838",
+   "tree": "/dev/shm/val-tree-0e4 (re-exported after the restart, 2026-10-31T14:04Z; 4,594 files equal to their blobs)",
+   "target_dir": "/dev/shm/val-target-0e4: a fresh, empty target directory on tmpfs (the root filesystem has ~0.5 GB free); nothing reused from the producer's target/",
+   "command": "cd /dev/shm/val-tree-0e4 && CARGO_TARGET_DIR=/dev/shm/val-target-0e4 CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e28_tau --example e29_twist --example e30_audit --example quartic_pipeline_gls",
+   "attempts": [
+    "2026-10-31T07:36:44Z attempt 1: shared target directory with the 789dc2ff6 build. VOID: cargo hashes the workspace's own path package by its relative path and judged the 789dc2ff6 library fresh by mtime (the exported files carry the commits' older mtimes), so the 0e4fccce1 examples failed to compile against it (unresolved E29/E30 imports). No binary of this attempt was used.",
+    "2026-10-31T07:37:25Z attempt 2: fresh target directory /dev/shm/val-target-0e4; lost when the container restarted (~14:00Z wiped /dev/shm) before its binaries were used.",
+    "2026-10-31 attempt 3: 2026-10-31T14:17:06Z Finished `release` profile [optimized] target(s) in 12m 20s (started 2026-10-31T14:04:35Z); fresh target dir /dev/shm/val-target-0e4"
+   ],
+   "binaries": [
+    {
+     "name": "e30_audit (0e4fccce1)",
+     "sha256": "eae15491e0ac78e1f0fbb3b998aa6b97b56ab0b2e222b58ac7d2fa1723024abb",
+     "bytes": 4849944
+    },
+    {
+     "name": "quartic_pipeline_gls (0e4fccce1)",
+     "sha256": "0daf9e744bd5262c56de9eefde917e6ba2a8e8044eb340b314855f52ad9d85cb",
+     "bytes": 5815560
+    }
+   ]
+  }
+ ],
+ "run_command": "BIN_A=<e30_audit 0e4fccce1> BIN_P=<quartic_pipeline_gls 0e4fccce1> research/e30_invariants_lite_20261030/replay/replay.sh",
+ "environment": "Walk audit: serial. End to end: RAYON_NUM_THREADS=4 as in experiments/35_invariants_lite/run_e2e.sh, which fixes the target stream (§9.19)."
+}

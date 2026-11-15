@@ -1,0 +1,37 @@
+{
+  "schema": "isolab.eks.failed-diagnosis/v1",
+  "workflow_run": 41260778029,
+  "job_name": "gh-41260778029-1",
+  "job_uid": "09392132-5307-4557-bf4c-4cda79e9aaa5",
+  "launcher_id": "ceff664e-b91d-4cd8-8a86-cbe8faa98083",
+  "request_sha256": "3732f132b4b04e600270af891435633872358cc3c77890f7aa7729855dd53bcc",
+  "source_revision": "b4d751706eb2244314ebc9b84ba9545485ba4ac7",
+  "ecbench_sha256": "0784fe47212d64dd2ee81510d3c28d2f604782086500135a3114c61738f854b7",
+  "launcher_state": "failed",
+  "remote_result_exit_code": 23,
+  "object_count": 19,
+  "pods": [
+    {
+      "pod_uid": "458712fd-1251-4d62-b943-b35f44a51e44",
+      "classification": "l2_isolation_gate",
+      "exit_code": 42,
+      "exit_source": "kubernetes_status",
+      "artifact_access": "payload_read_unavailable",
+      "manifest_verified": false,
+      "l2": null,
+      "audit": null,
+      "control": null,
+      "owner_checks": {
+        "run": false,
+        "replay": false
+      },
+      "private_stderr": {
+        "run_sha256": null,
+        "audit_sha256": null,
+        "content_published": false
+      }
+    }
+  ],
+  "scope": "allowlisted failure metadata only; raw records, timing values and stderr remain private",
+  "experiment_retry": false
+}

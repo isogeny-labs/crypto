@@ -107,6 +107,10 @@ but misleading tasks. Keep such populations separately labeled as controls.
 Mix natural/unconditioned targets and planted solvable PDPs under a frozen
 sampling rule. Store selection/rejection probabilities and failed constructions;
 never train only on successes without reporting the resulting selection bias.
+The [planted-positive PDP control contract](../../research/ml_dataset_planted_pdp_20261031/CONTRACT.md)
+specifies a separate versioned population, restricted witness replay,
+denominator accounting, causal feature exclusion, and source-level acceptance
+gates. It is a design contract; native runtime support requires a later patch.
 
 ## Identity, twists, and sampling
 

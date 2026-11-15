@@ -1,0 +1,32 @@
+# frozen analysis output (Park-Miller seed 20261101, 10000 resamples)
+## per d: m=3 (this protocol) and m=2 torsion-off reference (merged records), same seeds
+d=12 m=3: finished=6/6 mean_trials=94654201 (91552931..99355964) mean_adds=94692703 mean_wall=168.3s mean_rels=5550 mean_rank/K=0.92 mean_anchors=636
+d=12 m=2: finished=6/6 mean_trials=2441186 (759967..3851501) mean_adds=95766 mean_wall=3.8s mean_rels=142
+d=10 m=3: finished=6/6 mean_trials=317053845 (154055230..411395143) mean_adds=317072484 mean_wall=416.6s mean_rels=1107 mean_rank/K=0.74 mean_anchors=8570
+d=10 m=2: finished=6/6 mean_trials=7473531 (3655822..10153168) mean_adds=210448 mean_wall=8.3s mean_rels=27
+d=08 m=3: finished=6/6 mean_trials=672432094 (189933279..1056042758) mean_adds=672510491 mean_wall=636.6s mean_rels=135 mean_rank/K=0.38 mean_anchors=75099
+d=08 m=2: finished=6/6 mean_trials=30010957 (3655822..59135385) mean_adds=814234 mean_wall=23.0s mean_rels=7
+## per-seed ratios m=3 / m=2 (trials, group additions, wall)
+d=12 seed=20261024 trials m3=99355964 m2=3851501 ratio=25.80 | adds ratio=742.02 | wall ratio=29.03
+d=12 seed=20261101 trials m3=91552931 m2=2486584 ratio=36.82 | adds ratio=944.08 | wall ratio=41.66
+d=12 seed=20261102 trials m3=96938294 m2=2275432 ratio=42.60 | adds ratio=1062.22 | wall ratio=48.40
+d=12 seed=20261103 trials m3=92792340 m2=2544467 ratio=36.47 | adds ratio=941.91 | wall ratio=41.17
+d=12 seed=20261104 trials m3=93266999 m2=2729162 ratio=34.17 | adds ratio=900.69 | wall ratio=39.06
+d=12 seed=20261105 trials m3=94018680 m2=759967 ratio=123.71 | adds ratio=1874.25 | wall ratio=135.48
+d=10 seed=20261024 trials m3=281824350 m2=7988238 ratio=35.28 | adds ratio=1256.49 | wall ratio=42.49
+d=10 seed=20261101 trials m3=382556206 m2=3655822 ratio=104.64 | adds ratio=3566.65 | wall ratio=120.41
+d=10 seed=20261102 trials m3=300926059 m2=8378562 ratio=35.92 | adds ratio=1281.09 | wall ratio=42.37
+d=10 seed=20261103 trials m3=411395143 m2=6885174 ratio=59.75 | adds ratio=2114.70 | wall ratio=62.66
+d=10 seed=20261104 trials m3=154055230 m2=7780224 ratio=19.80 | adds ratio=704.28 | wall ratio=24.81
+d=10 seed=20261105 trials m3=371566080 m2=10153168 ratio=36.60 | adds ratio=1313.53 | wall ratio=45.30
+d=8 seed=20261024 trials m3=545250951 m2=31726279 ratio=17.19 | adds ratio=633.68 | wall ratio=22.40
+d=8 seed=20261101 trials m3=563552200 m2=3655822 ratio=154.15 | adds ratio=5528.38 | wall ratio=196.26
+d=8 seed=20261102 trials m3=189933279 m2=38327382 ratio=4.96 | adds ratio=182.83 | wall ratio=6.61
+d=8 seed=20261103 trials m3=755461386 m2=59135385 ratio=12.78 | adds ratio=471.81 | wall ratio=14.75
+d=8 seed=20261104 trials m3=1056042758 m2=21937453 ratio=48.14 | adds ratio=1771.93 | wall ratio=58.83
+d=8 seed=20261105 trials m3=924351993 m2=25283422 ratio=36.56 | adds ratio=1346.70 | wall ratio=45.30
+## per d: pairs, geometric mean m3/m2 with 95% bootstrap (csv)
+d,K,pairs,trials_geomean,trials_lo,trials_hi,adds_geomean,adds_lo,adds_hi,wall_geomean,wall_lo,wall_hi
+12,2011,6,42.906,31.455,68.189,1028.431,850.672,1345.490,48.338,35.518,76.057
+10,500,6,42.315,29.120,66.337,1496.485,1036.930,2308.830,49.809,35.315,76.239
+8,121,6,25.804,11.101,60.304,946.962,409.677,2182.980,32.335,14.219,77.132

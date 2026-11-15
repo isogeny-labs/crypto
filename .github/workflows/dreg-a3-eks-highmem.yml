@@ -59,7 +59,7 @@ jobs:
           if [ ! -x /usr/bin/time ] || ! command -v pkill >/dev/null; then
             sudo apt-get update -q && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends time procps
           fi
-          /usr/bin/time -v true 2>&1 | grep -q 'Maximum resident set size'
+          /usr/bin/time -v true 2>&1 | grep 'Maximum resident set size' >/dev/null
           command -v prlimit setsid pkill
       - name: Build dreg_ladder and dreg_closure (release)
         run: cargo build --locked --release --example dreg_ladder --example dreg_closure

@@ -1,0 +1,500 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-PRIME-M2-HILBERT-20261028",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "HILBERT_DESIGN.md"
+  },
+  "question": "What exact original-top Hilbert functions follow on the six saved prime m2 ell27 inputs from verified subset-inclusion ranks?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "text": "Complete source validation, primality certificate, Wilson diagonal rank data and bidegree tensor images give the exact original-top Hilbert function and its first zero on the six retained cases.",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "text": "No solving-degree, LFD, timing, elite-base or universal FFD/LFD inference; formalization covers only finite arithmetic, not the full quotient proof.",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "description": "original retained prime m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e1a3c68ae08afacd457b2596799d7753fbb25a40",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "hilbert"
+          ]
+        ],
+        "binary_sha256": "650396a323b0e0e084fa700b99b555de0f99ef668ebaa4c2a59805c0c40350ed",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "description": "baseline retained prime m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e1a3c68ae08afacd457b2596799d7753fbb25a40",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "hilbert"
+          ]
+        ],
+        "binary_sha256": "650396a323b0e0e084fa700b99b555de0f99ef668ebaa4c2a59805c0c40350ed",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "description": "spike40 retained prime m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e1a3c68ae08afacd457b2596799d7753fbb25a40",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "hilbert"
+          ]
+        ],
+        "binary_sha256": "650396a323b0e0e084fa700b99b555de0f99ef668ebaa4c2a59805c0c40350ed",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No extra data arm: runtime explicit multiplication matrices for n2..8 and product matrices n2..4 verify the structured formula; development unit tests retained."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Small-characteristic p2,3,5 rank deficiencies must be detected; characteristic2 product must vanish; incomplete full source is rejected."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "dataset",
+        "levels": [
+          "original",
+          "baseline",
+          "spike40"
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One pinned Rust binary, source commit and single thread"
+      },
+      {
+        "name": "input",
+        "treatment": "fixed",
+        "how": "Six exact files and metadata hashes; no new sampling or polynomial changes"
+      },
+      {
+        "name": "dataset",
+        "treatment": "crossed",
+        "how": "Original fixed-base and paired baseline/spike40; duplicates are retained identities, not independent samples"
+      },
+      {
+        "name": "characteristic",
+        "treatment": "fixed",
+        "how": "Saved p with native full Lucas primality certificate"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing-host fallback after retained EKS shared-bucket denial; no timing comparison"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Original,baseline,spike40; planted then natural"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "120s producer/replay,2GiB,no retries"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Complete source acceptance, all rank diagonals and bidegrees retained, failed checks invalidate"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "original",
+          "baseline",
+          "spike40"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All input, primality, rank controls, Hilbert and fresh replay checks pass"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact deterministic computation, no clock comparison",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix64: seed xor m<<32 xor family tag; source defines all draws."
+    },
+    "instance_sampling": {
+      "rule": "Entire pre-existing six-ID panel fixed before this calculation; no new draw depends on checker arm. Dataset identity is provenance, not a matched statistical comparison: original planted targets differ from paired planted targets.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Three arms times two retained input identities; exact calculation and fresh replay, no statistical test."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 260,
+      "measured_on": "Six development tests passed;260s is a budget, not a speed prediction"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "dreg_exact",
+        "name": "dreg_exact",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "First zero original-top Hilbert coefficient from verified rank certificate",
+        "source": "certificates/summary.json dreg_exact",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "last_nonzero_degree",
+        "name": "last_nonzero_degree",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Last positive original-top Hilbert coefficient",
+        "source": "certificates/summary.json last_nonzero_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "total_dimension",
+        "name": "total_dimension",
+        "unit": "dimension",
+        "kind": "counted",
+        "definition": "Sum of all exact Hilbert coefficients",
+        "source": "certificates/summary.json total_dimension",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "dreg_exact",
+      "last_nonzero_degree",
+      "total_dimension"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "2Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 260,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Six exact retained sources, all primality/matrix/Hilbert checks, then six fresh-process replays"
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "120s each producer/replay,2GiB,no retries; all partial data preserved"
+    }
+  ],
+  "invalidation_rules": [
+    "Any source, metadata or whole-template mismatch invalidates",
+    "Any failed primality, matrix control or replay invalidates",
+    "All clock values diagnostic; no performance claim"
+  ],
+  "decision_rule": {
+    "text": "Record exact degrees only after all checks and replay pass; errors remain explicit",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "exact",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/hilbert.rs",
+      "sha256": "876563ab4e218af2b2d119323520a2bead71c78a39abdebf2c7325ef0a42c0bb"
+    },
+    "inputs": [
+      "Six pinned input.json/system.sing pairs"
+    ],
+    "outputs": [
+      "certificates/*.json",
+      "replay.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Original-top Hilbert function and explicit control results"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/pdf/0709.3144",
+      "provenance": "retrieved",
+      "claim": "Corollary3 integral diagonal form with t<=k<=n-t",
+      "verified_by": "Primary PDF theorem and proof read before source implementation; HILBERT_DESIGN.md"
+    },
+    {
+      "ref": "https://arxiv.org/pdf/2211.13548",
+      "provenance": "retrieved",
+      "claim": "Theorem2.7 maximal rank for quadratic monomial complete intersections in characteristic>n",
+      "verified_by": "Primary PDF theorem and proof read before source implementation; HILBERT_DESIGN.md"
+    }
+  ],
+  "extensions": {
+    "cases": [
+      {
+        "key": "original-prime-m2-planted",
+        "arm": "original",
+        "id": "prime-m2-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m2-planted",
+        "input_sha256": "236f823aa2dcf3cd27b9681a6fcbe3dd2f46593f299ee61b8d1d5e2eec88061b",
+        "source_sha256": "7b97783129b773d97638104fbd9725735e1f6575c01fb1b3de0e916a2cc10c39",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "original-prime-m2-natural",
+        "arm": "original",
+        "id": "prime-m2-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/prime-m2-natural",
+        "input_sha256": "61cdf99f79a86384946fe895759c6bbd1f76dae40290eae1df51ce75c454b7c5",
+        "source_sha256": "1854f4af091455bedcd285398155c6b6487aa61c206c987039ad5cf3c1632032",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m2-planted",
+        "arm": "baseline",
+        "id": "prime-m2-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m2-planted",
+        "input_sha256": "1bcd29ae0959d645571a2242135d98a379a9ae4995831fc96bc717e0fa7cea5a",
+        "source_sha256": "8d9ab8bb50ef3923564469263bd46e26227bb027e1e969a980aac867278cc924",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "baseline-prime-m2-natural",
+        "arm": "baseline",
+        "id": "prime-m2-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/prime-m2-natural",
+        "input_sha256": "552ab28cfc9bf264ef640f3b6d60f7cc7a5d57dd88727cde2346b0e1e548116f",
+        "source_sha256": "1854f4af091455bedcd285398155c6b6487aa61c206c987039ad5cf3c1632032",
+        "factor_base_manifest_sha256": "199d1b214c78650b2e2e2b539f458eae2688296b9bc51985830951b1cac5aaa5"
+      },
+      {
+        "key": "spike40-prime-m2-planted",
+        "arm": "spike40",
+        "id": "prime-m2-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m2-planted",
+        "input_sha256": "c5f3fd1e29091533160a763fd5118f3489b78d60220cd2b8836b1f72f67bc44b",
+        "source_sha256": "e23a726b60678ebeb7fc192326bcf6ac15395945e0ca087c2f7195823b23c18d",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      },
+      {
+        "key": "spike40-prime-m2-natural",
+        "arm": "spike40",
+        "id": "prime-m2-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/prime-m2-natural",
+        "input_sha256": "4820eea187334e7273770713fa60cef1974d77d6412fa6639e081c10b7062164",
+        "source_sha256": "bc5accbdc5f93b7e0c413c12e4bf9dc1323180a47b2d9c31f2534f47a30f3b1b",
+        "factor_base_manifest_sha256": "78f21fdb94cd84163c8054258f9a4de914df8f82c24897555cb4c15ffe5b4324"
+      }
+    ],
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-prime-m2-hilbert-20261028-r1/local/",
+    "detailed_design": "HILBERT_DESIGN.md",
+    "file_layout": "HILBERT_FORMAT.json",
+    "backend_reason": "Existing-host fallback after retained EKS shared-bucket denial; current inventory has no duplicate; no IAM/capacity change",
+    "formalization": "Finite arithmetic only; polynomial and matrix theorem bridges remain unformalized"
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "419b1cb7a81fce4eeed4c6fc2ec6790ab7a98be109f6133c6c1f2d59e8c91011",
+    "commit": "e1a3c68ae08afacd457b2596799d7753fbb25a40",
+    "frozen_at": "2026-10-28T16:26:40Z",
+    "filed_before_affected_data": true
+  },
+  "amendments": []
+}

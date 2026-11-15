@@ -1,4 +1,4 @@
-# Optional GPU-resident right search — device validation pending
+# GPU-resident right search — validated in v13
 
 `make cuda-persistent ARCH=sm_120` retains the exact dense table, wide index
 and queried CUB scratch path, but replaces the host's reset/search/readback
@@ -20,8 +20,9 @@ same exact lower bound to find the minimum duplicate left ID. Separate IDs
 avoid packed-product overflow. The host checks the bounds and independently
 checks the relation. Tables and targets have the same semantics as before.
 
-Each block accumulates its actual valid tuple constructions and adds one
-counter at exit. `visited` records search tuples actually computed, including
+Each block accumulates its actual valid right-side entries processed and adds
+one counter at exit. Uncached entries construct the sum; full-cache entries
+load it. `visited` records search entries actually processed, including
 any speculative work above the final witness. It can depend on scheduling;
 it is neither a deterministic prefix nor a complete arithmetic-operation
 ledger. A complete miss must count every right tuple exactly once. The final
@@ -31,9 +32,10 @@ deterministic; only the counted speculative work can vary.
 Query tests cap the grid at two blocks to force multiple strides, a partial
 last tile, late minima, complete misses, alternating hit/miss resets and an
 empty reprepare. Existing full-coordinate CPU comparisons, duplicate/parity
-keys and large-key/index boundary checks remain. The future validation panel
-must run memcheck, racecheck and synccheck before any timings. No CUDA build
-or performance data for this option has yet been obtained.
+keys and large-key/index boundary checks remain. In v13, all seven query variants passed memcheck, racecheck and synccheck
+before the recovery panel. The persistent service and fresh certificate replay
+also passed. See the [v13 report](../../research/explicit_relations_e2e_20261030/reports/run-20261030T1757Z/report.pdf)
+and [raw records](../../research/explicit_relations_e2e_20261030/results-v13/).
 
 Literature checked before implementation:
 - NVIDIA's grid-stride loop guidance:
@@ -42,7 +44,11 @@ Literature checked before implementation:
   https://nvidia.github.io/cccl/unstable/libcudacxx/extended_api/synchronization_primitives/atomic_ref.html
   https://nvidia.github.io/cccl/unstable/libcudacxx/extended_api/memory_model.html
 - Existing search_right, normalize_block, exact indexed lookup and the frozen
-  v11 contract. This is conventional GPU scheduling, not a new ECDLP method.
+  v11 contract. The implementation follows those established scheduling and atomic rules.
 
-The active v11 run is pinned to its prior commit and does not use this option.
-A separate frozen matched experiment is required before any performance claim.
+The v13 panel compared chunked CUB, persistent queries, full right caching
+and an identical cache repeat at52bits. All eight matched controls recovered
+with identical certificates. Full-cache armv then recovered both61-bit and
+both62-bit targets. Timings are recorded as L0 diagnostics. The v16 filter
+panel keeps these components fixed and changes only filtering in its matched
+52-bit controls.

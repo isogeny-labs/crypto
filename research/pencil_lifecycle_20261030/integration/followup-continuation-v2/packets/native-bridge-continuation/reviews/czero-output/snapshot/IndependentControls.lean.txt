@@ -1,0 +1,36 @@
+import CurvePoint
+open Polynomial CZeroInterpolation
+-- Literal source C0 output at z1=z2=w1=w2=1, with B nonzero.
+theorem normalized_source_ordinate {K : Type*} [Field K]
+ (A B q1 q2 r1 s1 t1 : K) (hB : B≠0) :
+ let Xr:=(q1+q2)*B^2+A^2
+ let Yr:=(A*(q1*B^2+Xr)-s1*B^3)*Xr+(A*r1-B*t1)*B^4
+ Yr/B^5=(A/B)*((Xr/B^2)^2+q1*(Xr/B^2)+r1)-(s1*(Xr/B^2)+t1) := by
+ dsimp
+ field_simp [hB]
+ <;> ring
+
+theorem zero_a_fixture :
+ ((CZeroInterpolation.support (0:ℚ) 1*CZeroInterpolation.support 1 1*(X-C 1)).eval 1)=0 := by
+ simp
+
+theorem nonzero_a_fixture :
+ ((CZeroInterpolation.support (0:ℚ) 1*CZeroInterpolation.support 0 2*(X-C 1)+
+ (CZeroInterpolation.support 0 1)^2).eval 1)=2^2 := by
+ norm_num [CZeroInterpolation.support]
+
+-- Dropping coefficient4=0 invalidates the proposed root even for monic quintic.
+theorem coeff4_boundary :
+ ((CZeroInterpolation.support (0:ℚ) 1*CZeroInterpolation.support 1 1*X).eval 1)≠0 := by
+ norm_num [CZeroInterpolation.support]
+
+-- Native output ordinate is negative interpolant, not positive interpolant.
+theorem source_sign_fixture :
+ (-((ordinate (0:ℚ) 0-C 1*CZeroInterpolation.support 0 1).eval 1))=2 ∧
+ ((ordinate (0:ℚ) 0-C 1*CZeroInterpolation.support 0 1).eval 1)≠2 := by
+ norm_num [ordinate,CZeroInterpolation.support]
+#print axioms normalized_source_ordinate
+#print axioms zero_a_fixture
+#print axioms nonzero_a_fixture
+#print axioms coeff4_boundary
+#print axioms source_sign_fixture

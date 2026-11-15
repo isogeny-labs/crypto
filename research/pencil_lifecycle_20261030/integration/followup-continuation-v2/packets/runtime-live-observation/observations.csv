@@ -1,0 +1,7 @@
+check,observation,scope,not_established,evidence
+namespace_job_overview,2 listed Jobs;0 names containing pencil,Returned isolab Job list only,No global worker/Pod/EC2 activity or campaign cost conclusion,overview-tool-response.json
+original_recovery_request,helper rejected unsupported memory field,Original request preserved; parser failure,No successful recovery-status readback from helper,recovery-status-tool-response.json
+exact_c1_state_s3,fresh retained object read; phase failed; LastModified2026-10-30T07:54:06Z,Exact C1 state VersionId _dS372y1JUdgqOwWIIGTCcb7AEu2uPhQ,Old event is not new execution or complete worker accounting,c1-state.json;c1-state-read.stdout
+exact_instance_lookup,empty result [],Saved exact worker instance ID query,No exact termination time or zero incurred cost,c1-instance-read.stdout
+exact_controller_lookup,FAILED and buildComplete true; ended2026-10-30T07:54:08.858Z,isolab-recovery-controller:2fe8ec79-1f54-4abe-8ec4-151b50b1178b,Controller completion is not worker-time ledger closure,c1-controller-read.stdout
+pencil_s3_state_listing,"14 state objects, all LastModified2026-10-30; none after latest planning record",Returned pencil state object listing only,Absence in listing is not zero consumption or admission,pencil-states-list.stdout

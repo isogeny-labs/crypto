@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h32fcbc4a8cb7",
+  "label": "Registry optimization development: Koblitz reusable rank",
+  "spec_id": "ECS1hd0eadba0d795",
+  "spec_sha256": "d0eadba0d79567ebdf5e8d23a59b7fb2b619270994aff5cb0f77919b415bb225",
+  "env_class_id": "ECBENV3h0bb9eb2ab583",
+  "host_sha256": "fd0692caee6825608da6cf5259cf7e89bdf03c3441207a571ad98ee1d33156e3",
+  "plan_sha256": "6894d98862dd73fc626a199578bcd82df28a86c41c310920c98c30196d6557c8",
+  "binary_sha256": "d379632445955b30e7386d7edc68ba4e7a44cab24d189e24ea1c99e10dfcf1ce",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 0.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "5fcca52408a68c08609b1aebe24bb4f03f94c8f0ec0e418fdf510c73a93a4e98",
+  "child_env": {
+    "HOME": "/home/agent",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793494757975,
+  "finished_unix_ms": 1793494758498,
+  "status": "complete",
+  "executions_planned": 15,
+  "records_written": 15,
+  "records_sha256": "7763d250b784d0c18f08886d694bfb37ec26bf7ec461308720069cc72deb8bdf",
+  "status_counts": {
+    "verified": 15
+  },
+  "last_seq": 14
+}

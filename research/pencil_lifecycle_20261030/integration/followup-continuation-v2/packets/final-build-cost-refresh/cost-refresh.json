@@ -1,0 +1,239 @@
+{
+  "schema": "final-build.conditional-cost-refresh/v1",
+  "task": "T-1572",
+  "root_owned": true,
+  "status": "draft_conditional_allocation_for_review",
+  "capture_start_utc": "2026-11-03T22:29:25.774066+00:00",
+  "capture_end_utc": "2026-11-03T22:29:40.399970+00:00",
+  "read_commands": 12,
+  "all_native_exits_zero": true,
+  "caller": {
+    "UserId": "AROARQQQESLKVN4YQZYYN:i-0370afde6bdc38d0a",
+    "Account": "104186811093",
+    "Arn": "arn:aws:sts::104186811093:assumed-role/spot-experiments-WorkerRole-G1FZ84yk3gS6/i-0370afde6bdc38d0a"
+  },
+  "region": "us-east-2",
+  "budgets": [
+    {
+      "Name": "isolab-daily-cost-100",
+      "Filters": null,
+      "Types": {
+        "IncludeTax": true,
+        "IncludeSubscription": true,
+        "UseBlended": false,
+        "IncludeRefund": true,
+        "IncludeCredit": true,
+        "IncludeUpfront": true,
+        "IncludeRecurring": true,
+        "IncludeOtherSubscription": true,
+        "IncludeSupport": true,
+        "IncludeDiscount": true,
+        "UseAmortized": false
+      },
+      "Limit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      },
+      "Spent": {
+        "ActualSpend": {
+          "Amount": "131.13",
+          "Unit": "USD"
+        }
+      },
+      "Updated": "2026-11-03T19:48:04.319000+00:00"
+    },
+    {
+      "Name": "isolab-monthly-account-cost",
+      "Filters": null,
+      "Types": {
+        "IncludeTax": true,
+        "IncludeSubscription": true,
+        "UseBlended": false,
+        "IncludeRefund": true,
+        "IncludeCredit": true,
+        "IncludeUpfront": true,
+        "IncludeRecurring": true,
+        "IncludeOtherSubscription": true,
+        "IncludeSupport": true,
+        "IncludeDiscount": true,
+        "UseAmortized": false
+      },
+      "Limit": {
+        "Amount": "1000.0",
+        "Unit": "USD"
+      },
+      "Spent": {
+        "ActualSpend": {
+          "Amount": "350.379",
+          "Unit": "USD"
+        }
+      },
+      "Updated": "2026-11-03T19:56:13.130000+00:00"
+    },
+    {
+      "Name": "spot-experiments-daily-25",
+      "Filters": null,
+      "Types": null,
+      "Limit": {
+        "Amount": "200.0",
+        "Unit": "USD"
+      },
+      "Spent": {
+        "ActualSpend": {
+          "Amount": "48.79",
+          "Unit": "USD"
+        }
+      },
+      "Updated": "2026-11-03T19:56:27.624000+00:00"
+    }
+  ],
+  "daily_budgets_nonadditive": true,
+  "daily_spend_selected_usd": "131.13",
+  "daily_delayed_headroom_usd": "68.87",
+  "monthly_delayed_headroom_usd": "649.621",
+  "shared_reserve_preserved_usd": "55.00",
+  "prior_attempt_allocations_preserved_usd": "4.00",
+  "proposed_additional_usd": "2.00",
+  "proposed_total_reserved_usd": "61.00",
+  "conditional_daily_unreserved_usd": "7.87",
+  "conditional_monthly_unreserved_usd": "588.621",
+  "daily_allowance_basis": "Prior root-provided campaign200USD envelope; not a new override of owner alert/cost controls. Live budget limit alone is not authority.",
+  "resource_summary": {
+    "instances": 4,
+    "running_instances": 3,
+    "stopped_instances": 1,
+    "active_spot_requests": 3,
+    "volumes": 49,
+    "volume_provisioned_GiB": 4666,
+    "snapshots": 60,
+    "snapshot_full_volume_GiB_upper": 6794,
+    "nat_gateways": 1,
+    "cluster": {
+      "Name": "isolab",
+      "Status": "ACTIVE",
+      "Version": "1.36",
+      "Created": "2026-10-19T17:34:49.388000+00:00",
+      "Platform": "eks.15",
+      "Upgrade": {
+        "supportType": "EXTENDED"
+      }
+    }
+  },
+  "prior_row_comparison": {
+    "instances": {
+      "same_canonical_rows_as_prior": true,
+      "rows": 4
+    },
+    "spotrequests": {
+      "same_canonical_rows_as_prior": false,
+      "rows": 4
+    },
+    "volumes": {
+      "same_canonical_rows_as_prior": true,
+      "rows": 49
+    },
+    "snapshots": {
+      "same_canonical_rows_as_prior": true,
+      "rows": 60
+    },
+    "nat": {
+      "same_canonical_rows_as_prior": true,
+      "rows": 1
+    },
+    "budgets": {
+      "same_canonical_rows_as_prior": true,
+      "rows": 3
+    }
+  },
+  "known_hourly_planning_rates_usd": {
+    "active_EC2_request_caps": "1.776640",
+    "gp3": "0.5184444444444444444444444444",
+    "standard_snapshot_full_volume_assumption": "0.4718055555555555555555555556",
+    "EKS_version_support_allowance": "0.60",
+    "NAT_one_gateway_hourly_assumption": "0.045"
+  },
+  "daily_update_to_deadline_hours": "10.19880027777777777777777778",
+  "known_window_estimate_usd": "34.79718467974722222222222223",
+  "remaining_within_preserved55_estimate_usd": "20.20281532025277777777777777",
+  "estimate_method": "Current observed standing footprint extrapolated from stale daily update to deadline. Not actual accrued billing or proof historical footprint stayed constant. Snapshot full logical size is conservative storage-volume proxy;0.05USD/GB-month carried assumption, not newly queried regional snapshot SKU. EKS0.60 allowance covers version support only; EXTENDED policy is not proof currently billed extended support.720hours/month used.",
+  "proposed_stage_allocations": [
+    {
+      "stage": "final_optimized_worker_and_mappers",
+      "seconds": 1200,
+      "cpu_limit": 2,
+      "memory_GiB": 8,
+      "attempts": 1,
+      "cap_usd": "1.00",
+      "full_host_cost_at_current_catalog_usd": "0.56448"
+    },
+    {
+      "stage": "private_assembly",
+      "seconds": 600,
+      "cpu_limit": 2,
+      "memory_GiB": 2,
+      "attempts": 1,
+      "cap_usd": "0.50",
+      "full_host_cost_at_current_catalog_usd": "0.28224"
+    },
+    {
+      "stage": "private_qualification",
+      "seconds": 300,
+      "cpu_limit": 2,
+      "memory_GiB": 2,
+      "attempts": 1,
+      "cap_usd": "0.25",
+      "full_host_cost_at_current_catalog_usd": "0.14112"
+    },
+    {
+      "stage": "retained_storage_and_transfer",
+      "cap_usd": "0.25",
+      "deadline_utc": "2026-11-04T06:00:00Z",
+      "new_provisioned_resources": 0,
+      "requires_exact_byte_envelope_before_runtime": true
+    }
+  ],
+  "ordinary_source_check_separate": {
+    "seconds": 1800,
+    "cpu_limit": 2,
+    "memory_GiB": 16,
+    "attempts": 1,
+    "full_host_cost_at_catalog_usd": "0.84672",
+    "scientific_campaign_debit_inferred": false,
+    "cost_treatment": "Existing host standing-reserve estimate; overlap explicitly retained, no extra automatic dollar debit or launch."
+  },
+  "deadline_utc": "2026-11-04T06:00:00Z",
+  "scientific_remaining_seconds_unchanged": 22200,
+  "funds_guaranteed": false,
+  "allocation_approved": false,
+  "execution_admitted": false,
+  "new_resources_created": 0,
+  "unknowns": [
+    "Budgets delayed and unchanged; timestamps are not billing completeness watermarks.",
+    "Other-region services and unrelated-team forward commitments not inventoried.",
+    "S3 storage/requests, transfer, NATbytes, publicIPv4, CPUcredits, provisioned EKS control plane extras and other variable services are not fully measured.",
+    "Current regional footprint does not prove historical footprint constant.",
+    "No Kubernetes Job/RBAC/NodePool/quota readback in this CLI inventory; root reconciles separate Jobs evidence.",
+    "No accountwide reservation census. Root team confirmation is scoped, with earlier setup overhead unknown."
+  ],
+  "required_before_any_launch": [
+    "Root confirms no conflicting commitment and authorizes exact finite allocation without releasing55USD margin or4USD prior attempts.",
+    "Independent review of wrapper/source/binary/protocol/image and concrete storage/transfer byte cap.",
+    "Live owner, jobs and resource-enforcement reconciliation; preserve all failed attempts, no automatic retry."
+  ],
+  "prior_bindings": {
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-cost-refresh-v5/cost-refresh.json": "aee5bdc54464177acbd38e3e33e5b0460d06be088447f5f4405bb24cecbebc8b",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-dollar-reservation/allocation.json": "8af065fd291eb95d3aae5945857d123c40c2aacf201d266103fb052aa303ab2c"
+  },
+  "spot_request_difference": "Previous closed request sir-jg9znp6g is absent from fresh listing. The four retained request records match exactly; no action or billing cessation is inferred from omission.",
+  "coordinator_confirmation": "Root confirms no new paid resource/scientific job from this team since prior allocation; only existing-host bounded source/proof checks and artifact I/O. Full earlier setup overhead remains unknown.",
+  "root_reported_job_observation": {
+    "observed_approx_utc": "2026-11-03T22:23:00Z",
+    "provenance": "Parent message; native overview retained by root, not rerun here.",
+    "jobs": [
+      "hashed-ecdl-cpu-round24 succeeded",
+      "sat-hpo-metal suspended pending"
+    ],
+    "pencil_job_observed": false,
+    "accountwide_assurance": false
+  }
+}

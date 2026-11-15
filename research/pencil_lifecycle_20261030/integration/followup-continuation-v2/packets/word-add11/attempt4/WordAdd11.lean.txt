@@ -1,0 +1,236 @@
+import CrossScaling
+import WeightedAdd11
+set_option autoImplicit false
+namespace PencilWordRefinement
+
+def wordPowLoop : Nat → UInt64 → UInt64 → UInt64 → UInt64 → UInt64
+ | 0, _, _, _, r => r
+ | n+1,p,a,e,r =>
+   if e > 0 then
+     let r := if e &&& 1 != 0 then (r*a)%p else r
+     let e := e >>> 1
+     let a := if e > 0 then (a*a)%p else a
+     wordPowLoop n p a e r
+   else r
+
+def wordPow5 (p a : UInt64) : UInt64 := wordPowLoop 3 p a 5 1
+
+theorem pow5_unroll (p a : UInt64) : wordPow5 p a =
+    (let r := ((1:UInt64)*a)%p
+     let a2 := (a*a)%p
+     let a4 := (a2*a2)%p
+     (r*a4)%p) := by rfl
+
+def pow5Expr (a : UInt64) : MulExpr :=
+  .mul (.mul (.leaf 1) (.leaf a))
+    (.mul (.mul (.leaf a) (.leaf a)) (.mul (.leaf a) (.leaf a)))
+
+theorem pow5_composition (p a : UInt64) (hfive : 5 ≤ p.toNat) (hb : p.toNat < 2^31)
+    (ha : a.toNat < p.toNat) :
+    (wordPow5 p a).toNat < p.toNat ∧
+    ((wordPow5 p a).toNat : ZMod p.toNat) = (a.toNat : ZMod p.toNat)^5 := by
+  have hp : 0 < p.toNat := by omega
+  have hg : (pow5Expr a).good p := by simp [pow5Expr,MulExpr.good,ha]; omega
+  have hc := MulExpr.composition p hp hb (pow5Expr a) hg
+  refine ⟨hc.1,?_⟩
+  change (((pow5Expr a).word p).toNat : ZMod p.toNat) = _
+  rw [hc.2]
+  simp [pow5Expr,MulExpr.field]
+  ring
+
+def wordAdd (p a b : UInt64) : UInt64 := (a+b)%p
+
+theorem wordAdd_composition (p a b : UInt64) (hp : 0 < p.toNat) (hb : p.toNat < 2^31)
+    (ha : a.toNat < p.toNat) (hc : b.toNat < p.toNat) :
+    (wordAdd p a b).toNat < p.toNat ∧
+    ((wordAdd p a b).toNat : ZMod p.toNat) = (a.toNat : ZMod p.toNat)+(b.toNat : ZMod p.toNat) := by
+  have hsum : a.toNat+b.toNat < 2^64 := by omega
+  constructor
+  · rw [wordAdd, UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+  · simp only [wordAdd, UInt64.toNat_mod, UInt64.toNat_add, Nat.mod_eq_of_lt hsum,
+      ZMod.natCast_mod, Nat.cast_add]
+
+theorem wordNeg_composition (p a : UInt64) (hp : 0 < p.toNat) (ha : a.toNat < p.toNat) :
+    (wordNeg p a).toNat < p.toNat ∧
+    ((wordNeg p a).toNat : ZMod p.toNat) = -(a.toNat : ZMod p.toNat) := by
+  rw [wordNeg_value p a hp]
+  exact ⟨Nat.mod_lt _ hp,neg_decode _ _ ha⟩
+
+theorem wordSub_composition (p a b : UInt64) (hp : 0 < p.toNat) (hb : p.toNat < 2^31)
+    (ha : a.toNat < p.toNat) (hc : b.toNat < p.toNat) :
+    (wordSub p a b).toNat < p.toNat ∧
+    ((wordSub p a b).toNat : ZMod p.toNat) = (a.toNat : ZMod p.toNat)-(b.toNat : ZMod p.toNat) := by
+  rw [wordSub_value p a b hp hb ha]
+  exact ⟨Nat.mod_lt _ hp,sub_decode _ _ _ hc⟩
+
+inductive FieldExpr where
+ | leaf : UInt64 → FieldExpr
+ | mul : FieldExpr → FieldExpr → FieldExpr
+ | add : FieldExpr → FieldExpr → FieldExpr
+ | sub : FieldExpr → FieldExpr → FieldExpr
+ | neg : FieldExpr → FieldExpr
+ | pow5 : FieldExpr → FieldExpr
+
+def FieldExpr.good (p : UInt64) : FieldExpr → Prop
+ | .leaf a => a.toNat < p.toNat
+ | .mul a b | .add a b | .sub a b => a.good p ∧ b.good p
+ | .neg a | .pow5 a => a.good p
+
+def FieldExpr.word (p : UInt64) : FieldExpr → UInt64
+ | .leaf a => a
+ | .mul a b => (a.word p*b.word p)%p
+ | .add a b => wordAdd p (a.word p) (b.word p)
+ | .sub a b => wordSub p (a.word p) (b.word p)
+ | .neg a => wordNeg p (a.word p)
+ | .pow5 a => wordPow5 p (a.word p)
+
+def FieldExpr.field (p : UInt64) : FieldExpr → ZMod p.toNat
+ | .leaf a => (a.toNat : ZMod p.toNat)
+ | .mul a b => a.field p*b.field p
+ | .add a b => a.field p+b.field p
+ | .sub a b => a.field p-b.field p
+ | .neg a => -a.field p
+ | .pow5 a => (a.field p)^5
+
+theorem FieldExpr.composition (p : UInt64) (hfive : 5 ≤ p.toNat) (hb : p.toNat < 2^31)
+    (e : FieldExpr) (hg : e.good p) :
+    (e.word p).toNat < p.toNat ∧ ((e.word p).toNat : ZMod p.toNat) = e.field p := by
+  have hp : 0 < p.toNat := by omega
+  induction e with
+  | leaf a => exact ⟨hg,rfl⟩
+  | mul a b ia ib =>
+    have ha := ia hg.1
+    have hc := ib hg.2
+    exact ⟨uint64_mul_canonical p _ _ hp,by
+      change (((a.word p*b.word p)%p).toNat : ZMod p.toNat) = _
+      rw [uint64_mul_decode p _ _ hb ha.1 hc.1,ha.2,hc.2]; rfl⟩
+  | add a b ia ib =>
+    have ha := ia hg.1
+    have hc := ib hg.2
+    have hm := wordAdd_composition p _ _ hp hb ha.1 hc.1
+    exact ⟨hm.1,by simpa only [FieldExpr.word,FieldExpr.field,ha.2,hc.2] using hm.2⟩
+  | sub a b ia ib =>
+    have ha := ia hg.1
+    have hc := ib hg.2
+    have hm := wordSub_composition p _ _ hp hb ha.1 hc.1
+    exact ⟨hm.1,by simpa only [FieldExpr.word,FieldExpr.field,ha.2,hc.2] using hm.2⟩
+  | neg a ia =>
+    have ha := ia hg
+    have hm := wordNeg_composition p _ hp ha.1
+    exact ⟨hm.1,by simpa only [FieldExpr.word,FieldExpr.field,ha.2] using hm.2⟩
+  | pow5 a ia =>
+    have ha := ia hg
+    have hm := pow5_composition p _ hfive hb ha.1
+    exact ⟨hm.1,by simpa only [FieldExpr.word,FieldExpr.field,ha.2] using hm.2⟩
+
+structure WordD1 where
+ x : UInt64
+ y : UInt64
+ z : UInt64
+ w : UInt64
+
+def WordD1.canonical (p : UInt64) (a : WordD1) : Prop :=
+ a.x.toNat < p.toNat ∧ a.y.toNat < p.toNat ∧ a.z.toNat < p.toNat ∧ a.w.toNat < p.toNat
+
+def WordD1.decode (p : UInt64) (a : WordD1) : WeightedAdd11.Input (ZMod p.toNat) :=
+ ⟨(a.x.toNat : ZMod p.toNat),(a.y.toNat : ZMod p.toNat),(a.z.toNat : ZMod p.toNat),(a.w.toNat : ZMod p.toNat)⟩
+
+structure PayloadExpr where
+ q : FieldExpr
+ r : FieldExpr
+ s : FieldExpr
+ t : FieldExpr
+ z : FieldExpr
+ w : FieldExpr
+
+def payloadExpr (a b : WordD1) : PayloadExpr :=
+ let az2 := FieldExpr.mul (.leaf a.z) (.leaf a.z)
+ let bz2 := FieldExpr.mul (.leaf b.z) (.leaf b.z)
+ let axbz := FieldExpr.mul (.leaf a.x) bz2
+ let bxaz := FieldExpr.mul (.leaf b.x) az2
+ let ay := FieldExpr.mul (.leaf a.y) (.mul (.pow5 (.leaf b.z)) (.leaf b.w))
+ let yb := FieldExpr.mul (.leaf b.y) (.mul (.pow5 (.leaf a.z)) (.leaf a.w))
+ ⟨.neg (.add axbz bxaz),.mul axbz bxaz,.sub ay yb,
+   .sub (.mul axbz yb) (.mul bxaz ay),.mul (.leaf a.z) (.leaf b.z),
+   .mul (.sub axbz bxaz) (.mul (.leaf a.w) (.leaf b.w))⟩
+
+-- Literal source operations; returned payload only, branch dispatch below.
+def add11WordPayload (p : UInt64) (a b : WordD1) : WeightedWord :=
+ let az2 := (a.z*a.z)%p
+ let bz2 := (b.z*b.z)%p
+ let axbz := (a.x*bz2)%p
+ let bxaz := (b.x*az2)%p
+ let ay := (a.y*((wordPow5 p b.z*b.w)%p))%p
+ let yb := (b.y*((wordPow5 p a.z*a.w)%p))%p
+ ⟨wordNeg p (wordAdd p axbz bxaz), (axbz*bxaz)%p,
+  wordSub p ay yb,wordSub p ((axbz*yb)%p) ((bxaz*ay)%p),
+  (a.z*b.z)%p,((wordSub p axbz bxaz)*((a.w*b.w)%p))%p⟩
+
+theorem payload_decode (p : UInt64) [Fact p.toNat.Prime]
+    (hfive : 5 ≤ p.toNat) (hb : p.toNat < 2^31) (a b : WordD1)
+    (ha : a.canonical p) (hc : b.canonical p) :
+    let c := add11WordPayload p a b
+    let f := WeightedAdd11.output (a.decode p) (b.decode p)
+    c.canonical p ∧
+    (c.q.toNat : ZMod p.toNat)=f.q ∧ (c.r.toNat : ZMod p.toNat)=f.r ∧
+    (c.s.toNat : ZMod p.toNat)=f.s ∧ (c.t.toNat : ZMod p.toNat)=f.t ∧
+    (c.z.toNat : ZMod p.toNat)=f.z ∧ (c.w.toNat : ZMod p.toNat)=f.w := by
+  have good : (payloadExpr a b).q.good p ∧ (payloadExpr a b).r.good p ∧
+      (payloadExpr a b).s.good p ∧ (payloadExpr a b).t.good p ∧
+      (payloadExpr a b).z.good p ∧ (payloadExpr a b).w.good p := by
+    rcases ha with ⟨hax,hay,haz,haw⟩
+    rcases hc with ⟨hbx,hby,hbz,hbw⟩
+    simp [payloadExpr,FieldExpr.good,hax,hay,haz,haw,hbx,hby,hbz,hbw]
+  have hq := FieldExpr.composition p hfive hb _ good.1
+  have hr := FieldExpr.composition p hfive hb _ good.2.1
+  have hs := FieldExpr.composition p hfive hb _ good.2.2.1
+  have ht := FieldExpr.composition p hfive hb _ good.2.2.2.1
+  have hz := FieldExpr.composition p hfive hb _ good.2.2.2.2.1
+  have hw := FieldExpr.composition p hfive hb _ good.2.2.2.2.2
+  refine ⟨⟨hq.1,hr.1,hs.1,ht.1,hz.1,hw.1⟩,?_,?_,?_,?_,?_,?_⟩
+  all_goals
+    first | change (((payloadExpr a b).q.word p).toNat : ZMod p.toNat) = _; rw [hq.2]
+          | change (((payloadExpr a b).r.word p).toNat : ZMod p.toNat) = _; rw [hr.2]
+          | change (((payloadExpr a b).s.word p).toNat : ZMod p.toNat) = _; rw [hs.2]
+          | change (((payloadExpr a b).t.word p).toNat : ZMod p.toNat) = _; rw [ht.2]
+          | change (((payloadExpr a b).z.word p).toNat : ZMod p.toNat) = _; rw [hz.2]
+          | change (((payloadExpr a b).w.word p).toNat : ZMod p.toNat) = _; rw [hw.2]
+    rfl
+
+def crossWord (p : UInt64) (a b : WordD1) : UInt64 :=
+ (a.x*((b.z*b.z)%p))%p
+
+def yWord (p : UInt64) (a b : WordD1) : UInt64 :=
+ (a.y*((wordPow5 p b.z*b.w)%p))%p
+
+inductive Add11Branch | inverse | doubling | assertionFailure | distinct
+ deriving DecidableEq, Repr
+
+def wordGuard (p : UInt64) (a b : WordD1) : Add11Branch :=
+ if crossWord p a b = crossWord p b a ∧ yWord p a b = wordNeg p (yWord p b a) then .inverse
+ else if crossWord p a b = crossWord p b a ∧ yWord p a b = yWord p b a then .doubling
+ else if crossWord p a b = crossWord p b a then .assertionFailure else .distinct
+
+theorem crossWord_decode (p : UInt64) (hfive : 5 ≤ p.toNat) (hb : p.toNat < 2^31)
+    (a b : WordD1) (ha : a.canonical p) (hc : b.canonical p) :
+    ((crossWord p a b).toNat : ZMod p.toNat) = WeightedAdd11.crossA (a.decode p) (b.decode p) := by
+  have h := FieldExpr.composition p hfive hb
+    (.mul (.leaf a.x) (.mul (.leaf b.z) (.leaf b.z))) ⟨ha.1,hc.2.2.1,hc.2.2.1⟩
+  simpa [crossWord,FieldExpr.word,FieldExpr.field,WeightedAdd11.crossA,WordD1.decode,pow_two] using h.2
+
+theorem distinct_word_guard (p : UInt64) [Fact p.toNat.Prime]
+    (hfive : 5 ≤ p.toNat) (hb : p.toNat < 2^31) (a b : WordD1)
+    (ha : a.canonical p) (hc : b.canonical p)
+    (haz : (a.decode p).z ≠ 0) (hbz : (b.decode p).z ≠ 0)
+    (hx : WeightedAdd11.nx (a.decode p) ≠ WeightedAdd11.nx (b.decode p)) :
+    wordGuard p a b = .distinct := by
+  have hn := WeightedAdd11.normalized_distinct_cross (a.decode p) (b.decode p) haz hbz hx
+  have hw : crossWord p a b ≠ crossWord p b a := by
+    intro he
+    apply hn
+    have he' := congrArg (fun w : UInt64 => (w.toNat : ZMod p.toNat)) he
+    rw [crossWord_decode p hfive hb a b ha hc,crossWord_decode p hfive hb b a hc ha] at he'
+    exact he'
+  simp [wordGuard,hw]
+
+end PencilWordRefinement

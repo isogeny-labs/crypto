@@ -127,8 +127,12 @@ listed so that nobody spends budget on them.
      a = 0.
    - A screen of every genus-4 curve, together with a point-count lemma,
      adds K-283.
-   - The route is now closed for ECC2K-130, K-163, K-233 and K-283. K-409
-     and K-571 need bases of genus 5 or more.
+   - The route is now closed for ECC2K-130, K-163, K-233 and K-283.
+   - A screen of every genus-5 curve (7,829 curves, 4,339 L-polynomials)
+     finds no cover with λ = ±1 at n = 409 or 571 and excludes order 4 at
+     n = 409. Order 3 leaves 20 L-polynomials (40 curves) at K-409 and 12
+     (19 curves) at K-571 open, so K-409 and K-571 stay open at genus 5, and
+     K-571 at genus 6 and 7.
 3. **Random-b binary curves: only the cover question is new here.** A
    random-b curve does not lift to a curve over Q, so the modular mechanism
    behind the Koblitz leads is unavailable *(derived sketch)*. The one new
@@ -144,7 +148,7 @@ defined above.
 
 | # | family | lead | status | first experiment | kill criterion | if it works |
 |:--|:--|:--|:--|:--|:--|:--|
-| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured, every base of genus ≤ 3; genus 4 screened:** hits at n = 3 and n = 5 only (one plane quartic gives a genus-11 cover carrying T₅, a = 0); **closed for ECC2K-130, K-163, K-233 and K-283** | next: genus-5 bases with 409 ∣ P_B(λ), ord λ ≤ 3, for K-409 (Dragutinović's genus-5 census) | no genus-5 B passes the screen at n = 409 | the only structured family left inside the L(1/2) budget for K-409 and K-571, with explicit maps |
+| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured, every base of genus ≤ 3; genus 4 screened:** hits at n = 3 and n = 5 only (one plane quartic gives a genus-11 cover carrying T₅, a = 0); **closed for ECC2K-130, K-163, K-233 and K-283** | next: twisted L over F₈ for the 59 genus-5 candidates with ord λ = 3 (K-409, K-571; **genus 5 screened**, no λ = ±1 cover, order 4 excluded at 409) | no genus-5 B passes the order-3 screen at n = 409 | the only structured family left inside the L(1/2) budget for K-409 and K-571, with explicit maps |
 | L6 | Koblitz | Modular twists: (f_E ⊗ χ) mod 2 ≅ T_n up to isogeny, for every n | derived | find the smallest curve whose Jacobian contains A_{f⊗χ} for n = 3, 5, 7, 11 (modular quotients, Fermat quotients of level 7ℓ, Ekedahl–Serre curves) | minimal genus grows faster than c(n)·n | an explicit, computable transfer of T_n into a Jacobian over F₂ |
 | L10 | random-b binary | Genus-n Jacobians realising Res(E), beyond GHS | **sourced at n = 3 and 5:** genus-5 Jacobians realise Res(E) for t₅ ∈ {−9, −7, −5, −3, −1, 1, 3} (LMFDB) | take the genus-5 curves (Dragutinović census) and compute an explicit map C → E over F₃₂; then n = 7 | no explicit map; or no realisation at n = 7 | a genus-O(n) family would make prime-degree binary curves subexponential |
 | L9 | Koblitz and binary | Certified lower bounds on the cover genus | derived (partial); (a = 0, n = 5) at genus 5 excluded by LMFDB | Howe's principal-polarisability test on T_n for deployed n; point-count positivity | (produces bounds) | closes deployed sizes for good where the bound exceeds the budget |
@@ -399,9 +403,26 @@ Bergström)*.
       #D(F_{2^k}) = #B(F_{2^k}) + k·t_k, which must be ≡ 0 (mod n).
     - For the a = 0 curve, t₃ = 5, so #D(F₈) lies between 15 and 47, which
       is never ≡ 0 mod 283.
-  - K-409 (g₀ ≤ 5) and K-571 (≤ 7) stay open. Genus 4 is closed for them
-    too, so they need genus-5 or larger bases. The same lemma also excludes
-    the maximal twist at g₀ = 5 and 7.
+  - K-409 (g₀ ≤ 5) and K-571 (≤ 7): genus 4 is closed for both. The same
+    lemma also excludes the maximal twist at g₀ = 5 and 7.
+  - The genus-5 screen
+    ([`run-20261103T2209Z`](reports/run-20261103T2209Z/README.md)) covers all
+    7,829 genus-5 curves over F₂ and leaves K-409 and K-571 open at g₀ = 5.
+    - The hyperelliptic and trigonal families were enumerated independently
+      *(measured)*: 393,216 models give the stack count 512, and 67,608
+      quintics singular at one point give 2,817, with the same L-polynomial
+      sets as Dragutinović's lists.
+    - The 3,905 complete intersections are *sourced* from that census. Their
+      point counts were recounted and agree, but smoothness was not
+      re-tested. The union has 4,339 distinct L-polynomials, matching the
+      census.
+    - No genus-5 curve has n ∣ L(±1) for n = 409 or 571.
+    - Order 4 at n = 409 is excluded by the same lemma (k = 4 = g₀ − 1,
+      t₄ = 1 > 0) *(derived)*.
+    - Order 3 is not excluded: 20 L-polynomials (40 curves) at 409 and 12
+      (19 curves) at 571 satisfy n ∣ P(ω). At g₀ = 5 the Prym's spectrum is
+      only forced to contain the μ₃-closure of T_n's, so the lemma does not
+      apply.
 
 Caveats:
 
@@ -534,6 +555,8 @@ and has no modular-curve parametrisation.
     against the deployed sizes and their allowed g₀.
   - `reports/run-20261018T2144Z/reach.svg`: the same for every genus-4
     curve, with the order-3 twist candidates.
+  - `reports/run-20261103T2209Z/reach.svg`: the same for every genus-5
+    curve, with the order-3 candidates (open) and order-4 (excluded).
 
 ## Unresolved checks and owed certificates
 
@@ -547,8 +570,9 @@ and has no modular-curve parametrisation.
   n = 7 trace-zero class `6.2.b_ab_ad_ab_f_h`. All nine `5.2.*` classes and
   the first n = 7 class returned data on the retries. They are in the table
   under "Method and sources".
-- L8 covers bases of genus ≤ 3, and genus 4 by the screen. Still not run:
-  - genus-5 and larger bases, needed for K-409 and K-571;
+- L8 covers bases of genus ≤ 3, and genus 4 and 5 by the screen. Still not run:
+  - the twisted L-function over F₈ for the 59 genus-5 order-3 candidates
+    (K-409, K-571), and bases of genus 6 and 7 for K-571;
   - the twisted λ = −1 genus-3 covers, which were checked only for
     existence (n ∣ L(−1), never 163) and not for small-n hits;
   - ramified covers (L7) and non-cyclic covers.
@@ -591,6 +615,9 @@ etale_search/target/release/etale-search 2      # genus 2
 etale_search/target/release/etale-search 3      # hyperelliptic genus 3
 etale_search/target/release/etale-search q      # plane quartics
 etale_search/target/release/etale-search s4     # genus-4 screen at n = 283, 409, 571
+etale_search/target/release/etale-search g5 hyp-enum    # genus-5 screen at n = 409, 571;
+etale_search/target/release/etale-search g5 trig-enum   # sourced needs the two Dragutinović
+etale_search/target/release/etale-search g5 sourced <ci dir> <mt_curves dir>   # repositories
 ```
 
 ## References

@@ -1,0 +1,16 @@
+import UnionSize
+set_option autoImplicit false
+namespace SignedWord
+theorem size_selected_union_preserves {n : Nat} (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (t w : State n) (u v ru rv : Fin n) (pu pv : Pot)
+ (rank : Fin n→Nat) (value : Fin n→F r) (su sv : Int8) (a b : UInt64) (k : F r)
+ (hp : 0<r.toNat) (hr : r.toNat≤2^63) (hg : Good r s.graph) (hgf : FixedGood r s)
+ (hf : GraphFind.Forest (decode r s.graph) rank) (hv : GraphUnion.Valid (unionDecode r s) value k)
+ (h1 : Run r s.graph u t ru pu) (h2 : Run r t v w rv pv) (hd : ru≠rv)
+ (hs : Sign su) (ht : Sign sv) (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat)
+ (he : sd r su*value u+sd r sv*value v=wd r a+wd r b*k) (sizes : UnionSize.Sizes n) :
+ let out:=branchWord r ⟨w,s.fixed⟩ ru rv (reducedUnionPot r pu pv su sv a b) (UnionSize.forward sizes ru rv)
+ Good r out.graph ∧ FixedGood r out ∧
+ ∃ rank', GraphFind.Forest (unionDecode r out).graph rank' ∧ GraphUnion.Valid (unionDecode r out) value k := by
+ exact distinct_union_after_two_word_finds r s t w u v ru rv pu pv rank value su sv a b k hp hr hg hgf hf hv h1 h2 hd hs ht ha hb he (UnionSize.forward sizes ru rv)
+end SignedWord

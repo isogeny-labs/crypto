@@ -1,0 +1,36 @@
+import Fallback
+import WordStep
+set_option autoImplicit false
+namespace Pegcd
+open Polynomial
+variable {K : Type*} [Field K]
+theorem endpoint_nonzero (a b : K[X]) (z : State K)
+ (hv : Valid a b z) (hz : z.r1 = 0) (ha : a ≠ 0) : z.r0 ≠ 0 := by
+ intro he
+ have hd := (endpoint a b z hv hz).2.1
+ rw [he, zero_dvd_iff] at hd
+ exact ha hd
+
+theorem two_trace_fallback (ua ub va vb f : K[X]) (z1 z2 : State K)
+ (c k : K) (hc : c ≠ 0) (hk : k ≠ 0)
+ (ht1 : Trace (initial ua ub) z1) (hz1 : z1.r1 = 0)
+ (ht2 : Trace (initial (C c*z1.r0) (va+vb)) z2) (hz2 : z2.r1 = 0)
+ (hvalid : ua ∣ f-va*va) :
+ (C k*z2.r0)*(C k*z2.r0) ∣ ua*ub ∧
+ (C k*z2.r0) ∣
+ ((C k*z2.s0)*(C c*z1.s0)*ua)*vb +
+ ((C k*z2.s0)*(C c*z1.t0)*ub)*va +
+ (C k*z2.t0)*(va*vb+f) := by
+ have h1 := normalized_endpoint ua ub z1
+   (trace_valid ua ub _ z1 ht1 (initial_valid ua ub)) hz1 c hc
+ have h2 := normalized_endpoint (C c*z1.r0) (va+vb) z2
+   (trace_valid _ _ _ z2 ht2 (initial_valid _ _)) hz2 k hk
+ exact fallback_divisibilities ua ub va vb f (C c*z1.r0) (C k*z2.r0)
+   (C k*z2.s0) (C k*z2.t0) (C c*z1.s0) (C c*z1.t0)
+   ⟨h1.2.1,h1.2.2.1⟩ ⟨h2.2.1,h2.2.2.1⟩ hvalid
+
+theorem zero_second_valid (a : K[X]) : Valid a 0 (initial a 0) := initial_valid a 0
+
+theorem zero_second_stops (a : K[X]) : (initial a 0).r1 = 0 := rfl
+
+end Pegcd

@@ -1,0 +1,19 @@
+[package]
+name = "lift-dense-torsion-pairing"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[[bin]]
+name = "pairing"
+path = "src/main.rs"
+
+[[bin]]
+name = "c2pnb_pairing"
+path = "src/bin/c2pnb_pairing.rs"
+
+[profile.release]
+opt-level = 3
+
+[workspace]

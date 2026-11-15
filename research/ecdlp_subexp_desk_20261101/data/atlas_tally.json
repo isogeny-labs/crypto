@@ -1,0 +1,1170 @@
+{
+ "source": "aburan28/crypto-autoresearcher main cfc1dae29e5ea8e9c53d345659ca30f7274a2811, knowledge/leads/ecdlp/*/LEAD-*.yaml, read 2026-11-01",
+ "review_state": {
+  "coverage": {
+   "mapped": 2100,
+   "records": 2100
+  },
+  "leads": 153,
+  "note": "The default-branch commit each repository was examined at (merge-base with origin/main). --delta lists watched paths added or modified since, ignoring knowledge/leads/. ecc-challenges was not checked out at the 2026-10-30 review; its pin is carried over unchanged from the 2026-10-24 review. crypto and cryptanalysis were reviewed at this session's checkout (the pinned commits); their later main commits were not checked out (disk limit) and appear in the next --delta.",
+  "repos": {
+   "cryptanalysis": {
+    "commit": "eefacd273b83d6be7200f3d3e8c508b37c01612f"
+   },
+   "crypto": {
+    "commit": "3fe55f62e07dfc4c8562c58e2a8e180f9fe6c183"
+   },
+   "crypto-autoresearcher": {
+    "commit": "ed4ded06395463aa62c6da614aaf77859d023161"
+   },
+   "ecc-challenges": {
+    "commit": "3a71596ba85434bd98604cfda1e974c5b6c2dcc3"
+   }
+  },
+  "reviewed_at": "2026-10-30",
+  "reviewed_by": "claude-code-session-01A52AU2",
+  "schema": "lead-atlas-review/v1",
+  "tally": {
+   "closed_dominated": 5,
+   "closed_known": 18,
+   "closed_obstructed": 45,
+   "exhausted_at_scale": 6,
+   "open_blocked": 17,
+   "open_next_step": 53,
+   "open_unexamined": 9
+  }
+ },
+ "leads": [
+  {
+   "id": "LEAD-EXO-augmented-oracle-ggm",
+   "family": "exotic",
+   "disposition": "closed_obstructed",
+   "title": "Augmented oracles (x-, y-, full-point, halving, endomorphism-image, incidence) and GGM simulability",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-EXO-coordinate-statistic-leakage",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Coordinate-statistic hunts: bias of x/y, slopes, bits, cross-ratios and trace functions under the group law",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-EXO-cryptoscale-candidate-screen",
+   "family": "exotic",
+   "disposition": "exhausted_at_scale",
+   "title": "GOAL-CRYPTO-001 discovery screen for a reproducible non-generic crypto-size algorithm",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-EXO-curve-model-representation",
+   "family": "exotic",
+   "disposition": "closed_obstructed",
+   "title": "Alternative curve models and point representations (Edwards, Hessian, Montgomery, Kummer, x-only)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-dl-character-sum-pseudorandom",
+   "family": "exotic",
+   "disposition": "exhausted_at_scale",
+   "title": "Additive-character bias of the discrete log on structured factor bases (H-PSEUDO)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-elliptic-net-eds",
+   "family": "exotic",
+   "disposition": "closed_obstructed",
+   "title": "Elliptic nets / elliptic divisibility sequences as a relation or annihilator source",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-four-list-ktree-join",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Wagner k-tree / four-list joins with cheap sum-compatible filters",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-global-lift-height",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Height-compressing global lifts (Q, number fields, function fields / elliptic surfaces)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-hashed-factor-base-tensor-ecdl",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Hashed-factor-base ECDL with a compact low-degree Boolean encoding and exact tensor contraction (Akshima et al., Bochum v0.2), conditional on the openai/math #k-SAT result",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-EXO-hnp-advice-leakage",
+   "family": "exotic",
+   "disposition": "open_blocked",
+   "title": "Bit-security / hidden-number conversion of DL leakage, auxiliary inputs and advice",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-ideas-corpus-algebraic-transforms",
+   "family": "exotic",
+   "disposition": "open_blocked",
+   "title": "ECDLP-IDEA breakthrough corpus: algebraic-geometric transforms awaiting constructors",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-EXO-invertible-hint-subset",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "The invertible half: dense, cheaply recognizable AND cheaply invertible subsets of E(F_p)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-lossy-object-propagation",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Lossy tracked objects propagated through scalar multiplication (doubling coordinates, rigidity, belief propagation)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-methodology-instruments",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Program methodology: instrument calibration, nulls, findings promotion (not a cost mechanism)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-EXO-miller-pairing-cocycle",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Miller functions, S-unit descent and pairing-free Miller cocycles on prime-order curves",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-ml-learned-models",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Machine learning / neural and RL approaches to ECDLP and its subroutines",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-EXO-padic-jet-canonical-lift",
+   "family": "exotic",
+   "disposition": "closed_obstructed",
+   "title": "Prime-to-p jets, canonical/Teichmuller lifts and p-adic formal-group digits",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-EXO-quantum-ecdlp-resources",
+   "family": "exotic",
+   "disposition": "open_next_step",
+   "title": "Quantum ECDLP: reversible secp256k1 point-addition circuits for Shor (resource reduction)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-split-jacobian-projection",
+   "family": "exotic",
+   "disposition": "closed_obstructed",
+   "title": "Split-Jacobian projected smoothness and the pair (P,Q) as a genus-2 divisor",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-EXO-torsor-deck-period",
+   "family": "exotic",
+   "disposition": "closed_obstructed",
+   "title": "Torsor, deck-orbit, cubical/biextension and scalar-orbit elliptic-period descent",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-advice-table-variants",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "Variants of the advice table: batch-reselected, batch-grown, basin-instrumented and transported tables",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-automorphism-class-walks",
+   "family": "generic",
+   "disposition": "closed_known",
+   "title": "Rho on automorphism/Frobenius orbits: sqrt(2m) on Koblitz, order-4/6 maps on j=1728/j=0",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-RHO-batched-inversion-shared-pm",
+   "family": "generic",
+   "disposition": "closed_known",
+   "title": "Batched affine steps: Montgomery simultaneous inversion and the free x(P-Q) beside x(P+Q)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-best-of-candidates-indegree",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "Step to the better of k candidate images (best of P+R, P-R) to concentrate in-degree",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-bsgs-family-memory",
+   "family": "generic",
+   "disposition": "closed_known",
+   "title": "Baby-step giant-step family (textbook, interleaved, negation, paired, signed-Frobenius claw)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-cheaper-step-primitives",
+   "family": "generic",
+   "disposition": "open_unexamined",
+   "title": "Cheaper step primitives never measured here: tag tracing on EC, point-halving steps on binary curves",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-cheon-aux-acquisition",
+   "family": "generic",
+   "disposition": "closed_obstructed",
+   "title": "Run Cheon's auxiliary-input algorithm on ordinary ECDLP by generating [x^d]P yourself",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-cheon-deployed-applicability",
+   "family": "generic",
+   "disposition": "open_blocked",
+   "title": "Where Cheon stops on deployed parameters: exact r+-1 divisor census times priced auxiliary supply",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-cheon-toy-reproduction",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "Toy reproduction of Cheon's algorithm with memory charged and supplied-input CRT composition",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-correlated-walks-shared-sums",
+   "family": "generic",
+   "disposition": "closed_obstructed",
+   "title": "Correlated walks: one shared index sequence or shared precomputed sums across walks",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-dp-multitarget-precomputation",
+   "family": "generic",
+   "disposition": "closed_known",
+   "title": "Distinguished points, multi-target batching and Bernstein-Lange precomputation (incumbent controls)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-RHO-ecc2k130-gpu-fpga-throughput",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "ECC2K-130 kernel throughput on GPU and FPGA (iterations per second per device and per watt)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-RHO-ecc2k130-iteration-function",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "ECC2K-130 iteration function: sigma walk vs v3 table walk vs class-signed sigma steps",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-generic-sqrt-lower-bound",
+   "family": "generic",
+   "disposition": "closed_obstructed",
+   "title": "Beat the square-root exponent with any generic collision algorithm",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-grumpy-store-all-schedules",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "Exact average-case constant of store-all generic schedules (grumpy giants, compiled tiered walks)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-kangaroo-interval",
+   "family": "generic",
+   "disposition": "closed_dominated",
+   "title": "Kangaroo / lambda (van Oorschot-Wiener, Gaudry-Schost) as a full-group ECDLP solver",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-lhw-modular-filter-price",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "Residue-guess price of modular (mod-M) representation filters in prime-order groups",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-lhw-polymem-collision-walks",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "Low-Hamming-weight DLP with polynomial memory: collision walks on the weight-w class",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-lhw-preprocessing-frontier",
+   "family": "generic",
+   "disposition": "open_unexamined",
+   "title": "Low-weight DLP with preprocessing: the (P, S, T, epsilon, U) frontier",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-matched-rho-calibration",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "The matched rho reference itself: finite-size bias and the missing prime medium tier",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-native-step-cost",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "Native cost of one rho step: canonicalisation, field arithmetic and admitted CPU timing",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-negation-map-fruitless-cycles",
+   "family": "generic",
+   "disposition": "closed_known",
+   "title": "Negation-map rho on {+-P} classes with fruitless-cycle escape (prime curves)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-non-automorphism-equivalence",
+   "family": "generic",
+   "disposition": "open_unexamined",
+   "title": "Equivalence classes larger than Aut(E): quotients by subgroups H of (Z/N)^*",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-pool-class-quotient",
+   "family": "generic",
+   "disposition": "open_next_step",
+   "title": "Distributed pool v2 walk has no class quotient: add negation (sqrt 2) and Frobenius (sqrt 2m)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-prime-gpu-rho",
+   "family": "generic",
+   "disposition": "open_blocked",
+   "title": "GPU rho on prime and generic binary curves with an admitted CPU/GPU comparison",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-RHO-r-adding-walk-mixing",
+   "family": "generic",
+   "disposition": "closed_known",
+   "title": "Iteration-function choice: Teske r-adding walks, mixing, hashed partitions",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-cofactor-projected-ladder-base",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "Cofactor-projected factor base ([h]P into the prime-order subgroup) on the random-binary ladder rows with cofactor h > 1",
+   "last_reviewed": "2026-10-31"
+  },
+  {
+   "id": "LEAD-ICB-cofactor-torsion-quotients",
+   "family": "ic-binary",
+   "disposition": "closed_obstructed",
+   "title": "Spending the cofactor and 2-torsion of binary curves: quotient labels, k-tree filters, 2-torsion translation quotients of the factor base",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-composite-degree-c2pnb",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "Composite-degree ANSI X9.62 binary curves (c2pnb176/208/272/304/368): Gaudry-Diem n = 4 with a pi_16 orbit base",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICB-decomposition-encoding-and-sat",
+   "family": "ic-binary",
+   "disposition": "closed_obstructed",
+   "title": "Decomposition-oracle encodings and SAT/enumeration solving of binary PDP: SAT/XOR, Karabina, S_m symmetrisation, chained vs direct S_4, Nagao, basis and reduction-polynomial choice, trace replay",
+   "last_reviewed": "2026-10-27"
+  },
+  {
+   "id": "LEAD-ICB-ecc2k130-jacobian-carrier",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "ECC2K-130 via a Jacobian carrying the trace-zero abelian variety A (Torelli rarity heuristic)",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICB-factor-base-subspace-choice",
+   "family": "ic-binary",
+   "disposition": "exhausted_at_scale",
+   "title": "Choice of the factor-base subspace V at fixed dimension (geometric progression, dim(V.V), trace rank, cosets, greedy coverage, HW pools, trace-parity window)",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICB-free-relations-self-collision",
+   "family": "ic-binary",
+   "disposition": "exhausted_at_scale",
+   "title": "Free relations from self-collisions in the pair-root table (no-probe relations)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-frobenius-orbit-factor-base",
+   "family": "ic-binary",
+   "disposition": "closed_obstructed",
+   "title": "Frobenius/endomorphism-invariant factor bases and orbit columns on Koblitz and subfield curves, beyond the trivial orbit saving",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICB-frobenius-search-symmetry",
+   "family": "ic-binary",
+   "disposition": "closed_obstructed",
+   "title": "Frobenius as a symmetry of the decomposition search: orbit CNF encodings, conjugate attempts, equivariant elimination",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICB-generic-table-oracle",
+   "family": "ic-binary",
+   "disposition": "closed_obstructed",
+   "title": "Generic decomposition oracles for Koblitz IC: pair tables, compact-orbit 4-sum, MITM and enumeration, cap-locus arity, known-log pools",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICB-kic-golden-base-exact-decomp",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "Co-designed binary factor bases with exact decomposition: affine 2-flats, orbit-canonical abscissa lookup, SAT vs exact MITM (KIC lane)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-koblitz-rho-reference",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "The matched Koblitz rho reference for binary IC rows: step pricing, signed-Frobenius canonicalisation, a 131-bit walk",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-koblitz-setup-phase-cost",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "Cutting the reusable set-up of the one-target Koblitz pipeline (Table A), where 98.5-99.7% of S sits",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICB-large-prime-variants",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "Single and double large-prime relation collection for binary and Koblitz IC (free-leg, GTTD on subspace bases)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICB-learned-cost-model-factor-base-selection",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "Learned (gated, log-linear) cost model that selects the factor-base subspace at fixed dimension on binary and Koblitz toy fields, and its transfer across curves",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICB-multi-target-and-portfolio",
+   "family": "ic-binary",
+   "disposition": "closed_obstructed",
+   "title": "Batch IC and IC/rho portfolios: amortising the set-up over many targets, restart portfolios",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-nonlinear-frob-stable-bases",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "Non-subspace Frobenius-stable factor bases at prime n: trace-spectrum, Hamming ball, multiplicative subgroup, tau-adic, algebraic-group (Couveignes-Lercier) points",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICB-oakley-quintic-tower",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "Gaudry-Diem n = 5 point decomposition on the Oakley EC2N curves over F_{2^155} and F_{2^185}",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-orbit-linear-algebra",
+   "family": "ic-binary",
+   "disposition": "exhausted_at_scale",
+   "title": "Linear algebra of the orbit-folded relation matrix (equivariant blocks, sparse filters, Wiedemann, CADO-style merge)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-prime-degree-algebraic-decomposition",
+   "family": "ic-binary",
+   "disposition": "open_blocked",
+   "title": "Bounded-degree algebraic decomposition (Weil-descended S_{m+1} on subspace bases) at prime extension degree: ECC2K-130, NIST K/B, sect571",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICB-quasi-subfield-polynomials",
+   "family": "ic-binary",
+   "disposition": "closed_obstructed",
+   "title": "Quasi-subfield-polynomial factor bases (Huang-Kosters-Petit-Yeo-Yun; Euler-Petit) at prime extension degree, ECC2K-130",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-retained-setup-online",
+   "family": "ic-binary",
+   "disposition": "closed_dominated",
+   "title": "Retained-setup online IC on Koblitz curves (n = 61, 71, 73, 83): online ratio after an uncharged precomputation",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICB-tau-horner-chain",
+   "family": "ic-binary",
+   "disposition": "open_next_step",
+   "title": "tau-Horner decomposition chain on Koblitz curves (R = tau^{m-1}P_1 + ... + P_m over one base)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-boolean-f4-f5-f6-engines",
+   "family": "ic-engine",
+   "disposition": "closed_dominated",
+   "title": "Faster Boolean F4 / F5 / F6-IC / inherited-F4 / matrix-F5 engines for the descended Semaev system",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-chained-semaev-dreg-vs-semiregular",
+   "family": "ic-engine",
+   "disposition": "open_next_step",
+   "title": "Degree of regularity of the Boolean chained Semaev system (m = 3, t = 3) against a semi-regular null",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-charged-toy-ic-exponent-vs-rho",
+   "family": "ic-engine",
+   "disposition": "open_blocked",
+   "title": "One fully charged toy-scale index-calculus exponent vs matched rho (GOAL-ICEX-001 / G7)",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICE-curve-presentation-invariance",
+   "family": "ic-engine",
+   "disposition": "open_next_step",
+   "title": "Does decomposition difficulty change across an isogeny class, curve model or special j (transport to an easier presentation)?",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICE-decomposition-probability-audit",
+   "family": "ic-engine",
+   "disposition": "open_next_step",
+   "title": "Decomposition probability P(decomp) vs factor-base size, charged p_solve, and learned decomposability predictors",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICE-descent-closure-degree-at-scale",
+   "family": "ic-engine",
+   "disposition": "open_blocked",
+   "title": "Does the MutantXL/F4 closure (refutation) degree of descended S_3/S_4 chains stay at 4 as l and n grow?",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICE-first-fall-degree-assumptions",
+   "family": "ic-engine",
+   "disposition": "open_blocked",
+   "title": "First-fall-degree / Assumption-1 arguments for subexponential binary ECDLP (Semaev 2015, Nagao, Petit-Quisquater)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICE-generic-oracle-arity-cost-floor",
+   "family": "ic-engine",
+   "disposition": "closed_obstructed",
+   "title": "Generic (enumerative / MITM / free) decomposition oracles cannot reach rho at any arity",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-gpu-rootfind-oracle",
+   "family": "ic-engine",
+   "disposition": "open_blocked",
+   "title": "CUDA root-finding 2-decomposition oracle (embarrassingly parallel target x factor-base cells)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-hybrid-guess-determine-l7",
+   "family": "ic-engine",
+   "disposition": "open_next_step",
+   "title": "One-variable specialisation priced as hybrid guess-and-determine on the l = 7 descent cells",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-linearization-excess-fb-prior",
+   "family": "ic-engine",
+   "disposition": "open_unexamined",
+   "title": "Linearization excess as a factor-base design prior inside descent cells",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-prime-field-semaev-solving-degree",
+   "family": "ic-engine",
+   "disposition": "closed_known",
+   "title": "Groebner solving degree / eliminants of prime-field S_3 / S_4 decomposition systems",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICE-relation-graph-rank-large-prime",
+   "family": "ic-engine",
+   "disposition": "open_next_step",
+   "title": "Relation-stage rank accounting, large-prime / cycle-basis enrichment and rank-aware collection",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICE-rootfind-pairtable-oracle",
+   "family": "ic-engine",
+   "disposition": "open_blocked",
+   "title": "Root-finding / pair-table decomposition oracle in place of a Groebner solve",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICE-sat-xor-pdp-oracle",
+   "family": "ic-engine",
+   "disposition": "open_next_step",
+   "title": "SAT / native-XOR (CryptoMiniSat, WDSat) point-decomposition oracle with honest pricing",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-semaev-chain-cost-model",
+   "family": "ic-engine",
+   "disposition": "closed_obstructed",
+   "title": "Chain length t, merge-tree topology and memory charging in Semaev's charged cost",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-semaev-cover-monodromy",
+   "family": "ic-engine",
+   "disposition": "closed_obstructed",
+   "title": "Semaev summation-cover monodromy / Frobenius cycle types as a relation-rate gate",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-semaev-yield-model-coset-typing",
+   "family": "ic-engine",
+   "disposition": "open_next_step",
+   "title": "Semaev yield model (eq. 11, the m! factor) and coset-typed / trace-parity factor bases",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICE-syzygy-cascade-signatures",
+   "family": "ic-engine",
+   "disposition": "open_next_step",
+   "title": "Exploiting the degree-born non-rewritable syzygy (F5 signature) cascade of Semaev systems",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-algebraic-membership-factor-base",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Factor bases with low-degree algebraic membership over F_p (subgroup, coset, Dickson, j=0 orbit, images of low-degree maps, character-constant sets)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICP-char0-lifting-xedni-smoothness",
+   "family": "ic-prime",
+   "disposition": "closed_known",
+   "title": "Lifting to characteristic zero - classical xedni, prescribed rational lifts (Cheon 2-isogeny form) and smoothness of integer lifts of x",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-coincidence-harvest-structured-base",
+   "family": "ic-prime",
+   "disposition": "open_next_step",
+   "title": "Harvesting x-key / pair-sum coincidences of structured bases (label-GAP, window, log-GAP) and escaping conservation by target preselection",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICP-construction-normal-form",
+   "family": "ic-prime",
+   "disposition": "open_unexamined",
+   "title": "Normal form and calibrated instruments for proposed prime-field attack systems (dedup, result classes, estimator bias, dynamic range)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-coppersmith-smallroot-semaev",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Small-root (Coppersmith / Jochemsz-May) decomposition with lattice-describable (window, AP, GAP) factor bases",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICP-digit-presentation-solving-degree",
+   "family": "ic-prime",
+   "disposition": "open_next_step",
+   "title": "Digit (base-B) presentation of prime-field Semaev systems as a Weil-descent analogue - first/last fall degree, staircase and representation tricks",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICP-extension-field-embedding",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Embedding E(F_p) into E(F_{p^n}) to buy a subfield factor base",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-full-width-arity-grid",
+   "family": "ic-prime",
+   "disposition": "open_blocked",
+   "title": "Full-width complete-solve IC arity grid (m = 2..8) at 50-63-bit subgroups - prime coset/small-x bases, Koblitz orbit and ordinary-binary bases",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICP-generic-table-decomposition",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Enumeration, subtraction and meet-in-the-middle pair-table decomposition for prime-field Semaev IC (arity 2 to 7)",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICP-gfp5-oa-sdhp-jv",
+   "family": "ic-prime",
+   "disposition": "open_next_step",
+   "title": "Joux-Vitse oracle-assisted static DH and (n-1)-point decomposition on E(F_{p^5}), p = 2^64 - 2^32 + 1",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICP-gfp5-odd-char-cover",
+   "family": "ic-prime",
+   "disposition": "open_blocked",
+   "title": "Odd-characteristic GHS/Diem cover applicability for EcGFp5, EcMasFp5 and their isogeny classes",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-gfp5-rho-reference-audit",
+   "family": "ic-prime",
+   "disposition": "closed_known",
+   "title": "Rho ruler and SafeCurves-style parameter audit for EcGFp5/EcMasFp5 (affine F_{p^5} rho cost, inversion paths, partition, multi-instance, interval kangaroo)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-gfp5-symmetrized-gaudry",
+   "family": "ic-prime",
+   "disposition": "open_next_step",
+   "title": "Symmetrization-aware Gaudry/Diem decomposition on EcGFp5/EcMasFp5 (n = 5) using rational 2-torsion ((Z/2)^4 x| S_5) and side dichotomy",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-icperf-binary-pdp-solver",
+   "family": "ic-prime",
+   "disposition": "open_next_step",
+   "title": "Solver choice for the Weil-descended binary PDP (WDSat/CDCL+XOR vs Groebner/F4/BRiAl, side-constrained cores) on the ICPERF boundary",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-icperf-writability-boundary",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Writability of the descended system - arity forced to m >= 4 and the ANF too large to write inside the rho budget below n ~ 300",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-isogeny-transported-relation-yield",
+   "family": "ic-prime",
+   "disposition": "open_blocked",
+   "title": "Isogeny-transported or volcano-level factor bases and the arity-3 relation oracle (crater vs floor)",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICP-lattice-ic-relation-construction",
+   "family": "ic-prime",
+   "disposition": "open_blocked",
+   "title": "Lattice index calculus - ideal/quaternion lattices, isogeny-adjoint witnesses and Newton-shift certificates as relation constructors on prime cyclic subgroups",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICP-pkm-tower-algebraic-oracle",
+   "family": "ic-prime",
+   "disposition": "open_blocked",
+   "title": "PKM tower and APS partitioned factor bases solved algebraically over F_p (summation-polynomial systems with low-degree auxiliary membership; first and last fall degree)",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICP-prime-ic-constant-engineering",
+   "family": "ic-prime",
+   "disposition": "open_next_step",
+   "title": "Constant-factor engineering of the prime-field IC pipeline (native arithmetic, batching, pair-table build, generator, LA filter, planner)",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICP-representation-subset-sum",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Representation technique (Howgrave-Graham-Joux style) on the base-B digit subset-sum form of ECDLP",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICP-residual-partial-relations",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Crediting residuals as partial relations (single/double large prime) in prime-field IC",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-ICP-retained-setup-online",
+   "family": "ic-prime",
+   "disposition": "closed_dominated",
+   "title": "Retained-setup online IC (compact orbit n61, dense K1798 root table n83, orbit-folded m = 2) as a per-target win",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-self-pairing-prime-order",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Nondegenerate self-pairings or bilinear maps on a prime-order E(F_p) subgroup",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-shared-coefficient-membership",
+   "family": "ic-prime",
+   "disposition": "open_unexamined",
+   "title": "Shared divisor-coefficient circuits for high-degree implicit factor-base membership",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-ICP-xedni-function-field-sections",
+   "family": "ic-prime",
+   "disposition": "closed_obstructed",
+   "title": "Function-field xedni - Mordell-Weil sections of elliptic surfaces over F_p(t) as a relation source",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-ICP-xline-symmetry-special-j",
+   "family": "ic-prime",
+   "disposition": "open_unexamined",
+   "title": "x-line symmetry groups, automorphism folding and summation-polynomial degeneration at special j",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-automorphism-quotient-rho",
+   "family": "structure",
+   "disposition": "closed_known",
+   "title": "Rho on E/Aut (negation, j=0 order-6, j=1728 order-4) and anything beyond sqrt(|Aut|)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-class-group-ecdlp-bridge",
+   "family": "structure",
+   "disposition": "open_next_step",
+   "title": "Reduction between Cl(O)-vectorization (or CM self-pairings) and ECDLP in the same class",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-class-representative-ic-selection",
+   "family": "structure",
+   "disposition": "open_next_step",
+   "title": "Choose the isogenous curve or isomorphic model that minimises charged index-calculus cost",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-curve-generation-provenance-seeds",
+   "family": "structure",
+   "disposition": "exhausted_at_scale",
+   "title": "Manipulated generation of standard curves (NIST P-curve seeds, Brainpool, BN, rigidity)",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-STR-endo-scalar-action-generic",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "Endomorphism-augmented generic and witness-lattice attacks on a prime-order subgroup",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-glv-gls-isogeny-loop-scalar-mult",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "GLV/GLS and isogeny-loop endomorphisms, neighbour-model routing (known-scalar multiplication)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-isogeny-class-generic-invariance",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "Generic (rho, BSGS) ECDLP cost across an isogeny class and across volcano levels",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-STR-isogeny-transport-preprocessing",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "Multi-target and preprocessing tables shared across an isogeny class",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-isogeny-walk-weak-neighbour",
+   "family": "structure",
+   "disposition": "closed_known",
+   "title": "Walk or construct isogenies from a deployed curve to find a weak neighbour",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-jmv-random-self-reduction",
+   "family": "structure",
+   "disposition": "closed_known",
+   "title": "Jao-Miller-Venkatesan isogeny-expander random self-reduction within a level",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-koblitz-volcano-descendants",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "Curves below a binary Koblitz curve in its volcano (ECC2K-130, K-163, K-283, m=37..83)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-p192-class-cm-relations",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "P-192 isogeny class, smooth principal CM relations and loops",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-safecurves-parameter-audit",
+   "family": "structure",
+   "disposition": "closed_known",
+   "title": "SafeCurves-style parameter audits (twist security, completeness, ladder, cofactor, transfer rows)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-STR-secp256k1-cm-class-audit",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "secp256k1 CM structure (D=-3, j=0, h=1) and its isogeny class",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-small-cm-disc-nonunit-endo",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "Small |D_0| or a cheap non-unit endomorphism beyond the automorphism constant",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-STR-special-j-ic-semaev",
+   "family": "structure",
+   "disposition": "open_next_step",
+   "title": "Special j (0, 1728, small height, Semaev degeneration locus) in Semaev and index-calculus systems",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-STR-torsion-module-leak",
+   "family": "structure",
+   "disposition": "closed_obstructed",
+   "title": "l-torsion (l != N) as a Galois/End module leaking k or attack cost",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-anomalous-padic-lift",
+   "family": "transfer",
+   "disposition": "closed_known",
+   "title": "Smart / Satoh-Araki / Semaev p-adic lift for anomalous (trace one) curves",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-TRF-cm-canonical-lift-heights",
+   "family": "transfer",
+   "disposition": "closed_obstructed",
+   "title": "Serre-Tate canonical lift with CM: does the CM order shrink the heights of lifted points enough for xedni to bite?",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-cover-catalog-jacobian-transfer",
+   "family": "transfer",
+   "disposition": "open_blocked",
+   "title": "Catalogued cover maps (1,940 prime quadratic pullbacks, 160 binary cubic pullbacks): executable pushforward and subgroup recovery",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-curve-parameter-transfer-audits",
+   "family": "transfer",
+   "disposition": "closed_known",
+   "title": "Transfer-safety audits of deployed curves: embedding degree, anomaly, twist, subfield/descent, seed provenance",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-TRF-function-field-xedni-lift",
+   "family": "transfer",
+   "disposition": "closed_obstructed",
+   "title": "Function-field xedni: lift relations to sections of elliptic surfaces y^2 = x^3 + a(t)x + b(t) over F_p(t)",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-ghs-binary-composite",
+   "family": "transfer",
+   "disposition": "closed_known",
+   "title": "GHS / generalized GHS Weil descent (with Galbraith-Hess-Smart isogeny walks) for curves over F_{2^N}, N composite",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-TRF-global-lift-small-height",
+   "family": "transfer",
+   "disposition": "closed_known",
+   "title": "Global lifts to E(Q) or E(K) with small canonical height (xedni, SNFS / cyclotomic / Solinas number fields, rational 2-torsion lifts)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-TRF-jv-nagao-genus2-cover-decomp",
+   "family": "transfer",
+   "disposition": "closed_dominated",
+   "title": "Nagao decomposition on a genus-2 cover of E(F_{p^6}) (examples/jv_cover.rs), with F4 and sparse-FGLM engineering",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-jv-sieve-fp6-weak-class",
+   "family": "transfer",
+   "disposition": "open_next_step",
+   "title": "Joux-Vitse cover-and-decomposition sieve on the weak class of E(F_{p^6}) (genus-3 cover), with the isogeny walk into the class",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-TRF-miller-cocycle-nonhom-transfer",
+   "family": "transfer",
+   "disposition": "open_unexamined",
+   "title": "Non-homomorphic transfers into F_p^* when the pairing is trivial: Miller-cocycle primitive U, zeta-defect, generalized Jacobians",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-mov-small-embedding-degree",
+   "family": "transfer",
+   "disposition": "closed_known",
+   "title": "MOV / Frey-Rueck pairing transfer of the ECDLP to F_{p^k}^* for small embedding degree k",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-odd-char-descent-smith-quartic",
+   "family": "transfer",
+   "disposition": "open_blocked",
+   "title": "Odd-characteristic Weil descent onto genus 3, then Smith's isogeny to a plane quartic and Diem's q^{4/3} attack",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-TRF-odd-prime-ghs-cover-floor",
+   "family": "transfer",
+   "disposition": "open_next_step",
+   "title": "Odd-characteristic GHS cover genus floors at prime extension degree and their isogeny-class reach",
+   "last_reviewed": "2026-10-30"
+  },
+  {
+   "id": "LEAD-TRF-one-point-self-pairing",
+   "family": "transfer",
+   "disposition": "closed_obstructed",
+   "title": "A non-degenerate self-pairing or distortion map computable from one point of the prime-order subgroup",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-padic-canonical-section",
+   "family": "transfer",
+   "disposition": "closed_obstructed",
+   "title": "Canonical point sections E(F_p) -> E(Q_p) and their p-adic digits on non-anomalous curves",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-TRF-pairing-target-field-recost",
+   "family": "transfer",
+   "disposition": "open_next_step",
+   "title": "Recompute the post-MOV target-field DLP cost (exTNFS in GF(p^12)) for BLS12-381 and BN254 with memory charged",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-prime-field-isogeny-to-weak",
+   "family": "transfer",
+   "disposition": "closed_obstructed",
+   "title": "Isogeny transfer of a prime-field ECDLP to a weaker curve (anomalous, low embedding degree, descent-friendly) in the same class",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-same-field-genus-g-embedding",
+   "family": "transfer",
+   "disposition": "closed_obstructed",
+   "title": "Embed E/F_p as an isogeny factor of a genus-g Jacobian over the same field (covers, quadric pencils, quartic/bielliptic models)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-TRF-second-torsion-direction",
+   "family": "transfer",
+   "disposition": "closed_obstructed",
+   "title": "Reach a second N-torsion direction: nonequivariant trace-zero transfer, Kani/Robert graph kernels, Richelot gluing of E with E'",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-small-genus-cover-general",
+   "family": "transfer",
+   "disposition": "closed_obstructed",
+   "title": "Find small-genus GHS/Kummer covers beyond the Joux-Vitse weak class (other configurations over F_{q^3}, F_{p^k} with k = 6, 10, 14)",
+   "last_reviewed": "2026-10-29"
+  },
+  {
+   "id": "LEAD-TRF-teske-secret-isogeny-trapdoor",
+   "family": "transfer",
+   "disposition": "open_next_step",
+   "title": "Teske-style trapdoor on ordinary prime-field curves: a secret isogeny to an endpoint with a non-invariant ECDLP weakness",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-teske-trapdoor-fp6-weak-class",
+   "family": "transfer",
+   "disposition": "open_unexamined",
+   "title": "Teske-style trapdoor over F_{p^6} built on the Joux-Vitse weak class",
+   "last_reviewed": "2026-10-24"
+  },
+  {
+   "id": "LEAD-TRF-weil-restriction-jacobian-class",
+   "family": "transfer",
+   "disposition": "open_next_step",
+   "title": "Genus-n Jacobians in the isogeny class of a Weil-restricted elliptic curve",
+   "last_reviewed": "2026-10-24"
+  }
+ ],
+ "tally": {
+  "exotic": {
+   "closed_obstructed": 6,
+   "open_next_step": 10,
+   "exhausted_at_scale": 2,
+   "open_blocked": 2
+  },
+  "generic": {
+   "open_next_step": 11,
+   "closed_known": 6,
+   "open_unexamined": 3,
+   "closed_obstructed": 3,
+   "open_blocked": 2,
+   "closed_dominated": 1
+  },
+  "ic-binary": {
+   "open_next_step": 11,
+   "closed_obstructed": 7,
+   "exhausted_at_scale": 3,
+   "open_blocked": 1,
+   "closed_dominated": 1
+  },
+  "ic-engine": {
+   "closed_dominated": 1,
+   "open_next_step": 8,
+   "open_blocked": 5,
+   "closed_obstructed": 3,
+   "open_unexamined": 1,
+   "closed_known": 1
+  },
+  "ic-prime": {
+   "closed_obstructed": 9,
+   "closed_known": 2,
+   "open_next_step": 6,
+   "open_unexamined": 3,
+   "open_blocked": 5,
+   "closed_dominated": 1
+  },
+  "structure": {
+   "closed_known": 4,
+   "open_next_step": 3,
+   "exhausted_at_scale": 1,
+   "closed_obstructed": 9
+  },
+  "transfer": {
+   "closed_known": 5,
+   "closed_obstructed": 8,
+   "open_blocked": 2,
+   "closed_dominated": 1,
+   "open_next_step": 5,
+   "open_unexamined": 2
+  }
+ }
+}

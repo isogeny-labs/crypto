@@ -1,0 +1,31 @@
+{
+  "schema": "research.software-check/v1",
+  "candidate": "kummer-pruned-explicit-masks-degree1-recovery",
+  "status": "fixed_fixture_gate_passed",
+  "exit_code": 0,
+  "cases": 84,
+  "successful_geometric_repairs": 84,
+  "exact_signed_recoveries": 84,
+  "generic_recovery": 80,
+  "new_degree1_recovery": 4,
+  "boundary_control_sets": 4,
+  "baseline_failure_packet": "/var/tmp/pencil-kummer-successful-repair-20261031",
+  "baseline_exit": 101,
+  "controls": [
+    "scaled inputs",
+    "zero input",
+    "zero neighbour",
+    "identity",
+    "wrong identity neighbour",
+    "ambiguous torsion anchor",
+    "invalid degree1 conic"
+  ],
+  "independent_source_review": "pending",
+  "scientific_execution": false,
+  "measured_cost_ratio": null,
+  "unexercised_branches": [
+    "singular C1 transform",
+    "degree1 nonsquare",
+    "valid boundary with no matching signed neighbour"
+  ]
+}

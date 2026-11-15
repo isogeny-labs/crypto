@@ -1,0 +1,176 @@
+\chapter{Extension fields: $k=4$ and the $D_4$ symmetry}\label{ch:extension}
+
+Over $\FF_{q^k}$ with a factor base of points whose abscissa lies in
+$\FF_q$, Gaudry's index calculus~\cite{gaudry2009} decomposes each target
+into $k$ summands by Weil restriction of $\Sem{k+1}$. It costs
+$\tilde O(q^{2-2/k})$, below rho's $q^{k/2}$ for $k\ge3$, but with a
+Gröbner constant that grows very fast in $k$. Faugère, Gaudry, Huot and
+Renault~\cite{fghr2014} show that on curves with rational 2-torsion the
+system has the larger symmetry group $D_k$, the Weyl group of type D, in
+a well-chosen coordinate. At $k=4$ this chapter reports how far that
+symmetry moves the measured gap to rho. Chapter~\ref{sec:prime}
+(\S\ref{sec:gaudry}) gives the odd-characteristic engineering in detail.
+
+\section{The $D_4$ system}
+
+On $E$ with rational 2-torsion point $T$, the coordinate
+$Y=(x-x_0-c)/(x-x_0+c)$ satisfies $Y(P+T)=-Y(P)$. In $Y$, $\Sem5$ is
+invariant under $D_4$, of order 192. Written in the invariants
+$\sigma_k=e_k(Y_i^2)$ and $\pi=\prod Y_i$, the system shrinks
+(Table~\ref{tab:extension-system}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+System & Bézout number & Macaulay degree & Matrix \\
+\midrule
+before invariants & 4{,}096 & 29 & $41{,}780\times40{,}920$ \\
+$D_4$ invariants & 512 & 14 & $13{,}412\times11{,}628$ \\
+\addlinespace
+Frobenius-reduced, char.~2 & & 11 & $384\times448$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Size of the $\Sem5$ decomposition system at $k=4$: before and
+after rewriting it in the $D_4$ invariants $\sigma_k,\pi$, and in the
+Frobenius-reduced form with weights $(2,2,1,1)$ in characteristic two
+(ladder step~5 of Table~\ref{tab:extension-ladder}; the source gives no
+Bézout number for it). Matrix: rows $\times$ columns of the Macaulay
+matrix. Sources: \art{research/gaudry_quartic_d4_20261013/},
+\art{research/gaudry_quartic_d4_char2_20261015/}.}
+\label{tab:extension-system}
+\end{table}
+
+Table~\ref{tab:extension-ladder} gives the engineering ladder, each step
+against the previous incumbent. At step~1 all 19 solved targets agree with
+an independent meet-in-the-middle enumeration; at step~3 all 648 of 648
+solves are exact. At step~4, double large primes cut the linear algebra to
+$0.827\times$ but regress the whole solve, to $1.025\times$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}X>{\raggedright}p{3.0cm}>{\raggedright\arraybackslash}p{5.2cm}@{}}
+\toprule
+& Step & Scope & Result \\
+\midrule
+1 & $D_4$ invariants & $p=269$ & $C_4=2.54\cdot10^{10}$ instead of
+  $1.21\cdot10^{12}$, a factor of $47.5$--$48.4$ \\
+2 & The $Y$-line on a complete ladder & $p=101$--$1033$ (21 curves) &
+  $0.0548$ $[0.048,0.061]$ of plain $\Sem4$, at the same exponent \\
+3 & Sparsest pivots, the weighted grading $\sigma_4=\pi^2$, and shape
+  replay & & $C_4$ falls to $6.89\cdot10^7$, by $369.8\times$
+  $[367.9,371.6]$; ecbench $S$ falls $398$--$406\times$ \\
+4 & First-dependency stop & & $0.979$ $[0.973,0.986]$ of the previous
+  step \\
+\addlinespace
+5 & A Frobenius-reduced form in characteristic two & $m=8$ & one
+  decomposition $481\times$ $[479,483]$ below the plain form \\
+\bottomrule
+\end{tabularx}
+\caption[]{The $k=4$ engineering ladder, each step against the previous
+incumbent. $C_4$: $\FF_p$ multiplications per decomposition. Result: the
+step's cost as the source states it, either a factor below the previous
+incumbent or a fraction of it. Sources:
+\art{research/gaudry_quartic_d4_20261013/} (step~1),
+\art{research/gaudry_quartic_d4_cost_20261014/} (step~3),
+\art{research/gaudry_quartic_d4_char2_20261015/} (step~5).}
+\label{tab:extension-ladder}
+\end{table}
+The $D_n$ symmetry is FGHR's~\cite{fghr2014}. Invariant rings in
+characteristic two, including even-power substitutions, were studied by
+Galbraith and Gebregiyorgis~\cite{galbraith2014}. Whether the
+Frobenius-reduced weighting is in that work has not been checked.
+
+\section{Distance to rho}
+
+\paragraph{Odd characteristic.} Over $\FF_{p^4}$, index calculus is still
+$1.39\cdot10^6\times$ rho at the measured sizes. The modelled handover
+moves from $2^{150}$ to about $2^{103}$--$2^{119}$, depending on the frame,
+but that is an extrapolation through a measured constant.
+
+\paragraph{Characteristic two.} Over $\FF_{(2^m)^4}$ the gap closes with
+size. IC over the negation-map rho model is:
+
+\smallskip
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+$m$ & 6 & 8 & 10 & 12 & 14 \\
+$\log_2 n$ & 24 & 32 & 40 & 48 & 56 \\
+\midrule
+IC / rho model & 5{,}080 & 648 & 80.6 & 49.7 & 6.06 \\
+IC / measured rho & 4{,}427 & 919 & 98.9 & 47.2 & 4.27 \\
+\bottomrule
+\end{tabular}
+\smallskip
+
+\noindent These are first targets; $m=14$ is a single target. The fitted
+slope is $-0.248$ in $\log_2 n$, which is Gaudry's $n^{-1/4}$. The
+extrapolated crossover was $n\approx2^{68}$, where rho takes about $2^{34}$
+steps, so it could be tested directly.
+
+\paragraph{The red-team verdict.} An adversarial review tested that
+crossover (\art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}). Its
+verdict: \textbf{not survived (unsupported), not refuted}.
+Table~\ref{tab:extension-redteam} lists its estimates. The only clean point
+is at $m=15$, with two targets per arm, so no interval is possible with
+$n=2$; the $m=17$ ratio came from a killed run and is not evidence. The rho
+reference survives: these are generic ordinary curves with
+$\operatorname{Aut}=\{\pm1\}$. Pricing partly survives. A prime-field
+cross-check agrees with the fitted exponents. The corrected crossover is
+at or above the edge of what was measured.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{2.3cm}>{\raggedright}X>{\raggedright}p{2.2cm}>{\raggedright\arraybackslash}p{4.6cm}@{}}
+\toprule
+Part & Quantity & Estimate & Range or note \\
+\midrule
+Data & IC/rho at $m=15$, recorded & $6.30$ & two targets per arm \\
+ & IC/rho at $m=15$, corrected & $5.2$ & $2.4$--$15.0$ over unit-price variants \\
+ & IC/rho at $m=17$ & $0.72$ & killed run; not evidence \\
+\addlinespace
+Rho reference (survives) & floor & $0.886$ & about 3.5\% generous to rho \\
+\addlinespace
+Pricing (partly survives) & ratio moved by the unit price & $0.64$--$0.89$ & plausible range $0.31$--$3.1$ \\
+ & ratio moved by unpriced rho work & about $0.93$ & \\
+\addlinespace
+Fitted exponents & IC relations & $1.07$ & $[1.01,1.13]$ \\
+ & IC linear algebra & $2.03$ & \\
+ & rho & $2.00$ & $[1.71,2.29]$ \\
+\addlinespace
+Corrected crossover & fall of IC/rho per unit of $m$ & about $2^{-0.93}$ & \\
+ & crossover $m^*$ & $\approx17.6$ & range $16.3$--$19.2$ \\
+\bottomrule
+\end{tabularx}
+\caption[]{The red team's estimates for $k=4$ over $\FF_{(2^m)^4}$, grouped
+by the part of the verdict they bear on. Estimate: the point value; Range:
+the interval or range the review gives, with what it runs over. The
+corrected IC/rho applies the corrections that favour index calculus.
+Exponents are of cost in $q=2^m$. Source:
+\art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}.}
+\label{tab:extension-redteam}
+\end{table}
+Linear algebra is 0.4\% of the cost at $m=15$. Basic Gaudry linear
+algebra grows as $q^2$, like rho, so the $n^{-1/4}$ trend lasts only while
+the relation phase dominates. Beyond that point double large primes are
+required.
+
+The red team froze a plan to settle the question: $m=14$--$17$, eight fresh
+targets per arm, a strong rho with batched inversion and charged
+canonicalisation, counted and hardware units, about 30\,h of wall time.
+It has not run. This is the cheapest experiment in the programme that
+could yield a measured crossover of index calculus below rho on an
+elliptic curve. It would be a crossover in a weak family:
+$\FF_{(2^m)^4}$ is not a field deployed curves use.
+
+\section{Other extension-field routes}
+
+\begin{itemize}
+\item \emph{Joux--Vitse $(n-1)$-decomposition.} The
+  $(n-1)$-decomposition~\cite{jouxvitse2012} at $n=5$ over $E(\FF_{p^5})$
+  completed verified logarithms at $4.5\cdot10^7$--$1.8\cdot10^8\times$ rho,
+  with a crossover extrapolated to groups near $2^{291}$
+  (\art{research/joux_vitse_n1_20261015/}).
+\item \emph{Joux--Vitse cover.} The cover of $E(\FF_{p^6})$ is in
+  Chapter~\ref{sec:transfer}.
+\end{itemize}

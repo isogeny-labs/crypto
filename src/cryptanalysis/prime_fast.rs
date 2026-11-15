@@ -301,6 +301,75 @@ pub fn inv_mod_u64(a: u64, p: u64) -> u64 {
     }
 }
 
+/// `a·b mod m` for a fixed modulus, with the value of
+/// `((a as u128 * b as u128) % m as u128) as u64` for every input.
+///
+/// For an odd `m < 2^63` and reduced operands the product goes through two
+/// Montgomery reductions (`a·b·R⁻¹`, then `·R²·R⁻¹`), which return the
+/// canonical remainder in `[0, m)` — the same value the 128-bit `%`
+/// (`__umodti3`, a library call) returns, without a division.  Anything
+/// else (even modulus, `m ≥ 2^63`, unreduced operand) takes the 128-bit
+/// path unchanged, so no input changes its result.  Replay class WALL:
+/// callers that swap their `u128 %` for this keep every value and every
+/// counted unit (assessment 2026-11-10, R1/R2).
+#[derive(Clone, Copy, Debug)]
+pub struct MulModN {
+    pub m: u64,
+    /// `−m⁻¹ mod 2^64` (0 when the Montgomery path is off).
+    n_inv: u64,
+    /// `2^128 mod m`.
+    r2: u64,
+    mont: bool,
+}
+
+impl MulModN {
+    pub fn new(m: u64) -> Self {
+        let mont = m & 1 == 1 && m > 1 && m < (1u64 << 63);
+        if !mont {
+            return MulModN {
+                m,
+                n_inv: 0,
+                r2: 0,
+                mont,
+            };
+        }
+        let mut inv: u64 = 1;
+        for _ in 0..6 {
+            inv = inv.wrapping_mul(2u64.wrapping_sub(m.wrapping_mul(inv)));
+        }
+        let r = ((1u128 << 64) % m as u128) as u64;
+        let r2 = ((r as u128 * r as u128) % m as u128) as u64;
+        MulModN {
+            m,
+            n_inv: inv.wrapping_neg(),
+            r2,
+            mont,
+        }
+    }
+
+    /// Montgomery reduction of `t < m·2^64`: `t·2^-64 mod m` in `[0, m)`.
+    #[inline(always)]
+    fn redc(&self, t: u128) -> u64 {
+        let q = (t as u64).wrapping_mul(self.n_inv);
+        // t + q·m < 2m·2^64 ≤ 2^128 for m < 2^63, and the quotient by 2^64
+        // is below 2m, so one conditional subtraction makes it canonical.
+        let u = ((t + q as u128 * self.m as u128) >> 64) as u64;
+        // A select, not a branch: on field data the comparison is a coin
+        // flip a branch predictor cannot learn.
+        let (d, borrow) = u.overflowing_sub(self.m);
+        std::hint::select_unpredictable(borrow, u, d)
+    }
+
+    #[inline(always)]
+    pub fn mul(&self, a: u64, b: u64) -> u64 {
+        if self.mont && a < self.m && b < self.m {
+            self.redc(self.redc(a as u128 * b as u128) as u128 * self.r2 as u128)
+        } else {
+            ((a as u128 * b as u128) % self.m as u128) as u64
+        }
+    }
+}
+
 #[inline(always)]
 fn add_mod(a: u64, b: u64, n: u64) -> u64 {
     let s = a + b;
@@ -454,6 +523,14 @@ impl FastCurve {
         let x3 = f.sub(f.sub(f.sqr(lam), p1.x), p2.x);
         let y3 = f.sub(f.mul(lam, f.sub(p1.x, x3)), p1.y);
         Pt { x: x3, y: y3 }
+    }
+
+    /// Montgomery x of `p1 + p2` for `x1 != x2` given `inv_dx = 1 / (x2 - x1)`; skips the y coordinate.
+    #[inline]
+    pub fn add_x_with_inv(&self, p1: Pt, p2: Pt, inv_dx: u64) -> u64 {
+        let f = &self.f;
+        let lam = f.mul(f.sub(p2.y, p1.y), inv_dx);
+        f.sub(f.sub(f.sqr(lam), p1.x), p2.x)
     }
 
     #[inline]
@@ -1109,13 +1186,21 @@ impl FastFactorBase {
 }
 
 /// Meet-in-the-middle table for 3-decompositions: every
-/// `x(F_j + F_k)` (`j ≤ k`) and `x(F_j − F_k)` (`j < k`), sorted by
-/// canonical x.  `B²` entries of 16 bytes.
+/// `x(F_j + F_k)` (`j ≤ k`) and `x(F_j − F_k)` (`j < k`), bucketed by the
+/// high bits of the canonical x (entries inside a bucket are unordered).  `B²` entries of 16 bytes.
 #[derive(Clone, Debug)]
 pub struct PairTable {
     /// `(x_canonical, j, k_with_sign)`; the top bit of the third field
     /// is set for a difference `F_j − F_k`.
     entries: Vec<(u64, u32, u32)>,
+    /// Bucket index over the high bits of x: bucket `b` holds `entries[starts[b]..starts[b + 1]]`,
+    /// the buckets are monotone in x; entries inside a bucket are in construction order.
+    starts: Vec<u32>,
+    shift: u32,
+    /// Largest canonical x in the table (0 when empty).
+    max_x: u64,
+    /// Legacy layout (one bucket, globally sorted, binary-search lookup); `IC_PAIR_SORTED=1`.
+    sorted: bool,
 }
 
 const PAIR_DIFF_BIT: u32 = 1 << 31;
@@ -1124,6 +1209,7 @@ impl PairTable {
     pub fn build(curve: &FastCurve, fb: &FastFactorBase) -> Self {
         let f = curve.f;
         let b = fb.len();
+        let t_build = Instant::now();
         let mut entries = Vec::with_capacity(b * b);
         let mut d = Vec::with_capacity(b);
         let mut scratch = Vec::with_capacity(b);
@@ -1141,14 +1227,62 @@ impl PairTable {
             for (idx, k) in ((j + 1)..b).enumerate() {
                 let fk = fb.pts[k];
                 let inv = d[idx];
-                let sum = curve.add_with_inv(fj, fk, inv);
-                let diff = curve.add_with_inv(fj, curve.neg(fk), inv);
-                entries.push((f.from_mont(sum.x), j as u32, k as u32));
-                entries.push((f.from_mont(diff.x), j as u32, k as u32 | PAIR_DIFF_BIT));
+                let sum_x = curve.add_x_with_inv(fj, fk, inv);
+                let diff_x = curve.add_x_with_inv(fj, curve.neg(fk), inv);
+                entries.push((f.from_mont(sum_x), j as u32, k as u32));
+                entries.push((f.from_mont(diff_x), j as u32, k as u32 | PAIR_DIFF_BIT));
             }
         }
-        entries.sort_unstable();
-        PairTable { entries }
+        let add_ms = t_build.elapsed().as_secs_f64() * 1e3;
+        let t_sort = Instant::now();
+        if std::env::var_os("IC_PAIR_SORTED").is_some() {
+            entries.sort_unstable();
+            let max_x = entries.last().map(|e| e.0).unwrap_or(0);
+            let len = entries.len() as u32;
+            return PairTable {
+                entries,
+                starts: vec![0, len],
+                shift: 63,
+                max_x,
+                sorted: true,
+            };
+        }
+        // Counting sort over the high bits of x (monotone buckets), then a tiny sort inside each bucket.
+        let bits_p = 64 - (f.p.max(2) - 1).leading_zeros();
+        let target_bits = (usize::BITS - 1 - (entries.len().max(32) / 2).leading_zeros()).max(4);
+        let shift = bits_p.saturating_sub(target_bits);
+        let nb = (((f.p.max(2) - 1) >> shift) + 1) as usize;
+        let mut starts = vec![0u32; nb + 1];
+        for e in &entries {
+            starts[((e.0 >> shift) as usize) + 1] += 1;
+        }
+        for i in 0..nb {
+            starts[i + 1] += starts[i];
+        }
+        let mut cursor: Vec<u32> = starts[..nb].to_vec();
+        let mut sorted: Vec<(u64, u32, u32)> = vec![(0, 0, 0); entries.len()];
+        for e in &entries {
+            let b = (e.0 >> shift) as usize;
+            sorted[cursor[b] as usize] = *e;
+            cursor[b] += 1;
+        }
+        let max_x = entries.iter().map(|e| e.0).max().unwrap_or(0);
+        let entries = sorted;
+        if std::env::var_os("IC_MULTI_TIMING").is_some() {
+            eprintln!(
+                "pair table: {} entries, adds {:.1} ms, sort {:.1} ms",
+                entries.len(),
+                add_ms,
+                t_sort.elapsed().as_secs_f64() * 1e3
+            );
+        }
+        PairTable {
+            entries,
+            starts,
+            shift,
+            max_x,
+            sorted: false,
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -1161,13 +1295,27 @@ impl PairTable {
 
     /// All `(j, k, sigma)` with `x(F_j + sigma·F_k) == x`.
     #[inline]
-    pub fn lookup(&self, x: u64) -> &[(u64, u32, u32)] {
-        let lo = self.entries.partition_point(|e| e.0 < x);
-        let mut hi = lo;
-        while hi < self.entries.len() && self.entries[hi].0 == x {
-            hi += 1;
+    pub fn lookup(&self, x: u64) -> impl Iterator<Item = &(u64, u32, u32)> {
+        let b = (x >> self.shift) as usize;
+        let mut bucket: &[(u64, u32, u32)] = if b + 1 >= self.starts.len() {
+            &[]
+        } else {
+            &self.entries[self.starts[b] as usize..self.starts[b + 1] as usize]
+        };
+        if self.sorted {
+            let lo = bucket.partition_point(|e| e.0 < x);
+            let mut hi = lo;
+            while hi < bucket.len() && bucket[hi].0 == x {
+                hi += 1;
+            }
+            bucket = &bucket[lo..hi];
         }
-        &self.entries[lo..hi]
+        bucket.iter().filter(move |e| e.0 == x)
+    }
+
+    /// Largest canonical x in the table (0 when empty).
+    pub fn max_x(&self) -> u64 {
+        self.max_x
     }
 }
 
@@ -1294,7 +1442,7 @@ pub fn collect_relations(
                     }
                 }
                 if let Some(pairs) = pairs {
-                    if xc <= pairs.entries.last().map(|e| e.0).unwrap_or(0) {
+                    if xc <= pairs.max_x() {
                         for &(_, j, k_raw) in pairs.lookup(xc) {
                             if (j as usize) < i {
                                 continue;
@@ -1316,6 +1464,111 @@ pub fn collect_relations(
             }
         }
         let mut productive = false;
+        for entries in found {
+            let merged = merge_entries(entries);
+            if merged.is_empty() || !seen.insert(merged.clone()) {
+                continue;
+            }
+            if !relation_holds(curve, fb, r, &merged) {
+                stats.rejected += 1;
+                continue;
+            }
+            match merged.len() {
+                1 => stats.rows_one += 1,
+                2 => stats.rows_two += 1,
+                _ => stats.rows_three += 1,
+            }
+            rels.push(FastRelation {
+                a,
+                b,
+                entries: merged,
+            });
+            productive = true;
+            if rels.len() >= needed {
+                break;
+            }
+        }
+        if productive {
+            let (na, nb, nr) = fresh(&mut rng);
+            a = na;
+            b = nb;
+            r = nr;
+        } else {
+            match curve.add(Some(r), Some(g)) {
+                Some(nr) => {
+                    r = nr;
+                    a = add_mod(a, 1, n);
+                }
+                None => {
+                    let (na, nb, nr) = fresh(&mut rng);
+                    a = na;
+                    b = nb;
+                    r = nr;
+                }
+            }
+        }
+    }
+    stats.relations = rels.len();
+    (rels, stats)
+}
+
+/// Table-lookup 2-decomposition: like [`collect_relations`] but, instead of subtracting every
+/// factor-base element from `R` (O(fb) work per target), looks `x(R)` up in the pair table of
+/// `x(F_j ± F_k)` (plus the factor base itself for 1-term rows), O(1) per target.  The decomposable
+/// set is the same as the 2-decomposition sweep's (`R = ±F_j ± F_k`), found in the same walk
+/// (`R ← R + G`, fresh `(a, b)` after a productive target); relations are verified in the group.
+/// Experimental (`ic_solve_table`); the existing paths are unchanged.
+pub fn collect_relations_table(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb: &FastFactorBase,
+    pairs: &PairTable,
+    needed: usize,
+    max_targets: u64,
+    seed: u64,
+) -> (Vec<FastRelation>, CollectStats) {
+    let f = curve.f;
+    let n = curve.n;
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
+    let mut stats = CollectStats::default();
+    let max_pair_x = pairs.max_x();
+
+    let fresh = |rng: &mut StdRng| -> (u64, u64, Pt) {
+        loop {
+            let a = rng.gen_range(1..n);
+            let b = rng.gen_range(1..n);
+            if let Some(r) = curve.combine(g, q, a, b) {
+                return (a, b, r);
+            }
+        }
+    };
+    let (mut a, mut b, mut r) = fresh(&mut rng);
+
+    while rels.len() < needed && stats.targets < max_targets {
+        stats.targets += 1;
+        let xc = f.from_mont(r.x);
+        let mut found: Vec<Vec<(u32, i8)>> = Vec::new();
+        if let Some(j) = fb.lookup(xc) {
+            let s = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+            found.push(vec![(j as u32, s)]);
+        }
+        if xc <= max_pair_x {
+            for &(_, j, k_raw) in pairs.lookup(xc) {
+                let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                let fk = fb.pts[k];
+                let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                    continue;
+                };
+                let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                found.push(vec![(j, tau), (k as u32, tau * sigma)]);
+            }
+        }
+        let mut productive = false;
+        let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
         for entries in found {
             let merged = merge_entries(entries);
             if merged.is_empty() || !seen.insert(merged.clone()) {
@@ -1512,6 +1765,515 @@ pub fn ic_solve(
     ))
 }
 
+/// Solve for the discrete logs of the factor-base points to base `G` from relations `sum s_j x_j = a + b`
+/// (every relation collected against `Q = G`, so `R = (a + b) G`).  Returns `Some(x_j)` only for columns
+/// whose value is determined (pivot column with no free column in its reduced row).
+pub fn solve_fb_logs(curve: &FastCurve, m: usize, rels: &[FastRelation]) -> Vec<Option<u64>> {
+    let fnum = curve.scalar_field();
+    let n = curve.n;
+    let mut rows: Vec<Vec<u64>> = Vec::with_capacity(rels.len());
+    let mut rhs: Vec<u64> = Vec::with_capacity(rels.len());
+    for rel in rels {
+        let mut row = vec![0u64; m];
+        for &(j, sg) in &rel.entries {
+            let v = if sg < 0 {
+                neg_mod(sg.unsigned_abs() as u64 % n, n)
+            } else {
+                sg as u64 % n
+            };
+            row[j as usize] = fnum.to_mont(v);
+        }
+        rows.push(row);
+        rhs.push(fnum.to_mont(add_mod(rel.a % n, rel.b % n, n)));
+    }
+    let nrows = rows.len();
+    let mut pivot_of_col = vec![usize::MAX; m];
+    let mut row = 0usize;
+    for col in 0..m {
+        if row >= nrows {
+            break;
+        }
+        let Some(piv) = (row..nrows).find(|&r| rows[r][col] != 0) else {
+            continue;
+        };
+        rows.swap(row, piv);
+        rhs.swap(row, piv);
+        let inv = fnum.inv(rows[row][col]);
+        for c in 0..m {
+            rows[row][c] = fnum.mul(rows[row][c], inv);
+        }
+        rhs[row] = fnum.mul(rhs[row], inv);
+        let (pv, pr) = (rows[row].clone(), rhs[row]);
+        for r in 0..nrows {
+            if r == row || rows[r][col] == 0 {
+                continue;
+            }
+            let factor = rows[r][col];
+            for c in col..m {
+                if pv[c] != 0 {
+                    rows[r][c] = fnum.sub(rows[r][c], fnum.mul(factor, pv[c]));
+                }
+            }
+            rhs[r] = fnum.sub(rhs[r], fnum.mul(factor, pr));
+        }
+        pivot_of_col[col] = row;
+        row += 1;
+    }
+    (0..m)
+        .map(|c| {
+            let r = pivot_of_col[c];
+            if r == usize::MAX {
+                return None;
+            }
+            let free = (0..m).any(|c2| c2 != c && rows[r][c2] != 0);
+            if free {
+                None
+            } else {
+                Some(fnum.from_mont(rhs[r]))
+            }
+        })
+        .collect()
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct MultiReport {
+    pub setup_ms: f64,
+    pub per_target_ms: Vec<f64>,
+    pub total_ms: f64,
+    pub factor_base_size: usize,
+    pub determined_logs: usize,
+    pub targets_walked: Vec<u64>,
+}
+
+/// Relation collection against `Q = G` for the shared factor-base solve, with `lanes` walkers advanced in
+/// lock-step (one batched inversion per round) and the pair-table lookup of [`collect_relations_table`].
+/// Relations are returned as `a = a_eff, b = 0` (so `R = a G`).
+fn collect_setup_batched(
+    curve: &FastCurve,
+    g: Pt,
+    fb: &FastFactorBase,
+    pairs: &PairTable,
+    needed: usize,
+    lanes: usize,
+    seed: u64,
+) -> Vec<FastRelation> {
+    let n = curve.n;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x5E70_BA7C);
+    let max_pair_x = pairs.max_x();
+    let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
+    let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
+    let fresh = |rng: &mut StdRng| -> (u64, Pt) {
+        loop {
+            let a = rng.gen_range(1..n);
+            if let Some(r) = curve.mul(Some(g), a) {
+                return (a, r);
+            }
+        }
+    };
+    let mut a_l: Vec<u64> = Vec::with_capacity(lanes);
+    let mut cur: Vec<Option<Pt>> = Vec::with_capacity(lanes);
+    for _ in 0..lanes {
+        let (a, r) = fresh(&mut rng);
+        a_l.push(a);
+        cur.push(Some(r));
+    }
+    let gv: Vec<Option<Pt>> = vec![Some(g); lanes];
+    let mut scratch = BatchAddScratch::default();
+    let mut guard = 0u64;
+    while rels.len() < needed && guard < 50_000_000 {
+        guard += 1;
+        for l in 0..lanes {
+            let Some(r) = cur[l] else {
+                let (a, nr) = fresh(&mut rng);
+                a_l[l] = add_mod(a, 1, n);
+                cur[l] = Some(nr);
+                continue;
+            };
+            let xc = curve.f.from_mont(r.x);
+            let mut cands: Vec<Vec<(u32, i8)>> = Vec::new();
+            if let Some(j) = fb.lookup(xc) {
+                let sg = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+                cands.push(vec![(j as u32, sg)]);
+            }
+            if xc <= max_pair_x {
+                for &(_, j, k_raw) in pairs.lookup(xc) {
+                    let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                    let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                    let fk = fb.pts[k];
+                    let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                    let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                        continue;
+                    };
+                    let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                    cands.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                }
+            }
+            let mut productive = false;
+            for entries in cands {
+                let merged = merge_entries(entries);
+                if merged.is_empty() || !seen.insert(merged.clone()) {
+                    continue;
+                }
+                if !relation_holds(curve, fb, r, &merged) {
+                    continue;
+                }
+                rels.push(FastRelation {
+                    a: a_l[l],
+                    b: 0,
+                    entries: merged,
+                });
+                productive = true;
+                if rels.len() >= needed {
+                    break;
+                }
+            }
+            if productive {
+                // restart this lane at a fresh point, pre-shifted by -G so the batched step below lands on it
+                let (a, nr) = fresh(&mut rng);
+                a_l[l] = a;
+                cur[l] = Some(nr);
+            }
+            a_l[l] = add_mod(a_l[l], 1, n);
+        }
+        curve.add_many_batched(&mut cur, &gv, &mut scratch);
+    }
+    rels
+}
+
+/// Same as [`ic_multi_solve_ex`] without the batched per-target phase.
+pub fn ic_multi_solve(
+    curve: &FastCurve,
+    g: Pt,
+    qs: &[Pt],
+    fb_size: usize,
+    extra_relations: usize,
+    max_walk: u64,
+    seed: u64,
+    table: bool,
+) -> Option<(Vec<Option<u64>>, MultiReport)> {
+    ic_multi_solve_ex(
+        curve,
+        g,
+        qs,
+        fb_size,
+        extra_relations,
+        max_walk,
+        seed,
+        table,
+        false,
+    )
+}
+
+/// Multi-target index calculus: one shared factor-base log solve (relations against `G`), then per target
+/// one relation `aG + bQ_t = sum s_j F_j` (3-term decompositions) gives `log Q_t = (sum s_j x_j - a)/b`.
+/// Every returned log is verified `k G == Q_t`; `None` entries failed (no relation within `max_walk`
+/// points, an undetermined factor-base log, or b = 0).
+pub fn ic_multi_solve_ex(
+    curve: &FastCurve,
+    g: Pt,
+    qs: &[Pt],
+    fb_size: usize,
+    extra_relations: usize,
+    max_walk: u64,
+    seed: u64,
+    table: bool,
+    batched: bool,
+) -> Option<(Vec<Option<u64>>, MultiReport)> {
+    let t0 = Instant::now();
+    let fb = FastFactorBase::build(curve, fb_size);
+    if fb.is_empty() {
+        return None;
+    }
+    let t_pt = Instant::now();
+    let pairs = PairTable::build(curve, &fb);
+    let pair_ms = t_pt.elapsed().as_secs_f64() * 1e3;
+    let needed = fb.len() + extra_relations;
+    let collect = |q: Pt, need: usize, maxw: u64, sd: u64| {
+        if table {
+            collect_relations_table(curve, g, q, &fb, &pairs, need, maxw, sd)
+        } else {
+            collect_relations(curve, g, q, &fb, Some(&pairs), need, maxw, sd)
+        }
+    };
+    let t_col = Instant::now();
+    let (rels, _) = if table && batched {
+        (
+            collect_setup_batched(curve, g, &fb, &pairs, needed, 256, seed),
+            CollectStats::default(),
+        )
+    } else {
+        collect(g, needed, u64::MAX, seed)
+    };
+    let col_ms = t_col.elapsed().as_secs_f64() * 1e3;
+    if rels.len() < needed {
+        return None;
+    }
+    let t_sol = Instant::now();
+    let logs = solve_fb_logs(curve, fb.len(), &rels);
+    if std::env::var_os("IC_MULTI_TIMING").is_some() {
+        eprintln!(
+            "multi setup: fb {} pair_table {:.1} ms collect {:.1} ms solve {:.1} ms",
+            fb.len(),
+            pair_ms,
+            col_ms,
+            t_sol.elapsed().as_secs_f64() * 1e3
+        );
+    }
+    let determined = logs.iter().filter(|l| l.is_some()).count();
+    let setup_ms = t0.elapsed().as_secs_f64() * 1e3;
+    let fnum = curve.scalar_field();
+    let n = curve.n;
+    if table && batched {
+        // All targets walk in lock-step: one batched inversion per round advances every active R_t <- R_t + G;
+        // each point is looked up in the pair table (O(1)); a relation using only determined logs retires the lane.
+        let m = qs.len();
+        let mut rng = StdRng::seed_from_u64(seed ^ 0xBA7C_4ED0);
+        let max_pair_x = pairs.max_x();
+        let mut ab: Vec<(u64, u64)> = vec![(0, 0); m];
+        let mut cur: Vec<Option<Pt>> = Vec::with_capacity(m);
+        let fresh = |rng: &mut StdRng, q: Pt| -> (u64, u64, Pt) {
+            loop {
+                let a = rng.gen_range(1..n);
+                let b = rng.gen_range(1..n);
+                if let Some(r) = curve.combine(g, q, a, b) {
+                    return (a, b, r);
+                }
+            }
+        };
+        for (t, &q) in qs.iter().enumerate() {
+            let (a, b, r) = fresh(&mut rng, q);
+            ab[t] = (a, b);
+            cur.push(Some(r));
+        }
+        let mut res: Vec<Option<u64>> = vec![None; m];
+        let mut act: Vec<usize> = (0..m).collect();
+        let mut scratch = BatchAddScratch::default();
+        let mut walked = vec![0u64; m];
+        let mut round = 0u64;
+        while !act.is_empty() && round < max_walk {
+            round += 1;
+            let mut act2: Vec<usize> = Vec::with_capacity(act.len());
+            let mut cur2: Vec<Option<Pt>> = Vec::with_capacity(act.len());
+            for (pos, &t) in act.iter().enumerate() {
+                walked[t] += 1;
+                let (a, b) = ab[t];
+                let Some(r) = cur[pos] else {
+                    let (na, nb, nr) = fresh(&mut rng, qs[t]);
+                    ab[t] = (add_mod(na, 1, n), nb);
+                    act2.push(t);
+                    cur2.push(Some(nr));
+                    continue;
+                };
+                let xc = curve.f.from_mont(r.x);
+                let mut cands: Vec<Vec<(u32, i8)>> = Vec::new();
+                if let Some(j) = fb.lookup(xc) {
+                    let sg = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+                    cands.push(vec![(j as u32, sg)]);
+                }
+                if xc <= max_pair_x {
+                    for &(_, j, k_raw) in pairs.lookup(xc) {
+                        let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                        let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                        let fk = fb.pts[k];
+                        let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                        let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                            continue;
+                        };
+                        let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                        cands.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                    }
+                }
+                let mut done = false;
+                let mut restart = false;
+                for entries in cands {
+                    let merged = merge_entries(entries);
+                    if merged.is_empty() || !relation_holds(curve, &fb, r, &merged) {
+                        continue;
+                    }
+                    let usable =
+                        b % n != 0 && merged.iter().all(|&(j, _)| logs[j as usize].is_some());
+                    if !usable {
+                        restart = true;
+                        continue;
+                    }
+                    let mut sum = 0u64;
+                    for &(j, sg) in &merged {
+                        let x = logs[j as usize].unwrap() % n;
+                        let term = if sg < 0 { neg_mod(x, n) } else { x };
+                        let term = fnum.from_mont(fnum.mul(
+                            fnum.to_mont(term),
+                            fnum.to_mont((sg.unsigned_abs() as u64) % n),
+                        ));
+                        sum = add_mod(sum, term, n);
+                    }
+                    let num = add_mod(sum, neg_mod(a % n, n), n);
+                    let k = ((num as u128 * inv_mod_u64(b % n, n) as u128) % n as u128) as u64;
+                    if curve.mul(Some(g), k) == Some(qs[t]) {
+                        res[t] = Some(k);
+                        done = true;
+                        break;
+                    }
+                    restart = true;
+                }
+                if done {
+                    continue;
+                }
+                if restart {
+                    let (na, nb, nr) = fresh(&mut rng, qs[t]);
+                    ab[t] = (add_mod(na, 1, n), nb);
+                    act2.push(t);
+                    cur2.push(Some(nr));
+                } else {
+                    ab[t].0 = add_mod(a, 1, n);
+                    act2.push(t);
+                    cur2.push(Some(r));
+                }
+            }
+            // every lane in act2 now holds R = a*G + b*Q - G... i.e. a has been incremented to match R + G below
+            let gv: Vec<Option<Pt>> = vec![Some(g); cur2.len()];
+            curve.add_many_batched(&mut cur2, &gv, &mut scratch);
+            act = act2;
+            cur = cur2;
+        }
+        let total_ms = t0.elapsed().as_secs_f64() * 1e3;
+        let m_f = m.max(1) as f64;
+        return Some((
+            res,
+            MultiReport {
+                setup_ms,
+                per_target_ms: vec![(total_ms - setup_ms) / m_f; m],
+                total_ms,
+                factor_base_size: fb.len(),
+                determined_logs: determined,
+                targets_walked: walked,
+            },
+        ));
+    }
+    let mut out = Vec::with_capacity(qs.len());
+    let mut per = Vec::with_capacity(qs.len());
+    let mut walked = Vec::with_capacity(qs.len());
+    for (t, &q) in qs.iter().enumerate() {
+        let tt = Instant::now();
+        let mut rs: Vec<FastRelation> = Vec::new();
+        let mut st = CollectStats::default();
+        for attempt in 0..32u64 {
+            let (r1, s1) = collect(
+                q,
+                1,
+                max_walk,
+                seed ^ (0x9E37_79B9 + t as u64 * 7919 + attempt * 104_729),
+            );
+            st.targets += s1.targets;
+            let usable = r1.first().is_some_and(|r| {
+                r.b % n != 0 && r.entries.iter().all(|&(j, _)| logs[j as usize].is_some())
+            });
+            if usable {
+                rs = r1;
+                break;
+            }
+        }
+        walked.push(st.targets);
+        let mut res = None;
+        if let Some(rel) = rs.first() {
+            let mut acc: Option<u64> = Some(0);
+            for &(j, sg) in &rel.entries {
+                match (acc, logs[j as usize]) {
+                    (Some(a0), Some(x)) => {
+                        let term = if sg < 0 {
+                            neg_mod(x.wrapping_mul(1) % n, n)
+                        } else {
+                            x % n
+                        };
+                        let term = fnum.from_mont(fnum.mul(
+                            fnum.to_mont(term),
+                            fnum.to_mont((sg.unsigned_abs() as u64) % n),
+                        ));
+                        acc = Some(add_mod(a0, term, n));
+                    }
+                    _ => acc = None,
+                }
+            }
+            if let (Some(sum), true) = (acc, rel.b % n != 0) {
+                let num = add_mod(sum, neg_mod(rel.a % n, n), n);
+                let k = ((num as u128 * inv_mod_u64(rel.b % n, n) as u128) % n as u128) as u64;
+                if curve.mul(Some(g), k) == Some(q) {
+                    res = Some(k);
+                }
+            }
+        }
+        per.push(tt.elapsed().as_secs_f64() * 1e3);
+        out.push(res);
+    }
+    Some((
+        out,
+        MultiReport {
+            setup_ms,
+            per_target_ms: per,
+            total_ms: t0.elapsed().as_secs_f64() * 1e3,
+            factor_base_size: fb.len(),
+            determined_logs: determined,
+            targets_walked: walked,
+        },
+    ))
+}
+
+/// End-to-end index calculus with the table-lookup collector ([`collect_relations_table`]): factor
+/// base → pair table → relations → linear algebra → group verification.  Same report and the same
+/// fail-closed verification as [`ic_solve`].  Experimental.
+pub fn ic_solve_table(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb_size: usize,
+    extra_relations: usize,
+    max_targets: u64,
+    seed: u64,
+) -> Option<(u64, IcReport)> {
+    let t0 = Instant::now();
+    let fb = FastFactorBase::build(curve, fb_size);
+    let factor_base_ms = t0.elapsed().as_secs_f64() * 1e3;
+    if fb.is_empty() {
+        return None;
+    }
+    let t1 = Instant::now();
+    let pairs = PairTable::build(curve, &fb);
+    let pair_table_ms = t1.elapsed().as_secs_f64() * 1e3;
+    let needed = fb.len() + extra_relations;
+    let t2 = Instant::now();
+    let (rels, stats) =
+        collect_relations_table(curve, g, q, &fb, &pairs, needed, max_targets, seed);
+    let relations_ms = t2.elapsed().as_secs_f64() * 1e3;
+    if rels.len() < needed {
+        return None;
+    }
+    let t3 = Instant::now();
+    let x = solve_relations(curve, fb.len(), &rels)?;
+    let linear_algebra_ms = t3.elapsed().as_secs_f64() * 1e3;
+    let t4 = Instant::now();
+    if curve.mul(Some(g), x) != Some(q) {
+        return None;
+    }
+    let verify_ms = t4.elapsed().as_secs_f64() * 1e3;
+    Some((
+        x,
+        IcReport {
+            factor_base_ms,
+            pair_table_ms,
+            relations_ms,
+            linear_algebra_ms,
+            verify_ms,
+            total_ms: t0.elapsed().as_secs_f64() * 1e3,
+            factor_base_size: fb.len(),
+            pair_table_entries: pairs.len(),
+            relations: rels.len(),
+            targets: stats.targets,
+            rows_one: stats.rows_one,
+            rows_two: stats.rows_two,
+            rows_three: stats.rows_three,
+        },
+    ))
+}
+
 // ── Point counting and bench-curve generation ─────────────────────────
 
 /// Order of `g` found as the unique `N` in the Hasse interval with
@@ -1626,6 +2388,34 @@ pub fn find_a3_curve(bits: u32, residue_mod_4: u64) -> Option<(FastCurve, Pt)> {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn add_x_with_inv_matches_the_full_addition() {
+        let (curve, g) = find_a3_curve(24, 3).expect("curve");
+        let f = curve.f;
+        let mut pts = vec![g];
+        for k in 2..40u64 {
+            pts.push(curve.mul(Some(g), k).expect("multiple"));
+        }
+        for a in &pts {
+            for b in &pts {
+                if a.x == b.x {
+                    continue;
+                }
+                let inv = f.inv(f.sub(b.x, a.x));
+                assert_eq!(
+                    curve.add_x_with_inv(*a, *b, inv),
+                    curve.add_with_inv(*a, *b, inv).x
+                );
+                let nb = curve.neg(*b);
+                let inv2 = f.inv(f.sub(nb.x, a.x));
+                assert_eq!(
+                    curve.add_x_with_inv(*a, nb, inv2),
+                    curve.add_with_inv(*a, nb, inv2).x
+                );
+            }
+        }
+    }
     use super::*;
     use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
 
@@ -2053,5 +2843,54 @@ mod tests {
         cfg.threads = cfg.threads.min(4);
         let res = rho_parallel(&fc, g, q, &cfg).unwrap();
         assert_eq!(res.log, k);
+    }
+}
+
+#[cfg(test)]
+mod mulmod_n_tests {
+    use super::MulModN;
+
+    /// `MulModN::mul` against the 128-bit remainder it replaces, on edge
+    /// and pseudo-random inputs for odd, even, small and large moduli.
+    #[test]
+    fn mulmod_n_matches_the_128_bit_remainder() {
+        let mut s = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        let moduli = [
+            1u64,
+            2,
+            3,
+            5,
+            15,
+            53_411,
+            65_521,
+            4_294_967_291,
+            4_294_967_296,
+            (1 << 61) - 1,
+            (1 << 62) - 57,
+            (1 << 63) - 25,
+            (1 << 63) + 29,
+            u64::MAX,
+        ];
+        for &m in &moduli {
+            let f = MulModN::new(m);
+            let mut cases = vec![(0, 0), (0, m - 1), (m - 1, m - 1), (1, m - 1)];
+            for _ in 0..2000 {
+                cases.push((next() % m, next() % m));
+                cases.push((next(), next() % m)); // unreduced operand
+            }
+            for (a, b) in cases {
+                assert_eq!(
+                    f.mul(a, b),
+                    ((a as u128 * b as u128) % m as u128) as u64,
+                    "mul {a} {b} mod {m}"
+                );
+            }
+        }
     }
 }

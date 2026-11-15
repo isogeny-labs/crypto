@@ -1,0 +1,85 @@
+{
+  "schema": "source-policy-correspondence-review/v1",
+  "task": "T-1527",
+  "reviewer": "assembler_independent_review_v2",
+  "amendment_author": "first_information",
+  "recurrence_author": "assembler_independent_review_v2",
+  "independent_of_recurrence": false,
+  "blind": false,
+  "decision": "consistent_source_correspondence_nonblind_advisory",
+  "satisfies_non_author_policy_review": false,
+  "producer_commit": "23bc9560b7",
+  "inventory_sha256": "4e45941236040fdd01541922517954fe43df26f9628b610eabbe3ae54ac1057f",
+  "exact_source_bindings_verified": [
+    {
+      "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+      "sha256": "061f4f9f45d261b61af3482509ca5f09e03964abc670765852922d20f946bbd1",
+      "bytes": 74301
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/meter.rs",
+      "sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+      "bytes": 8345
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+      "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "bytes": 33938
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/scalar_ledger.rs",
+      "sha256": "fa5c52c8137bd2da5aef8e560ef1e72111e508b81db4f329928e89ce110cf6ba",
+      "bytes": 2862
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/accounting/kernel-primitive-registry.json",
+      "sha256": "a973bf6222125f37a5d37fa25dbaac434ea3c418fae7bbf8abbda67036c15e2f",
+      "bytes": 1899
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/accounting/COST_BOUNDARY.md",
+      "sha256": "186ebceb5281612f62442a3e005fa92b019f80f8309afe2fe5245ef9c0f4d402",
+      "bytes": 3659
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/coverage-review.json",
+      "sha256": "8936f5d99b49538a35d78729f2450a326801ff9df720ec1f5966166756cfa252",
+      "bytes": 37905
+    }
+  ],
+  "findings": [
+    {
+      "id": "counts",
+      "judgment": "consistent",
+      "detail": "k=2d+1 active reads; two initial adds plus three per x including final unused step; old k*p adds,muls,visits; deltas exactly match all three degree rows."
+    },
+    {
+      "id": "optional_access",
+      "judgment": "consistent_interpretation_requires_non_author_acceptance",
+      "detail": "Four get/first optional accesses operate as access/control machinery; no new user algorithm comparison event. Existing registry excludes API-call surcharges and CPU instruction census; baseline iterator mechanics similarly unpriced."
+    },
+    {
+      "id": "scalar_copy",
+      "judgment": "consistent_interpretation_requires_non_author_acceptance",
+      "detail": "Local u64 copied() and scalar assignments extract values without creating collection elements; baseline peval destructures &c and charges only consumed-entry visit. Fixed whole-record Copy exclusion supports distinction from explicit collection clone/fill."
+    },
+    {
+      "id": "mapping",
+      "judgment": "consistent",
+      "detail": "Native add charges base domain when runtime BASE_MODULUS matches p; analyzer uses base_adds, inverse-normalized base_muls and collection_entry_visits. Recurrence adds no inversion, so inverse expansion unchanged."
+    },
+    {
+      "id": "caller",
+      "judgment": "verified_local_source",
+      "detail": "Production caller degree guard skips all d.degree !=2 before measured sieve; initializer runs inside measured sieve. Complete route domain/setup ownership still needs final binding."
+    }
+  ],
+  "scope_limits": [
+    "Reviewer authored recurrence and its instrumentation; this does not discharge non-author policy-review condition.",
+    "Historical reviewed_complete coverage is bound to historical inputs; this correspondence does not rewrite it or create current complete coverage.",
+    "Final source, binary, mapper, protocol and runtime phase/base-domain joins remain required; all1260 candidate targets require fresh data.",
+    "No prices, speedup, scientific outcome, compilation or test execution in this review."
+  ],
+  "source_inspection_only": true,
+  "scientific_admission": false
+}

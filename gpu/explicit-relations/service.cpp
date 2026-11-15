@@ -54,9 +54,9 @@ static Point independent_add(Point a, Point b, U p, U ca) {
   if (a.x == b.x && (a.y + b.y) % p == 0)
     return {};
   U den = a.x == b.x ? 2 * a.y % p : (b.x + p - a.x) % p;
-  U num = a.x == b.x ? (3 * modmul(a.x, a.x, p) + ca) % p : (b.y + p - a.y) % p;
+  U num = a.x == b.x ? U((3 * (unsigned __int128)modmul(a.x, a.x, p) + ca) % p) : (b.y + p - a.y) % p;
   U slope = modmul(num, modpow(den, p - 2, p), p);
-  U x = (modmul(slope, slope, p) + 2 * p - a.x - b.x) % p;
+  U x = U(((unsigned __int128)modmul(slope, slope, p) + 2 * (unsigned __int128)p - a.x - b.x) % p);
   return {x, (modmul(slope, (a.x + p - x) % p, p) + p - a.y) % p, false};
 }
 static void validate_caps(U cap, U chunk) {
@@ -78,24 +78,24 @@ static void selftest() {
     require(rejected, "invalid row/chunk cap accepted");
   }
   for (U modulus : {U(1) << 62, (U(1) << 62) + 57,
-                    (U(1) << 63) - 25}) {
+                    (U(1) << 63) - 25, (U(1) << 63) + 29, UINT64_MAX - 58}) {
     for (U a : {U(0), U(1), modulus / 2, modulus - 2, modulus - 1})
       for (U b : {U(0), U(1), modulus / 2, modulus - 2, modulus - 1})
-        require(hash_mul63(a, b, modulus) == modmul(a, b, modulus),
+        require((modulus < (U(1) << 63) ? hash_mul63(a, b, modulus) : hash_mul64(a, b, modulus)) == modmul(a, b, modulus),
                 "wide hash multiply disagrees with u128");
   }
   // Public arithmetic fixtures, not certified group-order fixtures.
-  for (U modulus : {(U(1) << 61) - 1, (U(1) << 62) - 57}) {
+  for (U modulus : {(U(1) << 61) - 1, (U(1) << 62) - 57, (U(1) << 63) - (U(1) << 34) - 1}) {
     while (!prime(modulus))
       modulus -= 2;
     Curve c = curve(modulus, modulus - 3, 7);
     Backend device(c, 100000, 257);
     HostBackend host(c, 100000, 257);
-    for (U initial : {2 * modulus, (U(1) << 63) - 25}) {
+    for (U initial : {2 * modulus, (U(1) << 63) - 25, (U(1) << 63) + 29, UINT64_MAX - 58}) {
       U s = initial;
       while (!prime(s))
         ++s;
-      if (s > 4 * modulus)
+      if (s < 2 * modulus || (unsigned __int128)s > 4 * (unsigned __int128)modulus)
         continue;
       for (U alpha : {U(1), U(17), s - 1})
         for (U beta : {U(0), s / 2, s - 1}) {
@@ -157,11 +157,20 @@ static void selftest() {
         break;
       }
     require(missing_rejected, "nonlifting x accepted");
-    for (unsigned slots = 2; slots <= 8; ++slots) {
+    bool excess_slots_rejected = false;
+    try {
+      plan(c, std::vector<std::vector<Point>>(MAX_SLOTS + 1, {all[0]}), 100000);
+    } catch (const std::runtime_error &e) {
+      excess_slots_rejected = std::string(e.what()) == "invalid base slots or row cap";
+    }
+    require(excess_slots_rejected, "excess slot count accepted");
+    for (unsigned slots = 2; slots <= MAX_SLOTS; ++slots) {
       std::vector<std::vector<Point>> bases(slots);
       for (unsigned j = 0; j < slots; ++j) {
         // Same points in separate slots, both signs, duplicated sums.
-        bases[j] = {all[0], all[1], all[2], all[3], all[4], all[5], all[6]};
+        bases[j] = slots <= 8
+            ? std::vector<Point>{all[0], all[1], all[2], all[3], all[4], all[5], all[6]}
+            : std::vector<Point>{all[0], all[1]};
       }
       Plan p = plan(c, bases, 100000);
       device.prepare(p);
@@ -243,8 +252,8 @@ static void serve() {
     }
     if (cmd == "bases") {
       U m = number(in);
-      if (m < 2 || m > 8)
-        throw std::runtime_error("slot count must be 2..8");
+      if (m < 2 || m > MAX_SLOTS)
+        throw std::runtime_error("slot count must be 2..12");
       std::vector<std::vector<Point>> bases(m);
       for (auto &base : bases) {
         U n = number(in);

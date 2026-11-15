@@ -1,0 +1,22 @@
+{
+  "schema": "research.native-comparator-bridge/v1",
+  "main_declarations": 8,
+  "kernel_controls": 10,
+  "axiom_readbacks": 18,
+  "main_pass": true,
+  "controls_pass": true,
+  "axiom_audit_pass": true,
+  "native_mul": "narrow UInt64 x*y%p, not Ring u128",
+  "modulus_bound": "prime 0<p<=2^32",
+  "coordinate_premise": "all coordinates canonical below p",
+  "booleans": "Fin4 nested all matches16 native cross-product comparisons; any nonzero matches decoded nonzero",
+  "geometric_fibers_proved": false,
+  "xadd_closure": false,
+  "compiled_equivalence": false,
+  "counter_semantics": false,
+  "independent_review": "pending",
+  "scientific_execution": false,
+  "full_cohort_obligation": 1260,
+  "complete_cost_ratio": null,
+  "raw_zero_equivalence": "any nonzero iff function vector differs from all-zero"
+}

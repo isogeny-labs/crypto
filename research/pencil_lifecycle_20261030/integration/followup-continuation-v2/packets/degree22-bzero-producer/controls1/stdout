@@ -1,0 +1,26 @@
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:14:3: error: Tactic `apply` failed: could not unify the conclusion of `(div_eq_iff ?m.41).mpr`
+  ?m.31 / 4 = ?m.33
+with the goal
+  4⁻¹ = -1
+
+Note: The full type of `(div_eq_iff ?m.41).mpr` is
+  ?m.31 = ?m.33 * 4 → ?m.31 / 4 = ?m.33
+
+case left
+⊢ 4⁻¹ = -1
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:16:73: error: unsolved goals
+⊢ validTwo (WeightedDoubling.curve 0 (-1) 1 0) a
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:17:1: error: unexpected identifier; expected command
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:21:68: error: unexpected token '('; expected ':=', 'where' or '|'
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:32:87: error(lean.unknownIdentifier): Unknown identifier `hg`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:38:1: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:44:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instAdd', which is 'noncomputable'
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:45:34: error: unsolved goals
+⊢ 1 + X = 1 + X + X ^ 2 * 2 + X ^ 3 * 2 + X ^ 4 * 2
+/var/tmp/pencil-degree22-bzero-extraction-20261031-v1/Controls.lean:51:42: error: unsolved goals
+g : (ZMod 2)[X]
+heq : badf - C (WeightedAdd11.ny (point bad)) ^ 2 = (X - C (WeightedAdd11.nx (point bad))) * g
+he : 3 = (1 - WeightedAdd11.nx { x := 1, y := 1, z := 1, w := 1 }) * eval 1 g
+⊢ False

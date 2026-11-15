@@ -1,0 +1,64 @@
+import CurvePoint
+set_option autoImplicit false
+namespace CZeroCantor
+open Polynomial CZeroInterpolation CZeroOutput
+variable {K : Type*} [Field K]
+
+theorem crt_numerator (u1 u2 v1 v2 ell e1 e2 : K[X]) (a : K)
+ (hb:e1*u1+e2*u2=1) (h1:ell=v1-C a*u1) (h2:ell=v2-C a*u2) :
+ e1*u1*v2+e2*u2*v1=ell+u1*u2*(C a*(e1+e2)) := by
+ have hv1 : v1=ell+C a*u1 := by rw [h1]; ring
+ have hv2 : v2=ell+C a*u2 := by rw [h2]; ring
+ rw [hv1,hv2]
+ calc
+  _ = (e1*u1+e2*u2)*ell+u1*u2*(C a*(e1+e2)) := by ring
+  _ = _ := by rw [hb]; ring
+
+def reducedAbscissa (q1 q2 a : K) := q1+q2+a^2
+
+noncomputable def negRemainderQuotient (q s a x : K) : K[X] := C a*X+C (a*x+a*q-s)
+
+theorem negative_remainder_certificate (q r s t a x : K) :
+ -(ordinate s t-C a*CZeroInterpolation.support q r)=
+ (X-C x)*negRemainderQuotient q s a x+
+ C (-(ordinate s t-C a*CZeroInterpolation.support q r).eval x) := by
+ simp [ordinate,CZeroInterpolation.support,negRemainderQuotient]
+ ring
+
+theorem remainder_constant_bound (y : K) : (C y : K[X]).natDegree≤0 := by simp
+
+theorem linear_degree (x : K) : (X-C x : K[X]).natDegree=1 := by
+ apply natDegree_eq_of_le_of_coeff_ne_zero
+ · apply le_trans (natDegree_sub_le _ _); simp
+ · simp
+
+theorem linear_monic (x : K) : (X-C x : K[X]).Monic := by
+ show (X-C x : K[X]).leadingCoeff=1
+ rw [leadingCoeff,linear_degree]; simp
+
+theorem product_degree (q1 r1 q2 r2 : K) :
+ (CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2).natDegree=4 := by
+ rw [natDegree_mul (support_nonzero q1 r1) (support_nonzero q2 r2),support_degree,support_degree]
+
+theorem interpolant_initial_remainder_bound (q1 r1 s1 t1 q2 r2 a : K) :
+ (ordinate s1 t1-C a*CZeroInterpolation.support q1 r1).natDegree <
+ (CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2).natDegree := by
+ rw [product_degree]
+ have h:=interpolant_bound q1 r1 s1 t1 a
+ omega
+
+theorem one_reduction_certificate (f : K[X]) (q1 r1 s1 t1 q2 r2 a : K)
+ (hf:f.natDegree=5) (h5:f.coeff 5=1) (h4:f.coeff 4=0)
+ (hd:CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2 ∣
+ f-(ordinate s1 t1-C a*CZeroInterpolation.support q1 r1)^2) :
+ let ell:=ordinate s1 t1-C a*CZeroInterpolation.support q1 r1
+ let x:=reducedAbscissa q1 q2 a
+ f-ell^2=CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2*(X-C x) ∧
+ -ell=(X-C x)*negRemainderQuotient q1 s1 a x+C (-ell.eval x) ∧
+ (X-C x : K[X]).Monic ∧ (X-C x : K[X]).natDegree=1 ∧
+ (-ell.eval x)^2=f.eval x := by
+ dsimp [reducedAbscissa]
+ exact ⟨quotient_formula f q1 r1 s1 t1 q2 r2 a hf h5 h4 hd,
+ negative_remainder_certificate q1 r1 s1 t1 a _,linear_monic _,linear_degree _,
+ output_on_curve f q1 r1 s1 t1 q2 r2 a hf h5 h4 hd⟩
+end CZeroCantor

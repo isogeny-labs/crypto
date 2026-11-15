@@ -5,6 +5,21 @@ description: Produce and refresh evidence-linked diagrams, graphs, reports, and 
 
 # Research visuals and reports
 
+## Report progress at the working scope
+
+Owner instruction, 2026-10-30: lead with the construction, implementation,
+verified identity, or measured improvement and its supporting checks.
+State the relevant assumptions and costs. Name a material remaining dependency
+once and give the next technical step.
+
+Routine reports and updates do not need an overall ECDLP verdict or a rho
+comparison. Include those in an explicitly scoped evaluation, a required
+comparison table, or a specific factual correction. Describe limitations as
+the particular construction's domain, costs, and open dependencies. Recognize
+completed components as progress at their stated scope.
+
+## When to use this skill
+
 Use this skill at three points (AGENTS.md "Research searches must leave
 visual reports"):
 
@@ -41,9 +56,10 @@ PR as the run's records; failed and timed-out runs included.
   references and controls, and the paths of the raw records. Label every
   number measured or derived, and show how a derived one was computed. State
   missing data as missing.
-- **Observations only.** No speedup, win, or significance language beyond
-  what the harness's own comparison admitted, with its scope; wall time only
-  where the harness admitted it. Interpretation belongs to the result PR.
+- **Describe the run.** Lead with the outcomes and checks. Report component
+  and pipeline comparisons at the scope admitted by the harness, including
+  wall time where its measurement conditions permit it. Interpretation
+  belongs to the result PR.
 - **Graph.** At least one quantitative graph of the recorded values (arms
   side by side, per-round values, a quantity against a parameter), with
   units, sample size, uncertainty where recorded, and the session or run id
@@ -187,3 +203,22 @@ aws s3 ls s3://setec-astronomy-artifacts/reports/crypto/<repository path> --regi
 aws s3 cp s3://setec-astronomy-artifacts/reports/crypto/<repository path> . --region us-east-2
 aws s3 presign s3://setec-astronomy-artifacts/reports/crypto/<repository path> --expires-in 604800 --region us-east-2
 ```
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope research-visuals`. Apply the
+   adopted lessons; treat candidates as hypotheses this run can test.
+2. **While acting**: resolve a blocker yourself within your authority
+   (diagnose the cause, try the documented remedy, then a materially different
+   approach) before escalating; AGENTS.md "Persistent scientific research loop".
+   Persistence grants no extra execution or spending authority.
+3. **After acting**: record the outcome with evidence,
+   `python3 tools/lessons.py outcome --scope research-visuals --task "..." --result success|partial|fail|blocked --evidence <receipt|commit|job> [--applied L-...]`,
+   and `lessons.py test --lesson L-... --outcome confirm|refute --evidence ...`
+   for each lesson you applied. A surprise that would change what the next run
+   does becomes `lessons.py add --scope research-visuals --trigger "..." --action "..." --evidence ...`.
+4. **Adapt**: when a lesson scoped to `research-visuals` is adopted (two distinct
+   confirmations), propose the edit to this file in a PR that cites the lesson
+   id; when one is refuted twice more than confirmed, it retires itself.

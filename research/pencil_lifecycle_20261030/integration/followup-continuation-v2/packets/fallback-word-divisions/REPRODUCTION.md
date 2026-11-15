@@ -1,0 +1,3 @@
+# Reproduction
+
+Restore archived .lean.txt sources as .lean in a fresh directory. Preserve uniquely named FallbackWord modules. Adapt source-host paths in check.sh/replay.sh to the restored directory and pinned dependencies. dependencies.txt and per-attempt before.sha256 identify imported helpers and toolchain bindings. Compiled caches and checker binary are omitted. The seven modules listed in check.rs are final fresh targets; the remaining top-level sources are dependency snapshots. inventory.txt lists seventeen declarations. The archive preserves failed attempts and is not a self-contained toolchain distribution. Independent review remains pending.

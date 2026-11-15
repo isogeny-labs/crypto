@@ -1,0 +1,1052 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/binary_pair.rs",
+      "kind": "analysis",
+      "bytes": 24101,
+      "sha256": "df76ebcec2c08e937615ea26c46d6eacbf3d0853e6fe53d54afacb72d57494f1"
+    },
+    "outputs": [
+      {
+        "path": "evidence/binary-pair/verified-summary.json",
+        "kind": "summary",
+        "bytes": 7964,
+        "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original-koblitz",
+      "role": "baseline",
+      "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+      "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+      "image_digest": null
+    },
+    {
+      "id": "original-binary",
+      "role": "baseline",
+      "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+      "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+      "image_digest": null
+    },
+    {
+      "id": "baseline-koblitz",
+      "role": "baseline",
+      "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+      "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+      "image_digest": null
+    },
+    {
+      "id": "baseline-binary",
+      "role": "baseline",
+      "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+      "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+      "image_digest": null
+    },
+    {
+      "id": "spike40-koblitz",
+      "role": "candidate",
+      "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+      "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+      "image_digest": null
+    },
+    {
+      "id": "spike40-binary",
+      "role": "candidate",
+      "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+      "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+      "image_digest": null
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-28T17:16:05Z",
+  "export_id": "n83-binary-m2-pair-20261028-r1",
+  "files": [
+    {
+      "path": "evidence/binary-pair/baseline-binary-m2-natural.json",
+      "kind": "raw",
+      "bytes": 188865,
+      "sha256": "072051a8c277818629acf9370c92f86c9cc3671a83c1e2ac83ac9fd4d4645418"
+    },
+    {
+      "path": "evidence/binary-pair/baseline-binary-m2-planted.json",
+      "kind": "raw",
+      "bytes": 189516,
+      "sha256": "32593ac46172d3c089bff2cd1c8a528d2951fb5d037f846fefd3f2d1e39c6ffa"
+    },
+    {
+      "path": "evidence/binary-pair/baseline-koblitz-m2-natural.json",
+      "kind": "raw",
+      "bytes": 188862,
+      "sha256": "ff0835f283edf94259ebc5164d09b155371bd31c504089b8fe3f1a262a4f75ac"
+    },
+    {
+      "path": "evidence/binary-pair/baseline-koblitz-m2-planted.json",
+      "kind": "raw",
+      "bytes": 189499,
+      "sha256": "66c3d3040672496007937b9fcb3dfa8c82c40f82a1ade9334ef1a444d9373744"
+    },
+    {
+      "path": "evidence/binary-pair/controls.json",
+      "kind": "raw",
+      "bytes": 2657,
+      "sha256": "94eefdca93dd739bbd01aa88aec5aba7375fad0695828af4db81f7fce05bd248"
+    },
+    {
+      "path": "evidence/binary-pair/field.json",
+      "kind": "raw",
+      "bytes": 2982,
+      "sha256": "13313da1d3bcd4410600f4b5c193e8bee6bc0115626394aa9498b4661858a5ec"
+    },
+    {
+      "path": "evidence/binary-pair/host.txt",
+      "kind": "raw",
+      "bytes": 3504,
+      "sha256": "773aa1ae9fd8c38357c4afc12f513340e413b777f82301fa7366dfa7c2c7ee87"
+    },
+    {
+      "path": "evidence/binary-pair/manifest.sha256",
+      "kind": "raw",
+      "bytes": 6345,
+      "sha256": "710fa58cb378400e7103acbcb760cd2d1a3db49437fd7d5ee926fd29fe5c015b"
+    },
+    {
+      "path": "evidence/binary-pair/original-binary-m2-natural.json",
+      "kind": "raw",
+      "bytes": 188328,
+      "sha256": "b7b07ef5cb308891629920e9b4392a8e74a7fb1acabcfd6b5a98dcb60899e0fb"
+    },
+    {
+      "path": "evidence/binary-pair/original-binary-m2-planted.json",
+      "kind": "raw",
+      "bytes": 188922,
+      "sha256": "14822fa4b3cb0ed9e677fbd4b5fc9a7c020ef64347d99a33a4b2f6d02f82d34a"
+    },
+    {
+      "path": "evidence/binary-pair/original-koblitz-m2-natural.json",
+      "kind": "raw",
+      "bytes": 188325,
+      "sha256": "f4f86e7cf9672db9f4a473960bf16fd7ff54975ef10117eaa247ca43978c8b37"
+    },
+    {
+      "path": "evidence/binary-pair/original-koblitz-m2-planted.json",
+      "kind": "raw",
+      "bytes": 188930,
+      "sha256": "75826f2e5f96cf1c031ec7c6cf46fffafcce1e5aa3a2461e703e45853f3c7c7d"
+    },
+    {
+      "path": "evidence/binary-pair/producer.log",
+      "kind": "raw",
+      "bytes": 542,
+      "sha256": "8e6f776051b25fd84e38f07e5c62d90e4c6fa2b502ed5a1281be28ef7631a47d"
+    },
+    {
+      "path": "evidence/binary-pair/replay.json",
+      "kind": "raw",
+      "bytes": 169,
+      "sha256": "836e521fa18dc47bb6d36a428d353946d6ec4e10864cfaea73230808a031637d"
+    },
+    {
+      "path": "evidence/binary-pair/replay.log",
+      "kind": "raw",
+      "bytes": 530,
+      "sha256": "c243763e0ae34abed159a81f5e21cca7c91e6cba8568df862771ed08540c76c9"
+    },
+    {
+      "path": "evidence/binary-pair/spike40-binary-m2-natural.json",
+      "kind": "raw",
+      "bytes": 198286,
+      "sha256": "7ea9f4946b1efb925f2f68fc8f50ba38707b12e85a2188ef9cb263dc7321c6f7"
+    },
+    {
+      "path": "evidence/binary-pair/spike40-binary-m2-planted.json",
+      "kind": "raw",
+      "bytes": 198923,
+      "sha256": "e3530825272392b26c28624698d6c979f5fcd197ed23d2c70d529df953291942"
+    },
+    {
+      "path": "evidence/binary-pair/spike40-koblitz-m2-natural.json",
+      "kind": "raw",
+      "bytes": 198287,
+      "sha256": "b445c07bb9610c28398371d98c0021d062b893ae574481591102ebc906499f79"
+    },
+    {
+      "path": "evidence/binary-pair/spike40-koblitz-m2-planted.json",
+      "kind": "raw",
+      "bytes": 198858,
+      "sha256": "9ae8544f7d704994d46481cfe8abb322362ee595b5df1d944cbebdbcdbc4ef83"
+    },
+    {
+      "path": "evidence/binary-pair/status.json",
+      "kind": "raw",
+      "bytes": 55,
+      "sha256": "3d25e3ede527345e9e78b08da5161c9414bb92b9b5cc9f9a406f64941266bb1c"
+    },
+    {
+      "path": "evidence/binary-pair/summary.json",
+      "kind": "raw",
+      "bytes": 7865,
+      "sha256": "8355fd45ade4e0f366bee61630d4f7ccecfe287eb1ccc76366624c5fe37d458f"
+    },
+    {
+      "path": "evidence/binary-pair/terminal.json",
+      "kind": "raw",
+      "bytes": 201,
+      "sha256": "3aa42a891429ae9c77e67726a177b2c9479bdf6569610d955857f65423e5c5be"
+    },
+    {
+      "path": "evidence/binary-pair/verified-summary.json",
+      "kind": "raw",
+      "bytes": 7964,
+      "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+    },
+    {
+      "path": "binary-pair-archives/runs.tar.xz",
+      "kind": "raw",
+      "bytes": 1177400,
+      "sha256": "38c0fd69215a2cf966a2bd14049f4f5b465aa8b4302f363c77c23079aca861dc"
+    },
+    {
+      "path": "protocol-binary-pair.json",
+      "kind": "protocol",
+      "bytes": 24290,
+      "sha256": "d3c55d52d531772f8a752d487fdec80eaa63379792643d74e0926f7efffede9a"
+    },
+    {
+      "path": "BINARY_PAIR_FORMAT.json",
+      "kind": "other",
+      "bytes": 3155,
+      "sha256": "ad8aae058b40b5c86d5cfea98c12f7674ed654c5b80bb8122f07bda2cb9c051a"
+    },
+    {
+      "path": "BINARY_PAIR_DESIGN.md",
+      "kind": "other",
+      "bytes": 6414,
+      "sha256": "2787c8729afb7ff97358e851d57771598b3b1f8947162c0698525d19cd906711"
+    },
+    {
+      "path": "BinaryPairSlots.lean",
+      "kind": "other",
+      "bytes": 731,
+      "sha256": "1e35726269c2c1ae754bab02bc56792c8cc8d85980ed351e4def1d5058a65d4a"
+    },
+    {
+      "path": "BINARY_PAIR_PROOF_MAP.json",
+      "kind": "other",
+      "bytes": 934,
+      "sha256": "d0a59a2b10cb84c0a68dee17bd9b580799c2ac6f7b0110466ff6e4b888730927"
+    }
+  ],
+  "flow": {
+    "planned": 12,
+    "attempted": 12,
+    "completed": 12,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "class_id": "existing-spot-L0",
+    "path": "evidence/binary-pair/host.txt",
+    "sha256": "773aa1ae9fd8c38357c4afc12f513340e413b777f82301fa7366dfa7c2c7ee87",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "Amazon EC2",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux ip-172-31-17-173.us-east-2.compute.internal 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Twelve retained identities; coincident natural sources are not independent samples."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Exact original-top vanishing degree only; the saved Hilbert arrays are bounds, not exact full functions."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Twelve producer and twelve fresh-process replay checks passed."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Lean checks only the finite-slot degree argument; algebraic bridges remain written/native."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Existing-host fallback after retained EKS shared-bucket denial; no timing comparison."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "No earlier source, failed attempt, point dataset, or measurement was removed."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "role": "producer",
+    "model": null,
+    "session": "n83-binary-m2-pair-20261028-r1"
+  },
+  "protocol": {
+    "path": "protocol-binary-pair.json",
+    "protocol_id": "N83-BINARY-M2-PAIR-20261028",
+    "version": 1,
+    "sha256": "95cf1fbd579f98e7b766b3fceb105b833d90c372566e180defe027e13cf95ad6"
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "original-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/original-koblitz-m2-planted.json",
+          "kind": "other",
+          "bytes": 188930,
+          "sha256": "75826f2e5f96cf1c031ec7c6cf46fffafcce1e5aa3a2461e703e45853f3c7c7d"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/original-koblitz-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 53,
+          "product_rank": 53
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-koblitz-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/original-koblitz-m2-natural.json",
+          "kind": "other",
+          "bytes": 188325,
+          "sha256": "f4f86e7cf9672db9f4a473960bf16fd7ff54975ef10117eaa247ca43978c8b37"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/original-koblitz-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 53,
+          "product_rank": 53
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-koblitz-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original-binary",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/original-binary-m2-planted.json",
+          "kind": "other",
+          "bytes": 188922,
+          "sha256": "14822fa4b3cb0ed9e677fbd4b5fc9a7c020ef64347d99a33a4b2f6d02f82d34a"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/original-binary-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 53,
+          "product_rank": 53
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-binary-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original-binary",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/original-binary-m2-natural.json",
+          "kind": "other",
+          "bytes": 188328,
+          "sha256": "b7b07ef5cb308891629920e9b4392a8e74a7fb1acabcfd6b5a98dcb60899e0fb"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/original-binary-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 53,
+          "product_rank": 53
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-binary-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/baseline-koblitz-m2-planted.json",
+          "kind": "other",
+          "bytes": 189499,
+          "sha256": "66c3d3040672496007937b9fcb3dfa8c82c40f82a1ade9334ef1a444d9373744"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/baseline-koblitz-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 53,
+          "product_rank": 53
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/baseline-koblitz-m2-natural.json",
+          "kind": "other",
+          "bytes": 188862,
+          "sha256": "ff0835f283edf94259ebc5164d09b155371bd31c504089b8fe3f1a262a4f75ac"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/baseline-koblitz-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 53,
+          "product_rank": 53
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/baseline-binary-m2-planted.json",
+          "kind": "other",
+          "bytes": 189516,
+          "sha256": "32593ac46172d3c089bff2cd1c8a528d2951fb5d037f846fefd3f2d1e39c6ffa"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/baseline-binary-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 53,
+          "product_rank": 53
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/baseline-binary-m2-natural.json",
+          "kind": "other",
+          "bytes": 188865,
+          "sha256": "072051a8c277818629acf9370c92f86c9cc3671a83c1e2ac83ac9fd4d4645418"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/baseline-binary-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 53,
+          "product_rank": 53
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/spike40-koblitz-m2-planted.json",
+          "kind": "other",
+          "bytes": 198858,
+          "sha256": "9ae8544f7d704994d46481cfe8abb322362ee595b5df1d944cbebdbcdbc4ef83"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/spike40-koblitz-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 67,
+          "product_rank": 67
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/spike40-koblitz-m2-natural.json",
+          "kind": "other",
+          "bytes": 198287,
+          "sha256": "b445c07bb9610c28398371d98c0021d062b893ae574481591102ebc906499f79"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/spike40-koblitz-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 67,
+          "product_rank": 67
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/spike40-binary-m2-planted.json",
+          "kind": "other",
+          "bytes": 198923,
+          "sha256": "e3530825272392b26c28624698d6c979f5fcd197ed23d2c70d529df953291942"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/spike40-binary-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 67,
+          "product_rank": 67
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m2-planted",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/binary-pair/spike40-binary-m2-natural.json",
+          "kind": "other",
+          "bytes": 198286,
+          "sha256": "7ea9f4946b1efb925f2f68fc8f50ba38707b12e85a2188ef9cb263dc7321c6f7"
+        },
+        {
+          "path": "evidence/binary-pair/verified-summary.json",
+          "kind": "summary",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/certificates/spike40-binary-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-28T17:16:05Z",
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_exact": 28,
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 28,
+          "q_rank": 67,
+          "product_rank": 67
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m2-natural",
+      "seed": 20261027,
+      "started_at": "2026-10-28T17:15:52Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process complete source, field, XOR span, inverse, pair relation and lower projection recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+    "dirty": false
+  }
+}

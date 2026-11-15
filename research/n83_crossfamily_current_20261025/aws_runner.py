@@ -40,7 +40,7 @@ def read_allocation(path, stratum):
     if (receipt.get('schema') != SCHEMA or
             receipt.get('stratum') != stratum or
             receipt.get('account_id') != '590183823895' or
-            receipt.get('region') != 'us-east-1' or
+            receipt.get('region') != 'us-west-2' or
             receipt.get('instance_type') != 'g5g.4xlarge' or
             receipt.get('market') != 'spot' or
             receipt.get('state') != 'running' or

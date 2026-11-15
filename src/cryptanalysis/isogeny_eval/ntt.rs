@@ -46,8 +46,23 @@
 //! * `M = 2n` (`(q₁ mod p)·t₂` and `(q₁q₂ mod p)·t₃` per coefficient).
 //!
 //! Every butterfly multiplication is counted, including those by the twiddle
-//! `1`.  Additions, subtractions and conditional subtractions are free, as
-//! everywhere in this module.  Twiddle tables are constants of the three
+//! `1`.  Additions, subtractions and conditional subtractions are free
+//! unless the field was built with
+//! [`super::counted_fp::PrimeField::counted_with_adds`]; then, per
+//! product, they are tallied as follows (exact, see [`ntt_mul_add_cost`]):
+//!
+//! * `word_add = 3·T·N·log₂N` for the butterflies (each butterfly is one
+//!   addition and one subtraction modulo the NTT prime, `(N/2)·log₂N`
+//!   butterflies per transform), plus `3n` Garner differences, plus the
+//!   conditional subtractions that actually happen when the inputs are
+//!   brought below each NTT prime and in Garner's cross-reductions (data
+//!   dependent, usually zero for `p < 2^61`; counted one each);
+//! * `add = 2n` for the two `u128` accumulations per output coefficient of
+//!   the reconstruction `r₁ + (q₁ mod p)·t₂ + (q₁q₂ mod p)·t₃`.
+//!
+//! [`super::poly::mul`] under [`super::counted_fp::PolyMul::Auto`] still
+//! chooses between Karatsuba and the NTT by `M + W` alone, so frozen counts
+//! do not depend on whether additions are counted.  Twiddle tables are constants of the three
 //! primes (independent of `p` and of the inputs), built once per thread and
 //! per transform size, and are not counted, as a hard-coded table would not
 //! be.
@@ -254,14 +269,31 @@ fn inverse(m: &Mont, t: &Tables, a: &mut [u64]) {
     }
 }
 
-/// `x mod q` for `x < 4q` by conditional subtractions.
+/// `x mod q` for `x < 4q` by conditional subtractions; `subs` is
+/// incremented once per subtraction done.
 #[inline(always)]
-fn reduce_small(x: u64, q: u64) -> u64 {
+fn reduce_small(x: u64, q: u64, subs: &mut u64) -> u64 {
     let mut x = x;
     while x >= q {
         x -= q;
+        *subs += 1;
     }
     x
+}
+
+/// The data-independent part of the additions [`mul_ntt`] tallies for
+/// operand lengths `la`, `lb ≥ 1`: `(word_add, add)` =
+/// `(3·T·N·log₂N + 3n, 2n)`.  The conditional input reductions (data
+/// dependent) are counted at run time and come on top of `word_add`.
+pub fn ntt_mul_add_cost(la: usize, lb: usize, square: bool) -> (u64, u64) {
+    if la == 0 || lb == 0 {
+        return (0, 0);
+    }
+    let n = (la + lb - 1) as u64;
+    let big_n = n.next_power_of_two();
+    let log2n = big_n.trailing_zeros() as u64;
+    let transforms = if square { 2 } else { 3 };
+    (3 * transforms * big_n * log2n + 3 * n, 2 * n)
 }
 
 /// The counted cost of [`mul_ntt`] for operand lengths `la`, `lb ≥ 1`:
@@ -299,6 +331,11 @@ pub fn mul_ntt<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64
     let (words, muls) = ntt_mul_cost(a.len(), b.len(), square);
     f.counter().count_word_mul(words);
     f.count_muls(muls);
+    let (word_adds, adds) = ntt_mul_add_cost(a.len(), b.len(), square);
+    f.counter().count_word_add(word_adds);
+    f.count_adds(adds);
+    // Conditional subtractions actually performed (data dependent).
+    let mut subs = 0u64;
     let ms = monts();
     let mut res: [Vec<u64>; 3] = Default::default();
     TABLES.with(|cell| {
@@ -308,7 +345,7 @@ pub fn mul_ntt<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64
             let t = &tabs[i];
             let mut fa = vec![0u64; big_n];
             for (d, &s) in fa.iter_mut().zip(a) {
-                *d = reduce_small(s, m.q);
+                *d = reduce_small(s, m.q, &mut subs);
             }
             forward(m, t, &mut fa);
             if square {
@@ -318,7 +355,7 @@ pub fn mul_ntt<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64
             } else {
                 let mut fb = vec![0u64; big_n];
                 for (d, &s) in fb.iter_mut().zip(b) {
-                    *d = reduce_small(s, m.q);
+                    *d = reduce_small(s, m.q, &mut subs);
                 }
                 forward(m, t, &mut fb);
                 for (x, &y) in fa.iter_mut().zip(&fb) {
@@ -349,15 +386,18 @@ pub fn mul_ntt<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64
     let q1p = (q1 as u128 % p) as u64;
     let q12p = ((q1 as u128 % p) * (q2 as u128 % p) % p) as u64;
     let [r1s, r2s, r3s] = &res;
-    r1s.iter()
+    let out: Vec<u64> = r1s
+        .iter()
         .zip(r2s)
         .zip(r3s)
         .map(|((&r1, &r2), &r3)| {
-            let t2 = m2.mul(m2.sub(r2, reduce_small(r1, q2)), c12);
-            let x3 = m3.mul(m3.sub(r3, reduce_small(r1, m3.q)), c13);
-            let t3 = m3.mul(m3.sub(x3, reduce_small(t2, m3.q)), c23);
+            let t2 = m2.mul(m2.sub(r2, reduce_small(r1, q2, &mut subs)), c12);
+            let x3 = m3.mul(m3.sub(r3, reduce_small(r1, m3.q, &mut subs)), c13);
+            let t3 = m3.mul(m3.sub(x3, reduce_small(t2, m3.q, &mut subs)), c23);
             let v = r1 as u128 + q1p as u128 * t2 as u128 + q12p as u128 * t3 as u128;
             (v % p) as u64
         })
-        .collect()
+        .collect();
+    f.counter().count_word_add(subs);
+    out
 }

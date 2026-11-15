@@ -1,0 +1,1 @@
+The patch executable was unavailable. The setup shell failed to stop before compiling the unchanged original candidate; the redundant compile returned1 with the same original two errors. Preserved as an execution error. Attempt3b used exact checked single-hunk application, preserving all original files.

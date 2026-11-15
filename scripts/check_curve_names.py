@@ -51,6 +51,8 @@ SELF = {"docs/curves/ICV1.md", "docs/curves/README.md", "scripts/check_curve_nam
         "scripts/build_curve_registry.py", "scripts/curve_id.py",
         "src/cryptanalysis/curve_id.rs", "src/cryptanalysis/curve_aliases.json", "tests/curve_id.rs",
         "examples/curve_id_generated.rs",
+        # ecdb flags registry aliases that are retired forms (is_retired_name).
+        "ecdb/src/math.rs",
         # Generated alias tables: their "also called" column lists the
         # legacy spellings on purpose.
         "docs/ic-leaderboard.html", "docs/ic/LEADERBOARD.md"}
@@ -359,6 +361,10 @@ def main() -> int:
     problems = lint(res, pinned_hashes(), args.fix)
     if not cid.ALIAS_MAP.exists() or cid.ALIAS_MAP.read_text() != cid.alias_map_text(res.reg):
         problems.append("src/cryptanalysis/curve_aliases.json does not match docs/curves/registry.json; "
+                        "run scripts/build_curve_registry.py")
+    if (not cid.REGISTRY_INDEX.exists()
+            or cid.REGISTRY_INDEX.read_text() != cid.registry_index_text(cid.REGISTRY.read_text())):
+        problems.append("src/cryptanalysis/ecbench/registry_index.txt does not match docs/curves/registry.json; "
                         "run scripts/build_curve_registry.py")
     if args.diff:
         problems += lint_diff(args.diff, res)

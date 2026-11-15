@@ -1,0 +1,15 @@
+{
+  "schema": "n83.m3-closure-storage/v1",
+  "run_prefix": "s3://setec-astronomy-artifacts/runs/n83-degree3-m3-20261029-r1/local/",
+  "archive": {
+    "path": "degree3-m3-archives/runs.tar.xz",
+    "kind": "raw",
+    "bytes": 1047336364,
+    "sha256": "37d67c62bc7a551c54485693a613a22384144ace1fdeb713802b19438b5e32d4"
+  },
+  "object": "s3://setec-astronomy-artifacts/store/sha256/37/37d67c62bc7a551c54485693a613a22384144ace1fdeb713802b19438b5e32d4",
+  "source_archive_sha256": "3304b6f90c29e627ef7b3718d8de544ed7880f5ada3cee91d633395987ca7c20",
+  "source_commit": "6a2c028999634a4ddf9791dc3082180086b6c2ff",
+  "raw_file_count": 230,
+  "restoration": "Download archive and extract to a fresh directory; check manifest.sha256; for every successful producer run instrument replay INPUT_ROOT ID V2_DIR CASE_DIR; then check manifest again. Use protocol extensions.cases to map key/arm/id."
+}

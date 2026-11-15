@@ -350,6 +350,7 @@ impl FactorBaseBuilder<PrimeCurve> for CmOrbitBase<'_> {
             point_index: fast_map(4 * columns * length),
             cost: PhaseCost::default(),
             subspace_basis: None,
+            frobenius_orbit_layout: None,
             known_logs: None,
         };
         let mut seen = HashSet::new();
@@ -432,6 +433,8 @@ mod tests {
             r: 5325000430993249,
             cofactor: 1,
             generator: (4, 437435961147748),
+
+            representation: None,
         };
         let mut ops = GroupOps::default();
         let map = derive_map(&inst, 43, &mut ops).unwrap();
@@ -456,6 +459,8 @@ mod tests {
             r: 342833,
             cofactor: 1,
             generator: (0, 2882),
+
+            representation: None,
         }
     }
     #[test]

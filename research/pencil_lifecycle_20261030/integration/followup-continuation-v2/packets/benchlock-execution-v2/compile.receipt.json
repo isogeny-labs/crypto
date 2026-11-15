@@ -1,0 +1,18 @@
+{
+  "command": [
+    "timeout",
+    "-k",
+    "5s",
+    "120s",
+    "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc",
+    "--edition=2021",
+    "/var/tmp/pencil-benchlock-controls-20261031-v2/helper.rs",
+    "--extern",
+    "libc=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/liblibc-56ab79ec8afd5c44.rlib",
+    "-o",
+    "/var/tmp/pencil-benchlock-controls-execution-20261031-v2/helper"
+  ],
+  "started": 1793413453.371647,
+  "ended": 1793413459.584109,
+  "exit_code": 0
+}

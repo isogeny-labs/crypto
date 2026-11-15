@@ -1,0 +1,36 @@
+{
+  "schema": "source_preparation_review/v1",
+  "status": "validated_scoped_prospective",
+  "utc": "2026-10-31T03:11:26.508369+00:00",
+  "producer_manifest_sha256": "55d12fca3cb7646f7c010569c6c355346206bb2e1319e9dbe412a0c1bdb4bb7e",
+  "prepare_source_sha256": "1f27d16fbd3be20a1eb72ed83ef726dfd057e95484c6e63bc8050a80047aa621",
+  "refresh_source_sha256": "f19a9af8050c6b333bdd4b71010d950ec83e719b5348ad5b05bde001f43c2bfb",
+  "recompute": {
+    "inventory_live_git_equal": true,
+    "inventory_sha256": "6344af2a10ca8a5b6885acca7016246f45532f1c118fd1a657f6fc9e703d395e",
+    "selected": 5909,
+    "bytes": 289945217,
+    "omitted": 190081,
+    "added": [
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/benchlock-controls-v1/benchlock.rs",
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/benchlock-controls-v1/helper.rs",
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/benchlock-controls-v2/benchlock.rs",
+      "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/benchlock-controls-v2/helper.rs"
+    ],
+    "changed": [
+      "src/cryptanalysis/ecbench/isolation.rs"
+    ],
+    "removed": [],
+    "include_scan_byte_identical": true,
+    "all8_local_manifests_unchanged": true
+  },
+  "executed_mutation": false,
+  "conditions": [
+    "Live exact-commit Git inventory matched the proposed frozen inventory byte-for-byte. Recomputed 5909 selected files, 289945217 bytes and 190081 omitted entries. Existing selected changes consist only of isolation.rs; additions are two retained benchlock.rs and two retained helper.rs files. No selected path was removed.",
+    "All eight recursive local package manifest blobs remain unchanged, including the optional five-leads dependency. No local default build.rs is present. The include scan is byte-identical to the old reviewed scan: 141 expressions and the same retained runtime-string false positive. All source/config metadata selection rules remain; exact path patterns are checked. This is retained lexical closure, not arbitrary macro expansion proof.",
+    "The refresh script targets the fixed existing isolated checkout and target-cache owner lock. It requires a reviewed wrapper hash, admitted binding, exact final commit/tree, old/new selection hashes and matching patterns. Before mutation it obtains a nonblocking exclusive lock, checks scoped live processes, detached old HEAD, tracked cleanliness, all untracked files including ignored files, and exact old materialized blobs/modes. Only sparse pattern update, detached checkout and reapply mutate the isolated checkout. New commit/tree, cleanliness and complete materialization are then checked. No build, cleanup, cache fingerprint changes or automatic retry is present.",
+    "Git commands have per-command timeouts within the shared allowance; verification checks a cooperative deadline. A previously observed unsealed source gap omitted TimeoutExpired command receipts. Final reviewed source writes a started record and preserves timeout output/error receipts. Filesystem IO can still block beyond a cooperative check; root must retain outer supervision and reconcile this same destination on interruption. This review does not turn that bound into a hard IO wall-time guarantee.",
+    "Root must supply the exact reviewed binding, hold exclusive source ownership, and reconcile live owners immediately before execution. The lock is released at script return; cached build admission must reacquire its own lock and recheck source/owner bindings. The script rechecks the exact external-config ledger and CARGO_HOME before mutation; its process scan includes CARGO_TARGET_DIR and nested source working directories. Read-only source verification does not provide protection against an unrelated concurrent writer.",
+    "The selector completed read-only with exit0; its initial argument-shadowing failure is retained. This reviewer inspected source and recomputed metadata only: no checkout, build, container or scientific run. Proposed preparation remains unexecuted. Old b985 binary/receipts remain unchanged; this review concerns preparation for exact 3c592af and does not qualify a new binary."
+  ]
+}

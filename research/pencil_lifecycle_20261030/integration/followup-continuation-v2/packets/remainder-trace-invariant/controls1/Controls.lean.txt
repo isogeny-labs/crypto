@@ -1,0 +1,27 @@
+import Trace
+namespace RemainderTraceControls
+open Polynomial RemainderTrace
+ theorem complete_division : run (X-1 : ℚ[X]) [(1,1),(0,1)] (X^2-1)=0 := by
+  simp [run,cancel,term]
+  ring
+ theorem quotient_fixture : quotient (K:=ℚ) [(1,1),(0,1)]=X+1 := by simp [quotient,term]
+ theorem partial_division : run (X-1 : ℚ[X]) [(1,1)] (X^2-1)=X-1 := by
+  simp [run,cancel,term]
+  ring
+ theorem empty_trace (f : ℚ[X]) : run (X-1) [] f=f := rfl
+ theorem repeated_slot_sum : quotient (K:=ℚ) [(0,1),(0,1)]=C 2 := by
+  norm_num [quotient,term]
+ theorem repeated_slot_not_last : quotient (K:=ℚ) [(0,1),(0,1)]≠C 1 := by
+  rw [repeated_slot_sum]
+  intro h
+  have he:=congrArg (Polynomial.eval 0) h
+  norm_num at he
+ theorem divisible_but_nonterminal : (X-1 : ℚ[X])∣X^2-1 ∧ run (X-1) [] (X^2-1)≠0 := by
+  constructor
+  · exact zero_remainder_dvd _ _ _ complete_division
+  · intro h
+    have he:=congrArg (Polynomial.eval 0) h
+    norm_num [run] at he
+ theorem zero_divisor_trace (f : ℚ[X]) : run 0 [(2,7),(0,3)] f=f := by
+  simp [run,cancel]
+end RemainderTraceControls
