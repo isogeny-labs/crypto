@@ -1,0 +1,9 @@
+# Deterministic q16 n7 selector screen
+
+15 November 2026. The [frozen screen](SCREEN_PROTOCOL.md), [Sage implementation](screen.py) and [immutable 128-row receipt](screen.json) cover the first 128 full-absolute-field coefficients in arm V1 of Teske's published genus-eight n7 selector. The script used Sage 10.10.rc0 and records SHA-256 `457dd8f34e753b57593ff9b8d59c2c531b42faf661b34f68a456601d461c4dad`. [pcc:unverified]
+
+The field is `K=F2[z]/(z^28+z^3+1)`. The trace-one coefficient `a` has polynomial mask `65,712,646`; the selected `b` has mask `406,166`. Thus the exact source equation is `y²+xy=x³+a x²+b`. Both Frobenius kernels have F2 dimension twelve and trivial intersection. There are 8,064 full-absolute-field coefficients in the two arms with the fixed base component `c=1`; 128 were screened. Eleven of the 128 meet the frozen `cofactor≤8, r≥2²⁴` gate. The first has `#E(K)=268,413,186=6·44,735,531`, with 44,735,531 prime and trace 22,271. It is the chosen exact instance for a separate map-and-cost experiment. [pcc:unverified]
+
+A Sage point search after the screen found `P=6R` from the first eligible x mask four, with `x(P)` mask `179,462,209` and `y(P)` mask `218,074,333`; `P` has exact order 44,735,531. This point selection is recorded for the follow-up protocol and is not part of the 128-row order screen. [pcc:unverified]
+
+Exact-parameter searches in the local KB for the prime subgroup, source order and coefficient masks, and four web queries for the same values, returned no identified exact match. That bounded search cannot establish publication priority. The coefficient shape and genus-eight eligibility are in [Teske's published selector](https://www.lix.polytechnique.fr/Labo/Francois.Morain/Crypto/IsogenyParty/teske.pdf). No GHS map or attack advantage follows from this screen. [pcc:unverified]
