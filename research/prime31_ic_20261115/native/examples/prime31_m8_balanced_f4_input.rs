@@ -305,8 +305,8 @@ fn main()->Result<(),String>{
           "split_templates":split,"all_distinct_eight_templates":full,
           "subgroup_order":n,"split_expected_raw_witnesses_exact":"635980800/2147446831",
           "all_expected_raw_witnesses_exact":"2019513600/2147446831",
-          "split_min_mean_calls_for_32_rank":(32*n+split-1)/split,
-          "all_min_mean_calls_for_32_rank":(32*n+full-1)/full,
+          "split_expected_calls_lower_bound_exact":format!("{}/{}",32*n,split),
+          "all_expected_calls_lower_bound_exact":format!("{}/{}",32*n,full),
           "qualification":"uniform public masks, one raw witness per template, rank increment <= raw count; no F4 cost claim"},
       "f4_probe_requested":probe_f4,"f4_probe_records":f4_probe_records,
       "rust_compilation_status":"must be confirmed on exact GitHub head"}));
