@@ -23,3 +23,8 @@ source. Actual scalar multiplication verifies this without assuming the solver's
 output. The hyperelliptic relation control is additional algorithmic agreement.
 This is an executed correctness path after prior quotient construction, not a
 complete-cost speed comparison. The full genus2/3/4 tenfold objective stays open.
+
+The true log vector is nonzero in this fixture: the129classes[P_i-P_0] are
+distinct by the Abel embedding, while the rational2-primary subgroup of the
+known order2ell Jacobian has size2. They cannot all have zero ell-projection.
+The anchored nullity1 therefore fixes exactly their scalar multiple.
