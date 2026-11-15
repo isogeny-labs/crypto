@@ -2,7 +2,7 @@
 
 - **Status:** open
 - **Kind:** implementation gap and missing measurement
-- **Affected work:** [transfer search](../research/p256_genus_dlp_20261115/transfer_search/REPORT.md), PCC-20261115-e111c2
+- **Affected work:** [transfer search](../research/p256_genus_dlp_20261115/transfer_search/REPORT.md) and [folded solver](../research/p256_genus_dlp_20261115/folded_walk/REPORT.md), PCC-20261115-e111c2 and PCC-20261115-30dcbf
 - **Next action owner:** unassigned; no background run is active
 - **Last updated:** 2026-11-15
 
@@ -25,15 +25,20 @@ remains open. This is a specific constant-factor case related to
 - Cost control: the same eigenline in E x E needs two component additions;
   its ideal free-fold model costs 2/sqrt(3) source-addition units. This is
   not a wall-time lower bound for optimized implementations. [pcc:unverified]
-- Missing: folded walk with coefficient tracking and short-cycle handling;
-  an optimized arithmetic adapter; matched transport/setup/folding/solve/
+- Implemented continuation: independent jumps, exact coefficient tracking and
+  bounded short-cycle handling; complete public toy solves and an actual-field
+  transition trace. Four producer tests pass; signed standing is absent.
+  [pcc:unverified]
+- Missing: optimized destination arithmetic; matched transport/setup/folding/solve/
   recovery/verification costs; strongest available source control and replay.
 - No timing, speedup or global nonexistence claim follows from these checks.
 
 ## What would unblock it
 
-- [ ] Implement the quotient walk, with identity/degenerate-collision and
+- [x] Implement the bounded quotient walk, with identity/degenerate-collision and
   short-cycle tests; recover and replay every successful public toy scalar.
+  Producer evidence only; long cycles can reach the explicit budget.
+  [pcc:unverified]
 - [ ] Measure addition plus folding/hash/cycle cost against the matched source
   step on the same subgroup/workload. The preliminary threshold is sqrt(3)
   times source cost, with transport/setup/recovery additionally charged.
@@ -46,12 +51,14 @@ solve or stage saving does not establish an actual P-256 scalar-recovery gain.
 
 ## Next discriminating step
 
-Implement a bounded cycle-safe walk over the existing mixed-image API and
-compare its complete step to the strongest source step. Use exact P-256
+Prepare complete step pricing for the implemented bounded walk and
+compare it to the strongest applicable source step. Use exact P-256
 arithmetic for the component calibration and fully specified small prime-order
 fixtures for complete solves, with source negation, destination generic and
 folded controls. Freeze the workload and finite budget before any benchmark;
-use the EKS skill, including its GitHub route when direct AWS is absent.
+use RunPod as explicitly selected by the user. The documented proxy API route
+returned HTTP401; authenticated RunPod access is pending. A source-frozen replay
+payload exists; no pod or timed comparison is running.
 [pcc:unverified]
 
 If costs exceed the threshold, close that implementation and examine another
@@ -64,3 +71,7 @@ dependency. Recheck when an optimized adapter or solver implementation lands.
 
 2026-11-15: initial exact image checks and bounded exclusions recorded. Open.
 No benchmark is running, and a PR merge does not resolve this cost problem.
+
+2026-11-15 continuation: bounded folded solver and producer controls implemented,
+PCC-20261115-30dcbf. RunPod replay package prepared; authenticated API access and
+the subsequent admitted complete-cost comparison remain open. [pcc:unverified]
