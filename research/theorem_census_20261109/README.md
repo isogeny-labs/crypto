@@ -391,6 +391,38 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [prime-field source theorem](../prime_trace_weak_bound_audit_20261115/README.md)
+removes the explicit Hasse/count/trace-zero premise from the earlier conditional
+prime-field argument. For every odd finite field q>3, actual cubic Euler-power
+nonconstancy follows from Xq-X divisibility/formal differentiation/degree
+contradiction. Actual completed-square and nonsingular-point/fiber equivalences
+prove1<#E(K)<2q+1. For every primep>=5/all nonsingular general Weierstrass models,
+FST2010’s exact trace/gcd definition of supersingularity forces actual trace0
+and pointcountp+1. Every integer r>2 dividing that count, composite permitted,
+has exact modularorder2 and actual cyclotomic extensiondegree2: the field is
+literally IntermediateField.adjoin Fp of all rth roots in AlgebraicClosureFp.
+Primitive-root/simple algebraicity/finiteness and actual Frobenius order2 are
+derived, not assumed from a modular-order/field-degree identification.
+Actual nonsingular F3count1/7/sourceSS/trace±3 controls disprove removing small-field
+guards. Actual F5sourceSS count6/pointorder2/root-adjoin degree1 refutes literal
+unrestricted degree2; actual F7sourceSS count8/pointorder8/root-adjoin degree2
+is a positive composite control. Known examples and earlier arguments credited.
+Exact local **PCC-20261115-b69cc7** replay PASS at 2026-11-15T01:57:20Z, signed standing unverified;
+whole56/0/0, full1233-character binding
+`d190809525ceaf4787000e559cc18b79c39b86f3c811bddb94579290d7c2c638`,
+independent native1complete/0prefix/0unresolved;10formal/config+14artifactpins,
+140files/56objects/25832-byte losslessXZ/fivegate files/inspected one-page47699-byte
+PDF. Thirteen snapshots/eight failed states retained; final13 full logs have
+no warnings/errors. Source FST2010 printed230/PDF7 and237/PDF14 fully text-read/
+visually inspected, not all57pages. Initial derivative-protocol sign mistake
+corrected before code in separate log; original preserved. Alternate geometric
+SS/p-rank/Hasse-invariant comparisons, general Hasse theorem, general nonprime-field
+at-most6 classification and full geometric torsion fields remain separate.
+The repaired prime-field source clause is proved; literalr2 assertion is false.
+No novelty/canonical corpus promotion/full14 closure/frozen edits/cryptoPython/
+new native crypto/spend/upload. [pcc:unverified]
+
+
 The [actual continuous-H1 comparison](../continuous_h1_comparison_audit_20261115/README.md)
 discharges the separate homogeneous-complex comparison gap listed in earlier
 packets below. Actual Mathlib continuousCohomology1 is linearly equivalent to
