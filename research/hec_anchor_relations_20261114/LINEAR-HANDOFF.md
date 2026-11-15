@@ -27,6 +27,15 @@ CI's existing credentialed path must upload/verify the Git archive. Follow
 current-head PR4274and any artifact migration, then FF/recheck custody/checkpoint.
 
 ## Next steps
+
+Post-run exploratory diagnostic HARVEST-ONLY-BOUND.json/harvest_bound.jq:
+best_existing/(compact_total-compact_relation), computed per target, has max
+3.6211x if harvesting were free with all other observed work fixed. Thus a
+harvesting-only same-work kernel replacement does not supply a10xcase here.
+Seek a joint change in useful harvesting and downstream bookkeeping/
+recombination/setup/algebra. A changed relation distribution can change those
+other costs, so this is a conditional diagnostic, not a universal impossibility.
+
 Screen a structural relation-generation/selection mechanism, not this kernel's
 equivalent arithmetic. Primary paper *Improved sieving on algebraic curves*,
 https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/SievingB.pdf,

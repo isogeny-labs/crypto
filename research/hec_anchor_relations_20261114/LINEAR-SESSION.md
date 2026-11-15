@@ -163,3 +163,30 @@ Initial benchmark entry files were outside sparse patterns; added the directory
 permanently and committed it before push. The first metadata smoke used Git's
 same-day --since cutoff and saw no new record; the required historical window
 emits all12unchangedrecorded values. Shared resume was not reapplied or edited.
+
+## Exploratory joint-cost diagnostic
+
+### What was done (commands, files, features)
+From the closed raw observations, native harvest_bound.jq subtracts compact's
+relation time per target, holds all other observed costs fixed, then divides
+best-existing total by that remainder. Replay matches HARVEST-ONLY-BOUND.json.
+Maximum conditional ratio3.6210831112x; fixture medians1.53..3.26. Updated the
+results/handoff/report and inspected the modified PDF page; raw archive, closed
+record metrics and E6/E7criteria are unchanged.
+
+### Decisions made (and why)
+A harvesting-only same-work replacement cannot supply the10xcase under this
+fixed-cost assumption. The next structural cost case must change useful
+harvesting AND downstream bookkeeping/recombination/setup/algebra, or show that
+its changed relation distribution reduces those costs. This is exploratory
+post-run analysis, not a universal impossibility theorem or an observed speedup.
+
+### Open threads (unfinished, pick up next time)
+Publish this derived diagnostic with the measured screen, finish CI/S3custody,
+then cost-screen a joint known-sieving/sparse-recombination successor.
+
+### Errors (what went wrong, how it was handled)
+The completed linear-kernel coordination task exhausted its lease/attempt
+budget; the distinct post-run cost-analysis taskT-6066was checked/claimed before
+source updates. No scientific run was retried, no closed record edited, and
+no shared resume content changed.

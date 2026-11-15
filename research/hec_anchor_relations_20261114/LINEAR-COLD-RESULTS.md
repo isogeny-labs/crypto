@@ -88,6 +88,18 @@ change in useful-relation generation/selection, with prior-art and a complete
 cost case first. Avoid another equivalent arithmetic rewrite of this family.
 The full mathematical>=10xobjective remains active.
 
+An exploratory post-run cost diagnostic holds every non-harvesting cost of
+compact fixed and sets its observed harvesting time to zero. Per target it
+computes best_existing_ns/(compact_total_ns-compact_relation_ns), before any
+aggregation. The maximum is3.6210831112x; fixture medians are1.5332,1.9921,
+1.9464,2.0042,3.2589,3.1133. Thus a harvesting-only same-work replacement does
+not supply a10xcost case under these assumptions. This is not a universal bound:
+changing the relation distribution may also change downstream work. A successor
+needs a joint cost case for useful harvesting and bookkeeping/recombination/
+setup/algebra. Source: harvest_bound.jq; complete cases HARVEST-ONLY-BOUND.json.
+This derived diagnostic is separate from the pre-registered E6/E7tests and
+does not alter their raw archive, metrics or criteria.
+
 Known related successor literature found during packaging: *Improved sieving
 on algebraic curves*, https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/SievingB.pdf,
 Section2.2/2.3. Its Sarkar–Singh/Joux–Vitse point sieve buckets

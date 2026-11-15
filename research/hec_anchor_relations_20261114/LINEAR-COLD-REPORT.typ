@@ -82,6 +82,12 @@ The next structural candidate should change useful-relation supply or selection.
 Another equivalent arithmetic rewrite is not justified by the10× cost gap.
 Do not multiply these ratios by earlier engineering or rank-count gains.
 
+An exploratory fixed-work diagnostic removes compact's harvesting time per
+target before aggregation. Its maximum best-existing / remaining-cost ratio
+is3.62×. A harvesting-only same-work replacement therefore misses10× under
+that assumption; the next cost case needs joint downstream changes. This is
+not a universal bound. Source: #raw("HARVEST-ONLY-BOUND.json").
+
 *Provenance.* Protocol commits #raw("e38d00ce0e"), #raw("ce6ebaa97b") precede
 scientific source #raw("ed0fb2c5f982") and the pre-run S3 checkpoint at09:34UTC.
 Existing fifteen-arm cohort/receipts remain unchanged. Native Rust executes and
