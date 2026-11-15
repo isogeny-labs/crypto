@@ -16,7 +16,7 @@
     "$T_OUT/scaling.md has a table with at least three data rows and the words 'floor' and 'S'",
     "the note says three sizes do not establish a scaling law (AGENTS.md asks for at least four)"
   ],
-  "check_command": "for s in s14 s16 s18; do ./target/release/ecbench verify --dir \"$T_OUT/ecbench/$s\" --replay 8 || exit 1; done; [ \"$(grep -c '^|' \"$T_OUT/scaling.md\")\" -ge 5 ] && grep -qi 'floor' \"$T_OUT/scaling.md\" && grep -Eqi 'four|4 sizes|not establish|cannot' \"$T_OUT/scaling.md\"",
+  "check_command": "for s in s14 s16 s18; do ./target/release/ecbench verify --dir \"$T_OUT/ecbench/$s\" --replay 8 || exit 1; done && [ \"$(grep -c '^|' \"$T_OUT/scaling.md\")\" -ge 5 ] && grep -qi 'floor' \"$T_OUT/scaling.md\" && grep -Eqi 'four|4 sizes|not establish|cannot' \"$T_OUT/scaling.md\"",
   "unblock_answers": {
     "May I run this toy-size check locally instead of on EKS?": "Yes. Toy size, operation counts only, no wall-clock claim, no benchmark row.",
     "Are AWS credentials or S3 access available?": "No. Not available in this environment. Continue offline and report what it blocks."

@@ -18,7 +18,7 @@
     "the job's timeout-minutes is at most 25",
     ".github/scripts/check-pr-budgets.py is unchanged"
   ],
-  "check_command": "python3 .github/scripts/check-pr-budgets.py && python3 .github/scripts/test-pr-budgets.py && git diff --quiet \"$T_BASE\" -- .github/scripts/check-pr-budgets.py",
+  "check_command": "python3 .github/scripts/check-pr-budgets.py && python3 .github/scripts/test-pr-budgets.py && git diff --quiet \"$T_BASE\" HEAD -- .github/scripts/check-pr-budgets.py",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

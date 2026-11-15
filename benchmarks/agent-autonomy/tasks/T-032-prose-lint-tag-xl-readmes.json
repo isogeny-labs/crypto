@@ -17,7 +17,7 @@
     "removing every ` [pcc:unverified]` tag from the new and the base file gives identical text",
     "only these two files changed"
   ],
-  "check_command": "python3 tools/pcc/pcc.py lint-prose research/xl_bilinear_core_20261006/README.md research/xl_trilinear_t_unknown_20261006/README.md && for f in research/xl_bilinear_core_20261006/README.md research/xl_trilinear_t_unknown_20261006/README.md; do diff <(git show \"$T_BASE:$f\" | sed -E 's/ *\\[pcc:unverified\\]//g') <(sed -E 's/ *\\[pcc:unverified\\]//g' \"$f\") || exit 1; done; [ \"$(git diff --name-only \"$T_BASE\" | grep -vcE '^research/xl_(bilinear_core|trilinear_t_unknown)_20261006/README.md$')\" = 0 ]",
+  "check_command": "python3 tools/pcc/pcc.py lint-prose research/xl_bilinear_core_20261006/README.md research/xl_trilinear_t_unknown_20261006/README.md && for f in research/xl_bilinear_core_20261006/README.md research/xl_trilinear_t_unknown_20261006/README.md; do diff <(git show \"$T_BASE:$f\" | sed -E 's/ *\\[pcc:unverified\\]//g') <(sed -E 's/ *\\[pcc:unverified\\]//g' \"$f\") || exit 1; done && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vcE '^research/xl_(bilinear_core|trilinear_t_unknown)_20261006/README.md$')\" = 0 ]",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

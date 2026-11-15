@@ -15,7 +15,7 @@
     "the new row describes both optimize inventory and optimize audit, and cites a section or file",
     "only docs/ecbench/README.md changed"
   ],
-  "check_command": "python3 -c \"import re;h={re.match(r'//! ecbench (\\S+)',l).group(1) for l in open('src/bin/ecbench.rs') if l.startswith('//! ecbench ')};r=open('docs/ecbench/README.md').read();t=r.split('### Every subcommand')[1].split('## 1. Quick start')[0];m=[c for c in h if ('\\x60'+c) not in t];print(m);raise SystemExit(1 if m else 0)\" && grep -q 'inventory' docs/ecbench/README.md && [ \"$(git diff --name-only \"$T_BASE\" | grep -vc '^docs/ecbench/README.md$')\" = 0 ]",
+  "check_command": "python3 -c \"import re;h={re.match(r'//! ecbench (\\S+)',l).group(1) for l in open('src/bin/ecbench.rs') if l.startswith('//! ecbench ')};r=open('docs/ecbench/README.md').read();t=r.split('### Every subcommand')[1].split('## 1. Quick start')[0];m=[c for c in h if ('\\x60'+c) not in t];print(m);raise SystemExit(1 if m else 0)\" && grep -q 'inventory' docs/ecbench/README.md && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc '^docs/ecbench/README.md$')\" = 0 ]",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

@@ -17,7 +17,7 @@
     "$T_OUT/gap.md contains no pass/fail wording ('fail', 'pass') about the gap, carries [pcc:unverified], passes lint-prose",
     "benchmarks/20261114-wallfix-runpod-abab unchanged"
   ],
-  "check_command": "python3 -c \"import json,os;r=json.load(open(os.environ['T_OUT']+'/gap.json'));e={'w0':120194,'w0_1':134583,'w1':209730};assert all(abs(r[k]-v)/v<0.01 for k,v in e.items())\" && grep -q 'pcc:unverified' \"$T_OUT/gap.md\" && ! grep -Eqi '\\b(pass|fail)(ed|es)?\\b' \"$T_OUT/gap.md\" && python3 tools/pcc/pcc.py lint-prose \"$T_OUT/gap.md\" && git diff --quiet \"$T_BASE\" -- benchmarks/20261114-wallfix-runpod-abab",
+  "check_command": "python3 -c \"import json,os;r=json.load(open(os.environ['T_OUT']+'/gap.json'));e={'w0':120194,'w0_1':134583,'w1':209730};assert all(abs(r[k]-v)/v<0.01 for k,v in e.items())\" && grep -q 'pcc:unverified' \"$T_OUT/gap.md\" && ! grep -Eqi '\\b(pass|fail)(ed|es)?\\b' \"$T_OUT/gap.md\" && python3 tools/pcc/pcc.py lint-prose \"$T_OUT/gap.md\" && git diff --quiet \"$T_BASE\" HEAD -- benchmarks/20261114-wallfix-runpod-abab",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

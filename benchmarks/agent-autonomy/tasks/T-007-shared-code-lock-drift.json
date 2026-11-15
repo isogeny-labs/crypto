@@ -17,7 +17,7 @@
     "tools/pcc/pcc.py equals its content at the commit before the setup commit",
     "no lock or manifest file was edited"
   ],
-  "check_command": "python3 tools/check_lab_parity.py --repo crypto && python3 tools/pcc/pcc.py canary && git diff --quiet \"$T_BASE~1\" -- tools/pcc/pcc.py",
+  "check_command": "python3 tools/check_lab_parity.py --repo crypto && python3 tools/pcc/pcc.py canary && git diff --quiet \"$T_BASE~1\" HEAD -- tools/pcc/pcc.py",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

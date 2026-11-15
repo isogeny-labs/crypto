@@ -19,7 +19,7 @@
     "only the three named READMEs changed",
     "every changed line differs from the original only by curve-name substitution (added lines == removed lines, numbers unchanged)"
   ],
-  "check_command": "! python3 scripts/check_curve_names.py 2>&1 | grep -qE '^benchmarks/2026[0-9]+-[a-z-]+/README.md' && [ \"$(git diff --name-only \"$T_BASE\" | grep -vcE '^benchmarks/(20261113-ic-filter-layout|20261114-ic-fold-pack|20261114-ic-key-chains)/README.md$')\" = 0 ] && git diff --numstat \"$T_BASE\" | awk '{a+=$1;d+=$2} END{exit !(a==d && a>0)}'",
+  "check_command": "! python3 scripts/check_curve_names.py 2>&1 | grep -qE '^benchmarks/2026[0-9]+-[a-z-]+/README.md' && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vcE '^benchmarks/(20261113-ic-filter-layout|20261114-ic-fold-pack|20261114-ic-key-chains)/README.md$')\" = 0 ] && git diff --numstat \"$T_BASE\" HEAD | awk '{a+=$1;d+=$2} END{exit !(a==d && a>0)}'",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

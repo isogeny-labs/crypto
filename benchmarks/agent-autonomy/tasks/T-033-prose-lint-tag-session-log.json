@@ -16,7 +16,7 @@
     "with every ` [pcc:unverified]` tag removed, the file equals the base file with its tags removed",
     "only that file changed"
   ],
-  "check_command": "python3 tools/pcc/pcc.py lint-prose docs/session-logs/2026-11-14.md && diff <(git show \"$T_BASE:docs/session-logs/2026-11-14.md\" | sed -E 's/ *\\[pcc:unverified\\]//g') <(sed -E 's/ *\\[pcc:unverified\\]//g' docs/session-logs/2026-11-14.md) && [ \"$(git diff --name-only \"$T_BASE\" | grep -vc '^docs/session-logs/2026-11-14.md$')\" = 0 ]",
+  "check_command": "python3 tools/pcc/pcc.py lint-prose docs/session-logs/2026-11-14.md && diff <(git show \"$T_BASE:docs/session-logs/2026-11-14.md\" | sed -E 's/ *\\[pcc:unverified\\]//g') <(sed -E 's/ *\\[pcc:unverified\\]//g' docs/session-logs/2026-11-14.md) && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc '^docs/session-logs/2026-11-14.md$')\" = 0 ]",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

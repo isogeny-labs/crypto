@@ -18,7 +18,7 @@
     "decision_value names which result would change which decision",
     "no other card or file under backlog/ changed"
   ],
-  "check_command": "ID=$(ls -d backlog/XP-*smith*even* 2>/dev/null | head -1 | xargs -r basename); [ -n \"$ID\" ] && ./target/release/backlog validate \"$ID\" --no-git && test -s backlog/$ID/README.md && [ \"$(git diff --name-only \"$T_BASE\" | grep -vc \"^backlog/$ID/\")\" = 0 ]",
+  "check_command": "ID=$(ls -d backlog/XP-*smith*even* 2>/dev/null | head -1 | xargs -r basename); [ -n \"$ID\" ] && ./target/release/backlog validate \"$ID\" --no-git && test -s backlog/$ID/README.md && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc \"^backlog/$ID/\")\" = 0 ]",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

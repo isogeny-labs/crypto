@@ -16,7 +16,7 @@
     "the note quotes the study's files, theorems and top_family values from lean-health.sh",
     "research/ic_prime_eth_leads_20261031/leads/L01 is unchanged"
   ],
-  "check_command": "for h in 'Structure above' 'Theorem used as stated' 'The object as an instance' 'Assembly probe' 'Missing components' 'Inheritance table'; do grep -qi \"$h\" \"$T_OUT/PROOF_MAP.md\" || exit 1; done; grep -q 'top_family' \"$T_OUT/PROOF_MAP.md\" && git diff --quiet \"$T_BASE\" -- research/ic_prime_eth_leads_20261031/leads/L01",
+  "check_command": "for h in 'Structure above' 'Theorem used as stated' 'The object as an instance' 'Assembly probe' 'Missing components' 'Inheritance table'; do grep -qi \"$h\" \"$T_OUT/PROOF_MAP.md\" || exit 1; done && grep -q 'top_family' \"$T_OUT/PROOF_MAP.md\" && git diff --quiet \"$T_BASE\" HEAD -- research/ic_prime_eth_leads_20261031/leads/L01",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

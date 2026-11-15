@@ -15,7 +15,7 @@
     "only the two documents changed",
     "if a PDF is only in the artifact store, the text says so instead of linking a file that is absent"
   ],
-  "check_command": "python3 -c \"import re,os\nfor f in ['docs/ecbench/README.md','docs/ECDLP_CALIBRATION_PRIMES.md']:\n  b=os.path.dirname(f)\n  for t in re.findall(r'\\]\\(([^)#\\s]+)',open(f).read()):\n    if re.match(r'(https?:|mailto:|/)',t): continue\n    if ('ecbench_accounting_v2' in t or 'summation_poly' in t) and not os.path.exists(os.path.normpath(os.path.join(b,t))): raise SystemExit(1)\" && [ \"$(git diff --name-only \"$T_BASE\" | grep -vcE '^docs/(ecbench/README.md|ECDLP_CALIBRATION_PRIMES.md)$')\" = 0 ]",
+  "check_command": "python3 -c \"import re,os\nfor f in ['docs/ecbench/README.md','docs/ECDLP_CALIBRATION_PRIMES.md']:\n  b=os.path.dirname(f)\n  for t in re.findall(r'\\]\\(([^)#\\s]+)',open(f).read()):\n    if re.match(r'(https?:|mailto:|/)',t): continue\n    if ('ecbench_accounting_v2' in t or 'summation_poly' in t) and not os.path.exists(os.path.normpath(os.path.join(b,t))): raise SystemExit(1)\" && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vcE '^docs/(ecbench/README.md|ECDLP_CALIBRATION_PRIMES.md)$')\" = 0 ]",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

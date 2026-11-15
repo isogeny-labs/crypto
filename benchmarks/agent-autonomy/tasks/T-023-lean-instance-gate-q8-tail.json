@@ -17,7 +17,7 @@
     "the note names a concrete Mathlib or crypto-lean declaration for field 2 (for example Nat.Coprime)",
     "research/ghs_degree3_q8_tail_20261026 is unchanged"
   ],
-  "check_command": "for h in 'Structure above' 'Theorem used as stated' 'The object as an instance' 'Assembly probe' 'Missing components' 'Inheritance table'; do grep -qi \"$h\" \"$T_OUT/PROOF_MAP.md\" || exit 1; done; grep -q 'Nat\\.' \"$T_OUT/PROOF_MAP.md\" && git diff --quiet \"$T_BASE\" -- research/ghs_degree3_q8_tail_20261026",
+  "check_command": "for h in 'Structure above' 'Theorem used as stated' 'The object as an instance' 'Assembly probe' 'Missing components' 'Inheritance table'; do grep -qi \"$h\" \"$T_OUT/PROOF_MAP.md\" || exit 1; done && grep -q 'Nat\\.' \"$T_OUT/PROOF_MAP.md\" && git diff --quiet \"$T_BASE\" HEAD -- research/ghs_degree3_q8_tail_20261026",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

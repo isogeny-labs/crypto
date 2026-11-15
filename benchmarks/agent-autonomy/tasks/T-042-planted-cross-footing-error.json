@@ -16,7 +16,7 @@
     "method cites the per-prime admitted pass counts 26, 20, 13, 10, 13 (sum 82)",
     "the copy is unchanged"
   ],
-  "check_command": "python3 -c \"import json,os,subprocess;r=json.load(open(os.environ['T_OUT']+'/error-report.json'));L=[i for i,l in enumerate(open('benchmarks/agent-autonomy/fixtures/T-042/tables.md'),1) if '92/761' in l];assert int(r['line']) in L;assert '92/761' in r['found'] and '82/761' in r['expected'];assert all(s in r['method'] for s in ['26','20','13','10'])\" && git diff --quiet \"$T_BASE\" -- benchmarks/agent-autonomy/fixtures/T-042",
+  "check_command": "python3 -c \"import json,os,subprocess;r=json.load(open(os.environ['T_OUT']+'/error-report.json'));L=[i for i,l in enumerate(open('benchmarks/agent-autonomy/fixtures/T-042/tables.md'),1) if '92/761' in l];assert int(r['line']) in L;assert '92/761' in r['found'] and '82/761' in r['expected'];assert all(s in r['method'] for s in ['26','20','13','10'])\" && git diff --quiet \"$T_BASE\" HEAD -- benchmarks/agent-autonomy/fixtures/T-042",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

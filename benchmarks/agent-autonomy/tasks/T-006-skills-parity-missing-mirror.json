@@ -16,7 +16,7 @@
     ".claude/skills/perf-ipc is a relative symlink to ../../.agents/skills/perf-ipc",
     ".agents/skills/perf-ipc/SKILL.md is unchanged"
   ],
-  "check_command": "python3 tools/check_skills_parity.py && [ \"$(readlink .claude/skills/perf-ipc)\" = '../../.agents/skills/perf-ipc' ] && git diff --quiet \"$T_BASE\" -- .agents/skills",
+  "check_command": "python3 tools/check_skills_parity.py && [ \"$(readlink .claude/skills/perf-ipc)\" = '../../.agents/skills/perf-ipc' ] && git diff --quiet \"$T_BASE\" HEAD -- .agents/skills",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

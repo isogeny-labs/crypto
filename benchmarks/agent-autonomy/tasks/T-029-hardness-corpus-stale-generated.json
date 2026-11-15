@@ -16,7 +16,7 @@
     "node docs/ecdlp-hardness-corpus/validate.mjs exits 0",
     "docs/ecdlp-hardness-corpus/corpus.json is unchanged"
   ],
-  "check_command": "node docs/ecdlp-hardness-corpus/attack-graph.mjs --check && node docs/ecdlp-hardness-corpus/validate.mjs && git diff --quiet \"$T_BASE\" -- docs/ecdlp-hardness-corpus/corpus.json",
+  "check_command": "node docs/ecdlp-hardness-corpus/attack-graph.mjs --check && node docs/ecdlp-hardness-corpus/validate.mjs && git diff --quiet \"$T_BASE\" HEAD -- docs/ecdlp-hardness-corpus/corpus.json",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

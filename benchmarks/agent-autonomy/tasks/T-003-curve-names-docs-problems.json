@@ -17,7 +17,7 @@
     "only these three files changed",
     "added lines == removed lines in the diff"
   ],
-  "check_command": "! python3 scripts/check_curve_names.py 2>&1 | grep -qE '^(docs/ic/calibration-solver-units.md|problems/arity-completion-launch-gates.md|research/arity_completion_20261104/README.md):' && [ \"$(git diff --name-only \"$T_BASE\" | grep -vcE '^(docs/ic/calibration-solver-units.md|problems/arity-completion-launch-gates.md|research/arity_completion_20261104/README.md)$')\" = 0 ] && git diff --numstat \"$T_BASE\" | awk '{a+=$1;d+=$2} END{exit !(a==d && a>0)}'",
+  "check_command": "! python3 scripts/check_curve_names.py 2>&1 | grep -qE '^(docs/ic/calibration-solver-units.md|problems/arity-completion-launch-gates.md|research/arity_completion_20261104/README.md):' && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vcE '^(docs/ic/calibration-solver-units.md|problems/arity-completion-launch-gates.md|research/arity_completion_20261104/README.md)$')\" = 0 ] && git diff --numstat \"$T_BASE\" HEAD | awk '{a+=$1;d+=$2} END{exit !(a==d && a>0)}'",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

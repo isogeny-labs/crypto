@@ -15,7 +15,7 @@
     "the description matches the `description:` of perf-ipc/SKILL.md in substance",
     "only README.md changed"
   ],
-  "check_command": "for d in .agents/skills/*/; do n=$(basename \"$d\"); grep -q \"$n\" .agents/skills/README.md || exit 1; done; python3 tools/check_skills_parity.py && [ \"$(git diff --name-only \"$T_BASE\" | grep -vc '^.agents/skills/README.md$')\" = 0 ]",
+  "check_command": "for d in .agents/skills/*/; do n=$(basename \"$d\"); grep -q \"$n\" .agents/skills/README.md || exit 1; done && python3 tools/check_skills_parity.py && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc '^.agents/skills/README.md$')\" = 0 ]",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

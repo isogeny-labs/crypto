@@ -18,7 +18,7 @@
     "python3 tools/pcc/pcc.py lint-prose on the added lines reports no finding",
     "the entry contains the numbers 24 and 807"
   ],
-  "check_command": "F=docs/session-logs/$T_DATE.md; test -f \"$F\" && for h in 'What was done' 'Decisions made' 'Open threads' 'Errors'; do tail -n 60 \"$F\" | grep -q \"$h\" || exit 1; done; [ \"$(git diff \"$T_BASE\" -- \"$F\" | grep -c '^-[^-]')\" = 0 ] && grep -q '807' \"$F\" && git diff \"$T_BASE\" -- \"$F\" | grep '^+[^+]' | sed 's/^+//' | python3 tools/pcc/pcc.py lint-prose --stdin",
+  "check_command": "F=docs/session-logs/$T_DATE.md; test -f \"$F\" && for h in 'What was done' 'Decisions made' 'Open threads' 'Errors'; do tail -n 60 \"$F\" | grep -q \"$h\" || exit 1; done && [ \"$(git diff \"$T_BASE\" HEAD -- \"$F\" | grep -c '^-[^-]')\" = 0 ] && grep -q '807' \"$F\" && git diff \"$T_BASE\" HEAD -- \"$F\" | grep '^+[^+]' | sed 's/^+//' | python3 tools/pcc/pcc.py lint-prose --stdin",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

@@ -15,7 +15,7 @@
     "README.md still lists all seven entries (as a link or as annotated plain text)",
     "only README.md changed"
   ],
-  "check_command": "python3 -c \"import re,os;f='README.md';t=open(f).read();bad=[x for x in re.findall(r'\\]\\((\\./[^)#\\s]+)',t) if re.search(r'RESEARCH|DEFERRED',x) and not os.path.exists(x)];print(bad);raise SystemExit(1 if bad else 0)\" && for n in RESEARCH_P256 RESEARCH_RESIDUAL_WALKS RESEARCH_TII_MCELIECE RESEARCH_EXOTIC_COORDINATES DEFERRED RESEARCH_BENCH_LOG; do grep -q \"$n\" README.md || exit 1; done; [ \"$(git diff --name-only \"$T_BASE\" | grep -vc '^README.md$')\" = 0 ]",
+  "check_command": "python3 -c \"import re,os;f='README.md';t=open(f).read();bad=[x for x in re.findall(r'\\]\\((\\./[^)#\\s]+)',t) if re.search(r'RESEARCH|DEFERRED',x) and not os.path.exists(x)];print(bad);raise SystemExit(1 if bad else 0)\" && for n in RESEARCH_P256 RESEARCH_RESIDUAL_WALKS RESEARCH_TII_MCELIECE RESEARCH_EXOTIC_COORDINATES DEFERRED RESEARCH_BENCH_LOG; do grep -q \"$n\" README.md || exit 1; done && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc '^README.md$')\" = 0 ]",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",

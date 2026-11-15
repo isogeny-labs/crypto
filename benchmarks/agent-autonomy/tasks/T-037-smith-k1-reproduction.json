@@ -18,7 +18,7 @@
     "$T_OUT/repro.md exists, carries [pcc:unverified], has a 'Sources checked' line, and passes lint-prose",
     "research/smith_near_prime_20261114 is unchanged"
   ],
-  "check_command": "python3 -c \"import json,os;rows=[json.loads(l) for l in open(os.environ['T_OUT']+'/np.jsonl') if l.strip()];C=[r for r in rows if r['kind']=='curve' and r.get('squarefree') and r.get('smith') is not None];k1=[r for r in C if r['k']==1];assert len(k1)>=50,len(k1);assert not any(r['smith']['full_success'] for r in k1)\" && python3 tools/pcc/pcc.py lint-prose \"$T_OUT/repro.md\" && grep -q 'pcc:unverified' \"$T_OUT/repro.md\" && grep -qi 'sources checked' \"$T_OUT/repro.md\" && git diff --quiet \"$T_BASE\" -- research/smith_near_prime_20261114",
+  "check_command": "python3 -c \"import json,os;rows=[json.loads(l) for l in open(os.environ['T_OUT']+'/np.jsonl') if l.strip()];C=[r for r in rows if r['kind']=='curve' and r.get('squarefree') and r.get('smith') is not None];k1=[r for r in C if r['k']==1];assert len(k1)>=50,len(k1);assert not any(r['smith']['full_success'] for r in k1)\" && python3 tools/pcc/pcc.py lint-prose \"$T_OUT/repro.md\" && grep -q 'pcc:unverified' \"$T_OUT/repro.md\" && grep -qi 'sources checked' \"$T_OUT/repro.md\" && git diff --quiet \"$T_BASE\" HEAD -- research/smith_near_prime_20261114",
   "unblock_answers": {},
   "forbidden": [
     "force-pushing or rewriting history",
