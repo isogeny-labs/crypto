@@ -1,3 +1,19 @@
+# Complete metadata sidecar genuinely published; hold released
+
+## What was done
+pcc/claims/PCC-20261115-2625d2.json / pcc/claims/PCC-20261115-f2a4aa.json: original43750430453/job132922943345 two actual remote replays BEFORE bot67353d444b/direct00be7d54/exact4paths. All66706content185literal links538consumerowned/HEAD-status-ledger/Rootprefix terminal checks, full sourceblobs/XZintegrity/guarddecodedbytes/indexencoding and normalFF/originalartifact/wiring0 pass. Temporary sidecar HOLD RELEASED. Complete2,140,576-byte failedindex subject4a8f8f retains exact bytes via one exact original canonical entry and a transparent relative alias at the same path. Root two genuine ignored cache objects are restored from full retained originals; no new remote read claimed. [pcc:unverified]
+
+## Decisions made
+Finish comparator compiled-source governor03 with exact canonical artifact verification, source/byte/ledger/prose gates, then normalpublication and original exactsource checkpoint25 before whole controls. Preserve every failed build/source-governance/parser attempt and all pinned bytes. Full scientific custody NEW28 remains separate and pending. [pcc:unverified]
+
+## Open threads
+Comparator compiled-source checkpoint and originalreceipt25; run fullpositive/eightnegative/elapsed-only controls with whole archives and runtime/sourceguards; implement whole diagnosticCI under prospectively published9aad0c/5f23dd29; review/freeze unassisted relation-completion successor. Existing global/model/numericLean/calibrated/admission/reference/merge requirements persist. [pcc:unverified]
+
+## Errors
+Firstbuild missinghex testdependency32398d, immutable testlog whitespace4a8f8f, full index originalartifact selectioncdcaa2 and sidecar governor stdout-stderr parser5dca3c all retained. No source, mathematical gate, originalpolicy, pinned byte or historical failure changed. [pcc:unverified]
+
+---
+
 # Preserve sidecar governor selected-path parser failure
 
 ## What was done
