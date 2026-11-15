@@ -1,0 +1,62 @@
+{
+  "schema": "ghs-odd5-lmfdb-connected-mirror/v1",
+  "provider": "mcp__lmfdb__run_sql",
+  "queried_utc": "2026-11-15 14:13:28 UTC",
+  "mirror_refresh_utc": null,
+  "query": "SELECT label,g,q,poly,has_jacobian,is_simple,curve_count FROM av_fq_isog WHERE label IN ('5.3.a_a_a_a_aba','5.3.a_a_a_a_ba') ORDER BY label",
+  "columns": [
+    "label",
+    "g",
+    "q",
+    "poly",
+    "has_jacobian",
+    "is_simple",
+    "curve_count"
+  ],
+  "row_count": 2,
+  "rows": [
+    {
+      "label": "5.3.a_a_a_a_aba",
+      "g": 5,
+      "q": 3,
+      "poly": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        -26,
+        0,
+        0,
+        0,
+        0,
+        243
+      ],
+      "has_jacobian": 0,
+      "is_simple": true,
+      "curve_count": 4
+    },
+    {
+      "label": "5.3.a_a_a_a_ba",
+      "g": 5,
+      "q": 3,
+      "poly": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        26,
+        0,
+        0,
+        0,
+        0,
+        243
+      ],
+      "has_jacobian": 0,
+      "is_simple": true,
+      "curve_count": 4
+    }
+  ],
+  "flag_semantics_source": "https://github.com/LMFDB/lmfdb-inventory/blob/master/db-abvar.md"
+}
