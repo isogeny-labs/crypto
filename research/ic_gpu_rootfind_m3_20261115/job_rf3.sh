@@ -5,10 +5,11 @@ W=/work/rm3; OUT=/work/out_rm3
 log() { echo "[$(date -u +%H:%M:%S)] $*" | tee -a $OUT/progress.log; }
 pack() { (cd /work && tar czf out_rm3.tgz out_rm3 && sha256sum out_rm3.tgz > out_rm3.tgz.sha256); }
 cp $W/specs/rf3-amend1.json $OUT/
+rm -f $W/rootfind_serve.sock   # the first daemon's socket file outlives it
 T0=$(date +%s.%N)
 $W/rootfind_serve_cuda --daemon $W/rootfind_serve.sock 2> $OUT/daemon2.log &
 DPID=$!
-until [ -S $W/rootfind_serve.sock ] || ! kill -0 $DPID 2>/dev/null; do sleep 0.01; done
+until grep -q "listening" $OUT/daemon2.log 2>/dev/null || ! kill -0 $DPID 2>/dev/null; do sleep 0.01; done
 echo "daemon (2nd start) start to socket: $(python3 -c "print(round($(date +%s.%N) - $T0, 3))") s" >> $OUT/daemon-start.txt
 grep -q "cuda: " $OUT/daemon2.log || { log "ABORT: daemon not on the CUDA backend"; pack; exit 1; }
 log "amendment 1: daemon up: $(tail -1 $OUT/daemon-start.txt)"
