@@ -63,6 +63,10 @@ pub struct Stats {
     pub gate_linearisations: u64,
     pub learnt_clauses: u64,
     pub learnt_lits: u64,
+    /// Conflicts raised while the `stage_block` (the chain's `t`) was fully assigned
+    /// (the `x₃` stage) versus not (the `t` stage).
+    pub conflicts_stage_assigned: u64,
+    pub conflicts_stage_open: u64,
     /// Histogram of learnt-clause literals that fall in the "priority" (summand) blocks:
     /// index = count of priority literals, value = clauses. Width `< 2ℓ` means the clause
     /// excludes more than one pair.
@@ -103,6 +107,8 @@ pub struct LinCdcl {
     /// Literals decided first, one per level, before any search decision (incremental use).
     /// A refutation under assumptions returns `Unsat` without marking the solver inconsistent.
     pub assumptions: Vec<i32>,
+    /// Block whose assignment state classifies a conflict (see `Stats`).
+    pub stage_block: Vec<u32>,
     ok: bool,
 }
 
@@ -138,6 +144,7 @@ impl LinCdcl {
             stats: Stats::default(),
             restarts: false,
             assumptions: Vec::new(),
+            stage_block: Vec::new(),
             ok: true,
         }
     }
@@ -730,6 +737,13 @@ impl LinCdcl {
             if let Some(confl) = self.propagate() {
                 self.stats.conflicts += 1;
                 conflicts_since_restart += 1;
+                if !self.stage_block.is_empty() {
+                    if self.block_value(&self.stage_block).is_some() {
+                        self.stats.conflicts_stage_assigned += 1;
+                    } else {
+                        self.stats.conflicts_stage_open += 1;
+                    }
+                }
                 if self.decision_level() == 0 {
                     self.ok = false;
                     return Result::Unsat;
@@ -985,6 +999,7 @@ impl ChainInstance {
         let mut prio: Vec<u32> = x1[..l as usize].to_vec();
         prio.extend_from_slice(&x2[..l as usize]);
         s.set_priority(&prio);
+        s.stage_block = t.clone();
         ChainInstance {
             solver: s,
             x1,

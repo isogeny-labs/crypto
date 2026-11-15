@@ -312,6 +312,7 @@ fn run_lin(
         "conflicts": st.conflicts, "decisions": st.decisions, "propagations": st.propagations,
         "xor_propagations": st.xor_propagations, "gje_calls": st.gje_calls,
         "gate_linearisations": st.gate_linearisations, "learnt_clauses": st.learnt_clauses,
+        "conflicts_t_stage": st.conflicts_stage_open, "conflicts_x3_stage": st.conflicts_stage_assigned,
         "learnt_lits": st.learnt_lits, "learnt_priority_width": st.learnt_priority_width,
         "n_vars": inst.solver.n_vars, "build_ms": build_ms, "wall_ms": wall_ms,
     })
@@ -357,6 +358,8 @@ fn run_lin_reuse(
         "conflicts": st.conflicts - before.conflicts, "decisions": st.decisions - before.decisions,
         "propagations": st.propagations - before.propagations, "xor_propagations": st.xor_propagations - before.xor_propagations,
         "learnt_clauses": st.learnt_clauses - before.learnt_clauses, "cumulative_conflicts": st.conflicts,
+        "conflicts_t_stage": st.conflicts_stage_open - before.conflicts_stage_open,
+        "conflicts_x3_stage": st.conflicts_stage_assigned - before.conflicts_stage_assigned,
         "cumulative_learnt_clauses": st.learnt_clauses, "n_vars": inst.solver.n_vars, "wall_ms": wall_ms,
     })
 }
