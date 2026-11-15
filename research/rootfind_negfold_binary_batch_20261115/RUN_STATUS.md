@@ -13,8 +13,10 @@ The protocol file SHA-256 is
 The [protocol](PROTOCOL.md) specifies same-target scalar/batch comparisons,
 cost completeness, relation controls, L2/A/A wall admission, independent
 replay, fixed stopping, and the USD 5 new-job ceiling. Its source and protocol
-publication receipt must be checked after the first pushed commit and before
-any build or trial. No session directory or outcome row exists here.
+publication [receipt](publication.json) checks the listed source, protocol
+and spec paths against pushed commit `2f242cf2728f6091461441d2687688158778f98f`.
+The launch request and exact image/binary hashes remain to be bound at
+admission. No session directory or outcome row exists here.
 
 ## Admission obstruction
 
