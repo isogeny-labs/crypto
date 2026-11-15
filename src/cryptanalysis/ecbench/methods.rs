@@ -7535,6 +7535,9 @@ fn solve_ic_binary(
     let mut oracle_box: Box<dyn DecompositionOracle<BinaryGroup> + '_> = match or_name.as_str() {
         "subtract" => Box::new(SubtractOracle),
         "mitm" => Box::new(MitmOracle::new(ms)),
+        // Generic over the group: one probe a target into the negation-folded
+        // table of every signed m-sum of the base (as on prime curves).
+        "ksum" => Box::new(KSumOracle::new(ms)),
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
         "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
