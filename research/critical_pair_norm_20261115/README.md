@@ -67,9 +67,12 @@ Normalized unpack/repack is byte-identical. [pcc:unverified]
 |evidence/qualification001/runs.tar.xz|314744|bedb93ed6cdfd9c259d1a85e804d5454228289ef2920439ad773b917855021fa|
 |evidence/qualification002/runs.tar.xz|82016|1ff6979f864247b4aceb3d0f15e712ad073eb4e3ed48343bc8246d8f7f4cce80|
 
-Both whole objects use documented artifact-autofix upload/full-byte replay;
-their remote custody awaits its actual receipt. Extract runs.tar.xz in a fresh
-directory to read runs/. No shards or evidence replacement. Both
+Artifact-autofix run43720392567 uploads both whole objects and replays both
+remote objects in full. Bot0683ddd111 retains their SHA256/length manifests
+and ignore rules. Both exact local hydrated copies verify with zero problems;
+hydrate either directory with tools/artifacts/artifacts.py pull before reading
+runs.tar.xz. Extract it in a fresh directory to read runs/. No shards or
+evidence replacement. Both
 [round001](reports/qualification001/report.pdf) and
 [round002](reports/qualification002/report.pdf) reports have two inspected pages,
 recorded-count graphs and the [editable pipeline](pipeline.dot).

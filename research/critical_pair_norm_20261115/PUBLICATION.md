@@ -94,3 +94,31 @@ available after retargeting to main. Already-merged main4303 appears in the
 temporary stack diff until the parent takes its pending base merge; no
 benchmark utility, progress or eligibility content is authored by this study.
 Its two own whole archives await artifact-autofix receipts. [pcc:unverified]
+
+Ready stacked PR4304 opens at443293c80f. Its trusted-base artifact run
+43720392567 uploads both whole archives and replays both complete remote
+objects. Bot0683ddd111 changes only their manifests/ignore rules and tracked
+raw-file removal. Both exact ignored local copies verify with zero problems;
+the policy check now selects no added data files. No source, input, proof or
+raw archive byte changes. The report custody paragraphs and README now name
+that actual receipt. Any following documentation head needs its own checks.
+[pcc:unverified]
+
+At13:43Z parent4302 is still open/dirty at e8dfbee313, with no current-head
+check results returned. Its earlier bot-head gates do not apply to this head.
+No PR activity subscription tool is available. Keep the pending Copilot/base
+merge and normal check-in cadence; no empty rerun or force push. PR4304's
+base remains the parent feature branch, so main-only gate/size/artifacts and
+auto-merge follow retargeting after that parent lands. [pcc:unverified]
+
+Both report custody pages are rendered and visually inspected after this
+update; their first pages are pixel-identical to the previously inspected
+versions. The four source/evidence round bindings remain historical and
+unchanged. The revised PR body is linted before submission. Current-head
+checks and the parent Copilot merge remain pending; this note carries no
+earlier-head CI pass forward.
+
+The final scoped whitespace gate caught extra blank lines at both Typst EOFs
+before the commit; normalized those source endings. Report contents and all
+native/evidence bytes are unchanged. Large-file, ledger, lesson and prose
+checks passed; whitespace now passes too.

@@ -5,6 +5,10 @@ degree or positive-yield result for the norm systems. Actual software retains
 small fixed admission/caps. It does not implement the unbounded parameter
 family used in this conditional discussion. [pcc:unverified]
 
+D bounds actual DAG-node and critical-product degrees, rather than final
+printed degree or expanded input-multiplier degree. No flat Macaulay
+certificate-degree theorem is supplied by these controls. [pcc:unverified]
+
 Let v be the number of variables, s the number of input equations and
 M=binom(v+D,D). Every admitted nonzero remainder has a leading monomial not
 divisible by an earlier basis leading monomial: the native reduction visits

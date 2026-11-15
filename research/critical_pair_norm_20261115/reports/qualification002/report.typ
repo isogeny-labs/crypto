@@ -51,8 +51,9 @@ nine pre-call wrapper/source/binary bindings match at completion. Raw files,
 exits, failures, inputs, proofs and status tables are in the separate whole
 archive: *82,016 bytes*, SHA256
 #raw("1ff6979f864247b4aceb3d0f15e712ad073eb4e3ed48343bc8246d8f7f4cce80",block:true)
-Normalized unpack/repack is byte-identical. Remote custody awaits the
-documented same-repository artifact-autofix upload and complete-byte readback.
+Normalized unpack/repack is byte-identical. Artifact-autofix run43720392567
+uploads both whole objects and replays both complete remote bytes. Bot0683ddd111
+retains both SHA256/length pointers; hydrated checks have zero problems.
 No archive is split or old evidence rewritten.
 
 Sources checked (KB unavailable): existing PC/indexed producer, separate
@@ -64,4 +65,3 @@ The sufficient growing-family degree and useful positive yield remain open.
 Read PROTOCOL.md, PUBLICATION.md and README.md beside the implementation.
 This report makes no performance, general-field or complete ECDLP claim.
 All new scoped statements remain PCC unverified.
-
