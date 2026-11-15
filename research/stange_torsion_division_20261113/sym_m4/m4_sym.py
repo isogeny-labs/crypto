@@ -47,6 +47,20 @@ def padd(P,Q):
 def pneg(P): return None if P is None else (P[0],(-P[1])%p)
 PTS=[(x,msqrt(x**3+A*x+B)) for x in FD]
 PART=[FD[i::3] for i in range(3)]   # APS-style disjoint parts (round-robin by x order)
+def build_pair_table():
+    tab={}
+    for i in range(len(PTS)):
+        for j in range(i,len(PTS)):
+            for S in (padd(PTS[i],PTS[j]),padd(PTS[i],pneg(PTS[j]))):
+                tab.setdefault('O' if S is None else S[0],set()).add((PTS[i][0],PTS[j][0]))
+    return tab
+def mitm_table(xR,tab):
+    R_=(xR,msqrt(xR**3+A*xR+B)); out=set()
+    for P3 in PTS:
+        for T in (padd(R_,pneg(P3)),padd(R_,P3)):
+            for (a,b) in tab.get('O' if T is None else T[0],()):
+                out.add(tuple(sorted((a,b,P3[0]))))
+    return out
 def mitm(xR):
     # all multisets {x1,x2,x3} in FD with +-P1 +-P2 +-P3 = +-R, via hashing x(P1 +- P2) against x(R +- P3)
     R_=(xR,msqrt(xR**3+A*xR+B)); want={}
@@ -109,6 +123,9 @@ for _ in range(3):  # numeric check of Newton sums
 bs_cons=[Poly(e3**n-1,e1,e2,e3,modulus=p), Poly(pn-3,e1,e2,e3,modulus=p), Poly(expand((pn**2-p2n)*pow(2,-1,p))-3,e1,e2,e3,modulus=p)]
 print(f"# Newton sums to {2*n}: {time.time()-t0:.1f}s",file=sys.stderr)
 R=random.Random(SEED)
+TAB=None; TAB_s=None
+if 'Mt' in ARMS:
+    t1=time.perf_counter(); TAB=build_pair_table(); TAB_s=time.perf_counter()-t1
 def rand_xE():
     while True:
         z=R.randrange(p)
@@ -151,6 +168,12 @@ for ti in range(8):
         T['M'].append(best)
         truth={tuple(sorted(s_)) for s_ in solD if valid(s_)}
         assert mm==truth, ('mitm mismatch',xR,len(mm),len(truth))
+    if 'Mt' in ARMS:
+        best=None
+        for _ in range(3):
+            t1=time.perf_counter(); mt=mitm_table(xR,TAB); dt=time.perf_counter()-t1; best=dt if best is None else min(best,dt)
+        T['Mt'].append(best)
+        assert mt=={tuple(sorted(s_)) for s_ in solD if valid(s_)}, ('table mismatch',xR)
     arms=[a for a in arms if a[0] in ARMS]
     R.shuffle(arms)
     for k,polys,vs,has in arms:
@@ -158,6 +181,6 @@ for ti in range(8):
         assert trivial==(not has), (k,ti,xR,trivial,has)
     print(f"# target {ti} xR={xR} done",file=sys.stderr,flush=True)
 res={'p':p,'n':n,'baseline_s':base,'median_s':{k:st.median(v) for k,v in T.items()},'min_s':{k:min(v) for k,v in T.items()},
-     'max_s':{k:max(v) for k,v in T.items()},'valid_relations_ordered_or_multiset':REL,'valid_relation_multisets':MS,'partitioned_relation_multisets':PREL,'M_timing':'in-process python, min of 3 (not msolve)','targets':8,'seed':SEED,'msolve':'0.6.5',
+     'max_s':{k:max(v) for k,v in T.items()},'valid_relations_ordered_or_multiset':REL,'valid_relation_multisets':MS,'partitioned_relation_multisets':PREL,'M_timing':'in-process python, min of 3 (not msolve)','Mt_table_build_s':TAB_s,'targets':8,'seed':SEED,'msolve':'0.6.5',
      'S4_terms':len(S4.terms()),'Bs_constraint_terms':[len(c.terms()) for c in bs_cons]}
 print(json.dumps(res))
