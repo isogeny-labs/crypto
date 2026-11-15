@@ -11930,6 +11930,115 @@ fn project_by_frobenius_orbits_generic(
 /// about 1.6 million point operations — 8.2 seconds in big-integer
 /// arithmetic, and a large share of a precompute that no longer spends
 /// most of its time collecting.
+/// Whether the single-word projected map places points one factor-base
+/// orbit at a time (`KIC_ORBIT_MAP`, default on) instead of hashing
+/// every point.  The map is the same; `0` keeps the hashed route for A/B
+/// timing.
+fn orbit_map_by_orbits_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_ORBIT_MAP").map_or(true, |v| v != "0"))
+}
+
+/// The projected signed-orbit map from one walk a factor-base orbit, or
+/// `None` where its assumptions fail, for the hashed route to answer.
+///
+/// For a base orbit `i_0, …, i_{n−1}` whose projections walk Frobenius,
+/// `π^k([h]P_0)`, one walk of `[h]P_0`'s signed orbit finds its canonical
+/// member `C = ε·π^j([h]P_0)` (the least packed word, as the hashed route
+/// picks it), so `[h]P_k = ε·π^{k−j}(C)` sits at phase `(k − j) mod n`
+/// with sign `ε`.  That is the place the hashed route's first-come
+/// location map gives it whenever the `2n` signed members are distinct,
+/// which is checked, along with full-length orbits, the walk and that
+/// every point is placed; any failure returns `None`.
+fn signed_orbit_map_by_orbits(
+    kc: &KoblitzCurve,
+    fc: &FastCurve,
+    fb: &FrobeniusFactorBase,
+    projected: &[FastPoint],
+) -> Option<ProjectedSignedOrbitMap> {
+    let n = kc.n as usize;
+    if n == 0 || projected.len() != fb.points.len() {
+        return None;
+    }
+    // Per base orbit: its canonical point and word, the canonical phase
+    // `j` and sign `ε`, or `None` for an orbit projected to `O`.
+    let mut placed: Vec<Option<(u64, FastPoint, usize, bool)>> =
+        Vec::with_capacity(fb.orbits.len());
+    let mut walk: Vec<u64> = Vec::with_capacity(2 * n);
+    let mut assigned = 0usize;
+    for orbit in &fb.orbits {
+        if orbit.len() != n || orbit.iter().any(|&i| i >= projected.len()) {
+            return None;
+        }
+        assigned += n;
+        let first = projected[orbit[0]];
+        if first.infinity {
+            if orbit.iter().any(|&i| !projected[i].infinity) {
+                return None;
+            }
+            placed.push(None);
+            continue;
+        }
+        walk.clear();
+        let (mut best, mut best_point, mut best_phase, mut best_neg) =
+            (u64::MAX, first, 0usize, false);
+        let mut current = first;
+        for (k, &i) in orbit.iter().enumerate() {
+            if projected[i] != current {
+                return None;
+            }
+            for (neg, candidate) in [(false, current), (true, fc.neg(current))] {
+                let key = candidate.pack();
+                walk.push(key);
+                if key < best {
+                    (best, best_point, best_phase, best_neg) = (key, candidate, k, neg);
+                }
+            }
+            current = packed_curve_frobenius(kc, fc, current);
+        }
+        walk.sort_unstable();
+        if walk.windows(2).any(|w| w[0] == w[1]) {
+            return None;
+        }
+        placed.push(Some((best, best_point, best_phase, best_neg)));
+    }
+    if assigned != projected.len() {
+        return None;
+    }
+    let mut canonical: Vec<(u64, FastPoint)> = placed
+        .iter()
+        .flatten()
+        .map(|&(w, p, _, _)| (w, p))
+        .collect();
+    canonical.sort_unstable_by_key(|&(w, _)| w);
+    canonical.dedup_by_key(|&mut (w, _)| w);
+    let words: Vec<u64> = canonical.iter().map(|&(w, _)| w).collect();
+    let mut orbit_of: Vec<Option<(usize, u32, bool)>> = vec![None; projected.len()];
+    let mut seen = vec![false; projected.len()];
+    for (orbit, place) in fb.orbits.iter().zip(&placed) {
+        let Some((word, _, phase, neg)) = *place else {
+            for &i in orbit {
+                if std::mem::replace(&mut seen[i], true) {
+                    return None;
+                }
+            }
+            continue;
+        };
+        let column = words.binary_search(&word).ok()?;
+        for (k, &i) in orbit.iter().enumerate() {
+            if std::mem::replace(&mut seen[i], true) {
+                return None;
+            }
+            orbit_of[i] = Some((column, ((k + n - phase) % n) as u32, neg));
+        }
+    }
+    let representatives = canonical.iter().map(|&(_, p)| fc.lower(p)).collect();
+    Some(ProjectedSignedOrbitMap {
+        orbit_of,
+        representatives,
+    })
+}
+
 fn projected_signed_orbit_map_fast(
     kc: &KoblitzCurve,
     fb: &FrobeniusFactorBase,
@@ -11939,6 +12048,11 @@ fn projected_signed_orbit_map_fast(
     }
     let fc = FastCurve::new(&kc.curve)?;
     let (projected, _) = project_by_frobenius_orbits(kc, &fc, fb);
+    if orbit_map_by_orbits_enabled() {
+        if let Some(map) = signed_orbit_map_by_orbits(kc, &fc, fb, &projected) {
+            return Some(map);
+        }
+    }
     let mut representatives: Vec<FastPoint> = Vec::new();
     let mut seen = WordSet::with_capacity_and_hasher(projected.len(), Default::default());
     for &point in &projected {
