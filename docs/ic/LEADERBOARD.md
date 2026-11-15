@@ -296,6 +296,31 @@ Registered rule L1 (PROTOCOL.md): L1 holds on a row if the upper end of the 95% 
 
 validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-tableb-ksum/VALIDATION.json)
 
+
+## Table B random-binary rows re-measured with the k-sum tables (2026-11-15, counted component improvement, outside tables A-C)
+
+ecbench now runs the generic `ksum` oracle (one probe a target into a negation-folded table of every signed m-sum of the base) on binary curves. On Table B's five random-binary curves, each of three replicate sessions per curve (48 targets × 3 rounds) runs matched negation-map rho (rho-neg), BSGS, Table B's own recipe base (inc-tb, binary-subspace at the row's dimension), three tuned pair-table incumbents on the smallest-abscissa base (binary-multiplier) and ksum:m=4 and m=5 at sizes fixed by a disclosed sizing pilot. Registered rule L1: the upper end of the 95% interval of cost(ksum5) / cost(strictest incumbent) below 1 at every weight, pooled and in every replicate, beyond the replicate noise. Primary rows n21, n24, n27; n15, n18 secondary. Track: generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS). validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-tableb-binary-ksum/VALIDATION.json). Table B's recorded figures are another harness's before marks, shown, never divided into the new S. Part of the gain over Table B's own row comes from tuning the incumbent's base (inc-tb is 1.4–3.4× the tuned incumbent); the claim is only against the tuned incumbent.
+
+| curve | role | w | Table B before (S_IC, S_rho) | S rho-neg | S inc-tb | strictest incumbent: S | S ksum4 | S ksum5 | ksum5 / incumbent [95%] | ksum4 / incumbent | L1 ksum5 | distance remaining: ksum5 / rho-neg |
+|:--|:--|--:|:--|--:|--:|:--|--:|--:|:--|--:|:--|--:|
+| `icv1-f2m15-t131-ed7256f0` | secondary | 0 | 26.31, 2.01 | 1.966 | 16.27 | inc-n18: 11.84 | 11.19 | 13.47 | 1.138 [1.120, 1.155] | 0.945 | does not hold | 6.85 |
+| `icv1-f2m15-t131-ed7256f0` | secondary | 0.1 | 26.31, 2.01 | 2.106 | 17.71 | inc-n18: 12.75 | 11.89 | 14.19 | 1.113 [1.095, 1.131] | 0.933 | does not hold | 6.74 |
+| `icv1-f2m15-t131-ed7256f0` | secondary | 1 | 26.31, 2.01 | 3.365 | 30.65 | inc-n18: 20.92 | 18.17 | 20.64 | 0.987 [0.967, 1.007] | 0.869 | does not hold | 6.13 |
+| `icv1-f2m18-t393-d2c04152` | secondary | 0 | 21.30, 2.01 | 1.877 | 20.82 | inc-n21: 10.85 | 9.79 | 11.26 | 1.038 [1.019, 1.057] | 0.902 | does not hold | 6.00 |
+| `icv1-f2m18-t393-d2c04152` | secondary | 0.1 | 21.30, 2.01 | 2.023 | 23.42 | inc-n21: 11.77 | 10.52 | 11.98 | 1.018 [0.998, 1.037] | 0.894 | does not hold | 5.92 |
+| `icv1-f2m18-t393-d2c04152` | secondary | 1 | 21.30, 2.01 | 3.333 | 46.75 | inc-n21: 20.12 | 17.12 | 18.50 | 0.920 [0.898, 0.942] | 0.851 | does not hold | 5.55 |
+| `icv1-f2m21-t2591-de54d72e` | primary | 0 | 24.39, 1.36 | 1.261 | 22.15 | inc-n62: 10.28 | 6.73 | 7.01 | 0.681 [0.668, 0.695] | 0.654 | holds | 5.56 |
+| `icv1-f2m21-t2591-de54d72e` | primary | 0.1 | 24.39, 1.36 | 1.371 | 26.13 | inc-n62: 11.67 | 7.57 | 7.73 | 0.662 [0.649, 0.677] | 0.649 | holds | 5.64 |
+| `icv1-f2m21-t2591-de54d72e` | primary | 1 | 24.39, 1.36 | 2.359 | 61.88 | inc-n62: 24.18 | 15.16 | 14.27 | 0.590 [0.575, 0.605] | 0.627 | holds | 6.05 |
+| `icv1-f2m24-tm3047-2d0c0e8c` | primary | 0 | 27.24, 1.18 | 1.211 | 22.60 | inc-n67: 10.99 | 6.58 | 6.99 | 0.636 [0.621, 0.652] | 0.598 | holds | 5.77 |
+| `icv1-f2m24-tm3047-2d0c0e8c` | primary | 0.1 | 27.24, 1.18 | 1.320 | 26.55 | inc-n80: 12.52 | 7.33 | 7.87 | 0.629 [0.614, 0.644] | 0.586 | holds | 5.96 |
+| `icv1-f2m24-tm3047-2d0c0e8c` | primary | 1 | 27.24, 1.18 | 2.303 | 62.07 | inc-n80: 26.14 | 14.14 | 15.81 | 0.605 [0.588, 0.622] | 0.541 | holds | 6.86 |
+| `icv1-f2m27-t12543-569dca8b` | primary | 0 | 36.93, 0.97 | 1.069 | 47.91 | inc-n150: 13.95 | 6.70 | 6.41 | 0.460 [0.452, 0.468] | 0.481 | holds | 6.00 |
+| `icv1-f2m27-t12543-569dca8b` | primary | 0.1 | 36.93, 0.97 | 1.168 | 57.04 | inc-n150: 16.16 | 7.58 | 7.17 | 0.444 [0.435, 0.452] | 0.469 | holds | 6.14 |
+| `icv1-f2m27-t12543-569dca8b` | primary | 1 | 36.93, 0.97 | 2.059 | 139.22 | inc-n178: 36.05 | 15.46 | 13.95 | 0.387 [0.379, 0.395] | 0.429 | holds | 6.78 |
+
+Study: [research/ic_tableb_binary_ksum_20261115/](../../research/ic_tableb_binary_ksum_20261115/); [report](../../research/ic_tableb_binary_ksum_20261115/report.pdf); source `research/ic_tableb_binary_ksum_20261115/summary.json`. Counted cost (L0), 15 sessions, one ecbench binary (sha256 bc96a44a3342…). [pcc:unverified]
+
 ## Table C: Koblitz, 32-target batch (§19–§22)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r, per target.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit (§20, §22 isolated re-run).
@@ -1190,6 +1215,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/jv_sieve_line_vs_rho_20261103/fit.json` — sha256 `0a83239fe76f0502…`
 - `research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json` — sha256 `06b648eb1b7beacb…`
 - `research/ic_tableb_ksum_20261115/summary.json` — sha256 `12e525b585794584…`
+- `research/ic_tableb_binary_ksum_20261115/summary.json` — sha256 `adaee4d13ea5575f…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`
@@ -1247,7 +1273,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
 - `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
 - `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
-- `src/cryptanalysis/ecbench/methods.rs` — sha256 `2e884c247357af60…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `2b5bd6e586ec0a3a…`
 - `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `f8f9a75589e96902…`
 - `integrations/primo/README.md` — sha256 `4ec69082225f9f88…`
 - `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`

@@ -111,6 +111,7 @@ SOURCES = {
     "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
     "k1_pt_lgrow": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
     "tableb_ksum": "research/ic_tableb_ksum_20261115/summary.json",
+    "tableb_binary_ksum": "research/ic_tableb_binary_ksum_20261115/summary.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -523,6 +524,7 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "research/ic_gw_fasthash_20261114/validation",
                            "research/ic_gw_bl_reuse_20261115/validation",
                            "research/ic_gw_nrm_lz_20261115/validation",
+                           "benchmarks/20261115-tableb-binary-ksum",
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
                            "benchmarks/20261115-tableb-ksum")
 
@@ -2621,6 +2623,75 @@ def ghs_nrmlz_html(g: dict) -> str:
             gh(SOURCES["ghs_weak_nrmlz"], "Analysis") + '</section>')
 
 
+TABLEB_BKSUM_EVIDENCE = "benchmarks/20261115-tableb-binary-ksum"
+TABLEB_BKSUM_STUDY = "research/ic_tableb_binary_ksum_20261115"
+
+
+def tableb_binary_ksum_component() -> dict:
+    """Table B random-binary rows re-measured with the k-sum tables (frozen study
+    research/ic_tableb_binary_ksum_20261115; ecbench runs the generic ksum oracle on binary curves
+    since d87eb39548), counted GAE with native work at w = 0, 0.1, 1.  Copied from summary.json;
+    requires the validation gate's VALIDATION.json."""
+    summ = load(SOURCES["tableb_binary_ksum"])
+    errs = checked_evidence_dir(REPO / TABLEB_BKSUM_EVIDENCE, REPO)
+    if errs:
+        raise SystemExit(f"{TABLEB_BKSUM_EVIDENCE}: not validated: " + "; ".join(errs))
+    if (summ.get("schema") != "crypto.ic_tableb_binary_ksum_summary/v1"
+            or summ.get("ksum5_l1_holds_on_a_primary_row") is not True or summ.get("ksum5_l1_falsified") is not False):
+        raise SystemExit(f"{SOURCES['tableb_binary_ksum']}: review the summary (schema, L1 verdict)")
+    rows = []
+    for r in summ["rows"]:
+        for w in ("0", "0.1", "1"):
+            b = r["weights"][w]
+            k5, k4 = b["ksum5"], b["ksum4"]
+            rows.append({"slug": r["slug"], "role": r["role"], "w": w, "tb": r["table_b"],
+                         "s_rho": b["s"]["rho-neg"], "s_tb": b["s"]["inc-tb"], "inc": b["strictest_incumbent"],
+                         "s_inc": b["s"][b["strictest_incumbent"]], "s_k5": b["s"]["ksum5"], "s_k4": b["s"]["ksum4"],
+                         "r5": k5["ratio"], "ci5": k5["ci95"], "r4": k4["ratio"], "gap": k5["gap_to_rho"],
+                         "holds5": r["ksum5"]["holds"], "holds4": r["ksum4"]["holds"]})
+    return {"rows": rows, "study": TABLEB_BKSUM_STUDY + "/", "report": TABLEB_BKSUM_STUDY + "/report.pdf",
+            "source": SOURCES["tableb_binary_ksum"], "binary_sha256": summ["binary_sha256"],
+            "sessions": summ["sessions"], "targets_per_curve": summ["targets_per_curve"],
+            "rounds": summ["rounds"], "replicates": summ["replicates"], "track": summ["track"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference with "
+                           f"the section 5a band ({TABLEB_BKSUM_EVIDENCE}/VALIDATION.json)"),
+            "validated": True}
+
+
+def tableb_binary_ksum_md(k: dict) -> list[str]:
+    L = ["", "## Table B random-binary rows re-measured with the k-sum tables (2026-11-15, counted component improvement, outside tables A-C)", "",
+         "ecbench now runs the generic `ksum` oracle (one probe a target into a negation-folded table of every signed m-sum "
+         "of the base) on binary curves. On Table B's five random-binary curves, each of three replicate sessions per curve "
+         f"({k['targets_per_curve']} targets × {k['rounds']} rounds) runs matched negation-map rho (rho-neg), BSGS, Table B's "
+         "own recipe base (inc-tb, binary-subspace at the row's dimension), three tuned pair-table incumbents on the "
+         "smallest-abscissa base (binary-multiplier) and ksum:m=4 and m=5 at sizes fixed by a disclosed sizing pilot. "
+         "Registered rule L1: the upper end of the 95% interval of cost(ksum5) / cost(strictest incumbent) below 1 at every "
+         "weight, pooled and in every replicate, beyond the replicate noise. Primary rows n21, n24, n27; n15, n18 secondary. "
+         f"Track: {k['track']}. {k['validation']}. Table B's recorded figures are another harness's before marks, shown, "
+         "never divided into the new S. Part of the gain over Table B's own row comes from tuning the incumbent's base "
+         "(inc-tb is 1.4–3.4× the tuned incumbent); the claim is only against the tuned incumbent.", "",
+         "| curve | role | w | Table B before (S_IC, S_rho) | S rho-neg | S inc-tb | strictest incumbent: S | S ksum4 | S ksum5 | ksum5 / incumbent [95%] | ksum4 / incumbent | L1 ksum5 | distance remaining: ksum5 / rho-neg |",
+         "|:--|:--|--:|:--|--:|--:|:--|--:|--:|:--|--:|:--|--:|"]
+    for r in k["rows"]:
+        L.append(f"| `{r['slug']}` | {r['role']} | {r['w']} | {r['tb']['s_ic']:.2f}, {r['tb']['s_rho']:.2f} | {r['s_rho']:.3f} | "
+                 f"{r['s_tb']:.2f} | {r['inc']}: {r['s_inc']:.2f} | {r['s_k4']:.2f} | {r['s_k5']:.2f} | "
+                 f"{r['r5']:.3f} [{r['ci5'][0]:.3f}, {r['ci5'][1]:.3f}] | {r['r4']:.3f} | {'holds' if r['holds5'] else 'does not hold'} | {r['gap']:.2f} |")
+    L += ["", f"Study: [{k['study']}](../../{k['study']}); [report](../../{k['report']}); source `{k['source']}`. "
+          f"Counted cost (L0), {k['sessions']} sessions, one ecbench binary (sha256 {k['binary_sha256'][:12]}…). [pcc:unverified]", ""]
+    return L
+
+
+def tableb_binary_ksum_html(k: dict) -> str:
+    md = tableb_binary_ksum_md(k)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    hdr = [c.strip() for c in md[4].strip("|").split("|")]
+    tr = [x for x in md if x.startswith("| `")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip().strip('`'))}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="tableb-binary-ksum-20261115"><h2>Table B random-binary rows re-measured with the k-sum tables</h2>' + body +
+            '<div class="scroll"><table><thead><tr>' + "".join(f"<th>{esc(h)}</th>" for h in hdr) + '</tr></thead><tbody>' + rows +
+            '</tbody></table></div>' + gh(SOURCES["tableb_binary_ksum"], "Analysis") + '</section>')
+
+
 def _ci(v, lo, hi, i):
     return f"{v[i]:.3g} [{lo[i]:.3g}, {hi[i]:.3g}]"
 
@@ -3428,6 +3499,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "k1_pt_lgrow_component": k1_pt_lgrow_component(names),
         # Table B prime rows re-measured with the k = 5 sum table, copied from the study's frozen summary.
         "tableb_ksum_component": tableb_ksum_component(),
+        "tableb_binary_ksum_component": tableb_binary_ksum_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -3883,6 +3955,7 @@ def markdown(doc: dict) -> str:
     for code in ("A", "B", "C"):
         if code == "C":
             L += tableb_ksum_markdown(doc)
+            L += tableb_binary_ksum_md(doc["tableb_binary_ksum_component"])
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
         multi = len(f["regimes"]) > 1
@@ -6216,6 +6289,7 @@ def page(doc: dict, standalone: bool) -> str:
         family_table(code)
         P.append('</section>')
 
+    P.append(tableb_binary_ksum_html(doc["tableb_binary_ksum_component"]))
     # Table B prime rows re-measured with the k = 5 sum table (outside tables A-C).
     tk = doc["tableb_ksum_component"]
     tt = tableb_ksum_text(tk)

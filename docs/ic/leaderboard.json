@@ -242,6 +242,10 @@
    "path": "research/ic_tableb_ksum_20261115/summary.json",
    "sha256": "12e525b5857945847a94f9cf57ae8e6c647371c943cbab2ce421804148c42e07"
   },
+  "tableb_binary_ksum": {
+   "path": "research/ic_tableb_binary_ksum_20261115/summary.json",
+   "sha256": "adaee4d13ea5575f2cae92b139cd1fdeb2bfb8a00ae23c64fc9c2867933e2e63"
+  },
   "d4_char2_m12": {
    "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
    "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
@@ -472,7 +476,7 @@
   },
   "ecbench_methods_source": {
    "path": "src/cryptanalysis/ecbench/methods.rs",
-   "sha256": "2e884c247357af60f3098638e378c3993731a8b67a5eb395af0b2d5dc57bf588"
+   "sha256": "2b5bd6e586ec0a3a22b678ffe1543ef80c39c6d814fbb821aea12b6fbd6c41a3"
   },
   "solver_registry_source": {
    "path": "src/cryptanalysis/ic_framework/solvers.rs",
@@ -339087,6 +339091,441 @@
   "class": "counted component improvement",
   "title": "Table B prime rows re-measured with the k = 5 sum table (2026-11-15, counted component improvement, outside tables A-C)",
   "validation": "validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-tableb-ksum/VALIDATION.json)",
+  "validated": true
+ },
+ "tableb_binary_ksum_component": {
+  "rows": [
+   {
+    "slug": "icv1-f2m15-t131-ed7256f0",
+    "role": "secondary",
+    "w": "0",
+    "tb": {
+     "recipe": "folded table, walked targets, m = 2",
+     "columns": 15,
+     "signed_points": 30,
+     "s_ic": 26.3139455942,
+     "s_rho": 2.01343801469,
+     "ic_over_rho": 13.0691610083
+    },
+    "s_rho": 1.96603486256,
+    "s_tb": 16.2675984788,
+    "inc": "inc-n18",
+    "s_inc": 11.8401150766,
+    "s_k5": 13.4685474439,
+    "s_k4": 11.1939390807,
+    "r5": 1.13753518077,
+    "ci5": [
+     1.12045017073,
+     1.15488070892
+    ],
+    "r4": 0.945424855107,
+    "gap": 6.85061475788,
+    "holds5": false,
+    "holds4": false
+   },
+   {
+    "slug": "icv1-f2m15-t131-ed7256f0",
+    "role": "secondary",
+    "w": "0.1",
+    "tb": {
+     "recipe": "folded table, walked targets, m = 2",
+     "columns": 15,
+     "signed_points": 30,
+     "s_ic": 26.3139455942,
+     "s_rho": 2.01343801469,
+     "ic_over_rho": 13.0691610083
+    },
+    "s_rho": 2.10597926009,
+    "s_tb": 17.7058075778,
+    "inc": "inc-n18",
+    "s_inc": 12.7478727557,
+    "s_k5": 14.1856578356,
+    "s_k4": 11.8914721155,
+    "r5": 1.11278627481,
+    "ci5": [
+     1.09523717982,
+     1.13061656072
+    ],
+    "r4": 0.932820113867,
+    "gap": 6.7358962666,
+    "holds5": false,
+    "holds4": false
+   },
+   {
+    "slug": "icv1-f2m15-t131-ed7256f0",
+    "role": "secondary",
+    "w": "1",
+    "tb": {
+     "recipe": "folded table, walked targets, m = 2",
+     "columns": 15,
+     "signed_points": 30,
+     "s_ic": 26.3139455942,
+     "s_rho": 2.01343801469,
+     "ic_over_rho": 13.0691610083
+    },
+    "s_rho": 3.36547883789,
+    "s_tb": 30.6496894682,
+    "inc": "inc-n18",
+    "s_inc": 20.9176918673,
+    "s_k5": 20.6396513603,
+    "s_k4": 18.1692694284,
+    "r5": 0.98670787825,
+    "ci5": [
+     0.966903333303,
+     1.00691806871
+    ],
+    "r4": 0.868607757665,
+    "gap": 6.1327532736,
+    "holds5": false,
+    "holds4": false
+   },
+   {
+    "slug": "icv1-f2m18-t393-d2c04152",
+    "role": "secondary",
+    "w": "0",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 15,
+     "signed_points": 30,
+     "s_ic": 21.304700076,
+     "s_rho": 2.00589025176,
+     "ic_over_rho": 10.6210696509
+    },
+    "s_rho": 1.87702206647,
+    "s_tb": 20.8249579734,
+    "inc": "inc-n21",
+    "s_inc": 10.8481033622,
+    "s_k5": 11.2570646926,
+    "s_k4": 9.7891063345,
+    "r5": 1.03769887848,
+    "ci5": [
+     1.01904990451,
+     1.05668913528
+    ],
+    "r4": 0.902379522727,
+    "gap": 5.99730013499,
+    "holds5": false,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m18-t393-d2c04152",
+    "role": "secondary",
+    "w": "0.1",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 15,
+     "signed_points": 30,
+     "s_ic": 21.304700076,
+     "s_rho": 2.00589025176,
+     "ic_over_rho": 10.6210696509
+    },
+    "s_rho": 2.02261496193,
+    "s_tb": 23.417954785,
+    "inc": "inc-n21",
+    "s_inc": 11.7749753076,
+    "s_k5": 11.9811887188,
+    "s_k4": 10.5226363305,
+    "r5": 1.01751285296,
+    "ci5": [
+     0.998358316855,
+     1.03703488864
+    ],
+    "r4": 0.893644025199,
+    "gap": 5.92361321574,
+    "holds5": false,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m18-t393-d2c04152",
+    "role": "secondary",
+    "w": "1",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 15,
+     "signed_points": 30,
+     "s_ic": 21.304700076,
+     "s_rho": 2.00589025176,
+     "ic_over_rho": 10.6210696509
+    },
+    "s_rho": 3.33295102103,
+    "s_tb": 46.7549260894,
+    "inc": "inc-n21",
+    "s_inc": 20.1168228162,
+    "s_k5": 18.4983049546,
+    "s_k4": 17.1244062947,
+    "r5": 0.919544061386,
+    "ci5": [
+     0.898053002948,
+     0.941549416408
+    ],
+    "r4": 0.851248054983,
+    "gap": 5.55012805105,
+    "holds5": false,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m21-t2591-de54d72e",
+    "role": "primary",
+    "w": "0",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 31,
+     "signed_points": 62,
+     "s_ic": 24.3906271263,
+     "s_rho": 1.3560622421,
+     "ic_over_rho": 17.9863625497
+    },
+    "s_rho": 1.26093331362,
+    "s_tb": 22.1531741007,
+    "inc": "inc-n62",
+    "s_inc": 10.28404654,
+    "s_k5": 7.00701148152,
+    "s_k4": 6.72743792955,
+    "r5": 0.681347702409,
+    "ci5": [
+     0.667664625811,
+     0.695311199113
+    ],
+    "r4": 0.654162532555,
+    "gap": 5.55700401111,
+    "holds5": true,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m21-t2591-de54d72e",
+    "role": "primary",
+    "w": "0.1",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 31,
+     "signed_points": 62,
+     "s_ic": 24.3906271263,
+     "s_rho": 1.3560622421,
+     "ic_over_rho": 17.9863625497
+    },
+    "s_rho": 1.37070209018,
+    "s_tb": 26.1260554658,
+    "inc": "inc-n62",
+    "s_inc": 11.6731458176,
+    "s_k5": 7.73295653941,
+    "s_k4": 7.5704456755,
+    "r5": 0.662456946929,
+    "ci5": [
+     0.648522085214,
+     0.676691228471
+    ],
+    "r4": 0.648535175845,
+    "gap": 5.64160264642,
+    "holds5": true,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m21-t2591-de54d72e",
+    "role": "primary",
+    "w": "1",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 31,
+     "signed_points": 62,
+     "s_ic": 24.3906271263,
+     "s_rho": 1.3560622421,
+     "ic_over_rho": 17.9863625497
+    },
+    "s_rho": 2.3586210792,
+    "s_tb": 61.8819877512,
+    "inc": "inc-n62",
+    "s_inc": 24.175039316,
+    "s_k5": 14.2664620603,
+    "s_k4": 15.1575153891,
+    "r5": 0.59013190729,
+    "ci5": [
+     0.575355457228,
+     0.605287850539
+    ],
+    "r4": 0.626990309757,
+    "gap": 6.04864519619,
+    "holds5": true,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m24-tm3047-2d0c0e8c",
+    "role": "primary",
+    "w": "0",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 67,
+     "signed_points": 134,
+     "s_ic": 27.2403642967,
+     "s_rho": 1.18306494449,
+     "ic_over_rho": 23.0252484646
+    },
+    "s_rho": 1.21052396311,
+    "s_tb": 22.6007078813,
+    "inc": "inc-n67",
+    "s_inc": 10.9898392706,
+    "s_k5": 6.99052750912,
+    "s_k4": 6.57662036378,
+    "r5": 0.636090058914,
+    "ci5": [
+     0.620841772388,
+     0.651712853491
+    ],
+    "r4": 0.598427347464,
+    "gap": 5.7747948179,
+    "holds5": true,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m24-tm3047-2d0c0e8c",
+    "role": "primary",
+    "w": "0.1",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 67,
+     "signed_points": 134,
+     "s_ic": 27.2403642967,
+     "s_rho": 1.18306494449,
+     "ic_over_rho": 23.0252484646
+    },
+    "s_rho": 1.31980957857,
+    "s_tb": 26.5473670545,
+    "inc": "inc-n80",
+    "s_inc": 12.5194993643,
+    "s_k5": 7.87249472457,
+    "s_k4": 7.33338164673,
+    "r5": 0.628818652845,
+    "ci5": [
+     0.613776719467,
+     0.644229221514
+    ],
+    "r4": 0.585756780948,
+    "gap": 5.96487163936,
+    "holds5": true,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m24-tm3047-2d0c0e8c",
+    "role": "primary",
+    "w": "1",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 67,
+     "signed_points": 134,
+     "s_ic": 27.2403642967,
+     "s_rho": 1.18306494449,
+     "ic_over_rho": 23.0252484646
+    },
+    "s_rho": 2.30338011768,
+    "s_tb": 62.0672996136,
+    "inc": "inc-n80",
+    "s_inc": 26.1446778293,
+    "s_k5": 15.8101996636,
+    "s_k4": 14.1442331933,
+    "r5": 0.604719620826,
+    "ci5": [
+     0.587850213808,
+     0.62207312547
+    ],
+    "r4": 0.540998565199,
+    "gap": 6.86391253542,
+    "holds5": true,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m27-t12543-569dca8b",
+    "role": "primary",
+    "w": "0",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 127,
+     "signed_points": 254,
+     "s_ic": 36.929397567,
+     "s_rho": 0.966465514038,
+     "ic_over_rho": 38.2107763087
+    },
+    "s_rho": 1.06874268393,
+    "s_tb": 47.9095431999,
+    "inc": "inc-n150",
+    "s_inc": 13.9465505971,
+    "s_k5": 6.41434488635,
+    "s_k4": 6.70223619751,
+    "r5": 0.459923394081,
+    "ci5": [
+     0.45186710072,
+     0.468123322292
+    ],
+    "r4": 0.480565868302,
+    "gap": 6.0017672942,
+    "holds5": true,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m27-t12543-569dca8b",
+    "role": "primary",
+    "w": "0.1",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 127,
+     "signed_points": 254,
+     "s_ic": 36.929397567,
+     "s_rho": 0.966465514038,
+     "ic_over_rho": 38.2107763087
+    },
+    "s_rho": 1.16773721891,
+    "s_tb": 57.0409978087,
+    "inc": "inc-n150",
+    "s_inc": 16.1572737976,
+    "s_k5": 7.1677428826,
+    "s_k4": 7.57813337953,
+    "r5": 0.44362328524,
+    "ci5": [
+     0.435487212123,
+     0.4519113621
+    ],
+    "r4": 0.469023021735,
+    "gap": 6.13814715034,
+    "holds5": true,
+    "holds4": true
+   },
+   {
+    "slug": "icv1-f2m27-t12543-569dca8b",
+    "role": "primary",
+    "w": "1",
+    "tb": {
+     "recipe": "folded, walked, base at the family optimum, m = 2",
+     "columns": 127,
+     "signed_points": 254,
+     "s_ic": 36.929397567,
+     "s_rho": 0.966465514038,
+     "ic_over_rho": 38.2107763087
+    },
+    "s_rho": 2.0586880337,
+    "s_tb": 139.224089288,
+    "inc": "inc-n178",
+    "s_inc": 36.051060777,
+    "s_k5": 13.9483248489,
+    "s_k4": 15.4612080176,
+    "r5": 0.386904699841,
+    "ci5": [
+     0.379095042498,
+     0.394875242294
+    ],
+    "r4": 0.428869711027,
+    "gap": 6.77534654134,
+    "holds5": true,
+    "holds4": true
+   }
+  ],
+  "study": "research/ic_tableb_binary_ksum_20261115/",
+  "report": "research/ic_tableb_binary_ksum_20261115/report.pdf",
+  "source": "research/ic_tableb_binary_ksum_20261115/summary.json",
+  "binary_sha256": "bc96a44a3342d24569e7f2bbe7e24e55400eda47d955960e766ae66df3e08f8d",
+  "sessions": 15,
+  "targets_per_curve": 48,
+  "rounds": 3,
+  "replicates": 3,
+  "track": "generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS)",
+  "validation": "validated: replay certificate, validator report and the matched rho reference with the section 5a band (benchmarks/20261115-tableb-binary-ksum/VALIDATION.json)",
   "validated": true
  },
  "d4_char2_frob_roots_component": {
