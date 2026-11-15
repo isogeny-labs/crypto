@@ -21,3 +21,12 @@ The shared daily log is currently conflicted on parent PR4285, with a single
 Copilot request pending from07:42. Do not edit that conflicted file while the
 request is pending. This study checkpoint records decisions in the meantime.
 Do not edit/re-chain PCC events or change any frozen parent evidence.
+
+Generic semantic assembly probe type-checks. The reusable projective-step law
+builds in crypto-lean; full local gate passes102 theorems, zero trusted-native
+proofs. The actual AdjoinRoot(F19) three-step assembly now type-checks too.
+Initial unit proofs tried isUnit_iff_ne_zero without the separate Field import;
+retained both failed diagnostics, then used the more direct existing
+ZMod.isUnit_iff_coprime with explicit Nat coprimality and algebraMap of units.
+No limit or theorem hypothesis was changed. Source/native binding remains open.
+[pcc:unverified]

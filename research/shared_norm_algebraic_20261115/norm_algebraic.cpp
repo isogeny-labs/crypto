@@ -21,6 +21,7 @@ using P=std::vector<Polynomial>;
 using reference::Point;
 
 struct Generator {
+    struct DeferredMembership {};
     coeff::Config cfg;
     unsigned m,h;
     System system;
@@ -64,9 +65,13 @@ struct Generator {
     }
     void equations(const P&f) {for(const auto&v:f)if(!v.terms.empty())system.equations.push_back(v);}
 
-    Generator(coeff::Config input,unsigned arity,bool pruned=false):cfg(input),m(arity),h((arity+1)/2) {
+    Generator(coeff::Config input,unsigned arity,DeferredMembership):cfg(input),m(arity),h((arity+1)/2) {
         if(m<3||m>7||m%2==0||cfg.t<1||cfg.t>8||cfg.field.p<5||cfg.field.p>257)
             throw std::invalid_argument("bounded shared-norm shape");
+        system.p=cfg.field.p;
+    }
+    Generator(coeff::Config input,unsigned arity,bool pruned=false)
+        :Generator(input,arity,DeferredMembership{}) {
         if(pruned&&cfg.field.mod(cfg.c)==0)
             throw std::invalid_argument("witness-pruned membership requires nonzero c");
         system.p=cfg.field.p;
