@@ -1,0 +1,14 @@
+{
+  "action": "use prime_explicit curves with an independently checked group order; prime_search refuses bits > 32 and the whole session fails before any record",
+  "created": "2026-11-15T06:17:09Z",
+  "evidence": [
+    "research/ic_gpu_rootfind_m3_20261115/AMENDMENT_1.md; research/ic_gpu_rootfind_big_20261115/make_curves.py"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecbench-measure"
+  ],
+  "trigger": "an ecbench spec needs prime-field curves above 32 bits",
+  "why": "the refusal comes at run time on the pod, after the spec is frozen, and forces an amendment"
+}

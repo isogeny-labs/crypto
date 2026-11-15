@@ -24,10 +24,14 @@ case "$1" in
     [ -n "$id" ] || { echo "$out" >&2; exit 1; }
     umask 077; echo "$t" > "$TOKDIR/$id.token"; jq '{id,name,costPerHr,vcpuCount,memoryInGb,interruptible,machine,imageName}' <<<"$out" | tee "$TOKDIR/$id.create.json" ;;
   pod) curl -sS "$API/pods/$2" "${H[@]}" | jq '{id,name,desiredStatus,costPerHr,vcpuCount,memoryInGb,interruptible,lastStartedAt,machine}' ;;
-  upload) for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh run.sh build-info.json; do
-      [ -f "$3/$f" ] || continue; curl -sS -f -X PUT -H "X-Token: $(tok $2)" --data-binary "@$3/$f" "$(url $2)/upload/$f"; echo; done ;;
-  start) # Kummer jobs on the frozen binaries (Amendments 15, 19); same guards as start-iso
-      shas=$(jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json")
+  upload) # 2 MB chunks (Amendment 16): first chunk via /upload (truncates), the rest via /append
+    for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh run.sh build-info.json; do
+      [ -f "$3/$f" ] || continue; tmp=$(mktemp -d); split -b 2M -d -a 4 "$3/$f" "$tmp/part."; ep=upload
+      for c in "$tmp"/part.*; do curl -sS -f -m 300 -X PUT -H "X-Token: $(tok $2)" --data-binary "@$c" "$(url $2)/$ep/$f" > "$tmp/last"; ep=append; done
+      cat "$tmp/last"; echo; rm -rf "$tmp"; done ;;
+  start) # Kummer jobs. SHA_FILE (main's Amendment 17): a JSON {name: sha256} of the reproduction-gated rebuild; default: the
+      # frozen image's. Guard fields as start-iso (branch amendments, preregistration 22-29)
+      shas=$(if [ -n "${SHA_FILE:-}" ]; then jq . "$SHA_FILE"; else jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json"; fi)
       cph=$(curl -sS "$API/pods/$2" "${H[@]}" | jq -r .costPerHr)
       jq -n --argjson s "$3" --argjson h "$shas" --argjson sec "${SECONDS_LIMIT:?}" --argjson cph "$cph" \
         --argjson mx "${MAX_USD:-40}" --argjson mf "${MEMORY_FLOOR_GIB:-56}" \

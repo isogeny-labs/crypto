@@ -218,7 +218,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
@@ -1207,12 +1207,12 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.known_log_ksum_v1",
             family: "ic",
-            summary: "ic.known_log_mitm2_v1 with a negation-folded table of every signed k-sum (k = 3, 4, 5) of the seeded known-log base in place of the pair table; a hit's log is the sum of k known logs",
+            summary: "ic.known_log_mitm2_v1 with a negation-folded table of every signed k-sum (k = 3 to 9) of the seeded known-log base in place of the pair table; a hit's log is the sum of k known logs",
             entry: "ecbench::known_log::{prepare_ksum,recover}",
             applies: Applies::PrimeOnly,
             params: &[
                 ParamDecl { name: "size", default: None, help: "unsigned base points; signed point count is twice this (at most 2047)" },
-                ParamDecl { name: "k", default: None, help: "summands, 3, 4 or 5" },
+                ParamDecl { name: "k", default: None, help: "summands, 3 to 9" },
                 ParamDecl { name: "base_seed", default: None, help: "target-independent base seed" },
                 ParamDecl { name: "base_multiplier", default: Some("1"), help: "H=[u]G; use c^-1 when transporting a base to generator [c]G" },
                 ParamDecl { name: "max_sums", default: None, help: "hard bound on the table's 2^(k-1)·C(size,k) sums, checked before any work" },
@@ -6735,6 +6735,8 @@ fn solve_ic_prime(
     let mut rootfind_mitm_batch = RootfindMitmOracle::new_prime_batch(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut rootfind_gpu =
+        crate::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
     // `pkm-semaev` writes its system on the base's own tower; the shared
     // constructor rebuilds it from the base's spec (`ic bench` uses the same).
@@ -6760,6 +6762,7 @@ fn solve_ic_prime(
         "rootfind-mitm-prime-batch" => &mut rootfind_mitm_batch,
         "rootfind-pairs" => &mut rootfind_pairs,
         "rootfind-subtract" => &mut rootfind,
+        "rootfind-subtract-gpu" => &mut rootfind_gpu,
         other => match plugin_oracle.as_deref_mut() {
             Some(o) => o,
             None => return Err(format!("oracle `{other}` does not run on a prime curve")),
@@ -11215,8 +11218,8 @@ mod accounting_tests {
         )
         .unwrap();
         for (params, needle) in [
-            (ksum("12", "2", "1", "100000"), "k = 3, 4 or 5"),
-            (ksum("12", "6", "1", "100000"), "k = 3, 4 or 5"),
+            (ksum("12", "2", "1", "100000"), "k = 3 to 9"),
+            (ksum("12", "10", "1", "100000"), "k = 3 to 9"),
             (ksum("12", "3", "1", "10"), "above max_sums"),
             (ksum("0", "3", "1", "100000"), "size must lie in"),
             (ksum("999999999", "3", "1", "100000"), "size must lie in"),

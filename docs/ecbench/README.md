@@ -62,6 +62,7 @@ Factor bases (build with `ecbench fb`, publish to Git/`store:`, run
 | `ecbench …` | does | described in |
 |---|---|---|
 | `methods` | list every method with its parameters | §7, §11 |
+| `optimize` | `optimize inventory [--json]` lists every registered method with its search strategy, claim scope and knob count (`--json` adds parameter roles and nested solvers/engines); `optimize audit --development SPEC... [--holdout SPEC...] [--require-all]` audits the split between adaptive development specs and fresh confirmatory holdout specs, prints a JSON report, and exits 1 when the campaign is not admissible (`--require-all` also demands that development cover the live method registry, every system solver, every PDP3 engine and every prime PKM tower engine). It runs nothing and makes no performance claim | `src/cryptanalysis/ecbench/optimization.rs` (module header) |
 | `host` | print the host capsule | §5 |
 | `plan` | validate a spec and print what it expands to; an arm its curve cannot run is refused here | §1, §3 |
 | `run` | run a session | §1, §5, §6 |
@@ -273,7 +274,8 @@ rule, `A = 2` on every prime curve, and the audit recomputes it under that rule
 was written with. Under the first rule a `j = 0` curve's `rho.cubic` read
 0.91× a floor it was entitled to beat (`A = 6` makes that floor
 `√(π/12) = 0.51`, and the same run about 1.6× it). Apart from
-[`research/ecbench_accounting_v2_20261023`](../../research/ecbench_accounting_v2_20261023/REPORT.pdf),
+[`research/ecbench_accounting_v2_20261023`](../../research/ecbench_accounting_v2_20261023/REPORT.typ)
+(the report source; no PDF is committed),
 which measures this change on the registered `j = 0` curve
 `icv1-fp25-t9734-bcfe9f51`, the committed sessions that use a `j = 0` or
 `j = 1728` prime curve are the class set-up study's

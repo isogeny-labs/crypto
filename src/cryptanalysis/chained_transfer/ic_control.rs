@@ -610,20 +610,25 @@ impl IcResult {
     }
 }
 
+/// Factor-base entries one relation can hold.  Genus 3 uses three; the
+/// genus ladder (`genus_ladder.rs`, genus up to 5) and the plane-quartic
+/// line relations (four points) share the struct.
+pub(crate) const REL_FB: usize = 5;
+
 #[derive(Clone, Copy, Debug)]
-struct Rel {
-    fb: [(u32, i8); 3],
-    nfb: u8,
-    lp: [(u32, i8); 2],
-    nlp: u8,
+pub(crate) struct Rel {
+    pub(crate) fb: [(u32, i8); REL_FB],
+    pub(crate) nfb: u8,
+    pub(crate) lp: [(u32, i8); 2],
+    pub(crate) nlp: u8,
     /// Coefficient of `t`: `−h·b mod r`.
-    tcoef: u64,
+    pub(crate) tcoef: u64,
     /// `h·a mod r`.
-    rhs: u64,
+    pub(crate) rhs: u64,
 }
 
 impl Rel {
-    fn endpoints(&self) -> (u32, i8, u32, i8) {
+    pub(crate) fn endpoints(&self) -> (u32, i8, u32, i8) {
         match self.nlp {
             0 => (0, 0, 0, 0),
             1 => (0, 0, self.lp[0].0, self.lp[0].1),
@@ -718,7 +723,13 @@ impl Dsu {
 
 /// The cycle rows of the relation graph: large-prime columns eliminated
 /// along a breadth-first spanning tree of the component of the vertex "1".
-fn build_rows(rels: &[Rel], nverts: usize, tcol: u32, r: u64, nat: &mut Nat) -> Vec<Row> {
+pub(crate) fn build_rows(
+    rels: &[Rel],
+    nverts: usize,
+    tcol: u32,
+    r: u64,
+    nat: &mut Nat,
+) -> Vec<Row> {
     let neg = |e: i8| if e > 0 { 1u64 } else { r - 1 }; // coefficient as residue
     let frow = |rel: &Rel| -> Vec<(u32, u64)> {
         let mut v: Vec<(u32, u64)> = rel.fb[..rel.nfb as usize]
@@ -1173,7 +1184,7 @@ pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
             };
             let vc = cur.v_coeffs();
             let mut rel = Rel {
-                fb: [(0, 0); 3],
+                fb: [(0, 0); REL_FB],
                 nfb: 0,
                 lp: [(0, 0); 2],
                 nlp: 0,
