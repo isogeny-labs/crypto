@@ -47,6 +47,9 @@ def main():
                 'solving_degree': sorted(x.get('solving_degree') for x in dec),
                 'degree_reached': sorted(x.get('degree_reached') for x in dec),
                 'degree_reached_timeouts': sorted(x.get('degree_reached') for x in res if not x.get('decided')),
+                'oversize_matrices': sorted('%dx%d@d%d' % (x.get('oversize_rows') or 0, x.get('oversize_cols') or 0,
+                                                             x.get('oversize_degree') or 0)
+                                            for x in res if x.get('oversize')),
                 'matrix_rows_max_median': median([x.get('matrix_rows_max') for x in dec]),
                 'matrix_rows_max_max': max([x.get('matrix_rows_max') or 0 for x in res] or [0]),
                 'word_xors_median': median([x.get('word_xors') for x in dec]),
@@ -76,7 +79,9 @@ def main():
     for r in table:
         if r['solver'] == 'f4':
             mid = 'sd ' + ','.join(str(v) for v in r['solving_degree']) + (
-                ' (timeouts reached ' + ','.join(str(v) for v in r['degree_reached_timeouts']) + ')' if r['degree_reached_timeouts'] else '')
+                ' (undecided reached ' + ','.join(str(v) for v in r['degree_reached_timeouts']) + ')' if r['degree_reached_timeouts'] else '')
+            if r['oversize_matrices']:
+                mid += '; refused ' + r['oversize_matrices'][0] + ('..' + r['oversize_matrices'][-1] if len(r['oversize_matrices']) > 1 else '')
             mx = str(r['matrix_rows_max_max'])
         else:
             mid = 'sat %d unsat %d, confl med %s' % (r['sat'], r['unsat'], r['conflicts_median'])
