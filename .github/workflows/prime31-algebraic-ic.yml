@@ -57,6 +57,8 @@ jobs:
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_permutation_orbit_gate
       - name: Rust-native exact split-m8 reachability prefix (100 left blocks)
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_exact_support
+      - name: Independently recompute Dickson/S3 branch counts and signed pair lifts
+        run: python3 research/prime31_ic_20261115/native/replay_dickson_pair_branches.py
       - name: Replay exact Dickson first-collision S3 branch partition on prime31
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_dickson_pair_branches
       - name: Test all fixed-S3 algebraic quotient branches with reused Rust F4
