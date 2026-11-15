@@ -48,8 +48,16 @@ if its default cache is unavailable. The raw receipts record the service
 used in this environment. The gate audits transitive axioms, rather than
 inferring proof status from a text scan.
 
-To regenerate the report PDF using Pandoc and XeLaTeX (the diagram PNG is
-rendered from `transfer.svg` at 300 dpi):
+The repository's artifact workflow manages `transfer.png` through the local
+`.artifacts.json`; the editable SVG and report PDF remain in Git. Before
+regenerating the report, hydrate the PNG from the repository root:
+
+```sh
+python3 tools/artifacts/artifacts.py pull examples/cross_characteristic_ecdlp
+```
+
+Then, from this example directory, render with Pandoc and XeLaTeX (the PNG is
+a 300 dpi render of `transfer.svg`):
 
 ```sh
 pandoc report.html --from=html --pdf-engine=xelatex \
