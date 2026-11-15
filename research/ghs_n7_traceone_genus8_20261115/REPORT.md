@@ -8,7 +8,7 @@ For `k=F_q`, `K=F_(q^7)`, `q=2^s`, and the two cubic Frobenius kernels `Vi=ker p
 
 `N8(q)=2(q³−1)(q−1)` out of `q⁷−1` trace-one classes, or density `2(q³−1)(q−1)/(q⁷−1)=O(q⁻³)`.
 
-The [proof](THEOREM.md) shows that every Menezes–Teske W1 coefficient has relative trace zero, so this genus-eight locus is **disjoint** from W1 for every q. The trace test is an exact recognizer for distinguishing these two construction profiles. The count measures direct eligibility, not the number of curves on which a full attack has lower total cost than rho. Some coefficients may define curves over a smaller absolute F2-subfield even though they lie outside k; those are separately sieved in finite examples.
+The [proof](THEOREM.md) shows that every Menezes–Teske W1 coefficient has relative trace zero, so this genus-eight locus is **disjoint** from W1 for every q. Including the known genus-seven zero-trace arm gives exactly `2q(q³−1)` non-subfield classical magic-number-four classes: a rigorous ceiling of `2q(q³−1)/(q⁷−1)` on the share with direct classical genus at most eight. The trace test separates the two construction profiles. This ceiling measures direct eligibility, not the number of curves on which a full attack has lower total cost than rho. Some coefficients may define curves over a smaller absolute F2-subfield even though they lie outside k; those are separately sieved in finite examples.
 
 ## Exact examples and subgroup map
 
