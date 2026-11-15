@@ -2261,3 +2261,32 @@ failed states/APIprobe/threeprotocolsamendments retained, final08/gate full logs
 no warnings/errors. Qualified generalTate/canonicaldivisor/MOVFR and all original
 remaining gaps unchanged. No novelty/canonicalpromotion/newnativecrypto/spend/
 upload. [pcc:unverified]
+
+
+### Miller affine principal ideals and actual evaluation
+
+The [actual Miller affine ideal bridge](../research/miller_principal_ideal_audit_20261115/README.md)
+proves the generic coordinate-ring chord principal ideal and actual three-torsion
+tangent cube, nonzero regular/function-field line, and actual ring-hom evaluation
+agreeing with the numerical short-model Miller tangent expression. Actual F5
+positive and negative controls prove the three-torsion guard is necessary.
+This closes only the affine ideal/function/evaluation portion beyond the earlier
+polynomial certificates; projective infinity valuation, canonical divisor/pairing,
+reciprocity/isogeny/Lang/Cartier/Jacobian/MOV-FR and all14 completion remain open.
+Exact local **PCC-20261115-357b60** PASS at 2026-11-15T04:16:36Z, signed standing unverified. Whole gate
+25/0fail/0trusted; full1470-character binding d2b0fd734afc3313003d0373976189f696193cbf25807d2b3b20610645ef40ce;
+native1complete/0prefix/0unresolved;7formal-config+14artifactpins. Eight snapshots
+retain five failed states, successes04/07/08 and the attempt03 path error.
+100files/44objects/63732-byte losslessXZ/fivegatefiles; corrected one-page46797-byte
+PDF fully read/visually inspected/inbounds, first draft retained. Project08/build
+logs are warning-free; frozen audit tool emits one inherited String.mk deprecation.
+Four new modules use no prior custom proof modules, same prover/Mathlib/host,
+not independent physical-host validation. No canonical promotion/novelty claim.
+[pcc:unverified]
+
+Diagnostic correction: the [outside-pin receipt](../research/theorem_census_20261109/audit-tool-diagnostics-20261115.json)
+records one inherited String.mk deprecation warning in each of seven previous
+frozen audit logs. Any broad earlier claim that all gate logs were warning-free
+is superseded. Existing project-source S3/Galois warnings remain separately
+recorded; theorem verdicts/counts/axioms and all frozen files are unchanged.
+[pcc:unverified]
