@@ -1,0 +1,230 @@
+{
+  "result": {
+    "evidence": {
+      "actual_summary": {
+        "exact_old_parameter_fraction": "1/16",
+        "new_parameter_bits": 69,
+        "old_variables": 73,
+        "root_search_performed": false
+      },
+      "complete_global_root_search": false,
+      "complete_projection_diagnostic": true,
+      "consistent": true,
+      "controls": {
+        "complete_small_linear_systems": 256,
+        "formal_graph_ranks": [
+          [
+            4,
+            6
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            7,
+            15
+          ],
+          [
+            8,
+            18
+          ],
+          [
+            9,
+            21
+          ],
+          [
+            10,
+            24
+          ],
+          [
+            11,
+            27
+          ],
+          [
+            12,
+            30
+          ],
+          [
+            13,
+            33
+          ],
+          [
+            14,
+            36
+          ],
+          [
+            15,
+            39
+          ],
+          [
+            16,
+            42
+          ],
+          [
+            17,
+            45
+          ],
+          [
+            18,
+            48
+          ],
+          [
+            19,
+            51
+          ],
+          [
+            20,
+            54
+          ],
+          [
+            21,
+            57
+          ],
+          [
+            22,
+            60
+          ],
+          [
+            23,
+            63
+          ],
+          [
+            24,
+            66
+          ],
+          [
+            25,
+            69
+          ],
+          [
+            26,
+            72
+          ],
+          [
+            27,
+            75
+          ],
+          [
+            28,
+            78
+          ]
+        ],
+        "tiny_source_multisets": 16352,
+        "wrapped_fields_use_reduced_generators": true
+      },
+      "error": null,
+      "gold_rank_increment": 4,
+      "novelty_claim": false,
+      "original_root_count_exact": null,
+      "peak_process_rss_kib": 153764,
+      "qualified_speedup": null,
+      "raw_bytes": 1956,
+      "raw_payload_bytes": 3894,
+      "raw_sha256": "26e5f78fab406df805c958f7be13a3c7a9527dfedc26524504c5c93855a17f83",
+      "release_gate_claim": false,
+      "status_scope": "sole-model preparation diagnostic; independent algorithms, no external reviewer admission"
+    },
+    "experiment_id": "gold-projection-preparation-20261115-v14",
+    "next_actions": [
+      "If rank0consistent, retire Gold3-only tightening on this cell and test genuinely higher joint moment constraints; otherwise independently replay the exact tightened family before support work."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "passed",
+    "summary": "Gold3 conditional projection rank with full linear certificates; no root search or speed claim."
+  },
+  "process": {
+    "wall_seconds": 1.1850922350004112,
+    "peak_process_rss_kib": 153764
+  },
+  "recorded_replay": {
+    "schema": "recorded-gold-projection-replay/v1",
+    "verified": true,
+    "method": "existing independent BinaryField/literalnorm code; explicit153Goldgenerators/83residualrows; recordedkernel/coset andoldwitnessmembership only",
+    "rank_increment": 4,
+    "new_parameter_bits": 69,
+    "old_unique_points": 2048,
+    "old_unique_gold_admitted": 128,
+    "cells": [
+      {
+        "depth": 0,
+        "prefix": 0,
+        "old_points": 512,
+        "gold_admitted_points": 32,
+        "old_witness_size": 197,
+        "witness_points_in_new_domain": 17,
+        "old_witness_wholly_in_new_domain": false
+      },
+      {
+        "depth": 1,
+        "prefix": 0,
+        "old_points": 512,
+        "gold_admitted_points": 32,
+        "old_witness_size": 203,
+        "witness_points_in_new_domain": 12,
+        "old_witness_wholly_in_new_domain": false
+      },
+      {
+        "depth": 1,
+        "prefix": 1,
+        "old_points": 512,
+        "gold_admitted_points": 32,
+        "old_witness_size": 207,
+        "witness_points_in_new_domain": 11,
+        "old_witness_wholly_in_new_domain": false
+      },
+      {
+        "depth": 2,
+        "prefix": 0,
+        "old_points": 512,
+        "gold_admitted_points": 32,
+        "old_witness_size": 207,
+        "witness_points_in_new_domain": 11,
+        "old_witness_wholly_in_new_domain": false
+      },
+      {
+        "depth": 2,
+        "prefix": 1,
+        "old_points": 512,
+        "gold_admitted_points": 32,
+        "old_witness_size": 207,
+        "witness_points_in_new_domain": 13,
+        "old_witness_wholly_in_new_domain": false
+      },
+      {
+        "depth": 2,
+        "prefix": 2,
+        "old_points": 512,
+        "gold_admitted_points": 32,
+        "old_witness_size": 195,
+        "witness_points_in_new_domain": 14,
+        "old_witness_wholly_in_new_domain": false
+      },
+      {
+        "depth": 2,
+        "prefix": 3,
+        "old_points": 512,
+        "gold_admitted_points": 32,
+        "old_witness_size": 215,
+        "witness_points_in_new_domain": 12,
+        "old_witness_wholly_in_new_domain": false
+      }
+    ],
+    "no_new_points_or_root_search": true,
+    "external_reviewer": false,
+    "new_raw_sha256": "26e5f78fab406df805c958f7be13a3c7a9527dfedc26524504c5c93855a17f83",
+    "old_witness_raw_sha256": "123d001d247cce7c199cbfab5c448a5342d1afd9a9fa80aed6096bb1180b384d",
+    "seconds": 0.7020259829987481,
+    "qualified_speedup": null
+  },
+  "decision": "ActualfourindependentGoldguardsreduce73to69exactly; usecertifiednewfamilybeforefreshsupport/highermomentdiagnostic",
+  "scientific_goal_complete": false,
+  "qualified_speedup": null,
+  "requested_speed_target": 8,
+  "external_reviewer": false,
+  "review_scope": "sole-model preparation; independent oracle algorithms and third existing-code replay; no externally admitted solver promotion"
+}
