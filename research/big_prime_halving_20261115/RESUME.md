@@ -20,7 +20,9 @@ BN polynomial/EC_GROUP replay. Source must be committed before calls.
 
 ## State
 Shared source b38b6b4712 passes canonical proof gate106theorems/0failures/
-0trusted native; complete receipts in crypto-lean PR9 at5e26040. Native build001
+0trusted native; source7364d8dab7 adds two root-certificate laws and the local
+canonical gate passes108theorems/0failures/0trusted native. Shared PR9/10 are
+merged, hosted jobs did not start because of the billing lock. Native build001
 failed explicit-header/strict-layout compilation; build002 passes. No native
 numerical qualification has started. Builds under /workspace/scratch/
 big-prime-halving-build00{1,2}; diagnostics adjacent. Old controls preserved
@@ -29,7 +31,10 @@ Copilot journal merge request14:55:21Z; do not touch its journal while pending.
 
 ## Next steps
 From /workspace/scratch/big-prime-halving, commit/push all native source and
-immutable wrapper, then checkpoint gate. Run timeout1500 bash on copied
+immutable wrapper (already sourcef5b318b482), restore this saved resume to
+.resume/RESUME.md and pass scripts/checkpoint.sh gate after restoring its
+existing upload access. Ready PR4305 records the pending scope. Run
+timeout1500 bash on copied
 wrapper /workspace/scratch/big-prime-halving-runner001.sh with arguments
 /workspace/scratch/big-prime-halving-build002
 /workspace/scratch/big-prime-halving-qualification001

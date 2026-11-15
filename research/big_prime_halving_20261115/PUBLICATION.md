@@ -73,3 +73,27 @@ contains full logs/source bindings and ready shared PR10. This is independent
 of native execution and leaves its frozen protocol/caps untouched. Source
 audit and the two-page visual report record the new obligations and exact
 pending status. Data claim PCC-20261115-261591 remains unverified. [pcc:unverified]
+
+2026-11-15T15:33Z: ready PR4305 is open on the critical-pair feature base,
+https://github.com/isogeny-labs/crypto/pull/4305 . Auto-merge is unavailable
+for that feature base; main retarget/auto-merge follows the base dependency
+and the outstanding qualification/review requirements. Initial head15a64824d2
+has in-progress validation/PCC/learning/parity checks; their status is not
+carried forward to later heads. Artifact-autofix reports success without any
+data migration, matching the local policy check's no-added-data result. There
+is no raw qualification archive or remote numeric custody receipt to claim.
+[pcc:unverified]
+
+Both report pages were rendered and visually inspected after the final claim
+label; complete source/binary bindings still match build002. Lessons integrity
+checks60entries/0errors and ledger1086entries/prefix pass locally. The source
+and proof assertions remain unverified PCC standing. The tracked unrelated
+historical root resume note was restored after saving this component's full
+resume under RESUME.md. No task-wide completion episode is recorded.
+[pcc:unverified]
+
+Shared PR10 is now merged as e0e86e131728089a12759b8860db3834517f5f89.
+Its hosted run43729911221 has zero executed steps and the same explicit
+billing-lock annotation as PR9; no hosted proof pass is asserted. The next
+numerical action is still the original frozen wrapper after successful
+checkpoint upload, not a changed panel or another seed. [pcc:unverified]
