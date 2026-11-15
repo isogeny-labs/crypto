@@ -312,3 +312,42 @@ three blocks. If the single-block S4 is still oversize under identical limits,
 the actionable next lever is the S4 resultant representation or a certified
 quotient/#4228 or mature solver, not additional target/pair specializations.
 No full-cost or rho advantage is inferred from these partial counters.
+
+
+## Minimal S4 falsifier completed: three towers are sufficient to reproduce the stop
+
+[Exact-source Rust development CI 43725436615](https://github.com/isogeny-labs/crypto/actions/runs/43725436615)
+(success), head \`cb2213463ba7171be48dddc574ebb401cf1ebb51\`,
+reused the unchanged original \`f4_fp_tower.rs\` and the same S4 resultant
+to test each side with only **three active depth-six Dickson towers and
+one free sum abscissa**. The natural-positive witness was reconstructed
+and checked directly in each minimal quotient ring. [Machine-readable
+CI evidence](MINIMAL_THREE_TOWER_S4_CI_20261115.json).
+
+| Exact S4 subideal | Active towers | Free vars | Degree reached | Partial F4 muladds | Result |
+|---|---:|---:|---:|---:|---|
+| Six-block left-only (prior) | 6 | 2 | 10 | 14,129 | Oversize |
+| **Minimal left-only** | **3** | **1** | **10** | **14,129** | **Oversize** |
+| Six-block right-only (prior) | 6 | 2 | 10 | 14,129 | Oversize |
+| **Minimal right-only** | **3** | **1** | **10** | **14,129** | **Oversize** |
+
+Both minimal arms exactly reproduce the relevant partial counters, including
+1,289 max columns and 2,571 *previously accepted* max dense entries. The
+aborted reducer exceeds the separate frozen 15,000 limit; these maxima do
+not report its size. All four partial ideals have known rational positive
+solutions, checked before F4, so \`undetermined\` is not confused with a
+refutation. The **S4 resultant plus three depth-six fibre blocks** is thus
+itself the measured algebraic resource bottleneck at this F4 cap; six unused
+towers are not its cause. This remains an implementation-specific diagnosis,
+not a lower bound for all Gröbner methods.
+
+**Practical research decision:** stop spending on all 930 admissible fixed
+pair roots, Dickson-block stripping, or simply varying target masks under
+the same F4 formulation/cap. The next experiment should change the
+**three-point S4 encoding or reduction method**, preferably via the already
+investigated certified quotient/cubic pairing of #4228 or independent
+Singular/msolve F4. Before an end-to-end trial, a minimal S4 must return
+actual finite-field solutions for the *positive* control and genuine negative
+results on confirmed negative toys with all work counted. Only then restore
+the full eight-summand oracle and cold rank/recovery benchmark. No new
+complete prime31 logarithm has been obtained by this F4 path.
