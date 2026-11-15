@@ -17,9 +17,28 @@ on:
       - '.github/scripts/frozen-workflow-check.mjs'
       - '.github/scripts/run-frozen-workflow-replays.mjs'
       - '.github/scripts/frozen-workflow-pins.json'
+      - '.github/scripts/*-view-v1.json'
       - 'research/notes/ecc2k130/**'
       - 'research/ecc2k130_factor_base_replication_20260925/**'
       - 'research/ecc2k130_relations/**'
+      - 'research/ecc2k130_factor_base_pilot_20260924/**'
+      - 'research/ecc2k130_dual_transport_20260925/**'
+      - 'research/ecc2k130_oriented_transport_20260924/**'
+      - 'research/endomorphism_search_20261005/**'
+      - 'tools/endomorphism-search/**'
+      - 'research/p192_extension_cover_20261012/FROZEN_VIEW.md'
+      - 'research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/**'
+      - 'src/hash/sha256.rs'
+      - 'src/binary_ecc/curve.rs'
+      - 'src/binary_ecc/f2m.rs'
+      - 'src/cryptanalysis/binary_semaev.rs'
+      - 'src/cryptanalysis/coordinate_search.rs'
+      - 'src/cryptanalysis/pq_descent.rs'
+      - 'src/cryptanalysis/pq_descent_symbolic.rs'
+      - 'src/cryptanalysis/pq_groebner_f2.rs'
+      - 'src/cryptanalysis/sat.rs'
+      - 'src/cryptanalysis/semaev_decomp.rs'
+      - 'src/cryptanalysis/semaev_sat.rs'
       - '.github/workflows/ecc2k130-dag-linux-v2-outcome-replay.yml'
       - '.github/workflows/ecc2k130-factor-base-orbit-holdouts.yml'
       - '.github/workflows/ecc2k130-leaf-m10-support.yml'
@@ -78,6 +97,16 @@ jobs:
             research/notes/ecc2k130
             research/ecc2k130_factor_base_replication_20260925
             research/ecc2k130_relations
+            research/ecc2k130_factor_base_pilot_20260924
+            research/ecc2k130_dual_transport_20260925
+            research/ecc2k130_oriented_transport_20260924
+            research/endomorphism_search_20261005
+            tools/endomorphism-search
+            research/p192_extension_cover_20261012/lean
+            research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight
+            src/binary_ecc
+            src/cryptanalysis
+            src/hash
             tools/artifacts
             .artifacts
       - name: Pull store data this workflow reads (tools/artifacts)
@@ -99,6 +128,6 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130 research/p192_extension_cover_20261012
       - name: Custody of every pin, then each replay in its isolated view
         run: node .github/scripts/run-frozen-workflow-replays.mjs

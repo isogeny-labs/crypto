@@ -239,6 +239,8 @@ Left unpriced on purpose (both decided on 2026-11-07, below):
 | counter or family | rule | why |
 |---|---|---|
 | `table_filter_bit_sets` | `6 · word_op` | `mitm-prime-blocked:m=2,filter=1`: one bit set per stored entry of the packed pair table's membership filter (the key shift, the multiply-shift hash, the word index and bit shift, the OR); the probe's filter read happens inside a lookup the oracle already counts |
+| `sibling_second_points` | `field_sqr + 2 · field_add` | `wwalk:...,sib=m,pool=M`: a sibling pair is charged as one group addition plus this, and performs `inv + 2 mul + 2 sqr + 8 add`, so the second x-only point `x(P − J)` is the difference to the addition's `inv + 2 mul + sqr + 6 add`; the band prices it at `w` (`band::SIBLING_WORK_COUNTERS`, marker `counted:sibling_second_points`) |
+| `sibling_lift_products` | `field_mul + 2 · field_add` | the same walk: the continuing child's `y` (one product, two subtractions), once a parent; marker `counted:sibling_lift_products` |
 
 The filter's memory (8 to 16 bits per stored entry) is not added to the
 `bitop/v2` oracle-table term, which prices `table_insert_attempts · (κ + w)`

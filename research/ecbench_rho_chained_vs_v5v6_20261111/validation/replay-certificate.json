@@ -1,0 +1,308 @@
+{
+ "schema": "replay-certificate/v1 (validator)",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "session_id": "ECBS1h56930a35f003",
+ "validated_commit": "12439ac5d9554282593820325466e82f356d726e",
+ "evidence_commit": "98d68007c83909d9d9e1146b6973395421ab4dac",
+ "date": "2026-11-11",
+ "records_sha256": "2258d42f01db5143e69487e5d49fbdf00d7d708ec6dcd8caa07925a6406d710d",
+ "runs": [
+  {
+   "arm": "chained",
+   "method": "rho.negation_chained",
+   "measured_records_checked": 1152,
+   "measured_scalar_verified": 1152,
+   "measured_recovered_eq_planted": 1152,
+   "warmup_records_checked": 192,
+   "warmup_scalar_verified": 192,
+   "warmup_recovered_eq_planted": 192
+  },
+  {
+   "arm": "v5",
+   "method": "rho.negation_v5",
+   "measured_records_checked": 1152,
+   "measured_scalar_verified": 1152,
+   "measured_recovered_eq_planted": 1152,
+   "warmup_records_checked": 192,
+   "warmup_scalar_verified": 192,
+   "warmup_recovered_eq_planted": 192
+  },
+  {
+   "arm": "v6",
+   "method": "rho.negation_v6",
+   "measured_records_checked": 1152,
+   "measured_scalar_verified": 1152,
+   "measured_recovered_eq_planted": 1152,
+   "warmup_records_checked": 192,
+   "warmup_scalar_verified": 192,
+   "warmup_recovered_eq_planted": 192
+  },
+  {
+   "arm": "chained-aa",
+   "method": "rho.negation_chained",
+   "measured_records_checked": 1152,
+   "measured_scalar_verified": 1152,
+   "measured_recovered_eq_planted": 1152,
+   "warmup_records_checked": 192,
+   "warmup_scalar_verified": 192,
+   "warmup_recovered_eq_planted": 192
+  },
+  {
+   "arm": "legacy",
+   "method": "rho.negation",
+   "measured_records_checked": 1152,
+   "measured_scalar_verified": 1152,
+   "measured_recovered_eq_planted": 1152,
+   "warmup_records_checked": 192,
+   "warmup_scalar_verified": 192,
+   "warmup_recovered_eq_planted": 192
+  }
+ ],
+ "records_checked": 6720,
+ "nonwarmup_records_checked": 5760,
+ "nonwarmup_record_ids_sha256": "557060d8f98acd8df28df5497a127c1b06096d73ba7775644f89950b31457496",
+ "nonwarmup_record_ids_sha256_rule": "sha256 of the non-warmup record_id strings, sorted ascending, joined by '\\n', no trailing newline",
+ "failures": [],
+ "method": "For every record, warmups included: d = int(outcome.recovered), 0 <= d < r, and Q = workload.target on the curve; then [d]G == Q exactly with the validator's own affine short-Weierstrass arithmetic over F_p (Fermat inversion, binary double-and-add), and separately d == workload.planted. Negative control: 240 random scalars over the 6 curves; k+1, k-1 and r-k all rejected; [r-1]G == -G on every curve. This verifies the discrete-log solutions only; per-run GAE counts were not re-executed.",
+ "curve_parameters": [
+  {
+   "a": 188885,
+   "b": 173081,
+   "checks": {
+    "G_on_curve": true,
+    "disc_nonzero": true,
+    "hasse": true,
+    "j_matches": true,
+    "model12_matches": true,
+    "order_eq_r_eq_record": true,
+    "order_unique_in_hasse": true,
+    "p_prime": true,
+    "rG_is_identity": true,
+    "r_prime": true,
+    "registry_agrees": true,
+    "slug_matches": true,
+    "trace_matches": true
+   },
+   "construction": "find_prime_order_curve(18, 59297)",
+   "derived_from": {
+    "G": [
+     174945,
+     10250
+    ],
+    "Q": [
+     88544,
+     112689
+    ]
+   },
+   "j": 4738,
+   "model_json": "{\"a\":\"188885\",\"b\":\"173081\",\"field\":\"fp-212099\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"212099\",\"v\":\"1\"}",
+   "model_sha256": "d28d5e0941032b3b01cc23e89b235dfabc15878fc6bc871c143476820bbf952a",
+   "ok": true,
+   "p": 212099,
+   "r": 212437,
+   "slug": "icv1-fp18-tm337-d28d5e09",
+   "trace": -337
+  },
+  {
+   "a": 51142,
+   "b": 548946,
+   "checks": {
+    "G_on_curve": true,
+    "disc_nonzero": true,
+    "hasse": true,
+    "j_matches": true,
+    "model12_matches": true,
+    "order_eq_r_eq_record": true,
+    "order_unique_in_hasse": true,
+    "p_prime": true,
+    "rG_is_identity": true,
+    "r_prime": true,
+    "registry_agrees": true,
+    "slug_matches": true,
+    "trace_matches": true
+   },
+   "construction": "find_prime_order_curve(20, 59297)",
+   "derived_from": {
+    "G": [
+     271792,
+     48157
+    ],
+    "Q": [
+     559250,
+     443129
+    ]
+   },
+   "j": 476305,
+   "model_json": "{\"a\":\"51142\",\"b\":\"548946\",\"field\":\"fp-563153\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"563153\",\"v\":\"1\"}",
+   "model_sha256": "cd198a38cd5f938a015f482708e88c2c9d7f196469229c9b0ec89fde0127e2d7",
+   "ok": true,
+   "p": 563153,
+   "r": 562427,
+   "slug": "icv1-fp20-t727-cd198a38",
+   "trace": 727
+  },
+  {
+   "a": 620112,
+   "b": 1810598,
+   "checks": {
+    "G_on_curve": true,
+    "disc_nonzero": true,
+    "hasse": true,
+    "j_matches": true,
+    "model12_matches": true,
+    "order_eq_r_eq_record": true,
+    "order_unique_in_hasse": true,
+    "p_prime": true,
+    "rG_is_identity": true,
+    "r_prime": true,
+    "registry_agrees": true,
+    "slug_matches": true,
+    "trace_matches": true
+   },
+   "construction": "find_prime_order_curve(22, 59297)",
+   "derived_from": {
+    "G": [
+     1448421,
+     2354232
+    ],
+    "Q": [
+     1184161,
+     1182372
+    ]
+   },
+   "j": 1765340,
+   "model_json": "{\"a\":\"620112\",\"b\":\"1810598\",\"field\":\"fp-2434423\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"2434423\",\"v\":\"1\"}",
+   "model_sha256": "475dcb5fda590e267a250e24a42a1fa80e6898ab848d664abb6fe92e813a4099",
+   "ok": true,
+   "p": 2434423,
+   "r": 2435809,
+   "slug": "icv1-fp22-tm1385-475dcb5f",
+   "trace": -1385
+  },
+  {
+   "a": 8820674,
+   "b": 11008593,
+   "checks": {
+    "G_on_curve": true,
+    "disc_nonzero": true,
+    "hasse": true,
+    "j_matches": true,
+    "model12_matches": true,
+    "order_eq_r_eq_record": true,
+    "order_unique_in_hasse": true,
+    "p_prime": true,
+    "rG_is_identity": true,
+    "r_prime": true,
+    "registry_agrees": true,
+    "slug_matches": true,
+    "trace_matches": true
+   },
+   "construction": "find_prime_order_curve(24, 59297)",
+   "derived_from": {
+    "G": [
+     10566184,
+     339081
+    ],
+    "Q": [
+     2491912,
+     12640471
+    ]
+   },
+   "j": 3896869,
+   "model_json": "{\"a\":\"8820674\",\"b\":\"11008593\",\"field\":\"fp-16483309\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16483309\",\"v\":\"1\"}",
+   "model_sha256": "6df599dfaebd1f46b553a708162258a6cbe2e3003a79f69ce874982d112444e8",
+   "ok": true,
+   "p": 16483309,
+   "r": 16482251,
+   "slug": "icv1-fp24-t1059-6df599df",
+   "trace": 1059
+  },
+  {
+   "a": 26623966,
+   "b": 14210560,
+   "checks": {
+    "G_on_curve": true,
+    "disc_nonzero": true,
+    "hasse": true,
+    "j_matches": true,
+    "model12_matches": true,
+    "order_eq_r_eq_record": true,
+    "order_unique_in_hasse": true,
+    "p_prime": true,
+    "rG_is_identity": true,
+    "r_prime": true,
+    "registry_agrees": true,
+    "slug_matches": true,
+    "trace_matches": true
+   },
+   "construction": "find_prime_order_curve(26, 59297)",
+   "derived_from": {
+    "G": [
+     40895024,
+     26279521
+    ],
+    "Q": [
+     10820738,
+     19401246
+    ]
+   },
+   "j": 38191413,
+   "model_json": "{\"a\":\"26623966\",\"b\":\"14210560\",\"field\":\"fp-42652151\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"42652151\",\"v\":\"1\"}",
+   "model_sha256": "7e8fb6df09438fed74ec37c3856e40b8cf91cd36be0d997b64f28ed33741a0c1",
+   "ok": true,
+   "p": 42652151,
+   "r": 42653927,
+   "slug": "icv1-fp26-tm1775-7e8fb6df",
+   "trace": -1775
+  },
+  {
+   "a": 253954732,
+   "b": 162104541,
+   "checks": {
+    "G_on_curve": true,
+    "disc_nonzero": true,
+    "hasse": true,
+    "j_matches": true,
+    "model12_matches": true,
+    "order_eq_r_eq_record": true,
+    "order_unique_in_hasse": true,
+    "p_prime": true,
+    "rG_is_identity": true,
+    "r_prime": true,
+    "registry_agrees": true,
+    "slug_matches": true,
+    "trace_matches": true
+   },
+   "construction": "find_prime_order_curve(28, 59297)",
+   "derived_from": {
+    "G": [
+     208461996,
+     252671765
+    ],
+    "Q": [
+     248242674,
+     236932803
+    ]
+   },
+   "j": 225526909,
+   "model_json": "{\"a\":\"253954732\",\"b\":\"162104541\",\"field\":\"fp-260189597\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"260189597\",\"v\":\"1\"}",
+   "model_sha256": "380f655a934dde73af3f07606153b0657b6c6edc083598be6d9f7467f2a9c64e",
+   "ok": true,
+   "p": 260189597,
+   "r": 260192759,
+   "slug": "icv1-fp28-tm3161-380f655a",
+   "trace": -3161
+  }
+ ],
+ "verifier_sha256": {
+  "validate_chained.py": "4d95ab742c2fce43c2b6ec27c6efbd487cb00f97f54d3796f64f5923b0989d4d",
+  "validate.py": "da797c32ca0c9217b4886f050cacf350f3d7806785b7b7564c7f4198f75ede0f"
+ },
+ "verifier_command": "python3 -I validate_chained.py /home/user/crypto results_chained.json",
+ "verifier_source": {
+  "validate_chained.py": "#!/usr/bin/env python3\n\"\"\"Independent validator for research/ecbench_rho_chained_vs_v5v6_20261111/sessions/main.\n\nReuses, unchanged, the prime-field arithmetic and curve derivation of validate.py\n(loaded by exec of its helper section); shares no code with ecbench.\nUsage: validate_chained.py REPO_ROOT OUT_JSON\n\"\"\"\nimport hashlib\nimport json\nimport math\nimport os\nimport random\nimport sys\nfrom collections import defaultdict\n\nSCR = os.path.dirname(os.path.abspath(__file__))\nREPO, OUT = sys.argv[1], sys.argv[2]\nP = {}\nexec(open(f\"{SCR}/validate.py\").read().split(\"\\nresult = {}\\n\")[0], P)\nHELPER_SHA = hashlib.sha256(open(f\"{SCR}/validate.py\", \"rb\").read()).hexdigest()\n\nREL = \"research/ecbench_rho_chained_vs_v5v6_20261111/sessions/main\"\nPAIRS = [(\"v5\", \"chained\"), (\"v6\", \"chained\"), (\"chained\", \"legacy\"), (\"v5\", \"legacy\"), (\"v6\", \"legacy\"),\n         (\"chained-aa\", \"chained\"), (\"v6\", \"v5\")]\nMECH = {\"walk_operations\": (\"walk_operations\",), \"cycle_escape_doublings\": (\"cycle_escape_doublings\",),\n        \"cycles_all\": (\"cycles_length_2\", \"cycles_length_4\", \"cycles_other_length\", \"cycles_longer_than_window\"),\n        \"setup_additions+setup_doublings\": (\"setup_additions\", \"setup_doublings\"),\n        \"distinguished_points\": (\"distinguished_points\",)}\nDP_DECL = (\"distinguished_point_table_inserts_uncharged\", \"distinguished_point_table_queries_uncharged\")\n\n\ndef sha256_file(path):\n    h = hashlib.sha256()\n    with open(path, \"rb\") as fh:\n        for chunk in iter(lambda: fh.read(1 << 20), b\"\"):\n            h.update(chunk)\n    return h.hexdigest()\n\n\ndef hexint(s):\n    return int(s, 16)\n\n\ndef hash_probes(r):\n    n = 0\n    for ph in (r.get(\"work\") or {}).get(\"phases\", []):\n        n += int((ph.get(\"prims\") or {}).get(\"hash_probe\", 0))\n    return n\n\n\nd = f\"{REPO}/{REL}\"\nfiles = {fn: sha256_file(f\"{d}/{fn}\") for fn in (\"records.jsonl\", \"session.json\", \"spec.json\", \"plan.json\", \"host.json\")}\nsess = json.load(open(f\"{d}/session.json\"))\nrecs = [json.loads(line) for line in open(f\"{d}/records.jsonl\")]\nstruct = {\n    \"n_records\": len(recs), \"session_records_written\": sess[\"records_written\"],\n    \"records_sha256_matches_session\": files[\"records.jsonl\"] == sess[\"records_sha256\"],\n    \"host_sha256_matches_session\": files[\"host.json\"] == sess[\"host_sha256\"],\n    \"plan_sha256_matches_session\": files[\"plan.json\"] == sess[\"plan_sha256\"],\n    \"unique_record_ids\": len({r[\"record_id\"] for r in recs}) == len(recs),\n    \"seq_contiguous\": sorted(r[\"seq\"] for r in recs) == list(range(len(recs))),\n    \"all_session_id\": all(r[\"session_id\"] == sess[\"session_id\"] for r in recs),\n    \"single_binary\": sorted({r[\"binary_sha256\"] for r in recs}),\n    \"git_commit\": sess[\"git_commit\"], \"git_dirty\": sess[\"git_dirty\"],\n}\n\n# curves\nmeta, pts = {}, defaultdict(list)\nfor r in recs:\n    c = r[\"workload\"][\"curve\"]\n    pts[c[\"slug\"]].append((hexint(r[\"workload\"][\"target\"][0]), hexint(r[\"workload\"][\"target\"][1])))\n    m = (c[\"icv1\"], (hexint(c[\"generator\"][0]), hexint(c[\"generator\"][1])), int(c[\"r\"]), int(c[\"group_order\"]),\n         int(c[\"cofactor\"]), c[\"construction\"])\n    assert meta.setdefault(c[\"slug\"], m) == m\ncurves = {}\nfor slug, m in meta.items():\n    cv = P[\"derive_curve\"](slug, m[0], m[1], pts[slug], m[2], m[3], m[4])\n    cv[\"construction\"] = m[5]\n    curves[slug] = cv\n\n# negative control\nrng = random.Random(13)\nnt = nok = 0\nfor cv in curves.values():\n    p, a, rr = cv[\"p\"], cv[\"a\"], cv[\"r\"]\n    G = tuple(cv[\"derived_from\"][\"G\"])\n    assert P[\"ec_mul\"](rr - 1, G, p, a) == (G[0], (-G[1]) % p)\n    for _ in range(40):\n        k = rng.randrange(2, rr - 1)\n        Q = P[\"ec_mul\"](k, G, p, a)\n        nt += 1\n        if P[\"on_curve\"](Q, p, a, cv[\"b\"]) and P[\"ec_mul\"](k + 1, G, p, a) != Q and \\\n                P[\"ec_mul\"](k - 1, G, p, a) != Q and P[\"ec_mul\"](rr - k, G, p, a) != Q:\n            nok += 1\n\n# scalars and per-record unit checks\nscal = defaultdict(lambda: {\"checked\": 0, \"pass\": 0, \"fail\": 0, \"planted_eq\": 0})\nfailures, ids_nw = [], []\ns_unit = floor_err = phase_sum_err = 0.0\nfor r in recs:\n    cv = curves[r[\"workload\"][\"curve\"][\"slug\"]]\n    p, a, b, rr = cv[\"p\"], cv[\"a\"], cv[\"b\"], cv[\"r\"]\n    G = tuple(cv[\"derived_from\"][\"G\"])\n    Q = (hexint(r[\"workload\"][\"target\"][0]), hexint(r[\"workload\"][\"target\"][1]))\n    key = (r[\"arm\"], \"warmup\" if r[\"warmup\"] else \"measured\")\n    scal[key][\"checked\"] += 1\n    dv = int(r[\"outcome\"][\"recovered\"]) if r[\"outcome\"][\"recovered\"] is not None else None\n    ok = dv is not None and 0 <= dv < rr and P[\"on_curve\"](Q, p, a, b) and P[\"ec_mul\"](dv, G, p, a) == Q\n    scal[key][\"pass\" if ok else \"fail\"] += 1\n    if not ok:\n        failures.append(r[\"record_id\"])\n    if dv is not None and dv == int(r[\"workload\"][\"planted\"]):\n        scal[key][\"planted_eq\"] += 1\n    if not r[\"warmup\"]:\n        ids_nw.append(r[\"record_id\"])\n    s_unit = max(s_unit, abs(r[\"cost\"][\"total_gae\"] / math.sqrt(rr) - r[\"cost\"][\"s\"]) / r[\"cost\"][\"s\"])\n    fl = math.sqrt(math.pi / (2 * r[\"boundaries\"][\"automorphisms_available\"]))\n    floor_err = max(floor_err, abs(fl - r[\"boundaries\"][\"floor_s\"]) / fl)\n    phase_sum_err = max(phase_sum_err, abs(sum(ph[\"gae\"] for ph in r[\"phases\"]) - r[\"cost\"][\"total_gae\"]))\nids_nw.sort()\n\n# per-record table\narms = defaultdict(dict)\ndup = 0\nmech_acc = defaultdict(lambda: defaultdict(list))\nmech_curve = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))\ncyc_counts = defaultdict(lambda: defaultdict(int))\nfor r in recs:\n    if r[\"warmup\"] or r[\"outcome\"][\"status\"] != \"verified\":\n        continue\n    k = (r[\"workload\"][\"workload_id\"], r[\"round\"])\n    dup += k in arms[r[\"arm\"]]\n    cn = r.get(\"counters\") or {}\n    rr = int(r[\"workload\"][\"curve\"][\"r\"])\n    decl = r[\"cost\"][\"unpriced\"]\n    U_decl = sum(int(cn.get(x, 0)) for x in decl)\n    # symmetric sensitivity: every arm's distinguished-point table work charged.  Arms that declare the\n    # DP table counters use them; arms that do not are charged their hash probes from the record's own\n    # bit-op work block (lower bound: their distinguished_points counter).\n    if all(x in decl for x in DP_DECL):\n        dp_ops = sum(int(cn.get(x, 0)) for x in DP_DECL)\n        dp_src = \"declared\"\n    else:\n        dp_ops = hash_probes(r)\n        dp_src = \"work.hash_probe\"\n    U_sym = int(cn.get(\"canonicalisations_uncharged\", 0)) + dp_ops\n    U_sym2 = int(cn.get(\"canonicalisations_uncharged\", 0)) + (dp_ops if dp_src == \"declared\" else 2 * int(cn.get(\"distinguished_points\", 0)))\n    arms[r[\"arm\"]][k] = {\"S\": r[\"cost\"][\"s\"], \"gae\": r[\"cost\"][\"total_gae\"], \"r\": rr, \"seed\": r[\"algorithm_seed\"],\n                         \"target\": tuple(r[\"workload\"][\"target\"]), \"U_decl\": U_decl, \"U_sym\": U_sym, \"U_sym2\": U_sym2,\n                         \"dp_ops\": dp_ops, \"dp_src\": dp_src, \"dps\": int(cn.get(\"distinguished_points\", 0))}\n    for name in (\"cycle_escape_doublings\", \"cycles_all\"):\n        tot = sum(int(cn.get(x, 0)) for x in MECH[name])\n        cyc_counts[r[\"arm\"]][name + \"_records_nonzero\"] += 1 if tot else 0\n        cyc_counts[r[\"arm\"]][name + \"_total\"] += tot\n    for name, keys in MECH.items():\n        v = sum(int(cn.get(x, 0)) for x in keys) / math.sqrt(rr)\n        mech_acc[r[\"arm\"]][name].append(v)\n        mech_curve[r[\"arm\"]][name][rr].append(v)\n\n\ndef pooled(cand, ref):\n    A_, B_ = arms[ref], arms[cand]\n    keys = sorted(set(A_) & set(B_))\n    sb, sa = sum(B_[k][\"S\"] for k in keys), sum(A_[k][\"S\"] for k in keys)\n    bands = {}\n    for uk in (\"U_decl\", \"U_sym\", \"U_sym2\"):\n        band = {}\n        for w in (0.0, 0.1, 1.0):\n            nb = sum((B_[k][\"gae\"] + w * B_[k][uk]) / math.sqrt(B_[k][\"r\"]) for k in keys)\n            na = sum((A_[k][\"gae\"] + w * A_[k][uk]) / math.sqrt(A_[k][\"r\"]) for k in keys)\n            band[str(w)] = {\"ratio\": nb / na, \"cand_mean_S\": nb / len(keys), \"ref_mean_S\": na / len(keys)}\n        bands[uk] = band\n    per = defaultdict(lambda: [0.0, 0.0, 0])\n    for k in keys:\n        e = per[A_[k][\"r\"]]\n        e[0] += B_[k][\"S\"]\n        e[1] += A_[k][\"S\"]\n        e[2] += 1\n    return {\"cand\": cand, \"ref\": ref, \"pairs\": len(keys), \"unpaired_cand\": len(set(B_) - set(A_)),\n            \"unpaired_ref\": len(set(A_) - set(B_)), \"ratio_sumS\": sb / sa, \"mean_S_cand\": sb / len(keys),\n            \"mean_S_ref\": sa / len(keys),\n            \"ratio_sum_total_gae\": sum(B_[k][\"gae\"] for k in keys) / sum(A_[k][\"gae\"] for k in keys),\n            \"same_seed_and_target\": all(A_[k][\"seed\"] == B_[k][\"seed\"] and A_[k][\"target\"] == B_[k][\"target\"] for k in keys),\n            \"band\": bands[\"U_decl\"], \"band_symmetric_dp_charged\": bands[\"U_sym\"], \"band_symmetric_dp_charged_x2\": bands[\"U_sym2\"],\n            \"per_curve\": [{\"r\": rr, \"log2_r\": math.log2(rr), \"pairs\": v[2], \"mean_S_cand\": v[0] / v[2],\n                           \"mean_S_ref\": v[1] / v[2], \"ratio\": v[0] / v[1]} for rr, v in sorted(per.items())]}\n\n\ndef tail(arm):\n    s = sorted(v[\"S\"] for v in arms[arm].values())\n    med = s[len(s) // 2]\n    return {\"runs\": len(s), \"median_S\": med, \"max_S\": s[-1], \"max_over_median\": s[-1] / med,\n            \"top_run_share\": s[-1] / sum(s), \"top10_share\": sum(s[-10:]) / sum(s)}\n\n\nmech = {a: {n: sum(v) / len(v) for n, v in d_.items()} for a, d_ in mech_acc.items()}\nmech_pc = {a: {n: {str(rr): sum(v) / len(v) for rr, v in sorted(byr.items())} for n, byr in d_.items()}\n           for a, d_ in mech_curve.items()}\ndp_info = {a: {\"dp_ops_total\": sum(v[\"dp_ops\"] for v in arms[a].values()),\n               \"distinguished_points_total\": sum(v[\"dps\"] for v in arms[a].values()),\n               \"dp_source\": sorted({v[\"dp_src\"] for v in arms[a].values()})} for a in arms}\nfor cv in curves.values():\n    pass\nout = {\"helper_sha256\": HELPER_SHA, \"files_sha256\": files, \"session_id\": sess[\"session_id\"], \"struct\": struct,\n       \"duplicate_keys\": dup, \"arm_counts_measured_verified\": {a: len(v) for a, v in arms.items()},\n       \"curves\": curves, \"scalar\": {f\"{a}|{w}\": v for (a, w), v in sorted(scal.items())},\n       \"scalar_failures\": failures, \"nonwarmup_ids_sha256\": hashlib.sha256(\"\\n\".join(ids_nw).encode()).hexdigest(),\n       \"nonwarmup_ids_count\": len(ids_nw), \"S_unit_max_rel_err\": s_unit, \"floor_max_rel_err\": floor_err,\n       \"phase_gae_sum_max_abs_err\": phase_sum_err, \"negative_control\": {\"trials\": nt, \"rejected_all_wrong\": nok},\n       \"pairs\": {f\"{c}/{r_}\": pooled(c, r_) for c, r_ in PAIRS}, \"mechanism_means_per_sqrt_r\": mech,\n       \"mechanism_per_curve\": mech_pc, \"cycle_counts\": {a: dict(v) for a, v in cyc_counts.items()}, \"tails\": {a: tail(a) for a in arms}, \"dp_table_work\": dp_info,\n       \"declared_unpriced\": {a: sorted({tuple(r[\"cost\"][\"unpriced\"]) for r in recs if r[\"arm\"] == a}) for a in arms}}\njson.dump(out, open(OUT, \"w\"), indent=1, sort_keys=True, default=str)\nprint(\"written\", OUT)\n",
+  "validate.py": "#!/usr/bin/env python3\n\"\"\"Independent validator for two ecbench sessions.\n\nShares no code with ecbench: reads records.jsonl directly, does its own\nshort-Weierstrass affine arithmetic over F_p, and its own statistics.\nUsage: validate.py REPO_ROOT OUT_JSON\n\"\"\"\nimport hashlib\nimport json\nimport math\nimport sys\nfrom collections import defaultdict\n\nREPO = sys.argv[1]\nOUT = sys.argv[2]\n\nSESSIONS = {\n    \"rho_v3_ladder\": \"research/ecbench_rho_v3_ladder_20261107/sessions/main\",\n    \"ic_auto_base\": \"research/ecbench_ic_auto_base_20261107/sessions/main\",\n}\n\nRHO_UNPRICED = (\n    \"canonicalisations_uncharged\",\n    \"distinguished_point_table_inserts_uncharged\",\n    \"distinguished_point_table_queries_uncharged\",\n)\nIC_UNPRICED_NATIVE = (\"legendre_symbols\", \"lookups\", \"row_ops\", \"sqrt_solves\", \"target_guard_probes\")\n\n\n# ---------- number theory and curve arithmetic (independent) ----------\ndef is_prime(n):\n    if n < 2:\n        return False\n    small = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)\n    for q in small:\n        if n % q == 0:\n            return n == q\n    d, s = n - 1, 0\n    while d % 2 == 0:\n        d //= 2\n        s += 1\n    for a in small:  # deterministic for n < 3.3e24\n        x = pow(a, d, n)\n        if x in (1, n - 1):\n            continue\n        for _ in range(s - 1):\n            x = x * x % n\n            if x == n - 1:\n                break\n        else:\n            return False\n    return True\n\n\ndef finv(x, p):\n    x %= p\n    assert x != 0\n    return pow(x, p - 2, p)  # Fermat, p prime\n\n\ndef on_curve(P, p, a, b):\n    x, y = P\n    return (y * y - (x * x * x + a * x + b)) % p == 0\n\n\ndef ec_add(P, Q, p, a):\n    if P is None:\n        return Q\n    if Q is None:\n        return P\n    x1, y1 = P\n    x2, y2 = Q\n    if x1 == x2:\n        if (y1 + y2) % p == 0:\n            return None\n        lam = (3 * x1 * x1 + a) * finv(2 * y1, p) % p\n    else:\n        lam = (y2 - y1) * finv(x2 - x1, p) % p\n    x3 = (lam * lam - x1 - x2) % p\n    y3 = (lam * (x1 - x3) - y1) % p\n    return (x3, y3)\n\n\ndef ec_mul(k, P, p, a):\n    R, A = None, P\n    while k > 0:\n        if k & 1:\n            R = ec_add(R, A, p, a)\n        A = ec_add(A, A, p, a)\n        k >>= 1\n    return R\n\n\ndef hexint(s):\n    return int(s, 16) if isinstance(s, str) and s.startswith(\"0x\") else int(s)\n\n\ndef sha256_file(path):\n    h = hashlib.sha256()\n    with open(path, \"rb\") as f:\n        for chunk in iter(lambda: f.read(1 << 20), b\"\"):\n            h.update(chunk)\n    return h.hexdigest()\n\n\n# ---------- registry (third source for a, b) ----------\nwith open(f\"{REPO}/docs/curves/registry.json\") as f:\n    reg = json.load(f)\nreg_entries = reg if isinstance(reg, list) else reg.get(\"curves\", reg.get(\"entries\", []))\nREG = {e[\"slug\"]: e for e in reg_entries if isinstance(e, dict) and \"slug\" in e}\n\n\ndef derive_curve(slug, icv1, G, Qs, r, group_order, cofactor):\n    \"\"\"Derive (a, b) from G and a target with a different abscissa; bind them.\"\"\"\n    f = icv1.split(\":\")\n    assert f[0] == \"ICV1\" and f[1].startswith(\"fp-\"), icv1\n    p = int(f[1][3:])\n    trace, order, j_claim, model12 = int(f[2]), int(f[3]), int(f[4]), f[8]\n    xg, yg = G\n    Q = next(q for q in Qs if q[0] != xg)\n    xq, yq = Q\n    cg = (yg * yg - xg ** 3) % p\n    cq = (yq * yq - xq ** 3) % p\n    a = (cg - cq) * finv(xg - xq, p) % p\n    b = (cg - a * xg) % p\n    disc = (4 * a ** 3 + 27 * b * b) % p\n    j = (1728 * 4 * pow(a, 3, p) * finv(disc, p)) % p if disc else None\n    model_json = (\n        '{\"a\":\"%d\",\"b\":\"%d\",\"field\":\"fp-%d\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"%d\",\"v\":\"1\"}' % (a, b, p, p)\n    )\n    model_hash = hashlib.sha256(model_json.encode()).hexdigest()\n    t_tag = f\"tm{-trace}\" if trace < 0 else f\"t{trace}\"\n    slug_expect = f\"icv1-fp{p.bit_length()}-{t_tag}-{model_hash[:8]}\"\n    regent = REG.get(slug)\n    reg_ab = None\n    if regent:\n        pr = regent.get(\"params\", {})\n        reg_ab = (int(pr.get(\"p\")), int(pr.get(\"a\")), int(pr.get(\"b\")))\n    sq = math.isqrt(p)\n    checks = {\n        \"p_prime\": is_prime(p),\n        \"disc_nonzero\": disc != 0,\n        \"model12_matches\": model_hash[:12] == model12,\n        \"slug_matches\": slug_expect == slug,\n        \"j_matches\": j == j_claim,\n        \"trace_matches\": p + 1 - order == trace,\n        \"order_eq_r_eq_record\": order == r == group_order and cofactor == 1,\n        \"r_prime\": is_prime(r),\n        \"hasse\": (p + 1 - r) ** 2 <= 4 * p,\n        # 2r beyond the Hasse interval => #E(F_p) is exactly r (cofactor 1)\n        \"order_unique_in_hasse\": 2 * r > p + 1 + 2 * (sq + 1),\n        \"G_on_curve\": on_curve(G, p, a, b),\n        \"rG_is_identity\": ec_mul(r, G, p, a) is None,\n        \"registry_agrees\": reg_ab == (p, a, b),\n    }\n    return {\n        \"slug\": slug, \"p\": p, \"a\": a, \"b\": b, \"r\": r, \"j\": j, \"trace\": trace,\n        \"model_json\": model_json, \"model_sha256\": model_hash,\n        \"derived_from\": {\"G\": [xg, yg], \"Q\": [xq, yq]},\n        \"checks\": checks, \"ok\": all(checks.values()),\n    }\n\n\ndef ols(xs, ys):\n    n = len(xs)\n    mx, my = sum(xs) / n, sum(ys) / n\n    sxx = sum((x - mx) ** 2 for x in xs)\n    sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))\n    return sxy / sxx\n\n\ndef unpriced(rec):\n    if rec[\"method\"][\"family\"] == \"rho\":\n        c = rec.get(\"counters\") or {}\n        return sum(int(c.get(k, 0)) for k in RHO_UNPRICED), {k: int(c.get(k, 0)) for k in RHO_UNPRICED}\n    tot = {k: 0 for k in IC_UNPRICED_NATIVE}\n    for ph in rec.get(\"phases\") or []:\n        nat = ph.get(\"native\") or {}\n        for k in IC_UNPRICED_NATIVE:\n            tot[k] += int(nat.get(k, 0))\n    return sum(tot.values()), tot\n\n\nresult = {}\nfor name, rel in SESSIONS.items():\n    d = f\"{REPO}/{rel}\"\n    files = {fn: sha256_file(f\"{d}/{fn}\") for fn in (\"records.jsonl\", \"session.json\", \"spec.json\", \"plan.json\", \"host.json\")}\n    sess = json.load(open(f\"{d}/session.json\"))\n    recs = []\n    with open(f\"{d}/records.jsonl\") as f:\n        for line in f:\n            recs.append(json.loads(line))\n    # structural\n    ids = [r[\"record_id\"] for r in recs]\n    seqs = [r[\"seq\"] for r in recs]\n    struct = {\n        \"n_records\": len(recs),\n        \"session_records_written\": sess[\"records_written\"],\n        \"records_sha256_matches_session\": files[\"records.jsonl\"] == sess[\"records_sha256\"],\n        \"host_sha256_matches_session\": files[\"host.json\"] == sess[\"host_sha256\"],\n        \"plan_sha256_matches_session\": files[\"plan.json\"] == sess[\"plan_sha256\"],\n        \"unique_record_ids\": len(set(ids)) == len(ids),\n        \"seq_contiguous\": sorted(seqs) == list(range(len(recs))),\n        \"all_session_id\": all(r[\"session_id\"] == sess[\"session_id\"] for r in recs),\n        \"single_binary\": sorted({r[\"binary_sha256\"] for r in recs}),\n        \"git_commit\": sess[\"git_commit\"],\n        \"git_dirty\": sess[\"git_dirty\"],\n    }\n    # curves\n    by_curve_pts = defaultdict(list)\n    curve_meta = {}\n    for r in recs:\n        c = r[\"workload\"][\"curve\"]\n        G = (hexint(c[\"generator\"][0]), hexint(c[\"generator\"][1]))\n        Q = (hexint(r[\"workload\"][\"target\"][0]), hexint(r[\"workload\"][\"target\"][1]))\n        by_curve_pts[c[\"slug\"]].append(Q)\n        m = (c[\"icv1\"], G, int(c[\"r\"]), int(c[\"group_order\"]), int(c[\"cofactor\"]), c.get(\"construction\"))\n        if c[\"slug\"] in curve_meta:\n            assert curve_meta[c[\"slug\"]] == m, (\"curve metadata differs\", c[\"slug\"])\n        curve_meta[c[\"slug\"]] = m\n    curves = {}\n    for slug, (icv1, G, rr, go, cof, cons) in curve_meta.items():\n        cv = derive_curve(slug, icv1, G, by_curve_pts[slug], rr, go, cof)\n        cv[\"construction\"] = cons\n        curves[slug] = cv\n    # scalar verification of every record\n    scal = defaultdict(lambda: {\"checked\": 0, \"pass\": 0, \"fail\": 0, \"planted_eq\": 0})\n    failures = []\n    s_unit_maxrel = 0.0\n    ids_nonwarm = []\n    for r in recs:\n        cv = curves[r[\"workload\"][\"curve\"][\"slug\"]]\n        p, a, b, rr = cv[\"p\"], cv[\"a\"], cv[\"b\"], cv[\"r\"]\n        G = tuple(cv[\"derived_from\"][\"G\"])\n        Q = (hexint(r[\"workload\"][\"target\"][0]), hexint(r[\"workload\"][\"target\"][1]))\n        key = (r[\"arm\"], \"warmup\" if r[\"warmup\"] else \"measured\")\n        scal[key][\"checked\"] += 1\n        ok = r[\"outcome\"][\"recovered\"] is not None\n        dval = int(r[\"outcome\"][\"recovered\"]) if ok else None\n        ok = ok and 0 <= dval < rr and on_curve(Q, p, a, b) and ec_mul(dval, G, p, a) == Q\n        planted_ok = dval is not None and dval == int(r[\"workload\"][\"planted\"])\n        if ok:\n            scal[key][\"pass\"] += 1\n        else:\n            scal[key][\"fail\"] += 1\n            failures.append(r[\"record_id\"])\n        if planted_ok:\n            scal[key][\"planted_eq\"] += 1\n        if not r[\"warmup\"]:\n            ids_nonwarm.append(r[\"record_id\"])\n        # unit check: S = total_gae / sqrt(r)\n        s_re = r[\"cost\"][\"total_gae\"] / math.sqrt(rr)\n        s_unit_maxrel = max(s_unit_maxrel, abs(s_re - r[\"cost\"][\"s\"]) / r[\"cost\"][\"s\"])\n    ids_nonwarm.sort()\n    ids_sha = hashlib.sha256(\"\\n\".join(ids_nonwarm).encode()).hexdigest()\n\n    # measured table: non-warmup, outcome verified\n    arms = defaultdict(dict)\n    dup = 0\n    for r in recs:\n        if r[\"warmup\"] or r[\"outcome\"][\"status\"] != \"verified\":\n            continue\n        k = (r[\"workload\"][\"workload_id\"], r[\"round\"])\n        if k in arms[r[\"arm\"]]:\n            dup += 1\n        U, Ud = unpriced(r)\n        arms[r[\"arm\"]][k] = {\n            \"S\": r[\"cost\"][\"s\"], \"gae\": r[\"cost\"][\"total_gae\"], \"r\": int(r[\"workload\"][\"curve\"][\"r\"]),\n            \"seed\": r[\"algorithm_seed\"], \"target\": tuple(r[\"workload\"][\"target\"]), \"U\": U, \"Ud\": Ud,\n        }\n\n    def pooled(cand, inc):\n        A, B = arms[inc], arms[cand]\n        keys = sorted(set(A) & set(B))\n        sb = sum(B[k][\"S\"] for k in keys)\n        sa = sum(A[k][\"S\"] for k in keys)\n        same_seed = all(A[k][\"seed\"] == B[k][\"seed\"] and A[k][\"target\"] == B[k][\"target\"] for k in keys)\n        band = {}\n        for w in (0.0, 0.1, 1.0):\n            nb = sum((B[k][\"gae\"] + w * B[k][\"U\"]) / math.sqrt(B[k][\"r\"]) for k in keys)\n            na = sum((A[k][\"gae\"] + w * A[k][\"U\"]) / math.sqrt(A[k][\"r\"]) for k in keys)\n            band[str(w)] = {\"cand_sum_S\": nb, \"ref_sum_S\": na, \"ratio\": nb / na,\n                            \"cand_mean_S\": nb / len(keys), \"ref_mean_S\": na / len(keys)}\n        orders = {v[\"ratio\"] < 1 for v in band.values()}\n        ua = defaultdict(int)\n        ub = defaultdict(int)\n        for k in keys:\n            for kk, vv in A[k][\"Ud\"].items():\n                ua[kk] += vv\n            for kk, vv in B[k][\"Ud\"].items():\n                ub[kk] += vv\n        return {\n            \"cand\": cand, \"ref\": inc, \"pairs\": len(keys),\n            \"unpaired_cand\": len(set(B) - set(A)), \"unpaired_ref\": len(set(A) - set(B)),\n            \"sum_S_cand\": sb, \"sum_S_ref\": sa, \"ratio_sumS\": sb / sa,\n            \"mean_S_cand\": sb / len(keys), \"mean_S_ref\": sa / len(keys),\n            \"same_seed_and_target\": same_seed,\n            \"band\": band,\n            \"band_order_holds\": len(orders) == 1 and all(v[\"ratio\"] != 1 for v in band.values()),\n            \"unpriced_totals_ref\": dict(ua), \"unpriced_totals_cand\": dict(ub),\n        }\n\n    def per_curve(arm):\n        g = defaultdict(list)\n        for v in arms[arm].values():\n            g[v[\"r\"]].append(v)\n        out = []\n        for rr in sorted(g):\n            vs = g[rr]\n            out.append({\"r\": rr, \"log2_r\": math.log2(rr), \"n\": len(vs),\n                        \"mean_S\": sum(v[\"S\"] for v in vs) / len(vs),\n                        \"mean_gae\": sum(v[\"gae\"] for v in vs) / len(vs),\n                        \"mean_ln_gae\": sum(math.log(v[\"gae\"]) for v in vs) / len(vs)})\n        return out\n\n    def slopes(arm):\n        pc = per_curve(arm)\n        xs = [math.log(c[\"r\"]) for c in pc]\n        s_lnmean = ols(xs, [math.log(c[\"mean_gae\"]) for c in pc])\n        s_meanln = ols(xs, [c[\"mean_ln_gae\"] for c in pc])\n        px = [math.log(v[\"r\"]) for v in arms[arm].values()]\n        py = [math.log(v[\"gae\"]) for v in arms[arm].values()]\n        s_runs = ols(px, py)\n        return {\"slope_ln_mean_gae_6_sizes\": s_lnmean, \"slope_mean_ln_gae_6_sizes\": s_meanln,\n                \"slope_per_run_ols\": s_runs, \"per_run_points\": len(px), \"sizes\": len(pc)}\n\n    out = {\"files_sha256\": files, \"session_id\": sess[\"session_id\"], \"struct\": struct,\n           \"duplicate_keys\": dup,\n           \"arm_counts_measured_verified\": {a: len(v) for a, v in arms.items()},\n           \"curves\": curves,\n           \"scalar\": {f\"{a}|{w}\": v for (a, w), v in sorted(scal.items())},\n           \"scalar_failures\": failures, \"nonwarmup_ids_sha256\": ids_sha,\n           \"nonwarmup_ids_count\": len(ids_nonwarm),\n           \"S_unit_max_rel_err\": s_unit_maxrel}\n    if name == \"rho_v3_ladder\":\n        out[\"cand_vs_inc\"] = pooled(\"candidate\", \"incumbent\")\n        out[\"aa\"] = pooled(\"incumbent-aa\", \"incumbent\")\n        out[\"plainv3_vs_plain\"] = pooled(\"plain-v3\", \"plain\")\n        out[\"per_curve\"] = {a: per_curve(a) for a in arms}\n    else:\n        out[\"cand_vs_inc\"] = pooled(\"candidate\", \"incumbent\")\n        out[\"aa\"] = pooled(\"incumbent-aa\", \"incumbent\")\n        out[\"cand_vs_rhov3\"] = pooled(\"candidate\", \"rho-v3\")\n        out[\"cand_vs_rhov2\"] = pooled(\"candidate\", \"rho-v2\")\n        out[\"per_curve\"] = {a: per_curve(a) for a in arms}\n        out[\"slopes\"] = {a: slopes(a) for a in (\"candidate\", \"incumbent\", \"incumbent-aa\")}\n    result[name] = out\n\nwith open(OUT, \"w\") as f:\n    json.dump(result, f, indent=1, sort_keys=True, default=str)\nprint(\"written\", OUT)\n"
+ }
+}

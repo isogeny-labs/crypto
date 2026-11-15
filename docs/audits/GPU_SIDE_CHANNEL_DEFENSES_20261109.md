@@ -69,9 +69,37 @@ Recommended, in order:
    test (fixed versus random operands, low versus high Hamming weight) with
    `%clock64`, with a positive control, before relying on it.
 
+## Follow-up (2026-11-10): the audit's open items, run
+
+Measured in `cryptanalysis` PR #1459, study `research/clmad_audit_20261110/`
+(protocol frozen before data; record `benchmarks/records/20261110T0408Z-clmad-audit.json`;
+all `[pcc:unverified]`, one run per arm, no independent replay yet):
+
+- **A3 reproduced, and wider than reported.** The public reproducer
+  (github.com/robik75/ptxas-clmad-constant-operand, run unchanged on RunPod
+  RTX PRO 6000 pods) fails at `-O2`/`-O3` and under driver JIT for
+  N = 14, 15, 18, 19 and passes at N = 16 and at `-O1`/`-O0`, under **both**
+  `ptxas` 13.4.92 and 13.3.73. The defect is not specific to 13.4 Update 2.
+- **A4 holds.** An independently written Karatsuba reproducer folds the same
+  constant-one step (6 fewer `CLMAD` in SASS) and still computes correctly on
+  both toolkits; the defect is sensitive to the surrounding code. The
+  `ecc2k130` device tests pass on both toolkits with the production defines.
+- **A5 closed.** Both `ecc2k130` Makefiles read the `nvcc` version and refuse
+  a `clmad` build on a `BAD_PTXAS` entry unless `ALLOW_BAD_PTXAS=1`; the GPU
+  client prints `nvccVersion` in its `devices` and `bench`/`walk` JSON. The
+  default list is empty, since the affected versions include the production
+  toolkit and the kernels pass their device tests on it: the tests on the
+  toolkit in use are the guard.
+- **A2/A7 measured.** A two-class timing test (dependent `clmad` chain,
+  `clock64`, eleven operand classes, positive and negative controls, shuffled
+  launch order) found no operand class distinguishable for `clmad.lo` or
+  `clmad.hi` on an RTX 5090 (55.08 cycles per operation, one warp) or an RTX
+  PRO 6000 (63.53), nor at two blocks per SM (about 255.9). A bound at that
+  sample size, not a constant-time guarantee.
+
 ## Sources
 
-NVIDIA blog on clmad: https://developer.nvidia.com/blog/building-faster-cryptography-with-carryless-multiplication-in-nvidia-cuda-13-3/ ·
+NVIDIA blog on clmad: https://developer.nvidia.com/blog/building-faster-cryptography-with-carryless-multiplication-in-nvidia-cuda-13-3/ · [pcc:unverified]
 PTX ISA: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html ·
 ptxas repro: https://github.com/robik75/ptxas-clmad-constant-operand ·
 LLVM NVPTX clmad: https://github.com/llvm/llvm-project/pull/216412 ·
