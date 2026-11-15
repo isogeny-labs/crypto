@@ -18,7 +18,7 @@ permissions:
 jobs:
   factorized-resultant:
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 9
     env:
       RAYON_NUM_THREADS: '1'
     steps:
@@ -42,3 +42,6 @@ jobs:
         run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index
       - name: Rust-only 16384 public natural-target coordinate control
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index -- --natural-16384
+      - name: Rust-only 32-unknown cold prime31 factor-base relation solver trial
+        timeout-minutes: 5
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index -- --solve-one
