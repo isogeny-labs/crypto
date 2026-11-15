@@ -237,12 +237,22 @@
     "C++ diagnostic and separate Python replay are both producer-operated and unsignatured",
     "Rust-native example checked in but not compiled or executed at exact head",
     "generic MITM relation oracle; not subgeneric or cheaper complete prime-field ECDLP",
-    "cost accounting omits factor-base construction and symbolics; wall not comparable"
+    "cost accounting omits factor-base construction and symbolics; wall not comparable",
+    "original group_additions=3,826,072 excludes final 1,431 basis/target replay additions; inclusive total=3,827,503",
+    "3,774,896 reported inversion calls include 32 scalar-order row inversions and do not include final group replay inversions"
   ],
   "independent_python_producer_replay": {
     "verified_public_equations": 32,
     "rank": 32,
     "verified_basis_logs": 31,
     "verified_target": true
-  }
+  },
+  "group_additions_excludes_final_replay": true,
+  "mask_group_additions": 11352,
+  "group_lookup_additions": 3610880,
+  "final_basis_and_target_verification_additions": 1431,
+  "complete_group_additions_including_final_replay": 3827503,
+  "inversion_counter_includes_scalar_modular_rank_inversions": true,
+  "field_inversions_before_final_replay": 3774864,
+  "modular_rank_inversions_before_final_replay": 32
 }
