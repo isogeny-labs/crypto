@@ -2,8 +2,10 @@
 
 **Class.** A derivation (desk mathematics). No run, no measurement, no compute beyond compiling a
 core-Lean file. Notation follows `../README.md` §0 and `research/prime_fall_degree_20261027/DERIVED.md`
-(D1–D8). The proofs below are in prose. Their abstract closure steps and `pop` arithmetic are
-kernel-checked (§8). No pcc claim is registered for anything here, so every statement is
+(D1–D8). The proofs below are in prose. `lean/UpperBound.lean` kernel-checks only Lemma A, Lemma T,
+the single-ring gluing `closure_glue`, the abstract lift-plus-defect step `closure_lift_defect`, `wrap_pop`
+and `orbit_all_ones` (§8). U1's subring gluing and the cross-ring degree-shift lift in U2 and
+Proposition S are prose only. No pcc claim is registered for anything here, so every statement is
 `[pcc:unverified]` as a ledger matter, and measured values quoted from other notes stay
 `[pcc:unverified]`.
 
@@ -29,26 +31,30 @@ exactly where a four-level lifting fails.
 3. **Theorem U2 (one-level lift, cost 2).** `d_F(f, t+1) ≤ 2 + max_λ d_F(f_λ, t)`, where `f_λ(z) =
    f(λ_1 z_1, λ_2 z_2)` and `λ_i^K = ±1`. For generic generators of a box this reads
    `d_F^gen(W, t+1) ≤ d_F^gen(W, t) + 2`, so `d_F^gen(W, t+4) ≤ d_F^gen(W, t) + 8`.
-4. **Theorem E (where the growth lives: an exact identity).** Fix `f` with exponents `< 2^t`, and let
-   `k ≥ 1`. Let `κ_{t,k}(f)` be the least `c` with `z_1^K − 1, z_2^K − 1 ∈ V_c(f)` at level `t + k`.
+4. **Theorem E (where the growth lives: an exact identity).** Fix `f` with `deg f ≥ 1` and exponents
+   `< 2^t`, and let `k ≥ 1`. Let `κ_{t,k}(f)` be the least `c` with `z_1^K − 1, z_2^K − 1 ∈ V_c(f)` at level `t + k`.
    Then
 
        d_F(f, t + k) = max( d_F(f, t), κ_{t,k}(f) ).
 
-   So the four-level lift `d_F(t+4) ≤ d_F(t) + 1` holds **iff** the two degree-1 elements `z_i^K − 1`
+   The hypothesis `deg f ≥ 1` is needed: for constant `f` one has `d_F(f, t+k) = 0` but `κ_{t,k}(f) = 1`,
+   so the identity would read `0 = 1` (`d_F = 0`, `κ = 1`).
+   So, for `deg f ≥ 1`, the four-level lift `d_F(t+4) ≤ d_F(t) + 1` holds **iff** the two degree-1 elements `z_i^K − 1`
    (the lift defects) enter the level-`(t+4)` closure by degree `d_F(t) + 1`. Theorem 1 of
    `../README.md` is the easy half of this identity. Proposition S pins `κ_{t,1}` to within 1, using
    the twisted half-fibres.
 5. **Lemma B (the fibre-gluing barrier).** A non-zero element that annihilates a fibre ideal
-   `z_1^{2^s} − ω` has degree at least `t − s`. So any proof that glues fibres over the top `k` levels
-   of a coordinate pays at least `k` degrees. That is slope at least 1 in the levels glued. U1 and U2
-   are optimal for that method, and a period-4 bound (slope 1/4) cannot come from it. The shift
-   transport `z ↦ z^{16}` (Lemma S4) is the other natural route. It fails because, for generic `f`,
-   `f(z^{16})` is not a multiple of `f` in the infinite tower (Proposition N).
+   `z_1^{2^s} − ω` has degree at least `t − s`. So, for Lemma-G-style gluing (additive bookkeeping
+   `δ = deg e` with an annihilator `e` as multiplier), gluing fibres over the top `k` levels of a
+   coordinate pays at least `k` degrees. That is slope at least 1 in the levels glued. U1 and U2
+   are optimal for that mechanism, and a period-4 bound (slope 1/4) cannot come from it. The shift
+   transport `z ↦ z^{16}` (Lemma S4) is the other natural route. Proposition N rules out only the
+   polynomial identity `f | f(z^{16})` in `F[z_1, z_2]` (for the `W = 1` Möbius form); it does not decide
+   whether `f(z^{16}) ∈ V_{c'}(f)` at level `t + 4`.
 
 **Open.** These remain open: the upper half of Conjecture G for `t ≥ 2` (`W = 1`) and `t ≥ 3`
-(`W = 2`); any bound of slope below 1; and the four-level lift, which by Theorem E is the single
-statement `κ_{t,4}(f) ≤ d_F(f, t) + 1` (§7).
+(`W = 2`); any bound of slope below 1; and the four-level lift, which by Theorem E (for `deg f ≥ 1`) is
+the single statement `κ_{t,4}(f) ≤ d_F(f, t) + 1` (§7).
 
 ---
 
@@ -181,7 +187,10 @@ generator `S₃` (`t ≥ 2`) has `d_F ≤ t + 2`.
   bound is `ffd = 4` (Theorem 4 / D3).
 
 Both values equal `ffd(W) + max(0, ⌊(t − s_W)/4⌋)`. Part (b) agrees with the measured `t = 2` entries
-of `../README.md` §5 `[pcc:unverified]`, and so does part (a), where no `t = 1` entry was measured.
+of `../README.md` §5 `[pcc:unverified]`. Part (a) is supported by the recorded `t = 1` tower cell
+`d_F = 3` (`research/pkm_falldegree_unblock_20261107/RESULTS.md` Table 1, `[pcc:unverified]`); the `t = 1`
+reduction of `S₃` is a width-1-box unit. Conjecture G was fitted on `t = 2..11`, so `t = 1` is an
+extrapolated cell. Both `(1, 1)` and `(2, 2)` are proved cells.
 
 **Comparison with the fitted law** (measured values `[pcc:unverified]`, from `../README.md` §5):
 
@@ -194,7 +203,8 @@ of `../README.md` §5 `[pcc:unverified]`, and so does part (a), where no `t = 1`
 No measured value exceeds the bound. That is a consistency check of the theorem, not evidence for it.
 
 **Why the method stops at slope 1.** The fibre idempotent `e_x` costs `t` degrees. Lemma B (§6) shows
-that any element killing `z_1 − x` costs at least that much. One can also fibre over only the top
+that any element killing `z_1 − x` costs at least that much, so for Lemma-G-style gluing the cost cannot
+be reduced. One can also fibre over only the top
 `t − a` levels of `z_1`, which costs `t − a` and leaves twisted rings of heights `(a, t)`. That gives
 `d_F(f, t) ≤ (t − a) + max_λ d_F^{(a,t)}(f_λ)`. Any uniform constant bound `d_F^{(a,b)} ≤ C_a` on
 strips would therefore give `t + C_a − a`, which is still slope 1.
@@ -226,20 +236,27 @@ strips would therefore give `t + C_a − a`, which is still slope 1.
 
 *Proof.*
 - For each of the finitely many `λ`, the map `f ↦ f_λ` is a linear automorphism of the box's
-  coefficient space that preserves units (a zero of `f_λ` on `μ_K²` is a zero of `f` on `λμ_K²`).
+  coefficient space. It maps units at level `t + 1` to units at level `t`, which is the fact used
+  (a zero of `f_λ` on `μ_K²` is a zero of `f` on `λμ_K²`, and `λμ_K² ⊆ μ_{2K}²` since `λ_i^K = ±1`).
 - So the generic open sets at levels `t + 1` and `t`, pulled back along all `f ↦ f_λ`, meet in a dense
   open set.
 
+This step depends on Theorem 3 of `../README.md` (the generic value of a box; prose, `[pcc:unverified]`).
+Theorem U2 and the statement of U2′ also assume that `f` is a unit at level `t + 1` (otherwise the
+maximum is infinite and the bound is vacuous).
+
 ∎
 
-Used with the measured `d_F(1, 11) = 5` `[pcc:unverified]`, U2′ gives `d_F^gen(1, 12) ≤ 7`. Conjecture G
-predicts 6, and the falsification run read `≥ 6` `[pcc:unverified]`. U2′ is weaker than U1 asymptotically
-but sharper next to measured cells.
+Conditionally, used with the measured `d_F(1, 11) = 5` `[pcc:unverified]`, U2′ would give
+`d_F(1, 12) ≤ 7`. This is conditional on three things: the two `t = 11` draws lie in the generic stratum
+(Theorem 3 of `../README.md` gives no probability bound); the measurement is correct; and `d_F` of the
+four twists `f_λ` of the drawn `f` at `t = 11` is known, which was not measured. Conjecture G
+predicts 6, and the falsification run read `≥ 6` `[pcc:unverified]`. U2′ is weaker than U1 asymptotically.
 
 ## 5. Theorem E: the growth is exactly the membership degree of `z_i^K − 1` (proved)
 
-**Theorem E.** Let `f` have all exponents `< K = 2^t`, so that it is the same polynomial at levels `t`
-and `t + k`, and let `k ≥ 1`. Let `κ = κ_{t,k}(f)` be the least `c` with
+**Theorem E.** Let `f` have `deg f ≥ 1` and all exponents `< K = 2^t`, so that it is the same polynomial
+at levels `t` and `t + k`, and let `k ≥ 1`. Let `κ = κ_{t,k}(f)` be the least `c` with
 `y_{1,t} − 1, y_{2,t} − 1 ∈ V_c(f)` at level `t + k` (here `y_{i,t} = z_i^K` is a tower variable).
 Then
 
@@ -248,8 +265,8 @@ Then
 *Proof.*
 
 - **`≥`.** `d_F(f, t+k) ≥ d_F(f, t)` is Theorem 1 of `../README.md`. If `1 ∈ V_d` at level `t + k`,
-  then `V_d = R_{≤d}` by Lemma F, which contains the degree-1 elements `y_{i,t} − 1`. So
-  `d_F(f, t+k) ≥ κ`.
+  then `V_d = R_{≤d}` by Lemma F, and `d ≥ deg f ≥ 1`, so `R_{≤d}` contains the degree-1 elements
+  `y_{i,t} − 1`. So `d_F(f, t+k) ≥ κ`.
 - **`≤`.**
   1. Let `c = d_F(f, t)`, `c' = max(c, κ)` and `Y = V_{c'}(f)` at level `t + k`. Both `c` and `κ` are
      at least `deg f`, because `V_{c''} = 0` for `c'' < deg f`.
@@ -269,16 +286,22 @@ Then
 
 ∎
 
-**Corollary E1 (the four-level lift, restated exactly).** For `c = d_F(f, t)`:
+*Remark (hypothesis `deg f ≥ 1`).* For constant `f ≠ 0`, `d_F(f, t+k) = 0` but `κ_{t,k}(f) = 1`, so the
+identity fails (`d_F = 0`, `κ = 1`).
+
+**Corollary E1 (the four-level lift, restated exactly).** For `deg f ≥ 1`, all exponents `< 2^t`, and
+`c = d_F(f, t)`:
 `d_F(f, t+4) ≤ c + 1` iff `z_1^K − 1` and `z_2^K − 1` lie in `V_{c+1}(f)` at level `t + 4`. The upper
 half of Conjecture G for `W`, for `t ≥ s_W`, therefore **follows from** two statements, by induction
-in steps of 4:
-- (i) the upper bound at the base cells `t ∈ [s_W, s_W + 3]`;
-- (ii) for generic `f` and all `t ≥ s_W`, `κ_{t,4}(f) ≤ d_F(f, t) + 1`.
+in steps of 4. Theorem E needs all exponents `< 2^t`, so the base range starts at
+`t_0 = max(s_W, ⌈log₂(W+1)⌉)`. For `W = 1` (`s_1 = 0`) the base cells are `t = 1..4` (not `0..3`, since
+exponent 1 is not `< 2^0`); for `W = 2` they are `t = 2..5`.
+- (i) the upper bound at the base cells `t ∈ [t_0, t_0 + 3]`;
+- (ii) for generic `f` and all `t ≥ t_0`, `κ_{t,4}(f) ≤ d_F(f, t) + 1`.
 
 Conversely, Conjecture G with both halves implies (ii), because then
 `κ_{t,4} ≤ d_F(t+4) = d_F(t) + 1`. The upper half alone does not imply (ii). At present (i) is proved
-only at `(2, 2)` (U1′). The other base cells are measured `[pcc:unverified]`.
+only at `(1, 1)` and `(2, 2)` (U1′(a) and (b)). The other base cells are measured `[pcc:unverified]`.
 
 **Proposition S (one level, sandwich).** Let `R^{(i,−)}` be the ring of heights `t` in coordinate `i`
 and `t + 1` in the other, twisted by `z_i^K = −1`. Write `d^{(i,−)}` for its last fall degree of `f`.
@@ -324,12 +347,13 @@ and `ω ∈ F^×`. Then `deg e ≥ t − s`. If moreover `e·(y_{2,s'} − ω') 
 
 ∎
 
-*Consequence.* Lemma G with a fibre annihilator converts a fibre certificate of degree `c` into a
-global one of degree at least `c + (number of levels fibred)`. Every annihilator of the fibre ideal
-`(y_{i,s} − ω)` is a multiple of the fibre idempotent, and Lemma B bounds its degree from below. Hence
-U1 (`k = t` levels, cost `t`) and U2 (one level per coordinate, cost 1 each) are optimal for fibre
-gluing. A proof of the period-4 law has to absorb the defects `z_i^K − 1` through falls of the closure
-itself (Theorem E), not through annihilators.
+*Consequence (for Lemma-G-style gluing only).* Lemma G with a fibre annihilator converts a fibre [pcc:unverified]
+certificate of degree `c` into a global one of degree at least `c + (number of levels fibred)`. Every
+annihilator of the fibre ideal `(y_{i,s} − ω)` is a multiple of the fibre idempotent, and Lemma B
+bounds its degree from below. Hence U1 (`k = t` levels, cost `t`) and U2 (one level per coordinate,
+cost 1 each) are optimal for Lemma-G gluing with annihilator multipliers. Lemma B does not constrain
+other gluing arguments. A period-4 proof of that kind would have to absorb the defects `z_i^K − 1`
+by another route, for instance through falls of the closure itself (Theorem E); that is not proved.
 
 **Lemma S4 (shift transport).** `σ: R_t → R_{t+4}`, `z ↦ z^{16}`, is an injective ring map. It sends
 `y_{i,j} ↦ y_{i,j+4}` and preserves degree, so `σ(V_c(g)) ⊆ V_c(σ g)`, by the proof of Theorem 1 with
@@ -352,8 +376,9 @@ with `c_{11} ≠ 0`, `γ ≠ αβ` and `β ≠ 0`. Then `f ∤ f(z_1^{16}, z_2^{
 ∎
 
 So Lemma S4 with `g = f` needs the closure to manufacture `f(z^{16})` at level `t + 4` through wraps.
-By Theorem 2, wraps happen only in the top `c' − 1` levels. No degree-local identity in the infinite
-tower can supply it. The exploratory data say the same thing (`../lower_bound/README.md` §6.3, §8;
+By Theorem 2, wraps happen only in the top `c' − 1` levels. Proposition N rules out only the polynomial
+identity `f | f(z^{16})` in `F[z_1, z_2]`; whether `f(z^{16}) ∈ V_{c'}(f)` at level `t + 4` for
+`c' = d_F(t) + 1` is not decided here. The exploratory data say the same thing (`../lower_bound/README.md` §6.3, §8;
 Rust re-run §10; `[pcc:unverified]`). There, the first degree-2 multiple of `f` involving level 4 has
 the shape `κ w_1w_2 + w_1 ℓ_1 + w_2 ℓ_2 + (levels 0..3)`, with `w_i = z_i^{16}` and `ℓ_i` non-constant
 degree-≤1 forms. It is a Möbius relation one block up, but with coefficients in the low algebra rather
@@ -362,11 +387,11 @@ module, not over `F`. That relative transport is not formulated as a theorem her
 
 ## 7. What remains conjectural (stated exactly)
 
-- **Upper half of Conjecture G.** Open for `W = 1`, `t ≥ 2` and `W = 2`, `t ≥ 3`. By Theorem E it follows from
-  Corollary E1 (i) and (ii), and the full Conjecture G implies (ii). The weakest open statement that would give slope 1/4 is
+- **Upper half of Conjecture G.** Open for `W = 1`, `t ≥ 2` and `W = 2`, `t ≥ 3`. By Theorem E (for
+  `deg f ≥ 1`) it follows from Corollary E1 (i) and (ii), and the full Conjecture G implies (ii). The weakest open statement that would give slope 1/4 is
   `κ_{t,4}(f) ≤ d_F(f, t) + 1` for generic `f`.
-- **Any slope `< 1`.** Not proved. Lemma B shows that it needs falls inside the fibres (Theorem E's
-  defect absorption).
+- **Any slope `< 1`.** Not proved. Lemma B shows that Lemma-G-style gluing cannot give it; another route
+  (for instance Theorem E's defect absorption) is not established.
 - **Asymmetric strips.** Open: a uniform bound `d_F^{(a,b)}(f) ≤ C_a` for `b ≥ a`. If it holds,
   §3 gives `d_F ≤ t + C_a − a`, which changes only the constant.
 - **Other widths.** U1 extends to any box once each one-variable fibre `f(x, z_2)` has a `t`-uniform
@@ -376,7 +401,8 @@ module, not over `F`. That relative transport is not formulated as a theorem her
   `[pcc:unverified]`.
 
 **Counterexample risks.**
-1. U1, U2, E, S, B and N are unconditional theorems (U2′ needs only genericity). A counterexample to
+1. U1, U2, E (for `deg f ≥ 1`), S, B and N are unconditional theorems (prose). U2′ needs genericity and
+   Theorem 3 of `../README.md`; E and U2 also assume `f` is a unit at the higher level. A counterexample to
    them would mean an error in a proof. Every measured value is consistent with U1.
 2. Conjecture G's upper half could fail if the periodic step pattern breaks at larger `t`, i.e. if
    `κ_{t,4} − d_F(t) ≥ 2` somewhere. The data have two observed steps for `W = 1, 2` and one for
@@ -542,3 +568,5 @@ natural liftings fail" is shown only relative to the method used (finding 4).
 9. **Sourcing (process, minor).** The knowledge base was not consulted (the note says so). "The only
    previous upper bound, D4's `2t + 2`" is scoped to this repository; DERIVED.md D7 also records
    `d_F ≤ D` (solving degree), which is not explicit in `t`. No novelty is claimed.
+
+Corrections applied 2026-11-15: findings 2, 3, 5, 6, 7, 8 (see the body); 1, 4, 9 remain open.
