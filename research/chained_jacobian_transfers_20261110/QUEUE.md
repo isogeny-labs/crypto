@@ -1,3 +1,21 @@
+# Genuine21 settled; complete fixed Jacobian-chain implementation next
+
+pcc/claims/PCC-20261115-2e7b0f.json/pcc/claims/PCC-20261115-991276.json: original43661406081/job132651320244SUCCESS/FIVEremote replays BEFOREdb435e1b/direct43996852/exact7paths. ALL42866guards/162links/ownedbytes andwhole61501328Barchive/all1662members/14declaredwholesci roots preserved; normalfetch-FF-artifact-wiring0/HOLD21RELEASED. All40443prior keys/150oldlinks/old2850ledgerprefix retained withdeclaredmetadataupdates, prior20genuinepayloads remainexactwithoutrecursivecapture. TWOexactcanonicalmanifestentries/ONEplainGitwholefive-recordcontrol/THREErelativealiases. [pcc:unverified]
+
+## What was done
+Genuinelypublishedclosedct81sources/actualbinaries/librarycopies/failures/fullCI/checkpoints/proofs/reports/native16recordfixture-stdout-control plusc031Gitbase/fourpendingmetadatafiles. Native75338a originalD67negative/separateD39positive, proofs/report andnew5caf67protocol remainunchanged. [pcc:unverified]
+
+## Decisions made
+ImplementTHREEfixedgenericAdapter-NormNew-quadraticmodels andcompletefullgroupJacchainunderpublished5caf67; preserveall672exceptionaldescriptors/bothoutgoingmaps/fourhalves/cofactors/fullinverses/direct-sequentialscope. Keeporiginal-primefuturecontinuationreviewdistinct. No newevaluatorcode/outcome existsyet, no oldlogtwisttransferorpricedadvantage. [pcc:unverified]
+
+## Open threads
+Normalpublishsettlementmetadata; additive24thfull16record/20bindingpreflightCI withold23unchanged, andnewgeometryconstructorimplementation/oldknown-answerparity/compiledsource/checkpoint/native. ContinuecompleteJacpointmaps/direct-chainactualvectors, futurelargecustodyNEW22. [pcc:unverified]
+
+## Errors
+Original19GH001/materialization-disk/PATH-Typst failures andoldfullcold/root-main/geometry-program/benchmarkadmission/vaultKB gaps retained. No paidlaunch/waiver/novelty/advantage; continuequeue. [pcc:unverified]
+
+---
+
 # Whole scientific handoff21 ready; inputs HELD
 
 pcc/claims/PCC-20261115-4bef42.json: all40443prior keys/150oldlinks/2850ledgerprefix/ownedscience retained; allfourteenwholeclosedct81scientificroots, actualsource-exes-librarycopies/failures/proofs/checkpoints/wholeCI/reportroots andc031base+fourpendingmetadatafiles. Complete archive usesexact32MiBbyteparts beforeGitlimit; each member roundtripped, originalpolicy selects5objects. HOLD allinputs/aliases/consumerledger until originalactualremote replays BEFORErealpublisher/exactFF/orderedarchive reassembly/terminal21checks. Native75338a originalD67negative/separateD39positive; proofs2735b3/5d647c/report e26218 andprospective5caf67 remainunsigned. No newJacobian evaluatorcode/outcome yet. [pcc:unverified]
