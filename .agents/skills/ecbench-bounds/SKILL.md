@@ -43,6 +43,12 @@ there. This skill is the procedure. Native `ecbench` only; no Python harness.
 Only a verdict answers this. A `compare` of two arms in a session of your own
 design is a measurement; it is not a frontier move.
 
+Before sealing or running a challenge, write the cost chain from the
+incumbent to the candidate (AGENTS.md §3a): restructure lines are
+cost-neutral, each replace line swaps one component and names the arm that
+measures it. A chain with a line that does both is split first; a chain whose
+last line changes the target, curve or unit compares different problems.
+
 1. Register the candidate as a method (`ecbench-extend`). A changed algorithm
    is a new registry id; never change what a registered id counts.
 2. Pick the standing challenge for the domain and axis in

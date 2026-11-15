@@ -20,7 +20,7 @@ which says `1 ∉ V_c(f)` exactly when `t ≥ 4(c − 2)`.
 > SHA-256 recorded in §9 so their provenance is not concealed. The observations are reported as
 > exploratory leads only; each needs a native (Rust) reimplementation, for example as an option of
 > `examples/pkm_tower_pilot.rs` (fixed coefficients across `t`, the `λ_f` test), before it counts.
-> Every number below is `[pcc:unverified]`.
+> Every number below is `[pcc:unverified]`. **Update 2026-11-15:** a native Rust re-run reproduces every computation value for value; see §10.
 
 ## Answer
 
@@ -458,3 +458,87 @@ was not available to this subagent, so no knowledge-base receipt is recorded. Th
 Proposition 2 and Theorem 3 is therefore unchecked against the corpus. Theorem 3 is the
 polynomial-calculus degree-lower-bound pattern ("R-operator"/pseudo-solution duality) specialized to
 a support-closed subspace; it is presented as a tool, not as new.
+
+## 10. Native Rust re-run, compared with the recorded Python outputs (2026-11-15)
+
+**What this is.** The status note above says the Python scripts are not admitted as evidence and that
+each computation needs a native reimplementation. `examples/growth_lower_bound.rs` is that
+reimplementation: stand-alone Rust over exact `F_786433` arithmetic, with unit tests, rustfmt'd,
+clippy-clean. It re-runs every computation of the archived scripts at the same parameters. Outputs,
+`commands.log`, the binary and source SHA-256 and a source note are in `rust/` (`SOURCE_NOTE.md`,
+`binary.sha256`). The program prints the Python scripts' text format, so the comparison below is a
+`diff` of the six archived outputs (whose SHA-256 match §9) against the Rust outputs
+(`rust/compare_vs_python.txt`). Every number is still `[pcc:unverified]`: no pcc claim is registered,
+and the Rust code was written by the same session that read the Python, so a shared misreading of a
+definition would be reproduced by both (the definitions were re-checked against `../README.md` §0
+and the unit tests below).
+
+**Result: no difference.** All six Rust text outputs are byte-identical to the Python outputs
+(`run1` 63 lines, `run2` 28, `run3` 82, `hsupp2_t9_c4` 35, `s0pat_t9_c4` 26, `mult2_d2_s6` 15, shell
+trace lines removed). Value by value:
+
+| computation (Python script) | cells compared | Rust vs Python |
+|:--|:--|:--|
+| `closure.py` ladder, `f1`, `t = 2..7` (`cmax` 6, and 4 at `t = 7`) | every `(c, dim V, N, one)` row and `d_F = 3, 3, 4, 4, 4, 4` | agree, all rows |
+| `filt.py` (`c = 3, 4`; `t = 2..7`) | 12 rows of dimension by pivot degree and `R` by degree; `dim V_3 = 14 + 28(t-2)` at `t = 3..7` (15 at `t = 2`, where `1 ∈ V_3`) | agree |
+| `lowmult.py 2 7`, `3 6` | `(4,11,2) (9,22,4) (14,37,8) (15,56,16) (15,79,16) (15,106,16)`; `(8,15,3) (27,42,6) (64,93,12) (121,176,24) (194,299,48)` | agree (kernel dim, monomial count, max exponent) |
+| `twist.py` (`ζ = (5,7)` and `ζ` on the image curve, `x = 777`, `t = 2..7`) | `d_F = 3,3,4,4,4,4` generic, `None` on the curve at every `t` | agree |
+| `residue_check.py` (Prop. 2(b), `t = 2..5`, 3 random `g` each) | 12 of 12 `lhs == rhs` | agree (same `g`: CPython `seed(7)` is mirrored) |
+| `topfun.py`, `f1` | 10 cells `(t,c)` incl. `(8,4)`, `(9,4)`; `one`, `lam_kills_V`, `lam1` (e.g. 770180, 163820, 694602, 105447) | agree, all values |
+| `topfun.py`, `f2`, `f3` | 7 + 2 cells, including every `lam1` | agree |
+| `topfun_w.py`, `W = 2, 3`, seed 1 | 9 cells `one`, `lam kills V`, `lam(1)!=0` | agree (the seeded coefficients are the same polynomials) |
+| `lowsupp.py 8 4`, `9 4` | dims by degree `[0,0,15,327,1768]`, `[0,0,15,357,2437]`; max exponent 144, 272; 631, 727 monomials | agree |
+| `hsupp2.py 4 3, 5 3, 6 3, 8 4, 9 4` | `dim`, used / unused, minimal unused (1, 6, 15, 9, 31 elements, listed), up-set `True` | agree, lists identical |
+| `thmB.py 4 3, 5 3, 6 3, 8 4` | `dim V_<c`, `|S0|`, `|S1|`, top monomial, `kerdim S0/S1` = `(14,22) (14,14) (14,14) (342,474)` | agree |
+| `s0pat.py 8 4` (`deg ≤ 2, 3`), `9 4 3` | `|supp mult|` 256, 20480, 20992; 8, 7, 24 minimal non-members (listed); max popdeg 8, 14, 14 | agree, lists identical |
+| `mult2.py 2 6` | 15 kernel basis vectors, monomial supports | agree, identical lines |
+
+**Where the method differs (no printed value changes).** (1) The closure keeps an echelon basis
+rather than a fully reduced one. Every printed quantity (dimension, pivot-degree profile, support of
+the space, whether `λ_f` kills it, whether a monomial is used by the multipliers) depends only on the
+subspace `V_c(f)`. (2) The multiplier support `V_c·f⁻¹` is computed with exact 2-D number-theoretic
+transforms per basis row, not a float64 matrix product; a unit test checks it against the direct
+coefficient formula on a small cell. (3) The `thmB` kernel dimensions are exact (streamed Gaussian
+elimination); the Python used a random projection that can only overestimate. They agree, so on
+these four cells the projection was exact. (4) "Minimal unused" in `hsupp2` is computed exactly for
+an arbitrary set (subset DP over the `2t`-bit word); the Python compared every unused monomial with
+every other unused monomial, which is also exact (quadratic time), and tested the up-set property on
+the supersets of its minimal elements. Same lists. (5) Evaluation points of `lowmult`/`mult2`
+differ in nothing observable: the kernel of the evaluation map does not depend on them once there
+are enough points, and the kernel basis lines are byte-identical.
+
+**Checks inside the example** (`cargo test --release --example growth_lower_bound`, 11 pass):
+MT19937 reference vectors and CPython `seed(1)` `random()`; ring sizes equal the binomial counts;
+the transform round-trip; `f · f⁻¹ = 1` in `R` by direct convolution; the ladder `d_F = 3, 3, 4, 4`
+and the recorded dimensions; Proposition 1's twist invariance at `t = 2, 3, 4`; "`λ_f` kills `V_c`
+iff `1 ∉ V_c`" on `(3,2) (3,3) (4,3)`; the used-set against direct coefficients; the recorded
+`lowmult` values; the residue identity of Proposition 2(b).
+
+**Not covered by an archived Python output, now computed in Rust.**
+
+- `gridcheck.py`: no output was archived, and §6 only states the result. Rust (`rust/gridcheck.txt`):
+  `f1` has no zero on `μ_{2^t}²` for `t = 2..9`, and `f2`, `f3` none for `t = 2..8`.
+  So the §6 statement that they are units at those heights is now computed.
+
+**Two runs beyond the Python parameters** (same program, `rust/extension_t8_c5.txt`,
+`rust/extension_t9_c5.txt`; the Python could not run `c = 5` at `t = 8` within its resource limit):
+
+| `t` | `dim V_c` for `c = 2, 3, 4, 5` | `N` at `c = 5` | `1 ∈ V_5` | `d_F(f1)` |
+|--:|:--|--:|:--|--:|
+| 8 | 1, 182, 2110, 6885 | 6885 | yes | 5 (exact) |
+| 9 | 1, 210, 2809, 12616 | 12616 | yes | 5 (exact) |
+ [pcc:unverified]
+§6.1 recorded `d_F(f1) ≥ 5` at `t = 8, 9`; it is `= 5` at both, the value `3 + ⌊t/4⌋` of Conjecture G.
+This is one generator over the toy prime, so it is consistent with the fitted law and proves nothing
+about genericity. With Theorem 1 it gives `d_F(f1, t) ≥ 5` for every `t ≥ 8`, as before. Times: the
+whole port (`all`) took 19 s wall on 4 CPUs; `c = 5` closures took 11 s (`t = 8`) and 135 s (`t = 9`).
+
+**Status.** The §6 computations are now reproduced by native code and agree entry for entry with the
+recorded Python. That is the only change in their standing: no pcc claim is registered, no
+validation-gate record exists, and nothing here is a measurement against rho or an index-calculus
+improvement [pcc:unverified]. The remaining open items are unchanged (Conjectures Λ and C, the period-4 upper
+bound, genericity).
+
+Sources checked for this section: §0, §6 and §9 of this note; `../README.md` §0 (closure definition).
+The `research-kb` MCP server was not available to this subagent (KB unavailable), so no receipt is
+recorded.

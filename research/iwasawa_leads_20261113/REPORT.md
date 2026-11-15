@@ -276,3 +276,33 @@ the trivial negation symmetry. Diagnostic output: `r1_carry/diag_halfrange_seed2
 All at toy scale. Combinations of several bits and higher-dimensional fits remain untested. Their
 cost grows quickly, and nothing here suggests a direction. The Iwasawa line ends here with no
 surviving lead.
+
+## 11. Correction after reading the lead atlas (2026-11-15)
+
+Part II was written under the instruction to assume nothing from previous research. Once the atlas
+was readable (crypto-autoresearcher `knowledge/leads/ecdlp/`), three statements above turned out to be
+overstated. They are corrected here; the sections above are kept as written. All of this is an
+unverified assertion by the producing session [pcc:unverified].
+
+- **§6 / §10 (R1, R1b) is a replication, not a new lead.**
+  - `LEAD-TRF-padic-canonical-section` (closed_obstructed) already states that a non-homomorphic
+    section recovers the log only at the random 1/p rate. Its toy runs cover p up to 10⁵, and it
+    forecloses the Hensel lift section.
+  - `LEAD-EXO-padic-jet-canonical-lift` already found the valuation profile collapsing to the
+    ± fibre indicator. That is the same effect as the post-hoc diagnostic in §10.
+  - R1/R1b add an independent replication and the S5 degree statistic, recorded as evidence on the
+    first card.
+- **§7 (R2, Lemma D) covers only two-point lifts.** It bounds dependent lifts of P and Q
+  themselves. Xedni lifts r points P_i = s_iP − t_iQ with large random s_i and t_i, and a relation
+  with small coefficients m_i among them is not excluded by the counting argument. So Lemma D does
+  **not** replace the xedni heuristic, contrary to §7. `LEAD-TRF-global-lift-small-height` holds the
+  full premise chain and stays open.
+- **§8 (R3), Part 1 holds only in the generic model.** It bounds searches that only evaluate sp
+  on candidates. An algebraic search for sections through a prescribed fibre point is not generic.
+  `LEAD-TRF-function-field-xedni-lift` measures that route instead (lift exponent α = 3 for its
+  frozen family). Part 2, that Ulmer's points miss F_p, stands.
+
+New atlas cards from this study (crypto-autoresearcher#3300):
+
+- `LEAD-TRF-signature-calculus-euler-system` (Lemma A);
+- `LEAD-STR-function-field-iwasawa-tower` (Lemma C).
