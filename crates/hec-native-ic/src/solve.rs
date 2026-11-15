@@ -23,6 +23,17 @@ pub struct SolveStats {
     pub row_ops: u64,
     pub mulmods: u64,
     pub max_row_len: usize,
+    /// [`Solver::SgeBw`] only (summed over calls): the part of `mulmods`
+    /// spent in structured Gaussian elimination and in (block) Wiedemann,
+    /// matrix-vector products, the residual system's rows, columns and
+    /// non-zeros, and the generator degrees.
+    pub sge_mulmods: u64,
+    pub bw_mulmods: u64,
+    pub matvecs: u64,
+    pub sge_rows_left: u64,
+    pub sge_cols_left: u64,
+    pub sge_nnz_left: u64,
+    pub bw_degree: u64,
 }
 
 /// Which elimination to run.  Both make identical pivot choices and do
@@ -39,6 +50,10 @@ pub enum Solver {
     /// sparse columns are eliminated first, the residual block densely.
     /// Different pivot order; same `Option<k>` on every row set.
     Dense,
+    /// T3 (`solve_bw.rs`): structured Gaussian elimination, then block
+    /// Wiedemann with two projections on the square residual (port of the
+    /// `lpsgebw2` arm).  For line-sieve rows; ignores `dense_cols`.
+    SgeBw,
 }
 
 #[inline]
@@ -60,6 +75,7 @@ pub fn solve_for_last(
         Solver::Reference => solve_reference(rows, m, ell, stats),
         Solver::Fast => solve_fast(rows, m, ell, stats),
         Solver::Dense => solve_dense(rows, m, ell, dense_cols, stats),
+        Solver::SgeBw => crate::solve_bw::solve_sge_bw(rows, m, ell, stats),
     }
 }
 

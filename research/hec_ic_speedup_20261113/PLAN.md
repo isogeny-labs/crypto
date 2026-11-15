@@ -445,3 +445,98 @@ engine does not compute `S`, so no `S` claim is made, and nothing here is an adv
 
 **Stop rule (§5.5).** If E10 fails, record it. Lever L1 is not retried with a variant. The next
 genus-3/4 lever is (c) in the oracle, then (a).
+
+## 10. Slice S4 (track T2, lead 1): the full-base line sieve at genus 3 and 4, protocol frozen before code
+
+Written 2026-11-15, before any S4 code, on branch `research/hec-sieve-s4-20261115`, stacked on the
+line-sieve probe (`research/hec-sieve-probe-20261114` at d66dd9dd34).
+
+**Why, and what was seen before freezing.** The probe (`SIEVE-PROBE-20261114.md`, not under
+protocol) is the orientation for this slice, and its numbers were used to choose the rows and set
+the bars below. It found the sieve's relation phase 5–13× cheaper on the clock and, by an estimate
+that combined two sources, about 11–15× (genus 3) and 12× (genus 4) cheaper in counted
+multiplications per relation. S4 replaces that estimate with one counter applied to both arms on
+fresh seeds. Genus 2 is out of scope: there the full-base sieve loses end to end on its solve, which
+is track T3. As in S3, this is an engineering slice against the current native engine (the walk
+with `Solver::Dense`), not against a T1 entry, and it makes no `S` claim.
+
+**Change (S4).** No change to the walk, the sieve's relation logic, or any solver.
+
+1. Feature `count-ops` (implies `count-inv`): two thread-local counters, read by
+   `fp::op_counts()`.
+   - **Products**: every 64×64-bit product of field elements: one per `Fp::mul`, `Fp::mul_pre`
+     and `Fp::pre`, and one per term in `Poly::mul`'s lazily reduced inner product.
+   - **REDC**: every Montgomery reduction in `Fp::redc` (`Fp::mul` is 2, `mul_pre` and `pre` 1,
+     `Poly::mul` 2 per group of up to 4 terms).
+
+   Both count every `Fp` instance: the curve field and the solve's field mod ℓ
+   (`Fp::new_any(ℓ)` is `Fp::new`), so the solve is counted in the same unit. Without the feature
+   nothing is counted. Orientation check before freezing: `Poly::mul` reduces lazily, and the walk
+   (Cantor, `x^p mod u`) uses it far more than the sieve (Horner through `Fp::mul`), so REDC alone
+   would undercount the walk. That is why the primary unit is the product.
+2. Phase accounting in `IcReport` and `SieveReport`: REDC and `Fp::inv` counts for the factor base,
+   the relation phase, the solve, the final `k·D₁ = D₂` check, and (sieve only) relation
+   verification. The relation phase is everything after the factor base except the solve, the `k`
+   check and verification: walk steps, the oracle and row building in the walk; line additions,
+   evaluation, bucketing and row building in the sieve.
+3. `examples/s4_sieve.rs`: runs both arms per (row, seed) and prints one JSON line per arm.
+
+**Gates.**
+
+- **G10 (exactness).** In the count build, every sieve relation is checked in the Jacobian
+  (`verify_relations = ∞`) and holds; every `k`, in both arms, is the planted one and verifies.
+- **G11 (counter neutrality).** For each arm the count build and the timing build give identical
+  JSON on every run, apart from these fields, which differ by design: `*_ms`, the count fields
+  (products, REDC, inversions per phase), and `relations_verified` (verification is on only in the
+  count build). So the same `m`, relations, lines, trials, group ops, solve stats and `k`.
+- All crate tests pass, release and debug, run on the `git archive` tree of the S4 code commit
+  (the worktree may hold unrelated uncommitted work).
+
+**Measurement.**
+
+- **Binaries.** One release build at the S4 code commit, twice: with `--features count-ops` (the
+  primary, counts) and without (timing, descriptive). Built from a `git archive` of that commit into
+  separate directories, toolchain stable 1.99.1; sha256 recorded.
+- **Rows.** Genus 3: p = 61, 211, 401, 1021, 4001. Genus 4: p = 31, 61, 127, 251, 509, 1009.
+  Instance: `pick_instance_with_budget(p, g, 2_000_000)`, planted `k = ⌊ℓ/3⌋ + 7`. A row with no
+  usable instance is dropped and reported.
+- **Seeds.** 5 per row, `20261115 + s`: fresh, not the probe's.
+- **Arms.** Walk: `IcParams::default()` with `Solver::Dense`. Sieve: `SieveParams::default()`
+  (`Solver::Fast`, `stop_mid_line`), verification on in the count build, off in the timing build.
+- **Primary statistics.** The arms share seed values but not an RNG stream, so they are not
+  paired. Each statistic is a **ratio of per-arm medians** over the 5 seeds (the min–max of each
+  arm is reported):
+  - P1 = walk / sieve, field products per relation in the relation phase;
+  - P2 = the same ratio for `Fp::inv` calls;
+  - P3 = walk / sieve, total field products over relation phase + solve (the solve's mod-ℓ
+    products are counted by the same counter).
+- **Also reported.** Solve mulmods (`SolveStats`) both arms; relations per line against
+  `p/(g+1)!`; line additions per relation; REDC per trial and trials per relation for the walk; the
+  REDC per relation and per phase; the verification products that are excluded; wall clock per phase from the timing build, with `uptime`
+  logged (the host is shared; descriptive only).
+- **Records.** One `tools/benchrec.py` record; checkpoint pushed before the recorded run.
+
+**Pre-registered expectations.** "Bar rows" are every genus-3 row and genus-4 p ≥ 127. Genus 4 at
+p = 31 and 61 is reported but carries no bar: there the per-line addition is a large share and
+`m` is tiny.
+
+- **E12 (exactness).** G10 and G11 hold. Falsified by any failed relation, wrong `k` or differing
+  run line.
+- **E13 (relation cost, counted).** P1 ≥ 5 on every bar row. Falsified by any bar row under 5.
+  The probe's "about 12×" at genus 4 left out the per-line addition, which this slice counts. At
+  (4, 127), with 0.95 additions per relation, the sieve's estimate grows from about 1,500 to
+  2,100–3,500 products per relation (a genus-4 Cantor addition taken as 600–2,000 products, not yet
+  counted), against the walk's 21 trials × roughly 1,000; the expected P1 there is 6–14, so p = 127
+  stays a bar row, knowingly the tightest.
+- **E14 (inversions).** P2 ≥ 10 on every bar row.
+- **E15 (counted end to end, small m).** P3 ≥ 2 on every bar row with p ≤ 1021 (m ≲ 520).
+- **E16 (the solve at m ≈ 2000).** At (3, 4001), the sieve's solve mulmods exceed the walk's (the
+  probe's structural finding, re-tested on fresh seeds). Falsified if the sieve's median is lower.
+
+**Class.** Engineering on the relation phase. The counted unit is the field product (REDC is
+reported alongside); additions, comparisons, memory traffic and allocation are not counted, so a
+P1 ratio is not a clock ratio. Nothing here is an advance or carries an `S` claim.
+
+**Stop rule.** If E13 fails on a bar row, the sieve is not adopted as the genus-3/4 full-base
+relation source and the row is recorded. If E15 fails, record it; the reduced-base large-prime probe
+(lead 1, follow-up A) decides the next relation source either way.

@@ -9,7 +9,7 @@
 
 use std::time::Instant;
 
-use crate::fp::Fp;
+use crate::fp::{op_counts, Fp, OpCounts};
 use crate::instance::factor_base;
 use crate::jac::{Curve, Div};
 use crate::oracle::{split, OracleStats};
@@ -59,6 +59,13 @@ pub struct IcReport {
     pub total_ns: u128,
     /// Verified: `k·D₁ = D₂`.
     pub k: Option<u64>,
+    /// Operation counts per phase (feature `count-ops`; zero otherwise).
+    /// `ops_rel` is everything after the factor base except the solve and
+    /// the `k` check: walk steps, the oracle and row building (S4, §10).
+    pub ops_fb: OpCounts,
+    pub ops_rel: OpCounts,
+    pub ops_solve: OpCounts,
+    pub ops_kcheck: OpCounts,
 }
 
 impl IcReport {
@@ -73,6 +80,7 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
     let fl = Fp::new(ell);
     let mut rep = IcReport::default();
     let mut rng = Rng::new(params.seed);
+    let ops0 = op_counts();
 
     // Factor base and its x-index.
     let t = Instant::now();
@@ -96,6 +104,8 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
     }
     let steps: Vec<u32> = order[..branches].to_vec();
     rep.fb_ns = t.elapsed().as_nanos();
+    let ops_after_fb = op_counts();
+    rep.ops_fb = ops_after_fb.since(&ops0);
 
     // Start at D₁ + D₂ (one group operation, charged to precomputation).
     let mut r = curve.add(d1, d2);
@@ -184,10 +194,15 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
         if rows.len() >= wanted {
             let t = Instant::now();
             rep.solve_rounds += 1;
+            let o0 = op_counts();
             let k = solve_for_last(&rows, m, ell, params.solver, &steps, &mut rep.solve);
+            let o1 = op_counts();
+            rep.ops_solve.add(&o1.since(&o0));
             rep.solve_ns += t.elapsed().as_nanos();
             if let Some(k) = k {
-                if curve.mul(d1, k) == *d2 {
+                let ok = curve.mul(d1, k) == *d2;
+                rep.ops_kcheck.add(&op_counts().since(&o1));
+                if ok {
                     rep.k = Some(k);
                     break;
                 }
@@ -196,6 +211,9 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
             wanted += params.extra_relations + m / 16;
         }
     }
+    let mut not_rel = rep.ops_solve;
+    not_rel.add(&rep.ops_kcheck);
+    rep.ops_rel = op_counts().since(&ops_after_fb).since(&not_rel);
     rep.total_ns = t_all.elapsed().as_nanos();
     rep
 }

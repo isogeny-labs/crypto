@@ -13,6 +13,8 @@ publish = false
 [features]
 # Count `Fp::inv` calls (T2 orientation and gates). Off in timed builds.
 count-inv = []
+# Count field products, Montgomery reductions and inversions (S4, PLAN §10).
+count-ops = ["count-inv"]
 
 [profile.release]
 debug = 1

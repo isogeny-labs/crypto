@@ -22,7 +22,7 @@
 
 use std::time::Instant;
 
-use crate::fp::Fp;
+use crate::fp::{op_counts, Fp, OpCounts};
 use crate::instance::factor_base;
 use crate::jac::{Curve, Div};
 use crate::rng::Rng;
@@ -80,6 +80,15 @@ pub struct SieveReport {
     pub total_ns: u128,
     /// Verified: `k·D₁ = D₂`.
     pub k: Option<u64>,
+    /// Operation counts per phase (feature `count-ops`; zero otherwise).
+    /// `ops_rel` is everything after the factor base except the solve, the
+    /// `k` check and relation verification: line additions, evaluation,
+    /// bucketing and row building (S4, §10).
+    pub ops_fb: OpCounts,
+    pub ops_rel: OpCounts,
+    pub ops_solve: OpCounts,
+    pub ops_kcheck: OpCounts,
+    pub ops_verify: OpCounts,
 }
 
 pub fn solve_dlp_sieve(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &SieveParams) -> SieveReport {
@@ -91,12 +100,15 @@ pub fn solve_dlp_sieve(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &Sie
     assert!(p <= u32::MAX as u64, "the sieve buckets c in a dense table");
     let mut rep = SieveReport::default();
     let mut rng = Rng::new(params.seed);
+    let ops0 = op_counts();
 
     let t = Instant::now();
     let fb = factor_base(curve);
     let m = fb.len();
     rep.m = m;
     rep.fb_ns = t.elapsed().as_nanos();
+    let ops_after_fb = op_counts();
+    rep.ops_fb = ops_after_fb.since(&ops0);
 
     // Bucket state, reset through `touched` after each line.
     let mut cnt = vec![0u8; p as usize];
@@ -208,6 +220,7 @@ pub fn solve_dlp_sieve(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &Sie
                 break; // the rest of this line is not needed yet
             }
             if (rep.relations_verified as usize) < params.verify_relations {
+                let o0 = op_counts();
                 // D + Σ s_i F_i = 0.
                 let mut e = curve.zero();
                 for &(j, s) in grp {
@@ -220,6 +233,7 @@ pub fn solve_dlp_sieve(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &Sie
                     "sieve relation fails in the Jacobian"
                 );
                 rep.relations_verified += 1;
+                rep.ops_verify.add(&op_counts().since(&o0));
             }
             let mut row: Row = Vec::with_capacity(g + 2);
             let mut sorted = grp.clone();
@@ -241,10 +255,15 @@ pub fn solve_dlp_sieve(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &Sie
         if rows.len() >= wanted {
             let t = Instant::now();
             rep.solve_rounds += 1;
+            let o0 = op_counts();
             let k = solve_for_last(&rows, m, ell, params.solver, &[], &mut rep.solve);
+            let o1 = op_counts();
+            rep.ops_solve.add(&o1.since(&o0));
             rep.solve_ns += t.elapsed().as_nanos();
             if let Some(k) = k {
-                if curve.mul(d1, k) == *d2 {
+                let ok = curve.mul(d1, k) == *d2;
+                rep.ops_kcheck.add(&op_counts().since(&o1));
+                if ok {
                     rep.k = Some(k);
                     break;
                 }
@@ -252,6 +271,10 @@ pub fn solve_dlp_sieve(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &Sie
             wanted += params.extra_relations + m / 16;
         }
     }
+    let mut not_rel = rep.ops_solve;
+    not_rel.add(&rep.ops_kcheck);
+    not_rel.add(&rep.ops_verify);
+    rep.ops_rel = op_counts().since(&ops_after_fb).since(&not_rel);
     rep.total_ns = t_all.elapsed().as_nanos();
     rep
 }
