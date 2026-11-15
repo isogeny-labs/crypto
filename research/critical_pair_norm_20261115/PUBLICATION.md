@@ -122,3 +122,29 @@ The final scoped whitespace gate caught extra blank lines at both Typst EOFs
 before the commit; normalized those source endings. Report contents and all
 native/evidence bytes are unchanged. Large-file, ledger, lesson and prose
 checks passed; whitespace now passes too.
+
+Source-only successor review begins after the two preserved capped panels.
+Re-opened the existing October24 hyperelliptic-cover/norm work and October22
+conditional injectivity receipt before considering high-genus transfer. Read
+EGT0905.2177v2 sections2--5, exact Theorem7 growth conditions, full non-inert
+factor base and Heuristics5/6; also Milne Proposition2.3/Corollary6.3. An
+initial guessed arXiv identifier was unrelated and rejected after checking
+its title; actual author search found the paper used. KB remains unavailable.
+
+COVER-REVIEW.md derives an explicit tame Kummer family satisfying EGT's
+geometric conditions eventually, with degree/genusTheta((log p)^2). Its
+prime-order elliptic subgroup transfer follows the standard divisor-degree
+composition and existing conditional group law. Its full rational-place
+factor base still hasOmega(p) members; after projection/sign folding at least
+p/(4delta) columns remain eventually. This scopes a different route without
+launching a high-genus experiment or claiming all cover algorithms impossible.
+All geometry/cost arguments here are hand derivations, not a new formal
+proof or native implementation. [pcc:unverified]
+
+The self-audit checks the tame ramification/genus and cover degree by
+independent field-tower calculations, then checks all three actual Theorem7
+conditions rather than the introductory shorthand. Corrected one draft phrase:
+Eisenstein is over (algebraic-closure(Fp))(X), not an algebraic closure of the
+function field. The latter would already split the Y polynomial. This correction
+precedes publication and no frozen native evidence is changed. Known-order/
+generator and divisor-arithmetic costs stay separate, unimplemented obligations.
