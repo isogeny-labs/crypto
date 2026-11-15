@@ -1,0 +1,61 @@
+{
+  "schema": "crypto.ic-success-criteria/v2",
+  "owner_rule": "2026-11-15",
+  "revision": 2,
+  "doc": "docs/ic/SUCCESS_CRITERIA.md",
+  "review": "docs/ic/reviews/SUCCESS_CRITERIA-redteam-20261115.md",
+  "unit": {
+    "cost": "GAE on E",
+    "headline": "S = total_gae / sqrt(r)",
+    "interval": "cold_end_to_end",
+    "online_only_supports_tiers": false,
+    "band_weights": [0.0, 0.1, 1.0],
+    "calibrated_weights": ["0", "w_cal", "10*w_cal"],
+    "uncounted_work_allowed": false,
+    "memory_reported": true
+  },
+  "targets": {"kind": "public", "planted_allowed_for": ["T0", "controls"], "derivation": "beacon-seeded hash to curve"},
+  "rho_reference": {"rule": "cheapest registered rho variant at each weight", "automorphisms": ["negation", "frobenius", "j0_order6", "j1728_order4"], "idealized_S_negation": 0.886},
+  "preregistration": {"required_for": ["T1", "T2", "T3"], "pcc_claim_before_first_run": true, "beacon_derived_instances": true, "holm_familywise_alpha": 0.05, "fixed_target_count": true, "list_all_attempts": true},
+  "size_bands": [
+    {"band": "B0", "b_min": 0, "b_max": 32, "supports": ["T0"], "rho": "measured"},
+    {"band": "B1", "b_min": 32, "b_max": 64, "supports": ["T0", "T1", "T2-fit", "T3-fit"], "rho": "measured", "min_targets": 32},
+    {"band": "B2", "b_min": 64, "b_max": 100, "supports": ["T0", "T1", "T2-fit", "T2-heldout", "T3-fit", "T3-heldout"], "rho": "measured while expected cost <= 2^40 GAE, else extrapolated", "min_targets": 8},
+    {"band": "B3", "b_min": 100, "b_max": null, "supports": ["T0", "T1", "heldout"], "rho": "extrapolated"},
+    {"band": "challenge", "instance": "ECC2K-130: E_0 over GF(2^131), #E = 4r", "supports": ["T0", "T1-target-specific"], "rho": "extrapolated", "min_targets": 1}
+  ],
+  "rho_extrapolation": {"model": "sqrt(pi*r/(2*gamma))", "constant": "low end of measured 95% CI at largest measured size, same family and gamma", "measure_while_log2_expected_gae_le": 40},
+  "tiers": {
+    "T0": {"requires": ["frozen_baseline", "same_instances", "verified_answers", "cost_chain_3a", "class_3", "ratio_to_matched_rho"]},
+    "T1": {
+      "readings": ["band", "calibrated"],
+      "min_targets_b_lt_64": 32, "min_targets_b_ge_64": 8,
+      "estimator": "sum_ic/sum_rho, two-stage bootstrap, 2000 resamples",
+      "independent_setup_per_target": true, "failures_charged": true,
+      "min_smaller_sizes_reported": 2,
+      "controls": ["aa_rho", "positive", "negative"],
+      "evidence": ["validation_json", "cross_host_class_audit", "pcc_standing_verified", "validator_breakthrough"]
+    },
+    "T2": {
+      "t1_items_each_size": [1, 2, 5, 6],
+      "min_sizes": 6, "min_span_bits": 24, "min_smallest_b": 32, "min_largest_b": 56,
+      "single_bounds_tier": true, "cofactor_fixed_or_bounded": true, "fit_against": ["ln r", "ln q^m"],
+      "claimed_alpha": "max over phases of upper 95% limit", "phase_min_sizes": 4, "margin_delta_preregistered": true,
+      "rho_model_along_path": "sqrt(pi*r/(2*gamma(b)))",
+      "heldout_min_gap_bits": 8, "heldout_beyond_phase_crossovers": true, "heldout_interval": "fit tool 95% prediction interval, unwidened", "heldout_must_exclude_rho_model": true,
+      "review": ["red_team_breakthrough", "validator_breakthrough"]
+    },
+    "T3": {
+      "definition": "N^{o(1)} in the proved form; common case L_N[a,c], 0<a<1",
+      "requires_argument": true, "heuristics_named": true, "heuristic_numeric_criteria_preregistered": true,
+      "min_sizes": 8, "competitor_model": "K*r^alpha*(ln r)^k", "heldout_min_gap_bits": 8,
+      "lean": "theorem or conditional form; partial reported",
+      "review": ["red_team_breakthrough", "validator_breakthrough"]
+    }
+  },
+  "tracks": {"name_required": true, "generic_decomposition_T2_T3": "accounting error until uncounted group work found"},
+  "transfer": {
+    "allowed_for": ["T0", "T1", "T2", "T3"],
+    "requires": ["map_construction_charged_every_instance", "map_evaluation_charged_per_target", "homomorphism_injective_on_subgroup_certificate_independent", "answer_verified_on_E", "per_operation_type_conversion_at_0.5x_1x_2x", "applicability_and_density_preregistered", "literature_status_known_weak_is_reproduction", "cost_chain_3a_interface_unchanged"]
+  }
+}

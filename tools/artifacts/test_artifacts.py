@@ -378,6 +378,82 @@ class WorkflowPullStep(unittest.TestCase):
         self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
 
 
+class WorkflowStalePullEntries(unittest.TestCase):
+    """The generated pull line is output, not a reference: entries it names
+    must go once the rest of the workflow stops naming them."""
+
+    MOVED = {"research/study_a_20261031/establishment/certificate.json",
+             "research/study_b_20261031/data.bin"}
+    BEFORE = ("on:\n  push:\n    paths:\n"
+              "      - 'research/study_a_20261031/**'\n"
+              "      - 'research/study_b_20261031/**'\n"
+              "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n"
+              "      - run: python3 build.py\n")
+
+    def _paths(self, text):
+        return wire_workflows.needed(text, self.MOVED, wire_workflows.moved_dirs(self.MOVED))
+
+    def _main(self, wf: Path, *extra: str) -> subprocess.CompletedProcess:
+        script = ("import sys, wire_workflows as w\n"
+                  "w.moved_paths = lambda root: set(%r)\n"
+                  "sys.argv = ['wire_workflows.py', *sys.argv[1:]]\n"
+                  "sys.exit(w.main())\n" % sorted(self.MOVED))
+        return subprocess.run([sys.executable, "-c", script, *extra, str(wf)],
+                              cwd=str(TOOL.parent), capture_output=True, text=True)
+
+    def _wired(self):
+        old = self._paths(self.BEFORE)
+        self.assertEqual(old, ["research/study_a_20261031", "research/study_b_20261031"])
+        return wire_workflows.wire(self.BEFORE, old)[0]
+
+    def test_moved_directory_is_dropped_on_regeneration(self):
+        # The paths: glob narrows to study_a only; the old pull line still names study_b.
+        stale = self._wired().replace("      - 'research/study_b_20261031/**'\n", "")
+        self.assertIn("research/study_b_20261031", stale)
+        self.assertEqual(self._paths(stale), ["research/study_a_20261031"])
+        regenerated = wire_workflows.wire(stale, self._paths(stale))[0]
+        self.assertNotIn("research/study_b_20261031", regenerated)
+        self.assertIn("pull --jobs 16 research/study_a_20261031\n", regenerated)
+
+    def test_check_flags_and_regeneration_fixes_the_stale_entry(self):
+        stale = self._wired().replace("      - 'research/study_b_20261031/**'\n", "")
+        with tempfile.TemporaryDirectory() as d:
+            wf = Path(d) / "wf.yml"
+            wf.write_text(stale)
+            r = self._main(wf, "--check")
+            self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+            self.assertIn("wf.yml: needs", r.stdout)
+            self.assertEqual(wf.read_text(), stale)
+            r = self._main(wf)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertNotIn("research/study_b_20261031", wf.read_text())
+            self.assertEqual(self._main(wf, "--check").returncode, 0)
+
+    def test_declared_runtime_inputs_survive_and_stale_declarations_do_not(self):
+        bare = ("# tools/artifacts pull: research/study_b_20261031 research/gone_20261031\n"
+                "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n")
+        self.assertEqual(self._paths(bare), ["research/study_b_20261031"])
+        wired = wire_workflows.wire(bare, self._paths(bare))[0]
+        self.assertEqual(self._paths(wired), ["research/study_b_20261031"])
+        self.assertEqual(wire_workflows.wire(wired, self._paths(wired))[0], wired)
+
+    def test_step_is_removed_when_nothing_is_named(self):
+        wired = self._wired()
+        bare = wired.replace("      - 'research/study_a_20261031/**'\n", "").replace(
+            "      - 'research/study_b_20261031/**'\n", "")
+        self.assertEqual(self._paths(bare), [])
+        with tempfile.TemporaryDirectory() as d:
+            wf = Path(d) / "wf.yml"
+            wf.write_text(bare)
+            r = self._main(wf, "--check")
+            self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+            self.assertIn("stale", r.stdout)
+            self.assertEqual(self._main(wf).returncode, 0)
+            text = wf.read_text()
+            self.assertNotIn(wire_workflows.STEP_NAME, text)
+            self.assertIn("      - uses: actions/checkout@v4\n      - run: python3 build.py\n", text)
+
+
 class S3Argv(unittest.TestCase):
     def setUp(self):
         cfg = artifacts.Config(root=Path("."), remote="s3://bucket/store", endpoint=None, read_url=None,
