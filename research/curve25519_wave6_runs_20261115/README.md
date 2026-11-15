@@ -30,7 +30,7 @@ Four cores, one lead each; the F4 leads under `ulimit -v 6000000`.
 - The exponent studies' chain presentation was the wrong instrument: the flat presentation makes the same
   measurement 10 to 360x cheaper at m = 3 and reaches the cells the chain could not. The parent's section-5
   estimator, applied to the flat m = 3 cells D = 9 to 36 (8 cells, span 4.0x), gives s = 4.40 [4.10, 4.71]; at
-  m = 2, s = 2.21 [2.15, 2.27] over D = 9 to 133. These fits were not preregistered in L3 (reported as readings);
+  m = 2, s = 2.26 [2.21, 2.31] over D = 9 to 219 (9 cells, span 24x). These fits were not preregistered in L3 (reported as readings);
   under the parent's lever rule they would read "no lever at m = 3" instead of "undetermined".
 - Cost is a function of (m, D) alone: the same chain cells on three different primes and two family rules give the
   same field_ops to four digits. The family-rule confounder the wave-6 README feared does not exist for this
@@ -63,16 +63,17 @@ reproduce the recorded per-target field_ops exactly (P5).
 | 2 | 57 | 1.07e6 | 58 | 2 s | 3.88e6 | 21 | 3.6 |
 | 2 | 63 | 1.34e6 | 64 | 3 s | 2.23e7 | 9 | 16.7 |
 | 2 | 133 | 7.65e6 | 134 | 143 s | 3.51e7 | 22 | 4.6 |
-| 2 | 171 | 1.42e7 | 172 | 618 s | see `analysis.json` | | |
-| 2 | 189 | 1.81e7 | 190 | 973 s | see `analysis.json` | | |
-| 2 | 219, 399 | pending at the time of writing | | | | | |
+| 2 | 171 | 1.42e7 | 172 | 618 s | 3.83e8 | 21 | 27.1 |
+| 2 | 189 | 1.81e7 | 190 | 973 s | 3.94e8 | 10 | 21.7 |
+| 2 | 219 | 2.63e7 | 220 | 2,232 s | 6.18e7 | 75 | 2.4 |
+| 2 | 399 | censored: memory, 6 GB, exit −6 after 3,851 s (no target finished) | | | | | |
 
 Predictions: P1 (flat SD = D + 1) holds in every cell. P2: chain/flat in [70, 260] at D = 27 and 28 holds at
 D = 28 (201) and fails upward at D = 27 (363); above 10 at D = 9 to 21 holds (the smallest is 10.5 at D = 21).
 P3 (flat D = 36 completes under 6 GB and 1,800 s) holds. P4 (m = 2 ratio above 1 everywhere; flat on the prime-D
 curve within 3x) holds: 9.7e4·(D/19)^2.2 predicts 1.1e6 at D = 57 and 7.0e6 at D = 133 against 1.07e6 and
 7.65e6. P5 holds. Wall time per field operation grows with D at m = 2 (143 s for 7.7e6 field operations at D = 133,
-973 s for 1.8e7 at D = 189): the counted unit leaves out the symbolic work of the degree-D steps, as the theory lane
+2,232 s for 2.6e7 at D = 219), and the flat D = 399 cell exhausted 6 GB before its first target finished: the counted unit leaves out the symbolic work of the degree-D steps, as the theory lane
 warned; wall time is recorded, not claimed. Full table: `L3_flat/analysis.json` (`analyse_l3.py`).
 
 ## 3. L1: the faithful member (`L1_faithful/`)
