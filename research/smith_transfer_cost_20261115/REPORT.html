@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Smith transfer cost</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+<style>body{font-family:system-ui,sans-serif;font-size:10.5pt;line-height:1.4;max-width:1000px;margin:auto;color:#0b0b0b}table{border-collapse:collapse;margin:8px 0;font-size:9pt}th,td{border:1px solid #d8d7d2;padding:3px 6px}th{background:#f1f0ec}img{max-width:100%}code{font-size:9pt;background:#f4f3ef;padding:0 2px}pre{background:#f4f3ef;padding:8px;font-size:8.5pt;white-space:pre-wrap}h1{font-size:17pt}h2{font-size:13.5pt;margin-top:18px}header{display:none}</style></head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Smith transfer cost</h1>
+</header>
+<h1
+id="results-counted-cost-of-smiths-reduction-end-to-end-2026-11-15">Results:
+counted cost of Smith’s reduction, end to end (2026-11-15)</h1>
+<p>Study <code>smith_transfer_cost_20261115</code>. Protocol
+<code>PROTOCOL.md</code>, sha256
+<code>89a6fe5ce1b18be3a5a9a696bc89beaaedccc86df3fc894e9e7262c27a9a98e2</code>,
+frozen 2026-11-15T04:22:13Z, immediately before the run
+(<code>run.log</code>: 04:22:13Z to 04:41:18Z, exit 0). Data
+<code>runs.jsonl</code>, analysis <code>analysis.json</code>
+(<code>genus_ladder_analyze</code>), tables <code>tables.md</code>,
+figure <code>fig_cost.svg</code> (<code>fig_cost.png</code> is a render
+of it), hashes <code>data.sha256</code>, binary and source hashes
+<code>binary.sha256</code>.</p>
+<p>Every number here is <code>[pcc:unverified]</code>: one producer, one
+shared 4-vCPU host, no independent replay, no pcc claim. Synthetic toy
+curves. Pre-gate: no leaderboard row, no
+<code>benchmarks/README.md</code> row, no bench record.</p>
+<figure>
+<img src="fig_cost.png" alt="cost and ratios" />
+<figcaption aria-hidden="true">cost and ratios</figcaption>
+</figure>
+<h2 id="what-ran">What ran</h2>
+<p>For <code>p = 257, 521, 1031, 2053, 4099, 8209</code>: the first
+three curve seeds whose genus-3 curve <code>y^2 = f(x)</code> has
+<code>#J = h r</code> (<code>h &lt;= 8</code>, <code>r</code> prime), is
+Smith-positive with a normal-form trigonal map, and whose canonical
+quartic <code>C</code> is smooth with <code>#C(F_p) = #H(F_p)</code>. 18
+instances, 2 seeds each, four arms: 144 runs. Arms and counted unit as
+in the protocol; the transfer’s <code>F_p</code> work is inside
+<code>C_transfer_diem_2lp</code> and also reported apart.</p>
+<h2
+id="headline-table-fpm-mid-mean-of-6-runs-ratios-with-paired-bootstrap-95">Headline
+table (FPM mid, mean of 6 runs; ratios with paired bootstrap 95%)</h2>
+<p>“C route” = transfer by <code>Psi</code>, then Diem’s
+double-large-prime index calculus on <code>C</code>. “IC on H” =
+double-large-prime index calculus on <code>H</code> with prefilter.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">IC on H</th>
+<th style="text-align: right;">rho on H</th>
+<th style="text-align: right;">C route</th>
+<th style="text-align: right;">rho on C</th>
+<th>C route / IC on H</th>
+<th>C route / rho on H</th>
+<th>IC on H / rho on H</th>
+<th>transfer share of C route</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">257</td>
+<td style="text-align: right;">1.02e6</td>
+<td style="text-align: right;">6.66e5</td>
+<td style="text-align: right;">2.18e6</td>
+<td style="text-align: right;">2.69e7</td>
+<td>2.14 [1.32, 3.13]</td>
+<td>3.28 [2.19, 5.68]</td>
+<td>1.53 [0.99, 2.48]</td>
+<td>7.2% [5.9, 10.8]</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">521</td>
+<td style="text-align: right;">2.44e6</td>
+<td style="text-align: right;">1.24e6</td>
+<td style="text-align: right;">3.08e6</td>
+<td style="text-align: right;">5.32e7</td>
+<td>1.26 [0.88, 1.62]</td>
+<td>2.47 [1.71, 3.68]</td>
+<td>1.96 [1.40, 3.01]</td>
+<td>5.2% [3.9, 7.3]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1031</td>
+<td style="text-align: right;">5.70e6</td>
+<td style="text-align: right;">5.19e6</td>
+<td style="text-align: right;">3.51e6</td>
+<td style="text-align: right;">1.33e8</td>
+<td>0.616 [0.557, 0.654]</td>
+<td>0.677 [0.431, 1.02]</td>
+<td>1.10 [0.76, 1.55]</td>
+<td>4.4% [4.1, 4.8]</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2053</td>
+<td style="text-align: right;">1.35e7</td>
+<td style="text-align: right;">1.05e7</td>
+<td style="text-align: right;">8.69e6</td>
+<td style="text-align: right;">5.24e8</td>
+<td>0.646 [0.466, 0.809]</td>
+<td>0.827 [0.556, 1.48]</td>
+<td>1.28 [0.93, 2.24]</td>
+<td>1.8% [1.5, 2.5]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4099</td>
+<td style="text-align: right;">3.32e7</td>
+<td style="text-align: right;">3.75e7</td>
+<td style="text-align: right;">2.26e7</td>
+<td style="text-align: right;">1.13e9</td>
+<td>0.681 [0.418, 0.957]</td>
+<td>0.604 [0.333, 1.10]</td>
+<td>0.89 [0.68, 1.32]</td>
+<td>0.68% [0.49, 1.12]</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">8209</td>
+<td style="text-align: right;">8.37e7</td>
+<td style="text-align: right;">6.42e7</td>
+<td style="text-align: right;">4.18e7</td>
+<td style="text-align: right;">2.22e9</td>
+<td>0.500 [0.447, 0.572]</td>
+<td>0.652 [0.385, 1.43]</td>
+<td>1.30 [0.86, 2.79]</td>
+<td>0.38% [0.34, 0.42]</td>
+</tr>
+</tbody>
+</table>
+<p>The same ratio <code>C route / IC on H</code> on the other two
+readings (<code>tables.md</code> S4):</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">p</th>
+<th>FPM low (inversion 1, la 1)</th>
+<th>FPM mid (10, 9)</th>
+<th>FPM high (30, 9)</th>
+<th>across the band</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">257</td>
+<td>3.09 [2.17, 3.80]</td>
+<td>2.14 [1.32, 3.13]</td>
+<td>2.12 [1.32, 3.01]</td>
+<td>above</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">521</td>
+<td>2.20 [1.63, 2.70]</td>
+<td>1.26 [0.88, 1.62]</td>
+<td>1.28 [0.90, 1.63]</td>
+<td>unresolved</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1031</td>
+<td>1.24 [1.11, 1.33]</td>
+<td>0.616 [0.557, 0.654]</td>
+<td>0.622 [0.561, 0.662]</td>
+<td>unresolved</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2053</td>
+<td>1.28 [0.97, 1.57]</td>
+<td>0.646 [0.466, 0.809]</td>
+<td>0.643 [0.464, 0.805]</td>
+<td>unresolved</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4099</td>
+<td>1.38 [0.96, 1.77]</td>
+<td>0.681 [0.418, 0.957]</td>
+<td>0.669 [0.412, 0.938]</td>
+<td>unresolved</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">8209</td>
+<td>1.07 [0.98, 1.18]</td>
+<td>0.500 [0.447, 0.572]</td>
+<td>0.485 [0.435, 0.555]</td>
+<td>unresolved</td>
+</tr>
+</tbody>
+</table>
+<p>Growth exponents in <code>p</code> (analyzer OLS on ln mean, six
+primes, bootstrap 95%):</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>arm</th>
+<th>FPM low</th>
+<th>FPM mid</th>
+<th>FPM high</th>
+<th>group operations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>IC on H (<code>H_C_double_lp+pre</code>)</td>
+<td>1.148 [1.136, 1.167]</td>
+<td>1.270 [1.243, 1.320]</td>
+<td>1.250 [1.225, 1.294]</td>
+<td>1.010 [1.000, 1.022]</td>
+</tr>
+<tr class="even">
+<td>rho on H (<code>H_rho_neg</code>)</td>
+<td>1.394 [1.222, 1.548]</td>
+<td>1.395 [1.223, 1.549]</td>
+<td>1.396 [1.223, 1.550]</td>
+<td>1.396 [1.223, 1.550]</td>
+</tr>
+<tr class="odd">
+<td>C route (<code>C_transfer_diem_2lp</code>)</td>
+<td>0.872 [0.803, 0.945]</td>
+<td>0.895 [0.810, 0.985]</td>
+<td>0.866 [0.782, 0.956]</td>
+<td>0.446 [0.366, 0.535]</td>
+</tr>
+<tr class="even">
+<td>rho on C (<code>C_rho_neg</code>)</td>
+<td>1.347 [1.210, 1.467]</td>
+<td>1.347 [1.210, 1.466]</td>
+<td>1.346 [1.210, 1.466]</td>
+<td>1.332 [1.195, 1.450]</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-the-numbers-say">What the numbers say</h2>
+<ul>
+<li>The transfer works as an attack step: on all 18 instances the
+logarithm found on <code>C</code> by Diem’s algorithm, and by rho on
+<code>C</code>, is the planted logarithm on <code>H</code>.</li>
+<li>On FPM mid and FPM high the C route costs less than index calculus
+on <code>H</code> from <code>p = 1031</code> on (ratio 0.62, 0.65, 0.68,
+0.50; every interval below 1). On FPM low it does not: there the ratio
+is above 1 at every prime (1.24, 1.28, 1.38, 1.07). The difference
+between the readings is the price of the linear algebra modulo
+<code>r</code>: <code>la_mul</code> is weighted 9 on mid and high and 1
+on low, and the <code>H</code> arm does 4 times the linear-algebra
+multiplications of the <code>C</code> arm at <code>p = 8209</code>
+(6.90e6 against 1.64e6), while the <code>C</code> arm does more
+relation-phase and <code>Pic</code> work. So the advantage at these
+sizes rests on pricing a multiplication modulo <code>r ~ p^3</code> at 9
+field multiplications.</li>
+<li>The fitted exponents differ (1.27 against 0.90 on FPM mid; 1.15
+against 0.87 on FPM low, intervals disjoint on every reading), so the
+ratio should keep falling with <code>p</code> on every reading; within
+the grid it is not monotonic (0.62, 0.65, 0.68, 0.50 on mid) and at 3
+curves x 2 seeds the intervals at 2053 and 4099 are wide. On FPM low the
+fitted lines would cross near <code>p ~ 1e4</code> (extrapolation, not
+measured).</li>
+<li>Distance to the matched rho on <code>H</code> (the reference of the
+success criterion): index calculus on <code>H</code> is at 0.9 to 2.0
+times rho on FPM mid, never resolved on either side from 1031 on; the C
+route is at 0.60 to 0.83 times rho from 1031 on, with intervals that
+reach or cross 1 at every prime (0.431 to 1.02 at 1031 is the closest to
+resolved). Neither index calculus arm is shown to beat rho on
+<code>H</code> at these sizes. Under the section 5a band the order C
+route &lt; rho on H holds as a point estimate on all three FPM readings
+from 1031 on and is not resolved on any.</li>
+<li>Rho on <code>C</code> is 25 to 50 times rho on <code>H</code> (a
+<code>Pic^0</code> addition on the plane quartic costs about 9,000 field
+multiplications against about 220 for a genus-3 Cantor step). The
+transfer is useless for rho; it pays only through Diem’s algorithm.</li>
+<li>The transfer itself costs about 1.4e5 multiplications and 1.4e3
+inversions, flat in <code>p</code> (1.40e5 to 1.46e5 across the grid).
+80% of it is the 19 <code>Pic^0</code> operations and about 17 class
+constructions on <code>C</code>; building <code>T(t)</code> is 680
+multiplications, the quartic fit 8,100 to 8,800, image points and conic
+conditions 11,000 to 15,000, Cantor steps and root finding 6,000 to
+8,200 for 15 to 19 candidate representatives.</li>
+</ul>
+<h2 id="scorecard">Scorecard</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>prediction</th>
+<th>measured</th>
+<th>verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>T1</td>
+<td>every run certifies, transferred log = planted log,
+<code>ord_ratio</code> 1</td>
+<td>144/144 certified and correct; 36/36 transfers succeeded;
+<code>ord_ratio</code> 1 on all; 0 zeta mismatches</td>
+<td>holds</td>
+</tr>
+<tr class="even">
+<td>T2</td>
+<td>C route below IC on H on all three FPM readings at
+<code>p &gt;= 1031</code>; mid ratio falls from 1031 to the largest
+prime</td>
+<td>below on FPM mid and high at 1031, 2053, 4099, 8209; ABOVE 1 on FPM
+low at all four (point estimates 1.07 to 1.38); mid ratio 0.616 at 1031,
+0.500 at 8209</td>
+<td>fails as stated (the band condition); holds on two of three
+readings; the “falls” part holds end to end, not monotonically</td>
+</tr>
+<tr class="odd">
+<td>T3</td>
+<td>transfer below 5% of the arm (FPM mid) at
+<code>p &gt;= 1031</code></td>
+<td>4.4%, 1.8%, 0.68%, 0.38%</td>
+<td>holds (4.4% [4.1, 4.8] at 1031 is close to the bound; on FPM low the
+share at 1031 is 5.5%)</td>
+</tr>
+<tr class="even">
+<td>T4</td>
+<td>exponents (FPM mid): IC on H in [1.0, 1.4]; C route in [0.6, 1.0];
+rho on H in [1.3, 1.6]</td>
+<td>1.270 [1.243, 1.320]; 0.895 [0.810, 0.985]; 1.395 [1.223,
+1.549]</td>
+<td>holds (point estimates; the rho interval extends below 1.3)</td>
+</tr>
+<tr class="odd">
+<td>T5</td>
+<td>Smith-positive / admitted in [0.05, 0.20]</td>
+<td>18/105 = 0.171 (Wilson 95% [0.111, 0.255])</td>
+<td>holds on the stated statistic; see the bias note</td>
+</tr>
+</tbody>
+</table>
+<p>T5 bias: each prime’s search stops at its third accepted curve, so
+the last admitted curve of every prime is a success. The pooled fraction
+18/105 overstates the rate. Dropping the last curve of each of the six
+searches gives 12/99 = 0.121. Both are inside the predicted range. All
+18 Smith-positive admitted curves had a usable normal-form map, a smooth
+<code>C</code> and a matching point count: no curve was lost between
+“Smith-positive” and “accepted”.</p>
+<h2 id="instance-search">Instance search</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">seeds tried</th>
+<th style="text-align: right;">admitted</th>
+<th style="text-align: right;">Smith-positive</th>
+<th style="text-align: right;">accepted</th>
+<th style="text-align: right;">search wall s</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">257</td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">521</td>
+<td style="text-align: right;">278</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">19.9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1031</td>
+<td style="text-align: right;">257</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">57.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2053</td>
+<td style="text-align: right;">205</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">133.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4099</td>
+<td style="text-align: right;">466</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">785.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">8209</td>
+<td style="text-align: right;">168</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">994.3</td>
+</tr>
+</tbody>
+</table>
+<p>Cofactors of the accepted instances are 2, 4, 6 or 8 (never 1: a
+Smith-positive curve has even order). Instances with <code>f</code>,
+<code>N</code>, <code>D</code>, the 15 coefficients of <code>C</code>,
+<code>P0</code>, order, <code>h</code>, <code>r</code> are the
+<code>instance</code> records of <code>runs.jsonl</code>
+(<code>tables.md</code> S2).</p>
+<h2 id="deviations-from-the-protocol">Deviations from the protocol</h2>
+<ul>
+<li>None in grid, seeds, arms, parameters or analysis. The grid ran in
+one session from one binary (<code>binary.sha256</code>).</li>
+<li>The binary was built from a working tree in which
+<code>genus_ladder.rs</code> carried another session’s uncommitted work
+(structured Gaussian elimination behind <code>IcParams.sge</code>). This
+driver passes <code>sge: None</code>, which that module documents as the
+unchanged instrument; the file’s hash at build time is in
+<code>binary.sha256</code>. Not independently checked here.</li>
+<li><code>quartic_ladder::make_instance_from_classes</code> takes one
+argument more than the brief’s sketch (<code>n_points</code>, which
+<code>QInstance</code> stores).</li>
+<li>The figure legend was re-laid twice after the data existed (layout
+only).</li>
+<li>The pilot at <code>p = 131</code>
+(<code>pilot/pilot_131.jsonl</code>, 2 curves, 1 seed) ran before the
+freeze, as the protocol says.</li>
+</ul>
+<h2 id="what-is-and-is-not-counted">What is and is not counted</h2>
+<p>Counted in <code>transfer_mul</code> / <code>transfer_inv</code>:
+building <code>T(t)</code>; square roots in <code>F_p</code> and
+<code>F_p^2</code>, image points and <code>T(t) b</code> for every point
+used; the 15-column fit through 20 image points;
+<code>PlaneQuartic::setup_cost</code>; conic conditions,
+<code>class_from_conics</code>, <code>Pic^0</code> additions and
+negations; Cantor additions, split tests and root finding of the
+representative search. Multiplications by the fixed non-residue and
+squarings count as multiplications; additions are not priced.</p>
+<p>Not counted, in any arm:</p>
+<ul>
+<li>finding Smith’s trigonal map
+(<code>smith_prop24::analyze_curve</code>: factoring <code>f</code>, the
+tractable subgroups, linear algebra over extensions of degree at most
+8);</li>
+<li>the fixed-degree polynomial set-up in <code>Trigonal::new</code>
+(<code>F mod G</code>, <code>s(t)</code>, its square root, the
+deltas);</li>
+<li>the smoothness certificate and the coordinate-ring tables built by
+<code>PlaneQuartic::new</code> (<code>setup_cost</code> reports 15
+multiplications: it covers the base-point data only). The ladder’s
+quartic arms do not count these either;</li>
+<li>instance search, group orders, <code>#C(F_p) = #H(F_p)</code>, and
+the checks <code>[r] Psi(G) = 0</code>, <code>Psi(T) = [t] Psi(G)</code>
+made when the instance is formed.</li>
+</ul>
+<p>The first two are part of the attacker’s work and are missing from
+the C route. They do not grow with <code>p</code> beyond
+<code>log p</code> factors; their size was not measured, so the transfer
+share (0.4% to 7%) is a lower bound on the true overhead of the route,
+by an amount this study cannot state.</p>
+<h2 id="limits">Limits</h2>
+<ul>
+<li>3 curves x 2 seeds per cell. The curve is the unit of replication;
+most between-arm ratios against rho are unresolved for that reason.</li>
+<li>Only Smith-positive curves with a normal-form map and near-prime
+order: about 1 curve in 8 among the admitted, 18 of 1,490 seeds tried
+overall. Nothing here applies to the other genus-3 hyperelliptic
+curves.</li>
+<li>The comparison is between specific implementations at fixed
+parameters (<code>nb = 2 p^(2/3)</code> on <code>H</code>,
+<code>3 sqrt p</code> on <code>C</code>, no tuning of either, no
+structured Gaussian elimination on either). A better-tuned
+<code>H</code> arm or <code>C</code> arm would move the ratio.</li>
+<li>Exponents are fitted over a factor 32 in <code>p</code>; the
+predicted asymptotics (<code>p^(4/3)</code> on <code>H</code>,
+<code>p</code> on <code>C</code> up to logs) are not tested beyond
+that.</li>
+<li>The grid stops at 8209 because the instance search (orders by
+counting points over <code>F_p^2</code>) costs about 6 s per seed there
+and grows like <code>p^2</code>; the arms themselves took under 40 s per
+run. A larger prime needs a faster order computation, not more solver
+time.</li>
+<li>FPM readings price a <code>Pic^0</code> operation by its field
+multiplications in this implementation of
+<code>plane_quartic_pic</code>; that implementation was not optimised
+and its constant (about 9,000 multiplications per addition) enters the C
+route through the 1,052 group operations at 8209 (4.2e6 of 4.2e7).</li>
+<li>Wall time is not a result (<code>tables.md</code> S8, shared
+host).</li>
+</ul>
+</body>
+</html>

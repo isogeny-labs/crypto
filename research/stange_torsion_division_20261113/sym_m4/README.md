@@ -42,5 +42,7 @@ Errors fixed while building: (p_n^2 - p_2n)/2 coerced to a rational (now uses
 2^-1 mod p); sympy `symmetrize(formal=True)` returns three values; relation
 counts initially mixed ordered triples and multisets.
 
+Prior art: see `PRIOR_ART.md` (the subgroup factor base is PKM 2016 section 3.3).
+
 Limits: one curve, n <= 30, single-threaded msolve on a shared host; Ds only
-to n = 16; prior art (Amadori-Pintore-Sala, ePrint 2017/609) not yet read.
+to n = 16.
