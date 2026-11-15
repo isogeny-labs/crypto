@@ -1,0 +1,114 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261026-nist-p256-checkpoint-filter",
+  "title": "Filter the larger NIST P256 checkpoint with an R06 regression replay",
+  "created": "2026-10-26",
+  "authors": [
+    "NIST seed provenance research"
+  ],
+  "status": "blocked",
+  "status_note": "Submitted definition, not queued or executed. Full checkpoint publication, merged implementation pin and nonpreemptible execution setup are prerequisites. Protocol applies prospectively to filtering only.",
+  "blocked_on": [
+    "problem:problems/nist-factorization-raw-archive-publication.md",
+    "note:Pin the merged runner commit and select a nonpreemptible lab; pass the S3 resume checkpoint gate before execution."
+  ],
+  "links": {
+    "lead": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/README.md",
+    "notes": [
+      "backlog/XP-20261026-nist-p256-checkpoint-filter/PROTOCOL.md",
+      "backlog/XP-20261026-nist-p256-checkpoint-filter/protocol.json",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/reports/completion-20261026T2122Z/REPORT.md"
+    ],
+    "prs": [
+      2554
+    ]
+  },
+  "question": "What duplicate and singleton counts does the identical native filter produce on the R08 checkpoint, and what next state does its controller request?",
+  "decision_value": "Completed native filtering decides whether this specific larger dataset requests further collection or produces prerequisites for a separate matrix review. A failed replay or incomplete run prevents an arithmetic interpretation. Raw relation growth alone cannot decide this.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "10aa811530765a19f24a305d3ebedd3848016ab3"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/nist-r08-report-and-filter-experiment-20261026",
+    "build": [
+      [
+        "rustc",
+        "--edition=2021",
+        "-O",
+        "backlog/XP-20261026-nist-p256-checkpoint-filter/inspect_filter.rs",
+        "-o",
+        "/tmp/nist-inspect-filter"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 16,
+    "disk_gb": 24,
+    "gpu": null,
+    "est_core_hours": 1,
+    "est_wall_hours": 1,
+    "notes": "Rounded resource reservations, not predicted factoring time: two tasks capped at 900 seconds each; 2 CPUs. Require 5 GiB free before copying. No paid or preemptible host."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "backlog/XP-20261026-nist-p256-checkpoint-filter/run_pair.sh",
+      "{out}"
+    ],
+    "env": {
+      "NIST_R06_STATE": ".cache/nist-filter-inputs/R06/state",
+      "NIST_R08_STATE": ".cache/nist-filter-inputs/R08/state",
+      "NIST_FILTER_CHECKER": "/tmp/nist-inspect-filter",
+      "GNFS_BIN_DIR": "/opt/yafu/factor/lasieve5_64/bin"
+    },
+    "timeout_per_shard_s": 1800
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "nist-filter-counts/v1 per arm; unified experiment.export/v1 required in result PR",
+    "verify": [
+      "bash",
+      "backlog/XP-20261026-nist-p256-checkpoint-filter/verify_pair.sh",
+      "{out}"
+    ],
+    "land": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R09-filter-registered"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261026-nist-p256-checkpoint-filter"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "nist-yafu-filter-pinned",
+      "recipe": "Nonpreemptible Linux x86-64 AVX2/BMI2 host. Install pinned patched YAFU and its matching native libraries/sievers, Rust, Bash, jq, ripgrep, coreutils, xz and util-linux. Restore the unchanged published R06/R08 checkpoint archives and verify their input manifests; build the Rust checker. Complete the repository S3 resume gate. No remote data publication or selected environment is asserted."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 16384,
+      "timeout_s": 1800,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261026-nist-p256-checkpoint-filter"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Blocked submission with no priority or paid resources. Propose funding only after inputs, merged code and environment are available."
+    },
+    "notes": "No lease, remote task, objective, funds or machine is created. Filter interruptions are incomplete new executions, not resumed measurements."
+  }
+}

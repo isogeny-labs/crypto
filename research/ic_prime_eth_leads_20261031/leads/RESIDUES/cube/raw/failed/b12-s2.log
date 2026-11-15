@@ -1,0 +1,15 @@
+nice: setpriority: Operation not permitted
+curve p=3037 a=352 b=70 (12 bits)
+family small-x l=4 : 8 abscissae, 16 points
+[0] m=3 small-x l=4 bits-grouplaw sym=1 kissat planted#0: UNKNOWN conf=100001 dec=348528 wall=5.27s T_enum=112 ratio=892.866 timeout
+[1] m=3 small-x l=4 bits-grouplaw sym=1 kissat planted#1: UNKNOWN conf=100001 dec=340458 wall=5.05s T_enum=112 ratio=892.866 timeout
+[2] m=3 small-x l=4 bits-grouplaw sym=1 kissat planted#2: UNKNOWN conf=100001 dec=318152 wall=5.47s T_enum=112 ratio=892.866 timeout
+[3] m=3 small-x l=4 bits-grouplaw sym=1 kissat planted#3: UNKNOWN conf=100001 dec=325702 wall=5.05s T_enum=112 ratio=892.866 timeout
+[4] m=3 small-x l=4 bits-grouplaw sym=1 kissat planted#4: UNKNOWN conf=100001 dec=319724 wall=5.04s T_enum=112 ratio=892.866 timeout
+[5] m=3 small-x l=4 bits-grouplaw sym=1 kissat planted#5: UNKNOWN conf=100000 dec=351885 wall=4.86s T_enum=112 ratio=892.857 timeout
+[6] m=3 small-x l=4 bits-grouplaw sym=1 kissat planted#6: UNKNOWN conf=100000 dec=304691 wall=5.85s T_enum=112 ratio=892.857 timeout
+[7] m=3 small-x l=4 bits-grouplaw sym=1 kissat planted#7: UNKNOWN conf=0 dec=0 wall=5.23s T_enum=112 ratio=0.000 timeout
+
+thread 'main' (12267214) panicked at src/main.rs:222:97:
+called `Result::unwrap()` on an `Err` value: Os { code: 28, kind: StorageFull, message: "No space left on device" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

@@ -1,0 +1,46 @@
+import Fuel
+set_option autoImplicit false
+namespace MonicZeroTest
+open Polynomial ScaleTrim MonicRemainder MonicTermination
+
+def Normal (xs : List UInt64) : Prop := xs.getLast?≠some 0
+
+theorem selected_normal (p : UInt64) (b r : List UInt64) (hr : r≠[]) (hl : b.length≤r.length) :
+ Normal (selected p b r hr hl) := by
+ unfold selected Normal
+ exact trim_finished _ _ le_rfl
+
+theorem loop_normal (p : UInt64) (b : List UInt64) (fuel : Nat) (r out : List UInt64)
+ (hn : Normal r) (ho : loop p b fuel r=some out) : Normal out := by
+ induction fuel generalizing r out with
+ | zero =>
+   rw [loop] at ho
+   split_ifs at ho with hr hl
+   · exact Option.some.inj ho ▸ hn
+   · exact Option.some.inj ho ▸ hn
+ | succ fuel ih =>
+   rw [loop] at ho
+   split_ifs at ho with hr hl
+   · exact Option.some.inj ho ▸ hn
+   · exact ih _ out (selected_normal p b r hr hl) ho
+   · exact Option.some.inj ho ▸ hn
+
+theorem checked_normal (p : UInt64) (b a out : List UInt64) (fuel : Nat)
+ (hm : b.getLast?=some 1) (ho : checkedPrem p b a fuel=some out) : Normal out := by
+ apply loop_normal p b fuel (trimFuel a.length a) out (trim_finished _ _ le_rfl)
+ simpa [checkedPrem,hm,premModel] using ho
+
+theorem zero_iff_empty (p : UInt64) (xs : List UInt64) (hc : Canon p xs) (hn : Normal xs) :
+ wordsPoly p xs=0 ↔ xs=[] := by
+ constructor
+ · intro hz
+   by_contra he
+   have ht:=congrArg (fun f : (ZMod p.toNat)[X]=>f.coeff (xs.length-1)) hz
+   rw [last_coefficient p xs he] at ht
+   have hv:=congrArg ZMod.val ht
+   rw [ZMod.val_natCast_of_lt (hc _ (List.getLast_mem he))] at hv
+   have hw : xs.getLast he=0 := UInt64.toNat_inj.mp (by simpa using hv)
+   apply hn
+   simp [List.getLast?_eq_some_getLast he,hw]
+ · intro h; subst xs; simp [wordsPoly,listPoly]
+end MonicZeroTest

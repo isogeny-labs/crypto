@@ -1,0 +1,392 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "QUOTIENT-native-target-calibration-20261026",
+  "version": 1,
+  "created": "2026-10-26",
+  "repository": "crypto",
+  "study_dir": "research/quotient_calibration_20261025/target-native",
+  "authors": [
+    "Codex continuation"
+  ],
+  "links": {
+    "parent_protocol": "research/quotient_calibration_20261025/PROTOCOL.md",
+    "source_pr": "https://github.com/isogeny-labs/crypto/pull/2569",
+    "atlas_lead": "LEAD-TRF-odd-char-descent-smith-quartic"
+  },
+  "question": "Does the fixed nine-point calibration map the 32 unchanged coordinate challenges to their certified-anchor target Kummer values exactly?",
+  "claims": [
+    {
+      "id": "exact-calibration",
+      "text": "The frozen matrix agrees projectively on all 32 preselected coordinate inputs and their successors in this one public toy case.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-holdout"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "No inverse transfer, global section identity, Profile B initialization, speedup or security claim is established by this phase.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "Frozen M times the first eight native source quotient sections; no reference labels or target arithmetic.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/quotient_calibration_20261025/target-native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "reference",
+      "role": "reference",
+      "description": "Validation-only native divisor arithmetic from the certified anchor with the exact fixed origin.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "candidate"
+    },
+    {
+      "id": "historical-positive",
+      "role": "control_positive",
+      "description": "Three historical F49 vectors checked through both direct and residue-algebra paths.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "candidate"
+    },
+    {
+      "id": "swapped-negative",
+      "role": "control_negative",
+      "description": "Frozen source coordinate vectors with entries zero and one swapped after calibration.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/quotient_calibration_20261025/target-native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "candidate"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Deterministic exact algebra; no noisy or comparative metric."
+    },
+    "positive": {
+      "present": true,
+      "arm": "historical-positive",
+      "expected_detection": "All three historical F49 Kummer vectors match; direct six-permutation and residue-algebra evaluations agree.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "swapped-negative",
+      "null_population": {
+        "description": "The same 32 frozen coordinate vectors with entries zero and one swapped after matrix freeze.",
+        "generator": "Deterministic declared permutation of each unchanged source coordinate vector.",
+        "n": 32,
+        "why_n": "Exactly the parent's fixed challenge suite, without selection or replacement.",
+        "matched_on": [
+          "curve",
+          "subgroup",
+          "kernel",
+          "origin",
+          "matrix",
+          "coordinate inputs"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [],
+    "factors": [
+      {
+        "name": "case",
+        "treatment": "fixed",
+        "value": "F343 a248 b42 r373 kernel153",
+        "how": "Unchanged parent manifest and public target hashes."
+      },
+      {
+        "name": "origin",
+        "treatment": "fixed",
+        "value": "D9+D19+D26-H+P_infinity",
+        "how": "Section-space divisor arithmetic; no arbitrary generator or alternate origin."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": 32,
+        "how": "Copy the already frozen coordinate envelope; labels are validation-only after matrix freeze."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One locked native build, source hashes and one thread; exact primary metrics only."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record host and resource diagnostics; clocks do not decide a result."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-holdout",
+        "arms": [
+          "candidate",
+          "reference"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "32/32 exact primary and successor identities; permutation control not 32/32"
+      }
+    ],
+    "aa_not_applicable": "Exact finite identities, not a statistical or performance comparison.",
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "scope": "Only the Kummer calibration gate; inverse/sign/class-group transfer requirements remain in the parent protocol."
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "First freeze the calibration matrix, then publish evaluator predictions, then open the validation-only oracle.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        "ghs-calibration-holdout-v1"
+      ],
+      "note": "The parent manifest's SHA256 coordinate stream is already frozen; no new seed or point choice."
+    },
+    "instance_sampling": {
+      "rule": "Use all 32 existing case IDs and P+G partners unchanged.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact identities, not subjective/statistical analysis. Reference labels and targets stay outside the evaluator and are computed only after matrix publication."
+    }
+  },
+  "sample_size": {
+    "instances": 32,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "An exact requirement on the complete declared finite suite; no probabilistic generality claim or significance test."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "No target data taken yet. Parent bound is 3600 wall seconds and 2 GiB; timeout is inconclusive and preserved."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "matches",
+        "name": "Exact projective matches",
+        "unit": "points",
+        "kind": "exact",
+        "definition": "Count cross-product equality for every fixed primary input; record all failed cases.",
+        "source": "validation.json primary_matches",
+        "aggregation": "sum",
+        "resolution": "1 point",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "successor_matches",
+        "name": "Successor matches",
+        "unit": "points",
+        "kind": "exact",
+        "definition": "Exact matches for the corresponding 32 fixed P+G inputs.",
+        "source": "validation.json successor_matches",
+        "aggregation": "sum",
+        "resolution": "1 point",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "source_commit",
+      "binary_sha256",
+      "oci_digest",
+      "workflow_revision",
+      "job_uid",
+      "pod_uid",
+      "input_hashes",
+      "matrix_hash",
+      "host",
+      "native_threads",
+      "exit_status",
+      "resource_diagnostics"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "measurement_class": "search",
+    "timeout_seconds": 3600,
+    "placement": {
+      "cluster": "isolab",
+      "namespace": "isolab",
+      "region": "us-east-2",
+      "target_image_qualified": false,
+      "address_space_bytes": 2147483648,
+      "threads": 1
+    },
+    "checkpoint": {
+      "policy": "application",
+      "interval_seconds": 300,
+      "grace_seconds": 30,
+      "restore_validation": "manifest_sha256",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Stop on a failed chart, control, rank or field check; retain the input and failure. Do not replace any training/challenge input.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Freeze the matrix before opening target challenge values; record all 32 failures/matches and stop dependent inversion on any mismatch.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "At most 3600 wall seconds and 2 GiB address space for this experimental pipeline.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Pass only if the fixed matrix matches all 32 primary and all 32 successor vectors, with historical controls passing and the swapped suite failing. A failed feasibility gate is not a refutation of the global construction.",
+    "comparison_ids": [
+      "exact-holdout"
+    ],
+    "threshold": "32/32 primaries and successors; swapped-coordinate pass count below 32",
+    "statistic": "Exact cross products in F7^18",
+    "interval": "Not applicable to exact finite equalities",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Number of exact matches out of the fixed 32",
+    "verdict_vocabulary": [
+      "calibration_holdout_pass",
+      "calibration_holdout_failure",
+      "feasibility_failure",
+      "resource_inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/quotient_calibration_20261025/target-native/src/main.rs",
+      "sha256": null
+    },
+    "inputs": [
+      "matrix.json",
+      "predictions.json",
+      "fixtures/coordinate-inputs.json"
+    ],
+    "outputs": [
+      "validation.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Refit after opening validation targets",
+    "Replace or omit a frozen point",
+    "Use source labels or expected targets in the evaluator",
+    "Claim divisor inversion or Profile B from calibration",
+    "Use diagnostic clocks as a speed claim"
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/2012.07173v1#S3.SS2",
+      "provenance": "retrieved",
+      "claim": "Origin, symmetric Kummer sections and fixed linear coordinate change; no novelty claim.",
+      "verified_by": "Read section 3.2 in full."
+    },
+    {
+      "ref": "https://arxiv.org/abs/math/0105182",
+      "provenance": "retrieved",
+      "claim": "Section-space representations and exact multiplication/division, with degree hypotheses checked.",
+      "verified_by": "Read Lemmas 2.1--2.3 and their hypotheses/proofs."
+    },
+    {
+      "ref": "research/quotient_calibration_20261025/PROVENANCE.json",
+      "provenance": "internal",
+      "claim": "Unchanged certified anchor, charts, section basis and source/challenge freeze.",
+      "verified_by": "Read and hash-bind the pinned historical reports."
+    }
+  ]
+}

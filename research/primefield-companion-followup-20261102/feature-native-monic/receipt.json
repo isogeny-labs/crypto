@@ -1,0 +1,19 @@
+{
+  "schema": "native-monic-correctness/v1",
+  "checked_source_commit": "ebc7a960ae8970cff26086ed49c0c98204f826df",
+  "source_binding": "pretest check-lock.sha256 verified after tests",
+  "build_attempts": 1,
+  "test_attempts": 1,
+  "build_exit": 0,
+  "test_exit": 0,
+  "tests_passed": 4,
+  "tests_filtered": 60,
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "binary_sha256": "16c0469912c2f08a2e451db7c9ca5bdfb9e734385678cd95d514f6c31fb73560",
+  "build_command": "timeout 120 rustc --edition=2021 --test lib.rs -o unit-tests",
+  "test_command": "timeout 30 ./unit-tests monic_tests:: --test-threads=1",
+  "comparison_executed": false,
+  "comparison_protocol_status": "validated_draft_not_frozen",
+  "full_cohort_executed": false,
+  "cloud_jobs": 0
+}

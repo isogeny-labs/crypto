@@ -1,0 +1,41 @@
+import DispatchConsequences
+import WordCounter
+set_option autoImplicit false
+namespace BranchCount
+open SignedWord
+variable {n : Nat}
+def constraint (r a b : UInt64) : GraphSameRoot.Result UInt64 × Nat :=
+ (SignedWord.constraint r a b,if b=0 then 1 else 0)
+def anchor (r : UInt64) (s : Anchored n) (root : Fin n) (a b : UInt64) :
+ (Anchored n × GraphSameRoot.Result UInt64) × Nat :=
+ match s.fixed root with
+ | some xy => let c:=constraint r (GraphRingWord.sub r xy.1 a) (GraphRingWord.sub r xy.2 b);((s,c.1),c.2)
+ | none => ((⟨s.graph,fun i=>if i=root then some (a,b) else s.fixed i⟩,.none),0)
+def same (r : UInt64) (s : Anchored n) (root : Fin n) (cu cv : Int8) (a b : UInt64) :=
+ if cu+cv=0 then
+   let c:=constraint r (GraphRingWord.neg r a) (GraphRingWord.neg r b)
+   ((s,c.1),c.2)
+ else
+   let ci:=WideModPow.inverseGenerator r (denominator r cu)
+   anchor r s root (GraphRingWord.mul r a ci) (GraphRingWord.mul r b ci)
+theorem constraint_projection (r a b : UInt64) : (constraint r a b).1=SignedWord.constraint r a b := rfl
+theorem anchor_projection (r : UInt64) (s : Anchored n) (root : Fin n) (a b : UInt64) :
+ (anchor r s root a b).1=SignedWord.anchor r s root a b := by
+ cases h:s.fixed root <;> simp [anchor,SignedWord.anchor,constraint,h]
+theorem same_projection (r : UInt64) (s : Anchored n) (root : Fin n) (cu cv : Int8) (a b : UInt64) :
+ (same r s root cu cv a b).1=sameRoot r s root cu cv a b := by
+ unfold same sameRoot
+ split
+ · rfl
+ · exact anchor_projection _ _ _ _ _
+theorem constraint_bound (r a b : UInt64) : (constraint r a b).2≤1 := by unfold constraint;split <;> omega
+theorem anchor_bound (r : UInt64) (s : Anchored n) (root : Fin n) (a b : UInt64) : (anchor r s root a b).2≤1 := by
+ cases h:s.fixed root with
+ | none => simp [anchor,h]
+ | some xy => simpa only [anchor,h] using constraint_bound r (GraphRingWord.sub r xy.1 a) (GraphRingWord.sub r xy.2 b)
+theorem same_bound (r : UInt64) (s : Anchored n) (root : Fin n) (cu cv : Int8) (a b : UInt64) : (same r s root cu cv a b).2≤1 := by
+ unfold same
+ split
+ · exact constraint_bound r (GraphRingWord.neg r a) (GraphRingWord.neg r b)
+ · exact anchor_bound r s root (GraphRingWord.mul r a (WideModPow.inverseGenerator r (denominator r cu))) (GraphRingWord.mul r b (WideModPow.inverseGenerator r (denominator r cu)))
+end BranchCount

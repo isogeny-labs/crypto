@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h882e6d561549",
+  "label": "signed-Frobenius rho v4 (two-rung jumps) against v3, Koblitz 2^15.4..2^32.1",
+  "spec_id": "ECS1haa2e6cb3389b",
+  "spec_sha256": "aa2e6cb3389b11c822c3dd87982eb417db1f26af87a09cafe37f374ca7d48b86",
+  "env_class_id": "ECBENV3h8d80c7bc4dfc",
+  "host_sha256": "2ff36ac61d9336f466baa9bedc62737b84900ff767beb9bf2d669bb45178ecfa",
+  "plan_sha256": "0afc626548b9686fd78982b34f2e817667a27411f6789ee1e56b68fae0fdfd35",
+  "binary_sha256": "9fde9d8babe202901c390d3d4b3d77df65e4f44776294f8f3422b74a088549cf",
+  "git_commit": "9f6faa955388b65e06bf0e26b71b7945189751cb",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794038172971,
+  "finished_unix_ms": 1794038218438,
+  "status": "complete",
+  "executions_planned": 6048,
+  "records_written": 6048,
+  "records_sha256": "3ae1d5907383af52e19901b8d458750cefd40fd7b36597cac2cae07829bdc5e5",
+  "status_counts": {
+    "verified": 6048
+  },
+  "last_seq": 6047
+}

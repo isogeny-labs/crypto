@@ -1,0 +1,44 @@
+/var/tmp/pencil-sameu-word-20261031-v1/WordSameU.lean:43:28: error: unexpected token 'at'; expected rcasesPat
+/var/tmp/pencil-sameu-word-20261031-v1/WordSameU.lean:43:2: error: Unexpected syntax
+  failed to pretty print term (use 'set_option pp.rawOnError true' for raw representation)
+/var/tmp/pencil-sameu-word-20261031-v1/WordSameU.lean:40:83: error: unsolved goals
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hbound : p.toNat < 2 ^ 31
+a b : WeightedWord
+ha : WeightedWord.canonical p a
+hb : WeightedWord.canonical p b
+hg :
+  FieldExpr.good p (crossTrees a b).q ∧
+    FieldExpr.good p (crossTrees a b).r ∧ FieldExpr.good p (crossTrees a b).s ∧ FieldExpr.good p (crossTrees a b).t
+⊢ let c := crossWords p a b;
+  c.q.toNat < p.toNat ∧
+    c.r.toNat < p.toNat ∧
+      c.s.toNat < p.toNat ∧
+        c.t.toNat < p.toNat ∧
+          ↑c.q.toNat = SameUZeroSlope.crossQ (WeightedWord.decodeTwo p a) (WeightedWord.decodeTwo p b) ∧
+            ↑c.r.toNat = SameUZeroSlope.crossR (WeightedWord.decodeTwo p a) (WeightedWord.decodeTwo p b) ∧
+              ↑c.s.toNat = SameUZeroSlope.crossS (WeightedWord.decodeTwo p a) (WeightedWord.decodeTwo p b) ∧
+                ↑c.t.toNat = SameUZeroSlope.crossT (WeightedWord.decodeTwo p a) (WeightedWord.decodeTwo p b)
+/var/tmp/pencil-sameu-word-20261031-v1/WordSameU.lean:103:28: error: unexpected token 'at'; expected rcasesPat
+/var/tmp/pencil-sameu-word-20261031-v1/WordSameU.lean:103:2: error: Unexpected syntax
+  failed to pretty print term (use 'set_option pp.rawOnError true' for raw representation)
+/var/tmp/pencil-sameu-word-20261031-v1/WordSameU.lean:100:76: error: unsolved goals
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hbound : p.toNat < 2 ^ 31
+a b : WeightedWord
+ha : WeightedWord.canonical p a
+hb : WeightedWord.canonical p b
+hg :
+  FieldExpr.good p (samePointTrees a b).k ∧
+    FieldExpr.good p (samePointTrees a b).x ∧
+      FieldExpr.good p (samePointTrees a b).y ∧
+        FieldExpr.good p (samePointTrees a b).z ∧ FieldExpr.good p (samePointTrees a b).w
+⊢ let c := samePointWords p a b;
+  c.k.toNat < p.toNat ∧
+    WordD1.canonical p c.point ∧
+      ↑c.k.toNat = SameUMixed.sourceK (WeightedWord.decodeTwo p a) (WeightedWord.decodeTwo p b) ∧
+        WordD1.decode p c.point = SameUMixed.sourcePoint (WeightedWord.decodeTwo p a) (WeightedWord.decodeTwo p b)

@@ -495,6 +495,469 @@ pub fn matrix_f5_f2(
     matrix_f5_f2_timed(polys, n_vars, degree).map(|(rows, report, _)| (rows, report))
 }
 
+/// Bounded serial K2 implementation of this module's actual Boolean
+/// Koszul/Frobenius criterion, followed by the same scalar Macaulay reduction.
+/// This is a fixed-degree matrix step, not signature-compatible incremental F5
+/// or a recursive solver. See `bounded_matrix` for limits and accounting scope.
+pub fn matrix_f5_f2_bounded<F>(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    limits: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Limits,
+    deadline: std::time::Instant,
+    mut observer: F,
+) -> crate::cryptanalysis::koblitz_groebner::bounded_matrix::Report
+where
+    F: FnMut(&crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event) -> Result<(), ()>,
+{
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix::{Engine, Gate};
+    let mut gate = Gate::new(
+        Engine::F5KoszulFrobenius,
+        degree,
+        limits,
+        deadline,
+        &mut observer,
+    );
+    let result = (|| {
+        let degrees = gate.prepare(polys, n_vars)?;
+        let pruned = bounded_k2_criterion(polys, degree, &degrees, &mut gate)?;
+        gate.main(polys, &degrees, &pruned)
+    })();
+    gate.finish(result)
+}
+
+/// Fixed-storage specialization of F5Criterion::new. The three-variable
+/// monomial universe has eight elements; generator and prefix order are
+/// unchanged. No current-generator leading-ideal shortcut is used.
+fn bounded_k2_criterion<F>(
+    polys: &[F2BoolPoly],
+    degree: u32,
+    degrees: &[u32; 61],
+    gate: &mut crate::cryptanalysis::koblitz_groebner::bounded_matrix::Gate<'_, F>,
+) -> Result<[u8; 61], crate::cryptanalysis::koblitz_groebner::bounded_matrix::Stop>
+where
+    F: FnMut(&crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event) -> Result<(), ()>,
+{
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix::{
+        columns, criterion_reservation, pack, product, CriterionStatus, Stage, MULTIPLIERS,
+    };
+    gate.reserve(criterion_reservation(polys.len())?)?;
+    gate.report.backend_invoked = true;
+    let mut pruned = [0u8; 61];
+    gate.report.criterion_status = if polys.is_empty() {
+        CriterionStatus::EmptyInput
+    } else if degrees[..polys.len()].contains(&0) {
+        CriterionStatus::SkippedConstantInput
+    } else {
+        CriterionStatus::Active
+    };
+    if gate.report.criterion_status != CriterionStatus::Active {
+        return Ok(pruned);
+    }
+    // F5Criterion sorts/deduplicates these levels. Degrees are in 1..=3,
+    // so scanning the admitted 0..=5 levels preserves that order exactly.
+    for level in 0..degree {
+        if !degrees[..polys.len()]
+            .iter()
+            .any(|&di| di <= degree && degree - di == level)
+        {
+            continue;
+        }
+        gate.emit(Stage::CriterionLevel { level })?;
+        let mut universe = 0u8;
+        for mask in MULTIPLIERS {
+            if mask.count_ones() <= level {
+                universe |= 1 << mask;
+            }
+        }
+        let (columns, count) = columns(universe);
+        let mut permanent = [0u8; 8];
+        for (i, p) in polys.iter().enumerate() {
+            gate.clock()?;
+            let di = degrees[i];
+            if di <= degree && degree - di == level {
+                let mut predicted = 0u8;
+                for (c, &pivot) in permanent[..count].iter().enumerate() {
+                    if pivot != 0 {
+                        predicted |= 1 << columns[c];
+                    }
+                }
+                gate.report.counters.koszul_pruned += predicted.count_ones() as u64;
+                if degree >= 2 * di {
+                    let mut temporary = [0u8; 8];
+                    for multiplier in MULTIPLIERS {
+                        if multiplier.count_ones() > degree - 2 * di {
+                            continue;
+                        }
+                        gate.emit(Stage::CriterionCandidate {
+                            generator: i,
+                            multiplier,
+                            frobenius: true,
+                        })?;
+                        gate.report.counters.criterion_attempts += 1;
+                        let support = product(p, multiplier, true);
+                        // Match pack_product, including cancellation before
+                        // rejecting any surviving term outside the universe.
+                        if support == 0 || support & !universe != 0 {
+                            continue;
+                        }
+                        let mut row = pack(support, &columns, count);
+                        if let Some(c) = bounded_k2_reduce(
+                            &mut row,
+                            &permanent,
+                            &temporary,
+                            &mut gate.report.counters.criterion_word_xors,
+                        ) {
+                            temporary[c] = row;
+                        }
+                    }
+                    for (c, &pivot) in temporary[..count].iter().enumerate() {
+                        if pivot != 0 && predicted & (1 << columns[c]) == 0 {
+                            predicted |= 1 << columns[c];
+                            gate.report.counters.frobenius_pruned += 1;
+                        }
+                    }
+                }
+                pruned[i] = predicted;
+            }
+            if di > level {
+                continue;
+            }
+            for multiplier in MULTIPLIERS {
+                if multiplier.count_ones() > level - di {
+                    continue;
+                }
+                gate.emit(Stage::CriterionCandidate {
+                    generator: i,
+                    multiplier,
+                    frobenius: false,
+                })?;
+                gate.report.counters.criterion_attempts += 1;
+                let support = product(p, multiplier, false);
+                if support == 0 || support & !universe != 0 {
+                    continue;
+                }
+                gate.report.counters.criterion_rows += 1;
+                let mut row = pack(support, &columns, count);
+                match bounded_k2_reduce(
+                    &mut row,
+                    &permanent,
+                    &[0; 8],
+                    &mut gate.report.counters.criterion_word_xors,
+                ) {
+                    Some(c) => permanent[c] = row,
+                    None => gate.report.counters.criterion_zero_reductions += 1,
+                }
+            }
+        }
+    }
+    Ok(pruned)
+}
+
+/// Same leading-pivot order as PrefixEchelon::reduce_leading, with permanent
+/// pivots preferred over the temporary Frobenius extension. One byte is one
+/// packed word here; each XOR still counts as one native elimination word XOR.
+fn bounded_k2_reduce(
+    row: &mut u8,
+    permanent: &[u8; 8],
+    temporary: &[u8; 8],
+    word_xors: &mut u64,
+) -> Option<usize> {
+    while *row != 0 {
+        let c = row.trailing_zeros() as usize;
+        let pivot = if permanent[c] != 0 {
+            permanent[c]
+        } else {
+            temporary[c]
+        };
+        if pivot == 0 {
+            return Some(c);
+        }
+        *row ^= pivot;
+        *word_xors += 1;
+    }
+    None
+}
+
+#[cfg(test)]
+mod bounded_k2_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix::{
+        required_reservation,
+        tests::{censored, deadline, limits, oracle, polynomial, row_space},
+        CriterionStatus, Engine, Event, Gate, Stage, Stop, MAX_EQUATIONS, MAX_ROWS,
+    };
+
+    fn compare_criterion(polys: &[F2BoolPoly], degree: u32) {
+        let mut observer = |_: &Event| Ok(());
+        let mut gate = Gate::new(
+            Engine::F5KoszulFrobenius,
+            degree,
+            limits(),
+            deadline(),
+            &mut observer,
+        );
+        let degrees = gate.prepare(polys, 3).unwrap();
+        let pruned = bounded_k2_criterion(polys, degree, &degrees, &mut gate).unwrap();
+        let legacy = F5Criterion::new(polys, 3, degree, 7);
+        for (i, &bits) in pruned[..polys.len()].iter().enumerate() {
+            for multiplier in 0..8 {
+                assert_eq!(
+                    bits & (1 << multiplier) != 0,
+                    legacy.prunes(i, multiplier as Mask)
+                );
+            }
+        }
+        assert_eq!(gate.report.counters.criterion_word_xors, legacy.word_ops());
+        assert_eq!(
+            (
+                gate.report.counters.criterion_rows,
+                gate.report.counters.criterion_zero_reductions
+            ),
+            legacy.lower_level_rows()
+        );
+        assert_eq!(
+            (
+                gate.report.counters.koszul_pruned,
+                gate.report.counters.frobenius_pruned
+            ),
+            legacy.pruned_by_part()
+        );
+    }
+
+    #[test]
+    fn bounded_f5_exhaustive_single_anf_criterion_matches_legacy() {
+        for anf in 0..=255u8 {
+            for degree in 1..=6 {
+                compare_criterion(&[polynomial(anf)], degree);
+            }
+        }
+    }
+
+    #[test]
+    fn bounded_f5_actual_koszul_frobenius_and_unsound_shortcut_control() {
+        // The first polynomial is the existing Boolean unsound-shortcut
+        // counterexample x0*x1+x0+x1, not a homogeneous substitute.
+        for anfs in [
+            vec![14],
+            vec![2, 4, 6],
+            vec![14, 14, 23],
+            vec![11, 22, 41, 129],
+        ] {
+            let polys: Vec<_> = anfs.into_iter().map(polynomial).collect();
+            for degree in 1..=6 {
+                compare_criterion(&polys, degree);
+                let report =
+                    matrix_f5_f2_bounded(&polys, 3, degree, limits(), deadline(), |_| Ok(()));
+                assert_eq!(report.stop, Stop::Complete);
+                assert!(report.native_step_complete);
+                assert!(report.rows.iter().all(F2BoolPoly::is_canonical));
+                assert_eq!(row_space(&report.rows), oracle(&polys, degree));
+                let (legacy_rows, legacy) = matrix_f5_f2(&polys, 3, degree).unwrap();
+                assert_eq!(report.rows, legacy_rows);
+                assert_eq!(row_space(&report.rows), row_space(&legacy_rows));
+                assert_eq!(report.rank, Some(legacy.rank as usize));
+                assert_eq!(report.columns, legacy.cols as usize);
+                assert_eq!(report.counters.nonempty_rows, legacy.rows_f4);
+                assert_eq!(report.counters.pruned_nonempty_rows, legacy.rows_pruned);
+                assert_eq!(report.counters.selected_rows, legacy.rows_built);
+                assert_eq!(
+                    report.counters.criterion_word_xors,
+                    legacy.criterion_word_ops
+                );
+                assert_eq!(report.counters.reduction_word_xors, legacy.reduce_word_ops);
+            }
+        }
+        let polys = [polynomial(2), polynomial(4), polynomial(6)];
+        let report = matrix_f5_f2_bounded(&polys, 3, 4, limits(), deadline(), |_| Ok(()));
+        assert_eq!(report.criterion_status, CriterionStatus::Active);
+        assert!(report.counters.koszul_pruned > 0);
+        assert!(report.counters.frobenius_pruned > 0);
+        assert!(report.counters.criterion_word_xors > 0);
+        assert!(report.counters.pruned_nonempty_rows > 0);
+        assert!(report.counters.selected_rows > 0);
+    }
+
+    #[test]
+    fn bounded_f5_preserves_empty_zero_constant_bypass() {
+        let empty = matrix_f5_f2_bounded(&[], 3, 4, limits(), deadline(), |_| Ok(()));
+        assert_eq!(empty.stop, Stop::Complete);
+        assert_eq!(empty.criterion_status, CriterionStatus::EmptyInput);
+        assert_eq!(empty.rank, Some(0));
+        for anfs in [vec![0], vec![1], vec![0, 14, 11], vec![1, 14, 11]] {
+            let polys: Vec<_> = anfs.into_iter().map(polynomial).collect();
+            compare_criterion(&polys, 4);
+            let report = matrix_f5_f2_bounded(&polys, 3, 4, limits(), deadline(), |_| Ok(()));
+            assert_eq!(report.stop, Stop::Complete);
+            assert_eq!(
+                report.criterion_status,
+                CriterionStatus::SkippedConstantInput
+            );
+            assert_eq!(report.counters.criterion_attempts, 0);
+            assert_eq!(report.counters.criterion_word_xors, 0);
+            assert_eq!(report.counters.pruned_nonempty_rows, 0);
+            assert_eq!(row_space(&report.rows), oracle(&polys, 4));
+        }
+    }
+
+    #[test]
+    fn bounded_f5_maximum_active_criterion_fits_structural_envelope() {
+        let polys: Vec<_> = (0..MAX_EQUATIONS)
+            .map(|i| polynomial([2, 14, 128][i % 3]))
+            .collect();
+        let reservation = required_reservation(polys.len(), Engine::F5KoszulFrobenius).unwrap();
+        let mut caps = limits();
+        caps.work = reservation.work;
+        caps.bytes = reservation.bytes;
+        let report = matrix_f5_f2_bounded(&polys, 3, 6, caps, deadline(), |_| Ok(()));
+        assert_eq!(report.stop, Stop::Complete);
+        assert_eq!(report.criterion_status, CriterionStatus::Active);
+        assert_eq!(report.counters.main_attempts, MAX_ROWS as u64);
+        assert!(report.counters.criterion_attempts > MAX_ROWS as u64);
+        assert!(report.counters.criterion_attempts <= 32 * MAX_EQUATIONS as u64);
+        assert!(report.counters.criterion_word_xors > 0);
+        assert_eq!(row_space(&report.rows), oracle(&polys, 6));
+        compare_criterion(&polys, 6);
+    }
+
+    #[test]
+    fn bounded_f5_invocation_requires_criterion_phase_admission() {
+        let polys = [polynomial(14)];
+        // Frozen one-equation entry=4224, criterion=38016 work units.
+        // Both the entry-only and one-less criterion boundary must stop
+        // before claiming that the named backend phase was admitted.
+        for work in [4224, 42240 - 1] {
+            let mut caps = limits();
+            caps.work = work;
+            let mut seen = Vec::new();
+            let report = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |event| {
+                seen.push(event.stage);
+                Ok(())
+            });
+            censored(&report, Stop::WorkLimit);
+            assert_eq!(seen, [Stage::Begin]);
+            assert!(!report.backend_invoked);
+            assert_eq!(report.criterion_status, CriterionStatus::NotRequested);
+            assert_eq!(report.reserved.work, 4224);
+            assert_eq!(report.counters.criterion_attempts, 0);
+            assert_eq!(report.counters.main_attempts, 0);
+            assert_eq!(report.counters.allocation_requests, 0);
+        }
+        let mut caps = limits();
+        caps.work = 42240;
+        let report = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |_| Ok(()));
+        censored(&report, Stop::WorkLimit);
+        assert!(report.backend_invoked);
+        assert_eq!(report.criterion_status, CriterionStatus::Active);
+        assert_eq!(report.reserved.work, 42240);
+        assert!(report.counters.criterion_attempts > 0);
+        assert_eq!(report.counters.main_attempts, 0);
+        assert_eq!(report.counters.allocation_requests, 0);
+
+        let required = required_reservation(polys.len(), Engine::F5KoszulFrobenius).unwrap();
+        caps.work = required.work;
+        caps.bytes = required.bytes;
+        let report = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |_| Ok(()));
+        assert_eq!(report.stop, Stop::Complete);
+        assert!(report.backend_invoked);
+        assert!(report.counters.main_attempts > 0);
+
+        // An admitted bypass phase is visible but is not active criterion
+        // work, even when a later main reservation is refused.
+        for (input, work, status) in [
+            (vec![], 9216, CriterionStatus::EmptyInput),
+            (
+                vec![polynomial(0)],
+                42240,
+                CriterionStatus::SkippedConstantInput,
+            ),
+            (
+                vec![polynomial(1)],
+                42240,
+                CriterionStatus::SkippedConstantInput,
+            ),
+        ] {
+            let mut caps = limits();
+            caps.work = work;
+            let report = matrix_f5_f2_bounded(&input, 3, 5, caps, deadline(), |_| Ok(()));
+            censored(&report, Stop::WorkLimit);
+            assert!(report.backend_invoked);
+            assert_eq!(report.criterion_status, status);
+            assert_eq!(report.counters.criterion_attempts, 0);
+            assert_eq!(report.counters.criterion_word_xors, 0);
+            assert_eq!(report.counters.main_attempts, 0);
+        }
+    }
+
+    #[test]
+    fn bounded_f5_cumulative_exact_one_less_and_refused_criterion_terminal() {
+        let polys = [polynomial(2), polynomial(4), polynomial(6)];
+        let required = required_reservation(polys.len(), Engine::F5KoszulFrobenius).unwrap();
+        let mut caps = limits();
+        caps.work = required.work;
+        caps.bytes = required.bytes;
+        let full = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |_| Ok(()));
+        assert_eq!(full.stop, Stop::Complete);
+        assert_eq!(full.reserved, required);
+        caps.events = full.counters.attempted_events;
+        assert_eq!(
+            matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |_| Ok(())).stop,
+            Stop::Complete
+        );
+        for field in 0..3 {
+            let mut less = caps;
+            let expected = match field {
+                0 => {
+                    less.work -= 1;
+                    Stop::WorkLimit
+                }
+                1 => {
+                    less.bytes -= 1;
+                    Stop::ByteLimit
+                }
+                _ => {
+                    less.events -= 1;
+                    Stop::EventLimit
+                }
+            };
+            censored(
+                &matrix_f5_f2_bounded(&polys, 3, 5, less, deadline(), |_| Ok(())),
+                expected,
+            );
+        }
+        for finish in [false, true] {
+            let mut refused = false;
+            let report = matrix_f5_f2_bounded(&polys, 3, 5, limits(), deadline(), |event| {
+                assert!(!refused);
+                if (finish && event.stage == Stage::Finish)
+                    || (!finish && matches!(event.stage, Stage::CriterionCandidate { .. }))
+                {
+                    refused = true;
+                    Err(())
+                } else {
+                    Ok(())
+                }
+            });
+            assert!(refused);
+            censored(&report, Stop::Observer);
+            assert_eq!(
+                report.counters.attempted_events,
+                report.counters.acknowledged_events + 1
+            );
+        }
+        let polys = vec![polynomial(1); MAX_EQUATIONS];
+        let full = matrix_f5_f2_bounded(&polys, 3, 6, limits(), deadline(), |_| Ok(()));
+        assert_eq!(full.stop, Stop::Complete);
+        assert_eq!(full.counters.main_attempts, MAX_ROWS as u64);
+        let mut caps = limits();
+        caps.main_rows -= 1;
+        let report = matrix_f5_f2_bounded(&polys, 3, 6, caps, deadline(), |_| Ok(()));
+        censored(&report, Stop::RowLimit);
+        assert_eq!(report.counters.main_attempts, MAX_ROWS as u64 - 1);
+        assert_eq!(report.counters.dynamic_layout_bytes, 0);
+    }
+}
+
 /// Wall time of each phase of one [`matrix_f5_f2`] step, in nanoseconds.
 /// Kept out of [`F5Report`], which is compared and stored as a record of
 /// what a step did.

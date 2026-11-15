@@ -127,6 +127,9 @@
 //! - G. Bard, *Algebraic Cryptanalysis*, Springer 2009, ch. 13 — the
 //!   Boolean-ring representation.
 
+#[path = "koblitz_s4_bounded.rs"]
+pub mod bounded_s4;
+
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::bitop_tally;
 use crate::cryptanalysis::inherited_f4::{ChildSystem, InheritCost, ReducedBasis};
@@ -177,6 +180,14 @@ impl FieldStructure {
             reduced,
             squares,
         }
+    }
+
+    /// Whether the one-word structure constants hold the whole field.
+    /// Past `n = 64` the table keeps only the low word of each product,
+    /// so a system built from it is a different system: it must not be
+    /// built at all, or its UNSAT would be reported as a refutation.
+    pub fn is_exact(&self) -> bool {
+        self.n <= 64
     }
 }
 
@@ -977,7 +988,7 @@ pub fn build_decomposition_system(
     m: usize,
     st: &FieldStructure,
 ) -> Option<DecompositionSystem> {
-    if m < 2 {
+    if m < 2 || !st.is_exact() {
         return None;
     }
     let ell = basis.len();
@@ -1326,6 +1337,834 @@ fn poly_from_column_order(terms: Vec<F2BoolMono>, n_vars: usize) -> F2BoolPoly {
     F2BoolPoly { terms, n_vars }
 }
 
+/// Bounded, serial three-variable Macaulay steps. These are fixed-degree
+/// matrix operations, not recursive solvers or complete Gröbner computations.
+pub mod bounded_matrix {
+    use super::{echelon_f2_suffix_counted, mono_key, F2BoolMono, F2BoolPoly, Mask};
+    use std::alloc::Layout;
+    use std::mem::size_of;
+    use std::time::Instant;
+
+    pub const MAX_EQUATIONS: usize = 61;
+    pub const MAX_ROWS: usize = 488;
+    pub const MAX_WORK: u64 = 16_777_216;
+    pub const MAX_BYTES: u64 = 64 * 1024 * 1024;
+    pub const MAX_EVENTS: u64 = 4096;
+    /// Fixed native metadata allowance; not a compiler stack/RSS measurement.
+    pub const METADATA_BYTES: u64 = 8192;
+    pub(crate) const MULTIPLIERS: [u8; 8] = [0, 1, 2, 4, 3, 5, 6, 7];
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    pub enum Engine {
+        F4Macaulay,
+        F5KoszulFrobenius,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Limits {
+        pub work: u64,
+        pub bytes: u64,
+        /// Eligible main multiplier attempts, including zero/pruned products.
+        pub main_rows: u64,
+        pub events: u64,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    pub enum Stop {
+        Complete,
+        InvalidInput,
+        InvalidLimits,
+        WorkLimit,
+        ByteLimit,
+        RowLimit,
+        EventLimit,
+        Deadline,
+        Observer,
+        Allocation,
+        Overflow,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    pub enum CriterionStatus {
+        NotRequested,
+        EmptyInput,
+        SkippedConstantInput,
+        Active,
+    }
+
+    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Reservation {
+        pub work: u64,
+        pub bytes: u64,
+    }
+
+    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Counters {
+        pub main_attempts: u64,
+        pub nonempty_rows: u64,
+        pub selected_rows: u64,
+        pub pruned_nonempty_rows: u64,
+        pub criterion_attempts: u64,
+        pub criterion_rows: u64,
+        pub criterion_zero_reductions: u64,
+        pub koszul_pruned: u64,
+        pub frobenius_pruned: u64,
+        pub criterion_word_xors: u64,
+        pub reduction_word_xors: u64,
+        pub attempted_events: u64,
+        pub acknowledged_events: u64,
+        /// Sum of requested dynamic element layouts, not allocator capacities.
+        pub dynamic_layout_bytes: u64,
+        pub allocation_requests: u64,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    pub enum Stage {
+        Begin,
+        CriterionLevel {
+            level: u32,
+        },
+        CriterionCandidate {
+            generator: usize,
+            multiplier: u8,
+            frobenius: bool,
+        },
+        MainCandidate {
+            generator: usize,
+            multiplier: u8,
+        },
+        Pack,
+        Reduce,
+        Readback,
+        Finish,
+    }
+
+    /// A boundary snapshot, not a primitive-operation or derivation trace.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Event {
+        pub stage: Stage,
+        pub reserved: Reservation,
+        pub counters: Counters,
+    }
+
+    #[derive(Debug, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Report {
+        pub engine: Engine,
+        pub degree: u32,
+        pub stop: Stop,
+        /// A named native phase passed its resource permit. This does not
+        /// imply nonempty candidates, an active F5 criterion, or completion.
+        pub backend_invoked: bool,
+        pub native_step_complete: bool,
+        pub criterion_status: CriterionStatus,
+        pub reserved: Reservation,
+        pub counters: Counters,
+        pub columns: usize,
+        pub rank: Option<usize>,
+        pub rows: Vec<F2BoolPoly>,
+    }
+
+    fn checked_add(a: u64, b: u64) -> Result<u64, Stop> {
+        a.checked_add(b).ok_or(Stop::Overflow)
+    }
+
+    fn checked_mul(a: u64, b: u64) -> Result<u64, Stop> {
+        a.checked_mul(b).ok_or(Stop::Overflow)
+    }
+
+    fn entry_reservation(equations: usize) -> Result<Reservation, Stop> {
+        Ok(Reservation {
+            work: checked_add(4096, checked_mul(128, equations as u64)?)?,
+            bytes: METADATA_BYTES,
+        })
+    }
+
+    pub(crate) fn main_reservation(equations: usize) -> Result<Reservation, Stop> {
+        let r = checked_mul(8, equations as u64)?;
+        let kernel = checked_mul(64 * 9, checked_add(r, 1)?)?;
+        let row_bytes = checked_mul(r, (size_of::<Vec<u64>>() + size_of::<u64>()) as u64)?;
+        let output_bytes = checked_add(
+            checked_mul(8, size_of::<F2BoolPoly>() as u64)?,
+            checked_mul(64, size_of::<F2BoolMono>() as u64)?,
+        )?;
+        Ok(Reservation {
+            work: checked_add(checked_add(4096, checked_mul(1024, r)?)?, kernel)?,
+            bytes: checked_add(row_bytes, output_bytes)?,
+        })
+    }
+
+    pub(crate) fn criterion_reservation(equations: usize) -> Result<Reservation, Stop> {
+        let e = equations as u64;
+        Ok(Reservation {
+            work: checked_add(
+                checked_add(4096, checked_mul(128, e)?)?,
+                checked_mul(1024, checked_add(checked_mul(32, e)?, 1)?)?,
+            )?,
+            bytes: 0,
+        })
+    }
+
+    /// Structural worst-case reservation, not measured work. The F5 permit is
+    /// retained even when constants cause the criterion to be skipped.
+    pub fn required_reservation(equations: usize, engine: Engine) -> Result<Reservation, Stop> {
+        if equations > MAX_EQUATIONS {
+            return Err(Stop::InvalidInput);
+        }
+        let mut total = entry_reservation(equations)?;
+        let main = main_reservation(equations)?;
+        total.work = checked_add(total.work, main.work)?;
+        total.bytes = checked_add(total.bytes, main.bytes)?;
+        if engine == Engine::F5KoszulFrobenius {
+            total.work = checked_add(total.work, criterion_reservation(equations)?.work)?;
+        }
+        Ok(total)
+    }
+
+    pub(crate) struct Gate<'a, F> {
+        pub report: Report,
+        limits: Limits,
+        deadline: Instant,
+        observer: &'a mut F,
+    }
+
+    impl<'a, F: FnMut(&Event) -> Result<(), ()>> Gate<'a, F> {
+        pub(crate) fn new(
+            engine: Engine,
+            degree: u32,
+            limits: Limits,
+            deadline: Instant,
+            observer: &'a mut F,
+        ) -> Self {
+            Self {
+                report: Report {
+                    engine,
+                    degree,
+                    stop: Stop::InvalidInput,
+                    backend_invoked: false,
+                    native_step_complete: false,
+                    criterion_status: CriterionStatus::NotRequested,
+                    reserved: Reservation::default(),
+                    counters: Counters::default(),
+                    columns: 0,
+                    rank: None,
+                    rows: Vec::new(),
+                },
+                limits,
+                deadline,
+                observer,
+            }
+        }
+
+        pub(crate) fn clock(&self) -> Result<(), Stop> {
+            if Instant::now() >= self.deadline {
+                Err(Stop::Deadline)
+            } else {
+                Ok(())
+            }
+        }
+
+        pub(crate) fn reserve(&mut self, next: Reservation) -> Result<(), Stop> {
+            self.clock()?;
+            let work = checked_add(self.report.reserved.work, next.work)?;
+            let bytes = checked_add(self.report.reserved.bytes, next.bytes)?;
+            if work > self.limits.work {
+                return Err(Stop::WorkLimit);
+            }
+            if bytes > self.limits.bytes {
+                return Err(Stop::ByteLimit);
+            }
+            self.report.reserved = Reservation { work, bytes };
+            Ok(())
+        }
+
+        pub(crate) fn emit(&mut self, stage: Stage) -> Result<(), Stop> {
+            self.clock()?;
+            if self.report.counters.attempted_events >= self.limits.events {
+                return Err(Stop::EventLimit);
+            }
+            self.report.counters.attempted_events += 1;
+            let event = Event {
+                stage,
+                reserved: self.report.reserved,
+                counters: self.report.counters,
+            };
+            (self.observer)(&event).map_err(|()| Stop::Observer)?;
+            self.report.counters.acknowledged_events += 1;
+            self.clock()
+        }
+
+        pub(crate) fn prepare(
+            &mut self,
+            polys: &[F2BoolPoly],
+            n_vars: usize,
+        ) -> Result<[u32; MAX_EQUATIONS], Stop> {
+            if self.limits.work > MAX_WORK
+                || self.limits.bytes > MAX_BYTES
+                || self.limits.main_rows > MAX_ROWS as u64
+                || self.limits.events > MAX_EVENTS
+            {
+                return Err(Stop::InvalidLimits);
+            }
+            if n_vars != 3 || polys.len() > MAX_EQUATIONS || !(1..=6).contains(&self.report.degree)
+            {
+                return Err(Stop::InvalidInput);
+            }
+            self.reserve(entry_reservation(polys.len())?)?;
+            let mut degrees = [0; MAX_EQUATIONS];
+            for (i, p) in polys.iter().enumerate() {
+                if p.n_vars != 3
+                    || p.terms.len() > 8
+                    || !p.is_canonical()
+                    || p.terms.iter().any(|m| m.mask & !7 != 0)
+                {
+                    return Err(Stop::InvalidInput);
+                }
+                degrees[i] = p.terms.iter().map(|m| m.degree()).max().unwrap_or(0);
+            }
+            self.emit(Stage::Begin)?;
+            Ok(degrees)
+        }
+
+        fn vec<T>(&mut self, capacity: usize) -> Result<Vec<T>, Stop> {
+            self.clock()?;
+            let bytes = Layout::array::<T>(capacity)
+                .map_err(|_| Stop::Overflow)?
+                .size() as u64;
+            let total = checked_add(self.report.counters.dynamic_layout_bytes, bytes)?;
+            // The fixed metadata envelope is not spendable on dynamic storage.
+            if total > self.report.reserved.bytes.saturating_sub(METADATA_BYTES) {
+                return Err(Stop::ByteLimit);
+            }
+            let mut out = Vec::new();
+            if capacity != 0 {
+                self.report.counters.dynamic_layout_bytes = total;
+                self.report.counters.allocation_requests += 1;
+                out.try_reserve_exact(capacity)
+                    .map_err(|_| Stop::Allocation)?;
+            }
+            Ok(out)
+        }
+
+        pub(crate) fn main(
+            &mut self,
+            polys: &[F2BoolPoly],
+            degrees: &[u32; MAX_EQUATIONS],
+            pruned: &[u8; MAX_EQUATIONS],
+        ) -> Result<(), Stop> {
+            self.reserve(main_reservation(polys.len())?)?;
+            self.report.backend_invoked = true;
+            let mut supports = [0u8; MAX_ROWS];
+            let mut selected = 0usize;
+            let mut union = 0u8;
+            for (i, p) in polys.iter().enumerate() {
+                if degrees[i] > self.report.degree {
+                    continue;
+                }
+                for multiplier in MULTIPLIERS {
+                    if multiplier.count_ones() > self.report.degree - degrees[i] {
+                        continue;
+                    }
+                    if self.report.counters.main_attempts >= self.limits.main_rows {
+                        return Err(Stop::RowLimit);
+                    }
+                    self.emit(Stage::MainCandidate {
+                        generator: i,
+                        multiplier,
+                    })?;
+                    self.report.counters.main_attempts += 1;
+                    let support = product(p, multiplier, false);
+                    if support == 0 {
+                        continue;
+                    }
+                    self.report.counters.nonempty_rows += 1;
+                    if pruned[i] & (1 << multiplier) != 0 {
+                        self.report.counters.pruned_nonempty_rows += 1;
+                        continue;
+                    }
+                    supports[selected] = support;
+                    selected += 1;
+                    self.report.counters.selected_rows += 1;
+                    union |= support;
+                }
+            }
+            self.emit(Stage::Pack)?;
+            let (columns, count) = columns(union);
+            self.report.columns = count;
+            let mut matrix = self.vec::<Vec<u64>>(selected)?;
+            for &support in &supports[..selected] {
+                let mut row = self.vec::<u64>(1)?;
+                row.push(pack(support, &columns, count) as u64);
+                matrix.push(row);
+            }
+            self.emit(Stage::Reduce)?;
+            let rank = echelon_f2_suffix_counted(
+                &mut matrix,
+                count,
+                &mut self.report.counters.reduction_word_xors,
+                true,
+            );
+            self.clock()?;
+            self.emit(Stage::Readback)?;
+            let mut output = self.vec::<F2BoolPoly>(rank)?;
+            for row in &matrix[..rank] {
+                let mut terms = self.vec::<F2BoolMono>(row[0].count_ones() as usize)?;
+                for (c, &mask) in columns[..count].iter().enumerate() {
+                    if row[0] & (1 << c) != 0 {
+                        terms.push(F2BoolMono::from_mask(mask as Mask));
+                    }
+                }
+                output.push(F2BoolPoly { terms, n_vars: 3 });
+            }
+            self.emit(Stage::Finish)?;
+            self.report.rank = Some(rank);
+            self.report.rows = output;
+            self.report.native_step_complete = true;
+            Ok(())
+        }
+
+        pub(crate) fn finish(mut self, result: Result<(), Stop>) -> Report {
+            self.report.stop = match result {
+                Ok(()) => Stop::Complete,
+                Err(stop) => stop,
+            };
+            self.report
+        }
+    }
+
+    pub(crate) fn product(p: &F2BoolPoly, multiplier: u8, plus_one: bool) -> u8 {
+        let mut support = if plus_one { 1u8 << multiplier } else { 0 };
+        for term in &p.terms {
+            support ^= 1u8 << (term.mask as u8 | multiplier);
+        }
+        support
+    }
+
+    pub(crate) fn columns(support: u8) -> ([u8; 8], usize) {
+        let mut columns = [0u8; 8];
+        let mut count = 0;
+        for mask in 0..8u8 {
+            if support & (1 << mask) == 0 {
+                continue;
+            }
+            let mut j = count;
+            while j != 0
+                && mono_key(F2BoolMono::from_mask(columns[j - 1] as Mask))
+                    < mono_key(F2BoolMono::from_mask(mask as Mask))
+            {
+                columns[j] = columns[j - 1];
+                j -= 1;
+            }
+            columns[j] = mask;
+            count += 1;
+        }
+        (columns, count)
+    }
+
+    pub(crate) fn pack(support: u8, columns: &[u8; 8], count: usize) -> u8 {
+        let mut row = 0;
+        for (c, &mask) in columns[..count].iter().enumerate() {
+            if support & (1 << mask) != 0 {
+                row |= 1 << c;
+            }
+        }
+        row
+    }
+
+    /// One serial reduced Macaulay step with explicit K2 resource admission.
+    /// `deadline` is absolute. Callback-owned storage/work is outside the native
+    /// reservation model; callback failure is sticky and returns no final rows.
+    pub fn matrix_f4_f2_bounded<F: FnMut(&Event) -> Result<(), ()>>(
+        polys: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        limits: Limits,
+        deadline: Instant,
+        mut observer: F,
+    ) -> Report {
+        let mut gate = Gate::new(Engine::F4Macaulay, degree, limits, deadline, &mut observer);
+        let result = (|| {
+            let degrees = gate.prepare(polys, n_vars)?;
+            gate.main(polys, &degrees, &[0; MAX_EQUATIONS])
+        })();
+        gate.finish(result)
+    }
+
+    #[cfg(test)]
+    pub(crate) mod tests {
+        use super::*;
+        use std::time::Duration;
+
+        pub(crate) fn limits() -> Limits {
+            Limits {
+                work: MAX_WORK,
+                bytes: MAX_BYTES,
+                main_rows: MAX_ROWS as u64,
+                events: MAX_EVENTS,
+            }
+        }
+
+        pub(crate) fn deadline() -> Instant {
+            Instant::now() + Duration::from_secs(60)
+        }
+
+        pub(crate) fn polynomial(anf: u8) -> F2BoolPoly {
+            F2BoolPoly::from_monos(
+                (0..8)
+                    .filter(|&m| anf & (1 << m) != 0)
+                    .map(|m| F2BoolMono::from_mask(m as Mask))
+                    .collect(),
+                3,
+            )
+        }
+
+        // Independent dense Boolean elimination in raw numeric-mask order;
+        // it does not call the production product/column/packed-row helpers.
+        pub(crate) fn row_space(polys: &[F2BoolPoly]) -> [u8; 8] {
+            let mut rows: Vec<u8> = polys
+                .iter()
+                .map(|p| p.terms.iter().fold(0, |row, m| row ^ (1 << m.mask as u8)))
+                .collect();
+            let mut pivot = 0;
+            let mut result = [0; 8];
+            for c in 0..8 {
+                let Some(found) = (pivot..rows.len()).find(|&r| rows[r] & (1 << c) != 0) else {
+                    continue;
+                };
+                rows.swap(pivot, found);
+                let value = rows[pivot];
+                for (r, row) in rows.iter_mut().enumerate() {
+                    if r != pivot && *row & (1 << c) != 0 {
+                        *row ^= value;
+                    }
+                }
+                pivot += 1;
+            }
+            for &row in &rows[..pivot] {
+                result[row.trailing_zeros() as usize] = row;
+            }
+            result
+        }
+
+        pub(crate) fn oracle(polys: &[F2BoolPoly], degree: u32) -> [u8; 8] {
+            let mut rows = Vec::new();
+            for p in polys {
+                let d = p
+                    .terms
+                    .iter()
+                    .map(|m| m.mask.count_ones())
+                    .max()
+                    .unwrap_or(0);
+                if d > degree {
+                    continue;
+                }
+                for multiplier in 0..8u8 {
+                    if multiplier.count_ones() > degree - d {
+                        continue;
+                    }
+                    let mut coefficients = [false; 8];
+                    for term in &p.terms {
+                        let index = (term.mask as u8 | multiplier) as usize;
+                        coefficients[index] = !coefficients[index];
+                    }
+                    let bits = coefficients
+                        .iter()
+                        .enumerate()
+                        .fold(0, |bits, (m, &value)| bits | (u8::from(value) << m));
+                    rows.push(polynomial(bits));
+                }
+            }
+            row_space(&rows)
+        }
+
+        fn run(polys: &[F2BoolPoly], degree: u32, caps: Limits) -> Report {
+            matrix_f4_f2_bounded(polys, 3, degree, caps, deadline(), |_| Ok(()))
+        }
+
+        pub(crate) fn censored(report: &Report, stop: Stop) {
+            assert_eq!(report.stop, stop);
+            assert!(!report.native_step_complete);
+            assert_eq!(report.rank, None);
+            assert!(report.rows.is_empty());
+        }
+
+        #[test]
+        fn bounded_f4_exhaustive_single_anf_matches_legacy_and_independent_span() {
+            for anf in 0..=255u8 {
+                let input = [polynomial(anf)];
+                for degree in 1..=6 {
+                    let report = run(&input, degree, limits());
+                    assert_eq!(report.stop, Stop::Complete, "anf={anf}, degree={degree}");
+                    assert!(report.native_step_complete);
+                    assert!(report.rows.iter().all(F2BoolPoly::is_canonical));
+                    assert_eq!(row_space(&report.rows), oracle(&input, degree));
+                    let legacy = super::super::matrix_f4_f2(&input, 3, degree).unwrap();
+                    assert_eq!(report.rows, legacy);
+                    assert_eq!(row_space(&report.rows), row_space(&legacy));
+                    assert_eq!(report.rank, Some(report.rows.len()));
+                    assert!(
+                        report.counters.dynamic_layout_bytes + METADATA_BYTES
+                            <= report.reserved.bytes
+                    );
+                }
+            }
+        }
+
+        #[test]
+        fn bounded_f4_multi_generator_and_zero_unit_semantics() {
+            for masks in [
+                vec![],
+                vec![0],
+                vec![1],
+                vec![0, 3, 5],
+                vec![14, 14, 23],
+                vec![255, 41, 129, 1],
+            ] {
+                let input: Vec<_> = masks.into_iter().map(polynomial).collect();
+                let report = run(&input, 4, limits());
+                assert_eq!(report.stop, Stop::Complete);
+                assert_eq!(row_space(&report.rows), oracle(&input, 4));
+                let legacy = super::super::matrix_f4_f2(&input, 3, 4).unwrap();
+                assert_eq!(report.rows, legacy);
+                assert_eq!(row_space(&report.rows), row_space(&legacy));
+            }
+        }
+
+        #[test]
+        fn bounded_f4_maximum_rows_admits_before_candidate_callback() {
+            let input = vec![polynomial(1); MAX_EQUATIONS];
+            let full = run(&input, 6, limits());
+            assert_eq!(full.stop, Stop::Complete);
+            assert_eq!(full.counters.main_attempts, MAX_ROWS as u64);
+            assert_eq!(full.counters.selected_rows, MAX_ROWS as u64);
+            assert!(full.counters.reduction_word_xors > 0);
+            let mut caps = limits();
+            caps.main_rows = MAX_ROWS as u64 - 1;
+            let mut callbacks = 0;
+            let partial = matrix_f4_f2_bounded(&input, 3, 6, caps, deadline(), |event| {
+                if matches!(event.stage, Stage::MainCandidate { .. }) {
+                    callbacks += 1;
+                }
+                Ok(())
+            });
+            censored(&partial, Stop::RowLimit);
+            assert_eq!(callbacks, MAX_ROWS - 1);
+            assert_eq!(partial.counters.main_attempts, callbacks as u64);
+            assert_eq!(partial.counters.selected_rows, callbacks as u64);
+            assert_eq!(partial.counters.dynamic_layout_bytes, 0);
+        }
+
+        #[test]
+        fn bounded_f4_exact_and_one_less_reservations_and_events() {
+            let input = [polynomial(14), polynomial(11)];
+            let required = required_reservation(input.len(), Engine::F4Macaulay).unwrap();
+            let mut caps = limits();
+            caps.work = required.work;
+            caps.bytes = required.bytes;
+            let full = run(&input, 5, caps);
+            assert_eq!(full.stop, Stop::Complete);
+            assert_eq!(full.reserved, required);
+            caps.events = full.counters.attempted_events;
+            assert_eq!(run(&input, 5, caps).stop, Stop::Complete);
+            let mut less = caps;
+            less.events -= 1;
+            censored(&run(&input, 5, less), Stop::EventLimit);
+            less = caps;
+            less.work -= 1;
+            censored(&run(&input, 5, less), Stop::WorkLimit);
+            less = caps;
+            less.bytes -= 1;
+            censored(&run(&input, 5, less), Stop::ByteLimit);
+        }
+
+        #[test]
+        fn bounded_f4_invocation_requires_main_phase_admission() {
+            let input = [polynomial(14)];
+            let entry = entry_reservation(input.len()).unwrap();
+            let required = required_reservation(input.len(), Engine::F4Macaulay).unwrap();
+            for work in [entry.work, required.work - 1] {
+                let mut caps = limits();
+                caps.work = work;
+                let mut seen = Vec::new();
+                let report = matrix_f4_f2_bounded(&input, 3, 5, caps, deadline(), |event| {
+                    seen.push(event.stage);
+                    Ok(())
+                });
+                censored(&report, Stop::WorkLimit);
+                assert_eq!(seen, [Stage::Begin]);
+                assert_eq!(report.reserved, entry);
+                assert!(!report.backend_invoked);
+                assert_eq!(report.counters.main_attempts, 0);
+                assert_eq!(report.counters.allocation_requests, 0);
+            }
+            let mut caps = limits();
+            caps.work = required.work;
+            caps.bytes = required.bytes - 1;
+            let report = run(&input, 5, caps);
+            censored(&report, Stop::ByteLimit);
+            assert!(!report.backend_invoked);
+            caps.bytes += 1;
+            let report = run(&input, 5, caps);
+            assert_eq!(report.stop, Stop::Complete);
+            assert!(report.backend_invoked);
+            assert!(report.counters.main_attempts > 0);
+
+            // Admission is distinct from useful work: the phase may then
+            // encounter its first row cap, or complete an empty rank-zero step.
+            caps.main_rows = 0;
+            let report = run(&input, 5, caps);
+            censored(&report, Stop::RowLimit);
+            assert!(report.backend_invoked);
+            assert_eq!(report.counters.main_attempts, 0);
+            let report = run(&[], 5, limits());
+            assert_eq!(report.stop, Stop::Complete);
+            assert!(report.backend_invoked);
+            assert_eq!(report.rank, Some(0));
+            assert_eq!(report.counters.main_attempts, 0);
+        }
+
+        #[test]
+        fn bounded_f4_strict_input_rejected_before_callbacks() {
+            let good = polynomial(14);
+            let mut wrong_vars = good.clone();
+            wrong_vars.n_vars = 4;
+            let mut high = good.clone();
+            high.terms[0].mask |= 8;
+            let mut duplicate = good.clone();
+            duplicate.terms.push(duplicate.terms[0]);
+            let mut reversed = good.clone();
+            reversed.terms.reverse();
+            let many_terms = F2BoolPoly {
+                terms: vec![F2BoolMono::one(); 9],
+                n_vars: 3,
+            };
+            for input in [
+                vec![wrong_vars],
+                vec![high],
+                vec![duplicate],
+                vec![reversed],
+                vec![many_terms],
+                vec![good.clone(); 62],
+            ] {
+                let report = matrix_f4_f2_bounded(&input, 3, 4, limits(), deadline(), |_| {
+                    panic!("invalid input callback")
+                });
+                censored(&report, Stop::InvalidInput);
+                assert_eq!(report.counters.allocation_requests, 0);
+                assert!(!report.backend_invoked);
+            }
+            for (n_vars, degree) in [(2, 4), (4, 4), (3, 0), (3, 7), (3, u32::MAX)] {
+                let report = matrix_f4_f2_bounded(
+                    std::slice::from_ref(&good),
+                    n_vars,
+                    degree,
+                    limits(),
+                    deadline(),
+                    |_| panic!("invalid shape callback"),
+                );
+                censored(&report, Stop::InvalidInput);
+            }
+            let mut caps = limits();
+            caps.work = u64::MAX;
+            censored(&run(&[good], 4, caps), Stop::InvalidLimits);
+        }
+
+        #[test]
+        fn bounded_f4_observer_failure_and_deadline_never_return_final_rank() {
+            let input = [polynomial(14), polynomial(11)];
+            for stage in [
+                Stage::Begin,
+                Stage::Pack,
+                Stage::Reduce,
+                Stage::Readback,
+                Stage::Finish,
+            ] {
+                let mut refused = false;
+                let report = matrix_f4_f2_bounded(&input, 3, 5, limits(), deadline(), |event| {
+                    assert!(!refused, "callback after refusal");
+                    if event.stage == stage {
+                        refused = true;
+                        Err(())
+                    } else {
+                        Ok(())
+                    }
+                });
+                assert!(refused);
+                censored(&report, Stop::Observer);
+                assert_eq!(
+                    report.counters.attempted_events,
+                    report.counters.acknowledged_events + 1
+                );
+            }
+            let expired = Instant::now();
+            let report = matrix_f4_f2_bounded(&input, 3, 5, limits(), expired, |_| {
+                panic!("expired callback")
+            });
+            censored(&report, Stop::Deadline);
+            let soon = Instant::now() + Duration::from_millis(20);
+            let report = matrix_f4_f2_bounded(&input, 3, 5, limits(), soon, |_| {
+                std::thread::sleep(Duration::from_millis(25));
+                Ok(())
+            });
+            censored(&report, Stop::Deadline);
+            assert!(report.counters.attempted_events <= 1);
+            assert_eq!(
+                report.counters.attempted_events,
+                report.counters.acknowledged_events
+            );
+        }
+
+        #[test]
+        fn bounded_matrix_acknowledged_finish_after_deadline_is_censored() {
+            let input = [polynomial(14), polynomial(11)];
+            for engine in [Engine::F4Macaulay, Engine::F5KoszulFrobenius] {
+                let expires = Instant::now() + Duration::from_secs(1);
+                let mut last = None;
+                let mut observer = |event: &Event| {
+                    last = Some(event.stage);
+                    if event.stage == Stage::Finish {
+                        std::thread::sleep(
+                            expires.saturating_duration_since(Instant::now())
+                                + Duration::from_millis(1),
+                        );
+                    }
+                    Ok(())
+                };
+                let report = match engine {
+                    Engine::F4Macaulay => {
+                        matrix_f4_f2_bounded(&input, 3, 5, limits(), expires, &mut observer)
+                    }
+                    Engine::F5KoszulFrobenius => {
+                        crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2_bounded(
+                            &input,
+                            3,
+                            5,
+                            limits(),
+                            expires,
+                            &mut observer,
+                        )
+                    }
+                };
+                // This must reach the actual terminal callback, not pass by
+                // expiring at entry or an earlier phase on a stalled runner.
+                assert_eq!(last, Some(Stage::Finish));
+                censored(&report, Stop::Deadline);
+                assert!(report.backend_invoked);
+                assert!(report.counters.main_attempts > 0);
+                assert!(report.counters.dynamic_layout_bytes > 0);
+                assert_eq!(
+                    report.counters.attempted_events,
+                    report.counters.acknowledged_events
+                );
+            }
+        }
+    }
+}
+
 // ── Matrix-F4 over the Boolean ring ────────────────────────────────
 
 /// All monomials of degree `≤ deg` over `n_vars` Boolean variables, as
@@ -1416,16 +2255,131 @@ const MAX_F4_COLS: usize = 40_000;
 /// Macaulay size caps, overridable for experiments through the
 /// `F4_F2_MAX_ROWS` / `F4_F2_MAX_COLS` environment variables.
 fn max_f4_rows() -> usize {
+    if next_kernels() {
+        static ROWS: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+        return *ROWS.get_or_init(read_max_f4_rows);
+    }
+    read_max_f4_rows()
+}
+fn read_max_f4_rows() -> usize {
     std::env::var("F4_F2_MAX_ROWS")
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(MAX_F4_ROWS)
 }
 fn max_f4_cols() -> usize {
+    if next_kernels() {
+        static COLS: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+        return *COLS.get_or_init(read_max_f4_cols);
+    }
+    read_max_f4_cols()
+}
+fn read_max_f4_cols() -> usize {
     std::env::var("F4_F2_MAX_COLS")
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(MAX_F4_COLS)
+}
+
+// ── Next kernels (`inherited-f4-next`) ─────────────────────────────
+//
+// The `inherited-f4-next` solver plug-in runs the inherited engine with
+// this per-thread switch on.  Every place it is read chooses between two
+// implementations of the *same* computation: the same Macaulay rows and
+// column layout, the same eliminations in the same order, the same word
+// XORs charged.  Only how the work is done changes — SIMD row XORs in the
+// inherited basis's re-reduction, the specialisation's `bitop/v1` tally
+// taken in the rewrite pass instead of a pre-pass over the same words,
+// the Four Russians table buffer reused across pivot blocks (only each
+// table's zero entry is cleared), the exact fused and streamed Macaulay
+// builders that are off by default, and environment variables read once
+// instead of per node.  So every verdict, solution, split and `ops` count
+// is that of `inherited-f4`; the pinning tests check it.  Off, the engine
+// is unchanged.  A parallel split (`KIC_SOLVE_PARALLEL_DEPTH`) runs its
+// worker threads with the switch off: still exact, just the old kernels.
+
+thread_local! {
+    static NEXT_KERNELS: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Whether the next kernels are switched on for this thread.
+#[inline]
+pub(crate) fn next_kernels() -> bool {
+    NEXT_KERNELS.with(std::cell::Cell::get)
+}
+
+/// Run `f` with the next kernels switched `on` for this thread, restoring
+/// the previous setting afterwards (also on unwind).
+pub fn with_next_kernels<T>(on: bool, f: impl FnOnce() -> T) -> T {
+    struct Restore(bool, Option<bool>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            NEXT_KERNELS.with(|c| c.set(self.0));
+            crate::cryptanalysis::gf2_elim::set_reuse_table_thread(self.1);
+        }
+    }
+    let previous = NEXT_KERNELS.with(|c| c.replace(on));
+    let previous_reuse =
+        crate::cryptanalysis::gf2_elim::set_reuse_table_thread(if on { Some(true) } else { None });
+    let _restore = Restore(previous, previous_reuse);
+    f()
+}
+
+// ── Batched rewrite (`inherited-f4-batched`) ──────────────────────
+//
+// Under the inherited engine every specialisation rewrites every kept row
+// of every basis into the child's column layout at once (the eager
+// rewrite).  Between two splits a node specialises several times — the
+// split variable on entry, then each variable its tail forces — and a node
+// that is refuted or reaches a leaf never reads most of its rows at all, so
+// most of those rewrites are overwritten by the next one or never read.
+// With this per-thread switch on, a specialisation leaves its kept rows in
+// the layout they were last written in; a row is rewritten when something
+// reads it (a pivot a displaced row reduces against, a tail row, a
+// completion or closure step) and, at a split, every row still stale is
+// rewritten once, through the composition of every step since it was last
+// written, before the two children share the basis
+// (`ReducedBasis::materialise_shared`).  Each such rewrite runs the eager
+// kernel through the composed map and is charged exactly as the eager
+// rewrite charges one row.  The rows are the same polynomials in the same
+// order with the same pivots, so every reduction, tail, verdict, root and
+// tree statistic is that of the default path; only the specialisation
+// word count drops, by the rewrites no longer done.  Off by default.
+
+thread_local! {
+    static BATCHED_REWRITE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Whether the batched rewrite is switched on for this thread.
+#[inline]
+pub(crate) fn batched_rewrite() -> bool {
+    BATCHED_REWRITE.with(std::cell::Cell::get)
+}
+
+/// Run `f` with the batched rewrite switched `on` for this thread,
+/// restoring the previous setting afterwards (also on unwind).
+pub fn with_batched_rewrite<T>(on: bool, f: impl FnOnce() -> T) -> T {
+    struct Restore(bool);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            BATCHED_REWRITE.with(|c| c.set(self.0));
+        }
+    }
+    let _restore = Restore(BATCHED_REWRITE.with(|c| c.replace(on)));
+    f()
+}
+
+/// An environment switch that the next kernels read once per process and
+/// the default path reads per call, as it always has.
+fn env_is(
+    var: &'static str,
+    cache: &'static std::sync::OnceLock<Option<String>>,
+) -> Option<String> {
+    if next_kernels() {
+        cache.get_or_init(|| std::env::var(var).ok()).clone()
+    } else {
+        std::env::var(var).ok()
+    }
 }
 
 /// **Matrix-F4 step over `F_2`**: multiply every input polynomial by
@@ -2831,7 +3785,7 @@ pub(crate) fn build_inherited_macaulay_support_local(
     }
     let rows_started = profiling.then(std::time::Instant::now);
     let rows_result = (|| {
-        if F4_SUPPORT_LOCAL_STREAM.load(Relaxed) {
+        if F4_SUPPORT_LOCAL_STREAM.load(Relaxed) || next_kernels() {
             support_local_rows_stream(polys, n_vars, degree, multiplier_mask, max_f4_rows())
         } else {
             let mut rows_monos: Vec<Vec<Mask>> = Vec::new();
@@ -2862,7 +3816,7 @@ pub(crate) fn build_inherited_macaulay_support_local(
         return Some((Vec::new(), Vec::new()));
     }
     let columns_started = profiling.then(std::time::Instant::now);
-    let columns_result = if F4_SUPPORT_LOCAL_BITMAP_COLUMNS.load(Relaxed) {
+    let columns_result = if F4_SUPPORT_LOCAL_BITMAP_COLUMNS.load(Relaxed) || next_kernels() {
         support_local_bitmap_columns(&rows_monos, n_vars, degree)
             .or_else(|| macaulay_columns(&rows_monos))
     } else {
@@ -3026,7 +3980,9 @@ fn build_inherited_macaulay_with_layout(
         let layout_key = (multiplier_mask, degree, false);
         let cached = cached_f4_layout(layout_key);
         if let Some(layout) = cached {
-            let matrix = if F4_DIRECT_FUSED_PACK.load(std::sync::atomic::Ordering::Relaxed) {
+            let matrix = if F4_DIRECT_FUSED_PACK.load(std::sync::atomic::Ordering::Relaxed)
+                || next_kernels()
+            {
                 pack_polynomials_nested_fused::<true>(
                     polys,
                     n_vars,
@@ -3407,7 +4363,7 @@ fn build_macaulay_with_multiplier_mask(
     // cold layouts and all criterion-pruned rows.
     if reuse_layout
         && criterion == RowCriterion::None
-        && F4_DIRECT_FUSED_PACK.load(std::sync::atomic::Ordering::Relaxed)
+        && (F4_DIRECT_FUSED_PACK.load(std::sync::atomic::Ordering::Relaxed) || next_kernels())
     {
         let layout_key = (multiplier_mask, degree, false);
         if let Some(layout) = cached_f4_layout(layout_key) {
@@ -3496,7 +4452,8 @@ fn build_macaulay_packed<P: Default>(
     criterion: RowCriterion,
     pack: impl Fn(&[Vec<Mask>], &F4ColumnLayout, bool) -> Option<P>,
 ) -> Option<BuiltMacaulay<P>> {
-    let subprofile = std::env::var("KIC_F4_BUILD_SUBPROFILE").as_deref() == Ok("1");
+    static SUBPROFILE: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+    let subprofile = env_is("KIC_F4_BUILD_SUBPROFILE", &SUBPROFILE).as_deref() == Some("1");
     let rows_started = subprofile.then(std::time::Instant::now);
     let f5 = match criterion {
         RowCriterion::None => None,
@@ -3902,6 +4859,71 @@ fn charge_word_ops(word_ops: u64) {
 /// test binary running its cases in parallel.
 pub fn f4_word_ops_thread() -> u64 {
     F4_WORD_OPS_THREAD.with(|c| c.get())
+}
+
+/// The per-thread work counters a solve charges, read together: what a
+/// parallel solve's worker did, handed back to the thread that asked.
+#[derive(Clone, Copy, Default)]
+struct ThreadWork {
+    f4_word_ops: u64,
+    harvest: (u64, u64),
+    rows_generated: (u64, u64),
+    root_elimination: u64,
+    gate_first: (u64, u64),
+    tally: bitop_tally::Tally,
+}
+
+impl ThreadWork {
+    fn now() -> Self {
+        ThreadWork {
+            f4_word_ops: f4_word_ops_thread(),
+            harvest: linear_harvest_counts_thread(),
+            rows_generated: crate::cryptanalysis::inherited_f4::f4_rows_generated_thread(),
+            root_elimination: crate::cryptanalysis::inherited_f4::f4_root_elimination_thread(),
+            gate_first: gate_first_skips_thread(),
+            tally: bitop_tally::snapshot(),
+        }
+    }
+
+    /// The work done between `before` and now on this thread.
+    fn since(before: Self) -> Self {
+        let now = Self::now();
+        let sub = |a: (u64, u64), b: (u64, u64)| (a.0.wrapping_sub(b.0), a.1.wrapping_sub(b.1));
+        ThreadWork {
+            f4_word_ops: now.f4_word_ops.wrapping_sub(before.f4_word_ops),
+            harvest: sub(now.harvest, before.harvest),
+            rows_generated: sub(now.rows_generated, before.rows_generated),
+            root_elimination: now.root_elimination.wrapping_sub(before.root_elimination),
+            gate_first: sub(now.gate_first, before.gate_first),
+            tally: now.tally.since(before.tally),
+        }
+    }
+
+    /// Add `self` to this thread's counters.  The process-wide word-op
+    /// total already holds it: the worker charged it there.
+    fn credit(self) {
+        F4_WORD_OPS_THREAD.with(|c| c.set(c.get().wrapping_add(self.f4_word_ops)));
+        LINEAR_HARVEST_COUNTS.with(|c| {
+            let (a, b) = c.get();
+            c.set((
+                a.wrapping_add(self.harvest.0),
+                b.wrapping_add(self.harvest.1),
+            ));
+        });
+        crate::cryptanalysis::inherited_f4::credit_rows_generated(
+            self.rows_generated.0,
+            self.rows_generated.1,
+        );
+        crate::cryptanalysis::inherited_f4::credit_root_elimination(self.root_elimination);
+        GATE_FIRST_SKIPS.with(|c| {
+            let (a, b) = c.get();
+            c.set((
+                a.wrapping_add(self.gate_first.0),
+                b.wrapping_add(self.gate_first.1),
+            ));
+        });
+        bitop_tally::credit(self.tally);
+    }
 }
 
 pub(crate) fn rref_f2(matrix: &mut [Vec<u64>], n_cols: usize) -> usize {
@@ -4369,7 +5391,8 @@ fn legacy_rref_kernel() -> bool {
 // engine counts: the row echelon form of a root went through the Four
 // Russians kernel of `gf2_elim` (before, the column-at-a-time kernel's word
 // XORs), and a child asked the node oracle before specialising its bases
-// (before, after).  Committed records made before then charge the old
+// (before, after); the same change added the F6-IC gate's partial support
+// refutation, which the pre-#1646 gate did not have.  Committed records made before then charge the old
 // accounting; the replay audit turns this on for them (`ecbench::legacy`).
 // Per thread.
 thread_local! {
@@ -4381,6 +5404,11 @@ thread_local! {
 /// `false` restores the normal choice.
 pub fn set_legacy_pre_1646(on: bool) {
     LEGACY_PRE_1646.with(|c| c.set(on));
+}
+
+/// Whether [`set_legacy_pre_1646`] is in force on this thread.
+pub(crate) fn legacy_pre_1646_active() -> bool {
+    LEGACY_PRE_1646.with(|c| c.get())
 }
 
 /// Reduced row echelon form, which is unique: whichever kernel runs, the
@@ -5514,7 +6542,8 @@ fn reduce_system(
 /// A diagnostic for probes that need the real node systems (row-space
 /// checks, criterion counts) rather than a synthetic corpus; off by default.
 fn dump_node_system(system: &[F2BoolPoly], n_vars: usize, engine: SolverEngine) {
-    let Ok(path) = std::env::var("KIC_F4_NODE_DUMP") else {
+    static NODE_DUMP: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+    let Some(path) = env_is("KIC_F4_NODE_DUMP", &NODE_DUMP) else {
         return;
     };
     use std::io::Write;
@@ -5697,6 +6726,28 @@ impl InheritedBases {
             p.specialise_word_ops += total.specialise_word_ops;
         });
         (Self { bases }, child.system().clone())
+    }
+
+    /// Under the batched rewrite ([`with_batched_rewrite`]): bring every
+    /// basis's rows into the node's layout before the children share them,
+    /// charged in the stage unit as a specialisation's rewrite is, and its
+    /// wall time to the build phase.  Nothing to do otherwise.
+    fn materialise_for_split(&mut self) {
+        if self.bases.is_empty() || !batched_rewrite() {
+            return;
+        }
+        let started = std::time::Instant::now();
+        let mut total = InheritCost::default();
+        for b in &mut self.bases {
+            b.materialise_shared(&mut total);
+        }
+        let word_ops = total.word_ops();
+        charge_word_ops(word_ops);
+        f4_profile_add(|p| {
+            p.build_ns += started.elapsed().as_nanos();
+            p.word_ops += word_ops;
+            p.specialise_word_ops += total.specialise_word_ops;
+        });
     }
 }
 
@@ -6103,13 +7154,17 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
     if LEGACY_NO_LINEAR_HARVEST.with(|c| c.get()) {
         return None;
     }
-    if let Some(v) = LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
-        return v;
+    let chosen = match LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
+        Some(v) => v,
+        None => *ENV.get_or_init(|| match std::env::var("KIC_LINEAR_HARVEST") {
+            Err(_) => Some(LINEAR_HARVEST_DEFAULT),
+            Ok(s) => parse_linear_harvest(&s),
+        }),
+    };
+    if chosen == Some(LINEAR_HARVEST_DEFAULT) && LEGACY_HARVEST_R3.with(|c| c.get()) {
+        return Some(LINEAR_HARVEST_R3);
     }
-    *ENV.get_or_init(|| match std::env::var("KIC_LINEAR_HARVEST") {
-        Err(_) => Some(LINEAR_HARVEST_DEFAULT),
-        Ok(s) => parse_linear_harvest(&s),
-    })
+    chosen
 }
 
 // The replay audit's view of a record made before the harvest was on by
@@ -6118,6 +7173,21 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
 // solve.  Per thread.
 thread_local! {
     static LEGACY_NO_LINEAR_HARVEST: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+// The replay audit's view of a record made while the harvest default was
+// round 3 item 02's `gpv OR rank >= 331` gate ([`LINEAR_HARVEST_R3`]), before
+// repair R8 (`59fcca75d4`, 2026-10-26) narrowed the default to the rank gate:
+// wherever the current default is chosen, the R3 gate is used instead.  An
+// explicit `gpv`, `every` or `off` choice is untouched.  Per thread.
+thread_local! {
+    static LEGACY_HARVEST_R3: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Count the default harvest as round 3 item 02 shipped it (before repair
+/// R8); `false` restores the current default.
+pub fn set_legacy_harvest_r3(on: bool) {
+    LEGACY_HARVEST_R3.with(|c| c.set(on));
 }
 
 /// Count as the engine did before the harvest was the default; `false`
@@ -6316,6 +7386,26 @@ fn reduce_inherited(
                     take_lane_root(system, d, support_local)
                 } else {
                     None
+                };
+                // Prefix-cached root (`KIC_F4_PREFIX_ROOT=1`, off by
+                // default): the first reduction of a solve whose leading
+                // generators the decomposer marked target-free.  Exact; see
+                // `inherited_f4::prefix`.
+                let prebuilt = match prebuilt {
+                    Some(root) => Some(root),
+                    None if rounds == 0
+                        && stats.reductions == 1
+                        && crate::cryptanalysis::inherited_f4::prefix_root_enabled() =>
+                    {
+                        ReducedBasis::from_system_with_prefix(
+                            system,
+                            crate::cryptanalysis::inherited_f4::prefix_hint(),
+                            n_vars,
+                            d,
+                            support_local,
+                        )
+                    }
+                    None => None,
                 };
                 let built = match prebuilt {
                     Some(root) => Some(root),
@@ -6630,12 +7720,35 @@ fn solve_with_policy(
     policy: InheritPolicy,
     accept: impl FnMut(Mask) -> bool,
 ) -> (Vec<Mask>, SolveStats) {
-    solve_with_policy_and_oracle(equations, n_vars, opts, policy, accept, |_, _| {
-        NodeOracleDecision::Continue
-    })
+    let depth = PARALLEL_DEPTH_OVERRIDE
+        .with(|c| c.get())
+        .unwrap_or_else(parallel_depth);
+    let saved = PARALLEL_LEVELS.with(|c| c.replace(depth));
+    let result =
+        solve_with_policy_and_oracle_inner(equations, n_vars, opts, policy, accept, |_, _| {
+            NodeOracleDecision::Continue
+        });
+    PARALLEL_LEVELS.with(|c| c.set(saved));
+    result
 }
 
 fn solve_with_policy_and_oracle(
+    equations: &[F2BoolPoly],
+    n_vars: usize,
+    opts: &SolveOptions,
+    policy: InheritPolicy,
+    accept: impl FnMut(Mask) -> bool,
+    node_oracle: impl FnMut(&[Option<bool>], Mask) -> NodeOracleDecision,
+) -> (Vec<Mask>, SolveStats) {
+    // A node oracle runs on the calling thread only: no parallel split.
+    let saved = PARALLEL_LEVELS.with(|c| c.replace(0));
+    let result =
+        solve_with_policy_and_oracle_inner(equations, n_vars, opts, policy, accept, node_oracle);
+    PARALLEL_LEVELS.with(|c| c.set(saved));
+    result
+}
+
+fn solve_with_policy_and_oracle_inner(
     equations: &[F2BoolPoly],
     n_vars: usize,
     opts: &SolveOptions,
@@ -6667,6 +7780,152 @@ fn solve_with_policy_and_oracle(
         Vec::new(),
     );
     (out, stats)
+}
+
+thread_local! {
+    /// Split levels left that run their two children on separate threads
+    /// ([`solve_children_parallel`]); set from `KIC_SOLVE_PARALLEL_DEPTH` by
+    /// a solve without a node oracle, zero otherwise.
+    static PARALLEL_LEVELS: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+    static PARALLEL_DEPTH_OVERRIDE: std::cell::Cell<Option<u32>> = const { std::cell::Cell::new(None) };
+}
+
+/// Override `KIC_SOLVE_PARALLEL_DEPTH` on this thread (`None` restores it).
+pub fn set_parallel_depth(depth: Option<u32>) {
+    PARALLEL_DEPTH_OVERRIDE.with(|c| c.set(depth));
+}
+
+/// `KIC_SOLVE_PARALLEL_DEPTH=k` runs the first `k` split levels of a solve
+/// without a node oracle as `2^k` independent subtrees in parallel; `0`
+/// (the default) keeps the solve on one thread.  Read once per process.
+///
+/// A parallel child builds its bases from scratch rather than specialising
+/// its parent's (the inherited bases are single-threaded), so the counted
+/// work differs from the sequential solve's and a run with it set is not a
+/// stage-unit measurement; ecbench refuses `KIC_*` overrides.  Roots,
+/// their order and the accepted root are the sequential solve's.
+fn parallel_depth() -> u32 {
+    static DEPTH: std::sync::OnceLock<u32> = std::sync::OnceLock::new();
+    *DEPTH.get_or_init(|| {
+        std::env::var("KIC_SOLVE_PARALLEL_DEPTH")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(0)
+    })
+}
+
+/// A parallel child accepts no root itself (the merge does); a named
+/// function, not a closure, so the recursion instantiates one `solve_rec`.
+fn accept_none(_: Mask) -> bool {
+    false
+}
+
+/// A parallel child runs without a node oracle.
+fn no_oracle(_: &[Option<bool>], _: Mask) -> NodeOracleDecision {
+    NodeOracleDecision::Continue
+}
+
+/// Sum `child`'s counters into `stats`: the work of a subtree solved apart.
+fn absorb_stats(stats: &mut SolveStats, child: &SolveStats) {
+    stats.reductions += child.reductions;
+    stats.infeasible_branches += child.infeasible_branches;
+    stats.propagations += child.propagations;
+    stats.splits += child.splits;
+    stats.tail_enumerations += child.tail_enumerations;
+    stats.tail_assignments_tested += child.tail_assignments_tested;
+    stats.deferred_splits += child.deferred_splits;
+    stats.exhausted |= child.exhausted;
+    stats.unsupported |= child.unsupported;
+    stats.max_degree_built = stats.max_degree_built.max(child.max_degree_built);
+    stats.oversize += child.oversize;
+    stats.eliminated += child.eliminated;
+    stats.geometric_refutations += child.geometric_refutations;
+    stats.geometric_witnesses += child.geometric_witnesses;
+}
+
+/// The two children of a split, each solved as an independent root on its
+/// own thread, then merged in the sequential order: the `false` subtree's
+/// roots before the `true` subtree's, each offered to `accept` in turn and
+/// the solve stopped at the first it accepts, as the sequential recursion
+/// would have stopped there.  A child sees no node oracle and accepts
+/// nothing itself, so it explores its whole subtree; the merge decides.
+#[allow(clippy::too_many_arguments)]
+fn solve_children_parallel(
+    system: &[F2BoolPoly],
+    canonical: bool,
+    original: &[F2BoolPoly],
+    assignment: &[Option<bool>],
+    free: usize,
+    n_vars: usize,
+    opts: &SolveOptions,
+    policy: InheritPolicy,
+    stats: &mut SolveStats,
+    out: &mut Vec<Mask>,
+    accept: &mut impl FnMut(Mask) -> bool,
+    stop: &mut bool,
+    defined: &[(u32, Mask, bool)],
+) {
+    let levels = PARALLEL_LEVELS.with(|c| c.get());
+    let caller = std::thread::current().id();
+    let budget = opts.node_budget.saturating_sub(stats.reductions);
+    let run = |value: bool| {
+        bitop_tally::word_ops((assignment.len() as u64).div_ceil(8));
+        let mut branch = assignment.to_vec();
+        branch[free] = Some(value);
+        let specialised: Vec<F2BoolPoly> = system
+            .iter()
+            .map(|p| substitute_in_solve(p, free as u32, value, canonical))
+            .collect();
+        let saved = PARALLEL_LEVELS.with(|c| c.replace(levels - 1));
+        let before = ThreadWork::now();
+        let child_opts = SolveOptions {
+            node_budget: budget,
+            ..*opts
+        };
+        let mut child_stats = SolveStats::default();
+        let mut child_out = Vec::new();
+        let mut child_stop = false;
+        solve_rec(
+            specialised,
+            canonical,
+            original,
+            branch,
+            n_vars,
+            &child_opts,
+            policy,
+            &mut child_stats,
+            &mut child_out,
+            &mut accept_none,
+            &mut no_oracle,
+            &mut child_stop,
+            None,
+            defined.to_vec(),
+        );
+        let work = ThreadWork::since(before);
+        PARALLEL_LEVELS.with(|c| c.set(saved));
+        let elsewhere = std::thread::current().id() != caller;
+        (child_stats, child_out, elsewhere.then_some(work))
+    };
+    let (low, high) = rayon::join(|| run(false), || run(true));
+    for (child_stats, child_out, work) in [low, high] {
+        absorb_stats(stats, &child_stats);
+        if let Some(work) = work {
+            work.credit();
+        }
+        if *stop || out.len() >= opts.max_solutions {
+            continue;
+        }
+        for pt in child_out {
+            if out.len() >= opts.max_solutions {
+                break;
+            }
+            out.push(pt);
+            if accept(pt) {
+                *stop = true;
+                break;
+            }
+        }
+    }
 }
 
 /// `KIC_F4_EARLY_ORACLE=0` makes a child specialise its bases before asking
@@ -6994,8 +8253,27 @@ fn solve_rec(
                 }
             }
         }
+        Some(free) if PARALLEL_LEVELS.with(|c| c.get()) > 0 => {
+            stats.splits += 1;
+            solve_children_parallel(
+                &system,
+                canonical,
+                original,
+                &assignment,
+                free,
+                n_vars,
+                opts,
+                policy,
+                stats,
+                out,
+                accept,
+                stop,
+                &defined,
+            );
+        }
         Some(free) => {
             stats.splits += 1;
+            bases.materialise_for_split();
             for value in [false, true] {
                 bitop_tally::word_ops((assignment.len() as u64).div_ceil(8));
                 let mut branch = assignment.clone();
@@ -8508,6 +9786,371 @@ mod tests {
         systems
     }
 
+    /// The 33 systems the next-kernel pinning test fixes: the word-XOR
+    /// probe's 24 sparse ones and 9 dense random quadratic systems of 12, 14
+    /// and 16 unknowns.  Shared with the batched-rewrite pinning test.
+    fn next_kernels_pin_systems() -> Vec<(Vec<F2BoolPoly>, usize)> {
+        let mut systems = inherited_f4_word_xor_probe_systems();
+        let mut seed = 0x0dd5_eed0_f4f4_9e37u64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        for trial in 0..9 {
+            let n_vars = 12 + 2 * (trial % 3);
+            let system: Vec<F2BoolPoly> = (0..n_vars)
+                .map(|_| {
+                    let mut monos = Vec::new();
+                    for i in 0..n_vars {
+                        for j in i..n_vars {
+                            if next() % 2 == 0 {
+                                monos.push(F2BoolMono::from_mask(mask_from64(
+                                    (1u64 << i) | (1u64 << j),
+                                )));
+                            }
+                        }
+                    }
+                    if next() % 2 == 0 {
+                        monos.push(F2BoolMono::from_mask(0));
+                    }
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            systems.push((system, n_vars));
+        }
+        systems
+    }
+
+    /// **`inherited-f4-next` is `inherited-f4`, faster.**  The next kernels
+    /// ([`with_next_kernels`]) must leave every decision and every counted
+    /// word XOR where the default kernels put them: the same roots, the same
+    /// tree (reductions, splits, propagations, refuted branches, eliminated
+    /// variables, degree reached) and the same `f4_word_ops_thread` delta, on
+    /// the determinism probe's small sparse systems (support-local roots,
+    /// linear elimination, degree drops) and on dense random quadratic
+    /// systems of the oracle's shape (12 to 16 unknowns, as many equations,
+    /// satisfiable and not; their roots reach the Four Russians kernel).
+    /// Each system is solved twice per mode on a fresh thread, cold and then
+    /// with the thread's layout caches warm, so both builder paths are pinned.
+    #[test]
+    fn next_kernels_leave_decisions_and_word_xors_unchanged() {
+        let systems = next_kernels_pin_systems();
+        type Run = (Vec<Mask>, [usize; 7], u32, bool, u64);
+        let solve_twice = |system: &[F2BoolPoly], n_vars: usize, on: bool| -> Vec<Run> {
+            let system = system.to_vec();
+            std::thread::spawn(move || {
+                (0..2)
+                    .map(|_| {
+                        let opts = SolveOptions {
+                            max_solutions: 1 << 12,
+                            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                            ..SolveOptions::default()
+                        };
+                        let before = f4_word_ops_thread();
+                        let (mut roots, st) =
+                            with_next_kernels(on, || solve_boolean_system(&system, n_vars, &opts));
+                        assert!(!next_kernels(), "the switch is restored");
+                        let ops = f4_word_ops_thread() - before;
+                        roots.sort_unstable();
+                        (
+                            roots,
+                            [
+                                st.reductions,
+                                st.infeasible_branches,
+                                st.propagations,
+                                st.splits,
+                                st.eliminated,
+                                st.oversize,
+                                st.tail_enumerations,
+                            ],
+                            st.max_degree_built,
+                            st.exhausted,
+                            ops,
+                        )
+                    })
+                    .collect()
+            })
+            .join()
+            .unwrap()
+        };
+        let mut solved = 0;
+        let mut refuted = 0;
+        for (k, (system, n_vars)) in systems.iter().enumerate() {
+            let old = solve_twice(system, *n_vars, false);
+            let new = solve_twice(system, *n_vars, true);
+            assert_eq!(
+                old[0], old[1],
+                "system {k}: the default path is deterministic"
+            );
+            assert_eq!(
+                old, new,
+                "system {k} ({n_vars} unknowns): next kernels diverge"
+            );
+            for &point in &old[0].0 {
+                assert!(vanish_at(system, point), "system {k}: a root solves it");
+            }
+            if old[0].0.is_empty() {
+                refuted += 1;
+            } else {
+                solved += 1;
+            }
+        }
+        assert!(solved > 0 && refuted > 0, "both outcomes are pinned");
+    }
+
+    /// The 41 systems the batched-rewrite tests use: the next-kernel pin
+    /// systems and eight dense random quadratic systems of 12, 14, 16 and
+    /// 20 unknowns.
+    fn batched_rewrite_pin_systems() -> Vec<(Vec<F2BoolPoly>, usize)> {
+        let mut systems = next_kernels_pin_systems();
+        let mut seed = 0xba7c_4ed0_f4f4_2026u64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        for n_vars in [12usize, 14, 16, 20, 12, 14, 16, 20] {
+            let system: Vec<F2BoolPoly> = (0..n_vars)
+                .map(|_| {
+                    let mut monos = Vec::new();
+                    for i in 0..n_vars {
+                        for j in i..n_vars {
+                            if next() % 2 == 0 {
+                                monos.push(F2BoolMono::from_mask(mask_from64(
+                                    (1u64 << i) | (1u64 << j),
+                                )));
+                            }
+                        }
+                    }
+                    if next() % 2 == 0 {
+                        monos.push(F2BoolMono::from_mask(0));
+                    }
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            systems.push((system, n_vars));
+        }
+        systems
+    }
+
+    /// **The batched mode's counted cost is pinned.**  Per system of
+    /// [`batched_rewrite_pin_systems`], solved cold and then warm on a fresh
+    /// thread under `inherited-f4-batched` (next kernels on, batched rewrite
+    /// on): the stage unit (`f4_word_ops_thread`), the `bitop/v1` word
+    /// operations and hash probes.  The figures are those of the version
+    /// committed in 1da7694876; a change that is only meant to make the
+    /// batched mode faster must leave every one of them where it is.
+    #[test]
+    fn batched_rewrite_counts_are_pinned() {
+        let systems = batched_rewrite_pin_systems();
+        let mut got: Vec<[u64; 6]> = Vec::new();
+        for (system, n_vars) in &systems {
+            let system = system.clone();
+            let n_vars = *n_vars;
+            got.push(
+                std::thread::spawn(move || {
+                    let mut out = [0u64; 6];
+                    for pass in 0..2 {
+                        let opts = SolveOptions {
+                            max_solutions: 1 << 12,
+                            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                            ..SolveOptions::default()
+                        };
+                        let before = f4_word_ops_thread();
+                        let tally = bitop_tally::snapshot();
+                        let _ = with_next_kernels(true, || {
+                            with_batched_rewrite(true, || {
+                                solve_boolean_system(&system, n_vars, &opts)
+                            })
+                        });
+                        let t = bitop_tally::snapshot().since(tally);
+                        out[3 * pass] = f4_word_ops_thread() - before;
+                        out[3 * pass + 1] = t.word_ops;
+                        out[3 * pass + 2] = t.hash_probes;
+                    }
+                    out
+                })
+                .join()
+                .unwrap(),
+            );
+        }
+        assert_eq!(got.len(), BATCHED_PIN.len(), "one pinned row per system");
+        for (k, (g, want)) in got.iter().zip(BATCHED_PIN).enumerate() {
+            assert_eq!(g, want, "system {k}: the batched mode's counted cost moved");
+        }
+    }
+
+    /// Per system: (ops, bitop word ops, hash probes) cold, then warm.
+    const BATCHED_PIN: &[[u64; 6]] = &[
+        [9, 861, 42, 9, 464, 42],                               // system 0
+        [0, 33, 0, 0, 33, 0],                                   // system 1
+        [67, 2612, 186, 67, 1679, 186],                         // system 2
+        [72, 3939, 213, 72, 2988, 207],                         // system 3
+        [20, 1057, 54, 20, 659, 54],                            // system 4
+        [18, 624, 50, 18, 359, 50],                             // system 5
+        [36, 2185, 137, 36, 1555, 123],                         // system 6
+        [0, 32, 0, 0, 32, 0],                                   // system 7
+        [85, 1309, 30, 85, 909, 30],                            // system 8
+        [10, 726, 39, 10, 461, 39],                             // system 9
+        [439, 9017, 183, 439, 8479, 183],                       // system 10
+        [0, 40, 0, 0, 40, 0],                                   // system 11
+        [5, 667, 16, 5, 435, 3],                                // system 12
+        [9, 1166, 89, 9, 634, 89],                              // system 13
+        [0, 31, 0, 0, 31, 0],                                   // system 14
+        [210, 6399, 131, 210, 5583, 125],                       // system 15
+        [134, 3635, 39, 134, 2885, 39],                         // system 16
+        [0, 35, 0, 0, 35, 0],                                   // system 17
+        [0, 24, 0, 0, 24, 0],                                   // system 18
+        [19, 1515, 78, 19, 1110, 73],                           // system 19
+        [19, 607, 24, 19, 343, 24],                             // system 20
+        [6, 661, 10, 6, 416, 0],                                // system 21
+        [2, 272, 0, 2, 272, 0],                                 // system 22
+        [66, 3172, 238, 66, 2503, 238],                         // system 23
+        [91395, 539076, 12034, 91395, 490580, 6734],            // system 24
+        [314531, 1583456, 21212, 314531, 1498432, 11840],       // system 25
+        [1229773, 5456540, 36958, 1229773, 5292282, 20394],     // system 26
+        [87808, 522910, 12098, 87808, 474200, 6692],            // system 27
+        [315797, 1575761, 21200, 315797, 1491319, 11744],       // system 28
+        [1242998, 5517073, 35190, 1242998, 5364193, 19386],     // system 29
+        [82368, 477063, 11614, 82368, 429519, 6538],            // system 30
+        [314161, 1591957, 21764, 314161, 1503889, 12128],       // system 31
+        [1248547, 5598325, 37458, 1248547, 5433799, 20412],     // system 32
+        [84306, 494873, 12166, 84306, 444869, 6902],            // system 33
+        [306018, 1532455, 21784, 306018, 1447337, 11808],       // system 34
+        [1289286, 5716851, 35929, 1289286, 5563652, 19589],     // system 35
+        [16577314, 55853216, 86434, 16577314, 55478097, 46332], // system 36
+        [86284, 500240, 11786, 86284, 452358, 6580],            // system 37
+        [311365, 1582564, 21352, 311365, 1498046, 11744],       // system 38
+        [1230436, 5434112, 36910, 1230436, 5273676, 19998],     // system 39
+        [16701321, 56008489, 85250, 16701321, 55635964, 46046], // system 40
+    ];
+
+    /// **`inherited-f4-batched` decides exactly as `inherited-f4`, with no
+    /// more work.**  The batched rewrite ([`with_batched_rewrite`]) leaves
+    /// every decision where the eager rewrite puts it — the same roots and
+    /// the same tree (reductions, refuted branches, propagations, splits,
+    /// eliminated variables, oversize matrices, tail enumerations, degree
+    /// reached, exhaustion) — and charges at most the eager rewrite's word
+    /// XORs, on the 33 systems of the next-kernel pinning test and on dense
+    /// random quadratic systems of 12, 14, 16 and 20 unknowns.  Each system
+    /// is solved twice per mode on a fresh thread (cold, then warm), with
+    /// the next kernels on as `inherited-f4` runs them.  Prints the
+    /// per-system ratio of the batched count to the eager one
+    /// (`--nocapture`).
+    #[test]
+    fn batched_rewrite_leaves_decisions_and_never_adds_word_xors() {
+        let systems = batched_rewrite_pin_systems();
+        type Run = (Vec<Mask>, [usize; 7], u32, bool, u64, [(u64, u64); 3]);
+        let solve_twice = |system: &[F2BoolPoly], n_vars: usize, on: bool| -> Vec<Run> {
+            let system = system.to_vec();
+            std::thread::spawn(move || {
+                (0..2)
+                    .map(|_| {
+                        let opts = SolveOptions {
+                            max_solutions: 1 << 12,
+                            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                            ..SolveOptions::default()
+                        };
+                        let _ = crate::cryptanalysis::inherited_f4::take_rewrite_tally();
+                        let before = f4_word_ops_thread();
+                        let (mut roots, st) = with_next_kernels(true, || {
+                            with_batched_rewrite(on, || {
+                                solve_boolean_system(&system, n_vars, &opts)
+                            })
+                        });
+                        assert!(
+                            !BATCHED_REWRITE.with(std::cell::Cell::get),
+                            "the switch is restored"
+                        );
+                        let ops = f4_word_ops_thread() - before;
+                        let tally = crate::cryptanalysis::inherited_f4::take_rewrite_tally();
+                        roots.sort_unstable();
+                        (
+                            roots,
+                            [
+                                st.reductions,
+                                st.infeasible_branches,
+                                st.propagations,
+                                st.splits,
+                                st.eliminated,
+                                st.oversize,
+                                st.tail_enumerations,
+                            ],
+                            st.max_degree_built,
+                            st.exhausted,
+                            ops,
+                            tally,
+                        )
+                    })
+                    .collect()
+            })
+            .join()
+            .unwrap()
+        };
+        let (mut solved, mut refuted, mut cheaper) = (0, 0, 0);
+        let (mut old_total, mut new_total) = (0u64, 0u64);
+        let mut worst = 0.0f64;
+        for (k, (system, n_vars)) in systems.iter().enumerate() {
+            let old = solve_twice(system, *n_vars, false);
+            let new = solve_twice(system, *n_vars, true);
+            for (o, n) in old.iter().zip(&new) {
+                assert_eq!(
+                    (&o.0, o.1, o.2, o.3),
+                    (&n.0, n.1, n.2, n.3),
+                    "system {k} ({n_vars} unknowns): the batched rewrite changed a decision"
+                );
+                // Everything but the rewrites — root builds, re-reduction,
+                // tail reads, linear elimination — is the same work.
+                let rewrites = |t: &[(u64, u64); 3]| t.iter().map(|x| x.1).sum::<u64>();
+                assert_eq!(
+                    o.4 - rewrites(&o.5),
+                    n.4 - rewrites(&n.5),
+                    "system {k}: work other than the rewrites differs"
+                );
+                assert!(
+                    n.4 <= o.4,
+                    "system {k} ({n_vars} unknowns): batched {} > eager {} word XORs",
+                    n.4,
+                    o.4
+                );
+            }
+            assert_eq!(old[0].4, old[1].4, "system {k}: eager cold = warm");
+            assert_eq!(new[0].4, new[1].4, "system {k}: batched cold = warm");
+            for &point in &old[0].0 {
+                assert!(vanish_at(system, point), "system {k}: a root solves it");
+            }
+            let ratio = new[0].4 as f64 / old[0].4.max(1) as f64;
+            worst = worst.max(ratio);
+            eprintln!(
+                "batched/eager system {k:2} n={n_vars:2} splits={:3} propagations={:3}: \
+                 {} / {} = {ratio:.4}; rewrites (rows, words) bulk/single/displaced \
+                 eager {:?} batched {:?}",
+                old[0].1[3], old[0].1[2], new[0].4, old[0].4, old[0].5, new[0].5
+            );
+            old_total += old[0].4;
+            new_total += new[0].4;
+            cheaper += usize::from(new[0].4 < old[0].4);
+            if old[0].0.is_empty() {
+                refuted += 1;
+            } else {
+                solved += 1;
+            }
+        }
+        eprintln!(
+            "batched/eager over {} systems: {new_total} / {old_total} = {:.4}, \
+             worst {worst:.4}, {cheaper} cheaper",
+            systems.len(),
+            new_total as f64 / old_total as f64
+        );
+        assert!(solved > 0 && refuted > 0, "both outcomes are pinned");
+        assert!(cheaper > 0, "the batched rewrite saves work somewhere");
+    }
+
     /// One configuration of the word-XOR determinism probe.  It runs in its
     /// own process (see the test below) because the hash salt is a
     /// process-wide setting: set in a shared test process it would change
@@ -8930,6 +10573,69 @@ mod tests {
                 }
             }
         }
+        assert!(roots > 0, "no system had a root; the comparison is vacuous");
+    }
+
+    /// A parallel split returns the sequential solve's roots in the same
+    /// order, stops at the same accepted root, and credits its workers'
+    /// counted work to the calling thread.
+    #[test]
+    fn parallel_split_returns_the_sequential_roots_in_order() {
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = crate::cryptanalysis::koblitz_index_calculus::build_frobenius_factor_base(&kc, 0)
+            .unwrap();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        let opts = SolveOptions {
+            max_solutions: 1 << 12,
+            node_budget: 1 << 20,
+            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+            split_rule: SplitRule::HighestFree,
+        }
+        .resolve();
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(4)
+            .build()
+            .unwrap();
+        let mut roots = 0usize;
+        pool.install(|| {
+            for raw in [1u64, 23, 300, 77] {
+                let sys = build_decomposition_system(
+                    &fb.subspace_basis,
+                    &fe(raw, kc.n),
+                    &kc.curve.b,
+                    3,
+                    &st,
+                )
+                .unwrap();
+                let policy = InheritPolicy::resolve(opts.engine);
+                set_parallel_depth(Some(0));
+                let (want, _) =
+                    solve_with_policy(&sys.equations, sys.n_vars, &opts, policy, |_| false);
+                roots += want.len();
+                for depth in [1, 2, 3] {
+                    set_parallel_depth(Some(depth));
+                    let before = f4_word_ops_thread();
+                    let (got, stats) =
+                        solve_with_policy(&sys.equations, sys.n_vars, &opts, policy, |_| false);
+                    assert!(!stats.exhausted);
+                    assert_eq!(
+                        got, want,
+                        "x_R={raw} depth={depth}: roots or their order differ"
+                    );
+                    assert!(f4_word_ops_thread() > before, "workers' work not credited");
+                    if want.len() >= 2 {
+                        // Stop at the second root, as the sequential solve does.
+                        let target = want[1];
+                        let (stopped, _) =
+                            solve_with_policy(&sys.equations, sys.n_vars, &opts, policy, |r| {
+                                r == target
+                            });
+                        assert_eq!(stopped, want[..2].to_vec(), "x_R={raw} depth={depth}");
+                    }
+                }
+                set_parallel_depth(None);
+            }
+        });
         assert!(roots > 0, "no system had a root; the comparison is vacuous");
     }
 

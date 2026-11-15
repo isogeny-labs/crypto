@@ -1,0 +1,53 @@
+== n=31 (ell from file; negatives 128, positives 128) ==
+prog   B_r     phi core/neg |       Q(w=0)     Q(w=0.1)       Q(w=1) | natural found
+A      236   1.000 18415437 |     3.9100e3     4.1316e3     6.1258e3 | 1/128
+A1     236   1.000  3930471 |     8.3453e2     8.8176e2     1.3068e3 | 1/128
+B      258   0.883  3392680 |     3.4241e2     3.6276e2     5.4584e2 | 4/128
+C      274   0.312  1349381 |     3.4135e2     3.6093e2     5.3722e2 | 1/128
+P      258   0.883  3392680 |     3.4241e2     3.6276e2     5.4584e2 | 4/128
+  Q(B)/Q(A): w=0 0.088 [0.082,0.094]  w=0.1 0.088 [0.082,0.094]  w=1 0.089 [0.084,0.096]  -> better
+  Q(B)/Q(A1): w=0 0.410 [0.385,0.440]  w=0.1 0.411 [0.385,0.442]  w=1 0.418 [0.392,0.450]  -> better
+  Q(B)/Q(C): w=0 1.003 [0.734,1.279]  w=0.1 1.005 [0.730,1.273]  w=1 1.016 [0.749,1.317]  -> straddles
+  Q(C)/Q(A): w=0 0.087 [0.069,0.116]  w=0.1 0.087 [0.069,0.120]  w=1 0.088 [0.070,0.118]  -> better
+  Q(C)/Q(A1): w=0 0.409 [0.325,0.544]  w=0.1 0.409 [0.325,0.562]  w=1 0.411 [0.327,0.552]  -> better
+  Q(A1)/Q(A): w=0 0.213 [0.213,0.213]  w=0.1 0.213 [0.213,0.213]  w=1 0.213 [0.213,0.213]  -> better
+  Q(P)/Q(A): w=0 0.088 [0.082,0.094]  w=0.1 0.088 [0.082,0.094]  w=1 0.089 [0.084,0.096]  -> better
+  null (A first half / second half): 0.985 [0.956,1.000] 0.985 [0.956,1.000] 0.985 [0.956,1.000] interval covers 1 at all weights: true
+  cell verdict by the frozen rule: MATCHES (B vs A: Some("better"), B vs C: Some("straddles"))
+== n=37 (ell from file; negatives 128, positives 128) ==
+prog   B_r     phi core/neg |       Q(w=0)     Q(w=0.1)       Q(w=1) | natural found
+A      267   1.000 18554435 |     3.0891e3     3.2642e3     4.8394e3 | 0/128
+A1     267   1.000  5064215 |     8.4314e2     8.9085e2     1.3203e3 | 0/128
+B      267   0.367  1175849 |     2.6652e2     2.8235e2     4.2482e2 | 0/128
+C      267   0.367  1848692 |     4.1903e2     4.4972e2     7.2597e2 | 0/128
+  Q(B)/Q(A): w=0 0.086 [0.070,0.110]  w=0.1 0.086 [0.071,0.113]  w=1 0.088 [0.071,0.115]  -> better
+  Q(B)/Q(A1): w=0 0.316 [0.256,0.402]  w=0.1 0.317 [0.261,0.414]  w=1 0.322 [0.261,0.420]  -> better
+  Q(B)/Q(C): w=0 0.636 [0.461,0.881]  w=0.1 0.628 [0.447,0.879]  w=1 0.585 [0.420,0.816]  -> better
+  Q(C)/Q(A): w=0 0.136 [0.110,0.172]  w=0.1 0.138 [0.114,0.180]  w=1 0.150 [0.122,0.196]  -> better
+  Q(C)/Q(A1): w=0 0.497 [0.403,0.631]  w=0.1 0.505 [0.416,0.659]  w=1 0.550 [0.446,0.718]  -> better
+  Q(A1)/Q(A): w=0 0.273 [0.273,0.273]  w=0.1 0.273 [0.273,0.273]  w=1 0.273 [0.273,0.273]  -> better
+  null (A first half / second half): 1.000 [1.000,1.000] 1.000 [1.000,1.000] 1.000 [1.000,1.000] interval covers 1 at all weights: true
+  cell verdict by the frozen rule: ADVANCES (B vs A: Some("better"), B vs C: Some("better"))
+== n=41 (ell from file; negatives 128, positives 128) ==
+prog   B_r     phi core/neg |       Q(w=0)     Q(w=0.1)       Q(w=1) | natural found
+A      252   1.000 18556519 |     3.4670e3     3.6634e3     5.4312e3 | 0/128
+A1     252   1.000  4514279 |     8.4342e2     8.9113e2     1.3205e3 | 0/128
+B      275   0.336  1246699 |     2.9125e2     3.0855e2     4.6423e2 | 0/128
+C      275   0.336  2483579 |     5.8021e2     6.1596e2     9.3773e2 | 0/128
+  Q(B)/Q(A): w=0 0.084 [0.068,0.113]  w=0.1 0.084 [0.068,0.110]  w=1 0.085 [0.068,0.111]  -> better
+  Q(B)/Q(A1): w=0 0.345 [0.280,0.464]  w=0.1 0.346 [0.281,0.451]  w=1 0.352 [0.280,0.458]  -> better
+  Q(B)/Q(C): w=0 0.502 [0.357,0.723]  w=0.1 0.501 [0.356,0.719]  w=1 0.495 [0.351,0.712]  -> better
+  Q(C)/Q(A): w=0 0.167 [0.136,0.225]  w=0.1 0.168 [0.136,0.219]  w=1 0.173 [0.137,0.225]  -> better
+  Q(C)/Q(A1): w=0 0.688 [0.558,0.924]  w=0.1 0.691 [0.561,0.901]  w=1 0.710 [0.565,0.925]  -> better
+  Q(A1)/Q(A): w=0 0.243 [0.243,0.243]  w=0.1 0.243 [0.243,0.243]  w=1 0.243 [0.243,0.243]  -> better
+  null (A first half / second half): 1.000 [1.000,1.000] 1.000 [1.000,1.000] 1.000 [1.000,1.000] interval covers 1 at all weights: true
+  cell verdict by the frozen rule: ADVANCES (B vs A: Some("better"), B vs C: Some("better"))
+overall verdict: INCONCLUSIVE; per cell [(31, "MATCHES"), (37, "ADVANCES"), (41, "ADVANCES")]
+search positive control (arm p, n=31): best 3.1435e2, handicapped start 1.5505e4, incumbent 4.1622e3 -> PASS
+yield model (kappa = -ln(1-rate)/T_eff at the conservation cell), median over sub families 1.0524e-4
+  n=31 finalist b: family affine-aligned-s2 kappa 1.1576e-4 (+10.0% of median) -> within 25%
+  n=31 finalist c: family affine-aligned-s1 kappa 1.0400e-4 (-1.2% of median) -> within 25%
+  n=37 finalist b: family affine-aligned-s1 kappa 1.0400e-4 (-1.2% of median) -> within 25%
+  n=37 finalist c: family affine-aligned-s1 kappa 1.0400e-4 (-1.2% of median) -> within 25%
+  n=41 finalist b: family affine-aligned-s1 kappa 1.0400e-4 (-1.2% of median) -> within 25%
+  n=41 finalist c: family affine-aligned-s1 kappa 1.0400e-4 (-1.2% of median) -> within 25%

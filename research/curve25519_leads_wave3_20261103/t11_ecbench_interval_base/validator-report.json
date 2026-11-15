@@ -1,0 +1,1101 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_scope": "Lead T11 post-data (Curve25519 k=20 miniature, ecbench end-to-end comparison of the prime-interval factor base and selected bits frames). Every number in README sections 3, 4, 5, 7 and the headline distance-remaining figures was recomputed from data/chunks/c00..c05/records.jsonl with validator-written code and agrees with the README (45 table cells, 0 mismatches). 84/84 recovered logs re-verified as [d]G = T by independent EC code. All six verify receipts are ok with no problems. The errata below concern README text (an unfilled placeholder, a prediction tally, a rounding, a missing SHA256SUMS file, binding gaps); none changes a measured number or a prediction verdict.",
+ "independent": true,
+ "validator": "validator subagent (claude-sonnet-5-5). Not the producer of T11.",
+ "date": "2026-11-04",
+ "validated_commit": {
+  "tracked_protocol_and_scripts": "4eddc74edc19edf23d0c873ce68e8e7f54a7a5a8 (Addendum C; PROTOCOL.md 79de7370a457a60e7a03210eee3429e5350e8d5bf79a15ef76707e56fd558abd and scripts/ unchanged from it through HEAD)",
+  "protocol_freeze": "505ecbb154f907657e6b3865699d41a54c550406 (2026-11-03T21:59:32Z)",
+  "code_commit": "2993713af847e19024a8c569a83403223c95938d (2026-11-04T01:43:07Z; the measuring binary was built from 505ecbb154 + the T11 patch, see pre-data erratum R8)",
+  "git_head_at_start": "4f0b011445a14af5615a89174e625f072991cc2b",
+  "git_head_at_end": "035dad5b0a6a214c320df08d48fc07d323588375",
+  "note": "HEAD moved during validation (other leads commit to the shared tree); the T11 directory has exactly two tracked-history commits (505ecbb154, 4eddc74edc) and no tracked modification. The measurement artifacts themselves are untracked and git-excluded, so the frozen set is identified by content hash, not by commit (erratum E6)."
+ },
+ "tree_state": {
+  "tracked_files_in_lead_dir": [
+   "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/PROTOCOL.md",
+   "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/scripts/chunked_run.py",
+   "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/scripts/pooled_compare.py",
+   "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/scripts/run.sh",
+   "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/scripts/select_frames.py"
+  ],
+  "git_excluded_untracked": [
+   "data/",
+   "build/",
+   "ecbench/",
+   "selection/",
+   "README.md",
+   "validator-report.json (.git/info/exclude, 'TEMP: until wave-3 validation finishes')"
+  ],
+  "newest_mtime_under_data": "2026-11-04T08:26:54Z (verify/verify_driver.log); validation ran 2026-11-04 15:30Z to the time of this report; the data manifest taken at the start of validation and at the end are identical: True",
+  "data_files": 173
+ },
+ "artifact_hashes": {
+  "files": {
+   "PROTOCOL.md": "79de7370a457a60e7a03210eee3429e5350e8d5bf79a15ef76707e56fd558abd",
+   "README.md": "7bcd9b97375d67a4bb9a58732886642e94dca22e0419f8b15af8637329b56a7c",
+   "ecbench/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+   "selection/frames.json": "b28527408d99debb19b26daf2281e209b4ee01148245af19fb01038f58118b7f",
+   "scripts/run.sh": "e43fca15dceda63c7715224d130483723313c80a54c42cf78c7f27399a145215",
+   "scripts/chunked_run.py": "e8edaa81515b400bcb29e402f6ff0d8548001498aef662c23f47daf3d19aabde",
+   "scripts/pooled_compare.py": "061b11b0eec670ee6160b60d1b821bf52a7af277d2d4adf342d6afee57d4fdf9",
+   "scripts/select_frames.py": "62355d8366c8c4fd9b4e62900a30981c04b45ec4904fda57b762a8e2e2add303",
+   "build/build.log": "9eab76fa839ca3ddfc9d953b672fc7a67dcf93799f25e6edc47280745ee6296b",
+   "build/rustfmt.log": "7e1cd69fab85528649b3c67810caed1f9db026f90623c7d226ea1477c93b6a46",
+   "build/clippy.log": "c8908c64c12f17c316ea0f3f1dc9ca20e4e9545fb0b752960d49c38834db8eb3",
+   "build/test.log": "146ab5f5f7ffc7e6d14ce0eb72d4e2371c2c25667074412ff297784ff2318c27",
+   "build/ecbench.sha256": "b1fe6ed7c90a18cb1bba87fc7ed0d5e19addd9a78150ce6a8e9c30a323064a1b",
+   "build/source.sha256": "eb267e55b526651a5862ac0c6c412323c1384243318aebd0aa12a7af2cb7a571"
+  },
+  "data_manifest_sha256_of_listing": "88e1b126033d706118cccf2060539d426f428ab80d611a63f7da390622b01e37",
+  "note": "data/SHA256SUMS does not exist (erratum E3); data_manifest below is the validator's replacement listing (sha256 of every file under data/, sorted)."
+ },
+ "data_manifest": {
+  "data/attempt1_refused_busy/SHA256SUMS": "1dadbcdf49cf8d82ee4e6355d7fdf5ff4d023e4d19abf282cc6358d024c0099e",
+  "data/attempt1_refused_busy/binary.sha256": "2247a108927ab145c83261b0f2236addc8b1e67a2370da9b2ee18a5df73ef6b2",
+  "data/attempt1_refused_busy/ecbench/band.txt": "092a1aabdb31d0edb6385cb913a6bea1894688c5ef3ac85f21f9befe0fec3ae3",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w0.1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w0.1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w0.1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w0.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w0.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w0.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-L976503_w1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w0.1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w0.1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w0.1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w0.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w0.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w0.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L541434__over__pkm-int-t5-g3-lo0_w1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w0.1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w0.1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w0.1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w0.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w0.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w0.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-int-t5-g3-lo0_w1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w0.1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w0.1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w0.1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w0.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w0.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w0.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4-s1093_w1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w0.1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w0.1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w0.1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w0.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w0.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w0.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__pkm-iso-t6-g4_w1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w0.1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w0.1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w0.1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w0.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w0.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w0.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__proj-a_w1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w0.1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w0.1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w0.1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w0.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w0.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w0.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-int-t5-g3-L976503__over__rho-neg_w1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w0.1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w0.1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w0.1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w0.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w0.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w0.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w1.json.stderr": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/compare_pkm-iso-t6-g4-s1093__over__pkm-iso-t6-g4_w1.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/ecbench/load_end.txt": "c98212a278c182bce94b7d520d407ece76bd867470e44bf2c8a7d8b6eca77cba",
+  "data/attempt1_refused_busy/ecbench/load_start.txt": "31a9b32e76fcff4e4eb1d34aa70425be101dd4a19c70db1ccb45a0ad481b2fe0",
+  "data/attempt1_refused_busy/ecbench/plan.txt": "133c78e2554ce1d9ad2d5fd904deb9b52feaed293b85e97cc1b0236c0b8251a9",
+  "data/attempt1_refused_busy/ecbench/run.log": "60d8d2142a7e840d4e1d3a47e77429831aab0f24f49232f673edf89f648989b4",
+  "data/attempt1_refused_busy/ecbench/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+  "data/attempt1_refused_busy/ecbench/verify.txt": "11f48e1de04af3fa746293cf4185bf507e7229cf41879741a820cbef873d5f43",
+  "data/attempt1_refused_busy/run.log": "332b2e9b289095747fce53f603f1bb2a493f0bf3d220386830eee04646b26ab1",
+  "data/attempt1_refused_busy/source.sha256": "eb267e55b526651a5862ac0c6c412323c1384243318aebd0aa12a7af2cb7a571",
+  "data/band_pooled.json": "e16150db158a546def0836edcb517d15f575770a3c6bdd78ba4519a4a3417b25",
+  "data/band_pooled.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/band_pooled.txt": "3052bed78a6fdbf0f41e8f1171f993bd6e7f71646fc5d9b7b4c12824b6ac7e08",
+  "data/binary.sha256": "2247a108927ab145c83261b0f2236addc8b1e67a2370da9b2ee18a5df73ef6b2",
+  "data/chunks/c00.log": "063b0668b427db2d282cd01b18c5fd0c8497143fcaba8d6b3c0a77c85eeaa415",
+  "data/chunks/c00/host.json": "1f703ad79f364fe09aa8624a1304ff1ac32250818c47595263b8f855e07812df",
+  "data/chunks/c00/plan.json": "cc31e261b9480293571a1f10168ddf114a44f4b040226bf97be13c884cdf6ecb",
+  "data/chunks/c00/records.jsonl": "bfc6016b1c509fadd8e9b95993c10d27bd00754eb42a1af24d2863d7db4d178a",
+  "data/chunks/c00/session.json": "890dbde1439260862c8093f9a95cbaee5b6abf53286695fa6cb91c15e3c251e0",
+  "data/chunks/c00/spec.json": "72b4651dd36d4555de00069486798be0357ae92b3ac05e7911932326e14960e8",
+  "data/chunks/c01.log": "fac5e27b91c9728dc5efbae9d253461edc16b1c57fe68771c978a6666f15c30a",
+  "data/chunks/c01/host.json": "25689bcf1ee043d29b2b6a2ba8ba3fa6f70b9fbed1ffb6eafe6bb3fa77949eb1",
+  "data/chunks/c01/plan.json": "a17054682c7e022213b9db52bd1829c0e511a2bb8f67ea859efde93060a446d8",
+  "data/chunks/c01/records.jsonl": "fed55803ff085cbf932c41756da213d6b21bd790e4b31e29addb3169d50b1831",
+  "data/chunks/c01/session.json": "226d994514621db032ac3cb5faa8f3065d843704aadce947a7cd1a281e8c76af",
+  "data/chunks/c01/spec.json": "a9c65e78116a34948b68acdd31bce4400cae07b7ef8a0ee5fa83d464b2bac31a",
+  "data/chunks/c02.log": "5cda0f87cabb35da7519c7351c55c6f7d482b6766eb30407728774a9436a75b8",
+  "data/chunks/c02/host.json": "f684c10c430fc2682098a906482f96723ee2320140b8b05c8ff0d2d1231d80be",
+  "data/chunks/c02/plan.json": "a414c072326cb96753295e478972384193edf1203e7e1c6b8537ad5984815913",
+  "data/chunks/c02/records.jsonl": "74fd72413f5366b727893bfaf2aa7af2b1682b806feb55c5aeade82d9bd61380",
+  "data/chunks/c02/session.json": "d47858749aac3728b048bf29026b2b7f15015697d8d8455d04cdb61f214a73cd",
+  "data/chunks/c02/spec.json": "2cbf64cdd0173f08956abf0a1f580a80d0a5b2fb5e436828aa71c2b2405e9783",
+  "data/chunks/c03.log": "3e4a96ae7fe42264814fe677fa95175d951f3842810e7246de28aa4ddfb9a76a",
+  "data/chunks/c03/host.json": "dcede428e323e95a713bff3b0e0a5c24b8763edbe0886ab1c0a2d58327b3925f",
+  "data/chunks/c03/plan.json": "908c26279059c5552de293550cd5753c0a0c591638cad6f620404b9f7c367ebd",
+  "data/chunks/c03/records.jsonl": "03498b5ec0a5f35dcb7300f7f0e59423e21a125b43f0214bfb385168a0d82fdc",
+  "data/chunks/c03/session.json": "47679935997129feb2e9a6700fa59ad0777aa2985141c8d2aa514b1d037129a8",
+  "data/chunks/c03/spec.json": "7ae6e35b6e1e70db3580e97ed37c5f0e6cb67fd5aacf4812ef798c0a7e5f0d2c",
+  "data/chunks/c04.log": "76d0b0373f141dba45e7ff5d3323f610b81b8192056d00038f2d54271d67c243",
+  "data/chunks/c04/host.json": "192eae878c481d09704142f71dc5713120a069b3064747a4b9536075f136ebc0",
+  "data/chunks/c04/plan.json": "2a6a3637c5acb3b5e061a0c858119f4df857c7c68b0e8c792fa3b898eeaf5caa",
+  "data/chunks/c04/records.jsonl": "357938b3cee60a690a6c3560e644a9bfa2484141968ab47abb00cf54be52bb84",
+  "data/chunks/c04/session.json": "f4d2488fb4b684a84d9acdc562e9b70bbae429f8e6b8a8772caaa9ef1c716526",
+  "data/chunks/c04/spec.json": "6f017769a6bc4387f0a9ef0a86fea7b9c8df3668fc402d7c29fad3e599c5e877",
+  "data/chunks/c05.log": "8dbfb1d739d6ee4869654514f529d51d5edd33dc6151ad37064b4b5ae440431e",
+  "data/chunks/c05/host.json": "b80170c8827794286401934dc2e9719c7d17c958d574106c6aaf3e85a60032c0",
+  "data/chunks/c05/plan.json": "b172ea74f3b7bf5d361cba3a0eeae39c54b24ab385f79eb10ea333401ccf92a3",
+  "data/chunks/c05/records.jsonl": "7733807e94ed0921a7255114972b1a5a72cdbb41a24b5d0de302538265611182",
+  "data/chunks/c05/session.json": "8563aac34c7785f3ad463b133bda089ba4153c6bae58f0920589ddf869312399",
+  "data/chunks/c05/spec.json": "726a79fe2ea163528c9d1d2454f0b6fc32b468d3d7de7ca876ae65fde5de2e75",
+  "data/chunks/driver.log": "ed4248645f57b9325d36c6c05ce51af5d0023a87ee814ec554e6d512f55077d7",
+  "data/chunks/specs/c00.json": "72b4651dd36d4555de00069486798be0357ae92b3ac05e7911932326e14960e8",
+  "data/chunks/specs/c01.json": "a9c65e78116a34948b68acdd31bce4400cae07b7ef8a0ee5fa83d464b2bac31a",
+  "data/chunks/specs/c02.json": "2cbf64cdd0173f08956abf0a1f580a80d0a5b2fb5e436828aa71c2b2405e9783",
+  "data/chunks/specs/c03.json": "7ae6e35b6e1e70db3580e97ed37c5f0e6cb67fd5aacf4812ef798c0a7e5f0d2c",
+  "data/chunks/specs/c04.json": "6f017769a6bc4387f0a9ef0a86fea7b9c8df3668fc402d7c29fad3e599c5e877",
+  "data/chunks/specs/c05.json": "726a79fe2ea163528c9d1d2454f0b6fc32b468d3d7de7ca876ae65fde5de2e75",
+  "data/interrupted_attempt2/binary.sha256": "2247a108927ab145c83261b0f2236addc8b1e67a2370da9b2ee18a5df73ef6b2",
+  "data/interrupted_attempt2/ecbench/load_start.txt": "8a74ddb467f771dd8d686ffbd3be343c1ca77fdf1bf9c402ee3647c9bef8e059",
+  "data/interrupted_attempt2/ecbench/plan.txt": "133c78e2554ce1d9ad2d5fd904deb9b52feaed293b85e97cc1b0236c0b8251a9",
+  "data/interrupted_attempt2/ecbench/run.log": "5dd4e1b817c8c3e606c9b5aa64d5ff6aad497546e9eb5efb5cb40370fef741e0",
+  "data/interrupted_attempt2/ecbench/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+  "data/interrupted_attempt2/run.log": "a8c2f64857097aabb6363b23f98c8c0b3aa8b22f22773f8855895d8482e183e0",
+  "data/interrupted_attempt2/s1/host.json": "8953ce45fad9897698c08ecee79d99a648465d0172031d821712c7893f3dffdb",
+  "data/interrupted_attempt2/s1/plan.json": "aca3c3bc4477904fe51641722ea608fc2762044114b5788b22a1d34d9b76788a",
+  "data/interrupted_attempt2/s1/records.jsonl": "fb79d529c85a4bde8202610fc65a74cc1ae4f1f0fbbcc733825773c1cc084cb6",
+  "data/interrupted_attempt2/s1/session.interrupted.json": "5ffc950c60ac76363490ece02ea54244be45801143d4d18af8ac11a4380a58d0",
+  "data/interrupted_attempt2/s1/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+  "data/interrupted_attempt2/source.sha256": "eb267e55b526651a5862ac0c6c412323c1384243318aebd0aa12a7af2cb7a571",
+  "data/interrupted_attempt3/load_start.txt": "892aa899286b35c9551fe8cc848d1d697afc9f82fad10b3aabeec7d2b0ca0710",
+  "data/interrupted_attempt3/plan.txt": "133c78e2554ce1d9ad2d5fd904deb9b52feaed293b85e97cc1b0236c0b8251a9",
+  "data/interrupted_attempt3/run.log": "60c666637d3f5b62f49b5a7ad966b573d6b0f343708b4f73839275715b97b022",
+  "data/interrupted_attempt3/s2/host.json": "ddeb22714b395b775b1d58a994fae3f6c7624941e26d72c2100feb07d8c2555c",
+  "data/interrupted_attempt3/s2/plan.json": "aca3c3bc4477904fe51641722ea608fc2762044114b5788b22a1d34d9b76788a",
+  "data/interrupted_attempt3/s2/records.jsonl": "542349c131c03f3fef36cd8cf95022f22f97e2ca500cb36539f21351517382a8",
+  "data/interrupted_attempt3/s2/session.interrupted.json": "081e4ff9f7e56d08586c54edebe1bcb6059aeee26ea7f16e15cd496580deb6ef",
+  "data/interrupted_attempt3/s2/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+  "data/interrupted_attempt3/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+  "data/pooled_compare.jsonl": "be051f4b12d6b2d19ded6fef863b0de04f548dd2095ec296eed47ffa4f219897",
+  "data/preflight_s2_host.txt": "2c4f876193f7ec2d12b743f8f646d8864f082a756bbe220653d136be63e86fca",
+  "data/run.log": "5f45b045a5d02dba28943232aece6634c00adc9147808345f82de4932ba77484",
+  "data/run_allowbusy.sh.used": "27c6a77d00bab9af93b94291c4b4ad29cd87f83f06e1092d57e24f3dce736600",
+  "data/run_s2.stdout": "5f45b045a5d02dba28943232aece6634c00adc9147808345f82de4932ba77484",
+  "data/run_s2_allowbusy.sh.used": "9344e720cee5a61d90d4c21e0e8b3e67243b85ae6e4bff557581354e50a705ce",
+  "data/source.sha256": "eb267e55b526651a5862ac0c6c412323c1384243318aebd0aa12a7af2cb7a571",
+  "data/verify/c00.json": "7080897a3a590cd15833f958750eacb37974823b1bf68d372a458b08c3dec879",
+  "data/verify/c00.txt": "1297243e382d6ab9485b9da48f72bd2201049638c975dfa9d8b3a132184860e3",
+  "data/verify/c01.json": "eda581d01f67bc4567f75aed05cc3fc8b2140cf7c9872c4b886e878f95046e1b",
+  "data/verify/c01.txt": "51759c7a1a785356cc18874c4ac0e9e9de2fff73d1cf938655b8227a656e2b46",
+  "data/verify/c02.json": "2d886da84e9014b3135dfcd44ad73882b435f9b53bd5d8382dfa59e16bb4c08d",
+  "data/verify/c02.txt": "0af20457938874ba63163c4c4d21588e5ad33ceae2c094fa19c3143bf2fb4b86",
+  "data/verify/c03.json": "a1cb0448498cc2252d3b3bcf2e2663062dd8b6cad95b9d2a755e907f30b9b656",
+  "data/verify/c03.txt": "3b764068090f5c12d9073e84ecbce4edbeab9b5eae159e73f662945885194538",
+  "data/verify/c04.json": "37938f605b5eb7919f379580a2e38afa09b10504d170a9d1be45c9fad1022544",
+  "data/verify/c04.txt": "5e6632488133642ad046ff46a5ce7b905bcaea4ac0d6cb19801bb17c132846f6",
+  "data/verify/c05.json": "42bd3afc8bd492e8c716d2fc3c3b5fcaf53f718497a5dde1790f34215a203f2f",
+  "data/verify/c05.txt": "45d5df13803ab9159d39ad19d30ee4358a7f6a0e6e17e4dbf60808e21bc6af30",
+  "data/verify/nohup.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data/verify/run_verify.sh": "35f03f2156cb749b8349ec22e6f0661d0e19b11914a870bbe6fa26813ccd36fb",
+  "data/verify/verify_driver.log": "61d16b38cbd6f2f5cc36d00266ea47db1bf42327fc8a4c0f5e02f017f0598d2c"
+ },
+ "instrument": {
+  "binary": "/home/user/ctarget-t11/release/ecbench",
+  "sha256_now": "82bcad823fffcc7067eee11a38905ced4c1244b998741289155101a6bba19031",
+  "agrees_with": [
+   "build/ecbench.sha256",
+   "data/binary.sha256",
+   "binary_sha256 in session.json of c00..c05",
+   "auditor_binary_sha256 in verify/c00..c05.json"
+  ],
+  "equals_shared_binary_54737834": false,
+  "source_identity": "build/source.sha256 == data/source.sha256 (pkm_semaev.rs cdb05e78..., methods.rs ec8fe422..., ic_boundary.rs a811558a...). pkm_semaev.rs at HEAD (fab2da0a...) has since changed (b847203692, 08:13:43Z, wave-4 digit sets) and is not the measuring source."
+ },
+ "requirements": [
+  {
+   "id": "V1 freeze order",
+   "result": "pass (with binding gap E6)",
+   "evidence": "git log: 505ecbb154 2026-11-03T21:59:32Z (PROTOCOL.md, 20057 bytes) < 2993713af8 code 01:43:07Z < 4eddc74edc 2026-11-04T02:26:29Z (Addendum C; the 505ecbb154 PROTOCOL.md is an exact byte prefix of the current file, +37 lines only). Chunk starts from session.json: c00 05:02:34Z, c01 05:31:40Z, c02 05:56:20Z, c03 06:25:34Z, c04 07:14:19Z, c05 07:47:32Z, all after 4eddc74edc. Predictions, thresholds, arms, seeds and weights are unchanged between the two protocol commits. scripts/run.sh, chunked_run.py, pooled_compare.py, select_frames.py are byte-identical at 4eddc74edc and HEAD.",
+   "path": "PROTOCOL.md; data/chunks/cNN/session.json"
+  },
+  {
+   "id": "V2a data/SHA256SUMS re-verifies",
+   "result": "fail (file absent)",
+   "evidence": "data/SHA256SUMS does not exist; find finds only data/attempt1_refused_busy/SHA256SUMS (80/80 OK). README sec. 9 item 4 and 'Files' say it covers every file under data/. Replacement: the validator hashed all 173 files under data/ at the start and at the end of validation and they are identical; records.jsonl, session.json, spec.json, host.json and plan.json of every chunk equal the hashes bound in the ecbench verify receipts, and records_sha256 in session.json equals sha256(records.jsonl).",
+   "path": "data/SHA256SUMS (missing)"
+  },
+  {
+   "id": "V2b binary hash binding",
+   "result": "pass",
+   "evidence": "sha256(/home/user/ctarget-t11/release/ecbench) = 82bcad823fffcc7067eee11a38905ced4c1244b998741289155101a6bba19031 = build/ecbench.sha256 = data/binary.sha256 = binary_sha256 in all six session.json = auditor_binary_sha256 in all six receipts and in every one of the 84 records (binary_sha256 field). It is not the shared /home/user/ctarget binary (54737834...). Build logs build, rustfmt, clippy, test each end RC=0; test.log: 5 passed, 0 failed (U1-U6).",
+   "path": "build/*.log; data/binary.sha256"
+  },
+  {
+   "id": "V3 chunk specs differ from the frozen spec only where Addendum C allows",
+   "result": "pass",
+   "evidence": "Flat-key diff of the 53 keys of ecbench/spec.json (sha256 630f7722...) against data/chunks/specs/cNN.json and data/chunks/cNN/spec.json (byte-identical to each other): only /workloads/targets_per_curve 6->1, /workloads/target_seed 3110311101+c, /measurement/seed 3110311102+c, and a '[chunk c of 6, Addendum C]' suffix on /description. Arms, rounds=2, order alternate_measured, warmup 0, timeout 3600, isolation L0, curve, oracles unchanged. The description suffix is not named by Addendum C but is non-semantic (README sec. 9 item 2 discloses it).",
+   "path": "data/chunks/specs/c00..c05.json"
+  },
+  {
+   "id": "V4 recomputation of band and paired ratios",
+   "result": "pass",
+   "evidence": "Validator code (recompute.py) reads only records.jsonl: S(x,w) = (total_gae + w * sum of cost.unpriced operation counts) / sqrt(131203), unpriced counts resolved from solver.ops, phase natives and counters. S(w=0) equals every record's cost.s exactly. Band means (12 runs per arm) agree with data/band_pooled.json to 3e-16 relative and with the README table (21 cells). The 8 paired comparisons at w=0,0.1,1 (per-workload totals over rounds, ratio of sums, linearised t, df=5, t=2.570582) agree with data/pooled_compare.jsonl to 4e-14 relative and with the README sec. 4 table (24 cells: ratio, both interval ends, wins), 0 mismatches. Positive control for my own implementation: on the T9 single 16-workload session it reproduces `ecbench compare` ratio and linearised_t interval (df 15) to 6 decimals for 9 pair-weight cells; on chunk c00 alone the t11 binary's `ecbench compare` prints 0.4909 (w=0.1) and 0.5176 (w=0), as my formula and the README state. Leave-one-chunk-out range of L976503/lo0: 0.402-0.482 (w>=0.1), 0.422-0.509 (w=0); L976503/s1093: 6.86-8.43 (w>=0.1).",
+   "path": "data/chunks/c00..c05/records.jsonl"
+  },
+  {
+   "id": "V5 predictions C1, C2, P1-P12",
+   "result": "pass with errata E2, E5",
+   "evidence": "see predictions below: all 14 README verdicts agree with the frozen rule text and the data (13 held, 1 failed: P9). The README tally text is wrong (E2) and P12 rests on a records reading (E5).",
+   "path": "README.md sec. 5"
+  },
+  {
+   "id": "V6 verify receipts",
+   "result": "pass",
+   "evidence": "data/verify/c00..c05.json: ok true, problems [], every check true, records 14/14 verified, planned_executions 14, 1 replay each, detail 'identical', session_id and spec/records/host/plan/session hashes equal the chunk files, auditor_binary_sha256 = t11 binary. Replayed runs: c00 seq13 rho-neg r1; c01 seq0 rho-neg r0; c02 seq10 pkm-iso-t6-g4-s1093 r1; c03 seq7 pkm-int-t5-g3-L541434 r1; c04 seq10 s1093 r1; c05 seq11 pkm-iso-t6-g4 r1. Neither headline interval arm (lo0, L976503) was replayed by the producer; the validator replayed c03 seq 4 (lo0 r0), seq 5 (L976503 r0), seq 10 (s1093 r1): ok=True problems=[] replays=[(4, 'identical'), (5, 'identical'), (10, 'identical')]",
+   "path": "data/verify/cNN.json",
+   "validator_replay": {
+    "command": "nice -n 19 /home/user/ctarget-t11/release/ecbench verify --dir data/chunks/c03 --replay 0 --replay-seq 4 --replay-seq 5 --replay-seq 10 --out <scratchpad>/validator_replay_c03.json (receipt outside the evidence tree)",
+    "receipt_path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/validator_replay_c03.json",
+    "receipt_sha256": "03f80bcd30c7f95c7d725abf0745d42c30ac0b7d88a134f57fc129efa7ce99ec",
+    "ok": true,
+    "problems": [],
+    "replays": [
+     {
+      "seq": 4,
+      "record_id": "ECR1hb0a883dd8a71",
+      "reproduced": true,
+      "detail": "identical"
+     },
+     {
+      "seq": 5,
+      "record_id": "ECR1h727ba5916c18",
+      "reproduced": true,
+      "detail": "identical"
+     },
+     {
+      "seq": 10,
+      "record_id": "ECR1hec50258ae64e",
+      "reproduced": true,
+      "detail": "identical"
+     }
+    ],
+    "auditor_binary_sha256": "82bcad823fffcc7067eee11a38905ced4c1244b998741289155101a6bba19031"
+   }
+  },
+  {
+   "id": "V7 certificate discipline",
+   "result": "pass",
+   "evidence": "Validator affine EC code (cert.py), independent of the solver: for all 84 records G and the target lie on y^2=x^3+ax+b mod p=1048573 (a=63700, b=872826), [r]G = [r]T = O (r=131203), and [recovered]G = target; 0 failures. Per chunk all 7 arms recover the same d (111547, 119060, 31894, 76085, 93191, 89867) on one target; the 6 targets are distinct. #E = 1049624 = 8*131203 recomputed by Legendre sum; p and r prime.",
+   "path": "data/chunks/cNN/records.jsonl"
+  },
+  {
+   "id": "V8 controls and pricing",
+   "result": "pass",
+   "evidence": "rho-neg (reference) and proj-a (baseline) are priced in the same table and in every compare; both incumbent isogeny arms (seed 0 and 1093) and all three interval arms are priced at w=0, 0.1, 1 (sec. 5a). Unpriced counters listed per arm in the records (cost.unpriced) and in the compare arm lines; none is a byte counter. The frame-search cost (64000 Legendre symbols, 814514 group operations) is reported separately and recomputed here (+2248.7 to S at every w, +17.7 / +176.7 for the symbols; charged S of L976503 = 2274.6 / 6335917.5 / 63338703.8). The m=83 / ECC2K-130 disclosure rules do not apply (prime curve, k=20).",
+   "path": "README.md sec. 3, 4, 8"
+  },
+  {
+   "id": "V9 reporting contract",
+   "result": "pass (E1: sec. 6 table missing)",
+   "evidence": "One unit (S, GAE/sqrt(r)), band rows for every arm including the reference, ratio columns against rho-neg and proj-a, 'rho remains ahead', not a leaderboard or benchmarks row, no validation-gate submission, class engineering. Sec. 6 of the README still contains the literal placeholder VERIFY_TABLE.",
+   "path": "README.md"
+  },
+  {
+   "id": "V10 failed predictions stay failed; scope",
+   "result": "pass",
+   "evidence": "P9 is reported failed (1.14614 [0.878, 1.496], 2/6 targets won; the frozen rule needs < 1.0). No threshold, frame, seed, arm or weight differs between 505ecbb154 and the analysis. Against the incumbent isogeny arm the interval bits frames are slower at w>=0.1 (7.71 [5.06, 11.76]) and unresolved at w=0, so the result is a within-family frame choice (lo0 -> L976503, 0.437 [0.300, 0.637]) and not an improvement over the current best algebraic arm; the README says so.",
+   "path": "README.md sec. 5, 7, 10"
+  }
+ ],
+ "predictions": {
+  "C1": {
+   "readme": "held",
+   "validator": "held (on the lead's build tree)",
+   "agree": true,
+   "evidence": "build/{build,rustfmt,clippy,test}.log end RC=0; test.log 5 passed 0 failed; clippy's only diagnostic is the pre-existing unknown-lint note. Not re-run in this post-data pass (the pre-data validator re-ran rustfmt and the 5 tests on 2993713af8: RC=0). Binary provenance erratum R8 stands (pre_data_report)."
+  },
+  "C2": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "Validator ran `ecbench plan --spec ecbench/spec.json` with the t11 binary: 'spec ECS1hd4f9ace982f5 ... 84 executions', output sha256 133c78e2... identical to attempts 1, 2, 3 plan.txt. It prints a note (not an ordering warning) that the 6 curve slugs are not in docs/curves/registry.json."
+  },
+  "P1": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "Validator Euler-criterion scan: carriers of [lo, lo+32) = 11 (lo 0), 24 (976503), 16 (541434), lists equal selection/frames.json; no y=0 point; x=0 not a carrier. Records' factor_base blocks: columns 11/24/16, abscissae_scanned 32, sqrt_solves 11/24/16 per run, constant points_sha256 per arm. Model M = cols*r/covered gives 1, 0.46281, 0.44269 and 0.95652 as frozen. Unit tests U1-U4 pass per test.log."
+  },
+  "P2": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "84/84 verified, 12/12 per arm (band_pooled), six receipts ok with 0 problems, replays identical, plus the validator's own replays. The audit is 6 replays (Addendum C: --replay 1 per chunk) rather than the single-session 12."
+  },
+  "P3": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "L976503/lo0 = 0.437057 [0.299979, 0.636775] at w=0.1 and 0.437057 [0.299979, 0.636775] at w=1 (<= 0.65)."
+  },
+  "P4": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "upper ends 0.636775 and 0.636775 (< 1)."
+  },
+  "P5": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "L976503/lo0 at w=0 = 0.458085 [0.314212, 0.667836] (<= 0.75)."
+  },
+  "P6": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "L541434/L976503 at w=0.1 = 1.10551 [0.918283, 1.33092], inside [0.70, 1.30]; the interval includes 1 (reported, not predicted)."
+  },
+  "P7": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "L541434/lo0 = 0.483173 [0.328572, 0.710518] (w=0.1) and 0.483173 [0.328572, 0.710518] (w=1) (<= 0.65)."
+  },
+  "P8": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "L976503/s1093 = 7.71304 [5.0571, 11.7639] (w=0.1), 7.71321 [5.05719, 11.7641] (w=1) (>= 2.0); band means s1093 < L976503 at w=0 (22.633 < 25.941), 0.1 (821161 < 6333651), 1 (8211407 < 63336278); band verdict 'pkm-iso-t6-g4-s1093 < pkm-int-t5-g3-L976503'."
+  },
+  "P9": {
+   "readme": "failed",
+   "validator": "failed",
+   "agree": true,
+   "evidence": "L976503/s1093 at w=0 = 1.14614 [0.878171, 1.49588], wins 2/6; the rule needs < 1.0. Stays failed."
+  },
+  "P10": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "s1093/s0 at w=0.1 = 0.50746 [0.248682, 1.03552] (<= 0.75); the interval includes 1."
+  },
+  "P11": {
+   "readme": "held",
+   "validator": "held",
+   "agree": true,
+   "evidence": "Band means: proj-a 11.437/12.253/19.590 and rho-neg 1.466/1.569/2.491 are below every PKM arm at every weight (lowest PKM arm at w=0 is 22.633); band verdicts 'proj-a < X' and 'rho-neg < X' for all five PKM arms."
+  },
+  "P12": {
+   "readme": "held",
+   "validator": "held on a records reading (see E5)",
+   "agree": true,
+   "evidence": "records.jsonl phase factor_base native, summed over 12 runs: lo0 abscissae_scanned 384, legendre 384, sqrt_solves 132 (= 12*11); L976503 384, 384, 288 (= 12*24); L541434 384, 384, 192 (= 12*16); no sqrt_solves in other phases. `ecbench compare` arm lines (checked on c00) print legendre_symbols_uncharged=64 and sqrt_solves_uncharged=22/48 for 2 runs and no abscissae_scanned; band_pooled.json carries only charged_sum/native_sum per arm."
+  }
+ },
+ "recomputed": {
+  "band_mean_S_per_arm": {
+   "rho-neg": {
+    "0": 1.4661918115550348,
+    "0.1": 1.5687079062088747,
+    "1": 2.4913527580934365
+   },
+   "proj-a": {
+    "0": 11.43735442015487,
+    "0.1": 12.252651853355674,
+    "1": 19.59032875216292
+   },
+   "pkm-iso-t6-g4": {
+    "0": 29.169693988241463,
+    "0.1": 1618179.6412768625,
+    "1": 16181533.88552273
+   },
+   "pkm-iso-t6-g4-s1093": {
+    "0": 22.63291257576489,
+    "0.1": 821161.1096030782,
+    "1": 8211407.399817601
+   },
+   "pkm-int-t5-g3-lo0": {
+    "0": 56.628179017696425,
+    "0.1": 14491575.448840298,
+    "1": 144915244.8347918
+   },
+   "pkm-int-t5-g3-L976503": {
+    "0": 25.940529031865115,
+    "0.1": 6333651.186167044,
+    "1": 63336278.39690915
+   },
+   "pkm-int-t5-g3-L541434": {
+    "0": 28.225515234966412,
+    "0.1": 7001937.59747294,
+    "1": 70019121.94509228
+   }
+  },
+  "paired_ratios": [
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-int-t5-g3-lo0",
+    "weight": 0,
+    "ratio": 0.458085170348823,
+    "ci95": [
+     0.31421173438029215,
+     0.6678363674334875
+    ],
+    "b_wins_targets": "6/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-int-t5-g3-lo0",
+    "weight": 0.1,
+    "ratio": 0.4370574620079628,
+    "ci95": [
+     0.2999792942467333,
+     0.6367746999888876
+    ],
+    "b_wins_targets": "6/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-int-t5-g3-lo0",
+    "weight": 1,
+    "ratio": 0.4370573880554431,
+    "ci95": [
+     0.2999792434033296,
+     0.6367745924241036
+    ],
+    "b_wins_targets": "6/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L541434 / pkm-int-t5-g3-lo0",
+    "weight": 0,
+    "ratio": 0.49843586222586966,
+    "ci95": [
+     0.3372512040910512,
+     0.7366565507821661
+    ],
+    "b_wins_targets": "6/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L541434 / pkm-int-t5-g3-lo0",
+    "weight": 0.1,
+    "ratio": 0.4831729733038292,
+    "ci95": [
+     0.3285718572418821,
+     0.7105177055970479
+    ],
+    "b_wins_targets": "6/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L541434 / pkm-int-t5-g3-lo0",
+    "weight": 1,
+    "ratio": 0.4831729196256501,
+    "ci95": [
+     0.3285718262281084,
+     0.7105176147923893
+    ],
+    "b_wins_targets": "6/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L541434 / pkm-int-t5-g3-L976503",
+    "weight": 0,
+    "ratio": 1.08808556680916,
+    "ci95": [
+     0.9272536324135987,
+     1.2768137641226545
+    ],
+    "b_wins_targets": "2/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L541434 / pkm-int-t5-g3-L976503",
+    "weight": 0.1,
+    "ratio": 1.1055136116061237,
+    "ci95": [
+     0.9182834191239976,
+     1.3309184506590603
+    ],
+    "b_wins_targets": "2/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L541434 / pkm-int-t5-g3-L976503",
+    "weight": 1,
+    "ratio": 1.105513675847889,
+    "ci95": [
+     0.9182833863299819,
+     1.3309186528694665
+    ],
+    "b_wins_targets": "2/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-iso-t6-g4-s1093",
+    "weight": 0,
+    "ratio": 1.1461418827571483,
+    "ci95": [
+     0.8781713446583136,
+     1.4958825784975065
+    ],
+    "b_wins_targets": "2/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-iso-t6-g4-s1093",
+    "weight": 0.1,
+    "ratio": 7.713043289676148,
+    "ci95": [
+     5.057102381013309,
+     11.763858491727396
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-iso-t6-g4-s1093",
+    "weight": 1,
+    "ratio": 7.713206191464332,
+    "ci95": [
+     5.057190873636379,
+     11.764149552311599
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-iso-t6-g4",
+    "weight": 0,
+    "ratio": 0.8892972631911035,
+    "ci95": [
+     0.616865133831811,
+     1.2820462349794808
+    ],
+    "b_wins_targets": "4/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-iso-t6-g4",
+    "weight": 0.1,
+    "ratio": 3.914059369310399,
+    "ci95": [
+     2.535841202610875,
+     6.0413328447827706
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / pkm-iso-t6-g4",
+    "weight": 1,
+    "ratio": 3.9141084426844577,
+    "ci95": [
+     2.5358703060028565,
+     6.041414998562033
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4",
+    "weight": 0,
+    "ratio": 0.7759050398296398,
+    "ci95": [
+     0.46693338870564494,
+     1.2893244419763568
+    ],
+    "b_wins_targets": "4/6"
+   },
+   {
+    "b_over_a": "pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4",
+    "weight": 0.1,
+    "ratio": 0.5074597953507325,
+    "ci95": [
+     0.24868189497161472,
+     1.0355214798680894
+    ],
+    "b_wins_targets": "5/6"
+   },
+   {
+    "b_over_a": "pkm-iso-t6-g4-s1093 / pkm-iso-t6-g4",
+    "weight": 1,
+    "ratio": 0.5074554401275995,
+    "ci95": [
+     0.24867862289284012,
+     1.0355173304384173
+    ],
+    "b_wins_targets": "5/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / proj-a",
+    "weight": 0,
+    "ratio": 2.268053264673935,
+    "ci95": [
+     1.926404506386031,
+     2.6702935932435357
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / proj-a",
+    "weight": 0.1,
+    "ratio": 516920.8479903414,
+    "ci95": [
+     428537.1665664432,
+     623533.2286998358
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / proj-a",
+    "weight": 1,
+    "ratio": 3233038.056592916,
+    "ci95": [
+     2600720.633682963,
+     4019091.839393735
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / rho-neg",
+    "weight": 0,
+    "ratio": 17.69245253412835,
+    "ci95": [
+     11.978189264531897,
+     26.132737574890662
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / rho-neg",
+    "weight": 0.1,
+    "ratio": 4037495.547194439,
+    "ci95": [
+     2675257.0647150935,
+     6093384.63530082
+    ],
+    "b_wins_targets": "0/6"
+   },
+   {
+    "b_over_a": "pkm-int-t5-g3-L976503 / rho-neg",
+    "weight": 1,
+    "ratio": 25422444.971373167,
+    "ci95": [
+     16190913.233205263,
+     39917495.63557823
+    ],
+    "b_wins_targets": "0/6"
+   }
+  ],
+  "readme_agreement": "README sec. 3 (21 cells) and sec. 4 (24 cells incl. wins) match the recomputation within README rounding; 0 mismatches",
+  "distance_remaining_L976503": {
+   "rho-neg": {
+    "w0": 17.69245253412835,
+    "w0.1": 4037495.547194439,
+    "w1": 25422444.971373167
+   },
+   "proj-a": {
+    "w0": 2.268053264673935,
+    "w0.1": 516920.8479903414,
+    "w1": 3233038.056592916
+   }
+  }
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "location": "README.md sec. 6 'Replay audit' (line 164)",
+   "issue": "The literal placeholder VERIFY_TABLE was never replaced, so the receipt table that P2 and sec. 5 point to ('see sec. 6') is missing. The README was last written at 08:17:02Z, before the c03, c04 and c05 receipts existed (08:20:43Z, 08:23:45Z, 08:26:54Z), so its 'six receipts ok' statements were written ahead of three of them (the receipts now bear them out).",
+   "fix": "Replace the placeholder with the table: c00 seq13 rho-neg r1 seed 17475734811576208806; c01 seq0 rho-neg r0 seed 10657729066476355188; c02 seq10 pkm-iso-t6-g4-s1093 r1 seed 2092775619894450696; c03 seq7 pkm-int-t5-g3-L541434 r1 seed 9442080017830982377; c04 seq10 pkm-iso-t6-g4-s1093 r1 seed 1774701086946407456; c05 seq11 pkm-iso-t6-g4 r1 seed 16656228509676046783; each ok true, problems [], replay identical. State that the lo0 and L976503 arms were not in the producer's replay sample."
+  },
+  {
+   "id": "E2",
+   "location": "README.md Headline bullet 4 (line 26) and sec. 5 'Score' (line 155)",
+   "issue": "'11 of 12 predictions held (C1, C2, P1-P8, P10-P12 held; P9 failed)' and 'Score: 11 held, 1 failed' do not match the sec. 5 table, which has 14 rows (C1, C2, P1-P12): 13 held, 1 failed. 11 of 12 is the P1-P12 subtotal; adding C1 and C2 gives 13 of 14.",
+   "fix": "Write '13 of 14 predictions held (C1, C2, P1-P8, P10-P12), P9 failed' (or '11 of 12 of P1-P12, plus C1 and C2')."
+  },
+  {
+   "id": "E3",
+   "location": "README.md sec. 9 item 4 (lines 221-226) and 'Files' (line 266); dispatch item 2",
+   "issue": "data/SHA256SUMS, described as covering every file under data/, does not exist. The only SHA256SUMS in the tree is data/attempt1_refused_busy/SHA256SUMS (80/80 OK). The frozen run.sh step 6 was not reached under Addendum C and the replacement was not written.",
+   "fix": "Generate data/SHA256SUMS (excluding itself) and cite its hash; this report's data_manifest lists the 173 files as hashed at validation (listing sha256 88e1b126033d706118cccf2060539d426f428ab80d611a63f7da390622b01e37). Until then the freeze rests on the bindings in V2a."
+  },
+  {
+   "id": "E4",
+   "location": "README.md sec. 8 'Frame search' (line 190-191)",
+   "issue": "'at w >= 0.1 the ratio against lo0 is unchanged to three digits (0.4372 -> 0.4373)': the uncharged ratio is 0.437057 (0.4371, not 0.4372); charging the search to every run gives 0.43721 (w=0.1) and 0.43707 (w=1). The conclusion (unchanged to three digits, 0.437) stands; the 4-digit values do not.",
+   "fix": "Write '0.4371 -> 0.4372 at w = 0.1, 0.4371 -> 0.4371 at w = 1' (ratio of the 12-run means, search added to each L976503 run)."
+  },
+  {
+   "id": "E5",
+   "location": "README.md sec. 5 P12",
+   "issue": "The frozen P12 rule names the places to look ('in the ecbench compare arm lines or band.json') and says that if the session output shows no such counter the prediction is 'not evaluable' and 'not called held'. Neither named place prints abscissae_scanned (compare lines print legendre_symbols_uncharged and sqrt_solves_uncharged for the pair's runs only; band.json has charged_sum/native_sum). The README reads the counters from records.jsonl and calls this an 'Addendum C equivalent', but Addendum C contains no P12 provision. records.jsonl is session output and the counters match 384/384/384 and 12*cols exactly, so 'held' is defensible; it is a reading of the rule, not a plain pass.",
+   "fix": "Label the verdict 'held (counters read from records.jsonl; compare arm lines and band.json do not print abscissae_scanned, so the parenthetical in the frozen rule is not met)' and drop 'Addendum C equivalent'."
+  },
+  {
+   "id": "E6",
+   "location": "tree binding (all measurement artifacts)",
+   "issue": "data/, build/, ecbench/, selection/, README.md and validator-report.json are git-excluded (.git/info/exclude 'TEMP' lines), and every session.json has git_commit null and git_dirty null. So no commit freezes the measurement set; only PROTOCOL.md and scripts/ are committed (4eddc74edc). The measuring binary is not reproducible from any single commit (pre-data erratum R8). The records.jsonl files (146 KB each for the six chunks; eight such files over 64 KiB under data/ counting the two killed attempts) also fall under the artifact-store rule of AGENTS.md sec. 13 when committed.",
+   "fix": "Before landing: commit data/ (records.jsonl through tools/artifacts with a .artifacts.json manifest), build/, ecbench/spec.json, selection/frames.json and the README, remove the TEMP exclude lines, and add data/SHA256SUMS (E3)."
+  },
+  {
+   "id": "E7",
+   "location": "README.md sec. 9 item 3 (earlier attempts)",
+   "issue": "Disclosure gap. Chunk c00 is the same workload (target_seed 3110311101, index 0, Wc57904853fc3) as the first target of the killed attempts 2 (started 01:04:49Z, 17 records) and 3 (01:44:45Z, 13 records), and c00's round-0 records seq 0-6 carry counts identical to attempt 2's seq 0-6. The producer had therefore seen that target's round-0 counts before Addendum C was frozen (02:26:29Z). The README says only that the first 10 s2 records equal attempt 2's records. No retuning is visible: predictions and thresholds are byte-identical to 505ecbb154 (before any data), and Addendum C changes execution only.",
+   "fix": "State in sec. 9 item 3 that c00 reproduces the first target of attempts 2 and 3, that its round-0 counts were seen before the Addendum was frozen, and that the Addendum changed no threshold."
+  }
+ ],
+ "notes": [
+  "Robustness (validator addition, not a requirement): leave-one-chunk-out ratios of L976503/lo0 are 0.402-0.482 at w>=0.1 and 0.422-0.509 at w=0; per chunk (w=0.1) 0.491, 0.319, 0.376, 0.831, 0.307, 0.646, all below 1. lo0 runs are heavy-tailed (total_gae 5745-47813, F4 1.27e10-1.19e11); the interval already reflects K=6 workloads.",
+  "The plan printed by the t11 binary carries the line 'note: 6 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md sec. 11)'. It is not an ordering warning, so C2 holds; the README does not cite the slug.",
+  "Chunk c04 and c05 session start times (07:14:19Z, 07:47:32Z) trail the driver's 'start' lines (06:46:43Z, 07:43:45Z) because ecbench queued on /tmp/crypto-bench.lock; no chunk was killed and data/chunks/interrupted/ is empty.",
+  "Isolation levels in the 84 records: L0 x60, L1 x24; the spec requires L0. Counts are level-independent; no wall-time claim is made.",
+  "Pre-data findings R5 (code review of 2993713af8), R6, R7, R8 (instrument provenance) are carried unchanged in pre_data_report and were not re-run here; R8 is disclosed in README sec. 1.",
+  "No emoji, no edits to README, data or PROTOCOL by the validator. The validator's only writes are under the session scratchpad and this report; the replay receipt and logs live in the scratchpad."
+ ],
+ "recompute_agrees": true,
+ "recompute_agrees_detail": "All numeric claims checked agree with the README within its rounding, except two README text items: the prediction tally (E2) and the four-digit values in the frame-search sentence (E4).",
+ "validator_scripts": {
+  "note": "Validator-owned, in the session scratchpad; not producer code. They import nothing from the lead's scripts/.",
+  "files": {
+   "recompute.py": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/recompute.py",
+    "sha256": "4dc72547ff8d4ab2cfe492e047495ccbd168ccb45c5dfe87180283dd5073b24c"
+   },
+   "cert.py": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/cert.py",
+    "sha256": "564b38c3d8d25e1537659e6404d6ef7e85dee5fa7e0b7c337e9f6677ada41736"
+   },
+   "p12.py": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/p12.py",
+    "sha256": "edc3b87bdeeedf00edf368043fd2b016e4b7335f66c19ca647e7b5ff49a50614"
+   },
+   "specdiff.py": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/specdiff.py",
+    "sha256": "7a4cfcf12f2047bee03dee4ec6a7b53604dce2a43221338a773eeb62fa8f9f51"
+   },
+   "posctl.py": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/posctl.py",
+    "sha256": "99fd7d9e783be1cc8033fb0c995d35c3b7bedf2311cd1970caf0014c9b7f1e9f"
+   },
+   "readme_compare.py": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/readme_compare.py",
+    "sha256": "8d2b435e4613bdb8936c0ca193d8fce1788ddb0d42e15a842aa9df30fedb268d"
+   },
+   "make_report.py": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/make_report.py",
+    "sha256": "8c1ebbe7d8bc18aa746b011a20b56a96529810e6b07e4eb2226f3b0070da8dc2"
+   }
+  },
+  "outputs": {
+   "my_band.json": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/my_band.json",
+    "sha256": "22ec5631cf53707005ff57cfd06760165ff7e8a8e8c525646635e62474c6ea34"
+   },
+   "my_pairs.json": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/my_pairs.json",
+    "sha256": "9e7c14f061d1a362ed375d38369bcb266c77b799d5ab3a2dbb975b18bb2d83bf"
+   },
+   "my_manifest_data.sha256": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/my_manifest_data.sha256",
+    "sha256": "88e1b126033d706118cccf2060539d426f428ab80d611a63f7da390622b01e37"
+   },
+   "plan_validator.txt": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/plan_validator.txt",
+    "sha256": "133c78e2554ce1d9ad2d5fd904deb9b52feaed293b85e97cc1b0236c0b8251a9"
+   },
+   "old_validator_report.json": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/v/old_validator_report.json",
+    "sha256": "3dbd48874a19cc559412987f8de392705568114b1aae7944a2f6893b40b7a5a1"
+   }
+  }
+ },
+ "pre_data_report": {
+  "schema": "validator-report/v1 (validation-gate/v1 companion)",
+  "status": "fail",
+  "disposition": "refused",
+  "disposition_scope": "Measurement lead T11 (README.md, data/, predictions P2-P12): REFUSED. The artifact set is not frozen: data/ecbench/s2 is a live session (status 'running', 10 of 84 records when this report was generated, finished_unix_ms null, records_sha256 null), and README.md, data/SHA256SUMS, band, compare and verify outputs do not exist. This is a refusal to validate a moving tree, not a negative result about T11. Code-only scope (commit 2993713af8, PrimeIntervalBase and the pkm-semaev coupling): reviewed correct, unit tests and rustfmt pass on the committed tree, with a binary-provenance erratum (R8).",
+  "independent": true,
+  "validator": "validator subagent (core tier, claude-opus-5-5). Not the producer of T11.",
+  "date": "2026-11-04",
+  "validated_commit": "2993713af847e19024a8c569a83403223c95938d (code); no measurement commit exists (data/ is git-excluded and live)",
+  "protocol_freeze_commit": "505ecbb154f907657e6b3865699d41a54c550406",
+  "tree_state": "HEAD 91996ac7ef08cdfd89cdf6914a27940a9f33e992 on branch claude/curve25519-index-calculus-i674j4. HEAD moved during validation from 2993713af8 to 91996ac7ef (01:47:12Z, T12 protocol freeze, research files only). src/, Cargo.toml and Cargo.lock are byte-identical to 2993713af8; tracked tree clean. PROTOCOL.md, scripts/run.sh and scripts/select_frames.py are identical to 505ecbb154. data/, ecbench/, selection/, build/ are untracked (.git/info/exclude), so no commit freezes them.",
+  "artifact_hashes_at_validation": {
+   "PROTOCOL.md": "01726448ea647f55cee51c5d52a2163fc2b2edf389477b3a68fdb2a45d8c53fe",
+   "scripts/run.sh": "e43fca15dceda63c7715224d130483723313c80a54c42cf78c7f27399a145215",
+   "scripts/select_frames.py": "62355d8366c8c4fd9b4e62900a30981c04b45ec4904fda57b762a8e2e2add303",
+   "ecbench/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+   "selection/frames.json": "b28527408d99debb19b26daf2281e209b4ee01148245af19fb01038f58118b7f",
+   "build/ecbench.sha256": "b1fe6ed7c90a18cb1bba87fc7ed0d5e19addd9a78150ce6a8e9c30a323064a1b",
+   "build/source.sha256": "eb267e55b526651a5862ac0c6c412323c1384243318aebd0aa12a7af2cb7a571",
+   "build/build.log": "9eab76fa839ca3ddfc9d953b672fc7a67dcf93799f25e6edc47280745ee6296b",
+   "build/rustfmt.log": "7e1cd69fab85528649b3c67810caed1f9db026f90623c7d226ea1477c93b6a46",
+   "build/clippy.log": "c8908c64c12f17c316ea0f3f1dc9ca20e4e9545fb0b752960d49c38834db8eb3",
+   "build/test.log": "146ab5f5f7ffc7e6d14ce0eb72d4e2371c2c25667074412ff297784ff2318c27",
+   "data/binary.sha256": "2247a108927ab145c83261b0f2236addc8b1e67a2370da9b2ee18a5df73ef6b2",
+   "data/source.sha256": "eb267e55b526651a5862ac0c6c412323c1384243318aebd0aa12a7af2cb7a571",
+   "data/run_s2_allowbusy.sh.used": "9344e720cee5a61d90d4c21e0e8b3e67243b85ae6e4bff557581354e50a705ce",
+   "data/run_allowbusy.sh.used": "27c6a77d00bab9af93b94291c4b4ad29cd87f83f06e1092d57e24f3dce736600",
+   "data/ecbench/plan.txt": "133c78e2554ce1d9ad2d5fd904deb9b52feaed293b85e97cc1b0236c0b8251a9",
+   "data/ecbench/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+   "data/ecbench/s2/spec.json": "630f7722270399ce05ffcd585ef12ecd48f98e7f7401ace4c88d235b6becdbc2",
+   "data/ecbench/s2/plan.json": "aca3c3bc4477904fe51641722ea608fc2762044114b5788b22a1d34d9b76788a",
+   "data/ecbench/s2/host.json": "ddeb22714b395b775b1d58a994fae3f6c7624941e26d72c2100feb07d8c2555c",
+   "data/attempt1_refused_busy/SHA256SUMS": "1dadbcdf49cf8d82ee4e6355d7fdf5ff4d023e4d19abf282cc6358d024c0099e",
+   "data/interrupted_attempt2/s1/records.jsonl": "fb79d529c85a4bde8202610fc65a74cc1ae4f1f0fbbcc733825773c1cc084cb6",
+   "data/interrupted_attempt2/s1/session.interrupted.json": "5ffc950c60ac76363490ece02ea54244be45801143d4d18af8ac11a4380a58d0"
+  },
+  "missing_artifacts": [
+   "README.md",
+   "data/SHA256SUMS",
+   "data/ecbench/band.json",
+   "data/ecbench/band.txt",
+   "data/ecbench/verify.json",
+   "data/ecbench/verify.txt",
+   "data/ecbench/load_end.txt"
+  ],
+  "compare_outputs_present": [],
+  "live_session": {
+   "path": "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/data/ecbench/s2",
+   "session_id": "ECBS1h7165cac69326",
+   "status": "running",
+   "records_written": 10,
+   "records_lines_seen": 10,
+   "executions_planned": 84,
+   "started_unix_ms": 1793756685934,
+   "finished_unix_ms": null,
+   "records_sha256": null,
+   "binary_sha256": "82bcad823fffcc7067eee11a38905ced4c1244b998741289155101a6bba19031",
+   "git_commit": null,
+   "git_dirty": null,
+   "allow_busy": true
+  },
+  "instrument": {
+   "binary": "/home/user/ctarget-t11/release/ecbench",
+   "sha256": "82bcad823fffcc7067eee11a38905ced4c1244b998741289155101a6bba19031",
+   "checks": "Equal to build/ecbench.sha256, data/binary.sha256 and s2/session.json binary_sha256; mtime 2026-11-03T22:22:47Z. Re-hashed before and after the validator's test build: 82bcad823fffcc7067eee11a38905ced4c1244b998741289155101a6bba19031 / 82bcad823fffcc7067eee11a38905ced4c1244b998741289155101a6bba19031. Cargo.lock before/after: cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6 / cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6."
+  },
+  "requirements": [
+   {
+    "id": "R0 frozen, committed artifact set",
+    "result": "fail (refused)",
+    "evidence": "s2/session.json status 'running', records 10/84; ecbench run pid live at validation (started 01:44:40Z). README.md, data/SHA256SUMS, band.json, verify.json absent; data/ is git-excluded. The dispatch states README.md and data/ were produced; they were not.",
+    "path": "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/data/ecbench/s2/session.json"
+   },
+   {
+    "id": "R1 data files match data/SHA256SUMS",
+    "result": "not evaluable",
+    "evidence": "data/SHA256SUMS does not exist (run.sh step 6 not reached). Secondary: data/attempt1_refused_busy/SHA256SUMS verifies 80/80; the frozen script's `find ! -name run.log` omits every file named run.log (here ecbench/run.log and run.log), so the final SHA256SUMS will not cover ecbench/run.log either. data/interrupted_attempt2 has no SHA256SUMS.",
+    "path": "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/data/attempt1_refused_busy/SHA256SUMS"
+   },
+   {
+    "id": "R2 validator re-run of a measurement cell (ecbench verify --replay 4)",
+    "result": "not attempted (blocked)",
+    "evidence": "Blocked: the session is live (records_sha256 null), so a replay would audit a moving tree; the host also carried three other heavy processes. Exploratory, not a replay certificate: the first 10 s2 records equal the frozen interrupted attempt-2 records seq 0-9 (same binary, same seeds) in every count field (cost.s, total_gae, counters, F4 ops, outcome); the only differing keys are .time.*, wall_ns, solver gae/ns_per_op (priced_by measured = wall), isolation/PSI, env_class_id, record and session ids (/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/prefix_compare.out).",
+    "path": "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/data/ecbench/s2/records.jsonl"
+   },
+   {
+    "id": "R3 recompute every README number and verdict",
+    "result": "not evaluable",
+    "evidence": "No README.md and no band/compare outputs. Pre-data gates recomputed: C1, C2, P1 (see predictions)."
+   },
+   {
+    "id": "R4 scope; failed predictions reported as failed",
+    "result": "not evaluable",
+    "evidence": "No README. When it is written it must: keep T11 exploratory, not a leaderboard/benchmarks row and with no gate submission; state the distance to rho-neg and proj-a at w = 0, 0.1 and 1 from this session; disclose attempt 1 (refused by the PSI gate, 22:39:30Z to 00:34:30Z), attempt 2 (s1, 17/84, killed by the container restart, kept and not mixed), the --allow-busy deviation from the frozen run.sh, and the binary provenance (R8)."
+   },
+   {
+    "id": "R5 code review of 2993713af8",
+    "result": "pass (with low-severity notes)",
+    "evidence": "PrimeIntervalBase::build scans x = (lo + k) mod p for k < 2^t and delegates the points to bits_factor_base ((lo mod p + k) mod p, the same set), so the base is exactly the carriers of [L, L + 2^T) mod p, ascending x, one column per abscissa, coef 1 for (x, min(y, p-y)) and r-1 for its negative, a single point when y = 0: the conventions of abscissa_factor_base/prime_factor_base, which curve25519_family uses with pkm-semaev bits. Charging equals prime_factor_base: abscissae_scanned = legendre_symbols = 2^t, sqrt_solves = #(Legendre >= 0), count_index_build(a + n, a); bits_factor_base charges nothing itself, so no double count. Parameter checks: unknown key, t = 0, t >= 64 (short-circuits before the shift), 2^t >= p, lo >= p, empty interval. from_spec: the prime-interval arm precedes the generic bits arm, reads (t, lo) from the base, rejects a differing bits= or lo=, accepts equal ones; Membership::Bits in prepare checks (x - lo) mod p < 2^t, consistent with the base under wraparound. Registered in prime_base_for, dump_factor_base and the factor_base help string; ic_boundary.rs change is visibility only (pub(crate) count_index_build).",
+    "path": "src/cryptanalysis/ic_framework/pkm_semaev.rs"
+   },
+   {
+    "id": "R6 unit tests on the committed tree",
+    "result": "pass",
+    "evidence": "CARGO_TARGET_DIR=/home/user/ctarget-t11 nice -n 19 cargo test --release --locked --lib prime_interval on HEAD 91996ac7ef08cdfd89cdf6914a27940a9f33e992 (src identical to 2993713af8): RC=0; test cryptanalysis::ic_framework::pkm_semaev::tests::prime_interval_u2_lo0_equals_prime_abscissa_below ... ok; test cryptanalysis::ic_framework::pkm_semaev::tests::prime_interval_u3_u4_explicit_x_and_charging ... ok; test cryptanalysis::ic_framework::pkm_semaev::tests::prime_interval_u1_frames_equal_bits_factor_base ... ok; test cryptanalysis::ic_framework::pkm_semaev::tests::prime_interval_u5_rejections ... ok; test cryptanalysis::ic_framework::pkm_semaev::tests::prime_interval_u6_pipeline_solves ... ok; test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 6113 filtered out; finished in 0.19s",
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/test_validator.log"
+   },
+   {
+    "id": "R7 rustfmt --check on the changed files",
+    "result": "pass",
+    "evidence": "rustfmt 1.9.0 --edition 2021 --check pkm_semaev.rs methods.rs ic_boundary.rs at 2993713af8: RC=0",
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/rustfmt_validator.log"
+   },
+   {
+    "id": "R8 reproducibility binding of the instrument",
+    "result": "fail (erratum)",
+    "evidence": "build/source.sha256 and data/source.sha256 give ic_boundary.rs a811558a18ff...cd742; the committed file at 2993713af8 is 7b0ac308115d...12fb. The validator reproduced a811558a... exactly as 505ecbb154's ic_boundary.rs plus the one-line pub(crate) change. The binary (mtime 2026-11-03T22:22:47Z; reflog: HEAD was 505ecbb154 from 21:59:32Z to 22:39:07Z) was therefore built from 505ecbb154 + the T11 patch. 2993713af8 sits on origin/main c1a3eac7ec, whose ic_boundary.rs carries +153/-6 upstream lines (x86-64 asm mulmod_u32 and Euclid inversion, df75c8c3da/4f57ca1c6b/a959354b93). No commit rebuilds binary 82bcad82...; the lead's build/test/clippy/rustfmt logs certify the 505ecbb154-based tree, not 2993713af8; session git_commit and git_dirty are null; files beyond the three listed are not hashed. pkm_semaev.rs and methods.rs hashes do match 2993713af8, and 505ecbb154 and 2993713af8^ hold the same versions of both.",
+    "path": "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/build/source.sha256"
+   },
+   {
+    "id": "R9 certificate discipline (independent re-verification of solves)",
+    "result": "exploratory pass; not the gate",
+    "evidence": "Validator EC code (affine double-and-add, own implementation): every record in the frozen interrupted attempt 2 (17/17) and every s2 record present at validation (interrupted_attempt2/s1/records.jsonl independently verified: 17 failed: 0; ecbench/s2/records.jsonl independently verified: 10 failed: 0) has G and target on the curve and of order r, and [recovered]G = target. Re-verification of the final 84 s2 records is pending the session."
+   },
+   {
+    "id": "R10 controls and pricing",
+    "result": "not evaluable",
+    "evidence": "The frozen spec carries the reference (rho-neg), the baseline (proj-a), both incumbents and the three interval arms; band at w = 0, 0.1, 1 not yet produced. Pricing note for the README: in the records, the interval scan's legendre_symbols and sqrt_solves appear in cost.unpriced as *_uncharged (no pinned ratio on this curve), as they do for prime-abscissa: they are free at w = 0 and priced only by the band at w = 0.1 and 1. The protocol's 'nothing is moved into uncharged' holds only in the sense that the scan is counted inside the harness."
+   }
+  ],
+  "predictions": {
+   "C1": {
+    "outcome": "held on the lead's build tree; build tree is not 2993713af8 (see R8)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "build/{build,rustfmt,clippy,test}.log each end RC=0; test.log 5 passed 0 failed (U1-U6; U3+U4 are one test). Clippy's only diagnostic is E0602 unknown lint clippy::chunks_exact_to_as_chunks from Cargo.toml line 228 (pre-existing, ignores -D warnings), none in the changed files. Validator re-ran on the committed tree: rustfmt --check RC=0; cargo test --release --locked --lib prime_interval RC=0; 5 passed 0 failed."
+   },
+   "C2": {
+    "outcome": "held",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Validator ran `ecbench plan --spec ecbench/spec.json` with the t11 binary (82bcad82...9031) and the shared binary (54737834...9641b, the protocol's value): both print `spec ECS1hd4f9ace982f5 ...: 84 executions`, no warning; output byte-identical to data/ecbench/plan.txt. s2/session.json spec_id ECS1hd4f9ace982f5."
+   },
+   "P1": {
+    "outcome": "held (recomputed independently)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Validator Python (Legendre via Euler's criterion, own code): carriers of [lo, lo+32) are 11 (lo 0), 24 (976503), 16 (541434), lists equal selection/frames.json; no 2-torsion abscissa in any frame (22/48/32 points); x = 0 is not a carrier so [0,32) = prime-abscissa:below=32; 32 scanned, sqrt_solves 11/24/16. Curve: p, r prime, #E = p+1+sum Legendre = 1049624 = 8r, [r]G = O. M ratios 0.46281, 0.44269, Jcols/J 0.95652 equal frames.json. Unit tests U1-U4 pass on 2993713af8."
+   },
+   "P2": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P3": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P4": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P5": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P6": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P7": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P8": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P9": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P10": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P11": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time."
+   },
+   "P12": {
+    "outcome": "not evaluable: the session and the analysis do not exist yet (see R0)",
+    "readme": "no README",
+    "agree": null,
+    "evidence": "Requires the complete s2 session plus band, compare and verify outputs, none of which exist at validation time. Exploratory only (not a verdict): in the frozen interrupted attempt-2 records (same binary), all 6 interval-arm executions carry factor_base native abscissae_scanned = 32, legendre_symbols = 32, sqrt_solves = 11/24/16."
+   }
+  },
+  "errata": [
+   "REFUSED: the measurement artifact set is not frozen. data/ecbench/s2 is a live session; README.md, data/SHA256SUMS, band, compare and verify outputs do not exist, so checks (1)-(4) and P2-P12 cannot be validated. This is not a negative result.",
+   "Instrument provenance: binary 82bcad82...9031 was built from 505ecbb154 + the T11 patch (ic_boundary.rs a811558a...), not from 2993713af8 (ic_boundary.rs 7b0ac308..., +153/-6 upstream lines). No commit reproduces the measuring binary, and the lead's C1 logs certify that tree, not 2993713af8.",
+   "Deviations from the frozen run.sh, still to be disclosed: --allow-busy added after attempt 1 was refused by the PSI gate; output to s2 after attempt 2 (s1, 17/84) was killed by the container restart; D hard-coded. The protocol permits them (counts are level-independent; one fresh s2 is allowed).",
+   "Coverage: the frozen SHA256SUMS step excludes every file named run.log, ecbench/run.log included."
+  ],
+  "notes": [
+   "Low severity, code: with a prime-interval base the from_spec arm silently ignores square_bits=, t0_bits= or edwards_bits= on the oracle (the same behaviour the prime-kummer and prime-isogeny arms have); the fall-through error text does not list prime-interval.",
+   "Low severity, tests: no test exercises wraparound (lo + 2^t > p); base, bits_factor_base and Membership::Bits all reduce mod p consistently, and no frozen frame wraps.",
+   "Low severity, tests: U6 calls run_pipeline with PrimeIntervalBase directly; ecbench's prime_base_for registration is exercised only by the session runs (the interrupted attempt-2 interval-arm executions verified).",
+   "Out of protocol scope: src/bin/ic/bench.rs keeps its own factor-base dispatch without prime-interval.",
+   "Host at validation: four cores shared by the t11 s2 run, another validator's t9 replay, and a T12/T10-winner ecbench run. Load affects wall time only; the validator ran one heavy process (the test build) at nice 19."
+  ],
+  "recompute_agrees": null,
+  "recompute_agrees_detail": "No README numbers exist to compare. Recomputed and agreeing: C2 spec id and execution count, P1 frame facts, frames.json M ratios, curve order.",
+  "headline": [],
+  "raw_data": [],
+  "validator_scripts": {
+   "note": "Validator-owned, in the session scratchpad; not producer code.",
+   "frames_check": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/frames_check.py",
+    "sha256": "91a1f99903452535ab7bc87a2cf75124ac91cdf2350c66816e3208fed4655f26"
+   },
+   "cert_check": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/cert_check.py",
+    "sha256": "c6e068eaeac89ddc18f053b5d55558cd6e7890b38e570cd66427ec71de5227a2"
+   },
+   "prefix_compare": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/prefix_compare.py",
+    "sha256": "49bc4635cfbefbac05231141d7fd02601c705570c7b02bd29faffab7b4d90e7a"
+   },
+   "prefix_compare_output": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/prefix_compare.out",
+    "sha256": "80c497f9e15cc979c19e9b34060644facb19dde9478c41bf37508b21f5da9256"
+   },
+   "cert_check_output": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/cert_check.out",
+    "sha256": "830bae5a4fe62d6b9de3eb4fee9124c7001ba75436bf81d9856a497e7be1ee65"
+   },
+   "report_generator": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/make_report.py"
+   },
+   "plan_output": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/plan_validator.txt",
+    "sha256": "133c78e2554ce1d9ad2d5fd904deb9b52feaed293b85e97cc1b0236c0b8251a9"
+   },
+   "test_log": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/test_validator.log",
+    "sha256": "7fd26fb3735d353f0e3bc5652954dfac9b357271880b00b8b4d37cf1fb3fc034"
+   },
+   "rustfmt_log": {
+    "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/t11/rustfmt_validator.log",
+    "sha256": "7e1cd69fab85528649b3c67810caed1f9db026f90623c7d226ea1477c93b6a46"
+   }
+  },
+  "next_action": "Re-dispatch validation after run.sh logs 'done' (s2 complete with 84 records, band.json, all 24 compares, verify.json with --replay 12, data/SHA256SUMS) and the producer writes README.md; the producer should also correct the instrument provenance (R8) in the README. Then run ecbench verify --dir data/ecbench/s2 --replay 4 with binary 82bcad82..., re-verify all 84 certificates, and recompute P2-P12 from band/compare outputs."
+ }
+}

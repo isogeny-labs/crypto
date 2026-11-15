@@ -834,3 +834,5 @@ fn no_restore_with_generation_rejected() {
     });
     assert!(f.run().unwrap_err().contains("zero restores"));
 }
+
+mod unknown_runtime;

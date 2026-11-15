@@ -163,6 +163,119 @@ fn config_block(output_bits: u64) -> [u8; 32] {
     cfg
 }
 
+/// Incremental unkeyed Skein state. The final message block remains buffered
+/// until finalization so its UBI tweak carries the final flag.
+pub struct SkeinStream<const N: usize> {
+    state: [u8; N],
+    block: [u8; N],
+    filled: usize,
+    consumed: u128,
+    first: bool,
+    output_len: usize,
+    ubi: fn(&mut [u8; N], &[u8; N], &[u8; 16]),
+}
+
+impl<const N: usize> SkeinStream<N> {
+    fn with_ubi(output_len: usize, ubi: fn(&mut [u8; N], &[u8; N], &[u8; 16])) -> Self {
+        assert!((1..=1_048_576).contains(&output_len));
+        let mut state = [0u8; N];
+        let mut config = [0u8; N];
+        config[..32].copy_from_slice(&config_block((output_len as u64).wrapping_mul(8)));
+        ubi(
+            &mut state,
+            &config,
+            &make_tweak(32, T_CFG, true, true, false),
+        );
+        Self {
+            state,
+            block: [0; N],
+            filled: 0,
+            consumed: 0,
+            first: true,
+            output_len,
+            ubi,
+        }
+    }
+
+    fn compress_nonfinal(&mut self, block: &[u8; N]) {
+        self.consumed = self.consumed.wrapping_add(N as u128);
+        (self.ubi)(
+            &mut self.state,
+            block,
+            &make_tweak(self.consumed, T_MSG, self.first, false, false),
+        );
+        self.first = false;
+    }
+
+    pub fn update(&mut self, mut data: &[u8]) {
+        if self.filled != 0 {
+            let take = data.len().min(N - self.filled);
+            self.block[self.filled..self.filled + take].copy_from_slice(&data[..take]);
+            self.filled += take;
+            data = &data[take..];
+            if data.is_empty() {
+                return;
+            }
+            let block = self.block;
+            self.compress_nonfinal(&block);
+            self.filled = 0;
+        }
+        while data.len() > N {
+            let mut block = [0u8; N];
+            block.copy_from_slice(&data[..N]);
+            self.compress_nonfinal(&block);
+            data = &data[N..];
+        }
+        self.block[..data.len()].copy_from_slice(data);
+        self.filled = data.len();
+    }
+
+    pub fn finalize(mut self) -> Vec<u8> {
+        self.block[self.filled..].fill(0);
+        let position = self.consumed.wrapping_add(self.filled as u128);
+        (self.ubi)(
+            &mut self.state,
+            &self.block,
+            &make_tweak(position, T_MSG, self.first, true, false),
+        );
+
+        let mut output = Vec::with_capacity(self.output_len);
+        let mut counter = 0u64;
+        while output.len() < self.output_len {
+            let mut counter_block = [0u8; N];
+            counter_block[..8].copy_from_slice(&counter.to_le_bytes());
+            let mut state = self.state;
+            (self.ubi)(
+                &mut state,
+                &counter_block,
+                &make_tweak(8, T_OUT, true, true, false),
+            );
+            let take = (self.output_len - output.len()).min(N);
+            output.extend_from_slice(&state[..take]);
+            counter += 1;
+        }
+        output
+    }
+}
+
+impl SkeinStream<32> {
+    pub fn new_256(output_len: usize) -> Self {
+        Self::with_ubi(output_len, ubi_block_256)
+    }
+}
+
+impl SkeinStream<64> {
+    pub fn new_512(output_len: usize) -> Self {
+        Self::with_ubi(output_len, ubi_block_512)
+    }
+}
+
+impl SkeinStream<128> {
+    pub fn new_1024(output_len: usize) -> Self {
+        Self::with_ubi(output_len, ubi_block_1024)
+    }
+}
+
 // ── Skein-256 ───────────────────────────────────────────────────────────────
 
 /// Run one UBI pass of type `type_byte` consuming `data` (zero-padded
@@ -356,6 +469,40 @@ pub fn skein1024(data: &[u8], output_len: usize) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn streaming_matches_all_one_shot_variants_across_final_blocks() {
+        for size in [0, 1, 31, 32, 33, 63, 64, 65, 127, 128, 129, 257] {
+            let input: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            for split in [1, 7, 32, 65, 129] {
+                for output_len in [1, 17, 32, 64, 129] {
+                    let mut s256 = SkeinStream::<32>::new_256(output_len);
+                    let mut s512 = SkeinStream::<64>::new_512(output_len);
+                    let mut s1024 = SkeinStream::<128>::new_1024(output_len);
+                    for chunk in input.chunks(split) {
+                        s256.update(chunk);
+                        s512.update(chunk);
+                        s1024.update(chunk);
+                    }
+                    assert_eq!(
+                        s256.finalize(),
+                        skein256(&input, output_len),
+                        "256/{size}/{split}/{output_len}"
+                    );
+                    assert_eq!(
+                        s512.finalize(),
+                        skein512(&input, output_len),
+                        "512/{size}/{split}/{output_len}"
+                    );
+                    assert_eq!(
+                        s1024.finalize(),
+                        skein1024(&input, output_len),
+                        "1024/{size}/{split}/{output_len}"
+                    );
+                }
+            }
+        }
+    }
 
     fn hex_to_vec(s: &str) -> Vec<u8> {
         hex::decode(s).expect("valid hex literal")

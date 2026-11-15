@@ -1,0 +1,53 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 3458,
+  "standing": "unverified",
+  "date": "2026-11-05",
+  "parent": "41305a25b937f23d2cea55c1cd94c3e57ad6112f",
+  "observed_failure": {
+    "head": "c925c4f2018273128ae3396022cca27606d99db7",
+    "cli_job": 127307531525,
+    "conclusion": "cancelled at unchanged 25-minute bound during root Rust compilation",
+    "library": "success",
+    "sdk_s3_compile_started": "2026-11-05T14:34:08Z",
+    "sdk_sts_compile_started": "2026-11-05T14:37:32Z",
+    "root_compile_started": "2026-11-05T14:39:01Z"
+  },
+  "repair": "Build only the existing locked aws-sdk-s3 and aws-sdk-sts dependencies in one bounded macOS job; restore its dependency cache before both unchanged qualification phases.",
+  "cache": {
+    "action": "Swatinem/rust-cache@v2",
+    "shared_key": "certicom-metal-pinned-sdk-v1",
+    "add_job_id_key": false,
+    "qualification_save": false,
+    "toolchain": "stable",
+    "build_jobs": 2,
+    "release_codegen_units": 256,
+    "checkout": "exact existing qualification sparse paths",
+    "scope": "GitHub dependency cache; no storage or push credentials"
+  },
+  "checks": {
+    "local_feature_selection": "cargo metadata --locked and cargo tree confirm exact existing SDK features; all 343 nonempty selected normal/build dependency lines occur in the full root normal/build graph",
+    "sdk_features": {
+      "aws-sdk-s3": [
+        "http-1x",
+        "rt-tokio"
+      ],
+      "aws-sdk-sts": [
+        "rt-tokio"
+      ]
+    },
+    "yaml_and_semantic_validation": "PASS: actionlint 1.7.12 (release SHA-256 checked), YAML parse and structural comparison after removing only the new dependency job/needs/cache step; every original job matches.",
+    "actual_macOS_cache_restore_and_qualification": "pending fresh CI"
+  },
+  "preservation": [
+    "Every original qualification command, assertion, shader/worker build, probe, matrix, hardware restriction, runner, timeout and permission is retained.",
+    "One extra executed dependency job is expected; the actual total must remain <=30, counting every context that ran.",
+    "All source, frozen research, artifact policy and PCC objects remain exact parent objects; no ledger integration or standing selection is performed.",
+    "The complete current parent journal is retained verbatim as a prefix; prior owner main/ledger integrations are inherited without modification."
+  ],
+  "references": [
+    "https://github.com/Swatinem/rust-cache/blob/v2/README.md",
+    "https://doc.rust-lang.org/cargo/commands/cargo-build.html#package-selection",
+    "https://doc.rust-lang.org/cargo/reference/profiles.html#codegen-units"
+  ]
+}

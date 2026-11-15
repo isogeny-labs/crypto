@@ -1,0 +1,9 @@
+import WordMixed
+open PencilWordRefinement
+example : mixedClassifyWord 7 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩ = .positiveCoincidence := by decide
+example : mixedClassifyWord 7 ⟨0,0,1,1⟩ ⟨0,0,0,0,1,1⟩ = .cancellation := by decide
+example : (7:UInt64) ≠ 0 := by decide
+example : (((7:UInt64).toNat):ZMod 7) = 0 := by decide
+#print axioms MixedCancellation.scales
+#print axioms MixedCancellation.shared_support_conclusions
+#print PencilWordRefinement.mixed_word_branch_invariant

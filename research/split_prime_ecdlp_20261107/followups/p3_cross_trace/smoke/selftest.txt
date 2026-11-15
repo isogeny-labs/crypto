@@ -1,0 +1,12 @@
+# selftest
+PASS sqrt_mod: 0 failures in 200 (p in 1009..2^32)
+PASS is_prime: ok
+PASS bsgs vs brute count: 160/160 curves
+PASS psi3/psi5 (deg, lead 5, torsion<=>root, gcd vs evaluation, squarefree): last p=10007 psi3 roots 0 psi5 roots 2
+PASS z_c equals splitcount.rs recount at all 12 cutoffs: 3 curves, max |dz| = 0.00e0; odd primes used at 691: 124 (124 expected)
+PASS rho recovers planted k: 10/10; mean ops 456
+PASS m=2 coverage equals brute-force set size: p=1009, N=20, 3 curves
+PASS t quantile: t_0.975,10 = 2.228139
+PASS normal: ok
+PASS ols slope: b = 0.3000 [0.2997,0.3003]
+ALL SELFTESTS PASSED

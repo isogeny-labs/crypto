@@ -1,0 +1,46 @@
+{
+  "argv": [
+    "-T:30",
+    "-st",
+    "/work/inputs/target_native-holdout-0-carry.smt2"
+  ],
+  "arm": "target_native",
+  "artifacts": [
+    {
+      "bytes": 1086,
+      "path": "0008.solver.out",
+      "sha256": "cc1ca7d84b7c02f823aeadfe15d01969c0c31933ff591ebf80cb0b58f952fcbf"
+    },
+    {
+      "bytes": 0,
+      "path": "0008.solver.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "base_sha256": "5bd01ca00efcec04102e160e86f9ce6539d93e8686d083808b665f552a29c7d4",
+  "encoding": "carry",
+  "expected": "unsat",
+  "external_replay_exit": 0,
+  "independent_standing": "unverified",
+  "index": 8,
+  "observed": "unsat",
+  "producer_check_passed": true,
+  "query": "target_native-holdout-0-carry.smt2",
+  "query_sha256": "30413ddcca48e8e8bdd766a861526d00a57474e4a0aec070d8e183c5e124d854",
+  "replay_artifacts": [
+    {
+      "bytes": 100,
+      "path": "0008.openssl.out",
+      "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+    },
+    {
+      "bytes": 0,
+      "path": "0008.openssl.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "replay_exit": null,
+  "schema": "atlas.solver-row/v1",
+  "solver_exit": 1,
+  "solver_rlimit": 79735874
+}

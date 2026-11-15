@@ -1,4 +1,22 @@
-# Required root-library validation: incomplete legacy case
+# Required root-library validation and fixture correction
+
+## Completion update
+
+The full command has now completed with exit 101: 5,404 passed, 26 failed and
+123 default ignored. The previously pending legacy isogeny-walk case passed.
+Every failure was a missing tracked compile/runtime fixture; all 26 exact-name
+replays pass after materialization, against the identical native executable.
+No root-library or test source was edited. There is no remaining local validation job.
+
+The complete raw output is archived as `root-cargo-attempt3-final.log.gz`, with
+its hash/size fixed in the stored-artifact binding file. The earlier incomplete
+snapshot below remains historical evidence. This is not a fresh single green
+full-suite run: preserve both the original nonzero exit and the separate 26 passes.
+The combined coverage is all 5,430 default non-ignored cases, with 123 existing
+ignored cases outside that original scope. No wall-clock performance conclusion
+is drawn from the test harness's printed duration.
+
+## Historical snapshot
 
 Snapshot: 2026-10-30 05:11 UTC. This is development regression validation,
 not a scientific experiment or a measured algorithm comparison. The full
@@ -33,7 +51,7 @@ The running executable and the on-disk executable have the same SHA256:
 The binary itself is not vendored; its source/lock/toolchain and hash are
 receipts. The native inventory command also completed successfully.
 
-## The unresolved running case
+## The unresolved case at the historical snapshot
 
 `cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies`
 has not returned. It invokes the existing `run_end_to_end(101,1,8,

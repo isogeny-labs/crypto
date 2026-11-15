@@ -6,7 +6,7 @@
 
 All selected numeric query work and retained attempt accounting are published as natural per-curve/per-algorithm CSV tables; paired/I-number tables summarize each problem over every curve. These projections exclude scalar witnesses and raw randomness. Full scalar-bearing journals and all unsuccessful attempts remain preserved locally.
 
-The full PDFs and 150 dpi PNG renders remain local because new repository policy routes data files over 64 KiB to the configured S3 store, and this runtime has no AWS client or configured outbound identity. No successful S3 upload is claimed. SVG/HTML figures are reviewable here. This is descriptive research evidence and is not promoted to the benchmark index or IC leaderboard under the new validation gate.
+The inspected [results PDF](RESULTS_REPORT.pdf) and [run PDF](RUN_REPORT.pdf) are now included under the October 26 PDF-in-Git policy. Four full-size heatmap PNGs were uploaded to the content-addressed S3 store on October 28 and independently downloaded/hash-checked; each panel directory has its `.artifacts.json` and hydration instructions are in [the publication receipt](../ARTIFACT_PUBLICATION_20261028.md). The old inspection JSON is retained as a dated pre-publication snapshot. Numeric results and SVG/HTML figures are unchanged. This is descriptive research evidence and is not promoted to the benchmark index or IC leaderboard under the validation gate.
 
 | Curve alias | Level | Rho modular counters | BSGS modular counters | Per-system regularity |
 | --- | --- | --- | --- | --- |

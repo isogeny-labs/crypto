@@ -3,6 +3,12 @@ pub mod benchmark;
 pub mod core;
 pub mod evidence;
 pub mod exhaustive;
+pub mod tr04;
+pub mod tr04_protocol;
+pub mod tr04_relation;
+pub mod tr04_report;
+pub mod tr04_select;
+pub mod tr04_verify;
 
 pub fn valid_prime(p: u64, maximum: u64) -> bool {
     p >= 7 && p <= maximum && p % 4 == 3 && core::prime(p)

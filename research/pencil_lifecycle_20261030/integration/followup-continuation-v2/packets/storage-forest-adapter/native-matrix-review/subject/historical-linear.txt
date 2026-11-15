@@ -1,0 +1,4 @@
+fn linear(x: [u64; 4], mat: [[u64; 4]; 4], p: u64) -> [u64; 4] {
+    std::array::from_fn(|i| (0..4).fold(0, |v, j| add(v, mul(mat[i][j], x[j], p), p)))
+}
+fn same(x: [u64; 4], y: [u64; 4], p: u64) -> bool {

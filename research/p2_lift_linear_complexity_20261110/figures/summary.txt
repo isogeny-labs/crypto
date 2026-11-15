@@ -1,0 +1,26 @@
+summary (numbers, not verdicts):
+  rows: 336 (21 curves x 4 multipliers x 4 observables); fatal: []
+  self-checks all true on every row: True
+  c == N on all 84 rows of O1: True; rows with c != N: 0
+  c == N on all 84 rows of O6: True; rows with c != N: 0
+  c == N on all 84 rows of O2: True; rows with c != N: 0
+  c == N on all 84 rows of O3: True; rows with c != N: 0
+  L in {r-1, r} on all rows: True; mean_nonzero: O1,O2,O3 False on all 252 rows, O6 True on all 84 rows: True
+  A/A pass: 21/21 curves
+  plant O5 (set S): S_0: L=2, c=1, pass=True; S_1: L=2, c=1, pass=True
+  empirical null: sequences with c < N, all curves: 0 of 4200; curves with c_min != N or c_max != N: 0
+  S_0: r=5449, c(O1)=2724, (r-1)/2=2724, rule-2 threshold (r-1)/2-3=2721, c(O1)-threshold=3
+  S_1: r=5431, c(O1)=2715, (r-1)/2=2715, rule-2 threshold (r-1)/2-3=2712, c(O1)-threshold=3
+  log10 P_vanish: min -317120.13, max -5.59 (S_0 -5.59, S_1 -6.19); curves with P_vanish < 1e-3: 21 of 21
+  cost counts (generation counted once per (curve,multiplier), 84 pairs; BM counted per row):
+    hensel_lifts: generation 5726624; naive sum over 336 rows 22906496 (= 4.0 x generation)
+    inversions_mod_p2: generation 236445680; naive sum over 336 rows 945782720 (= 4.0 x generation)
+    inversions_mod_p: generation 8589852; naive sum over 336 rows 34359408 (= 4.0 x generation)
+    affine_mod_p_adds: generation 1431572; naive sum over 336 rows 5726288 (= 4.0 x generation)
+    lifted_adds: generation 71525800; naive sum over 336 rows 286103200 (= 4.0 x generation)
+    lifted_doublings: generation 159193256; naive sum over 336 rows 636773024 (= 4.0 x generation)
+    kernel_mixed_adds: generation 5726624; naive sum over 336 rows 22906496 (= 4.0 x generation)
+    formal_extractions: generation 5726624; naive sum over 336 rows 22906496 (= 4.0 x generation)
+    bm_multiplications: sum over 336 rows 739548609053 (generation part 0)
+    bm_inversions: sum over 336 rows 14315528
+    plant O5 bm_multiplications: 43522

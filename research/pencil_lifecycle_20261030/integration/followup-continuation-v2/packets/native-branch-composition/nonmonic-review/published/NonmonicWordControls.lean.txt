@@ -1,0 +1,13 @@
+import NonmonicWord
+set_option autoImplicit false
+namespace NonmonicWordControls
+open NonmonicStorage
+theorem exact_words : wordDiv 17 2 [2,2] [2,4,2] 3=some ([1,1],[]) := by decide
+theorem nonexact_words : wordDiv 17 2 [2,2] [3,2] 2=some ([1],[1]) := by decide
+theorem zero_input : wordDiv 17 2 [2,2] [] 0=some ([],[]) := by decide
+theorem leading_zeros_input : wordDiv 17 2 [2,2] [2,4,2,0,0] 5=some ([1,1],[]) := by decide
+theorem constant_divisor : wordDiv 17 2 [2] [2,4,2] 3=some ([1,2,1],[]) := by decide
+theorem insufficient_fuel : wordDiv 17 2 [2,2] [2,4,2] 1=none := by decide
+theorem short_input : wordDiv 17 2 [2,2] [5] 0=some ([],[5]) := by decide
+theorem monic_agreement : wordDiv 17 1 [1,1] [1,2,1] 3=some ([1,1],[]) := by decide
+end NonmonicWordControls

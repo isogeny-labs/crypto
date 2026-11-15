@@ -1,0 +1,1 @@
+Restore .lean.txt suffixes. With exact dependencies from check.sh, compile UnionReturn, ReturnContract, ReturnAfterFinds, ReturnSource, ReturnControls and ReturnReadback sequentially. ExpectedFailure must fail. Run audit-readback.py for the retained inventory; fresh independent review needs new pinned receipts. Render using render-report.py.

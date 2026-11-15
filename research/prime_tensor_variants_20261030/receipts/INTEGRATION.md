@@ -77,5 +77,29 @@ copied unchanged in the digit addition.
 
 The required root-library run and restored-fixture follow-up are recorded in
 `ROOT-VALIDATION.md`. Twenty-six exact-name reruns pass after tracked fixtures
-are restored. One unmodified legacy case remains running in the full run, so
-no full-suite pass is claimed. These are validation states, not new timings.
+are restored. The last unmodified legacy case subsequently passed; the full
+command's original exit101 and the separate fixture correction remain explicit.
+No fresh single green full-suite run is claimed. These are validation states,
+not new timings, and no local validation process remains running.
+
+Storage migration21ed4d356025a95cd5a25b0c053190eecca764fd moved two raw packet
+tables and the93,616-byte compressed root-validation snapshot. All three
+pointer SHA256/byte pairs were checked against the exact pre-migration Git
+payloads at b2e02d257d25671efd37c19464abffa2c5cacbbc. This is a pointer/source
+binding check, not a local S3 readback. The frozen replay manifest additionally
+binds every regenerated native table.
+
+The first post-storage preflight correctly failed because the source inventory
+still required that archival gzip locally. Preserve its diagnostic separately.
+The current inventory excludes managed payloads while the new fixed
+stored-artifact binding file preserves its original hash/size. The top helper
+checks either local bytes or matching managed-pointer metadata before replay.
+The artifact workflow retains ownership of its generated metadata. An attempted
+auto-merge hold arrived after PR2941 had merged; this integration correction
+therefore lands in a separate follow-up PR.
+
+The final complete root log is also declared a stored payload before upload.
+The inventory omits every explicitly bound stored path whether its bytes are
+still local or have moved; verification checks local bytes or the matching
+pointer. This avoids making source integrity depend on the workflow's current
+storage stage. The final native replay passes with the two large tables absent.

@@ -1,9 +1,16 @@
 //! `ic tensor`: the ecdl-tensor-ic crate through the research CLI.
 use serde_json::Value;
-use std::process::Command;
+use std::{path::PathBuf, process::Command};
+
+fn ic_binary() -> PathBuf {
+    option_env!("CARGO_BIN_EXE_ic")
+        .or(option_env!("IC_TEST_BINARY"))
+        .map(PathBuf::from)
+        .expect("CLI contracts require Cargo's integration-test executable or IC_TEST_BINARY pointing to a freshly built ic; see docs/ic/cli-contract-tests.md")
+}
 
 fn ic(args: &[&str]) -> (bool, Value) {
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .args(args)
         .arg("--json")
         .output()
@@ -50,4 +57,24 @@ fn demo_recovers_the_secret() {
     assert_eq!(report["result"]["verified"], true);
     assert_eq!(report["result"]["recovered"], report["result"]["expected"]);
     assert_eq!(report["network"]["is_graph"], true);
+}
+
+#[test]
+fn demo_recovers_the_secret_on_a_cofactor_curve() {
+    let (ok, report) = ic(&[
+        "tensor",
+        "demo",
+        "--bits",
+        "10",
+        "--m",
+        "2",
+        "--seed",
+        "7",
+        "--cofactor",
+        "4",
+    ]);
+    assert!(ok, "{report}");
+    assert_eq!(report["cofactor"], 4);
+    assert_eq!(report["result"]["verified"], true);
+    assert_eq!(report["result"]["recovered"], report["result"]["expected"]);
 }

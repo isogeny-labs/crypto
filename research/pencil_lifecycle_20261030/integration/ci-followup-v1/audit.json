@@ -1,0 +1,29 @@
+{
+  "schema": "ci-failure-audit/v1",
+  "pr": 3001,
+  "head": "e4d868da67497d005254bbb77fb695b19328bb39",
+  "merge": "76349947e2100a5b5f0960b160ae3d53aec4aba4",
+  "failures": [
+    {
+      "jobs": [
+        "124330007444",
+        "124329664967"
+      ],
+      "cause": "E0063 missing ChildInput.diagnostic_lifecycle",
+      "source": "research/full_volcano_graphwide_ic_20261017/execution/driver.rs:253",
+      "introduced_by": "383bed5fa7d8cc80e1fafffa986e159b2fca9e8d",
+      "work_caused": true,
+      "remedy": "Add diagnostic_lifecycle: None to legacy initializer."
+    },
+    {
+      "jobs": [
+        "124329048584"
+      ],
+      "cause": "Generated MCP tools JSON differs from stale golden fixture after optional request schema additions. Seven Rust tests passed before diff.",
+      "introduced_by": "ae6ed3e3f3",
+      "work_caused": true,
+      "remedy": "Regenerate contracts/mcp-tools.json from pinned MCP CLI; exact CI-generated JSON and recursive six-path delta retained."
+    }
+  ],
+  "limits": "Read-only logs/source analysis. No builds, root edits, job retries or CI repeat polling. These are first observed failures; later checks may reveal further failures."
+}

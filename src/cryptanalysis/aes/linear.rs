@@ -76,6 +76,27 @@ pub fn aes_sbox_lat() -> Vec<Vec<i32>> {
     lat
 }
 
+/// Exact AES S-box differential-linear connectivity table.
+///
+/// `DLCT[delta][mask] = #{x : mask·S(x) = mask·S(x xor delta)} - 128`.
+/// A nonzero entry measures the signed bias at a differential-to-linear
+/// switch. Both the zero-difference row and zero-mask column contain 128.
+pub fn aes_sbox_dlct() -> Vec<Vec<i32>> {
+    let mut table = vec![vec![0i32; 256]; 256];
+    for (delta, row) in table.iter_mut().enumerate() {
+        for (mask, entry) in row.iter_mut().enumerate() {
+            let mut equal = 0i32;
+            for x in 0..256usize {
+                if dot(mask as u8, SBOX[x] ^ SBOX[x ^ delta]) == 0 {
+                    equal += 1;
+                }
+            }
+            *entry = equal - 128;
+        }
+    }
+    table
+}
+
 /// Returns `(a, b, |bias|)` for the maximum-magnitude entry over
 /// nonzero `(a, b)`. The headline `16` corresponds to bias `16/256 = 1/16`.
 pub fn max_linear_bias(lat: &[Vec<i32>]) -> (u8, u8, u32) {
@@ -283,6 +304,34 @@ pub fn known_plaintext_corpus(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn dlct_matches_independent_ddt_walsh_relation() {
+        let dlct = aes_sbox_dlct();
+        let ddt = super::super::differential::aes_sbox_ddt();
+        assert_eq!(dlct[1][1], -4);
+        assert_eq!(dlct[2][1], 8);
+        for delta in [0usize, 1, 2, 37, 255] {
+            for mask in 0..256usize {
+                let transform: i32 = ddt[delta]
+                    .iter()
+                    .enumerate()
+                    .map(|(output, &count)| {
+                        if dot(mask as u8, output as u8) == 0 {
+                            count as i32
+                        } else {
+                            -(count as i32)
+                        }
+                    })
+                    .sum();
+                assert_eq!(
+                    2 * dlct[delta][mask],
+                    transform,
+                    "delta={delta}, mask={mask}"
+                );
+            }
+        }
+    }
 
     #[test]
     fn lat_origin() {

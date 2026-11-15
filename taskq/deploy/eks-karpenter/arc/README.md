@@ -1,5 +1,10 @@
 # GitHub Actions runners on isolab EKS
 
+Owner cost control, 2026-11-01: all six scale sets default to zero runners,
+and all four ARC NodePools have zero CPU/RAM ceilings. Routine CI uses hosted
+runners. Follow [the cost runbook](../COST_CONTROLS.md) before any explicitly
+authorized temporary activation. These are desired settings; verify live state.
+
 This installs the GitHub-supported Actions Runner Controller (ARC) chart version
 `0.15.0` for `isogeny-labs/crypto`. ARC listens for Actions jobs, starts one ephemeral
 runner pod per job, and Karpenter supplies a Spot EC2 node when a pod cannot
@@ -8,39 +13,21 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
-| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 7 |
-| `crypto-eks-highmem` | 14 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
-| `crypto-eks-xmem` | 14 CPU, 440 GiB plus Docker sidecar | 480 GiB runner (x2iedn/x2iezn.4xlarge, 512 GiB) | 1 |
-| `crypto-eks-xmem1t` | 30 CPU, 900 GiB plus Docker sidecar | 960 GiB runner (x2iedn/x2iezn.8xlarge, 1 TiB) | 1 |
-| `crypto-isolab-build` | 1.5 CPU, 12 GiB | 16 GiB runner | 1 |
-| `crypto-isolab` | Iso Lab publisher with Docker sidecar | See `isolab-values.yaml` | 1 |
+| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 0 |
+| `crypto-eks-highmem` | 14 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 0 |
+| `crypto-eks-xmem` | 14 CPU, 440 GiB plus Docker sidecar | 480 GiB runner (x2iedn/x2iezn.4xlarge, 512 GiB) | 0 |
+| `crypto-eks-xmem1t` | 30 CPU, 900 GiB plus Docker sidecar | 960 GiB runner (x2iedn/x2iezn.8xlarge, 1 TiB) | 0 |
+| `crypto-isolab-build` | 1.5 CPU, 12 GiB | 16 GiB runner | 0 |
+| `crypto-isolab` | Iso Lab publisher with Docker sidecar | See `isolab-values.yaml` | 0 |
 
-The base NodePool admits x86-64 M/R instances with 8 or 16 vCPUs and caps
-aggregate provisioning at 16 vCPUs and 128 GiB. An additional R-family pool
-admits 16-vCPU nodes and caps at 16 vCPUs and 128 GiB. A separate
-`gha-gates` R-family Spot pool reserves one 16-vCPU / 128-GiB node for
-the high-memory gate runner through `gha.dev/pool=gates`. The pool names and the
-`gha.dev/pool=on-demand` scheduling label are legacy; the Karpenter
-`karpenter.sh/capacity-type=spot` requirement controls the actual EC2 capacity.
-All ARC scale sets have `minRunners: 0`. With no queued or running jobs, ARC
-removes its ephemeral runner pods and Karpenter removes empty runner nodes after
-five minutes. The managed system node group has a two-node floor for the ARC and
-cluster controllers. NodePool limits are upper bounds, not spending limits or
-guaranteed capacity; the regional Spot vCPU quota can prevent new nodes from
-launching. Worker EC2, EBS and NAT traffic are billed. Linux x64 jobs are the
-only migration candidates; ARM, macOS, Windows, GPU and hardware-isolated
-ecbench jobs remain on their current runners.
+The retained templates describe base, extra, gate and xmem hardware routes;
+none may provision nodes while its zero limit remains. Pool names and
+`gha.dev/pool=on-demand` are legacy labels; capacity requirements remain Spot.
+The xmem templates retain their 512-GiB/1-TiB instance definitions for an explicit
+future allowance, but the previous 1100-GiB ceiling is removed. Existing nodes
+are not evicted by lowering these limits. Empty-only consolidation remains at
+five minutes. System controllers keep their separate managed node group.
 
-The `gha-xmem` NodePool (added 2026-10-24) is for single processes larger than
-the 120 GiB highmem pod: msolve on the PKM N=21 system needs at least 256 GB in
-one process and the dense degree-5 Weil-descent closure about 768 GB. It admits
-only Spot x2iedn and x2iezn nodes with 16 or 32 vCPUs and carries its own
-`gha.dev/pool=xmem` taint, so only the two xmem scale sets land there. Its limit
-is 32 vCPUs and 1100 GiB, which is one 1 TiB node or two 512 GiB nodes. The
-runner NodePool caps then total 80 vCPUs (16 + 16 + 16 + 32). These are upper
-bounds, not a concurrent allocation: the account also runs the harness and Iso
-Lab worker pools under a 96-vCPU regional Spot quota. Karpenter leaves a
-runner pending when quota or capacity is unavailable.
 The two scale sets differ only in their request, so the request decides the
 node size. Spot prices for these families were not checked when the pool was
 written. Read them before dispatching a long job. Every runner pod template sets
@@ -50,11 +37,10 @@ process memory.
 
 ## Required access and authentication
 
-The deploying IAM role needs `eks:DescribeCluster` and Kubernetes cluster-admin
-access on `isolab`. The EKS access entry for this session's role,
-`arn:aws:iam::104186811093:role/spot-experiments-WorkerRole-G1FZ84yk3gS6`,
-has the cluster-scoped `AmazonEKSClusterAdminPolicy`. Remove this broad access
-after deployment if ongoing administration uses a narrower role.
+Deployment needs an existing authorized operator identity with the required
+EKS, Kubernetes and Helm access. Do not assume the current worker role has
+cluster administration: its NodePool access was denied on 2026-11-01. See the
+cost runbook for the specific reduction-only access and readback requirements.
 
 ARC needs a fine-grained GitHub PAT restricted to `isogeny-labs/crypto` with
 Repository permissions → Administration: Read and write. Save it in a local

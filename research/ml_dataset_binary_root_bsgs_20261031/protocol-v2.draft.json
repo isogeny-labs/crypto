@@ -1,0 +1,641 @@
+{
+  "amendments": [
+    {
+      "changes": [
+        "Keep indices 0..10 under v1 frozen protocol/plan at /var/tmp/ml-dataset-binary-root-bsgs-20261031.",
+        "Bind indices 11..15 to this v2 frozen protocol and native plan, with output root /mnt/spot-codex-state/tmp/ml-dataset-binary-root-bsgs-20261031-v2.",
+        "Use distinct v2 restricted archive and custody logical-name namespaces for indices 11..15.",
+        "Keep all scientific axes, labels, seed, shared instances, 30s inner and 90s outer caps, 2 GiB memory, 64 MiB trace, and 4 GiB floor unchanged."
+      ],
+      "filed": "2026-10-31",
+      "filed_before_affected_data": true,
+      "id": "AMEND-BINARY-XFS-20261031",
+      "reason": "Original /var/tmp XFS fell below frozen 4 GiB new-attempt floor after indices 0..10 were durably completed; index 11 was refused before attempt. Move only remaining indices 11..15 to the second local XFS with ample capacity. Preserve all v1 records and exact planned population.",
+      "supersedes_fields": [
+        "extensions.ml_dataset_binary_root_bsgs.output_root",
+        "extensions.ml_dataset_binary_root_bsgs.s3_logical_name_namespace",
+        "variable_ledger",
+        "execution.placement"
+      ]
+    }
+  ],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "runner receipt.json",
+      "config bytes",
+      "clean-build receipt"
+    ],
+    "outputs": [
+      "exact terminal classification and command-scoped elapsed nanoseconds"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "Four fixed ordinary binary n23 m2 root cells, twist=false, crossed with two generators and two keys; the matching method uses the same public instance",
+      "id": "binary23-root-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 20261031,
+        "shard_count": 16,
+        "shard_indices": "mixed-radix selected indices 0..15",
+        "solver": "root",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 root cells, twist=true, crossed with two generators and two keys; the matching method uses the same public instance",
+      "id": "binary23-root-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 20261031,
+        "shard_count": 16,
+        "shard_indices": "mixed-radix selected indices 0..15",
+        "solver": "root",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 bsgs cells, twist=false, crossed with two generators and two keys; the matching method uses the same public instance",
+      "id": "binary23-bsgs-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 20261031,
+        "shard_count": 16,
+        "shard_indices": "mixed-radix selected indices 0..15",
+        "solver": "bsgs",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "baseline"
+    },
+    {
+      "description": "Four fixed ordinary binary n23 m2 bsgs cells, twist=true, crossed with two generators and two keys; the matching method uses the same public instance",
+      "id": "binary23-bsgs-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "binary",
+        "field_size_bits": 23,
+        "generators": 2,
+        "keys": 2,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 20261031,
+        "shard_count": 16,
+        "shard_indices": "mixed-radix selected indices 0..15",
+        "solver": "bsgs",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "baseline"
+    }
+  ],
+  "authors": [
+    "ML dataset ordinary binary root and BSGS pilot"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "fixed-population-accounting",
+      "text": "Exactly 16 frozen plan indices have one retained native generate attempt each, including censored and failed outcomes."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "root-certificate-replay",
+      "text": "Where a root cell completes, its binary S3 distinct-root and group-lift certificates pass the native independent verifier; root evidence is PDP evidence and is not an ECDLP scalar-recovery label."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "bsgs-ecdlp-replay",
+      "text": "A BSGS cell is labelled solved ECDLP only when its independently recovered scalar and known-answer identity pass native verify for the corresponding public generator and target."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "custody",
+      "text": "Each completed shard has its native report, strict public/restricted export, restricted archive and fresh S3 byte-equality receipt; failures at every stage remain counted."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "excluded-inference",
+      "text": "No root-versus-BSGS speed, whole-worker instruction, exact fall-degree, ECDLP advantage or broader matrix claim is inferred from this pilot."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Absolute software coverage, replay and custody; no comparative performance claim or timing-effect inference.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Exact accounting of the fixed selected population; no detector false-positive or null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Each BSGS solved claim requires independent group replay; each completed root certificate has native mathematical replay. No sensitivity claim is made.",
+      "present": false
+    }
+  },
+  "created": "2026-10-31",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: exact fixed-population accounting without inferential interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact counts by solver, twist and terminal outcome; native root-certificate replay, independently recovered ECDLP cells and S3 readback-complete cells",
+    "text": "Count all 16 planned indices and outcomes. Promote a root certificate only after native replay, and an ECDLP solve only after independently recovered BSGS scalar plus native verify. Custody requires restricted S3 archive PUT and fresh GET byte comparison. Retain failures, timeouts and missing stages.",
+    "verdict_vocabulary": [
+      "verified_root_certificate_and_durable",
+      "verified_ecdlp_and_durable",
+      "verified_custody_pending",
+      "failed",
+      "timed_out",
+      "interrupted",
+      "invalid_receipt",
+      "unattempted"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": 1,
+      "policy": "application",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "immediate_s3_custody": true,
+      "local_only": true,
+      "local_xfs_output": true,
+      "one_shard_at_a_time": true,
+      "output_roots_by_shard": {
+        "0..10": "/var/tmp/ml-dataset-binary-root-bsgs-20261031 (v1)",
+        "11..15": "/mnt/spot-codex-state/tmp/ml-dataset-binary-root-bsgs-20261031-v2 (v2)"
+      },
+      "single_worker": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 90
+  },
+  "extensions": {
+    "ml_dataset_binary_root_bsgs": {
+      "amendment_applies_to_shards": "11..15 inclusive only; 0..10 retain v1 protocol and plan",
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "bsgs_label_scope": "independently recovered ECDLP scalar only after native verify",
+      "export_mapping": {
+        "arms": "solver by twist: root-untwisted,root-twisted,bsgs-untwisted,bsgs-twisted",
+        "instance_ids": [
+          "g0k0",
+          "g0k1",
+          "g1k0",
+          "g1k1"
+        ],
+        "rows_expected": 16,
+        "twist_identity_note": "Cross-twist instance IDs match generator/key indices for balanced accounting, not identical public curves; within each twist root and BSGS use the same public generator and target."
+      },
+      "max_cases_per_shard": 1,
+      "no_cloud_worker_submission": true,
+      "output_filesystem": "xfs",
+      "output_root": "/mnt/spot-codex-state/tmp/ml-dataset-binary-root-bsgs-20261031-v2",
+      "plan_axes": {
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "families": [
+          "binary"
+        ],
+        "generators": 2,
+        "keys": 2,
+        "m": [
+          2
+        ],
+        "n": [
+          23
+        ],
+        "seed": 20261031,
+        "solvers": [
+          "root",
+          "bsgs"
+        ],
+        "twists": [
+          false,
+          true
+        ],
+        "work_limit": 20000
+      },
+      "planned_cells": 16,
+      "root_label_scope": "bounded binary S3 PDP root and group-lift evidence; not recovered ECDLP scalar",
+      "s3_content_addressed_prefix": "s3://setec-astronomy-artifacts/store/sha256",
+      "s3_logical_name_namespace": "restricted/ml-dataset-binary-root-bsgs-mnt-v2-20261031",
+      "schema": "ml-dataset.binary-root-bsgs-pilot/v1",
+      "selected_shards": "0..15 inclusive",
+      "shard_count": 16,
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262"
+    }
+  },
+  "freeze": {
+    "commit": null,
+    "filed_before_affected_data": null,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "status": "draft"
+  },
+  "inadmissible": [
+    "replacing a seed or shard after failure",
+    "rerunning an existing attempted shard",
+    "dropping failed, timed-out or interrupted attempts",
+    "calling a recorded known-answer scalar an independently recovered ECDLP without native verify",
+    "using restricted witness material as public ML features",
+    "promoting missing S3 readback as durable",
+    "claiming storage or solver speedup from unmatched runs",
+    "calling a root certificate an ECDLP scalar solve",
+    "comparing root and BSGS wall times as a performance claim",
+    "promoting an incomplete root call to a negative PDP result"
+  ],
+  "invalidation_rules": [
+    "Binary, plan or protocol file digest changes invalidate new admission.",
+    "Existing marker or live worker blocks a new attempt for that shard.",
+    "A missing or failed independent native verify prevents solution promotion.",
+    "A missing fresh S3 GET or hash mismatch prevents durability promotion.",
+    "A root artifact cannot provide an ECDLP label, even if a matched BSGS cell solves the public instance."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and freeze/checker contract",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Native root capability and exact certificate scope",
+      "provenance": "internal",
+      "ref": "src/ml_dataset/solvers.rs:326-346,2510-2523 and src/ml_dataset/binary_roots.rs:1-21,68-89",
+      "verified_by": "current source inspection; distinct-root/group-lift replay is not ECDLP scalar recovery"
+    },
+    {
+      "claim": "Dataset generation, leakage boundaries and prior local-XFS custody",
+      "provenance": "internal",
+      "ref": "docs/ml-dataset/DESIGN.md; docs/ml-dataset/OPERATIONS.md; research/ml_dataset_local_generation_20261031/RESULT-01.md",
+      "verified_by": "current source and retained receipts"
+    },
+    {
+      "claim": "External method novelty or performance",
+      "provenance": "internal",
+      "ref": "not assessed for this software coverage protocol",
+      "verified_by": "no novelty or performance claim; external literature review remains outside this pilot"
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "plan/protocol SHA-256 before/after",
+      "shard index",
+      "argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes",
+      "native verify/report/export status",
+      "archive SHA-256 and bytes",
+      "S3 PUT and fresh GET receipt",
+      "solver and twist",
+      "root certificate replay status",
+      "independent ECDLP scalar-recovery status"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Frozen native generate shard retains its manifest and passes dataset verify; failed or incomplete attempts remain recorded.",
+        "id": "sealed-cell-verified",
+        "kind": "exact",
+        "name": "Sealed cell verification",
+        "resolution": "1",
+        "source": "generated cell manifest and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Completed binary root artifact passes independent distinct-root and group-lift replay; does not imply ECDLP scalar recovery.",
+        "id": "verified-root-certificate",
+        "kind": "exact",
+        "name": "Native root certificate replay",
+        "resolution": "1",
+        "source": "root artifact and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "BSGS recovers a scalar without reading the witness and native verify replays scalar times the declared generator equals target.",
+        "id": "independent-ecdlp-solve",
+        "kind": "exact",
+        "name": "Independent ECDLP solve",
+        "resolution": "1",
+        "source": "BSGS solver result and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around full dataset generate timeout process spawn through wait; includes parent and cell work, excludes runner receipt writes.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-BINARY23-ROOT-BSGS-20261031",
+  "question": "Can all 16 frozen ordinary binary n23 m2 root and BSGS cells across paired twists, generators and keys retain exact terminal outcomes, replay applicable native certificates, and preserve restricted S3 custody?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic mixed-radix plan order pairs root and BSGS public instances for exact cross-method identity; no timing-effect or method advantage estimated.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical exact receipt and hash validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Four shared instance IDs g0k0, g0k1, g1k0, g1k1 in every solver-by-twist arm. Root and BSGS share exact public input within a twist; opposite twists are distinct curves. Entire fixed16-cell plan retained without outcome selection."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Native plan seed20261031 fixed before data; curve seed index0.",
+      "seeds": [
+        20261031
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 4,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "Four instance IDs per arm (generator0/1 by key0/1), four solver-by-twist arms, exactly16 native cells; no inferential effect or power claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 340.0,
+      "fixed_seconds": 20.0,
+      "measured_on": "Per-arm planning allowance of 4*80s plus 20s admission. Four arms imply up to 1360s for 16 cells; each generate has a 90s outer cap. This is an allowance, not a binary-root runtime estimate or performance claim.",
+      "per_sample_seconds": 80.0,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All 16 plan indices0..15, one new solver attempt each; retain every outcome and no replacement."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Each generate has 30s inner and90s outer cap; each verify/report/export/archive/PUT/GET stage has a finite controller cap. Stop on failed custody and resume finalization only; at least4GiB XFS free before each new attempt."
+    }
+  ],
+  "study_dir": "research/ml_dataset_binary_root_bsgs_20261031",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "binary23-root-untwisted",
+          "binary23-root-twisted",
+          "binary23-bsgs-untwisted",
+          "binary23-bsgs-twisted"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "All16 indices accounted; each promoted root/BSGS claim requires its corresponding native replay; durable custody requires restricted S3 archive and fresh readback."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Clean source c41bec15 and binary SHA b8e0881e pinned; preflight and per-attempt hash checks.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Native plan crosses root/BSGS, two twists, two generators and two keys at ordinary binary n23,m2, one curve seed.",
+        "name": "curve-and-method",
+        "treatment": "crossed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1 and one generate command at a time.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Host conditions recorded as operational context; no timing-effect inference.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "30s inner worker and90s outer generate cap per shard.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "All16 frozen indices retained regardless of outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      },
+      {
+        "how": "First 11 cells completed on /var/tmp XFS under v1; after its free space dropped below 4 GiB, remaining five cells move prospectively to /mnt/spot-codex-state/tmp XFS under v2. Same 4 GiB gate and per-shard restricted S3 archive/readback. Storage is measured context; no timing comparison.",
+        "name": "output-filesystem",
+        "treatment": "measured"
+      }
+    ],
+    "independent": []
+  },
+  "version": 2
+}

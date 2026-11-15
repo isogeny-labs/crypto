@@ -1,0 +1,41 @@
+ℹ [3092/3093] Replayed ThreeLeads
+info: ThreeLeads.lean:121:0: 'ThreeLeads.tower_membership' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ThreeLeads.lean:122:0: 'ThreeLeads.squaring_tower' depends on axioms: [propext]
+info: ThreeLeads.lean:123:0: 'ThreeLeads.table_recovery' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ThreeLeads.lean:124:0: 'ThreeLeads.row_combination' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ThreeLeads.lean:125:0: 'ThreeLeads.target_recovery' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ThreeLeads.lean:126:0: 'ThreeLeads.kernel_ambiguity' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ThreeLeads.lean:127:0: 'ThreeLeads.table_model_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ThreeLeads.lean:128:0: 'ThreeLeads.shift_coverage_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [3093/3093] Building ThreeLeads.PKMScalarCertificates (22s)
+trace: .> LEAN_PATH=/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/mathlib4/.lake/build/lib/lean:/workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/build/lib/lean /workspace/toolchains/lean-4.34.1-linux/bin/lean /workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/ThreeLeads/PKMScalarCertificates.lean -o /workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/build/lib/lean/ThreeLeads/PKMScalarCertificates.olean -i /workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/build/lib/lean/ThreeLeads/PKMScalarCertificates.ilean -c /workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/build/ir/ThreeLeads/PKMScalarCertificates.c --setup /workspace/crypto/research/prime_ecdlp_three_leads_20261029/lean/.lake/build/ir/ThreeLeads/PKMScalarCertificates.setup.json --json
+error: ThreeLeads/PKMScalarCertificates.lean:36:51: failed to synthesize instance of type class
+  Decidable (i = target)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: ThreeLeads/PKMScalarCertificates.lean:40:89: unsolved goals
+K : Type u_1
+I : Type u_2
+J : Type u_3
+inst✝² : Field K
+inst✝¹ : Fintype I
+inst✝ : Fintype J
+M : J → I → K
+z : I → K
+rhs weights : J → K
+target : I
+value : K
+rows : ∀ (j : J), rowEval (M j) z = rhs j
+certificate : ∀ (i : I), ∑ j, weights j * M j i = sorry
+rightHandSide : ∑ j, weights j * rhs j = value
+h : rowEval (fun i => ∑ j, weights j * M j i) z = ∑ j, weights j * rhs j
+⊢ ∑ x, sorry () * z x = z target
+info: ThreeLeads/PKMScalarCertificates.lean:58:0: 'ThreeLeads.PKMScalarCertificates.cyclic_point_relation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ThreeLeads/PKMScalarCertificates.lean:59:0: 'ThreeLeads.PKMScalarCertificates.recovery_combination' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+info: ThreeLeads/PKMScalarCertificates.lean:60:0: 'ThreeLeads.PKMScalarCertificates.target_ambiguity' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- ThreeLeads.PKMScalarCertificates
+error: build failed

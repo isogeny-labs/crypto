@@ -1,0 +1,11 @@
+# Combined native-engine validation contract
+
+Frozen before integration, 2026-10-30. Local software validation only; no scientific generation or cloud budget extension.
+
+Base12b5cff92b4ffaa67aed78a154f134f568188a7c includes reviewed bounded S4, Boolean F4/F5 and common helper visibility correction. Integrate the seven exact dynamic/setup design, implementation and correction commits from23727b3 through182b314317a60c8cfe9494e0dd99a7e71a833408; omit the already-equivalent visibility fix. Preserve original design/review lineage. No algorithm change is intended.
+
+Conductor check identified existing root tasks T850/T868/T874/T875/T876. Live task cards and lease identities matched this thread before integration; no external reservation was bypassed or released. Notes remain within T876 research scope. References are the committed per-engine DESIGN/IMPLEMENTATION records, their existing legacy kernel references, and independent immutable correction reviews for182b314 and12b5cff. No novelty/performance claim is made.
+
+Before builds, compare runtime blobs exactly with reviewed donors: dynamic child/parent/field from182b314; S4/Boolean/helper from12b5cff. Materialize exact tracked build inputs. Serialize after prime210 full/CLI continuation. Run strict release Clippy for lib/bin crypto/tests, compile immutable source-bound library tests, and run whole f4_tower_generic, fp_backend, koblitz_groebner, matrix_f5_f2, semaev_decomp, ml_dataset and checked-collector filters. Retain failures under original source, repair in new commits, then run required full library regression and applicable CLI gates. Never double-count nested test subprocess summaries or borrow historical pass counts.
+
+Combined coverage replaces redundant standalone builds only where actual source and executed filters prove coverage. It does not replace prime m3 CLI fixtures, original-chain/both-twist/extraction/persistence/export/consumer checks, or the broader corpus requirements. Backend invocation is not useful-work proof; matrix completion is not full basis or UNSAT; modeled work/requested layout are not instructions/RSS. Preserve all explicit partial labels. Archive evidence and binaries to S3 with independent readback; publish only after required validation.

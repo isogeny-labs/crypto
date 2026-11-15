@@ -11,13 +11,7 @@ on:
       - research/p192_extension_cover_20261012/*cross_cubic_anchor*
       - research/p192_extension_cover_20261012/*residual_point_reuse*
       - research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/**
-      - research/p192_extension_cover_20261012/*four_anchor*
-      - research/p192_extension_cover_20261012/*multi_anchor*
-      - research/p192_extension_cover_20261012/reports/run-20261026-four-anchor/**
   workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
   pencil-and-four-cell:
@@ -29,11 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # The package reads the parent research directory, not only lean/.
-          # Keep that directory and the artifact tools; the rest of the tree
-          # stays out so the Lean toolchain still fits.
+          # The full tree (144k files) leaves the runner too little disk to
+          # unpack the Lean toolchain; the package needs only its own directory.
           sparse-checkout: |
-            research/p192_extension_cover_20261012
+            research/p192_extension_cover_20261012/lean
+            research/p192_extension_cover_20261012/reports/run-20261024
             tools/artifacts
             .artifacts
       - name: Pull store data this workflow reads (tools/artifacts)
@@ -86,11 +80,6 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            research/p192_extension_cover_20261012
-            tools/artifacts
-            .artifacts
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -138,11 +127,6 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            research/p192_extension_cover_20261012
-            tools/artifacts
-            .artifacts
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -184,58 +168,10 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/screen_cross_cubic_anchor.py
           python3 -B research/p192_extension_cover_20261012/verify_cross_cubic_anchor_degree_eight.py
           python3 -B research/p192_extension_cover_20261012/analyze_cross_cubic_anchor_combined_rows.py
-          # The frozen receipt includes these three evolving integration files.
-          # Preserve the original receipt and check all immutable run artifacts.
-          awk '$2 != "research/p192_extension_cover_20261012/REPORT.md" && $2 != "research/p192_extension_cover_20261012/lean/lakefile.toml" && $2 != ".github/workflows/p192-geometry-collector-lean.yml"' research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256 | sha256sum -c
-  four-anchor-recurrence:
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            research/p192_extension_cover_20261012
-            tools/artifacts
-            .artifacts
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
+      # The manifest pins this workflow and REPORT.md at their 2026-10-24 bytes;
+      # the replay's isolated view restores both (.github/CI.md, Frozen workflow pins).
+      - name: Check the frozen anchor-eight manifest in its replay view
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012
-      - name: Build and fresh-check four-anchor recurrence
-        uses: leanprover/lean-action@v1
-        with:
-          lake-package-directory: research/p192_extension_cover_20261012/lean
-          auto-config: false
-          use-mathlib-cache: true
-          build: true
-          build-args: 'FourAnchorRecurrence'
-          test: false
-          lint: false
-          leanchecker: true
-          leanchecker-args: '--fresh --verbose FourAnchorRecurrence'
-      - name: Audit axioms and replay four-anchor geometry
-        run: |
-          cd research/p192_extension_cover_20261012/lean
-          lake env lean FourAnchorRecurrence.lean
-          cd ../../..
-          python3 -B research/p192_extension_cover_20261012/screen_multi_anchor.py
-          python3 -B research/p192_extension_cover_20261012/analyze_four_anchor_field_incidence.py
-          python3 -B research/p192_extension_cover_20261012/verify_four_anchor_relation_fan.py
-          python3 -B research/p192_extension_cover_20261012/analyze_four_anchor_combined_rows.py
-          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261026-four-anchor/ARTIFACTS.sha256
+          FROZEN_VIEW_STEP: |
+            sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only p192_anchor_eight_20261024 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

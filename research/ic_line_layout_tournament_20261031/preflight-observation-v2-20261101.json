@@ -1,0 +1,78 @@
+{
+  "schema": "crypto.ic-relation-tournament-preflight-observation/v1",
+  "recorded_utc": "2026-11-01T04:26:27Z",
+  "protocol": {
+    "id": "IC-LINE-LAYOUT-E2E-FP20-V2-20261101",
+    "sha256": "0dc2be59cd4860fae6775d0dff823c1025d4fa999b2c9550bd4d7e19c030f92b",
+    "merge_commit": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+    "spec_path": "research/ic_line_layout_tournament_20261031/spec-fp20-v2.json",
+    "spec_sha256": "7b56916dd7b9112099aa55adef353207d74f384bb20dcdf0901cedb40956683c",
+    "analysis_sha256": "1856d6285f8b5949247dc34ffb222bb00335dbfb728eaca4a95458abef9ffe2d"
+  },
+  "qualification": {
+    "workflow_run": 41271383665,
+    "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/41271383665",
+    "workflow_revision": "e443a60f00839aa84a7734053b8d6b5b0bad0f40",
+    "tested_source_revision": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+    "spec_path": "taskq/deploy/eks-karpenter/l2-validation.json",
+    "instance_type": "c8a.2xlarge",
+    "timeout_seconds": 900,
+    "workflow_status": "completed",
+    "workflow_conclusion": "failure",
+    "jobs": {
+      "contracts": "success",
+      "build": "success",
+      "experiment": "failure"
+    },
+    "build": {
+      "artifact_id": 13069693394,
+      "artifact_name": "isolab-build-41271383665-1",
+      "artifact_size_bytes": 82666555,
+      "artifact_digest": "sha256:29ab639216eadbc2041bd92467d98fb7a7d774f2bd0e0990b0f9f095a3bddd4d",
+      "ecbench_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+      "image_digest": "sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914"
+    },
+    "launcher": {
+      "job_name": "gh-41271383665-1",
+      "job_uid": "06bc6798-a65b-4805-9e43-47f16be8d97f",
+      "launcher_id": "c4090885-9236-4b36-8dba-8cea6f746655",
+      "request_sha256": "9e4c461dd35f5301360efb1a67351d6097735857d79cc79ae055427684f70971",
+      "state": "failed",
+      "remote_result_exit_code": 23,
+      "github_step_exit_code": 26,
+      "pod_uid": null,
+      "results_uri": null
+    },
+    "evidence_level": "public_launcher_receipt",
+    "payload_classification": null,
+    "manifest_verified": false,
+    "accepted_l2": false,
+    "receipt_scope": "The public launcher receipt proves the fixed request reached a terminal failed state. It provides no successful Pod UID or results URI and does not identify a payload exit classification or exact failed L2 predicate."
+  },
+  "execution_accounting": {
+    "qualification": {
+      "planned": 1,
+      "attempted": 1,
+      "terminal": 1,
+      "accepted_l2": 0
+    },
+    "scientific_jobs": {
+      "planned_if_qualified": 2,
+      "attempted": 0,
+      "terminal": 0
+    },
+    "retries": 0,
+    "alternate_seeds": 0,
+    "stop_rule_applied": true
+  },
+  "performance_evidence": {
+    "authenticated_session_directories": 0,
+    "admitted_rows": 0,
+    "numeric_comparisons": 0,
+    "experiment_export_available": false,
+    "reason": "The failed qualification returned no results URI and the scientific stage was not dispatched."
+  },
+  "claim_status": "inconclusive_before_scientific_stage",
+  "speedup_established": false,
+  "claim_boundary": "The relation-yield pruning instrumentation from PR #3091 is merged separately. This failed infrastructure qualification and the unattempted scientific stage do not establish an end-to-end ECDLP index-calculus speedup."
+}

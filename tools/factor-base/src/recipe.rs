@@ -36,6 +36,30 @@ pub enum Recipe {
         step: String,
         count: usize,
     },
+    /// A coset of a supplied, exact-order subgroup of F_p^* (PKM section 3.3).
+    PrimeMultiplicativeCoset {
+        order: usize,
+        generator: String,
+        coset: String,
+    },
+    /// Traces of a subgroup in the norm-one torus of F_p[s]/(s^2-nonsquare).
+    PrimeNormOneTrace {
+        order: usize,
+        generator_real: String,
+        generator_imag: String,
+        nonsquare: String,
+        scale: String,
+        shift: String,
+    },
+    /// Image of an explicit progression under D_degree(x, parameter).
+    /// An image recipe does not assert a cheap membership or PDP solver.
+    PrimeDicksonImage {
+        degree: usize,
+        parameter: String,
+        start: String,
+        step: String,
+        count: usize,
+    },
     RandomX {
         count: usize,
         seed: u64,
@@ -102,6 +126,34 @@ fn canonical_recipe(recipe: &Recipe) -> Result<Recipe> {
             *start = enc(&parse(start)?);
             *step = enc(&parse(step)?);
         }
+        Recipe::PrimeMultiplicativeCoset {
+            generator, coset, ..
+        } => {
+            *generator = enc(&parse(generator)?);
+            *coset = enc(&parse(coset)?);
+        }
+        Recipe::PrimeNormOneTrace {
+            generator_real,
+            generator_imag,
+            nonsquare,
+            scale,
+            shift,
+            ..
+        } => {
+            for value in [generator_real, generator_imag, nonsquare, scale, shift] {
+                *value = enc(&parse(value)?);
+            }
+        }
+        Recipe::PrimeDicksonImage {
+            parameter,
+            start,
+            step,
+            ..
+        } => {
+            for value in [parameter, start, step] {
+                *value = enc(&parse(value)?);
+            }
+        }
         _ => {}
     }
     if let Recipe::BinaryExplicit { basis, .. } = &mut r {
@@ -119,6 +171,55 @@ pub fn offsets(recipe: &Recipe) -> Option<&[String]> {
         _ => None,
     }
 }
+
+// Exact-order tests need only the distinct prime divisors of the bounded order.
+fn order_primes(mut order: usize) -> Vec<usize> {
+    let mut primes = Vec::new();
+    let mut q = 2;
+    while q <= order / q {
+        if order.is_multiple_of(q) {
+            primes.push(q);
+            while order.is_multiple_of(q) {
+                order /= q;
+            }
+        }
+        q += 1;
+    }
+    if order > 1 {
+        primes.push(order);
+    }
+    primes
+}
+
+type Quadratic = (N, N);
+fn torus_mul(f: &Field, nu: &N, a: &Quadratic, b: &Quadratic) -> Quadratic {
+    (
+        f.add(&f.mul(&a.0, &b.0), &f.mul(nu, &f.mul(&a.1, &b.1))),
+        f.add(&f.mul(&a.0, &b.1), &f.mul(&a.1, &b.0)),
+    )
+}
+fn torus_pow(f: &Field, nu: &N, base: &Quadratic, mut exponent: usize) -> Quadratic {
+    let mut result = (N::one(), N::zero());
+    let mut power = base.clone();
+    while exponent > 0 {
+        if exponent & 1 == 1 {
+            result = torus_mul(f, nu, &result, &power);
+        }
+        power = torus_mul(f, nu, &power, &power);
+        exponent >>= 1;
+    }
+    result
+}
+fn dickson(f: &Field, x: &N, a: &N, degree: usize) -> N {
+    let (mut previous, mut value) = (n(2), x.clone());
+    for _ in 1..degree {
+        let next = f.sub(&f.mul(x, &value), &f.mul(a, &previous));
+        previous = value;
+        value = next;
+    }
+    value
+}
+
 pub fn generate(config: &Config) -> Result<Generated> {
     ensure!(
         (1..=1_000_000).contains(&config.max_candidates),
@@ -246,6 +347,130 @@ pub fn generate(config: &Config) -> Result<Generated> {
             let mut x = start;
             for _ in 0..*count {
                 xs.insert(x.clone());
+                x = f.add(&x, &step);
+            }
+        }
+        Recipe::PrimeMultiplicativeCoset {
+            order,
+            generator,
+            coset,
+        } => {
+            ensure!(
+                f.degree().is_none(),
+                "multiplicative coset requires a prime field"
+            );
+            ensure!(
+                *order > 0 && *order <= cap,
+                "subgroup order exceeds candidate cap"
+            );
+            let group_order = f.size() - N::one();
+            ensure!(
+                &group_order % n(*order as u64) == N::zero(),
+                "order must divide p-1"
+            );
+            let generator = parse(generator)?;
+            let coset = parse(coset)?;
+            ensure!(
+                !generator.is_zero()
+                    && generator < f.size()
+                    && !coset.is_zero()
+                    && coset < f.size(),
+                "noncanonical or zero coset parameters"
+            );
+            ensure!(
+                generator.modpow(&n(*order as u64), &f.size()) == N::one()
+                    && order_primes(*order)
+                        .iter()
+                        .all(|q| generator.modpow(&n((order / q) as u64), &f.size()) != N::one()),
+                "generator does not have the declared exact order"
+            );
+            let mut x = coset;
+            for _ in 0..*order {
+                xs.insert(x.clone());
+                x = f.mul(&x, &generator);
+            }
+        }
+        Recipe::PrimeNormOneTrace {
+            order,
+            generator_real,
+            generator_imag,
+            nonsquare,
+            scale,
+            shift,
+        } => {
+            ensure!(
+                f.degree().is_none(),
+                "norm-one torus requires a prime field"
+            );
+            ensure!(
+                *order > 0 && *order <= cap,
+                "torus order exceeds candidate cap"
+            );
+            ensure!(
+                (f.size() + N::one()) % n(*order as u64) == N::zero(),
+                "torus order must divide p+1"
+            );
+            let nu = parse(nonsquare)?;
+            let scale = parse(scale)?;
+            let shift = parse(shift)?;
+            let g = (parse(generator_real)?, parse(generator_imag)?);
+            ensure!(
+                nu < f.size()
+                    && !nu.is_zero()
+                    && scale < f.size()
+                    && !scale.is_zero()
+                    && shift < f.size()
+                    && g.0 < f.size()
+                    && g.1 < f.size(),
+                "noncanonical torus parameters or zero scale"
+            );
+            ensure!(
+                nu.modpow(&((f.size() - N::one()) >> 1), &f.size()) == f.size() - N::one(),
+                "quadratic parameter must be a nonsquare"
+            );
+            ensure!(
+                f.sub(&f.sq(&g.0), &f.mul(&nu, &f.sq(&g.1))) == N::one(),
+                "generator is not norm one"
+            );
+            let identity = (N::one(), N::zero());
+            ensure!(
+                torus_pow(f, &nu, &g, *order) == identity
+                    && order_primes(*order)
+                        .iter()
+                        .all(|q| torus_pow(f, &nu, &g, order / q) != identity),
+                "torus generator does not have the declared exact order"
+            );
+            let mut point = identity;
+            for _ in 0..*order {
+                // Tr(z)=z+z^p=2*Re(z). Inverse elements have equal traces.
+                xs.insert(f.add(&f.mul(&scale, &f.add(&point.0, &point.0)), &shift));
+                point = torus_mul(f, &nu, &point, &g);
+            }
+        }
+        Recipe::PrimeDicksonImage {
+            degree,
+            parameter,
+            start,
+            step,
+            count,
+        } => {
+            ensure!(f.degree().is_none(), "Dickson image requires a prime field");
+            ensure!(
+                *degree > 0
+                    && *count > 0
+                    && degree.checked_mul(*count).is_some_and(|work| work <= cap)
+                    && n(*count as u64) <= f.size(),
+                "Dickson degree times count exceeds cap or field"
+            );
+            let a = parse(parameter)?;
+            let mut x = parse(start)?;
+            let step = parse(step)?;
+            ensure!(
+                a < f.size() && x < f.size() && !step.is_zero() && step < f.size(),
+                "noncanonical Dickson parameters or zero step"
+            );
+            for _ in 0..*count {
+                xs.insert(dickson(f, &x, &a, *degree));
                 x = f.add(&x, &step);
             }
         }

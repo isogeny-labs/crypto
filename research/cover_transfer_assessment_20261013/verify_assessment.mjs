@@ -852,7 +852,7 @@ const expectedSubgroupClaimIds = [
 ].sort();
 const expectedTemplateStatuses = {
   "map.advantage.unknown": "unknown",
-  "map.binary-arbitrary-pushforward.refuted": "refuted",
+  "map.binary-arbitrary-pushforward.supported": "supported",
   "map.binary-composition.supported": "supported",
   "map.binary-construction.supported": "supported",
   "map.binary-jacobian.supported": "supported",
@@ -902,7 +902,7 @@ const expectedProfiles = {
       pullback_point_classes: "map.binary-pullback.supported",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
       pushforward_point_divisors: "map.binary-typed-pushforward.supported",
-      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.refuted",
+      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.supported",
       composition_on_typed_domain: "map.binary-composition.supported",
       alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.same-field.not-applicable",
@@ -1026,10 +1026,10 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "5470ecac7ef17b749fae984a64d979c59c91cdb3e8fdbbddba6031d6fa6e956e",
-  profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "73b73e3b963c82264d942170e20186c1f9f78ffa6ef556e7eca4299e90998055",
-  open_obligations: "dffb0831f47c54218afaf9e9d81a54b117bd8017db4014400d56986d61f3c5a7",
+  result_templates: "a762cc8659726c43b7ce84bd1750b4cd6c108c216031ec318452140dbb7aebc9",
+  profiles: "8fbcabe05bc436d528bdafabc5514d45d80355337ec6f74edd6db0b3ebc8fde1",
+  controls: "2ecc0db58b61a77891ddb1ed14924d70f9a101bb3791114859e83aa92279e06f",
+  open_obligations: "98cf42d30763b94c73d6b62c8c3b3901bc0556eb3c9be5067ea97798a447a53a",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
 };
@@ -1140,9 +1140,10 @@ check(
   "assessment status vocabulary changed",
 );
 for (const [section, expectedDigest] of Object.entries(expectedSemanticDigests)) {
+  const actualDigest = sha256(canonicalJson(assessment[section]));
   check(
-    sha256(canonicalJson(assessment[section])) === expectedDigest,
-    `authoritative semantic digest mismatch for ${section}`,
+    actualDigest === expectedDigest,
+    `authoritative semantic digest mismatch for ${section}: expected ${expectedDigest}, got ${actualDigest}`,
   );
 }
 
@@ -1887,7 +1888,7 @@ const expectedExactOverlays = {
     },
     evidence_additions: [
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer",
-      "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+      "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
     ],
   },
   "map.prime-fp827-degree2": {

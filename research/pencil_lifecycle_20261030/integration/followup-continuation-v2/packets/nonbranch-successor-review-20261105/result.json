@@ -1,0 +1,57 @@
+{
+  "schema": "prospective-norm-successor-review/v1",
+  "task": "T-1725",
+  "created_utc": "2026-11-05T20:11:20.031861+00:00",
+  "producer_commit": "b3eeef70af3c8b808eb4f5383d984fbebaa1dd12",
+  "freeze_sha256": "5843f7cf1f9c1ec1fe463edb8e39e866552a091b9e8f3c57d8552ea0ba5c25c1",
+  "preread_plan_sha256": "345f5d5e5b44eff77be2b99697bd4e35d83b06da4484d15799a2fdc9fffc2d8a",
+  "recommendation": "source_amendment_supported_ready_after_authenticated_serial_coordinator_release",
+  "source_blocking_findings": [],
+  "checks": [
+    {
+      "joint": "Publication",
+      "finding": "GitHub commit API independently returned b3eeef70af3c8b808eb4f5383d984fbebaa1dd12. All packet bytes and frozen source hashes matched."
+    },
+    {
+      "joint": "Replay invariants",
+      "finding": "replay.py differs from V3 only in workspace. Producer, Readback, ExpectedFailure, names, runtime and tactic bindings identical. Corrected IndependentControls exact448d5; 30 names and four ordered calls retained."
+    },
+    {
+      "joint": "Negative control",
+      "finding": "Requires one unsolved-goals error and False goal, forbids syntax/environment/resource/tactic failures and stderr. Allowed axiom set and malformed parser controls unchanged."
+    },
+    {
+      "joint": "Custody",
+      "finding": "Full16736-file/3111892318-byte pre/post checks retained with identical dictionaries required. Closure/baseline manifest files matched their pins; imported payload files are not rehashed during this source review. Fresh pre mandatory."
+    },
+    {
+      "joint": "Supervisor",
+      "finding": "Captured per-phase invocation, original bounded wait/stop and GC manager journal fallback unchanged. Malformed receipts fail, compiler failure still proceeds to post when terminal ownership and remaining budget permit. Fresh paths/units, 1CPU8GiB0swap128tasks and2400 total retained."
+    },
+    {
+      "joint": "Conditional ledger",
+      "finding": "42300 remains before materializer debit. Only authenticated terminal materializer plus900 charge permits5400 total debit/41400 before norm. Norm2400 leaves39000. Other intervening charges require prospective amendment; no invented balance."
+    },
+    {
+      "joint": "Release trust",
+      "finding": "Release SHA binds bytes, not provenance. Launcher validates shape, exact balances and five receipt hashes; coordinator must authenticate publication/review/ledger/materializer terminal/live lease contents and maintain lease. This explicit trusted coordinator boundary is not independent authentication."
+    },
+    {
+      "joint": "Scope",
+      "finding": "Later finite nonbranch and branch transport/root multiplicity sources are outside these30 names and are not imported. This replay does not validate those newer declarations."
+    }
+  ],
+  "required_before_execution": [
+    "Publish exact review and source; coordinator authenticates all five receipt contents and binds exact frozen revision.",
+    "Reconcile materializer terminal ownership and900 debit; verify actual41400 balance or amend.",
+    "Obtain fresh runtime reservation/fence, maintain lease throughout, confirm new paths/units absent and no overlap.",
+    "Record one2400-second allocation and concrete reviewed command with actual hash-pinned release record; retain original deadline."
+  ],
+  "compiler_invoked": false,
+  "tests_executed": 0,
+  "runtime_executed": false,
+  "release_performed": false,
+  "new_user_permission_required": false,
+  "independence": "Reviewer did not author successor; prior failed V3 and reviewed control correction known before preread plan.",
+  "knowledge": "Exact published primary packets; KB fallback unchanged."
+}

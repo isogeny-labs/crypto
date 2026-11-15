@@ -1,0 +1,197 @@
+{
+ "study": "research/f4_fp_ic_effect_20261018",
+ "run": "run-20261018T1548Z",
+ "pipeline": "examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve)",
+ "change": "f4_fp as on main before #1717 (4b6e09b78) against after #1717",
+ "class": "engineering",
+ "unit": "S counted by jv_cover (field multiplications priced in group additions); unpriced native work is not emitted by either arm, so S/rho is a lower-bound comparison",
+ "ccov": [
+  {
+   "p": 53,
+   "tests": 120,
+   "planted_found": [
+    20,
+    20
+   ],
+   "constructed": 20,
+   "c_cov_before": 6157721.75,
+   "c_cov_after": 1224314.9583333333,
+   "f4_muls_before": 5671366.458333333,
+   "f4_muls_after": 737959.6666666666,
+   "lin_muls": [
+    482158.80833333335,
+    482158.80833333335
+   ],
+   "f4_degree": [
+    9.958333333333334,
+    7.958333333333333
+   ],
+   "max_rows": [
+    769.1666666666666,
+    234.58333333333334
+   ],
+   "total_ms": [
+    22.966666666666665,
+    10.825
+   ],
+   "c_cov_ratio": 5.029524231560922,
+   "f4_ratio": 7.6851984119276615
+  },
+  {
+   "p": 101,
+   "tests": 120,
+   "planted_found": [
+    20,
+    20
+   ],
+   "constructed": 20,
+   "c_cov_before": 6172092.333333333,
+   "c_cov_after": 1222626.6666666667,
+   "f4_muls_before": 5686392.225,
+   "f4_muls_after": 736926.5583333333,
+   "lin_muls": [
+    481526.1583333333,
+    481526.1583333333
+   ],
+   "f4_degree": [
+    9.958333333333334,
+    7.983333333333333
+   ],
+   "max_rows": [
+    766.5833333333334,
+    231.28333333333333
+   ],
+   "total_ms": [
+    23.558333333333334,
+    8.858333333333333
+   ],
+   "c_cov_ratio": 5.048223224314863,
+   "f4_ratio": 7.716362181138651
+  },
+  {
+   "p": 251,
+   "tests": 120,
+   "planted_found": [
+    20,
+    20
+   ],
+   "constructed": 20,
+   "c_cov_before": 6252565.741666666,
+   "c_cov_after": 1284448.725,
+   "f4_muls_before": 5712778.633333334,
+   "f4_muls_after": 744661.6166666667,
+   "lin_muls": [
+    534854.5416666666,
+    534854.5416666666
+   ],
+   "f4_degree": [
+    9.95,
+    7.975
+   ],
+   "max_rows": [
+    766.5666666666667,
+    231.21666666666667
+   ],
+   "total_ms": [
+    23.725,
+    9.066666666666666
+   ],
+   "c_cov_ratio": 4.867898281939333,
+   "f4_ratio": 7.671643744584929
+  }
+ ],
+ "dlp": [
+  {
+   "p": 53,
+   "seed": 1,
+   "bits": 32.367524181961606,
+   "residuals": 19020,
+   "relations": 31,
+   "solved": [
+    true,
+    true
+   ],
+   "correct": [
+    true,
+    true
+   ],
+   "s_before": 4734.316428761252,
+   "s_after": 936.8931731239282,
+   "s_ratio": 5.053208374841063,
+   "rho_s_mean": 1.1018183957660987,
+   "rho_s_sd": 0.20388657741417576,
+   "rho_runs": 4,
+   "s_over_rho_before": 4296.821006940497,
+   "s_over_rho_after": 850.3154210567548
+  },
+  {
+   "p": 53,
+   "seed": 2,
+   "bits": 32.36751642104743,
+   "residuals": 8486,
+   "relations": 33,
+   "solved": [
+    true,
+    true
+   ],
+   "correct": [
+    true,
+    true
+   ],
+   "s_before": 2120.6281618881812,
+   "s_after": 425.1906676112552,
+   "s_ratio": 4.987475792453273,
+   "rho_s_mean": 1.1507108178272323,
+   "rho_s_sd": 0.6885399420204872,
+   "rho_runs": 4,
+   "s_over_rho_before": 1842.885396604112,
+   "s_over_rho_after": 369.502624833317
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "bits": 37.94926814244049,
+   "residuals": 40100,
+   "relations": 53,
+   "solved": [
+    true,
+    true
+   ],
+   "correct": [
+    true,
+    true
+   ],
+   "s_before": 1454.6153254364363,
+   "s_after": 287.52343827130653,
+   "s_ratio": 5.059119124973263,
+   "rho_s_mean": 1.482643809155018,
+   "rho_s_sd": 0.5214613787591336,
+   "rho_runs": 4,
+   "s_over_rho_before": 981.0956053331814,
+   "s_over_rho_after": 193.92617194764443
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "bits": 37.949271097566,
+   "residuals": 65422,
+   "relations": 50,
+   "solved": [
+    true,
+    true
+   ],
+   "correct": [
+    true,
+    true
+   ],
+   "s_before": 2370.4731038011378,
+   "s_after": 466.43569742533793,
+   "s_ratio": 5.082100527223429,
+   "rho_s_mean": 1.249439259025052,
+   "rho_s_sd": 0.5771822177479129,
+   "rho_runs": 4,
+   "s_over_rho_before": 1897.2295665263773,
+   "s_over_rho_after": 373.3160248136445
+  }
+ ]
+}

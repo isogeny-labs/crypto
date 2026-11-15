@@ -2020,7 +2020,9 @@ fn validate_plan(
         Ok(expected) => {
             if plan.plan_uid != expected {
                 errors.push(format!(
-                    "plan_uid does not match the canonical full-plan preimage; expected {expected}"
+                    "plan_uid does not match the canonical full-plan preimage; expected {expected}. \
+                     After reviewing the change, set plan_uid to this value \
+                     (docs/ecdlp-audit/README.md, \"Status semantics\")."
                 ));
             }
         }
@@ -2961,6 +2963,14 @@ fn validate_repo_file(
     }
 }
 
+/// How to refresh a stale deliverable digest (docs/ecdlp-audit/README.md, "Status
+/// semantics"): there is no generator; the digest and plan_uid are edited by hand.
+const REFRESH_HINT: &str = "If the change to the file is reviewed, set this deliverable's \
+    artifact_sha256 to the file's digest in the plan, then run `cargo run --bin ecdlp-audit -- \
+    verify-plan --input docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json --repo-root .` and set \
+    plan_uid to the expected value it prints (docs/ecdlp-audit/README.md, \"Status semantics\"). \
+    A refreshed digest does not promote the artifact or close a gate.";
+
 fn validate_deliverable_artifact(
     repo_root: &Path,
     deliverable: &Deliverable,
@@ -2996,11 +3006,18 @@ fn validate_deliverable_artifact(
                 return;
             };
             match read_bounded(&canonical_path, MAX_SOURCE_BYTES, "deliverable artifact") {
-                Ok(bytes) => require(
-                    sha256_hex(&bytes) == expected_digest,
-                    &format!("{} artifact SHA-256 mismatch", deliverable.id),
-                    errors,
-                ),
+                Ok(bytes) => {
+                    let actual_digest = sha256_hex(&bytes);
+                    require(
+                        actual_digest == expected_digest,
+                        &format!(
+                            "{} artifact SHA-256 mismatch: the plan pins {path} at {expected_digest}, \
+                             the file is {actual_digest}. {REFRESH_HINT}",
+                            deliverable.id
+                        ),
+                        errors,
+                    )
+                }
                 Err(error) => errors.push(error),
             }
         }
@@ -3571,9 +3588,16 @@ mod tests {
         let mut wrong_digest = fixture();
         wrong_digest.workstreams[0].deliverables[1].artifact_sha256 = Some("0".repeat(64));
         let errors = validate_fixture(&wrong_digest);
-        assert!(errors
+        let mismatch = errors
             .iter()
-            .any(|error| error.contains("WS1-D2 artifact SHA-256 mismatch")));
+            .find(|error| error.contains("WS1-D2 artifact SHA-256 mismatch"))
+            .expect("a wrong digest is reported");
+        // The message names both digests and how to refresh the pin.
+        assert!(mismatch.contains(&"0".repeat(64)));
+        assert!(mismatch.contains("the file is "));
+        assert!(
+            mismatch.contains("verify-plan --input docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json")
+        );
     }
 
     #[test]

@@ -1,0 +1,21 @@
+import RowFold
+set_option autoImplicit false
+namespace RowFoldControls
+open RowFold WordComparator
+-- Fixed arithmetic objects, not curve points or new scientific samples.
+def m : Mat := fun i j=>if i=j then 1 else if i=0 ∧ j=1 then 2 else if i=1 ∧ j=2 then 3 else if i=2 ∧ j=3 then 4 else if i=3 ∧ j=0 then 5 else 0
+def x : V := fun i=>UInt64.ofNat (i.val+1)
+theorem orientation : linear 17 m x = (fun i=>if i=0 then 5 else if i=1 then 11 else if i=2 then 2 else 9) := by decide
+theorem transpose_differs : linear 17 (fun i j=>m j i) x ≠ linear 17 m x := by decide
+theorem zero_stays : linear 17 m (fun _=>0) = fun _=>0 := by decide
+theorem noncanonical_breaks_raw_nonzero : nonzeroB (fun _=>17)=true ∧ linear 17 m (fun _=>17)=(fun _=>0) := by decide
+theorem singular_kills : nonzeroB x=true ∧ linear 17 (fun _ _=>0) x=(fun _=>0) := by decide
+theorem upper_product : mul 4294967296 4294967295 4294967295=1 := by decide
+theorem upper_accumulation : add 4294967296 4294967295 4294967295=4294967294 := by decide
+theorem overflow_without_bound : mul 4294967297 4294967296 4294967296=0 ∧
+ (4294967296*4294967296:Nat)%4294967297=1 := by decide
+theorem narrow_dot_overflows : (4*(4294967295*4294967295):Nat)>2^64 ∧
+ (4*(4294967295*4294967295):Nat)<2^66 := by norm_num
+def involution : Mat := fun i j=>if (i=0 ∧ j=1) ∨ (i=1 ∧ j=0) ∨ (i=2 ∧ j=3) ∨ (i=3 ∧ j=2) then 2 else 0
+theorem repeated_action : linear 17 involution (linear 17 involution x)=(fun i=>UInt64.ofNat (4*(i.val+1))) := by decide
+end RowFoldControls

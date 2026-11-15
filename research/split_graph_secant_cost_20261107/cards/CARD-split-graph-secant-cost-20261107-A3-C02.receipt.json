@@ -1,0 +1,253 @@
+{
+  "card_id": "CARD-split-graph-secant-cost-20261107-A3-C02",
+  "card_path": "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C02.yaml",
+  "card_sha256": "5d14cff4a24187e984a111f11fe14ce4d078d0b091b53e703da0965e222f4148",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "773893e2d63e26decef72791df237255a58766f4",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "773893e2d63e26decef72791df237255a58766f4",
+        "HEAD",
+        "--",
+        "research/split_graph_secant_cost_20261107",
+        ":(exclude)research/split_graph_secant_cost_20261107/cards",
+        ":(exclude)research/split_graph_secant_cost_20261107/receipts",
+        ":(exclude)research/split_graph_secant_cost_20261107/results",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "20acbf94d87b87f47fa20b4866c79143e9df6154e64cc1a07de9e56e10a84ed1",
+        ".provenance.protocol_sha256 == $h",
+        "research/split_graph_secant_cost_20261107/eks/r2img_request_attempt3.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "job",
+        "sgsecant-panel-20261108-a3",
+        ".job_name == $job and (.job_uid | length) > 0 and (.state == \"submitted\" or .state == \"active\" or .state == \"succeeded\")",
+        "research/split_graph_secant_cost_20261107/receipts/A3/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-receipt-exists",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/wait_command_status.sh",
+        "research/split_graph_secant_cost_20261107/cards/status_request_a3.json",
+        "sgsecant-panel-20261108-a3",
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-02",
+        "900",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 53.689,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "status-once",
+      "index": 5,
+      "outputs": {
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-02/final-status.json": "b0e30f21c405f82d177dafcde62b181f381c3ae47f856c364ac2671e4f677414"
+      },
+      "seconds": 53.689,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "bc746c2d1d93f6e8da389e9a54ba87e490893a83d10963c39879f1fa5d17e98f",
+      "stdout_tail": [
+        "2026-11-08T12:03:50Z poll 1 launcher_exit 0 state succeeded",
+        "{\"state\":\"succeeded\",\"job_name\":\"sgsecant-panel-20261108-a3\",\"job_uid\":\"517e76f8-a6c1-482f-aed0-3c15347e88e3\",\"pods\":[],\"launcher\":\"isolab-experiment-launcher:3d004bc3-7aca-40b0-a673-efaf3ae8a1ec\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261108-a3/launcher/3d004bc3-7aca-40b0-a673-efaf3ae8a1ec/\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "s3",
+        "sync",
+        "s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261108-a3/",
+        "research/split_graph_secant_cost_20261107/results/A3",
+        "--exclude",
+        "launcher/*",
+        "--only-show-errors"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.649,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "download",
+      "index": 6,
+      "outputs": {},
+      "seconds": 1.649,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/verify_results.sh",
+        "research/split_graph_secant_cost_20261107/receipts/A3/collect-02/final-status.json",
+        "research/split_graph_secant_cost_20261107/receipts/A3/launch/result.json",
+        "research/split_graph_secant_cost_20261107/results/A3",
+        "SHA256SUMS",
+        "dc7c013bc2ac19aecc69f6cd5c9a253563ef02e49d72c5590b0d9e951ef88ee9  /opt/sgsecant/sgsecant"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 50,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 50,
+      "id": "verify",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e91dc4cc2a49cff50a7320cef7f3421b471b757544a9030eb7401bd3c659a2b2",
+      "stderr_tail": [
+        "FAIL: Job is not succeeded with exactly one pod and pod exit 0"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 10,
+  "commit": "773893e2d63e26decef72791df237255a58766f4",
+  "dirty_after": [
+    "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-M16-C01.yaml",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C01.yaml",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C02.yaml"
+  ],
+  "dirty_before": [
+    "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-M16-C01.yaml",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C01.yaml",
+    "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A3-C02.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 7"
+}

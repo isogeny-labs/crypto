@@ -3,8 +3,9 @@
 Read the [four-page illustrated report](reports/report.pdf),
 [original requirement mapping](requirements.md), and
 [evidence/storage notes](receipts/INTEGRATION.md).
-Repository-wide validation has a separately reported
-[pending legacy case](receipts/ROOT-VALIDATION.md); it is not labeled green.
+Repository-wide validation has a separate
+[completed run and fixture-replay receipt](receipts/ROOT-VALIDATION.md);
+the original nonzero full-run exit is preserved.
 
 2026-10-30 UTC. **The requested essentially new sub-exponential ECDLP
 algorithm has not been achieved.** This continuation develops a three-adic
@@ -77,6 +78,8 @@ the counterfamily's signed parity, polynomial evaluation, origin and node
 values; it does not formalize all chart coefficients or the full obstruction.
 Raw-table hashes permit replay after automatic artifact migration; there are
 no downloaded answers or external services in the native checks.
+The shell metadata checks also require `jq`. Stored pointers are checked
+against frozen pre-migration hashes; this does not claim a local S3 readback.
 
 Still open: full formalization of the ternary contraction theorem, a general
 recursive native implementation and proof-to-code audit, an essentially new

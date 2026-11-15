@@ -1,0 +1,165 @@
+\documentclass[10pt]{article}
+\usepackage[letterpaper,margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,array}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\makeatletter
+\renewcommand{\maketitle}{\begin{center}{\Large\bfseries\@title\par}\vspace{5pt}\@author\qquad\@date\end{center}}
+\makeatother
+\title{Scope Dependence of Strict Splitting Counts\\
+\large An Exact Check of 69 Recorded Seed Positions}
+\author{Anonymous}
+\date{30 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We test the previously reported lower strict-splitting-count criterion on a
+broader, previously certified census of 69 prime-order seed positions, retaining
+all 82 recorded root branches. No cutoff from 100 through 5000 separates the
+ten published positions from all 59 unpublished positions. At the original
+cutoff 691, 22 unpublished positions tie or fall below their field's published
+maximum. They belong to categories excluded from the earlier 21-choice cohort
+by additional root and order-width screens. A separate PARI implementation
+reproves 76 distinct field/order primes, verifies the point certificates and
+reconstructs all six output files; three deliberate corruptions are refused.
+The earlier 21-choice result reproduces exactly. This scope test limits the
+splitting criterion alone; it neither refutes a combined-screen hypothesis nor
+establishes historical selection, random-curve unusualness or an ECDLP weakness.
+\end{abstract}
+
+\section{Fixed criterion and population}
+For a prime-field curve of certified full prime order $n$, define
+\[
+ t=p+1-n,\quad \Delta=t^2-4p,\quad
+ S_L=\#\{\text{odd primes }\ell\le L:(\Delta/\ell)=+1\}.
+\]
+Let $R_L$ count the separate zero-character cases. A strict split prime has
+two distinct Frobenius-stable lines in $E[\ell]$, corresponding to cyclic
+isogeny kernels defined over the base field. Their individual points need
+not be rational. Ramified cases can also admit rational isogenies; $S_L$
+therefore does not count every rational small-degree isogeny~\cite{ss,pari}.
+
+The degree-691 observation predates this analysis~\cite{asanso}. The earlier
+21-choice replay compares ten publications with eleven named unpublished
+candidates. Their lower-count separation survives only at integer cutoffs
+691--718 and 769--772. The inherited November-1997-draft acceptance analysis
+records a broader prime-order cohort: 69 positions, of which ten are published
+and 59 unpublished~\cite{acceptance}. Its additional 48 positions comprise
+17 width-only and 31 other-root-only cases. This is a lower-bound census of
+numerically eligible recorded positions, not evidence of original visits,
+rejections or an exhaustive near-prime search.
+
+The fixed comparison is the same: within each field, all unpublished counts
+must exceed the largest published count. At each integer $100\le L\le5000$,
+the margin is $m_L=\min_{\rm unpub}S_L-\max_{\rm pub}S_L$; strict success
+requires $m_L>0$. The broader census has five paired fields. P-521 remains
+a singleton and receives no artificial margin. All labels were visible;
+this is retrospective reanalysis, with no fitted replacement cutoff.
+
+\section{Broader result}
+\begin{center}\small\input{tables/fields.tex}\end{center}
+The ranges refer to $S_{691}$. Positive-cutoff counts cover all 4901 integers.
+``Violators'' are unpublished positions with $S_{691}$ at or below the
+published maximum in the same field; equality fails the strict rule.
+No broader joint strict or inclusive ($S_L+R_L$) separator occurs anywhere
+in the requested range. P-192, P-239 and P-256 each fail individually at
+every cutoff. This does not change the correctly reproduced narrow result.
+\clearpage
+
+\section{Counterexamples and the role of additional screens}
+\begin{center}\small\input{tables/categories.tex}\end{center}
+All 22 counterexamples lie among the extra 48 positions. The eleven named
+omissions remain above their field's published maximum at 691. Accordingly,
+the broader failure limits \emph{splitting alone}; a conjunction that first
+applies the root/width screens and then the splitting test still fits these
+recorded labels. Its historical use and motivation remain unverified. Treating
+the extra positions as original rejections would also require unavailable
+visitation evidence. The table gives every strict-691 counterexample.
+
+\begin{center}\small\input{tables/violators.tex}\end{center}
+Category W denotes order-width-only; O denotes other-root-only. The difference
+is the candidate's score minus the largest published score in its field.
+
+\section{Branches, the base point and coefficient}
+All 82 recorded branches remain explicit. Within each seed position, their
+discriminants are verified equal before selecting a representative for the
+69-position comparison: canonical when present, otherwise the sole other
+branch. Isomorphic P-224 coefficient signs have equal order. A quadratic
+twist over the other fields has trace $-t$, and $(-t)^2-4p=\Delta$.
+Thus this score cannot distinguish those twist branches.
+
+For $a=-3$, every on-curve point satisfies
+$b\equiv y^2-x^3+3x\pmod p$. Hence $x=0$ gives $y^2=b$, while $x=1$
+gives $y^2=b-2$. These identities explain simple relations for assigned
+smallest-$x$ points. The earlier finite G--b study independently checked
+100548 trait cells, found no separator among 19152 single-envelope tests,
+and no match in 880 fixed public-scalar checks~\cite{gb}. It does not
+exhaust all mathematical functions, and the historical unpublished generators
+remain unknown. The present score uses only $p,n$ and adds no point attack.
+\clearpage
+
+\section{Verification, provenance and interpretation}
+Source, inputs, commands and resource bounds were committed before actual
+cohort extraction at \path{1fe0d49974b2a3083772d003b69f4e75fe48aa4b}.
+The GMP producer checks nonsingularity, point equations, Hasse membership,
+uniqueness and $[n]P=O$, then enumerates quadratic residues. The separate PARI
+verifier uses proved \texttt{isprime}, \texttt{ellmul} and \texttt{kronecker},
+and pairwise comparison differences. It reproves all 76 distinct field/order
+primes and reconstructs six files byte for byte: branch endpoints, characters,
+all seed/cutoff profiles, joint outcomes/margins, counterexamples and summary.
+The implementations share the GMP integer family and TSV I/O, which handles
+no curve or comparison arithmetic. No new production point count was needed.
+
+All ten phases finish as expected: two arithmetic controls, producer, verifier
+and three corruption preparations exit zero; the three deliberately corrupted
+character/profile/cutoff copies are refused with native exit one. There are
+54776 odd-prime branch characters, 338169 seed/cutoff profiles and 4901 joint
+cutoff outcomes. Every original branch, source file, phase and corrupted copy
+is retained in the local raw archive. No S3 upload or remote custody receipt
+is claimed. Existing-results analysis uses the repository's documented local
+development exception; no random-experiment gate is waived.
+
+The finding is a restriction on the empirical criterion's scope. It does
+not establish the original decision program, either weak-publication or
+weak-omission hypothesis, or a designer's motive. Fewer strict split primes
+has no demonstrated ECDLP-hardness ordering on these inputs. Isogeny-based
+random-reducibility results have additional same-field/order/endomorphism
+assumptions and do not turn this count into an attack~\cite{jmv}.
+The requested 10000 accepted random prime-order curves per field and published
+percentiles remain unrun. Already examined large fields are not unseen
+holdouts. A finite test family cannot measure every mathematical difference.
+
+\begin{thebibliography}{9}\small
+\bibitem{asanso} asanso. Public strict splitting-count observation, 2026.
+Pinned provenance in the earlier strict-count study,
+\path{research/nist_skip_criterion_20261025/strict_elkies_20261029}.
+\bibitem{acceptance} Prior lab analysis. November-1997 X9.62 acceptance-space
+replay, 24 October 2026. Source revision
+\path{351c9c021c7be044ade54dc7e352b33d3a772244},
+\path{research/nist_seed_1997_acceptance_20261024/analysis.json}.
+\bibitem{ss} I. Shparlinski and A. Sutherland. On the distribution of Atkin
+and Elkies primes. \url{https://arxiv.org/abs/1112.3390}, version 2.
+\bibitem{jmv} D. Jao, S. Miller and R. Venkatesan. Expander graphs based on
+GRH with an application to elliptic curve cryptography.
+\url{https://arxiv.org/abs/0811.0647}, version 2.
+\bibitem{pari} PARI Group. PARI/GP documentation: \texttt{isprime},
+\texttt{kronecker}, \texttt{ellinit}, \texttt{ellmul}.
+\url{https://pari.math.u-bordeaux.fr/dochtml/html/}.
+\bibitem{gb} Prior lab study. Generator--coefficient comparison: all 21 curves,
+29 October 2026. \path{research/nist_skip_criterion_20261025/generator_b_execution_20261029/REPORT.md}.
+\end{thebibliography}
+\clearpage
+\appendix
+\section{All 69 selected seed-position endpoints}
+P: published; N: named unpublished omission; W: order-width-only;
+O: other-root-only. These are source classification categories, not proven
+historical program dispositions. $R$ is retained separately. Representative
+choice and both branch endpoints are explicit in the raw 82-branch table.
+Full profiles include all cutoffs, not only these endpoints.
+
+\begin{center}\small\input{tables/all-seeds.tex}\end{center}
+\end{document}

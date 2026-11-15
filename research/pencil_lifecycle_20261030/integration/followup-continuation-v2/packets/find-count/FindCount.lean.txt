@@ -1,0 +1,34 @@
+import EdgeDispatch
+set_option autoImplicit false
+namespace FindCount
+open SignedWord
+variable {n : Nat}
+inductive Counted (r : UInt64) : State n → Fin n → State n → Fin n → Pot → Nat → Prop
+ | root (s : State n) (x : Fin n) (h : s.parent x=x) : Counted r s x s x ident 1
+ | step (s t : State n) (x root : Fin n) (q : Pot) (c : Nat)
+   (hne : s.parent x≠x) (rec : Counted r s (s.parent x) t root q c) :
+   Counted r s x (compress t x root (compose r (t.pot x) q)) root (compose r (t.pot x) q) (c+1)
+theorem erase {r : UInt64} {s t : State n} {x root : Fin n} {p : Pot} {c : Nat}
+ (h : Counted r s x t root p c) : Run r s x t root p := by
+ induction h with
+ | root x h => exact Run.root s x h
+ | step t x root q c hne rec ih => exact Run.step s t x root q hne ih
+theorem lift {r : UInt64} {s t : State n} {x root : Fin n} {p : Pot}
+ (h : Run r s x t root p) : ∃ c,Counted r s x t root p c := by
+ induction h with
+ | root x h => exact ⟨1,Counted.root s x h⟩
+ | step t x root q hne rec ih =>
+   obtain ⟨c,hc⟩:=ih
+   exact ⟨c+1,Counted.step s t x root q c hne hc⟩
+theorem positive {r : UInt64} {s t : State n} {x root : Fin n} {p : Pot} {c : Nat}
+ (h : Counted r s x t root p c) : 0<c := by cases h <;> omega
+theorem rank_bound {r : UInt64} {s t : State n} {x root : Fin n} {p : Pot} {c : Nat}
+ (h : Counted r s x t root p c) (rank : Fin n→Nat)
+ (hf : GraphFind.Forest (decode r s) rank) : c≤rank x+1 := by
+ induction h with
+ | root x h => omega
+ | step t x root q c hne rec ih =>
+   have hb:=ih
+   have hlt:rank (s.parent x)<rank x := (hf x).resolve_left hne
+   omega
+end FindCount

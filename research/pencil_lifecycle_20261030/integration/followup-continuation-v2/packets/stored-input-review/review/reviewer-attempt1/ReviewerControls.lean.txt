@@ -1,0 +1,14 @@
+import StoredControls
+set_option autoImplicit false
+open StoredInput DivisorArrayCopy Polynomial
+namespace StoredReviewer
+theorem extraction_order :
+ extract ⟨2,#[10,11,1],#[13,14]⟩ ⟨2,#[20,21,1],#[23,24]⟩ =
+ ⟨11,10,14,13,21,20,24,23⟩ := rfl
+theorem leading_slot_required : ¬WellFormed 17 (X^5) ⟨0,#[2,7,8],#[9,10]⟩ := by simp [WellFormed]
+theorem inactive_noncanonical_rejected : ¬WellFormed 17 (X^5) ⟨0,#[1,17,8],#[9,10]⟩ := by
+ simp [WellFormed,Stored.canonical,ScaleTrim.Canon]
+end StoredReviewer
+#print axioms StoredReviewer.extraction_order
+#print axioms StoredReviewer.leading_slot_required
+#print axioms StoredReviewer.inactive_noncanonical_rejected

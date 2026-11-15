@@ -1,0 +1,13 @@
+{
+  "command": [
+    "bash",
+    "-lc",
+    "set -euo pipefail; aws s3 cp s3://setec-astronomy-artifacts/runs/n83-centered-panel-20261030-r1/protocol.json /work/protocol.json --region us-east-2 --only-show-errors; echo '8aeec565c7b6808be72a56ceeb0fd149f78d6591c9953565daf58adbf4ef922a  /work/protocol.json' | sha256sum -c -; export N83_RUN_BACKEND=isolab-k8s; exec timeout --signal=TERM --kill-after=10 1500 bash /centered-panel/source/run-centered-panel.sh /centered-panel /work/protocol.json /work/centered-raw s3://setec-astronomy-artifacts/runs/n83-centered-panel-20261030-r1/raw/"
+  ],
+  "cpu": 2,
+  "memory": "3Gi",
+  "seconds": 1800,
+  "retries": 0,
+  "job_name": "n83-centered-panel-20261030-r1",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:dc4df3f5da5d33678682437ca26b8c54dbc47e82f4328c3ab9f7b4f9d3405780"
+}

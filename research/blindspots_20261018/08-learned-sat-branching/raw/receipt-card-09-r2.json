@@ -1,0 +1,467 @@
+{
+  "card_id": "CARD-BLINDSPOT-08-09-r2",
+  "card_path": "research/blindspots_20261018/08-learned-sat-branching/card-09-r2.yaml",
+  "card_sha256": "236a2e4ed09118f4c5275e90238b18029500f2e7149efc93734eff8af557f18e",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-08/card-09-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-work-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "clone",
+        "--quiet",
+        "--depth",
+        "1",
+        "--branch",
+        "5.11.21",
+        "https://github.com/msoos/cryptominisat",
+        "target/blindspots-08/card-09-r2/src"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.883,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "clone-cms",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.883,
+      "stderr_sha256": "9634cd701d688de96e8b8dae2f9f5322f479204587b3582f8505adbf19537fc4",
+      "stderr_tail": [
+        "Note: switching to '4c9a6b6b459b7c1381744115ccfe744f1121794b'.",
+        "",
+        "You are in 'detached HEAD' state. You can look around, make experimental",
+        "changes and commit them, and you can discard any commits you make in this",
+        "state without impacting any branches by switching back to a branch.",
+        "",
+        "If you want to create a new branch to retain commits you create, you may",
+        "do so (now or later) by using -c with the switch command. Example:",
+        "",
+        "  git switch -c <new-branch-name>",
+        "",
+        "Or undo this operation with:",
+        "",
+        "  git switch -",
+        "",
+        "Turn off this advice by setting config variable advice.detachedHead to false",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "target/blindspots-08/card-09-r2/src",
+        "checkout",
+        "--quiet",
+        "--detach",
+        "4c9a6b6b459b7c1381744115ccfe744f1121794b"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.018,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pin-cms-revision",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.018,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "target/blindspots-08/card-09-r2/src",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cms-revision",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c0d1da979a765dfcf8edf1ea0dd5ea248f6117c0f9ee57d0fc39ab21101e2159",
+      "stdout_tail": [
+        "4c9a6b6b459b7c1381744115ccfe744f1121794b"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "target/blindspots-08/card-09-r2/src",
+        "-B",
+        "target/blindspots-08/card-09-r2/build",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DENABLE_TESTING=OFF",
+        "-DSTATS=OFF",
+        "-DNOZLIB=ON",
+        "-DNOM4RI=ON",
+        "-DSTATICCOMPILE=ON"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.49,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cms-configure",
+      "index": 5,
+      "outputs": {},
+      "seconds": 2.49,
+      "stderr_sha256": "9f49a8fa789cec28a2cf06f5ea0e207372dbac482491d1e05895834f3c4dadc1",
+      "stderr_tail": [
+        "CMake Warning at CMakeLists.txt:714 (message):",
+        "  Testing is disabled",
+        "",
+        "",
+        "CMake Warning:",
+        "  Manually-specified variables were not used by the project:",
+        "",
+        "    NOM4RI",
+        "",
+        ""
+      ],
+      "stdout_sha256": "285fd2d0ac1dfa2a82b8d2958b5e300ff3416fe4590fc22f3df3373342cb6381",
+      "stdout_tail": [
+        "-- Performing Test HAVE_FLAG_-Wnull-dereference - Success",
+        "-- Performing Test HAVE_FLAG_-Wdouble-promotion",
+        "-- Performing Test HAVE_FLAG_-Wdouble-promotion - Success",
+        "-- Performing Test HAVE_FLAG_-Wshadow",
+        "-- Performing Test HAVE_FLAG_-Wshadow - Success",
+        "-- Performing Test HAVE_FLAG_-Wformat=2",
+        "-- Performing Test HAVE_FLAG_-Wformat=2 - Success",
+        "-- Performing Test HAVE_FLAG_-Wextra-semi",
+        "-- Performing Test HAVE_FLAG_-Wextra-semi - Success",
+        "-- Performing Test HAVE_FLAG_-pedantic",
+        "-- Performing Test HAVE_FLAG_-pedantic - Success",
+        "-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY",
+        "-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success",
+        "-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY",
+        "-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success",
+        "-- Performing Test COMPILER_HAS_DEPRECATED_ATTR",
+        "-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success",
+        "-- Configuring done (2.5s)",
+        "-- Generating done (0.0s)",
+        "-- Build files have been written to: /home/user/crypto/target/blindspots-08/card-09-r2/build"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "target/blindspots-08/card-09-r2/build",
+        "-j2",
+        "cryptominisat5-bin"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 44.52,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cms-build",
+      "index": 6,
+      "outputs": {},
+      "seconds": 44.52,
+      "stderr_sha256": "5e13de18a9c6725a8e78d674f13095fb7045ef85bfa46e2f8fffc80de9979fb6",
+      "stderr_tail": [
+        "  136 |     bind1st(const _Operation& __fn, const _Tp& __x)",
+        "      |     ^~~~~~~",
+        "In file included from /home/user/crypto/target/blindspots-08/card-09-r2/src/src/signalcode.cpp:24:",
+        "/home/user/crypto/target/blindspots-08/card-09-r2/src/src/time_mem.h: In function \u2018uint64_t memUsedTotal(double&, std::string*)\u2019:",
+        "/home/user/crypto/target/blindspots-08/card-09-r2/src/src/time_mem.h:183:72: warning: \u2018std::binder1st<_Operation> std::bind1st(const _Operation&, const _Tp&) [with _Operation = not_equal_to<char>; _Tp = char]\u2019 is deprecated: use 'std::bind' instead [-Wdeprecated-declarations]",
+        "  183 |                         std::find_if(tp.begin(), tp.end(), std::bind1st(std::not_equal_to<char>(), '\\t')));",
+        "      |                                                            ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+        "In file included from /usr/include/c++/13/bits/stl_function.h:1438,",
+        "                 from /usr/include/c++/13/string:49,",
+        "                 from /home/user/crypto/target/blindspots-08/card-09-r2/src/src/signalcode.h:26,",
+        "                 from /home/user/crypto/target/blindspots-08/card-09-r2/src/src/signalcode.cpp:23:",
+        "/usr/include/c++/13/backward/binders.h:136:5: note: declared here",
+        "  136 |     bind1st(const _Operation& __fn, const _Tp& __x)",
+        "      |     ^~~~~~~",
+        "/home/user/crypto/target/blindspots-08/card-09-r2/src/src/time_mem.h:185:72: warning: \u2018std::binder1st<_Operation> std::bind1st(const _Operation&, const _Tp&) [with _Operation = not_equal_to<char>; _Tp = char]\u2019 is deprecated: use 'std::bind' instead [-Wdeprecated-declarations]",
+        "  185 |                         std::find_if(tp.begin(), tp.end(), std::bind1st(std::not_equal_to<char>(), ' ')));",
+        "      |                                                            ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+        "/usr/include/c++/13/backward/binders.h:136:5: note: declared here",
+        "  136 |     bind1st(const _Operation& __fn, const _Tp& __x)",
+        "      |     ^~~~~~~"
+      ],
+      "stdout_sha256": "1666f010271283f096556407cd8b098f326a2504226c9f0140936d6cc754be67",
+      "stdout_tail": [
+        "[ 82%] Building C object cmsat5-src/CMakeFiles/cryptominisat5.dir/picosat/version.c.o",
+        "[ 84%] Building CXX object cmsat5-src/CMakeFiles/cryptominisat5.dir/oracle/oracle.cpp.o",
+        "[ 86%] Building CXX object cmsat5-src/CMakeFiles/cryptominisat5.dir/GitSHA1.cpp.o",
+        "[ 88%] Building CXX object cmsat5-src/CMakeFiles/cryptominisat5.dir/cryptominisat.cpp.o",
+        "[ 90%] Linking CXX static library ../lib/libcryptominisat5.a",
+        "make[3]: Leaving directory '/home/user/crypto/target/blindspots-08/card-09-r2/build'",
+        "[ 90%] Built target cryptominisat5",
+        "make[3]: Entering directory '/home/user/crypto/target/blindspots-08/card-09-r2/build'",
+        "make[3]: Leaving directory '/home/user/crypto/target/blindspots-08/card-09-r2/build'",
+        "make[3]: Entering directory '/home/user/crypto/target/blindspots-08/card-09-r2/build'",
+        "[ 94%] Building CXX object cmsat5-src/CMakeFiles/cryptominisat5-bin.dir/main_common.cpp.o",
+        "[ 94%] Building CXX object cmsat5-src/CMakeFiles/cryptominisat5-bin.dir/main.cpp.o",
+        "[ 96%] Building CXX object cmsat5-src/CMakeFiles/cryptominisat5-bin.dir/main_exe.cpp.o",
+        "[ 98%] Building CXX object cmsat5-src/CMakeFiles/cryptominisat5-bin.dir/signalcode.cpp.o",
+        "[100%] Linking CXX executable ../cryptominisat5",
+        "make[3]: Leaving directory '/home/user/crypto/target/blindspots-08/card-09-r2/build'",
+        "[100%] Built target cryptominisat5-bin",
+        "make[2]: Leaving directory '/home/user/crypto/target/blindspots-08/card-09-r2/build'",
+        "make[1]: Leaving directory '/home/user/crypto/target/blindspots-08/card-09-r2/build'",
+        "make: Leaving directory '/home/user/crypto/target/blindspots-08/card-09-r2/build'"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "target/blindspots-08/card-09-r2/build/cryptominisat5",
+        "--version"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cms-version",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c0b244a17bf1fd0e2c711307edf2598778e9dcff46f0a9d8a5e8861b4af5694d",
+      "stdout_tail": [
+        "c CryptoMiniSat version 5.11.21",
+        "c CMS Copyright (C) 2009-2020 Authors of CryptoMiniSat, see AUTHORS file",
+        "c CMS SHA revision 4c9a6b6b459b7c1381744115ccfe744f1121794b",
+        "c Using VMTF code by Armin Biere from CaDiCaL",
+        "c Using Yalsat by Armin Biere, see Balint et al. Improving implementation of SLS solvers [...], SAT'14",
+        "c Using WalkSAT by Henry Kautz, see Kautz and Selman Pushing the envelope: planning, propositional logic, and stochastic search, AAAI'96,",
+        "c CMS is MIT licensed",
+        "c Using code from 'When Boolean Satisfiability Meets Gauss-E. in a Simplex Way'",
+        "c       by C.-S. Han and J.-H. Roland Jiang in CAV 2012. Fixes by M. Soos",
+        "c Using CCAnr from 'CCAnr: A Conf. Checking Based Local Search Solver [...]'",
+        "c       by Shaowei Cai, Chuan Luo, and Kaile Su, SAT 2015",
+        "c CMS compilation env CMAKE_CXX_COMPILER = /usr/bin/c++ | CMAKE_CXX_FLAGS =  -fno-stack-protector -fvisibility=hidden -Wlogical-op -Wrestrict -Wnull-dereference -Wdouble-promotion -Wshadow -Wformat=2 -Wextra-semi -pedantic | COMPILE_DEFINES =  -DRDB0_ONLY_FEATURES -DNDEBUG -D_FORTIFY_SOURCE=0 -DYALSAT_FPU | STATICCOMPILE = ON | ONLY_SIMPLE =  | STATS = OFF | SQLITE3_FOUND =  | ZLIB_FOUND =  | VALGRIND_FOUND =  | ENABLE_TESTING = OFF | SLOW_DEBUG = OFF | ENABLE_ASSERTIONS = OFF | PYTHON_EXECUTABLE =  | PYTHON_LIBRARY =  | PYTHON_INCLUDE_DIRS =  | MY_TARGETS =  | LARGEMEM = OFF | LIMITMEM = OFF | BREAKID_LIBRARIES =  | BREAKID-VER = . | BOSPHORUS_LIBRARIES =  | BOSPH-VER = . | compilation date time = Oct 18 2026 13:24:10",
+        "c CMS compiled with gcc version 13.3.0"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-08/card-09-r2/b08",
+        "examples/blindspots_08_learned_branching.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.865,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 8,
+      "outputs": {},
+      "seconds": 6.865,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-08/card-09-r2/b08",
+        "cell",
+        "--n",
+        "31",
+        "--ell",
+        "5",
+        "--np",
+        "16",
+        "--nr",
+        "16",
+        "--seed",
+        "20261018",
+        "--role",
+        "7",
+        "--models",
+        "research/blindspots_20261018/08-learned-sat-branching/raw/model.txt",
+        "--arms",
+        "a",
+        "--only",
+        "0,1,2",
+        "--cms",
+        "target/blindspots-08/card-09-r2/build/cryptominisat5",
+        "--cms-maxtime",
+        "40",
+        "--tmp",
+        "target/blindspots-08/card-09-r2",
+        "--cap",
+        "100000000"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.712,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cms-n31-planted",
+      "index": 9,
+      "outputs": {},
+      "seconds": 9.712,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4e88c3deafd4df34fc88569e00b5c76d7b0ac3235549c97b1ea628bf5fbf35ea",
+      "stdout_tail": [
+        "{\"n\":31,\"l\":5,\"idx\":0,\"kind\":\"P\",\"xr\":647897843,\"chain_sols\":6,\"direct_sols\":-1,\"arm\":\"a\",\"verdict\":\"SAT\",\"D\":20668,\"P\":2633586,\"Q\":0,\"W\":20668,\"visits\":20593542,\"model_ok\":true,\"ms\":194}",
+        "{\"n\":31,\"l\":5,\"idx\":0,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}",
+        "{\"n\":31,\"l\":5,\"idx\":0,\"kind\":\"P\",\"xr\":647897843,\"arm\":\"e\",\"verdict\":\"SAT\",\"D\":59220,\"P\":355000,\"Q\":0,\"W\":0,\"conflicts\":53827,\"model_ok\":true,\"ms\":2821}",
+        "{\"n\":31,\"l\":5,\"idx\":1,\"kind\":\"P\",\"xr\":1639900461,\"chain_sols\":6,\"direct_sols\":-1,\"arm\":\"a\",\"verdict\":\"SAT\",\"D\":4247,\"P\":383238,\"Q\":0,\"W\":4255,\"visits\":3241039,\"model_ok\":true,\"ms\":35}",
+        "{\"n\":31,\"l\":5,\"idx\":1,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}",
+        "{\"n\":31,\"l\":5,\"idx\":1,\"kind\":\"P\",\"xr\":1639900461,\"arm\":\"e\",\"verdict\":\"SAT\",\"D\":103771,\"P\":2956000,\"Q\":0,\"W\":0,\"conflicts\":96703,\"model_ok\":true,\"ms\":6352}",
+        "{\"n\":31,\"l\":5,\"idx\":2,\"kind\":\"P\",\"xr\":633593688,\"chain_sols\":12,\"direct_sols\":-1,\"arm\":\"a\",\"verdict\":\"SAT\",\"D\":240,\"P\":12906,\"Q\":0,\"W\":240,\"visits\":145689,\"model_ok\":true,\"ms\":1}",
+        "{\"n\":31,\"l\":5,\"idx\":2,\"check\":\"agreement\",\"arms_agree\":true,\"planted_sat\":true,\"truth_ok\":true}",
+        "{\"n\":31,\"l\":5,\"idx\":2,\"kind\":\"P\",\"xr\":633593688,\"arm\":\"e\",\"verdict\":\"SAT\",\"D\":687,\"P\":34000,\"Q\":0,\"W\":0,\"conflicts\":387,\"model_ok\":true,\"ms\":30}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-rf",
+        "target/blindspots-08/card-09-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.108,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-work-dir",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.108,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 10,
+  "commit": "5ba9a88528de27003cdcb975dc50d23e699d755a",
+  "dirty_after": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-planted-r2.jsonl",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-planted-r2.stderr.log"
+  ],
+  "dirty_before": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/11-learned-prefilter/card-07-r2.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

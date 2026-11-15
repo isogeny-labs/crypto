@@ -1,0 +1,51 @@
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:20:32: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ?a * ?a
+in the target expression
+  -i * i = 1
+
+K : Type u_1
+inst✝ : Field K
+i t : K
+hi : i ^ 2 = -1
+h3 : i ^ 3 = -i
+⊢ -i * i = 1
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:26:48: error: No goals to be solved
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:32:12: warning: This simp argument is unused:
+  h7
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [h6, h5, h4, h3, hi]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:32:18: warning: This simp argument is unused:
+  h5
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [h7, h6, h4, h3, hi]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:32:24: warning: This simp argument is unused:
+  h3
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [h7, h6, h5, h4, hi]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:48:1: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:86:1: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:96:47: warning: Variable name `hα` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hα
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:104:5: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-scholten-model-normalization-20261031-v1/Model.lean:104:5: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`

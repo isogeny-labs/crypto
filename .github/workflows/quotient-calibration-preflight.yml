@@ -1,11 +1,6 @@
 name: Quotient calibration native preflight
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'research/quotient_calibration_20261025/**'
-      - '.github/workflows/quotient-calibration-preflight.yml'
   push:
     branches: [main]
     paths:
@@ -32,6 +27,8 @@ jobs:
             .artifacts
             research/quotient_calibration_20261025
             tools/artifacts
+            src/cryptanalysis
+            docs/identity-certificates
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -65,3 +62,14 @@ jobs:
         run: |
           cargo run --release --locked --manifest-path research/quotient_calibration_20261025/native/Cargo.toml -- --output "$RUNNER_TEMP/native-preflight.json"
           cmp "$RUNNER_TEMP/native-preflight.json" research/quotient_calibration_20261025/reports/run-20261025T1845Z/native-preflight.json
+      - name: Target component formatting
+        run: cargo fmt --manifest-path research/quotient_calibration_20261025/target-native/Cargo.toml -- --check
+      - name: Target fixed-fixture and certificate tests
+        run: cargo test --release --locked --manifest-path research/quotient_calibration_20261025/target-native/Cargo.toml
+      - name: Target strict Clippy
+        run: cargo clippy --release --locked --manifest-path research/quotient_calibration_20261025/target-native/Cargo.toml --all-targets -- -D warnings
+      - name: Replay trace identity certificate
+        run: |
+          cargo run --release --locked --manifest-path research/quotient_calibration_20261025/target-native/Cargo.toml --bin trace-certificate -- "$RUNNER_TEMP/trace-three-slots.json"
+          cmp "$RUNNER_TEMP/trace-three-slots.json" research/quotient_calibration_20261025/target-native/certificates/trace-three-slots.json
+          cmp "$RUNNER_TEMP/trace-three-slots.expansion.json" research/quotient_calibration_20261025/target-native/certificates/trace-three-slots.expansion.json

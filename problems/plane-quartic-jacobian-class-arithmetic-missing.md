@@ -4,7 +4,7 @@
 - **Kind:** implementation gap
 - **Affected work:** `research/ghs_cubic_genus3_build_20261012/` (Conductor T-2267); follow-up IC study `research/ghs_cubic_quartic_ic_20261012/` (T-2280 / T-2491, PR #1768)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-19
+- **Last updated:** 2026-10-21
 
 ## Problem
 
@@ -40,3 +40,4 @@ Evidence: `research/ghs_cubic_quartic_ic_20261012/results/run-20261014T0200Z.jso
 2026-10-14: Pic lin-equiv checks + orbit-aware pure IC on toys (T-2491 / PR #1768). Status → `resolved` for the discriminating toy checks named in "What would unblock it."
 2026-10-18: W1 canonical `Pic^0` keys and arithmetic (PR for branch `claude/quartic-pic-canonical-20261018`).
 2026-10-19 (N4, `research/quartic_n4_20261019/`): the 2026-10-14 "pure IC" smokes were subgroup enumeration (99.8-99.99% of their cost was the loop over every multiple of the generator; relation rows discarded; 0, 1 and 3 relations at q = 5, 7, 11), so they are withdrawn as index-calculus evidence; their recovered scalars and deg-6 table are correct, their degree-3 reduction merged distinct classes (1, 7, 20 pairs). A real relation-collection pipeline on canonical `Pic^0` (no enumeration) now exists (q up to 262111, 51 of 51 instances verified) and measures an exponent of 1.083 [1.040, 1.128] against matched rho's 1.485 on q >= 4051 for the GHS-weak family; lead N4 stays open. The "FB points are 4-primary" note above is not supported at q = 5, 7, 11 (all points but `P0` have a nonzero `ell`-part).
+2026-10-21 (N4 iteration 2, `research/quartic_n4_la_20261021/`): double large primes (B2) cut the cold cost of the plane-quartic relation-collection solve to 0.22 to 0.36 of the recorded B0 baseline at q >= 4051 and give an exponent of 1.045 [1.037, 1.052] against rho's 1.475 on that range (IC/rho 0.024 at q = 1 048 507, GHS-weak family only); structured elimination (B1) was a small gain and a regression at q = 262 111. B2 is the new baseline; lead N4 stays open and is now ahead of rho in the whole measured range q >= 991.
