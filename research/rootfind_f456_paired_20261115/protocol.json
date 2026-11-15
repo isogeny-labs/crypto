@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "ROOTFIND-F456-PAIRED-K13-20261115",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-15",
   "repository": "crypto",
   "study_dir": "research/rootfind_f456_paired_20261115",
@@ -11,7 +11,8 @@
   "links": {
     "spec": "SPEC-K13.json",
     "spec_sha256": "f5fa85c7ce29ff9475c30f8ffbc861ba6bcddaa6625d1ea2f5c072964889beb2",
-    "conductor": "T-6333"
+    "conductor": "T-6333",
+    "protocol_v1": "protocol-v1.json"
   },
   "question": "On eight fresh public Koblitz E0 n13 targets, is complete cold rootfind-negfold m3 bitop/v1 cost below matrix F4, matrix F5, inherited F4 and F6-IC using the identical standard-subspace base?",
   "claims": [
@@ -91,9 +92,10 @@
         "binary_sha256": null,
         "flags": {},
         "env": {
-          "RAYON_NUM_THREADS": "1"
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
         },
-        "threads": 1
+        "threads": 4
       },
       "parameters": {
         "method": "rho.signed_frobenius_strong",
@@ -120,9 +122,10 @@
         "binary_sha256": null,
         "flags": {},
         "env": {
-          "RAYON_NUM_THREADS": "1"
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
         },
-        "threads": 1
+        "threads": 4
       },
       "parameters": {
         "method": "ic.pipeline",
@@ -151,9 +154,10 @@
         "binary_sha256": null,
         "flags": {},
         "env": {
-          "RAYON_NUM_THREADS": "1"
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
         },
-        "threads": 1
+        "threads": 4
       },
       "parameters": {
         "method": "ic.pipeline",
@@ -182,9 +186,10 @@
         "binary_sha256": null,
         "flags": {},
         "env": {
-          "RAYON_NUM_THREADS": "1"
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
         },
-        "threads": 1
+        "threads": 4
       },
       "parameters": {
         "method": "ic.pipeline",
@@ -213,9 +218,10 @@
         "binary_sha256": null,
         "flags": {},
         "env": {
-          "RAYON_NUM_THREADS": "1"
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
         },
-        "threads": 1
+        "threads": 4
       },
       "parameters": {
         "method": "ic.pipeline",
@@ -244,9 +250,10 @@
         "binary_sha256": null,
         "flags": {},
         "env": {
-          "RAYON_NUM_THREADS": "1"
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
         },
-        "threads": 1
+        "threads": 4
       },
       "parameters": {
         "method": "ic.pipeline",
@@ -275,9 +282,10 @@
         "binary_sha256": null,
         "flags": {},
         "env": {
-          "RAYON_NUM_THREADS": "1"
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
         },
-        "threads": 1
+        "threads": 4
       },
       "parameters": {
         "method": "ic.pipeline",
@@ -306,9 +314,10 @@
         "binary_sha256": null,
         "flags": {},
         "env": {
-          "RAYON_NUM_THREADS": "1"
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
         },
-        "threads": 1
+        "threads": 4
       },
       "parameters": {
         "method": "ic.pipeline",
@@ -683,12 +692,26 @@
       "verified_by": "Codex 2026-11-15"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1",
+      "filed": "2026-11-15",
+      "filed_before_affected_data": true,
+      "reason": "The Iso Lab L2 benchmark launcher sets RAYON_NUM_THREADS and OMP_NUM_THREADS to its four requested CPUs; v1 declared one thread although no run had started.",
+      "changes": [
+        "All arm instrument environments and thread counts now match the existing four-CPU EKS job; spec, target law, metric and decision rule are unchanged."
+      ],
+      "supersedes_fields": [
+        "arms[*].instrument.env",
+        "arms[*].instrument.threads"
+      ]
+    }
+  ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "354de4b1973d5fefb8e4ab6372989be6f976c7fca149be9d535ff8d4825f12e5",
-    "commit": "a327df23e23cbd154a29bd9240bc746c2d606c6b",
-    "frozen_at": "2026-11-15T22:04:07Z",
+    "protocol_sha256": "ec7bd6f5aa67b90215c7660f6cc772a4f00ab60905edb4cf639f96283d955e51",
+    "commit": "59cb9e14af4e4396bf4737db64a41aece667747f",
+    "frozen_at": "2026-11-15T22:10:18Z",
     "filed_before_affected_data": true
   }
 }

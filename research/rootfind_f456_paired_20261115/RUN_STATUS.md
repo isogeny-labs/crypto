@@ -1,8 +1,8 @@
 # K13 paired panel: admission state
 
-**2026-11-15 14:05 PST — frozen and published; scientific session unlaunched.**
+**2026-11-15 14:10 PST — amended before data; scientific session unlaunched.**
 
-The native release `ecbench` built with Rust 1.99.1, and `ecbench plan` accepted all eight arms, eight registered public workloads and 448 executions without warning. The `experiment.protocol/v1` checker reported zero findings. The protocol's canonical hash is `354de4b1973d5fefb8e4ab6372989be6f976c7fca149be9d535ff8d4825f12e5`; the ecbench spec SHA-256 is `f5fa85c7ce29ff9475c30f8ffbc861ba6bcddaa6625d1ea2f5c072964889beb2`. The tested-source candidate is commit `2aa0119a2bcb915f404db9a5d8625c0a929e4b8f`, with [GitHub publication verification](publication.json). No session directory or outcome row exists for this study.
+The native release `ecbench` built with Rust 1.99.1, and `ecbench plan` accepted all eight arms, eight registered public workloads and 448 executions without warning. The `experiment.protocol/v1` checker reported zero findings. The current protocol is [v2](protocol.json), frozen before data with canonical hash `ec7bd6f5aa67b90215c7660f6cc772a4f00ab60905edb4cf639f96283d955e51`. The ecbench spec SHA-256 remains `f5fa85c7ce29ff9475c30f8ffbc861ba6bcddaa6625d1ea2f5c072964889beb2`. The original source and inputs were published at commit `2aa0119a2bcb915f404db9a5d8625c0a929e4b8f` with [GitHub publication verification](publication.json); the amended protocol will need a fresh publication receipt after this change is pushed. [Protocol v1](protocol-v1.json) is retained with hash `354de4b1973d5fefb8e4ab6372989be6f976c7fca149be9d535ff8d4825f12e5` as the superseded thread-count declaration. No session directory or outcome row exists for this study.
 
 ## Admission obstruction
 
