@@ -96,3 +96,5 @@ parser/compiler or physical-host independence. Signed standing remains
 unverified. [pcc:unverified]
 
 Exact local **PCC-20261115-2cfd10** replay PASS at 2026-11-15T18:18:29Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `39ab9da50a5c9a82d55aab3b9c07a0e1a33d7687` and local receipt `8d7b7adbae8bec4c378b696624efdc2b39f664e9` share tree `4bf3bcdcd337726d5b89d346c1f8de5a0ac21565`. Anonymous fetch completed; fresh PR head/body/open/ready matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
