@@ -59,3 +59,9 @@ and memory costs), official Rust HashSet Eq/Hash documentation, and the native
 finite/reduction/curve contracts. The crate's PREPARED_PAIRS.md gives API,
 lifecycle, ordering and replay details. Runtime qualification and independent
 review remain open.
+
+Canonical artifact registration is separately pending under the
+[PCC/storage conflict](../../problems/prepared-point-tables-ledger-artifact-policy.md).
+The exact statement/ledger append is preserved on its proposal branch; this
+code branch preserves the original canonical ledger unchanged. Development
+observations remain unregistered producer data. [pcc:unverified]
