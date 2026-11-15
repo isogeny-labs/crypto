@@ -34,7 +34,14 @@ impl<'a,T:Owner> Session<'a,T>{
  pub fn next(&mut self)->Result<Outcome,Failure>{
   if let Some(e)=self.attempt.failure{return Err(e)}
   let mut m=Meter{owner:self.owner,limits:self.limits,deadline:self.deadline,charge:self.attempt.charge};
-  let result=next(self.n,self.original,&mut self.attempt,&mut m);self.attempt.charge=m.charge;
+  let result=next(self.n,self.original,&mut self.attempt,&mut m,None);self.attempt.charge=m.charge;
+  if let Err(e)=result{self.attempt.failure=Some(e);self.attempt.outcome=Outcome::Unknown}result
+ }
+ pub fn next_with_checkpoint(&mut self,control:&mut scheduler::CheckpointControl,hook:&mut impl FnMut(&Attempt,usize,&search::SearchAttempt,usize,&scheduler::Attempt,Charge,Charge,&mut T)->Result<(),()>)->Result<Outcome,Failure>{
+  if let Some(e)=self.attempt.failure{return Err(e)}
+  if control.stop().is_some(){self.attempt.failure=Some(Failure::Owner);self.attempt.outcome=Outcome::Unknown;return Err(Failure::Owner)}
+  let mut m=Meter{owner:self.owner,limits:self.limits,deadline:self.deadline,charge:self.attempt.charge};
+  let result=next(self.n,self.original,&mut self.attempt,&mut m,Some((control,hook)));self.attempt.charge=m.charge;
   if let Err(e)=result{self.attempt.failure=Some(e);self.attempt.outcome=Outcome::Unknown}result
  }
  /// Caller-requested exclusion, explicitly not a cryptographic certificate.
@@ -87,7 +94,7 @@ fn build<T:Owner>(g:&[Polynomial],p:&mut Partition,m:&mut Meter<T>)->Result<(),F
   let mut q=Vec::new();m.reserve(&mut q,if *value{2}else{1})?;if *value{q.push(Vec::new())}let mut t=Vec::new();m.reserve(&mut t,1)?;t.push(v);q.push(t);p.equations.push(q);
  }p.status=Status::Ready;Ok(())
 }
-fn next<T:Owner>(n:u32,g:&[Polynomial],a:&mut Attempt,m:&mut Meter<T>)->Result<Outcome,Failure>{
+fn next<T:Owner>(n:u32,g:&[Polynomial],a:&mut Attempt,m:&mut Meter<T>,mut checkpoint:Option<(&mut scheduler::CheckpointControl,&mut dyn FnMut(&Attempt,usize,&search::SearchAttempt,usize,&scheduler::Attempt,Charge,Charge,&mut T)->Result<(),()>)>)->Result<Outcome,Failure>{
  m.pay(1,0)?;
  if a.outcome==Outcome::CandidateRetained{return Ok(a.outcome)}
  if a.outcome==Outcome::RemainingBooleanModelsExhaustedUnderRecordedExclusions{return Ok(a.outcome)}
@@ -100,7 +107,16 @@ fn next<T:Owner>(n:u32,g:&[Polynomial],a:&mut Attempt,m:&mut Meter<T>)->Result<O
   m.pay(1,0)?;let Some(&id)=a.queue.last()else{a.active=None;a.outcome=Outcome::RemainingBooleanModelsExhaustedUnderRecordedExclusions;return Ok(a.outcome)};
   a.active=Some(id);let p=&mut a.partitions[id];
   if p.status==Status::Building{build(g,p,m)?}if p.status!=Status::Ready{return Err(Failure::State)}p.status=Status::Running;
-  let mut bridge=Bridge{meter:m,failure:None};let s=search::solve(n,&p.equations,bridge.meter.limits.search,bridge.meter.deadline,&mut bridge);let failed=bridge.failure;let result=s.result;p.search=Some(s);
+  a.charge=m.charge;
+  let mut bridge=Bridge{meter:m,failure:None};
+  let s=if let Some((control,hook))=checkpoint.as_mut(){
+   search::solve_with_checkpoint(n,&a.partitions[id].equations,bridge.meter.limits.search,bridge.meter.deadline,&mut bridge,control,&mut |search,node,native,search_charge,owner|{
+    owner.meter.pay(0,0).map_err(|_|())?;
+    let result=hook(a,id,search,node,native,owner.meter.charge,search_charge,&mut *owner.meter.owner);
+    if result.is_err(){return result}owner.meter.pay(0,0).map_err(|_|())
+   })
+  }else{search::solve(n,&a.partitions[id].equations,bridge.meter.limits.search,bridge.meter.deadline,&mut bridge)};
+  let failed=bridge.failure;let result=s.result;let p=&mut a.partitions[id];p.search=Some(s);
   if let Some(e)=failed{return Err(e)}if result.is_err(){return Err(Failure::Native)}
   let mut bridge=Bridge{meter:m,failure:None};let v=check::verify(n,&p.equations,p.search.as_ref().unwrap(),bridge.meter.limits.audit,bridge.meter.deadline,&mut bridge);let failed=bridge.failure;let result=v.result;p.audit=Some(v);
   if let Some(e)=failed{return Err(e)}if result.is_err(){return Err(Failure::Audit)}

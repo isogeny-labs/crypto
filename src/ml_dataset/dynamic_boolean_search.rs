@@ -19,10 +19,13 @@ fn eval<T:Owner>(g:&[Polynomial],point:&[bool],m:&mut Meter<T>)->Result<bool,Fai
 /// Stops at the first exactly evaluated Boolean witness. A witness is not a signed
 /// ECDLP relation. UnsatDerived requires every visited branch leaf to contain an
 /// actual retained constant-one row; source identity checker is a separate gate.
-pub fn solve(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut impl Owner)->SearchAttempt{
+pub fn solve(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut impl Owner)->SearchAttempt{solve_inner(n,g,limits,deadline,owner,None)}
+pub fn solve_with_checkpoint<T:Owner>(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut T,control:&mut super::CheckpointControl,hook:&mut impl FnMut(&SearchAttempt,usize,&Attempt,Charge,&mut T)->Result<(),()>)->SearchAttempt{solve_inner(n,g,limits,deadline,owner,Some((control,hook)))}
+fn solve_inner<T:Owner>(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut T,mut checkpoint:Option<(&mut super::CheckpointControl,&mut dyn FnMut(&SearchAttempt,usize,&Attempt,Charge,&mut T)->Result<(),()>)>)->SearchAttempt{
  let mut a=SearchAttempt{result:Ok(()),verdict:Verdict::Unknown,nodes:Vec::new(),queue:Vec::new(),active:None,witness_node:None,charge:Charge::default()};
  let mut m=Meter{owner,limits:limits.native,deadline,charge:Charge::default()};
  a.result=(||{
+  if checkpoint.as_ref().is_some_and(|(c,_)|c.stop().is_some()){return Err(Failure::Owner)}
   m.pay(1,0)?;if n>limits.native.variables||g.len()>limits.native.generators||limits.nodes==0{return Err(Failure::Cap)}
   for p in g{m.pay(1,0)?;m.validate(p,n)?}
   a.nodes=m.alloc(limits.nodes)?;a.queue=m.alloc(limits.nodes)?;
@@ -32,7 +35,16 @@ pub fn solve(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&m
   loop{
    m.pay(1,0)?;let Some(&idx)=a.queue.last()else{a.verdict=Verdict::UnsatDerived;a.active=None;return Ok(())};let queue_slot=a.queue.len()-1;a.active=Some(idx);
    a.nodes[idx].status=NodeStatus::Running;
-   let mut bridge=NativeOwner{meter:&mut m,failure:None};let native=super::run(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge);let failure=bridge.failure;
+   a.charge=m.charge;
+   let mut bridge=NativeOwner{meter:&mut m,failure:None};
+   let native=if let Some((control,hook))=checkpoint.as_mut(){
+    super::run_with_checkpoint(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge,control,&mut |native,owner|{
+     owner.meter.pay(0,0).map_err(|_|())?;
+     let result=hook(&a,idx,native,owner.meter.charge,&mut *owner.meter.owner);
+     if result.is_err(){return result}owner.meter.pay(0,0).map_err(|_|())
+    })
+   }else{super::run(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge)};
+   let failure=bridge.failure;
    let result=native.result;a.nodes[idx].native=Some(native);
    if let Some(e)=failure{a.nodes[idx].native_disposition=Some(NativeDisposition::Stopped);return Err(e)}
    match result{

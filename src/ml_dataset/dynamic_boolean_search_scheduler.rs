@@ -67,10 +67,26 @@ fn build_task<T:Owner>(task:Task,g:&[Polynomial],basis:&[Row],m:&mut Meter<T>)->
 /// Bounded degree-batch matrix scheduler. All admitted rows and operations remain
 /// owned by the attempt. Complete means queued ordinary/Boolean pairs exhausted;
 /// no reduced-basis, F5, solution-search, or original-source admission claim.
+#[derive(Debug,Clone,Copy,PartialEq,Eq)]
+pub enum CheckpointStop{InvalidPolicy,SnapshotCap,Callback,Precheck(Failure),Postcheck(Failure)}
+/// Single live invocation controller; never reconstructed by a child node.
+pub struct CheckpointControl{every_batches:u64,max_snapshots:u64,batches:u64,snapshots:u64,stop:Option<CheckpointStop>}
+impl CheckpointControl{
+ pub fn new(every_batches:u64,max_snapshots:u64)->Result<Self,CheckpointStop>{if every_batches==0||max_snapshots==0{return Err(CheckpointStop::InvalidPolicy)}Ok(Self{every_batches,max_snapshots,batches:0,snapshots:0,stop:None})}
+ pub fn snapshots(&self)->u64{self.snapshots}
+ pub fn stop(&self)->Option<CheckpointStop>{self.stop}
+}
 pub fn run(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut impl Owner)->Attempt{
+ run_inner(n,g,limits,deadline,owner,None)
+}
+pub fn run_with_checkpoint<T:Owner>(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut T,control:&mut CheckpointControl,hook:&mut impl FnMut(&Attempt,&mut T)->Result<(),()>)->Attempt{
+ run_inner(n,g,limits,deadline,owner,Some((control,hook)))
+}
+fn run_inner<T:Owner>(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut T,mut checkpoint:Option<(&mut CheckpointControl,&mut dyn FnMut(&Attempt,&mut T)->Result<(),()>)>)->Attempt{
  let mut a=Attempt{batches:Vec::new(),result:Ok(()),complete:false,basis:Vec::new(),pending:Vec::new(),active:None,current:Row::default(),charge:Charge::default(),completed:0,row_xors:0,symbolic_reducers:0,field_tasks:0,ordinary_tasks:0,last_degree:0};
  let mut m=Meter{owner,limits,deadline,charge:Charge::default()};
  a.result=(||{
+  if checkpoint.as_ref().is_some_and(|(c,_)|c.stop.is_some()){return Err(Failure::Owner)}
   m.pay(1,0)?;if n>limits.variables||g.len()>limits.generators||g.len()>limits.tasks{return Err(Failure::Cap)}
   if !g.is_empty()&&limits.proof==0{return Err(Failure::Cap)}
   for p in g{m.pay(1,0)?;m.validate(p,n)?}
@@ -153,6 +169,17 @@ pub fn run(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut impl 
    m.scan(a.pending.len().checked_add(b.staged_tasks.len()).and_then(|x|x.checked_add(b.staged_basis.len())).ok_or(Failure::Overflow)?)?;
    a.pending.retain(|t|t.degree!=degree);a.pending.append(&mut b.staged_tasks);a.basis.append(&mut b.staged_basis);
    a.completed=completed;a.field_tasks=fields;a.ordinary_tasks=pairs;b.stage=Stage::Committed;a.active=None;
+   if let Some((control,hook))=checkpoint.as_mut(){
+    if control.stop.is_some(){return Err(Failure::Owner)}
+    control.batches=control.batches.checked_add(1).ok_or(Failure::Overflow)?;
+    if control.batches%control.every_batches==0{
+     if control.snapshots>=control.max_snapshots{control.stop=Some(CheckpointStop::SnapshotCap);return Err(Failure::Owner)}
+     if let Err(e)=m.pay(1,0){control.stop=Some(CheckpointStop::Precheck(e));return Err(Failure::Owner)}a.charge=m.charge;control.snapshots+=1;
+     if hook(&a,&mut *m.owner).is_err(){control.stop=Some(CheckpointStop::Callback);return Err(Failure::Owner)}
+     if let Err(e)=m.pay(0,0){control.stop=Some(CheckpointStop::Postcheck(e));return Err(Failure::Owner)}
+    }
+   }
+
   }
  })();a.charge=m.charge;a
 }

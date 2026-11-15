@@ -25,6 +25,27 @@ mod prime_chain_graph;
 #[path = "prime_chain_prefix.rs"]
 mod prime_chain_prefix;
 
+// Distinct source-derived row scope; historical data never inherits terminal IDs.
+fn owned_historical_projection(record: &Value) -> Result<bool, String> {
+    match record["schema"].as_str() {
+        Some("crypto.ml-dataset.owned-search-restricted-rows/v1") => Ok(false),
+        Some("crypto.ml-dataset.owned-search-historical-rows/v1") => {
+            if record["status"]!="verified_rows_from_prior_checkpoint"
+                || record["producer_attempt_complete"]!=false
+                || record["report_capture_join_verified"]!=false
+                || record["solver_completed"]!=false
+                || record["original_descent_verified"]!=true
+                || record["outer_manifest_outcome_bound"]!=true
+                || !record["selected_checkpoint_receipt"].is_object()
+                || !record["terminal_capture_receipt"].is_object()
+                || ["first_fall_degree","last_fall_degree","degree_of_regularity"].iter().any(|k|record.get(*k)!=Some(&Value::Null)) {
+                return Err("historical owned projection scope mismatch".into());
+            }
+            Ok(true)
+        }
+        _ => Err("unknown owned row projection schema".into()),
+    }
+}
 const CHUNK_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RECORD_BYTES: usize = 64 * 1024 * 1024;
 const MERGE_FAN_IN: usize = 8;
@@ -1111,6 +1132,8 @@ fn export_with_graph_projector(
     let mut affine_identity_records=0u64;
     let mut search_relation_records=0u64;
     let mut owned_row_records=0u64;
+    let mut owned_historical_row_records=0u64;
+    let mut owned_descent_verified_records=0u64;
     let mut feature_occurrences = 0u64;
     let mut sealed = 0u64;
     let mut unsealed = 0u64;
@@ -1170,23 +1193,35 @@ fn export_with_graph_projector(
                 super::digest(format!("{source_run_sha}\n{manifest_sha}\n{cell_index}").as_bytes());
             if super::solvers::needs_owned_search_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
                 let record=if manifest.outcome["strategy"]=="original-boolean-search-unsupported" {
+                    super::owned_replay_caller::with_current(|session|{
+                        if session.is_some_and(|s|s.historical()){return Err("unsupported owned search is not historical row evidence".into())}Ok(())
+                    })?;
                     super::solvers::verify_owned_search_unsupported(&manifest.config,&manifest.outcome,&manifest.artifacts)?;
                     json!({"schema":"crypto.ml-dataset.owned-search-restricted-rows/v1","visibility":"restricted","status":"unsupported","row_identities_verified":false,"original_descent_verified":false,"solver_completed":false,"scalar_recovered_without_witness":false,"first_fall_degree":null,"last_fall_degree":null,"degree_of_regularity":null})
                 } else {
                     super::owned_replay_caller::with_current(|session|session.ok_or("owned-search export requires retained replay invocation")?.project(&dir,&manifest))?
                 };
+                let historical=owned_historical_projection(&record)?;
+                let target_id=if historical{super::digest(format!("{target_id}\nowned-search-historical-target").as_bytes())}else{target_id};
                 let(group,partition)=split_for_size(manifest.config.n as u64);
-                let record_id=super::digest(format!("{target_id}\nowned-search-row-record").as_bytes());
+                let domain=if historical{"owned-search-historical-row-record"}else{"owned-search-row-record"};
+                let record_id=super::digest(format!("{target_id}\n{domain}").as_bytes());
+                let feature_status=if historical{"restricted_historical_owned_row_identities_only"}else{"restricted_owned_row_identities_only"};
+                let index_status=if historical{"restricted_historical_owned_search_scope"}else{"restricted_owned_search_scope"};
                 prefix_records.push(&record_id,&json!({"schema":"ml-dataset.restricted-prefix-record/v1","record_id":record_id,
                     "source_target_id":target_id,"feature_id":null,"split_component":group,"split":partition,"record":record}))?;
                 targets.push(&target_id,&json!({"schema":"ml-dataset.restricted-targets/v1","target_id":target_id,"feature_id":null,
                     "pdp_domain":null,"split_component":group,"split":partition,"solver":manifest.config.solver,"labels":record,
                     "known_answer_scalar":null,"independently_recovered_scalar":null,"witness_artifact":null,
-                    "solution_certificates":[],"feature_status":"restricted_owned_row_identities_only"}))?;
+                    "solution_certificates":[],"feature_status":feature_status}))?;
                 index.push(&target_id,&json!({"schema":"ml-dataset.export-index/v1","record_id":target_id,"target_id":target_id,
                     "feature_id":null,"cell":relative,"source_manifest_sha256":manifest_sha,"source_run_sha256":source_run_sha,
-                    "source_artifacts":manifest.artifacts,"status":"restricted_owned_search_scope"}))?;
-                owned_row_records+=1;sealed+=1;
+                    "source_artifacts":manifest.artifacts,"status":index_status}))?;
+                if historical{owned_historical_row_records+=1;}else{
+                    if record["original_descent_verified"]==true{owned_descent_verified_records+=1;}
+                    owned_row_records+=1;
+                }
+                sealed+=1;
                 // No generic witness, scalar or exact-degree label construction.
                 continue;
             }
@@ -1645,7 +1680,14 @@ fn export_with_graph_projector(
     if owned_row_records>0 {
         manifest["owned_search_rows"]=json!({"schema":"ml-dataset.owned-search-row-export/v1",
             "restricted_records":owned_row_records,"restricted_file":"restricted/prefix-records.jsonl",
-            "public_search_features":0,"causal_solver_training_admitted":false,"original_descent_verified":false,"degree_labels_available":false});
+            "public_search_features":0,"causal_solver_training_admitted":false,"original_descent_verified":owned_descent_verified_records==owned_row_records,"original_descent_verified_records":owned_descent_verified_records,"descent_scope":"authenticated-pattern-auxiliary-boolean-gate-equations","degree_labels_available":false});
+    }
+    if owned_historical_row_records>0 {
+        manifest["owned_search_historical_rows"]=json!({"schema":"ml-dataset.owned-search-historical-row-export/v1",
+            "restricted_records":owned_historical_row_records,"restricted_file":"restricted/prefix-records.jsonl",
+            "producer_attempt_complete":false,"report_capture_join_verified":false,"solver_completed":false,
+            "public_search_features":0,"causal_solver_training_admitted":false,"original_descent_verified":true,
+            "descent_scope":"authenticated-pattern-auxiliary-boolean-gate-equations","degree_labels_available":false});
     }
     if search_relation_records>0 {
         manifest["sat_model_relations"]=json!({"schema":"ml-dataset.sat-model-relation-export/v1",

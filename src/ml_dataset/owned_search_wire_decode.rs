@@ -126,3 +126,7 @@ pub fn decode(raw:Vec<u8>,limits:Limits,deadline:Instant,owner:&mut impl Admissi
  };
  Attempt{raw,value,result,consumed,nodes,charge}
 }
+
+// Schema-directed prefix parsing shares the decoder limits and owner meter.
+#[path = "owned_search_wire_prefix.rs"]
+pub mod strict_prefix;

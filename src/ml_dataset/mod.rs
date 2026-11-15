@@ -4,6 +4,7 @@ pub mod budget;
 pub mod capture;
 pub mod curves;
 mod execution;
+mod original_registry;
 pub mod export;
 pub mod factor_bases;
 pub mod relations;
@@ -1385,6 +1386,7 @@ fn worker_reserved_artifact_path(path: &str) -> bool {
         "worker-process.json",
         "host.json",
         "worker-artifacts.json",
+        original_registry::PATH,
         "measurement-policy.json",
         "capture-binding.json",
         "capture-limits.json",
@@ -1605,12 +1607,15 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
 }
 
 fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
-    let registry: Vec<Artifact> = if dir.join("worker-artifacts.json").exists() {
+    let terminal_exists = dir.join("worker-artifacts.json").exists();
+    let registry: Vec<Artifact> = if terminal_exists {
         read_json(&dir.join("worker-artifacts.json"))?
     } else {
         Vec::new()
     };
-    storage::verify_manifest(dir, &registry)?;
+    // Original roles can survive interruption only through the immutable
+    // pre-token receipt checkpoint. A conflicting final registry is an error.
+    let registry = original_registry::merge(dir, registry, terminal_exists)?;
     let registered: BTreeMap<_, _> = registry.iter().map(|a| (a.path.as_str(), a)).collect();
     // A killed worker may never write its registry. Promote only an exact,
     // fully validated finite phase prefix; malformed bytes remain partial.

@@ -1,0 +1,6295 @@
+{
+  "schema": "dataset-static-derived-plans/v1",
+  "not_frozen_not_funded": true,
+  "plans": [
+    {
+      "id": "eligible-block-000",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "enumerate",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "enumerate"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-001",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "enumerate",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "enumerate"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-002",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "bsgs",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "bsgs"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-003",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "bsgs",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "bsgs"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-004",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "sat",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_chain_sat",
+        "source": "solvers.rs:1731",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "sat"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-005",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "sat",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_chain_sat",
+        "source": "solvers.rs:1731",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "sat"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-006",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "weil",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "encoding_only",
+        "reason": "selector_weil_not_solver",
+        "source": "solvers.rs:1956; capabilities:1096",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "weil"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-007",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "weil",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "encoding_only",
+        "reason": "selector_weil_not_solver",
+        "source": "solvers.rs:1956; capabilities:1096",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "weil"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-008",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "f4",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "boolean_matrix_m2",
+        "source": "solvers.rs:1956",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-009",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "f4",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "boolean_matrix_m2",
+        "source": "solvers.rs:1956",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-010",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "f5",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "boolean_matrix_m2",
+        "source": "solvers.rs:1956",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f5"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-011",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "f5",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "boolean_matrix_m2",
+        "source": "solvers.rs:1956",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f5"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-012",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "f6",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          4
+        ],
+        "status": "conditional_route",
+        "reason": "geometric_four_sum_not_groebner",
+        "source": "solvers.rs:3251",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          4
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f6"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-013",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "f6",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          4
+        ],
+        "status": "conditional_route",
+        "reason": "geometric_four_sum_not_groebner",
+        "source": "solvers.rs:3251",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          4
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f6"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-014",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "root",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "m2_root_and_lift",
+        "source": "solvers.rs:3325",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "root"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-015",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "root",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "m2_root_and_lift",
+        "source": "solvers.rs:3325",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "root"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-016",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "double-large-prime",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "double-large-prime"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-017",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "binary",
+        "solver": "double-large-prime",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "double-large-prime"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-018",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "enumerate",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "enumerate"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-019",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "enumerate",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "enumerate"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-020",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "bsgs",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "bsgs"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-021",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "bsgs",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "bsgs"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-022",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "sat",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_chain_sat",
+        "source": "solvers.rs:1731",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "sat"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-023",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "sat",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_chain_sat",
+        "source": "solvers.rs:1731",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "sat"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-024",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "weil",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "encoding_only",
+        "reason": "selector_weil_not_solver",
+        "source": "solvers.rs:1956; capabilities:1096",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "weil"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-025",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "weil",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "encoding_only",
+        "reason": "selector_weil_not_solver",
+        "source": "solvers.rs:1956; capabilities:1096",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "weil"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-026",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "f4",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "boolean_matrix_m2",
+        "source": "solvers.rs:1956",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-027",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "f4",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "boolean_matrix_m2",
+        "source": "solvers.rs:1956",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-028",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "f5",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "boolean_matrix_m2",
+        "source": "solvers.rs:1956",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f5"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-029",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "f5",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "boolean_matrix_m2",
+        "source": "solvers.rs:1956",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f5"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-030",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "f6",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          4
+        ],
+        "status": "conditional_route",
+        "reason": "geometric_four_sum_not_groebner",
+        "source": "solvers.rs:3251",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          4
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f6"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-031",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "f6",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          4
+        ],
+        "status": "conditional_route",
+        "reason": "geometric_four_sum_not_groebner",
+        "source": "solvers.rs:3251",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          4
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f6"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-032",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "root",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "m2_root_and_lift",
+        "source": "solvers.rs:3325",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "root"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-033",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "root",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "m2_root_and_lift",
+        "source": "solvers.rs:3325",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "root"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-034",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "double-large-prime",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "double-large-prime"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-035",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "family": "koblitz",
+        "solver": "double-large-prime",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "double-large-prime"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-036",
+      "derivation": {
+        "template": "owned-matrix.draft.json",
+        "family": "binary",
+        "solver": "f4",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "explicit_owned_profile",
+        "source": "sat_original_owner.rs:108; owned_boolean_search_worker.rs:8; sat_search_worker.rs:6",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v3",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ],
+        "channels": {
+          "schema": "crypto.ml-dataset.channel-requests/v5",
+          "owned_boolean_search": {
+            "mode": "matrix_continuation",
+            "pattern": 0,
+            "policy": "conservative_affine_envelope_checkpoint_v1"
+          }
+        }
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-037",
+      "derivation": {
+        "template": "owned-matrix.draft.json",
+        "family": "binary",
+        "solver": "f4",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "explicit_owned_profile",
+        "source": "sat_original_owner.rs:108; owned_boolean_search_worker.rs:8; sat_search_worker.rs:6",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v3",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ],
+        "channels": {
+          "schema": "crypto.ml-dataset.channel-requests/v5",
+          "owned_boolean_search": {
+            "mode": "matrix_continuation",
+            "pattern": 0,
+            "policy": "conservative_affine_envelope_checkpoint_v1"
+          }
+        }
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-038",
+      "derivation": {
+        "template": "owned-matrix.draft.json",
+        "family": "koblitz",
+        "solver": "f4",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "explicit_owned_profile",
+        "source": "sat_original_owner.rs:108; owned_boolean_search_worker.rs:8; sat_search_worker.rs:6",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v3",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ],
+        "channels": {
+          "schema": "crypto.ml-dataset.channel-requests/v5",
+          "owned_boolean_search": {
+            "mode": "matrix_continuation",
+            "pattern": 0,
+            "policy": "conservative_affine_envelope_checkpoint_v1"
+          }
+        }
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-039",
+      "derivation": {
+        "template": "owned-matrix.draft.json",
+        "family": "koblitz",
+        "solver": "f4",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "explicit_owned_profile",
+        "source": "sat_original_owner.rs:108; owned_boolean_search_worker.rs:8; sat_search_worker.rs:6",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v3",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ],
+        "channels": {
+          "schema": "crypto.ml-dataset.channel-requests/v5",
+          "owned_boolean_search": {
+            "mode": "matrix_continuation",
+            "pattern": 0,
+            "policy": "conservative_affine_envelope_checkpoint_v1"
+          }
+        }
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-040",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "enumerate",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 4128768,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "enumerate"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 4128768,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-041",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "enumerate",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 6881280,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "enumerate"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 6881280,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-042",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "bsgs",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 4128768,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "bsgs"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 4128768,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-043",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "bsgs",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 6881280,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "bsgs"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 6881280,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-044",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "f4",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "prime_affine_or_supervised_f4",
+        "source": "solvers.rs:3049",
+        "nominal_cells": 4128768,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 4128768,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-045",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "f4",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3
+        ],
+        "status": "conditional_route",
+        "reason": "prime_affine_or_supervised_f4",
+        "source": "solvers.rs:3049",
+        "nominal_cells": 983040,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "f4"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 983040,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-046",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "root",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "m2_root_and_lift",
+        "source": "solvers.rs:3325",
+        "nominal_cells": 294912,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "root"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 294912,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-047",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "root",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "status": "conditional_route",
+        "reason": "m2_root_and_lift",
+        "source": "solvers.rs:3325",
+        "nominal_cells": 491520,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "root"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 491520,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-048",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "pkm",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3
+        ],
+        "status": "conditional_route",
+        "reason": "prime_kummer_m2_m3",
+        "source": "solvers.rs:2310",
+        "nominal_cells": 589824,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "pkm"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 589824,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-049",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "double-large-prime",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 4128768,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "double-large-prime"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 4128768,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-050",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "family": "prime",
+        "solver": "double-large-prime",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "bounded_group_or_relation_route",
+        "source": "solvers.rs:1093-1102",
+        "nominal_cells": 6881280,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "double-large-prime"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 6881280,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-051",
+      "derivation": {
+        "template": "sat-search.draft.json",
+        "family": "binary",
+        "solver": "sat",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "explicit_owned_profile",
+        "source": "sat_original_owner.rs:108; owned_boolean_search_worker.rs:8; sat_search_worker.rs:6",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v3",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "sat"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ],
+        "channels": {
+          "schema": "crypto.ml-dataset.channel-requests/v4",
+          "sat_search": {
+            "mode": "capture_and_check_model",
+            "events": 10000,
+            "conflicts": 10000
+          }
+        }
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-052",
+      "derivation": {
+        "template": "sat-search.draft.json",
+        "family": "binary",
+        "solver": "sat",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "explicit_owned_profile",
+        "source": "sat_original_owner.rs:108; owned_boolean_search_worker.rs:8; sat_search_worker.rs:6",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v3",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "sat"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ],
+        "channels": {
+          "schema": "crypto.ml-dataset.channel-requests/v4",
+          "sat_search": {
+            "mode": "capture_and_check_model",
+            "events": 10000,
+            "conflicts": 10000
+          }
+        }
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-053",
+      "derivation": {
+        "template": "sat-search.draft.json",
+        "family": "koblitz",
+        "solver": "sat",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "explicit_owned_profile",
+        "source": "sat_original_owner.rs:108; owned_boolean_search_worker.rs:8; sat_search_worker.rs:6",
+        "nominal_cells": 8257536,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v3",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "sat"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ],
+        "channels": {
+          "schema": "crypto.ml-dataset.channel-requests/v4",
+          "sat_search": {
+            "mode": "capture_and_check_model",
+            "events": 10000,
+            "conflicts": 10000
+          }
+        }
+      },
+      "nominal_cells": 8257536,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-054",
+      "derivation": {
+        "template": "sat-search.draft.json",
+        "family": "koblitz",
+        "solver": "sat",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "conditional_route",
+        "reason": "explicit_owned_profile",
+        "source": "sat_original_owner.rs:108; owned_boolean_search_worker.rs:8; sat_search_worker.rs:6",
+        "nominal_cells": 13762560,
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v3",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "sat"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ],
+        "channels": {
+          "schema": "crypto.ml-dataset.channel-requests/v4",
+          "sat_search": {
+            "mode": "capture_and_check_model",
+            "events": 10000,
+            "conflicts": 10000
+          }
+        }
+      },
+      "nominal_cells": 13762560,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-055",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "status": "corrected_configuration",
+        "reason": "four_signed_two_x_m3_profile",
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          3
+        ],
+        "families": [
+          "binary"
+        ],
+        "solvers": [
+          "f4",
+          "f5"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 4,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 3145728,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-056",
+      "derivation": {
+        "template": "binary-koblitz-methods.draft.json",
+        "status": "corrected_configuration",
+        "reason": "four_signed_two_x_m3_profile",
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          3
+        ],
+        "families": [
+          "koblitz"
+        ],
+        "solvers": [
+          "f4",
+          "f5"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 4,
+        "degree_bound": 3,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_subspace_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          },
+          {
+            "kind": "binary_frobenius_union_intersection",
+            "basis": [
+              1,
+              2,
+              4,
+              8
+            ],
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 3145728,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    },
+    {
+      "id": "eligible-block-057",
+      "derivation": {
+        "template": "prime-methods.draft.json",
+        "status": "corrected_configuration",
+        "reason": "explicit_wide_dynamic_degree12",
+        "authorized_cells": 0
+      },
+      "plan": {
+        "schema": "crypto.ml-dataset.plan/v2",
+        "field_sizes": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61
+        ],
+        "arities": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "families": [
+          "prime"
+        ],
+        "solvers": [
+          "f4-wide-dynamic-v1"
+        ],
+        "curve_seeds": 16,
+        "generators": 8,
+        "keys": 64,
+        "seed": 20261027,
+        "factor_base_size": 8,
+        "degree_bound": 12,
+        "work_limit": 100000,
+        "twists": true,
+        "protocol_sha256": null,
+        "split_rule": "curve-twist-component-sha256-v1",
+        "factor_base_policies": [
+          {
+            "kind": "legacy"
+          },
+          {
+            "kind": "sampled_x_projected_control",
+            "candidate_limit": 4096
+          }
+        ]
+      },
+      "nominal_cells": 5898240,
+      "authorized_cells": 0,
+      "native_validation": "pending"
+    }
+  ]
+}
