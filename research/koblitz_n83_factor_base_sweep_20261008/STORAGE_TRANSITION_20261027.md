@@ -132,3 +132,26 @@ publication, and the current result still lacks a fully charged rank,
 descent and verification comparison. It cannot select a minimum-runtime
 factor base. The historical panel path and its old-bucket receipts continue
 unchanged. No S3 write or runtime graph change follows from this bridge.
+
+## Native successor chained-S3 bridge — 2026-11-15 UTC
+
+`primary-store-v3-chain-cold`, `primary-store-v3-orbit-chain-cold`, and
+`primary-store-v3-ordered-orbit-chain-cold` accept the same verified v3 base
+and public target fixture for `m=4..6`. Each command requires explicit
+variable, finite-domain-clause, model, conflict, wall, and hard cgroup memory
+caps. The ordered first-pair mode is only available with the Frobenius orbit
+domain. The imported store row must match the requested column count and the
+policy and seed bound in the run configuration. The historical panel path
+retains its separate object and source rules.
+
+The native file-store test now also executes one `m=2` enumerate query and
+checks that the trial count and solver-stage flag are set while total runtime
+remains null. A separate `m=5` orbit-chain zero-query control checks the
+combined store/chain input path and its distinct result schema. These are
+execution-path controls; no natural chained-S3 search or useful-rank result
+has run from a v3 base. A real chained-S3 run still needs a qualified Linux
+hard-memory cgroup, external wall supervisor, frozen public query protocol,
+and independently replayed models. Base construction, S3 publication, graph
+closure, column logarithms, target descent, and matched rho remain outside
+the bounded trial interval. No complete-runtime graph or leaderboard row
+changes.

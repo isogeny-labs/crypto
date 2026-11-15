@@ -1659,6 +1659,18 @@ fn main() -> Result<()> {
             )?;
             println!("{summary}");
         },
+        Some("primary-store-v3-chain-cold") | Some("primary-store-v3-orbit-chain-cold") | Some("primary-store-v3-ordered-orbit-chain-cold")=>{
+            if args.len()!=14 { return Err("primary-store-v3-[ordered-orbit-|orbit-]chain-cold BASE_DIR FIXTURE_DIR K M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (verified v3 artifact-store input; requires hard cgroup memory and external wall caps)".into()); }
+            let summary=primary_adapter::run_store_chain_cli(
+                Path::new(&args[2]),Path::new(&args[3]),args[4].parse()?,args[5].parse()?,
+                args[6].parse()?,ChainS3Limits {
+                    max_variables:args[7].parse()?, max_domain_clauses:args[8].parse()?,
+                    max_models:args[9].parse()?, conflict_budget:args[10].parse()?,
+                },args[11].parse()?,args[12].parse()?,Path::new(&args[13]),
+                args[1]!="primary-store-v3-chain-cold",args[1]=="primary-store-v3-ordered-orbit-chain-cold",
+            )?;
+            println!("{summary}");
+        },
         Some("primary-chain-cold") | Some("primary-orbit-chain-cold") | Some("primary-ordered-orbit-chain-cold")=>{
             if args.len()!=16 { return Err("primary-[ordered-orbit-]chain-cold PANEL_DIR FIXTURE_DIR K POLICY SEED M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (requires verified hard cgroup memory and external wall caps)".into()); }
             let summary=primary_adapter::run_chain_cli(
@@ -1671,7 +1683,7 @@ fn main() -> Result<()> {
             )?;
             println!("{summary}");
         },
-        _=>return Err("usage: plan output.json | case ordinal | pilot NEW_DIRECTORY budget_seconds | v2-construct-one NEW_DIRECTORY A POLICY K SEED BUDGET_SECONDS | v2-replay-one PANEL_DIR BUDGET_SECONDS | replay directory | probes directory budget_seconds | upload directory | cold PANEL_DIR K MAX_SECONDS [unordered] | primary-adapter-check PANEL_DIR K NEW_OUTPUT_JSON | primary-sat-build PANEL_DIR K MEMORY_MIB NEW_OUTPUT_JSON | primary-s3-probe PANEL_DIR K POLICY SEED ordered|unordered MAX_STATES MEMORY_MIB NEW_OUTPUT_JSON | primary-[orbit-|ordered-orbit-]chain-build PANEL_DIR K POLICY SEED M IDENTITY_MASK MAX_VARIABLES MAX_DOMAIN_CLAUSES MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-planted PANEL_DIR pinned|unpinned MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-witness PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-root-phase PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-search-progress PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-selector-positive PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-selector-only PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-phase-only PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-cold PANEL_DIR K M STRATEGY MAX_TRIALS BUDGET_SECONDS NEW_RUN_DIR | primary-store-v3-trial BASE_DIR FIXTURE_DIR K M MAX_TRIALS BUDGET_SECONDS NEW_RUN_DIR | primary-[orbit-|ordered-orbit-]chain-cold PANEL_DIR FIXTURE_DIR K POLICY SEED M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR".into()),
+        _=>return Err("usage: plan output.json | case ordinal | pilot NEW_DIRECTORY budget_seconds | v2-construct-one NEW_DIRECTORY A POLICY K SEED BUDGET_SECONDS | v2-replay-one PANEL_DIR BUDGET_SECONDS | replay directory | probes directory budget_seconds | upload directory | cold PANEL_DIR K MAX_SECONDS [unordered] | primary-adapter-check PANEL_DIR K NEW_OUTPUT_JSON | primary-sat-build PANEL_DIR K MEMORY_MIB NEW_OUTPUT_JSON | primary-s3-probe PANEL_DIR K POLICY SEED ordered|unordered MAX_STATES MEMORY_MIB NEW_OUTPUT_JSON | primary-[orbit-|ordered-orbit-]chain-build PANEL_DIR K POLICY SEED M IDENTITY_MASK MAX_VARIABLES MAX_DOMAIN_CLAUSES MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-planted PANEL_DIR pinned|unpinned MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-witness PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-root-phase PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-search-progress PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-selector-positive PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-selector-only PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-phase-only PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-cold PANEL_DIR K M STRATEGY MAX_TRIALS BUDGET_SECONDS NEW_RUN_DIR | primary-store-v3-trial BASE_DIR FIXTURE_DIR K M MAX_TRIALS BUDGET_SECONDS NEW_RUN_DIR | primary-store-v3-[orbit-|ordered-orbit-]chain-cold BASE_DIR FIXTURE_DIR K M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR | primary-[orbit-|ordered-orbit-]chain-cold PANEL_DIR FIXTURE_DIR K POLICY SEED M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR".into()),
     }
     Ok(())
 }

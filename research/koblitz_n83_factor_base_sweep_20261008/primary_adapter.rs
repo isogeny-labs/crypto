@@ -4280,6 +4280,87 @@ pub(super) fn run_store_trial_cli(
     )
 }
 
+/// Run a bounded chained-S3 search against a verified v3 artifact-store base.
+/// The hard cgroup gate applies even to a zero-query preflight.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn run_store_chain_cli(
+    root: &Path,
+    fixture_root: &Path,
+    columns: usize,
+    m: usize,
+    max_trials: usize,
+    limits: ChainS3Limits,
+    budget_seconds: u64,
+    memory_mib: u64,
+    run_dir: &Path,
+    frobenius_orbits: bool,
+    order_first_pair: bool,
+) -> Result<Value> {
+    if columns == 0
+        || columns > 32_643
+        || !(4..=6).contains(&m)
+        || max_trials > 1000
+        || limits.max_variables == 0
+        || limits.max_variables > i32::MAX as u32
+        || limits.max_domain_clauses == 0
+        || limits.max_domain_clauses > i32::MAX as usize
+        || limits.max_models == 0
+        || limits.max_models > 1_000_000
+        || limits.conflict_budget == 0
+        || limits.conflict_budget > 10_000_000_000
+        || budget_seconds == 0
+        || budget_seconds > 7200
+        || !(128..=65_536).contains(&memory_mib)
+        || (order_first_pair && !frobenius_orbits)
+        || !fixture_root.join("probe-corpus.json").is_file()
+        || !fixture_root.join("probe-validation.json").is_file()
+    {
+        return Err("v3 store chained-S3 caps or fixture inputs invalid".into());
+    }
+    let memory_limit_bytes = checked_cgroup_memory_limit(memory_mib)?;
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let store = Store::open_default()?;
+    let manifest: Value = serde_json::from_slice(&fs::read(root.join("manifest.json"))?)?;
+    let policy = manifest["base"]["policy"]
+        .as_str()
+        .ok_or("v3 store policy missing")?;
+    let seed = manifest["base"]["seed"]
+        .as_u64()
+        .ok_or("v3 store seed missing")?;
+    let chain_config = ChainRunConfig {
+        policy,
+        seed,
+        fixture_root,
+        limits,
+        memory_limit_bytes,
+        source_commit: source_commit.clone(),
+        source_attestation_mode,
+    };
+    let store_config = StoreRunConfig {
+        store: &store,
+        fixture_root,
+        source_commit,
+        source_attestation_mode,
+    };
+    let strategy = match (frobenius_orbits, order_first_pair) {
+        (false, false) => "chain-s3",
+        (true, false) => "orbit-chain-s3",
+        (true, true) => "ordered-orbit-chain-s3",
+        (false, true) => unreachable!("checked above"),
+    };
+    run_with_config(
+        root,
+        columns,
+        m,
+        strategy,
+        max_trials,
+        budget_seconds,
+        run_dir,
+        Some(&chain_config),
+        Some(&store_config),
+    )
+}
+
 /// Execute one replay-bound primary chained-S3 search only inside a verified
 /// hard-memory cgroup. The outer supervisor owns the separate wall deadline.
 #[allow(clippy::too_many_arguments)]
@@ -4370,11 +4451,18 @@ fn run_with_config(
     chain: Option<&ChainRunConfig<'_>>,
     store: Option<&StoreRunConfig<'_>>,
 ) -> Result<Value> {
+    if let (Some(chain_config), Some(store_config)) = (chain, store) {
+        if chain_config.source_commit != store_config.source_commit
+            || chain_config.fixture_root != store_config.fixture_root
+            || chain_config.source_attestation_mode != store_config.source_attestation_mode
+        {
+            return Err("v3 store chain source or fixture mismatch".into());
+        }
+    }
     if !(store.is_some()
         || [64, 256, 600].contains(&columns)
         || (chain.is_some() && V2_SIZES.contains(&columns)))
         || !(2..=6).contains(&m)
-        || (chain.is_some() && store.is_some())
     {
         return Err("unsupported primary K or summand count".into());
     }
@@ -4426,12 +4514,18 @@ fn run_with_config(
         "memory_cgroup_swap_limit_bytes":chain.map(|_| 0),
     });
     if store.is_some() {
-        config_record["schema"] = json!("n83.primary-store-trial-config/v1");
+        config_record["schema"] = json!(if chain.is_some() {
+            "n83.primary-store-chain-config/v1"
+        } else {
+            "n83.primary-store-trial-config/v1"
+        });
         config_record["base_dir"] = json!(root.to_string_lossy().to_string());
         config_record["panel_dir"] = Value::Null;
-        config_record["measurement_scope"] = json!(
+        config_record["measurement_scope"] = json!(if chain.is_some() {
+            "store import and bounded chained-S3 trial; base construction and publication are outside this interval"
+        } else {
             "store import and bounded enumerate trial; base construction and publication are outside this interval"
-        );
+        });
     }
     write_new_json(&run_dir.join("config.json"), &config_record)?;
     let cap_path = run_dir.join("cap.json");
@@ -4457,6 +4551,11 @@ fn run_with_config(
         let (base, row) = load_store_primary_base(root, config.store)?;
         if row["columns"].as_u64() != Some(columns as u64) {
             return Err("v3 store base column count differs from requested workload".into());
+        }
+        if let Some(chain_config) = chain {
+            if row["policy"] != chain_config.policy || row["seed"] != chain_config.seed {
+                return Err("v3 store chain selection differs from verified base".into());
+            }
         }
         let manifest_hash = sha256_hex(&fs::read(root.join("manifest.json"))?);
         (base, row, manifest_hash)
@@ -4530,7 +4629,7 @@ fn run_with_config(
         None => false,
     };
     let post_solver_validation_ms = verification_start.elapsed().as_secs_f64() * 1000.0;
-    let memory_cgroup_peak_bytes = if chain.is_some() {
+    let memory_cgroup_peak_bytes = if chain.is_some() && (store.is_none() || max_trials != 0) {
         Some(
             fs::read_to_string(cgroup_v2_file("memory.peak")?)?
                 .trim()
@@ -4668,15 +4767,21 @@ fn run_with_config(
         "selected_best_total_runtime":Value::Null
     });
     if store.is_some() {
-        summary["schema"] = json!("n83.primary-store-trial/v1");
+        summary["schema"] = json!(if chain.is_some() {
+            "n83.primary-store-chain/v1"
+        } else {
+            "n83.primary-store-trial/v1"
+        });
         summary["input_kind"] = json!("artifact_store_v3");
         summary["object"] = row["store_name"].clone();
         summary["store_name"] = row["store_name"].clone();
         summary["store_manifest_sha256"] = summary["panel_manifest_blake3"].clone();
         summary["panel_manifest_blake3"] = Value::Null;
-        summary["measurement_scope"] = json!(
+        summary["measurement_scope"] = json!(if chain.is_some() {
+            "bounded store import and chained-S3 trial only; base construction and publication are outside this interval; total cold index-calculus runtime remains unset"
+        } else {
             "bounded store import and enumerate trial only; base construction and publication are outside this interval; total cold index-calculus runtime remains unset"
-        );
+        });
     } else {
         summary["input_kind"] = json!("historical_panel_v1v2");
     }
@@ -4896,6 +5001,55 @@ mod tests {
         assert_eq!(one_query["report"]["trials"], 1);
         assert_eq!(one_query["solver_stage_executed"], true);
         assert!(one_query["total_index_calculus_runtime_ms"].is_null());
+        let chain_config = ChainRunConfig {
+            policy: "public_x_hash",
+            seed: SEEDS[0],
+            fixture_root: &fixture_root,
+            limits: ChainS3Limits {
+                max_variables: 10_000,
+                max_domain_clauses: 100_000,
+                max_models: 1,
+                conflict_budget: 1_000,
+            },
+            memory_limit_bytes: 256 * 1024 * 1024,
+            source_commit: "a".repeat(40),
+            source_attestation_mode: "test_fixture",
+        };
+        let chain_preflight = run_with_config(
+            &bundle,
+            2,
+            5,
+            "orbit-chain-s3",
+            0,
+            7200,
+            &root.join("chain-preflight"),
+            Some(&chain_config),
+            Some(&config),
+        )
+        .unwrap();
+        assert_eq!(chain_preflight["schema"], "n83.primary-store-chain/v1");
+        assert_eq!(chain_preflight["store_name"], name);
+        assert_eq!(chain_preflight["strategy"], "orbit-chain-s3");
+        assert_eq!(chain_preflight["solver_stage_executed"], false);
+        assert!(chain_preflight["total_index_calculus_runtime_ms"].is_null());
+        let wrong_chain_config = ChainRunConfig {
+            policy: "public_x_sequential",
+            ..chain_config
+        };
+        assert!(run_with_config(
+            &bundle,
+            2,
+            5,
+            "orbit-chain-s3",
+            0,
+            7200,
+            &root.join("wrong-chain-policy"),
+            Some(&wrong_chain_config),
+            Some(&config),
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("selection differs from verified base"));
         assert!(run_with_config(
             &bundle,
             3,
