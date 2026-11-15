@@ -79,3 +79,21 @@ Publish exact source then rebind canonical frozen protocol to its actual source 
 ### Errors
 
 Initial C++ build failed misleading-indentation Werror; braces corrected without reducing warnings. Pre-data review removed an inadvertently premature redundant witness multiplication before the cap check; exact draft retained locally. First canonical metadata estimate1800s exceeded the checker's600s per-instance threshold; explicit UNMEASURED conservative estimate300s now validates, with real600s stage/3600s outer caps unchanged. No timing/performance claim or scientific rerun. Build/protocol drafts/logs are retained outside the checkout. [pcc:unverified]
+
+## 2026-11-15T05:24Z — first full partial-chord run retained, diagonal control inapplicable
+
+### What was done
+
+Published source8a23f680 and canonical full freeze8243ceae BEFORE data. First full producer, both fresh A/A audits and positive audit pass:3024 configurations,57456 diagnostic cells,54432 original-target attempts,18792 original-source recoveries,35640 blocked setups,16128 partial-branch queries. A/A datasets/receipts exact. All first12 actually changed/rehashed controls reject101/no receipt. Final mutate-diagonal exits101 inapplicable, so its rejecting auditor never ran:30 actual native processes, full launcher101. Whole run is NOT accepted/complete despite the successful positive semantic replays. Exact raw sources/data/commands/failures remain /workspace/twist-chord-partial-run01-20261115. [pcc:unverified]
+
+### Decisions made
+
+Retain the complete declared population and mandatory diagonal control. Static review identifies a needless zero-remainder witness construction: Euclid has an existing gcd row but tries to build multipliers for0 and can deny that step. File a NEW version that stops on empty remainder and validates the existing nonzero row's Bezout identity and both original-generator reductions. Preserve original sources/protocol/data immutably; no cap/predicate relaxation or favorable subset. [pcc:unverified]
+
+### Open threads
+
+Version2 needs new source/binary pins, pre-data amendment, exact GitHub publication, full replication and all original controls. Add a separately bound native comparison with the pinned earlier dataset, clearly unblinded after the first instrument. No new Lean theorem/IDC1/signed verdict or total-cost claim. [pcc:unverified]
+
+### Errors
+
+Overall launcher101 is a real unmet mandatory control, not a null or verification pass. The zero-remainder stopping issue is source review supported by that inapplicable control; correcting it requires a separately frozen instrument. Previously observed241920 unmatched actual degree/rank pairs and0 strongest-source frontier extensions remain observations of the first instrument, not a claim that it passed every control. [pcc:unverified]
