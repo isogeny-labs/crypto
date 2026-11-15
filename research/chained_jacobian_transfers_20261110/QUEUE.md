@@ -1,3 +1,21 @@
+# Full original-source Jacobian chain result mirrored; custody25 and additive CI next
+
+pcc/claims/PCC-20261115-c66350.json: exactpublished consumer675cbc9 retainsnativee245d0/sourcec8490c7/build03/checkpoint19/all28/immediategate0. Oneunfilteredtest0/worker0/all14phases/all701whole/fiveactualwholeclassomissions101-nooutput/1270hashes/actualbinaries pass. Fullconditionalproofsources7b5f49-da2fe7/all21bindings andinspected58175Btwo-page report761003 exportedexactly. [pcc:unverified]
+
+## What was done
+Frozenoriginalcases2,0-0,1-2,0/D116-39-36/ell2773073/fullorder11092292 passesall4cofactors/all4halves/duplicates/672twooutgoingexceptionals/144mixed120public/96additions-pair/48opaque48knownpoint15originalpubliccontrols. Original inverse13=3413013/169=9648325; strongerretainedlift/knownpointwholeoutputsagree. KnownpointpresentationdoesnotclaimallJacobcofactorcoverage; callsunpriced. BothoriginalLean gates19+2roots0trusted/all21bindings, actualgeometric/program bridges explicit. [pcc:unverified]
+
+## Decisions made
+Onlyexactpublishedmetadata mirrored; all343originalproducer sciencefiles unchanged. Preservefailed99d448/693whole andallfixedD12-D24-D67/nu12/prime-only negatives. GenuinewholecustodyNEW25/canonical701onlyafteractualoriginalpublication, thenfreshadditiveCI preservingoldworkflows/references. [pcc:unverified]
+
+## Open threads
+Whole25 allct90builds/nativefailed-successful/fiveomissions/checkpoints/proofs/reportdrafts/primaryreviews/fullsource-executable-preparedcopies. Holdall49753prior24keys/172links/bothledgerprefixes/ownedbytes; genuineproof-before-bot/exactFF. ThenadditiveCI andnextstrongprimitive/setup/reference/prime-fieldICdescent study usingexistingIC/norm-assistedsampler. [pcc:unverified]
+
+## Errors
+Allmathematical/program/source/proof/format/importer/launch/reportfailures preserved. Vaultlocked8edec422/KBunavailable; rootnative124/clock101/fullcold120coverage andsigning/mainledger/review/conflict/admission gaps remain. No calibratedadvantage/globalCI/mergepromotion. [pcc:unverified]
+
+---
+
 # Genuine24 settled; publish full geometry A andadvance full-group evaluator
 
 pcc/claims/PCC-20261115-8605e7.json/pcc/claims/PCC-20261115-9a5256.json: original43692253321/job132745186500SUCCESS, sixremoteobjects replayed BEFOREbot06d030bb/direct64653b0/exact8paths/twoplainGitobjects unchanged. All49753heldinputs/172links/ownedbytes andwhole24881096Barchive/all927members/33closedroots preserved; normalFF-artifact-wiring0/HOLD24RELEASED. All47225prior23keys/169links/both exactledgerprefixes retained. Fourexactcanonicalmanifest entries/fourtransparentrelativealiases, no newconsumerremote read. [pcc:unverified]
