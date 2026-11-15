@@ -964,6 +964,11 @@ pub struct VerdictInputs<'a> {
     /// derives from; `epoch` must be what they give.
     pub commitment: Option<&'a Commitment>,
     pub beacon: Option<&'a str>,
+    /// A `w_cal` override (`challenge verdict --w-cal`): takes precedence
+    /// over the session's own reading for the calibrated block, which then
+    /// records `source: "override"`, and for the bounds fitted from the
+    /// session.  Procedure 2 only; validated.
+    pub w_cal: Option<&'a crate::cryptanalysis::ecbench::band::WCal>,
 }
 
 pub struct VerdictOutput {
@@ -1005,6 +1010,15 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
         ));
     }
     let v2 = inputs.procedure >= 2;
+    if let Some(w) = inputs.w_cal {
+        if !v2 {
+            return Err(
+                "a w_cal override needs verdict procedure 2: a procedure-1 verdict has no calibrated block"
+                    .into(),
+            );
+        }
+        w.validate()?;
+    }
     let dir = inputs.dir;
     let session = read_session(dir)?;
     let plan_doc: PlanDoc = serde_json::from_str(
@@ -1147,14 +1161,29 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
     }
 
     // Paired operations, from `compare`.
-    let cmp = compare(
-        dir,
-        inputs.incumbent_arm,
-        None,
-        inputs.candidate_arm,
-        inputs.resamples,
-        inputs.seed,
-    )?;
+    let compare_arms = |b_arm: &str| {
+        if v2 {
+            compare(
+                dir,
+                inputs.incumbent_arm,
+                None,
+                b_arm,
+                inputs.resamples,
+                inputs.seed,
+            )
+        } else {
+            procedure_1_compare(
+                &session,
+                &recs,
+                &spec,
+                inputs.incumbent_arm,
+                b_arm,
+                inputs.resamples,
+                inputs.seed,
+            )
+        }
+    };
+    let cmp = compare_arms(inputs.candidate_arm)?;
     if cmp.ops.status != "ok" {
         reasons.push(format!(
             "the comparison is {}: {}",
@@ -1176,6 +1205,7 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
         } else {
             1
         },
+        w_cal: inputs.w_cal.cloned(),
         ..Default::default()
     };
     let dirs = [dir.to_path_buf()];
@@ -1516,15 +1546,7 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
         .control_arm
         .filter(|c| plan_doc.arms.iter().any(|a| &a.name == c))
         .map(|c| {
-            compare(
-                dir,
-                inputs.incumbent_arm,
-                None,
-                c,
-                inputs.resamples,
-                inputs.seed,
-            )
-            .map(|k| Control {
+            compare_arms(c).map(|k| Control {
                 arm: c.to_string(),
                 ratio: k.ops.ratio_b_over_a,
                 ci95: k.ops.ci95,
@@ -1657,8 +1679,18 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
             control.as_ref().and_then(|c| c.ratio.map(|r| format!("; A/A {} {r:.4}{}", if v2 { "determinism check" } else { "control" }, fmt_ci(c.ci95)))).unwrap_or_default(),
         ),
     };
-    let calibrated = match (v2, crate::cryptanalysis::ecbench::runner::read_wcal(dir)?) {
-        (true, Some(w)) => {
+    // Procedure 1 has no calibrated block, so it neither reads nor
+    // validates the sidecar: a bad `w_cal.json` cannot change a v1 verdict.
+    let wcal = match (v2, inputs.w_cal) {
+        (false, _) => None,
+        (true, Some(w)) => Some((
+            w.clone(),
+            Some(crate::cryptanalysis::ecbench::band::WCAL_SOURCE_OVERRIDE.to_string()),
+        )),
+        (true, None) => crate::cryptanalysis::ecbench::runner::read_wcal(dir)?.map(|w| (w, None)),
+    };
+    let calibrated = match wcal {
+        Some((w, source)) => {
             use crate::cryptanalysis::ecbench::band as bd;
             let pick = |arm: &str| {
                 recs.iter()
@@ -1667,14 +1699,16 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
             };
             let (inc, cand) = (pick(inputs.incumbent_arm), pick(inputs.candidate_arm));
             let pairs = bd::matched_verified(inc.iter().copied(), cand.iter().copied());
-            Some(bd::calibrated_ratio_grid(
+            let mut g = bd::calibrated_ratio_grid(
                 &pairs,
                 &BAND_WEIGHTS,
                 bd::Pricing::default(),
                 &w,
                 inputs.incumbent_arm,
                 inputs.candidate_arm,
-            )?)
+            )?;
+            g.source = source;
+            Some(g)
         }
         _ => None,
     };
@@ -1754,6 +1788,59 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
         candidate_bound,
         candidate_bound_text,
     })
+}
+
+/// The comparison a procedure-1 verdict reads, on the session and records
+/// the verdict already loaded.
+///
+/// Procedure 1 has no calibrated block, so it reads no `w_cal` at all
+/// (neither the `w_cal.json` sidecar nor `options.w_cal`): a bad one cannot
+/// change or break a version-1 verdict.
+///
+/// It was also frozen on the comparison's version-1 interval, the
+/// percentile two-stage (`cluster`) or within-workload (`within`)
+/// bootstrap.  `ecbench.comparison/v2` (commit c7ae83ee81) made the
+/// linearised `t` interval primary and kept that bootstrap beside it as
+/// `ci95_bootstrap` (same statistic, resamples and seed), so a version-1
+/// verdict reads it back and re-derives byte for byte.  Procedure 2 keeps
+/// the v2 interval.
+fn procedure_1_compare(
+    session: &crate::cryptanalysis::ecbench::runner::Session,
+    recs: &[Record],
+    spec: &Spec,
+    a_arm: &str,
+    b_arm: &str,
+    resamples: usize,
+    seed: u64,
+) -> Result<crate::cryptanalysis::ecbench::compare::Comparison, String> {
+    use crate::cryptanalysis::ecbench::compare::{compare_loaded, CompareOptions};
+    let mut s = session.clone();
+    s.options.w_cal = None;
+    let mut c = compare_loaded(
+        &s,
+        recs,
+        &s,
+        recs,
+        a_arm,
+        b_arm,
+        spec.measurement.isolation_required,
+        &CompareOptions {
+            resamples,
+            seed,
+            allow_interrupted: false,
+            pricing: crate::cryptanalysis::ecbench::band::Pricing::default(),
+            bitop: false,
+            w_cal: None,
+        },
+    )?;
+    c.ops.ci95 = c.ops.ci95_bootstrap;
+    if let Some(m) = &c.ops.ci_bootstrap_method {
+        c.ops.ci_method = m.clone();
+    }
+    for k in &mut c.curves {
+        k.ci95 = k.ci95_bootstrap;
+    }
+    Ok(c)
 }
 
 /// Build a challenge document from its parts and seal it.
@@ -2166,6 +2253,48 @@ mod tests {
         assert_eq!(a.spec_id, b.spec_id);
     }
 
+    /// A `w_cal` override is refused on a procedure-1 verdict (no
+    /// calibrated block) and when not positive and finite, before the
+    /// session is read.
+    #[test]
+    fn a_w_cal_override_needs_procedure_2_and_a_positive_finite_value() {
+        let ch = challenge();
+        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let missing = root.join("no-such-session-dir");
+        let run = |procedure: u32, w: f64| {
+            let w = crate::cryptanalysis::ecbench::band::WCal {
+                w_cal: w,
+                method: "best-of-N timing".into(),
+                host: "h".into(),
+            };
+            verdict(&VerdictInputs {
+                challenge: &ch,
+                dir: &missing,
+                epoch: 1,
+                candidate_arm: CANDIDATE_ARM,
+                incumbent_arm: INCUMBENT_ARM,
+                control_arm: None,
+                replay: 0,
+                bounds: None,
+                root: &root,
+                resamples: 100,
+                seed: 1,
+                procedure,
+                commitment: None,
+                beacon: None,
+                w_cal: Some(&w),
+            })
+            .err()
+            .unwrap()
+        };
+        assert!(run(1, 0.02).contains("procedure 2"));
+        for bad in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+            assert!(run(2, bad).contains("finite and > 0"), "{bad}");
+        }
+        // A good value passes the check and fails only on the session.
+        assert!(!run(2, 0.02).contains("w_cal"));
+    }
+
     #[test]
     fn the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2() {
         let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -2179,5 +2308,266 @@ mod tests {
         // Version 1 wrote no purpose on the control; none is invented.
         assert!(v.control.as_ref().unwrap().purpose.is_none());
         assert_eq!(VERDICT_PROCEDURE, 2);
+    }
+
+    // ── Committed procedure-1 verdict and the calibrated block ─────────
+
+    const E1_SESSION: &str =
+        "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1";
+
+    fn repo_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+    }
+
+    fn e1_challenge() -> Challenge {
+        Challenge::read(&repo_root().join("docs/bounds/challenges/prime-toy-reference.json"))
+            .unwrap()
+    }
+
+    fn copy_dir(from: &Path, to: &Path) {
+        std::fs::create_dir_all(to).unwrap();
+        for e in std::fs::read_dir(from).unwrap() {
+            let e = e.unwrap();
+            let t = to.join(e.file_name());
+            if e.file_type().unwrap().is_dir() {
+                copy_dir(&e.path(), &t);
+            } else {
+                std::fs::copy(e.path(), &t).unwrap();
+            }
+        }
+    }
+
+    /// A copy of the e1 session under a fresh root at the same relative
+    /// path, so every path a verdict records is the one the original gives.
+    fn e1_copy(tag: &str) -> (PathBuf, PathBuf) {
+        let root = std::env::temp_dir().join(format!(
+            "challenge-{tag}-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        let dir = root.join(E1_SESSION);
+        copy_dir(&repo_root().join(E1_SESSION), &dir);
+        (root, dir)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn e1_verdict(
+        ch: &Challenge,
+        root: &Path,
+        dir: &Path,
+        procedure: u32,
+        epoch: u64,
+        replay: usize,
+        bounds: Option<&Path>,
+        committed: Option<(&Commitment, &str)>,
+        w_cal: Option<&crate::cryptanalysis::ecbench::band::WCal>,
+    ) -> Result<VerdictOutput, String> {
+        verdict(&VerdictInputs {
+            challenge: ch,
+            dir,
+            epoch,
+            candidate_arm: CANDIDATE_ARM,
+            incumbent_arm: INCUMBENT_ARM,
+            control_arm: Some(CONTROL_ARM),
+            replay,
+            bounds,
+            root,
+            resamples: crate::cryptanalysis::ecbench::bounds::RESAMPLES,
+            seed: crate::cryptanalysis::ecbench::bounds::SEED,
+            procedure,
+            commitment: committed.map(|c| c.0),
+            beacon: committed.map(|c| c.1),
+            w_cal,
+        })
+    }
+
+    /// `docs/bounds/refit.sh` re-derives the two committed procedure-1
+    /// verdicts and the bounds they wrote byte for byte: procedure 1 keeps the
+    /// bootstrap interval it was written with (`cluster`), not the
+    /// linearised `t` interval `ecbench.comparison/v2` made primary.
+    #[test]
+    fn the_committed_procedure_1_verdicts_re_derive_byte_for_byte() {
+        let root = repo_root();
+        let bounds = root.join("docs/bounds/records");
+        let k = "research/ecbench_bounds_challenges_20261006";
+        for (challenge, session, id, bound) in [
+            (
+                "prime-toy-reference",
+                "prime-toy-reference-e1",
+                "ECVD1h0b0f5e0d7f67",
+                "challenge-prime-toy-reference-e1-bsgs-negation",
+            ),
+            (
+                "koblitz-toy-reference",
+                "koblitz-toy-reference-e1",
+                "ECVD1h53a3dfe36118",
+                "challenge-koblitz-toy-reference-e1-rho-signed-frobenius",
+            ),
+        ] {
+            let ch =
+                Challenge::read(&root.join(format!("docs/bounds/challenges/{challenge}.json")))
+                    .unwrap();
+            let o = e1_verdict(
+                &ch,
+                &root,
+                &root.join(format!("{k}/sessions/{session}")),
+                1,
+                1,
+                crate::cryptanalysis::ecbench::audit::REPLAY_ALL,
+                Some(&bounds),
+                None,
+                None,
+            )
+            .unwrap();
+            let committed =
+                std::fs::read_to_string(root.join(format!("{k}/verdict-{session}.json"))).unwrap();
+            assert_eq!(o.verdict.verdict_id, id, "{session}");
+            assert!(o.verdict.axes.iter().all(|a| a.ci_method == "cluster"));
+            assert_eq!(o.verdict_text, committed, "{session}");
+            let b = std::fs::read_to_string(bounds.join(format!("{bound}.json"))).unwrap();
+            assert_eq!(
+                o.candidate_bound_text.as_deref(),
+                Some(b.as_str()),
+                "{session}"
+            );
+        }
+    }
+
+    /// Procedure 1 has no calibrated block, so an invalid `w_cal.json`
+    /// beside its input changes nothing (procedure 2 still refuses it).
+    #[test]
+    fn an_invalid_w_cal_sidecar_leaves_a_procedure_1_verdict_unchanged() {
+        use crate::cryptanalysis::ecbench::runner::{read_wcal, WCAL_SIDECAR};
+        let ch = e1_challenge();
+        let root = repo_root();
+        let plain = e1_verdict(
+            &ch,
+            &root,
+            &root.join(E1_SESSION),
+            1,
+            1,
+            0,
+            None,
+            None,
+            None,
+        )
+        .unwrap();
+        let (troot, dir) = e1_copy("bad-sidecar");
+        std::fs::write(
+            dir.join(WCAL_SIDECAR),
+            r#"{"w_cal":-1,"method":"guess","host":""}"#,
+        )
+        .unwrap();
+        assert!(read_wcal(&dir).is_err());
+        let side = e1_verdict(&ch, &troot, &dir, 1, 1, 0, None, None, None).unwrap();
+        assert_eq!(side.verdict_text, plain.verdict_text);
+        assert!(side.verdict.calibrated.is_none());
+        // Procedure 2 reads the sidecar and refuses it.
+        let cand = method("bsgs.negation");
+        let (c, _) = commit(&ch, &cand, "", 1).unwrap();
+        let beacon = "0123456789abcdef";
+        let e = epoch_from(&ch, &c, beacon).unwrap();
+        let err = e1_verdict(&ch, &troot, &dir, 2, e, 0, None, Some((&c, beacon)), None)
+            .err()
+            .unwrap();
+        assert!(err.contains("w_cal must be finite"), "{err}");
+        std::fs::remove_dir_all(&troot).ok();
+    }
+
+    /// A procedure-2 verdict end to end: the calibrated block is present
+    /// with a sidecar `w_cal` (no source) and with an override (source
+    /// `override`), absent without one, and its grid matches a hand
+    /// computation over the matched pairs.  With `w_cal = 0.1` the field
+    /// weights are `[0, 0.1, 1]`, so the diagonal prices every native
+    /// counter alike: `Σ S_B / Σ S_A` at `0`, then `priced_s` at 0.1 and 1.
+    #[test]
+    fn a_procedure_2_verdict_carries_the_calibrated_block_only_with_w_cal() {
+        use crate::cryptanalysis::ecbench::band::{priced_s, WCal, WCAL_SOURCE_OVERRIDE};
+        use crate::cryptanalysis::ecbench::runner::WCAL_SIDECAR;
+        let ch = e1_challenge();
+        let root = repo_root();
+        let cand = method("bsgs.negation");
+        let (c, _) = commit(&ch, &cand, "", 1).unwrap();
+        let beacon = "0123456789abcdef";
+        let e = epoch_from(&ch, &c, beacon).unwrap();
+        let run = |r: &Path, d: &Path, w: Option<&WCal>| {
+            e1_verdict(&ch, r, d, 2, e, 0, None, Some((&c, beacon)), w)
+                .unwrap()
+                .verdict
+        };
+        // Hand computation over pairs matched by (workload, round).
+        let recs = read_records(&root.join(E1_SESSION)).unwrap();
+        let arm = |a: &str| -> BTreeMap<(String, u32), &Record> {
+            recs.iter()
+                .filter(|r| !r.warmup && r.arm == a && r.counts())
+                .map(|r| ((r.workload.workload_id.clone(), r.round), r))
+                .collect()
+        };
+        let (inc, cnd) = (arm(INCUMBENT_ARM), arm(CANDIDATE_ARM));
+        let hand = |f: &dyn Fn(&Record) -> f64| {
+            let (mut sa, mut sb) = (0.0, 0.0);
+            for (k, a) in &inc {
+                if let Some(b) = cnd.get(k) {
+                    sa += f(a);
+                    sb += f(b);
+                }
+            }
+            sb / sa
+        };
+        let expect = [
+            hand(&|r| r.cost.s.unwrap()),
+            hand(&|r| priced_s(r, 0.1).unwrap().unwrap()),
+            hand(&|r| priced_s(r, 1.0).unwrap().unwrap()),
+        ];
+        let check = |g: &crate::cryptanalysis::ecbench::band::CalibratedGrid| {
+            assert_eq!(g.w_cal, 0.1);
+            assert_eq!(g.field_weights, vec![0.0, 0.1, 1.0]);
+            assert_eq!(g.other_weights, BAND_WEIGHTS.to_vec());
+            for (i, x) in expect.iter().enumerate() {
+                let got = g.ratio_b_over_a[i][i].unwrap();
+                assert!((got - x).abs() < 1e-12, "[{i}][{i}] {got} vs {x}");
+            }
+        };
+
+        // Without w_cal: no block.
+        let none = run(&root, &root.join(E1_SESSION), None);
+        assert_eq!(none.procedure, 2);
+        // A synthetic commitment: the session ran another spec.
+        assert_eq!(none.outcome, "inadmissible");
+        assert!(!none.session.spec_matches);
+        assert!(none.calibrated.is_none());
+        assert!((none.axes[0].ratio_candidate_over_incumbent.unwrap() - expect[0]).abs() < 1e-12);
+
+        // An override.
+        let w = WCal {
+            w_cal: 0.1,
+            method: "best-of-N timing".into(),
+            host: "h".into(),
+        };
+        let over = run(&root, &root.join(E1_SESSION), Some(&w));
+        let g = over.calibrated.as_ref().unwrap();
+        assert_eq!(g.source.as_deref(), Some(WCAL_SOURCE_OVERRIDE));
+        check(g);
+
+        // A sidecar beside the session.
+        let (troot, dir) = e1_copy("sidecar");
+        std::fs::write(
+            dir.join(WCAL_SIDECAR),
+            r#"{"schema":"ecbench.wcal/v1","w_cal":0.1,"method":"best-of-N timing","host":"h"}"#,
+        )
+        .unwrap();
+        let side = run(&troot, &dir, None);
+        let gs = side.calibrated.as_ref().unwrap();
+        assert!(gs.source.is_none());
+        check(gs);
+        // The block changes no axis or outcome.
+        assert_eq!(
+            serde_json::to_value(&side.axes).unwrap(),
+            serde_json::to_value(&none.axes).unwrap()
+        );
+        assert_eq!(side.outcome, none.outcome);
+        assert_eq!(over.outcome, none.outcome);
+        std::fs::remove_dir_all(&troot).ok();
     }
 }

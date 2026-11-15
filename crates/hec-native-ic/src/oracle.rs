@@ -75,7 +75,7 @@ fn split_impl(u: &Poly, fp: &Fp, stats: &mut OracleStats, direct: bool) -> Optio
         2 => {
             let (b, c) = (u.c[1], u.c[0]);
             let disc = fp.sub(fp.mul(b, b), fp.mul(4, c));
-            let half = fp.inv(2);
+            let half = (fp.p + 1) / 2; // 1/2, no inversion (S3)
             if disc == 0 {
                 out.push(fp.mul(fp.neg(b), half), 2);
             } else {
@@ -161,7 +161,7 @@ fn edf(w: &Poly, fp: &Fp, roots: &mut [u64; 4], nr: &mut usize) {
             let (b, c) = (w.c[1], w.c[0]);
             let disc = fp.sub(fp.mul(b, b), fp.mul(4, c));
             let s = fp.sqrt(disc).expect("edf: split quadratic has square disc");
-            let half = fp.inv(2);
+            let half = (fp.p + 1) / 2; // 1/2, no inversion (S3)
             roots[*nr] = fp.mul(fp.sub(s, b), half);
             roots[*nr + 1] = fp.mul(fp.sub(fp.neg(s), b), half);
             *nr += 2;

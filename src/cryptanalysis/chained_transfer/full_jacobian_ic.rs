@@ -46,14 +46,15 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::bielliptic::Quotient;
+use super::ec::{Curve, Pt};
 use super::hyper64::{H64Curve, H64Div};
 use super::ic_control::{
     addm, combine, mulmod, pa, peel, pm, ppow, roots_of, splits_completely, subm, wiedemann, Arm,
     Dsu, IcParams, IcResult, Instance, Nat, Poly, Row,
 };
 use super::instrument::{convert_div, genus2_to_h64, instance_for_rung};
-use super::negation_remeasure::CoverCurve;
-use crate::cryptanalysis::ic_boundary::{CountedGroup, GroupOps};
+use super::negation_remeasure::{rho_full, CoverCurve, RhoFull};
+use crate::cryptanalysis::ic_boundary::{CountedGroup, FieldOps, GroupOps};
 use crate::cryptanalysis::residual_walk::mix64;
 
 /// Walk length between fresh random starts (as `ic_control::RESTART_DEFAULT`).
@@ -263,6 +264,9 @@ pub fn run_full_ic(
         ..Default::default()
     };
     let mut ops = GroupOps::default();
+    // Every counted group operation goes through the tallied wrapper: the
+    // same values and group counts as `curve`, plus `ops.field_ops`.
+    let tj = TalliedJac::new(curve);
     let f = curve.f_coeffs();
 
     // ── factor base: every degree-1 place up to sign (or `nb` of them) ──
@@ -304,14 +308,14 @@ pub fn run_full_ic(
     for _ in 0..16 {
         let a = rng.gen_range(1..short);
         let b = rng.gen_range(1..short);
-        let ag = curve.mul(&mut ops, inst.g, a);
-        let bt = curve.mul(&mut ops, inst.target, b);
-        let mut m = curve.add(&mut ops, ag, bt);
+        let ag = tj.mul(&mut ops, inst.g, a);
+        let bt = tj.mul(&mut ops, inst.target, b);
+        let mut m = tj.add(&mut ops, ag, bt);
         let mut gam = 0u64;
         if whole {
             gam = rng.gen_range(1..(1u64 << 12));
-            let gz = curve.mul(&mut ops, z, gam);
-            m = curve.add(&mut ops, m, gz);
+            let gz = tj.mul(&mut ops, z, gam);
+            m = tj.add(&mut ops, m, gz);
         }
         jumps.push((m, a, b, gam % r, gam));
     }
@@ -339,17 +343,17 @@ pub fn run_full_ic(
             if since_restart >= RESTART {
                 let a = rng.gen_range(1..r);
                 let b = rng.gen_range(1..r);
-                let ag = curve.mul(&mut ops, inst.g, a);
-                let bt = curve.mul(&mut ops, inst.target, b);
-                cur = curve.add(&mut ops, ag, bt);
+                let ag = tj.mul(&mut ops, inst.g, a);
+                let bt = tj.mul(&mut ops, inst.target, b);
+                cur = tj.add(&mut ops, ag, bt);
                 ca = a;
                 cb = b;
                 ck = 0;
                 (fa, fb_, fk) = (a as u128, b as u128, 0);
                 if whole {
                     let k = rng.gen_range(1..inst.order);
-                    let kz = curve.mul(&mut ops, z, k);
-                    cur = curve.add(&mut ops, cur, kz);
+                    let kz = tj.mul(&mut ops, z, k);
+                    cur = tj.add(&mut ops, cur, kz);
                     ck = k % r;
                     fk = k as u128;
                 }
@@ -357,7 +361,7 @@ pub fn run_full_ic(
             } else {
                 let j = (mix64(curve.key_of(&cur)) >> 24) as usize % 16;
                 let (m, aj, bj, gj, gx) = jumps[j];
-                cur = curve.add(&mut ops, cur, m);
+                cur = tj.add(&mut ops, cur, m);
                 ca = addm(ca, aj, r);
                 cb = addm(cb, bj, r);
                 ck = addm(ck, gj, r);
@@ -496,7 +500,7 @@ pub fn run_full_ic(
         if let Some(x) = sol {
             let t = x[ct as usize];
             let v0 = ops.adds + ops.doubles;
-            let chk = curve.mul(&mut ops, inst.g, t);
+            let chk = tj.mul(&mut ops, inst.g, t);
             res.verify_ops = ops.adds + ops.doubles - v0;
             let ok = chk == inst.target && curve.mul_rtl(inst.g, t) == inst.target;
             if ok {
@@ -577,30 +581,678 @@ pub fn certify_both(ci: &CoverCurve, x_inst: u64, k: u64) -> (bool, bool) {
 /// Why each candidate before the selected one of [`cover_select`] was
 /// skipped, by reason (the same checks, in the same order, as the selection).
 pub fn selection_skips(p: u64, i: usize, selected: u64) -> std::collections::BTreeMap<String, u32> {
-    use super::bielliptic::Bielliptic;
-    use super::negation_remeasure::{candidate_coeffs, largest_cyclic_prime};
+    selection_skips_min_r(p, i, selected, 0)
+}
+
+/// [`selection_skips`] for [`cover_select_min_r`]: a candidate whose `r` is
+/// below `min_r` is counted as `r_below_min_r`.  With `min_r = 0` this is
+/// exactly [`selection_skips`].
+pub fn selection_skips_min_r(
+    p: u64,
+    i: usize,
+    selected: u64,
+    min_r: u64,
+) -> std::collections::BTreeMap<String, u32> {
     let mut m = std::collections::BTreeMap::new();
-    let _ = i;
     for s in 0..selected {
-        let reason = match Bielliptic::new(p, candidate_coeffs(p, s)) {
-            Err(_) => "bielliptic_rejected",
-            Ok(b) => {
-                let (n1, n2) = (b.e1.order(), b.e2.order());
-                let r = largest_cyclic_prime(n1);
-                if r < 50 {
-                    "r_below_50"
-                } else if n2.is_multiple_of(r) {
-                    "r_divides_e2_order"
-                } else if (n1 * n2).is_multiple_of(r * r) {
-                    "r_squared_divides_jac_order"
-                } else {
-                    "other_hop_or_point_failure"
-                }
-            }
+        let reason = match admissible_min_r(p, s, seed0_of(i, s), min_r) {
+            Ok(_) => "admissible_but_not_selected",
+            Err("bielliptic_rejected") => "bielliptic_rejected",
+            Err("r_below_50") => "r_below_50",
+            Err("r_below_min_r") => "r_below_min_r",
+            Err("r_divides_e2_order") => "r_divides_e2_order",
+            Err("r_squared_divides_jac_order") => "r_squared_divides_jac_order",
+            Err(_) => "other_hop_or_point_failure",
         };
         *m.entry(reason.to_string()).or_insert(0) += 1;
     }
     m
+}
+
+/// The cover seed of candidate `s` of prime number `i`, as [`cover_select`].
+pub fn seed0_of(i: usize, s: u64) -> u64 {
+    0xC0FFEE + i as u64 * 101 + s
+}
+
+/// The admissibility checks of `negation_remeasure::cover_select`, in the
+/// same order, with one extra exclusion after `r < 50`: `r < min_r`, where
+/// `r` is the largest prime with `r || #E1(F_p)`.  `min_r = 0` adds nothing.
+pub fn admissible_min_r(
+    p: u64,
+    s: u64,
+    seed: u64,
+    min_r: u64,
+) -> Result<(super::bielliptic::Bielliptic, u64, super::ec::Pt), &'static str> {
+    use super::bielliptic::Bielliptic;
+    use super::chain::{Chain, Elt, Hop};
+    use super::negation_remeasure::{candidate_coeffs, ec_gen, find_isogeny, largest_cyclic_prime};
+    let b = Bielliptic::new(p, candidate_coeffs(p, s)).map_err(|_| "bielliptic_rejected")?;
+    let (n1, n2) = (b.e1.order(), b.e2.order());
+    let r = largest_cyclic_prime(n1);
+    if r < 50 {
+        return Err("r_below_50");
+    }
+    if r < min_r {
+        return Err("r_below_min_r");
+    }
+    if n2.is_multiple_of(r) {
+        return Err("r_divides_e2_order");
+    }
+    if (n1 * n2).is_multiple_of(r * r) {
+        return Err("r_squared_divides_jac_order");
+    }
+    let x = (seed.wrapping_mul(2_246_822_519).wrapping_add(7)) % r;
+    let gen = ec_gen(&b.e1, r).ok_or("no_order_r_point_on_E1")?;
+    let target = b.e1.mul(&gen, x as u128);
+    let (iso, _k) = find_isogeny(&b.e1, r).ok_or("no_rational_small_isogeny")?;
+    let hop = Hop::isogeny(iso, &gen, &target, r).map_err(|_| "isogeny_hop_failed")?;
+    if !Chain::new(vec![hop]).verify(&Elt::E(gen), r, x as u128) {
+        return Err("isogeny_chain_unverified");
+    }
+    let hop = Hop::pullback(&b, Quotient::E1, &gen, r).map_err(|_| "pullback_hop_failed")?;
+    if !Chain::new(vec![hop]).verify(&Elt::E(gen), r, x as u128) {
+        return Err("pullback_chain_unverified");
+    }
+    Ok((b, r, gen))
+}
+
+/// Number of candidates scanned per prime (as `cover_select`).
+pub const COVER_CANDIDATES: u64 = 4000;
+
+/// `cover_select` with `r >= min_r` (2026-11-14 rerun of O3: binds the
+/// transferred order `r` to `p`, so `#E1 / r` is small).  The first of the
+/// same 4000 candidates, in the same order, that passes every check of
+/// `cover_select` and `r >= min_r`.  With `min_r = 0` it selects the same
+/// cover as `cover_select` (unit-tested).
+pub fn cover_select_min_r(p: u64, i: usize, min_r: u64) -> Option<CoverCurve> {
+    (0..COVER_CANDIDATES).find_map(|s| {
+        let seed0 = seed0_of(i, s);
+        admissible_min_r(p, s, seed0, min_r)
+            .ok()
+            .map(|(b, r, gen)| CoverCurve {
+                b,
+                candidate: s,
+                seed0,
+                r,
+                gen,
+            })
+    })
+}
+
+/// `min_r = ceil(frac * p)` (0 when `frac <= 0`).
+pub fn min_r_for(p: u64, frac: f64) -> u64 {
+    if frac > 0.0 {
+        (frac * p as f64).ceil() as u64
+    } else {
+        0
+    }
+}
+
+/// The frozen fallback of the 2026-11-14 protocol: when prime `p` has no
+/// candidate with `r >= ceil(frac p)`, the next prime above it is tried, in
+/// increasing order, with the same prime number `i`, at most `max_hops`
+/// times.  Returns the prime actually used, the primes passed over, and the
+/// cover.  With `frac <= 0` and a candidate at `p`, this is `cover_select(p, i)`.
+pub fn cover_select_rp(
+    p: u64,
+    i: usize,
+    frac: f64,
+    max_hops: u32,
+) -> Option<(u64, Vec<u64>, CoverCurve)> {
+    use crate::cryptanalysis::residual_walk::is_prime_u64;
+    let mut q = p;
+    let mut passed = vec![];
+    for hop in 0..=max_hops {
+        if hop > 0 {
+            q += 1;
+            while !is_prime_u64(q) {
+                q += 1;
+            }
+        }
+        if let Some(c) = cover_select_min_r(q, i, min_r_for(q, frac)) {
+            return Some((q, passed, c));
+        }
+        passed.push(q);
+    }
+    None
+}
+
+// ── field-operation tally (Amendment 1 of the 2026-11-14 protocol) ─────────
+//
+// Validator finding 7 (`research/validation_20261114/REPORT.md`): one Cantor
+// step was charged as one E1 addition.  The tallies below count the `F_p`
+// multiplications, squarings and inversions behind every counted group
+// operation of both sides, in the convention of
+// [`crate::cryptanalysis::ic_boundary::FieldOps`]: a `sqr` is a product the
+// code forms as a square (the diagonal of `v·v`, `d·d`), every other product,
+// including one by a small constant, is a `mul`, every inversion an `inv`;
+// additions, subtractions and negations are not counted.
+//
+// - **Genus 2 (`J_C`).**  [`CantorTally`] is `hyper64::H64Curve::cantor`
+//   step for step (same extended gcds, products, divisions and reduction loop,
+//   on its own copy of the polynomial routines, which `hyper64` keeps
+//   private); it returns the same reduced divisor (unit-tested against
+//   `H64Curve::cantor`) and counts what that code performs.  It is the
+//   generic Cantor algorithm, not explicit genus-2 formulae, so it counts more
+//   field work per step than an optimised implementation would need.
+// - **Genus 1 (`E1`).**  [`ec_add_tally`] counts the `F_p` operations of the
+//   affine formula `ec::Curve::add` evaluates on `F_p`-rational points
+//   (addition 2M + 1S + 1I, doubling 4M + 2S + 1I, an identity operand or
+//   `P + (−P)` nothing).  `ec.rs` holds the coordinates in an `F_{p²}`
+//   container whose zero imaginary parts cost it extra products in time; those
+//   are not charged.
+//
+// [`TalliedJac`] and [`TalliedEc`] wrap the two groups as [`CountedGroup`]s
+// whose `add`/`double` charge `GroupOps` exactly as `H64Curve` and
+// `measure::EcGroup` do (so every existing group-operation counter is
+// unchanged) and also add the tally to `ops.field_ops` and to an internal
+// cell (read by [`TalliedJac::tally`] / [`TalliedEc::tally`]) for callers such
+// as `negation_remeasure::rho_full` that keep only the group counts.
+
+const FCAP: usize = 16;
+
+/// A polynomial over `F_p` (`c[..n]`, `c[n-1] != 0`; `n = 0` is zero).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct FPoly {
+    c: [u64; FCAP],
+    n: usize,
+}
+
+impl FPoly {
+    const ZERO: FPoly = FPoly { c: [0; FCAP], n: 0 };
+    fn constant(a: u64) -> FPoly {
+        let mut q = FPoly::ZERO;
+        if a != 0 {
+            q.c[0] = a;
+            q.n = 1;
+        }
+        q
+    }
+    fn trim(&mut self) {
+        while self.n > 0 && self.c[self.n - 1] == 0 {
+            self.n -= 1;
+        }
+    }
+    fn is_zero(&self) -> bool {
+        self.n == 0
+    }
+    fn deg(&self) -> usize {
+        self.n.saturating_sub(1)
+    }
+    fn lead(&self) -> u64 {
+        if self.n == 0 {
+            0
+        } else {
+            self.c[self.n - 1]
+        }
+    }
+}
+
+/// `a⁻¹ mod p` by the extended Euclidean algorithm (`hyper64`'s inversion),
+/// `0 < a < p`.  Public for the inversion microbenchmark.
+#[inline]
+pub fn inv_extgcd(p: u64, a: u64) -> u64 {
+    debug_assert!(a != 0 && a < p);
+    let (mut r0, mut r1) = (p as i64, a as i64);
+    let (mut t0, mut t1) = (0i64, 1i64);
+    while r1 != 0 {
+        let q = r0 / r1;
+        (r0, r1) = (r1, r0 - q * r1);
+        (t0, t1) = (t1, t0 - q * t1);
+    }
+    debug_assert_eq!(r0, 1);
+    t0.rem_euclid(p as i64) as u64
+}
+
+/// The polynomial routines of `hyper64`, counting into `t`.
+#[derive(Clone, Copy, Debug)]
+struct Tk {
+    p: u64,
+}
+
+impl Tk {
+    #[inline]
+    fn mul(&self, a: u64, b: u64, t: &mut FieldOps) -> u64 {
+        t.muls += 1;
+        a * b % self.p
+    }
+    #[inline]
+    fn add(&self, a: u64, b: u64) -> u64 {
+        let s = a + b;
+        if s >= self.p {
+            s - self.p
+        } else {
+            s
+        }
+    }
+    #[inline]
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        if a >= b {
+            a - b
+        } else {
+            a + self.p - b
+        }
+    }
+    #[inline]
+    fn neg(&self, a: u64) -> u64 {
+        if a == 0 {
+            0
+        } else {
+            self.p - a
+        }
+    }
+    #[inline]
+    fn inv(&self, a: u64, t: &mut FieldOps) -> u64 {
+        t.invs += 1;
+        inv_extgcd(self.p, a)
+    }
+    fn padd(&self, a: &FPoly, b: &FPoly) -> FPoly {
+        let mut q = FPoly::ZERO;
+        let n = a.n.max(b.n);
+        for i in 0..n {
+            q.c[i] = self.add(a.c[i], b.c[i]);
+        }
+        q.n = n;
+        q.trim();
+        q
+    }
+    fn psub(&self, a: &FPoly, b: &FPoly) -> FPoly {
+        let mut q = FPoly::ZERO;
+        let n = a.n.max(b.n);
+        for i in 0..n {
+            q.c[i] = self.sub(a.c[i], b.c[i]);
+        }
+        q.n = n;
+        q.trim();
+        q
+    }
+    fn pscale(&self, a: &FPoly, s: u64, t: &mut FieldOps) -> FPoly {
+        let mut q = FPoly::ZERO;
+        for i in 0..a.n {
+            q.c[i] = self.mul(a.c[i], s, t);
+        }
+        q.n = a.n;
+        q.trim();
+        q
+    }
+    /// `a·b`; with `square` (the code squares one polynomial) the diagonal
+    /// products are squarings.
+    fn pmul_k(&self, a: &FPoly, b: &FPoly, square: bool, t: &mut FieldOps) -> FPoly {
+        if a.is_zero() || b.is_zero() {
+            return FPoly::ZERO;
+        }
+        let n = a.n + b.n - 1;
+        assert!(n <= FCAP, "polynomial product past capacity");
+        let mut q = FPoly::ZERO;
+        for i in 0..a.n {
+            if a.c[i] == 0 {
+                continue;
+            }
+            for j in 0..b.n {
+                if square && i == j {
+                    t.sqrs += 1;
+                } else {
+                    t.muls += 1;
+                }
+                q.c[i + j] = (q.c[i + j] + a.c[i] * b.c[j]) % self.p;
+            }
+        }
+        q.n = n;
+        q.trim();
+        q
+    }
+    fn pmul(&self, a: &FPoly, b: &FPoly, t: &mut FieldOps) -> FPoly {
+        self.pmul_k(a, b, false, t)
+    }
+    fn psqr(&self, a: &FPoly, t: &mut FieldOps) -> FPoly {
+        self.pmul_k(a, a, true, t)
+    }
+    fn pdivrem(&self, a: &FPoly, b: &FPoly, t: &mut FieldOps) -> (FPoly, FPoly) {
+        assert!(!b.is_zero(), "division by the zero polynomial");
+        let mut r = *a;
+        let mut q = FPoly::ZERO;
+        if a.n < b.n {
+            return (q, r);
+        }
+        let li = if b.lead() == 1 {
+            1
+        } else {
+            self.inv(b.lead(), t)
+        };
+        let db = b.deg();
+        while r.n >= b.n && !r.is_zero() {
+            let shift = r.deg() - db;
+            let coef = if li == 1 {
+                r.lead()
+            } else {
+                self.mul(r.lead(), li, t)
+            };
+            q.c[shift] = coef;
+            for j in 0..b.n {
+                let m = self.mul(coef, b.c[j], t);
+                r.c[shift + j] = self.sub(r.c[shift + j], m);
+            }
+            r.trim();
+        }
+        q.n = a.n - b.n + 1;
+        q.trim();
+        (q, r)
+    }
+    fn prem(&self, a: &FPoly, b: &FPoly, t: &mut FieldOps) -> FPoly {
+        self.pdivrem(a, b, t).1
+    }
+    fn pmonic(&self, a: &FPoly, t: &mut FieldOps) -> FPoly {
+        if a.is_zero() || a.lead() == 1 {
+            return *a;
+        }
+        let li = self.inv(a.lead(), t);
+        self.pscale(a, li, t)
+    }
+    fn pxgcd(&self, a: &FPoly, b: &FPoly, t: &mut FieldOps) -> (FPoly, FPoly, FPoly) {
+        let (mut r0, mut r1) = (*a, *b);
+        let (mut s0, mut s1) = (FPoly::constant(1), FPoly::ZERO);
+        let (mut t0, mut t1) = (FPoly::ZERO, FPoly::constant(1));
+        while !r1.is_zero() {
+            let (q, r) = self.pdivrem(&r0, &r1, t);
+            r0 = r1;
+            r1 = r;
+            let s = self.psub(&s0, &self.pmul(&q, &s1, t));
+            s0 = s1;
+            s1 = s;
+            let tt = self.psub(&t0, &self.pmul(&q, &t1, t));
+            t0 = t1;
+            t1 = tt;
+        }
+        if r0.is_zero() {
+            return (r0, s0, t0);
+        }
+        let li = self.inv(r0.lead(), t);
+        (
+            self.pscale(&r0, li, t),
+            self.pscale(&s0, li, t),
+            self.pscale(&t0, li, t),
+        )
+    }
+}
+
+/// `H64Curve::cantor` with a field-operation tally (see the section notes).
+#[derive(Clone, Debug)]
+pub struct CantorTally {
+    k: Tk,
+    genus: usize,
+    f: FPoly,
+}
+
+impl CantorTally {
+    pub fn new(curve: &H64Curve) -> CantorTally {
+        let fc = curve.f_coeffs();
+        assert!(fc.len() <= FCAP);
+        let mut f = FPoly::ZERO;
+        f.c[..fc.len()].copy_from_slice(&fc);
+        f.n = fc.len();
+        f.trim();
+        CantorTally {
+            k: Tk { p: curve.p() },
+            genus: curve.genus() as usize,
+            f,
+        }
+    }
+
+    fn polys(d: &H64Div) -> (FPoly, FPoly) {
+        let n = d.deg as usize;
+        let mut u = FPoly::ZERO;
+        for i in 0..n {
+            u.c[i] = u64::from(d.u[i]);
+        }
+        u.c[n] = 1;
+        u.n = n + 1;
+        let mut v = FPoly::ZERO;
+        for i in 0..n {
+            v.c[i] = u64::from(d.v[i]);
+        }
+        v.n = n;
+        v.trim();
+        (u, v)
+    }
+
+    fn pack(u: &FPoly, v: &FPoly) -> H64Div {
+        let mut d = H64Div {
+            deg: u.deg() as u8,
+            ..H64Div::IDENTITY
+        };
+        for i in 0..u.deg() {
+            d.u[i] = u.c[i] as u32;
+        }
+        for i in 0..v.n {
+            d.v[i] = v.c[i] as u32;
+        }
+        d
+    }
+
+    /// `a + b` (the reduced divisor `H64Curve::cantor` returns), adding the
+    /// field operations performed to `t`.
+    pub fn cantor(&self, a: H64Div, b: H64Div, t: &mut FieldOps) -> H64Div {
+        if a.is_identity() {
+            return b;
+        }
+        if b.is_identity() {
+            return a;
+        }
+        let k = &self.k;
+        let (u1, v1) = Self::polys(&a);
+        let (u2, v2) = Self::polys(&b);
+        let (d1, e1, e2) = k.pxgcd(&u1, &u2, t);
+        let (u, v) = if d1.n == 1 {
+            let u = k.pmul(&u1, &u2, t);
+            let e1u1 = k.pmul(&e1, &u1, t);
+            let tt = k.pmul(&e1u1, &k.psub(&v2, &v1), t);
+            let v = k.prem(&k.padd(&v1, &tt), &u, t);
+            (u, v)
+        } else {
+            let (d, c1, c2) = k.pxgcd(&d1, &k.padd(&v1, &v2), t);
+            let s1 = k.pmul(&c1, &e1, t);
+            let s2 = k.pmul(&c1, &e2, t);
+            let u1u2 = k.pmul(&u1, &u2, t);
+            let dd = k.psqr(&d, t);
+            let (u, ur) = k.pdivrem(&u1u2, &dd, t);
+            debug_assert!(ur.is_zero(), "u1 u2 / d^2 is exact");
+            let s1u1 = k.pmul(&s1, &u1, t);
+            let t1 = k.pmul(&s1u1, &v2, t);
+            let s2u2 = k.pmul(&s2, &u2, t);
+            let t2 = k.pmul(&s2u2, &v1, t);
+            let v1v2 = k.pmul(&v1, &v2, t);
+            let t3 = k.pmul(&c2, &k.padd(&v1v2, &self.f), t);
+            let (vq, vr) = k.pdivrem(&k.padd(&k.padd(&t1, &t2), &t3), &d, t);
+            debug_assert!(vr.is_zero(), "the v numerator divides by d");
+            (u, k.prem(&vq, &u, t))
+        };
+        self.reduce(u, v, t)
+    }
+
+    fn reduce(&self, mut u: FPoly, mut v: FPoly, t: &mut FieldOps) -> H64Div {
+        let k = &self.k;
+        while u.deg() > self.genus {
+            let vv = k.psqr(&v, t);
+            let num = k.psub(&self.f, &vv);
+            let (q, r) = k.pdivrem(&num, &u, t);
+            debug_assert!(r.is_zero(), "(f - v^2)/u is exact");
+            let un = k.pmonic(&q, t);
+            let mut nv = FPoly::ZERO;
+            for i in 0..v.n {
+                nv.c[i] = k.neg(v.c[i]);
+            }
+            nv.n = v.n;
+            v = k.prem(&nv, &un, t);
+            u = un;
+        }
+        let u = k.pmonic(&u, t);
+        Self::pack(&u, &v)
+    }
+}
+
+/// The field operations `e.add(p, q)` (`ec::Curve::add`) performs on
+/// `F_p`-rational points, branch for branch (see the section notes).
+pub fn ec_add_tally(e: &Curve, p: &Pt, q: &Pt) -> FieldOps {
+    let (Some((x1, y1)), Some((x2, y2))) = (p, q) else {
+        return FieldOps::default();
+    };
+    if x1 == x2 {
+        if e.k.add2(*y1, *y2).is_zero() {
+            // P + (−P): the identity, before any product
+            return FieldOps::default();
+        }
+        // doubling: sqr2(x1), 3·x1², 2a2·x1, inv2(2y1), num·inv, sqr2(m), m·(x1 − x3)
+        FieldOps {
+            muls: 4,
+            sqrs: 2,
+            invs: 1,
+        }
+    } else {
+        // inv2(x2 − x1), (y2 − y1)·inv, sqr2(m), m·(x1 − x3)
+        FieldOps {
+            muls: 2,
+            sqrs: 1,
+            invs: 1,
+        }
+    }
+}
+
+/// `H64Curve` as a [`CountedGroup`] that also tallies field operations
+/// ([`CantorTally`]).  Group counts are charged exactly as `H64Curve`'s own
+/// `CountedGroup` impl charges them; the values are `H64Curve::cantor`'s.
+pub struct TalliedJac<'a> {
+    pub curve: &'a H64Curve,
+    ct: CantorTally,
+    cell: std::cell::Cell<FieldOps>,
+}
+
+impl<'a> TalliedJac<'a> {
+    pub fn new(curve: &'a H64Curve) -> TalliedJac<'a> {
+        TalliedJac {
+            curve,
+            ct: CantorTally::new(curve),
+            cell: std::cell::Cell::new(FieldOps::default()),
+        }
+    }
+    /// Every field operation tallied by this wrapper so far.
+    pub fn tally(&self) -> FieldOps {
+        self.cell.get()
+    }
+    fn cantor(&self, ops: &mut GroupOps, a: H64Div, b: H64Div) -> H64Div {
+        let mut t = FieldOps::default();
+        let out = self.ct.cantor(a, b, &mut t);
+        debug_assert_eq!(out, self.curve.cantor(a, b), "tally mirror diverged");
+        ops.field_ops.merge(t);
+        let mut c = self.cell.get();
+        c.merge(t);
+        self.cell.set(c);
+        out
+    }
+}
+
+impl CountedGroup for TalliedJac<'_> {
+    type Elt = H64Div;
+    fn identity(&self) -> H64Div {
+        H64Div::IDENTITY
+    }
+    fn is_identity(&self, d: &H64Div) -> bool {
+        d.is_identity()
+    }
+    fn add(&self, ops: &mut GroupOps, a: H64Div, b: H64Div) -> H64Div {
+        if a == b {
+            ops.doubles += 1;
+        } else {
+            ops.adds += 1;
+        }
+        self.cantor(ops, a, b)
+    }
+    fn double(&self, ops: &mut GroupOps, a: H64Div) -> H64Div {
+        ops.doubles += 1;
+        self.cantor(ops, a, a)
+    }
+    fn neg(&self, a: H64Div) -> H64Div {
+        self.curve.negate(a)
+    }
+    fn key(&self, d: &H64Div) -> u64 {
+        self.curve.key_of(d)
+    }
+    fn counts_field_ops(&self) -> bool {
+        true
+    }
+}
+
+/// `measure::EcGroup` (the group of `negation_remeasure::rho_full_ec`) with
+/// the field tally of [`ec_add_tally`]; group counts, values and keys are
+/// `EcGroup`'s.
+pub struct TalliedEc {
+    pub e: Curve,
+    inner: super::measure::EcGroup,
+    cell: std::cell::Cell<FieldOps>,
+}
+
+impl TalliedEc {
+    pub fn new(e: Curve) -> TalliedEc {
+        TalliedEc {
+            e,
+            inner: super::measure::EcGroup(e),
+            cell: std::cell::Cell::new(FieldOps::default()),
+        }
+    }
+    pub fn tally(&self) -> FieldOps {
+        self.cell.get()
+    }
+    fn charge(&self, ops: &mut GroupOps, p: &Pt, q: &Pt) {
+        let t = ec_add_tally(&self.e, p, q);
+        ops.field_ops.merge(t);
+        let mut c = self.cell.get();
+        c.merge(t);
+        self.cell.set(c);
+    }
+}
+
+impl CountedGroup for TalliedEc {
+    type Elt = Pt;
+    fn identity(&self) -> Pt {
+        self.inner.identity()
+    }
+    fn is_identity(&self, p: &Pt) -> bool {
+        self.inner.is_identity(p)
+    }
+    fn add(&self, ops: &mut GroupOps, p: Pt, q: Pt) -> Pt {
+        self.charge(ops, &p, &q);
+        self.inner.add(ops, p, q)
+    }
+    fn double(&self, ops: &mut GroupOps, p: Pt) -> Pt {
+        self.charge(ops, &p, &p);
+        self.inner.double(ops, p)
+    }
+    fn neg(&self, p: Pt) -> Pt {
+        self.inner.neg(p)
+    }
+    fn key(&self, p: &Pt) -> u64 {
+        self.inner.key(p)
+    }
+    fn counts_field_ops(&self) -> bool {
+        true
+    }
+}
+
+/// `negation_remeasure::rho_full_ec` on [`TalliedEc`]: the same run (every
+/// counter equal, unit-tested) and the field operations behind its group
+/// operations.
+pub fn rho_full_ec_tallied(
+    e: &Curve,
+    gen: Pt,
+    target: Pt,
+    r: u64,
+    seed: u64,
+    negation: bool,
+) -> (RhoFull, FieldOps) {
+    let g = TalliedEc::new(*e);
+    let out = rho_full(&g, gen, target, r, seed, negation, &|k| {
+        e.mul(&gen, k as u128) == target
+    });
+    (out, g.tally())
 }
 
 // ── statistics ──────────────────────────────────────────────────────────
@@ -803,6 +1455,244 @@ mod tests {
         assert!(n.is_multiple_of(c.z_order));
         assert!(c.inst.curve.mul_uncounted(c.z, c.z_order).is_identity());
         assert_eq!(point_order(&c.inst.curve, c.inst.g, n), c.inst.r);
+    }
+
+    #[test]
+    fn min_r_zero_selects_the_cover_select_cover_and_skips() {
+        for (i, p) in [211u64, 419, 821, 1619, 3203].into_iter().enumerate() {
+            let a = cover_select(p, i).expect("cover");
+            let b = cover_select_min_r(p, i, 0).expect("cover");
+            assert_eq!((a.candidate, a.seed0, a.r), (b.candidate, b.seed0, b.r));
+            assert_eq!(a.gen, b.gen);
+            let sk = selection_skips(p, i, a.candidate);
+            assert_eq!(sk, selection_skips_min_r(p, i, a.candidate, 0));
+            assert_eq!(sk.values().sum::<u32>() as u64, a.candidate);
+            assert!(!sk.contains_key("r_below_min_r"));
+            let (q, passed, c) = cover_select_rp(p, i, 0.0, 3).expect("rp");
+            assert!(q == p && passed.is_empty() && c.candidate == a.candidate);
+        }
+    }
+
+    #[test]
+    fn min_r_binds_r_to_p_and_keeps_every_exclusion() {
+        use super::super::negation_remeasure::largest_cyclic_prime;
+        for (i, p) in [211u64, 419, 821, 1619, 3203, 6421].into_iter().enumerate() {
+            let min_r = min_r_for(p, 0.125);
+            assert_eq!(min_r, (p as f64 / 8.0).ceil() as u64);
+            let (q, _passed, c) = cover_select_rp(p, i, 0.125, 20).expect("rp cover");
+            assert!(q >= p);
+            let (n1, n2) = (c.b.e1.order(), c.b.e2.order());
+            assert_eq!(c.r, largest_cyclic_prime(n1));
+            assert!(c.r >= min_r_for(q, 0.125) && c.r >= 50, "p={q} r={}", c.r);
+            assert!(!n2.is_multiple_of(c.r) && !(n1 * n2).is_multiple_of(c.r * c.r));
+            // #E1 / r is small: at most about 8 (p + 1 + 2 sqrt p) / p
+            assert!(n1 / c.r <= 9, "cofactor {}", n1 / c.r);
+            // every candidate before it was skipped for a recorded reason
+            let sk = selection_skips_min_r(q, i, c.candidate, min_r_for(q, 0.125));
+            assert_eq!(sk.values().sum::<u32>() as u64, c.candidate);
+            assert!(!sk.contains_key("admissible_but_not_selected"));
+            // the selected cover still gives a certified whole-J instance
+            let inst = cover_instance(&c, 0).expect("instance");
+            assert_eq!(inst.inst.r, c.r);
+        }
+        // a bound no curve meets: no candidate and the fallback is bounded
+        assert!(cover_select_min_r(211, 0, 10_000).is_none());
+        assert!(cover_select_rp(211, 0, 50.0, 2).is_none());
+    }
+
+    #[test]
+    fn cantor_tally_returns_h64_cantor_and_counts_work() {
+        // p = 211 (old selection) and p = 1619 (the 2026-11-14 selection)
+        for (p, i, frac) in [(211u64, 0usize, 0.0), (1619, 3, 0.4)] {
+            let (_, _, ci) = cover_select_rp(p, i, frac, 20).expect("cover");
+            let c = cover_instance(&ci, 0).expect("instance");
+            let curve = &c.inst.curve;
+            let ct = CantorTally::new(curve);
+            let mut st = 0x5EED_u64 ^ p;
+            let mut pool: Vec<H64Div> = (0..24).map(|_| curve.random_divisor(&mut st)).collect();
+            pool.push(H64Div::IDENTITY);
+            pool.push(c.inst.g);
+            pool.push(curve.negate(c.inst.g));
+            for k in 1..6u64 {
+                let x = (st >> 3) % p;
+                st = mix64(st ^ k);
+                if let Some(y) = (0..p).find(|&y| curve.point(x, y).is_some()) {
+                    pool.push(curve.point(x, y).unwrap());
+                }
+            }
+            let mut nontrivial = 0u64;
+            for &a in &pool {
+                for &b in &pool {
+                    let mut t = FieldOps::default();
+                    assert_eq!(ct.cantor(a, b, &mut t), curve.cantor(a, b), "p={p}");
+                    if a.is_identity() || b.is_identity() {
+                        assert_eq!(t, FieldOps::default());
+                    } else {
+                        nontrivial += 1;
+                        assert!(t.muls + t.sqrs > 0 && t.invs >= 1, "{t:?}");
+                    }
+                }
+            }
+            assert!(nontrivial > 500);
+            // a doubling of a full-degree divisor squares v and d
+            let d = pool
+                .iter()
+                .find(|d| u32::from(d.deg) == curve.genus())
+                .unwrap();
+            let mut t = FieldOps::default();
+            ct.cantor(*d, *d, &mut t);
+            assert!(t.sqrs > 0, "{t:?}");
+        }
+    }
+
+    #[test]
+    fn tallied_groups_keep_every_group_counter_and_value() {
+        use super::super::negation_remeasure::rho_full_ec;
+        let ci = cover_select(211, 0).expect("cover");
+        let c = cover_instance(&ci, 0).expect("instance");
+        let curve = &c.inst.curve;
+        let tj = TalliedJac::new(curve);
+        let (mut o1, mut o2) = (GroupOps::default(), GroupOps::default());
+        for k in [0u64, 1, 2, 3, 108, 109, 110, 12345] {
+            assert_eq!(
+                tj.mul(&mut o1, c.inst.g, k),
+                curve.mul(&mut o2, c.inst.g, k)
+            );
+        }
+        assert_eq!(
+            (o1.adds, o1.doubles, o1.scalar_mults),
+            (o2.adds, o2.doubles, o2.scalar_mults)
+        );
+        assert_eq!(o1.field_ops, tj.tally());
+        assert!(o1.field_ops.invs > 0 && o2.field_ops == FieldOps::default());
+        // rho on J's r-part through the wrapper: the same run
+        let (g, t, x) = (c.inst.g, c.inst.target, c.x);
+        let ok = |k: u64| curve.mul_rtl(g, k) == t && k % c.inst.r == x;
+        let a = rho_full(curve, g, t, c.inst.r, 2000, true, &ok);
+        let b = rho_full(&tj, g, t, c.inst.r, 2000, true, &ok);
+        assert_eq!(
+            serde_json::to_string(&a).unwrap(),
+            serde_json::to_string(&b).unwrap()
+        );
+        // rho on E1: every RhoFull field equal, and a tally per operation
+        let (e1, ge) = (ci.b.e1, ci.gen);
+        let te = e1.mul(&ge, c.x as u128);
+        for neg in [true, false] {
+            for s in 0..6u64 {
+                let a = rho_full_ec(&e1, ge, te, ci.r, 1000 + s, neg);
+                let (b, f) = rho_full_ec_tallied(&e1, ge, te, ci.r, 1000 + s, neg);
+                assert_eq!(
+                    serde_json::to_string(&a).unwrap(),
+                    serde_json::to_string(&b).unwrap()
+                );
+                // at most one inversion per group operation, 2-4 M and 1-2 S each
+                assert!(
+                    f.invs <= b.total_ops && f.invs + 8 >= b.total_ops,
+                    "{f:?} {}",
+                    b.total_ops
+                );
+                assert!(f.muls >= 2 * f.invs && f.muls <= 4 * f.invs);
+                assert!(f.sqrs >= f.invs && f.sqrs <= 2 * f.invs);
+            }
+        }
+        // the E1 formula tally, branch by branch
+        let p1 = e1.mul(&ge, 5);
+        let p2 = e1.mul(&ge, 7);
+        let fo = |m, s, i| FieldOps {
+            muls: m,
+            sqrs: s,
+            invs: i,
+        };
+        assert_eq!(ec_add_tally(&e1, &p1, &p2), fo(2, 1, 1));
+        assert_eq!(ec_add_tally(&e1, &p1, &p1), fo(4, 2, 1));
+        assert_eq!(ec_add_tally(&e1, &p1, &e1.neg(&p1)), fo(0, 0, 0));
+        assert_eq!(ec_add_tally(&e1, &None, &p1), fo(0, 0, 0));
+    }
+
+    #[test]
+    fn old_counters_replay_the_2026_11_13_p211_row() {
+        // research/full_jacobian_ic_20261113/full_jacobian.json, row p = 211
+        // (old selection, `--min-r-frac 0`): means over 3 instances x 4 seeds
+        // times 12, and the negation rho over 3 x 16 seeds times 48.  The
+        // field tally must leave every one of these sums unchanged.
+        use super::super::instrument::fb_size_g;
+        use super::super::negation_remeasure::rho_full_ec;
+        let ci = cover_select(211, 0).expect("cover");
+        assert_eq!((ci.r, ci.candidate, ci.seed0), (109, 9, 12_648_439));
+        let insts: Vec<CoverInstance> = (0..3).map(|k| cover_instance(&ci, k).unwrap()).collect();
+        assert_eq!(
+            insts.iter().map(|c| c.x).collect::<Vec<_>>(),
+            vec![8, 21, 34]
+        );
+        // (arm, group_ops, setup_ops, walk_ops, rel_mul, rel_add, la_mul, la_add, trials)
+        let want: [(Arm, [u64; 8]); 2] = [
+            (
+                Arm::Full,
+                [
+                    14_332, 6_026, 8_246, 929_139, 764_952, 58_713_111, 95_613_461, 6_628,
+                ],
+            ),
+            (
+                Arm::DoubleLp,
+                [
+                    13_798, 6_026, 7_712, 839_554, 703_713, 2_489_171, 3_082_095, 6_227,
+                ],
+            ),
+        ];
+        for (arm, w) in want {
+            let nb = if arm == Arm::Full {
+                0
+            } else {
+                fb_size_g(Arm::DoubleLp, 2, 211, 2.0)
+            };
+            let mut sum = [0u64; 8];
+            let mut fops = FieldOps::default();
+            for (k, c) in insts.iter().enumerate() {
+                for s in 0..4u64 {
+                    let prm = IcParams {
+                        arm,
+                        nb,
+                        seed: 700 + s + 10 * k as u64,
+                        max_trials: 200_000_000,
+                        verify_relations: false,
+                    };
+                    let out = run_full_ic(&c.inst, c.z, Source::WholeJ, prm, false).ic;
+                    assert!(out.certified);
+                    let v = [
+                        out.group_ops(),
+                        out.setup_ops,
+                        out.walk_ops,
+                        out.rel.mul,
+                        out.rel.add,
+                        out.la.mul,
+                        out.la.add,
+                        out.trials,
+                    ];
+                    for j in 0..8 {
+                        sum[j] += v[j];
+                    }
+                    fops.merge(out.group.field_ops);
+                }
+            }
+            assert_eq!(sum, w, "{arm:?}");
+            // the new tally: dozens of field products per Cantor step
+            assert!(
+                fops.muls + fops.sqrs > 20 * sum[0] && fops.invs >= sum[0],
+                "{fops:?}"
+            );
+        }
+        let mut tot = 0u64;
+        for c in &insts {
+            let te = ci.b.e1.mul(&ci.gen, c.x as u128);
+            for s in 0..16u64 {
+                let a = rho_full_ec(&ci.b.e1, ci.gen, te, 109, 1000 + s + c.seed % 997, true);
+                let (b, _) =
+                    rho_full_ec_tallied(&ci.b.e1, ci.gen, te, 109, 1000 + s + c.seed % 997, true);
+                assert_eq!(a.total_ops, b.total_ops);
+                tot += b.total_ops;
+            }
+        }
+        assert_eq!(tot, 3_073, "64.0208333 x 48");
     }
 
     #[test]

@@ -12,8 +12,15 @@
 #define GPU_ROOTFIND_HOST_HPP
 
 #include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <functional>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -126,28 +133,123 @@ inline std::vector<U256x64> to_mont256(const Fp256Ctx &f, const uint64_t *limbs,
 
 /* --- emulation driver ----------------------------------------------- */
 
-/* Run every thread index on the host.  Threads are split across hardware
- * threads only for speed; each tid's work is independent and the output
- * order is irrelevant (the Rust harness compares sets). */
+/* CPUs this process may use: RF_EMU_THREADS if set; else hardware_concurrency,
+ * capped by a cgroup CPU quota (cgroup v2 cpu.max, or v1 cfs quota/period).  A
+ * container commonly sees every host thread in nproc but is allowed far fewer;
+ * running a thread per host thread then oversubscribes the quota. */
+inline unsigned rf_cpu_budget() {
+    if (const char *e = std::getenv("RF_EMU_THREADS")) {
+        long v = std::strtol(e, nullptr, 10);
+        if (v > 0) return (unsigned)v;
+    }
+    unsigned n = std::max(1u, std::thread::hardware_concurrency());
+    double quota = -1, period = -1;
+    if (FILE *f = std::fopen("/sys/fs/cgroup/cpu.max", "r")) {
+        char q[64] = {0};
+        if (std::fscanf(f, "%63s %lf", q, &period) == 2 && std::strcmp(q, "max") != 0) quota = std::atof(q);
+        std::fclose(f);
+    } else if (FILE *fq = std::fopen("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "r")) {
+        if (std::fscanf(fq, "%lf", &quota) != 1) quota = -1;
+        std::fclose(fq);
+        if (FILE *fp = std::fopen("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "r")) {
+            if (std::fscanf(fp, "%lf", &period) != 1) period = -1;
+            std::fclose(fp);
+        }
+    }
+    if (quota > 0 && period > 0) {
+        unsigned cap = (unsigned)std::max(1.0, std::ceil(quota / period));
+        n = std::min(n, cap);
+    }
+    return n;
+}
+
+/* A persistent worker pool for the emulation backend (the multi-threaded CPU
+ * sweep, `backend=emulate`).  The threads are created once per process and wait
+ * between batches; a batch hands out grains of thread indices through an atomic
+ * cursor, and the calling thread works too.  One batch at a time. */
+class EmuPool {
+public:
+    static EmuPool &get() {
+        static EmuPool pool(rf_cpu_budget());
+        return pool;
+    }
+    unsigned size() const { return (unsigned)workers_.size() + 1; }
+    /* fn(start, end) over [0, total) in grains */
+    template <class Fn>
+    void run(uint64_t total, uint64_t grain, const Fn &fn) {
+        std::lock_guard<std::mutex> one(run_mu_);
+        auto body = [&]() {
+            for (;;) {
+                uint64_t start = next_.fetch_add(grain);
+                if (start >= total) break;
+                fn(start, std::min(total, start + grain));
+            }
+        };
+        {
+            std::lock_guard<std::mutex> lk(mu_);
+            job_ = body;
+            next_.store(0);
+            busy_ = (unsigned)workers_.size();
+            gen_++;
+        }
+        cv_.notify_all();
+        body();
+        std::unique_lock<std::mutex> lk(mu_);
+        done_cv_.wait(lk, [&] { return busy_ == 0; });
+        job_ = nullptr;
+    }
+    ~EmuPool() {
+        {
+            std::lock_guard<std::mutex> lk(mu_);
+            stop_ = true;
+            gen_++;
+        }
+        cv_.notify_all();
+        for (auto &t : workers_) t.join();
+    }
+
+private:
+    explicit EmuPool(unsigned n) {
+        for (unsigned i = 1; i < n; i++) workers_.emplace_back([this] { loop(); });
+    }
+    void loop() {
+        uint64_t seen = 0;
+        for (;;) {
+            std::function<void()> job;
+            {
+                std::unique_lock<std::mutex> lk(mu_);
+                cv_.wait(lk, [&] { return gen_ != seen; });
+                seen = gen_;
+                if (stop_) return;
+                job = job_;
+            }
+            if (job) job();
+            {
+                std::lock_guard<std::mutex> lk(mu_);
+                if (--busy_ == 0) done_cv_.notify_one();
+            }
+        }
+    }
+    std::vector<std::thread> workers_;
+    std::mutex mu_, run_mu_;
+    std::condition_variable cv_, done_cv_;
+    std::function<void()> job_;
+    std::atomic<uint64_t> next_{0};
+    uint64_t gen_ = 0;
+    unsigned busy_ = 0;
+    bool stop_ = false;
+};
+
+/* Run every thread index on the host, on the persistent pool for large batches.
+ * Each tid's work is independent; the output order is irrelevant (callers
+ * compare sets or sort). */
 template <class F, class T, int CHUNK>
 void emulate(const DecompArgs<F> &a, const T &table, unsigned hw_threads = 0) {
     const uint64_t total = rf_thread_count(a.n_targets, a.n_fb, CHUNK);
-    if (hw_threads == 0) hw_threads = std::max(1u, std::thread::hardware_concurrency());
-    if (hw_threads > 1 && total >= 4096) {
-        std::vector<std::thread> pool;
-        std::atomic<uint64_t> next{0};
-        const uint64_t grain = 1024;
-        for (unsigned h = 0; h < hw_threads; h++) {
-            pool.emplace_back([&]() {
-                for (;;) {
-                    uint64_t start = next.fetch_add(grain);
-                    if (start >= total) break;
-                    uint64_t end = std::min(total, start + grain);
-                    for (uint64_t tid = start; tid < end; tid++) rf_decompose_thread<F, T, CHUNK>(a, table, tid);
-                }
-            });
-        }
-        for (auto &th : pool) th.join();
+    if (hw_threads != 1 && total >= 4096) {
+        EmuPool::get().run(total, 256, [&](uint64_t start, uint64_t end) {
+            for (uint64_t tid = start; tid < end; tid++) rf_decompose_thread<F, T, CHUNK>(a, table, tid);
+        });
     } else {
         for (uint64_t tid = 0; tid < total; tid++) rf_decompose_thread<F, T, CHUNK>(a, table, tid);
     }
