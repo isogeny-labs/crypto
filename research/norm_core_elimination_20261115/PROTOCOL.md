@@ -62,3 +62,21 @@ fixture. Passing leaves the original growing-family algorithm criterion open.
 Formalization attempt: use the pinned shared polynomial laws and existing
 Mathlib monic division; do not copy them. Record exact missing endpoint laws
 and actual build/axiom receipts if any new Lean declaration is reported.
+
+## Amendment D1 — diagnose the preserved arity5 backend crash
+
+After the fixed core arity controls, the dense m5/t4 call exited139 with an
+empty basis and no stdout/stderr. Its cause is unknown: do not label it a
+memory-cap observation or a mathematical failure. No recovered relation can
+be extracted from that empty file.
+
+Permit exactly two diagnostic native backend calls on that preserved public
+input, with unchanged20s CPU/wall and2GiB address caps, one thread:
+(a) -v2,-l2 (current exact-sparse method with diagnostic output),
+(b) -v2,-l1 (the backend's distinct exact sparse/dense method).
+Capture the exact input, backend digest, flags, stdout/stderr, basis and exit
+in fresh diagnostic-001 paths. No adaptive cap change or extra fixture.
+This bounded software crash diagnosis is not a timing/performance experiment.
+Preserve the original139 outcome, whichever diagnostic outcome follows. A
+successful basis still requires bounded extraction and original/group checks
+before it can supply any model claim; those are separate from backend exit.
