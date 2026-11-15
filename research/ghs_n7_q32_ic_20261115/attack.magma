@@ -1,0 +1,344 @@
+SetSeed(20261115);
+R<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^35+x^2+1>;
+k := GF(32);
+Embed(k, K);
+function FromMask(n, z)
+    v := Parent(z)!0;
+    for i in [0..34] do
+        if (n div 2^i) mod 2 eq 1 then
+            v +:= z^i;
+        end if;
+    end for;
+    return v;
+end function;
+a := K!1;
+b := FromMask(9698245,z);
+E := EllipticCurve([K | 1, a, 0, 0, b]);
+P := E![FromMask(25722924589,z),FromMask(16457048142,z),1];
+Q := E![FromMask(31908057006,z),FromMask(10517578624,z),1];
+r := 5726649013;
+assert #E eq 34359894078 and IsPrime(r);
+assert P ne E!0 and r*P eq E!0;
+assert Q ne E!0 and Q eq 1234567*P;
+
+function Partition(R)
+    if R eq Parent(R)!0 then
+        return 0;
+    end if;
+    bits := Eltseq(R[1]);
+    v := 0;
+    for i in [1..Min(4, #bits)] do
+        v +:= 2^(i-1)*Integers()!bits[i];
+    end for;
+    return v mod 3;
+end function;
+
+function Walk(R, aa, bb, P, Q, rr)
+    part := Partition(R);
+    if part eq 0 then
+        return R+P, (aa+1) mod rr, bb;
+    elif part eq 1 then
+        return R+Q, aa, (bb+1) mod rr;
+    end if;
+    return 2*R, (2*aa) mod rr, (2*bb) mod rr;
+end function;
+
+rho_cpu_start := Cputime();
+rho_wall_start := Realtime();
+rho_scalar := -1;
+rho_steps := 0;
+rho_restarts := 0;
+for restart in [0..31] do
+    aa := restart+1;
+    bb := 2*restart+1;
+    R1 := aa*P+bb*Q;
+    R2 := R1;
+    aa2 := aa;
+    bb2 := bb;
+    rho_restarts := restart+1;
+    for iteration in [1..1000000] do
+        R1, aa, bb := Walk(R1, aa, bb, P, Q, r);
+        R2, aa2, bb2 := Walk(R2, aa2, bb2, P, Q, r);
+        R2, aa2, bb2 := Walk(R2, aa2, bb2, P, Q, r);
+        rho_steps +:= 3;
+        if R1 eq R2 then
+            den := (bb2-bb) mod r;
+            if den ne 0 then
+                candidate := ((aa-aa2)*InverseMod(den,r)) mod r;
+                if candidate*P eq Q then
+                    rho_scalar := candidate;
+                end if;
+            end if;
+            break;
+        end if;
+    end for;
+    if rho_scalar ge 0 then
+        break;
+    end if;
+end for;
+rho_cpu := Cputime(rho_cpu_start);
+rho_wall := Realtime(rho_wall_start);
+assert rho_scalar ge 0 and rho_scalar*P eq Q;
+print "rho_scalar", rho_scalar;
+print "rho_steps", rho_steps;
+print "rho_restarts", rho_restarts;
+print "rho_cpu_sec", rho_cpu;
+print "rho_wall_sec", rho_wall;
+
+rho_batch_count := 20;
+rho_batch_cpu_start := Cputime();
+rho_batch_wall_start := Realtime();
+for rep in [1..rho_batch_count] do
+    aa := 1;
+    bb := 1;
+    R1 := aa*P+bb*Q;
+    R2 := R1;
+    aa2 := aa;
+    bb2 := bb;
+    repeated_scalar := -1;
+    for iteration in [1..1000000] do
+        R1, aa, bb := Walk(R1, aa, bb, P, Q, r);
+        R2, aa2, bb2 := Walk(R2, aa2, bb2, P, Q, r);
+        R2, aa2, bb2 := Walk(R2, aa2, bb2, P, Q, r);
+        if R1 eq R2 then
+            den := (bb2-bb) mod r;
+            if den ne 0 then
+                repeated_scalar := ((aa-aa2)*InverseMod(den,r)) mod r;
+            end if;
+            break;
+        end if;
+    end for;
+    assert repeated_scalar eq rho_scalar and repeated_scalar*P eq Q;
+end for;
+rho_batch_cpu := Cputime(rho_batch_cpu_start);
+rho_batch_wall := Realtime(rho_batch_wall_start);
+print "rho_batch_count", rho_batch_count;
+print "rho_batch_cpu_sec", rho_batch_cpu;
+print "rho_batch_wall_sec", rho_batch_wall;
+
+function SmoothParts(D, J)
+    parts := [];
+    if D eq J!0 or D[3] ne Degree(D[1]) then
+        return false, parts, false;
+    end if;
+    v := D[2];
+    for pe in Factorization(D[1]) do
+        p := pe[1];
+        if Degree(p) gt 2 then
+            return false, parts, false;
+        end if;
+        B := J![p, v mod p];
+        for i in [1..pe[2]] do
+            Append(~parts, B);
+        end for;
+    end for;
+    total := J!0;
+    for B in parts do
+        total +:= B;
+    end for;
+    return total eq D, parts, true;
+end function;
+
+ghs_cpu_start := Cputime();
+ghs_wall_start := Realtime();
+setup_cpu_start := Cputime();
+C, h := WeilDescent(E, k, K!1);
+assert Type(C) eq CrvHyp and Genus(C) eq 8;
+J := Jacobian(C);
+// Hess Theorem 15 in this exact 7+1 orbit specialization gives
+// #J = #E(K) * #E0(k); the full Euler polynomial was checked separately.
+aa := [v : v in k | K!v eq a][1];
+E0 := EllipticCurve([k | 1,aa,0,0,1]);
+N := #E * #E0;
+assert #E0 eq 22 and N eq 755917669716;
+assert N mod r eq 0;
+cofactor := N div r;
+assert GCD(cofactor,r) eq 1;
+G := h(P);
+T := h(Q);
+assert G ne J!0 and r*G eq J!0 and T eq 1234567*G;
+setup_cpu := Cputime(setup_cpu_start);
+setup_wall := Realtime(ghs_wall_start);
+print "ghs_genus", Genus(C);
+print "ghs_source_order", r;
+print "target_jacobian_order", N;
+print "target_jacobian_order_source", "Hess-L-factorization";
+print "base_elliptic_order", #E0;
+print "target_jacobian_cofactor", cofactor;
+print "subfield_generator_in_K", K!k.1;
+print "source_point", P;
+print "source_target", Q;
+print "target_curve", C;
+print "target_generator", G;
+print "ghs_setup_cpu_sec", setup_cpu;
+print "ghs_setup_wall_sec", setup_wall;
+
+rel_cpu_start := Cputime();
+rel_wall_start := Realtime();
+fb_keys := [];
+fb := [];
+rows := [];
+rhs := [];
+attempts := 0;
+smooth_candidates := 0;
+reconstruction_failures := 0;
+S := J!0;
+for scalar in [1..Min(r-1,1000000)] do
+    if Cputime(rel_cpu_start) ge 90 then
+        break;
+    end if;
+    S +:= G;
+    attempts +:= 1;
+    ok, parts, degree_smooth := SmoothParts(S,J);
+    if degree_smooth and not ok then
+        reconstruction_failures +:= 1;
+    end if;
+    if not ok then
+        continue;
+    end if;
+    smooth_candidates +:= 1;
+    indices := [];
+    for B in parts do
+        key := Sprint(B);
+        idx := Index(fb_keys,key);
+        if idx eq 0 then
+            Append(~fb_keys,key);
+            Append(~fb,B);
+            idx := #fb_keys;
+        end if;
+        Append(~indices,idx);
+    end for;
+    Append(~rows,indices);
+    Append(~rhs,scalar);
+    if attempts ge 500 and #rows ge #fb_keys+20 and attempts mod 50 eq 0 then
+        M0 := ZeroMatrix(GF(r),#rows,#fb_keys);
+        for i in [1..#rows] do
+            for idx in rows[i] do
+                M0[i,idx] +:= GF(r)!1;
+            end for;
+        end for;
+        if Rank(M0) eq #fb_keys then
+            break;
+        end if;
+    end if;
+end for;
+rel_cpu := Cputime(rel_cpu_start);
+rel_wall := Realtime(rel_wall_start);
+print "relation_attempts", attempts;
+print "smooth_relations", #rows;
+print "factor_base_classes", #fb_keys;
+print "reconstruction_failures", reconstruction_failures;
+if #fb gt 0 then
+    print "factor_base_first", fb[1];
+    print "factor_base_last", fb[#fb];
+end if;
+for i in [1..#rows] do
+    print "relation", rhs[i], rows[i];
+end for;
+print "relations_cpu_sec", rel_cpu;
+print "relations_wall_sec", rel_wall;
+
+linear_cpu_start := Cputime();
+linear_wall_start := Realtime();
+M := ZeroMatrix(GF(r),#rows,#fb_keys);
+for i in [1..#rows] do
+    for idx in rows[i] do
+        M[i,idx] +:= GF(r)!1;
+    end for;
+end for;
+linear_rank := Rank(M);
+solved := false;
+logs := [];
+if linear_rank eq #fb_keys then
+    good, logs0, null := IsConsistent(Transpose(M),Vector(GF(r),rhs));
+    if good and Dimension(null) eq 0 then
+        logs := Eltseq(logs0);
+        solved := true;
+    end if;
+end if;
+linear_cpu := Cputime(linear_cpu_start);
+linear_wall := Realtime(linear_wall_start);
+print "linear_rank", linear_rank;
+print "linear_solved", solved;
+if solved then
+    in_subgroup := 0;
+    r_annihilated := 0;
+    projection_checks := 0;
+    for i in [1..#fb] do
+        if fb[i] eq (Integers()!logs[i])*G then
+            in_subgroup +:= 1;
+        end if;
+        if r*fb[i] eq J!0 then
+            r_annihilated +:= 1;
+        end if;
+        assert cofactor*fb[i] eq (cofactor*Integers()!logs[i])*G;
+        projection_checks +:= 1;
+    end for;
+    print "factor_base_in_source_subgroup_count", in_subgroup;
+    print "factor_base_r_annihilated_count", r_annihilated;
+    print "factor_base_projected_checks", projection_checks;
+end if;
+print "linear_cpu_sec", linear_cpu;
+print "linear_wall_sec", linear_wall;
+
+descent_cpu_start := Cputime();
+descent_wall_start := Realtime();
+ghs_scalar := -1;
+descent_attempts := 0;
+descent_smooth := 0;
+descent_unknown_base := 0;
+descent_indices := [];
+if solved then
+    U := T;
+    for offset in [0..Min(r-1,999999)] do
+        if Cputime(descent_cpu_start) ge 45 then
+            break;
+        end if;
+        descent_attempts +:= 1;
+        ok, parts, degree_smooth := SmoothParts(U,J);
+        if ok then
+            descent_smooth +:= 1;
+            unknown := false;
+            accum := GF(r)!0;
+            trial_indices := [];
+            for B in parts do
+                idx := Index(fb_keys,Sprint(B));
+                if idx eq 0 then
+                    unknown := true;
+                    break;
+                end if;
+                accum +:= logs[idx];
+                Append(~trial_indices,idx);
+            end for;
+            if not unknown then
+                candidate := Integers()!(accum-GF(r)!offset);
+                if candidate*P eq Q and candidate*G eq T then
+                    ghs_scalar := candidate;
+                    descent_indices := trial_indices;
+                    break;
+                end if;
+            else
+                descent_unknown_base +:= 1;
+            end if;
+        end if;
+        U +:= G;
+    end for;
+end if;
+descent_cpu := Cputime(descent_cpu_start);
+descent_wall := Realtime(descent_wall_start);
+ghs_cpu := Cputime(ghs_cpu_start);
+ghs_wall := Realtime(ghs_wall_start);
+print "descent_attempts", descent_attempts;
+print "descent_smooth", descent_smooth;
+print "descent_unknown_base", descent_unknown_base;
+print "descent_indices", descent_indices;
+print "ghs_scalar", ghs_scalar;
+print "descent_cpu_sec", descent_cpu;
+print "descent_wall_sec", descent_wall;
+print "ghs_total_cpu_sec", ghs_cpu;
+print "ghs_total_wall_sec", ghs_wall;
+if ghs_scalar ge 0 then
+    assert ghs_scalar*P eq Q and ghs_scalar*G eq T;
+end if;
+assert solved and ghs_scalar ge 0;
