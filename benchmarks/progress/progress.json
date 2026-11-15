@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2010Z-ic-native-ifma",
+  "latest_record": "20261115T2225Z-ic-gpu-rootfind-setup",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
-    "censored": 8,
+    "censored": 9,
     "invalid": 4,
-    "measured": 198,
+    "measured": 199,
     "open": 1
   },
   "repo": "crypto",
@@ -4126,6 +4126,29 @@
     },
     {
       "better": "lower",
+      "first": 0.0008,
+      "latest": 0.0008,
+      "latest_derived": {},
+      "metric": "ic_pair_keys_kernel_s_n4096",
+      "points": [
+        {
+          "commit": "0c8c4311854f",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 1,
+          "record": "20261115T2225Z-ic-gpu-rootfind-setup",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 6: device pair-table key kernel with batched inversions (runs of 16): 5.7x the per-cell kernel at n=4096 with 0 mismatching keys; 120/120 verified and replayed, 36 identity checks equal. GPU m=3 set-up at 4096 0.109-0.116 s vs round 5's 0.121 s (prediction <= half failed): the stage timings put 47 ms in copying the 67 MB build-index map to the host. Launched through benchrec run.",
+          "value": 0.0008
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.004,
       "latest": 0.004,
       "latest_derived": {},
@@ -4558,14 +4581,19 @@
     {
       "better": "lower",
       "first": 0.122,
-      "latest": 0.122,
-      "latest_derived": {},
+      "latest": 0.109,
+      "latest_derived": {
+        "improvement_vs_first_percent": 10.6557,
+        "improvement_vs_previous_percent": 10.6557
+      },
       "metric": "ic_rf3_gpup_setup_s_r39_f4096",
       "points": [
         {
           "commit": "5142615e5d83",
           "date": "2026-11-15",
-          "derived": {},
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
           "n": 4,
           "record": "20261115T0656Z-ic-gpu-rootfind-pairs",
           "reference": null,
@@ -4573,6 +4601,21 @@
           "spread": null,
           "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
           "value": 0.122
+        },
+        {
+          "commit": "0c8c4311854f",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 10.6557,
+            "improvement_vs_previous_percent": 10.6557
+          },
+          "n": 6,
+          "record": "20261115T2225Z-ic-gpu-rootfind-setup",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 6: device pair-table key kernel with batched inversions (runs of 16): 5.7x the per-cell kernel at n=4096 with 0 mismatching keys; 120/120 verified and replayed, 36 identity checks equal. GPU m=3 set-up at 4096 0.109-0.116 s vs round 5's 0.121 s (prediction <= half failed): the stage timings put 47 ms in copying the 67 MB build-index map to the host. Launched through benchrec run.",
+          "value": 0.109
         }
       ],
       "problem": "ic-gpu-kernels",
