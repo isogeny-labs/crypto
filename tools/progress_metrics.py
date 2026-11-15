@@ -840,6 +840,20 @@ def hec_linear_cold_record(ref, since):
                  source=f"{path}@{commit}")
 
 
+def hec_zero_core_cold_record(ref, since):
+    """Copy immutable registry observations; no scientific reduction."""
+    path = "benchmarks/records/20261115T1208Z-hec-zero-core-cold.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "bench.record/v1" or record.get("status") != "measured":
+            continue
+        for metric in record.get("metrics", []):
+            emit(f"hec.zero_core_cold.{metric['name']}", metric.get("value"), date=date,
+                 problem=record["problem"], unit=metric["unit"], better=metric["better"],
+                 label="Recorded three-target cold median; reused genus-2 curves, L0, producer unverified",
+                 source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -878,6 +892,7 @@ def main():
     explicit_gpu_fullcache(a.ref, a.since)
     n83_d18_vsids_gate(a.ref, a.since)
     hec_linear_cold_record(a.ref, a.since)
+    hec_zero_core_cold_record(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

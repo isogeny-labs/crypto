@@ -51,3 +51,35 @@ all terminal outcomes; follow current PR CI independently of scientific gates.
 ### Errors
 Conductor MCP used HTTPS against the HTTP service; CLI confirmed the existing
 T-6123 claim and its exact study-directory scope. No competing path was edited.
+
+## Cold comparison admission
+### What was done
+Revalidated clean scientific source a500c14f9a, prior terminal gate and frozen
+COLD-PROTOCOL. Fresh build passes synthetic gate, 29 research and 12 library
+tests; previous turn published current-head CI green. No pilot worker is live.
+Pinned source and worker/collector hashes; created separate open cold record.
+### Decisions made
+Execute the registered six new targets once from the frozen isolated build.
+Keep all 108 child outcomes and exact caps, comparisons and aggregate budget.
+### Open threads
+Checkpoint this admission, execute collector and reduce deterministic receipts;
+then report Z1/Z2 without selecting or rerunning unfavorable outcomes.
+### Errors
+None. Shared resume edit stays untouched.
+
+## Cold comparison terminal
+### What was done
+Frozen a500c14f9a and admission checkpoint preceded six gates/102 timed cells.
+All108exit0, six scalars verify, Z1 passes, Z2 fails both fixtures. Primary
+medians .245253/.362194 favor compact; positive/zero 1.018057/1.136459.
+Native jq retains every target and A/A; PDF/SVG visually inspected. Fixed-work
+free-row/free-setup diagnostics remain below control (max .407856/.649240).
+### Decisions made
+Elimination-only path fails the complete-cost case. Preserve exact solver
+component and losses; next relation supply must beat compact with all costs.
+### Open threads
+Finish immutable custody/metrics, publish and follow CI. Full genus2/3/4
+mathematical objective stays active; do not rerun this terminal cohort.
+### Errors
+Empty reducer smoke used string input; corrected actual pipeline uses array
+of108CELLs. No scientific execution failed or was restarted.

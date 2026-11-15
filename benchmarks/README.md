@@ -1,5 +1,12 @@
 # Benchmarks
 
+The [15 November zero-core genus-2 cold pilot](20261115-hec-zero-core-cold/)
+([PDF](20261115-hec-zero-core-cold/REPORT.pdf)) remains outside the admitted table.
+Six targets recover; six gates and 102 cold timed children pass. Z1 passes and
+the Z2 10x criterion fails. Fastest-existing/zero-core fixture medians are
+0.245 and 0.362, favoring existing controls. Local ARM L0, A/A maximum 1.091;
+producer observations pending independent validation [pcc:unverified].
+
 The [15 November complete point-sieve cold pilot](20261115-hec-point-cold/)
 ([PDF](20261115-hec-point-cold/REPORT.pdf)) remains outside the admitted table.
 All18targets recover and18gates/306cold cells pass checks; E8passes and E9fails.
