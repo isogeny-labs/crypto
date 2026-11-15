@@ -54,3 +54,11 @@ replay receipts remain intact. This error changes no native outcome and is
 not a reason to repeat PC. A1 uses a separate frozen execution copy, with its
 exact script hash captured before the still-single amended msolve arm.
 [pcc:unverified]
+
+A1 completes12/12 model sets,4 total models, all independent OpenSSL replayed.
+All msolve calls remain unchanged20s/2GiB; only dynamic-library admission is
+repaired. Original12 loader failures and12 PC timeout unknowns remain intact.
+A2 is frozen before implementing source-certified early completion: constant1
+or a source-consistent full linear point ideal can stop the queue, followed by
+all unchanged external checks. No degree or resource cap increase is planned.
+[pcc:unverified]

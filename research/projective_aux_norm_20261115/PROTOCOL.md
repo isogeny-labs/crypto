@@ -82,3 +82,27 @@ degree, memory, time, schedule or verification criterion changes. Retain
 all completed/unknown outcomes and replay any completed models with the
 same independent OpenSSL executable. This repairs process startup, not a
 failed mathematical conjecture or a performance result.
+
+## Amendment A2 — source-certified early completion, fixed panel
+
+A1 loader repair completes all12 targets; independent OpenSSL matches4 total
+models. The original PC arm remains12 capped unknowns. Preserve both rounds.
+Change only PC's stopping rule, not equations, degree, queue ordering or caps:
+stop when an independently derived constant1 pivot exists, or when all variable
+linear pivots exist and every original equation reduces to zero under them.
+The latter triangular full-rank linear set is a point ideal; a failed internal
+test continues the existing queue. Charge these internal reductions against
+the same producer step cap. Retain all original generators in the candidate
+and require the unchanged separate DAG/completion/original-inclusion verifier.
+No unverified candidate is accepted merely by an early trigger.
+
+Freeze exactly one new early-003 panel: the same six small exact ideals and
+the saved natural Kummer norm at D4, then all12 unchanged auxiliary targets at
+D4. Complete point/quotient comparisons and independent OpenSSL replay apply
+as before. The checker is unchanged and retains its previous adverse-proof
+qualification; no extra negative producer experiment is needed. Capture fresh
+source/binary/script hashes before calls, fresh paths, unchanged20s/2GiB per
+backend and all PC caps. No old degree5/6 or old PC arm is repeated. Preserve
+all unknowns, do not adapt the degree, schedule, targets or caps. This is a
+standard completion shortcut, not a new mathematical elimination method or
+a registered timing comparison. [pcc:unverified]
