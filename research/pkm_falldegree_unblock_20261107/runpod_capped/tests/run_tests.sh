@@ -297,25 +297,30 @@ nd D21; mktree "$DO" cap:8:0:5:12800000000 "$S0" "$okE" 0 0 0; ck "$DR" $((DLE +
 nd D22; mktree "$DO" cap:8:0:5:12800000000 "$S0" "$okE" 0 0 0; ck "$DR" $((okEe + 100)) prefetch done "$S0" "$okE" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $((okEe + 200)); echo tampered >> "$DO/host.txt"; dcase D22 "NOT_ADMITTED P2e" "a file of the kept tree changed after collection (rule 6)"
 nd D23; mktree "$DO" cap:8:0:5:12800000000 "$S0" "$okE" 0 0 0; ck "$DR" $((okEe + 100)) prefetch done "$S0" "$okE" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $((okEe + 200)); jq '.machine.secureCloud = false' "$DR/pod-create.json" > "$DR/c" && mv "$DR/c" "$DR/pod-create.json"; dcase D23 "NOT_ADMITTED P2e" "create response not in the reserved tier (rule 7)"
 P2E=$(( okEe + 100 )); PCOL=$(( okEe + 200 ))
-mcase() { # mcase ID STAGE PILOT_EXIT OOM CG_PEAK LOG EXPECTED DESCRIPTION [EXPECTED_AS_M112] [EXPECTED_SOURCE]
+mcase() { # mcase ID STAGE PILOT_EXIT OOM CG_PEAK LOG EXPECTED DESCRIPTION [EXPECTED_AS_M112] [EXPECTED_SOURCE_USED]
   nd "$1"; local rx=0; [ "$3" = 0 ] || rx=1
   mktree "$DO" "$2" "$S0" "$okE" "$3" 0 "$4" 1 "$5" "$6"; jq --arg st "$2" '.stage = $st' "$DR/pod-state.json" > "$DR/x" && mv "$DR/x" "$DR/pod-state.json"
   ck "$DR" $P2E prefetch done "$S0" "$okE" $rx 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $PCOL
-  local got; got=$( (cd "$RC" && ./fetch.sh --classify-dir "$DR" "$DO") 2> "$OUTD/$1.err" | tee "$OUTD/$1.txt" | jq -r '.class + " " + .rule + " as_m112=" + ((.memory.as_m112 // false) | tostring) + " source=" + (.memory.source // "none")')
-  local want="$7 as_m112=${9:-false} source=${10:-cgroup_v2_memory.peak}"; [ "$got" = "$want" ]; rec "$1" $? "$want" "$got" "$8"
+  local got; got=$( (cd "$RC" && ./fetch.sh --classify-dir "$DR" "$DO") 2> "$OUTD/$1.err" | tee "$OUTD/$1.txt" | jq -r '.class + " " + .rule + " as_m112=" + ((.memory.as_m112 // false) | tostring) + " source=" + (.memory.source_used // "none")')
+  local want="$7 as_m112=${9:-false} source=${10:-pilot_log_VmHWM_MiB}"; [ "$got" = "$want" ]; rec "$1" $? "$want" "$got" "$8"
 }
 G=1073741824; S56=cap:8:0:5:12800000000; S112=cap:8:0:5:27900000000
-mcase D25 $S56 0 0 $((30 * G)) keep "ADMITTED P2d" "memory: cgroup peak 30 GiB (below 56 GiB)"
-mcase D26 $S56 0 0 $((70 * G)) keep "ADMITTED P2m3" "memory: cgroup peak 70 GiB (between 56 and 112 GiB): the cell's -m112 row" true
-mcase D27 $S56 0 0 $((125 * G)) keep "OOM P2m1" "memory: cgroup peak 125 GiB (above 112 GiB): OOM at -m112" true
-mcase D28 $S56 0 0 - keep "ADMITTED P2d" "memory: no cgroup peak, pilot VmHWM field present (64 MiB)" false pilot_log_VmHWM_MiB
-mcase D28b $S56 0 0 - 70000 "ADMITTED P2m3" "memory: no cgroup peak, pilot VmHWM field 70,000 MiB (> 56 GiB)" true pilot_log_VmHWM_MiB
-mcase D29 $S56 0 0 - strip "NOT_ADMITTED P2u" "memory: neither a cgroup peak nor a pilot field" false none
-mcase D30 $S56 0 0 v1:$((60 * G)) keep "ADMITTED P2m3" "memory: cgroup v1 max_usage_in_bytes 60 GiB" true cgroup_v1_memory.max_usage_in_bytes
-mcase D31 $S112 0 0 $((113 * G)) keep "OOM P2p" "memory: an -m112 attempt with peak 113 GiB" false
-mcase D32 $S112 0 0 $((100 * G)) keep "ADMITTED P2d" "memory: an -m112 attempt with peak 100 GiB" false
-mcase D33 $S56 0 0 60129542144 keep "ADMITTED P2d" "memory: peak exactly 56 GiB (not above)" false
-mcase D34 $S56 137 0 $((70 * G)) keep "LOST P2m2" "memory: peak 70 GiB and exit 137 without oom: a lost -m112 attempt" true
+# Fixtures state both figures: "pilot N MiB" is a VmHWM line in the F4 log (the fixture log's own lines peak at 64 MiB),
+# "cgroup N GiB" is a memory.peak file (or v1 max_usage_in_bytes). The pilot figure is used when present.
+mcase D25 $S56 0 0 - 30720 "ADMITTED P2d" "memory: pilot 30,720 MiB (30 GiB), no cgroup file -> pilot, below 56 GiB"
+mcase D26 $S56 0 0 - 71680 "ADMITTED P2m3" "memory: pilot 71,680 MiB (70 GiB), no cgroup file -> pilot, between 56 and 112 GiB: the cell's -m112 row" true
+mcase D27 $S56 0 0 - 128000 "OOM P2m1" "memory: pilot 128,000 MiB (125 GiB), no cgroup file -> pilot, above 112 GiB: OOM at -m112" true
+mcase D28 $S56 0 0 $((70 * G)) keep "ADMITTED P2d" "memory: pilot 64 MiB and cgroup 70 GiB -> pilot (primary); cgroup ignored"
+mcase D28b $S56 0 0 $((70 * G)) strip "ADMITTED P2m3" "memory: no pilot line, cgroup v2 70 GiB -> cgroup fallback" true cgroup_v2_memory.peak
+mcase D29 $S56 0 0 - strip "NOT_ADMITTED P2u" "memory: no pilot line, no cgroup file -> none" false none
+mcase D30 $S56 0 0 v1:$((60 * G)) strip "ADMITTED P2m3" "memory: no pilot line, cgroup v1 max_usage 60 GiB -> v1 fallback" true cgroup_v1_memory.max_usage_in_bytes
+mcase D31 $S112 0 0 - 115712 "OOM P2p" "memory: -m112 attempt, pilot 115,712 MiB (113 GiB), no cgroup file -> pilot"
+mcase D32 $S112 0 0 - 102400 "ADMITTED P2d" "memory: -m112 attempt, pilot 102,400 MiB (100 GiB), no cgroup file -> pilot"
+mcase D33 $S56 0 0 - 57344 "ADMITTED P2d" "memory: pilot exactly 57,344 MiB (56 GiB, not above), no cgroup file -> pilot"
+mcase D34 $S56 137 0 - 71680 "LOST P2m2" "memory: pilot 70 GiB, exit 137, oom_kill 0 -> pilot: a lost -m112 attempt" true
+mcase D35 $S56 0 0 $((120 * G)) 92160 "ADMITTED P2m3" "memory: cgroup 120 GiB (> 112 GiB) but pilot 92,160 MiB (90 GiB) -> pilot: not OOM, the cell's -m112 row" true
+mcase D35b $S112 0 0 $((120 * G)) 92160 "ADMITTED P2d" "memory: -m112 attempt, cgroup 120 GiB but pilot 90 GiB -> pilot: P2p does not fire"
+mcase D36 $S56 137 1 - 30720 "OOM P2b" "memory: pilot 30 GiB but exit 137 with oom_kill 1 -> OOM whatever the peak"
 nd D24; ck "$DR" $((S0E + 4000)) regular running "$S0" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D24 "LOST P3" "pod no longer listed (deleted outside the route)"
 
 # ===================================================================== E. the registered order (next_allowed)
