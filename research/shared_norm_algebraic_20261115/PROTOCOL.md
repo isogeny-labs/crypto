@@ -104,3 +104,22 @@ source/binary hashes captured before launch. The final cold-002 run used that
 same unchanged final binary and source; retain both its exact input/output
 records and the observed binary digest. Do not repeat the three arity calls.
 This is a custody correction, not a new performance experiment.
+
+## Amendment A4 — witness-pruned encoding controls (04:10 UTC)
+
+Before new backend calls, test the separately selected witness-pruned encoding
+from chart-pruning.md. Keep the original generator/default explicit-chart
+interface and its historical records. With odd characteristic, c!=0 and target
+separation retained, omit only the (U,C) and (U,U') Bezout blocks. Reject c=0
+in this mode. Direct relation checks remain unchanged. The written projection
+argument is not a formal proof or a bound on elimination cost.
+
+Exactly90 m3 model controls, the same3 arity controls from A1, and exactly18
+cold point-only controls may run once with that mode after strict compilation
+and hashes captured before calls. Preserve full inputs, outputs and statuses
+in fresh pruned-001 directories, use the same20s/2GiB caps and quotient128.
+The independent OpenSSL replayer must match complete m3 models and cold traces;
+completed arity models must match the bounded reference. Stop on disagreement,
+keep caps as unknown, and do not adaptively expand the panel. Also require an
+input rejection check for c=0. These are encoding/correctness controls; no
+scientific timing, speedup, fitted exponent or general degree claim is admitted.
