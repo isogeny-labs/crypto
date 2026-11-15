@@ -99,8 +99,9 @@ later admitted cost comparison.
 The owner extended the Conductor exception to native partition-lab edits and
 bounded local correctness experiments. The standalone
 [partition lab](../../tools/aps-partition-lab/README.md) now supplies coloring
-coverage and specialization-feature experiments. Its scope stops before real
-labeled-pool integration and certified F4 trace reuse. Those obligations are
+coverage and specialization-feature experiments, plus a tiny public
+known-label group control. Its scope stops before production APS sampler
+integration and certified F4 trace reuse. Those obligations are
 not replaced with synthetic trace checks. Performance trials still need the
 frozen design, prospective checkpoint and accounting/replay/admission below.
 Register native claims before public citation of resulting observations;

@@ -28,7 +28,8 @@ fn cli_refuses_replacement_and_keeps_unqualified_structural_output() {
     let bytes = fs::read(&out).unwrap();
     let value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
     assert_eq!(value["performance_trial"], false);
-    assert_eq!(value["real_labeled_pool_tested"], false);
+    assert_eq!(value["production_aps_sampler_tested"], false);
+    assert_eq!(value["known_label_group_control_tested"], true);
     assert_eq!(value["f4_trace_reuse_tested"], false);
     assert_eq!(value["execution_attested"], false);
     assert_eq!(value["coloring"].as_array().unwrap().len(), 12);

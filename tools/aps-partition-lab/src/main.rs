@@ -1,4 +1,4 @@
-use aps_partition_lab::{coloring, curve::Curve, signature};
+use aps_partition_lab::{coloring, curve::Curve, labels, signature};
 use serde::Serialize;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -13,12 +13,15 @@ struct Report {
     performance_trial: bool,
     execution_attested: bool,
     signed_standing: &'static str,
-    real_labeled_pool_tested: bool,
+    production_aps_sampler_tested: bool,
+    known_label_group_control_tested: bool,
+    labeled_pool_scope: &'static str,
     f4_trace_reuse_tested: bool,
     maximum_points: usize,
     maximum_colorings: usize,
     coloring: Vec<coloring::Coverage>,
     signatures: Vec<signature::SignatureReport>,
+    labeled_control: Vec<labels::LabelReport>,
 }
 
 fn hex(s: &str, n: usize) -> bool {
@@ -62,12 +65,16 @@ fn run() -> Result<(), String> {
         performance_trial: false,
         execution_attested: false,
         signed_standing: "unverified",
-        real_labeled_pool_tested: false,
+        production_aps_sampler_tested: false,
+        known_label_group_control_tested: true,
+        labeled_pool_scope:
+            "public-known-answer-order-19-fixture-only; production APS sampler not tested",
         f4_trace_reuse_tested: false,
         maximum_points: coloring::MAX_POINTS,
         maximum_colorings: coloring::MAX_FAMILY,
         coloring: cases,
         signatures,
+        labeled_control: vec![labels::experiment(3)?, labels::experiment(4)?],
     };
     let bytes = serde_json::to_vec_pretty(&report).map_err(|e| e.to_string())?;
     // Exclusive creation: a later invocation cannot replace an earlier receipt.

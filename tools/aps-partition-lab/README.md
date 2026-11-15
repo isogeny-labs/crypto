@@ -27,10 +27,18 @@ The source formula is the short-Weierstrass f3 of
 related APS and factor-base work. No novelty claim.
 
 Same-signature/different-root counterexamples are retained when found. The
-feature buckets cannot authorize reuse of numerical roots or a basis. Real
-labeled factor-base sampling, informative-label checks and the existing
-certified F4 trace path are not exercised by this standalone tool. All are
-required next integration steps, rather than mocked successful checks.
+feature buckets cannot authorize reuse of numerical roots or a basis.
+
+An additional tiny known-answer group control constructs points as aG+bQ,
+canonicalizes their signs with the labels, recolors the same point IDs, and
+retains every signed zero relation including B=0. Informative relations must
+pass a separate scalar check. This is an order-19 public fixture, not the
+production APS sampler or a large-curve solve. Recoloring does not inherit
+the original one-point-per-slot informative-label guarantee.
+
+The production APS sampler and existing certified F4 trace path are not
+exercised by this standalone tool. Both remain next integration steps,
+rather than mocked successful checks.
 
 ## Commands
 
