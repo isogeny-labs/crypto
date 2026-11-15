@@ -10,11 +10,11 @@ files are re-included by `../.gitignore`).
 **Runs.** `bash tests/run_tests.sh` from `runpod_capped/` writes nothing in the repository and prints the results;
 `bash tests/run_tests.sh --write` also replaces `tests/out/`, `tests/results.tsv` and this file.
 
-**The image layer.** 46 of the 161 cases (launch, fetch, four reaper cases and five refusals that come after the
+**The image layer.** 46 of the 163 cases (launch, fetch, four reaper cases and five refusals that come after the
 binary check) need the image layer: `RPC_LAYER_SRC` (the layer tarball, SHA-256 `a0f7e28e…`, `image.json`
 `layer.digest`) and `RPC_BIN_SRC` (its `usr/local/bin`; defaults in the session scratchpad). Without them those
-cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 115 results and 46 skips; a run with
-it gives 161 results. The layer is the study layer of the image `image/image.json` names (ECR); fetching it
+cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 117 results and 46 skips; a run with
+it gives 163 results. The layer is the study layer of the image `image/image.json` names (ECR); fetching it
 by digest needs read access to that registry, which this container does not have.
 
 Groups: A refusals before any API call; B launch paths; C `fetch.sh` flows; D the outcome classifier alone
@@ -84,7 +84,7 @@ client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.ts
 | C10 | PASS | pilot exit 137 with cgroup oom_kill 1 | exit 8, OOM P2b | exit 8 OOM P2b |
 | C11 | PASS | pilot exit 137 with oom_kill 0 | exit 8, LOST P2c, relaunch owner | exit 8 LOST P2c owner |
 | C12 | PASS | N2: the two fetches differ while the runner is done (no information) | exit 6, pod kept, collection 1 abandoned, nothing kept | exit 6 |
-| C13 | PASS | N3a: pod gone (not listed, 404) with no RunPod-side status change recorded | exit 0, LOST P3, relaunch owner, cost upper bound | exit 0 LOST P3 owner |
+| C13 | PASS | owner decision 13: pod gone (not listed, GET 404) before any logged session action | exit 0, LOST P3, relaunch auto, cost upper bound | exit 0 LOST P3 auto |
 | C14 | PASS | S1: lastStartedAt changed while the runner reports running under s0 | exit 41, pod kept | exit 41 |
 | C15 | PASS | a failed delete is resumed by the next fetch.sh call | exit 7 (still listed), then exit 0 on the next call | exit 7 then 0 |
 | C16 | PASS | launcher died before start (no start.json, runner idle) | exit 0, NOT_AN_ATTEMPT, receipts -> .prestart-1 | exit 0 |
@@ -120,7 +120,9 @@ client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.ts
 | D21 | PASS | N2: completed in time but the transfer check still failed at the hard deadline | NO_EVIDENCE P7 | NO_EVIDENCE P7 |
 | D22 | PASS | a file of the kept tree changed after collection (rule 6) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
 | D23 | PASS | create response not in the reserved tier (rule 7) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
-| D24 | PASS | N3a: pod missing from the list and GET 404, no status change recorded | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
+| D24 | PASS | owner decision 13: pod gone from the list and GET 404, before any logged session action | LOST P3 relaunch=auto | LOST P3 relaunch=auto |
+| D24c | PASS | pod gone and GET 404 after a logged session delete | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
+| D24d | PASS | pod absent from the list but GET returns a healthy RUNNING record: no loss evidence, wait | PENDING P8 | PENDING P8 |
 | D24b | PASS | S6: missing from the list but GET unreadable (not corroborated) | PENDING P8 | PENDING P8 |
 | D25 | PASS | memory: pilot 30,720 MiB (30 GiB), no cgroup file -> pilot, below 56 GiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB |
 | D26 | PASS | memory: pilot 71,680 MiB (70 GiB), no cgroup file -> pilot, between 56 and 112 GiB, oversize false: the cell's -m112 row | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB |
@@ -187,4 +189,4 @@ client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.ts
 | G-curl_stub.sh | PASS | syntax of tests/curl_stub.sh | bash -n ok | rc 0 |
 | G-pin | PASS | pinned client copy unchanged | rp_pinned.sh sha256 b4b60199... | b4b60199 |
 
-Summary of this run (image layer available: 1): 161 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-15T01:44:38Z).
+Summary of this run (image layer available: 1): 163 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-15T01:50:38Z).

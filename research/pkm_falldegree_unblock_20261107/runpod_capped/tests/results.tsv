@@ -58,7 +58,7 @@ C09	PASS	exit 8 (upload wait), LIMIT P2a	exit 8 LIMIT P2a	runner done 90,050 s a
 C10	PASS	exit 8, OOM P2b	exit 8 OOM P2b	pilot exit 137 with cgroup oom_kill 1
 C11	PASS	exit 8, LOST P2c, relaunch owner	exit 8 LOST P2c owner	pilot exit 137 with oom_kill 0
 C12	PASS	exit 6, pod kept, collection 1 abandoned, nothing kept	exit 6	N2: the two fetches differ while the runner is done (no information)
-C13	PASS	exit 0, LOST P3, relaunch owner, cost upper bound	exit 0 LOST P3 owner	N3a: pod gone (not listed, 404) with no RunPod-side status change recorded
+C13	PASS	exit 0, LOST P3, relaunch auto, cost upper bound	exit 0 LOST P3 auto	owner decision 13: pod gone (not listed, GET 404) before any logged session action
 C14	PASS	exit 41, pod kept	exit 41	S1: lastStartedAt changed while the runner reports running under s0
 C15	PASS	exit 7 (still listed), then exit 0 on the next call	exit 7 then 0	a failed delete is resumed by the next fetch.sh call
 C16	PASS	exit 0, NOT_AN_ATTEMPT, receipts -> .prestart-1	exit 0	launcher died before start (no start.json, runner idle)
@@ -94,7 +94,9 @@ D20	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	the runner's start differ
 D21	PASS	NO_EVIDENCE P7	NO_EVIDENCE P7	N2: completed in time but the transfer check still failed at the hard deadline
 D22	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	a file of the kept tree changed after collection (rule 6)
 D23	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	create response not in the reserved tier (rule 7)
-D24	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	N3a: pod missing from the list and GET 404, no status change recorded
+D24	PASS	LOST P3 relaunch=auto	LOST P3 relaunch=auto	owner decision 13: pod gone from the list and GET 404, before any logged session action
+D24c	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	pod gone and GET 404 after a logged session delete
+D24d	PASS	PENDING P8	PENDING P8	pod absent from the list but GET returns a healthy RUNNING record: no loss evidence, wait
 D24b	PASS	PENDING P8	PENDING P8	S6: missing from the list but GET unreadable (not corroborated)
 D25	PASS	ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB	ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB	memory: pilot 30,720 MiB (30 GiB), no cgroup file -> pilot, below 56 GiB
 D26	PASS	ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB	ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB	memory: pilot 71,680 MiB (70 GiB), no cgroup file -> pilot, between 56 and 112 GiB, oversize false: the cell's -m112 row
