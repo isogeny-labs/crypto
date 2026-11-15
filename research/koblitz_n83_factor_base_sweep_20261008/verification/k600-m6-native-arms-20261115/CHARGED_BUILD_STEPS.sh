@@ -33,7 +33,7 @@ case "$mode" in
       -DCMAKE_INSTALL_PREFIX="$out/solver-install" \
       -DFETCHCONTENT_SOURCE_DIR_CADICAL="$out/cadical-source" \
       -DFETCHCONTENT_SOURCE_DIR_CADIBACK="$out/cadiback-source" \
-      -DNOBREAKID=ON -DNOMPI=ON -DSTATIC_BINARY=ON
+      -DNOBREAKID=ON -DNOMPI=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_BINARY=ON
     cmake --build "$out/solver-build" --parallel 1
     cmake --install "$out/solver-build"
     install -m 755 "$out/solver-install/bin/cryptominisat5" "$out/solver"
