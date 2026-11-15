@@ -133,3 +133,21 @@ Publish source/protocol/pins and fresh clean-head receipt, then actual600s bound
 ### Errors
 
 Default sandbox public HTTPS could not reach managed proxy; approved same-destination outer request succeeded, with inherited proxy/CA unchanged. Public Git dependency fetch works; no AWS/auth probes or secret reads. Earlier Mathlib cache source is not substituted: exact old pin verified, source Git diff unchanged. No current toolchain availability block remains and no repeated upload approval is requested. [pcc:unverified]
+
+## 2026-11-15T06:50Z — first real chord Lean gate rejected diagonal tactic
+
+### What was done
+
+Published d72c01e8 before affected data; restored pinned dependencies and used the exact current unmodified official gate under600s. First actual target gate exits1/FAIL_build: diagonal_quadratic line46 ring normalization cannot simplify2 inverse under h2. The build log prints sorryAx only for the FAILED diagonal declaration; that output is UNACCEPTED. Whole5-statement proof source has NOT passed. Other7 planned gate stages never started, not fictitious passes. Exact original source/log/command/exit/status remain /workspace/twist-chord-kernel-run01-20261115 and original source snapshot is preserved as failed-sources/Chord-v1.lean.txt. [pcc:unverified]
+
+### Decisions made
+
+Change only denominator-clearing tactics: field_simp[h2] before linear_combination, using the EXISTING2nonzero hypothesis. No statement/hypothesis/definition change or new assumption. Preserve original failed source/protocol/controls; regenerate separately versioned five false-statement source fixtures from the corrected base, so rejection cannot be caused merely by the old legitimate diagonal tactic bug. Checkpoint revised source and a new pre-data protocol before the full eight-gate replication. [pcc:unverified]
+
+### Open threads
+
+Actual corrected elaboration and transitive-axiom audit, then meaningful false-source controls. No signed PCC/new IDC1/group-coverage/minimum-degree/speed conclusion. Same focused proof window<=3600s from first gate, stage600/two local threads. No paid/upload/token request; source publication remains authorized, all raw result assets stay local. [pcc:unverified]
+
+### Errors
+
+Initial proof-protocol schema had16 findings for8 build strings and numeric flag values; exact initial JSON retained, corrected metadata types before freeze. First REAL proof failure is a denominator tactic error, not cache/auth failure or a mathematical counterexample. No gate/axiom/trust-manifest patch, source weakening, admitted proof or forged success. [pcc:unverified]

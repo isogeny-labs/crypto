@@ -43,9 +43,10 @@ theorem diagonal_quadratic (s p : K) (h2 : (2:K)≠0) :
   unfold quad
   constructor
   · intro h
-    linear_combination -4*h
+    field_simp [h2] at h
+    linear_combination -h
   · intro h
-    field_simp
+    field_simp [h2]
     linear_combination -h
 
 #print axioms curve_line
