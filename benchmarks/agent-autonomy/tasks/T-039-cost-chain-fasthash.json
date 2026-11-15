@@ -1,0 +1,40 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-039",
+  "title": "Apply the cost-chain rule to the fasthash CPU-time claim",
+  "class": "research",
+  "difficulty": 3,
+  "source": [
+    "AGENTS.md sections 3, 3a and 6",
+    "research/ic_gw_fasthash_20261114/README.md",
+    "research/ic_gw_fasthash_20261114/PROTOCOL.md",
+    "research/ic_gw_fasthash_20261114/analysis.json"
+  ],
+  "prompt": "The research-kb server may be unreachable in this environment; if so, record that under 'Sources checked' and use the repository's own files. Every number you report is an unverified assertion unless a pcc claim says otherwise; tag it. Apply AGENTS.md section 3a to the fasthash study in `research/ic_gw_fasthash_20261114/` (arms HASH and COMBO against REF, primary metric relations-phase CPU at identical counted work). Write `$T_OUT/cost-chain-fasthash.md`: the chain, RESTRUCTURE and REPLACE lines, the section 3 class with the reason, what the A/A floor does to the HASH verdict, and why the counted M-eq and the gap to the matched rho do not move. Do not claim a leaderboard change. Do not edit the study. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout; no fixture.",
+  "acceptance": [
+    "$T_OUT/cost-chain-fasthash.md has RESTRUCTURE and REPLACE lines and one 'Class:' line",
+    "mentions HASH, COMBO, A/A, NOT SUPPORTED and SUPPORTED",
+    "states that no leaderboard or benchmarks row moves",
+    "carries [pcc:unverified], passes lint-prose, has 'Sources checked'",
+    "research/ic_gw_fasthash_20261114 unchanged"
+  ],
+  "check_command": "F=\"$T_OUT/cost-chain-fasthash.md\"; grep -q '^RESTRUCTURE' \"$F\" && grep -q '^REPLACE' \"$F\" && [ \"$(grep -cE '^Class: *(advance|engineering|relabelling|accounting)\\b' \"$F\")\" = 1 ] && grep -q 'HASH' \"$F\" && grep -q 'COMBO' \"$F\" && grep -q 'A/A' \"$F\" && grep -q 'NOT SUPPORTED' \"$F\" && grep -qi 'leaderboard' \"$F\" && grep -q 'pcc:unverified' \"$F\" && grep -qi 'sources checked' \"$F\" && python3 tools/pcc/pcc.py lint-prose \"$F\" && git diff --quiet \"$T_BASE\" HEAD -- research/ic_gw_fasthash_20261114",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "citing a result as verified without a pcc claim id (use [pcc:unverified])",
+    "editing the study or evidence you are checking",
+    "inventing a source id, claim id or number",
+    "a RESTRUCTURE line that changes the total"
+  ],
+  "max_wall_minutes": 50,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Format gate only; class and chain judged by the validator."
+}

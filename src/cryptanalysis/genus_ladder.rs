@@ -51,9 +51,12 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    addm, build_rows, mulmod, peel, split_order, subm, wiedemann, Dsu, Nat, Rel, REL_FB,
+    addm, build_rows, combine, mulmod, peel, split_order, subm, wiedemann, Dsu, Nat, Rel, Row,
+    REL_FB,
 };
-use super::ic_boundary::{rho_reference_walk, CountedGroup, GroupOps, RhoWalk};
+use super::ic_boundary::{
+    invmod, pivot_inversion_steps, rho_reference_walk, CountedGroup, GroupOps, RhoWalk,
+};
 use super::residual_walk::{is_prime_u64, mix64};
 
 /// Largest genus the fixed arrays hold.
@@ -1197,6 +1200,9 @@ pub struct IcParams {
     pub prefilter: bool,
     /// Check every accepted relation by group arithmetic (tests only).
     pub verify_relations: bool,
+    /// Structured Gaussian elimination between the peel and Wiedemann
+    /// ([`SgeParams`]); `None` is the frozen instrument, count for count.
+    pub sge: Option<SgeParams>,
 }
 
 /// Double-large-prime base size `ceil(c · p^{1 − 1/g})` (Gaudry, Thomé,
@@ -1227,6 +1233,10 @@ pub struct IcResult {
     pub la_graph: Nat,
     pub la_peel: Nat,
     pub la_wied: Nat,
+    /// The merge stage ([`SgeParams`]); zero without it.  Included in `la`.
+    pub la_sge: Nat,
+    /// What the merge did to the core of the last attempt (zero without it).
+    pub sge: SgeStats,
     pub fb_cols: usize,
     pub trials: u64,
     /// Trials of full degree that reached the smoothness decision.
@@ -1479,11 +1489,25 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
         }
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
-        let sol = wiedemann(&core, cc, r, &mut rng, dense, &mut w_nat);
+        let sol = match prm.sge {
+            None => wiedemann(&core, cc, r, &mut rng, dense, &mut w_nat).map(|x| x[ct as usize]),
+            Some(sp) => {
+                let mut s_nat = Nat::default();
+                let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+                res.la_sge.merge(s_nat);
+                res.la.merge(s_nat);
+                res.sge = st;
+                // The merged system is solved with a copy of the stream; the
+                // stream itself advances as the unmerged solve would, so a
+                // failed attempt resumes the relation phase identically.
+                let mut wrng = rng.clone();
+                skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
+            }
+        };
         res.la_wied.merge(w_nat);
         res.la.merge(w_nat);
-        if let Some(x) = sol {
-            let t = x[ct as usize];
+        if let Some(t) = sol {
             let v0 = ops.adds + ops.doubles;
             let chk = curve.mul(&mut ops, inst.g, t);
             res.verify_ops = ops.adds + ops.doubles - v0;
@@ -1514,6 +1538,351 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
     }
     res.wall_ns = start.elapsed().as_nanos() as u64;
     res
+}
+
+// ── structured Gaussian elimination before Wiedemann ────────────────────
+
+/// Structured Gaussian elimination (filtering, as in NFS linear algebra)
+/// between the peel and Wiedemann: columns of weight `2, 3, …, w_max` are
+/// merged away while the non-zeros stay within `fill_max` times the peeled
+/// core's.  See [`sge_reduce`].
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SgeParams {
+    pub w_max: usize,
+    pub fill_max: f64,
+}
+
+/// What the merge did to the last core it reduced.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct SgeStats {
+    pub rows_in: usize,
+    pub cols_in: usize,
+    pub nnz_in: usize,
+    /// Entries that are not `±1` (each costs a multiplication per matrix
+    /// product in Wiedemann; a `±1` entry costs an addition).
+    pub generic_in: usize,
+    pub rows_out: usize,
+    pub cols_out: usize,
+    pub nnz_out: usize,
+    pub generic_out: usize,
+    /// Columns eliminated by a merge (one pivot row each).
+    pub merged: usize,
+    /// Columns of weight one removed with their row (no arithmetic).
+    pub peeled: usize,
+    /// Rows that became empty, and duplicate rows, removed.
+    pub empty: usize,
+    pub duplicates: usize,
+    /// Merges refused because the fill bound would have been passed.
+    pub refused: usize,
+}
+
+#[inline]
+fn is_unit(v: u64, r: u64) -> bool {
+    v == 1 || v == r - 1
+}
+
+fn coef_at(t: &[(u32, u64)], c: u32) -> Option<u64> {
+    t.binary_search_by_key(&c, |x| x.0).ok().map(|i| t[i].1)
+}
+
+/// Column state of [`sge_reduce`]: weights, the rows that may hold each
+/// column (stale ids are filtered on use), and the queue by weight.
+struct SgeCols {
+    w: Vec<usize>,
+    rows: Vec<Vec<u32>>,
+    heap: std::collections::BinaryHeap<std::cmp::Reverse<(usize, u32)>>,
+    tcol: u32,
+    w_max: usize,
+}
+
+impl SgeCols {
+    /// Row `i` changes from `old` to `new`: weights out and in, holders and
+    /// queue updated; one addition of bookkeeping per entry visited.
+    fn reweigh(&mut self, old: &[(u32, u64)], new: &[(u32, u64)], i: u32, nat: &mut Nat) {
+        let (mut a, mut b) = (0, 0);
+        while a < old.len() || b < new.len() {
+            nat.add += 1;
+            let c = if b == new.len() || (a < old.len() && old[a].0 < new[b].0) {
+                let c = old[a].0;
+                self.w[c as usize] -= 1;
+                a += 1;
+                c
+            } else if a == old.len() || new[b].0 < old[a].0 {
+                let c = new[b].0;
+                self.w[c as usize] += 1;
+                self.rows[c as usize].push(i);
+                b += 1;
+                c
+            } else {
+                a += 1;
+                b += 1;
+                continue;
+            };
+            if c != self.tcol && self.w[c as usize] <= self.w_max {
+                self.heap.push(std::cmp::Reverse((self.w[c as usize], c)));
+            }
+        }
+    }
+}
+
+/// Structured Gaussian elimination of `rows` (columns `0..ncols`, the
+/// unknown `t` in column `tcol`, never eliminated).
+///
+/// Repeatedly takes the live column of least weight `w ≤ w_max` (ties: the
+/// lower index).  Weight 0: dropped.  Weight 1: the column and its row are
+/// removed (a peel; no arithmetic).  Weight `w ≥ 2`: the shortest row holding
+/// the column (ties: a `±1` coefficient first) is the pivot; every other row
+/// holding the column becomes `row − (a_i / a_p)·pivot`, and the pivot row
+/// and the column leave the system.  A merge is refused when its worst-case
+/// fill (no cancellation: `(w − 1)(len_p − 2) − len_p` new non-zeros) would
+/// take the non-zeros past `fill_max` times the start.  Afterwards empty and
+/// duplicate rows are dropped and the columns renumbered densely, `t` last.
+///
+/// Every eliminated variable is determined by its pivot row from variables
+/// that stay or were eliminated later, so a full-column-rank system stays of
+/// full column rank and `t` keeps its value; the pivot rows are not needed
+/// because the solver wants `t` only (no back substitution).
+///
+/// Counting, in the convention of `ic_control` (`combine`, `mat_vec`): a
+/// product with a `±1` factor is free, any other modular product is one
+/// multiplication; an inversion of a pivot coefficient other than `±1` costs
+/// `pivot_inversion_steps(r)` multiplications; `combine` charges one
+/// addition per entry of both operands; the right-hand side one
+/// multiplication (unless the multiplier is `±1`) and one addition per
+/// merged row; the index bookkeeping one addition per entry touched, as
+/// `peel` does.
+fn sge_reduce(
+    rows: &[Row],
+    ncols: usize,
+    tcol: u32,
+    r: u64,
+    prm: SgeParams,
+    nat: &mut Nat,
+) -> (Vec<Row>, usize, u32, SgeStats) {
+    use std::cmp::Reverse;
+    use std::collections::BinaryHeap;
+
+    let mut st = SgeStats {
+        rows_in: rows.len(),
+        cols_in: ncols,
+        ..Default::default()
+    };
+    let mut rws: Vec<Row> = rows.to_vec();
+    let mut alive = vec![true; rws.len()];
+    let mut cs = SgeCols {
+        w: vec![0usize; ncols],
+        rows: vec![Vec::new(); ncols],
+        heap: BinaryHeap::new(),
+        tcol,
+        w_max: prm.w_max,
+    };
+    let mut nnz = 0usize;
+    for (i, (t, _)) in rws.iter().enumerate() {
+        for &(c, v) in t {
+            cs.rows[c as usize].push(i as u32);
+            cs.w[c as usize] += 1;
+            st.generic_in += usize::from(!is_unit(v, r));
+            nat.add += 1;
+        }
+        nnz += t.len();
+    }
+    st.nnz_in = nnz;
+    let limit = (prm.fill_max * nnz as f64).floor() as usize;
+    let mut dead = vec![false; ncols];
+    for c in 0..ncols as u32 {
+        if c != tcol && cs.w[c as usize] <= prm.w_max {
+            cs.heap.push(Reverse((cs.w[c as usize], c)));
+        }
+    }
+
+    while let Some(Reverse((wc, c))) = cs.heap.pop() {
+        let cu = c as usize;
+        if dead[cu] || cs.w[cu] != wc {
+            continue;
+        }
+        if wc == 0 {
+            dead[cu] = true;
+            continue;
+        }
+        // live rows holding c
+        let mut holders: Vec<u32> = Vec::with_capacity(wc);
+        cs.rows[cu].retain(|&i| alive[i as usize] && coef_at(&rws[i as usize].0, c).is_some());
+        cs.rows[cu].sort_unstable();
+        cs.rows[cu].dedup();
+        holders.extend_from_slice(&cs.rows[cu]);
+        nat.add += holders.len() as u64;
+        debug_assert_eq!(holders.len(), wc, "column weight bookkeeping");
+        if wc == 1 {
+            let i = holders[0];
+            let old = std::mem::take(&mut rws[i as usize].0);
+            alive[i as usize] = false;
+            nnz -= old.len();
+            cs.reweigh(&old, &[], i, nat);
+            dead[cu] = true;
+            st.peeled += 1;
+            continue;
+        }
+        let &piv = holders
+            .iter()
+            .min_by_key(|&&i| {
+                let t = &rws[i as usize].0;
+                let a = coef_at(t, c).expect("holder");
+                (t.len(), !is_unit(a, r), i)
+            })
+            .expect("weight at least 2");
+        let lp = rws[piv as usize].0.len();
+        let grow = (wc - 1) as isize * (lp as isize - 2) - lp as isize;
+        if nnz as isize + grow > limit as isize {
+            st.refused += 1;
+            continue;
+        }
+        let (pt, prhs) = {
+            let (t, b) = &rws[piv as usize];
+            (t.clone(), *b)
+        };
+        let ap = coef_at(&pt, c).expect("pivot holds c");
+        // ip = 1 / a_p
+        let ip = if is_unit(ap, r) {
+            ap
+        } else {
+            nat.mul += pivot_inversion_steps(r);
+            invmod(ap, r).expect("r is prime")
+        };
+        for &i in &holders {
+            if i == piv {
+                continue;
+            }
+            let (old, rhs) = {
+                let (t, b) = &rws[i as usize];
+                (t.clone(), *b)
+            };
+            let ai = coef_at(&old, c).expect("holder");
+            // m = a_i / a_p
+            let m = if ap == 1 {
+                ai
+            } else if ap == r - 1 {
+                subm(0, ai, r)
+            } else if is_unit(ai, r) {
+                if ai == 1 {
+                    ip
+                } else {
+                    subm(0, ip, r)
+                }
+            } else {
+                nat.mul += 1;
+                mulmod(ai, ip, r)
+            };
+            let (new, nrhs) = if m == 1 {
+                nat.add += 1;
+                (combine(&old, false, &pt, true, r, nat), subm(rhs, prhs, r))
+            } else if m == r - 1 {
+                nat.add += 1;
+                (combine(&old, false, &pt, false, r, nat), addm(rhs, prhs, r))
+            } else {
+                let scaled: Vec<(u32, u64)> = pt
+                    .iter()
+                    .map(|&(cc, v)| {
+                        let s = if v == 1 {
+                            m
+                        } else if v == r - 1 {
+                            subm(0, m, r)
+                        } else {
+                            nat.mul += 1;
+                            mulmod(v, m, r)
+                        };
+                        (cc, s)
+                    })
+                    .collect();
+                nat.mul += 1;
+                nat.add += 1;
+                (
+                    combine(&old, false, &scaled, true, r, nat),
+                    subm(rhs, mulmod(m, prhs, r), r),
+                )
+            };
+            debug_assert!(coef_at(&new, c).is_none(), "the pivot column cancels");
+            nnz = nnz + new.len() - old.len();
+            cs.reweigh(&old, &new, i, nat);
+            if new.is_empty() {
+                alive[i as usize] = false;
+                st.empty += 1;
+            }
+            rws[i as usize] = (new, nrhs);
+        }
+        alive[piv as usize] = false;
+        nnz -= lp;
+        let old = std::mem::take(&mut rws[piv as usize].0);
+        cs.reweigh(&old, &[], piv, nat);
+        dead[cu] = true;
+        st.merged += 1;
+    }
+
+    // duplicates (same entries and right-hand side), first occurrence kept
+    let mut seen: std::collections::HashSet<Row> = std::collections::HashSet::new();
+    let mut kept: Vec<Row> = Vec::new();
+    for (i, row) in rws.into_iter().enumerate() {
+        if !alive[i] {
+            continue;
+        }
+        nat.add += row.0.len() as u64;
+        if !seen.insert(row.clone()) {
+            st.duplicates += 1;
+            continue;
+        }
+        kept.push(row);
+    }
+    // dense renumbering, t last
+    let mut wt = vec![0usize; ncols];
+    for (t, _) in &kept {
+        for &(c, _) in t {
+            wt[c as usize] += 1;
+        }
+    }
+    let mut map = vec![u32::MAX; ncols];
+    let mut n = 0u32;
+    for c in 0..ncols {
+        if c as u32 != tcol && wt[c] > 0 {
+            map[c] = n;
+            n += 1;
+        }
+    }
+    map[tcol as usize] = n;
+    let out: Vec<Row> = kept
+        .into_iter()
+        .map(|(t, b)| {
+            let mut nt: Vec<(u32, u64)> = t.iter().map(|&(c, v)| (map[c as usize], v)).collect();
+            nt.sort_unstable_by_key(|x| x.0);
+            (nt, b)
+        })
+        .collect();
+    st.rows_out = out.len();
+    st.cols_out = n as usize + 1;
+    st.nnz_out = out.iter().map(|(t, _)| t.len()).sum();
+    st.generic_out = out
+        .iter()
+        .flat_map(|(t, _)| t.iter())
+        .filter(|&&(_, v)| !is_unit(v, r))
+        .count();
+    (out, n as usize + 1, n, st)
+}
+
+/// Advance `rng` exactly as `wiedemann` on an `nr × ncols` system would, so
+/// that the relation phase after a failed attempt draws the same stream with
+/// and without the merge (the merged system is solved with a copy).
+fn skip_wiedemann_draws(rng: &mut StdRng, nr: usize, ncols: usize, r: u64, dense_u: bool) {
+    for _ in 0..nr {
+        let _: u64 = rng.gen_range(1..r);
+    }
+    if dense_u || ncols <= 16 {
+        for _ in 0..ncols {
+            let _: u64 = rng.gen_range(1..r);
+        }
+    } else {
+        for _ in 0..16 {
+            let _: usize = rng.gen_range(0..ncols);
+            let _: u64 = rng.gen_range(1..r);
+        }
+    }
 }
 
 // ── rho ─────────────────────────────────────────────────────────────────
@@ -1874,6 +2243,253 @@ mod tests {
         }
     }
 
+    fn prm(p: u64, g: u32, arm: Arm, prefilter: bool, sge: Option<SgeParams>) -> IcParams {
+        IcParams {
+            arm,
+            nb: fb_size_2lp(p, g, 2.0),
+            seed: 5,
+            max_trials: 5_000_000,
+            restart: RESTART,
+            prefilter,
+            verify_relations: false,
+            sge,
+        }
+    }
+
+    /// `sge: None` is the frozen instrument: these counts were recorded from
+    /// the source before the merge stage existed (2026-11-15) and must not
+    /// move.  Fields: trials, relations, rel.mul, rel.add, cantor_mul,
+    /// la.mul, la.add, la_wied.mul, core_rows, core_cols, recovered.
+    #[test]
+    fn sge_none_reproduces_frozen_counts() {
+        #[rustfmt::skip]
+        let gold: [(u64, u32, Arm, bool, u64, u64, u64, u64, u64, u64, u64, u64, usize, usize, u64); 16] = [
+            (131, 2, Arm::Full, false, 145, 75, 17029, 14414, 59514, 19741, 36136, 19741, 72, 28, 2418),
+            (131, 2, Arm::Full, true, 145, 75, 11374, 8034, 59514, 19741, 36136, 19741, 72, 28, 2418),
+            (131, 2, Arm::DoubleLp, false, 99, 53, 11419, 9628, 55474, 2645, 3352, 2645, 32, 8, 2418),
+            (131, 2, Arm::DoubleLp, true, 99, 53, 7558, 5272, 55474, 2645, 3352, 2645, 32, 8, 2418),
+            (67, 3, Arm::Full, false, 4272, 39, 419722, 417673, 945740, 11597, 25023, 11597, 36, 27, 5447),
+            (67, 3, Arm::Full, true, 4272, 39, 323304, 275525, 945740, 11597, 25023, 11597, 36, 27, 5447),
+            (67, 3, Arm::DoubleLp, false, 4272, 39, 419722, 417673, 945740, 11597, 25023, 11597, 36, 27, 5447),
+            (67, 3, Arm::DoubleLp, true, 4272, 39, 323304, 275525, 945740, 11597, 25023, 11597, 36, 27, 5447),
+            (67, 4, Arm::Full, false, 1945, 39, 357024, 353828, 992336, 15695, 38397, 15695, 38, 30, 380849),
+            (67, 4, Arm::Full, true, 1945, 39, 241824, 202296, 992336, 15695, 38397, 15695, 38, 30, 380849),
+            (67, 4, Arm::DoubleLp, false, 1945, 39, 357024, 353828, 992336, 15695, 38397, 15695, 38, 30, 380849),
+            (67, 4, Arm::DoubleLp, true, 1945, 39, 241824, 202296, 992336, 15695, 38397, 15695, 38, 30, 380849),
+            (43, 5, Arm::Full, false, 2597, 35, 632387, 628324, 2205323, 13390, 37575, 13390, 35, 27, 15903666),
+            (43, 5, Arm::Full, true, 2597, 35, 448821, 371486, 2205323, 13390, 37575, 13390, 35, 27, 15903666),
+            (43, 5, Arm::DoubleLp, false, 2597, 35, 632387, 628324, 2205323, 13390, 37575, 13390, 35, 27, 15903666),
+            (43, 5, Arm::DoubleLp, true, 2597, 35, 448821, 371486, 2205323, 13390, 37575, 13390, 35, 27, 15903666),
+        ];
+        let mut insts: HashMap<(u64, u32), Instance> = HashMap::new();
+        for &(p, g, arm, pre, tr, rl, rm, ra, cm, lm, la, lw, cr, cc, t) in &gold {
+            let inst = insts.entry((p, g)).or_insert_with(|| first_instance(p, g));
+            let o = run_ic(inst, prm(p, g, arm, pre, None));
+            let got = (
+                o.trials,
+                o.relations,
+                o.rel.mul,
+                o.rel.add,
+                o.cantor_mul,
+                o.la.mul,
+                o.la.add,
+                o.la_wied.mul,
+                o.core_rows,
+                o.core_cols,
+                o.recovered,
+            );
+            assert_eq!(
+                got,
+                (tr, rl, rm, ra, cm, lm, la, lw, cr, cc, Some(t)),
+                "p = {p} g = {g} {arm:?} pre = {pre}"
+            );
+            assert!(o.certified);
+            assert_eq!(o.la_sge, Nat::default());
+            assert_eq!(o.sge, SgeStats::default());
+        }
+    }
+
+    /// With the merge the relation phase is identical, only the linear
+    /// algebra changes, and the run certifies with the same `t`.
+    #[test]
+    fn sge_keeps_relation_phase_and_t() {
+        let settings = [
+            SgeParams {
+                w_max: 2,
+                fill_max: 3.0,
+            },
+            SgeParams {
+                w_max: 4,
+                fill_max: 3.0,
+            },
+            SgeParams {
+                w_max: 8,
+                fill_max: 3.0,
+            },
+            SgeParams {
+                w_max: 8,
+                fill_max: 1.0,
+            },
+        ];
+        let mut reduced_some = false;
+        for (p, g) in [
+            (131u64, 2u32),
+            (67, 3),
+            (67, 4),
+            (43, 5),
+            (257, 3),
+            (131, 4),
+        ] {
+            let inst = first_instance(p, g);
+            for arm in [Arm::Full, Arm::DoubleLp] {
+                let off = run_ic(&inst, prm(p, g, arm, true, None));
+                assert!(off.certified);
+                for sp in settings {
+                    let on = run_ic(&inst, prm(p, g, arm, true, Some(sp)));
+                    let tag = format!("p = {p} g = {g} {arm:?} {sp:?}");
+                    assert!(on.certified, "{tag}");
+                    assert_eq!(on.recovered, off.recovered, "{tag}");
+                    assert_eq!(on.recovered, Some(inst.t_secret), "{tag}");
+                    assert_eq!(on.trials, off.trials, "{tag}");
+                    assert_eq!(on.candidates, off.candidates, "{tag}");
+                    assert_eq!(on.splits, off.splits, "{tag}");
+                    assert_eq!(on.relations, off.relations, "{tag}");
+                    assert_eq!(on.rels_by_lp, off.rels_by_lp, "{tag}");
+                    assert_eq!(on.rel, off.rel, "{tag}");
+                    assert_eq!(on.group_ops(), off.group_ops(), "{tag}");
+                    assert_eq!(on.cantor_mul, off.cantor_mul, "{tag}");
+                    assert_eq!(on.cantor_inv, off.cantor_inv, "{tag}");
+                    assert_eq!(on.attempts, off.attempts, "{tag}");
+                    assert_eq!(on.la_graph, off.la_graph, "{tag}");
+                    assert_eq!(on.la_peel, off.la_peel, "{tag}");
+                    assert_eq!((on.core_rows, on.core_cols), (off.core_rows, off.core_cols));
+                    assert_eq!(on.sge.rows_in, on.core_rows, "{tag}");
+                    assert_eq!(on.sge.cols_in, on.core_cols, "{tag}");
+                    assert!(on.sge.nnz_out as f64 <= sp.fill_max * on.sge.nnz_in as f64 + 1e-9);
+                    assert_eq!(
+                        on.la,
+                        Nat {
+                            mul: on.la_graph.mul + on.la_peel.mul + on.la_sge.mul + on.la_wied.mul,
+                            add: on.la_graph.add
+                                + on.la_peel.add
+                                + on.la_sge.add
+                                + on.la_wied.add
+                                + (off.la.add
+                                    - off.la_graph.add
+                                    - off.la_peel.add
+                                    - off.la_wied.add),
+                        },
+                        "{tag}"
+                    );
+                    if on.sge.cols_out < on.sge.cols_in {
+                        reduced_some = true;
+                    }
+                }
+            }
+        }
+        assert!(reduced_some, "the merge never removed a column");
+    }
+
+    /// The stream skip advances the generator exactly as `wiedemann` does.
+    #[test]
+    fn skip_draws_match_wiedemann() {
+        let r = 1_000_003u64;
+        for (nrow, ncol, dense) in [(30usize, 20usize, false), (30, 20, true), (12, 10, false)] {
+            let mut st = 77u64;
+            let rows: Vec<Row> = (0..nrow)
+                .map(|_| {
+                    let mut t: Vec<(u32, u64)> = (0..3)
+                        .map(|_| {
+                            st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+                            (
+                                (mix64(st) % ncol as u64) as u32,
+                                1 + mix64(st ^ 9) % (r - 1),
+                            )
+                        })
+                        .collect();
+                    t.sort_unstable_by_key(|x| x.0);
+                    t.dedup_by_key(|x| x.0);
+                    (t, 1)
+                })
+                .collect();
+            let mut a = StdRng::seed_from_u64(3);
+            let mut b = a.clone();
+            let mut nat = Nat::default();
+            let _ = wiedemann(&rows, ncol, r, &mut a, dense, &mut nat);
+            skip_wiedemann_draws(&mut b, nrow, ncol, r, dense);
+            assert_eq!(a.gen::<u64>(), b.gen::<u64>());
+        }
+    }
+
+    /// On a random sparse system with general coefficients, the merged
+    /// system has the same `t`, and its counts are charged.
+    #[test]
+    fn sge_preserves_t_on_random_systems() {
+        let r = 1_000_000_007u64;
+        // Sparse enough that columns of weight 2 and 3 exist.
+        let (nrow, ncol) = (60usize, 41usize);
+        let tcol = (ncol - 1) as u32;
+        let mut st = 5u64;
+        let mut next = || {
+            st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            mix64(st)
+        };
+        for trial in 0..6 {
+            let x: Vec<u64> = (0..ncol).map(|_| next() % r).collect();
+            let rows: Vec<Row> = (0..nrow)
+                .map(|_| {
+                    let k = 2 + next() % 2;
+                    let mut t: Vec<(u32, u64)> = (0..k)
+                        .map(|_| {
+                            let c = (next() % (ncol as u64 - 1)) as u32;
+                            let v = match next() % 4 {
+                                0 => r - 1,
+                                1 | 2 => 1,
+                                _ => 1 + next() % (r - 1),
+                            };
+                            (c, v)
+                        })
+                        .collect();
+                    t.push((tcol, 1 + next() % (r - 1)));
+                    t.sort_unstable_by_key(|e| e.0);
+                    t.dedup_by_key(|e| e.0);
+                    let rhs = t
+                        .iter()
+                        .fold(0, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+                    (t, rhs)
+                })
+                .collect();
+            for sp in [
+                SgeParams {
+                    w_max: 3,
+                    fill_max: 2.0,
+                },
+                SgeParams {
+                    w_max: 10,
+                    fill_max: 4.0,
+                },
+            ] {
+                let mut nat = Nat::default();
+                let (red, rc, rt, s) = sge_reduce(&rows, ncol, tcol, r, sp, &mut nat);
+                assert!(s.merged > 0 && nat.add > 0, "trial {trial} {s:?}");
+                assert_eq!(s.rows_out, red.len());
+                assert!(s.cols_out < ncol);
+                assert_eq!(
+                    s.rows_in - s.rows_out,
+                    s.merged + s.peeled + s.empty + s.duplicates
+                );
+                let mut rng = StdRng::seed_from_u64(trial);
+                let mut wn = Nat::default();
+                let sol = wiedemann(&red, rc, r, &mut rng, false, &mut wn);
+                assert_eq!(
+                    sol.map(|v| v[rt as usize]),
+                    Some(x[tcol as usize]),
+                    "trial {trial} {sp:?}"
+                );
+            }
+        }
+    }
+
     /// Every arm recovers the planted logarithm at every genus; the prefilter
     /// changes the native count and nothing else.
     #[test]
@@ -1890,6 +2506,7 @@ mod tests {
                     restart: RESTART,
                     prefilter,
                     verify_relations: verify,
+                    sge: None,
                 };
                 let chk = run_ic(&inst, mk(false, true));
                 assert!(chk.certified, "{arm:?} p = {p} g = {g}");
