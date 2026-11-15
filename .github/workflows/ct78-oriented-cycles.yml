@@ -1,0 +1,29 @@
+name: CT78 oriented torsion Frobenius cycle and etale factor audit
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct78/**'
+      - '.github/workflows/ct78-oriented-cycles.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct78-cycles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enumerated vectors versus independent matrix fixed-point inversion
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct78
+          python3 -B "$D/ct78_cycles.py" >ct78-py.jsonl
+          python3 -O -B "$D/ct78_cycles.py" >ct78-pyopt.jsonl
+          node "$D/ct78_independent.js" >ct78-js.jsonl
+          node --no-opt "$D/ct78_independent.js" >ct78-jsopt.jsonl
+          cmp ct78-py.jsonl ct78-pyopt.jsonl
+          cmp ct78-py.jsonl ct78-js.jsonl
+          cmp ct78-py.jsonl ct78-jsopt.jsonl
+          test "$(wc -l <ct78-py.jsonl)" -eq 30
+          echo 'e621037b773793defd1003e8e7ccda8acd7add015aba12fb09558fbbbf79880a  ct78-py.jsonl' | sha256sum -c
