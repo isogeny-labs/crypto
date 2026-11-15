@@ -190,6 +190,7 @@ void selftest(const Tower&tower,std::ostream&log){
     log<<"projected_shape\t"<<projected.system.names.size()<<'\t'<<projected.max_degree<<'\t'<<projected.zero_equations<<'\n';
 }
 } // namespace auxiliary
+#ifndef AUXILIARY_NO_MAIN
 int main(int argc,char**argv){
     try{
         const auxiliary::Tower tower;
@@ -226,3 +227,4 @@ int main(int argc,char**argv){
         throw std::invalid_argument("usage: auxiliary --selftest | --qualify[-eliminated] BACKEND NEW_ROOT TSV");
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<'\n';return 2;}
 }
+#endif

@@ -107,3 +107,12 @@ A5 now freezes the complete auxiliary point-only cold control using the
 qualified msolve witness path, plus order19 interface regression. Every
 returned decomposition is checked independently of a source-ideal assertion.
 [pcc:unverified]
+
+A5 code generalizes the shared collector and scalar arithmetic with default19
+preserved; order13 is explicit. Auxiliary cold setup checks13-torsion, Hasse
+bounds, gcd(X^19-X,X³+2)=1 and the actual coset/lifted base before collection.
+No field census is called in the candidate. New OpenSSL replay takes explicit
+field/scalar orders and preserves default/full and one-target CLI bindings.
+Strict fresh cold-build006 passes. The frozen cold006 run and default18-target
+regression start only after committed source and pre-call hashes are recorded.
+No successful cold006 result is asserted before those calls complete.

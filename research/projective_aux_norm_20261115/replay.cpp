@@ -32,6 +32,19 @@ struct AuxiliaryGroup {
             if(!EC_POINT_add(group,sum.get(),sum.get(),point_value.get(),ctx))throw std::runtime_error("OpenSSL addition");}
         const auto target=point(R);return EC_POINT_cmp(group,sum.get(),target.get(),ctx)==0;
     }
+    void sum_check(const std::vector<Point>&points,Point R){
+        if(!sum_matches(points,R))throw std::runtime_error("OpenSSL auxiliary sum mismatch");
+    }
+    bool equal(const EC_POINT*A,const EC_POINT*B){return EC_POINT_cmp(group,A,B,ctx)==0;}
+    ECPoint mixed(Point Q,int a,int b){
+        if(a<0||a>=13||b<0||b>=13)throw std::runtime_error("noncanonical order13 label");
+        const auto P=point({4,3}),target=point(Q);auto A=fresh(),B=fresh(),out=fresh();
+        auto aa=BN_new(),bb=BN_new();BN_set_word(aa,a);BN_set_word(bb,b);
+        const int ok=EC_POINT_mul(group,A.get(),nullptr,P.get(),aa,ctx)&&EC_POINT_mul(group,B.get(),nullptr,target.get(),bb,ctx);
+        BN_free(aa);BN_free(bb);
+        if(!ok||!EC_POINT_add(group,out.get(),A.get(),B.get(),ctx))throw std::runtime_error("OpenSSL order13 mixed query");
+        return out;
+    }
     std::set<int> fibre(){
         const auto T=point({16,11}),G=point({12,5});std::set<int> roots;
         for(int i=0;i<8;++i){auto H=fresh(),P=fresh();auto n=BN_new();BN_set_word(n,i);
@@ -44,6 +57,13 @@ struct AuxiliaryGroup {
 };
 int main(int argc,char**argv){
     try{
+        if(argc==4&&std::string(argv[1])=="--cold"){
+            AuxiliaryGroup aux(2,2),main_group(0,2);const auto fibre=aux.fibre();std::vector<Point> base;
+            for(const auto&P:main_group.all())if(P.second<=9&&fibre.count(P.first))base.push_back(P);
+            if(base.size()!=3)throw std::runtime_error("OpenSSL auxiliary cold base");
+            cold_replay_rows(argv[2],argv[3],main_group,base,19,13,std::set<Point>{{18,1}},[&](int x){return fibre.count(x)!=0;});
+            return 0;
+        }
         if(argc!=3)throw std::runtime_error("usage: replay ROOT SUMMARY.tsv");
         AuxiliaryGroup aux(2,2),main_group(0,2);const auto fibre=aux.fibre();const auto points=main_group.all();
         if(aux.all().size()!=23||points.size()!=12||fibre.size()!=8)throw std::runtime_error("OpenSSL auxiliary/main census");
