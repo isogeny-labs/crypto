@@ -471,6 +471,66 @@ fn cold_full_log(q:(u64,u64), cap:usize)->Result<Option<u64>,String>{
     Ok(final_log)
 }
 
+
+// Honest generic cold-cost comparator on exactly the same public Q, reuse
+// the native curve arithmetic. Plain BSGS is not optimized negation-map rho.
+// Include curve certification, baby table, giant steps, independent replay,
+// memory cardinality and group additions; never treat rho as measured here.
+fn cold_bsgs_log(q: (u64,u64))->Result<u64,String>{
+    use std::collections::HashMap;
+    let cold=Instant::now();
+    let mut ar=Arithmetic::default();
+    check_curve(PRIME31,&mut ar)?;
+    if !ar.on_curve(PRIME31,Some(q)){return Err("invalid public target for BSGS".into());}
+    // ceil sqrt(2147446831) = 46341.
+    let m=46_341u64;
+    if (m-1)* (m-1) >= N || m*m<N {
+        return Err("incorrect BSGS sqrt subgroup-order bound".into());
+    }
+    let mut table=HashMap::<Point,u64>::with_capacity(m as usize);
+    let mut baby=None;
+    let baby_started=Instant::now();
+    for j in 0..m {
+        table.entry(baby).or_insert(j);
+        baby=ar.add(PRIME31,baby,Some(PRIME31.g));
+    }
+    let baby_ns=baby_started.elapsed().as_nanos();
+    let giant_started=Instant::now();
+    let step=ar.scalar(PRIME31,m,Some(PRIME31.g))
+        .ok_or("BSGS mG unexpectedly infinity")?;
+    let step_neg=ar.neg(PRIME31,Some(step));
+    let mut cur=Some(q);
+    let mut found=None;
+    let mut checked=0u64;
+    for i in 0..=m {
+        checked+=1;
+        if let Some(&j)=table.get(&cur) {
+            let k=(i*m+j)%N;
+            if ar.scalar(PRIME31,k,Some(PRIME31.g))==Some(q) {
+                found=Some(k);
+                break;
+            }
+        }
+        cur=ar.add(PRIME31,cur,step_neg);
+    }
+    let giant_ns=giant_started.elapsed().as_nanos();
+    let recovered=found.ok_or("BSGS failed complete prime-order log")?;
+    println!("{}",json!({
+        "standing":"[pcc:unverified]",
+        "method":"plain Rust HashMap BSGS fully cold generic control",
+        "not_optimized_negation_rho":true,
+        "curve_p":P,"curve_n":N,
+        "baby_step_table_entries":table.len(),"m":m,
+        "giant_step_probes":checked,
+        "baby_step_ns":baby_ns,"giant_step_and_replay_ns":giant_ns,
+        "cold_total_wall_ns":cold.elapsed().as_nanos(),
+        "group_additions_including_curve_check":ar.counts.group_additions,
+        "verified_complete_log":recovered,
+        "complete_ECDLP_recovery":true
+    }));
+    Ok(recovered)
+}
+
 fn main()->Result<(),String>{
     let mut ar=Arithmetic::default();
     check_curve(PRIME31,&mut ar)?;
@@ -498,6 +558,13 @@ fn main()->Result<(),String>{
         "no_ordinates_or_group_additions_in_discovery":true,
         "generic_equivalent_not_novel":true}));
     if std::env::args().any(|x|x=="--natural-16384"){natural(&base,&index,&mut ar)?;}
+    if std::env::args().any(|x|x=="--bsgs-one"){
+        const FIXTURE_K:u64=1_038_579_171;
+        let public_q=ar.scalar(PRIME31,FIXTURE_K,Some(PRIME31.g))
+            .ok_or("BSGS known-answer fixture unexpectedly infinity")?;
+        let recovered=cold_bsgs_log(public_q)?;
+        if recovered!=FIXTURE_K {return Err("BSGS public target known-answer mismatch".into());}
+    }
     if std::env::args().any(|x|x=="--solve-one"){
         // Public synthetic fixture only. The solver receives q, never k.
         const FIXTURE_K:u64=1_038_579_171;
