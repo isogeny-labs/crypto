@@ -136,6 +136,19 @@ def run():
                      s4(u[0], v[0], w[0], r[0])]
         assert equations == [0, 0, 0, 0]
         mutated += s4(u[0], v[0], w[0], (r[0] + 1) % P) != 0
+        # A polynomial x-witness is not a signed point witness. Enumerate
+        # all 256 orientations and require the full y-coordinate target.
+        exact_signs = 0
+        same_x_signs = 0
+        distinct = set()
+        for mask in range(256):
+            total = None
+            for j, pt in enumerate(signed):
+                total = ec_add(total, negate(pt) if mask & (1 << j) else pt)
+            distinct.add(total)
+            exact_signs += total == r
+            same_x_signs += total is not None and total[0] == r[0]
+        assert (exact_signs, same_x_signs, len(distinct)) == (1, 2, 256)
         first_aux = first_aux or [u[0], v[0], w[0], r[0]]
     assert mutated == 32
     assert first_aux == [803189040, 898740481, 729813404, 903384438]
@@ -147,6 +160,9 @@ def run():
             "S4_zero_residuals": 96, "S3_zero_residuals": 32,
             "signed_public_group_equations_checked": 32,
             "corrupted_target_abscissae_rejected": mutated,
+            "sign_orientations_per_tuple": 256,
+            "unique_exact_y_signs_per_tuple": 1,
+            "x_only_sign_solutions_per_tuple": 2,
             "first_aux": first_aux,
             "scope": "producer-only exact semantic replay; no algebraic oracle, F4 timing or speedup"}
 
