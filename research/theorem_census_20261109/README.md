@@ -391,6 +391,30 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [general finite-field cyclotomic proof](../finite_cyclotomic_degree_audit_20261115/README.md)
+advances items2/3/4. For every actual finite field K and natural r nonzero in K,
+the field adjoining all rth roots inside AlgebraicClosureK has actual finrank
+orderOf(#K:ZModr). Primitive root existence/simple algebraicity/finite dimension
+and carrier/actual Frobenius order are derived. For every actual finite
+intermediate extension L, all rth roots belong to L iff r divides Nat.cardL−1,
+equivalently (#K)^actualfinrank(K,L)−1; actual splitting descent and finite-module
+cardinality prove the criterion. Every characteristicp finite field has actual
+pth-root field=base/degree1 versus modularorder0 and p∤#K−1, refuting deletion
+of the characteristic guard on the same actual fields. Every field actualr1/r2
+rootfields have degree1. Correctly qualified cyclotomic statement survives.
+Exact local **PCC-20261115-b5d0f3** PASS at 2026-11-15T02:29:20Z, signed standing unverified. Whole23/0/0;
+complete861-character bindingf288e1fae592ab4d95cb11362fa1784f7a077a5ba6ee54060279e215ce8c5742;
+independent native1complete/0prefix/0unresolved. Five modules/eight formal-config
+plus14artifactpins;88files/44objects/16332-byte losslessXZ/five gate files;
+fully inspected one-page46709-byte PDF. Eight snapshots/three failed01/03/04
+retained; final08 and gate full logs have no warnings/errors. Credited prior
+arguments and official APIs, exact primary read scope retained, originals unchanged.
+The actual full elliptic E[r] field/canonical Weil-Tate geometric bridge,
+general nonprime supersingular≤6 and other all14 obligations remain separate.
+No novelty/canonical promotion/full14 closure/cryptoPython/new native crypto/
+paid compute/agent upload. [pcc:unverified]
+
+
 The [prime-field source theorem](../prime_trace_weak_bound_audit_20261115/README.md)
 removes the explicit Hasse/count/trace-zero premise from the earlier conditional
 prime-field argument. For every odd finite field q>3, actual cubic Euler-power

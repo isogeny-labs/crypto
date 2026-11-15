@@ -8,6 +8,8 @@ requirements. Local kernel checks, native observations and signed execution
 assurance are different evidence. Signed PCC standing remains unverified.
 [pcc:unverified]
 
+The [general finite-field root-field proof](../finite_cyclotomic_degree_audit_20261115/README.md) now covers the cyclotomic degree and all-root finite-extension rationality bridge for items2/3/4, with actual characteristic-guard counterexamples and r1/r2 degree1 controls. Full elliptic E[r]/canonical Weil-Tate geometric identification remains separate. [pcc:unverified]
+
 | Item and original requested check | Current evidence and precise boundary |
 |:--|:--|
 | **1. Semaev:** S₃ equivalence, both directions, binary formula, m4/m5 degrees and exhaustive small fields. | The requested bounded checks and mathematical statements are covered: actual general-Weierstrass [all-arity zero-sum equivalence](SEMAEV_GEOMETRY.md), [all-input degrees](ALL_INPUT_DEGREES.md), canonical recursion and small-field [census](README.md#finite-census). The census covers all nonsingular short models over F5/F7 at m4/m5, and all ordinary binary coefficient choices over F2/F4 at m3/m4/m5. Literal binary S₄/domain and specialization strengthenings have Lean counterexamples and repairs. Higher-arity absolute irreducibility is a **follow-up**, not an original item1 requirement. Native census protocol deviation and unsigned standing remain disclosed. |
