@@ -1,0 +1,66 @@
+# P-256 mixed eigenline: cycle-safe solver and net cost
+
+- **Status:** open
+- **Kind:** implementation gap and missing measurement
+- **Affected work:** [transfer search](../research/p256_genus_dlp_20261115/transfer_search/REPORT.md), PCC-20261115-e111c2
+- **Next action owner:** unassigned; no background run is active
+- **Last updated:** 2026-11-15
+
+## Problem
+
+The mixed P-256 subgroup in J(C3) has a checked order-three action, but no
+cycle-safe quotient solver and complete-cost comparison establish a runtime
+advantage over the strongest direct P-256 solver. The user's speedup objective
+remains open. This is a specific constant-factor case related to
+[chained prime-field transfers](prime-field-chained-transfer-no-advantage.md).
+[pcc:unverified]
+
+## Evidence and uncertainty
+
+- Observed producer checks: nonzero order-n mixed image, eigenvalue relation,
+  six distinct signed images, addition and public scalar checks over the actual
+  P-256 field. Source and exact divisor are in audit.json. [pcc:unverified]
+- Derived: a uniform quotient-walk heuristic saves sqrt(3) in steps relative
+  to negation-only rho. It does not change the square-root exponent. [pcc:unverified]
+- Cost control: the same eigenline in E x E needs two component additions;
+  its ideal free-fold model costs 2/sqrt(3) source-addition units. This is
+  not a wall-time lower bound for optimized implementations. [pcc:unverified]
+- Missing: folded walk with coefficient tracking and short-cycle handling;
+  an optimized arithmetic adapter; matched transport/setup/folding/solve/
+  recovery/verification costs; strongest available source control and replay.
+- No timing, speedup or global nonexistence claim follows from these checks.
+
+## What would unblock it
+
+- [ ] Implement the quotient walk, with identity/degenerate-collision and
+  short-cycle tests; recover and replay every successful public toy scalar.
+- [ ] Measure addition plus folding/hash/cycle cost against the matched source
+  step on the same subgroup/workload. The preliminary threshold is sqrt(3)
+  times source cost, with transport/setup/recovery additionally charged.
+- [ ] If that threshold survives, run the full three-arm transfer protocol
+  under the repository isolation and independent-replay rules. A net gain
+  needs source-total / destination-total > 1 within stated uncertainty.
+
+These conditions would establish only the measured/modelled regime. A toy
+solve or stage saving does not establish an actual P-256 scalar-recovery gain.
+
+## Next discriminating step
+
+Implement a bounded cycle-safe walk over the existing mixed-image API and
+compare its complete step to the strongest source step. Use exact P-256
+arithmetic for the component calibration and fully specified small prime-order
+fixtures for complete solves, with source negation, destination generic and
+folded controls. Freeze the workload and finite budget before any benchmark;
+use the EKS skill, including its GitHub route when direct AWS is absent.
+[pcc:unverified]
+
+If costs exceed the threshold, close that implementation and examine another
+representation; if they beat it, execute a full matched solve protocol; if
+solver or infrastructure checks fail, retain the failure and fix that exact
+dependency. Recheck when an optimized adapter or solver implementation lands.
+[pcc:unverified]
+
+## Resolution and history
+
+2026-11-15: initial exact image checks and bounded exclusions recorded. Open.
+No benchmark is running, and a PR merge does not resolve this cost problem.
