@@ -45,3 +45,11 @@ forhashcheck only; solverinput/limits/verifier unchanged. Freeze next.
 V2stopped before solver: manifestfilename also relative aftercwd change. Retain
 allreceipts. V3canonicalizes manifest before switchingcwd, thenmetadata-only
 preflight passes3fingerprints without solver. No inverse cell has run.
+
+## Positive inverse control passed
+CollectorV3sourceb0e17847b341/checkpoint215552 launched first actual solvercell.
+Exit0; exactverifier recovers knowncontrol, dimension0/degree12andall12original
+equations vanish moduloelim (numeratorconvention126). No solverrerun.
+RSSfield is sampled250ms and missed shortchildpeak;32KiBis onlyobserved lower
+bound, NOT processpeak or hardmemorycertificate. No performanceclaim.
+Next target unchanged after checkpoint; class recovery/sign still required.
