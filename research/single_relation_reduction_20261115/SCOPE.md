@@ -62,3 +62,16 @@ supporting laws must not be presented as a complete reduction/program proof.
 No numerical qualification is planned or run in this source-only study. The
 older multiprecision qualification remains frozen and pending its required
 S3 upload access. No old source, raw archive, cap or seed is changed here.
+
+## A1: full finite-group coverage check
+
+After the three supporting laws pass, check the actual coverage statement
+over an existing finite additive commutative group G, without a new toy curve
+or numerical case. For assignments on the m-by-b record grid, prove tuple-sum
+surjectivity and joint-sum surjectivity for distinct tuples. Reuse subgroup
+kernel/range cardinality and finite Cauchy--Schwarz laws to derive the exact
+event counts and support bound L/(r+L-1). Preserve failed builds and statement
+pins, and use the same canonical proof/axiom gate. This target formalizes
+unconditioned coverage; elliptic clean-base loss, label conditioning, native
+execution and a fast selector remain distinct. No cap/field/seed or numerical
+qualification is introduced by this proof continuation.
