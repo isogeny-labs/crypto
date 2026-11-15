@@ -1,0 +1,58 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-pkm-present-panelP-20261115-1
+experiment_id: pkm_present_panel_20261115
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: d2318090bb380dd8e95086b40d66fcd9bb33bfd2
+receipt: research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-1.receipt.json
+binds:
+  - {path: research/pkm_present_panel_20261115/PROTOCOL.md, sha256: 66214775dfdd97152f16a2d57e16364d89ea48b20c28d7483d1e40c905099f38}
+  - {path: research/pkm_present_panel_20261115/protocol.json, sha256: 91a2c4ce822183f86ea69e2829efe1cc9e36b6ddb65e5ce813e40a496ad749e2}
+  - {path: research/pkm_present_panel_20261115/FREEZE.json, sha256: be6de2160039f6fde7d7f8aeb2ed109a352a253f0e7bbd49198df79cc0ce1547}
+  - {path: research/pkm_present_panel_20261115/plan.json, sha256: 0d04d98490ab4c99608a195afdf2ec4cd64a6f18a53dc8dbd1f2bdb676c5a31f}
+  - {path: research/pkm_present_panel_20261115/plan.sha256, sha256: 62b8f384b2469951663af41fe9add8233dbad58e0ca568b220b34251f8d99a18}
+  - {path: research/pkm_present_panel_20261115/systems/MANIFEST.json, sha256: 5ad815aabffb85a3e734c8718bf6261035f4e2a33ed1b3a5ed2071776fbe6b3d}
+  - {path: research/pkm_present_panel_20261115/runner/run_plan.py, sha256: a5278709f1791c49a5796790c7dc1912df7740d59ee68ff6f1fee746926f64fd}
+  - {path: research/pkm_present_panel_20261115/runner/build_plan.py, sha256: f28cd7bfe4c48a9c017e72dfb1ec6bd2ef5413d97a8798d867cc05325412fb04}
+  - {path: research/pkm_present_panel_20261115/runner/export_all.py, sha256: cfa9d9420132396a38e493c6bbb17d88808beb4bc1c08d574671d0f16d8f3c88}
+  - {path: research/pkm_present_panel_20261115/analysis/build_results.py, sha256: 11eeae817131760d1fc817e4036d6627f40e76f76f155ae95c504cefdd478d8f}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/parse_msolve_log.py, sha256: 9758ac06b13db7e2dd796cbbb2ea6fe45aa862460d0aaf280efda09c85c12362}
+  - {path: benchmarks/records/20261115T0345Z-pkm-present-panel.json, sha256: 364c5388b87ef01f43f05a2fdd467f56d42186c6347614aa1c008a3d640f8a05}
+  - {path: tools/benchrec.py, sha256: 42f9b9ca0a343bcc381d37eef14437e656f892e773fd39cfac9d0d7b6f208ea3}
+  - {path: tools/task_card.py, sha256: ef72b3f7ec9f2592af1035fb2e77158ea89cea8443ad56311d603384b48078cf}
+  - {path: target/release/examples/pkm_present_panel, sha256: 857143e4a39b324ac3eab190c0b03beb443b50f90efb40694b41abb5fb7bf4f6}
+  - {path: target/release/examples/pkm_m8_panel, sha256: b83a2f19d3cd7b2874c4da3e419218bf1b2f82b3a8c34ad58894f0b84354545f}
+  - {path: /usr/bin/msolve, sha256: c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa}
+must_not_exist: [research/pkm_present_panel_20261115/results/20261115T0535Z]
+commands:
+  - id: head-ancestor
+    argv: [git, merge-base, --is-ancestor, 770e0fa632b2cca3f1059b2393d693c632a1ff7c, HEAD]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+  - id: plan-sha
+    argv: [sha256sum, research/pkm_present_panel_20261115/plan.json]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-1.plan-sha.stdout
+    stderr: research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-1.plan-sha.stderr
+  - id: tests
+    argv: [python3, -m, pytest, research/pkm_present_panel_20261115/runner/tests, research/pkm_present_panel_20261115/analysis/tests, -q]
+    timeout_seconds: 600
+    success_exit_codes: [0]
+    stdout: research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-1.tests.stdout
+    stderr: research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-1.tests.stderr
+  - id: run
+    argv: [python3, tools/benchrec.py, run, benchmarks/records/20261115T0345Z-pkm-present-panel.json, --, python3, research/pkm_present_panel_20261115/runner/run_plan.py, --plan, research/pkm_present_panel_20261115/plan.json, --out, research/pkm_present_panel_20261115/results/20261115T0535Z]
+    timeout_seconds: 172800
+    success_exit_codes: [0]
+    stdout: research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-1.run.stdout
+    stderr: research/pkm_present_panel_20261115/cards/CARD-pkm-present-panelP-20261115-1.run.stderr
+    outputs: [research/pkm_present_panel_20261115/results/20261115T0535Z/rows.jsonl]
+bus_address: executor-mechanical-pkm-present-panelp
+background: true
+write_scope: [research/pkm_present_panel_20261115/, benchmarks/records/, .resume/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the original request and build identity.
+  - Never raise a cap.
+  - Never run a second copy of run_plan.
