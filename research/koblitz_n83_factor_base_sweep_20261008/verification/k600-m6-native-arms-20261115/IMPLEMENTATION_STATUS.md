@@ -173,6 +173,17 @@ Natural export/query, the qualified image and cumulative budget controller,
 rank/logs and full cold-runtime selection remain open. No performance graph
 changed because no experiment was run in this code step.
 
+The [unpinned replay amendment](UNPINNED_REPLAY_AMENDMENT.md) adds a
+`replay-unpinned` command. It requires the exact unpinned SAT receipt bound
+to the passing pinned replay, rechecks both controls after isolated native
+XCNF/group/row replay, and emits a distinct passing or terminal failure
+receipt. The release example remains **11/11** and the production release
+build exits 0; [test](unpinned-replay-test.log.gz) and
+[build](unpinned-replay-build.log.gz) logs preserve results. The real K600
+path is still unrun. A source-matched image/build receipt, cumulative budget
+controller, natural arm, rank/logs and full cold-runtime selection remain
+open. No graph changed because this revision contains no K600 measurement.
+
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
 
