@@ -1,0 +1,26 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 64/64 | 1.574 | 1.690 | 2.736 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j16 | 64/64 | 2.253 | 2.257 | 2.298 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j2 | 64/64 | 6.875 | 6.904 | 7.172 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j32 | 64/64 | 2.142 | 2.147 | 2.187 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j4 | 64/64 | 2.617 | 2.622 | 2.671 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-j8 | 64/64 | 2.118 | 2.123 | 2.164 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j16 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j2 | rho-neg < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j32 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j4 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-j8 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | twcj-j16 vs twcj-j2 | twcj-j16 < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | twcj-j16 vs twcj-j32 | twcj-j32 < twcj-j16 |
+| icv1-fp20-tm1050-4295f05e | twcj-j16 vs twcj-j4 | twcj-j16 < twcj-j4 |
+| icv1-fp20-tm1050-4295f05e | twcj-j16 vs twcj-j8 | twcj-j8 < twcj-j16 |
+| icv1-fp20-tm1050-4295f05e | twcj-j2 vs twcj-j32 | twcj-j32 < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | twcj-j2 vs twcj-j4 | twcj-j4 < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | twcj-j2 vs twcj-j8 | twcj-j8 < twcj-j2 |
+| icv1-fp20-tm1050-4295f05e | twcj-j32 vs twcj-j4 | twcj-j32 < twcj-j4 |
+| icv1-fp20-tm1050-4295f05e | twcj-j32 vs twcj-j8 | twcj-j8 < twcj-j32 |
+| icv1-fp20-tm1050-4295f05e | twcj-j4 vs twcj-j8 | twcj-j8 < twcj-j4 |

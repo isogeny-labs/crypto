@@ -1,0 +1,88 @@
+{
+  "schema": "durable-root-library-admission/v2",
+  "status": "materialized_inputs_bound_pending_qualification_publication",
+  "workspace": "/var/tmp/pencil-root-materialize-t1953-20261109",
+  "unit": "pencil-root-durable-t1958-20261109.service",
+  "uid": 1000,
+  "gid": 1000,
+  "toolchain": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+  "absolute_deadline": "2026-11-10T05:11:39+00:00",
+  "limits": {
+    "total_seconds": 1800,
+    "outer_term_seconds": 1795,
+    "outer_kill_grace_seconds": 5,
+    "aggregate_cpu": 2,
+    "aggregate_memory_bytes": 17179869184,
+    "target_stop_threshold_bytes": 6442450944,
+    "logs_stop_threshold_bytes": 268435456,
+    "minimum_free_bytes": 6442450944,
+    "durable_metadata_stop_bytes": 67108864,
+    "durable_total_stop_bytes": 402653184,
+    "supervisor_permit_seconds": 10
+  },
+  "inputs_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
+  "recipe_files": {
+    "durable-launcher.py": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c",
+    "durable-worker.py": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e",
+    "durable_io.py": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c",
+    "source-bindings.json": "592f30641e3bf9b7cc9f505d7b70233887a8a65e8fbbdc49ffece118fda87b6b",
+    "fixture.json": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980",
+    "candidate.patch": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75",
+    "recipe-proposal.json": "3d00b4f9dc141ea3769d1a0927adefb7fcbfdf6a75fdada255eab29109798614",
+    "owner-dollar-waiver.json": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90",
+    "materialized-inputs.json": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
+    "materializer-terminal.json": "59d4b238d027646c7bb1367e00a7541760ae34c72c013593f7a62b076e8e042f",
+    "materializer-worker-receipt.json": "81b2858dab85a95f6051ed4dca161310ecfe8ae758a838c77a7f6bd99dd261a2",
+    "coordination-claim.json": "9c021edbf59f9d0de6f89d441e3093d6c7c6a247f2bbee30bca1771c02ccb440"
+  },
+  "exact_tests": [
+    "cryptanalysis::ecbench::three_leads::pencil::tests::actual_some_none_known_answer_and_diagnostic_ledger",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_fake_dispatch_and_shared_meter",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_panic_clears_ownership",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::audited_digest_covers_work_and_failures_but_excludes_observations"
+  ],
+  "launch_command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "1795s",
+    "python3",
+    "-B",
+    "durable-launcher.py"
+  ],
+  "compiler_invoked": false,
+  "admission": false,
+  "lease": {
+    "task_id": "240a7800-602b-43f3-afa5-7de244cf51d8",
+    "attempt_id": "0e84ee39-565d-402c-8914-a186c1ea6fd2",
+    "lease_id": "cc4e412e-c0a7-44ac-bda2-2c8f1ed4729d",
+    "fencing_epoch": 3
+  },
+  "durable_run": "/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109",
+  "publication": {
+    "verified_github_commit": null,
+    "receipt_file": "publication.json",
+    "receipt_sha256": null
+  },
+  "cost": {
+    "mode": "owner-waived-dollar-facts/v1",
+    "finite_dollar_ceiling_usd": null,
+    "worst_case_incremental_usd": null,
+    "receipt_file": "owner-dollar-waiver.json",
+    "receipt_sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+  },
+  "attempts": 1,
+  "automatic_retry": false,
+  "campaign_authorization": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261109/authorization.json",
+  "campaign_remaining_worker_seconds": 42120,
+  "produced_manifest_expected_path": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+  "admitted": false,
+  "campaign_accounting": {
+    "ceiling_seconds": 43200,
+    "charged_seconds_after_pending_qualification": 1080,
+    "before_reservation_remaining_seconds": 42120,
+    "validation_reservation_seconds": 1800,
+    "unreserved_after_reservation_seconds": 40320,
+    "pending_qualification_must_complete_before_release": true
+  }
+}

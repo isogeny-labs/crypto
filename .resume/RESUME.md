@@ -17,38 +17,34 @@ Stop each stage at600s and the focused scientific window at3600s. No paid comput
 # Preserved incoming resume (historical task state)
 # Resume: crypto @ main e87fa18a73 (IC line-layout tournament v6, V6-AMENDMENT-1 merged in #3531)
 
+---
+
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
+
 ## Goal
-Run IC-LINE-LAYOUT-E2E-FP28-V6-20261106. It tests whether `layout=lines` lowers the fp28 IC wall time against the walk incumbent at equal counted cost.
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
 ## Lead / hypothesis
-Candidate: `mitm:negation_folded=1,layout=lines` against the incumbent `prime-abscissa:size=407`, `mitm:negation_folded=1`, `targets=walk`, `max_trials=26479085`.
-- Confirm: both wall sessions pass analyze-v6.sh.
-- Kill: per the PROTOCOL-V6.md stopping rule.
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-- Protocol: research/ic_line_layout_tournament_20261031/protocol-v6.json, frozen (sha256 12415faa…, commit 7c173e5a1d, merged in PR 3527 as f352040f06).
-- Decision: DEC-20261106-662e33.
-- Specs: spec-fp28-v6{,-qual,-counted}.json. Launch requests: launch-v6/.
-- Pinned image: ea8e9ef7 / ecbench 73362eed.
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
 ## State
-- Qualification passed (§5.1). Wall s1 and s2 exit 0, both on node ip-10-84-67-216, data SEALED (S3 runs/ic-line-v6-s{1,2}-20261106/).
-- Counted companion ic-line-v6-counted-20261106: exit 42 (accepted by §7), audit OK, node ip-10-84-72-222.
-- V6-AMENDMENT-1 frozen (protocol_sha256 2aedaaf8…) and merged in #3531 at 05:33Z. The owner approved launching s3 after the merge.
-- A worker restart at about 05:50Z wiped /dev/shm: the old cards, clones and downloads are gone. Work now lives in the session scratchpad v6/ on the main disk.
-
-## Next steps
-1. Director rewrites card-s3 for the new paths; launch ic-line-v6-s3-20261106 via executor-mechanical.
-2. After s3 has written job-exit.json: node check, then analyze-v6.sh on (s1,s2) and (s3,s1), validator, report and results PR.
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
 ## Runs in flight
-- None at checkpoint time; s3 is about to launch.
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
 
 ## Stop and success conditions
-- Budget: USD 5 ceiling, rolling hard-bound check (§14.1). Spend so far USD 0.155.
-- The qualification requires all executions at L2 and a minimum solve of at least 5 ms.
-- Never redispatch a consumed registration, and never auto-retry an ambiguous submission.
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
+<<<<<<< HEAD
 ## Open questions
 - Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
 - /home/user/crypto-autoresearcher is half-switched, pending the owner.
@@ -180,3 +176,8 @@ Commit exact source, pass current official checkpoint gate, then run pinned lake
 None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
 ## Stop and success conditions
 Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
+=======
+## Next steps
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.
+>>>>>>> origin/main

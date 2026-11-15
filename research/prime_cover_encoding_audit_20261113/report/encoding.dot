@@ -1,0 +1,11 @@
+digraph Encoding {
+ graph[rankdir=TB,bgcolor="white",pad=0.15];
+ node[shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,fillcolor="#e6f4ed"];
+ saved[label="Two frozen completed inputs\nDifferent curves and planted targets"];
+ audit[label="Native exact arithmetic audit\n16 image abscissas each\nUsable reference6 / cubic8"];
+ source[label="Frozen source: direct cubic substitution\nRecorded raw degrees12,8,8\nReference4,4,4"];
+ limit[label="W-only stage result has limited scope\nNo useful-relation yield or DLP recovery",fillcolor="#fff2d5"];
+ graph_encoding[label="Proposed standard graph representation\nx_i=N(u_i), ordinary S3 in x_i\nSame polynomial-cover solutions"];
+ next[label="Next admitted test: direct vs graph on identical inputs\nAccount for added variables and all solve/output costs\nSub-exponential bit cost remains unproved",fillcolor="#fff2d5"];
+ saved->audit; saved->source; audit->limit; source->graph_encoding; limit->next; graph_encoding->next;
+}

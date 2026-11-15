@@ -161,6 +161,10 @@ containers cannot reach the catalog, and those sessions said so in the PR
 rather than the session log. The metric now sees both channels; making the
 catalog reachable from those containers is the next separate problem.
 
+The session-start reminder now checks for the catalog. Where it is absent the
+session is told to record `KB unavailable: <why>` and use the lead atlas,
+instead of being asked to query a server that is not there.
+
 ## What the audit does not see
 
 - Pull-request bodies in the coverage number: they are reported separately by

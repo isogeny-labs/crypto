@@ -20,6 +20,9 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            .github/scripts/frozen-workflow-check.mjs
+            .github/scripts/run-frozen-workflow-replays.mjs
+            .github/scripts/frozen-workflow-pins.json
             research/notes/ecc2k130/leaf_m10_support_20260930
             research/notes/ecc2k130/m10_export_capacity_20260925/INPUT.json
             research/notes/ecc2k130/dual_all_lines_20260930/RESULT.json
@@ -29,10 +32,12 @@ jobs:
             research/ecc2k130_relations/relations.py
             .github/workflows/ecc2k130-leaf-m10-support.yml
       - name: Check frozen source, toy point law and source positive control
-        run: |
-          python3 -m py_compile research/notes/ecc2k130/leaf_m10_support_20260930/*.py
-          python3 -m unittest discover -s research/notes/ecc2k130/leaf_m10_support_20260930 -p 'test_support.py' -v
-          python3 -c 'import sys; sys.path.insert(0,"research/notes/ecc2k130/leaf_m10_support_20260930"); from produce import checked_inputs; checked_inputs()'
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 -m py_compile research/notes/ecc2k130/leaf_m10_support_20260930/*.py
+            python3 -m unittest discover -s research/notes/ecc2k130/leaf_m10_support_20260930 -p 'test_support.py' -v
+            python3 -c 'import sys; sys.path.insert(0,"research/notes/ecc2k130/leaf_m10_support_20260930"); from produce import checked_inputs; checked_inputs()'
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only leaf_m10_support_20260930 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
 
   measure:
     if: github.event_name == 'workflow_dispatch'

@@ -1,0 +1,17 @@
+{
+  "inputs": {
+    "feature-native-monomial-transport/transport.rs": "94976006fd57ccaec2e05eb3821fa434dc6990228098eb4c953283dc7644e6b1",
+    "feature-native-monomial-transport/lib.rs": "7f529eb99a3fec472502e40fe40076144a027039d68aa2ee8fcf4a8a0e4cfbea",
+    "feature-native-batch-reciprocals/lib.rs": "6460bc9a0ed543f13af0fa3251c5d00e8a4e5bcc6cdc480f62f07e51420123b0"
+  },
+  "outputs": {
+    "transport.rs": "a948aabe670cc84d1d6eec4c2980a54388f1332e38646ac98de1dbd7571cc0dd",
+    "source.rs": "f880d81496fb143ab7ac7fe42eb889d1b51818084d7843a48dd3edc9f9b4200e",
+    "lib.rs": "5b5ad35b814c5a465bdfdd0a4a7938571f2e93d5d92740e2cbde28a773fcc9f0"
+  },
+  "changes": [
+    "transport begin retains geometry tail, last two one-pair monomial vectors and middle x coordinates; budget covers initial plus extra rows",
+    "consumer gains begin, advance, skip_sign with shared normalization and test-only counters",
+    "quartic program construction/evaluation unchanged; source adapter gains explicit limits and initial-work fields"
+  ]
+}
