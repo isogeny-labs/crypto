@@ -73,12 +73,12 @@ impl Arithmetic {
         self.counts.fp_inversions += 1;
         self.pow(x, p - 2, p)
     }
-    fn sqrt(&mut self, x: u64, p: u64) -> Option<u64> {
+    pub fn sqrt(&mut self, x: u64, p: u64) -> Option<u64> {
         assert_eq!(p % 4, 3);
         let r = self.pow(x, (p + 1) / 4, p);
         (self.mul(r, r, p) == x).then_some(r)
     }
-    fn rhs(&mut self, e: Curve, x: u64) -> u64 {
+    pub fn rhs(&mut self, e: Curve, x: u64) -> u64 {
         let xx = self.mul(x, x, e.p);
         let xxx = self.mul(xx, x, e.p);
         (xxx + self.mul(e.a, x, e.p) + e.b) % e.p
