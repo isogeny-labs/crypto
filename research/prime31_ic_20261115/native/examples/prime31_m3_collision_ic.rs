@@ -209,7 +209,13 @@ fn enumerate_triples(base: &Base, ar: &mut Arithmetic) -> TripleBank {
                 ];
                 for (sum, signs) in variants {
                     bank.offer(sum, triple_code(i, j, k, signs), PRIME31.n);
+                    if bank.hom.rank == b - 1 {
+                        return bank;
+                    }
                     bank.offer(ar.neg(PRIME31, sum), triple_code(i, j, k, signs ^ 7), PRIME31.n);
+                    if bank.hom.rank == b - 1 {
+                        return bank;
+                    }
                 }
             }
         }
@@ -251,9 +257,9 @@ fn main() -> Result<(), String> {
     let before_bank = ar.counts;
     let bank = enumerate_triples(&base, &mut ar);
     let after_bank = ar.counts;
-    if bank.templates != 22_108_160
-        || bank.first.len() != 21_992_660
-        || bank.collisions != 115_500
+    if bank.templates != 4_051_363
+        || bank.first.len() != 4_047_598
+        || bank.collisions != 3_765
         || bank.hom.rank != 255
         || bank.first_full_rank != Some((3_765, 4_051_363))
     {
