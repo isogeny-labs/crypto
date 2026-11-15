@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Launch the four leads side by side (one core each). Run from the repository root after the build.
+# Launch the four leads side by side (one core each). Record of the intended launch; the actual launches were the
+# same commands issued inline (see each lead's run.log and the cells' ext.cmd), with L1 on p=16777141,A=7842 after
+# its pre-data amendment (the k = 20 member named below is invalid under the full family rule).
 set -u
 R=/home/user/crypto/research/curve25519_wave6_runs_20261115
 BIN=/home/user/ctarget-f1/release/curve25519_family
