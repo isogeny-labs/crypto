@@ -4237,6 +4237,31 @@ struct StoreRunConfig<'a> {
     source_attestation_mode: &'static str,
 }
 
+fn seal_store_run_error(run_dir: &Path, result: Result<Value>) -> Result<Value> {
+    match result {
+        Ok(summary) => Ok(summary),
+        Err(error) => {
+            if run_dir.is_dir()
+                && !run_dir.join("summary.json").exists()
+                && !run_dir.join("cap.json").exists()
+            {
+                let receipt = json!({
+                    "schema":"n83.primary-store-command-error/v1",
+                    "status":"COMMAND_ERROR",
+                    "reason":error.to_string(),
+                    "solver_stage_executed":Value::Null,
+                    "total_index_calculus_runtime_ms":Value::Null,
+                    "selected_best_total_runtime":Value::Null,
+                });
+                write_new_json(&run_dir.join("failure.json"), &receipt).map_err(|write_error| {
+                    format!("{error}; failed to seal store command error: {write_error}")
+                })?;
+            }
+            Err(error)
+        }
+    }
+}
+
 /// Run a bounded enumerate trial against a verified v3 artifact-store base.
 /// Base construction and publication are outside this diagnostic interval.
 #[allow(clippy::too_many_arguments)]
@@ -4267,16 +4292,19 @@ pub(super) fn run_store_trial_cli(
         source_commit,
         source_attestation_mode,
     };
-    run_with_config(
-        root,
-        columns,
-        m,
-        "enumerate",
-        max_trials,
-        budget_seconds,
+    seal_store_run_error(
         run_dir,
-        None,
-        Some(&config),
+        run_with_config(
+            root,
+            columns,
+            m,
+            "enumerate",
+            max_trials,
+            budget_seconds,
+            run_dir,
+            None,
+            Some(&config),
+        ),
     )
 }
 
@@ -4348,16 +4376,19 @@ pub(super) fn run_store_chain_cli(
         (true, true) => "ordered-orbit-chain-s3",
         (false, true) => unreachable!("checked above"),
     };
-    run_with_config(
-        root,
-        columns,
-        m,
-        strategy,
-        max_trials,
-        budget_seconds,
+    seal_store_run_error(
         run_dir,
-        Some(&chain_config),
-        Some(&store_config),
+        run_with_config(
+            root,
+            columns,
+            m,
+            strategy,
+            max_trials,
+            budget_seconds,
+            run_dir,
+            Some(&chain_config),
+            Some(&store_config),
+        ),
     )
 }
 
@@ -5036,32 +5067,47 @@ mod tests {
             policy: "public_x_sequential",
             ..chain_config
         };
-        assert!(run_with_config(
-            &bundle,
-            2,
-            5,
-            "orbit-chain-s3",
-            0,
-            7200,
-            &root.join("wrong-chain-policy"),
-            Some(&wrong_chain_config),
-            Some(&config),
+        let wrong_chain_dir = root.join("wrong-chain-policy");
+        assert!(seal_store_run_error(
+            &wrong_chain_dir,
+            run_with_config(
+                &bundle,
+                2,
+                5,
+                "orbit-chain-s3",
+                0,
+                7200,
+                &wrong_chain_dir,
+                Some(&wrong_chain_config),
+                Some(&config),
+            ),
         )
         .unwrap_err()
         .to_string()
         .contains("selection differs from verified base"));
-        assert!(run_with_config(
-            &bundle,
-            3,
-            2,
-            "enumerate",
-            0,
-            7200,
-            &root.join("wrong-columns"),
-            None,
-            Some(&config),
+        let rejected: Value =
+            serde_json::from_slice(&fs::read(wrong_chain_dir.join("failure.json")).unwrap())
+                .unwrap();
+        assert_eq!(rejected["schema"], "n83.primary-store-command-error/v1");
+        assert_eq!(rejected["status"], "COMMAND_ERROR");
+        assert!(rejected["total_index_calculus_runtime_ms"].is_null());
+        let wrong_columns_dir = root.join("wrong-columns");
+        assert!(seal_store_run_error(
+            &wrong_columns_dir,
+            run_with_config(
+                &bundle,
+                3,
+                2,
+                "enumerate",
+                0,
+                7200,
+                &wrong_columns_dir,
+                None,
+                Some(&config),
+            ),
         )
         .is_err());
+        assert!(wrong_columns_dir.join("failure.json").is_file());
         let mut bad = storage.clone();
         bad["fresh_download_sha256"] = json!("0");
         fs::write(

@@ -155,3 +155,10 @@ and independently replayed models. Base construction, S3 publication, graph
 closure, column logarithms, target descent, and matched rho remain outside
 the bounded trial interval. No complete-runtime graph or leaderboard row
 changes.
+
+For both v3 trial commands, an error after the new run directory is created
+now writes `failure.json` with `COMMAND_ERROR`, the original error, and null
+runtime and winner fields, unless a terminal `summary.json` or `cap.json`
+already exists. The file-store controls cover rejected policy and column
+bindings and verify their terminal error receipts. An admission failure
+before directory creation still returns an error without claiming a run.
