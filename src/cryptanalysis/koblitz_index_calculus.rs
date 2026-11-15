@@ -6219,6 +6219,8 @@ impl PairSumTable {
         let parts_per_run = parts.div_ceil(fill_runs);
         let mut bucket_start = vec![0u32; buckets + 1];
         let mut rests = vec![0u32; total];
+        advise_huge_pages(&bucket_start);
+        advise_huge_pages(&rests);
         let rp = rests.as_mut_ptr() as usize;
         // The harvest's side arrays, in the order of `rests`.
         let mut sorted_hash = vec![0u64; if harvest { total } else { 0 }];
@@ -6232,6 +6234,7 @@ impl PairSumTable {
             .enumerate()
             .map(|(run, run_starts)| {
                 let mut present = vec![0u64; filter_words];
+                advise_huge_pages(&present);
                 for (k, starts) in run_starts.chunks_mut(per_part).enumerate() {
                     let p = run * parts_per_run + k;
                     let first = p * per_part;
@@ -15644,6 +15647,42 @@ struct LogSystem<'a> {
     /// `λ^k mod r` for `k` in `0..=n`: the Frobenius column
     /// coefficients, so a row needs no `modpow` per summand.
     lambda_powers: Vec<BigUint>,
+}
+
+/// Whether the pair table asks the kernel for transparent huge pages on
+/// its large, randomly read arrays (`KIC_HUGE_PAGES`, default on).  The
+/// arrays and every answer and count are the same either way; only the
+/// page size behind them changes, and so the TLB misses of the scan's
+/// filter probes and run lookups and of the build's scatter.  `0` turns
+/// the advice off for A/B timing.
+fn huge_pages_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_HUGE_PAGES").map_or(true, |v| v != "0"))
+}
+
+/// Advise transparent huge pages for the 2 MiB-aligned span of `v`,
+/// before its pages are first written: a freshly zeroed large `Vec`
+/// comes from `mmap` untouched, so the advice decides how its pages are
+/// faulted in.  Small slices, other systems and a refused advice are
+/// left as they are; the advice never changes the contents.
+fn advise_huge_pages<T>(v: &[T]) {
+    const HUGE: usize = 2 << 20;
+    let bytes = std::mem::size_of_val(v);
+    if bytes < 2 * HUGE || !huge_pages_enabled() {
+        return;
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let start = v.as_ptr() as usize;
+        let (lo, hi) = (start.next_multiple_of(HUGE), (start + bytes) / HUGE * HUGE);
+        if hi > lo {
+            // SAFETY: `[lo, hi)` lies inside `v`'s allocation, and
+            // `MADV_HUGEPAGE` changes only how its pages are backed.
+            unsafe {
+                libc::madvise(lo as *mut libc::c_void, hi - lo, libc::MADV_HUGEPAGE);
+            }
+        }
+    }
 }
 
 /// Whether the sparse relation system builds each row straight from
