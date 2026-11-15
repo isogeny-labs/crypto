@@ -1,0 +1,30 @@
+# solveab.sh (docs/perf/20261112-rust-deep-audit/solveab.sh): 5 alternating rounds A,B; a round = sum of report.solve_wall_ns
+# over N `ecbench exec` runs of the same input, RAYON_NUM_THREADS=1. Values in ms per round. Local, unisolated, [pcc:unverified].
+# da-f4-k13: N=20; tensor12: N=2. Other agents' builds/linters ran on the same 4-vCPU VM.
+== AA base/base da-f4-k13 | load before 2.96 4.28 5.10 | after 3.12 4.27 5.09
+A: min 481 ms, median 500 ms all: 630 501 500 492 481
+B: min 488 ms, median 534 ms all: 543 534 536 488 519
+== F1 base->f1 da-f4-k13 | load before 3.12 4.27 5.09 | after 3.27 4.29 5.09
+A: min 478 ms, median 501 ms all: 561 501 518 478 498
+B: min 449 ms, median 486 ms all: 525 466 449 486 559
+== F2 t1->f2 da-f4-k13 | load before 3.27 4.29 5.09 | after 3.33 4.28 5.08
+A: min 468 ms, median 472 ms all: 472 468 572 472 534
+B: min 459 ms, median 492 ms all: 459 484 557 504 492
+== AA base/base tensor12 | load before 4.75 4.56 5.17 | after 3.99 4.39 5.06
+A: min 7119 ms, median 7384 ms all: 7119 7357 7705 7397 7384
+B: min 7014 ms, median 7321 ms all: 8710 7321 7342 7014 7190
+== T1 f1->t1 tensor12 | load before 3.99 4.39 5.06 | after 3.35 4.11 4.91
+A: min 6889 ms, median 7224 ms all: 7343 7212 6889 7224 7267
+B: min 6299 ms, median 6755 ms all: 6946 6755 6799 6299 6743
+== T2 f2->t2 tensor12 | load before 3.35 4.11 4.91 | after 2.92 3.84 4.76
+A: min 6719 ms, median 6889 ms all: 6719 6723 6987 7141 6889
+B: min 6341 ms, median 6627 ms all: 6413 6627 6694 6341 6641
+== T3 t2->t3 tensor12 | load before 2.92 3.84 4.76 | after 1.74 3.33 4.53
+A: min 6411 ms, median 6759 ms all: 6699 7044 6411 6759 7331
+B: min 4798 ms, median 4987 ms all: 4858 5014 4798 4987 5026
+== ALL base->t3 tensor12 | load before 1.80 3.27 4.48 | after 2.15 3.10 4.34
+A: min 7055 ms, median 7624 ms all: 7494 7943 7624 8460 7055
+B: min 4596 ms, median 4930 ms all: 4872 5010 5006 4930 4596
+== ALL base->t3 da-f4-k13 | load before 2.15 3.10 4.34 | after 2.14 3.08 4.33
+A: min 485 ms, median 527 ms all: 535 525 485 536 527
+B: min 434 ms, median 479 ms all: 479 538 449 434 487
