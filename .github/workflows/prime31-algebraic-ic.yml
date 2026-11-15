@@ -1,0 +1,34 @@
+name: Prime31 algebraic IC development tests
+
+on:
+  push:
+    branches: [main, research/norm-branch-rank-pilot-20261115]
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - src/cryptanalysis/f4_fp_tower.rs
+      - src/cryptanalysis/sig_fp_tower.rs
+      - .github/workflows/prime31-algebraic-ic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  development:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install recorded development toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal --component clippy
+      - name: Test reused engines and adapter
+        run: cargo +1.100.0 test --locked --release --lib --manifest-path research/prime31_ic_20261115/native/Cargo.toml
+      - name: Lint adapter and CLI
+        run: cargo +1.100.0 clippy --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib --bin prime31-algebraic-ic -- -D warnings
