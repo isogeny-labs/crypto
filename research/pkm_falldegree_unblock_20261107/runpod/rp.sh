@@ -29,7 +29,8 @@ case "$1" in
       [ -f "$3/$f" ] || continue; tmp=$(mktemp -d); split -b 2M -d -a 4 "$3/$f" "$tmp/part."; ep=upload
       for c in "$tmp"/part.*; do curl -sS -f -m 300 -X PUT -H "X-Token: $(tok $2)" --data-binary "@$c" "$(url $2)/$ep/$f" > "$tmp/last"; ep=append; done
       cat "$tmp/last"; echo; rm -rf "$tmp"; done ;;
-  start) shas=$(jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json")
+  start) # SHA_FILE (Amendment 17): a JSON {name: sha256} of the reproduction-gated rebuild; default: the frozen image's
+      shas=$(if [ -n "${SHA_FILE:-}" ]; then jq . "$SHA_FILE"; else jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json"; fi)
       jq -n --argjson s "$3" --argjson h "$shas" '{stages:$s,sha256:$h,rayon:12}' |
       curl -sS -X POST -H "X-Token: $(tok $2)" -H "Content-Type: application/json" --data-binary @- "$(url $2)/start"; echo ;;
   status) curl -sS -H "X-Token: $(tok $2)" "$(url $2)/status" ;;
