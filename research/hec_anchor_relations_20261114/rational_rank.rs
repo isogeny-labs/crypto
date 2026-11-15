@@ -71,6 +71,12 @@ fn lower_pair(points: &[(u64, u64)], signs: usize, f: &Fp) -> (Poly, Poly) {
 }
 
 fn main() {
+    let args: Vec<_> = std::env::args().skip(1).collect();
+    let primitive_mode = match args.as_slice() {
+        [] => false,
+        [arg] if arg == "--primitive" => true,
+        _ => panic!("usage: rational_rank [--primitive]"),
+    };
     for (g, p) in [(2usize, 1009u64), (3, 503), (4, 127)] {
         let Some(inst) = pick_instance(p, g) else {
             println!("{{\"g\":{g},\"p\":{p},\"status\":\"unavailable\"}}");
@@ -120,6 +126,7 @@ fn main() {
                     mut admitted,
                     mut projected,
                 ) = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                let (mut normalized_admitted, mut normalized_projected) = (0, 0);
                 let status;
                 loop {
                     if echelon.rank == h - 1 {
@@ -182,10 +189,17 @@ fn main() {
                             continue;
                         }
                         assert!(!q.is_zero());
-                        if Poly::gcd(&a, &b, f).deg() > 0 {
+                        let common = Poly::gcd(&a, &b, f).deg() > 0;
+                        let (a, b, q, keep_mask) = if common {
                             nonprimitive += 1;
-                            continue;
-                        }
+                            if !primitive_mode {
+                                continue;
+                            }
+                            let z = rational::primitive(c, &pts, a, b).expect("nonzero pair");
+                            (z.a, z.b, z.q, z.keep_mask)
+                        } else {
+                            (a, b, q, (1usize << m) - 1)
+                        };
                         if q.deg() < g as isize {
                             degree_drop += 1;
                         }
@@ -196,6 +210,9 @@ fn main() {
                         };
                         let mut raw = BTreeMap::<usize, i64>::new();
                         for (i, &j) in chosen.iter().enumerate() {
+                            if keep_mask & (1 << i) == 0 {
+                                continue;
+                            }
                             *raw.entry(j).or_default() += if i > 0 && s & (1 << (i - 1)) != 0 {
                                 -1
                             } else {
@@ -247,6 +264,9 @@ fn main() {
                         }
                         assert!(c.is_zero(&sum), "principal g={g} h={h} d={d} signs={s}");
                         admitted += 1;
+                        if common {
+                            normalized_admitted += 1;
+                        }
                         admitted_rows.push(row.clone());
                         let mut off = Vec::new();
                         let mut on = Row::new();
@@ -259,6 +279,9 @@ fn main() {
                         }
                         if let Some(pure) = forest.insert(&off, &on) {
                             projected += 1;
+                            if common {
+                                normalized_projected += 1;
+                            }
                             echelon.insert(&pure, 0);
                             assert!(echelon.rank <= h - 1, "excessive rank");
                         }
@@ -271,7 +294,12 @@ fn main() {
                     echelon.rank,
                     "independent anchor-intersection rank"
                 );
-                println!("{{\"g\":{g},\"p\":{p},\"c\":{},\"ell\":{ell},\"fb\":{},\"h\":{h},\"d\":{d},\"m\":{m},\"tuples\":{},\"constructed\":{constructed},\"visited\":{visited},\"zero\":{zero},\"nonprimitive\":{nonprimitive},\"degree_drop\":{degree_drop},\"nonsplit\":{nonsplit},\"many_off\":{many_off},\"empty\":{empty},\"duplicate\":{duplicate},\"admitted\":{admitted},\"projected\":{projected},\"rank\":{},\"full_rank\":{full_rank},\"off_rank\":{off_rank},\"status\":\"{status}\"}}",inst.c,fb.len(),tuples.len(),echelon.rank);
+                let extra = if primitive_mode {
+                    format!(",\"mode\":\"primitive\",\"normalized_admitted\":{normalized_admitted},\"normalized_projected\":{normalized_projected}")
+                } else {
+                    String::new()
+                };
+                println!("{{\"g\":{g},\"p\":{p},\"c\":{},\"ell\":{ell},\"fb\":{},\"h\":{h},\"d\":{d},\"m\":{m},\"tuples\":{},\"constructed\":{constructed},\"visited\":{visited},\"zero\":{zero},\"nonprimitive\":{nonprimitive},\"degree_drop\":{degree_drop},\"nonsplit\":{nonsplit},\"many_off\":{many_off},\"empty\":{empty},\"duplicate\":{duplicate},\"admitted\":{admitted},\"projected\":{projected},\"rank\":{},\"full_rank\":{full_rank},\"off_rank\":{off_rank},\"status\":\"{status}\"{extra}}}",inst.c,fb.len(),tuples.len(),echelon.rank);
             }
         }
     }

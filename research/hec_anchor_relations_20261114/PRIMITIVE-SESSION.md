@@ -45,3 +45,53 @@ extend the frozen rank screen with explicit --primitive mode and compare yield.
 I chose branch coordinates for a different curve equation. Exact division
 caught the invalid control. Preserve the failure and protocol amendment;
 no generated-curve failure was hidden or removed.
+
+## Corrected algebra gate and rank implementation
+
+### What was done (commands, files, features)
+All7tests now pass, including corrected branch/repeated-factor controls. The
+production normalization code was unchanged by the synthetic-input correction.
+Generated-panel split group checks total1370, including262recovered common-factor
+cases. Implemented explicit --primitive rank arm with removed-anchor accounting,
+full principal checks and independent Gaussian rank validation. Default replay
+is running before the candidate arm.
+
+### Decisions made (and why)
+Require the rejection-mode stdout to be byte-identical to the committed prior
+rank output before interpreting primitive mode. Count normalization admissions
+and projected rows separately; added relations need not add independent rank.
+
+### Open threads (unfinished, pick up next time)
+Complete default replay, run primitive mode with the same frozen inputs/caps,
+and inspect every arm's rank, admission, duplicate and terminal status.
+
+### Errors (what went wrong, how it was handled)
+The synthetic sign error is fixed and the initial failed output remains in Git.
+No new algebra error appeared in the corrected gate. Runtime is still unmeasured.
+
+## Paired rank/yield result
+
+### What was done (commands, files, features)
+Default rejection output reproduces RATIONAL-RANK-VERIFIED.jsonl byte-for-byte.
+Primitive mode completes all36arms, visits133730functions and admits5344rows
+before its arm-specific stops. It admits181normalized rows,37projected directly.
+Independent Gaussian ranks agree on all36arms. Compared with rejection,11arms
+need fewer functions and25are unchanged; maximum count ratio1.4054878049.
+All23rank attainments,12exhaustions and one tuple cap remain the same statuses.
+
+### Decisions made (and why)
+Normalization is useful but does not by itself establish the10x cost case.
+Do not compare aggregate admissions as yield: rank stopping changes stream
+prefixes. Preserve both modes and their complete arm outputs. Next integrate
+an explicit single-target solver with descent-seeded anchors and scalar check;
+the untargeted rank screen cannot price those dependencies.
+
+### Open threads (unfinished, pick up next time)
+Freeze and implement an integration correctness gate before timing. It must
+report requested/effective anchor size, constructed/consumed functions,
+normalization, all cold phases and final verification, with no target scalar
+available to the solver. A timing protocol is still separate and unregistered.
+
+### Errors (what went wrong, how it was handled)
+No new error. Primitive mode retains all formerly capped/exhausted cases.
+Counts are not runtime ratios, and the earlier synthetic-input failure remains.

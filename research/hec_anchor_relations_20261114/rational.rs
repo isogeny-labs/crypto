@@ -1,5 +1,52 @@
 //! Correctness gate only. See RATIONAL-PROTOCOL.md for scope and prior art.
-use hec_native_ic::{fp::Fp, poly::Poly};
+use hec_native_ic::{fp::Fp, jac::Curve, poly::Poly};
+
+pub struct Primitive {
+    pub a: Poly,
+    pub b: Poly,
+    pub q: Poly,
+    pub keep_mask: usize,
+    pub common_degree: usize,
+    pub removed: usize,
+}
+
+/// Remove vertical factors and the anchor conditions they invalidated.
+/// Does not assume interpolation survives at a canceled anchor.
+pub fn primitive(c: &Curve, points: &[(u64, u64)], a: Poly, b: Poly) -> Option<Primitive> {
+    if a.is_zero() && b.is_zero() {
+        return None;
+    }
+    let f = &c.fp;
+    let h = Poly::gcd(&a, &b, f);
+    let a = a.div_exact(&h, f);
+    let b = b.div_exact(&h, f);
+    assert_eq!(Poly::gcd(&a, &b, f).deg(), 0);
+    let mut keep_mask = 0;
+    let mut removed = 0;
+    let mut anchors = Poly::one();
+    for (i, &(x, _)) in points.iter().enumerate() {
+        if h.eval(x, f) == 0 {
+            removed += 1;
+        } else {
+            keep_mask |= 1 << i;
+            anchors = anchors.mul(&Poly::x_minus(x, f), f);
+        }
+    }
+    assert!(removed <= h.deg() as usize);
+    let norm = a.mul(&a, f).sub(&c.f.mul(&b.mul(&b, f), f), f);
+    assert!(!norm.is_zero());
+    let (q, r) = norm.divrem(&anchors, f);
+    assert!(r.is_zero());
+    assert!(q.deg() <= c.g as isize);
+    Some(Primitive {
+        a,
+        b,
+        q,
+        keep_mask,
+        common_degree: h.deg() as usize,
+        removed,
+    })
+}
 
 pub struct SignedFamily {
     pub m: usize,
@@ -353,5 +400,126 @@ mod tests {
                 verify_linear(2, d, pts, s, a, b, &f);
             }
         }
+    }
+
+    fn check_primitive(
+        c: &Curve,
+        pts: &[(u64, u64)],
+        signs: usize,
+        a: Poly,
+        b: Poly,
+    ) -> (bool, bool, usize) {
+        let f = &c.fp;
+        let Some(p) = primitive(c, pts, a, b) else {
+            return (false, false, 0);
+        };
+        for (i, &(x, y)) in pts.iter().enumerate() {
+            if p.keep_mask & (1 << i) == 0 {
+                continue;
+            }
+            let y = if i > 0 && signs & (1 << (i - 1)) != 0 {
+                f.neg(y)
+            } else {
+                y
+            };
+            assert_ne!(p.b.eval(x, f), 0);
+            assert_eq!(p.a.eval(x, f), f.mul(y, p.b.eval(x, f)));
+        }
+        let mut q = p.q;
+        let mut roots = Vec::new();
+        for x in 0..f.p {
+            while q.deg() > 0 && q.eval(x, f) == 0 {
+                roots.push(x);
+                q = q.div_exact(&Poly::x_minus(x, f), f);
+            }
+        }
+        if q.deg() > 0 {
+            return (p.common_degree > 0, false, p.removed);
+        }
+        let mut sum = c.zero();
+        for (i, &(x, y)) in pts.iter().enumerate() {
+            if p.keep_mask & (1 << i) != 0 {
+                let y = if i > 0 && signs & (1 << (i - 1)) != 0 {
+                    f.neg(y)
+                } else {
+                    y
+                };
+                sum = c.add(&sum, &c.place(x, y));
+            }
+        }
+        for x in roots {
+            let bx = p.b.eval(x, f);
+            assert_ne!(bx, 0);
+            let y = f.mul(p.a.eval(x, f), f.inv(bx));
+            assert_eq!(f.mul(y, y), c.f.eval(x, f));
+            sum = c.add(&sum, &c.place(x, y));
+        }
+        assert!(c.is_zero(&sum), "normalized principal identity");
+        (p.common_degree > 0, true, p.removed)
+    }
+
+    #[test]
+    fn normalized_curve_relations() {
+        for g in 2..=4 {
+            let (mut n, mut common, mut split, mut recovered, mut removed) = (0, 0, 0, 0, 0);
+            for p in [101, 127] {
+                for d in 1..=3 {
+                    let c = (1..60).find_map(|k| thread_curve(p, k, g)).unwrap();
+                    let fb = factor_base(&c);
+                    let m = g + 2 * d;
+                    for offset in [0, 3, 6, 9] {
+                        let pts = &fb[offset..offset + m];
+                        let family = SignedFamily::new(g, d, pts, &c.fp);
+                        for (s, (a, b)) in family.walsh(&c.fp).into_iter().enumerate() {
+                            let norm = a
+                                .mul(&a, &c.fp)
+                                .sub(&c.f.mul(&b.mul(&b, &c.fp), &c.fp), &c.fp);
+                            let (is_common, is_split, k) = check_primitive(&c, pts, s, a, b);
+                            if let Some(z) = primitive(&c, pts, a, b) {
+                                assert!(
+                                    z.q.deg()
+                                        <= norm.deg()
+                                            - 2 * z.common_degree as isize
+                                            - (m - z.removed) as isize
+                                );
+                            }
+                            n += 1;
+                            common += is_common as usize;
+                            split += is_split as usize;
+                            recovered += (is_common && is_split) as usize;
+                            removed += k;
+                        }
+                    }
+                }
+            }
+            assert!(recovered > 0, "vacuous recovered-common-factor gate");
+            println!("primitive g={g} cases={n} common={common} split_group_checks={split} recovered_common_split={recovered} removed_anchor_occurrences={removed}");
+        }
+    }
+
+    #[test]
+    fn vertical_and_repeated_factor_controls() {
+        let f = Fp::new(101);
+        let c = Curve::new(f, Poly::from_coeffs(&[0, 100, 0, 0, 0, 1]));
+        let at = Poly::x_minus(0, &f);
+        let away = Poly::x_minus(2, &f);
+        for h in [at, at.mul(&at, &f)] {
+            let pts = [(0, 0), (1, 0), (100, 0), (10, 0)];
+            let z = primitive(&c, &pts, Poly::zero(), h).unwrap();
+            assert_eq!(z.keep_mask, 0b1110);
+            assert_eq!(z.removed, 1);
+            assert!(check_primitive(&c, &pts, 0, Poly::zero(), h).1);
+        }
+        for h in [away, away.mul(&away, &f)] {
+            let pts = [(0, 0), (1, 0), (100, 0)];
+            let z = primitive(&c, &pts, Poly::zero(), h).unwrap();
+            assert_eq!(z.keep_mask, 0b111);
+            assert_eq!(z.removed, 0);
+            assert!(check_primitive(&c, &pts, 0, Poly::zero(), h).1);
+        }
+        let z = primitive(&c, &[(0, 0)], at, Poly::zero()).unwrap();
+        assert_eq!(z.keep_mask, 0);
+        assert_eq!(z.q, Poly::one());
+        assert!(primitive(&c, &[], Poly::zero(), Poly::zero()).is_none());
     }
 }
