@@ -416,7 +416,142 @@ pub fn reference_interreduce(inputs: &[Poly], n: usize, p: u64) -> Result<Vec<Ro
     }
     Ok(reduced)
 }
+/// Initial interreduction plus the standard product criterion.
+pub fn reference_criteria(inputs: &[Poly], n: usize, p: u64) -> Result<Vec<Row>, String> {
+    let mut basis: Vec<Row> = Vec::new();
+    for row in input_rows(inputs, n) {
+        let row = monic(normal_form(row, &basis, p), p);
+        if !row.poly.is_empty() {
+            basis.push(row);
+        }
+    }
+    // Same generators and ideal, but eliminate obsolete initial rows before pairs.
+    for round in 0..128 {
+        let mut changed = false;
+        let mut i = 0;
+        while i < basis.len() {
+            let others: Vec<Row> = basis
+                .iter()
+                .enumerate()
+                .filter(|(j, _)| *j != i)
+                .map(|(_, r)| r.clone())
+                .collect();
+            let reduced = monic(normal_form(basis[i].clone(), &others, p), p);
+            if reduced.poly.is_empty() {
+                basis.remove(i);
+                changed = true;
+                continue;
+            }
+            if reduced.poly != basis[i].poly {
+                basis[i] = reduced;
+                changed = true;
+            }
+            i += 1;
+        }
+        if !changed {
+            break;
+        }
+        if round == 127 {
+            return Err("initial_interreduction_budget".into());
+        }
+    }
+    let mut pairs = VecDeque::new();
+    for j in 0..basis.len() {
+        for i in 0..j {
+            pairs.push_back((i, j));
+        }
+    }
+    let mut count = 0;
+    while let Some((i, j)) = pairs.pop_front() {
+        count += 1;
+        if count > 10000 || basis.len() > 128 {
+            return Err("reference_budget: pairs or basis cap".into());
+        }
+        // Product criterion. Final certificate checks still reduce every S-pair.
+        if lead(&basis[i].poly)
+            .iter()
+            .zip(lead(&basis[j].poly))
+            .all(|(a, b)| *a == 0 || *b == 0)
+        {
+            continue;
+        }
+        let row = monic(
+            normal_form(s_polynomial(&basis[i], &basis[j], p), &basis, p),
+            p,
+        );
+        if !row.poly.is_empty() {
+            let k = basis.len();
+            for i in 0..k {
+                pairs.push_back((i, k));
+            }
+            basis.push(row);
+        }
+    }
+    // Retain a minimal leading-monomial set, then fully interreduce it.
+    let minimal: Vec<Row> = basis
+        .iter()
+        .enumerate()
+        .filter(|(i, g)| {
+            !basis.iter().enumerate().any(|(j, h)| {
+                i != &j
+                    && divides(lead(&h.poly), lead(&g.poly))
+                    && (lead(&h.poly) != lead(&g.poly) || j < *i)
+            })
+        })
+        .map(|(_, g)| g.clone())
+        .collect();
+    let mut reduced = Vec::new();
+    for (i, row) in minimal.iter().enumerate() {
+        let others: Vec<Row> = minimal
+            .iter()
+            .enumerate()
+            .filter(|(j, _)| i != *j)
+            .map(|(_, g)| g.clone())
+            .collect();
+        reduced.push(monic(normal_form(row.clone(), &others, p), p));
+    }
+    reduced.sort_by(|a, b| cmp(lead(&b.poly), lead(&a.poly)));
+    if !check_reference(&reduced, inputs, n, p) {
+        return Err("reference certificate check failed".into());
+    }
+    Ok(reduced)
+}
 pub fn check_reference(basis: &[Row], inputs: &[Poly], n: usize, p: u64) -> bool {
+    if basis.is_empty()
+        || basis
+            .iter()
+            .any(|g| g.poly.is_empty() || !verify(g, inputs, p))
+    {
+        return false;
+    }
+    let bare: Vec<Row> = basis
+        .iter()
+        .map(|r| Row {
+            poly: r.poly.clone(),
+            proof: Proof::new(),
+        })
+        .collect();
+    let basis = bare.as_slice();
+    if input_rows(inputs, n)
+        .into_iter()
+        .any(|r| !normal_form(r, basis, p).poly.is_empty())
+    {
+        return false;
+    }
+    for j in 0..basis.len() {
+        for i in 0..j {
+            if !normal_form(s_polynomial(&basis[i], &basis[j], p), basis, p)
+                .poly
+                .is_empty()
+            {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+pub fn check_reference_legacy(basis: &[Row], inputs: &[Poly], n: usize, p: u64) -> bool {
     if basis.is_empty()
         || basis
             .iter()
@@ -953,6 +1088,36 @@ mod tests {
             let expected = key(baseline);
             assert_eq!(expected, key(raw));
             assert_eq!(expected, key(fast));
+        }
+    }
+    #[test]
+    fn fast_verifier_and_product_criterion_keep_all_contracts() {
+        let system = simple();
+        let f = system.decode().unwrap();
+        let valid = reference(&f, 2, 101).unwrap();
+        assert!(check_reference(&valid, &f, 2, 101));
+        assert!(check_reference_legacy(&valid, &f, 2, 101));
+        let mut forged = valid.clone();
+        forged[0].proof.clear();
+        assert!(!check_reference(&forged, &f, 2, 101));
+        assert!(!check_reference_legacy(&forged, &f, 2, 101));
+        let missing = &valid[..1];
+        assert!(!check_reference(missing, &f, 2, 101));
+        assert!(!check_reference_legacy(missing, &f, 2, 101));
+        for p in [2147483647, 9007199254740881] {
+            let fixture = workload::generate(p, 3, 7).unwrap();
+            let raw = fixture.system.decode().unwrap();
+            let expected = reference(&raw, 3, p).unwrap();
+            let augmented = projection::augment(&raw, 3, p).0;
+            let actual = reference_criteria(&augmented, 3, p).unwrap();
+            assert_eq!(
+                expected
+                    .iter()
+                    .map(|r| r.poly.clone())
+                    .collect::<BTreeSet<_>>(),
+                actual.iter().map(|r| r.poly.clone()).collect()
+            );
+            assert!(check_reference_legacy(&actual, &augmented, 3, p));
         }
     }
     #[test]

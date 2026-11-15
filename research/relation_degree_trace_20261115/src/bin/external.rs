@@ -56,28 +56,69 @@ fn expected(path: &Path) -> Result<Option<BTreeSet<Poly>>, Box<dyn Error>> {
         return Ok(None);
     };
     for sample in array {
-        let b = &sample["arms"]["baseline"];
-        if b["status"] == "complete" {
-            let terms: Vec<Vec<Term>> = serde_json::from_value(b["basis"].clone())?;
-            return Ok(Some(
-                terms
-                    .into_iter()
-                    .map(|terms| {
-                        terms
-                            .into_iter()
-                            .map(|t| (t.exponents, t.coefficient as u64))
-                            .collect()
-                    })
-                    .collect(),
-            ));
+        for arm in ["baseline", "candidate"] {
+            let b = &sample["arms"][arm];
+            if b["status"] == "complete" {
+                let terms: Vec<Vec<Term>> = serde_json::from_value(b["basis"].clone())?;
+                return Ok(Some(
+                    terms
+                        .into_iter()
+                        .map(|terms| {
+                            terms
+                                .into_iter()
+                                .map(|t| (t.exponents, t.coefficient as u64))
+                                .collect()
+                        })
+                        .collect(),
+                ));
+            }
         }
     }
     Ok(None)
+}
+fn parse_msolve(text: &str, p: u64, names: &[String]) -> Result<BTreeSet<Poly>, Box<dyn Error>> {
+    let data = text
+        .lines()
+        .filter(|l| !l.trim_start().starts_with('#'))
+        .collect::<String>();
+    let body = data
+        .trim()
+        .strip_prefix('[')
+        .and_then(|s| s.strip_suffix("]:"))
+        .ok_or("bad msolve framing")?;
+    let mut basis = BTreeSet::new();
+    for polynomial in body.split(',') {
+        let mut f = Poly::new();
+        for term in polynomial.trim().split('+') {
+            let mut parts = term.trim().split('*');
+            let c: u64 = parts.next().ok_or("missing coefficient")?.trim().parse()?;
+            let mut m = vec![0; names.len()];
+            for power in parts {
+                let (name, e) = power.split_once('^').ok_or("missing power")?;
+                let axis = names
+                    .iter()
+                    .position(|v| v == name.trim())
+                    .ok_or("unknown variable")?;
+                m[axis] = e.trim().parse()?;
+            }
+            if !c.is_multiple_of(p) && f.insert(m, c % p).is_some() {
+                return Err("duplicate monomial".into());
+            }
+        }
+        if !f.is_empty() {
+            basis.insert(f);
+        }
+    }
+    if basis.is_empty() {
+        return Err("missing msolve basis".into());
+    }
+    Ok(basis)
 }
 fn main() -> Result<(), Box<dyn Error>> {
     let mut args = std::env::args().skip(1);
     let (mut fixtures, mut native, mut out, mut singular) = (None, None, None, None);
     let mut cpu = "0".to_string();
+    let mut msolve = None;
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--fixtures" => fixtures = Some(PathBuf::from(args.next().ok_or("missing fixtures")?)),
@@ -86,6 +127,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
             "--out" => out = Some(PathBuf::from(args.next().ok_or("missing output")?)),
             "--singular" => singular = Some(PathBuf::from(args.next().ok_or("missing Singular")?)),
+            "--msolve" => msolve = Some(PathBuf::from(args.next().ok_or("missing msolve")?)),
             "--cpu" => cpu = args.next().ok_or("missing CPU")?,
             _ => return Err(format!("unknown argument {arg}").into()),
         }
@@ -155,6 +197,49 @@ fn main() -> Result<(), Box<dyn Error>> {
                 };
                 println!("{id} {arm} {algorithm}: {}", row["status"]);
                 rows.push(row);
+            }
+        }
+        if let Some(msolve) = &msolve {
+            for arm in ["baseline", "candidate"] {
+                if fixture.system.prime >= 2u64.pow(52) {
+                    rows.push(json!({"id":id,"arm":arm,"algorithm":"msolve-f4","status":"unsupported_prime_by_documented_limit"}));
+                    continue;
+                }
+                let output = out.join(format!("{id}-{arm}-msolve.gb"));
+                let start = Instant::now();
+                let result = Command::new("timeout")
+                    .args([
+                        "30s",
+                        "prlimit",
+                        "--as=2147483648",
+                        "--",
+                        "taskset",
+                        "-c",
+                        &cpu,
+                    ])
+                    .arg(msolve)
+                    .args(["-g", "2", "-t", "1", "-v", "2", "-f"])
+                    .arg(root.join(format!("{arm}.ms")))
+                    .arg("-o")
+                    .arg(&output)
+                    .env("OMP_NUM_THREADS", "1")
+                    .output()?;
+                let wall_ns = start.elapsed().as_nanos();
+                fs::write(
+                    out.join(format!("{id}-{arm}-msolve.stdout")),
+                    &result.stdout,
+                )?;
+                fs::write(
+                    out.join(format!("{id}-{arm}-msolve.stderr")),
+                    &result.stderr,
+                )?;
+                let raw = fs::read_to_string(&output).unwrap_or_default();
+                let parsed = parse_msolve(&raw, fixture.system.prime, &fixture.system.variables);
+                let checked = parsed
+                    .as_ref()
+                    .ok()
+                    .is_some_and(|b| expected.as_ref().is_some_and(|v| v == b));
+                rows.push(json!({"id":id,"arm":arm,"algorithm":"msolve-f4","status":if result.status.success()&&checked{"checked_against_native_basis"}else{"failed_or_unverified"},"native_basis_equal":checked,"process_wall_ns":wall_ns,"timing_scope":"single CLI whole-process wall; no comparison to native solver-only wall"}));
             }
         }
     }

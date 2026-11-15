@@ -127,6 +127,8 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         && arm != "projection"
         && arm != "interreduce"
         && arm != "projection-interreduce"
+        && arm != "criteria"
+        && arm != "projection-criteria"
     {
         return Err("arm must be baseline, candidate or projection".into());
     }
@@ -142,7 +144,10 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         let charged_start = Instant::now();
         reset_counters();
         let start = Instant::now();
-        let augmented = if arm == "projection" || arm == "projection-interreduce" {
+        let augmented = if arm == "projection"
+            || arm == "projection-interreduce"
+            || arm == "projection-criteria"
+        {
             let (a, info) =
                 relation_degree_trace::projection::augment(std::hint::black_box(&inputs), n, p);
             pairs = info.len();
@@ -159,7 +164,9 @@ fn execute(path: &Path, arm: &str, repetitions: usize) -> Result<Value, Box<dyn 
         preprocess_products += counters().modular_products;
         reset_counters();
         let start = Instant::now();
-        basis = if arm == "interreduce" || arm == "projection-interreduce" {
+        basis = if arm == "criteria" || arm == "projection-criteria" {
+            relation_degree_trace::reference_criteria(std::hint::black_box(&augmented), n, p)?
+        } else if arm == "interreduce" || arm == "projection-interreduce" {
             relation_degree_trace::reference_interreduce(std::hint::black_box(&augmented), n, p)?
         } else {
             reference(std::hint::black_box(&augmented), n, p)?

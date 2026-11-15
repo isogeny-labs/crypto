@@ -173,6 +173,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         && candidate_arm != "projection"
         && candidate_arm != "interreduce"
         && candidate_arm != "projection-interreduce"
+        && candidate_arm != "criteria"
+        && candidate_arm != "projection-criteria"
     {
         return Err("candidate arm must be candidate or projection".into());
     }
@@ -286,7 +288,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 directory.join(format!("sample-{sample:02}.json")),
                 serde_json::to_string_pretty(&record)? + "\n",
             )?;
-            let failed = record["arms"]["baseline"]["status"] != "complete"
+            let failed = ratio.is_none()
+                || record["arms"]["baseline"]["status"] != "complete"
                 || record["arms"]["candidate"]["status"] != "complete";
             raw.push(record);
             if failed {

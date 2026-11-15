@@ -242,3 +242,57 @@ Full native tests and clippy passed as producer checks `[pcc:unverified]`.
 The previous projection interruption records the stop race and orphan-worker
 cleanup explicitly. No timed process or build remains before the next launch.
 Publish the engine/control fix and its protocol before running both ablations.
+
+## External comparison preparation
+
+The native replay parser now covers msolve's documented positive-coefficient
+reduced-basis format as well as Singular's term dump, requiring proper framing
+and exact coefficient/exponent agreement. Unsupported 53-bit msolve calls are
+explicitly not attempted. External solver CPU batches and CLI whole-process
+wall times are separate diagnostics, not mixed with native solver-only wall
+or relabelled as end-to-end gains. Preprocessing costs remain an obligation
+for any external candidate ranking.
+
+## Analysis/replay prepared without changing running binaries
+
+A native report renderer retains the entire fixed case roster, failed controls,
+missing/interrupted cases, matched milliseconds, paired intervals and per-case
+thresholds. It does not infer speed from degree, pool different cases, or turn
+censored baseline costs into wins. The external parser accepts only fully
+framed, exact coefficient/exponent bases. No analysis or build load is run
+concurrently with the active timed campaign; code changes are compiled after
+those workers finish.
+
+## 2026-11-15T06:02Z — Combined result and final bounded engine test
+
+Completed four-variable combined cases show about 6.7–6.9 producer median
+ratios, with failed controls explicitly not admitted. The declared tenfold
+criterion is still unmet in those completed cases `[pcc:unverified]`.
+
+Next bounded test: retain full membership and every final S-polynomial check,
+but stop propagating unused provenance during the verifier's polynomial-only
+normal forms. Apply this equivalent checker to both arms. Preserve the legacy
+checker and test equal outcomes on valid, missing and forged bases. Separately
+add the standard relatively-prime-leading-monomial product criterion to the
+candidate engine; the final checker still recomputes every S-pair. Compare raw
+and projection inputs to attribute the construction effect. No novelty claim;
+this is standard Buchberger pruning and verification housekeeping. Freeze the
+comparison before timing, retain all prior losses, and do not weaken checks.
+
+## 2026-11-15T06:08Z — Engine panels finished
+
+The raw-interreduction and combined panels have ended and retained their full
+planned case roster. Six-variable cases are incomplete under the worker cap,
+not speed ratios. Four-variable combined cases are approximately 6.7–6.9
+producer medians; the tenfold target has not been established there
+`[pcc:unverified]`. No active timing process remains before building the final
+bounded criterion/checker comparison and the external replay/report tools.
+
+## Final comparison safety review
+
+The fast checker and product-criterion routine passed the exact legacy/new
+checker and forged/missing-basis tests. Prose remains explicit that this is a
+producer check, not an independent verdict `[pcc:unverified]`. A final harness
+review also stops a case on any failed exact-basis/counter-build eligibility
+check, not only a failed process status. External-parser clippy requested the
+standard divisibility method; no lint or correctness gate is disabled.
