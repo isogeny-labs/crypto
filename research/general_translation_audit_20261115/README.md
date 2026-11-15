@@ -139,3 +139,5 @@ bridges and canonical Weil–Tate/MOV–FR remain open. The fourteen-item audit
 remains active. [pcc:unverified]
 
 Exact local **PCC-20261115-833af1** replay PASS at 2026-11-15T22:06:27Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: ready [PR #4355](https://github.com/isogeny-labs/crypto/pull/4355), stacked on #3739 after #4343 merged and its branch was deleted. Remote proof `34044dba931f705ce0336ccaddd2b3b118db770c` and local receipt `6a304f0e8455d5a761d422b836e146672756fdfa` share tree `f67d180e4112cc5e29254a06cc333063a7e8c4db`. Anonymous fetch completed; fresh head/body/open/ready matched. See [integration context](integration-context.json) for the recorded publication-destination deviation; formal criteria and pins are unchanged. Publication metadata is outside the frozen pinset. [pcc:unverified]
