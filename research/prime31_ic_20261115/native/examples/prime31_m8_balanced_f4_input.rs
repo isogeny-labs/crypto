@@ -195,11 +195,13 @@ fn capped_f4(input:&[RPoly],ring:&TowerRing,known_witness:Option<&[u64]>)->Resul
 fn main()->Result<(),String>{
     let args:Vec<_>=std::env::args().skip(1).collect();
     if args.len()>1 || (!args.is_empty()
-        && args[0]!="--probe-f4" && args[0]!="--panel-f4") {
-        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4]".into());
+        && args[0]!="--probe-f4" && args[0]!="--panel-f4"
+        && args[0]!="--ablate-f4") {
+        return Err("usage: prime31_m8_balanced_f4_input [--probe-f4|--panel-f4|--ablate-f4]".into());
     }
     let probe_f4=args.first().is_some_and(|v|v=="--probe-f4");
     let panel_f4=args.first().is_some_and(|v|v=="--panel-f4");
+    let ablate_f4=args.first().is_some_and(|v|v=="--ablate-f4");
     let e=PRIME31;
     let mut ar=Arithmetic::default();
     check_curve(e,&mut ar)?;
@@ -219,6 +221,37 @@ fn main()->Result<(),String>{
     let polys:Vec<_>=fixed.iter().map(|p|ring.from_raw(&p.raw_tower())).collect();
     let nf_terms:Vec<_>=polys.iter().map(|p|p.len()).collect();
     if nf_terms!=[526,526,16] {return Err(format!("F4 tower input terms changed: {nf_terms:?}"));}
+    if ablate_f4 {
+        // Isolate which set of inherited fixed and target Semaev constraints
+        // first exceeds the F4 dense-reducer B' limit. These separate ideals
+        // are NOT interchangeable with the complete m8 oracle.
+        let qx=Q.ok_or("no fixed public Q")?.0;
+        let final_raw=s4(&u,&v,&w,&Polynomial::constant(qx));
+        let final_poly=ring.from_raw(&final_raw.raw_tower());
+        let mut full=polys.clone();
+        full.push(final_poly.clone());
+        let arms:Vec<(&str,Vec<RPoly>)>=vec![
+            ("left_s4_only",vec![polys[0].clone()]),
+            ("right_s4_only",vec![polys[1].clone()]),
+            ("pair_s3_only",vec![polys[2].clone()]),
+            ("target_s4_only",vec![final_poly]),
+            ("three_fixed_constraints",polys.clone()),
+            ("all_four_constraints",full),
+        ];
+        let mut outcomes=Vec::new();
+        for (name,input) in arms {
+            let result=capped_f4(&input,&ring,None)?;
+            outcomes.push(json!({"arm":name,"input_polynomials":input.len(),
+                "result":result}));
+        }
+        println!("{}",json!({
+            "standing":"[pcc:unverified]",
+            "scope":"F4 matrix-stop ablation only; reduced ideals NOT an m8 relation oracle, no ECDLP",
+            "public_Q":Q,"degree_cap":12,"dense_cap":15_000,
+            "ablation_arms":outcomes
+        }));
+        return Ok(());
+    }
     // Prospective naturally sampled F4 panel: source labels are checked only
     // AFTER the algebraic oracle has received the public R coordinates.
     // A "split miss" says NOTHING about the unrestricted m8 ideal: other
