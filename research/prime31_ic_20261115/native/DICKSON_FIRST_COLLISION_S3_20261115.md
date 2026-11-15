@@ -70,3 +70,24 @@ All seven: **538,689 measured F4 multiply-adds**, including work on censored bra
 For j>=1, rather than add T_j(x)+T_j(y)=0 to two complete depth-six towers, retain one complete six-level x chain and only j y-variables, with terminal y_(j-1)^2 = 2-x_j. All original levels y_j through y_5 become consequences of the branch and the x chain. This yields 6+j tower variables, versus 12. For j=0 and the diagonal, use y=-x and y=x directly, requiring only six tower variables. Feed the **same S3** into this smaller quotient ring. The union of seven branch solution sets is exactly the rational finite pair fibre (with the stated first-collision/separability and identity exclusions); unlike simply dropping equations, this is an algebraically constrained presentation, not a group enumerator.
 
 A new source file [prime31_dickson_collapsed_s3.rs](examples/prime31_dickson_collapsed_s3.rs) and focused workflow gate compare all seven quotients with the same Rust F4 engine and 15k cap. This is a distinct proposed encoding test, not yet a benchmark. No end-to-end ECDLP or matched-rho performance inference is justified from its development counters.
+
+
+## Second Rust CI result — collapsed towers, exact branch coverage
+
+Actual exact-source GitHub Actions [43722021158](https://github.com/isogeny-labs/crypto/actions/runs/43722021158) **passed all Rust and independent Python development steps**, including new [collapsed-tower Rust example](examples/prime31_dickson_collapsed_s3.rs). The [machine-readable seven-arm CI results](DICKSON_COLLAPSED_S3_CI_EVIDENCE_20261115.json) pin the compiled source head a61bf2050a8a47d4a39cad770c52552a199fcffd and job 132835864395. Its independently cross-checked rational pair enumeration still covers exactly all 961 signed-pair S3 finite roots. This is development evidence, [pcc:unverified].
+
+| Arm | Reduced tower vars | Full-tower B' peak | Collapsed B' peak | Collapsed F4 muladds | Collapsed verdict |
+|---|---:|---:|---:|---:|---|
+| j=0 | 6 | 4,056 | 4,056 | 40,020 | Basis only |
+| j=1 | 7 | 19,473 | 18,282 | 259,813 | Oversize |
+| j=2 | 8 | 22,619 | **15,577** | 39,259 | Oversize (just over cap) |
+| j=3 | 9 | 27,727 | 18,515 | 28,421 | Oversize |
+| j=4 | 10 | 26,618 | 26,618 | 30,943 | Oversize |
+| j=5 | 11 | 26,618 | 26,618 | 30,943 | Oversize |
+| Diagonal | 6 | 7,886 | 7,886 | 303,074 | Basis only |
+
+**Conclusion at the frozen cap:** true quotient-ring elimination lowers certain peak dense reducer sizes substantially (j=2: 22,619 to 15,577), with identical correct rational root coverage, but does not change the number of completed arms (2 of 7), and **total recorded F4 multiply-adds rise from 538,689 to 732,473 (about 1.36x)**. The summed engine-only clock is 12.44 ms versus 16.39 ms on separate runs, **not an admissible end-to-end speedup** (no cold setup, witness extraction or controlled paired runtime); the operation count and censoring defeat a positive whole-call claim. No new algebraic witness was extracted, and no scalar recovered.
+
+This rejects further uncapped scaling of either seven-arm raw F4 construction as a primary solver strategy. It also gives a more surgical question: the j=2 cap miss is only 577 entries above 15,000, but satisfying *one* branch is insufficient. The next candidate should avoid F4 for the fixed pair stage altogether: compute the finite signed pair-abscissa fibres using the quadratic S3 discriminant and field operations, construct a certified univariate or split-fibre membership for w, and charge that algebraic preprocessing and the target-dependent S4/F4/finite-field witness extraction in full. This must not use a generic EC group table or hidden target logs. Test against existing dense membership experiments (#4275), not as an unsearched innovation.
+
+**No cheaper complete ECDLP solution has been established on prime31.** These measurements are specific to fixed S3 preprocessing, not a full index-calculus call, and remain [pcc:unverified].
