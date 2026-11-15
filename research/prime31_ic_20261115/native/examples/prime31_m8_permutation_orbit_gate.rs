@@ -4,6 +4,7 @@
 //! collected* public 8-sum witness. It does not extract a new relation or
 //! solve an ECDLP. A single positive eight-distinct-index signed witness
 //! produces 8! distinct ordered rational roots of the balanced m8 ideal.
+//! Two different index sets for the same public mask give at least 2*8! roots.
 //! [pcc:unverified]
 use prime31_algebraic_ic::{check_curve, Arithmetic, Base, Point, PRIME31};
 use serde_json::json;
@@ -15,7 +16,7 @@ const B: u64 = 2_087_444_724;
 const Q: (u64, u64) = (1_547_953_785, 1_667_575_595);
 const A_MASK: u64 = 806_206_853;
 const B_MASK: u64 = 542_783_019;
-const CODES: [u64; 2] = [18_903_234, 258_036_944];
+const CODES: [[u64; 2]; 2] = [[18_903_234, 258_036_944], [37_012_034, 107_578_577]];
 
 fn add(x: u64, y: u64) -> u64 {
     let s = x + y;
@@ -88,56 +89,65 @@ fn main() -> Result<(), String> {
         || base.points.len() != 31 || base.terminal != 933_677_148 {
         return Err("registered ordinary prime31 curve/base changed".into());
     }
-    let labels: Vec<_> = CODES.iter().flat_map(|&x| four(x)).collect();
-    if labels.len() != 8
-        || labels.iter().map(|&(i, _)| i).collect::<std::collections::HashSet<_>>().len() != 8 {
-        return Err("expected eight distinct factor-base indices".into());
-    }
-    let ps: Vec<(u64, u64)> = labels.iter().map(|&(i, sign)| {
-        let pt = Some(base.points[i]);
-        if sign < 0 { ar.neg(PRIME31, pt).unwrap() } else { pt.unwrap() }
-    }).collect();
     let ag = ar.scalar(PRIME31, A_MASK, Some(PRIME31.g));
     let bq = ar.scalar(PRIME31, B_MASK, Some(Q));
     let target = ar.add(PRIME31, ag, bq)
         .ok_or("registered public mask is infinity")?;
-    if sum(&mut ar, &ps, &[0,1,2,3,4,5,6,7]) != Some(target) {
-        return Err("prior signed relation no longer checks".into());
-    }
-    let mut a: [usize;8] = std::array::from_fn(|i| i);
     let mut checked: usize = 0;
-    let mut orbit_counts: BTreeMap<[u8;8], usize> = BTreeMap::new();
-    loop {
-        let u = sum(&mut ar, &ps, &a[..3]).ok_or("u=O, special case")?;
-        let v = sum(&mut ar, &ps, &a[3..6]).ok_or("v=O, special case")?;
-        let w = sum(&mut ar, &ps, &a[6..]).ok_or("w=O, special case")?;
-        let uv = ar.add(PRIME31, Some(u), Some(v));
-        if ar.add(PRIME31, uv, Some(w)) != Some(target) {
-            return Err("permuted eight-summand equality failed".into());
+    let mut orbit_counts: BTreeMap<(usize, [u8;8]), usize> = BTreeMap::new();
+    let mut witness_sets = std::collections::HashSet::new();
+    for (witness_index, &codes) in CODES.iter().enumerate() {
+        let labels: Vec<_> = codes.iter().flat_map(|&x| four(x)).collect();
+        let distinct: std::collections::HashSet<_> = labels.iter().map(|&(i, _)| i).collect();
+        if labels.len() != 8 || distinct.len() != 8 {
+            return Err("expected eight distinct factor-base indices".into());
         }
-        if s4(ps[a[0]].0, ps[a[1]].0, ps[a[2]].0, u.0) != 0
-            || s4(ps[a[3]].0, ps[a[4]].0, ps[a[5]].0, v.0) != 0
-            || s3(ps[a[6]].0, ps[a[7]].0, w.0) != 0
-            || s4(u.0, v.0, w.0, target.0) != 0 {
-            return Err("balanced S4/S3 polynomial residual nonzero".into());
+        let mut sorted_set: Vec<_> = distinct.into_iter().collect();
+        sorted_set.sort_unstable();
+        if !witness_sets.insert(sorted_set) {
+            return Err("same index set repeated under distinct witness codes".into());
         }
-        *orbit_counts.entry(orbit_key(&a)).or_default() += 1;
-        checked += 1;
-        if !next_permutation(&mut a) { break; }
+        let ps: Vec<(u64, u64)> = labels.iter().map(|&(i, sign)| {
+            let pt = Some(base.points[i]);
+            if sign < 0 { ar.neg(PRIME31, pt).unwrap() } else { pt.unwrap() }
+        }).collect();
+        if sum(&mut ar, &ps, &[0,1,2,3,4,5,6,7]) != Some(target) {
+            return Err("prior signed relation no longer checks".into());
+        }
+        let mut a: [usize;8] = std::array::from_fn(|i| i);
+        loop {
+            let u = sum(&mut ar, &ps, &a[..3]).ok_or("u=O, special case")?;
+            let v = sum(&mut ar, &ps, &a[3..6]).ok_or("v=O, special case")?;
+            let w = sum(&mut ar, &ps, &a[6..]).ok_or("w=O, special case")?;
+            let uv = ar.add(PRIME31, Some(u), Some(v));
+            if ar.add(PRIME31, uv, Some(w)) != Some(target) {
+                return Err("permuted eight-summand equality failed".into());
+            }
+            if s4(ps[a[0]].0, ps[a[1]].0, ps[a[2]].0, u.0) != 0
+                || s4(ps[a[3]].0, ps[a[4]].0, ps[a[5]].0, v.0) != 0
+                || s3(ps[a[6]].0, ps[a[7]].0, w.0) != 0
+                || s4(u.0, v.0, w.0, target.0) != 0 {
+                return Err("balanced S4/S3 polynomial residual nonzero".into());
+            }
+            *orbit_counts.entry((witness_index, orbit_key(&a))).or_default() += 1;
+            checked += 1;
+            if !next_permutation(&mut a) { break; }
+        }
     }
-    if checked != 40_320 || orbit_counts.len() != 280
-        || orbit_counts.values().any(|&count| count != 144) {
+    if checked != 80_640 || orbit_counts.len() != 560
+        || orbit_counts.values().any(|&count| count != 144)
+        || witness_sets.len() != 2 {
         return Err("permutation/orbit certificate changed".into());
     }
     println!("{}", json!({
         "standing":"[pcc:unverified]",
         "curve_p":P,"curve_n":PRIME31.n,"factor_base_points":base.points.len(),
-        "source":"previously recorded first public natural-positive m8 witness",
+        "source":"two different previously recorded natural-positive m8 witnesses for the same public mask",
         "witness_mask":[A_MASK,B_MASK],
-        "leaf_x_distinct":8,
+        "leaf_x_distinct_per_witness":8,"distinct_witness_index_sets":witness_sets.len(),
         "distinct_balanced_affine_roots_lower_bound":checked,
         "zero_polynomial_residuals_checked":4*checked,
-        "relabel_symmetry_order":144,
+        "relabel_symmetry_order":144,"orbits_per_witness":280,
         "symmetry_quotient_orbits":orbit_counts.len(),
         "orbit_size_min":orbit_counts.values().min(),
         "orbit_size_max":orbit_counts.values().max(),
