@@ -1,35 +1,85 @@
-# Resume: crypto @ claude/ecstatic-thompson-0jpmjv
+# Resume: mathematical 10x hyperelliptic IC goal
 
 ## Goal
-Owner (2026-11-12): run the frozen wide-modulus sparse-LA pack on RunPod ("1 but on runpod").
-Protocol: research/ic_techniques_20261012/wide_sparse_la/PROTOCOL.md + PROTOCOL_AMENDMENT_1.md
-(RunPod cpu5g 4 vCPU/16 GiB, one pod per seed, A/A per pod, USD 25 ceiling, 40 h pod deadline).
+Establish a mathematical breakthrough giving >=10x complete IC speedup for genus2 and above.
+This remains active and unachieved. Current branch research/hec-principal-relations-20261114,
+worktree /Users/adamburan/pq-work/hec-followups. PRs4096 and4170 are open;4170 is currently CLEAN.
 
 ## Lead / hypothesis
-Size law: row_ops/D grows as D^(beta-1), beta in [1.9, 2.1] (Krylov). Width law: ns per row_op
-t(L) = c0 + c2 L^2 over limbs L = 1..4. Extrapolate U192@129 (ECC2K-130 order) to D = 1e9 with
-interval; falsifiers in PROTOCOL.md "How the extrapolation model is falsified".
+Exact principal-divisor identity from interpolation through g+1 rational places yields <=2g+1
+entry relation rows. This is known Riemann-Roch mathematics, not novelty; screen its end-to-end
+cost and rank against best-native controls before pursuing any breakthrough claim.
 
 ## Spec
-research/ic_techniques_20261012/wide_sparse_la/runpod/{launch.py, pod_run.sh, make_bundle.py}.
-launch.py bundles HEAD, uploads to s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/<stamp>-<sha>/,
-creates 3 RunPod CPU pods (REST v1) that build la_engine_bench and run the grid for their seed.
-Record: benchmarks/records/<id>-wide-sparse-la.json (benchrec).
+research/hec_relation_math_20261114/DERIVATION.md, committed13930db391 before implementation.
+Eleven round-eight instances at seeds20260916..20260920; include both target descents, all solve
+retries, catalogue construction and final verification. Four Fast/Hybrid x reference/direct
+controls plus one-step walk. Candidate cap1million trials,16solves,10000descentsteps.
 
 ## State
-2026-11-12: amendment + launcher committed; local smoke test of pod_run.sh (D=2^8..2^9) run.
-Launch manifest: research/ic_techniques_20261012/wide_sparse_la/launch.json (pod ids, S3 prefix).
-
-## Runs in flight
-None. Attempt 2 completed 2026-11-13 ~16Z; raw data pulled into wide_sparse_la/raw/ (2026-11-14).
-Was: 3 RunPod pods (see launch.json). Progress: aws s3 cp <prefix>/seed<s>/runs.jsonl -; done.json appears at end.
-Pods self-terminate via podTerminate; if not, terminate via REST DELETE /v1/pods/<id>.
-
-## Stop and success conditions
-Fixed grid; per-run 3600 s timeout and per-arm stop rule; pod deadline 40 h; A/A determinism failure voids.
-Success = complete raw data + frozen analysis (fits, intervals, falsification outcomes), whatever the outcome.
+Experimental code interpolation.rs and example principal_relations implemented. Release tests
+passed two tests including18 gated solves across six instances, all generated principal identities
+and target descents checked. Debug gate and build initiated; collect before experiment.
+No >=10x result established. Conductor T-5922 reserved paths; progress endpoint later hung.
 
 ## Next steps
-1. Monitor pods (~13-16 h). 2. Pull raw/*.jsonl into wide_sparse_la/raw/, sha256 + S3.
-3. analysis.py per frozen Analysis section -> results.json; research-visuals report/PDF/graphs.
-4. benchrec add-raw/metric/close; benchmarks/<date>-wide-sparse-la/ + README row; progress report; PR.
+Run recorded HEC_GATE=1 pilot first (all accepted rows group-checked); then run normal pilot.
+Example binary /Users/adamburan/pq-work/hec-followup-target/release/examples/principal_relations.
+Use benchrec run and preserve gate output and measurement output separately. Summarize against
+best-control complete time, retain capped/rank-failure rows. Extend sizes only with a cost case.
+Write source-linked report/graphs/PDF and benchmark record. Keep goal active if any gate misses.
+
+## Runs in flight
+All five recorded mathematical pilots are terminal. Final release library/example tests are
+being collected in the current session. Do not restart completed pilots. Current source and
+latest raw results are summarized in research/hec_anchor_relations_20261114/STATUS.md.
+
+## Stop and success conditions
+Local CPU only; no cloud spend authorized. A pilot or a known-method reproduction is not goal
+completion. >=10x requires held-out growing-size per-genus ladder, independent replay, baseline
+ratchet and mathematical novelty review. Preserve the full objective on null/negative evidence.
+
+## Open questions
+Will short rows retain enough rank and target connectivity? Does a one-step walk give the same
+gain more cheaply? Is there any mechanism beyond known interpolation that survives prior art?
+
+## 2026-11-15 04:54 UTC: next mathematical lead
+Principal pilot finished:55 gated candidate runs and330 paired solves all checked, but unrestricted
+principal rows lose at every row to best-native controls. At g2p4001:123ms vs5.3ms one-step walk.
+Next source ee98ca8b1d: table_factor.rs and table_oracle implement exact cubic and quartic root
+lookup via projective cubing/Cardano/Ferrari, p>3, p<=1million. PROTOCOL.md at
+research/hec_table_oracle_20261114/ freezes lemma and gates before code (c8a30320a6).
+Two release tests passed (all monic degree1..4 atp5,7,11,13 compared to independent root division,
+plus48000 randomized/constructed cases across8primes). Next is component measurement; table
+construction and O(p) memory must be charged. This is NOT an end-to-end10x result.
+Conductor MCP authentication failed; CLI check+claim worked for separate disjoint task T-5932.
+
+## Table pipeline gate
+The table pipeline preserves catalogue, trials, relations, rank retries, pivot hash, pivots,
+row operations, modular multiplications and k on220matched configurations. Genus2 builds only
+square roots (8p bytes), using square recurrence; genus3/4 builds inverse/cube/projective tables.
+Three release tests passed (including exhaustive/randomized oracle checks). Ready for new
+end-to-end record, eight controls and four table choices on eleveninstances x fiveseeds. Every
+cold setup, catalogue and verification remains inside total time. Component cold10.4x atg3p401
+is a component result only, with g2p503 regression in the initial all-degree table setup.
+
+## Anchor screen
+New protocol/source research/hec_anchor_relations_20261114/ (target-seeded H, <=2 off-anchor,
+weighted forest, signed-cycle proof). Twelve gated solves passed, plus planted arbitrary-gain
+forest invariants. Next: recorded55-case full gate and55-case timed pilot, compare to strongest
+native AND table baselines. Tables/caches/descents/forest/verification all charged cold.
+Goal remainsactive: no >=10x complete gain established. User requests skipping further repeated
+coordination. Work remains in task T-5941's already-claimed paths.
+
+## Signed-orbit pilot and packaging
+Source88a969080d integrates Gray-code norm updates, one batch anchor-difference inversion,
+bounded dense affine forest and incremental dense anchor elimination. Genus2 tuple family is
+shuffled without replacement. Original Horner catalogue retained on both sides by explicit
+pre-timing amendment. All55 group gate cases pass (15115raw,1290projected identities), and
+all110 interleaved cold solves pass. Per-size five-seed median gain vs frozen table controls
+1.27..2.94x, exploratory L0 macOS. Producer assertions [pcc:unverified].
+Five records now closed with raw hashes and shared report/plots in
+benchmarks/20261114-hec-anchor-forest. Source-linked report visually inspected, two pages.
+Next: finish final checks and open stacked PR on research/hec-followups-20261114; preserve
+independent replay, external comparison, held-out scaling and >=10x as outstanding research.
+Do not mark the goal complete based on this engineering/algebraic reuse pilot.

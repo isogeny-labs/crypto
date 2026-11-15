@@ -48,3 +48,17 @@ Next: implement dense affine forest, batch anchor inverses and bounded tuple sch
 run full group gates before measuring the frozen variant. Retain the old solve path unchanged
 as an explicit reference. Current integration intentionally does not represent the entire
 signed-orbit protocol amendment.
+
+## Completed signed-orbit pilot
+Source88a969080d implements the dense affine forest, batch inverse differences, shuffled
+genus2 triples, all Gray sign classes and incremental target elimination. The original Horner
+catalogue remains in both arms; a pre-timing protocol amendment records that choice.
+All55 fully gated solves passed, with15115 raw principal identities and1290 projected anchor
+identities checked. All110 interleaved cold solves passed. Five-seed table/orbit median ratios:
+g2 p1011.27,p2511.32,p5031.58,p10092.59,p20032.86,p40012.94;
+g3 p611.55,p2111.38,p4012.21; g4 p311.34,p611.69.
+These are local L0 producer assertions [pcc:unverified], not independently signed results.
+Record20261115T0602Z-hec-signed-orbit and run/orbit-* retain all outputs.
+The shared report preserves the preceding negative pilots and separate comparison boundaries.
+The next research step is frozen-arm confirmation on held-out families and a phase-cost
+analysis of the remaining relation work. The10x mathematical goal remains active.
