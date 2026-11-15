@@ -128,7 +128,7 @@ for pref, label in (("tp", "|F| = 65536, 65536 targets"), ("tpsmall", "|F| = 102
     mb = best["D"][1]
     md.append("\nBest configuration per arm:\n")
     for a in arms:
-        c, v = best[a]; md.append(f"- {NAMES[a]}: {c} {v:.2f} ms ({mb / v:.3f}× the default's best)")
+        c, v = best[a]; md.append(f"- {NAMES[a]}: {c} {v:.2f} ms ({v / mb:.3f}× the default's best time)")
     aa = max(max(med(v["D2"]) / med(v["D"]), med(v["D"]) / med(v["D2"])) for v in data.values() if "D2" in v)
     spread = max(max(v[a]) / min(v[a]) for v in data.values() for a in v)
     md.append(f"\nA/A: largest |D2/D − 1| {aa - 1:.4f}; largest max/min of one arm's rounds {spread:.4f}.")

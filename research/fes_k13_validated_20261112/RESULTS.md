@@ -124,7 +124,7 @@ claim, wall figure, or claim needing the L2 gate or the A/A noise floor is not `
 | F2 | major | H1 not supported as frozen: order flips at w = 0 (see Verdicts). |
 | F3 | major | Route deviation: no L2 gate, shared host; no wall figure admissible. |
 | F4 | major | A/A wall control fails its frozen threshold (0 pairs at L2; each A/A solve is about 0.12 ms, under the 1 ms minimum), so the threshold was unattainable for this spec. At count level the A/A is exact: 48 of 48 pairs identical. |
-| F5 | major, open | Binary-to-source link to e9d5dbdccd is the producer's assertion with supporting evidence, not rebuilt. |
+| F5 | major, closed 2026-11-15 | Binary-to-source link to e9d5dbdccd. Closed by the validator's own rebuild and 288/288 identical replay (`runpod-a1/f5-rebuild/F5-ASSESSMENT.md`). |
 | F6 | minor | Attempt history incomplete; recorded above. |
 | F7 | minor | The producer wrote `compare --save` output into the session copy; moved to `claimed/` before validation, and session/ is byte-identical to the S3 tarball. |
 | F8 | minor | rho-negation's band S is a lower bound (table work not listed as unpriced); no order changes. |
@@ -138,9 +138,11 @@ claim, wall figure, or claim needing the L2 gate or the A/A noise floor is not `
 
 - No wall figure is usable: the A/A wall control failed (F4), there is no L2 gate, and the
   route is a deviation (F3). Do not cite the comparison's wall block.
-- F5 is open. A rebuild of ecbench from e9d5dbdccd with `ecbench verify --dir
-  research/fes_k13_validated_20261112/runpod-a1/session --replay-all --exit-code`
-  requiring 288 of 288 identical replays would close it.
+- F5 is closed (2026-11-15) `[pcc:unverified]`. The validator built ecbench from its own `git
+  archive` of e9d5dbdccd with official rustc 1.97.0 and `--locked`, and replayed the session:
+  288 of 288 identical. A second rebuild on a fresh Runpod pod also replayed 288 of 288 and
+  re-ran the frozen spec with every counted field equal to the session's. Details:
+  [`runpod-a1/f5-rebuild/F5-ASSESSMENT.md`](runpod-a1/f5-rebuild/F5-ASSESSMENT.md).
 - The replay on a different host class (Intel Xeon KVM guest) reproduced all 288 measured
   runs, but a replay with the same binary cannot detect a binary that miscounts.
 - One curve, one size; the result says nothing about other degrees.

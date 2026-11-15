@@ -173,6 +173,18 @@ On both draws the degree-5 closure completes (55,455 columns, 6.8·10⁷ entries
 `t = 12` happened; Conjecture G survives this test.** That the value is exactly 6 (not 7) is not
 tested: the degree-6 closure needs a host with more than 15 GB.
 
+**RunPod attempt at degree 6 (2026-11-15; censored, no value; `[pcc:unverified]`).** Both draws of
+`W = 1`, `t = 12` were run to `--hky-cmax 7` on a 16-vCPU / 128 GB RunPod pod (`falsify_runpod/`:
+binary sha256 `86a52280…` from commit `d2a16c72`, exact command in `commands.log` and `cells_job.sh`,
+`MANIFEST.sha256`). Memory was not the limit (pod peak 77 GB for the two processes together), but
+neither closure finished inside its 3 h wall-clock timeout (`exit=124`). The pilot writes its rows
+only when a run ends, so the timeout also discarded the `c ≤ 5` rows: **no new value**. The
+`--budget 10500` limit did not stop the run first, so it appears to be checked only between closures.
+The queued `W = 3`, `t = 13` pair was stopped after the `W = 1` result, because it is larger and would
+have ended the same way; `W = 2`, `t = 14` was not started. Pod spend $3.17 of an $8 cap, pod terminated.
+The value at `t = 12` is still `d_F ≥ 6`. A further attempt should first make the closure engine
+write each completed degree as it finishes (and checkpoint), so that a timeout keeps what was decided.
+
 ## 6. What remains open, stated exactly
 
 **Update 2026-11-13** (`lower_bound/README.md`, written by a delegated agent and checked by the main
