@@ -163,6 +163,16 @@ monotonicity and the intercepts, and the fit uses the observed step positions (`
 - `W = 3` reads 6 at `t = 10, 11, 12` and 7 at `t = 13`.
 - `W = 2` reads 7 at `t = 14` (the C-step prediction of Amendment 6, already registered).
 
+**Falsifying cell `W = 1`, `t = 12` (run 2026-11-14; development check, this host; `[pcc:unverified]`).**
+Rows `falsify/nullw1_m2_t12_k{0,1}.jsonl` (null arm, Kummer `P1`, seed 1347106132 = `0x504B3554`, passed explicitly; the pilot's default `0x504B4D54` = 1347112276 is not used, binary sha256
+prefix `922f4082`, source commit in `falsify/source_commit.txt`). Two attempts to run the closure to
+degree 6 were killed by the 15 GB memory limit (`falsify/run_*_attempt{1,2}_oom.log`); the closure was
+then run to degree 5 (`--hky-cmax 5`), which decides the half of the prediction that tests the step.
+On both draws the degree-5 closure completes (55,455 columns, 6.8·10⁷ entries, about 500 s) without
+`1` and without censoring, so `d_F ≥ 6` at `t = 12`, against 5 at `t = 11`. **The predicted step at
+`t = 12` happened; Conjecture G survives this test.** That the value is exactly 6 (not 7) is not
+tested: the degree-6 closure needs a host with more than 15 GB.
+
 ## 6. What remains open, stated exactly
 
 **Update 2026-11-13** (`lower_bound/README.md`, written by a delegated agent and checked by the main
@@ -191,11 +201,13 @@ supporting toy computations were Python and are not admitted (see that note).
 
 | result | statement | Lean | status |
 |:--|:--|:--|:--|
-| Theorem 1 | monotone in `t` (fixed system); generic form via Thm 3 | `closure_image`, `closure_one` (abstract core), `pop_mod_le` (degree hypothesis on monomials), `lean/GrowthLaw.lean` | abstract core and monomial lemma checked (2026-11-13); instantiation on the concrete tower algebras not formalised (needs Mathlib) |
+| Theorem 1 | monotone in `t` (fixed system); generic form via Thm 3 | abstract order step only: `closure_image`, `closure_one`, `refutes_descend`, `lower_bound_lifts`, `lastFall_le` (`d_F(t) ≤ d_F(t+1)` for `IsLastFall`), `lastFall_unique`, `closure_mono_deg`, `tower_refutes_descend`, `tower_lastFall_mono`, and existence descends: `lastFall_exists_of_refutes`, `lastFall_descend_exists`, `lastFall_le_of_top` (needs `IsLastFall` only at level `t+1`), via `Level`/`LevelMap`; `lean/GrowthLaw.lean` | abstract order step checked (least `c` monotone, existence descends; 2026-11-15). Mathlib bridge `lean/bridge/Bridge.lean` built 2026-11-15 (Lean 4.35.0, Mathlib `56a00585`, `lake build` rc 0, no `sorry`, `#print axioms` on all 105 declarations of `Bridge.lean` and the namespaced `GrowthLaw.lean` copy: only `propext`, `Classical.choice`, `Quot.sound`; receipt `lean/bridge/receipts/20261115_pod/b2/`) `[pcc:unverified]`: for `R_t = F_p[X]/(X^(2^t)-1)` (`Bridge.Uni`) and `F_p[z_1..z_n]/(z_i^(2^t)-1)` (`Bridge.Kummer`, `n = 2` is PKM) the reduction `red : R_{t+1} →+* R_t` (`red_X_pow`/`red_prod`: monomial exponents reduce mod `2^t`), the popcount degree `deg` (least bound over representatives) with `deg_red_le` on all elements, `levelMap` (every `GrowthLaw.LevelMap` hypothesis, generators = images of an arbitrary set `S`), and `lastFall_mono`/`refutes_descend` (`d_F(t) ≤ d_F(t')` for `t ≤ t'` on the concrete towers); one variable only (`p > 1`): `deg_eq_nfDeg` (`deg` = max popcount over the normal-form support) and `deg_le` (`deg ≤ t`). NOT formalized: `Closure = V_c` (the inductive closure vs the linear-span definition of PREREGISTRATION §2), the normal-form identity of `deg` in the multivariate ring, the HKY system itself (`S` arbitrary), and the generic form |
 | Theorem 2 | top window | `top_window`, `lean/GrowthLaw.lean` | checked (2026-11-13) |
-| Theorem 3 | generic value; `S₃` support = width-2 box | none | proved in prose (no probability bound) |
-| Lemma, Thm 4 | `ffd = D + 1` under a common top variable; `ffd(W)` | none | proved in prose; `W = 2` by D3 |
+| Theorem 3 | generic value; `S₃` support = width-2 box | none | proved in prose (no probability bound); not formalised |
+| Lemma, Thm 4 | `ffd = D + 1` under a common top variable; `ffd(W)` | Nat `pop` range facts only: `pop_le_four_eq_two_iff` (only exponent in `[0,4]` of popcount 2 is 3), `pop_le_two_of_le_four`, `pop_le_one_of_le_two`; hypotheses: exponents are normal forms (`W < 2^t`, so `t ≥ 2` for `W = 3`, `t ≥ 3` for `W = 4`) and generic nonzero top coefficients; `D_W` and the top form are not defined in Lean (the conclusion about `D_W` is prose); `lean/GrowthLaw.lean` | Nat range lemmas checked (2026-11-15, same receipt); the Lemma (`gr R`, `y² = 0`, unit argument) and the `W = 2` case proved in prose only; `W = 2` by D3 `[pcc:unverified]` |
 | Conjecture G | growth law | — | fitted, open |
+
+**Gate count 2026-11-15.** `lean/GrowthLaw.lean` has 34 hand-written theorems (`grep -c '^theorem '`); the gate (`tools/lean/proof-gate.sh`, receipt `lean/receipts/20261115/`) PASSes with 0 trusted and audits 54 declarations including compiler-generated ones. Every value `[pcc:unverified]`.
 
 **Update 2026-11-13.** `lean/GrowthLaw.lean` (core Lean 4.35.0, no Mathlib, pinned in
 `lean/lean-toolchain`) proves `pop_mod_le`, `top_window`, `closure_image` and `closure_one`.

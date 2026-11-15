@@ -1,0 +1,82 @@
+# Atlas verdict patch, follow-up item 4 (2026-11-15). Companion to ATLAS_PATCH.md.
+# Every result statement is [pcc:unverified]. Nothing applied; atlas bodies were not readable here.
+# Proposed wording is copied verbatim from research/leads_20261112/README.md section 4.
+entries:
+  - cell: '0.1'
+    name: Kummer g*mu_{2^t} (P-224 shape)
+    current: OPEN (flagship)
+    proposed: 'open only for m >= 3 with LFD/k < 0.184, or slope < 0.083 at m = 2'
+    evidence:
+      - 'research/leads_20261112/README.md section 1 (thresholds; measured m=2 slope 0.25)'
+      - 'research/leads_20261112/BRIEFING.md ("What is settled today about the fall degree of the flagship family 0.1")'
+      - 'research/leads_chase_20261112/RESULTS.md section "M1 three-summand arity grid" (m=3: LFD 7 at k<=5, LFD>=8 at k=6)'
+      - 'research/leads_chase_20261112/RESULTS.md section "P1 quotient law" (72/72 out of sample; stage 2 not run); figure research/leads_chase_20261112/figures/p1_quotient_law.svg'
+      - 'research/leads_chase_20261112/RESULTS.md section "S1 crossing" (Dm survives); figure research/leads_chase_20261112/figures/s1_departures.svg'
+    reversal_condition: 'Certified m=3 LFD(k) with LFD/k < 0.184 at growing k; or measured m=2 slope < 0.083 (trigger 1 in V_7(18), README section 2a P2); a P1 stage-2 mismatch (D=6, k=15, q != 167665) undercuts the P1 reading, not the section 4 wording; or the BRIEFING open items resolved against the cell.'
+    notes:
+      - 'M1 ratios are at k=5,6 only; the m=2 law itself gives LFD/k=0.8 at k=5 with slope 0.25, so small-k ratios do not decide the asymptotic 0.184 threshold (derived).'
+      - 'Measured m=2 slope 0.25 is above 0.083; proved floor 1/14=0.071 is below 0.083 (omega=2 line) and above 0.054 (omega=2.81 line).'
+      - 'README section 2a says P1 holding makes 0.1 engineering-only; section 4 wording does not use P1. Owner to choose.'
+  - cell: '0.2'
+    name: Isogeny tower x(R' + <Q>)
+    current: OPEN (flagship)
+    proposed: 'open on the solver axis only; S2 decides whether its graded algebra changes the degree law'
+    evidence:
+      - 'research/leads_20261112/README.md section 2c, S2 (LEAD-SYN-velu-tower-exact-lfd): not run'
+      - 'research/leads_20261112/README.md section 2a, P4: withdrawn (misreading; belongs to A11/D7 reading)'
+      - 'research/leads_20261112/lanes/synthesis.md (about lines 145-148, contradiction between records; around line 318, priors H_same 0.45, H_flat 0.35, H_steep 0.20)'
+      - 'docs/ic/factor-base-encyclopedia/README.md section 0.2 (from line 354): auxiliary-curve Vélu tower definition'
+      - 'research/leads_chase_20261112/RESULTS.md: no section for 0.2'
+    reversal_condition: 'S2 shows the Velu tower exact closure LFD on unit instances at k=4..10 departs from the Kummer law (H_flat or H_steep); or the atlas body defines 0.2 as the P4 reading (isogeny into E class), in which case the cell falls under A11/D7 and the wording does not apply.'
+    notes:
+      - 'Wording applies only if the atlas body 0.2 equals encyclopedia section 0.2 (auxiliary curve E prime).'
+      - 'Priors are not evidence until S2 runs.'
+  - cell: 'E3'
+    name: P-192 CM class ideals
+    current: OPEN
+    proposed: 'closed by structure once cm_closed_walk_scalar_action is written: a closed class walk acts as one scalar on P and Q'
+    evidence:
+      - 'research/leads_20261112/README.md section 2b (E3 closes by structure; Lean obligation cm_closed_walk_scalar_action, elementary)'
+      - 'research/leads_20261112/lanes/lane_J_covers.md line 411 (desk argument: closed walk acts as one scalar; non-integer endomorphisms degree about p; class group about 2^96)'
+      - 'docs/ic/factor-base-encyclopedia/README.md E3 entry (from line 1509), source research/p192-weak-curve-20261006/REPORT.md L249-380: 9,948,061 vectors gave 103 relations, all scalar; INDETERMINATE'
+      - 'research/leads_chase_20261112/RESULTS.md: no section for E3'
+    reversal_condition: 'A closed class walk whose action on P and Q is not one scalar (counterexample to the obligation); or a relation source for the E3 base not produced by closed walks that acts non-scalarly.'
+    notes:
+      - 'Lean obligation not established: grep for cm_closed_walk_scalar_action over /home/user/crypto and /home/user/ml-cryptanalysis (exit 0) found it only in prose (README.md, lane_J_covers.md, docs/session-logs/2026-11-12.md); crypto-lean not searched.'
+      - 'Walk claim is a desk argument until the obligation is written and checked.'
+      - 'Closed by structure is not in the brief legend (REF/ENG/OPEN/JAC/WEAK).'
+  - cell: 'D4'
+    name: Cyclotomic
+    current: 'OPEN (brief row "D4 cyclotomic: yield-neutral")'
+    proposed: 'engineering; the two-summand floor is exponent 2/3 and Koblitz curves proper are excluded from the m >= 4 Gaudry route by the group-order trap (lane K; the fold K1 lives on the weak class over F_16)'
+    evidence:
+      - 'research/leads_20261112/README.md section 2e (lane findings; K1 fold)'
+      - 'research/ecbench_pair_claw_20261003/README.md (pair claw 2.195x matched rho pooled over six Koblitz curves; 2.51x at f2m41; orbit-IC 18.16x at n41)'
+      - 'research/subgroup_trap_20261107/README.md (group-order trap)'
+      - 'research/c1_twisted_line_ladder_20261027 (K1: same yield 1.024, per-trial cost 0.961; no end-to-end run)'
+      - 'docs/ic/factor-base-encyclopedia/README.md D4 entry (from line 1274): gamma-weight cyclotomic base, yield-neutral at n=23; costlier 1.022 and 1.122 vs compact-orbit-scan'
+      - 'research/cyclotomic_falsifier_20261015/README.md (15 tests in null, smallest two-sided p 0.363; positive control p=0.001)'
+      - 'research/leads_chase_20261112/RESULTS.md: no section for D4; K1 not run'
+    reversal_condition: 'For the gamma-weight base: yield-positive result at n > 23, or validated cost ratio < 1.0 vs compact-orbit-scan at matched columns. For the Koblitz/Gaudry reading: a Koblitz instance where the group-order trap does not apply to an m>=4 route, or a fold gain that changes the exponent. K1 relation counts outside 0.27/0.17/0.11-0.12 (+-25%) falsify the fold prediction.'
+    notes:
+      - 'DISCREPANCY: section 4 and 2e evidence concerns the Koblitz/Gaudry route; encyclopedia D4 is the gamma-weight cyclotomic base. Owner must confirm the object before applying.'
+      - 'Lane K uses the label D4 for binary Gaudry (x in F_Q, n=4m): a third meaning; confirm.'
+  - cell: 'C5'
+    name: Trace-zero (note; no verdict change proposed)
+    current: ENG
+    proposed: 'no change; README section 4: today k=11 binary measurement (LFD 5, every law) is consistent with engineering'
+    evidence:
+      - 'research/leads_20261112/BRIEFING.md ("Binary deep chain today", interim 16 of 57 systems, unverified)'
+      - 'docs/ic/factor-base-encyclopedia/README.md C5 row (line 1171): pre-filter 1.00003x, 0 rejections in 29,624 checks; research/ic_improve_20261014/03-tracezero-freerel/README.md (PR #1862)'
+    reversal_condition: 'Final 57-system deep binary run showing trace-zero LFD below every law at k=11, or a different pattern at larger k.'
+    notes: []
+  - cell: 'A4'
+    name: Subgroup/coset, one binomial (note; no verdict change proposed; citation rule only)
+    current: REF
+    proposed: 'no verdict change; if its refutation is cited through the fall degree, the coset case of the k + 2 bound is written only, not kernel-checked (README section 4)'
+    evidence:
+      - 'docs/ic/factor-base-encyclopedia/README.md A4 entry (from line 659): A4a Groebner 74.7 ms vs 30.8 ms at 19 bits; A4b exponents 0.97 [0.95,0.99] at m=2, 1.00 [0.98,1.01] at m=3'
+      - 'research/leads_20261112/BRIEFING.md (kernel LFD <= k+2 stated for every target)'
+    reversal_condition: 'A4 exponent departing from random-set behaviour at matched random, or a counterexample to the coset case of the k+2 bound.'
+    notes:
+      - 'BRIEFING says kernel bound covers every target; README section 4 says the A4 coset case is written only. Reconcile before citing the fall degree for A4.'

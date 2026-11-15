@@ -1,0 +1,192 @@
+{
+  "schema": "unsigned-target-fiber-validation/v1",
+  "created_utc": "2026-11-14T01:31:55.288813+00:00",
+  "source_freeze": "d265c35a0efc1efb609a396e451fd543ab838c21",
+  "standing": "unsigned producer receipts, no signed independent execution verdict",
+  "new_statements": 26,
+  "checks": {
+    "fresh-001": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/fresh-001.log",
+        "sha256": "aff21332c1afcee90afe9642fe9298ed8887f9a53f3e6fe2647940b4e168d9b5"
+      }
+    },
+    "identity-build-001": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/identity-build-001.log",
+        "sha256": "0346be58bba7bed95d7c9cac4204ee168f7193e19a47be6d75b3d1928eaa75ee"
+      }
+    },
+    "identity-clippy-001": {
+      "exit": 101,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/identity-clippy-001.log",
+        "sha256": "8de38a5292a22f1d0b5c95cc1604d7f927e6e31b8937d0d6e968095e1660e34a"
+      }
+    },
+    "identity-fmt-001": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/identity-fmt-001.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "identity-issue-001": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/identity-issue-001.log",
+        "sha256": "d795b15aa74a1cd8cf6d0b1dcafd00a34514210885675a68a9a8ffba6c8c587f"
+      }
+    },
+    "identity-tests-001": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/identity-tests-001.log",
+        "sha256": "b6004d4d22f3eac9cc0e1e08624cf5bdfce9c5e9ec0868d6572eb358ea367a20"
+      }
+    },
+    "lean-build-001": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/lean-build-001.log",
+        "sha256": "e2210c487983d164f44a11d1863631f624ee76be16b2f13992968ae6b2baee54"
+      }
+    },
+    "lean-build-002": {
+      "exit": 1,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/lean-build-002.log",
+        "sha256": "1b410653beec6206715dcd156c974a2c88230a256fc120519b2f0175bdd802aa"
+      }
+    },
+    "lean-build-003": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/lean-build-003.log",
+        "sha256": "3288613aff1c5f632668bffd93934e5a5c4cf46503b9f2847ef1e8fc343663b3"
+      }
+    },
+    "lean-build-004": {
+      "exit": 1,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/lean-build-004.log",
+        "sha256": "1165c8ec890e7088355caa40659e6c6bfe51083eb647475822d3010917b7ab91"
+      }
+    },
+    "lean-build-005": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/lean-build-005.log",
+        "sha256": "b917eb15ae1e1869ceacae63f07e5ff3fd5f7919562aed5dcfb3e714992d6ff6"
+      }
+    },
+    "lean-build-006": {
+      "exit": 1,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/lean-build-006.log",
+        "sha256": "da39e00c2835cf823c19aadd22b0e0612aa9bac6855a97f334485a56decdd18b"
+      }
+    },
+    "lean-build-007": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/lean-build-007.log",
+        "sha256": "8f128594f34b4b869f46f1545c3ae99d5e223b780aa0222a2682ee63317cbb63"
+      }
+    },
+    "proof-gate-001": {
+      "exit": 0,
+      "log": {
+        "path": "research/prime_norm_rank_20261112/target-fiber-evidence/proof-gate-001.log",
+        "sha256": "02c9d8f2f4c73354abcd8e8f0c0f74d6831583158291352c4445709de79e15f0"
+      }
+    }
+  },
+  "gate": {
+    "statements": 353,
+    "additional_trusted_native_decide": 0,
+    "exit": 0,
+    "audit": "research/prime_norm_rank_20261112/target-fiber-evidence/gate-001/research_prime_norm_rank_20261112_lean/audit.log"
+  },
+  "fresh": {
+    "command": "lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormTargetFiber",
+    "imports_included": true,
+    "exit": 0
+  },
+  "sources": [
+    {
+      "path": "research/prime_norm_rank_20261112/lean/NormTargetFiber.lean",
+      "sha256": "ed73420455b680f6dd0c25cb560ba233e064765a9f7f0e107ba0c72633e60a06"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/lean/lakefile.toml",
+      "sha256": "e196228f3309c024f9fb6394f7b6b61e33b66d6b276c6803d826c5c526024877"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/lean/lean-toolchain",
+      "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/lean/lake-manifest.json",
+      "sha256": "15b44bf4a56f599422b0fa768fde334d39f44a2d1afddd60bb30e19277b6713c"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/identity-control/src/bin/target_fiber.rs",
+      "sha256": "2fbaee71c538c3ea6b598a5efab573230c2e75c0be1de07d6457e4e2c6c329b2"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/identity-control/Cargo.toml",
+      "sha256": "290f9123c8ec4e1275f6fc980d461eb91d18dc5e4def720c1482d8fc70ef357d"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/identity-control/Cargo.lock",
+      "sha256": "d88908afc49bbf925738e1080b4054460325cc382e011cc255990160d80f90f0"
+    },
+    {
+      "path": "src/hash/sha256.rs",
+      "sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+    },
+    {
+      "path": "src/cryptanalysis/identity_certificate.rs",
+      "sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270"
+    }
+  ],
+  "dependencies": {
+    "Lean": "4.35.0",
+    "CryptoLean": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+    "Mathlib": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+    "Rust": "1.99.1"
+  },
+  "identity": {
+    "id": "IDC1h085fdef17210ed0e",
+    "path": "research/prime_norm_rank_20261112/target-fiber-evidence/target-norm-factor.identity.json",
+    "sha256": "a34cd0067ec3b8966b5f2668bd44010a388561e4d678a9b3f3e3e9c7becc13c8",
+    "degree_bound": 4,
+    "points": 32,
+    "extra_points": 16,
+    "scope": "unconditional evaluated norm-derivative factoring step only"
+  },
+  "native_fixture_experiment": {
+    "planned": 1,
+    "attempted": 0,
+    "completed": 0,
+    "excluded": 0,
+    "admission_blocked": 1,
+    "reason": "previous unchanged checkpoint upload blocker; no new retry or experiment"
+  },
+  "source_unchanged": true,
+  "errors_preserved": [
+    "draft002 export definitional equality,004 mapped numeral,006 wrong factor side",
+    "draft001/003/005 pass; final007 passes",
+    "four inherited unchanged SHA256 strict-clippy style errors"
+  ],
+  "limitations": [
+    "degree5 chart, no growing-arity family bound",
+    "e^3 divisibility, not asserted exact order",
+    "e!=0 for factor removal",
+    "no graded weighted-degree29 claim",
+    "no low closure/finder/expected bit-cost claim"
+  ]
+}

@@ -142,6 +142,13 @@ template <class F, int CHUNK>
 __global__ void RF_BOUNDS k_decompose_shared_hash(DecompArgs<F> a, HashTable gtable) {
     extern __shared__ uint64_t s_dyn[];
     const uint32_t cap = gtable.mask + 1;
+    HashTable table = gtable;
+#if RF_HASH_PACKED
+    /* packed slots only: 8 bytes per slot instead of 12 */
+    for (uint32_t s = threadIdx.x; s < cap; s += blockDim.x) s_dyn[s] = gtable.slots[s];
+    __syncthreads();
+    table.slots = s_dyn;
+#else
     uint64_t *s_keys = s_dyn;
     uint32_t *s_vals = reinterpret_cast<uint32_t *>(s_dyn + cap);
     for (uint32_t s = threadIdx.x; s < cap; s += blockDim.x) {
@@ -149,10 +156,9 @@ __global__ void RF_BOUNDS k_decompose_shared_hash(DecompArgs<F> a, HashTable gta
         s_vals[s] = gtable.vals[s];
     }
     __syncthreads();
-    HashTable table;
     table.keys = s_keys;
     table.vals = s_vals;
-    table.mask = gtable.mask;
+#endif
     rf_decompose_thread<F, HashTable, CHUNK>(a, table, rf_global_tid());
 }
 
@@ -193,8 +199,8 @@ static int run_device(const typename F::ctx &f,
 
     int rc = RF_OK;
     elt *d_fbx = nullptr, *d_fby = nullptr, *d_tx = nullptr, *d_ty = nullptr;
-    uint64_t *d_keys = nullptr;
-    uint32_t *d_idx = nullptr, *d_cnt = nullptr;
+    uint64_t *d_keys = nullptr, *d_aux64 = nullptr;
+    uint32_t *d_idx = nullptr, *d_cnt = nullptr, *d_aux32 = nullptr;
     rf_relation *d_out = nullptr;
     cudaEvent_t e0 = nullptr, e1 = nullptr;
     SortedTable sview{};
@@ -224,6 +230,12 @@ static int run_device(const typename F::ctx &f,
         CU(cudaMemcpy(d_keys, sorted.keys.data(), n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
         CU(cudaMemcpy(d_idx, sorted.idx.data(), n_fb * sizeof(uint32_t), cudaMemcpyHostToDevice));
         sview.keys = d_keys; sview.idx = d_idx; sview.n = n_fb;
+        /* Eytzinger copy (RF_SORTED_EYT): n_fb + 1 entries, 1-indexed */
+        CU(rf_cu_alloc(&d_aux64, (n_fb + 1) * sizeof(uint64_t)));
+        CU(rf_cu_alloc(&d_aux32, (n_fb + 1) * sizeof(uint32_t)));
+        CU(cudaMemcpy(d_aux64, sorted.eyt.data(), (n_fb + 1) * sizeof(uint64_t), cudaMemcpyHostToDevice));
+        CU(cudaMemcpy(d_aux32, sorted.eyt_rank.data(), (n_fb + 1) * sizeof(uint32_t), cudaMemcpyHostToDevice));
+        sview.eyt = d_aux64; sview.eyt_rank = d_aux32;
     } else {
         hcap = hash.capacity();
         CU(rf_cu_alloc(&d_keys, hcap * sizeof(uint64_t)));
@@ -231,6 +243,10 @@ static int run_device(const typename F::ctx &f,
         CU(cudaMemcpy(d_keys, hash.keys.data(), hcap * sizeof(uint64_t), cudaMemcpyHostToDevice));
         CU(cudaMemcpy(d_idx, hash.vals.data(), hcap * sizeof(uint32_t), cudaMemcpyHostToDevice));
         hview.keys = d_keys; hview.vals = d_idx; hview.mask = hash.mask;
+        /* packed slots (RF_HASH_PACKED) */
+        CU(rf_cu_alloc(&d_aux64, hcap * sizeof(uint64_t)));
+        CU(cudaMemcpy(d_aux64, hash.slots.data(), hcap * sizeof(uint64_t), cudaMemcpyHostToDevice));
+        hview.slots = d_aux64;
     }
 
     a.f = f;
@@ -238,7 +254,11 @@ static int run_device(const typename F::ctx &f,
     a.t_x = d_tx; a.t_y = d_ty; a.n_targets = n_targets;
     a.out = d_out; a.out_count = d_cnt; a.out_cap = cap;
 
+#if RF_HASH_PACKED
+    hash_smem = (size_t)hcap * sizeof(uint64_t);
+#else
     hash_smem = (size_t)hcap * (sizeof(uint64_t) + sizeof(uint32_t));
+#endif
     CU(rf_cu_event(&e0));
     CU(rf_cu_event(&e1));
     CU(cudaEventRecord(e0));
@@ -276,6 +296,7 @@ cleanup:
     cudaGetLastError();
     cudaFree(d_fbx); cudaFree(d_fby); cudaFree(d_tx); cudaFree(d_ty);
     cudaFree(d_keys); cudaFree(d_idx); cudaFree(d_cnt); cudaFree(d_out);
+    cudaFree(d_aux64); cudaFree(d_aux32);
     if (e0) cudaEventDestroy(e0);
     if (e1) cudaEventDestroy(e1);
     return rc;
@@ -298,6 +319,183 @@ extern "C" int rf_cuda_decompose256(const Fp256Ctx *f,
      * honour the request (the caller may be measuring exactly that) but
      * the default the API applies for P-256 is 16. */
     return run_device<FieldP256>(*f, fb_x, fb_y, n_fb, tx, ty, n_targets, lookup, chunk, out, cap, n_found, seconds);
+}
+
+/* ------------------------------------------------------------------ *
+ * Persistent Fp64 session (rootfind_serve): the factor base, its table and
+ * the target/output buffers stay on the device across calls, so a batch
+ * costs two copies in, one launch and the copies out -- no table build,
+ * no cudaMalloc.  The kernels and their arguments are the ones
+ * run_device launches.
+ * ------------------------------------------------------------------ */
+
+struct RfCudaSession64 {
+    Fp64Ctx f;
+    int lookup;
+    uint32_t chunk, n_fb, max_targets, cap, hcap;
+    uint64_t *d_fbx, *d_fby, *d_tx, *d_ty, *d_keys, *d_aux64;
+    uint32_t *d_idx, *d_aux32, *d_cnt;
+    rf_relation *d_out;
+    SortedTable sview;
+    HashTable hview;
+    cudaEvent_t e0, e1;
+};
+
+extern "C" void rf_cuda_session64_destroy(void *h) {
+    RfCudaSession64 *s = static_cast<RfCudaSession64 *>(h);
+    if (!s) return;
+    cudaGetLastError();
+    cudaFree(s->d_fbx); cudaFree(s->d_fby); cudaFree(s->d_tx); cudaFree(s->d_ty);
+    cudaFree(s->d_keys); cudaFree(s->d_aux64); cudaFree(s->d_idx); cudaFree(s->d_aux32);
+    cudaFree(s->d_cnt); cudaFree(s->d_out);
+    if (s->e0) cudaEventDestroy(s->e0);
+    if (s->e1) cudaEventDestroy(s->e1);
+    delete s;
+}
+
+#define CUS(call)                                                                  \
+    do {                                                                           \
+        cudaError_t e_ = (call);                                                   \
+        if (e_ != cudaSuccess) {                                                   \
+            std::fprintf(stderr, "CUDA error %s at %s:%d: %s\n", #call, __FILE__,  \
+                         __LINE__, cudaGetErrorString(e_));                        \
+            rc = RF_ERR_CUDA;                                                      \
+            goto fail;                                                             \
+        }                                                                          \
+    } while (0)
+
+/* fb_x, fb_y: Montgomery form.  Returns RF_OK and *out = session. */
+extern "C" int rf_cuda_session64_create(const Fp64Ctx *f, const uint64_t *fb_x, const uint64_t *fb_y,
+                                        uint32_t n_fb, int lookup, uint32_t chunk,
+                                        uint32_t max_targets, uint32_t cap, void **out) {
+    int rc = RF_OK;
+    if (!rf::chunk_ok(chunk)) return RF_ERR_BAD_CHUNK;
+    if (n_fb == 0 || max_targets == 0) return RF_ERR_BAD_ARG;
+    RfCudaSession64 *s = new RfCudaSession64();
+    s->f = *f; s->lookup = lookup; s->chunk = chunk; s->n_fb = n_fb;
+    s->max_targets = max_targets; s->cap = cap ? cap : 1;
+    {
+        rf::SortedTableHost sorted;
+        rf::HashTableHost hash;
+        if (lookup == RF_LOOKUP_SORTED) sorted = rf::build_sorted<FieldFp64>(*f, fb_x, n_fb);
+        else hash = rf::build_hash<FieldFp64>(*f, fb_x, n_fb);
+        CUS(rf_cu_alloc(&s->d_fbx, n_fb * sizeof(uint64_t)));
+        CUS(rf_cu_alloc(&s->d_fby, n_fb * sizeof(uint64_t)));
+        CUS(rf_cu_alloc(&s->d_tx, max_targets * sizeof(uint64_t)));
+        CUS(rf_cu_alloc(&s->d_ty, max_targets * sizeof(uint64_t)));
+        CUS(rf_cu_alloc(&s->d_cnt, sizeof(uint32_t)));
+        CUS(rf_cu_alloc(&s->d_out, s->cap * sizeof(rf_relation)));
+        CUS(cudaMemcpy(s->d_fbx, fb_x, n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
+        CUS(cudaMemcpy(s->d_fby, fb_y, n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
+        if (lookup == RF_LOOKUP_SORTED) {
+            CUS(rf_cu_alloc(&s->d_keys, n_fb * sizeof(uint64_t)));
+            CUS(rf_cu_alloc(&s->d_idx, n_fb * sizeof(uint32_t)));
+            CUS(rf_cu_alloc(&s->d_aux64, (n_fb + 1) * sizeof(uint64_t)));
+            CUS(rf_cu_alloc(&s->d_aux32, (n_fb + 1) * sizeof(uint32_t)));
+            CUS(cudaMemcpy(s->d_keys, sorted.keys.data(), n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
+            CUS(cudaMemcpy(s->d_idx, sorted.idx.data(), n_fb * sizeof(uint32_t), cudaMemcpyHostToDevice));
+            CUS(cudaMemcpy(s->d_aux64, sorted.eyt.data(), (n_fb + 1) * sizeof(uint64_t), cudaMemcpyHostToDevice));
+            CUS(cudaMemcpy(s->d_aux32, sorted.eyt_rank.data(), (n_fb + 1) * sizeof(uint32_t), cudaMemcpyHostToDevice));
+            s->sview.keys = s->d_keys; s->sview.idx = s->d_idx; s->sview.n = n_fb;
+            s->sview.eyt = s->d_aux64; s->sview.eyt_rank = s->d_aux32;
+        } else {
+            s->hcap = hash.capacity();
+            CUS(rf_cu_alloc(&s->d_keys, s->hcap * sizeof(uint64_t)));
+            CUS(rf_cu_alloc(&s->d_idx, s->hcap * sizeof(uint32_t)));
+            CUS(rf_cu_alloc(&s->d_aux64, s->hcap * sizeof(uint64_t)));
+            CUS(cudaMemcpy(s->d_keys, hash.keys.data(), s->hcap * sizeof(uint64_t), cudaMemcpyHostToDevice));
+            CUS(cudaMemcpy(s->d_idx, hash.vals.data(), s->hcap * sizeof(uint32_t), cudaMemcpyHostToDevice));
+            CUS(cudaMemcpy(s->d_aux64, hash.slots.data(), s->hcap * sizeof(uint64_t), cudaMemcpyHostToDevice));
+            s->hview.keys = s->d_keys; s->hview.vals = s->d_idx; s->hview.mask = hash.mask;
+            s->hview.slots = s->d_aux64;
+        }
+        CUS(rf_cu_event(&s->e0));
+        CUS(rf_cu_event(&s->e1));
+    }
+    *out = s;
+    return RF_OK;
+fail:
+    rf_cuda_session64_destroy(s);
+    return rc;
+}
+
+/* tx, ty: Montgomery form, n_targets <= max_targets.  Writes up to the
+ * session's cap relations to out[]; *n_found is the kernel's count. */
+extern "C" int rf_cuda_session64_run(void *h, const uint64_t *tx, const uint64_t *ty, uint32_t n_targets,
+                                     rf_relation *out, uint32_t *n_found, double *seconds) {
+    RfCudaSession64 *s = static_cast<RfCudaSession64 *>(h);
+    int rc = RF_OK;
+    if (!s || n_targets == 0 || n_targets > s->max_targets) return RF_ERR_BAD_ARG;
+    const uint64_t total = rf_thread_count(n_targets, s->n_fb, (int)s->chunk);
+    const uint64_t grid64 = (total + (uint64_t)RF_BLOCK - 1) / (uint64_t)RF_BLOCK;
+    if (grid64 == 0 || grid64 > 2147483647ull) return RF_ERR_BAD_ARG;
+    const unsigned int grid = (unsigned int)grid64;
+    DecompArgs<FieldFp64> a{};
+    float ms = 0;
+    uint32_t found = 0, nw = 0;
+#if RF_HASH_PACKED
+    const size_t hash_smem = (size_t)s->hcap * sizeof(uint64_t);
+#else
+    const size_t hash_smem = (size_t)s->hcap * (sizeof(uint64_t) + sizeof(uint32_t));
+#endif
+    a.f = s->f;
+    a.fb_x = s->d_fbx; a.fb_y = s->d_fby; a.n_fb = s->n_fb;
+    a.t_x = s->d_tx; a.t_y = s->d_ty; a.n_targets = n_targets;
+    a.out = s->d_out; a.out_count = s->d_cnt; a.out_cap = s->cap;
+    CUS(cudaMemcpy(s->d_tx, tx, n_targets * sizeof(uint64_t), cudaMemcpyHostToDevice));
+    CUS(cudaMemcpy(s->d_ty, ty, n_targets * sizeof(uint64_t), cudaMemcpyHostToDevice));
+    CUS(cudaMemset(s->d_cnt, 0, sizeof(uint32_t)));
+    CUS(cudaEventRecord(s->e0));
+#define RF_SLAUNCH(CH)                                                                        \
+    if (s->lookup == RF_LOOKUP_SORTED) {                                                      \
+        k_decompose_sorted<FieldFp64, CH><<<grid, RF_BLOCK>>>(a, s->sview);                   \
+    } else if (s->hcap <= RF_SHARED_HASH_CAP) {                                               \
+        k_decompose_shared_hash<FieldFp64, CH><<<grid, RF_BLOCK, hash_smem>>>(a, s->hview);   \
+    } else {                                                                                  \
+        k_decompose_global_hash<FieldFp64, CH><<<grid, RF_BLOCK>>>(a, s->hview);              \
+    }
+    switch (s->chunk) {
+        case 16: RF_SLAUNCH(16) break;
+        case 32: RF_SLAUNCH(32) break;
+        case 64: RF_SLAUNCH(64) break;
+        default: return RF_ERR_BAD_CHUNK;
+    }
+#undef RF_SLAUNCH
+    CUS(cudaGetLastError());
+    CUS(cudaEventRecord(s->e1));
+    CUS(cudaEventSynchronize(s->e1));
+    CUS(cudaEventElapsedTime(&ms, s->e0, s->e1));
+    *seconds = ms / 1000.0;
+    CUS(cudaMemcpy(&found, s->d_cnt, sizeof(uint32_t), cudaMemcpyDeviceToHost));
+    *n_found = found;
+    nw = found < s->cap ? found : s->cap;
+    if (nw) CUS(cudaMemcpy(out, s->d_out, nw * sizeof(rf_relation), cudaMemcpyDeviceToHost));
+    return RF_OK;
+fail:
+    cudaGetLastError();
+    return rc;
+}
+#undef CUS
+
+/* RF_PROFILE builds: reset and read the sampled phase cycles of
+ * rf_decompose_thread (rootfind.cuh).  Return 0 on success, -1 when the
+ * build has no profile. */
+extern "C" int rf_profile_reset(void) {
+#if RF_PROFILE
+    unsigned long long z[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    return cudaMemcpyToSymbol(rf_prof_cycles, z, sizeof z) == cudaSuccess ? 0 : -1;
+#else
+    return -1;
+#endif
+}
+
+extern "C" int rf_profile_read(unsigned long long *out8) {
+#if RF_PROFILE
+    return cudaMemcpyFromSymbol(out8, rf_prof_cycles, 8 * sizeof(unsigned long long)) == cudaSuccess ? 0 : -1;
+#else
+    (void)out8;
+    return -1;
+#endif
 }
 
 extern "C" int rf_cuda_device_present(char *name, int name_len) {

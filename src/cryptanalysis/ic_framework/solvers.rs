@@ -2641,6 +2641,99 @@ mod tests {
         }
     }
 
+    /// Timing probe (not a test of correctness; `--ignored --nocapture`):
+    /// the Rust-side cost of one `fes-f2-gpu` call on degree-29 descent
+    /// systems (30 unknowns, as in research/ic_gpu_e2e_20261113), split into
+    /// the engine body around the search, form packing, and serialisation.
+    #[test]
+    #[ignore]
+    fn fes_gpu_rust_side_overhead_probe() {
+        use crate::cryptanalysis::fes_gpu::PackedSystem;
+        use crate::cryptanalysis::ic_boundary::random_binary_instance;
+        use crate::cryptanalysis::mq_fes::QuadraticForm;
+        use crate::cryptanalysis::pq_descent_symbolic::descend;
+        use rand::{Rng, SeedableRng};
+        let (n, np) = (
+            std::env::var("PROBE_N")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(29u32),
+            std::env::var("PROBE_NP")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(15u32),
+        );
+        let inst = random_binary_instance(n, 1, 8).unwrap();
+        let words: Vec<u64> = (0..np).map(|k| 1u64 << k).collect();
+        let mut rng = rand::rngs::StdRng::seed_from_u64(9);
+        let systems: Vec<BooleanSystem> = (0..40)
+            .map(|_| {
+                let x_r = rng.gen::<u64>() & ((1u64 << n) - 1);
+                let d = descend(&inst.gf, inst.b, x_r, &words, 2).unwrap();
+                BooleanSystem {
+                    equations: d.equations,
+                    n_vars: d.n_vars,
+                }
+            })
+            .collect();
+        let terms: usize = systems[0].equations.iter().map(|e| e.terms.len()).sum();
+        let t = Instant::now();
+        for sys in &systems {
+            let _ = fes_quadratic_solve(sys, |_| Some(Vec::new()));
+        }
+        let body = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let forms: Vec<Vec<QuadraticForm>> = systems
+            .iter()
+            .map(|s| {
+                s.equations
+                    .iter()
+                    .map(|p| {
+                        QuadraticForm::from_anf_row(
+                            &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
+                            s.n_vars,
+                        )
+                        .unwrap()
+                    })
+                    .collect()
+            })
+            .collect();
+        let t = Instant::now();
+        let packed: Vec<PackedSystem> = forms
+            .iter()
+            .map(|f| PackedSystem::from_quadratic_forms(f).unwrap())
+            .collect();
+        let pack = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let t = Instant::now();
+        let bytes: usize = packed.iter().map(|p| p.to_contract().len()).sum();
+        let ser = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let t = Instant::now();
+        for s in &systems {
+            for p in &s.equations {
+                std::hint::black_box(crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p));
+            }
+        }
+        let anf = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let t = Instant::now();
+        for s in &systems {
+            for p in &s.equations {
+                std::hint::black_box(QuadraticForm::from_poly(p));
+            }
+        }
+        let from_poly = t.elapsed().as_secs_f64() / systems.len() as f64;
+        let same_n = systems
+            .iter()
+            .all(|s| s.equations.iter().all(|p| p.n_vars == s.n_vars));
+        eprintln!(
+            "  AnfRow::from_poly {:.3} ms, QuadraticForm::from_poly {:.3} ms (poly n_vars == system n_vars: {same_n})",
+            anf * 1e3,
+            from_poly * 1e3
+        );
+        eprintln!(
+            "n = {n}, unknowns = {}, equations = {}, terms = {terms}: engine body {:.3} ms, pack {:.3} ms, to_contract {:.3} ms ({} bytes)",
+            systems[0].n_vars, systems[0].equations.len(), body * 1e3, pack * 1e3, ser * 1e3, bytes / systems.len()
+        );
+    }
+
     /// `fes-f2-gpu` reports `fes-f2`'s counted cost and answer on the same
     /// system, whichever search ran (the serve worker, or the CPU fallback
     /// when none is configured): the counting lives in one function.

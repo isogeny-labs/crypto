@@ -1,39 +1,76 @@
-# Resume: crypto @ claude/tooling-build-alq44y
+# Resume: crypto @ codex/ghs-strong-rho-results-20261114
 
 ## Goal
-Measure whether odd-degree (3, 5) and mixed 2/3 PKM Kummer towers change F4's counted work
-(`field_ops`) against the degree-2 tower at equal information log2 S (EXP-PKM-ODD-001). Part of
-PR #4091 (pkm-smooth-tower tooling, report and tutorial).
+
+Establish, with admitted end-to-end measurements, whether the historical
+plane-quartic index-calculus result on the restricted GHS-weak
+`E0/F_{q^3}` family remains below a newly optimized, same-target strong
+Pollard-rho control. Reconcile the comprehensive ECBench frontier report and
+generated leaderboard only if the validation gates permit it.
 
 ## Lead / hypothesis
-Barrier-note information reading: cost tracks log2|V|, not how membership is written. Prediction:
-no_material_effect for A3, A5, A23, A32 at m = 2, 3, tower and null; no order effect. Falsified by
-gain or loss for any arm on the tower at m = 2. Never run before: the tower engine cannot express
-odd degrees (research/curve25519_leads_wave4_20261104/l11_odd_kummer_design, Q-B).
+
+Historical N4-v2 evidence places its best double-large-prime IC arm far below
+the older serial negation rho at large q. PR #4171 added a materially stronger
+rho implementation: six-product cubic multiplication, negation quotient,
+32 partitions, eight lockstep walks and Montgomery batch inversion. The
+frozen hypothesis is in the study protocol; this round tests whether the
+restricted-family exception survives that stronger comparator, without
+generalizing it to generic or standard curves.
 
 ## Spec
-research/pkm_odd_tower_f4_20261114/PROTOCOL.md and protocol.json (frozen in the commit that adds
-them, before data). Instrument examples/pkm_odd_tower_f4.rs (generic f4_fp, grevlex, D = 64).
-Runner run_cells.sh; analysis analyze.py.
+
+`research/quartic_ghs_strong_rho_20261114/PROTOCOL.md` plus prospective
+duration-only amendment
+`research/quartic_ghs_strong_rho_20261114/ROUND_A.md`. Grid q = 4,051 through
+4,194,271; seeds 1,2,3; `strong-b8` primary; exact historical IC targets;
+five repetitions through q = 262,111 and three thereafter; weights 0,0.1,1;
+10,000 clustered bootstrap resamples; strongest same-target reference and
+all conjunctive admission gates retained.
 
 ## State
-Instrument built and smoke-tested (all rows agree with exhaustive check; planted points check).
-Protocol frozen; run launched locally with CHECKPOINT_SKIP=no-s3-credentials (no AWS here).
+
+Implementation/protocol PR #4171 merged at
+`352dd51da0f7519e25e32256213cad90c246d486`; required checks passed. No primary
+or paid round has run. The selected runtime has no AWS/checkpoint identity;
+live budget headroom and all-tenant pool state are unavailable. Historical
+archive SHA-256 is
+`aac9a25ce50ac5d23895f0dba8f907fb223aaac32a2a41391bc590e3c6bcca42`.
+The existing frontier/leaderboard is unchanged.
 
 ## Next steps
-1. `cargo build --release --example pkm_odd_tower_f4`
-2. `RAYON_NUM_THREADS=4 CHECKPOINT_SKIP=no-s3-credentials research/pkm_odd_tower_f4_20261114/run_cells.sh`
-   (skips completed cells; reruns a partial cell from the start).
-3. `python3 analyze.py` in the study dir; write REPORT.md/.typ with graphs and PDF; update the
-   tutorial §9; push to PR #4091.
+
+1. Finish the round-A launch package, analyzer/validator, problem record and
+   report/PDF update in this worktree.
+2. Run repository validation, commit, push, run `check-experiment-git`, and
+   open a normal PR with auto-merge.
+3. After merge, from an approved operator context, record live STS, Budgets,
+   quota, all-tenant pool, and active-Job receipts. Stop if any gate fails.
+4. Publish the exact custom image by digest, commit/push its four request
+   manifests, checkpoint again, and submit low/mid/high/top with zero retries.
+5. Retrieve raw S3 objects, verify manifests, run independent analysis/replay,
+   create bench/PCC records, and update report/leaderboard only if admitted.
 
 ## Runs in flight
-run_cells.sh on the session container (local, 4 vCPU). Progress in progress.txt; rows in runs/.
+
+None. Optional CI jobs on already merged PR #4171 are monitored separately;
+they are not scientific runs.
 
 ## Stop and success conditions
-Stop when every cell in run_cells.sh has its rows (censored rows count) and analyze.py has run.
-Success = a reported verdict per arm under the frozen rule, whatever it is. instrument_invalid if
-any row disagrees with the exhaustive check, a planted row fails, or the A/A cell differs.
+
+Hard all-attempt ceiling USD 5, at most 8 requested vCPU and 8 GiB concurrently
+in low+mid then high+top waves (16 vCPU/16 GiB across all four Jobs), zero
+automatic retries, deadlines 3,600/3,600/7,200/10,800 seconds for
+low/mid/high/top. Stop before spending on unknown/stale budget, pool conflict,
+checkpoint/Git/source/image mismatch, or missing raw-result custody. A complete
+measurement requires every primary row correct, exact repetitions/targets,
+batch eight, rho steps/sqrt(ell) in [0.75,1.15], replay match, independent
+recompute, and full artifact manifests. H1 succeeds on the measured grid only
+if every size is admitted and every 95% upper IC/rho bound is below one at all
+three weights; otherwise report the frozen rejected/limited/unresolved verdict.
 
 ## Open questions
-Isogeny (rational-map) towers of odd degree are not in this study.
+
+Whether an approved operator identity with current budget/pool visibility is
+available, and whether the optimized rho records remain inside the preregistered
+step band at every size.

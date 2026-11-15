@@ -199,6 +199,25 @@ pub fn run(
     q: &BinaryPoint,
     p: &BatchedParams,
 ) -> Result<DescentOutcome, String> {
+    run_with_filter_layout(kc, q, p, FilterLayout::Low)
+}
+
+/// Run the current worker pipeline with the partition-local folded-table
+/// filter. The unversioned [`run`] remains Low-layout replay control.
+pub fn run_top(
+    kc: &KoblitzCurve,
+    q: &BinaryPoint,
+    p: &BatchedParams,
+) -> Result<DescentOutcome, String> {
+    run_with_filter_layout(kc, q, p, FilterLayout::Top)
+}
+
+fn run_with_filter_layout(
+    kc: &KoblitzCurve,
+    q: &BinaryPoint,
+    p: &BatchedParams,
+    filter_layout: FilterLayout,
+) -> Result<DescentOutcome, String> {
     let pool = rayon::ThreadPoolBuilder::new()
         .num_threads(1)
         .thread_name(|_| "ic-koblitz-batched".into())
@@ -207,7 +226,7 @@ pub fn run(
     pool.install(|| {
         let single = rayon::current_num_threads() == 1 && rayon::current_thread_index() == Some(0);
         let session = measurement::Session::begin().map_err(|e| e.to_string())?;
-        let out = pipeline(kc, q, p);
+        let out = pipeline(kc, q, p, filter_layout);
         let snapshot = session.finish().map_err(|e| e.to_string());
         let mut out = out?;
         out.snapshot = snapshot;
@@ -220,6 +239,7 @@ fn pipeline(
     kc: &KoblitzCurve,
     q: &BinaryPoint,
     p: &BatchedParams,
+    filter_layout: FilterLayout,
 ) -> Result<DescentOutcome, String> {
     if kc.n >= 64 || kc.subgroup_order.bits() > 64 || kc.n.is_multiple_of(2) {
         return Err("ic.koblitz_batched needs odd n < 64 and r <= 2^64".into());
@@ -240,7 +260,7 @@ fn pipeline(
         &fb,
         PairSumTable::DEFAULT_BYTE_BUDGET,
         ProbeBudget::default(),
-        FilterLayout::Low,
+        filter_layout,
     )
     .ok_or("pair table unavailable")?;
     ledger.lap("oracle_setup");

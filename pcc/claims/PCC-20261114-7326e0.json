@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:07:20Z",
+ "id": "PCC-20261114-7326e0",
+ "kind": "theorem",
+ "producer": {
+  "commit": "85c57a726a644a6d2138a5c97785ab1119a06aff",
+  "model": "",
+  "session": "norm-target-grading-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ed4fcd29468406c6b7d4abaa54d695b5d1508d73818372254e5d4981eaaef8ca",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormRowClosure.transport"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact source declaration/context hypotheses. Field K, CommRing coefficient algebra A; Nontrivial A where monic degree guards need it. Curve equation, e!=0, d>=3 explicit for actual normalized binding. Full iterated closure with literal deg(a)+deg(f)<=D multiplier budget; requires both old/new input families admitted. No invariance below admission threshold, runtime impossibility, weighted-degree29, growing-family low closure or sub-exponential claim. Unsigned; fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormRowClosure.transport: theorem transport (deg : A \u2192 \u2115) (F G : Set A) (D : \u2115) (inputs : \u2200 f\u2208F, deg f\u2264D \u2192 InClosure K deg G D f) {p : A} (h : InClosure K deg F D p) : InClosure K deg G D p"
+}

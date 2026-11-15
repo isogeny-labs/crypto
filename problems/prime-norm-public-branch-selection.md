@@ -130,3 +130,125 @@ pole-normalization/filtration proof independently; use an admitted symbolic
 fixture check when its infrastructure is available. Original W-jet/public
 finder exit criteria remain open, without identifying the families or
 inferring a non-generic impossibility result [pcc:unverified].
+
+
+2026-11-14 exact pole-transport update: [report](../research/prime_norm_rank_20261112/pole-transport-report/README.md),
+source23d78212afe6b379e51040abf66622305250f62b, merged in4087. Actual
+norm/support/master/full-remainder transport holds for every stated tower
+depth under the inverse-pair premise e*l=1 and explicit target-curve premise.
+Twenty-three new statements, whole-study gate327/0, import-inclusive fresh
+replay0; centralPCC-20261114-d754b9 and PCC-20261114-9e7aa6, receipt
+PCC-20261114-5a59a9, all unsigned. This is exact polynomial transport, not a
+low full-closure bound [pcc:unverified].
+
+2026-11-14 actual target-row update: [report](../research/prime_norm_rank_20261112/target-fiber-report/README.md),
+source d265c35a0efc1efb609a396e451fd543ab838c21. From actual monic division,
+the target-evaluated membership remainder has a uniform factor e^3 over a
+commutative ring, including the polynomial parameter ring. Monic base change
+recovers the existing field model. For a field and e!=0, replacing the
+constant coefficient equation by the normalized target equation, while
+retaining all four nonconstant equations, preserves exactly the degree5
+chart's five-equation solution set. Twenty-six new statements, whole-study
+gate353/0, fresh replay0; factorPCC-20261114-76f2d5,
+polynomial-divisibilityPCC-20261114-af9c9e,
+specializationPCC-20261114-ca75bf, lossless-rowsPCC-20261114-2ceac7,
+receiptPCC-20261114-7ad52b, all unsigned [pcc:unverified].
+
+Next, bind this transformed row to its exact grading, then establish a
+constructive full weighted closure/normal-form bound for a growing family.
+Uniform divisibility is not an exact order3 claim, weighted degree29 claim,
+last-fall bound or fast finder. The original W-jet chart still requires its
+own faithful map. The fixed native fixture experiment remains unlaunched
+due checkpoint upload admission; no solver, paid or attack campaign was run.
+Original public finder, field extraction and expected bit-cost exit criteria
+remain open [pcc:unverified].
+
+
+2026-11-14 normalized scaling/full-closure test: [report](../research/prime_norm_rank_20261112/target-grading-report/README.md),
+source85c57a726a644a6d2138a5c97785ab1119a06aff. The normalized actual target
+row has exact inverse-pair weight-(d-3) transport, retaining d>=3, e*l=1
+and the curve premise. Separately, its row change is a public constant
+field-linear recombination in the coefficient algebra. The old/new input
+spans, and their full iterated degree-budgeted closures, coincide whenever
+both input families fit the budget. Multiplication of newly derived rows
+is included; the degree function is explicit. Actual symbolic remainder
+binding is not a finite-field pointwise surrogate. Central unsigned
+PCC-20261114-46dee9/5f67e7/044d98/d07690; validation6643d4 records15 authored
+theorems plus one generated recursor, whole-study gate369/0 and fresh0
+[pcc:unverified].
+
+This excludes attributing a closure reduction above input admission to
+constant row recombination alone. It does not prove the original closure
+large or exclude short derivations exposed by a different row basis,
+lower-budget effects, implementation gains or nonlinear mechanisms.
+Exact multivariate degree29 binding and full growing-family closure remain
+open. Next, obtain actual bounded derivations or test a mechanism beyond
+constant row recombination; preserve all original public finder, extraction
+and expected bit-cost criteria. No solver/native fixture experiment was
+launched, and no global non-generic impossibility is inferred [pcc:unverified].
+
+
+2026-11-14 rational-point base descent: [report](../research/prime_norm_rank_20261112/split-base-descent-report/README.md),
+source1e3f20752022a341a4612e6a72e8e5690f8c6baa. For a monic bounded norm
+pair, divisibility of the actual full norm by a public nodal polynomial on
+actual prime-field points forces all pair coefficients into the prime
+subfield. Selected support and either successful sign are derived; zero
+lower polynomial is handled. General arbitrary-arity rigidity and prime
+coefficient claimsPCC-20261114-8c21e7/255fa5; actual monic support/membership
+specializationPCC-20261114-0943a7/5d35b3. Validation7b5216 records14 authored
+theorems, whole-study gate383/0 and import-inclusive fresh0, all unsigned
+[pcc:unverified].
+
+This openly changes the base to actual rational points; it is not an
+extension of the Kummer good-coset theorem to Dickson/arbitrary primes.
+The new membership polynomial is an explicit point-list nodal product;
+no cheap tower or free known-log precomputation is assumed. Base generation,
+coverage, collisions/opposites/target exclusions, retry policy, actual
+public finder, growing-family normal forms and complete expected bit cost
+remain obligations. Field-of-definition correctness is distinct from the
+cost of extraction. Original W-jet mapping and all original exit criteria
+remain open; no native/solver/paid experiment was launched [pcc:unverified].
+
+
+2026-11-14 finite weighted counting: [report](../research/prime_norm_rank_20261112/weighted-count-report/README.md),
+source740732e95389e5185ed9a6547c18d8d889a6c580. For positive weights,
+all weighted exponent vectors under budgetD satisfy
+M*product(weights)<=choose(D+sum(weights),v), and
+M*product(weights)*v!<=(D+sum(weights))^v. Consecutive weights1,...,v give
+M(v,D)*(v!)^2<=(D+v^2)^v, including zero variables and zero budget.
+Exact finite count/completeness and mixed-radix injection are source-bound
+in unsignedPCC-20261114-cc1d70/621b19/9932d5. This is an elementary
+combinatorial component, with no novelty claim for the counting argument
+[pcc:unverified].
+
+The full study gate reports394 theorem declarations/0 extra trusted axioms;
+final import-inclusive replay status and hashed receipts are in the linked
+report. This does not bind actual growing norm input weights, construct a
+small full closure, or supply a public finder. A quadratic weighted budget
+would require a separately justified construction; the count does not
+supply it. Keep original W-jet map, coverage, field extraction, retries and
+complete expected bit-cost criteria open. No solver/native fixture or paid
+experiment was launched [pcc:unverified].
+
+
+2026-11-14 actual growing input grading: [report](../research/prime_norm_rank_20261112/growing-input-report/README.md),
+source0a12a195c66785b5b8b4b4409ab0cc02ee991f64. The literal multivariate
+coefficient support of the actual computed membership remainder has budget
+2*deg(P), with coefficient-j weightedTotalDegree<=2*deg(P)-2*j. Actual
+retained weights are exactly1,...,2a-2 via a proved bijection for all a>=2.
+The norm/support are monic of degrees2a/2a-1, actual target incidence gives
+exact norm multiplication, and an exact polynomial-ring renaming binds
+h=1 to the unchanged four-variable norm/support/full remainder. Central
+PCC-20261114-3a3e7b/cad062/253550/2c4a15/6c253b/3a3330/69b0f2, all
+unsigned. Forty authored new statements plus generated finSumFinEquiv.eq_1;
+whole-study435/0, fresh NormGrowingInput0, receiptsdc7d16/41a33c
+[pcc:unverified].
+
+This closes the actual growing input-budget obligation for the openly
+specified rational-point-base norm chart. It does not bind the original
+W-jet family or the separately unlaunched reduced.ms native fixture,
+prove the normalized-row degree29 claim, or establish a low full-closure
+cutoff. The next discriminating question is constructive bounded full
+closure on this actual family. Preserve public finder, coverage,
+field-extraction, retry and complete expected bit-cost exit criteria;
+no solver/native/paid experiment was launched [pcc:unverified].

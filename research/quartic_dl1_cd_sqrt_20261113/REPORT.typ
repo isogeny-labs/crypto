@@ -47,3 +47,16 @@ A c#sub[D] between 1.55 and 2.0, or a lighter cycle basis, to keep the relation 
 Headline: c#sub[D] = 1.7 and 1.8 are robust improvements for DL at every k = 18–22 (below 1 at every seed with additions free and at 1 M-eq); 1.7 is the best once additions cost anything. Mean cycle-row weight: 24–28 (2.0), 84–90 (1.55), 41–48 (1.7), 32–38 (1.8). DL1 is robust at 1.7 and 1.8; D (plain Lanczos) is dearer at every c#sub[D] below 2.0. Recommendation: c#sub[D] = 1.7 for k ≥ 18.
 
 #figure(image("cd_sweep/sweep.png", width: 100%), caption: [DL (solid), DL1 (dotted), D (dashed) against c#sub[D] = 2.0 by addition price.])
+
+#pagebreak()
+= Follow-up 2: c#sub[D] = 1.7 with the square-root chain (combo/, protocol frozen before data)
+45 units at k = 18–22, seeds 1–3, one at a time. 90 records reproduce the sweep exactly; the chain changes only the relation-stage multiplication count in all 45 pairs; all verified, no retries.
+
+#table(columns: 5, align: (left, right, right, right, left),
+  [DL vs c#sub[D] = 2.0], [additions free], [at 0.5 M-eq], [at 1 M-eq], [CPU (diagnostic)],
+  [c#sub[D] = 1.7 alone], [0.73–0.75], [0.82–0.83], [0.87–0.88], [—],
+  [*c#sub[D] = 1.7 + chain*], [*0.68–0.74*], [0.79–0.83], [*0.85–0.88*], [0.80–0.91],
+)
+Pre-registered headline: robust improvement for DL at every size (prediction 0.68–0.74 with additions free). DL1 0.64–0.75 (free), 0.92–0.98 (1 M-eq); D stays dearer (1.07–1.12). The chain adds 0.6–6.5% in counted cost over c#sub[D] = 1.7 but no measured CPU gain in this interpreted implementation.
+
+#figure(image("combo/combo.png", width: 100%), caption: [DL and DL1 against c#sub[D] = 2.0: c#sub[D] = 1.7 alone and with the chain.])

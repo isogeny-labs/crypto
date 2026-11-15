@@ -31,6 +31,8 @@ Sources (all committed, read at --ref unless noted):
                                 IC collect-phase component: paired native ratio and its A/A floor
   research/explicit_relations_e2e_20261030/results-v*/
                                 exact recovery counts and bounded two-target frontier; no L0 timing rank
+  research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json
+                                bounded D18 solver-policy gate on the a=0 N83 curve; no complete-cost rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -798,6 +800,30 @@ def explicit_gpu_fullcache(ref, since):
                  source=f"{path}@{revision}")
 
 
+def n83_d18_vsids_gate(ref, since):
+    path = ("research/koblitz_n83_factor_base_sweep_20261008/verification/"
+            "d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json")
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "n83.d18-vsids-raw-audit/v1":
+            continue
+        if record.get("status") != "PASS_CENSORED_NATURAL":
+            continue
+        positive = record.get("positive", {})
+        natural = record.get("natural", {})
+        if positive.get("status") != "SAT_PENDING_XCNF_REPLAY" or natural.get("status") != "INDETERMINATE":
+            continue
+        source = f"{path}@{commit}"
+        emit("n83.a0.d18_vsids.positive_conflicts", positive.get("conflicts"),
+             date=date, problem=P_IC, unit="conflicts", better="neutral",
+             label="Constructed D18 positive, VSIDS-only branching; L0 local, PCC unverified",
+             source=source)
+        emit("n83.a0.d18_vsids.natural_censored_queries", 1,
+             date=date, problem=P_IC, unit="queries", better="neutral",
+             label="One public natural D18 query capped without a model; no relation-yield estimate, PCC unverified",
+             source=source)
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -834,6 +860,7 @@ def main():
                           "gpu.explicit_relations.affine")
     explicit_gpu_profile(a.ref, a.since)
     explicit_gpu_fullcache(a.ref, a.since)
+    n83_d18_vsids_gate(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

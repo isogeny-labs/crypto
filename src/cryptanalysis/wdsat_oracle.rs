@@ -47,10 +47,13 @@ impl AnfRow {
                 constant = !constant;
                 continue;
             }
-            let mut vars: Vec<u32> = (0..MASK_BITS as u32)
-                .filter(|i| (term.mask >> i) & 1 == 1)
-                .collect();
-            vars.sort_unstable();
+            // The set bits in increasing order (already sorted).
+            let mut vars = Vec::with_capacity(term.mask.count_ones() as usize);
+            let mut m = term.mask;
+            while m != 0 {
+                vars.push(m.trailing_zeros());
+                m &= m - 1;
+            }
             monomials.push(vars);
         }
         Self {
