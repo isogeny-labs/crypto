@@ -6,7 +6,7 @@ mod source {
     include!("../hec_alignment13_20261115/atlas/source_api.rs");
     include!("../hec_image13_20261115/relations.rs");
     include!("../hec_geometry13_20261115/jets.rs");
-    include!("../hec_sourcejet13_20261115/source.rs");
+    include!("source_jet.rs");
     include!("fiber.rs");
 }
 #[allow(dead_code)]

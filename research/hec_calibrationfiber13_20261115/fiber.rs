@@ -259,7 +259,7 @@ pub fn run_fiber() {
         .mul(&JP::embed(&wi, &j), &j)
         .rem(&u0, &j);
     let u = u0.add(&u2, &j).add(&u4, &j);
-    let pts = super::target::rational_points(&QF, P);
+    // Target chord points are factored per zero; no target point grid.
     let mut selected = 0;
     for (x, y) in zeros {
         let d = source_div(x, y);
@@ -279,6 +279,7 @@ pub fn run_fiber() {
         let gj = section_jet(
             &src.ks, &src.hs, &src.neg, &src.alpha, &src.chars, &ux, &vx, &j, &sc,
         );
+        let pts = chord_points(&gj, &j);
         let dd = match decode(&gj, &j, &pts) {
             Ok(a) => a,
             Err(e) => {
@@ -309,4 +310,59 @@ pub fn run_fiber() {
     }
     assert!(selected > 0, "no_supported_calibration");
     println!("PASS fixed_degree_calibration=true norm_degree_bound=18 decoded={selected} exact_restriction=true no_cyclic_scan=true timing_claim=false");
+}
+
+fn chord_points(g: &Jet, j: &JC) -> Vec<[u64; 3]> {
+    let n: [u64; 3] = std::array::from_fn(|i| {
+        let mut e = [0; 3];
+        e[i] = 1;
+        g.0[j.es.iter().position(|a| *a == e).unwrap()][0]
+    });
+    let f = &j.f;
+    let mut out = vec![];
+    let (x, y, inf, vertical) = if n[1] != 0 {
+        let a = (P - n[0]) * Fp::new(P).inv(n[1]) % P;
+        let b = (P - n[2]) * Fp::new(P).inv(n[1]) % P;
+        (
+            Pol::new(vec![Z, O]),
+            Pol::new(vec![base(b), base(a)]),
+            [1, a, 0],
+            false,
+        )
+    } else {
+        assert_ne!(n[0], 0, "line_at_infinity_unsupported");
+        let a = (P - n[2]) * Fp::new(P).inv(n[0]) % P;
+        (
+            Pol::new(vec![base(a)]),
+            Pol::new(vec![Z, O]),
+            [0, 1, 0],
+            true,
+        )
+    };
+    let mut poly = Pol::zero();
+    let mut k = 0;
+    for a in (0..=4).rev() {
+        for b in (0..=4 - a).rev() {
+            poly = poly.add(
+                &pscale(&pow(&x, a, f).mul(&pow(&y, b, f), f), base(QF[k]), f),
+                f,
+            );
+            k += 1;
+        }
+    }
+    let roots = unip::roots(native(&poly));
+    for t in roots {
+        let xx = x.eval(base(t), f)[0];
+        let yy = y.eval(base(t), f)[0];
+        out.push([xx, yy, 1]);
+    }
+    // A degree drop is the single point at infinity on this line.
+    if poly.degree() < 4 {
+        out.push(inf)
+    }
+    out.sort();
+    out.dedup();
+    assert!(out.iter().all(|p| pdot(n, *p) == 0));
+    println!("CHORD rational_points={out:?} vertical={vertical} root_factoring=true");
+    out
 }
