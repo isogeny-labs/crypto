@@ -116,3 +116,37 @@ reading the file. The initial seven-box report diagram spilled to a fourth
 page; condensed its repeated steps to four boxes, regenerated three pages
 and inspected all of them. No mathematical statement, numeric cap or input
 was changed to get a pass.
+
+## 2026-11-15T18:08Z
+
+### What was done (commands, files, features)
+
+Read Kohel--Shparlinski sections3--4, Theorem1/Corollary1/Lemma3 and the
+Kim--Tibouchi conference manuscript section2/Lemma3.1 for implicit coordinate
+intervals. Prospective A3 scope and six-field inheritance plan are committed
+at38ae306f73 before any A3 Lean edit. The floor-law assembly probe now passes
+existing character orthogonality/cardinality, unit norm and norm_sum_le;
+source/log are retained under checks/interval-laws/.
+
+### Decisions made (and why)
+
+Check uniform-list closure, not all implicit/adaptive join algorithms. The
+generic target is a triple-count inequality conditional on actual subset
+character-sum bounds; the elliptic analytic estimate remains an explicit
+external input. Build only missing generic Fourier bookkeeping in shared
+crypto-lean. No new curve model, analytic axiom or numerical panel.
+
+### Open threads (unfinished, pick up next time)
+
+Preserve full source/build/gate history for the new generic target, then
+apply it only at its explicit hypotheses. Correlated lists and adaptive
+selection remain outside a uniform-subset inference. PR4311follow-up has a
+standing-rule safety-net scheduled18:41:51Z; concrete future environment
+details were unavailable, so no execution is implied. The journal stays
+frozen under the sole Copilot request until its response/fallback condition.
+
+### Errors (what went wrong, how it was handled)
+
+Capability recheck still finds no AWS CLI, ambient key pair, checkpoint token
+file or token environment. Did not repeat the unchanged upload failure or
+run the frozen native panel. No A3 probe error or proof-limit change.
