@@ -16,4 +16,24 @@ The cost chain is an accounting identity: the existing counted GAE phase costs a
 
 ## Validation
 
-The focused rootfinding test checks the block's phase names, sum, nonzero relation inversion tally, and incomplete-cost boundary. Rust formatting and the required release library suite are run from the source branch; the exact results belong in the branch's session entry and PR description.
+The focused rootfinding test checks the block's phase names, sum, nonzero relation inversion tally, and incomplete-cost boundary. The focused replay test checks exact matching and compatibility with old records. Both passed with the release test binary before the `origin/main` merge. `rustfmt --check` on the two edited Rust files and `git diff --check` passed.
+
+The required `cargo test --release --lib` was attempted with Rust 1.99.1 on macOS. After about 25 minutes it had recorded 6,287 passes, 86 ignored tests, and 19 failures; the remaining long tests were interrupted, so the full suite has no passing verdict. Five ecbench band/compare failures open an absent, untracked `research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl`. A separately rerun `ml_dataset::report` failure requires Linux `/proc`; a separately rerun wide-prime fixture test failed on a missing file. These failures are outside the edited code. Both focused release tests passed again after merging `origin/main` at `2f847a3711` (6,498 other tests filtered out in each run).
+
+## Handoff
+
+### What was done
+
+Added the partial phase tally and replay binding in `methods.rs` and `audit.rs`; merged current `origin/main` into the branch. The commands and outcomes above are the local validation receipt.
+
+### Decisions made
+
+Keep `SolveReport::field_ops` absent because the group-law tally does not cover the whole IC pipeline. Treat the full-suite attempt as incomplete and failing, while retaining the focused test outcomes at their exact source revision.
+
+### Open threads
+
+Price the remaining native counters in a common unit and run the isolated lane panel with controls and independent replay. The complete-cost calibration problem remains open.
+
+### Errors
+
+The macOS full suite encountered absent raw session inputs and Linux-specific `ml_dataset` requirements. Its long tail was interrupted after the failures were observed; no full-suite pass is claimed.
