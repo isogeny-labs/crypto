@@ -1,0 +1,39 @@
+P<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^7+x+1>;
+E := EllipticCurve([K | 1, 1, 0, 0, z+1]);
+assert #E eq 142;
+assert WeilDescentGenus(E, GF(2), K!1) eq 8;
+C, h := WeilDescent(E, GF(2), K!1);
+assert Type(C) eq CrvHyp;
+assert Genus(C) eq 8;
+J := Jacobian(C);
+found := false;
+for pt in Points(E) do
+    if Order(pt) eq 71 then
+        image := h(pt);
+        print "source_point", pt;
+        print "source_order", Order(pt);
+        print "target_type", Type(C);
+        print "target_genus", Genus(C);
+        print "image_type", Type(image);
+        print "target_zero", image eq J!0;
+        print "target_71_zero", 71*image eq J!0;
+        assert image ne J!0;
+        assert 71*image eq J!0;
+        Q := 7*pt;
+        target := h(Q);
+        assert target eq 7*image;
+        recovered := -1;
+        for k in [0..70] do
+            if k*image eq target then
+                recovered := k;
+                break;
+            end if;
+        end for;
+        print "recovered_scalar", recovered;
+        assert recovered eq 7;
+        found := true;
+        break;
+    end if;
+end for;
+assert found;
