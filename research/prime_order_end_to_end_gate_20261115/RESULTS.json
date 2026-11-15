@@ -1,6 +1,6 @@
 {
   "standing": "[pcc:unverified]",
-  "local_execution": "2026-11-15, standard-library CPython, producer-local, independent PCC/CI pending",
+  "local_execution": "2026-11-15, standard-library CPython, producer-local, independent PCC/CI pending; original and Python -O stdout byte-identical",
   "prime_order_cold": {
     "file": "prime_signed_relation_pipeline.py",
     "field_p": 1019,
@@ -34,9 +34,23 @@
       84
     ],
     "all_per_target_records_sha256": "f92a201e7d0f99b54373e335c529582f6efdd93a22ea526a215cfdd39ea15ce1",
-    "script_sha256": "69f63877cfd31b7dcf764ee1c0691d7837e4d5e5a9619ea47c3e530b506e2a99",
+    "script_sha256": "1b6db0641be38fa639f799448f4b7a34e6dbbd2b86465bba9a1bdb941f0d94ca",
     "full_stdout_sha256": "4daa7fb7fb98f8b26f21365b3f8b4e087c5df1fdc7d8940bbedb4b6ec62598fb",
-    "limitations": "Not a PKM sparse Groebner oracle. Matrix arithmetic, generator/curve choice, memory, rho and field operation weighting are not charged; counting is a conservative point-op-only comparison in favor of signed method."
+    "limitations": "Not a PKM sparse Groebner oracle. Matrix arithmetic, generator/curve choice, memory, rho and field operation weighting are not charged; counting is a conservative point-op-only comparison in favor of signed method.",
+    "simple_rho_baseline": {
+      "file": "rho_prime_order_control.py",
+      "verified_targets": 977,
+      "mean_point_ops": 147.38178096212897,
+      "median_point_ops": 139,
+      "max_point_ops": 503,
+      "total_restarts": 3,
+      "max_restarts_per_target": 1,
+      "rho_mean_iterations": 35.80962128966223,
+      "point_ops_ratio_signed_over_rho": 2.923523529084949,
+      "not_optimized": true,
+      "script_sha256": "7b00509122535a7ed47bf3f91bfa7ffc3e88a2f56f0677597dc2582151b72129",
+      "full_stdout_sha256": "d05521b8fb35f3c16526c6d92ebef7f75a2c212fadea8e553073f86a3f14867e"
+    }
   },
   "smooth_order_positive_control": {
     "file": "smooth_order_control.py",
@@ -71,7 +85,7 @@
       "bsgs_not_run": true,
       "nontrivial_group_order_factorization": "2^61"
     },
-    "script_sha256": "cb4d091802923f9a3f430e0d8fd2075ee915708527750bb8f47552b82bc4eb6b",
+    "script_sha256": "164b074cc80edc9fa94ece48a92d0d3c46c6cff6bd99db1f556c8152d0fa90d8",
     "full_stdout_sha256": "a2737f32a00f671fe7d70ec092790c1fd41b9bcfe22363ed1fb3ee5abc704766",
     "novelty": "none; standard Pohlig-Hellman on smooth group order, not applicable to secure prime-order groups"
   }
