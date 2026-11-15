@@ -1,0 +1,29 @@
+name: CT75 odd-prime input-uniform torsion lifts
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct75/**'
+      - '.github/workflows/ct75-odd-prime-lift.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct75-local-odd-torsion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independently verify every encoded target and Hensel precision
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct75
+          python3 -B "$D/ct75_generic.py" > ct75-py.jsonl
+          python3 -O -B "$D/ct75_generic.py" > ct75-pyopt.jsonl
+          node "$D/ct75_independent.js" > ct75-js.jsonl
+          node --no-opt "$D/ct75_independent.js" > ct75-jsopt.jsonl
+          cmp ct75-py.jsonl ct75-pyopt.jsonl
+          cmp ct75-py.jsonl ct75-js.jsonl
+          cmp ct75-py.jsonl ct75-jsopt.jsonl
+          test "$(wc -l < ct75-py.jsonl)" -eq 22
+          echo '9d16bc738049c00ab76ca2f9e1cf0b0d4fc5b7b083d72dcd577c2cbffd327a33  ct75-py.jsonl' | sha256sum -c

@@ -86,6 +86,21 @@ stderr outside that directory, and require `result.json` as an output. Freeze a
 client timeout that covers the launcher's documented wait plus submission and
 receipt retrieval, separately from the experiment's execution deadline.
 
+Before the launch step, put a pool-check step on the card that runs
+`scripts/isolab_pool_check.sh --cpu N --memory M --pool <pool> --save <receipt
+directory>/pool.json` (bound by SHA-256, success exit 0): it reads every pod in
+every namespace on the pool, not only this study's Jobs, and exit 10 names the
+jobs in the way. Without cluster read access, the card cannot claim the pool is
+free; say so in the card notes.
+
+A step whose `timeout_seconds` exceeds the card's `detach_above_seconds`
+(default 540, under the executor's 600 s shell cap) is started detached by
+`tools/task_card.py run`, which exits 4 with `status: detached`; such a step
+must have `stdout` and `stderr` paths, and the run directory
+(`<receipt stem>.run/`) must be inside `write_scope`. The executor then runs
+`tools/task_card.py wait <card>` until it stops exiting 4. `status <card>`
+reports running / exited / lost; lost (exit 5) means a loss-ledger row.
+
 The executor runs the existing card tool only. It does not choose an instance,
 build an image, invent a spec, switch backends or retry submission. A requested
 resumable run instead binds the separate recovery client's request and commands;

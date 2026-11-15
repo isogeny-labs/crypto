@@ -156,11 +156,63 @@ asked whether a higher Macaulay degree closes that gap [pcc:unverified]:
     probability about 1/p;
   - a solution of multiplicity above 1 at infinity;
   - a non-zero-dimensional component.
-- **The cheapest test** would be a second independent A on the same
-  targets. That was not run.
+- **The cheapest test** is a second independent A on the same targets.
+  Amendment A2 below runs it.
 - **Decompositions are unaffected.** Every oracle decomposition is
   recovered at every degree.
 - **Q1-b.** The verdict stays as registered at degree 29.
+
+## Amendment A2: the remaining shortfall belongs to the chart, not the system
+
+Amendment A2 was registered at `0542602115` before its data. It re-solves
+each of curve 1's four conj targets with a short decomposition at degree 29,
+under 3 fresh random charts A₁, A₂ and A₃, each from its own seed. That is
+12 solves, about 42 min [pcc:unverified].
+
+![lost dimension against lost rational solutions, 16 charts](reports/run-20261106T1550Z/fig2_charts.png)
+
+| target | first A | A₁ | A₂ | A₃ |
+|:--|--:|--:|--:|--:|
+| planted | 4,095 | **4,095, solve failed (0/3)** | 4,096 | 4,094 |
+| common 0 | 4,094 | 4,096 | 4,095 | 4,095 |
+| planted3_0 | 4,095 | 4,096 | 4,096 | 4,095 |
+| planted3_1 (control) | 4,096 | 4,096 | **4,095** | 4,096 |
+
+- **M3: chart-dependent on every target** [pcc:unverified].
+  - Each of the three targets that fell short with the first A reaches
+    4,096 under at least one fresh chart.
+  - So no multiple point or positive-dimensional component is needed. The
+    Bézout count of 4,096 is there, and a given chart can leave part of it
+    on its own hyperplane at infinity.
+- **The control fails.** `planted3_1`, at 4,096 with the first A, drops to
+  4,095 under A₂. That fits the same reading: no chart is safe in advance.
+- **The Q2 re-check fails once.**
+  - On `planted` under A₁, the transformed solve reports "border
+    unreachable" and returns nothing (0/3), as the plain solve did.
+  - The other 11 solves return exactly the oracle's decompositions. That
+    includes every chart with dim 4,095 or 4,094.
+- **What is lost is rational solutions, one for one** (post-hoc, not
+  registered).
+  - Within a target, every unit of missing dimension matches one F_p-rational
+    e-solution that the solver no longer returns:
+    - `planted`: 16, 15 and 14 rational solutions at dim 4,096, 4,095 and
+      4,094;
+    - `common0`: 15, 14 and 13;
+    - `planted3_0` and `planted3_1`: 13 and 12.
+  - That is what an F_p-rational solution on the chart's hyperplane at
+    infinity produces. Each rational solution lies on a random F_p-rational
+    hyperplane with probability about 1/p.
+  - With 13–16 rational solutions at p = 29, the chance that a chart misses
+    at least one is about 1 − (28/29)¹⁶ ≈ 0.43. On these four targets 9 of
+    16 charts fell short.
+  - Every other target's first chart reached 4,096, apart from the
+    positive-dimensional case. Most of those targets have 0–4 rational
+    solutions. The three curve 2 conj targets with 12–18 had a combined
+    chance of about 0.22 of all avoiding a shortfall, so curve 2 was partly
+    lucky too.
+  - The missing rational solutions were never one of the oracle's
+    decompositions, but there is no reason that should always hold.
+- **Q1-b.** The verdict stays as registered.
 
 ## Registered verdicts (`--summarize-inf`)
 
@@ -174,6 +226,9 @@ asked whether a higher Macaulay degree closes that gap [pcc:unverified]:
 | Q2-cost: R2 within [0.9, 1.1] × generic | **PASS** | 0.970–1.030 |
 | Q1-d: points at infinity vs short counts (report) | — | at least one per short decomposition on every successful solve |
 | A1 / M2: dim 4,096 at some degree ≤ 32 | not reached | 4,095 and 4,094 through degree 32: not truncation |
+| A2 / M3: some fresh chart gives 4,096 | **chart-dependent** on all 3 targets | 4,096 under 1, 1 and 2 of 3 fresh charts |
+| A2 control: planted3_1 stays at 4,096 | **FAIL** | 4,095 under A₂ |
+| A2 Q2 re-check: solver = oracle | **FAIL** | 11/12; `planted` under A₁ returned nothing (border unreachable) |
 
 ## What this changes
 
@@ -187,9 +242,18 @@ asked whether a higher Macaulay degree closes that gap [pcc:unverified]:
   measured [pcc:unverified]. The previous caveat ("only on curves where
   the solver handles the system") is removed for targets that are not
   themselves factor-base points.
+- **One random chart is not always enough** (A2). A chart with an
+  F_p-rational solution on its hyperplane at infinity loses that solution.
+  In 1 of 16 charts on curve 1 it also lost every decomposition. The cheap
+  guard is the Bézout check: if dim < 4,096, draw a new A and solve again.
+  On these targets that is about one extra solve in two. On targets with
+  few rational solutions it is rare. A chart defined over F_{p²} would
+  avoid every F_p-rational point except those on a codimension-2 subspace.
+  It is not tested here.
 - **A further gain left unused.** A transformed solve also returns the
   3-point relations, at infinity. They are not counted here.
-- **Scope.** Two curves at p = 29, one A per target. No ECDLP cost
+- **Scope.** Two curves at p = 29, one A per target (four on curve 1's
+  conj targets with a short decomposition). No ECDLP cost
   against rho is claimed, and there is no leaderboard or benchmark row.
 
 ## Reproduce
@@ -203,6 +267,9 @@ $B --p 29 --curves 2 --inf --macdeg 30,31,32 --only-arm conj --only-curve 1 \
 $B --summarize-inf rows.jsonl a1_rows.jsonl \
    research/lift_dense_conjugate_pair_decomp_20261106/reports/run-20261106T0643Z/rows.jsonl out/ claimed.json
 python3 research/lift_dense_conjugate_pair_infinity_20261106/fig.py out/   # layout only
+$B --p 29 --curves 2 --a2 3 --only-curve 1 --only-arm conj --out a2_rows.jsonl   # ~42 min
+$B --summarize-a2 a2_rows.jsonl rows.jsonl out/ claimed_a2.json
+python3 research/lift_dense_conjugate_pair_infinity_20261106/fig2.py out/  # layout only
 ```
 
 ## Claim record
@@ -210,3 +277,4 @@ python3 research/lift_dense_conjugate_pair_infinity_20261106/fig.py out/   # lay
 | claim | standing | content |
 |:--|:--|:--|
 | `PCC-20261106-e1a9d3` | not covered (unsigned) | rule counts, cost band, A1 degrees ([`validator-report.json`](reports/run-20261106T1550Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
+| `PCC-20261106-213a67` | not covered (unsigned) | Amendment A2: chart dependence, control, Q2 re-check ([`validator-report-a2.json`](reports/run-20261106T1550Z/validator-report-a2.json), values in [`claimed_a2.json`](claimed_a2.json)) |

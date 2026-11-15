@@ -109,7 +109,8 @@ of Bochum v0.2 §3 in `crates/hashed-ecdl-tensor`.
   (`cofactor_factor_bases`). The hash is evaluated on A_i, the subgroup
   point.
 - **Whole-point network** (`cofactor_relation_network`). Each slot takes a
-  free S_i ∈ E (a support over every affine point) and a projection vertex
+  free S_i ∈ E (a support over the preimages of F_i, enumerated once per
+  factor-base draw into `FactorBases::preimages`) and a projection vertex
   emits A_i = [c]S_i only when A_i is a member of F_i. Since every point of
   G has exactly c preimages, the count is exactly c^m times the subgroup
   network's.
@@ -123,14 +124,15 @@ of Bochum v0.2 §3 in `crates/hashed-ecdl-tensor`.
   unchanged) switches all of this on. It refuses a target outside G and
   coordinate windows. Meet-in-the-middle search runs on the A_i directly.
 - **CLI.** `ic tensor demo --cofactor C`.
-- **Tests.** `tests/cofactor_test.rs` (8 tests):
+- **Tests.** `tests/cofactor_test.rs` (9 tests):
   - the curve order, and exactly c preimages per point of G;
   - the whole-point identity count = c^m × subgroup count, for m = 2 and 3,
     with c = 2 and 4;
   - an exhaustive [k]S gadget check;
   - gadget count = whole-point count;
   - solves for c = 2 and 4 (whole-point, meet-in-the-middle, gadgets);
-  - rejected inputs, and the bounded shape.
+  - rejected inputs, and the bounded shape;
+  - cached preimages give the same count as sources over all of E.
 
 None of this changes the cost class: every counter is still exponential.
 

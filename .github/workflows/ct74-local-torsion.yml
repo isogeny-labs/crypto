@@ -1,0 +1,28 @@
+name: CT74 source-local torsion Hensel lift and negative control
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct74/**'
+      - '.github/workflows/ct74-local-torsion.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct74-local-torsion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute independent local Hensel torsion controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct74
+          python3 -B "$D/ct74_local_torsion.py" > ct74-py.jsonl
+          python3 -O -B "$D/ct74_local_torsion.py" > ct74-pyopt.jsonl
+          node "$D/ct74_independent.js" > ct74-js.jsonl
+          node --no-opt "$D/ct74_independent.js" > ct74-jsopt.jsonl
+          cmp ct74-py.jsonl ct74-pyopt.jsonl
+          cmp ct74-py.jsonl ct74-js.jsonl
+          cmp ct74-py.jsonl ct74-jsopt.jsonl
+          echo 'b459b8be46bf3b7e9cc8af7ecc85d732e4e5fc5d51dfcb27773fae0a22d799e4  ct74-py.jsonl' | sha256sum -c

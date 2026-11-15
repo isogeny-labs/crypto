@@ -185,3 +185,170 @@ has to see the curve. No specialisation to finitely many points can give one.
   - This is open.
 - No theorem for isogeny towers. Their reduced `S₃` has degree 4, and
   *measured* `ffd = 5` = degree + 1.
+
+## Addendum, 2026-11-12 (pointer; nothing above is changed)
+
+Four further results, with prose proofs, are in
+`research/prime_ic_leads_20261110/growth_law/README.md`: monotonicity of `d_F` in `t` for a fixed
+system (reduction modulo `z^{2^t} − 1` maps closures into closures); the top-window lemma (a
+degree-`c` closure uses `y_{t−1}² = 1` only through the top `c − 1` variables, which is the precise
+form of the "pseudo-solution near the top" hint above); the generic value of `d_F` by support, with
+`S₃` filling the width-2 box; and `ffd = 3, 4, 5, 5` for the width-`W` boxes, `W = 1 … 4`. The growth
+in `t` is still only fitted there (`d_F = ffd(W) + max(0, ⌊(t − s_W)/4⌋)`), so the first item of
+"What is not derived" stays open.
+
+## D9. Theorem (selector upper bound, Kummer chain, any `m`). Added 2026-11-15; nothing above is changed
+
+**Setting.** A Kummer tower of height `t ≥ 2` in each of the `m` factor-base
+coordinates, the `S₃` chain with `m − 2` free unknowns `u_1, …, u_{m−2}`:
+`F_1 = S₃(x_1, x_2, u_1)`, `F_k = S₃(u_{k−1}, x_{k+1}, u_k)`,
+`F_{m−1} = S₃(u_{m−2}, x_m, x_R)`.
+
+**Hypothesis.** `1 ∈ ⟨F⟩` in `R`. By D1, `R ≅ Π_{x∈V^m} F_p[u]`, so this holds
+iff `1 ∈ ⟨φ_x F⟩ ⊂ F_p[u]` at every grid point `x`. By the Nullstellensatz, that
+means the residual chain `φ_x F` has no common zero over `F̄_p` at any `x`. This is
+exactly the condition for `d_F < ∞`, since `V_{F,c} ⊆ ⟨F⟩`. It is stronger than
+"no `F_p`-relation". At `m = 3` the two differ only when, at some grid point,
+`f_1, f_2` are proportional irreducible quadratics.
+
+**Statement.**
+- (a) `m = 3`: `d_F ≤ 3t + 5`.
+- (b) `m ≥ 3`: `d_F ≤ m·t + 4^{m−2} + 4`.
+- (c) `m = 2`: the same construction is D4, `d_F ≤ 2t + 2`.
+
+**Degrees of the chain in `R`.** With `x_i = g·y_{i,0}`, `x_i² = g²·y_{i,1}` and
+each `u_k` of degree 1, expanding `S₃` gives `deg F_1 = 4`, `deg F_k ≤ 4` (middle),
+and `deg F_{m−1} = 3`. In each monomial, an `x` contributes at most degree 1.
+
+**Proof.**
+1. *Pointwise certificate.* At each `x`, `1 ∈ ⟨φ_x F⟩`, so there are `h_i^x ∈ F_p[u]`
+   with `Σ_i h_i^x·φ_x F_i = 1`.
+   - At `m = 3`, `f_1 = φ_x F_1` and `f_2 = φ_x F_2` are univariate of degree `≤ 2`.
+     The extended Euclidean algorithm gives `deg h_i^x ≤ 1` (Bézout).
+   - For general `m`, Kollár's effective Nullstellensatz applies to `m − 1`
+     polynomials of total `u`-degree `≤ 4` in `n = m − 2` variables. It gives
+     `deg(h_i^x φ_x F_i) ≤ max(3, 4)^n = 4^{m−2}`, so `deg h_i^x ≤ 4^{m−2}`.
+   - Kollár's bound is stated over `F̄_p`. A bounded-degree linear system over
+     `F_p` has a solution over `F_p` iff it has one over `F̄_p`, so the `h_i^x`
+     can be taken in `F_p[u]`.
+2. *Selector sum.* Let `δ_x ∈ F_p[y]/T` be the indicator of `x` (D1), and put
+   `G_i = Σ_x δ_x·h_i^x(u)`. Then `φ_x(Σ_i G_i F_i) = 1` at every `x`, so
+   `Σ_i G_i F_i = 1` in `R` (D1).
+   - In normal form, `G_i` is spanned by `z^k u^e` with
+     `popcount(k) = Σ_j popcount(k_j) ≤ m·t`.
+   - Its `u`-degree is `≤ 1` (`m = 3`) or `≤ 4^{m−2}` (general `m`).
+3. *Closure degree, as in D4.* Build `z^k u^e·F_i` from `F_i` by multiplying by
+   one variable at a time.
+   - Rewriting never raises degree (D2), and `u` is free.
+   - So after `j` steps the product has degree `≤ deg F_i + j`.
+   - Every step starts from degree `< c` when `c = deg F_i + popcount(k) + e`.
+   - Hence `1 = Σ coeff·(z^k u^e F_i) ∈ V_{F,c}` with
+     `c = max_i (deg F_i) + m·t + max deg_u G_i`:
+     - `m = 3`: `c = 4 + 3t + 1 = 3t + 5`;
+     - general `m`: `c ≤ 4 + m·t + 4^{m−2}`. ∎
+
+**What this does and does not say.**
+- **Not a cost improvement.** At the operating point `K^m ≍ p`, `m·t ≈ log₂ p`.
+  The bound is in the brute-force regime, which is worse than rho, and it changes
+  no cost estimate.
+- **No lower bound.** The construction always reaches its full degree (the check
+  below), but that says nothing about whether `d_F` itself is tight.
+- **Measured `d_F` is far below the bound.** At `m = 3` it is about 5, as at
+  `m = 2`, where falls take `2t + 2` down to 4–6. `[pcc:unverified]`
+- **"What is not derived" is unchanged.** Its open item is a growing *lower*
+  bound.
+- The minimum degree of a no-fall certificate at `m = 3` (is it `3t + 5`?) is
+  being measured separately in `research/kummer_m3_ns_degree_20261115/`.
+
+**Check** (`d9_check.py`, stdlib only; output in `d9/d9_check.json`,
+`d9/d9_check.log`, `d9/d9_control.log`). `[pcc:unverified]`
+- **Instances:** `m = 3`, `p ∈ {998244353, 2013265921}`, `t = 2 … 5`, three seeded
+  draws each, 24 instances.
+- **On every instance:**
+  - every one of the `K³` grid pairs is coprime;
+  - `max deg_u h ≤ 1`;
+  - `deg F_1 = 4` and `deg F_2 = 3`, computed from the symbolic expansion;
+  - `G_1F_1 + G_2F_2 = 1` holds by **explicit multiplication** in
+    `F_p[z_1,z_2,z_3]/(z_i^K − 1)[u]`, with `F_i` built symbolically, not
+    pointwise, so the check does not rest on D1's evaluation map;
+  - changing one coefficient of `G_1` breaks the identity;
+  - the certificate degree equals `3t + 5`: 11, 14, 17 and 20 at `t = 2 … 5`.
+- **Negative control** (`--control`): a target with a common root planted at
+  one grid point is rejected in 6/6 cases.
+- **Result:** 24/24 pass. Runtime 36 s on one core.
+
+## D10. Theorem (growing lower bound for the no-fall degree, Kummer `m = 3`). Added 2026-11-15; conditional on a per-instance check
+
+**Proof system.** `d_NS` is the least `c` with
+`1 ∈ span{z^k u^j F_i : popcount(k) + j + deg F_i ≤ c}` in `R`. This is D4's no-fall
+system (Nullstellensatz in `R`). `d_F ≤ d_NS`, and D9 gives `d_NS ≤ 3t + 5`. This
+section is about `d_NS` only, **not about `d_F`**.
+
+**Hypotheses.**
+- D9's hypothesis.
+- `x_R ∉ V`, so `deg_u φ_x F_2 = 2` at every `x`.
+- `λ(1) ≠ 0` for the functional below. This is checked per instance, not proved.
+
+**The functional.** The lead was proposed as KM3-LQR-NS in
+`research/kummer_m3_ns_degree_20261115/NEW_LEADS.md`. For `g ∈ R` put
+
+`λ(g) = Σ_{x∈V³} x_1·x_2·x_3 · ⟨u⟩( φ_x(g)·φ_x(F_1)^{-1} mod φ_x(F_2) )`,
+
+where `⟨u⟩` takes the `u`-coefficient of the residue, which has degree `≤ 1`.
+- `φ_x F_1` is invertible modulo `φ_x F_2` by D9's hypothesis.
+- `λ` is `F_p`-linear on `R`.
+
+**Statement.** Under the hypotheses, `λ` vanishes on every column of degree
+`≤ 2t + 5`. Hence `d_NS ≥ 2t + 6`.
+
+**Proof.**
+1. *Multiples of `F_2`.* `φ_x(μF_2)·φ_x(F_1)^{-1} ≡ 0 mod φ_x F_2`, so `λ(μF_2) = 0`.
+2. *Multiples of `F_1`.* `λ(z^k u^j F_1) = A_{k_1}·A_{k_2}·B_{k_3, j}`, where
+   - `A_k = Σ_{ζ∈μ_K} gζ·ζ^k`;
+   - `B_{k,j} = Σ_{ζ∈μ_K} gζ·ζ^k·r_j(gζ)`;
+   - `r_j(x_3) = ⟨u⟩(u^j mod φ F_2)`.
+3. *Character sums.* By orthogonality, `A_k = gK·[k ≡ −1 mod K]`. So `A_k ≠ 0` only
+   for `k = K − 1`, which has popcount `t`.
+4. *Small `j`.* `r_0 = 0` and `r_1 = 1`. So `B_{k,0} = 0`, and `B_{k,1} = A_k` is
+   nonzero only for `k = K − 1`.
+5. *Surviving columns.* A column `z^k u^j F_1` survives only if `k_1 = k_2 = K − 1`,
+   and either `j ≥ 2`, or `j = 1` with `k_3 = K − 1`. Its degree is therefore at least
+   `min(2t + 2 + 4, 3t + 1 + 4) = 2t + 6`.
+6. *Conclusion.* `λ` vanishes on the whole span at `c = 2t + 5`, and `λ(1) ≠ 0`. So
+   `1` is not in that span. ∎
+
+**Check** (`research/kummer_m3_ns_degree_20261115/lqr/`; `lqr_exhaustive.py`, `lqr_ex.log`, `lqr_check.py`, `lqr.log`). `[pcc:unverified]`
+- **Instances:** `p ∈ {40961, 12289, 998244353}`, `t = 2 … 5`, three draws each.
+  - 32 of 36 instances satisfy the hypotheses.
+  - The other 4 have a consistent grid point and are skipped (`K³/p` is not small at `p = 12289`, `t = 5`).
+- **Certified on all 32:**
+  - every column of degree `≤ 2t + 5` is killed, checked exhaustively over all `k` and `j` with the factorised formula;
+  - the degree-`(2t+6)` column `z_1^{K−1} z_2^{K−1} u² F_1` is *not* killed, so the argument cannot reach past `2t + 6`;
+  - `λ(1) ≠ 0`.
+- **Certified bound:** `d_NS ≥ 10, 12, 14, 16` at `t = 2, 3, 4, 5`.
+- **Direct check, independent of the factorisation** (`lqr_check.py`): `λ` was evaluated pointwise on random `F_1` and `F_2` columns that the proof says it kills. All were 0, on 27/27 instances.
+
+**Reading.**
+- On every certified instance, `2t + 6 ≤ d_NS ≤ 3t + 5`. The no-fall degree at
+  `m = 3` grows at least like `2t`, like D4's `2t + 2` at `m = 2`.
+- The measured `d_F` is about 5. So falls account for everything above a constant,
+  as at `m = 2`.
+- "What is not derived" is unchanged. Its open item is a growing lower bound on
+  **`d_F`**, a proof system with falls, and `λ` is not a closure pseudo-solution.
+  Whether a variant of `λ` is one is lead KM3-LQR-CLOSURE in `NEW_LEADS.md`.
+
+*Measured* (`research/kummer_m3_ns_degree_20261115/RESULTS.md`, lab N1, protocol frozen with sha256 `b790f8bd…`). `[pcc:unverified]`
+- **Same instances, two measurements.** Primes 40961 and 12289, three instances each, all six agreeing.
+  - With multipliers restricted to `u`-degree `≤ 1` (D9's class), `d_NS = 3t + 5` at `t = 2 … 5`.
+  - With no restriction, `d_NS = 10` at `t = 2`.
+  - At `t = 3` with `u`-degree caps 2–4, `d_NS ≤ 13`.
+- **D10 is attained at `t = 2`**: `10 = 2t + 6`.
+- **D9 is not tight for `d_NS`.** Its value 3t+5 is exact only within the `u`-degree `≤ 1` class.
+- **Control:** m = 2 reproduces `2t + 2` on 24/24 instances.
+
+*Measured, wave 2* (`research/kummer_wave2_20261115/`; pointer only, nothing above changed). `[pcc:unverified]`
+- **KM3-LQR-CLOSURE.** D10's functional also vanishes on the **true closure** `V_{F,c}` for every `c < d_F`, so it is a closure pseudo-solution.
+  - Cells: 12/12 at m = 3 (t = 2, 3) and 28/28 at m = 2, plus `c ≤ 5` at t = 4 on one draw.
+  - A growing lower bound on `d_F` would follow from showing that λ kills `V_{F,c}` up to a growing `c`. That is open; the data reach only `d_F = 5, 6`.
+- **KM-ART-DEGEN.** Replacing `y_{t−1}² = 1` by `0` or `5` leaves `d_F` and `ffd` unchanged (65/65 m = 2 cells, t ≤ 8). So a lower-bound argument has to come from carry transport, not the wrap.
+- **KM3-SPEC-LADDER.** The specialisation inequality `d_F(m) ≥ d_F(m−1, ρ)` holds on 50/50 pairs, but it gives only `d_F ≥ 4`.
