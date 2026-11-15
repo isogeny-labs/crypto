@@ -7,7 +7,9 @@ Standing of this review: `[pcc:unverified]`. No pcc claim is registered for it.
 
 Every certificate holds, the identity claim holds, and every number in the REPORT table and in the
 listed ranges recomputes from the raw records with my own code. The §5a band values match both
-`ecbench band` and my own re-implementation of the `band.rs` rule. No measured number is refuted.
+`ecbench band` and my own re-implementation of the `band.rs` rule. All 88 worker-free records (rho and
+the CPU arms) replay identically on another host with a binary built from a clean commit. No
+measured number is refuted.
 The scope is narrower than the report's wording in places. The CPU solve ratio is attributed to the
 solver change beyond what the data support (finding 3). The code at the measured commit differs from
 the protocol commit in `src/`, and the report does not say so; the change does not touch the measured
@@ -19,7 +21,7 @@ without a CUDA device, so their walls rest on the pod's own same-host audit. [pc
 
 | item | value |
 |---|---|
-| validated objects | `219b1378f80c4db37c8b7dabca19bfa97c1ea9f9`, the branch head at dispatch, read with `git archive`. The study directory and the three records are byte-identical from `e673b23fc4` to `219b1378f8`. The remote branch later moved to `d71bc17b0f` (push 20:20:35Z); per the GitHub compare API, that change touches neither the study, the records, `gpu/rootfind` nor `ic_framework` |
+| validated objects | `219b1378f80c4db37c8b7dabca19bfa97c1ea9f9`, the branch head at dispatch, read with `git archive`. The REPORT validated is that commit's `REPORT.md` (blob `9dffac1f08`, sha256 `6325c02e…`). The corrections committed afterwards at `3767aaca3f` were not validated here. The study directory and the three records are byte-identical from `e673b23fc4` to `219b1378f8`. The remote branch later moved to `d71bc17b0f` (push 20:20:35Z); per the GitHub compare API, that change touches neither the study, the records, `gpu/rootfind` nor `ic_framework` |
 | measured revision | `8c5ae6a512` (`REV` in the tarball). GitHub push activity: `5d618524e2` (protocol, specs, `job.sh`) at 17:07:15Z, `8c5ae6a512` at 18:56:53Z, `2f89e87c07` (record only) at 18:57:19Z. Command 3 of record r2 started 18:57:03Z, so `REV` was taken at `8c5ae6a512` |
 | raw tarball | `raw/out_rla.tgz`: 145 432 B, sha256 `f1f774f6c18f2da3f3524e577d67b6de4bda716ddc56ce1c37ff581cafd08c34`. This equals `raw/out_rla.tgz.sha256` and the `raw` entry of records r2 and r3. It has 43 entries, all regular files or directories, with no links and no absolute or `..` paths. I extracted it into a fresh scratch directory |
 | sessions | `smoke` (`ECBS1h7e02b5ff0c2a`) holds 36 records and `rf3la` (`ECBS1h5d935fcbaf36`) holds 132; every record has status `verified` [pcc:unverified]. `records.jsonl`, `plan.json` and `host.json` hash to the values in `session.json`. Sequence numbers are contiguous, there are no warm-ups, every record is L0, and every record and receipt carries one binary, `0742b939c210…`. `git_commit` and `git_dirty` are `null` in both sessions |
@@ -40,7 +42,7 @@ without a CUDA device, so their walls rest on the pod's own same-host audit. [pc
 | 2a | Certificates, all 168 records, re-checked with my own EC arithmetic [pcc:unverified] | **pass, 168/168** | `certs.py` (own affine arithmetic). It checks: p and r prime; G and Q on the curve; r·G = O; recovered·G = Q; recovered = planted mod r; the outcome flags. For the smoke curve, a and b are solved from G and Q. A tampered copy (recovered + 1; Q moved off the curve) fails as it should |
 | 2b | Curve orders | **pass, 3/3** | r prime, r·G = O, t² ≤ 4p and r > 4√p, so #E = r. The trace and j-invariant match ICV1 fields 2 and 4 on all three curves (20, 38, 40 bits) |
 | 2c | Planted scalars | **pass, 168/168** | Re-derived from `uniform_scalar_sha256_v1` (model hash, r, seed, index) with my own SHA-256 code, on all 8 workloads |
-| 2d | Replays | **same host 168/168; cross-host, worker-free: smoke 16/16, rf3la REPLAY_RF3LA** | My replays used a different binary, `0afa6c10…` (built from a clean `219b1378f8`), on another hardware class (`ECBHW1hd21b654a34b7`). They covered every rho, rho A/A and CPU IC record. GPU records were not replayed (no device) |
+| 2d | Replays | **same host 168/168; cross-host, worker-free: smoke 16/16, rf3la 72/72 `identical`** | My replays used a different binary, `0afa6c10…` (built from a clean `219b1378f8`), on another hardware class (`ECBHW1hd21b654a34b7`). They covered every rho, rho A/A and CPU IC record: rf3la `rho-neg`, `rho-neg-aa` and the four CPU arms, 12 each. Both receipts are `ok` with 0 problems. GPU records were not replayed (no device) |
 | 3a | Identity: every IC arm against `rf3-cpu-gauss` per (workload, round) | **pass, 84 checks, 0 mismatches** | `check.py`. The checked fields are trials, relations, matrix rank, rows and dependents, recovered, planted, status, S, total GAE, `cost.unpriced`, the factor-base hashes and the algorithm seed. Every phase's adds, doubles, scalar mults and GAE are included. So is every `native` and `work_native` counter outside linear algebra, except the `gpu_*` diagnostics. Keys are indexed, so a missing key fails |
 | 3b | What differs inside linear algebra | **two counters** | Echelon against gauss differs only in `native.row_ops` and `work_native.gauss_entries_scanned`. The top-level `matrix_work` mirrors `row_ops`. `pivot_inversion_steps`, `row_build_*`, `rank`, `rows`, `columns` and the charged LA fields (all 0) are equal. The same solver gives identical LA maps on the CPU and GPU arms and on the A/A copy (0 mismatches) |
 | 3c | Smoke identity | **pass, 20 checks** | Every daemon arm against its CPU arm (rf3: mt, gpud, gpuh, gpup; rf2: gpud), with the LA maps included. Smoke runs echelon only, so it does not compare the two solvers |
@@ -216,6 +218,22 @@ rounds). Ratios are ratios of medians unless marked per pair.
   plus two short failed pods) against the bound.
 - **Calibrated reading.** No `w_cal` reading.
 - **Run route.** I did not check the route against the EKS default.
+
+## Addendum: the corrections at `3767aaca3f` (read, not re-validated)
+
+I read the `REPORT.md` diff from `219b1378f8` to `3767aaca3f`. Its new numbers are the ones above:
+LA 9–11.5× on the CPU, LA-only 0.84–0.99×, per pair 0.61–1.12×, LA share 0.87–0.89 → 0.34–0.42,
+cold 5.4–13.2×, and the command window 18:57–19:39Z. Its rewording follows findings 1–12. Two
+notes:
+
+- Its sentence that the validator "replayed every worker-free record on another hardware class"
+  was committed at 20:33:54Z. At that time my rf3la replay was still running; it finished at
+  20:35:19Z with 72/72 `identical`. So the sentence now holds, but it was written before its
+  evidence existed. `0fdc9479af` committed an earlier copy of this review with the placeholder
+  `REPLAY_RF3LA` in requirement 2d. This file replaces it.
+- "the waiver was granted in conversation" cannot be checked from committed objects.
+
+I did not check `REPORT.pdf` at `3767aaca3f`.
 
 ## Scripts and outputs (scratch, not committed)
 
