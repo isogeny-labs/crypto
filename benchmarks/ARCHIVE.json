@@ -723,6 +723,18 @@
         "benchmarks/20261013-n83-dense-root/panel.pdf",
         "benchmarks/20261013-n83-dense-root/panel.png"
       ]
+    },
+    {
+      "directory": "20261111-mt-fieldops-ic4",
+      "row": "| 2026-11-11 | [`20261111-mt-fieldops-ic4`](20261111-mt-fieldops-ic4/) ([PDF](20261111-mt-fieldops-ic4/REPORT.pdf); [validation](20261111-mt-fieldops-ic4/VALIDATION.json)) | Multi-target IC4 (x-only pair-sum table and paired trials x(Q ± W) sharing one inversion) against the cheapest of four pre-registered rho arms (anchored, sibling, x-only sibling, sequential database; x 3 kappa, per configuration and price) and a paired BSGS, all in one counted F_p layer (`examples/mt_fieldops.rs`; I = 3/10/30 M, S = M, h = 0/0.1/1 GAE); 33 fresh prime-order curves 2^22-2^26, 22 paired configurations per cell, 2112 runs; independent replay of all runs and recompute; claim PCC-20261111-fa13c8 | T = 16384: IC4 / rho **0.91-0.95**, cheaper at every I/M and h (0.93-0.98 with rho's per-target start overhead removed, validator estimate); T = 4096 unranked; T = 1024 dearer (1.05-1.19); distance remaining to paired BSGS 1.18-1.80 [pcc:unverified] | 4 vCPU Xeon 2.10 GHz, local, L0 (counted operations) | [`research/mt_fieldops_v2_20261111/`](../research/mt_fieldops_v2_20261111/) |",
+      "sha256": "60d971ca10e313ce22c773416859dea7e0b5ed7e216c8b2965a26c8a7e97d731",
+      "disposition": "superseded",
+      "reason": "The rho reference had a restart defect (bounded walk starts) that made it 1.4-4.8% too expensive, and the rho family lacks Kuhn-Struik retention; re-measured with the fix, IC4/rho at T = 16384 is 0.95-0.99 against the harness family and 1.12-1.17x against a retention rho at h = 0, so the row's 'cheaper than rho' headline no longer holds and its VALIDATION.json records strongest_available false. Superseded by the correction study and claim PCC-20261111-9a26ac.",
+      "provenance": [
+        "research/mt_rho_start_fix_20261111/RESULTS.md",
+        "research/mt_rho_start_fix_20261111/validation/claim-report.json",
+        "benchmarks/20261111-mt-fieldops-ic4/README.md"
+      ]
     }
   ]
 }

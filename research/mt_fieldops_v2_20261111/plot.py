@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+"""Figure + 2-page PDF report from results/holdout/summary.json (no other inputs)."""
+import json, matplotlib
+matplotlib.use("Agg"); import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+S = json.load(open("results/holdout/summary.json"))
+cells = sorted({(s["bits"], s["T"]) for s in S}); lab = [f"{b}b\nT={t}" for b, t in cells]
+col = {"rhobest": "#c0392b", "rho": "#3366cc", "bsgs2": "#2a9d55"}
+def fig_ratios():
+    fig, axs = plt.subplots(1, 3, figsize=(13, 4.2), sharey=True)
+    for ax, ci in zip(axs, [3, 10, 30]):
+        for k, a in enumerate(["rhobest", "rho", "bsgs2"]):
+            for h, mk in zip([0, 0.1, 1], ["o", "s", "^"]):
+                ss = [next(s for s in S if s["cI"] == ci and s["vs"] == a and (s["bits"], s["T"]) == c and s["h"] == h) for c in cells]
+                xs = [i + (k - 1) * 0.25 + (h if h < 1 else 0.2) * 0.3 - 0.03 for i in range(len(cells))]
+                ax.errorbar(xs, [s["median"] for s in ss], yerr=[[s["median"] - s["lo"] for s in ss], [s["hi"] - s["median"] for s in ss]],
+                            fmt=mk, color=col[a], ms=4, lw=1, label=f"vs {a}, h={h}" if ci == 3 else None)
+        ax.axhline(1, color="k", lw=0.8); ax.set_xticks(range(len(cells))); ax.set_xticklabels(lab, fontsize=8)
+        ax.set_title(f"inversion I = {ci} M"); ax.grid(alpha=.3)
+    axs[0].set_ylabel("IC4 / reference, cost per target (median, 95% CI)")
+    fig.legend(loc="lower center", ncol=9, fontsize=7, frameon=False); fig.tight_layout(rect=(0, 0.07, 1, 1)); return fig
+f = fig_ratios(); f.savefig("ratios.svg"); f.savefig("ratios.png", dpi=150)
+with PdfPages("REPORT.pdf") as pdf:
+    lines = open("RESULTS.md").read().splitlines(); per = 95
+    for k in range(0, len(lines), per):
+        t = plt.figure(figsize=(8.27, 11.69))
+        if k == 0: t.text(0.06, 0.965, "IC4 vs the strongest rho, fresh curves (v2, 2026-11-11)", fontsize=13, weight="bold")
+        t.text(0.04, 0.94, "\n".join(lines[k:k + per]), fontsize=5.6, family="monospace", va="top"); pdf.savefig(t)
+    pdf.savefig(fig_ratios())
+print("ok")

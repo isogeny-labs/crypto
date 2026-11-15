@@ -1,0 +1,54 @@
+{
+  "schema": "independent-mathematical-derivation/v1",
+  "status": "hand_derivation_source_supported_not_machine_verified",
+  "producer_new_candidate_read": false,
+  "compiler_runs": 0,
+  "hypotheses": [
+    "field K, characteristic not2",
+    "separable quintic f",
+    "rational simple branch P=(a,0)",
+    "b nonzero scalar",
+    "n polynomial",
+    "for factorization N=c*u1*u2*U, c nonzero scalar"
+  ],
+  "formulas": {
+    "vP_y": 1,
+    "vP_x_minus_a": 2,
+    "vP_polynomial_A": "2*va(A)",
+    "vP_h": "0 if n(a)!=0, 1 if n(a)=0",
+    "va_norm": "vP(h)",
+    "vP_norm": "2*vP(h)",
+    "base_factor_order_sum": "vP(h)",
+    "stalk_factor_order_sum": "2*vP(h)"
+  },
+  "selected_branch_consequence": "Exactly one nonzero polynomial factor has a simple root at a; two vanishing factors are incompatible with all premises.",
+  "counterexample": {
+    "field": "Q",
+    "f": "x^5+x",
+    "a": 0,
+    "b": 1,
+    "n": "x",
+    "h": "y-x",
+    "N": "x^2-x^5-x",
+    "vP_h": 1,
+    "va_N": 1,
+    "vP_N": 2
+  },
+  "source_bindings": {
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjFiniteBranchDVR.lean": {
+      "sha256": "181f480366672eadf9fa0e08fac1786f467789d71f677ea858aadac6252cb35f",
+      "bytes": 6795
+    },
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjSourceBranchActualQuintic.lean": {
+      "sha256": "c7373682f8ce09e0c2243dfa44c92b9e6467f0b9188fa420aa1c23fbc4e6ca7d",
+      "bytes": 4711
+    }
+  },
+  "knowledge_fallback": "Existing exact local primary sources and elementary derivation; KB unavailable. No new novelty claim.",
+  "limitations": [
+    "No new producer source review yet",
+    "No Lean kernel verification",
+    "General-factor example not a coefficientData fixture",
+    "No infinity, nonsplit closed-point or global divisor-class result"
+  ]
+}

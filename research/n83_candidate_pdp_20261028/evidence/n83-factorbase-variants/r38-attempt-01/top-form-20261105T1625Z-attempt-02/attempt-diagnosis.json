@@ -1,0 +1,33 @@
+{
+  "schema": "n83.topform-preflight-failure/v1",
+  "candidate": "spike38",
+  "attempt": "02",
+  "observed_utc": "2026-11-05T16:38:20.821478+00:00",
+  "exit_code": 1,
+  "failure_class": "instrument_preflight_hash_mismatch",
+  "preflight_failure_stage": "local pinned binary verification, before S3 emptiness check and before base-shard fetch or PDP generation",
+  "expected": {
+    "pdp_binary_sha256": "b8e00f73512977828497c4bb30f0ae08d319350688a90b15310aa4143308a3ca",
+    "protocol_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5"
+  },
+  "observed": {
+    "pdp_binary_sha256": "2ebd29a31146755f8a79b454b4d6d1673b2ed979ffedfc807218d2d8605b37d4",
+    "protocol_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "pdp_source_sha256": "8e23a7287dc82afc967ef3f50e20c486f3f01d1e4a5f1847b5891b24df3b7629",
+    "top_source_sha256": "2b22d880eb68ba304c8cca67fec0694c8987f1523436ef728bfa9ad39a621e7e",
+    "top_binary_sha256": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a"
+  },
+  "data_attempted": false,
+  "pdp_systems_generated": 0,
+  "top_certificates_generated": 0,
+  "factor_base_shards_downloaded": 0,
+  "outputs_absent": [
+    "candidate-inputs/",
+    "top-certificates/",
+    "generate.log",
+    "top-single.log",
+    "top-replay.log"
+  ],
+  "existing_attempt_preserved": true,
+  "next_attempt_rule": "Use fresh S3 prefix and exact source commit 52665 build; no scientific data retry has been consumed."
+}

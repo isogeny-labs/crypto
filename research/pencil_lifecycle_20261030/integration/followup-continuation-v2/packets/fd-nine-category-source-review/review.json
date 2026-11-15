@@ -1,0 +1,355 @@
+{
+  "schema": "pencil-fd-nine-category-source-review/v1",
+  "task": "T-1564",
+  "reviewer": "witness_independent_review_v2",
+  "status": "source_coverage_accepted_with_explicit_scope",
+  "published_revision": "5ea0e1e75a93ef025fb6f25645a7936ad06ccb9d",
+  "producer_route_revision": "2d17cb240d40de09f58cb92f8f8a37d04337b575",
+  "reviewer_independent_of_policy_and_fd_producers": true,
+  "reviewer_prior_context": "Authored exporter and build plans; nonblind route/source context. No new independent algorithm.",
+  "method": "Read-only exact snapshot comparison, source diff review and hand derivation; no compiler or payload replay.",
+  "unchanged_historical_files": 10,
+  "changed_historical_files": 7,
+  "categories": [
+    {
+      "category": "field_arithmetic",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "FD replacements call the same charged add helper; 2 initialization adds and 3 updates per x, including last x and both continue branches. Degree2 removes 5p Horner multiplies and changes adds by 2-2p. Native inverse expansion remains bitlength(p-2)+popcount(p-2), including the final square.",
+      "current_site_notes": "progress:713-760,850-1010; analyzer:197-229",
+      "historical_fields": [
+        "Counts.m",
+        "Counts.s",
+        "Counts.i",
+        "Counts.field_adds",
+        "Counts.bit_ops",
+        "ArithmeticCounts.base_adds",
+        "ArithmeticCounts.base_muls",
+        "ArithmeticCounts.base_inversions",
+        "geometry.entry_visits",
+        "geometry.elements_copied",
+        "geometry.elements_initialized",
+        "geometry.key_comparisons"
+      ],
+      "historical_exclusions": [
+        "group/jacobian addition summaries are not extra field operations",
+        "report and host timing remain separate"
+      ],
+      "uncovered_modeled_sites_found": []
+    },
+    {
+      "category": "scalar_arithmetic",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "Unchanged meter/scalar ledger and progress scalar dispatch; importer combines candidate native/query/setup scalar counters and removes expanded inverse multiplies once. Reference Ring stays atomic.",
+      "current_site_notes": "progress:680-760; importer:239-318; scalar_ledger:14-45",
+      "historical_fields": [
+        "scalar_adds",
+        "scalar_muls",
+        "scalar_negations",
+        "scalar_inversions",
+        "modular_reductions",
+        "scalar_adds_uncharged",
+        "scalar_muls_uncharged",
+        "scalar_inversions_uncharged"
+      ],
+      "historical_exclusions": [
+        "expanded inversion multiplications are removed once before atomic inverse price",
+        "primality powers are not inverse expansion"
+      ],
+      "uncovered_modeled_sites_found": []
+    },
+    {
+      "category": "outer_and_constructor_validation",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "Actual outer p/r checks and unchanged constructor observers remain. Moved applicability parses method parameters/family predicates, invokes no field/geometry meter; it changes the wall boundary, not selected event counts.",
+      "current_site_notes": "progress:1232-1288; three_leads adapter:341-393; analyzer:252-275",
+      "historical_fields": [
+        "outer_primality.*.modular_muls",
+        "outer_primality.*.modular_squares",
+        "outer_primality.*.standalone_modular_reductions",
+        "constructor_modular_muls",
+        "constructor_modular_squares",
+        "constructor_standalone_reductions",
+        "scalar_constructor_modular_muls",
+        "scalar_constructor_modular_squares",
+        "scalar_constructor_standalone_reductions"
+      ],
+      "historical_exclusions": [
+        "prime call counts, product reductions, loop and witness counters are diagnostic and not added again"
+      ],
+      "uncovered_modeled_sites_found": []
+    },
+    {
+      "category": "setup_transfer",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "Progress snapshots preserve cold setup field/native counts before reset; final candidate arithmetic and field include setup once. Mapper separately includes setup symbolic counts, not duplicate field/native setup.",
+      "current_site_notes": "progress:1280-1340,1450-1475; analyzer:199-247",
+      "historical_fields": [
+        "cold_setup.field",
+        "cold_setup.arithmetic",
+        "cold_setup.semantic_counts",
+        "solver_including_cold_setup.*"
+      ],
+      "historical_exclusions": [
+        "setup elapsed/allocation remain separate resources",
+        "candidate detail totals already add setup arithmetic and field counts before export"
+      ],
+      "uncovered_modeled_sites_found": []
+    },
+    {
+      "category": "collection_graph_elimination",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "Progress versus historical solver diff leaves graph/vector/map/set bodies identical. FD reads active coefficients once, charging 2d+1 visits versus p(2d+1); scalar local copies remain excluded. Initialization and all branches retain old modeled events.",
+      "current_site_notes": "progress:443-535,850-1010; analyzer:230-247",
+      "historical_fields": [
+        "map_key_comparisons",
+        "map_entry_visits",
+        "map_cloned_entries",
+        "collection_entry_visits",
+        "collection_elements_copied",
+        "collection_elements_initialized",
+        "collection_comparisons",
+        "modular_reductions"
+      ],
+      "historical_exclusions": [
+        "map_calls",
+        "sparse_accumulations",
+        "partition_terms",
+        "payload_terms",
+        "parent_hops and row summaries are excluded diagnostics",
+        "iterator visits are not copied again at fixed scalar locals",
+        "allocator nodes and rebalancing are outside the finite model"
+      ],
+      "uncovered_modeled_sites_found": []
+    },
+    {
+      "category": "hash_rng",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "Two walk-label calls per walk remain actual atomic events. Reference rho production body unchanged; its whole-file delta is test-only. Mapper requires pinned rho hash policy and counts hashes/draws once.",
+      "current_site_notes": "progress:1355-1366,1490-1498; analyzer:278-298",
+      "historical_fields": [
+        "walk_label_calls",
+        "rho_semantic_key_comparisons_v1",
+        "rho_semantic_entry_visits_v1",
+        "rho_semantic_elements_copied_v1",
+        "rho_semantic_elements_initialized_v1",
+        "rho_observed_hash_calls_v1",
+        "partition_hashes_uncharged",
+        "rng_draws_uncharged"
+      ],
+      "historical_exclusions": [
+        "hash bytes and hash probes are diagnostic/excluded",
+        "internal mix/reduction and hash CPU expansion are not inferred",
+        "pinned hasher can affect runtime and remains bound to toolchain/binary"
+      ],
+      "uncovered_modeled_sites_found": []
+    },
+    {
+      "category": "source_verification",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "Internal recovery check remains in counted phase; adapter fresh-instance verification is additional and separate. NativeResult enum keeps graph owners alive and moves JSON payload without graph cloning.",
+      "current_site_notes": "progress:1428-1447; pencil adapter:139-233,279-289; analyzer:199-214",
+      "historical_fields": [
+        "candidate.counts",
+        "additional_source_verification.*",
+        "additional_source_verification geometry segment",
+        "reference field counters"
+      ],
+      "historical_exclusions": [
+        "parent record audit outside the method is a separate resource and is not folded into algorithm counters"
+      ],
+      "uncovered_modeled_sites_found": []
+    },
+    {
+      "category": "metadata_clone",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "Unchanged StudyInstance::fresh and geometry census retain one logical copied Value node. Byte totals remain supplemental. Progress JSON snapshots do not call this algorithm metadata clone observer.",
+      "current_site_notes": "three_leads engine:1290-1307; geometry:214-265; analyzer:331-350",
+      "historical_fields": [
+        "metadata_value_nodes_copied",
+        "metadata_string_bytes_copied",
+        "metadata_key_bytes_copied",
+        "metadata_family_bytes_copied"
+      ],
+      "historical_exclusions": [
+        "observer traversal creates no collection event",
+        "string/key/family bytes are retained supplemental observations",
+        "fixed whole-record Copy moves are excluded"
+      ],
+      "uncovered_modeled_sites_found": []
+    },
+    {
+      "category": "calibration",
+      "disposition": "covered_at_reviewed_source_under_declared_model",
+      "reason": "Preparation plus addition equals total; source unit equals addition, geometry partitions recomputed by importer. Mapper separates method and calibration then adds once for combined output.",
+      "current_site_notes": "pencil adapter:291-386; importer:329-437; analyzer:299-328",
+      "historical_fields": [
+        "source_unit_calibration_arithmetic.preparation.*",
+        "source_unit_calibration_arithmetic.addition.*",
+        "source_unit_calibration_arithmetic.total.*",
+        "geometry.source_unit_calibration.*"
+      ],
+      "historical_exclusions": [
+        "calibration is not silently free or included in method-only price",
+        "geometry total and segments are never added together"
+      ],
+      "uncovered_modeled_sites_found": []
+    }
+  ],
+  "source_files": [
+    {
+      "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+      "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "bytes": 33938
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_price/src/importer.rs",
+      "sha256": "db05f1bda12bfbdeaff4806f3d3ac968e165c05d06b28e8dd73bb9868963633d",
+      "bytes": 26124
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/collector.rs",
+      "sha256": "ada360c21d2c9ccd135379f4cb841713f8e31b626dda526e70cfc776ad93f6d8",
+      "bytes": 9633
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/lib.rs",
+      "sha256": "208d0ed9ac15bd486d55d33b1663527f3e5bca411cf3f7ae804fa9ce5733419d",
+      "bytes": 20669
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/meter.rs",
+      "sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+      "bytes": 8345
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+      "sha256": "061f4f9f45d261b61af3482509ca5f09e03964abc670765852922d20f946bbd1",
+      "bytes": 74301
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/outer_primality.rs",
+      "sha256": "15dc97eca3aad733aaad43757a608af11e090f3b3c3806ad0aaab57e53df0937",
+      "bytes": 6624
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/residual.rs",
+      "sha256": "21fd29dc330fbbf8ce3c45876584418c55c366876adc85d24888d0693144966f",
+      "bytes": 8757
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/scalar_ledger.rs",
+      "sha256": "fa5c52c8137bd2da5aef8e560ef1e72111e508b81db4f329928e89ce110cf6ba",
+      "bytes": 2862
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/sparse.rs",
+      "sha256": "f6e5920670339fa73c3b070b09e83858887531255d6c5061841f3fca761f2821",
+      "bytes": 7439
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/tracked_set.rs",
+      "sha256": "fc41c2295ee032a3018325928859ac13eee2f0a6261da5a4e4ebaa0743f52991",
+      "bytes": 5214
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/pencil.rs",
+      "sha256": "481f94cc389a1e79880fc168c3a98b5bb37e9411694d424632d4f8f389e5ed00",
+      "bytes": 18333
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/three_leads.rs",
+      "sha256": "6d3572b5fdaf97b48989b21c1d1d5bef9351e295d3d51fe19c3aafa417700a9c",
+      "bytes": 16148
+    },
+    {
+      "path": "src/cryptanalysis/three_leads.rs",
+      "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+      "bytes": 106080
+    },
+    {
+      "path": "src/cryptanalysis/three_leads_constructor_primality.rs",
+      "sha256": "b239f2041f4183c2694079a5d4c990c9e37fee251262fc48f94b56c8a34286fb",
+      "bytes": 2809
+    },
+    {
+      "path": "src/cryptanalysis/three_leads_geometry_events.rs",
+      "sha256": "a60e3894f4178cf5894b3c277991627ab15c1279a78daf2000e897064f0f20ee",
+      "bytes": 16140
+    },
+    {
+      "path": "src/cryptanalysis/three_leads_rho_events.rs",
+      "sha256": "16d51e2d8ba04bf08477f0a935c47ef0a8dbb7930ee833039515ba1088f42836",
+      "bytes": 6120
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/pencil_progress_native.rs",
+      "sha256": "87f3581cbbeadb826e878cc80887de8e9d0980cb65262058ca54b50aae86a0ae",
+      "bytes": 54339
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/pencil_progress_sink.rs",
+      "sha256": "6587e873f5de575ea31999c2b026c9e4989718137ba28c9a3ad4d14a8dc3fb6d",
+      "bytes": 13546
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/accounting/COST_BOUNDARY.md",
+      "sha256": "186ebceb5281612f62442a3e005fa92b019f80f8309afe2fe5245ef9c0f4d402",
+      "bytes": 3659
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/accounting/finite-nine-category-source-audit.json",
+      "sha256": "28aa7c41bfc25552d9c63431671616d627fac61429b649ff4bffc1f8efba3724",
+      "bytes": 35060
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/coverage-review.json",
+      "sha256": "8936f5d99b49538a35d78729f2450a326801ff9df720ec1f5966166756cfa252",
+      "bytes": 37905
+    }
+  ],
+  "binary_sha256": null,
+  "protocol_sha256": null,
+  "image_sha256": null,
+  "execution_admitted": false,
+  "coverage_review_admission_record": false,
+  "assumptions": [
+    "Selected Some(sink) root route and concrete AtomicSink, not an arbitrary mutating custom Sink.",
+    "Canonical active coefficients, degree2 when sieve called, 0<p<=2^63 for safe u64 additions; intended finite prime cohort is within this domain. No universal large-u64 guarantee.",
+    "Thread-local meters are used serially and counters do not overflow.",
+    "Existing finite semantic model exclusions retained; no full machine instruction accounting."
+  ],
+  "remaining": [
+    "Full root ecbench adapter compilation/integration obligation.",
+    "Fresh final optimized worker/mapper source closure and executable/protocol/image bindings.",
+    "Matched diagnostics/timing policy and actual retained session identity/custody.",
+    "Progress output is bounded diagnostic snapshots, not canonical relation-stream trace."
+  ],
+  "findings": [
+    {
+      "id": "FD-1",
+      "severity": "scope",
+      "text": "Old complete coverage cannot be reused as new binary/protocol admission; this review deliberately does not emit mapper reviewed_complete status."
+    },
+    {
+      "id": "FD-2",
+      "severity": "scope",
+      "text": "Applicability moves before solve timer; retained algorithm counters are unchanged, but prior wall intervals cannot silently be reused."
+    },
+    {
+      "id": "FD-3",
+      "severity": "scope",
+      "text": "Progress serialization, snapshots, I/O and allocation overhead remain separate; completed_write_ns does not include all JSON construction and counter snapshot overhead."
+    },
+    {
+      "id": "FD-4",
+      "severity": "scope",
+      "text": "FD safe-add precondition is documented in source rather than an explicit new public p<=2^63 guard. Review is limited to the intended bounded prime domain."
+    }
+  ],
+  "proves_too_much_checks": [
+    "A null planned session cannot import an actual record: importer requires Some session.",
+    "Identical outputs alone do not preserve old counts: degree2 delta has -5p multiplies, 2-2p adds, 5-5p visits.",
+    "A source report with null executable/protocol cannot satisfy the existing complete binary review gate.",
+    "Canonical optional trace does not add trace capability to selected progress route."
+  ]
+}

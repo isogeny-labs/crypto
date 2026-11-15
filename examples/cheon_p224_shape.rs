@@ -1,7 +1,7 @@
 //! Driver for `research/cheon_p224_shape_20261022/` (see its `PROTOCOL.md`).
 //!
 //! ```text
-//! cheon_p224_shape gen   --out curves.json
+//! cheon_p224_shape gen   --out curves.json [--bits 36,38,...,62]
 //! cheon_p224_shape check --curves curves.json
 //! cheon_p224_shape spec  --curves curves.json --out ecbench-spec.json
 //! cheon_p224_shape run   --curves curves.json --out runs.jsonl [--family minus|plus]
@@ -20,6 +20,7 @@ use crypto_lib::cryptanalysis::cheon_counted::{
     cheon_pminus1, cheon_pplus1, distinct_prime_factors, find_shaped_curve, leaked_powers,
     next_prime, scalar_mul_plain, shape_divisor, Side,
 };
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crypto_lib::cryptanalysis::ecbench::methods::{resolve, solve, MethodSpec};
 use crypto_lib::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
 use crypto_lib::cryptanalysis::ic_boundary::{GroupOps, PrimeCurve, PrimePoint};
@@ -71,9 +72,17 @@ fn explicit_spec(c: &Value) -> CurveSpec {
 
 fn gen(args: &[String]) {
     let out = arg(args, "--out").expect("--out");
+    // Sizes default to SIZES; a --bits list picks others (p < 2^62, so at most 62).
+    let sizes: Vec<u32> = arg(args, "--bits").map_or(SIZES.to_vec(), |s| {
+        s.split(',').map(|b| b.parse().expect("--bits")).collect()
+    });
+    assert!(
+        sizes.iter().all(|&b| (4..=62).contains(&b)),
+        "--bits must lie in 4..=62 (prime_explicit needs p < 2^62)"
+    );
     let mut rows = Vec::new();
     for family in ["minus", "plus"] {
-        for &bits in &SIZES {
+        for &bits in &sizes {
             let f = if family == "minus" { 0u64 } else { 1 };
             let seed = (0x4368_6561u64 << 32) ^ ((bits as u64) << 8) ^ f;
             let p = next_prime(3u64 << (bits - 2));
@@ -439,7 +448,7 @@ fn replay(args: &[String]) {
             let seed: u64 = rec["algorithm_seed"].as_str().unwrap().parse().unwrap();
             let rep = solve(&rho_method, &inst, &w.curve, &w.target, seed).expect("rho solve");
             let recorded = rec["cost"]["total_gae"].as_f64().unwrap();
-            let verified = rep.recovered == w.planted;
+            let verified = rep.recovered == w.planted.map(ExactScalar::from);
             let same_rho = rep.total_gae == recorded && verified;
             all_ok &= same_rho;
             eprintln!(

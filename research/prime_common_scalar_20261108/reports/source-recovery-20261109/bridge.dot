@@ -1,0 +1,13 @@
+digraph recovery {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f3fa",fontname="Helvetica",fontsize=13,margin="0.15"];
+ edge [color="#334155",fontname="Helvetica",fontsize=11];
+ grid [label="Actual nodes t = m - 2^a\nexact valuation i: 2^(a-i) nodes"];
+ taper [label="Actual h = ceil(3 M / u)\nq(t) = h max(0, u - v2(t)); exclude t = 0"];
+ total [label="Full per-node sum of q(t)\nexceeds 2 M (2 L - 1), for 3 <= u <= a, u <= M"];
+ unique [label="Unit node differences + monic products\nexact Taylor jet uniqueness; nilpotents allowed"];
+ scaled [label="Actual source chart t + 2 L z\nexact jets determine actual cleared polynomial"];
+ precision [label="OPEN: finite-precision Hermite multipliers\nvaluation and bit-cost theorem",fillcolor="#fff2d4",style="rounded,filled,dashed"];
+ grid -> taper -> total -> unique -> scaled;
+ scaled -> precision [style=dashed,label="exact Q-algebra cancellation alone is insufficient"];
+}

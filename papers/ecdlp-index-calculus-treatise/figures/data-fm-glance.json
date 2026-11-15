@@ -1,0 +1,470 @@
+{
+ "_comment": "Counts by month, copied or counted from committed files at origin/main 05f7382689cd603eee71d12557630e9795de3f5b. Counting rules are in each block's 'rule'.",
+ "commit": "05f7382689cd603eee71d12557630e9795de3f5b",
+ "months": [
+  "2026-07",
+  "2026-08",
+  "2026-09",
+  "2026-10",
+  "2026-11"
+ ],
+ "sources": [
+  {
+   "path": "research/ecdlp_jul_sep_index_20261029/SUMMARY.json",
+   "blob": "676de01ffd670369ba74e7920816e6c90b97707f",
+   "what": "crypto-autoresearcher ledger decisions, experiments and run directories, 19 Jul - 30 Sep"
+  },
+  {
+   "path": "research/",
+   "tree": "a581b42af7370795794f012ca8fafc5feb7fffb4",
+   "what": "top-level study directories; month from the YYYYMMDD in the directory name"
+  },
+  {
+   "path": "research/**/session.json",
+   "tree": "a581b42af7370795794f012ca8fafc5feb7fffb4",
+   "what": "ecbench session capsules (session_id ECBS1h...)"
+  },
+  {
+   "path": "benchmarks/README.md",
+   "blob": "441d1517dbc6fa757d62e3ba6a9124aea852ee6a",
+   "what": "admitted benchmark rows"
+  },
+  {
+   "path": "benchmarks/ARCHIVE.json",
+   "blob": "83dc1018a973c213c89956386092144693555443",
+   "what": "archived (removed) benchmark rows and dispositions"
+  },
+  {
+   "path": "benchmarks/PRE_GATE.json",
+   "blob": "3ffb3a3e3da21380830a0133bae2cfe2f0500bcb",
+   "what": "rows frozen as unvalidated (pre-gate)"
+  },
+  {
+   "path": "docs/ic/leaderboard.json",
+   "blob": "0c49a0073c3ae4237842a0a01796cbed75368474",
+   "what": "validation_gate.status_counts and board[*].validation.status"
+  },
+  {
+   "path": "pcc/ledger.jsonl",
+   "blob": "f14935470945ee5fb8d4e156633af3480563d928",
+   "what": "hash-chained pcc ledger: claim, bypass and genesis entries; no verdict entries"
+  },
+  {
+   "path": "pcc/claims/",
+   "tree": "b3e06ef2e8649d2083f2461836fcc338039bccf0",
+   "what": "pcc.claim/v1 records"
+  },
+  {
+   "path": "docs/ecbench/DEFECTIVE_SESSIONS.tsv",
+   "blob": "e8dd944b5e467e4a9fff4bf5e198713ba94cb414",
+   "what": "sessions with an owner-dispositioned integrity defect"
+  }
+ ],
+ "ledger": {
+  "rule": "copied from SUMMARY.json; the index covers 19 Jul-30 Sep; its 7 October-dated rows are late-September files and are not a count of October work",
+  "decisions": {
+   "2026-07": 74,
+   "2026-08": 364,
+   "2026-09": 964,
+   "2026-10": 7
+  },
+  "experiments": {
+   "2026-07": 20,
+   "2026-08": 92,
+   "2026-09": 449,
+   "2026-10": 8
+  },
+  "run_dirs": {
+   "2026-07": 977,
+   "2026-08": 321,
+   "2026-09": 776,
+   "2026-10": 18
+  }
+ },
+ "studies": {
+  "rule": "top-level directories under research/ at origin/main, month from the 2026MMDD in the name",
+  "by_month": {
+   "2026-09": 157,
+   "2026-10": 1069,
+   "2026-11": 151
+  },
+  "undated": 25,
+  "total": 1402
+ },
+ "ecbench": {
+  "rule": "directories under research/ holding session.json, plan.json and records.jsonl (an ecbench session capsule); month of started_unix_ms (UTC); records = records_written",
+  "sessions": {
+   "2026-10": 727,
+   "2026-11": 18
+  },
+  "records": {
+   "2026-10": 129883,
+   "2026-11": 62
+  },
+  "status": {
+   "2026-10|complete": 680,
+   "2026-10|interrupted": 15,
+   "2026-10|running": 32,
+   "2026-11|complete": 16,
+   "2026-11|interrupted": 2
+  },
+  "directories": 745,
+  "distinct_session_ids": 744
+ },
+ "benchmarks": {
+  "rule": "rows of the admitted results table in benchmarks/README.md (before 'Studies awaiting benchmark admission'), month from the date column; with_validation_json = the row's directory holds a VALIDATION.json",
+  "admitted_rows": {
+   "2026-10": 143,
+   "2026-11": 2
+  },
+  "with_validation_json": {
+   "2026-10": 31,
+   "2026-11": 2
+  }
+ },
+ "archive": {
+  "rule": "rows of benchmarks/ARCHIVE.json (removed from the admitted table), month from the directory name",
+  "by_month_disposition": {
+   "2026-10|censored": 1,
+   "2026-10|documentary": 8,
+   "2026-10|incomplete": 56
+  },
+  "total": 65,
+  "by_day_disposition": {
+   "20261013|documentary": 2,
+   "20261014|documentary": 2,
+   "20261015|documentary": 1,
+   "20261015|incomplete": 1,
+   "20261016|incomplete": 5,
+   "20261017|documentary": 3,
+   "20261017|incomplete": 22,
+   "20261018|incomplete": 16,
+   "20261019|censored": 1,
+   "20261019|incomplete": 8,
+   "20261020|incomplete": 1,
+   "20261021|incomplete": 1,
+   "20261026|incomplete": 2
+  },
+  "rows": [
+   {
+    "directory": "20261020-ic-oracle-setup-blocked",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261019-ic-matched-rho-v8",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-two-sylow-fp64",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261014-ic-program-paper",
+    "disposition": "documentary"
+   },
+   {
+    "directory": "20261019-pdp-split-closure-ecbench",
+    "disposition": "censored"
+   },
+   {
+    "directory": "20261019-factor-base-designs-ek1",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-safecurves-trapdoor-slots",
+    "disposition": "documentary"
+   },
+   {
+    "directory": "20261019-adaptive-pair-cells",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-factor-base-shape-leads",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-rootfinding-paper-synthesis",
+    "disposition": "documentary"
+   },
+   {
+    "directory": "20261017-rootfinding-native-followup",
+    "disposition": "documentary"
+   },
+   {
+    "directory": "20261017-ic-a20-build-line-streams",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-ic-a19-filter-pages-build-parts",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-ic-a18-wider-base",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-ic-a17-filter-huge-pages",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-ic-a16-huge-pages",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-ic-a15-filter-slots",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-ic-scan-stages-v8",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-ic-a14-prefetch-size-gate",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-ic-r12-admitted-prefetch",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261016-ic-r11-build-streams",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261016-ic-r08-scan-fold",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261016-ic-r06-scan-key",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261016-ic-r10-main-head",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261016-n83-prebuilt-factor-base",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-pdp-ps3-bitsliced",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261026-n83-d18-solver-gates",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261026-humbert-genus5-cover",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-volcano-ecdlp-census",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261021-n83-k128-split-index",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261019-volcano-tall-layers",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-volcano-prime-layers",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-volcano-koblitz-n83",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-volcano-koblitz-layers",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-jv-cover-large-prime",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-n83-k16627-natural-query",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261019-isogeny-class-rho-n45",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-isogeny-class-rho",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261019-r5-3-ntt-sqrt-velu",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261019-r6-4-vertical-margin-2",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-n83-k16627-selector-only",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-n83-k16627-selector-positive",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-n83-k16627-m4-search-progress",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-n83-k16627-m4-root-phase",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-n83-k16627-m4-witness",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-n83-k16627-m4-planted",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-k16627-m4-capacity",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-k16627-prebuild",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261019-volcano-repaired-7937",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-volcano-repaired-6137",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261018-volcano-repaired-5533",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-structured-m4",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-C-full-point-orders",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-volcano-repaired-4037",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-k992-tier1",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-k1000-extension",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-k992-layout-screen",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-lower-k-screen",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-finalist",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261017-n83-current-source-controls",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261015-u64-rootbatch",
+    "disposition": "documentary"
+   },
+   {
+    "directory": "20261015-ic-linear-algebra-cado",
+    "disposition": "incomplete"
+   },
+   {
+    "directory": "20261014-n71-n83-hosted-single-target",
+    "disposition": "documentary"
+   },
+   {
+    "directory": "20261013-ecbench-frontier",
+    "disposition": "documentary"
+   },
+   {
+    "directory": "20261013-n83-dense-root",
+    "disposition": "documentary"
+   }
+  ]
+ },
+ "pre_gate": {
+  "rows": 116,
+  "frozen": "2026-10-19"
+ },
+ "validation_files": {
+  "rule": "files named VALIDATION.json with schema validation-gate/v1, test fixtures excluded; month from the 2026MMDD in the path; benchmark copies of a study's file count separately",
+  "by_month": {
+   "2026-10": 64,
+   "2026-11": 7
+  },
+  "undated": 4,
+  "total": 75
+ },
+ "leaderboard": {
+  "status_counts": {
+   "validated": 19,
+   "unvalidated (pre-gate)": 9
+  },
+  "by_family": {
+   "A|validated": 6,
+   "B|validated": 13,
+   "C|unvalidated (pre-gate)": 9
+  }
+ },
+ "pcc_ledger": {
+  "entries": 181,
+  "by_type": {
+   "genesis": 1,
+   "claim": 157,
+   "bypass": 23
+  },
+  "first": "2026-11-04T02:35:17Z",
+  "last": "2026-11-06T15:52:05Z"
+ },
+ "pcc_claims": {
+  "rule": "pcc/claims/PCC-*.json; proofs = the set of proof kinds the record carries",
+  "files": 166,
+  "by_kind": {
+   "statement": 92,
+   "theorem": 36,
+   "measurement": 26,
+   "execution": 12
+  },
+  "by_date": {
+   "2026-11-04": 93,
+   "2026-11-05": 62,
+   "2026-11-06": 11
+  },
+  "by_kind_proofs": {
+   "execution|attestation": 12,
+   "measurement|recompute": 7,
+   "measurement|recompute+replay": 19,
+   "statement|attestation": 23,
+   "statement|none": 69,
+   "theorem|attestation": 9,
+   "theorem|lean": 27
+  }
+ },
+ "defective_sessions": 1
+}
