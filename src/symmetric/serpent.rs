@@ -466,7 +466,12 @@ mod tests {
         }
         let mut printed = block;
         printed.reverse();
-        assert_eq!(printed, hex_block(expect_msb_first), "Serpent-{} Monte Carlo mismatch", key_len * 8);
+        assert_eq!(
+            printed,
+            hex_block(expect_msb_first),
+            "Serpent-{} Monte Carlo mismatch",
+            key_len * 8
+        );
         for _ in 0..10_000 {
             block = serpent_decrypt(&key, &block);
         }
