@@ -1,3 +1,21 @@
+# Whole research handoff23 prepared; science and consumer ledger HELD
+
+pcc/claims/PCC-20261115-a1e903.json: all44386 prior keys/165links/67aledgerprefix and all pendingconsumer bytes retained. Complete norm-point46008b/full695, exact25 CI0f3ea8/full294members/15runlogs, proofs/builds/checkpoints13-14/reports and FAILED original-prime native01e62fb2/whole completed records are archived. Corrected03a3c6eb compiled, native02 NOTRUN/full1077unmet. Exact32MiBparts/all scientific members roundtripped; private transport exclusions explicit/localonly. Original policy selects7objects. HOLD until actual original remote replays BEFOREactualpublisher/exactFF/reassembly/terminal23guards. [pcc:unverified]
+
+## What was done
+Complete declared closed research/control roots, both new whole reports, actual proof sources and current48262e0 plus ALL pending delta. Existing genuine22 archive/parts stayexact/held; full prior guard/manifest/publication metadata retained. [pcc:unverified]
+
+## Decisions made
+Preserve whole failure subject through genuine store and transparent canonical alias; no truncation, fake manifest or subject-staging exception. Original artifact policy/tools unchanged. [pcc:unverified]
+
+## Open threads
+Genuine23/exactFF/release/canonical norm-point fixture and completed-failure alias; publish corrected03 and exact checkpoint before full original-prime native02. Separate full kernel-compatibility census needs prospective protocol; primitive/minimal setup/strongest known-point and calibrated-reference obligations remain open. [pcc:unverified]
+
+## Errors
+All native101/import/CIpath/staging/authoring/cache-preflight/cold/root-main/D12-D24-D67/oldtwistprime negatives retained. No paidlaunch/force/rebase/waiver/novelty/signedpromotion. [pcc:unverified]
+
+---
+
 # Norm-point reuse result mirrored; next original-prime and cost tasks
 
 pcc/claims/PCC-20261115-21c9c3.json: exact published consumer69ce10b evidence exports mirror unsigned native46008b at51dff2bb. Full695 mathematical records match under the prospective48 counter transformations; one unfiltered test0/all14 phases expected/four whole omissions101/no output/all1099 guards/three actual binaries exact. Same entire finite population and independent elliptic/full-cofactor checks. Three conditional Lean roots pass both original gates and all3 exact bindings36f906; the inspected two-page reportf8d381 is59,050B. [pcc:unverified]
