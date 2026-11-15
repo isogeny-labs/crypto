@@ -1,0 +1,3 @@
+# Frozen full source-class replay
+
+15 November 2026 UTC. The first census used Sage's elliptic-curve cardinality algorithm for all 484 ordinary normal-form classes and direct character sums for eight representatives. Independently recalculate **every** order using the quadratic-character sum on all 243 field elements, without calling `EllipticCurve.cardinality`. Enumerate `(a2,bmask)` in the same frozen order, compare the entire 484-row trace list, histogram and selected 100 rows byte-for-byte at the data level with `class_count.json`, and refuse to overwrite either receipt. Preserve the script SHA-256, input SHA-256, operation count and any failure. This is an arithmetic replay of the finite count, not an explicit isogeny or a DLP transfer. [pcc:unverified]
