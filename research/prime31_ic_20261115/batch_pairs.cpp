@@ -60,4 +60,5 @@ int main(int argc,char**argv){size_t b=argc>1?stoul(argv[1]):384;if(b<8||b>1500)
   size_t checked=0;for(auto it=fast.begin();it!=fast.end();++it,++checked)if(key(relation(f,it->second))!=it->first)throw runtime_error("invalid fast relation");
   double slow_ms=chrono::duration<double,milli>(t1-t0).count(),fast_ms=chrono::duration<double,milli>(t2-t1).count();
   cout<<"{\"p\":"<<P<<",\"b\":"<<b<<",\"pairs\":"<<fast.size()<<",\"compared_keys\":"<<ref.size()<<",\"checked_relations\":"<<checked<<",\"slow_ms\":"<<slow_ms<<",\"fast_ms\":"<<fast_ms<<",\"speedup\":"<<slow_ms/fast_ms<<",\"slow_inverse\":"<<cr.inv<<",\"fast_inverse\":"<<cf.inv<<",\"slow_field_multiplies\":"<<cr.mul<<",\"fast_field_multiplies\":"<<cf.mul<<",\"slow_adds\":"<<cr.add<<",\"fast_adds\":"<<cf.add<<"}\n";
+  return 0;
 }
