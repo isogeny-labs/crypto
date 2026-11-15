@@ -1,14 +1,16 @@
 # Native point-table study instrument: development qualification
 
-The [batch example](../../examples/native_point_hash_study.rs) and its
+The [ordinary batch example](../../examples/native_point_hash_study.rs),
+[counts-only accounting example](../../examples/native_point_hash_accounting.rs) and
 [pilot module](../../examples/native_point_hash_study/pilot.rs) supply the six
 arms and orchestration of the first [planned study](../../backlog/XP-20261105-native-point-hashing/README.md).
 The requested studies have **not run**. This directory contains development
 qualification only. No scientific batch, cloud build or measurement job was
 submitted. The original frozen 1,728-attempt panel is unchanged.
 
-Current pilot software, fixed input recipe and development qualification are
-described in [pilot-v1/PROTOCOL.md](pilot-v1/PROTOCOL.md) and
+Current key/allocation diagnostics and exact-source development receipts are
+described in [accounting-20261115](accounting-20261115/README.md). The original
+pilot software, fixed input recipe and historical qualification are described in [pilot-v1/PROTOCOL.md](pilot-v1/PROTOCOL.md) and
 [pilot-v1/qualification.json](pilot-v1/qualification.json). The original
 batch-only `qualification.json`, `source.sha256` and `development.tar.xz` below
 remain historical evidence for commit `8c90746a23b2943a94f75558033958f31f91199e`;
@@ -73,7 +75,7 @@ measurement admission.
 
 ## Development checks and source identity
 
-The final producer invocation reports **8 passed controls**, strict release
+The historical batch-only producer invocation reports **8 passed controls**, strict release
 clippy and changed-file format checks. Their exact commands, source hashes,
 toolchain and raw-log hashes are in [qualification.json](qualification.json).
 The six lossless raw logs are in [development.tar.xz](development.tar.xz), under
@@ -112,13 +114,16 @@ do not treat the final manifest as an identity for the initial receipts.
 The six-arm single-batch instrument now has a compact fixed 32-context recipe,
 2,368-attempt schedule (the original 1,920 timed/warmup batches plus explicit
 controls and counted passes), fresh-process execution, durable failure ledger
-and paired diagnostic analysis. The current [canonical draft](pilot-v1/protocol-v2.json)
-passes structural/cross-reference validation but remains unfrozen. The real CLI
+and paired diagnostic analysis. The current [canonical draft](pilot-v1/protocol-v3.json)
+passes structural/cross-reference validation with the pinned readable validator,
+but current canonical plaintext access and freeze remain pending. The real CLI
 development control completed 76 counts-only F17 children; no 12/16-bit solver
 batch was run. Current receipts are in [pilot-v1](pilot-v1/qualification.json).
 These are unregistered producer observations. [pcc:unverified]
 
-Full field/hash/allocation inventory, external references, calibrated costs,
+Scoped key/hash and observed allocator-request counters are now implemented in
+the separate accounting build. Internal probe groups, live bytes and full field
+inventory remain unknown. External references, calibrated costs,
 masking/canonical export and native host/resource admission remain pending.
 The actual canonical protocol must be completed and frozen before data.
 A digest-pinned image must include this example and earn native

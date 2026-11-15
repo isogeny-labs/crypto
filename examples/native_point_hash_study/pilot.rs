@@ -582,6 +582,7 @@ fn execute_with(
     out: &Path,
     deadline_unix: u64,
     binary_sha256: &str,
+    accounting_binary_sha256: Option<&str>,
     mut run: impl FnMut(&Input, &Path, &Path, &Path, Instant) -> ProcessReceipt,
 ) -> Result<()> {
     let now = SystemTime::now()
@@ -603,8 +604,9 @@ fn execute_with(
     write_new(
         &out.join("run.json"),
         &serde_json::json!({
-            "schema":"native-point-hash.pilot-run/v1", "plan_sha256":digest(plan)?,
+            "schema":"native-point-hash.pilot-run/v2", "plan_sha256":digest(plan)?,
             "binary_sha256":binary_sha256, "profile":plan.profile, "deadline_unix":deadline_unix,
+            "accounting_binary_sha256":accounting_binary_sha256,
             "automatic_retries":0, "automatic_restores":0,
             "clock_admission":"unadmitted; external native L2, host/resource and canonical protocol verification remain required"
         }),
@@ -643,6 +645,12 @@ fn execute_with(
         } else {
             match read_json::<Record>(&output_path).and_then(|record| {
                 check_record(input, &record)?;
+                if input.mode == Mode::Counts
+                    && accounting_binary_sha256.is_some()
+                    && record.final_cost.work.and_then(|w| w.allocations).is_none()
+                {
+                    return Err("requested allocation backend is missing".into());
+                }
                 if record
                     .outcomes
                     .iter()
@@ -702,10 +710,67 @@ fn read_events(path: &Path) -> Result<Vec<Event>> {
         })
         .collect()
 }
+const METRICS: [&str; 21] = [
+    "meter_steps",
+    "curve_additions",
+    "root_requests",
+    "key_constructions",
+    "table_lookups",
+    "key_hash_calls",
+    "hash_builds",
+    "hash_finishes",
+    "hash_input_bytes",
+    "full_key_equalities",
+    "full_key_orderings",
+    "alloc_calls",
+    "alloc_zeroed_calls",
+    "realloc_calls",
+    "dealloc_calls",
+    "alloc_requested_bytes",
+    "zeroed_requested_bytes",
+    "realloc_old_layout_bytes",
+    "realloc_new_requested_bytes",
+    "dealloc_layout_bytes",
+    "failed_allocation_calls",
+];
+fn metric_value(prefix: &Prefix, metric: &str) -> Option<u64> {
+    match metric {
+        "meter_steps" => return Some(prefix.meter_steps),
+        "curve_additions" => return Some(prefix.curve_additions),
+        "root_requests" => return Some(prefix.root_requests),
+        _ => {}
+    }
+    let work = prefix.work?;
+    match metric {
+        "key_constructions" => return Some(work.keys.key_constructions),
+        "table_lookups" => return Some(work.keys.table_lookups),
+        "key_hash_calls" => return Some(work.keys.key_hash_calls),
+        "hash_builds" => return Some(work.keys.hash_builds),
+        "hash_finishes" => return Some(work.keys.hash_finishes),
+        "hash_input_bytes" => return Some(work.keys.hash_input_bytes),
+        "full_key_equalities" => return Some(work.keys.full_key_equalities),
+        "full_key_orderings" => return Some(work.keys.full_key_orderings),
+        _ => {}
+    }
+    let a = work.allocations?;
+    match metric {
+        "alloc_calls" => Some(a.alloc_calls),
+        "alloc_zeroed_calls" => Some(a.alloc_zeroed_calls),
+        "realloc_calls" => Some(a.realloc_calls),
+        "dealloc_calls" => Some(a.dealloc_calls),
+        "alloc_requested_bytes" => Some(a.alloc_requested_bytes),
+        "zeroed_requested_bytes" => Some(a.zeroed_requested_bytes),
+        "realloc_old_layout_bytes" => Some(a.realloc_old_layout_bytes),
+        "realloc_new_requested_bytes" => Some(a.realloc_new_requested_bytes),
+        "dealloc_layout_bytes" => Some(a.dealloc_layout_bytes),
+        "failed_allocation_calls" => Some(a.failed_allocation_calls),
+        _ => None,
+    }
+}
 fn analyze(plan: &Plan, dir: &Path) -> Result<serde_json::Value> {
     plan.validate()?;
     let header: serde_json::Value = read_json(&dir.join("run.json"))?;
-    if header["schema"] != "native-point-hash.pilot-run/v1"
+    if header["schema"] != "native-point-hash.pilot-run/v2"
         || header["plan_sha256"] != digest(plan)?
     {
         return Err("run/plan binding mismatch".into());
@@ -787,6 +852,14 @@ fn analyze(plan: &Plan, dir: &Path) -> Result<serde_json::Value> {
                         }
                         let record: Record = read_json(&row_dir.join("record.json"))?;
                         check_record(&inputs[ordinal], &record)?;
+                        if inputs[ordinal].mode == Mode::Counts
+                            && !header["accounting_binary_sha256"].is_null()
+                            && record.final_cost.work.and_then(|w| w.allocations).is_none()
+                        {
+                            return Err(
+                                "missing requested allocation backend in successful record".into(),
+                            );
+                        }
                         if record
                             .outcomes
                             .iter()
@@ -835,43 +908,59 @@ fn analyze(plan: &Plan, dir: &Path) -> Result<serde_json::Value> {
     if complete {
         for bits in [5, 12, 16] {
             for threshold in [12, 24, 32, 128] {
-                for arm in ARMS.into_iter().filter(|a| *a != Arm::Current) {
+                let mut pairs: Vec<_> = ARMS
+                    .into_iter()
+                    .filter(|a| *a != Arm::Current)
+                    .map(|a| (Arm::Current, a))
+                    .collect();
+                pairs.extend([
+                    (Arm::Prepared, Arm::Ordered),
+                    (Arm::Ordered, Arm::Hashed),
+                    (Arm::Hashed, Arm::Fingerprint),
+                ]);
+                for (baseline, arm) in pairs {
                     for prefix_count in [1, 4, 16, 64, 256] {
-                        for metric in ["meter_steps", "curve_additions", "root_requests"] {
+                        for metric in METRICS {
                             let mut clusters = Vec::new();
+                            let mut expected_clusters = 0;
                             for (i, context) in plan
                                 .contexts
                                 .iter()
                                 .enumerate()
                                 .filter(|(_, c)| c.bits == bits && c.threshold == threshold)
                             {
+                                expected_clusters += 1;
                                 let select = |record: &Record| -> Option<f64> {
                                     let p = record
                                         .prefixes
                                         .iter()
                                         .find(|p| p.queries == prefix_count)?;
-                                    Some(match metric {
-                                        "meter_steps" => p.meter_steps,
-                                        "curve_additions" => p.curve_additions,
-                                        _ => p.root_requests,
-                                    } as f64)
+                                    metric_value(p, metric).map(|v| v as f64)
                                 };
                                 let _ = context;
                                 if let (Some(a), Some(b)) = (
-                                    diagnostic.get(&(i, Arm::Current)).and_then(select),
+                                    diagnostic.get(&(i, baseline)).and_then(select),
                                     diagnostic.get(&(i, arm)).and_then(select),
                                 ) {
                                     clusters.push((a, b));
                                 }
                             }
-                            if clusters.is_empty() {
+                            if expected_clusters == 0 || prefix_count > plan.query_count {
                                 continue;
                             }
-                            let estimate = linearised_ratio(&clusters);
+                            let all_present = clusters.len() == expected_clusters;
+                            let estimate = if all_present {
+                                linearised_ratio(&clusters)
+                            } else {
+                                None
+                            };
                             contrasts.push(serde_json::json!({
-                            "bits":bits,"threshold":threshold,"arm":arm,"prefix_queries":prefix_count,
+                            "bits":bits,"threshold":threshold,"baseline":baseline,"arm":arm,"prefix_queries":prefix_count,
                             "metric":metric,"independent_base_seed_clusters":clusters.len(),
-                            "candidate_over_current":estimate.as_ref().map(|x| x.estimate),
+                            "unavailable_base_seed_clusters":expected_clusters-clusters.len(),
+                            "baseline_total":all_present.then(||clusters.iter().map(|p|p.0).sum::<f64>()),
+                            "candidate_total":all_present.then(||clusters.iter().map(|p|p.1).sum::<f64>()),
+                            "candidate_over_baseline":estimate.as_ref().map(|x| x.estimate),
                             "descriptive_pointwise_95_interval":estimate.and_then(|x| x.ci95_log()),
                             "inferential_promotion":"none; unpriced diagnostics and no multiplicity/power qualification"
                         }));
@@ -882,7 +971,7 @@ fn analyze(plan: &Plan, dir: &Path) -> Result<serde_json::Value> {
         }
     }
     Ok(serde_json::json!({
-        "schema":"native-point-hash.pilot-analysis/v1", "plan_sha256":digest(plan)?, "profile":plan.profile,
+        "schema":"native-point-hash.pilot-analysis/v2", "plan_sha256":digest(plan)?, "profile":plan.profile,
         "flow":{"planned":rows.len(),"attempted":started,"finished":finished,"passed":passed,
             "failed":finished-passed,"inflight":started-finished,"not_attempted":rows.len()-started},
         "complete":complete,"count_contrasts":contrasts,
@@ -891,6 +980,130 @@ fn analyze(plan: &Plan, dir: &Path) -> Result<serde_json::Value> {
         "timing_comparisons":"refused: native L2/host/resource admission integration is pending",
         "scope":"paired diagnostic count ratios only; fresh-target ECDLP and runtime gains not established",
         "standing":"producer analysis; not a signed PCC or independent audit verdict"
+    }))
+}
+
+// Development artifact qualification only, never a measurement authenticator.
+// Optional historical records are v1 and remain checked against their own source
+// manifest; this command compares their input/answer/native diagnostic fields.
+fn qualify_development(
+    plan: &Plan,
+    plain: &Path,
+    accounted: &Path,
+    historical: Option<&Path>,
+) -> Result<serde_json::Value> {
+    plan.validate()?;
+    if plan.profile != Profile::DevelopmentF17 {
+        return Err("accounting parity qualification is restricted to development F17".into());
+    }
+    for dir in [plain, accounted] {
+        if analyze(plan, dir)?["complete"] != true {
+            return Err(
+                "parity qualification requires complete successful development runs".into(),
+            );
+        }
+    }
+    let mut snapshots = 0;
+    for row in plan.rows() {
+        let name = format!("{:06}/record.json", row.ordinal);
+        let a: Record = read_json(&plain.join(&name))?;
+        let b: Record = read_json(&accounted.join(&name))?;
+        if a.input_sha256 != b.input_sha256
+            || a.arm != b.arm
+            || a.mode != b.mode
+            || a.base_sizes != b.base_sizes
+            || a.outcomes != b.outcomes
+            || a.prefixes.len() != b.prefixes.len()
+        {
+            return Err(format!(
+                "development answer/binding mismatch at {}",
+                row.ordinal
+            ));
+        }
+        let signature = |p: &Prefix| (p.queries, p.meter_steps, p.curve_additions, p.root_requests);
+        for (p, q) in std::iter::once(&a.preparation)
+            .chain(&a.prefixes)
+            .chain([&a.final_cost])
+            .zip(
+                std::iter::once(&b.preparation)
+                    .chain(&b.prefixes)
+                    .chain([&b.final_cost]),
+            )
+        {
+            let x = p.work.ok_or("missing plain key counts")?;
+            let y = q.work.ok_or("missing accounted key counts")?;
+            if signature(p) != signature(q)
+                || x.keys != y.keys
+                || x.allocations.is_some()
+                || y.allocations.is_none()
+                || y.internal_probe_groups.is_some()
+                || y.peak_live_bytes.is_some()
+            {
+                return Err(format!(
+                    "development native/key/backend mismatch at {}",
+                    row.ordinal
+                ));
+            }
+            snapshots += 1;
+        }
+        if !b
+            .final_cost
+            .work
+            .and_then(|w| w.allocations)
+            .is_some_and(|a| a.alloc_calls > 0)
+        {
+            return Err("development accounting produced no allocation requests".into());
+        }
+        if let Some(dir) = historical {
+            let old: serde_json::Value = read_json(&dir.join(&name))?;
+            let now = serde_json::to_value(&a).map_err(|e| e.to_string())?;
+            if old["schema"] != "native-point-hash.batch-record/v1" {
+                return Err("unsupported historical record schema".into());
+            }
+            for key in ["input_sha256", "arm", "mode", "base_sizes", "outcomes"] {
+                if old[key] != now[key] {
+                    return Err(format!("historical {key} mismatch"));
+                }
+            }
+            let compare = |x: &serde_json::Value, y: &serde_json::Value| -> Result<()> {
+                for key in [
+                    "queries",
+                    "meter_steps",
+                    "curve_additions",
+                    "root_requests",
+                    "cold_ns",
+                ] {
+                    if x[key] != y[key] {
+                        return Err(format!("historical native {key} mismatch"));
+                    }
+                }
+                Ok(())
+            };
+            for key in ["preparation", "final_cost"] {
+                compare(&old[key], &now[key])?;
+            }
+            let op = old["prefixes"]
+                .as_array()
+                .ok_or("historical prefixes missing")?;
+            let np = now["prefixes"]
+                .as_array()
+                .ok_or("current prefixes missing")?;
+            if op.len() != np.len() {
+                return Err("historical prefix length mismatch".into());
+            }
+            for (x, y) in op.iter().zip(np) {
+                compare(x, y)?;
+            }
+        }
+    }
+    Ok(serde_json::json!({
+        "schema":"native-point-hash.development-accounting-qualification/v1",
+        "records_compared":plan.planned_attempts,"snapshots_compared":snapshots,
+        "historical_v1_compared":historical.is_some(),
+        "inputs_answers_base_sizes_native_and_key_counts_match":true,
+        "ordinary_allocations_unknown":true,"accounting_requests_present":true,
+        "scope":"development artifact parity, not counter authentication or scientific measurement",
+        "standing":"unregistered producer observation; no signed PCC or independent audit verdict"
     }))
 }
 
@@ -908,17 +1121,31 @@ pub(super) fn cli(args: &[OsString]) -> Result<()> {
             println!("{}", serde_json::json!({"plan_sha256":digest(&plan)?,"planned_attempts":plan.planned_attempts,"measurements_taken":false}));
             Ok(())
         }
-        Some("execute-plan") if args.len() == 5 => {
+        Some("execute-plan") if args.len() == 5 || args.len() == 6 => {
             let plan: Plan = read_json(&path(2)?)?;
+            if plan.profile == Profile::Pilot12And16 && accounting::has_allocator() {
+                return Err("use the ordinary executor for the timed pilot, with a separate accounting binary".into());
+            }
             let deadline = args[4].to_str().ok_or("non-UTF8 deadline")?.parse().map_err(|_| "invalid deadline")?;
             let program = std::env::current_exe().map_err(|e| e.to_string())?;
-            execute_with(&plan, &path(3)?, deadline, &sha_file(&program)?, |_, input, output, dir, stop| child(&program, input, output, dir, stop))
+            let counted = if args.len() == 6 { Some(path(5)?.canonicalize().map_err(|e|e.to_string())?) } else { None };
+            let counted_sha = counted.as_ref().map(|p|sha_file(p)).transpose()?;
+            execute_with(&plan, &path(3)?, deadline, &sha_file(&program)?, counted_sha.as_deref(), |data, input, output, dir, stop| {
+                let executable = if data.mode == Mode::Counts { counted.as_ref().unwrap_or(&program) } else { &program };
+                child(executable, input, output, dir, stop)
+            })
         }
         Some("analyze-plan") if args.len() == 5 => {
             let plan: Plan = read_json(&path(2)?)?;
             write_new(&path(4)?, &analyze(&plan, &path(3)?)?)
         }
-        _ => Err("usage: make-plan OUT | make-development-plan OUT | check-plan PLAN | execute-plan PLAN NEW_DIR ABSOLUTE_UNIX_DEADLINE | analyze-plan PLAN RUN_DIR OUT".into()),
+        Some("qualify-development-accounting") if args.len() == 5 || args.len() == 6 => {
+            let plan: Plan = read_json(&path(2)?)?;
+            let historical = if args.len()==6 {Some(path(5)?)} else {None};
+            println!("{}", qualify_development(&plan, &path(3)?, &path(4)?, historical.as_deref())?);
+            Ok(())
+        }
+        _ => Err("usage: make-plan OUT | make-development-plan OUT | check-plan PLAN | execute-plan PLAN NEW_DIR ABSOLUTE_UNIX_DEADLINE [ACCOUNTING_BINARY] | analyze-plan PLAN RUN_DIR OUT | qualify-development-accounting DEVELOPMENT_PLAN PLAIN_RUN ACCOUNTED_RUN [HISTORICAL_V1_RUN]".into()),
     }
 }
 
@@ -1055,7 +1282,7 @@ mod tests {
         let t = Temp::new();
         let p = development();
         let out = t.0.join("run");
-        execute_with(&p, &out, future(), "development-mock", mock_success).unwrap();
+        execute_with(&p, &out, future(), "development-mock", None, mock_success).unwrap();
         let a = analyze(&p, &out).unwrap();
         assert_eq!(a["flow"]["passed"], p.planned_attempts);
         assert_eq!(a["complete"], true);
@@ -1076,7 +1303,7 @@ mod tests {
             2
         );
         assert!(!a["count_contrasts"].as_array().unwrap().is_empty());
-        assert!(execute_with(&p, &out, future(), "development-mock", mock_success).is_err());
+        assert!(execute_with(&p, &out, future(), "development-mock", None, mock_success).is_err());
         fs::write(out.join("000000/record.json"), b"{}").unwrap();
         assert!(analyze(&p, &out).is_err());
     }
@@ -1086,15 +1313,22 @@ mod tests {
         let p = development();
         let out = t.0.join("run");
         let mut calls = 0;
-        let r = execute_with(&p, &out, future(), "development-mock", |_, _, _, _, _| {
-            calls += 1;
-            ProcessReceipt {
-                exit_code: Some(7),
-                timed_out: false,
-                elapsed_ns: None,
-                error: None,
-            }
-        });
+        let r = execute_with(
+            &p,
+            &out,
+            future(),
+            "development-mock",
+            None,
+            |_, _, _, _, _| {
+                calls += 1;
+                ProcessReceipt {
+                    exit_code: Some(7),
+                    timed_out: false,
+                    elapsed_ns: None,
+                    error: None,
+                }
+            },
+        );
         assert!(r.is_err());
         assert_eq!(calls, 1);
         let a = analyze(&p, &out).unwrap();
@@ -1107,7 +1341,7 @@ mod tests {
         let t = Temp::new();
         let p = development();
         let out = t.0.join("run");
-        assert!(execute_with(&p, &out, 0, "development-mock", mock_success).is_err());
+        assert!(execute_with(&p, &out, 0, "development-mock", None, mock_success).is_err());
         assert!(!out.exists());
     }
     #[test]
@@ -1122,7 +1356,7 @@ mod tests {
         let t = Temp::new();
         let p = development();
         let out = t.0.join("run");
-        execute_with(&p, &out, future(), "development-mock", mock_success).unwrap();
+        execute_with(&p, &out, future(), "development-mock", None, mock_success).unwrap();
         let path = out.join("events.jsonl");
         let events = read_events(&path).unwrap();
         let mut file = fs::File::create(&path).unwrap();
@@ -1145,5 +1379,32 @@ mod tests {
             wait_child(process, Instant::now() + Duration::from_millis(10)).unwrap();
         assert!(timed_out);
         assert!(!Path::new(&format!("/proc/{pid}")).exists());
+    }
+    #[test]
+    fn missing_allocations_stay_unknown_and_requested_backends_are_enforced() {
+        let t = Temp::new();
+        let p = development();
+        let out = t.0.join("run");
+        execute_with(&p, &out, future(), "mock", None, mock_success).unwrap();
+        let a = analyze(&p, &out).unwrap();
+        let missing = a["count_contrasts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|v| v["metric"] == "alloc_calls")
+            .unwrap();
+        assert_eq!(missing["unavailable_base_seed_clusters"], 2);
+        assert!(missing["candidate_over_baseline"].is_null());
+        let out = t.0.join("required");
+        assert!(execute_with(
+            &p,
+            &out,
+            future(),
+            "mock",
+            Some("required-accounting-binary"),
+            mock_success
+        )
+        .is_err());
+        assert_eq!(analyze(&p, &out).unwrap()["flow"]["failed"], 1);
     }
 }

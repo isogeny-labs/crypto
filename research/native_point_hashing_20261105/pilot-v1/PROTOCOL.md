@@ -5,7 +5,7 @@ measurement has been taken. Input generation and development controls are
 preparation, not study outcomes. The original frozen native feasibility panel
 and all earlier evidence remain unchanged.
 
-Current canonical draft: [protocol-v2.json](protocol-v2.json). The
+Current canonical draft: [protocol-v3.json](protocol-v3.json). The
 [2026-11-08 user budget exception](budget-override-20261108.json) removes
 account/lane headroom gating for this first pilot within a USD 10 total cap.
 The old [v1 draft](protocol.json) is retained unchanged. All measurement,
@@ -73,7 +73,11 @@ receive identical control queries. Constant hashes retain full point equality.
 Controls, collision checks and counted batches precede the timing schedule.
 Within each warmup/measured round, shuffle context blocks and then all six arms.
 Reverse the whole order in the second round of each pair. Each invocation uses
-a fresh process of the same binary; no table is shared across child batches.
+a fresh process per child. Counts/control children use the counts-only
+accounting binary; clocks use the ordinary timing binary, which has the default
+allocator and plain keys. Both release binaries share the same driver/source
+and lockfile, and have separate SHA-256 identities in run.json. No table is
+shared across child batches. The accounting binary refuses clocks.
 
 ## Execution and failure ledger
 
@@ -96,12 +100,27 @@ contrasts. It never silently discards a failed attempt.
 
 ## Analysis and limits
 
-The current analyzer reports **count diagnostics only**: root requests,
-curve-addition calls and meter steps at query prefixes 1/4/16/64/256. For each
-size/threshold cell, pair each arm with the original baseline on identical base
-seeds. Use one counted record per independent base seed, not 256 queries or
-eight timing repeats as 256 or eight independent observations. Reuse the native
-`ecbench::stats::linearised_ratio` and its log-scale Student-t interval.
+The v3 analyzer reports **21 count diagnostics**: native root/add/meter events,
+eight key/hash/lookup events, and ten observed allocation-request/layout counters.
+Snapshots cover preparation and cumulative query prefixes 1/4/16/64/256. The
+System wrapper observes only the active thread's cold interval, ending before
+teardown. Reporter vectors are preallocated outside it; parse/record serialization
+and the separate word check are outside. Allocation optimization may elide or
+combine requests. These counters are neither semantic allocation guarantees nor
+usable/live bytes, allocator arenas or RSS. Internal table probe groups and peak
+live bytes are explicitly null; full-key equality is not a probe-group count.
+Hash feeds retain raw key behavior and are toolchain-specific.
+
+For each size/threshold cell, pair all five candidates with Current and report
+the three direct adjacent contrasts Prepared/Ordered, Ordered/Hashed and
+Hashed/Fingerprint. Use one counted record per independent base seed, not queries
+or timing repeats as independent observations. Missing metrics leave clusters
+unavailable and forbid a complete-case ratio. Zero baseline totals forbid a
+ratio; complete absolute totals remain available. The existing native
+`ecbench::stats::linearised_ratio` supplies descriptive ratios and log-scale
+Student-t intervals where defined. This is up to 3360 descriptive cells, not a
+powered or multiplicity-controlled search. None of these diagnostics prices a
+whole method.
 
 Intervals are descriptive and pointwise. They establish neither power nor
 multiplicity-controlled selection. Zero or undefined denominators stay
@@ -110,7 +129,9 @@ promoted from this pilot analysis. **Timing comparisons are refused** until the
 native L2/host/resource and canonical export/masking integrations exist.
 [pcc:unverified]
 
-The canonical record passes structural and cross-reference checks as a draft. Its
+The canonical record passes structural and cross-reference checks as a draft
+using the pinned readable historical validator. Current canonical plaintext
+access is unresolved; this is not current launch admission. Its
 source/binary admission, runtime estimate, power and freeze fields remain
 unready. Passing that validator does not establish launch readiness. Freeze
 the completed canonical record and analysis before the first affected data;
@@ -119,7 +140,7 @@ the existing frozen protocol in the older native study is not changed.
 ## Invocation contract
 
 The native example provides `make-plan OUT`, `check-plan PLAN`,
-`execute-plan PLAN NEW_DIR ABSOLUTE_UNIX_DEADLINE` and
+`execute-plan PLAN NEW_DIR ABSOLUTE_UNIX_DEADLINE [ACCOUNTING_BINARY]` and
 `analyze-plan PLAN RUN_DIR OUT`, alongside the existing `run`/`check` batch
 commands. `make-development-plan OUT` supplies only the fixed F17 lifecycle
 control profile, whose child batches always have clocks disabled. It cannot
@@ -129,3 +150,11 @@ These are the software interfaces, not instructions to run a local
 timing substitute. A cloud submission requires the maintained authenticated
 native image/worker path and exact-source S3 checkpoint/readback, within the
 scoped budget exception and retained limits. No such submission was made.
+
+The current card supplies ACCOUNTING_BINARY explicitly. Omitting it retains
+ordinary counts with allocation fields unknown; it does not satisfy the v3
+accounting contract. Run headers and analyses use v2 schemas, as do batch records.
+The native `qualify-development-accounting DEVELOPMENT_PLAN PLAIN_RUN ACCOUNTED_RUN
+[HISTORICAL_V1_RUN]` command compares complete F17 development artifact streams,
+including original v1 native counters/answers when supplied. It is a producer
+software check, not authentication of measurement counters or scientific data.

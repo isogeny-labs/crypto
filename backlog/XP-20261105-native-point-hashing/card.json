@@ -7,7 +7,7 @@
     "Codex planning lane"
   ],
   "status": "blocked",
-  "status_note": "User budget override recorded 2026-11-08: account/lane headroom is no longer a gate for the first pilot within a USD 10 total cap. Protocol v2 is draft/unfrozen. Authentication, exact-source checkpoint/image/native L2 and remaining software/independent qualifications still block measurements; the production pilot has not run.",
+  "status_note": "User budget override remains active: account/lane headroom is not a gate for the first pilot within USD 10 total. The unfrozen v3 draft adds separate counts-only key/allocation diagnostics. Authentication, exact-source checkpoint/image/native L2, current canonical protocol access and remaining inventory/external/masked export/power/independent qualifications block measurements; the production pilot has not run.",
   "blocked_on": [
     "pr:2984 native integration and combined-source qualification",
     "problem:problems/native-ecbench-pcc-ledger-fork.md protected canonical ledger decision",
@@ -23,7 +23,9 @@
       "research/native_point_hashing_20261105/README.md",
       "research/native_point_hashing_20261105/pilot-v1/PROTOCOL.md",
       "research/native_point_hashing_20261105/pilot-v1/budget-override-20261108.json",
-      "research/native_point_hashing_20261105/pilot-v1/protocol-v2.json"
+      "research/native_point_hashing_20261105/pilot-v1/protocol-v2.json",
+      "research/native_point_hashing_20261105/pilot-v1/protocol-v3.json",
+      "research/native_point_hashing_20261105/accounting-20261115/README.md"
     ],
     "prs": [
       2984
@@ -46,7 +48,9 @@
         "--locked",
         "--release",
         "--example",
-        "native_point_hash_study"
+        "native_point_hash_study",
+        "--example",
+        "native_point_hash_accounting"
       ]
     ]
   },
@@ -65,7 +69,8 @@
       "execute-plan",
       "research/native_point_hashing_20261105/pilot-v1/pilot-plan.json",
       "{out}/pilot",
-      "ORIGINAL_ABSOLUTE_UNIX_DEADLINE"
+      "ORIGINAL_ABSOLUTE_UNIX_DEADLINE",
+      "target/release/examples/native_point_hash_accounting"
     ],
     "env": {},
     "timeout_per_shard_s": 1800
@@ -81,7 +86,7 @@
     "resume_flag": null
   },
   "outputs": {
-    "result_schema": "native-point-hash.pilot-analysis/v1",
+    "result_schema": "native-point-hash.pilot-analysis/v2",
     "verify": [
       "native_point_hash_study",
       "analyze-plan",

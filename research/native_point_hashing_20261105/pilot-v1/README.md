@@ -3,8 +3,10 @@
 The first point-hashing study now has a fixed input recipe, complete schedule,
 fresh-process executor, retained failure flow and paired diagnostic analysis.
 The production study has not run. The [protocol](PROTOCOL.md) and current
-[canonical v2 JSON](protocol-v2.json) remain draft/unfrozen. The original
-[v1 draft](protocol.json) remains unchanged for its qualification receipts.
+[canonical v3 JSON](protocol-v3.json) remain draft/unfrozen. The original
+[v1](protocol.json) and [v2](protocol-v2.json) drafts remain unchanged. Current
+accounting qualification is in [accounting-20261115](../accounting-20261115/README.md);
+the 15-control receipts below identify the historical source.
 
 The user [overrode budget headroom gating on 2026-11-08](budget-override-20261108.json).
 This first pilot uses the existing USD 10 native-work ceiling conservatively,
@@ -21,7 +23,8 @@ exception changes no shared AWS budget, quota, IAM or review settings.
 - **2,368 planned child attempts**: 192 context controls, 64 forced-collision
   controls, 192 counted batches, 384 warmup and 1,536 measured batches.
 - Seeded context/arm shuffles with paired reverse orders; a new child process
-  per batch. Controls precede the timed schedule.
+  per batch. Counted/control children now use a separate accounting binary;
+  timing children retain the ordinary default-allocator binary. Controls precede the timed schedule.
 - Original absolute deadline, durable start/finish records, no overwrite,
   retries or automatic resumes. Analysis preserves failures and in-flight rows.
 - Paired diagnostic ratios use one counted record per independent base seed;
@@ -32,7 +35,7 @@ These describe the prepared software/manifest, not measured algorithm results.
 
 ## Development qualification
 
-The final source reports **15 passing controls**, strict release lint, release
+The historical v1 source reports **15 passing controls**, strict release lint, release
 build and changed-file format checks. The canonical protocol validator reports
 zero findings **as a draft**. The rebuilt native backlog validator accepts the
 blocked card. The real CLI development profile finishes **76/76 counts-only
@@ -55,20 +58,22 @@ into a fresh directory, then inside `orchestration-development` run
 `sha256sum -c SHA256SUMS`. The qualification also pins the archive's SHA-256.
 The archive was created before its first commit; earlier evidence is untouched.
 
-The [current source manifest](source.sha256) identifies the new example/module,
+The [historical v1 source manifest](source.sha256) identifies the new example/module,
 named native/word/statistics dependencies, compact recipe and draft protocol.
 Remaining tracked library inputs are unchanged from the qualification's base
 commit. Older batch-only receipts remain tied to their own source hashes.
 
 ## Still required for the experiment
 
-Complete native field/hash/allocation counts and calibrated prices, external
+Full native field inventory and calibrated prices, external
 references, masked canonical export, and native L2/host/rusage/image integration
 remain pending. The analyzer currently refuses timing comparisons and marks
 count intervals descriptive. Its outputs cannot promote a runtime gain,
 equivalence, fastest-tool result or complete ECDLP price.
-Root/add/meter diagnostics do not charge key, probe or allocation work; equal
-ordered/hash counts therefore cannot establish equal runtime or table cost.
+The v3 diagnostic inventory includes key construction, logical lookups, full-key
+Hash/Eq/Ord, hasher events/feed bytes and observed allocation-layout requests.
+These remain unpriced; internal probes, live/usable bytes and RSS are unknown.
+Equal native root/add/meter counts still cannot establish equal table costs.
 
 Finish test-specific power/runtime calibration and freeze the completed
 canonical protocol/analysis before affected data. Execution still requires
