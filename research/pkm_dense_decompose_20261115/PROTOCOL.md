@@ -52,3 +52,30 @@ cryptographic sizes or Pollard rho [pcc:unverified].
 ## Amendments
 
 None at freeze. No row of this study, smoke or otherwise, had been seen at freeze.
+
+### Amendment 1 (2026-11-15, after the frozen run): larger `S` on RunPod
+
+Requested by the user after the frozen run. A separate, labelled extension; the frozen rows and verdicts stand. Rows in
+`runs/large/`, never mixed with `runs/`. Same instrument and binary family (SHA-256 in `runs/large/binary.sha256`), seed
+`20261114`, degree bound `2^20`, same verdict rules. Host: one RunPod CPU pod (16 vCPU, 128 GB), four lanes of 4 threads,
+peak RSS recorded per cell. No EKS route from this session, as before.
+
+Ladder:
+- `P1`, `m = 2`, `S = 2^9, 2^10`: `both` (tower and dense on the same targets) and `dense-random`, 4 planted + 2 random,
+  budget 7,200 s (the tower at `2^10` is estimated near 10¹² multiplications).
+- `P3 = 3221225473` (`= 3·2^30 + 1`, prime; the only change of prime, needed for `2^k | p − 1` beyond `2^10`):
+  `m = 2`, `S = 2^8` (`both`, linking the two primes) and `S = 2^11 … 2^15` dense-coset and dense-random, 4 planted + 2
+  random, budget 1,800 s.
+- `P1`, `m = 3`: `S = 2^6` dense-coset and dense-random, 4 planted + 2 random, budget 7,200 s; `S = 2^7` dense-coset,
+  1 planted target, budget 86,400 s.
+
+Predictions, frozen with this amendment before any row:
+- L1: dense ÷ tower `< 0.5` at `m = 2`, `S = 2^9, 2^10`.
+- L2: dense ÷ enumeration `> 1` at every completed `S`.
+- L3: the dense oracle's growth exponent, fitted on planted medians, lies in `[1.8, 2.3]` at `m = 2` (`S = 2^8 → 2^15`,
+  `P3`) and in `[4.5, 6.0]` at `m = 3` (`S = 2^5 → 2^7`, the `2^5` point from the frozen run).
+- L4: dense-random ÷ dense-coset in `(0.5, 2)` at every `S ≥ 2^6`.
+- Validity as before: every decided row agrees with enumeration; every planted target has a relation; the `P3`, `S = 2^8`
+  dense count is reported beside `P1`'s.
+
+A cell that hits its budget or the pod's memory is censored and reported as a lower bound.
