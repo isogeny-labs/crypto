@@ -4407,6 +4407,100 @@ impl FilterGeom {
             (1u64 << ((h >> a) & 63)) | (more & self.extra),
         )
     }
+
+    /// Each key's hash, filter word and filter bits, a block at a time:
+    /// `hashes[i] = pair_filter_hash(keys[i])` and `(words[i], bits[i]) =
+    /// self.slot(hashes[i])`, eight lanes at once where AVX-512DQ runs.
+    /// The aimed scan then tests the filter from these arrays instead of
+    /// hashing and slotting each key between its loads
+    /// ([`scan_vfilter_enabled`]).
+    fn fill_block(
+        &self,
+        keys: &[u64],
+        hashes: &mut Vec<u64>,
+        words: &mut Vec<u64>,
+        bits: &mut Vec<u64>,
+    ) {
+        let n = keys.len();
+        hashes.resize(n, 0);
+        words.resize(n, 0);
+        bits.resize(n, 0);
+        #[allow(unused_mut)]
+        let mut done = 0;
+        #[cfg(target_arch = "x86_64")]
+        if filter_simd() {
+            // SAFETY: AVX-512F and DQ were detected at run time, and the
+            // outputs were just sized to the keys.
+            done = unsafe { self.fill_block_avx512(keys, hashes, words, bits) };
+        }
+        for i in done..n {
+            let h = pair_filter_hash(keys[i]);
+            let (w, b) = self.slot(h);
+            hashes[i] = h;
+            words[i] = w as u64;
+            bits[i] = b;
+        }
+    }
+
+    /// [`Self::fill_block`]'s whole groups of eight; returns how many keys
+    /// it filled.
+    ///
+    /// # Safety
+    ///
+    /// The CPU must support AVX-512F and AVX-512DQ, and the three output
+    /// slices must be at least `keys.len()` long.
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "avx512f,avx512dq")]
+    unsafe fn fill_block_avx512(
+        &self,
+        keys: &[u64],
+        hashes: &mut [u64],
+        words: &mut [u64],
+        bits: &mut [u64],
+    ) -> usize {
+        use std::arch::x86_64::*;
+        let set = |v: u64| _mm512_set1_epi64(v as i64);
+        let (c1, c2) = (set(0xff51_afd7_ed55_8ccd), set(0xc4ce_b9fe_1a85_ec53));
+        let (shift, mask) = (set(u64::from(self.shift)), set(self.words));
+        let [a, b, c] = self.bit_shifts;
+        let (sa, sb, sc) = (set(u64::from(a)), set(u64::from(b)), set(u64::from(c)));
+        let (m63, one, extra) = (set(63), set(1), set(self.extra));
+        let bit = |h: __m512i, s: __m512i| {
+            _mm512_sllv_epi64(one, _mm512_and_si512(_mm512_srlv_epi64(h, s), m63))
+        };
+        let whole = keys.len() / 8 * 8;
+        for i in (0..whole).step_by(8) {
+            let k = _mm512_loadu_si512(keys.as_ptr().add(i).cast());
+            // `pair_filter_hash`, lane by lane.
+            let mut h = _mm512_mullo_epi64(k, c1);
+            h = _mm512_xor_si512(h, _mm512_srli_epi64::<33>(h));
+            h = _mm512_mullo_epi64(h, c2);
+            let w = _mm512_and_si512(_mm512_srlv_epi64(h, shift), mask);
+            let more = _mm512_and_si512(_mm512_or_si512(bit(h, sb), bit(h, sc)), extra);
+            let bb = _mm512_or_si512(bit(h, sa), more);
+            _mm512_storeu_si512(hashes.as_mut_ptr().add(i).cast(), h);
+            _mm512_storeu_si512(words.as_mut_ptr().add(i).cast(), w);
+            _mm512_storeu_si512(bits.as_mut_ptr().add(i).cast(), bb);
+        }
+        whole
+    }
+}
+
+/// Whether AVX-512F and DQ run here, for [`FilterGeom::fill_block`].
+#[cfg(target_arch = "x86_64")]
+fn filter_simd() -> bool {
+    static SIMD: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *SIMD.get_or_init(|| {
+        std::is_x86_feature_detected!("avx512f") && std::is_x86_feature_detected!("avx512dq")
+    })
+}
+
+/// Whether the aimed scan fills its filter tests a block at a time
+/// ([`FilterGeom::fill_block`]); `KIC_SCAN_VFILTER=0` hashes and slots
+/// each key in the test loop as before, the control.
+fn scan_vfilter_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_SCAN_VFILTER").map_or(true, |v| v != "0"))
 }
 
 /// **Every pair sum of a factor base**, `P_i + P_j` for `i ≤ j`, sorted
@@ -7814,6 +7908,8 @@ impl PairSumTable {
         const LOOKAHEAD: usize = 32;
         let mut admitted_offsets = Vec::with_capacity(BLOCK / 8);
         let mut hashes = Vec::with_capacity(BLOCK);
+        let vfilter = scan_vfilter_enabled();
+        let (mut fwords, mut fbits) = (Vec::new(), Vec::new());
         #[cfg(feature = "scan-probes")]
         scan_probes::lap(scan_probes::SUBTRACT, &mut probe);
         let count = if fused { len } else { rests.len() };
@@ -7825,22 +7921,46 @@ impl PairSumTable {
             }
             #[cfg(feature = "scan-probes")]
             scan_probes::lap(scan_probes::KEY, &mut probe);
-            hashes.clear();
-            hashes.extend(keys.iter().copied().map(pair_filter_hash));
             admitted_offsets.clear();
-            for &h in hashes.iter().take(LOOKAHEAD) {
-                prefetch(&self.present[self.filter_word_hash(h)]);
-            }
-            for within in 0..hi - lo {
-                if let Some(&ahead) = hashes.get(within + LOOKAHEAD) {
-                    prefetch(&self.present[self.filter_word_hash(ahead)]);
+            if vfilter {
+                // The tests `admitted_hash` makes below, their hashes,
+                // words and bits filled a block at a time, and the same
+                // count of probes.
+                let n = hi - lo;
+                self.filter
+                    .fill_block(&keys[..n], &mut hashes, &mut fwords, &mut fbits);
+                group_op_count::count_filter_probes(n as u64);
+                for &w in fwords.iter().take(LOOKAHEAD) {
+                    prefetch(&self.present[w as usize]);
                 }
-                let h = hashes[within];
-                if !self.admitted_hash(h) {
-                    continue;
+                for within in 0..n {
+                    if let Some(&ahead) = fwords.get(within + LOOKAHEAD) {
+                        prefetch(&self.present[ahead as usize]);
+                    }
+                    let b = fbits[within];
+                    if self.present[fwords[within] as usize] & b != b {
+                        continue;
+                    }
+                    self.prefetch_bucket_hash(keys[within], hashes[within]);
+                    admitted_offsets.push(within);
                 }
-                self.prefetch_bucket_hash(keys[within], h);
-                admitted_offsets.push(within);
+            } else {
+                hashes.clear();
+                hashes.extend(keys.iter().copied().map(pair_filter_hash));
+                for &h in hashes.iter().take(LOOKAHEAD) {
+                    prefetch(&self.present[self.filter_word_hash(h)]);
+                }
+                for within in 0..hi - lo {
+                    if let Some(&ahead) = hashes.get(within + LOOKAHEAD) {
+                        prefetch(&self.present[self.filter_word_hash(ahead)]);
+                    }
+                    let h = hashes[within];
+                    if !self.admitted_hash(h) {
+                        continue;
+                    }
+                    self.prefetch_bucket_hash(keys[within], h);
+                    admitted_offsets.push(within);
+                }
             }
             #[cfg(feature = "scan-probes")]
             {
@@ -20800,6 +20920,41 @@ mod tests {
             let geom = FilterGeom::new(FilterLayout::Top, mask, FILTER_EXTRA);
             for h in [0u64, u64::MAX, x, x.rotate_left(17)] {
                 assert!(geom.word(h) as u64 <= mask >> 6);
+            }
+        }
+    }
+
+    #[test]
+    fn a_filled_block_is_the_per_key_hash_and_slot() {
+        // `fill_block` (AVX-512 where it runs, scalar for the tail) must
+        // give each key exactly the hash, word and bits the scan's per-key
+        // test computes, under both layouts, both probe counts and every
+        // filter width, at block lengths that leave tails of every size.
+        let mut x = 0x2545_f491_4f6c_dd1du64;
+        for layout in [FilterLayout::Low, FilterLayout::Top] {
+            for probes in [1u8, FILTER_PROBES] {
+                for filter_bits in 6..=32u32 {
+                    let geom =
+                        FilterGeom::new(layout, (1u64 << filter_bits) - 1, filter_extra(probes));
+                    for len in [0usize, 1, 7, 8, 9, 63, 1024] {
+                        let keys: Vec<u64> = (0..len)
+                            .map(|_| {
+                                x ^= x << 13;
+                                x ^= x >> 7;
+                                x ^= x << 17;
+                                x
+                            })
+                            .collect();
+                        let (mut h, mut w, mut b) = (Vec::new(), Vec::new(), Vec::new());
+                        geom.fill_block(&keys, &mut h, &mut w, &mut b);
+                        assert_eq!(h.len(), len);
+                        for (i, &k) in keys.iter().enumerate() {
+                            let hk = pair_filter_hash(k);
+                            let (wk, bk) = geom.slot(hk);
+                            assert_eq!((h[i], w[i], b[i]), (hk, wk as u64, bk));
+                        }
+                    }
+                }
             }
         }
     }
