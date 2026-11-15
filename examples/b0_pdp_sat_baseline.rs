@@ -30,7 +30,7 @@ use rand::{Rng, SeedableRng};
 use serde_json::{json, Value};
 use std::io::Write;
 
-#[path = "pdp_lin_cdcl.rs"]
+#[path = "support/pdp_lin_cdcl.rs"]
 mod pdp_lin_cdcl;
 use pdp_lin_cdcl::{ChainInstance, Result as LinResult};
 use std::process::Command;
@@ -445,7 +445,7 @@ fn run_ext(
     v
 }
 
-fn median(xs: &mut Vec<f64>) -> f64 {
+fn median(xs: &mut [f64]) -> f64 {
     if xs.is_empty() {
         return f64::NAN;
     }
