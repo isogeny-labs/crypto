@@ -45,3 +45,6 @@ jobs:
       - name: Rust-only 32-unknown cold prime31 factor-base relation solver trial
         timeout-minutes: 5
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index -- --solve-one
+      - name: Rust-only BSGS full-cold prime31 generic reference on identical public Q
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index -- --bsgs-one
