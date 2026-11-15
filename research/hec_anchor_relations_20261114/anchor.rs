@@ -1,4 +1,6 @@
 //! Target-seeded anchor relations with coefficient-aware off-base elimination.
+#[path = "compact.rs"]
+mod compact;
 #[path = "dense.rs"]
 mod dense;
 #[path = "orbit.rs"]
@@ -280,13 +282,17 @@ pub struct Report {
     pub solve: SolveStats,
 }
 pub fn solve(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
-    solve_variant(c, d1, d2, ell, seed, gate, false)
+    solve_variant(c, d1, d2, ell, seed, gate, false, false)
 }
 
 /// Integration gate for orbit reuse, dense forest and incremental elimination.
 /// Tuple scheduling and inverse caching are still pending; not a timing arm.
 pub fn solve_orbit(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
-    solve_variant(c, d1, d2, ell, seed, gate, true)
+    solve_variant(c, d1, d2, ell, seed, gate, true, false)
+}
+
+pub fn solve_compact(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
+    solve_variant(c, d1, d2, ell, seed, gate, true, true)
 }
 
 fn solve_variant(
@@ -297,6 +303,7 @@ fn solve_variant(
     seed: u64,
     gate: bool,
     use_orbit: bool,
+    use_compact: bool,
 ) -> Report {
     let all = Instant::now();
     let mut r = Report::default();
@@ -447,11 +454,23 @@ fn solve_variant(
                         )
                     })
                     .collect();
-                for (step, (hp, q)) in orbit::signed_orbit_with_weights(c, &points, &weights)
-                    .into_iter()
-                    .enumerate()
-                    .rev()
-                {
+                let reference;
+                let compact;
+                let pairs = if use_compact {
+                    compact = compact::signed_orbit(c, &points, &weights);
+                    compact.as_slice()
+                } else {
+                    reference = orbit::signed_orbit_with_weights(c, &points, &weights);
+                    reference.as_slice()
+                };
+                if use_compact && gate {
+                    assert_eq!(
+                        pairs,
+                        orbit::signed_orbit_with_weights(c, &points, &weights).as_slice(),
+                        "complete generated orbit gate"
+                    );
+                }
+                for (step, (hp, q)) in pairs.iter().copied().enumerate().rev() {
                     let gray = step ^ (step >> 1);
                     let signed = chosen
                         .iter()
@@ -670,6 +689,17 @@ mod tests {
                 assert_eq!(r.k, Some(k), "g={g} p={p} seed={seed} {r:?}");
                 assert_eq!(r.raw_checks, r.admitted);
                 assert_eq!(r.pure_checks, r.pure_rows as u64);
+                let compact = solve_compact(&i.curve, &i.d1, &target, i.ell, 20260916 + seed, true);
+                assert_eq!(compact.k, r.k);
+                assert_eq!(
+                    (
+                        compact.draws,
+                        compact.admitted,
+                        compact.pure_rows,
+                        compact.solves
+                    ),
+                    (r.draws, r.admitted, r.pure_rows, r.solves)
+                );
             }
         }
     }
