@@ -54,6 +54,9 @@ Kummer D4 and auxiliary D6 inputs. All original-equation lifts and complete-set
 comparisons remain. No timing, fitted exponent, security dataset or general
 prime-width extension is included. [pcc:unverified]
 
+Scoped result statements PCC-20261115-555122 and PCC-20261115-c012b0 remain
+unverified; the prospective statement is PCC-20261115-df00a3.
+
 Every round retains nineteen build bindings and nine separate pre-call
 wrapper/source/binary bindings; all match at its completion. Its whole raw
 archive includes inputs, output, proofs, exits, unknown diagnostics and replay.
