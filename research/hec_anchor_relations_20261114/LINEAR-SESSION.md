@@ -136,3 +136,30 @@ immediately, changed no files in that task, then claimed the explicitT-6056.
 Initial Typst rendering needed a space in b H; corrected and visually inspected.
 Shared resume stays untouched. Local broad sparse-ledger diagnostics do not
 replace current-head complete-checkout CI. Closed historical records unchanged.
+
+## Final publication checks
+
+### What was done (commands, files, features)
+Closed record has no metadata errors; canonical generic progress report is
+current. Daily metadata exporter emits all12recorded native ratio values when
+run against committed HEAD with --since2026-10-01, in under one second. New
+benchmark report directory was materialized in sparse-checkout patterns and
+committed after an initial git-add refusal; allfourentryfiles are now tracked.
+Scientific run/source/raw archive remain unchanged. Prepared PR scope update.
+
+### Decisions made (and why)
+Use complete-checkout current-head CI as the S3/canonical admission authority.
+Local whole-ledger gate reports1862old missing-file/manifest issues in this
+sparse checkout; targeted new-record metadata validation passes. Keep exact
+failed upload and sparse diagnostics in the log, without editing historical
+records or claiming a local global pass. No merge or admitted-row promotion.
+
+### Open threads (unfinished, pick up next time)
+Push and verify current-head CI/S3 raw custody, FF any artifact-only bot commit,
+checkpoint. Then execute the structural cost screen in LINEAR-HANDOFF.md.
+
+### Errors (what went wrong, how it was handled)
+Initial benchmark entry files were outside sparse patterns; added the directory
+permanently and committed it before push. The first metadata smoke used Git's
+same-day --since cutoff and saw no new record; the required historical window
+emits all12unchangedrecorded values. Shared resume was not reapplied or edited.
