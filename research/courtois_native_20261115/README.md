@@ -117,3 +117,7 @@ the pending local claim and its append entry are retained separately instead
 of choosing a side or changing published ledger history. The baseline is
 `b42bc6d1ae547d9cbc84d8a512c894db396c89af`. This change makes no canonical PCC
 ledger or claim-file update, and does not assert registered or signed standing.
+
+## Merge follow-up
+
+The [2026-11-15 merge review](review-20261115T2234Z/README.md) retains fresh producer checks on both updated PR heads. The compatibility PR's automatic ledger reconciliation rewrote a published event; its auto-merge is disabled until canonical PCC maintainers provide an authorized provenance-preserving route. No frozen evidence or claim is changed. [pcc:unverified]
