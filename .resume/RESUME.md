@@ -1,3 +1,19 @@
+## Resume capacity recovery02
+
+Whole verified remote promisor cache bytes relocated to RAM with original paths/refs/HEAD/status/science preserved;1.5GB overlay free. Local automatic Git repacking disabled in both clones. Full recovery manifest is /workspace/scratch/ct99-remote-cache-relocation-02/outcome.json; follow its regenerable-cache-only recipe if RAM is replaced. Next genuineNEW26, then relation-rank discriminator and complete strong-reference cost census. [pcc:unverified]
+
+# Paired original-model sampling complete; stronger known-point reference retained
+
+pcc/claims/PCC-20261115-bd3afc.json: exactconsumer41247ff/native4fd903/prospectiveabf432/compiled033a84. All225samples1125triples60pairs120FULLreports15jointcases45verifiedpairs90answers15sharedFB30pairs30rejections; whole101records87new14old/all33phases/eightomissions/1487guards/exactruntime-preparedcustody/checkpoint21all28remote-localgate0. All343producer scientificinputsunchanged. [pcc:unverified]
+
+Allthreepublicnorm-derivedpreparedsources EXACTalreadyknownindependentGpoints; afterprep samplebodymatchesstrongerknownpointsource-scalar-Phi reference/no newadvantageestablishedversusthatreference. Bothoriginalconditional3roots0trusted/three20261114bindingsholdactualscalar-model-program-costbridgesexplicit. InspectedreportSOURCE346f08/full69112BPDFselectedbyoriginalpolicy retainedforNEW26canonicalmigration. No raw/timing/counter/rejectedreport filtered. [pcc:unverified]
+
+NextgenuineNEW26 wholeclosedct92-98/proofs-source-native100-101/full749CIartifact-logs/rejectedreports/selectedPDF/fixtures. RAM8.7GiBpermitsarchive/worktree staging whileOverlay~100MiB; preserveoriginalpipeline/actualremote replays-before-bot/normalFF/allguards-links-ledgerprefixes. Capacity463139 recordsFUSEEPERM/partialclone-historyfetchENOSPC128beforepacking-removal/allrefsunchanged andwholebyteRAMrelocationonlynewremote180MBcache withalloriginalpathsbytes/refHEADstatusstable. Avoidhistoryenumeration/useGIT_NO_LAZY_FETCH=1. No researchsource/raw/executable/preparedcopyremoved. [pcc:unverified]
+
+Thencompleteprimitive/setup/strongreferencecensus andpossibleFB30relation-rankdiscriminator; no calibratedratio-ECDLPadvantage/novelty/globalCI/signedpromotion. Cold12018complete102missing124/root124/clock101/mainledger/liveadmission/vault8edec422locked-KB127/review-signinggapsremainopen. [pcc:unverified]
+
+---
+
 # Original fixed-prime IC solves all15 public cases; next paired sampler
 
 pcc/claims/PCC-20261115-61fcae.json: exactpublishedconsumerba1fae2 mirrorsnative7df2ae/reportab5c32. All60attempts/whole100records/all15publiccases/45verifiedFB36-48-64/15retainedrejectedFB30; all30phases/sevenwholeomissions101-nooutput/1465guards/exactbinaries-fullpreparedreuse/checkpoint20all28+remote-localgate0. Both63791BresultPDFpagesopened/all12partialcountergroupsretainallattempts. All343producer scientificinputs remainunchanged. [pcc:unverified]
