@@ -6,9 +6,13 @@ This study tests membership in the *published* genus-14 W1 locus, not a
 new curve family or a full ECDLP attack. The decisive prior source is
 [Menezes--Teske, §5.2](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf).
 They define W1 and report that they did not have a decomposition test below
-q^2.5 per candidate. Their estimate `#W1 ≈ q^6` is heuristic. A new
-Sidon-kernel argument below gives a uniform lower bound of order `q^6`
-for the same published locus. The later
+q^2.5 per candidate. Their estimate `#W1 ≈ q^6` is heuristic. The
+kernel Sidon property is prior work:
+[Roth--Raviv--Tamo, Lemma 25](https://arxiv.org/pdf/1705.04560)
+states it for `X^(q^k)+X^q+X`, citing the earlier
+[Ben-Sasson--Etzion--Gabizon--Raviv construction](https://arxiv.org/pdf/1404.7739).
+Here that property gives a uniform lower bound of order `q^6` for the
+published W1 locus. The later
 [Weil-descent product analysis](https://math.dartmouth.edu/~carlp/WeilDescent-Product.pdf)
 changes attack comparisons, so a faster membership test alone cannot show
 an end-to-end advantage.
@@ -126,13 +130,15 @@ Lean theorem checks the exact scaling equivalence under explicit coverage
 and second-factor stability hypotheses. The Rust program checks the
 dimension, line count, and exact membership equality at q=2,4; at q=8 it
 checks the direct count and the trace-zero containment. The new
-[Sidon-kernel proof and bounds](SIDON_BOUND.md) derive that, for each cubic,
-`V=ker p(sigma)` satisfies `dim_k(V ∩ tV) ≤ 1` for every `t∉k`.
+[Sidon-kernel proof and bounds](SIDON_BOUND.md) apply the published Sidon
+property to both cubic kernels, giving `dim_k(V ∩ tV) ≤ 1` for every
+`t∉k`.
 The characteristic-two elimination step is checked in
 [`SidonKernel.lean`](SidonKernel.lean); the fixed-field, dimension, trace
 pairing, and incidence-count bridges are argued on paper in the linked note
-and are not formalized in Lean. The argument turns the earlier heuristic
-W0 product formula into an all-`q` count. For W1, set `m=q^2+q+1`,
+and are not formalized in Lean. The exact one-cubic W0 product count is
+an elementary corollary of the published Sidon property. For W1, set
+`m=q^2+q+1`,
 `M=(q^3-1)^2`, and `D=M+m(m-1)(q^2-1)`. Then
 
     ceil(M^2/D) <= #W1_p <= q^6-1.
@@ -148,7 +154,8 @@ transfer or DLP cost.
 
 The determinant argument also applies to trinomial kernels
 `T^d+T^s+1` when this polynomial divides `T^n-1` and `gcd(s,n)=1`.
-It supplies a structural search family. The first degree-15 example
-`T^4+T+1` falls within the magic-number-5 cases already analyzed by
-Maurer--Menezes--Teske; it is a rediscovery as a GHS candidate. Its
+The `s=1` kernel family was already constructed by Ben-Sasson and
+coauthors. The first degree-15 example `T^4+T+1` falls within the
+magic-number-5 cases already analyzed by Maurer--Menezes--Teske; it is
+a rediscovery as a GHS candidate. Its
 transfer genus, subgroup map, and total attack cost require separate work.

@@ -2,13 +2,16 @@
 
 15 November 2026 UTC. Scope: a mathematical count of coefficient eligibility,
 not a new GHS family or a full attack-cost bound. The W1 locus and genus-14
-transfer are from [Menezes--Teske, §5.2](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf).
-That paper estimates its size heuristically. Sidon spaces and their
-intersection characterization are already studied in
-[Roth--Raviv--Tamo (2017)](https://arxiv.org/abs/1705.04560) and
-[Constructions and equivalence of Sidon spaces (2023), Theorem 3.3](https://d-nb.info/131813403X/34).
-The targeted prior-work search did not locate this exact GHS-kernel
-application; that is an incomplete priority screen.
+transfer are from [Menezes--Teske, §5.2](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf),
+which estimates its size heuristically. The root-space Sidon property is
+**prior work**: [Roth--Raviv--Tamo, Lemma 25](https://arxiv.org/pdf/1705.04560)
+states it for `X^(q^k)+X^q+X`, attributing the construction to
+[Ben-Sasson--Etzion--Gabizon--Raviv](https://arxiv.org/pdf/1404.7739).
+The reciprocal cubic case follows by applying their theorem over
+`F_(q^3)` inside `F_(q^21)` and intersecting with `F_(q^7)`; factor
+scalings then lie in `F_(q^3)∩F_(q^7)=F_q`. The W1 incidence application
+below was not located in the screened papers; its publication priority
+remains open.
 
 ## The two kernel spaces are Sidon
 
@@ -49,15 +52,17 @@ each unordered pair of lines yields `q-1` distinct products. Thus
                 = (q^3-1)(q^2+q+2)/2.             (3)
 
 Menezes--Teske §5.1.2 gave (3) as a heuristic count and reported finite
-checks at degrees 7, 14 and 21. Equation (1) supplies a proof for each
-`q=2^ell`; it does not establish a new attack against W0 curves.
+checks at degrees 7, 14 and 21. Equation (3) follows directly from the
+published Sidon theorem by counting unordered projective pairs; it is not
+claimed as a new Sidon theorem or a new attack against W0 curves.
 
 The determinant argument extends as a search filter. If `p(T)=T^d+T^s+1`
 divides `T^n-1` over `F_2`, `gcd(s,n)=1`, and `V=ker p(sigma)` in
 `F_(q^n)`, then `dim_k V=d` by a normal basis and
 `dim_k(V∩tV)≤1` for `t∉k`: replace `q^3,q` in (2) by `q^d,q^s`.
 For example `T^4+T+1` divides `T^15-1`, so its four-dimensional kernel
-has this property. This is a **structural coefficient-space family**;
+has this property. The `s=1` construction is in the cited Sidon
+literature. This is a **structural coefficient-space family**;
 the [Maurer--Menezes--Teske 2002 analysis](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/D4B264D082FF67354EE9968D9803102A/S1461157000000723a.pdf/analysis_of_the_ghs_weil_descent_attack_on_the_ecdlp_over_characteristic_two_finite_fields_of_composite_degree.pdf)
 already treats degree 15 and magic number 5. It is a rediscovery as a GHS
 candidate, and the degree-seven W1 incidence bound below does not carry
@@ -128,7 +133,8 @@ The prior-work screen covered the primary GHS paper and two Sidon-space
 papers, plus focused index searches; broader novelty review remains open.
 
 The genus-14 W1 curves remain a **known eligible family**. A new exact
-equation in this locus would be a new instance only. The proof above is a
-possible new bound or method of analysis, subject to full prior-work review.
+equation in this locus would be a new instance only. The W1 incidence
+bound may be a new application of published Sidon theory, subject to a
+full prior-work review.
 No new vulnerable family or same-subgroup GHS-versus-rho advantage follows
 from it.
