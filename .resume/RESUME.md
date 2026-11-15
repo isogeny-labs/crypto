@@ -1,27 +1,28 @@
-# Resume: crypto @ aburan28/kind-volta-4zo2ul
+# Resume: crypto @ claude/index-calculus-gpu-optimization-otouqv (round 5: GPU m = 3 with incremental-gauss-echelon)
 
 ## Goal
-Owner (2026-11-11): "run the whole thing" — the frozen 30-seed relation-oversampling run.
+User (2026-11-15), "Keep working on open leads". Lead from research/ic_la_m3_20261115 (PR #4310):
+incremental-gauss-echelon matches incremental-gauss (trials, relations, logarithm, S) with 0.10-0.15x the
+row_ops. Measure the whole-solve effect on the round-4 GPU arm (probe_build=pairs, daemon, cuda).
 
 ## Lead / hypothesis
-research/logs_oversampling_20261111/protocol.json (frozen, sha256 aa928f27…3076). H1: some f>0 lowers
-total counted cost C = trials + lambda*row_ops vs f=0. Pilot (run-20261111T0451Z) favoured H0.
+PROTOCOL.md: identity across IC arms; at |F_x| = 4096 the GPU arm's median solve with echelon <= 0.5x
+with gauss; row_ops ratio 0.10-0.20.
 
 ## Spec
-research/logs_oversampling_20261111/full/run_full.sh: ic oversample, cells C1-C4, 30 seeds (base +100),
-fractions 0,0.1,0.25,0.5, --aa-control --logs-arm, release build. Local, unisolated (owner-requested;
-no AWS identity). S3 checkpoint waived by owner; this file in Git is the checkpoint.
+specs/smoke.json, specs/rf3la.json (38/40-bit prime_explicit curves, |F_x| 2048/4096, 3 targets, 2
+rounds; CPU and GPU arms x gauss/echelon; GPU echelon A/A at 4096; rho and rho A/A). job.sh on one A100,
+launched by run_pod.sh under benchrec run.
 
 ## State
-Protocol frozen and committed; run next under a bench record.
+2026-11-15: protocol and specs frozen; pod not yet launched.
 
 ## Runs in flight
-Local `ic oversample` full run, cells C1-C4 sequential, session_01TCbLH7MBa3sEKfh3Trpi2R.
+None yet (pod icgpu-rla; cleanup: research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-rla).
 
 ## Stop and success conditions
-Fixed sample: stop when all cells finish 30 seeds; any unverified arm is a failure (reported).
-Decision rule per protocol.json; no claim beyond it.
+Any S/relation/logarithm mismatch or failed replay voids that comparison. Wall L0, A/A floor. Cap
+~1.5 GPU-hours, $4. S3: same waiver as earlier rounds (session AWS keys rejected).
 
 ## Next steps
-1. full/analyze.py; run report + graph + PDF under reports/run-<UTC>/; bench record close.
-2. Commit on PR branch; report to owner.
+Commit+push protocol -> record init -> ecbench release build -> run_pod.sh -> analyze -> report -> PR.

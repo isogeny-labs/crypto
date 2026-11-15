@@ -96,11 +96,16 @@ since changed on `main` may name an `input_view_manifest`
 (`frozen-input-view/v1`, read by `applyPinnedInputView`): each input is
 restored from a named revision after its digest is matched against the
 study's original freeze manifest (by `source_sha256` key or JSON pointer) and
-that manifest's SHA-256. The input then either equals a current twin
+that manifest's SHA-256; for a coreutils `sha256sum` freeze,
+`original_manifest_format: "sha256sum"` reads it as its path-to-digest map and
+the pointer names one listed path. The overlay happens before the manifest's
+own digests are checked, so they check the restored bytes and any other drift
+still fails. The input then either equals a current twin
 (`current_equal`) or is named in a committed drift note
 (`current_drift_note`) that says why the checks only verify or replay frozen
 code. [symbolic-oaware-width-gate-source-view-v1.json](scripts/symbolic-oaware-width-gate-source-view-v1.json)
-is the example. A replay whose manifest pins a different version of its
+is the example; [p192-anchor-eight-report-view-v1.json](scripts/p192-anchor-eight-report-view-v1.json)
+restores the P-192 report that the anchor-eight `ARTIFACTS.sha256` pins. A replay whose manifest pins a different version of its
 workflow than the index's top-level `revision` holds carries its own
 `revision`; custody then checks that its manifest pins its workflows' bytes
 at that commit, and the runner fetches it like the top-level one. A workflow
@@ -176,7 +181,7 @@ workloads.
 | Rust CodeQL cache warming (`warm-rust-cache`, named exception) | 45 minutes |
 | Rust CodeQL queries (`analyze`, named exception) | 60 minutes |
 | Each PR or merge-group packaging component | 25 minutes |
-| ecbench PR harness | 25 minutes, including a 12-minute historical integrity step |
+| ecbench PR harness (named exception) | 75 minutes (45 until 2026-11-11, when runs 42969362215 and 43000966973 were cancelled at that cap before the audit steps) |
 | ecbench weekly/manual exhaustive audit | Existing 300-minute scientific budget |
 
 The PR Rust CodeQL lane runs in three jobs that hand one database forward:

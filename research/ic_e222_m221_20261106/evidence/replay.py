@@ -71,6 +71,26 @@ if os.path.exists(bm) and sha(bm)==C["raw_data"]["band"]["sha256"]:
         log["runs"].append({"file":"band","name":meta["instance"],"config":meta["config"],"recorded":{"group_additions":rec["ic"]["stages"]["counters"]["group_additions"],"rho_mean_gae":rec["matched_rho"]["mean_gae"]},
                             "replayed":{"group_additions":o["ic"]["stages"]["counters"]["group_additions"],"rho_mean_gae":o["matched_rho"]["mean_gae"],"ok":o["ic"]["scalar"]==rec["ic"]["scalar"]},"identical":same})
         if not same: log["mismatches"].append(f"band {meta['instance']} {meta['config']}: counters or rho differ on replay")
+# mid-size (claim C7): larger subgroup orders; rerun a small drawn sample (the biggest runs take about 15 s)
+mm=os.path.join(ROOT,C["raw_data"]["mid"]["path"])
+if os.path.exists(mm) and sha(mm)==C["raw_data"]["mid"]["sha256"]:
+    man=json.load(open(mm));mdir=os.path.dirname(mm);files=sorted(man["files"])
+    for rel in rng.sample(files,min(max(a.k//4,4),len(files))):
+        p=os.path.join(mdir,os.path.relpath(rel,"mid"))
+        if sha(p)!=man["files"][rel]: log["mismatches"].append(f"mid {rel}: file sha256 differs from the manifest");continue
+        rec=json.load(open(p));meta=rec["_meta"]
+        d=json.load(open(os.path.join(inst["mid_inst"],meta["instance"]+".json")))
+        t=os.path.join(tmp,"_t.json")
+        json.dump({**{k:int(v) for k,v in dict(p=d["field"]["modulus"],a=d["a"],b=d["b"],n=d["subgroup_order"],gx=d["generator"]["x"],gy=d["generator"]["y"],qx=d["point"]["x"],qy=d["point"]["y"]).items()},"group_order":int(d["group_order"])},open(t,"w"))
+        cmd=[a.ic,"--json","solve-prime-file","--input",t,"--seed","1","--rho-steps","0","--matched-rho-runs","8","--fb-size",str(meta["F"]),"--extra-relations","2","--max-trials-per-relation","200000000","--max-relation-attempts","64"]
+        if meta["config"]=="h1": cmd.append("--project-cofactor")
+        env=dict(env0);env["IC_SUM_TABLE"]="1"
+        o=json.loads(subprocess.run(cmd,capture_output=True,text=True,env=env).stdout);bins.add(o["software"]["binary_blake3"])
+        same=(o["ic"]["stages"]["counters"]==rec["ic"]["stages"]["counters"] and o["ic"]["stages"]["trials_total"]==rec["ic"]["stages"]["trials_total"]
+              and o["matched_rho"]["mean_gae"]==rec["matched_rho"]["mean_gae"] and o["ic"]["scalar"]==rec["ic"]["scalar"])
+        log["runs"].append({"file":"mid","name":meta["instance"],"F":meta["F"],"config":meta["config"],"recorded":{"trials":rec["ic"]["stages"]["trials_total"],"rho_mean_gae":rec["matched_rho"]["mean_gae"]},
+                            "replayed":{"trials":o["ic"]["stages"]["trials_total"],"rho_mean_gae":o["matched_rho"]["mean_gae"],"ok":o["ic"]["scalar"]==rec["ic"]["scalar"]},"identical":same})
+        if not same: log["mismatches"].append(f"mid {meta['instance']} F={meta['F']} {meta['config']}: counters or rho differ on replay")
 log["binary_blake3"]=sorted(bins);log["git_head"]=subprocess.run(["git","-C",ROOT,"rev-parse","HEAD"],capture_output=True,text=True).stdout.strip()
 n=[r for r in log["runs"] if "identical" in r];log["replayed"]=len(n);log["identical"]=sum(r["identical"] for r in n)
 log["status"]="pass" if n and not log["mismatches"] else "fail"

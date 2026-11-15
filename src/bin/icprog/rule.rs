@@ -292,6 +292,32 @@ pub const V9C: Constants = Constants {
     ..V8
 };
 
+/// The rule's comparison at baseline v10 (`research/ic_tool_program/rule/v10`):
+/// rule v9's protocol, matched rho included, on a binary whose only change
+/// from its control is the single-word factor-base selection and
+/// projection, the base unchanged bit for bit.
+pub const V10: Constants = Constants {
+    what_this_is: "The rule's comparison at baseline v10, rho matched: §23's figures, from the \
+                   checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v10",
+    },
+    ..V8
+};
+
+/// Rule v10's control: `main` at the branch's base, run in the same
+/// session and host as rule v10, so their rows pair by target.
+pub const V10C: Constants = Constants {
+    what_this_is: "The rule's comparison at baseline v10, its control: main's binary at the \
+                   branch base, rho matched, same session: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v10c",
+    },
+    ..V8
+};
+
 /// Where a comparison lives and what it writes.
 pub struct Comparison {
     /// The repository: the ledger, and what record paths are relative to.

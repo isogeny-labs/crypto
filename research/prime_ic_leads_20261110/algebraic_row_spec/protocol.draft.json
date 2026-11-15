@@ -1,0 +1,1049 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "DRAFT-prime-ic-algebraic-track-first-row-20261111",
+  "version": 1,
+  "created": "2026-11-11",
+  "repository": "crypto",
+  "study_dir": "research/prime_ic_leads_20261110/algebraic_row_spec",
+  "authors": [
+    "prime IC leads session, lead 4 (draft, not frozen; no data taken)"
+  ],
+  "links": {
+    "readme": "research/prime_ic_leads_20261110/algebraic_row_spec/README.md",
+    "protocol_prose": "research/prime_ic_leads_20261110/algebraic_row_spec/PROTOCOL.md",
+    "spec": "research/prime_ic_leads_20261110/algebraic_row_spec/spec.json",
+    "spec_m3": "research/prime_ic_leads_20261110/algebraic_row_spec/spec-m3.json",
+    "blockers": "research/prime_ic_leads_20261110/algebraic_row_spec/BLOCKERS.md",
+    "lead": "research/prime_ic_leads_20261110/README.md section 7, lead 4",
+    "program": "research/prime_ic_program_20261029/README.md section 2.2; DECISIONS.md (R1 Option C, D1, D2, D-EKS)",
+    "smoke_evidence": "research/curve25519_ic_ratchet_20261102/sessions/pkm-smoke-k20; research/curve25519_algebraic_ladder_20261102/README.md and sessions/e2e-iso-t6-k20",
+    "incumbent_evidence": "docs/ic/leaderboard.json (Table B rows fp16/fp18/fp20)",
+    "status_note": "DRAFT. Nothing is frozen and no data exists. FILL-AT-FREEZE fields must be set and tools/experiment_protocol.py freeze run before the first execution."
+  },
+  "question": "What does the lab's only native prime-field algebraic oracle (pkm-semaev: S_(m+1) plus the membership equations of PKM's isogeny tower, solved by F4 over the tower ring) cost on three Table B curves (fp16, fp18, fp20), cold whole pipeline, in S = GAE/sqrt(r) across the AGENTS.md 5a band at w = 0, 0.1 and 1, against matched rho.negation and the generic-track incumbent on the same targets? This is the first counted row of the prime-field algebraic track: it establishes the track's own baseline and reports its distance to rho. It tests no new method and licenses no improvement or parity claim.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every iso-* run verifies [d]G = Q, and on every (target, t) the F4 arm and its engine=exhaustive grid arm have identical targets_tried, relations_found and matrix_rank, with zero crosscheck disagreements in the xchk arms (relation-stream identity).",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Distance remaining: the cheapest verified pkm-semaev m=2 isogeny arm on each curve costs X times matched rho.negation at w = 0, 0.1 and 1 (paired ratio of summed S, 95% cluster-bootstrap interval over the 8 targets of the curve); reported as a distance, not a pass/fail gate.",
+      "class": "comparative",
+      "decided_by": [
+        "C-iso-rho"
+      ],
+      "if_supported": "the algebraic track has a counted baseline on Table B curves at these sizes; later algebraic-track candidates ratchet against it",
+      "if_not_supported": "the row is not established (an admission check failed) and no algebraic-track baseline exists yet"
+    },
+    {
+      "id": "C3",
+      "text": "Context: the order of the best iso arm and the matched generic incumbent (inc-n*) across the band, read as ecbench band --ranks does: cheaper at every weight, or unresolved inside the band. Under AGENTS.md \"Tracks of index calculus\" the tracks may be ranked against each other on the same instances; neither ratchets the other.",
+      "class": "comparative",
+      "decided_by": [
+        "C-iso-inc"
+      ]
+    },
+    {
+      "id": "C4",
+      "text": "Context: on the same system, the counted grid (engine=exhaustive) is the cost an algebraic engine has to beat; report F4 over grid S at each weight.",
+      "class": "comparative",
+      "decided_by": [
+        "C-f4-grid"
+      ]
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "On each Table B curve the cheapest pkm-semaev m=2 isogeny arm is at least 10^4 times matched rho at w = 0.1 (the F4 multiply-adds, priced at 0.1 GAE each, dominate the whole pipeline).",
+      "mechanism": "Per-trial F4 work is 10^6 to 10^8 F_p multiply-adds at t = 4..6 (Q-D table), against about one GAE of walking per trial; at w = 0.1 each multiply-add costs a tenth of a group addition.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "s_w01",
+          "direction": "higher",
+          "minimum_effect": "best iso arm / rho-neg paired ratio of summed S at w = 0.1, lower 95% bound above 1e4 on every curve",
+          "provenance": {
+            "written_at": "2026-11-11",
+            "data_seen": [
+              {
+                "path": "research/curve25519_algebraic_ladder_20261102/README.md",
+                "measured": "k = 20 miniature, 2 targets, isogeny t = 6, m = 2: S = 42.4 / 1.9e8 / 1.9e9 at w = 0 / 0.1 / 1 against rho.negation 1.71 / 1.84 / 2.99 [pcc:unverified]"
+              },
+              {
+                "path": "research/curve25519_algebraic_ladder_20261102/sessions/e2e-iso-t6-k20/records.jsonl",
+                "measured": "targets_tried 11692 and 14932, F4 multiply-adds 6.16e11 and 7.78e11, solve wall 823.5 s and 1022 s, peak RSS about 25 MB, 25 columns, 15 and 18 relations [pcc:unverified]"
+              },
+              {
+                "path": "research/curve25519_algebraic_ladder_20261102/README.md",
+                "measured": "Q-D table, isogeny form, k = 20: F4 multiply-adds per target 5.23e5 (t=4), 3.96e6 (t=5), 5.55e7 (t=6), 7.46e8 (t=7); columns 9, 18, 25, 65 [pcc:unverified]"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "statement": "Within t = 4..6 the cost at w >= 0.1 rises with t on every curve: F4 work per trial grows about 14x per step in t while the trials needed fall by less than 2x.",
+      "mechanism": "Hit probability per trial is about 2c^2/N for c columns, relations needed are about 0.7c, so trials fall as 1/c while c grows by 1.4-2x per step; Q-D F4 work per trial grows 7.5x (t=4 to 5) and 14x (t=5 to 6).",
+      "predictions": [
+        {
+          "id": "P2",
+          "metric": "s_w01",
+          "direction": "higher",
+          "minimum_effect": "iso-t6-m2 / iso-t4-m2 paired ratio of summed S at w = 0.1, lower 95% bound above 5 on every curve",
+          "provenance": {
+            "written_at": "2026-11-11",
+            "data_seen": [
+              {
+                "path": "research/curve25519_algebraic_ladder_20261102/README.md",
+                "measured": "Q-D table, isogeny form, k = 20: F4 multiply-adds per target 5.23e5 (t=4), 3.96e6 (t=5), 5.55e7 (t=6), 7.46e8 (t=7); columns 9, 18, 25, 65 [pcc:unverified]"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    },
+    {
+      "id": "H3",
+      "statement": "At w = 0 the isogeny arms cost a small multiple of the matched generic incumbent, so the whole gap to the incumbent sits in the priced F4 work.",
+      "mechanism": "At w = 0 only group operations are charged: about one walk step per trial plus the one-off aux-curve search, comparable to the incumbent's walk.",
+      "predictions": [
+        {
+          "id": "P3",
+          "metric": "s_w0",
+          "direction": "equal_within",
+          "minimum_effect": "iso-t6-m2 / matched inc paired ratio of summed S at w = 0 within [2, 10] on fp20 (calibrated on 5.4 = 42.4/7.92 at k = 20)",
+          "provenance": {
+            "written_at": "2026-11-11",
+            "data_seen": [
+              {
+                "path": "research/curve25519_algebraic_ladder_20261102/README.md",
+                "measured": "k = 20 miniature, 2 targets, isogeny t = 6, m = 2: S = 42.4 / 1.9e8 / 1.9e9 at w = 0 / 0.1 / 1 against rho.negation 1.71 / 1.84 / 2.99 [pcc:unverified]"
+              },
+              {
+                "path": "research/curve25519_algebraic_ladder_20261102/sessions/e2e-iso-t6-k20/records.jsonl",
+                "measured": "targets_tried 11692 and 14932, F4 multiply-adds 6.16e11 and 7.78e11, solve wall 823.5 s and 1022 s, peak RSS about 25 MB, 25 columns, 15 and 18 relations [pcc:unverified]"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    },
+    {
+      "id": "H4",
+      "statement": "F4 refutations never disagree with the grid: the F4 and grid arms emit identical relation streams.",
+      "mechanism": "The oracle decides every non-refuted system on the grid and counts budget_exceeded; a refutation is exact over F_p.",
+      "predictions": [
+        {
+          "id": "P4",
+          "metric": "relation_stream_identity",
+          "direction": "equal_within",
+          "minimum_effect": "zero disagreements and equal targets_tried / relations_found / matrix_rank for every (target, t)",
+          "provenance": {
+            "written_at": "2026-11-11",
+            "data_seen": [
+              {
+                "path": "src/cryptanalysis/ecbench/methods.rs",
+                "measured": "unit test asserting f4 and grid counters equal for prime-kummer t = 2, m = 3 (code reading, not a run)"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "matched Pollard rho with the negation map, rho.negation, same workloads and targets",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "taskq/deploy/eks-karpenter/build-bundle",
+            "SOURCE_DIR",
+            "COMMIT",
+            "OUTPUT_DIR"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation repeated under a second arm name",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "inc-n20",
+      "role": "baseline",
+      "description": "generic-track incumbent, Table B recipe mitm_m2_negfold_walk_balanced re-measured in ecbench: prime-abscissa:size=20 (the leaderboard column count of the fp16 row), negation-folded pair table, walked targets, m = 2. The arm with the matching size is the incumbent of that curve; the other two are context",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=20",
+        "oracle": "mitm:negation_folded=1",
+        "targets": "walk"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "inc-n32",
+      "role": "baseline",
+      "description": "generic-track incumbent, Table B recipe mitm_m2_negfold_walk_balanced re-measured in ecbench: prime-abscissa:size=32 (the leaderboard column count of the fp18 row), negation-folded pair table, walked targets, m = 2. The arm with the matching size is the incumbent of that curve; the other two are context",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "targets": "walk"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "inc-n51",
+      "role": "baseline",
+      "description": "generic-track incumbent, Table B recipe mitm_m2_negfold_walk_balanced re-measured in ecbench: prime-abscissa:size=51 (the leaderboard column count of the fp20 row), negation-folded pair table, walked targets, m = 2. The arm with the matching size is the incumbent of that curve; the other two are context",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=51",
+        "oracle": "mitm:negation_folded=1",
+        "targets": "walk"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t4-m2",
+      "role": "candidate",
+      "description": "pkm-semaev on prime-isogeny:t=4 (seed 0), m = 2, mode full: S_3 plus the Velu 2-isogeny tower membership equations, F4 over the tower ring, hits read off the grid and lifted",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=4",
+        "oracle": "pkm-semaev:m=2,mode=full",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t5-m2",
+      "role": "candidate",
+      "description": "pkm-semaev on prime-isogeny:t=5 (seed 0), m = 2, mode full: S_3 plus the Velu 2-isogeny tower membership equations, F4 over the tower ring, hits read off the grid and lifted",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=5",
+        "oracle": "pkm-semaev:m=2,mode=full",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t6-m2",
+      "role": "candidate",
+      "description": "pkm-semaev on prime-isogeny:t=6 (seed 0), m = 2, mode full: S_3 plus the Velu 2-isogeny tower membership equations, F4 over the tower ring, hits read off the grid and lifted",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=6",
+        "oracle": "pkm-semaev:m=2,mode=full",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t5-m2-aa",
+      "role": "control_aa",
+      "description": "iso-t5-m2 repeated under a second arm name",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=5",
+        "oracle": "pkm-semaev:m=2,mode=full",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t4-m2-grid",
+      "role": "control_negative",
+      "description": "iso-t4-m2 with engine=exhaustive: the counted V^2 grid on the same system (negative control and the cost F4 has to beat)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=4",
+        "oracle": "pkm-semaev:m=2,mode=full,engine=exhaustive",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t5-m2-grid",
+      "role": "control_negative",
+      "description": "iso-t5-m2 with engine=exhaustive: the counted V^2 grid on the same system (negative control and the cost F4 has to beat)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=5",
+        "oracle": "pkm-semaev:m=2,mode=full,engine=exhaustive",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t6-m2-grid",
+      "role": "control_negative",
+      "description": "iso-t6-m2 with engine=exhaustive: the counted V^2 grid on the same system (negative control and the cost F4 has to beat)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=6",
+        "oracle": "pkm-semaev:m=2,mode=full,engine=exhaustive",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t4-m2-xchk",
+      "role": "control_negative",
+      "description": "iso-t4-m2 with crosscheck=1: every F4 refutation is grid-checked (diagnostic, not charged); pkm_crosscheck_disagreements must be 0",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=4",
+        "oracle": "pkm-semaev:m=2,mode=full,crosscheck=1",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "iso-t5-m2-xchk",
+      "role": "control_negative",
+      "description": "iso-t5-m2 with crosscheck=1: every F4 refutation is grid-checked (diagnostic, not charged); pkm_crosscheck_disagreements must be 0",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-isogeny:t=5",
+        "oracle": "pkm-semaev:m=2,mode=full,crosscheck=1",
+        "targets": "walk",
+        "max_trials": "400000"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa-iso",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "ecbench ic.pipeline cannot plant a known decomposition R = P_i +- P_j into a trial; there is no oracle-check command for pkm-semaev yet. The exactness checks that exist are C1 (F4 against the counted grid on every trial, identical streams) and recovery of a hashed public target by [d]G = Q. A planted-decomposition detector is an implementation gap recorded in BLOCKERS.md; until it exists the row is admitted without a positive control and says so."
+    },
+    "negative": {
+      "present": true,
+      "arm": "iso-t5-m2-grid",
+      "null_population": {
+        "description": "trial points at which the grid over V^2 finds no decomposition; F4 must return a refutation on every one (zero false positives) and the F4 and grid arms must emit identical relation streams",
+        "generator": "the walked trial stream of each iso execution, classified by the grid arm on the same system",
+        "n": 1000,
+        "why_n": "every execution has more than 1000 trials (derived 910 to 40,717 per execution, README section 6); zero disagreements over 1000 non-decomposing points bound the rate below 0.3% (one-sided 95%)",
+        "matched_on": [
+          "curve",
+          "factor base",
+          "system presentation",
+          "trial point"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "ic.pipeline"
+        ]
+      },
+      {
+        "name": "decomposition oracle",
+        "levels": [
+          "mitm:negation_folded=1",
+          "pkm-semaev:m=2,mode=full"
+        ]
+      },
+      {
+        "name": "system engine",
+        "levels": [
+          "f4",
+          "exhaustive"
+        ]
+      },
+      {
+        "name": "isogeny tower height t",
+        "levels": [
+          "4",
+          "5",
+          "6"
+        ]
+      },
+      {
+        "name": "curve (Table B)",
+        "levels": [
+          "fp16",
+          "fp18",
+          "fp20"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "prime_roster bits 16, 18, 20 (icv1-fp16-t351-d433f24e, icv1-fp18-t175-45770ebc, icv1-fp20-t1293-3c2999ba)",
+        "how": "frozen spec workloads; curve slugs checked with ecbench plan before freeze"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "target_seed 1504454584 = sha256(\"prime-ic-algebraic-row-20261111|target_seed\") mod 2^31, public targets, 8 per curve",
+        "how": "same target set for every arm on a curve"
+      },
+      {
+        "name": "walk_seed",
+        "treatment": "fixed",
+        "value": "the harness's algorithm seed per (target, round), shared by all arms",
+        "how": "ecbench plan derives algorithm_seed per execution from measurement.seed independently of arm, so inc and pub-m2 see the same walked trial stream"
+      },
+      {
+        "name": "factor_base_identity",
+        "treatment": "fixed",
+        "value": "FB1h id per (curve, t); grid and xchk arms share the F4 arm's base",
+        "how": "the same prime-abscissa spec gives the same FB1h id in inc and pub-m2; checked from records"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "msolve -t 1, RAYON_NUM_THREADS=1, one execution per CPU"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "measurement.order alternate within each round"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "cpu model, kernel, isolation level, steal and PSI per record; wall metrics compared only within one host"
+      },
+      {
+        "name": "spot_preemption",
+        "treatment": "measured",
+        "how": "a preempted execution is re-run fresh (infrastructure retry); counted values are host independent, its wall time is discarded"
+      },
+      {
+        "name": "auxiliary-curve seed",
+        "treatment": "fixed",
+        "value": "seed 0 (the prime-isogeny default)",
+        "how": "not a design choice; searching it would select luck (docs/ic/SWEEPER.md)"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-iso-rho",
+        "arms": [
+          "iso-t5-m2",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "reason": "distance remaining (the cheapest iso arm per curve, chosen by the rule in decision_rule, not by looking)"
+      },
+      {
+        "id": "C-iso-inc",
+        "arms": [
+          "iso-t5-m2",
+          "inc-n32"
+        ],
+        "differs_in": [
+          "decomposition oracle"
+        ],
+        "design": "one_factor",
+        "reason": "generic incumbent against algebraic arm; the incumbent arm is the one whose size matches the curve"
+      },
+      {
+        "id": "C-f4-grid",
+        "arms": [
+          "iso-t5-m2",
+          "iso-t5-m2-grid"
+        ],
+        "differs_in": [
+          "system engine"
+        ],
+        "design": "one_factor",
+        "reason": "the cost F4 has to beat on the same system; also the stream-identity check"
+      },
+      {
+        "id": "C-t",
+        "arms": [
+          "iso-t6-m2",
+          "iso-t4-m2"
+        ],
+        "differs_in": [
+          "isogeny tower height t"
+        ],
+        "design": "one_factor",
+        "reason": "H2"
+      },
+      {
+        "id": "C-aa-iso",
+        "arms": [
+          "iso-t5-m2",
+          "iso-t5-m2-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": null
+      },
+      {
+        "id": "C-aa-rho",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": null
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false,
+    "transfer_obligations": []
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        1504454584,
+        976050496
+      ],
+      "nonce": null,
+      "note": "seeds are the first 8 bytes (big-endian) of sha256(\"prime-ic-algebraic-row-20261111|<name>\") modulo 2^31, fixed before any data and written into spec.json; the algorithm seed of each execution is derived by ecbench from (measurement.seed, workload id, round), shared by every arm"
+    },
+    "instance_sampling": {
+      "rule": "the three curves are the Table B roster entries fp16, fp18, fp20; targets are hashed public targets (hash_to_subgroup_v1), indices 0..7, independent of arm",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "tools/experiment_protocol.py blind on the export before ecbench compare/band are read; labels unmasked after the decision table is written",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 24,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 4,
+      "correction": "holm",
+      "rank_test_n": 8,
+      "min_attainable_two_sided_p": 0.0078125,
+      "passes": true,
+      "note": "8 targets per curve; the minimum two-sided sign-test p over 8 pairs is 2/2^8 = 0.0078, below 0.05/4. The predictions are order-of-magnitude (1e4, 5x) against per-target spread of about 30% (derived from 11692 vs 14932 trials on two k = 20 targets), so the design resolves them; it does not resolve a 20% effect, and none is claimed."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 15228,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "s_w0",
+        "name": "S at w = 0",
+        "unit": "ecbench.gae / sqrt(r)",
+        "kind": "counted",
+        "definition": "cold whole solve, every phase charged (factor base, oracle setup, relations, linear algebra, verify), unpriced native work at 0",
+        "source": "ecbench band / compare --weight 0",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "s_w01",
+        "name": "S at w = 0.1",
+        "unit": "ecbench.gae / sqrt(r)",
+        "kind": "derived",
+        "definition": "G - C + 0.1 (U + n_C) over sqrt(r) (src/cryptanalysis/ecbench/band.rs); U includes the msolve multiply-adds and every *_uncharged counter of every arm, rho included",
+        "source": "ecbench band / compare --weight 0.1",
+        "formula": "priced_gae(w) / sqrt(r)",
+        "aggregation": "paired_ratio",
+        "resolution": "0.1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "s_w1",
+        "name": "S at w = 1",
+        "unit": "ecbench.gae / sqrt(r)",
+        "kind": "derived",
+        "definition": "as s_w01 at w = 1",
+        "source": "ecbench band / compare --weight 1",
+        "formula": "priced_gae(w) / sqrt(r)",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "alpha_w01",
+        "name": "fitted exponent at w = 0.1",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "slope of log priced cost against log r over the measured sizes",
+        "source": "ecbench bound fit",
+        "formula": "least squares on per-size means",
+        "aggregation": "per_row",
+        "resolution": null,
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "hit_rate",
+        "name": "decomposition hit rate",
+        "unit": "relations per trial",
+        "kind": "rate",
+        "definition": "relations_found / targets_tried",
+        "source": "records counters",
+        "aggregation": "mean",
+        "resolution": null,
+        "uncertainty": "clopper_pearson_ci95"
+      },
+      {
+        "id": "peak_rss",
+        "name": "peak RSS",
+        "unit": "bytes",
+        "kind": "counted",
+        "definition": "runner peak RSS of the execution, children included",
+        "source": "records resources",
+        "aggregation": "max",
+        "resolution": null,
+        "uncertainty": "range"
+      },
+      {
+        "id": "f4_muladds_per_trial",
+        "name": "F4 F_p multiply-adds per trial",
+        "unit": "F_p multiply-adds",
+        "kind": "counted",
+        "definition": "solver.ops / counters.targets_tried",
+        "source": "records solver.ops and counters.targets_tried",
+        "formula": "solver.ops / targets_tried",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "solve_wall_seconds",
+        "name": "solve wall time (descriptive)",
+        "unit": "s",
+        "kind": "timed",
+        "definition": "harness solve interval at L0 on a command Job: diagnostic only, never a result",
+        "source": "records time.solve_wall_ns",
+        "aggregation": "median",
+        "resolution": "1 us",
+        "uncertainty": "range"
+      },
+      {
+        "id": "relation_stream_identity",
+        "name": "F4 vs grid relation-stream disagreements",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "number of (target, t) cells where targets_tried, relations_found or matrix_rank differ between an F4 arm and its engine=exhaustive arm, plus pkm_crosscheck_disagreements",
+        "source": "records counters and phases.relations.native",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "targets_tried",
+      "relations_found",
+      "matrix_rank",
+      "solver_calls",
+      "solver_ops",
+      "solver_budget_exceeded",
+      "pkm_system_fp_mults_uncharged",
+      "pkm_grid_fp_mults_uncharged",
+      "pkm_crosscheck_disagreements",
+      "canonicalisations_uncharged"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "isolation.level",
+      "threads"
+    ],
+    "timed_primary_justification": "no wall-time claim is made: S is a count; wall time is descriptive (a command Job has no native L2 admission)"
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "route": "isolab-eks command Job (isolab.eks.command-request/v1 via remote/launch-remote-command), because the audited isolab_k8s_benchmark contract requires L2, at least five rounds and a matching A/A, which a counts-only row does not need and which would multiply the run by 6 and cap each Job at 3600 s",
+      "instance_type": "FILL-AT-FREEZE (one x86 family for the whole row)",
+      "cpus_per_execution": 1,
+      "memory_per_execution": "4Gi pod (the command-request minimum cpu is 2) for spec.json (measured peak RSS about 25 MB at t = 6 on the k = 20 anchor); 8Gi for spec-m3.json (unmeasured)",
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 7200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: 14 arms x 3 curves x 8 targets x 1 round in spec.json (336 executions); stop when every planned execution has a record",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "budget: ceiling of 46 pod vCPU-hours for the whole row (2-vCPU pods: run and in-job replay-all Job deadline 54000 s; independent-replay Job deadline 28800 s; derived expectation 25 vCPU-hours, README section 6), inside the approved D-EKS allowance of about 49 CPU-hours, and a USD 10 ceiling for builds, idle and retries (plan). If a deadline or the ceiling is reached the session is kept as interrupted evidence, the unfinished executions are reported censored, and nothing is re-run with a larger limit",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "preflight gate for spec-m3.json: run 2 targets of iso-t4-m3-chain before freezing it; if the measured F4 multiply-adds per target exceed 3e11 (about 400 s), spec-m3.json is not run and the row says the m = 3 cell is unmeasured",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "any C1 mismatch (F4 and grid streams differ, a crosscheck disagreement, a run that does not verify) or any non-identical replay voids every iso-* record of that session",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "an execution that reaches timeout_seconds is censored, recorded, and never re-run with a larger timeout",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Admission (all must hold, else the row is not established): every iso-* run verifies; C1 holds (identical streams, zero crosscheck disagreements); ecbench verify --replay-all is identical in the job and on an independent host class; C-aa-iso and C-aa-rho counted ratios are exactly 1.000. Then C2 reports, per curve and weight, sum S of the cheapest iso arm over sum S of rho-neg with its 95% cluster-bootstrap interval as the distance remaining; the cheapest arm per curve is the one with the smallest sum S at w = 0.1, fixed by this rule, and all arms are reported. C3 reports the ecbench band --ranks order of that arm against the matched inc arm as cheaper at every weight or unresolved. C4 reports F4 over grid S. No result is called an improvement of the generic track, no result ratchets another track, and no parity claim follows from any outcome.",
+    "comparison_ids": [
+      "C-iso-rho",
+      "C-iso-inc",
+      "C-f4-grid",
+      "C-t"
+    ],
+    "threshold": "no pass/fail threshold on C-iso-rho (distance remaining, owner criterion 2026-10-15); H1 and H2 thresholds read as stated in the predictions",
+    "statistic": "ratio of summed S over matched (target, round) pairs (ecbench compare), per curve",
+    "interval": "cluster bootstrap over the 8 targets of a curve, 95%, 4000 resamples",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "ratio of summed S per weight",
+    "verdict_vocabulary": [
+      "established",
+      "not_established"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/prime_ic_leads_20261110/algebraic_row_spec/analysis.sh (to be written and hashed before freeze: ecbench compare --weight W, ecbench band --ranks, ecbench bound fit, experiment_protocol.py blind)",
+      "sha256": null
+    },
+    "inputs": [
+      "sessions/*/records.jsonl"
+    ],
+    "outputs": [
+      "analysis/compare-*.json",
+      "analysis/band-*.json"
+    ],
+    "blinded": true,
+    "frozen_before_data": false
+  },
+  "inadmissible": [
+    "changing curves, t, targets, seeds, unit, band weights or accounting after seeing results",
+    "quoting S(0) alone for an arm with unpriced solver work",
+    "calling an iso arm an improvement of, or a regression of, the generic track, or the reverse",
+    "pricing F4 work by host wall time inside S",
+    "choosing the reported arm per curve other than by the decision rule",
+    "dropping censored executions",
+    "running spec-m3.json when its preflight bound failed, or re-running any execution with a larger timeout",
+    "describing the row as parity, as a new algorithm, or as a security statement"
+  ],
+  "amendments": [],
+  "invalidation_rules": [
+    "a record whose binary_sha256 or image digest differs from the frozen build",
+    "C1 mismatch",
+    "a non-identical replay",
+    "a run that does not verify"
+  ],
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "S per arm vs curve at w = 0, 0.1, 1 with intervals",
+      "F4 multiply-adds per trial vs t per curve",
+      "distance to rho vs log2 r"
+    ],
+    "report_dir": "research/prime_ic_leads_20261110/algebraic_row_spec/reports"
+  },
+  "literature": [
+    {
+      "ref": "C. Petit, M. Kosters, A. Messeng, Algebraic approaches for the elliptic curve discrete logarithm problem over prime fields, PKC 2016",
+      "provenance": "internal",
+      "claim": "the Kummer and isogeny tower factor bases (as cited in src/cryptanalysis/ic_framework/pkm_semaev.rs and research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md); not re-read for this draft",
+      "verified_by": null
+    },
+    {
+      "ref": "I. Semaev, Summation polynomials and the discrete logarithm problem on elliptic curves, ePrint 2004/031",
+      "provenance": "internal",
+      "claim": "S_(m+1) decomposition (as cited in the repository notes)",
+      "verified_by": null
+    }
+  ],
+  "extensions": {
+    "draft_status": "DRAFT - not frozen; FILL-AT-FREEZE fields open",
+    "ecbench_specs": [
+      "spec.json",
+      "spec-m3.json"
+    ],
+    "estimated_total_seconds_basis": "derived, not measured: README.md section 6 (model anchored on the k = 20 isogeny t = 6 end-to-end session and the Q-D table)"
+  },
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

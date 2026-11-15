@@ -2,9 +2,6 @@
 //! usage: prime_fast_j0_rho <out.jsonl> <bits> <targets>
 //!
 //! Curve y^2 = x^3 + b over F_p, p = 1 mod 3, prime order n.  phi(x,y) = (beta x, y) = [lambda]P.
-//! Symmetric arm: B orbit representatives, 6B covered points, B unknowns.
-//! Plain arm (`ic_solve`, 2 summands): 3B x-coordinates covered, 3B unknowns.
-//! usage: prime_fast_j0_sym <out.jsonl> <bits> <B,B,...> <instances> <extra>
 use crypto_lib::cryptanalysis::challenge_ladder::is_prime_u64;
 use crypto_lib::cryptanalysis::prime_fast::*;
 use rand::rngs::StdRng;
@@ -12,49 +9,6 @@ use rand::{Rng, SeedableRng};
 use serde_json::json;
 use std::io::Write;
 use std::time::Instant;
-
-/// Open-addressing x -> (orbit element id) table.
-struct XTable {
-    keys: Vec<u64>,
-    vals: Vec<u32>,
-    mask: usize,
-}
-impl XTable {
-    fn new(cap: usize) -> Self {
-        let n = (cap * 4).next_power_of_two();
-        XTable {
-            keys: vec![u64::MAX; n],
-            vals: vec![0; n],
-            mask: n - 1,
-        }
-    }
-    #[inline(always)]
-    fn h(&self, k: u64) -> usize {
-        (k.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & self.mask
-    }
-    fn insert(&mut self, k: u64, v: u32) {
-        let mut i = self.h(k);
-        while self.keys[i] != u64::MAX {
-            i = (i + 1) & self.mask;
-        }
-        self.keys[i] = k;
-        self.vals[i] = v;
-    }
-    #[inline(always)]
-    fn get(&self, k: u64) -> Option<u32> {
-        let mut i = self.h(k);
-        loop {
-            let kk = self.keys[i];
-            if kk == k {
-                return Some(self.vals[i]);
-            }
-            if kk == u64::MAX {
-                return None;
-            }
-            i = (i + 1) & self.mask;
-        }
-    }
-}
 
 fn find_j0_curve(bits: u32, skip: u64) -> (FastCurve, Pt, u64, u64) {
     let mut p = (1u64 << bits) - 1;
@@ -149,6 +103,7 @@ fn folded_rho(
     lam: u64,
     dp_bits: u32,
     seed: u64,
+    cyc: bool,
 ) -> Option<(u64, u64)> {
     let f = c.f;
     let n = c.n;
@@ -182,6 +137,8 @@ fn folded_rho(
         }
         let (mut a, mut b) = (mulm(a0, mu), mulm(b0, mu));
         let mut len = 0u64;
+        let mut ring = [u64::MAX; 8];
+        let mut ri = 0usize;
         loop {
             if f.from_mont(p.x) & mask == 0 {
                 let key = f.from_mont(p.x) ^ (f.from_mont(p.y) << 32);
@@ -200,11 +157,22 @@ fn folded_rho(
                 break;
             }
             let h = (f.from_mont(p.x) as usize) % R;
-            let (t, u, v) = tb[h];
-            let Some(p1) = c.add(Some(p), Some(t)) else {
+            let (mut t, mut u, mut v) = tb[h];
+            let Some(mut p1) = c.add(Some(p), Some(t)) else {
                 break;
             };
-            let (p2, s, neg) = canon_pt(c, beta, beta2, p1);
+            let (mut p2, mut s, mut neg) = canon_pt(c, beta, beta2, p1);
+            if cyc && ring.contains(&p2.x) {
+                // fruitless short cycle: leave it through a different jump
+                (t, u, v) = tb[(h + 1) % R];
+                let Some(q1) = c.add(Some(p), Some(t)) else {
+                    break;
+                };
+                p1 = q1;
+                (p2, s, neg) = canon_pt(c, beta, beta2, p1);
+            }
+            ring[ri & 7] = p2.x;
+            ri += 1;
             let mut mu = lams[s];
             if neg {
                 mu = (n - mu) % n;
@@ -240,7 +208,15 @@ fn main() {
             let k = rng.gen_range(2..c.n);
             let q = c.mul(Some(g), k).unwrap();
             let t0 = Instant::now();
-            if let Some((x, st)) = folded_rho(&c, g, q, lam, dp_bits, t + 1) {
+            if let Some((x, st)) = folded_rho(
+                &c,
+                g,
+                q,
+                lam,
+                dp_bits,
+                t + 1,
+                std::env::var_os("CYCFIX").is_some(),
+            ) {
                 if x == k {
                     ok += 1;
                 }

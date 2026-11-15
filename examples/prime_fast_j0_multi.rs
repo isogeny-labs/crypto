@@ -130,6 +130,7 @@ fn beta_of(c: &FastCurve, g: Pt, lam: u64) -> u64 {
 type Term = (usize, usize, i8); // (rep, rotation k, sign)
 
 struct Ctx<'a> {
+    rot: bool,
     c: &'a FastCurve,
     reps: Vec<Pt>,
     cand: Vec<Pt>,
@@ -137,6 +138,8 @@ struct Ctx<'a> {
     ents: Vec<(u64, u32, u32, u8, u8, u8)>,
     heads: Vec<u32>,
     next: Vec<u32>,
+    slots: Vec<(u32, u32)>,
+    lp: bool,
     hmask: usize,
     beta: u64,
     beta2: u64,
@@ -155,7 +158,7 @@ impl<'a> Ctx<'a> {
             (x2, 1)
         }
     }
-    fn build(c: &'a FastCurve, g: Pt, lam: u64, b_size: usize) -> Self {
+    fn build(c: &'a FastCurve, g: Pt, lam: u64, b_size: usize, rot: bool) -> Self {
         let f = c.f;
         let beta = beta_of(c, g, lam);
         let beta2 = f.mul(beta, beta);
@@ -188,6 +191,7 @@ impl<'a> Ctx<'a> {
             });
         }
         let mut me = Ctx {
+            rot,
             c,
             reps,
             cand,
@@ -195,6 +199,8 @@ impl<'a> Ctx<'a> {
             ents: vec![],
             heads: vec![],
             next: vec![],
+            slots: vec![],
+            lp: std::env::var_os("LINPROBE").is_some(),
             hmask: 0,
             beta,
             beta2,
@@ -205,8 +211,16 @@ impl<'a> Ctx<'a> {
         for i in 0..b_size {
             let fi = me.reps[i];
             if let Some(dbl) = c.double(fi) {
-                let (kk, se) = me.canon(dbl.x);
-                ents.push((kk, i as u32, i as u32, 0, 0, se as u8));
+                if rot {
+                    let mut a1 = dbl.x;
+                    for t2 in 0..3u8 {
+                        ents.push((a1, i as u32, i as u32, 0, 0, t2));
+                        a1 = f.mul(beta, a1);
+                    }
+                } else {
+                    let (kk, se) = me.canon(dbl.x);
+                    ents.push((kk, i as u32, i as u32, 0, 0, se as u8));
+                }
             }
             for j in i..b_size {
                 dd.clear();
@@ -223,21 +237,43 @@ impl<'a> Ctx<'a> {
                     }
                     let sx = c.add_x_with_inv(fi, qj, dd[t]);
                     let dx2 = c.add_x_with_inv(fi, c.neg(qj), dd[t]);
-                    let (k1, s1) = me.canon(sx);
-                    ents.push((k1, i as u32, j as u32, m as u8, 0, s1 as u8));
-                    let (k2, s2) = me.canon(dx2);
-                    ents.push((k2, i as u32, j as u32, m as u8, 1, s2 as u8));
+                    if rot {
+                        let mut a1 = sx;
+                        let mut a2 = dx2;
+                        for t2 in 0..3u8 {
+                            ents.push((a1, i as u32, j as u32, m as u8, 0, t2));
+                            ents.push((a2, i as u32, j as u32, m as u8, 1, t2));
+                            a1 = f.mul(beta, a1);
+                            a2 = f.mul(beta, a2);
+                        }
+                    } else {
+                        let (k1, s1) = me.canon(sx);
+                        ents.push((k1, i as u32, j as u32, m as u8, 0, s1 as u8));
+                        let (k2, s2) = me.canon(dx2);
+                        ents.push((k2, i as u32, j as u32, m as u8, 1, s2 as u8));
+                    }
                 }
             }
         }
         let hs = (ents.len() * 2).next_power_of_two().max(16);
         me.hmask = hs - 1;
-        me.heads = vec![u32::MAX; hs];
-        me.next = vec![u32::MAX; ents.len()];
-        for (e, ent) in ents.iter().enumerate() {
-            let h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & me.hmask;
-            me.next[e] = me.heads[h];
-            me.heads[h] = e as u32;
+        if me.lp {
+            me.slots = vec![(u32::MAX, 0); hs];
+            for (e, ent) in ents.iter().enumerate() {
+                let mut h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & me.hmask;
+                while me.slots[h].0 != u32::MAX {
+                    h = (h + 1) & me.hmask;
+                }
+                me.slots[h] = (e as u32, (ent.0 >> 17) as u32);
+            }
+        } else {
+            me.heads = vec![u32::MAX; hs];
+            me.next = vec![u32::MAX; ents.len()];
+            for (e, ent) in ents.iter().enumerate() {
+                let h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & me.hmask;
+                me.next[e] = me.heads[h];
+                me.heads[h] = e as u32;
+            }
         }
         me.ents = ents;
         me
@@ -263,17 +299,42 @@ impl<'a> Ctx<'a> {
             let lp = f.mul(f.sub(r.y, fi.y), inv);
             for (eps, l) in [(1i8, lm), (-1i8, lp)] {
                 let x3 = f.sub(f.sub(f.sqr(l), r.x), fi.x);
-                let (key, sft0) = self.canon(x3);
+                let (key, sft0) = if self.rot { (x3, 0) } else { self.canon(x3) };
                 let h = (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & self.hmask;
-                let mut e = self.heads[h];
-                while e != u32::MAX {
-                    let ent = self.ents[e as usize];
-                    e = self.next[e as usize];
-                    if ent.0 != key {
-                        continue;
+                let mut hits = [0u32; 16];
+                let mut nh = 0usize;
+                if self.lp {
+                    let fp = (key >> 17) as u32;
+                    let mut i = h;
+                    loop {
+                        let (idx, sfp) = self.slots[i];
+                        if idx == u32::MAX {
+                            break;
+                        }
+                        if sfp == fp && self.ents[idx as usize].0 == key && nh < 16 {
+                            hits[nh] = idx;
+                            nh += 1;
+                        }
+                        i = (i + 1) & self.hmask;
                     }
+                } else {
+                    let mut e = self.heads[h];
+                    while e != u32::MAX {
+                        if self.ents[e as usize].0 == key && nh < 16 {
+                            hits[nh] = e;
+                            nh += 1;
+                        }
+                        e = self.next[e as usize];
+                    }
+                }
+                for &e in &hits[..nh] {
+                    let ent = self.ents[e as usize];
                     let (ei, ej, em, sg) = (ent.1 as usize, ent.2 as usize, ent.3 as usize, ent.4);
-                    let sft = (sft0 + 3 - ent.5 as usize) % 3;
+                    let sft = if self.rot {
+                        ent.5 as usize
+                    } else {
+                        (sft0 + 3 - ent.5 as usize) % 3
+                    };
                     let fb_ = self.cand[3 * ej + em];
                     let fb_ = if sg == 1 { c.neg(fb_) } else { fb_ };
                     let Some(pp) = c.add(Some(self.reps[ei]), Some(fb_)) else {
@@ -327,6 +388,7 @@ fn coef(n: u64, lams: &[u64; 3], t: &Term) -> u64 {
 struct MultiOut {
     setup_ms: f64,
     pair_ms: f64,
+    collect_ms: f64,
     per_target_ms: f64,
     total_ms: f64,
     determined: usize,
@@ -349,7 +411,7 @@ fn sym_multi(
     let lam2 = (lam as u128 * lam as u128 % n as u128) as u64;
     let lams = [1u64, lam, lam2];
     let t0 = Instant::now();
-    let ctx = Ctx::build(c, g, lam, b_size);
+    let ctx = Ctx::build(c, g, lam, b_size, std::env::var_os("ROTKEYS").is_some());
     let pair_ms = t0.elapsed().as_secs_f64() * 1e3;
     let mut rng = StdRng::seed_from_u64(seed);
     let needed = b_size + extra;
@@ -395,6 +457,7 @@ fn sym_multi(
             }
         }
     }
+    let collect_ms = t0.elapsed().as_secs_f64() * 1e3 - pair_ms;
     // Gauss-Jordan; a log is determined when its pivot row has no other nonzero entry.
     let nrows = rows.len();
     let cols = b_size;
@@ -492,6 +555,7 @@ fn sym_multi(
     MultiOut {
         setup_ms,
         pair_ms,
+        collect_ms,
         per_target_ms: t1.elapsed().as_secs_f64() * 1e3,
         total_ms: t0.elapsed().as_secs_f64() * 1e3,
         determined,
@@ -535,7 +599,7 @@ fn main() {
                 None => (0, f64::NAN),
             };
             let row = json!({"bits": bits, "curve": c.name, "T": t_count, "inst": ins, "B": bsz, "base_fb": fb,
-                "sym_total_ms": s.total_ms, "sym_setup_ms": s.setup_ms, "sym_pair_ms": s.pair_ms, "sym_per_target_ms": s.per_target_ms,
+                "sym_total_ms": s.total_ms, "sym_setup_ms": s.setup_ms, "sym_pair_ms": s.pair_ms, "sym_collect_ms": s.collect_ms, "sym_per_target_ms": s.per_target_ms,
                 "sym_determined": s.determined, "sym_solved": s.solved, "sym_ok": s.ok,
                 "base_total_ms": base_ms, "base_setup_ms": bsetup, "base_ok": bok});
             writeln!(out, "{row}").unwrap();

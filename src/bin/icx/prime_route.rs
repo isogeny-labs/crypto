@@ -537,6 +537,7 @@ mod tests {
         ));
         std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
         let target = PrimeArgs {
+            group_order: None,
             p: input.p,
             a: input.a,
             b: input.b,
@@ -607,6 +608,7 @@ mod tests {
         ));
         std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
         let target = PrimeArgs {
+            group_order: None,
             p: input.p,
             a: input.a,
             b: input.b,
@@ -675,6 +677,7 @@ mod tests {
         ));
         std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
         let target = PrimeArgs {
+            group_order: None,
             p: input.p,
             a: input.a,
             b: input.b,
@@ -746,6 +749,7 @@ mod tests {
         ));
         std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
         let target = PrimeArgs {
+            group_order: None,
             p: input.p,
             a: input.a,
             b: input.b,

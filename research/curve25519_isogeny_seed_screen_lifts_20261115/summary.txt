@@ -1,0 +1,29 @@
+group seed on_curve base_pts lifts_hits mul-adds(1e9) rate/1e9 expected(model) | blind_hits blind_rate | lifts/target
+top     50  22  44   129   28.24  4.568  151.00 |  14  3.954 | 1.4120e+06
+top     23  21  42   122   28.24  4.320  137.27 |  27  7.628 | 1.4121e+06
+top     26  21  42   137   28.24  4.851  137.27 |  15  4.237 | 1.4121e+06
+top     41  20  40   139   28.23  4.923  124.17 |  16  4.519 | 1.4117e+06
+top     43  20  40   123   28.24  4.355  124.20 |  15  4.236 | 1.4121e+06
+top     58  20  40   120   28.25  4.248  124.24 |  23  6.498 | 1.4125e+06
+top     55  19  38   122   28.25  4.319  111.83 |  18  5.084 | 1.4124e+06
+top     57  19  38   122   28.24  4.320  111.81 |  18  5.084 | 1.4122e+06
+bottom  39  10  20    34   28.31  1.201   30.07 |   4  1.129 | 1.4155e+06
+bottom  42  11  22    37   28.31  1.307   36.56 |   5  1.412 | 1.4156e+06
+bottom  25  12  24    40   28.31  1.413   43.68 |   6  1.694 | 1.4153e+06
+bottom  59  12  24    38   28.30  1.343   43.68 |   8  2.259 | 1.4152e+06
+bottom  35  13  26    51   28.30  1.802   51.46 |   7  1.977 | 1.4149e+06
+bottom  40  13  26    45   28.31  1.590   51.47 |   6  1.694 | 1.4153e+06
+bottom  24  14  28    69   28.28  2.440   59.87 |   7  1.977 | 1.4142e+06
+bottom  28  14  28    54   28.30  1.908   59.91 |   8  2.259 | 1.4150e+06
+
+top lifts: 1014 hits / 225.9 = 4.488 [4.216, 4.773]; model expects 1021.8 (95% interval 960..1085) -> H20 SUPPORTED
+
+bottom lifts: 368 hits / 226.4 = 1.625 [1.463, 1.800]; model expects 376.7 (95% interval 339..415) -> H20 SUPPORTED
+H17 top/bottom lifts rate ratio 2.76, one-sided p = 1.22e-70 -> SUPPORTED
+H18 top lower bound 4.216 vs 2.864 -> SUPPORTED
+H19 pooled lifts 1382/452.4 = 3.055 vs blind 197/56.7 = 3.477; ratio 0.879, two-sided p = 0.0928 -> SUPPORTED
+   top lifts/blind rate ratio 0.87
+   bottom lifts/blind rate ratio 0.90
+H21 lifts mul-adds/target 1.4117e+06..1.4156e+06, spread 0.28% -> SUPPORTED
+descriptive: Spearman on-curve vs lifts arm rate (16 arms) = 0.940
+descriptive (not pre-registered): all 36 seeds 1-20 and screened, lifts 3002/1017.9=2.949 vs blind 403/127.5=3.161; ratio 0.933, two-sided p=0.1910

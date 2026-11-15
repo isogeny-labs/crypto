@@ -69,8 +69,20 @@ frontier. Comb has fewer operations; rho makes no oracle queries.
   every weight. These are computed by the independent validator
   (`examples/cheon_wide_validate.rs`,
   [`benchmarks/20261107-cheon-wide/band.json`](../../benchmarks/20261107-cheon-wide/band.json)).
-- **No pooled interval.** No tool pools across the 11 chunk sessions with a
-  bootstrap, so the pooled figures are point values.
+- **Pooled intervals (added 2026-11-11).** `ecbench compare` now pools the
+  pairs of several sessions, pairing only within each session
+  ([`gap-pooled-ci.jsonl`](gap-pooled-ci.jsonl), 264 pairs per family).
+  The ratios of total cost, comb over rho, with linearised 95 % intervals:
+
+  | family | w = 0 | w = 0.1 | w = 1 |
+  |:--|:--|:--|:--|
+  | n−1 | 0.525 [0.473, 0.584] | 0.502 [0.452, 0.558] | 0.398 [0.358, 0.441] |
+  | n+1 | 0.367 [0.318, 0.422] | 0.339 [0.294, 0.391] | 0.216 [0.188, 0.249] |
+
+  The point values equal the validator's. Every interval lies below 1. Both
+  arms leave some work unpriced (oracle queries for comb, canonicalisations
+  for rho), so these ratios describe charged operations, not a bound on full
+  cost.
 - **Per size.** The per-size paired ratios (`ecbench compare`, 24 pairs each,
   [`gap-per-size.jsonl`](gap-per-size.jsonl)) carry intervals at every weight.
 - **What "resolved" means.** A size is resolved when the interval lies below 1

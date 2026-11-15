@@ -17,6 +17,11 @@
    "generator": "gen_instances.py",
    "args": "--families E,M,W --bits 12,16,20 --per 8 --seed e222m221-h1default-v1",
    "manifest_sha256": "261a37b2b1e9fc9f1391fec7f80f0c5f704ef2f7d740dfd539f52b5553b4ef82"
+  },
+  "mid_inst": {
+   "generator": "gen_instances.py",
+   "args": "--families W,E,M --bits 26,30 --per 2 --seed e222m221-mid-v1",
+   "manifest_sha256": "e466ce39e5a62e60967c2fb2faf049d38359e5f5378ef3437547396f15975168"
   }
  },
  "raw_data": {
@@ -59,6 +64,23 @@
    "sha256": "c3c7f0581bcdc2b64b5e445d27c748fb3e6de1a11085564230b6346f56b1c29b",
    "in_git": true,
    "note": "hash manifest of the 120 per-instance outputs under evidence/band/{default,h1}/; produced by run_band_panel.py"
+  },
+  "native_band_model": {
+   "path": "native_band/native_band_model.py",
+   "sha256": "d9ada78f894ef9c557c8e8d5ce43e4283273c1def95f9d4a98026f76c3d7f884",
+   "in_git": true,
+   "note": "stdlib counter model; reads evidence/band for its validation"
+  },
+  "native_band_results": {
+   "path": "native_band/native_band_results.json",
+   "sha256": "44b319812cf6e102bd9ffa5036ecf9faadf462067ccbd3f74e9bcb5ac5db9eb0",
+   "in_git": true
+  },
+  "mid": {
+   "path": "evidence/mid/MANIFEST.json",
+   "sha256": "383ae81edec5c5271cc4a5f0c9c4e084f070d35c9a54bd51e2ff507767ce44e1",
+   "in_git": true,
+   "note": "hash manifest of the 40 mid-size per-run outputs under evidence/mid/{default,h1}/; produced by run_mid_panel.py"
   }
  },
  "claims": [
@@ -204,6 +226,77 @@
     {
      "name": "band_default_median_ic_over_rho_w1",
      "claimed": 179.24,
+     "rel_tol": 0.002
+    }
+   ]
+  },
+  {
+   "id": "C6",
+   "statement": "A counter model of the default IC path reproduces the measured band counters (deterministic counters exactly; trials within a median bias of 7%) and, evaluated at the real E-222 and M-221, projects the IC arm at 2^187 to 2^225 GAE against the matched rho at about 2^110 to 2^111 (a model projection, not a measurement; a native solve was not run).",
+   "source_note": "RESULTS_native_band.md",
+   "raw": "native_band_model",
+   "headline": [
+    {
+     "name": "model_default_trials_obs_over_pred",
+     "claimed": 0.931,
+     "rel_tol": 0.002
+    },
+    {
+     "name": "model_h1_trials_obs_over_pred",
+     "claimed": 1.032,
+     "rel_tol": 0.002
+    },
+    {
+     "name": "model_default_inserts_obs_over_pred",
+     "claimed": 1.0,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "model_h1_negations_obs_over_pred",
+     "claimed": 1.0,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "projection_E222_H1_F2e20_log2_ic_w0",
+     "claimed": 207.6,
+     "rel_tol": 0.001
+    },
+    {
+     "name": "projection_M221_H1_F2e20_log2_ic_w0",
+     "claimed": 205.6,
+     "rel_tol": 0.001
+    },
+    {
+     "name": "projection_max_abs_log2_ic_w0_minus_w1",
+     "claimed": 0.011,
+     "rel_tol": 0.05
+    }
+   ]
+  },
+  {
+   "id": "C7",
+   "statement": "Mid-size check of the counter model in the regime n >> 2F^2 (subgroup orders of about 2^27 and 2^31, F = 128 and 512, 40 runs on 12 instances, each with a same-instance matched rho): every run recovered the planted logarithm; observed / predicted trials is 1.001 (default configuration, 24 runs) and 0.962 (with H1, 16 runs).",
+   "source_note": "RESULTS_native_band.md",
+   "raw": "mid",
+   "headline": [
+    {
+     "name": "mid_runs",
+     "claimed": 40,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "mid_all_recovered",
+     "claimed": 1,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "mid_default_trials_obs_over_pred",
+     "claimed": 1.001,
+     "rel_tol": 0.002
+    },
+    {
+     "name": "mid_h1_trials_obs_over_pred",
+     "claimed": 0.962,
      "rel_tol": 0.002
     }
    ]
