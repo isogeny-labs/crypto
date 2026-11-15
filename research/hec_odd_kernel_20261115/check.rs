@@ -301,7 +301,7 @@ fn controls(start: &Instant) {
     );
     println!("CONTROLS norm_elements={elements} genus2_curves={curves} congruence_cases=43 mod3_cases=2 pass=true");
 }
-fn orders(path: &str) {
+fn orders(path: &str, projectors: bool) {
     let text = fs::read_to_string(path).unwrap();
     let mut label = String::new();
     let mut polys = Vec::new();
@@ -328,6 +328,25 @@ fn orders(path: &str) {
         }
         if line.starts_with("CASE ") && line.contains("status=abstract_regular_kernels ") {
             assert_eq!(polys.len(), 2);
+            if projectors {
+                let fp = Fp::new(3);
+                let chi = polys[0].mul(&polys[1], &fp);
+                let (one, inverse, _) = Poly::xgcd(&polys[1], &polys[0], &fp);
+                assert_eq!(one, Poly::one());
+                let e0 = polys[1].mulmod(&inverse, &chi, &fp);
+                let e1 = Poly::one().sub(&e0, &fp);
+                assert_eq!(e0.add(&e1, &fp), Poly::one());
+                assert!(e0.mulmod(&e1, &chi, &fp).is_zero());
+                for (i, e) in [e0, e1].iter().enumerate() {
+                    assert_eq!(e.mulmod(e, &chi, &fp), *e);
+                    assert!(polys[i].mulmod(e, &chi, &fp).is_zero());
+                    println!(
+                        "PROJECTOR {label} kernel_factor={:?} operator={:?} domain=J[3]",
+                        &polys[i].c[..polys[i].n],
+                        &e.c[..e.n]
+                    );
+                }
+            }
             for f in &polys {
                 assert_eq!(factor3(*f), vec![(*f, 1)]);
                 let bound = 3u64.pow(f.deg() as u32) - 1;
@@ -350,8 +369,14 @@ fn orders(path: &str) {
     println!("TERMINAL positive_cases={cases} factors={factors}");
 }
 fn main() {
-    if std::env::args().nth(1).as_deref() == Some("--orders") {
-        orders(&std::env::args().nth(2).unwrap());
+    if matches!(
+        std::env::args().nth(1).as_deref(),
+        Some("--orders" | "--projectors")
+    ) {
+        orders(
+            &std::env::args().nth(2).unwrap(),
+            std::env::args().nth(1).as_deref() == Some("--projectors"),
+        );
         return;
     }
     let start = Instant::now();
