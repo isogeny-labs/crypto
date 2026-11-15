@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0031Z-genus-ladder-bound-r",
+  "latest_record": "20261115T0349Z-tableb-ksum-l1",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
-    "invalid": 3,
-    "measured": 172,
-    "open": 0
+    "invalid": 4,
+    "measured": 177,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -2464,6 +2464,661 @@
     },
     {
       "better": "lower",
+      "first": 0.6677638364209324,
+      "latest": 0.6677638364209324,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6563666166577568,
+            0.6793589587206363
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.6677638364209324
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.6907608750588367,
+      "latest": 0.6907608750588367,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.676849629335083,
+            0.7049580376970707
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.6907608750588367
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5957548772263922,
+      "latest": 0.5957548772263922,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp20.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5836234323126437,
+            0.6081384915143417
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5957548772263922
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.8589768247986305,
+      "latest": 7.8589768247986305,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.696159
+      },
+      "metric": "fp20_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.696159
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.3796975073023274,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.8589768247986305
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 7.111354055695914,
+      "latest": 7.111354055695914,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.603242
+      },
+      "metric": "fp20_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.603242
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.2691499828475836,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.111354055695914
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.58758174672307,
+      "latest": 14.58758174672307,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.143109
+      },
+      "metric": "fp20_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.143109
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.3746252273950295,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.58758174672307
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.5732780016891322,
+      "latest": 0.5732780016891322,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5593052061836886,
+            0.5875998713889119
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5732780016891322
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5964883365746998,
+      "latest": 0.5964883365746998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5825048139389976,
+            0.6108075455440152
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5964883365746998
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5016278555270598,
+      "latest": 0.5016278555270598,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp22.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4913683767473674,
+            0.5121015461075353
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5016278555270598
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.390894343938431,
+      "latest": 7.390894343938431,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.776033
+      },
+      "metric": "fp22_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.776033
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.2795796107762163,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.390894343938431
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.64927952268661,
+      "latest": 6.64927952268661,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.674148
+      },
+      "metric": "fp22_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.674148
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.1718550848270417,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 6.64927952268661
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.065427735204743,
+      "latest": 14.065427735204743,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.253802
+      },
+      "metric": "fp22_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.253802
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.2491003443187934,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.065427735204743
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.4842625047788181,
+      "latest": 0.4842625047788181,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w0.1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.47402810976282467,
+            0.4947178631494867
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.4842625047788181
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.5010859114536607,
+      "latest": 0.5010859114536607,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4909425327970129,
+            0.5114388627663705
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.5010859114536607
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.42610600569321144,
+      "latest": 0.42610600569321144,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fp24.ksum5_over_strictest_incumbent.w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.415640784782985,
+            0.4368347254050702
+          ],
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 0.42610600569321144
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 7.157859173063904,
+      "latest": 7.157859173063904,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.041586
+      },
+      "metric": "fp24_s_ksum5_w0p1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.041586
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.1847649638714108,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 7.157859173063904
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 6.383007476400372,
+      "latest": 6.383007476400372,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5.870922
+      },
+      "metric": "fp24_s_ksum5_w0",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.870922
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 1.0872239713560443,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 6.383007476400372
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 14.13152444303565,
+      "latest": 14.13152444303565,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.851203
+      },
+      "metric": "fp24_s_ksum5_w1",
+      "points": [
+        {
+          "commit": "8143aef076bc",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.851203
+          },
+          "n": 432,
+          "record": "20261115T0349Z-tableb-ksum-l1",
+          "reference": 2.0626338965097077,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+          "value": 14.13152444303565
+        }
+      ],
+      "problem": "ecdlp:ic_prime_tableb_ksum",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.7081,
+      "latest": 0.7081,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_fes_over_inherited",
+      "points": [
+        {
+          "commit": "b61a431d279d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261115T0009Z-fes-k13-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6683,
+            0.7503
+          ],
+          "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+          "value": 0.7081
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 86.067,
+      "latest": 86.067,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 33.307663
+      },
+      "metric": "s_ic_descent_fes_f2",
+      "points": [
+        {
+          "commit": "b61a431d279d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 33.307663
+          },
+          "n": 48,
+          "record": "20261115T0009Z-fes-k13-runpod",
+          "reference": 2.584,
+          "reference_kind": "matched_rho",
+          "spread": [
+            78.914,
+            93.868
+          ],
+          "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+          "value": 86.067
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 121.544,
+      "latest": 121.544,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 47.037152
+      },
+      "metric": "s_ic_descent_inherited_f4",
+      "points": [
+        {
+          "commit": "b61a431d279d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 47.037152
+          },
+          "n": 48,
+          "record": "20261115T0009Z-fes-k13-runpod",
+          "reference": 2.584,
+          "reference_kind": "matched_rho",
+          "spread": [
+            106.689,
+            138.468
+          ],
+          "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+          "value": 121.544
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.584,
+      "latest": 2.584,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "s_rho_sfstrong_v2",
+      "points": [
+        {
+          "commit": "b61a431d279d",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 48,
+          "record": "20261115T0009Z-fes-k13-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.512,
+            2.659
+          ],
+          "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+          "value": 2.584
+        }
+      ],
+      "problem": "ecdlp:icv1-f2m13-t181-515ee569",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
       "first": 49.3937,
       "latest": 49.3937,
       "latest_derived": {
@@ -3814,6 +4469,62 @@
     },
     {
       "better": "lower",
+      "first": 0.004,
+      "latest": 0.004,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_rf2_daemon_setup_s_r31_f4096",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.004
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.214,
+      "latest": 0.214,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 44.032922
+      },
+      "metric": "ic_rf2_daemon_solve_s_r31_f4096",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 44.032922
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 0.00486,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.214
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.246,
       "latest": 0.246,
       "latest_derived": {
@@ -3898,6 +4609,64 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.249,
+      "latest": 0.249,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 27.513812
+      },
+      "metric": "ic_rf3_daemon_solve_s_r31_f1024",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 27.513812
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 0.00905,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.249
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 79.8,
+      "latest": 79.8,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 42.903226
+      },
+      "metric": "ic_rf3_s_r31_f1024",
+      "points": [
+        {
+          "commit": "219333b6ab8c",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 42.903226
+          },
+          "n": 4,
+          "record": "20261115T0239Z-ic-gpu-rootfind-m3",
+          "reference": 1.86,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 79.8
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "S"
     },
     {
       "better": "lower",
@@ -8014,9 +8783,10 @@
     {
       "better": "higher",
       "first": 1.0044447074829879,
-      "latest": 1.0044447074829879,
+      "latest": 1.0078455598240346,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 0.3386,
+        "improvement_vs_previous_percent": 0.3386
       },
       "metric": "build_aa_k0n53",
       "points": [
@@ -8036,6 +8806,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 1.0044447074829879
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.3386,
+            "improvement_vs_previous_percent": 0.3386
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9907661242917067,
+            1.0334314937393239
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0078455598240346
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -8044,9 +8832,10 @@
     {
       "better": "higher",
       "first": 0.9971213805255936,
-      "latest": 0.9971213805255936,
+      "latest": 0.9996278829608752,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 0.2514,
+        "improvement_vs_previous_percent": 0.2514
       },
       "metric": "build_aa_k0n61",
       "points": [
@@ -8066,6 +8855,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9971213805255936
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.2514,
+            "improvement_vs_previous_percent": 0.2514
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9791123960695629,
+            1.018036352744864
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 0.9996278829608752
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -8133,10 +8940,71 @@
     },
     {
       "better": "higher",
-      "first": 0.9924685457673248,
-      "latest": 0.9924685457673248,
+      "first": 0.9971339316979637,
+      "latest": 0.9971339316979637,
       "latest_derived": {
         "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_perkey_over_block_k0n53",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9632026218580793,
+            1.0231939360358027
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 0.9971339316979637
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9960893763849149,
+      "latest": 0.9960893763849149,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_perkey_over_block_k0n61",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9827033865164593,
+            1.014037830348502
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 0.9960893763849149
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9924685457673248,
+      "latest": 1.0023916522832244,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.9998,
+        "improvement_vs_previous_percent": 0.9998
       },
       "metric": "collect_aa_k0n53",
       "points": [
@@ -8156,6 +9024,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9924685457673248
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.9998,
+            "improvement_vs_previous_percent": 0.9998
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9802366855329098,
+            1.0419932530914249
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0023916522832244
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -8164,9 +9050,10 @@
     {
       "better": "higher",
       "first": 0.9932761800741537,
-      "latest": 0.9932761800741537,
+      "latest": 1.0073627441780668,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 1.4182,
+        "improvement_vs_previous_percent": 1.4182
       },
       "metric": "collect_aa_k0n61",
       "points": [
@@ -8186,6 +9073,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9932761800741537
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 1.4182,
+            "improvement_vs_previous_percent": 1.4182
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9852365025911541,
+            1.0226772064734977
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0073627441780668
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -8246,6 +9151,66 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 1.0192706170412436
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.08696182728291,
+      "latest": 1.08696182728291,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_perkey_over_block_k0n53",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.07103909677251,
+            1.1219648460806706
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.08696182728291
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0973715992842736,
+      "latest": 1.0973715992842736,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_perkey_over_block_k0n61",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0764954488212193,
+            1.1153249815280666
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0973715992842736
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -8314,9 +9279,10 @@
     {
       "better": "higher",
       "first": 0.9996021703604971,
-      "latest": 0.9996021703604971,
+      "latest": 1.012385271861417,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 1.2788,
+        "improvement_vs_previous_percent": 1.2788
       },
       "metric": "setup_aa_k0n53",
       "points": [
@@ -8336,6 +9302,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9996021703604971
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 1.2788,
+            "improvement_vs_previous_percent": 1.2788
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9911321548920167,
+            1.043940505766153
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.012385271861417
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -8344,9 +9328,10 @@
     {
       "better": "higher",
       "first": 0.9963203913163303,
-      "latest": 0.9963203913163303,
+      "latest": 1.0076386870057852,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 1.136,
+        "improvement_vs_previous_percent": 1.136
       },
       "metric": "setup_aa_k0n61",
       "points": [
@@ -8366,6 +9351,24 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 0.9963203913163303
+        },
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 1.136,
+            "improvement_vs_previous_percent": 1.136
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9922168023869545,
+            1.0205471333823364
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0076386870057852
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -8426,6 +9429,66 @@
           ],
           "summary": "Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; default reverted to one chain, opt-in KIC_KEY_CHAINS=2. Two-level filter dropped at micro-benchmark.",
           "value": 1.0167528869791844
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0498267124210316,
+      "latest": 1.0498267124210316,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_perkey_over_block_k0n53",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.027452527399568,
+            1.074113536385307
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.0498267124210316
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.08604487469524,
+      "latest": 1.08604487469524,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_perkey_over_block_k0n61",
+      "points": [
+        {
+          "commit": "d9d14dbbd7f4",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T2243Z-ic-scan-vfilter-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0565446962704201,
+            1.1026041652376894
+          ],
+          "summary": "Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established; set-up 1.086 [1.056,1.102] at k0n61 established, 1.049 at k0n53 not; no build regression. Kept as default.",
+          "value": 1.08604487469524
         }
       ],
       "problem": "ic:koblitz_collect_phase",
@@ -14655,6 +15718,186 @@
       ],
       "problem": "kernel:c25519_family_bsgs_vs_rho",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9771584596548346,
+      "latest": 0.9771584596548346,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr3850.koblitz.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9726330396687172,
+            0.9810499006498247
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.9771584596548346
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9049709086110559,
+      "latest": 0.9049709086110559,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr3850.prime.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9046475878158163,
+            0.9052548891637372
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.9049709086110559
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9635473542464292,
+      "latest": 0.9635473542464292,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr3850.tensor.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9584804715070011,
+            0.9677433998961907
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.9635473542464292
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0133224951978266,
+      "latest": 1.0133224951978266,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr3991.prime.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0114613899962586,
+            1.0145893917751176
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 1.0133224951978266
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9258217129328429,
+      "latest": 0.9258217129328429,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr4009.koblitz.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9246861417296337,
+            0.9269698139656425
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.9258217129328429
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.6535928517571333,
+      "latest": 0.6535928517571333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "pr4009.tensor.solve_cpu_ba",
+      "points": [
+        {
+          "commit": "4a832ccb02fd",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T1934Z-wallfix-runpod-abab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6451017052237096,
+            0.6640905408191071
+          ],
+          "summary": "crypto #3850/#3991/#4009 merge vs first parent on RunPod (L0, [pcc:unverified]): session solve CPU B/A #4009 tensor 0.654, #3850 prime 0.905, #4009 koblitz 0.926, #3850 tensor 0.964, #3850 koblitz 0.977, #3991 prime 1.013; outputs identical 18/18; replayed on a second host",
+          "value": 0.6535928517571333
+        }
+      ],
+      "problem": "kernel:ecbench_wallfix_prs",
+      "unit": "ratio"
     },
     {
       "better": "neutral",

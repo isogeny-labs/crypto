@@ -1,0 +1,146 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp12-tm53-6c9ff4bb",
+      "log2_r": 11.806952328210736,
+      "arm": "ic-tensor",
+      "runs": 30,
+      "verified": 30,
+      "mean_s": [
+        66674.19480479468,
+        80102.14286683574,
+        200953.67542520547
+      ],
+      "charged_sum": 119729850.0,
+      "native_sum": 241131702,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp12-tm53-6c9ff4bb",
+      "log2_r": 11.806952328210736,
+      "arm": "rho-neg",
+      "runs": 30,
+      "verified": 30,
+      "mean_s": [
+        2.7548455268199135,
+        2.920570618548558,
+        4.412096444106362
+      ],
+      "charged_sum": 4947.0,
+      "native_sum": 2976,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp12-tm53-6c9ff4bb",
+      "log2_r": 11.806952328210736,
+      "arm": "rho-neg-aa",
+      "runs": 30,
+      "verified": 30,
+      "mean_s": [
+        2.7548455268199135,
+        2.920570618548558,
+        4.412096444106362
+      ],
+      "charged_sum": 4947.0,
+      "native_sum": 2976,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp14-tm143-dec4cf6b",
+      "log2_r": 13.827044924115224,
+      "arm": "ic-tensor",
+      "runs": 30,
+      "verified": 30,
+      "mean_s": [
+        269097.58533881174,
+        323102.7537787748,
+        809149.2697384426
+      ],
+      "charged_sum": 973214772.0,
+      "native_sum": 1953143787,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp14-tm143-dec4cf6b",
+      "log2_r": 13.827044924115224,
+      "arm": "rho-neg",
+      "runs": 30,
+      "verified": 30,
+      "mean_s": [
+        2.2388512907697202,
+        2.400771917653103,
+        3.858057559603546
+      ],
+      "charged_sum": 8097.0,
+      "native_sum": 5856,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp14-tm143-dec4cf6b",
+      "log2_r": 13.827044924115224,
+      "arm": "rho-neg-aa",
+      "runs": 30,
+      "verified": 30,
+      "mean_s": [
+        2.2388512907697202,
+        2.400771917653103,
+        3.858057559603546
+      ],
+      "charged_sum": 8097.0,
+      "native_sum": 5856,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp12-tm53-6c9ff4bb",
+      "a": "ic-tensor",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ic-tensor"
+    },
+    {
+      "curve": "icv1-fp12-tm53-6c9ff4bb",
+      "a": "ic-tensor",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < ic-tensor"
+    },
+    {
+      "curve": "icv1-fp12-tm53-6c9ff4bb",
+      "a": "rho-neg",
+      "b": "rho-neg-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp14-tm143-dec4cf6b",
+      "a": "ic-tensor",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ic-tensor"
+    },
+    {
+      "curve": "icv1-fp14-tm143-dec4cf6b",
+      "a": "ic-tensor",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < ic-tensor"
+    },
+    {
+      "curve": "icv1-fp14-tm143-dec4cf6b",
+      "a": "rho-neg",
+      "b": "rho-neg-aa",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}
