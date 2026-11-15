@@ -1,3 +1,35 @@
+# Whole comparator01 allocation failure retained; versioned streaming repair next
+
+## What was done
+pcc/claims/PCC-20261115-769560.json / pcc/claims/PCC-20261115-2b4297.json: exacta9f16019/compiled174696/originalcheckpoint25 gate0. Whole historical byte materialization0, positive comparison abort134 with an allocation failure under the fixed2GiBVM/120-second cap; driver1, no accepted output, no negative controls executed. Full source/runtime/logs/inputs retained at scratch/ct107-whole-relation-comparator-native-01 and ct112-comparator-memory-failure-custody-01; complete positive archive CRC/full original-byte compare0 and postfailure source/runtime guards0. [pcc:unverified]
+
+## Decisions made
+Preserve all old audit01 source and174696 subjects. Implement VERSIONED audit-02, native driver02 and source guards02 with sequential complete JSONL record-pair parsing and the existing exact metadata bindings. Every value/order/count and all six complete historical fixture byte pins remain mandatory; resource caps and prospective9aad0c contract unchanged. Review uses actual allocation failure, existing original SHA streaming interface/tests and Rust standard file/JSON iteration, not a new DLP method. [pcc:unverified]
+
+## Open threads
+Versioned streaming build/source publication/originalcheckpoint26, then full positive/eightnegative/elapsed controls. Full diagnosticCI draft in scratch/ct111 remains unexecuted; adapt it to the accepted comparator version after controls. Preserve future fullscientificcustodyNEW28, then reviewed/prospective unassisted relation completion. All global/model/numericLean/calibrated/reference/admission/merge gaps remain. [pcc:unverified]
+
+## Errors
+Whole-record parse plus normalization copies cannot complete this run inside the existing virtual-memory envelope. The exact allocation point/peak is not profiled; buffering is the implementation hypothesis. This is not evidence against the mathematical input data. Keep the failed source and run, and use a new version/output without weakening complete comparisons or raising caps. [pcc:unverified]
+
+---
+
+# Exact original checkpoint25 imported; whole comparator control run ready
+
+## What was done
+pcc/claims/PCC-20261115-6b5b25.json: exactcleanconsumer a9f16019, original43751355945/job132925802891/artifact14176234660, full442913BZIP/SHA7db1eda062fb8855508cef5b6f0d0a64fa6c0f4f0590e74788ed0b3227c5220c/all28members, originalremote readbacks/source/Resume0, exact.lastpushimport/localstatus-gate0 and unchangedconsumerGitstatus. All raw members/ZIP retained in scratch/ct110-current-original-checkpoint-25; private signedURL metadata excluded. [pcc:unverified]
+
+## Decisions made
+Run the pinned clean-source whole comparator driver next with compiled build02, new scratch/ct107-whole-relation-comparator-native-01 and RAM/dev-shm/ct107-whole-relation-comparator-controls-01, allwhole inputs/controls/archive/process exits/source-runtime guards. Do not edit consumer source/Resume/ledger between this receipt and execution. [pcc:unverified]
+
+## Open threads
+Actual whole controls, then finalize full diagnosticCI. Scratch/ct111-whole-diagnostic-CI-draft-01 holds an UNEXECUTED shell driver and operational receipt-validator draft, original contract/workflow copies and proof-name/binding lists; phaseplan/workflow/reference/projected source validation still needed. All native timings unpriced, admission/reference/global/numericLean/merge obligations remain. Future wholecustodyNEW28. [pcc:unverified]
+
+## Errors
+The explicit dispatch waited for a runner; source stayed unchanged and no native ran before the genuine receipt. No exact-a9 automatic run was observed; earlier path-filter explanation is only an operational observation, not a claim about all pull-request filter semantics. All earlier failures remain preserved. [pcc:unverified]
+
+---
+
 # Complete metadata sidecar genuinely published; hold released
 
 ## What was done
