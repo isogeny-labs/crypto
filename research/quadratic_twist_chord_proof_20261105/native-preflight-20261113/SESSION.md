@@ -151,3 +151,21 @@ Actual corrected elaboration and transitive-axiom audit, then meaningful false-s
 ### Errors
 
 Initial proof-protocol schema had16 findings for8 build strings and numeric flag values; exact initial JSON retained, corrected metadata types before freeze. First REAL proof failure is a denominator tactic error, not cache/auth failure or a mathematical counterexample. No gate/axiom/trust-manifest patch, source weakening, admitted proof or forged success. [pcc:unverified]
+
+## 2026-11-15T07:00Z — five chord statements pass official gate; wrapper case mismatch retained
+
+### What was done
+
+At pre-data checkpointccfde154, all three fresh true-source gates PASS. Official unmodified scoped axiom audit reports5 theorems,0 failing,0 trusted native; transitive axioms only propext,Classical.choice,Quot.sound. Corrected source printed no sorryAx. Four pre-filed false statements reject gate1/FAIL_build. Full wrapper exits2 after7 of8 gates, because the distinct-completeness rejection uses capitalized Type mismatch and the intended math-error matcher was lower-case only. Last false diagonal gate did NOT run. Exact sources/logs/statuses remain /workspace/twist-chord-kernel-run02-20261115. This is a real scoped kernel/axiom observation, NOT signed PCC or a completed full control plan. [pcc:unverified]
+
+### Decisions made
+
+Do not relabel wrapper failure. Change only metadata matching to case-insensitive, leaving exact Lean statements/tactics, all five false templates, official gate/auditor/trust whitelist and dependency hashes unchanged. File version3 before affected data, then one full8-stage end-to-end replay is warranted by the wrapper code fix. No repeated native scalar/yield run, new assumption, relaxed axiom/control predicate or global verifier patch. [pcc:unverified]
+
+### Open threads
+
+Complete the last full proof/control replay under remaining<=3600s proof-window budget, preserve earlier outputs, then report five exact field-algebra lemmas at scoped level. Full group/lift proof, IDC bindings, signed standing, original-source frontier/minimum-degree benefit remain separate. [pcc:unverified]
+
+### Errors
+
+The second source proof itself succeeds; the unexpected failure is strictly a report classifier case bug on a genuine mathematical Type mismatch (remV=0 versus1), not missing dependencies or a false theorem being accepted. The shared official audit emits an upstream String.mk deprecation warning; it is not patched or treated as mathematical failure. [pcc:unverified]
