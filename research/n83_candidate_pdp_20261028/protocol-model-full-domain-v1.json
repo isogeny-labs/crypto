@@ -1,0 +1,190 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-PDP-FULL-DOMAIN-BASE-MODEL-20261101-V1",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "question": "Does changing the fixed coordinate-bit factor base change PDP top-form outcomes when planted points are sampled from matched selectors across the entire 2^27 domain, and can point-derived features predict a lower interval-midpoint proxy for a held-out base?",
+  "epistemic_status": "exploratory_post_label",
+  "prior_label_exposure": "The seven-base common-support panel, its 48 equal configuration outcomes, and its failed grouped model were inspected before this protocol. This follow-up is exploratory and cannot make confirmatory or general elite-base claims.",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exploratory_measurement",
+      "text": "For the named seven coordinate-bit bases, matched 27-bit selectors produce base-specific point tuples and PDP top-form interval outcomes that can be compared within each family, m, and target kind."
+    },
+    {
+      "id": "C2",
+      "class": "exploratory_prediction",
+      "text": "A ridge model trained on point-derived and presentation-size features will be evaluated by grouped leave-one-coordinate-bit-base-out validation against the matched-configuration mean baseline."
+    },
+    {
+      "id": "C3",
+      "class": "out_of_scope",
+      "text": "Exact degree of regularity, FFD, LFD, solving degree, a general elite-base ranking, and ECDLP performance are not inferred from interval-midpoint labels or this seven-base panel."
+    }
+  ],
+  "freeze": {
+    "source_commit": "fa07fb15bdcc093df618e67176a904a698cc8b17",
+    "generator_path": "research/n83_candidate_pdp_20261028/src/bin/pdp.rs",
+    "generator_sha256": "6f58f0972189141bede5005e33ac3c23a790fef6d12f211caf218531021dbb70",
+    "binary_path": "research/n83_candidate_pdp_20261028/target/release/pdp",
+    "binary_sha256": "cda944bb308d0b2c537087efa340793631a1d2812907069bdadc52da1a290718",
+    "build": "cargo build --locked --release --manifest-path research/n83_candidate_pdp_20261028/Cargo.toml --bin pdp",
+    "test": "cargo test --locked --manifest-path research/n83_candidate_pdp_20261028/Cargo.toml --bin pdp",
+    "test_result": "6 passed"
+  },
+  "design": {
+    "factor_base_candidates": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "curve_families": [
+      "koblitz",
+      "binary",
+      "prime"
+    ],
+    "m": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ell": 27,
+    "target_kinds": [
+      "planted",
+      "natural"
+    ],
+    "expected_systems": 336,
+    "same_seed_selectors_across_bases": true,
+    "planted_sampling": "Draw the 27-bit selector uniformly from the frozen deterministic PRNG stream. Decode selector bits into x using the candidate's omitted coordinate bit. Reject non-liftable x and the point that makes a partial sum infinity; continue the same stream until m distinct selected points with non-infinite partial sums are collected. The planted target is their curve sum.",
+    "natural_target_control": "Reuse the saved baseline natural target for the same family and m across all candidate bases; only the sampled factor-base summand tuple changes.",
+    "common_support_control": "Retain the already-generated low-26 common-support panel unchanged as a historical matched-target control; do not pool it with the full-domain panel without a target-distribution feature.",
+    "outcomes": [
+      "top-form quotient interval status and lower/upper bounds",
+      "finite-interval midpoint proxy, when finite",
+      "positive-dimensional/non-finite status"
+    ],
+    "model_features": [
+      "m, family, target kind, variable count, equation count, binary term count",
+      "selected point selector bits and normalized x/y coordinate summaries"
+    ],
+    "validation": "Group all rows by omitted coordinate-bit base. Seven leave-one-base-out folds; standardize numeric features on training rows only; ridge alpha=10, unpenalized intercept. Predict only finite interval midpoints. Compare absolute error with the mean label for the same family, m, and target kind in training rows. Report folds and aggregate errors; no random row split.",
+    "decision_rule": "Exploratory lead only if aggregate held-out MAE is strictly below matched-configuration baseline MAE and at least five of seven held-out bases improve. Any candidate requires fresh independent target draws and exact regularity/FFD/LFD computation before ranking.",
+    "persistence": "Persist all source manifests, sampled selectors, input JSON and Singular systems, producer/replay logs, top-form certificates, model rows/results, and diagnostics to Git plus s3://setec-astronomy-artifacts. Preserve failures and partial outputs.",
+    "factor_base_sources": [
+      {
+        "candidate_id": "spike27",
+        "coordinate_bit": 27,
+        "index_path": "evidence/n83-factorbase-variants/r27-attempt-07/first-fall-20261031T1725Z/candidate-structure/factor-base-index.json",
+        "index_sha256": "182736df8b497f696eb78cd32207e6a6d8b1159414a7d97ca0d1389a376c0585",
+        "family_manifests": {
+          "koblitz": "7dcc0d71fe1ca263090baa8e1697271d916068e491f9d7f733a260628e35dc64",
+          "binary": "ec04f5fbfc5e47af2a14a5594679c95baea8bf6a6af62c89ce74e7c01685b304",
+          "prime": "0878922ea5f7b58736d16af1b192fa2519ae6d9376724baea6d7e6593170fa8a"
+        }
+      },
+      {
+        "candidate_id": "spike28",
+        "coordinate_bit": 28,
+        "index_path": "evidence/n83-factorbase-variants/r28-attempt-01/first-fall-20261031T1715Z/candidate-structure/factor-base-index.json",
+        "index_sha256": "5fce442d57c37866242ee15ae0fe8fb5be870d6c1d38a2d47bb33e067dd4edc0",
+        "family_manifests": {
+          "koblitz": "317000c32dea4944ee3810920fdf8b5d4075a5b914acd6cc1adbdd2ca47ec5b2",
+          "binary": "de459ba40ab278a49577fc3f60c08a5f334c078042b980b544639fefc142a723",
+          "prime": "71bc3e55e5d0b790b658edda156d0c644b079c8f1cc35fbb3ccd9fd9e9f0b310"
+        }
+      },
+      {
+        "candidate_id": "spike29",
+        "coordinate_bit": 29,
+        "index_path": "evidence/n83-factorbase-variants/r29-attempt-02/pdp-inputs/attempt-02/candidate-structure/factor-base-index.json",
+        "index_sha256": "f6787fb737fb988bcd5089fb1cb755b81f8745a7016e93d37d7c15bf87874236",
+        "family_manifests": {
+          "koblitz": "852f773550a05dc4aec23eceb616b11378c17cb34794e8a7ce00290d46917a73",
+          "binary": "1e4161c9fba93f02bcb64659581037cc631a7ae4086ab8d809613e949e808d8c",
+          "prime": "058c490c8a3f56a50fa717d64edd04ef009bea301cc42d598744f935ea56054b"
+        }
+      },
+      {
+        "candidate_id": "spike30",
+        "coordinate_bit": 30,
+        "index_path": "evidence/n83-factorbase-variants/r30-attempt-01/first-fall-20261031T1700Z/candidate-structure/factor-base-index.json",
+        "index_sha256": "153300be6301b175637e04d7fb6299f677ec5c68cfe6444736a14183f27e57fe",
+        "family_manifests": {
+          "koblitz": "fdba8ca5ba43fc4faf6d4add0032d3a1b22132ebe0f79d46e5cf04d651ef106a",
+          "binary": "b1234d88a6ecc474c0a15e6fac7304284c8b80c5c00046e825078a19739c5ac4",
+          "prime": "1c8d8e1f09a84fef8c5d4a6dba01cb6995a50498c31fcd9b50935537249d3750"
+        }
+      },
+      {
+        "candidate_id": "spike31",
+        "coordinate_bit": 31,
+        "index_path": "evidence/n83-factorbase-variants/r31-attempt-01/first-fall-20261031T1610Z/candidate-structure/factor-base-index.json",
+        "index_sha256": "658aa2c8632faad7183c1ca157f1ce939004aa4b91a9e3dbfde562caa29bba38",
+        "family_manifests": {
+          "koblitz": "cc705c905c115e1530ee1660c79151f1b6985752dde645f5e3090233ef51db56",
+          "binary": "81bcc6c402cd6498e033978e052e1c0995bad34d64a175145cb3f490df4971c6",
+          "prime": "2fb30e5c2bf8f79908984a5135e311ca7e37f1519355c1021f522d59a026edee"
+        }
+      },
+      {
+        "candidate_id": "spike32",
+        "coordinate_bit": 32,
+        "index_path": "evidence/n83-factorbase-variants/r32-attempt-01/first-fall-20261031T1630Z/candidate-structure/factor-base-index.json",
+        "index_sha256": "ec18f496b0f58695c20c517a980b11c5d7e9c49efa105706ce40150676075be1",
+        "family_manifests": {
+          "koblitz": "4cc3d30926ae5cf6cc1011cc87096f069feecf9970c5fd99ec38358b680b29ae",
+          "binary": "8b88cf1d9f2be998f2128e1ca41a789388d585db2cd07933e771d3185bc1bb7e",
+          "prime": "1d19bb198a644b9bd2cf10228941a537d9a69bf8ee5776173890fccdd6cb3268"
+        }
+      },
+      {
+        "candidate_id": "spike33",
+        "coordinate_bit": 33,
+        "index_path": "evidence/n83-factorbase-variants/r33-attempt-01/first-fall-20261031T1640Z/candidate-structure/factor-base-index.json",
+        "index_sha256": "69b37d7599c11ac49280d07c3db70ac5eb813929b0c240fcc5d0834dba87eeda",
+        "family_manifests": {
+          "koblitz": "83628d8e01738e2f9bab0eeb4f2559aa652a7b041e81b331c02f1e7a33e1add4",
+          "binary": "d2d45446b66425e0e0ee310c8216990f66a6763a5da09dc63dfeb013851c15a4",
+          "prime": "e5c6f2bf55b9f3ed8ae7c5b1a1568413c48d9164a9d3e72e59829b95694fcce1"
+        }
+      }
+    ]
+  },
+  "input_format": {
+    "root": "inputs/<candidate_id>/",
+    "index": "inputs/<candidate_id>/inputs.json",
+    "case": "inputs/<candidate_id>/<family>-m<M>-<target_kind>/input.json",
+    "singular_system": "inputs/<candidate_id>/<family>-m<M>-<target_kind>/system.sing",
+    "required_provenance": [
+      "candidate id and coordinate-bit position",
+      "factor-base index and family manifest SHA-256",
+      "selected base selector for every point",
+      "lifted point coordinates and source shard SHA-256",
+      "target kind, target coordinates, PRNG seed and rejection policy",
+      "input and system SHA-256"
+    ]
+  },
+  "analysis_outputs": [
+    "per-base input counts and selector/point validity checks",
+    "per-base top-form producer and replay summaries",
+    "grouped-fold rows, predictions, and aggregate lead decision",
+    "report with explicit exploratory/post-label and interval-proxy labels"
+  ],
+  "artifacts": {
+    "data_remote": "s3://setec-astronomy-artifacts/store",
+    "git_metadata": "protocol, manifests, source hashes, README and report",
+    "local_data_retention": "Never remove original local or remote run outputs; retries use a new attempt path."
+  }
+}

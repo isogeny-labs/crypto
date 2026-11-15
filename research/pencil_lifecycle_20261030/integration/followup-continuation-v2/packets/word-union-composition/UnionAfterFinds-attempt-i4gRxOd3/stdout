@@ -1,0 +1,60 @@
+/var/tmp/pencil-word-union-composition-20261101-v1/UnionAfterFinds.lean:14:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field (ZMod r.toNat)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-word-union-composition-20261101-v1/UnionAfterFinds.lean:55:109: error: unsolved goals
+n : ℕ
+r : UInt64
+inst✝ : Fact (Nat.Prime r.toNat)
+s : UnionState n
+t w : State n
+u v ru rv : Fin n
+pu pv : Pot
+rank : Fin n → ℕ
+value : Fin n → F r
+su sv : Int8
+a b : UInt64
+k : F r
+hp : 0 < r.toNat
+hr : r.toNat ≤ 2 ^ 63
+hg : Good r s.graph
+hgf : FixedGood r s
+hf : GraphFind.Forest (decode r s.graph) rank
+hv : GraphUnion.Valid (unionDecode r s) value k
+h1 : Run r s.graph u t ru pu
+h2 : Run r t v w rv pv
+hd : ru ≠ rv
+hs : Sign su
+ht : Sign sv
+ha : a.toNat < r.toNat
+hb : b.toNat < r.toNat
+he : sd r su * value u + sd r sv * value v = wd r a + wd r b * k
+forward : Bool
+hgt : Good r t
+hpu : GoodPot r pu
+hu : GraphFind.Run (decode r s.graph) u (decode r t) ru (decPot r pu)
+hgw : Good r w
+hpv : GoodPot r pv
+hv' : GraphFind.Run (decode r t) v (decode r w) rv (decPot r pv)
+hpot : GoodPot r (reducedUnionPot r pu pv su sv a b) ∧ decPot r (reducedUnionPot r pu pv su sv a b) = sorry
+hsu : sd r su * (decPot r pu).s * (sd r su * (decPot r pu).s) = 1
+hsv : sd r sv * (decPot r pv).s * (sd r sv * (decPot r pv).s) = 1
+hfield :
+  ∃ rank',
+    GraphFind.Forest
+        (GraphForest.branch (GraphForest.lifted (unionDecode r s) (decode r w)) ru rv
+            (GraphForest.reducedPotential (decPot r pu) (decPot r pv) (sd r su) (sd r sv) (wd r a) (wd r b))
+            forward).graph
+        rank' ∧
+      GraphUnion.Valid
+        (GraphForest.branch (GraphForest.lifted (unionDecode r s) (decode r w)) ru rv
+          (GraphForest.reducedPotential (decPot r pu) (decPot r pv) (sd r su) (sd r sv) (wd r a) (wd r b)) forward)
+        value k
+href :
+  unionDecode r (branchWord r { graph := w, fixed := s.fixed } ru rv (reducedUnionPot r pu pv su sv a b) forward) =
+    GraphForest.branch (unionDecode r { graph := w, fixed := s.fixed }) ru rv
+      (decPot r (reducedUnionPot r pu pv su sv a b)) forward
+⊢ let out := branchWord r { graph := w, fixed := s.fixed } ru rv (reducedUnionPot r pu pv su sv a b) forward;
+  Good r out.graph ∧
+    FixedGood r out ∧
+      ∃ rank', GraphFind.Forest (unionDecode r out).graph rank' ∧ GraphUnion.Valid (unionDecode r out) value k

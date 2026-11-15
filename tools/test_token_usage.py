@@ -201,7 +201,7 @@ class ActionTests(unittest.TestCase):
         rec = tu.action_record(PRICES, p, label="sonnet")
         self.assertEqual(rec["total"]["output_tokens"], 2_000)
         self.assertAlmostEqual(rec["total"]["cost_usd"],
-                               round(10 * 2e-6 + 900_000 * 0.2e-6 + 60_000 * 2.5e-6 + 2_000 * 10e-6, 6))
+                               round(10 * 2e-6 + 900_000 * 0.1e-6 + 60_000 * 2.5e-6 + 2_000 * 10e-6, 6))  # Sonnet 5.5 cache read: $0.10/MTok
 
     def test_summary_cost_per_accepted(self):
         p = self.write([{"type": "result", "modelUsage": {"claude-haiku-5-5": {

@@ -1,0 +1,50 @@
+{
+  "schema": "n83.prime-first-fall-format/v1",
+  "scope": "Six unchanged n83 prime m2 ell27 presentations. Exact highest-form FFD and a separate conditional strict filtered witness; no global LFD upper or exact LFD.",
+  "directories": {
+    "inputs/KEY/input.json": "Immutable typed input, target, field, selector and actual point-manifest identity",
+    "inputs/KEY/system.sing": "Unchanged complete original equation source, validated byte for byte",
+    "results/primality.json": "Lucas certificate for the retained 83-bit prime with full p-1 factorization",
+    "results/KEY/certificate.json": "Full source validation; selector weights/inverses; exact rank certificates; direct and formula pairings; degree claims and exceptional-target rule; factor hashes and witness circuit",
+    "results/KEY/A0.poly": "H: product of thirteen disjoint normalized-variable differences",
+    "results/KEY/A1.poly": "Complete sparse normal form of H*X under z_i^2=w_i*z_i",
+    "results/KEY/A2.poly": "Complete sparse normal form of H*X^2 under the same selector equations",
+    "results/KEY/B0.poly": "Complete sparse normal form of t^2*Y^2+(-2at-4b)*Y+(a^2-4bt)",
+    "results/KEY/B1.poly": "Complete sparse normal form of -2t*Y^2+(-2t^2-2a)*Y+(-2at-4b)",
+    "results/KEY/B2.poly": "Complete sparse normal form of Y^2-2t*Y+t^2",
+    "results/summary.json": "All six source/base identities and separate FFD, strict filtered fall and LFD fields",
+    "controls.json": "36 independent expanded-polynomial comparisons; 12 small dense-closure comparisons including positive and exceptional targets; inherited explicit small rank controls",
+    "manifest.sha256": "Hash of every sealed raw payload; verify before and after replay"
+  },
+  "polynomial_file": {
+    "magic": "N83PFF1\n",
+    "header_bytes": 40,
+    "fields": [
+      {"offset": 0, "bytes": 8, "encoding": "ASCII magic"},
+      {"offset": 8, "bytes": 4, "encoding": "u32 little-endian local variable count"},
+      {"offset": 12, "bytes": 4, "encoding": "u32 little-endian maximum squarefree degree; zero polynomial convention is zero"},
+      {"offset": 16, "bytes": 8, "encoding": "u64 little-endian term count"},
+      {"offset": 24, "bytes": 16, "encoding": "u128 little-endian field modulus"}
+    ],
+    "record_bytes": 24,
+    "record": "u64 little-endian squarefree variable mask, followed by u128 little-endian coefficient",
+    "invariants": "Exactly header+24*count bytes; strictly increasing masks below 2^ell; coefficients in [1,p-1]; no omitted nonzero terms; degree equals maximum mask popcount. Each factor uses local indices0..26."
+  },
+  "reconstruction": {
+    "coordinate_map": "A local variable z_i=w_i*v_i. B local variable u_i=w_i*v_(27+i). Original v variables are Boolean selectors; normalized squares satisfy z_i^2=w_i*z_i and u_i^2=w_i*u_i.",
+    "witness": "g = A0 tensor B0 + A1 tensor B1 + A2 tensor B2. To expand, shift each B mask left by27, OR it with an A mask, multiply coefficients modulo p, and combine equal masks. Retaining factors is exact, not a sampling or truncation.",
+    "source_relation": "g=NF(H*S3(X,Y,t)), where H=A0,X=sum z_i,Y=sum u_i. This gives a degree-at-most17 derivation from the original system.",
+    "functional": "On the degree16 part, multiply by H in the square-zero associated graded algebra and extract the coefficient of all27 A variables and B variables0,1. Compute directly by complementary A masks and each B coefficient at mask3."
+  },
+  "claim_fields": {
+    "first_fall_degree": "Nontrivial highest-form syzygy degree using the written Koszul/annihilator argument and certified multiplication ranks",
+    "strict_filtered_fall_verified": "True only when the directly computed functional is nonzero and matches the algebraic formula",
+    "first_strict_filtered_fall_degree": "Exact first strict filtered fall when the nonzero witness and complete lower-space argument apply; otherwise null",
+    "last_fall_lower_bound": "Strict witness degree when verified; otherwise null, not inferred merely from highest-form FFD",
+    "last_fall_upper_bound": "Always null in this dataset",
+    "last_fall_degree": "Always null in this dataset",
+    "exceptional_delta": "S-2t modulo p. Zero makes this strict-witness test inconclusive, not a nonexistence result."
+  },
+  "replay": "Recompute complete source validation, primality, ranks, every sparse factor coefficient and direct pairing; require byte-identical factor files and identical JSON certificates/summary. Replay writes no dataset file.",
+  "review_boundary": "Producer and replay checks are not independent scientific review or a full Lean proof. Original-top regularity, solving degree, FFD and LFD remain distinct. No elite-base or ECDLP recovery claim."
+}

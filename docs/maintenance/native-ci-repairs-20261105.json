@@ -1,0 +1,70 @@
+{
+  "schema": "pr-maintenance/v1",
+  "date": "2026-11-05",
+  "standing": "unverified",
+  "preparation_parent": "dcc8ce1c53deade75f962c77f9dac3c70d8f7e20",
+  "repairs": {
+    "metal": {
+      "pr": 3458,
+      "parent": "d16ef1847e6854a32838885760eb36de9492aeac",
+      "workflow_blob": "a76ed588ccad7391741306edbb4a46a450ffc180",
+      "paths": [
+        "crates/hashed-ecdl-tensor",
+        "crates/ecdl-tensor-ic",
+        "research/pencil_large_prime_20261029/Cargo.toml",
+        "research/pencil_large_prime_20261029/Cargo.lock",
+        "research/pencil_large_prime_20261029/src"
+      ],
+      "failed_jobs": [
+        127215042210,
+        127215042175
+      ]
+    },
+    "field_tests": {
+      "source_entries": [
+        {
+          "path": "src/binary_ecc/f2m.rs",
+          "mode": "100644",
+          "type": "blob",
+          "sha": "8b1ac6bef1010bd15927a0ada7e38fcc25c95634"
+        },
+        {
+          "path": ".github/workflows/quadratic-twist-evidence.yml",
+          "mode": "100644",
+          "type": "blob",
+          "sha": "7ad25bbbbc3be35e049a808f5c54748f8b75b054"
+        }
+      ],
+      "failed_job": 127215268229,
+      "change": "Two test-only absolute paths become sibling-relative; production code/assertions/native producer unchanged. Add source dependency triggers."
+    },
+    "aps": {
+      "pr": 3455,
+      "parent": "22788cdfd0f91c0900e6770a391b74ca36639fab",
+      "workflow_blob": "6995a4ca15afd6d0dcfbd4ab8d2cd26e91ed30e9",
+      "cancelled_job": 127195704188,
+      "actual_partial_result": "34 aps_single_relation tests passed; example was still compiling at cap; later F4/GLV commands not run.",
+      "repair": "Two25-minute compilation lanes, all four original cargo commands unchanged, original rust aggregate requires both.",
+      "estimated_extra_check_contexts": 2
+    }
+  },
+  "journal_preservation": {
+    "previous_preparation_is_byte_prefix": true,
+    "complete_verbatim_public_parent_journals": [
+      {
+        "pr": 3455,
+        "head": "22788cdfd0f91c0900e6770a391b74ca36639fab",
+        "blob": "cd8bd615ba8d9b4eec5746b30f2877e7b5e79a6c"
+      },
+      {
+        "pr": 2850,
+        "head": "54b1bad61151161b73fb239572bb3aecd2b42c73",
+        "blob": "4033b6a3c3ffa737efd32a6bf67affb322fcf3d0"
+      }
+    ]
+  },
+  "validation": "All repaired source validation pending actual current-head CI; no local or scientific pass asserted.",
+  "timeouts_increased": false,
+  "assertions_removed": false,
+  "frozen_artifacts_or_ledger_changed": false
+}

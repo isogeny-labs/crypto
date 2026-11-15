@@ -1,0 +1,15 @@
+[package]
+name = "aps-measurement-export"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+serde_json = { version = "1", features = ["arbitrary_precision"] }
+sha2 = "0.10"
+jsonschema = { version = "0.33", default-features = false }
+
+[dev-dependencies]
+tempfile = "3"

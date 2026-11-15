@@ -1,0 +1,111 @@
+name: pcc-gate
+
+# Contract: docs/SABOTAGE_RESISTANCE.md. The `gate` job runs on every pull
+# request and push: it runs the sabotage canaries, checks the hash-chained
+# ledger against the base branch, re-verifies every claim and lints prose.
+# The `sign` job runs only on main with the repository secret PCC_SIGNING_KEY,
+# which no producer session holds, and appends signed verdicts to the ledger.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    concurrency:
+      group: ${{ github.event_name == 'pull_request' && format('pcc-gate-{0}', github.ref) || format('pcc-gate-run-{0}', github.run_id) }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch the base tip
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: |
+          git fetch --no-tags --depth=1 --filter=blob:none origin \
+            "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          git rev-parse --verify "origin/$BASE_REF^{commit}"
+      - name: Sabotage canaries are all rejected
+        run: python3 tools/pcc/pcc.py canary
+      - name: Ledger chain holds, and the base ledger is a prefix (pull request)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: python3 tools/pcc/pcc.py ledger verify --base "origin/$BASE_REF"
+      - name: Ledger chain holds (push)
+        if: github.event_name != 'pull_request'
+        run: python3 tools/pcc/pcc.py ledger verify
+      - name: Every claim verifies (exit 2, not covered, is allowed; exit 1 fails)
+        run: python3 tools/pcc/pcc.py verify-all || [ $? -eq 2 ]
+      - name: PR body is strict - a strong-claim word needs [pcc:ID] or [pcc:unverified]
+        if: github.event_name == 'pull_request'
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: printf '%s' "$PR_BODY" | python3 tools/pcc/pcc.py lint-prose --stdin
+      - name: Advisory prose lint of changed session logs and reports
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: |
+          files=$(git diff --name-only "origin/$BASE_REF...HEAD" | grep -E '^docs/session-logs/.*\.md$|(^|/)(REPORT|README)\.md$' || true)
+          if [ -z "$files" ]; then echo "no session logs or reports changed"; exit 0; fi
+          # shellcheck disable=SC2086
+          python3 tools/pcc/pcc.py lint-prose $files
+      - name: pcc tests
+        run: python3 tools/pcc/test_pcc.py
+
+  sign:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    concurrency:
+      group: pcc-sign
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Sign verdicts for claims that do not stand
+        env:
+          PCC_SIGNING_KEY: ${{ secrets.PCC_SIGNING_KEY }}
+        run: |
+          if [ -z "$PCC_SIGNING_KEY" ]; then
+            echo "::notice::PCC_SIGNING_KEY is not set; no verdicts signed"
+            exit 0
+          fi
+          KEYFILE="$(mktemp)"
+          trap 'rm -f "$KEYFILE"' EXIT
+          chmod 600 "$KEYFILE"
+          printf '%s' "$PCC_SIGNING_KEY" > "$KEYFILE"
+          for f in pcc/claims/*.json; do
+            [ -e "$f" ] || continue
+            id="$(basename "$f" .json)"
+            if ! python3 tools/pcc/pcc.py standing "$id"; then
+              python3 tools/pcc/pcc.py verdict --sign-key "$KEYFILE" --key-id ci-main "$id" || true
+            fi
+          done
+          if [ -n "$(git status --porcelain pcc/ledger.jsonl)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add pcc/ledger.jsonl
+            git commit -m "pcc: signed verdicts for ${GITHUB_SHA}"
+            git push origin HEAD:main
+          fi

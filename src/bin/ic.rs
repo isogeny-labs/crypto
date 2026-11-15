@@ -27,6 +27,8 @@ mod price;
 mod prime;
 #[path = "icx/prime_external.rs"]
 mod prime_external;
+#[path = "ic/prime_orbit.rs"]
+mod prime_orbit;
 #[path = "ic/progress.rs"]
 mod progress;
 #[path = "ic/rho.rs"]
@@ -122,6 +124,9 @@ enum Action {
     /// Measure the exact pair-sum yield of a small-x factor base on a
     /// prime-field curve (NIST P-192 or small prime fixtures with common hits).
     Prime(prime::PrimeArgs),
+    /// Run the scaled automorphism-orbit prime-field IC pipeline; relation
+    /// walks support affine or batched Jacobian coordinates.
+    PrimeOrbit(prime_orbit::PrimeArgs),
     /// Run bounded EC index calculus on an explicit prime-field public target.
     SolvePrime(prime_external::PrimeArgs),
     /// Run bounded prime-field EC index calculus from a checked JSON target artifact.
@@ -202,6 +207,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
+        Some(Action::PrimeOrbit(args)) => prime_orbit::run(args.clone(), cli.json),
         Some(Action::SolvePrime(args)) => prime_external::solve(args),
         Some(Action::SolvePrimeFile(args)) => prime_external::solve_file(args),
         Some(Action::PrimeRouteGenerate(args)) => prime_external::generate_route(args),
@@ -549,6 +555,27 @@ fn display(report: &Value) {
                 println!("{name}");
             }
         }
+        Some("prime-orbit") => {
+            println!(
+                "Prime-orbit IC: {} ({}, {}-bit scaled field)",
+                report["status"].as_str().unwrap_or("?"),
+                report["curve_type"].as_str().unwrap_or("?"),
+                report["instance"]["field_bits"]
+            );
+            println!(
+                "  relation walk: {} coordinates, {} lane(s); {} relations in {} rounds",
+                report["configuration"]["relation_coordinates"],
+                report["configuration"]["relation_lanes"],
+                report["logs"]["relations"],
+                report["logs"]["collection_rounds"]
+            );
+            println!(
+                "  target: expected {}; recovered {}; verified {}",
+                report["result"]["expected"],
+                report["result"]["recovered"],
+                report["result"]["verified"]
+            );
+        }
         Some("prime") => {
             let r = &report["report"];
             let f = |k: &str| r[k].as_f64().unwrap_or(f64::NAN);
@@ -731,6 +758,43 @@ fn main() -> ExitCode {
         ExitCode::SUCCESS
     } else {
         ExitCode::FAILURE
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn prime_orbit_parses_the_jacobian_relation_mode() {
+        let cli = Cli::try_parse_from([
+            "ic",
+            "prime-orbit",
+            "--type",
+            "j0",
+            "--bits",
+            "20",
+            "--relation-coordinates",
+            "jacobian",
+            "--no-rho",
+        ])
+        .unwrap();
+        let Some(Action::PrimeOrbit(args)) = cli.command else {
+            panic!("prime-orbit did not select its action");
+        };
+        assert_eq!(args.curve_type, Some(prime_orbit::TypeArg::J0));
+        assert_eq!(
+            args.relation_coordinates,
+            prime_orbit::RelationCoordinatesArg::Jacobian
+        );
+        assert!(args.no_rho);
+    }
+
+    #[test]
+    fn every_listed_curve_is_inspectable() {
+        for name in params::names() {
+            params::named(name).unwrap_or_else(|error| panic!("{name}: {error}"));
+        }
     }
 }
 

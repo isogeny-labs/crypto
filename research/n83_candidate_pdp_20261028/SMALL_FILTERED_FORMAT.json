@@ -1,0 +1,28 @@
+{
+  "schema": "n83.small-filtered-format/v1",
+  "scope": "Six synthetic m3 ell3 prime-chain development fixtures; not n83 production",
+  "encoding": {
+    "field": "Small integer prime, either101 or103; all coefficients canonical integers modulo p",
+    "variables": "Nine selectors z0..z8, three per block, followed by one unrestricted U; weights1,2,4 repeat per block; z_i^2=w_i*z_i",
+    "polynomial": "List of [selector_mask,U_exponent,coefficient]; mask bitj means z_j; zero coefficients omitted",
+    "columns": "List of [selector_mask,U_exponent], ordered increasingly by total degree then mask then U exponent; only degree<=d included",
+    "basis": "List of objects with pivot column index and entries [column_index,coefficient]; normalized pivot coefficient1; zero entries omitted",
+    "degree": "Selector-mask popcount plus U exponent; no U field equation",
+    "rank": "Rank of the image of V_d in the selector quotient, not dimension of V_d in the unreduced polynomial ring"
+  },
+  "files": {
+    "pP-tT.json": "Full inputs, witness and both V4/V5 quotient bases for one fixed field/target fixture",
+    "summary.json": "Six case summaries, exact witness degrees, memberships, quotient ranks and completed closure check counts; v2 additionally records rejection of the mutated witness g+1",
+    "test.log": "All three native tests, build identity and diagnostic timing; no performance comparison",
+    "exit-code.txt": "Controller exit status; zero for this completed development invocation",
+    "source/": "Exact new Rust binary source, Cargo package/lock and pre-control design",
+    "test-instrument": "Exact native executable for replay; no production entry point",
+    "manifest.json": "Payload lengths and SHA256 hashes, excluding itself",
+    "build.json": "Published source/binary identity and fixed development bounds"
+  },
+  "algorithm": "Start normalized input rows; graded elimination; enqueue every variable multiple of each newly independent row of degree<d; stop only on empty queue. Check all final low-degree basis products again.",
+  "guards": "At most9selectors, degree5,4096columns and50000processed rows;120second controller timeout and2GiB address-space cap. A hit is inconclusive.",
+  "replay": "Run restored test-instrument --test-threads=1 with fresh N83_FILTERED_SMALL_OUT; compare six case JSON files and summary byte-for-byte",
+  "versions": "development.tar.gz preserves the initial three-test invocation; development-v2.tar.gz adds the explicit g+1 negative control in all six fixtures. Both versions and replay logs remain retained; use v2 for the current implementation.",
+  "boundary": "Zero scalar pairing is inconclusive; both exceptional fixtures still have witness outside V4 and inside V5. No universal/n83 LFD, exact global LFD, regularity, rational-point decomposition or elite-base claim. Independent mathematical review remains separate."
+}

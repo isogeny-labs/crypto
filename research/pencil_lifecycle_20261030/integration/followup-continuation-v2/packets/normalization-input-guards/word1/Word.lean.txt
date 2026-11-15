@@ -1,0 +1,24 @@
+import Guards
+set_option autoImplicit false
+namespace NormalizationInputGuards
+open Polynomial MumfordNormalization MumfordValidity AffineCoefficientLoop TraversalPolynomial StoredDivisor ScaleTrim
+
+theorem top_word_one (d : ℕ) (p : UInt64) (u : Fin (d+1)→UInt64)
+ (ht : u ⟨d,by omega⟩=1) : extend p u d=1 := by
+ simp only [extend,dif_pos (by omega : d<d+1),ht]
+ norm_num
+
+theorem stored_valid_from_guards (d : Fin 3) (p : UInt64) [Fact p.toNat.Prime]
+ (u : Fin (d.val+1)→UInt64) (v : Fin d.val→UInt64) (a b : UInt64) (f : (ZMod p.toNat)[X])
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hu : ∀i,(u i).toNat<p.toNat) (hv : ∀i,(v i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (ha0 : a≠0)
+ (ht : u ⟨d.val,by omega⟩=1)
+ (hr : sourcePoly (extend p u) (d.val+1)∣f-(sourcePoly (extend p v) d.val)^2) :
+ Valid (T 6 (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) f)
+  (wordsPoly p (storeU d p u a b)) (wordsPoly p (storeV d p v a b)) ∧
+ (wordsPoly p (storeU d p u a b)).natDegree=d.val := by
+ have ht' := top_word_one d.val p u ht
+ exact stored_valid d p u v a b f hp hb hu hv ha hbeta ha0
+  (prefix_natDegree _ _ ht') (prefixes_valid _ _ d.val (by have:=d.isLt; omega) ht' f hr)
+end NormalizationInputGuards

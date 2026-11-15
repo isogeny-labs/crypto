@@ -1,0 +1,17 @@
+{
+  "schema": "software.integration-check/v1",
+  "checked_utc": "2026-11-02T20:16:56.927339+00:00",
+  "reviewer": "root",
+  "source_sha256": "5fc312fade29786fc0d5a8fd8f9ff182358b8250b1a543218918ea148fb5e04f",
+  "command": "timeout 30s env PYTHONDONTWRITEBYTECODE=1 python3 signed-witness-checker-v2/check.py",
+  "exit_code": 0,
+  "certificates": 64,
+  "source_rows": 6900,
+  "determined": 39,
+  "undetermined": 25,
+  "negative_controls_rejected": 11,
+  "producer_invoked": false,
+  "elimination_invoked": false,
+  "collector_invoked": false,
+  "scope": "root inspected unique archive/manifest/source/summary joins and replayed direct equalities and controls; not a geometric proof"
+}

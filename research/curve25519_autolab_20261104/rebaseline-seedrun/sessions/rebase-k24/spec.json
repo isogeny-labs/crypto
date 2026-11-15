@@ -1,0 +1,75 @@
+{
+ "arms": [
+  {
+   "method": {
+    "id": "rho.negation"
+   },
+   "name": "rho-neg",
+   "role": "reference"
+  },
+  {
+   "name": "inc",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "inc-run",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "inc-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "description": "research/curve25519_autolab_20261104/r4-i1 follow-up: the incumbent wwalkGg-x09-n2 with its fixed walk table (seed 0) against the same oracle with seed=run (a fresh table each run). Frozen before data. Public synthetic Curve25519-family miniature; no security claim.",
+ "label": "re-baseline k = 24: incumbent with a fixed table vs the same arm with seed=run",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 2,
+  "seed": 20261228,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 16743506,
+    "b": 2381926,
+    "group_order": 16778792,
+    "gx": 109,
+    "gy": 3123379,
+    "kind": "prime_explicit",
+    "p": 16777213,
+    "r": 2097349
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261229,
+  "targets_per_curve": 32
+ }
+}

@@ -1,0 +1,52 @@
+import Product
+set_option autoImplicit false
+namespace ProjectiveComparator
+variable {K : Type*} [Field K]
+abbrev V (K : Type*) := Fin 4 → K
+def same (x y : V K) : Prop := ∀ i j,x i*y j=x j*y i
+def nonzero (x : V K) : Prop := ∃ i,x i≠0
+
+theorem scaled_same (x : V K) (c : K) : same x (fun i=>c*x i) := by
+ intro i j;ring
+
+theorem same_symm (x y : V K) (h:same x y) : same y x := by
+ intro i j
+ calc y i*x j=x j*y i := mul_comm _ _
+      _=x i*y j := (h i j).symm
+      _=y j*x i := mul_comm _ _
+
+theorem pivot_scale (x y : V K) (i:Fin 4) (hx:x i≠0) (h:same x y) :
+ ∀ j,y j=(y i/x i)*x j := by
+ intro j
+ apply (mul_left_cancel₀ hx)
+ calc
+  x i*y j=x j*y i := h i j
+  _=x i*((y i/x i)*x j) := by field_simp [hx] <;> ring
+
+theorem same_iff_nonzero_scale (x y : V K) (hx:nonzero x) (hy:nonzero y) :
+ same x y ↔ ∃ c:K,c≠0 ∧ ∀ j,y j=c*x j := by
+ constructor
+ · intro h
+   rcases hx with ⟨i,hi⟩
+   have hs:=pivot_scale x y i hi h
+   refine ⟨y i/x i,?_,hs⟩
+   intro hz
+   rcases hy with ⟨j,hj⟩
+   apply hj
+   rw [hs j,hz,zero_mul]
+ · rintro ⟨c,hc,h⟩
+   intro i j
+   rw [h i,h j]
+   ring
+
+theorem same_trans (x y z : V K) (hx:nonzero x) (hy:nonzero y) (hz:nonzero z)
+ (hxy:same x y) (hyz:same y z) : same x z := by
+ rcases (same_iff_nonzero_scale x y hx hy).mp hxy with ⟨a,ha,haxy⟩
+ rcases (same_iff_nonzero_scale y z hy hz).mp hyz with ⟨b,hb,hbyz⟩
+ apply (same_iff_nonzero_scale x z hx hz).mpr
+ refine ⟨b*a,mul_ne_zero hb ha,?_⟩
+ intro j;rw [hbyz j,haxy j,mul_assoc]
+
+theorem zero_matches_everything (x:V K) : same (fun _=>0) x := by
+ intro i j;simp
+end ProjectiveComparator

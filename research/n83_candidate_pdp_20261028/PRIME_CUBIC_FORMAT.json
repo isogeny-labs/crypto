@@ -1,0 +1,54 @@
+{
+  "schema": "n83.prime-cubic-format/v1",
+  "status": "development_only_no_n83_production",
+  "encoding": "UTF-8 JSON; field elements as canonical decimal strings; indices zero-based",
+  "template": {
+    "variables": "Nine selectors per block, block-major, followed by m-2 unrestricted U variables",
+    "columns": "Generator-major, then lexicographic triples a<=b<=c without repeated selectors",
+    "column_count": "(m-1)*(binomial(10m,3)-9m*(10m-2))",
+    "monomial": "Sorted list of seven variable indices; repeated selector indices reduce to zero; U repetitions allowed",
+    "pivot_rows": "Original coefficient row [column,decimal coefficient], monomial, pivot column and nonzero pre-normalization pivot",
+    "replay": "Reconstruct all original coefficients and deterministic sparse Gaussian elimination; reported rank alone is insufficient"
+  },
+  "coverage": {
+    "construction": "For each i<=j<=k in0..26, pad set{i,j,k} with smallest missing indices to nine; deduplicate",
+    "validation": "Every ordered triple in0..26 cubed occurs in a retained subset; all U retained",
+    "purpose": "Coefficient restrictions of original27-selector system, not replacement factor bases"
+  },
+  "bounds": {
+    "success": "Conditional FFD>=8 only after complete injectivity, source normalization, triple coverage and a separately frozen production protocol",
+    "deficiency": "Inconclusive for original system; no lifted kernel claimed",
+    "lfd": "No new claim",
+    "current_production": "No cubic n83 production; existing quadratic conditional7\u201317 intervals remain unchanged"
+  },
+  "development_summary": "validation-prime-cubic-development/summary.json",
+  "bounded_contract": "PRIME_CUBIC_DESIGN.md",
+  "journal": {
+    "encoding": "UTF-8 JSONL; each event flushed; canonical coefficients are decimal strings",
+    "events": [
+      "header",
+      "column",
+      "pending_column",
+      "matrix_complete",
+      "row_complete",
+      "pending_row",
+      "terminal"
+    ],
+    "column": "column index plus exact [sorted monomial,coefficient] pairs",
+    "row_complete": "matrix row cursor,monomial,pivot record or null,cumulative reduction updates and basis entries",
+    "pending_row": "partially reduced row plus next reducer or null for pending insertion",
+    "terminal": "complete certificate or capped record with null certificate",
+    "hard_interruption": "Unverified prefix only; do not report a successful replay"
+  },
+  "attempt": "No production controller enabled",
+  "assembly": "No production assembly enabled",
+  "replay_commands": [
+    "test-instrument with N83_CUBIC_TEST_ARTIFACTS pointing to a fresh retained output directory"
+  ],
+  "development_controls": {
+    "dense-m3-ellE-pP.json": "All nonzero coefficient rows, sparse pivot certificate, independent dense rank; development_only true",
+    "terminal-ell8-pP.json": "56 squarefree cubic columns,56 degree-five rows and full dense coefficient vectors; independent rank",
+    "seven-selector-annihilator.json": "Eight signed cubic terms and checked zero product; no original-system kernel inference",
+    "PID-N/": "identity.json,append-only journal.jsonl,result.json; deliberately corrupted-journal fixtures preserve original-journal.jsonl"
+  }
+}

@@ -254,18 +254,18 @@ def load_pre_gate(rel: str, repo: Path = REPO) -> dict[str, str]:
 
 
 def verdict_keys(v: dict) -> list[str]:
-    """The keys a verdict line is filed under.  `row` is used as written.  `row_id` is
-    used as written and, for a board table prefix (`A:`, `B:`, `C:`), also without it,
-    because the gate names a board row by `board:<slug>:<source>`, `<slug>@<source>` or `<slug>`."""
-    keys = []
-    for field in ("row", "row_id"):
-        k = v.get(field)
-        if isinstance(k, str) and k:
-            keys.append(k)
-            head, sep, rest = k.partition(":")
-            if field == "row_id" and sep and head in BOARD_TABLE_PREFIXES and rest:
-                keys.append(rest)
-    return keys
+    """The keys a verdict line is filed under: `row` and `row_id`, each as written.
+    A board-table `row_id` (`A:<slug>`, `B:<slug>`, `C:<slug>`) is not reduced to the bare
+    slug: the same curve can sit in two tables (Table A and Table C share four slugs), and
+    a bare-slug key would hand one table's verdict, a failing one included, to the other.
+    The board row looks itself up by `<table>:<slug>` instead (judge_board_row)."""
+    return [k for k in (v.get("row"), v.get("row_id")) if isinstance(k, str) and k]
+
+
+def table_key(row: dict) -> str | None:
+    """The sweep's `<table>:<slug>` key of a board row, or None for a row outside tables A-C."""
+    family = row.get("family")
+    return f"{family}:{row['slug']}" if family in BOARD_TABLE_PREFIXES else None
 
 
 def load_verdicts(kind: str, repo: Path = REPO) -> dict[str, dict]:
@@ -381,7 +381,8 @@ def judge(keys: list[str], digest: str, evidence: Path | None, slug: str | None,
 
 def judge_board_row(row: dict, digest: str, verdicts: dict, pre_gate: dict,
                     repo: Path = REPO) -> dict:
-    keys = [board_key(row), row["slug"] + "@" + row["source"], row["slug"]]
+    keys = [board_key(row), row["slug"] + "@" + row["source"], table_key(row), row["slug"]]
+    keys = [k for k in keys if k]
     st, why = judge(keys, digest, repo / board_evidence_dir(row), row["slug"],
                     verdicts, pre_gate, repo)
     out = {"status": st, "evidence_dir": board_evidence_dir(row), "reasons": why}

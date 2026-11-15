@@ -1,0 +1,176 @@
+{
+  "schema": "quadratic-ordinate-pencil-verification/v1",
+  "date": "2026-11-01",
+  "request": "Keep searching for the golden factor base, with complete relations, lower structured degree and lower solving work",
+  "source_parent": "87d7e0587cafdbb253e575200235f23ee460b3d5",
+  "curve": "icv1-fp5-tm1-a77cc6af",
+  "factor_base": "FB1h29cc024e755c",
+  "inherited_registered": false,
+  "construction": "Boolean offsets of a quadratic ordinate coordinate; no complete-split assumption",
+  "generic_theorems": [
+    "PencilSelector.complete_selector_iff",
+    "PencilSelector.system_implies_base_relation",
+    "PencilCanonical.canonical_first_vanishing",
+    "PencilElimination.two_selectors_iff"
+  ],
+  "degree_metric": "canonical highest-form homogeneous quotient first vanishing; not affine solving degree",
+  "generic_degree": "2k+3 for independent k-bit labels per slot, including all 2k bits",
+  "generic_degree_hypotheses": [
+    "field",
+    "characteristic other than 2",
+    "nonzero quadratic coefficients in both slots"
+  ],
+  "fixture": {
+    "columns": 8,
+    "distinct_signed_points": 16,
+    "positive_fibre_sizes": [
+      4,
+      1,
+      2,
+      2
+    ],
+    "canonical_degree": 7,
+    "same_base_dense_canonical_degree": 9,
+    "selection": "hand-derived after inspecting the older fixture, not a prospective trial"
+  },
+  "derived_ambient_column_budgets": {
+    "all_bit_variables": 7,
+    "all_bit_at_degree7": 3432,
+    "dense_variables": 2,
+    "dense_at_degree9": 55,
+    "status": "binomial envelopes only; not observed matrix widths"
+  },
+  "exact_projection": {
+    "variables_removed": 2,
+    "projected_canonical_degree": null,
+    "status": "semantics proved; canonical degree not separately formalized"
+  },
+  "validation": {
+    "command": "env PATH=/workspace/prime-degree-lean/bin:/workspace/n83-rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin:$PATH LEAN_NUM_THREADS=4 RUSTUP_HOME=/workspace/n83-rustup RUSTUP_TOOLCHAIN=1.94.1-x86_64-unknown-linux-gnu CARGO_HOME=/workspace/n83-cargo bash verify.sh verification/final",
+    "exit_code": 0,
+    "input_hashes": 40,
+    "source_modules": 18,
+    "audited_declarations": 240,
+    "audit_failures": 0,
+    "native_trust": 0,
+    "warnings_as_errors": "all five new modules passed",
+    "native_tests_passed": 13,
+    "native_format": "passed",
+    "native_clippy": "release all-targets warnings-as-errors passed",
+    "deterministic_export_replay": "byte-identical",
+    "lean4checker": "unavailable; no fresh pass claimed",
+    "cache_download_preflight": "not claimed",
+    "root_library": {
+      "status": "failed compilation under installed Rust 1.94.1",
+      "attempt_exit_codes": [
+        101,
+        101,
+        101
+      ],
+      "latest_errors": [
+        "E0658 atomic_try_update in src/cryptanalysis/ecbench/diagnostic_runtime.rs:139",
+        "E0658 atomic_try_update in src/cryptanalysis/ecbench/pencil.rs:79"
+      ],
+      "sparse_dependencies_materialized": true,
+      "tracked_compile_time_fixture_paths_materialized": 43,
+      "command": "env PATH=/workspace/n83-rustup/toolchains/1.94.1-x86_64-unknown-linux-gnu/bin:$PATH RUSTUP_HOME=/workspace/n83-rustup RUSTUP_TOOLCHAIN=1.94.1-x86_64-unknown-linux-gnu CARGO_HOME=/workspace/n83-cargo CARGO_TARGET_DIR=/workspace/n83-target CARGO_BUILD_JOBS=4 cargo test --release --lib --offline --locked",
+      "receipt": "verification/root-library-attempt03.log",
+      "changed_root_modules": false,
+      "pass_claimed": false
+    }
+  },
+  "toolchains": {
+    "lean": "Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)",
+    "rust": "rustc 1.94.1 (e408947bf 2026-03-25)",
+    "mathlib": "c44e0c8ee63ca166450922a373c7409c5d26b00b",
+    "git_dependencies_checked": 9
+  },
+  "development": {
+    "failed_builds": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      15,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "successful_builds": [
+      2,
+      14,
+      16,
+      22
+    ],
+    "archive": "verification/development-records.tar.gz",
+    "deterministic_repack": "byte-identical"
+  },
+  "report": {
+    "renderer": "Typst 0.15.0",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "render_dpi": 100,
+    "pdfinfo_suspects": false,
+    "bytes": 54695
+  },
+  "experiments": {
+    "status": "not launched",
+    "runner_and_controls": "not implemented",
+    "protocol": "PROTOCOL.json",
+    "route_gap": "no arbitrary-command EKS tool or ready AWS identity configured; ecbench workflow integration absent",
+    "old_local_exception_reused": false,
+    "timing": null,
+    "natural_yield": null,
+    "affine_f4_degree": null,
+    "field_ops": null,
+    "group_ops": null,
+    "ram": null,
+    "disk_traffic": null,
+    "false_positives": null,
+    "false_negatives": null
+  },
+  "requirement_status": {
+    "new_candidate": "verified complete at construction scope",
+    "complete_two_summand_semantics": "verified complete",
+    "actual_canonical_degree": "verified complete",
+    "finite_fixture_and_fb1": "verified complete",
+    "exact_one_bit_projection": "verified complete semantically",
+    "projected_degree": "not established",
+    "matched_solver_experiment": "partial: protocol only; no run",
+    "lower_complete_solving_cost": "not established",
+    "golden_base": "not identified",
+    "external_novelty": "not established",
+    "p256_17_term_gate": "open; not implemented in this continuation",
+    "pr": "existing PR3108 continuation"
+  },
+  "identity_certificate": "IDC1hb79cfe74b833e0be; evaluated tier proof:null, separate kernel identity theorem",
+  "merge": "auto-merge rejected previously; no retry without explicit approval naming PR3108",
+  "selected_sha256": {
+    "PencilSelector.lean": "a8e13a0ca4bd930befbb831c2da5add0dcae4b25c2ac3b1632f753c6838d37bd",
+    "PencilTop.lean": "ab9b40d7a71f6b4b3b7993ef6feae3d309a8c4e976ce2d4b4ca58f85a113c3fd",
+    "PencilCanonical.lean": "ee71e0d6558c2fc8ca4aea6e35059e9d4986eb8e05dc616dce953a5a1652e2c4",
+    "PencilElimination.lean": "d9b779a4e48947e42747b94f46973334a23036ad5a58d6b5d129ef9e395fd5cc",
+    "PencilFixture.lean": "3bb04780b952c1710ebaaafa48b44d2ba5586595a847239d8758e41506964bb5",
+    "native/main.rs": "076ac8682151fb30ae1493d6db88f30a7fe0fb849e7aec11d8e5ec181ecf44b0",
+    "fixture/FB1h29cc024e755c.json": "642235d347cc6c84aaa2480de4a9ec4d4e6eb975352f3b203cea75d72bac1b3b",
+    "fixture/fixture.json": "1051bf322901bb9481d0e4a94d3e7669f1ef0ccbcb0b1ff9637e39c1bb8ea76e",
+    "fixture/identity.json": "fe84ae27a3db094256222ecac982a53819ec4a7f81de6ba7f03fb0767d480af5",
+    "PROTOCOL.json": "ed5d1a923e43d76d73ce92ea17fa7d4db4c02e481df526f1ce970b9ec4468988",
+    "verify.sh": "2842830473a91f7e2760f87c8e009ee3ebf0a16f9a96f69ddf83b317c4026cc6",
+    "verification/inputs.sha256": "d52f790a84688dca4f7503853ca6791606da41dda5de63d67a51346bd9ee7f1d",
+    "verification/final/axioms.log": "17c293891d0d87da3ecd20a854aa83fbf5a5bfef8d2d23bc99e4fdffc87e875f",
+    "verification/development-records.tar.gz": "39a02ccbc51bf7b08c139ab9b86add5ff59c9a11d734350322574fca51867911",
+    "reports/report.pdf": "d951c56dab1ecd2c0fbff8ec1c35e93abba55080170aec3f0ba9675856d2b0fe",
+    "reports/construction.svg": "882db455d45924e0e32126d264eedae6b888def45e0efc2d8b7bb0da1d544979"
+  }
+}

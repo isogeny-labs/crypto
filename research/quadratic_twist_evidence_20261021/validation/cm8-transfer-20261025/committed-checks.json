@@ -1,0 +1,81 @@
+{
+  "checked_commit": "aa1808b35fc24f6be3a5f5594f385b649218e39f",
+  "status": "passed",
+  "checks": {
+    "artifact-committed-check.log": "artifacts check: no data files committed\n",
+    "large-files-check.log": "check-large-files: no added or modified file over 10485760 bytes\n",
+    "naming-diff.log": "curve names: 0 problem(s)\n",
+    "backlog-committed-check.log": "XP-20261025-cm8-quadratic-transfer: ok\nXP-20261025-cm8-explicit-dual: ok\n"
+  },
+  "metrics_command": "timeout 60 python3 tools/progress_metrics.py --ref HEAD --since 2026-10-01",
+  "metrics_stderr": "",
+  "new_metrics": [
+    {
+      "metric": "ic.twist.cm8_transfer.verified",
+      "value": 72.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "finite audit count",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "F13 finite audit; no cost or generalization",
+      "source": "research/quadratic_twist_evidence_20261021/native/cm8-transfer-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.cm8_transfer.addition_pairs",
+      "value": 196.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "finite audit count",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "F13 finite audit; no cost or generalization",
+      "source": "research/quadratic_twist_evidence_20261021/native/cm8-transfer-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.cm8_transfer.joint_original",
+      "value": 0.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "finite audit count",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "F13 finite audit; no cost or generalization",
+      "source": "research/quadratic_twist_evidence_20261021/native/cm8-transfer-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.cm8_transfer.joint_reduced",
+      "value": 3.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "finite audit count",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "F13 finite audit; no cost or generalization",
+      "source": "research/quadratic_twist_evidence_20261021/native/cm8-transfer-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.cm8_transfer.matched_degree_equal",
+      "value": 68.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "finite audit count",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "F13 finite audit; no cost or generalization",
+      "source": "research/quadratic_twist_evidence_20261021/native/cm8-transfer-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.cm8_transfer.matched_degree_different",
+      "value": 4.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "finite audit count",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "F13 finite audit; no cost or generalization",
+      "source": "research/quadratic_twist_evidence_20261021/native/cm8-transfer-20261025/audit.json"
+    }
+  ],
+  "scope": "Committed-tree metadata checks; exact finite audit counts only, no working-tree metrics or extrapolation."
+}

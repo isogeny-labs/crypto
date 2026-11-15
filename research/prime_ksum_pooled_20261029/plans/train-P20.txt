@@ -1,0 +1,43 @@
+spec ECS1h0b7ca2bf24d1 (prime_ksum_pooled_20261029 train, 20-bit prime-order curves): 1224 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm bsgs-neg         reference  ECM1h87f6341629c3 bsgs.negation {}
+  arm inc-n16          candidate  ECM1hdffef694967d ic.pipeline {"factor_base": "prime-abscissa:size=16", "linalg": "incremental-gauss", "max_trials": "1410236", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n23          candidate  ECM1hb09114de920b ic.pipeline {"factor_base": "prime-abscissa:size=23", "linalg": "incremental-gauss", "max_trials": "1410236", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n32          candidate  ECM1h586f93741037 ic.pipeline {"factor_base": "prime-abscissa:size=32", "linalg": "incremental-gauss", "max_trials": "1410236", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n45          candidate  ECM1h0fc574520f33 ic.pipeline {"factor_base": "prime-abscissa:size=45", "linalg": "incremental-gauss", "max_trials": "1410236", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n64          candidate  ECM1hd54aa769734c ic.pipeline {"factor_base": "prime-abscissa:size=64", "linalg": "incremental-gauss", "max_trials": "1410236", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a5         candidate  ECM1he2d497fd5b2b ic.pipeline {"factor_base": "prime-abscissa:size=5", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a7         candidate  ECM1h3105f844b3d9 ic.pipeline {"factor_base": "prime-abscissa:size=7", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a10        candidate  ECM1h1639ea62a5a9 ic.pipeline {"factor_base": "prime-abscissa:size=10", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a14        candidate  ECM1h0c03ec62628e ic.pipeline {"factor_base": "prime-abscissa:size=14", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a20        candidate  ECM1ha52c8fb50db8 ic.pipeline {"factor_base": "prime-abscissa:size=20", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a5         candidate  ECM1hfe74aaa27a5c ic.pipeline {"factor_base": "prime-abscissa:size=5", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a6         candidate  ECM1h81ec185cbaf9 ic.pipeline {"factor_base": "prime-abscissa:size=6", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a9         candidate  ECM1h3d22188326c6 ic.pipeline {"factor_base": "prime-abscissa:size=9", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a13        candidate  ECM1hbd3a6aca25cd ic.pipeline {"factor_base": "prime-abscissa:size=13", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a18        candidate  ECM1h039339f8a650 ic.pipeline {"factor_base": "prime-abscissa:size=18", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  workload Wc91c3779c0ab icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload W1567e195fa3f icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload We832a6244702 icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload Wc01e7b10e937 icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload W959ac7970800 icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload Wd2a5a9b65a51 icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload Wde41c203124d icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload Wf6ad872aa28e icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload W2a4996e04390 icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload W822cd1e809c3 icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload W0f70ecb64f1b icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload Wc48e18b865e9 icv1-fp20-tm985-4efa604e r=2^19.29 A=2 registered=false ec1=-
+  workload W6855e41b0e4e icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W56ebcd2565ec icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload Wfe051a397c21 icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W5dd4cdc2a5ab icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W172df150608f icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W38951ef98d10 icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W99ec4db38b4a icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload Wbcc20eaf2e72 icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W81eaa6441d6c icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W7c29c4e6b351 icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W4c9979b132cc icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+  workload W9c8963583b8e icv1-fp20-t1239-d852a683 r=2^19.81 A=2 registered=false ec1=-
+note: 24 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md §11)

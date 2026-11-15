@@ -1,0 +1,45 @@
+name: APS native export contracts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/aps-export/**'
+      - '.github/workflows/aps-export.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aps-export-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        rust: ['1.98.0', stable]
+    defaults:
+      run:
+        working-directory: tools/aps-export
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: tools/aps-export
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+          components: clippy,rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/aps-export
+      - name: Format
+        run: cargo fmt --check
+      - name: Strict lint
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Native export, arithmetic, metrics and corruption contracts
+        run: cargo test --release --locked

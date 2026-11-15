@@ -502,6 +502,7 @@ impl F2mElement {
         if k == 0 {
             return acc;
         }
+        super::operation_tally::tick_n(self.m, "square", u64::from(k));
         let nw = acc.bits.len();
         with_scratch(2 * nw + 1, |sq| {
             for _ in 0..k {
@@ -1447,6 +1448,26 @@ mod tests {
                 F2mElement::one(m)
             );
         }
+    }
+
+    #[test]
+    fn operation_tally_counts_batched_squares_and_inversion_internals() {
+        let irr = IrreduciblePoly {
+            degree: 7,
+            low_terms: vec![0, 1],
+        };
+        let a = F2mElement::from_bit_positions(&[0, 1, 3], 7);
+        let tally = crate::binary_ecc::operation_tally::OperationTally::begin();
+        let _ = a.square_k_times(5, &irr);
+        let counts = tally.finish();
+        assert_eq!(counts.get("f2m7_square"), Some(&5));
+
+        let tally = crate::binary_ecc::operation_tally::OperationTally::begin();
+        let _ = a.flt_inverse(&irr).unwrap();
+        let counts = tally.finish();
+        assert_eq!(counts.get("f2m7_inverse_informational"), Some(&1));
+        assert!(counts.get("f2m7_mul").is_some_and(|count| *count > 0));
+        assert!(counts.get("f2m7_square").is_some_and(|count| *count > 1));
     }
 
     /// Inversion round-trips at every field size.

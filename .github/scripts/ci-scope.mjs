@@ -171,9 +171,18 @@ export function sourceFiles(cwd) {
   for (const source of pathDependencyFiles(cwd, tracked)) {
     if (!source.endsWith('/Cargo.toml')) sources.add(source);
   }
+  // Materialize the known sources in one batch before reading them. In the
+  // scope job's blob-less partial clone, `git show HEAD:<file>` fetches one
+  // missing blob per call, a round trip each; the path-dependency crates
+  // alone took the `scope` job past its 5-minute cap on every pull request
+  // on 2026-11-03. A sparse-checkout add fetches every missing blob at once.
+  materializeSources(cwd, sources);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
     const file = queue[index];
+    // Dependencies discovered while walking modules arrive in small groups;
+    // fetch everything still unread the first time one is missing.
+    if (!existsSync(path.join(cwd, file))) materializeSources(cwd, new Set(queue.slice(index)));
     const text = sourceText(cwd, file);
     const dir = path.posix.dirname(file);
     const add = dependency => {

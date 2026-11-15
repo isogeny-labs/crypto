@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "115s",
+    "bash",
+    "-c",
+    "ulimit -v 2097152; exec python3 -B -m unittest -v test_supervise"
+  ],
+  "exit": 0,
+  "elapsed_seconds": 0.7339349210087676,
+  "source_unchanged": true,
+  "source_pins": {
+    "supervise.py": "d6587a8b2d7c169672d2d3dcbdc82a79bd4ee0ba38c324995c0e887a905d96b0",
+    "test_supervise.py": "80790d5a12a8b028997dacd57dbebb82404d3a31077b8e6bcf1c8589c3686b7c",
+    "PLAN.md": "bdc664d5aeaaa622898249a9a6a2814991535bd6d952de9d271c7cb02ef563b6"
+  },
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "9bb7e480c59f4040b7ff909ef6b0b3b204b78db3176aa3359403a6b65a9cff6c",
+  "plan_sha256": "2bc16055c50af7734a68340d094d7525495919296c1a49d2d3f2445b37273790",
+  "runtime_executed": false
+}

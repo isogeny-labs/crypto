@@ -37,6 +37,13 @@
 //! `--kinds dickson-torus` builds the Dickson tower in its torus case
 //! (`2^t | p + 1`, `u` and `μ_{2^t}` in the norm-1 torus of `F_{p²}`; note
 //! §2.1), checked by `check_torus` before anything is measured.
+//! `--radix 4` (or 8, 16; `--engine tower` with Kummer or Dickson towers)
+//! grades every block of `k` tower levels with weights `1, 2, …, 2^{k−1}`: the
+//! radix-`2^k` presentation of the same tower, same ring and same systems,
+//! with only F4's degree order changed (`TowerWeights`;
+//! `research/pkm_radix_grading_20261104/`). Rows then carry `radix` and
+//! `weights`, and `solving_degree_max` is a weighted degree. Without the
+//! flag every row is as before (`radix: 2`).
 //! `--null-chain` runs the null control at `m ≥ 3` as well, with every `S₃`
 //! link of the chain given random coefficients on its own support
 //! (`research/pkm_dickson_torus_20261015/`).
@@ -74,7 +81,9 @@ use std::io::Write;
 use std::time::{Duration, Instant};
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, F4Report, Ordering, Poly};
-use crypto_lib::cryptanalysis::f4_fp_tower::{self, RPoly, SquareRule, TowerF4Options, TowerRing};
+use crypto_lib::cryptanalysis::f4_fp_tower::{
+    self, RPoly, SquareRule, TowerF4Options, TowerRing, TowerWeights,
+};
 use crypto_lib::cryptanalysis::f4_tower_generic::{f4_tower_generic, GPoly, GTowerRing};
 use crypto_lib::cryptanalysis::fp_backend::{Fp224, Fp256, Fp32, Fp64, FpP192, FpWide, PrimeField};
 use crypto_lib::cryptanalysis::fp_backend_ifma::Fp52;
@@ -1404,6 +1413,7 @@ fn measure_tower(
     trace: bool,
     full_rank_exit: bool,
     sig: Option<sig_fp_tower::SigOptions>,
+    weights: TowerWeights,
 ) -> (Outcome, Vec<RPoly>) {
     let p = ring.p;
     if let Some(s) = sol {
@@ -1440,6 +1450,7 @@ fn measure_tower(
         opts = opts.with_max_dense(c);
     }
     opts.full_rank_exit = full_rank_exit;
+    opts = opts.with_weights(weights);
     if trace {
         // Each step as it ends, so that a run that dies leaves its trace,
         // and a step a stop cuts off when it does.
@@ -1463,9 +1474,18 @@ fn measure_tower(
         })
     };
     let zero_dim = r.inconsistent || (0..ring.n_free).all(pure);
+    // Linear in the variables, whatever the grading: with weights,
+    // `degree_of` is the weighted degree.
     let linear = lms
         .iter()
-        .filter(|&&m| f4_fp_tower::degree_of(m) == 1)
+        .filter(|&&m| {
+            f4_fp_tower::mask_of(m).count_ones()
+                + f4_fp_tower::free_of(m)
+                    .iter()
+                    .map(|&e| u32::from(e))
+                    .sum::<u32>()
+                == 1
+        })
         .count();
     let out = Outcome {
         solving_degree_max: r.solving_degree_max,
@@ -1494,6 +1514,9 @@ fn measure_tower(
             "sig_rewrite": sig.map(|so| format!("{:?}", so.rewrite)),
             "sig_steps": sig.map(|so| format!("{:?}", so.steps)),
             "input_ring_degrees": ring_degrees,
+            "weights": (!weights.is_unit()).then(|| {
+                (0..ring.n_tower() as u32).map(|j| weights.weight(j)).collect::<Vec<_>>()
+            }),
             "muladds": r.muladds,
             "max_nnz": r.max_nnz,
             "max_residual_rows": r.max_residual_rows,
@@ -1783,6 +1806,11 @@ struct Args {
     hky_cmax: u32,
     hky_max_cols: u128,
     hky_max_entries: u64,
+    /// `--radix 2^k` (`f4_fp_tower` only): grade every block of `k` tower
+    /// levels with weights `1, 2, …, 2^{k−1}`, the radix-`2^k` presentation
+    /// of the same tower (`TowerWeights`). `k = 1`, radix 2, is the unit
+    /// grading of every committed row.
+    radix_k: u32,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1961,6 +1989,7 @@ fn parse_args() -> Args {
         hky_cmax: 6,
         hky_max_cols: 2_000_000,
         hky_max_entries: 600_000_000,
+        radix_k: 1,
     };
     let args: Vec<String> = std::env::args().skip(1).collect();
     let list = |s: &str| -> Vec<usize> {
@@ -2074,6 +2103,14 @@ fn parse_args() -> Args {
             }
             "--max-nnz" => a.max_nnz = Some(v.parse().expect("--max-nnz")),
             "--max-dense" => a.max_dense = Some(v.parse().expect("--max-dense")),
+            "--radix" => {
+                let r: u32 = v.parse().expect("--radix");
+                assert!(
+                    [2, 4, 8, 16].contains(&r),
+                    "--radix must be 2, 4, 8 or 16 (a radix-2^k grading of the binary tower)"
+                );
+                a.radix_k = r.trailing_zeros();
+            }
             "--hky-cmin" => a.hky_cmin = Some(v.parse().expect("--hky-cmin")),
             "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
             "--hky-max-cols" => a.hky_max_cols = v.parse().expect("--hky-max-cols"),
@@ -2105,6 +2142,19 @@ fn parse_args() -> Args {
             other => panic!("unknown flag `{other}`"),
         }
         i += 2;
+    }
+    if a.radix_k > 1 {
+        assert!(
+            a.engine == Engine::Tower,
+            "--radix grades the f4_fp_tower engine only (--engine tower)"
+        );
+        assert!(
+            a.kinds
+                .iter()
+                .all(|k| matches!(k, Kind::Kummer | Kind::Dickson | Kind::DicksonTorus)),
+            "--radix needs towers without a y_j·y_next term (kummer, dickson, dickson-torus): \
+             an isogeny step's leading monomial would change"
+        );
     }
     if a.p == 0 {
         // Above 2^63 only the wide builder holds the prime.
@@ -2261,6 +2311,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
                     a.trace,
                     a.full_rank_exit,
                     (a.engine == Engine::Sig).then_some(a.sig),
+                    TowerWeights::radix_blocks(cell.m, cell.t, a.radix_k),
                 );
                 (out, Dumpable::Ring(basis))
             }
@@ -2275,6 +2326,9 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             "control": cell.control.name(),
             "t": cell.t,
             "N": cell.m * cell.t,
+            // The grading's radix, `2^k` (`--radix`); 2 is the unit grading
+            // of every row before it.
+            "radix": 1u32 << a.radix_k,
             "g": cell.g,
             "n_vars": n,
             "n_equations": eqs.len(),

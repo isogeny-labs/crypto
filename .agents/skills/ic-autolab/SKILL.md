@@ -16,6 +16,43 @@ Every autolab or tournament round leaves a run report, graph and PDF beside
 its records, and every PR that lands its result carries the result's graphs
 and PDF (`research-visuals`, "Every experiment run" and "Every result PR").
 
+## The Curve25519-family loop (`ic_autolab`)
+
+The native loop for one curve family is `src/bin/ic_autolab.rs`; its home for
+the Curve25519 miniatures is
+[`research/curve25519_autolab_20261104/`](../../../research/curve25519_autolab_20261104/README.md)
+(`ledger.json`: the incumbents per track and size with their provenance,
+trials and exposures; `families.json`: the candidate families; one
+`round-NNN/` per round). It is the autolab contract (propose, portfolio,
+development screen, selection, fresh confirmation, scoreboard) on ecbench,
+under the success criterion and the two tracks of AGENTS.md:
+
+```sh
+cargo build --release --bin ecbench --bin ic_autolab
+H=research/curve25519_autolab_20261104
+./target/release/ic_autolab --home $H status
+./target/release/ic_autolab --home $H propose --round N --track generic --sizes 20,24 --out /tmp/panel.json
+./target/release/ic_autolab --home $H freeze  --round N --panel /tmp/panel.json --ecbench target/release/ecbench
+./target/release/ic_autolab --home $H card    --round N --stage train      # relay route (lint, relay, assess)
+./target/release/ic_autolab --home $H run     --round N --stage train      # explicitly requested local route only
+./target/release/ic_autolab --home $H select  --round N --ecbench target/release/ecbench
+./target/release/ic_autolab --home $H card    --round N --stage holdout --n 2   # or run --stage holdout
+./target/release/ic_autolab --home $H assess  --round N && ./target/release/ic_autolab --home $H ratchet --round N
+./target/release/ic_autolab --home $H report  --round N && $H/scripts/render_pdf.sh $H/round-$(printf %03d N)
+```
+
+Rules the tool enforces: a round is frozen once (protocol, specs, manifest
+with sha256, fresh target seeds disjoint from every exposure); the train
+screen is in sample and never promotes; one challenger per size goes to a
+fresh holdout with `inc`, `inc-aa` and `rho-neg`; **improvement** needs the
+paired `sel / inc` interval below 1 at w = 0 and the band order `sel < inc`
+at every weight; the ratchet records the delta with the session id, spec and
+receipt sha256; every arm joins the trial history so it is never proposed
+again at that size. Fill `.resume/RESUME.md` and push the checkpoint before
+`run`. A new oracle, base or solver is a source change: build it, add a
+family to `families.json`, and the next round's exploration slot picks it up.
+The loop's rows are development evidence until the validation gate.
+
 ## Begin or resume
 
 **The current `AGENTS.md` requires native research execution and verification.**

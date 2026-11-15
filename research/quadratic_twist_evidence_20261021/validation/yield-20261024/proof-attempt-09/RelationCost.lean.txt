@@ -1,0 +1,151 @@
+import Mathlib.Data.Nat.Choose.Basic
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.FieldSimp
+
+/-! Conditional, deterministic cost accounting. No assertion that a twist
+has better useful yield, lower regularity, or an available DLP reduction. -/
+namespace RelationCost
+
+/-- All excluded phases must be put in overhead: setup, transfer, LA, descent, verification. -/
+def budget (overhead rows attemptWork usefulRate : ℚ) : ℚ :=
+  overhead + rows * (attemptWork / usefulRate)
+
+/-- A degree-parameterized dense monomial model, not a measured F4/F5 runtime. -/
+def macaulayWork (numVars omega degree : ℕ) : ℚ :=
+  (Nat.choose (numVars + degree) numVars : ℚ) ^ omega
+
+theorem macaulayWork_mono (numVars omega : ℕ) :
+    Monotone (macaulayWork numVars omega) := by
+  intro dT dE hd
+  unfold macaulayWork
+  have hc : (Nat.choose (numVars + dT) numVars : ℚ) ≤
+      (Nat.choose (numVars + dE) numVars : ℚ) := by
+    exact_mod_cast Nat.choose_le_choose numVars (Nat.add_le_add_left hd numVars)
+  exact pow_le_pow_left₀ (by positivity) hc omega
+
+theorem macaulayWork_strictMono (numVars omega : ℕ)
+    (hn : 0 < numVars) (hw : 0 < omega) :
+    StrictMono (macaulayWork numVars omega) := by
+  have hc : StrictMono (fun d => Nat.choose (numVars + d) numVars) := by
+    apply strictMono_nat_of_lt_succ
+    intro d
+    cases numVars with
+    | zero => omega
+    | succ n =>
+      rw [Nat.add_succ, Nat.choose_succ_succ]
+      have hp : 0 < Nat.choose (n.succ + d) n := Nat.choose_pos (by omega)
+      omega
+  intro dT dE hd
+  unfold macaulayWork
+  have hcast : (Nat.choose (numVars + dT) numVars : ℚ) <
+      (Nat.choose (numVars + dE) numVars : ℚ) := by exact_mod_cast hc hd
+  exact pow_lt_pow_left₀ hcast (by positivity) (Nat.ne_of_gt hw)
+
+theorem batch_normalization (work : ℚ) (attempts useful : ℕ)
+    (ha : 0 < attempts) (hu : 0 < useful) :
+    (work / attempts) / ((useful : ℚ) / attempts) = work / useful := by
+  have ha0 : (attempts : ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt ha)
+  have hu0 : (useful : ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt hu)
+  field_simp [ha0, hu0]
+
+theorem overhead_threshold (oT oE rows cT cE pT pE : ℚ) :
+    budget oT rows cT pT < budget oE rows cE pE ↔
+      oT - oE < rows * (cE / pE - cT / pT) := by
+  unfold budget
+  rw [mul_sub]
+  constructor <;> intro h <;> linarith
+
+theorem overhead_threshold_general (oT oE rowsT rowsE cT cE pT pE : ℚ) :
+    budget oT rowsT cT pT < budget oE rowsE cE pE ↔
+      oT - oE < rowsE * (cE / pE) - rowsT * (cT / pT) := by
+  unfold budget
+  constructor <;> intro h <;> linarith
+
+/-- Polynomial part of clearing the two positive yield denominators. -/
+theorem cleared_budget_difference_identity {F : Type*} [CommRing F]
+    (oT oE rows cT cE pT pE : F) :
+    (oT * pT + rows * cT) * pE - (oE * pE + rows * cE) * pT =
+      (oT - oE) * pE * pT + rows * (cT * pE - cE * pT) := by ring
+
+theorem budget_lt_iff_cleared (oT oE rows cT cE pT pE : ℚ)
+    (hpT : 0 < pT) (hpE : 0 < pE) :
+    budget oT rows cT pT < budget oE rows cE pE ↔
+      (oT - oE) * pE * pT + rows * (cT * pE - cE * pT) < 0 := by
+  have ht : budget oT rows cT pT = (oT * pT + rows * cT) / pT := by
+    unfold budget
+    field_simp
+  have he : budget oE rows cE pE = (oE * pE + rows * cE) / pE := by
+    unfold budget
+    field_simp
+  rw [ht, he, div_lt_div_iff₀ hpT hpE]
+  have hid := cleared_budget_difference_identity oT oE rows cT cE pT pE
+  constructor <;> intro h <;> nlinarith
+
+theorem faster_of_useful_yield (oT oE rows cT cE pT pE : ℚ)
+    (hrows : 0 < rows) (hcE : 0 < cE) (hpE : 0 < pE)
+    (hp : pE < pT) (hc : cT ≤ cE) (ho : oT ≤ oE) :
+    budget oT rows cT pT < budget oE rows cE pE := by
+  have hpT : 0 < pT := lt_trans hpE hp
+  have hcost : cT / pT < cE / pE := lt_of_le_of_lt
+    (div_le_div_of_nonneg_right hc (le_of_lt hpT))
+    (div_lt_div_of_pos_left hcE hpE hp)
+  unfold budget
+  exact add_lt_add_of_le_of_lt ho (mul_lt_mul_of_pos_left hcost hrows)
+
+theorem faster_of_attempt_work (oT oE rows cT cE pT pE : ℚ)
+    (hrows : 0 < rows) (hcT : 0 ≤ cT) (hpE : 0 < pE)
+    (hp : pE ≤ pT) (hc : cT < cE) (ho : oT ≤ oE) :
+    budget oT rows cT pT < budget oE rows cE pE := by
+  have hcost : cT / pT < cE / pE := lt_of_le_of_lt
+    (div_le_div_of_nonneg_left hcT hpE hp)
+    ((div_lt_div_iff_of_pos_right hpE).mpr hc)
+  unfold budget
+  exact add_lt_add_of_le_of_lt ho (mul_lt_mul_of_pos_left hcost hrows)
+
+/-- The degree and useful-yield improvements are supplied hypotheses, not consequences of twisting. -/
+theorem faster_of_yield_and_degree (numVars omega dT dE : ℕ)
+    (oT oE rows pT pE : ℚ) (hrows : 0 < rows) (hpE : 0 < pE)
+    (hp : pE < pT) (hd : dT ≤ dE) (ho : oT ≤ oE) :
+    budget oT rows (macaulayWork numVars omega dT) pT <
+      budget oE rows (macaulayWork numVars omega dE) pE := by
+  have hchoose : 0 < Nat.choose (numVars + dE) numVars :=
+    Nat.choose_pos (Nat.le_add_right numVars dE)
+  have hc : 0 < macaulayWork numVars omega dE := by
+    unfold macaulayWork
+    positivity
+  exact faster_of_useful_yield oT oE rows _ _ pT pE hrows hc hpE hp
+    (macaulayWork_mono numVars omega hd) ho
+
+theorem faster_of_strict_degree (numVars omega dT dE : ℕ)
+    (oT oE rows pT pE : ℚ) (hrows : 0 < rows) (hpE : 0 < pE)
+    (hp : pE ≤ pT) (hn : 0 < numVars) (hw : 0 < omega)
+    (hd : dT < dE) (ho : oT ≤ oE) :
+    budget oT rows (macaulayWork numVars omega dT) pT <
+      budget oE rows (macaulayWork numVars omega dE) pE := by
+  apply faster_of_attempt_work oT oE rows _ _ pT pE hrows _ hpE hp _ ho
+  · unfold macaulayWork
+    positivity
+  · exact macaulayWork_strictMono numVars omega hn hw hd
+
+/-- Bounds must be independently justified; the budget comparison alone is a model result. -/
+theorem actual_faster_of_bounds (actualT actualE upperT lowerE : ℚ)
+    (hT : actualT ≤ upperT) (hE : lowerE ≤ actualE) (h : upperT < lowerE) :
+    actualT < actualE := lt_of_le_of_lt hT (lt_of_lt_of_le h hE)
+
+#print axioms batch_normalization
+#print axioms macaulayWork_mono
+#print axioms macaulayWork_strictMono
+#print axioms overhead_threshold
+#print axioms overhead_threshold_general
+#print axioms cleared_budget_difference_identity
+#print axioms budget_lt_iff_cleared
+#print axioms faster_of_useful_yield
+#print axioms faster_of_attempt_work
+#print axioms faster_of_yield_and_degree
+#print axioms faster_of_strict_degree
+#print axioms actual_faster_of_bounds
+
+end RelationCost

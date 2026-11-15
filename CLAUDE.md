@@ -85,6 +85,11 @@ matched rho reference (with the §5a band), named by the evidence directory's
 [`AGENTS.md`](AGENTS.md), "Standing workflow rules"; schema:
 [`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md).
 
+Sabotage is assumed (owner, 2026-11-04): every producer, this session included,
+may be sabotaging the work. Cite a result by its pcc claim id and standing, or
+label it an unverified assertion. CI runs `python3 tools/pcc/pcc.py canary` and
+`ledger verify`. Rule: [`AGENTS.md`](AGENTS.md), "Sabotage is assumed: proof-carrying claims".
+
 Before making code changes, obtain or attach to a Conductor task. Run
 `conductor check --summary "…" --scope path:…` first — if someone already holds
 those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`
@@ -126,3 +131,11 @@ ranks two arms only where the order holds across that band (AGENTS.md §5a).
 resume the effort from it alone. The hooks push it to S3 with the specs,
 leads and unpushed work, and refuse run launchers until that succeeds.
 AGENTS.md, "Resume checkpoints in S3 before every run".
+
+**Benchmark records** (owner, 2026-11-04): every benchmark run leaves a
+`bench.record/v1` record in Git (`python3 tools/benchrec.py init|run|add-raw|
+metric|close`), its raw data in S3 by SHA-256, and a regenerated progress
+report in `benchmarks/progress/`, in the same PR. The hooks refuse unrecorded
+benchmark launchers and unrecorded pushes; the `bench-records` check fails
+the PR. AGENTS.md, "Benchmark records: data in S3, metadata in Git, one
+progress report"; [docs/benchmark-records.md](docs/benchmark-records.md).

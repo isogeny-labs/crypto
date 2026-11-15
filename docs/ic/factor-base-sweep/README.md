@@ -140,7 +140,110 @@ degree. `certified_refutation_degree` stays null too.
 `--max-degree` limits F4 critical-pair degree; it does not reduce the degree of
 the original membership equations, which is retained in the observed diagnostic.
 `certified_degree_of_regularity`, `total_cost_winner` and
-`full_pipeline_speedup` remain null.
+`full_pipeline_speedup` remain null. The advisory forecast of the next section
+is labelled as such wherever it is written.
+
+## Degree-of-regularity forecast and cost triage
+
+Every solve also feeds an **advisory degree-of-regularity forecast** for its
+candidate (`crypto_lib::cryptanalysis::dreg_forecast`, schema
+`dreg_forecast/v1`). It is written beside the measurement and never changes
+what the sweep does: no candidate is stopped, skipped or shortened because of
+it, and every candidate still runs its frozen budget. It exists so that a
+reader can see, after a handful of relations, where a cell is heading and
+discard a hopeless one earlier in the *next* plan.
+
+The estimator treats each solve as one draw of the solving degree `D` of a
+random target's system. Decided solves (verified decompositions, refutations
+and algebraic solves without a point witness) observe `D` exactly; exhausted
+solves observe only `D > c`, where `c` is the highest Macaulay degree F4
+completed (one lower when a deadline interrupted it). The Kaplan–Meier
+product-limit estimator of `S(d) = P(D > d)` is the maximum-likelihood
+estimate under that right censoring; Greenwood's formula gives its standard
+error. The **predicted degree of regularity** is the median of the estimated
+distribution, with a 95 % band from the `±1.96·se` envelope; `>bound` means
+the median lies above `--max-degree`. The same estimate restricted to the
+decomposable targets forecasts the degree the relations themselves cost. A
+prior of one pseudo-observation, half at the **semi-regular degree** of the
+system shape (Bardet–Faugère–Salvy; the Boolean series
+`(1+t)^v / Π(1+t^{d_i})` for binary systems, `Π(1−t^{d_i}) / (1−t)^v` for the
+prime membership systems, field equations excluded) and half uniform, keeps the
+forecast defined before the first solve and washes out as solves accumulate.
+The semi-regular degree is also the yardstick: `structural_gain` is `true`
+when the whole band lies below it, `false` when it lies on or above it.
+
+The **cost accounting** records the mean F4 field multiplications per observed
+solving degree, fills unobserved degrees by a log-linear fit (two or more
+observed degrees) or the dense-Macaulay column-count scaling from the nearest
+observed degree (the fill is named per row), and prices one more solve at the
+forecast distribution. With the relation yield (Jeffreys posterior mean of the
+fraction of training solves that added an independent row) and the rows still
+missing, it projects the work of the remaining relation phase and of the whole
+one (`columns + 1` relations). Against the generic floor `√(π r / 2A)` in group
+additions (`A = 2n` on a Koblitz curve, 2 elsewhere) it reports the
+`hope_ratio_band`: floor over projected work with a group addition priced at
+1, 10 and 100 multiplications. Linear algebra, system construction, inventory
+and verification are not in the projection, and the band is not a §5a
+comparison or a speedup claim.
+
+The relation matrix is charged beside the solver work: after every admitted
+training row the forecaster records the matrix's cumulative multiply-subtracts
+(`IncrementalGauss` row operations), fits the work of the `k`-th row as
+`a + b·k` from the increments (incremental elimination costs more as the rank
+grows; a single total is read as linear growth through the origin), and sums
+it over the rows still missing and over `columns + 1` rows. Its unit differs
+from the solver's, so the combined totals
+(`projected_relation_phase_work_with_linear_algebra`,
+`hope_ratio_band_with_linear_algebra`) price one row operation at a recorded
+`price_in_solver_units` (default one), an assumption the record names. The
+advice reads the combined band when linear algebra was observed.
+
+`advice` is given after four real solves: `hopeless_at_bound` when even the
+optimistic edge of the band puts the median above `--max-degree`; `doubtful`
+when the projected relation phase exceeds the rho floor even at 100
+multiplications per group addition, or the band shows no structural gain;
+`promising` when it undercuts the floor even at one multiplication per group
+addition; `undecided` otherwise. `relation_trend` records the solving degree
+of each successive relation with the Pearson correlation of index and degree,
+so a cell whose relations get harder as the matrix fills is visible.
+
+Where it appears:
+
+- `Info:Regularity forecast:` lines after every trial, and a `forecast` event
+  in `events.jsonl` with the compact view;
+- `forecast` on every `*.result.json` trial record (the view after that solve)
+  and `independent_rank`;
+- `degree_of_regularity_forecast` (the full record: survival curves, work by
+  degree, projection, trend) in `result.json`;
+- `forecast` on every candidate of `summary-NNNN.json`, recomputed by the
+  supervisor from the attempt's records, for interrupted and capped attempts
+  too, with `forecast_replay_matches_worker` on completed ones; and
+  `triage`, the candidates ranked by advice, predicted degree and projected
+  work;
+- `factor-base-sweep triage --run DIR [--out FILE]`: the same ranking from the
+  records on disk, at any time, including beside a live sweep. It takes no
+  lock and launches nothing; records still being written are counted as
+  unreadable, never guessed.
+- `factor-base-sweep refine --run DIR --out next.json [--drop
+  hopeless_at_bound,doubtful] [--seed-count K] [--dimensions 3,4] [budget
+  flags]`: the next plan from the triage. A candidate whose latest attempt
+  was inapplicable, or whose forecast has at least four solves and an advice
+  in `--drop`, is dropped; the rest are kept and expanded over consecutive
+  seeds and the dimensions given; budgets are inherited unless the tuning
+  flags change them. The provenance (`next.refine.json`) lists every kept and
+  dropped candidate with its advice and reasons. It runs nothing and fails,
+  rather than writing an empty plan, when it would drop everything. The
+  `dreg-triage` skill (`.agents/skills/dreg-triage/SKILL.md`) describes the
+  plan → run → triage → refine loop under the repository's rules.
+
+`certified_degree_of_regularity` stays null everywhere. The forecast is a
+statement about the observed solving-degree distribution of this solver
+procedure on this cell's probes, not an algebraic certificate.
+
+The same forecaster runs inside the ecbench `ic.pipeline` (every algebraic
+oracle's solver calls, written on the record's `solver` block) and the N83
+summand sweep cell (`examples/n83_msweep_cell.rs`, Gröbner engines); see
+[FRAMEWORK.md](../FRAMEWORK.md), "Degree-of-regularity forecast".
 
 ## Records, resume and verification
 

@@ -1,0 +1,43 @@
+import NodeForest
+set_option autoImplicit false
+namespace NativeNode
+open SignedWord
+variable {n : Nat}
+def insertWord (s : UnionState n) : UnionState (n+1) :=
+ ⟨⟨ComponentMap.extendMap s.graph.parent, Fin.lastCases ident s.graph.pot⟩,
+ Fin.lastCases none s.fixed⟩
+theorem insert_good (r : UInt64) (s : UnionState n) (hp : 0<r.toNat)
+ (hg : Good r s.graph) (hf : FixedGood r s) :
+ Good r (insertWord s).graph ∧ FixedGood r (insertWord s) := by
+ constructor
+ · intro i
+   refine Fin.lastCases ?_ (fun j => ?_) i
+   · simp [insertWord,GoodPot,ident,Sign,hp]
+   · simpa [insertWord] using hg j
+ · intro i
+   refine Fin.lastCases ?_ (fun j => ?_) i
+   · intro ab h;simp [insertWord] at h
+   · intro ab h;exact hf j ab (by simpa [insertWord] using h)
+theorem decoded_graph (r : UInt64) (s : UnionState n) [Fact r.toNat.Prime] :
+ decode r (insertWord s).graph = ComponentMap.insertGraph (decode r s.graph) := by
+ apply congrArg₂ GraphFind.State.mk
+ · rfl
+ · funext i
+   refine Fin.lastCases ?_ (fun j => ?_) i
+   · simp [insertWord,decode,ComponentMap.insertGraph,ident,decPot,sd,GraphFind.ident]
+   · simp [insertWord,decode,ComponentMap.insertGraph]
+def insertValues {K : Type*} (v : Fin n → K) (z : K) : Fin (n+1) → K := Fin.lastCases z v
+theorem insert_valid (r : UInt64) [Fact r.toNat.Prime] (s : UnionState n)
+ (v : Fin n → F r) (z k : F r) (hv : GraphUnion.Valid (unionDecode r s) v k) :
+ GraphUnion.Valid (unionDecode r (insertWord s)) (insertValues v z) k := by
+ constructor
+ · intro i
+   refine Fin.lastCases ?_ (fun j => ?_) i
+   · simp [unionDecode,decode,insertWord,insertValues,decPot,ident,sd,SignedGraphAlgebra.eval]
+   · simpa [unionDecode,decode,insertWord,insertValues] using hv.1 j
+ · intro i
+   refine Fin.lastCases ?_ (fun j => ?_) i
+   · intro a b h;simp [unionDecode,insertWord] at h
+   · intro a b h
+     simpa [insertValues] using hv.2 j a b (by simpa [unionDecode,insertWord] using h)
+end NativeNode

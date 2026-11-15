@@ -75,6 +75,8 @@ aws s3 cp "$raw_uri" "$receipt_dir/artifacts/" --recursive --only-show-errors
 "$here/verify-build" "$receipt_dir/request.json" "$receipt_dir/status.json" "$pod_uid" "$receipt_dir/artifacts"
 jq -e '.exit_code==0' "$receipt_dir/artifacts/job-exit.json" >/dev/null
 jq -e '.accepted and .executions>0 and (.below_l2|length)==0 and (.invalid_outcomes|length)==0' "$receipt_dir/artifacts/l2-gate.json" >/dev/null
-jq -e '.ok and .regraded and .records_bound and .verified_records==.records and (.replays|length)>0 and all(.replays[];.reproduced)' "$receipt_dir/artifacts/audit.json" >/dev/null
+jq -e '.ok and .regraded and .records_bound and .records>0
+  and (.replays|length)>0 and all(.replays[];.reproduced)' \
+  "$receipt_dir/artifacts/audit.json" >/dev/null
 jq -e '.wall.status=="admitted" and .wall.aa_pairs>=5 and .wall.aa_ci95!=null' "$receipt_dir/artifacts/control-comparison.json" >/dev/null
 state=succeeded

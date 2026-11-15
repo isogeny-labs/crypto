@@ -94,6 +94,34 @@ not a demonstrated runtime or algorithm.
 
 ## Next discriminating step
 
+A [repeated-anchor follow-up](../research/prime_pole_anchor_20261030/repeated/README.md)
+extends the fixed odd-anchor gain to k bits at added degree k, without
+changing the source moment index. It also charges a specific attempt to
+boost every valuation level: guarded scalar anchor products require added
+degree at least g*F_(2a) to gain g in each diagonal linear coefficient across
+all a levels (or g*F_(2u) for the source's retained u levels). The latter
+can fit the source's O(L) degree budget. Diagonal gains do not cover all
+crossings: L8,t2,x0,y1 is unchanged by every guarded anchor schedule.
+The general abstract suffix-budget lower bound is Lean-proved; its valuation
+bridge is written, with exact native controls. This is a family-specific
+degree obstruction, not nonexistence of a nonscalar completion or an improved
+ECDLP algorithm. The missing low-density common factorization stays open.
+
+An [anchored-pole completion](../research/prime_pole_anchor_20261030/README.md)
+has now been constructed inside W_base+C H with constant H. Exact checks
+certify one extra odd-level crossing bit, old even-level coarse weights,
+and degree2L instead of2L-1 for L4,8,16. Its single-axis mode family does
+not give the requested two-axis density or improved asymptotic exponent.
+The valuation/global integration arguments are written and partially
+formalized only; a complete recursive proof and end-to-end cost remain open.
+
+A new [nonscalar-origin/jet-completion proposal](../research/prime_jet_completion_20261030/README.md)
+uses `W_new=W_base+C H` to preserve all node values while optimizing crossing
+jets. Ordinary derivative flattening supplies a finite control:5440 nodal
+checks pass, but the tested first crossing coefficient gains only2valuation
+bits as degree roughly doubles. The matrix completion is not implemented;
+its integral factorization, higher jets and adjusted costs remain open.
+
 - **Action:** construct a fixed kernel with different valid local factorizations
   at different valuation levels; prove an actual common-family/jet identity
   before trying a relation search or fitting timing exponents.

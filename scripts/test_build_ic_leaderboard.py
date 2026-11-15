@@ -105,5 +105,52 @@ curves:
         self.assertTrue(all(record["curves_yaml_key"] for record in records.values()))
 
 
+class FrozenEngineeringComponent(unittest.TestCase):
+    def test_f4_fp_result_is_rendered_with_its_engineering_scope(self):
+        data = builder.build()
+        study = data["f4_fp_ic_component"]
+        self.assertEqual(study["class"], "engineering")
+        self.assertEqual(len(study["dlp"]), 4)
+        for row in study["dlp"]:
+            self.assertEqual(row["solved"], [True, True])
+            self.assertEqual(row["correct"], [True, True])
+        md = builder.markdown(data)
+        html = builder.page(data, standalone=True)
+        self.assertIn("## F_p Gröbner engine (`f4_fp`)", md)
+        self.assertIn("S/rho is a lower-bound comparison", md)
+        self.assertIn("no recovered-scalar certificate for an independent replay", md)
+        self.assertIn('id="f4-fp-ic-component"', html)
+        self.assertIn("Frozen engineering summary", html)
+        self.assertIn("no recovered-scalar certificate for an independent replay", html)
+
+class Roster(unittest.TestCase):
+    def names_with(self, params):
+        row = {"slug": "ext", "family": "extension", "params": params,
+               "order": "1000003", "standard_names": [], "aliases": []}
+        return type("N", (), {"reg": {"curves": [row]}})()
+
+    def field_of(self, params):
+        try:
+            return builder.roster(self.names_with(params), set())[0]["field"]
+        except KeyError as err:  # a missing key must never escape as KeyError
+            self.fail(f"roster raised KeyError({err})")
+
+    def test_extension_degree_from_k(self):
+        self.assertEqual(self.field_of({"p": 7, "k": 3, "a": 1, "b": 2}), "GF(7^3)")
+
+    def test_extension_degree_from_degree_key(self):
+        # 47 registry rows (coverage-fixtures-v3) spell the degree "degree", not "k".
+        self.assertEqual(self.field_of({"p": 7, "degree": 3, "a": 1, "b": 2}), "GF(7^3)")
+
+    def test_extension_without_degree_names_the_slug(self):
+        with self.assertRaisesRegex(ValueError, "ext"):
+            builder.roster(self.names_with({"p": 7, "a": 1, "b": 2}), set())
+
+    def test_whole_registry_yields_one_entry_per_curve(self):
+        names = builder.Names()
+        self.assertEqual(len(builder.roster(names, set())), len(names.reg["curves"]))
+
+
+
 if __name__ == "__main__":
     unittest.main()

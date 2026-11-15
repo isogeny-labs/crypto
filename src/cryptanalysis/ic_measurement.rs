@@ -11,7 +11,50 @@ use std::collections::BTreeMap;
 use std::marker::PhantomData;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU8, Ordering};
+#[cfg(not(all(target_os = "linux", target_pointer_width = "64")))]
 use std::time::Instant;
+
+/// The monotonic clock in nanoseconds: `CLOCK_MONOTONIC`, the clock
+/// `std::time::Instant` reads on Linux, kept as a plain count.  A boundary
+/// runs once per relation (millions in a 32-bit child), and `Instant`'s
+/// checked difference, `Duration` normalisation and 128-bit nanosecond
+/// conversion cost more instructions than the clock read itself; the
+/// interval between two reads is the same number either way.
+///
+/// The C function is declared here rather than taken from the `libc` crate,
+/// because research crates compile this file by `#[path]` and do not all
+/// depend on `libc`.  Elsewhere the clock is `Instant` from a fixed anchor.
+#[inline]
+fn now_ns() -> u64 {
+    #[cfg(all(target_os = "linux", target_pointer_width = "64"))]
+    {
+        /// `struct timespec` on 64-bit Linux.
+        #[repr(C)]
+        struct Timespec {
+            tv_sec: i64,
+            tv_nsec: i64,
+        }
+        extern "C" {
+            fn clock_gettime(clock: i32, tp: *mut Timespec) -> i32;
+        }
+        /// `CLOCK_MONOTONIC` in `<linux/time.h>`.
+        const CLOCK_MONOTONIC: i32 = 1;
+        let mut ts = Timespec {
+            tv_sec: 0,
+            tv_nsec: 0,
+        };
+        // SAFETY: `ts` is a valid, writable `struct timespec` of the
+        // 64-bit Linux ABI, and CLOCK_MONOTONIC always exists there.
+        let rc = unsafe { clock_gettime(CLOCK_MONOTONIC, &mut ts) };
+        debug_assert_eq!(rc, 0);
+        (ts.tv_sec as u64) * 1_000_000_000 + ts.tv_nsec as u64
+    }
+    #[cfg(not(all(target_os = "linux", target_pointer_width = "64")))]
+    {
+        static ANCHOR: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
+        u64::try_from(ANCHOR.get_or_init(Instant::now).elapsed().as_nanos()).expect("bounded clock")
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(usize)]
@@ -90,13 +133,14 @@ impl Phase {
 struct Trace {
     generation: u64,
     phase: Phase,
-    started: Instant,
-    last: Instant,
+    /// [`now_ns`] at the session's start and at the last boundary.
+    started: u64,
+    last: u64,
     elapsed: [u64; 14],
     entered: [bool; 14],
     online_elapsed: [u64; 14],
     online_entered: [bool; 14],
-    online_start: Option<Instant>,
+    online_start: Option<u64>,
     online_ns: Option<u64>,
     error: Option<&'static str>,
 }
@@ -104,8 +148,9 @@ struct Trace {
 impl Trace {
     fn boundary(&mut self, next: Phase) {
         dump(self.phase.label());
-        let now = Instant::now();
-        let ns = u64::try_from(now.duration_since(self.last).as_nanos()).expect("bounded interval");
+        let now = now_ns();
+        // The clock is monotonic, so the difference never wraps.
+        let ns = now - self.last;
         self.elapsed[self.phase as usize] += ns;
         if self.online_start.is_some() {
             self.online_elapsed[self.phase as usize] += ns;
@@ -175,7 +220,7 @@ impl Session {
                 .checked_add(1)
                 .expect("bounded session count");
             let generation = state.generation;
-            let now = Instant::now();
+            let now = now_ns();
             let mut entered = [false; 14];
             entered[Phase::Setup as usize] = true;
             state.trace = Some(Trace {
@@ -238,10 +283,7 @@ impl Session {
                         )
                     })
                     .collect(),
-                observed_wall_ns: u64::try_from(
-                    trace.last.duration_since(trace.started).as_nanos(),
-                )
-                .expect("bounded session"),
+                observed_wall_ns: trace.last - trace.started,
                 online_phases_ns: PHASES
                     .iter()
                     .filter(|p| p.online())
@@ -330,10 +372,7 @@ pub fn end_online() {
             };
             trace.boundary(Phase::Setup);
             trace.online_start = None;
-            trace.online_ns = Some(
-                u64::try_from(trace.last.duration_since(start).as_nanos())
-                    .expect("bounded online interval"),
-            );
+            trace.online_ns = Some(trace.last - start);
         } else {
             foreign_boundary();
         }

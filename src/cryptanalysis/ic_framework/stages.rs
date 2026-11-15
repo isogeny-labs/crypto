@@ -174,6 +174,18 @@ pub trait FactorBaseBuilder<G: CountedGroup> {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<FactorBase<G::Elt>, String>;
+
+    /// Columns whose logarithm the base knows before any relation, in the
+    /// relation matrix's convention `x = h·log_G(seed)`. The pipeline enters
+    /// each as a unit row ahead of the relation search. Empty for every base
+    /// whose seeds are found points rather than the generator.
+    fn known_column_logs(
+        &self,
+        _ctx: &InstanceCtx<G>,
+        _params: &Params,
+    ) -> Result<Vec<(usize, u64)>, String> {
+        Ok(Vec::new())
+    }
 }
 
 /// The shape of an algebraic system, for the report's degree columns.
@@ -249,6 +261,17 @@ pub trait DecompositionOracle<G: CountedGroup> {
         point: G::Elt,
     ) -> Option<Vec<usize>>;
 
+    /// Request data that a future decomposition of `point` will read.
+    /// The default is a no-op and the hook may not decide or count.
+    fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
+
+    /// Select the cache-line relation guard.  Both representations return
+    /// identical membership answers; the default preserves every recorded
+    /// run's hash-map path.
+    fn line_guard(&self) -> bool {
+        false
+    }
+
     /// **The large-prime seam.**  Decompose `point = [a]G + [b]Q`, or
     /// store what partially decomposed and hand back whatever complete
     /// relations the stored partials now merge into.  The default is
@@ -311,6 +334,18 @@ pub trait DecompositionOracle<G: CountedGroup> {
 /// Totals an algebraic oracle accumulates over its solver calls.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SolverTotals {
+    /// Advisory degree-of-regularity forecast over the calls seen so far
+    /// (`crate::cryptanalysis::dreg_forecast`), fed by
+    /// [`absorb_outcome`](Self::absorb_outcome).  Built at the first call
+    /// that reports a degree: a capped engine's cap (`extra["max_degree"]`)
+    /// is the censoring bound, an uncapped one gets the Boolean ring's own
+    /// ceiling, the variable count.  An engine that reports no degree at
+    /// all (SAT, exhaustive search) leaves it `None` and says why in
+    /// `forecast_unavailable`.  Never priced, never a stopping rule.
+    #[serde(skip)]
+    pub forecaster: Option<crate::cryptanalysis::dreg_forecast::Forecaster>,
+    #[serde(skip)]
+    pub forecast_unavailable: Option<String>,
     pub solver: String,
     pub calls: u64,
     pub ops: u64,
@@ -381,6 +416,118 @@ impl SolverTotals {
             } else {
                 *entry += v;
             }
+        }
+    }
+
+    /// [`absorb`](Self::absorb), then feed the degree-of-regularity
+    /// forecaster with what the call decided: `found` is whether the
+    /// solve produced a decomposition.  A decided call observes its
+    /// solving degree (the engine's, or else the highest degree it
+    /// built); a budget-exceeded call is right-censored at the highest
+    /// degree built.  A call that reports neither degree is counted in
+    /// the totals but not in the forecast.
+    pub fn absorb_outcome(
+        &mut self,
+        shape: &SystemShape,
+        cost: Option<&SolverCost>,
+        budget_exceeded: bool,
+        found: bool,
+    ) {
+        use crate::cryptanalysis::dreg_forecast::{Forecaster, Outcome, SolveObservation};
+        self.absorb(shape, cost, budget_exceeded);
+        let Some(c) = cost else {
+            return;
+        };
+        let exhausted = budget_exceeded || c.timed_out;
+        let degree = c.solving_degree.or(c.degree_reached);
+        if self.forecaster.is_none() && self.forecast_unavailable.is_none() {
+            let cap = c
+                .extra
+                .get("max_degree")
+                .copied()
+                .filter(|b| *b > 0 && *b <= u64::from(u32::MAX))
+                .map(|b| b as u32);
+            if cap.is_none() && degree.is_none() {
+                self.forecast_unavailable = Some(
+                    "the solver reports neither a degree cap (`max_degree`) nor a solving degree: no degree-of-regularity forecast".into(),
+                );
+                return;
+            }
+            // An uncapped engine (a full Gröbner basis) is bounded by the
+            // Boolean ring's own ceiling, the variable count.
+            let bound = cap.unwrap_or_else(|| shape.n_vars.clamp(1, u32::MAX as usize) as u32);
+            let mut f = Forecaster::new(bound).with_work_unit(&c.op_unit);
+            f.set_shape(crate::cryptanalysis::dreg_forecast::SystemShape {
+                variables: shape.n_vars,
+                equation_degrees: shape.degrees.iter().copied().filter(|d| *d > 0).collect(),
+                boolean: true,
+            });
+            self.forecaster = Some(f);
+        }
+        let Some(f) = self.forecaster.as_mut() else {
+            return;
+        };
+        if degree.is_none() {
+            return;
+        }
+        f.observe(SolveObservation {
+            outcome: if exhausted {
+                Outcome::Exhausted
+            } else if found {
+                Outcome::Decomposed
+            } else {
+                Outcome::Refuted
+            },
+            solving_degree: degree,
+            censored_above: c.degree_reached.unwrap_or(0),
+            work: c.ops,
+            relation_phase: true,
+            relation: found,
+        });
+    }
+
+    /// Feed the forecaster from an oracle that totals its own degrees: a
+    /// Macaulay solve at a fixed `degree` under a fixed `bound`.  An
+    /// `exhausted` call (a degenerate system that the matrix at this degree
+    /// did not resolve) is right-censored at `degree`; a decided call
+    /// observes `degree` and whether it `found` a decomposition.  Creates
+    /// the forecaster from the recorded shape and unit on first use.
+    pub fn observe_degree(
+        &mut self,
+        bound: u32,
+        degree: u32,
+        work: u64,
+        exhausted: bool,
+        found: bool,
+    ) {
+        use crate::cryptanalysis::dreg_forecast::{Forecaster, Outcome, SolveObservation};
+        if self.forecaster.is_none() {
+            let mut f = Forecaster::new(bound.max(1)).with_work_unit(&self.op_unit);
+            if let Some(shape) = &self.shape {
+                f.set_shape(crate::cryptanalysis::dreg_forecast::SystemShape {
+                    variables: shape.n_vars,
+                    equation_degrees: shape.degrees.iter().copied().filter(|d| *d > 0).collect(),
+                    boolean: false,
+                });
+            }
+            self.forecaster = Some(f);
+            self.forecast_unavailable = None;
+        }
+        if let Some(f) = self.forecaster.as_mut() {
+            f.observe(SolveObservation {
+                outcome: if exhausted {
+                    Outcome::Exhausted
+                } else if found {
+                    Outcome::Decomposed
+                } else {
+                    Outcome::Refuted
+                },
+                solving_degree: Some(degree),
+                censored_above: degree,
+                work,
+                relation_phase: true,
+                relation: found,
+            });
         }
     }
 
@@ -600,12 +747,25 @@ pub enum Targets {
     /// every step and relations come from collisions of the residuals;
     /// the oracle is not consulted.  See `ic_framework::residual`.
     Residual,
+    /// `Residual` with the jump and the base-point subtraction fused into one
+    /// group addition per step (`16 * |F|` precomputed sums, counted at setup).
+    /// See `ic_framework::residual::collect_residual_fused_and_solve`.
+    ResidualFused,
+    /// Fused step with distinguished-point storage and probing.
+    ResidualFusedDp,
+    /// Negation-equivariant walk on a large step set with distinguished points.
+    ResidualFusedEq,
+    /// `ResidualFusedEq` whose restarts cost one addition (previous start plus a jump).
+    ResidualFusedEqChain,
     /// `R ← R + S` for one drawn `S = [s]G + [t]Q`: one addition per
     /// target, with no jump table to set up.  See `TargetSource::Stride`.
     Stride,
     /// `Stride` with a new stride after every relation.  See
     /// `TargetSource::StrideRenew`.
     StrideRenew,
+    /// `R = Q + [k]G`: no scalar multiplication, for a base with a known
+    /// column logarithm (`generator_orbit=1`). `TargetSource::StrideGenerator`.
+    StrideGenerator,
     /// `StrideRenew` probing the repeat guard only on targets that
     /// decompose.  See `TargetSource::StrideRenewDeferredGuard`.
     StrideRenewDeferredGuard,
@@ -624,8 +784,13 @@ impl Targets {
             Targets::WalkPrimeBatch8 => "walk-prime-batch-8",
             Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
             Targets::Residual => "residual",
+            Targets::ResidualFused => "residual-fused",
+            Targets::ResidualFusedDp => "residual-fused-dp",
+            Targets::ResidualFusedEq => "residual-fused-eq",
+            Targets::ResidualFusedEqChain => "residual-fused-eq-chain",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
+            Targets::StrideGenerator => "stride-generator",
             Targets::StrideRenewDeferredGuard => "stride-renew-deferred-guard",
         }
     }
@@ -642,11 +807,16 @@ impl Targets {
             "walk-prime-batch-8" => Ok(Targets::WalkPrimeBatch8),
             "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
             "residual" => Ok(Targets::Residual),
+            "residual-fused" => Ok(Targets::ResidualFused),
+            "residual-fused-dp" => Ok(Targets::ResidualFusedDp),
+            "residual-fused-eq" => Ok(Targets::ResidualFusedEq),
+            "residual-fused-eq-chain" => Ok(Targets::ResidualFusedEqChain),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
+            "stride-generator" => Ok(Targets::StrideGenerator),
             "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride, stride-renew or stride-renew-deferred-guard"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }
@@ -696,6 +866,123 @@ mod tests {
         late.absorb(&shape, Some(&cost(false)), false);
         late.absorb(&shape, Some(&cost(true)), false);
         assert!(!late.extra.contains_key("bitop_complete"));
+    }
+
+    /// `absorb_outcome` builds the degree-of-regularity forecaster from the
+    /// engine's degree cap, observes decided and censored calls, and leaves
+    /// an engine without a cap with a stated reason instead of a forecast.
+    #[test]
+    fn absorb_outcome_feeds_the_degree_forecaster_or_says_why_not() {
+        use crate::cryptanalysis::dreg_forecast::Outcome;
+        let shape = SystemShape {
+            n_vars: 6,
+            n_equations: 6,
+            degrees: vec![2; 6],
+            semi_regular_degree: Some(3),
+        };
+        let cost = |built: u32, exhausted: bool| {
+            let mut c = SolverCost {
+                ops: 100,
+                op_unit: "word XORs (elimination only)".into(),
+                degree_reached: Some(built),
+                timed_out: exhausted,
+                ..Default::default()
+            };
+            c.extra.insert("max_degree".into(), 3);
+            c
+        };
+        let mut t = SolverTotals::default();
+        t.absorb_outcome(&shape, Some(&cost(2, false)), false, true);
+        t.absorb_outcome(&shape, Some(&cost(2, false)), false, false);
+        t.absorb_outcome(&shape, Some(&cost(3, true)), true, false);
+        // A call without a degree is totalled but not observed.
+        let mut bare = cost(2, false);
+        bare.degree_reached = None;
+        t.absorb_outcome(&shape, Some(&bare), false, true);
+        assert_eq!(t.calls, 4);
+        let f = t.forecaster.as_ref().expect("forecaster from max_degree");
+        let obs = f.observations();
+        assert_eq!(obs.len(), 3);
+        assert_eq!(obs[0].outcome, Outcome::Decomposed);
+        assert!(obs[0].relation);
+        assert_eq!(obs[1].outcome, Outcome::Refuted);
+        assert_eq!(obs[2].outcome, Outcome::Exhausted);
+        assert_eq!(obs[2].censored_above, 3);
+        let fc = f.forecast();
+        assert_eq!(fc.degree_bound, 3);
+        assert_eq!(fc.semi_regular_degree, Some(3));
+        assert_eq!(fc.shape.as_ref().map(|s| s.variables), Some(6));
+        assert_eq!(fc.decided, 2);
+        assert_eq!(fc.censored, 1);
+        assert!(t.forecast_unavailable.is_none());
+
+        // An uncapped engine that reports its solving degree is bounded by
+        // the ring's ceiling, the variable count.
+        let mut uncapped = SolverTotals::default();
+        let full = SolverCost {
+            ops: 9,
+            op_unit: "word XORs (elimination only)".into(),
+            degree_reached: Some(4),
+            solving_degree: Some(3),
+            ..Default::default()
+        };
+        uncapped.absorb_outcome(&shape, Some(&full), false, true);
+        let fc = uncapped.forecaster.as_ref().unwrap().forecast();
+        assert_eq!(fc.degree_bound, 6);
+        assert_eq!(fc.all_targets.decided, 1);
+        assert_eq!(
+            uncapped.forecaster.as_ref().unwrap().observations()[0].solving_degree,
+            Some(3)
+        );
+
+        let mut sat = SolverTotals::default();
+        let conflicts = SolverCost {
+            ops: 7,
+            op_unit: "conflicts".into(),
+            ..Default::default()
+        };
+        sat.absorb_outcome(&shape, Some(&conflicts), false, false);
+        assert!(sat.forecaster.is_none());
+        assert!(sat
+            .forecast_unavailable
+            .as_deref()
+            .is_some_and(|s| s.contains("max_degree")));
+        // Plain `absorb` never starts a forecast.
+        let mut plain = SolverTotals::default();
+        plain.absorb(&shape, Some(&cost(2, false)), false);
+        assert!(plain.forecaster.is_none() && plain.forecast_unavailable.is_none());
+    }
+
+    /// A fixed-degree oracle feeds the forecaster directly: decided calls at
+    /// the Macaulay degree, degenerate systems censored there.
+    #[test]
+    fn observe_degree_feeds_fixed_degree_oracles() {
+        use crate::cryptanalysis::dreg_forecast::Outcome;
+        let mut t = SolverTotals {
+            solver: "d4-macaulay".into(),
+            op_unit: "F_p multiplications".into(),
+            shape: Some(SystemShape {
+                n_vars: 5,
+                n_equations: 4,
+                degrees: vec![8; 4],
+                semi_regular_degree: Some(14),
+            }),
+            ..Default::default()
+        };
+        t.observe_degree(14, 14, 1000, false, true);
+        t.observe_degree(14, 14, 1000, false, false);
+        t.observe_degree(14, 14, 400, true, false);
+        let f = t.forecaster.as_ref().unwrap();
+        let obs = f.observations();
+        assert_eq!(obs.len(), 3);
+        assert_eq!(obs[0].outcome, Outcome::Decomposed);
+        assert_eq!(obs[1].outcome, Outcome::Refuted);
+        assert_eq!(obs[2].outcome, Outcome::Exhausted);
+        assert_eq!(obs[2].censored_above, 14);
+        let fc = f.forecast();
+        assert_eq!(fc.degree_bound, 14);
+        assert_eq!(fc.cost.unit, "F_p multiplications");
+        assert_eq!(fc.all_targets.predicted_degree, Some(14));
     }
 
     #[test]

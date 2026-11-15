@@ -1,0 +1,61 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | abs-2a | 48/48 | 30.738 | 33.042 | 53.779 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | abs-2a-aa | 48/48 | 30.738 | 33.042 | 53.779 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | abs-a | 48/48 | 32.254 | 37.532 | 85.032 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | proj-2a | 48/48 | 24.658 | 25.289 | 30.966 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | proj-a | 48/48 | 12.570 | 13.692 | 23.786 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 48/48 | 1.184 | 1.290 | 2.251 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg-aa | 48/48 | 1.184 | 1.290 | 2.251 | — |
+| icv1-fp22-tm149-52fcd7ee | 21.26 | abs-2a | 48/48 | 20.203 | 20.833 | 26.500 | — |
+| icv1-fp22-tm149-52fcd7ee | 21.26 | abs-2a-aa | 48/48 | 20.203 | 20.833 | 26.500 | — |
+| icv1-fp22-tm149-52fcd7ee | 21.26 | abs-a | 48/48 | 10.798 | 11.945 | 22.264 | — |
+| icv1-fp22-tm149-52fcd7ee | 21.26 | proj-2a | 48/48 | 23.376 | 24.047 | 30.083 | — |
+| icv1-fp22-tm149-52fcd7ee | 21.26 | proj-a | 48/48 | 12.385 | 13.552 | 24.055 | — |
+| icv1-fp22-tm149-52fcd7ee | 21.26 | rho-neg | 48/48 | 1.199 | 1.308 | 2.290 | — |
+| icv1-fp22-tm149-52fcd7ee | 21.26 | rho-neg-aa | 48/48 | 1.199 | 1.308 | 2.290 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a vs abs-2a-aa | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a vs abs-a | abs-2a < abs-a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a vs proj-2a | proj-2a < abs-2a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a vs proj-a | proj-a < abs-2a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a vs rho-neg | rho-neg < abs-2a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a vs rho-neg-aa | rho-neg-aa < abs-2a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a-aa vs abs-a | abs-2a-aa < abs-a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a-aa vs proj-2a | proj-2a < abs-2a-aa |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a-aa vs proj-a | proj-a < abs-2a-aa |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a-aa vs rho-neg | rho-neg < abs-2a-aa |
+| icv1-fp24-tm1578-e83ed1b2 | abs-2a-aa vs rho-neg-aa | rho-neg-aa < abs-2a-aa |
+| icv1-fp24-tm1578-e83ed1b2 | abs-a vs proj-2a | proj-2a < abs-a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-a vs proj-a | proj-a < abs-a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-a vs rho-neg | rho-neg < abs-a |
+| icv1-fp24-tm1578-e83ed1b2 | abs-a vs rho-neg-aa | rho-neg-aa < abs-a |
+| icv1-fp24-tm1578-e83ed1b2 | proj-2a vs proj-a | proj-a < proj-2a |
+| icv1-fp24-tm1578-e83ed1b2 | proj-2a vs rho-neg | rho-neg < proj-2a |
+| icv1-fp24-tm1578-e83ed1b2 | proj-2a vs rho-neg-aa | rho-neg-aa < proj-2a |
+| icv1-fp24-tm1578-e83ed1b2 | proj-a vs rho-neg | rho-neg < proj-a |
+| icv1-fp24-tm1578-e83ed1b2 | proj-a vs rho-neg-aa | rho-neg-aa < proj-a |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp22-tm149-52fcd7ee | abs-2a vs abs-2a-aa | unresolved inside the band |
+| icv1-fp22-tm149-52fcd7ee | abs-2a vs abs-a | abs-a < abs-2a |
+| icv1-fp22-tm149-52fcd7ee | abs-2a vs proj-2a | abs-2a < proj-2a |
+| icv1-fp22-tm149-52fcd7ee | abs-2a vs proj-a | proj-a < abs-2a |
+| icv1-fp22-tm149-52fcd7ee | abs-2a vs rho-neg | rho-neg < abs-2a |
+| icv1-fp22-tm149-52fcd7ee | abs-2a vs rho-neg-aa | rho-neg-aa < abs-2a |
+| icv1-fp22-tm149-52fcd7ee | abs-2a-aa vs abs-a | abs-a < abs-2a-aa |
+| icv1-fp22-tm149-52fcd7ee | abs-2a-aa vs proj-2a | abs-2a-aa < proj-2a |
+| icv1-fp22-tm149-52fcd7ee | abs-2a-aa vs proj-a | proj-a < abs-2a-aa |
+| icv1-fp22-tm149-52fcd7ee | abs-2a-aa vs rho-neg | rho-neg < abs-2a-aa |
+| icv1-fp22-tm149-52fcd7ee | abs-2a-aa vs rho-neg-aa | rho-neg-aa < abs-2a-aa |
+| icv1-fp22-tm149-52fcd7ee | abs-a vs proj-2a | abs-a < proj-2a |
+| icv1-fp22-tm149-52fcd7ee | abs-a vs proj-a | abs-a < proj-a |
+| icv1-fp22-tm149-52fcd7ee | abs-a vs rho-neg | rho-neg < abs-a |
+| icv1-fp22-tm149-52fcd7ee | abs-a vs rho-neg-aa | rho-neg-aa < abs-a |
+| icv1-fp22-tm149-52fcd7ee | proj-2a vs proj-a | proj-a < proj-2a |
+| icv1-fp22-tm149-52fcd7ee | proj-2a vs rho-neg | rho-neg < proj-2a |
+| icv1-fp22-tm149-52fcd7ee | proj-2a vs rho-neg-aa | rho-neg-aa < proj-2a |
+| icv1-fp22-tm149-52fcd7ee | proj-a vs rho-neg | rho-neg < proj-a |
+| icv1-fp22-tm149-52fcd7ee | proj-a vs rho-neg-aa | rho-neg-aa < proj-a |
+| icv1-fp22-tm149-52fcd7ee | rho-neg vs rho-neg-aa | unresolved inside the band |

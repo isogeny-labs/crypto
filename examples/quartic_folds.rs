@@ -79,6 +79,12 @@ fn main() {
                             )
                             .map(|i| (i.n, i.cofactor))
                         }
+                        Family4::Gls => {
+                            crypto_lib::cryptanalysis::quartic_folds::generate_gls_klein_instance(
+                                p, 1, 16,
+                            )
+                            .map(|k| (k.inst.n, k.inst.cofactor))
+                        }
                     };
                     println!("probe {} p={p}: {ok:?}", family.name());
                 }

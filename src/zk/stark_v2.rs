@@ -24,14 +24,19 @@
 //!    For a valid trace and a transition `C` of degree 1 in the trace
 //!    values, `Comp` is a polynomial of degree `< n`; if a transition
 //!    or a boundary fails, the division leaves a non-polynomial and
-//!    `Comp` is far from every degree-`< n` polynomial — unless the
-//!    poles cancel, which is why `α₁, α₂` must be drawn only after the
-//!    statement (the `v_k`) is fixed.
+//!    `Comp` is far from every degree-`< n` polynomial, in the sense that
+//!    it agrees with one on at most `2n + k − 2` coset points (a relative
+//!    distance of about `1 − 2/β`; for `β = 2`, which [`StarkConfig`]
+//!    accepts, that implies no distance, and soundness rests on the
+//!    out-of-domain check of item 3) — unless the poles cancel, which is
+//!    why `α₁, α₂` must be drawn only after the statement (the `v_k`) is
+//!    fixed.
 //!
 //! 3. **Out-of-domain (DEEP) sample.**  After the trace and composition
 //!    commitments the transcript draws `z`, redrawing while `z ∈ H_trace`
-//!    or `z ∈ g · H_lde` ([`ood_point_ok`]); then `ω·z` is outside both
-//!    too.  The prover sends `f(z)`, `f(ω·z)` and `Comp(z)`, which the
+//!    or `z ∈ g · H_lde` ([`ood_point_ok`]), so `x − z` never vanishes on
+//!    the coset and `Comp(z)` has no pole (`ω·z` is then outside both
+//!    too, which the current DEEP terms do not need).  The prover sends `f(z)`, `f(ω·z)` and `Comp(z)`, which the
 //!    transcript absorbs before any further challenge, and the verifier
 //!    checks the AIR at `z`: `Comp(z)` must equal item 2's formula
 //!    evaluated on `f(z)`, `f(ω·z)`.
@@ -78,7 +83,7 @@
 //! path bound to its position, each value a canonical field element
 //! `< r`), recomputes `Comp(x)` from the AIR (a check beyond standard
 //! DEEP-ALI, kept from the pre-DEEP construction), recomputes `D(x)`
-//! from `f(x)`, `Comp(x)` and the OOD values, checks that FRI's first
+//! from `f(x)`, `f(ω·x)`, `Comp(x)` and the OOD values, checks that FRI's first
 //! layer holds that value, and checks the folding down to the
 //! committed constant final layer.  Malformed input returns `false`;
 //! it never panics.
@@ -103,7 +108,15 @@
 //! 2^(−240)` for [`StarkConfig::default`], `4^(−20) = 2^(−40)` for
 //! [`StarkConfig::fast`]).  `F_r` is the BLS12-381 scalar field (`r ≈
 //! 2^254.86`, no extension field), so for any trace this code can
-//! build (`L ≤ 2^32`) `ε_field` is below about `2^(−215)`.  `ε_hash`:
+//! build (`L ≤ 2^32`, `k ≤ n`) `ε_field` evaluates to about `2^(−217.6)`
+//! with the `L/r` form of the last line above (about `2^(−185.7)` with
+//! `L²/r` per challenge).  That is above the default query term `2^(−240)`,
+//! so for [`StarkConfig::default`] the conjectured error is dominated by
+//! `ε_field`; for [`StarkConfig::fast`] the query term `2^(−40)` dominates.
+//! Either way it is far below the 128-bit SHA-256 ceiling below.  The field
+//! terms are written in the unique-decoding `L/r` form without list-size
+//! factors, and are not tied to one
+//! published statement of the conjecture; treat them as indicative.  `ε_hash`:
 //! every commitment is a SHA-256 Merkle tree, and a SHA-256 collision
 //! (generic cost about `2^128`) lets a prover open one leaf two ways,
 //! so nothing above 128 bits can hold whatever `q` and `β` are; a
@@ -365,14 +378,24 @@ pub fn air_fingerprint(air: &AirV2) -> Vec<u8> {
     out
 }
 
+/// Largest LDE size `L = n·β`: `F_r^*` has a subgroup of order `2^32`
+/// and no larger power-of-two one ([`super::plonk::primitive_nth_root`]).
+const MAX_LDE_SIZE: usize = 1 << 32;
+
 /// The Fiat-Shamir transcript state before the trace commitment: tag,
 /// AIR identifier, `n`, `β`, `q`, FRI fold count and final-layer size,
 /// and every boundary `(position, value)`.  `None` if the configuration
-/// is invalid, a boundary position is `≥ n`, or a boundary value is not
-/// canonical (`≥ r`).
+/// is invalid, `n·β > 2^32`, there are more than `n` boundaries, a
+/// boundary position is `≥ n`, or a boundary value is not canonical
+/// (`≥ r`).
 pub fn statement_transcript(air: &AirV2, config: &StarkConfig) -> Option<Vec<u8>> {
     let (n, beta, q) = (air.n, config.blow_up, config.query_count);
     if !n.is_power_of_two() || n < 2 || !beta.is_power_of_two() || beta < 2 || q == 0 {
+        return None;
+    }
+    // L = n·β is at most 2^32 (the two-adicity of F_r, so `coset(L)` exists
+    // and never panics), and k ≤ n (the bound the soundness text assumes).
+    if n.checked_mul(beta)? > MAX_LDE_SIZE || air.boundary.len() > n {
         return None;
     }
     let mut t = FS_TAG.as_bytes().to_vec();
@@ -409,9 +432,9 @@ fn absorb_trace_draw_alphas(t: &mut Vec<u8>, trace_commit: &[u8; 32]) -> (BigUin
 
 /// Is `z` usable as the out-of-domain point: outside the trace domain
 /// `H_trace` (`zⁿ ≠ 1`) and outside the LDE coset `g · H_lde`
-/// (`(z/g)^L ≠ 1`)?  Then `ω·z` is outside both as well (`ω ∈ H_trace
-/// ⊂ H_lde`), so neither `x − z` nor `x − ω·z` vanishes on the coset and
-/// `Comp(z)` has no pole.
+/// (`(z/g)^L ≠ 1`)?  Then `x − z` never vanishes on the coset and
+/// `Comp(z)` has no pole.  (`ω·z` is outside both as well, since `ω ∈
+/// H_trace ⊂ H_lde`; the current DEEP terms only use `x − z`.)
 pub fn ood_point_ok(z: &BigUint, n: usize, lde_size: usize) -> bool {
     let Some(g_inv) = fr_inv(&coset_shift()) else {
         return false;
@@ -558,6 +581,9 @@ struct ProverKnobs {
     trace_degree_n: bool,
     /// Leave out the `(λ₀ + λ₁·x)` degree adjustment.
     skip_degree_adjust: bool,
+    /// Add 1 to every committed composition value (re-committed), so it
+    /// differs from the AIR's composition at every queried point.
+    composition_offset: bool,
     /// Keep FRI layer 0 and replace every later layer with zeros (each
     /// root re-committed, the transcript re-derived): the final-layer
     /// root check passes, and only fold consistency can reject.
@@ -629,6 +655,11 @@ fn prove_with(air: &AirV2, config: &StarkConfig, knobs: &ProverKnobs) -> Option<
                 &alpha2,
             )?
         });
+    }
+    if knobs.composition_offset {
+        for v in composition_lde.iter_mut() {
+            *v = fr_add(v, &BigUint::one());
+        }
     }
     let comp_leaves: Vec<Vec<u8>> = composition_lde.iter().map(reduced_bytes).collect();
     let comp_tree = MerkleTree::from_leaves(&comp_leaves);
@@ -1438,6 +1469,12 @@ mod tests {
         }
     }
 
+    /// (Commit a232be6a8 introduced this form; the term it replaced,
+    /// `(f(x) − f(ω·z))/(x − ω·z)`, was an equally valid DEEP quotient, so
+    /// the change is an equivalent reformulation, not a soundness fix, and
+    /// this test pins the formula, not a soundness property: sheriff case
+    /// SHF-20261028-0f3f64, S2N-7.)
+    ///
     /// The second DEEP term is the divided difference of the transformed
     /// trace polynomial `f(ω·X)`, so it must use the opened `f(ω·x)` at the
     /// same `x`.  A nonconstant trace makes this distinguishable from using
@@ -1665,6 +1702,147 @@ mod tests {
             check_gated(&fa, &cfg, &honest, false),
             Err(Reject::Fri(FriReject::FinalLayer))
         );
+    }
+
+    // The remaining minor sheriff findings (SHF-20261028-0f3f64).
+
+    /// S2N-3: the composition opening and the per-query AIR recompute are
+    /// separate gates.  A valid Merkle path for another leaf (query 1's
+    /// opening in query 0's slot) fails the position binding; a
+    /// re-committed composition table offset from the AIR's, with valid
+    /// paths at the right leaves, fails the recompute.
+    #[test]
+    fn rejects_composition_opening_and_recompute_separately() {
+        let air = two_boundary_air();
+        let cfg = StarkConfig::fast();
+        let proof = prove(&air, &cfg).unwrap();
+        assert_ne!(
+            proof.composition_openings[0].0,
+            proof.composition_openings[1].0
+        );
+        let mut p = proof.clone();
+        p.composition_openings.swap(0, 1);
+        assert_eq!(check(&air, &cfg, &p), Err(Reject::Opening));
+        let p = prove_with(&air, &cfg, &knobs(|k| k.composition_offset = true)).unwrap();
+        assert_eq!(check(&air, &cfg, &p), Err(Reject::Composition));
+    }
+
+    /// S2N-4: the `γ₁` term is `(f(x) − f(z))/(x − z)` of the opened
+    /// `f(x)`, not of `f(ω·x)` or `Comp(x)`.
+    #[test]
+    fn deep_gamma1_uses_f_at_same_x() {
+        let (x, z) = (big(11), big(13));
+        let ood = OodValues {
+            f_z: big(23),
+            f_wz: big(29),
+            comp_z: big(31),
+        };
+        let coeffs = DeepCoeffs {
+            gamma: [big(1), big(0), big(0)],
+            lambda: [big(1), big(0)],
+        };
+        let (fx, f_wx, comp_x) = (big(17), big(19), big(37));
+        let got = deep_at(&x, &fx, &f_wx, &comp_x, &z, &ood, &coeffs).unwrap();
+        let expected = fr_mul(&fr_sub(&fx, &ood.f_z), &fr_inv(&fr_sub(&x, &z)).unwrap());
+        assert_eq!(got, expected);
+        assert_ne!(
+            got,
+            fr_mul(&fr_sub(&f_wx, &ood.f_z), &fr_inv(&fr_sub(&x, &z)).unwrap())
+        );
+    }
+
+    /// S2N-5: the AIR fingerprint, `n`, `β`, `q` and the boundaries each
+    /// move the statement transcript, hence `α₁, α₂`.  (A proof for a
+    /// different AIR is also rejected by the AIR checks, so absorption
+    /// cannot be isolated end to end; this pins it directly.  The
+    /// frozen-heart tests cover the boundary values.)
+    #[test]
+    fn statement_transcript_binds_air_n_beta_q() {
+        let base_air = two_boundary_air();
+        let cfg = StarkConfig::fast();
+        let alphas = |air: &AirV2, cfg: &StarkConfig| {
+            let mut t = statement_transcript(air, cfg).unwrap();
+            absorb_trace_draw_alphas(&mut t, &[7u8; 32])
+        };
+        let base = alphas(&base_air, &cfg);
+        let tripling = air2(
+            8,
+            vec![(0, big(1)), (7, big(128))],
+            trip(),
+            doubling_trace(8, 1),
+        );
+        let shifted = air2(
+            8,
+            vec![(0, big(1)), (7, big(128))],
+            AffineTransition::new(fr_sub(&big(0), &big(2)), big(1), big(1)),
+            doubling_trace(8, 1),
+        );
+        let n16 = AirV2::doubling(16, 1);
+        let more_boundaries = air2(
+            8,
+            vec![(0, big(1)), (6, big(64)), (7, big(128))],
+            dbl(),
+            doubling_trace(8, 1),
+        );
+        for (name, other) in [
+            ("transition coefficient", alphas(&tripling, &cfg)),
+            ("transition constant", alphas(&shifted, &cfg)),
+            ("n", alphas(&n16, &cfg)),
+            ("boundary count", alphas(&more_boundaries, &cfg)),
+            (
+                "blow_up",
+                alphas(
+                    &base_air,
+                    &StarkConfig {
+                        blow_up: 8,
+                        ..cfg.clone()
+                    },
+                ),
+            ),
+            (
+                "query_count",
+                alphas(
+                    &base_air,
+                    &StarkConfig {
+                        query_count: 21,
+                        ..cfg.clone()
+                    },
+                ),
+            ),
+        ] {
+            assert_ne!(base, other, "{name} is not bound into alpha");
+        }
+        assert_eq!(base, alphas(&two_boundary_air(), &cfg));
+    }
+
+    /// S2N-11: `n·β > 2^32` (no root of unity of that order) and more
+    /// boundaries than rows are rejected as a statement, so `verify`
+    /// returns false instead of panicking, and `prove` returns `None`.
+    #[test]
+    fn rejects_oversized_statements_without_panic() {
+        let cfg = StarkConfig::fast();
+        let proof = prove(&two_boundary_air(), &cfg).unwrap();
+        let huge = air2(1 << 30, vec![(0, big(1))], dbl(), Vec::new());
+        let big_beta = StarkConfig {
+            blow_up: 8,
+            query_count: 20,
+        };
+        assert!(statement_transcript(&huge, &big_beta).is_none());
+        assert!(!verify(&huge, &big_beta, &proof));
+        assert!(prove(&huge, &big_beta).is_none());
+        // n·β = 2^32 is the largest allowed size.
+        let at_limit = StarkConfig {
+            blow_up: 4,
+            query_count: 1,
+        };
+        assert!(statement_transcript(&huge, &at_limit).is_some());
+        let crowded = air2(
+            2,
+            vec![(0, big(1)), (1, big(2)), (0, big(1))],
+            dbl(),
+            Vec::new(),
+        );
+        assert!(statement_transcript(&crowded, &cfg).is_none());
     }
 
     /// Non-canonical (v + r) or oversized OOD values return false.

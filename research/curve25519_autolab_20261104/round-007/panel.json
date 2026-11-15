@@ -1,0 +1,140 @@
+{
+  "created": "2026-11-04T04:23:34Z",
+  "round": 7,
+  "rules": {
+    "exploration_slots": 2,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "mitm3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "rfpairs3",
+      "rfsub2",
+      "sub2",
+      "mitmbatch",
+      "mitmblocked"
+    ],
+    "max_candidates": 9,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "20": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=9,scan_cap=144",
+            "family": "ksum3",
+            "n": 9,
+            "name": "ksum3-n9",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "incumbent neighbourhood: N = 0.85 x 11"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=13,scan_cap=208",
+            "family": "ksum3",
+            "n": 13,
+            "name": "ksum3-n13",
+            "oracle": "ksum:m=3"
+          },
+          "reason": "incumbent neighbourhood: N = 1.2 x 11"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=9,scan_cap=144",
+            "family": "ksum4",
+            "n": 9,
+            "name": "ksum4-n9",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer: ksum4 is incumbent at 3 sizes; ln N fitted on log2 r (slope 0.097) and extrapolated"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+            "family": "ksum4",
+            "n": 8,
+            "name": "ksum4-n8",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 0.85 x 9 (ksum4 from k = 24)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+            "family": "ksum4",
+            "n": 11,
+            "name": "ksum4-n11",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 1.2 x 9 (ksum4 from k = 24)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=13,scan_cap=208",
+            "family": "ksum4",
+            "n": 13,
+            "name": "ksum4-n13",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 1.4 x 9 (ksum4 from k = 24)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+            "family": "ksum4",
+            "n": 18,
+            "name": "ksum4-n18",
+            "oracle": "ksum:m=4"
+          },
+          "reason": "cross-size transfer neighbourhood: N = 2 x 9 (ksum4 from k = 24)"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=8,scan_cap=128",
+            "family": "ksum5",
+            "n": 8,
+            "name": "ksum5-n8",
+            "oracle": "ksum:m=5"
+          },
+          "reason": "exploration: family ksum5 untried at k = 20, N = 0.08 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+            "family": "rfsub2",
+            "n": 32,
+            "name": "rfsub2-n32",
+            "oracle": "rootfind-subtract:m=2"
+          },
+          "reason": "exploration: family rfsub2 untried at k = 20, N = 1 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+        "family": "ksum3",
+        "n": 11,
+        "name": "ksum3-n11",
+        "oracle": "ksum:m=3"
+      },
+      "incumbent_s": [
+        8.987,
+        9.71,
+        16.217
+      ],
+      "tried_before": 17
+    }
+  },
+  "track": "generic"
+}

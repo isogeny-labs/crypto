@@ -188,15 +188,144 @@ const DEG_SHIFT: u32 = 96;
 /// Free variables a monomial can carry.
 pub const MAX_FREE: usize = 4;
 
-/// The monomial with tower mask `mask` and free exponents `free`.
+/// Positive integer weights `1..=8` on the tower variables: the grading of
+/// a weighted run ([`TowerF4Options::weights`]).
+///
+/// The weight of variable `j` is `1 + Σ_b 2^b·bit_j(planes[b])`, so the
+/// default (all planes zero) is the unit grading, under which every key is
+/// the one [`mono`] makes. A weighted degree with positive weights, broken
+/// by the same reverse-lexicographic comparison of the key's low half, is a
+/// monomial order. Its use here: a radix-`2^k` Kummer tower `u^{2^k} = u'`
+/// is the radix-2 tower `y_0 = u, y_{i+1} = y_i²` with weights
+/// `1, 2, …, 2^{k−1}` on each block of `k` levels. The ring, its rules and its
+/// standard monomials are the same; only the grading, and so the order in
+/// which F4 meets the monomials, changes. [`TowerWeights::check`] says when
+/// the rules still have leading monomials `y_j²`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct TowerWeights {
+    planes: [u64; 3],
+}
+
+impl TowerWeights {
+    /// The unit grading.
+    pub const UNIT: TowerWeights = TowerWeights { planes: [0; 3] };
+
+    /// Weights given per tower variable, each in `1..=8`; variables past the
+    /// slice's end get weight 1.
+    pub fn from_slice(w: &[u32]) -> Self {
+        assert!(w.len() <= 64, "f4_fp_tower: at most 64 tower weights");
+        let mut planes = [0u64; 3];
+        for (j, &x) in w.iter().enumerate() {
+            assert!(
+                (1..=8).contains(&x),
+                "f4_fp_tower: weight {x} of y_{j} is not in 1..=8"
+            );
+            let e = x - 1;
+            for (b, plane) in planes.iter_mut().enumerate() {
+                if (e >> b) & 1 == 1 {
+                    *plane |= 1u64 << j;
+                }
+            }
+        }
+        TowerWeights { planes }
+    }
+
+    /// Radix-`2^k` blocks on `n` tower variables laid out as `blocks` towers
+    /// of `t` consecutive levels each (`n = blocks·t`): level `i` of every
+    /// tower gets weight `2^(i mod k)`. `k = 1` is the unit grading.
+    pub fn radix_blocks(blocks: usize, t: usize, k: u32) -> Self {
+        assert!(
+            (1..=4).contains(&k),
+            "f4_fp_tower: radix exponent k must be 1..=4"
+        );
+        let w: Vec<u32> = (0..blocks)
+            .flat_map(|_| (0..t).map(move |i| 1u32 << (i as u32 % k)))
+            .collect();
+        Self::from_slice(&w)
+    }
+
+    pub fn is_unit(self) -> bool {
+        self.planes == [0; 3]
+    }
+
+    /// The weight of tower variable `j`.
+    #[inline]
+    pub fn weight(self, j: u32) -> u32 {
+        1 + self
+            .planes
+            .iter()
+            .enumerate()
+            .map(|(b, p)| (((p >> j) & 1) as u32) << b)
+            .sum::<u32>()
+    }
+
+    /// The weighted degree of a tower mask.
+    #[inline]
+    pub fn mask_degree(self, mask: u64) -> u32 {
+        mask.count_ones()
+            + (mask & self.planes[0]).count_ones()
+            + 2 * (mask & self.planes[1]).count_ones()
+            + 4 * (mask & self.planes[2]).count_ones()
+    }
+
+    /// Panics unless every rule of `ring` keeps `y_j²` as its leading
+    /// monomial in this grading, so that the tower stays a Gröbner basis
+    /// with pairwise coprime leads (Lemma 1 of the note):
+    /// - a `b·y_next` term needs `w(next) ≤ 2·w(j)` (at equality the reverse
+    ///   lexicographic tie-break puts `y_next`, the later variable, below);
+    /// - an `a·y_j·y_next` term needs `w(next) ≤ w(j)`, by the same argument;
+    /// - `c·y_j` and `d` are always below.
+    pub fn check(self, ring: &TowerRing) {
+        assert!(
+            self.planes
+                .iter()
+                .all(|p| ring.n_tower() == 64 || p >> ring.n_tower() == 0),
+            "f4_fp_tower: weights set on variables past the tower"
+        );
+        for (j, r) in ring.rules.iter().enumerate() {
+            let wj = self.weight(j as u32);
+            if let Some(nx) = r.next {
+                let wn = self.weight(u32::from(nx));
+                if r.b != 0 {
+                    assert!(
+                        wn <= 2 * wj,
+                        "f4_fp_tower: weight of y_{nx} ({wn}) above twice that of y_{j} ({wj}): y_{j}² is not the leading monomial"
+                    );
+                }
+                if r.a != 0 {
+                    assert!(
+                        wn <= wj,
+                        "f4_fp_tower: rule {j} has a y_{j}·y_{nx} term and w(y_{nx}) = {wn} > w(y_{j}) = {wj}"
+                    );
+                }
+            }
+        }
+    }
+}
+
+/// The key of degree `deg`, tower mask `mask` and free exponents `free`.
 #[inline]
-pub fn mono(mask: u64, free: [u8; MAX_FREE]) -> Mono {
-    let deg = mask.count_ones() + free.iter().map(|&e| u32::from(e)).sum::<u32>();
+fn key_with_degree(deg: u32, mask: u64, free: [u8; MAX_FREE]) -> Mono {
     let mut key = (u128::from(deg) << DEG_SHIFT) | u128::from(!mask);
     for (k, &e) in free.iter().enumerate() {
         key |= u128::from(255 - e) << (FREE_SHIFT + 8 * k as u32);
     }
     key
+}
+
+/// The monomial with tower mask `mask` and free exponents `free`, in the
+/// unit grading.
+#[inline]
+pub fn mono(mask: u64, free: [u8; MAX_FREE]) -> Mono {
+    mono_w(mask, free, TowerWeights::UNIT)
+}
+
+/// The monomial with tower mask `mask` and free exponents `free`, in the
+/// grading `w`.
+#[inline]
+pub fn mono_w(mask: u64, free: [u8; MAX_FREE], w: TowerWeights) -> Mono {
+    let deg = w.mask_degree(mask) + free.iter().map(|&e| u32::from(e)).sum::<u32>();
+    key_with_degree(deg, mask, free)
 }
 
 /// The tower variables of `m`, as a mask.
@@ -234,17 +363,35 @@ pub(crate) fn divides(a: Mono, b: Mono) -> bool {
     fa.iter().zip(&fb).all(|(x, y)| x <= y)
 }
 
+/// `a | b` from the masks and free exponents alone, whatever grading
+/// either key is in.
+#[inline]
+pub(crate) fn divides_ungraded(a: Mono, b: Mono) -> bool {
+    if mask_of(a) & !mask_of(b) != 0 {
+        return false;
+    }
+    let (fa, fb) = (free_of(a), free_of(b));
+    fa.iter().zip(&fb).all(|(x, y)| x <= y)
+}
+
 #[inline]
 pub(crate) fn lcm(a: Mono, b: Mono) -> Mono {
+    lcm_w(a, b, TowerWeights::UNIT)
+}
+
+/// The lcm of `a` and `b`, keyed in the grading `w` (both must be).
+#[inline]
+pub(crate) fn lcm_w(a: Mono, b: Mono, w: TowerWeights) -> Mono {
     let (fa, fb) = (free_of(a), free_of(b));
     let mut f = [0u8; MAX_FREE];
     for k in 0..MAX_FREE {
         f[k] = fa[k].max(fb[k]);
     }
-    mono(mask_of(a) | mask_of(b), f)
+    mono_w(mask_of(a) | mask_of(b), f, w)
 }
 
-/// `a / b`, for `b | a`.
+/// `a / b`, for `b | a`. Its degree is `deg a − deg b` in any grading, so
+/// the quotient is keyed in the grading of its arguments.
 #[inline]
 pub(crate) fn quotient(a: Mono, b: Mono) -> Mono {
     let (fa, fb) = (free_of(a), free_of(b));
@@ -252,7 +399,7 @@ pub(crate) fn quotient(a: Mono, b: Mono) -> Mono {
     for k in 0..MAX_FREE {
         f[k] = fa[k] - fb[k];
     }
-    mono(mask_of(a) & !mask_of(b), f)
+    key_with_degree(degree_of(a) - degree_of(b), mask_of(a) & !mask_of(b), f)
 }
 
 #[inline]
@@ -471,29 +618,37 @@ impl TowerRing {
         out.extend_from_slice(cur);
     }
 
-    /// `u · g` in normal form.
+    /// `u · g` in normal form (unit grading).
     pub fn mul_mono(&self, g: &RPoly, u: Mono) -> RPoly {
         let fp = Fp::new(self.p);
-        self.mul_mono_fp(fp, g, u)
+        self.mul_mono_fp(fp, g, u, TowerWeights::UNIT)
     }
 
-    fn mul_mono_fp(&self, fp: Fp, g: &RPoly, u: Mono) -> RPoly {
+    /// `u · g` in normal form, with `g`, `u` and the result keyed in `w`.
+    pub fn mul_mono_w(&self, g: &RPoly, u: Mono, w: TowerWeights) -> RPoly {
+        let fp = Fp::new(self.p);
+        self.mul_mono_fp(fp, g, u, w)
+    }
+
+    fn mul_mono_fp(&self, fp: Fp, g: &RPoly, u: Mono, w: TowerWeights) -> RPoly {
         let terms = g.monos.iter().copied().zip(g.coefs.iter().copied());
-        self.mul_terms_fp(fp, terms, g.len(), u)
+        self.mul_terms_fp(fp, terms, g.len(), u, w)
     }
 
-    fn mul_elem(&self, fp: Fp, g: &Elem, u: Mono) -> RPoly {
-        self.mul_terms_fp(fp, g.terms(), g.len(), u)
+    fn mul_elem(&self, fp: Fp, g: &Elem, u: Mono, w: TowerWeights) -> RPoly {
+        self.mul_terms_fp(fp, g.terms(), g.len(), u, w)
     }
 
     /// `u · g` in normal form, for `g` given by its terms, descending and
-    /// with non-zero coefficients (`len` of them).
+    /// with non-zero coefficients (`len` of them). `g`, `u` and the result
+    /// are keyed in the grading `w`.
     pub(crate) fn mul_terms_fp(
         &self,
         fp: Fp,
         g: impl Iterator<Item = (Mono, u32)>,
         len: usize,
         u: Mono,
+        w: TowerWeights,
     ) -> RPoly {
         let (mu, fu) = (mask_of(u), free_of(u));
         // When `u` has no free variable, the key of a plain product is the
@@ -516,14 +671,14 @@ impl TowerRing {
             if mm & mu == 0 {
                 monos.push(match plain_shift {
                     Some(shift) => m + shift,
-                    None => mono(mm | mu, add_free(free_of(m), fu)),
+                    None => mono_w(mm | mu, add_free(free_of(m), fu), w),
                 });
                 coefs.push(c);
             } else {
                 let f = add_free(free_of(m), fu);
                 tmp.clear();
                 self.mask_product_into(fp, mm, mu, u64::from(c), &mut tmp, &mut scratch);
-                carried.extend(tmp.iter().map(|&(x, cc)| (mono(x, f), cc)));
+                carried.extend(tmp.iter().map(|&(x, cc)| (mono_w(x, f, w), cc)));
             }
         }
         if carried.is_empty() {
@@ -781,6 +936,52 @@ pub struct TowerF4Options {
     /// then reduces to zero, and no pivot changes. On by default; off
     /// reproduces the elimination row for row, multiply-adds included.
     pub full_rank_exit: bool,
+    /// Learn an [`F4Trace`]: on a run that ends in a refutation, record for
+    /// each step the S-rows that gave a new pivot (and the promoted rows),
+    /// and the leading monomials of the new elements. Costs nothing in
+    /// multiply-adds; the result is [`TowerF4Report::learned`].
+    pub record_trace: bool,
+    /// Replay a learned trace on another specialisation of the same system
+    /// shape: each step reduces only the recorded rows (and only the
+    /// reducers they reach), and stops with a failure as soon as the new
+    /// elements' leads differ from the trace's. Only a refutation (`1` in
+    /// the ideal) is a result of a replay; it is sound whatever the trace
+    /// was learned on, because every row computed lies in the ideal. A
+    /// replay that does not refute has not decided anything.
+    pub replay: Option<Arc<F4Trace>>,
+    /// The grading of the run: weights on the tower variables
+    /// ([`TowerWeights`]). `None` is the unit grading, and leaves every key,
+    /// every step and every count as before. With weights the inputs are
+    /// re-keyed at entry, the steps and `solving_degree_max` are weighted
+    /// degrees, and the basis comes back keyed in the grading
+    /// ([`degree_of`] on it is the weighted degree; [`mask_of`] and
+    /// [`free_of`] are unchanged).
+    pub weights: Option<TowerWeights>,
+}
+
+/// What an F4 run that ended in a refutation learned about its system
+/// shape: per step, which rows to reduce. See [`TowerF4Options::replay`].
+#[derive(Clone, Debug, Default)]
+pub struct F4Trace {
+    pub steps: Vec<TraceStep>,
+}
+
+/// One step of an [`F4Trace`].
+#[derive(Clone, Debug, Default)]
+pub struct TraceStep {
+    pub degree: u32,
+    /// `(multiplier, element)` of the rows kept: S-rows that gave a pivot,
+    /// and the S-rows promoted to reducers.
+    pub kept: std::collections::HashSet<(Mono, u32)>,
+    /// Leading monomials of the step's new elements, ascending.
+    pub fresh_lms: Vec<Mono>,
+}
+
+impl F4Trace {
+    /// Rows kept over all steps (a measure of the trace's size).
+    pub fn kept_rows(&self) -> usize {
+        self.steps.iter().map(|s| s.kept.len()).sum()
+    }
 }
 
 impl TowerF4Options {
@@ -795,7 +996,15 @@ impl TowerF4Options {
             on_stop: None,
             on_sig_step: None,
             full_rank_exit: true,
+            record_trace: false,
+            replay: None,
+            weights: None,
         }
+    }
+    /// Run in the grading `w` (see [`TowerF4Options::weights`]).
+    pub fn with_weights(mut self, w: TowerWeights) -> Self {
+        self.weights = (!w.is_unit()).then_some(w);
+        self
     }
     pub fn on_step(mut self, f: fn(usize, &StepTrace)) -> Self {
         self.on_step = Some(f);
@@ -911,6 +1120,13 @@ pub struct TowerF4Report {
     /// entries (`dense_entries`). The basis fields are those before the
     /// step, and `pairs_left` counts the step's pairs again.
     pub stopped_step: Option<StepTrace>,
+    /// With [`TowerF4Options::record_trace`] and a refutation: the trace.
+    pub learned: Option<F4Trace>,
+    /// With [`TowerF4Options::replay`]: why the replay stopped without a
+    /// refutation (a replay that refuted leaves `None` and `inconsistent`).
+    pub replay_failure: Option<&'static str>,
+    /// For a lead mismatch: (step, new elements found, new elements in the trace).
+    pub replay_mismatch: Option<(usize, usize, usize)>,
 }
 
 // ── Sparse rows and the two eliminations ─────────────────────────────
@@ -1294,6 +1510,11 @@ struct ElimStats {
     /// Time spent on `B'`, and on the S-rows and their echelon.
     ms_reducers: f64,
     ms_residues: f64,
+    /// Input: form `B'` only for the reducers the S-rows reach, directly or
+    /// through other reducers (a replay; the plain run forms all of it).
+    prune_reducers: bool,
+    /// Output: the S-rows (indices) that gave a new pivot, in order.
+    useful: Vec<u32>,
 }
 
 /// Forms row `k` of a set of rows on demand.
@@ -1382,6 +1603,29 @@ fn eliminate(
         pos[k as usize] = i as u32;
     }
     let mut bred: Vec<Vec<u32>> = vec![Vec::new(); n_piv];
+    // A replay forms `B'` only for the reducers its S-rows reach.
+    let needed: Option<Vec<bool>> = st.prune_reducers.then(|| {
+        let mut need = vec![false; n_piv];
+        let mut work: Vec<u32> = Vec::new();
+        let mark = |row: &Row, from: usize, need: &mut Vec<bool>, work: &mut Vec<u32>| {
+            for &c in &row.cols[from..] {
+                if q_of[c as usize] == NONE {
+                    let j = pivot_of[c as usize];
+                    if !need[j as usize] {
+                        need[j as usize] = true;
+                        work.push(j);
+                    }
+                }
+            }
+        };
+        for k in 0..n_s {
+            mark(&s_row(k), 0, &mut need, &mut work);
+        }
+        while let Some(j) = work.pop() {
+            mark(&piv_row(j as usize), 1, &mut need, &mut work);
+        }
+        need
+    });
     const BLOCK: usize = 64;
     for (b, block) in order.chunks(BLOCK).enumerate() {
         let first = (b * BLOCK) as u32;
@@ -1393,8 +1637,8 @@ fn eliminate(
                 let mut acc = vec![0u64; nq - s0];
                 let mut later = Vec::new();
                 let mut work = 0u64;
-                if past() {
-                    return (acc, later, work);
+                if past() || needed.as_ref().is_some_and(|n| !n[k as usize]) {
+                    return (Vec::new(), later, work);
                 }
                 let row = piv_row(k as usize);
                 debug_assert_eq!(row.cols[0], piv_leads[k as usize]);
@@ -1564,6 +1808,7 @@ fn eliminate(
                 .collect();
             let at = new_leads.partition_point(|&m| m < l as u32);
             new_leads.insert(at, l as u32);
+            st.useful.push(rows[i] as u32);
             if leads.len() + new_leads.len() == nq {
                 st.full_rank_after = Some(done + i + 1);
             }
@@ -1636,11 +1881,23 @@ struct State {
     /// Active leading monomial → element.
     lm_index: MonoMap<u32>,
     pairs: Vec<Pair>,
+    /// The grading every key of this run is in.
+    w: TowerWeights,
 }
 
 /// Every monomial `L'` with `lo | L' | L`, `L'` ≠ `L`, is passed to `f`
 /// until it returns `true`; returns whether one did.
-pub(crate) fn any_between(lo: Mono, l: Mono, mut f: impl FnMut(Mono) -> bool) -> bool {
+pub(crate) fn any_between(lo: Mono, l: Mono, f: impl FnMut(Mono) -> bool) -> bool {
+    any_between_w(lo, l, TowerWeights::UNIT, f)
+}
+
+/// [`any_between`] with every monomial keyed in the grading `w`.
+pub(crate) fn any_between_w(
+    lo: Mono,
+    l: Mono,
+    w: TowerWeights,
+    mut f: impl FnMut(Mono) -> bool,
+) -> bool {
     let (lo_mask, l_mask) = (mask_of(lo), mask_of(l));
     let extra = l_mask & !lo_mask;
     let (lo_f, l_f) = (free_of(lo), free_of(l));
@@ -1649,7 +1906,7 @@ pub(crate) fn any_between(lo: Mono, l: Mono, mut f: impl FnMut(Mono) -> bool) ->
     loop {
         let mut fv = lo_f;
         loop {
-            let cand = mono(lo_mask | s, fv);
+            let cand = mono_w(lo_mask | s, fv, w);
             if cand != l && f(cand) {
                 return true;
             }
@@ -1696,7 +1953,7 @@ impl State {
             self.pairs.push(Pair {
                 kind: PairKind::Tower(h as u32, v as u8),
                 lcm: lh,
-                deg: dh + 1,
+                deg: dh + self.w.weight(v),
             });
         }
 
@@ -1712,7 +1969,7 @@ impl State {
             if !self.active[g] {
                 continue;
             }
-            let l = lcm(lh, self.lm[g]);
+            let l = lcm_w(lh, self.lm[g], self.w);
             let e = groups.entry(l).or_insert((g as u32, false));
             if coprime(lh, self.lm[g]) {
                 e.1 = true;
@@ -1720,7 +1977,7 @@ impl State {
         }
         let mut kept: Vec<(u32, Mono)> = Vec::new();
         for (&l, &(g, has_coprime)) in &groups {
-            if any_between(lh, l, |c| groups.contains_key(&c)) {
+            if any_between_w(lh, l, self.w, |c| groups.contains_key(&c)) {
                 rep.pairs_chain_skipped += 1;
                 continue;
             }
@@ -1733,13 +1990,14 @@ impl State {
         // Old critical pairs whose lcm `LM(h)` divides, strictly on both
         // sides (criterion B).
         let lm = &self.lm;
+        let w = self.w;
         let mut dropped = 0u64;
         self.pairs.retain(|p| match p.kind {
             PairKind::Tower(..) => true,
             PairKind::Critical(i, j) => {
                 let keep = !divides(lh, p.lcm)
-                    || lcm(lm[i as usize], lh) == p.lcm
-                    || lcm(lm[j as usize], lh) == p.lcm;
+                    || lcm_w(lm[i as usize], lh, w) == p.lcm
+                    || lcm_w(lm[j as usize], lh, w) == p.lcm;
                 if !keep {
                     dropped += 1;
                 }
@@ -1776,7 +2034,7 @@ impl State {
         loop {
             let mut fv = [0u8; MAX_FREE];
             loop {
-                if let Some(&g) = self.lm_index.get(&mono(s, fv)) {
+                if let Some(&g) = self.lm_index.get(&mono_w(s, fv, self.w)) {
                     if best
                         .is_none_or(|b| self.polys[g as usize].len() < self.polys[b as usize].len())
                     {
@@ -1847,8 +2105,11 @@ pub(crate) fn staircase_at_most(
         bound: usize,
     ) -> bool {
         let (lms, n_tower, n_free, cap) = ctx;
+        // Divisibility on masks and exponents alone: the leads may be keyed
+        // in a weighted grading, which `divides`'s degree test would mix
+        // with this unit-keyed `cur`.
         let cur = mono(mask, *free);
-        if lms.iter().any(|&l| divides(l, cur)) {
+        if lms.iter().any(|&l| divides_ungraded(l, cur)) {
             return true;
         }
         if k == n_tower + n_free {
@@ -1988,6 +2249,7 @@ pub(crate) fn order_columns(examined: &MonoMap<u32>) -> (Vec<Mono>, Vec<u32>) {
 fn scan_products(
     ring: &TowerRing,
     fp: Fp,
+    w: TowerWeights,
     polys: &[Elem],
     todo: &[(Mono, u32)],
     skip: usize,
@@ -2001,7 +2263,7 @@ fn scan_products(
     for batch in todo.chunks(1024) {
         let prods: Vec<RPoly> = batch
             .par_iter()
-            .map(|&(mult, g)| ring.mul_elem(fp, &polys[g as usize], mult))
+            .map(|&(mult, g)| ring.mul_elem(fp, &polys[g as usize], mult, w))
             .collect();
         for (&(mult, g), p) in batch.iter().zip(&prods) {
             let Some(lead) = p.lm() else { continue };
@@ -2050,6 +2312,8 @@ fn f4_tower_cached(
     cache_terms: usize,
 ) -> TowerF4Report {
     ring.check();
+    let w = opts.weights.unwrap_or(TowerWeights::UNIT);
+    w.check(ring);
     let started = Instant::now();
     let fp = Fp::new(ring.p);
     let mut rep = TowerF4Report::default();
@@ -2064,9 +2328,25 @@ fn f4_tower_cached(
         }]
     };
 
-    let inputs: Vec<RPoly> = input.iter().filter(|p| !p.is_empty()).cloned().collect();
+    let mut inputs: Vec<RPoly> = input.iter().filter(|p| !p.is_empty()).cloned().collect();
+    if !w.is_unit() {
+        // Re-key every term in the grading. The map is injective on
+        // (mask, free), so the terms stay distinct; only their order moves.
+        for p in &mut inputs {
+            let mut t: Vec<(Mono, u32)> = p
+                .monos
+                .iter()
+                .zip(&p.coefs)
+                .map(|(&m, &c)| (mono_w(mask_of(m), free_of(m), w), c))
+                .collect();
+            t.sort_unstable_by_key(|x| std::cmp::Reverse(x.0));
+            p.monos = t.iter().map(|x| x.0).collect();
+            p.coefs = t.iter().map(|x| x.1).collect();
+        }
+    }
     if inputs.iter().any(|p| p.is_unit()) {
         rep.inconsistent = true;
+        rep.learned = opts.record_trace.then(F4Trace::default);
         rep.basis = unit();
         return finish(rep);
     }
@@ -2110,6 +2390,7 @@ fn f4_tower_cached(
     };
     if start.iter().any(|p| p.is_unit()) {
         rep.inconsistent = true;
+        rep.learned = opts.record_trace.then(F4Trace::default);
         rep.basis = unit();
         return finish(rep);
     }
@@ -2122,12 +2403,14 @@ fn f4_tower_cached(
         active: Vec::new(),
         lm_index: MonoMap::default(),
         pairs: Vec::new(),
+        w,
     };
     for p in start {
         s.insert(Elem::from_rpoly(p), &mut rep);
     }
     // (solving_degree_max, max_cols_to_solution, steps_to_solution)
     let mut learned = (0u32, 0usize, 0usize);
+    let mut trace_steps: Vec<TraceStep> = Vec::new();
     let mut max_cols_so_far = 0usize;
 
     let active_basis = |s: &State| -> Vec<RPoly> {
@@ -2188,12 +2471,34 @@ fn f4_tower_cached(
                 PairKind::Tower(g, v) => {
                     tr.tower_pairs += 1;
                     // A tower multiplier lies inside LM(g), a half's outside it.
-                    let mult = mono(1u64 << v, [0; MAX_FREE]);
+                    let mult = mono_w(1u64 << v, [0; MAX_FREE], s.w);
                     if seen.insert((mult, g), ()).is_none() {
                         jobs.push((mult, g));
                     }
                 }
             }
+        }
+        // Replay: keep only the rows the trace kept at this step. The lcm
+        // columns stay as they are: a column of `lcm_cols` is never searched
+        // for a reducer, and the row promoted there (kept) is what leads it;
+        // dropping a column whose promoted row is a tower product would send
+        // it to the reducer search and change the matrix.
+        let rstep: Option<&TraceStep> = match &opts.replay {
+            None => None,
+            Some(trace) => match trace.steps.get(rep.steps - 1) {
+                None => {
+                    rep.replay_failure = Some("trace exhausted");
+                    break;
+                }
+                Some(ts) if ts.degree != d => {
+                    rep.replay_failure = Some("step degree differs");
+                    break;
+                }
+                Some(ts) => Some(ts),
+            },
+        };
+        if let Some(ts) = rstep {
+            jobs.retain(|j| ts.kept.contains(j));
         }
         rep.critical_pairs_reduced += tr.critical_pairs as u64;
         rep.tower_pairs_reduced += tr.tower_pairs as u64;
@@ -2217,6 +2522,7 @@ fn f4_tower_cached(
         let mut nnz = scan_products(
             ring,
             fp,
+            s.w,
             &s.polys,
             &jobs,
             0,
@@ -2250,6 +2556,7 @@ fn f4_tower_cached(
             nnz += scan_products(
                 ring,
                 fp,
+                s.w,
                 &s.polys,
                 &todo,
                 1,
@@ -2349,7 +2656,7 @@ fn f4_tower_cached(
                     vals: cache.coefs[at].to_vec(),
                 };
             }
-            let p = ring.mul_elem(fp, &polys[d.g as usize], d.mult);
+            let p = ring.mul_elem(fp, &polys[d.g as usize], d.mult, s.w);
             debug_assert_eq!(
                 p.len(),
                 d.len as usize,
@@ -2375,7 +2682,10 @@ fn f4_tower_cached(
         };
         let s_row = |k: usize| form(&s_list[k]);
         let piv_leads: Vec<u32> = piv.iter().map(|d| col_of[&d.lead]).collect();
-        let mut st = ElimStats::default();
+        let mut st = ElimStats {
+            prune_reducers: rstep.is_some(),
+            ..Default::default()
+        };
         let result = eliminate(
             fp,
             n_cols,
@@ -2448,7 +2758,38 @@ fn f4_tower_cached(
             learned = (learned.0.max(d), max_cols_so_far, rep.steps);
             rep.last_productive_degree = d;
         }
-        if fresh.iter().any(|p| p.lm() == ONE) {
+        let refuted = fresh.iter().any(|p| p.lm() == ONE);
+        let mut fresh_lms: Vec<Mono> = Vec::new();
+        if opts.record_trace || rstep.is_some() {
+            fresh_lms = fresh.iter().map(|p| p.lm()).collect();
+            fresh_lms.sort_unstable();
+        }
+        if opts.record_trace {
+            let mut kept: std::collections::HashSet<(Mono, u32)> = st
+                .useful
+                .iter()
+                .map(|&k| (s_list[k as usize].mult, s_list[k as usize].g))
+                .collect();
+            kept.extend(piv[n_reducers..].iter().map(|d| (d.mult, d.g)));
+            trace_steps.push(TraceStep {
+                degree: d,
+                kept,
+                fresh_lms: fresh_lms.clone(),
+            });
+        }
+        if let Some(ts) = rstep {
+            // A refutation stands on its own; anything else must follow the
+            // trace, or the replay stops.
+            if !refuted && fresh_lms != ts.fresh_lms {
+                rep.replay_failure = Some("new leads differ from the trace");
+                rep.replay_mismatch = Some((rep.steps, fresh_lms.len(), ts.fresh_lms.len()));
+                break;
+            }
+        }
+        if refuted {
+            if opts.record_trace {
+                rep.learned = Some(F4Trace { steps: trace_steps });
+            }
             rep.inconsistent = true;
             rep.basis = unit();
             record(&mut rep, learned);
@@ -3161,7 +3502,7 @@ mod tests {
             assert_eq!(e.to_rpoly(), g, "trial {trial}");
             let u = key_of(&exponents(&mut rng), nt);
             assert_eq!(
-                ring.mul_elem(fp(p), &e, u),
+                ring.mul_elem(fp(p), &e, u, TowerWeights::UNIT),
                 ring.mul_mono(&g, u),
                 "trial {trial}"
             );
@@ -3276,6 +3617,168 @@ mod tests {
                 }
             }
         }
+    }
+
+    // ── Weighted gradings (radix-2^k presentations of the same tower) ──
+
+    /// The key `mono` made before gradings existed, written out again.
+    fn unit_key_reference(mask: u64, free: [u8; MAX_FREE]) -> Mono {
+        let deg = mask.count_ones() + free.iter().map(|&e| u32::from(e)).sum::<u32>();
+        let mut key = (u128::from(deg) << DEG_SHIFT) | u128::from(!mask);
+        for (k, &e) in free.iter().enumerate() {
+            key |= u128::from(255 - e) << (FREE_SHIFT + 8 * k as u32);
+        }
+        key
+    }
+
+    #[test]
+    fn unit_weights_leave_every_key_unchanged() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        assert!(TowerWeights::radix_blocks(3, 5, 1).is_unit());
+        assert!(TowerWeights::from_slice(&[1; 64]).is_unit());
+        for _ in 0..20_000 {
+            let (ma, mb): (u64, u64) = (rng.gen(), rng.gen());
+            let fa = [
+                rng.gen_range(0..9u8),
+                rng.gen_range(0..9),
+                0,
+                rng.gen_range(0..3),
+            ];
+            let fb = [rng.gen_range(0..9u8), 0, rng.gen_range(0..4), 0];
+            let (a, b) = (mono(ma, fa), mono(mb, fb));
+            assert_eq!(a, unit_key_reference(ma, fa));
+            assert_eq!(mono_w(ma, fa, TowerWeights::UNIT), a);
+            let l = lcm(a, b);
+            assert_eq!(lcm_w(a, b, TowerWeights::UNIT), l);
+            // The quotient now subtracts degrees; it must equal the old
+            // recomputation exactly.
+            let (qa, qb) = (free_of(l), free_of(b));
+            let mut qf = [0u8; MAX_FREE];
+            for k in 0..MAX_FREE {
+                qf[k] = qa[k] - qb[k];
+            }
+            assert_eq!(quotient(l, b), unit_key_reference(mask_of(l) & !mb, qf));
+        }
+    }
+
+    #[test]
+    fn a_weighted_key_order_is_a_monomial_order() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(11);
+        for k in 2..=3u32 {
+            let w = TowerWeights::radix_blocks(4, 6, k);
+            assert_eq!(w.weight(0), 1);
+            assert_eq!(w.weight(1), 2);
+            assert_eq!(w.weight(6), 1);
+            for _ in 0..20_000 {
+                let n = 24u32;
+                let full = (1u64 << n) - 1;
+                let (ma, mb, mu) = (
+                    rng.gen::<u64>() & full,
+                    rng.gen::<u64>() & full,
+                    rng.gen::<u64>() & full,
+                );
+                let (ma, mb) = (ma & !mu, mb & !mu);
+                let z = [0u8; MAX_FREE];
+                let (a, b, u) = (mono_w(ma, z, w), mono_w(mb, z, w), mono_w(mu, z, w));
+                let (au, bu) = (mono_w(ma | mu, z, w), mono_w(mb | mu, z, w));
+                // Multiplicative, and the plain-product shortcut is exact.
+                assert_eq!(a < b, au < bu);
+                let shift = (u128::from(degree_of(u)) << DEG_SHIFT) - u128::from(mu);
+                assert_eq!(a + shift, au);
+                // Divisibility implies order, 1 is least, and the degree is
+                // the weighted one.
+                assert!(au >= a && a >= ONE);
+                assert_eq!(
+                    degree_of(a),
+                    (0..n)
+                        .filter(|j| ma >> j & 1 == 1)
+                        .map(|j| w.weight(j))
+                        .sum::<u32>()
+                );
+                assert!(divides_ungraded(a, au) && divides(a, au));
+                assert_eq!(quotient(au, a), u);
+                let _ = (b, bu);
+            }
+        }
+    }
+
+    #[test]
+    fn weighted_runs_refute_exactly_the_empty_systems_and_count_the_rest() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(2027);
+        let p = 97u64; // 2^5 | 96
+        for (t, k) in [(2usize, 2u32), (4, 2), (3, 3), (4, 3), (5, 2)] {
+            let (r0, pts) = kummer_block(p, t, 0);
+            let (r1, _) = kummer_block(p, t, t);
+            let ring = TowerRing {
+                p,
+                rules: [r0, r1].concat(),
+                n_free: 0,
+            };
+            let w = TowerWeights::radix_blocks(2, t, k);
+            for trial in 0..10 {
+                let plant: Option<Vec<u64>> = (trial % 2 == 0).then(|| {
+                    let a = &pts[rng.gen_range(0..pts.len())];
+                    let b = &pts[rng.gen_range(0..pts.len())];
+                    [a.clone(), b.clone()].concat()
+                });
+                let g = biquadratic(&mut rng, &ring, t, plant.as_deref());
+                let mut zeros = Vec::new();
+                for a in &pts {
+                    for b in &pts {
+                        let x = [a.clone(), b.clone()].concat();
+                        if ring.eval(&g, &x) == 0 {
+                            zeros.push(x);
+                        }
+                    }
+                }
+                let unit = f4_tower(std::slice::from_ref(&g), &ring, &TowerF4Options::new(64));
+                let rep = f4_tower(&[g], &ring, &TowerF4Options::new(64).with_weights(w));
+                assert!(!rep.timed_out && rep.pairs_above_bound == 0);
+                assert_eq!(
+                    rep.inconsistent,
+                    zeros.is_empty(),
+                    "t {t} k {k} trial {trial}"
+                );
+                assert_eq!(rep.inconsistent, unit.inconsistent);
+                if !rep.inconsistent {
+                    for z in &zeros {
+                        for b in &rep.basis {
+                            assert_eq!(ring.eval(b, z), 0, "a solution was lost (t {t} k {k})");
+                        }
+                    }
+                    // Every ideal of F_p^{V×V} is radical: the staircase of
+                    // the weighted basis counts the points too.
+                    let lms: Vec<Mono> = rep.basis.iter().map(|b| b.lm().unwrap()).collect();
+                    assert_eq!(
+                        staircase_at_most(&lms, ring.n_tower(), 0, 1 << 12),
+                        Some(zeros.len()),
+                        "t {t} k {k} trial {trial}"
+                    );
+                    // The basis is keyed in the grading.
+                    for b in &rep.basis {
+                        for &m in &b.monos {
+                            assert_eq!(m, mono_w(mask_of(m), free_of(m), w));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "is not the leading monomial")]
+    fn a_grading_that_unseats_the_square_is_refused() {
+        let (rules, _) = kummer_block(97, 2, 0);
+        let ring = TowerRing {
+            p: 97,
+            rules,
+            n_free: 0,
+        };
+        // w(y_1) = 3 > 2·w(y_0): y_1 would lead y_0² − y_1.
+        TowerWeights::from_slice(&[1, 3]).check(&ring);
     }
 
     #[test]

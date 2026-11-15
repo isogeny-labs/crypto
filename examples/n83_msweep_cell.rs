@@ -27,8 +27,21 @@
 //! engine: enumerate | f4-matrix | f5-matrix | f4-inherited | f6-ic
 //!         | f6-ic-pair | crossbred | sat-native | sat-cnf | sat-restrict
 //!         | mq-fes | chain-s3 | chain-s3-orbit | chain-s3-orbit-ordered
+//!
+//! The Gröbner engines (`f4-matrix`, `f5-matrix`, `f4-inherited`, `f6-ic`,
+//! `f6-ic-pair`) also feed the advisory degree-of-regularity forecaster
+//! (`crypto_lib::cryptanalysis::dreg_forecast`): every query observes the
+//! highest Macaulay degree built, decided or censored, and the cell record
+//! carries the running forecast under `degree_of_regularity_forecast`.  It
+//! never shortens the cell; the other engines record why they have none.
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
-use crypto_lib::cryptanalysis::koblitz_groebner::{FieldStructure, SolveStats, SolverEngine};
+use crypto_lib::cryptanalysis::dreg_forecast::{
+    Forecaster, Outcome, SolveObservation, SystemShape as ForecastShape,
+};
+use crypto_lib::cryptanalysis::ic_boundary::generic_floor_ops;
+use crypto_lib::cryptanalysis::koblitz_groebner::{
+    build_decomposition_system, FieldStructure, SolveStats, SolverEngine,
+};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::*;
 use crypto_lib::cryptanalysis::mq_fes::mq_fes_decompose;
 use crypto_lib::cryptanalysis::semaev_sat::XorEncoding;
@@ -64,11 +77,48 @@ fn factor_base(kc: &KoblitzCurve, spec: &str, seed: u64) -> Result<FrobeniusFact
     }
 }
 
+/// The F4 critical-pair degree cap of the Gröbner engines.
+const F4_DEGREE: u32 = 3;
+
+/// Engines whose queries report a Macaulay degree.
+fn groebner_engine(engine: &str) -> bool {
+    matches!(
+        engine,
+        "f4-matrix" | "f5-matrix" | "f4-inherited" | "f6-ic" | "f6-ic-pair"
+    )
+}
+
 /// What one query returned, in the collector's vocabulary.
 struct Query {
     points: Option<Vec<usize>>,
     verdict: &'static str,
     work: u64,
+    /// Highest Macaulay degree the engine built, where it builds one.
+    degree_built: Option<u32>,
+}
+
+impl Query {
+    /// The query as the degree-of-regularity forecaster sees it: decided
+    /// queries observe the highest degree built as their solving degree,
+    /// incomplete ones are censored there.  Unsupported, unresolved and
+    /// invalid-model queries observe nothing.
+    fn observation(&self) -> Option<SolveObservation> {
+        let degree = self.degree_built?;
+        let outcome = match self.verdict {
+            "witness" => Outcome::Decomposed,
+            "proved_unsat" => Outcome::Refuted,
+            "incomplete" => Outcome::Exhausted,
+            _ => return None,
+        };
+        Some(SolveObservation {
+            outcome,
+            solving_degree: Some(degree),
+            censored_above: degree,
+            work: self.work,
+            relation_phase: true,
+            relation: self.verdict == "witness",
+        })
+    }
 }
 
 fn verdict(found: bool, refuted: bool, exhausted: bool, unsupported: bool) -> &'static str {
@@ -96,7 +146,7 @@ fn query(
     engine: &str,
     budget: Duration,
 ) -> Result<Query, String> {
-    let deg = 3;
+    let deg = F4_DEGREE;
     let node_budget = 8192;
     let sat = |enc: XorEncoding, restrict: bool| SatDecompositionOptions {
         encoding: enc,
@@ -123,6 +173,7 @@ fn query(
             ),
             points: p,
             work: s.reductions as u64,
+            degree_built: Some(s.max_degree_built),
         }
     };
     let inh = SolverEngine::InheritedF4 { max_degree: deg };
@@ -133,6 +184,7 @@ fn query(
                 verdict: verdict(p.is_some(), true, false, false),
                 points: p,
                 work: 0,
+                degree_built: None,
             }
         }
         "f4-matrix" => groebner(
@@ -157,6 +209,7 @@ fn query(
                 ),
                 points: p,
                 work: 0,
+                degree_built: None,
             }
         }
         "sat-native" | "sat-cnf" | "sat-restrict" | "mq-fes" => {
@@ -184,6 +237,7 @@ fn query(
                 verdict: verdict(p.is_some(), s.refuted, s.exhausted, s.unsupported),
                 points: p,
                 work: s.solver_calls as u64,
+                degree_built: None,
             }
         }
         "chain-s3" | "chain-s3-orbit" | "chain-s3-orbit-ordered" => {
@@ -205,6 +259,7 @@ fn query(
                 verdict: v,
                 points: p,
                 work: s.conflicts,
+                degree_built: None,
             }
         }
         other => return Err(format!("unknown engine `{other}`")),
@@ -243,6 +298,23 @@ fn cell(
     let r = kc.subgroup_order.clone();
     let group_order = &r * &kc.cofactor;
     let mut rng = StdRng::seed_from_u64(seed ^ ((m as u64) << 40));
+    // Advisory degree-of-regularity forecast for the Gröbner engines: the
+    // F4 cap is the censoring bound, the shape comes from the cell's own
+    // descent system, the rho floor folds negation and Frobenius.  The
+    // cell keeps no relation matrix, so the rank is approximated by the
+    // relations collected (an upper bound).  Nothing here shortens the
+    // cell or changes a query.
+    let mut forecaster = groebner_engine(engine).then(|| {
+        let mut f = Forecaster::new(F4_DEGREE).with_work_unit("algebraic reductions (F4 passes)");
+        if let Ok(r_f64) = r.to_string().parse::<f64>() {
+            f.set_rho_floor_group_additions(generic_floor_ops(r_f64, 2.0 * f64::from(kc.n)));
+        }
+        f.set_relation_state(fb.unknowns(), 0);
+        f
+    });
+    let forecast_unavailable = (forecaster.is_none()).then(|| {
+        format!("engine `{engine}` reports no Macaulay degree: no degree-of-regularity forecast")
+    });
     let mut outcomes: BTreeMap<&str, u64> = BTreeMap::new();
     let (mut relations, mut verified, mut work, mut done) = (0u64, 0u64, 0u64, 0u64);
     let mut per_trial = Vec::new();
@@ -256,12 +328,40 @@ fn cell(
             let a = BigUint::from(rng.gen_range(1..u64::MAX)) % &r;
             kc.mul(kc.generator(), &a)
         };
+        if let (Some(f), BinaryPoint::Affine { x, .. }) = (forecaster.as_mut(), &target) {
+            if f.shape().is_none() {
+                if let Some(sys) =
+                    build_decomposition_system(&fb.subspace_basis, x, &kc.curve.b, m, &st)
+                {
+                    f.set_shape(ForecastShape {
+                        variables: sys.n_vars,
+                        equation_degrees: sys
+                            .equations
+                            .iter()
+                            .filter_map(|p| p.terms.iter().map(|t| t.degree()).max())
+                            .filter(|d| *d > 0)
+                            .collect(),
+                        boolean: true,
+                    });
+                }
+            }
+        }
         let t = Instant::now();
         let q = query(&kc, &fb, &index_of, &st, &target, m, engine, per_query)?;
         per_trial.push(t.elapsed().as_secs_f64());
         done += 1;
         work += q.work;
         *outcomes.entry(q.verdict).or_default() += 1;
+        if let Some(f) = forecaster.as_mut() {
+            if let Some(observation) = q.observation() {
+                f.observe(observation);
+            }
+            let columns = fb.unknowns();
+            f.set_relation_state(
+                columns,
+                (relations as usize + usize::from(q.points.is_some())).min(columns),
+            );
+        }
         if let Some(points) = q.points {
             relations += 1;
             let sum = points
@@ -320,6 +420,9 @@ fn cell(
         "relations_needed": need,
         "log2_projected_collection_seconds": projection,
         "projection_rule": "need / p * seconds_per_trial, only when >= 90% of queries were decided",
+        "degree_of_regularity_forecast": forecaster.as_ref().map(Forecaster::forecast),
+        "forecast_unavailable": forecast_unavailable,
+        "forecast_scope": "advisory forecast of the observed solving-degree distribution over this cell's queries (dreg_forecast/v1): decided queries observe the highest Macaulay degree built, incomplete ones are censored there; work is counted in algebraic reductions; the relation rank is approximated by the relations collected (the cell keeps no matrix); rho floor folds negation and Frobenius (A = 2n); not a certified degree of regularity and never a stopping rule",
     }))
 }
 

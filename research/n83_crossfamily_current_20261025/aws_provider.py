@@ -21,7 +21,7 @@ def verify(snapshot, strata, head):
                 'ec2_describe_instances_at_collection') or
             controller.get('schema') != 'n83.crossfamily-aws-controller/v1' or
             controller.get('account_id') != '590183823895' or
-            controller.get('region') != 'us-east-1' or
+            controller.get('region') != 'us-west-2' or
             controller.get('source_head_sha') != head or
             len(controller.get('strata', [])) != 2 or
             len(instances) != 2 or
