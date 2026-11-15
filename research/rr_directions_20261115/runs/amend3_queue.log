@@ -73,3 +73,7 @@ MASK_BITS = 128
 m17_l7_d0_norm sat nv=55 np=68 deg=3 truth_tot=12 truth_dist=12 truth0_tot=12 truth0_dist=12 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=52572 wall=2.01 tfa=12 ndx=null xlc=null xlcomplete=null skipped=null
 m17_l7_d0_norm f4 nv=55 np=68 deg=3 truth_tot=12 truth_dist=12 truth0_tot=12 truth0_dist=12 decided=false sd=3 dr=4 rows=10659 nsol=null ver=null status=null model_ok=null confl=null wall=2.09 tfa=12 ndx=null xlc=null xlcomplete=null skipped=null
 m17_l7_d0_rr4 sat nv=22 np=35 deg=4 truth_tot=12 truth_dist=12 truth0_tot=12 truth0_dist=12 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=48232 wall=6.34 tfa=12 ndx=null xlc=null xlcomplete=null skipped=null
+./runs/amend3_queue.sh: line 16:  7384 Killed                  $P --out runs/f1_ladder_20261115 --m 17 --ell 7 --arms norm,rr4 --solvers sat,f4 --planted 4 --unplanted 4 --budget-s 600 --seed 20261115
++ /home/user/crypto/target/release/examples/rr_quadratic_panel --out runs/f1_ladder_20261115 --m 17 --ell 7 --arms s4 --solvers sat --planted 4 --unplanted 4 --budget-s 600 --seed 20261115
+MASK_BITS = 128
+m17_l7_d0_s4 sat nv=21 np=17 deg=6 truth_tot=12 truth_dist=12 truth0_tot=12 truth0_dist=12 decided=true sd=null dr=null rows=null nsol=null ver=null status="sat" model_ok=true confl=3475 wall=3.82 tfa=12 ndx=null xlc=null xlcomplete=null skipped=null
