@@ -3129,3 +3129,56 @@ procedural header check, no independent parser/compiler/physical host assurance.
 No holes/custom axioms/native proof evaluation/raised limits/new flags/waivers/
 frozen edits/cryptoPython/native crypto experiment/spend/upload/full fourteen-
 item completion claim. [pcc:unverified]
+
+
+### Actual elliptic function-field translations and domains
+
+The [actual elliptic translation proof](../research/elliptic_translation_audit_20261115/README.md)
+constructs coefficient-fixing automorphisms of the actual full function field
+for every nonsingular general Weierstrass model over an algebraically closed
+field, in every characteristic including two and three. Actual translated
+generic-point transcendence and coordinate substitution injectivity are derived
+from the actual quadratic fiber, credited minimal-polynomial argument and
+official norm product. Actual fraction-field lifting, official Point.map,
+and coefficient/x/y/basis/fraction generation derive composition, identity,
+explicit negative-point inverse, RingEquiv and faithfulness. No supplied
+transcendence, injectivity, inverse or action premise.
+
+Actual point pushforward permutes integer divisors, preserves degree and
+changes point sum by degree(D)•Q. The actual elliptic principality criterion
+proves principal preservation and the actual induced Picard action is identity.
+An actual function with shifted principal divisor exists, but is not yet
+identified with the constructed field pullback. Pushforward Q would match
+field pullback negative Q. All-local valuation/residue compatibility remains
+open, alongside general base-field descent, Scheme/line-bundle APIs,
+reciprocity, isogeny/Lang/Jacobian and canonical Weil–Tate/MOV–FR.
+
+On the source Example9.2.4 curve y²=x³+x and Q=(0,0), the actual constructed
+field automorphism sends x to1/x and y to−y/x². Actual reciprocal x has infinity
+order2 and is outside the actual affine coordinate-ring image, whose nonzero
+functions have nonpositive infinity order. A concrete actual algebraic closure
+of F5 with actual CharP5/nonzero discriminant proves translation need not
+preserve that ring. Actual F5 raw affine evaluation at Q fails against Q+Q=O;
+ordinary P=(2,0) has nonzero denominator and actual translate(3,0), agreeing
+with the formula. The source explicitly excludes Q/O: qualified source survives,
+known example and methods credited, no new population or novelty claim.
+
+Exact local **PCC-20261115-2e952c PASS at 2026-11-15T20:30:05Z**, signed standing unverified.
+Whole tracked/transitive gate82/12 new concrete modules/zero failures or trusted
+native;84 frozen modules/zero copies/90 old formal files/all107 old pins checked
+before/after24 states and gate. Fourteen failed states/ten successes retained;
+final24/new source warnings0/one frozen auditor deprecation.105 formal19 artifact
+124 pins; full1910-character SHA2569e8f18530d274a7a60789d4a0a33f511b376793a856212a165811f5f72bb8;
+native one complete/zero prefixes/zero unresolved/empty suffix after completed
+gate. Lossless480 files/136 objects/40900B XZ, roundtrip equal/five gate files.
+Final onepage47299B PDF/all4744 characters read/full-page visual inbounds;
+seven first-report files retained in47132B XZ after correcting strictly-negative
+wording for constants. Fresh Galbraith correctedch9 PDF3–4/36, printed167–168,
+Definition9.2.2/Example9.2.4 fulltext and individual visual; freshch7 PDF8–9,
+printed130–131 fulltext context only. No whole-chapter read; copyright local.
+Four correct KB calls/Conductor127 before code; expanded publication Conductor127
+before maps/outside pins; bounded fallback/no absence claim. Same host/prover/
+procedural written-header check, no independent parser/compiler/physical-host
+assurance. No holes/custom axioms/native proof evaluation/raised limits/new global
+flags/waivers/frozen edits/cryptoPython/native crypto experiment/spend/upload.
+Full fourteen-item request remains unfinished. [pcc:unverified]
