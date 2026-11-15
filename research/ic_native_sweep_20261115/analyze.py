@@ -15,7 +15,7 @@ def wall(r, n=None): return (phase(r, n).get("wall_ns") if n else r["outcome"].g
 keys = [("trials", lambda x: x["counters"].get("targets_tried")), ("relations", lambda x: x["counters"].get("relations_found")),
         ("recovered", lambda x: x["outcome"]["recovered"]), ("status", lambda x: x["outcome"]["status"]),
         ("S", lambda x: x["cost"]["s"]), ("total_gae", lambda x: x["cost"]["total_gae"]),
-        ("charged", lambda x: [(p["name"], p.get("adds"), p.get("dbls"), p.get("field_ops")) for p in x["phases"]])]
+        ("charged", lambda x: [(p["name"], p["adds"], p["doubles"], p["scalar_mults"], p["gae"]) for p in x["phases"]])]
 md, rows, mism, nchk = [], [], [], 0
 for sess in ("native2", "native3"):
     recs = [json.loads(l) for l in (S / "sessions" / sess / "records.jsonl").read_text().splitlines() if l.strip()]
