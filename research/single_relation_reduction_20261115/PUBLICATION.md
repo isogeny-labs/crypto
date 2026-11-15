@@ -104,3 +104,13 @@ untimed blocks keep source order. Existing math/report/native-component files
 remain unchanged. Receipts/checkers are journal-main001 and journal-post-
 handoff001 under checks/; claim920990is unverified. Required checks must
 assess the actual resulting head. [pcc:unverified]
+
+A later main update to910700d906 again overlaps only the daily journal.
+Continuation fallback6900245256 uses the unanswered original Copilot request;
+new002 receipts preserve230incoming/228own blocks, the233block union, both
+sequences and one final handoff. Old001 receipts remain unchanged. One stray
+conflict-marker line already committed on main is retained in its complete
+source block and identified in journal-source002.json. Head2497's four
+required gates passed; a new head must receive its own gates. Existing
+mathematics, report PDF, native sources, frozen controls and PCC ledger are
+unchanged. No scientific or paid execution was started. [pcc:unverified]

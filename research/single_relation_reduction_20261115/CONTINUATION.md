@@ -198,3 +198,42 @@ matched an early repeated tag; moved the section after A2. A literal Typst
 tilde rendered as a space; changed it to the intended Unicode relation and
 re-rendered page4, with pages1--3 byte-identical to their inspected renders.
 [pcc:unverified]
+
+## 2026-11-15T19:48:23Z — PR4311 follow-up: preserve the new main journal history
+
+### What was done (commands, files, features)
+
+Head2497e4d969 passed validation43748933569, size43748933543,
+artifacts43748933530 and latest PCC43748941582. Earlier PCC43748933557
+was cancelled. Main advanced to910700d906; its only overlap is the daily
+journal. The original Copilot request6898455027 remains unanswered after
+more than two hours; continuation fallback6900245256 documents manual work.
+The new source-pinned002 preview retains230incoming/228own complete blocks,
+233blocks in the union, both source sequences and full multiplicities.
+This handoff adds one block. Prior001 receipts and resolution remain intact.
+[pcc:unverified]
+
+### Decisions made (and why)
+
+Use a normal main merge, fresh preservation receipts and no force push.
+Main already contains a trailing conflict-marker line in its19:25 entry;
+retain it as source content and record its exact origin, rather than alter
+that complete incoming block. Existing mathematical/report/native files,
+frozen controls and PCC ledger remain unchanged. No research or numerical,
+native or paid job is authorized or started here. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+
+Required validation/size/artifacts/latest PCC must assess the new head.
+Auto-merge remains enabled; re-arm one safety-net check about50minutes after
+the push, then honor the unchanged-activity limit. Disable on merge/close.
+The complete algorithm criterion is still unmet, and checkpoint upload
+access still blocks the frozen multiprecision panel.
+
+### Errors (what went wrong, how it was handled)
+
+The first main fetch updated its ref but returned1 because it tried an
+unavailable unrelated submodule. A focused fetch with recursion disabled
+succeeded; no source or scientific-input change was made for that error.
+The new merge has only the expected journal conflict. Main's existing stray
+marker is explicitly recorded in checks/journal-source002.json.
