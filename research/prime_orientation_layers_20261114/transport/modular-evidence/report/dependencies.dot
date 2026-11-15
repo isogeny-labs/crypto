@@ -1,0 +1,16 @@
+digraph G {
+  rankdir=TB; graph [bgcolor="white",nodesep=.32,ranksep=.48];
+  node [shape=box,style="rounded,filled",fillcolor="#eaf1fa",fontname="Helvetica",fontsize=12];
+  A [label="Actual scalar atoms\ngrid / mask / normalization"];
+  B [label="Constructed integer\nnumerator + denominator"];
+  C [label="Derived work precision\np+E <= p+budget"];
+  D [label="Constructed expression\ncoefficient-box evaluation"];
+  E [label="Actual trim / crossing\ncanonical agreement"];
+  F [label="OPEN: scalar-only builder\nand total bit / entry cost",fillcolor="#fff0d8",style="rounded,dashed"];
+  {rank=same; A; B; C;}
+  {rank=same; D; E; F;}
+  A -> B [constraint=false]; B -> C [constraint=false];
+  B -> D; C -> E; D -> E [constraint=false];
+  E -> F [constraint=false,style=dashed];
+  A -> D [style=invis]; B -> E [style=invis]; C -> F [style=invis];
+}
