@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1218-27eeac22 | 17.00 | bsgs-neg | 24/24 | 0.961 | 1.054 | 1.892 | — |
+| icv1-fp20-tm1218-27eeac22 | 17.00 | rho-neg | 24/24 | 1.602 | 1.718 | 2.769 | — |
+| icv1-fp20-tm1218-27eeac22 | 17.00 | rho-neg-aa | 24/24 | 1.602 | 1.718 | 2.769 | — |
+| icv1-fp20-tm898-793f1c4c | 17.00 | bsgs-neg | 24/24 | 1.061 | 1.165 | 2.092 | — |
+| icv1-fp20-tm898-793f1c4c | 17.00 | rho-neg | 24/24 | 2.017 | 2.176 | 3.602 | — |
+| icv1-fp20-tm898-793f1c4c | 17.00 | rho-neg-aa | 24/24 | 2.017 | 2.176 | 3.602 | — |
+| icv1-fp20-tm1498-fba36596 | 17.00 | bsgs-neg | 24/24 | 0.857 | 0.940 | 1.684 | — |
+| icv1-fp20-tm1498-fba36596 | 17.00 | rho-neg | 24/24 | 1.358 | 1.450 | 2.287 | — |
+| icv1-fp20-tm1498-fba36596 | 17.00 | rho-neg-aa | 24/24 | 1.358 | 1.450 | 2.287 | — |
+| icv1-fp20-tm1250-c45e00c4 | 17.00 | bsgs-neg | 24/24 | 0.964 | 1.058 | 1.898 | — |
+| icv1-fp20-tm1250-c45e00c4 | 17.00 | rho-neg | 24/24 | 1.494 | 1.600 | 2.554 | — |
+| icv1-fp20-tm1250-c45e00c4 | 17.00 | rho-neg-aa | 24/24 | 1.494 | 1.600 | 2.554 | — |
+| icv1-fp20-tm1666-acbf9fea | 17.00 | bsgs-neg | 24/24 | 1.061 | 1.164 | 2.091 | — |
+| icv1-fp20-tm1666-acbf9fea | 17.00 | rho-neg | 24/24 | 1.628 | 1.747 | 2.820 | — |
+| icv1-fp20-tm1666-acbf9fea | 17.00 | rho-neg-aa | 24/24 | 1.628 | 1.747 | 2.820 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1218-27eeac22 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp20-tm1218-27eeac22 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp20-tm1218-27eeac22 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm898-793f1c4c | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp20-tm898-793f1c4c | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp20-tm898-793f1c4c | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm1498-fba36596 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp20-tm1498-fba36596 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp20-tm1498-fba36596 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm1250-c45e00c4 | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp20-tm1250-c45e00c4 | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp20-tm1250-c45e00c4 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-tm1666-acbf9fea | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp20-tm1666-acbf9fea | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp20-tm1666-acbf9fea | rho-neg vs rho-neg-aa | unresolved inside the band |

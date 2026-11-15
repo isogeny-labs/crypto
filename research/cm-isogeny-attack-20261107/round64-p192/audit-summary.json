@@ -1,0 +1,32 @@
+{
+  "matched_norm_calls": 22764,
+  "field_multiplications": 9798826,
+  "field_inversions": 279601,
+  "dense_multiplications": 19903610,
+  "dense_inversions": 394290,
+  "branches": {
+    "unit": 9612,
+    "simple": 1770,
+    "multiple": 0,
+    "zero_perturbation": 11382
+  },
+  "decoder_cases": 381,
+  "science_equal_R63": true,
+  "synthetic_controls": 35,
+  "P192_norm_counts": [
+    11106,
+    1008,
+    72,
+    54,
+    18,
+    0
+  ],
+  "P192_rows": 24,
+  "R63_zero_count_clarification": {
+    "complete_zero_blocks": 2190,
+    "singular_baby_norms": 1770,
+    "zero_center_only_blocks": 420
+  },
+  "units": "K multiplications (including inversion powers) and K inversions in small fields; P192 K primitive calls exclude inverse internals; do not combine models",
+  "cost_scope": "isolated norm on identical already-formed polynomials; preparation, interpolation, point arithmetic, streams, decoder and dense reference still charged separately"
+}

@@ -1,0 +1,20 @@
+{
+ "created_at": "2026-11-06T09:08:59Z",
+ "id": "PCC-20261106-d88645",
+ "kind": "measurement",
+ "producer": {
+  "commit": "0cb4b3ccca3c5de46588e9b26cc8a48a95c0b9c3",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/lift_dense_conjugate_pair_decomp_20261106/reports/run-20261106T0643Z/validator-report.json",
+   "sha256": "4093a7f15ffdea66024913d9a079d68e81a83c5c6d5e00af346c649ef305ff91"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "counted k=4 Gaudry solver (gaudry_quartic, Macaulay degree 29-32, chains+sparsest), p=29, 2 curves with full 2-torsion, 12 main solves + 9 Amendment-A1 solves; research/lift_dense_conjugate_pair_decomp_20261106",
+ "statement": "A k=4 decomposition solve on an all-lift conjugate-pair line costs the same as on F_p when it succeeds (conj/std 1.025, 0.982, 1.025 on shared targets; median over all solves 1.012; about 1.1e11 F_p multiplications at Macaulay degree 29). On one of the two curves the solver fails on both conjugate-pair targets that decompose: quotient dimension 4090 instead of 4096 at Macaulay degree 29, 30, 31 and 32, with 0 of 3 and 0 of 2 oracle decompositions found; the other curve's conjugate-pair targets, including a decomposable one, solve correctly at degrees 29-32."
+}

@@ -1,6 +1,6 @@
 # Index Calculus for the Elliptic-Curve Discrete Logarithm: Theory, Algorithms, and a Measured Frontier
 
-`treatise.tex` (built: [`treatise.pdf`](treatise.pdf), 268 pages) is the
+`treatise.tex` (built: [`treatise.pdf`](treatise.pdf), 293 pages) is the
 programme's comprehensive document on ECDLP index calculus, current to
 2026-11-06.
 

@@ -1,0 +1,16 @@
+# Corrected known-C1 amendment, prospective only
+
+Draft v3 names the changed finite-difference algorithm, actual arithmetic/collection counts and clock instrument. It does not claim old/new counter equivalence or a measured gain. No scientific execution is admitted. [pcc:unverified]
+
+Preserve1,260targets in8plans,22,680slots,3,780warmups,6,300measured pairs and36pricecells. Preserve C1sevenrows/twopenciltimeouts/elevenmissing and original p739 identities/invalidtiming. Separate p186379target0gate remains18slots,15measured replays,oneattempt,noautomaticretry,25Mcoefficients,8GiB,3600seconds perexecution. Complete valid gate and independent replay/review precede remainder; capped/incomplete/wrong/invalid stops extension. preservation-check.json compares unaffected JSON fields directly.
+
+1. Complete root validation and independently review exactsource/counter/timing differences. Resolve candidate/baseline instrumentation and oldrow reuse explicitly; prior sourceidentity is historical, not newinstrument equivalence.
+2. Build/pin new intendedecbench/source/toolchain/flags/input closure; reuse unchanged helpers only by verified identities. Assemble changed binary/image and prospectively qualify exactruntime using existing reviewed lineage. Oldimage qualification remains historical.
+3. Complete canonical experiment.protocol/v1 from this amendment: claims, variableledger, controls,seeds, metric mapping, method/source coverage, exactanalysis, timingL2/A-A, custody,start/retry boundary and frozen decision rules. Validate and independently review before freeze and affecteddata. Existing source review of v2does not approve v3.
+4. Read currentcampaign ledger/reservations and actual resource enforcement; bind43200totalallowance and05:11:39Zdeadline, onepayload, actualearliercutoff/teardown reserve. Old1800-second collectionreserve is retained as proposal;04:41:39Z is derived proposal, not a measured grace guarantee or executiondeadline. Dollars stayunknown under ownerwaiver; no newCPU/RAM or IAM expansion.
+5. Publish exactprotocol/source/inputs/seeds/command/newimagebindings. Use existing controller/fresh-owner/run-ecbench path in launch-pipeline-paths.json after priorjobs/owners reconciled. Realrequest/Job/Pod identities and externalcontroller custody remainpending until actuallyallocated. No arbitrary IDs or retry of frozenfailedrequest.
+6. Retain allnative host/session/preparation/launch/context/journal/owner/config/custodyfiles. Existing retained-export-cli checks actualpostrunjoins with independently suppliedpins; it doesnot authenticate custody itself. Complete measured15replays and gate acceptance before extending preservedplans.
+
+Sourcepaths in launch-pipeline-paths.json are exacttrackedGit locations and hashes at inspectedHEAD, not a claim that deployedcontrollerbytes equal them. Prior publication checklist and savedcontrollerreceipt directory supply artifact lineage. Do not invoke broad deploy-controller shorthand; no cloud mutation is specified by this draft.
+
+KB unavailable: exactpriorv2draft/review, inputreconciliation, sourcecomparison and runtime/controller sourcepaths used. This amends an existing experiment; no new mathematical novelty claim. Allnewbinary/image/request/job/remainingledger fields staynull, and canonicalvalidation/freeze/admission remainfalse/null.

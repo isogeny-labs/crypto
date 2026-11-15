@@ -16,6 +16,7 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 
 use super::field::{inv_mod, mulmod, Curve, Fq};
+use crypto_lib::cryptanalysis::prime_fast::MulModN;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Fold {
@@ -110,7 +111,13 @@ impl Folder {
                     if with_neg {
                         let q = (x, x ^ y);
                         if (q.0, q.1) < (best.0 .0, best.0 .1) {
-                            best = (q, mulmod(n - 1, lam, n));
+                            // `(n − 1)·λ ≡ −λ`: the same value without a 128-bit remainder.
+                            let nl = if lam != 0 && lam < n {
+                                n - lam
+                            } else {
+                                mulmod(n - 1, lam, n)
+                            };
+                            best = (q, nl);
                         }
                     }
                 }
@@ -168,6 +175,11 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
     let dp_mask = (1u64 << cfg.dp_bits) - 1;
     let max_run = cfg.max_run_factor << cfg.dp_bits;
     let folded = fold.fold != Fold::None;
+    // Coefficient products modulo `n` through a precomputed Montgomery
+    // form and sums by compare-and-subtract: the values of `mulmod` and
+    // `% n` for every input, so iterations, DPs and `k` are unchanged
+    // (assessment 2026-11-10, R1).
+    let nm = MulModN::new(n);
     let part = |x: u64| (f.hash_x(x).wrapping_mul(0x9E37_79B9_7F4A_7C15) >> shift) as usize;
     let is_dp = |x: u64| f.hash_x(x).wrapping_mul(0xC2B2_AE3D_27D4_EB4F) >> 40 & dp_mask == 0;
     let finish = |k: Option<u64>, iters: u64, restarts: u32, dps: u64, escapes: u32| Solve {
@@ -187,8 +199,8 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
         if folded {
             let (cx, lam) = fold.canon(f, e, n, x);
             x = cx;
-            a = mulmod(a, lam, n);
-            b = mulmod(b, lam, n);
+            a = nm.mul(a, lam);
+            b = nm.mul(b, lam);
         }
         let mut run = 0u64;
         let mut saved: Option<((u64, u64), u64)> = None; // (point, step) for cycle checks
@@ -200,7 +212,7 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
                 iters += 1;
                 match f.ec_add(e, Some(x), Some(steps[j].2)) {
                     Some(y) => {
-                        let (a2, b2) = ((a + steps[j].0) % n, (b + steps[j].1) % n);
+                        let (a2, b2) = (add_n(a, steps[j].0, n), add_n(b, steps[j].1, n));
                         if !folded {
                             break (y, a2, b2);
                         }
@@ -210,11 +222,11 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
                             j = (j + 1) % r;
                             continue;
                         }
-                        break (cy, mulmod(a2, lam, n), mulmod(b2, lam, n));
+                        break (cy, nm.mul(a2, lam), nm.mul(b2, lam));
                     }
                     None => {
                         // aP + bQ + M_j = O
-                        let (a2, b2) = ((a + steps[j].0) % n, (b + steps[j].1) % n);
+                        let (a2, b2) = (add_n(a, steps[j].0, n), add_n(b, steps[j].1, n));
                         if b2 != 0 {
                             let k = mulmod(n - a2 % n, inv_mod(b2, n), n) % n;
                             return finish(Some(k), iters, restarts, dps, escapes);
@@ -273,8 +285,8 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
                                 }
                                 nxt = Some((
                                     cy,
-                                    mulmod((ca + steps[jj2].0) % n, lam, n),
-                                    mulmod((cb + steps[jj2].1) % n, lam, n),
+                                    nm.mul(add_n(ca, steps[jj2].0, n), lam),
+                                    nm.mul(add_n(cb, steps[jj2].1, n), lam),
                                 ));
                             }
                             let (cy, a2, b2) = nxt.unwrap();
@@ -296,8 +308,8 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
                         let (cd, lam) = fold.canon(f, e, n, d);
                         iters += 1;
                         x = cd;
-                        a = mulmod((ba + ba) % n, lam, n);
-                        b = mulmod((bb + bb) % n, lam, n);
+                        a = nm.mul(add_n(ba, ba, n), lam);
+                        b = nm.mul(add_n(bb, bb, n), lam);
                         escapes += 1;
                         saved = None;
                     }
@@ -339,7 +351,7 @@ pub fn folder_aut(
     n: u64,
 ) -> Result<Folder, String> {
     let f = *fp;
-    let nf = super::field::Fp { p: n };
+    let nf = super::field::Fp::new(n);
     let j = f.ec_j(c).ok_or("singular")?;
     let mut maps = vec![(1u64, 1u64, 1u64)];
     if j == 0 {
@@ -393,7 +405,7 @@ pub fn folder_frob(
     if c.a > 1 || c.b != 1 {
         return Err("fold frob needs a Koblitz curve y² + xy = x³ + ax² + 1, a ∈ {0, 1}".into());
     }
-    let nf = super::field::Fp { p: n };
+    let nf = super::field::Fp::new(n);
     let mu = if c.a == 1 { 1u64 } else { n - 1 };
     let s = nf.sqrt(nf.fneg(7)).ok_or("−7 is not a square mod n")?;
     let inv2 = nf.finv(2);
@@ -413,4 +425,20 @@ pub fn folder_frob(
         m: f.m,
         orbit: if with_neg { 2 * f.m as u64 } else { f.m as u64 },
     })
+}
+
+/// `(a + b) % n`, by one compare-and-subtract when both are reduced (the
+/// walk coefficients always are); the same value for every input.
+#[inline(always)]
+fn add_n(a: u64, b: u64, n: u64) -> u64 {
+    if a < n && b < n {
+        let s = a + b;
+        if s >= n {
+            s - n
+        } else {
+            s
+        }
+    } else {
+        (a + b) % n
+    }
 }

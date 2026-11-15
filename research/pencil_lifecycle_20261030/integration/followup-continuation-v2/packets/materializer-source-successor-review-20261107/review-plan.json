@@ -1,0 +1,38 @@
+{
+  "schema": "source.review.plan/v1",
+  "recorded_utc": "2026-11-07T00:38:09.230855+00:00",
+  "task": "T-1743",
+  "candidate_read": false,
+  "claim": "Replace repeated full cleanup-array checkpoint writes by append-only durable cleanup journal while retaining child custody, complete closure, and final receipt semantics. No runtime gain claimed.",
+  "prior": "Plausible reduction in serialized bytes; durability and interrupted-prefix interpretation need explicit scrutiny.",
+  "reviewer": "/root/review_materializer_fix",
+  "joints": [
+    {
+      "owner": "reviewer",
+      "joint": "durable append and prefix",
+      "attack": "Crash after partial write, before fsync, after fsync before checkpoint: old published prefix must remain interpretable and no success admitted from truncated tail."
+    },
+    {
+      "owner": "reviewer",
+      "joint": "custody order",
+      "attack": "Child exits abnormally or cleanup record append fails; inspect whether cleanup error can disappear or child release be falsely certified."
+    },
+    {
+      "owner": "reviewer",
+      "joint": "terminal compatibility",
+      "attack": "Both success and exception finalizers must preserve full child_cleanup array and all prior fields; timeout checkpoint is not terminal success."
+    },
+    {
+      "owner": "reviewer",
+      "joint": "scope and gates",
+      "attack": "Compare deadline, resources, owner check, source closure, hashes and commands exactly; no renewed budget or launch authority."
+    }
+  ],
+  "proves_too_much": [
+    "Empty or truncated journal must not certify unseen child cleanup.",
+    "An incomplete checkpoint cannot establish successful materialization."
+  ],
+  "blind_derivation": "If checkpoint k serializes all k cleanup records, total record serializations are sum(k)=N(N+1)/2. Appending each record once plus bounded metadata and final full array is O(N) record bytes excluding file-list checkpoint costs; no wall-time prediction follows.",
+  "sources": "KB tools absent from tool catalogue; fallback exact predecessor materializer and raw execution receipts plus Python os write/fsync documentation.",
+  "runtime": "No worker, compiler or experiment execution. Expired campaign unchanged."
+}

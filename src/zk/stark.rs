@@ -511,9 +511,14 @@ pub enum FriReject {
     Opening,
     /// A zero domain point (no inverse).
     Domain,
-    /// Fold consistency: the folded pair differs from the next layer's
-    /// opened value, or the last fold from the final constant.
-    Fold,
+    /// Intermediate fold consistency: a folded pair differs from the
+    /// next layer's opened value.
+    FoldLayer,
+    /// Last-layer fold consistency: the last folded pair differs from
+    /// the final constant.  Separate from [`FriReject::FoldLayer`] so a
+    /// test can assert which of the two comparisons fired (sheriff case
+    /// SHF-20261106-a114e7, finding ZKX-1).
+    FoldFinal,
 }
 
 /// FRI verify: [`fri_check`] accepts.
@@ -620,13 +625,13 @@ pub fn fri_check(
                 // Next layer's claimed eval_main.
                 let next_eval = &opening.openings[layer_idx + 1].0;
                 if next_eval != &folded_expected {
-                    return Err(FriReject::Fold);
+                    return Err(FriReject::FoldLayer);
                 }
             } else {
                 // Last layer: check folded equals the FRI commitment's
                 // final_constant.
                 if folded_expected != commitment.final_constant {
-                    return Err(FriReject::Fold);
+                    return Err(FriReject::FoldFinal);
                 }
             }
             // Advance: domain squares, layer size halves.

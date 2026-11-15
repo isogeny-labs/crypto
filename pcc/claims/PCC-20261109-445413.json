@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-09T07:58:13Z",
+ "id": "PCC-20261109-445413",
+ "kind": "theorem",
+ "producer": {
+  "commit": "15ab03e54a929ce076fd6b58edc6bb646a110cb8",
+  "model": "",
+  "session": "stream-precision-20261109"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "b44b5a3e32981631c2d594171650f4b589d673c7050893d3ad1dd58f24600edd",
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "StreamPrecision.crossPrecisionCancellation"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "rational scaled-accumulator algebra only; no native unscaling, construction cost, measured memory gain or full recursive bound",
+ "statement": "For actual integral rational coefficients, equality of2^K-scaled residues at p+K is equivalent to equality of unscaled residues at p; no cancellation in a fixed finite characteristic ring is assumed."
+}

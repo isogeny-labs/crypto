@@ -31,13 +31,25 @@ DEFAULT_QUERIES = HERE.parent / "docs" / "kb-retrieval-queries.json"
 DEFAULT_RUNNER = HERE / "research-kb"
 
 
-def rank_of(results: list[dict], repo: str, path: str) -> int | None:
-    """1-based rank of the first result for repo:path, or None."""
+def rank_of_any(results: list[dict], candidates: list[tuple[str, str]]) -> int | None:
+    """1-based rank of the first result matching any (repo, path), or None."""
+    wanted = set(candidates)
     for index, result in enumerate(results):
         for origin in result.get("origins") or []:
-            if origin.get("repo") == repo and origin.get("path") == path:
+            if (origin.get("repo"), origin.get("path")) in wanted:
                 return index + 1
     return None
+
+
+def rank_of(results: list[dict], repo: str, path: str) -> int | None:
+    return rank_of_any(results, [(repo, path)])
+
+
+def candidates(item: dict) -> list[tuple[str, str]]:
+    """Accepted repo:path pairs; a shared locked file may exist in several repos."""
+    if item.get("accept_any"):
+        return [tuple(spec.split(":", 1)) for spec in item["accept_any"]]
+    return [(item["repo"], item["path"])]
 
 
 def summarize(ranks: list[int | None], top_k: int = 5) -> dict:
@@ -75,11 +87,14 @@ def probe(queries: list[dict], runner: Path, top_k: int) -> list[dict]:
     rows = []
     for item in queries:
         results = search(runner, item["query"], top_k)
+        accepted = candidates(item)
         rows.append(
             {
                 "query": item["query"],
-                "expect": f"{item['repo']}:{item['path']}",
-                "rank": rank_of(results, item["repo"], item["path"]),
+                "expect": f"{accepted[0][0]}:{accepted[0][1]}"
+                + (f" (any of {len(accepted)})" if len(accepted) > 1 else ""),
+                "accept_any": [f"{repo}:{path}" for repo, path in accepted],
+                "rank": rank_of_any(results, accepted),
                 "top": [
                     f"{(r.get('origins') or [{}])[0].get('repo', '?')}:"
                     f"{(r.get('origins') or [{}])[0].get('path', '?')}"
