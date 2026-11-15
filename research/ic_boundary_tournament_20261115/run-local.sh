@@ -14,8 +14,8 @@ cp "$0" "$out/run-local.sh"
 printf '%s\n' "$$" > "$out/pid.txt"
 deadline=$(python3 -c 'import json,datetime,sys;print(int(datetime.datetime.fromisoformat(json.load(open(sys.argv[1]))["original_deadline_utc"]).timestamp()))' "$control/local-plan.json")
 remaining() { local seconds=$((deadline-$(date +%s))); ((seconds>0)) || return 1; echo "$seconds"; }
-finish() { local code=$?; trap - EXIT; printf '%s\n' "$code" > "$out/job.exit"; date -u '+%Y-%m-%dT%H:%M:%SZ' > "$out/stopped-at.txt"; exit "$code"; }
 # shellcheck disable=SC2329
+finish() { local code=$?; trap - EXIT; printf '%s\n' "$code" > "$out/job.exit"; date -u '+%Y-%m-%dT%H:%M:%SZ' > "$out/stopped-at.txt"; exit "$code"; }
 trap finish EXIT
 trap 'exit 143' TERM
 cd "$repo"
