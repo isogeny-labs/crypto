@@ -84,9 +84,14 @@ cargo test --locked --release --lib --manifest-path research/prime31_ic_20261115
 cargo clippy --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib --bin prime31-algebraic-ic -- -D warnings
 ```
 
-The full repository release-lib command was also attempted. Its outcome is
-recorded in the session log and development status; the focused 40-test run must
-not be reported as the full workspace suite.
+The full repository release-lib command was also attempted. After materializing
+the named missing modules, Cargo path dependencies and compile-time fixtures,
+the complete-input `rustc` process was terminated by **signal 9 (SIGKILL)**.
+`workspace-resource-stop.txt` retains the output. The kill cause is unconfirmed;
+no memory diagnosis or full-workspace test pass is asserted. Claim
+`PCC-20261115-3d5e1d` is unverified. The focused 40-test run is a separate check.
+Earlier sparse-input failures are retained in `workspace-test-attempt*.txt`.
+[pcc:unverified]
 
 ## Accounting and execution status
 
