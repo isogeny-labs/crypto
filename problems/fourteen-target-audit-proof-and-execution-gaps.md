@@ -3020,3 +3020,55 @@ outside pins; bounded fallback/no absence claim. Copyright primary files local.
 No holes/custom axioms/native proof evaluation/raised limits/new global flags/
 waivers/frozen edits/cryptoPython/native crypto experiment/spend/upload/new
 physical host/compiler or full fourteen-item completion claim. [pcc:unverified]
+
+
+### Actual general-model geometric seven-torsion rank
+
+The [actual seven-torsion rank proof](../research/seven_torsion_rank_audit_20261115/README.md)
+derives **49 actual geometric points killed by seven**, 48 of exact order seven,
+and an actual two-element ZMod7 basis for every nonsingular general Weierstrass
+model over an algebraically closed field with seven nonzero, including
+characteristics two, three and five. The literal pinned Mathlib preΨ7 point
+criterion is proved in every characteristic. Actual tripling and fourfold
+x-representatives come from the official actual addition/subtraction map and
+duplication; all division domains are proved. Structured derivative identities
+over every commutative ring derive separability; the official degree theorem
+gives 24 distinct roots, two actual ordinates each, and an explicit point/fiber
+equivalence gives the whole kernel49. Actual annihilation and cardinality
+then supply the module rank and basis. No kernel count, rank, separability,
+multiplication formula or point/polynomial bridge is supplied as a premise.
+The general-model **rank gap at seven is closed**. Determinants for primes≥5,
+ranks for general primes≥11, canonical Weil and the full all-k p<500 census
+remain open.
+
+Actual characteristic2/3/5 controls have kernel49/rank2. Over the actual
+algebraic closure of F7, y²=x³−x has discriminant1 and literal Ψ7(0)=−1.
+Its leading coefficient vanishes, so degree≤23. The distinct-root bound and
+actual ordinate fibers give whole kernel **≤47, hence not49**, and rank≠2.
+This strict bound disproves deleting coprimality from rank/count; it is not an
+exact kernel1 count, BK point-count-divisibility refutation, group-scheme
+length or supersingularity-definition claim. Prior actual3/5 methods and
+official degree/duplication/sym2x results are credited; no novelty or
+qualified-source refutation claim.
+
+Exact local **PCC-20261115-919b86 PASS at 2026-11-15T18:58:37Z**, signed standing unverified. Whole tracked
+and transitive gate59 theorems/11 new modules(10 concrete/1 public adapter),
+0 failures/0 trusted native;22 frozen modules/0 copies/28 old formal configs,
+all45 old pins checked before/after8 states and gate. One failed07 and seven
+successes retained, final08 clean; prior50 gate credited separately. All42
+formal17 artifact59 pins match. Full1611-character header SHA
+1846d4084e69a4dc55b87caa81922228875456387d79d874638524e22fd54cc9;
+native1 complete/0 prefixes/0 unresolved/empty suffix after completed gate.
+Lossless172 files/68 objects/23872 bytes, exact roundtrip and five gate files.
+First report valid: one page48129 bytes, all5016 characters read and full-page
+visual inbounds. New-source warnings0;7 inherited advisories+1 auditor retained.
+Galbraithch9 PDF16–17/36, printed180–181, §9.8/Def9.8.5/Lemma9.8.6/Thm9.8.7
+fulltext and individual visual in preceding five-rank study credited exactly;
+its short-model/char!=2,3 theorem is not silently generalized. Pinned official
+AddSubMap definitions/theorem read; opening TODO stale relative to later proof.
+Four correct KB calls and Conductor127 before code; publication Conductor127
+before maps/outside pins; bounded fallback/no absence claim. Copyright files
+local. Same host/prover/procedural header check; no independent compiler/parser
+or physical host assurance. No holes/custom axioms/native proof evaluation/
+raised limits/new global flags/waivers/frozen edits/cryptoPython/native crypto
+experiment/spend/upload/full fourteen-item completion claim. [pcc:unverified]
