@@ -329,6 +329,16 @@ enum Tab<V: Copy> {
         mask: usize,
         shift: u32,
     },
+    /// 8-byte slots (low 32 bits of x as a fingerprint, u32 index; index FLAT_EMPTY = empty) with the full x of
+    /// every entry in `xs`, read only on a fingerprint match, so the table is exactly FlatW's
+    /// (research/mt_ic_mem_20261115, ic5b table mode "flatf" when p >= 2^32).
+    FlatF {
+        slots: Vec<(u32, u32)>,
+        xs: Vec<u64>,
+        ents: Vec<V>,
+        mask: usize,
+        shift: u32,
+    },
 }
 const FLAT_EMPTY: u32 = u32::MAX;
 /// A flat-table key: the x coordinate, narrowed to u32 when p < 2^32. `EMPTY` is never a valid x.
@@ -429,6 +439,55 @@ fn flat_get<K: FKey, V: Copy>(
         i = (i + 1) & mask;
     }
 }
+fn flatf_insert<V>(
+    slots: &mut [(u32, u32)],
+    xs: &mut Vec<u64>,
+    ents: &mut Vec<V>,
+    mask: usize,
+    shift: u32,
+    x: u64,
+    e: V,
+) {
+    // ic5b sizes the table exactly (load factor at most 1/2), so no resize is needed
+    assert!(2 * ents.len() < slots.len(), "flatf table full");
+    let fp = x as u32;
+    let mut i = flat_home(x, shift);
+    loop {
+        let (k, v) = slots[i];
+        if v == FLAT_EMPTY {
+            slots[i] = (fp, ents.len() as u32);
+            ents.push(e);
+            xs.push(x);
+            return;
+        }
+        if k == fp && xs[v as usize] == x {
+            return;
+        }
+        i = (i + 1) & mask;
+    }
+}
+#[inline]
+fn flatf_get<V: Copy>(
+    slots: &[(u32, u32)],
+    xs: &[u64],
+    ents: &[V],
+    mask: usize,
+    shift: u32,
+    x: u64,
+) -> Option<V> {
+    let fp = x as u32;
+    let mut i = flat_home(x, shift);
+    loop {
+        let (k, v) = slots[i];
+        if v == FLAT_EMPTY {
+            return None;
+        }
+        if k == fp && xs[v as usize] == x {
+            return Some(ents[v as usize]);
+        }
+        i = (i + 1) & mask;
+    }
+}
 #[inline]
 fn flat_prefetch<T>(slots: &[T], i: usize) {
     #[cfg(target_arch = "x86_64")]
@@ -466,6 +525,20 @@ impl<V: Copy> Tab<V> {
             Tab::Std(HashMap::with_capacity_and_hasher(cap, Default::default()))
         }
     }
+    /// ic5b table mode "flatf": `Flat` for p < 2^32, `FlatF` (8-byte fingerprint slots) above.
+    fn new_fp(cap: usize, p: u64) -> Tab<V> {
+        if p <= FLAT_EMPTY as u64 {
+            return Tab::new(true, cap, p);
+        }
+        let size = (2 * cap.max(1)).next_power_of_two();
+        Tab::FlatF {
+            slots: vec![(0, FLAT_EMPTY); size],
+            xs: Vec::with_capacity(cap),
+            ents: Vec::with_capacity(cap),
+            mask: size - 1,
+            shift: 64 - size.trailing_zeros(),
+        }
+    }
     fn insert_if_absent(&mut self, x: u64, e: V) {
         match self {
             Tab::Std(m) => {
@@ -483,6 +556,13 @@ impl<V: Copy> Tab<V> {
                 mask,
                 shift,
             } => flat_insert(slots, ents, mask, shift, x, e),
+            Tab::FlatF {
+                slots,
+                xs,
+                ents,
+                mask,
+                shift,
+            } => flatf_insert(slots, xs, ents, *mask, *shift, x, e),
         }
     }
     #[inline]
@@ -501,6 +581,13 @@ impl<V: Copy> Tab<V> {
                 mask,
                 shift,
             } => flat_get(slots, ents, *mask, *shift, x),
+            Tab::FlatF {
+                slots,
+                xs,
+                ents,
+                mask,
+                shift,
+            } => flatf_get(slots, xs, ents, *mask, *shift, x),
         }
     }
     #[inline]
@@ -509,12 +596,15 @@ impl<V: Copy> Tab<V> {
             Tab::Std(_) => {}
             Tab::Flat { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
             Tab::FlatW { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
+            Tab::FlatF { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
         }
     }
     fn len(&self) -> usize {
         match self {
             Tab::Std(m) => m.len(),
-            Tab::Flat { ents, .. } | Tab::FlatW { ents, .. } => ents.len(),
+            Tab::Flat { ents, .. } | Tab::FlatW { ents, .. } | Tab::FlatF { ents, .. } => {
+                ents.len()
+            }
         }
     }
 }
@@ -1083,9 +1173,11 @@ fn main() {
             let mu = param;
             let k: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(3);
             let gfac: f64 = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(1.2);
-            let flat = match args.get(8).map(|s| s.as_str()).unwrap_or("std") {
+            // "flatf" (research/mt_ic_mem_20261115): "flat" with 8-byte fingerprint slots when p >= 2^32
+            let tmode = args.get(8).map(|s| s.as_str()).unwrap_or("std");
+            let flat = match tmode {
                 "std" => false,
-                "flat" => true,
+                "flat" | "flatf" => true,
                 o => panic!("ic5b table mode {o}"),
             };
             let bsz: usize = args.get(9).map(|s| s.parse().unwrap()).unwrap_or(1).max(1);
@@ -1093,6 +1185,12 @@ fn main() {
             // phase (per lock-step round); the table, every trial and the recovered logs are unchanged, only I and
             // M counts move (research/mt_ic_scale_20261115). Default "plain" is ic5b as before.
             let bi = args.get(10).map(|s| s.as_str()) == Some("bi");
+            // args[11] = "pf" (research/mt_ic_mem_20261115): table-build inserts go through a FIFO of PF_DIST
+            // entries whose slots are prefetched; insert order, the table and every count are unchanged.
+            let pf = args.get(11).map(|s| s.as_str()) == Some("pf");
+            const PF_DIST: usize = 32;
+            let mut ring: std::collections::VecDeque<(u64, (u32, u16, i8))> =
+                std::collections::VecDeque::with_capacity(PF_DIST + 1);
             let mut bscr: Vec<u64> = Vec::new();
             assert!((2..=5).contains(&k)); // k = 5 added for research/mt_ic_retune_20261115
             let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
@@ -1153,7 +1251,23 @@ fn main() {
                 .map(|(_, idx, _)| 2 * (m - 1 - *idx.last().unwrap() as usize))
                 .sum::<usize>()
                 .max(kstar as usize + 16);
-            let mut table = Tab::new(flat, cap, p);
+            let mut table = if tmode == "flatf" {
+                Tab::new_fp(cap, p)
+            } else {
+                Tab::new(flat, cap, p)
+            };
+            let mut put = |table: &mut Tab<(u32, u16, i8)>, x: u64, e: (u32, u16, i8)| {
+                if pf {
+                    table.prefetch(x);
+                    ring.push_back((x, e));
+                    if ring.len() > PF_DIST {
+                        let (x0, e0) = ring.pop_front().unwrap();
+                        table.insert_if_absent(x0, e0);
+                    }
+                } else {
+                    table.insert_if_absent(x, e);
+                }
+            };
             let mut dens: Vec<u64> = Vec::with_capacity(m);
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
@@ -1178,20 +1292,24 @@ fn main() {
                         let (xp, xm) = f.xpair_d(pp, fb[l], dens[j]);
                         j += 1;
                         f.hash();
-                        table.insert_if_absent(xp, (ci_ as u32, l as u16, 1));
+                        put(&mut table, xp, (ci_ as u32, l as u16, 1));
                         f.hash();
-                        table.insert_if_absent(xm, (ci_ as u32, l as u16, -1));
+                        put(&mut table, xm, (ci_ as u32, l as u16, -1));
                     }
                     continue;
                 }
                 for l in (last + 1)..m {
                     if let Some((xp, xm)) = f.xpair(*p, Some(fb[l])) {
                         f.hash();
-                        table.insert_if_absent(xp, (ci_ as u32, l as u16, 1));
+                        put(&mut table, xp, (ci_ as u32, l as u16, 1));
                         f.hash();
-                        table.insert_if_absent(xm, (ci_ as u32, l as u16, -1));
+                        put(&mut table, xm, (ci_ as u32, l as u16, -1));
                     }
                 }
+            }
+            let _ = put; // end the closure's borrow of `ring`
+            while let Some((x0, e0)) = ring.pop_front() {
+                table.insert_if_absent(x0, e0);
             }
             snap.push(("table".into(), take(&f)));
             let ms_at_table = t0.elapsed().as_secs_f64() * 1e3;
@@ -1427,9 +1545,9 @@ fn main() {
             Out {
                 ok: 0,
                 extra: format!(
-                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"inv\":\"{}\",\"batch\":{},\"ms_targets\":{:.3},\"ms_at_fb\":{:.3},\"ms_at_combos\":{:.3},\"ms_at_table\":{:.3},\"ms_at_relations\":{:.3}",
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"inv\":\"{}\",\"pf\":{},\"batch\":{},\"ms_targets\":{:.3},\"ms_at_fb\":{:.3},\"ms_at_combos\":{:.3},\"ms_at_table\":{:.3},\"ms_at_relations\":{:.3}",
                     k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len(),
-                    if flat { "flat" } else { "std" }, if bi { "bi" } else { "plain" }, bsz, ms_targets, ms_at_fb, ms_at_combos, ms_at_table, ms_at_relations
+                    tmode, if bi { "bi" } else { "plain" }, pf, bsz, ms_targets, ms_at_fb, ms_at_combos, ms_at_table, ms_at_relations
                 ),
             }
         }
