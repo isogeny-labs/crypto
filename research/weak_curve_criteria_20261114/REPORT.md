@@ -136,6 +136,25 @@ cargo run --release --bin ghs_screen -- --degree 15 --modulus 0x8003 --a 0x1 --b
 cargo run --release --bin ghs_screen -- --degree 24 --modulus 0x100001b --a 0x1 --b 0xf19f6f --genus-bound 8
 ```
 
+These native screens returned genus 4 over `F_(2^5)` for the first model and
+genus 8 over `F_(2^6)` for the second, both with the published descent
+condition true. The second model also has genus-2 and genus-4 towers over
+`F_(2^12)` and `F_(2^8)`; the destination field changes with the genus, so
+none of those three towers wins a cost comparison from genus alone.
+
+## Validation status
+
+On the local macOS build with rustc 1.99.1, the native `curve_cover_check`
+tests passed 11/11, and `curve_cover_check --check` regenerated the committed
+cover report with 22,278 verified rows, zero unsupported and zero invalid.
+`audit.py --check` and all nine Python tests passed after that replay. The
+repository-wide `cargo test --release --lib` run encountered unrelated
+ecbench tests whose store-backed
+`research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl`
+is absent in this checkout; a focused rerun reproduced the missing-file
+error at `src/cryptanalysis/ecbench/band.rs:1191`. The broad run was stopped
+after that dependency was identified. No Rust source is changed here.
+
 ## Primary sources and prior work
 
 - Maurer, Menezes and Teske, [*Analysis of the GHS Weil Descent Attack on the
