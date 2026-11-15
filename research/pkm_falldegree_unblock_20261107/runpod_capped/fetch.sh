@@ -52,9 +52,10 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 # Positive loss evidence: the runner, reachable, reports idle or a start other than s0; the REST record (HTTP 200)
 # shows desiredStatus other than RUNNING; the pod is missing from a successful list AND its GET returns 404; the tree
 # shows a second start. A changed lastStartedAt alone is recorded but is not evidence. A LOST is relaunched
-# automatically (relaunch "auto") only on host-side evidence recorded before any action the session logged for the pod
-# (owner decision 13): a lastStatusChange that differs from its value at start and does not name the user ("by User"),
-# or the pod gone from a successful list with GET 404. Every other LOST has relaunch "owner".
+# automatically (relaunch "auto") only on host-side evidence tied to the loss (owner decision 13; see decide()): a
+# lastStatusChange that differs from its value at start and does not name the user ("by User"), or the pod gone from a
+# successful list with GET 404, recorded between the last check-in that saw the runner alive and the first loss, before
+# any action the session logged. Every other LOST has relaunch "owner".
 # The memory peak is the pilot's own field (largest "memory R MB (peak P MB)" in runs/<cell>.log: VmHWM in MiB,
 # x 1,048,576), else the cgroup figure (v2 memory.peak, else v1 memory.max_usage_in_bytes). Both are recorded.
 # ---------------------------------------------------------------------------------------------------------------------
@@ -175,14 +176,29 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
        + (if $f.collect != null and $f.tree.runner_state != null and $f.tree.runner_state.started != null and $f.tree.runner_state.started != $s0
           then [{at:$f.collect.at, why:"runner_state.json start differs from start.json"}] else [] end)
       ) as $ev
-    # host-side evidence (owner decision 13), recorded before any action the session logged for this pod (every session
-    # delete is logged before its API call): a RunPod-side status change, or the pod gone from the list with GET 404
+    # host-side evidence (owner decision 13), tied to the loss (review round 3, R1, R2). The first loss is the earliest
+    # loss evidence (or the collection, for a loss read from the tree). A host-side record counts only from a check-in
+    # strictly after the last check-in that saw the runner alive under s0, or from the first-loss check-in itself; at or
+    # before the first loss; and before any action the session logged for this pod (every session delete is logged
+    # before its API call). Forms: a RunPod-side status change (not naming the user), or the pod gone from a successful
+    # list with GET 404. Relaunch goes to the owner if the status at the first-loss check-in names the user (R1), or if any
+    # check-in before the first loss saw the runner done under s0 (R2).
     | ([ $f.actions[] | .at | ep ] | min) as $act0
-    | ([ $ck[] | select(($act0 == null or (.at | ep) < $act0) and .rest != null and
+    | (([ $ev[] | .at | ep ] | min) // ($f.collect.at | ep)) as $loss0
+    | ([ $ck[] | select($loss0 != null and (.at | ep) <= $loss0 and .live != null and .live.started == $s0
+           and (.live.state == "running" or .live.state == "done")) | .at | ep ] | max) as $alive
+    | ([ $ck[] | select($loss0 != null and (.at | ep) == $loss0) ] | first) as $lossck
+    | ([ $ck[] | select($loss0 != null and (.at | ep) < $loss0 and .live != null and .live.started == $s0 and .live.state == "done") ] | first) as $sawdone
+    | ([ $ck[] | select($loss0 != null and (.at | ep) <= $loss0 and ($alive == null or (.at | ep) > $alive or (.at | ep) == $loss0)
+           and ($act0 == null or (.at | ep) < $act0) and .rest != null and
            ((.rest.http == 200 and .rest.lastStatusChange != null and .rest.lastStatusChange != $f.LSC0
              and (.rest.lastStatusChange | test("by user"; "i") | not))
-            or (.listed == false and .rest.http == 404))) ] | first) as $hs
-    | (if $hs == null then {relaunch:"owner", host_side:null}
+            or (.listed == false and .rest.http == 404))) ] | last) as $hs
+    | ($lossck != null and $lossck.rest != null and $lossck.rest.http == 200 and $lossck.rest.lastStatusChange != null
+       and ($lossck.rest.lastStatusChange | test("by user"; "i"))) as $lossuser
+    | (if $sawdone != null then {relaunch:"owner", host_side:null, relaunch_note:"a check-in at \($sawdone.at) saw the runner done before the loss"}
+       elif $lossuser then {relaunch:"owner", host_side:null, relaunch_note:"the loss check-in'"'"'s status names the user"}
+       elif $hs == null then {relaunch:"owner", host_side:null}
        elif $hs.rest.http == 404 then {relaunch:"auto", host_side:"pod gone from the list and GET 404 at \($hs.at), before any logged session action"}
        else {relaunch:"auto", host_side:"lastStatusChange \"\($hs.rest.lastStatusChange)\" at \($hs.at)"} end) as $rl
     | ($f.collect.prefetch // null) as $pre

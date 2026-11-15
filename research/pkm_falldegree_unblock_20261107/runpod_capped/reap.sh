@@ -5,7 +5,8 @@
 # main-session decision N3c). It never deletes a pod before that, whatever fetch.sh says. For a due pod with receipts it
 # runs fetch.sh NAME, which at the hard deadline collects what it can and deletes the pod (it recovers a missing pod
 # token from the REST record); a due pod still listed afterwards is deleted directly, the action logged with its reason
-# before the API call. A pod whose deadline cannot be read is not deleted: it is reported (exit 1). Every pass appends
+# before the API call. A pod whose deadline cannot be read is not deleted: it is reported (exit 1). It takes the same
+# per-name lock as run.sh and fetch.sh; a pod whose lock is held is skipped for this pass and the skip is recorded. Every pass appends
 # one JSON line per pkm-x- pod to reaper/reap-YYYYMMDD.jsonl. It never touches a pod outside pkm-x-.
 # The main session runs it as a scheduled check-in at most every 4 h (section 2.6).
 # Exit: 0 no due pod remains listed; 1 the pod list, or a pod's deadline, could not be read; 7 a due pod is still listed.
@@ -17,7 +18,7 @@ mkdir -p "$REAP_DIR"; rlog="$REAP_DIR/reap-$(date -u +%Y%m%d).jsonl"
 note() { jq -nc --arg at "$(now)" "$@" >> "$rlog"; }
 pods=$(list_pkm) || { note --arg e "pod list not readable" '{at:$at, error:$e}'; echo "pod list not readable" >&2; exit 1; }
 [ -n "$pods" ] || { note '{at:$at, pkm_x_pods:0}'; echo "no pkm-x- pod"; exit 0; }
-left=0 errs=0
+left=0 errs=0 locked=0
 while read -r p; do
   id=$(jq -r .id <<<"$p"); name=$(jq -r .name <<<"$p")
   rec="" hd="" err=0
@@ -37,17 +38,27 @@ while read -r p; do
     continue
   fi
   action="" rc=""
+  # S1 (review round 3): the same per-name lock as run.sh and fetch.sh. Held by another process: skip this pod this pass.
+  lockf="$RPC_STATE/$(printf '%s' "$name" | tr -c 'a-z0-9-' '_').lock"
+  exec 8>"$lockf"
+  if ! flock -n 8; then exec 8>&-; locked=$((locked + 1))
+    note --arg id "$id" --arg n "$name" --arg w "$why" '{at:$at, pod:$id, name:$n, due:true, why:$w, action:"skipped: lock held by another run.sh, fetch.sh or reap.sh"}'
+    echo "$name ($id): due ($why); lock held, skipped this pass"; continue; fi
+  exec 8>&-                                   # released for fetch.sh, which takes the same lock itself
   if [ "$DRY" = 1 ]; then action="dry-run: would collect and delete"
   else
     if [ -n "$rec" ] && [ ! -f "$rec/cost.json" ]; then
       set +e; "$here/fetch.sh" "$name" </dev/null > "$REAP_DIR/fetch-$name-$(date -u +%Y%m%dT%H%M%SZ).out" 2>&1; rc=$?; set -e
       action="fetch.sh exit $rc"
     fi
-    if list_pkm 2>/dev/null | jq -se --arg i "$id" 'any(.[]; .id == $i)' >/dev/null; then
+    exec 8>"$lockf"
+    if ! flock -w 60 8; then action="${action:+$action; }direct DELETE skipped: lock held"
+    elif list_pkm 2>/dev/null | jq -se --arg i "$id" 'any(.[]; .id == $i)' >/dev/null; then
       session_action "$REAP_DIR" DELETE "$id" "reaper: $why"; [ -n "$rec" ] && session_action "$rec" DELETE "$id" "reaper: $why"
       c=$(api_code DELETE "$API/pods/$id" "$REAP_DIR/delete-$id-$(date -u +%Y%m%dT%H%M%SZ).response")
       action="${action:+$action; }direct DELETE HTTP $c"
     fi
+    exec 8>&-
   fi
   gone=false
   for i in $(seq 1 12); do
@@ -61,5 +72,6 @@ while read -r p; do
   echo "$name ($id): due ($why); $action; gone $gone"
 done <<<"$pods"
 [ "$left" = 0 ] || { echo "$left due pkm-x- pod(s) still listed: tell the owner" >&2; exit 7; }
+[ "$locked" = 0 ] || echo "$locked due pkm-x- pod(s) skipped: lock held (next pass)" >&2
 [ "$errs" = 0 ] || { echo "$errs pkm-x- pod(s) with an unreadable deadline (not deleted): tell the owner" >&2; exit 1; }
 remind "runpod_capped/reaper/"

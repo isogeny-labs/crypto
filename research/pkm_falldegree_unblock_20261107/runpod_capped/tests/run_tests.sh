@@ -235,7 +235,7 @@ awk '{print $1}' "$D/local-sha256-1.txt" | jq -Rn '{raw:[inputs | {sha256:., upl
 rc4=$(fetch pkm-x-dev-c)
 [ "$rc" = 8 ] && [ "$c1" = "ADMITTED P2d" ] && [ "$rc2" = 8 ] && [ "$rc3" = 0 ] && [ "$rc4" = 9 ] && [ -f "$D/cost.json" ] && [ "$(pods)" = 0 ] \
   && grep -qP '^pkm-x-dev-c/stubpod1\t.*\tclosed\t' "$R/ledger.tsv" && [ -d "$RD/collect-1" ] && grep -q 'largest pilot memory peak' "$D/admission-lines-1.txt" \
-  && jq -e '.classifier.version == "a18-r3" and (.classifier.fetch_sha256 | length) == 64' "$D/outcome.json" >/dev/null
+  && jq -e '.classifier.version == "a18-r4" and (.classifier.fetch_sha256 | length) == 64' "$D/outcome.json" >/dev/null
 rec C02 $? "exit 8 ADMITTED; empty record exit 8; full record exit 0; re-run exit 9; classifier pinned in outcome.json" "exit $rc $c1; $rc2; $rc3; $rc4" "completed run: collect, wait for the raw upload, delete, refuse re-collection"
 startrun C03; rc=$(fetch pkm-x-dev-c --abort); [ "$rc" = 0 ] && [ "$(cls "$D")" = "ABORTED P5" ] && [ "$(pods)" = 0 ]
 rec C03 $? "exit 0, ABORTED P5, pod deleted" "exit $rc $(cls "$D")" "session abort while running"
@@ -359,6 +359,12 @@ nd D24; ck "$DR" $((S0E + 4000)) regular null "" "" null 404 "" "" false; collec
 nd D24c; printf '{"at":"%s","action":"DELETE","pod":"p1","reason":"x"}\n' "$(iso $((S0E + 3000)))" > "$DR/session-actions.jsonl"; ck "$DR" $((S0E + 4000)) regular null "" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D24c "LOST P3" "pod gone and GET 404 after a logged session delete" owner
 nd D24d; ck "$DR" $((S0E + 4000)) regular null "" "" null 200 RUNNING "$L0" false; dcase D24d "PENDING P8" "pod absent from the list but GET returns a healthy RUNNING record: no loss evidence, wait"
 nd D24b; ck "$DR" $((S0E + 4000)) regular null "" "" null 0 "" "" false; dcase D24b "PENDING P8" "S6: missing from the list but GET unreadable (not corroborated)"
+# Review round 3, R1 and R2: host-side evidence must be tied to the loss.
+nd D43; ck "$DR" $((S0E + 20000)) regular running "$S0" "" null 200 RUNNING "$L0" true "Migrated: host maintenance"; ck "$DR" $((S0E + 30000)) regular idle "" "" null 200 RUNNING "$L0" true "Restarted by User: x"; collect "$DR" "$DO" lost false $((S0E + 30010)); dcase D43 "LOST P3" "R1 probe P1: an earlier RunPod-side change, then a restart whose status names the user" owner
+nd D43b; ck "$DR" $((S0E + 20000)) regular running "$S0" "" null 200 RUNNING "$L0" true; ck "$DR" $((S0E + 25000)) regular null "" "" null 200 RUNNING "$L0" true "Migrated: host failure"; ck "$DR" $((S0E + 30000)) regular idle "" "" null 0 "" "" null; collect "$DR" "$DO" lost false $((S0E + 30010)); dcase D43b "LOST P3" "R1: a RunPod-side change after the last alive check-in and before the loss" auto
+nd D43c; ck "$DR" $((S0E + 20000)) regular running "$S0" "" null 200 RUNNING "$L0" true "Migrated: host maintenance"; ck "$DR" $((S0E + 30000)) regular idle "" "" null 0 "" "" null; collect "$DR" "$DO" lost false $((S0E + 30010)); dcase D43c "LOST P3" "R1: the only RunPod-side change was seen while the runner was still alive" owner
+nd D44; ck "$DR" $((S0E + 80000)) regular done "$S0" "$(iso $((S0E + 79000)))" 0 200 RUNNING "$L0" true; ck "$DR" $((S0E + 82000)) regular null "" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 82010)); dcase D44 "LOST P3" "R2 probe P2: runner seen done, then gone with GET 404 before the run deadline" owner
+nd D44b; ck "$DR" $((S0E + 80000)) regular done "$S0" "$(iso $((S0E + 79000)))" 0 200 RUNNING "$L0" true; ck "$DR" $((DLE + 3600)) regular null "" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((DLE + 3610)); dcase D44b "LOST P6" "R2 probe P3: runner seen done, then gone with GET 404 after the run deadline" owner
 P2E=$(( okEe + 100 )); PCOL=$(( okEe + 200 ))
 mcase() { # mcase ID STAGE PILOT_EXIT OOM CG_PEAK LOG EXPECTED DESCRIPTION [EXPECTED_AS_M112] [EXPECTED_SOURCE_USED] [OVERSIZE]
   nd "$1"; local rx=0; [ "$3" = 0 ] || rx=1
@@ -435,6 +441,11 @@ rc=$(run ./reap.sh); left=$(jq -c '[.[].id]' "$ST/pods.json"); rc2=$( (cd "$R" &
 left2=$(jq -c '[.[].id]' "$ST/pods.json"); lines=$(cat "$R"/reaper/reap-*.jsonl | wc -l)
 [ "$rc" = 0 ] && [ "$left" = '["young1","other1"]' ] && [ "$rc2" = 0 ] && [ "$left2" = '["young1","other1"]' ] && grep -q '"due":true' "$R"/reaper/reap-*.jsonl && grep -q '"action":"DELETE"' "$R/reaper/session-actions.jsonl"
 rec F01 $? "pod past creation + 26 h deleted (logged first); young and non-pkm-x pods kept; second pass changes nothing" "exit $rc, left $left; exit $rc2, left $left2; $lines receipt lines" "reaper: 27 h old pod without receipts, 1 h old pod, other session's pod"
+ID=F08; mksb; old=$(rpd $(( $(date +%s) - 27 * 3600 ))); jq -n --arg o "$old" '[{id:"old1",name:"pkm-x-t14-k0-c6",desiredStatus:"RUNNING",createdAt:$o,lastStartedAt:$o}]' > "$ST/pods.json"
+( flock "$SB/state/pkm-x-t14-k0-c6.lock" sleep 6 ) & lp=$!; sleep 1
+rc=$(run ./reap.sh); wait $lp
+[ "$rc" = 0 ] && [ "$(pods)" = 1 ] && grep -q 'lock held' "$R"/reaper/reap-*.jsonl && ! grep -q 'DELETE https://rest.runpod.io/v1/pods/old1' "$ST/calls.log"
+rec F08 $? "pod untouched, skip recorded" "exit $rc, pods $(pods)" "S1: a due pod whose per-name lock is held by another process"
 ID=F03; mksb; touch "$ST/deny"; rc=$(run ./reap.sh); [ "$rc" = 1 ]; rec F03 $? "exit 1" "exit $rc" "reaper: pod list unreadable (network blocked)"
 ID=F07; mksb; jq -n '[{id:"bad1",name:"pkm-x-dev-q",desiredStatus:"RUNNING",createdAt:"garbage"},{id:"nul1",name:null,desiredStatus:"RUNNING"}]' > "$ST/pods.json"
 rc=$(run ./reap.sh); [ "$rc" = 1 ] && [ "$(pods)" = 2 ]; rec F07 $? "exit 1, nothing deleted" "exit $rc, pods $(pods)" "S6: unparsable createdAt and a null name: reported, not deleted"
@@ -489,7 +500,7 @@ by digest needs read access to that registry, which this container does not have
 
 Groups: A refusals before any API call; B launch paths; C \`fetch.sh\` flows; D the outcome classifier alone
 (\`fetch.sh --classify-dir\`) on synthetic receipt sets: one per class, the review's conflicting cases, the memory rule
-(D25-D37c) and the round-2 cases (D38-D42); E the registered order (\`next_allowed\`); F \`reap.sh\`; G syntax and the
+(D25-D37c), the round-2 cases (D38-D42) and the round-3 cases (D43-D44b); E the registered order (\`next_allowed\`); F \`reap.sh\`; G syntax and the
 client pin. Per-case output: \`out/<id>.txt\`. Machine-readable table: \`results.tsv\`. Every result here is
 \`[pcc:unverified]\`.
 
