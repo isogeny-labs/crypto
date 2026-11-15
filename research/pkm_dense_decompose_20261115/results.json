@@ -1,0 +1,312 @@
+{
+ "study": "EXP-PKM-DENSE-DEC-001",
+ "metric": "field_ops (counted F_p multiplications)",
+ "validity": {
+  "V1": {
+   "checked": 76,
+   "disagree": []
+  },
+  "V2": {
+   "planted": 34,
+   "without_relation": []
+  },
+  "V3": [
+   {
+    "cell": "m2-t4",
+    "pairs": 4,
+    "equal": true
+   },
+   {
+    "cell": "m2-t6",
+    "pairs": 4,
+    "equal": true
+   },
+   {
+    "cell": "m2-t8",
+    "pairs": 2,
+    "equal": true
+   }
+  ],
+  "valid": true
+ },
+ "P1": {
+  "cells": [
+   [
+    2,
+    16,
+    0.04999840423600065
+   ],
+   [
+    2,
+    32,
+    0.017950701758629624
+   ],
+   [
+    2,
+    64,
+    0.005419574666721599
+   ],
+   [
+    2,
+    128,
+    0.002462441355372889
+   ],
+   [
+    2,
+    256,
+    0.000985245400625518
+   ]
+  ],
+  "verdict": "held"
+ },
+ "P2": {
+  "verdict": "held"
+ },
+ "P3": {
+  "cells": [
+   [
+    2,
+    16,
+    1.0354222611109436
+   ],
+   [
+    2,
+    32,
+    1.016395152374794
+   ],
+   [
+    2,
+    64,
+    1.0079045036938419
+   ],
+   [
+    2,
+    128,
+    1.00388291186381
+   ]
+  ],
+  "verdict": "held"
+ },
+ "P4": {
+  "cells": [
+   [
+    2,
+    16,
+    "coset",
+    10.650064267352185
+   ],
+   [
+    2,
+    32,
+    "coset",
+    20.540274207369322
+   ],
+   [
+    2,
+    64,
+    "coset",
+    40.4469625219862
+   ],
+   [
+    2,
+    128,
+    "coset",
+    87.00482005141389
+   ],
+   [
+    2,
+    256,
+    "coset",
+    180.64603378626515
+   ]
+  ],
+  "verdict": "held"
+ },
+ "replication_P2": [],
+ "cells": [
+  {
+   "cell": "m2-t4-both",
+   "p": 1399680001,
+   "m": 2,
+   "S": 16,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 662881.5,
+   "tower_planted_over_enum_median": 213.00819408740358,
+   "tower_staircase_max": 2,
+   "tower_linear_stage_share_median": 0.00012369806849011977,
+   "tower_random_ops_median": 662046.0,
+   "dense_planted_ops_median": 33143.0,
+   "dense_planted_over_enum_median": 10.650064267352185,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 0.0015387864707479709,
+   "dense_random_ops_median": 33112.0,
+   "dense_over_tower_planted_median": 0.04999840423600065,
+   "dense_over_tower_planted_range": [
+    0.04996238838999697,
+    0.050091375043115706
+   ],
+   "enum_ops": 3112
+  },
+  {
+   "cell": "m2-t4-random",
+   "p": 1399680001,
+   "m": 2,
+   "S": 16,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 34317.0,
+   "dense_planted_over_enum_median": 8.82185089974293,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 0.0014861438936970015,
+   "dense_random_ops_median": 34286.0,
+   "enum_ops": 3890
+  },
+  {
+   "cell": "m2-t5-both",
+   "p": 1399680001,
+   "m": 2,
+   "S": 32,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 8012121.5,
+   "tower_planted_over_enum_median": 1144.2618537560697,
+   "tower_staircase_max": 2,
+   "tower_linear_stage_share_median": 1.3230566714530186e-05,
+   "tower_random_ops_median": 7925572.0,
+   "dense_planted_ops_median": 143823.0,
+   "dense_planted_over_enum_median": 20.540274207369322,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 0.0003546025322792599,
+   "dense_random_ops_median": 143792.0,
+   "dense_over_tower_planted_median": 0.017950701758629624,
+   "dense_over_tower_planted_range": [
+    0.01792934921634596,
+    0.017972054300913292
+   ],
+   "enum_ops": 7002
+  },
+  {
+   "cell": "m2-t5-random",
+   "p": 1399680001,
+   "m": 2,
+   "S": 32,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 146181.0,
+   "dense_planted_over_enum_median": 20.877035132819195,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 0.0003488825497157633,
+   "dense_random_ops_median": 146150.0,
+   "enum_ops": 7002
+  },
+  {
+   "cell": "m2-t6-both",
+   "p": 1399680001,
+   "m": 2,
+   "S": 64,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 110319912.5,
+   "tower_planted_over_enum_median": 7463.124915437695,
+   "tower_staircase_max": 2,
+   "tower_linear_stage_share_median": 1.1058721274267683e-06,
+   "tower_random_ops_median": 110172474.0,
+   "dense_planted_ops_median": 597887.0,
+   "dense_planted_over_enum_median": 40.4469625219862,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 8.530039957383252e-05,
+   "dense_random_ops_median": 597856.0,
+   "dense_over_tower_planted_median": 0.005419574666721599,
+   "dense_over_tower_planted_range": [
+    0.005419189494414882,
+    0.005420372538274406
+   ],
+   "enum_ops": 14782
+  },
+  {
+   "cell": "m2-t6-random",
+   "p": 1399680001,
+   "m": 2,
+   "S": 64,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 602613.0,
+   "dense_planted_over_enum_median": 51.637789203084836,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 8.463143012181948e-05,
+   "dense_random_ops_median": 602582.0,
+   "enum_ops": 11670
+  },
+  {
+   "cell": "m2-t7-both",
+   "p": 1399680001,
+   "m": 2,
+   "S": 128,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 989599608.0,
+   "tower_planted_over_enum_median": 35332.74807197943,
+   "tower_staircase_max": 2,
+   "tower_linear_stage_share_median": 1.4349237696949452e-07,
+   "tower_random_ops_median": 986513639.0,
+   "dense_planted_ops_median": 2436831.0,
+   "dense_planted_over_enum_median": 87.00482005141389,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 2.092882107950859e-05,
+   "dense_random_ops_median": 2436800.0,
+   "dense_over_tower_planted_median": 0.002462441355372889,
+   "dense_over_tower_planted_range": [
+    0.0024615200435755425,
+    0.002462441355372889
+   ],
+   "enum_ops": 28008
+  },
+  {
+   "cell": "m2-t7-random",
+   "p": 1399680001,
+   "m": 2,
+   "S": 128,
+   "vkind": "random",
+   "membership": "dense",
+   "censored": 0,
+   "dense_planted_ops_median": 2446293.0,
+   "dense_planted_over_enum_median": 92.48045516407078,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 2.084787063528367e-05,
+   "dense_random_ops_median": 2446262.0,
+   "enum_ops": 26452
+  },
+  {
+   "cell": "m2-t8-both",
+   "p": 1399680001,
+   "m": 2,
+   "S": 256,
+   "vkind": "coset",
+   "membership": "both",
+   "censored": 0,
+   "tower_planted_ops_median": 9985312283.5,
+   "tower_planted_over_enum_median": 183351.30891479985,
+   "tower_staircase_max": 2,
+   "tower_linear_stage_share_median": 1.5422656645484642e-08,
+   "dense_planted_ops_median": 9837983.0,
+   "dense_planted_over_enum_median": 180.64603378626515,
+   "dense_staircase_max": 2,
+   "dense_linear_stage_share_median": 5.18398944173821e-06,
+   "dense_over_tower_planted_median": 0.000985245400625518,
+   "dense_over_tower_planted_range": [
+    0.000985234851429219,
+    0.0009852559498218169
+   ],
+   "enum_ops": 54460
+  }
+ ],
+ "note": "No claim about cryptographic sizes or Pollard rho [pcc:unverified]."
+}
