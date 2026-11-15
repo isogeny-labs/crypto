@@ -26,6 +26,7 @@
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
 //! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
 //! | `primo-smt` | Primo 0.2.0 through SMT-LIB `QF_UF`; one checked Boolean model per call | solver-reported SAT conflicts |
+//! | `primo-smt-file` | matched legacy control for `primo-smt`: temporary-file input and 5 ms completion polling | solver-reported SAT conflicts |
 //! | `fes-f2` | fast exhaustive search, libfes-lite Gray code, quadratic systems only | word XORs (Gray-code steps) |
 //! | `fes-f2-gpu` | `fes-f2` with the search on the `gpu/fes` CUDA serve worker, every point re-verified on the CPU; same count as `fes-f2` | word XORs (Gray-code steps) |
 //! | `fes-f2-wide` | the same over 8 or 16 sub-cubes per step in the lanes of an AVX2 or AVX-512 register, ≤ 32 equations | vector XORs (Gray-code steps) |
@@ -1668,7 +1669,7 @@ pub fn validate_solver_params(name: &str, params: &Params) -> Result<(), String>
         "sat-cdcl" => {
             sat_xor_encoding(params)?;
         }
-        "primo-smt" => {
+        "primo-smt" | "primo-smt-file" => {
             let timeout_ms = params.u64_or("primo_timeout_ms", 600_000)?;
             if timeout_ms == 0 {
                 return Err("primo_timeout_ms must be positive".into());
@@ -1825,26 +1826,165 @@ impl SystemSolver for SatCdcl {
 /// converted to the framework's mask representation.
 pub struct PrimoSmt;
 
+/// The pre-optimization Primo adapter, retained as a matched benchmark arm.
+/// It has the same input, solver and model checks as [`PrimoSmt`]; only the
+/// script transport and child-completion polling interval differ.
+pub struct PrimoSmtFile;
+
+const PRIMO_PARAMETERS: &[(&str, &str)] = &[
+    (
+        "primo_binary",
+        "path to Primo; otherwise SMT_PRIMO_BIN or PATH is used",
+    ),
+    (
+        "primo_timeout_ms",
+        "external wall timeout per call (default 600000; intersected with the pipeline budget)",
+    ),
+];
+
+#[derive(Clone, Copy)]
+enum PrimoTransport {
+    Stdin,
+    LegacyFile,
+}
+
+fn solve_primo(
+    solver_name: &str,
+    transport: PrimoTransport,
+    system: &BooleanSystem,
+    params: &Params,
+    budget: Option<Duration>,
+) -> (SolverVerdict, SolverCost) {
+    validate_solver_params(solver_name, params)
+        .expect("primo-smt configuration must be validated before a timed solve");
+    let binary = primo_binary(params)
+        .expect("primo-smt configuration must be validated before a timed solve");
+    let started = Instant::now();
+    let rows: Vec<AnfRow> = system.equations.iter().map(AnfRow::from_poly).collect();
+    let script = format_smtlib_for_solver(
+        system.n_vars as u32,
+        &rows,
+        &[],
+        SmtEncoding::Bool,
+        SmtSolverKind::Primo,
+    );
+    let configured = Duration::from_millis(
+        params
+            .u64_or("primo_timeout_ms", 600_000)
+            .expect("validated Primo timeout"),
+    );
+    let timeout = budget.map_or(configured, |limit| limit.min(configured));
+    let mut options = SmtSolveOptions::new(SmtSolverKind::Primo, binary);
+    options.encoding = SmtEncoding::Bool;
+    options.timeout = timeout;
+    options.use_stdin = matches!(transport, PrimoTransport::Stdin);
+    options.poll_interval = match transport {
+        PrimoTransport::Stdin => Duration::from_micros(250),
+        PrimoTransport::LegacyFile => Duration::from_millis(5),
+    };
+
+    let mut extra = BTreeMap::from([
+        ("input_bytes".into(), script.len() as u64),
+        ("rows".into(), rows.len() as u64),
+        ("variables".into(), system.n_vars as u64),
+        ("solver_calls".into(), 1),
+        ("solver_conflicts_available".into(), 0),
+        ("solver_decisions_available".into(), 0),
+        ("decisions".into(), 0),
+        ("invocation_error".into(), 0),
+        ("external_timeout".into(), 0),
+        ("unknown".into(), 0),
+        ("invalid_model".into(), 0),
+        ("model_checked".into(), 0),
+        ("stdin_transport".into(), u64::from(options.use_stdin)),
+        (
+            "poll_interval_us".into(),
+            options.poll_interval.as_micros() as u64,
+        ),
+        ("solver_process_wall_ns".into(), 0),
+    ]);
+    let run = match run_smt(&script, 0, &options) {
+        Ok(run) => run,
+        Err(error) => {
+            let timed_out = error.contains(" timed out after ");
+            extra.insert("external_timeout".into(), u64::from(timed_out));
+            extra.insert("invocation_error".into(), u64::from(!timed_out));
+            return (
+                SolverVerdict::BudgetExceeded,
+                SolverCost {
+                    ops: 0,
+                    op_unit: "Primo SAT conflicts (solver-reported)".into(),
+                    wall_ns: started.elapsed().as_nanos() as u64,
+                    peak_bytes: 0,
+                    degree_reached: None,
+                    solving_degree: None,
+                    timed_out,
+                    extra,
+                },
+            );
+        }
+    };
+    let conflicts = run.conflicts.unwrap_or(0);
+    extra.insert(
+        "solver_conflicts_available".into(),
+        u64::from(run.conflicts.is_some()),
+    );
+    extra.insert(
+        "solver_decisions_available".into(),
+        u64::from(run.decisions.is_some()),
+    );
+    extra.insert("decisions".into(), run.decisions.unwrap_or(0));
+    extra.insert(
+        "solver_process_wall_ns".into(),
+        run.elapsed.as_nanos() as u64,
+    );
+    let verdict = match parse_smt_stdout(&run.stdout, system.n_vars) {
+        SmtVerdict::Unsat => SolverVerdict::Unsatisfiable,
+        SmtVerdict::Unknown => {
+            extra.insert("unknown".into(), 1);
+            SolverVerdict::BudgetExceeded
+        }
+        SmtVerdict::Sat(model) if rows_satisfied(&rows, &model) => {
+            extra.insert("model_checked".into(), 1);
+            let root = model
+                .iter()
+                .enumerate()
+                .filter(|(_, value)| **value)
+                .fold(0 as Mask, |mask, (i, _)| mask | bit(i as u32));
+            SolverVerdict::Solved(vec![root])
+        }
+        SmtVerdict::Sat(_) => {
+            extra.insert("invalid_model".into(), 1);
+            SolverVerdict::BudgetExceeded
+        }
+    };
+    (
+        verdict,
+        SolverCost {
+            ops: conflicts,
+            op_unit: "Primo SAT conflicts (solver-reported)".into(),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: None,
+            solving_degree: None,
+            timed_out: false,
+            extra,
+        },
+    )
+}
+
 impl SystemSolver for PrimoSmt {
     fn name(&self) -> &str {
         "primo-smt"
     }
 
     fn describe(&self) -> String {
-        "Primo SMT over exact Boolean QF_UF rows; returns one independently checked model".into()
+        "Primo SMT over stdin on exact Boolean QF_UF rows; returns one independently checked model"
+            .into()
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[
-            (
-                "primo_binary",
-                "path to Primo; otherwise SMT_PRIMO_BIN or PATH is used",
-            ),
-            (
-                "primo_timeout_ms",
-                "external wall timeout per call (default 600000; intersected with the pipeline budget)",
-            ),
-        ]
+        PRIMO_PARAMETERS
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
@@ -1861,106 +2001,43 @@ impl SystemSolver for PrimoSmt {
         params: &Params,
         budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
-        validate_solver_params(self.name(), params)
-            .expect("primo-smt configuration must be validated before a timed solve");
-        let binary = primo_binary(params)
-            .expect("primo-smt configuration must be validated before a timed solve");
-        let rows: Vec<AnfRow> = system.equations.iter().map(AnfRow::from_poly).collect();
-        let script = format_smtlib_for_solver(
-            system.n_vars as u32,
-            &rows,
-            &[],
-            SmtEncoding::Bool,
-            SmtSolverKind::Primo,
-        );
-        let configured = Duration::from_millis(
-            params
-                .u64_or("primo_timeout_ms", 600_000)
-                .expect("validated Primo timeout"),
-        );
-        let timeout = budget.map_or(configured, |limit| limit.min(configured));
-        let mut options = SmtSolveOptions::new(SmtSolverKind::Primo, binary);
-        options.encoding = SmtEncoding::Bool;
-        options.timeout = timeout;
+        solve_primo(self.name(), PrimoTransport::Stdin, system, params, budget)
+    }
+}
 
-        let started = Instant::now();
-        let mut extra = BTreeMap::from([
-            ("input_bytes".into(), script.len() as u64),
-            ("rows".into(), rows.len() as u64),
-            ("variables".into(), system.n_vars as u64),
-            ("solver_calls".into(), 1),
-            ("solver_conflicts_available".into(), 0),
-            ("solver_decisions_available".into(), 0),
-            ("decisions".into(), 0),
-            ("invocation_error".into(), 0),
-            ("external_timeout".into(), 0),
-            ("unknown".into(), 0),
-            ("invalid_model".into(), 0),
-            ("model_checked".into(), 0),
-        ]);
-        let run = match run_smt(&script, 0, &options) {
-            Ok(run) => run,
-            Err(error) => {
-                let timed_out = error.contains(" timed out after ");
-                extra.insert("external_timeout".into(), u64::from(timed_out));
-                extra.insert("invocation_error".into(), u64::from(!timed_out));
-                return (
-                    SolverVerdict::BudgetExceeded,
-                    SolverCost {
-                        ops: 0,
-                        op_unit: "Primo SAT conflicts (solver-reported)".into(),
-                        wall_ns: started.elapsed().as_nanos() as u64,
-                        peak_bytes: 0,
-                        degree_reached: None,
-                        solving_degree: None,
-                        timed_out,
-                        extra,
-                    },
-                );
-            }
-        };
-        let conflicts = run.conflicts.unwrap_or(0);
-        extra.insert(
-            "solver_conflicts_available".into(),
-            u64::from(run.conflicts.is_some()),
-        );
-        extra.insert(
-            "solver_decisions_available".into(),
-            u64::from(run.decisions.is_some()),
-        );
-        extra.insert("decisions".into(), run.decisions.unwrap_or(0));
-        let verdict = match parse_smt_stdout(&run.stdout, system.n_vars) {
-            SmtVerdict::Unsat => SolverVerdict::Unsatisfiable,
-            SmtVerdict::Unknown => {
-                extra.insert("unknown".into(), 1);
-                SolverVerdict::BudgetExceeded
-            }
-            SmtVerdict::Sat(model) if rows_satisfied(&rows, &model) => {
-                extra.insert("model_checked".into(), 1);
-                let root = model
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, value)| **value)
-                    .fold(0 as Mask, |mask, (i, _)| mask | bit(i as u32));
-                SolverVerdict::Solved(vec![root])
-            }
-            SmtVerdict::Sat(_) => {
-                extra.insert("invalid_model".into(), 1);
-                SolverVerdict::BudgetExceeded
-            }
-        };
-        (
-            verdict,
-            SolverCost {
-                ops: conflicts,
-                op_unit: "Primo SAT conflicts (solver-reported)".into(),
-                wall_ns: run.elapsed.as_nanos() as u64,
-                peak_bytes: 0,
-                degree_reached: None,
-                solving_degree: None,
-                timed_out: false,
-                extra,
-            },
+impl SystemSolver for PrimoSmtFile {
+    fn name(&self) -> &str {
+        "primo-smt-file"
+    }
+
+    fn describe(&self) -> String {
+        "legacy Primo SMT file transport and 5 ms polling; matched performance control only".into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        PRIMO_PARAMETERS
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn finds_every_solution(&self) -> bool {
+        false
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        solve_primo(
+            self.name(),
+            PrimoTransport::LegacyFile,
+            system,
+            params,
+            budget,
         )
     }
 }
@@ -2053,6 +2130,7 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(XlF2),
         Box::new(SatCdcl),
         Box::new(PrimoSmt),
+        Box::new(PrimoSmtFile),
         Box::new(FesF2),
         Box::new(FesF2Gpu),
         Box::new(FesWide),
@@ -2269,8 +2347,24 @@ mod tests {
         assert_eq!(cost.extra["invalid_model"], 0);
         assert_eq!(cost.extra["solver_calls"], 1);
         assert_eq!(cost.extra["solver_conflicts_available"], 1);
+        assert_eq!(cost.extra["stdin_transport"], 1);
+        assert_eq!(cost.extra["poll_interval_us"], 250);
+        assert!(cost.extra["solver_process_wall_ns"] > 0);
         assert!(!cost.timed_out);
         assert!(!PrimoSmt.finds_every_solution());
+
+        let (legacy_verdict, legacy_cost) =
+            PrimoSmtFile.solve(&sys, &params, Some(Duration::from_secs(60)));
+        let SolverVerdict::Solved(legacy_found) = legacy_verdict else {
+            panic!("legacy Primo control did not solve the fixture: {legacy_verdict:?}");
+        };
+        assert_eq!(legacy_found, found);
+        assert_eq!(legacy_cost.ops, cost.ops);
+        assert_eq!(legacy_cost.extra["decisions"], cost.extra["decisions"]);
+        assert_eq!(legacy_cost.extra["stdin_transport"], 0);
+        assert_eq!(legacy_cost.extra["poll_interval_us"], 5_000);
+        assert!(legacy_cost.extra["solver_process_wall_ns"] > 0);
+        assert!(!PrimoSmtFile.finds_every_solution());
 
         let m = F2BoolMono::from_mask;
         let inconsistent = BooleanSystem {
@@ -2284,6 +2378,12 @@ mod tests {
         assert!(matches!(verdict, SolverVerdict::Unsatisfiable));
         assert_eq!(cost.extra["unknown"], 0);
         assert!(!cost.timed_out);
+        let (legacy_verdict, legacy_cost) = PrimoSmtFile.solve(&inconsistent, &params, None);
+        assert!(matches!(legacy_verdict, SolverVerdict::Unsatisfiable));
+        assert_eq!(legacy_cost.ops, cost.ops);
+        assert_eq!(legacy_cost.extra["decisions"], cost.extra["decisions"]);
+        assert_eq!(legacy_cost.extra["unknown"], 0);
+        assert!(!legacy_cost.timed_out);
     }
 
     #[test]
