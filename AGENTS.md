@@ -300,20 +300,24 @@ descriptive investigations report their own technical outcomes and next steps.
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
 
-**Claim tiers** (owner, 2026-11-15): "faster than rho", "smaller exponent" and
+**Claim tiers** (owner, 2026-11-15): "below rho", "smaller exponent" and
 "subexponential" are defined in
 [`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md) (checklist
-`docs/ic/success_criteria.json`): T0 improvement over the IC baseline; T1
-faster than matched rho at a stated size (paired interval below 1 across the
-§5a band and at `w_cal`, 32+ verified targets); T2 a smaller exponent along a
-declared family path (six or more sizes over 24+ bits, a frozen held-out
-prediction); T3 subexponential (a proof or named, per-size-tested heuristics,
-model selection on eight or more sizes, held-out test). A transfer to another
-group (a hyperelliptic or other Jacobian, a finite field, an isogenous curve)
-counts at every tier when the map's construction and evaluation are charged,
-its correctness is certified independently, the answer is verified on `E`,
-and its applicability is checked on the exact instance. Each tier is
-reported as the distance remaining, never as a gate on the work.
+`docs/ic/success_criteria.json`; red-team review in `docs/ic/reviews/`).
+Every tier claim uses the cold end-to-end interval (the online interval of
+"IC measurement rules" is reported beside it, never instead), public targets,
+no uncounted work, the cheapest registered rho at each weight, and a
+preregistration committed as a pcc claim before the first run, with Holm
+correction over the thread's attempts. T0 is a gain over the IC baseline; T1
+is below that rho at a stated size (band and calibrated readings, growing-size
+trend, controls, cross-host audit); T2 is a smaller exponent on a declared path
+(the largest per-phase upper limit, six or more sizes over 24+ bits, a
+beacon-derived held-out size); T3 is subexponential (an argument with named,
+numerically tested heuristics; data can only falsify). A transfer to another
+group counts at every tier when the map is charged on every instance, certified
+independently, the answer checked on `E`, and applicability and literature
+status are preregistered. Each tier is reported as the distance remaining,
+never as a gate on the work.
 
 ## Tracks of index calculus
 
