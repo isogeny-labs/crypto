@@ -276,3 +276,63 @@ and `deg F_{m−1} = 3`. In each monomial, an `x` contributes at most degree 1.
 - **Negative control** (`--control`): a target with a common root planted at
   one grid point is rejected in 6/6 cases.
 - **Result:** 24/24 pass. Runtime 36 s on one core.
+
+## D10. Theorem (growing lower bound for the no-fall degree, Kummer `m = 3`). Added 2026-11-15; conditional on a per-instance check
+
+**Proof system.** `d_NS` is the least `c` with
+`1 ∈ span{z^k u^j F_i : popcount(k) + j + deg F_i ≤ c}` in `R`. This is D4's no-fall
+system (Nullstellensatz in `R`). `d_F ≤ d_NS`, and D9 gives `d_NS ≤ 3t + 5`. This
+section is about `d_NS` only, **not about `d_F`**.
+
+**Hypotheses.**
+- D9's hypothesis.
+- `x_R ∉ V`, so `deg_u φ_x F_2 = 2` at every `x`.
+- `λ(1) ≠ 0` for the functional below. This is checked per instance, not proved.
+
+**The functional.** The lead was proposed as KM3-LQR-NS in
+`research/kummer_m3_ns_degree_20261115/NEW_LEADS.md`. For `g ∈ R` put
+
+`λ(g) = Σ_{x∈V³} x_1·x_2·x_3 · ⟨u⟩( φ_x(g)·φ_x(F_1)^{-1} mod φ_x(F_2) )`,
+
+where `⟨u⟩` takes the `u`-coefficient of the residue, which has degree `≤ 1`.
+- `φ_x F_1` is invertible modulo `φ_x F_2` by D9's hypothesis.
+- `λ` is `F_p`-linear on `R`.
+
+**Statement.** Under the hypotheses, `λ` vanishes on every column of degree
+`≤ 2t + 5`. Hence `d_NS ≥ 2t + 6`.
+
+**Proof.**
+1. *Multiples of `F_2`.* `φ_x(μF_2)·φ_x(F_1)^{-1} ≡ 0 mod φ_x F_2`, so `λ(μF_2) = 0`.
+2. *Multiples of `F_1`.* `λ(z^k u^j F_1) = A_{k_1}·A_{k_2}·B_{k_3, j}`, where
+   - `A_k = Σ_{ζ∈μ_K} gζ·ζ^k`;
+   - `B_{k,j} = Σ_{ζ∈μ_K} gζ·ζ^k·r_j(gζ)`;
+   - `r_j(x_3) = ⟨u⟩(u^j mod φ F_2)`.
+3. *Character sums.* By orthogonality, `A_k = gK·[k ≡ −1 mod K]`. So `A_k ≠ 0` only
+   for `k = K − 1`, which has popcount `t`.
+4. *Small `j`.* `r_0 = 0` and `r_1 = 1`. So `B_{k,0} = 0`, and `B_{k,1} = A_k` is
+   nonzero only for `k = K − 1`.
+5. *Surviving columns.* A column `z^k u^j F_1` survives only if `k_1 = k_2 = K − 1`,
+   and either `j ≥ 2`, or `j = 1` with `k_3 = K − 1`. Its degree is therefore at least
+   `min(2t + 2 + 4, 3t + 1 + 4) = 2t + 6`.
+6. *Conclusion.* `λ` vanishes on the whole span at `c = 2t + 5`, and `λ(1) ≠ 0`. So
+   `1` is not in that span. ∎
+
+**Check** (`research/kummer_m3_ns_degree_20261115/lqr/`; `lqr_exhaustive.py`, `lqr_ex.log`, `lqr_check.py`, `lqr.log`). `[pcc:unverified]`
+- **Instances:** `p ∈ {40961, 12289, 998244353}`, `t = 2 … 5`, three draws each.
+  - 32 of 36 instances satisfy the hypotheses.
+  - The other 4 have a consistent grid point and are skipped (`K³/p` is not small at `p = 12289`, `t = 5`).
+- **Certified on all 32:**
+  - every column of degree `≤ 2t + 5` is killed, checked exhaustively over all `k` and `j` with the factorised formula;
+  - the degree-`(2t+6)` column `z_1^{K−1} z_2^{K−1} u² F_1` is *not* killed, so the argument cannot reach past `2t + 6`;
+  - `λ(1) ≠ 0`.
+- **Certified bound:** `d_NS ≥ 10, 12, 14, 16` at `t = 2, 3, 4, 5`.
+- **Direct check, independent of the factorisation** (`lqr_check.py`): `λ` was evaluated pointwise on random `F_1` and `F_2` columns that the proof says it kills. All were 0, on 27/27 instances.
+
+**Reading.**
+- On every certified instance, `2t + 6 ≤ d_NS ≤ 3t + 5`. The no-fall degree at
+  `m = 3` grows at least like `2t`, like D4's `2t + 2` at `m = 2`.
+- The measured `d_F` is about 5. So falls account for everything above a constant,
+  as at `m = 2`.
+- "What is not derived" is unchanged. Its open item is a growing lower bound on
+  **`d_F`**, a proof system with falls, and `λ` is not a closure pseudo-solution.
+  Whether a variant of `λ` is one is lead KM3-LQR-CLOSURE in `NEW_LEADS.md`.
