@@ -1,0 +1,7 @@
+# Output-only amendment after q32 attempt 1 truncation
+
+15 November 2026 UTC, before the compact rerun. The original committed `attack.magma` and incomplete `receipts/attempt1.json` are immutable. Attempt 1's public calculator response reached 77,700 subgroup attempts and 679 reconstructed relations on 470 classes, then truncated at 19,747 stdout bytes while printing relation rows. No rank, projection, descent or total cost was returned.
+
+The copied `attack_compact.magma` changes only the serialization of each accepted relation. Instead of `relation <decimal RHS> [ <decimal indices> ]`, it prints `R <base36 RHS>:<two-base36-digits per index>`; each index is asserted below `36²=1296`. The 20-rho batch, point and curve, relation collector, matrix, exact cofactor-132 projection checks, descent, limits and timers are unchanged. A separate `run_attack_compact.py` fixes the new source path and preserves an immutable response with its SHA-256. The decoder must parse every `R` row, compare its count with `smooth_relations`, replay rank and all equations modulo r, and verify target descent. A truncated or otherwise incomplete rerun stays incomplete; do not infer the missing total from the first run's visible prefix.
+
+The output encoding is supported by the official [Magma `IntegerToString(n,36)` documentation](https://docs.magma-maths.org/MagmaLanguage/InputOutput/string.html). This amendment changes observation, not the attack algorithm or acceptance criteria in `ATTACK_PROTOCOL.md`.
