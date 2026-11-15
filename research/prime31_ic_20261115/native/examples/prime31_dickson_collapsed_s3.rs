@@ -101,10 +101,6 @@ fn input(r:&TowerRing,n_y:usize,j:Option<usize>)->RPoly{
         let mut powers=vec![0u32;r.n_vars()];
         if n_y==0 {
             powers[0]=ex+ey;
-            if j==Some(0) && ey%2!=0 {
-                *exps.entry({let mut k=powers.clone();k[DEPTH]=ew;k}).or_default()=
-                    add(0,0); // overwritten below using direct entry
-            }
         } else {
             powers[n_y]=ex;powers[0]=ey;
         }
@@ -160,7 +156,8 @@ fn main()->Result<(),String>{
         let mut first_witness=None;
         for (i,&(x,ay)) in fb.points.iter().enumerate(){
             for &(y,by) in fb.points.iter().skip(i){
-                if if x==y {branch.is_some()}else{branch!=Some(first_collision(x,y)?)}{continue;}
+                let belongs=if x==y {branch.is_none()}else{branch==Some(first_collision(x,y)?)};
+                if !belongs {continue;}
                 matches+=1;
                 for w in s3_roots(x,y)?{
                     let eval=lifted_witness(x,y,w,branch,&ring,n_y)?;
