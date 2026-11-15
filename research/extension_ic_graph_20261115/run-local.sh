@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Thin local build-independent capture/run wrapper; all research computation is Rust.
+set -u -o pipefail
+umask 077
+[[ $# == 1 ]] || { echo 'usage: run-local.sh NEW-RUN-DIR' >&2; exit 2; }
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+repo=$(/usr/bin/git -C "$here" rev-parse --show-toplevel)
+cd "$repo" || exit 2
+for program in jq taskset timeout sha256sum; do command -v "$program" >/dev/null || exit 2; done
+if pgrep -x rustc >/dev/null || pgrep -x cargo >/dev/null || pgrep -x clippy-driver >/dev/null; then
+  echo 'Compiler/build activity exists; do not time this run yet.' >&2; exit 2
+fi
+[[ -z $(/usr/bin/git status --porcelain --untracked-files=normal) ]] || { echo 'Publish the clean source/spec first.' >&2; exit 2; }
+source_revision=$(/usr/bin/git rev-parse HEAD)
+sha256sum -c "$here/validation/local-pilot-component-source.sha256" || exit 2
+mkdir "$1" || exit 2
+run_dir=$(cd "$1" && pwd)
+cp target/release/examples/gaudry_cubic_graph_compare "$run_dir/driver" || exit 2
+cp "$here/native_analysis/target/release/cubic-graph-analysis" "$run_dir/analyzer" || exit 2
+binary_sha=$(sha256sum "$run_dir/driver" | cut -d ' ' -f1)
+cpu=$(awk '/^Cpus_allowed_list:/{split($2,a,/[,-]/); print a[1]}' /proc/self/status)
+jq --arg source "$source_revision" --arg binary "$binary_sha" --arg cpu "$cpu" \
+  '. + {source_revision:$source,binary_sha256:$binary,pinned_cpu:$cpu}' \
+  "$here/local-pilot-plan.json" > "$run_dir/runtime-plan.json" || exit 2
+cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
+/usr/bin/git archive --format=tar HEAD -- Cargo.toml Cargo.lock src/cryptanalysis/gaudry_cubic.rs \
+  src/cryptanalysis/gaudry_cubic_graph.rs src/cryptanalysis/gaudry_cubic_symmetric.rs \
+  src/cryptanalysis/residual_walk.rs src/cryptanalysis/jv_bitops.rs \
+  examples/gaudry_cubic_graph_compare.rs research/pencil_large_prime_20261029/Cargo.toml \
+  research/pencil_large_prime_20261029/src research/extension_ic_graph_20261115 \
+  > "$run_dir/source-checkpoint.tar" || exit 2
+uname -a > "$run_dir/os.txt"
+lscpu -J > "$run_dir/cpu.json"
+{ cat /sys/fs/cgroup/cpu.max; cat /sys/fs/cgroup/memory.max; rg '^Cpus_allowed_list:' /proc/self/status; } > "$run_dir/cgroup.txt"
+"${HOME}/.cargo/bin/rustc" -Vv > "$run_dir/rustc.txt"
+primes=$(jq -er '.primes|map(tostring)|join(",")' "$run_dir/runtime-plan.json")
+seeds=$(jq -er '.seeds|map(tostring)|join(",")' "$run_dir/runtime-plan.json")
+oracles=$(jq -er .oracle_cli "$run_dir/runtime-plan.json")
+rounds=$(jq -er .rounds "$run_dir/runtime-plan.json")
+warmups=$(jq -er .warmup_rounds "$run_dir/runtime-plan.json")
+cap=$(jq -er .max_residuals "$run_dir/runtime-plan.json")
+seconds=$(jq -er .timeout_seconds "$run_dir/runtime-plan.json")
+memory_kib=$(( $(jq -er .memory_gib "$run_dir/runtime-plan.json") * 1024 * 1024 ))
+argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" --oracles "$oracles" \
+  --warmup-rounds "$warmups" --rounds "$rounds" --max-residuals "$cap" \
+  --source-revision "$source_revision" --out "$run_dir/raw.jsonl")
+jq -n --args '$ARGS.positional' -- "${argv[@]}" > "$run_dir/argv.json" || exit 2
+sha256sum "$run_dir/driver" "$run_dir/analyzer" "$run_dir/runtime-plan.json" \
+  "$run_dir/argv.json" "$run_dir/source-checkpoint.tar" "$run_dir/RESUME-before.md" \
+  "$run_dir/os.txt" "$run_dir/cpu.json" "$run_dir/cgroup.txt" "$run_dir/rustc.txt" \
+  > "$run_dir/pre-call.sha256" || exit 2
+date -u +%FT%TZ > "$run_dir/started-at.txt"
+echo "Local run: $run_dir"
+export RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1
+ulimit -v "$memory_kib" || exit 2
+TIMEFORMAT=$'real_s=%R\nuser_s=%U\nsys_s=%S\ncpu_percent=%P'
+{ time {
+  timeout --signal=TERM --kill-after=5s "${seconds}s" taskset -c "$cpu" "${argv[@]}" \
+    > "$run_dir/stdout.txt" 2> "$run_dir/stderr.txt" &
+  worker_pid=$!
+  printf '%s\n' "$worker_pid" > "$run_dir/worker.pid"
+  wait "$worker_pid"
+}; } 2> "$run_dir/time.txt"
+run_status=$?
+printf '%s\n' "$run_status" > "$run_dir/exit-code.txt"
+date -u +%FT%TZ > "$run_dir/finished-at.txt"
+sha256sum "$run_dir/exit-code.txt" "$run_dir/time.txt" "$run_dir/stdout.txt" \
+  "$run_dir/stderr.txt" > "$run_dir/post-call.sha256"
+if [[ -f "$run_dir/raw.jsonl" ]]; then sha256sum "$run_dir/raw.jsonl" >> "$run_dir/post-call.sha256"; fi
+echo "Local run exited $run_status; raw evidence retained at $run_dir"
+exit "$run_status"
