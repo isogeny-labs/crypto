@@ -187,6 +187,9 @@ fn m4_first_eliminant_factorized(
         if !r.is_empty() {
             return Err("factorized S4 exceptional division failed".into());
         }
+        if eval(&q, t) == 0 {
+            return Err("factorized S4 requires squarefree exceptional U=t root".into());
+        }
         q
     } else {
         k.to_vec()
@@ -461,7 +464,7 @@ fn m4_factorized_scale(base: &Base, ar: &mut Arithmetic) -> Result<(), String> {
             }
             // Only inspect full signed lifts on the smallest case, where
             // root splitting is already bounded and independently tested.
-            let verified_signed_rows = if size == 4 {
+            let verified_signed_rows = if size == 4 && kind == "planted-four" {
                 let (_, tuples) = m4_extract_from_eliminant(&xs, &k, target.0, &fast)?;
                 let rows = m4_signed_lifts(base, Some(target), &tuples, ar);
                 if kind == "planted-four" && rows.is_empty() {
