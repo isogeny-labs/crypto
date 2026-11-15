@@ -560,6 +560,7 @@ fn main() {
                 let row = json!({
                     "plain3_ok": p3.as_ref().map(|s| s.0 == k).unwrap_or(false), "plain3_ms": p3_ms, "plain3_fb": fbs3,
                     "curve": c.name, "rho_neg_median_ms": rho1, "p": c.f.p, "n": c.n, "B": bsz, "inst": ins,
+                    "cert": {"g": [g.x, g.y], "q": [q.x, q.y], "k": k, "sym_rec": sym.as_ref().map(|s| s.0), "plain3_rec": p3.as_ref().map(|s| s.0)},
                     "summands": summ, "shiftfix": std::env::var_os("NOSHIFTFIX").is_none(), "prefilter": std::env::var_os("NOPREFILTER").is_none(), "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
                     "sym_ms": sym.as_ref().map(|s| s.1.ms_total),
                     "sym_fb_ms": sym.as_ref().map(|s| s.1.ms_fb),
