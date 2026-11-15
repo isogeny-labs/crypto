@@ -170,7 +170,7 @@ impl Linear {
         let mut solution = vec![0_u64; self.dim];
         for (j, row) in self.pivots.iter().rev() {
             let mut val = row[self.dim];
-            for k in j + 1..self.dim {
+            for k in (*j + 1)..self.dim {
                 val = sub_mod(val, mul_mod(row[k], solution[k], n), n);
             }
             solution[*j] = val;
@@ -242,8 +242,9 @@ fn main() -> Result<(), String> {
             };
             // Verify the exact *elliptic curve* equality before admitting a
             // polynomial relation row. This cost is not omitted.
-            let witness = ar.add(e, signed_four(code, &base, &mut ar),
-                                 signed_four(term.code, &base, &mut ar));
+            let left_witness = signed_four(code, &base, &mut ar);
+            let right_witness = signed_four(term.code, &base, &mut ar);
+            let witness = ar.add(e, left_witness, right_witness);
             if witness != r {
                 return Err("invalid 4+4 relation witness".into());
             }
