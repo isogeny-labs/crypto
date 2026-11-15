@@ -1,0 +1,13 @@
+✖ [2/3] Building DualProjected229 (2.4s)
+trace: .> LEAN_PATH=/Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/fiber-grid-worktree/research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/lean/.lake/build/lib/lean /Users/adamburan/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean /Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/fiber-grid-worktree/research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/lean/DualProjected229.lean -o /Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/fiber-grid-worktree/research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/lean/.lake/build/lib/lean/DualProjected229.olean -i /Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/fiber-grid-worktree/research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/lean/.lake/build/lib/lean/DualProjected229.ilean -c /Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/fiber-grid-worktree/research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/lean/.lake/build/ir/DualProjected229.c --setup /Volumes/SSD990-2/.codex/worktrees/d92d/crypto/target/fiber-grid-worktree/research/isogeny_torsion_fibers_20261012/dual_projected_base_20261115/lean/.lake/build/ir/DualProjected229.setup.json --json
+error: DualProjected229.lean:18:32: Unknown identifier `mul_assoc`
+error: DualProjected229.lean:17:34: unsolved goals
+forward dual : Fin 229 → Fin 229
+composition : ∀ (y : Fin 229), forward (dual y) = 3 * y
+linearity : ∀ (n x : Fin 229), forward (n * x) = n * forward x
+y : Fin 229
+⊢ 153 * (3 * y) = y
+info: DualProjected229.lean:20:0: 'DualProjected229.inverseThree' depends on axioms: [propext]
+info: DualProjected229.lean:21:0: 'DualProjected229.projectedTransport' depends on axioms: [propext, sorryAx]
+Some required targets logged failures:
+- DualProjected229
