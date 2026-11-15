@@ -36,8 +36,12 @@
 //! than three abscissas of curve points, so that nothing can be planted), drawn from
 //! `StdRng::seed_from_u64(cell_seed ^ 0x7A52_6574 ^ (d << 16))`, solved
 //!   * `warm`: one solver on the symbolic system, the `2m` target bits as assumptions;
-//!   * `cold`: a fresh solver per target on the panel's constant-target system.
-//! `--budget-s` is per target per mode.  `wall_s` is loading the solver (cold) plus the
+//!   * `cold`: a fresh solver per target on the panel's constant-target system;
+//!   * `cold_sym`: a fresh solver per target on the symbolic system (warm's encoding),
+//!     the `2m` target bits as unit clauses.
+//! Summary ratios `ratio_<a>_over_<b>_{conflicts,decisions,wall}` for cold/warm,
+//! cold_sym/warm (incrementality alone) and cold/cold_sym (encoding size alone).
+//! `--budget-s` is per target per mode.  `wall_s` is loading the solver (cold, cold_sym) plus the
 //! solve; cold's building and encoding of the constant system is `build_encode_s`; the
 //! warm solver is built and loaded once per `V` (`warm_load_s` in the summary line).
 //!
@@ -45,7 +49,7 @@
 //!         [--draws 0,1,..] [--seed 20261115] [--budget-s 600] [--max-k 12] [--modes warm,cold]
 //!     rr_sat_amortise targets --out DIR [--m 11] [--ell ..] [--planted 4] [--unplanted 4]
 //!         [--draws ..] [--seed ..] [--budget-s 600] [--targets 64] [--planted-share 0.5]
-//!         [--check-targets 20] [--modes warm,cold]
+//!         [--check-targets 20] [--modes warm,cold,cold_sym]
 //!     rr_sat_amortise draws   --m 9 [--ell ..] [--planted 4] [--unplanted 4] [--seed ..]
 //!
 //! JSON lines are appended to `DIR/results.jsonl` (field `kind`); a progress line per
@@ -827,7 +831,7 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
     let n_targets: usize = args.num("--targets", "64");
     let share: f64 = args.num("--planted-share", "0.5");
     let n_check: usize = args.num("--check-targets", "20");
-    let modes = args.list("--modes", "warm,cold");
+    let modes = args.list("--modes", "warm,cold,cold_sym");
     let only: Option<Vec<u32>> = args
         .get("--draws")
         .map(|s| s.split(',').map(|x| x.parse().expect("--draws")).collect());
@@ -962,7 +966,43 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
                             model_verified: mv,
                         }
                     }
+                } else if mode == "cold_sym" {
+                    // A fresh solver on the SAME symbolic encoding as warm, the 2m target
+                    // bits as unit clauses: separates incrementality from encoding size.
+                    let (mut s, mut ok) = load(&enc_sym);
+                    let mut units: Vec<Lit> = Vec::with_capacity(2 * mu);
+                    for j in 0..mu {
+                        units.push(lit(3 * ell + 2 * mu + j, xr >> j & 1 == 1));
+                    }
+                    for j in 0..mu {
+                        units.push(lit(3 * ell + 3 * mu + j, yr >> j & 1 == 1));
+                    }
+                    for &l in &units {
+                        ok &= s.add_clause(vec![l]);
+                    }
+                    let res = if ok {
+                        s.deadline = Some(Instant::now() + budget);
+                        s.solve()
+                    } else {
+                        SolveResult::Unsat
+                    };
+                    let wall = t0.elapsed().as_secs_f64();
+                    let mv = (res == SolveResult::Sat).then(|| {
+                        let model = s.model();
+                        units.iter().all(|&l| model[(l.unsigned_abs() - 1) as usize] == (l > 0))
+                            && verify(&model[..n_sym])
+                    });
+                    TargetRun {
+                        status: res,
+                        conflicts: s.stats.conflicts,
+                        decisions: s.stats.decisions,
+                        assumption_decisions: 0,
+                        propagations: s.stats.propagations,
+                        wall,
+                        model_verified: mv,
+                    }
                 } else {
+                    assert_eq!(mode, "cold", "unknown mode {mode} (warm | cold | cold_sym)");
                     let (polys, n_vars) = build_norm(&cell.curve, &cell.st, &dr.basis, t);
                     let enc = encode(&polys, n_vars);
                     build_s = t0.elapsed().as_secs_f64();
@@ -1023,10 +1063,15 @@ fn cmd_targets(args: &Args, cell: &Cell, out: &mut std::fs::File) {
                 "undecided": e[3] as u64, "truth_mismatches": e[4] as u64, "models_failed": e[5] as u64,
             });
         }
-        if let (Some(w), Some(c)) = (tot.get("warm"), tot.get("cold")) {
-            summary["ratio_cold_over_warm_conflicts"] = json!(if w[0] > 0.0 { Some(c[0] / w[0]) } else { None });
-            summary["ratio_cold_over_warm_decisions"] = json!(if w[1] > 0.0 { Some(c[1] / w[1]) } else { None });
-            summary["ratio_cold_over_warm_wall"] = json!(if w[2] > 0.0 { Some(c[2] / w[2]) } else { None });
+        // ratio_<num>_over_<den>_{conflicts,decisions,wall}: cold/warm (both effects),
+        // cold_sym/warm (incrementality, same encoding), cold/cold_sym (encoding cost).
+        for (num, den) in [("cold", "warm"), ("cold_sym", "warm"), ("cold", "cold_sym")] {
+            if let (Some(a), Some(b)) = (tot.get(num), tot.get(den)) {
+                for (i, what) in ["conflicts", "decisions", "wall"].iter().enumerate() {
+                    summary[format!("ratio_{num}_over_{den}_{what}").as_str()] =
+                        json!(if b[i] > 0.0 { Some(a[i] / b[i]) } else { None });
+                }
+            }
         }
         writeln!(out, "{summary}").expect("write");
         out.flush().expect("flush");
