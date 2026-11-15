@@ -115,7 +115,7 @@ targets (seed 777):
 | 5 | 1.217 | 0.521 | 0.606, 0.524, 0.509, 0.520 | 0.457 |
 | 6 | 1.465 | 1.001 | 1.102, 1.025, 1.003, 0.998 | 0.717 |
 | 7 | 1.269 | 0.567 | 0.647, 0.581, 0.572, 0.565 | 0.457 |
-| 8 | *(running)* | | | |
+| 8 | 1.493 | 1.047 (2nd half; 28 of 64 targets before the session's 2 h limit) | first half 1.135, last four 1.044, 1.037, 1.037, 1.035 | 0.773 |
 
 Stage split (24 targets, ℓ = 7): FRESH spends 5918 t-stage + 4556 x₃-stage
 conflicts per refutation; REUSE's second half spends 434 + 4556. The t-stage
@@ -124,6 +124,11 @@ t-root), target-dependent) does not, so the plateau is x₃-stage/T_enum: 0.98 a
 n = 17 and 0.55 at n = 20. Forgetting learnt clauses that mention `x_R` at each
 new target keeps the count (R 0.564 vs 0.566) with a 10× smaller clause database
 (26.5k vs 260k live) and half the wall (5.6 s vs 11.3 s; FRESH 4.6 s).
+
+Candidate 3.3's rule (REUSE/FRESH < 0.5 at ℓ = 8 and 9) is not met: the ratio
+is 0.70 at ℓ = 8 and the plateau is the x₃-stage share (0.98, 0.55, 1.04 of the
+pair count at n = 17, 20, 23), so the candidate is closed as "bounded
+amortisation of the root-less pairs".
 
 Reading: REUSE learns the target-independent fact "this pair has no `t`-root"
 (about half the pairs, one conflict each in FRESH) and plateaus at the remaining
