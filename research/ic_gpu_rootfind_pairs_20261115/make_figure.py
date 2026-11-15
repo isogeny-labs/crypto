@@ -7,7 +7,7 @@ the shared counted S against rho.
 import json, math, sys
 R = json.load(open(sys.argv[1]))
 rows = [("rf3pairs", x) for x in R.get("rf3pairs", {}).get("rows", [])] + [("rf2mt2", x) for x in R.get("rf2mt2", {}).get("rows", [])]
-ARMS = [("cpu", "c1", "CPU, 1 thread"), ("mt", "c4", "CPU, all threads (pool)"), ("gpud", "c2", "GPU, CPU-built pair table"), ("gpup", "c3", "GPU, pair table on device")]
+ARMS = [("cpu", "c1", "CPU, 1 thread"), ("mt", "c4", "CPU, 14 threads (quota 13.6)"), ("gpud", "c2", "GPU, CPU-built pair table"), ("gpup", "c3", "GPU, pair table on device")]
 W, left, right, top, bar, gap, ggap = 880, 230, 160, 92, 10, 2, 14
 nb = lambda x: sum(a in x["arms"] for a, _, _ in ARMS)
 H = top + sum(nb(x) * (bar + gap) + ggap for _, x in rows) + 40
@@ -21,7 +21,7 @@ o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}"
      '@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.c1{fill:#8f8e89}.c2{fill:#1f5ea8}.c3{fill:#3987e5}.c4{fill:#52514e}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>',
      f'<rect class="bg" width="{W}" height="{H}"/>',
      '<text class="p" x="16" y="24" font-size="15" font-weight="600">rootfind-subtract in complete IC solves: the m = 3 pair table on the device</text>',
-     '<text class="q" x="16" y="42" font-size="12">median solve wall, log scale; A100 pod; every arm reports identical relations, logarithm and counted S</text>']
+     '<text class="q" x="16" y="42" font-size="12">median solve wall (L0, descriptive), log scale; A100 pod; every arm reports the same counted S, logarithm and relation counts</text>']
 for i, (_, c, l) in enumerate(ARMS):
     o.append(f'<rect class="{c}" x="{16 + 190 * i}" y="54" width="12" height="12" rx="2"/><text class="p" x="{34 + 190 * i}" y="64" font-size="12">{l}</text>')
 t = lo

@@ -9,8 +9,13 @@ User request (2026-11-15), "do these", on the open items of PR #4276: build the 
 the device; a tuned multi-threaded CPU sweep; the validator check of
 `research/ic_gpu_rootfind_big_20261115`.
 
-**Standing.** `[pcc:unverified]`: one A100 pod, measured by the session that wrote the code; no
-validator yet for this report. Counted S is unchanged by design and measured unchanged in every pair;
+**Standing.** `[pcc:unverified]`: one A100 pod, measured by the session that wrote the code. An
+independent validator (`VALIDATION_REVIEW.md`, after the PR merged) re-verified all 260 certificates
+and the 8 curve orders, matched all 156 pairs on every charge and counter (the device-built pair
+table's charge equal to the CPU build's in all 36 records), replayed 30 worker-free records on another
+hardware class, and reproduced every table cell: **validated, scoped**, no number refuted; its prose
+corrections are applied below (*corrected*). The wall ratios here, the 57× included, are L0
+measurements, descriptive and not admitted comparisons (ecbench's own rating), never a cost claim. Counted S is unchanged by design and measured unchanged in every pair;
 the differences are wall time. Every record is L0 (`--cpus none --allow-busy`); the CPU arm's A/A copy
 differs from it by up to 14% in solve wall. This pod's host (AMD EPYC 7543) differs from round 3's
 (Intel Xeon 6240R), so wall times are compared within this session only. No scoreboard or leaderboard
@@ -80,13 +85,21 @@ tables `RESULTS.md`, `results.json`.
 
 - **The device table removes the set-up.** Against the CPU arm's 0.50–0.51 s (2048) and 2.9–4.2 s
   (4096), the oracle set-up is 0.018–0.034 s and 0.11–0.12 s, and the worker creates the session in a
-  median 0.034 s (daemon timing lines). In the same session the device-table arm is 2.6–6.7× faster
+  median 0.017 s at 2048 and 0.111 s at 4096 (daemon timing lines; *corrected*: 0.034 s pooled both
+  sizes). In the same session the device-table arm is 2.6–6.7× faster
   than the GPU arm that still builds the table on the CPU. [pcc:unverified]
 - **What bounds the solve now:** at 2048, the relation phase (0.02–0.16 s) and linear algebra
-  (0.18–0.22 s); at 4096, linear algebra (0.53–1.50 s, the same code on every arm).
+  (0.18–0.22 s on the device-table arm); at 4096, linear algebra (0.53–1.49 s on the device-table arm,
+  *corrected*: the range had mixed arms; the same code on every arm).
 - **Distance to rho:** S is 140–569× the matched rho's mean S at w = 0, unchanged by the device. In
   wall time the device-table arm is 3–99× slower than rho's median solve (7–108 ms); at 39.3 bits and
-  2048 it is 3.4× (0.368 s against 0.108 s), the closest any round has come.
+  2048 it is 3.4× (0.368 s against 0.108 s). *Corrected:* that sets an A100 arm against single-thread
+  rho, and "the closest any round has come" compared wall time across rounds on different hosts, which
+  this report rules out; it is withdrawn. The validator's §5a band: `m = 3` is 140–569× rho at w = 0,
+  190–574× at 0.1 and 297–1019× at 1; rho is ahead at all three weights.
+- **Device work not charged** (*corrected*, previously unnamed): the GPU and multi-threaded records
+  carry `work.complete: false`; the device's sweep beyond the charged candidates, unused swept targets,
+  batch splits and the degenerate rows' pair search are reported as `gpu_*` counters, not charged.
 
 ### `m = 2`: the pooled multi-threaded arm against the GPU (\|F_x\| = 4096, median of 4)
 
@@ -96,16 +109,24 @@ tables `RESULTS.md`, `results.json`.
 | 30.0 | 19 501 | 12.9 s | 1.30 s | 0.158 s | 9.9× | 8.3× |
 | 31.3 | 22 023 | 34.0 s | 3.24 s | 0.282 s | 10.5× | 11.5× |
 
-- With the pool sized to the 14 CPUs the pod may use, the multi-threaded arm reaches 7.5–10.5× one
-  thread at `m = 2` (round 3, a different host and 96 threads on an unrecorded quota: about 5×). It is
+- With the pool sized to the pod's quota of 13.6 CPUs (14 threads), the multi-threaded arm reaches
+  7.5–10.5× one thread at `m = 2` (round 3, a different host and 96 threads on an unrecorded quota:
+  about 5×). *Corrected:* that oversubscription caused round 3's weaker arm is a hypothesis this run
+  does not test (no oversubscribed control in the same session). It is
   still the GPU kernel's per-thread code run on the CPU, not a CPU-optimised sweep; a vectorised CPU
   implementation could do better, and that is not measured.
-- At `m = 3` the multi-threaded arm is slower than one thread at the small sizes (0.85–0.96× at 33–35
-  bits, 4096): its set-up builds a host hash of the 4–17M-entry probe set (3.9–6.0 s) on top of the
-  CPU pair table. Its relation phase is 2.5–9.6× one thread where that phase is large.
+- At `m = 3`, 33–35 bits and 4096, the multi-threaded arm's solve is 0.85–0.96× one thread's, *corrected:*
+  inside the A/A spread (per-pair A/A ratios 0.73–1.38), so not shown to be slower. Its set-up at 4096 is
+  3.9–6.0 s, of which the host hash of the probe set is only 0.17–0.92 s; at 33.4 bits and 4096 the
+  difference comes from its relation phase (0.41× one thread's, with 4 batch splits a run). Elsewhere
+  its relation phase is 2.5–9.6× one thread.
 
 ## Not done / next
 
 - Linear algebra now dominates the `m = 3` solve at \|F_x\| = 4096 (and is the same on every arm).
 - A CPU-optimised (vectorised) multi-threaded sweep, for the strongest CPU baseline.
-- A validator check of this report.
+- Process (validator): the raw tarball is in Git, not S3 (the S3 waiver of the earlier rounds; this
+  session's AWS keys are rejected), the run did not go through the `benchrec` launcher wrapper
+  (disclosed in the record), and PR #4276 merged before this validation; the records carry no relation
+  digest, so a wrong pair among colliding abscissae would show only through the linear-algebra
+  counters (equal in every pair).

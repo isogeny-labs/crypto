@@ -1,0 +1,82 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-15T17:49:08+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/ic_native_sweep_20261115/run.sh",
+        "/tmp/claude-0/-home-user/648c3177-6621-55ff-b9d8-09ead07ab678/scratchpad/nat/out_native"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T17:40:47+00:00",
+      "wall_s": 400.825
+    }
+  ],
+  "commit": "2ec4187be0c0c1af2d51d8c2d847dde4cf847217",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T17:40:43+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/ic_native_sweep_20261115"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T1740Z-ic-native-sweep",
+  "metrics": [
+    {
+      "baseline": 3.373,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf2_native_relation_s_r30_f4096",
+      "note": "relation-phase median wall, rootfind-subtract-gpu worker=native (4 threads) vs the emulation arm backend=emulate (baseline 3.373 s), m=2, log2 r=30.0, |F_x|=4096, 4-thread VM, L0; one thread 11.23 s; S identical (24637x matched rho)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 3.38
+    },
+    {
+      "baseline": 0.551,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_native_relation_s_r35_f2048",
+      "note": "relation-phase median wall, worker=native (4 threads) vs emulation arm (baseline), m=3, log2 r=35.2, |F_x|=2048, L0; one thread 1.537 s; S identical (162x matched rho)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.534
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 77674,
+      "path": "research/ic_native_sweep_20261115/raw/out_native.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4b/4b8351cad9fc4d488376bc57e740ff2a368acad1d95febd991fe354dcec972e9",
+      "sha256": "4b8351cad9fc4d488376bc57e740ff2a368acad1d95febd991fe354dcec972e9",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_native_sweep_20261115/REPORT.md",
+    "png": [],
+    "svg": [
+      "research/ic_native_sweep_20261115/fig_native.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-native-sweep",
+  "status": "measured",
+  "summary": "rootfind-subtract-gpu worker=native (the Rust sweep on a 4-thread rayon pool) on a 4-thread VM, L0: 80/80 verified and replayed, 48 identity checks equal S/relations/logarithm/ledger. Relation phase 2.2-3.3x one thread and 0.99-1.11x the C++ emulation arm (prediction >=1.5x failed); threads=1 control 0.56-0.93x one thread (batch sweeps). S unchanged, 106-24637x matched rho. Run through benchrec run.",
+  "validation": null
+}
