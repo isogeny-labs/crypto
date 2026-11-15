@@ -44,6 +44,7 @@ ColdResult cold(Point Q,std::uint64_t seed,GraphOracle&oracle,const Tower&tower)
     return cold_collect(E,P,Q,seed,13,base,3,tower.terminal,oracle);
 }
 } // namespace auxiliary
+#ifndef AUXILIARY_COLD_NO_MAIN
 int main(int argc,char**argv){
     try{
         if(argc!=3)throw std::invalid_argument("usage: cold BACKEND NEW_ROOT");
@@ -56,3 +57,4 @@ int main(int argc,char**argv){
         std::cout<<"PASS auxiliary point-only cold scalar="<<out.scalar<<" attempts="<<out.attempts<<" calls="<<out.calls<<'\n';return 0;
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<'\n';return 2;}
 }
+#endif
