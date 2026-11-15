@@ -47,6 +47,7 @@ fn run() -> Result<serde_json::Value, String> {
         return Err("canonical prime31 B31 base changed".into());
     }
     let mut fiber = BTreeSet::new();
+    let mut per_y = Vec::new();
     let mut unique = Vec::new();
     let mut one = 0;
     let mut three = 0;
@@ -68,6 +69,7 @@ fn run() -> Result<serde_json::Value, String> {
         } else {
             return Err("exceptional repeated-root y fiber".into());
         }
+        per_y.push(xs.iter().copied().map(|root| (root, y)).collect::<Vec<_>>());
         for root in xs {
             let q = Some((root, y));
             if !ar.on_curve(e, q) {
@@ -78,6 +80,30 @@ fn run() -> Result<serde_json::Value, String> {
     }
     if (one, three, fiber.len()) != (14, 17, 65) {
         return Err("prime31 y-fiber census changed".into());
+    }
+    // For distinct base y-values, independently count oriented y(sum) roots.
+    // The 1/3/9 distribution is a negative-control cost measure, NOT an oracle.
+    let mut pair_projection = [0usize; 10];
+    for i in 0..per_y.len() {
+        for j in i + 1..per_y.len() {
+            let mut outputs = BTreeSet::new();
+            for &a in &per_y[i] {
+                for &b in &per_y[j] {
+                    let Some((_, yr)) = ar.add(e, Some(a), Some(b)) else {
+                        return Err("unexpected y-pair cancellation".into());
+                    };
+                    outputs.insert(yr);
+                }
+            }
+            let expected = per_y[i].len() * per_y[j].len();
+            if outputs.len() != expected {
+                return Err("unexpected distinct-y projection collision".into());
+            }
+            pair_projection[expected] += 1;
+        }
+    }
+    if (pair_projection[1], pair_projection[3], pair_projection[9]) != (91, 238, 136) {
+        return Err("prime31 y-sum root multiplicities changed".into());
     }
     // A larger Dickson fibre contains enough injective y-fibres to
     // recover B31 without triple lifts; this changes the factor-base encoding.
@@ -124,6 +150,7 @@ fn run() -> Result<serde_json::Value, String> {
         "base_y_unique_root": one,
         "base_y_three_roots": three,
         "y_only_rational_lifted_points": extended.len(),
+        "distinct_y_pair_output_root_histogram": {"1":pair_projection[1],"3":pair_projection[3],"9":pair_projection[9]},
         "oriented_pair_support_canonical": or_original.len(),
         "oriented_pair_support_y_lifted": or_extended.len(),
         "signed_pair_support_canonical": signed_original.len(),
