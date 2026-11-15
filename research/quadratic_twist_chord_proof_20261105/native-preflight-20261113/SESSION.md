@@ -19,3 +19,27 @@ Configure the already-approved narrow checkpoint credential in environment setti
 ## Errors
 
 Initial C++ compilation passed with two warnings; final warnings-as-errors build passed, with both versions/logs retained. Initial native README prose lint had one missing tag; corrected without scientific execution. No new checkpoint/proof/native failure or successful run is invented. [pcc:unverified]
+
+## 2026-11-15T04:08Z — first actual fixed-point engineering run
+
+### What was done
+
+After the user's explicit GitHub selection, published the separately named checkpoint amendment, complete handoff and launcher at aa66bd7e BEFORE data. The exact live GitHub head matched the clean local head. The bounded fixed-point Rust/C++ run completed with launcher0: two fresh cases/audits matched38 fiber points each; the reference enumerated1444 extension-curve points; all ten changed/rehashed controls rejected101/no receipt. The case inventory retains1369 attempts,36 secants and2 tangents per run. All110 raw files restore/repack exactly from6380bytes. These are unsigned producer replay observations, not signed PCC verification. [pcc:unverified]
+
+### Decisions made
+
+Preserve the existing S3 launcher, official gate, native sources/binaries and original engineering contract. The GitHub amendment changes transport only, not coverage or acceptance. Use the measured engineering completion to prepare a separately frozen full nineteen-query census; do not relabel this one-point pass as that census. No paid resources, S3 call or key reuse occurred. [pcc:unverified]
+
+### Open threads
+
+Canonical full-study freeze/export, identity/all18-point coverage, faithful proof/identity bindings, then actual public-log setup/useful-rank/expanded-degree/original-source recovery. The structured trace-projected factor-base lane is proposed; the quadric certificate-transport observation remains an unsigned desk screen. [pcc:unverified]
+
+### Errors
+
+First report build lacked amssymb, so mathbb failed; exact source/log retained, package-only correction produced the inspected one-page PDF. Initial archive-restore command used a wrong relative cwd; absolute invocation passed all hashes/repack. Canonical protocol repository has transferred to isogeny-labs; its current files have VLT1 encryption, so inspect the official last public pre-encryption source at immutable0ca36c9d without keys or decrypted-current claims. No numerical/native rerun was used to repair documentation. [pcc:unverified]
+
+## 2026-11-15 — continue full census with preserved local evidence
+
+The fixed run's generated report/evidence package is now retained at /workspace/twist-fixed-pending-publication-20261115/{reports,validation}, with before/after file manifests proving exact relocation. Original native raw output remains /workspace/twist-fixed-github-20261115. No denied archive was uploaded, converted or deleted. The source checkout contains only committed scientific source plus this journal update. [pcc:unverified]
+
+Automatic review twice rejected the exact archive publication; the specific question remains pending. This affects publishing those assets, not the already requested bounded local computation. Continue the separately frozen nineteen-query protocol after recording this source/journal checkpoint on GitHub. Do not change its native algorithms, binary pins, clean committed-source guard, coverage or acceptance. Keep new raw outputs outside the checkout and all false payloads intact. [pcc:unverified]
