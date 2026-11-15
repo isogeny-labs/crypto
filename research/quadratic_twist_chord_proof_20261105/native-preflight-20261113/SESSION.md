@@ -207,3 +207,21 @@ Actual trace fixture and odd-subgroup reduction, independent native algebraic me
 Original proof normalization failed; existing h2 was explicitly used without changing the theorem. Capitalized Type mismatch required case-insensitive metadata matching. Initial USTAR archive preparation stopped on long paths; deterministic GNU format restores/repackages exactly. Initial incomplete-export flow metadata counted absent rows, corrected using official observed-row flow while retaining10/4 real coverage findings. All originals retained; no scientific rerun for packaging. [pcc:unverified]
 
 Packaging notes: first journal write exceeded the command argument limit before execution; bounded chunks preserved the complete incoming main journal. Whole-journal prose lint finds two inherited lines; own new entry lint is clean, and inherited wording is untouched. Lesson-tool warnings reflect its scratch ROOT; evidence paths target this PR checkout. [pcc:unverified]
+
+## 2026-11-15T07:45Z — actual proper-extension auxiliary trace screen
+
+### What was done
+
+Pre-data GitHub checkpoint4f7af6d7 froze independent C++/Rust instruments and a deterministic engineering protocol. Both exhaust all2401 F49 models under fixed eligibility,192 qualify; first E:y²=x³+x+(1+i), order47, twistdelta1+i with coefficients4+2i,2i, order53. All2491 source×twist pairs pass source-preserving trace([24]B+psiT)=B; Rust independently counts2491 extension points. Two audit receipts agree; six genuinely altered payloads reject101/no receipt. All13 predeclared process exits match. Native window07:45:32–07:45:34 is finished. [pcc:unverified]
+
+### Decisions made
+
+Use this real proper-extension fixture for the next algebraic-membership design. This is actual finite trace routing, not a rational group injection or measured useful-yield/degree improvement. Source group47 and twist group53 differ. Keep actual-point inputs and independently checked projected rows; free witness multiplicity does not count as rank. A new canonical solver experiment must be frozen before solver data. Existing LOCAL resources only; raw assets remain local; PR3560 open/autooff and automation paused. [pcc:unverified]
+
+### Open threads
+
+Algebraic membership with source-identical extended controls, legitimate public setup, unknown-Q original scalar recovery, strongest source frontier and expanded relevant solver degree. No new Lean/IDC/signed PCC statement, registry alias, speed or total-cost result. No process in flight. [pcc:unverified]
+
+### Errors
+
+Static JSON field-count correction13 preceded compilation; initial source/pins retained. Successful C++ build emits compact-indentation warnings, preserved without rerun. Report first launched with nonexistent workdir, then required amssymb/amsmath; failed source/logs retained and final one-page PDF rendered/inspected. Local70-file raw archive7136bytes restores hashes/repack exactly. Sources checked(KB unavailable): prior trace geometry/README, Gorla–Massierer §2.2; no novelty or higher-dimensional complexity claim. [pcc:unverified]
