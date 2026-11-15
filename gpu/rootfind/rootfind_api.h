@@ -103,14 +103,24 @@ int rf256_decompose(const uint64_t *fb_x, const uint64_t *fb_y, uint32_t n_fb,
  * at most `max_targets` targets.  Results and their meaning are those of
  * rf64_decompose on the same factor base and targets; `cap` bounds the
  * relations one batch may report (overflow returns RF_ERR_OVERFLOW with
- * res->n_found set, and the caller may retry with a smaller batch). */
+ * res->n_found set, and the caller may retry with a smaller batch).
+ *
+ * probe_x (n_probe canonical abscissae) selects probe mode: each candidate
+ * x(R -/+ F_i) is looked up in that set instead of the factor base, and every
+ * hit is reported as (target, i, j = index into probe_x, eps, tau = +1), with no
+ * j >= i filter -- the three-summand sweep against a pair table's abscissae.
+ * probe_x = NULL: the factor base, exactly as rf64_decompose. */
 typedef struct rf64_session rf64_session;
 int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint64_t *fb_y, uint32_t n_fb,
-                        uint32_t max_targets, uint32_t cap, const rf_options *opt,
+                        const uint64_t *probe_x, uint32_t n_probe, uint32_t max_targets, uint32_t cap, const rf_options *opt,
                         rf64_session **out, rf_result *info);
 int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const uint64_t *ty,
                            uint32_t n_targets, rf_relation *out, uint32_t cap, rf_result *res);
 void rf64_session_destroy(rf64_session *s);
+
+/* Create the CUDA context now when the CUDA backend is available (0 on success
+ * or when there is nothing to do). */
+int rf_warmup(void);
 
 /* 1 if the CUDA backend is compiled in and at least one device answers. */
 int rf_cuda_available(void);
