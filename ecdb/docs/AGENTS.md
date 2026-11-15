@@ -49,6 +49,10 @@ It holds:
   direction (horizontal, ascending, descending). End(E) is stored for 149,593
   census curves whose conductor is {2, 3, 5}-smooth; `ecdb import end-rings`
   computes it for every other ordinary census curve (Kohel's criterion).
+- Frobenius on E[ℓ] (ℓ ≤ 13) of every census curve: `curve_ell_torsion`
+  (action, rational ℓ-isogenies, torsion and isogeny field degrees, ψ_ℓ
+  factor degrees) and `frobenius_ell` (characteristic polynomial mod ℓ,
+  depth, splitting), from `ecdb import ell-torsion`.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).

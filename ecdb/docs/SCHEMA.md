@@ -6,7 +6,7 @@ isogenies, covers and DLP transfers. It reuses this repository's identity
 conventions (ICV1 for a curve model, EC1 for a representation) and its trait
 vocabulary, and it is loaded from catalogues that already exist here.
 
-Files: [`../migrations/`](../migrations/) (the schema, eight immutable
+Files: [`../migrations/`](../migrations/) (the schema, immutable
 migrations), [`../openapi.yaml`](../openapi.yaml) (the API),
 [`../README.md`](../README.md) (running and deploying it).
 
@@ -158,7 +158,7 @@ table with Vélu isogenies of elliptic curves, and `source_curve_id` /
 | `isogeny_class_fq` | isogeny classes of abelian varieties over F_q of any dimension. Holds the L-polynomial, the LMFDB-style label (computed for every q), trace, #A(F_q), point and curve counts over extensions, real Weil polynomial, p-rank, Newton slopes, ordinary / supersingular / almost-ordinary flags, simplicity and simple factors, angle rank, Q(pi), Jacobian and principal-polarization existence, twists, and LMFDB columns verbatim |
 | `curve_zeta` | the curve's own point counts, #C(F_{q^k}) for k = 1..g (one per degree of the class), and how they were established (`order_method`). Genus-1 rows hold #E(F_q); the genus-2 and genus-3 cover sources hold their exact counts, see "Frobenius data of the cover sources" below |
 | `frobenius_genus1` | t, t / 2 sqrt(q), t mod p (anomalous, supersingular), Delta = t^2 - 4q with factorization and unfactored cofactors, d_K, the CM field, v = [O_K : Z[pi]] with factorization, conductor fraction, class number h(d_K) |
-| `frobenius_ell` | what the class fixes per prime l: volcano depth v_l(v), splitting in Q(pi), and the number of rational l-isogenies when l does not divide v |
+| `frobenius_ell` | what the class fixes per prime l: volcano depth v_l(v), splitting in Q(pi), the number of rational l-isogenies when l does not divide v, and the characteristic polynomial X^2 - (t mod l) X + (q mod l) of Frobenius on E[l] (`frobenius_trace_mod_ell`, `frobenius_det_mod_ell`, migration 0013) |
 | `curve_ell_torsion` | what depends on the curve: Frobenius action on E[l] (scalar or Jordan block when l divides v, by the curve's volcano level; split / inert / ramified otherwise), its rational l-isogenies, fields of definition of l-torsion points, full l-torsion and l-isogenies, factorization pattern of psi_l |
 | `endomorphism_ring` | End(E) over the base field or the closure: imaginary quadratic order (discriminant f^2 d_K, conductor f, established bound f | f_0, maximality, the orders it contains), or a maximal order in B_{p,inf} (ramification, basis) for supersingular curves |
 | `endomorphism_level` | the level in each l-volcano (0 on the crater, the depth on the floor), with bounds and method |
@@ -424,6 +424,22 @@ No record was refused. The full run in a 4-CPU container took under an hour; ecd
 - **Verified so far (no deployed run yet).**
   - Without a database, `full_census_sweep` (an ignored test) covers every ordinary F_p-isomorphism class over 5 ≤ p < 2^10: 157,350 curves in 13,558 classes, and every class satisfies the h(f² D_K) counts. 7,750 of those curves have v that is not {2, 3, 5}-smooth: 6,818 are on the floor at some ℓ ≥ 7, and 932 are on the crater at every ℓ ≥ 7.
   - End to end, on a throwaway database with a census of every curve over 5 ≤ p < 140 and its ℓ = 2, 3, 5 isogenies, after `volcanoes`: 948 classes passed and 0 problems. All 3,944 stored End(E) rows and all 12,270 stored levels agree, 146 previously-null census curves were filled, and a second run inserted 0. A deliberately corrupted stored conductor was refused with its class.
+
+**Frobenius on E[ℓ] of every census curve** (`ecdb import ell-torsion`, `src/import/ell_torsion.rs`; also part of `ecdb import all`, after `end-rings`). For every short-Weierstrass curve over F_p, 5 ≤ p < 2^10 (the census-fp curves and any other stored curve over those fields) and ℓ ∈ {2, 3, 5, 7, 11, 13}, ℓ ≠ p, it computes the action of Frobenius on E[ℓ], which the census held only implicitly (rational ℓ-isogeny counts were read off the edge out-degree).
+
+- **Rule.** Frobenius has characteristic polynomial X² − (t mod ℓ) X + (p mod ℓ) on E[ℓ]. Its class in GL₂(F_ℓ) is fixed by that polynomial, except at a double root λ = t/2, where it is the scalar λ or a Jordan block; the scalar test of `end_ring.rs` (x^p ≡ x([λ]P) mod ψ_ℓ) decides. A matrix of that class gives `frobenius_action` (`split`, `inert`, `scalar`, `jordan`), `rational_isogenies` (the stable lines: 2, 0, ℓ + 1, 1), `torsion_point_degree`, `full_torsion_degree` (the order of the matrix), `isogeny_field_degree`, `all_isogenies_degree`, and the orbits on (E[ℓ] \ {0})/±1, which are the irreducible factors of ψ_ℓ (the cubic for ℓ = 2).
+- **Checks.** Each runs before any write; a failure is a reported problem and that (curve, ℓ) is not inserted:
+  - the trace is recounted from the model, the model is nonsingular, t is in the Hasse interval;
+  - ψ_ℓ is squarefree and is factored over F_p by distinct-degree factorization; the factor degrees must equal the orbit structure predicted from (t mod ℓ, p mod ℓ, scalar). The scalar and the Jordan block give different patterns, so this also confirms the scalar test;
+  - identities: the point degree is the least k with ℓ | #E(F_{p^k}) (traces by recurrence); p^k ≡ 1 (mod ℓ) at the full-torsion degree k, so full rational ℓ-torsion requires p ≡ 1 (mod ℓ) and ℓ² | #E(F_p); the scalar case has ℓ + 1 isogenies;
+  - for ℓ = 2, 3, 5 the isogeny count equals the out-degree of the complete census Vélu graph (census-fp curves and every source of a Vélu edge over these fields);
+  - with t² − 4p = v² D_K verified and D_K a negative fundamental discriminant (a stored (v, D_K) that fails is a reported problem, and depth, splitting and count stay NULL): ℓ ∤ v excludes the scalar (Kohel), ℓ | v requires scalar or Jordan, and the scalar holds exactly when a stored volcano level is below the depth;
+  - a stored `curve_ell_torsion` or `frobenius_ell` row (for example from `traits.json`) must agree in every non-null column.
+- **Writes.** `curve_ell_torsion` (status `proved`; `division_poly_factor_degrees` in the traits.json format `1^2 2 4^2`) and, per isogeny class and ℓ, `frobenius_ell`: the characteristic polynomial (`frobenius_trace_mod_ell`, `frobenius_det_mod_ell`, migration 0013), and for ordinary classes the depth v_ℓ(v), the splitting of ℓ in Q(π) by the Kronecker symbol (D_K/ℓ), and 1 + (D_K/ℓ) isogenies at depth 0 (checked against every member curve). Depth, splitting and count stay NULL for supersingular classes. Insert only: stored rows are checked, never changed, and a rerun inserts nothing.
+- **Pinned.** The eight prime-field curves of `traits.json` (p = 59 … 3529), whose `dissect.torsion` rows come from `src/cryptanalysis/curve_traits`, agree in every column for ℓ ≤ 13.
+- **Verified so far (no deployed run yet).**
+  - Without a database, `full_census_ell_torsion` (an ignored test, release build) runs every F_p-isomorphism class over 5 ≤ p < 2^10: all 160,862 curves (the census-fp count) pass every per-curve check for every ℓ ≠ p, in 309 s on one core; the importer spreads the work over up to 8 threads.
+  - End to end, on a throwaway database with the registry, traits, a census of every curve over 5 ≤ p < 140 with its ℓ = 2, 3, 5 isogenies, volcanoes and end-rings: 4,325 census-fp curves and 16 other curves, 25,962 (curve, ℓ) pairs, 0 problems (3 s). Every ℓ = 2, 3, 5 count agrees with the census graph (4,330 / 4,330 / 4,318 curves; the 12 curves over F₅ have no ℓ = 5 row), 2,581 stored volcano levels agree, and the 42 stored `traits.json` torsion rows and 42 `frobenius_ell` rows agree. It inserted 25,868 census-fp and 52 other `curve_ell_torsion` rows (census actions: 10,970 inert, 8,382 split, 5,537 Jordan, 978 scalar) and 5,808 `frobenius_ell` rows; a second run inserted 0. A deleted census Vélu edge, a corrupted stored ψ_ℓ pattern and a corrupted stored trace residue were each reported, and the affected (curve, ℓ) and class rows were refused (a refused pair is not re-inserted).
 
 These tables exist and still wait for a producer:
 
