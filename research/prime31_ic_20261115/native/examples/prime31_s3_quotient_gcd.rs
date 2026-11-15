@@ -462,9 +462,9 @@ fn m4_factorized_scale(base: &Base, ar: &mut Arithmetic) -> Result<(), String> {
             if size == 31 && factors != size * (size + 1) / 2 {
                 return Err("factorized B31 factor count changed".into());
             }
-            // Only inspect full signed lifts on the smallest case, where
-            // root splitting is already bounded and independently tested.
-            let verified_signed_rows = if size == 4 && kind == "planted-four" {
+            // Root splitting remains capped: test both small-fixture and B31
+            // planted witnesses, never an unbounded target enumeration.
+            let verified_signed_rows = if (size == 4 || size == 31) && kind == "planted-four" {
                 let (_, tuples) = m4_extract_from_eliminant(&xs, &k, target.0, &fast)?;
                 let rows = m4_signed_lifts(base, Some(target), &tuples, ar);
                 if kind == "planted-four" && rows.is_empty() {
@@ -484,7 +484,7 @@ fn m4_factorized_scale(base: &Base, ar: &mut Arithmetic) -> Result<(), String> {
                 "same_monic_eliminant_as_reference":reference_ns.is_some(),
                 "exceptional_u_equals_target_x":exc,
                 "gcd_degree":fast.len().saturating_sub(1),
-                "post_extraction_signed_rows_b4_only":verified_signed_rows,
+                "post_extraction_signed_rows_planted_B4_B31":verified_signed_rows,
                 "measured_cold_ECDLP":false
             }));
         }
