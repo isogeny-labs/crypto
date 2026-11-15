@@ -34,3 +34,9 @@ Built bounded collector and independent modular-parametrization verifier, not
 executed. Exact emittedpolynomial substitution and knowncontrol point required.
 Positivecell first; actualtarget only after passing control. NextKummerpublic
 input added for non-oracle sign recovery. Class reconstruction still open.
+
+## Initial collector producer failure
+Source942ab8f2385c/checkpoint215301 stopped exit101 BEFORE spawningmsolve: the
+manifestpaths are repository-relative while collectorcwd is study. No solver
+outputfiles created; retain POSITIVE-COLLECT and EXIT-POSITIVE. V2uses reporoot
+forhashcheck only; solverinput/limits/verifier unchanged. Freeze next.
