@@ -60,6 +60,24 @@ class SparseComponentInputs(unittest.TestCase):
         self.check([self.directory + "/" + name for name in
                     ("VALIDATION.json", "validator.json", "replay.json", "raw.json")])
 
+    def test_unpulled_artifact_store_input_cannot_be_silently_omitted(self):
+        self.manifest()
+        (self.evidence / ".artifacts.json").write_text(json.dumps({
+            "schema": "artifacts.manifest/v1",
+            "files": {"raw.json": {"sha256": "0" * 64, "bytes": 2}},
+        }))
+        with self.assertRaisesRegex(SystemExit, self.directory + "/raw.json"):
+            self.check([])
+
+    def test_pulled_artifact_store_input_is_accepted(self):
+        self.manifest()
+        (self.evidence / "raw.json").write_text("{}")
+        (self.evidence / ".artifacts.json").write_text(json.dumps({
+            "schema": "artifacts.manifest/v1",
+            "files": {"raw.json": {"sha256": "0" * 64, "bytes": 2}},
+        }))
+        self.check([])
+
 
 if __name__ == "__main__":
     unittest.main()

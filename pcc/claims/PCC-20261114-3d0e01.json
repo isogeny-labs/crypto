@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:47:53Z",
+ "id": "PCC-20261114-3d0e01",
+ "kind": "theorem",
+ "producer": {
+  "commit": "1e3f20752022a341a4612e6a72e8e5690f8c6baa",
+  "model": "",
+  "session": "norm-split-base-descent-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "a3206abbcef4b45debf77d2140892916b6626ec199292848af2a363859489fe7",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormSplitBaseDescent.pairFixedOnNodes"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration/context: Field L; prime p and CharP for Frobenius descent; explicitly fixed public abscissas and public square roots; actual monic norm divisor of public nodal polynomial; pole degree window proved, selected support and successful signs derived. Actual chart uses target outside base and computed support remainder0. DecidableEq on finite-set insertion helper, classically supplied by caller. General arbitrary-arity rigidity versus fixed degree5 actual specialization distinguished. No successful finder algorithm, coverage/retry, weighted closure/normal form or sub-exponential expected bit-cost theorem. Unsigned, fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormSplitBaseDescent.pairFixedOnNodes: theorem pairFixedOnNodes (phi : L \u2192+* L) (S : Finset L) (f A B : L[X]) (hNorm : A^2-f*B^2=Lagrange.nodal S id) (hm : A.Monic) (hf : f.map phi=f) (hx : \u2200 x\u2208S, phi x=x) (hy : \u2200 x\u2208S, \u2203 y : L, phi y=y \u2227 y^2=f.eval x) (a b : \u2115) (hA : A.natDegree\u2264a) (hB : B.natDegree\u2264b) (hcard : a+b<S.card) : A.map phi=A \u2227 B.map phi=B"
+}

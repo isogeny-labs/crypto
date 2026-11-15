@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T06:18:06Z",
+ "id": "PCC-20261114-20ffa4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "740732e95389e5185ed9a6547c18d8d889a6c580",
+  "model": "",
+  "session": "norm-weighted-count-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "efcc1e084246d65fd51477002542c187699cbfa944c63467a2229e232be47592",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormWeightedCount.mem_monomials"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Positive natural weights for completeness and radix bounds; all exponent vectors counted via explicit finite box and degree filter; exact slack multiset injection and mixed-radix encoding. Consecutive weights include zero variables and zero budget. No actual growing norm input grading, closure cutoff, finder, asymptotic specialization or total expected bit-cost theorem. Unsigned; independent gate and fresh replay pending at creation.",
+ "statement": "Exact finite combinatorial declaration NormWeightedCount.mem_monomials: theorem mem_monomials {v D : \u2115} {w : Fin v \u2192 \u2115} (hw : \u2200 i, 0 < w i) (e : Fin v \u2192 \u2115) : e \u2208 monomials w D \u2194 \u2211 i, w i * e i \u2264 D"
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T01:28:44Z",
+ "id": "PCC-20261114-5a50b9",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d265c35a0efc1efb609a396e451fd543ab838c21",
+  "model": "",
+  "session": "norm-target-fiber-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ce946874b415c359ac40eda417b85f55059a7520c5388cb1b602ee04c1809196",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormTargetFiber.targetRowsIff"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual declaration/context hypotheses: CommRing, Nontrivial ring where needed, and Field for field specializations/factor removal. Curve equation, d>=3, bounded remainder and e!=0 premises are explicit. Actual computed norm/division/remainder and base change only; no weighted-degree29, low closure, finder or sub-exponential claim. Unsigned source-bound evidence.",
+ "statement": "Exact source-bound theorem NormTargetFiber.targetRowsIff: theorem targetRowsIff (V : R[X]) (q : R) (hV : V.natDegree\u22644) : V=0 \u2194 V.eval q=0 \u2227 \u2200 j, 1\u2264j \u2192 j\u22644 \u2192 V.coeff j=0"
+}

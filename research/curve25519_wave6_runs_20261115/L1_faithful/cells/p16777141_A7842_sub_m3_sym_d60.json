@@ -1,0 +1,23 @@
+{
+ "miniature": "p=16777141,A=7842",
+ "kind": "sub",
+ "form": "sym",
+ "m": 3,
+ "d_or_t": 60,
+ "capped": true,
+ "failure": "exit -6",
+ "stderr": "memory allocation of 42832 bytes failed\nstack backtrace:\nnote: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.\n",
+ "ext": {
+  "study": "curve25519_wave6_runs_20261115/L1_faithful",
+  "cap_s": 1800,
+  "mem_kb": 6000000,
+  "load_before": 1.0,
+  "load_after": 1.0,
+  "wall_s": 1523.8,
+  "started_utc": "2026-11-15T03:25:08Z",
+  "bin_sha256": "5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746",
+  "exit": -6,
+  "cmd": "ulimit -v 6000000; RAYON_NUM_THREADS=1 /home/user/ctarget-f1/release/curve25519_family f4sub p=16777141,A=7842 sub 60 0 mont 3 sym 6 20264168 1800",
+  "env_extra": []
+ }
+}

@@ -8,7 +8,8 @@
 //! Only the census graphs are used (p < 2^10; a census record that matched an
 //! existing ecdb curve keeps that curve's family, so vertices are the census
 //! curves plus every source of a stored Velu edge there): they hold every curve over F_p
-//! and every rational ℓ-isogeny between them (ℓ = 2, 3, 5), so each component
+//! and every rational ℓ-isogeny between them (ℓ = 2, 3, 5 from the Sage census;
+//! ℓ = 7, 11, 13 from `ell_isogenies.rs`, field by field), so each component
 //! is complete. Before anything is written, a class and ℓ must pass every
 //! check below; otherwise it is reported and skipped:
 //! - every out-degree is 1 + (D_K/ℓ) when d = 0, and ℓ + 1 or 1 when d ≥ 1;
@@ -20,9 +21,9 @@
 //! - `isogeny_volcano` components and their `volcano_vertex` rows;
 //! - `endomorphism_level`;
 //! - each edge's direction;
-//! - `endomorphism_ring` when v is {2, 3, 5}-smooth, which pins f_E = ∏ ℓ^level.
+//! - `endomorphism_ring` when v is {2, 3, 5, 7, 11, 13}-smooth, which pins f_E = ∏ ℓ^level.
 //!
-//! ℓ = p (the classes over F_5 at ℓ = 5) is skipped: there is no volcano in
+//! ℓ = p (the classes over F_5 at ℓ = 5, F_7, F_11, F_13 at ℓ = 7, 11, 13) is skipped: there is no volcano in
 //! characteristic ℓ.
 //!
 //! Every other curve with a known conductor gets level 0 for each ℓ ∤ v: its
@@ -36,7 +37,8 @@ use num_traits::{ToPrimitive, Zero};
 use serde_json::json;
 use std::collections::{BTreeMap, VecDeque};
 
-const ELLS: [u64; 3] = [2, 3, 5];
+/// ℓ = 2, 3, 5 from the Sage census records; ℓ = 7, 11, 13 from `ell_isogenies.rs`.
+const ELLS: [u64; 6] = [2, 3, 5, 7, 11, 13];
 
 const VERTICES_SQL: &str = "
 SELECT c.id, ic.id, ic.p::text, fg.conductor_v::text, fg.cm_discriminant::text, fg.trace::text,
@@ -54,7 +56,12 @@ SELECT i.id, i.source_curve_id, i.target_curve_id, i.ell::int8
 FROM ec.isogeny i
 JOIN ec.abelian_variety av ON av.curve_id = i.source_curve_id
 JOIN ec.isogeny_class_fq ic ON ic.id = av.isogeny_class_id
-WHERE ic.p < 1024 AND i.formula = 'velu' AND i.ell IN (2, 3, 5)";
+WHERE ic.p < 1024 AND i.formula = 'velu' AND i.ell IN (2, 3, 5, 7, 11, 13)";
+
+/// ℓ = 7, 11, 13: the curves whose rational ℓ-isogenies `ell_isogenies.rs` marked complete.
+const COMPLETE_SQL: &str = "
+SELECT t.curve_id, t.ell::int8 FROM ec.curve_ell_torsion t
+WHERE t.ell IN (7, 11, 13) AND t.rational_isogenies IS NOT NULL";
 
 const VOLCANO_SQL: &str = "
 INSERT INTO ec.isogeny_volcano (isogeny_class_id, ell, depth, crater_size, crater_shape, vertex_count, is_complete,
@@ -96,12 +103,12 @@ SELECT c.id, l.ell, 0, 0, 'v_l(v) = 0: the l-volcano is a bare crater', 'proved'
 FROM ec.curve c
 JOIN ec.abelian_variety av ON av.curve_id = c.id
 JOIN ec.frobenius_genus1 fg ON fg.isogeny_class_id = av.isogeny_class_id
-CROSS JOIN (VALUES (2::numeric), (3::numeric), (5::numeric)) AS l(ell)
+CROSS JOIN (VALUES (2::numeric), (3::numeric), (5::numeric), (7::numeric), (11::numeric), (13::numeric)) AS l(ell)
 WHERE c.genus = 1 AND fg.conductor_v IS NOT NULL AND NOT coalesce(fg.is_supersingular, false)
   AND mod(fg.conductor_v, l.ell) <> 0
 ON CONFLICT (curve_id, ell) DO NOTHING";
 
-/// The Kronecker symbol (D/ℓ) for a fundamental discriminant D and ℓ ∈ {2, 3, 5}.
+/// The Kronecker symbol (D/ℓ) for a fundamental discriminant D and a prime ℓ (Euler's criterion for odd ℓ).
 pub fn kronecker(d: &BigInt, l: u64) -> i64 {
     if l == 2 {
         if d.is_even() {
@@ -113,7 +120,7 @@ pub fn kronecker(d: &BigInt, l: u64) -> i64 {
     if r == 0 {
         return 0;
     }
-    // Euler's criterion for small odd ℓ
+    // Euler's criterion for odd ℓ
     let e = (1..=((l - 1) / 2)).fold(1u64, |acc, _| acc * r % l);
     if e == 1 {
         1
@@ -288,6 +295,10 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
         edge_ids.entry(l as u64).or_default().push((id, s, t));
     }
     report.count("census_vertices", vertices.len() as u64);
+    let mut complete: std::collections::BTreeSet<(i64, u64)> = std::collections::BTreeSet::new();
+    for r in client.query(COMPLETE_SQL, &[]).await? {
+        complete.insert((r.get(0), r.get::<_, i64>(1) as u64));
+    }
 
     let (mut volcanoes, mut vrows, mut lrows) = (Vec::new(), Vec::new(), Vec::new());
     let mut levels_by: BTreeMap<(u64, i64), u32> = BTreeMap::new();
@@ -298,6 +309,11 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
         for l in ELLS {
             if l == first.p {
                 report.count("classes_skipped_l_equals_p", 1); // no volcano: l-isogenies in characteristic l
+                continue;
+            }
+            // ℓ >= 7: only graphs whose every vertex was marked complete (ell_isogenies.rs)
+            if l >= 7 && !verts.iter().all(|v| complete.contains(&(*v, l))) {
+                report.count(&format!("classes_skipped_l{l}_graph_not_complete"), 1);
                 continue;
             }
             let depth = val(&first.v, l);
@@ -353,7 +369,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     }
     report.count("isogeny_directions", bulk1(client, DIRECTION_SQL, &dirs).await?);
 
-    // End(E) where v is {2,3,5}-smooth and every level is known
+    // End(E) where v is {2,3,5,7,11,13}-smooth and every level is known
     let mut ends = Vec::new();
     for (id, vx) in &vertices {
         let mut rest = vx.v.clone();
@@ -372,7 +388,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
         if known && rest == BigInt::from(1) {
             ends.push(json!({ "curve_id": id, "disc": (&f * &f * &vx.d_k).to_string(), "f": f.to_string(),
                 "v": vx.v.to_string(),
-                "method": "f = prod over l | v of l^level (volcano levels), v {2,3,5}-smooth" }));
+                "method": "f = prod over l | v of l^level (volcano levels), v {2,3,5,7,11,13}-smooth" }));
             let _ = vx.class_id;
         }
     }
