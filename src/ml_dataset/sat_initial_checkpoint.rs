@@ -166,3 +166,6 @@ impl WithLedger<'_> {
         }
     }
 }
+
+#[path = "sat_search_owned.rs"]
+pub(in crate::ml_dataset::solvers) mod search;

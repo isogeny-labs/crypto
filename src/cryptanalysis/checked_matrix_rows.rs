@@ -70,3 +70,83 @@ mod integration_tests {
   }
  }
 }
+
+/// Static window avoids a borrowed local buffer or a second copied window owner.
+/// The source itself is moved, never rebound from a digest or raw polynomial list.
+pub struct OwnedRows {
+    source: super::OwnedExpansion,
+    window: &'static [sparse::Monomial],
+    attempt: Option<rows::Attempt>,
+    failure: Option<Failure>,
+    owner_failure: Option<Error>,
+}
+pub fn reduce_owned(source: super::OwnedExpansion, window: &'static [sparse::Monomial], limits: Limits, owner: &mut impl Admission) -> OwnedRows {
+    if source.status().is_err() {
+        return OwnedRows { source, window, attempt: None, failure: Some(Failure::Incomplete), owner_failure: None };
+    }
+    let mut bridge = Bridge { owner, last: None };
+    let attempt = rows::reduce(source.variables(), source.equations(), window, limits, &mut bridge);
+    let failure = attempt.result.err();
+    OwnedRows { source, window, attempt: Some(attempt), failure, owner_failure: bridge.last }
+}
+impl OwnedRows {
+    pub fn source(&self) -> &super::OwnedExpansion { &self.source }
+    pub fn failure(&self) -> Option<Failure> { self.failure }
+    pub fn owner_failure(&self) -> Option<Error> { self.owner_failure }
+    pub fn rows(&self) -> usize { self.attempt.as_ref().map_or(0, |a| a.basis.len()) }
+}
+pub struct OwnedCertificate {
+    rows: OwnedRows,
+    wire: Option<rows::Encoded>,
+    audit: Option<Audit>,
+    failure: Option<Failure>,
+    owner_failure: Option<Error>,
+}
+pub fn certify_owned(rows: OwnedRows, row: usize, limits: Limits, checker: CheckerLimits, deadline: Instant, owner: &mut impl Admission) -> OwnedCertificate {
+    let mut out = OwnedCertificate { rows, wire: None, audit: None, failure: None, owner_failure: None };
+    if let Some(f) = out.rows.failure { out.failure = Some(f); return out; }
+    let mut bridge = Bridge { owner, last: None };
+    let wire = rows::encode_retained(out.rows.source.variables(), out.rows.source.equations(), out.rows.window, out.rows.attempt.as_ref().unwrap(), row, limits, &mut bridge);
+    out.failure = wire.result.err(); out.wire = Some(wire);
+    if out.failure.is_none() {
+        let checked = rows::independent_check_retained(&out.wire.as_ref().unwrap().raw, checker, deadline, &mut bridge);
+        out.failure = checked.failure; out.audit = checked.audit;
+        if out.failure.is_none() && out.audit.as_ref().is_some_and(|a| a.result.is_err()) { out.failure = Some(Failure::Checker); }
+    }
+    out.owner_failure = bridge.last; out
+}
+impl OwnedCertificate {
+    pub fn rows(&self) -> &OwnedRows { &self.rows }
+    pub fn raw(&self) -> Option<&[u8]> { self.wire.as_ref().map(|w| w.raw.as_slice()) }
+    pub fn audit(&self) -> Option<&Audit> { self.audit.as_ref() }
+    pub fn failure(&self) -> Option<Failure> { self.failure }
+    pub fn owner_failure(&self) -> Option<Error> { self.owner_failure }
+}
+
+/// Retained arithmetic replay against the complete ordered checked-map source.
+/// A caller still needs original/capture authority before publishing a seal.
+pub struct OwnedReplay {
+    source: super::OwnedExpansion,
+    raw: Vec<u8>,
+    audit: Option<Audit>,
+    failure: Option<Failure>,
+    owner_failure: Option<Error>,
+}
+pub fn replay_owned(source: super::OwnedExpansion, raw: Vec<u8>, limits: CheckerLimits, deadline: Instant, owner: &mut impl Admission) -> OwnedReplay {
+    let mut out=OwnedReplay{source,raw,audit:None,failure:None,owner_failure:None};
+    if out.source.status().is_err(){out.failure=Some(Failure::Incomplete);return out}
+    let Some(work)=limits.caps.iter().try_fold(0u64,|n,v|n.checked_add(*v)) else{out.failure=Some(Failure::Overflow);return out};
+    if let Err(e)=owner.reserve(Quote{work,bytes:limits.caps[bqi::Resource::AllocationBytes as usize]}){out.failure=Some(Failure::Owner);out.owner_failure=Some(e);return out}
+    if let Err(e)=owner.check(){out.failure=Some(Failure::Owner);out.owner_failure=Some(e);return out}
+    out.audit=Some(bqi::verify_expected(&out.raw,out.source.variables(),out.source.equations(),limits,deadline));
+    if out.audit.as_ref().unwrap().result.is_err(){out.failure=Some(Failure::Checker)}
+    if let Err(e)=owner.check(){out.owner_failure=Some(e);out.failure.get_or_insert(Failure::Owner);}
+    out
+}
+impl OwnedReplay {
+    pub fn source(&self)->&super::OwnedExpansion{&self.source}
+    pub fn raw(&self)->&[u8]{&self.raw}
+    pub fn audit(&self)->Option<&Audit>{self.audit.as_ref()}
+    pub fn failure(&self)->Option<Failure>{self.failure}
+    pub fn owner_failure(&self)->Option<Error>{self.owner_failure}
+}

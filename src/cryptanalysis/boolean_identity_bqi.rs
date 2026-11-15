@@ -90,11 +90,15 @@ pub enum Exhaustion {
     ArithmeticOverflow,
     Allocation,
     Deadline,
+    /// Original-owner admission refused this exact request. Its ancestor may
+    /// have reserved before a later postcheck failed; consult that owner ledger.
+    Admission { resource: Resource, amount: u64 },
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Failure {
     Malformed(Syntax),
     EqualityMismatch,
+    SourceMismatch,
     Unknown(Exhaustion),
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -111,12 +115,13 @@ pub struct Audit {
     pub source_authenticated: bool,
     pub native_operation_witness: bool,
 }
-struct Meter {
+struct Meter<'a> {
     limits: Limits,
     charges: Charges,
     deadline: Instant,
+    admission: Option<&'a mut dyn FnMut(Resource, u64) -> Result<(), ()>>,
 }
-impl Meter {
+impl Meter<'_> {
     fn charge(&mut self, resource: Resource, amount: u64) -> Result<(), Failure> {
         let probe = Resource::DeadlineProbes as usize;
         let next = self.charges.used[probe]
@@ -127,6 +132,7 @@ impl Meter {
                 Resource::DeadlineProbes,
             )));
         }
+        self.admit(Resource::DeadlineProbes, 1)?;
         self.charges.used[probe] = next;
         if Instant::now() >= self.deadline {
             return Err(Failure::Unknown(Exhaustion::Deadline));
@@ -138,7 +144,15 @@ impl Meter {
         if next > self.limits.caps[i] {
             return Err(Failure::Unknown(Exhaustion::Resource(resource)));
         }
+        self.admit(resource, amount)?;
         self.charges.used[i] = next;
+        Ok(())
+    }
+    fn admit(&mut self, resource: Resource, amount: u64) -> Result<(), Failure> {
+        if let Some(admission) = self.admission.as_mut() {
+            admission(resource, amount).map_err(|()|
+                Failure::Unknown(Exhaustion::Admission { resource, amount }))?;
+        }
         Ok(())
     }
     fn vector<T>(&mut self, count: usize) -> Result<Vec<T>, Failure> {
@@ -291,7 +305,7 @@ struct ProofTerm {
     generator: usize,
     multiplier: Mono,
 }
-fn arithmetic(bytes: &[u8], meter: &mut Meter) -> Result<Degrees, Failure> {
+fn arithmetic(bytes: &[u8], expected: Option<(u32, &[Poly])>, meter: &mut Meter) -> Result<Degrees, Failure> {
     meter.charge(Resource::EncodedBytes, bytes.len() as u64)?;
     meter.charge(Resource::Validation, 5)?;
     if !bytes.starts_with(b"BQI1 ") {
@@ -311,6 +325,21 @@ fn arithmetic(bytes: &[u8], meter: &mut Meter) -> Result<Degrees, Failure> {
         meter.charge(Resource::Validation, 1)?;
         generators.push(parser.poly(n, meter)?);
     }
+    if let Some((variables, equations)) = expected {
+        meter.charge(Resource::Validation, 1)?;
+        if n != variables || generators.len() != equations.len() {
+            return Err(Failure::SourceMismatch);
+        }
+        for (actual, expected) in generators.iter().zip(equations) {
+            meter.charge(Resource::Validation, 1)?;
+            if actual.len() != expected.len() { return Err(Failure::SourceMismatch); }
+            for (actual, expected) in actual.iter().zip(expected) {
+                if cmp(actual, expected, meter)? != Ordering::Equal {
+                    return Err(Failure::SourceMismatch);
+                }
+            }
+        }
+    }
     let target = parser.poly(n, meter)?;
     let count = parser.integer(meter)?;
     if count > meter.limits.proof_terms {
@@ -324,6 +353,7 @@ fn arithmetic(bytes: &[u8], meter: &mut Meter) -> Result<Degrees, Failure> {
             return Err(Failure::Malformed(Syntax::Generator));
         }
         let multiplier = parser.mono(n, meter)?;
+        if expected.is_some() && !multiplier.is_empty() { return Err(Failure::SourceMismatch); }
         if let Some(previous) = proof.last() {
             meter.charge(Resource::Validation, 1)?;
             if generator < previous.generator
@@ -395,14 +425,45 @@ pub fn verify_untrusted(bytes: &[u8], limits: Limits, deadline: Instant) -> Audi
         limits,
         charges: Charges::default(),
         deadline,
+        admission: None,
     };
-    let result = arithmetic(bytes, &mut meter);
+    let result = arithmetic(bytes, None, &mut meter);
     Audit {
         result,
         charges: meter.charges,
         source_authenticated: false,
         native_operation_witness: false,
     }
+}
+
+/// Incremental caller-owned admission before each accepted resource charge and
+/// before the corresponding computation/allocation. Local caps and the original
+/// absolute deadline remain unchanged. Callback contract: every successful
+/// return must enforce that SAME original deadline after its reservation and
+/// postchecks. This function does not impose a second unmetered clock probe
+/// around an arbitrary callback; the native bridge satisfies this contract via
+/// Meter::pay. Successful admissions contribute to the
+/// same nine counters as verify_untrusted. A refusal retains the exact request
+/// in Unknown(Admission); an ancestor may already have reserved before returning
+/// a postcheck failure, so this is not a claim that the parent spent zero.
+/// The caller must retain its original ledger, including that refused request.
+pub fn verify_untrusted_admitted(
+    bytes: &[u8], limits: Limits, deadline: Instant,
+    admission: &mut impl FnMut(Resource, u64) -> Result<(), ()>,
+) -> Audit {
+    let mut meter = Meter { limits, charges: Charges::default(), deadline,
+        admission: Some(admission) };
+    let result = arithmetic(bytes, None, &mut meter);
+    Audit { result, charges: meter.charges, source_authenticated: false,
+        native_operation_witness: false }
+}
+
+/// Private to the checked-map parent module. Expected source is supplied only
+/// after checked-map reconstruction; comparison itself does not mint authority.
+pub(super) fn verify_expected(bytes: &[u8], variables: u32, equations: &[Poly], limits: Limits, deadline: Instant) -> Audit {
+    let mut meter = Meter { limits, charges: Charges::default(), deadline, admission: None };
+    let result = arithmetic(bytes, Some((variables, equations)), &mut meter);
+    Audit { result, charges: meter.charges, source_authenticated: false, native_operation_witness: false }
 }
 
 #[cfg(test)]
@@ -717,4 +778,23 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn expected_source_rejects_valid_foreign_and_reordered_generator_identities(){
+        let generators=vec![vec![vec![0]],vec![vec![1]]];
+        let bytes=wire(2,&generators,&generators[0],&[(0,vec![])]);
+        let deadline=Instant::now()+Duration::from_secs(10);
+        assert!(verify_untrusted(&bytes,Limits::software(),deadline).result.is_ok());
+        assert!(verify_expected(&bytes,2,&generators,Limits::software(),deadline).result.is_ok());
+        let reordered=vec![generators[1].clone(),generators[0].clone()];
+        assert_eq!(verify_expected(&bytes,2,&reordered,Limits::software(),deadline).result,Err(Failure::SourceMismatch));
+        assert_eq!(verify_expected(&bytes,3,&generators,Limits::software(),deadline).result,Err(Failure::SourceMismatch));
+        let foreign=vec![vec![vec![]],vec![vec![1]]];
+        let foreign_bytes=wire(2,&foreign,&foreign[0],&[(0,vec![])]);
+        assert!(verify_untrusted(&foreign_bytes,Limits::software(),deadline).result.is_ok());
+        assert_eq!(verify_expected(&foreign_bytes,2,&generators,Limits::software(),deadline).result,Err(Failure::SourceMismatch));
+        let multiplied=wire(2,&generators,&vec![vec![0,1]],&[(0,vec![1])]);
+        assert!(verify_untrusted(&multiplied,Limits::software(),deadline).result.is_ok());
+        assert_eq!(verify_expected(&multiplied,2,&generators,Limits::software(),deadline).result,Err(Failure::SourceMismatch));
+    }
+
 }

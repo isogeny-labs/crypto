@@ -1163,3 +1163,13 @@ pub fn check_imported(
         }),
     }
 }
+
+#[path = "checked_binary_sat_model.rs"]
+pub mod checked_model;
+
+#[path="checked_binary_search_lift.rs"]
+pub mod signed_lift;
+
+#[cfg(all(test, sat_qualification_child))]
+#[path = "sat_qualification_reference.rs"]
+pub mod qualification_reference;

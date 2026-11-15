@@ -311,6 +311,7 @@ impl Custody {
             map_ack,
             publication_attempted,
             map_published,
+            boolean_attempted: _, // original owner is consumed; no row retry authority survives
             capture_limits,
         } = o;
         self.public_sha256 = original.public_sha256;

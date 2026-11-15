@@ -19,6 +19,7 @@ struct Math {
     b: F2mElement,
     irr: IrreduciblePoly,
     target: Option<F2mElement>,
+    signed_target: Option<(u64, u64)>,
     signed: Vec<(u64, u64)>,
     codes: Vec<BigUint>,
 }
@@ -30,6 +31,7 @@ struct DecodedParts {
     a: Option<F2mElement>,
     b: Option<F2mElement>,
     target: Option<Option<F2mElement>>,
+    signed_target: Option<Option<(u64, u64)>>,
     low_terms: Vec<u32>,
     signed: Vec<(u64, u64)>,
     codes: Vec<BigUint>,
@@ -85,6 +87,7 @@ pub(super) struct OriginalOwner<'a> {
     map_ack: Option<capture::CommittedEventPosition>,
     publication_attempted: bool,
     map_published: bool,
+    boolean_attempted: bool,
     capture_limits: capture::CaptureLimits,
 }
 
@@ -196,6 +199,11 @@ fn decode_into(
         // Native binary point format uses the same infinity tag as group replay.
         state.a = Some(field(a, c.n));
         state.b = Some(field(b, c.n));
+        state.signed_target = Some(if p["target"].is_null() {
+            None
+        } else {
+            Some((scalar(&p["target"]["x"])?, scalar(&p["target"]["y"])?))
+        });
         state.target = Some(if p["target"].is_null() {
             None
         } else {
@@ -250,6 +258,10 @@ fn decode_into(
                 low_terms: std::mem::take(&mut state.low_terms),
             },
             target: state.target.take().expect("decoder assigned target"),
+            signed_target: state
+                .signed_target
+                .take()
+                .expect("decoder assigned signed target"),
             signed: std::mem::take(&mut state.signed),
             codes: std::mem::take(&mut state.codes),
         });
@@ -364,6 +376,7 @@ impl<'a> OriginalOwner<'a> {
                     map_ack: None,
                     publication_attempted: false,
                     map_published: false,
+                    boolean_attempted: false,
                     capture_limits: capture_limits.clone(),
                 })
             }
@@ -953,3 +966,24 @@ pub(in crate::ml_dataset::solvers) mod central;
 
 #[path = "sat_initial_worker.rs"]
 pub(in crate::ml_dataset::solvers) mod worker;
+
+// Original-ledger finite Boolean row producer; no CLI activation.
+#[path = "original_boolean_rows.rs"]
+pub(in crate::ml_dataset::solvers) mod boolean_rows;
+
+#[path="original_boolean_search.rs"]
+pub(in crate::ml_dataset::solvers) mod boolean_search;
+
+#[path = "affine_row_central.rs"]
+pub(in crate::ml_dataset::solvers) mod affine_central;
+#[path = "original_affine_rows.rs"]
+pub(in crate::ml_dataset::solvers) mod affine_rows;
+
+#[path = "affine_boolean_row_worker.rs"]
+pub(in crate::ml_dataset::solvers) mod affine_worker;
+
+#[path="sat_search_worker.rs"]
+pub(in crate::ml_dataset::solvers) mod search_worker;
+
+#[path="owned_boolean_search_worker.rs"]
+pub(in crate::ml_dataset::solvers) mod owned_search_worker;

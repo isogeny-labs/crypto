@@ -1,0 +1,25 @@
+from pathlib import Path
+import json,hashlib,datetime
+P=Path(__file__).parent; B=P.parent
+bindings=json.loads((P/'SOURCE_BINDINGS.json').read_text())
+for rel in ['src/ml_dataset/affine_boolean_row_worker.rs','src/ml_dataset/types.rs','src/ml_dataset/sat_original_owner.rs']:
+ x=B/'sat-cli-native-recovery-20261107/source'/rel
+ bindings.append(dict(path=str(x),sha256=hashlib.sha256(x.read_bytes()).hexdigest(),bytes=x.stat().st_size))
+(P/'SOURCE_BINDINGS.json').write_text(json.dumps(bindings,indent=2)+'\n')
+receipt={'schema':'local-policy-entry-controls/v1','observed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'compile_exit_code':0,'test_exit_code':0,'passed':21,'new_policy_tests':5,'unchanged_donor_tests':16,'failed':0,'commands':['timeout 60 bash -c \'ulimit -v 1572864; ulimit -t 60; rustc --edition=2021 --test harness.rs -o policy-tests\'','timeout 30 ./policy-tests --test-threads=1'],'compiled_scope':['mechanically extracted original Budget core','exact scheduler/checker/continuation modules and types','mechanically extracted actual equation Limits','policy from_budget, eligible_inputs, and their tests'],'not_compiled':['authentic OriginalOwner consuming entry','CaseConfig projection wrapper','production module registration and dispatch'],'cloud_jobs':0,'scientific_records':0,'sat_recovery_attempts':0}
+(P/'TEST_RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
+(P/'README.md').write_text('''# Finite policy factory and consuming original-owner entry
+
+Source proposal, not active worker dispatch. The entry takes an explicit `ProposedPolicy::ConservativeAffineEnvelopeV1` instead of arbitrary caller Caps. It reserves the existing setup admission, checks the existing capture directory and attempt limits, derives finite caps from remaining original work and memory, then checks the original deadline. Success and failure both move all owner fields and the sink into the retained attempt. No owner is cloned and no deadline, ledger or allowance is created. The exact context patch targets the published owning-continuation donor bound in SOURCE_BINDINGS.json.
+
+The affine worker's existing finite cap constants supply a conservative proposed algorithm envelope: 4,000,000 work, 8,000,000 bytes, 4096 structural counts, degree 64, one row per batch, wire 65536, and its nine checker caps. Each cap is further restricted by remaining admitted resources; expansion retains original quarter-memory ceiling. The owning adapter still re-clamps continuation after actual phase admission. The shared original Budget remains authoritative across all stages; checker cap sums can fail admission and never raise that budget. This is a new source-level proposed choice, not authorization to run a new scientific policy. The request projection only accepts f4, supported ordinary binary/Koblitz profiles, positive work/base/degree, and no existing channel request. A new versioned frozen request and dispatch integration remain necessary; v1-v4 meanings are unchanged.
+
+Focused validation: 21 passing tests, comprising five factory controls and 16 unchanged donor tests. The five check all envelope fields and unchanged owner identity/counters/deadlines, remaining shared allowances, construction memory restriction, sticky stops/wrong phase/zero allowance, and the primitive request gate. Genuine original Budget core, genuine limit declarations, and unchanged scheduler/continuation/checker modules compile together. `prepare.py` documents mechanical extraction: production imports, CaseConfig wrapper and owner wrapper are omitted; visibility and Phase paths are normalized. The fifth test checks the primitive gate used by CaseConfig projection, not serde parsing or channel schema deserialization. CaseConfig field types and original profile were read and hash-bound. The authentic consuming owner is not compiled by this harness; a full-source assembled type check remains required. No fake OriginalOwner or arithmetic map is supplied as a substitute.
+
+No cloud run, scientific generation, deadline renewal, SAT recovery attempt, active dispatch, Git mutation or upload was performed. The partial earlier draft remains untouched. Reproduce within a bounded local resource envelope using the commands in TEST_RECEIPT.json. `prepare.py` regenerates source and harness; `finalize.py` records the observed validation and binds source inputs. The final manifest binds all retained packet files including test binary and logs. No failed compile or test attempt occurred in this packet.
+''')
+files=[]
+for f in sorted(P.iterdir()):
+ if f.is_file() and f.name!='MANIFEST.json':files.append(dict(path=f.name,sha256=hashlib.sha256(f.read_bytes()).hexdigest(),bytes=f.stat().st_size))
+(P/'MANIFEST.json').write_text(json.dumps({'schema':'source-proposal-packet/v1','files':files},indent=2)+'\n')
+print(json.dumps({'manifest_sha256':hashlib.sha256((P/'MANIFEST.json').read_bytes()).hexdigest(),'files':len(files),'policy_sha256':hashlib.sha256((P/'original_boolean_search_policy.rs').read_bytes()).hexdigest(),'entry_sha256':hashlib.sha256((P/'original_boolean_search.proposed.rs').read_bytes()).hexdigest()},indent=2))
