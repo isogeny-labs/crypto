@@ -599,10 +599,7 @@ fn run(args: &[String]) -> Result<Value> {
         *reason == "container cleanup unverified" || *reason == "container kill failed"
     }) {
         "PRODUCER_FAILURE_container_cleanup"
-    } else if failure
-        .iter()
-        .any(|reason| *reason == "frozen source/input/binary changed")
-    {
+    } else if failure.contains(&"frozen source/input/binary changed") {
         "PRODUCER_FAILURE_frozen_input_changed"
     } else if timed_out {
         "UNKNOWN_wall_cap"
