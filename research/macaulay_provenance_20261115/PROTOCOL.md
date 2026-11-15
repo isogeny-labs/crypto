@@ -87,3 +87,25 @@ remapped compactly. The producer still generates/reduces the entire prescribed
 Macaulay rowspace and logs its total counts. Unused internal rows are not part
 of the successful basis-membership proof object. No raw file is truncated or
 removed, and this compact proof does not certify a negative rowspace/rank claim.
+
+## Amendment A1 — keep original generators in the candidate
+
+First panel: all6 small ideals pass and all4 adversarial certificates are
+rejected for their declared reasons. The natural D4/5/6 candidates all fail
+original-generator inclusion, although their source row identities pass.
+Dropping nonminimal-leading pivots before completion can generate a proper
+subideal; the checker correctly refuses it. Preserve qualification-001.
+
+Repair candidate construction by retaining every nonzero original generator
+in addition to the minimal-leading pivot subset (omit exact duplicate
+polynomials only). Each added original has its trivial source-row certificate.
+Keep the exact same provenance, original-inclusion and Buchberger checks and
+all caps. This preserves I=J even if the candidate is still not a complete GB.
+It does not assert GB completion or a degree bound.
+
+Before new calls, freeze exactly one repeat of the same6+4+3 panel in a fresh
+qualification-002, with new source/binary hashes captured first. Preserve the
+old binaries/source commit38c0d23859 and raw panel. No degree, support, time,
+memory or verifier criterion is loosened, and no further retry is authorized
+by A1. The repeat is justified by this actual candidate-construction change;
+completion may still remain unknown. No timing comparison is admitted.

@@ -12,8 +12,10 @@ void subtract(Weights&a,const Weights&b,U factor,U p){
 class Producer{
     const System&s;unsigned degree;Stats&stats;std::vector<RowDefinition> rows;
     std::map<Monomial,Pivot> pivots;
+    std::vector<std::size_t> original_ids;
     void emit(std::size_t eq,const Monomial&m){
         require(rows.size()<row_cap,"input-multiple count cap");const auto id=rows.size();rows.push_back({eq,m});++stats.rows;
+        if(canonical::degree(m)==0)original_ids.at(eq)=id;
         Pivot row{multiple(s.equations[eq],m),{{id,1}}};
         while(!row.poly.terms.empty()){
             require(stats.entries+row.poly.terms.size()+row.weights.size()<=entry_cap,"live-entry cap");
@@ -33,7 +35,7 @@ class Producer{
         for(unsigned e=0;e<=remaining;++e){m[at]=e;enumerate(eq,m,at+1,remaining-e);}m[at]=0;
     }
 public:
-    Producer(const System&input,unsigned d,Stats&counts):s(input),degree(d),stats(counts){}
+    Producer(const System&input,unsigned d,Stats&counts):s(input),degree(d),stats(counts),original_ids(input.equations.size(),row_cap){}
     void run(const std::filesystem::path&basis,const std::filesystem::path&certificate){
         for(std::size_t i=0;i<s.equations.size();++i){const auto&f=s.equations[i];if(f.terms.empty())continue;
             require(f.largest_degree()<=degree,"input degree exceeds cap");Monomial m(s.names.size());enumerate(i,m,0,degree-f.largest_degree());}
@@ -41,6 +43,12 @@ public:
         for(const auto&entry:pivots){bool minimal=true;for(const auto&other:pivots){
             if(entry.first!=other.first&&quotient::divides(other.first,entry.first)){minimal=false;break;}}
             if(minimal)selected.push_back(&entry.second);}
+        std::vector<Pivot> originals;originals.reserve(s.equations.size());
+        for(std::size_t i=0;i<s.equations.size();++i){const auto&f=s.equations[i];if(f.terms.empty())continue;
+            bool present=false;for(const auto*row:selected)if(row->poly.terms==f.terms){present=true;break;}
+            if(present)continue;
+            require(original_ids.at(i)<rows.size(),"missing original source row");
+            originals.push_back({f,{{original_ids[i],1}}});selected.push_back(&originals.back());}
         require(selected.size()<=basis_cap,"candidate basis count cap");
         std::map<std::size_t,std::size_t> used;
         for(const auto*row:selected)for(const auto&w:row->weights)used.emplace(w.first,0);
