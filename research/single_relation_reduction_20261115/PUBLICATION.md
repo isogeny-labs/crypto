@@ -72,7 +72,7 @@ are copied under checks/line-laws/. Shared PR14merged asf13359f; hosted
 PCC-20261115-6186b7 is unverified. No general coordinate-selector lower bound
 or fast algorithm is claimed. [pcc:unverified]
 
-The three-page report and both editable diagrams were rendered and inspected.
+A2's three-page report and both editable diagrams were rendered and inspected.
 PROOF-MAP.md and the assembly probe document inheritance and the missing
 full probability/cost bridges. The instance-gate writeup was completed after
 the proof builds, a recorded ordering failure; do not label it prospective.
@@ -94,3 +94,13 @@ near-certain-retention assumption for independent uniform interval points,
 not every interval/correlated/adaptive selector. The full analytic/sampling
 bridge is not formalized. All four PDF pages and three editable diagrams
 were rendered/inspected. No native numerical case or paid job. [pcc:unverified]
+
+After the sole Copilot request had no response for an hour, fallback comment
+6899259733 releases the journal freeze. The normal maina6b170b388merge has
+only the expected journal conflict. Its source-pinned preview preserves all
+226incoming/210own complete blocks and both sequences; the final handoff has
+228blocks. Repeated headers are retained with full-block multiplicity and
+untimed blocks keep source order. Existing math/report/native-component files
+remain unchanged. Receipts/checkers are journal-main001 and journal-post-
+handoff001 under checks/; claim920990is unverified. Required checks must
+assess the actual resulting head. [pcc:unverified]

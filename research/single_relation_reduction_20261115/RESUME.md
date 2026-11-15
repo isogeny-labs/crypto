@@ -59,9 +59,9 @@ outputs. Read the exact three selector assessments and Wagner2002 sections
 application is not an ECDLP solver.
 
 PROOF-MAP.md records actual inherited laws, hypotheses and partial formal
-scope. The assembly probe and explicit axiom prints pass, but the six-field
-instance-gate writeup was retrospective, violating its requested pre-edit
-ordering. Preserve this process gap and all original builds/source pins.
+scope. The assembly probe and explicit axiom prints pass. A1/A2's six-field
+writeup was retrospective, a recorded ordering gap; A3's plan/probe precede
+its first edit. Preserve the distinctions and all original builds/source pins.
 
 The central next algorithmic step remains an explicit label-free selector
 with a known subexponential cap T and inverse useful yield. The direct complete
@@ -70,23 +70,24 @@ the growing algorithm. Sparse/circuit selectors are not ruled out. Forcing the
 last labelled point to close a relation gives alpha=beta=0and is not a solver.
 
 ## Publication and controls
-PR4311is regular on main; enable auto-merge after the final handoff push.
+PR4311is regular on main with auto-merge enabled.
 Review actual final-head validation/size/artifact/PCC checks, without carrying
 earlier passes forward. Normal unchanged-head cadence is about50minutes.
-Current main advanced to44ac88c807 with unrelated LA/GPU and isogeny studies.
-Its ledger remains a prefix; the daily journal has additional incoming work.
-PR4311is dirty;
-one Copilot request comment6898455027 is pending. Freeze the conflicted daily
-journal until a response or the documented no-response fallback; keep both
-complete histories and multiplicities. Other study files may progress.
+Normal main merge at a6b170b388 preserves unrelated incoming studies/audits.
+The sole17:31:48Z Copilot request6898455027 had no response after an hour;
+fallback comment6899259733 releases the journal freeze. The only conflict was
+the daily journal. Pre-handoff union227blocks and final228blocks retain every
+incoming/own complete block and multiplicity, both input sequences and all
+existing math/report/native-component files. Exact source/hash receipts are
+checks/journal-main001.json and journal-post-handoff001.json. Claim920990is
+unverified. The resulting head needs its own required checks.
 PCC history stays append-only; no force push or ledger rechain.
 
-A one-time safety-net PR follow-up was scheduled for18:41:51Z under the
-standing check-in instruction. It inherits the source environment selection;
-the service did not expose concrete environment details, so this is not a
-receipt that the future command has executed. Avoid duplicate journal
-resolvers. Re-arm to about50minutes after the final A3 push, under the same
-standing cadence, and record the actual returned time. A3's prospective
+A one-time safety-net follow-up's original18:41:51Z schedule was paused during
+manual resolution. Re-arm about50minutes after the final push. Check the task
+service's actual schedule and current PR state before acting; do not duplicate
+resolvers. Environment selection is inherited, with no concrete details
+exposed, so no future command execution is implied. A3's prospective
 six-field proof plan and floor probe precede its first Lean edit. The original numerical
 checkpoint capability recheck still finds no AWS CLI/ambient pair or upload
 token file/environment; no failed upload gate was repeated.

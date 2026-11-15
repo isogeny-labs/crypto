@@ -24,6 +24,58 @@ S4f=lambda a,b,c,d: S4.eval({x1:a,x2:b,x3:c,x4:d})%p
 g=next(z for z in range(2,p) if all(pow(z,(p-1)//q,p)!=1 for q in range(2,p) if (p-1)%q==0 and all(q%k for k in range(2,int(q**.5)+1))))
 MU=sorted({pow(g,(p-1)//n*k,p) for k in range(n)}); assert len(MU)==n
 FD=[x for x in range(p) if issq(x**3+A*x+B)][:n]
+def msqrt(a):
+    a%=p
+    if a==0: return 0
+    q,s_=p-1,0
+    while q%2==0: q//=2; s_+=1
+    z=2
+    while pow(z,(p-1)//2,p)!=p-1: z+=1
+    M_,c,t_,r=s_,pow(z,q,p),pow(a,q,p),pow(a,(q+1)//2,p)
+    while t_!=1:
+        i,tt=0,t_
+        while tt!=1: tt=tt*tt%p; i+=1
+        b=pow(c,1<<(M_-i-1),p); M_,c,t_,r=i,b*b%p,t_*b*b%p,r*b%p
+    assert r*r%p==a
+    return r
+def padd(P,Q):
+    if P is None: return Q
+    if Q is None: return P
+    if P[0]==Q[0] and (P[1]+Q[1])%p==0: return None
+    l=(3*P[0]*P[0]+A)*pow(2*P[1],-1,p)%p if P==Q else (Q[1]-P[1])*pow(Q[0]-P[0],-1,p)%p
+    x=(l*l-P[0]-Q[0])%p; return (x,(l*(P[0]-x)-P[1])%p)
+def pneg(P): return None if P is None else (P[0],(-P[1])%p)
+PTS=[(x,msqrt(x**3+A*x+B)) for x in FD]
+PART=[FD[i::3] for i in range(3)]   # APS-style disjoint parts (round-robin by x order)
+def build_pair_table():
+    tab={}
+    for i in range(len(PTS)):
+        for j in range(i,len(PTS)):
+            for S in (padd(PTS[i],PTS[j]),padd(PTS[i],pneg(PTS[j]))):
+                tab.setdefault('O' if S is None else S[0],set()).add((PTS[i][0],PTS[j][0]))
+    return tab
+def mitm_table(xR,tab):
+    R_=(xR,msqrt(xR**3+A*xR+B)); out=set()
+    for P3 in PTS:
+        for T in (padd(R_,pneg(P3)),padd(R_,P3)):
+            for (a,b) in tab.get('O' if T is None else T[0],()):
+                out.add(tuple(sorted((a,b,P3[0]))))
+    return out
+def mitm(xR):
+    # all multisets {x1,x2,x3} in FD with +-P1 +-P2 +-P3 = +-R, via hashing x(P1 +- P2) against x(R +- P3)
+    R_=(xR,msqrt(xR**3+A*xR+B)); want={}
+    for k,P3 in enumerate(PTS):
+        for T in (padd(R_,pneg(P3)),padd(R_,P3)):
+            if T is not None: want.setdefault(T[0],set()).add(P3[0])
+            elif True: want.setdefault('O',set()).add(P3[0])
+    out=set()
+    for i in range(len(PTS)):
+        for j in range(i,len(PTS)):
+            for S in (padd(PTS[i],PTS[j]),padd(PTS[i],pneg(PTS[j]))):
+                key='O' if S is None else S[0]
+                for x3 in want.get(key,()):
+                    out.add(tuple(sorted((PTS[i][0],PTS[j][0],x3))))
+    return out
 def ms(P,vs):  # Poly -> msolve string
     out=[]
     for mon,c in P.terms():
@@ -71,11 +123,14 @@ for _ in range(3):  # numeric check of Newton sums
 bs_cons=[Poly(e3**n-1,e1,e2,e3,modulus=p), Poly(pn-3,e1,e2,e3,modulus=p), Poly(expand((pn**2-p2n)*pow(2,-1,p))-3,e1,e2,e3,modulus=p)]
 print(f"# Newton sums to {2*n}: {time.time()-t0:.1f}s",file=sys.stderr)
 R=random.Random(SEED)
+TAB=None; TAB_s=None
+if 'Mt' in ARMS:
+    t1=time.perf_counter(); TAB=build_pair_table(); TAB_s=time.perf_counter()-t1
 def rand_xE():
     while True:
         z=R.randrange(p)
         if issq(z**3+A*z+B): return z
-T={k:[] for k in ARMS}; REL={'D':0,'Bn':0,'Bs':0}; MS={'dense':0,'binomial':0}; SOLS={}
+T={k:[] for k in ARMS}; PREL={'Dp':0}; REL={'D':0,'Bn':0,'Bs':0}; MS={'dense':0,'binomial':0}; SOLS={}
 if DS:
     FX=lambda v: eval('*'.join(f'({v}-{c})' for c in FD))
 for ti in range(8):
@@ -101,6 +156,24 @@ for ti in range(8):
     if DS:
         sig=[esym(expand(FX('x1')+FX('x2')+FX('x3'))), esym(expand(FX('x1')*FX('x2')+FX('x1')*FX('x3')+FX('x2')*FX('x3'))), esym(expand(FX('x1')*FX('x2')*FX('x3')))]
         arms.append(('Ds',[ms(S4sym,['e1','e2','e3'])]+[ms(Poly(s,e1,e2,e3,modulus=p),['e1','e2','e3']) for s in sig],['e1','e2','e3'],bool(solD)))
+    solP=[(a,b,c) for a in PART[0] for b in PART[1] for c in PART[2] if S4f(a,b,c,xR)==0]
+    fP=[Poly(expand(eval('*'.join(f'(X-{c})' for c in Pk))),X,modulus=p) for Pk in PART]
+    arms.append(('Dp',[ms(S4R,['x1','x2','x3'])]+[ms(Poly(fP[k].as_expr().subs(X,symbols(v)),symbols(v),modulus=p),[v]) for k,v in enumerate(('x1','x2','x3'))],['x1','x2','x3'],bool(solP)))
+    PREL['Dp']+=len({tuple(sorted(s_)) for s_ in solP if valid(s_)})
+    if 'M' in ARMS:
+        t1=time.perf_counter(); mm=min((mitm(xR),time.perf_counter()-t1) for _ in range(1))[0]
+        best=None
+        for _ in range(3):
+            t1=time.perf_counter(); mm=mitm(xR); dt=time.perf_counter()-t1; best=dt if best is None else min(best,dt)
+        T['M'].append(best)
+        truth={tuple(sorted(s_)) for s_ in solD if valid(s_)}
+        assert mm==truth, ('mitm mismatch',xR,len(mm),len(truth))
+    if 'Mt' in ARMS:
+        best=None
+        for _ in range(3):
+            t1=time.perf_counter(); mt=mitm_table(xR,TAB); dt=time.perf_counter()-t1; best=dt if best is None else min(best,dt)
+        T['Mt'].append(best)
+        assert mt=={tuple(sorted(s_)) for s_ in solD if valid(s_)}, ('table mismatch',xR)
     arms=[a for a in arms if a[0] in ARMS]
     R.shuffle(arms)
     for k,polys,vs,has in arms:
@@ -108,6 +181,6 @@ for ti in range(8):
         assert trivial==(not has), (k,ti,xR,trivial,has)
     print(f"# target {ti} xR={xR} done",file=sys.stderr,flush=True)
 res={'p':p,'n':n,'baseline_s':base,'median_s':{k:st.median(v) for k,v in T.items()},'min_s':{k:min(v) for k,v in T.items()},
-     'max_s':{k:max(v) for k,v in T.items()},'valid_relations_ordered_or_multiset':REL,'valid_relation_multisets':MS,'targets':8,'seed':SEED,'msolve':'0.6.5',
+     'max_s':{k:max(v) for k,v in T.items()},'valid_relations_ordered_or_multiset':REL,'valid_relation_multisets':MS,'partitioned_relation_multisets':PREL,'M_timing':'in-process python, min of 3 (not msolve)','Mt_table_build_s':TAB_s,'targets':8,'seed':SEED,'msolve':'0.6.5',
      'S4_terms':len(S4.terms()),'Bs_constraint_terms':[len(c.terms()) for c in bs_cons]}
 print(json.dumps(res))
