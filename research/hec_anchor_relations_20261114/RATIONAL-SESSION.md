@@ -119,3 +119,28 @@ the1.99compiler rejected it. Selecting the matching cached1.99library fixed
 the compile. No dependency/source was deleted or rebuilt to mask the error.
 Certificates are producer-issued/rechecked finite-field evaluations; no
 independent signature, formal proof or novelty standing is claimed.
+
+## Publication and formatting correction
+
+### What was done (commands, files, features)
+Published32edd3de65and updated regular PR4274 with the rational gate/report scope.
+Checkpoint20261115T083913Z-32edd3de6595succeeded with0unpushed commits. Native CI
+reported only module ordering in heldout.rs. Applied cargo fmt across the crate;
+full cargo fmt --check now passes. Scientific source, counts and tests are unchanged.
+
+### Decisions made (and why)
+Keep the CI failure in the record and publish the formatting fix. Follow checks
+on the new head rather than treating the previous head's green state as current.
+No merge or leaderboard change is requested.
+
+### Open threads (unfinished, pick up next time)
+Follow current-head CI and checkpoint the final state. Continue the structural
+cold-cost work described in RATIONAL-HANDOFF.md; no scientific process is running.
+
+### Errors (what went wrong, how it was handled)
+I missed the full Cargo formatting check before the first push; module ordering
+was the sole native-CI failure. The generic local benchrec gate scans all legacy
+records in this sparse checkout and reports absent unrelated files. An attempted
+S3 verification was denied bucket listing and fell back to1798HEAD requests;
+that overbroad metadata check was stopped. Do not infer a branch result from
+those sparse/global diagnostics; the PR's scoped records check is authoritative.
