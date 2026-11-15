@@ -1,0 +1,22 @@
+// Exact dual-engine check of the two degree-five interpolation survivors.
+// The branch screen itself is independently replayed in degree5_linear_replay.sage.
+F := GF(3);
+R0<z> := PolynomialRing(F);
+K<a> := ext<F | z^5+2*z+1>;
+R<x> := PolynomialRing(K);
+f := x^11+x^9+2*x^8+x^7+2*x^5+x^3+x^2+x+1;
+assert GCD(f,Derivative(f)) eq 1;
+B := x^4 + (a^3 + a^2 + a + 2)*x^3 + (a^4 + a^3 + a^2 + 2*a + 2)*x^2 + 2*a^4*x + 2*a^4 + 2*a^3 + a^2 + 2;
+A1 := (2*a^4 + a^3 + a^2)*x^5 + (2*a^4 + 2*a^3 + 2*a^2 + 2)*x^4 + (a^4 + a^2 + a + 2)*x^3 + (2*a^3 + a^2 + 2)*x^2 + (2*a^4 + a^2)*x + a^4 + 2*a^3 + 2*a^2 + a;
+A2 := (a^4 + 2*a^3 + 1)*x^5 + (2*a^4 + a^2 + a + 1)*x^4 + (a^4 + a^3 + 2)*x^3 + (2*a^4 + 2*a^2)*x^2 + (a^4 + a^2)*x + 2*a^3 + 2*a + 1;
+assert Degree(B) eq 4;
+for i in [1..2] do
+    A := i eq 1 select A1 else A2;
+    assert Degree(A) eq 5 and GCD(A,B) eq 1;
+    N := B*(A^3+2*A^2*B+a*B^3);
+    assert N mod f eq 0;
+    Q := N div f;
+    print "candidate",i,"quotient_degree",Degree(Q),"is_square",IsSquare(Q);
+    print "factorization",Factorization(Q);
+    assert IsSquare(Q) eq false;
+end for;
