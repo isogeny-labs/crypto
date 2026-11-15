@@ -17,4 +17,5 @@ pub mod jac;
 pub mod oracle;
 pub mod poly;
 pub mod rng;
+pub mod sieve;
 pub mod solve;
