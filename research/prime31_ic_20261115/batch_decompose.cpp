@@ -14,7 +14,7 @@ Hit reference(Point r,const vector<Point>& f,const Table& h){
   }return {};
 }
 Hit batched_query(Point r,const vector<Point>& f,const Table& h){
-  if(r.o)throw runtime_error("infinity not supported by batched test");
+  if(r.o)return reference(r,f,h);
   const size_t b=f.size();vector<uint64_t> d(b),pre(b+1,1);
   for(size_t k=0;k<b;++k){d[k]=r.x==f[k].x?1:sub(f[k].x,r.x);pre[k+1]=mm(pre[k],d[k]);}
   uint64_t t=inv(pre.back());vector<Point> minus(b),plus(b);
@@ -31,6 +31,8 @@ bool witness(Point r,const vector<Point>& f,Hit h){
   Point v=relation(f,h.pair);
   return add(v,h.s==1?f[h.k]:neg(f[h.k]))==r;
 }
+
+#ifndef INCLUDE_AS_LIBRARY
 int main(int argc,char**argv){
   size_t b=argc>1?stoul(argv[1]):384;size_t qcount=argc>2?stoul(argv[2]):200;
   if(b<8||b>1500||qcount<1||qcount>1000)return 2;
@@ -54,3 +56,4 @@ int main(int argc,char**argv){
       <<",\"reference_inversions\":"<<old_inv<<",\"batched_inversions\":"<<new_inv
       <<",\"reference_multiplies\":"<<old_mul<<",\"batched_multiplies\":"<<new_mul<<"}\n";
 }
+#endif
