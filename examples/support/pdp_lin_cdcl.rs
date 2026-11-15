@@ -67,6 +67,7 @@ pub struct Stats {
     /// (the `x₃` stage) versus not (the `t` stage).
     pub conflicts_stage_assigned: u64,
     pub conflicts_stage_open: u64,
+    pub forgotten_clauses: u64,
     /// Histogram of learnt-clause literals that fall in the "priority" (summand) blocks:
     /// index = count of priority literals, value = clauses. Width `< 2ℓ` means the clause
     /// excludes more than one pair.
@@ -811,6 +812,58 @@ impl LinCdcl {
         }
     }
 
+    /// Backtrack to level 0 (public reset between incremental solves).
+    pub fn reset(&mut self) {
+        self.backtrack(0);
+    }
+
+    /// Drop learnt clauses that mention any variable of `block` (e.g. the target block, whose
+    /// clauses are specific to one target) and rebuild the watch lists. Clauses that are the
+    /// reason of a current assignment are kept. Returns the number dropped.
+    pub fn forget_learnts_mentioning(&mut self, block: &[u32]) -> usize {
+        let set: std::collections::HashSet<u32> = block.iter().copied().collect();
+        let locked: std::collections::HashSet<usize> = self
+            .trail
+            .iter()
+            .filter_map(|&t| match self.reason[t.unsigned_abs() as usize] {
+                Reason::Clause(c) => Some(c),
+                _ => None,
+            })
+            .collect();
+        let mut removed = 0;
+        for ci in self.n_original_clauses..self.clauses.len() {
+            if self.clauses[ci].is_empty() || locked.contains(&ci) {
+                continue;
+            }
+            if self.clauses[ci]
+                .iter()
+                .any(|l| set.contains(&l.unsigned_abs()))
+            {
+                self.clauses[ci].clear();
+                removed += 1;
+            }
+        }
+        for w in &mut self.watches {
+            w.clear();
+        }
+        for ci in 0..self.clauses.len() {
+            if self.clauses[ci].len() >= 2 {
+                let (a, b) = (self.clauses[ci][0], self.clauses[ci][1]);
+                self.watches[lit_code(a)].push(ci);
+                self.watches[lit_code(b)].push(ci);
+            }
+        }
+        self.stats.forgotten_clauses += removed as u64;
+        removed
+    }
+
+    pub fn live_learnts(&self) -> usize {
+        self.clauses[self.n_original_clauses..]
+            .iter()
+            .filter(|c| !c.is_empty())
+            .count()
+    }
+
     pub fn model_block(&self, block: &[u32]) -> u64 {
         self.block_value(block).expect("model incomplete")
     }
@@ -848,7 +901,15 @@ impl ChainInstance {
         Self::build_inner(n, l, irr, None, b, lex_pairs)
     }
 
-    pub fn set_target(&mut self, x_r: u64) {
+    /// Fix the target for the next solve. With `forget`, learnt clauses that mention the
+    /// `x_R` block (specific to the previous target) are dropped first; the rest, the learnt
+    /// table of root-less pairs, is kept.
+    pub fn set_target(&mut self, x_r: u64, forget: bool) {
+        let xr = self.xr.as_ref().expect("parametrised instance").clone();
+        if forget {
+            self.solver.reset();
+            self.solver.forget_learnts_mentioning(&xr);
+        }
         let xr = self.xr.as_ref().expect("parametrised instance");
         self.solver.assumptions = xr
             .iter()

@@ -327,9 +327,10 @@ fn run_lin_reuse(
     x_r: &F2mElement,
     gf: &Gf2,
     budget: u64,
+    forget: bool,
 ) -> Value {
     let before = inst.solver.stats.clone();
-    inst.set_target(gf.from_element(x_r));
+    inst.set_target(gf.from_element(x_r), forget);
     inst.solver.conflict_budget = budget;
     let t = Instant::now();
     let r = inst.solver.solve();
@@ -360,6 +361,7 @@ fn run_lin_reuse(
         "learnt_clauses": st.learnt_clauses - before.learnt_clauses, "cumulative_conflicts": st.conflicts,
         "conflicts_t_stage": st.conflicts_stage_open - before.conflicts_stage_open,
         "conflicts_x3_stage": st.conflicts_stage_assigned - before.conflicts_stage_assigned,
+        "forgotten_clauses": st.forgotten_clauses - before.forgotten_clauses, "live_learnts": inst.solver.live_learnts(),
         "cumulative_learnt_clauses": st.learnt_clauses, "n_vars": inst.solver.n_vars, "wall_ms": wall_ms,
     })
 }
@@ -522,6 +524,11 @@ fn main() {
     } else {
         None
     };
+    let mut reuse_forget_inst = if wants("lin-reuse-forget") {
+        Some(ChainInstance::build_param(n, l, irr_mask, 1, true))
+    } else {
+        None
+    };
     let mut r_by_arm: std::collections::BTreeMap<String, Vec<f64>> = Default::default();
     let mut r3_by_arm: std::collections::BTreeMap<String, Vec<f64>> = Default::default();
     let mut disagreements = 0usize;
@@ -581,7 +588,13 @@ fn main() {
         if let Some(ri) = reuse_inst.as_mut() {
             arms.insert(
                 "lin-reuse".into(),
-                run_lin_reuse(ri, l, &irr, x_r, &gf, cfg.budget),
+                run_lin_reuse(ri, l, &irr, x_r, &gf, cfg.budget, false),
+            );
+        }
+        if let Some(ri) = reuse_forget_inst.as_mut() {
+            arms.insert(
+                "lin-reuse-forget".into(),
+                run_lin_reuse(ri, l, &irr, x_r, &gf, cfg.budget, true),
             );
         }
         if wants("lin-nolex") {
