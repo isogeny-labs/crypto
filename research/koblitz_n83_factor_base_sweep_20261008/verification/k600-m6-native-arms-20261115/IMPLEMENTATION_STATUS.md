@@ -1,5 +1,12 @@
 # Native K600 m6 arm-input staging component
 
+The [frozen Linux ARM64 build smoke](LINUX_ARM64_BUILD_SMOKE_PROTOCOL.md)
+was executed once at source `3ff510d8a280`. Its
+[attempt-1 report and visual](LINUX_ARM64_BUILD_SMOKE_ATTEMPT1.md)
+record a 6 GiB Docker OOM while compiling the `crypto` library with
+two Cargo jobs; all five requested executables remain absent. This is
+a failed engineering build control, not a K600 relation or runtime result.
+
 The [Linux build producer amendment](LINUX_BUILD_PRODUCER_AMENDMENT.md)
 adds a source-bound native build receipt for the existing `charge build`
 precharge phase. Its two focused release tests pass. A frozen host-specific
