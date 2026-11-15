@@ -1,0 +1,161 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hf2c6f973357f42f7",
+  "statement": {
+    "name": "vertical common-factor norm removal",
+    "source": "Elementary norm factorization; PRIMITIVE-PROTOCOL.md. Evaluated scalar polynomial identity only; divisor/anchor bookkeeping is checked separately.",
+    "variables": [
+      "a",
+      "b",
+      "f",
+      "h"
+    ],
+    "degree_bound": 5,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "h"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "h"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "f"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "h"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "h"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "h"
+            },
+            {
+              "op": "var",
+              "args": "h"
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "f"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "b"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2026111506,
+  "value_digest": "e4b8f17ebe0ed6caf133ef455cf77d5ce312632482e715bd1c74c4f436a27a27",
+  "independence": "Producer-issued and rechecked at16additional derived points; not independent authorship or a formal proof.",
+  "proof": null
+}

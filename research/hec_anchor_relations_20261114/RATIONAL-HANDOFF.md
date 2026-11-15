@@ -1,5 +1,7 @@
 # Rational-family continuation
 
+Latest continuation: PRIMITIVE-HANDOFF.md (normalized complete solver).
+
 ## Goal
 Establish and verify a mathematical >=10x improvement for hyperelliptic index
 calculus for genus2+. The objective is active; algebra/rank gates are progress.

@@ -14,7 +14,7 @@ use hec_native_ic::{
     solve::{solve_fast, Row, SolveStats},
 };
 use std::{collections::HashSet, time::Instant};
-type Signed = Vec<(u32, i64)>;
+pub(crate) type Signed = Vec<(u32, i64)>;
 fn mul(f: &Fp, a: u64, b: u64) -> u64 {
     if a == 0 || b == 0 {
         0
@@ -61,7 +61,7 @@ fn scale(a: &Row, s: u64, f: &Fp) -> Row {
         })
         .collect()
 }
-fn signed(mut r: Signed) -> Signed {
+pub(crate) fn signed(mut r: Signed) -> Signed {
     r.sort_unstable_by_key(|e| e.0);
     let mut o: Signed = Vec::new();
     for (c, v) in r {
@@ -76,7 +76,7 @@ fn signed(mut r: Signed) -> Signed {
     o.retain(|e| e.1 != 0);
     o
 }
-fn modular(r: &Signed, f: &Fp) -> Row {
+pub(crate) fn modular(r: &Signed, f: &Fp) -> Row {
     r.iter()
         .filter_map(|&(c, v)| {
             let v = f.from_i64(v);
@@ -84,7 +84,7 @@ fn modular(r: &Signed, f: &Fp) -> Row {
         })
         .collect()
 }
-fn sum_signed(c: &Curve, fb: &[(u64, u64)], r: &Signed) -> Div {
+pub(crate) fn sum_signed(c: &Curve, fb: &[(u64, u64)], r: &Signed) -> Div {
     let mut s = c.zero();
     for &(j, v) in r {
         let (x, y) = fb[j as usize];
@@ -93,7 +93,7 @@ fn sum_signed(c: &Curve, fb: &[(u64, u64)], r: &Signed) -> Div {
     }
     s
 }
-fn sum_mod(c: &Curve, points: &[Div], r: &Row) -> Div {
+pub(crate) fn sum_mod(c: &Curve, points: &[Div], r: &Row) -> Div {
     let mut s = c.zero();
     for &(j, v) in r {
         s = c.add(&s, &c.mul(&points[j as usize], v));
@@ -185,7 +185,7 @@ impl Forest {
         }
     }
 }
-fn descend(
+pub(crate) fn descend(
     c: &Curve,
     d: &Div,
     fb: &[(u64, u64)],
@@ -231,7 +231,7 @@ fn descend(
     }
     None
 }
-fn projection(c: &Curve, ell: u64, fb: &[(u64, u64)]) -> Vec<Div> {
+pub(crate) fn projection(c: &Curve, ell: u64, fb: &[(u64, u64)]) -> Vec<Div> {
     let p = c.fp.p;
     let s = (p as f64).sqrt() as u64;
     let lo = (s.saturating_sub(1) as u128).pow((2 * c.g) as u32);

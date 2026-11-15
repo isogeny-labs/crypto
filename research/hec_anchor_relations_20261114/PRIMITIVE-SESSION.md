@@ -95,3 +95,60 @@ available to the solver. A timing protocol is still separate and unregistered.
 ### Errors (what went wrong, how it was handled)
 No new error. Primitive mode retains all formerly capped/exhausted cases.
 Counts are not runtime ratios, and the earlier synthetic-input failure remains.
+
+## Single-target integration gate
+
+### What was done (commands, files, features)
+Implemented rational_solve.rs with cold catalogue/tables, descent-seeded anchors,
+complete signed-family generation, primitive normalization, deduplication,
+coefficient-aware forest, incremental solve and final k*D1=D2verification.
+All12frozen single-target cases recover the harness scalar and pass every raw
+and projected group check. Full output: RATIONAL-SOLVE-GATE.txt. Exported shared
+anchor helpers without changing their algorithm; the candidate is an additional
+heldout-example test module, not a default method change.
+
+### Decisions made (and why)
+The untargeted rank screen understates some requested anchor sizes. At g3p61,
+one requestedH9case needsH10; at g4p31,the requestedH10cases needH14andH13.
+RequestedH28at g4is clamped to its16availableFBplaces, explicitly reported.
+Keep these effective sizes and all constructed unused outputs in future costs.
+No timing statement follows from the gated diagnostic clocks.
+
+### Open threads (unfinished, pick up next time)
+Run the complete CI target and formatting check, package normalization/rank/
+integration evidence and report, then publish. Next scientific action is an
+identical-target cold timing screen of the complete solver, not another count
+ratio or multiplication by previous performance ratios. Freeze that separately.
+
+### Errors (what went wrong, how it was handled)
+No integration assertion failed. EffectiveH differs from requestedH by design
+when target support or available factor-base size requires it; both are retained.
+
+## Replay, report and publication preparation
+
+### What was done (commands, files, features)
+Native primitive_gate.sh rebuilds the library, reproduces rejection and primitive
+rank JSONL byte-for-byte, independently checks both rank sets and reruns the
+12target integration gate. Full22test heldout target and Cargo formatting pass.
+Added norm-factor evaluated certificateIDC1hf2c6f973357f42f7, source/library/binary
+hashes, complete results/handoff, Rust-rendered all36arm chart and two-page Typst
+PDF. Both PDF pages were rendered with Poppler and inspected. Sources checked
+and KB receipt remain in the frozen protocol. No runtime measurements were made.
+
+### Decisions made (and why)
+Publish the complete solver gate and honest count scope to the existing regular
+PR4274. Existing timing graphs stay unchanged because these inputs/counts do
+not add a compatible wall-time observation. Mathematical10x objective stays
+active. Next is a competitive same-target cold implementation/cost comparison,
+not a count-only claim or a product with earlier timing ratios.
+
+### Open threads (unfinished, pick up next time)
+Push the prepared extension, follow current-head CI and checkpoint. Continue
+from PRIMITIVE-HANDOFF.md; no scientific process is running. Shared dated log
+and resume file remain untouched; scoped study log carries this work.
+
+### Errors (what went wrong, how it was handled)
+Initial PDF compilation needed explicit Typst math operators for rank and the
+text subscript off; corrected and inspected the successful rendering. The
+scientific synthetic-input failure remains in Git. No benchmark record was
+opened: these runs are exact correctness/count gates, with no timing comparison.

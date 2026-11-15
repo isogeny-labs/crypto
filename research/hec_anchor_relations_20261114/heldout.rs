@@ -4,6 +4,8 @@ mod anchor;
 mod pipeline;
 #[cfg(test)]
 mod rational;
+#[cfg(test)]
+mod rational_solve;
 #[path = "../../crates/hec-native-ic/src/table_factor.rs"]
 mod table_factor;
 use hec_native_ic::{
