@@ -31,6 +31,9 @@ keeps its existing behavior. `LEADS.md` is the exact frozen early claim subject;
 use LEAD_STATUS.md for current notes. See INTEGRATION_HYPOTHESIS.md for the
 codebase integration hypothesis and qualification scope.
 
+[INTEGRATION_REPORT.md](INTEGRATION_REPORT.md) records the tested native API,
+the retained proof-budget failures and the fixed-cap breadth-first result.
+
 ## Run
 
 From this directory, with a current stable Rust toolchain:
@@ -230,3 +233,6 @@ backend after the user's instruction to continue. No cloud run was launched.
 Supported Singular and msolve basis replays are complete on the fresh panel;
 their diagnostic clocks and checking obligations differ from native charged
 wall intervals. No fastest-solver claim is made.
+
+[Current native Rust handoff](RUST_INTEGRATION_RESUME.md) records the integrated
+API qualification and the remaining matched-runtime gate.
