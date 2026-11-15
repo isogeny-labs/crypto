@@ -45,9 +45,18 @@ eliminable (one linear equation per merge).
 #figure(image("figures/census.svg", width: 85%),
   caption: [Exhaustive census of S#sub[3] root triples (results/census.jsonl).])
 
+*Prior art for λ.* The trace map behind this is the Lenstra–Kosters homomorphism
+$E(k) -> FF_2$, $P |-> "Tr"((x(P) + a_2)/a_1^2)$ with kernel $2E(k)$ (2013), derived from the same
+line identity $x_1 + x_2 + x_3 = lambda^2 + a_1 lambda + a_2$; it is the known explanation of the
+first fall degree 2 of $S_3$ systems (Kosters, ECC 2015 slides; atlas KR-IC-f5c584). The census is
+an exhaustive confirmation at n = 11, 13, not a new fact.
+
 *Open question (gated).* Whether $mu = e_2$, or the explicit implied trace equations, lowers the
-refutation degree relative to the generic control. `PROTOCOL_DRAFT.md` gives the four-arm cell;
-it is not frozen (instrument binding missing) and cannot run without the checkpoint token.
+closure refutation degree relative to its matched control. `PROTOCOL.md` (frozen 2026-11-14) fixes
+four arms in two matched pairs with identical variable sets, eight cells, 16 exhaustively
+unsatisfiable and 4 planted draws per cell, and the instrument `examples/replead_closure.rs`
+(the routines of `examples/dreg_closure.rs`). The 640 systems are pinned by sha256; running needs the
+checkpoint token.
 
 == R3: odd power-sum coordinates
 
@@ -61,9 +70,19 @@ in three variables are recovered (j = 0), so the method sees such elements. Clos
 
 $N = product (X - x_i)$ divides the subspace polynomial $L_V$ iff all roots lie in V; tracking
 $R_k = X^(2^k) mod N$ with $R_k = R_(k-1)^2 mod N$ is bilinear, so membership is degree 2 for all
-m at l·m·n auxiliary bits. This is very likely one of the big-field systems analysed by
-Huang–Kosters–Yeo (CRYPTO 2015, "Last fall degree, HFE, and Weil descent attacks on ECDLP"); the
-paper was not retrieved, so the lead is blocked on that reading rather than closed.
+m at l·m·n auxiliary bits.
+
+*Closed: dominated inside the Huang–Kosters–Yang–Yeo framework* (arXiv:1505.02532, Theorem 1.1,
+read 2026-11-14). For a zero-dimensional radical big-field system $cal(F)$ in M variables with at
+most s solutions over the closure, the last fall degree of its full Weil descent is at most
+$max(tau(max(d_(cal(F)), deg cal(F), (M+1)s, 1), q, M), M dot tau(2s, q, 1), q)$ with
+$tau(r, c, t) = max(floor(2t(c-1)(log_c(r/(2t)) + 1)), 0)$; their Section 4.4 says, without proof,
+that the same should hold with added constraints of Frobenius weight at most $tau(2s, q, 1)$,
+"such as linear subspace constraints". $L_V$ is linearized (weight 1), so the standard system
+($S_(m+1)$ plus $L_V (x_i) = 0$, M = m) already sits in that scope; the squaring chain lowers only
+the ordinary degree, which the bound does not use, and adds l·m big-field variables, which enter it
+linearly. Scope: the subspace case is an unproved remark there, and $d_(cal(F))$ is bounded for
+neither system.
 
 == R4 and R5
 
