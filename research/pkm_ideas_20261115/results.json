@@ -230,6 +230,96 @@
     "tower_field_ops_max": 15884632465,
     "dense_over_tower_max": 0.040064902376700975,
     "dense_over_tower_min": 0.040064902376700975
+   },
+   {
+    "source": "ext (Amendment 1, dmax 1024)",
+    "m": 2,
+    "S": 64,
+    "vkind": "coset",
+    "rows": 3,
+    "censored": 0,
+    "agree_all": true,
+    "field_ops_min": 595776,
+    "field_ops_max": 595776,
+    "tower_field_ops": 110172474,
+    "tower_field_ops_max": 110172474,
+    "dense_over_tower_max": 0.005407666528392563,
+    "dense_over_tower_min": 0.005407666528392563
+   },
+   {
+    "source": "ext (Amendment 1, dmax 1024)",
+    "m": 2,
+    "S": 64,
+    "vkind": "random",
+    "rows": 3,
+    "censored": 0,
+    "agree_all": true,
+    "field_ops_min": 600502,
+    "field_ops_max": 600502,
+    "tower_field_ops": 110172474,
+    "tower_field_ops_max": 110172474,
+    "dense_over_tower_max": 0.005450562905576578,
+    "dense_over_tower_min": 0.005450562905576578
+   },
+   {
+    "source": "ext (Amendment 1, dmax 1024)",
+    "m": 2,
+    "S": 128,
+    "vkind": "coset",
+    "rows": 3,
+    "censored": 0,
+    "agree_all": true,
+    "field_ops_min": 2428544,
+    "field_ops_max": 2428544,
+    "tower_field_ops": 986513639,
+    "tower_field_ops_max": 986513639,
+    "dense_over_tower_max": 0.002461743967839861,
+    "dense_over_tower_min": 0.002461743967839861
+   },
+   {
+    "source": "ext (Amendment 1, dmax 1024)",
+    "m": 2,
+    "S": 128,
+    "vkind": "random",
+    "rows": 3,
+    "censored": 0,
+    "agree_all": true,
+    "field_ops_min": 2438006,
+    "field_ops_max": 2438006,
+    "tower_field_ops": 986513639,
+    "tower_field_ops_max": 986513639,
+    "dense_over_tower_max": 0.002471335320281365,
+    "dense_over_tower_min": 0.002471335320281365
+   },
+   {
+    "source": "ext (Amendment 1, dmax 1024)",
+    "m": 2,
+    "S": 256,
+    "vkind": "coset",
+    "rows": 3,
+    "censored": 0,
+    "agree_all": true,
+    "field_ops_min": 9805056,
+    "field_ops_max": 9805056,
+    "tower_field_ops": 9979181522,
+    "tower_field_ops_max": 9979181522,
+    "dense_over_tower_max": 0.0009825511218914972,
+    "dense_over_tower_min": 0.0009825511218914972
+   },
+   {
+    "source": "ext (Amendment 1, dmax 1024)",
+    "m": 2,
+    "S": 256,
+    "vkind": "random",
+    "rows": 3,
+    "censored": 0,
+    "agree_all": true,
+    "field_ops_min": 9823990,
+    "field_ops_max": 9823990,
+    "tower_field_ops": 9979181522,
+    "tower_field_ops_max": 9979181522,
+    "dense_over_tower_max": 0.000984448471885408,
+    "dense_over_tower_min": 0.000984448471885408
    }
   ],
   "prediction": "random dense / tower >= 2 at every completed S, growing with S",
@@ -259,6 +349,21 @@
     "frozen",
     3,
     16
+   ],
+   [
+    "ext (Amendment 1, dmax 1024)",
+    2,
+    64
+   ],
+   [
+    "ext (Amendment 1, dmax 1024)",
+    2,
+    128
+   ],
+   [
+    "ext (Amendment 1, dmax 1024)",
+    2,
+    256
    ]
   ],
   "falsifying_S": [
@@ -291,6 +396,24 @@
     3,
     16,
     0.040064902376700975
+   ],
+   [
+    "ext (Amendment 1, dmax 1024)",
+    2,
+    64,
+    0.005450562905576578
+   ],
+   [
+    "ext (Amendment 1, dmax 1024)",
+    2,
+    128,
+    0.002471335320281365
+   ],
+   [
+    "ext (Amendment 1, dmax 1024)",
+    2,
+    256,
+    0.000984448471885408
    ]
   ]
  },
@@ -441,6 +564,34 @@
     ],
     "ratio_min": 0.9061112524567945,
     "ratio_max": 0.9061112524567945
+   },
+   {
+    "cell": "replay-m2-A2-t8",
+    "m": 2,
+    "degrees": [
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "S": 256,
+    "record_p": 1399680001,
+    "p": 1399680001,
+    "replays": 4,
+    "mismatches": 0,
+    "disagreements": 0,
+    "fresh_field_ops": [
+     9979181522
+    ],
+    "replay_field_ops": [
+     4031168193
+    ],
+    "ratio_min": 0.4039577979529612,
+    "ratio_max": 0.4039577979529612
    },
    {
     "cell": "replay-m2-A3-k3",
