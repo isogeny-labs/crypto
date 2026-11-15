@@ -41,3 +41,11 @@ balanced m. A different selector would need an explicit effective capped-cost
 and useful-yield contract. The univariate root-finding theorem does not supply
 that interface. These are scoped dependencies, not an impossibility claim.
 [pcc:unverified]
+
+Ready main PR4311 is open at source28e9e365ed:
+https://github.com/isogeny-labs/crypto/pull/4311 . Final handoff changes no
+mathematical/native input, proof source or report pixels. Auto-merge is to be
+enabled after this final push; current-head required checks retain their own
+status. The remaining hand-coverage formalization and actual selector contract
+are recorded in RESUME.md. The goal's complete algorithm criterion is unmet.
+[pcc:unverified]
