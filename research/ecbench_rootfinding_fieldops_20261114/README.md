@@ -20,6 +20,8 @@ The focused rootfinding test checks the block's phase names, sum, nonzero relati
 
 The required `cargo test --release --lib` was attempted with Rust 1.99.1 on macOS. After about 25 minutes it had recorded 6,287 passes, 86 ignored tests, and 19 failures; the remaining long tests were interrupted, so the full suite has no passing verdict. Five ecbench band/compare failures open an absent, untracked `research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl`. A separately rerun `ml_dataset::report` failure requires Linux `/proc`; a separately rerun wide-prime fixture test failed on a missing file. These failures are outside the edited code. Both focused release tests passed again after merging `origin/main` at `2f847a3711` (6,498 other tests filtered out in each run).
 
+After the 2026-11-15 merge of `origin/main` at `b05c8a03af`, the release rootfinding report test and replay-binding test each passed again (6,543 other tests filtered out per run). The full library suite was not repeated on that final tree; its earlier failed/interrupted run is the only full-suite attempt. No new benchmark or performance claim follows from these tests.
+
 ## Handoff
 
 ### What was done
