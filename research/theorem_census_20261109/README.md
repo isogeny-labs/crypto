@@ -391,6 +391,36 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual continuous-H1 comparison](../continuous_h1_comparison_audit_20261115/README.md)
+discharges the separate homogeneous-complex comparison gap listed in earlier
+packets below. Actual Mathlib continuousCohomology1 is linearly equivalent to
+all continuous crossed cocycles modulo all principal cocycles. Actual d0/d1,
+both homogeneous/crossed inverse maps, full principal-image equality and actual
+categorical kernel/cokernel/index isomorphisms are proved. Representatives use
+actual categorical homologyπ, with the exact representative formula proved.
+For every finite K and finite Abelian M with continuous Galois action into
+discrete automorphisms, the actual coefficient TopRep derives joint continuity;
+actual H1 identifies with the whole standard class quotient and Frobenius
+coinvariants. Under exponent dividing #K−1, both perfectness MulEquivs and
+both radicals hold on actual H1, with exact source chi(F(1,Frob)) formula.
+Every finite characteristic2 field/M=Z2/trivial action has actual H1 nonzero
+and all characters trivial; deleting annihilation makes right-nondegeneracy
+impossible on these same canonical domains. Qualified source survives.
+Exact local **PCC-20261115-de23d0** replay PASS at 2026-11-15T01:19:32Z; signed standing unverified.
+Whole100/0/0 includes11byte-identical prior cores/6new modules;
+20formal/config+14artifactpins, full1405-character binding
+`65928939b66df9e96c426f625abbea3493ad127ec27c3bae6ed4cc38c7d8848d`,
+independent native1complete/0prefix/0unresolved;189files/61objects/24844-byte
+losslessXZ/fivegatefiles/inspected one-page47307-byte PDF. Twelve snapshots,
+five failed states and setup01 failure retained. Final12 has exactly two
+inherited unused-section advisories, no new-module advisories. Prior pairing
+advisory-free prose is corrected outside its frozen pinset.
+Isogeny-kernel/Lang/Cartier group scheme/Jacobian/divisor/full Tate/MOV/FR
+bridges remain open; original FR94 unread. No novelty/canonical promotion/
+full14 closure, frozen edits/cryptoPython/new native crypto/spend/upload.
+[pcc:unverified]
+
+
 The [actual Galois-character pairing audit](../galois_character_pairing_audit_20261115/README.md)
 proves the finite-module pairing displayed in Bruin2011 Lemma2.1 for every
 finite K and finite Abelian M with continuous action and exponent dividing
@@ -410,7 +440,7 @@ Whole gate73/0/0 includes reused proofs, complete1184-character binding
 `117deabc6ffa81828e499acbcc42d2c0a96947d2d3e5605128590db25ba4aee7`,
 independent native1complete/0prefix/0unresolved;15formal/config+14artifactpins,
 106files/41objects/18280-byte losslessXZ/fivegate files and inspected one-page
-46919-byte PDF. Six snapshots/four failed states retained; final06 advisory-free.
+46919-byte PDF. Six snapshots/four failed states retained; final06 passes with two unused-section advisories (the prior advisory-free report wording is corrected in the packet).
 Separate continuous homogeneous-complex H1 comparison, isogeny-kernel/Lang/
 Cartier group scheme/Jacobian/divisor/full Tate/MOV/FR bridges remain open;
 original FR94 remains unread. No novelty, canonical promotion or full14 closure.

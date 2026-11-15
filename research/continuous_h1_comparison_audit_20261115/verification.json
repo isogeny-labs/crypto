@@ -1,0 +1,80 @@
+{
+  "schema": "continuous-h1-comparison-verification/v1",
+  "source_commit": "27b48c344eb25b40af5fc479c5b79a874d58332b",
+  "claim_id": "PCC-20261115-de23d0",
+  "declaration_sha256": "65928939b66df9e96c426f625abbea3493ad127ec27c3bae6ed4cc38c7d8848d",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 20,
+  "gate_declarations": 100,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 189,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-de23d0",
+    "claim_sha256": "de3c15eb89c5217a67a095ec9e2af164a3ef80784a6d6b8a56cc6ef667ca8ab8",
+    "commit": "27b48c344eb25b40af5fc479c5b79a874d58332b",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/continuous_h1_comparison_audit_20261115/lean (ContinuousH1Certificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T01:19:32Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-de23d0",
+    "claim_sha256": "de3c15eb89c5217a67a095ec9e2af164a3ef80784a6d6b8a56cc6ef667ca8ab8",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47307,
+    "sha256": "0cb6ea16086f1c73304a46f740470075445c20e929363e2a239aed47dc828d37",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 100,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "inherited_unused_section_advisories": 2,
+    "new_module_advisories": 0,
+    "actual_homology_projection_representative_formula_proved": true,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_all_Gamma_equivariant_Omega_characters": true,
+    "actual_character_descent_derived": true,
+    "actual_all_continuous_cocycle_principal_class_quotient": true,
+    "both_duality_MulEquivs_derived": true,
+    "exact_source_Omega_value_formula_proved": true,
+    "actual_characteristic2_guard_deletion_counterexample": true,
+    "canonical_continuous_complex_H1_comparison_proved": true,
+    "full_isogeny_Tate_pairing_proved": false,
+    "original_FR_read": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}
