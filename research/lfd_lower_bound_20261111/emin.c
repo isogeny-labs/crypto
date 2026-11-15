@@ -337,6 +337,23 @@ int main(int argc, char **argv) {
     else printf("], \"e_min\": null, \"e_min_gt\": %d}\n", last_infeasible);
     return 0;
   }
+  if (!strcmp(argv[1], "nullity")) {
+    /* LEAD-A-selector-eta-kernel: nullity of the homogeneous selector system at degree E over
+       ALL 2^k points (no right-hand side): columns minus rank. Prediction: M(k-1, E-1). */
+    int e = atoi(argv[2]);
+    make_mons(e);
+    rci_t ncol = (rci_t)n * nmons;
+    size_t P = (size_t)1 << k;
+    mzd_t *A = mzd_init((rci_t)(P * (k + 1)), ncol + 1);
+    for (size_t c = 0; c < P; c++) put_point(A, (rci_t)(c * (k + 1)), (uint32_t)c);
+    mzd_t *H = mzd_submatrix(NULL, A, 0, 0, A->nrows, ncol); /* drop the rhs column */
+    mzd_free(A);
+    double t1 = now();
+    rci_t r = mzd_echelonize_m4ri(H, 0, 0);
+    printf("{\"n\": %d, \"k\": %d, \"e\": %d, \"rows\": %zu, \"cols\": %d, \"rank\": %d, \"nullity\": %d, "
+           "\"seconds\": %.1f}\n", n, k, e, P * (k + 1), ncol, r, ncol - r, now() - t1);
+    return 0;
+  }
   if (!strcmp(argv[1], "verify")) {
     /* independent rebuild: rows from the definitions via a second code path (per-row
        construction from the field values, not from rowsC), PLUQ elimination */

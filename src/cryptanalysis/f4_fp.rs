@@ -343,6 +343,25 @@ pub fn field_ops_total() -> u64 {
     field_ops_now()
 }
 
+/// Opt-in (counted only while `jv_bitops` counting is on): the share of
+/// [`count_ops`] row operations that are pivot normalisations (`x · inv`, a
+/// product with no addition).  Every other row operation is a
+/// multiply-subtract, so F4's emitted `F_p` additions are
+/// `count_ops − norm_ops`.  Off by default: one relaxed load per pivot.
+static NORM_OPS: AtomicU64 = AtomicU64::new(0);
+
+/// Process-wide pivot-normalisation row operations (see [`NORM_OPS`]).
+pub fn norm_ops_total() -> u64 {
+    NORM_OPS.load(AtomicOrdering::Relaxed)
+}
+
+#[inline]
+fn count_norm(n: usize) {
+    if super::jv_bitops::enabled() {
+        NORM_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
+    }
+}
+
 #[inline]
 fn count_ops(n: usize) {
     FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
@@ -2061,11 +2080,12 @@ const PAR_WORK: usize = 1 << 15;
 /// Subtract `f · pivot` from `row` over the columns `from..`, with
 /// `f = row[col]`.  `p < 2³²`, so `x + (p − f)·y < 2⁶⁴` fits a `u64`
 /// and one Barrett reduction replaces the `u128` remainder of [`mulmod`].
+/// Returns the multiply-subtracts done; [`eliminate_rows`] counts them.
 #[inline]
-fn eliminate(row: &mut [u64], pivot: &[u64], col: usize, fp: Barrett) {
+fn eliminate(row: &mut [u64], pivot: &[u64], col: usize, fp: Barrett) -> usize {
     let f = row[col];
     if f == 0 {
-        return;
+        return 0;
     }
     let neg = fp.p - f;
     let mut ops = 0usize;
@@ -2075,20 +2095,82 @@ fn eliminate(row: &mut [u64], pivot: &[u64], col: usize, fp: Barrett) {
             ops += 1;
         }
     }
-    count_ops(ops);
+    ops
 }
 
+/// A pivot row's non-zero entries from `col` on, as `(column, value)`, when
+/// they are at most a quarter of the tail; `None` for a denser tail, which
+/// [`eliminate`] scans as it is.  Computed once for the pivot, it saves
+/// every row below (or above) it the test of each zero entry.
+fn sparse_tail(pivot: &[u64], col: usize) -> Option<Vec<(u32, u64)>> {
+    let tail = &pivot[col..];
+    if tail.len() < 32 || pivot.len() > u32::MAX as usize {
+        return None;
+    }
+    let nnz = tail.iter().filter(|&&y| y != 0).count();
+    if nnz * 4 > tail.len() {
+        return None;
+    }
+    Some(
+        tail.iter()
+            .enumerate()
+            .filter(|&(_, &y)| y != 0)
+            .map(|(j, &y)| ((col + j) as u32, y))
+            .collect(),
+    )
+}
+
+/// [`eliminate`] by a pivot given as its non-zero entries
+/// ([`sparse_tail`]): the same entries are updated, in the same order, and
+/// the same row operations are returned.
 #[inline]
-fn eliminate32(row: &mut [u32], pivot: &[u32], col: usize, fp: Barrett32) {
+fn eliminate_sparse(row: &mut [u64], nz: &[(u32, u64)], col: usize, fp: Barrett) -> usize {
     let f = row[col];
     if f == 0 {
-        return;
+        return 0;
+    }
+    let neg = fp.p - f;
+    for &(j, y) in nz {
+        let x = &mut row[j as usize];
+        *x = fp.reduce(*x + neg * y);
+    }
+    nz.len()
+}
+
+/// As [`eliminate`], on narrow rows; returns the row operations.
+#[inline]
+fn eliminate32(row: &mut [u32], pivot: &[u32], col: usize, fp: Barrett32) -> usize {
+    let f = row[col];
+    if f == 0 {
+        return 0;
     }
     let neg = fp.p - f;
     for (x, &y) in row[col..].iter_mut().zip(&pivot[col..]) {
         *x = fp.reduce(*x + neg * y);
     }
-    count_ops(row.len() - col);
+    row.len() - col
+}
+
+/// Run `elim` on every row, in parallel when `parallel`, and add the row
+/// operations it returns to the counters once per task instead of once
+/// per row (assessment 2026-11-10, R3).  A rayon `fold` hands each split's
+/// sum to `count_ops` on the thread that reduced those rows, so the
+/// process total ([`FIELD_OPS`]), every thread's total
+/// (`F4_FP_THREAD_OPS=1`) and the `jv_bitops` tally (a row with no work
+/// adds nothing either way) are exactly what the per-row calls gave.
+#[inline]
+fn eliminate_rows<R: Send>(
+    rows: &mut [R],
+    parallel: bool,
+    elim: impl Fn(&mut R) -> usize + Sync + Send,
+) {
+    if parallel {
+        rows.par_iter_mut()
+            .fold(|| 0usize, |ops, row| ops + elim(row))
+            .for_each(count_ops);
+    } else {
+        count_ops(rows.iter_mut().map(elim).sum());
+    }
 }
 
 fn rref32(
@@ -2117,15 +2199,11 @@ fn rref32(
             *x = fp.reduce(*x * inv);
         }
         count_ops(n_cols - c);
+        count_norm(n_cols - c);
         let (head, tail) = rows.split_at_mut(pr + 1);
         let prow = &head[pr];
-        if tail.len() * (n_cols - c) > PAR_WORK {
-            tail.par_iter_mut()
-                .for_each(|row| eliminate32(row, prow, c, fp));
-        } else {
-            tail.iter_mut()
-                .for_each(|row| eliminate32(row, prow, c, fp));
-        }
+        let parallel = tail.len() * (n_cols - c) > PAR_WORK;
+        eliminate_rows(tail, parallel, |row| eliminate32(row, prow, c, fp));
         pivots.push(c);
         pr += 1;
     }
@@ -2137,13 +2215,8 @@ fn rref32(
         let c = pivots[i];
         let (head, tail) = rows.split_at_mut(i);
         let prow = &tail[0];
-        if head.len() * (n_cols - c) > PAR_WORK {
-            head.par_iter_mut()
-                .for_each(|row| eliminate32(row, prow, c, fp));
-        } else {
-            head.iter_mut()
-                .for_each(|row| eliminate32(row, prow, c, fp));
-        }
+        let parallel = head.len() * (n_cols - c) > PAR_WORK;
+        eliminate_rows(head, parallel, |row| eliminate32(row, prow, c, fp));
     }
     Some(pivots)
 }
@@ -2373,6 +2446,7 @@ fn rref32_deferred(
                 *x = fp32.reduce(*x * inv);
             }
             count_ops(row.len() - c);
+            count_norm(row.len() - c);
             let at = known.partition_point(|(pc, _)| *pc < c);
             known.insert(at, (c, row));
         }
@@ -2751,13 +2825,13 @@ fn rref_ckpt(
                 }
             }
             count_ops(ops);
+            count_norm(ops);
             let (head, tail) = rows.split_at_mut(pr + 1);
             let prow = &head[pr];
-            if tail.len() * (n_cols - c) > PAR_WORK {
-                tail.par_iter_mut()
-                    .for_each(|row| eliminate(row, prow, c, fp));
-            } else {
-                tail.iter_mut().for_each(|row| eliminate(row, prow, c, fp));
+            let parallel = tail.len() * (n_cols - c) > PAR_WORK;
+            match sparse_tail(prow, c) {
+                Some(nz) => eliminate_rows(tail, parallel, |row| eliminate_sparse(row, &nz, c, fp)),
+                None => eliminate_rows(tail, parallel, |row| eliminate(row, prow, c, fp)),
             }
             pivots.push(c);
             pr += 1;
@@ -2786,11 +2860,10 @@ fn rref_ckpt(
         let c = pivots[i];
         let (head, tail) = rows.split_at_mut(i);
         let prow = &tail[0];
-        if head.len() * (n_cols - c) > PAR_WORK {
-            head.par_iter_mut()
-                .for_each(|row| eliminate(row, prow, c, fp));
-        } else {
-            head.iter_mut().for_each(|row| eliminate(row, prow, c, fp));
+        let parallel = head.len() * (n_cols - c) > PAR_WORK;
+        match sparse_tail(prow, c) {
+            Some(nz) => eliminate_rows(head, parallel, |row| eliminate_sparse(row, &nz, c, fp)),
+            None => eliminate_rows(head, parallel, |row| eliminate(row, prow, c, fp)),
         }
     }
     Some(pivots)
@@ -3670,6 +3743,9 @@ fn f4_with_arithmetic(
                 for &(c, v) in r {
                     acc[c as usize] = v;
                 }
+                // One count a pair row, on the thread that reduced it: the same
+                // totals as one a reducer (assessment 2026-11-10, R3).
+                let mut row_ops = 0usize;
                 let mut pending = 0usize;
                 for c in r[0].0 as usize..n_cols {
                     if reducer_at[c] == NONE {
@@ -3685,13 +3761,14 @@ fn f4_with_arithmetic(
                     for &(cc, v) in reducer {
                         acc[cc as usize] += neg * v;
                     }
-                    count_ops(reducer.len());
+                    row_ops += reducer.len();
                     pending += 1;
                     if pending == 256 {
                         normalize_lazy(&mut acc, fp);
                         pending = 0;
                     }
                 }
+                count_ops(row_ops);
                 Some(
                     free_cols
                         .iter()
@@ -3761,6 +3838,9 @@ fn f4_with_arithmetic(
                 for &(c, v) in r {
                     acc[c as usize] = v as u32;
                 }
+                // One count a pair row, on the thread that reduced it: the same
+                // totals as one a reducer (assessment 2026-11-10, R3).
+                let mut row_ops = 0usize;
                 for c in r[0].0 as usize..n_cols {
                     let f = acc[c];
                     if f == 0 || reducer_at[c] == NONE {
@@ -3773,8 +3853,9 @@ fn f4_with_arithmetic(
                         let x = &mut acc[cc as usize];
                         *x = fp32.reduce(*x + neg * v as u32);
                     }
-                    count_ops(reducer.len());
+                    row_ops += reducer.len();
                 }
+                count_ops(row_ops);
                 Some(free_cols.iter().map(|&c| acc[c]).collect())
             };
             let reduced: Option<Vec<Vec<u32>>> = if parallel {
@@ -3804,6 +3885,9 @@ fn f4_with_arithmetic(
                 })
             })
         } else {
+            // Products an entry below `p` can take without reaching `2⁶⁴`
+            // (`p < 2³²`, so `(p - 1)²` fits a `u64`).
+            let lazy_limit = ((u64::MAX - p) / ((p - 1) * (p - 1))) as usize;
             let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
                 if deadline.is_some_and(|d| Instant::now() > d) {
                     return None;
@@ -3811,6 +3895,41 @@ fn f4_with_arithmetic(
                 let mut acc = vec![0u64; n_cols];
                 for &(c, v) in r {
                     acc[c as usize] = v;
+                }
+                // One count a pair row, on the thread that reduced it: the same
+                // totals as one a reducer (assessment 2026-11-10, R3).
+                let mut row_ops = 0usize;
+                if lazy_limit >= 64 {
+                    // Unreduced accumulation: a product is below
+                    // `(p - 1)²`, so `lazy_limit` of them on an entry below
+                    // `p` stay below `2⁶⁴`; the entry at a reducer's column
+                    // is read through one reduction and the row is
+                    // reduced when read out, so every value is the
+                    // remainder the reducing form gave.
+                    let mut pending = 0usize;
+                    for c in r[0].0 as usize..n_cols {
+                        if reducer_at[c] == NONE || acc[c] == 0 {
+                            continue;
+                        }
+                        let f = fp.reduce(acc[c]);
+                        if f == 0 {
+                            continue;
+                        }
+                        acc[c] = 0;
+                        let neg = p - f;
+                        let reducer = &reducers[reducer_at[c] as usize][1..];
+                        for &(cc, v) in reducer {
+                            acc[cc as usize] += neg * v;
+                        }
+                        row_ops += reducer.len();
+                        pending += 1;
+                        if pending == lazy_limit {
+                            normalize_lazy(&mut acc, fp);
+                            pending = 0;
+                        }
+                    }
+                    count_ops(row_ops);
+                    return Some(free_cols.iter().map(|&c| fp.reduce(acc[c])).collect());
                 }
                 for c in r[0].0 as usize..n_cols {
                     let f = acc[c];
@@ -3824,8 +3943,9 @@ fn f4_with_arithmetic(
                         let x = &mut acc[cc as usize];
                         *x = fp.reduce(*x + neg * v);
                     }
-                    count_ops(reducer.len());
+                    row_ops += reducer.len();
                 }
+                count_ops(row_ops);
                 Some(free_cols.iter().map(|&c| acc[c]).collect())
             };
             // an in-step snapshot stands in for the reducer pass and the finished
@@ -4515,7 +4635,19 @@ impl PackedSet {
 /// The index of the first of `lms`, other than `skip`, that divides `x`.
 fn first_divisor(lms: &[u128], skip: usize, x: u128) -> Option<usize> {
     let cut = skip.min(lms.len());
-    let find = |part: &[u128]| part.iter().position(|&l| packed_divides(l, x));
+    // [`packed_divides`] on the two halves: every field of a lead is at
+    // most 127 (or `SET_NEVER`'s 128, which `x | guard` still covers), so
+    // no field of `(x | guard) − l` borrows, nor does either half as a
+    // whole, and the halves can be tested together without the 128-bit
+    // borrow chain.
+    const G: u64 = PACKED_GUARD as u64;
+    let (xl, xh) = ((x as u64) | G, ((x >> 64) as u64) | G);
+    let find = |part: &[u128]| {
+        part.iter().position(|&l| {
+            let (ll, lh) = (l as u64, (l >> 64) as u64);
+            xl.wrapping_sub(ll) & xh.wrapping_sub(lh) & G == G
+        })
+    };
     find(&lms[..cut]).or_else(|| {
         let rest = lms.get(cut + 1..)?;
         find(rest).map(|j| cut + 1 + j)
@@ -6732,6 +6864,74 @@ mod packed_set_tests {
         assert_eq!(first_divisor(&lms[..3], 2, lm(&[0, 5])), None);
         assert_eq!(first_divisor(&lms, 4, lm(&[0, 5])), None);
         assert_eq!(first_divisor(&[], 0, x), None);
+    }
+
+    /// Elimination by a pivot's non-zero list is the elimination by the
+    /// pivot row: same entries, same row operations.
+    #[test]
+    fn sparse_pivot_elimination_matches_the_dense_scan() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(23);
+        for &p in &[786_433u64, 65_521, 4_294_967_291] {
+            let fp = Barrett::new(p);
+            for round in 0..60 {
+                let n = 40 + round * 3;
+                let col = rng.gen_range(0..8usize);
+                let density = [0.02, 0.1, 0.24, 0.5][round % 4];
+                let mut pivot: Vec<u64> = (0..n)
+                    .map(|_| {
+                        if rng.gen_bool(density) {
+                            rng.gen_range(1..p)
+                        } else {
+                            0
+                        }
+                    })
+                    .collect();
+                pivot[col] = 1;
+                let row: Vec<u64> = (0..n).map(|_| rng.gen_range(0..p)).collect();
+                let mut dense = row.clone();
+                let ops = eliminate(&mut dense, &pivot, col, fp);
+                match sparse_tail(&pivot, col) {
+                    Some(nz) => {
+                        let mut sparse = row.clone();
+                        assert_eq!(eliminate_sparse(&mut sparse, &nz, col, fp), ops);
+                        assert_eq!(sparse, dense, "p = {p}, density {density}");
+                    }
+                    None => {
+                        let nnz = pivot[col..].iter().filter(|&&y| y != 0).count();
+                        assert!(pivot.len() - col < 32 || nnz * 4 > pivot.len() - col);
+                    }
+                }
+            }
+        }
+    }
+
+    /// The half-word divisibility scan agrees with [`packed_divides`] on
+    /// random leads (exponents up to 127, bytes of both halves, and
+    /// `SET_NEVER`) and every `skip`.
+    #[test]
+    fn first_divisor_agrees_with_packed_divides() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(17);
+        for round in 0..200 {
+            let max = [1u32, 2, 3, 127][round % 4];
+            let word = |rng: &mut rand::rngs::StdRng| {
+                let e: Vec<u32> = (0..16).map(|_| rng.gen_range(0..=max)).collect();
+                set_pack(&e).unwrap()
+            };
+            let mut lms: Vec<u128> = (0..40).map(|_| word(&mut rng)).collect();
+            lms[rng.gen_range(0..40)] = SET_NEVER;
+            for _ in 0..40 {
+                let x = word(&mut rng);
+                for skip in [0, 3, 17, 39, 40, usize::MAX] {
+                    let cut = skip.min(lms.len());
+                    let want = (0..lms.len())
+                        .filter(|&i| i != cut)
+                        .find(|&i| packed_divides(lms[i], x));
+                    assert_eq!(first_divisor(&lms, skip, x), want);
+                }
+            }
+        }
     }
 
     /// Reduction by a set with its monomials packed against the vector one,

@@ -9,7 +9,12 @@
 //! `x^e` with `popcount(e) <= d`.
 //!
 //! `jet_digit_degree --p P --t T --k K [--a A --b B] [--seed S] [--curves N]
-//!                   [--out FILE.jsonl] [--verify]`
+//!                   [--out FILE.jsonl] [--verify] [--tower kummer|dickson]`
+//!
+//! `--tower dickson` (split case, `2^t | p - 1`) replaces the Kummer base by
+//! `V = { w + 1/w : w = u * omega^i }` (`u^2` outside `mu_{2^t}`) with tower
+//! variables `y_0 = v`, `y_{j+1} = y_j^2 - 2`; the monomial basis is the set of
+//! multilinear monomials `prod_{j in J} y_j` of degree `|J|`.
 //!
 //! Assumption: the affine lift `(x, y, 1)` is made to lie on the lifted curve
 //! mod `p^k` by Hensel-lifting `y` (x is kept as the integer in `[0, p)`), so
@@ -438,13 +443,10 @@ impl Echelon {
     }
 }
 
-/// Least popcount-degree of each function on the abscissae `vs`, and d_full.
-fn degrees(vs: &[u64], t: u32, p: u64, funcs: &[Vec<u64>]) -> (Vec<usize>, usize) {
-    let n = vs.len();
+/// Kummer monomial table: `rows[i][e] = vs[i]^e`, `e` in `0..2^t`.
+fn kummer_rows(vs: &[u64], t: u32, p: u64) -> Vec<Vec<u64>> {
     let ne = 1usize << t;
-    // powers table: pw[i][e]
-    let pw: Vec<Vec<u64>> = vs
-        .iter()
+    vs.iter()
         .map(|&v| {
             let mut row = Vec::with_capacity(ne);
             let mut cur = 1u64;
@@ -454,7 +456,37 @@ fn degrees(vs: &[u64], t: u32, p: u64, funcs: &[Vec<u64>]) -> (Vec<usize>, usize
             }
             row
         })
-        .collect();
+        .collect()
+}
+
+/// Dickson monomial table: `rows[i][J] = prod_{j in J} towers[i][j]`, with the
+/// bit set `J` read as the integer `e = sum_{j in J} 2^j`.
+fn dickson_rows(towers: &[Vec<u64>], t: u32, p: u64) -> Vec<Vec<u64>> {
+    let ne = 1usize << t;
+    towers
+        .iter()
+        .map(|y| {
+            let mut row = vec![1u64; ne];
+            for e in 1..ne {
+                let low = e.trailing_zeros() as usize;
+                row[e] = row[e & (e - 1)] * y[low] % p;
+            }
+            row
+        })
+        .collect()
+}
+
+/// Least popcount-degree of each function on the abscissae `vs`, and d_full
+/// (Kummer columns `v^e`).
+fn degrees(vs: &[u64], t: u32, p: u64, funcs: &[Vec<u64>]) -> (Vec<usize>, usize) {
+    degrees_rows(&kummer_rows(vs, t, p), t, p, funcs)
+}
+
+/// Least degree of each function in the span of the columns `rows[.][e]`
+/// added in order of `popcount(e)`, and d_full.
+fn degrees_rows(pw: &[Vec<u64>], t: u32, p: u64, funcs: &[Vec<u64>]) -> (Vec<usize>, usize) {
+    let n = pw.len();
+    let ne = 1usize << t;
     let mut ech = Echelon {
         n,
         p,
@@ -500,13 +532,71 @@ struct Row {
     summary: String,
 }
 
-fn abscissae(c: &Curve, t: u32, g: u64) -> Vec<(u64, u64)> {
-    let p = c.p;
+/// A primitive `2^t`-th root of unity in `F_p`.
+fn omega_2t(p: u64, t: u32) -> u64 {
     let mut h = 2u64;
     while powmod(h as u128, ((p - 1) / 2) as u128, p as u128) != (p - 1) as u128 {
         h += 1;
     }
-    let omega = powmod(h as u128, ((p - 1) >> t) as u128, p as u128) as u64;
+    powmod(h as u128, ((p - 1) >> t) as u128, p as u128) as u64
+}
+
+/// Dickson base: for each `w = u * omega^i` the tower `y_0 = w + 1/w`,
+/// `y_{j+1} = y_j^2 - 2` (`j = 0..t-2`).  Returns the `2^t` towers and the
+/// common top constant `c = u^{2^t} + u^{-2^t}`.
+fn dickson_base(p: u64, t: u32, u: u64) -> (Vec<Vec<u64>>, u64) {
+    let pp = p as u128;
+    let omega = omega_2t(p, t);
+    let c_expected = {
+        let ut = powmod(u as u128, 1u128 << t, pp);
+        ((ut + invmod(ut, pp)) % pp) as u64
+    };
+    let mut towers = Vec::with_capacity(1usize << t);
+    let mut w = u;
+    for _ in 0..(1u64 << t) {
+        let v = ((w as u128 + invmod(w as u128, pp)) % pp) as u64;
+        let mut y = vec![v];
+        for j in 1..t as usize {
+            let prev = y[j - 1] as u128;
+            y.push(((prev * prev + pp - 2) % pp) as u64);
+        }
+        let top = y[t as usize - 1] as u128;
+        assert_eq!(((top * top + pp - 2) % pp) as u64, c_expected, "top != c");
+        towers.push(y);
+        w = (w as u128 * omega as u128 % pp) as u64;
+    }
+    let mut vals: Vec<u64> = towers.iter().map(|y| y[0]).collect();
+    vals.sort_unstable();
+    vals.dedup();
+    assert_eq!(vals.len(), 1usize << t, "Dickson base |V| != 2^t");
+    (towers, c_expected)
+}
+
+/// `u` in `F_p^*` with `u^{2^{t+1}} != 1` (so `u^2` is outside `mu_{2^t}`).
+fn dickson_u(p: u64, t: u32, rng: &mut Rng) -> u64 {
+    loop {
+        let u = 1 + Rng::below(rng, p - 1);
+        if powmod(u as u128, 1u128 << (t + 1), p as u128) != 1 {
+            return u;
+        }
+    }
+}
+
+/// Abscissae among the base values `vals` (with their indices).
+fn select_abscissae(c: &Curve, vals: &[u64]) -> Vec<(usize, u64, u64)> {
+    let mut out = Vec::new();
+    for (i, &v) in vals.iter().enumerate() {
+        let f = rhs(c, v);
+        if f != 0 && is_square(f, c.p) {
+            out.push((i, v, sqrt_mod(f, c.p)));
+        }
+    }
+    out
+}
+
+fn abscissae(c: &Curve, t: u32, g: u64) -> Vec<(u64, u64)> {
+    let p = c.p;
+    let omega = omega_2t(p, t);
     let mut out = Vec::new();
     let mut zeta = 1u64;
     for _ in 0..(1u64 << t) {
@@ -520,10 +610,27 @@ fn abscissae(c: &Curve, t: u32, g: u64) -> Vec<(u64, u64)> {
     out
 }
 
-fn probe(c: &Curve, t: u32, k: u32, g: u64, full: bool, rng: &mut Rng) -> Row {
+#[derive(Clone, Copy)]
+enum Base {
+    Kummer { g: u64 },
+    Dickson { u: u64 },
+}
+
+fn probe(c: &Curve, t: u32, k: u32, base: Base, full: bool, rng: &mut Rng) -> Row {
     let t0 = Instant::now();
     let p = c.p;
-    let pts = abscissae(c, t, g);
+    // pts: abscissae with y; towers: Dickson tower values on them.
+    let (pts, towers, dick_c) = match base {
+        Base::Kummer { g } => (abscissae(c, t, g), Vec::new(), 0),
+        Base::Dickson { u } => {
+            let (all, cc) = dickson_base(p, t, u);
+            let vals: Vec<u64> = all.iter().map(|y| y[0]).collect();
+            let sel = select_abscissae(c, &vals);
+            let pts: Vec<(u64, u64)> = sel.iter().map(|&(_, v, y)| (v, y)).collect();
+            let tw: Vec<Vec<u64>> = sel.iter().map(|&(i, _, _)| all[i].clone()).collect();
+            (pts, tw, cc)
+        }
+    };
     let n = pts.len();
     let mut ver = Verify::default();
     let mut digits: Vec<Vec<u64>> = vec![Vec::with_capacity(n); k as usize - 1];
@@ -542,16 +649,32 @@ fn probe(c: &Curve, t: u32, k: u32, g: u64, full: bool, rng: &mut Rng) -> Row {
         check_hom(c, k, &pts, 20, rng, &mut ver);
     }
     let vs: Vec<u64> = pts.iter().map(|q| q.0).collect();
-    let mut names: Vec<String> = vec!["x".into(), "x3".into(), "xtop".into()];
-    let mut funcs: Vec<Vec<u64>> = vec![
-        vs.clone(),
-        vs.iter()
-            .map(|&v| powmod(v as u128, 3, p as u128) as u64)
-            .collect(),
-        vs.iter()
-            .map(|&v| powmod(v as u128, (1u128 << t) - 1, p as u128) as u64)
-            .collect(),
-    ];
+    let rows = match base {
+        Base::Kummer { .. } => Vec::new(),
+        Base::Dickson { .. } => dickson_rows(&towers, t, p),
+    };
+    let (mut names, mut funcs): (Vec<String>, Vec<Vec<u64>>) = match base {
+        Base::Kummer { .. } => (
+            vec!["x".into(), "x3".into(), "xtop".into()],
+            vec![
+                vs.clone(),
+                vs.iter()
+                    .map(|&v| powmod(v as u128, 3, p as u128) as u64)
+                    .collect(),
+                vs.iter()
+                    .map(|&v| powmod(v as u128, (1u128 << t) - 1, p as u128) as u64)
+                    .collect(),
+            ],
+        ),
+        Base::Dickson { .. } => (
+            vec!["y0".into(), "y0y1".into(), "ytop".into()],
+            vec![
+                rows.iter().map(|r| r[1]).collect(),
+                rows.iter().map(|r| r[3]).collect(),
+                rows.iter().map(|r| r[(1usize << t) - 1]).collect(),
+            ],
+        ),
+    };
     for j in 1..k {
         names.push(match j {
             1 => "x1".into(),
@@ -565,7 +688,10 @@ fn probe(c: &Curve, t: u32, k: u32, g: u64, full: bool, rng: &mut Rng) -> Row {
     for _ in 0..3 {
         funcs.push((0..n).map(|_| Rng::below(rng, p)).collect());
     }
-    let (degs, d_full) = degrees(&vs, t, p, &funcs);
+    let (degs, d_full) = match base {
+        Base::Kummer { .. } => degrees(&vs, t, p, &funcs),
+        Base::Dickson { .. } => degrees_rows(&rows, t, p, &funcs),
+    };
     let mut deg_json = String::new();
     for (i, nm) in names.iter().enumerate() {
         deg_json += &format!("\"{}\":{},", nm, degs[i]);
@@ -573,18 +699,22 @@ fn probe(c: &Curve, t: u32, k: u32, g: u64, full: bool, rng: &mut Rng) -> Row {
     let rnd: Vec<String> = degs[first_random..].iter().map(|d| d.to_string()).collect();
     deg_json += &format!("\"random\":[{}]", rnd.join(","));
     let secs = t0.elapsed().as_secs_f64();
+    let (tower_name, g_val, tower_json) = match base {
+        Base::Kummer { g } => ("kummer", g, String::new()),
+        Base::Dickson { u } => ("dickson", 0, format!(",\"u\":{},\"c\":{}", u, dick_c)),
+    };
     let json = format!(
-        "{{\"p\":{},\"t\":{},\"k\":{},\"a\":{},\"b\":{},\"lift_a\":{},\"lift_b\":{},\"r\":{},\"g\":{},\"n_abscissae\":{},\"size_V\":{},\
+        "{{\"p\":{},\"tower\":\"{}\"{},\"t\":{},\"k\":{},\"a\":{},\"b\":{},\"lift_a\":{},\"lift_b\":{},\"r\":{},\"g\":{},\"n_abscissae\":{},\"size_V\":{},\
 \"lift_note\":\"lifted curve a+lift_a*p, b+lift_b*p\",\"deg\":{{{}}},\"d_full\":{},\
 \"verify\":{{\"points\":{},\"reduces\":{},\"on_curve\":{},\"order_r\":{},\"even\":{},\"hom_pairs\":{}}},\
 \"wall_seconds\":{:.3}}}",
-        p, t, k, c.a, c.b, c.la, c.lb, c.r, g, n, 1u64 << t, deg_json, d_full,
+        p, tower_name, tower_json, t, k, c.a, c.b, c.la, c.lb, c.r, g_val, n, 1u64 << t, deg_json, d_full,
         ver.points, ver.reduces, ver.on_curve, ver.order_r, ver.even, ver.hom_pairs, secs
     );
     let summary =
         format!(
-        "p={} t={} k={} a={} b={} r={} g={} n={} 2^t={} deg={{{}}} d_full={} verify={:?} {:.2}s",
-        p, t, k, c.a, c.b, c.r, g, n, 1u64 << t, deg_json, d_full, ver, secs
+        "p={} tower={}{} t={} k={} a={} b={} r={} g={} n={} 2^t={} deg={{{}}} d_full={} verify={:?} {:.2}s",
+        p, tower_name, tower_json, t, k, c.a, c.b, c.r, g_val, n, 1u64 << t, deg_json, d_full, ver, secs
     );
     Row { json, summary }
 }
@@ -628,6 +758,12 @@ fn main() {
     let lift_b: u64 = get("--lift-b").map_or(0, |s| s.parse().unwrap());
     let ncurves: usize = get("--curves").map_or(1, |s| s.parse().unwrap());
     let verify = args.iter().any(|a| a == "--verify");
+    let dickson = match get("--tower").as_deref() {
+        None | Some("kummer") => false,
+        Some("dickson") => true,
+        Some(other) => panic!("unknown --tower {other} (kummer|dickson)"),
+    };
+    assert!(!dickson || t >= 2, "--tower dickson needs t >= 2");
     assert!(
         p < 1 << 16 && (2..=4).contains(&k),
         "need p < 2^16 and 2 <= k <= 4"
@@ -656,8 +792,16 @@ fn main() {
         let mut c = fixed.unwrap_or_else(|| find_curve(p, &mut rng));
         c.la = lift_a;
         c.lb = lift_b;
-        let g = 1 + Rng::below(&mut rng, p - 1);
-        let row = probe(&c, t, k, g, verify, &mut rng);
+        let base = if dickson {
+            Base::Dickson {
+                u: dickson_u(p, t, &mut rng),
+            }
+        } else {
+            Base::Kummer {
+                g: 1 + Rng::below(&mut rng, p - 1),
+            }
+        };
+        let row = probe(&c, t, k, base, verify, &mut rng);
         println!("{}", row.summary);
         if let Some(f) = out.as_mut() {
             writeln!(f, "{}", row.json).unwrap();
@@ -730,6 +874,62 @@ mod tests {
             .map(|&v| powmod(v as u128, 3, p as u128) as u64)
             .collect();
         let (d, d_full) = degrees(&vs, t, p, &[f1, f3]);
+        assert_eq!(d, vec![1, 2]);
+        assert!(d_full <= t as usize);
+    }
+
+    #[test]
+    fn dickson_base_and_rank() {
+        let mut rng = Rng(3);
+        let c = find_curve(40961, &mut rng);
+        let (p, t) = (c.p, 6u32);
+        let u = dickson_u(p, t, &mut rng);
+        let (all, cc) = dickson_base(p, t, u);
+        assert_eq!(all.len(), 64);
+        let mut vals: Vec<u64> = all.iter().map(|y| y[0]).collect();
+        vals.sort_unstable();
+        vals.dedup();
+        assert_eq!(vals.len(), 64);
+        for y in &all {
+            let top = y[t as usize - 1] as u128;
+            assert_eq!(((top * top + p as u128 - 2) % p as u128) as u64, cc);
+        }
+        let vs: Vec<u64> = all.iter().map(|y| y[0]).collect();
+        let sel = select_abscissae(&c, &vs);
+        let tw: Vec<Vec<u64>> = sel.iter().map(|&(i, _, _)| all[i].clone()).collect();
+        let rows = dickson_rows(&tw, t, p);
+        let n = tw.len();
+        assert!(n > 0);
+        let mut ech = Echelon {
+            n,
+            p,
+            basis: Vec::new(),
+        };
+        for e in 0..(1usize << t) {
+            let col: Vec<u64> = rows.iter().map(|r| r[e]).collect();
+            ech.insert(&col);
+        }
+        assert_eq!(
+            ech.basis.len(),
+            n,
+            "multilinear columns at d = t not full rank"
+        );
+    }
+
+    #[test]
+    fn dickson_degree_sanity() {
+        let mut rng = Rng(5);
+        let c = find_curve(40961, &mut rng);
+        let (p, t) = (c.p, 5u32);
+        let u = dickson_u(p, t, &mut rng);
+        let (all, _) = dickson_base(p, t, u);
+        let vs: Vec<u64> = all.iter().map(|y| y[0]).collect();
+        let sel = select_abscissae(&c, &vs);
+        let tw: Vec<Vec<u64>> = sel.iter().map(|&(i, _, _)| all[i].clone()).collect();
+        let rows = dickson_rows(&tw, t, p);
+        let y0: Vec<u64> = rows.iter().map(|r| r[1]).collect();
+        let y01: Vec<u64> = rows.iter().map(|r| r[3]).collect();
+        let (d, d_full) = degrees_rows(&rows, t, p, &[y0, y01]);
         assert_eq!(d, vec![1, 2]);
         assert!(d_full <= t as usize);
     }

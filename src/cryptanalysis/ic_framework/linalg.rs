@@ -58,6 +58,7 @@ use std::cell::RefCell;
 use num_bigint::BigUint;
 
 use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+use crate::cryptanalysis::prime_fast::MulModN;
 
 use crate::cryptanalysis::ic_boundary::{
     pivot_inversion_steps, IncrementalGauss, RelationSolver, RowStatus,
@@ -70,13 +71,31 @@ use crate::cryptanalysis::koblitz_sparse_la::{
 fn addmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 + b as u128) % m as u128) as u64
 }
+/// `(a + m − b) mod m` on 128-bit integers, exactly; reduced operands
+/// (every stored entry and right-hand side once reduced) take one
+/// compare-and-subtract instead of the 128-bit remainder.
+#[inline]
 fn submod(a: u64, b: u64, m: u64) -> u64 {
-    ((a as u128 + m as u128 - b as u128) % m as u128) as u64
+    if a < m && b < m {
+        // A select, not a branch: on field data the comparison is a coin
+        // flip a branch predictor cannot learn.
+        let (d, borrow) = a.overflowing_sub(b);
+        std::hint::select_unpredictable(borrow, d.wrapping_add(m), d)
+    } else {
+        ((a as u128 + m as u128 - b as u128) % m as u128) as u64
+    }
 }
+#[cfg(test)]
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 * b as u128) % m as u128) as u64
 }
+/// `a⁻¹ mod m`: `ic_boundary::invmod` (word-division Euclid) and, only
+/// when it finds no inverse, the `i128` Euclid it replaced.  Both are
+/// exact and the inverse is unique, so the value is unchanged.
 fn invmod(a: u64, m: u64) -> Option<u64> {
+    crate::cryptanalysis::ic_boundary::invmod(a, m).or_else(|| invmod_i128(a, m))
+}
+fn invmod_i128(a: u64, m: u64) -> Option<u64> {
     // Extended Euclid over i128; `m` is prime, so any non-zero `a` inverts.
     let (mut r0, mut r1) = (m as i128, (a % m) as i128);
     let (mut t0, mut t1) = (0i128, 1i128);
@@ -96,22 +115,28 @@ type Sparse = Vec<(usize, u64)>;
 
 /// `a − f·b`, both sparse and sorted, counting one `row_op` per
 /// non-zero touched and, in `steps`, one merge step (a column compare
-/// and a push) per entry of either input.
-fn sparse_sub_scaled(
-    a: &Sparse,
+/// and a push) per entry of either input.  The result is written into
+/// `out` (cleared first), so callers reuse one buffer instead of
+/// allocating a row per reduction; products go through `mm`
+/// ([`MulModN`], the value of the `u128` remainder).
+fn sparse_sub_scaled_into(
+    a: &[(usize, u64)],
     f: u64,
-    b: &Sparse,
-    m: u64,
+    b: &[(usize, u64)],
+    mm: &MulModN,
     ops: &mut u64,
     steps: &mut u64,
-) -> Sparse {
-    let mut out = Vec::with_capacity(a.len() + b.len());
+    out: &mut Sparse,
+) {
+    let m = mm.m;
+    out.clear();
+    out.reserve(a.len() + b.len());
     let (mut i, mut j) = (0, 0);
     while i < a.len() || j < b.len() {
         *steps += 1;
         match (a.get(i), b.get(j)) {
             (Some(&(ca, va)), Some(&(cb, vb))) if ca == cb => {
-                let v = submod(va, mulmod(f, vb, m), m);
+                let v = submod(va, mm.mul(f, vb), m);
                 *ops += 1;
                 if v != 0 {
                     out.push((ca, v));
@@ -128,7 +153,7 @@ fn sparse_sub_scaled(
                 i += 1;
             }
             (_, Some(&(cb, vb))) => {
-                let v = submod(0, mulmod(f, vb, m), m);
+                let v = submod(0, mm.mul(f, vb), m);
                 *ops += 1;
                 if v != 0 {
                     out.push((cb, v));
@@ -138,7 +163,6 @@ fn sparse_sub_scaled(
             (None, None) => break,
         }
     }
-    out
 }
 
 /// Sparse incremental elimination, pivoting on the lightest column.
@@ -175,6 +199,10 @@ pub struct StructuredGauss {
     pub entries_scanned: u64,
     /// Pivot normalisations, one modular inversion each.
     pub pivot_inversions: u64,
+    /// `a·b mod modulus` (the value of the `u128` remainder).
+    mm: MulModN,
+    /// The reduction buffer reused by `add_row` (no counted meaning).
+    scratch: Sparse,
 }
 
 impl StructuredGauss {
@@ -194,21 +222,26 @@ impl StructuredGauss {
             peak_nonzeros: 0,
             entries_scanned: 0,
             pivot_inversions: 0,
+            mm: MulModN::new(modulus),
+            scratch: Vec::new(),
         }
     }
+}
 
-    fn note_weight(&mut self, row: &Sparse, delta: i32) {
-        self.entries_scanned += row.len() as u64;
-        for &(c, _) in row {
-            let w = &mut self.weight[c];
-            *w = (*w as i32 + delta).max(0) as u32;
-        }
+/// Column-weight bookkeeping of [`StructuredGauss`], on the two fields it
+/// touches, so that it can run while a stored row is borrowed.
+fn note_weight(weight: &mut [u32], entries_scanned: &mut u64, row: &[(usize, u64)], delta: i32) {
+    *entries_scanned += row.len() as u64;
+    for &(c, _) in row {
+        let w = &mut weight[c];
+        *w = (*w as i32 + delta).max(0) as u32;
     }
 }
 
 impl RelationSolver for StructuredGauss {
     fn add_row(&mut self, dense: Vec<u64>, mut rhs: u64) -> RowStatus {
         let m = self.modulus;
+        let mm = self.mm;
         debug_assert_eq!(dense.len(), self.cols);
         let mut row: Sparse = dense
             .iter()
@@ -217,6 +250,13 @@ impl RelationSolver for StructuredGauss {
             .map(|(c, &v)| (c, v % m))
             .collect();
         self.entries_scanned += self.cols as u64;
+        // One reusable buffer for every reduction below (assessment
+        // 2026-11-10, R2): each `sparse_sub_scaled_into` writes into it
+        // and the result is swapped in, so no row is cloned or allocated
+        // per step.  The `2 × len` clone charges to `entries_scanned` are
+        // kept exactly as before: they are now modelled work, the copy the
+        // counted algorithm makes, so `bitop/v1` records do not change.
+        let mut scratch = std::mem::take(&mut self.scratch);
         // Reduce against every pivot the new row touches.  A sparse row
         // touches few, and the reduction adds only the pivot row's
         // non-zeros, so this is the step the structure pays for.
@@ -228,20 +268,23 @@ impl RelationSolver for StructuredGauss {
             });
             self.entries_scanned += looked;
             let Some((i, f)) = hit else { break };
-            let pivot_row = self.rows[i].clone();
-            self.entries_scanned += 2 * pivot_row.len() as u64;
-            row = sparse_sub_scaled(
+            // Modelled clone of the pivot row (see above).
+            self.entries_scanned += 2 * self.rows[i].len() as u64;
+            sparse_sub_scaled_into(
                 &row,
                 f,
-                &pivot_row,
-                m,
+                &self.rows[i],
+                &mm,
                 &mut self.row_ops,
                 &mut self.entries_scanned,
+                &mut scratch,
             );
-            rhs = submod(rhs, mulmod(f, self.rhs[i], m), m);
+            std::mem::swap(&mut row, &mut scratch);
+            rhs = submod(rhs, mm.mul(f, self.rhs[i]), m);
             self.row_ops += 1;
         }
         if row.is_empty() {
+            self.scratch = scratch;
             if rhs == 0 {
                 self.dependent += 1;
                 return RowStatus::Dependent;
@@ -259,10 +302,10 @@ impl RelationSolver for StructuredGauss {
         self.pivot_inversions += 1;
         let inv = invmod(pv, m).expect("prime modulus");
         for (_, v) in row.iter_mut() {
-            *v = mulmod(*v, inv, m);
+            *v = mm.mul(*v, inv);
             self.row_ops += 1;
         }
-        rhs = mulmod(rhs, inv, m);
+        rhs = mm.mul(rhs, inv);
         self.row_ops += 1;
         // Eliminate the new pivot column from every stored row that
         // holds it; only those rows are touched.
@@ -273,27 +316,34 @@ impl RelationSolver for StructuredGauss {
                 Ok(k) => self.rows[i][k].1,
                 Err(_) => continue,
             };
-            let before = self.rows[i].clone();
-            self.entries_scanned += 2 * before.len() as u64;
-            let after = sparse_sub_scaled(
-                &before,
+            // Modelled clone of the reduced row (see above).
+            self.entries_scanned += 2 * self.rows[i].len() as u64;
+            sparse_sub_scaled_into(
+                &self.rows[i],
                 f,
                 &row,
-                m,
+                &mm,
                 &mut self.row_ops,
                 &mut self.entries_scanned,
+                &mut scratch,
             );
-            self.rhs[i] = submod(self.rhs[i], mulmod(f, rhs, m), m);
+            // `scratch` now holds the row after, `rows[i]` the row before;
+            // swap so that `rows[i]` is the new row and `scratch` the old.
+            std::mem::swap(&mut self.rows[i], &mut scratch);
+            let (before, after) = (&scratch, &self.rows[i]);
+            self.rhs[i] = submod(self.rhs[i], mm.mul(f, rhs), m);
             self.row_ops += 1;
             self.nonzeros = self.nonzeros - before.len() as u64 + after.len() as u64;
-            self.note_weight(&before, -1);
-            self.note_weight(&after, 1);
-            self.rows[i] = after;
+            // Same order as before: the old row's weights out, then the
+            // new row's in.
+            note_weight(&mut self.weight, &mut self.entries_scanned, before, -1);
+            note_weight(&mut self.weight, &mut self.entries_scanned, after, 1);
         }
+        self.scratch = scratch;
         self.row_of_pivot[pc] = Some(self.rows.len());
         self.pivot_of_row.push(pc);
         self.nonzeros += row.len() as u64;
-        self.note_weight(&row, 1);
+        note_weight(&mut self.weight, &mut self.entries_scanned, &row, 1);
         self.peak_nonzeros = self.peak_nonzeros.max(self.nonzeros);
         self.rows.push(row);
         self.rhs.push(rhs);
@@ -569,9 +619,13 @@ impl<S: RhoScalar> Wiedemann<S> {
                     .expect("below the modulus")
             })
             .collect();
-        // y = Rᵀ D (R x)
-        let apply = |x: &[S], ops: &mut u64| -> Vec<S> {
-            let mut y = vec![S::zero(); n];
+        // y = Rᵀ D (R x), into a caller-owned buffer: the products of the
+        // Krylov run reuse two vectors instead of allocating one per
+        // matvec (assessment 2026-11-10, R10).  The loop order, every
+        // value and every `ops` charge are as before.
+        let apply = |x: &[S], y: &mut Vec<S>, ops: &mut u64| {
+            y.clear();
+            y.resize(n, S::zero());
             for (row, &di) in r.iter().zip(&d) {
                 let mut t = S::zero();
                 for &(j, v) in row {
@@ -588,7 +642,6 @@ impl<S: RhoScalar> Wiedemann<S> {
                 }
                 *ops += row.len() as u64;
             }
-            y
         };
         let dot = |x: &[S], y: &[S], ops: &mut u64| -> S {
             *ops += n as u64;
@@ -607,12 +660,13 @@ impl<S: RhoScalar> Wiedemann<S> {
         // s_0 .. s_{2n-1} from w_0 .. w_n.
         let mut seq = Vec::with_capacity(2 * n);
         let mut w = b.clone();
+        let mut next = Vec::with_capacity(n);
         for _ in 0..n {
-            let next = apply(&w, &mut ops);
+            apply(&w, &mut next, &mut ops);
             st.matvecs += 1;
             seq.push(dot(&w, &w, &mut ops));
             seq.push(dot(&w, &next, &mut ops));
-            w = next;
+            std::mem::swap(&mut w, &mut next);
         }
         let c = berlekamp_massey(&seq, m, &mut ops);
         let l = c.len() - 1;
@@ -624,6 +678,7 @@ impl<S: RhoScalar> Wiedemann<S> {
             let f0_inv = S::inverse_mod(c[l], m)?;
             let mut z = vec![S::zero(); n];
             let mut w = b.clone();
+            let mut tmp = next;
             for j in 1..=l {
                 let fj = c[l - j];
                 if fj != S::zero() {
@@ -633,7 +688,8 @@ impl<S: RhoScalar> Wiedemann<S> {
                     ops += n as u64;
                 }
                 if j < l {
-                    w = apply(&w, &mut ops);
+                    apply(&w, &mut tmp, &mut ops);
+                    std::mem::swap(&mut w, &mut tmp);
                     st.matvecs += 1;
                 }
             }

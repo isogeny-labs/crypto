@@ -81,7 +81,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::cryptanalysis::ecbench::band::{
-    priced_s_with, table_work_counts, unpriced_counts, Pricing, DEFAULT_WEIGHTS,
+    calibrated_ratio_grid, matched_verified, priced_s_with, table_work_counts, unpriced_counts,
+    CalibratedGrid, Pricing, WCal, DEFAULT_WEIGHTS, WCAL_SOURCE_OVERRIDE,
 };
 use crate::cryptanalysis::ecbench::canonical::short_id;
 use crate::cryptanalysis::ecbench::record::Record;
@@ -232,6 +233,13 @@ pub struct OpsBand {
     /// (`--no-price-table-work`) and in every comparison before that date.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub priced_table_work: Vec<String>,
+    /// The calibrated reading of AGENTS.md §5a (2026-11-12): the same pairs
+    /// with the field-multiplication counters priced at `0`, `w_cal` and
+    /// `10·w_cal`.  Present only when the sessions carry (or the options
+    /// give) a `w_cal`; additive: `order`, `ratio_b_over_a` and every other
+    /// field are unchanged, and the band's `order` still governs.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calibrated: Option<CalibratedGrid>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -474,7 +482,26 @@ pub struct CompareOptions {
     /// (default since 2026-11-08: the counted table inserts;
     /// `Pricing::pre_2026_11_08()` charges nothing extra).
     pub pricing: Pricing,
+    /// Pair each run's recorded bitop/v1 price (`work.bitops_per_sqrt_r`)
+    /// instead of its S (`ecbench compare --unit bitop/v1`): the ratio and
+    /// its intervals are in gates, the §5a GAE band is not computed (it
+    /// prices operations in GAE), and the unit enters `comparison_id`.
+    /// Refused with a weight.
+    pub bitop: bool,
+    /// The calibrated weight to surface beside the band
+    /// (`ops.band.calibrated`); `None` reads the sessions' own
+    /// (`options.w_cal`, or the `w_cal.json` sidecar via
+    /// [`compare_weighted_with`]).  `Some` is an override (`ecbench compare
+    /// --w-cal`): it takes precedence over the sessions' reading, is
+    /// validated (finite, positive, a known method, a named host), is
+    /// refused with `bitop`, and is recorded as `source: "override"`.
+    pub w_cal: Option<WCal>,
 }
+
+/// The refusal of a `w_cal` override on a `bitop/v1` comparison: that unit
+/// prices every field multiplication at its frozen primitive weight
+/// (`docs/units/BITOPS.md`), so there is no GAE field class to calibrate.
+pub const BITOP_TAKES_NO_WCAL: &str = "a bitop/v1 comparison takes no w_cal: bitop/v1 prices field multiplications at their frozen primitive weights (docs/units/BITOPS.md), so there is no GAE field-arithmetic class to price at a calibrated weight";
 
 // ── Tail diagnostics ───────────────────────────────────────────────
 
@@ -708,6 +735,7 @@ fn match_pairs(
     mb: &[&Record],
     weight: Option<f64>,
     pricing: Pricing,
+    bitop: bool,
 ) -> Result<Matched, String> {
     let (ca, cb) = (arm_censor(ma), arm_censor(mb));
     let key = |r: &Record| (r.workload.workload_id.clone(), r.round);
@@ -716,11 +744,32 @@ fn match_pairs(
     let mut a_unpriced = 0usize;
     let mut b_unpriced = 0usize;
 
+    let bitop_s = |r: &Record| -> Result<Option<(f64, bool)>, String> {
+        if !r.counts() {
+            return Ok(None);
+        }
+        let w = r
+            .work
+            .as_ref()
+            .ok_or_else(|| format!("record {} has no bitop/v1 work block", r.record_id))?;
+        let v = w.bitops_per_sqrt_r;
+        if !(v.is_finite() && v >= 0.0) {
+            return Err(format!(
+                "record {}: bitops_per_sqrt_r is not finite",
+                r.record_id
+            ));
+        }
+        Ok(Some((v, false)))
+    };
     for r in ma {
-        let cost = match weight {
-            Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
-            Some(_) => None,
-            None => run_cost(r, &ca),
+        let cost = if bitop {
+            bitop_s(r)?
+        } else {
+            match weight {
+                Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
+                Some(_) => None,
+                None => run_cost(r, &ca),
+            }
         };
         if let Some((s, censored)) = cost {
             a.insert(key(r), (*r, s, censored));
@@ -729,10 +778,14 @@ fn match_pairs(
         }
     }
     for r in mb {
-        let cost = match weight {
-            Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
-            Some(_) => None,
-            None => run_cost(r, &cb),
+        let cost = if bitop {
+            bitop_s(r)?
+        } else {
+            match weight {
+                Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
+                Some(_) => None,
+                None => run_cost(r, &cb),
+            }
         };
         if let Some((s, censored)) = cost {
             b.insert(key(r), (*r, s, censored));
@@ -752,7 +805,7 @@ fn match_pairs(
                 b: *sb,
                 a_censored: *ca,
                 b_censored: *cb,
-                band: if exact {
+                band: if exact && !bitop {
                     priced_pair(ra, rb, pricing)
                 } else {
                     Vec::new()
@@ -925,6 +978,7 @@ pub fn band_report(
         pairs: exact.len() as u64,
         note,
         priced_table_work: Vec::new(),
+        calibrated: None,
     })
 }
 
@@ -964,6 +1018,8 @@ pub fn compare_weighted(
             seed,
             allow_interrupted: false,
             pricing: Pricing::default(),
+            bitop: false,
+            w_cal: None,
         },
         weight,
     )
@@ -990,9 +1046,9 @@ pub fn compare_weighted_with(
     weight: Option<f64>,
 ) -> Result<Comparison, String> {
     validate_pricing_weight(weight)?;
-    let sa = read_session(a_dir)?;
+    let mut sa = read_session(a_dir)?;
     let ra = read_records(a_dir)?;
-    let (sb, rb) = match b_dir {
+    let (mut sb, rb) = match b_dir {
         Some(d) => (read_session(d)?, read_records(d)?),
         None => (sa.clone(), ra.clone()),
     };
@@ -1003,7 +1059,23 @@ pub fn compare_weighted_with(
         .as_ref()
         .map(|s| s.measurement.isolation_required)
         .unwrap_or(Level::L2);
+    // Without an override the sessions' own reading is used (the sidecar
+    // wins over `options.w_cal`); it is read here, on the loaded copies, so
+    // `compare_loaded_weighted` can tell it from an override.  A bitop/v1
+    // comparison has no calibrated block and reads none.
+    if opts.w_cal.is_none() && !opts.bitop {
+        let mut dirs = vec![a_dir.to_path_buf()];
+        dirs.extend(b_dir.map(Path::to_path_buf));
+        let shared = crate::cryptanalysis::ecbench::runner::shared_wcal(&dirs)?;
+        sa.options.w_cal = shared.clone();
+        sb.options.w_cal = shared;
+    }
     compare_loaded_weighted(&sa, &ra, &sb, &rb, a_arm, b_arm, required, opts, weight)
+}
+
+/// A `w_cal` override as it enters a comparison's identity.
+pub(crate) fn wcal_identity(w: &WCal) -> serde_json::Value {
+    json!({"w_cal": w.w_cal.to_string(), "method": w.method, "host": w.host})
 }
 
 fn validate_pricing_weight(weight: Option<f64>) -> Result<(), String> {
@@ -1086,7 +1158,16 @@ pub fn compare_loaded_weighted(
         return Err("the arms report different units".into());
     }
 
-    let matched = match_pairs(&ma, &mb, weight, opts.pricing)?;
+    if opts.bitop && weight.is_some() {
+        return Err("a bitop/v1 comparison takes no GAE weight".into());
+    }
+    if let Some(w) = &opts.w_cal {
+        if opts.bitop {
+            return Err(BITOP_TAKES_NO_WCAL.into());
+        }
+        w.validate()?;
+    }
+    let matched = match_pairs(&ma, &mb, weight, opts.pricing, opts.bitop)?;
     if weight.is_some() {
         validate_weighted_totals(&matched)?;
     }
@@ -1151,7 +1232,33 @@ pub fn compare_loaded_weighted(
         .collect();
     let incomplete = a.verified < a.measured || b.verified < b.measured;
     let priced_table_work = opts.pricing.priced_table_work();
+    let wcal = if opts.bitop {
+        None
+    } else {
+        match &opts.w_cal {
+            Some(w) => Some((w.clone(), Some(WCAL_SOURCE_OVERRIDE.to_string()))),
+            None if sa.options.w_cal == sb.options.w_cal => {
+                sa.options.w_cal.clone().map(|w| (w, None))
+            }
+            None => {
+                return Err(
+                    "the two sessions carry different w_cal; pass one in CompareOptions".into(),
+                )
+            }
+        }
+    };
+    let calibrated = match &wcal {
+        Some((w, source)) => {
+            let pairs = matched_verified(ma.iter().copied(), mb.iter().copied());
+            let mut g =
+                calibrated_ratio_grid(&pairs, &DEFAULT_WEIGHTS, opts.pricing, w, a_arm, b_arm)?;
+            g.source = source.clone();
+            Some(g)
+        }
+        None => None,
+    };
     let band = band_report(&strata, a_arm, b_arm, rep.censored_pairs).map(|mut b| {
+        b.calibrated = calibrated;
         if !priced_table_work.is_empty() {
             b.note.push_str(&format!(
                 "; counted table work priced in U with the unpriced counters: {}",
@@ -1171,7 +1278,11 @@ pub fn compare_loaded_weighted(
         } else {
             "ok".into()
         },
-        unit: ma[0].cost.unit.clone(),
+        unit: if opts.bitop {
+            "bitop/v1".to_string()
+        } else {
+            ma[0].cost.unit.clone()
+        },
         ratio_b_over_a: rep.ratio,
         ci95: rep.ci95,
         ci_method: rep.ci_method.clone(),
@@ -1252,10 +1363,19 @@ pub fn compare_loaded_weighted(
         if let Some(w) = weight {
             identity["pricing_weight"] = json!(w.to_string());
         }
+        if opts.bitop {
+            identity["unit"] = json!("bitop/v1");
+        }
         // The reading is part of the v2 identity; the v1 identity predates
         // pricing and stays the same under either reading.
         if extra && !priced_table_work.is_empty() {
             identity["priced_table_work"] = json!(priced_table_work);
+        }
+        // An override changes the calibrated block, so it enters the v2
+        // identity (and a saved file name); the sessions' own reading does
+        // not, so every comparison without an override keeps its id.
+        if let (true, Some(w)) = (extra, &opts.w_cal) {
+            identity["w_cal_override"] = wcal_identity(w);
         }
         short_id("ECC1", &identity)
     };
@@ -1275,7 +1395,7 @@ pub fn compare_loaded_weighted(
         wall,
         quality: Some(quality),
         verdict,
-        legacy_comparison_id: weight.is_none().then_some(legacy_id),
+        legacy_comparison_id: (weight.is_none() && !opts.bitop).then_some(legacy_id),
         a_session_status: Some(sa.status.clone()),
         b_session_status: Some(sb.status.clone()),
         allow_interrupted: opts.allow_interrupted,
@@ -2213,6 +2333,8 @@ mod tests {
                 seed: 7,
                 allow_interrupted: allow,
                 pricing: Pricing::default(),
+                bitop: false,
+                w_cal: None,
             },
         )
     }
@@ -2629,6 +2751,8 @@ mod tests {
             seed: 1,
             allow_interrupted: false,
             pricing: Pricing::default(),
+            bitop: false,
+            w_cal: None,
         };
         let unweighted = compare_loaded_weighted(
             &session,
@@ -2696,6 +2820,8 @@ mod tests {
                 seed: 7,
                 allow_interrupted: false,
                 pricing,
+                bitop: false,
+                w_cal: None,
             };
             compare_loaded_weighted(
                 &session,
@@ -2799,9 +2925,41 @@ mod tests {
         );
         a.cost.total_gae = None;
         b.cost.total_gae = None;
-        let matched = match_pairs(&[&a], &[&b], Some(1.0), Pricing::default()).unwrap();
+        let matched = match_pairs(&[&a], &[&b], Some(1.0), Pricing::default(), false).unwrap();
         assert_eq!(matched.unpaired, 2);
         assert!(matched.by_workload.is_empty());
+    }
+
+    #[test]
+    fn bitop_pairing_needs_a_work_block() {
+        let a = rec(
+            "A",
+            "M1",
+            "reference",
+            "W00",
+            1,
+            "verified",
+            Some(10.0),
+            1_000,
+        );
+        let b = rec(
+            "B",
+            "M2",
+            "candidate",
+            "W00",
+            1,
+            "verified",
+            Some(20.0),
+            2_000,
+        );
+        assert!(a.work.is_none());
+        let err = match_pairs(&[&a], &[&b], None, Pricing::default(), true)
+            .err()
+            .unwrap();
+        assert!(err.contains("no bitop/v1 work block"), "{err}");
+        // The S reading of the same records still pairs.
+        let m = match_pairs(&[&a], &[&b], None, Pricing::default(), false).unwrap();
+        assert_eq!(m.by_workload.values().map(|v| v.len()).sum::<usize>(), 1);
     }
 
     #[test]

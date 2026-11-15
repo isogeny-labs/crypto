@@ -199,6 +199,10 @@ const ROW_OP: Rule = Prims(&[(ModrMul, 1), (ModrAdd, 1)]);
 /// Native counters of the index-calculus methods (phase `native` maps).
 fn ic_rule(counter: &str) -> Option<Rule> {
     Some(match counter {
+        // wwalk aut=3: min(x, ωx, ω²x) per stored or probed point, the two
+        // ω-rotations and the two key comparisons (the IC table, not the
+        // generic rule table, is what `ic.*` records are priced from).
+        "aut_canonicalisations_uncharged" => Prims(&[(FieldMul, 2), (WordOp, 2)]),
         // Outcomes, sizes, parameters, flags.
         "trials"
         | "relations"
@@ -641,6 +645,8 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         | "jump_count"
         | "dp_bits"
         | "chained_setup"
+        | "lanes"
+        | "lane_rounds"
         | "starts" => Shape,
         // Kangaroo's distinguished points are probed under lookups_uncharged.
         "distinguished_points" if kangaroo => Shape,
@@ -658,9 +664,6 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         // compare each (`work_native` of the search phase, 2026-11-07;
         // research/rho_cycle_window_bitops_20261107).
         "cycle_window_word_ops" | "brent_word_ops" => Prims(&[(WordOp, 1)]),
-        // wwalk aut=3: min(x, ωx, ω²x) per stored or probed point, the two
-        // ω-rotations and the two key comparisons.
-        "aut_canonicalisations_uncharged" => Prims(&[(FieldMul, 2), (WordOp, 2)]),
         "canonicalisations_uncharged" if strong => {
             // canon(x), three more basis conversions, the Montgomery scalar
             // update.
@@ -688,6 +691,7 @@ fn gae_carries_group_ops(method: &str) -> bool {
         "rho.plain"
             | "rho.negation"
             | "rho.negation_chained"
+            | "rho.negation_lanes_v1"
             | "rho.cubic"
             | "rho.quartic"
             | "rho.signed_frobenius"

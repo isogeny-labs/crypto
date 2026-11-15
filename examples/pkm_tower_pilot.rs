@@ -363,6 +363,9 @@ struct Tower {
     /// The value the last step must reach.
     c: u64,
     info: Value,
+    /// `--cover-map`: the factor base is `x∘φ(V)`, not `V` (see [`CoverMap`]).
+    /// `None` for every tower unless the flag is given.
+    cover: Option<CoverMap>,
 }
 
 impl Tower {
@@ -523,6 +526,7 @@ fn kummer(p: u64, t: usize, rng: &mut StdRng) -> Tower {
         steps: vec![Step::Square; t],
         c: 1,
         info: json!({"g": g, "zeta": zeta}),
+        cover: None,
     }
 }
 
@@ -554,6 +558,7 @@ fn dickson(p: u64, t: usize, rng: &mut StdRng) -> Tower {
             steps: vec![Step::Dickson; t],
             c: addm(ut, invm(ut, p), p),
             info: json!({"u": u, "zeta": zeta}),
+            cover: None,
         };
     }
 }
@@ -698,6 +703,7 @@ fn dickson_torus(p: u64, t: usize, rng: &mut StdRng) -> Tower {
             steps: vec![Step::Dickson; t],
             c,
             info: json!({"case": "torus", "u": [u.0, u.1], "zeta": [zeta.0, zeta.1], "c": c}),
+            cover: None,
         };
         check_torus(&tower, u, zeta, p);
         return tower;
@@ -829,7 +835,277 @@ fn isogeny(p: u64, t: usize, rng: &mut StdRng) -> Tower {
             steps,
             c: rj.x,
             info,
+            cover: None,
         };
+    }
+}
+
+// ── Cover-image factor bases (`--cover-map`) ───────────────────────
+
+/// The shape of the degree-2 map `x∘φ(u) = N(u)/D(u)` of `--cover-map`.
+///
+/// A degree-2 map `u ↦ X` pulls `E: Y² = f(X)` back to the double cover
+/// `C: v² = h(u)`, `h = D⁴·f(N/D)`, with `φ(u, v) = (N/D, v/D²)`. Its genus
+/// is set by where the map's two critical values fall: both on branch points
+/// of `E` (∞ and a rational root of `f`) gives genus 1, a 2-isogeny (PKM's
+/// Vélu step); one at ∞ (a quadratic polynomial) gives a sextic `h`, genus 2;
+/// neither gives an octic `h`, genus 3. Prime-order curves have no rational
+/// root of `f`, so genus 2 is the smallest cover of this kind that is not an
+/// isogeny.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CoverKind {
+    /// `X = u²`: genus 2, and the positive control. On a Kummer tower it is
+    /// the tower's own first step, so `x∘φ(V)` is the depth-`t − 1` tower.
+    Square,
+    /// `X = λ(u − α)² + β`, `α, β, λ` random: genus 2.
+    Quad,
+    /// `X = N(u)/D(u)`, random coprime quadratics: genus 3.
+    Generic,
+    /// `X = u⁴`: genus 5, the second positive control. On a Kummer tower it
+    /// is the tower's first two steps, so `x∘φ(V)` is the depth-`t − 2` tower.
+    Fourth,
+    /// `X = u³ + c₂u² + c₁u + c₀`, random: `h = f(X(u))` of degree 9, genus 4.
+    Cubic,
+    /// `X = u⁴ + c₃u³ + … + c₀`, random: `h` of degree 12, genus 5.
+    Quart,
+    /// `X = N(u)/D(u)`, random coprime cubics: `h = D⁴f(N/D)` of degree 12,
+    /// genus 5.
+    Generic3,
+}
+
+impl CoverKind {
+    fn name(self) -> &'static str {
+        match self {
+            CoverKind::Square => "square",
+            CoverKind::Quad => "quad",
+            CoverKind::Generic => "generic",
+            CoverKind::Fourth => "fourth",
+            CoverKind::Cubic => "cubic",
+            CoverKind::Quart => "quart",
+            CoverKind::Generic3 => "generic3",
+        }
+    }
+}
+
+/// The largest degree of `N` and `D` in [`CoverMap`], plus one.
+const COVER_COEFFS: usize = 5;
+
+/// `x∘φ(u) = N(u)/D(u)`, coefficients from degree 0 up, zero-padded.
+#[derive(Clone, Copy, Debug)]
+struct CoverMap {
+    kind: CoverKind,
+    num: [u64; COVER_COEFFS],
+    den: [u64; COVER_COEFFS],
+}
+
+/// Zero-pads `c` to [`COVER_COEFFS`] coefficients.
+fn cover_coeffs(c: &[u64]) -> [u64; COVER_COEFFS] {
+    let mut out = [0u64; COVER_COEFFS];
+    out[..c.len()].copy_from_slice(c);
+    out
+}
+
+fn upoly_eval(c: &[u64], u: u64, p: u64) -> u64 {
+    c.iter()
+        .rev()
+        .fold(0, |acc, &k| addm(mulm(acc, u, p), k, p))
+}
+
+fn upoly_trim(mut a: Vec<u64>) -> Vec<u64> {
+    while a.last() == Some(&0) {
+        a.pop();
+    }
+    a
+}
+
+fn upoly_mul(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    }
+    let mut r = vec![0u64; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        for (j, &y) in b.iter().enumerate() {
+            r[i + j] = addm(r[i + j], mulm(x, y, p), p);
+        }
+    }
+    upoly_trim(r)
+}
+
+fn upoly_add(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut r = vec![0u64; a.len().max(b.len())];
+    for (i, &x) in a.iter().enumerate() {
+        r[i] = x;
+    }
+    for (i, &y) in b.iter().enumerate() {
+        r[i] = addm(r[i], y, p);
+    }
+    upoly_trim(r)
+}
+
+/// `a mod b` (`b` non-zero).
+fn upoly_rem(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut r = upoly_trim(a.to_vec());
+    let lead = invm(*b.last().expect("non-zero divisor"), p);
+    while r.len() >= b.len() {
+        let q = mulm(*r.last().unwrap(), lead, p);
+        let shift = r.len() - b.len();
+        for (i, &y) in b.iter().enumerate() {
+            r[shift + i] = subm(r[shift + i], mulm(q, y, p), p);
+        }
+        r = upoly_trim(r);
+    }
+    r
+}
+
+fn upoly_gcd_degree(a: &[u64], b: &[u64], p: u64) -> usize {
+    let (mut x, mut y) = (upoly_trim(a.to_vec()), upoly_trim(b.to_vec()));
+    while !y.is_empty() {
+        let r = upoly_rem(&x, &y, p);
+        x = y;
+        y = r;
+    }
+    x.len().saturating_sub(1)
+}
+
+impl CoverMap {
+    fn draw(kind: CoverKind, p: u64, rng: &mut StdRng) -> CoverMap {
+        match kind {
+            CoverKind::Square => CoverMap {
+                kind,
+                num: cover_coeffs(&[0, 0, 1]),
+                den: cover_coeffs(&[1]),
+            },
+            CoverKind::Fourth => CoverMap {
+                kind,
+                num: cover_coeffs(&[0, 0, 0, 0, 1]),
+                den: cover_coeffs(&[1]),
+            },
+            CoverKind::Cubic | CoverKind::Quart => {
+                let deg = if kind == CoverKind::Cubic { 3 } else { 4 };
+                let mut num: Vec<u64> = (0..deg).map(|_| rng.gen_range(0..p)).collect();
+                num.push(1);
+                CoverMap {
+                    kind,
+                    num: cover_coeffs(&num),
+                    den: cover_coeffs(&[1]),
+                }
+            }
+            CoverKind::Generic3 => loop {
+                let num = [
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    1,
+                ];
+                let den = [
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                ];
+                if upoly_gcd_degree(&num, &den, p) == 0 {
+                    break CoverMap {
+                        kind,
+                        num: cover_coeffs(&num),
+                        den: cover_coeffs(&den),
+                    };
+                }
+            },
+            CoverKind::Quad => {
+                // λ(u − α)² + β = λu² − 2λα·u + λα² + β.
+                let (al, be, la) = (
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                );
+                CoverMap {
+                    kind,
+                    num: cover_coeffs(&[
+                        addm(mulm(la, mulm(al, al, p), p), be, p),
+                        subm(0, mulm(2, mulm(la, al, p), p), p),
+                        la,
+                    ]),
+                    den: cover_coeffs(&[1]),
+                }
+            }
+            CoverKind::Generic => loop {
+                let num = [rng.gen_range(0..p), rng.gen_range(0..p), 1];
+                let den = [
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                ];
+                if upoly_gcd_degree(&num, &den, p) == 0 {
+                    break CoverMap {
+                        kind,
+                        num: cover_coeffs(&num),
+                        den: cover_coeffs(&den),
+                    };
+                }
+            },
+        }
+    }
+
+    /// `x∘φ(u)`, or `None` at a pole.
+    fn eval(&self, u: u64, p: u64) -> Option<u64> {
+        let d = upoly_eval(&self.den, u, p);
+        (d != 0).then(|| mulm(upoly_eval(&self.num, u, p), invm(d, p), p))
+    }
+
+    /// `x∘φ(u)` as an argument of [`s3_dbl_args`], `u` a polynomial.
+    fn arg(&self, u: &Pol, n: usize, p: u64) -> Arg {
+        let lift = |c: &[u64; COVER_COEFFS]| {
+            let c = upoly_trim(c.to_vec());
+            let mut f = Pol::constant(n, c.first().copied().unwrap_or(0), p);
+            let mut pw = u.clone();
+            for &k in c.iter().skip(1) {
+                f = f.add(&pw.scale(k, p), p);
+                pw = pw.mul(u, p);
+            }
+            f
+        };
+        if upoly_trim(self.den.to_vec()) == [1] {
+            Arg::Plain(lift(&self.num))
+        } else {
+            Arg::Frac(lift(&self.num), lift(&self.den))
+        }
+    }
+
+    /// `h = D⁴·f(N/D) = N³D + a·N·D³ + b·D⁴`, the cover `C: v² = h(u)`.
+    fn h(&self, a: u64, b: u64, p: u64) -> Vec<u64> {
+        let (nn, dd) = (upoly_trim(self.num.to_vec()), upoly_trim(self.den.to_vec()));
+        let n3 = upoly_mul(&upoly_mul(&nn, &nn, p), &nn, p);
+        let d2 = upoly_mul(&dd, &dd, p);
+        let d3 = upoly_mul(&d2, &dd, p);
+        let d4 = upoly_mul(&d2, &d2, p);
+        let t1 = upoly_mul(&n3, &dd, p);
+        let t2: Vec<u64> = upoly_mul(&nn, &d3, p)
+            .iter()
+            .map(|&c| mulm(c, a, p))
+            .collect();
+        let t3: Vec<u64> = d4.iter().map(|&c| mulm(c, b, p)).collect();
+        upoly_add(&upoly_add(&t1, &upoly_trim(t2), p), &upoly_trim(t3), p)
+    }
+
+    /// The genus of `v² = h(u)` when `h` is squarefree, else `None`.
+    fn genus(&self, a: u64, b: u64, p: u64) -> Option<usize> {
+        let h = self.h(a, b, p);
+        let dh: Vec<u64> = h
+            .iter()
+            .enumerate()
+            .skip(1)
+            .map(|(i, &c)| mulm(i as u64 % p, c, p))
+            .collect();
+        (h.len() >= 2 && upoly_gcd_degree(&h, &upoly_trim(dh), p) == 0)
+            .then(|| (h.len() - 1 - 1) / 2)
+    }
+
+    /// The factor base's abscissae `x∘φ(V)`, distinct, poles dropped.
+    fn image(&self, v: &[u64], p: u64) -> Vec<u64> {
+        let mut out: Vec<u64> = v.iter().filter_map(|&u| self.eval(u, p)).collect();
+        out.sort_unstable();
+        out.dedup();
+        out
     }
 }
 
@@ -868,13 +1144,21 @@ fn plant(
     let p = curve.p;
     let mut ops = GroupOps::default();
     let mut pick: Vec<u64> = Vec::with_capacity(m);
+    // With `--cover-map`, `pick` holds tower values u and `abs` their images
+    // x∘φ(u), distinct; without it the two are the same.
+    let mut abs: Vec<u64> = Vec::with_capacity(m);
     while pick.len() < m {
-        let x = on[rng.gen_range(0..on.len())];
-        if !pick.contains(&x) {
-            pick.push(x);
+        let u = on[rng.gen_range(0..on.len())];
+        let x = match &tower.cover {
+            Some(cv) => cv.eval(u, p).expect("on holds no pole"),
+            None => u,
+        };
+        if !abs.contains(&x) {
+            pick.push(u);
+            abs.push(x);
         }
     }
-    let pts: Vec<PrimePoint> = pick
+    let pts: Vec<PrimePoint> = abs
         .iter()
         .map(|&x| {
             let y = curve.sqrt(curve.rhs(x)).expect("abscissa on the curve");
@@ -904,7 +1188,7 @@ fn plant(
         planted: true,
         x_r,
         solution: Some(sol),
-        xs: pick,
+        xs: abs,
     })
 }
 
@@ -927,6 +1211,10 @@ enum Control {
     Naive,
     Null,
     Multiples,
+    /// A random factor base of the same size: two unknowns `x_1, x_2`,
+    /// membership `∏_{f ∈ F}(x_i − f)`, `F` random abscissae on the curve
+    /// (with the planted ones), `|F|` that of the cell's base (m = 2 only).
+    RandBase,
 }
 
 impl Control {
@@ -937,6 +1225,7 @@ impl Control {
             Control::Naive => "naive",
             Control::Null => "null",
             Control::Multiples => "multiples",
+            Control::RandBase => "randbase",
         }
     }
 }
@@ -950,6 +1239,20 @@ fn summation(tower: &Tower, curve: &PrimeCurve, m: usize, n: usize, x_r: u64) ->
     let (a, b) = (curve.a, curve.b);
     let x = |i: usize| Pol::var(n, i * tower.t).scale(tower.scale, p);
     let xr = Pol::constant(n, x_r, p);
+    if let Some(cv) = &tower.cover {
+        // S₃ at x∘φ(u_i), cleared of φ's denominators.
+        let xa = |i: usize| cv.arg(&x(i), n, p);
+        if m == 2 {
+            return vec![s3_dbl_args([xa(0), xa(1), Arg::Plain(xr)], a, b, p)];
+        }
+        let u = |k: usize| Arg::Plain(Pol::var(n, m * tower.t + k));
+        let mut eqs = vec![s3_dbl_args([xa(0), xa(1), u(0)], a, b, p)];
+        for k in 1..m - 2 {
+            eqs.push(s3_dbl_args([u(k - 1), xa(k + 1), u(k)], a, b, p));
+        }
+        eqs.push(s3_dbl_args([u(m - 3), xa(m - 1), Arg::Plain(xr)], a, b, p));
+        return eqs;
+    }
     if m == 2 {
         return vec![s3(&x(0), &x(1), &xr, a, b, p)];
     }
@@ -1173,6 +1476,37 @@ fn system(
                 pw = pw.mul(&xi, p);
             }
             pw.sub(&Pol::constant(n, powm(tower.scale, k, p), p), p)
+        };
+        let s = s3(
+            &Pol::var(n, 0),
+            &Pol::var(n, 1),
+            &Pol::constant(n, target.x_r, p),
+            curve.a,
+            curve.b,
+            p,
+        );
+        let sol = target.planted.then(|| target.xs.clone());
+        return (vec![s, member(0), member(1)], n, sol, 0..0);
+    }
+    if control == Control::RandBase {
+        assert_eq!(m, 2, "randbase is written for m = 2");
+        let n = 2;
+        let size = match &tower.cover {
+            Some(cv) => cv.image(&tower.v, p).len(),
+            None => tower.v.len(),
+        };
+        let mut base: Vec<u64> = target.xs.clone();
+        while base.len() < size {
+            let x = rng.gen_range(0..p);
+            if !base.contains(&x) && curve.legendre(curve.rhs(x)) == 1 {
+                base.push(x);
+            }
+        }
+        let member = |i: usize| {
+            let xi = Pol::var(n, i);
+            base.iter().fold(Pol::constant(n, 1, p), |acc, &f| {
+                acc.mul(&xi.sub(&Pol::constant(n, f, p), p), p)
+            })
         };
         let s = s3(
             &Pol::var(n, 0),
@@ -1987,6 +2321,9 @@ struct Args {
     /// of exponents `0..=W` on the equation's own variables, not `S₃`'s
     /// support (off by default).
     null_width: Option<usize>,
+    /// `--cover-map square|quad|generic`: the factor base is the image
+    /// `x∘φ(V)` of the tower set under a degree-2 cover map (off by default).
+    cover: Option<CoverKind>,
     budget: u64,
     seed: u64,
     ladder_ts: Vec<usize>,
@@ -2201,6 +2538,7 @@ fn parse_args() -> Args {
         random: 3,
         null_chain: false,
         null_width: None,
+        cover: None,
         budget: 60,
         seed: 0x504B_4D54,
         ladder_ts: vec![4, 6],
@@ -2302,6 +2640,21 @@ fn parse_args() -> Args {
                     .collect()
             }
             "--m" => a.ms = list(&v),
+            "--cover-map" => {
+                a.cover = Some(match v.as_str() {
+                    "square" => CoverKind::Square,
+                    "quad" => CoverKind::Quad,
+                    "generic" => CoverKind::Generic,
+                    "fourth" => CoverKind::Fourth,
+                    "cubic" => CoverKind::Cubic,
+                    "quart" => CoverKind::Quart,
+                    "generic3" => CoverKind::Generic3,
+                    other => panic!(
+                        "unknown --cover-map `{other}` \
+                         (square, quad, generic, fourth, cubic, quart, generic3)"
+                    ),
+                })
+            }
             "--controls" => {
                 a.controls = v
                     .split(',')
@@ -2310,6 +2663,7 @@ fn parse_args() -> Args {
                         "null" => Control::Null,
                         "naive" => Control::Naive,
                         "multiples" => Control::Multiples,
+                        "randbase" => Control::RandBase,
                         other => panic!("unknown control `{other}` (the ladder has its own flags)"),
                     })
                     .collect()
@@ -2398,6 +2752,21 @@ fn parse_args() -> Args {
              an isogeny step's leading monomial would change"
         );
     }
+    if a.cover.is_some() {
+        assert!(
+            a.engine == Engine::F4,
+            "--cover-map runs under --engine f4 only: the tower engines rewrite \
+             the summation by the tower, which no longer starts at x"
+        );
+        assert!(
+            !a.controls
+                .iter()
+                .any(|c| matches!(c, Control::Naive | Control::Multiples)),
+            "--cover-map takes the tower, null and randbase controls"
+        );
+        // The generator-count ladder is not written for cover bases.
+        a.ladder_ts.clear();
+    }
     if a.p == 0 {
         // Above 2^63 only the wide builder holds the prime.
         a.wide = true;
@@ -2421,6 +2790,27 @@ fn target_curve(p: u64, tower: &Tower, need: usize, rng: &mut StdRng) -> (PrimeC
             continue;
         }
         let curve = PrimeCurve { p, a, b };
+        if let Some(cv) = &tower.cover {
+            // `on` holds the u of V whose image x∘φ(u) carries a point; the
+            // cover must be a smooth curve (h squarefree).
+            if cv.genus(a, b, p).is_none() {
+                continue;
+            }
+            let on: Vec<u64> = tower
+                .v
+                .iter()
+                .copied()
+                .filter(|&u| {
+                    cv.eval(u, p)
+                        .is_some_and(|x| curve.legendre(curve.rhs(x)) == 1)
+                })
+                .collect();
+            let distinct = cv.image(&on, p).len();
+            if distinct >= need {
+                return (curve, on);
+            }
+            continue;
+        }
         let on: Vec<u64> = tower
             .v
             .iter()
@@ -2449,7 +2839,11 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         ^ ((cell.t as u64) << 16)
         ^ (cell.g as u64);
     let mut rng = StdRng::seed_from_u64(cell_seed);
-    let tower = build_tower(cell.kind, p, cell.t, &mut rng);
+    let mut tower = build_tower(cell.kind, p, cell.t, &mut rng);
+    if let Some(kind) = a.cover {
+        // Drawn after the tower, so no draw of a run without the flag moves.
+        tower.cover = Some(CoverMap::draw(kind, p, &mut rng));
+    }
     // A cell with planted targets needs m distinct base abscissae on the
     // curve. Random targets need none beyond two. Capping the requirement
     // at |V| changes nothing for a cell that could be drawn before
@@ -2614,6 +3008,17 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         });
         if let Some(w) = a.null_width {
             row["null_width"] = json!(w);
+        }
+        if let Some(cv) = &tower.cover {
+            row["cover"] = json!({
+                "map": cv.kind.name(),
+                "num": upoly_trim(cv.num.to_vec()),
+                "den": upoly_trim(cv.den.to_vec()),
+                "genus": cv.genus(curve.a, curve.b, p),
+                "h_degree": cv.h(curve.a, curve.b, p).len() - 1,
+                "base_size": cv.image(&tower.v, p).len(),
+                "base_on_curve": cv.image(&on, p).len(),
+            });
         }
         if cell.control == Control::Multiples {
             row["multiples"] = json!(2);
@@ -2789,6 +3194,7 @@ fn export_magma_rows(files: &[String], dir: &str) {
                 steps: vec![Step::Square; t],
                 c: 1,
                 info: r["tower"].clone(),
+                cover: None,
             };
             let curve = PrimeCurve { p, a: ca, b: cb };
             let target = Target {
@@ -2920,6 +3326,7 @@ fn main() {
                     Control::Null => m == 2 || a.null_chain,
                     Control::Naive => m == 2 && kind == Kind::Kummer,
                     Control::Multiples => true,
+                    Control::RandBase => m == 2,
                     Control::Ladder => false,
                 })
                 .collect();
