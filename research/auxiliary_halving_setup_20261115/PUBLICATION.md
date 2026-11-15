@@ -101,3 +101,13 @@ and is adopted. No agent file named prime-field-research exists here; its
 narrow evidence rule is folded into the existing native-work instructions
 in root AGENTS.md, with the lesson id. The frozen-wrapper lesson gets its
 first confirmation from this round; no speculative promotion.
+
+Main merge b5b390f99a incorporates fa20dc796b, including merged parent4300,
+and preserves the incoming main journal byte-for-byte. The out-of-cone
+src/hash/sha256.rs was absent after sparse checkout updated; its exact tracked
+HEAD bytes were restored after checking no source difference since 2ca55a9c9f.
+The distinct post-main-build-binding.txt receipt now confirms all 27 original
+source/binary bindings. No qualification was repeated or pre-call manifest
+replaced. The plotted SVG/TSV now use normalized whitespace and line endings;
+all four re-rendered PDF pages are pixel-identical to the inspected pages.
+This formatting change makes the scoped diff whitespace check pass.
