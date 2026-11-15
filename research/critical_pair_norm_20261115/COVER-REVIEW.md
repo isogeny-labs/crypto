@@ -21,7 +21,7 @@ context, not presented as absent or new. [pcc:unverified]
 
 Primary text opened: Enge, Gaudry and Thome, *An L(1/3) Discrete Logarithm
 Algorithm for Low Degree Curves*, arXiv:0905.2177v2, December2009,
-https://arxiv.org/abs/0905.2177 . Read sections2--5, especially Proposition3,
+https://arxiv.org/abs/0905.2177 . Read the relevant discussion in sections2--5, especially Proposition3,
 Heuristics5/6, the precise factor base on page9, Theorem7 and the non-cyclic
 case. Theorem7 requires g>=(log p)^rho with rho>=2, not merely a small genus
 or a small elliptic factor. It computes a full factor base before individual

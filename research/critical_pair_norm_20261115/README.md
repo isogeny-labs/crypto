@@ -1,4 +1,11 @@
-# Source-certified critical-pair elimination
+# Native elimination and high-genus cover audit
+
+The separate [high-genus cover review](COVER-REVIEW.md) constructs an algebraic
+subgroup-transfer family meeting EGT's geometric conditions, but bounds its
+standard full projected base below by p/(4delta) columns. This is a scoped
+cost obstruction for that explicit method, with an
+[inspected visual report](cover-review/report.pdf); smaller implicit bases
+remain open algorithms. PCC-20261115-c4aaf8 is unverified. [pcc:unverified]
 
 The first fixed auxiliary panel certifies all eight empty ideals; all four
 positive cases retain UNKNOWN at the reduction cap. Adding standard chain

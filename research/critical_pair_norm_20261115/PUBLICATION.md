@@ -148,3 +148,12 @@ Eisenstein is over (algebraic-closure(Fp))(X), not an algebraic closure of the
 function field. The latter would already split the Y polynomial. This correction
 precedes publication and no frozen native evidence is changed. Known-order/
 generator and divisor-arithmetic costs stay separate, unimplemented obligations.
+
+The two-page cover review and its editable construction/cost diagram are
+rendered and visually inspected. There is no empirical quantitative plot:
+the result is a symbolic source review. Initial Typst markup used literal
+subscript/star and less-than tokens, which produced delimiter/label diagnostics;
+plain notation fixed both before the final readable render. Existing native
+round reports, source bindings and archives stay unchanged. The PR title/body
+are rewritten around both the native qualification and this cover-cost review.
+The new scoped statement is PCC-20261115-c4aaf8, unverified.
