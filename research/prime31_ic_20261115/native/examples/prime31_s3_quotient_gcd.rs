@@ -209,11 +209,10 @@ fn split_linear_roots(f: &[u64], remaining_depth: usize) -> Result<Vec<u64>,Stri
     Err("m4 root split cap reached; undetermined".into())
 }
 
-fn m4_extract_pairs(xs: &[u64], k: &[u64], t: u64)
+fn m4_extract_from_eliminant(xs: &[u64], k: &[u64], t: u64, d: &[u64])
     -> Result<(Vec<(u64,u64)>,Vec<[usize;4]>),String>
 {
-    let (d,_)=m4_first_eliminant(k,t)?;
-    let u_roots=split_linear_roots(&d,32)?;
+    let u_roots=split_linear_roots(d,32)?;
     let mut uv=Vec::new();
     let mut raw=Vec::new();
     for u in u_roots {
@@ -239,6 +238,13 @@ fn m4_extract_pairs(xs: &[u64], k: &[u64], t: u64)
     uv.sort_unstable();uv.dedup();
     raw.sort_unstable();raw.dedup();
     Ok((uv,raw))
+}
+
+fn m4_extract_pairs(xs: &[u64], k: &[u64], t: u64)
+    -> Result<(Vec<(u64,u64)>,Vec<[usize;4]>),String>
+{
+    let (d,_)=m4_first_eliminant(k,t)?;
+    m4_extract_from_eliminant(xs,k,t,&d)
 }
 
 // All ordinate/group operations are quarantined to this final semantic
@@ -292,7 +298,7 @@ fn m4_scale(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
             let (d,exceptional)=m4_first_eliminant(&k,target.0)?;
             let membership_ns=start.elapsed().as_nanos();
             let start=Instant::now();
-            let (uv,raw)=m4_extract_pairs(&xs,&k,target.0)?;
+            let (uv,raw)=m4_extract_from_eliminant(&xs,&k,target.0,&d)?;
             let algebraic_extraction_ns=start.elapsed().as_nanos();
             let additions_before=ar.counts.group_additions;
             let start=Instant::now();
@@ -310,6 +316,7 @@ fn m4_scale(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
                 "exceptional_target_abscissa":exceptional,
                 "target_dependent_eliminant_ns":membership_ns,
                 "target_dependent_algebraic_root_extraction_ns":algebraic_extraction_ns,
+                "eliminant_recomputed_during_extraction":false,
                 "ordered_uv":uv.len(),"ordered_pair_index_tuples":raw.len(),
                 "post_extraction_signed_validation_ns":validation_ns,
                 "post_extraction_validation_group_additions":validation_group_additions,
@@ -645,6 +652,9 @@ mod tests {
         assert!(!exc);
         assert_eq!(d.len()-1,6);
         let (uv,tuples)=m4_extract_pairs(&xs,&k,t.0).unwrap();
+        let (uv_reused,tuples_reused)=m4_extract_from_eliminant(&xs,&k,t.0,&d).unwrap();
+        assert_eq!(uv,uv_reused);
+        assert_eq!(tuples,tuples_reused);
         assert_eq!(uv.len(),6);
         let rows=m4_signed_lifts(&base,Some(t),&tuples,&mut ar);
         assert_eq!(rows,vec![vec![(0,1),(1,1),(2,1),(3,1)]]);
