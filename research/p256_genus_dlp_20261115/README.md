@@ -83,3 +83,13 @@ dot -Tpng -Gdpi=150 research/p256_genus_dlp_20261115/factors.dot -o research/p25
 
 Keep the artifact manifest and managed ignore rules. The bot's storage change
 does not alter the source equations or native correctness outputs.
+
+## All-cover classification framework
+
+The follow-on [classification framework](classification/README.md) includes all
+finite covers through function-field extensions and Frobenius, with structural
+hyperelliptic/quadratic descriptions, general traits, a worked catalogue and
+actual-field Smith prerequisite checks. It is a representation framework, not
+an implemented enumeration of every isomorphism class. See the inspected
+[seven-page report](classification/FRAMEWORK.pdf) and
+[validation boundaries](classification/VALIDATION.md). [pcc:unverified]
