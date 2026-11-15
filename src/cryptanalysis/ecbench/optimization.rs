@@ -116,6 +116,7 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!("ic.aps_v2", NativeAdaptive, SpecializedDomain, StandardBand),
+    policy!("ic.aps_v3", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
         NativeGrid,
@@ -518,12 +519,24 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.koblitz_descent",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_batched",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_descent_v2",
         NativeAdaptive,
         SpecializedDomain,
         StandardBand
     ),
     policy!(
-        "ic.koblitz_batched",
+        "ic.koblitz_batched_v2",
         NativeGrid,
         SpecializedDomain,
         StandardBand
@@ -538,6 +551,15 @@ const POLICIES: &[PolicyDecl] = &[
     // 2.74x rho.negation's cost): a diagnostic, never a frontier reference.
     policy!(
         "rho.negation_chained",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    // rho.negation's walk in lock-step lanes with a batched inversion
+    // (docs/perf/20261112-rust-deep-audit.md): a diagnostic until a reviewed
+    // paired session admits it.
+    policy!(
+        "rho.negation_lanes_v1",
         ImplementationAb,
         DiagnosticOnly,
         StandardBand
@@ -698,6 +720,7 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         "attempts"
         | "budget_ms"
         | "cap_multiple"
+        | "growth_ceiling"
         | "matrix_coefficient_cap"
         | "max_pair_work"
         | "max_descent_ops"
@@ -717,6 +740,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "step_cap_factor"
         | "target_max_attempts"
         | "trial_cap"
+        | "trace_entries"
+        | "trace_words"
         | "unit_trials"
         | "units" => ResourceEnvelope,
         "baby"
@@ -742,6 +767,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "factor_base"
         | "factor_base_points"
         | "fb_size"
+        | "growth"
+        | "guess"
         | "independent"
         | "inner"
         | "jumps"
@@ -768,9 +795,11 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "solver"
         | "stop"
         | "subset_size"
+        | "subset_profile"
         | "summands"
         | "table_scale"
         | "targets"
+        | "trace"
         | "unique_relations"
         | "walks" => Knob,
         _ => return None,
@@ -1270,7 +1299,7 @@ mod tests {
         let profiles = profiles().unwrap();
         let profile = profiles
             .iter()
-            .find(|profile| profile.id == "ic.koblitz_batched")
+            .find(|profile| profile.id == "ic.koblitz_batched_v2")
             .unwrap();
         assert_eq!(profile.strategy, SearchStrategy::NativeGrid);
         assert_eq!(profile.claim_scope, ClaimScope::SpecializedDomain);

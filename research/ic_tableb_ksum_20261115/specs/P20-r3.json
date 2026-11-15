@@ -1,0 +1,113 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_tableb_ksum_20261115 20-bit Table B curve, replicate 3",
+ "description": "Generic decomposition track (bounded by sqrt(r); cannot beat rho). PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 1048291,
+    "a": 1,
+    "b": 11,
+    "group_order": 1046999,
+    "r": 1046999,
+    "gx": 1,
+    "gy": 123004
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115203,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "reference",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "inc-tb",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=51",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1410236"
+    }
+   }
+  },
+  {
+   "name": "inc-rec",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=45",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1410236"
+    }
+   }
+  },
+  {
+   "name": "inc-sel",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=64",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1410236"
+    }
+   }
+  },
+  {
+   "name": "ksum4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=10",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=9",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261115303,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}
