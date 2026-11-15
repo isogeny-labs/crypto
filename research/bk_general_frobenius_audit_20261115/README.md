@@ -102,3 +102,5 @@ determinant/Weil-pairing necessity, the full all-k p<500 population and the
 remaining obligations across all14 items stay open. [pcc:unverified]
 
 Exact local **PCC-20261115-bec94e** replay PASS at 2026-11-15T17:19:12Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `0687605f5d88c67747bd8b3adc8015ba52986cfd` and local receipt `3e3cf7e8f748ffbe066ad1111febf22a056fbf42` share tree `ef21e74e47aa45e43907342597fb842a6ba9afd4`. Anonymous fetch completed; fresh PR head/body/open/ready matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
