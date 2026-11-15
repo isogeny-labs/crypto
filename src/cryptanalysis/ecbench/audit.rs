@@ -696,6 +696,15 @@ fn replay_with_accounting_inner(
     (false, detail)
 }
 
+fn counted_field_ops_match(
+    replay_detail: &serde_json::Value,
+    recorded_detail: &serde_json::Value,
+) -> bool {
+    recorded_detail
+        .get("counted_field_ops")
+        .is_none_or(|recorded| replay_detail.get("counted_field_ops") == Some(recorded))
+}
+
 /// What a replay must reproduce of `r`: `(reproduced, detail)`.
 fn compare_replay(
     rep: &SolveReport,
@@ -810,6 +819,11 @@ fn compare_replay(
         if a != b {
             diffs.push("field_ops");
         }
+    }
+    // Historical records have no partial IC tally.  Once a record carries
+    // one, its replay must reproduce the exact phase split and total.
+    if !counted_field_ops_match(&rep.detail, &r.detail) {
+        diffs.push("counted_field_ops");
     }
     if rep.unpriced != r.cost.unpriced
         || rep.deterministic != r.cost.deterministic
@@ -2074,6 +2088,22 @@ pub(crate) mod tests {
     }
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn partial_ic_field_tally_is_replay_bound_without_rewriting_old_records() {
+        let counted = json!({"counted_field_ops": {
+            "schema": "ecbench.counted-field-ops/v1",
+            "phases": [{"name": "relations", "field_ops": {"muls": 8, "sqrs": 3, "invs": 1}}],
+            "total": {"muls": 8, "sqrs": 3, "invs": 1},
+            "complete": false,
+        }});
+        let mut altered = counted.clone();
+        altered["counted_field_ops"]["phases"][0]["field_ops"]["invs"] = json!(2);
+        assert!(counted_field_ops_match(&counted, &json!({})));
+        assert!(counted_field_ops_match(&counted, &counted));
+        assert!(!counted_field_ops_match(&altered, &counted));
+        assert!(!counted_field_ops_match(&json!({}), &counted));
+    }
 
     fn detail(w: f64, before: f64, priced_by: &str) -> serde_json::Value {
         json!({

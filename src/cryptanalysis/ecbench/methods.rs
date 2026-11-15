@@ -6230,7 +6230,26 @@ fn ic_report(
             automorphisms,
         )
     });
-    let detail = json!({
+    // GroupOps already tallies prime field arithmetic in the group law and
+    // in instrumented oracles such as rootfind-subtract.  Keep that partial
+    // tally visible by phase without promoting it to SolveReport::field_ops:
+    // factor-base lifts, native tests, and elimination still have separate
+    // accounting, and some of their field work is not in GroupOps.
+    let phase_field_ops = [
+        ("factor_base", rep.factor_base.cost.group_ops.field_ops),
+        ("oracle_setup", rep.decomposition.setup.group_ops.field_ops),
+        ("relations", rep.decomposition.cost.group_ops.field_ops),
+        (
+            "linear_algebra",
+            rep.linear_algebra.cost.group_ops.field_ops,
+        ),
+        ("verify", rep.verify.group_ops.field_ops),
+    ];
+    let mut counted_field_ops = FieldOps::default();
+    for (_, ops) in phase_field_ops {
+        counted_field_ops.merge(ops);
+    }
+    let mut detail = json!({
         "label": rep.label,
         "decomposition": {
             "name": rep.decomposition.name,
@@ -6243,6 +6262,18 @@ fn ic_report(
         "calibration_pinned_units": calib.pinned_units,
         "framework_total_gae_before_solver_removal": rep.total_gae,
     });
+    if counted_field_ops != FieldOps::default() {
+        detail["counted_field_ops"] = json!({
+            "schema": "ecbench.counted-field-ops/v1",
+            "scope": "instrumented GroupOps arithmetic only; incomplete pipeline field cost",
+            "complete": false,
+            "phases": phase_field_ops.iter().map(|(name, ops)| json!({
+                "name": name,
+                "field_ops": ops,
+            })).collect::<Vec<_>>(),
+            "total": counted_field_ops,
+        });
+    }
     SolveReport {
         recovered: rep.recovered.map(ExactScalar::from),
         exhausted: rep.exhausted,
@@ -9368,6 +9399,24 @@ mod tests {
         let inversions = r.native["inversions"];
         assert!(inversions > 0 && inversions <= root.counters["targets_tried"]);
         assert_eq!(s.native.get("inversions").copied().unwrap_or(0), 0);
+        let counted = &root.detail["counted_field_ops"];
+        assert_eq!(counted["schema"], "ecbench.counted-field-ops/v1");
+        assert_eq!(counted["complete"], false);
+        let phase_tallies = counted["phases"].as_array().unwrap();
+        assert_eq!(phase_tallies.len(), root.phases.len());
+        let relation_tally = phase_tallies
+            .iter()
+            .find(|phase| phase["name"] == "relations")
+            .unwrap();
+        assert!(relation_tally["field_ops"]["invs"].as_u64().unwrap() > 0);
+        for op in ["muls", "sqrs", "invs"] {
+            let sum: u64 = phase_tallies
+                .iter()
+                .map(|phase| phase["field_ops"][op].as_u64().unwrap())
+                .sum();
+            assert_eq!(counted["total"][op].as_u64(), Some(sum), "{op}");
+        }
+        assert!(root.field_ops.is_none(), "partial work is not a full tally");
         assert_eq!(r.native.get("frobfold_mismatches").copied().unwrap_or(0), 0);
         assert!(root.solver.is_none(), "a table oracle solves no system");
         assert!(root.deterministic);
