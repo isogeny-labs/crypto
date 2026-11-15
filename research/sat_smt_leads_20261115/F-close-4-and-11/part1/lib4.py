@@ -296,9 +296,11 @@ def cube_lits(B, cubevars, k, cval):
     return [cubevars[j] if cval >> j & 1 else -cubevars[j] for j in range(k)]
 
 
-def run_cubes(B, arm, k, order_seed, solver='cadical153', full=None):
+def run_cubes(B, arm, k, order_seed, solver='cadical153', full=None, conf_budget=50000):
     """All 2^k cubes on the first k cube variables (arm 'lit': bits of x1; 'xor'/'sym': bits of
-    e1), one incremental solver, cube order = seeded shuffle (order_seed None = numeric)."""
+    e1), one incremental solver, cube order = seeded shuffle (order_seed None = numeric).
+    Each cube solve is capped at conf_budget conflicts (solve_limited); if a cube hits the budget
+    the run is marked censored and stopped (conflicts recorded are a lower bound)."""
     l = B['l']
     cubevars = B['c'][0] if arm == 'lit' else B['yv']
     order = list(range(1 << k))
@@ -306,9 +308,17 @@ def run_cubes(B, arm, k, order_seed, solver='cadical153', full=None):
         random.Random(order_seed).shuffle(order)
     keys = ('conflicts', 'decisions', 'propagations', 'restarts')
     nsat = 0
-    with Solver(name=solver, bootstrap_with=B['cnf'].cl) as s:
+    censored = False
+    with Solver(name=solver, bootstrap_with=B['cnf'].cl, use_timer=False) as s:
         for cval in order:
-            r = s.solve(assumptions=cube_lits(B, cubevars, k, cval))
+            if conf_budget:
+                s.conf_budget(conf_budget)
+                r = s.solve_limited(assumptions=cube_lits(B, cubevars, k, cval), expect_interrupt=False)
+            else:
+                r = s.solve(assumptions=cube_lits(B, cubevars, k, cval))
+            if r is None:
+                censored = True
+                break
             if r:
                 nsat += 1
                 u = decode(B, s.get_model())
@@ -321,4 +331,5 @@ def run_cubes(B, arm, k, order_seed, solver='cadical153', full=None):
         st = s.accum_stats()
     out = {key: int(st[key]) for key in keys}
     out['n_sat_cubes'] = nsat
+    out['censored'] = censored
     return out

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Measured runs (see PROTOCOL.md).
-Usage: run.py OUT.jsonl.gz DEADLINE_S L PHASES(csv of sweep,rand,planted,alpha,explore) [NTARGETS]"""
+"""Measured runs (see PROTOCOL.md).  (Named cmeasure.py, not run.py: a first launch was killed by a
+process-name kill from another job on the shared machine.)
+Usage: cmeasure.py OUT.jsonl.gz DEADLINE_S L PHASES(csv of sweep,rand,planted,alpha,explore) [NTARGETS | a:b]"""
 import sys, os, json, time, random, gzip
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lib
@@ -8,7 +9,7 @@ import lib
 lib.CMS_OPTS.update({"autodisablegauss": "0", "sls": "0"})
 OUT, DEADLINE, L = sys.argv[1], float(sys.argv[2]), int(sys.argv[3])
 PH = sys.argv[4].split(",")
-NT = int(sys.argv[5]) if len(sys.argv) > 5 else 24
+NT = sys.argv[5] if len(sys.argv) > 5 else "24"   # number of targets, or a slice a:b of the 24 (continuation)
 T0 = time.time()
 CAP = 50000
 fout = gzip.open(OUT, "at")
@@ -28,7 +29,8 @@ l = L
 seed = int(os.environ.get("C_SEED_BASE", "2026111500")) + l
 cell = lib.Cell(l, seed)
 non, dec = cell.targets(24, 4)
-non = non[:NT]
+_a, _b = ([0] + [int(x) for x in NT.split(":")])[-2:]
+TG = list(enumerate(non))[_a:_b]
 std = list(range(l))
 ctx = {}
 
@@ -135,7 +137,7 @@ def leafclass_row(idx, R):
 BUDS = list(range(11)) if l <= 8 else [0, 1, 2, 3, 5, 10]
 for ph in PH:
     if ph == "sweep":
-        for idx, R in enumerate(non):
+        for idx, R in TG:
             leafclass_row(idx, R)
             for rep in (0, 1):
                 for b in BUDS:
@@ -144,7 +146,7 @@ for ph in PH:
                 for b in (0, 3):
                     dfs_row(idx, R, False, "sweep", b, rep, std)
     elif ph == "rand":
-        for idx, R in enumerate(non):
+        for idx, R in TG:
             rnd = std[:]
             random.Random(seed * 13 + idx).shuffle(rnd)
             for b in (0, 3):
@@ -154,7 +156,7 @@ for ph in PH:
             for b in (0, 3, 10):
                 dfs_row(24 + i, R, True, "planted", b, 0, std)
     elif ph == "alpha":
-        for idx, R in enumerate(non[:12]):
+        for idx, R in [t for t in TG if t[0] < 12]:
             alpha(idx, R)
     elif ph == "explore":
         import explore

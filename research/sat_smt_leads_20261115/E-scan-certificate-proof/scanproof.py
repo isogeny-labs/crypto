@@ -363,3 +363,44 @@ def xor_translation_clauses(st):
     PROTOCOL.md): 8 per support variable of each row addition + 1, 2 per gate substitution,
     1 per search node."""
     return 8 * st["wsum"] + st["rowops"] + 2 * st["props"] + st["nodes"]
+
+
+# ---------------------------------------------------------------- independent forward check
+def forward_check(clauses, pr):
+    """Forward RUP check with MiniSat 2.2 unit propagation (python-sat), lemma by lemma.
+    -> True iff every proof clause is RUP at its position and the last one is empty."""
+    with Solver(name="m22", bootstrap_with=clauses) as s:
+        for c in pr.cl:
+            ok, _ = s.propagate(assumptions=[-x for x in c])
+            if ok:
+                return False
+            if c:
+                s.add_clause(c)
+    return pr.cl[-1] == []
+
+
+def subsume_filter(clauses, pr):
+    """Drop proof clauses subsumed by an original clause or an earlier kept proof clause."""
+    occ = {}
+    def reg(fs):
+        for x in fs:
+            occ.setdefault(x, []).append(fs)
+    for c in clauses:
+        reg(frozenset(c))
+    keep = []
+    for i, c in enumerate(pr.cl):
+        fs = frozenset(c)
+        sub_ = False
+        if c and pr.role[i][0] == "lemma":
+            for x in c:
+                for d in occ.get(x, ()):
+                    if len(d) <= len(fs) and d <= fs:
+                        sub_ = True
+                        break
+                if sub_:
+                    break
+        if not sub_:
+            keep.append(i)
+            if c:
+                reg(fs)
+    return pr.sub(keep)

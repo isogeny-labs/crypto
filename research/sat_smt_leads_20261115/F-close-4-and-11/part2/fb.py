@@ -1,7 +1,8 @@
 """Self-contained F_{2^n} arithmetic, binary curve y^2+xy=x^3+a x^2+b, subspace tools,
 linear 2+1 scan and CNF generators for the idea-11 pilot."""
 import random, itertools
-MOD = {7: (1 << 7) | 3, 11: (1 << 11) | 5, 13: (1 << 13) | 0b11011, 15: (1 << 15) | 3,
+MOD = {3: (1 << 3) | 3, 5: (1 << 5) | 5, 7: (1 << 7) | 3, 11: (1 << 11) | 5,
+       13: (1 << 13) | 0b11011, 15: (1 << 15) | 3,
        17: (1 << 17) | 9, 19: (1 << 19) | 0b100111, 23: (1 << 23) | 33}
 
 def pmulmod(a, b, f, n):

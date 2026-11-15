@@ -136,3 +136,66 @@ run).** Literal counts are reported as well.
 One process, one core, `nice`; single runs under 10 minutes; about 75 minutes in total. No
 tuning: solver options are defaults, and no arm is re-run with other settings after its numbers
 are seen. Words "improvement", "speedup", "beats" are not used as claims.
+
+## Amendment 1 (2026-11-15, before any measured run; after the seed-999 cost probe)
+
+What the probe showed (seed 999, not reported as data): a `cold` leaf costs about 800 to 1 700
+conflicts at l = 3 and 4, and the single (n, l) = (17, 5) probe target had not finished its 32
+leaf solves after about 4 CPU minutes. A CDCL leaf solve re-does elimination over the 3l - 1
+unknown bits of (s, p) by resolution, so the per-leaf factor of arms 1 and 2 grows with l even
+at fixed n. Changes, all made before measuring:
+
+1. **Sizes for arms 1, 2, 4 (`cold`, `warm`, `free`): n = 17, l = 2, 3, 4** (6 targets each;
+   three complete sizes). l = 5 is attempted for these arms only as an extension with a
+   9-minute wall limit per run and is reported as censored if it does not finish. Secondary
+   cells for them: (3, 11) and (4, 13).
+2. **New arm 6, `xproof`: the scan certificate itself, emitted as clauses and checked.**
+   `xproof.py` replays the scan (x1 first; at a leaf: substitute the gates, forward Gaussian
+   elimination; one more branch on a free bit where needed) and writes every step as clauses.
+   Rows are sorted variable lists with prefix-parity variables. Fresh prefix variables are
+   introduced by definitions d = a XOR b (4 clauses, extended resolution; RAT in DRAT terms).
+   Because the checker is RUP-only, the definitions are appended to the CNF, and
+   `xproof.check_defs` verifies syntactically that each defines a variable larger than all
+   earlier ones as the XOR of two earlier variables (a conservative extension). All other proof
+   lines must be RUP for `rup_dep`. The CNF of this arm has the same constraints as the other
+   arms' CNF; its stage rows are full prefix chains ordered by the non-selector operand of each
+   gate and closed by a unit clause. **Proof size of this arm = RUP lemmas + definition clauses
+   used**, after one backward trimming pass, with the trimmed proof checked again.
+   Sizes: primary n = 17, l = 2, 3, 4, 5, 6; secondary (3, 11), (4, 13), (5, 17), (6, 19),
+   and (7, 23) if time allows. 6 targets per cell. No dependency file is written for this arm
+   (its lemmas carry the leaf's x1 literals or concern leaf-specific definitions, so no
+   cross-leaf sharing is possible by construction); the sharing statistic is not computed for it.
+3. Arm 3 (`xor`, unchecked count) stays as written, on the sizes of arm 6.
+4. **Step 2 rule, restated for two proof systems.** The rule (slope <= 1.5 bits per l over
+   >= 3 complete sizes on the primary series, every proof verified) is applied separately to
+   (i) the better of `cold`/`warm`: RUP proofs over the CNF without new variables, l = 2..4, and
+   (ii) `xproof`: RUP plus definitions, l = 2..6. "short proofs exist" is declared for the proof
+   system in which the rule holds and the README names that system; if it holds for neither,
+   "not shown".
+5. Step 3 is unchanged (n = 17, l = 3 and 4). Its rule is evaluated at l = 4, the largest l at
+   which `cold`/`warm` are complete for 6 targets.
+6. Prediction for the new arm: slope between 1.0 and 1.4 bits per l on the primary series, and
+   about the same on the secondary series plus a polynomial factor in n.
+
+## Amendment 2 (2026-11-15 07:54Z, after the first measured rows; a deviation, cost-driven)
+
+Seen when this was written: all rows of n = 17, l = 2 and 3 (every arm), and target 0 of n = 17,
+l = 4, where `cold` took 343 985 conflicts and 242 s and `warm` 188 303 conflicts and 235 s
+(about 21 000 conflicts per leaf against about 2 300 at l = 3). Six targets of `cold` and `warm`
+at (17, 4) would take about 50 minutes on the one permitted core, more than is left. The run was
+stopped after target 0 (its `free` row, 110 233 conflicts, had been written and is kept). Changes:
+
+1. `cold`, `warm`, `free` at (17, 4): target 0 only, reported as a partial cell (censored by
+   time, not by result). On the primary series these arms therefore have 2 complete sizes, and
+   by the Step 2 rule as written the RUP-only decision at n = 17 is "not shown" regardless of
+   what the partial cell shows. (17, 5) is not attempted for them.
+2. Added, post hoc, a second fixed-n series so that the RUP-only arms have three complete
+   sizes: **n = 13, l = 2, 3, 4**, all arms, 6 targets per cell ((4, 13) is also the secondary
+   cell). It is labelled "fixed n = 13 (added after the n = 17 cost was seen)" wherever shown.
+   The Step 2 rule is also evaluated on it, and that evaluation is reported as post hoc.
+3. `xproof` and `xor`: unchanged on the primary series (n = 17, l = 2..6). Secondary series cut
+   to (3, 11), (4, 13), (5, 17) for time; (6, 19) and (7, 23) are not run.
+4. Step 3 moves from (17, 3) and (17, 4) to **(17, 3) and (13, 4)**. The Step 3 rule is
+   evaluated where the amended text of Amendment 1 puts it: the largest l of the primary series
+   with 6 complete `cold`/`warm` targets, which is now l = 3 (8 leaves). The (13, 4) value
+   (16 leaves) is reported next to it. Re-solve rounds limited to 2 at (13, 4).

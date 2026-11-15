@@ -11,13 +11,21 @@ SEED0 = int(os.environ.get("DR4_SEED0", "2026111500"))
 T0 = time.time()
 LEAFCAP, COLDCAP = 200000, 20000
 half = (1 << (2 * l)) // 2
-FREECAP = 100 * half
+# Deviation (see README): at l = 6 the free cap is 20x instead of 100x and the dual2 cold sample is
+# 4 leaves instead of 8, set after the first l = 6 process was killed externally (time budget).
+FREECAP = (20 if (l >= 6 and os.environ.get("DR4_FULLCAP") != "1") else 100) * half
+COLD2 = 4 if (l >= 6 and os.environ.get("DR4_FULLCAP") != "1") else 8
 seed = SEED0 + l
 cell = dr4.Cell4(l, seed)
 non, dec = cell.targets(8, 4)
 tg = [(i, R, False) for i, R in enumerate(non)] + [(8 + i, R, True) for i, R in enumerate(dec)]
 a, b = [int(x) for x in SL.split(":")]
 tg = tg[a:b]
+DONE = set()
+if os.path.exists(OUT):       # resume after an external kill: keep finished rows, redo the rest
+    keepl = [x for x in open(OUT) if x.endswith("\n") and json.loads(x)["status"] == "OK"]
+    DONE = set((json.loads(x)["idx"], json.loads(x)["arm"]) for x in keepl)
+    open(OUT, "w").writelines(keepl)
 fout = open(OUT, "a")
 ctx = {}
 for idx, R, isdec in tg:
@@ -38,6 +46,8 @@ def base(idx, R, isdec, arm):
 
 
 def guard(row):
+    if (row["idx"], row["arm"]) in DONE:
+        return True
     if time.time() - T0 > DEADLINE:
         row["status"] = "NOT_RUN"
         emit(row)
@@ -128,7 +138,7 @@ for ph in PH:
             free(idx, R, isdec, "free", "dual")
         elif ph == "cold" and not isdec:
             cold(idx, R, "dual", 16)
-            cold(idx, R, "dual2", 8)
+            cold(idx, R, "dual2", COLD2)
         elif ph == "var" and not isdec:
             dfs(idx, R, isdec, "keep-B0-blk", "dual", "blk", 0, True)
             dfs(idx, R, isdec, "keep-B10-blk", "dual", "blk", 10, True)

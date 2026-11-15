@@ -132,3 +132,21 @@ no rule, reported as (leaves + conflicts) / 2^l on the same targets with rho' an
 One process, one core, under `nice`; each process under 10 minutes; about 80 minutes in total. Cells
 not reached are listed as NOT_RUN. No parameter is changed after a measured run; a deviation is listed
 in the README.
+
+## Addendum: the exploratory arm (5), written after the l = 6 and l = 7 sweep files were analysed and before any exploratory run
+
+Seen so far (l = 6, 7, rep 0): the events are almost all dimension-2 nodes refuted by their own
+budget-3 call (59 to 78 % of dimension-2 attempts succeed), they spend about 0.5 to 0.6 conflicts per
+leaf, and the budget-3 DFS spends about 1.1 conflicts per leaf on failed attempts at dimensions >= 3.
+Exploratory question: do the dimension-2 refutations stay cheap when the failed attempts above them
+are not made? Variants (`explore.py`), budget 3, rep 0 and rep 1, the same 24 non-decomposable targets,
+l = 6..9: `j2only` (calls at dimension 2 and at leaves only), `jle2` (dimensions 1, 2), `jle3`
+(dimensions 1, 2, 3). Reported as rho, conflicts / 2^l and rho'; reference = the budget-0 and budget-3
+arms of the same rep. No rule; nothing in decisions (2) to (4) depends on it.
+
+Second exploratory variant, added after the l = 6, 7, 8 sweep files were analysed and before any
+exploratory run: in the budget-0 leaf scan about a quarter of the leaf refutations end in a final
+assumption conflict that omits a coordinate at which the leaf has value 0, i.e. the solver has refuted
+leaves the DFS has not reached. `coreskip` = the budget-0 scan in which a leaf inside the
+final-conflict cube of an earlier leaf refutation is not submitted to the solver (no leaf unit, no
+conflicts). It triggers the mechanism by bookkeeping only. Same reporting, no rule.
