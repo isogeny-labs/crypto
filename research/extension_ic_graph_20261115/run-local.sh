@@ -23,12 +23,13 @@ jq --arg source "$source_revision" --arg binary "$binary_sha" --arg cpu "$cpu" \
   '. + {source_revision:$source,binary_sha256:$binary,pinned_cpu:$cpu}' \
   "$here/local-pilot-plan.json" > "$run_dir/runtime-plan.json" || exit 2
 cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
-/usr/bin/git archive --format=tar HEAD -- Cargo.toml Cargo.lock src/cryptanalysis/gaudry_cubic.rs \
+/usr/bin/git ls-files -z -- Cargo.toml Cargo.lock src/cryptanalysis/gaudry_cubic.rs \
   src/cryptanalysis/gaudry_cubic_graph.rs src/cryptanalysis/gaudry_cubic_symmetric.rs \
   src/cryptanalysis/residual_walk.rs src/cryptanalysis/jv_bitops.rs \
   examples/gaudry_cubic_graph_compare.rs research/pencil_large_prime_20261029/Cargo.toml \
-  research/pencil_large_prime_20261029/src research/extension_ic_graph_20261115 \
-  > "$run_dir/source-checkpoint.tar" || exit 2
+  research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \
+  research/pencil_large_prime_20261029/src/sparse.rs research/extension_ic_graph_20261115 \
+  | tar --null -T - -cf "$run_dir/source-checkpoint.tar" || exit 2
 uname -a > "$run_dir/os.txt"
 lscpu -J > "$run_dir/cpu.json"
 { cat /sys/fs/cgroup/cpu.max; cat /sys/fs/cgroup/memory.max; rg '^Cpus_allowed_list:' /proc/self/status; } > "$run_dir/cgroup.txt"
