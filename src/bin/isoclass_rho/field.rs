@@ -5,6 +5,8 @@
 //! `F_p`; `y² + xy = x³ + ax² + b` over `F_{2^m}`), so the walk, the rho
 //! walk and the statistics are written once, generically over [`Fq`].
 
+use crypto_lib::cryptanalysis::ic_boundary::invmod;
+use crypto_lib::cryptanalysis::prime_fast::MulModN;
 use rand::rngs::SmallRng;
 use rand::Rng;
 
@@ -112,12 +114,46 @@ pub trait Fq: Copy + Send + Sync + 'static {
 
 // ================================================================== F_p
 
-#[derive(Clone, Copy, Debug)]
+/// `F_p`.  Products go through [`MulModN`] (Montgomery, no `__umodti3`
+/// library call) and inverses through `ic_boundary::invmod`
+/// (word-division Euclid); both return the value the earlier `u128 %` and `i128`
+/// Euclid returned for every input (the remainder and the inverse are
+/// unique; out-of-range operands take the old code), so every walk and
+/// count is unchanged and only wall time differs (assessment 2026-11-10,
+/// R1).  `Debug` prints `p` alone, as the derived form did.
+#[derive(Clone, Copy)]
 pub struct Fp {
     pub p: u64,
+    mm: MulModN,
 }
 
+impl std::fmt::Debug for Fp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Fp").field("p", &self.p).finish()
+    }
+}
+
+impl Fp {
+    pub fn new(p: u64) -> Self {
+        Fp {
+            p,
+            mm: MulModN::new(p),
+        }
+    }
+}
+
+/// `a⁻¹ mod m` by `ic_boundary::invmod` (word-division Euclid; 32-bit
+/// steps for a modulus below 2^32), falling back to the `i128` Euclid
+/// only for a non-invertible `a`, to keep its panic.  The inverse is
+/// unique, so both give the same value.
 pub fn inv_mod(a: u64, m: u64) -> u64 {
+    if let Some(x) = invmod(a, m) {
+        return x;
+    }
+    inv_mod_i128(a, m)
+}
+
+fn inv_mod_i128(a: u64, m: u64) -> u64 {
     let (mut t, mut nt, mut r, mut nr) = (0i128, 1i128, m as i128, (a % m) as i128);
     while nr != 0 {
         let q = r / nr;
@@ -388,7 +424,7 @@ impl Fq for Fp {
         }
     }
     fn fmul(&self, a: u64, b: u64) -> u64 {
-        mulmod(a, b, self.p)
+        self.mm.mul(a, b)
     }
     fn finv(&self, a: u64) -> u64 {
         inv_mod(a, self.p)

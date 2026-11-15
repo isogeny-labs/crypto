@@ -179,6 +179,69 @@ static void test_batch() {
     printf("  %d instances, same answer batched and alone\n", batch);
 }
 
+/* ── 6. block-kernel index logic ───────────────────────────────────── */
+
+/* The two pieces of `mac_rref_block` whose control flow changed, run on
+ * the host: (a) the update cursor must visit exactly the (idx / width,
+ * idx % width) of idx = tid, tid + THREADS, ... < rows * width, for every
+ * lane; (b) the pivot search's "first hit per lane, then minimum over
+ * lanes" must equal the lowest non-zero row.  The field arithmetic of the
+ * kernel is the verified fp_* above, unchanged. */
+static void test_block_indexing() {
+    printf("=== block-kernel index logic ===\n");
+    long visits = 0;
+    int bad = 0;
+    const int thread_counts[] = {32, 64, 128, 256, 512, 1024};
+    for (int threads : thread_counts) {
+        for (int rows = 1; rows <= 70; rows += 23) {
+            for (int width = 1; width <= 1100; width += (width < 40 ? 1 : 37)) {
+                const long total = (long)rows * width;
+                const int qstep = threads / width, rstep = threads % width;
+                for (int tid = 0; tid < threads; tid++) {
+                    long idx = tid;
+                    int i = tid / width, j = tid % width;
+                    for (; i < rows; mac_cursor_advance(&i, &j, width, qstep, rstep)) {
+                        if (idx >= total || i != (int)(idx / width) ||
+                            j != (int)(idx - (long)i * width))
+                            bad++;
+                        idx += threads;
+                        visits++;
+                    }
+                    if (idx < total) bad++; /* the cursor stopped early */
+                }
+            }
+        }
+    }
+    CHECK(bad == 0, "update cursor differs from idx / width in %d places", bad);
+
+    uint64_t st = 12345;
+    int pbad = 0, cases = 0;
+    for (int trial = 0; trial < 2000; trial++) {
+        const int rows = 1 + (int)(mac_splitmix64(&st) % 600);
+        const int threads = 32 << (mac_splitmix64(&st) % 6);
+        const int r = (int)(mac_splitmix64(&st) % rows);
+        const int density = (int)(mac_splitmix64(&st) % 5);
+        std::vector<uint32_t> col(rows);
+        for (int i = 0; i < rows; i++)
+            col[i] = (mac_splitmix64(&st) % 8) < (uint64_t)density ? 1u : 0u;
+        int want = rows;
+        for (int i = r; i < rows; i++)
+            if (col[i]) { want = i; break; }
+        int got = rows;
+        for (int tid = 0; tid < threads; tid++) {
+            int mine = rows;
+            for (int i = r + tid; i < rows; i += threads)
+                if (col[i]) { mine = i; break; }
+            if (mine < got) got = mine;
+        }
+        cases++;
+        if (got != want) pbad++;
+    }
+    CHECK(pbad == 0, "pivot search differs in %d of %d columns", pbad, cases);
+    printf("  %ld cursor positions, %d pivot columns: %s\n", visits, cases,
+           bad == 0 && pbad == 0 ? "ok" : "FAILED");
+}
+
 int main() {
     printf("gpu/macaulay CPU verification: p=%u shape=%dx%d\n\n", MAC_P, MAC_ROWS,
            MAC_COLS);
@@ -186,6 +249,7 @@ int main() {
     test_small();
     test_big();
     test_batch();
+    test_block_indexing();
     printf("\n%s (%d failures)\n", failures ? "FAILED" : "all checks passed",
            failures);
     return failures ? 1 : 0;

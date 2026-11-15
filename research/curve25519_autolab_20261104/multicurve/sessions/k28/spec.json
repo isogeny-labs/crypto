@@ -1,0 +1,110 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "inc-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "description": "research/curve25519_autolab_20261104/multicurve: the ledger incumbent wwalkGg-x09-sr-n2 (seed=run where it has a random table) and rho-neg on five Curve25519-family curves of k = 28 (the ledger curve and four sibling primes under the family rule, curve25519_family siblings). Public synthetic targets; no security claim.",
+ "label": "multi-curve re-baseline k = 28: ledger incumbent and rho-neg on 5 family curves",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 2,
+  "seed": 20261328,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 169487139,
+    "b": 71222779,
+    "gx": 178958571,
+    "gy": 19523146,
+    "group_order": 268462472,
+    "p": 268435157,
+    "r": 33557809,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 267214002,
+    "b": 250952373,
+    "gx": 663,
+    "gy": 26513493,
+    "group_order": 268465304,
+    "p": 268435133,
+    "r": 33558163,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 268429818,
+    "b": 148134,
+    "gx": 46,
+    "gy": 68711506,
+    "group_order": 268438088,
+    "p": 268435109,
+    "r": 33554761,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 89070572,
+    "b": 149924549,
+    "gx": 89478689,
+    "gy": 114605419,
+    "group_order": 268436648,
+    "p": 268434949,
+    "r": 33554581,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 177652387,
+    "b": 205395575,
+    "gx": 89478959,
+    "gy": 109796884,
+    "group_order": 268438648,
+    "p": 268434821,
+    "r": 33554831,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261329,
+  "targets_per_curve": 12
+ }
+}

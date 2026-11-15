@@ -1,14 +1,17 @@
 # Index Calculus for the Elliptic-Curve Discrete Logarithm: Theory, Algorithms, and a Measured Frontier
 
-`treatise.tex` (built: [`treatise.pdf`](treatise.pdf), 87 pages) is the
+`treatise.tex` (built: [`treatise.pdf`](treatise.pdf), 293 pages) is the
 programme's comprehensive document on ECDLP index calculus, current to
-2026-10-29.
+2026-11-06.
 
 **Status:** research draft, anonymized, not peer-reviewed, not submitted.
 It synthesises committed evidence. Its one new computation is a
 re-verification of one closure certificate (Chapter 6). Every number cites a
 committed artefact (Appendix A); plotted values and their sources are in
-`figures/data-*.json`.
+`figures/data-*.json`. The source survey behind the November expansion is in
+[`survey/`](survey/) (`INDEX.md`, digests, verification logs); the
+independent review of 6 November (132 findings, each re-verified against its
+source before it was applied or skipped) is in [`survey/review/`](survey/review/).
 
 ## How it relates to the other papers here
 
@@ -27,6 +30,7 @@ the ledger.
 - **5. The summation cover:** Galois group $(\mathbb Z/2)^{m-2}$, the factorisation law, complete splitting on the factor-base locus, conservation of yield.
 - **6. Fall degrees:** binary Weil descent of $S_3$ (first fall degree 2, last fall degree at most $k+2$, certified $\ge5$ at $n=33$–$45$, Semaev's Assumption 1 fails as stated); the guarded chain, $(4,5)$ exactly; PKM Kummer towers; definitional pitfalls, including Nagao's Lemma 4.
 - **7. Obstructions:** transport conservation, generic-oracle closures, xedni $\alpha=3$, and the twist obstruction.
+- **12.7 Curve25519 miniatures** (new section in Chapter 12, Prime fields): 31 studies on $k=16$–$32$ curves built by Curve25519's selection rule. Rho with negation is ahead of every arm: the generic baseline is $7.8$–$24.7\times$ rho, the autolab plateau is $1.8$–$1.9\times$ (a derived $F=2$ collision floor; claims unverified), and the best F4 arm is $1.83\cdot10^4\times$ at $w=0.1$. No statement about the 255-bit curve is made.
 - **13. Extension fields:** $k=4$ with $D_4$, and the red-team verdict.
 - **15. The summer record (July–September 2026):** 1,402 ledger decisions indexed by date, verdict and run-data path ([`research/ecdlp_jul_sep_index_20261029/`](../../research/ecdlp_jul_sep_index_20261029/)); the retracted July wins, August yield/monodromy/oracle/transfer closures, September tables, lifts, Semaev 2015 and Nagao audits, Frobenius bases and the first ICPERF costing against rho.
 - **17. Distance by family:** includes the $k$-sum oracle, the validated 20-bit baseline, N4 v2, and the $n=83$ precomputed-rho reproduction.

@@ -1,0 +1,395 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "inc",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.2180203993624277,
+        2.407942846556009,
+        4.117244871298253
+      ],
+      "charged_sum": 51395.0,
+      "native_sum": 44008,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2207.375
+      }
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "rho-neg",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.4091841638365858,
+        1.5384287886446528,
+        2.7016304119172547
+      ],
+      "charged_sum": 32653.0,
+      "native_sum": 29948,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "tw2l-x10-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.1846605439541746,
+        2.3830459505857364,
+        4.1685146102697965
+      ],
+      "charged_sum": 50622.0,
+      "native_sum": 45969,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2834.0625
+      }
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "tw2l-x10-j8-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.816623225815002,
+        1.9818214024220537,
+        3.4686049918855213
+      ],
+      "charged_sum": 42094.0,
+      "native_sum": 38279,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2352.3125
+      }
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "tw2l-x15-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.9723744782967412,
+        2.1491169774415777,
+        3.739799469745109
+      ],
+      "charged_sum": 45703.0,
+      "native_sum": 40954,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2519.875
+      }
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "tw2l-x20-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.194154940060016,
+        2.392548977960766,
+        4.17809531906751
+      ],
+      "charged_sum": 50842.0,
+      "native_sum": 45971,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2833.5625
+      }
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "tw2l-x20-j32-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.7729921600740657,
+        1.9214758839002426,
+        3.257829398335836
+      ],
+      "charged_sum": 41083.0,
+      "native_sum": 34406,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2110.875
+      }
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "tw2l-x20-j8-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.992183241081202,
+        2.174410911794459,
+        3.8144599482137735
+      ],
+      "charged_sum": 46162.0,
+      "native_sum": 42225,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2598.3125
+      }
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "log2_r": 21.000135515964004,
+      "arm": "tw2l-x30-j16-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.9558024414574542,
+        2.1305036454395347,
+        3.702814481278262
+      ],
+      "charged_sum": 45319.0,
+      "native_sum": 40481,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 2490.4375
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "inc",
+      "b": "tw2l-x10-j16-n2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "inc",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "tw2l-x10-j8-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "inc",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "inc",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "inc",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j32-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "inc",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "inc",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < inc"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "rho-neg",
+      "b": "tw2l-x10-j16-n2",
+      "verdict": "rho-neg < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "rho-neg",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "rho-neg < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "rho-neg",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "rho-neg < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "rho-neg < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "rho-neg < tw2l-x20-j32-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "rho-neg",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "rho-neg < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "rho-neg",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "rho-neg < tw2l-x30-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x10-j8-n2",
+      "verdict": "tw2l-x10-j8-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x10-j16-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j32-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x10-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x15-j16-n2",
+      "verdict": "tw2l-x10-j8-n2 < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x10-j8-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j32-n2 < tw2l-x10-j8-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x10-j8-n2 < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x10-j8-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x10-j8-n2 < tw2l-x30-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j16-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j32-n2 < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x15-j16-n2 < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x15-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x15-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x20-j32-n2",
+      "verdict": "tw2l-x20-j32-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j8-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x20-j16-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x20-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x20-j32-n2",
+      "b": "tw2l-x20-j8-n2",
+      "verdict": "tw2l-x20-j32-n2 < tw2l-x20-j8-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x20-j32-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x20-j32-n2 < tw2l-x30-j16-n2"
+    },
+    {
+      "curve": "icv1-fp24-tm1578-e83ed1b2",
+      "a": "tw2l-x20-j8-n2",
+      "b": "tw2l-x30-j16-n2",
+      "verdict": "tw2l-x30-j16-n2 < tw2l-x20-j8-n2"
+    }
+  ]
+}

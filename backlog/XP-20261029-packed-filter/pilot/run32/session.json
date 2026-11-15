@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h3cbe521f26f0",
+  "label": "pilot: dg vs dgb vs dgb filter=1 at 32 bits (local, descriptive)",
+  "spec_id": "ECS1h6713063830c4",
+  "spec_sha256": "6713063830c4d77501e68eb26e3ee258837e7e3172ec4f81767ff5dc46d4ab29",
+  "env_class_id": "ECBENV3h13e37662a118",
+  "host_sha256": "7f68b0e713e49af7d90dd8d5769b6abb4fbfe8f82d6f7a43472aa1f89fab5e03",
+  "plan_sha256": "f34c188e02bbdf9075b54aa36dd43efc21ee9103852d6f8c913a7ea2e891c4bc",
+  "binary_sha256": "b00eea70fc528030007b3946c9f3e5a01614e9bcc07e997b3f4d447c49bc6733",
+  "git_commit": "117c9c4f3ee85d4dc32f275893f6e50b591e4a47",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793291473192,
+  "finished_unix_ms": 1793291476549,
+  "status": "complete",
+  "executions_planned": 9,
+  "records_written": 9,
+  "records_sha256": "3716d9f47382b3765ded89c1639263396d0e490cd79ebfb07790848939af0be2",
+  "status_counts": {
+    "verified": 9
+  },
+  "last_seq": 8
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "simulated-source-controls/v1",
+  "status": "passed",
+  "cases": [
+    {
+      "name": "malformed",
+      "status": "passed",
+      "receipt_error_recorded": true,
+      "post_attempted": true
+    },
+    {
+      "name": "missing_status",
+      "status": "passed",
+      "receipt_error_recorded": true,
+      "post_attempted": true
+    },
+    {
+      "name": "missing_file",
+      "status": "passed",
+      "receipt_error_recorded": true,
+      "post_attempted": true
+    },
+    {
+      "name": "passed",
+      "status": "passed",
+      "receipt_error_recorded": false,
+      "post_attempted": true
+    },
+    {
+      "name": "unknown_terminal_owner_blocks_post",
+      "status": "passed"
+    },
+    {
+      "name": "changed_invocation_rejected",
+      "status": "passed"
+    }
+  ],
+  "native_compiler_invocations": 0,
+  "systemd_invocations": 0,
+  "scope": "Extracted exact helper functions and phase loop with mocked services/clock; not live runtime qualification",
+  "pcc": "unverified",
+  "launcher_sha256": "de073714bea83707af9bb1698fb85e8c0f082006e9ec9ab015da822b8f4d13a1",
+  "simulation_script_sha256": "02e8db9311efa2084b82569ae852204474767024414ae9993c25eff240f5372e"
+}

@@ -1,6 +1,7 @@
 name: Delphi tools
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - tools/delphi_tools/**
       - .github/workflows/delphi-tools.yml
@@ -12,6 +13,7 @@ permissions:
   contents: read
 jobs:
   test:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

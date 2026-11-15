@@ -1,0 +1,19 @@
+# Prospective bounded nonbranch replay continuation
+
+This version preserves the original replay and failed attempt. Preparation only: publication and independent prospective source review must precede execution. No compiler or experiment was run to prepare this packet. [pcc:unverified]
+
+The prior pre phase reported a work deadline at 280.005 seconds, CPU 6.65 seconds and zero compiler invocations. Charge it conservatively as 300 active worker-seconds, separately from the new maximum 2,400 seconds. The campaign remains 46,800 active worker-seconds with absolute deadline 2026-11-06 04:00 UTC; this packet does not reset earlier campaign debits. Root recorded the owner's dollar-accounting override; no CPU/RAM/concurrency expansion is included. [pcc:unverified]
+
+One new attempt, no automatic retries: pre 900 seconds, compiler 600 seconds, post 900 seconds. Work boundaries reserve 20 seconds within each phase for cleanup; outer timeout sends TERM at phase limit minus20 seconds, then KILL after5 seconds; systemd RuntimeMax is phase limit minus15 with a pinned5-second stop grace. One CPU, 8 GiB RAM, zero swap, TasksMax128, KillMode control-group. Post custody is attempted after any compiler attempt, including failure; a failed pre stops before compiler. [pcc:unverified]
+
+`launch.py` exclusively creates persistent outer output `/home/ec2-user/pencil-native-nonbranch-t1637-v2-20261105.outer`; replay exclusively creates `/home/ec2-user/pencil-native-nonbranch-t1637-v2-20261105`. Existing directories reject reuse. All original source texts, names, runtime bindings, closure and baseline hashes are preserved; historical PLAN.md and REPLAY.md are copied verbatim for provenance and are superseded only on timing/workspace/diagnostics by this continuation. The exact patch is replay.patch. [pcc:unverified]
+
+Every native dependency still receives realpath, before/after metadata, SHA256 and size checks. All 16,736 files and 3,111,892,318 bytes must pass independently in both pre and post; completed dictionaries must agree. Runtime pins are checked on both sides and around compiler work. Four compiler calls, all 30 requested axiom names, malformed-parser controls, intended mathematical negative failure and no-sorry restrictions are unchanged. No partial hash dictionary is accepted or reused. [pcc:unverified]
+
+Each phase periodically fsyncs a bounded progress JSON (at most once per five seconds plus initial/final checkpoints). It reports actually validated files/bytes, last checked path, currently hashed path and bytes read in that file. Declared totals are separate. A blocking filesystem read can delay a checkpoint; stale progress therefore proves only its recorded completed prefix. Failure receipts include current counters rather than presenting declared totals as checked. Source-only metadata comparison in metadata-preservation.json binds unchanged native inputs; it does not claim the native files were rehashed during preparation. [pcc:unverified]
+
+Acceptance requires all three outer exits zero within bounds, all three native receipts passed, full matching pre/post native and runtime dictionaries, four expected compiler exits, all names/axioms, negative/parser controls and reaped descendants. Review and complete custody remain mandatory; no phase success alone is the scientific result. Compiler output and every failed phase remain durable. [pcc:unverified]
+
+Before execution, verify the exact GitHub commit and independent review for freeze.json and launch.py, confirm original attempts/units are terminal, retain the publication receipt, and reconcile all campaign debits. Invoke only the command in COMMAND.txt; no retry after any failure. [pcc:unverified]
+
+Reference: the preserved original PLAN.md, REPLAY.md, freeze.json lineage and replay.py are the governing local review evidence. This is an operational continuation, not a changed mathematical assertion. [pcc:unverified]

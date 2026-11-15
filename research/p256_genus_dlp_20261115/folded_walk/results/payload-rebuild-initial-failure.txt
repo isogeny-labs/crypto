@@ -1,0 +1,53 @@
+   Compiling version_check v0.9.5
+   Compiling zeroize v1.9.1
+   Compiling typenum v1.20.1
+   Compiling cfg-if v1.0.5
+   Compiling proc-macro2 v1.0.107
+   Compiling libc v0.2.191
+   Compiling generic-array v0.14.9
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling crossbeam-utils v0.8.23
+   Compiling crossbeam-epoch v0.9.21
+   Compiling autocfg v1.5.1
+   Compiling serde_core v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling subtle v2.6.1
+   Compiling crossbeam-deque v0.8.8
+   Compiling syn v3.0.10
+   Compiling getrandom v0.2.17
+   Compiling rand_core v0.6.4
+   Compiling rayon-core v1.13.0
+   Compiling zmij v1.0.23
+   Compiling serde v1.0.229
+   Compiling crypto-common v0.1.6
+   Compiling block-buffer v0.10.4
+   Compiling const-oid v0.9.6
+   Compiling serde_json v1.0.154
+   Compiling der v0.7.10
+   Compiling num-integer v0.1.47
+   Compiling serde_derive v1.0.229
+   Compiling digest v0.10.7
+   Compiling ff v0.13.1
+   Compiling either v1.19.0
+   Compiling memchr v2.8.3
+   Compiling cpufeatures v0.2.17
+   Compiling base16ct v0.2.0
+   Compiling itoa v1.0.19
+   Compiling sec1 v0.7.3
+   Compiling sha2 v0.10.9
+   Compiling rayon v1.12.0
+   Compiling group v0.13.0
+   Compiling num-bigint v0.4.8
+   Compiling crypto-bigint v0.5.5
+   Compiling hex v0.4.3
+   Compiling p256-genus-check v0.1.0 (/workspace/scratch/p256-runpod-source-rebuild/research/p256_genus_dlp_20261115/native)
+error: couldn't read `/workspace/scratch/p256-runpod-source-rebuild/research/p256_genus_dlp_20261115/native/src/../../historical/results/toy-zeta.json`: No such file or directory (os error 2)
+   --> /workspace/scratch/p256-runpod-source-rebuild/research/p256_genus_dlp_20261115/native/src/lib.rs:669:30
+    |
+669 |         serde_json::from_str(include_str!("../../historical/results/toy-zeta.json")).unwrap();
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling smith-reference v0.1.0 (/workspace/scratch/p256-runpod-source-rebuild/research/p256_genus_dlp_20261115/classification/reference)
+error: could not compile `p256-genus-check` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

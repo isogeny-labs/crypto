@@ -1,0 +1,120 @@
+diff --git a/src/bin/curve25519_family.rs b/src/bin/curve25519_family.rs
+index c257778d36..4f38b84331 100644
+--- a/src/bin/curve25519_family.rs
++++ b/src/bin/curve25519_family.rs
+@@ -1480,7 +1480,7 @@ fn support(k: u32, form: &str, t: u32) -> Value {
+ #[allow(dead_code)]
+ fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
+     f4cost_m(
+-        k, form, t, guess, targets, seed, cap_s, 2, "full", 0, None, false,
++        k, form, t, guess, targets, seed, cap_s, 2, "full", 0, None, false, false,
+     )
+ }
+ 
+@@ -1776,6 +1776,7 @@ fn f4cost_m(
+     lifts: u8,
+     max_nnz: Option<u64>,
+     trace: bool,
++    descent_skip: bool,
+ ) -> Value {
+     use crypto_lib::cryptanalysis::ic_boundary::{
+         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
+@@ -1930,6 +1931,9 @@ fn f4cost_m(
+     if lifts > 0 {
+         spec.push_str(&format!(",lifts={lifts}"));
+     }
++    if descent_skip {
++        spec.push_str(",descent_skip=1");
++    }
+     if let Some(n) = max_nnz {
+         spec.push_str(&format!(",max_nnz={n}"));
+     }
+@@ -2096,7 +2100,7 @@ fn f4cost_m(
+         "wall_s": started.elapsed().as_secs_f64(),
+         "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
+         "solving_degree_max": tot.solving_degree_max, "undecided": tot.budget_exceeded,
+-        "lifts": lifts > 0, "lifts_mode": lifts, "trace": trace, "hits_exact": exact,
++        "lifts": lifts > 0, "lifts_mode": lifts, "descent_skip": descent_skip, "trace": trace, "hits_exact": exact,
+         "trace_learn_muladds": learn_muladds,
+         "amortised_muladds_per_target": (learn_muladds + tot.ops) as f64 / done.max(1) as f64,
+         "calls_per_target": tot.calls as f64 / done.max(1) as f64,
+@@ -2392,10 +2396,13 @@ fn main() {
+                 .filter(|v| v.as_str() != "-")
+                 .map(|v| v.parse().unwrap());
+             let trace = args.get(13).is_some_and(|v| v == "1");
++            // Position 14: descent_skip (0|1, with lifts 1 on square-bits).
++            let descent_skip = args.get(14).is_some_and(|v| v == "1");
+             println!(
+                 "{}",
+                 serde_json::to_string(&f4cost_m(
+-                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts, max_nnz, trace
++                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts, max_nnz, trace,
++                    descent_skip
+                 ))
+                 .unwrap()
+             );
+diff --git a/src/cryptanalysis/ic_framework/pkm_semaev.rs b/src/cryptanalysis/ic_framework/pkm_semaev.rs
+index 0d311d92ac..75edfd1935 100644
+--- a/src/cryptanalysis/ic_framework/pkm_semaev.rs
++++ b/src/cryptanalysis/ic_framework/pkm_semaev.rs
+@@ -809,6 +809,11 @@ pub struct PkmSemaevOracle {
+     /// Cofactor-fiber lifts (`lifts=1`): the rational `h`-torsion `E(F_q)[h]`,
+     /// computed once in `prepare`; `decompose` tries the targets `R + K`.
+     lifts: bool,
++    /// `descent_skip=1` (with `lifts=1` on a `square-bits` base): skip a lift
++    /// R + K whose 2-descent class chi(x_W - A/3) is -1. Every base point of
++    /// that base lies in 2E(F_p), so no sum of base points equals such a lift.
++    /// One Legendre symbol per lift, counted as `pkm_descent_legendre`.
++    descent_skip: bool,
+     /// `lifts=2`: ONE F4 system per target (per guess branch) for all the
+     /// lifts. The third abscissa is a free ring variable `X`, constrained by
+     /// `P_R(X) = Π (X − x(R+K))` over the distinct lift abscissae, built
+@@ -856,6 +861,7 @@ impl PkmSemaevOracle {
+             traces: Vec::new(),
+             trace_setup: BTreeMap::new(),
+             lifts: false,
++            descent_skip: false,
+             shared_req: false,
+             shared: false,
+             shared_pts: Vec::new(),
+@@ -1104,6 +1110,11 @@ impl PkmSemaevOracle {
+         }
+         self.lifts = lifts >= 1;
+         self.shared_req = lifts == 2;
++        let descent_skip = params.u64_or("descent_skip", 0)?;
++        if descent_skip > 1 || (descent_skip == 1 && lifts != 1) {
++            return Err("pkm-semaev: descent_skip is 0, or 1 together with lifts=1".into());
++        }
++        self.descent_skip = descent_skip == 1;
+         if self.shared_req
+             && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some() || self.m != 2)
+         {
+@@ -1920,6 +1931,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
+                 "lifts",
+                 "1: cofactor-fiber lifts; try R + K for each x-distinct K in E(F_q)[h], first liftable relation wins; relations are over the projection [h]P (see fiber.rs). 2: the same verdicts from ONE F4 system per target: the third abscissa is a free variable X with P_R(X) = prod (X - x(R+K)) (m = 2, engine f4)",
+             ),
++            (
++                "descent_skip",
++                "1 (with lifts=1, square-bits base): skip lifts whose 2-descent class is -1; they cannot decompose; one Legendre symbol per lift, counted",
++            ),
+         ]
+     }
+ 
+@@ -2169,6 +2184,17 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
+                             continue;
+                         }
+                         tried_x.push(t.x);
++                        if self.descent_skip {
++                            if let Membership::SquareBits { shift: Some(sh), .. } = self.membership
++                            {
++                                // x_M = x_W - A/3; class -1 means R + K is not in 2E(F_p).
++                                self.bump("pkm_descent_legendre", 1);
++                                if ctx.group.legendre(subm(t.x, sh, ctx.group.p)) < 0 {
++                                    self.bump("pkm_descent_skipped", 1);
++                                    continue;
++                                }
++                            }
++                        }
+                         self.bump("pkm_lift_targets_tried", 1);
+                         if let Some(idx) = self.decompose(ctx, fb, ops, counters, t) {
+                             if i != 0 {
