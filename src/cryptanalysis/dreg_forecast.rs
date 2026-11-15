@@ -1225,11 +1225,11 @@ mod tests {
         let s47 = boolean_quadratics(26, 47); // n = 47, k = 13
         assert_eq!(effective_degree(&s47, 47 - 25 + 1), 2); // fppr, dim(VV) = 25
         assert_eq!(effective_degree(&s47, 47 - 36 + 1), 3); // near_gp, dim(VV) = 36
-        assert_eq!(effective_degree(&s47, 47 - 47 + 1), 4); // random, dim(VV) = 47
+        assert_eq!(effective_degree(&s47, 1), 4); // random, dim(VV) = n, falls = 1
         let s53 = boolean_quadratics(30, 53); // n = 53, k = 15
         assert_eq!(effective_degree(&s53, 53 - 29 + 1), 2);
         assert_eq!(effective_degree(&s53, 53 - 42 + 1), 4);
-        assert_eq!(effective_degree(&s53, 53 - 53 + 1), 5);
+        assert_eq!(effective_degree(&s53, 1), 5); // random, falls = 1
         assert_eq!(
             effective_degree(&boolean_quadratics(4, 3), 10),
             2,
