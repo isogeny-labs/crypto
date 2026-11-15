@@ -1,37 +1,28 @@
-# Resume: crypto @ claude/gpu-ic-baseline-modal-20261107
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
-User request (2026-11-07): draft the EKS GPU pool for review and also use Modal, for the first hardware
-baseline of gpu/semaev and gpu/rootfind (no kernel in either has ever run on a GPU).
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
 ## Lead / hypothesis
-Engineering stage diagnostic, not a lead. Does the device agree with the verified host path, and how fast
-does it run (clmad vs software product, per-row vs per-pair, sorted vs hash lookup)? Predictions P1-P4 are
-in the spec.
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-research/gpu_ic_baseline_20261027/PROTOCOL.md including Amendment 1 (frozen at the commit that adds
-gpu/modal/). Container job: gpu/modal/ic_baseline_job.sh. Launcher: gpu/modal/modal_ic_job.py.
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
 ## State
-Protocol, Modal launcher/job and the EKS GPU pool draft (taskq/deploy/eks-karpenter/gpu-draft/, NOT applied)
-are committed on this branch. No Modal run yet. Modal credentials are in the session environment
-(MODAL_TOKEN_ID, MODAL_TOKEN_SECRET); the `modal` client is pip-installed (1.6.3).
-
-## Next steps
-1. Checkpoint push must succeed (needs CHECKPOINT_UPLOAD_TOKEN or AWS creds; neither was present).
-2. `modal run --detach gpu/modal/modal_ic_job.py --out /tmp/gpu-ic-baseline/run-01`; if the client dies,
-   `--fetch-token <token>`.
-3. If the selftest gate fails, that is the result: report it, no throughput.
-4. Otherwise score P1-P4, write RESULTS, graph, PDF, benchmarks/ row only if the validation gate allows
-   (it does not for a Modal-only run), session log, PR.
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
 ## Runs in flight
-None.
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
 
 ## Stop and success conditions
-One Modal launch, 2 h function timeout, expected under 30 min. Any selftest failure stops throughput.
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
-## Open questions
-Whether sm_120 is available on Modal as "RTX-PRO-6000" for this workspace; whether the g7e sizes and
-G-family Spot quota exist for the EKS pool.
+## Next steps
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.

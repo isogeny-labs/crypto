@@ -1,0 +1,14 @@
+{
+  "action": "git checkout -B <branch> origin/main (carry uncommitted work with git stash) and push normally: the old remote head is an ancestor of main, so the push fast-forwards; no force push is needed",
+  "created": "2026-11-15T06:17:09Z",
+  "evidence": [
+    "docs/session-logs/2026-11-15.md (03:20Z entry, Errors)"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "*"
+  ],
+  "trigger": "restarting a work branch whose PR merged with a merge commit",
+  "why": "a force push was refused by the permission classifier; the fast-forward is the safe path"
+}

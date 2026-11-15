@@ -1,0 +1,3261 @@
+{
+  "schema": "validator-report/v1",
+  "status": "pass",
+  "verdict": "pass",
+  "disposition": "validated",
+  "disposition_meaning": "Scope: the GAE result under validation. Certificates 4,410/4,410 ([d]G = Q by the validator's own arithmetic; 4,410/4,410 negative controls rejected) and replays 3,780/3,780 identical. Every GAE ratio, interval, band row, band order and the trend slope recomputes from the committed records with independent code to within 1e-15 (trend 1e-13). E1 is fixed in the 5a band: both arms' canonicalisations are listed in cost.unpriced with counts and charged one native operation each at w. The headline sib8-p512-aut3 / rho-cubic = 0.992 [0.902, 1.092] / 0.875 [0.804, 0.952] / 0.909 [0.828, 0.997] at w = 0, 1.356 / 1.200 / 1.248 at w = 0.1, 3.000 / 2.663 / 2.776 at w = 1, unresolved in the band at every size, and flat in r (slope -0.015 [-0.051, +0.021]) are validated. NOT validated: the README's bit-op figures for the aut=3 arms. The E1 fix did not reach bitop/v1 for ic.pipeline records (erratum N1), so those figures leave the aut=3 canonicalisations unpriced.",
+  "gate_note": "status pass applies to the GAE comparison sib8-p512-aut3 vs rho-cubic that VALIDATION.json covers. Errata N1-N5 do not change any GAE number. N1 bars citing the aut=3 bit-op ratios (README 'Bit-ops' paragraph) until they are restated as lower bounds or re-priced.",
+  "independent": true,
+  "validator": "validator subagent (Claude Opus 5.5) dispatched by the main session. It produced none of the producer's artifacts and made no edit to README, records, specs, comparisons, band, trend, protocol or bench-record files. It made no git mutation. Scratch work and checker code are outside the repository (no Python); its outputs are only the four files named in the dispatch, in this evidence directory.",
+  "validated_commit": "55d2f329d27209bec8e82205b18e94c2edbf8083",
+  "tree_clean": true,
+  "claim_under_validation": "On j = 0, b = 7 prime-order prime-field curves at p = 34/37/40 bits (five each), sib8-p512-aut3 / rho-cubic in GAE is 0.992 [0.902, 1.092] / 0.875 [0.804, 0.952] / 0.909 [0.828, 0.997] at w = 0, 1.356 / 1.200 / 1.248 at w = 0.1 and 3.000 / 2.663 / 2.776 at w = 1, unresolved in the AGENTS.md 5a band at every size; flat in r (ecbench trend free_r slope -0.015 [-0.051, +0.021]). Secondary: aut3/non-aut3 0.56-0.61 at w = 0 and 0.84-0.90 at w = 1; every aut3 record lists aut_canonicalisations_uncharged with count = table_insert_attempts. [pcc:unverified]",
+  "pcc_note": "No pcc claim is filed for this result; its standing remains [pcc:unverified]. This report is a validator recomputation, not a signed pcc verdict.",
+  "validator_tools": {
+    "location": "validator scratch directory outside the repository; not committed",
+    "extract.jq": "d01513a11d0ca3867d29e6d3eb24020313ab38e7e8ea29a3ca692846a80b44b3",
+    "check.rs (Rust, std only, no crate shared with ecbench; rustc 1.97.0 -O)": "d9ccbe68b7791bb8835db6da15a029e3b5dab7d4e7868062e3df884a637e31a3",
+    "check (compiled)": "1781a6830679810edfb7fd64ea76bf68ec9f9306a23502bc81880607f18e1f38",
+    "records.tsv (extract.jq output over the three records.jsonl)": "8d7cdc9064d386c96b9cb993625b4c6743f94885d91f988a701ac67d01dc3fde",
+    "check.out (checker output)": "808c17e0150929140ac62cce8fd0e3d528264f562c304463322c14fda247c707",
+    "method": "jq extracts raw record fields only (ICV1 p, t, r; G; Q; recovered d; total_gae; phase gae; cost.unpriced names with counts looked up in counters, else phase native maps as X_uncharged or X; work_native table and sibling counters with their counted: markers; bitops). check.rs does the curve and scalar arithmetic (affine, u128), the 5a pricing S(w) = (G + w*U)/sqrt(r), the pairing by (workload, round) over measured verified runs, the ratio of summed S, the delta-method log interval over workload clusters with its own Student-t quantile (incomplete beta), per-curve ratios, band means, and the WLS slope. It was written from the AGENTS.md 5a text and the band.rs module contract and shares no code with ecbench."
+  },
+  "checks": [
+    {
+      "id": "C0",
+      "requirement": "Frozen, committed artifact set; clean tree",
+      "command": "git rev-parse HEAD; git status --short; git show 55d2f329d2:<records.jsonl> | sha256sum",
+      "result": "HEAD 55d2f329d27209bec8e82205b18e94c2edbf8083 at the start and the end of validation, with no tracked or untracked changes. The three records.jsonl are committed in 55d2f329d2, and the committed blobs hash to the working files.",
+      "pass": true
+    },
+    {
+      "id": "C1a",
+      "requirement": "Raw-data identity",
+      "command": "sha256sum sessions/*/{records.jsonl,plan.json,host.json,spec.json}; jq session.json; bench record raw[]",
+      "result": "session.json records_sha256 = sha256(records.jsonl): ca11410e... (p34), abeef99c... (p37), e6e983e3... (p40). plan_sha256 and host_sha256 also equal the file hashes. Each session has 1,470 records, status_counts verified 1,470, and status complete. The bench record raw[].sha256 equal the three records digests, with raw[].uploaded = false (see N3). Store presence was not checked; the bytes are in Git at 55d2f329d2.",
+      "pass": true
+    },
+    {
+      "id": "C1b",
+      "requirement": "Spec and protocol frozen before data",
+      "command": "sha256sum -c frozen.sha256; git show 709f978290:<file> | sha256sum; git diff --stat 709f978290 HEAD -- <frozen files>; session.json started/finished, git_commit, git_dirty",
+      "result": "4/4 OK. The frozen files are identical to their blobs at 709f978290 and unchanged since; compare.sh and run_local.sh were also committed at 709f978290 and are unchanged. Freeze commit 03:11:02Z. Sessions started 03:11:47Z / 03:13:17Z / 03:17:27Z and finished 03:13:12Z / 03:17:20Z / 03:29:06Z. Every session.json has git_commit 709f978290 and git_dirty false, and each sessions/*/spec.json is byte-identical to its frozen spec. The specs equal Stage 4's apart from label, description and seeds (+1000); 0 of the 15 curves are shared with Stage 4. Wording note: the target seed is measurement seed + 50 (35591 / 35621 / 35651), Stage 4's convention. PROTOCOL.md's 'measurement seed, target seed and curve seeds are 35201 + 10*bits (+ i)' does not say this. The frozen spec is authoritative.",
+      "pass": true
+    },
+    {
+      "id": "C1c",
+      "requirement": "Binary identity",
+      "command": "sha256sum target/release/ecbench; session.json and every record's binary_sha256; independent rebuild (binary_provenance in replay-certificate.json)",
+      "result": "target/release/ecbench sha256 a2338b69323813fedc51e30a0eae52eb7287e0825f127c25600e7cf5f6256fe5 equals binary_sha256 in all three session.json files and all 4,410 records (one env class, ECBENV3h019d40ac615e). An independent rebuild from the committed source (55d2f329d2, clean; src/, Cargo.toml and Cargo.lock identical to 4e2ea6c1be; rustc 1.97.0; 16m 14s) has sha256 a2c8b6a20c558be1905ef739c98be6d0002b77cd92a2a3102be1f4c1f24d14e9. It is not byte-identical, but all 6,633 differing bytes are in .strtab (6,613: ThinLTO .llvm.<hash> suffixes of 778 crypto_lib symbol names) and .note.gnu.build-id (20). 0 bytes differ in any loaded section (.text, .rodata, .data, .data.rel.ro, .eh_frame, .gcc_except_table, .rela.*), and the section tables are identical. The rebuilt binary replays j0b7-34 1,260/1,260 identical with 0 problems (receipt e2ec29fc9dd5fcfa629facacde21499e43a17838dffdca6befeb362e5413d6cd). The executable image is therefore the build of the committed source. The binary's mtime (02:47:22Z) precedes commit 4e2ea6c1be (03:11:01Z); see N5.",
+      "pass": true
+    },
+    {
+      "id": "C2",
+      "requirement": "Replay certificate: ecbench verify --replay-all on all three sessions",
+      "command": "<scratch>/bin/ecbench verify --dir sessions/j0b7-<b> --replay-all --out validator-replay-all-j0b7-<b>.json (binary sha256 a2338b69...)",
+      "result": "j0b7-34: ok, 1,470 verified, 1,260/1,260 replays identical, 0 problems, 18/18 checks true, receipt sha256 0ecf117115b34ae7f4f896312abcf1f526a0eb59c13ab1654284fabcbe84de96 (105 s). j0b7-37: ok, 1,470 verified, 1,260/1,260 identical, 0 problems, receipt bbc92878fbefce477c82483ae4c8ddbb3985e1e935e653d2ceb662b7b65020d7 (265 s). j0b7-40: ok, 1,470 verified, 1,260/1,260 identical, 0 problems, receipt fe4ae3e5000f99621c65b78d977a4705f0c095f6804bbe04b25eb17232c57e54 (685 s). The producer's verify-j0b7-*.json (--replay 8) also reproduce 8/8 identical each. Same host class (auditor env ECBENV3h019d40ac615e, hardware ECBHW1he9e33daae9e7): an independent process, not another host class. AGENTS.md 12 asks for another host class only for an ecbench vs_rho claim, which this result does not make.",
+      "pass": true
+    },
+    {
+      "id": "C3",
+      "requirement": "Every recovered log satisfies [d]G = Q (validator's own arithmetic), with a negative control",
+      "command": "check < records.tsv (CURVE, CERT, CERTSUM lines)",
+      "result": "4,410/4,410 records, warm-ups included, satisfy [d]G = Q with Q on the curve. 4,410/4,410 negative controls [d+1]G != Q are rejected. All 15 curves check out: y^2 = x^3 + 7 (b derived from G); p and r prime (deterministic Miller-Rabin); r = p + 1 - t from the ICV1 string; rG = O; cofactor 1; p = r = 1 mod 3; and zeta3(G) = (omega*x, y) = [kappa]G for a primitive cube root omega mod p and kappa mod r, so the order-3 automorphism exists. All 90 targets satisfy rQ = O, and the target is identical across the 7 arms of every workload. curve_uid is null on every record and in the bench record, so curves are identified by ICV1 slug only.",
+      "pass": true
+    },
+    {
+      "id": "C4a",
+      "requirement": "Headline ratios recomputed from records.jsonl (paired by workload and round), w = 0, 0.1, 1",
+      "command": "check (CMP lines) joined with every saved comparison file (sessions/*/comparisons/*.json, unit ecbench.gae)",
+      "result": "63/63 saved GAE comparisons (7 pairs x 3 weights x 3 sizes) reproduce ratio and both 95% interval ends, max relative difference 9.95e-16. Each has 180 pairs on 30 workloads, 0 unpaired, and the same algorithm seed on 180/180 pairs. The estimand is sum S_b / sum S_a over pairs with S = (total_gae + w*U)/sqrt(r). U = cost.unpriced counts + table_insert_attempts + sibling_second_points + sibling_lift_products, each table or sibling term only where its counted: marker is present. The interval is the delta method on the log scale over 30 workload clusters with t(0.975, 29) = 2.045229642132702. The README table (all six rows, three sizes, three weights), the bench record's 9 metrics and the figure's 27 bars agree with these values to their printed precision.",
+      "pass": true
+    },
+    {
+      "id": "C4b",
+      "requirement": "5a band and band orders",
+      "command": "check (BAND, ORDER lines) vs band-j0b7-*.json rows and ranks",
+      "result": "105/105 band rows (7 arms x 15 curves) match: mean S at w = 0, 0.1, 1 within 1.2e-16, with charged_sum and native_sum equal as integers. Pooled order of sib8-p512-aut3 vs rho-cubic: unresolved at every size (below at w = 0, above at w = 0.1 and 1). Per curve: 10/15 unresolved, 5/15 rho-cubic lower at every weight (icv1-fp34-tm164207-29f8e485, icv1-fp34-tm193799-7ed37e0f, icv1-fp34-tm222119-a0bb7a3a, icv1-fp37-tm633899-b9e1ea03, icv1-fp40-tm1957301-6195e1af), 0/15 sib8-p512-aut3 lower at every weight. This equals the band files' ranks on 15/15. The other pooled orders also match the saved comparisons: aut3 lower than non-aut3 at every weight and size, rho-cubic lower than tw2cj-lazy-aut3 and sib8-p512, rho-cubic lower than rho-neg, and A/A ratio exactly 1.",
+      "pass": true
+    },
+    {
+      "id": "C4c",
+      "requirement": "Slope in r (ecbench trend free_r)",
+      "command": "check (CURVECMP, TREND lines) vs trend/*.json",
+      "result": "60/60 per-curve trend inputs (ratio and 95% interval) agree within 1.1e-15. Validator's WLS gives slope -0.0147580569745267 [-0.0505716371103043, +0.0210555231612508] and chi2/dof 0.5555, against the claimed -0.014758056974527407 [-0.05057163711030578, +0.021055523161250964]. An unweighted OLS over the same 15 curves gives -0.0187 [-0.0486, +0.0112] (t, 13 df): the same reading, an interval containing 0. At w = 0.1 the WLS slope is -0.0135 [-0.0494, +0.0223]; at w = 1 it is -0.0121 [-0.0481, +0.0238].",
+      "pass": true
+    },
+    {
+      "id": "C4d",
+      "requirement": "Pre-registered J1-J4",
+      "command": "check (CMP, J4 lines)",
+      "result": "J1 holds: 0.9922 / 0.8749 / 0.9088, inside [0.80, 1.00]. J2 holds: 1.3560 / 1.1996 / 1.2481 inside [1.10, 1.40] at w = 0.1, and 2.9998 / 2.6632 / 2.7756 inside [2.4, 3.1] at w = 1. J3 holds: at w = 0, tw2cj-lazy-aut3 / tw2cj-lazy is 0.5603 / 0.5633 / 0.5747 and sib8-p512-aut3 / sib8-p512 is 0.5904 / 0.5668 / 0.6080, inside [0.50, 0.66]; at w = 1 they are 0.8383 / 0.8442 / 0.8618 and 0.8696 / 0.8387 / 0.9018, inside [0.70, 0.95]. J4 holds: 1,080/1,080 measured aut3 records (1,260/1,260 with warm-ups) list aut_canonicalisations_uncharged in cost.unpriced with count = table_insert_attempts. No non-aut3 record lists it.",
+      "pass": true
+    },
+    {
+      "id": "C5a",
+      "requirement": "Charging audit: E1 fixed in the band (both arms' canonicalisations priced alike)",
+      "command": "git show a6a9750f53; src/cryptanalysis/ic_boundary.rs canon_key, probe, rotate_kept, CubicClasses::canon; records' cost.unpriced, counters, phase native and work_native maps",
+      "result": "Fixed in the GAE band. TargetWalk::canon_key performs two mulmod(omega) and two key compares per stored point and counts aut_canonicalisations. The count is emitted as aut_canonicalisations_uncharged in the relations phase native map and listed in cost.unpriced, so the band charges it at w (1,260/1,260 aut3 records). CubicClasses::canon performs the same two omega-rotations and compares once per walk step. It is emitted as counters.canonicalisations_uncharged and listed in cost.unpriced (630/630 rho-cubic records). The band therefore charges one native operation per canonicalisation on both arms. Mean per run at p40: sib8-p512-aut3 GAE 446,612 and U 2,279,915 (aut canonicalisations 889,857, table inserts 889,857, sibling second points 444,490, sibling lift products 55,672, others 40); rho-cubic GAE 489,552 and U 489,050 (canonicalisations). The engine's accounting code differs from Stage 4's only by the counter rename and the bitop rule (git diff b460422af6 4e2ea6c1be). Under the pre-E1 reading (aut term dropped), the validator gets sib8-p512-aut3 / rho-cubic = 1.179 / 2.024 (p34), 1.042 / 1.795 (p37), 1.083 / 1.870 (p40) at w = 0.1 / 1. The committed values 1.356 / 3.000, 1.200 / 2.663 and 1.248 / 2.776 include the term. Small uncharged items on both sides, none listed or charged on any arm: probe() canonicalisations (2 lookups a run, not counted); rotate_kept mod-r products (at most 5 per rotated collision, a few a run); rho's distinguished-point probes (183-795 a run); and the IC arms' index, row-build and gauss word counters (tens a run). The largest uncharged item is rho's cycle-window compares (observation O1).",
+      "pass": true
+    },
+    {
+      "id": "C5b",
+      "requirement": "Charging audit: sibling work and robustness of the verdict to the pricing rule",
+      "command": "band.rs SIBLING_WORK_COUNTERS; check (no_sibling_counters reading)",
+      "result": "sibling_second_points and sibling_lift_products are charged at w on both sib arms, where their counted: markers are present (540/540 measured runs per sib arm). This is the committed band.rs reading. AGENTS.md 5a names only table_insert_attempts. Without the two sibling terms, sib8-p512-aut3 / rho-cubic is 1.257 / 2.451 (p34), 1.111 / 2.175 (p37) and 1.156 / 2.266 (p40) at w = 0.1 / 1, still unresolved at every size, so the verdict does not depend on that rule.",
+      "pass": true
+    },
+    {
+      "id": "C5c",
+      "requirement": "A/A control",
+      "command": "check (rho-neg-aa / rho-neg)",
+      "result": "180/180 pairs identical at every weight and size; ratio exactly 1. rho-neg-aa is rho.negation with the same seeds, so it tests determinism and pairing, not run-to-run noise. Counts are deterministic and no wall time is claimed.",
+      "pass": true
+    },
+    {
+      "id": "C6",
+      "requirement": "Matched-rho fairness",
+      "command": "records boundaries.automorphisms_*; band means; spec arms",
+      "result": "PROTOCOL.md names rho-cubic as the matched rho. It is rho.cubic with automorphisms_used = 6 = automorphisms_available on 630/630 records: the full automorphism fold (negation and the order-3 automorphism) for j = 0 curves over F_p, which have no Frobenius to add, so it is the strongest available. At w = 0 it runs at 1.020 / 1.068 / 1.055 x its A = 6 floor sqrt(pi r / 12), a strong reference. It runs in the same binary and sessions as the IC arm, on the same workloads, targets and algorithm seeds, in the same unit, with its unpriced canonicalisations listed and counted. rho-neg (A = 2) is the unmodified reference row.",
+      "pass": true
+    },
+    {
+      "id": "C7",
+      "requirement": "Review of the new native analysis code (4e2ea6c1be)",
+      "command": "git show 4e2ea6c1be -- src/bin/ecbench.rs src/cryptanalysis/ecbench/compare.rs src/cryptanalysis/ecbench/compare/pooled.rs src/cryptanalysis/ecbench/trend.rs",
+      "result": "trend: icv1-fp slugs get n = 1. free_r is the fit that applies. free_r_n is singular (ln n = 0), and the Gauss-Jordan solve returns None, so it is skipped. The model row uses the default fixed beta = 1/6, gamma = -1/2 and is meaningless for this pair; it is not cited. The fit recomputes exactly (C4c). compare --unit bitop/v1 pairs the recorded work.bitops_per_sqrt_r by (workload, round). It refuses --weight and several --dir, puts the unit in comparison_id and the file name, computes no band, and reproduces 15/15 saved bit-op comparisons within 1e-15. Two gaps: (i) it never reads work.complete or work.unpriced, so it pairs incomplete bit-op prices without a lower-bound flag (N2); (ii) a run that does not count is dropped, not censored as on the GAE path (no effect here: 0 failures). The GAE path the headline uses is unchanged apart from the extra argument.",
+      "pass": true
+    },
+    {
+      "id": "C8",
+      "requirement": "Reporting contract (AGENTS.md 2, 5, 5a, 6; m=83 / ECC2K-130 rules)",
+      "command": "README.md, REPORT.pdf, figures, bench record",
+      "result": "Met: one table in one unit (GAE; S = GAE/sqrt r); a ratio for every row; every arm priced, rho-cubic and rho-neg included; the band at 0, 0.1 and 1 with the order stated as unresolved; the w = 0 figure cited only with the band; every answer verified. The ECC2K-130 and m = 83 rules do not apply (prime-field j = 0 curves; 'no claim about secp256k1'). Omissions (minor): the dominant phase is not stated (oracle_setup carries 99.75 / 99.90 / 99.96 % of the IC arm's GAE; linear algebra charges 0 GAE, and its row operations are priced at w as row_ops_uncharged). The wall-clock practicality note is omitted: compare's end-to-end wall sib8-p512-aut3 / rho-cubic at L0 is 5.23 [4.79, 5.70] / 5.18 [4.74, 5.65] / 5.32 [4.88, 5.80]. Not met: the bit-op paragraph (N1).",
+      "pass": true
+    },
+    {
+      "id": "C9",
+      "requirement": "Blockers",
+      "command": "review of the above",
+      "result": "None for the GAE result. No certificate failure, replay drift, data edit or protocol change after data. N1 bars citing the aut=3 bit-op ratios; N2-N5 are tool, process and provenance errata.",
+      "pass": true
+    }
+  ],
+  "errata": [
+    {
+      "id": "N1",
+      "severity": "secondary claims (bit-op figures); GAE headline and band unaffected",
+      "location": "src/cryptanalysis/ecbench/work.rs (a6a9750f53 put the rule in generic_rule, which only non-IC methods reach); PROTOCOL.md 'Why' ('bitop/v1 prices them at 2 field multiplications and 2 word compares'); the aut help text in ic_framework/plugins.rs; README 'Bit-ops' paragraph; PYTHON-PROVENANCE.md's Stage 4 bit-op check",
+      "issue": "The E1 fix did not reach bitop/v1 for ic.pipeline records. work.rs prices ic.* phase counters through ic_rule, which has no entry for aut_canonicalisations_uncharged. So 1,260/1,260 aut3 records list it in work.unpriced and their bitops omit 2 field_mul + 2 word_op per canonicalisation; rho-cubic's rotations are priced (2 field_mul, 3 modr_mul, 2 field_add each). This is Stage 4's E4, still present. The validator prices each canonicalisation at 2 field_mul + 2 word_op. Its gates (fp mul(b) = 2(b^2 + 5b(b-1)) + 13b, word_op 64) reproduce the records' own bitops. With them: sib8-p512-aut3 / tw2cj-lazy is 0.589 / 0.538 / 0.540, not the README's 0.368 / 0.334 / 0.334. sib8-p512-aut3 / rho-cubic is 0.995 / 0.881 / 0.917, not 0.621 / 0.547 / 0.568 (README: 'not used'). tw2cj-lazy-aut3 / tw2cj-lazy is 0.770 / 0.775 / 0.791, not 0.561 / 0.563 / 0.575. sib8-p512-aut3 / sib8-p512 is 0.945 / 0.912 / 0.981, not 0.590 / 0.567 / 0.608. Every IC record (aut3 or not) also has work.complete = false (tw_* counters unclassified), so every IC bit-op price is a lower bound.",
+      "fix": "Add aut_canonicalisations_uncharged to ic_rule, not generic_rule. Re-price, by an explicit re-pricing reading or a new stage. Restate the README bit-op line as a lower bound for the aut3 arms. Correct the PROTOCOL/plugins/commit statements where they are cited again."
+    },
+    {
+      "id": "N2",
+      "severity": "tool gap (secondary)",
+      "location": "src/cryptanalysis/ecbench/compare.rs match_pairs, bitop_s (4e2ea6c1be)",
+      "issue": "compare --unit bitop/v1 pairs work.bitops_per_sqrt_r without reading work.complete or work.unpriced. On these sessions 540/540 measured IC records per session have work.complete = false, and the saved bit-op comparisons carry no lower-bound or unpriced flag. A run that does not count is dropped (None), not censored as on the GAE path.",
+      "fix": "Refuse, or mark the ratio as a bound in the direction the incomplete arm implies, when either arm's work block is incomplete. List the work.unpriced names per arm in the comparison. Censor failures as the GAE path does."
+    },
+    {
+      "id": "N3",
+      "severity": "process (not a validity issue)",
+      "location": "sessions/j0b7-{34,37,40}/records.jsonl at 55d2f329d2; benchmarks/records/20261112T0311Z-sib-stage4b-aut3.json raw[].uploaded",
+      "issue": "Three data files of 12.8-12.9 MB each are committed to Git, against AGENTS.md 13 (data files over 64 KiB belong in the artifact store; files over 10 MiB fail the large-files check). The bench record still has uploaded = false. The dispatch notes that the artifact-migrate bot may move them.",
+      "fix": "Move them through tools/artifacts with .artifacts.json manifests, then update raw[].uploaded. This report's raw_data deliberately omits records.jsonl and plan.json and binds them through session.json (records_sha256, plan_sha256, pinned in raw_data), so the gate survives the move."
+    },
+    {
+      "id": "N4",
+      "severity": "cosmetic",
+      "location": "compare.txt",
+      "issue": "compare.txt contains 'failed printing to stdout: Broken pipe' panics from compare.sh's '| head -N'. Each comparison file was saved before its panic; all 78 saved comparison files are present and consistent (C4a, C7).",
+      "fix": "Write the full output to the log, or use --json, instead of piping to head."
+    },
+    {
+      "id": "N5",
+      "severity": "provenance note (not a validity issue)",
+      "location": "target/release/ecbench; session.json git_commit; bench record commit",
+      "issue": "The session binary was built from the working tree (mtime 02:47:22Z) before 4e2ea6c1be was committed (03:11:01Z). The sessions record the freeze commit 709f978290 as git_commit, and nothing records a build commit. A fresh build of the committed source has the same loaded image but different symbol-table hashes and build-id (C1c), so the binary is not byte-reproducible from the named commit. Its executable content is.",
+      "fix": "Build the measuring binary from the committed tree and record the build commit and tree state in the bench record or session."
+    }
+  ],
+  "observations": [
+    {
+      "id": "O1",
+      "note": "The 5a band (AGENTS.md 5a, band.rs) charges no word-level work on any arm. The largest such count is rho's cycle-window compares (work_native.cycle_window_word_ops: 17.4 / 17.7 / 17.8 per step on rho-cubic). These are priced in bitop/v1 only; research/rho_cycle_window_bitops_20261107 states that the GAE unit is unchanged. The IC arms' hash and key-compare word operations are not counted at all, so no symmetric band reading that charges word operations exists. The validator neither computes nor requests one; it is flagged so the owner can decide whether the band's 'native operation' should ever include word operations."
+    },
+    {
+      "id": "O2",
+      "note": "boundaries.automorphisms_used is 2 on every ic.pipeline record, including the aut=3 arms, which fold 6. This is metadata only: floor_s uses automorphisms_available = 6, and no ratio reads automorphisms_used."
+    },
+    {
+      "id": "O3",
+      "note": "At w = 0, sib8-p512-aut3 runs at 1.012 / 0.934 / 0.959 x the A = 6 generic floor, because each sibling pair's second point and each lift are native operations priced at 0 at w = 0 (Stage 4's E5). The w = 0 ratio is a lower bound for the IC arm. The README cites it only with the band and makes no below-rho claim."
+    },
+    {
+      "id": "O4",
+      "note": "The slope uses 15 curves in three size bands (log2 r 33.3-40.0), fewer than the four sizes AGENTS.md 5 asks for an exponent fit. The producer makes no exponent claim. 'Flat in r' means the slope interval contains 0 over this range."
+    },
+    {
+      "id": "O5",
+      "note": "The panel ran locally at L0, not on the EKS default; PROTOCOL.md froze that route. Operation counts do not depend on isolation, and no wall-time result is claimed."
+    },
+    {
+      "id": "O6",
+      "note": "The README's 'at w = 1 the sibling mechanism no longer pays' is supported by the direct paired ratio sib8-p512-aut3 / tw2cj-lazy-aut3 at w = 1: 1.083 [1.018, 1.152] (p34), 0.984 [0.939, 1.031] (p37), 0.968 [0.911, 1.030] (p40). At w = 0 the ratio is 0.537 / 0.485 / 0.476. Band order: unresolved at p34, sib lower at every weight at p37 and p40."
+    },
+    {
+      "id": "O7",
+      "note": "Conductor is not installed in this session, so no task reservation was made. Writes are limited to the four output files the dispatch names, in this evidence directory."
+    }
+  ],
+  "validated_at_utc": "2026-11-12T03:54:39Z",
+  "raw_data": [
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "0cf2bb2512dcc518473f44967804db8b8d23f860f318df35d113009218544c9d"
+    },
+    {
+      "path": "frozen.sha256",
+      "sha256": "1375b23df05547e0908fba543a398033c10c88c7b16b413966540508e3d98848"
+    },
+    {
+      "path": "spec-j0b7-34.json",
+      "sha256": "7dbb4e5ee069eea5b48944e5138a7fedc77689c77719d43851b88569fee51521"
+    },
+    {
+      "path": "spec-j0b7-37.json",
+      "sha256": "db114532b39c12c39991f60f9cdd90203acb66a8cf46bff309f7e53fd5cda0c5"
+    },
+    {
+      "path": "spec-j0b7-40.json",
+      "sha256": "3846a6715c09b7fee40ba2dd210ac51b3d88dde962d212cf327c1b2d5cb0081c"
+    },
+    {
+      "path": "compare.sh",
+      "sha256": "00ca40407ab2ce74ab68c33d044b7ce8b7f0f94fb937cbe14f5ba98a35df17aa"
+    },
+    {
+      "path": "run_local.sh",
+      "sha256": "5244943c2259ab871a049e8351e9c3926a5e4a32e3058b6d4612075b4581a4a7"
+    },
+    {
+      "path": "README.md",
+      "sha256": "720dddb1d29effc6d702c6275a2b57355c1405966d1a369b3583dae6a2e7f972"
+    },
+    {
+      "path": "sessions/j0b7-34/session.json",
+      "sha256": "4a3aa354d4e8c260ea14a93a5c613cc7f93701d9732547a74f68f375276c4355"
+    },
+    {
+      "path": "sessions/j0b7-34/spec.json",
+      "sha256": "7dbb4e5ee069eea5b48944e5138a7fedc77689c77719d43851b88569fee51521"
+    },
+    {
+      "path": "sessions/j0b7-34/host.json",
+      "sha256": "e3b115d9b8a37f5a681d1c39a2788eeba101b0cf16ed1c392f4159602529f651"
+    },
+    {
+      "path": "band-j0b7-34.json",
+      "sha256": "4ca531ff843f6854ec5e1565067a84ff3f244cd2c220e9b07b69d06c39a540a2"
+    },
+    {
+      "path": "verify-j0b7-34.json",
+      "sha256": "b7f9d403bbddb325a777e49757135f9fd3e8adb8c5866497f983f756877e8325"
+    },
+    {
+      "path": "sessions/j0b7-34/comparisons/rho-cubic__sib8-p512-aut3__ECC1h3fda0f2776f8.json",
+      "sha256": "8c517635ed95832f84a20f1c190d53bef5156c9ca7f96c3c4cc7a74f1b039316"
+    },
+    {
+      "path": "sessions/j0b7-34/comparisons/rho-cubic__sib8-p512-aut3__ECC1h4e250f618dcf.json",
+      "sha256": "7325200b6878f2e977f007a2f2eda15b6d4ad0f08c709a75e7a2748d648d5f81"
+    },
+    {
+      "path": "sessions/j0b7-34/comparisons/rho-cubic__sib8-p512-aut3__ECC1h97bd060c6c4b.json",
+      "sha256": "cfa4dcbc315ceac065516be86e55d4ce57d9ff1ce7893b018eb52f35fd47013f"
+    },
+    {
+      "path": "sessions/j0b7-34/comparisons/rho-cubic__sib8-p512-aut3__ECC1hd1a874a1ec52.json",
+      "sha256": "429b9b2aa80ef37859babc10c07d1f18abde414e67538b14873494a26467eb2e"
+    },
+    {
+      "path": "sessions/j0b7-37/session.json",
+      "sha256": "906b36aa4832e2b47f00061fe320a77216f432208aefec963499e26aa1e31fb1"
+    },
+    {
+      "path": "sessions/j0b7-37/spec.json",
+      "sha256": "db114532b39c12c39991f60f9cdd90203acb66a8cf46bff309f7e53fd5cda0c5"
+    },
+    {
+      "path": "sessions/j0b7-37/host.json",
+      "sha256": "3b551db23cfbebb028516b09f1111bc2869097d83999f3375027822b23730888"
+    },
+    {
+      "path": "band-j0b7-37.json",
+      "sha256": "6343e84d95213d68dd5b75c07a02782ed1b4ffe054ba3a8af9f44891cc4047fb"
+    },
+    {
+      "path": "verify-j0b7-37.json",
+      "sha256": "2db5d2e8700af2bad0138586ae8ce45f96c8009aad84a70c6d20d75077891d13"
+    },
+    {
+      "path": "sessions/j0b7-37/comparisons/rho-cubic__sib8-p512-aut3__ECC1h37c3b509a2f2.json",
+      "sha256": "41c9dd24ca4875d38b7d0e5fec73f5992bcb2b86b67cfd82c5782b1db282f457"
+    },
+    {
+      "path": "sessions/j0b7-37/comparisons/rho-cubic__sib8-p512-aut3__ECC1ha9ffe4a08af6.json",
+      "sha256": "df17d19509fe66f362b36d7bb8838a9b13cba658c6e4a8618842ef83d2616ed9"
+    },
+    {
+      "path": "sessions/j0b7-37/comparisons/rho-cubic__sib8-p512-aut3__ECC1hb36b166102b6.json",
+      "sha256": "8b8a6b52d5c46de5a359144d40cde9da0ffe93c9685192b34ab8497bdc97f721"
+    },
+    {
+      "path": "sessions/j0b7-37/comparisons/rho-cubic__sib8-p512-aut3__ECC1hfda058cf9b79.json",
+      "sha256": "c33b23a62f3f289738a10bd38f4f13f62a2ed370d310c8ff1f8c1908478c9116"
+    },
+    {
+      "path": "sessions/j0b7-40/session.json",
+      "sha256": "dca1ce46e89f3216859aa81fa2dd08bfcc10ffbba9d192a5059e2145735e805c"
+    },
+    {
+      "path": "sessions/j0b7-40/spec.json",
+      "sha256": "3846a6715c09b7fee40ba2dd210ac51b3d88dde962d212cf327c1b2d5cb0081c"
+    },
+    {
+      "path": "sessions/j0b7-40/host.json",
+      "sha256": "34c2c2895932a1f8f0e7bfc6e195d27221132af9baf0c2a267652f458499be9f"
+    },
+    {
+      "path": "band-j0b7-40.json",
+      "sha256": "c5852fb80f3dc46b51266eb808dd90033fcfc63ece757ff545c3ad4ea277e04f"
+    },
+    {
+      "path": "verify-j0b7-40.json",
+      "sha256": "968c1e72a2af94ffd8c0a6f8a2d33ad96be67c25e2a2656ecf5f044c3df7c99a"
+    },
+    {
+      "path": "sessions/j0b7-40/comparisons/rho-cubic__sib8-p512-aut3__ECC1h321c1e39bbe2.json",
+      "sha256": "c152ccab86c1b4458f539c81527ecbf1c662ac474d6ab583b94ed6ecfba8ae5f"
+    },
+    {
+      "path": "sessions/j0b7-40/comparisons/rho-cubic__sib8-p512-aut3__ECC1h3af43290dfb2.json",
+      "sha256": "4c5198131e8d1f55165efa5ba2c2a954d951d7c9a1f00cad7cd83f4da9e014ee"
+    },
+    {
+      "path": "sessions/j0b7-40/comparisons/rho-cubic__sib8-p512-aut3__ECC1hb22b0844852d.json",
+      "sha256": "48ded6b840ca2a9b0f1af6c463a4d72219de8add043ed061fe0f6f60a0779332"
+    },
+    {
+      "path": "sessions/j0b7-40/comparisons/rho-cubic__sib8-p512-aut3__ECC1hb59e681c0aff.json",
+      "sha256": "33352851f96b26d65dfab65ca8c3866b15c93b38c31cbccc22f40df6a8d5c6d3"
+    },
+    {
+      "path": "trend/rho-cubic__sib8-p512-aut3.trend.json",
+      "sha256": "2483ebd1937210b143b138e531c4b38706a760d509a9179378e14e66a16f6ddd"
+    },
+    {
+      "path": "trend/rho-cubic__sib8-p512-aut3-34.json",
+      "sha256": "cfa4dcbc315ceac065516be86e55d4ce57d9ff1ce7893b018eb52f35fd47013f"
+    },
+    {
+      "path": "trend/rho-cubic__sib8-p512-aut3-37.json",
+      "sha256": "df17d19509fe66f362b36d7bb8838a9b13cba658c6e4a8618842ef83d2616ed9"
+    },
+    {
+      "path": "trend/rho-cubic__sib8-p512-aut3-40.json",
+      "sha256": "48ded6b840ca2a9b0f1af6c463a4d72219de8add043ed061fe0f6f60a0779332"
+    }
+  ],
+  "raw_data_note": "raw_data pins the files that stay in Git. records.jsonl and plan.json are bound through session.json (records_sha256, plan_sha256; session.json is pinned here), so this list remains valid after the artifact-store migration (N3). Their digests are in raw_records.",
+  "raw_records": [
+    {
+      "path": "sessions/j0b7-34/records.jsonl",
+      "sha256": "ca11410eab847b88b2a76c382bfe675152b4cecc68480187b1365a230d7cad75",
+      "bytes": 12832665
+    },
+    {
+      "path": "sessions/j0b7-34/plan.json",
+      "sha256": "96f12ff01857bc78336bcf1bd022f440e7afc3116d39965fc0a2024b787c8546",
+      "bytes": 263817
+    },
+    {
+      "path": "sessions/j0b7-37/records.jsonl",
+      "sha256": "abeef99c5a27a3fb805a9acee42ca30589a5e2bb4689eace91efd3123d864415",
+      "bytes": 12866664
+    },
+    {
+      "path": "sessions/j0b7-37/plan.json",
+      "sha256": "64676632f183eae04c42169e0297261a1712e4ef47eba391a3c0f35bbec8b36f",
+      "bytes": 263927
+    },
+    {
+      "path": "sessions/j0b7-40/records.jsonl",
+      "sha256": "e6e983e39f2dc2f22e5453bceebd0583cb7fea74a1bec36d7cc3c58072bb4b98",
+      "bytes": 12899956
+    },
+    {
+      "path": "sessions/j0b7-40/plan.json",
+      "sha256": "d9d5a7ef624222d1e15bd5e9c94cea3bee3c663f9666750f99b191d1fbe2a5a9",
+      "bytes": 264043
+    }
+  ],
+  "headline": [
+    {
+      "name": "j0b7-34: rho-cubic/rho-neg GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5557212345858703,
+      "recomputed": 0.5557212345858705,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: rho-cubic/rho-neg GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5554993843029572,
+      "recomputed": 0.5554993843029569,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: rho-cubic/rho-neg GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.554499177711472,
+      "recomputed": 0.5544991777114717,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: rho-neg-aa/rho-neg GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: rho-neg-aa/rho-neg GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: rho-neg-aa/rho-neg GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512-aut3/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.9922224952568774,
+      "recomputed": 0.9922224952568779,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512-aut3/rho-cubic w=0 ci95 low (linearised t, 30 workload clusters, df 29)",
+      "claimed": 0.9016135861035282,
+      "recomputed": 0.9016135861035282,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512-aut3/rho-cubic w=0 ci95 high",
+      "claimed": 1.0919372725387688,
+      "recomputed": 1.0919372725387688,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512-aut3/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.356014292071472,
+      "recomputed": 1.3560142920714724,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512-aut3/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.9997754455671877,
+      "recomputed": 2.9997754455671886,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512-aut3/sib8-p512 GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5904374207563695,
+      "recomputed": 0.5904374207563696,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512-aut3/sib8-p512 GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.6776457360551176,
+      "recomputed": 0.6776457360551176,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512-aut3/sib8-p512 GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.8696067631371149,
+      "recomputed": 0.8696067631371148,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.6804871445746243,
+      "recomputed": 1.6804871445746248,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.0010666634832597,
+      "recomputed": 2.0010666634832606,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: sib8-p512/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 3.4495769498680855,
+      "recomputed": 3.4495769498680873,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: tw2cj-lazy-aut3/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.8462597062915524,
+      "recomputed": 1.8462597062915529,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: tw2cj-lazy-aut3/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.0137228665418148,
+      "recomputed": 2.0137228665418148,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: tw2cj-lazy-aut3/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.7703903886555676,
+      "recomputed": 2.7703903886555672,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5602556725668756,
+      "recomputed": 0.5602556725668758,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.6107618887526634,
+      "recomputed": 0.6107618887526629,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-34: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.8383298592090732,
+      "recomputed": 0.8383298592090729,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: rho-cubic/rho-neg GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5438025408870435,
+      "recomputed": 0.5438025408870436,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: rho-cubic/rho-neg GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5437224055348314,
+      "recomputed": 0.5437224055348318,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: rho-cubic/rho-neg GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5433615625840225,
+      "recomputed": 0.5433615625840221,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: rho-neg-aa/rho-neg GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: rho-neg-aa/rho-neg GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: rho-neg-aa/rho-neg GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512-aut3/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.8748791137989838,
+      "recomputed": 0.8748791137989843,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512-aut3/rho-cubic w=0 ci95 low (linearised t, 30 workload clusters, df 29)",
+      "claimed": 0.8037766351096713,
+      "recomputed": 0.8037766351096713,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512-aut3/rho-cubic w=0 ci95 high",
+      "claimed": 0.9522713529204034,
+      "recomputed": 0.9522713529204032,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512-aut3/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.1996372942288474,
+      "recomputed": 1.1996372942288474,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512-aut3/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.6631836892653595,
+      "recomputed": 2.6631836892653604,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512-aut3/sib8-p512 GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5667924051355515,
+      "recomputed": 0.5667924051355520,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512-aut3/sib8-p512 GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.6520138214448923,
+      "recomputed": 0.6520138214448922,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512-aut3/sib8-p512 GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.8387069250136038,
+      "recomputed": 0.8387069250136034,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.543561815352398,
+      "recomputed": 1.5435618153523978,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.8398954972616937,
+      "recomputed": 1.8398954972616943,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: sib8-p512/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 3.17534481931476,
+      "recomputed": 3.1753448193147618,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: tw2cj-lazy-aut3/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.8045094381445623,
+      "recomputed": 1.8045094381445632,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: tw2cj-lazy-aut3/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.9683752434515833,
+      "recomputed": 1.9683752434515835,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: tw2cj-lazy-aut3/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.7068484308225726,
+      "recomputed": 2.7068484308225744,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5633266529574955,
+      "recomputed": 0.5633266529574956,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.6143737383796213,
+      "recomputed": 0.6143737383796209,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-37: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.8441985169442094,
+      "recomputed": 0.8441985169442100,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: rho-cubic/rho-neg GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5579271655128325,
+      "recomputed": 0.5579271655128325,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: rho-cubic/rho-neg GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5578993484604886,
+      "recomputed": 0.5578993484604892,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: rho-cubic/rho-neg GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5577741413526701,
+      "recomputed": 0.5577741413526702,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: rho-neg-aa/rho-neg GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: rho-neg-aa/rho-neg GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: rho-neg-aa/rho-neg GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.0,
+      "recomputed": 1.0000000000000000,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512-aut3/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.9088450426163454,
+      "recomputed": 0.9088450426163458,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512-aut3/rho-cubic w=0 ci95 low (linearised t, 30 workload clusters, df 29)",
+      "claimed": 0.828149549347135,
+      "recomputed": 0.8281495493471350,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512-aut3/rho-cubic w=0 ci95 high",
+      "claimed": 0.9974035633292047,
+      "recomputed": 0.9974035633292047,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512-aut3/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.248107352422144,
+      "recomputed": 1.2481073524221433,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512-aut3/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.775577116019132,
+      "recomputed": 2.7755771160191309,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512-aut3/sib8-p512 GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.6080304685466703,
+      "recomputed": 0.6080304685466701,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512-aut3/sib8-p512 GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.7002264738513521,
+      "recomputed": 0.7002264738513519,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512-aut3/sib8-p512 GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.9018221492375056,
+      "recomputed": 0.9018221492375057,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.494736020036446,
+      "recomputed": 1.4947360200364470,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.7824338253841843,
+      "recomputed": 1.7824338253841836,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: sib8-p512/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 3.0777433425935414,
+      "recomputed": 3.0777433425935401,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: tw2cj-lazy-aut3/rho-cubic GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 1.91094504732961,
+      "recomputed": 1.9109450473296097,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: tw2cj-lazy-aut3/rho-cubic GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.084601586882136,
+      "recomputed": 2.0846015868821359,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: tw2cj-lazy-aut3/rho-cubic GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 2.8664600655596137,
+      "recomputed": 2.8664600655596111,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=0 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.5747200888062028,
+      "recomputed": 0.5747200888062028,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=0.1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.6269093505884845,
+      "recomputed": 0.6269093505884851,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "j0b7-40: tw2cj-lazy-aut3/tw2cj-lazy GAE ratio w=1 (paired ratio of summed S, 180 pairs)",
+      "claimed": 0.8618036040158292,
+      "recomputed": 0.8618036040158290,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "trend free_r slope of ln(sib8-p512-aut3/rho-cubic) on ln r, w=0, 15 curves (WLS, se from per-curve 95% interval)",
+      "claimed": -0.014758056974527407,
+      "recomputed": -0.0147580569745267,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "trend slope ci95 low",
+      "claimed": -0.05057163711030578,
+      "recomputed": -0.0505716371103043,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "trend slope ci95 high",
+      "claimed": 0.021055523161250964,
+      "recomputed": 0.0210555231612508,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p34 value (w = 0, p 34)",
+      "claimed": 0.992,
+      "recomputed": 0.9922224952568779,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p34 spread low",
+      "claimed": 0.902,
+      "recomputed": 0.9016135861035282,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p34 spread high",
+      "claimed": 1.092,
+      "recomputed": 1.0919372725387688,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p37 value (w = 0, p 37)",
+      "claimed": 0.875,
+      "recomputed": 0.8748791137989843,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p37 spread low",
+      "claimed": 0.804,
+      "recomputed": 0.8037766351096713,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p37 spread high",
+      "claimed": 0.952,
+      "recomputed": 0.9522713529204032,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p40 value (w = 0, p 40)",
+      "claimed": 0.909,
+      "recomputed": 0.9088450426163458,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p40 spread low",
+      "claimed": 0.828,
+      "recomputed": 0.8281495493471350,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w0_p40 spread high",
+      "claimed": 0.997,
+      "recomputed": 0.9974035633292047,
+      "rel_tol": 0.0006
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p34 value (w = 0.1, p 34)",
+      "claimed": 1.356014292071472,
+      "recomputed": 1.3560142920714724,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p34 spread low",
+      "claimed": 1.231844281014972,
+      "recomputed": 1.2318442810149719,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p34 spread high",
+      "claimed": 1.492700651081521,
+      "recomputed": 1.4927006510815208,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p34 value (w = 1, p 34)",
+      "claimed": 2.9997754455671877,
+      "recomputed": 2.9997754455671886,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p34 spread low",
+      "claimed": 2.7235817043465063,
+      "recomputed": 2.7235817043465063,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p34 spread high",
+      "claimed": 3.303977519553412,
+      "recomputed": 3.3039775195534120,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p37 value (w = 0.1, p 37)",
+      "claimed": 1.1996372942288474,
+      "recomputed": 1.1996372942288474,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p37 spread low",
+      "claimed": 1.1020709556832142,
+      "recomputed": 1.1020709556832142,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p37 spread high",
+      "claimed": 1.305841180446082,
+      "recomputed": 1.3058411804460819,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p37 value (w = 1, p 37)",
+      "claimed": 2.6631836892653595,
+      "recomputed": 2.6631836892653604,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p37 spread low",
+      "claimed": 2.446224212976563,
+      "recomputed": 2.4462242129765630,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p37 spread high",
+      "claimed": 2.8993856430432645,
+      "recomputed": 2.8993856430432645,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p40 value (w = 0.1, p 40)",
+      "claimed": 1.248107352422144,
+      "recomputed": 1.2481073524221433,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p40 spread low",
+      "claimed": 1.1372625620489303,
+      "recomputed": 1.1372625620489303,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w01_p40 spread high",
+      "claimed": 1.369755775978133,
+      "recomputed": 1.3697557759781329,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p40 value (w = 1, p 40)",
+      "claimed": 2.775577116019132,
+      "recomputed": 2.7755771160191309,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p40 spread low",
+      "claimed": 2.5289348889418535,
+      "recomputed": 2.5289348889418535,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "bench record metric sib8_p512_aut3_over_rho_cubic_gae_w10_p40 spread high",
+      "claimed": 3.04627389208604,
+      "recomputed": 3.0462738920860399,
+      "rel_tol": 1E-12
+    },
+    {
+      "name": "J4: measured aut3 records listing aut_canonicalisations_uncharged with count = table_insert_attempts",
+      "claimed": 1080,
+      "recomputed": 1080,
+      "rel_tol": 0
+    },
+    {
+      "name": "A/A rho-neg-aa / rho-neg GAE ratio, every weight and size",
+      "claimed": 1.0,
+      "recomputed": 1.0,
+      "rel_tol": 0
+    },
+    {
+      "name": "records verified ([d]G = Q, validator arithmetic), all three sessions",
+      "claimed": 4410,
+      "recomputed": 4410,
+      "rel_tol": 0
+    }
+  ],
+  "headline_note": "claimed values: the producer's saved comparison files (full precision), the trend file, and the bench record's metrics (w = 0 metrics rounded to 3 decimals, hence rel_tol 6e-4). recomputed values: the validator's check.out. The aut=3 bit-op ratios are deliberately not in this list (N1).",
+  "recomputed": {
+    "comparisons": [
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5602556725668758,
+        "ci95": [
+          0.5349628321306675,
+          0.5867443489358041
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6107618887526629,
+        "ci95": [
+          0.5831754232903944,
+          0.6396533013137086
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.8383298592090729,
+        "ci95": [
+          0.8004005127835858,
+          0.8780565999356473
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.5602556725668758,
+        "ci95": [
+          0.5349628321306675,
+          0.5867443489358041
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.5601107165857527,
+        "ci95": [
+          0.5348161070610561,
+          0.5866016574523060
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.5594575823594955,
+        "ci95": [
+          0.5341550147174488,
+          0.5859587157954419
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.5602556725668758,
+        "ci95": [
+          0.5349628321306675,
+          0.5867443489358041
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.6107618887526629,
+        "ci95": [
+          0.5831754232903944,
+          0.6396533013137086
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 0.8383298592090729,
+        "ci95": [
+          0.8004005127835858,
+          0.8780565999356473
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5904374207563696,
+        "ci95": [
+          0.5549577659717552,
+          0.6281853668972303
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6776457360551176,
+        "ci95": [
+          0.6367132877141700,
+          0.7212096126378084
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.8696067631371148,
+        "ci95": [
+          0.8166517698629353,
+          0.9259955716752213
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.5904374207563696,
+        "ci95": [
+          0.5549577659717552,
+          0.6281853668972303
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.5892371836586641,
+        "ci95": [
+          0.5536950770658627,
+          0.6270607650078389
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.5865952481364820,
+        "ci95": [
+          0.5509159231125059,
+          0.6245852964137893
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.5904374207563696,
+        "ci95": [
+          0.5549577659717552,
+          0.6281853668972303
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.6862127068772212,
+        "ci95": [
+          0.6448000427076355,
+          0.7302851239004533
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 0.9757151639553781,
+        "ci95": [
+          0.9163421178475701,
+          1.0389351996705176
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.9922224952568779,
+        "ci95": [
+          0.9016135861035282,
+          1.0919372725387688
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.3560142920714724,
+        "ci95": [
+          1.2318442810149719,
+          1.4927006510815208
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 2.9997754455671886,
+        "ci95": [
+          2.7235817043465063,
+          3.3039775195534120
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.9922224952568779,
+        "ci95": [
+          0.9016135861035282,
+          1.0919372725387688
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 1.1791028851041161,
+        "ci95": [
+          1.0712071601833058,
+          1.2978662441193394
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 2.0235054468737594,
+        "ci95": [
+          1.8373048761751147,
+          2.2285764037440656
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.9922224952568779,
+        "ci95": [
+          0.9016135861035282,
+          1.0919372725387688
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 1.2565718359045503,
+        "ci95": [
+          1.1415495187795335,
+          1.3831837803029883
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.4510110203876057,
+        "ci95": [
+          2.2254019362734128,
+          2.6994921340463036
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.8462597062915529,
+        "ci95": [
+          1.7005979781449712,
+          2.0043978335161774
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 2.0137228665418148,
+        "ci95": [
+          1.8547296485859852,
+          2.1863454796902118
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 2.7703903886555672,
+        "ci95": [
+          2.5509728018106830,
+          3.0086808060467667
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 1.8462597062915529,
+        "ci95": [
+          1.7005979781449712,
+          2.0043978335161774
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 1.8467225584218061,
+        "ci95": [
+          1.7009274069465063,
+          2.0050145549164147
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 1.8488139149564633,
+        "ci95": [
+          1.7024154306696948,
+          2.0078018740655037
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 1.8462597062915529,
+        "ci95": [
+          1.7005979781449712,
+          2.0043978335161774
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 2.0137228665418148,
+        "ci95": [
+          1.8547296485859852,
+          2.1863454796902118
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.7703903886555672,
+        "ci95": [
+          2.5509728018106830,
+          3.0086808060467667
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.6804871445746248,
+        "ci95": [
+          1.5469269440464501,
+          1.8255788057407949
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 2.0010666634832606,
+        "ci95": [
+          1.8418670718019781,
+          2.1740264826964304
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 3.4495769498680873,
+        "ci95": [
+          3.1741618252808999,
+          3.7488892463786567
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 1.6804871445746248,
+        "ci95": [
+          1.5469269440464501,
+          1.8255788057407949
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 2.0010666634832606,
+        "ci95": [
+          1.8418670718019781,
+          2.1740264826964304
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 3.4495769498680873,
+        "ci95": [
+          3.1741618252808999,
+          3.7488892463786567
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 1.6804871445746248,
+        "ci95": [
+          1.5469269440464501,
+          1.8255788057407949
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 1.8311695824212990,
+        "ci95": [
+          1.6855058752727949,
+          1.9894217449952765
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.5120148901362129,
+        "ci95": [
+          2.3114904212522553,
+          2.7299350887413474
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5557212345858705,
+        "ci95": [
+          0.5093355908918569,
+          0.6063312599633640
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.5554993843029569,
+        "ci95": [
+          0.5091093084419530,
+          0.6061165271271942
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.5544991777114717,
+        "ci95": [
+          0.5080891682958575,
+          0.6051483819542097
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.3010943040796347,
+        "ci95": [
+          0.2810586561988253,
+          0.3225582203206251
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.4112789619474582,
+        "ci95": [
+          0.3838043931385349,
+          0.4407202928485595
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.9077425828644944,
+        "ci95": [
+          0.8467341992681706,
+          0.9731467058466290
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.3010943040796347,
+        "ci95": [
+          0.2810586561988253,
+          0.3225582203206251
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.3576217547634180,
+        "ci95": [
+          0.3337591880059927,
+          0.3831904081626959
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.6123198533076393,
+        "ci95": [
+          0.5712058606247009,
+          0.6563931300435880
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.3010943040796347,
+        "ci95": [
+          0.2810586561988253,
+          0.3225582203206251
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.3811180776669836,
+        "ci95": [
+          0.3556737411890237,
+          0.4083826617028300
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 0.7416845409424672,
+        "ci95": [
+          0.6918583718213347,
+          0.7950990848385583
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5513991100480253,
+        "ci95": [
+          0.4960624764611950,
+          0.6129086415298300
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.7532651043517128,
+        "ci95": [
+          0.6774920191259682,
+          0.8375129173713510
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 1.6633730178860697,
+        "ci95": [
+          1.4953550920864644,
+          1.8502694184636039
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5374230352726934,
+        "ci95": [
+          0.5056233934534858,
+          0.5712226186154195
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6733867478001918,
+        "ci95": [
+          0.6333535003561047,
+          0.7159504318804045
+        ]
+      },
+      {
+        "session": "j0b7-34",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 1,
+        "value": 1.0827988206466956,
+        "ci95": [
+          1.0179472420268771,
+          1.1517819761064969
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5633266529574956,
+        "ci95": [
+          0.5399017063912207,
+          0.5877679477129633
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6143737383796209,
+        "ci95": [
+          0.5888190156522399,
+          0.6410375350946176
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.8441985169442100,
+        "ci95": [
+          0.8090534677368441,
+          0.8808702569489633
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.5633266529574956,
+        "ci95": [
+          0.5399017063912207,
+          0.5877679477129633
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.5632705497670131,
+        "ci95": [
+          0.5398441611355487,
+          0.5877135200785647
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.5630179613337499,
+        "ci95": [
+          0.5395850751675521,
+          0.5874684815661002
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.5633266529574956,
+        "ci95": [
+          0.5399017063912207,
+          0.5877679477129633
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.6143737383796209,
+        "ci95": [
+          0.5888190156522399,
+          0.6410375350946176
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 0.8441985169442100,
+        "ci95": [
+          0.8090534677368441,
+          0.8808702569489633
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5667924051355520,
+        "ci95": [
+          0.5441149969763316,
+          0.5904149532811312
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6520138214448922,
+        "ci95": [
+          0.6258752354710360,
+          0.6792440398048716
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.8387069250136034,
+        "ci95": [
+          0.8049774237389862,
+          0.8738497320812578
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.5667924051355520,
+        "ci95": [
+          0.5441149969763316,
+          0.5904149532811312
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.5662979484679612,
+        "ci95": [
+          0.5436066977402813,
+          0.5899363782162949
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.5652147506774235,
+        "ci95": [
+          0.5424930910103251,
+          0.5888880792718920
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.5667924051355520,
+        "ci95": [
+          0.5441149969763316,
+          0.5904149532811312
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.6601593038207493,
+        "ci95": [
+          0.6337037888361168,
+          0.6877192690003027
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 0.9412052045343658,
+        "ci95": [
+          0.9033657808848941,
+          0.9806296140361040
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.8748791137989843,
+        "ci95": [
+          0.8037766351096713,
+          0.9522713529204032
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.1996372942288474,
+        "ci95": [
+          1.1020709556832142,
+          1.3058411804460819
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 2.6631836892653604,
+        "ci95": [
+          2.4462242129765630,
+          2.8993856430432645
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.8748791137989843,
+        "ci95": [
+          0.8037766351096713,
+          0.9522713529204032
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 1.0419290454947367,
+        "ci95": [
+          0.9572024312347535,
+          1.1341552219473274
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 1.7947517303638418,
+        "ci95": [
+          1.6485590586658261,
+          1.9539086311235088
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.8748791137989843,
+        "ci95": [
+          0.8037766351096713,
+          0.9522713529204032
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 1.1109927196241811,
+        "ci95": [
+          1.0206432527844491,
+          1.2093401094756553
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.1750558824585657,
+        "ci95": [
+          1.9978725533231023,
+          2.3679528926650804
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.8045094381445632,
+        "ci95": [
+          1.6599760479876997,
+          1.9616272875142930
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.9683752434515835,
+        "ci95": [
+          1.8106740137540089,
+          2.1398115119574777
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 2.7068484308225744,
+        "ci95": [
+          2.4897424728813857,
+          2.9428860644237815
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 1.8045094381445632,
+        "ci95": [
+          1.6599760479876997,
+          1.9616272875142930
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 1.8046471329503178,
+        "ci95": [
+          1.6600687030710666,
+          1.9618171636155362
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 1.8052676646219479,
+        "ci95": [
+          1.6604862042087629,
+          1.9626729404129686
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 1.8045094381445632,
+        "ci95": [
+          1.6599760479876997,
+          1.9616272875142930
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 1.9683752434515835,
+        "ci95": [
+          1.8106740137540089,
+          2.1398115119574777
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.7068484308225744,
+        "ci95": [
+          2.4897424728813857,
+          2.9428860644237815
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.5435618153523978,
+        "ci95": [
+          1.4135120426017946,
+          1.6855767803919555
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.8398954972616943,
+        "ci95": [
+          1.6848190780587073,
+          2.0092456720898433
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 3.1753448193147618,
+        "ci95": [
+          2.9073584462887037,
+          3.4680328923390906
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 1.5435618153523978,
+        "ci95": [
+          1.4135120426017946,
+          1.6855767803919555
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 1.8398954972616943,
+        "ci95": [
+          1.6848190780587073,
+          2.0092456720898433
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 3.1753448193147618,
+        "ci95": [
+          2.9073584462887037,
+          3.4680328923390906
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 1.5435618153523978,
+        "ci95": [
+          1.4135120426017946,
+          1.6855767803919555
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 1.6829160979693549,
+        "ci95": [
+          1.5410785684354373,
+          1.8378080461398965
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.3109263229527208,
+        "ci95": [
+          2.1159073672724866,
+          2.5239197862427258
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5438025408870436,
+        "ci95": [
+          0.5008109871676032,
+          0.5904846559930556
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.5437224055348318,
+        "ci95": [
+          0.5007288657352582,
+          0.5904074530364494
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.5433615625840221,
+        "ci95": [
+          0.5003590767247992,
+          0.5900598218909401
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.2731172874471378,
+        "ci95": [
+          0.2611867775262499,
+          0.2855927601273220
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.3744335088580985,
+        "ci95": [
+          0.3580514253357518,
+          0.3915651290155291
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.8305805730484187,
+        "ci95": [
+          0.7941526354229020,
+          0.8686794673395162
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.2731172874471378,
+        "ci95": [
+          0.2611867775262499,
+          0.2855927601273220
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.3252092531322558,
+        "ci95": [
+          0.3109874461959690,
+          0.3400814393523596
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.5597383037053846,
+        "ci95": [
+          0.5351984973633731,
+          0.5854033039675399
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.2731172874471378,
+        "ci95": [
+          0.2611867775262499,
+          0.2855927601273220
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.3467655634965008,
+        "ci95": [
+          0.3315977417106045,
+          0.3626271862007686
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 0.6783456839821324,
+        "ci95": [
+          0.6485998927358776,
+          0.7094556630840674
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.4757614850528926,
+        "ci95": [
+          0.4381117420486889,
+          0.5166467111821413
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6522696753874057,
+        "ci95": [
+          0.6006159667805434,
+          0.7083656661852400
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 1.4470716508475070,
+        "ci95": [
+          1.3323282376254804,
+          1.5716970514852668
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.4848293366082665,
+        "ci95": [
+          0.4626069979053580,
+          0.5081191739431947
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6094555894359149,
+        "ci95": [
+          0.5814832538355373,
+          0.6387735382655283
+        ]
+      },
+      {
+        "session": "j0b7-37",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.9838687896004783,
+        "ci95": [
+          0.9386081979646649,
+          1.0313118905726324
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5747200888062028,
+        "ci95": [
+          0.5431215724225303,
+          0.6081569896112412
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6269093505884851,
+        "ci95": [
+          0.5924382837714162,
+          0.6633861190626827
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.8618036040158290,
+        "ci95": [
+          0.8144029600088118,
+          0.9119631047100267
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.5747200888062028,
+        "ci95": [
+          0.5431215724225303,
+          0.6081569896112412
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.5747008180335316,
+        "ci95": [
+          0.5431016777647466,
+          0.6081384826645242
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.5746140838356336,
+        "ci95": [
+          0.5430121353359704,
+          0.6080551867187574
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.5747200888062028,
+        "ci95": [
+          0.5431215724225303,
+          0.6081569896112412
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.6269093505884851,
+        "ci95": [
+          0.5924382837714162,
+          0.6633861190626827
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 0.8618036040158290,
+        "ci95": [
+          0.8144029600088118,
+          0.9119631047100267
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.6080304685466701,
+        "ci95": [
+          0.5726628020036121,
+          0.6455824429098351
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.7002264738513519,
+        "ci95": [
+          0.6594723349208759,
+          0.7434991412355861
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.9018221492375057,
+        "ci95": [
+          0.8492830159291891,
+          0.9576115071199814
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.6080304685466701,
+        "ci95": [
+          0.5726628020036121,
+          0.6455824429098351
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.6078626862255653,
+        "ci95": [
+          0.5724884410401606,
+          0.6454227174159477
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.6074958136020798,
+        "ci95": [
+          0.5721071903535010,
+          0.6450734578532719
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.6080304685466701,
+        "ci95": [
+          0.5726628020036121,
+          0.6455824429098351
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.7089108337178235,
+        "ci95": [
+          0.6676561585040016,
+          0.7527146477440714
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/sib8-p512",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 1.0120775338079562,
+        "ci95": [
+          0.9531219905087153,
+          1.0746797835312649
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.9088450426163458,
+        "ci95": [
+          0.8281495493471350,
+          0.9974035633292047
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.2481073524221433,
+        "ci95": [
+          1.1372625620489303,
+          1.3697557759781329
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 2.7755771160191309,
+        "ci95": [
+          2.5289348889418535,
+          3.0462738920860399
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.9088450426163458,
+        "ci95": [
+          0.8281495493471350,
+          0.9974035633292047
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 1.0834750131173401,
+        "ci95": [
+          0.9872560186597692,
+          1.1890716104655921
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 1.8697161959672473,
+        "ci95": [
+          1.7035767778640301,
+          2.0520581748275348
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.9088450426163458,
+        "ci95": [
+          0.8281495493471350,
+          0.9974035633292047
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 1.1555725222473279,
+        "ci95": [
+          1.0529485183379548,
+          1.2681986164725836
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.2664202471258887,
+        "ci95": [
+          2.0650265923618925,
+          2.4874550069144985
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.9109450473296097,
+        "ci95": [
+          1.7066583878115655,
+          2.1396847781565262
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 2.0846015868821359,
+        "ci95": [
+          1.8617284784900576,
+          2.3341555045427245
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 2.8664600655596111,
+        "ci95": [
+          2.5598778827431712,
+          3.2097598728588914
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 1.9109450473296097,
+        "ci95": [
+          1.7066583878115655,
+          2.1396847781565262
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 1.9109975567130528,
+        "ci95": [
+          1.7066890212560486,
+          2.1397639618467865
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 1.9112339711133459,
+        "ci95": [
+          1.7068269357669275,
+          2.1401204866129984
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 1.9109450473296097,
+        "ci95": [
+          1.7066583878115655,
+          2.1396847781565262
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 2.0846015868821359,
+        "ci95": [
+          1.8617284784900576,
+          2.3341555045427245
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "tw2cj-lazy-aut3/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.8664600655596111,
+        "ci95": [
+          2.5598778827431712,
+          3.2097598728588914
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.4947360200364470,
+        "ci95": [
+          1.3569588925475751,
+          1.6465021762006435
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.7824338253841836,
+        "ci95": [
+          1.6181136495818944,
+          1.9634407896470187
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "committed",
+        "w": 1,
+        "value": 3.0777433425935401,
+        "ci95": [
+          2.7938725171275922,
+          3.3904568031678237
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 1.4947360200364470,
+        "ci95": [
+          1.3569588925475751,
+          1.6465021762006435
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 1.7824338253841836,
+        "ci95": [
+          1.6181136495818944,
+          1.9634407896470187
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 3.0777433425935401,
+        "ci95": [
+          2.7938725171275922,
+          3.3904568031678237
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 1.4947360200364470,
+        "ci95": [
+          1.3569588925475751,
+          1.6465021762006435
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 1.6300675166537160,
+        "ci95": [
+          1.4797975046495120,
+          1.7955971006174574
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512/rho-cubic",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 2.2393741303578296,
+        "ci95": [
+          2.0328358209546598,
+          2.4668969545021291
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5579271655128325,
+        "ci95": [
+          0.4973149724793166,
+          0.6259267048914958
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.5578993484604892,
+        "ci95": [
+          0.4972859998754136,
+          0.6259007554819903
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "rho-cubic/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.5577741413526702,
+        "ci95": [
+          0.4971555925672628,
+          0.6257839545868461
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "rho-neg-aa/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 1.0000000000000000,
+        "ci95": [
+          1.0000000000000000,
+          1.0000000000000000
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.2733367473509818,
+        "ci95": [
+          0.2580788636862336,
+          0.2894966925429772
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.3753475842556380,
+        "ci95": [
+          0.3543863659392442,
+          0.3975486151481817
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.8344795696088526,
+        "ci95": [
+          0.7878464057782616,
+          0.8838729820778856
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0,
+        "value": 0.2733367473509818,
+        "ci95": [
+          0.2580788636862336,
+          0.2894966925429772
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 0.1,
+        "value": 0.3258371389173496,
+        "ci95": [
+          0.3076430809500110,
+          0.3451071962027832
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "pre_E1_no_aut_canon",
+        "w": 1,
+        "value": 0.5621317301892237,
+        "ci95": [
+          0.5307213107286491,
+          0.5954011563087445
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0,
+        "value": 0.2733367473509818,
+        "ci95": [
+          0.2580788636862336,
+          0.2894966925429772
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 0.1,
+        "value": 0.3475192689282597,
+        "ci95": [
+          0.3281134029868296,
+          0.3680728710776858
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy",
+        "reading": "no_sibling_counters",
+        "w": 1,
+        "value": 0.6814011332846589,
+        "ci95": [
+          0.6433242969901859,
+          0.7217316470307363
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.5070693385173273,
+        "ci95": [
+          0.4655355299432803,
+          0.5523086800608464
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.6963182787250598,
+        "ci95": [
+          0.6392718921208114,
+          0.7584552852434814
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/rho-neg",
+        "reading": "committed",
+        "w": 1,
+        "value": 1.5481451426456914,
+        "ci95": [
+          1.4212615480246753,
+          1.6863563121288614
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 0,
+        "value": 0.4755997792225281,
+        "ci95": [
+          0.4473396856321574,
+          0.5056451668867030
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 0.1,
+        "value": 0.5987270470655703,
+        "ci95": [
+          0.5631380367934012,
+          0.6365651997671243
+        ]
+      },
+      {
+        "session": "j0b7-40",
+        "ratio": "sib8-p512-aut3/tw2cj-lazy-aut3",
+        "reading": "committed",
+        "w": 1,
+        "value": 0.9682943604788238,
+        "ci95": [
+          0.9107002290910033,
+          1.0295308363663578
+        ]
+      }
+    ],
+    "band_means_by_size": [
+      {
+        "session": "j0b7-34",
+        "arm": "rho-cubic",
+        "mean_s": {
+          "0": 0.52193785849784324,
+          "0.1": 0.57370628143260194,
+          "1": 1.0396220878454299
+        }
+      },
+      {
+        "session": "j0b7-34",
+        "arm": "sib8-p512-aut3",
+        "mean_s": {
+          "0": 0.51787848432776151,
+          "0.1": 0.77795391707378669,
+          "1": 3.1186328117880153
+        }
+      },
+      {
+        "session": "j0b7-37",
+        "arm": "rho-cubic",
+        "mean_s": {
+          "0": 0.54644212484882115,
+          "0.1": 0.60092694011473591,
+          "1": 1.0912902775079689
+        }
+      },
+      {
+        "session": "j0b7-37",
+        "arm": "sib8-p512-aut3",
+        "mean_s": {
+          "0": 0.47807080193017049,
+          "0.1": 0.72089436846846244,
+          "1": 2.9063064673130898
+        }
+      },
+      {
+        "session": "j0b7-40",
+        "arm": "rho-cubic",
+        "mean_s": {
+          "0": 0.53981076749968682,
+          "0.1": 0.59373605131023621,
+          "1": 1.079063605605181
+        }
+      },
+      {
+        "session": "j0b7-40",
+        "arm": "sib8-p512-aut3",
+        "mean_s": {
+          "0": 0.49060433999301523,
+          "0.1": 0.74104633103839723,
+          "1": 2.995024250446833
+        }
+      }
+    ],
+    "readings": {
+      "committed": "AGENTS.md 5a / band.rs default: cost.unpriced counts + counted table_insert_attempts + counted sibling_second_points and sibling_lift_products",
+      "pre_E1_no_aut_canon": "committed minus aut_canonicalisations_uncharged (the asymmetric Stage 4 reading, for comparison only)",
+      "no_sibling_counters": "committed minus the two sibling counters (robustness check, C5b)"
+    }
+  }
+}
