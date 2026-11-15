@@ -184,6 +184,18 @@ path is still unrun. A source-matched image/build receipt, cumulative budget
 controller, natural arm, rank/logs and full cold-runtime selection remain
 open. No graph changed because this revision contains no K600 measurement.
 
+The [natural export amendment](NATURAL_EXPORT_AMENDMENT.md) adds an
+`export-natural` command after both terminal passing constructed-control
+replays. It checks that pinned and unpinned exports used the same constructed
+target, binds the unpinned replay digest into the natural export receipt,
+and rechecks control/input hashes after the bounded exporter process. The
+release example remains **11/11** and the production release build exits 0;
+[test](natural-export-test.log.gz) and [build](natural-export-build.log.gz)
+logs preserve the result. No real natural XCNF or solver stage has run.
+The image/build receipt, cumulative budget controller, natural solver and
+replay, useful rank and full cold-runtime selection remain open. No graph
+changed because this revision contains no K600 measurement.
+
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
 

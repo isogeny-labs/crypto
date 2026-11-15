@@ -732,10 +732,13 @@ fn export(
     mode: &str,
     output: &Path,
     outer_seconds: u64,
+    natural_controls: Option<(&Path, &Path, &Path, &Path, &Path, &Path)>,
 ) -> Result<Value> {
     let stage_start = Instant::now();
-    if !["positive-pinned", "positive-unpinned"].contains(&mode)
-        || !output.is_absolute()
+    if !matches!(
+        (mode, natural_controls.is_some()),
+        ("positive-pinned", false) | ("positive-unpinned", false) | ("natural", true)
+    ) || !output.is_absolute()
         || output.exists()
         || outer_seconds == 0
         || outer_seconds > 3_600
@@ -753,7 +756,23 @@ fn export(
     let commit = clean_source_commit(&repo)?;
     let panel = PathBuf::from(lock["panel_root"].as_str().ok_or("panel root missing")?);
     let stage_root = panel.parent().ok_or("stage root missing")?;
-    if parent.starts_with(stage_root) {
+    let control_dirs = natural_controls
+        .map(|(a, b, c, d, e, f)| -> Result<_> {
+            Ok([
+                fs::canonicalize(a)?,
+                fs::canonicalize(b)?,
+                fs::canonicalize(c)?,
+                fs::canonicalize(d)?,
+                fs::canonicalize(e)?,
+                fs::canonicalize(f)?,
+            ])
+        })
+        .transpose()?;
+    if parent.starts_with(stage_root)
+        || control_dirs
+            .as_ref()
+            .is_some_and(|dirs| dirs.iter().any(|dir| parent.starts_with(dir)))
+    {
         return Err("export output must be outside staged input".into());
     }
     let (checked_panel, _) = staged_panel(stage_root, &commit)?;
@@ -787,6 +806,22 @@ fn export(
         return Err("K600 arm lock or source changed before export".into());
     }
     let preflight_hashes = preflight_gate(&lock, preflight_lock_path, preflight_root)?;
+    let control_hashes = control_dirs
+        .as_ref()
+        .map(|dirs| {
+            audited_unpinned_replay(
+                &lock,
+                &lock_path,
+                &preflight_hashes,
+                &dirs[0],
+                &dirs[1],
+                &dirs[2],
+                &dirs[3],
+                &dirs[4],
+                &dirs[5],
+            )
+        })
+        .transpose()?;
     let image = lock["image_id"].as_str().ok_or("image ID missing")?;
     let inspected = docker_short(&["image", "inspect", "--format", "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}", image])?;
     if inspected != format!("{image} linux/arm64 {commit}") {
@@ -857,6 +892,23 @@ fn export(
         let (after_panel, _) = staged_panel(stage_root, &commit)?;
         if after_panel != panel
             || preflight_gate(&lock, preflight_lock_path, preflight_root)? != preflight_hashes
+            || control_dirs
+                .as_ref()
+                .map(|dirs| {
+                    audited_unpinned_replay(
+                        &lock,
+                        &lock_path,
+                        &preflight_hashes,
+                        &dirs[0],
+                        &dirs[1],
+                        &dirs[2],
+                        &dirs[3],
+                        &dirs[4],
+                        &dirs[5],
+                    )
+                })
+                .transpose()?
+                != control_hashes
         {
             return Err("panel changed after export".into());
         }
@@ -864,6 +916,7 @@ fn export(
             "schema":"n83.k600-m6-native-arm-export/v1", "status":"PASS_EXPORT_ONLY",
             "mode":mode, "source_commit":commit, "lock_sha256":lock_sha,
             "preflight_outer_sha256":preflight_hashes[1],
+            "unpinned_replay_stage_sha256":control_hashes.as_ref().map(|hashes|&hashes[3]),
             "export_json_sha256":sha256_file(&json_path)?, "xcnf_sha256":sha256_file(&xcnf_path)?,
             "exporter_exit_code":0, "outer_wall_ms":wall_ms,
             "outer_wall_limit_seconds":outer_seconds,
@@ -1588,6 +1641,109 @@ fn audited_pinned_replay(
     ])
 }
 
+fn audited_unpinned_replay(
+    lock: &Value,
+    lock_path: &Path,
+    preflight_hashes: &[String],
+    pinned_export_root: &Path,
+    pinned_solver_root: &Path,
+    pinned_replay_root: &Path,
+    unpinned_export_root: &Path,
+    unpinned_solver_root: &Path,
+    unpinned_replay_root: &Path,
+) -> Result<Vec<String>> {
+    let pinned = audited_pinned_replay(
+        lock,
+        lock_path,
+        preflight_hashes,
+        pinned_export_root,
+        pinned_solver_root,
+        pinned_replay_root,
+    )?;
+    let export_root = fs::canonicalize(unpinned_export_root)?;
+    let solver_root = fs::canonicalize(unpinned_solver_root)?;
+    let replay_root = fs::canonicalize(unpinned_replay_root)?;
+    let (_, export_hashes) = audited_constructed_export(
+        lock,
+        lock_path,
+        preflight_hashes,
+        "positive-unpinned",
+        &export_root,
+    )?;
+    let (_, _, solver_hashes) = audited_constructed_solver(
+        lock,
+        lock_path,
+        preflight_hashes,
+        &export_hashes,
+        &solver_root,
+        "positive-unpinned",
+        Some(&pinned[2]),
+    )?;
+    if replay_root.join("failure.json").exists() {
+        return Err("unpinned replay has a terminal failure receipt".into());
+    }
+    let stage_path = replay_root.join("replay-stage.json");
+    let result_path = replay_root.join("replay.json");
+    let stage: Value = serde_json::from_slice(&fs::read(&stage_path)?)?;
+    let result: Value = serde_json::from_slice(&fs::read(&result_path)?)?;
+    let export: Value =
+        serde_json::from_slice(&fs::read(export_root.join("positive-unpinned.json"))?)?;
+    let pinned_export: Value = serde_json::from_slice(&fs::read(
+        Path::new(pinned_export_root).join("positive-pinned.json"),
+    )?)?;
+    let stage_hash = sha256_file(&stage_path)?;
+    let result_hash = sha256_file(&result_path)?;
+    if stage["schema"] != "n83.k600-m6-native-unpinned-replay-stage/v1"
+        || stage["status"] != "PASS_UNPINNED_MODEL_REPLAY"
+        || stage["mode"] != "positive-unpinned"
+        || stage["pinned_replay_stage_sha256"] != pinned[2]
+        || stage["source_commit"] != lock["source_commit"]
+        || stage["lock_sha256"] != sha256_file(lock_path)?
+        || stage["preflight_outer_sha256"] != preflight_hashes[1]
+        || stage["export_stage_sha256"] != export_hashes[0]
+        || stage["solver_receipt_sha256"] != solver_hashes[0]
+        || stage["replay_json_sha256"] != result_hash
+        || stage["xcnf_sha256"] != export_hashes[2]
+        || stage["replay_binary_sha256"] != lock["exporter_replayer_sha256"]
+        || stage["checked_relation_row_decimal"] != result["relation_row_decimal"]
+        || !stage["total_index_calculus_runtime_ms"].is_null()
+        || !stage["selected_best_total_runtime"].is_null()
+        || result["schema"] != "n83.k600-m6-model-replay/v2"
+        || result["status"] != "PASS_ORIGINAL_XCNF_GROUP_AND_ROW_REPLAY"
+        || result["mode"] != "positive-unpinned"
+        || result["source_commit"] != lock["source_commit"]
+        || result["export_binary_sha256"] != lock["exporter_replayer_sha256"]
+        || result["replay_binary_sha256"] != lock["exporter_replayer_sha256"]
+        || result["solver_stdout_sha256"] != solver_hashes[1]
+        || result["xcnf_sha256"] != export_hashes[2]
+        || result["object_sha256"] != OBJECT_SHA
+        || result["target"] != export["target"]
+        || result["target"] != pinned_export["target"]
+        || export["positive"] != pinned_export["positive"]
+        || result["checked_cnf_clauses"] != export["shape"]["clauses"]
+        || result["checked_xor_rows"] != export["shape"]["xor_rows"]
+        || result["relation_row_decimal"]
+            .as_array()
+            .is_none_or(|v| v.len() != 600)
+        || result["chosen_indices"]
+            .as_array()
+            .is_none_or(|v| v.len() != 6)
+        || result["subgroup_order"] != "2417851639230796216685689"
+        || !result["selected_best_total_runtime"].is_null()
+    {
+        return Err(
+            "unpinned replay result or constructed target differs from pinned control".into(),
+        );
+    }
+    Ok(vec![
+        pinned[2].clone(),
+        export_hashes[0].clone(),
+        solver_hashes[0].clone(),
+        stage_hash,
+        result_hash,
+    ])
+}
+
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     let (output, result, stage_created_output) = match args.get(1).map(String::as_str) {
@@ -1609,9 +1765,20 @@ fn main() -> Result<()> {
             let output = PathBuf::from(&args[6]);
             let result = (|| -> Result<Value> {
                 let seconds: u64 = args[7].parse()?;
-                export(Path::new(&args[2]), Path::new(&args[3]), Path::new(&args[4]), &args[5], &output, seconds)
+                export(Path::new(&args[2]), Path::new(&args[3]), Path::new(&args[4]), &args[5], &output, seconds,None)
             })();
             (output, result, false)
+        }
+        Some("export-natural") if args.len() == 13 => {
+            let output = PathBuf::from(&args[11]);
+            let result = (|| -> Result<Value> {
+                let seconds: u64 = args[12].parse()?;
+                export(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
+                    "natural",&output,seconds,
+                    Some((Path::new(&args[5]),Path::new(&args[6]),Path::new(&args[7]),
+                        Path::new(&args[8]),Path::new(&args[9]),Path::new(&args[10]))))
+            })();
+            (output,result,false)
         }
         Some("solve") if args.len() == 9 => {
             let output = PathBuf::from(&args[7]);
@@ -1651,7 +1818,7 @@ fn main() -> Result<()> {
             })();
             (output,result,false)
         }
-        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned|positive-unpinned NEW_OUTPUT_DIR OUTER_SECONDS | solve ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned EXPORT_DIR NEW_OUTPUT_DIR OUTER_SECONDS | replay-pinned ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR EXPORT_DIR SOLVER_DIR NEW_OUTPUT_DIR OUTER_SECONDS | solve-unpinned ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR UNPINNED_EXPORT_DIR PINNED_EXPORT_DIR PINNED_SOLVER_DIR PINNED_REPLAY_DIR NEW_OUTPUT_DIR OUTER_SECONDS | replay-unpinned ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR UNPINNED_EXPORT_DIR UNPINNED_SOLVER_DIR PINNED_EXPORT_DIR PINNED_SOLVER_DIR PINNED_REPLAY_DIR NEW_OUTPUT_DIR OUTER_SECONDS (natural requires completed earlier controls)".into()),
+        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned|positive-unpinned NEW_OUTPUT OUTER_SECONDS | solve ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned EXPORT_DIR NEW_OUTPUT OUTER_SECONDS | replay-pinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN EXPORT_DIR SOLVER_DIR NEW_OUTPUT OUTER_SECONDS | solve-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | replay-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT UNPINNED_SOLVER PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | export-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS".into()),
     };
     if let Err(error) = &result {
         if stage_created_output && output.is_dir() && !output.join("staging.json").exists() {
@@ -1781,7 +1948,26 @@ mod tests {
             Path::new("/missing-preflight-run"),
             "natural",
             &output,
-            1
+            1,
+            None,
+        )
+        .is_err());
+        assert!(!output.exists());
+        assert!(export(
+            Path::new("/missing-lock"),
+            Path::new("/missing-preflight-lock"),
+            Path::new("/missing-preflight-run"),
+            "natural",
+            &output,
+            1,
+            Some((
+                Path::new("/pinned-export"),
+                Path::new("/pinned-solver"),
+                Path::new("/pinned-replay"),
+                Path::new("/unpinned-export"),
+                Path::new("/unpinned-solver"),
+                Path::new("/unpinned-replay")
+            ))
         )
         .is_err());
         assert!(!output.exists());
