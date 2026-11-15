@@ -182,3 +182,36 @@ The source upload is approved but still lacks secure authentication; no
 checkpoint upload, runtime pilot, benchmark or scaling panel has occurred.
 T9/research and T10/authblocked checkpoint remain open. The independently
 denied full native-ledger/shared-log/host-detail publications remain excluded.
+
+## Colored interpolation: exact union, missing nonzero extractor (2026-11-15)
+
+The independent [selector-A assessment](../research/selector_kernel_assessment_20261115/README.md)
+records actual bounded polynomial kernels, their exact b^t prefix count for
+t <= dU, and an exact factored-product representation of their union. Shared
+source and actual-prime-field assembly pass local checks, with complete raw
+audit/failure receipts. Claim `PCC-20261115-26947e` remains unverified.
+The cardinality consequence applies only to an architecture materializing
+the entire level with one entry per exact kernel; it does not lower-bound
+lazy or selective searches, future-color pruning or symbolic algorithms.
+[pcc:unverified]
+
+The new specific gap is an effective **nonzero** coefficient-witness
+extractor for the factored homogeneous color system on the actual clean
+random elliptic input distribution. Compact representation and inexpensive
+supplied-witness membership do not provide extraction or useful-output yield.
+This is a missing construction/analysis, not an impossibility result.
+[pcc:unverified]
+
+To discharge this component, give an explicit capped program and its charged
+construction/search/decoding/label/final-check costs, with per-attempt
+T <= 2^(C*m*log(m+1))*(m*b)^c*N^c and useful-output probability
+theta >= 2^(-C*m*log(m+1)) for fixed C,c at the proposal's growing parameters.
+The next discriminating proof obligation is a nonzero extraction method
+under that distribution, including failures and actual relation checks.
+A membership-only algorithm does not meet it. Success would settle this
+selector component; the full scalar bridge, complete costs and original
+panel acceptance criteria would still need their own evidence.
+
+Earlier native controls, frozen inputs and checkpoint-access requirements
+are unchanged. PR4311/4338 frozen-ledger conflicts remain separate from this
+main-based assessment; no conflicting history is selected or rewritten.
