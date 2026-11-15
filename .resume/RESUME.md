@@ -1,3 +1,19 @@
+# Whole IC, paired sampler and induced-proof custody26: inputs HELD
+
+## What was done
+pcc/claims/PCC-20261115-a62a85.json: at consumer41247ff and producer a0004ee, original IC7df2ae retains all100records/60attempts/45verified15rejected, pairedsampler4fd903 all101records/60pairs120reports/45verified15rejectedpairs, and inducedproofeddc37/freshproofCI39bb46 plus fullCIa93f80 all749members/logs. Both native phase sets, all prior51583keys/176links and exact ledger prefixes were checked before preparation. [pcc:unverified]
+
+## Decisions made
+HOLD all science, source, raw, aliases, consumer owned bytes and consumer ledger until actual original remote replays BEFORE the actual publisher, exact normal FF, archive reassembly and terminal26 held-byte/link checks. Archive every declared closed nonsecret ct92–99 root, additional uncaptured publication metadata and all consumer deltas since genuine25. Original crypto PDF keep policy differs from cryptanalysis: retain full69112B PDF in producer Git and whole archive, without a fabricated canonical PDF entry. [pcc:unverified]
+
+## Open threads
+Complete genuine26, project exact whole100/101-record fixture entries, link full producer PDF and add CI. Then prospectively investigate FB30 relation-kernel rank and complete strong-reference primitive/setup cost coverage. [pcc:unverified]
+
+## Errors
+All failed builds, proofs, recorders, transport/control attempts, ENOSPC and FUSE EPERM evidence remains intact. Only private transport authorization metadata is withheld from publication and retained locally. RAM cache relocation preserves all research and refs; follow ct99-remote-cache-relocation-02 recovery receipt if RAM is replaced. [pcc:unverified]
+
+---
+
 ## Resume capacity recovery02
 
 Whole verified remote promisor cache bytes relocated to RAM with original paths/refs/HEAD/status/science preserved;1.5GB overlay free. Local automatic Git repacking disabled in both clones. Full recovery manifest is /workspace/scratch/ct99-remote-cache-relocation-02/outcome.json; follow its regenerable-cache-only recipe if RAM is replaced. Next genuineNEW26, then relation-rank discriminator and complete strong-reference cost census. [pcc:unverified]
