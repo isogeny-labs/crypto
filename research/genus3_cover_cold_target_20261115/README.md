@@ -124,13 +124,35 @@ does not authenticate the historical clock readings or physical execution.
   the fallback, not evidence that no related result exists. ecdb was not
   accessible without its configured AWS/token route.
 
+## Native execution continuation
+
+The [native solver](native-check/src/solver.rs) implements factor-base
+construction, the degree-four map, pole-corrected pullback and Frobenius
+trace, Cantor arithmetic, interpolation relations, exact finite-field CG,
+individual descent and checked scalar recovery for this exact fixture.
+It provides a public-target interface accepting only a point and relation
+seed; no known scalar is accepted. The RNG is explicitly specified and
+differs from the archived NumPy stream.
+
+See the [bounded development contract](native-check/DEVELOPMENT.md) and
+its commands. These checks exercise the execution path; they do not add a
+performance comparison. Their claim publication is pending the divergent
+PCC-ledger conflict in PR #4284. The existing signed standing is unchanged;
+there is no new admitted result or timing series in this continuation.
+
+The historical PDF and its graph remain the report of the original Python
+record. They have not been relabelled as native solver measurements.
+The [native implementation companion](reports/NATIVE-IMPLEMENTATION.pdf)
+diagrams the new path and its bounded development contract.
+
 ## Admission, dashboards, and continuation
 
 | Requirement | Status |
 | --- | --- |
 | Preserve original source and raw record | Imported unchanged; local hashes checked |
 | Native scalar/summary checks | Local checks added; signed independence pending |
-| Native cover solver and matched native BSGS/rho | Not implemented by this import |
+| Native cover solver | Implementation and bounded development interface added; admission pending |
+| Matched strongest native rho reference | Missing |
 | Counted cold cost, five online phases, calibration band | Missing |
 | Qualified isolation, A/A controls and external comparison | Missing |
 | Native formal curve/transfer identity and Lean correspondence | Pending |
@@ -143,6 +165,6 @@ Generated dashboards and progress exporters remain unchanged because no
 qualified numeric series or registered identity is added. No ecdb source row
 is promoted by this archive.
 
-Next is a native solver implementation against the frozen fixture, followed
-by a separately preregistered, fully counted, matched-rho comparison under
+Next is native operation accounting and reference integration, followed by
+a separately preregistered, fully counted, matched-rho comparison under
 the repository's execution/validation gates. No such run is scheduled here.

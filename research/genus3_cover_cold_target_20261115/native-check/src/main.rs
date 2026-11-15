@@ -4,6 +4,8 @@ use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, fs, io::Read, path::Path};
 
+mod solver;
+
 const P: i64 = 1061;
 const ELL: u64 = 298_607_311;
 const ORDER: u64 = 1_194_429_244;
@@ -290,6 +292,17 @@ fn check(data: &Value, archive: &Path) -> Result<Value, String> {
 }
 
 fn main() -> Result<(), String> {
+    let args: Vec<_> = std::env::args().collect();
+    if args
+        .get(1)
+        .is_some_and(|arg| arg == "--solve-public-target")
+    {
+        require(args.len() == 3, "usage: --solve-public-target REQUEST.json")?;
+        return solver::public_target(&args[2]);
+    }
+    if std::env::args().any(|arg| arg == "--native-development-check") {
+        return solver::development_check();
+    }
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
     let raw = root.join("historical/cold_target_audit_q1061_v65.json");
     let bytes = fs::read(raw).map_err(|e| e.to_string())?;
