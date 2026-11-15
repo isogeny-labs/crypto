@@ -29,6 +29,10 @@ Every entry has four headings:
 - Errors (what went wrong, how it was handled)
 
 Commit project handoffs with the related PR so they survive across sessions.
+Several sessions append to the same day's file, so a PR that touches it goes
+`dirty` on `main` often (lesson `L-1e09e78e395f`, adopted 2026-11-15). Fetch
+`origin/main` before appending, and when the file conflicts, merge `main` and
+keep both sides in time order; never drop another session's entry.
 Keep entries about this project; do not copy private global logs or chat transcripts.
 
 <!-- END SHARED SESSION LOG -->
