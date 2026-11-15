@@ -29,8 +29,10 @@ cat /proc/self/status > "$out/process-status.txt"
 cat /proc/cmdline > "$out/kernel-cmdline.txt"
 cp /opt/tournament/run.sh "$out/run.sh"
 # Build and validate before taking the timing reservation. Every failure is terminal for this build.
+build_seconds=$(remaining)
+((build_seconds>3600)) && build_seconds=3600
 set +e
-timeout --signal=TERM --kill-after=45s "$(remaining)s" cargo build --release --locked \
+timeout --signal=TERM --kill-after=45s "${build_seconds}s" cargo build --release --locked \
   --example koblitz_orbit_dlp_fast_online --example koblitz_rho_batch_ks_strong_online \
   --example koblitz_orbit_dlp_fast --example koblitz_rho_batch_ks_strong > "$out/build.log" 2>&1
 build_status=$?
