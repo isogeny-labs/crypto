@@ -84,6 +84,18 @@ data migration, matching the local policy check's no-added-data result. There
 is no raw qualification archive or remote numeric custody receipt to claim.
 [pcc:unverified]
 
+2026-11-15T16:00Z dependency update: critical4304 released its journal
+freeze through the documented hour-long no-response fallback, normal merge
+417dd19e294627188355d5f56d46b5064bad4c08. The full-block/multiplicity receipt
+preserves all198incoming/205own blocks (206in their union), including repeated
+headings, before its one new handoff. The prototype inherits that base with
+normal mergef421e30bc1. No protocol, native source, copied wrapper or raw
+evidence is changed; local ledger1087 retains the exact critical1084prefix
+and lessons integrity checks61entries/0errors. Parent current-head required
+gates remain pending. Qualification001 is still unrun for the same failed
+upload gate; the saved resume is updated to this dependency state.
+[pcc:unverified]
+
 Both report pages were rendered and visually inspected after the final claim
 label; complete source/binary bindings still match build002. Lessons integrity
 checks60entries/0errors and ledger1086entries/prefix pass locally. The source

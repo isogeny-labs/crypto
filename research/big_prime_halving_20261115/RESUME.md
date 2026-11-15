@@ -26,8 +26,11 @@ merged, hosted jobs did not start because of the billing lock. Native build001
 failed explicit-header/strict-layout compilation; build002 passes. No native
 numerical qualification has started. Builds under /workspace/scratch/
 big-prime-halving-build00{1,2}; diagnostics adjacent. Old controls preserved
-at /workspace/scratch/aux-halving-qualification001. Critical PR4304 has one
-Copilot journal merge request14:55:21Z; do not touch its journal while pending.
+at /workspace/scratch/aux-halving-qualification001. After an hour without a
+Copilot response, critical PR4304 resolved its journal with normal merge
+417dd19e294627188355d5f56d46b5064bad4c08. This branch inherits it asf421e30bc1;
+all original blocks/multiplicities and native bindings were preserved. Parent
+current-head required gates remain pending; do not carry earlier passes.
 
 ## Next steps
 From /workspace/scratch/big-prime-halving, commit/push all native source and
@@ -40,6 +43,8 @@ wrapper /workspace/scratch/big-prime-halving-runner001.sh with arguments
 /workspace/scratch/big-prime-halving-qualification001
 /workspace/scratch/aux-halving-qualification001. Capture outer log adjacent.
 Inspect every exit, retain failures, archive whole raw round, publish report/PR.
+After4304lands, retarget4305to main and enable auto-merge under its review/
+validation requirements. Keep the missing numerical qualification explicit.
 
 ## Runs in flight
 None. The shared local gate is complete. No native case or paid job is running.
