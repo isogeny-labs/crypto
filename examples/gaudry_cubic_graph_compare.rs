@@ -1,5 +1,6 @@
 //! Matched native comparison of protected-target pivot and symbolic-graph IC.
-//! This is an IC component/pipeline diagnostic, not an ecbench rho comparison.
+//! Includes the existing same-instance cubic rho reference. Clocks and the
+//! incomplete multiplication model require external admission before ranking.
 //! Run only through the repository's experiment/checkpoint/isolation contract.
 //! Raw output is create-new JSONL; failed solves are retained, never filtered.
 
@@ -9,8 +10,8 @@ use std::time::Instant;
 
 use clap::Parser;
 use crypto_lib::cryptanalysis::gaudry_cubic::{
-    generate_instance3, run_gaudry_with_eliminator, GaudryOptions, LargePrimeBackend, Solver,
-    SubspaceBase,
+    generate_instance3, run_gaudry_with_eliminator, run_rho3, GaudryOptions, LargePrimeBackend,
+    Solver, SubspaceBase,
 };
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
 use rand::{rngs::StdRng, SeedableRng};
@@ -24,6 +25,8 @@ struct Args {
     seeds: Vec<u64>,
     #[arg(long, default_value_t = 5)]
     rounds: usize,
+    #[arg(long, default_value_t = 1)]
+    warmup_rounds: usize,
     #[arg(long, default_value_t = 10_000)]
     max_residuals: u64,
     /// Frozen source commit, externally checked against binary/build receipt.
@@ -36,13 +39,20 @@ struct Args {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     if args.rounds < 5
+        || args.warmup_rounds == 0
         || args.primes.is_empty()
         || args.seeds.is_empty()
         || args.source_revision.len() != 40
         || !args.source_revision.bytes().all(|c| c.is_ascii_hexdigit())
     {
-        return Err("need nonempty inputs, at least five rounds, and a full source SHA".into());
+        return Err(
+            "need nonempty inputs, a warmup, at least five rounds, and a full source SHA".into(),
+        );
     }
+    let total_rounds = args
+        .warmup_rounds
+        .checked_add(args.rounds)
+        .ok_or("round count overflow")?;
     let mut output = BufWriter::new(
         OpenOptions::new()
             .write(true)
@@ -59,18 +69,68 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         for &seed in &args.seeds {
             let inst = generate_instance3(p, seed);
-            for solver in [Solver::MeetInTheMiddle, Solver::Groebner, Solver::PairOnly] {
-                for round in 0..args.rounds {
+            for solver in [
+                Solver::MeetInTheMiddle,
+                Solver::Groebner,
+                Solver::PairOnly,
+                Solver::SymmetricPairOnly,
+                Solver::SymmetricMeetInTheMiddle,
+            ] {
+                for iteration in 0..total_rounds {
+                    let (phase, round) = if iteration < args.warmup_rounds {
+                        ("warmup", iteration)
+                    } else {
+                        ("measurement", iteration - args.warmup_rounds)
+                    };
                     // A/A control and candidate are interleaved; every arm pays
                     // fresh base setup and starts its oracle from the same seed.
-                    let mut arms = ["pivot_a", "graph", "pivot_b"];
+                    let mut arms = ["pivot_a", "graph", "pivot_b", "rho_a", "rho_b"];
                     if round % 2 == 1 {
                         arms.reverse();
                     }
                     let mut reference = None;
+                    let mut rho_reference = None;
+                    let mut diagnostics = Vec::new();
                     for arm in arms {
                         inst.curve.reset();
                         let start = Instant::now();
+                        if arm.starts_with("rho_") {
+                            let report = run_rho3(&inst, seed);
+                            let before_replay = inst.curve.ops();
+                            let replay = report
+                                .recovered_scalar
+                                .map(|d| inst.curve.mul(&inst.curve.g, d) == inst.q);
+                            let replay_adds = inst.curve.ops() - before_replay;
+                            let elapsed = start.elapsed().as_nanos();
+                            let signature =
+                                (report.steps, report.group_ops, report.recovered_scalar);
+                            let aa_equal =
+                                rho_reference.as_ref().is_none_or(|old| old == &signature);
+                            rho_reference.get_or_insert(signature);
+                            let valid =
+                                replay == Some(true) && report.correct == Some(true) && aa_equal;
+                            if !valid {
+                                failures += 1;
+                            }
+                            let cost = report.group_ops + replay_adds;
+                            diagnostics.push((arm, cost as f64, elapsed, valid));
+                            let record = json!({
+                                "schema":"gaudry.cubic.graph-comparison/v2", "record_type":"execution",
+                                "source_revision":args.source_revision, "phase":phase,
+                                "p":p, "seed":seed, "round":round, "arm":arm, "oracle_block":solver,
+                                "field":inst.curve.field,"a":inst.curve.a,"b":inst.curve.b,
+                                "generator":inst.curve.g,"target":inst.q,"subgroup_order":inst.curve.n,
+                                "known_answer_scalar":inst.d, "report":report,
+                                "group_replay":replay,"group_replay_adds":replay_adds,"aa_equal":aa_equal,
+                                "legacy_model_cold_gae":cost,"unadmitted_wall_ns":elapsed,
+                                "reference_status":"existing_cubic_radding_reference_not_fastest_external",
+                                "clock_status":"requires_external_L2_and_AA_admission"
+                            });
+                            serde_json::to_writer(&mut output, &record)?;
+                            writeln!(output)?;
+                            output.flush()?;
+                            continue;
+                        }
                         let base = SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(seed));
                         let base_muls = inst.curve.field.muls();
                         let base_adds = inst.curve.ops();
@@ -105,26 +165,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         );
                         let prefix_equal = reference.as_ref().is_none_or(|old| old == &signature);
                         reference.get_or_insert(signature);
-                        if replay != Some(true) || report.correct != Some(true) || !prefix_equal {
+                        let valid =
+                            replay == Some(true) && report.correct == Some(true) && prefix_equal;
+                        if !valid {
                             failures += 1;
                         }
                         let setup_gae =
                             base_adds as f64 + base_muls as f64 / report.fp_muls_per_add;
+                        let cost = setup_gae + report.total_ops + replay_adds as f64;
+                        diagnostics.push((arm, cost, elapsed, valid));
                         let record = json!({
-                            "schema":"gaudry.cubic.graph-comparison/v1",
+                            "schema":"gaudry.cubic.graph-comparison/v2","record_type":"execution",
                             "source_revision":args.source_revision,
-                            "p":p,"seed":seed,"round":round,"arm":arm,"options":opts,
+                            "phase":phase,"p":p,"seed":seed,"round":round,"arm":arm,"oracle_block":solver,"options":opts,
                             "field":inst.curve.field,"a":inst.curve.a,"b":inst.curve.b,
                             "generator":inst.curve.g,"target":inst.q,"subgroup_order":inst.curve.n,
                             "known_answer_scalar":inst.d,
                             "base_setup_fp_muls":base_muls,"base_setup_adds":base_adds,
                             "group_replay_adds":replay_adds,
-                            "legacy_model_cold_gae":setup_gae+report.total_ops+replay_adds as f64,
+                            "legacy_model_cold_gae":cost,
                             "prefix_equal":prefix_equal,"group_replay":replay,
                             "report":report,
                             "unadmitted_wall_ns":elapsed,
                             "cost_status":"legacy_mul_equivalent_diagnostic_not_full_native_budget",
                             "unpriced_scope":["dense_and_pivot_scalar_adds_and_inversions",
+                                "oracle_scalar_inversions",
                                 "hash_and_collection_primitives_outside_graph_meter",
                                 "base_lift_integer_and_rng_work","calibration_work"],
                             "hash_work_note":"lp_input_hash_bytes records fingerprint input size; native hash instructions remain unpriced",
@@ -134,6 +199,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         writeln!(output)?;
                         output.flush()?;
                     }
+                    // A failed arm invalidates the complete block. Raw rows
+                    // remain flushed even when a later arm fails or is capped.
+                    let block_valid = diagnostics.iter().all(|row| row.3);
+                    let rho = diagnostics.iter().find(|row| row.0 == "rho_a").unwrap();
+                    let ratios: Vec<_> = diagnostics
+                        .iter()
+                        .filter(|row| !row.0.starts_with("rho_"))
+                        .map(|row| {
+                            json!({
+                                "arm":row.0,
+                                "legacy_cost_over_rho":row.1 / rho.1,
+                                "unadmitted_wall_over_rho":row.2 as f64 / rho.2.max(1) as f64
+                            })
+                        })
+                        .collect();
+                    serde_json::to_writer(
+                        &mut output,
+                        &json!({
+                            "schema":"gaudry.cubic.graph-comparison/v2","record_type":"block_diagnostic",
+                            "source_revision":args.source_revision,"phase":phase,
+                            "p":p,"seed":seed,"round":round,"oracle_block":solver,
+                            "block_valid":block_valid,"ratios":ratios,
+                            "parity_status":"unadmitted_diagnostic_only_incomplete_pricing_and_reference_scope"
+                        }),
+                    )?;
+                    writeln!(output)?;
+                    output.flush()?;
                 }
             }
         }

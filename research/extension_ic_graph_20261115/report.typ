@@ -30,11 +30,21 @@ constraints are converted back to inhomogeneous rows. Constructor primality
 and graph-merge multiplication counts are retained. [pcc:unverified]
 
 == Planned comparison and controls
+Amendment 1 adds a Rust symmetric-coordinate S3 pair oracle and a hybrid triple
+variant. With s = x1+x2 and t = x1*x2, the two nonconstant extension components
+are linear in t. Their eliminant has degree at most three. GCD compatibility
+with the constant component precedes root extraction; vanishing denominators
+and dependent equations retain explicit recovery or counted scan paths.
+The filtered release run reports 30 passing tests for this continuation.
+These are producer-run correctness checks. [pcc:unverified]
+
 The native driver uses the existing Weil-restricted S3 pair oracle,
 symmetrised S4 solver, and hybrid scan/S3 solver. It interleaves two identical
 pivot controls with the graph candidate, reversing arm order on odd rounds.
-Every arm rebuilds its factor base and starts from the same seed. Raw JSONL
-is create-new; failures and scalar replays are retained.
+Both symmetric variants are included as additional oracle blocks. Every IC arm
+rebuilds its factor base and starts from the same seed. Actual cubic r-adding
+rho A/A arms use the same instances. A retained warmup precedes measured
+rounds. Raw JSONL is create-new; failures and scalar replays are retained.
 
 The frozen exploratory cohort has p = 7, 13, 19, 31 and seeds 3, 7, 11, 23,
 with five rounds. A separate p = 43, seeds 101 and 103 cohort is held out.
@@ -51,16 +61,26 @@ complete native-cost ranking, external-tool comparison or speedup is claimed.
 No leaderboard measurement changes are supported by this packet.
 
 == Local development checks
-The final filtered release-library run reports 24 passing Gaudry/cubic-graph
+The earlier integration's filtered release-library run reports 24 passing Gaudry/cubic-graph
 tests, including the target-boundary regression, actual-oracle prefix/scalar
 comparisons and input-fingerprint equality. The touched example compiled in its
 Cargo test target before that control; it defines no example-local tests.
-The current-head example also passes its release type check. The earlier full default-feature library
+That head's example also passed its release type check. The earlier full default-feature library
 run reported failures outside the touched module and was interrupted after
 more than twelve minutes of test execution; it is not a passing whole-library
 result. A missing archived fixture was reproduced, and one device case passed
 after restoring tracked emulator assets. Other failures remain unclassified.
 These are producer-run checks, not independent signed verdicts.
+[pcc:unverified]
+
+The symmetric-oracle continuation passes 30 filtered release tests, including
+exhaustive tiny-group target checks,
+all constructed signed pairs, a non-binomial cubic fixture, hybrid-triple
+comparison, and explicit dependent/vanishing-denominator regressions. Its
+first test compile found archived include fixtures absent from this sparse
+checkout. Exact tracked fixtures were restored before the passing run.
+The continuation's release example type check also passed locally.
+The earlier 24-test result remains evidence for the earlier source only.
 [pcc:unverified]
 
 Raw command output is retained under `validation/`. The checkpoint gate reports

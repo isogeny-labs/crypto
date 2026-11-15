@@ -63,6 +63,9 @@ use super::residual_walk::{inv_mod, is_prime_u64, mix64, pow_mod, sqrt_mod, Rela
 
 #[path = "gaudry_cubic_graph.rs"]
 mod graph;
+#[path = "gaudry_cubic_symmetric.rs"]
+mod symmetric;
+pub use symmetric::{weil_s3_pair_test_symmetric, SymmetricPairStats};
 
 /// `F_p` multiplications per affine addition in `E(F_{p³})`: measured by
 /// [`Fp3::adds_to_muls_ratio`] on construction and folded into the
@@ -1049,6 +1052,18 @@ pub fn subspace_triple_oracle(
     r: &Pt3,
     rng: &mut StdRng,
 ) -> (Vec<Vec<(usize, i64)>>, u64) {
+    triple_with_pair(inst, base, r, rng, |y, rng| {
+        weil_s3_pair_test(inst, base, y, rng)
+    })
+}
+
+fn triple_with_pair(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    r: &Pt3,
+    rng: &mut StdRng,
+    mut pair_test: impl FnMut(&Pt3, &mut StdRng) -> (Vec<Vec<(usize, i64)>>, u64),
+) -> (Vec<Vec<(usize, i64)>>, u64) {
     let curve = &inst.curve;
     let mut found = Vec::new();
     let mut muls = 0u64;
@@ -1071,7 +1086,7 @@ pub fn subspace_triple_oracle(
                 terms.sort_unstable();
                 found.push(terms);
             }
-            let (pairs, m) = weil_s3_pair_test(inst, base, &y, rng);
+            let (pairs, m) = pair_test(&y, rng);
             muls += m;
             for pair in pairs {
                 // Only keep k above both pair indices so every triple is
@@ -3138,6 +3153,10 @@ pub struct GaudryReport {
     /// Hash input bytes (not a count of native hash instructions).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lp_input_hash_bytes: Option<u64>,
+    /// Present only for the symmetric S3 oracle variants. Fallback group
+    /// additions remain included in `group_ops`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub symmetric_pair_stats: Option<SymmetricPairStats>,
 }
 
 /// Auxiliary-column elimination for the protected-target comparison path.
@@ -3667,6 +3686,11 @@ pub enum Solver {
     /// It is here to be measured rather than assumed; see
     /// `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md` §11.9.
     PairOnly,
+    /// Pair-only channel using elementary symmetric coordinates and a
+    /// degree-at-most-three eliminant. Degenerate systems use a counted scan.
+    SymmetricPairOnly,
+    /// The existing hybrid triple scan, using the symmetric S3 pair oracle.
+    SymmetricMeetInTheMiddle,
 }
 
 /// Collect relations by full decomposition of random `R = aG + bQ` until
@@ -3900,6 +3924,7 @@ fn run_gaudry_impl(
         lp_graph_work: None,
         lp_input_digest: None,
         lp_input_hash_bytes: None,
+        symmetric_pair_stats: None,
     };
     let mut la = std::time::Duration::ZERO;
     while rep.residuals < max_residuals {
@@ -3962,6 +3987,21 @@ fn run_gaudry_impl(
                 rep.pair_tests += 1;
                 decs
             }
+            Solver::SymmetricPairOnly | Solver::SymmetricMeetInTheMiddle => {
+                let stats = rep
+                    .symmetric_pair_stats
+                    .get_or_insert_with(SymmetricPairStats::default);
+                let mut pair =
+                    |y: &Pt3, rng: &mut StdRng| symmetric::pair_test(inst, base, y, rng, stats);
+                let (decs, muls) = if solver == Solver::SymmetricPairOnly {
+                    pair(&r, &mut rng)
+                } else {
+                    triple_with_pair(inst, base, &r, &mut rng, pair)
+                };
+                rep.oracle_fp_muls += muls;
+                rep.pair_tests = stats.calls;
+                decs
+            }
         };
         if cross_check {
             let other = match solver {
@@ -3982,13 +4022,22 @@ fn run_gaudry_impl(
                     )
                 }
                 Solver::Groebner => subspace_triple_oracle(inst, base, &r, &mut rng).0,
+                Solver::SymmetricPairOnly => weil_s3_pair_test(inst, base, &r, &mut rng).0,
+                Solver::SymmetricMeetInTheMiddle => {
+                    subspace_triple_oracle(inst, base, &r, &mut rng).0
+                }
             };
             // Compare distinct-index triples and singles only (the pair
             // channel differs between the two oracles).
             let filt = |v: &Vec<Vec<(usize, i64)>>| -> Vec<Vec<(usize, i64)>> {
                 v.iter().filter(|t| t.len() != 2).cloned().collect()
             };
-            if filt(&decs) != filt(&other) {
+            let mismatch = if solver == Solver::SymmetricPairOnly {
+                decs != other
+            } else {
+                filt(&decs) != filt(&other)
+            };
+            if mismatch {
                 rep.cross_check_mismatches += 1;
                 if std::env::var_os("GAUDRY_DEBUG").is_some() {
                     eprintln!(

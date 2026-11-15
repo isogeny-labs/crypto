@@ -239,7 +239,13 @@ mod tests {
             LargePrimeBackend, Solver, SubspaceBase,
         };
         use rand::{rngs::StdRng, SeedableRng};
-        for solver in [Solver::MeetInTheMiddle, Solver::Groebner, Solver::PairOnly] {
+        for solver in [
+            Solver::MeetInTheMiddle,
+            Solver::Groebner,
+            Solver::PairOnly,
+            Solver::SymmetricPairOnly,
+            Solver::SymmetricMeetInTheMiddle,
+        ] {
             let inst = generate_instance3(7, 3);
             let base = SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(3));
             let opts = GaudryOptions {

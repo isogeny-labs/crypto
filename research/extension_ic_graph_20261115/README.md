@@ -6,6 +6,30 @@ with a protected target logarithm and protected constant coordinate. [pcc:unveri
 
 [Implementation report (PDF)](report.pdf) · [Frozen protocol](protocol.json)
 
+## Rust continuation toward the rho comparison
+
+[Amendment 1](AMENDMENT_1.md) adds a native symmetric-coordinate S3 pair
+oracle and its hybrid triple variant, both integrated with the existing
+collector and graph/pivot backends. The pair eliminant has degree at most
+three; GCD compatibility is applied before root extraction. Dependent systems
+retain a counted scan, and both-denominator-zero sums retain the constant
+quadratic instead of being discarded. The new filtered release run reports
+30 passing tests, including six new oracle checks and both new solvers in
+the protected graph/pivot recovery test. These are producer-run development
+checks, not admitted performance observations. [pcc:unverified]
+The continuation's release example type check also passed locally. [pcc:unverified]
+
+The Rust comparison driver now records one warmup plus five measured rounds,
+includes same-instance `run_rho3` A/A arms, and labels raw execution rows and
+derived block diagnostics separately under schema v2. Warmups and failures
+remain in the output. Cross-oracle input prefixes are not asserted identical;
+graph/pivot prefixes match within each oracle block. [pcc:unverified]
+
+The reference is the repository's existing cubic r-adding rho. The fastest
+external reference and full native pricing remain required for a broader
+parity claim. Ratios in the driver are unadmitted diagnostics; no performance
+run or parity result has been produced. [pcc:unverified]
+
 ## Scope and status
 
 | Requirement | State | Evidence / remaining step |
@@ -68,10 +92,10 @@ duplicate auxiliary coefficients, nonzero right-hand sides, invalid columns, and
 actual cubic instances under all three native oracles. These are development
 correctness checks, not admitted benchmark measurements. [pcc:unverified]
 
-The final local filtered release-library run reports **24 passing tests**, including
+The earlier graph-integration filtered release-library run reports **24 passing tests**, including
 six adapter/integration tests and the input-fingerprint comparisons. The touched
 example compiled in its Cargo test target before that control (it defines no
-example-local tests); the current-head example also passes its release type check. These are producer-run
+example-local tests); that integration head's example also passed its release type check. These are producer-run
 development checks, with no independent signed verdict. [pcc:unverified]
 
 Raw development output: [final targeted library](validation/final-targeted-library-tests.log),
@@ -81,6 +105,11 @@ Raw development output: [final targeted library](validation/final-targeted-libra
 The [current-head example check](validation/current-head-example-check.log) and
 [component source hashes](validation/component-source.sha256) distinguish the
 final code checks from the earlier pre-fingerprint development runs.
+
+The symmetric continuation's [30-test release output](validation/symmetric-targeted-library-tests.log)
+and [source hashes](validation/symmetric-component-source.sha256) identify the
+new source. Its [initial sparse-fixture compile failure](validation/symmetric-sparse-fixture-compile-failure.log)
+is retained separately from the passing retry. [pcc:unverified]
 
 The pre-fingerprint full default-feature library run was interrupted after
 reported failures outside the touched module and more than twelve minutes in
@@ -109,10 +138,10 @@ attempts, and reverses arm order between rounds.
 ```sh
 cargo build --release --no-default-features --example gaudry_cubic_graph_compare
 target/release/examples/gaudry_cubic_graph_compare \
-  --primes 7,13,19,31 --seeds 3,7,11,23 --rounds 5 \
+  --primes 7,13,19,31 --seeds 3,7,11,23 --warmup-rounds 1 --rounds 5 \
   --max-residuals 10000 --source-revision SOURCE_SHA --out cohort.jsonl
 target/release/examples/gaudry_cubic_graph_compare \
-  --primes 43 --seeds 101,103 --rounds 5 \
+  --primes 43 --seeds 101,103 --warmup-rounds 1 --rounds 5 \
   --max-residuals 10000 --source-revision SOURCE_SHA --out holdout.jsonl
 ```
 
