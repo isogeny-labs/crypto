@@ -1,0 +1,219 @@
+# EXP-R31-F — certified finite pair-abscissa elimination (2026-11-15)
+
+**Scope:** algebraic preprocessing component for the existing **Rust** prime-field
+index-calculus project. **[pcc:unverified]** producer arithmetic and focused CI
+only; no new algebraic relation extraction, complete prime31 solve, cost win,
+independent PCC signature or new complexity exponent is asserted.
+
+## Starting point and prior-result review (before selecting this experiment)
+
+The fixed Semaev S3 constraint was the first actual Rust F4 failure on all
+16 naturally sampled public masks: 16/16 stopped on the *same* 26,618-entry
+dense reducer under a 15,000-entry cap, before target-dependent S4 changed
+the measured work. The two-tower minimal S3 ablation did not fix it
+([EXP-R31-D](M8_NATURAL_F4_CI_OUTCOME_20261115.md)).
+Seven first-collision arms, with the redundant Dickson tower collapsed,
+still stopped on five of seven arms; their summed development F4 multiply-add
+count increased from 538,689 to 732,473
+([EXP-R31-E](DICKSON_FIRST_COLLISION_S3_20261115.md) and
+[exact CI counters](DICKSON_COLLAPSED_S3_CI_EVIDENCE_20261115.json)).
+Those numbers are *censored component* counters, not complete cold costs.
+
+Before choosing this change I rechecked the following existing paths:
+
+- [crypto #4077](https://github.com/isogeny-labs/crypto/pull/4077):
+  useful independent rows and *whole-call* gamma/delta, not positive-witness
+  counts or lone stage speedups, are the advancement metric.
+- [crypto #4275](https://github.com/isogeny-labs/crypto/pull/4275):
+  dense membership beat Dickson towers at small *planted-positive* cells
+  but enumeration remained cheaper, so an expensive dense polynomial is
+  not presumed an improvement.
+- [crypto #4228](https://github.com/isogeny-labs/crypto/pull/4228):
+  certified quotient solving, paired S3 and linear subresultants; this is
+  a possible target-dependent post-elimination implementation, not a result
+  already obtained on the present natural-prime31 panel.
+- [crypto #3877](https://github.com/isogeny-labs/crypto/pull/3877):
+  chained transfers still need an independently computable scalar-free
+  point map and full cost, so they are not substituted for this oracle.
+- [cryptanalysis #1536](https://github.com/isogeny-labs/cryptanalysis/pull/1536):
+  optimized auxiliary-map index calculus is already in Rust, but no
+  same-target qualified full-cost advantage is reported there.
+- [crypto-autoresearcher #3305](https://github.com/isogeny-labs/crypto-autoresearcher/pull/3305):
+  the prior semaev-alternatives campaign and lead-atlas rules explicitly
+  warn against toy-stage positives, uncertified closures and omitted rho
+  totals. This remains an independent prior-lead register.
+- [Petit–Kosters–Messeng, PKC 2016](https://doi.org/10.1007/978-3-662-49387-8_1)
+  gives the established rational-map/Semaev prime-field IC framework;
+  [Diem, Compositio 2011](https://doi.org/10.1112/S0010437X10005075)
+  provides extension-field and special prime-field complexity regimes.
+  The S3 quadratic and polynomial projection below are algebraic
+  consequences of those established methods, **not a novelty claim**.
+
+The shared research-KB MCP server and its repository wrapper were not
+available in this runtime. This is a **bounded**, source-linked GitHub and
+primary-literature review, not a comprehensive novelty clearance.
+
+## Exact finite-field elimination theorem (on the fixed public curve)
+
+The tested domain is the inherited ordinary cofactor-one curve
+
+    p = 2147483647 = 2^31-1
+    E: y^2 = x^3 + 847514846*x + 2087444724
+    #E(Fp) = n = 2147446831 (prime)
+    G = (625037715, 2100627251)
+
+The deterministic depth-six Dickson preimage fibre has 64 distinct x values,
+31 of which lift to canonical finite nonzero-y elliptic-curve points
+P_i=(x_i,y_i). This is the same fixture as #4188; no smooth subgroup or
+known-secret input is introduced.
+
+Write S3(x,y,w) as a polynomial **quadratic in w**:
+
+    a = (x-y)^2
+    b = -2*((x+y)*(x*y + A) + 2*B)
+    c = (x*y - A)^2 - 4*B*(x+y)
+    S3(x,y,w) = a*w^2 + b*w + c
+
+Let \`R_{ij}\` be the finite Fp roots of S3(x_i,x_j,w), including
+i=j. For i<j, there are two roots: x(P_i+P_j), x(P_i-P_j).
+For i=j, the quadratic degenerates to one finite root: x(2P_i);
+the other sign choice produces the point at infinity and **has no
+affine x-coordinate**. The field is of odd characteristic, the group
+has prime odd order, and the tested P_i are nonzero, so these cases
+have no extra zero/torsion exceptions.
+
+Define the **monic field polynomial**
+
+    H(W) = product_{0<=i<=j<31} product_{w in R_ij} (W-w) in Fp[W].
+
+Then for *every* rational w in Fp,
+
+    H(w)=0  <=>  some i<=j has S3(x_i,x_j,w)=0.
+
+This is exact existential elimination of the two fixed Dickson S3 leaves
+**for rational coordinates over this chosen factor base**. The equivalence
+is immediate because Fp is a field and H is an explicit product of linear
+factors. The construction also retains a preimage index for each w
+so any *later* target-dependent S4 solution can reconstruct its contributing
+point pair and check the full public point with y signs.
+
+### Exact measured finite-instance certificate
+
+| Item | Exact result |
+|---|---:|
+| Liftable canonical factor-base points | 31 |
+| Unordered base pairs, including diagonal | 496 |
+| Two-root distinct pairs | 465 |
+| One-root diagonals | 31 |
+| Algebraic S3 finite roots, with multiplicity | 961 |
+| Distinct finite w roots | **961** |
+| Degree of squarefree H | **961** |
+| First-collision branch polynomial degrees, j=0..5 | 16, 20, 62, 124, 240, 468 |
+| Diagonal branch polynomial degree | 31 |
+| H leading coefficient | 1 |
+| First six H coefficients, constant first | 1384764775, 1730047243, 2061394966, 644849095, 1634675601, 1780857477 |
+| Sorted-root SHA-256 (u32 LE) | \`f83e7ecdd585af6d9457b054e61d66c957624a7cc5a9719b62ca92e4afe7aca6\` |
+| Coefficient SHA-256 (u32 LE) | \`a1b9f09503c9eb08ff70bca1f7cf6dd7b9c575c924bc4f5530580f7ca4852e3a\` |
+
+The collision-free preimage count is a *measured property of this specific
+31-point base*: each w determines one unordered pair and one S3-root
+index. It is not asserted for arbitrary curves or growing B.
+
+Construction needs 496 field S3 quadratics and 961 rational roots. A
+naive incremental monic-product builder uses exactly
+\`961*962/2=462241\` modular coefficient multiplications for H
+(excluding inversions, square roots, polynomial checks and other field
+work). The seven branch products separately require 149,211 such
+multiplications. These are transparent analytic operation counts,
+**not a same-host runtime, a full oracle invocation cost, or evidence
+that the result beats EC group enumeration**.
+
+The independent Python replay reconstructs the curve base and all signed
+group sums with a separate group-law implementation, checks every one of
+the 961 S3 root abscissae, multiplies the seven factor polynomials,
+and compares both complete SHA-256 hashes. The Rust example uses
+the existing \`Arithmetic\`, \`Base::build\` and \`PRIME31\`, generates
+candidate abscissae solely by the field S3 quadratic, and uses EC
+addition only as a semantic validator **after** root construction.
+
+## Actual algorithmic opportunity and limitation
+
+Replace the **fixed** S3(x6,x7,w) plus two depth-six leaf towers in the
+balanced m8 system with the exact rational condition H(w)=0. This is
+an algebraically valid projection for finding x-coordinate solutions.
+Full integer-index relation extraction still requires selecting a
+preimage (i,j), sign-lifting, rejecting repeated indices if required,
+and point-verifying against the original public R. Those are explicit
+steps, not implicit consequences of H.
+
+The existing packed Rust F4 configuration has a 12-degree bound, while
+H has degree **961**. Therefore simply inserting H into that F4 ideal
+is **not executable under the registered cap** and is not advertised
+as a speedup. The two implementation alternatives to measure, without
+pretending to have already measured them, are:
+
+1. **Specialize w** to the 961 certified roots with cached provenance.
+   This removes the two pair towers and S3 equation, leaving the six
+   other depth-six blocks and two auxiliary variables u,v. First run
+   all branches on a frozen, bounded diagnostic panel, recording every
+   failed/successful specialization and at most one prior-known positive
+   *validator*; never select w using a secret or test-only oracle.
+2. **Certified quotient/CRT or streamed branch elimination:** represent
+   the seven H_j factor sets, or a factored fixed quotient, without
+   expanding degree-961 H into a degree-12 F4 system. Audit the
+   projection/extension and back-substitution, and test actual F4
+   target-dependent S4 work. Compare with #4228 and dense #4275,
+   using the same frozen positive and negative natural masks.
+
+The *first falsifier* is whether the target-dependent left/right S4 ideal
+still oversizes under a six-block, two-free-variable specialization;
+the earlier separate left S4 ablation also oversized when all eight
+unused tower blocks were retained. A smaller ring is a hypothesis, not
+a benchmark. Any method that searches all 961 w values must charge
+every attempt and all fixed preprocessing once per cold target.
+
+## Experiment protocol / promotion gates
+
+- **R31-F1 (automated development test):** run the independent Python
+  and existing-Rust certificate programs on this exact source head.
+  Require the 31-point curve fixture, all 496 pair laws, 961 unique
+  finite roots, seven factor polynomials with the exact degrees/hashes,
+  256 nonmember controls, and no compilation/test failure.
+- **R31-F2 (bounded true algebraic pilot):** preregister the same 16
+  natural public masks from EXP-R31-D plus held-out masks. In the real
+  Rust S4 solver try w-specialization and/or factored-quotient
+  preprocessing with **all** branches, no generic pair-table fallback,
+  complete call/censor/memory/root counters, and genuine signed outputs.
+  Keep 12-degree, 15k dense/NNZ and five-second per-call controls for
+  *development diagnostics*; request a separate EKS admission if a
+  larger registered study is needed. The 961 specializations must
+  never be silently discounted.
+- **R31-F3 (complete cold IC):** only after natural algebraic extraction,
+  collect projective-distinct independent rank on public targets, solve
+  the modular base-log system and independently verify unknown Q's
+  scalar. Include base generation, H construction, *every* F4,
+  rejection, root, rank, LA, memory and final check. Compare against
+  optimized same-curve Rust negation-map rho and BSGS using the
+  registered ecbench/PCC accounting (whole-call gamma/delta #4077).
+  Independent audit and growing-field holdouts are mandatory before
+  any solver cost or complexity improvement claim.
+
+No paid EKS execution, new leaderboard score or PR merge is authorized by
+this *component* report. The implementation is intended for the existing
+open [crypto PR #4188](https://github.com/isogeny-labs/crypto/pull/4188);
+preserve historical producer data and the independent PCC gate.
+
+## Reproduction
+
+- [Rust certificate](examples/prime31_pair_elimination_poly.rs):
+  \`cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_pair_elimination_poly\`
+- [Independent Python certificate](replay_pair_elimination_poly.py):
+  \`python3 research/prime31_ic_20261115/native/replay_pair_elimination_poly.py\`
+- Development workflow:
+  [prime31-algebraic-ic.yml](../../../.github/workflows/prime31-algebraic-ic.yml)
+
+**Current verdict:** exact fixed-pair algebraic projection and collision-free
+finite-root catalogue demonstrated by producer arithmetic; Rust exact-head
+execution is separately gated by CI. It is a useful elimination component,
+not yet a natural-target m8 oracle, a prime31 scalar solver, or a
+cheaper-than-generic ECDLP result.
