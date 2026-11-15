@@ -88,21 +88,16 @@ fn native_polynomial_trace_preserves_incomplete_status() {
     assert!(trace["baseline"]["solving_degree"].is_null());
 }
 #[test]
-fn six_variable_case_has_checked_basis_or_explicit_budget_failure() {
-    let p = 2147483647;
-    let input = fixture(6, p);
-    match try_quotient_basis(&input, 6, p) {
-        Ok(report) => {
-            assert!(verify_basis(&report, &input));
-            assert_eq!(report.quotient.quotient_dimension, 4);
-            eprintln!("six-variable development outcome: complete checked basis");
-        }
-        Err(reason) => {
-            assert!(
-                reason.contains("quotient_budget"),
-                "unexpected six-variable failure: {reason}"
-            );
-            eprintln!("six-variable development outcome: explicit budget failure: {reason}");
-        }
+fn six_variable_breadth_first_basis_passes_on_both_fields() {
+    for p in [2147483647, 9007199254740881] {
+        let input = fixture(6, p);
+        let report = try_quotient_basis(&input, 6, p).unwrap();
+        assert!(verify_basis(&report, &input));
+        assert_eq!(report.quotient.quotient_dimension, 4);
+        assert_eq!(
+            report.quotient.derivation_depths.iter().copied().max(),
+            Some(3)
+        );
+        eprintln!("six-variable development outcome: complete checked breadth-first basis, p={p}, depths={:?}, basis_degree={}, stored_certificate_product_degree={}, max_stored_basis_proof_terms={}",report.quotient.derivation_depths,report.quotient.basis_polynomial_degree,report.quotient.basis_certificate_product_degree,report.certificates.iter().map(|r|r.proof.len()).max().unwrap_or(0));
     }
 }

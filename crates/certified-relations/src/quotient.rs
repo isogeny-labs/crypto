@@ -21,6 +21,9 @@ pub struct Info {
     pub coordinate_certificates: Vec<Coordinate>,
     pub basis_certificate_product_degree: usize,
     pub basis_polynomial_degree: usize,
+    pub propagation_policy: &'static str,
+    pub coordinate_parents: Vec<Option<usize>>,
+    pub derivation_depths: Vec<usize>,
 }
 fn bounded(row: &Row) -> Result<(), String> {
     let polynomial_degree = degree(&row.poly);
@@ -309,6 +312,19 @@ fn change_order(h: &Row, rules: &[Option<Row>], t: usize, p: u64) -> Result<Vec<
 /// Unsupported shape/zero divisors/budgets return Err; there is no hidden GB
 /// fallback and no use of fixture witnesses or a reference completion oracle.
 pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), String> {
+    solve_impl(inputs, n, p, true)
+}
+/// Explicit legacy scheduling ablation: reuse each coordinate immediately in
+/// the current edge scan. It has the same equations, checks and budgets.
+pub fn solve_input_order(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), String> {
+    solve_impl(inputs, n, p, false)
+}
+fn solve_impl(
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    breadth_first: bool,
+) -> Result<(Vec<Row>, Info), String> {
     if !(3..=8).contains(&n)
         || p < 3
         || inputs.len() > 32
@@ -337,15 +353,19 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), Stri
     let originals = input_rows(inputs, n);
     let mut rules = vec![None; n];
     let mut known = vec![false; n];
+    let mut parents = vec![None; n];
+    let mut depths = vec![0; n];
     known[t] = true;
     loop {
         let mut progressed = false;
+        let wave = known.clone();
         for pair in &pairs {
             let [a, b] = pair.variables;
-            let y = if known[a] && !known[b] {
-                b
-            } else if known[b] && !known[a] {
-                a
+            let available = if breadth_first { &wave } else { &known };
+            let (parent, y) = if available[a] && !known[b] {
+                (a, b)
+            } else if available[b] && !known[a] {
+                (b, a)
             } else {
                 continue;
             };
@@ -368,6 +388,8 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), Stri
                     return Err("quotient: invalid coordinate certificate".into());
                 }
                 rules[y] = Some(row);
+                parents[y] = Some(parent);
+                depths[y] = depths[parent] + 1;
                 known[y] = true;
                 progressed = true;
             }
@@ -379,16 +401,38 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), Stri
             return Err("quotient: disconnected graph or nonunit subresultant".into());
         }
     }
+    // H and every coordinate row have already passed original-input
+    // membership checks. This phase needs their polynomial rewrite only;
+    // provenance of an input's zero remainder is never used as a certificate.
+    let bare = |row: &Row| Row {
+        poly: row.poly.clone(),
+        proof: Proof::new(),
+    };
+    let polynomial_h = bare(&h);
+    let polynomial_rules: Vec<_> = rules.iter().map(|r| r.as_ref().map(bare)).collect();
     for (i, row) in originals.into_iter().enumerate() {
-        if !rewrite(row, &h, &rules, t, p)
-            .map_err(|e| format!("{e}; phase=input-rewrite; input={i}"))?
-            .poly
-            .is_empty()
+        if !rewrite(
+            Row {
+                poly: row.poly,
+                proof: Proof::new(),
+            },
+            &polynomial_h,
+            &polynomial_rules,
+            t,
+            p,
+        )
+        .map_err(|e| format!("{e}; phase=input-rewrite; input={i}"))?
+        .poly
+        .is_empty()
         {
             return Err("quotient: original input not in representation".into());
         }
     }
-    let basis = change_order(&h, &rules, t, p).map_err(|e| format!("{e}; phase=change-order"))?;
+    let basis = change_order(&h, &rules, t, p).map_err(|e| {
+        format!(
+            "{e}; phase=change-order; derivation_depths={depths:?}; coordinate_parents={parents:?}"
+        )
+    })?;
     let reduced = basis.iter().enumerate().all(|(i, r)| {
         r.poly[lead(&r.poly)] == 1
             && r.poly.keys().all(|m| {
@@ -423,6 +467,13 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), Stri
             .max()
             .unwrap_or(0),
         basis_polynomial_degree: basis.iter().map(|r| degree(&r.poly)).max().unwrap_or(0),
+        propagation_policy: if breadth_first {
+            "breadth-first"
+        } else {
+            "input-order"
+        },
+        coordinate_parents: parents,
+        derivation_depths: depths,
     };
     Ok((basis, info))
 }
@@ -431,6 +482,74 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), Stri
 mod tests {
     use super::*;
     use crate::projection::product;
+    #[test]
+    fn polynomial_containment_keeps_full_remainders_and_rejects_nonzero_inputs() {
+        let p = 101;
+        let t = 2;
+        let mut r0 = variable(3, 0);
+        axpy(&mut r0, &variable(3, t), p - 1, p);
+        let mut r1 = variable(3, 1);
+        axpy(&mut r1, &variable(3, t), p - 1, p);
+        axpy(&mut r1, &one(3), p - 1, p);
+        let h = BTreeMap::from([(vec![0, 0, 2], 1), (vec![0, 0, 0], 100)]);
+        let inputs = vec![r0, r1, h];
+        let rows = input_rows(&inputs, 3);
+        let rules = vec![Some(rows[0].clone()), Some(rows[1].clone()), None];
+        let bare = |r: &Row| Row {
+            poly: r.poly.clone(),
+            proof: Proof::new(),
+        };
+        let bare_rules: Vec<_> = rules.iter().map(|r| r.as_ref().map(bare)).collect();
+        for f in inputs.iter().chain(std::iter::once(&one(3))) {
+            let full = rewrite(
+                Row {
+                    poly: f.clone(),
+                    proof: Proof::new(),
+                },
+                &rows[2],
+                &rules,
+                t,
+                p,
+            )
+            .unwrap();
+            let lean = rewrite(
+                Row {
+                    poly: f.clone(),
+                    proof: Proof::new(),
+                },
+                &bare(&rows[2]),
+                &bare_rules,
+                t,
+                p,
+            )
+            .unwrap();
+            assert_eq!(full.poly, lean.poly);
+            if f == &one(3) {
+                assert_eq!(lean.poly, one(3));
+            } else {
+                assert!(lean.poly.is_empty());
+            }
+            assert!(lean.proof.is_empty());
+        }
+    }
+    #[test]
+    fn six_variable_development_basis_fits_unchanged_caps() {
+        for p in [2147483647, 9007199254740881] {
+            let system = workload::generate(p, 6, 7).unwrap().system;
+            let inputs = system.decode().unwrap();
+            let (basis, info) = solve(&inputs, 6, p).unwrap();
+            assert_eq!(info.quotient_dimension, 4);
+            assert_eq!(info.propagation_policy, "breadth-first");
+            assert_eq!(info.derivation_depths.iter().copied().max(), Some(3));
+            assert!(basis.iter().all(|r| r.proof.len() <= PROOF_CAP));
+            assert!(check_reference_legacy(&basis, &inputs, 6, p));
+            if p == 2147483647 {
+                let legacy = solve_input_order(&inputs, 6, p).unwrap_err();
+                assert!(legacy.contains("phase=change-order"));
+                assert!(legacy.contains("[1, 2, 3, 4, 1, 0]"));
+            }
+        }
+    }
     #[test]
     fn missing_rules_fail_and_forged_rules_cannot_pass_final_check() {
         let p = 101;

@@ -72,7 +72,8 @@ fn export(rows: &[CertificateRow], p: u64) -> Result<Vec<Poly>, String> {
 }
 
 /// Try a complete certified quotient basis. This does not call `f4` or a
-/// reference basis oracle. Recognition, graph/unit failures and proof budgets
+/// reference basis oracle. Coordinate propagation uses minimum-depth waves.
+/// Recognition, graph/unit failures and proof budgets
 /// are reported explicitly. Field admission also applies to the 53-bit prime;
 /// that does not extend the regular F4 engine's documented small-prime scope.
 pub fn try_quotient_basis(input: &[Poly], n: usize, p: u64) -> Result<CertifiedBasis, String> {
