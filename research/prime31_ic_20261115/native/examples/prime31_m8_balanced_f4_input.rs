@@ -319,6 +319,28 @@ fn main()->Result<(),String>{
                 "f4":result
             }));
         }
+        // Frozen diagnostic ablations of the *same* six-tower positive ideal.
+        // These are strict subsets, never relation oracles. Their only purpose
+        // is to identify the first reducer causing the remaining S4 stop.
+        let f_known=six_input(&s4(&u,&v,&Polynomial::constant(aux_w.0),
+            &Polynomial::constant(r.0)),&r6)?;
+        let diagnostic_arms:Vec<(&str,Vec<RPoly>)>=vec![
+            ("left_only",vec![left.clone()]),
+            ("right_only",vec![right.clone()]),
+            ("target_only",vec![f_known.clone()]),
+            ("left_plus_right",vec![left.clone(),right.clone()]),
+            ("left_plus_target",vec![left.clone(),f_known.clone()]),
+            ("right_plus_target",vec![right.clone(),f_known.clone()]),
+        ];
+        let mut ablations=Vec::with_capacity(diagnostic_arms.len());
+        for (label,inputs) in diagnostic_arms {
+            if inputs.iter().any(|poly|r6.eval(poly,&known)!=0) {
+                return Err(format!("invalid positive S4 ablation witness: {label}"));
+            }
+            let f4=capped_f4(&inputs,&r6,Some(known.as_slice()))?;
+            ablations.push(json!({"arm":label,"polynomials":inputs.len(),
+                "strict_subset_not_an_oracle":true,"f4":f4}));
+        }
         println!("{}",json!({
             "standing":"[pcc:unverified]",
             "scope":"eight finite fixed-w S4 F4 development calls; no full 961-way search, no root extraction or ECDLP",
@@ -330,7 +352,8 @@ fn main()->Result<(),String>{
             "full_root_catalogue_size":961,
             "original_fixed_s3_bottleneck_dense_entries":26_618,
             "comparability":"only full 961-root/all-branch runs could be a complete oracle",
-            "outcomes":outcomes
+            "outcomes":outcomes,
+            "positive_ideal_ablation_controls":ablations
         }));
         return Ok(());
     }
