@@ -111,6 +111,20 @@ replay remain open. This command does not run a solver or change the
 total-runtime selection. Natural export remains unavailable through this
 command until a completed constructed solver control can gate it.
 
+The follow-on preflight gate checks the exact `a=0`, fixture-0,
+`artifact_store_v3`, `orbit-chain-s3`, K600/m6, hash-policy/seed selection,
+chain limits, 4 GiB cgroup limit, zero swap, no trial/relation/matrix work,
+and null total runtime in the worker config and summary. It also checks the
+outer status, child exit, absence of cap/failure records, and preflight lock
+and worker receipt hashes. The positive synthetic receipt test passes, while
+a fixture change is rejected **even after** the test recomputes the outer
+summary hash. Release example tests pass **6/6** and the production release
+build exits 0 on local macOS arm64 Rust 1.99.1; the new
+[test](preflight-gate-test.log.gz) and [build](preflight-gate-build.log.gz)
+logs are retained separately from the prior version. A real preflight and
+Docker export remain unrun, and this receipt check is not evidence of a
+completed constructed control.
+
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
 

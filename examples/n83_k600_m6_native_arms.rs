@@ -526,6 +526,8 @@ fn preflight_gate(
         sha256_file(&config_path)?,
         sha256_file(&summary_path)?,
     ];
+    let limits = json!({"max_variables":125_000,"max_domain_clauses":350_000,
+        "max_models":1,"conflict_budget":10_000});
     if preflight["schema"] != "n83.k600-m6-native-preflight-lock/v1"
         || preflight["source_commit"] != arm_lock["source_commit"]
         || preflight["image_id"] != arm_lock["image_id"]
@@ -538,6 +540,9 @@ fn preflight_gate(
         || preflight["max_domain_clauses"] != 350_000
         || preflight["max_models"] != 1
         || preflight["conflict_budget"] != 10_000
+        || preflight["memory_mib"] != 4096
+        || preflight["cpu_limit"] != 1
+        || preflight["summands"] != 6
         || outer["schema"] != "n83.k600-m6-native-outer/v1"
         || outer["status"] != "PREFLIGHT_ONLY"
         || outer["worker_exit_code"] != 0
@@ -551,18 +556,55 @@ fn preflight_gate(
         || outer["worker_summary_sha256"] != hashes[3]
         || config["schema"] != "n83.primary-store-chain-config/v1"
         || config["source_commit"] != arm_lock["source_commit"]
+        || config["study"] != "koblitz_n83_factor_base_sweep_20261008"
+        || config["input_kind"] != "artifact_store_v3"
+        || config["curve_a"] != 0
+        || config["fixture"] != 0
+        || config["strategy"] != "orbit-chain-s3"
         || config["max_trials"] != 0
         || config["orbit_columns"] != 600
         || config["summands"] != 6
         || config["policy"] != "public_x_hash"
         || config["seed"] != 2_026_100_801u64
+        || config["chain_s3_limits"] != limits
+        || config["source_attestation_mode"] != "supervised_snapshot"
+        || config["memory_cgroup_limit_bytes"] != 4_294_967_296u64
+        || config["memory_cgroup_swap_limit_bytes"] != 0
         || summary["schema"] != "n83.primary-store-chain/v1"
         || summary["status"] != "PREFLIGHT_ONLY"
+        || summary["study"] != "koblitz_n83_factor_base_sweep_20261008"
+        || summary["input_kind"] != "artifact_store_v3"
+        || summary["curve_a"] != 0
+        || summary["fixture"] != 0
+        || summary["strategy"] != "orbit-chain-s3"
+        || summary["orbit_columns"] != 600
+        || summary["summands"] != 6
+        || summary["policy"] != "public_x_hash"
+        || summary["seed"] != 2_026_100_801u64
         || summary["source_commit"] != arm_lock["source_commit"]
+        || summary["source_attestation_mode"] != "supervised_snapshot"
         || summary["store_name"] != STORE_NAME
+        || summary["object"] != STORE_NAME
         || summary["point_set_blake3"] != POINT_SET
+        || summary["store_manifest_sha256"] != preflight["base_sha256"]["manifest.json"]
+        || summary["chain_s3_limits"] != limits
         || summary["max_trials"] != 0
         || summary["solver_stage_executed"] != false
+        || summary["report"]["trials"] != 0
+        || summary["report"]["relations"] != 0
+        || summary["report"]["sat_calls"] != 0
+        || summary["report"]["matrix_rows"] != 0
+        || !summary["attempt_records"]
+            .as_array()
+            .is_some_and(Vec::is_empty)
+        || !summary["relation_matrix"]
+            .as_array()
+            .is_some_and(Vec::is_empty)
+        || !summary["verified_log"].is_null()
+        || summary["memory_cgroup_limit_bytes"] != 4_294_967_296u64
+        || summary["memory_cgroup_swap_limit_bytes"] != 0
+        || !summary["total_index_calculus_runtime_ms"].is_null()
+        || !summary["selected_best_total_runtime"].is_null()
         || summary["memory_cgroup_peak_bytes"]
             .as_u64()
             .filter(|n| *n > 0 && *n <= 4_294_967_296)
@@ -921,23 +963,44 @@ mod tests {
         let commit = "a".repeat(40);
         let image = format!("sha256:{}", "b".repeat(64));
         let arm = json!({"source_commit":commit,"image_id":image});
+        let limits = json!({"max_variables":125_000,"max_domain_clauses":350_000,
+            "max_models":1,"conflict_budget":10_000});
         let preflight = json!({
             "schema":"n83.k600-m6-native-preflight-lock/v1", "source_commit":commit,
             "image_id":image,"object_sha256":OBJECT_SHA,"point_set_blake3":POINT_SET,
             "store_remote":REMOTE,"store_name":STORE_NAME,"max_trials":0,
             "max_variables":125_000,"max_domain_clauses":350_000,"max_models":1,
-            "conflict_budget":10_000,
+            "conflict_budget":10_000,"memory_mib":4096,"cpu_limit":1,"summands":6,
+            "base_sha256":{"manifest.json":"manifest"},
         });
         let config = json!({
             "schema":"n83.primary-store-chain-config/v1","source_commit":commit,
             "max_trials":0,"orbit_columns":600,"summands":6,
             "policy":"public_x_hash","seed":2_026_100_801u64,
+            "study":"koblitz_n83_factor_base_sweep_20261008",
+            "input_kind":"artifact_store_v3","curve_a":0,"fixture":0,
+            "strategy":"orbit-chain-s3","chain_s3_limits":limits,
+            "source_attestation_mode":"supervised_snapshot",
+            "memory_cgroup_limit_bytes":4_294_967_296u64,
+            "memory_cgroup_swap_limit_bytes":0,
         });
         let summary = json!({
             "schema":"n83.primary-store-chain/v1","status":"PREFLIGHT_ONLY",
             "source_commit":commit,"store_name":STORE_NAME,"point_set_blake3":POINT_SET,
             "max_trials":0,"solver_stage_executed":false,
             "memory_cgroup_peak_bytes":1_048_576u64,
+            "study":"koblitz_n83_factor_base_sweep_20261008",
+            "input_kind":"artifact_store_v3","curve_a":0,"fixture":0,
+            "strategy":"orbit-chain-s3","orbit_columns":600,"summands":6,
+            "policy":"public_x_hash","seed":2_026_100_801u64,
+            "source_attestation_mode":"supervised_snapshot","object":STORE_NAME,
+            "store_manifest_sha256":"manifest","chain_s3_limits":limits,
+            "report":{"trials":0,"relations":0,"sat_calls":0,"matrix_rows":0},
+            "attempt_records":[],"relation_matrix":[],"verified_log":Value::Null,
+            "memory_cgroup_limit_bytes":4_294_967_296u64,
+            "memory_cgroup_swap_limit_bytes":0,
+            "total_index_calculus_runtime_ms":Value::Null,
+            "selected_best_total_runtime":Value::Null,
         });
         let lock_path = root.join("preflight-lock.json");
         let config_path = worker.join("config.json");
@@ -954,7 +1017,16 @@ mod tests {
         });
         write_new_json(&run.join("outer.json"), &outer).unwrap();
         preflight_gate(&arm, &lock_path, &run).unwrap();
-        fs::write(&summary_path, b"changed").unwrap();
+        let mut wrong_summary = summary;
+        wrong_summary["fixture"] = json!(1);
+        fs::write(&summary_path, serde_json::to_vec(&wrong_summary).unwrap()).unwrap();
+        let mut changed_outer = outer;
+        changed_outer["worker_summary_sha256"] = json!(sha256_file(&summary_path).unwrap());
+        fs::write(
+            run.join("outer.json"),
+            serde_json::to_vec(&changed_outer).unwrap(),
+        )
+        .unwrap();
         assert!(preflight_gate(&arm, &lock_path, &run).is_err());
         fs::remove_dir_all(root).unwrap();
     }
