@@ -2,17 +2,18 @@
 
 ## Timing and verification scope
 
-The source/theorem searches and prospective scope commits preceded the Lean
-implementation. The required lean-instance-gate six-field writeup and assembly
-probe were completed after the builds, during final review. This timing does
+For A1/A2, the source/theorem searches and prospective scope commits preceded
+the Lean implementation. The required lean-instance-gate six-field writeup
+and assembly probe were completed after the builds, during final review. This timing does
 not satisfy the skill's pre-edit ordering and is recorded as a process gap,
 not a preregistration. No source or failed diagnostic is replaced to hide it.
 The mathematical source/axiom gates are separate completed checks.
 
 Lean4.35.0; Mathlib cfc55fc58714a59dc06e6e79edc6d1d95140d3c2. Shared
-coverage source2e4b08b, secant source867527c. Exact full pins/hashes are under
-checks/coverage-laws/ and checks/line-laws/. Canonical gates134/141theorems,
-0failures and0trusted native exceptions, respectively. Full audit inventories
+coverage source2e4b08b, secant source867527c, subset Fourier source5b7a9d2.
+Exact full pins/hashes are under checks/coverage-laws/, checks/line-laws/ and
+checks/interval-laws/. Canonical gates134/141/149theorems,0failures and
+0trusted native exceptions, respectively. Full audit inventories
 name every theorem and its transitive standard axioms. These are local proof
 checks; all PCC statements remain unverified without signed verdicts.
 [pcc:unverified]
@@ -162,3 +163,28 @@ definition; its owning Parseval/triple assembly lemmas open it to connect
 with existing orthogonality. No curve equation, character internals or
 external analytic bound is unfolded or axiomatized. The consumer will apply
 the resulting endpoint rather than copying the finite Fourier proof.
+
+### A3 actual result and remaining bridge
+
+At5b7a9d2a9a2638a1251a805d20d31349c35fa904 the generic actual-subset
+energy, Parseval and triple identities and both deviation endpoints pass.
+Canonical all-source/axiom gate:149theorems,0failures,0trusted native.
+The module contributes8audited declarations including2definition equations;
+all six named laws' axiom prints list only propext, Classical.choice and
+Quot.sound. Claims730397/ab6d22 remain unverified. [pcc:unverified]
+
+The pre-edit floor-law probe passes. The final endpoint probe applies the
+same law to generic subsets and Mathlib's actual Weierstrass affine-point
+group, with finiteness/flatness explicit. Both probe sources/logs and all four
+build versions are in checks/interval-laws/. Build001's sum-binder/cast issue
+and003's cancellation-lemma-shape failure are retained;002and004pass their
+respective targets. No endpoint was weakened or limit raised. The runtime
+has no lean4checker executable, so no separate --fresh checker pass is claimed.
+[pcc:unverified]
+
+The full curve application is still partial formalization: the inspected
+Mathlib modules do not contain the Kohel--Shparlinski elliptic character
+estimate/interval L1 theorem, and this source does not formalize those
+analytic proofs or the actual solver's output law. INTERVAL-JOINS.md uses
+these as cited external hand bridges. The finite-group theorem is not a
+formal proof of all elliptic interval selectors or their costs.

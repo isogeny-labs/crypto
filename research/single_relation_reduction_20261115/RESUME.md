@@ -39,13 +39,24 @@ PR14merged asf13359f. Hosted43742865652 has zero steps and the billing-lock
 annotation. Claim6186b7 is unverified. The probability/cost consequence is
 hand-derived, with explicit scope limits.
 
-The next algorithmic question is an adaptive coordinate-aware partial join
-with cheaply enumerable candidates and controlled distributions at every
-level, or another explicit selector mechanism. No such construction is
-supplied. Reusing a generic meet-in-the-middle backend or producing an
-existence count does not fill this contract. Read Wagner2002 sections2--3
-and the ROS subsection4 before proposing a birthday-tree transfer; its scalar
-ROS application is not an ECDLP solver.
+A3 checks implicit intervals in INTERVAL-JOINS.md. For independent uniform
+points in an abscissa interval of density1/b, the return probability is
+asymptotic to1/b, refuting near-certain retention in that model. The actual
+finite-group subset deviation at5b7a9d2passes canonical gate149/0/0, with
+pre-edit and final generic/actual-point-group assembly probes. Claims730397/
+ab6d22 are unverified. The elliptic analytic estimate and sampling law remain
+hand/external bridges; correlated/adaptive selectors are not ruled out.
+Shared PR15merged as56a7aec5; hosted43746326008has zero steps and the
+explicit billing-lock annotation. All four builds and source hashes are
+retained in checks/interval-laws/. No fresh lean4checker executable is present.
+
+The next algorithmic question is a constructive coordinate-aware join with
+cheaply enumerable candidates and its actual distributions controlled at
+every level, or another explicit selector mechanism. No such construction
+is supplied. Support membership alone does not justify independent uniform
+outputs. Read the exact three selector assessments and Wagner2002 sections
+2--3/ROS subsection4 before a birthday-tree transfer; its scalar ROS
+application is not an ECDLP solver.
 
 PROOF-MAP.md records actual inherited laws, hypotheses and partial formal
 scope. The assembly probe and explicit axiom prints pass, but the six-field
@@ -62,18 +73,21 @@ last labelled point to close a relation gives alpha=beta=0and is not a solver.
 PR4311is regular on main; enable auto-merge after the final handoff push.
 Review actual final-head validation/size/artifact/PCC checks, without carrying
 earlier passes forward. Normal unchanged-head cadence is about50minutes.
-Current main advanced toe0e3725bac with unrelated LA/GPU work. PR4311is dirty;
+Current main advanced to44ac88c807 with unrelated LA/GPU and isogeny studies.
+Its ledger remains a prefix; the daily journal has additional incoming work.
+PR4311is dirty;
 one Copilot request comment6898455027 is pending. Freeze the conflicted daily
 journal until a response or the documented no-response fallback; keep both
 complete histories and multiplicities. Other study files may progress.
 PCC history stays append-only; no force push or ledger rechain.
 
-A one-time safety-net PR follow-up is scheduled for18:41:51Z under the
+A one-time safety-net PR follow-up was scheduled for18:41:51Z under the
 standing check-in instruction. It inherits the source environment selection;
 the service did not expose concrete environment details, so this is not a
 receipt that the future command has executed. Avoid duplicate journal
-resolvers. A3 now scopes implicit coordinate-interval closure; its prospective
-six-field proof plan precedes any new Lean edit. The original numerical
+resolvers. Re-arm to about50minutes after the final A3 push, under the same
+standing cadence, and record the actual returned time. A3's prospective
+six-field proof plan and floor probe precede its first Lean edit. The original numerical
 checkpoint capability recheck still finds no AWS CLI/ambient pair or upload
 token file/environment; no failed upload gate was repeated.
 

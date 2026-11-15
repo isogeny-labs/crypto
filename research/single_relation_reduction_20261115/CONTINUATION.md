@@ -117,7 +117,7 @@ page; condensed its repeated steps to four boxes, regenerated three pages
 and inspected all of them. No mathematical statement, numeric cap or input
 was changed to get a pass.
 
-## 2026-11-15T18:08Z
+## 2026-11-15T18:05:53Z
 
 ### What was done (commands, files, features)
 
@@ -150,3 +150,51 @@ frozen under the sole Copilot request until its response/fallback condition.
 Capability recheck still finds no AWS CLI, ambient key pair, checkpoint token
 file or token environment. Did not repeat the unchanged upload failure or
 run the frozen native panel. No A3 probe error or proof-limit change.
+
+## 2026-11-15T18:30:07Z
+
+### What was done (commands, files, features)
+
+A3 shared source5b7a9d2checks actual subset energy/Parseval/triple identities
+and both flatness-conditioned deviation endpoints. Canonical full gate:
+149theorems/0failures/0trusted native. The final assembly applies the same
+endpoint unchanged to an actual Mathlib affine-point group with explicit
+finiteness/flatness; all named laws print only standard axioms. Shared PR15
+merged as56a7aec5. Hosted43746326008ran zero steps and reports the billing
+lock. The runtime has no lean4checker. Complete four-build/gate/probe/source
+receipts and primary PDF hashes are retained. Claims730397/ab6d22 remain
+unverified. All four PDF pages and three diagrams were rendered/inspected.
+
+### Decisions made (and why)
+
+The generic conditional count endpoint is checked. Keep the elliptic analytic
+estimate and sampling interpretation as explicit external/hand bridges. The
+uniform-subset return result refutes the proposed near-certain retention in
+that model; it does not rule out correlated/adaptive interval selectors or
+supply a fast enumerator. No native numerical case or paid job was run.
+
+### Open threads (unfinished, pick up next time)
+
+Current main44ac88c807 adds unrelated isogeny/LA/GPU work and journal entries;
+its PCC ledger stays a prefix. The sole Copilot journal request is17:31:48Z,
+comment6898455027. Keep the daily journal frozen until response or the
+documented no-response fallback. The safety-net check was18:41:51Z; re-arm
+after the final substantive push under the standing50minute cadence. The
+effective capped selector/cost/yield contract remains the algorithmic gap;
+the frozen multiprecision panel still needs checkpoint upload access.
+
+### Errors (what went wrong, how it was handled)
+
+Fourier build001 exposed a finite-sum binder/cast mismatch;003 used an
+outdated cancellation-lemma shape. Exact statements/failures are preserved;
+004passes without weaker endpoints or raised limits. The first shared PR15
+body lint flagged the untagged phrase 'not re-proved'; a sequential tool
+orchestrator still invoked create without checking the nonzero exit. Retained
+first/final bodies, corrected/linted the body and updated it before enabling
+auto-merge. The consumer publication now explicitly gates mutations on exit0.
+Record this coupling failure as a candidate operational lesson, not a false
+confirmation that the original sequence was gated. An A3 report insertion
+matched an early repeated tag; moved the section after A2. A literal Typst
+tilde rendered as a space; changed it to the intended Unicode relation and
+re-rendered page4, with pages1--3 byte-identical to their inspected renders.
+[pcc:unverified]

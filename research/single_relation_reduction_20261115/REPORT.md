@@ -208,3 +208,22 @@ Adaptive slopes and other join algorithms are outside this conclusion.
 The probability/cost argument is a hand derivation; actual curve-fibre counts
 are a separate shared formal target. No native numerical case is run.
 [pcc:unverified]
+
+## A3. Implicit intervals and the uniform-list assumption
+
+[INTERVAL-JOINS.md](INTERVAL-JOINS.md) checks the proposed near-certain
+retention of old abscissa constraints for independent uniform subset points.
+For a finite group subset S with nontrivial character sums bounded by M,
+the actual triple count satisfies |T(S)-s^3/r|<=M*s. Shared source5b7a9d2
+checks this generic conditional endpoint; its canonical source/axiom gate
+audits149theorems/0failures/0trusted-native exceptions. All four builds and
+pre-edit/final assembly probes are retained in checks/interval-laws/.
+Claims730397/ab6d22 are unverified. [pcc:unverified]
+
+For a full prime-order elliptic group in characteristic>3, the cited
+Kohel--Shparlinski x-coordinate and interval estimates give
+M=1+4sqrt(p)(1+ln p). At interval density1/b with b=2^(O(sqrt(log2 r))), the
+return probability is asymptotic to1/b. This refutes near-certain retention
+in that independent uniform model. The curve analytic input and actual
+sampling law remain external/hand bridges; no conclusion for all interval,
+correlated-list or adaptive selectors is claimed. [pcc:unverified]

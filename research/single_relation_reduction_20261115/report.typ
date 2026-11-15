@@ -109,3 +109,41 @@ and the retrospective instance-gate timing gap.
 Sources: Wagner2002 full author version, sections2–3 and the scalar ROS
 subsection4; Sutherland, MIT18.783 Spring2013 Lecture2, section2.1.2.
 SELECTOR-JOINS.md gives the full derivation, controls and exact limitations.
+
+#pagebreak()
+#text(size:16pt,weight:"bold")[Implicit intervals: checking retention]
+#v(7pt)
+A large coordinate interval has a short description, so the small explicit
+slope-family bound does not settle it. The next check asks whether old
+interval constraints survive addition. Its model is two independent uniform
+points in the interval point set; support membership alone does not establish
+that model for a solver's selected outputs.
+
+#align(center)[#image("intervals.svg",width:78%)]
+
+Take a nonsingular short-Weierstrass E over F_p, p>3, whose full group has
+prime order r. Set S={P≠O:x(P)∈I} for an abscissa interval I. The cited
+character and interval estimates give the explicit safe input
+#raw("M = 1 + 4*sqrt(p)*(1+ln p)",block:true)
+and s∼r/b for |I|=floor(p/b), with b=2^(O(sqrt(log2 r))) growing.
+The bound M/s is o(1/b), hence the return rate is (1+o(1))/b.
+
+This refutes near-certain retention in that independent uniform subset
+model. It prevents importing the XOR tree's automatic retention of old bits
+without a new argument. The early identity probability is 1/s, also small.
+Correlated/adaptive lists, other filters and actual join-enumeration costs
+remain outside this inference; no general interval-selector lower bound is
+claimed.
+
+*Formal evidence.* Shared source 5b7a9d2 checks the finite-group energy,
+Parseval, actual triple counts and flatness-conditioned deviation. The
+canonical all-source/axiom gate audits 149 theorems, 0 failures, 0 trusted
+native exceptions. Four builds and both assembly probes are retained.
+The curve's analytic character estimate and sampling law remain external
+hand bridges; no analytic axiom was inserted. Claims730397/ab6d22 are
+unverified. This A3 inheritance plan and floor probe preceded its first edit.
+
+Sources: Kohel–Shparlinski, ANTS-IV2000, sections3–4; Kim–Tibouchi,
+NutMiC2019 conference manuscript, section2/Lemma3.1. Only f=x with pole order2
+and p>3 is used, with trivial character terms handled separately.
+INTERVAL-JOINS.md contains the proof, controls and limits.

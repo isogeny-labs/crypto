@@ -77,3 +77,20 @@ PROOF-MAP.md and the assembly probe document inheritance and the missing
 full probability/cost bridges. The instance-gate writeup was completed after
 the proof builds, a recorded ordering failure; do not label it prospective.
 Original failed builds and immutable source/gate identities are retained.
+
+A3 scope/proof-map38ae306f73 and floor probe4cab4d5c88 precede its first
+generic edit. Shared source5b7a9d2checks actual subset Parseval/triple counts
+and an explicit-flatness deviation bound; canonical gate149/0/0passes.
+Complete four-build/gate receipts and the generic/actual affine-point-group
+assembly probe are copied under checks/interval-laws/. Shared PR15merged
+as56a7aec51b80be1f8f42eb3f5c2cd1979744367a. Hosted43746326008ran zero
+steps and reports the explicit billing lock. Claims730397/ab6d22 remain
+unverified. The runtime has no lean4checker, so no --fresh pass is asserted.
+[pcc:unverified]
+
+INTERVAL-JOINS.md applies external elliptic character estimates only to x in
+characteristic>3, with trivial character terms separate. It refutes a
+near-certain-retention assumption for independent uniform interval points,
+not every interval/correlated/adaptive selector. The full analytic/sampling
+bridge is not formalized. All four PDF pages and three editable diagrams
+were rendered/inspected. No native numerical case or paid job. [pcc:unverified]

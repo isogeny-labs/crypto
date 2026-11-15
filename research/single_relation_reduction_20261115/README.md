@@ -6,7 +6,7 @@ It removes auxiliary setup/final matrix work but does not supply a fast
 selector or meet the complete subexponential algorithm criterion.
 PCC-20261115-3dfae3 remains unverified. [pcc:unverified]
 
-Read the [three-page report](report.pdf), starting at page1, and its editable
+Read the [four-page report](report.pdf), starting at page1, and its editable
 [diagram](pipeline.dot). [SCOPE.md](SCOPE.md) fixes the source/proof boundaries.
 No new native case, measurement or paid job was run. The earlier multiprecision
 qualification remains pending its required checkpoint upload access.
@@ -29,3 +29,11 @@ with a141/0/0canonical gate; conditioning/cost remain hand arguments. Adaptive
 slopes and other joins are outside the conclusion. The [proof map](PROOF-MAP.md)
 records exact hypotheses, inheritance and the retrospective process gap.
 Claim6186b7 remains unverified. [pcc:unverified]
+
+The [implicit-interval check](INTERVAL-JOINS.md) then examines independent
+uniform points in an abscissa interval. Their return rate is near the ambient
+interval density, so old constraints are not retained nearly surely in that
+model. Source5b7a9d2checks the generic flatness-conditioned subset deviation
+with a149/0/0canonical gate. The elliptic analytic input and a solver's output
+law remain hand/external bridges; correlated/adaptive lists are outside the
+inference. Claims730397/ab6d22 are unverified. [pcc:unverified]
