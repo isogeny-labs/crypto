@@ -1,0 +1,38 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-002",
+  "title": "Replace retired curve names in three benchmark READMEs",
+  "class": "ci-repair",
+  "difficulty": 1,
+  "source": [
+    "scripts/check_curve_names.py",
+    ".github/workflows/curve-names.yml",
+    "AGENTS.md section 11",
+    "benchmarks/20261113-ic-filter-layout/README.md",
+    "benchmarks/20261114-ic-fold-pack/README.md",
+    "benchmarks/20261114-ic-key-chains/README.md"
+  ],
+  "prompt": "The curve-names check (`python3 scripts/check_curve_names.py`, AGENTS.md section 11) reports retired curve names such as `k0n53` and `k0n61` in the README of the three benchmark entries `benchmarks/20261113-ic-filter-layout`, `benchmarks/20261114-ic-fold-pack` and `benchmarks/20261114-ic-key-chains`. Fix those three files using the repository's own tooling. Do not touch other files. The check reports hundreds of other problems elsewhere; they are out of scope.",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- benchmarks/20261113-ic-filter-layout/README.md benchmarks/20261114-ic-fold-pack/README.md benchmarks/20261114-ic-key-chains/README.md benchmarks/20261115-ic-scan-vfilter/README.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
+  "acceptance": [
+    "no line of the form `^benchmarks/2026[0-9]{4}-[^/]+/README.md` appears in the output of scripts/check_curve_names.py",
+    "only the four named READMEs changed",
+    "every changed line differs from the original only by curve-name substitution (added lines == removed lines, numbers unchanged)"
+  ],
+  "check_command": "! python3 scripts/check_curve_names.py 2>&1 | grep -qE '^benchmarks/2026[0-9]+-[a-z-]+/README.md' && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vcE '^benchmarks/(20261113-ic-filter-layout|20261114-ic-fold-pack|20261114-ic-key-chains|20261115-ic-scan-vfilter)/README.md$')\" = 0 ] && git diff --numstat \"$T_BASE\" HEAD | awk '{a+=$1;d+=$2} END{exit !(a==d && a>0)}'",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "rewriting any measured number, ratio or conclusion in the READMEs",
+    "hand-writing a slug that is not the one the checker prints"
+  ],
+  "max_wall_minutes": 20,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Real findings on 2026-11-15 (2, 4, 2 and 2 retired-name lines in the four READMEs). The check takes about 26 s."
+}
