@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261114T2215Z-pkm-fd-pfd-b-rp",
+  "latest_record": "20261115T1729Z-ic-huge-pages-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
-    "censored": 6,
+    "censored": 7,
     "invalid": 4,
-    "measured": 191,
+    "measured": 194,
     "open": 1
   },
   "repo": "crypto",
@@ -4057,6 +4057,75 @@
     },
     {
       "better": "lower",
+      "first": 975.0,
+      "latest": 975.0,
+      "latest_derived": {},
+      "metric": "ic_la_echelon_band_w1_r37_f4096",
+      "points": [
+        {
+          "commit": "9f8feeace6a1",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 2,
+          "record": "20261115T1647Z-ic-la-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Linear algebra for m=3 rootfind-subtract at |F_x| 2048/4096 on 34-38-bit prime_explicit curves (local L0, counts deterministic): incremental-gauss-echelon needs 0.10-0.15x the row_ops of incremental-gauss (structured-gauss 0.25-0.30x) with identical trials, relations, logarithm and S in all 24 comparisons; 42/42 verified and replayed. \u00a75a band: 1.03-1.87x cheaper at w=0.1, 1.15-4.46x at w=1; S unchanged at w=0. Run through benchrec run.",
+          "value": 975.0
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 46505346.0,
+      "latest": 46505346.0,
+      "latest_derived": {},
+      "metric": "ic_la_echelon_row_ops_r37_f4096",
+      "points": [
+        {
+          "commit": "9f8feeace6a1",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 2,
+          "record": "20261115T1647Z-ic-la-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Linear algebra for m=3 rootfind-subtract at |F_x| 2048/4096 on 34-38-bit prime_explicit curves (local L0, counts deterministic): incremental-gauss-echelon needs 0.10-0.15x the row_ops of incremental-gauss (structured-gauss 0.25-0.30x) with identical trials, relations, logarithm and S in all 24 comparisons; 42/42 verified and replayed. \u00a75a band: 1.03-1.87x cheaper at w=0.1, 1.15-4.46x at w=1; S unchanged at w=0. Run through benchrec run.",
+          "value": 46505346.0
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.148,
+      "latest": 0.148,
+      "latest_derived": {},
+      "metric": "ic_la_echelon_row_ops_ratio_max",
+      "points": [
+        {
+          "commit": "9f8feeace6a1",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 12,
+          "record": "20261115T1647Z-ic-la-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Linear algebra for m=3 rootfind-subtract at |F_x| 2048/4096 on 34-38-bit prime_explicit curves (local L0, counts deterministic): incremental-gauss-echelon needs 0.10-0.15x the row_ops of incremental-gauss (structured-gauss 0.25-0.30x) with identical trials, relations, logarithm and S in all 24 comparisons; 42/42 verified and replayed. \u00a75a band: 1.03-1.87x cheaper at w=0.1, 1.15-4.46x at w=1; S unchanged at w=0. Run through benchrec run.",
+          "value": 0.148
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 0.004,
       "latest": 0.004,
       "latest_derived": {},
@@ -4150,6 +4219,29 @@
           "spread": null,
           "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
           "value": 3.238
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 3.38,
+      "latest": 3.38,
+      "latest_derived": {},
+      "metric": "ic_rf2_native_relation_s_r30_f4096",
+      "points": [
+        {
+          "commit": "2ec4187be0c0",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T1740Z-ic-native-sweep",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu worker=native (the Rust sweep on a 4-thread rayon pool) on a 4-thread VM, L0: 80/80 verified and replayed, 48 identity checks equal S/relations/logarithm/ledger. Relation phase 2.2-3.3x one thread and 0.99-1.11x the C++ emulation arm (prediction >=1.5x failed); threads=1 control 0.56-0.93x one thread (batch sweeps). S unchanged, 106-24637x matched rho. Run through benchrec run.",
+          "value": 3.38
         }
       ],
       "problem": "ic-gpu-kernels",
@@ -4381,6 +4473,29 @@
           "spread": null,
           "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
           "value": 0.368
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.534,
+      "latest": 0.534,
+      "latest_derived": {},
+      "metric": "ic_rf3_native_relation_s_r35_f2048",
+      "points": [
+        {
+          "commit": "2ec4187be0c0",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T1740Z-ic-native-sweep",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu worker=native (the Rust sweep on a 4-thread rayon pool) on a 4-thread VM, L0: 80/80 verified and replayed, 48 identity checks equal S/relations/logarithm/ledger. Relation phase 2.2-3.3x one thread and 0.99-1.11x the C++ emulation arm (prediction >=1.5x failed); threads=1 control 0.56-0.93x one thread (batch sweeps). S unchanged, 106-24637x matched rho. Run through benchrec run.",
+          "value": 0.534
         }
       ],
       "problem": "ic-gpu-kernels",
@@ -8895,6 +9010,214 @@
     },
     {
       "better": "neutral",
+      "first": 0.9936946952799995,
+      "latest": 0.9936946952799995,
+      "latest_derived": {},
+      "metric": "admitted_aa_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.954487109266288,
+            1.0697512852050381
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 0.9936946952799995
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.9906579495433447,
+      "latest": 0.9906579495433447,
+      "latest_derived": {},
+      "metric": "admitted_aa_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9737560669867515,
+            1.011154533720109
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 0.9906579495433447
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0760358449579497,
+      "latest": 1.0760358449579497,
+      "latest_derived": {},
+      "metric": "admitted_off_over_on_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0097799250013855,
+            1.1131916383044216
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0760358449579497
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0837492033947118,
+      "latest": 1.0837492033947118,
+      "latest_derived": {},
+      "metric": "admitted_off_over_on_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0734194861786328,
+            1.1082477784940377
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0837492033947118
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.0252541002390572,
+      "latest": 1.0252541002390572,
+      "latest_derived": {},
+      "metric": "build_aa_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9774596548399014,
+            1.1089481879287586
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0252541002390572
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.0098062333040732,
+      "latest": 1.0098062333040732,
+      "latest_derived": {},
+      "metric": "build_aa_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9614583085972014,
+            1.0281545593206398
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0098062333040732
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0754475156152812,
+      "latest": 1.0754475156152812,
+      "latest_derived": {},
+      "metric": "build_off_over_on_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0307037348992043,
+            1.1183700438445452
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0754475156152812
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0355998892293097,
+      "latest": 1.0355998892293097,
+      "latest_derived": {},
+      "metric": "build_off_over_on_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9905253391327046,
+            1.0720848200558946
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0355998892293097
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
       "first": 9.375174351789854,
       "latest": 9.375174351789854,
       "latest_derived": {},
@@ -9128,6 +9451,318 @@
       ],
       "problem": "ic:koblitz_setup_phase",
       "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 0.9975502951567751,
+      "latest": 0.9975502951567751,
+      "latest_derived": {},
+      "metric": "collect_aa_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9880771348656641,
+            1.029646220134441
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 0.9975502951567751
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.9868535955289628,
+      "latest": 0.9868535955289628,
+      "latest_derived": {},
+      "metric": "collect_aa_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9619806823821148,
+            1.0138080977171033
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 0.9868535955289628
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0288942306773046,
+      "latest": 1.0288942306773046,
+      "latest_derived": {},
+      "metric": "collect_off_over_on_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0014300876699684,
+            1.0656469438857197
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0288942306773046
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0467990415670427,
+      "latest": 1.0467990415670427,
+      "latest_derived": {},
+      "metric": "collect_off_over_on_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0250381802837005,
+            1.0710539245572663
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0467990415670427
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.007316210958665,
+      "latest": 1.007316210958665,
+      "latest_derived": {},
+      "metric": "filter_aa_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.956932559985951,
+            1.0495881660545323
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.007316210958665
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.9857451205160304,
+      "latest": 0.9857451205160304,
+      "latest_derived": {},
+      "metric": "filter_aa_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9493377912363832,
+            1.0164374078053333
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 0.9857451205160304
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0667210747209819,
+      "latest": 1.0667210747209819,
+      "latest_derived": {},
+      "metric": "filter_off_over_on_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9894334863013007,
+            1.0861092980702935
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0667210747209819
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.1157391391895075,
+      "latest": 1.1157391391895075,
+      "latest_derived": {},
+      "metric": "filter_off_over_on_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0982633020516266,
+            1.1743050690650239
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.1157391391895075
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.018536182234212,
+      "latest": 1.018536182234212,
+      "latest_derived": {},
+      "metric": "setup_aa_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9960499188903091,
+            1.111428052828853
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.018536182234212
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.9930865502835435,
+      "latest": 0.9930865502835435,
+      "latest_derived": {},
+      "metric": "setup_aa_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9640665241595734,
+            1.0192791048915526
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 0.9930865502835435
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0546058553084412,
+      "latest": 1.0546058553084412,
+      "latest_derived": {},
+      "metric": "setup_off_over_on_k0n53",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 23,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0173272018833923,
+            1.0737752933483873
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0546058553084412
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0400940958652325,
+      "latest": 1.0400940958652325,
+      "latest_derived": {},
+      "metric": "setup_off_over_on_k0n61",
+      "points": [
+        {
+          "commit": "35eb722035ac",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T1729Z-ic-huge-pages-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.027181593474149,
+            1.0702909337050628
+          ],
+          "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
+          "value": 1.0400940958652325
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
     },
     {
       "better": "lower",
