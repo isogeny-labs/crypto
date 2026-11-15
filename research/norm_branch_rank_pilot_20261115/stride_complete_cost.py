@@ -127,6 +127,7 @@ def sign_recover(target,table,step,stride):
         q=meter.add(q,step)
     raise RuntimeError('signed search failed')
 
+
 def lift(z):
     f=(z*z*z+A*z+B)%P
     if not f: return None
