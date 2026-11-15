@@ -42,3 +42,21 @@ Outputs in `runs_lp/`. Numbers [pcc:unverified].
 - The large-prime variant costs about p^0.48, the same class as rho. The gap stays at about 2x instead of growing, which is 4-7x fewer group operations than plain IC at these sizes [pcc:unverified].
 - It still does not beat rho. The best n is tiny (2-4), and almost every relation comes from leftover-point collisions. At that point it is a birthday-collision algorithm with an almost empty factor base, so it is bound by the generic sqrt(p) limit (Shoup) like rho. The remaining factor of about 2 is a constant: rho takes one addition per step, while this pays 2n additions per target.
 - Every log was checked correct. Across 45 runs (3 primes, 3 curves, 5 values of n) the solver retried 6 times. Rho has no negation map here; adding one would widen the gap by about sqrt(2).
+
+## Stronger rho reference, minimal slack, and the triple-large-prime question (2026-11-15)
+
+Two stronger rho arms (`ic_mt.py`, always run): `rho_store` stores every visited
+point and solves at the first repeat, with no cycle-detection overhead.
+`rho_store_neg` also matches +-X on x-coordinate (the negation-map gain). LP-IC
+now runs with `--slack=1` (collect n + 1 relations, not n + 5). Outputs in
+`runs_lp_slack1/`; mean of 3 curves; numbers [pcc:unverified].
+
+| p | sqrt r | rho Brent | rho store | rho store+neg | LP-IC best (n) | vs store+neg | vs Brent |
+|---|---|---|---|---|---|---|---|
+| 10007 | 100 | 162 | 129 | 91 | 220 (1) | 2.40 | 1.35 |
+| 100003 | 316 | 500 | 382 | 350 | 755 (1) | 2.15 | 1.51 |
+| 1000003 | 1000 | 1751 | 1500 | 871 | 1985 (4) | 2.28 | 1.13 |
+
+- Against the strongest rho reference the gap is about 2.2-2.4x and does not shrink with p [pcc:unverified]. The earlier "~2x" was measured against the weaker Brent rho.
+- The constant matches a count. At n = 1, each target costs 3 additions (1 walk step, 2 leftovers) and yields 2 stored points, so 1.5 additions per point. It also needs n + 1 = 2 collisions instead of rho's 1, a factor of sqrt(2) in a birthday search. So 1.5 x sqrt(2) is about 2.1. As n goes to 0 the method becomes `rho_store_neg`, so in this generic setting it can approach strong rho but not pass it [pcc:unverified].
+- Triple (and double) large primes are not tested, because they have no meaningful generic analogue here. In Gaudry/Thériault-style methods, large primes are elements of a bounded larger set (for example x < B2) that the decomposition can target algebraically. Here decomposition is a hash join, so leftovers are arbitrary points, and the single-large-prime variant already uses every one. Multi-way variants would need 3-way collisions (L1 + L2 + L3 = O), which take more points than pairwise birthday collisions in a prime-order group. A bounded large-prime set would make only a B2/p fraction of leftovers usable, which is strictly worse. Triple large primes pay off only where decomposition is algebraic and fast, as with Weil descent over F_{q^n}.

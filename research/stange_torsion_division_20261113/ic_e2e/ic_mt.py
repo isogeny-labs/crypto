@@ -3,6 +3,7 @@ both counted in elliptic-curve point additions (group ops) on the same prime-ord
 Exploratory; not a bench.record run. Usage: ic_mt.py p seed n1,n2,...  (n = factor-base size)"""
 import sys, random, json, math, time
 p=int(sys.argv[1]); SEED=int(sys.argv[2]); NS=[int(v) for v in sys.argv[3].split(',')]; LP='--lp' in sys.argv
+SLACK=next((int(a.split('=')[1]) for a in sys.argv if a.startswith('--slack=')),5)
 rng=random.Random(SEED)
 def legendre(a): a%=p; return 0 if a==0 else (1 if pow(a,(p-1)//2,p)==1 else -1)
 def isprime(n): return n>1 and all(n%k for k in range(2,int(n**.5)+1))
@@ -61,6 +62,23 @@ def rho():
         H,ha,hb=step(H,ha,hb); lam+=1
     if (hb-tb)%r==0: return None,OPS[0]
     return (ta-ha)*pow(hb-tb,-1,r)%r, OPS[0]
+def rho_store(negmap):
+    # r-adding walk storing every visited point; first repeat (or x-repeat with negation matching) solves the DLP
+    OPS[0]=0
+    K=20; coef=[(rng.randrange(r),rng.randrange(r)) for _ in range(K)]
+    M=[add(mul(a,P),mul(b,Q)) for a,b in coef]; OPS[0]=0
+    a,b=rng.randrange(r),rng.randrange(r); X=add(mul(a,P),mul(b,Q)); OPS[0]=0
+    seen={}
+    while True:
+        key=X[0] if negmap else X
+        if key in seen:
+            a0,b0,X0=seen[key]
+            if X0==X: da,db=(a0-a)%r,(b-b0)%r          # a0P+b0Q = aP+bQ
+            else:     da,db=(-a0-a)%r,(b+b0)%r         # a0P+b0Q = -(aP+bQ)
+            if db: return da*pow(db,-1,r)%r, OPS[0]
+            return None, OPS[0]
+        seen[key]=(a,b,X)
+        i=hash(X)%K; X=add(X,M[i]); a=(a+coef[i][0])%r; b=(b+coef[i][1])%r
 # ---------- index calculus with hash-table 3-decomposition ----------
 def ic(n, lp=False):
     OPS[0]=0
@@ -80,7 +98,7 @@ def ic(n, lp=False):
     K=20; coef=[(rng.randrange(r),rng.randrange(r)) for _ in range(K)]
     sv=OPS[0]; M=[add(mul(a,P),mul(b,Q)) for a,b in coef]; OPS[0]=sv
     a,b=rng.randrange(r),rng.randrange(r); sv=OPS[0]; R_=add(mul(a,P),mul(b,Q)); OPS[0]=sv
-    rows=[]; targets=0; need=n+5; partial={}; nlp=0; retries=0
+    rows=[]; targets=0; need=n+SLACK; partial={}; nlp=0; retries=0
     while True:
         while len(rows)<need:
             k=rng.randrange(K); R_=add(R_,M[k]); a=(a+coef[k][0])%r; b=(b+coef[k][1])%r; targets+=1
@@ -132,13 +150,19 @@ def ic(n, lp=False):
             lam=Mx[i][n:]
             sa=sum(l*rows[k][1] for k,l in enumerate(lam))%r; sb=sum(l*rows[k][2] for k,l in enumerate(lam))%r
             if sb: return (-sa*pow(sb,-1,r))%r, table_ops, walk_ops, targets, len(rows), nlp, retries
-        need+=5; retries+=1   # no usable dependency yet: collect more relations (ops keep counting)
+        need+=max(1,SLACK); retries+=1   # no usable dependency yet: collect more relations (ops keep counting)
         if retries>50: return None, table_ops, OPS[0]-table_ops, targets, len(rows), nlp, retries
 out={'p':p,'r':r,'seed':SEED,'curve':[A,B]}
 rr=[]
 for _ in range(5):
     wr,ops=rho(); assert wr is None or wr==w, 'rho wrong'; rr.append(ops)
 out['rho_ops_mean']=sum(rr)/len(rr); out['rho_ops_runs']=rr; out['sqrt_r']=math.isqrt(r)
+for nm,ng in (('rho_store',False),('rho_store_neg',True)):
+    v=[]
+    for _ in range(5):
+        wr,ops=rho_store(ng); assert wr is None or wr==w, nm+' wrong'; v.append(ops)
+    out[nm+'_ops_mean']=sum(v)/len(v); out[nm+'_ops_runs']=v
+out['slack']=SLACK
 out['ic']=[]
 for n in NS:
     t0=time.time(); wi,to,wo,tg,nr,nl,rt=ic(n, LP)
