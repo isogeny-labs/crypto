@@ -1,7 +1,6 @@
 // Fixed first end-to-end integration control; production recovery is reused.
-#define main preserved_core_cli_main
+#define NORM_CORE_NO_MAIN
 #include "../norm_core_elimination_20261115/core.cpp"
-#undef main
 int main(int argc,char**argv){
     try{
         if(argc!=3)throw std::invalid_argument("usage: cold PC_BACKEND NEW_ROOT");

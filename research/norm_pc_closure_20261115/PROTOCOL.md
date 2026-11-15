@@ -100,3 +100,12 @@ and2GiB address space; stop on any unknown/mismatch. Replay successful output
 with the independent OpenSSL binary. Capture source/binary hashes beforehand.
 Large evidence uses the existing artifact store; never split a raw round to
 fit Git. No clocks or query counts become comparative performance claims.
+
+Build correction before any cold backend invocation: the driver's attempted
+main-symbol macro conflicts with a nested legacy parser include. Replace it
+with an explicit NORM_CORE_NO_MAIN guard, leaving the standalone core CLI and
+all oracle/recovery logic unchanged. The first wrapper startup created an empty
+cold-001 directory, then failed because no compiled cold build manifest existed.
+No cold candidate or replay ran. Preserve these build/setup logs and use fresh
+cold-002 for the still-single registered cold invocation. No algorithm or cap
+changes and no extra target/call are introduced.
