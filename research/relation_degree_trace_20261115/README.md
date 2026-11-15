@@ -11,7 +11,7 @@ predeclared fresh four-variable cases pass the per-case tenfold rule, with
 These are local producer component observations, pending signed independent
 validation; mature CAS diagnostics are retained separately `[pcc:unverified]`.
 
-[LEADS.md](LEADS.md) records the next bounded work: a direct-quadratic
+[LEAD_STATUS.md](LEAD_STATUS.md) records the next bounded work: a direct-quadratic
 projection with explicit certificates, a selectable strong native baseline,
 and a separately frozen [successor protocol](QPROJECTION_PROTOCOL.md).
 Development checks are under `quadratic-development/`. No successor timing
@@ -23,6 +23,13 @@ maps and the complete basis without a reference-basis oracle. Its
 [future timing protocol](QUOTIENT_SPEED_PROTOCOL.md) uses the best existing
 native route as baseline. No quotient speed ratio has been measured; see
 `quotient-development/` for the checked scope and limits `[pcc:unverified]`.
+
+The algorithms now live in the shared `crates/certified-relations` Rust crate.
+This study reexports that implementation, and the main codebase exposes it
+through `crypto_lib::cryptanalysis::f4_fp::certified`. The default F4 engine
+keeps its existing behavior. `LEADS.md` is the exact frozen early claim subject;
+use LEAD_STATUS.md for current notes. See INTEGRATION_HYPOTHESIS.md for the
+codebase integration hypothesis and qualification scope.
 
 ## Run
 

@@ -10,3 +10,12 @@ proof. Neither the old claim nor its ledger row is edited or promoted.
 The replacement producer statement pins the frozen QPROJECTION_PROTOCOL.md
 instead. Both records remain unverified; no verifier signature is supplied.
 This corrects a producer metadata error and preserves the audit trail.
+
+## Integration correction
+
+The main CI gate later rejected the stale live-path pin, as expected from its
+hash check. Integration restores LEADS.md to the exact originally pinned
+bytes without changing any claim or ledger row. The current evolving note
+is retained separately as LEAD_STATUS.md. The earlier stale-pin account above
+is historical; the original subject now matches its pin again. Its standing
+is still unverified because no independent signature has been supplied.

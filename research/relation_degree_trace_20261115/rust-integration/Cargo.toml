@@ -1,0 +1,11 @@
+[package]
+name = "relation-native-qualification"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+crypto_lib = { package = "crypto", path = "../../..", default-features = false }
+certified-relations = { path = "../../../crates/certified-relations" }
