@@ -108,7 +108,7 @@
 //! The Jacobian arithmetic of `H` ([`HJac`]) is for `deg F = 7`. Point
 //! counting and root finding are brute force: toy primes only.
 
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 
 use super::plane_quartic_pic::{
@@ -117,6 +117,11 @@ use super::plane_quartic_pic::{
 };
 use super::smith_prop24::{chi, deg, inv_mod, peval, Poly, SplitMix64};
 use super::smith_trigonal::{Fp2, Trigonal, XPoint, F2};
+use rand::rngs::StdRng;
+use rand::{Rng, SeedableRng};
+
+use super::chained_transfer::ic_control::Nat;
+use super::genus_ladder::{roots_of, splits_completely, JCurve, JDiv};
 
 // ---------------------------------------------------------------------------
 // F_p and F_p[x] helpers.
@@ -1730,6 +1735,788 @@ pub fn verify_curve(tr: &Trigonal, o: &VerifyOpts) -> Result<CurveReport, String
     Ok(rep)
 }
 
+// ---------------------------------------------------------------------------
+// Counted transfer (study `research/smith_transfer_cost_20261115`).
+//
+// The same map as above with every `F_p` multiplication and inversion of the
+// attacker's work tallied, and without anything of size `p`: no enumeration
+// of points, root finding by `genus_ladder::roots_of`, `J_H` arithmetic by
+// `genus_ladder::JCurve` (its own counters).
+
+/// Smith's data for `y^2 = f(x)` (`deg f = 7`): the first rational tractable
+/// subgroup passing Propositions 2 and 4 without twist and its first valid
+/// normal-form trigonal map with square `lc(s)`. `Err("not smith-positive")`
+/// when `full_success(false)` fails, `Err("no normal-form map ...")` when it
+/// holds but no such map is in normal form.
+pub fn find_trigonal(f: &[u64], p: u64, seed: u64) -> Result<Trigonal, String> {
+    let mut rng = SplitMix64(seed ^ p.rotate_left(17));
+    let co = super::smith_prop24::analyze_curve(f, p, &mut rng).ok_or("f is not squarefree")?;
+    if !co.full_success(false) {
+        return Err("not smith-positive".into());
+    }
+    let (n1, n0, d1, d0) = co
+        .subgroups
+        .iter()
+        .filter(|s| s.trig_rational() && s.iso_rational(false))
+        .flat_map(|s| s.maps.iter())
+        .filter(|m| m.valid() && m.alpha_chi == 1)
+        .find_map(|m| m.map.smith_coeffs())
+        .ok_or("no normal-form map with square lc(s)")?;
+    Trigonal::new(f, p, n1, n0, d1, d0)
+}
+
+/// The `F_p` work of one transfer, by part. `mul` counts multiplications
+/// (squarings and exponentiation steps included), `inv` inversions.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct TransferCost {
+    /// Building `T(t)`.
+    pub map_mul: u64,
+    /// Image points for the fit, the fit itself (15-column elimination).
+    pub fit_mul: u64,
+    pub fit_inv: u64,
+    /// `PlaneQuartic` base-point setup (`setup_cost`).
+    pub setup_mul: u64,
+    pub setup_inv: u64,
+    /// Points of `H`, their image points, `psi`, conic conditions.
+    pub image_mul: u64,
+    pub image_inv: u64,
+    /// `Pic^0(C)` work: `class_from_conics`, additions, negations.
+    pub pic_mul: u64,
+    pub pic_inv: u64,
+    pub pic_ops: u64,
+    /// `J_H` work: Cantor additions while searching split representatives.
+    pub cantor_mul: u64,
+    pub cantor_inv: u64,
+    pub cantor_ops: u64,
+    /// Split tests and root finding of the `u` polynomials.
+    pub root_mul: u64,
+    /// Candidate representatives tried.
+    pub tries: u64,
+}
+
+impl TransferCost {
+    pub fn mul(&self) -> u64 {
+        self.map_mul
+            + self.fit_mul
+            + self.setup_mul
+            + self.image_mul
+            + self.pic_mul
+            + self.cantor_mul
+            + self.root_mul
+    }
+    pub fn inv(&self) -> u64 {
+        self.fit_inv + self.setup_inv + self.image_inv + self.pic_inv + self.cantor_inv
+    }
+}
+
+/// Counted `F_p` and `F_{p^2} = F_p[w]/(w^2 - nr)` arithmetic.
+struct Ct {
+    p: u64,
+    nr: u64,
+    mul: Cell<u64>,
+    inv: Cell<u64>,
+}
+
+impl Ct {
+    fn new(p: u64) -> Ct {
+        Ct {
+            p,
+            nr: F2::new(p).nr,
+            mul: Cell::new(0),
+            inv: Cell::new(0),
+        }
+    }
+    fn take(&self) -> (u64, u64) {
+        (self.mul.replace(0), self.inv.replace(0))
+    }
+    #[inline]
+    fn m(&self, a: u64, b: u64) -> u64 {
+        self.mul.set(self.mul.get() + 1);
+        a * b % self.p
+    }
+    fn inv(&self, a: u64) -> u64 {
+        self.inv.set(self.inv.get() + 1);
+        inv_mod(a, self.p)
+    }
+    fn pow(&self, a: u64, mut e: u64) -> u64 {
+        let mut r = 1;
+        let mut b = a;
+        while e > 0 {
+            if e & 1 == 1 {
+                r = self.m(r, b);
+            }
+            e >>= 1;
+            if e > 0 {
+                b = self.m(b, b);
+            }
+        }
+        r
+    }
+    fn eval(&self, poly: &[u64], x: u64) -> u64 {
+        let mut r = 0;
+        for &c in poly.iter().rev() {
+            r = ad(self.m(r, x), c, self.p);
+        }
+        r
+    }
+    /// Tonelli-Shanks.
+    fn sqrt(&self, a: u64) -> Option<u64> {
+        let p = self.p;
+        if a == 0 {
+            return Some(0);
+        }
+        if self.pow(a, (p - 1) / 2) != 1 {
+            return None;
+        }
+        if p % 4 == 3 {
+            return Some(self.pow(a, p.div_ceil(4)));
+        }
+        let (mut q, mut s) = (p - 1, 0u32);
+        while q.is_multiple_of(2) {
+            q /= 2;
+            s += 1;
+        }
+        let mut c = self.pow(self.nr, q);
+        let mut x = self.pow(a, q.div_ceil(2));
+        let mut t = self.pow(a, q);
+        let mut m = s;
+        while t != 1 {
+            let mut i = 0;
+            let mut t2 = t;
+            while t2 != 1 {
+                t2 = self.m(t2, t2);
+                i += 1;
+            }
+            let mut b = c;
+            for _ in 0..m - i - 1 {
+                b = self.m(b, b);
+            }
+            x = self.m(x, b);
+            c = self.m(b, b);
+            t = self.m(t, c);
+            m = i;
+        }
+        Some(x)
+    }
+    fn qc(&self, x: u64) -> Fp2 {
+        Fp2 {
+            a: x % self.p,
+            b: 0,
+        }
+    }
+    fn qadd(&self, x: Fp2, y: Fp2) -> Fp2 {
+        Fp2 {
+            a: ad(x.a, y.a, self.p),
+            b: ad(x.b, y.b, self.p),
+        }
+    }
+    fn qsub(&self, x: Fp2, y: Fp2) -> Fp2 {
+        Fp2 {
+            a: sb(x.a, y.a, self.p),
+            b: sb(x.b, y.b, self.p),
+        }
+    }
+    fn qneg(&self, x: Fp2) -> Fp2 {
+        Fp2 {
+            a: ng(x.a, self.p),
+            b: ng(x.b, self.p),
+        }
+    }
+    fn qconj(&self, x: Fp2) -> Fp2 {
+        Fp2 {
+            a: x.a,
+            b: ng(x.b, self.p),
+        }
+    }
+    fn qm(&self, x: Fp2, y: Fp2) -> Fp2 {
+        if x.b == 0 {
+            return self.qs(y, x.a);
+        }
+        if y.b == 0 {
+            return self.qs(x, y.a);
+        }
+        Fp2 {
+            a: ad(self.m(x.a, y.a), self.m(self.nr, self.m(x.b, y.b)), self.p),
+            b: ad(self.m(x.a, y.b), self.m(x.b, y.a), self.p),
+        }
+    }
+    fn qs(&self, x: Fp2, c: u64) -> Fp2 {
+        Fp2 {
+            a: self.m(x.a, c),
+            b: if x.b == 0 { 0 } else { self.m(x.b, c) },
+        }
+    }
+    fn qinv(&self, x: Fp2) -> Fp2 {
+        let n = sb(self.m(x.a, x.a), self.m(self.nr, self.m(x.b, x.b)), self.p);
+        let i = self.inv(n);
+        Fp2 {
+            a: self.m(x.a, i),
+            b: ng(self.m(x.b, i), self.p),
+        }
+    }
+    fn qeval(&self, poly: &[u64], x: Fp2) -> Fp2 {
+        let mut r = Fp2::default();
+        for &c in poly.iter().rev() {
+            r = self.qadd(self.qm(r, x), self.qc(c));
+        }
+        r
+    }
+    /// A square root in `F_{p^2}` (`None` for a non-square).
+    fn qsqrt(&self, z: Fp2) -> Option<Fp2> {
+        let p = self.p;
+        if z.b == 0 {
+            return Some(match self.sqrt(z.a) {
+                Some(s) => Fp2 { a: s, b: 0 },
+                None => Fp2 {
+                    a: 0,
+                    b: self.sqrt(self.m(z.a, self.inv(self.nr)))?,
+                },
+            });
+        }
+        let n = sb(self.m(z.a, z.a), self.m(self.nr, self.m(z.b, z.b)), p);
+        let s = self.sqrt(n)?;
+        let i2 = p.div_ceil(2);
+        let x = match self.sqrt(self.m(ad(z.a, s, p), i2)) {
+            Some(x) => x,
+            None => self.sqrt(self.m(sb(z.a, s, p), i2))?,
+        };
+        let y = self.m(z.b, self.inv(ad(x, x, p)));
+        Some(Fp2 { a: x, b: y })
+    }
+    fn qnormalize(&self, h: [Fp2; 3]) -> Option<[Fp2; 3]> {
+        let i = (0..3).find(|&i| h[i] != Fp2::default())?;
+        let iv = self.qinv(h[i]);
+        let mut out = [Fp2::default(); 3];
+        for j in 0..3 {
+            out[j] = if j == i {
+                self.qc(1)
+            } else {
+                self.qm(h[j], iv)
+            };
+        }
+        Some(out)
+    }
+    fn pmul(&self, a: &[u64], b: &[u64]) -> Poly {
+        self.mul.set(self.mul.get() + (a.len() * b.len()) as u64);
+        pmul(a, b, self.p)
+    }
+    /// [`nullspace`] with its multiplications and inversions counted.
+    fn nullspace(&self, rows: &[Vec<u64>], n: usize) -> Vec<Vec<u64>> {
+        let p = self.p;
+        let mut m: Vec<Vec<u64>> = rows.to_vec();
+        let mut piv = Vec::new();
+        let mut r = 0;
+        for c in 0..n {
+            let Some(pr) = (r..m.len()).find(|&i| m[i][c] != 0) else {
+                continue;
+            };
+            m.swap(r, pr);
+            let iv = self.inv(m[r][c]);
+            for v in m[r].iter_mut().skip(c) {
+                *v = self.m(*v, iv);
+            }
+            let prow = m[r].clone();
+            for (i, row) in m.iter_mut().enumerate() {
+                if i != r && row[c] != 0 {
+                    let f = row[c];
+                    for (v, &w) in row.iter_mut().zip(&prow).skip(c) {
+                        *v = sb(*v, self.m(f, w), p);
+                    }
+                }
+            }
+            piv.push(c);
+            r += 1;
+        }
+        let mut out = Vec::new();
+        for fc in (0..n).filter(|c| !piv.contains(c)) {
+            let mut v = vec![0u64; n];
+            v[fc] = 1;
+            for (i, &pc) in piv.iter().enumerate() {
+                v[pc] = ng(m[i][fc], p);
+            }
+            out.push(v);
+        }
+        out
+    }
+    fn mon_values(&self, mons: &[(u8, u8, u8)], h: &[Fp2; 3]) -> Vec<Fp2> {
+        // Powers up to 4 of each coordinate, then two products per monomial.
+        let mut pw = [[self.qc(1); 5]; 3];
+        let top = mons
+            .iter()
+            .map(|m| m.0.max(m.1).max(m.2))
+            .max()
+            .unwrap_or(0) as usize;
+        for i in 0..3 {
+            for e in 1..=top {
+                pw[i][e] = self.qm(pw[i][e - 1], h[i]);
+            }
+        }
+        mons.iter()
+            .map(|&(a, b, c)| {
+                self.qm(
+                    self.qm(pw[0][a as usize], pw[1][b as usize]),
+                    pw[2][c as usize],
+                )
+            })
+            .collect()
+    }
+}
+
+/// [`psi_matrix`] with its coefficient multiplications counted.
+fn psi_matrix_counted(tr: &Trigonal, ct: &Ct) -> [[Poly; 3]; 3] {
+    let p = tr.p;
+    let g = &tr.g;
+    let mul_x = |a: &Tx| -> Tx {
+        [
+            psub(&[], &ct.pmul(&a[2], &g[0]), p),
+            psub(&a[0], &ct.pmul(&a[2], &g[1]), p),
+            psub(&a[1], &ct.pmul(&a[2], &g[2]), p),
+        ]
+    };
+    let c0: Tx = tr.fpoly.clone();
+    let c1 = mul_x(&c0);
+    let c2 = mul_x(&c1);
+    let m = |i: usize, k: usize| -> &Poly { &[&c0, &c1, &c2][k][i] };
+    let minor = |k0: usize, k1: usize| {
+        psub(
+            &ct.pmul(m(1, k0), m(2, k1)),
+            &ct.pmul(m(1, k1), m(2, k0)),
+            p,
+        )
+    };
+    let adj: Tx = [minor(1, 2), psub(&[], &minor(0, 2), p), minor(0, 1)];
+    // adj * D, D = d0 + d1 x + x^2.
+    let ax = mul_x(&adj);
+    let axx = mul_x(&ax);
+    let mut w: Tx = [Vec::new(), Vec::new(), Vec::new()];
+    for i in 0..3 {
+        w[i] = padd(
+            &padd(&ct.pmul(&adj[i], &[tr.d0]), &ct.pmul(&ax[i], &[tr.d1]), p),
+            &axx[i],
+            p,
+        );
+    }
+    let mut col: Vec<Poly> = Vec::with_capacity(5);
+    for _ in 0..5 {
+        col.push(w[2].clone());
+        w = mul_x(&w);
+    }
+    let row = |i: usize| [col[i].clone(), col[i + 1].clone(), col[i + 2].clone()];
+    [row(0), row(1), row(2)]
+}
+
+/// `Psi` with counted cost: the canonical quartic from 20 image points, the
+/// base point from a rational image point, and the transfer of classes of
+/// `J_H(F_p)` given as `genus_ladder` divisors.
+pub struct CountedTransfer {
+    pub tr: Trigonal,
+    pub tmat: [[Poly; 3]; 3],
+    pub quartic: [u32; 15],
+    pub p0: Pt,
+    pub pq: PlaneQuartic,
+    std2: Vec<(u8, u8, u8)>,
+    m4: Vec<(u8, u8, u8)>,
+    ct: Ct,
+    cost: Cell<TransferCost>,
+}
+
+impl CountedTransfer {
+    /// Points of `X` used for the fit.
+    pub const FIT_POINTS: usize = 20;
+
+    fn images(&self, x: u64, y: u64) -> Result<[[Fp2; 3]; 2], String> {
+        images_counted(&self.tr, &self.tmat, &self.ct, x, y)
+    }
+
+    fn bump(&self, f: impl FnOnce(&mut TransferCost)) {
+        let mut c = self.cost.get();
+        f(&mut c);
+        self.cost.set(c);
+    }
+    /// Build `T(t)`, fit `C` through the images of the first points of `H`
+    /// over `U` (`x = 0, 1, 2, ..`), take the first rational image point as
+    /// `P0`. `Err` when the fit is not a single quartic, `C` is singular, or
+    /// no rational image point turns up within `2000` values of `x`.
+    pub fn new(tr: Trigonal) -> Result<CountedTransfer, String> {
+        let p = tr.p;
+        let ct = Ct::new(p);
+        let tmat = psi_matrix_counted(&tr, &ct);
+        let mut cost = TransferCost {
+            map_mul: ct.take().0,
+            ..Default::default()
+        };
+        let m4 = mons_of_degree(4);
+        let mut pts: Vec<[Fp2; 3]> = Vec::new();
+        let mut rat: Option<[Fp2; 3]> = None;
+        let mut x = 0u64;
+        while (pts.len() < Self::FIT_POINTS || rat.is_none()) && x < p.min(2000) {
+            if let Some(y) = ct.sqrt(ct.eval(&tr.f, x)) {
+                if let Ok(im) = images_counted(&tr, &tmat, &ct, x, y) {
+                    for h in im {
+                        if rat.is_none() && is_rational(&h) {
+                            rat = Some(h);
+                        }
+                        if pts.len() < Self::FIT_POINTS && !pts.contains(&h) {
+                            pts.push(h);
+                        }
+                    }
+                }
+            }
+            x += 1;
+        }
+        if pts.len() < Self::FIT_POINTS {
+            return Err("too few image points for the fit".into());
+        }
+        let rat = rat.ok_or("no rational image point for P0")?;
+        let mut rows = Vec::with_capacity(2 * pts.len());
+        for h in &pts {
+            let v = ct.mon_values(&m4, h);
+            rows.push(v.iter().map(|z| z.a).collect::<Vec<u64>>());
+            if !is_rational(h) {
+                rows.push(v.iter().map(|z| z.b).collect::<Vec<u64>>());
+            }
+        }
+        let ns = ct.nullspace(&rows, 15);
+        if ns.len() != 1 {
+            return Err(format!("{} quartics through the fit points", ns.len()));
+        }
+        let lead = *ns[0].iter().find(|&&c| c != 0).unwrap();
+        let il = ct.inv(lead);
+        let mut quartic = [0u32; 15];
+        for (q, &c) in quartic.iter_mut().zip(&ns[0]) {
+            *q = ct.m(c, il) as u32;
+        }
+        let (fm, fi) = ct.take();
+        cost.fit_mul = fm;
+        cost.fit_inv = fi;
+        let p0: Pt = [rat[0].a as u32, rat[1].a as u32, rat[2].a as u32];
+        let pq = PlaneQuartic::new(p as u32, quartic, p0).map_err(|e| format!("C: {e:?}"))?;
+        let p0 = pq.base_point();
+        let sc = pq.setup_cost();
+        cost.setup_mul = sc.mul;
+        cost.setup_inv = sc.inv;
+        let std2 = pq.std_monomials(2);
+        Ok(CountedTransfer {
+            tr,
+            tmat,
+            quartic,
+            p0,
+            pq,
+            std2,
+            m4,
+            ct,
+            cost: Cell::new(cost),
+        })
+    }
+
+    /// `[E(P) + 2 P0 - K]` for the affine point `P = (x, y)` of `H`, as
+    /// [`Transfer::e_class`] with base point `P0` only: `Err` in the
+    /// degenerate positions (the caller draws another representative).
+    pub fn e_class(&self, x: u64, y: u64) -> Result<PicClass, String> {
+        let ct = &self.ct;
+        let r = (|| {
+            let [n1, n2] = self.images(x, y)?;
+            let rational = is_rational(&n1) && is_rational(&n2);
+            if !rational && n2 != n1.map(|z| ct.qconj(z)) {
+                return Err("the pair is neither rational nor conjugate".to_string());
+            }
+            // On C (guards the fit) and in general position with P0.
+            let v4 = ct.mon_values(&self.m4, &n1);
+            let mut s = Fp2::default();
+            for (z, &c) in v4.iter().zip(&self.quartic) {
+                s = ct.qadd(s, ct.qs(*z, c as u64));
+            }
+            if s != Fp2::default() {
+                return Err("image point not on C".into());
+            }
+            let bf = [
+                ct.qc(self.p0[0] as u64),
+                ct.qc(self.p0[1] as u64),
+                ct.qc(self.p0[2] as u64),
+            ];
+            let mn = |a: Fp2, b: Fp2, c: Fp2, d: Fp2| ct.qsub(ct.qm(a, d), ct.qm(b, c));
+            let det = ct.qadd(
+                ct.qsub(
+                    ct.qm(n1[0], mn(n2[1], n2[2], bf[1], bf[2])),
+                    ct.qm(n1[1], mn(n2[0], n2[2], bf[0], bf[2])),
+                ),
+                ct.qm(n1[2], mn(n2[0], n2[1], bf[0], bf[1])),
+            );
+            if det == Fp2::default() {
+                return Err("degenerate position with P0".into());
+            }
+            let v1 = ct.mon_values(&self.std2, &n1);
+            let mut rows: Vec<Vec<u64>> = vec![v1.iter().map(|z| z.a).collect()];
+            if rational {
+                let v2 = ct.mon_values(&self.std2, &n2);
+                rows.push(v2.iter().map(|z| z.a).collect());
+            } else {
+                rows.push(v1.iter().map(|z| z.b).collect());
+            }
+            rows.push(ct.mon_values(&self.std2, &bf).iter().map(|z| z.a).collect());
+            let ns = ct.nullspace(&rows, 6);
+            if ns.len() != 3 {
+                return Err("conic conditions dependent".into());
+            }
+            Ok(ns
+                .into_iter()
+                .map(|r| r.into_iter().map(|x| x as u32).collect())
+                .collect::<Vec<Vec<u32>>>())
+        })();
+        let (im, ii) = ct.take();
+        self.bump(|c| {
+            c.image_mul += im;
+            c.image_inv += ii;
+        });
+        let conics = r?;
+        Ok(self.pic(|pq| pq.class_from_conics(conics), 0))
+    }
+
+    /// Run a `Pic^0` computation and charge its field work.
+    fn pic<R>(&self, f: impl FnOnce(&PlaneQuartic) -> R, ops: u64) -> R {
+        let c0 = self.pq.counter();
+        let r = f(&self.pq);
+        let d = self.pq.counter().since(&c0);
+        self.bump(|c| {
+            c.pic_mul += d.mul;
+            c.pic_inv += d.inv;
+            c.pic_ops += ops;
+        });
+        r
+    }
+
+    /// A random affine non-Weierstrass point of `H`.
+    fn random_point(&self, rng: &mut StdRng) -> (u64, u64) {
+        let p = self.tr.p;
+        loop {
+            let x = rng.gen_range(0..p);
+            let y = self.ct.sqrt(self.ct.eval(&self.tr.f, x));
+            let (im, ii) = self.ct.take();
+            self.bump(|c| {
+                c.image_mul += im;
+                c.image_inv += ii;
+            });
+            match y {
+                Some(y) if y != 0 => {
+                    return (x, if rng.gen::<bool>() { ng(y, p) } else { y });
+                }
+                _ => continue,
+            }
+        }
+    }
+
+    /// The classes of the three points of a divisor of weight 3 that splits
+    /// over `F_p` into points over `U`; `None` otherwise.
+    fn split_classes(&self, jc: &JCurve, d: &JDiv, rng: &mut StdRng) -> Option<Vec<PicClass>> {
+        let p = self.tr.p;
+        self.bump(|c| c.tries += 1);
+        if d.deg != 3 {
+            return None;
+        }
+        let u = jc.u_coeffs(d);
+        let v = jc.v_coeffs(d);
+        let mut nat = Nat::default();
+        let roots = if splits_completely(p, &u, &mut nat) {
+            roots_of(p, &u, rng, &mut nat)
+        } else {
+            None
+        };
+        self.bump(|c| c.root_mul += nat.mul);
+        let roots = roots?;
+        let mut out = Vec::with_capacity(3);
+        for x in roots {
+            let y = self.ct.eval(&v, x);
+            out.push(self.e_class(x, y).ok()?);
+        }
+        Some(out)
+    }
+
+    /// `Psi(D)` for each class `D` of `divs` (module doc, "The transfer"):
+    /// `D + A - B = R1 + R2 + R3 - 3 inf` and
+    /// `(A' - B') + (A'' - B'') = R1' + R2' + R3' - 3 inf`, all points
+    /// rational over `U`, so `Psi(D) = sum E(R) + E(B) - E(A) + c` with
+    /// `c = E(A') + E(A'') - E(B') - E(B'') - sum E(R')` shared by all `D`.
+    pub fn transfer(&self, jc: &JCurve, divs: &[JDiv], seed: u64) -> Result<Vec<PicClass>, String> {
+        let p = self.tr.p;
+        let mut rng = StdRng::seed_from_u64(seed ^ 0x5317_C057_0000_0001);
+        let (m0, i0) = (jc.fmul(), jc.finv());
+        let cantor_ops = Cell::new(0u64);
+        let add = |a: JDiv, b: JDiv| {
+            cantor_ops.set(cantor_ops.get() + 1);
+            jc.cantor(a, b)
+        };
+        let pt = |q: (u64, u64)| jc.point(q.0, q.1).expect("point on H");
+        let npt = |q: (u64, u64)| jc.point(q.0, ng(q.1, p)).expect("point on H");
+        let sum = |v: &[PicClass]| {
+            let mut s = v[0].clone();
+            for x in &v[1..] {
+                s = self.pic(|pq| pq.add(&s, x), 1);
+            }
+            s
+        };
+        let classes = |pts: &[(u64, u64)]| -> Option<Vec<PicClass>> {
+            pts.iter().map(|q| self.e_class(q.0, q.1).ok()).collect()
+        };
+        let mut shared = None;
+        for _ in 0..10_000 {
+            let a1 = self.random_point(&mut rng);
+            let a2 = self.random_point(&mut rng);
+            let b1 = self.random_point(&mut rng);
+            let b2 = self.random_point(&mut rng);
+            let d = add(add(pt(a1), pt(a2)), add(npt(b1), npt(b2)));
+            let Some(mut rs) = self.split_classes(jc, &d, &mut rng) else {
+                continue;
+            };
+            let (Some(ea), Some(eb)) = (classes(&[a1, a2]), classes(&[b1, b2])) else {
+                continue;
+            };
+            rs.extend(eb);
+            let neg = sum(&rs);
+            let pos = sum(&ea);
+            shared = Some(self.pic(|pq| pq.sub(&pos, &neg), 2));
+            break;
+        }
+        let shared = shared.ok_or("no split representative of S2")?;
+        let mut out = Vec::with_capacity(divs.len());
+        for d in divs {
+            let mut img = None;
+            for _ in 0..10_000 {
+                let a = self.random_point(&mut rng);
+                let b = self.random_point(&mut rng);
+                let e = add(add(*d, pt(a)), npt(b));
+                let Some(mut rs) = self.split_classes(jc, &e, &mut rng) else {
+                    continue;
+                };
+                let Some(eab) = classes(&[a, b]) else {
+                    continue;
+                };
+                rs.push(eab[1].clone());
+                rs.push(shared.clone());
+                let pos = sum(&rs);
+                img = Some(self.pic(|pq| pq.sub(&pos, &eab[0]), 2));
+                break;
+            }
+            out.push(img.ok_or("no split representative of D + A - B")?);
+        }
+        self.bump(|c| {
+            c.cantor_mul += jc.fmul() - m0;
+            c.cantor_inv += jc.finv() - i0;
+            c.cantor_ops += cantor_ops.get();
+        });
+        Ok(out)
+    }
+
+    /// The cost so far.
+    pub fn cost(&self) -> TransferCost {
+        self.cost.get()
+    }
+}
+
+/// The two image points `psi(Q1), psi(Q2)` of the affine point `(x, y)` of
+/// `H`, normalised, with counted arithmetic. Same output as `psi_xpoint` on
+/// `image_points`.
+fn images_counted(
+    tr: &Trigonal,
+    tmat: &[[Poly; 3]; 3],
+    ct: &Ct,
+    x: u64,
+    y: u64,
+) -> Result<[[Fp2; 3]; 2], String> {
+    let p = tr.p;
+    if y == 0 {
+        return Err("Weierstrass point".into());
+    }
+    let dx = ad(ct.m(x, ad(x, tr.d1, p)), tr.d0, p);
+    if dx == 0 {
+        return Err("D(x) = 0".into());
+    }
+    let nx = ad(ct.m(x, ad(ct.m(x, x), tr.n1, p)), tr.n0, p);
+    let t = ct.m(nx, ct.inv(dx));
+    for i in [0, 1, 3] {
+        if ct.eval(&tr.delta[i], t) == 0 {
+            return Err("t outside U".into());
+        }
+    }
+    let g1 = sb(tr.n1, ct.m(t, tr.d1), p);
+    let g2 = ng(t, p);
+    let q1 = ad(g2, x, p);
+    let q0 = ad(g1, ct.m(x, q1), p);
+    let disc = sb(ct.m(q1, q1), ct.m(4, q0), p);
+    if disc == 0 {
+        return Err("repeated root of G(t, .)".into());
+    }
+    let rd = ct.qsqrt(ct.qc(disc)).ok_or("no square root")?;
+    let i2 = p.div_ceil(2);
+    let mq = ct.qc(ng(q1, p));
+    let x2 = ct.qs(ct.qadd(mq, rd), i2);
+    let x3 = ct.qs(ct.qsub(mq, rd), i2);
+    let y2 = ct
+        .qsqrt(ct.qeval(&tr.f, x2))
+        .ok_or("F(x2) is not a square in F_p^2")?;
+    let mut y3 = if x2.b == 0 {
+        ct.qsqrt(ct.qeval(&tr.f, x3))
+            .ok_or("F(x3) is not a square in F_p^2")?
+    } else {
+        ct.qconj(y2)
+    };
+    // The R-triples have y1 y2 y3 = -sqrt(s)(t).
+    let want = ct.qc(ng(ct.eval(&tr.sqrt_s, t), p));
+    let prod = ct.qs(ct.qm(y2, y3), y);
+    if prod == ct.qneg(want) {
+        y3 = ct.qneg(y3);
+    } else if prod != want {
+        return Err("y1 y2 y3 != +-sqrt(s)".into());
+    }
+    if want == Fp2::default() {
+        return Err("s(t) = 0".into());
+    }
+    // Lagrange: b = sum_i (y_i / d_i) (x_j x_l, -(x_j + x_l), 1).
+    let xs = [ct.qc(x), x2, x3];
+    let ys = [ct.qc(y), y2, y3];
+    let mut part = [[Fp2::default(); 3]; 3];
+    for i in 0..3 {
+        let (j, l) = ((i + 1) % 3, (i + 2) % 3);
+        let d = ct.qm(ct.qsub(xs[i], xs[j]), ct.qsub(xs[i], xs[l]));
+        let w = ct.qm(ys[i], ct.qinv(d));
+        part[i] = [
+            ct.qm(w, ct.qm(xs[j], xs[l])),
+            ct.qneg(ct.qm(w, ct.qadd(xs[j], xs[l]))),
+            w,
+        ];
+    }
+    let tt: Vec<u64> = (0..9)
+        .map(|k| {
+            let (i, j) = (k / 3, k % 3);
+            if j < i {
+                0
+            } else {
+                ct.eval(&tmat[i][j], t)
+            }
+        })
+        .collect();
+    let te = |i: usize, j: usize| if j < i { tt[j * 3 + i] } else { tt[i * 3 + j] };
+    let mut out = [[Fp2::default(); 3]; 2];
+    for (o, sign) in out.iter_mut().zip([false, true]) {
+        let mut b = part[0];
+        for k in 0..3 {
+            let rest = ct.qadd(part[1][k], part[2][k]);
+            b[k] = if sign {
+                ct.qsub(b[k], rest)
+            } else {
+                ct.qadd(b[k], rest)
+            };
+        }
+        let mut h = [Fp2::default(); 3];
+        for i in 0..3 {
+            for j in 0..3 {
+                h[i] = ct.qadd(h[i], ct.qs(b[j], te(i, j)));
+            }
+        }
+        *o = ct.qnormalize(h).ok_or("T(t) b = 0")?;
+    }
+    Ok(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::plane_quartic_pic::tests as pq;
@@ -2205,6 +2992,98 @@ mod tests {
             }
         }
         assert!(fit_quartic(37, &pts).is_err());
+    }
+
+    /// The counted transfer against the verified one: same `T`, same image
+    /// points, same quartic, and (with the same base point) the same classes.
+    #[test]
+    fn counted_transfer_matches_verified() {
+        use super::super::genus_ladder as gl;
+        let mut curves = vec![example1()];
+        curves.extend(random_positive(101, 2, 0xC057_0001, 7));
+        // Monic curves, as the cost study draws them.
+        for p in [257u64, 1031] {
+            let tr = (1..)
+                .find_map(|cs| find_trigonal(&gl::random_f(p, 3, cs), p, cs).ok())
+                .unwrap();
+            curves.push(tr);
+        }
+        for tr in curves {
+            let p = tr.p;
+            let cm = CanonicalMap::new(tr.clone()).unwrap();
+            let ctf = CountedTransfer::new(tr.clone()).unwrap();
+            assert_eq!(ctf.tmat, cm.tmat);
+            assert_eq!(ctf.quartic, cm.quartic, "p = {p}");
+            let mut checked = 0;
+            for (x, y) in tr.points_over_u() {
+                let Ok(ip) = tr.image_points(x, y) else {
+                    continue;
+                };
+                let want = [
+                    cm.psi_xpoint(&ip.points[0]).unwrap(),
+                    cm.psi_xpoint(&ip.points[1]).unwrap(),
+                ];
+                let got = ctf.images(x, y).unwrap();
+                assert!(
+                    (got[0] == want[0] && got[1] == want[1])
+                        || (got[0] == want[1] && got[1] == want[0]),
+                    "p = {p} P = ({x}, {y})"
+                );
+                checked += 1;
+            }
+            assert!(checked >= 20);
+            // Classes: the verified transfer on the same base point.
+            let q = p as u32;
+            let pq = PlaneQuartic::new(q, cm.quartic, ctf.p0).unwrap();
+            let tf = Transfer {
+                bases: vec![pq.base_point()],
+                std2: pq.std_monomials(2),
+                c: pq,
+                cm,
+                cache: RefCell::new(HashMap::new()),
+            };
+            let mut same = 0;
+            for (x, y) in tr.points_over_u().into_iter().take(40) {
+                if let (Ok(a), Ok(b)) = (tf.e_class(x, y), ctf.e_class(x, y)) {
+                    assert_eq!(a, b);
+                    same += 1;
+                }
+            }
+            assert!(same >= 10, "{same}");
+            // genus_ladder's Jacobian wants a monic f.
+            if tr.f[7] != 1 {
+                continue;
+            }
+            let jc = gl::JCurve::new(p, 3, &tr.f).unwrap();
+            let hj = HJac::new(&tr.f, p).unwrap();
+            let pts = tf.usable_points();
+            let mut rng = SplitMix64(11);
+            let mut st = 5u64;
+            for _ in 0..3 {
+                let d = jc.random_divisor(&mut st);
+                let k = 1 + rng.below(1000);
+                let dk = jc.mul_ltr(d, k);
+                let img = ctf.transfer(&jc, &[d, dk], rng.next_u64()).unwrap();
+                assert_eq!(tf.c.mul_scalar(&img[0], k as u128), img[1]);
+                let m = Mumford {
+                    u: jc.u_coeffs(&d),
+                    v: {
+                        let mut v = jc.v_coeffs(&d);
+                        trim(&mut v);
+                        v
+                    },
+                };
+                let want = tf.transfer_divisor(&hj, &m, &pts, &mut rng).unwrap();
+                assert_eq!(img[0], want, "p = {p}");
+            }
+            let c = ctf.cost();
+            eprintln!(
+                "p = {p}: transfer cost {c:?} mul {} inv {}",
+                c.mul(),
+                c.inv()
+            );
+            assert!(c.mul() > 0 && c.pic_ops > 0 && c.cantor_ops > 0);
+        }
     }
 
     /// The frozen sweep of `research/smith_canonical_20261115/PROTOCOL.md`.
