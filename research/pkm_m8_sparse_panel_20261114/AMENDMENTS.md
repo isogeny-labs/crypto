@@ -48,3 +48,11 @@ bill past its deadline (`pod/HARDENING.md` has the smoke-pod evidence):
   pod state to `.resume/pod_state/` and a `## Pod in flight` line into `.resume/RESUME.md`; 3× retry on `put`;
   pod-status check in the poll loop. sha256: 88de4f76925c7df5a012a413c30f10843aeea677a1983b9ba42eb4b6e9a5afd5.
 - `pod/podserver.py` (+8/−1): SIGTERM handler; re-stop if the container restarts after a guard stop.
+
+## A3 — 2026-11-15T03:36Z, launch not approved (seen: nothing beyond A2; no data row)
+
+The owner did not approve the 72 h / USD 175 pod run ("Not approved. Find a different experiment to run",
+2026-11-15). Card `cards/CARD-pkm-m8-panelA-20261114-1.yaml` was never run; no pod was created for the plan;
+no data-seed row exists. The protocol stays frozen as written; a later run under it needs a new card and
+an A4 entry stating what was seen in between. The cells, plan, bundle, instrument, runner and analysis
+pipeline remain valid for that run or for a cheaper variant under a new protocol version.
