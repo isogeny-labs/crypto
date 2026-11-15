@@ -2348,7 +2348,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
-            ("m", "summands, 3, 4 or 5"),
+            ("m", "summands, 3 to 9 (the packed index is 12 bits for m <= 5, 64/m bits above: bases of up to 1023, 511, 255, 127 points for m = 6..9)"),
             ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
         ]
     }
