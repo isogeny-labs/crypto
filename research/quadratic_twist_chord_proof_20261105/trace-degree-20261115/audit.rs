@@ -19,8 +19,8 @@ type Poly=BTreeMap<u32,F>;
 fn ex(k:u32,i:u32)->i32{((k>>(6*i))&63) as i32}
 fn deg(k:u32,w:bool)->i32{(0..5).map(|i|ex(k,i)*if w&&(i==2||i==4){2}else{1}).sum()}
 fn pd(p:&Poly,w:bool)->i32{p.keys().map(|&k|deg(k,w)).max().unwrap_or(-1)}
-fn c(v:F)->Poly{if v==f(0,0){Poly::new()}else{[(0,v)].into_iter().collect()}}
-fn var(i:u32)->Poly{[(1<<(6*i),f(1,0))].into_iter().collect()}
+fn c(v:F)->Poly{if v==f(0,0){Poly::new()}else{[(0,v)].iter().copied().collect()}}
+fn var(i:u32)->Poly{[(1<<(6*i),f(1,0))].iter().copied().collect()}
 fn put(p:&mut Poly,k:u32,v:F){let z=a(*p.get(&k).unwrap_or(&f(0,0)),v);if z==f(0,0){p.remove(&k);}else{p.insert(k,z);}}
 fn pa(p:&Poly,q:&Poly)->Poly{let mut r=p.clone();for (&k,&v) in q{put(&mut r,k,v)}r}
 fn ps(p:&Poly,s:F)->Poly{p.iter().filter_map(|(&k,&v)|{let z=m(v,s);if z==f(0,0){None}else{Some((k,z))}}).collect()}
