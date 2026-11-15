@@ -37,11 +37,11 @@ for sess in ("native2", "native3"):
     md.append("|---|--:|---|--:|--:|--:|--:|--:|--:|")
     for c in sorted(by, key=lambda c: bits[c]):
         cpu = next(a for a in by[c] if "-cpu-" in a)
-        rel0 = med(wall(r, "relations") for r in by[c][cpu]); sol0 = med(r["outcome"]["wall_ns"] / 1e9 for r in by[c][cpu])
+        rel0 = med(wall(r, "relations") for r in by[c][cpu]); sol0 = med(r["time"]["solve_wall_ns"] / 1e9 for r in by[c][cpu])
         rho = band[(c, "rho-neg")]["mean_s"][0]
         for a in sorted(by[c]):
             if a == "rho-neg": continue
-            rs = by[c][a]; rel = med(wall(r, "relations") for r in rs); sol = med(r["outcome"]["wall_ns"] / 1e9 for r in rs)
+            rs = by[c][a]; rel = med(wall(r, "relations") for r in rs); sol = med(r["time"]["solve_wall_ns"] / 1e9 for r in rs)
             sr = band[(c, a)]["mean_s"][0] / rho
             rows.append({"session": sess, "curve": c, "log2_r": bits[c], "arm": a, "runs": len(rs), "s_over_rho": sr,
                          "relation_s": rel, "solve_s": sol, "relation_speedup": rel0 / rel, "solve_speedup": sol0 / sol,
