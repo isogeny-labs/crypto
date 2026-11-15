@@ -76,7 +76,7 @@ def run():
     ol, oli = support(lifted)
     assert so.issubset(sl)
     def digest(rows):
-        raw = "".join(f"{x},{y}\\n" for x, y in sorted(rows)).encode()
+        raw = "".join(f"{x},{y}\n" for x, y in sorted(rows)).encode()
         return hashlib.sha256(raw).hexdigest()
     fingerprints = {"canonical1922":digest(so), "lifted8450":digest(sl)}
     assert fingerprints == {
