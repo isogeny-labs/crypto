@@ -1,7 +1,22 @@
 {
   "branch": "claude/zealous-meitner-85ipb5",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-15T01:22:34+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/c98a3763-10f4-59b3-bd9c-1ee80dc15113/scratchpad/isolab-k13/ecbench-e9d5dbdccd",
+        "verify",
+        "--dir",
+        "research/fes_k13_validated_20261112/runpod-a1/session",
+        "--replay-all",
+        "--exit-code"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T01:22:31+00:00",
+      "wall_s": 2.856
+    }
+  ],
   "commit": "b61a431d279dc8450da84f5255783b077a5a15e6",
   "commit_dirty": true,
   "created_utc": "2026-11-15T00:09:09+00:00",
@@ -91,14 +106,18 @@
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "benchmarks/20261115-fes-k13-runpod/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-fes-k13-runpod/fig2-band.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-fes-k13-runpod/fig2-band.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "fes-k13-runpod",
-  "status": "open",
-  "summary": "",
-  "validation": null
+  "status": "measured",
+  "summary": "[pcc:unverified] Measurement ran on Runpod pod y1i37jqnb3511d via research/fes_k13_validated_20261112/runpod-a1/pod-run.sh (launched by Runpod API, not under benchrec); recorded command is the local replay-all of that session. fes-f2/inherited-f4 paired S ratio 0.708 [0.668, 0.750]; band order flips at w=0, H1 unresolved inside the band; rho below every IC arm; distance 33.3x; validated for counts only",
+  "validation": "benchmarks/20261115-fes-k13-runpod/VALIDATION.json"
 }
