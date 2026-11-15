@@ -61,6 +61,7 @@ use super::stages::{DecompositionOracle, InstanceCtx, Params};
 use crate::cryptanalysis::ic_boundary::{
     CountedGroup, FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimeInstance, PrimePoint,
 };
+use crate::cryptanalysis::prime_fast::Fp64;
 
 const MAGIC_INIT: u32 = 0x3353_4652; // "RFS3"
 const MAGIC_BATCH: u32 = 0x3142_4652; // "RFB1"
@@ -121,6 +122,9 @@ pub fn discover_socket() -> Option<PathBuf> {
 pub enum WorkerMode {
     Spawn,
     Daemon,
+    /// No worker: the sweep runs in this process, [`NativeSweep`] over the
+    /// batch's targets on every available thread (`worker=native`).
+    Native,
 }
 
 impl WorkerMode {
@@ -128,8 +132,9 @@ impl WorkerMode {
         match s {
             "spawn" => Ok(Self::Spawn),
             "daemon" => Ok(Self::Daemon),
+            "native" => Ok(Self::Native),
             other => Err(format!(
-                "rootfind-subtract-gpu: worker must be spawn or daemon, got `{other}`"
+                "rootfind-subtract-gpu: worker must be spawn, daemon or native, got `{other}`"
             )),
         }
     }
@@ -331,6 +336,9 @@ fn with_worker<T>(
                     )?;
                     RootfindWorker::connect(&sock)?
                 }
+                WorkerMode::Native => {
+                    return Err("rootfind-subtract-gpu: worker=native has no worker process".into())
+                }
             };
             *guard = Some((mode, worker));
         }
@@ -365,6 +373,120 @@ fn charge_misses(ops: &mut GroupOps, counters: &mut OracleCounters, n: usize) {
 /// `position = 2·i + (0 for ε = +1, 1 for ε = −1)`.
 type Hits = Vec<(usize, u32, i8)>;
 
+/// `worker=native`: the batch sweep on the CPU, in this process, with
+/// `rootfind-subtract`'s own arithmetic (one Montgomery batched inversion a
+/// target, two candidates per abscissa) and the targets of a batch spread
+/// over a thread pool.  A candidate is reported when its abscissa is in the
+/// probe set (`m = 2`: the base's abscissae; `m = 3`: the pair table's), a
+/// superset of the positions where the CPU lookup succeeds; the caller
+/// confirms them in order through that lookup, as it does a worker's.
+struct NativeSweep {
+    f: Fp64,
+    xs: Vec<u64>,
+    ys: Vec<u64>,
+    /// Open-addressing set of Montgomery-form abscissae (`u64::MAX` empty).
+    slots: Vec<u64>,
+    shift: u32,
+    pool: rayon::ThreadPool,
+}
+
+impl NativeSweep {
+    fn new(f: Fp64, reps: &[SweepRep], probe_mont: &[u64], threads: usize) -> Result<Self, String> {
+        let n = probe_mont.len().max(1);
+        let bits = (usize::BITS - (2 * n - 1).leading_zeros()).max(4);
+        let mut slots = vec![u64::MAX; 1usize << bits];
+        let shift = 64 - bits;
+        let mask = slots.len() - 1;
+        for &x in probe_mont {
+            let mut h = Self::hash(x, shift);
+            while slots[h] != u64::MAX && slots[h] != x {
+                h = (h + 1) & mask;
+            }
+            slots[h] = x;
+        }
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .map_err(|e| format!("rootfind-subtract-gpu: worker=native thread pool: {e}"))?;
+        Ok(Self {
+            f,
+            xs: reps.iter().map(|r| r.x).collect(),
+            ys: reps.iter().map(|r| r.y).collect(),
+            slots,
+            shift,
+            pool,
+        })
+    }
+
+    #[inline(always)]
+    fn hash(x: u64, shift: u32) -> usize {
+        (x.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> shift) as usize
+    }
+
+    #[inline(always)]
+    fn contains(&self, x: u64) -> bool {
+        let mask = self.slots.len() - 1;
+        let mut h = Self::hash(x, self.shift);
+        loop {
+            let v = self.slots[h];
+            if v == x {
+                return true;
+            }
+            if v == u64::MAX {
+                return false;
+            }
+            h = (h + 1) & mask;
+        }
+    }
+
+    /// One target's reported positions, in the CPU sweep's order.  Rows with
+    /// `x_i = x_R` are skipped (such targets go to the CPU oracle whole).
+    fn sweep_one(&self, x: u64, y: u64, diffs: &mut Vec<u64>, scratch: &mut Vec<u64>) -> Hits {
+        let f = self.f;
+        let (xr, yr) = (f.to_mont(x), f.to_mont(y));
+        diffs.clear();
+        diffs.extend(self.xs.iter().map(|&xi| {
+            let d = f.sub(xr, xi);
+            if d == 0 {
+                f.one
+            } else {
+                d
+            }
+        }));
+        f.batch_inv(diffs, scratch);
+        let mut hits = Hits::new();
+        for i in 0..self.xs.len() {
+            let (xi, yi) = (self.xs[i], self.ys[i]);
+            if xi == xr {
+                continue;
+            }
+            let inv = diffs[i];
+            let lm = f.mul(f.add(yr, yi), inv);
+            let lp = f.mul(f.sub(yr, yi), inv);
+            let base = f.add(xr, xi);
+            if self.contains(f.sub(f.sqr(lm), base)) {
+                hits.push((2 * i, 0, 1));
+            }
+            if self.contains(f.sub(f.sqr(lp), base)) {
+                hits.push((2 * i + 1, 0, 1));
+            }
+        }
+        hits
+    }
+
+    fn sweep(&self, pts: &[PrimePoint]) -> Vec<Hits> {
+        use rayon::prelude::*;
+        self.pool.install(|| {
+            pts.par_iter()
+                .map_init(
+                    || (Vec::new(), Vec::new()),
+                    |(d, s), p| self.sweep_one(p.x, p.y, d, s),
+                )
+                .collect()
+        })
+    }
+}
+
 pub struct RootfindSubtractGpuOracle<'i> {
     cpu: RootfindSubtractOracle<'i>,
     m: u32,
@@ -377,6 +499,7 @@ pub struct RootfindSubtractGpuOracle<'i> {
     pending: RefCell<Vec<PrimePoint>>,
     swept: HashMap<(u64, u64), Hits>,
     counters: BTreeMap<String, u64>,
+    native: Option<NativeSweep>,
 }
 
 impl<'i> RootfindSubtractGpuOracle<'i> {
@@ -391,6 +514,7 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
             pending: RefCell::new(Vec::new()),
             swept: HashMap::new(),
             counters: BTreeMap::new(),
+            native: None,
         }
     }
 
@@ -583,6 +707,15 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
                 batch.push(p);
             }
         }
+        if let Some(native) = &self.native {
+            let hits = native.sweep(&batch);
+            for (p, h) in batch.iter().zip(hits) {
+                self.swept.insert((p.x, p.y), h);
+            }
+            self.bump("gpu_batches", 1);
+            self.bump("gpu_targets_swept", batch.len() as u64);
+            return Ok(());
+        }
         // A batch whose relations overflow the worker's buffer is split in
         // halves until each fits (only dense m = 3 tables on tiny curves).
         let mut work: Vec<&[PrimePoint]> = batch.chunks(MAX_BATCH).rev().collect();
@@ -651,8 +784,10 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             ),
             (
                 "worker",
-                "spawn (default: a worker process per run, which creates its CUDA context) or \
-                 daemon (connect to rootfind_serve --daemon; its start is a one-time host cost)",
+                "spawn (default: a worker process per run, which creates its CUDA context), \
+                 daemon (connect to rootfind_serve --daemon; its start is a one-time host cost) or \
+                 native (no worker: rootfind-subtract's own sweep over each batch's targets on a \
+                 thread pool in this process)",
             ),
             (
                 "backend",
@@ -662,6 +797,11 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             (
                 "probe_build",
                 "device (default for m = 3: the lookup table built on the device) or host",
+            ),
+            (
+                "threads",
+                "worker=native only: the thread pool's size (default: every thread the process \
+                 may use)",
             ),
         ]
     }
@@ -680,14 +820,34 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             ));
         }
         for key in params.0.keys() {
-            if !["m", "worker", "backend", "probe_build"].contains(&key.as_str()) {
+            if !["m", "worker", "backend", "probe_build", "threads"].contains(&key.as_str()) {
                 return Err(format!(
-                    "rootfind-subtract-gpu reads only `m`, `worker`, `backend` and `probe_build`; \
-                     `{key}` is unknown"
+                    "rootfind-subtract-gpu reads only `m`, `worker`, `backend`, `probe_build` and \
+                     `threads`; `{key}` is unknown"
                 ));
             }
         }
         self.mode = WorkerMode::parse(params.0.get("worker").map_or("spawn", |s| s.as_str()))?;
+        // `worker=native` has no backend or device table; `threads` belongs to it
+        // alone (0 or absent: every thread the process may use).
+        let threads = match params.0.get("threads") {
+            None => 0,
+            Some(t) => t.parse::<usize>().map_err(|_| {
+                format!("rootfind-subtract-gpu: threads must be a count, got `{t}`")
+            })?,
+        };
+        if self.mode == WorkerMode::Native {
+            for k in ["backend", "probe_build"] {
+                if params.0.contains_key(k) {
+                    return Err(format!(
+                        "rootfind-subtract-gpu: worker=native takes no `{k}` (it sweeps on the \
+                         CPU against the probe set the CPU oracle builds)"
+                    ));
+                }
+            }
+        } else if params.0.contains_key("threads") {
+            return Err("rootfind-subtract-gpu: `threads` needs worker=native".into());
+        }
         // `backend=cuda` fails closed when the worker has no device; `emulate`
         // runs the same kernel code on every host thread (a multi-threaded CPU
         // sweep); `any` (the default) takes the device when there is one.
@@ -706,7 +866,11 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         // (sorted for large sets), the first m = 3 measurement's path;
         // `pairs` (m = 3): the pair table itself is built by the worker (on the
         // device under CUDA) from the base, and charged here as the CPU build.
-        let default_build = if self.m == 3 { "device" } else { "host" };
+        let default_build = if self.m == 3 && self.mode != WorkerMode::Native {
+            "device"
+        } else {
+            "host"
+        };
         self.lookup = match params
             .0
             .get("probe_build")
@@ -728,7 +892,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         // The CPU oracle sees only `m`: the worker changes where the sweep
         // runs, not the search.
         let mut cpu_params = params.clone();
-        for k in ["worker", "backend", "probe_build"] {
+        for k in ["worker", "backend", "probe_build", "threads"] {
             cpu_params.0.remove(k);
         }
         self.cpu.prepare(ctx, fb, &cpu_params, ops)?;
@@ -776,6 +940,28 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         } else {
             Vec::new()
         };
+        self.native = None;
+        if self.mode == WorkerMode::Native {
+            let (f, reps) = self
+                .cpu
+                .sweep()
+                .ok_or("rootfind-subtract did not prepare")?;
+            let set: Vec<u64> = if self.m == 3 {
+                probe.iter().map(|&x| f.to_mont(x)).collect()
+            } else {
+                reps.iter().map(|r| r.x).collect()
+            };
+            let threads = if threads == 0 {
+                std::thread::available_parallelism().map_or(1, |n| n.get())
+            } else {
+                threads
+            };
+            self.native = Some(NativeSweep::new(f, reps, &set, threads)?);
+            self.swept.clear();
+            self.pending.borrow_mut().clear();
+            self.counters.clear();
+            return Ok(());
+        }
         let (backend, lookup) = (self.backend, self.lookup);
         let curve_a = ctx.group.a;
         if lookup == 4 {
@@ -1131,6 +1317,23 @@ mod tests {
         }
     }
 
+    /// `worker=native` (no worker process): the in-process multi-threaded sweep
+    /// equals `rootfind-subtract`, `m = 2` and `3`, one thread and three, on
+    /// single targets and lane batches.
+    #[test]
+    fn native_sweep_matches_rootfind_subtract() {
+        for m in [2, 3] {
+            for threads in ["1", "3"] {
+                run_equality_with(
+                    m,
+                    "native",
+                    &[Targets::Walk, Targets::WalkPrimeBatch256],
+                    &[("threads", threads)],
+                );
+            }
+        }
+    }
+
     /// The emulation backend asked for by name, and both probe-table builds.
     #[test]
     fn gpu_oracle_backend_and_probe_build_match() {
@@ -1334,6 +1537,21 @@ mod tests {
             let r = run_pipeline(&c, &spec, &base, &mut o, 1, &Calibration::default(), None);
             assert!(r.is_err(), "{k}={v}");
             spec.oracle_params.0.remove(k);
+        }
+        // `threads` only with worker=native; native takes no backend or build.
+        for extra in [
+            &[("threads", "2")][..],
+            &[("worker", "native"), ("backend", "emulate")],
+            &[("worker", "native"), ("probe_build", "host")],
+            &[("worker", "native"), ("threads", "two")],
+        ] {
+            let mut sp = spec.clone();
+            for (k, v) in extra {
+                sp.oracle_params.set(k, *v);
+            }
+            let mut o = RootfindSubtractGpuOracle::new(2, &inst);
+            let r = run_pipeline(&c, &sp, &base, &mut o, 1, &Calibration::default(), None);
+            assert!(r.is_err(), "{extra:?}");
         }
     }
 }
