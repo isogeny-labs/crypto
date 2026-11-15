@@ -1,5 +1,7 @@
 # Trace-fiber geometry instruments
 
+2026-11-15 update: the user selected GitHub for this bounded run's durable checkpoint. See GITHUB_CHECKPOINT_AMENDMENT.md, GITHUB_RUN_HANDOFF.md and the separately named run-fixed-github.sh. The historical S3 launcher and official gate remain unchanged. The amendment is filed before any geometry data and changes only the checkpoint transport, not numerical inputs, native algorithms or acceptance criteria. [pcc:unverified]
+
 Status: compiled implementation only; no geometry, audit, mutation or proof path has executed. Compilation and help-path checks are producer observations, not mathematical or signed PCC verification. [pcc:unverified]
 
 This continues the auxiliary trace-fiber lead in `../auxiliary-20261113/`. Its source references, derivation, projective cases and source-DLP acceptance criteria still apply. No novelty claim is added here. The immediate question is whether the quartic chart covers the actual finite trace fibers, including tangents and the identity fiber. [pcc:unverified]
