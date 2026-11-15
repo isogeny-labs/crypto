@@ -122,6 +122,88 @@ matter of the lattice construction.
 ## 2. SAT against F4 on the quadratic RR system over GF(2^m)
 
 Preregistration: [`PREREGISTRATION.md`](PREREGISTRATION.md) (frozen before the panel).
-Results: §2 below is filled from `runs/`, see RESULTS section.
+Six follow-ups were added at the owner's request and preregistered separately in [`PREREG_FOLLOWUPS.md`](PREREG_FOLLOWUPS.md).
 
-<!-- RESULTS -->
+
+### 2.1 Panel of record: incidence (degree 2) against norm (degree 3), SAT and F4
+
+`examples/rr_quadratic_panel.rs`, curve y² + xy = x³ + 1, factor base every affine point
+with x ∈ V (T included), ℓ = ⌊(m+2)/3⌋, 4 planted + 4 unplanted draws per cell, 600 s
+budget, F4 cap per [`PREREGISTRATION.md`](PREREGISTRATION.md) amendments 1–2. Every
+decided F4 count and every SAT verdict equals the group-arithmetic ground truth (0
+mismatches in every cell); every SAT model verifies. Table:
+[`tables/panel_snapshot_0910Z.md`](tables/panel_snapshot_0910Z.md) (regenerated at the
+end). `[pcc:unverified]`
+
+| m | ℓ | incidence (3ℓ+8m vars): F4 | incidence: SAT conflicts (median) | norm (3ℓ+2m vars): F4 solving degree | norm: SAT conflicts (median) |
+|--:|--:|:--|--:|:--|--:|
+| 7 | 3 | 2/8 decided (rootless draws, refuted at degree 3); the rest refuse a degree-4 matrix ≈ 5–6.6·10⁵ square | 5,875 | 4 (8/8) | 144 |
+| 9 | 3 | 4/8 (rootless only); refused ≈ 1.3–1.5·10⁶ square at degree 4 | 55,171 | 3–4 (8/8) | 217 |
+| 11 | 4 | 0/8 (draws 0–3: 600 s budget under the 8 GiB cap; draws 4–7: a degree-3 matrix ≈ 10⁵ × 1.5·10⁵ refused under the 1 GiB cap) | 537,100 (5/8 decided) | 4 (8/8) | 688.5 |
+| 13 | 5 | 0/8 (degree-3 matrix ≈ 10⁵ × 1.5·10⁵ refused, 1 GiB cap) | 0/8 decided in 600 s | 0/7 so far: degree-5 matrix ≈ 7·10⁵ square (≈ 60 GB) refused under the 8 GiB cap | 3,385.5 (8/8) |
+
+Reading. The quadratic incidence form is the hard one for **both** engines: F4 needs a
+degree-4 step it cannot build from m = 7, and SAT needs 10³× the conflicts of the norm form
+at every m. The norm form, with a quarter of the unknowns and one degree more, is decided
+by SAT on every draw through m = 13 (median 144 → 3,386 conflicts from m = 7 to 13), and by F4
+at solving degree 4 through m = 11; at m = 13 F4 needs a degree-5 step it cannot build.
+Owner's hypothesis "quadratic is where SAT wins": on these systems the number of unknowns
+decides, not the degree.
+
+### 2.2 F2 — guess-and-solve floors
+
+`rr_sat_amortise guess`, norm arm, the panel's draws, k = 0 … 2ℓ guessed summand bits,
+warm (one solver, branches as assumptions) and cold (fresh solver per branch); 320 rows,
+0 verdict mismatches, 0 undecided. `[pcc:unverified]`
+
+| m | k = 0 | k = ℓ (guess one summand) | k = 2ℓ | argmin k per draw (cold) |
+|--:|--:|--:|--:|:--|
+| 11 | 688 | 3,325 (4.8×) | 3,910 | 0 on 7 of 8 draws |
+| 13 | 3,385 | 29,378 (8.7×) | 32,311 | 0 on 7 of 8 draws |
+
+(median total conflicts over all 2^k branches, warm mode. Cold lies between −4 % and +16 %
+of warm at every k ≥ 1, except m = 13, k = 1, where it is +72 %.) P2 holds:
+no guessing split beats the solver on the median draw.
+
+### 2.3 F4 — amortising across targets
+
+`rr_sat_amortise targets`, m = 11, 4 draws × 64 targets (amendment 3), three modes on the
+same V: warm (one solver, symbolic target bits as assumptions), cold_sym (fresh solver on
+the same symbolic encoding, target bits as units), cold (fresh solver on the constant-target
+system). 0 undecided, 0 truth mismatches. `[pcc:unverified]`
+
+| draw | cold_sym / warm (incrementality) | cold / cold_sym (encoding) | cold / warm (net) |
+|--:|--:|--:|--:|
+| 0 | 1.023 | 0.0187 | 0.0191 |
+| 1 | 1.394 | 0.0206 | 0.0288 |
+| 2 | 1.237 | 0.0165 | 0.0204 |
+| 3 | 1.252 | 0.0173 | 0.0217 |
+
+Keeping learnt clauses across targets saves a median 1.24× in conflicts; making the target
+symbolic, which is what lets one solver serve every target, costs ≈ 55×. Net, a fresh solver
+per target is 35–52× cheaper. P4 (warm ≤ ½ cold) is falsified.
+
+### 2.4 F6 — Gauss–Jordan in CryptoMiniSat
+
+[`cms/`](cms/): the unmodified CryptoMiniSat 5.11.21 library from its PyPI sdist behind a
+thin DIMACS-XOR driver (the upstream CLI could not be built: no GitHub access), single
+thread; Gauss–Jordan off sets `max_num_matrices = 0`. 46 panel CNFs × 2 configurations;
+every SAT model checked; every decided verdict equals the panel's. `[pcc:unverified]`
+
+| m | arm | CMS Gauss on (median conflicts) | Gauss off | Gauss factor | repo CDCL (panel) |
+|--:|:--|--:|--:|--:|--:|
+| 7 | norm | 126 | 835.5 | 6.6× | 144 |
+| 9 | norm | 274 | 1,513.5 | 5.5× | 217 |
+| 11 | norm | 2,197.5 | 22,745.5 | 10.4× | 437 |
+| 7 | incidence | 3,586 | 17,021.5 | 4.7× | 5,875 |
+| 9 | incidence | 30,336.5 | 222,941 | 7.3× | 55,171 |
+| 11 | incidence | 934,076 (5/7) | 5,127,626 (4/7) | 5.5× | 537,100 (5/7) |
+
+Gauss–Jordan is worth 5–10× to CryptoMiniSat on these systems (P6: ≥ 10× on the norm arm at
+m ≥ 11 holds at m = 11, by 0.4). The repository's own CDCL, which handles XORs natively
+with its own elimination, needs fewer conflicts than CryptoMiniSat-with-Gauss on the norm
+arm at m = 11 (437 against 2,198); conflicts are not the same unit across solvers, so this is
+reported, not ranked.
+
+<!-- RESULTS-PENDING: F1 (ℓ-ladder), F3 (norm4), F5 (XL), F6 m = 13 -->
+
