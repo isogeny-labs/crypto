@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261114T2215Z-pkm-fd-pfd-b-rp",
+  "latest_record": "20261115T1647Z-ic-la-m3",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 6,
     "invalid": 4,
-    "measured": 191,
+    "measured": 192,
     "open": 1
   },
   "repo": "crypto",
@@ -4054,6 +4054,75 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 975.0,
+      "latest": 975.0,
+      "latest_derived": {},
+      "metric": "ic_la_echelon_band_w1_r37_f4096",
+      "points": [
+        {
+          "commit": "9f8feeace6a1",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 2,
+          "record": "20261115T1647Z-ic-la-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Linear algebra for m=3 rootfind-subtract at |F_x| 2048/4096 on 34-38-bit prime_explicit curves (local L0, counts deterministic): incremental-gauss-echelon needs 0.10-0.15x the row_ops of incremental-gauss (structured-gauss 0.25-0.30x) with identical trials, relations, logarithm and S in all 24 comparisons; 42/42 verified and replayed. \u00a75a band: 1.03-1.87x cheaper at w=0.1, 1.15-4.46x at w=1; S unchanged at w=0. Run through benchrec run.",
+          "value": 975.0
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 46505346.0,
+      "latest": 46505346.0,
+      "latest_derived": {},
+      "metric": "ic_la_echelon_row_ops_r37_f4096",
+      "points": [
+        {
+          "commit": "9f8feeace6a1",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 2,
+          "record": "20261115T1647Z-ic-la-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Linear algebra for m=3 rootfind-subtract at |F_x| 2048/4096 on 34-38-bit prime_explicit curves (local L0, counts deterministic): incremental-gauss-echelon needs 0.10-0.15x the row_ops of incremental-gauss (structured-gauss 0.25-0.30x) with identical trials, relations, logarithm and S in all 24 comparisons; 42/42 verified and replayed. \u00a75a band: 1.03-1.87x cheaper at w=0.1, 1.15-4.46x at w=1; S unchanged at w=0. Run through benchrec run.",
+          "value": 46505346.0
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.148,
+      "latest": 0.148,
+      "latest_derived": {},
+      "metric": "ic_la_echelon_row_ops_ratio_max",
+      "points": [
+        {
+          "commit": "9f8feeace6a1",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 12,
+          "record": "20261115T1647Z-ic-la-m3",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Linear algebra for m=3 rootfind-subtract at |F_x| 2048/4096 on 34-38-bit prime_explicit curves (local L0, counts deterministic): incremental-gauss-echelon needs 0.10-0.15x the row_ops of incremental-gauss (structured-gauss 0.25-0.30x) with identical trials, relations, logarithm and S in all 24 comparisons; 42/42 verified and replayed. \u00a75a band: 1.03-1.87x cheaper at w=0.1, 1.15-4.46x at w=1; S unchanged at w=0. Run through benchrec run.",
+          "value": 0.148
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
     },
     {
       "better": "lower",
