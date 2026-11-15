@@ -8,7 +8,9 @@ were used to choose it.
 
 - **Code:** `crates/hec-native-ic/src/lp_sieve.rs`, `examples/lp_sieve_probe.rs`.
 - **Raw output:** `lp-sieve-probe-20261115/` (`probe.txt` fixed-budget runs, `target.txt`
-  run-to-target, `summary.md`, `host.txt` with load, `binary.sha256`).
+  run-to-target, `solve.txt` and `solve-sgebw.txt` end to end, `summary.md`,
+  `summary-target.md`, `summary-solve.md`, `summary-solve-sgebw.md`, `host.txt` with load,
+  `binary.sha256`).
 - **Unit:** field products (feature `count-ops`, S4's counter, PLAN §10): every 64×64 product of
   field elements, including each term of `Poly::mul`'s lazily reduced inner product. Deterministic.
   Wall clock is from a shared host at load average 55–83 and is descriptive only.
@@ -65,7 +67,7 @@ arms. Products per class charge the whole run to that class.
   1:43:956 against 1:65:934 per thousand at (3, 32749), κ = 1), because its candidates come from
   base hits and a quadratic finish.
 - **Partials are equally useful.** At an equal partial count, the large-prime graphs close the same
-  number of cycles on 10 of the 12 rows (to within 4%). At (3, 32749), below the graph's giant
+  number of cycles on 10 of the 12 rows (to within 5%). At (3, 32749), below the graph's giant
   component, the walk's larger 1P share gives it more cycles: 3 and 18 against 1 and 5. The
   run-to-target figures below include this deficit.
 
@@ -146,21 +148,24 @@ also tried and dropped: no usable instance within the 2,000,000-step BSGS budget
   κ chosen for the combined cost are the levers.
 
 With `Solver::SgeBw` (follow-up B, `sieve-solve-20261115/`) instead of `Solver::Fast` on the same
-matrices (`solve-sgebw.txt`, `summary-solve-sgebw.md`), every run still recovers `k` (one walk seed
-at (4, 509) needed μ = 1.1), but the solve costs more, not less: 5.91M against 2.87M mulmods for the
+matrices (`solve-sgebw.txt`, `summary-solve-sgebw.md`), every run still ends with a verified `k`,
+but one walk run at (4, 509) (seed 20261117, μ = 1) returned a *wrong* `k` that `Fast` solved
+correctly; the `k·D₁ = D₂` check caught it and μ = 1.1 succeeded. Cause not investigated. And the solve costs more, not less: 5.91M against 2.87M mulmods for the
 sieve at (3, 8191), 0.80M against 0.19M at (3, 2039). At these sizes SGE leaves too large a
 residual for Wiedemann to pay off, so B does not yet relieve the 2LP solve.
 
 ## What this decides
 
-1. **The relation source for T1 (2LP at genus 3/4) should be the line sieve, not the walk.** To GTTD's
+1. **The relation source for T1 (2LP at genus 3/4) should be the line sieve, not the walk.** [pcc:unverified] To GTTD's
    relation count it needed 21–46× (genus 3) and 14–29× (genus 4) fewer counted field products than
    this engine's walk, the clock agreeing, and its relations solved for `k` with no extra margin.
    This is a constant factor against an untuned walk; prior work (Sarkar–Singh; Vitse–Wallet for
    large primes) has the mechanism.
 2. **The linear algebra becomes the bottleneck sooner.** With relation collection this cheap, the
-   2LP solve dominates the sieve's cost from p ≈ 2^13 at genus 3. T3 (SGE, then block Wiedemann) and
-   κ balance (T4) move up.
+   2LP solve dominates the sieve's cost from p ≈ 2^13 at genus 3: end to end (relation phase +
+   `Fast` solve) the advantage is 12.4×, 8.8× and 15.2× on the three solved rows, against 20–28× for
+   the relation phase alone. SGE + block Wiedemann as ported (B) does not help here; the lever is
+   better filtering for a smaller residual, together with κ balance (T4). [pcc:unverified]
 3. **Next protocol.** A frozen slice for the large-prime sieve: rows, κ grid including κ = 2 (to
    bracket the optimum), run-to-`k` end to end as the gate, relation-phase and solve products as the
    primary statistics, and the walk with the cheapest Tier-2 levers as the comparator.

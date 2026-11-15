@@ -111,3 +111,11 @@ after SGE is ~m/7 (g2) with ~20 non-zeros per row, so any Wiedemann-type
 finish costs ~37·(m/7)².  Getting near the walk's 3.57M would need a much
 smaller residual (better filtering / merging of the sieve rows, e.g. using
 that all rows of a line share α and β), not a different Krylov solver.
+
+## Later finding (parent session, 2026-11-15)
+
+On the pruned 2LP matrices of `LP-SIEVE-PROBE-20261115.md` (`lp-sieve-probe-20261115/solve-sgebw.txt`),
+`Solver::SgeBw` returned a wrong `k` once: walk rows, (4, 509), seed 20261117, μ = 1, a system
+`Solver::Fast` solved correctly. The `k·D₁ = D₂` check caught it. Cause not investigated; it may be
+the rank-loss mode fixed above for sieve rows. SgeBw also cost 2–4× more mulmods than `Fast` on those
+matrices.
