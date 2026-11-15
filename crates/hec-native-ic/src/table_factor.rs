@@ -4,6 +4,7 @@ use hec_native_ic::{fp::Fp, oracle::Roots, poly::Poly};
 const MISS: u64 = u64::MAX;
 
 pub struct Tables {
+    degree_limit: usize,
     pub fp: Fp,
     square: Vec<u64>,
     cube: Vec<u64>,
@@ -30,12 +31,33 @@ fn pack(mut rs: Vec<(u64, u32)>) -> Roots {
 }
 impl Tables {
     pub fn new(p: u64) -> Self {
+        Self::for_degree(p, 4)
+    }
+    pub fn for_degree(p: u64, degree_limit: usize) -> Self {
         assert!(p > 3 && p <= 1_000_000, "bounded odd prime field required");
+        assert!((2..=4).contains(&degree_limit));
         let f = Fp::new(p);
         let len = p as usize;
         let mut square = vec![MISS; len];
+        let (mut value, mut delta) = (0, 1);
         for y in 0..=p / 2 {
-            square[f.mul(y, y) as usize] = y;
+            square[value as usize] = y;
+            value = f.add(value, delta);
+            delta = f.add(delta, 2);
+        }
+        if degree_limit == 2 {
+            return Self {
+                degree_limit,
+                fp: f,
+                square,
+                cube: Vec::new(),
+                inverse: Vec::new(),
+                projective: Vec::new(),
+                scale: Vec::new(),
+                n: 0,
+                zeta: 0,
+                kappa: 0,
+            };
         }
         let mut cube = vec![MISS; len];
         for x in 0..p {
@@ -77,6 +99,7 @@ impl Tables {
             assert_ne!(zeta, 1);
         }
         Self {
+            degree_limit,
             fp: f,
             square,
             cube,
@@ -97,7 +120,17 @@ impl Tables {
     }
     fn inv(&self, a: u64) -> u64 {
         assert_ne!(a, 0);
+        if self.inverse.is_empty() {
+            assert_eq!(a, 2);
+            return (self.fp.p + 1) / 2;
+        }
         self.inverse[a as usize]
+    }
+    pub fn factor_base(&self, curve: &hec_native_ic::jac::Curve) -> Vec<(u64, u64)> {
+        assert_eq!(self.fp.p, curve.fp.p);
+        (0..self.fp.p)
+            .filter_map(|x| self.sq(curve.f.eval(x, &self.fp)).map(|y| (x, y)))
+            .collect()
     }
     fn sq(&self, a: u64) -> Option<u64> {
         let v = self.square[a as usize];
@@ -287,6 +320,7 @@ impl Tables {
     }
     pub fn split(&self, u: &Poly) -> Option<Roots> {
         assert_eq!(u.lc(), 1);
+        assert!(u.deg() <= self.degree_limit as isize);
         match u.deg() {
             0 => Some(Roots::default()),
             1 => Some(pack(vec![(self.fp.neg(u.c[0]), 1)])),

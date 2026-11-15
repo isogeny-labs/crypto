@@ -1,3 +1,5 @@
+#[path = "../../../research/hec_table_oracle_20261114/pipeline.rs"]
+mod pipeline;
 #[path = "../src/table_factor.rs"]
 mod table_factor;
 use hec_native_ic::{
@@ -15,6 +17,10 @@ fn checksum(r: Option<Roots>) -> u64 {
     })
 }
 fn main() {
+    if std::env::var("HEC_PIPELINE").is_ok() {
+        run_pipeline();
+        return;
+    }
     let repeats: u64 = std::env::var("HEC_REPEATS")
         .ok()
         .and_then(|s| s.parse().ok())
@@ -77,6 +83,134 @@ fn main() {
                 println!("JSON {{\"g\":{g},\"p\":{p},\"repeat\":{rep},\"arm\":\"{arm}\",\"n\":{count},\"scan_ns\":{scan},\"setup_ns\":{},\"cold_ns\":{},\"bytes\":{},\"checksum\":{sum},\"verified\":true}}",if arm=="table"{setup}else{0},scan+if arm=="table"{setup}else{0},if arm=="table"{tables.bytes()}else{0});
             }
             assert!(sums.iter().all(|s| s == &sums[0]));
+        }
+    }
+}
+
+fn run_pipeline() {
+    use hec_native_ic::{
+        ic::{solve_dlp, IcParams},
+        solve::Solver,
+    };
+    let seeds: u64 = std::env::var("HEC_SEEDS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(5);
+    for (g, p) in [
+        (2, 101),
+        (2, 251),
+        (2, 503),
+        (2, 1009),
+        (2, 2003),
+        (2, 4001),
+        (3, 61),
+        (3, 211),
+        (3, 401),
+        (4, 31),
+        (4, 61),
+    ] {
+        let i = pick_instance(p, g).unwrap();
+        let k = i.ell / 3 + 7;
+        let target = i.curve.mul(&i.d1, k);
+        for seed in 0..seeds {
+            let mut arms = Vec::new();
+            for branches in [1, 64] {
+                for hybrid in [false, true] {
+                    for oracle in ["reference", "direct", "table"] {
+                        arms.push((branches, hybrid, oracle));
+                    }
+                }
+            }
+            if seed % 2 == 1 {
+                arms.reverse();
+            }
+            for (branches, hybrid, oracle) in arms {
+                let params = IcParams {
+                    seed: 20260916 + seed,
+                    branches,
+                    solver: if hybrid { Solver::Hybrid } else { Solver::Fast },
+                    reference_oracle: oracle == "reference",
+                    ..IcParams::default()
+                };
+                let r = if oracle == "table" {
+                    pipeline::solve_table(&i.curve, &i.d1, &target, i.ell, &params)
+                } else {
+                    solve_dlp(&i.curve, &i.d1, &target, i.ell, &params)
+                };
+                assert_eq!(r.k, Some(k), "g={g} p={p} seed={seed}");
+                println!("PIPE {{\"g\":{g},\"p\":{p},\"seed\":{seed},\"branches\":{branches},\"hybrid\":{hybrid},\"oracle\":\"{oracle}\",\"trials\":{},\"rows\":{},\"pivot_hash\":\"{:016x}\",\"solve_ns\":{},\"fb_ns\":{},\"oracle_ns\":{},\"total_ns\":{},\"verified\":true}}",r.trials,r.relations,r.solve.pivot_hash,r.solve_ns,r.fb_ns,r.oracle_ns,r.total_ns);
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod pipeline_tests {
+    use super::*;
+    use hec_native_ic::{
+        ic::{solve_dlp, IcParams},
+        solve::Solver,
+    };
+    #[test]
+    fn same_catalogue_walk_rank_and_answer() {
+        for (g, p) in [
+            (2, 101),
+            (2, 251),
+            (2, 503),
+            (2, 1009),
+            (2, 2003),
+            (2, 4001),
+            (3, 61),
+            (3, 211),
+            (3, 401),
+            (4, 31),
+            (4, 61),
+        ] {
+            let i = pick_instance(p, g).unwrap();
+            assert_eq!(
+                table_factor::Tables::for_degree(p, g).factor_base(&i.curve),
+                factor_base(&i.curve)
+            );
+            let k = i.ell / 3 + 7;
+            let target = i.curve.mul(&i.d1, k);
+            for seed in 0..5 {
+                for branches in [1, 64] {
+                    for solver in [Solver::Fast, Solver::Hybrid] {
+                        let params = IcParams {
+                            seed: 20260916 + seed,
+                            branches,
+                            solver,
+                            ..IcParams::default()
+                        };
+                        let a = solve_dlp(&i.curve, &i.d1, &target, i.ell, &params);
+                        let b = pipeline::solve_table(&i.curve, &i.d1, &target, i.ell, &params);
+                        assert_eq!(b.k, Some(k));
+                        assert_eq!(
+                            (
+                                a.k,
+                                a.trials,
+                                a.relations,
+                                a.solve_rounds,
+                                a.solve.pivot_hash,
+                                a.solve.pivots,
+                                a.solve.row_ops,
+                                a.solve.mulmods
+                            ),
+                            (
+                                b.k,
+                                b.trials,
+                                b.relations,
+                                b.solve_rounds,
+                                b.solve.pivot_hash,
+                                b.solve.pivots,
+                                b.solve.row_ops,
+                                b.solve.mulmods
+                            ),
+                            "g={g} p={p} seed={seed} b={branches}"
+                        );
+                    }
+                }
+            }
         }
     }
 }

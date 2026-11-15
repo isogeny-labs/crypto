@@ -66,3 +66,21 @@ reported separately AND included. A component10x gain does not establish the ful
 
 A subsequent end-to-end experiment must integrate table setup into factor-base construction and
 compare the strongest native pipeline on matched targets. No claim until that experiment exists.
+
+## End-to-end amendment (before pipeline timing)
+
+The component pilot (ee98ca8b1d) yields cold oracle gain0.75..10.39x against the best of reference
+and direct, including a genus2 p503 loss. It does not establish10x total. Genus2 must not pay for
+unused cubic tables: build square roots alone there, using square(y+1)=square(y)+2y+1. The
+catalogue reuses that table, so its complete cold cost is charged once per solve.
+
+Implement a separately instrumented table pipeline by copying the unchanged walk/row/solve
+semantics from ic.rs. Gate equal catalogue, trials, rows, pivot hash, row operations and answer
+against the native pipeline at both branch counts1/64 and Fast/Hybrid. Replace only catalogue
+root lookup and oracle. Test all eleven current instances at five seeds before timing.
+
+Pilot: five seeds per instance. Baseline is the fastest of all eight native combinations
+(branches1/64 x Fast/Hybrid x reference/direct), candidate is the fastest of four table
+combinations(branches1/64 x Fast/Hybrid), with every table build, catalogue and final verification
+inside total time. These best-arm selections are exploratory and cannot establish the goal;
+any follow-up claim needs frozen choices and held-out curves. Retain nulls and caps.
