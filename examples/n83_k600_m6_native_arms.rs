@@ -430,7 +430,7 @@ fn docker_export_args(
     ]
 }
 
-fn bounded_export(
+fn bounded_container(
     command: &mut Command,
     name: &str,
     outer_seconds: u64,
@@ -617,6 +617,114 @@ fn preflight_gate(
     Ok(hashes)
 }
 
+fn audited_constructed_export(
+    arm_lock: &Value,
+    arm_lock_path: &Path,
+    preflight_hashes: &[String],
+    mode: &str,
+    export_root: &Path,
+) -> Result<(PathBuf, Vec<String>)> {
+    if !["positive-pinned", "positive-unpinned"].contains(&mode) {
+        return Err("constructed control mode required before natural query".into());
+    }
+    let root = fs::canonicalize(export_root)?;
+    let stage_path = root.join("export-stage.json");
+    let export_path = root.join(format!("{mode}.json"));
+    let xcnf_path = root.join(format!("{mode}.xcnf"));
+    let stage: Value = serde_json::from_slice(&fs::read(&stage_path)?)?;
+    let export: Value = serde_json::from_slice(&fs::read(&export_path)?)?;
+    let hashes = vec![
+        sha256_file(&stage_path)?,
+        sha256_file(&export_path)?,
+        sha256_file(&xcnf_path)?,
+    ];
+    if stage["schema"] != "n83.k600-m6-native-arm-export/v1"
+        || stage["status"] != "PASS_EXPORT_ONLY"
+        || stage["mode"] != mode
+        || stage["source_commit"] != arm_lock["source_commit"]
+        || stage["lock_sha256"] != sha256_file(arm_lock_path)?
+        || stage["preflight_outer_sha256"] != preflight_hashes[1]
+        || stage["export_json_sha256"] != hashes[1]
+        || stage["xcnf_sha256"] != hashes[2]
+        || stage["exporter_exit_code"] != 0
+        || stage["solver_executed"] != false
+        || stage["model_replayed"] != false
+        || !stage["total_index_calculus_runtime_ms"].is_null()
+        || !stage["selected_best_total_runtime"].is_null()
+    {
+        return Err("constructed XCNF export stage differs from frozen lock".into());
+    }
+    validate_export(&export, arm_lock, mode, &xcnf_path)?;
+    Ok((xcnf_path, hashes))
+}
+
+fn docker_solver_args(
+    lock: &Value,
+    solver: &Path,
+    xcnf: &Path,
+    name: &str,
+    solver_seconds: u64,
+) -> Vec<String> {
+    let mount = |source: &Path, destination: &str| {
+        format!(
+            "type=bind,src={},dst={destination},readonly",
+            source.display()
+        )
+    };
+    vec![
+        "run".into(),
+        "--rm".into(),
+        "--pull".into(),
+        "never".into(),
+        "--name".into(),
+        name.into(),
+        "--network".into(),
+        "none".into(),
+        "--memory".into(),
+        "4096m".into(),
+        "--memory-swap".into(),
+        "4096m".into(),
+        "--cpus".into(),
+        "1".into(),
+        "--cpuset-cpus".into(),
+        "0".into(),
+        "--pids-limit".into(),
+        "64".into(),
+        "--cap-drop".into(),
+        "ALL".into(),
+        "--security-opt".into(),
+        "no-new-privileges".into(),
+        "--read-only".into(),
+        "--tmpfs".into(),
+        "/tmp:rw,noexec,nosuid,size=64m".into(),
+        "--user".into(),
+        format!("{}:{}", unsafe { libc::geteuid() }, unsafe {
+            libc::getegid()
+        }),
+        "--mount".into(),
+        mount(solver, "/solver"),
+        "--mount".into(),
+        mount(xcnf, "/input.xcnf"),
+        lock["image_id"].as_str().unwrap_or_default().into(),
+        "/solver".into(),
+        "--threads".into(),
+        "1".into(),
+        "--random".into(),
+        "20261115".into(),
+        "--maxtime".into(),
+        solver_seconds.to_string(),
+        "--maxconfl".into(),
+        "10000".into(),
+        "--verb".into(),
+        "1".into(),
+        "--verbstat".into(),
+        "1".into(),
+        "--printsol".into(),
+        "1".into(),
+        "/input.xcnf".into(),
+    ]
+}
+
 fn export(
     lock_path: &Path,
     preflight_lock_path: &Path,
@@ -717,7 +825,7 @@ fn export(
                     .create_new(true)
                     .open(&stderr_path)?,
             ));
-        let (exit, wall_cap, wall_ms) = bounded_export(&mut command, &name, outer_seconds)?;
+        let (exit, wall_cap, wall_ms) = bounded_container(&mut command, &name, outer_seconds)?;
         if wall_cap {
             return Err(format!("UNKNOWN_export_wall_cap: {outer_seconds} seconds").into());
         }
@@ -792,6 +900,183 @@ fn export(
     run
 }
 
+fn solve(
+    lock_path: &Path,
+    preflight_lock_path: &Path,
+    preflight_root: &Path,
+    mode: &str,
+    export_root: &Path,
+    output: &Path,
+    outer_seconds: u64,
+) -> Result<Value> {
+    let stage_start = Instant::now();
+    if mode != "positive-pinned"
+        || !output.is_absolute()
+        || output.exists()
+        || !(6..=3_600).contains(&outer_seconds)
+    {
+        return Err(
+            "constructed mode, new absolute output, and 6..3600 outer seconds required".into(),
+        );
+    }
+    let repo = fs::canonicalize(env!("CARGO_MANIFEST_DIR"))?;
+    let parent = fs::canonicalize(output.parent().ok_or("output parent missing")?)?;
+    let lock_path = fs::canonicalize(lock_path)?;
+    let lock_sha = sha256_file(&lock_path)?;
+    let lock: Value = serde_json::from_slice(&fs::read(&lock_path)?)?;
+    let commit = clean_source_commit(&repo)?;
+    let panel = PathBuf::from(lock["panel_root"].as_str().ok_or("panel root missing")?);
+    let stage_root = panel.parent().ok_or("stage root missing")?;
+    let export_root = fs::canonicalize(export_root)?;
+    if parent.starts_with(&repo)
+        || parent.starts_with(stage_root)
+        || parent.starts_with(&export_root)
+    {
+        return Err("solver output overlaps frozen source or input".into());
+    }
+    let (checked_panel, _) = staged_panel(stage_root, &commit)?;
+    let solver = fs::canonicalize(
+        lock["solver_binary"]
+            .as_str()
+            .ok_or("solver binary missing")?,
+    )?;
+    let exporter = fs::canonicalize(
+        lock["exporter_replayer_binary"]
+            .as_str()
+            .ok_or("exporter binary missing")?,
+    )?;
+    let supervisor = fs::canonicalize(std::env::current_exe()?)?;
+    if lock["schema"] != "n83.k600-m6-native-arms-lock/v1"
+        || lock["status"] != "PREPARED_ONLY"
+        || lock["source_commit"] != commit
+        || lock["source_root"] != repo.to_string_lossy().as_ref()
+        || checked_panel != panel
+        || lock["staging_receipt_sha256"] != sha256_file(&stage_root.join("staging.json"))?
+        || lock["store_name"] != STORE_NAME
+        || lock["object_sha256"] != OBJECT_SHA
+        || lock["point_set_blake3"] != POINT_SET
+        || lock["solver_sha256"] != sha256_file(&solver)?
+        || lock["exporter_replayer_sha256"] != sha256_file(&exporter)?
+        || lock["supervisor_sha256"] != sha256_file(&supervisor)?
+        || lock["max_conflicts"] != 10_000
+        || lock["max_models"] != 1
+        || lock["solver_launch_admitted"] != false
+        || !is_linux_arm64_elf(&solver)?
+    {
+        return Err("K600 arm lock, source, base, or solver changed before launch".into());
+    }
+    let preflight_hashes = preflight_gate(&lock, preflight_lock_path, preflight_root)?;
+    let (xcnf, export_hashes) =
+        audited_constructed_export(&lock, &lock_path, &preflight_hashes, mode, &export_root)?;
+    let image = lock["image_id"].as_str().ok_or("image ID missing")?;
+    let image_identity = format!("{image} linux/arm64 {commit}");
+    let image_format = "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}";
+    if docker_short(&["image", "inspect", "--format", image_format, image])? != image_identity {
+        return Err("frozen solver image differs before launch".into());
+    }
+    fs::create_dir(output)?;
+    let output = fs::canonicalize(output)?;
+    let stdout_path = output.join("solver.stdout");
+    let stderr_path = output.join("solver.stderr");
+    let run = (|| -> Result<Value> {
+        let name = format!("n83-k600-m6-solve-{mode}-{}", std::process::id());
+        let solver_seconds = outer_seconds - 5;
+        let args = docker_solver_args(&lock, &solver, &xcnf, &name, solver_seconds);
+        let mut command = Command::new("docker");
+        command
+            .args(&args)
+            .stdout(Stdio::from(
+                File::options()
+                    .write(true)
+                    .create_new(true)
+                    .open(&stdout_path)?,
+            ))
+            .stderr(Stdio::from(
+                File::options()
+                    .write(true)
+                    .create_new(true)
+                    .open(&stderr_path)?,
+            ));
+        let (exit, capped, wall_ms) = bounded_container(&mut command, &name, outer_seconds)?;
+        let stdout_bytes = fs::metadata(&stdout_path)?.len();
+        let status = if capped {
+            "UNKNOWN_solver_wall_cap"
+        } else if stdout_bytes > 20_000_000 {
+            "PRODUCER_FAILURE_output_cap"
+        } else if exit == Some(10) {
+            "SAT_PENDING_XCNF_REPLAY"
+        } else if exit == Some(20) {
+            "UNSAT_CONSTRUCTED_CONTROL"
+        } else if exit == Some(0) {
+            "UNKNOWN_solver_cap_or_exit0"
+        } else if matches!(exit, Some(134 | 137)) {
+            "RESOURCE_EXIT"
+        } else {
+            "PRODUCER_FAILURE_solver_exit"
+        };
+        if clean_source_commit(&repo)? != commit
+            || sha256_file(&lock_path)? != lock_sha
+            || sha256_file(&solver)? != lock["solver_sha256"]
+            || sha256_file(&exporter)? != lock["exporter_replayer_sha256"]
+            || sha256_file(&supervisor)? != lock["supervisor_sha256"]
+            || sha256_file(&stage_root.join("staging.json"))? != lock["staging_receipt_sha256"]
+            || preflight_gate(&lock, preflight_lock_path, preflight_root)? != preflight_hashes
+            || audited_constructed_export(&lock, &lock_path, &preflight_hashes, mode, &export_root)?
+                .1
+                != export_hashes
+            || docker_short(&["image", "inspect", "--format", image_format, image])?
+                != image_identity
+        {
+            return Err("source, image, solver, preflight, or XCNF changed after solver".into());
+        }
+        let (after_panel, _) = staged_panel(stage_root, &commit)?;
+        if after_panel != panel {
+            return Err("factor-base panel changed after solver".into());
+        }
+        Ok(json!({
+            "schema":"n83.k600-m6-native-solver/v1","status":status,"mode":mode,
+            "source_commit":commit,"lock_sha256":lock_sha,"image_id":image,
+            "preflight_outer_sha256":preflight_hashes[1],
+            "export_stage_sha256":export_hashes[0],"xcnf_sha256":export_hashes[2],
+            "solver_binary_sha256":lock["solver_sha256"],"stdout_sha256":sha256_file(&stdout_path)?,
+            "stderr_sha256":sha256_file(&stderr_path)?,"exit_code":exit,
+            "outer_wall_limit_seconds":outer_seconds,"solver_internal_maxtime_seconds":solver_seconds,
+            "outer_wall_ms":wall_ms,"stage_wall_ms":stage_start.elapsed().as_millis(),
+            "conflict_budget":10_000,"threads":1,"random_seed":20_261_115u64,
+            "model_replayed":false,"total_index_calculus_runtime_ms":Value::Null,
+            "selected_best_total_runtime":Value::Null,
+        }))
+    })();
+    match run {
+        Ok(receipt) => {
+            write_new_json(&output.join("solver-receipt.json"), &receipt)?;
+            if receipt["status"] == "SAT_PENDING_XCNF_REPLAY" {
+                Ok(receipt)
+            } else {
+                Err(format!("constructed solver ended with {}", receipt["status"]).into())
+            }
+        }
+        Err(error) => {
+            let reason = error.to_string();
+            let status = if reason.starts_with("CLEANUP_FAILURE") {
+                "CLEANUP_FAILURE"
+            } else {
+                "PRODUCER_FAILURE"
+            };
+            let _ = write_new_json(
+                &output.join("failure.json"),
+                &json!({
+                    "schema":"n83.k600-m6-native-solver-failure/v1","status":status,
+                    "mode":mode,"reason":reason,"source_commit":commit,
+                    "stage_wall_ms":stage_start.elapsed().as_millis(),
+                    "selected_best_total_runtime":Value::Null,
+                }),
+            );
+            Err(error)
+        }
+    }
+}
+
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     let (output, result, stage_created_output) = match args.get(1).map(String::as_str) {
@@ -817,7 +1102,16 @@ fn main() -> Result<()> {
             })();
             (output, result, false)
         }
-        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned|positive-unpinned NEW_OUTPUT_DIR OUTER_SECONDS (natural requires completed positive control)".into()),
+        Some("solve") if args.len() == 9 => {
+            let output = PathBuf::from(&args[7]);
+            let result = (|| -> Result<Value> {
+                let seconds: u64 = args[8].parse()?;
+                solve(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
+                    &args[5],Path::new(&args[6]),&output,seconds)
+            })();
+            (output,result,false)
+        }
+        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned|positive-unpinned NEW_OUTPUT_DIR OUTER_SECONDS | solve ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned EXPORT_DIR NEW_OUTPUT_DIR OUTER_SECONDS (unpinned and natural require completed earlier controls)".into()),
     };
     if let Err(error) = &result {
         if stage_created_output && output.is_dir() && !output.join("staging.json").exists() {
@@ -1029,5 +1323,66 @@ mod tests {
         .unwrap();
         assert!(preflight_gate(&arm, &lock_path, &run).is_err());
         fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn solver_container_args_pin_xcnf_conflicts_and_isolation() {
+        let lock = json!({"image_id":format!("sha256:{}","a".repeat(64))});
+        let args = docker_solver_args(
+            &lock,
+            Path::new("/solver-bin"),
+            Path::new("/formula.xcnf"),
+            "n83-solver-check",
+            95,
+        );
+        let has = |key: &str, value: &str| {
+            args.windows(2)
+                .any(|pair| pair[0] == key && pair[1] == value)
+        };
+        for (key, value) in [
+            ("--network", "none"),
+            ("--memory", "4096m"),
+            ("--memory-swap", "4096m"),
+            ("--cpus", "1"),
+            ("--cpuset-cpus", "0"),
+            ("--pids-limit", "64"),
+            ("--cap-drop", "ALL"),
+            ("--security-opt", "no-new-privileges"),
+            ("--threads", "1"),
+            ("--random", "20261115"),
+            ("--maxtime", "95"),
+            ("--maxconfl", "10000"),
+            ("--printsol", "1"),
+        ] {
+            assert!(has(key, value), "missing {key} {value}");
+        }
+        assert!(args.iter().any(|arg| arg == "--read-only"));
+        assert!(has(
+            "--mount",
+            "type=bind,src=/solver-bin,dst=/solver,readonly"
+        ));
+        assert!(has(
+            "--mount",
+            "type=bind,src=/formula.xcnf,dst=/input.xcnf,readonly"
+        ));
+        assert_eq!(args.last().map(String::as_str), Some("/input.xcnf"));
+    }
+
+    #[test]
+    fn unpinned_solver_waits_for_pinned_model_replay() {
+        let output =
+            std::env::temp_dir().join(format!("n83-k600-m6-unpinned-gate-{}", std::process::id()));
+        assert!(!output.exists());
+        assert!(solve(
+            Path::new("/missing-arm-lock"),
+            Path::new("/missing-preflight-lock"),
+            Path::new("/missing-preflight-run"),
+            "positive-unpinned",
+            Path::new("/missing-export"),
+            &output,
+            10
+        )
+        .is_err());
+        assert!(!output.exists());
     }
 }

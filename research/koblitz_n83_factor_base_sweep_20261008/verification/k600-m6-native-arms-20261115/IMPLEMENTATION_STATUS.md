@@ -125,6 +125,29 @@ logs are retained separately from the prior version. A real preflight and
 Docker export remain unrun, and this receipt check is not evidence of a
 completed constructed control.
 
+The [solver-stage amendment](SOLVER_STAGE_AMENDMENT.md) freezes a separate
+CryptoMiniSat XCNF backend and the pinned-control, unpinned-control, natural
+order before any such run. The Rust `solve` command currently admits only
+`positive-pinned`: it rechecks the arm lock, read-only K600 panel, exact
+preflight, constructed XCNF/export hashes and Linux arm64 solver/image before
+launch. Its Docker arguments enforce the same hard resource isolation,
+one-thread solver, seed `20261115`, 10,000 conflicts, complete model output,
+and an internal wall limit five seconds below its outer limit. It captures
+stdout/stderr and emits a terminal solver receipt. Exit 10 is explicitly
+`SAT_PENDING_XCNF_REPLAY`; no relation is accepted until native replay.
+Unpinned solver and natural export remain gated. The result and failure
+receipts retain the full stage interval, exit/cap class and input hashes, and
+leave total IC runtime null.
+
+The solver-stage release example passed **8/8** and the production release
+example build exited 0 on local macOS arm64 Rust 1.99.1. The added tests
+check hard Docker and CryptoMiniSat arguments and reject an unpinned solve
+before pinned replay. The [test](solver-stage-test.log.gz) and
+[build](solver-stage-build.log.gz) logs are retained. This code has not run
+the solver, a real preflight or any K600 XCNF. The image/build receipt,
+cumulative approved-budget controller, pinned model replay, unpinned and
+natural arms, useful rank and full cold runtime selection remain open.
+
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
 
