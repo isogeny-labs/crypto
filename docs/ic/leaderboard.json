@@ -468,7 +468,7 @@
   },
   "ecbench_methods_source": {
    "path": "src/cryptanalysis/ecbench/methods.rs",
-   "sha256": "1452c4c7672603e52c2ee7e0538d7ca0a15fdc0b291230de47f7eb6274a4a6b8"
+   "sha256": "2e884c247357af60f3098638e378c3993731a8b67a5eb395af0b2d5dc57bf588"
   },
   "solver_registry_source": {
    "path": "src/cryptanalysis/ic_framework/solvers.rs",
@@ -497,6 +497,10 @@
   "ghs_weak_cd_chain": {
    "path": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
    "sha256": "d363ee50d3da05c23085ae383ffadc61bcfe77e77711e756559ae79ed3656c79"
+  },
+  "ghs_weak_relstage": {
+   "path": "research/ic_gw_fasthash_20261114/analysis.json",
+   "sha256": "504ae961cf2d994b0b188eb3ff0faae897c53bc988195420b6ea2985059594be"
   },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -346809,6 +346813,53 @@
   "source": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
   "class": "component improvement over the frozen N4 v2 DL (restricted to the GHS-weak family)",
   "validation": "validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "ghs_weak_relstage_component": {
+  "rows": [
+   {
+    "q": 262111,
+    "k": 18,
+    "relations_geomean": 0.492803796134,
+    "relations_max": 0.520966422729,
+    "total_cpu_geomean": 0.837851611422
+   },
+   {
+    "q": 524287,
+    "k": 19,
+    "relations_geomean": 0.544969851752,
+    "relations_max": 0.560582611265,
+    "total_cpu_geomean": 0.884396105086
+   },
+   {
+    "q": 1048507,
+    "k": 20,
+    "relations_geomean": 0.499731564547,
+    "relations_max": 0.508559515242,
+    "total_cpu_geomean": 0.881365764525
+   },
+   {
+    "q": 2097091,
+    "k": 21,
+    "relations_geomean": 0.466641942657,
+    "relations_max": 0.495537277756,
+    "total_cpu_geomean": 0.873888693091
+   },
+   {
+    "q": 4194271,
+    "k": 22,
+    "relations_geomean": 0.462585907394,
+    "relations_max": 0.470161970366,
+    "total_cpu_geomean": 0.795803823852
+   }
+  ],
+  "decision": "SUPPORTED",
+  "aa_floor": 0.206941887983,
+  "study": "research/ic_gw_fasthash_20261114/",
+  "report": "research/ic_gw_fasthash_20261114/REPORT.pdf",
+  "source": "research/ic_gw_fasthash_20261114/analysis.json",
+  "class": "phase speed-up (relation stage, CPU time) at identical counted work; GHS-weak family only",
+  "validation": "validated: replay certificate (counted replay and an independent timing replay), validator report and the negation-map rho reference (research/ic_gw_fasthash_20261114/validation/VALIDATION.json)",
   "validated": true
  },
  "phases": [
