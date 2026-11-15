@@ -1,0 +1,220 @@
+{
+  "b_real": 2,
+  "cell_sha256": "0eb9d50b0f5998527dcaa6c5e1ba14506a3b62ca153712a99f273fc799799700",
+  "doc": "[pcc:unverified] instrument construction; no claim",
+  "entries": [
+    {
+      "build_wall_s": 0.000033474,
+      "construction_cell_cpu_s": 0.0,
+      "construction_cell_field_multiplications": 0,
+      "construction_cpu_s": 0.00002790900000000044,
+      "construction_field_multiplications": 89,
+      "construction_per_cell": {
+        "cpu_s": 0.0,
+        "field_multiplications": 0
+      },
+      "construction_per_target": {
+        "cpu_s": 0.00002790900000000044,
+        "field_multiplications": 89
+      },
+      "max_input_degree": 4,
+      "max_total_degree": 4,
+      "ms_bytes": 485,
+      "ms_sha256": "285ec2f5ba388e22bf67657f3573b6f5fdd127e8cad0d6adda76a08360987a15",
+      "nequations": 8,
+      "nterms_total": 34,
+      "nvars": 7,
+      "presentation": "chain-tower",
+      "solution_semantics": "ordered_repeats",
+      "solution_semantics_detail": {
+        "classifier_set": "real_count",
+        "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+        "extra_algebraic_solutions": "none beyond twist points of V (x_i in V not on the real base), which do not lift",
+        "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+        "not_representable": "tuples whose fixed-order prefix is an identity partial sum (P + (-P)); a multiset is absent altogether when every ordering has one (observed: chain misses none of the smoke targets, but see tree-tower)",
+        "ordered": true,
+        "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+        "wires": "m-2 F_p wires: partial-sum abscissae of the fixed left-to-right order"
+      },
+      "sym_applicable": false,
+      "system_seal_sha256": "cd83cbaeb7ccc703d714296ba9e20d2c6ccde3e3f45a82763afa37efe199edfc",
+      "system_sha256": "cd101dd031011b969f938c60ec80f7d904a86806c6a49c3941b16c6694b747dd"
+    },
+    {
+      "build_wall_s": 0.000021979,
+      "construction_cell_cpu_s": 0.0,
+      "construction_cell_field_multiplications": 0,
+      "construction_cpu_s": 0.000019214000000000037,
+      "construction_field_multiplications": 77,
+      "construction_per_cell": {
+        "cpu_s": 0.0,
+        "field_multiplications": 0
+      },
+      "construction_per_target": {
+        "cpu_s": 0.000019214000000000037,
+        "field_multiplications": 77
+      },
+      "max_input_degree": 4,
+      "max_total_degree": 4,
+      "ms_bytes": 485,
+      "ms_sha256": "285ec2f5ba388e22bf67657f3573b6f5fdd127e8cad0d6adda76a08360987a15",
+      "nequations": 8,
+      "nterms_total": 34,
+      "nvars": 7,
+      "presentation": "tree-tower",
+      "solution_semantics": "ordered_repeats",
+      "solution_semantics_detail": {
+        "classifier_set": "real_count",
+        "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+        "extra_algebraic_solutions": "none beyond twist points of V, which do not lift",
+        "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+        "not_representable": "tuples whose tree-order subtree sums are identity partial sums; a multiset is absent altogether when every pairing has one (observed at m = 4: {-P,-P,-P,+P} for R = -2P, every pairing puts +P with a -P), so tree-tower can miss real decompositions that chain-tower finds",
+        "ordered": true,
+        "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+        "wires": "m-2 F_p wires: abscissae of the subtree sums of the fixed balanced tree"
+      },
+      "sym_applicable": false,
+      "system_seal_sha256": "3724748aca466451fe360db6d888c5fecd1a07be9e550c36382a97a206725aa9",
+      "system_sha256": "bcfec54cc570470a79a0b5733d20fe0908ceba242fba812e0a5e31dc29e486d3"
+    },
+    {
+      "build_wall_s": 0.000121147,
+      "construction_cell_cpu_s": 0.000555687,
+      "construction_cell_field_multiplications": 2740,
+      "construction_cpu_s": 0.00011727500000000002,
+      "construction_field_multiplications": 1794,
+      "construction_per_cell": {
+        "cpu_s": 0.000555687,
+        "field_multiplications": 2740
+      },
+      "construction_per_target": {
+        "cpu_s": 0.00011727500000000002,
+        "field_multiplications": 1794
+      },
+      "max_input_degree": 12,
+      "max_total_degree": 12,
+      "ms_bytes": 2970,
+      "ms_sha256": "91a76e2497cd9e7c50056b09e541b1205c4d5393c1ddff53653b333921a375bf",
+      "nequations": 7,
+      "nterms_total": 137,
+      "nvars": 6,
+      "presentation": "mono-tower",
+      "solution_semantics": "ordered_repeats_unlifted",
+      "solution_semantics_detail": {
+        "classifier_set": "real_count",
+        "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+        "extra_algebraic_solutions": "tuples whose internal partial sums are not F_p-rational (wires in F_pbar) and identity partial sums (leading coefficients both vanish)",
+        "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+        "not_representable": "none: symmetric in x_0..x_{m-1}, all permutations are zeros",
+        "ordered": true,
+        "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+        "wires": "no wires: every internal wire eliminated by a Sylvester resultant (formal degrees, nothing divided out)"
+      },
+      "sym_applicable": false,
+      "system_seal_sha256": "56cdd101f3e72205b69b96ba83714d892e13938203b1ad204755fea57cf9c97c",
+      "system_sha256": "9c76a0da7889e80562b6eecbaedcf8d41d91039b7e78aeea3c36951bddee0c8c"
+    },
+    {
+      "build_wall_s": 0.000023221,
+      "construction_cell_cpu_s": 0.0,
+      "construction_cell_field_multiplications": 0,
+      "construction_cpu_s": 0.000019494999999999582,
+      "construction_field_multiplications": 78,
+      "construction_per_cell": {
+        "cpu_s": 0.0,
+        "field_multiplications": 0
+      },
+      "construction_per_target": {
+        "cpu_s": 0.000019494999999999582,
+        "field_multiplications": 78
+      },
+      "max_input_degree": 4,
+      "max_total_degree": 4,
+      "ms_bytes": 338,
+      "ms_sha256": "b114a3d4871360ace16f86ce881e1d6615151961087d0c05cc4ea3ee31997d9c",
+      "nequations": 5,
+      "nterms_total": 28,
+      "nvars": 4,
+      "presentation": "chain-direct",
+      "solution_semantics": "ordered_repeats",
+      "solution_semantics_detail": {
+        "classifier_set": "real_count",
+        "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+        "extra_algebraic_solutions": "none beyond twist points of V (x_i in V not on the real base), which do not lift",
+        "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+        "not_representable": "tuples whose fixed-order prefix is an identity partial sum (P + (-P)); a multiset is absent altogether when every ordering has one (observed: chain misses none of the smoke targets, but see tree-tower)",
+        "ordered": true,
+        "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+        "wires": "m-2 F_p wires: partial-sum abscissae of the fixed left-to-right order"
+      },
+      "sym_applicable": false,
+      "system_seal_sha256": "30404b8dadc52770633aac571d290d12a7c86acb942e383852d3cc175b22e774",
+      "system_sha256": "b5d29e7cbe494ed326a9da84a4d83371b9ff9bd88ad6b3726866e824bac73da6"
+    },
+    {
+      "build_wall_s": 0.000089997,
+      "construction_cell_cpu_s": 0.000555687,
+      "construction_cell_field_multiplications": 2740,
+      "construction_cpu_s": 0.00008688400000000061,
+      "construction_field_multiplications": 448,
+      "construction_per_cell": {
+        "cpu_s": 0.000555687,
+        "field_multiplications": 2740
+      },
+      "construction_per_target": {
+        "cpu_s": 0.00008688400000000061,
+        "field_multiplications": 448
+      },
+      "max_input_degree": 12,
+      "max_total_degree": 12,
+      "ms_bytes": 2294,
+      "ms_sha256": "18f1543bae4c1d9da61894aa80d27be0322bd74036601d9de9885ba7a30c6709",
+      "nequations": 4,
+      "nterms_total": 131,
+      "nvars": 3,
+      "presentation": "mono-direct",
+      "solution_semantics": "ordered_repeats_unlifted",
+      "solution_semantics_detail": {
+        "classifier_set": "real_count",
+        "exact_on": "F_p-rational decompositions with pairwise distinct abscissae and no identity partial sums in the arm's fixed order",
+        "extra_algebraic_solutions": "tuples whose internal partial sums are not F_p-rational (wires in F_pbar) and identity partial sums (leading coefficients both vanish)",
+        "lifting": "x_i must be a real base abscissa; decomposition = sign patterns whose point sum is exactly R, verified by counted point additions",
+        "not_representable": "none: symmetric in x_0..x_{m-1}, all permutations are zeros",
+        "ordered": true,
+        "tower_vs_direct": "exactly equivalent over F_p: y_{i,0} = x_i/g, y^(2^t) = 1 iff x^(2^t) = g^(2^t)",
+        "wires": "no wires: every internal wire eliminated by a Sylvester resultant (formal degrees, nothing divided out)"
+      },
+      "sym_applicable": false,
+      "system_seal_sha256": "6edb9fd3b5c7b4e0470b177f240f936eea5df4c930b8e11f74d75060616a067f",
+      "system_sha256": "1021c90505555cd52c6443639e9057f1126e7f9e9c0dddd50f241c661ba23569"
+    },
+    {
+      "presentation": "sym-direct",
+      "reason": "sym_applicable = false: B_real = 2 < m + 1 = 4",
+      "skipped": true
+    },
+    {
+      "presentation": "sym-tower",
+      "reason": "sym_applicable = false: B_real = 2 < m + 1 = 4",
+      "skipped": true
+    }
+  ],
+  "label": "unsat",
+  "m": 3,
+  "p": 1048721,
+  "real_count": 0,
+  "real_count_distinct": 0,
+  "schema": "pkm.present-panel.export-manifest/v1",
+  "sha256": "a5b391bd569e6ddc4dc7ff998467d9281c3fa9696d8c41ea967385297ba031dd",
+  "slug": "c2-nested-t2",
+  "sym_applicable": false,
+  "t": 2,
+  "target": "d000001",
+  "targets_sha256": "9d3a6bedf81ad6c7bd6a9f0575918fc0eba1065d29221fd85c4036798310ef02",
+  "tool": {
+    "git_commit": "7e5176b8f3bf90406a73c512e42f838719b27471",
+    "git_note": "null when run outside a git checkout and PKM_PRESENT_GIT_COMMIT was not set at build",
+    "name": "pkm_present_panel",
+    "source_sha256": "e8335b88f3866d8deb5316a329f71a689cbc8d678f1f968bbee8d0647a8089a2"
+  }
+}
