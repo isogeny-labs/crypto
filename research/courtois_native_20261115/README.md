@@ -121,3 +121,7 @@ ledger or claim-file update, and does not assert registered or signed standing.
 ## Merge follow-up
 
 The [2026-11-15 merge review](review-20261115T2234Z/README.md) retains fresh producer checks on both updated PR heads. The compatibility PR's automatic ledger reconciliation rewrote a published event; its auto-merge is disabled until canonical PCC maintainers provide an authorized provenance-preserving route. No frozen evidence or claim is changed. [pcc:unverified]
+
+## Compatibility merged-head follow-up
+
+The [post-merge review](postmerge-20261115T2341Z/README.md) records PR 1572 merged and fresh producer binary/vector checks passing on its final head. Its PCC gate fails because the frozen claim incorrectly labels raw text logs as recompute proofs; a maintainer-authorized versioned correction is required. The final merge also rechained the published ledger event again. The claim, canonical ledger and prior evidence are unchanged by this review. [pcc:unverified]
