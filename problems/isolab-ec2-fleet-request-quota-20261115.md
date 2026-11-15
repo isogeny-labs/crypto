@@ -37,3 +37,5 @@ Worker admission is necessary, not sufficient: compilation, all four rungs, meas
 ## Resolution and history
 
 Unresolved. 2026-11-15: exact launch inputs published; image smoke and local harness checks passed; one Job submitted; CreateFleet refusal retained. No fleets, instances, infrastructure limits or other workloads were changed.
+
+2026-11-15T22:20Z: Owner selected native Mac execution of the same four rungs. The original cloud Job was UID-guarded, suspended and deleted before it executed; no associated pods remain. See [local plan](../research/ic_boundary_tournament_20261115/local-plan.json). The cloud fleet-count issue remains unresolved; local correctness and timing qualification are separate obligations.
