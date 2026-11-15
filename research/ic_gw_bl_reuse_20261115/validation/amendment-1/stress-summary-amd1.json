@@ -1,0 +1,91 @@
+{
+ "summary": {
+  "trials": 20000,
+  "ref_blr_same_result_iters_narrowed": 20000,
+  "aud_blr_identical_incl_counts": 20000,
+  "id1_used": 142892,
+  "id1_bad": 0,
+  "id1_direct": 0,
+  "id2_used": 80955,
+  "id2_bad": 0,
+  "id2_direct": 81216,
+  "calls_with_id1_bad": 0,
+  "calls_with_id2_bad": 0,
+  "lmul_ladd_reconciled_exactly": 19842,
+  "audited_calls": 19842,
+  "early_return_no_audit_line": 158
+ },
+ "by_class": {
+  "no_narrowing": {
+   "id2_bad_calls": 0,
+   "id1_bad_calls": 0,
+   "trials": 4768,
+   "ref_blr_same": 4768,
+   "ref_ok": 3935,
+   "blr_ok": 3935
+  },
+  "('no_narrowing', 'ell_small')": {
+   "trials": 2656,
+   "ref_blr_differ": 0
+  },
+  "narrowed_last_two": {
+   "id2_bad_calls": 0,
+   "id1_bad_calls": 0,
+   "trials": 8443,
+   "ref_blr_same": 8443,
+   "ref_ok": 5113,
+   "blr_ok": 5113
+  },
+  "('narrowed_last_two', 'ell_small')": {
+   "trials": 6005,
+   "ref_blr_differ": 0
+  },
+  "('narrowed_last_two', 'ell_large')": {
+   "trials": 2438,
+   "ref_blr_differ": 0
+  },
+  "narrowed_mid": {
+   "id2_bad_calls": 0,
+   "id1_bad_calls": 0,
+   "trials": 2990,
+   "ref_blr_same": 2990,
+   "ref_ok": 136,
+   "blr_ok": 136
+  },
+  "('narrowed_mid', 'ell_small')": {
+   "trials": 2990,
+   "ref_blr_differ": 0
+  },
+  "('no_narrowing', 'ell_large')": {
+   "trials": 2112,
+   "ref_blr_differ": 0
+  },
+  "narrowed_at_iter0": {
+   "id2_bad_calls": 0,
+   "id1_bad_calls": 0,
+   "trials": 3641,
+   "ref_blr_same": 3641,
+   "ref_ok": 1825,
+   "blr_ok": 1825
+  },
+  "('narrowed_at_iter0', 'ell_large')": {
+   "trials": 385,
+   "ref_blr_differ": 0
+  },
+  "('narrowed_at_iter0', 'ell_small')": {
+   "trials": 3256,
+   "ref_blr_differ": 0
+  },
+  "early_return": {
+   "trials": 158,
+   "ref_blr_same": 158,
+   "ref_ok": 0,
+   "blr_ok": 0
+  },
+  "('early_return', 'ell_small')": {
+   "trials": 158,
+   "ref_blr_differ": 0
+  }
+ },
+ "first_divergent_examples": []
+}
