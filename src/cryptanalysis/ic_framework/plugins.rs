@@ -2350,6 +2350,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
         &[
             ("m", "summands, 3 to 9 (the packed index is 12 bits for m <= 5, 64/m bits above: bases of up to 1023, 511, 255, 127 points for m = 6..9)"),
             ("free", "1: verify the table's key collisions and use them as target-free relations (default 0)"),
+            ("prune", "1: skip the adds of partial sums that cannot be completed to m summands; same table, fewer build adds (default 0)"),
         ]
     }
 
@@ -2362,7 +2363,13 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     ) -> Result<(), String> {
         self.free = params.flag("free");
         self.free_pending = self.free;
-        let table = KSumTable::build_negation_folded_with(ctx.group, fb, self.k, self.free)?;
+        let table = KSumTable::build_negation_folded_opts(
+            ctx.group,
+            fb,
+            self.k,
+            self.free,
+            params.flag("prune"),
+        )?;
         // The table's construction is part of the pipeline's cost.
         ops.merge(table.build_ops);
         self.table = Some(table);
