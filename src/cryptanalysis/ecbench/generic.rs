@@ -430,43 +430,68 @@ pub fn kangaroo_with<G: CountedGroup>(
         }
         point
     };
-    let mut roo = [start(0, &mut out, 0, false), start(1, &mut out, 0, false)];
+    // Each kangaroo carries the mixed key of its point (the jump index's
+    // input), computed once when the point is reached rather than again at
+    // the start of its next step.
+    let place = |(p, d): (G::Elt, u64)| (p, d, mix(g.key(&p)));
+    let mut roo = [
+        place(start(0, &mut out, 0, false)),
+        place(start(1, &mut out, 0, false)),
+    ];
+    // The per-distinguished-point counters, kept in words and written to
+    // the map once at each exit: a counter is in the map exactly when the
+    // per-event `count` calls would have created it (it is non-zero), so
+    // the map ends with the same keys and values.  `steps` is always
+    // written, as before.
+    let (mut dps, mut inserts, mut collisions) = (0u64, 0u64, 0u64);
+    let flush = |out: &mut GenericOutcome, steps: u64, dps: u64, inserts: u64, collisions: u64| {
+        for (name, v) in [
+            ("distinguished_points", dps),
+            ("lookups_uncharged", dps),
+            ("same_kind_collisions", collisions),
+            ("inserts_uncharged", inserts),
+        ] {
+            if v > 0 {
+                out.count(name, v);
+            }
+        }
+        out.count("steps", steps);
+    };
     let mut steps = 0u64;
     while steps < max_steps {
         for kind in 0..2u8 {
-            let (pos, dist) = roo[kind as usize];
-            let h = mix(g.key(&pos));
+            let (pos, dist, h) = roo[kind as usize];
             let (jp, jd) = jumps[jump_of.rem(h) as usize];
             let np = g.add(&mut out.search, pos, jp);
             let nd = addmod(dist, jd, r);
             steps += 1;
-            roo[kind as usize] = (np, nd);
-            if mix(g.key(&np) ^ 0xD15C) & dp_mask != 0 {
+            let nk = g.key(&np);
+            roo[kind as usize] = (np, nd, mix(nk));
+            if mix(nk ^ 0xD15C) & dp_mask != 0 {
                 continue;
             }
-            out.count("distinguished_points", 1);
-            out.count("lookups_uncharged", 1);
-            match table.get(&g.key(&np)) {
+            dps += 1;
+            match table.get(&nk) {
                 Some(&(other, od)) if other != kind => {
                     // tame: P = [dt]G; wild: P = Q + [dw]G  ⇒  k = dt − dw.
                     let (dt, dw) = if kind == 0 { (nd, od) } else { (od, nd) };
-                    out.count("steps", steps);
+                    flush(&mut out, steps, dps, inserts, collisions);
                     out.recovered = Some(submod(dt, dw, r));
                     return out;
                 }
                 Some(_) => {
-                    out.count("same_kind_collisions", 1);
+                    collisions += 1;
                     let off = next() % r.max(2);
-                    roo[kind as usize] = start(kind, &mut out, off, true);
+                    roo[kind as usize] = place(start(kind, &mut out, off, true));
                 }
                 None => {
-                    table.insert(g.key(&np), (kind, nd));
-                    out.count("inserts_uncharged", 1);
+                    table.insert(nk, (kind, nd));
+                    inserts += 1;
                 }
             }
         }
     }
-    out.count("steps", steps);
+    flush(&mut out, steps, dps, inserts, collisions);
     out.exhausted = true;
     out
 }
