@@ -79,6 +79,24 @@ fn run() -> Result<serde_json::Value, String> {
     if (one, three, fiber.len()) != (14, 17, 65) {
         return Err("prime31 y-fiber census changed".into());
     }
+    // A larger Dickson fibre contains enough injective y-fibres to
+    // recover B31 without triple lifts; this changes the factor-base encoding.
+    let base7 = Base::build(e, 7, &mut ar)?;
+    let mut injective7 = Vec::new();
+    for &(x, y) in &base7.points {
+        let disc = sub(0, (3 * mul(x, x, e.p) + 4 * e.a) % e.p, e.p);
+        if ar.sqrt(disc, e.p).is_none() {
+            injective7.push((x, y));
+        }
+    }
+    if base7.points.len() != 64 || injective7.len() != 39 {
+        return Err("prime31 depth-seven injective y count changed".into());
+    }
+    let (injective7_signed_31, injective7_identities) =
+        support(&signed(&injective7[..31], e), &mut ar, e);
+    if injective7_signed_31.len() != 1922 || injective7_identities != 31 {
+        return Err("depth-seven B31 unique-y support changed".into());
+    }
     let canonical = base.points;
     let extended: Vec<_> = fiber.into_iter().collect();
     let (or_original, oi) = support(&canonical, &mut ar, e);
@@ -99,6 +117,9 @@ fn run() -> Result<serde_json::Value, String> {
         "curve_p": e.p,
         "curve_order_n": e.n,
         "depth": base.depth,
+        "depth7_full_base": base7.points.len(),
+        "depth7_injective_y_base": injective7.len(),
+        "depth7_first31_injective_y_signed_pair_support": injective7_signed_31.len(),
         "canonical_base": canonical.len(),
         "base_y_unique_root": one,
         "base_y_three_roots": three,
