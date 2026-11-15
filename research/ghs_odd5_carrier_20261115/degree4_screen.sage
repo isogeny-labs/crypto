@@ -70,7 +70,7 @@ for pole_index, pole_q in enumerate(quadratics):
 
 assert counts['assignments'] == 405
 print(json.dumps({'schema': 'ghs.odd5.degree4-branch-pole/v1',
-                  'source_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                  'source_sha256': hashlib.sha256(Path(__file__).with_suffix('').read_bytes()).hexdigest(),
                   'trace': 26, 'base_field': 'F3[a]/(a^5+2a+1)',
                   'factors': [str(p) for p in factors],
-                  'counts': counts, 'hits': hits}, sort_keys=True))
+                  'counts': counts, 'hits': hits}, sort_keys=True, default=int))
