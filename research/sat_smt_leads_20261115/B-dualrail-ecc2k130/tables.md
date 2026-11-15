@@ -34,6 +34,10 @@
 | 8 | 131 | 8,515 | 255 | L-plain-scan | 8 (0) | (sampled leaves) | - | - | >= 5,002 (64, 64) | 3.77 |
 | 8 | 131 | 8,515 | 255 | L-free | 2 (0) | >= 263,233 | >= 30.9 | >= 1,032 | - | 28.21 |
 | 8 | 131 | 8,515 | 255 | L-rail-free | 2 (0) | >= 895.0 | >= 0.105 | >= 3.51 | - | 35.72 |
+| 9 | 252 | 31,626 | 511 | a | 2 (0) | >= 1,266,012 | >= 40.0 | >= 2,478 | - | 48.55 |
+| 9 | 252 | 31,626 | 511 | b | 2 (0) | >= 36,864 | >= 1.17 | >= 72.1 | - | 46.18 |
+| 9 | 252 | 31,626 | 511 | c | 2 (0) | >= 120,858 | >= 3.82 | >= 236.5 | 389.9 (620, 0) | 241.44 |
+| 9 | 252 | 31,626 | 511 | L-scan | 2 (2) | 817.5 | 0.0258 | 1.6 | 1.6 (1022, 0) | 38.26 |
 
 ### Decomposable (planted) targets, first model: mean conflicts per target [pcc:unverified]
 
@@ -76,6 +80,9 @@
 | 8 | 251,039 | c | 7,988 | 31.4 | 0.938 | yes | yes |
 | 8 | 251,039 | L-scan | 425.0 | 590.7 | 0.0499 | yes | yes |
 | 8 | 251,039 | a-scan | >= 255,132 | 0.984 (upper bound: arm not all decided) | 30.0 | no | no |
+| 9 | >= 1,266,012 | b | >= 36,864 | 34.3 (both censored) | 1.17 | no | no |
+| 9 | >= 1,266,012 | c | >= 120,858 | 10.5 (both censored) | 3.82 | no | no |
+| 9 | >= 1,266,012 | L-scan | 817.5 | 1,549 (lower bound: a censored) | 0.0258 | yes | yes |
 
 Decision by the pre-registered rule: **inconclusive** (arms meeting both legs at d = 7 and d = 8: none).
 Attribution leg: arm c / a-scan control at d = 8 = 0.0313 -> attributed to the rails.
