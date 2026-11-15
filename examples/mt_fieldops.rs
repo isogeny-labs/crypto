@@ -223,6 +223,18 @@ impl F {
         }
         (self.padd(p, q), None)
     }
+    /// `padd_with_sibling` with d = 1 / (x2 - x1) given (x1 != x2): (2M + S) + (2M + S)
+    /// (research/mt_ic_rel_20261115, ic5b option "cb").
+    fn padd_sib_d(&self, p: (u64, u64), q: (u64, u64), d: u64) -> (Pt, Pt) {
+        let ((x1, y1), (x2, y2)) = (p, q);
+        let lam = self.mul(self.sub(y2, y1), d);
+        let x3 = self.sub(self.sub(self.sqr(lam), x1), x2);
+        let y3 = self.sub(self.mul(lam, self.sub(x1, x3)), y1);
+        let lm = self.mul(self.neg(self.add(y2, y1)), d);
+        let xm = self.sub(self.sub(self.sqr(lm), x1), x2);
+        let ym = self.sub(self.mul(lm, self.sub(x1, xm)), y1);
+        (Some((x3, y3)), Some((xm, ym)))
+    }
     fn smul(&self, p: Pt, k: u64) -> Pt {
         let mut r: Pt = None;
         let mut base = p;
@@ -448,8 +460,8 @@ fn flatf_insert<V>(
     x: u64,
     e: V,
 ) {
-    // ic5b sizes the table exactly (load factor at most 1/2), so no resize is needed
-    assert!(2 * ents.len() < slots.len(), "flatf table full");
+    // ic5b sizes the table exactly (load factor at most 1/2, or 0.6 for "flatfd"), so no resize is needed
+    assert!(4 * ents.len() < 3 * slots.len(), "flatf table full");
     let fp = x as u32;
     let mut i = flat_home(x, shift);
     loop {
@@ -539,6 +551,19 @@ impl<V: Copy> Tab<V> {
             shift: 64 - size.trailing_zeros(),
         }
     }
+    /// ic5b table mode "flatfd" (research/mt_ic_rel_20261115): `FlatF` for every p, sized to load at most 0.6
+    /// (slots = next power of two >= 5 cap / 3) instead of 1/2, which halves the slot array whenever 2 cap is
+    /// just above a power of two. Same x -> entry map as "flat"/"flatf"; probes stay mostly within a cache line.
+    fn new_fp_dense(cap: usize, _p: u64) -> Tab<V> {
+        let size = (cap.max(1) * 5).div_ceil(3).next_power_of_two();
+        Tab::FlatF {
+            slots: vec![(0, FLAT_EMPTY); size],
+            xs: Vec::with_capacity(cap),
+            ents: Vec::with_capacity(cap),
+            mask: size - 1,
+            shift: 64 - size.trailing_zeros(),
+        }
+    }
     fn insert_if_absent(&mut self, x: u64, e: V) {
         match self {
             Tab::Std(m) => {
@@ -599,6 +624,15 @@ impl<V: Copy> Tab<V> {
             Tab::FlatF { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
         }
     }
+    /// The flat tables' hash shift (home = (x * C) >> shift); None for `Std`.
+    fn shift(&self) -> Option<u32> {
+        match self {
+            Tab::Std(_) => None,
+            Tab::Flat { shift, .. } | Tab::FlatW { shift, .. } | Tab::FlatF { shift, .. } => {
+                Some(*shift)
+            }
+        }
+    }
     fn len(&self) -> usize {
         match self {
             Tab::Std(m) => m.len(),
@@ -607,6 +641,47 @@ impl<V: Copy> Tab<V> {
             }
         }
     }
+}
+
+/// Insert a chunk of table entries in order of their home slot (stable counting sort on the top bits of the home,
+/// at most 4096 buckets), so consecutive inserts touch nearby slots (research/mt_ic_rel_20261115, ic5b option
+/// "rad"). Equal x share a home, so their relative order, and with it "first insert wins", is kept: the table maps
+/// every x to the same entry as in-order insertion; only slot positions and entry indices may differ.
+fn rad_flush<V: Copy>(table: &mut Tab<V>, buf: &mut Vec<(u64, V)>, tmp: &mut Vec<(u64, V)>) {
+    if buf.is_empty() {
+        return;
+    }
+    let Some(shift) = table.shift() else {
+        for &(x, e) in buf.iter() {
+            table.insert_if_absent(x, e);
+        }
+        buf.clear();
+        return;
+    };
+    let bb = (64 - shift).min(12);
+    let bucket = |x: u64| (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> (64 - bb)) as usize;
+    let mut pos = vec![0usize; (1usize << bb) + 1];
+    for &(x, _) in buf.iter() {
+        pos[bucket(x) + 1] += 1;
+    }
+    for i in 1..pos.len() {
+        pos[i] += pos[i - 1];
+    }
+    tmp.clear();
+    tmp.resize(buf.len(), buf[0]);
+    for &(x, e) in buf.iter() {
+        let b = bucket(x);
+        tmp[pos[b]] = (x, e);
+        pos[b] += 1;
+    }
+    // home-ordered inserts, each slot prefetched 32 inserts ahead
+    for i in 0..tmp.len() {
+        if i + 32 < tmp.len() {
+            table.prefetch(tmp[i + 32].0);
+        }
+        table.insert_if_absent(tmp[i].0, tmp[i].1);
+    }
+    buf.clear();
 }
 
 fn main() {
@@ -1177,7 +1252,7 @@ fn main() {
             let tmode = args.get(8).map(|s| s.as_str()).unwrap_or("std");
             let flat = match tmode {
                 "std" => false,
-                "flat" | "flatf" => true,
+                "flat" | "flatf" | "flatfd" => true,
                 o => panic!("ic5b table mode {o}"),
             };
             let bsz: usize = args.get(9).map(|s| s.parse().unwrap()).unwrap_or(1).max(1);
@@ -1187,7 +1262,24 @@ fn main() {
             let bi = args.get(10).map(|s| s.as_str()) == Some("bi");
             // args[11] = "pf" (research/mt_ic_mem_20261115): table-build inserts go through a FIFO of PF_DIST
             // entries whose slots are prefetched; insert order, the table and every count are unchanged.
-            let pf = args.get(11).map(|s| s.as_str()) == Some("pf");
+            // args[11] is a comma-separated option set (research/mt_ic_rel_20261115): "pf" as before; "rel" batches
+            // the relation phase's inversions per block of kw trials and prefetches its probes; "rad" inserts the
+            // table in home-slot order per chunk (rad_flush); "cb" batches the (k-1)-term combination step. None of
+            // them changes the table's x -> entry map, a trial, a relation or a recovered log; I and M move.
+            let opts: Vec<&str> = args
+                .get(11)
+                .map(|s| s.split(',').collect())
+                .unwrap_or_default();
+            for o in &opts {
+                assert!(["pf", "rel", "rad", "cb"].contains(o), "ic5b option {o}");
+            }
+            let pf = opts.contains(&"pf");
+            let rel_b = opts.contains(&"rel");
+            let rad = opts.contains(&"rad");
+            let cb = opts.contains(&"cb");
+            const RAD_CHUNK: usize = 1 << 22;
+            let mut rbuf: Vec<(u64, (u32, u16, i8))> = Vec::new();
+            let mut rtmp: Vec<(u64, (u32, u16, i8))> = Vec::new();
             const PF_DIST: usize = 32;
             let mut ring: std::collections::VecDeque<(u64, (u32, u16, i8))> =
                 std::collections::VecDeque::with_capacity(PF_DIST + 1);
@@ -1224,12 +1316,33 @@ fn main() {
             let mut combos: Vec<(Pt, Vec<u16>, Vec<i8>)> = (0..m)
                 .map(|i| (Some(fb[i]), vec![i as u16], vec![1i8]))
                 .collect();
+            let mut cdens: Vec<u64> = Vec::with_capacity(m);
             for _ in 2..k {
                 let mut next = Vec::new();
                 for (p, idx, sg) in &combos {
                     let last = *idx.last().unwrap() as usize;
+                    // "cb": one simultaneous inversion per P over its l with x(F_l) != x(P)
+                    let batched = match (*p, cb) {
+                        (Some(pp), true) => {
+                            cdens.clear();
+                            for l in (last + 1)..m {
+                                if fb[l].0 != pp.0 {
+                                    cdens.push(f.sub(fb[l].0, pp.0));
+                                }
+                            }
+                            f.batch_inv(&mut cdens, &mut bscr);
+                            true
+                        }
+                        _ => false,
+                    };
+                    let mut j = 0usize;
                     for l in (last + 1)..m {
-                        let (sum, dif) = f.padd_with_sibling(*p, Some(fb[l]));
+                        let (sum, dif) = if batched && fb[l].0 != p.unwrap().0 {
+                            j += 1;
+                            f.padd_sib_d(p.unwrap(), fb[l], cdens[j - 1])
+                        } else {
+                            f.padd_with_sibling(*p, Some(fb[l]))
+                        };
                         for (pt, s) in [(sum, 1i8), (dif, -1i8)] {
                             if pt.is_some() {
                                 let mut i2 = idx.clone();
@@ -1253,11 +1366,18 @@ fn main() {
                 .max(kstar as usize + 16);
             let mut table = if tmode == "flatf" {
                 Tab::new_fp(cap, p)
+            } else if tmode == "flatfd" {
+                Tab::new_fp_dense(cap, p)
             } else {
                 Tab::new(flat, cap, p)
             };
             let mut put = |table: &mut Tab<(u32, u16, i8)>, x: u64, e: (u32, u16, i8)| {
-                if pf {
+                if rad {
+                    rbuf.push((x, e));
+                    if rbuf.len() >= RAD_CHUNK {
+                        rad_flush(table, &mut rbuf, &mut rtmp);
+                    }
+                } else if pf {
                     table.prefetch(x);
                     ring.push_back((x, e));
                     if ring.len() > PF_DIST {
@@ -1307,10 +1427,12 @@ fn main() {
                     }
                 }
             }
-            let _ = put; // end the closure's borrow of `ring`
+            let _ = put; // end the closure's borrow of `ring` and `rbuf`
             while let Some((x0, e0)) = ring.pop_front() {
                 table.insert_if_absent(x0, e0);
             }
+            rad_flush(&mut table, &mut rbuf, &mut rtmp);
+            drop((rbuf, rtmp));
             snap.push(("table".into(), take(&f)));
             let ms_at_table = t0.elapsed().as_secs_f64() * 1e3;
             let entry_pt = |f: &F, e: (u32, u16, i8)| -> Pt {
@@ -1374,6 +1496,7 @@ fn main() {
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
             let mut kk = 0usize;
+            let mut rblk: Vec<Option<(u64, u64)>> = Vec::with_capacity(kw);
             while rank < m {
                 if kk == kw {
                     kk = 0;
@@ -1381,7 +1504,39 @@ fn main() {
                     v_log = (v_log + e_log) % n;
                 }
                 p1_trials += 2;
-                if let Some((xp, xm)) = f.xpair(v_pt, w_pts[kk]) {
+                if rel_b && kk == 0 {
+                    // "rel": the block's kw pairs share one simultaneous inversion; all probes prefetched
+                    rblk.clear();
+                    if let Some(vp) = v_pt {
+                        dens.clear();
+                        for w in &w_pts[..kw] {
+                            if w.unwrap().0 != vp.0 {
+                                dens.push(f.sub(w.unwrap().0, vp.0));
+                            }
+                        }
+                        f.batch_inv(&mut dens, &mut bscr);
+                        let mut j = 0usize;
+                        for w in &w_pts[..kw] {
+                            if w.unwrap().0 == vp.0 {
+                                rblk.push(None);
+                                continue;
+                            }
+                            let pr = f.xpair_d(vp, w.unwrap(), dens[j]);
+                            j += 1;
+                            table.prefetch(pr.0);
+                            table.prefetch(pr.1);
+                            rblk.push(Some(pr));
+                        }
+                    } else {
+                        rblk.resize(kw, None);
+                    }
+                }
+                let pair = if rel_b {
+                    rblk[kk]
+                } else {
+                    f.xpair(v_pt, w_pts[kk])
+                };
+                if let Some((xp, xm)) = pair {
                     for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
                         f.hash();
                         if let Some(e) = table.get(xx) {
@@ -1545,9 +1700,9 @@ fn main() {
             Out {
                 ok: 0,
                 extra: format!(
-                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"inv\":\"{}\",\"pf\":{},\"batch\":{},\"ms_targets\":{:.3},\"ms_at_fb\":{:.3},\"ms_at_combos\":{:.3},\"ms_at_table\":{:.3},\"ms_at_relations\":{:.3}",
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"inv\":\"{}\",\"pf\":{},\"opts\":\"{}\",\"batch\":{},\"ms_targets\":{:.3},\"ms_at_fb\":{:.3},\"ms_at_combos\":{:.3},\"ms_at_table\":{:.3},\"ms_at_relations\":{:.3}",
                     k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len(),
-                    tmode, if bi { "bi" } else { "plain" }, pf, bsz, ms_targets, ms_at_fb, ms_at_combos, ms_at_table, ms_at_relations
+                    tmode, if bi { "bi" } else { "plain" }, pf, opts.join(","), bsz, ms_targets, ms_at_fb, ms_at_combos, ms_at_table, ms_at_relations
                 ),
             }
         }
