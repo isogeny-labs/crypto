@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T2233Z-hec-s2b-dense-solve",
+  "latest_record": "20261115T0426Z-hec-s3-inversion-hygiene",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 166,
+    "measured": 167,
     "open": 0
   },
   "repo": "crypto",
@@ -3573,6 +3573,167 @@
       ],
       "problem": "hec:g234-native-solve",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 11.0,
+      "latest": 11.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "aa_invalid_rows",
+      "points": [
+        {
+          "commit": "91e5a13ef192",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 13,
+          "record": "20261115T0426Z-hec-s3-inversion-hygiene",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            10.0,
+            11.0
+          ],
+          "summary": "S3 (T2 lever L1) exact inversion hygiene in hec-native-ic: u64 Fp::inv, monic divrem skips inversion, 1/2=(p+1)/2. Gates G7-G9 hold (identical stream hashes on 13 rows, 55 identical runs). Fp::inv per walk step 6.5-9.0 -> 3.0-4.5, per g3/g4 oracle call 9.4-16.2 -> 3.6-5.2 (E9 <=5 missed at g4 p=61,1009). Per-trial timing E10/E11 not determined: A/A floor failed in both sets (load 50-401). Shared host, unvalidated.",
+          "value": 11.0
+        }
+      ],
+      "problem": "hec:g234-native-trial",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 62.0,
+      "latest": 62.0,
+      "latest_derived": {},
+      "metric": "exact_processes_identical",
+      "points": [
+        {
+          "commit": "91e5a13ef192",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": null,
+          "record": "20261115T0426Z-hec-s3-inversion-hygiene",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S3 (T2 lever L1) exact inversion hygiene in hec-native-ic: u64 Fp::inv, monic divrem skips inversion, 1/2=(p+1)/2. Gates G7-G9 hold (identical stream hashes on 13 rows, 55 identical runs). Fp::inv per walk step 6.5-9.0 -> 3.0-4.5, per g3/g4 oracle call 9.4-16.2 -> 3.6-5.2 (E9 <=5 missed at g4 p=61,1009). Per-trial timing E10/E11 not determined: A/A floor failed in both sets (load 50-401). Shared host, unvalidated.",
+          "value": 62.0
+        }
+      ],
+      "problem": "hec:g234-native-trial",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 3.8,
+      "latest": 3.8,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "inv_per_oracle_call_g3_p4001",
+      "points": [
+        {
+          "commit": "91e5a13ef192",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261115T0426Z-hec-s3-inversion-hygiene",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S3 (T2 lever L1) exact inversion hygiene in hec-native-ic: u64 Fp::inv, monic divrem skips inversion, 1/2=(p+1)/2. Gates G7-G9 hold (identical stream hashes on 13 rows, 55 identical runs). Fp::inv per walk step 6.5-9.0 -> 3.0-4.5, per g3/g4 oracle call 9.4-16.2 -> 3.6-5.2 (E9 <=5 missed at g4 p=61,1009). Per-trial timing E10/E11 not determined: A/A floor failed in both sets (load 50-401). Shared host, unvalidated.",
+          "value": 3.8
+        }
+      ],
+      "problem": "hec:g234-native-trial",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 5.17,
+      "latest": 5.17,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "inv_per_oracle_call_g4_p1009",
+      "points": [
+        {
+          "commit": "91e5a13ef192",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261115T0426Z-hec-s3-inversion-hygiene",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S3 (T2 lever L1) exact inversion hygiene in hec-native-ic: u64 Fp::inv, monic divrem skips inversion, 1/2=(p+1)/2. Gates G7-G9 hold (identical stream hashes on 13 rows, 55 identical runs). Fp::inv per walk step 6.5-9.0 -> 3.0-4.5, per g3/g4 oracle call 9.4-16.2 -> 3.6-5.2 (E9 <=5 missed at g4 p=61,1009). Per-trial timing E10/E11 not determined: A/A floor failed in both sets (load 50-401). Shared host, unvalidated.",
+          "value": 5.17
+        }
+      ],
+      "problem": "hec:g234-native-trial",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 3.0,
+      "latest": 3.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "inv_per_walk_step_g2_p4001",
+      "points": [
+        {
+          "commit": "91e5a13ef192",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261115T0426Z-hec-s3-inversion-hygiene",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S3 (T2 lever L1) exact inversion hygiene in hec-native-ic: u64 Fp::inv, monic divrem skips inversion, 1/2=(p+1)/2. Gates G7-G9 hold (identical stream hashes on 13 rows, 55 identical runs). Fp::inv per walk step 6.5-9.0 -> 3.0-4.5, per g3/g4 oracle call 9.4-16.2 -> 3.6-5.2 (E9 <=5 missed at g4 p=61,1009). Per-trial timing E10/E11 not determined: A/A floor failed in both sets (load 50-401). Shared host, unvalidated.",
+          "value": 3.0
+        }
+      ],
+      "problem": "hec:g234-native-trial",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 4.49,
+      "latest": 4.49,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "inv_per_walk_step_g4_p1009",
+      "points": [
+        {
+          "commit": "91e5a13ef192",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261115T0426Z-hec-s3-inversion-hygiene",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S3 (T2 lever L1) exact inversion hygiene in hec-native-ic: u64 Fp::inv, monic divrem skips inversion, 1/2=(p+1)/2. Gates G7-G9 hold (identical stream hashes on 13 rows, 55 identical runs). Fp::inv per walk step 6.5-9.0 -> 3.0-4.5, per g3/g4 oracle call 9.4-16.2 -> 3.6-5.2 (E9 <=5 missed at g4 p=61,1009). Per-trial timing E10/E11 not determined: A/A floor failed in both sets (load 50-401). Shared host, unvalidated.",
+          "value": 4.49
+        }
+      ],
+      "problem": "hec:g234-native-trial",
+      "unit": "count"
     },
     {
       "better": "lower",

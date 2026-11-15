@@ -332,3 +332,116 @@ native engine does not compute `S`, so no `S` claim is made, and nothing here is
 
 **If E6 fails:** report it. The next lever is the per-trial cost at genus 3 and 4 (track T2), not
 more solver work. Plan §1 sets the genus-2 limit: only constants can move there.
+
+## 9. Slice S3 (track T2, lever L1): exact inversion hygiene, protocol frozen before code
+
+Written 2026-11-14, before any S3 code, on branch `research/hec-t2-20261114`, stacked on S2b
+(`research/hec-s2b-20261114` at dd2ab52300).
+
+**Why this lever first, and how it relates to §4 T2 and §5.**
+
+- §5 orders T1 (2LP baselines) before T2, and runs every T2 lever against the pinned T1 entry. No T1
+  entry exists. The owner asked for T2 now. So S3 is an **engineering slice on the native engine's
+  per-trial cost**, measured against the S2b engine (`Solver::Dense`) at dd2ab52300. It makes no
+  T1-relative claim. It will be re-measured against T1 once T1 is pinned.
+- §5's round-4 design (held-out curves, A/A floor, 2,000-resample paired bootstrap) is replaced as
+  follows. The change is exact: every output is bit-identical, so held-out curves add nothing to the
+  exactness check. The A/A floor is kept through an A–B–A′ design. With 7 paired repetitions, a
+  bootstrap would be coarse, so min–max over the repetitions is reported instead.
+- §4 T2 levers:
+  - (a) batched inversion over lockstep walks and (e) threads change the trial sequence. They cannot
+    keep the identical-run gate, so they get later slices with their own gate.
+  - (d) early abort applies to large-prime arms. The native engine is full-base, so (d) does not
+    apply yet.
+  - (c), a quartic/cubic splitting test, is the next oracle lever after S3.
+- **Orientation before freezing.** An uncommitted probe, then `examples/t2_stream.rs` (committed with
+  this section), was run under feature `count-inv` on the IC's trial mix. `Fp::inv` (an i128
+  extended Euclid) costs 35–90 ns, against about 1.2 ns for `Fp::mul`. Counts:
+
+  | genus | `Fp::inv` per walk step | per oracle call |
+  |---|---|---|
+  | 2 | 6.5 | 1.0 |
+  | 3 | 7.9–8.0 | 10.4–16.2 |
+  | 4 | 8.8–9.0 | 9.4–13.4 |
+
+  Most of these are avoidable:
+  - `Poly::divrem` inverts the divisor's leading coefficient even when it is 1, which is every
+    `mulmod` in `x^p mod u`.
+  - The degree-2 oracle and the EDF compute `inv(2)` on every call.
+  - Every inversion goes through i128 division.
+
+  The timings from this orientation were taken at load average 10–26 and are not used for any bar.
+
+**Change (S3).**
+
+1. `Fp::inv`: the extended Euclid on `u64` remainders with `i64` cofactors (no i128). The inverse is
+   unique, so the output is identical.
+2. `Poly::divrem` (and so `rem`, `div_exact`, `mulmod`): when the divisor is monic, skip the
+   inversion and the multiplication by 1. Identical quotient and remainder.
+3. Oracle, degree 2 and EDF: `1/2 = (p + 1)/2`, with no inversion.
+
+Nothing else changes: not the walk, the oracle's decision procedure, the trial sequence or the solve.
+
+**Gates (must hold before timing).**
+
+- **G7 (unit).**
+  - `Fp::inv` equals the old i128 routine, kept in the tests as the reference. Checked on random
+    `a` for every row prime and for primes near 2^31, 2^32, 2^61 and 2^62 − ε, and `a·inv(a) = 1`.
+  - `Poly::divrem` equals a reference copy of the old routine on random dividends and divisors,
+    both monic and non-monic, of degree 0–12.
+  - `oracle_matches_bruteforce` (exhaustive at small p) and `group_law_g1` still pass.
+- **G8 (stream).** `t2_stream` on all 13 rows: the old and new builds give identical `walk_hash`,
+  `oracle_hash`, `smooth`, `frobenius` and `parity_rejects`.
+- **G9 (runs).** `hec_native_bench` with `HEC_SOLVER=dense` on round eight's 55 runs: the old and new
+  builds give identical JSON lines apart from the `*_ms` fields. That means the same `k`, trials,
+  relations, group ops, oracle stats, solve rounds, solve stats and pivot hash. Every `k` verifies.
+- All crate tests pass in release and in debug.
+
+**Measurement.**
+
+- **Binaries.** `old` is built at the commit that freezes this section, with `t2_stream` and
+  `count-inv` present and nothing else changed. `new` is built at the S3 code commit. Both are built
+  with the same toolchain (stable 1.99.1) and profile, into separate target dirs. Their sha256
+  values are recorded.
+- **Rows.** Round eight's 11 (g, p) plus two stream-only rows registered here: (3, 4001) and
+  (4, 1009). `t2_stream` takes the smallest valid `c` per row, which is not round eight's instance
+  choice. The stream does not need a prime-order instance.
+- **Stream.** 100,000 trials, 1 warm-up pass, then 3 timed passes; the median pass is used.
+- **Design.** 7 repetitions of A–B–A′: `old`, `new`, `old`, as separate processes, one after
+  another. `uptime` is logged before each process.
+- **Primary statistic.** Per row, the median over the 7 repetitions of
+  `per_trial_ns(mean of A, A′) / per_trial_ns(B)`.
+- **A/A floor.** Per row, the median over repetitions of `A / A′`. A repetition set is valid only if
+  every row's A/A median lies in [0.95, 1.05]. If one fails, the full set is rerun once and both sets
+  are reported. If it fails again, the timing verdicts are "not determined".
+- **Also reported.**
+  - The walk and oracle components separately.
+  - Min–max of the paired ratio.
+  - `Fp::inv` per walk step and per oracle call, from one `count-inv` build of each arm. These are
+    deterministic.
+  - End to end: `hec_native_bench` (`HEC_SOLVER=dense`), 3 repetitions of A–B–A′, median paired
+    `total_ms` ratio per row. Descriptive only: round eight's runs are 0.15–17 ms, too short for a
+    bar.
+- **Host.** The arm64 laptop, single thread. It is **shared and not L0**: load average 10–26 when
+  this section was written. This is pre-registered as the run condition, with load logged.
+- **Records.** One `tools/benchrec.py` record. The S3 checkpoint is pushed before the recorded run.
+
+**Pre-registered expectations.**
+
+- **E8 (exactness).** G7, G8 and G9 hold. Falsified by any differing hash, count or run line.
+- **E9 (counts).**
+  - At genus 3 and 4, `Fp::inv` per oracle call falls to ≤ 5 on every row.
+  - At genus 2 it is 0.
+  - `Fp::inv` per walk step falls on every row.
+  - Falsified by any row that misses.
+- **E10 (per-trial cost, genus 3 and 4).** The primary statistic is ≥ 1.25× on every genus-3 and
+  genus-4 row (five rows, both stream-only rows included). Falsified by any such row under 1.25×.
+- **E11 (per-trial cost, genus 2).** The primary statistic is ≥ 1.10× on every genus-2 row.
+  Falsified by any such row under 1.10×.
+
+**Class.** Engineering on the relation phase. Trials, relations, group operations and the solve are
+unchanged by construction; G9 checks this. Field inversions fall, and they are reported. The native
+engine does not compute `S`, so no `S` claim is made, and nothing here is an advance.
+
+**Stop rule (§5.5).** If E10 fails, record it. Lever L1 is not retried with a variant. The next
+genus-3/4 lever is (c) in the oracle, then (a).

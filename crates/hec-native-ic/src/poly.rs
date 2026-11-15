@@ -171,13 +171,18 @@ impl Poly {
         if self.n < d.n {
             return (Poly::zero(), *self);
         }
-        let inv = fp.inv(d.lc());
+        // A monic divisor needs no inversion (S3): every `mulmod` in the
+        // oracle's `x^p mod u` and most of the walk divide by a monic `u`.
+        let lc = d.lc();
+        let monic = lc == 1;
+        let inv = if monic { 1 } else { fp.inv(lc) };
         let mut r = *self;
         let mut q = Poly::zero();
         let dn = d.n;
         q.n = self.n - dn + 1;
         for k in (0..q.n).rev() {
-            let coef = fp.mul(r.c[k + dn - 1], inv);
+            let top = r.c[k + dn - 1];
+            let coef = if monic { top } else { fp.mul(top, inv) };
             q.c[k] = coef;
             if coef != 0 {
                 for j in 0..dn {
@@ -350,6 +355,63 @@ mod tests {
         }
         cs[deg] = 1 + rng.below(fp.p - 1);
         Poly::from_coeffs(&cs)
+    }
+
+    /// The pre-S3 `divrem` (always inverts `lc(d)`), kept as G7's reference.
+    fn divrem_ref(a: &Poly, d: &Poly, fp: &Fp) -> (Poly, Poly) {
+        if a.n < d.n {
+            return (Poly::zero(), *a);
+        }
+        let inv = fp.inv(d.lc());
+        let mut r = *a;
+        let mut q = Poly::zero();
+        let dn = d.n;
+        q.n = a.n - dn + 1;
+        for k in (0..q.n).rev() {
+            let coef = fp.mul(r.c[k + dn - 1], inv);
+            q.c[k] = coef;
+            if coef != 0 {
+                for j in 0..dn {
+                    r.c[k + j] = fp.sub(r.c[k + j], fp.mul(coef, d.c[j]));
+                }
+            }
+        }
+        r.n = dn - 1;
+        r.trim();
+        for i in r.n..CAP {
+            r.c[i] = 0;
+        }
+        q.trim();
+        (q, r)
+    }
+
+    /// G7 (PLAN.md §9): `divrem` equals the pre-S3 routine, bit for bit, on
+    /// monic and non-monic divisors of degree 0–12.
+    #[test]
+    fn divrem_matches_reference() {
+        let mut rng = Rng::new(20261115);
+        let mut monic_seen = 0;
+        for &p in &[31u64, 61, 401, 4001, 1_000_003, (1u64 << 61) - 1] {
+            let fp = Fp::new(p);
+            for _ in 0..4000 {
+                let da = rng.below(13) as usize;
+                let db = rng.below(13) as usize;
+                let a = if rng.below(8) == 0 {
+                    Poly::zero()
+                } else {
+                    rand_poly(&mut rng, da, &fp)
+                };
+                let mut b = rand_poly(&mut rng, db, &fp);
+                if rng.below(2) == 0 {
+                    b = b.monic(&fp);
+                }
+                if b.lc() == 1 {
+                    monic_seen += 1;
+                }
+                assert_eq!(a.divrem(&b, &fp), divrem_ref(&a, &b, &fp), "p={p} a={a:?} b={b:?}");
+            }
+        }
+        assert!(monic_seen > 5000);
     }
 
     #[test]
