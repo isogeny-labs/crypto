@@ -1,0 +1,24 @@
+| p | log2 r | curves/targets | rho steps / sqrt r | rho M-eq | IC 2lp trials / p | IC M per trial | IC 2lp M-eq | gap 2lp (I=3M) | gap 2lp (I=1.5 log2 p M) | gap 1lp:p/2 | gap 1lp:p/4 | gap full:p/2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 251 | 15.9 | 5/15 | 0.97 | 3.64e+03 | 0.532 | 368 | 5.24e+04 | 14.4 | 10.7 | 17.2 | 27.9 | 30.1 |
+| 1019 | 20.0 | 5/15 | 0.81 | 1.24e+04 | 0.465 | 459 | 2.29e+05 | 18.5 | 12.3 | 26.4 | 40.2 | 43.0 |
+| 4091 | 24.0 | 5/15 | 0.77 | 4.7e+04 | 0.501 | 547 | 1.17e+06 | 24.9 | 15.0 | 32.4 | 46.2 | 51.2 |
+| 16363 | 28.0 | 5/15 | 0.83 | 2.04e+05 | 0.446 | 624 | 4.73e+06 | 23.2 | 12.9 | 28.9 | 43.6 | 46.5 |
+| 65519 | 32.0 | 5/15 | 0.99 | 9.77e+05 | 0.488 | 725 | 2.39e+07 | 24.5 | 12.4 | 29.7 | 42.5 | 49.2 |
+| 262139 | 36.0 | 5/15 | 0.98 | 3.87e+06 | 0.471 | 824 | 1.05e+08 | 27.0 | 12.7 | 33.7 | 46.1 | 56.4 |
+
+fit log2(rho_Meq_w3) vs log2 r: slope 0.508 +- 0.010
+fit log2(ic_2lp_Meq_w3) vs log2 r: slope 0.548 +- 0.005
+fit log2(rho_Meq_wlog) vs log2 r: slope 0.543 +- 0.009
+fit log2(ic_2lp_Meq_wlog) vs log2 r: slope 0.551 +- 0.005
+fit log2(ic2lp_trials) vs log2 r: slope 0.494 +- 0.005
+fit log2(rho_steps) vs log2 r: slope 0.508 +- 0.010
+fit log2(gap_2lp_w3) vs log2 r: slope 0.040 +- 0.011
+
+| p | log2 r | curves/targets | rho steps | rho M-eq | IC trials | IC rels | counted M per trial | gap lower bound all | 2lp:B | 1lp:B | full:B | break-even M-eq per decomposition | msolve s/call | IC wall s | rho wall s |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 31 | 14.9 | 4/8 | 139 | 6.25e+03 | 193 | 14 | 4398 | 136.8 | 153.5 | 244.9 | censored 6/8 | 32 | 5.0 ms | 1.23 | 0.002 |
+| 67 | 18.2 | 4/8 | 488 | 2.2e+04 | 279 | 29 | 8974 | 116.4 | 129.0 | 207.4 | censored 7/8 | 79 | 6.0 ms | 2.35 | 0.011 |
+| 127 | 21.0 | 4/8 | 1384 | 6.23e+04 | 436 | 56 | 15106 | 107.1 | 115.2 | 152.4 | censored 1/8 | 143 | 6.8 ms | 4.70 | 0.046 |
+| 251 | 23.9 | 4/8 | 4176 | 1.88e+05 | 835 | 106 | 21179 | 94.9 | 106.1 | 159.3 | censored 4/8 | 225 | 6.6 ms | 9.44 | 0.123 |
+{31: {'ok': 4654, 'badparam': 59, 'nongeneric': 339, 'msolve_error': 15}, 67: {'ok': 8246, 'badparam': 76, 'nongeneric': 237}, 127: {'ok': 10264, 'nongeneric': 159, 'badparam': 51, 'msolve_error': 1}, 251: {'ok': 23784, 'nongeneric': 188, 'badparam': 49, 'msolve_error': 2}}
