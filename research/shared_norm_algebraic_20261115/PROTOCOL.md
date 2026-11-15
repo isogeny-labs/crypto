@@ -64,3 +64,16 @@ is a backend computation, not an independent source-ideal provenance proof.
 Completeness relative to the input ideal requires that proof or the independent
 complete-set reference on these bounded fixtures. No general good-target yield,
 solving-degree bound or subexponential theorem is assumed from these controls.
+
+## Amendment A1 — growing-arity interface qualification (03:38 UTC)
+
+After the frozen m3 controls and cold path have passed, test the generic norm
+builder at exactly three additional public fixtures: (m,t,c)=(5,3,16),
+(5,4,1),(7,4,1), all on the same F17 curve and R=(0,6). No scalar, norm
+coefficients or decomposition witness is supplied to the backend. This is a
+bounded arity/interface control, not a scaling campaign or distribution claim.
+Compare any completed extracted point sets to the exhaustive signed-point
+reference. Keep the 20s/2GiB backend limits, staircase cap128 and reduction
+cap unchanged. A backend error, resource cap, nonzero-dimensional output or
+staircase cap is unknown and preserved, never certified nonexistence. Limit
+this amendment to those three calls. Do not expand caps adaptively.
