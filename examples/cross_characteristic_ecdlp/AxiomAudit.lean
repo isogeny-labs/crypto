@@ -1,4 +1,5 @@
 import CrossCharacteristicExample
+import CrossCharacteristicTwo
 
 #print axioms CrossCharacteristicExample.P_order
 #print axioms CrossCharacteristicExample.R_order
@@ -8,3 +9,12 @@ import CrossCharacteristicExample
 #print axioms CrossCharacteristicExample.example_dlog
 #print axioms CrossCharacteristicExample.target_scalar_mod
 #print axioms CrossCharacteristicExample.no_field_map
+
+#print axioms CrossCharacteristicTwo.R_double
+#print axioms CrossCharacteristicTwo.R_order
+#print axioms CrossCharacteristicTwo.phi_challenge
+#print axioms CrossCharacteristicTwo.transfer_dlog
+#print axioms CrossCharacteristicTwo.target_scalar_mod
+#print axioms CrossCharacteristicTwo.no_field_map
+#print axioms CrossCharacteristicTwo.F4_card
+#print axioms CrossCharacteristicTwo.F5_to_F4_dlog

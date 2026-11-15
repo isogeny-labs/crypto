@@ -1,5 +1,79 @@
 # Cross-characteristic example: instance and proof map
 
+## Characteristic-two extension: instance statement before the Lean edit
+
+The additional request is an odd-characteristic source and an even-characteristic
+target. A field of even characteristic has characteristic 2. The worked target
+is the actual field `GaloisField 2 2`, of cardinality 4, rather than `ZMod 4`.
+Its model is `y² + y = x³`; the earlier short model is singular in
+characteristic 2. The source and target subgroup orders must match.
+
+1. **Structure above:** the same Mathlib affine-point groups and cyclic
+   subgroups, now over a field `K` with `CharP K 2`. `GaloisField` provides
+   the concrete finite-field specialization; `CharTwo` provides its arithmetic.
+2. **Theorem used as stated:** `addEquivOfAddOrderOfEq` and its generator
+   image lemma, followed by `map_zsmul` and injectivity. `GaloisField.card`
+   supplies the field cardinality without a new field construction.
+3. **Object as an instance:** `⟨0,0,1,0,0⟩ : WeierstrassCurve K`, with
+   `R = (0,0)` and `S = (0,1)`. These points are already rational over the
+   prime subfield, and also define points over the genuine field of four elements.
+4. **Assembly probe:** check the existing constructor with the target field
+   and equal-order obligations as parameters, then specialize it to these
+   coordinates. Retain the source and output under the new binary receipt.
+5. **Missing components only:** the binary discriminant, two memberships,
+   `R + R = S`, `S + R = O` and the order-three obligation. The source
+   obligations are imported unchanged. No generic law is added.
+6. **Inheritance:** field and characteristic from Mathlib `GaloisField`;
+   arithmetic from `CharTwo`; ellipticity from the literal discriminant;
+   all point operations, subgroup operations and scalar laws from the existing
+   inheritance table below. No limit override is needed.
+
+The proof chain is `Q = [2]P`, then `Φ(Q) = [2]Φ(P)` by `map_zsmul`,
+then `[2]R = S` by the binary coordinate obligation. For an arbitrary scalar,
+`Φ(T) = [k]R` becomes `Φ(T) = Φ([k]P)` by the generator-image law;
+injectivity gives `T = [k]P`. The existing source scalar congruence gives
+`2 ≡ k (mod 3)`. No new generic cyclic-group argument is required.
+
+| Binary statements | Classification | Existing owner / hypotheses |
+| --- | --- | --- |
+| Binary ellipticity, point memberships, doubling and order | Instance obligations | Mathlib Weierstrass model, `Field K`, `CharP K 2` |
+| Binary transfer | Assembly | Mathlib equal-order constructor, order 3 on both sides |
+| Scalar endpoints and table | Endpoints | Existing morphism laws and concrete coordinates |
+| Four-element field cardinality | Endpoint | `GaloisField.card`, exponent 2 is nonzero |
+
+Only the concrete coordinate obligations open the affine formulas; they are
+not supplied by generic morphism laws. No generic replacement is possible for
+these literal coordinates across arbitrary curves. As in the original example,
+`Point.add_def` is the named opening for a doubling calculation. The construction
+uses classical choice and provides no general efficient encoded-point evaluator.
+The primary sources additionally include Mathlib v4.24.0
+`Algebra/CharP/Two.lean` and `FieldTheory/Finite/GaloisField.lean`.
+
+The assembly probe and final module both type-check. The first concrete build
+left characteristic-dependent numeral goals; the next exposed Lean's placement
+rule for a documentation comment after `omit`. The retained third build and
+axiom audit pass. No limit was raised. The versioned receipts retain those
+attempts rather than replacing the earlier F5-to-F7 verification record.
+The characteristic-two claim record is `PCC-20261115-6a7830` and remains
+unsigned; local kernel validation is recorded separately. [pcc:unverified]
+
+The unchanged repository proof gate reports `PASS 50 thm 0 trusted`, auditing
+both modules with zero failing theorems. Its raw output is in the versioned
+binary receipt. All generic binary-point declarations additionally carry
+`DecidableEq K`; the concrete four-element field uses a classical instance.
+The no-field-map theorem needs only `Field K` and `CharP K 2`.
+
+| Report statement | Lean declaration | Hypotheses and status |
+| --- | --- | --- |
+| Binary model nonsingular | `CrossCharacteristicTwo.instIsEllipticBinaryCurve` | `Field K`, `DecidableEq K`, `CharP K 2`; checked instance |
+| Binary generator order 3 | `CrossCharacteristicTwo.R_order` | Same field assumptions; local kernel check |
+| Target challenge image | `CrossCharacteristicTwo.phi_challenge` | Source challenge in the order-three subgroup; local kernel check |
+| All scalar equations preserved and reflected | `CrossCharacteristicTwo.transfer_dlog` | Any source subgroup point, any integer; local kernel check |
+| Scalar congruence | `CrossCharacteristicTwo.target_scalar_mod` | Any integer; local kernel check |
+| Actual four-element target field | `CrossCharacteristicTwo.F4_card` | `GaloisField 2 2`; local kernel check |
+| F5-to-F4 endpoint | `CrossCharacteristicTwo.F5_to_F4_dlog` | Any integer; local kernel check, PCC unsigned |
+| No unital source-to-binary field map | `CrossCharacteristicTwo.no_field_map` | `Field K`, `CharP K 2`; local kernel check |
+
 The requested deliverable is a worked Lean example of scalar-preserving
 transfer between prime-field elliptic-curve subgroups, published as a PR.
 The exact models are `y² = x³ + 1` over `ZMod 5` and `ZMod 7`; the chosen
