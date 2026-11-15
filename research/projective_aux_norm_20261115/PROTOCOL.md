@@ -166,3 +166,46 @@ source/binary/script hashes precede calls; use fresh build and frozen runner
 paths. No cap, degree, target, order or verifier criterion adapts after start.
 This is standard indexed elimination, not a novelty or speedup claim.
 [pcc:unverified]
+
+## Amendment A5 — complete auxiliary cold recovery
+
+Indexed005 passes six small controls and the old Kummer norm, then certifies
+six empty auxiliary ideals. The four positive and two other empty cases hit
+the unchanged1M reduction cap, with entries below2M. Preserve all outcomes.
+The msolve oracle already returns complete verified model sets for all12
+targets. A selective relation procedure needs checked point witnesses; its
+correctness does not require trusting the solver's source-ideal claim.
+
+Generalize the existing shared collector and scalar arithmetic to an explicit
+prime scalar order, retaining default19. Reuse its label-free query, signed-row,
+left-kernel and recovery logic for order13. Add a thin auxiliary oracle using
+the already qualified eight-variable generator, all-original lift and curve/
+membership/group checks. It receives only the public domain and query point.
+
+Candidate setup for E/F19:y²=x³+2,P=(4,3) verifies13P=O and prime13; Hasse
+gives order in[12,28]. Compute gcd(X^19-X,X³+2)=1 by modular polynomial power
+and gcd, proving no rational2-torsion; the odd multiple of13 is therefore13.
+Validate the preset auxiliary A,T,G, enumerate its8-element coset, lift main
+points with native polynomial roots and choose one sign per abscissa. No field
+scan, base logarithm, supplied norm assignment or known target scalar enters
+the candidate. General auxiliary-curve search is still not implemented.
+
+Freeze one cold006 control Q=(18,1), seed1234, using pinned msolve and fixed
+loader path. Build fresh binaries and capture hashes beforehand. Each backend
+retains20s CPU/wall and2GiB; whole driver has1200s wall/2GiB and the existing
+4096-attempt/64-batch bounds. Record every query, failed query, relation,
+kernel and scalar. Verify the final scalar on E and with separately compiled
+OpenSSL query/relation/kernel replay. Unknown stops the control, no retry.
+
+Interface regression: replay the saved parent18-target traces with the
+generalized replayer once, then run exactly the same18 default Kummer cold
+targets/seed with the generalized collector and replay them independently.
+The default order19 and previous CLI meanings must be preserved. Fresh paths,
+same backend caps, a1200s overall driver cap; preserve all failures. No PC
+producer call is repeated in this amendment. Native standalone structural
+selftests remain required. All wrappers run from separate frozen copies.
+
+This is a finite end-to-end software control, with all setup actually executed
+for its preset. No tier, timing, random-family yield, general point-counting,
+arbitrary-prime implementation or subexponential cost conclusion follows.
+[pcc:unverified]

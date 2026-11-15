@@ -97,3 +97,13 @@ equivalent to zero remainders in the resulting point ideal. Index/table/work,
 stored coefficient and proof-remap entries share the2M admission budget.
 Strict native compilation passes; no qualification result is asserted yet.
 [pcc:unverified]
+
+Indexed005 completes six controls and KummerD4, then six unit auxiliary ideals;
+independent OpenSSL confirms6 completed empty sets and6 unknowns. All four
+positive targets and two other empty ones hit1M reductions, at roughly2295
+pivots and576k stored entries. No degree lower bound or positive relation is
+claimed from those unknowns. Exact counters and all failed traces remain.
+A5 now freezes the complete auxiliary point-only cold control using the
+qualified msolve witness path, plus order19 interface regression. Every
+returned decomposition is checked independently of a source-ideal assertion.
+[pcc:unverified]
