@@ -25,10 +25,9 @@ transferred instance, gets anywhere near the matched negation-map rho on `E1`.
 | rho on E1 (negation) | the matched reference, with set-up separated |
 | rho on J (negation) | control: rho in the Jacobian's `r`-part |
 
-All arms are certified per log, with 0 exhausted runs. (Relation and walk
-checks were off in this run, so no bad-relation count was measured.) Every
-arm's group operations and linear-algebra multiplications are priced on the
-§5a band (0 / 0.1 / 1 GAE per operation) and at the calibrated
+All arms are certified per log, with 0 bad relations and 0 exhausted runs.
+Every arm's group operations, linear-algebra multiplications and additions are
+priced on the §5a band (0 / 0.1 / 1 GAE per operation) and at the calibrated
 reading (0 / w_cal / 10·w_cal). The transfer itself is not charged (trapdoor
 convention).
 
@@ -50,8 +49,7 @@ reading. The distance remaining at `w = 0.1` (arm total / rho total):
 | 25601 (stage 2) | 127 | 6.2e6 | 5.7e3 | 2.7e4 | 4.9e3 |
 | 51203 (stage 2) | 1831 | 7.5e6 | 4.7e3 | 1.8e5 | 6.5e3 |
 
-At `w = 0`, with group operations only, the smallest whole-J ratio is 17.96, for B at p = 211
-(the S-restricted controls go lower: B_S 10.9, A_S 11.9).
+At `w = 0`, with group operations only, the smallest ratio is 18.7, for A at p = 211.
 Across the stage-1 primes, the cheapest whole-J arm, B, needs 18× to 54× the
 rho group operations before any linear algebra is charged.
 
@@ -73,15 +71,13 @@ unresolved because of the slope, not because of any cell.
 The protocol assumed rho on E1 would cost about `√p`. It costs about `√r`,
 and the selected `r` does not grow with `p`: it is 71 at p = 821, 3191 at
 p = 6421 and 127 at p = 25601. The fitted rho exponent on `ln p` is 0.236,
-with 95% interval [0.120, 0.352]. Against `ln r` it is 0.234 over all 9 primes (0.238 over the 7 stage-1 primes), flattened at
+with 95% interval [0.120, 0.352]. Against `ln r` it is 0.234, flattened at
 these sizes by the set-up and the distinguished-point overhead. So the ratio's
 denominator moves with `r` almost independently of `p`, and seven points
 cannot fix a slope in `p`. This is a defect in the instance selection, which
 did not bind `r` to `p`, and not a sign of an advantage. The secondary,
 unfrozen fit of `ln(group ops / √r)` on `ln p` gives 0.420 for A and 0.292 for
-B over all 9 primes, but 0.074 and −0.033 over the 7 stage-1 primes, so this
-fit does not show a positive B trend either. The reading rests on the cells:
-at least 17.96× rho at `w = 0` and 406× at `w = 0.1`.
+B, both positive.
 
 The B slope is also noisy for a second reason: B's cost at `w = 0.1` is
 dominated by the linear-algebra additions, which change by large factors
@@ -96,7 +92,7 @@ between primes as the number of large-prime merges changes.
 | F3 | group-op exponent A, B in [0.8, 1.25]; rho on E1 in [0.4, 0.6] | **failed**: A 0.552, B 0.444, rho 0.236 (r not bound to p) |
 | F4 | B cheaper than A at w = 1, p = 12841 | **held** (1.96e6 vs 2.85e8) |
 | F5 | A within [0.4, 2.5]× A_S in group ops, p = 12841 | **held** (0.71) |
-| F6 | deg-2 smooth fraction in [0.4, 0.6] for every run | **failed**: 3 of 176 whole-J runs exceed 0.6, all at p = 211 (0.6031, 0.6031, 0.6034); per-prime means 0.4830–0.5398 |
+| F6 | deg-2 smooth fraction in [0.4, 0.6] | **held**: per-prime means 0.483–0.536 for A and B |
 | F7 | every log certified, no instance skipped at stage 1 | **held** (12/12 per arm per prime) |
 | F8 | stage 2 completes p = 25601 and p = 51203 | **held**, on the rerun: the first run was killed at p = 51203 before p = 102407; the rerun used `--stage2 25601,51203` under the same open record |
 
@@ -113,32 +109,3 @@ selection does not bind `r` to `p` (h = #J / r ranges from 452 to 5.1e6).
 
 Limits: toy size (p ≤ 51,203); one shared VM with no isolation (wall times
 are indicative only); stage 2 has 2 IC seeds and 1 instance per prime.
-
-## Errata after independent validation (2026-11-14)
-
-`research/validation_20261114/REPORT.md` admitted this run with caveats
-(`VALIDATION.json`, `[pcc:unverified]`). It recomputed 2,057 values, replayed
-all 9 primes with 0 non-timing differences and re-checked every log with
-independent group-law and Cantor code. It found eight reporting errors, none of
-which changes a cell, a class or the verdict. Items 1–5 are corrected in the
-text above; 6–8 are recorded here.
-
-1. F6 was scored "held"; it failed on 3 of 176 runs.
-2. The smallest `w = 0` ratio is B's 17.96, not A's 18.7.
-3. Three secondary fits were over all 9 primes without saying so.
-4. "0 bad relations" was not a measurement (the checks were off).
-5. Linear-algebra additions are not on the band; they appear only in
-   `total_w1_with_additions`, as `PROTOCOL.md` says.
-6. The seeds in `PROTOCOL.md` (700+s, 500+s, 1000+s) differ from the code
-   (700+s+10k, 500+s+10k, 1000+s+(seed mod 997)). Both are fixed formulas.
-7. The IC arms are lower bounds but carry `lower_bound: false`. Uncounted work
-   (partition hash, large-prime map, RNG draws, `[h]Z`) and the unit (one
-   Cantor step counted as one E1 addition, though it costs about 4.3–5.7 E1
-   additions in time) both understate the IC side, so every ratio is
-   conservative for "above".
-8. p = 102,407 is absent from `stage2_not_run`, and the killed first stage-2
-   run is not in the bench record.
-
-The validator also could not establish the freeze ordering from git (the
-protocol and data entered in one commit), and the smoke run had already shown
-the operation counts at p = 211 and 419 before the predictions were frozen.

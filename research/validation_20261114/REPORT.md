@@ -15,8 +15,8 @@ Scripts are in `scripts/`, outputs in `out/`, the checklist in `PROGRESS.md`.
 
 Every number, class and certificate checks, and "unresolved" is what the
 frozen rule gives. Eight reporting errors were found; none changes a cell, a
-class or the verdict. They are corrected or recorded in the run's `RESULTS.md`
-("Errata after independent validation").
+class or the verdict. They are corrected in the run's `ERRATA.md`
+(`RESULTS.md` stays as validated).
 
 - **Binding.** PR #4071 = `c88c7b4e0c`, `008a5cf3fb`, `f199720572`; merged in
   `cc075763d7`. Target files are byte-equal to HEAD. Raw hashes match the
