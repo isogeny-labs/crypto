@@ -12,7 +12,7 @@ This directory is that kernel, in three forms that share one algorithm:
 
 | file | what it is |
 |---|---|
-| `fes.cuh` | the algorithm: packed quadratic evaluation, the derivative-maintained Gray walk, and `fes_search_subcube` — one sub-cube (a fixed assignment of the top `n-low_bits` variables). Compiles as host C++ **and** as CUDA. |
+| `fes.cuh` | the algorithm: packed quadratic evaluation, the derivative-maintained Gray walk, and `fes_search_subcube` — one sub-cube (a fixed assignment of the top `n-low_bits` variables) — plus the walks the kernel runs: `fes_walk_gray` (O(1) per point) and `fes_walk_block<K>` (the default, K = 6: the low K derivatives in registers). All emit the same zeros in the same order; `make test` checks each. A100 kernel time, n = 30: 132.8 ms (O(n) walk), 5.14 ms (Gray), 1.30 ms (block); `research/ic_gpu_measure_20261112/REPORT.md`. Compiles as host C++ **and** as CUDA. |
 | `fes.cu` | CUDA launcher: one thread per sub-cube, results appended through an atomic counter. |
 | `fes.metal` | Metal compute shader: the same kernel for Apple silicon. |
 | `test_cpu.cpp` | host verification — runs `fes_search_subcube` for every prefix and checks the collected solutions against a from-scratch brute force. **No GPU required.** |

@@ -142,6 +142,50 @@ map, pinned EFD sources and the short-Weierstrass `(A, B)`.
 No production path uses `unwrap`/`expect` on user input; the remaining
 `unwrap`s are in test code.
 
+## `ic bench`
+
+A prime instance can be built directly from an EFD model/chart, so sweeps and
+end-to-end pipelines use the same representation layer:
+
+```bash
+ic bench --efd-model montgom --efd-p 1019 \
+  --efd-param a=131 --efd-param b=1 \
+  --efd-chart xz --efd-order 269 --efd-cofactor 4 \
+  --efd-generator 604,1 \
+  --factor-base prime-abscissa:size=8 --oracle subtract --targets walk
+```
+
+The instance name is `EFD <model>/<chart> over F_p`; the JSON report carries a
+`representation` block with the chart, parameters, affine map and the derived
+short-Weierstrass `(A, B)`.  `PrimeInstance::from_efd` decodes the generator in
+the chart, checks it on the short-Weierstrass curve and checks `[n]G = O`
+before the bench starts.  `decode_efd_point` and `encode_efd_point` expose the
+conversion to callers; instances without a representation keep
+`representation: None`, which is omitted from serialized output.
+
+## `ecbench` and boundary records
+
+`ecbench` accepts an EFD instance as a `CurveSpec::Efd` JSON:
+
+```bash
+ecbench fb --curve '{"kind":"efd","model":"montgom","chart":"xz","p":1019,
+  "params":{"a":131,"b":1},"r":269,"cofactor":4,"generator":[604,1],"lift":0}' \
+  --factor-base prime-abscissa:size=6
+```
+
+The workload and factor-base dump carry a `representation` block (model,
+chart, parameters, lift); the curve facts still describe the derived
+short-Weierstrass curve.  Boundary ledger rows carry the same block on the
+prime regime.
+
+## Chart arithmetic
+
+`EfdRepresentation::chart_add` and `chart_double` evaluate the imported EFD
+formula in the selected chart and project the result back to the
+short-Weierstrass point.  `formula_ids(operation)` lists the available
+formulas.  This uses the 471-formula catalogue directly; it does not replace
+the optimized engine arithmetic.
+
 ## Verification
 
 ```sh

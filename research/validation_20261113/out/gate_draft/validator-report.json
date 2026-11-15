@@ -1,0 +1,2503 @@
+{
+ "schema": "validator-report/v1",
+ "target": "research/negation_remeasure_20261113 (bench record 20261113T0320Z-negation-remeasure, status measured, closed in 4c6db51b17e5e2242db44ccbeb4b9f83a757c22d)",
+ "validated_commit": "8bf77ba333645b98136d0be242ba8a9a1dca5649 (clean; checks run on 47dc95a934 plus the uncommitted working tree, whose 25 target files hash equal to this commit's blobs; HEAD 4c6db51b17e5e2242db44ccbeb4b9f83a757c22d at the binding check)",
+ "validator": "validator role (Claude Opus 5.5), not the producer; 2026-11-13",
+ "status": "pass",
+ "status_note": "commit binding checked",
+ "independent": true,
+ "standing": "[pcc:unverified]: no pcc claim id; no keyring signature",
+ "raw_data": [
+  {
+   "path": "remeasure.json",
+   "sha256": "796bdd62ad775b94843b5ccc6960c8764f823becd32334d88f1c04a46fb5ddc8"
+  },
+  {
+   "path": "remeasure_v3.json",
+   "sha256": "30c24e780223d2ea666001d80ef1b9b5e668be01d2ec4a471a76c172148df1f4"
+  },
+  {
+   "path": "remeasure_cover.json",
+   "sha256": "41130ab3bf5064d0744a6dd1052291ee04b238ed2cf5b708b5509c4822e4bd62"
+  },
+  {
+   "path": "remeasure_tower.json",
+   "sha256": "54c43d3b4d3ccb9e9ba7cd8b7725b6df1f65877a3e13c5116d4e5abd9c436332"
+  },
+  {
+   "path": "remeasure_tower_p32003.json",
+   "sha256": "54b1a42dd58abba9a9d9026cb1928534458feb9c2f22d82bb832d4bd96b6d800"
+  },
+  {
+   "path": "remeasure_tower_p64007.json",
+   "sha256": "20d9fb0eb41b9c2a0efdec7fb12ff00873ee2d0caa7298c6497b9c9324597654"
+  },
+  {
+   "path": "remeasure_tower_aut.json",
+   "sha256": "c2b0919d33d89a756b1f4ae6d88df1cd1d2dbb445dff4517ff8a7ea57df032a8"
+  },
+  {
+   "path": "run.log",
+   "sha256": "2223b4c974fb51ab2017042ec756d07a8d816833f84b38ab1d0a55ba6321c8b2"
+  },
+  {
+   "path": "PROTOCOL.md",
+   "sha256": "8771b2dca99318cd058a9c19ddc1a92d8ac7bef68aeeed630e06c2bda53cba86"
+  },
+  {
+   "path": "frozen.sha256",
+   "sha256": "03889b18fdc36309cc56692b31fec4d965ead1091e3f3246bcac8681fc3cf344"
+  }
+ ],
+ "method": [
+  "recompute_tables.py: 162 arm-rows (band totals, calibrated totals, ratios to negation/plain/best rho, classes) from the raw counts; 214 record metrics",
+  "check_old_values.py: recorded arms and old ratios against results_v3.json, tower_large.json, pushforward.json (478 values)",
+  "check_headlines.py: RESULTS.md headline numbers and the N1-N9 scorecard",
+  "check_results_md_tables.py: 1,497 RESULTS.md arm-table cells",
+  "check_merge.py: remeasure.json rows equal to the part files (8,272 values)",
+  "check_nr_certs.py on val_nr_dump output: instance data and every returned log certified with vlib; per-arm means tied to the parts",
+  "jcheck.py / check_j_original.py / check_tower_curves.py: j-invariants of every E (no j = 0 or 1728)"
+ ],
+ "headline": [
+  {
+   "name": "record:cover_p211_ic_jc_total_w0",
+   "claimed": 3359.3333333333335,
+   "recomputed": 3359.3333333333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_ic_jc_total_w0:reference(negation rho, w=0)",
+   "claimed": 64.15625,
+   "recomputed": 64.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_ic_jc_total_w0.1",
+   "claimed": 4822.633333333333,
+   "recomputed": 4822.633333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_ic_jc_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 72.396875,
+   "recomputed": 72.396875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_ic_jc_total_w1",
+   "claimed": 17992.333333333332,
+   "recomputed": 17992.333333333332,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_ic_jc_total_w1:reference(negation rho, w=1)",
+   "claimed": 146.5625,
+   "recomputed": 146.5625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_c_total_w0",
+   "claimed": 670.5,
+   "recomputed": 670.5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 64.15625,
+   "recomputed": 64.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_c_total_w0.1",
+   "claimed": 3337.9625,
+   "recomputed": 3337.9625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 72.396875,
+   "recomputed": 72.396875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_c_total_w1",
+   "claimed": 27345.125,
+   "recomputed": 27345.125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 146.5625,
+   "recomputed": 146.5625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_rho_negation_native_per_step",
+   "claimed": 7.107816711590297,
+   "recomputed": 7.107816711590297,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p211_rho_plain_native_per_step",
+   "claimed": 5.610789980732177,
+   "recomputed": 5.610789980732177,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_ic_jc_total_w0",
+   "claimed": 8931.666666666666,
+   "recomputed": 8931.666666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_ic_jc_total_w0:reference(negation rho, w=0)",
+   "claimed": 75.78125,
+   "recomputed": 75.78125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_ic_jc_total_w0.1",
+   "claimed": 14129.266666666666,
+   "recomputed": 14129.266666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_ic_jc_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 90.0,
+   "recomputed": 90.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_ic_jc_total_w1",
+   "claimed": 60907.666666666664,
+   "recomputed": 60907.666666666664,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_ic_jc_total_w1:reference(negation rho, w=1)",
+   "claimed": 217.96875,
+   "recomputed": 217.96875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_c_total_w0",
+   "claimed": 1993.125,
+   "recomputed": 1993.125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 75.78125,
+   "recomputed": 75.78125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_c_total_w0.1",
+   "claimed": 11593.7,
+   "recomputed": 11593.7,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 90.0,
+   "recomputed": 90.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_c_total_w1",
+   "claimed": 97998.875,
+   "recomputed": 97998.875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 217.96875,
+   "recomputed": 217.96875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_rho_negation_native_per_step",
+   "claimed": 7.520661157024794,
+   "recomputed": 7.520661157024794,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p419_rho_plain_native_per_step",
+   "claimed": 5.271255060728745,
+   "recomputed": 5.271255060728745,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_ic_jc_total_w0",
+   "claimed": 11426.333333333334,
+   "recomputed": 11426.333333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_ic_jc_total_w0:reference(negation rho, w=0)",
+   "claimed": 66.0,
+   "recomputed": 66.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_ic_jc_total_w0.1",
+   "claimed": 27909.13333333333,
+   "recomputed": 27909.13333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_ic_jc_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 72.71875,
+   "recomputed": 72.71875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_ic_jc_total_w1",
+   "claimed": 176254.33333333334,
+   "recomputed": 176254.33333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_ic_jc_total_w1:reference(negation rho, w=1)",
+   "claimed": 133.1875,
+   "recomputed": 133.1875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_c_total_w0",
+   "claimed": 1953.25,
+   "recomputed": 1953.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 66.0,
+   "recomputed": 66.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_c_total_w0.1",
+   "claimed": 14849.375,
+   "recomputed": 14849.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 72.71875,
+   "recomputed": 72.71875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_c_total_w1",
+   "claimed": 130914.5,
+   "recomputed": 130914.5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 133.1875,
+   "recomputed": 133.1875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_rho_negation_native_per_step",
+   "claimed": 7.190635451505017,
+   "recomputed": 7.190635451505017,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p821_rho_plain_native_per_step",
+   "claimed": 5.221374045801527,
+   "recomputed": 5.221374045801527,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_ic_jc_total_w0",
+   "claimed": 34876.0,
+   "recomputed": 34876.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_ic_jc_total_w0:reference(negation rho, w=0)",
+   "claimed": 92.9375,
+   "recomputed": 92.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_ic_jc_total_w0.1",
+   "claimed": 95248.1,
+   "recomputed": 95248.1,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_ic_jc_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 110.965625,
+   "recomputed": 110.965625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_ic_jc_total_w1",
+   "claimed": 638597.0,
+   "recomputed": 638597.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_ic_jc_total_w1:reference(negation rho, w=1)",
+   "claimed": 273.21875,
+   "recomputed": 273.21875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_c_total_w0",
+   "claimed": 2583.25,
+   "recomputed": 2583.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 92.9375,
+   "recomputed": 92.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_c_total_w0.1",
+   "claimed": 23440.45,
+   "recomputed": 23440.45,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 110.965625,
+   "recomputed": 110.965625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_c_total_w1",
+   "claimed": 211155.25,
+   "recomputed": 211155.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 273.21875,
+   "recomputed": 273.21875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_rho_negation_native_per_step",
+   "claimed": 7.979253112033195,
+   "recomputed": 7.979253112033195,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p1619_rho_plain_native_per_step",
+   "claimed": 6.8761149653121905,
+   "recomputed": 6.8761149653121905,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_ic_jc_total_w0",
+   "claimed": 60062.666666666664,
+   "recomputed": 60062.666666666664,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_ic_jc_total_w0:reference(negation rho, w=0)",
+   "claimed": 84.25,
+   "recomputed": 84.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_ic_jc_total_w0.1",
+   "claimed": 296913.9666666667,
+   "recomputed": 296913.9666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_ic_jc_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 98.971875,
+   "recomputed": 98.971875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_ic_jc_total_w1",
+   "claimed": 2428575.6666666665,
+   "recomputed": 2428575.6666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_ic_jc_total_w1:reference(negation rho, w=1)",
+   "claimed": 231.46875,
+   "recomputed": 231.46875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_c_total_w0",
+   "claimed": 5931.5,
+   "recomputed": 5931.5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 84.25,
+   "recomputed": 84.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_c_total_w0.1",
+   "claimed": 55483.725000000006,
+   "recomputed": 55483.725000000006,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 98.971875,
+   "recomputed": 98.971875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_c_total_w1",
+   "claimed": 501453.75,
+   "recomputed": 501453.75,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 231.46875,
+   "recomputed": 231.46875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_rho_negation_native_per_step",
+   "claimed": 7.672638436482084,
+   "recomputed": 7.672638436482084,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p3203_rho_plain_native_per_step",
+   "claimed": 6.265133171912833,
+   "recomputed": 6.265133171912833,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_ic_jc_total_w0",
+   "claimed": 188082.66666666666,
+   "recomputed": 188082.66666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_ic_jc_total_w0:reference(negation rho, w=0)",
+   "claimed": 158.65625,
+   "recomputed": 158.65625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_ic_jc_total_w0.1",
+   "claimed": 1177813.4666666668,
+   "recomputed": 1177813.4666666668,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_ic_jc_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 222.453125,
+   "recomputed": 222.453125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_ic_jc_total_w1",
+   "claimed": 10085390.666666666,
+   "recomputed": 10085390.666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_ic_jc_total_w1:reference(negation rho, w=1)",
+   "claimed": 796.625,
+   "recomputed": 796.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_c_total_w0",
+   "claimed": 8592.125,
+   "recomputed": 8592.125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 158.65625,
+   "recomputed": 158.65625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_c_total_w0.1",
+   "claimed": 120754.57500000001,
+   "recomputed": 120754.57500000001,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 222.453125,
+   "recomputed": 222.453125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_c_total_w1",
+   "claimed": 1130216.625,
+   "recomputed": 1130216.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 796.625,
+   "recomputed": 796.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_rho_negation_native_per_step",
+   "claimed": 9.871856866537717,
+   "recomputed": 9.871856866537717,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p6421_rho_plain_native_per_step",
+   "claimed": 10.108404802744426,
+   "recomputed": 10.108404802744426,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_ic_jc_total_w0",
+   "claimed": 372746.6666666667,
+   "recomputed": 372746.6666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_ic_jc_total_w0:reference(negation rho, w=0)",
+   "claimed": 150.75,
+   "recomputed": 150.75,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_ic_jc_total_w0.1",
+   "claimed": 4448291.466666667,
+   "recomputed": 4448291.466666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_ic_jc_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 215.2375,
+   "recomputed": 215.2375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_ic_jc_total_w1",
+   "claimed": 41128194.666666664,
+   "recomputed": 41128194.666666664,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_ic_jc_total_w1:reference(negation rho, w=1)",
+   "claimed": 795.625,
+   "recomputed": 795.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_c_total_w0",
+   "claimed": 15062.625,
+   "recomputed": 15062.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 150.75,
+   "recomputed": 150.75,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_c_total_w0.1",
+   "claimed": 229696.02500000002,
+   "recomputed": 229696.02500000002,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 215.2375,
+   "recomputed": 215.2375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_c_total_w1",
+   "claimed": 2161396.625,
+   "recomputed": 2161396.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 795.625,
+   "recomputed": 795.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_rho_negation_native_per_step",
+   "claimed": 10.076171875,
+   "recomputed": 10.076171875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:cover_p12841_rho_plain_native_per_step",
+   "claimed": 9.958402112908551,
+   "recomputed": 9.958402112908551,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_recorded_total_w0",
+   "claimed": 278.625,
+   "recomputed": 278.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 68.55729166666667,
+   "recomputed": 68.55729166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_recorded_total_w0.1",
+   "claimed": 5535.820833333333,
+   "recomputed": 5535.820833333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 76.16979166666667,
+   "recomputed": 76.16979166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_recorded_total_w1",
+   "claimed": 52850.58333333333,
+   "recomputed": 52850.583333333336,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 144.68229166666669,
+   "recomputed": 144.68229166666669,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_c_total_w0",
+   "claimed": 751.6666666666666,
+   "recomputed": 751.6666666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 68.55729166666667,
+   "recomputed": 68.55729166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_c_total_w0.1",
+   "claimed": 4342.141666666667,
+   "recomputed": 4342.141666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 76.16979166666667,
+   "recomputed": 76.16979166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_c_total_w1",
+   "claimed": 36656.416666666664,
+   "recomputed": 36656.416666666664,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 144.68229166666669,
+   "recomputed": 144.68229166666669,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_recorded_total_w0",
+   "claimed": 766.6666666666666,
+   "recomputed": 766.6666666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 68.55729166666667,
+   "recomputed": 68.55729166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_recorded_total_w0.1",
+   "claimed": 33185.81666666667,
+   "recomputed": 33185.816666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 76.16979166666667,
+   "recomputed": 76.16979166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_recorded_total_w1",
+   "claimed": 324958.16666666674,
+   "recomputed": 324958.1666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 144.68229166666669,
+   "recomputed": 144.68229166666669,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_c_total_w0",
+   "claimed": 845.4166666666666,
+   "recomputed": 845.4166666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 68.55729166666667,
+   "recomputed": 68.55729166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_c_total_w0.1",
+   "claimed": 10043.916666666666,
+   "recomputed": 10043.916666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 76.16979166666667,
+   "recomputed": 76.16979166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_c_total_w1",
+   "claimed": 92830.41666666667,
+   "recomputed": 92830.41666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 144.68229166666669,
+   "recomputed": 144.68229166666669,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_rho_negation_native_per_step",
+   "claimed": 7.304347826086956,
+   "recomputed": 7.304347826086956,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p251_rho_plain_native_per_step",
+   "claimed": 5.393437077131258,
+   "recomputed": 5.393437077131258,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_recorded_total_w0",
+   "claimed": 531.5416666666666,
+   "recomputed": 531.5416666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 84.15625,
+   "recomputed": 84.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_recorded_total_w0.1",
+   "claimed": 14849.679166666667,
+   "recomputed": 14849.679166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 101.73385416666667,
+   "recomputed": 101.73385416666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_recorded_total_w1",
+   "claimed": 143712.91666666666,
+   "recomputed": 143712.91666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 259.93229166666663,
+   "recomputed": 259.93229166666663,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_c_total_w0",
+   "claimed": 1473.8333333333333,
+   "recomputed": 1473.8333333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 84.15625,
+   "recomputed": 84.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_c_total_w0.1",
+   "claimed": 11524.841666666669,
+   "recomputed": 11524.841666666669,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 101.73385416666667,
+   "recomputed": 101.73385416666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_c_total_w1",
+   "claimed": 101983.91666666667,
+   "recomputed": 101983.91666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 259.93229166666663,
+   "recomputed": 259.93229166666663,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_recorded_total_w0",
+   "claimed": 1648.0833333333333,
+   "recomputed": 1648.0833333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 84.15625,
+   "recomputed": 84.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_recorded_total_w0.1",
+   "claimed": 76023.92916666667,
+   "recomputed": 76023.92916666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 101.73385416666667,
+   "recomputed": 101.73385416666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_recorded_total_w1",
+   "claimed": 745406.5416666667,
+   "recomputed": 745406.5416666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 259.93229166666663,
+   "recomputed": 259.93229166666663,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_c_total_w0",
+   "claimed": 1270.4166666666667,
+   "recomputed": 1270.4166666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 84.15625,
+   "recomputed": 84.15625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_c_total_w0.1",
+   "claimed": 20463.25,
+   "recomputed": 20463.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 101.73385416666667,
+   "recomputed": 101.73385416666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_c_total_w1",
+   "claimed": 193198.74999999997,
+   "recomputed": 193198.74999999997,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 259.93229166666663,
+   "recomputed": 259.93229166666663,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_rho_negation_native_per_step",
+   "claimed": 8.28196319018405,
+   "recomputed": 8.28196319018405,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p503_rho_plain_native_per_step",
+   "claimed": 6.542420027816411,
+   "recomputed": 6.542420027816411,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_recorded_total_w0",
+   "claimed": 1033.4166666666667,
+   "recomputed": 1033.4166666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 85.671875,
+   "recomputed": 85.671875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_recorded_total_w0.1",
+   "claimed": 33003.79583333334,
+   "recomputed": 33003.79583333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 102.0375,
+   "recomputed": 102.0375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_recorded_total_w1",
+   "claimed": 320737.2083333334,
+   "recomputed": 320737.2083333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 249.328125,
+   "recomputed": 249.328125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_c_total_w0",
+   "claimed": 2171.4166666666665,
+   "recomputed": 2171.4166666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 85.671875,
+   "recomputed": 85.671875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_c_total_w0.1",
+   "claimed": 19418.658333333333,
+   "recomputed": 19418.658333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 102.0375,
+   "recomputed": 102.0375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_c_total_w1",
+   "claimed": 174643.8333333333,
+   "recomputed": 174643.8333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 249.328125,
+   "recomputed": 249.328125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_recorded_total_w0",
+   "claimed": 3137.1666666666665,
+   "recomputed": 3137.1666666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 85.671875,
+   "recomputed": 85.671875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_recorded_total_w0.1",
+   "claimed": 149496.09583333333,
+   "recomputed": 149496.09583333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 102.0375,
+   "recomputed": 102.0375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_recorded_total_w1",
+   "claimed": 1466726.4583333333,
+   "recomputed": 1466726.4583333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 249.328125,
+   "recomputed": 249.328125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_c_total_w0",
+   "claimed": 1929.1666666666667,
+   "recomputed": 1929.1666666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 85.671875,
+   "recomputed": 85.671875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_c_total_w0.1",
+   "claimed": 37668.625,
+   "recomputed": 37668.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 102.0375,
+   "recomputed": 102.0375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_c_total_w1",
+   "claimed": 359323.75,
+   "recomputed": 359323.75,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 249.328125,
+   "recomputed": 249.328125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_rho_negation_native_per_step",
+   "claimed": 7.892991710625471,
+   "recomputed": 7.892991710625471,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p1009_rho_plain_native_per_step",
+   "claimed": 6.3120950323974085,
+   "recomputed": 6.3120950323974085,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_recorded_total_w0",
+   "claimed": 2023.75,
+   "recomputed": 2023.75,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 102.88020833333333,
+   "recomputed": 102.88020833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_recorded_total_w0.1",
+   "claimed": 72655.69583333333,
+   "recomputed": 72655.69583333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 127.74270833333333,
+   "recomputed": 127.74270833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_recorded_total_w1",
+   "claimed": 708343.2083333333,
+   "recomputed": 708343.2083333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 351.5052083333333,
+   "recomputed": 351.5052083333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_c_total_w0",
+   "claimed": 3234.9166666666665,
+   "recomputed": 3234.9166666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 102.88020833333333,
+   "recomputed": 102.88020833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_c_total_w0.1",
+   "claimed": 37308.89166666666,
+   "recomputed": 37308.89166666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 127.74270833333333,
+   "recomputed": 127.74270833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_c_total_w1",
+   "claimed": 343974.6666666667,
+   "recomputed": 343974.6666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 351.5052083333333,
+   "recomputed": 351.5052083333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_recorded_total_w0",
+   "claimed": 6024.958333333333,
+   "recomputed": 6024.958333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 102.88020833333333,
+   "recomputed": 102.88020833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_recorded_total_w0.1",
+   "claimed": 326352.88333333336,
+   "recomputed": 326352.88333333336,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 127.74270833333333,
+   "recomputed": 127.74270833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_recorded_total_w1",
+   "claimed": 3209304.2083333335,
+   "recomputed": 3209304.2083333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 351.5052083333333,
+   "recomputed": 351.5052083333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_c_total_w0",
+   "claimed": 3114.0,
+   "recomputed": 3114.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 102.88020833333333,
+   "recomputed": 102.88020833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_c_total_w0.1",
+   "claimed": 78371.49166666667,
+   "recomputed": 78371.49166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 127.74270833333333,
+   "recomputed": 127.74270833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_c_total_w1",
+   "claimed": 755688.9166666666,
+   "recomputed": 755688.9166666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 351.5052083333333,
+   "recomputed": 351.5052083333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_rho_negation_native_per_step",
+   "claimed": 8.022857142857143,
+   "recomputed": 8.022857142857143,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p2003_rho_plain_native_per_step",
+   "claimed": 6.584606741573034,
+   "recomputed": 6.584606741573034,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_recorded_total_w0",
+   "claimed": 4047.875,
+   "recomputed": 4047.875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 103.65625,
+   "recomputed": 103.65625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_recorded_total_w0.1",
+   "claimed": 143155.09583333335,
+   "recomputed": 143155.09583333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 130.23541666666668,
+   "recomputed": 130.23541666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_recorded_total_w1",
+   "claimed": 1395120.0833333335,
+   "recomputed": 1395120.0833333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 369.4479166666667,
+   "recomputed": 369.44791666666663,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_c_total_w0",
+   "claimed": 6154.25,
+   "recomputed": 6154.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 103.65625,
+   "recomputed": 103.65625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_c_total_w0.1",
+   "claimed": 73802.41666666667,
+   "recomputed": 73802.41666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 130.23541666666668,
+   "recomputed": 130.23541666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_c_total_w1",
+   "claimed": 682635.9166666667,
+   "recomputed": 682635.9166666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 369.4479166666667,
+   "recomputed": 369.44791666666663,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_recorded_total_w0",
+   "claimed": 11815.416666666666,
+   "recomputed": 11815.416666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 103.65625,
+   "recomputed": 103.65625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_recorded_total_w0.1",
+   "claimed": 755448.1958333333,
+   "recomputed": 755448.1958333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 130.23541666666668,
+   "recomputed": 130.23541666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_recorded_total_w1",
+   "claimed": 7448143.208333333,
+   "recomputed": 7448143.208333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 369.4479166666667,
+   "recomputed": 369.44791666666663,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_c_total_w0",
+   "claimed": 4977.916666666667,
+   "recomputed": 4977.916666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 103.65625,
+   "recomputed": 103.65625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_c_total_w0.1",
+   "claimed": 141546.8583333333,
+   "recomputed": 141546.8583333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 130.23541666666668,
+   "recomputed": 130.23541666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_c_total_w1",
+   "claimed": 1370667.3333333333,
+   "recomputed": 1370667.3333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 369.4479166666667,
+   "recomputed": 369.44791666666663,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_rho_negation_native_per_step",
+   "claimed": 8.128703408728896,
+   "recomputed": 8.128703408728896,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p4001_rho_plain_native_per_step",
+   "claimed": 6.456171735241503,
+   "recomputed": 6.456171735241503,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_recorded_total_w0",
+   "claimed": 8054.208333333333,
+   "recomputed": 8054.208333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 148.45833333333334,
+   "recomputed": 148.45833333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_recorded_total_w0.1",
+   "claimed": 283551.32499999995,
+   "recomputed": 283551.325,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 214.35000000000002,
+   "recomputed": 214.35000000000002,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_recorded_total_w1",
+   "claimed": 2763025.375,
+   "recomputed": 2763025.3750000005,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 807.375,
+   "recomputed": 807.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_c_total_w0",
+   "claimed": 9192.5,
+   "recomputed": 9192.5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 148.45833333333334,
+   "recomputed": 148.45833333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_c_total_w0.1",
+   "claimed": 139458.56666666668,
+   "recomputed": 139458.56666666668,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 214.35000000000002,
+   "recomputed": 214.35000000000002,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_c_total_w1",
+   "claimed": 1311853.1666666667,
+   "recomputed": 1311853.1666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 807.375,
+   "recomputed": 807.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_recorded_total_w0",
+   "claimed": 24401.458333333332,
+   "recomputed": 24401.458333333332,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 148.45833333333334,
+   "recomputed": 148.45833333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_recorded_total_w0.1",
+   "claimed": 2080164.0458333336,
+   "recomputed": 2080164.0458333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 214.35000000000002,
+   "recomputed": 214.35000000000002,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_recorded_total_w1",
+   "claimed": 20582027.333333336,
+   "recomputed": 20582027.333333332,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 807.375,
+   "recomputed": 807.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_c_total_w0",
+   "claimed": 9315.333333333334,
+   "recomputed": 9315.333333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 148.45833333333334,
+   "recomputed": 148.45833333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_c_total_w0.1",
+   "claimed": 330924.8416666667,
+   "recomputed": 330924.8416666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 214.35000000000002,
+   "recomputed": 214.35000000000002,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_c_total_w1",
+   "claimed": 3225410.416666667,
+   "recomputed": 3225410.416666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 807.375,
+   "recomputed": 807.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_rho_negation_native_per_step",
+   "claimed": 10.37493849434148,
+   "recomputed": 10.37493849434148,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p8009_rho_plain_native_per_step",
+   "claimed": 8.846239586999882,
+   "recomputed": 8.846239586999882,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_recorded_total_w0",
+   "claimed": 16047.916666666666,
+   "recomputed": 16047.916666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 196.58333333333334,
+   "recomputed": 196.58333333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_recorded_total_w0.1",
+   "claimed": 567726.8875,
+   "recomputed": 567726.8875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 305.74635416666666,
+   "recomputed": 305.74635416666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_recorded_total_w1",
+   "claimed": 5532837.625,
+   "recomputed": 5532837.625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 1288.2135416666665,
+   "recomputed": 1288.2135416666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_c_total_w0",
+   "claimed": 15683.666666666666,
+   "recomputed": 15683.666666666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 196.58333333333334,
+   "recomputed": 196.58333333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_c_total_w0.1",
+   "claimed": 274217.9583333333,
+   "recomputed": 274217.9583333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 305.74635416666666,
+   "recomputed": 305.74635416666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_c_total_w1",
+   "claimed": 2601026.583333333,
+   "recomputed": 2601026.583333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 1288.2135416666665,
+   "recomputed": 1288.2135416666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_recorded_total_w0",
+   "claimed": 47918.208333333336,
+   "recomputed": 47918.208333333336,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 196.58333333333334,
+   "recomputed": 196.58333333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_recorded_total_w0.1",
+   "claimed": 7242538.945833335,
+   "recomputed": 7242538.945833334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 305.74635416666666,
+   "recomputed": 305.74635416666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_recorded_total_w1",
+   "claimed": 71994125.58333334,
+   "recomputed": 71994125.58333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 1288.2135416666665,
+   "recomputed": 1288.2135416666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_c_total_w0",
+   "claimed": 14457.333333333334,
+   "recomputed": 14457.333333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 196.58333333333334,
+   "recomputed": 196.58333333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_c_total_w0.1",
+   "claimed": 583519.2416666667,
+   "recomputed": 583519.2416666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 305.74635416666666,
+   "recomputed": 305.74635416666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_c_total_w1",
+   "claimed": 5705076.416666666,
+   "recomputed": 5705076.416666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 1288.2135416666665,
+   "recomputed": 1288.2135416666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_rho_negation_native_per_step",
+   "claimed": 10.984958071278825,
+   "recomputed": 10.984958071278825,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p16001_rho_plain_native_per_step",
+   "claimed": 10.107459867799811,
+   "recomputed": 10.107459867799811,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_recorded_total_w0",
+   "claimed": 32003.791666666668,
+   "recomputed": 32003.791666666668,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 252.06770833333334,
+   "recomputed": 252.06770833333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_recorded_total_w0.1",
+   "claimed": 1157876.0041666667,
+   "recomputed": 1157876.004166667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 407.7088541666667,
+   "recomputed": 407.7088541666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_recorded_total_w1",
+   "claimed": 11290725.916666664,
+   "recomputed": 11290725.916666666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 1808.4791666666665,
+   "recomputed": 1808.4791666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_c_total_w0",
+   "claimed": 20586.583333333332,
+   "recomputed": 20586.583333333332,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 252.06770833333334,
+   "recomputed": 252.06770833333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_c_total_w0.1",
+   "claimed": 413879.875,
+   "recomputed": 413879.875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 407.7088541666667,
+   "recomputed": 407.7088541666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_c_total_w1",
+   "claimed": 3953519.5,
+   "recomputed": 3953519.5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 1808.4791666666665,
+   "recomputed": 1808.4791666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_recorded_total_w0",
+   "claimed": 95571.83333333333,
+   "recomputed": 95571.83333333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 252.06770833333334,
+   "recomputed": 252.06770833333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_recorded_total_w0.1",
+   "claimed": 36649323.104166664,
+   "recomputed": 36649323.10416667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 407.7088541666667,
+   "recomputed": 407.7088541666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_recorded_total_w1",
+   "claimed": 365633084.54166657,
+   "recomputed": 365633084.5416666,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 1808.4791666666665,
+   "recomputed": 1808.4791666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_c_total_w0",
+   "claimed": 28618.833333333332,
+   "recomputed": 28618.833333333332,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 252.06770833333334,
+   "recomputed": 252.06770833333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_c_total_w0.1",
+   "claimed": 1303746.6083333334,
+   "recomputed": 1303746.6083333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 407.7088541666667,
+   "recomputed": 407.7088541666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_c_total_w1",
+   "claimed": 12779896.583333334,
+   "recomputed": 12779896.583333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 1808.4791666666665,
+   "recomputed": 1808.4791666666665,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_rho_negation_native_per_step",
+   "claimed": 10.988857836287417,
+   "recomputed": 10.988857836287417,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p32003_rho_plain_native_per_step",
+   "claimed": 9.708107507156953,
+   "recomputed": 9.708107507156953,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_recorded_total_w0",
+   "claimed": 63987.0,
+   "recomputed": 63987.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 312.7291666666667,
+   "recomputed": 312.7291666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_recorded_total_w0.1",
+   "claimed": 2366331.1583333337,
+   "recomputed": 2366331.158333333,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 510.0317708333334,
+   "recomputed": 510.0317708333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_recorded_total_w1",
+   "claimed": 23087428.583333336,
+   "recomputed": 23087428.583333332,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 2285.7552083333335,
+   "recomputed": 2285.7552083333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_c_total_w0",
+   "claimed": 52898.0,
+   "recomputed": 52898.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 312.7291666666667,
+   "recomputed": 312.7291666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_c_total_w0.1",
+   "claimed": 1223226.0833333335,
+   "recomputed": 1223226.0833333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 510.0317708333334,
+   "recomputed": 510.0317708333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_c_total_w1",
+   "claimed": 11756178.833333334,
+   "recomputed": 11756178.833333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g2_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 2285.7552083333335,
+   "recomputed": 2285.7552083333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_recorded_total_w0",
+   "claimed": 192688.33333333334,
+   "recomputed": 192688.33333333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 312.7291666666667,
+   "recomputed": 312.7291666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_recorded_total_w0.1",
+   "claimed": 227636219.94166666,
+   "recomputed": 227636219.9416667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 510.0317708333334,
+   "recomputed": 510.0317708333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_recorded_total_w1",
+   "claimed": 2274628004.4166665,
+   "recomputed": 2274628004.416667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 2285.7552083333335,
+   "recomputed": 2285.7552083333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_c_total_w0",
+   "claimed": 44494.0,
+   "recomputed": 44494.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 312.7291666666667,
+   "recomputed": 312.7291666666667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_c_total_w0.1",
+   "claimed": 2396884.383333334,
+   "recomputed": 2396884.383333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 510.0317708333334,
+   "recomputed": 510.0317708333334,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_c_total_w1",
+   "claimed": 23568397.833333336,
+   "recomputed": 23568397.833333336,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_g3_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 2285.7552083333335,
+   "recomputed": 2285.7552083333335,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_rho_negation_native_per_step",
+   "claimed": 10.788318049780715,
+   "recomputed": 10.788318049780715,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:tower_p64007_rho_plain_native_per_step",
+   "claimed": 9.546730006642644,
+   "recomputed": 9.546730006642644,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_recorded_total_w0",
+   "claimed": 3419.0,
+   "recomputed": 3419.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 62.65625,
+   "recomputed": 62.65625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_recorded_total_w0.1",
+   "claimed": 4882.3,
+   "recomputed": 4882.3,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 69.78125,
+   "recomputed": 69.78125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_recorded_total_w1",
+   "claimed": 18052.0,
+   "recomputed": 18052.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 133.90625,
+   "recomputed": 133.90625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_c_total_w0",
+   "claimed": 670.5,
+   "recomputed": 670.5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 62.65625,
+   "recomputed": 62.65625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_c_total_w0.1",
+   "claimed": 3337.9625,
+   "recomputed": 3337.9625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 69.78125,
+   "recomputed": 69.78125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_c_total_w1",
+   "claimed": 27345.125,
+   "recomputed": 27345.125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 133.90625,
+   "recomputed": 133.90625,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_rho_negation_native_per_step",
+   "claimed": 7.102803738317757,
+   "recomputed": 7.102803738317757,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p211_rho_plain_native_per_step",
+   "claimed": 5.348290598290598,
+   "recomputed": 5.348290598290598,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_recorded_total_w0",
+   "claimed": 8475.0,
+   "recomputed": 8475.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 64.9375,
+   "recomputed": 64.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_recorded_total_w0.1",
+   "claimed": 13672.6,
+   "recomputed": 13672.6,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 73.0875,
+   "recomputed": 73.0875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_recorded_total_w1",
+   "claimed": 60451.0,
+   "recomputed": 60451.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 146.4375,
+   "recomputed": 146.4375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_c_total_w0",
+   "claimed": 1993.125,
+   "recomputed": 1993.125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 64.9375,
+   "recomputed": 64.9375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_c_total_w0.1",
+   "claimed": 11593.7,
+   "recomputed": 11593.7,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 73.0875,
+   "recomputed": 73.0875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_c_total_w1",
+   "claimed": 97998.875,
+   "recomputed": 97998.875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 146.4375,
+   "recomputed": 146.4375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_rho_negation_native_per_step",
+   "claimed": 7.264623955431754,
+   "recomputed": 7.264623955431754,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p419_rho_plain_native_per_step",
+   "claimed": 5.5610619469026545,
+   "recomputed": 5.5610619469026545,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_recorded_total_w0",
+   "claimed": 11353.0,
+   "recomputed": 11353.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 66.4375,
+   "recomputed": 66.4375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_recorded_total_w0.1",
+   "claimed": 27835.8,
+   "recomputed": 27835.8,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 72.828125,
+   "recomputed": 72.828125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_recorded_total_w1",
+   "claimed": 176181.0,
+   "recomputed": 176181.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 130.34375,
+   "recomputed": 130.34375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_c_total_w0",
+   "claimed": 1953.25,
+   "recomputed": 1953.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 66.4375,
+   "recomputed": 66.4375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_c_total_w0.1",
+   "claimed": 14849.375,
+   "recomputed": 14849.375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 72.828125,
+   "recomputed": 72.828125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_c_total_w1",
+   "claimed": 130914.5,
+   "recomputed": 130914.5,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 130.34375,
+   "recomputed": 130.34375,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_rho_negation_native_per_step",
+   "claimed": 7.200704225352113,
+   "recomputed": 7.200704225352113,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p821_rho_plain_native_per_step",
+   "claimed": 5.367647058823529,
+   "recomputed": 5.367647058823529,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_recorded_total_w0",
+   "claimed": 34521.0,
+   "recomputed": 34521.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_recorded_total_w0:reference(negation rho, w=0)",
+   "claimed": 91.875,
+   "recomputed": 91.875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_recorded_total_w0.1",
+   "claimed": 94893.1,
+   "recomputed": 94893.1,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_recorded_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 109.8125,
+   "recomputed": 109.8125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_recorded_total_w1",
+   "claimed": 638242.0,
+   "recomputed": 638242.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_recorded_total_w1:reference(negation rho, w=1)",
+   "claimed": 271.25,
+   "recomputed": 271.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_c_total_w0",
+   "claimed": 2583.25,
+   "recomputed": 2583.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_c_total_w0:reference(negation rho, w=0)",
+   "claimed": 91.875,
+   "recomputed": 91.875,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_c_total_w0.1",
+   "claimed": 23440.45,
+   "recomputed": 23440.45,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_c_total_w0.1:reference(negation rho, w=0.1)",
+   "claimed": 109.8125,
+   "recomputed": 109.8125,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_c_total_w1",
+   "claimed": 211155.25,
+   "recomputed": 211155.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_c_total_w1:reference(negation rho, w=1)",
+   "claimed": 271.25,
+   "recomputed": 271.25,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_rho_negation_native_per_step",
+   "claimed": 8.176638176638177,
+   "recomputed": 8.176638176638177,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "record:v3_p1619_rho_plain_native_per_step",
+   "claimed": 6.373913043478261,
+   "recomputed": 6.373913043478261,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "RESULTS.md v3 p=1619 recorded arm / negation rho, w=0",
+   "claimed": 376,
+   "recomputed": 375.7387755102041,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md v3 p=1619 recorded arm / negation rho, w=0.1",
+   "claimed": 864,
+   "recomputed": 864.1375071143996,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md v3 p=1619 recorded arm / negation rho, w=1",
+   "claimed": 2353,
+   "recomputed": 2352.9658986175114,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md cover p=12841 ic_jc / negation rho, w=0",
+   "claimed": 2473,
+   "recomputed": 2472.6147042564953,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md cover p=12841 ic_jc / negation rho, w=0.1",
+   "claimed": 20667,
+   "recomputed": 20666.89803898794,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md cover p=12841 ic_jc / negation rho, w=1",
+   "claimed": 51693,
+   "recomputed": 51692.93909400366,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md tower g3 p=64007 recorded / negation rho, w=0",
+   "claimed": 616,
+   "recomputed": 616.150822729998,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md tower g3 p=64007 recorded / negation rho, w=0.1",
+   "claimed": 446318,
+   "recomputed": 446317.72559920186,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md tower g3 p=64007 recorded / negation rho, w=1",
+   "claimed": 995132,
+   "recomputed": 995131.9354425621,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md v3 p=1619 arm C group ops",
+   "claimed": 2583,
+   "recomputed": 2583.25,
+   "rel_tol": 0.002
+  },
+  {
+   "name": "RESULTS.md v3 p=1619 arm C / negation rho, w=0",
+   "claimed": 28.1,
+   "recomputed": 28.11700680272109,
+   "rel_tol": 0.003
+  },
+  {
+   "name": "RESULTS.md v3 p=1619 arm C / negation rho, w=0.1",
+   "claimed": 213,
+   "recomputed": 213.4588503130336,
+   "rel_tol": 0.003
+  },
+  {
+   "name": "RESULTS.md v3 p=1619 arm C / negation rho, w=1",
+   "claimed": 778,
+   "recomputed": 778.452534562212,
+   "rel_tol": 0.003
+  },
+  {
+   "name": "RESULTS.md arm-rows classified",
+   "claimed": 162,
+   "recomputed": 162,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "RESULTS.md rows below the negation rho at all three prices",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "RESULTS.md recorded-arm class changes",
+   "claimed": 16,
+   "recomputed": 16,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "RESULTS.md curves checked for j = 0, 1728",
+   "claimed": 38,
+   "recomputed": 38,
+   "rel_tol": 1e-09
+  }
+ ],
+ "headline_failures": [],
+ "band": {
+  "rows_above_at_0_0.1_1": 156,
+  "rows_unresolved_lower_bound": 6,
+  "rows_below": 0
+ },
+ "findings_outside_evidence_dir": [
+  "record summary (added in the closing commit) says \"recorded gaps understated 5.4-9.2x\"; the recorded plain rho total over the negation rho total is 5.50-9.22 (v3), 5.21-8.00 (cover), 4.35-7.21 (tower) (headlines.json), so 4.35-9.22 over the three targets; 5.4 is not supported. At the headline cells the recorded-arm distance moves by 9.2/7.7/3.1 (v3 p=1619), 6.3/4.4/1.2 (cover p=12841) and 4.3/2.8/0.62 (tower g3 p=64007) at 0/0.1/1 GAE, so the gap is not understated at every price. The same 5.4-9.2 figure is in problems/prime-field-chained-transfer-no-advantage.md (2026-11-13 addendum).",
+  "record summary says the 16 verdict changes are \"all toward 'above'\"; by class they go to {'unresolved (lower bound)': 6, 'above': 10} (RESULTS.md states this correctly)."
+ ]
+}

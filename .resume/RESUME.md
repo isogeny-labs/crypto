@@ -1,35 +1,28 @@
-# Resume: crypto @ claude/exponent-study-20261108
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
-Exponent study (owner preregistration 2026-11-08): fit the exponent of the cost T(E,m,L) of ONE
-decomposition system against |V| for multiplicative-subgroup bases on the Curve25519-family
-miniatures, m = 2, 3, 4, symmetrised system in the elementary symmetric polynomials. Success rule:
-every verified measured improvement counts; report distance to rho.
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
 ## Lead / hypothesis
-Lever iff m = 4 exponent < 0.5 (upper 95% bound too) or m = 3 exponent < 0. Prediction: m = 2 about 1.5,
-m = 3 about 3.5, m = 4 >= 4.5 or capped; no lever.
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-research/curve25519_exponent_study_20261108/PROTOCOL.md (frozen, data/frozen.sha256). Code:
-src/cryptanalysis/ic_framework/subgroup_semaev.rs (6 unit tests pass), `curve25519_family f4sub` and
-`subcensus`. Binary /home/user/ctarget-f1/release/curve25519_family. Run: python3 scripts/run_grid.py
-(4 workers, cells/*.json, resumable: finished cells skipped). Analysis: scripts/analyse.py.
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
 ## State
-Local worktree /home/user/crypto, branch claude/exponent-study-20261108 (not pushed by instruction).
-Conductor, ecdb and research-kb unreachable. Disk about 2.6 GB free: no second target dir.
-
-## Next steps
-1. Run the grid; census (subcensus); calibration (bits base vs tower f4cost G=0).
-2. analyse.py; README.md with [pcc:unverified] result sentences; figure; REPORT.pdf; pcc lint-prose.
-3. Session log docs/session-logs/2026-11-08.md; local commits with the two attribution lines.
-
-## Stop and success conditions
-Stop when every grid cell is complete or censored, the analysis, README, figure, PDF and session log
-are written and committed locally. Success: fitted exponents with intervals per m (or a stated
-censoring), verdicts on the preregistered thresholds, failed predictions kept as failed.
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
 ## Runs in flight
-Grid launched by scripts/run_grid.py in the background on this machine; cells land in
-research/curve25519_exponent_study_20261108/cells/. Relaunch the same command to resume.
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
+
+## Stop and success conditions
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
+
+## Next steps
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.

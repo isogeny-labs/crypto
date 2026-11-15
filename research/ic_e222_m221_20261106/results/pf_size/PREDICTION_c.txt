@@ -1,0 +1,1 @@
+Exploratory c-retune at 35 bits (T = 1000, 1 instance per residue, batched + bucketed): c in {0.5, 0.7}. Prediction written before the run: total time at c = 0.5 is at least 15% lower than at c = 1.0 (1977 and 2162 ms) because setup shrinks faster than the per-target phase grows; the best c over {0.5, 0.7, 1.0} gives IC/BSGS <= 3.5 at 35 bits. All targets must verify.
