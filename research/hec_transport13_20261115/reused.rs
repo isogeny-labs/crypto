@@ -982,4 +982,3 @@ pub fn rational_points(f: &[u64; 15], p: u64) -> Vec<[u64; 3]> {
     }
     out
 }
-

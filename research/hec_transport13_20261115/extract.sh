@@ -9,4 +9,4 @@ awk '
 /^pub fn rational_points/ { copying=1 }
 /^\/\/\/ `\(a₁, a₂\)`/ { copying=0 }
 copying { print }
-' > research/hec_transport13_20261115/reused.rs
+' | sed '$d' > research/hec_transport13_20261115/reused.rs

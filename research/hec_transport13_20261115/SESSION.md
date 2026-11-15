@@ -28,3 +28,8 @@ hash interpreted as variable; corrected prose before successful compile. No scie
 rerun. Frozen extraction has an upstream trailing blank line, preserved bytewise.
 Standalone runner not covered automatically by native CI. No performance claims.
 Shared .resume untouched. Next: actual Kummer coordinate alignment and divisor map.
+
+## Publication whitespace cleanup
+Removed only the extracted file's terminal blank line and recorded the trim in
+extract.sh; refreshed source hash. Scientific binary/results unchanged, no rerun.
+This supersedes the earlier note about preserving that upstream blank line.
