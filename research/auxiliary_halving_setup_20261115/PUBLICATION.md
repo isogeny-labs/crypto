@@ -111,3 +111,9 @@ source/binary bindings. No qualification was repeated or pre-call manifest
 replaced. The plotted SVG/TSV now use normalized whitespace and line endings;
 all four re-rendered PDF pages are pixel-identical to the inspected pages.
 This formatting change makes the scoped diff whitespace check pass.
+
+The exact pre-submission body is retained as checks/pr-body001.md (identical
+bytes to the temporary /workspace/scratch/aux-halving-pr.md referenced by
+lesson test T-40fa2db68053). Its prose lint reports zero findings. The restored
+tracked .artifacts/config.json supplies the actual keep rules; the policy
+check selects exactly the two whole archives, retaining PDF and PCC ledger.
