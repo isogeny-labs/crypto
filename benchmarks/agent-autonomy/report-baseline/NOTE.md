@@ -1,17 +1,20 @@
-# Baseline status: partial, not representative
+# Baseline status: 8 episodes, labels not yet audited
 
-This pre-loop baseline (sessions ended 2026-11-01 to 2026-11-14) holds 3 episodes, not the
-planned 25 to 40, and is **not usable as a baseline yet** `[pcc:unverified]`.
+Pre-loop baseline: sessions whose crypto PR merged 2026-11-01..14 `[pcc:unverified]`.
 
-- **Selection bias.** The 3 sessions were recorded because their transcripts were short
-  enough to read in full; about 15 qualifying sessions are unprocessed (PRs #3405, #3027,
-  #3447, #3408, #3731, #3839, #3180, #3245, #3952, #3844, #4150, #4153 and others). Short
-  sessions are not a random sample.
-- **Cost.** `list_events` pages count raw events before filtering, and most "user" events are
-  tool results, so a long session needs 5 to 50 pages.
-- **Unaudited.** Interventions were classed by a Sonnet agent; none is audited yet. One case
-  ("use Rust", against AGENTS.md "no Python") was classed redirect under the conservative rule.
-- **Pending.** Two episodes stay pending until a `reverted` check is recorded after 14 days.
+- **Coverage.** Every eligible session was attempted (no sampling). 17 candidates:
+  8 recorded; 6 excluded with a reason (PR number pointed at an unrelated PR: #2994, #3027,
+  #3180; no PR found or several PRs: two sessions; one transcript over the 60-page cap, #3731);
+  4 not recorded because the batch-A agent could not save inline transcript pages (#4153,
+  #4150, #3952, #3844).
+- **Result as recorded:** 0 unsupervised successes, 5 fails, 3 pending (14-day revert window).
+  Every fail is driven by `redirect` labels.
+- **Labels are unaudited, and the redirects are the uncertain ones.** Several are "continue" /
+  "resume" nudges after an agent stopped, or short fragments, labelled redirect by the
+  conservative tie rule. The owner audit (every redirect plus a random 10% of other labels,
+  seed 20261115) decides these; results are recorded as `--classifier human` interventions,
+  which override the machine label.
+- **Known gaps:** answers the owner gave through a tool prompt are not human-typed events
+  and are not counted; some hook messages on inline pages may be missing (hooks are neutral).
 
-Next: a transcript filter that keeps only human-typed messages, one cheap agent per session,
-and a uniform sample by date before this baseline is compared with anything.
+Do not compare this baseline with later weeks until the audit is recorded.
