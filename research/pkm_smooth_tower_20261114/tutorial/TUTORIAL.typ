@@ -339,8 +339,8 @@ quoted from their reports. They have no pcc claim id yet [pcc:unverified].
 - *Solving the system loses to enumerating $V$.* The slides' relation search (F4 plus a linear stage that reads the
   solutions off the basis) was implemented. It finds exactly the relations enumeration finds (80 of 80 decided
   targets), but it costs between $2 dot 10^2$ and $1.2 dot 10^7$ times more $FF_p$ multiplications than simply
-  trying every factor-base point. The gap grows with $|V|$, at $m = 2$ and at $m = 3$. Larger $m = 3$ systems did
-  not fit in 15 GiB of memory.
+  trying every factor-base point. The gap grows with $|V|$, at $m = 2$ and at $m = 3$, where it reaches
+  $5 dot 10^7$ at $|V| = 32$. Those systems needed about 18 GiB and ran on a 128 GiB host.
 
 *Bottom line.* At the sizes measured, this attack is slower than Pollard rho by 18–141 times. Solving its
 polynomial systems is slower than enumerating the factor base by orders of magnitude. Odd degrees shave a

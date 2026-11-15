@@ -51,9 +51,31 @@ the system's shape, not the target.
   0.76–1.47× Kummer's for the same degree sequence, and *the auxiliary-curve search was not charged*. The pre-registered
   "isogeny is not cheaper" prediction stands.
 - *The slides' algebraic relation search.* Implemented, verified exact (80/80 decided targets), and measured. On these
-  sizes it costs between 2·10² and 1.2·10⁷ times plain enumeration of the factor base, and the gap grows with `S` in
+  sizes it costs between 2·10² and 1.2·10⁷ times plain enumeration of the factor base (5·10⁷ at `m = 3`,
+  `S = 32`–`36` in the extension below), and the gap grows with `S` in
   every arm with more than one cell, at `m = 2` and at `m = 3`. The slides' hope that solving beats enumerating at
   `m ≥ 3` is not seen on any measured cell (`m = 3`, `S ≤ 27`). The larger `m = 3` systems did not fit in 15 GiB.
+
+== Extension: the `m = 3` cells on a 128 GiB host (Amendments 4–5)
+
+At the user's request, the cells censored for memory were rerun on a RunPod CPU pod (16 vCPU, 128 GiB; EKS was not
+reachable from this session). The binaries were hash-checked on the pod, with the same seeds and 4 threads. A
+host-equivalence gate passed: three committed cells (`M2-A3-k5`, `M3-A2-t4`, `B-M3-A2-t4`) reproduced
+bit-identically. With memory, the `m = 3` systems at `S = 32` still hit the frozen 1,800 s budget, so they stay
+censored for the frozen verdicts (`runs/highmem/`). A separate 24 h-budget extension (`runs/xb/`, Amendment 5;
+descriptive, not a frozen verdict) completed all six systems in 44–54 min each, at a peak RSS of 16.4–17.9 GiB, just
+above the first host's 15 GiB:
+
+#table(columns: 3, align: left,
+  [system], [result], [note],
+  [`m = 3`, degree 2, `S = 32` (16 unknowns)], [`5.10·10¹²` F4 mults, `D = 7`, refuted; agrees with exhaustive], [`S = 16` was `1.59·10¹⁰`: about ×320 per doubling of `|V|` (×9–14 at `m = 2`)],
+  [`m = 3`, mixed 2,3,2,3, `S = 36` (13 unknowns)], [`5.10·10¹²`, `D = 8`, refuted; agrees], [Equal to the `S = 32` count within 0.03%; observed, not explained],
+  [Degree 3 vs degree 2 at `m = 3`, `S = 27`], [`r = 0.45` (gain band)], [Against the reference extended to `S = 32`; the frozen verdict, read at `S = 9`, was 0.54],
+  [Part B, `m = 3`, `S = 32` and `36`], [algebraic ÷ enumeration `5.0·10⁷`], [4/4 targets agree with enumeration; up from `7.7·10⁵` (`S = 16`) and `2.9·10⁵` (`S = 12`)],
+)
+
+Each random part B target is the same system as the part A refutation draw at its size, and their F4 counts are
+identical (`5,097,695,134,360` and `5,096,514,454,550`). The pod ran about 6.9 h (about \$7) and was deleted.
 
 == Scope and deviations
 
