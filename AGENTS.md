@@ -887,6 +887,11 @@ follows the PR until it lands, under the check-in and merge rules below.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
+- **Lint the PR body before submitting it** (lesson `L-77b44d3fe205`, adopted
+  2026-11-15). `pcc-gate` runs `python3 tools/pcc/pcc.py lint-prose --stdin` on
+  the PR body and fails the required `gate` check on a strong-claim word
+  without `[pcc:ID]` or `[pcc:unverified]`. Run it locally first; reword words
+  that describe proposals, and cite or tag those that describe results.
 - **Record the episode when the PR merges or closes** (owner, 2026-11-15).
   The session that owned the PR runs `python3 tools/autonomy_report.py
   add-episode` (task, class, PR, start and end, result, merged, CI state, each
