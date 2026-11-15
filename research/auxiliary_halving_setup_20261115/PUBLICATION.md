@@ -29,3 +29,35 @@ Its exact complete log is retained for the next evidence commit; no root-suite
 pass is claimed. The original partial snapshot remains unchanged. All native
 and local Lean controls retain their previous scope and source bindings.
 [pcc:unverified]
+
+Implementation is now present: fixed-degree preimages, generated order8/trace
+setup, public main-base filter, existing cold path and OpenSSL complete-set/
+transcript replay. No native qualification call has occurred. Strict build001
+compiles both candidate executables, then rejects the reference source because
+its new std::optional declaration lacks <optional>. Preserve that diagnostic;
+add the missing standard header before a fresh build002. A prior orchestration
+submission failed JS template parsing before executing any command; corrected
+only the shell argument spelling. No cap, field, seed or native criterion is
+changed. The exact same parent/default interfaces remain regression targets.
+
+Fresh build002 passes all five strict C++ executables. The standalone Rust
+embedding then fails because the unchanged identity module also uses hex,
+which its new manifest did not declare. Retain checks/identity-build002.log;
+add the existing hex dependency and rebuild in fresh003. No candidate,
+identity, reference or legacy qualification call has run yet. The protocol,
+all native sources, fields/seeds/caps and replay criteria stay unchanged.
+
+Build003 passes all five strict C++ binaries and the standalone native Rust
+certificate embedding with locked dependencies. The initial C++ header and
+Rust manifest failures remain under checks. These are local functional unit
+and integration controls under AGENTS9a (development work), without scientific
+measurements or a cloud experiment claim. Full final root-suite evidence is
+retained as one97024-byte archive in parent checks/root-rust-final002; it uses
+the documented artifact-store migration path, not shards. No old snapshot or
+raw archive is rewritten. [pcc:unverified]
+
+Source now freezes before qualification001. The qualifier is executed only
+from a separate copied file; exact build and pre-call manifests have distinct
+names. Its raw round retains every arm exit and complete setup history. The
+new scoped statement PCC-20261115-a14c8e remains unverified. No source-model,
+setup or recovery result is asserted before those calls complete.
