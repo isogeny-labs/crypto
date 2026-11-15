@@ -257,6 +257,60 @@ fn enumerate_triples(base: &Base, ar: &mut Arithmetic) -> TripleBank {
     bank
 }
 
+/// First B liftable abscissae, a target-independent non-Dickson control.
+fn plain_x_base(b: usize, ar: &mut Arithmetic) -> Result<Base, String> {
+    let mut points = Vec::with_capacity(b);
+    for x in 0..PRIME31.p {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
+            if y != 0 {
+                points.push((x, y.min(PRIME31.p - y)));
+            }
+        }
+        if points.len() == b {
+            return Ok(Base { depth: 0, terminal: 0, values: Vec::new(), points });
+        }
+    }
+    Err("not enough liftable x values in requested prime field".into())
+}
+
+/// Optional exact full enumeration controls, kept outside the cold target
+/// solve. They compare the same number of points with and without the
+/// Dickson constraint. Neither constructs an algebraic f6 relation oracle.
+fn compare_b135_controls() -> Result<serde_json::Value, String> {
+    let mut ar = Arithmetic::default();
+    let dickson = Base::build(PRIME31, 8, &mut ar)?;
+    if dickson.points.len() != 135 {
+        return Err("changed Dickson control size".into());
+    }
+    let d = enumerate_triples(&dickson, &mut ar);
+    if d.templates != 3_207_960 || d.collisions != 2_370
+        || d.first.len() != 3_205_590 || d.projective_rows.len() != 127
+        || d.duplicate_projective_rows != 2_243 || d.hom.rank != 126
+    {
+        return Err("Dickson depth-8 signed collision census mismatch".into());
+    }
+    let natural = plain_x_base(135, &mut ar)?;
+    let c = enumerate_triples(&natural, &mut ar);
+    if c.templates != 3_207_960 || c.collisions != 2_244
+        || c.first.len() != 3_205_716 || c.projective_rows.len() != 122
+        || c.duplicate_projective_rows != 2_122 || c.hom.rank != 122
+    {
+        return Err("plain-x signed collision census mismatch".into());
+    }
+    Ok(json!({
+        "factor_base_size":135,
+        "dickson_depth8":{"collisions":d.collisions,
+            "projective_unique":d.projective_rows.len(),"rank":d.hom.rank,
+            "templates":d.templates},
+        "plain_first_135_x":{"collisions":c.collisions,
+            "projective_unique":c.projective_rows.len(),"rank":c.hom.rank,
+            "templates":c.templates},
+        "standing":"[pcc:unverified]",
+        "oracle":"complete signed m3 generic enumeration, NOT F4"
+    }))
+}
+
 fn signed_point(code: u32, base: &Base, ar: &mut Arithmetic) -> Point {
     let mut out = None;
     for (i, sign) in decode(code) {
@@ -356,6 +410,11 @@ fn main() -> Result<(), String> {
     if ar.scalar(e, scalar, Some(e.g)) != Q || scalar != VERIFIER_SCALAR_ONLY {
         return Err("independent full scalar verification failed".into());
     }
+    let b135_controls = if std::env::var_os("PRIME31_COMPARE_BASES").is_some() {
+        Some(compare_b135_controls()?)
+    } else {
+        None
+    };
     println!("{}", serde_json::to_string_pretty(&json!({
         "standing": "[pcc:unverified]",
         "mode": "signed-distinct-index m3 collision/anchor/target index calculus",
@@ -367,6 +426,7 @@ fn main() -> Result<(), String> {
         "unique_projective_collision_rows":bank.projective_rows.len(),
         "duplicate_projective_rows":bank.duplicate_projective_rows,
         "homogeneous_rank":bank.hom.rank,"full_rank_at":bank.first_full_rank,
+        "b135_full_enumeration_controls":b135_controls,
         "anchor_trials":anchor_trials,"anchor_scalar":anchor_a,
         "target_trials":target_trials,"target_mix_a":a,"target_mix_b":b,
         "recovered_scalar":scalar,"basis_log_replays":base.points.len(),
