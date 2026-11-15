@@ -163,11 +163,13 @@ def belongs_in_store(path: str, size: int, policy: dict) -> bool:
 # Manifests and the managed .gitignore block
 
 
-def staged_content(root: Path, relative: str, *, missing_ok: bool = False) -> bytes | None:
-    """Apply required Git filters; absence alone may return None."""
+def staged_content(root: Path, relative: str, *, missing_ok: bool = False, output=None) -> bytes | None:
+    """Apply required filters, streaming payloads to output when supplied."""
     spec = f":{relative}"
     result = subprocess.run(["git", "-C", str(root), "cat-file", "--filters",
-                             f"--path={relative}", spec], capture_output=True)
+                             f"--path={relative}", spec],
+                            stdout=subprocess.PIPE if output is None else output,
+                            stderr=subprocess.PIPE)
     if result.returncode:
         if missing_ok and "\n" not in spec:
             request = spec.encode("utf-8", "surrogateescape")
@@ -544,7 +546,7 @@ def cmd_push(cfg: Config, args) -> int:
                 (cfg.cache / "tmp").mkdir(parents=True, exist_ok=True)
                 fd, tmp = tempfile.mkstemp(dir=cfg.cache / "tmp")
                 with os.fdopen(fd, "wb") as out:
-                    out.write(staged_content(cfg.root, f))
+                    staged_content(cfg.root, f, output=out)
                 path = Path(tmp)
             size = path.stat().st_size
             digest = sha256_file(path)
