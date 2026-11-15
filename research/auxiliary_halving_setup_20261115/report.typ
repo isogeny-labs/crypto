@@ -96,8 +96,9 @@ The whole qualification archive is 99,856 bytes. It retains all 25 arms,
 14,754-case census, setup histories, identity record, native inputs/bases,
 legacy comparison, complete cold trace and exits. SHA256 and exact normalized
 unpack/repack identity pass. The separate complete parent Rust-gate archive is
-97,024 bytes. Both whole files use the standard artifact-autofix upload and
-complete-byte replay route; remote custody is pending the actual receipt.
+97,024 bytes. Artifact-autofix run43717663512 uploads both whole objects and
+replays their complete remote bytes. Manifest commit ba62e3ae93 retains their
+SHA256/length pointers; both local hydrated checks report zero problems.
 No archive is split. README.md gives build, extraction and hydration context.
 
 All new C++ binaries use strict -Wall/-Wextra/-Wpedantic/-Werror. Build001's
