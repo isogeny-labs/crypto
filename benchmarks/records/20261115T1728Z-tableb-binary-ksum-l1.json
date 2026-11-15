@@ -1,0 +1,393 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-15T17:41:37+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_tableb_binary_ksum_20261115/run_all.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T17:29:04+00:00",
+      "wall_s": 415.626
+    }
+  ],
+  "commit": "77bc2141984f3279d854e51f444d8dc1ac0f23ee",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T17:28:59+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-tableb-binary-ksum"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T1728Z-tableb-binary-ksum-l1",
+  "metrics": [
+    {
+      "baseline": 11.8401,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5_w0_n15",
+      "note": "[pcc:unverified] icv1-f2m15-t131-ed7256f0 counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n18; ratio 1.138 [1.120, 1.155]; L1 not met (secondary)",
+      "reference": 1.966,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 13.4685
+    },
+    {
+      "baseline": 11.8401,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4_w0_n15",
+      "note": "[pcc:unverified] icv1-f2m15-t131-ed7256f0 counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n18; ratio 0.945 [0.929, 0.962]; L1 not met (secondary)",
+      "reference": 1.966,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 11.1939
+    },
+    {
+      "baseline": 10.8481,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5_w0_n18",
+      "note": "[pcc:unverified] icv1-f2m18-t393-d2c04152 counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n21; ratio 1.038 [1.019, 1.057]; L1 not met (secondary)",
+      "reference": 1.877,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 11.2571
+    },
+    {
+      "baseline": 10.8481,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4_w0_n18",
+      "note": "[pcc:unverified] icv1-f2m18-t393-d2c04152 counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n21; ratio 0.902 [0.883, 0.922]; L1 holds (secondary)",
+      "reference": 1.877,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 9.7891
+    },
+    {
+      "baseline": 10.284,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5_w0_n21",
+      "note": "[pcc:unverified] icv1-f2m21-t2591-de54d72e counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n62; ratio 0.681 [0.668, 0.695]; L1 holds (primary)",
+      "reference": 1.2609,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 7.007
+    },
+    {
+      "baseline": 10.284,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4_w0_n21",
+      "note": "[pcc:unverified] icv1-f2m21-t2591-de54d72e counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n62; ratio 0.654 [0.638, 0.670]; L1 holds (primary)",
+      "reference": 1.2609,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.7274
+    },
+    {
+      "baseline": 10.9898,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5_w0_n24",
+      "note": "[pcc:unverified] icv1-f2m24-tm3047-2d0c0e8c counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n67; ratio 0.636 [0.621, 0.652]; L1 holds (primary)",
+      "reference": 1.2105,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.9905
+    },
+    {
+      "baseline": 10.9898,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4_w0_n24",
+      "note": "[pcc:unverified] icv1-f2m24-tm3047-2d0c0e8c counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n67; ratio 0.598 [0.587, 0.610]; L1 holds (primary)",
+      "reference": 1.2105,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.5766
+    },
+    {
+      "baseline": 13.9466,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5_w0_n27",
+      "note": "[pcc:unverified] icv1-f2m27-t12543-569dca8b counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n150; ratio 0.460 [0.452, 0.468]; L1 holds (primary)",
+      "reference": 1.0687,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.4143
+    },
+    {
+      "baseline": 13.9466,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4_w0_n27",
+      "note": "[pcc:unverified] icv1-f2m27-t12543-569dca8b counted cost GAE/sqrt(r), w=0; baseline = strictest incumbent inc-n150; ratio 0.481 [0.473, 0.488]; L1 holds (primary)",
+      "reference": 1.0687,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.7022
+    }
+  ],
+  "problem": "ecdlp:tableb-random-binary-ksum-l1",
+  "raw": [
+    {
+      "bytes": 1225110,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f2/f2694515a3a6b9563890b93011391a8479cf103189c83879e3d89b121e1811bb",
+      "sha256": "f2694515a3a6b9563890b93011391a8479cf103189c83879e3d89b121e1811bb",
+      "uploaded": false
+    },
+    {
+      "bytes": 1226924,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/bea61d8bd7c3f3a35d787ad392f3adf1a211d4b89ff3c716a8460ecb52888fab",
+      "sha256": "bea61d8bd7c3f3a35d787ad392f3adf1a211d4b89ff3c716a8460ecb52888fab",
+      "uploaded": false
+    },
+    {
+      "bytes": 1227046,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/340b02b6797c18e46a0379b05a7a8ca2069f9039bad40f3563fa6495709e5469",
+      "sha256": "340b02b6797c18e46a0379b05a7a8ca2069f9039bad40f3563fa6495709e5469",
+      "uploaded": false
+    },
+    {
+      "bytes": 1257064,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bc/bc4a28abc1d3156d3a9093bf1112cf2ec005d5de1f0829c7d72f38875c4d5bfa",
+      "sha256": "bc4a28abc1d3156d3a9093bf1112cf2ec005d5de1f0829c7d72f38875c4d5bfa",
+      "uploaded": false
+    },
+    {
+      "bytes": 1257815,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/318cc36431c1a3d589ff90553d5f97c554d984cb2fc969de92072366d09ae89a",
+      "sha256": "318cc36431c1a3d589ff90553d5f97c554d984cb2fc969de92072366d09ae89a",
+      "uploaded": false
+    },
+    {
+      "bytes": 1255722,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/23/23769faf86a13825d8b3017f9569c61c09c20ede3181b3951f5174ae1fbcf9cd",
+      "sha256": "23769faf86a13825d8b3017f9569c61c09c20ede3181b3951f5174ae1fbcf9cd",
+      "uploaded": false
+    },
+    {
+      "bytes": 1365723,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/aa/aa340a3f27a7c8ee8e69e7ed519f9ae5bba60c1ded848ef2d70dce0de5dc1ec6",
+      "sha256": "aa340a3f27a7c8ee8e69e7ed519f9ae5bba60c1ded848ef2d70dce0de5dc1ec6",
+      "uploaded": false
+    },
+    {
+      "bytes": 1365663,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c6/c657f7df51f5b433c6d25e62f07db690cbe5157ee777ea7a5b87218338837f65",
+      "sha256": "c657f7df51f5b433c6d25e62f07db690cbe5157ee777ea7a5b87218338837f65",
+      "uploaded": false
+    },
+    {
+      "bytes": 1365017,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0e/0e18a55da1d32e9bbebc23e3aa5354d3b3d05dba96f805eeec44ca63c87d4f1d",
+      "sha256": "0e18a55da1d32e9bbebc23e3aa5354d3b3d05dba96f805eeec44ca63c87d4f1d",
+      "uploaded": false
+    },
+    {
+      "bytes": 1356744,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1d/1d4a4a3bb7195935d3142de64daf2a7485eee9b5836260393583c31d03c99f63",
+      "sha256": "1d4a4a3bb7195935d3142de64daf2a7485eee9b5836260393583c31d03c99f63",
+      "uploaded": false
+    },
+    {
+      "bytes": 1357689,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3f480f569ef747f96c64178faa027ca0b60ae1fa38c6ab819f3c5830543e56cb",
+      "sha256": "3f480f569ef747f96c64178faa027ca0b60ae1fa38c6ab819f3c5830543e56cb",
+      "uploaded": false
+    },
+    {
+      "bytes": 1360453,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ea/eae0e0ba83cf1ee993ba54468d359c76f35a9e01ecdd17e9b48490c27d0490ec",
+      "sha256": "eae0e0ba83cf1ee993ba54468d359c76f35a9e01ecdd17e9b48490c27d0490ec",
+      "uploaded": false
+    },
+    {
+      "bytes": 1400246,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e1/e13595082cfb470e0a3dd02b272efa7717623fd65fafdb29a98eedf94b14388c",
+      "sha256": "e13595082cfb470e0a3dd02b272efa7717623fd65fafdb29a98eedf94b14388c",
+      "uploaded": false
+    },
+    {
+      "bytes": 1398593,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7a/7a89f2648c8a62e68182e0eba703e28ac3a2fcdd36c538c9848a93c925f17b62",
+      "sha256": "7a89f2648c8a62e68182e0eba703e28ac3a2fcdd36c538c9848a93c925f17b62",
+      "uploaded": false
+    },
+    {
+      "bytes": 1397972,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b7/b7187fa9bcc5170a290067272e15fdbf3eae6a90a5cb66896ee6a74a6c77c7ae",
+      "sha256": "b7187fa9bcc5170a290067272e15fdbf3eae6a90a5cb66896ee6a74a6c77c7ae",
+      "uploaded": false
+    },
+    {
+      "bytes": 2035,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r1/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/edd08a7687d44bec9739c2e8b2139a389528433b5c3fae87181c3bede292924f",
+      "sha256": "edd08a7687d44bec9739c2e8b2139a389528433b5c3fae87181c3bede292924f",
+      "uploaded": false
+    },
+    {
+      "bytes": 2035,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r2/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/33/33f397a75b7ed4883196987881bf49b6824954d4ab50bb9f54610b7bc92e2244",
+      "sha256": "33f397a75b7ed4883196987881bf49b6824954d4ab50bb9f54610b7bc92e2244",
+      "uploaded": false
+    },
+    {
+      "bytes": 2035,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B15-r3/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/38e530b7ed06d9e83c1ea3d01df2d67d171a1ac64fc20ec0139e240e9c3f5104",
+      "sha256": "38e530b7ed06d9e83c1ea3d01df2d67d171a1ac64fc20ec0139e240e9c3f5104",
+      "uploaded": false
+    },
+    {
+      "bytes": 2035,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r1/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f4/f495c3389c094c2805e64df870c4798fc41f0640ecbe2b6ad1929f7e95c39dbe",
+      "sha256": "f495c3389c094c2805e64df870c4798fc41f0640ecbe2b6ad1929f7e95c39dbe",
+      "uploaded": false
+    },
+    {
+      "bytes": 2035,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r2/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/47/47ef1843e78bc9b577def21f73bbc30ee7aa54d75026aa59af82c2f144032c8f",
+      "sha256": "47ef1843e78bc9b577def21f73bbc30ee7aa54d75026aa59af82c2f144032c8f",
+      "uploaded": false
+    },
+    {
+      "bytes": 2035,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B18-r3/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7d/7d3ccf9ac92d53053b8cff7333d714cb3f1ac0288440458bd5d6382dadb76591",
+      "sha256": "7d3ccf9ac92d53053b8cff7333d714cb3f1ac0288440458bd5d6382dadb76591",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r1/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b6/b6274accc1522e7fd7921d488432395e9ee61cef19c2b845c7dabb33b98f33ce",
+      "sha256": "b6274accc1522e7fd7921d488432395e9ee61cef19c2b845c7dabb33b98f33ce",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r2/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b9/b9862a7142d585eb01be5e732b55131c2af3e9324631450d992211a02512a886",
+      "sha256": "b9862a7142d585eb01be5e732b55131c2af3e9324631450d992211a02512a886",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B21-r3/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/00/008fe961b8d32c05568ded39eb46c8beca959f5513b3d1b91228cb369dde54c2",
+      "sha256": "008fe961b8d32c05568ded39eb46c8beca959f5513b3d1b91228cb369dde54c2",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r1/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0c/0cab02a109a5242198c9c845d3441fbcc38da94848da6072b9b91e3b7695ec6c",
+      "sha256": "0cab02a109a5242198c9c845d3441fbcc38da94848da6072b9b91e3b7695ec6c",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r2/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b6/b693d7c73c620b44ab6b96c8b3f716a4242a88448c8a71d94ba95d44b4871670",
+      "sha256": "b693d7c73c620b44ab6b96c8b3f716a4242a88448c8a71d94ba95d44b4871670",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B24-r3/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e5/e5ff0274569fe191c59af57cea2cd6d39a4449d362f3ddda7ae38fc2fa391a00",
+      "sha256": "e5ff0274569fe191c59af57cea2cd6d39a4449d362f3ddda7ae38fc2fa391a00",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r1/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/14/14fcd063ad4107859fbffcaa0ca4208163dcea6ed1c5a301ac8e0235f21b632a",
+      "sha256": "14fcd063ad4107859fbffcaa0ca4208163dcea6ed1c5a301ac8e0235f21b632a",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r2/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e1/e1ca46233f752ba3905c7eb892c093d5f4e4298f3857ef29b47f94c4cd2508d5",
+      "sha256": "e1ca46233f752ba3905c7eb892c093d5f4e4298f3857ef29b47f94c4cd2508d5",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/ic_tableb_binary_ksum_20261115/sessions/B27-r3/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0f/0fcf35d53ab079a6aa071c1bcb1205fb2d734aea0feaf580a6f2f9346af84718",
+      "sha256": "0fcf35d53ab079a6aa071c1bcb1205fb2d734aea0feaf580a6f2f9346af84718",
+      "uploaded": false
+    },
+    {
+      "bytes": 70497,
+      "path": "research/ic_tableb_binary_ksum_20261115/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/01/01da471ecd62ff3022a0603adab50b8115fa2e0da9c5fe6ae259c3ec0f2613da",
+      "sha256": "01da471ecd62ff3022a0603adab50b8115fa2e0da9c5fe6ae259c3ec0f2613da",
+      "uploaded": false
+    },
+    {
+      "bytes": 24943,
+      "path": "research/ic_tableb_binary_ksum_20261115/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ad/adaee4d13ea5575f2cae92b139cd1fdeb2bfb8a00ae23c64fc9c2867933e2e63",
+      "sha256": "adaee4d13ea5575f2cae92b139cd1fdeb2bfb8a00ae23c64fc9c2867933e2e63",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_tableb_binary_ksum_20261115/report.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_tableb_binary_ksum_20261115/l1-ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "tableb-binary-ksum-l1",
+  "status": "measured",
+  "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
+  "validation": null
+}
