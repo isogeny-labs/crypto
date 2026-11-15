@@ -1,0 +1,29 @@
+name: CT79 coherent global 3-torsion recognition at two residue primes
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct79/**'
+      - '.github/workflows/ct79-global-recognition.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct79-recognition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent Newton and exhaustive-digit Hensel plus target curve laws
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct79
+          python3 -B "$D/ct79_global_recognition.py" >ct79-py.jsonl
+          python3 -O -B "$D/ct79_global_recognition.py" >ct79-pyopt.jsonl
+          node "$D/ct79_global_recognition_independent.js" >ct79-js.jsonl
+          node --no-opt "$D/ct79_global_recognition_independent.js" >ct79-jsopt.jsonl
+          cmp ct79-py.jsonl ct79-pyopt.jsonl
+          cmp ct79-py.jsonl ct79-js.jsonl
+          cmp ct79-py.jsonl ct79-jsopt.jsonl
+          test "$(wc -l <ct79-py.jsonl)" -eq 1
+          echo 'd60a86d86f366d4b3b06c6b6bc25eb2320f26cc6f3870fd8464251e8a5ae153b  ct79-py.jsonl' | sha256sum -c
