@@ -141,6 +141,22 @@ fn git_common_dir(repo: &Path) -> Result<PathBuf> {
     Ok(fs::canonicalize(String::from_utf8(output.stdout)?.trim())?)
 }
 
+fn frozen_image_identity(lock: &Value) -> Result<String> {
+    let image = lock["image_id"].as_str().ok_or("arm image ID missing")?;
+    let build = lock["build_source_commit"]
+        .as_str()
+        .ok_or("arm build source missing")?;
+    if !image.starts_with("sha256:")
+        || image.len() != 71
+        || !image[7..].bytes().all(|b| b.is_ascii_hexdigit())
+        || build.len() != 40
+        || !build.bytes().all(|b| b.is_ascii_hexdigit())
+    {
+        return Err("arm build image identity invalid".into());
+    }
+    Ok(format!("{image} linux/arm64 {build}"))
+}
+
 fn committed_preflight_revision(
     repo: &Path,
     lock_path: &Path,
@@ -943,7 +959,7 @@ fn export(
         .transpose()?;
     let image = lock["image_id"].as_str().ok_or("image ID missing")?;
     let inspected = docker_short(&["image", "inspect", "--format", "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}", image])?;
-    if inspected != format!("{image} linux/arm64 {commit}") {
+    if inspected != frozen_image_identity(&lock)? {
         return Err("frozen Linux arm64 source image changed before export".into());
     }
     fs::create_dir(output)?;
@@ -1005,7 +1021,7 @@ fn export(
             return Err("source, executable, or staged input changed after export".into());
         }
         if docker_short(&["image", "inspect", "--format", "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}", image])?
-            != format!("{image} linux/arm64 {commit}") {
+            != frozen_image_identity(&lock)? {
             return Err("frozen image changed after export".into());
         }
         let (after_panel, _) = staged_panel(stage_root, &commit)?;
@@ -1203,7 +1219,7 @@ fn solve(
         .map(|(a, b, c)| audited_pinned_replay(&lock, &lock_path, &preflight_hashes, a, b, c))
         .transpose()?;
     let image = lock["image_id"].as_str().ok_or("image ID missing")?;
-    let image_identity = format!("{image} linux/arm64 {commit}");
+    let image_identity = frozen_image_identity(&lock)?;
     let image_format = "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}";
     if docker_short(&["image", "inspect", "--format", image_format, image])? != image_identity {
         return Err("frozen solver image differs before launch".into());
@@ -1693,7 +1709,7 @@ fn replay_constructed(
     };
     let image = lock["image_id"].as_str().ok_or("image ID missing")?;
     let image_format = "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}";
-    let image_identity = format!("{image} linux/arm64 {commit}");
+    let image_identity = frozen_image_identity(&lock)?;
     if docker_short(&["image", "inspect", "--format", image_format, image])? != image_identity {
         return Err("frozen replay image differs before launch".into());
     }
@@ -2211,6 +2227,21 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn runtime_image_label_uses_build_revision_across_all_arms() {
+        let image = format!("sha256:{}", "b".repeat(64));
+        let build = "a".repeat(40);
+        let evidence = "c".repeat(40);
+        let mut lock = json!({"image_id":image,"build_source_commit":build,
+            "source_commit":evidence});
+        assert_eq!(
+            frozen_image_identity(&lock).unwrap(),
+            format!("{image} linux/arm64 {build}")
+        );
+        lock["build_source_commit"] = Value::Null;
+        assert!(frozen_image_identity(&lock).is_err());
+    }
 
     #[test]
     fn committed_k600_metadata_matches_frozen_arm_input() {

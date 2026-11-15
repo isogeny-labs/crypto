@@ -93,3 +93,8 @@ and arm execution to `H`, and passes a temporary-repository acceptance and
 tamper test. The dependent preflight gate test also passes. The complete
 Linux image/preflight/freeze chain remains unexecuted, so the problem stays
 open for host verification and full budget custody.
+
+2026-11-15: A subsequent audit found four runtime image-label comparisons
+still using evidence commit `H`. The [versioned correction](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-m6-native-arms-20261115/RUNTIME_IMAGE_LABEL_CORRECTION.md)
+binds them to build commit `C`; 15/15 release arm example tests passed.
+Host execution and complete cold budget custody remain open.

@@ -1,5 +1,9 @@
 # Native K600 m6 arm-input staging component
 
+The [runtime image-label correction](RUNTIME_IMAGE_LABEL_CORRECTION.md)
+aligns export, solver and replay inspection with the two-revision build
+commit. Its release tests pass; a real Linux K600 path remains unrun.
+
 The [native precharge child-interval amendment](PRECHARGE_CHILD_INTERVAL_AMENDMENT.md)
 adds bounded wrappers and a four-phase receipt chain. Its tests are
 implementation controls; the full-invocation cold runtime and real K600
