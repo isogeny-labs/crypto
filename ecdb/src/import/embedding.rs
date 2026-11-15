@@ -359,7 +359,8 @@ pub fn embedding_degree(q: &BigUint, r: &BigUint, primes: &[u32], rho_steps: u64
 
 const JOBS_SQL: &str = "
 SELECT s.id, s.order_value::text, s.primality_status::text, f.order_q::text,
-       pd.subgroup_id IS NOT NULL, pd.embedding_degree::text, pd.embedding_lower_bound::text, pd.status::text
+       pd.subgroup_id IS NOT NULL, pd.embedding_degree::text, pd.embedding_lower_bound::text, pd.status::text,
+       pd.complement_bits, pd.target_field_bits, f.order_bits
 FROM ec.subgroup s
 JOIN ec.field f ON f.id = s.field_id
 LEFT JOIN ec.pairing_data pd ON pd.subgroup_id = s.id
@@ -367,7 +368,9 @@ WHERE s.is_prime_order AND s.primality_status IN ('proved', 'probable') AND f.or
 ORDER BY s.id";
 
 // An exact degree: a new row, or the degree of a row that has none. The old
-// lower bound stays (it remains true); the rho-value is filled only if empty.
+// lower bound stays (it remains true); the rho-value, complement and target
+// field sizes are filled only if empty (`decide` refuses a held value that
+// disagrees, and the WHERE clause repeats that guard).
 const EXACT_SQL: &str = "
 INSERT INTO ec.pairing_data AS pd (subgroup_id, embedding_degree, complement_bits, target_field_bits, rho_value, status,
        provenance_id)
@@ -378,11 +381,15 @@ FROM jsonb_to_recordset($1::jsonb) AS r(subgroup_id bigint, degree numeric, comp
 JOIN ec.subgroup s ON s.id = r.subgroup_id
 JOIN ec.field f ON f.id = s.field_id
 ON CONFLICT (subgroup_id) DO UPDATE SET embedding_degree = EXCLUDED.embedding_degree,
-       complement_bits = EXCLUDED.complement_bits, target_field_bits = EXCLUDED.target_field_bits,
+       complement_bits = coalesce(pd.complement_bits, EXCLUDED.complement_bits),
+       target_field_bits = coalesce(pd.target_field_bits, EXCLUDED.target_field_bits),
        rho_value = coalesce(pd.rho_value, EXCLUDED.rho_value), status = EXCLUDED.status,
        provenance_id = EXCLUDED.provenance_id
 WHERE pd.embedding_degree IS NULL AND pd.status <> 'not_applicable'
-  AND (pd.embedding_lower_bound IS NULL OR pd.embedding_lower_bound <= EXCLUDED.embedding_degree)";
+  AND (pd.embedding_lower_bound IS NULL OR pd.embedding_lower_bound <= EXCLUDED.embedding_degree)
+  AND (pd.complement_bits IS NULL OR pd.complement_bits = EXCLUDED.complement_bits)
+  AND (pd.target_field_bits IS NULL OR EXCLUDED.target_field_bits IS NULL
+       OR pd.target_field_bits = EXCLUDED.target_field_bits)";
 
 // A lower bound k > B: a new row, or a larger bound on a row without a degree.
 const BOUND_SQL: &str = "
@@ -397,6 +404,7 @@ ON CONFLICT (subgroup_id) DO UPDATE SET embedding_lower_bound = EXCLUDED.embeddi
 WHERE pd.embedding_degree IS NULL AND pd.status <> 'not_applicable'
   AND (pd.embedding_lower_bound IS NULL OR pd.embedding_lower_bound < EXCLUDED.embedding_lower_bound)";
 
+#[derive(Clone)]
 struct Job {
     subgroup_id: i64,
     r: BigUint,
@@ -406,6 +414,10 @@ struct Job {
     degree: Option<BigUint>,
     lower: Option<BigUint>,
     status: Option<String>,
+    /// The held `complement_bits` and `target_field_bits`, and log2 q rounded up.
+    complement_bits: Option<i32>,
+    target_bits: Option<i32>,
+    order_bits: Option<i32>,
 }
 
 fn run_jobs(jobs: &[Job]) -> Vec<Outcome> {
@@ -447,6 +459,9 @@ fn decide(job: &Job, out: Outcome, report: &mut Report) -> Row {
     match out {
         Outcome::Failed(why) => fail(report, why),
         Outcome::NotApplicable => {
+            if let Some(old) = &job.degree {
+                return fail(report, format!("r divides q, so there is no embedding degree, but ecdb holds k = {old}"));
+            }
             report.count("embedding_degree_not_applicable", 1);
             Row::None
         }
@@ -469,9 +484,26 @@ fn decide(job: &Job, out: Outcome, report: &mut Report) -> Row {
                     format!("the producer marks it not_applicable, but r does not divide q (k = {k})"),
                 );
             }
+            let complement = (&job.r - 1u8) / &k;
+            if let Some(old) = job.complement_bits {
+                if i64::from(old) != complement.bits() as i64 {
+                    return fail(
+                        report,
+                        format!("ecdb holds complement_bits {old}, ecdb computes {} (k = {k})", complement.bits()),
+                    );
+                }
+            }
+            if let Some(old) = job.target_bits {
+                let want = job.order_bits.and_then(|b| u64::try_from(b).ok()).map(|b| &k * b);
+                if want.as_ref() != u64::try_from(old).ok().map(BigUint::from).as_ref() {
+                    return fail(
+                        report,
+                        format!("ecdb holds target_field_bits {old}, ecdb computes {want:?} (k = {k})"),
+                    );
+                }
+            }
             let status = if job.r_proved && primes_proved { "proved" } else { "probable" };
             report.count(&format!("embedding_degree_exact_{status}"), 1);
-            let complement = (&job.r - 1u8) / &k;
             Row::Exact(json!({
                 "subgroup_id": job.subgroup_id, "degree": k.to_string(),
                 "complement_bits": complement.bits(), "status": status,
@@ -520,6 +552,9 @@ pub async fn import(client: &Client, report: &mut Report, prov_exact: i64, prov_
             degree: parse(row.get(5)),
             lower: parse(row.get(6)),
             status: row.get(7),
+            complement_bits: row.get(8),
+            target_bits: row.get(9),
+            order_bits: row.get(10),
         });
     }
     let targets = jobs.iter().filter(|j| j.degree.is_none()).count();
@@ -550,6 +585,13 @@ pub async fn import(client: &Client, report: &mut Report, prov_exact: i64, prov_
     }
     let n_exact = bulk(client, EXACT_SQL, &exact, prov_exact).await?;
     let n_bound = bulk(client, BOUND_SQL, &bound, prov_bound).await?;
+    // every row `decide` passed must be written: a row the SQL guard refused
+    // (a concurrent writer) is a problem, never a silent skip
+    for (what, sent, written) in [("exact degrees", exact.len(), n_exact), ("lower bounds", bound.len(), n_bound)] {
+        if sent as u64 != written {
+            report.problem(format!("embedding degree: {sent} {what} decided, {written} written"));
+        }
+    }
     report.count("embedding_degree_inserted", new_exact.min(n_exact) + new_bound.min(n_bound));
     report.count("embedding_degree_updated", n_exact.saturating_sub(new_exact));
     report.count("embedding_lower_bound_raised", n_bound.saturating_sub(new_bound));
@@ -763,6 +805,9 @@ mod tests {
             degree: degree.map(BigUint::from),
             lower: lower.map(BigUint::from),
             status: status.map(str::to_string),
+            complement_bits: None,
+            target_bits: None,
+            order_bits: Some(4),
         };
         let out = || Outcome::Exact { k: BigUint::from(12u8), primes_proved: true };
         let mut rep = Report::default();
@@ -777,5 +822,45 @@ mod tests {
             _ => panic!("expected an exact row"),
         }
         assert!(matches!(decide(&job(None, None, None), out(), &mut rep), Row::Exact(_)));
+        assert_eq!(rep.counts["embedding_degree_crosscheck_failures"], 2);
+    }
+
+    /// Held values that disagree with the computation are refused, not
+    /// overwritten: complement_bits and target_field_bits on a row without a
+    /// degree, and a degree held for r | q.
+    #[test]
+    fn decide_refuses_conflicting_held_values() {
+        // ord_13(2) = 12: complement (13 - 1)/12 = 1 has 1 bit; q = 2 has order_bits 1 here
+        let base = Job {
+            subgroup_id: 7,
+            r: BigUint::from(13u8),
+            r_proved: true,
+            q: BigUint::from(2u8),
+            has_row: true,
+            degree: None,
+            lower: None,
+            status: Some("unknown".into()),
+            complement_bits: None,
+            target_bits: None,
+            order_bits: Some(1),
+        };
+        let out = || Outcome::Exact { k: BigUint::from(12u8), primes_proved: true };
+        let mut rep = Report::default();
+        let agree = Job { complement_bits: Some(1), target_bits: Some(12), ..base.clone() };
+        assert!(matches!(decide(&agree, out(), &mut rep), Row::Exact(_)));
+        let bad_c = Job { complement_bits: Some(3), ..base.clone() };
+        assert!(matches!(decide(&bad_c, out(), &mut rep), Row::None));
+        let bad_t = Job { target_bits: Some(24), ..base.clone() };
+        assert!(matches!(decide(&bad_t, out(), &mut rep), Row::None));
+        let unknown_t = Job { target_bits: Some(12), order_bits: None, ..base.clone() };
+        assert!(matches!(decide(&unknown_t, out(), &mut rep), Row::None));
+        // r = 13 divides q = 26: no embedding degree, yet one is held
+        let na = Job { q: BigUint::from(26u8), degree: Some(BigUint::from(12u8)), ..base.clone() };
+        assert!(matches!(decide(&na, Outcome::NotApplicable, &mut rep), Row::None));
+        let na_empty = Job { q: BigUint::from(26u8), ..base.clone() };
+        assert!(matches!(decide(&na_empty, Outcome::NotApplicable, &mut rep), Row::None));
+        assert_eq!(rep.counts["embedding_degree_crosscheck_failures"], 4);
+        assert_eq!(rep.problems.len(), 4);
+        assert_eq!(rep.counts["embedding_degree_not_applicable"], 1);
     }
 }

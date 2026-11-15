@@ -280,7 +280,10 @@ deleted. A second run writes nothing.
   1 must be k (or absent when k > 2000 or only a bound is known); every
   existing `embedding_degree` must equal the computed k (or, when only a bound
   is computed, exceed it with q^k = 1); an existing lower bound must not exceed
-  the computed k.
+  the computed k; a held `complement_bits` or `target_field_bits` must equal
+  the computed value (they are filled only where NULL, never replaced); a
+  degree held for a subgroup with r | q is refused. Every row that passes
+  must be written: a row the SQL guard refuses is a problem line too.
 - **Report.** `embedding_degree_targets`, `_exact_proved`, `_exact_probable`,
   `_bounded`, `_not_applicable`, `_inserted`, `_updated`,
   `embedding_lower_bound_raised`, `_existing_agree`, `_existing_consistent`,
