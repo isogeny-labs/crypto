@@ -1,7 +1,58 @@
 //! Signed interpolation orbit; one norm division per tuple.
-use hec_native_ic::{jac::Curve, poly::Poly};
+use hec_native_ic::{fp::Fp, jac::Curve, poly::Poly};
 
+/// Inverse differences in row-major order, diagonal zero, one field inversion.
+pub fn inverse_differences(xs: &[u64], f: &Fp) -> Vec<u64> {
+    let n = xs.len();
+    let mut out = vec![0; n * n];
+    let mut prefixes = vec![1; n * n];
+    let mut product = 1;
+    for i in 0..n {
+        for j in 0..n {
+            if i != j {
+                let at = i * n + j;
+                prefixes[at] = product;
+                let difference = f.sub(xs[i], xs[j]);
+                assert_ne!(difference, 0, "distinct anchors");
+                product = f.mul(product, difference);
+            }
+        }
+    }
+    let mut inverse = f.inv(product);
+    for i in (0..n).rev() {
+        for j in (0..n).rev() {
+            if i != j {
+                let at = i * n + j;
+                out[at] = f.mul(inverse, prefixes[at]);
+                inverse = f.mul(inverse, f.sub(xs[i], xs[j]));
+            }
+        }
+    }
+    out
+}
+
+#[cfg(test)]
 pub fn signed_orbit(c: &Curve, points: &[(u64, u64)]) -> Vec<(Poly, Poly)> {
+    let xs: Vec<_> = points.iter().map(|p| p.0).collect();
+    let inv = inverse_differences(&xs, &c.fp);
+    let n = points.len();
+    let weights: Vec<_> = points
+        .iter()
+        .enumerate()
+        .map(|(i, &(_, y))| {
+            (0..n)
+                .filter(|&j| i != j)
+                .fold(y, |w, j| c.fp.mul(w, inv[i * n + j]))
+        })
+        .collect();
+    signed_orbit_with_weights(c, points, &weights)
+}
+
+pub fn signed_orbit_with_weights(
+    c: &Curve,
+    points: &[(u64, u64)],
+    weights: &[u64],
+) -> Vec<(Poly, Poly)> {
     let f = &c.fp;
     assert_eq!(points.len(), c.g + 1);
     let n = points.len();
@@ -9,14 +60,13 @@ pub fn signed_orbit(c: &Curve, points: &[(u64, u64)]) -> Vec<(Poly, Poly)> {
     for &(x, _) in points {
         a = a.mul(&Poly::x_minus(x, f), f);
     }
-    let mut weights = Vec::with_capacity(n);
+    assert_eq!(weights.len(), n);
     let mut basis = Vec::with_capacity(n);
     let mut h = Poly::zero();
-    for &(x, y) in points {
+    for (i, &(x, _)) in points.iter().enumerate() {
         let ai = a.div_exact(&Poly::x_minus(x, f), f);
-        let w = f.mul(y, f.inv(ai.eval(x, f)));
+        let w = weights[i];
         let hi = ai.scale(w, f);
-        weights.push(w);
         basis.push(hi);
         h = h.add(&hi, f);
     }

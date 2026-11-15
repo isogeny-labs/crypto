@@ -283,8 +283,8 @@ pub fn solve(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> 
     solve_variant(c, d1, d2, ell, seed, gate, false)
 }
 
-/// Integration gate for orbit reuse and incremental elimination. The sparse
-/// forest and raw-row dedup remain the reference versions; not a timing arm.
+/// Integration gate for orbit reuse, dense forest and incremental elimination.
+/// Tuple scheduling and inverse caching are still pending; not a timing arm.
 pub fn solve_orbit(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
     solve_variant(c, d1, d2, ell, seed, gate, true)
 }
@@ -313,10 +313,12 @@ fn solve_variant(
     for (j, &(x, _)) in fb.iter().enumerate() {
         by[x as usize] = j as u32;
     }
-    let mut inv = vec![0u64; fp.p as usize];
-    inv[1] = 1;
-    for a in 2..fp.p {
-        inv[a as usize] = fp.mul(fp.p - fp.p / a, inv[(fp.p % a) as usize]);
+    let mut inv = vec![0u64; if use_orbit { 0 } else { fp.p as usize }];
+    if !use_orbit {
+        inv[1] = 1;
+        for a in 2..fp.p {
+            inv[a as usize] = fp.mul(fp.p - fp.p / a, inv[(fp.p % a) as usize]);
+        }
     }
     let Some(a) = descend(c, d1, &fb, &by, &tab, &mut rng, gate, &mut r.descent_steps) else {
         r.total_ns = all.elapsed().as_nanos();
@@ -347,6 +349,25 @@ fn solve_variant(
     }
     let anchor: Vec<_> = (0..m).filter(|&j| hot[j]).collect();
     let h = anchor.len();
+    let inverse_differences = if use_orbit {
+        orbit::inverse_differences(&anchor.iter().map(|&j| fb[j].0).collect::<Vec<_>>(), fp)
+    } else {
+        Vec::new()
+    };
+    let mut triples = Vec::new();
+    if use_orbit && c.g == 2 {
+        for a in 0..h {
+            for b in a + 1..h {
+                for d in b + 1..h {
+                    triples.push([a, b, d]);
+                }
+            }
+        }
+        for j in (1..triples.len()).rev() {
+            let k = rng.below((j + 1) as u64) as usize;
+            triples.swap(j, k);
+        }
+    }
     r.anchors = h;
     let mut col = vec![u32::MAX; m];
     for (j, &global) in anchor.iter().enumerate() {
@@ -374,10 +395,16 @@ fn solve_variant(
         None
     };
     let mut forest = Forest::new(m, ell);
+    let mut dense_forest = use_orbit.then(|| dense::DenseForest::new(m, h, ell));
     let mut tuples: HashSet<Vec<(u32, bool)>> = HashSet::new();
     let mut relations: HashSet<Row> = HashSet::new();
     let mut pure: HashSet<Row> = HashSet::new();
     r.memory_bytes = tab.bytes() + inv.len() * 8;
+    r.memory_bytes +=
+        inverse_differences.len() * 8 + triples.capacity() * std::mem::size_of::<[usize; 3]>();
+    if let Some(forest) = &dense_forest {
+        r.memory_bytes += forest.bytes();
+    }
     r.setup_ns = all.elapsed().as_nanos();
     let mut pending = Vec::new();
     while r.draws < 1_000_000 && (use_orbit || r.solves < 16) {
@@ -386,6 +413,12 @@ fn solve_variant(
         let (chosen, hp, q) = if use_orbit {
             if pending.is_empty() {
                 let mut chosen: Vec<(u32, bool)> = Vec::with_capacity(c.g + 1);
+                if c.g == 2 {
+                    let Some(tuple) = triples.pop() else {
+                        break;
+                    };
+                    chosen.extend(tuple.iter().map(|&j| (anchor[j] as u32, false)));
+                }
                 while chosen.len() < c.g + 1 {
                     let j = anchor[rng.below(h as u64) as usize] as u32;
                     if !chosen.iter().any(|e| e.0 == j) {
@@ -398,7 +431,23 @@ fn solve_variant(
                     continue;
                 }
                 let points: Vec<_> = chosen.iter().map(|&(j, _)| fb[j as usize]).collect();
-                for (step, (hp, q)) in orbit::signed_orbit(c, &points)
+                let weights: Vec<_> = chosen
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &(id, _))| {
+                        chosen.iter().enumerate().filter(|&(j, _)| i != j).fold(
+                            fb[id as usize].1,
+                            |w, (_, &(other, _))| {
+                                fp.mul(
+                                    w,
+                                    inverse_differences[col[id as usize] as usize * h
+                                        + col[other as usize] as usize],
+                                )
+                            },
+                        )
+                    })
+                    .collect();
+                for (step, (hp, q)) in orbit::signed_orbit_with_weights(c, &points, &weights)
                     .into_iter()
                     .enumerate()
                     .rev()
@@ -488,7 +537,7 @@ fn solve_variant(
             f.inv(first)
         };
         row = scale(&row, norm, &f);
-        if !relations.insert(row.clone()) {
+        if !use_orbit && !relations.insert(row.clone()) {
             r.duplicate_relations += 1;
             r.relation_ns += clock.elapsed().as_nanos();
             continue;
@@ -510,7 +559,11 @@ fn solve_variant(
             }
         }
         on.sort_unstable();
-        let reduced = forest.insert(&off, on);
+        let reduced = if let Some(forest) = &mut dense_forest {
+            forest.insert(&off, &on)
+        } else {
+            forest.insert(&off, on)
+        };
         r.forest_ns += clock.elapsed().as_nanos();
         let Some(mut row) = reduced else {
             continue;
@@ -554,8 +607,8 @@ fn solve_variant(
             wanted += 8 + h / 16;
         }
     }
-    r.unions = forest.unions;
-    r.pins = forest.pins;
+    r.unions = dense_forest.as_ref().map_or(forest.unions, |f| f.unions);
+    r.pins = dense_forest.as_ref().map_or(forest.pins, |f| f.pins);
     r.unique_tuples = tuples.len();
     r.total_ns = all.elapsed().as_nanos();
     r

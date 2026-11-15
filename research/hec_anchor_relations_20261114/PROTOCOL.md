@@ -100,3 +100,20 @@ Gates: every Gray-code residual/h must equal full signed interpolation and norm 
 random tuples. Same principal/projected checks as before, arbitrary-coefficient forest fixture,
 full target verification. Timing remains exploratory against all strongest existing native and
 table controls, with all cold setup and memory reported. >=10x and novelty remain unestablished.
+
+### Integration pilot amendment, before timing
+
+The implemented variant includes Gray reuse, dense forest, incremental echelon, one batch
+inversion and shuffled genus2 triples without replacement. Genus3/4 sample distinct unsigned
+tuples. Full-p inverse cache and raw-row dedup are absent in this variant. Pure rows are deduped.
+Retain the original Horner catalogue in BOTH arms: finite-difference evaluation is deferred.
+The reported storage includes tables, anchor inverse differences, triple capacity and dense
+forest arrays; it is not peak RSS and excludes Rust allocator overhead and variable row sets.
+
+orbit_bench.rs first runs all55 gate cases, then110 cold solves interleaving candidate and the
+strongest previous table configuration, frozen per row in the harness before this run. Candidate
+must finish every case and satisfy every group identity before timing. Five seeds, L0 local
+host, same inputs and known-answer targets as prior pilot. Report every size; no best-seed
+selection, no pooled genus ratio. Earlier native controls remain descriptive cross-run evidence,
+not a substitute for this paired table control. This pilot cannot establish novelty or the
+held-out/scaling requirement of the10x goal. Explicitly retain losses and capped outcomes.
