@@ -145,6 +145,17 @@ consecutive rungs ℓ ≥ 8 is read as the survey's falsifier firing (its
   expected to be censored at ℓ = 9, 10 and that is reported as censoring.
   Hashes after the amendment: `FREEZE-am1.sha256`.
 
+- **AM2 (2026-11-15T04:50Z, after the first ℓ = 7 target; chain-p12 only).** In
+  the ℓ = 7 row run `chain-p12` censored at 4·10⁶ conflicts on target 0 after
+  1282 s (R > 484, outside its predicted 100–300), which made the rung ≈ 11 h and
+  kept the bench record open (an open record fails the repository's `records`
+  check for every PR). The run was stopped after its first complete target; that
+  row is kept unchanged as `rows/l7-run1-chain-p12-partial.jsonl`; the rung is
+  rerun without `chain-p12`, and `analyze.py` merges rows of one rung by target
+  (asserting the same `x_R`). `chain-p12` at ℓ = 7 is therefore 1 target,
+  censored, and B5 reads "not supported, censored". Other arms' counted metrics
+  are deterministic per target and unaffected. Hashes: `FREEZE-am2.sha256`.
+
 ## Inadmissible after the freeze
 
 Changing budget, seeds, target counts, symmetry-breaking setting, encoding, or

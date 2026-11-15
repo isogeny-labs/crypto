@@ -366,6 +366,15 @@
    "reason": "The l = 7 row run measured about 25 minutes of wall for one CryptoMiniSat refutation (target 0) on this host; at l >= 8 the external arms would need more than 24 h per rung, which the session cannot afford. The external references' role (B4) is served by the l = 5, 6 checks and the l = 7 rung.",
    "change": "cms and cadical are run at l = 7 only (as chain-p12 already was). Rungs l = 8, 9, 10 run the arms oracle, native, native-aa, lin, lin-nolex. Rungs may run concurrently on the same frozen binaries (sha256 in rows/binaries.sha256); counted metrics are unaffected, wall columns were already descriptive only.",
    "consequence_noted": "With the frozen 4e6 budget the incumbent native arm is expected to be censored at l = 9 (C(512, 3) = 22.2M) and l = 10 (1.6e7 < 178M); B1 is then read on l = 7, 8 only and the censoring is reported as such."
+  },
+  {
+   "id": "AM2-chain-p12-stopped-after-one-target",
+   "filed": "2026-11-15T04:50Z",
+   "filed_before_affected_data": false,
+   "scope": "stopping rule 1 (chain-p12 arm) and analyze.py row loading; no budget, seed, target, encoding or metric change",
+   "reason": "In the l = 7 row run the chain-p12 arm hit its 4e6 conflict budget on target 0 after 1282 s wall (R > 484, outside the predicted 100-300), making the rung about 11 h; the bench record cannot close before the rung ends and an open record fails the repository's records check for every PR. The arm's role (B5) is answered by that censored target together with the l = 5 check.",
+   "change": "The l = 7 run was stopped after its first complete target (all eight arms); that row is kept unchanged as rows/l7-run1-chain-p12-partial.jsonl. The rung is rerun with the arms oracle, native, lin, lin-nolex, native-aa, cms, cadical into rows/l7.jsonl. analyze.py merges files of the same rung by (l, idx), asserting the same target, so chain-p12 at l = 7 is reported as 1 target (censored) and B5 reads 'not supported, censored'. Counted metrics of the other arms are deterministic per (target, arm) and unaffected by the restart.",
+   "data_affected": "chain-p12 at l = 7: 1 of 20 targets instead of 20. No other arm or rung."
   }
  ],
  "freeze": {

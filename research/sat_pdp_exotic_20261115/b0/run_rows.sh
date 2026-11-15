@@ -6,7 +6,7 @@
 set -euo pipefail
 L="$1"
 case "$L" in
-  7)  ARMS="${2:-oracle,native,chain-p12,lin,lin-nolex,native-aa,cms,cadical}"; BUDGET=4000000 ;;
+  7)  ARMS="${2:-oracle,native,lin,lin-nolex,native-aa,cms,cadical}"  # AM2: chain-p12 dropped after target 0; BUDGET=4000000 ;;
   8|9) ARMS="${2:-oracle,native,lin,lin-nolex,native-aa,cms,cadical}"; BUDGET=4000000 ;;
   10) ARMS="${2:-oracle,native,lin,lin-nolex,native-aa}"; BUDGET=16000000 ;;
   *) echo "rung ℓ=$L is not in the frozen grid {7,8,9,10}" >&2; exit 2 ;;
