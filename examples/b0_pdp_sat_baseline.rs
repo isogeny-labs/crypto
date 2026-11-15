@@ -401,7 +401,7 @@ fn run_ext(
     v
 }
 
-fn median(xs: &mut Vec<f64>) -> f64 {
+fn median(xs: &mut [f64]) -> f64 {
     if xs.is_empty() {
         return f64::NAN;
     }
