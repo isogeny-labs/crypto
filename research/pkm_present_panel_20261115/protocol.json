@@ -1,7 +1,7 @@
 {
  "schema": "experiment.protocol/v1",
  "protocol_id": "PKM-PRESENT-PANELP-20261115",
- "version": "1.1",
+ "version": "1.2",
  "created": "2026-11-15",
  "repository": "isogeny-labs/crypto",
  "study_dir": "research/pkm_present_panel_20261115",
@@ -47,8 +47,16 @@
    "cells": "all"
   },
   {
-   "id": "mono-direct",
+   "id": "mono-tower",
    "role": "positive_control_for_statistic",
+   "semantics": "may admit unlifted tuples",
+   "membership": "y-tower",
+   "cells": "m = 3 only",
+   "note": "2026-10-26 plain one-S_4 arm, D = 12"
+  },
+  {
+   "id": "mono-direct",
+   "role": "candidate",
    "semantics": "may admit unlifted tuples",
    "membership": "direct",
    "cells": "m = 3 only"
@@ -74,7 +82,6 @@
   }
  ],
  "not_run": [
-  "mono-tower",
   "monolithic at m >= 4 (S_5 degree 8; S_6 not expandable)",
   "m = 5",
   "random-base null",
@@ -174,14 +181,27 @@
   "hidden": "k and decompositions in hidden.json"
  },
  "caps": {
-  "native": {
-   "wall_s": 600,
-   "as_gb": 10
+  "m3": {
+   "native": {
+    "wall_s": 600,
+    "as_gb": 10
+   },
+   "msolve": {
+    "wall_s": 600,
+    "as_gb": 10
+   }
   },
-  "msolve": {
-   "wall_s": 600,
-   "as_gb": 10
+  "m4": {
+   "native": {
+    "wall_s": 1800,
+    "as_gb": 10
+   },
+   "msolve": {
+    "wall_s": 1800,
+    "as_gb": 10
+   }
   },
+  "native_deadline_s": 86400,
   "retries": 0
  },
  "order": "cells in table order; curves c1,c2,(c3); instances in draw order; arms in table order then A/A; native then msolve; resumable runner; lost row rerun once tagged rerun",
@@ -216,7 +236,7 @@
   "per_arm_variety_gate": true,
   "positive_planted": true,
   "negative_unsat": true,
-  "positive_control_for_statistic": "mono-direct at m = 3",
+  "positive_control_for_statistic": "mono-tower at m = 3",
   "aa_literal": true,
   "engine_cross_check": "msolve -g 2 proxy sign",
   "construction_charged": true,
@@ -252,8 +272,9 @@
  },
  "expectations_preregistered": {
   "sym-tower": "below chain-tower",
-  "sym-direct": "below chain-tower",
-  "mono-direct": "above chain-tower (worst)",
+  "mono-tower": "above chain-tower",
+  "mono-direct": "above chain-tower",
+  "sym-direct": "undecided",
   "chain-direct": "undecided",
   "tree-tower": "undecided"
  },

@@ -58,15 +58,16 @@ m signed real base points.
 | id | Semaev part | membership part | variables | semantics |
 |---|---|---|---|---|
 | `chain-tower` (baseline) | chained S_3, m−2 auxiliaries (panel A's raw system) | y-tower, t levels per leaf | m·t + (m−2) | ordered leaves, repeats allowed |
-| `tree-tower` (m = 4 only) | balanced merge tree of S_3 | y-tower | m·t + (m−2) | as chain |
+| `tree-tower` (m = 4 only) | balanced merge tree of S_3 | y-tower | m·t + (m−2) | as chain, but a decomposition whose tree-order partial sum is the identity is missed (smoke: 5 of 6 on one target) |
 | `chain-direct` | chained S_3 | `x_i^{2^t} = g^{2^t}` | m + (m−2) | as chain |
-| `mono-direct` (m = 3 only; **positive control**, §6) | S_4 by resultant | direct | m | may admit unlifted tuples (non-rational partial sums) |
+| `mono-tower` (m = 3 only; **positive control**, §6: the 2026-10-26 "plain, one S_4" arm, D = 12 there and in the smoke) | S_4 by resultant | y-tower | m·t | may admit unlifted tuples (non-rational partial sums) |
+| `mono-direct` (m = 3 only) | S_4 by resultant | direct | m | as mono-tower (smoke: D = 16 at t = 3) |
 | `sym-tower` | S_{m+1} in e_1..e_m (2026-10-26 construction) | remainder tower `R_j = X^{2^j} mod Q`, `R_{t−1}^2 ≡ 1` | m·t | **unordered, distinct abscissae only** |
 | `sym-direct` | S_{m+1} in e_1..e_m | `X^{2^t} − g^{2^t} ≡ 0 mod P_e(X)` (m equations) | m | unordered, distinct abscissae only |
 
-`mono-tower` (S_{m+1} with the y-tower) and any monolithic arm at m = 4 (S_5, degree 8) or m = 5 (S_6 is not
-expandable) are **not run**: the 2026-10-26 diagnostic already places the unsymmetrised monolithic arm last, and
-S12's runtime budget goes to the untried arms. Symmetric arms run only in cells with `B_real ≥ m + 1`
+Monolithic arms at m = 4 (S_5, degree 8; the smoke's mono-tower censored at 100 s with D ≥ 32) and at m = 5 (S_6 is
+not expandable) are **not run**: the 2026-10-26 diagnostic already places the unsymmetrised monolithic arm last,
+and S12's runtime budget goes to the untried arms. Symmetric arms run only in cells with `B_real ≥ m + 1`
 (`sym_applicable`, recorded per cell); where they do not run, the cell reports them as not applicable, not as
 censored (B2).
 
@@ -133,8 +134,8 @@ pkm_present_panel cell --prime <p_k> --t 2 ... --slug c<k>t2   and   --t 3 ... -
 
 | cell | m | t | B | curves | arms |
 |---|---|---|---|---|---|
-| m3t2 | 3 | 2 | 4 | c1, c2, c3 | chain-tower, chain-direct, mono-direct (+ sym-* iff B_real(t=2) ≥ 4) |
-| m3t3 | 3 | 3 | 8 | c1, c2, c3 | chain-tower, chain-direct, mono-direct, sym-tower, sym-direct (iff B_real ≥ 4) |
+| m3t2 | 3 | 2 | 4 | c1, c2, c3 | chain-tower, chain-direct, mono-tower, mono-direct (+ sym-* iff B_real(t=2) ≥ 4) |
+| m3t3 | 3 | 3 | 8 | c1, c2, c3 | chain-tower, chain-direct, mono-tower, mono-direct, sym-tower, sym-direct (iff B_real ≥ 4) |
 | m3t4 | 3 | 4 | 16 | c1, c2, c3 | same as m3t3 |
 | m4t2 | 4 | 2 | 4 | c1, c2 | chain-tower, tree-tower, chain-direct |
 | m4t3 | 4 | 3 | 8 | c1, c2 | chain-tower, tree-tower, chain-direct, sym-tower, sym-direct (iff B_real ≥ 5) |
@@ -152,8 +153,11 @@ disclosed (M4); the native engine is deterministic, so order cannot leak between
 retry. The runner is resumable (rows already in `rows.jsonl` are skipped by `(cell, curve, instance, arm, engine)`);
 a call interrupted by a container loss is a **lost row**, re-run once on resume and tagged `rerun: true` (S12).
 
-**Per-call caps (frozen):** native 600 s wall (external `timeout -k 10 600`) and 10 GB address space; msolve 600 s
-and 10 GB. **Stop rules:** if `chain-tower` censors on more than half of a cell's instances on a curve, the remaining
+**Per-call caps (frozen):** m = 3 cells: native 600 s wall (external `timeout -k 10 600`) and 10 GB address space;
+msolve 600 s and 10 GB. m = 4 cells: 1,800 s and 10 GB for both engines (the smoke's chain-tower at m = 4, t = 3
+censored at 100 s single-threaded, and the probe's 266 CPU-s at 4 threads says the baseline needs minutes; a cap
+that censors the baseline on most instances would void C2 for the whole m = 4 block). The native `--deadline` is
+86,400 s (non-binding) so that extraction is only ever stopped by the external cap and leaves its progress line. **Stop rules:** if `chain-tower` censors on more than half of a cell's instances on a curve, the remaining
 cells of that m are not run (reported); the m4t4 block runs only after every other cell has finished.
 
 **Runtime (S12):** calls = Σ_cells Σ_curves 11 instances × (arms + A/A) × 2 engines ≈ 3 × 11 × (4..6) × 2 × 3
@@ -187,7 +191,7 @@ For each cell (m, t), each candidate arm A, each label stratum L ∈ {SAT, UNSAT
   on the `d_i` (p_min = 2/2^10 ≈ 0.002); percentile bootstrap of the median (20,000 resamples, level `1 − 0.05/k`,
   k = number of candidate arms in the cell); degenerate intervals (all signs equal) are reported as such (M3).
 - **floor:** literal A/A `D_AA` = max_i |log2(w_AA(i)/w_chain(i))| per curve (expected 0 for a deterministic
-  engine; a nonzero value is itself a finding), and the **positive control** (mono-direct at m = 3; §6).
+  engine; a nonzero value is itself a finding), and the **positive control** (mono-tower at m = 3; §6).
 - **supported_within_scope** for (A, cell, L): sign-flip p ≤ 0.05/k, interval excludes 0, the per-curve medians have
   the same sign on every curve of the cell, `|median| > D_AA`, the same sign holds on `w^+` (B5) and on
   `w^solve` (S1), and the msolve `work_proxy` median has the same sign (S4 co-gate). Scope: the measured (m, t,
@@ -203,8 +207,9 @@ For each cell (m, t), each candidate arm A, each label stratum L ∈ {SAT, UNSAT
   gate value is applied; the arity-matched heuristic gates the red-team derived (0, 1, 2 at m = 3, 4, 5) are
   quoted as desk, unverified, for orientation only (S7).
 
-**Pre-registered expectations, which the data may contradict:** from the 2026-10-26 diagnostic, `sym-tower` and
-`sym-direct` below `chain-tower` and `mono-direct` above it (worst); `chain-direct` and `tree-tower` undecided.
+**Pre-registered expectations, which the data may contradict:** from the 2026-10-26 diagnostic and the seed-777
+smoke (development data, D only), `sym-tower` below `chain-tower`, `mono-tower` and `mono-direct` above it;
+`sym-direct` (D = 7 vs 6 in the smoke), `chain-direct` and `tree-tower` undecided.
 **Non-improvement sentence (S8):** whatever C2 finds, no presentation effect at m ≤ 4 is a measured improvement
 of the index-calculus baseline; the panel changes no leaderboard row and makes no claim about m = 8.
 
@@ -217,7 +222,7 @@ of the index-calculus baseline; the panel changes no leaderboard row and makes n
 | per-arm variety gate (S5) | F_p-rational solution count of each arm vs the count its semantics predicts from the classifier (ordered with repeats / distinct unordered) | equal; monolithic arms ≥ with `unlifted` explaining the excess | exporter fault: arm invalid in that cell |
 | positive (detector sees solutions) | planted instance per (cell, curve), every arm | planted decomposition recovered | arm invalid in that cell |
 | negative (no false relations) | real-UNSAT instances | zero verified decompositions; algebraic solutions counted | false relation: invalid run |
-| **positive control for the C2 statistic (S13)** | `mono-direct` at m = 3 (the known worst arm of 2026-10-26) | `supported_within_scope` with positive sign in every m = 3 cell where it completes | the statistic cannot detect a known effect: the cell's other C2 verdicts are inconclusive |
+| **positive control for the C2 statistic (S13)** | `mono-tower` at m = 3 (the 2026-10-26 "plain, one S_4" arm, D = 12, reproduced in the smoke) | `supported_within_scope` with positive sign in every m = 3 cell where it completes | the statistic cannot detect a known effect: the cell's other C2 verdicts are inconclusive |
 | literal A/A (S3, S13) | chain-tower rerun on every instance | identical counts (D_AA = 0) | engine nondeterminism; D_AA becomes the floor |
 | engine cross-check (S4) | msolve `-g 2` proxy sign | same sign as native | engine-specific effect: inconclusive |
 | construction charged (B5) | `w^+` sign agreement | same sign | "presentation" was precomputation moved offline: inconclusive |
@@ -266,7 +271,7 @@ Resolved while the runner and analysis were built (`runner/`, `analysis/`), befo
    lower bound does not already exceed the completed side are counted and reported (`n_lb_not_exceeding`), and
    the analysis is re-run with them dropped as a sensitivity reading.
 6. k for Bonferroni = the candidate arms applicable in the cell, `mono-direct` included.
-7. The positive control (`mono-direct`) gates per (cell, stratum) at m = 3; the m = 4 cells have no control arm
+7. The positive control (`mono-tower`) gates per (cell, stratum) at m = 3; the m = 4 cells have no control arm
    and their verdicts are reported without that gate, stated in RESULTS.md.
 8. `|median| > D_AA` uses the largest per-curve `D_AA`; `within_control_distribution` uses per-curve medians.
 9. The stop rule counts native chain-tower censoring only.
@@ -284,6 +289,11 @@ Resolved while the runner and analysis were built (`runner/`, `analysis/`), befo
 15. Failure classification without a marker (exit 134/137/139 with RSS ≥ 50 % of the cap → `as_rlimit`,
     otherwise `crash`) is a recorded heuristic (`censor_basis`).
 16. `verify-msolve` is not run (`-g 2` has no parametrisation); the msolve arm is the F4 proxy only.
+17. (v1.2, after the instrument smoke) Positive control is `mono-tower`, not `mono-direct`: the prior study's
+    "plain, one S_4" arm is S_4 with the y-tower; `mono-direct` is a second monolithic arm (D = 16 in the smoke).
+    Both run at m = 3 only. m = 4 caps 1,800 s. `tree-tower` semantics noted. The instrument's construction counter
+    also counts the scaling inside subtractions (over-counts negations); stated with `w^+`. Symmetric arms at
+    m = 4, t = 3 run only on curves with `B_real(t = 3) ≥ 5` (the curve rule guarantees it at t = 4 only).
 
 ## 9. Freeze
 
