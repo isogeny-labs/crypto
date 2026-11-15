@@ -16,3 +16,9 @@ Weil uniqueness and public subgroup proof still remain before pipeline replaceme
 ## Errors
 Fast-forward sparse checkout removed local prior-study copies; read original files
 with git show HEAD:path. No scientific rerun.
+
+## Completed coefficient gate
+Source9e75b695db30/checkpoint193556 preceded one exit0execution.
+108polynomial comparisons plus fixture matched; W/residues inRUN.txt.
+No scientific rerun. git diffcheck noticed blank EOF in Weil note; trimmed only
+prose afterward. Next V2 adds exact integer lifting as a separate frozen gate.

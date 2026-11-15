@@ -116,4 +116,3 @@ Falsifiers / next proof obligations, with no execution authorized here:
 
 ### Gaps
 No replacement latency, memory measurement or speedup was measured. General ambiguous cases require additional certified information or established lifting machinery. The bounded screen supplies an exact p=127 conditional recovery certificate and a general uniqueness test; the full 10× genus-2-or-higher objective remains the acceptance criterion.
-
