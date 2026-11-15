@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-13T20:55:37Z",
+ "id": "PCC-20261113-add2c4",
+ "kind": "statement",
+ "producer": {
+  "commit": "43875b707caedfb7b8175de0961e219a1152bbb3",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/record-search-20261113/arithmetic.json",
+    "sha256": "7b4243422361481cbbb76a5449a1dbb1e62dae50c00621ba435f7d9cae0bba0f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/record-search-20261113/certificate-replay.json",
+    "sha256": "7cc3e9bf228d33827aea35f67283befaa3505b5ddce544b91a534602fd91fb57"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/record-search-20261113/prime263.cert",
+    "sha256": "427271d15cc10ba2957da6641ebd007aae0e56b72830f8947318b7e09a4890b4"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/record-search-20261113",
+ "statement": "PARI/GP 2.17.2 reconstructs the fixed published K-571 conductor factor and accepts its saved 263-bit prime certificate; no quotient, point images, or endpoint timings are produced."
+}
