@@ -117,3 +117,39 @@ Reproduction:
 3. **Only if compression scales, measure whole-query complexity:** exact model extraction and verified positive/negative certificates, amortized vs cold setup, elimination proof width and final public DLP solve. Compare to the strongest batched rho and sparse PKM under identical conditions. No proposed algorithm has yet shown a cheaper complete single-target solve.
 
 The new scripts are **small deterministic exact-arithmetic test artifacts**, not an independently certified research claim. No pcc record/signature or external CI rerun is implied by checking these files into GitHub.
+
+## 2026-11-15 follow-up: scalable cubic factorization and complete toy DLP [pcc:unverified]
+
+The local cubic-square pattern is **still a conjecture** for arbitrary eight abscissae. The new `cubic_factor_fast.py` replaces the original `locus_selector.py`'s linear scan through all `p` field elements with a bounded Las Vegas factorization of the degree-three quotient. It first computes `gcd(cubic, X^p-X)` to count exactly the distinct `F_p` roots (including when the original cubic has repeated factors), splits the linear factors by randomized quadratic characters, checks each returned root against the cubic, and checks the rank of the original 6x6 matrix. Exhaustion of the splitting cap is an explicit error, never a partial root list. It does **not** verify primality of input `p`. The interpolation and square-cubic factorization remain guarded hypotheses and cause a failure if contradicted.
+
+```sh
+python3 research/norm_branch_rank_pilot_20261115/cubic_factor_fast.py --selftest
+python3 research/norm_branch_rank_pilot_20261115/signed_support.py
+python3 research/norm_branch_rank_pilot_20261115/toy_complete.py
+```
+
+Producer-local deterministic arithmetic tests, not signed independent validation: the original `F_1019` seven-tuple returns cubic `z^3-2z^2+79z+609`, unique noncollision root `764`, and rank `4/6`. In addition to `F_10007`, the factorization code was locally exercised on algebraic residue tuples at the **61-, 127- and 256-bit prime-field sizes** `2^61-1`, `2^127-1`, and `2^256-2^32-977`. These latter tuples are not validated elliptic-curve factor bases and cannot establish any ECDLP speed advantage. At each chosen input, the determinant polynomial is built from 19 evaluations, checked on 32 further inputs, and candidate ranks are rechecked. The computation of *roots* no longer loops over `p`; expected splitting work is polynomial in `log p` for fixed degree, conditional on the factorization hypothesis holding.
+
+### Exact fixed-base hit ceiling (mathematical argument)
+
+Let `H = <G>` have prime order `r` and let `P_1,...,P_8 in H` be **fixed before** sampling the uniform target `R in H`. Define `S = {sum_i epsilon_i P_i : epsilon_i in {-1,+1}}`. A single candidate signed-sum test has exactly
+
+```text
+Pr[R in S] = |S|/r <= 256/r.
+```
+
+This is a direct counting identity, not a conjecture: there are at most `2^8` signed sums and all `r` target points have equal probability. A cubic-selected rank-deficient base that depends only on seven fixed abscissae therefore cannot by itself increase the hit probability above `256/r`. The statement does **not** apply unchanged to a base chosen adaptively after seeing `R`, to a larger changing collection of bases, or to a scheme that exposes additional outputs per query. It is not an index-calculus lower bound.
+
+On the guarded `E/F_1019: y^2=x^3+46x+158` fixture, `signed_support.py` counts exactly `#E(F_1019)=977`, a prime, and **256 distinct** signed sums from the selected eight points. Thus a *uniform* full-group target hits this fixed support with probability exactly `256/977`. This counting experiment is [pcc:unverified] until independently replayed.
+
+### End-to-end toy result and cost boundary
+
+`toy_complete.py` uses `P_1` as generator, independently recomputes all eight factor-base logarithms by standard baby-step/giant-step, creates the signed-sum table with 255 Gray-code updates, and recovers a scalar for **each of the 977 possible target points** by adding `G` until it finds the table. Every answer is re-multiplied to the target. Producer-local run: 977/977 correct, 32 baby table entries, 111 giant steps across eight base-log queries, 256 signed-table entries, 3958 total online shift additions (mean 4.051177, maximum 23). All figures are [pcc:unverified].
+
+This is a **complete toy ECDLP solver with reusable generic preprocessing**, not a new asymptotic algorithm, not a speed comparison against a matched rho, and not evidence of a cheaper cold prime-field solver. The setup, including finding eight factor-base logs and building/storing 256 entries, must be charged for one cold target; the low per-target online step count cannot be substituted for that full cost.
+
+### Next decisive tests
+
+First prove or refute the general square-cubic determinant identity (including exceptional characteristic and collision strata). Then carry a preregistered held-out growing-`k` rank census into the norm-branch B1 gate, and allow SAT B2 only after a substantial rank compression survives controls. Independently execute the already specified sparse PKM `m=8` positive full-solver-call panel with extracted relations and its `gamma<3.5` whole-call gate; this remains the stronger direct cost-changing ECDLP lead. All claims here are [pcc:unverified].
+
+**Literature and prior-work check:** This extends the current PR #4188 counterexample and protocol, not a claim of novelty in polynomial factorization. Root splitting uses the standard Cantor–Zassenhaus idea, and the toy preprocessing belongs to ordinary generic-group time/memory tradeoffs, as in the repository's `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md`. Review also considered Shoup 1997 (generic model) and Yokoyama–Yasuda–Takahashi–Kogure 2020 (naive Semaev IC limits, DOI 10.1515/jmc-2019-0029). Research-KB MCP/catalog remained unavailable in this execution context; the repository lead heat map and primary sources served as fallback. No signed PCC standing, EKS benchmark, conductor scope lock, full Rust suite or independent host replay is claimed.
