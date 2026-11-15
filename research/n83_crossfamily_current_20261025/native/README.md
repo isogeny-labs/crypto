@@ -8,17 +8,17 @@ records all child outcomes and resource telemetry, replays arithmetic and
 calibration receipts, and uploads its raw archive. The local selector uses
 all 16 paired points, six exact sign-flip tests, and a 0.05/6 threshold.
 
-The owner-approved route remains `us-east-1a` under the
-[2026-11-14 amendment](AWS_EAST1A_AMENDMENT_20261114.md). This branch prepares
-a separate [west-2b proposal](AWS_WEST2B_PROPOSAL_20261114.md) for the same
-single allocation. Its controller binds two `g5g.4xlarge` Spot instances in
-`us-west-2b`, each with a proposed $0.31/hour maximum bid, 50 GB encrypted
-gp3 root disk, and a 21,600-second lifetime. The six-hour bid projection,
+The owner approved the [west-2b route amendment](AWS_WEST2B_PROPOSAL_20261114.md)
+on 2026-11-14 for the same single allocation, superseding the earlier
+[`us-east-1a` amendment](AWS_EAST1A_AMENDMENT_20261114.md). Its controller
+binds two `g5g.4xlarge` Spot instances in `us-west-2b`, each with a
+$0.31/hour maximum bid, 50 GB encrypted gp3 root disk, and a 21,600-second
+lifetime. The six-hour bid projection,
 including a bounded cross-region S3 transfer allowance, is $4.15 under the
 owner's $4.20 allocation cap. The host shutdown timer and an
 independently detached local termination guard retain their outcomes.
 
-This native proposal extends the east-region AWS protocol at commit
+This native route extends the east-region AWS protocol at commit
 `c1b40731907eb7db238186e1b11f58d754572fd0`. The parent README's
 west-region alternative is a separate Python dispatch route. The native
 controller binds its region, zone, instance type, source hash, and budget in
@@ -40,10 +40,13 @@ rustup run 1.99.1 cargo run --release --locked --manifest-path "$native_manifest
   /absolute/path/outside/repository/allocation
 ```
 
-`aws-plan` is read-only. `aws-allocate` mutates S3 and EC2 and requires
-explicit owner approval of the west-2b route amendment. It repeats the
-provider price and placement gate immediately before mutation. The
-controller receipt and source manifests retain exact SHA-256 values. Do
+`aws-plan` is read-only. `aws-allocate` mutates S3 and EC2 under the single
+approved west-2b allocation. The 2026-11-14 attempt reached EC2 and returned
+`Client.Blocked`; do not retry until AWS confirms account launch access is
+restored. A retry requires a fresh clean source bundle and plan, plus all
+account, source, provider, budget, security-group, guard, and no-overlap gates.
+The controller repeats the provider price and placement gate immediately
+before mutation. Its receipt and source manifests retain exact SHA-256 values. Do
 not put presigned URLs, AWS credentials, or EC2 user data in a PR or log.
 The raw result archives and host status objects remain outside the tree
 until independently collected and verified. Each host limits raw upload to

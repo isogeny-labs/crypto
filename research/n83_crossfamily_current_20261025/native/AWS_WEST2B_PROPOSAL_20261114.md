@@ -1,12 +1,11 @@
-# N83 native AWS west-2b route proposal — 2026-11-14 UTC
+# N83 native AWS west-2b route amendment — 2026-11-14 UTC
 
-The native N83 panel can use `us-west-2b` for the same single two-instance
-allocation if the owner approves this route amendment. The approved
-`us-east-1a` route remains the operative protocol until that approval. This
-proposal changes the region, zone, VPC, subnet, security group, and maximum
-Spot bid; it does not authorize another allocation.
+The owner approved `us-west-2b` for the same single two-instance allocation
+on 2026-11-14, superseding the earlier `us-east-1a` route. This amendment
+changes the region, zone, VPC, subnet, security group, and maximum Spot bid;
+it does not authorize another allocation.
 
-| Field | Proposed binding |
+| Field | Approved binding |
 | --- | --- |
 | AWS account, region, zone and zone ID | `590183823895`, `us-west-2`, `us-west-2b`, `usw2-az2` |
 | VPC and public subnet | `vpc-0394e002d95674fe6`, `subnet-0ffc4f0562edc244f` |
@@ -39,15 +38,17 @@ the operator must verify security group, S3, and absence of another active
 N83 allocation immediately before mutation.
 
 The west-2b controller must be committed and bundled from its exact clean
-source commit. The source bundle, read-only plan, owner approval of this
-amendment, and complete two-curve measurement protocol must be bound before
+source commit. The source bundle, read-only plan, approved route amendment,
+and complete two-curve measurement protocol must be bound before
 the single allocation. The controller checks for active N83-tagged instances
 in both `us-west-2` and `us-east-1`. The paired points, candidate identities,
 alternating same-point IC/rho schedule, independent replay, raw failure
 retention, and selector remain frozen. The `a=0` N83 curve requires its
 separate exact solver panel and cannot be inferred from this `a=1` panel.
 
-No S3 or EC2 mutation belongs to preparation of this proposal. Owner
-approval must explicitly replace the `us-east-1a` route with this `us-west-2b`
-route and allow the $0.31 per-instance-hour bid and $0.30 transfer allowance under the same one-pair,
-$4.20 cap.
+The 2026-11-14 launch attempt returned `Client.Blocked` and created zero
+instances; its [failure receipt](verification/aws-west2b-attempt-20261114/RESULT.md)
+retains the versioned S3 inputs. A retry requires AWS to confirm account
+launch access, followed by a fresh exact source bundle, read-only plan, and
+all live gates. The approved $0.31 per-instance-hour bid and $0.30 transfer
+allowance remain within the same one-pair, $4.20 cap.
