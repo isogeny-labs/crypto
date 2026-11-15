@@ -1,12 +1,14 @@
 # Degree-seven generalized GHS: projective membership study
 
-14 November 2026. Status: **[pcc:unverified] producer result**. Source branch
+15 November 2026 UTC. Status: **[pcc:unverified] producer result**. Source branch
 `codex/ghs-n7-membership-20261114`, initial frozen commit `eacae612c8f8`.
 This study tests membership in the *published* genus-14 W1 locus, not a
 new curve family or a full ECDLP attack. The decisive prior source is
 [Menezes--Teske, §5.2](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf).
 They define W1 and report that they did not have a decomposition test below
-q^2.5 per candidate. Their estimate `#W1 ≈ q^6` is heuristic. The later
+q^2.5 per candidate. Their estimate `#W1 ≈ q^6` is heuristic. A new
+Sidon-kernel argument below gives a uniform lower bound of order `q^6`
+for the same published locus. The later
 [Weil-descent product analysis](https://math.dartmouth.edu/~carlp/WeilDescent-Product.pdf)
 changes attack comparisons, so a faster membership test alone cannot show
 an end-to-end advantage.
@@ -54,7 +56,8 @@ identity certificate and remains **[pcc:unverified]** for repository claims.
 All rows are one deterministic run per field and two cubic arms, on a local
 arm64 macOS host. They have no statistical interval. The q=2 and q=4
 projective sets were exhaustively compared with direct product enumeration;
-the q=8 run used direct products only. `W1 union` is the union of both cubic
+the original q=8 run used direct products and the later incidence run
+matched its union. `W1 union` is the union of both cubic
 sets for `sqrt(b)`; squaring permutes K, so it has the same cardinality for
 coefficients b. `Trace-zero nonzero` is `q^6-1`.
 
@@ -63,18 +66,24 @@ coefficients b. `Trace-zero nonzero` is `q^6-1`.
 | 2 | `0x83` | 42 | 56 | 63 | 7 | both |
 | 4 | `0x4021` | 2898 | 3906 | 4095 | 189 | both |
 | 8 | `0x200005` | 182938 | 237839 | 262143 | 24304 | direct |
+| 16 | `0x10000003` | 11490570 | 15110970 | 16777215 | 1666245 | product bitset |
 
 The q=2 and q=4 complement values happen to fit
 `(q-1)(q^3-1)`. Amendment 2 froze a q=8 falsification test. Its prediction
-was 3577, while the measured complement was **24304**. The proposed
-formula is false. The figure shows the three observed proportions; its
+was 3577, while the measured complement was **24304**. The q=16
+nonsplit prediction was 61425 versus **1666245** measured. The proposed
+simple complement formula is false in both later fields. The figure shows
+the four observed proportions; its
 percentages are derived from the exact counts in the table.
 
-![W1 union relative to nonzero trace-zero elements](w1-density.svg)
+![Derived one-cubic lower bound and measured W1 counts relative to nonzero trace-zero elements](w1-density.svg)
 
 Raw records: [original q=2,4 control](reports/run-20261115T0542Z/),
 [Gaussian setup q=2,4](reports/run-20261115T0547Z/), and
-[q=8 falsifier](reports/run-20261115T0551Z/). The q=8 binary used
+[q=8 falsifier](reports/run-20261115T0551Z/),
+[q=2,4,8 incidence](reports/run-20261115T0614Z/),
+[q=16 bitset census](reports/run-20261115T0616Z/), and
+[q=2,4,8,16 pair ranks](reports/run-20261115T0619Z/). The q=8 binary used
 `src/main.rs` SHA-256 `7dcf817b3b87a78de36693f6121529e4b4a5aca9149314a20f20d799b94deb01`
 and executable SHA-256
 `c1986b7006ea3daa9b6bd04d5f468ef64841dfa66ed52fb25939d7fcfc416f7d`.
@@ -82,6 +91,8 @@ The q=8 direct run took 26.57 seconds wall and 4.88 seconds user time as
 reported by `/usr/bin/time -l`; this was not a per-candidate benchmark.
 All commands were gated by an S3 checkpoint before their run. The q=8
 pre-run checkpoint is `20261115T055032Z-eacae612c8f8`.
+The study density figure was refreshed; the unrelated IC leaderboard was
+checked and left unchanged.
 
 ## Exact finite source curves and novelty boundary
 
@@ -109,19 +120,35 @@ matched rho cost for the same source subgroup.
 
 The projective normalization has three forms `(1,u,v)`, `(0,1,u)`,
 `(0,0,1)` over k, hence `q^2+q+1` trials **assuming** `dim_k V=3`.
-Irreducibility of p and the normal-basis decomposition of `K/k` imply that
+The normal-basis decomposition of `K/k` and `p | (T^7-1)` imply that
 dimension, but that field-theoretic bridge is not in the Lean proof. The
 Lean theorem checks the exact scaling equivalence under explicit coverage
 and second-factor stability hypotheses. The Rust program checks the
 dimension, line count, and exact membership equality at q=2,4; at q=8 it
-checks the direct count and the trace-zero containment. The only general
-count bounds presently justified from the construction are the coarse
-`(q^3-1)(q-1) <= #W1 <= q^6-1` for each cubic, and the upper bound
-`#(W1 union) <= q^6-1`, using the trace-zero derivation above. The lower
-bound uses a fixed nonzero gamma1: all `(q^3-1)(q-1)` choices of gamma2
-are distinct. The q=8 counterexample forbids promoting a sharper count
-from q=2,4 interpolation.
+checks the direct count and the trace-zero containment. The new
+[Sidon-kernel proof and bounds](SIDON_BOUND.md) derive that, for each cubic,
+`V=ker p(sigma)` satisfies `dim_k(V ∩ tV) ≤ 1` for every `t∉k`.
+The characteristic-two elimination step is checked in
+[`SidonKernel.lean`](SidonKernel.lean); the fixed-field, dimension, trace
+pairing, and incidence-count bridges are argued on paper in the linked note
+and are not formalized in Lean. The argument turns the earlier heuristic
+W0 product formula into an all-`q` count. For W1, set `m=q^2+q+1`,
+`M=(q^3-1)^2`, and `D=M+m(m-1)(q^2-1)`. Then
 
-Canonical graphs checked: no GHS-specific canonical density graph is
-present in this sparse branch. The existing IC leaderboard is unrelated
-to this membership-only result and was not changed.
+    ceil(M^2/D) <= #W1_p <= q^6-1.
+
+The same lower and upper bounds hold for the union of both cubic arms.
+The lower bound is asymptotic to `q^6/2`, establishing the `q^6` order
+of the published W1 locus without an isogeny-distribution assumption.
+Finite pair-rank checks found every distinct projective pair intersects
+in dimension two at q=2,4,8,16, as the proof predicts. The interpolated
+exact one-cubic count fits four sizes, but has no proof and remains only
+a pattern. These are coefficient counts; they do not bound complete
+transfer or DLP cost.
+
+The determinant argument also applies to trinomial kernels
+`T^d+T^s+1` when this polynomial divides `T^n-1` and `gcd(s,n)=1`.
+It supplies a structural search family. The first degree-15 example
+`T^4+T+1` falls within the magic-number-5 cases already analyzed by
+Maurer--Menezes--Teske; it is a rediscovery as a GHS candidate. Its
+transfer genus, subgroup map, and total attack cost require separate work.

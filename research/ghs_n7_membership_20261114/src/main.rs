@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Clone, Copy)]
 struct Field {
@@ -275,7 +275,190 @@ fn curve_order(field: Field, a: u32, b: u32) -> u32 {
     order
 }
 
+fn incidence_summary(counts: &[u16]) -> (usize, u64, u64, u128, BTreeMap<u16, usize>) {
+    let mut histogram = BTreeMap::new();
+    let mut union = 0;
+    let mut first_moment = 0_u64;
+    let mut second_moment = 0_u64;
+    for &count in counts.iter().filter(|&&count| count != 0) {
+        union += 1;
+        first_moment += u64::from(count);
+        second_moment += u64::from(count) * u64::from(count);
+        *histogram.entry(count).or_insert(0) += 1;
+    }
+    let lower =
+        (u128::from(first_moment) * u128::from(first_moment)).div_ceil(u128::from(second_moment));
+    (union, first_moment, second_moment, lower, histogram)
+}
+
+fn incidence_census() {
+    for (ell, expected_single, expected_union) in
+        [(1, 42, 56), (2, 2898, 3906), (3, 182938, 237839)]
+    {
+        let q = 1 << ell;
+        let field = Field::new(7 * ell);
+        let mut total = vec![0_u16; field.size as usize];
+        for (index, p) in CUBICS.into_iter().enumerate() {
+            let (subfield, first, projective) = subgroup_data(field, q, p);
+            let mut counts = vec![0_u16; field.size as usize];
+            for &r in &projective {
+                let mut line = BTreeSet::new();
+                for &w in first.iter().filter(|&&w| w != 0) {
+                    for &c in subfield.iter().filter(|&&c| c != 0) {
+                        line.insert(field.mul(r, w ^ c));
+                    }
+                }
+                assert_eq!(line.len() as u32, (q.pow(3) - 1) * (q - 1));
+                for z in line {
+                    counts[z as usize] += 1;
+                    total[z as usize] += 1;
+                }
+            }
+            let (union, first_moment, second_moment, lower, histogram) = incidence_summary(&counts);
+            assert_eq!(union, expected_single);
+            assert!(counts
+                .iter()
+                .enumerate()
+                .all(|(z, &count)| { count == 0 || field.relative_trace(z as u32, q) == 0 }));
+            println!(
+                "q={q} cubic={} lines={} set_size={} union={union} M={first_moment} E={second_moment} cauchy_lower={lower} histogram={histogram:?}",
+                index + 1,
+                projective.len(),
+                (q.pow(3) - 1) * (q - 1)
+            );
+        }
+        let (union, first_moment, second_moment, lower, histogram) = incidence_summary(&total);
+        assert_eq!(union, expected_union);
+        println!(
+            "q={q} both_cubics union={union} M={first_moment} E={second_moment} cauchy_lower={lower} histogram={histogram:?}"
+        );
+    }
+}
+
+fn bitset_insert(bits: &mut [u8], value: u32) {
+    let index = (value / 8) as usize;
+    bits[index] |= 1 << (value % 8);
+}
+
+fn q16_product_census() {
+    let q = 16;
+    let field = Field::new(28);
+    let bitset_len = (field.size / 8) as usize;
+    let mut cubic_bitsets = Vec::new();
+    let mut cubic_counts = Vec::new();
+    for (index, p) in CUBICS.into_iter().enumerate() {
+        let (subfield, first, projective) = subgroup_data(field, q, p);
+        let mut bits = vec![0_u8; bitset_len];
+        for &r in &projective {
+            for &w in first.iter().filter(|&&w| w != 0) {
+                for &c in subfield.iter().filter(|&&c| c != 0) {
+                    bitset_insert(&mut bits, field.mul(r, w ^ c));
+                }
+            }
+        }
+        let count: u64 = bits.iter().map(|&byte| u64::from(byte.count_ones())).sum();
+        println!(
+            "q=16 modulus=0x{:x} cubic={} lines={} set_size={} unique={count}",
+            field.modulus,
+            index + 1,
+            projective.len(),
+            (q.pow(3) - 1) * (q - 1)
+        );
+        cubic_counts.push(count);
+        cubic_bitsets.push(bits);
+    }
+    let union: u64 = cubic_bitsets[0]
+        .iter()
+        .zip(&cubic_bitsets[1])
+        .map(|(&a, &b)| u64::from((a | b).count_ones()))
+        .sum();
+    let overlap = cubic_counts[0] + cubic_counts[1] - union;
+    let trace_zero_nonzero = u64::from(q.pow(6) - 1);
+    let complement = trace_zero_nonzero - union;
+    let predicted = u64::from((q - 1) * (q.pow(3) - 1));
+    println!(
+        "q=16 union={union} overlap={overlap} trace_zero_nonzero={trace_zero_nonzero} complement={complement} nonsplit_prediction={predicted} prediction_holds={}",
+        complement == predicted
+    );
+}
+
+fn binary_rank(values: impl IntoIterator<Item = u32>) -> u32 {
+    let mut pivots = [0_u32; 32];
+    let mut rank = 0;
+    for mut value in values {
+        while value != 0 {
+            let pivot = Field::polynomial_degree(value) as usize;
+            if pivots[pivot] == 0 {
+                pivots[pivot] = value;
+                rank += 1;
+                break;
+            }
+            value ^= pivots[pivot];
+        }
+    }
+    rank
+}
+
+fn rank_pair_census() {
+    for ell in [1, 2, 3, 4] {
+        let q = 1 << ell;
+        let field = Field::new(7 * ell);
+        let k_binary = binary_kernel(field, |x| field.pow(x, q) ^ x);
+        for (index, p) in CUBICS.into_iter().enumerate() {
+            let (subfield, first, projective) = subgroup_data(field, q, p);
+            let mut v_basis = Vec::new();
+            for candidate in first {
+                if !in_k_span(field, candidate, &v_basis, &subfield) {
+                    v_basis.push(candidate);
+                }
+                if v_basis.len() == 3 {
+                    break;
+                }
+            }
+            assert_eq!(v_basis.len(), 3);
+            let h_basis: Vec<_> = [1_u32, v_basis[0], v_basis[1], v_basis[2]]
+                .into_iter()
+                .flat_map(|h| k_binary.iter().map(move |&c| field.mul(h, c)))
+                .collect();
+            assert_eq!(binary_rank(h_basis.iter().copied()), 4 * ell);
+            let subspaces: Vec<Vec<u32>> = projective
+                .iter()
+                .map(|&r| h_basis.iter().map(|&h| field.mul(r, h)).collect())
+                .collect();
+            let mut histogram = BTreeMap::<u32, u32>::new();
+            for i in 0..subspaces.len() {
+                for j in i + 1..subspaces.len() {
+                    let rank = binary_rank(subspaces[i].iter().chain(&subspaces[j]).copied());
+                    assert_eq!(rank % ell, 0);
+                    let intersection_dim = 8 - rank / ell;
+                    *histogram.entry(intersection_dim).or_insert(0) += 1;
+                }
+            }
+            let expected_pairs = (projective.len() * (projective.len() - 1) / 2) as u32;
+            assert_eq!(histogram.values().sum::<u32>(), expected_pairs);
+            println!(
+                "q={q} modulus=0x{:x} cubic={} projective={} pairs={expected_pairs} intersection_dims={histogram:?}",
+                field.modulus,
+                index + 1,
+                projective.len()
+            );
+        }
+    }
+}
+
 fn main() {
+    if std::env::args().any(|arg| arg == "--rank-pairs") {
+        rank_pair_census();
+        return;
+    }
+    if std::env::args().any(|arg| arg == "--q16-products") {
+        q16_product_census();
+        return;
+    }
+    if std::env::args().any(|arg| arg == "--incidence") {
+        incidence_census();
+        return;
+    }
     if std::env::args().any(|arg| arg == "--q8-direct") {
         let q = 8;
         let field = Field::new(21);
