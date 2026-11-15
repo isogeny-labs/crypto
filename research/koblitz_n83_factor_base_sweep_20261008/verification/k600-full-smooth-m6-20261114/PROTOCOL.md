@@ -48,8 +48,10 @@ repository reports linked above are the primary execution receipts.
   staging time; the execution lock must bind the final corrected source.
 - Target: first sealed public corpus point, supplied as a point to the
   worker. The known-answer sidecar is read only after scalar production.
-  Identity pattern 0 is the all-affine chained-S3 arm; other patterns
-  require separate coverage and remain outside this first admission.
+  The XCNF exports use the worker's per-representative orbit-root encoding.
+  Identity pattern 0 is the all-affine chained-S3 control arm. The native
+  worker starts with that pattern and may continue to the other patterns
+  within its frozen conflict and wall caps.
 
 ## Admission sequence and proposed local resource envelope
 
@@ -77,9 +79,13 @@ fails or the remaining allowance cannot cover the next stage.
    Record actual CNF/XOR shape, cgroup peak, source, archive and terminal
    status. A static threshold pass alone does not admit search.
 3. Use the new `primary-k600-m6-xcnf positive-pinned` and
-   `positive-unpinned` exports on this *same* retained base and circuit.
+   `positive-unpinned` exports on this *same* retained base and pattern-0
+   core circuit as the native worker. The pinned export adds witness clauses;
+   the unpinned export changes the target to a constructed point.
    The release example suite passes 22 tests [pcc:unverified];
-   [the corrected-source test log](cargo-test-fixture0.txt) is retained;
+   [the per-representative source test log](cargo-test-per-rep.txt) is retained;
+   [the earlier fixture-zero test log](cargo-test-fixture0.txt) records the
+   source before the encoding correction;
    the [earlier pre-correction log](cargo-test.txt) remains for provenance.
    The new exporter
    has not yet been run on the full archive. Preserve its actual six points,
@@ -93,6 +99,19 @@ fails or the remaining allowance cannot cover the next stage.
    the original formula, all point lifts and group equation, and the
    relation row. Record rank contribution. Retain timeout, OOM,
    `UNKNOWN_solver_cap` and producer failure as distinct outcomes.
+
+The standalone [model replayer](replay_model.py) takes the export JSON,
+original XCNF, solver stdout and receipt, retained input root, and the
+source-commit and binary-hash values from the frozen execution lock. It
+requires a complete SAT assignment, checks every original CNF and XOR row,
+verifies the exact K600 archive, and checks fixture 0 for natural queries
+or the archived six-point witness for positive controls. It lifts all six
+model x-coordinates through the stored point/column coefficients, checks the
+four intermediate x-coordinates and final group sum, and writes a fresh receipt
+only after all checks pass. Preserve invalid and incomplete models as
+failures. Its arithmetic, model parser and XCNF selftest passed
+[pcc:unverified]; [the raw selftest log](replay-selftest.txt) is retained.
+The replayer has not yet checked a full K600 solver model.
 
 The admission result can justify expanding to multiple ordinary relations
 and then a full same-point single-target IC/rho comparison. Select a base

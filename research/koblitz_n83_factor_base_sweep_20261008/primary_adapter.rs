@@ -777,13 +777,8 @@ pub(super) fn k600_m6_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result
         125_000,
     )
     .map_err(|_| "K600 m6 chained-S3 circuit construction failed")?;
-    enc.constrain_frobenius_orbit_summands_with_encoding(
-        &representatives,
-        FrobeniusOrbitRootEncoding::SharedBits,
-        125_000,
-        350_000,
-    )
-    .map_err(|_| "K600 m6 shared-root orbit domain failed")?;
+    enc.constrain_frobenius_orbit_summands(&representatives, 125_000, 350_000)
+        .map_err(|_| "K600 m6 orbit domain failed")?;
     if pinned {
         let (indices, partial, _) = positive.as_ref().ok_or("K600 positive witness missing")?;
         let points: Vec<&BinaryPoint> = indices
@@ -815,7 +810,7 @@ pub(super) fn k600_m6_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result
     let shape = json!({
         "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
         "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
-        "summands":6,"identity_mask":0,"root_encoding":"shared_root_bits",
+        "summands":6,"identity_mask":0,"root_encoding":"per_representative",
         "domain_representatives":representatives.len(),
         "positive_x_pins":if pinned { 11*83 } else { 0 },
         "summand_ordering":"none",
