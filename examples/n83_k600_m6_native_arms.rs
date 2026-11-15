@@ -506,7 +506,83 @@ fn validate_export(receipt: &Value, lock: &Value, mode: &str, xcnf_path: &Path) 
     Ok(())
 }
 
-fn export(lock_path: &Path, mode: &str, output: &Path, outer_seconds: u64) -> Result<Value> {
+fn preflight_gate(
+    arm_lock: &Value,
+    preflight_lock_path: &Path,
+    preflight_root: &Path,
+) -> Result<Vec<String>> {
+    let lock_path = fs::canonicalize(preflight_lock_path)?;
+    let root = fs::canonicalize(preflight_root)?;
+    let outer_path = root.join("outer.json");
+    let config_path = root.join("worker-output/run/config.json");
+    let summary_path = root.join("worker-output/run/summary.json");
+    let preflight: Value = serde_json::from_slice(&fs::read(&lock_path)?)?;
+    let outer: Value = serde_json::from_slice(&fs::read(&outer_path)?)?;
+    let config: Value = serde_json::from_slice(&fs::read(&config_path)?)?;
+    let summary: Value = serde_json::from_slice(&fs::read(&summary_path)?)?;
+    let hashes = vec![
+        sha256_file(&lock_path)?,
+        sha256_file(&outer_path)?,
+        sha256_file(&config_path)?,
+        sha256_file(&summary_path)?,
+    ];
+    if preflight["schema"] != "n83.k600-m6-native-preflight-lock/v1"
+        || preflight["source_commit"] != arm_lock["source_commit"]
+        || preflight["image_id"] != arm_lock["image_id"]
+        || preflight["object_sha256"] != OBJECT_SHA
+        || preflight["point_set_blake3"] != POINT_SET
+        || preflight["store_remote"] != REMOTE
+        || preflight["store_name"] != STORE_NAME
+        || preflight["max_trials"] != 0
+        || preflight["max_variables"] != 125_000
+        || preflight["max_domain_clauses"] != 350_000
+        || preflight["max_models"] != 1
+        || preflight["conflict_budget"] != 10_000
+        || outer["schema"] != "n83.k600-m6-native-outer/v1"
+        || outer["status"] != "PREFLIGHT_ONLY"
+        || outer["worker_exit_code"] != 0
+        || outer["timed_out"] != false
+        || !outer["failure_reasons"]
+            .as_array()
+            .is_some_and(Vec::is_empty)
+        || !outer["worker_cap_sha256"].is_null()
+        || outer["lock_sha256"] != hashes[0]
+        || outer["worker_config_sha256"] != hashes[2]
+        || outer["worker_summary_sha256"] != hashes[3]
+        || config["schema"] != "n83.primary-store-chain-config/v1"
+        || config["source_commit"] != arm_lock["source_commit"]
+        || config["max_trials"] != 0
+        || config["orbit_columns"] != 600
+        || config["summands"] != 6
+        || config["policy"] != "public_x_hash"
+        || config["seed"] != 2_026_100_801u64
+        || summary["schema"] != "n83.primary-store-chain/v1"
+        || summary["status"] != "PREFLIGHT_ONLY"
+        || summary["source_commit"] != arm_lock["source_commit"]
+        || summary["store_name"] != STORE_NAME
+        || summary["point_set_blake3"] != POINT_SET
+        || summary["max_trials"] != 0
+        || summary["solver_stage_executed"] != false
+        || summary["memory_cgroup_peak_bytes"]
+            .as_u64()
+            .filter(|n| *n > 0 && *n <= 4_294_967_296)
+            .is_none()
+    {
+        return Err(
+            "zero-trial K600 preflight is missing, failed, or differs from arm lock".into(),
+        );
+    }
+    Ok(hashes)
+}
+
+fn export(
+    lock_path: &Path,
+    preflight_lock_path: &Path,
+    preflight_root: &Path,
+    mode: &str,
+    output: &Path,
+    outer_seconds: u64,
+) -> Result<Value> {
     let stage_start = Instant::now();
     if !["positive-pinned", "positive-unpinned"].contains(&mode)
         || !output.is_absolute()
@@ -560,6 +636,7 @@ fn export(lock_path: &Path, mode: &str, output: &Path, outer_seconds: u64) -> Re
     {
         return Err("K600 arm lock or source changed before export".into());
     }
+    let preflight_hashes = preflight_gate(&lock, preflight_lock_path, preflight_root)?;
     let image = lock["image_id"].as_str().ok_or("image ID missing")?;
     let inspected = docker_short(&["image", "inspect", "--format", "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}", image])?;
     if inspected != format!("{image} linux/arm64 {commit}") {
@@ -628,12 +705,15 @@ fn export(lock_path: &Path, mode: &str, output: &Path, outer_seconds: u64) -> Re
             return Err("frozen image changed after export".into());
         }
         let (after_panel, _) = staged_panel(stage_root, &commit)?;
-        if after_panel != panel {
+        if after_panel != panel
+            || preflight_gate(&lock, preflight_lock_path, preflight_root)? != preflight_hashes
+        {
             return Err("panel changed after export".into());
         }
         let result = json!({
             "schema":"n83.k600-m6-native-arm-export/v1", "status":"PASS_EXPORT_ONLY",
             "mode":mode, "source_commit":commit, "lock_sha256":lock_sha,
+            "preflight_outer_sha256":preflight_hashes[1],
             "export_json_sha256":sha256_file(&json_path)?, "xcnf_sha256":sha256_file(&xcnf_path)?,
             "exporter_exit_code":0, "outer_wall_ms":wall_ms,
             "outer_wall_limit_seconds":outer_seconds,
@@ -687,15 +767,15 @@ fn main() -> Result<()> {
             );
             (output, result, false)
         }
-        Some("export") if args.len() == 6 => {
-            let output = PathBuf::from(&args[4]);
+        Some("export") if args.len() == 8 => {
+            let output = PathBuf::from(&args[6]);
             let result = (|| -> Result<Value> {
-                let seconds: u64 = args[5].parse()?;
-                export(Path::new(&args[2]), &args[3], &output, seconds)
+                let seconds: u64 = args[7].parse()?;
+                export(Path::new(&args[2]), Path::new(&args[3]), Path::new(&args[4]), &args[5], &output, seconds)
             })();
             (output, result, false)
         }
-        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export LOCK_JSON positive-pinned|positive-unpinned NEW_OUTPUT_DIR OUTER_SECONDS (natural requires completed positive control)".into()),
+        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned|positive-unpinned NEW_OUTPUT_DIR OUTER_SECONDS (natural requires completed positive control)".into()),
     };
     if let Err(error) = &result {
         if stage_created_output && output.is_dir() && !output.join("staging.json").exists() {
@@ -819,7 +899,63 @@ mod tests {
         let output =
             std::env::temp_dir().join(format!("n83-k600-m6-natural-gate-{}", std::process::id()));
         assert!(!output.exists());
-        assert!(export(Path::new("/missing-lock"), "natural", &output, 1).is_err());
+        assert!(export(
+            Path::new("/missing-lock"),
+            Path::new("/missing-preflight-lock"),
+            Path::new("/missing-preflight-run"),
+            "natural",
+            &output,
+            1
+        )
+        .is_err());
         assert!(!output.exists());
+    }
+
+    #[test]
+    fn preflight_gate_binds_worker_receipts_before_export() {
+        let root =
+            std::env::temp_dir().join(format!("n83-k600-m6-preflight-gate-{}", std::process::id()));
+        let run = root.join("run");
+        let worker = run.join("worker-output/run");
+        fs::create_dir_all(&worker).unwrap();
+        let commit = "a".repeat(40);
+        let image = format!("sha256:{}", "b".repeat(64));
+        let arm = json!({"source_commit":commit,"image_id":image});
+        let preflight = json!({
+            "schema":"n83.k600-m6-native-preflight-lock/v1", "source_commit":commit,
+            "image_id":image,"object_sha256":OBJECT_SHA,"point_set_blake3":POINT_SET,
+            "store_remote":REMOTE,"store_name":STORE_NAME,"max_trials":0,
+            "max_variables":125_000,"max_domain_clauses":350_000,"max_models":1,
+            "conflict_budget":10_000,
+        });
+        let config = json!({
+            "schema":"n83.primary-store-chain-config/v1","source_commit":commit,
+            "max_trials":0,"orbit_columns":600,"summands":6,
+            "policy":"public_x_hash","seed":2_026_100_801u64,
+        });
+        let summary = json!({
+            "schema":"n83.primary-store-chain/v1","status":"PREFLIGHT_ONLY",
+            "source_commit":commit,"store_name":STORE_NAME,"point_set_blake3":POINT_SET,
+            "max_trials":0,"solver_stage_executed":false,
+            "memory_cgroup_peak_bytes":1_048_576u64,
+        });
+        let lock_path = root.join("preflight-lock.json");
+        let config_path = worker.join("config.json");
+        let summary_path = worker.join("summary.json");
+        write_new_json(&lock_path, &preflight).unwrap();
+        write_new_json(&config_path, &config).unwrap();
+        write_new_json(&summary_path, &summary).unwrap();
+        let outer = json!({
+            "schema":"n83.k600-m6-native-outer/v1","status":"PREFLIGHT_ONLY",
+            "worker_exit_code":0,"timed_out":false,"failure_reasons":[],
+            "worker_cap_sha256":Value::Null,"lock_sha256":sha256_file(&lock_path).unwrap(),
+            "worker_config_sha256":sha256_file(&config_path).unwrap(),
+            "worker_summary_sha256":sha256_file(&summary_path).unwrap(),
+        });
+        write_new_json(&run.join("outer.json"), &outer).unwrap();
+        preflight_gate(&arm, &lock_path, &run).unwrap();
+        fs::write(&summary_path, b"changed").unwrap();
+        assert!(preflight_gate(&arm, &lock_path, &run).is_err());
+        fs::remove_dir_all(root).unwrap();
     }
 }
