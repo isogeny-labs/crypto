@@ -28,7 +28,8 @@ fn fours(base:&Base,ar:&mut Arithmetic,start:usize,end:usize)->Vec<Point> {
             let mut sum=None;
             for (bit,&idx) in [i,j,k,l].iter().enumerate() {
                 let p=Some(base.points[idx]);
-                sum=ar.add(PRIME31,sum,if mask&(1<<bit)==0 {p}else{ar.neg(PRIME31,p)});
+                let term=if mask&(1<<bit)==0 {p}else{ar.neg(PRIME31,p)};
+                sum=ar.add(PRIME31,sum,term);
             }
             out.push(sum);
         }
