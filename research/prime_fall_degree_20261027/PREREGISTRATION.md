@@ -639,3 +639,33 @@ Route only, for the cells that Amendment 16 left out. Every number is `[pcc:unve
   - The Amendment 16 disclosure applies here too: the wall-clock budget makes censoring depend on the host.
 - **Unchanged.** No hypothesis, §6 rule, reading, cell, seed, cap, budget or `--max-dense` changes. The C-step reading
   (Amendment 7 D.5) is applied to these rows as registered.
+
+## Amendment 19 (2026-11-15; the `m = 4` cells of Amendments 8 and 13 on reserved RunPod pods; before any `m = 4` row at `t ≥ 4` and before any `m = 4` null row exists)
+
+Route only, plus a study-level spend guard. Every number is `[pcc:unverified]`.
+
+- **Owner instruction (2026-11-15, ~04:20Z, session 01TCbLH6osebpnEbutNogBzD):** "also launch the m=4 cells on runpod".
+- **Cells.** Each runs its registered `entry_r2.sh` stage verbatim, with `--budget 172800` per closure:
+  - Kummer (Amendment 8): `m4:4:K:7:13958643712:4000000` and `m4:5:K:6:13958643712:4000000`, for `K = 0, 1`;
+  - shape-matched nulls (Amendment 13): `m4n:4:K:7:13958643712:4000000` and `m4n:5:K:6:13958643712:4000000`.
+- **Host and binaries.** One reserved RunPod CPU pod per cell, 16 vCPU / 128 GB. That is above the registered 112Gi
+  request, and `max_entries` is the registered value. `RAYON_NUM_THREADS = 12`. The binaries are those admitted by
+  Amendment 17; runner and client are as in Amendment 16.
+- **Order.** Amendment 13's order is kept for submission: each null is submitted after its Kummer counterpart of the same
+  `(t, K)`. Amendment 13's "serially" existed because the EKS pool admitted one job at a time. Here the eight jobs run
+  concurrently on separate pods, and no job's systems or limits depend on another's.
+- **Per-job cost.** US$40 per job (owner decision 4). At US$1.04/h that binds at about 38.5 h, before the 49 h job limit.
+  A job stopped by it is recorded as censored-by-cost.
+- **Study-level spend guard (owner decision 4: US$400 for the study).**
+  - The worst case of everything launched under Amendments 16, 18 and this one is US$435, if every job ran to its cost
+    stop. That exceeds the ceiling.
+  - So actual RunPod spend (`costPerHr ×` elapsed, summed over all pods of the study) is checked at every check-in.
+  - When it reaches US$370 (US$30 kept for the earlier EKS jobs, which together cost less than that), the running null
+    cells are stopped first, then the `t = 5` Kummer cells. Each stopped job is recorded as censored-by-cost, and the
+    owner is told.
+- **Disclosure.**
+  - No `m = 4` row at `t ≥ 4` and no `m = 4` null row has been seen by this session.
+  - The Amendment 16 disclosure applies: the wall-clock budget makes censoring depend on the host.
+- **Unchanged.** No hypothesis, §6 rule, reading, cell, seed, cap, budget, `max_entries` or `max_cols` changes. Amendment
+  8's readings and Amendment 13's H-null rule apply as registered. The `t = 5, c = 7` and `t = 6` cells stay out (a limit
+  change, R3 §3).
