@@ -93,3 +93,23 @@ Its artifact check selects the696074-byte canonical ledger for migration;
 canonical ledger rewrite or registration/verification claim is made on the
 code PR. Its canonical ledger remains byte-identical to the parent.
 [pcc:unverified]
+
+## Subsequent parent refresh
+
+The stacked parent received automated merge683647fbb2c9d21bf8a87161d7e9d4b0f3ffe23f
+from mainb05c8a03af1034fdc6c92c1bb061a9258ad0b555. Its native source and old
+feature evidence are byte-identical to the preceding parent; its canonical PCC
+contents equal that main commit. Full journal-resolution review remains pending.
+A normal local merge into the successor found only the dated journal conflict
+and was aborted without choosing sides. [pcc:unverified]
+
+The [attempt receipt](crypto.parent-refresh-attempt.json) pins both commits,
+original source-journal blob and conflicted result digest. The complete raw
+conflict is losslessly represented by the original Git journal plus the
+[compressed unified patch](crypto.parent-refresh-conflict.journal.patch.xz);
+its reconstruction was compared byte-for-byte before upload. To reconstruct,
+extract the pinned source journal with `git show`, decompress the patch with
+`xz -dc` and apply it with `patch --output RESULT BASE PATCH`; check RESULT's
+SHA256 against the receipt. The full uncompressed conflict is retained locally
+as well. No journal entry or frozen source/body was picked over another.
+[pcc:unverified]
