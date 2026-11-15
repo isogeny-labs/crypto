@@ -160,9 +160,12 @@ struct TripleBank {
 }
 impl TripleBank {
     fn new(b: usize) -> Self {
-        let expected = 8 * b * (b - 1) * (b - 2) / 6;
+        // A rank-first bank should not reserve the entire O(B^3) exhaustive
+        // support. B^2*64 suffices for the frozen B=256 fixture without
+        // a rehash before its measured first rank-255 collision.
+        let initial_capacity = b * b * 64;
         Self {
-            first: HashMap::with_capacity(expected),
+            first: HashMap::with_capacity(initial_capacity),
             hom: HomogeneousRank::new(b),
             templates: 0,
             collisions: 0,
