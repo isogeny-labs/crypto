@@ -102,6 +102,7 @@ fn main() {
                     solver: match std::env::var("HEC_SIEVE_SOLVER").as_deref() {
                         Ok("dense") => Solver::Dense,
                         Ok("reference") => Solver::Reference,
+                        Ok("sgebw") => Solver::SgeBw,
                         _ => Solver::Fast,
                     },
                     ..SieveParams::default()

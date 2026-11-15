@@ -20,3 +20,4 @@ pub mod poly;
 pub mod rng;
 pub mod sieve;
 pub mod solve;
+pub mod solve_bw;
