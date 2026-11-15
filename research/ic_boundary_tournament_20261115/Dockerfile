@@ -15,6 +15,10 @@ RUN curl -fsS https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o /tmp/a
  && unzip -q /tmp/awscliv2.zip -d /tmp \
  && /tmp/aws/install \
  && rm -rf /tmp/aws /tmp/awscliv2.zip
+# Reinstall the pinned toolchain after the local storage fault; validate the executable.
+RUN rustup toolchain uninstall 1.99.1 \
+ && rustup toolchain install 1.99.1 --profile minimal \
+ && rustc --version
 COPY request.json run.sh /opt/tournament/
 RUN chmod 755 /opt/tournament/run.sh
 LABEL org.opencontainers.image.source="https://github.com/isogeny-labs/crypto" org.opencontainers.image.algorithm-revision="a10cb7b4f8e48f094efe70c31d9a24b6d72aee4a"
