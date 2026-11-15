@@ -1,0 +1,18 @@
+{
+  "schema": "n83.k600-s3-adoption-execution-lock/v1",
+  "status": "FROZEN_BEFORE_EXECUTION",
+  "protocol_commit": "865312e46cdd90211cbe0c58667ff34e8598813d",
+  "native_code_commit": "1bcf8308d007d2ee6c69514108c4934425ac4962",
+  "source_manifest_sha256": "438cd804ba99160121fecce4e072b1b71ae87ea5be58110bbb7e12752df185ff",
+  "artifact_pointer_sha256": "432355b8ac52b5b0f019e8bbb4dcec496f41946b1c20a413c38b8b175e243404",
+  "store_index_sha256": "298b5c1396b58a1b4025813be092934be6f65e34544856d92f1edadabeabd28b",
+  "compressed_sha256": "3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf",
+  "remote": "s3://setec-astronomy-artifacts/store",
+  "aws_profile": "ecc-challenges-new",
+  "aws_account": "104186811093",
+  "host": "Darwin arm64, local shared host L0",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cap_seconds": 300,
+  "command": "AWS_PROFILE=ecc-challenges-new CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/store CRYPTO_STORE_INDEX=/private/tmp/n83-k600-s3-adoption-20261115-1/inputs/store-index.json CRYPTO_STORE_CACHE=/private/tmp/n83-k600-s3-adoption-20261115-1/normal-cache RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc gtimeout -s TERM 300s cargo run --release --locked --offline --example koblitz_n83_factor_base_export -- primary-store-v3-adopt-readonly /private/tmp/n83-k600-s3-adoption-20261115-1/source /private/tmp/n83-k600-s3-adoption-20261115-1/inputs/artifact-pointer.json 438cd804ba99160121fecce4e072b1b71ae87ea5be58110bbb7e12752df185ff 432355b8ac52b5b0f019e8bbb4dcec496f41946b1c20a413c38b8b175e243404 s3://setec-astronomy-artifacts/store 300 /private/tmp/n83-k600-s3-adoption-20261115-1/output",
+  "selected_best_total_runtime": null
+}
