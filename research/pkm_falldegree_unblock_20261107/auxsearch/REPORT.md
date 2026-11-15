@@ -45,10 +45,10 @@ the means sit about 13% high, all three inside H's interval. The protocol allows
 - Group operations are additions plus doublings (`GroupOps`). Almost all of them are Mestre/BSGS point counting:
   constant per curve (about 1,656, of order p^(1/4)).
 - The search therefore costs about **1,656 · 2^t group operations**, and the chain is negligible.
-- For scale: rho on a curve of order about P1 takes roughly √(πn/4) ≈ 4.0 × 10^4 steps (an expected-value formula,
-  not a matched measurement). At t = 14 the search is about 770× that.
-- It is a per-prime precomputation, made once for every target over F_p. It is not charged per target here. A per-target
-  comparison that included it would have to charge it.
+- **Scope (owner, 2026-11-15): finding the auxiliary curve and the isogenies is not part of the success criteria.**
+  This cost is a description of the setup, made once per prime. It is not compared with rho and enters no criterion or
+  tier reading. `docs/ic/SUCCESS_CRITERIA.md` ("One target, cold"; the transfer-map rule) still says to charge
+  target-independent setup in full. Whether to amend that document is the owner's decision; it is not changed here.
 - Point counting by SEA instead of BSGS would lower the per-curve constant (not measured).
 
 ![fig](fig1.svg)
@@ -66,4 +66,4 @@ the means sit about 13% high, all three inside H's interval. The protocol allows
 ## Not claimed
 
 No fall-degree reading changes. Isogeny factor bases show no solving-degree advantage (iso-a / iso-14 readings). This
-study adds that their setup costs ~2^t · p^(1/4) group operations per prime.
+study describes their setup (~2^t · p^(1/4) group operations per prime), outside the criteria.
