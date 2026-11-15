@@ -1,0 +1,44 @@
+{
+  "schema": "n83.attempt-output-readback/v1",
+  "attempt": "05",
+  "s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-05/results/",
+  "indexed_files": 420,
+  "index_sha256": "576dcb86414d3c93d40e4384650a606f4a8eebff833ac8f343e6f6c9ec4561c3",
+  "readback_byte_identical": true,
+  "candidate_input_systems": 0,
+  "top_certificates": 0,
+  "shards_downloaded": 0,
+  "failure": {
+    "schema": "n83.runner-error/v1",
+    "exit_code": 1,
+    "line": 43,
+    "command": "aws s3 ls \"$DEST\" --recursive > \"$HERE/pre-run-results-s3-list.txt\"",
+    "utc": "2026-11-05T18:01:12.277785+00:00"
+  },
+  "terminal": {
+    "schema": "n83.candidate-top-run-terminal/v1",
+    "candidate_id": "spike38",
+    "attempt": "05",
+    "started_at": "2026-11-05T18:01:11Z",
+    "finished_at": "2026-11-05T18:01:12Z",
+    "exit_code": 1,
+    "wall_valid": false
+  },
+  "controller": {
+    "schema": "n83.topform-controller-status/v1",
+    "candidate": "spike38",
+    "attempt": "05",
+    "start_utc": "2026-11-05T18:01:11Z",
+    "end_utc": "2026-11-05T18:01:12Z",
+    "launcher_exit_code": 1,
+    "wall_cap_seconds": 12850,
+    "termination_grace_seconds": 45,
+    "wall_clock_valid": false
+  },
+  "protocol_hash_check": {
+    "schema": "n83.protocol-hash-check/v1",
+    "expected_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "actual_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "match": true
+  }
+}
