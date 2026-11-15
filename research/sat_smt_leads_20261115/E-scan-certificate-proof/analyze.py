@@ -143,36 +143,45 @@ for arm in ("cold", "warm", "free"):
                      "bits_from_l3_geomean": round(math.log2(r4[0]["final"]["clauses"]) - sum(g3) / len(g3), 2)}
 dec["partial_17_4_rup_only"] = part
 # step 3 at the largest l with 6 complete cold/warm targets
-share = {}
-for l in sorted({r["l"] for r in rows if r["n"] == PRIMARY_N}):
-    per = {}
-    for r in rows:
-        if r["n"] == PRIMARY_N and r["l"] == l and r["arm"] in ("cold", "warm") and r.get("checked") and r.get("sharing"):
-            k = r["target"]
-            if k not in per or r["final"]["clauses"] < per[k]["final"]["clauses"]:
-                per[k] = r
-    for m in mins:
-        if m["n"] == PRIMARY_N and m["l"] == l:
-            k = m["target"]
-            if k not in per or m["best_clauses"] < per[k]["final"]["clauses"]:
-                per[k] = {"final": {"clauses": m["best_clauses"]}, "sharing": m["sharing"], "arm": "min3:" + m["best_label"], "target": k}
-    if len(per) == 6:
-        med = sorted(p["sharing"]["median"] for p in per.values())
-        share[l] = {"per_target_median": [per[k]["sharing"]["median"] for k in sorted(per)],
-                    "per_target_mean": [per[k]["sharing"]["mean"] for k in sorted(per)],
-                    "per_target_share_ge4": [per[k]["sharing"]["share_ge4"] for k in sorted(per)],
-                    "per_target_source": [per[k]["arm"] for k in sorted(per)],
-                    "per_target_size": [per[k]["final"]["clauses"] for k in sorted(per)],
-                    "median_of_medians": (med[2] + med[3]) / 2}
+def share_for(N):
+  share = {}
+  for l in sorted({r["l"] for r in rows if r["n"] == N}):
+      per = {}
+      for r in rows:
+          if r["n"] == N and r["l"] == l and r["arm"] in ("cold", "warm") and r.get("checked") and r.get("sharing"):
+              k = r["target"]
+              if k not in per or r["final"]["clauses"] < per[k]["final"]["clauses"]:
+                  per[k] = r
+      for m in mins:
+          if m["n"] == N and m["l"] == l:
+              k = m["target"]
+              if k not in per or m["best_clauses"] < per[k]["final"]["clauses"]:
+                  per[k] = {"final": {"clauses": m["best_clauses"]}, "sharing": m["sharing"], "arm": "min3:" + m["best_label"], "target": k}
+      if len(per) == 6:
+          med = sorted(p["sharing"]["median"] for p in per.values())
+          share[l] = {"per_target_median": [per[k]["sharing"]["median"] for k in sorted(per)],
+                      "per_target_mean": [per[k]["sharing"]["mean"] for k in sorted(per)],
+                      "per_target_share_ge4": [per[k]["sharing"]["share_ge4"] for k in sorted(per)],
+                      "per_target_source": [per[k]["arm"] for k in sorted(per)],
+                      "per_target_size": [per[k]["final"]["clauses"] for k in sorted(per)],
+                      "median_of_medians": (med[2] + med[3]) / 2}
+  return share
+
+
+share = share_for(PRIMARY_N)
+share13 = share_for(13)
 if share:
     L = max(share)
     dec["step3"] = {"l": L, "leaves": 1 << L, "median_of_medians": share[L]["median_of_medians"],
                     "decision": "cross-leaf sharing" if share[L]["median_of_medians"] >= 4 else "no cross-leaf sharing shown"}
+if 4 in share13:
+    dec["step3_posthoc_n13_l4"] = {"l": 4, "leaves": 16, "median_of_medians": share13[4]["median_of_medians"],
+                                   "rule_value": ">= 4" if share13[4]["median_of_medians"] >= 4 else "< 4"}
 min_sum = {}
-for l in sorted({m["l"] for m in mins}):
-    ms = [m for m in mins if m["l"] == l]
+for (nn, l) in sorted({(m["n"], m["l"]) for m in mins}):
+    ms = [m for m in mins if m["l"] == l and m["n"] == nn]
     g = lambda k: round(2 ** (sum(math.log2(m[k]) for m in ms) / len(ms)), 1)
-    min_sum[l] = {"targets": len(ms), "geomean_best": g("best_clauses"), "geomean_noshare_reference": g("noshare_reference"),
+    min_sum["n%d_l%d" % (nn, l)] = {"targets": len(ms), "geomean_best": g("best_clauses"), "geomean_noshare_reference": g("noshare_reference"),
                   "ratio_best_to_reference": [m["ratio_best_to_reference"] for m in ms],
                   "best_labels": [m["best_label"] for m in ms],
                   "best_leaf_equivalents": [round(m["ratio_best_to_reference"] * m["leaves"], 2) for m in ms],
@@ -182,11 +191,27 @@ for l in sorted({m["l"] for m in mins}):
                   "sharing_share_all_leaves": [m["sharing"]["share_all_leaves"] for m in ms],
                   "all_forward_checked": all(m["best_forward_check"] for m in ms)}
 
+# descriptive two-variable fit for xproof over every complete cell (post hoc): log2 size = a + b l + c log2 n
+pts = [(r["l"], math.log2(r["n"]), math.log2(r["final"]["clauses"])) for r in rows if r["arm"] == "xproof" and r.get("checked") and r["l"] <= 5]
+A = np.array([[1, p[0], p[1]] for p in pts]); y = np.array([p[2] for p in pts])
+coef, res_, _, _ = np.linalg.lstsq(A, y, rcond=None)
+rng = random.Random(1); bsb = []; bsc = []
+for _ in range(2000):
+    idx = [rng.randrange(len(pts)) for _ in pts]
+    cf = np.linalg.lstsq(A[idx], y[idx], rcond=None)[0]; bsb.append(cf[1]); bsc.append(cf[2])
+bsb.sort(); bsc.sort()
+dec["xproof_two_variable_fit_posthoc"] = {"model": "log2(size) = a + b*l + c*log2(n)", "rows": len(pts), "b_bits_per_l": round(float(coef[1]), 3),
+    "b_ci95": [round(bsb[49], 3), round(bsb[1949], 3)], "c_power_of_n": round(float(coef[2]), 3), "c_ci95": [round(bsc[49], 3), round(bsc[1949], 3)],
+    "max_abs_residual_bits": round(float(np.max(np.abs(A @ coef - y))), 3)}
+x6 = [r for r in rows if r["arm"] == "xproof" and r["l"] == 6 and r.get("checked")]
+g5 = [math.log2(r["final"]["clauses"]) for r in rows if r["arm"] == "xproof" and r["l"] == 5 and r["n"] == 17]
+if x6:
+    dec["xproof_partial_17_6"] = {"targets": len(x6), "size": x6[0]["final"]["clauses"], "bits_from_l5_geomean": round(math.log2(x6[0]["final"]["clauses"]) - sum(g5) / len(g5), 2), "seconds": x6[0]["solve_s"]}
 REF = {"pilot01_cdcl_found_conflicts": {"slope": 3.34, "ci95": [3.24, 3.42], "n": 17, "l": "2..5", "source": "../../sat_smt_leads_20261114/01-proof-size-slope/README.md"},
        "pilot01_cdcl_found_trimmed_core": {"slope": 3.27, "ci95": [3.14, 3.38], "n": 17, "l": "2..5",
                                            "geomean": {2: 296, 3: 1802, 4: 22063, 5: 246904}},
        "scan_count_2^l": {"slope": 1.0}}
-json.dump({"standing": "[pcc:unverified] local pilot", "fits": FITS, "decisions": dec, "sharing_by_l": share,
+json.dump({"standing": "[pcc:unverified] local pilot", "fits": FITS, "decisions": dec, "sharing_by_l": share, "sharing_by_l_n13": share13,
            "step3_minimisation": min_sum, "status_counts": {a: dict(v) for a, v in status.items()},
            "forward_check_counts": {a: dict(v) for a, v in fwd.items()}, "references": REF,
            "rows": rows, "min_rows": mins}, open("results.json", "w"), indent=1)
@@ -203,7 +228,7 @@ for f in FITS:
             f["ci95"][0], f["ci95"][1], ", ".join("%s: %s" % kv for kv in f["geomean"].items()), f.get("note", "")))
 T += ["", "## Check status per arm", ""] + ["- %s: %s; forward check: %s" % (a, dict(v), dict(fwd.get(a, {}))) for a, v in status.items()]
 T += ["", "## Decisions", "", "```", json.dumps(dec, indent=1), "```", "", "## Sharing by l (smallest verified cold/warm/minimised proof per target)", "",
-      "```", json.dumps(share, indent=1), "```", "", "## Step 3 minimisation", "", "```", json.dumps(min_sum, indent=1), "```"]
+      "```", json.dumps({"n17": share, "n13": share13}, indent=1), "```", "", "## Step 3 minimisation", "", "```", json.dumps(min_sum, indent=1), "```"]
 open("tables.md", "w").write("\n".join(T) + "\n")
 
 # ---- figure
