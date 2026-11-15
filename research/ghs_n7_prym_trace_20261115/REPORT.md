@@ -10,9 +10,9 @@ Hess's [Theorems 14–15 and Section 8.3](https://www.cambridge.org/core/service
 
 ## Exact q=2 result
 
-The fixed field representation is F2[z]/(z^7+z+1), with E(a,b): `y^2+xy=x^3+a x^2+b`. The census contains 56 W1 coefficients and both a twists, 112 exact curves. Fourteen coefficients lie in the classical cubic kernels. The other 42 give six trace classes absent from this classical coefficient slice, plus two shared trace classes. The table lists one exact nonclassical representative for each class.
+The fixed field representation is F2[z]/(z^7+z+1), with E(a,b): `y^2+xy=x^3+a x^2+b`. The census contains 56 coefficients satisfying the W1 coefficient pattern and both a twists, 112 exact curves. Exactly the 56 rows with `a=1` are W1; the `a=0` rows are a paired coefficient control. Fourteen coefficients lie in the classical cubic kernels. The other 42 give six trace classes absent from this classical coefficient slice, plus two shared trace classes. The table lists one exact nonclassical representative for each class.
 
-| trace t | E(a,b) | #E(F128) | degree-7 places if genus-7 Y exists | classical W1 trace class? |
+| trace t | E(a,b) | #E(F128) | degree-7 places if genus-7 Y exists | classical coefficient trace class? |
 |---:|:---|---:|---:|:---|
 | -17 | (1,26) | 146 | 35 | no |
 | -9 | (1,8) | 138 | 27 | no |
@@ -23,9 +23,9 @@ The fixed field representation is F2[z]/(z^7+z+1), with E(a,b): `y^2+xy=x^3+a x^
 | 9 | (0,8) | 120 | 9 | no |
 | 17 | (0,26) | 112 | 1 | no |
 
-![Trace classes of classical and nonclassical W1 coefficients](trace-classes.svg){width=65%}
+![Trace classes of classical and nonclassical coefficient slices](trace-classes.svg){width=65%}
 
-The classical W1 slice has traces `{-15,-1,1,15}`. Every observed trace is ordinary and outside the ±13 exceptional subfield-isogeny traces, so the genus-seven floor applies to all 112 curves. The degree-seven place bound `18-t>=0` is met in every row. The six nonclassical-only trace classes are a concrete *arithmetic search subset* of the **published** W1 family. The equations and subset do not constitute a new vulnerable family; the orders here are small and this run has no attack-cost measurement.
+The classical coefficient slice across both twists has traces `{-15,-1,1,15}`; its actual W1 rows have traces `{-1,15}`. Every observed trace is ordinary and outside the ±13 exceptional subfield-isogeny traces, so the genus-seven floor applies to all 112 curves. The degree-seven place bound `18-t>=0` is met in every row. The nonclassical coefficient slice is an arithmetic screen across two twist families; W1 status additionally requires absolute `Tr(a)=1`. The equations and subset do not constitute a new vulnerable family; the orders here are small and this run has no attack-cost measurement.
 
 A second native program [replayed all 112 orders](reports/replay-20261115T0833Z/RUN.md) by directly testing every (x,y) pair in the fixed field, with a separate carryless multiplication routine. It matched the CSV orders, traces and place-count values. This is a local algorithmic cross-check; a PCC signed verdict and independent geometric review remain open.
 
@@ -39,15 +39,15 @@ The [same proof for any even q](BRANCH_SUPPORT_BOUND.md) gives an exact branch-s
 
 The [complete finite census](HYPERELLIPTIC_CLASSIFICATION.md) tested 294,912 normalized equations over those supports. A separate direct `(x,y)` program reproduced every stage count and trace bin. The only genus-seven hyperelliptic Jacobian traces are `±15, ±13, ±9, ±1`, with one F2-isomorphism class per trace in this normalized search. Intersecting with the W1 source traces gives:
 
-Of the 112 exact source equations, 84 pass the genus-seven hyperelliptic isogeny-class existence screen and 28 (`±17,±7`) fail it. The 42 `±9` passing equations are entirely in the nonclassical W1 slice. These counts do not certify any subgroup transfer.
+Of the 56 actual W1 equations, 42 pass the genus-seven hyperelliptic isogeny-class existence screen (traces `{-9,-1,15}`) and 14 (traces `{-17,7}`) fail it. The separate 56 `a=0` paired controls include 42 passing and 14 failing equations. The +9 passing rows are published W0, and the −9 passing rows are W1. These counts do not certify any subgroup transfer.
 
 The trace-set intersection and witness seventh-count arithmetic were checked in [`HyperellipticTraceLedger.lean`](HyperellipticTraceLedger.lean). The Lean input lists come from the native census; the geometric completeness theorem and Jacobian isogeny application remain paper-level and require independent review. The [proof map and prior-work check](HYPERELLIPTIC_CLASSIFICATION.md) give the exact scope.
 
 | W1 trace class | genus-seven hyperelliptic target with the required Weil polynomial | source status |
 |:---|:---|:---|
-| `±15`, `±1` | exists | classical or shared W1 slice |
-| `±9` | exists, with explicit equations | nonclassical W1 slice only |
-| `±17`, `±7` | excluded by complete F2 census | nonclassical W1 slice only |
+| `−1`, `+15` | exists | classical or shared W1 coefficient slice |
+| `−9` | exists, with explicit equation | W1 isogeny-class geometry lead |
+| `−17`, `+7` | excluded by complete F2 hyperelliptic census | W1; other target geometries remain open |
 
 For example, `E(1,8)/F128` has trace −9, and `Y/F2: y²+(x⁷+x³+x²+x+1)y = x¹⁵+x¹⁴+x⁶+x⁵+x⁴+x³+x` has the required genus-seven Weil polynomial; the bit encodings are `v=0x8f, u=0xc07a`. This is an isogeny-class match. An explicit correspondence from this E to J_Y, its subgroup action, and complete attack cost are not yet established. Nonhyperelliptic genus-seven targets remain outside this census.
 
@@ -55,4 +55,4 @@ For example, `E(1,8)/F128` has trace −9, and `Y/F2: y²+(x⁷+x³+x²+x+1)y = 
 
 ## Next discriminating step
 
-The ±9 isogeny-class witness is the most focused follow-up: construct an explicit k-rational algebraic correspondence from A to J_Y and evaluate it on a chosen prime-order source subgroup. Also examine nonhyperelliptic genus-seven targets for the excluded hyperelliptic traces. Then run complete relation/decomposition, linear algebra, target recovery and matched rho with setup charged. A point-count match alone does not supply a map or a lower-cost logarithm algorithm.
+The −9 W1 isogeny-class witness is the focused geometry follow-up; the +9 direct route is published W0. [Hess, Section 6](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/315278965D8D277A85812D9498236A88/S146115700000108Xa.pdf/generalising-the-ghs-attack-on-the-elliptic-curve-discrete-logarithm-problem.pdf) gives a general isogeny barrier: W0 curves have group order divisible by four, while W1 curves have group order two modulo four. Thus an isogeny over the same source field cannot turn the −9 W1 curve into a W0 curve; the q2 nonintersection is an instance of this published theorem. For −9, construct an explicit k-rational algebraic correspondence from A to J_Y and evaluate it on a chosen prime-order source subgroup. Also examine nonhyperelliptic genus-seven targets for the excluded hyperelliptic traces. Then run complete relation/decomposition, linear algebra, target recovery and matched rho with setup charged. A point-count match alone does not supply a map or a lower-cost logarithm algorithm.
