@@ -15,7 +15,9 @@
 //! --budget 4000000 --arms oracle,native,native-aa,cms,cadical --export /tmp/b0
 //! --ext-bin tools/b0-ext-solvers/target/release/b0-ext-solvers`
 use crypto_lib::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly};
-use crypto_lib::cryptanalysis::binary_semaev_chain_sat::{chain_s3_max_variables, ChainedS3Encoding};
+use crypto_lib::cryptanalysis::binary_semaev_chain_sat::{
+    chain_s3_max_variables, ChainedS3Encoding,
+};
 use crypto_lib::cryptanalysis::binary_semaev_s4::{elementary_symmetric_3, symmetrised_s4_eval};
 use crypto_lib::cryptanalysis::ic_corpus::plant_nondegenerate;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{find_irreducible_sparse, points_with_x};
@@ -63,7 +65,11 @@ fn parse_args() -> Cfg {
     };
     let mut i = 1;
     while i < v.len() {
-        let val = || v.get(i + 1).unwrap_or_else(|| panic!("{} needs a value", v[i])).clone();
+        let val = || {
+            v.get(i + 1)
+                .unwrap_or_else(|| panic!("{} needs a value", v[i]))
+                .clone()
+        };
         match v[i].as_str() {
             "--l" => c.l = val().parse().expect("l"),
             "--n" => c.n = val().parse().expect("n"),
@@ -87,7 +93,10 @@ fn parse_args() -> Cfg {
     }
     assert!(c.l < c.n && c.n <= 62, "need l < n <= 62");
     if c.arms.iter().any(|a| a == "cms" || a == "cadical") {
-        assert!(c.ext_bin.is_some() && c.export.is_some(), "cms/cadical arms need --ext-bin and --export");
+        assert!(
+            c.ext_bin.is_some() && c.export.is_some(),
+            "cms/cadical arms need --ext-bin and --export"
+        );
     }
     c
 }
@@ -100,22 +109,50 @@ fn verify(xs: &[F2mElement; 3], x_r: &F2mElement, irr: &IrreduciblePoly) -> bool
 /// Model bits of the `3ℓ` x-variables (`x_{i,j}` is variable `1 + i·ℓ + j`) to field elements.
 fn xs_from_bits(bits: &[bool], l: u32, gf: &Gf2) -> [F2mElement; 3] {
     let word = |i: usize| -> u64 {
-        (0..l as usize).fold(0u64, |acc, j| acc | ((bits[i * l as usize + j] as u64) << j))
+        (0..l as usize).fold(0u64, |acc, j| {
+            acc | ((bits[i * l as usize + j] as u64) << j)
+        })
     };
-    [gf.to_element(word(0)), gf.to_element(word(1)), gf.to_element(word(2))]
+    [
+        gf.to_element(word(0)),
+        gf.to_element(word(1)),
+        gf.to_element(word(2)),
+    ]
 }
 
-fn run_native(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2, budget: u64, aa_seed: Option<u64>) -> Value {
+fn run_native(
+    n: u32,
+    l: u32,
+    irr: &IrreduciblePoly,
+    x_r: &F2mElement,
+    gf: &Gf2,
+    budget: u64,
+    aa_seed: Option<u64>,
+) -> Value {
     let one = F2mElement::one(n);
     let t_enc = Instant::now();
-    let mut enc = encode_semaev_s4_with(n, l, irr, &one, x_r, S4Options { encoding: XorEncoding::Native, break_symmetry: true });
+    let mut enc = encode_semaev_s4_with(
+        n,
+        l,
+        irr,
+        &one,
+        x_r,
+        S4Options {
+            encoding: XorEncoding::Native,
+            break_symmetry: true,
+        },
+    );
     let encode_ms = t_enc.elapsed().as_secs_f64() * 1e3;
     if let Some(s) = aa_seed {
         enc.solver.scramble_saved_phases(s);
     }
     enc.solver.conflict_budget = budget;
     let t = Instant::now();
-    let r = if enc.trivially_unsat { SolveResult::Unsat } else { enc.solver.solve() };
+    let r = if enc.trivially_unsat {
+        SolveResult::Unsat
+    } else {
+        enc.solver.solve()
+    };
     let wall_ms = t.elapsed().as_secs_f64() * 1e3;
     let (status, verified) = match r {
         SolveResult::Sat => {
@@ -151,11 +188,28 @@ fn run_native(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2,
 /// summands confined to the subspace by domain clauses, `x₁ ≤ x₂ ≤ x₃` lex symmetry breaking,
 /// both identity patterns solved (a refutation needs both UNSAT). `priority_first_pair` puts
 /// only the `x₁, x₂` bits ahead of VSIDS, so `t` and `x₃` are reached by propagation.
-fn run_chain(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2, budget: u64, priority_first_pair: bool) -> Value {
+fn run_chain(
+    n: u32,
+    l: u32,
+    irr: &IrreduciblePoly,
+    x_r: &F2mElement,
+    gf: &Gf2,
+    budget: u64,
+    priority_first_pair: bool,
+) -> Value {
     let one = F2mElement::one(n);
     let codes: Vec<BigUint> = (0..(1u64 << l)).map(BigUint::from).collect();
     let maxv = (chain_s3_max_variables(n, 3).expect("chain size") * 2 + 10_000) as u32;
-    let (mut conflicts, mut decisions, mut propagations, mut xor_props, mut learnt, mut learnt_lits, mut wall_ms, mut n_vars) = (0u64, 0u64, 0u64, 0u64, 0u64, 0u64, 0f64, 0u64);
+    let (
+        mut conflicts,
+        mut decisions,
+        mut propagations,
+        mut xor_props,
+        mut learnt,
+        mut learnt_lits,
+        mut wall_ms,
+        mut n_vars,
+    ) = (0u64, 0u64, 0u64, 0u64, 0u64, 0u64, 0f64, 0u64);
     let mut status = "unsat";
     let mut verified: Option<bool> = None;
     let mut patterns_run = 0;
@@ -213,8 +267,19 @@ fn run_chain(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2, 
 
 /// New solver: CDCL + XOR engine with field-product gates (`pdp_lin_cdcl.rs`) on the chained-S₃
 /// system; `lex` adds `x₁ ≤ x₂` so the pair count matches the oracle's `X₁ ≤ X₂` scan.
-fn run_lin(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2, budget: u64, lex: bool) -> Value {
-    let irr_mask = irr.low_terms.iter().fold(1u64 << n, |m, &t| m | (1u64 << t));
+fn run_lin(
+    n: u32,
+    l: u32,
+    irr: &IrreduciblePoly,
+    x_r: &F2mElement,
+    gf: &Gf2,
+    budget: u64,
+    lex: bool,
+) -> Value {
+    let irr_mask = irr
+        .low_terms
+        .iter()
+        .fold(1u64 << n, |m, &t| m | (1u64 << t));
     let xr = gf.from_element(x_r);
     let t_build = Instant::now();
     let mut inst = ChainInstance::build(n, l, irr_mask, xr, 1, lex);
@@ -225,8 +290,16 @@ fn run_lin(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2, bu
     let wall_ms = t.elapsed().as_secs_f64() * 1e3;
     let (status, verified, model) = match r {
         LinResult::Sat => {
-            let xs = [inst.solver.model_block(&inst.x1), inst.solver.model_block(&inst.x2), inst.solver.model_block(&inst.x3)];
-            let arr = [gf.to_element(xs[0]), gf.to_element(xs[1]), gf.to_element(xs[2])];
+            let xs = [
+                inst.solver.model_block(&inst.x1),
+                inst.solver.model_block(&inst.x2),
+                inst.solver.model_block(&inst.x3),
+            ];
+            let arr = [
+                gf.to_element(xs[0]),
+                gf.to_element(xs[1]),
+                gf.to_element(xs[2]),
+            ];
             let in_base = xs.iter().all(|&x| x < (1u64 << l));
             ("sat", Some(verify(&arr, x_r, irr) && in_base), Some(xs))
         }
@@ -244,10 +317,37 @@ fn run_lin(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, gf: &Gf2, bu
     })
 }
 
-fn export_instance(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, dir: &str, idx: usize) -> (String, String) {
+fn export_instance(
+    n: u32,
+    l: u32,
+    irr: &IrreduciblePoly,
+    x_r: &F2mElement,
+    dir: &str,
+    idx: usize,
+) -> (String, String) {
     let one = F2mElement::one(n);
-    let enc_x = encode_semaev_s4_with(n, l, irr, &one, x_r, S4Options { encoding: XorEncoding::Native, break_symmetry: true });
-    let enc_c = encode_semaev_s4_with(n, l, irr, &one, x_r, S4Options { encoding: XorEncoding::Cnf, break_symmetry: true });
+    let enc_x = encode_semaev_s4_with(
+        n,
+        l,
+        irr,
+        &one,
+        x_r,
+        S4Options {
+            encoding: XorEncoding::Native,
+            break_symmetry: true,
+        },
+    );
+    let enc_c = encode_semaev_s4_with(
+        n,
+        l,
+        irr,
+        &one,
+        x_r,
+        S4Options {
+            encoding: XorEncoding::Cnf,
+            break_symmetry: true,
+        },
+    );
     let px = format!("{dir}/t{idx:03}.xnf");
     let pc = format!("{dir}/t{idx:03}.cnf");
     std::fs::write(&px, to_dimacs_xor(&enc_x.solver)).expect("write xnf");
@@ -255,9 +355,27 @@ fn export_instance(n: u32, l: u32, irr: &IrreduciblePoly, x_r: &F2mElement, dir:
     (px, pc)
 }
 
-fn run_ext(bin: &str, solver: &str, file: &str, budget: u64, l: u32, x_r: &F2mElement, irr: &IrreduciblePoly, gf: &Gf2) -> Value {
+fn run_ext(
+    bin: &str,
+    solver: &str,
+    file: &str,
+    budget: u64,
+    l: u32,
+    x_r: &F2mElement,
+    irr: &IrreduciblePoly,
+    gf: &Gf2,
+) -> Value {
     let out = Command::new(bin)
-        .args(["--solver", solver, "--file", file, "--budget", &budget.to_string(), "--model-vars", &(3 * l).to_string()])
+        .args([
+            "--solver",
+            solver,
+            "--file",
+            file,
+            "--budget",
+            &budget.to_string(),
+            "--model-vars",
+            &(3 * l).to_string(),
+        ])
         .output()
         .expect("run external solver");
     if !out.status.success() {
@@ -265,8 +383,17 @@ fn run_ext(bin: &str, solver: &str, file: &str, budget: u64, l: u32, x_r: &F2mEl
     }
     let mut v: Value = serde_json::from_slice(&out.stdout).expect("ext json");
     if v["status"] == "sat" {
-        let bits: Vec<bool> = v["model"].as_str().unwrap_or("").chars().map(|c| c == '1').collect();
-        let verified = if bits.len() == 3 * l as usize { verify(&xs_from_bits(&bits, l, gf), x_r, irr) } else { false };
+        let bits: Vec<bool> = v["model"]
+            .as_str()
+            .unwrap_or("")
+            .chars()
+            .map(|c| c == '1')
+            .collect();
+        let verified = if bits.len() == 3 * l as usize {
+            verify(&xs_from_bits(&bits, l, gf), x_r, irr)
+        } else {
+            false
+        };
         v["verified"] = json!(verified);
     } else {
         v["verified"] = Value::Null;
@@ -280,7 +407,11 @@ fn median(xs: &mut Vec<f64>) -> f64 {
     }
     xs.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let m = xs.len() / 2;
-    if xs.len() % 2 == 1 { xs[m] } else { 0.5 * (xs[m - 1] + xs[m]) }
+    if xs.len() % 2 == 1 {
+        xs[m]
+    } else {
+        0.5 * (xs[m - 1] + xs[m])
+    }
 }
 
 fn main() {
@@ -298,7 +429,9 @@ fn main() {
         order: BigUint::from(1u32),
         cofactor: BigUint::from(1u32),
     };
-    let base: Vec<BinaryPoint> = (1..(1u64 << l)).flat_map(|x| points_with_x(&curve, &gf.to_element(x))).collect();
+    let base: Vec<BinaryPoint> = (1..(1u64 << l))
+        .flat_map(|x| points_with_x(&curve, &gf.to_element(x)))
+        .collect();
     let oracle = SubspaceOracle::low_order(l, 1, &gf);
     let pow = 1u64 << l;
     let t_enum_oracle = pow * (pow + 1) / 2; // pairs X1 <= X2 the oracle scans on a refutation
@@ -309,7 +442,10 @@ fn main() {
     if let Some(d) = &cfg.export {
         std::fs::create_dir_all(d).expect("export dir");
     }
-    let mut out_file = cfg.out.as_ref().map(|p| std::fs::File::create(p).expect("out file"));
+    let mut out_file = cfg
+        .out
+        .as_ref()
+        .map(|p| std::fs::File::create(p).expect("out file"));
     let wants = |a: &str| cfg.arms.iter().any(|x| x == a);
 
     // targets: uniform x-coordinates of curve points outside the base, then planted sums
@@ -340,8 +476,15 @@ fn main() {
         let oracle_ms = t0.elapsed().as_secs_f64() * 1e3;
         let oracle_sat = wit.is_some();
         if let Some(w) = wit {
-            let xs = [gf.to_element(w[0]), gf.to_element(w[1]), gf.to_element(w[2])];
-            assert!(verify(&xs, x_r, &irr), "oracle witness fails S'4 at target {idx}");
+            let xs = [
+                gf.to_element(w[0]),
+                gf.to_element(w[1]),
+                gf.to_element(w[2]),
+            ];
+            assert!(
+                verify(&xs, x_r, &irr),
+                "oracle witness fails S'4 at target {idx}"
+            );
         }
         let mut rec = json!({
             "schema": "b0.pdp.sat.target/v1",
@@ -350,32 +493,67 @@ fn main() {
             "t_enum_oracle": t_enum_oracle, "t_enum_pairs": t_enum_pairs, "t_enum_triples": t_enum_triples,
             "oracle": {"sat": oracle_sat, "pairs": pairs, "witness": wit, "wall_ms": oracle_ms},
         });
-        let files = cfg.export.as_ref().map(|d| export_instance(n, l, &irr, x_r, d, idx));
+        let files = cfg
+            .export
+            .as_ref()
+            .map(|d| export_instance(n, l, &irr, x_r, d, idx));
         let mut arms = serde_json::Map::new();
         if wants("native") {
-            arms.insert("native".into(), run_native(n, l, &irr, x_r, &gf, cfg.budget, None));
+            arms.insert(
+                "native".into(),
+                run_native(n, l, &irr, x_r, &gf, cfg.budget, None),
+            );
         }
         if wants("chain") {
-            arms.insert("chain".into(), run_chain(n, l, &irr, x_r, &gf, cfg.budget, false));
+            arms.insert(
+                "chain".into(),
+                run_chain(n, l, &irr, x_r, &gf, cfg.budget, false),
+            );
         }
         if wants("chain-p12") {
-            arms.insert("chain-p12".into(), run_chain(n, l, &irr, x_r, &gf, cfg.budget, true));
+            arms.insert(
+                "chain-p12".into(),
+                run_chain(n, l, &irr, x_r, &gf, cfg.budget, true),
+            );
         }
         if wants("lin") {
-            arms.insert("lin".into(), run_lin(n, l, &irr, x_r, &gf, cfg.budget, true));
+            arms.insert(
+                "lin".into(),
+                run_lin(n, l, &irr, x_r, &gf, cfg.budget, true),
+            );
         }
         if wants("lin-nolex") {
-            arms.insert("lin-nolex".into(), run_lin(n, l, &irr, x_r, &gf, cfg.budget, false));
+            arms.insert(
+                "lin-nolex".into(),
+                run_lin(n, l, &irr, x_r, &gf, cfg.budget, false),
+            );
         }
         if wants("native-aa") {
-            arms.insert("native-aa".into(), run_native(n, l, &irr, x_r, &gf, cfg.budget, Some(cfg.seed ^ 0xA5A5_5A5A ^ idx as u64)));
+            arms.insert(
+                "native-aa".into(),
+                run_native(
+                    n,
+                    l,
+                    &irr,
+                    x_r,
+                    &gf,
+                    cfg.budget,
+                    Some(cfg.seed ^ 0xA5A5_5A5A ^ idx as u64),
+                ),
+            );
         }
         if let (Some(bin), Some((px, pc))) = (&cfg.ext_bin, &files) {
             if wants("cms") {
-                arms.insert("cms".into(), run_ext(bin, "cms", px, cfg.budget, l, x_r, &irr, &gf));
+                arms.insert(
+                    "cms".into(),
+                    run_ext(bin, "cms", px, cfg.budget, l, x_r, &irr, &gf),
+                );
             }
             if wants("cadical") {
-                arms.insert("cadical".into(), run_ext(bin, "cadical", pc, cfg.budget, l, x_r, &irr, &gf));
+                arms.insert(
+                    "cadical".into(),
+                    run_ext(bin, "cadical", pc, cfg.budget, l, x_r, &irr, &gf),
+                );
             }
         }
         for (name, a) in arms.iter_mut() {
@@ -397,8 +575,14 @@ fn main() {
                 a["r_pairs"] = json!(c / t_enum_pairs as f64);
                 a["r_triples"] = json!(c / t_enum_triples as f64);
                 if kind == "uniform" && status != "unknown" {
-                    r_by_arm.entry(name.clone()).or_default().push(c / t_enum_oracle as f64);
-                    r3_by_arm.entry(name.clone()).or_default().push(c / t_enum_triples as f64);
+                    r_by_arm
+                        .entry(name.clone())
+                        .or_default()
+                        .push(c / t_enum_oracle as f64);
+                    r3_by_arm
+                        .entry(name.clone())
+                        .or_default()
+                        .push(c / t_enum_triples as f64);
                 }
             }
         }

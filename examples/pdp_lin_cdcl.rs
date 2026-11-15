@@ -158,12 +158,16 @@ impl LinCdcl {
 
     /// Column `j` of the multiplication-by-`a` matrix: `a · z^j`.
     pub fn mul_matrix(&self, a: u64) -> Vec<u64> {
-        (0..self.field_n).map(|j| self.gf_mul(a, 1u64 << j)).collect()
+        (0..self.field_n)
+            .map(|j| self.gf_mul(a, 1u64 << j))
+            .collect()
     }
 
     /// Column `j` of the squaring matrix: `z^{2j}`.
     pub fn sq_matrix(&self) -> Vec<u64> {
-        (0..self.field_n).map(|j| self.gf_mul(1u64 << j, 1u64 << j)).collect()
+        (0..self.field_n)
+            .map(|j| self.gf_mul(1u64 << j, 1u64 << j))
+            .collect()
     }
 
     // ---- constraint builders ----
@@ -259,7 +263,12 @@ impl LinCdcl {
     }
 
     pub fn add_gate(&mut self, x: Vec<u32>, y: Vec<u32>, z: Vec<u32>) {
-        self.gates.push(Gate { x, y, z, linearised_at: None });
+        self.gates.push(Gate {
+            x,
+            y,
+            z,
+            linearised_at: None,
+        });
     }
 
     // ---- assignment ----
@@ -310,7 +319,16 @@ impl LinCdcl {
     }
 
     fn block_lits(&self, block: &[u32]) -> Vec<i32> {
-        block.iter().map(|&v| if self.assigns[v as usize] == Val::True { v as i32 } else { -(v as i32) }).collect()
+        block
+            .iter()
+            .map(|&v| {
+                if self.assigns[v as usize] == Val::True {
+                    v as i32
+                } else {
+                    -(v as i32)
+                }
+            })
+            .collect()
     }
 
     // ---- propagation ----
@@ -377,10 +395,21 @@ impl LinCdcl {
                 if self.gates[gi].linearised_at.is_some() {
                     continue;
                 }
-                let (xv, yv) = (self.block_value(&self.gates[gi].x), self.block_value(&self.gates[gi].y));
+                let (xv, yv) = (
+                    self.block_value(&self.gates[gi].x),
+                    self.block_value(&self.gates[gi].y),
+                );
                 let (known, other, guard) = match (xv, yv) {
-                    (Some(a), _) => (a, self.gates[gi].y.clone(), self.block_lits(&self.gates[gi].x)),
-                    (None, Some(b)) => (b, self.gates[gi].x.clone(), self.block_lits(&self.gates[gi].y)),
+                    (Some(a), _) => (
+                        a,
+                        self.gates[gi].y.clone(),
+                        self.block_lits(&self.gates[gi].x),
+                    ),
+                    (None, Some(b)) => (
+                        b,
+                        self.gates[gi].x.clone(),
+                        self.block_lits(&self.gates[gi].y),
+                    ),
                     (None, None) => continue,
                 };
                 let cols = self.mul_matrix(known);
@@ -395,7 +424,11 @@ impl LinCdcl {
                         }
                     }
                     vars.sort_unstable();
-                    self.dyn_rows.push(DynRow { row: XorRow { vars, rhs: false }, guard: guard.clone(), level: lvl });
+                    self.dyn_rows.push(DynRow {
+                        row: XorRow { vars, rhs: false },
+                        guard: guard.clone(),
+                        level: lvl,
+                    });
                 }
                 self.gates[gi].linearised_at = Some(lvl);
                 self.stats.gate_linearisations += 1;
@@ -431,7 +464,11 @@ impl LinCdcl {
         let mut rhs: Vec<bool> = Vec::with_capacity(n_rows);
         let mut comb: Vec<Vec<u64>> = Vec::with_capacity(n_rows);
         for ri in 0..n_rows {
-            let row = if ri < n_static { &self.xors[ri] } else { &self.dyn_rows[ri - n_static].row };
+            let row = if ri < n_static {
+                &self.xors[ri]
+            } else {
+                &self.dyn_rows[ri - n_static].row
+            };
             let mut bits = vec![0u64; vw];
             let mut r = row.rhs;
             for &v in &row.vars {
@@ -466,7 +503,11 @@ impl LinCdcl {
             mat.swap(pivot_row, sel);
             rhs.swap(pivot_row, sel);
             comb.swap(pivot_row, sel);
-            let (prow, prhs, pcomb) = (mat[pivot_row].clone(), rhs[pivot_row], comb[pivot_row].clone());
+            let (prow, prhs, pcomb) = (
+                mat[pivot_row].clone(),
+                rhs[pivot_row],
+                comb[pivot_row].clone(),
+            );
             for r in 0..n_rows {
                 if r != pivot_row && mat[r][w] & b != 0 {
                     for k in 0..vw {
@@ -501,7 +542,11 @@ impl LinCdcl {
                 propagated = true;
             }
         }
-        if propagated { GjeOutcome::Propagated } else { GjeOutcome::Quiet }
+        if propagated {
+            GjeOutcome::Propagated
+        } else {
+            GjeOutcome::Quiet
+        }
     }
 
     /// Assigned literals in the original rows of a combination, plus dynamic-row guards.
@@ -551,7 +596,8 @@ impl LinCdcl {
             match best {
                 None => best = Some(key),
                 Some(b) => {
-                    if (key.0, key.1) > (b.0, b.1) || ((key.0, key.1) == (b.0, b.1) && key.2 < b.2) {
+                    if (key.0, key.1) > (b.0, b.1) || ((key.0, key.1) == (b.0, b.1) && key.2 < b.2)
+                    {
                         best = Some(key);
                     }
                 }
@@ -635,7 +681,11 @@ impl LinCdcl {
             }
             p = Some(lit);
             cur = match &self.reason[v] {
-                Reason::Clause(ci) => self.clauses[*ci].iter().copied().filter(|&l| l != lit).collect(),
+                Reason::Clause(ci) => self.clauses[*ci]
+                    .iter()
+                    .copied()
+                    .filter(|&l| l != lit)
+                    .collect(),
                 Reason::Lits(ls) => ls.iter().map(|&l| -l).filter(|&l| l != -lit).collect(),
                 Reason::None => unreachable!("decision on the implication path"),
             };
@@ -648,7 +698,9 @@ impl LinCdcl {
         if learnt.len() > 1 {
             let mut max_i = 1;
             for i in 2..learnt.len() {
-                if self.level[learnt[i].unsigned_abs() as usize] > self.level[learnt[max_i].unsigned_abs() as usize] {
+                if self.level[learnt[i].unsigned_abs() as usize]
+                    > self.level[learnt[max_i].unsigned_abs() as usize]
+                {
                     max_i = i;
                 }
             }
@@ -678,7 +730,10 @@ impl LinCdcl {
                 }
                 let (learnt, bt) = self.analyze(confl);
                 self.backtrack(bt);
-                let pw = learnt.iter().filter(|&&l| self.priority[l.unsigned_abs() as usize]).count();
+                let pw = learnt
+                    .iter()
+                    .filter(|&&l| self.priority[l.unsigned_abs() as usize])
+                    .count();
                 if self.stats.learnt_priority_width.len() <= pw {
                     self.stats.learnt_priority_width.resize(pw + 1, 0);
                 }
@@ -750,7 +805,17 @@ impl ChainInstance {
             next += n;
             v
         };
-        let (x1, x2, x3, t, p, q, v, w, a) = (block(), block(), block(), block(), block(), block(), block(), block(), block());
+        let (x1, x2, x3, t, p, q, v, w, a) = (
+            block(),
+            block(),
+            block(),
+            block(),
+            block(),
+            block(),
+            block(),
+            block(),
+            block(),
+        );
         let n_vars = (next - 1) as usize + if lex_pairs { nn } else { 0 };
         let mut s = LinCdcl::new(n_vars, n, irr);
         let sq = s.sq_matrix();
@@ -837,6 +902,12 @@ impl ChainInstance {
         let mut prio: Vec<u32> = x1[..l as usize].to_vec();
         prio.extend_from_slice(&x2[..l as usize]);
         s.set_priority(&prio);
-        ChainInstance { solver: s, x1, x2, x3, t }
+        ChainInstance {
+            solver: s,
+            x1,
+            x2,
+            x3,
+            t,
+        }
     }
 }
