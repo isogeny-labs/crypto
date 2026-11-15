@@ -52,3 +52,19 @@ new prospective protocols and actual qualified implementations; sufficient
 cost/yield on growing admissible prime-field inputs remains open. A dual audit
 might establish insufficiency of a single finite rowspace, not an asymptotic
 barrier or refutation of the effective-subset theorem. [pcc:unverified]
+
+Integration checks: current main ancestry5a479b3cce and the normally resolved
+core parent are merged without force or rebase. Ledger1068 passes exact prefix
+and chain checks, with no claim event changed. Artifact/large-file gates and
+PCC prose lint pass. A stale unscoped diff inspected inherited main SVG whitespace;
+stopped that read-only process and checked only the PR delta. Unrelated frozen
+main artifacts were preserved. Generated plot whitespace was normalized by its
+rendering script; both rerendered PDF pages are pixel-identical to those inspected.
+[pcc:unverified]
+
+New owner workflow instructions were read after integration, including the
+lessons brief and claim-tier rules. No T3 tier result is claimed. Recorded a
+partial component outcome, confirmations for applied workflow lessons and a
+candidate lesson for the incomplete-basis diagnostic. No candidate lesson was
+promoted by assertion. Autonomy episodes are recorded when the maintained PRs
+actually merge/close; the original research goal remains active.
