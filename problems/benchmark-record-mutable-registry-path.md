@@ -14,7 +14,7 @@ The offline gate initially lacked the archived bytes needed to check a closed re
 
 At main `719ece9f04e68f3c0fff199ff103675aa16922dc`, the closed record declares raw `docs/curves/registry.json` with SHA-256 `1edbd0d717644b047931aba9126431f98862ee96791f4fed3884c40f971c2bc8`. Current registry bytes hash to `33a16da0548b7b0c3482b3ba7198500a0285271794f63e9c46e10f9a02186e4f`. Reading the path at the record's source commit `19b5e74b9af6934ccc0d37f192019337682ed11d` through Git filters reproduces the declared digest exactly.
 
-This establishes availability and byte identity of one archived input. It does not validate the benchmark's execution, costs, other inputs or conclusions. The gate remains failing for this mismatch. The separate open record `20261115T0609Z-genus-ladder-sge-scale` is ongoing work and is preserved; this problem does not close it.
+This establishes availability and byte identity of one archived input. It does not validate the benchmark's execution, costs, other inputs or conclusions. The initial offline gate failed on this mismatch before the guarded archive cache was hydrated; the online CI check already verifies the original stored bytes. The separate open record `20261115T0609Z-genus-ladder-sge-scale` is ongoing work and is preserved; this problem does not close it.
 
 Initial sparse checks also reported missing raw/report/figure paths. Materializing the tracked dependencies and artifact manifests removed those setup findings; the remaining mismatch is present in the committed baseline, independently of the artifact reader patch. This differs from the [full-tree registry rebuild gap](curve-registry-full-tree-rebuild-diverges.md): this record needs its original bytes, regardless of the latest registry's completeness.
 
