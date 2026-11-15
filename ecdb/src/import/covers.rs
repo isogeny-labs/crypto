@@ -4,7 +4,8 @@
 //! curve row (with its Jacobian) and a curve_morphism to E. Existence over the
 //! declared field only: no descent, subgroup-map or DLP-cost claim.
 //! The exact L-polynomial of each cover source's Jacobian is computed at the
-//! end of the import ([`super::cover_lpoly`]).
+//! end of the import ([`super::cover_lpoly`]), and the Prym complement E' of
+//! each genus-2 source after it ([`super::cover_prym`]).
 
 use super::{bulk, bulk1, Ctx, Report};
 use crate::field::Fq;
@@ -220,5 +221,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     report.count("field_status_updates", bulk1(client, FIELD_STATUS_SQL, &rows).await?);
     // The Frobenius data of every cover source, new or imported earlier.
     super::cover_lpoly::import(ctx, &mut report).await?;
+    // Then the Prym complement E' of every genus-2 source with an L-polynomial.
+    super::cover_prym::import(ctx, &mut report).await?;
     Ok(report)
 }

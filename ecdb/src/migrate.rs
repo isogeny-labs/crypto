@@ -42,6 +42,7 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "order_class_groups",
         sql: include_str!("../migrations/0014_order_class_groups.sql"),
     },
+    Migration { version: 15, name: "prym_complement", sql: include_str!("../migrations/0015_prym_complement.sql") },
 ];
 
 pub fn schema_version() -> i32 {

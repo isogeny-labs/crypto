@@ -165,6 +165,10 @@ repository's files matches the checkout.
     equal traces give `isomorphism` (same model) or `birational_model_change`
     (e.g. Montgomery or Edwards against Weierstrass).
   - Sextic and quartic twists at j = 0, 1728 are not recorded yet.
+  - `prym_complement` links the target E of a genus-2 cover H to E', the
+    other elliptic factor of Jac(H) ~ E x E'. Its `map` names H. E' is a
+    curve of family `prym-complement`, and `av_component` holds the
+    decomposition ([`SCHEMA.md`](SCHEMA.md), "Prym complements").
   - None of them transports a discrete logarithm. A walk needs an `isogeny`
     row with its kernel certificate, as the typed curve-link rules require.
 - **GLV.** An endomorphism of kind `glv` with a non-null `eigenvalue` was
