@@ -18,7 +18,7 @@ Matched rho: not rerun (this session's AWS identity is invalid); the lab's repla
 ## Indicative distance to matched rho (not an ecbench S; see PROTOCOL.md for what it omits)
 | cell | w = 0 | w = 0.1 | w = 1 |
 |---|---|---|---|
-| t = 5 G = 3 seed 1550 (previous study, same method) | about 8 (S) | about 5e5 | about 5e6 |
+| t = 5 G = 3 seed 1550 (previous study, same method; recomputed) | gap 3.4 | 5.3e5 | 3.3e6 |
 | t = 4 G = 3 (8 screened seeds) | gap 3.6 | **1.55e5** | 9.7e5 |
 | t = 3 G = 2 | gap 2.7 | **6.8e4** | 4.2e5 |
 | atlas best F4 arm (T13, t = 4 G = 3 seed 1193, trace replay; ecbench measured) | 27.9 | **1.83e4** | 1.13e5 |
