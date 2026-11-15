@@ -3,7 +3,7 @@ import sys, json, time, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ns_degree import *
 
-RAW = os.path.join(os.path.dirname(os.path.abspath(__file__)), "raw")
+RAW = os.environ.get("N1_RAW") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "raw")
 T0 = time.time()
 def log(s): print(f"[{time.time()-T0:7.1f}s] {s}", flush=True)
 def dump(name, obj):
