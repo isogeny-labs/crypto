@@ -1,0 +1,58 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-pkm-m8-panelA-20261114-1
+experiment_id: pkm_m8_sparse_panel_20261114
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 8ac7f57734eec702d7fbe7c4c50c1366c8168141
+receipt: research/pkm_m8_sparse_panel_20261114/cards/CARD-pkm-m8-panelA-20261114-1.receipt.json
+binds:
+  - {path: research/pkm_m8_sparse_panel_20261114/PROTOCOL.md, sha256: ffbf07c2a893efa6910fb2169619871df7ec4497298048bd597995a03720744e}
+  - {path: research/pkm_m8_sparse_panel_20261114/protocol.json, sha256: 81585f274c13af62df70b744179a9d09abf5a547dbd34d2dda41944b40599789}
+  - {path: research/pkm_m8_sparse_panel_20261114/FREEZE.json, sha256: cc7ca94207479bdfb585dff26c109e1472448363410b48a5e69db6a88fa2963d}
+  - {path: research/pkm_m8_sparse_panel_20261114/AMENDMENTS.md, sha256: 9885e6a803f7976b57aff5e4eeb2c14129c42f092a7fc7976fdac77619f83304}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/plan.json, sha256: 8c753d79af929b4886d93225a88051f77b08f2ce596a19d265a64df710a7474e}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/bundle.tgz, sha256: a4c33a32775ce6e825a877428a4543709887100f19ba9fb85f93bd770f577931}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/launch.sh, sha256: 88de4f76925c7df5a012a413c30f10843aeea677a1983b9ba42eb4b6e9a5afd5}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/job.sh, sha256: dd243da0abb0723e964b94d5d7329c570412002bb9b9e9f77a2ec100719b7bd4}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/guard.sh, sha256: 667ea094e069bb1ecc392a05a9477c7c83c197d718c4aded1db64dcf965809e1}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/podserver.py, sha256: 9f2f01126631451768f2164cc51c89883ad7c53b14bb96a5b123d20f67c4baaf}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/rp.sh, sha256: 9627bd510c6f36f2631f69e7d6fa74493f2b8ab6dbb5a5c35f8c8915d99096f2}
+  - {path: research/pkm_m8_sparse_panel_20261114/pod/parse_msolve_log.py, sha256: 9758ac06b13db7e2dd796cbbb2ea6fe45aa862460d0aaf280efda09c85c12362}
+  - {path: research/pkm_m8_sparse_panel_20261114/cells/MANIFEST.json, sha256: ef386a8972b71fd89732ead1e87d31aeb986b5100520006db7f220b531d80573}
+  - {path: benchmarks/records/20261114T2333Z-pkm-m8-panel-a.json, sha256: 4814691619b781f9472d9926cb81d5797d884571e7cf6e2894509d9b07ede7a1}
+  - {path: tools/benchrec.py, sha256: 42f9b9ca0a343bcc381d37eef14437e656f892e773fd39cfac9d0d7b6f208ea3}
+  - {path: tools/task_card.py, sha256: ef72b3f7ec9f2592af1035fb2e77158ea89cea8443ad56311d603384b48078cf}
+  - {path: target/release/examples/pkm_m8_panel, sha256: b83a2f19d3cd7b2874c4da3e419218bf1b2f82b3a8c34ad58894f0b84354545f}
+must_not_exist: [research/pkm_m8_sparse_panel_20261114/results/20261115T0010Z]
+commands:
+  - id: head-ancestor
+    argv: [git, merge-base, --is-ancestor, 97def9de33ea3b234d8bdcebb5e2732c5d2f889f, HEAD]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+  - id: bundle-sha
+    argv: [sha256sum, research/pkm_m8_sparse_panel_20261114/pod/bundle.tgz]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/pkm_m8_sparse_panel_20261114/cards/CARD-pkm-m8-panelA-20261114-1.bundle-sha.stdout
+    stderr: research/pkm_m8_sparse_panel_20261114/cards/CARD-pkm-m8-panelA-20261114-1.bundle-sha.stderr
+  - id: no-pkm-pods
+    argv: [bash, research/pkm_m8_sparse_panel_20261114/pod/rp.sh, pods]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/pkm_m8_sparse_panel_20261114/cards/CARD-pkm-m8-panelA-20261114-1.no-pkm-pods.stdout
+    stderr: research/pkm_m8_sparse_panel_20261114/cards/CARD-pkm-m8-panelA-20261114-1.no-pkm-pods.stderr
+  - id: launch
+    argv: [python3, tools/benchrec.py, run, benchmarks/records/20261114T2333Z-pkm-m8-panel-a.json, --, bash, research/pkm_m8_sparse_panel_20261114/pod/launch.sh, --bundle, research/pkm_m8_sparse_panel_20261114/pod/bundle.tgz, --out, research/pkm_m8_sparse_panel_20261114/results/20261115T0010Z, --deadline-h, "72", --poll-s, "600", --stamp, 20261115T0010Z]
+    timeout_seconds: 288000
+    success_exit_codes: [0]
+    stdout: research/pkm_m8_sparse_panel_20261114/cards/CARD-pkm-m8-panelA-20261114-1.launch.stdout
+    stderr: research/pkm_m8_sparse_panel_20261114/cards/CARD-pkm-m8-panelA-20261114-1.launch.stderr
+    outputs: [research/pkm_m8_sparse_panel_20261114/results/20261115T0010Z/launch.json, research/pkm_m8_sparse_panel_20261114/results/20261115T0010Z/runs.jsonl]
+bus_address: executor-mechanical-pkm-m8-panela
+background: true
+write_scope: [research/pkm_m8_sparse_panel_20261114/, benchmarks/records/, .resume/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the original output files.
+  - Do not create a second pod.
+  - Do not raise any cap.
