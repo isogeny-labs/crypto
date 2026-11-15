@@ -301,7 +301,59 @@ fn controls(start: &Instant) {
     );
     println!("CONTROLS norm_elements={elements} genus2_curves={curves} congruence_cases=43 mod3_cases=2 pass=true");
 }
+fn orders(path: &str) {
+    let text = fs::read_to_string(path).unwrap();
+    let mut label = String::new();
+    let mut polys = Vec::new();
+    let mut cases = 0;
+    let mut factors = 0;
+    for line in text.lines() {
+        if line.starts_with("CURVE ") {
+            label = line
+                .split_whitespace()
+                .take(4)
+                .skip(1)
+                .collect::<Vec<_>>()
+                .join(" ");
+            polys.clear();
+        }
+        if line.starts_with("FACTOR ") && !label.is_empty() {
+            let start = line.find('[').unwrap();
+            let end = line.find(']').unwrap();
+            let c: Vec<u64> = line[start + 1..end]
+                .split(',')
+                .map(|s| s.trim().parse().unwrap())
+                .collect();
+            polys.push(Poly::from_coeffs(&c));
+        }
+        if line.starts_with("CASE ") && line.contains("status=abstract_regular_kernels ") {
+            assert_eq!(polys.len(), 2);
+            for f in &polys {
+                assert_eq!(factor3(*f), vec![(*f, 1)]);
+                let bound = 3u64.pow(f.deg() as u32) - 1;
+                let fp = Fp::new(3);
+                let x = Poly::x();
+                assert_eq!(x.powmod(bound, f, &fp), Poly::one());
+                let order = (1..=bound)
+                    .find(|&k| x.powmod(k, f, &fp) == Poly::one())
+                    .unwrap();
+                println!(
+                    "ORDER {label} factor={:?} field_degree={order} kernel_nonzero_points={bound}",
+                    &f.c[..f.n]
+                );
+                factors += 1;
+            }
+            cases += 1;
+        }
+    }
+    assert_eq!((cases, factors), (3, 6));
+    println!("TERMINAL positive_cases={cases} factors={factors}");
+}
 fn main() {
+    if std::env::args().nth(1).as_deref() == Some("--orders") {
+        orders(&std::env::args().nth(2).unwrap());
+        return;
+    }
     let start = Instant::now();
     controls(&start);
     let rootdir = std::env::args().nth(1).unwrap();
@@ -390,7 +442,12 @@ fn main() {
                 let coeff: Vec<u64> = l.iter().rev().map(|x| x.rem_euclid(3) as u64).collect();
                 println!("CURVE g={g} p={p} family={family} ell={ell} counts={cks:?} bound={b} order={order} L={l:?}");
                 let (status, kernels) = screen(Poly::from_coeffs(&coeff), p % 3);
-                println!("CASE g={g} p={p} family={family} ell={ell} candidates=1 status={status} abstract_kernels={kernels}");
+                let count_text = if status.starts_with("unknown") {
+                    "null".to_string()
+                } else {
+                    kernels.to_string()
+                };
+                println!("CASE g={g} p={p} family={family} ell={ell} candidates=1 status={status} abstract_kernels={count_text}");
                 cases += 1;
             }
         }
