@@ -78,17 +78,27 @@
 //!   and the surface/floor counts equal the Delfs-Galbraith formula above.
 //!   The census holds every curve over F_p, so a short or over class is
 //!   refused whole;
-//! - where ecdb already holds an `endomorphism_ring` row, its kind, discriminant
-//!   and conductor must agree exactly, or the class is refused.
+//! - where ecdb already holds an `endomorphism_ring` row ([`reconcile`]), every
+//!   stored value must agree with the computed order or be implied by it:
+//!   over the base field, kind `imaginary_quadratic_order` or `unknown`, equal
+//!   discriminant, conductor and `is_maximal`, `conductor_divides` a multiple
+//!   of f, `contains` a subset of the computed list, `cm_field_id` a quadratic
+//!   field of discriminant D_K, `quaternion_ramification` = {p}, a
+//!   `quaternion_order_basis` only where ecdb certifies the same one, and a
+//!   status other than `refuted` / `not_applicable`. Otherwise the class is
+//!   refused, so no unverified stored value is ever kept under status `proved`.
 //!
 //! # Writes
 //!
 //! `endomorphism_ring` (over_closure = false, kind `imaginary_quadratic_order`
 //! for End_{F_p}(E), status `proved`, `conductor_divides` = v = [O_K : Z[pi]],
 //! `contains`, `quaternion_ramification` = {p}, `quaternion_order_basis` for
-//! j = 0, 1728) for curves without a row; a row of kind
-//! `imaginary_quadratic_order` or `unknown` that agrees has only its NULL
-//! columns filled. Insert-or-update only.
+//! j = 0, 1728) for curves without a row; a row that agrees has only its NULL
+//! columns filled, its kind set from `unknown` and its status raised to
+//! `proved` (with ecdb's method and provenance when the status is raised).
+//! The UPDATE repeats every check as a guard; rows it or the insert's
+//! `ON CONFLICT DO NOTHING` skip are reported as a problem
+//! (`endomorphism_rings_write_refused_conflict`). Insert-or-update only.
 //!
 //! # Report
 //!
@@ -96,7 +106,8 @@
 //! `ss_curves_refused_input`, `ss_surface`, `ss_floor`, `ss_maximal_p1mod4`,
 //! `ss_quaternion_order_certified`, `ss_existing_agree`,
 //! `endomorphism_rings_inserted_supersingular`,
-//! `endomorphism_rings_updated_supersingular`.
+//! `endomorphism_rings_updated_supersingular`,
+//! `endomorphism_rings_write_refused_conflict`.
 
 use super::end_ring::{check_class, class_number, division_polys, is_prime, iso_key, powmod, scalar_on, trim};
 use super::{bulk, Ctx, Report};
@@ -113,7 +124,13 @@ const METHOD: &str = "Delfs-Galbraith: End_{F_p}(E) = Z[(1+sqrt(-p))/2] iff E[2]
 
 const CURVES_SQL: &str = "
 SELECT c.id, coalesce(c.family, ''), ic.id, ic.p::int8, c.coefficients->>'a', c.coefficients->>'b',
-       ic.trace::int8, er.curve_id IS NOT NULL, er.kind, er.over_closure, er.discriminant::int8, er.conductor_f::int8
+       ic.trace::int8, er.curve_id IS NOT NULL, er.kind, er.over_closure, er.discriminant::int8, er.conductor_f::int8,
+       er.conductor_divides::int8, er.is_maximal, er.contains, er.cm_field_id,
+       (SELECT n.fundamental_discriminant::int8 FROM ec.number_field n WHERE n.id = er.cm_field_id AND n.degree = 2),
+       er.quaternion_ramification::text, er.quaternion_order_basis, er.status::text, er.method IS NULL,
+       er.provenance_id IS NULL,
+       (SELECT n.id FROM ec.number_field n WHERE n.degree = 2
+          AND n.fundamental_discriminant = CASE WHEN ic.p % 4 = 1 THEN -4 * ic.p ELSE -ic.p END ORDER BY n.id LIMIT 1)
 FROM ec.curve c
 JOIN ec.abelian_variety av ON av.curve_id = c.id
 JOIN ec.isogeny_class_fq ic ON ic.id = av.isogeny_class_id
@@ -134,22 +151,33 @@ LEFT JOIN LATERAL (SELECT n.id FROM ec.number_field n WHERE n.fundamental_discri
                    ORDER BY n.id LIMIT 1) nf ON true
 ON CONFLICT (curve_id) DO NOTHING";
 
-/// Fill the NULL columns of an agreeing row; never overwrites a stored value. The caller has checked
-/// kind, discriminant and conductor; the guards repeat it, so a row changed in between is left alone.
+/// Complete an existing row that [`reconcile`] found consistent with the computed End_{F_p}(E): its NULL columns
+/// are filled and its status becomes `proved` (every stored value is then one ecdb verified). A stored value is
+/// never overwritten: the guards repeat every [`reconcile`] check, so a row changed in between is left alone, and
+/// the caller reports rows sent but not updated. Method and provenance become ecdb's when the status is raised
+/// (the proof is then ecdb's), and are only filled when the row was already `proved`.
 const END_UPDATE_SQL: &str = "
 UPDATE ec.endomorphism_ring er SET kind = 'imaginary_quadratic_order', discriminant = r.disc, conductor_f = r.f,
-       is_maximal = coalesce(er.is_maximal, r.f = 1), conductor_divides = coalesce(er.conductor_divides, r.v),
-       contains = coalesce(er.contains, r.contains), quaternion_ramification = coalesce(er.quaternion_ramification,
-       ARRAY[r.p]), quaternion_order_basis = coalesce(er.quaternion_order_basis, r.quat), status = 'proved',
-       method = coalesce(er.method, r.method), provenance_id = coalesce(er.provenance_id, $2::bigint)
-FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, disc numeric, f numeric, v numeric, p numeric,
+       is_maximal = (r.f = 1), conductor_divides = coalesce(er.conductor_divides, r.v),
+       contains = coalesce(er.contains, r.contains), cm_field_id = coalesce(er.cm_field_id, nf.id),
+       quaternion_ramification = ARRAY[r.p], quaternion_order_basis = coalesce(er.quaternion_order_basis, r.quat),
+       method = CASE WHEN er.status = 'proved' THEN coalesce(er.method, r.method) ELSE r.method END,
+       provenance_id = CASE WHEN er.status = 'proved' THEN coalesce(er.provenance_id, $2::bigint) ELSE $2::bigint END,
+       status = 'proved'
+FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, disc numeric, f numeric, v numeric, d_k numeric, p numeric,
      contains text[], quat jsonb, method text)
+LEFT JOIN LATERAL (SELECT n.id FROM ec.number_field n WHERE n.fundamental_discriminant = r.d_k AND n.degree = 2
+                   ORDER BY n.id LIMIT 1) nf ON true
 WHERE er.curve_id = r.curve_id AND NOT er.over_closure AND er.kind IN ('imaginary_quadratic_order', 'unknown')
   AND (er.discriminant IS NULL OR er.discriminant = r.disc) AND (er.conductor_f IS NULL OR er.conductor_f = r.f)
   AND (er.is_maximal IS NULL OR er.is_maximal = (r.f = 1))
   AND (er.conductor_divides IS NULL OR mod(er.conductor_divides, r.f) = 0)
-  AND (er.discriminant IS NULL OR er.conductor_f IS NULL OR er.quaternion_ramification IS NULL
-       OR (er.quaternion_order_basis IS NULL AND r.quat IS NOT NULL) OR er.status <> 'proved')";
+  AND (er.contains IS NULL OR er.contains <@ r.contains)
+  AND (er.quaternion_ramification IS NULL OR er.quaternion_ramification::numeric[] = ARRAY[r.p])
+  AND (er.quaternion_order_basis IS NULL OR er.quaternion_order_basis = r.quat)
+  AND (er.cm_field_id IS NULL OR EXISTS (SELECT 1 FROM ec.number_field n WHERE n.id = er.cm_field_id
+                                         AND n.degree = 2 AND n.fundamental_discriminant = r.d_k))
+  AND er.status NOT IN ('refuted', 'not_applicable')";
 
 // ------------------------------------------------------------- quaternion orders
 
@@ -475,6 +503,89 @@ fn j_invariant(p: u64, a: u64, b: u64) -> u64 {
 
 // ------------------------------------------------------------- import
 
+/// A stored `endomorphism_ring` row, as far as the reconciliation needs it.
+#[derive(Clone, Debug, Default)]
+pub struct Stored {
+    pub kind: String,
+    pub over_closure: bool,
+    pub disc: Option<i64>,
+    pub f: Option<i64>,
+    pub divides: Option<i64>,
+    pub is_maximal: Option<bool>,
+    pub contains: Option<Vec<String>>,
+    pub cm_field_id: Option<i64>,
+    /// Fundamental discriminant of the stored `cm_field_id` (None if absent or not a quadratic field).
+    pub cm_d_k: Option<i64>,
+    /// `quaternion_ramification` as Postgres array text, e.g. `{7}`.
+    pub ramification: Option<String>,
+    pub basis: Option<Value>,
+    pub status: String,
+    pub method_null: bool,
+    pub provenance_null: bool,
+}
+
+/// Compare a stored row with the computed End_{F_p}(E) (and its certified quaternion JSON, if any). Every stored
+/// non-NULL value must agree exactly (or, for `conductor_divides` and `contains`, be implied by the computed
+/// order); otherwise the reason is returned and the class is refused. `Ok(true)` when the row has something to
+/// fill (a NULL column, kind `unknown`, or a status below `proved`), `Ok(false)` when it already holds everything.
+pub fn reconcile(s: &Stored, e: &SsEnd, p: u64, quat: Option<&Value>, want_nf: Option<i64>) -> Result<bool, String> {
+    let mut bad = Vec::new();
+    if s.over_closure {
+        bad.push("over_closure".to_string());
+    }
+    if s.kind != "imaginary_quadratic_order" && s.kind != "unknown" {
+        bad.push(format!("kind {}", s.kind));
+    }
+    if s.disc.is_some_and(|d| d != e.disc) {
+        bad.push(format!("discriminant {:?}", s.disc));
+    }
+    if s.f.is_some_and(|f| f != e.f as i64) {
+        bad.push(format!("conductor {:?}", s.f));
+    }
+    if s.is_maximal.is_some_and(|m| m != (e.f == 1)) {
+        bad.push(format!("is_maximal {:?}", s.is_maximal));
+    }
+    if s.divides.is_some_and(|d| d <= 0 || d % e.f as i64 != 0) {
+        bad.push(format!("conductor_divides {:?}", s.divides));
+    }
+    let ours = e.contains();
+    if let Some(c) = &s.contains {
+        if !c.iter().all(|x| ours.contains(&x.as_str())) {
+            bad.push(format!("contains {c:?} (End_F_p contains only {ours:?})"));
+        }
+    }
+    if s.cm_field_id.is_some() && s.cm_d_k != Some(e.d_k) {
+        bad.push(format!("cm_field_id {:?} (fundamental discriminant {:?})", s.cm_field_id, s.cm_d_k));
+    }
+    if s.ramification.as_ref().is_some_and(|r| *r != format!("{{{p}}}")) {
+        bad.push(format!("quaternion_ramification {:?}", s.ramification));
+    }
+    if let Some(b) = &s.basis {
+        // a stored basis ecdb cannot certify (no j = 0, 1728 certificate) or that differs from the certified one
+        if quat != Some(b) {
+            bad.push("a quaternion_order_basis ecdb does not certify for this curve".to_string());
+        }
+    }
+    if s.status == "refuted" || s.status == "not_applicable" {
+        bad.push(format!("status {}", s.status));
+    }
+    if !bad.is_empty() {
+        return Err(bad.join(", "));
+    }
+    Ok(s.kind == "unknown"
+        || s.disc.is_none()
+        || s.f.is_none()
+        || s.is_maximal.is_none()
+        || s.divides.is_none()
+        || s.contains.is_none()
+        || (s.cm_field_id.is_none() && want_nf.is_some())
+        || s.ramification.is_none()
+        || (s.basis.is_none() && quat.is_some())
+        || s.status != "proved"
+        || s.method_null
+        || s.provenance_null)
+}
+
 struct Row {
     id: i64,
     census: bool,
@@ -482,11 +593,8 @@ struct Row {
     a: u64,
     b: u64,
     t: i64,
-    has_row: bool,
-    kind: Option<String>,
-    over_closure: bool,
-    old_disc: Option<i64>,
-    old_f: Option<i64>,
+    stored: Option<Stored>,
+    want_nf: Option<i64>,
 }
 
 pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
@@ -520,11 +628,23 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
             a,
             b,
             t,
-            has_row: r.get(7),
-            kind: r.get(8),
-            over_closure: r.get::<_, Option<bool>>(9).unwrap_or(false),
-            old_disc: r.get(10),
-            old_f: r.get(11),
+            stored: r.get::<_, bool>(7).then(|| Stored {
+                kind: r.get(8),
+                over_closure: r.get(9),
+                disc: r.get(10),
+                f: r.get(11),
+                divides: r.get(12),
+                is_maximal: r.get(13),
+                contains: r.get(14),
+                cm_field_id: r.get(15),
+                cm_d_k: r.get(16),
+                ramification: r.get(17),
+                basis: r.get(18),
+                status: r.get(19),
+                method_null: r.get(20),
+                provenance_null: r.get(21),
+            }),
+            want_nf: r.get(22),
         });
     }
 
@@ -549,49 +669,63 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
             report.problem(format!("class {class_id} (p = {}): {why}", rows[0].p));
             continue;
         }
+        let quats: Vec<Option<Value>> = rows
+            .iter()
+            .zip(&computed)
+            .map(|(r, e)| e.geometric.as_ref().map(|(o, label)| o.to_json(r.p, label, j_invariant(r.p, r.a, r.b))))
+            .collect();
         let mut agree = 0u64;
-        for (r, e) in rows.iter().zip(&computed) {
-            if !r.has_row {
-                continue;
-            }
-            let kind_ok =
-                !r.over_closure && matches!(r.kind.as_deref(), Some("imaginary_quadratic_order") | Some("unknown"));
-            let disc_ok = r.old_disc.is_none_or(|d| d == e.disc);
-            let f_ok = r.old_f.is_none_or(|f| f as u64 == e.f);
-            if !(kind_ok && disc_ok && f_ok) {
-                report.count("ss_classes_refused", 1);
-                report.problem(format!(
-                    "class {class_id}: curve {} has stored End row (kind {:?}, over_closure {}, disc {:?}, f {:?}); \
-                     ecdb computes End_F_p = disc {} (f = {})",
-                    r.id, r.kind, r.over_closure, r.old_disc, r.old_f, e.disc, e.f
-                ));
-                continue 'class;
+        let mut fill = vec![false; rows.len()];
+        for (i, (r, e)) in rows.iter().zip(&computed).enumerate() {
+            let Some(s) = &r.stored else { continue };
+            match reconcile(s, e, r.p, quats[i].as_ref(), r.want_nf) {
+                Ok(needs) => fill[i] = needs,
+                Err(why) => {
+                    report.count("ss_classes_refused", 1);
+                    report.problem(format!(
+                        "class {class_id}: curve {} has a stored End row that disagrees with End_F_p = disc {} \
+                         (f = {}): {why}",
+                        r.id, e.disc, e.f
+                    ));
+                    continue 'class;
+                }
             }
             agree += 1;
         }
         report.count("ss_classes_ok", 1);
         report.count("ss_existing_agree", agree);
-        for (r, e) in rows.iter().zip(&computed) {
+        for (i, (r, e)) in rows.iter().zip(&computed).enumerate() {
             match (r.p % 4, e.surface()) {
                 (1, _) => report.count("ss_maximal_p1mod4", 1),
                 (_, true) => report.count("ss_surface", 1),
                 _ => report.count("ss_floor", 1),
             }
-            let quat = e.geometric.as_ref().map(|(o, label)| o.to_json(r.p, label, j_invariant(r.p, r.a, r.b)));
-            if quat.is_some() {
+            if quats[i].is_some() {
                 report.count("ss_quaternion_order_certified", 1);
             }
             let row = json!({ "curve_id": r.id, "disc": e.disc, "f": e.f, "v": e.v, "d_k": e.d_k, "p": r.p,
-                "contains": e.contains(), "quat": quat, "method": METHOD, "census": r.census });
-            if r.has_row {
-                updates.push(row);
-            } else {
+                "contains": e.contains(), "quat": quats[i], "method": METHOD, "census": r.census });
+            if r.stored.is_none() {
                 inserts.push(row);
+            } else if fill[i] {
+                updates.push(row);
             }
         }
     }
-    report.count("endomorphism_rings_inserted_supersingular", bulk(client, END_SQL, &inserts, prov).await?);
-    report.count("endomorphism_rings_updated_supersingular", bulk(client, END_UPDATE_SQL, &updates, prov).await?);
+    let inserted = bulk(client, END_SQL, &inserts, prov).await?;
+    report.count("endomorphism_rings_inserted_supersingular", inserted);
+    let updated = bulk(client, END_UPDATE_SQL, &updates, prov).await?;
+    report.count("endomorphism_rings_updated_supersingular", updated);
+    let (lost_ins, lost_upd) =
+        ((inserts.len() as u64).saturating_sub(inserted), (updates.len() as u64).saturating_sub(updated));
+    if lost_ins + lost_upd > 0 {
+        // rows written or changed by someone else between the read and the write: nothing was overwritten
+        report.count("endomorphism_rings_write_refused_conflict", lost_ins + lost_upd);
+        report.problem(format!(
+            "{lost_ins} insert(s) found an existing endomorphism_ring row and {lost_upd} update(s) were refused by \
+             the guards (the stored row changed or disagrees); those rows were left unchanged"
+        ));
+    }
     Ok(report)
 }
 
@@ -759,6 +893,66 @@ mod tests {
         let other = computed.iter().find(|(_, e)| e.f != computed[0].1.f).unwrap();
         dup.push((computed[0].0, &other.1));
         assert!(check_ss_class(p, &dup).is_err());
+    }
+
+    /// Existing rows: an agreeing partial row is filled, a complete one (what the insert writes) needs nothing, and
+    /// every stored value that contradicts End_{F_p}(E) or that ecdb cannot certify refuses the class instead of
+    /// being kept under status `proved`.
+    #[test]
+    fn existing_rows_are_reconciled_or_refused() {
+        // the floor curve y^2 = x^3 + x over F_11, with its certified j = 1728 order
+        let p = 11;
+        let e = ss_end(p, 1, 0, 0).unwrap();
+        let quat = e.geometric.as_ref().map(|(o, l)| o.to_json(p, l, j_invariant(p, 1, 0)));
+        // every F_11 class has j = 0 or 1728; over F_23 two classes have another j
+        let generic = ss_census(23)
+            .into_iter()
+            .map(|(a, b)| ss_end(23, a, b, 0).unwrap())
+            .find(|g| g.geometric.is_none())
+            .unwrap();
+        assert_eq!((e.f, e.disc, e.d_k), (2, -44, -11));
+        let full = Stored {
+            kind: "imaginary_quadratic_order".into(),
+            disc: Some(-44),
+            f: Some(2),
+            divides: Some(2),
+            is_maximal: Some(false),
+            contains: Some(vec!["Z[pi]".into()]),
+            cm_field_id: Some(9),
+            cm_d_k: Some(-11),
+            ramification: Some("{11}".into()),
+            basis: quat.clone(),
+            status: "proved".into(),
+            ..Default::default()
+        };
+        assert_eq!(reconcile(&full, &e, p, quat.as_ref(), Some(9)), Ok(false));
+        let partial =
+            Stored { kind: "unknown".into(), status: "unknown".into(), method_null: true, ..Default::default() };
+        assert_eq!(reconcile(&partial, &e, p, quat.as_ref(), None), Ok(true));
+        // a stored bound that the computed conductor satisfies is kept
+        assert_eq!(reconcile(&Stored { divides: Some(4), ..full.clone() }, &e, p, quat.as_ref(), Some(9)), Ok(false));
+        let conflicts = [
+            Stored { over_closure: true, ..full.clone() },
+            Stored { kind: "quaternion_maximal_order".into(), ..full.clone() },
+            Stored { disc: Some(-11), ..full.clone() },
+            Stored { f: Some(1), ..full.clone() },
+            Stored { is_maximal: Some(true), ..full.clone() },
+            Stored { divides: Some(3), ..full.clone() },
+            Stored { contains: Some(vec!["Z[pi]".into(), "Z[(1+pi)/2]".into()]), ..full.clone() },
+            Stored { cm_d_k: Some(-44), ..full.clone() },
+            Stored { cm_d_k: None, ..full.clone() },
+            Stored { ramification: Some("{2}".into()), ..full.clone() },
+            Stored { basis: Some(json!({"basis": "something else"})), ..full.clone() },
+            Stored { status: "refuted".into(), ..full.clone() },
+            Stored { status: "not_applicable".into(), ..full.clone() },
+        ];
+        for s in &conflicts {
+            assert!(reconcile(s, &e, p, quat.as_ref(), Some(9)).is_err(), "{s:?}");
+        }
+        // a quaternion basis stored for a curve whose order ecdb cannot certify is refused, not upgraded to proved
+        let uncertified =
+            Stored { kind: "unknown".into(), status: "heuristic".into(), basis: quat, ..Default::default() };
+        assert!(reconcile(&uncertified, &generic, 23, None, None).unwrap_err().contains("does not certify"));
     }
 
     /// Every F_p, 5 <= p < 2^10: the supersingular classes satisfy Deuring, Delfs-Galbraith, and the j = 0,
