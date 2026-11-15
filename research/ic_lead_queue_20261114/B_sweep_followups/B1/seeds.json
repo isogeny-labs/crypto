@@ -1,0 +1,12 @@
+{
+  "schema": "ic_lead_queue_B1.seeds/v1",
+  "rule": "seed(tag) = int(SHA-256(UTF-8(prefix + tag)).hexdigest()[0:12], 16); computed with sha256sum and shell arithmetic",
+  "prefix": "ic_lead_queue_20261114/B1/v1/",
+  "seeds": [
+    {"tag": "curve_seed/c1", "seed": 211747386521066},
+    {"tag": "curve_seed/c2", "seed": 145169970934094},
+    {"tag": "target_seed", "seed": 242005234523932},
+    {"tag": "measurement_seed", "seed": 270048475138877},
+    {"tag": "analysis/bootstrap", "seed": 171294647853004}
+  ]
+}
