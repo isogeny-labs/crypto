@@ -24,10 +24,13 @@ def code(v,m):
     if m==1:return int(v)
     digs=list(v.polynomial().list())
     return sum(int(digs[j])*3**j for j in range(len(digs)))
+def element_at(K,i,m):
+    if m==1:return K(i)
+    return K(R([(i//(3**j))%3 for j in range(m)]))
 for m in range(1,5):
     q=3**m
     K=GF(q,'a',modulus=moduli[m-1]) if m>1 else GF(3)
-    elems=[K.fetch_int(i) for i in range(q)] if m>1 else [K(i) for i in range(q)]
+    elems=[element_at(K,i,m) for i in range(q)]
     assert sorted(code(v,m) for v in elems)==list(range(q))
     chi=np.full(q,-1,dtype=np.int8);chi[0]=0
     for v in elems[1:]:chi[code(v*v,m)]=1
@@ -53,7 +56,7 @@ for mask in candidates:
     f=x**11+sum(int(coeff[mask,j])*x**j for j in range(11))
     if gcd(f,f.derivative())==1:valid.append(int(mask))
 stage.append(len(valid))
-K=GF(3**5,'a',modulus=moduli[4]);elems=[K.fetch_int(i) for i in range(243)]
+K=GF(3**5,'a',modulus=moduli[4]);elems=[element_at(K,i,5) for i in range(243)]
 chi=np.full(243,-1,dtype=np.int8);chi[0]=0
 for v in elems[1:]:chi[code(v*v,5)]=1
 assert int(np.count_nonzero(chi==1))==121

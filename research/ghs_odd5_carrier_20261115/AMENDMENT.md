@@ -1,0 +1,3 @@
+# Sage audit API amendment
+
+15 November 2026 UTC, after the first independent replay stopped before point counting. The frozen auditor called `FiniteField_givaro.fetch_int`, which Sage 10.10.rc0 does not provide. The amendment replaces only integer-to-polynomial-basis element enumeration with explicit base-three coefficient coercion `K(R(digits))`. A focused nine-element F9 check confirmed the intended order and coordinates. The C++ screen, its receipt, the finite slice, point-count criterion and all acceptance gates are unchanged. The stopped traceback is recorded in today's session log. Commit this amendment and edited auditor before retrying; retain any further mismatch rather than changing the screen. [pcc:unverified]
