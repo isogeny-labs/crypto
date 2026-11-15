@@ -51,11 +51,17 @@ for pr, spec in sorted({(k[0], k[1]) for k in S}):
     arms = sorted(S[(pr, spec, rounds[0], "A")])
     row["per_arm_cpu"] = {}
     for e in arms:
-        rs = [S[(pr, spec, r, "B")][e][1] / S[(pr, spec, r, "A")][e][1] for r in rounds
-              if S[(pr, spec, r, "A")][e][1] > 0]
-        aa = [S[(pr, spec, r, "A")][e][1] for r in rounds]
+        # schedstat cpu_ns advances on scheduler ticks: solves under ~1 ms read 0. A per-arm
+        # ratio is reported only when every round of both arms has a nonzero sum; otherwise null.
+        pa = [S[(pr, spec, r, "A")][e][1] for r in rounds]
+        pb = [S[(pr, spec, r, "B")][e][1] for r in rounds]
+        n = S[(pr, spec, rounds[0], "A")][e][2]
+        if min(pa + pb) <= 0:
+            row["per_arm_cpu"][e] = {"ba_geomean": None, "n": n, "note": "a round sums to 0 cpu_ns (sub-tick solves)"}
+            continue
+        rs = [b / a for a, b in zip(pa, pb)]
         row["per_arm_cpu"][e] = {"ba_geomean": gm(rs), "ba_min": min(rs), "ba_max": max(rs),
-                                 "aa_spread": max(aa) / max(min(aa), 1), "n": S[(pr, spec, rounds[0], "A")][e][2]}
+                                 "aa_spread": max(pa) / min(pa), "share_of_A_cpu": sum(pa) / sum(tot(r, "A", 1) for r in rounds), "n": n}
     res.append(row)
 
 json.dump({"schema": "wallfix.runpod.analysis/v1", "standing": "pcc:unverified",

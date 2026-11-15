@@ -10,7 +10,7 @@
 == Outcome and checks
 
 - *Identical outputs.* After dropping only timing, host, id and binary-hash fields (`docs/perf/20261110-wall-only-rust-fixes/norm-records.sh`), the A and B records of all 18 (PR, spec, round) pairs are identical, and identical across rounds (`data/identity.txt`). Counted cost (GAE), counters, recovered logarithms and outcomes do not change: these PRs change wall time only.
-- *All runs verified.* 36/36 sessions `rc=0`; 36/36 `ecbench verify --replay-all` on the pod `rc=0`; an independent replay on a second host is in `verify-local/`.
+- *All runs verified.* 36/36 sessions `rc=0`; 36/36 `ecbench verify --replay-all` on the pod `rc=0` (a self-audit: same binary, same host); every measured run replayed again on a second host (Intel Xeon 2.10 GHz container) with the producing binary, `verify-local/`, summarised in `replay-certificate.json`.
 - *Binaries distinct.* Six binaries, six SHA-256 (`data/binaries-run2.sha256`), each build compiled the `crypto` crate (≈190–200 s each).
 - *Measured (derived ratio of recorded values).* Session-total solve CPU time, merge (B) over first parent (A), geometric mean of 3 counterbalanced rounds, with the per-round range:
 
@@ -34,7 +34,11 @@ A/A spread is max/min of the three A-arm session totals in run 2. Solve wall tim
 - \#4009 (GPU/F4 fixes in `pq_f4_f2.rs`, `pq_groebner_f2.rs`) makes the `ic-tensor` solve *35% faster* (0.654) and `da-f4` 8% faster, far outside every A/A range.
 - \#3850 makes `ic-rf-pairs` *10% faster* on the prime spec (0.905, all three rounds 0.905), and `ic-tensor` 3.6% faster.
 - \#3991 makes the prime spec *1.3% slower* (1.011–1.015 in all three rounds, A/A 1.004; run-1 control 1.001–1.003). Small, consistent, on `ic-rf-pairs`; a candidate regression to profile, not yet attributed.
-- The run-1 A/A band for tensor is wide (up to 1.43) because run 1 ran at load 12–44 on the shared host; run 2 ran at load 4–22 and its own A/A spread is 1.2–2.5%.
+- The run-1 A/A band for tensor is wide (up to 1.43) because run 1 ran at load 12–44 on the shared host; run 2 ran at load 4–22 and its own A/A spread is 1.2–2.5%. \#3850 tensor (0.964) is therefore resolved only against run 2's own A spread (1.025), not against run 1's band; the other five rows lie outside both.
+- *Scope: the solve interval.* Whole-session wall time from `runlog-run2.tsv` (process start-up, workload set-up, every arm and warmup) gives #4009 tensor 0.657, #3850 prime 0.910, #3850 tensor 0.966, but leaves the short specs unresolved: #3850 koblitz 1.000 (rounds 0.886–1.128), #4009 koblitz 1.008 (0.975–1.063), #3991 prime 1.024 (0.991–1.067). The koblitz sessions last about 5 s, mostly outside the solves.
+- *Per-arm ratios.* `time.schedstat_solve.cpu_ns` advances on scheduler ticks, so solves under about 1 ms read 0 (2,131 of 4,320 measured records, 0.0115% of solve wall time). Per-arm ratios are given only for arms whose every round has a nonzero sum; the rho arms on these small curves have none. One arm carries 92.5–100% of each session sum; on #3850 koblitz the 0.977 comes mostly from `rf-pairs` (0.769), `da-f4` alone being 0.995.
+- *Order.* Counterbalanced; an order-balanced estimate differs from the three-round geometric mean by at most 0.4% (#4009 tensor 0.656 vs 0.654).
+- *Independent recompute.* `validator/validator-report.json` (status pass): all 12 headline geometric means recomputed from the raw records with separate code, output identity, outcomes and binary identity re-checked.
 
 == Cross-method band (AGENTS.md §5a)
 
