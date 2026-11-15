@@ -10,6 +10,8 @@ The earlier [q2 census](../ghs_n7_prym_trace_20261115/HYPERELLIPTIC_CLASSIFICATI
 
 The source pair is `E_-(a,b)=(1,8)` with t=-9 and `E_+(a,b)=(0,8)` with t=9 over `F2[z]/(z⁷+z+1)`. The target pair is `Y_-(v,u)=(0x8f,0xc07a)` and `Y_+(v,u)=(0x8f,0x802f)` over F2, where bit i is the coefficient of x^i in `y²+v(x)y=u(x)`. These are exact curves. A fixed F2-isogeny exists by Tate because the Weil polynomials match; its degree and rational formulas have not been found. For every prime ℓ outside that fixed degree, its base change injects the ℓ-primary source group into the target Jacobian mathematically, but there is no executable subgroup map in this study.
 
+An [exact genus-floor theorem](GENUS_FLOOR.md) shows that the base-changed Weil restriction is simple over `F_(2^s)` precisely when `7∤s`. Its proof uses the quadratic field `Q(√−431)`: the source Frobenius has norm `2⁷` but cannot be a seventh power because that field has no algebraic integer of norm two. Capelli's criterion then makes the degree-14 Weil polynomial irreducible for every `s` coprime to seven. Any nonzero algebraic map from the restriction to a Jacobian must therefore have target genus at least seven. The displayed `Y_s` meets this **geometric** lower bound at the isogeny-class level. SageMath 10.10.rc0 checked both signs through s=10, including the expected split at s=7; the failed first validation assertion and corrected run are preserved in `reports/simplicity-20261115/`. The theorem is paper-level and awaits independent review. [pcc:unverified]
+
 ## q=4 independent check
 
 At s=2, the trace recurrence from t_1=±9 and q2 extension size 128 gives `t_2=t_1²−256=−175`. Both source twists therefore have predicted order `4⁷+1−t_2=16560`. The new native source code independently embedded F128 into `F2[z]/(0x4021)`, found `w=0xd2e` satisfying `w⁷+w+1=0`, mapped b=8 to `w³=0x1dee`, and counted **16,560** points on each E. It found a W1 presentation with old and new cubic arm 2: `r=0x2549`, `v=0xd30` in the q4 field.
@@ -30,12 +32,6 @@ The seven counts determine the full genus-seven Weil polynomial `1+175T⁷+4⁷T
 
 The W1 source family is in [Menezes–Teske, Section 5.2](https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf). The hyperelliptic enumeration method is in [Borodin–May, Section 4](https://arxiv.org/pdf/2508.16886). An earlier internal `research/ic_next10_20261014/10-torelli-toy/README.md` already produced the ±13 genus-seven carriers; its explicit `v=0xb9,u=0x8051` is the +13 class in the new q2 census. That is a rediscovery. The predecessor did not report a ±9 W1 carrier, though its all-model search may have traversed its equations. Base change of Weil restriction is standard. Novelty is limited to identifying this ±9 W1 carrier line in the present audit, subject to wider source and data review. [pcc:unverified]
 
-| Claim | Evidence | Status |
-|:---|:---|:---|
-| q2 ±9 target class | q2 finite census and separate direct replay | local computational result, geometric reduction pending review |
-| q4 source, target, W1 membership | two native q4 programs and raw records above | measured finite arithmetic, local replay |
-| trace recurrence and q4 predicted count | `CoprimeBaseChangeTrace.lean` | Lean 4.35.0 proof gate: 3 theorems, 0 trusted |
-| all-s isogeny-class carrier | finite-field tensor product and Weil-restriction/Jacobian base-change proof | paper-level; not formalized in Lean |
-| explicit isogeny, subgroup evaluation, complete GHS vs rho cost | none | open |
+**Evidence status.** The q2 ±9 target class has a finite census and separate direct replay; its geometric reduction awaits review. The q4 source, target, and W1 membership were checked by two native programs. `CoprimeBaseChangeTrace.lean` passed the Lean 4.35.0 proof gate with three theorems and zero trusted exceptions. The all-s carrier and genus-floor arguments are paper proofs; their geometric statements are not formalized in Lean. Explicit isogeny formulas, subgroup evaluation, and complete GHS/rho costs remain open.
 
 The q2 group orders are 138 and 120; their q4 base changes both have order 16,560. These first two rungs are geometry and membership controls. Any security claim at larger s would require a large chosen source subgroup, an explicit nonzero map, full target recovery, and a matched total-cost benchmark against rho. The source family remains W1, and a Jacobian in the same isogeny class need not be the endpoint of the published GHS cover map.

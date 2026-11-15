@@ -28,6 +28,8 @@ If π and π̄ are the F128 Frobenius eigenvalues of E_-, with `π+π̄=-9` and 
 
 The genus remains seven. The family has unbounded base-field size but is a fixed base-change line inside the **known W1 family**. It is an isogeny-class carrier family, not a newly established GHS-vulnerable family. The fixed isogeny whose existence follows from Tate could in principle be reused across s, but its degree, rational formulas, evaluation complexity, and action on the chosen source subgroup are not known. An asymptotic index-calculus exponent alone is insufficient to claim a practical attack.
 
+The separate [simplicity and genus-floor proof](GENUS_FLOOR.md) strengthens this statement: for every `s` coprime to seven, the Weil restriction is simple, so every nonzero algebraic homomorphism from it to a Jacobian has target genus at least seven. The genus-seven carrier meets this lower bound at the isogeny-class level. This is a bound on transfer geometry, not a completed attack.
+
 ## Prior-work boundary
 
 The q2 +13 carrier with `v=0xb9,u=0x8051` appears explicitly in the earlier `research/ic_next10_20261014/10-torelli-toy/README.md`; that class is a rediscovery. The ±9 q2 carriers are absent from that predecessor's two b=1 target traces, but the predecessor's exhaustive hyperelliptic model enumeration may have traversed their equations without identifying these trace classes. The base-change theorem is an application of standard Weil-restriction functoriality and finite-field tensor products. The novelty claim is limited to the exact ±9 W1 isogeny-class carrier line in this audit, subject to a wider literature and data search. [pcc:unverified]
