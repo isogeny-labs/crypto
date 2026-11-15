@@ -21,3 +21,29 @@ The already prepared 58,011,243-byte private D18 source package (SHA-256 `dcc242
 At the read-only check on 2026-10-27, the configured default and `ecc2k130` AWS profiles each received `403` for `HeadObject` on a known published `setec-astronomy-artifacts/store` object. The default profile also received `AccessDenied` for `GetBucketLocation` and `403` for `HeadBucket`. No local `ARTIFACTS_AWS_ACCESS_KEY_ID`/`ARTIFACTS_AWS_SECRET_ACCESS_KEY` pair was present. These observations establish this executor's current access limit; they do not assert that the bucket or prior object is absent. Do not use credentials from another account or change bucket permissions by inference. Use a specifically authorized artifact identity, then read back its exact policy and test a bounded write-once object/fresh GET before a bulk N83 upload.
 
 The next implementation PR should pin the successor panel schema and dual adapter, exact bucket/region and identity, test old-record replay plus new-record rejection controls, and publish one verified public synthetic known-answer base through the existing native store to the new bucket. Its raw checksum and provider receipts must be committed or stored durably with a hashed manifest. Only after that gate should new grid candidates be routed there. The existing `selected_best_total_runtime=null` stays unchanged until complete cold same-target IC runs and matched references justify a selection. This routing correction yields no new performance observation, so existing runtime graphs are unchanged.
+
+## Read-only access update — 2026-11-15 UTC
+
+The earlier `403` observations above remain historical. A fresh read-only
+check found profile `ecc-challenges-new` to be IAM user `coreuser` in account
+`104186811093`. With that profile, `HeadBucket` succeeded for
+`setec-astronomy-artifacts` in `us-east-2`, `ListObjectsV2` returned keys
+under `store/`, and `HeadObject` found the previously published
+`store/sha256/e9/e9c89a33a4cf96ae075e015e02829d0ad40165634c0317d40d5c2091ed576fa2`
+at 14,861,500 bytes. A fresh `GetObject` of that exact key returned 14,861,500
+bytes; local SHA-256 was
+`e9c89a33a4cf96ae075e015e02829d0ad40165634c0317d40d5c2091ed576fa2`,
+matching the committed prior publication receipt. The temporary download was
+removed after hashing.
+
+IAM `SimulatePrincipalPolicy` evaluated `s3:GetObject` and `s3:PutObject` as
+`allowed` for a placeholder key under this store prefix. This is an IAM-side
+simulation, not a successful `PutObject` or a proof that bucket policy permits
+publication. `HeadBucket` on `ctech-astronomy-artifacts` returned `404` under
+both inspected profiles, while the old-account `default` profile still got
+`403` on `setec-astronomy-artifacts`. These checks support the repository's
+spelling and identify one usable read principal; they do not authorize a
+new-bucket write or historical mirroring. The owner has been asked to confirm
+the exact destination, writer identity and mirror preference. The storage
+diagram and runtime graphs are unchanged because no N83 object moved and no
+algorithm arm ran.
