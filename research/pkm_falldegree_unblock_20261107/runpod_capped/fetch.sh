@@ -79,7 +79,7 @@ facts() {
   acts='[]'; [ -s "$R/session-actions.jsonl" ] && acts=$(jq -cs '.' "$R/session-actions.jsonl" 2>/dev/null || echo '[]')
   # The collections: complete ones have collect-<k>.json. The one classified is the latest whose fetches agreed with the
   # runner done; otherwise the latest complete one.
-  cols=$(for f in "$R"/collect-[0-9]*.json; do [ -e "$f" ] && jq -c --arg k "$(basename "$f" .json | sed 's/collect-//')" '. + {k:($k|tonumber)}' "$f" 2>/dev/null; done | jq -cs 'sort_by(.k)')
+  cols=$(for f in "$R"/collect-[0-9]*.json; do [ -e "$f" ] && jq -c --arg k "$(basename "$f" .json | sed 's/collect-//')" '. + {k:($k|tonumber)}' "$f" 2>/dev/null || true; done | jq -cs 'sort_by(.k)')
   [ -n "$cols" ] || cols='[]'
   K=$(jq -r '([.[] | select(.fetched == true and .transfer_ok == true and .prefetch.live.state == "done")] | last | .k) // (last | .k) // empty' <<<"$cols")
   col=null; O=/nonexistent
@@ -87,7 +87,7 @@ facts() {
   # P0b: complete collections made with the runner done must have the same tree.
   disagree=false
   local mans; mans=$(for k in $(jq -r '.[] | select(.prefetch.live.state == "done") | .k' <<<"$cols"); do
-    [ -d "$RES/collect-$k" ] && manifest "$RES/collect-$k" | sha256sum | cut -d' ' -f1; done | sort -u | wc -l)
+    if [ -d "$RES/collect-$k" ]; then manifest "$RES/collect-$k" | sha256sum | cut -d' ' -f1; fi; done | sort -u | wc -l)
   [ "$mans" -gt 1 ] && disagree=true
   s0=$(jq -r 'select(.state == "running") | .started // empty' "$R/start.json" 2>/dev/null || true)
   [ -n "$s0" ] || s0=$(jq -r '[.[] | .live.started // empty] | first // empty' <<<"$ck")
