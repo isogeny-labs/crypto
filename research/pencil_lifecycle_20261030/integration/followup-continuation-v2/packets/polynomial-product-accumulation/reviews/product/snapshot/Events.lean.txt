@@ -1,0 +1,54 @@
+import Cancel
+set_option autoImplicit false
+namespace RemainderPolynomial
+open Polynomial CoefficientTraversal ScaleTrim RemainderWord
+
+def events {n : Nat} (j : Nat) (bs : List UInt64) (h : j+bs.length≤n) : List (RemainderWord.Event n) :=
+ match bs with
+ | []=>[]
+ | b::bs=>(⟨j,by simp only [List.length_cons] at h; omega⟩,b)::
+   events (j+1) bs (by simp only [List.length_cons] at h; omega)
+
+noncomputable def eventPoly {n : Nat} (p c : UInt64) (es : List (RemainderWord.Event n)) : (ZMod p.toNat)[X] :=
+ (es.map fun e=>C ((c.toNat : ZMod p.toNat)*(e.2.toNat : ZMod p.toNat))*X^e.1.val).sum
+
+theorem events_good {n : Nat} (p : UInt64) (j : Nat) (bs : List UInt64) (h : j+bs.length≤n)
+ (hb : ∀b∈bs,b.toNat<p.toNat) : ∀e∈events j bs h,e.2.toNat<p.toNat := by
+ induction bs generalizing j with
+ | nil => simp [events]
+ | cons b bs ih =>
+   intro e he
+   simp only [events,List.mem_cons] at he
+   rcases he with rfl|he
+   · exact hb b (by simp)
+   · exact ih (j+1) _ (by intro x hx; exact hb x (by simp [hx])) e he
+
+theorem events_polynomial {n : Nat} (p c : UInt64) (j : Nat) (bs : List UInt64) (h : j+bs.length≤n) :
+ eventPoly p c (events j bs h)=C (c.toNat : ZMod p.toNat)*X^j*wordsPoly p bs := by
+ induction bs generalizing j with
+ | nil => simp [events,eventPoly,wordsPoly,listPoly]
+ | cons b bs ih =>
+   change C ((c.toNat : ZMod p.toNat)*(b.toNat : ZMod p.toNat))*X^j+
+    eventPoly p c (events (j+1) bs _) = _
+   rw [ih]
+   simp only [wordsPoly,List.map_cons,listPoly,pow_succ,map_mul]
+   ring
+
+theorem event_coeff {n : Nat} (p c : UInt64) (es : List (RemainderWord.Event n)) (i : Nat) :
+ (eventPoly p c es).coeff i=(es.map fun e=>if i=e.1.val then
+ (c.toNat : ZMod p.toNat)*(e.2.toNat : ZMod p.toNat) else 0).sum := by
+ induction es with
+ | nil => simp [eventPoly]
+ | cons e es ih =>
+   simp only [eventPoly,List.map_cons,List.sum_cons,coeff_add] at *
+   rw [coeff_C_mul_X_pow,ih]
+
+theorem event_coeff_high {n : Nat} (p c : UInt64) (es : List (RemainderWord.Event n)) (i : Nat) (hi : n ≤ i) :
+ (eventPoly p c es).coeff i=0 := by
+ induction es with
+ | nil => simp [eventPoly]
+ | cons e es ih =>
+   have h : i≠e.1.val := by have := e.1.isLt; omega
+   simp only [eventPoly,List.map_cons,List.sum_cons,coeff_add,coeff_C_mul_X_pow] at *
+   rw [if_neg h,zero_add,ih]
+end RemainderPolynomial

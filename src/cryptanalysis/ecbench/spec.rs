@@ -232,7 +232,7 @@ impl Spec {
         Ok(spec)
     }
 
-    fn identity_view(&self) -> Value {
+    pub(crate) fn identity_view(&self) -> Value {
         json!({
             "schema": self.schema,
             "workloads": serde_json::to_value(&self.workloads).unwrap_or(Value::Null),

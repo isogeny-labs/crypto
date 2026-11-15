@@ -1,0 +1,27 @@
+{
+  "targets": {
+    "SameSupportCandidate.validity_coefficients": {
+      "declaration": "theorem SameSupportCandidate.validity_coefficients.{u_1} : \u2200 {K : Type u_1} [inst : Field K] (f : Polynomial K)\n  (q r s1 t1 s2 t2 : K),\n  Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r \u2223\n      f - (Polynomial.C s1 * Polynomial.X + Polynomial.C t1) ^ 2 \u2192\n    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r \u2223\n        f - (Polynomial.C s2 * Polynomial.X + Polynomial.C t2) ^ 2 \u2192\n      s1 = s2 \u2192 (t2 - t1) * (s1 + s2) = 0 \u2227 (t2 - t1) * (t2 + t1) = 0",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "allowed_axioms_only": true
+    },
+    "SameSupportCandidate.valid_inputs_exclude_same_support_error": {
+      "declaration": "theorem SameSupportCandidate.valid_inputs_exclude_same_support_error.{u_1} : \u2200 {K : Type u_1} [inst : Field K]\n  [inst_1 : DecidableEq K] (f : Polynomial K) (q r s1 t1 s2 t2 : K),\n  2 \u2260 0 \u2192\n    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r \u2223\n        f - (Polynomial.C s1 * Polynomial.X + Polynomial.C t1) ^ 2 \u2192\n      Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r \u2223\n          f - (Polynomial.C s2 * Polynomial.X + Polynomial.C t2) ^ 2 \u2192\n        ProjectiveLawRuntime.classifySameU22 s1 t1 s2 t2 \u2260 ProjectiveLawRuntime.Branch22Prelude.sameUMixedZeroSlope",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "allowed_axioms_only": true
+    }
+  },
+  "machine_status": "passed",
+  "source_fidelity": "faithful_scoped",
+  "formal_gate_promotion": false,
+  "trust_boundary": "Local Lean 4.34.1 compiler/kernel and reused hashed dependency/runtime mirror; no separate kernel rechecker.",
+  "receipt_sha256": "4c13752e250cfdb5263ae02ec391aa35c27eff7efa9109a435eb455719b027bc"
+}

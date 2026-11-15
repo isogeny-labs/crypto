@@ -136,7 +136,8 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
     SolveStats, SolverEngine,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
-    build_standard_subspace_factor_base, groebner_decompose, groebner_decompose_f6_ic, point_key,
+    build_standard_subspace_factor_base, groebner_decompose, groebner_decompose_f6_ic,
+    groebner_decompose_f6_ic_pair_index, point_key, reset_f6_ic_pair_index_cache,
     FrobeniusFactorBase, KoblitzCurve, PairSumTable,
 };
 
@@ -333,6 +334,11 @@ pub enum Pdp3Engine {
     InheritedF4,
     /// `groebner_decompose_f6_ic`: inherited F4 with the geometric gate.
     F6Ic,
+    /// `groebner_decompose_f6_ic_pair_index`: F6-IC whose one-fixed-summand
+    /// closure answers from a pair-sum index of the base (built once per
+    /// run, its |F|(|F|+1)/2 additions charged) with one charged addition
+    /// per lift, instead of scanning the base at every closed node.
+    F6IcPair,
     /// `groebner_decompose` with Boolean matrix-F4, every node from scratch.
     MatrixF4,
     /// `groebner_decompose` with Boolean matrix-F5: matrix-F4's matrices
@@ -359,6 +365,7 @@ impl Pdp3Engine {
         match s {
             "inherited-f4" => Ok(Self::InheritedF4),
             "f6-ic" => Ok(Self::F6Ic),
+            "f6-ic-pair" => Ok(Self::F6IcPair),
             "matrix-f4" => Ok(Self::MatrixF4),
             "matrix-f5" => Ok(Self::MatrixF5),
             "rootfind" => Ok(Self::Rootfind),
@@ -366,7 +373,8 @@ impl Pdp3Engine {
             "rootfind-negfold" => Ok(Self::RootfindNegfold),
             "rootfind-window-negfold" => Ok(Self::RootfindWindowNegfold),
             other => Err(format!(
-                "unknown engine `{other}`; try inherited-f4, f6-ic, matrix-f4, matrix-f5, \
+                "unknown engine `{other}`; try inherited-f4, f6-ic, f6-ic-pair, matrix-f4, \
+                 matrix-f5, \
                  rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold"
             )),
         }
@@ -376,6 +384,7 @@ impl Pdp3Engine {
         match self {
             Self::InheritedF4 => "inherited-f4",
             Self::F6Ic => "f6-ic",
+            Self::F6IcPair => "f6-ic-pair",
             Self::MatrixF4 => "matrix-f4",
             Self::MatrixF5 => "matrix-f5",
             Self::Rootfind => "rootfind",
@@ -416,7 +425,9 @@ impl Pdp3Engine {
     /// `None` for a root-finding engine, which has no tree.
     fn solver(self, max_degree: u32) -> Option<SolverEngine> {
         match self {
-            Self::InheritedF4 | Self::F6Ic => Some(SolverEngine::InheritedF4 { max_degree }),
+            Self::InheritedF4 | Self::F6Ic | Self::F6IcPair => {
+                Some(SolverEngine::InheritedF4 { max_degree })
+            }
             Self::MatrixF4 => Some(SolverEngine::MatrixF4 { max_degree }),
             Self::MatrixF5 => Some(SolverEngine::MatrixF5 { max_degree }),
             Self::Rootfind
@@ -483,7 +494,7 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
     e
 }
 
-/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N[,linear_harvest=H]`,
+/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic|f6-ic-pair,degree=D,node_budget=N[,linear_harvest=H]`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind`,
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
@@ -783,6 +794,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
              rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
+        if self.engine == Pdp3Engine::F6IcPair {
+            // Reuse within this pipeline solve, never across independent
+            // records or replayed records in the auditor process.
+            reset_f6_ic_pair_index_cache();
+        }
         let mut max_degree = 0u32;
         if self.engine.is_groebner() {
             let degree = params
@@ -807,7 +823,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             self.linear_harvest = match params.get("linear_harvest") {
                 None => None,
                 Some(raw) => {
-                    if !matches!(self.engine, Pdp3Engine::InheritedF4 | Pdp3Engine::F6Ic) {
+                    if !matches!(
+                        self.engine,
+                        Pdp3Engine::InheritedF4 | Pdp3Engine::F6Ic | Pdp3Engine::F6IcPair
+                    ) {
                         return Err(format!(
                             "engine={} does not take linear_harvest (only inherited-f4 and \
                              f6-ic harvest the root's linear rows)",
@@ -1028,6 +1047,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         let target = view.instance().fast.lower(point);
         let decompose = match self.engine {
             Pdp3Engine::F6Ic => groebner_decompose_f6_ic,
+            Pdp3Engine::F6IcPair => groebner_decompose_f6_ic_pair_index,
             _ => groebner_decompose,
         };
         let before = f4_word_ops_thread();
@@ -1179,6 +1199,20 @@ pub fn plugins() -> BinaryPlugins {
 /// must still replay bit for bit, each under the accounting that produced
 /// it.  The oracle lives in this binary, so the replays do too.
 #[cfg(test)]
+mod engine_names {
+    use super::Pdp3Engine;
+
+    #[test]
+    fn f6_ic_pair_parses_and_shares_the_f6_solver() {
+        let engine = Pdp3Engine::parse("f6-ic-pair").unwrap();
+        assert_eq!(engine, Pdp3Engine::F6IcPair);
+        assert_eq!(engine.name(), "f6-ic-pair");
+        assert!(engine.is_groebner());
+        assert_eq!(engine.solver(3), Pdp3Engine::F6Ic.solver(3));
+    }
+}
+
+#[cfg(test)]
 mod committed_replays {
     use crypto_lib::cryptanalysis::ecbench::audit::{
         replay_input_json, replay_record, replay_with_accounting,
@@ -1254,6 +1288,46 @@ mod committed_replays {
         let rel = "research/ecbench_all_candidates_20261003/sessions/koblitz";
         if let Some((ok, detail)) = replay(rel, 625) {
             assert!(ok && detail.contains("pre-1646"), "{detail}");
+        }
+    }
+
+    /// Recorded 2026-10-24, before repair R8 (`59fcca75d4`, 2026-10-26)
+    /// narrowed the default linear harvest from `gpv OR rank >= 331` to the
+    /// rank gate: the `f4-m3-default` arm (every sixth seq from 2) harvests
+    /// fewer root rows today and counts fewer solver operations; the other
+    /// arms (`off`, `gpv`, m = 2) never differed.
+    #[test]
+    fn f4_default_harvest_record_replays_under_the_pre_r8_harvest_accounting() {
+        let rel = "research/f4_harvest_remeasure_20261024/sessions/K1n11";
+        for seq in [2, 8, 140] {
+            if let Some((ok, detail)) = replay(rel, seq) {
+                assert!(
+                    ok && detail.contains("pre-r8-harvest"),
+                    "seq {seq}: {detail}"
+                );
+            }
+        }
+        for seq in [1, 3, 4, 5] {
+            if let Some((ok, detail)) = replay(rel, seq) {
+                assert!(ok && detail == "identical", "seq {seq}: {detail}");
+            }
+        }
+    }
+
+    /// The profile excuses nothing the record does not reproduce, and is
+    /// offered to its producer alone.
+    #[test]
+    fn the_pre_r8_harvest_accounting_does_not_excuse_a_changed_count_or_binary() {
+        let rel = "research/f4_harvest_remeasure_20261024/sessions/K1n11";
+        if let Some((ok, detail)) = replay_edited(rel, 2, |r| {
+            *r.phases[2].native.get_mut("solver_ops").unwrap() += 1;
+        }) {
+            assert!(!ok, "{detail}");
+        }
+        if let Some((ok, detail)) = replay_edited(rel, 2, |r| {
+            r.binary_sha256 = Some("0".repeat(64));
+        }) {
+            assert!(!ok, "{detail}");
         }
     }
 

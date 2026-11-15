@@ -1,0 +1,30 @@
+import ReductionEntry
+set_option autoImplicit false
+namespace ReductionWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+theorem fallback_reduced (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb f : List UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hua : Canon p ua) (hub : Canon p ub) (hva : Canon p va) (hvb : Canon p vb) (hf : Canon p f)
+ (hna : Normal ua) (hnb : Normal ub)
+ (hanz : wordsPoly p ua≠0) (hbnz : wordsPoly p ub≠0)
+ (hda : (wordsPoly p ua).natDegree≤2) (hdb : (wordsPoly p ub).natDegree≤2)
+ (hfd : (wordsPoly p f).natDegree=5)
+ (hvalidA : wordsPoly p ua ∣ wordsPoly p f-wordsPoly p va*wordsPoly p va)
+ (hvalidB : wordsPoly p ub ∣ wordsPoly p f-wordsPoly p vb*wordsPoly p vb) :
+ ∃ ch : FallbackWord.Chain p ua ub va vb, ∃ u w r v0 a b,
+ FallbackWord.Divided p ua ub va vb f ch u w ∧
+ FallbackGeometry.remainder p w u=some r ∧
+ FallbackGeometry.remainder p r (monic p u)=some v0 ∧
+ Run p f (monic p u) v0 a b ∧ Canon p a ∧ Canon p b ∧
+ a≠[] ∧ a.length≤3 ∧ b.length≤2 ∧
+ MumfordValidity.Valid (wordsPoly p f) (wordsPoly p a) (wordsPoly p b) := by
+ obtain ⟨ch,u,w,r,hdiv,hr,hrc,hrn,hrs,hrvalid⟩ := FallbackGeometry.fallback_prepared_exists p ua ub va vb f hp hb hua hub hva hvb hf hna hnb hanz hbnz hvalidA hvalidB
+ have hcu : Canon p u := hdiv.2.2.1
+ have hnu : Normal u := hdiv.2.2.2.2.1
+ have hprod := hdiv.2.2.2.2.2.2.1
+ have hdegree := composed_degree (wordsPoly p ua) (wordsPoly p ub) (wordsPoly p ch.d) (wordsPoly p u) hanz hbnz hda hdb hprod
+ have hune : u≠[] := by intro hz; apply hdegree.1; simp [hz,wordsPoly,listPoly]
+ obtain ⟨v0,a,b,hv0,hrun,hac,hbc,hae,hal,hbl,hval⟩ := reduction_exists p f u r hp hb hf hcu hrc hnu hune hfd hdegree.2 (by simpa [pow_two] using hrvalid)
+ exact ⟨ch,u,w,r,v0,a,b,hdiv,hr,hv0,hrun,hac,hbc,hae,hal,hbl,hval⟩
+end ReductionWord

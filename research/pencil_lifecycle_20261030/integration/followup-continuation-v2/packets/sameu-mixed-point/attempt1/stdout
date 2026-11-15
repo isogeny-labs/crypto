@@ -1,0 +1,81 @@
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/SameUMixed.lean:23:24: error: Ambiguous term
+  support
+Possible interpretations:
+  MixedCancellation.support : ?m.356 → ?m.356 → ?m.356[X]
+  
+  Polynomial.support : ?m.356[X] → Finset ℕ
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/SameUMixed.lean:22:50: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+q r s1 t1 s2 t2 : K
+h1 : MixedCancellation.support q r ∣ f - ordinate s1 t1 ^ 2
+h2 : MixedCancellation.support q r ∣ f - ordinate s2 t2 ^ 2
+hd : MixedCancellation.support q r ∣ (ordinate s1 t1 - ordinate s2 t2) * (ordinate s1 t1 + ordinate s2 t2)
+he :
+  f - ordinate s2 t2 ^ 2 - (f - ordinate s1 t1 ^ 2) =
+    (ordinate s1 t1 - ordinate s2 t2) * (ordinate s1 t1 + ordinate s2 t2)
+hm : MixedCancellation.support q r ∣ C ((s1 - s2) * (s1 + s2)) * MixedCancellation.support q r
+hrem :
+  MixedCancellation.support q r ∣
+    (ordinate s1 t1 - ordinate s2 t2) * (ordinate s1 t1 + ordinate s2 t2) -
+      C ((s1 - s2) * (s1 + s2)) * MixedCancellation.support q r
+aa : K := (s1 - s2) * (t1 + t2) + (t1 - t2) * (s1 + s2) - (s1 - s2) * (s1 + s2) * q
+bb : K := (t1 - t2) * (t1 + t2) - (s1 - s2) * (s1 + s2) * r
+⊢ C s1 * X * C t1 * 2 + C s1 ^ 2 * X ^ 2 - C s1 ^ 2 * MixedCancellation.support q r - X * C s2 * C t2 * 2 -
+            X ^ 2 * C s2 ^ 2 +
+          C t1 ^ 2 +
+        C s2 ^ 2 * MixedCancellation.support q r -
+      C t2 ^ 2 =
+    C s1 * X * C t1 * 2 - C s1 ^ 2 * X * C q - C s1 ^ 2 * C r - X * C s2 * C t2 * 2 + X * C s2 ^ 2 * C q + C t1 ^ 2 +
+        C s2 ^ 2 * C r -
+      C t2 ^ 2
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/SameUMixed.lean:27:9: error: Ambiguous term
+  support
+Possible interpretations:
+  MixedCancellation.support : ?m.376 → ?m.376 → ?m.376[X]
+  
+  Polynomial.support : ?m.376[X] → Finset ℕ
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/SameUMixed.lean:27:2: error: Type mismatch: After simplification, term
+  natDegree_quadratic one_ne_zero
+ has type
+  (X ^ 2 + C q * X).natDegree = 2
+but is expected to have type
+  (MixedCancellation.support q r).natDegree = 2
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/SameUMixed.lean:40:18: error: Ambiguous term
+  support
+Possible interpretations:
+  MixedCancellation.support : ?m.103 → ?m.103 → ?m.103[X]
+  
+  Polynomial.support : ?m.103[X] → Finset ℕ
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/SameUMixed.lean:40:2: error: Type mismatch: After simplification, term
+  hc
+ has type
+  (C s1 * X * (C s1 * X)).coeff 1 + t1 * s1 - ((C s2 * X * (C s1 * X)).coeff 1 + t2 * s1) + (s1 * t1 - s2 * t1) +
+      ((C s1 * X * (C s2 * X)).coeff 1 + t1 * s2 - ((C s2 * X * (C s2 * X)).coeff 1 + t2 * s2) + (s1 * t2 - s2 * t2)) =
+    0
+but is expected to have type
+  s1 * t1 - s2 * t1 + (s1 * t2 - s2 * t2) = 0
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/SameUMixed.lean:53:22: error(lean.unknownIdentifier): Unknown identifier `eval`
+/var/tmp/pencil-sameu-mixed-point-20261031-v1/SameUMixed.lean:49:46: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+q r s1 t1 s2 t2 : K
+h1 : MixedCancellation.support q r ∣ f - ordinate s1 t1 ^ 2
+h2 : MixedCancellation.support q r ∣ f - ordinate s2 t2 ^ 2
+hk : s1 - s2 ≠ 0
+hn : ¬(s1 = -s2 ∧ t1 = -t2)
+x : K := (t2 - t1) / (s1 - s2)
+hxlin : s1 * x + t1 - (s2 * x + t2) = 0
+h :
+  (ordinate s1 t1 - ordinate s2 t2) * (ordinate s1 t1 + ordinate s2 t2) =
+    C ((s1 - s2) * (s1 + s2)) * MixedCancellation.support q r
+⊢ let x := (t2 - t1) / (s1 - s2);
+  x ^ 2 + q * x + r = 0 ∧ X - C x ∣ f - C (s1 * x + t1) ^ 2

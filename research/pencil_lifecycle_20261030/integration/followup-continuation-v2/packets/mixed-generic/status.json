@@ -1,0 +1,66 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "source_sha256": "df3fc1e0d8ce9a6d27885578b9d9e7889edde64e882962199b97e2891dc974c2",
+  "scope": "generic weighted degree1+degree2 field-value output preservation",
+  "premises": [
+    "field K",
+    "monic quintic f=X5+a3X3+a2X2+a1X+a0",
+    "four representation weights nonzero",
+    "actual genericK nonzero",
+    "original normalized degree1 and degree2 Mumford validity"
+  ],
+  "conclusions": [
+    "exact generic source field output z/w nonzero",
+    "normalized output quadratic divides f minus output linear ordinate squared",
+    "generic dispatcher returns Some output under rawK guard"
+  ],
+  "no_output_identity_or_validity_premises": true,
+  "theorem_ledger": [
+    "disjoint_product_dvd",
+    "interpolation_divides",
+    "residual_degree",
+    "reduction_identity",
+    "affine_generic_valid",
+    "genericK_same",
+    "normalized_with",
+    "slope_decode",
+    "weighted_generic_preserves",
+    "generic_dispatch"
+  ],
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "boundary": [
+    "field arithmetic only; no UInt64 expression correspondence",
+    "not divisor-class addition or compiler/counter semantics",
+    "no smoothness assumption for polynomial divisibility",
+    "zeroK branch excluded, no tripling or whole-walk claim"
+  ],
+  "control_fixtures": [
+    "nonunit weighted disjoint input with nonzero interpolation slope",
+    "zero interpolation slope yielding repeated output support",
+    "zeroK dispatcherNone",
+    "invalid point constant coefficient negative control"
+  ],
+  "failures_preserved": [
+    "scratch fixture expansion wrong in PLAN; exact corrected CONTROL-PLAN checked by kernel before theorem controls",
+    "ambiguous support namespace attempt1",
+    "unused API probe missing degree lemma",
+    "local slope alias in degree bound attempt3; dsimp correction"
+  ],
+  "independent_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "receipts": {
+    "attempt1": 1,
+    "probe1": 1,
+    "attempt2": 0,
+    "attempt3": 1,
+    "attempt4": 0,
+    "attempt5": 0,
+    "controls1": 0,
+    "readback1": 0
+  }
+}

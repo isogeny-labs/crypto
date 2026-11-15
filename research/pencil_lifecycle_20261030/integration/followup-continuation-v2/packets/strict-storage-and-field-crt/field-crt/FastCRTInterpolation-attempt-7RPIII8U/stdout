@@ -1,0 +1,66 @@
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolation.lean:37:2: error: unknown tactic
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolation.lean:33:39: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+qa ra sa ta qb rb sb tb : K
+h1 :
+  (support qa ra - support qb rb) * adjugate (qa - qb) (ra - rb) qb =
+    C (norm (qa - qb) (ra - rb) qb rb) - C ((qa - qb) ^ 2) * support qb rb
+h2 :
+  delta (sb - sa) (tb - ta) * adjugate (qa - qb) (ra - rb) qb -
+      (C (slopeZero (qa - qb) (ra - rb) (sb - sa) (tb - ta) qb rb) +
+        C (slopeOne (qa - qb) (ra - rb) (sb - sa) (tb - ta)) * X) =
+    support qb rb * C (-(qa - qb) * (sb - sa))
+⊢ (C (slopeZero (qa - qb) (ra - rb) (sb - sa) (tb - ta) qb rb) +
+          C (slopeOne (qa - qb) (ra - rb) (sb - sa) (tb - ta)) * X) *
+        support qa ra -
+      delta (sb - sa) (tb - ta) * C (norm (qa - qb) (ra - rb) qb rb) =
+    support qb rb *
+      (delta (sb - sa) (tb - ta) * (adjugate (qa - qb) (ra - rb) qb - C ((qa - qb) ^ 2)) +
+        C ((qa - qb) * (sb - sa)) * support qa ra)
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolation.lean:58:8: error: unknown tactic
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolation.lean:52:63: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+qa ra sa ta qb rb sb tb : K
+hn : norm (qa - qb) (ra - rb) qb rb ≠ 0
+I : K[X] := C (norm (qa - qb) (ra - rb) qb rb)⁻¹
+hi : I * C (norm (qa - qb) (ra - rb) qb rb) = 1
+hd : delta (sb - sa) (tb - ta) = delta sb tb - delta sa ta
+⊢ delta sa ta + I * numerator (qa - qb) (ra - rb) (sb - sa) (tb - ta) qb rb * support qa ra - delta sb tb =
+    I *
+      (numerator (qa - qb) (ra - rb) (sb - sa) (tb - ta) qb rb * support qa ra -
+        (delta sb tb - delta sa ta) * C (norm (qa - qb) (ra - rb) qb rb))
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolation.lean:45:1: error: unsolved goals
+case right.calc.step
+K : Type u_1
+inst✝ : Field K
+qa ra sa ta qb rb sb tb : K
+hn : norm (qa - qb) (ra - rb) qb rb ≠ 0
+I : K[X] := C (norm (qa - qb) (ra - rb) qb rb)⁻¹
+hi : I * C (norm (qa - qb) (ra - rb) qb rb) = 1
+⊢ I *
+      (numerator (qa - qb) (ra - rb) (sb - sa) (tb - ta) qb rb * support qa ra -
+        delta (sb - sa) (tb - ta) * C (norm (qa - qb) (ra - rb) qb rb)) =
+    support qb rb *
+      (I *
+        (delta (sb - sa) (tb - ta) * (adjugate (qa - qb) (ra - rb) qb - C ((qa - qb) ^ 2)) +
+          C ((qa - qb) * (sb - sa)) * support qa ra))
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolation.lean:65:26: error: unknown tactic
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolation.lean:65:22: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+u v w f q : K[X]
+hq : f - v ^ 2 = u * q
+t : K[X]
+ht : w - v = u * t
+⊢ w = v + u * t
+/var/tmp/pencil-fast-crt-interpolation-20261101-v1/FastCRTInterpolation.lean:62:48: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+u v w f q : K[X]
+hq : f - v ^ 2 = u * q
+t : K[X]
+ht : w - v = u * t
+hw : w = v + u * t
+⊢ u ∣ f - w ^ 2

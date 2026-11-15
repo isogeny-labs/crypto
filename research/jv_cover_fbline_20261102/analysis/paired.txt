@@ -1,0 +1,25 @@
+C1 baseline unchanged (p=1301 s3, residuals/relation_digest/total_muls/decompositions equal to the crossover record): PASS
+C2 machinery null (JV_FB_LINE=1): residuals 428147 vs 428147, digest equal true, total_muls diff 22772 = search muls 22772: PASS
+
+| p | seed | B plain | B best | S plain (A) | S line (B) | S_B/S_A | predicted (B_plain/B_best)^5 | residuals A | residuals B | search share of B | rate_B / model |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1301 | 1 | 634 | 728 | 1.4940 | 0.7288 | **0.488** | 0.501 | 568769 | 275600 | 0.55% | 0.969 |
+| 1301 | 2 | 651 | 725 | 1.3366 | 0.7813 | **0.585** | 0.584 | 508789 | 295572 | 0.52% | 0.921 |
+| 1301 | 3 | 662 | 730 | 1.1249 | 0.7033 | **0.625** | 0.613 | 428147 | 265906 | 0.57% | 0.991 |
+| 1451 | 1 | 735 | 811 | 0.9821 | 0.6015 | **0.612** | 0.611 | 518223 | 315400 | 0.54% | 0.949 |
+| 1451 | 2 | 729 | 800 | 1.0364 | 0.6330 | **0.611** | 0.628 | 546934 | 332057 | 0.51% | 0.963 |
+| 1451 | 3 | 703 | 804 | 1.2412 | 0.6103 | **0.492** | 0.511 | 655128 | 320031 | 0.53% | 0.977 |
+| 1601 | 1 | 764 | 884 | 1.1184 | 0.5233 | **0.468** | 0.482 | 793128 | 368821 | 0.51% | 0.952 |
+| 1601 | 2 | 820 | 883 | 0.7164 | 0.5040 | **0.704** | 0.691 | 507722 | 355043 | 0.53% | 0.994 |
+| 1601 | 3 | 824 | 883 | 0.6654 | 0.5063 | **0.761** | 0.708 | 471586 | 356689 | 0.53% | 0.988 |
+
+C3 every arm-B run solved and correct: PASS
+C4 rate_B / ((2B/p)^6/720) in [0.8, 1.25] on every run: PASS
+
+Primary: geometric mean S_B/S_A over 9 instances = 0.5865 [0.5301, 0.6508] (95% bootstrap over instances, 20000); speed-up x1.705 [1.537, 1.886]; predicted geometric mean 0.5872
+every instance S_B < S_A: true; H1 SUPPORTED
+p=1301: geo-mean S_A 1.3097, S_B 0.7371, ratio 0.5628
+p=1451: geo-mean S_A 1.0810, S_B 0.6148, ratio 0.5687
+p=1601: geo-mean S_A 0.8108, S_B 0.5111, ratio 0.6304
+
+failures/notes: []

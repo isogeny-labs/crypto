@@ -1,0 +1,42 @@
+import FallbackWordExact
+set_option autoImplicit false
+namespace FallbackWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+theorem result_nonzero (p : UInt64) [Fact p.toNat.Prime] (a b : (ZMod p.toNat)[X])
+ (d s t : List UInt64) (h : PegcdWord.Result p a b d s t) (ha : a ≠ 0) : wordsPoly p d ≠ 0 := by
+ rcases h with ⟨_,_,_,_,_,_,_,hd,_,_⟩
+ intro hz
+ rw [hz,zero_dvd_iff] at hd
+ exact ha hd
+
+structure Chain (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb : List UInt64) where
+ d1 : List UInt64
+ e1 : List UInt64
+ e2 : List UInt64
+ d : List UInt64
+ c1 : List UInt64
+ c2 : List UInt64
+ z1 : PegcdWord.Registers
+ z2 : PegcdWord.Registers
+ run1 : PegcdWord.Run p (PegcdWord.initial ua ub) z1
+ finish1 : PegcdWord.finish p z1=some (d1,e1,e2)
+ first : PegcdWord.Result p (wordsPoly p ua) (wordsPoly p ub) d1 e1 e2
+ run2 : PegcdWord.Run p (PegcdWord.initial d1 (ResidualWord.padd p va vb)) z2
+ finish2 : PegcdWord.finish p z2=some (d,c1,c2)
+ second : PegcdWord.Result p (wordsPoly p d1) (wordsPoly p (ResidualWord.padd p va vb)) d c1 c2
+
+theorem chain_exists (p : UInt64) [Fact p.toNat.Prime] (ua ub va vb : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31)
+ (hua : Canon p ua) (hub : Canon p ub) (hva : Canon p va) (hvb : Canon p vb)
+ (hna : Normal ua) (hnb : Normal ub) (hanz : wordsPoly p ua ≠ 0) :
+ Nonempty (Chain p ua ub va vb) := by
+ obtain ⟨z1,d1,e1,e2,hr1,_,hf1,h1⟩ := PegcdWord.full_word_endpoint p ua ub hp hb hua hna hub hnb hanz
+ have hd1 := result_nonzero p _ _ d1 e1 e2 h1 hanz
+ have hsum := ResidualWord.add_correct p va vb (by omega) hb hva hvb
+ have hc1 : Canon p d1 := h1.1
+ have hn1 : Normal d1 := h1.2.2.2.1
+ obtain ⟨z2,d,c1,c2,hr2,_,hf2,h2⟩ := PegcdWord.full_word_endpoint p d1 (ResidualWord.padd p va vb)
+   hp hb hc1 hn1 hsum.1 (add_normal p va vb) hd1
+ exact ⟨⟨d1,e1,e2,d,c1,c2,z1,z2,hr1,hf1,h1,hr2,hf2,h2⟩⟩
+end FallbackWord

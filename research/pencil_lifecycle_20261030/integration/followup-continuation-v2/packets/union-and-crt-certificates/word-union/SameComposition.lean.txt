@@ -1,0 +1,36 @@
+import SameRoot
+set_option autoImplicit false
+namespace GraphSameRoot
+open SignedGraphAlgebra GraphFind GraphUnion GraphForest
+variable {K : Type*} [Field K] [DecidableEq K] {n : Nat}
+def afterSame (s : GraphUnion.State K n) (w : GraphFind.State K n) (root : Fin n)
+ (pu pv : Potential K) (su sv a b : K) :=
+ sameRoot (lifted s w) root (su*pu.s) (sv*pv.s)
+ (a-su*pu.a-sv*pv.a) (b-su*pu.b-sv*pv.b)
+
+theorem same_after_two_finds (s : GraphUnion.State K n) (t w : GraphFind.State K n)
+ (u v root : Fin n) (pu pv : Potential K) (rank : Fin n → Nat)
+ (value : Fin n → K) (su sv a b k : K)
+ (hf : Forest s.graph rank) (hv : Valid s value k)
+ (h1 : Run s.graph u t root pu) (h2run : Run t v w root pv)
+ (h2 : (2:K)≠0)
+ (hsu : su*pu.s=1 ∨ su*pu.s= -1) (hsv : sv*pv.s=1 ∨ sv*pv.s= -1)
+ (he : su*value u+sv*value v=a+b*k) :
+ Forest (afterSame s w root pu pv su sv a b).1.graph rank ∧
+ Valid (afterSame s w root pu pv su sv a b).1 value k ∧
+ Safe (afterSame s w root pu pv su sv a b).2 k := by
+ obtain ⟨hwf,hwv,_,_,hu,hv'⟩ := two_finds s t w u v root root pu pv rank value k hf hv h1 h2run
+ have hr := edge_reduction pu pv su sv (value u) (value v) (value root) (value root) a b k hu hv' he
+ obtain ⟨hout,hsafe,hgraph⟩ := same_root_safe (lifted s w) root _ _ _ _ value k hwv h2 hsu hsv hr
+ refine ⟨?_,hout,hsafe⟩
+ change Forest (sameRoot (lifted s w) root _ _ _ _).1.graph rank
+ rw [hgraph]
+ exact hwf
+
+theorem recovered_answer (o : Result K) (k a : K) (h : Safe o k) (ha : o=.answer a) : a=k := by
+ simpa [ha,Safe] using h
+
+theorem assertion_excluded (o : Result K) (k : K) (h : Safe o k) : o≠.inconsistent := by
+ intro he
+ simpa [he,Safe] using h
+end GraphSameRoot

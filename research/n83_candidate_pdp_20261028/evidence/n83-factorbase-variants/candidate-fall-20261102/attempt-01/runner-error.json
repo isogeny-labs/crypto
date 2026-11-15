@@ -1,0 +1,15 @@
+{
+  "cases_not_started": 143,
+  "cases_started": 1,
+  "data_state": "native certificate and results.json exist locally; native certificate S3 object read back byte-identically; replay performed as recovery and verified",
+  "decision": "Preserve attempt-01 as a partial runner-error attempt. Do not rerun this certificate. Continue only the 143 unstarted systems using a fresh S3 prefix and a separately bound continuation runner.",
+  "exception": "bounded() missing 1 required positional argument: env",
+  "exception_type": "TypeError",
+  "failed_after_case": "spike35/koblitz-m2-planted",
+  "location": "run_first_fall.py line 183, fresh replay invocation",
+  "producer_returncode": "not captured",
+  "protocol_freeze_sha256": "50cd6f8213789de2dfd54a3b33a067ed87cc0def761b7c98769be3e19aee47a9",
+  "protocol_id": "N83-FACTOR-BASE-PDP-FFD-LFD-20261031-V2",
+  "runner_sha256": "641bf20a152715574efd4f36faf90dc368c26a0d4a0e453c8fcb53d345c2021e",
+  "schema": "n83.candidate-fall-runner-error/v1"
+}

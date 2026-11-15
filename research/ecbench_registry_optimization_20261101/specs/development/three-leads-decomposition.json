@@ -1,0 +1,18 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: three-leads decomposition implementations",
+  "description": "Unit-test-derived binary subfield fixture for the two decomposition adapters. Development only.",
+  "workloads": {
+    "curves": [{"kind": "three_leads", "p": 2, "n": 6, "modulus": 67, "a": 3, "b": 3, "group_order": 56, "r": 7, "gx": 1, "gy": 58, "family": "subfield", "parameter": 3}],
+    "targets_per_curve": 1,
+    "target_seed": 202611010403,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {"name": "rho-neg-reference", "role": "reference", "method": {"id": "rho.three_leads_negation_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.three_leads_negation_v1", "params": {"trial_cap": "2000"}}},
+    {"name": "decomposition-v1", "role": "baseline", "method": {"id": "ic.three_leads_decomposition_v1", "params": {"trial_cap": "2000", "oracle": "subtract", "random_base": "0", "base_seed": "17"}}},
+    {"name": "decomposition-v2", "role": "candidate", "method": {"id": "ic.three_leads_decomposition_v2", "params": {"trial_cap": "2000", "oracle": "subtract", "random_base": "0", "base_seed": "17"}}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 202611010404, "isolation_required": "L2", "timeout_seconds": 180}
+}

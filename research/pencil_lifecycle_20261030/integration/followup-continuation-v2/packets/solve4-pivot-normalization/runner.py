@@ -1,0 +1,57 @@
+import os,sys,time,json,hashlib,signal,subprocess,resource
+from pathlib import Path
+D=Path(__file__).resolve().parent
+resource.setrlimit(resource.RLIMIT_AS,(8*1024**3,8*1024**3))
+resource.setrlimit(resource.RLIMIT_STACK,(10*1024**2,10*1024**2))
+number=int(sys.argv[1]);assert 1<=number<=3
+OUT=D/('attempt'+str(number));OUT.mkdir()
+for n in ['Normalization','Controls','ExpectedFailure']:(OUT/(n+'.lean')).write_bytes((D/'source'/(n+'.lean')).read_bytes())
+start=time.monotonic(); child=None; rows=[]; pending=None
+roots=[D/'source',*[D/f'imports-{i}' for i in range(3)],Path('/var/tmp/pencil-mumford-validity-20261031-v1/dependency-union'),Path('/var/tmp/pencil-sameu-global-smooth-20261031-v1/dependency-union')]
+lean=Path('/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean')
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+inputs={str(p):digest(p) for root in roots for p in sorted(root.rglob('*')) if p.is_file() and p not in {D/'source'/(n+'.olean') for n in ['Normalization','Controls','ExpectedFailure']}}
+inputs[str(lean)]=digest(lean)
+(OUT/'inputs.json').write_text(json.dumps(inputs,indent=2)+'\n')
+def stop(sig,frame):
+ global pending
+ pending=sig
+ raise RuntimeError('received signal '+str(sig))
+signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
+try:
+ env=dict(os.environ,LEAN_SYSROOT=str(lean.parent.parent),LEAN_PATH=':'.join(map(str,roots)))
+ for n in ['Normalization','Controls','ExpectedFailure']:
+  remaining=80-(time.monotonic()-start)
+  if remaining<=0:raise RuntimeError('total deadline')
+  cmd=[str(lean),'-j1','-M3500','-s16384','-o',str(D/'source'/(n+'.olean')),str(D/'source'/(n+'.lean'))]
+  row={'module':n,'command':cmd,'expected_exit':1 if n=='ExpectedFailure' else 0};rows.append(row)
+  with (OUT/(n+'.stdout')).open('wb') as so,(OUT/(n+'.stderr')).open('wb') as se:
+   child=subprocess.Popen(cmd,cwd=D,env=env,stdout=so,stderr=se,start_new_session=True)
+   row['pid']=child.pid
+   try:row['exit']=child.wait(timeout=remaining)
+   except BaseException:
+    os.killpg(child.pid,signal.SIGKILL)
+    try:row['exit']=child.wait(timeout=2);row['reaped']=True
+    except BaseException:row['reaped']=False
+    raise
+   row['reaped']=True;child=None
+  if row['exit']!=row['expected_exit']:raise RuntimeError('unexpected child exit')
+ allowed={'propext','Classical.choice','Quot.sound'}
+ import re
+ audit='\n'.join((OUT/(n+'.stdout')).read_text() for n in ['Controls'])
+ found=re.findall(r"'([^']+)' depends on axioms: \[([^\]]*)\]",audit)
+ noaxioms=re.findall(r"'([^']+)' does not depend on any axioms",audit)
+ names=[n for n,a in found]+noaxioms
+ assert len(names)==16 and len(set(names))==16,(len(names),names)
+ for n,a in found:assert set(filter(None,(x.strip() for x in a.split(','))))<=allowed,(n,a)
+ (OUT/'axioms.json').write_text(json.dumps({'named_declarations':names,'allowlist':sorted(allowed),'passed':True},indent=2)+'\n')
+ changed=[p for p,h in inputs.items() if not Path(p).exists() or digest(Path(p))!=h]
+ assert not changed,changed
+ assert pending is None and time.monotonic()-start<80
+ status='passed'
+except BaseException as e:
+ status='failed';error=repr(e)
+finally:
+ (OUT/'receipt.json').write_text(json.dumps({'status':status,'error':locals().get('error'),'commands':rows,'elapsed_seconds':time.monotonic()-start,'pending_signal':pending,'input_files':len(inputs),'changed_inputs':locals().get('changed'),'scientific_runs':0},indent=2)+'\n')
+print(status)
+sys.exit(0 if status=='passed' else 1)

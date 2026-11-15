@@ -1,0 +1,635 @@
+--- a/taskq/deploy/eks-karpenter/resume/controller/src/contract.rs
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/contract.rs
+@@ -57,6 +57,17 @@
+     pub diagnostic_transport: Option<DiagnosticTransport>,
+     #[serde(default, skip_serializing_if = "Option::is_none")]
+     pub worker_campaign: Option<crate::campaign::Binding>,
++    #[serde(default, skip_serializing_if = "Option::is_none")]
++    pub fresh_owner: Option<FreshOwnerAdmission>,
++}
++
++#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct FreshOwnerAdmission {
++    pub schema: String,
++    pub binary_sha256: String,
++    /// Immutable process stop, never later than the original request deadline.
++    pub stop_utc_seconds: u64,
+ }
+ 
+ pub const MAX_DIAGNOSTIC_LAUNCH_BYTES: usize = 65_536;
+@@ -200,6 +211,16 @@
+         }
+         if let Some(transport) = &self.diagnostic_transport {
+             transport.validate(&self.spec)?;
++        }
++        if let Some(owner) = &self.fresh_owner {
++            if owner.schema != "isolab.fresh-owner-admission/v1"
++                || !hex(&owner.binary_sha256, 64)
++                || self.diagnostic_transport.is_none()
++                || owner.stop_utc_seconds == 0
++                || owner.stop_utc_seconds > self.deadline_unix_seconds
++            {
++                return Err("invalid explicit fresh owner admission".into());
++            }
+         }
+         Ok(())
+     }
+@@ -241,6 +262,7 @@
+         max_restores: 2,
+         memory: Memory::default(),
+         diagnostic_transport: None,
++        fresh_owner: None,
+         worker_campaign: None,
+     }
+ }
+@@ -421,4 +443,23 @@
+         assert!(fixture().validate_new_deadline(5001).is_err());
+         assert!(fixture().validate_new_deadline(4999).is_err());
+     }
+-}
++    #[test]
++    fn fresh_owner_requires_diagnostics_and_original_deadline() {
++        let mut r = fixture();
++        r.fresh_owner = Some(FreshOwnerAdmission {
++            schema: "isolab.fresh-owner-admission/v1".into(),
++            binary_sha256: "e".repeat(64),
++            stop_utc_seconds: 4000,
++        });
++        assert!(r.validate().is_err());
++        let mut r = diagnostic_fixture();
++        r.fresh_owner = Some(FreshOwnerAdmission {
++            schema: "isolab.fresh-owner-admission/v1".into(),
++            binary_sha256: "e".repeat(64),
++            stop_utc_seconds: 4000,
++        });
++        assert!(r.validate().is_ok());
++        r.fresh_owner.as_mut().unwrap().stop_utc_seconds = r.deadline_unix_seconds + 1;
++        assert!(r.validate().is_err());
++    }
++}
+--- a/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs
+@@ -513,8 +513,39 @@
+             let bytes = serde_json::to_vec_pretty(&job).map_err(error)?;
+             let name = format!("benchmark-expired-job-{}.json", digest(&bytes));
+             retain_owner_bytes(&dir.join(name), &bytes)?;
+-            // Evidence-only status retention. Fresh owner/artifact collector is
+-            // a separate unfinished adapter; do not invoke verify/replay here.
++            if s.request.fresh_owner.is_some() {
++                collection_call_fits(deadline, now())?;
++                let job_name = s.benchmark_job.as_deref().ok_or("fresh Job name missing")?;
++                let list = json(kube("isolab").args([
++                    "get",
++                    "pods",
++                    "-l",
++                    &format!("job-name={job_name}"),
++                    "-o",
++                    "json",
++                ]))?;
++                let items = list["items"].as_array().ok_or("fresh Pod list absent")?;
++                if items.len() > 16 {
++                    return Err("fresh Pod identity cap".into());
++                }
++                let mut pods = Vec::new();
++                for pod in items {
++                    let expected = job["metadata"]["uid"].as_str().ok_or("Job UID absent")?;
++                    if !pod["metadata"]["ownerReferences"]
++                        .as_array()
++                        .is_some_and(|refs| {
++                            refs.iter()
++                                .any(|r| r["kind"] == "Job" && r["uid"] == expected)
++                        })
++                    {
++                        return Err("fresh Pod/Job owner mismatch".into());
++                    }
++                    pods.push(json!({"uid":field(pod,"/metadata/uid")?}));
++                }
++                let status =
++                    json!({"pods":pods,"source":"existing Kubernetes Pod ownerReferences"});
++                collect_fresh_owner_evidence(s, &status, dir)?;
++            }
+         }
+     }
+     Ok(())
+@@ -930,6 +961,36 @@
+                 json!(transport.fresh.spec_bytes_sha256),
+             ]);
+     }
++    if let Some(owner) = &s.request.fresh_owner {
++        if s.request.diagnostic_transport.is_none()
++            || owner.stop_utc_seconds <= now()
++            || owner.stop_utc_seconds > s.request.deadline_unix_seconds
++            || !hex(&owner.binary_sha256, 64)
++        {
++            return Err("fresh owner admission unavailable or expired".into());
++        }
++        let image = s
++            .request
++            .build
++            .image_uri
++            .rsplit_once("@sha256:")
++            .ok_or("fresh image digest missing")?
++            .1;
++        let task = &mut v["spec"]["template"]["spec"]["containers"][0];
++        let env = task["env"].as_array_mut().ok_or("fresh env absent")?;
++        for (name, value) in [
++            ("ISOLAB_FRESH_OWNER_SHA256", owner.binary_sha256.clone()),
++            ("ISOLAB_OWNER_REQUEST_SHA256", s.request_sha256.clone()),
++            ("ISOLAB_OWNER_IMAGE_SHA256", image.to_string()),
++            ("ISOLAB_OWNER_STOP_UTC", owner.stop_utc_seconds.to_string()),
++        ] {
++            if env.iter().any(|v| v["name"] == name) {
++                return Err("duplicate owner env".into());
++            }
++            env.push(json!({"name":name,"value":value}));
++        }
++        env.push(json!({"name":"ISOLAB_OWNER_JOB_UID","valueFrom":{"fieldRef":{"fieldPath":"metadata.labels['batch.kubernetes.io/controller-uid']"}}}));
++    }
+     Ok(v)
+ }
+ fn mcp(name: &str, job: &str) -> Result<Value, String> {
+@@ -1002,6 +1063,11 @@
+             .arg(pod_uid)
+             .arg(&artifact),
+     )?;
++    let owner_check = if s.request.fresh_owner.is_some() {
++        Some(crate::fresh_owner::check(s, pod_uid, &artifact)?)
++    } else {
++        None
++    };
+     let gate: Value = read(&artifact.join("l2-gate.json"))?;
+     let audit: Value = read(&artifact.join("audit.json"))?;
+     let control: Value = read(&artifact.join("control-comparison.json"))?;
+@@ -1025,7 +1091,7 @@
+         return Err("fresh epoch L2/replay/A-A admission failed".into());
+     }
+     Ok(
+-        json!({"job_name":job,"job_uid":s.benchmark_uid,"pod_uid":pod_uid,"results_uri":uri,"payload_hashes_verified":named.len(),"l2":gate,"native_audit":audit,"control":control}),
++        json!({"job_name":job,"job_uid":s.benchmark_uid,"pod_uid":pod_uid,"results_uri":uri,"payload_hashes_verified":named.len(),"fresh_owner_identity_check":owner_check,"l2":gate,"native_audit":audit,"control":control}),
+     )
+ }
+ fn benchmark(stored: &mut Stored, dir: &Path) -> Result<(), String> {
+@@ -1052,6 +1118,17 @@
+         let mut manifest = manifest_job(&stored.state, remaining)?;
+         if let Some(r) = &reservation {
+             campaign_bind_manifest(&mut manifest, r, true)?;
++            if let Some(owner) = &stored.state.request.fresh_owner {
++                let stop = owner.stop_utc_seconds.min(r.deadline_unix_seconds);
++                let env = manifest["spec"]["template"]["spec"]["containers"][0]["env"]
++                    .as_array_mut()
++                    .ok_or("fresh env missing")?;
++                let value = env
++                    .iter_mut()
++                    .find(|v| v["name"] == "ISOLAB_OWNER_STOP_UTC")
++                    .ok_or("fresh owner cutoff env absent")?;
++                value["value"] = json!(stop.to_string());
++            }
+         }
+         stored.state.benchmark_manifest = Some(manifest);
+         stored.save()?;
+@@ -1102,6 +1179,18 @@
+     {
+         return Err("existing benchmark differs from immutable intent".into());
+     }
++    if s.request.fresh_owner.is_some()
++        && (current["spec"]["template"]["spec"]["containers"][0]["env"]
++            != intended["spec"]["template"]["spec"]["containers"][0]["env"]
++            || current["spec"]["template"]["spec"]["volumes"]
++                != intended["spec"]["template"]["spec"]["volumes"]
++            || current["spec"]["template"]["spec"]["containers"][0]["volumeMounts"]
++                != intended["spec"]["template"]["spec"]["containers"][0]["volumeMounts"])
++    {
++        return Err(
++            "existing fresh owner environment or mounts differ from immutable intent".into(),
++        );
++    }
+     let uid = field(&current, "/metadata/uid")?.to_owned();
+     if s.benchmark_uid.as_ref().is_some_and(|x| x != &uid) {
+         return Err("epoch job identity changed".into());
+@@ -1123,6 +1212,22 @@
+     ]))?;
+     let status = mcp("isolab_k8s_status", &name)?;
+     save(&dir.join("benchmark-status.json"), &status)?;
++    if s.request.fresh_owner.is_some()
++        && matches!(
++            status["job"]["state"].as_str(),
++            Some("failed" | "succeeded")
++        )
++    {
++        // Evidence collection precedes interpretation, and never executes a verifier or replay.
++        if let Err(e) = collect_fresh_owner_evidence(s, &status, dir) {
++            if let Err(retention) = save(
++                &dir.join("fresh-owner-collection-error.json"),
++                &json!({"error":e,"scientific_acceptance":null}),
++            ) {
++                eprintln!("fresh owner collection and local retention failed: {e}; {retention}");
++            }
++        }
++    }
+     if status["job"]["state"] == "failed" {
+         return Err("fresh benchmark epoch failed; measurement is not retried".into());
+     }
+@@ -1767,6 +1872,121 @@
+     }
+ }
+ 
++/// Bounded evidence-only collection; never launches verification, replay or another Job.
++/// Missing files/identity/remaining time are findings, not fabricated completed observations.
++pub(crate) fn collect_fresh_owner_evidence(
++    s: &State,
++    status: &Value,
++    dir: &Path,
++) -> Result<Value, String> {
++    let mut findings = Vec::<String>::new();
++    let mut objects = Vec::<Value>::new();
++    let job = s.benchmark_job.as_deref().ok_or("fresh job name missing")?;
++    let pods = status["pods"].as_array();
++    if pods.is_none_or(|p| p.is_empty()) {
++        findings.push("missing existing Pod identities".into());
++    }
++    if pods.is_some_and(|p| p.len() > 16) {
++        return Err("fresh owner pod collection cap".into());
++    }
++    let custody = dir.to_path_buf();
++    fs::create_dir_all(&custody).map_err(error)?;
++    for pod in pods.into_iter().flatten() {
++        let Some(uid) = pod["uid"].as_str().filter(|v| {
++            !v.is_empty()
++                && v.len() <= 128
++                && v.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
++        }) else {
++            findings.push("invalid Pod identity".into());
++            continue;
++        };
++        for name in [
++            "owner-run-config.json",
++            "owner-run.json",
++            "owner-replay-config.json",
++            "owner-replay.json",
++        ] {
++            // Existing aws() permits180 seconds plus5 kill grace. Reserve that full bound
++            // before every call; campaign/root deadline is never extended for collection.
++            if s.request
++                .worker_campaign
++                .as_ref()
++                .map_or(s.request.deadline_unix_seconds, |v| {
++                    v.policy.absolute_deadline_unix_seconds
++                })
++                .saturating_sub(now())
++                <= 185
++            {
++                findings.push(format!(
++                    "collection deadline reserve exhausted: {uid}/{name}"
++                ));
++                continue;
++            }
++            let cap = if name.ends_with("config.json") {
++                65536
++            } else {
++                262144
++            };
++            let tmp = custody.join(format!("{uid}-{name}.download-{}", std::process::id()));
++            if tmp.exists() {
++                findings.push(format!("retained ambiguous download exists: {uid}/{name}"));
++                continue;
++            }
++            let key = format!("runs/{job}/{uid}/{name}");
++            let out = output(
++                aws()
++                    .args([
++                        "s3api",
++                        "get-object",
++                        "--bucket",
++                        BUCKET,
++                        "--key",
++                        &key,
++                        "--range",
++                        &format!("bytes=0-{cap}"),
++                    ])
++                    .arg(&tmp),
++            );
++            let meta = match out {
++                Ok(v) => v,
++                Err(e) => {
++                    findings.push(format!("{uid}/{name}: {e}"));
++                    continue;
++                }
++            };
++            let bytes = fs::read(&tmp).map_err(error)?;
++            if bytes.len() > cap {
++                findings.push(format!("object cap: {uid}/{name}"));
++                continue;
++            }
++            let sha = digest(&bytes);
++            let retained = custody.join(format!("fresh-owner-{uid}-{name}-{sha}.json"));
++            if retained.exists() {
++                if fs::read(&retained).map_err(error)? != bytes {
++                    return Err("custody digest collision".into());
++                }
++            } else {
++                fs::hard_link(&tmp, &retained).map_err(error)?;
++            }
++            File::open(&retained)
++                .and_then(|v| v.sync_all())
++                .map_err(error)?;
++            fs::remove_file(&tmp).map_err(error)?;
++            objects.push(json!({"pod_uid":uid,"job_uid":s.benchmark_uid,"request_sha256":s.request_sha256,"image_uri":s.request.build.image_uri,"key":key,"bytes":bytes.len(),"sha256":sha,"retained_file":retained.file_name().and_then(|v|v.to_str()),"get_metadata":serde_json::from_slice::<Value>(&meta.stdout).ok()}));
++        }
++    }
++    File::open(&custody)
++        .and_then(|v| v.sync_all())
++        .map_err(error)?;
++    let result = json!({"schema":"isolab.fresh-owner-custody/v1","request_sha256":s.request_sha256,"job_uid":s.benchmark_uid,"objects":objects,"findings":findings,"owner_receipts_authenticated":false,"accepted_external_closure":null,"total_active_worker_ns":null,"scope":"exact bounded bytes collected from expected S3 keys; metadata is not semantic acceptance"});
++    let raw = serde_json::to_vec_pretty(&result).map_err(error)?;
++    retain_owner_bytes(
++        &dir.join(format!("fresh-owner-custody-{}.json", digest(&raw))),
++        &raw,
++    )?;
++    Ok(result)
++}
++
+ #[cfg(test)]
+ mod campaign_cas_tests {
+     use super::*;
+--- a/taskq/deploy/eks-karpenter/resume/controller/src/lib.rs
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/lib.rs
+@@ -4,3 +4,5 @@
+ pub mod io;
+ pub mod model;
+ pub mod supervisor;
++
++pub mod fresh_owner;
+--- /dev/null
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/fresh_owner.rs
+@@ -0,0 +1,177 @@
++//! Independent expected-identity comparison for fresh owner artifact custody.
++//! No full journal closure, mathematical acceptance or allocated-worker inference.
++use crate::{contract::*, io::error, model::State};
++use serde_json::{json, Value};
++use std::os::unix::fs::OpenOptionsExt;
++use std::{io::Read, path::Path};
++fn bounded(path: &Path, cap: usize) -> Result<Vec<u8>, String> {
++    let f = std::fs::OpenOptions::new()
++        .read(true)
++        .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK)
++        .open(path)
++        .map_err(error)?;
++    if !f.metadata().map_err(error)?.is_file() {
++        return Err("owner artifact not regular".into());
++    }
++    let mut b = Vec::new();
++    f.take(cap as u64 + 1).read_to_end(&mut b).map_err(error)?;
++    if b.len() > cap {
++        return Err("owner artifact cap".into());
++    }
++    Ok(b)
++}
++pub fn check(s: &State, pod_uid: &str, dir: &Path) -> Result<Value, String> {
++    let admission = s
++        .request
++        .fresh_owner
++        .as_ref()
++        .ok_or("owner admission missing")?;
++    let transport = s
++        .request
++        .diagnostic_transport
++        .as_ref()
++        .ok_or("diagnostic transport missing")?;
++    let image = s
++        .request
++        .build
++        .image_uri
++        .rsplit_once("@sha256:")
++        .ok_or("fresh image digest")?
++        .1;
++    let job = s
++        .benchmark_uid
++        .as_deref()
++        .ok_or("expected Job UID absent")?;
++    let manifest = s
++        .benchmark_manifest
++        .as_ref()
++        .ok_or("immutable fresh manifest missing")?;
++    let env = manifest["spec"]["template"]["spec"]["containers"][0]["env"]
++        .as_array()
++        .ok_or("fresh manifest env missing")?;
++    let values: Vec<_> = env
++        .iter()
++        .filter(|v| v["name"] == "ISOLAB_OWNER_STOP_UTC")
++        .collect();
++    if values.len() != 1 {
++        return Err("exact fresh cutoff missing".into());
++    }
++    let stop = values[0]["value"]
++        .as_str()
++        .ok_or("cutoff string")?
++        .parse::<u64>()
++        .map_err(error)?;
++    if stop == 0 || stop > admission.stop_utc_seconds || stop > s.request.deadline_unix_seconds {
++        return Err("immutable cutoff beyond admission".into());
++    }
++    let mut records = Vec::new();
++    for phase in ["run", "replay"] {
++        let raw = bounded(&dir.join(format!("owner-{phase}-config.json")), 65536)?;
++        let Unique(config) = serde_json::from_slice(&raw).map_err(error)?;
++        let expected = json!({"schema":"isolab.fresh-owner-config/v1","phase":phase,"request_sha256":s.request_sha256,"launch_sha256":transport.fresh.sha256,"launch":"/opt/isolab/diagnostic-input/fresh-launch.json","pod_uid":pod_uid,"job_uid":job,"image_digest":image,"binary_sha256":s.request.build.ecbench_sha256,"binary":"/usr/local/bin/ecbench","argv":if phase=="run"{json!(["run","--spec","/work/results/input-spec.json","--out","/work/results/session","--cpus","auto","--diagnostic-launch","/opt/isolab/diagnostic-input/fresh-launch.json"])}else{json!(["verify","--dir","/work/results/session","--replay-all","--exit-code","--out","/work/results/audit.json"])},"spec":"/work/results/input-spec.json","spec_sha256":transport.fresh.spec_bytes_sha256,"session":"/work/results/session","receipt":format!("/work/results/owner-{phase}.json"),"stop_utc_seconds":stop});
++        if config != expected {
++            return Err(format!(
++                "{phase}: config differs from controller expected identities/argv"
++            ));
++        }
++        let receipt_raw = bounded(&dir.join(format!("owner-{phase}.json")), 262144)?;
++        let Unique(receipt) = serde_json::from_slice(&receipt_raw).map_err(error)?;
++        let checker_raw = bounded(&dir.join(format!("owner-{phase}-check.json")), 65536)?;
++        let Unique(checker) = serde_json::from_slice(&checker_raw).map_err(error)?;
++        let receipt_hash = digest(&receipt_raw);
++        let config_hash = digest(&raw);
++        if receipt["schema"] != "isolab.fresh-owner-observation/v1"
++            || receipt["binding"] != expected
++            || receipt["config_sha256"] != config_hash
++            || receipt["exit_code"] != 0
++            || receipt["reap_observed"] != true
++            || receipt["findings"] != json!([])
++            || receipt.get("total_active_worker_ns") != Some(&Value::Null)
++            || receipt.get("accepted_external_closure") != Some(&Value::Null)
++            || checker["schema"] != "isolab.fresh-owner-check/v1"
++            || checker["phase"] != phase
++            || checker["receipt_sha256"] != receipt_hash
++            || checker["config_sha256"] != config_hash
++            || checker["identity_and_observation_checked"] != true
++            || checker.get("accepted_external_closure") != Some(&Value::Null)
++        {
++            return Err(format!(
++                "{phase}: incomplete or inconsistent observation/checker binding"
++            ));
++        }
++        if phase == "run" {
++            for (name, key, cap) in [
++                ("session-preparation.json", "preparation_sha256", 262144),
++                ("resource-journal.json", "journal_sha256", 8 * 1024 * 1024),
++            ] {
++                if receipt["session_binding"][key]
++                    != digest(&bounded(&dir.join("session").join(name), cap)?)
++                {
++                    return Err("run journal/preparation custody mismatch".into());
++                }
++            }
++        } else if !receipt["session_binding"].is_null() {
++            return Err("replay fabricated closure".into());
++        }
++        records
++            .push(json!({"phase":phase,"receipt_sha256":receipt_hash,"config_sha256":config_hash}));
++    }
++    let Unique(build) =
++        serde_json::from_slice(&bounded(&dir.join("build-info.json"), 65536)?).map_err(error)?;
++    if build["fresh_owner_sha256"] != admission.binary_sha256 {
++        return Err("owner executable build binding mismatch".into());
++    }
++    Ok(
++        json!({"schema":"isolab.fresh-owner-controller-check/v1","request_sha256":s.request_sha256,"pod_uid":pod_uid,"job_uid":job,"records":records,"scope":"controller-expected identities and retained bytes; native full journal closure remains separate","accepted_external_closure":null,"total_active_worker_ns":null}),
++    )
++}
++// Reject duplicate keys recursively before interpreting untrusted metadata.
++struct Unique(Value);
++impl<'de> serde::Deserialize<'de> for Unique {
++    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
++        struct V;
++        impl<'de> serde::de::Visitor<'de> for V {
++            type Value = Unique;
++            fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
++                write!(f, "JSON without duplicate keys")
++            }
++            fn visit_bool<E: serde::de::Error>(self, v: bool) -> Result<Unique, E> {
++                Ok(Unique(json!(v)))
++            }
++            fn visit_i64<E: serde::de::Error>(self, v: i64) -> Result<Unique, E> {
++                Ok(Unique(json!(v)))
++            }
++            fn visit_u64<E: serde::de::Error>(self, v: u64) -> Result<Unique, E> {
++                Ok(Unique(json!(v)))
++            }
++            fn visit_f64<E: serde::de::Error>(self, v: f64) -> Result<Unique, E> {
++                Ok(Unique(json!(v)))
++            }
++            fn visit_str<E: serde::de::Error>(self, v: &str) -> Result<Unique, E> {
++                Ok(Unique(json!(v)))
++            }
++            fn visit_unit<E: serde::de::Error>(self) -> Result<Unique, E> {
++                Ok(Unique(Value::Null))
++            }
++            fn visit_seq<A: serde::de::SeqAccess<'de>>(self, mut a: A) -> Result<Unique, A::Error> {
++                let mut out = Vec::new();
++                while let Some(Unique(v)) = a.next_element()? {
++                    out.push(v);
++                }
++                Ok(Unique(Value::Array(out)))
++            }
++            fn visit_map<A: serde::de::MapAccess<'de>>(self, mut a: A) -> Result<Unique, A::Error> {
++                let mut out = serde_json::Map::new();
++                while let Some(k) = a.next_key::<String>()? {
++                    if out.contains_key(&k) {
++                        return Err(serde::de::Error::custom("duplicate JSON key"));
++                    }
++                    let Unique(v) = a.next_value()?;
++                    out.insert(k, v);
++                }
++                Ok(Unique(Value::Object(out)))
++            }
++        }
++        d.deserialize_any(V)
++    }
++}
+--- a/taskq/deploy/eks-karpenter/run-ecbench
++++ b/taskq/deploy/eks-karpenter/run-ecbench
+@@ -16,17 +16,33 @@
+     done
+   ) > "$ISOLAB_OUTPUT_DIR/SHA256SUMS"
+   hash_exit=$?
+-  if [[ "$hash_exit" != 0 ]]; then exit 90; fi
++  if [[ "$hash_exit" != 0 ]]; then
++    printf 'Artifact hash collection failed: %s; original exit: %s\n' "$hash_exit" "$run_exit" >&2
++    if [[ "$run_exit" != 0 ]]; then exit "$run_exit"; fi
++    exit 90
++  fi
+   if aws s3 cp "$ISOLAB_OUTPUT_DIR/" "$ISOLAB_RESULTS_URI" --recursive --only-show-errors; then
+     printf 'Artifacts saved: %s\n' "$ISOLAB_RESULTS_URI"
+   else
++    printf 'Artifact upload failed; original exit: %s\n' "$run_exit" >&2
++    if [[ "$run_exit" != 0 ]]; then exit "$run_exit"; fi
+     exit 91
+   fi
+   exit "$run_exit"
+ }
+ trap finish EXIT
+-trap 'exit 143' TERM
+-trap 'exit 130' INT
++OWNER_PID=""
++OWNER_INTERRUPTED=0
++owner_signal() {
++  if [[ -n "$OWNER_PID" ]]; then
++    OWNER_INTERRUPTED=1
++    kill -"$1" "$OWNER_PID" 2>/dev/null || true
++  else
++    exit "$2"
++  fi
++}
++trap 'owner_signal TERM 143' TERM
++trap 'owner_signal INT 130' INT
+ cp /opt/isolab/build-info.json "$ISOLAB_OUTPUT_DIR/build-info.json"
+ sha256sum /usr/local/bin/ecbench > "$ISOLAB_OUTPUT_DIR/binary.sha256"
+ # Validate build identity before any warmup or measured execution.
+@@ -61,8 +77,51 @@
+ # A separate whole core remains for the parent shell and harness. No busy
+ # override, threshold override, automatic retry, or selective record removal.
+ sleep 60
+-ecbench run --spec "$spec" --out "$ISOLAB_OUTPUT_DIR/session" --cpus auto "${diagnostic_args[@]}" > "$ISOLAB_OUTPUT_DIR/run-summary.json" 2> "$ISOLAB_OUTPUT_DIR/run.stderr"
+-ecbench verify --dir "$ISOLAB_OUTPUT_DIR/session" --replay-all --exit-code --out "$ISOLAB_OUTPUT_DIR/audit.json" > "$ISOLAB_OUTPUT_DIR/audit.stdout" 2> "$ISOLAB_OUTPUT_DIR/audit.stderr"
++owner_invoke() {
++  local phase=$1
++  shift
++  local config="$ISOLAB_OUTPUT_DIR/owner-$phase-config.json"
++  local receipt="$ISOLAB_OUTPUT_DIR/owner-$phase.json"
++  local config_sha child_exit check_exit
++  [[ ${#diagnostic_args[@]} == 2 ]] || return 46
++  [[ $(sha256sum /usr/local/bin/isolab-fresh-owner | cut -d' ' -f1) == "$ISOLAB_FRESH_OWNER_SHA256" ]] || return 46
++  [[ $(jq -r .fresh_owner_sha256 "$ISOLAB_OUTPUT_DIR/build-info.json") == "$ISOLAB_FRESH_OWNER_SHA256" ]] || return 46
++  jq -n --arg phase "$phase" --arg request "$ISOLAB_OWNER_REQUEST_SHA256" \
++    --arg pod "$POD_UID" --arg job "$ISOLAB_OWNER_JOB_UID" --arg image "$ISOLAB_OWNER_IMAGE_SHA256" \
++    --arg binary_sha "$(cut -d' ' -f1 "$ISOLAB_OUTPUT_DIR/binary.sha256")" \
++    --arg launch "${diagnostic_args[1]}" --arg launch_sha "$(sha256sum "${diagnostic_args[1]}" | cut -d' ' -f1)" \
++    --arg spec "$spec" --arg spec_sha "$(sha256sum "$spec" | cut -d' ' -f1)" \
++    --arg session "$ISOLAB_OUTPUT_DIR/session" --arg receipt "$receipt" \
++    --argjson stop "$ISOLAB_OWNER_STOP_UTC" --args \
++    '{schema:"isolab.fresh-owner-config/v1",phase:$phase,request_sha256:$request,pod_uid:$pod,job_uid:$job,
++      image_digest:$image,binary_sha256:$binary_sha,binary:"/usr/local/bin/ecbench",argv:$ARGS.positional,
++      launch:$launch,launch_sha256:$launch_sha,spec:$spec,spec_sha256:$spec_sha,session:$session,receipt:$receipt,stop_utc_seconds:$stop}' -- "$@" > "$config"
++  config_sha=$(sha256sum "$config" | cut -d' ' -f1)
++  set +e
++  /usr/local/bin/isolab-fresh-owner "$config" "$config_sha" &
++  OWNER_PID=$!
++  while true; do
++    OWNER_INTERRUPTED=0
++    wait "$OWNER_PID"
++    child_exit=$?
++    # A trapped wrapper signal interrupts wait before the native owner has
++    # reaped/published. Forward it, then wait again for that same owner.
++    if [[ $OWNER_INTERRUPTED == 0 ]]; then break; fi
++  done
++  OWNER_PID=""
++  /usr/local/bin/isolab-fresh-owner --check "$config" "$config_sha" > "$ISOLAB_OUTPUT_DIR/owner-$phase-check.json" 2> "$ISOLAB_OUTPUT_DIR/owner-$phase-check.stderr"
++  check_exit=$?
++  set -e
++  if [[ $child_exit != 0 ]]; then return "$child_exit"; fi
++  [[ $check_exit == 0 ]] || return 47
++}
++if [[ -n ${ISOLAB_FRESH_OWNER_SHA256:-} ]]; then
++  owner_invoke run run --spec "$spec" --out "$ISOLAB_OUTPUT_DIR/session" --cpus auto "${diagnostic_args[@]}" > "$ISOLAB_OUTPUT_DIR/run-summary.json" 2> "$ISOLAB_OUTPUT_DIR/run.stderr"
++  owner_invoke replay verify --dir "$ISOLAB_OUTPUT_DIR/session" --replay-all --exit-code --out "$ISOLAB_OUTPUT_DIR/audit.json" > "$ISOLAB_OUTPUT_DIR/audit.stdout" 2> "$ISOLAB_OUTPUT_DIR/audit.stderr"
++else
++  ecbench run --spec "$spec" --out "$ISOLAB_OUTPUT_DIR/session" --cpus auto "${diagnostic_args[@]}" > "$ISOLAB_OUTPUT_DIR/run-summary.json" 2> "$ISOLAB_OUTPUT_DIR/run.stderr"
++  ecbench verify --dir "$ISOLAB_OUTPUT_DIR/session" --replay-all --exit-code --out "$ISOLAB_OUTPUT_DIR/audit.json" > "$ISOLAB_OUTPUT_DIR/audit.stdout" 2> "$ISOLAB_OUTPUT_DIR/audit.stderr"
++fi
+ cat "$ISOLAB_OUTPUT_DIR/audit.stderr"
+ jq -e '.ok and .regraded and .records_bound and .records>0
+   and .verified_records==.records and (.replays|length)>0

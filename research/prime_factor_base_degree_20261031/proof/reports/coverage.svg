@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="610" viewBox="0 0 1000 610">
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#126b66"/></marker></defs>
+<rect width="1000" height="610" fill="white"/>
+<style>text{font-family:DejaVu Sans,sans-serif;fill:#18313e}.title{font-size:23px;font-weight:700}.h{font-size:19px;font-weight:700}.s{font-size:16px}.muted{fill:#536571}.box{fill:#edf7f4;stroke:#126b66;stroke-width:1.5}.arrow{stroke:#126b66;stroke-width:2;marker-end:url(#arrow)}</style>
+<text x="30" y="35" class="title">Canonical homogeneous-degree reduction: Lean checked</text>
+<text x="30" y="62" class="s muted">Field K, 2 ≠ 0; d ≥ 2; nonzero leading coefficients; explicit strict lower-term degree bounds.</text>
+<rect x="30" y="90" width="450" height="84" rx="7" class="box"/>
+<rect x="520" y="90" width="450" height="84" rx="7" class="box"/>
+<text x="48" y="119" class="h">Secant original equations</text>
+<text x="48" y="145" class="s">Three variables: g₁, g₂, qₓ, qz; all four signs.</text>
+<text x="538" y="119" class="h">Dense original equations</text>
+<text x="538" y="145" class="s">Two monic memberships of degree 2d plus S₃.</text>
+<line x1="255" y1="174" x2="255" y2="195" class="arrow"/>
+<line x1="745" y1="174" x2="745" y2="195" class="arrow"/>
+<rect x="30" y="200" width="450" height="69" rx="7" class="box"/>
+<rect x="520" y="200" width="450" height="69" rx="7" class="box"/>
+<text x="48" y="227" class="h">Actual total degrees: 2, 2, d, d</text>
+<text x="48" y="250" class="s">No component index is assumed to be highest.</text>
+<text x="538" y="227" class="h">Actual total degrees: 2d, 2d, 4</text>
+<text x="538" y="250" class="s">Top(p) = homogeneousComponent(totalDegree p, p).</text>
+<line x1="255" y1="269" x2="255" y2="290" class="arrow"/>
+<line x1="745" y1="269" x2="745" y2="290" class="arrow"/>
+<rect x="30" y="295" width="450" height="83" rx="7" class="box"/>
+<rect x="520" y="295" width="450" height="83" rx="7" class="box"/>
+<text x="48" y="324" class="h">Actual ideal, d ≥ 3: (m², xz, xᵈ, zᵈ)</text>
+<text x="48" y="350" class="s">d = 2: retain (m², xz, x²−αmx, z²−βmz).</text>
+<text x="538" y="324" class="h">Actual ideal: (x²ᵈ, z²ᵈ, x²z²)</text>
+<text x="538" y="350" class="s">Polynomial membership and quotient bridge proved.</text>
+<line x1="255" y1="378" x2="255" y2="399" class="arrow"/>
+<line x1="745" y1="378" x2="745" y2="399" class="arrow"/>
+<rect x="30" y="404" width="450" height="69" rx="7" class="box"/>
+<rect x="520" y="404" width="450" height="69" rx="7" class="box"/>
+<text x="48" y="433" class="h">First vanishing degree: δ = d+1</text>
+<text x="48" y="457" class="s">Surviving homogeneous class at every lower degree.</text>
+<text x="538" y="433" class="h">First vanishing degree: δ = 2d+1</text>
+<text x="538" y="457" class="s">Strict comparison d+1 &lt; 2d+1, kernel checked.</text>
+<rect x="30" y="493" width="940" height="67" rx="7" fill="#183f53"/>
+<text x="48" y="520" font-size="20" font-weight="700" style="fill:white">Exact F17 fixture: canonical degree 5 → 3, every target, all four signs</text>
+<text x="48" y="545" font-size="16" style="fill:white">h(T)=4T²+9T+9; V={5,6,10,16}; exact split, membership and signed lifts checked.</text>
+<text x="30" y="589" class="s muted">121 audited declarations; 0 failing, 0 native trust. Full group-law bridge remains written; δ is not F4 degree.</text>
+</svg>

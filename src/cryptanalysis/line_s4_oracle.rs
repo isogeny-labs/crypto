@@ -188,28 +188,37 @@ impl DecompositionOracle<ExtCurve<Fp3>> for LineS4Oracle {
             timed_out: false,
             extra: Default::default(),
         };
+        let exceeded = triples.is_none();
+        let work = cost.ops;
         self.totals
-            .absorb(&self.shape.clone(), Some(&cost), triples.is_none());
-        let triples = triples?;
-        if triples.is_empty() {
-            return None;
-        }
-        let f = &ctx.group.f;
-        for [t1, t2, t3] in &triples {
-            self.solutions += 1;
-            let xs = [
-                f.pack(f.scale(self.line, *t1)),
-                f.pack(f.scale(self.line, *t2)),
-                f.pack(f.scale(self.line, *t3)),
-            ];
-            if let Some(indices) = lift_abscissae(ctx.group, fb, ops, &xs, point) {
-                return Some(indices);
+            .absorb(&self.shape.clone(), Some(&cost), exceeded);
+        let found = (|| {
+            let triples = triples?;
+            if triples.is_empty() {
+                return None;
             }
-            counters.lift_failures += 1;
-        }
-        self.unliftable += 1;
-        counters.unliftable_systems += 1;
-        None
+            let f = &ctx.group.f;
+            for [t1, t2, t3] in &triples {
+                self.solutions += 1;
+                let xs = [
+                    f.pack(f.scale(self.line, *t1)),
+                    f.pack(f.scale(self.line, *t2)),
+                    f.pack(f.scale(self.line, *t3)),
+                ];
+                if let Some(indices) = lift_abscissae(ctx.group, fb, ops, &xs, point) {
+                    return Some(indices);
+                }
+                counters.lift_failures += 1;
+            }
+            self.unliftable += 1;
+            counters.unliftable_systems += 1;
+            None
+        })();
+        // The line solve builds its Macaulay matrix at degree 13 and reads
+        // the answer at degree 10: a fixed-degree oracle for the forecaster.
+        self.totals
+            .observe_degree(13, 10, work, exceeded, found.is_some());
+        found
     }
 
     fn last_system(&self) -> Option<SystemShape> {

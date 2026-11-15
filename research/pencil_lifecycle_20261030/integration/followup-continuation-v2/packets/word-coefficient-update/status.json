@@ -1,0 +1,225 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1149",
+  "main_declarations": 9,
+  "control_declarations": 17,
+  "readback": [
+    {
+      "name": "WordCoefficient.smallPow_unroll",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficient.smallPow_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficient.chooseCoeff_decode",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficient.chooseCoeff_canonical",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficient.term_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficient.term_literal",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficient.inverse_witness_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficient.update_decode",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficient.smallExponent_drained",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.inverse_witness",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.certificate_decodes",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.term_value",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.updated_value",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.scalar_reference",
+      "axioms": []
+    },
+    {
+      "name": "WordCoefficientControls.choose_reduction",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.zero_exponent",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.zero_base",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.negative_one_power",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.wrong_inverse_rejected",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.zero_scale_rejected",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.noncanonical_inverse_rejected",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.noncanonical_product_alone_passes",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.invalid_index_rejected",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.overflow_word_value",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "WordCoefficientControls.overflow_natural_value",
+      "axioms": []
+    },
+    {
+      "name": "WordCoefficientControls.overflow_input_excluded",
+      "axioms": []
+    }
+  ],
+  "domain": {
+    "modulus": "prime;1<p<2^31",
+    "inputs": "canonical",
+    "indices": "0<=j<=k<=5",
+    "inverse_certificate": "scale canonical and nonzero; inverse canonical; (scale*inverse)%p=1"
+  },
+  "independent_source_fidelity_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "attempts": {
+    "attempt1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "attempt2": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "attempt3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "attempt4": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "controls2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  }
+}

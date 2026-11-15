@@ -1,0 +1,614 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/curve25519_wave6_runs_20261115 (leads L2_ladder_check and L4_trace only)",
+ "validated_at_utc": "2026-11-15T01:31Z",
+ "validator": "validator subagent dispatched by the producing session; did not produce the runs or the analysis; recomputed from the committed artifacts with its own code",
+ "independent": true,
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "summary": "L2: validated. 3240 records, every discrete-log certificate re-verified with independent curve arithmetic, and all 1440 measured runs per session replay identically. The paired ratio tw2cj-lazy-lcheck / tw2cj-lazy recomputes to 0.9669 [0.966, 0.968] at k = 20 and 0.9862 [0.986, 0.987] at k = 24 (w = 0). The order holds at w = 0.1 and 1, so P1 holds. P2 holds: in all 540 pairs per k the walk, entries, rows and every native counter are identical, and only the check doublings (and totals derived from them) differ. P3 holds: distance to rho-neg 1.557 / 1.606 against 1.611 / 1.629. The saving is exactly 2*(bitlen(d)-1) doublings per run (30.27 GAE at k = 20, 38.30 at k = 24). The protocol's basis of 'about 4.7 additions over the ladder' is wrong, because additions are unchanged (E1). This is a measured, constant-factor reduction of the tw2cj-lazy arm and not an accounting change. Whether it counts as an index-calculus improvement depends on the owner's tw=2 classification. L4: validated as a measurement. The new binary reproduces the recorded d = 19 cell exactly, and the frozen and new binaries reproduce the d = 19 and d = 57 references. The step logs show degrees 2, 19, 20, 20, 19, ..., 3 with the top degree at steps 3-4 of 22. P1 fails as written, on both clauses: the degree-20 steps have 4 and 6 pairs, not 4 each (E2), and the last productive step is at degree 2-3. P2 is vacuous. P3 holds (SD 20/21 unchanged, T ratios 1.244 and 0.912). The 'substantive reading' is a post-hoc interpretation, not a preregistered verdict (E3). Process: 14 MB records committed to Git outside the artifact store (E6); no VALIDATION.json or report yet.",
+ "commit": {
+  "validated_sha": "cbc46b060204ab6388dddeb2c4bf47ebfb99b897",
+  "branch": "claude/curve25519-index-calculus-i674j4",
+  "tree_state": "L2 and L4 files equal their cbc46b0602 blobs. git status at validation time showed only the still-running L3 lead's changes (L3_flat/run.log modified, L3_flat/cells/20_subflat_m2_sym_d171.json untracked) and this validator's validation/ directory.",
+  "protocol_freeze_commit": "c66e2b3f4f (2026-11-15T00:06:38Z): L2 PROTOCOL.md, spec-k20.json, spec-k24.json, L4 PROTOCOL.md; unchanged at HEAD",
+  "data_commit": "cbc46b0602 (2026-11-15T01:13:52Z); first data 2026-11-15T01:01:52Z",
+  "commits_beyond_merge_d2a16c723d": [
+   "c66e2b3f4f",
+   "f844c26366",
+   "4764179929 (WIP snapshot: engine knobs and wwalk lcheck)",
+   "a408bc1813",
+   "d877972514 (WIP snapshot)",
+   "7695c57489",
+   "44ba0223d1",
+   "1d9992f485",
+   "cbc46b0602"
+  ],
+  "git_use": "read-only (rev-parse, log, show, diff, status, ls-tree); no commits, no pushes"
+ },
+ "binary": {
+  "curve25519_family": {
+   "path": "/home/user/ctarget-f1/release/curve25519_family",
+   "sha256": "5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746",
+   "matches_recorded": true,
+   "mtime_utc": "2026-11-15T01:00:44Z"
+  },
+  "ecbench": {
+   "path": "/home/user/ctarget-f1/release/ecbench",
+   "sha256": "fc6bd9b710ffe0237ab77ae9338b379baf84071fb78cb5c288e92aff8e2bd4e8",
+   "matches_recorded": true,
+   "mtime_utc": "2026-11-15T01:00:54Z"
+  },
+  "frozen_reference": {
+   "path": "/home/user/bin-archive/curve25519_family-dc2c30a4",
+   "sha256": "dc2c30a4242d80281622b2cb42cbaf9cb457d041ffbc9a4d35794bb893bf3faf",
+   "matches_recorded": true,
+   "mtime_utc": "2026-11-08T23:39:58Z"
+  },
+  "note": "Used in place and read-only. Nothing was built. Source binding: see C2 and E7."
+ },
+ "artifact_hashes_sha256": {
+  "README_PLAN.md": "0ce2661cfcbaa91b7da93d5e336070837206d5bf042e27635eeee11faba9d7d4",
+  "launch_all.sh": "9d41774b8aa669978085b0992506b05a79563ae7114de5d98e1a76abb253b162",
+  "run_cells.py": "56b08c4e0cc437ff59ce8275a4bf88687083d353d6fafc9ee7eb42963518f6fd",
+  "smoke_equivalence.sh": "a13293242878d1c1eb8216c35063e423ec4176a7bd91f25c23cbd6b9bd4e3cd1",
+  "L2_ladder_check/PROTOCOL.md": "261b00395e4a4632a4c6c50f8c667179ea933d225aad9edd26d8d23e6b487b7f",
+  "L2_ladder_check/spec-k20.json": "afe1401423b7f2302d68a28d057ed8d8949eab9761ca3677224e8f43703635c6",
+  "L2_ladder_check/spec-k24.json": "e9efc3d4bf4365331f06626e07b91c819bc59f025504b9f31af44339166cd431",
+  "L2_ladder_check/band-k20.json": "9af48ee0a9c020123cb7f0bd548ea825375c0db9358f43d6292167b1f72efc42",
+  "L2_ladder_check/band-k20.txt": "a7a2ab9c37c2b48760303124fb0b1e98519a4b48a4f06c87df3d4833804fb893",
+  "L2_ladder_check/band-k24.json": "db4cf612656e1a3268151ea0818ed0d9c7f1a19a103558fd31afb43f53214f02",
+  "L2_ladder_check/band-k24.txt": "fa408230b48788e39821d5ac4523f5095dddc4db46d438c3cfb18febd4f75f22",
+  "L2_ladder_check/verify-k20.json": "1b15e46d950d1f1627fabd4a990277265747434e773dfef930153a97a738201c",
+  "L2_ladder_check/verify-k24.json": "7d636df7784db69ec685e527e74c7f0b401ad05f6105a758ebb1c8797132e0a5",
+  "L2_ladder_check/run.log": "a109d3dbd5008a79ad77b84a1eaa78abdec44e02ed22e521dccabee1034bcdeb",
+  "L4_trace/PROTOCOL.md": "206e9e0326467c6f65515d3942999ac3173d5f4f4bf49b69f3cd3eb04b7cc3f9",
+  "L4_trace/run.log": "0b0bceb82381d5a9cc526ccf3bf2ab1dbe91f14f0708ca3a7b704f920a91fdd5"
+ },
+ "raw_data": [
+  {
+   "path": "L2_ladder_check/sessions/k20/comparisons/rho-neg__tw2cj-lazy-lcheck__ECC1h2b3100538190.json",
+   "sha256": "521236f45f3f5600246b4cf420637055131eba609aa66b00e85b978e4fc03ac0"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/comparisons/rho-neg__tw2cj-lazy__ECC1h59bcdf29ca8e.json",
+   "sha256": "eac5f2f9c9500aa747328a8931149f985d8f1b024d4e44f44fb2eb87c8c77a7b"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/comparisons/tw2cj-lazy__tw2cj-lazy-lcheck__ECC1h06e31a952dde.json",
+   "sha256": "29d6581994d81638dd3f8ca0d1fbf7316c322476c07055487216e24d0f4f7621"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/comparisons/tw2cj-lazy__tw2cj-lazy-lcheck__ECC1hc8f08899cd11.json",
+   "sha256": "e26e6716e0a870eb736b5df68c51259979320462d093c373d17f7e0718cb5abf"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/comparisons/tw2cj-lazy__tw2cj-lazy-lcheck__ECC1hec7e4c07edd3.json",
+   "sha256": "00f6e6ddca3e47d683a379cd6fc06af72a4adf29f3837ccbe2afb17e2696fde1"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/host.json",
+   "sha256": "1dd14947e535e2994e463e21398d133ff66fb80c81fa4b137cc401f64e9158af"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/plan.json",
+   "sha256": "ec3610503d053e134c282d657fa1d6f7485041eb1de7a7597f2218581f0f6164"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/records.jsonl",
+   "sha256": "f24b56f5c1a25c190ece5b3f8105458432cc52b91aeed1ff73b41aed15df23eb"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/session.json",
+   "sha256": "2c921e0ca904828b1eec70b76c6144b6415a038df86a8c175bfc9621ad505981"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k20/spec.json",
+   "sha256": "afe1401423b7f2302d68a28d057ed8d8949eab9761ca3677224e8f43703635c6"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/comparisons/rho-neg__tw2cj-lazy-lcheck__ECC1h6b2dd7943bf6.json",
+   "sha256": "38893506bd83a16b0db11b02cce18bf065fc9ef24e867a4f89425d1f3d33e14d"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/comparisons/rho-neg__tw2cj-lazy__ECC1h1af05854daf8.json",
+   "sha256": "49fe7e539906e951943023887aa1f93c95ae83a0d91a12b08155e858ab3d50fa"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/comparisons/tw2cj-lazy__tw2cj-lazy-lcheck__ECC1h48d2cbd73b3e.json",
+   "sha256": "1dc70e0abb269ad49f7e4322947b3fed3611b014b9e4b97e789f4c75208762b7"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/comparisons/tw2cj-lazy__tw2cj-lazy-lcheck__ECC1h6d6ccbcacd09.json",
+   "sha256": "4329b6563cd19dbdcae608fb45c57fbe465771b99d1d60f6e9a961b1a41e26a4"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/comparisons/tw2cj-lazy__tw2cj-lazy-lcheck__ECC1hfa0988ec8645.json",
+   "sha256": "ecf9a1c1735956f7c8f96c2b562883c5b4b1a762fdd6c1a8120e011938d1ea46"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/host.json",
+   "sha256": "6e9c9e546eb10680b593ec34f6b250410d072714cb8d7a74be2b81abab487d7c"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/plan.json",
+   "sha256": "b81c81a1d2d3d607e8d9f6f3fa606b6b266595dc46a113102d0b20a11de3c487"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/records.jsonl",
+   "sha256": "54ca9a9390201ad89a935875c634113d8e42215e95bbca73ccf1779e43f50bc7"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/session.json",
+   "sha256": "dc061f8a1ceb077ba0974c22ec89ee8139d686652c1c5184d3cbcdadedb14e66"
+  },
+  {
+   "path": "L2_ladder_check/sessions/k24/spec.json",
+   "sha256": "e9efc3d4bf4365331f06626e07b91c819bc59f025504b9f31af44339166cd431"
+  },
+  {
+   "path": "L4_trace/cells/20_sub_m2_sym-efirst_d19.json",
+   "sha256": "fe076ac0f6dcb1ee51dc0c0e462b0aadf126c5ad732a9c27c6a2186509533467"
+  },
+  {
+   "path": "L4_trace/cells/20_sub_m2_sym-efirst_d57.json",
+   "sha256": "87e16c642cb6cacdb83cbc5b9ba9f75e7a56195e04ccd8e7a95c903012961af2"
+  },
+  {
+   "path": "L4_trace/cells/20_sub_m2_sym_d19.json",
+   "sha256": "6f3b911326c85edd5b50d2fc9364658849794c0cddaa422eea028695445c60ee"
+  },
+  {
+   "path": "../curve25519_exponent_study_20261108/cells/k20_m2_sym_d19_g0.json",
+   "sha256": "0eee61cdf472178a02407c022d64092b9d1cd5b960dd85fb3872578bc7ef1107",
+   "role": "recorded reference (frozen binary dc2c30a4)"
+  },
+  {
+   "path": "../curve25519_exponent_study_20261108/cells/k20_m2_sym_d57_g0.json",
+   "sha256": "4478ea737e4038d0168d82cb23bfb88bd1346c1e6cec20bbf77eaa3b65a16da2",
+   "role": "recorded reference (frozen binary dc2c30a4)"
+  }
+ ],
+ "headline": [
+  {
+   "name": "L2 k20 lcheck/lazy paired ratio w=0",
+   "claimed": 0.9669,
+   "recomputed": 0.966949,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k20 lcheck/lazy ci95 lo w=0",
+   "claimed": 0.966,
+   "recomputed": 0.966041,
+   "rel_tol": 0.0006,
+   "agrees": true
+  },
+  {
+   "name": "L2 k20 lcheck/lazy ci95 hi w=0",
+   "claimed": 0.968,
+   "recomputed": 0.967858,
+   "rel_tol": 0.0006,
+   "agrees": true
+  },
+  {
+   "name": "L2 k20 lcheck/lazy w=0.1",
+   "claimed": 0.9692,
+   "recomputed": 0.969199,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k20 lcheck/lazy w=1",
+   "claimed": 0.9809,
+   "recomputed": 0.9809,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k24 lcheck/lazy paired ratio w=0",
+   "claimed": 0.9862,
+   "recomputed": 0.986189,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k24 lcheck/lazy ci95 lo w=0",
+   "claimed": 0.986,
+   "recomputed": 0.985763,
+   "rel_tol": 0.0006,
+   "agrees": true
+  },
+  {
+   "name": "L2 k24 lcheck/lazy ci95 hi w=0",
+   "claimed": 0.987,
+   "recomputed": 0.986616,
+   "rel_tol": 0.0006,
+   "agrees": true
+  },
+  {
+   "name": "L2 k24 lcheck/lazy w=0.1",
+   "claimed": 0.9873,
+   "recomputed": 0.987318,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k24 lcheck/lazy w=1",
+   "claimed": 0.9927,
+   "recomputed": 0.992693,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k20 distance to rho-neg, candidate (w=0)",
+   "claimed": 1.557,
+   "recomputed": 1.55735,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k20 distance to rho-neg, baseline (w=0)",
+   "claimed": 1.611,
+   "recomputed": 1.61058,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k24 distance to rho-neg, candidate (w=0)",
+   "claimed": 1.606,
+   "recomputed": 1.60634,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 k24 distance to rho-neg, baseline (w=0)",
+   "claimed": 1.629,
+   "recomputed": 1.62884,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "L2 records per session",
+   "claimed": 1620,
+   "recomputed": 1620,
+   "rel_tol": 0,
+   "agrees": true
+  },
+  {
+   "name": "L2 k20 per-check doublings saved (double-and-add minus ladder)",
+   "claimed": 16,
+   "recomputed": 15.1333,
+   "rel_tol": 0.1,
+   "agrees": false,
+   "note": "recomputed 15.13 doublings per check; 'about 16' is the rounded maximum-length case, not the mean"
+  },
+  {
+   "name": "L2 k20 per-check additions of the ladder [d]G",
+   "claimed": 4.7,
+   "recomputed": 7.5333,
+   "rel_tol": 0.1,
+   "agrees": false,
+   "note": "ladder_mul does popcount(d)-1 additions, the same as double-and-add (7.53 in both arms); the saving is the doublings only"
+  },
+  {
+   "name": "L2 k20 mean saving per run (GAE)",
+   "claimed": 37.6,
+   "recomputed": 30.2667,
+   "rel_tol": 0.05,
+   "agrees": false,
+   "note": "37.6 = 2*(16+7.5-4.7), the protocol's basis; measured 30.27 = 2*15.13 exactly per pair"
+  },
+  {
+   "name": "L4 d19 T (new binary, step-logged)",
+   "claimed": 96740.0,
+   "recomputed": 96745.0,
+   "rel_tol": 0.0005,
+   "agrees": true,
+   "note": "claimed 9.674e4; exact 96745 = recorded 96745"
+  },
+  {
+   "name": "L4 d19 SD",
+   "claimed": 20,
+   "recomputed": 20,
+   "rel_tol": 0,
+   "agrees": true
+  },
+  {
+   "name": "L4 sym-efirst d19 T",
+   "claimed": 120300.0,
+   "recomputed": 120323.0,
+   "rel_tol": 0.0005,
+   "agrees": true,
+   "note": "claimed 1.203e5"
+  },
+  {
+   "name": "L4 sym-efirst d19 T ratio to recorded",
+   "claimed": 1.24,
+   "recomputed": 1.2437,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "L4 sym-efirst d57 T",
+   "claimed": 3534000.0,
+   "recomputed": 3534388.5,
+   "rel_tol": 0.0005,
+   "agrees": true,
+   "note": "claimed 3.534e6"
+  },
+  {
+   "name": "L4 sym-efirst d57 T ratio to recorded",
+   "claimed": 0.91,
+   "recomputed": 0.9118,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "L4 sym-efirst SD d19 / d57",
+   "claimed": 20,
+   "recomputed": 20,
+   "rel_tol": 0,
+   "agrees": true
+  },
+  {
+   "name": "L4 pairs at each degree-20 step",
+   "claimed": 4,
+   "recomputed": 6,
+   "rel_tol": 0,
+   "agrees": false,
+   "note": "degree-20 steps are steps 3 and 4 with 4 and 6 pairs (every target); new_polys 4 and 4"
+  }
+ ],
+ "checks": [
+  {
+   "id": "C1",
+   "requirement": "frozen artifact set: commit, freeze order, tree state",
+   "result": "pass",
+   "evidence": "HEAD = cbc46b060204ab6388dddeb2c4bf47ebfb99b897 (branch claude/curve25519-index-calculus-i674j4). L2 PROTOCOL.md, spec-k20.json, spec-k24.json and L4 PROTOCOL.md added in c66e2b3f4f (2026-11-15T00:06:38Z) and byte-identical at HEAD (git blob ids 291ad512, 429892c2, b8333aff, 04474f01 at both commits); first data written 01:01:52Z (L4 run.log, L2 session start unix_ms 1794704515438); sessions, comparisons, verify, band and L4 cells added once, in cbc46b0602 (01:13:52Z), never modified. Every L2/L4 file read by the validator equals its cbc46b0602 blob (l2_recompute.py / l4_check.py compare git show against the working tree).",
+   "notes": "Working tree is not entirely clean: the still-running L3 lead modifies L3_flat/run.log and adds L3_flat/cells/20_subflat_m2_sym_d171.json; out of scope and untouched. The protocols were frozen before the lcheck code was finished (code commits 00:26-00:50); predictions predate data, which is what preregistration requires."
+  },
+  {
+   "id": "C2",
+   "requirement": "binaries and source binding",
+   "result": "pass (hashes); source binding consistent but not proven",
+   "evidence": "sha256 curve25519_family 5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746 (mtime 2026-11-15T01:00:44Z), ecbench fc6bd9b710ffe0237ab77ae9338b379baf84071fb78cb5c288e92aff8e2bd4e8 (01:00:54Z), frozen reference /home/user/bin-archive/curve25519_family-dc2c30a4 dc2c30a4242d80281622b2cb42cbaf9cb457d041ffbc9a4d35794bb893bf3faf, all equal to README_PLAN.md. Every L2 record carries binary_sha256 fc6bd9b7...; every L4 cell ext.bin_sha256 5abc70ba.... ecbench.d lists /home/user/crypto sources; no file under src/ is newer than 2026-11-15T00:50:46Z (7695c57489) or than the binaries; commits after 7695c57489 touch only research/.",
+   "notes": "session.json git_commit and git_dirty are null; the binding to source is README_PLAN prose (erratum E7). No rebuild was attempted (3 of 4 cores busy with running leads)."
+  },
+  {
+   "id": "C3",
+   "requirement": "L2 specs equal the snc-panel's except for the arm set",
+   "result": "pass",
+   "evidence": "spec-k20.json / spec-k24.json against research/curve25519_autolab_20261104/snc-panel/spec-k20.json / spec-k24.json: 'workloads' (five prime_explicit curves per k, target_kind public, target_seed 20261140, 12 targets per curve) and 'measurement' (L0, alternate, 8 rounds, seed 20261130, warmup 1, timeout 3600) are equal; only arms, label and description differ. tw2cj-lazy has the same method_id ECM1hd7092ebe3905 in both panels; rho-neg ECM1hefea4e0ebe79 in both. sessions/k*/spec.json are byte-identical to the frozen specs (sha256 afe14014..., e9efc3d4...)."
+  },
+  {
+   "id": "C4",
+   "requirement": "L2 record census",
+   "result": "pass",
+   "evidence": "Each session: 1620 records = 3 arms x 60 workloads x 9 rounds (round 0 warm-up, rounds 1-8 measured); 540 per arm, 60 warm-ups per arm; status verified 1620/1620; 540 (warm-up, round, workload) keys each with exactly one record per arm; same target point for all arms and the same algorithm_seed for all three arms in every key (so the two tw arms walk identically)."
+  },
+  {
+   "id": "C5",
+   "requirement": "certificate discipline: every claimed discrete-log solve re-verified with code independent of the solver",
+   "result": "pass",
+   "evidence": "validation/l2_recompute.py (own affine short-Weierstrass arithmetic over F_p, stdlib only): for all 3240 records, G and Q on the curve, [r]G = O, [r]Q = O, 0 <= d < r and [d]G = Q for the recorded d, outcome verified and matches_target true; per curve (10 curves) p and r prime, h*r = group_order, [group_order]P = O for three curve points, Hasse bound. 0 failures."
+  },
+  {
+   "id": "C6",
+   "requirement": "ecbench verify receipts consistent; replay",
+   "result": "pass",
+   "evidence": "verify-k20.json / verify-k24.json: ok, records 1620, verified 1620, planned 1620, 8 sampled replays 'identical' (k20: 2 rho-neg, 4 tw2cj-lazy, 2 lcheck; k24: 1 rho-neg, 3 tw2cj-lazy, 4 lcheck), file hashes equal the committed session files, receipt sha256 1b15e46d.../7d636df7... equal the values printed in run.log. Validator full replay on scratch copies (validation/l2_replay_all.sh, ecbench verify --replay-all): 1440/1440 measured runs reproduced identically in each session, receipts sha256 31601e20... (k20) and 14048426... (k24).",
+   "notes": "Both the producer's audit and the validator's replay ran the producing binary on the same host class (ECBENV3hb516f42f4ab3); not a cross-host audit."
+  },
+  {
+   "id": "C7",
+   "requirement": "L2 P1: paired ratio and band",
+   "result": "pass",
+   "evidence": "Ratio of totals sum S_lcheck / sum S_lazy over 480 matched measured pairs, delta-method 95% interval with the 60 workloads as clusters, t(59) = 2.00100: k20 w=0 0.96695 [0.96604, 0.96786], w=0.1 0.9692, w=1 0.9809; k24 w=0 0.98619 [0.98576, 0.98662], w=0.1 0.98732, w=1 0.99269. Intervals exclude 1 at every weight; per-curve ratios 0.9663-0.9681 (k20). U = unpriced counts (sqrt_solves, row_ops, legendre_symbols, projected_base_*) + phase sum of table_insert_attempts behind its counted: marker (default reading since 2026-11-08). Preregistered ranges 0.959 [0.950, 0.970] (k20) and 0.983 [0.975, 0.990] (k24) contain the measured values; order holds at w = 0.1 and 1. P1 holds.",
+   "notes": "The point prediction 0.959 was off because its basis overestimated the saving (erratum E1)."
+  },
+  {
+   "id": "C8",
+   "requirement": "L2 P2: identical walk, entries and rows per paired run; only check counters differ",
+   "result": "pass",
+   "evidence": "All 540 (warm-up, round, workload) pairs per k, every non-timing field compared. Fields that differ: phases[relations].native.tw_lazy_check_doubles (k20 10-16, k24 17-20 per pair), phases[oracle_setup].doubles and .gae (the build's lazy check is charged to oracle_setup; same deltas), phases[verify].doubles and .gae (pipeline recovery check; same deltas), and quantities derived from them: cost.total_gae and detail.framework_total_gae_before_solver_removal (k20 20-32, k24 34-40), cost.s, boundaries.ratio_to_floor, and the bitop/v1 work block (bitops, per-phase group_double, ratio_to_floor, reusable/per-target bitops). Two non-measurement differences: fbm_id (configuration hash that includes the oracle string) and the bitop block's list of native counter names (the zero-valued tw_lazy_check_doubles drops out). Identical in every pair: tw_lazy_check_adds, tw_lazy_checks (1), tw_lazy_failures (0), tw_steps, tw_walk_adds, tw_collisions, tw_rows, tw_rank, tw_setup_adds/doubles, table_insert_attempts, every factor-base and linear-algebra counter, recovered d, every unpriced count. Candidate check and verify doublings are 0 in all 1080 candidate records (both k)."
+  },
+  {
+   "id": "C9",
+   "requirement": "L2 saving per run equals double-and-add minus ladder [d]G for two checks (recompute from counters)",
+   "result": "pass (mechanism); fail (the stated '4.7 additions' basis)",
+   "evidence": "In all 540 pairs per k the GAE saving equals exactly 2*(bitlen(d)-1). Per check, baseline = (bitlen(d)-1) doublings + (popcount(d)-1) additions, candidate = (popcount(d)-1) additions, in every pair (0 model mismatches). Means k20 (log2 r = 17.0): 15.133 doublings + 7.533 additions vs 7.533 additions; saving 30.267 GAE per run = 3.297% of the baseline's 917.9 GAE. k24 (log2 r = 21.0): 19.15 + 9.95 vs 9.95; saving 38.3 GAE = 1.373% of 2789.5. The code reading agrees: CountedGroup::mul is left-to-right double-and-add ((bits-1) doublings, popcount-1 additions); ladder_mul adds one stored rung per set bit, the first free, no doubling when the ladder covers bits(d).",
+   "notes": "Erratum E1: 'about 4.7 additions each over the ladder' is wrong; the additions are unchanged and the whole saving is doublings (about 15 per check at k20, not 16+7.5-4.7 = 18.8)."
+  },
+  {
+   "id": "C10",
+   "requirement": "L2 P3: distance to rho-neg",
+   "result": "pass",
+   "evidence": "Ratio of totals against rho-neg (same session, same seeds, 480 pairs): candidate k20 1.5573 [1.4989, 1.6181] at w=0, 1.562 at 0.1, 1.5864 at 1; baseline 1.6106 / 1.6116 / 1.6172; candidate k24 1.6063 / 1.6068 / 1.6089, baseline 1.6288 / 1.6274 / 1.6207. rho-neg < both tw arms at every weight on every curve (band-k*.txt ranks). Factor of the fall = P1 ratio; point estimates above 1.5x at both k. P3 holds.",
+   "notes": "The 'same factor' is an identity for ratios of totals over the same rho runs; the k20 candidate interval's lower end at w=0 is 1.4989 (E9). Gap to rho is the distance remaining, not a gate."
+  },
+  {
+   "id": "C11",
+   "requirement": "L2 code reading at branch head: the change touched only the checks",
+   "result": "pass",
+   "evidence": "src/cryptanalysis/ic_boundary.rs: ladder_mul (line 3103) predates the branch (7c0a288e0b, 2026-11-07) and is unchanged; TargetWalk gains field lcheck, build_lcheck, g_ladder() = pows[1] (the [2^i]G chain of rbits entries that build_inner doubles and charges to setup_ops in both arms), and the lazy final check uses ladder_mul only when the ladder is non-empty, else g.mul as before; collect_and_solve_relations_touching now forwards to ..._ladder(None) and the RecoveryCheck uses ladder_mul only for Some(non-empty). plugins.rs: lcheck parsed (error unless tw=1|2); the three TargetWalk call sites (aut, sib, plain) map to build_lcheck with arguments equivalent to the former build_ext_aut / build_ext_sib (cheap=true) / build_ext_cv (cheap=cj) calls; recovery_ladder() is Some only with lcheck. stages.rs trait default None; mod.rs passes oracle.recovery_ladder(). No ecbench source changed on the branch. The rest of the branch's source diff (curve25519_family.rs, subgroup_semaev.rs) is the L1/L3/L4 engine knobs.",
+   "notes": "Empirical cross-check in C12."
+  },
+  {
+   "id": "C12",
+   "requirement": "L2 baseline and reference unchanged by the new binary (cross-binary)",
+   "result": "pass",
+   "evidence": "Per-workload mean S of rho-neg and tw2cj-lazy in this session's w=0 comparisons equal the snc-panel's (sessions ECBS1h598b30e45910 / ECBS1hef9804d08b2a, ecbench 1163f6b3 from 829d17dd9d) on all 60 workloads at both k, maximum absolute difference 0.0; arm means 1.5701781099 / 2.5288917562 (k20) and 1.1756236941 / 1.9149022219 (k24) agree to every printed digit. So lcheck=0 and rho are unchanged in counted cost.",
+   "notes": "The snc-panel records.jsonl live in S3 (artifact manifest) and are not on this host; the check uses the committed snc-panel comparison files."
+  },
+  {
+   "id": "C13",
+   "requirement": "section 5a: every arm's unpriced work listed and priced at 0, 0.1, 1; w_cal where applicable",
+   "result": "pass",
+   "evidence": "Comparison files list unpriced counts for both arms, the reference included (rho-neg canonicalisations_uncharged 197408 at k20; tw arms legendre_symbols, projected_base_*, row_ops, sqrt_solves, plus table_insert_attempts 302145); every name in cost.unpriced has a count (0 missing). None of these counters is in band.rs FIELD_ARITHMETIC_COUNTERS (sqrt_solves is explicitly excluded), so the 2026-11-12 w_cal reading does not apply. No byte counter is involved."
+  },
+  {
+   "id": "C14",
+   "requirement": "L2 read-outs (band-k*.json, comparisons/*.json) recompute from records",
+   "result": "pass",
+   "evidence": "validation/l2_crosscheck.py: 15 band rows per k, per-curve per-arm mean S at w = 0/0.1/1, charged_sum and native_sum all equal (max abs diff 0.0); all 10 comparison ratios recompute to within 2e-15."
+  },
+  {
+   "id": "C15",
+   "requirement": "L2/L4 reporting and storage contract",
+   "result": "fail (process; does not affect the numbers)",
+   "evidence": "records.jsonl 14,380,043 and 14,441,011 bytes and L2 run.log 287,293 bytes are committed directly in Git (section 13: data files over 64 KiB / any file over 10 MiB go through the artifact store; the snc-panel used .artifacts.json); no VALIDATION.json, README, report or figures for L2/L4; no bench.record/v1; runs local, not on the EKS route (disclosed in README_PLAN.md).",
+   "notes": "Erratum E6; observation O6."
+  },
+  {
+   "id": "C16",
+   "requirement": "L4: new binary reproduces the recorded d = 19 cell exactly",
+   "result": "pass",
+   "evidence": "cells/20_sub_m2_sym_d19.json vs research/curve25519_exponent_study_20261108/cells/k20_m2_sym_d19_g0.json: same seed 20263127, same six target_x in the same order, and every shared per-target field equal (field_ops 96745 each, solving_degree_max 20, solving_degree 2, degree_reached 20, steps 22, max_rows 2795, max_cols 2869, basis_len 1, inconsistent true); cell fields p, n_vars 4, input_degree 19, input_terms 19, levels 1, v_size 19, mean_field_ops 96745.0 equal. Only ms differs."
+  },
+  {
+   "id": "C17",
+   "requirement": "L4 replays by the validator",
+   "result": "pass",
+   "evidence": "validation/l4_replay.sh run twice: new binary sym d19 (with and without F4SUB_STEP_LOG), sym-efirst d19 and d57, sym d57; frozen dc2c30a4 sym d19 and d57. Every replay equals its committed or recorded cell on all shared fields except ms; the replayed step logs equal the committed step logs exactly; logging changes no count (field_ops, steps, SD, degree_reached, max_rows, max_cols)."
+  },
+  {
+   "id": "C18",
+   "requirement": "L4 step log and P1",
+   "result": "P1 fails as written (agrees with the producer); claim detail 'four pairs each' fails",
+   "evidence": "All six targets have identical step logs. Degrees by step: [2, 19, 20, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3]; pairs [1, 2, 4, 6, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]; new_polys [1, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3]. The degree-20 steps are steps 3 and 4 with 4 and 6 pairs and 4 and 4 new polynomials. The last logged productive step is at degree 3; the 22nd step, in which 1 appears, is not logged (f4_fp returns before pushing it) and is at degree 2 (report field solving_degree = 2). Logged ops 96667 of field_ops 96745 (78 ops outside the log). Ops shares of the logged total: step 2 (degree 19, all_rows 2795) 14.55%, the two degree-20 steps 7.56%, the descending steps 5-21 (degrees 19 to 3, 12 pairs and 4 new polynomials each, 3 at the last) 77.86%. P1 needs the last productive step at degree 20 with at most 4 pairs: both clauses fail.",
+   "notes": "What the logs show: SD (solving_degree_max = highest productive step degree) = D + 1 = 20 is reached at steps 3-4 of 22, right after the step that processes the degree-19 generators, and every later productive step is at falling degree. This is consistent with SD being set by the generator degree. The frozen rule ties that conclusion to P1 and P2 holding, so the 'substantive reading' is post hoc (E3). The log gives counts only, so 'binomial-quadric pairs' is inferred, and the second degree-20 step has 6 pairs (E2)."
+  },
+  {
+   "id": "C19",
+   "requirement": "L4 P2",
+   "result": "pass (vacuous)",
+   "evidence": "No step of degree 21 or above in any target (maximum step degree 20)."
+  },
+  {
+   "id": "C20",
+   "requirement": "L4 P3",
+   "result": "pass",
+   "evidence": "sym-efirst vs recorded sym, same seeds and targets: d19 SD 20 vs 20, T 120323.0 vs 96745.0 (ratio 1.2437); d57 SD 21 vs 21, T 3534388.5 vs 3876409.33 (ratio 0.9118). |delta SD| = 0 <= 1 and T within a factor 2: P3 holds, so under the protocol no variable-order disclosure is required for SD. T moves by -8.8% to +24.4% with the order."
+  },
+  {
+   "id": "C21",
+   "requirement": "L4 run follows the frozen command",
+   "result": "pass with deviation",
+   "evidence": "PROTOCOL.md gives seeds 20263019 (D = 19) and 20263057 (D = 57); the cells ran with 20263127 and 20263165 (run_cells.py: 20261108 + 1000 m + d), which are the recorded cells' seeds. This follows the protocol's stated intent ('same seed as the record so the targets agree') and not its literal text. ulimit -v 6000000 and RAYON_NUM_THREADS=1 as frozen.",
+   "notes": "Erratum E4."
+  },
+  {
+   "id": "C22",
+   "requirement": "classification: measured improvement under the 2026-11-04 ruling, or accounting change",
+   "result": "measured improvement of the tw2cj-lazy arm; IC status is the owner's call; not accounting",
+   "evidence": "P1 and P2 hold, so the frozen L2 decision rule applies: lcheck lowers the counted cost of the C = 2 lazy target-walk arm to 0.96695 (k20) and 0.98619 (k24) of tw2cj-lazy, band-ordered at w = 0, 0.1, 1. The README (research/curve25519_autolab_20261104/README.md line 99) counts 'the wwalk arms with known-log G jumps (g=1,grow=2)' as IC, and tw2cj-lazy is such an arm. But the snc-panel README and red team R8 leave tw=2 (target inside the walk, no probe phase) to the owner, so the IC reading stands only if the owner confirms it. Not relabelling or accounting: the candidate performs fewer group doublings; the reused [2^i]G chain is computed and charged in both arms' set-up (tw_setup_doubles equal); no count moved to another phase or into the unpriced list; no new uncounted work. It is a constant-factor saving in the two [d]G checks. It changes no exponent and shrinks with k (3.30% at k20, 1.37% at k24).",
+   "notes": "P3's 'same factor' is an identity, not a second result (E9). No wall-clock gain is resolved (O1)."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "moderate",
+   "location": "L2_ladder_check/PROTOCOL.md 'Predictions' basis; any summary repeating it",
+   "issue": "'about 16 doublings + 7.5 additions each by double-and-add against about 4.7 additions each over the ladder' is not what the code does or what the counters show. ladder_mul does popcount(d)-1 additions, the same as double-and-add. Means per check at k20: 15.13 doublings + 7.53 additions against 7.53 additions; at k24: 19.15 + 9.95 against 9.95. The saving is 2*(bitlen(d)-1) doublings per run (30.27 GAE at k20, 38.30 at k24), exact in every pair, not 2*(16+7.5-4.7) = 37.6.",
+   "fix": "State the mechanism as 'two checks, each saving bitlen(d)-1 doublings; additions unchanged'. P1 still holds because the frozen interval covers the measured value. Note that the point prediction 0.959 rested on the overestimate; the corrected basis gives 1 - 30.27/917.9 = 0.967."
+  },
+  {
+   "id": "E2",
+   "severity": "moderate",
+   "location": "L4 summary claim 'the degree-20 steps having 4 pairs each and new_polys 4'",
+   "issue": "The two degree-20 steps (steps 3 and 4) have 4 and 6 pairs in every target; new_polys is 4 and 4. The 'at most 4 pairs' clause of P1 therefore also fails, not only the 'last productive step at degree 20' clause.",
+   "fix": "Write 'two degree-20 steps with 4 and 6 pairs, 4 new polynomials each'. Say that P1 fails on both clauses."
+  },
+  {
+   "id": "E3",
+   "severity": "moderate",
+   "location": "L4 summary claim 'the substantive reading (SD = generator-degree bookkeeping) holds'",
+   "issue": "The frozen decision rule draws the bookkeeping conclusion only if P1 and P2 hold. P1 failed, so the reading is post hoc. The log records counts per step, not which polynomials form the pairs, so 'binomial pairs' at the top degree is inferred, not observed. It is one cell (k = 20, m = 2, d = 19).",
+   "fix": "Report the preregistered verdict as 'P1 failed, P2 vacuous, P3 held'. Give the bookkeeping reading as an exploratory interpretation: SD = D + 1 is reached at steps 3-4 of 22, right after the degree-19 generators enter, and the remaining productive steps (about 78% of the logged field operations) run at falling degree. Do not use it to update the HEUR-FIRST-FALL-DEGREE corpus record without a preregistered test that identifies the pairs."
+  },
+  {
+   "id": "E4",
+   "severity": "low",
+   "location": "L4_trace/PROTOCOL.md 'Instrument'",
+   "issue": "The frozen commands give seeds 20263019 and 20263057. The runs used 20263127 and 20263165, the recorded cells' seeds, which is the protocol's stated intent. The deviation is not disclosed.",
+   "fix": "Disclose in the L4 write-up that the literal seeds in PROTOCOL.md were typos and that the runs used the record seeds."
+  },
+  {
+   "id": "E5",
+   "severity": "low",
+   "location": "L4 step-log reading",
+   "issue": "The F4 step log omits the step in which 1 appears (f4_fp returns before logging it). 21 of 22 steps and 96,667 of 96,745 field operations are logged. The true last productive step is at degree 2 (report field solving_degree = 2), not degree 3 as the log alone suggests.",
+   "fix": "Use solving_degree for the last productive step and solving_degree_max for the highest. State that the log excludes the final step."
+  },
+  {
+   "id": "E6",
+   "severity": "moderate",
+   "location": "L2_ladder_check/sessions/k*/records.jsonl, L2_ladder_check/run.log (commit cbc46b0602)",
+   "issue": "Two 14.4 MB .jsonl files and a 287 KB log are committed directly in Git. Under AGENTS.md section 13 they belong in the artifact store with an .artifacts.json manifest, as in the snc-panel. The large-files check will fail a PR that adds files over 10 MiB that are not on the allowlist.",
+   "fix": "Before a PR, move the files through tools/artifacts or get the owner's large-file-ok label. The producer reports S3 unreachable from this runtime, so this is a coordinator item."
+  },
+  {
+   "id": "E7",
+   "severity": "low",
+   "location": "README_PLAN.md 'Binaries'; sessions/k*/session.json",
+   "issue": "session.json has git_commit and git_dirty null. The binary-to-source binding is the README sentence 'built from branch commit 7695c57489 plus the snapshot of the engine knobs', and the snapshot commits are labelled WIP. The evidence is consistent with a build from the 7695c57489 tree (= HEAD's src), but no rebuild proves it.",
+   "fix": "Name the exact tree (7695c57489; no uncommitted source at build time) and, when cores are free, rebuild and compare hashes or record the cargo fingerprint."
+  },
+  {
+   "id": "E8",
+   "severity": "low",
+   "location": "L4_trace/cells/*.json top-level 'study'",
+   "issue": "The binary writes study 'curve25519_exponent_study_20261108' into the wave-6 cells (a hard-coded label). Only ext.study names the right study.",
+   "fix": "Mention it in the README, or fix the label in a later build."
+  },
+  {
+   "id": "E9",
+   "severity": "low",
+   "location": "L2 P3 claim",
+   "issue": "'Falls by the same factor' holds by construction: it is a ratio of totals over the same rho-neg runs, so it adds no evidence beyond P1. 'Stays above 1.5x' holds for the point estimates only; the k20 candidate's interval at w = 0 is [1.4989, 1.6181].",
+   "fix": "Present the distance to rho as the distance remaining (1.557x / 1.606x at w = 0, 1.586x / 1.609x at w = 1) with its interval, and say the factor equals the P1 ratio."
+  }
+ ],
+ "observations": [
+  "O1 Wall time (practicality note only): lcheck/lazy total wall ratio 1.009 [0.995, 1.023] at k20 and 1.006 [0.991, 1.021] at k24, ns/GAE 1.044 and 1.020. Isolation was L1 (42 pairs L2 at k24), there was no A/A, and the other leads loaded the host (p95 foreign busy 285% / 252%). The 3.3% / 1.4% GAE saving is not resolved in wall time; a wall claim would need an L2 run with A/A.",
+  "O2 Reference symmetry: rho-neg's own final check stays double-and-add (mean 22.7 GAE = 4.0% of its cost at k20, doublings 2.7%; 1.7% / 1.1% at k24). If the reference got an analogous already-paid ladder, the distance to rho would rise by at most about those shares. Not assessed.",
+  "O3 The saving 2(bitlen(d)-1) / total is about 2 log2 r / (S sqrt r) and vanishes with k: 3.30% (k20), 1.37% (k24). The protocol's remark that k >= 28 is below 1% is consistent with this. k >= 28 was not run.",
+  "O4 The bitop/v1 work block counts the oracle_setup phase, which holds the target walk's in-build check, as reusable_bitops. The target walk is built from the target (single-target), so 'reusable' is misleading for this oracle. The GAE figures are not affected.",
+  "O5 Both the producer's 8-replay audits and the validator's 1440-run replays used the producing binary on the same host class. No vs_rho claim is made, so section 12's cross-host requirement does not bind here, but it would for any claim built from these sessions.",
+  "O6 Process gaps disclosed in README_PLAN.md: no EKS route, Conductor, S3 checkpoint, bench.record/v1 or ecdb. Every number is [pcc:unverified] with no claim id. No VALIDATION.json, README, PDF or figures yet for L2 or L4. The validation gate for the leaderboard and benchmarks/README.md is therefore not met yet (this report is one of its three inputs).",
+  "O7 Exploratory, validator only (not producer evidence): step logs of sym-efirst d19, sym d57 and sym-efirst d57 from l4_replay.sh. At d19 e-first the top degree 20 comes at steps 2-3 (2 and 6 pairs). At d57 (generator degrees 3 and 19) the top degree 21 = 19 + 2 is reached only after a low-degree opening of 7 to 9 steps (degrees 2-5): step 10 with 15 pairs (sym) and step 8 with 13 pairs (e-first), followed by a descent with 50-60 pairs per step. 'Top degree early, productive descent after' recurs, but not 'in the first steps', and the top-degree steps have more than 4 pairs.",
+  "O8 m = 83 / ECC2K-130 disclosure rules do not apply (prime-field curves at k = 20 and 24, miniature F4 cells)."
+ ],
+ "not_done": [
+  "No rebuild of the binaries from source (3 of 4 cores busy with the running L1/L3 leads), so the source-to-binary binding is not proven (E7).",
+  "The lcheck unit tests (lcheck_ladder_mul_agrees_with_mul_and_charges_no_more, lcheck_changes_only_the_check_counters) and the sym_efirst / logged-solve tests were not run; no test log is committed.",
+  "The target law hash_to_subgroup_v1 was not re-derived. Targets were checked to lie in the order-r subgroup, to be identical across arms in each key, and to come from workloads identical to the snc-panel spec.",
+  "The L4 consistency flags (inconsistent = true for all targets) were not re-derived. They carry over by exact reproduction of the recorded cell, whose flags the exponent-study validator checked with independent code.",
+  "The snc-panel records (in S3) were not available. The cross-binary check used the committed snc-panel comparison files (per-workload means), not run-by-run records.",
+  "No replay on another host class.",
+  "L1 and L3 were not validated (out of scope; L3 was still running)."
+ ],
+ "validator_scripts": {
+  "note": "validation/ in this study directory; stdlib Python and bash; outputs written to the validator's scratchpad (hashes listed)",
+  "validation/l2_crosscheck.py": "58be86f361026027f3086ce25ec7c2633bcd17d450fa88938c4e46f94836482c",
+  "validation/l2_recompute.py": "5bd616e28fb6fcd1800afc8a71d98e58659777a7c3c18c3c17385fd4bc2befd0",
+  "validation/l2_replay_all.sh": "88ca383c3fbf6da2bf36631a3fbea4cdb15161bb589d71ebcba6838941c79f68",
+  "validation/l4_check.py": "dd8f1e84c19db9fa60725c819c8cd208b4e9f8fbbf4a0e459a58a2b72162d053",
+  "validation/l4_replay.sh": "69298db5b0aab06576fdbd5d74aefb128b0a64c1c6aa999b8f930a0647cdc342",
+  "outputs": {
+   "l2_recompute.py -> l2_out.json": "791c98136175bfb3bd31cd105e7be58ee7c1c848f83cd42ef9ebe1c4afb82aac",
+   "l2_crosscheck.py -> l2_cross.json": "fa8c39461e1a3fa1b4320b0cafb0801a2962c5279f1c8fd61553159a2c6ec377",
+   "l4_check.py -> l4_out.json": "6aa2f6027d3b8729c67dc2ad8c2d1e5244eb46ae1500f39efcd32bcbad054afe",
+   "l2_replay_all.sh -> verify-all-k20.json": "31601e208d15996531f1c59fd9245b55ec7c4bdeffa9cbaaf2185ecd0101c4d0",
+   "l2_replay_all.sh -> verify-all-k24.json": "140484263d970a6f8c827566ec0b8221be97afc594957eb32d858beb828ff96d"
+  },
+  "commands": [
+   "python3 -I validation/l2_recompute.py /home/user/crypto cbc46b060204ab6388dddeb2c4bf47ebfb99b897 <out.json>",
+   "python3 -I validation/l2_crosscheck.py <study>/L2_ladder_check <out.json>",
+   "bash validation/l2_replay_all.sh <scratch_dir>",
+   "bash validation/l4_replay.sh <replay_dir>; python3 -I validation/l4_check.py /home/user/crypto cbc46b060204ab6388dddeb2c4bf47ebfb99b897 <replay_dir> <out.json>"
+  ]
+ }
+}

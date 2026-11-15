@@ -1,0 +1,9 @@
+# Prospective descriptor release design — T1475
+
+Source-only design phase, 2026-11-03. Root requests minimal replacement for failed Docker archive-copy gate release. Freeze before design: preserve TMPFS_MAGIC validation, read-only container root, pids1, existing mounts, exact nonce, root0444 regular token and ancestry-before-release gate. No proc writes, mount, container, Docker, systemd or cloud action; no implementation/test execution in this phase. No index staging.
+
+Read primary Linux proc/PID/openat/pidfd/filesystem documentation and Python os descriptor APIs, plus exact current private_contract, release call site, gate.c and retained v4 failure/postreview. Identify safe exceptions: /proc/PID/root is an intentional magic symlink, so blanket O_NOFOLLOW on it is incompatible with traversal; all ordinary work/token components must be descriptor-relative and nofollow. Specify the trusted kernel anchor, process lifetime binding, race boundaries and cleanup behavior explicitly rather than claiming path checks are atomic.
+
+Design targets: exact container identity and PID/start-ticks/cgroup before and after opening held descriptors; pin proc PID directory and process lifetime where supported; open root then work through held descriptors; require actual work FD directory custody and tmpfs type; stage bounded37byte root0444 regular nonce with exclusive creation; publish final name without replacement only after revalidation; do not retry ambiguous publication. A failed or uncertain publish must not lead to a new token. Define which failure points permit only owned staging cleanup and how teardown handles possible release.
+
+Deliver design before implementation. Include source hashes, primary links, concrete proposed interface and meaningful mocked/local filesystem controls for later authorization. Implementation and any runtime admission are separate. Existing immutable source and failed receipts remain unchanged.

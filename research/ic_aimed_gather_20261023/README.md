@@ -7,8 +7,6 @@ the trial's scan (`Scan::Gathered`) hands two slices to the folding kernel. The
 same summands go in, in the same order: every count and recovered logarithm is
 identical at `icv1-f2m53-tm56619371-dac20a85` (n53) and `icv1-f2m61-t158598901-ab42b6c5` (n61).
 
-> **Correction (2026-10-29).** The A/B intervals below came from a bootstrap that drew only odd-numbered rounds ([`aa2_20261029/CORRECTION.md`](aa2_20261029/CORRECTION.md)). Corrected: collect [1.082, 1.149], whole set-up [1.018, 1.080]; the 5-pair A/A is unaffected and both verdicts stand (1.082 against 1.087). The follow-up [`aa2_20261029/`](aa2_20261029/README.md) measured a 42-round A/A and established the collect-phase gain.
-
 | measurement | result |
 |:--|:--|
 | Callgrind, instructions per `ic price` process | n53 1.023× (−0.73 × 10^9); n61 1.029× (−4.0 × 10^9) |

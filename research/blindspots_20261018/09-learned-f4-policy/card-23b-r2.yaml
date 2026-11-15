@@ -1,0 +1,65 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-09-23b-r2
+experiment_id: BLINDSPOT-09
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-23b-r2.json
+binds:
+  - {path: examples/blindspots_09_learned_f4.rs, sha256: 7e46e27eaf9f5901f74772e9fd2a5f95457ab3182cda7ffcad320fcd820e5743}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.0, sha256: df34941f7fea48ac4122b7092236798245151c7cd829b1c32811cac466e9d6ef}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.6, sha256: de8a2c82225fe2e57060e9be320ae281ec51fe25fb71ffa818f633fe944813af}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.12, sha256: 8d5793c2c46edcb2c2fcf5eac1ce6c29387428052068871d9ca5d1231b62ffa4}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.18, sha256: f78abc8fee5b1510d43c9a4680aecd73ee0ed55e2bf908b6ec355dd4a92b27e4}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.24, sha256: ee60af8b824ea9db543cc3d55f72da42b6923144b2cdf6ec0e74f3e44302e30f}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.30, sha256: 3652db9662b92d340a54700a88b768506be5d8f84c416bbabe8c8bf3122d1f07}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.0, sha256: ecefb28f4a285569037841f91cb3fac80b566b104babfe9b5f6d4cd28a854efe}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.6, sha256: 07cc4ba0ee73e769bc436756b104caa029efd9338d83a3bcf6bd5a29c6ce5004}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.12, sha256: b2607734274527d57c4a14f6d4557548adebb913f0515fa6ecf3a6e7e54ecc3f}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.18, sha256: a19188622be98ab1c49004a1cdb16df4b59cb302c4d55c5db8804fe33178739a}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.24, sha256: 41273640117e873387cad0a18999ccb41d23a1e40f6a6e4a8e44bc6672f17cc2}
+  - {path: research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.30, sha256: 5158959103a942c06b3cc2817bb7394adb82ade2baa5936d7349b121755274b3}
+commands:
+  - id: make-bin-dir
+    argv: ["mkdir", "-p", "target/blindspots-09/card-23b-r2"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-09/card-23b-r2/b09", "examples/blindspots_09_learned_f4.rs"]
+    timeout_seconds: 45
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/card-23b-r2-build.stdout.log
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/card-23b-r2-build.stderr.log
+  - id: fit-21-5-3-c23b
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-09/card-23b-r2/b09", "fit", "--n", "21", "--ell", "5", "--m", "3", "--seed", "20261018", "--out", "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2-c23b", "--samples", "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.0,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.6,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.12,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.18,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.24,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.samples.30"]
+    timeout_seconds: 20
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/fit-21-5-3-c23b-r2.json
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/fit-21-5-3-c23b-r2.stderr.log
+    outputs: [research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2-c23b.model]
+  - id: eval-21-5-3-test-30-32
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-09/card-23b-r2/b09", "eval", "--n", "21", "--ell", "5", "--m", "3", "--seed", "20261018", "--role", "test", "--from", "30", "--to", "32", "--arms", "a,b50,c,d,p,r50", "--model", "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2-c23b.model", "--trace", "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.0,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.6,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.12,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.18,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.24,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3-r2.trace.30", "--cap", "30000000000", "--rel-cap", "1.5"]
+    timeout_seconds: 250
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-30-32-r2.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-30-32-r2.stderr.log
+  - id: remove-bin
+    argv: ["rm", "-f", "target/blindspots-09/card-23b-r2/b09"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "target/blindspots-09/card-23b-r2"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-09
+background: false
+write_scope:
+  - research/blindspots_20261018/09-learned-f4-policy/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

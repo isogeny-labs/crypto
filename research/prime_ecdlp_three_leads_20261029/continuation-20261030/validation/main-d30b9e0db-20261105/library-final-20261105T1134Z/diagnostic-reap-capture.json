@@ -1,0 +1,13 @@
+{
+  "raw_utf8": "\nrunning 4 tests\ntest cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::clock_identity_binds_exact_preparation_bytes_without_cycle ... ok\ntest cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::diagnostic_raw_clock_offset_rejects_underflow_and_regression ... ok\ntest cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars ... FAILED\ntest cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure ... FAILED\n\nfailures:\n\n---- cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars stdout ----\n\nthread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars' (24083) panicked at src/cryptanalysis/ecbench/runner.rs:2733:57:\ncalled `Result::unwrap()` on an `Err` value: \"No such file or directory (os error 2)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n---- cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure stdout ----\n\nthread 'cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure' (24084) panicked at src/cryptanalysis/ecbench/runner.rs:2774:57:\ncalled `Result::unwrap()` on an `Err` value: \"No such file or directory (os error 2)\"\n\n\nfailures:\n    cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars\n    cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure\n\ntest result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 6164 filtered out; finished in 0.06s\n\n",
+  "raw_bytes": 2027,
+  "raw_sha256": "b0ffa1041dcf4e801bca7b6684d20f0cc7d1cb48fb5a571a3e2d0d85383d80f7",
+  "exit": 101,
+  "command": "RAYON_NUM_THREADS=8 target/release/deps/crypto_lib-0f5740d1cfe22c09 cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests:: --test-threads=1",
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "ignored": 0,
+    "filtered_out": 6164
+  }
+}

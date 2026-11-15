@@ -1,0 +1,41 @@
+   Compiling crypto v0.1.0 (/workspace/crypto)
+    Finished `release` profile [optimized] target(s) in 21m 00s
+     Running unittests examples/hecke_target_router.rs (target/release/examples/hecke_target_router-400337dfe79d54df)
+
+running 4 tests
+test tests::arbitrary_public_target_is_verified ... ok
+test tests::cap_preserves_miss_and_bad_labels_fail_closed ... ok
+test tests::duplicate_and_wrong_subgroup_are_refused ... ok
+test tests::identity_target_is_verified_as_zero ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/pkm_oracle_program.rs (target/release/examples/pkm_oracle_program-9b34922ca9c096c6)
+
+running 12 tests
+test pipeline::tests::cap_and_full_group_order_are_checked ... ok
+test pipeline::tests::public_target_recovery_has_no_scalar_input_and_replays ... ok
+test pipeline::tests::rank_deficiency_and_contradiction_are_not_answers ... ok
+test tests::all_presentations_agree_on_supported_two_sum_sets ... ok
+test tests::budget_and_output_caps_remain_incomplete ... ok
+test tests::canonical_export_is_deterministic_and_uses_full_field_domains ... ok
+test tests::certified_miss_does_not_depend_on_a_planted_target ... ok
+test tests::complete_m4_sets_match_independent_affine_control_on_all_finite_targets ... ok
+test tests::independent_affine_reference_matches_known_group_equations ... ok
+test tests::malformed_public_inputs_fail_before_polynomial_construction ... ok
+test tests::replay_rejects_binding_completion_and_ledger_tampering ... ok
+test tests::tiny_control_rejects_lost_duplicate_and_corrupt_witnesses ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 306.79s
+
+     Running unittests examples/pkm_symmetric_complete.rs (target/release/examples/pkm_symmetric_complete-54795fd1798bb6d4)
+
+running 4 tests
+test complete_tests::actual_curve_target_and_off_curve_refusal ... ok
+test complete_tests::invalid_tower_is_rejected_before_construction ... ok
+test complete_tests::positive_relation_requires_no_scalar_input ... ok
+test complete_tests::two_sum_decisions_match_independent_small_group_enumeration ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.68s
+
+[Capture note: the preceding bytes retain the exact native stdout, including its final blank line. See retry1-capture-packaging.json for lengths, hashes and reconstruction.]

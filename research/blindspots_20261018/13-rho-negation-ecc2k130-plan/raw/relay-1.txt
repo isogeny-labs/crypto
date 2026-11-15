@@ -1,0 +1,58 @@
+Exit status 0, status completed. Verbatim output:
+
+```
+card: CARD-BLINDSPOT-13-01 (sha256 efe62caab62fd45277a07a922436c4929c5626d103ff7f8dbc36dbf7f7f26a1a)
+commit: aa53efefef31cce12ca6ece3f27de35521cc7c58
+receipt: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/receipt-card-01.json sha256 5383a6cb3db85319e7982e0b8738794eb9e1fcaff06146a312740de462f73338
+status: completed
+command 1 (make-dirs): ["mkdir", "-p", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw", "target/blindspots-13/card-01"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-13/card-01/b13", "examples/blindspots_13_rho_negation.rs"] exit 0 (7.053 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (selftest): ["prlimit", "--as=4294967296", "target/blindspots-13/card-01/b13", "selftest"] exit 0 (3.711 s) succeeded
+  stdout sha256 2eee1ad359ba4afccb0cb7c51aa2898f64259927c01b510b3934c1df77406c59; last 20 lines:
+      per4     solved 6/6 censored 0/6 mean ops/sqrt(N) 1.443 bad 0
+      per8     solved 6/6 censored 0/6 mean ops/sqrt(N) 1.122 bad 0
+      per16    solved 6/6 censored 0/6 mean ops/sqrt(N) 1.550 bad 0
+      per32    solved 2/6 censored 4/6 mean ops/sqrt(N) 2.258 bad 0
+      per64    solved 0/6 censored 6/6 mean ops/sqrt(N) 2.507 bad 0
+      laper16  solved 6/6 censored 0/6 mean ops/sqrt(N) 0.918 bad 0
+      laper32  solved 6/6 censored 0/6 mean ops/sqrt(N) 0.974 bad 0
+      laper64  solved 6/6 censored 0/6 mean ops/sqrt(N) 1.088 bad 0
+    PASS positive control (absorption): no-escape arm censored on 6/6 targets at r=16
+    PASS positive control (baseline): baseline solved 6/6
+    PASS positive control (detecting arms): windows of 4, 8, 16 and the three look-ahead+periodic arms solved at least 5 of 6 at r=16 (a window of k sees only cycles of length <= k, so the window of 2 is a 2-cycle-only rule like min-of-2 and dbl, which longer fruitless cycles absorb at r=16; windows of 32 and 64 lose to re-entry; those are not asserted, they are the effect under measurement)
+      r=2048 base     solved 6/6
+      r=2048 dbl      solved 6/6
+      r=2048 min2     solved 6/6
+      r=2048 la       solved 6/6
+      r=2048 per16    solved 6/6
+      r=2048 laper16  solved 6/6
+    PASS positive control (r = 2048): baseline, doubling escape, min-of-2, look-ahead, window 16 and look-ahead+16 solved at least 5 of 6 at r=2048
+    PASS ideal-map control: points/classes mean steps = 1.295 over 200 targets at 2^30 (sqrt2 = 1.414)
+    selftest OK in 3.7s
+command 4 (ctl-40): ["prlimit", "--as=4294967296", "target/blindspots-13/card-01/b13", "ctl", "--bits", "40", "--targets", "512", "--out", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/ctl-b40.jsonl"] exit 0 (8.367 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    ctl bits=40: 512 targets x 2 arms in 8.4s
+  output research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/ctl-b40.jsonl: 998a78005683b9bd084b67f05679b49340438fa09525ac32c797c26d3f447539
+command 5 (ctl-44): ["prlimit", "--as=4294967296", "target/blindspots-13/card-01/b13", "ctl", "--bits", "44", "--targets", "512", "--out", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/ctl-b44.jsonl"] exit 0 (32.08 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    ctl bits=44: 512 targets x 2 arms in 32.1s
+  output research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/ctl-b44.jsonl: 5b0ffc92b786433d0c1af35497aa8159790d8de8940dbf800e1e0eaa136e6d35
+command 6 (sweep): ["prlimit", "--as=4294967296", "target/blindspots-13/card-01/b13", "sweep", "--bits", "40", "--t0", "0", "--t1", "64", "--rs", "16,32,128,2048", "--arms", "base,none,dbl,min2,la,per2,per4,per8,per16,per32,per64,laper16,laper32,laper64", "--seed-offset", "7000000", "--out", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64.jsonl"] exit 0 (78.955 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    sweep bits=40 targets 0..64 arms ["base", "none", "dbl", "min2", "la", "per2", "per4", "per8", "per16", "per32", "per64", "laper16", "laper32", "laper64"] rs [16, 32, 128, 2048]: 3584 records in 79.0s
+  output research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64.jsonl: 72f7e198f7b07a7f63264f1eb83ff0c285cb7f80a211f08d8a1a02467645f53f
+command 7 (sweep-baseb): ["prlimit", "--as=4294967296", "target/blindspots-13/card-01/b13", "sweep", "--bits", "40", "--t0", "0", "--t1", "64", "--rs", "16,32,128,2048", "--arms", "baseb", "--seed-offset", "9000011", "--out", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64-baseb.jsonl"] exit 0 (3.776 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    sweep bits=40 targets 0..64 arms ["baseb"] rs [16, 32, 128, 2048]: 256 records in 3.8s
+  output research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64-baseb.jsonl: 23c3a5a11896ebf00459bc809864ac67ac87a86a199373ad441b04daca1db358
+command 8 (remove-bin): ["rm", "-f", "target/blindspots-13/card-01/b13"] exit 0 (0.007 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 9 (remove-bin-dir): ["rmdir", "target/blindspots-13/card-01"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+```

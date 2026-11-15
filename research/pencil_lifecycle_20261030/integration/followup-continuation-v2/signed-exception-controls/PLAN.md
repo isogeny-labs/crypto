@@ -1,0 +1,7 @@
+# Constructed signed exceptional-event controls
+
+T-1390, 2026-11-02. Five deliberately constructed streams: identity with nonzero target coefficient; zero-label identity; opposite-sign duplicate ending at cap; repeated-choice restart; walk-duplicate restart followed by identity recovery. Derive one real split candidate and its node/edge records from the saved p739 fixture. Negate both labels with the divisor for opposite-sign duplicates. Use the known public fixture Q=2G for identity coefficients. These are not native scheduler traces and supply no natural-event frequency or timing claim.
+
+Validate each through strict graph replay and the concrete group-label checker. Negative controls remove required restarts, insert unsolicited or repeated restarts, terminate with an unfinished restart, repeat a jump index, or choose before considering both candidates. First preserve current behavior before changing the replay source. Then enforce the source's observed transition obligations and rerun all five controls and six saved native streams. Do not alter producer code or frozen evidence.
+
+Source basis: signed-labels/SESSION.md, signed-replay/src/lib.rs, and three_leads_followup.rs observed loop: two distinct jumps, choice, unconditional restart on repeated choice, optional walk-duplicate restart before next candidates. No PRNG/choice-priority proof is claimed. One build job, 3GiB virtual memory and180 seconds per check with source/input bindings. No collector or scientific campaign launch. Independent review remains pending.

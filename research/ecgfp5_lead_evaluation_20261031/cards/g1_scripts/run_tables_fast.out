@@ -1,0 +1,56 @@
+== check of Pornin 2.2 count ==
+p^{2-2/5} = 2^102.40 ; x D^2=2^40 -> 2^142.40 ; with 5! = 2^6.91 -> 2^149.31
+with nominal 5 D^3 (D=2^20) = 2^62.32: Pornin-style 2^164.72 ; with 5!: 2^171.63
+JV(n-1) attempts: 4! p^2 = 2^132.58 ; /2 relations-needed = 2^131.58
+
+== relation/LA balance for c in F_p ops; totals as log2 64-bit word ops ==
+log2c | full  | nolp(B,tot) | lp1(B,tot) | lp2(B,tot,edges) | Pornin-style p^1.6*c*u | best | rho(800)
+ 30.0 |  135.9 |  125.5 B=2^57.5 |  124.0 B=2^56.6 |  125.5 B=2^0.0 E=2^0.0 d=0.00 |  134.4 |  124.0 |  169.0
+ 32.0 |  135.9 |  126.2 B=2^57.8 |  124.8 B=2^57.0 |  126.2 B=2^0.0 E=2^0.0 d=0.00 |  136.4 |  124.8 |  169.0
+ 36.0 |  135.9 |  127.5 B=2^58.5 |  126.2 B=2^57.7 |  127.5 B=2^0.0 E=2^0.0 d=0.00 |  140.4 |  126.2 |  169.0
+ 40.0 |  135.9 |  128.8 B=2^59.2 |  127.7 B=2^58.4 |  128.8 B=2^0.0 E=2^0.0 d=0.00 |  144.4 |  127.7 |  169.0
+ 44.0 |  135.9 |  130.2 B=2^59.8 |  129.2 B=2^59.2 |  130.2 B=2^0.0 E=2^0.0 d=0.00 |  148.4 |  129.2 |  169.0
+ 48.0 |  135.9 |  131.5 B=2^60.5 |  130.7 B=2^59.9 |  131.5 B=2^0.0 E=2^0.0 d=0.00 |  152.4 |  130.7 |  169.0
+ 50.0 |  135.9 |  132.2 B=2^60.8 |  131.4 B=2^60.3 |  132.2 B=2^0.0 E=2^0.0 d=0.00 |  154.4 |  131.4 |  169.0
+ 54.0 |  135.9 |  133.5 B=2^61.5 |  133.0 B=2^61.0 |  133.5 B=2^0.0 E=2^0.0 d=0.00 |  158.4 |  133.0 |  169.0
+ 60.0 |  136.0 |  135.5 B=2^62.5 |  135.6 B=2^62.0 |  135.5 B=2^0.0 E=2^0.0 d=0.00 |  164.4 |  135.5 |  169.0
+ 62.3 |  136.3 |  136.3 B=2^62.9 |  137.3 B=2^62.0 |  136.3 B=2^0.0 E=2^0.0 d=0.00 |  166.7 |  136.3 |  169.0
+ 70.0 |  141.9 |  141.9 B=2^63.0 |  144.8 B=2^62.0 |  141.9 B=2^0.0 E=2^0.0 d=0.00 |  174.4 |  141.9 |  169.0
+ 80.0 |  151.9 |  151.8 B=2^63.0 |  154.8 B=2^62.0 |  151.8 B=2^0.0 E=2^0.0 d=0.00 |  184.4 |  151.8 |  169.0
+ 82.6 |  154.5 |  154.4 B=2^63.0 |  157.4 B=2^62.0 |  154.4 B=2^0.0 E=2^0.0 d=0.00 |  187.0 |  154.4 |  169.0
+ 90.0 |  161.9 |  161.8 B=2^63.0 |  164.8 B=2^62.0 |  161.8 B=2^0.0 E=2^0.0 d=0.00 |  194.4 |  161.8 |  169.0
+
+== crossovers (central conversions) ==
+nolp  T=2^128 at log2 c = 37.5 ; T = rho_words(2^169.0) at log2 c = 97.1
+lp1   T=2^128 at log2 c = 40.8 ; T = rho_words(2^169.0) at log2 c = 94.1
+
+== c-range per ideal degree D (F_p ops): D^2 .. 5 D^3 ==
+D=2^16 quotient  D^2   log2c= 32.0 -> nolp 2^126.2  lp1 2^124.8  lp2(n/a) 2^126.2   (128: below ; rho 2^169.0: below)
+D=2^16 quotient  5D^3  log2c= 50.3 -> nolp 2^132.3  lp1 2^131.5  lp2(n/a) 2^132.3   (128: above ; rho 2^169.0: below)
+D=2^20 S5        D^2   log2c= 40.0 -> nolp 2^128.8  lp1 2^127.7  lp2(n/a) 2^128.8   (128: below ; rho 2^169.0: below)
+D=2^20 S5        5D^3  log2c= 62.3 -> nolp 2^136.3  lp1 2^137.3  lp2(n/a) 2^136.3   (128: above ; rho 2^169.0: below)
+D=2^26.9 raw     D^2   log2c= 53.8 -> nolp 2^133.4  lp1 2^132.9  lp2(n/a) 2^133.4   (128: above ; rho 2^169.0: below)
+D=2^26.9 raw     5D^3  log2c= 83.0 -> nolp 2^154.8  lp1 2^157.9  lp2(n/a) 2^154.8   (128: above ; rho 2^169.0: below)
+
+== JV (n-1) and hybrid at full base (words) ==
+c~ = 2^30.0 F_p ops: JV(n-1) full base = 2^163.58 (R 2^163.58, LA 2^135.91)  vs rho_words 2^168.97  -> gap -5.38 bits
+c~ = 2^33.5 F_p ops: JV(n-1) full base = 2^167.08 (R 2^167.08, LA 2^135.91)  vs rho_words 2^168.97  -> gap -1.88 bits
+c~ = 2^35.0 F_p ops: JV(n-1) full base = 2^168.58 (R 2^168.58, LA 2^135.91)  vs rho_words 2^168.97  -> gap -0.38 bits
+c~ = 2^36.0 F_p ops: JV(n-1) full base = 2^169.58 (R 2^169.58, LA 2^135.91)  vs rho_words 2^168.97  -> gap 0.62 bits
+c~ = 2^40.0 F_p ops: JV(n-1) full base = 2^173.58 (R 2^173.58, LA 2^135.91)  vs rho_words 2^168.97  -> gap 4.62 bits
+break-even c~ vs rho_words(800): log2 c~ = 35.38 F_p ops
+break-even c~ vs rho_words(500..1830): 34.71 .. 36.58
+hybrid c_h=2^38: 2^173.9 words
+hybrid c_h=2^40: 2^175.9 words
+hybrid c_h=2^45: 2^180.9 words
+JV measured F4' 32-bit: 2.21e+10 cycles = 2^34.36 ; as words (x1.5 IPC) 2^34.95 ; 64-bit p x2: 2^35.95
+JV(n-1) full base with c~_words = 2^34.95 : 2^166.53  (gap to rho_words -2.43)
+JV(n-1) full base with c~_words = 2^35.95 : 2^167.53  (gap to rho_words -1.43)
+JV(n-1) B-sweep, c~_words=2^36 (c~=2^34 F_p ops)
+  B=2^63.0  total 2^167.6  (rho 2^169.0)  LA mem 2.58e+21 B
+  B=2^62.5  total 2^169.1  (rho 2^169.0)  LA mem 1.83e+21 B
+  B=2^62.0  total 2^170.6  (rho 2^169.0)  LA mem 1.29e+21 B
+  B=2^61.0  total 2^173.6  (rho 2^169.0)  LA mem 6.46e+20 B
+  B=2^60.0  total 2^176.6  (rho 2^169.0)  LA mem 3.23e+20 B
+  B=2^58.0  total 2^182.6  (rho 2^169.0)  LA mem 8.07e+19 B
+  B=2^55.0  total 2^191.6  (rho 2^169.0)  LA mem 1.01e+19 B

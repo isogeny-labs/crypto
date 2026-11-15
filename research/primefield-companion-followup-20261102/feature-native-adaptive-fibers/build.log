@@ -1,0 +1,59 @@
+warning: variable `updates` is assigned to, but never used
+   --> research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/../feature-native-seed-factor/routed/source.rs:111:204
+    |
+111 | ...());let(mut bp,mut ap,mut prefix)=([1,1],[1,1],[1,1]);let mut updates=0;
+    |                                                              ^^^^^^^^^^^
+    |
+    = note: consider using `_updates` instead
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `updates` is never read
+   --> research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/../feature-native-seed-factor/routed/source.rs:114:183
+    |
+114 | ...vious=current;current=next;t=grid[2+w as usize+i as usize];updates+=1;}}
+    |                                                               ^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `updates` is never read
+   --> research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/../feature-native-seed-factor/routed/source.rs:112:215
+    |
+112 | ...ed_sq)?;previous=current;current=next;t=grid[2+j as usize];updates+=1;}
+    |                                                               ^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+
+warning: fields `matrix_entries` and `elimination_updates` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/target.rs:4:105
+  |
+4 | ...uct Program{pub terms:Vec<(u64,Vec<usize>)>,pub rank:usize,pub columns:usize,pub matrix_entries:usize,pub elimination_updates:u64}
+  |        ------- fields in this struct                                                ^^^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `Program` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `product` is never used
+ --> research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/target.rs:7:4
+  |
+7 | fn product(a:&[u64],b:&[u64],r:u64)->Vec<u64>{
+  |    ^^^^^^^
+
+warning: function `shifted_power` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/target.rs:12:4
+   |
+12 | fn shifted_power(r:u64,a:usize)->Vec<u64>{
+   |    ^^^^^^^^^^^^^
+
+warning: fields `labels`, `projective`, and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/../feature-native-seed-factor/routed/../../feature-native-joint-window/lib.rs:18:21
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ----     ^^^^^^              ^^^^^^^^^^                                          ^^^^^^^^^
+   |            |
+   |            fields in this struct
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: 7 warnings emitted
+

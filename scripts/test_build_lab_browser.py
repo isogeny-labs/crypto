@@ -1,5 +1,6 @@
-"""Focused controls for sparse-safe lab-browser source discovery."""
+"""Focused controls for sparse-safe sources and exact cover joins."""
 
+import hashlib
 import os
 import pathlib
 import subprocess
@@ -21,6 +22,9 @@ class RepositoryInputsTests(unittest.TestCase):
         (self.root / "tracked" / "nested").mkdir()
         (self.root / "tracked" / "off.json").write_text('{"source":"head"}\n', encoding="utf-8")
         (self.root / "tracked" / "live.json").write_text('{"source":"old"}\n', encoding="utf-8")
+        (self.root / "tracked" / "deleted.json").write_text(
+            '{"source":"deleted"}\n', encoding="utf-8"
+        )
         (self.root / "tracked" / "nested" / "inside.json").write_text(
             '{"source":"nested"}\n', encoding="utf-8"
         )
@@ -29,6 +33,7 @@ class RepositoryInputsTests(unittest.TestCase):
         self.off_oid = self.git("rev-parse", "HEAD:tracked/off.json", capture=True).strip()
         self.git("update-index", "--skip-worktree", "tracked/off.json")
         os.unlink(self.root / "tracked" / "off.json")
+        os.unlink(self.root / "tracked" / "deleted.json")
         (self.root / "tracked" / "live.json").write_text('{"source":"worktree"}\n', encoding="utf-8")
         (self.root / "tracked" / "untracked.json").write_text(
             '{"source":"untracked"}\n', encoding="utf-8"
@@ -57,6 +62,10 @@ class RepositoryInputsTests(unittest.TestCase):
             source.glob_files("tracked/*.json"),
             ["tracked/live.json", "tracked/off.json"],
         )
+        self.assertEqual(
+            source.glob_files("tracked/**/*.json"),
+            ["tracked/live.json", "tracked/nested/inside.json", "tracked/off.json"],
+        )
         self.assertEqual(source.read_text("tracked/off.json"), '{"source":"head"}\n')
         self.assertEqual(source.read_text("tracked/live.json"), '{"source":"worktree"}\n')
         self.assertEqual(source.size("tracked/off.json"), 18)
@@ -79,6 +88,11 @@ class RepositoryInputsTests(unittest.TestCase):
         self.assertTrue(
             browser._glob_match("tracked/.hidden.json", "tracked/.hidden.json")
         )
+        self.assertTrue(browser._glob_match("tracked", "tracked/**"))
+        self.assertTrue(browser._glob_match("tracked/nested", "tracked/**"))
+        self.assertTrue(browser._glob_match("tracked/nested/inside.json", "**/*.json"))
+        self.assertFalse(browser._glob_match("tracked/.hidden", "tracked/**"))
+        self.assertFalse(browser._glob_match("tracked/.hidden/inside.json", "**/*.json"))
 
     def test_missing_sparse_blob_fails_closed_with_its_path(self):
         source = browser.RepositoryInputs(str(self.root))
@@ -106,6 +120,26 @@ class RepositoryInputsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             with self.assertRaisesRegex(RuntimeError, "cannot enumerate committed"):
                 browser.RepositoryInputs(root)
+
+
+class CoverJoinTests(unittest.TestCase):
+    def test_older_catalog_keeps_new_model_visible_as_unassessed(self):
+        curves = [
+            {"slug": "icv1-a", "model_json": '{"model":"a"}'},
+            {"slug": "icv1-b", "model_json": '{"model":"b"}'},
+        ]
+        report = {"schema_version": "curve-covers/v1", "registry_sha256": "a" * 64,
+                  "curves": [{"slug": "icv1-a", "model_sha256":
+                              hashlib.sha256(curves[0]["model_json"].encode()).hexdigest()}]}
+        with mock.patch.object(browser, "sha256_file", return_value="b" * 64):
+            self.assertEqual(browser.attach_covers(curves, report), {"icv1-a"})
+            self.assertEqual(curves[0]["hyperelliptic_cover"], report["curves"][0])
+            self.assertIsNone(curves[1]["hyperelliptic_cover"])
+            bad = {**report, "curves": [{**report["curves"][0], "model_sha256": "0" * 64}]}
+            with self.assertRaisesRegex(ValueError, "cover model digest mismatch"):
+                browser.attach_covers(curves, bad)
+            with self.assertRaisesRegex(ValueError, "current cover report must have one finding"):
+                browser.attach_covers(curves, {**report, "registry_sha256": "b" * 64})
 
 
 if __name__ == "__main__":

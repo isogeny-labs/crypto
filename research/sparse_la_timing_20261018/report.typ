@@ -8,7 +8,7 @@
   #text(15pt, weight: "bold")[Sparse relation matrices in `ic.pipeline`: first paired measurement]
   #v(2pt)
   research/sparse_la_timing_20261018 · 2026-10-18/19 · protocol frozen at `6414d1575` \
-  Sessions `ECBS1h0bf2b60b4cc4` (S2, LA scaling, 330 runs) and FP4_SESSION (S1, E(F#sub[29#super[4]]) ladder, 20 runs)
+  Sessions `ECBS1h0bf2b60b4cc4` (S2, LA scaling, 330 runs) and `ECBS1h74e873bda045` (S1, E(F#sub[29#super[4]]) ladder, 20 runs)
 ]
 
 #block(fill: luma(240), inset: 8pt, radius: 3pt)[
@@ -18,7 +18,7 @@
   target's column is pinned: 1.75× the relations on S1 workload 2 (end-to-end 1.398×), 5.5–10.5× on S2
   (end-to-end 5.72× at 128 columns, 1.030× at 4096). In counted `row_ops` the filtered solvers cost 1.47–1.97× the
   dense full-rank matrix on the same rows (a lower bound); their L0 wall time falls to 0.52× of it at 4096 columns
-  (descriptive only). Every answer verified; S2 replay-all OK; AUDIT_S1_SHORT.
+  (descriptive only). Every answer verified; S2 replay-all OK; S1 replay-all OK (20/20 replays reproduced).
 ]
 
 = Baseline and design
@@ -47,7 +47,7 @@ $S$; the D#sub[4] oracle is the rest. Band (§5a): `ecbench band` refuses the se
 calibration row for this curve); pricing every `row_op` at 1 GAE adds ≤ 218 S, rho's canonicalisations ≤ 0.67 S, so
 the order holds at 0, 0.1 and 1 GAE.
 
-#figure(image("figures/fp4.svg", width: 92%), caption: [S1, FP4_SESSION: end-to-end $S$ and LA `row_ops` per arm (2 targets).])
+#figure(image("figures/fp4.svg", width: 92%), caption: [S1, ECBS1h74e873bda045: end-to-end $S$ and LA `row_ops` per arm (2 targets).])
 
 = S2: scaling with matrix size (30-bit prime curve, 6 targets)
 

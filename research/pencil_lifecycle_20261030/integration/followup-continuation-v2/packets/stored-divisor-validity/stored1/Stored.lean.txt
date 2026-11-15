@@ -1,0 +1,72 @@
+import Bridge
+import Validity
+set_option autoImplicit false
+namespace StoredDivisor
+open Polynomial MumfordNormalization MumfordValidity AffineCoefficientLoop CoefficientTraversal TraversalPolynomial WordCoefficient ScaleTrim PencilWordRefinement
+
+def store {n : Nat} (hn : n≤6) (p : UInt64) (c : Fin n→UInt64)
+ (a b : UInt64) (m : Fin 6) (capacity : Nat) : List UInt64 :=
+ let out := (transform hn p c a b (smallPow p a m)).val.toList
+ pad capacity (trimFuel out.length out)
+
+def storeU (d : Fin 3) (p : UInt64) (u : Fin (d.val+1)→UInt64) (a b : UInt64) : List UInt64 :=
+ store (by have := d.isLt; omega) p u a b ⟨d.val,by have := d.isLt; omega⟩ 3
+
+def storeV (d : Fin 3) (p : UInt64) (v : Fin d.val→UInt64) (a b : UInt64) : List UInt64 :=
+ store (by have := d.isLt; omega) p v a b ⟨3,by decide⟩ 2
+
+theorem capacities (d : Fin 3) (p : UInt64) (u : Fin (d.val+1)→UInt64)
+ (v : Fin d.val→UInt64) (a b : UInt64) :
+ (storeU d p u a b).length=3 ∧ (storeV d p v a b).length=2 := by
+ constructor
+ · exact postprocessed_capacity _ p u a b _ 3 (by have := d.isLt; omega)
+ · exact postprocessed_capacity _ p v a b _ 2 (by have := d.isLt; omega)
+
+theorem stored_polynomials (d : Fin 3) (p : UInt64) [Fact p.toNat.Prime]
+ (u : Fin (d.val+1)→UInt64) (v : Fin d.val→UInt64) (a b : UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hu : ∀i,(u i).toNat<p.toNat) (hv : ∀i,(v i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (ha0 : a≠0) :
+ wordsPoly p (storeU d p u a b)=T d.val (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (sourcePoly (extend p u) (d.val+1)) ∧
+ wordsPoly p (storeV d p v a b)=T 3 (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (sourcePoly (extend p v) d.val) := by
+ constructor
+ · exact postprocessed_transform _ p u a b _ 3 hp hb hu ha hbeta ha0
+ · exact postprocessed_transform _ p v a b _ 2 hp hb hv ha hbeta ha0
+
+theorem stored_valid (d : Fin 3) (p : UInt64) [Fact p.toNat.Prime]
+ (u : Fin (d.val+1)→UInt64) (v : Fin d.val→UInt64) (a b : UInt64) (f : (ZMod p.toNat)[X])
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hu : ∀i,(u i).toNat<p.toNat) (hv : ∀i,(v i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (ha0 : a≠0)
+ (hdeg : (sourcePoly (extend p u) (d.val+1)).natDegree=d.val)
+ (hvalid : Valid f (sourcePoly (extend p u) (d.val+1)) (sourcePoly (extend p v) d.val)) :
+ Valid (T 6 (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) f)
+  (wordsPoly p (storeU d p u a b)) (wordsPoly p (storeV d p v a b)) ∧
+ (wordsPoly p (storeU d p u a b)).natDegree=d.val := by
+ have h := stored_polynomials d p u v a b hp hb hu hv ha hbeta ha0
+ have han : (a.toNat : ZMod p.toNat)≠0 := canonical_word_nonzero p a (by omega) ha ha0
+ rw [h.1,h.2]
+ constructor
+ · simpa only [hdeg] using valid_transport (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) han f _ _ hvalid
+ · rw [natDegree_transport _ _ _ han,hdeg]
+
+variable {K : Type*} [Field K]
+theorem identity_valid (f : K[X]) : Valid f 1 0 := by
+ simp [Valid]
+
+theorem degree_zero_identity (f u v : K[X]) (h : Valid f u v) (hd : u.natDegree=0) :
+ u=1 ∧ v=0 := by
+ have hu := eq_one_of_monic_natDegree_zero h.1 hd
+ refine ⟨hu,?_⟩
+ have hv := h.2.2.1
+ rw [hu] at hv
+ exact degree_lt_zero.mp (by simpa using hv)
+
+theorem unchanged_identity_branch (f g u v : K[X]) (h : Valid f u v) (hd : u.natDegree=0) :
+ Valid g u v := by
+ obtain ⟨rfl,rfl⟩ := degree_zero_identity f u v h hd
+ exact identity_valid g
+
+theorem identity_normalization (a b : K) : T 0 a b (1:K[X])=1 ∧ T 3 a b (0:K[X])=0 := by
+ simp [T]
+end StoredDivisor

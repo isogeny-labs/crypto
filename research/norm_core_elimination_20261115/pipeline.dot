@@ -1,0 +1,14 @@
+digraph core {
+ graph [rankdir=TB, bgcolor=white, pad="0.22", ranksep="0.28", fontname="DejaVu Sans", fontsize=13, labelloc=t,
+ label="Norm core • exact substitutions and bounded outcomes • PCC:unverified"];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=10,fillcolor="#eef4f8",color="#36566f",margin="0.16,0.09"];
+ edge [color="#36566f",arrowsize=0.7];
+ full [label="Unknown witness-pruned norm/remainder input\nt4: 24 / 42 / 60 variables at m3 / m5 / m7",URL="../shared_norm_algebraic_20261115/norm_algebraic.cpp"];
+ target [label="Solve a0 from target; monic norm division reconstructs U\nRemove public pre-wrap layers and known zero quotient terms",URL="derivation.md"];
+ reduced [label="Core t4: 15 / 18 / 22 variables; degree ≤ 3\nLift every assignment; check every original equation",URL="core.cpp",fillcolor="#e1f1ea"];
+ backend [label="Same native backend and 20s / 2GiB caps\nComplete m3 sets and cold IC pass OpenSSL replay",URL="PROTOCOL.md"];
+ dense [label="Dense m5: exit139; dense m7: cap124\nNo basis → unknown",fillcolor="#fff1d6",color="#ad6b25"];
+ diag [label="Diagnostics on the same dense m5 input\nMemory trace: ENOMEM → null SIGSEGV\nPair batch512: cap137; still no basis",URL="evidence/",fillcolor="#fff1d6",color="#ad6b25"];
+ next [label="Next: capped Macaulay with input-row provenance\nGrowing-family useful-yield / cost theorem remains open",URL="../prime_one_shot_20261029/continuation/theory/initial-elimination-obligation.md"];
+ full -> target -> reduced -> backend -> dense -> diag -> next;
+}

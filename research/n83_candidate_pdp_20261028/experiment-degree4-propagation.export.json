@@ -1,0 +1,1581 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/degree4_propagation_impl.rs",
+      "kind": "analysis",
+      "bytes": 23883,
+      "sha256": "73753f5aaad56b96f2dca3c1951d3c7820a4584ea96b52a2e4991dd8ff3f1c63"
+    },
+    "outputs": [
+      {
+        "path": "evidence/degree4-propagation/summary.json",
+        "kind": "summary",
+        "bytes": 14281,
+        "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original-koblitz",
+      "role": "baseline",
+      "commit": "57e4f7a928f8a3d9a29c47e3c19c2e8d51d81807",
+      "binary_sha256": "fb961b36271bbef8acce8d5f169eb712be6b4bd385b828dacfcdba9e388463a2",
+      "image_digest": null
+    },
+    {
+      "id": "original-binary",
+      "role": "baseline",
+      "commit": "57e4f7a928f8a3d9a29c47e3c19c2e8d51d81807",
+      "binary_sha256": "fb961b36271bbef8acce8d5f169eb712be6b4bd385b828dacfcdba9e388463a2",
+      "image_digest": null
+    },
+    {
+      "id": "baseline-koblitz",
+      "role": "baseline",
+      "commit": "57e4f7a928f8a3d9a29c47e3c19c2e8d51d81807",
+      "binary_sha256": "fb961b36271bbef8acce8d5f169eb712be6b4bd385b828dacfcdba9e388463a2",
+      "image_digest": null
+    },
+    {
+      "id": "baseline-binary",
+      "role": "baseline",
+      "commit": "57e4f7a928f8a3d9a29c47e3c19c2e8d51d81807",
+      "binary_sha256": "fb961b36271bbef8acce8d5f169eb712be6b4bd385b828dacfcdba9e388463a2",
+      "image_digest": null
+    },
+    {
+      "id": "spike40-koblitz",
+      "role": "candidate",
+      "commit": "57e4f7a928f8a3d9a29c47e3c19c2e8d51d81807",
+      "binary_sha256": "fb961b36271bbef8acce8d5f169eb712be6b4bd385b828dacfcdba9e388463a2",
+      "image_digest": null
+    },
+    {
+      "id": "spike40-binary",
+      "role": "candidate",
+      "commit": "57e4f7a928f8a3d9a29c47e3c19c2e8d51d81807",
+      "binary_sha256": "fb961b36271bbef8acce8d5f169eb712be6b4bd385b828dacfcdba9e388463a2",
+      "image_digest": null
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-29T19:30:38Z",
+  "export_id": "N83-DEGREE4-PROPAGATION-20261029-R1",
+  "files": [
+    {
+      "path": "evidence/degree4-propagation/controls.json",
+      "kind": "raw",
+      "bytes": 2966,
+      "sha256": "134e2256cb4428c7297ff67a8f06bf308a6eadf77d729dc4629bedacb1a34ced"
+    },
+    {
+      "path": "evidence/degree4-propagation/controls.log",
+      "kind": "raw",
+      "bytes": 2162,
+      "sha256": "088278e4ed9b37bfc3235f969bfff6df619a64e539ecf0a6d16755067c9da72c"
+    },
+    {
+      "path": "evidence/degree4-propagation/host.txt",
+      "kind": "raw",
+      "bytes": 3504,
+      "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/baseline-binary-m3-natural.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "5944e1b1312d863e229d8af26491296ee765316e831aaed74e0d44de9407ea3d"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/baseline-binary-m3-planted.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "ad25e1bf3d0bfbe383d3ac5a15c1da036e0a2e70096ffb97829df2ed018c0ed1"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/baseline-koblitz-m3-natural.log",
+      "kind": "raw",
+      "bytes": 282,
+      "sha256": "ae3399be6a774f0540c5aecb9842be4871c4228ca0e74967145da897b7f75020"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/baseline-koblitz-m3-planted.log",
+      "kind": "raw",
+      "bytes": 282,
+      "sha256": "a6a135b336e0943d643caa9f3bddc375e9d29a051c359eac95d0110040cd900f"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/original-binary-m3-natural.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "297b32737626aead31f289ab85bb5375cc542dca701556ac51ff0d555946cb31"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/original-binary-m3-planted.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "7abf233c9d3dab16530891896a130f0b9a7d96b3f0121a1234756d0487c91e69"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/original-koblitz-m3-natural.log",
+      "kind": "raw",
+      "bytes": 282,
+      "sha256": "fd08af0c033e6c54ee4fcb7f9af6ad67b00afef7dbde11af69d8b4feb2059f0c"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/original-koblitz-m3-planted.log",
+      "kind": "raw",
+      "bytes": 282,
+      "sha256": "0e733fed3c34b9ebc5976a09d9e04d7f44b8a608ca52b3db2bcb75c0d314a859"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/spike40-binary-m3-natural.log",
+      "kind": "raw",
+      "bytes": 278,
+      "sha256": "7e126e4d7f806fa52e14d960fb15b716cc8cf3fe6d3aba107a8e575fb1f6cc61"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/spike40-binary-m3-planted.log",
+      "kind": "raw",
+      "bytes": 278,
+      "sha256": "9a1a7d96a35a907954308ed9d050dc3523fe6d6dde88bbb21635813832b49b4f"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/spike40-koblitz-m3-natural.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "98083e02693d7a4559974d6887d733ba5cdcfd550fe277dc17dab72a69b2f778"
+    },
+    {
+      "path": "evidence/degree4-propagation/logs/spike40-koblitz-m3-planted.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "e9712ec34350411dd1de00f7151c29fb8b08295a52cc884d061827e4f773c0e1"
+    },
+    {
+      "path": "evidence/degree4-propagation/manifest.sha256",
+      "kind": "raw",
+      "bytes": 33750,
+      "sha256": "36d3a3c928f9fa2b5c5edb0b70a0e67725dca6617a69ea3367f8fc42285f3dbb"
+    },
+    {
+      "path": "evidence/degree4-propagation/parent-reference.json",
+      "kind": "raw",
+      "bytes": 1072,
+      "sha256": "4a033bddf6f0126bd8f6a58eece2127762feb079705a09af97fe948ad1db4c74"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/baseline-binary-m3-natural.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "5944e1b1312d863e229d8af26491296ee765316e831aaed74e0d44de9407ea3d"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/baseline-binary-m3-planted.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "ad25e1bf3d0bfbe383d3ac5a15c1da036e0a2e70096ffb97829df2ed018c0ed1"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/baseline-koblitz-m3-natural.log",
+      "kind": "raw",
+      "bytes": 282,
+      "sha256": "ae3399be6a774f0540c5aecb9842be4871c4228ca0e74967145da897b7f75020"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/baseline-koblitz-m3-planted.log",
+      "kind": "raw",
+      "bytes": 282,
+      "sha256": "a6a135b336e0943d643caa9f3bddc375e9d29a051c359eac95d0110040cd900f"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/original-binary-m3-natural.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "297b32737626aead31f289ab85bb5375cc542dca701556ac51ff0d555946cb31"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/original-binary-m3-planted.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "7abf233c9d3dab16530891896a130f0b9a7d96b3f0121a1234756d0487c91e69"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/original-koblitz-m3-natural.log",
+      "kind": "raw",
+      "bytes": 282,
+      "sha256": "fd08af0c033e6c54ee4fcb7f9af6ad67b00afef7dbde11af69d8b4feb2059f0c"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/original-koblitz-m3-planted.log",
+      "kind": "raw",
+      "bytes": 282,
+      "sha256": "0e733fed3c34b9ebc5976a09d9e04d7f44b8a608ca52b3db2bcb75c0d314a859"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/spike40-binary-m3-natural.log",
+      "kind": "raw",
+      "bytes": 278,
+      "sha256": "7e126e4d7f806fa52e14d960fb15b716cc8cf3fe6d3aba107a8e575fb1f6cc61"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/spike40-binary-m3-planted.log",
+      "kind": "raw",
+      "bytes": 278,
+      "sha256": "9a1a7d96a35a907954308ed9d050dc3523fe6d6dde88bbb21635813832b49b4f"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/spike40-koblitz-m3-natural.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "98083e02693d7a4559974d6887d733ba5cdcfd550fe277dc17dab72a69b2f778"
+    },
+    {
+      "path": "evidence/degree4-propagation/replay/spike40-koblitz-m3-planted.log",
+      "kind": "raw",
+      "bytes": 280,
+      "sha256": "e9712ec34350411dd1de00f7151c29fb8b08295a52cc884d061827e4f773c0e1"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/baseline-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 9710,
+      "sha256": "7b56f77574e5c230cc4c30a79022a72cb3043dd9fedf4ac8c45f9fc1ca310c46"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/baseline-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 9710,
+      "sha256": "9f7eb56d7848552fd894ea17cbd02eb29a6928c7a5081ca89db6171cd94de83e"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/baseline-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 9732,
+      "sha256": "7fa375958c4fd4333748482a81f4501e1c67a46a5bce4a9a75de79e116ad970d"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/baseline-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 9738,
+      "sha256": "a84b45493a653d1bd17464e44eb6dc0c2a59f437fa45b4e0b04ec9097881bfaa"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/original-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 9710,
+      "sha256": "2e1ebb063857ec21f01e6145a80a2931f222abba667a919755f3203cf1d2c434"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/original-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 9710,
+      "sha256": "d1ce06ea0bb5f7d0e6e331a4ccf990029d2b0b9a67defe797f5b3f03997555ef"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/original-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 9732,
+      "sha256": "fcca390a2d3887f485ff04cb372152c4664ed28a3e439b1ef429cd860e95cf9d"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/original-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 9732,
+      "sha256": "d222e45d7b5f5e371073d478b2c9ae9f5ab30d7d90d854270b0ae0a39d754ecf"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/spike40-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 9694,
+      "sha256": "1e0d0fe383fe6df83be67b24090f0d1ef988493f5908569840f4c532cdded890"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/spike40-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 9694,
+      "sha256": "0bbfd63877ff4ce721a0104b5aa157a6f4a9b1616aa325b98261f9cf4962266e"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/spike40-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 9716,
+      "sha256": "92d7f65c9a9e732fd865b73f172a628103f470447f8c5405d71d7f345a927a4e"
+    },
+    {
+      "path": "evidence/degree4-propagation/results/spike40-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 9724,
+      "sha256": "fe5adcf303921da7aadf91ba97c6942f4de5dea9bed96c91cd2f6c57b39a743f"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/baseline-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 146,
+      "sha256": "91abf244f252a16e3fea04de6758da480cf4a3e6e0092feb5e41e7520029e88e"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/baseline-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 146,
+      "sha256": "52f5422e0ef07968dc0e41ca46df1e84aa7c1e3955aa3ecba012f013a15f2368"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/baseline-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 149,
+      "sha256": "996f1fb74fdfacc5bcd8a1a8a589c300cbae88f3556c1b0e9eab118264f63293"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/baseline-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 149,
+      "sha256": "2d2c3e8613130b675324fd22930b812d5eab152b5c2f9247e5c15c226a172d65"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/original-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 146,
+      "sha256": "5c11d3b0ae152fbbaba2c293ca7c86be962c9f39e12384c37d653a2e54fe5c0a"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/original-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 146,
+      "sha256": "5dc7b76009351db089d3b2b506f756af707a7b5da97b1c9abf2809cf2916d7c8"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/original-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 149,
+      "sha256": "d41e61db042f6fe3b75f5e89f2247e6bb8578276a8d22a9f266a713fbdbae59a"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/original-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 149,
+      "sha256": "6583f288c6fe6acc431c43505c938c2e924afb642c7e32b77b3cf2aff24cdcf5"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/spike40-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 144,
+      "sha256": "c9b3bf1c65718407ae024ef87fdf84c0e2c7682a0e3a08953d81ccd8a0602c10"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/spike40-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 144,
+      "sha256": "16fb54c0d34f3d0387f4f41df7dc86a13f757b83da1e4b2591b6ef2a99681baa"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/spike40-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 147,
+      "sha256": "7ce9ad7ef029015e59fec46a13a62a9ca36e783c7653d2af0a678091863cc6d4"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/spike40-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 147,
+      "sha256": "21e646a3bf055c56644bfac4a82de39cbfdeb4959ed7a103033cc72034f1a912"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-baseline-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 10660,
+      "sha256": "0428532cc6033f1b0bac2444995f056d059e031a0194da1bb1eb409f66951fc1"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-baseline-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 9755,
+      "sha256": "e1bd73003ac6772a663330b49521dca6da931468834aacdb6d8488273c2e3100"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-baseline-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 8850,
+      "sha256": "ee04611dc20ba32ff85ac2f6058c79953e4cf372ffcf177e2e41bc3747a6f40c"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-baseline-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 7945,
+      "sha256": "fadf88a2639bd1e3961715ba5206c39dd4066f9309d9b41e1438b2904284d895"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-original-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 7040,
+      "sha256": "5581eee4d0b4b0e45f31f24eb74d6712db2822664cdd116aad88f90d6764c848"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-original-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 6135,
+      "sha256": "5caab619becb604ea8ee77c8e4d447fc6a25d4e7bf15719a4e7248ef736ec99e"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-original-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 5230,
+      "sha256": "418342ccdc16d3440823ee0b634aa65b9a1154822bbfd0e8397a3794af5d7b4b"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-original-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 4325,
+      "sha256": "1e7e85e1956a0f38b6009c9da29f6d29889efbbf62ecbb39ea942c45f80629b8"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-spike40-binary-m3-natural.json",
+      "kind": "raw",
+      "bytes": 14281,
+      "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-spike40-binary-m3-planted.json",
+      "kind": "raw",
+      "bytes": 13376,
+      "sha256": "66f9e73b47d3b181f1121ca3990442b3d407ba5e5d3f960ea18cb07202891a80"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-spike40-koblitz-m3-natural.json",
+      "kind": "raw",
+      "bytes": 12471,
+      "sha256": "a1dfb95ced635a6aadbf520d1c98cb7c84c6a29e6aa48324c7fe947c2a0a2ffc"
+    },
+    {
+      "path": "evidence/degree4-propagation/status/summary-after-spike40-koblitz-m3-planted.json",
+      "kind": "raw",
+      "bytes": 11565,
+      "sha256": "ea6e7ec7e97c3ba4288db4cece3516e112621f5ba8e20697f29939ccbd767b79"
+    },
+    {
+      "path": "evidence/degree4-propagation/summary.json",
+      "kind": "raw",
+      "bytes": 14281,
+      "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+    },
+    {
+      "path": "evidence/degree4-propagation/terminal.json",
+      "kind": "raw",
+      "bytes": 206,
+      "sha256": "d007870b5351a068a4bc0eaf91fe4f57e7df5988c1e1101bdc697d1fb2505334"
+    },
+    {
+      "path": "degree4-propagation-archives/runs.tar.xz",
+      "kind": "raw",
+      "bytes": 59009744,
+      "sha256": "7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918"
+    },
+    {
+      "path": "protocol-degree4-propagation.json",
+      "kind": "protocol",
+      "bytes": 135414,
+      "sha256": "930e7220ef013bfc7fb3cae6350e4cef442f28452c8bf06af1977730c525f738"
+    },
+    {
+      "path": "DEGREE4_PROPAGATION_FORMAT.json",
+      "kind": "other",
+      "bytes": 5096,
+      "sha256": "8ee0cbb69b0cdf3f58388890ef39d9aeb8ee7fe9500d6c41d1a7612c0ee7553f"
+    },
+    {
+      "path": "DEGREE4_PROPAGATION_DESIGN.md",
+      "kind": "other",
+      "bytes": 5562,
+      "sha256": "86d84129db86ee3f9b00d12599a984161429fbd4a4b7d5040e87897857d6ff6a"
+    },
+    {
+      "path": "src/bin/degree4_propagation.rs",
+      "kind": "other",
+      "bytes": 51681,
+      "sha256": "c644f212eff8c9e0094f0a4baaf9c1cfddcabc971ce04afa7409e1f778d7bdc8"
+    },
+    {
+      "path": "src/degree4_propagation_parent.rs",
+      "kind": "other",
+      "bytes": 26894,
+      "sha256": "0df46975842a8bd3d01b5c98b0013d92a62f4ea95da38304f75e13b3ea1915a1"
+    },
+    {
+      "path": "evidence/degree4-propagation-publication.json",
+      "kind": "receipt",
+      "bytes": 7071,
+      "sha256": "c6ab0ad5b84f24d28332e49ef9072280b68551378a69cf74617083a3889df502"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/prefix-after.log",
+      "kind": "log",
+      "bytes": 11969,
+      "sha256": "870d3037da8f9b9e70d5e979c27b42bb70033db9856caa29ca78dbe4a2cce554"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/prefix-before.log",
+      "kind": "log",
+      "bytes": 11969,
+      "sha256": "870d3037da8f9b9e70d5e979c27b42bb70033db9856caa29ca78dbe4a2cce554"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/raw-after.log",
+      "kind": "log",
+      "bytes": 15212,
+      "sha256": "9b7fdb0725f81348c263a4fc211248e9d9e11919cf0af2e2cd562deb8af8ac1c"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/raw-before.log",
+      "kind": "log",
+      "bytes": 15212,
+      "sha256": "9b7fdb0725f81348c263a4fc211248e9d9e11919cf0af2e2cd562deb8af8ac1c"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-baseline-binary-m3-natural.log",
+      "kind": "log",
+      "bytes": 280,
+      "sha256": "5944e1b1312d863e229d8af26491296ee765316e831aaed74e0d44de9407ea3d"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-baseline-binary-m3-planted.log",
+      "kind": "log",
+      "bytes": 280,
+      "sha256": "ad25e1bf3d0bfbe383d3ac5a15c1da036e0a2e70096ffb97829df2ed018c0ed1"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-baseline-koblitz-m3-natural.log",
+      "kind": "log",
+      "bytes": 282,
+      "sha256": "ae3399be6a774f0540c5aecb9842be4871c4228ca0e74967145da897b7f75020"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-baseline-koblitz-m3-planted.log",
+      "kind": "log",
+      "bytes": 282,
+      "sha256": "a6a135b336e0943d643caa9f3bddc375e9d29a051c359eac95d0110040cd900f"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-original-binary-m3-natural.log",
+      "kind": "log",
+      "bytes": 280,
+      "sha256": "297b32737626aead31f289ab85bb5375cc542dca701556ac51ff0d555946cb31"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-original-binary-m3-planted.log",
+      "kind": "log",
+      "bytes": 280,
+      "sha256": "7abf233c9d3dab16530891896a130f0b9a7d96b3f0121a1234756d0487c91e69"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-original-koblitz-m3-natural.log",
+      "kind": "log",
+      "bytes": 282,
+      "sha256": "fd08af0c033e6c54ee4fcb7f9af6ad67b00afef7dbde11af69d8b4feb2059f0c"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-original-koblitz-m3-planted.log",
+      "kind": "log",
+      "bytes": 282,
+      "sha256": "0e733fed3c34b9ebc5976a09d9e04d7f44b8a608ca52b3db2bcb75c0d314a859"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-spike40-binary-m3-natural.log",
+      "kind": "log",
+      "bytes": 278,
+      "sha256": "7e126e4d7f806fa52e14d960fb15b716cc8cf3fe6d3aba107a8e575fb1f6cc61"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-spike40-binary-m3-planted.log",
+      "kind": "log",
+      "bytes": 278,
+      "sha256": "9a1a7d96a35a907954308ed9d050dc3523fe6d6dde88bbb21635813832b49b4f"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-spike40-koblitz-m3-natural.log",
+      "kind": "log",
+      "bytes": 280,
+      "sha256": "98083e02693d7a4559974d6887d733ba5cdcfd550fe277dc17dab72a69b2f778"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/replay-spike40-koblitz-m3-planted.log",
+      "kind": "log",
+      "bytes": 280,
+      "sha256": "e9712ec34350411dd1de00f7151c29fb8b08295a52cc884d061827e4f773c0e1"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-baseline-binary-m3-natural.json",
+      "kind": "receipt",
+      "bytes": 67,
+      "sha256": "1e914f184b8ecf28b7d66ea5103f07c7cac9652736d46435cd8d06333c6760cc"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-baseline-binary-m3-planted.json",
+      "kind": "receipt",
+      "bytes": 67,
+      "sha256": "4fd4123ade9be760953844b23ec1de4c066438848c985f6441973b229ab15c4a"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-baseline-koblitz-m3-natural.json",
+      "kind": "receipt",
+      "bytes": 68,
+      "sha256": "d141950f022625d71e4b82f5192bee886e8bcd95102ec39715345d85e34a787f"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-baseline-koblitz-m3-planted.json",
+      "kind": "receipt",
+      "bytes": 68,
+      "sha256": "0ff30acaa49a6d49ce52749c833b355e5277521e95ec12f71df71a4bfb130d8b"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-original-binary-m3-natural.json",
+      "kind": "receipt",
+      "bytes": 67,
+      "sha256": "dbfe7f9367906c2094160857cc2ab43c523ebd46085dd9bcf1f30de6c9f45330"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-original-binary-m3-planted.json",
+      "kind": "receipt",
+      "bytes": 67,
+      "sha256": "e339c7204f8ad86c40e803c4042f763b68b9b074dea013754d8c02964707b224"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-original-koblitz-m3-natural.json",
+      "kind": "receipt",
+      "bytes": 68,
+      "sha256": "4349322fa65e4f7a57c8e6951fe521d2b83593fcd67fbf29c9a1ba97972e8a45"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-original-koblitz-m3-planted.json",
+      "kind": "receipt",
+      "bytes": 68,
+      "sha256": "59302f4cf119c2b2d7189e435c1940caa66b3fe112bc8728515ba5554b6fdaf6"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-spike40-binary-m3-natural.json",
+      "kind": "receipt",
+      "bytes": 66,
+      "sha256": "08b8ec8a608804fbd81e6ce57101805cd0c26402e178f8d5dc7dad561dea6dff"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-spike40-binary-m3-planted.json",
+      "kind": "receipt",
+      "bytes": 66,
+      "sha256": "5b1c8015635ff020650c4c850ce0b35fa938ea89678a4a8adad8b465077b308f"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-spike40-koblitz-m3-natural.json",
+      "kind": "receipt",
+      "bytes": 67,
+      "sha256": "f43d614421bf9d40a85e675e363aded6b851c82c644467ce1772b9b2065bd647"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/status-spike40-koblitz-m3-planted.json",
+      "kind": "receipt",
+      "bytes": 67,
+      "sha256": "afc571ebd8308f251e94eb9448b6252952051c50a86c3b44454f02f62fb07885"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/suffix-after.log",
+      "kind": "log",
+      "bytes": 14720,
+      "sha256": "1d7282176e8dec67fb420ce3f4d8690cf2c8d82ff747d5993e503b9b12218d86"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/suffix-before.log",
+      "kind": "log",
+      "bytes": 14720,
+      "sha256": "1d7282176e8dec67fb420ce3f4d8690cf2c8d82ff747d5993e503b9b12218d86"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/witness-after.log",
+      "kind": "log",
+      "bytes": 19839,
+      "sha256": "9e354efd07edc663bc79d6220ee0deedc5fe4bd65df69c1419af4710cd1ef0ec"
+    },
+    {
+      "path": "validation-degree4-propagation/restored/witness-before.log",
+      "kind": "log",
+      "bytes": 19839,
+      "sha256": "9e354efd07edc663bc79d6220ee0deedc5fe4bd65df69c1419af4710cd1ef0ec"
+    }
+  ],
+  "flow": {
+    "planned": 12,
+    "attempted": 12,
+    "completed": 12,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "class_id": "existing-spot-L0",
+    "path": "evidence/degree4-propagation/host.txt",
+    "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux ip-172-31-26-169.us-east-2.compute.internal 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "All12 retained provenance identities attempted. Natural original/baseline inputs repeat; rows and seeds are correlated and do not rank factor-base quality."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Every new row is in V4. Only unit or exhaustive affine completion yields global upper4; inherited lower4 then gives exact4. Unknown native upper/exact values remain null and are omitted from counted export."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Restricted queue exhaustion or caps do not establish complete V4, global upper or lower5. Exact original-top regularity results and original point/target/equation bindings remain unchanged."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Existing-host L0 fallback after retained failed EKS storage probe; no timing claim. All failed, partial and development data are retained."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "backend_ref names the immutable content-addressed raw archive; per-case paths are cases/KEY. Three immutable parent archives are separately required."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "role": "producer",
+    "model": null,
+    "session": "n83-degree4-propagation-20261029-r1"
+  },
+  "protocol": {
+    "path": "protocol-degree4-propagation.json",
+    "protocol_id": "N83-DEGREE4-PROPAGATION-20261029-R1",
+    "version": 1,
+    "sha256": "bd04d5cc6828bb5211c701edddbf001f68f806a751e78d69fbfb32185835bee1"
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "original-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/original-koblitz-m3-planted.json",
+          "kind": "raw",
+          "bytes": 149,
+          "sha256": "6583f288c6fe6acc431c43505c938c2e924afb642c7e32b77b3cf2aff24cdcf5"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/original-koblitz-m3-planted.json",
+          "kind": "other",
+          "bytes": 9732,
+          "sha256": "d222e45d7b5f5e371073d478b2c9ae9f5ab30d7d90d854270b0ae0a39d754ecf"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-koblitz-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/original-koblitz-m3-natural.json",
+          "kind": "raw",
+          "bytes": 149,
+          "sha256": "d41e61db042f6fe3b75f5e89f2247e6bb8578276a8d22a9f266a713fbdbae59a"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/original-koblitz-m3-natural.json",
+          "kind": "other",
+          "bytes": 9732,
+          "sha256": "fcca390a2d3887f485ff04cb372152c4664ed28a3e439b1ef429cd860e95cf9d"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-koblitz-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original-binary",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/original-binary-m3-planted.json",
+          "kind": "raw",
+          "bytes": 146,
+          "sha256": "5dc7b76009351db089d3b2b506f756af707a7b5da97b1c9abf2809cf2916d7c8"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/original-binary-m3-planted.json",
+          "kind": "other",
+          "bytes": 9710,
+          "sha256": "d1ce06ea0bb5f7d0e6e331a4ccf990029d2b0b9a67defe797f5b3f03997555ef"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-binary-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "original-binary",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/original-binary-m3-natural.json",
+          "kind": "raw",
+          "bytes": 146,
+          "sha256": "5c11d3b0ae152fbbaba2c293ca7c86be962c9f39e12384c37d653a2e54fe5c0a"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/original-binary-m3-natural.json",
+          "kind": "other",
+          "bytes": 9710,
+          "sha256": "2e1ebb063857ec21f01e6145a80a2931f222abba667a919755f3203cf1d2c434"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "original-binary-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/baseline-koblitz-m3-planted.json",
+          "kind": "raw",
+          "bytes": 149,
+          "sha256": "2d2c3e8613130b675324fd22930b812d5eab152b5c2f9247e5c15c226a172d65"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/baseline-koblitz-m3-planted.json",
+          "kind": "other",
+          "bytes": 9738,
+          "sha256": "a84b45493a653d1bd17464e44eb6dc0c2a59f437fa45b4e0b04ec9097881bfaa"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/baseline-koblitz-m3-natural.json",
+          "kind": "raw",
+          "bytes": 149,
+          "sha256": "996f1fb74fdfacc5bcd8a1a8a589c300cbae88f3556c1b0e9eab118264f63293"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/baseline-koblitz-m3-natural.json",
+          "kind": "other",
+          "bytes": 9732,
+          "sha256": "7fa375958c4fd4333748482a81f4501e1c67a46a5bce4a9a75de79e116ad970d"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/baseline-binary-m3-planted.json",
+          "kind": "raw",
+          "bytes": 146,
+          "sha256": "52f5422e0ef07968dc0e41ca46df1e84aa7c1e3955aa3ecba012f013a15f2368"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/baseline-binary-m3-planted.json",
+          "kind": "other",
+          "bytes": 9710,
+          "sha256": "9f7eb56d7848552fd894ea17cbd02eb29a6928c7a5081ca89db6171cd94de83e"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/baseline-binary-m3-natural.json",
+          "kind": "raw",
+          "bytes": 146,
+          "sha256": "91abf244f252a16e3fea04de6758da480cf4a3e6e0092feb5e41e7520029e88e"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/baseline-binary-m3-natural.json",
+          "kind": "other",
+          "bytes": 9710,
+          "sha256": "7b56f77574e5c230cc4c30a79022a72cb3043dd9fedf4ac8c45f9fc1ca310c46"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/spike40-koblitz-m3-planted.json",
+          "kind": "raw",
+          "bytes": 147,
+          "sha256": "21e646a3bf055c56644bfac4a82de39cbfdeb4959ed7a103033cc72034f1a912"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/spike40-koblitz-m3-planted.json",
+          "kind": "other",
+          "bytes": 9724,
+          "sha256": "fe5adcf303921da7aadf91ba97c6942f4de5dea9bed96c91cd2f6c57b39a743f"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/spike40-koblitz-m3-natural.json",
+          "kind": "raw",
+          "bytes": 147,
+          "sha256": "7ce9ad7ef029015e59fec46a13a62a9ca36e783c7653d2af0a678091863cc6d4"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/spike40-koblitz-m3-natural.json",
+          "kind": "other",
+          "bytes": 9716,
+          "sha256": "92d7f65c9a9e732fd865b73f172a628103f470447f8c5405d71d7f345a927a4e"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/spike40-binary-m3-planted.json",
+          "kind": "raw",
+          "bytes": 144,
+          "sha256": "16fb54c0d34f3d0387f4f41df7dc86a13f757b83da1e4b2591b6ef2a99681baa"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/spike40-binary-m3-planted.json",
+          "kind": "other",
+          "bytes": 9694,
+          "sha256": "0bbfd63877ff4ce721a0104b5aa157a6f4a9b1616aa325b98261f9cf4962266e"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/degree4-propagation/status/spike40-binary-m3-natural.json",
+          "kind": "raw",
+          "bytes": 144,
+          "sha256": "c9b3bf1c65718407ae024ef87fdf84c0e2c7682a0e3a08953d81ccd8a0602c10"
+        },
+        {
+          "path": "evidence/degree4-propagation/summary.json",
+          "kind": "summary",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "path": "evidence/degree4-propagation/results/spike40-binary-m3-natural.json",
+          "kind": "other",
+          "bytes": 9694,
+          "sha256": "1e0d0fe383fe6df83be67b24090f0d1ef988493f5908569840f4c532cdded890"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/store/sha256/7e/7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "linear_rank": 1,
+          "last_fall_lower_bound": 4,
+          "added_rows": 249,
+          "independent_seed_rows": 249,
+          "processed_operations": 249
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh native replay verifies all three parent layers, every new row/reduction, pending queue, affine assignment and verdict. Global upper requires unit or exhaustive affine certificate; lower4 is inherited; independent scientific review pending."
+      },
+      "warmup": false,
+      "worker": "ip-172-31-26-169.us-east-2.compute.internal"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "57e4f7a928f8a3d9a29c47e3c19c2e8d51d81807",
+    "dirty": false
+  }
+}

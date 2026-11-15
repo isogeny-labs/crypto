@@ -1,0 +1,15 @@
+card_id: CARD-isogeny-ic-yield-p3-b-main-k5-s0-20261102-1
+relay_verbatim: not_checked   # detached run (LAUNCH_NOTE.md, tools/card_queue.sh) or no executor report file supplied; check-relay needs --report; not a deviation
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "Receipt research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-main-k5-s0-20261102-1.receipt.json (sha256 6c4b2d9ceac3569d11e90d3a7d3aa32ba56a3865ab164ac3e369622494f3b54f): status completed, commands_total 1 (card lists 1), measure exit_code 0, attempts 1, timed_out false, 2958.472 s of 10800 s. Command id and argv in the receipt equal the card's; no retry key in the card; no other command ran."
+  - "Identity: receipt commit d97f5953b24e05096208a54df6e699827d021541 equals the HEAD of /home/user/crypto-p3run and the card's commit field; receipt card_sha256 089f24e828dcac176d121ea3041084afe69630ce51b340a652b4c23c622349b3 equals the card file in /home/user/crypto-p3run and in /home/user/crypto; all 9 bind sha256 values equal the files on disk in /home/user/crypto-p3run now; target/release/p3h sha256 is 73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299."
+  - "Output digest in the receipt equals the file in /home/user/crypto-p3run and in /home/user/crypto: p3_ecc2k130/full/p3b_main_k5.s0.jsonl 0d349d7892f14204e89ca98c241d390bdf5211d8365f332ea3d0f0ba404b8ac0 (157621 bytes, equals the p3_ecc2k130/full/.artifacts.json manifest entry)."
+  - "stdout/stderr digests in the receipt equal the files in the worktree and in main: both e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (the empty file)."
+  - "Rows p3b_main_k5.s0.jsonl, read by key: 263 lines, 0 unparsable, 0 with an error/err/panic key; arm {main: 263}; k {5: 263}; attempt {0: 263}; 263 distinct curve indices; outcome counts {atleast: 263}; dreg field 8 in all 263 (the dmax+1 bound encoding, not a value); planted_ok -1 in all 263 (not applicable to the main arm). The last row has seq 262, rows 2096, cols 10546."
+  - "Queue log queue_p3_laneB.log: '2026-11-02T12:26:56Z start CARD-isogeny-ic-yield-p3-b-main-k5-s0-20261102-1' and '2026-11-02T13:16:15Z end CARD-isogeny-ic-yield-p3-b-main-k5-s0-20261102-1 exit 0'; the log ends with 'queue done'."
+  - "launch.log (research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-main-k5-s0-20261102-1.launch.log, sha256 464d9a7754f396066f5556b44bad404559c2581c7d05c9f57bcb8a41f17e6439): status completed; the receipt sha256 it prints equals the receipt file; the copy in /home/user/crypto is byte-identical to the worktree's."
+  - "Write scope: receipt dirty_after minus dirty_before is 3 paths (p3b_main_k5.s0.jsonl, run.stdout, run.stderr), all inside write_scope; git status --porcelain in /home/user/crypto-p3run outside cards/ and p3_ecc2k130/full/ shows only the untracked LAUNCH_NOTE.md and TIMEOUT_NOTE.md (main-session files bound by no card) and ' M .resume/RESUME.md' (hook, in every receipt's dirty_before)."
+interpretation: not_assessed

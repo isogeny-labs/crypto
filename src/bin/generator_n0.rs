@@ -137,6 +137,8 @@ fn census(argv: &[String]) {
                 r,
                 cofactor: go / r,
                 generator: (key.3, key.4),
+
+                representation: None,
             };
             let fb = prime_factor_base(&inst, 32);
             // The hash ecbench records: sorted point keys, big-endian.

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Delphi verifier tool: lint a frozen task card with tools/task_card.py.
+# Argument: repo-relative card path (research/....yaml).
+# Prints one pcc.verdict/v1 object on stdout, always exits 0 (diagnostics on
+# stderr) unless jq or python3 is missing (exit 3).
+set -euo pipefail
+
+command -v jq >/dev/null || { echo "card-lint: jq not on PATH" >&2; exit 3; }
+command -v python3 >/dev/null || { echo "card-lint: python3 not on PATH" >&2; exit 3; }
+[ $# -eq 1 ] || { echo "usage: card-lint research/<card>.yaml" >&2; exit 3; }
+
+root=${DELPHI_TOOLS_ROOT:-$(git rev-parse --show-toplevel)}
+cd "$root"
+
+verdict() {
+  jq -cn --arg v "$1" --arg r "$2" --arg c "${DELPHI_CLAIM_ID:-}" \
+    '{schema: "pcc.verdict/v1", verdict: $v}
+     + (if $c != "" then {claim_id: $c} else {} end)
+     + {reason: $r}'
+}
+
+card=$1
+if ! [[ $card =~ ^research/[A-Za-z0-9_./-]+\.yaml$ ]]; then
+  verdict fail "argument is not a research/*.yaml card path"
+  exit 0
+fi
+
+rc=0
+out=$(python3 tools/task_card.py lint "$card" 2>&1) || rc=$?
+printf '%s\n' "$out" >&2
+if [ "$rc" -eq 0 ]; then
+  verdict pass "$(printf '%s\n' "$out" | tail -n 3)"
+else
+  verdict fail "task_card.py lint exited $rc: $(printf '%s\n' "$out" | tail -n 3)"
+fi

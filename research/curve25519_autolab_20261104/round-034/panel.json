@@ -1,0 +1,811 @@
+{
+  "created": "2026-11-04T12:14:18Z",
+  "round": 34,
+  "rules": {
+    "exploration_slots": 14,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f",
+      "wsum-b4",
+      "wsum-b5",
+      "wsum-b12",
+      "wsum-b20",
+      "wsum-b8",
+      "wsum-b16",
+      "wsum-b24",
+      "wsum-b30",
+      "wsum2-b30",
+      "wsum2-b60",
+      "wsum2-b120",
+      "wsum2-b200",
+      "wsum2-b15",
+      "wsum2-b20",
+      "wsum2-b40",
+      "wsum2-b45",
+      "wsum2-b50",
+      "wsum2-b75",
+      "wsum2-b90",
+      "wsum2-b100",
+      "wsum2-b140",
+      "wsum2-b160",
+      "wsum2g-b20",
+      "wsum2g-b30",
+      "wsum2g-b45",
+      "wsum2g-b60",
+      "wsum2g-b90",
+      "wsum2g-b120",
+      "wsum2g-b10",
+      "wsum2g-b15",
+      "wsum2g-b160",
+      "wsum2g-b180",
+      "wwalkG-x06",
+      "wwalkGg-x06",
+      "wwalkG-x07",
+      "wwalkGg-x07",
+      "wwalkG-x08",
+      "wwalkGg-x08",
+      "wwalkG-x09",
+      "wwalkGg-x09",
+      "wwalkG-x10",
+      "wwalkGg-x10",
+      "wwalkG-x12",
+      "wwalkGg-x12",
+      "wwalkG-x03",
+      "wwalkG-x04",
+      "wwalkG-x05",
+      "wwalkG-x06-j8",
+      "wwalkG-x09-j8",
+      "wwalkG-x06-j32",
+      "wwalkG-x09-j32",
+      "wwalkGg-x03",
+      "wwalkGg-x04",
+      "wwalkGg-x05",
+      "wwalkGg-x06-j8",
+      "wwalkGg-x09-j8",
+      "wwalkGg-x06-j32",
+      "wwalkGg-x09-j32"
+    ],
+    "max_candidates": 16,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "20": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x03",
+            "n": 2,
+            "name": "wwalkG-x03-n2",
+            "oracle": "wwalk:x=0.3,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x03 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x04",
+            "n": 2,
+            "name": "wwalkG-x04-n2",
+            "oracle": "wwalk:x=0.4,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x04 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x05",
+            "n": 2,
+            "name": "wwalkG-x05-n2",
+            "oracle": "wwalk:x=0.5,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x05 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x06-j8",
+            "n": 2,
+            "name": "wwalkG-x06-j8-n2",
+            "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x06-j8 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x09-j8",
+            "n": 2,
+            "name": "wwalkG-x09-j8-n2",
+            "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x09-j8 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x06-j32",
+            "n": 2,
+            "name": "wwalkG-x06-j32-n2",
+            "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x06-j32 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x09-j32",
+            "n": 2,
+            "name": "wwalkG-x09-j32-n2",
+            "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x09-j32 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x03",
+            "n": 2,
+            "name": "wwalkGg-x03-n2",
+            "oracle": "wwalk:x=0.3,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x03 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x04",
+            "n": 2,
+            "name": "wwalkGg-x04-n2",
+            "oracle": "wwalk:x=0.4,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x04 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x05",
+            "n": 2,
+            "name": "wwalkGg-x05-n2",
+            "oracle": "wwalk:x=0.5,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x05 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x06-j8",
+            "n": 2,
+            "name": "wwalkGg-x06-j8-n2",
+            "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x06-j8 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-j8",
+            "n": 2,
+            "name": "wwalkGg-x09-j8-n2",
+            "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x09-j8 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x06-j32",
+            "n": 2,
+            "name": "wwalkGg-x06-j32-n2",
+            "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x06-j32 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-j32",
+            "n": 2,
+            "name": "wwalkGg-x09-j32-n2",
+            "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x09-j32 untried at k = 20, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2g-b15",
+        "n": 2,
+        "name": "wsum2g-b15-n2",
+        "oracle": "wsum:coef=15,free=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        2.5745780660849693,
+        2.691211404585748,
+        3.740911451092766
+      ],
+      "tried_before": 103
+    },
+    "24": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x03",
+            "n": 2,
+            "name": "wwalkG-x03-n2",
+            "oracle": "wwalk:x=0.3,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x03 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x04",
+            "n": 2,
+            "name": "wwalkG-x04-n2",
+            "oracle": "wwalk:x=0.4,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x04 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x05",
+            "n": 2,
+            "name": "wwalkG-x05-n2",
+            "oracle": "wwalk:x=0.5,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x05 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x06-j8",
+            "n": 2,
+            "name": "wwalkG-x06-j8-n2",
+            "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x06-j8 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x09-j8",
+            "n": 2,
+            "name": "wwalkG-x09-j8-n2",
+            "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x09-j8 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x06-j32",
+            "n": 2,
+            "name": "wwalkG-x06-j32-n2",
+            "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x06-j32 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x09-j32",
+            "n": 2,
+            "name": "wwalkG-x09-j32-n2",
+            "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x09-j32 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x03",
+            "n": 2,
+            "name": "wwalkGg-x03-n2",
+            "oracle": "wwalk:x=0.3,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x03 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x04",
+            "n": 2,
+            "name": "wwalkGg-x04-n2",
+            "oracle": "wwalk:x=0.4,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x04 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x05",
+            "n": 2,
+            "name": "wwalkGg-x05-n2",
+            "oracle": "wwalk:x=0.5,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x05 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x06-j8",
+            "n": 2,
+            "name": "wwalkGg-x06-j8-n2",
+            "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x06-j8 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-j8",
+            "n": 2,
+            "name": "wwalkGg-x09-j8-n2",
+            "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x09-j8 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x06-j32",
+            "n": 2,
+            "name": "wwalkGg-x06-j32-n2",
+            "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x06-j32 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-j32",
+            "n": 2,
+            "name": "wwalkGg-x09-j32-n2",
+            "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x09-j32 untried at k = 24, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        1.6734952045194382,
+        1.7178491390547963,
+        2.1170345498730194
+      ],
+      "tried_before": 103
+    },
+    "28": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x03",
+            "n": 2,
+            "name": "wwalkG-x03-n2",
+            "oracle": "wwalk:x=0.3,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x03 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x04",
+            "n": 2,
+            "name": "wwalkG-x04-n2",
+            "oracle": "wwalk:x=0.4,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x04 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x05",
+            "n": 2,
+            "name": "wwalkG-x05-n2",
+            "oracle": "wwalk:x=0.5,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x05 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x06-j8",
+            "n": 2,
+            "name": "wwalkG-x06-j8-n2",
+            "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x06-j8 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x09-j8",
+            "n": 2,
+            "name": "wwalkG-x09-j8-n2",
+            "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x09-j8 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x06-j32",
+            "n": 2,
+            "name": "wwalkG-x06-j32-n2",
+            "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x06-j32 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x09-j32",
+            "n": 2,
+            "name": "wwalkG-x09-j32-n2",
+            "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x09-j32 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x03",
+            "n": 2,
+            "name": "wwalkGg-x03-n2",
+            "oracle": "wwalk:x=0.3,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x03 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x04",
+            "n": 2,
+            "name": "wwalkGg-x04-n2",
+            "oracle": "wwalk:x=0.4,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x04 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x05",
+            "n": 2,
+            "name": "wwalkGg-x05-n2",
+            "oracle": "wwalk:x=0.5,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x05 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x06-j8",
+            "n": 2,
+            "name": "wwalkGg-x06-j8-n2",
+            "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x06-j8 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-j8",
+            "n": 2,
+            "name": "wwalkGg-x09-j8-n2",
+            "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x09-j8 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x06-j32",
+            "n": 2,
+            "name": "wwalkGg-x06-j32-n2",
+            "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x06-j32 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-j32",
+            "n": 2,
+            "name": "wwalkGg-x09-j32-n2",
+            "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x09-j32 untried at k = 28, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09",
+        "n": 2,
+        "name": "wwalkGg-x09-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        1.571748849781295,
+        1.6107124260862111,
+        1.9613846128304555
+      ],
+      "tried_before": 118
+    },
+    "32": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x03",
+            "n": 2,
+            "name": "wwalkG-x03-n2",
+            "oracle": "wwalk:x=0.3,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x03 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x04",
+            "n": 2,
+            "name": "wwalkG-x04-n2",
+            "oracle": "wwalk:x=0.4,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x04 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x05",
+            "n": 2,
+            "name": "wwalkG-x05-n2",
+            "oracle": "wwalk:x=0.5,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x05 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x06-j8",
+            "n": 2,
+            "name": "wwalkG-x06-j8-n2",
+            "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x06-j8 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x09-j8",
+            "n": 2,
+            "name": "wwalkG-x09-j8-n2",
+            "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x09-j8 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x06-j32",
+            "n": 2,
+            "name": "wwalkG-x06-j32-n2",
+            "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x06-j32 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkG-x09-j32",
+            "n": 2,
+            "name": "wwalkG-x09-j32-n2",
+            "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2"
+          },
+          "reason": "exploration: family wwalkG-x09-j32 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x03",
+            "n": 2,
+            "name": "wwalkGg-x03-n2",
+            "oracle": "wwalk:x=0.3,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x03 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x04",
+            "n": 2,
+            "name": "wwalkGg-x04-n2",
+            "oracle": "wwalk:x=0.4,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x04 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x05",
+            "n": 2,
+            "name": "wwalkGg-x05-n2",
+            "oracle": "wwalk:x=0.5,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x05 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x06-j8",
+            "n": 2,
+            "name": "wwalkGg-x06-j8-n2",
+            "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x06-j8 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-j8",
+            "n": 2,
+            "name": "wwalkGg-x09-j8-n2",
+            "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x09-j8 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x06-j32",
+            "n": 2,
+            "name": "wwalkGg-x06-j32-n2",
+            "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x06-j32 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-j32",
+            "n": 2,
+            "name": "wwalkGg-x09-j32-n2",
+            "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family wwalkGg-x09-j32 untried at k = 32, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06",
+        "n": 2,
+        "name": "wwalkG-x06-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2"
+      },
+      "incumbent_s": [
+        1.51519557395628,
+        1.6245101539840512,
+        2.6083413742340005
+      ],
+      "tried_before": 109
+    }
+  },
+  "track": "generic"
+}

@@ -1,0 +1,735 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "date": "2026-10-30",
+ "row": "E27 (GLV note §9.25/§9.29): Stage W (10 curves x {<±psi>, negation} x 16 walks x 3 arithmetics) and the E31 solver-A pipeline with Karatsuba products (10 curves x 2 arms); evidence directory research/e27_walk_20261030",
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E27: fresh build from an export of the recorded binary commit in a fresh target directory, fresh runs, own comparison (validate_e27.rs compare)",
+ "recorded_binary": "af2504ef161cbe804d855f3fa26c435bc02ba282 (experiments/32_walk_karatsuba/binary_commit.txt); E27 code 6490d0fac plus compile repairs af2504ef1",
+ "build": {
+  "schema": "e27-validator-build/v1",
+  "recorded_binary_commit": "af2504ef161cbe804d855f3fa26c435bc02ba282",
+  "repository_head_at_start": "5b8f3d21768300db266bfa5e4350570d57706e22 (branch claude/glv-endomorphism-index-calculus-pe7ige, PR #2152); working tree clean except .resume/ (gitignored)",
+  "source": "git archive af2504ef1 of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/e27_walk.rs, examples/quartic_pipeline_gls.rs, every explicit [[bin]]/[[example]]/[[bench]] path of Cargo.toml, the six path dependencies (crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, isogeny_algos without docs/, research/pencil_large_prime_20261029 Cargo.toml + src) and every include_str!/include_bytes! target of src (50 files under docs/, research/, tests/). Extracted to /dev/shm/e27val-tree; 1,732 files, each equal to its af2504ef1 blob (git hash-object).",
+  "target_dir": "/dev/shm/e27val-target: a fresh, empty target directory on tmpfs (the root filesystem had ~0.5 GB free). Nothing was reused from the producer's target/ directory; its binaries were not run.",
+  "command": "cd /dev/shm/e27val-tree && CARGO_TARGET_DIR=/dev/shm/e27val-target CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e27_walk --example quartic_pipeline_gls",
+  "attempts": [
+   "2026-10-30T23:27:02Z: first attempt from an export without the include_str! targets; 231 crates compiled, then the crypto crate failed with 8 `couldn't read` errors (missing docs/ files the library embeds). Recorded, not a code error.",
+   "2026-10-30T23:31:30Z: same command after adding those files from af2504ef1 and moving the tree to tmpfs; `Finished release profile [optimized] target(s) in 10m 13s` at 23:41:43Z."
+  ],
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+  "binaries": [
+   {
+    "name": "e27_walk",
+    "sha256": "97e01b2c3fd42893fd91e8850cce577907778342311be60124f6898fd6afc2e3",
+    "bytes": 5122928
+   },
+   {
+    "name": "quartic_pipeline_gls",
+    "sha256": "91de8b21227fc478ef23d7306bbd3a1120bd5e00489b537368549a7044af1b7a",
+    "bytes": 5782560
+   }
+  ],
+  "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, not isolab-eks. The replay admits operation counts only (no wall time is compared or claimed), so a local run suffices.",
+  "run_command": "BIN_W=/dev/shm/e27val-target/release/examples/e27_walk BIN_P=/dev/shm/e27val-target/release/examples/quartic_pipeline_gls research/e27_walk_20261030/replay/replay.sh (from the repository root)",
+  "environment": "Stage W: RAYON_NUM_THREADS unset (its records do not depend on the thread count: walks are seeded per walk and collected in order; the replay is byte-identical). End to end: RAYON_NUM_THREADS=4 as in experiments/32_walk_karatsuba/run_e2e.sh, which fixes the target stream (§9.19).",
+  "concurrency": "The end-to-end replays shared the 4 vCPUs with the validator's own unit-test build and HEAD build; only wall-clock fields (wall_ms, solve_ms) are affected, and they are listed, not compared."
+ },
+ "build_record": {
+  "path": "replay/build.json",
+  "sha256": "9655634b8d59c489c46991a0f6a58f962d7225655cc6a3eec1c2fccf18710032"
+ },
+ "comparison": {
+  "path": "replay/replay_comparison.json",
+  "sha256": "955d64a8f800474d7461e6817d660247120d40479019553a377bbc13f6102298",
+  "rule": "every leaf of every committed record against the replay: integers and floats by their text (equal text, or equal value with the same integer/float form), strings and booleans exactly; wall_ms and solve_ms are wall-clock and listed, not compared"
+ },
+ "runs_total": 11,
+ "runs_matched": 11,
+ "fields_compared": 23144,
+ "fields_identical": 23144,
+ "coverage": "full: every recorded run replayed (the Stage W run: 960 walks, the per-op cost probe; all ten end-to-end runs, both arms each, 48 walks per arm); no sampling",
+ "scalar_verification": "Every replayed walk (960) reports correct = true, which the binary sets only when the collision-recovered logarithm equals the instance's planted d and [d]G = Q is checked on the curve (quartic_folds.rs rho4_folded_with / WalkMachine::finish); all 96 walks of a curve recover the same d. Every replayed index-calculus arm (20) reports solved and correct (Wiedemann logarithm checked against the planted d and [x]G = Q in the binary) and its recovered logarithm equals the walks' d: two independent algorithms agree on every curve. The instances are E25's (n, group_order, cofactor, base_points equal, checked leaf by leaf in validator-report.json); benchmarks/20261018-k4-gls-v4/replay-certificate.json verified them independently.",
+ "runs": [
+  {
+   "run": "stage_w",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/stage_w.json",
+    "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/stage_w.json",
+    "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+   },
+   "fields_compared": 11044,
+   "fields_identical": 11044,
+   "mismatches": [],
+   "matched": true,
+   "walks": 960,
+   "walks_correct": 960,
+   "logarithms": [
+    {
+     "p": 101,
+     "seed": 1,
+     "d": 1538068
+    },
+    {
+     "p": 101,
+     "seed": 2,
+     "d": 557533
+    },
+    {
+     "p": 149,
+     "seed": 1,
+     "d": 4914788
+    },
+    {
+     "p": 149,
+     "seed": 2,
+     "d": 2874927
+    },
+    {
+     "p": 197,
+     "seed": 1,
+     "d": 79622603
+    },
+    {
+     "p": 197,
+     "seed": 2,
+     "d": 7399960
+    },
+    {
+     "p": 269,
+     "seed": 1,
+     "d": 270725152
+    },
+    {
+     "p": 269,
+     "seed": 2,
+     "d": 309622187
+    },
+    {
+     "p": 397,
+     "seed": 1,
+     "d": 1275612762
+    },
+    {
+     "p": 397,
+     "seed": 2,
+     "d": 1421554453
+    }
+   ]
+  },
+  {
+   "run": "e2e_p101s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s1.json",
+    "sha256": "39d93707a3dc8430fce2df47886012ea6545b63b02d8cdf58990eb4e6d3adadb"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p101s1.json",
+    "sha256": "05d13f784f92487c13bbb1683b490af697c8f01ce9043e5b4af4ef5be2e6b794"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1538068,
+     "walks_logarithm": 1538068,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 26964723596,
+     "macaulay_entries": 7446468736
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1538068,
+     "walks_logarithm": 1538068,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 13833208042,
+     "macaulay_entries": 3832401664
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 136394.842815,
+     "replay": 149643.90390399954
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 51337.761762,
+     "replay": 58660.020572
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 77169.00054799994,
+     "replay": 74728.47942999985
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 29296.512055,
+     "replay": 29764.281094
+    }
+   ]
+  },
+  {
+   "run": "e2e_p101s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s2.json",
+    "sha256": "bc4c3a81a1a7de63ddf204a4b8b289ae6bcc200f33a7bcc6251e65430afd31f9"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p101s2.json",
+    "sha256": "6eb52b178570167d4932840e415929043ed3175b17832e5ec20b9d8c5f27368b"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 557533,
+     "walks_logarithm": 557533,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 9818244813,
+     "macaulay_entries": 2719210368
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 557533,
+     "walks_logarithm": 557533,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 4659726750,
+     "macaulay_entries": 1288514304
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 51998.45986600023,
+     "replay": 53099.79781300028
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 19659.319679,
+     "replay": 21085.686481
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 23965.768885999958,
+     "replay": 24711.512786999967
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 9098.002493999998,
+     "replay": 9898.106602
+    }
+   ]
+  },
+  {
+   "run": "e2e_p149s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s1.json",
+    "sha256": "71618ef39d4b6ca0ec0a38b3667288393d087572cc6d97208e5d331baed0d5f7"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p149s1.json",
+    "sha256": "7dbb0ee9528b4bf006621ceb243a3572e6f8dc211d871872152ff64b609efbbb"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 4914788,
+     "walks_logarithm": 4914788,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 228974148611,
+     "macaulay_entries": 63194288640
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 4914788,
+     "walks_logarithm": 4914788,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 85999708286,
+     "macaulay_entries": 23709225792
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 1456299.635012978,
+     "replay": 1606953.0449599707
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 601773.46677,
+     "replay": 703509.149825
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 576507.9004280122,
+     "replay": 528717.0100890014
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 242627.85031100002,
+     "replay": 220700.77653
+    }
+   ]
+  },
+  {
+   "run": "e2e_p149s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s2.json",
+    "sha256": "683e68771a3615fc2cacfa573736b156478899cbe8d99a81e4edaf611a3a8b24"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p149s2.json",
+    "sha256": "3ad704d88b34a04d06ecb62eabe313a15aaf3c4eabc966ae2f90712fddc1aec4"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 2874927,
+     "walks_logarithm": 2874927,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 39561022727,
+     "macaulay_entries": 10888461696
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 2874927,
+     "walks_logarithm": 2874927,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 22353365025,
+     "macaulay_entries": 6146620032
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 218213.73770099925,
+     "replay": 191130.45656500052
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 85361.26107200001,
+     "replay": 69540.745555
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 125267.07518700043,
+     "replay": 105030.29950399991
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 49244.869125,
+     "replay": 37711.890981000004
+    }
+   ]
+  },
+  {
+   "run": "e2e_p197s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s1.json",
+    "sha256": "db97629bc6887c37fd5b3b06bd62b37e14936c660022af252e653a0a796c0d10"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p197s1.json",
+    "sha256": "f2a13b36e9584161fbf9f479b208cc0e6a48845e50a0d61653164d89b1f2bd2e"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 79622603,
+     "walks_logarithm": 79622603,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 33364322762,
+     "macaulay_entries": 9128112000
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 79622603,
+     "walks_logarithm": 79622603,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 24750444620,
+     "macaulay_entries": 6764870784
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 230058.03714700087,
+     "replay": 157865.8113640018
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 97716.237757,
+     "replay": 55987.314769000004
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 197440.30496199973,
+     "replay": 115912.07646400064
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 88606.692173,
+     "replay": 41213.994747000004
+    }
+   ]
+  },
+  {
+   "run": "e2e_p197s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s2.json",
+    "sha256": "d86f811e85852e311ee8583823ef5a3619635c0511148038c6cf99f83ed1f38a"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p197s2.json",
+    "sha256": "0e10119643b5a4bc7ebaa54dd0bfffd0d093599fbdbfffd67a086845ba73b48e"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 7399960,
+     "walks_logarithm": 7399960,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 17136680229,
+     "macaulay_entries": 4691155392
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 7399960,
+     "walks_logarithm": 7399960,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 10121590489,
+     "macaulay_entries": 2771075328
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 127827.01458599945,
+     "replay": 84139.78485099992
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 55369.832723,
+     "replay": 30490.308249
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 79254.04378100045,
+     "replay": 45531.7209489998
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 35604.72475,
+     "replay": 15666.713359
+    }
+   ]
+  },
+  {
+   "run": "e2e_p269s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s1.json",
+    "sha256": "ed045d101098b39e58686b48cc663aaedb8b40920f13f8824be7badebe5c817a"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p269s1.json",
+    "sha256": "4045779adf2bef1c1f1c7f4938eabb1e2023def18db2b6c8f9fd489419aa7d6d"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 270725152,
+     "walks_logarithm": 270725152,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 53286038394,
+     "macaulay_entries": 14597220288
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 270725152,
+     "walks_logarithm": 270725152,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 30691610728,
+     "macaulay_entries": 8405358528
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 435933.80424700386,
+     "replay": 237427.4607189993
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 191574.340512,
+     "replay": 81492.98412000001
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 208360.57640999972,
+     "replay": 144340.74513099983
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 83840.579716,
+     "replay": 51524.534156
+    }
+   ]
+  },
+  {
+   "run": "e2e_p269s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s2.json",
+    "sha256": "a67423a8acf8fab3fd32276b31374ab60deef3864d2c4129a0b63db14f232e1a"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p269s2.json",
+    "sha256": "0ee91b3a4aa60f498bf218c891f87905ca1442cc53dbbd283e7ab281445e96bb"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 309622187,
+     "walks_logarithm": 309622187,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 19775127049,
+     "macaulay_entries": 5425916160
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 309622187,
+     "walks_logarithm": 309622187,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 9773820165,
+     "macaulay_entries": 2681474880
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 101386.85601900023,
+     "replay": 97374.7695509998
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 37409.229883,
+     "replay": 34817.492168000004
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 48301.24646099979,
+     "replay": 44044.15706000034
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 17503.611195,
+     "replay": 15507.313373
+    }
+   ]
+  },
+  {
+   "run": "e2e_p397s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s1.json",
+    "sha256": "cb469c62cbf518eb8610f42e50dff859b28c480c4d9776fe9921bf1e3465eabd"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p397s1.json",
+    "sha256": "7283a655390796dd076d51edcf44a454b9dc5d4041aa1beaf2a922f6cf7edd47"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1275612762,
+     "walks_logarithm": 1275612762,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 27927862989,
+     "macaulay_entries": 7572761280
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1275612762,
+     "walks_logarithm": 1275612762,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 16188662103,
+     "macaulay_entries": 4394191872
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 194162.2152829994,
+     "replay": 170680.0755099997
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 65586.348771,
+     "replay": 55668.608996
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 108567.69537399936,
+     "replay": 96974.48539400053
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 36818.841596,
+     "replay": 31207.5677
+    }
+   ]
+  },
+  {
+   "run": "e2e_p397s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s2.json",
+    "sha256": "7fbc78e9ffc61aeca3353f14d70badf51624b15e2344cd380b066951f847fd0c"
+   },
+   "replay_output": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p397s2.json",
+    "sha256": "725d47aa90ca47897e24b971616bbb8a7d476b7d2dd020294e7c74d5c2159722"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "matched": true,
+   "scalars": [
+    {
+     "arm": "A",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1421554453,
+     "walks_logarithm": 1421554453,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 51225062800,
+     "macaulay_entries": 13904260608
+    },
+    {
+     "arm": "B",
+     "ic_solved": true,
+     "ic_correct": true,
+     "ic_recovered": 1421554453,
+     "walks_logarithm": 1421554453,
+     "ic_equals_walks": true,
+     "all_48_walks_correct": true,
+     "total_muls": 22044076955,
+     "macaulay_entries": 5982337536
+    }
+   ],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 319760.3586240017,
+     "replay": 306892.3686999982
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 104249.700203,
+     "replay": 98256.025035
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 136824.7227269997,
+     "replay": 133741.26952399986
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 44952.023297,
+     "replay": 43712.512313
+    }
+   ]
+  }
+ ]
+}

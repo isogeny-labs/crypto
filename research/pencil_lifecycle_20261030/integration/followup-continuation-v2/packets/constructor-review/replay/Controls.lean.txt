@@ -1,0 +1,18 @@
+import Constructor
+open Polynomial PencilWordRefinement
+instance : Fact (Nat.Prime (5 : UInt64).toNat) := ⟨by decide⟩
+lemma fixture_valid : (X^2+C (0 : ZMod (5 : UInt64).toNat)*X+C 0) ∣
+    (X^5+X^2+1)-(C 0*X+C 1)^2 := by
+  norm_num
+  exact ⟨X^3,by ring⟩
+example : (weightConstructor 5 0 0 0 1 2 3).t = 1 := by decide
+example : (weightConstructor 5 0 0 0 1 2 3).z = 2 := by rfl
+example : (weightConstructor 5 0 0 0 1 2 3).w = 3 := by rfl
+example : let a := weightConstructor 5 0 0 0 1 2 3
+    a.canonical 5 ∧ a.z ≠ 0 ∧ a.w ≠ 0 ∧ a.normalizedValid 5 (X^5+X^2+1) := by
+  exact constructor_preserves_invariant 5 0 0 0 1 2 3 (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide) _ fixture_valid
+example : (weightConstructor 5 0 0 0 1 0 3).z = 0 := by rfl
+example : crossPreludeWord 5 (weightConstructor 5 0 0 0 1 1 1)
+    (weightConstructor 5 0 0 0 1 1 1) = some .sameUDouble := by decide

@@ -1,0 +1,31 @@
+module
+public import Mathlib.Data.Nat.Choose.Lucas
+public import Mathlib.NumberTheory.Padics.PadicVal.Basic
+public import Mathlib.Tactic
+public section
+namespace CauchyNormalizer
+instance : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+
+/-- Every binomial coefficient in an all-ones binary row is odd. -/
+theorem choose_all_ones (a k : ℕ) (hk : k < 2^a) :
+    (((2^a-1).choose k : ℕ) : ZMod 2) = 1 := by
+  induction a generalizing k with
+  | zero => have : k = 0 := by simpa using hk; subst k; simp
+  | succ a ih =>
+    have hp : 0 < 2^a := by positivity
+    have hshape : 2^(a+1)-1 = 2*(2^a-1)+1 := by rw [pow_succ]; omega
+    have hdiv : (2^(a+1)-1)/2 = 2^a-1 := by rw [hshape]; omega
+    have hmod : (2^(a+1)-1)%2 = 1 := by rw [hshape]; omega
+    have hhalf : k/2 < 2^a := by rw [pow_succ] at hk; omega
+    have hsmall : (1 : ℕ).choose (k%2) = 1 := by
+      have : k%2 < 2 := Nat.mod_lt _ (by decide)
+      interval_cases h : k%2 <;> simp [h]
+    have h : (((2^(a+1)-1).choose k : ℕ) : ZMod 2) =
+        ((((2^(a+1)-1)%2).choose (k%2) *
+          ((2^(a+1)-1)/2).choose (k/2) : ℕ) : ZMod 2) := by
+      exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr
+        (Choose.choose_modEq_choose_mod_mul_choose_div_nat (p := 2))
+    rw [h, hmod, hdiv, hsmall, one_mul, ih (k/2) hhalf]
+
+end CauchyNormalizer
+#print axioms CauchyNormalizer.choose_all_ones
