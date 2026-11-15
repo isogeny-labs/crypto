@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T2126Z-k1-pair-table-dimension",
+  "latest_record": "20261114T2233Z-hec-s2b-dense-solve",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 165,
+    "measured": 166,
     "open": 0
   },
   "repo": "crypto",
@@ -3271,6 +3271,307 @@
         }
       ],
       "problem": "hec:g234-native-engine",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 915581.0,
+      "latest": 915581.0,
+      "latest_derived": {},
+      "metric": "dense_mulmods_g2_p4001",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 915581.0
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.0017612,
+      "latest": 0.0017612,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dense_solve_g2_p4001",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 0.0017612
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 17.71992818671454,
+      "latest": 17.71992818671454,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dense_solve_share_g2_p1009",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 17.71992818671454
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 25.103634435553847,
+      "latest": 25.103634435553847,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dense_solve_share_g2_p2003",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 25.103634435553847
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 19.533819710646718,
+      "latest": 19.533819710646718,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dense_solve_share_g2_p4001",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 19.533819710646718
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 26.311834690043835,
+      "latest": 26.311834690043835,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dense_solve_share_g2_p503",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 26.311834690043835
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 275.0,
+      "latest": 275.0,
+      "latest_derived": {},
+      "metric": "g6_runs_identical",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 275,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 275.0
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 4.038387715930902,
+      "latest": 4.038387715930902,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "solve_fast_over_dense_g2_p1009",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.12252439998610677,
+            48.024236548715464
+          ],
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 4.038387715930902
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 5.48531367097788,
+      "latest": 5.48531367097788,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "solve_fast_over_dense_g2_p2003",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5081991182292604,
+            33.5356295878035
+          ],
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 5.48531367097788
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 5.749464107083314,
+      "latest": 5.749464107083314,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "solve_fast_over_dense_g2_p4001",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.5039093447133358,
+            49.905023835716904
+          ],
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 5.749464107083314
+        }
+      ],
+      "problem": "hec:g234-native-solve",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 4.205882352941177,
+      "latest": 4.205882352941177,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "solve_fast_over_dense_g2_p503",
+      "points": [
+        {
+          "commit": "507c1dc511c6",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 25,
+          "record": "20261114T2233Z-hec-s2b-dense-solve",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8940002169903439,
+            68.78510317060896
+          ],
+          "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+          "value": 4.205882352941177
+        }
+      ],
+      "problem": "hec:g234-native-solve",
       "unit": "ratio"
     },
     {

@@ -1,0 +1,263 @@
+{
+  "branch": "research/hec-s2b-20261114",
+  "closed_utc": "2026-11-15T04:14:06+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/hec_ic_speedup_20261113/run_s2b.sh",
+        "research/hec_ic_speedup_20261113/s2b-20261114"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T22:33:35+00:00",
+      "wall_s": 27.986
+    }
+  ],
+  "commit": "507c1dc511c6a44dfad857985a4e96da1a41e008",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T22:33:29+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261114-hec-s2b-dense-solve"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit"
+  },
+  "id": "20261114T2233Z-hec-s2b-dense-solve",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "solve_fast_over_dense_g2_p503",
+      "note": "median over 25 (repeat, seed) pairs of solve_ms(Fast)/solve_ms(Dense), same process; spread = min/max pair; E6 bar 2.0 (PLAN.md section 8); host load average 81-95",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8940002169903439,
+        68.78510317060896
+      ],
+      "unit": "ratio",
+      "value": 4.205882352941177
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 25,
+      "name": "dense_solve_share_g2_p503",
+      "note": "median Dense solve_ms/total_ms; E7 bar 35",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 26.311834690043835
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "solve_fast_over_dense_g2_p1009",
+      "note": "median over 25 (repeat, seed) pairs of solve_ms(Fast)/solve_ms(Dense), same process; spread = min/max pair; E6 bar 2.0 (PLAN.md section 8); host load average 81-95",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.12252439998610677,
+        48.024236548715464
+      ],
+      "unit": "ratio",
+      "value": 4.038387715930902
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 25,
+      "name": "dense_solve_share_g2_p1009",
+      "note": "median Dense solve_ms/total_ms; E7 bar 35",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 17.71992818671454
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "solve_fast_over_dense_g2_p2003",
+      "note": "median over 25 (repeat, seed) pairs of solve_ms(Fast)/solve_ms(Dense), same process; spread = min/max pair; E6 bar 2.0 (PLAN.md section 8); host load average 81-95",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5081991182292604,
+        33.5356295878035
+      ],
+      "unit": "ratio",
+      "value": 5.48531367097788
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 25,
+      "name": "dense_solve_share_g2_p2003",
+      "note": "median Dense solve_ms/total_ms; E7 bar 35",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 25.103634435553847
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25,
+      "name": "solve_fast_over_dense_g2_p4001",
+      "note": "median over 25 (repeat, seed) pairs of solve_ms(Fast)/solve_ms(Dense), same process; spread = min/max pair; E6 bar 2.0 (PLAN.md section 8); host load average 81-95",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5039093447133358,
+        49.905023835716904
+      ],
+      "unit": "ratio",
+      "value": 5.749464107083314
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 25,
+      "name": "dense_solve_share_g2_p4001",
+      "note": "median Dense solve_ms/total_ms; E7 bar 35",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 19.533819710646718
+    },
+    {
+      "baseline": 0.013713699999999999,
+      "better": "lower",
+      "n": 25,
+      "name": "dense_solve_g2_p4001",
+      "note": "median Dense solve per run; baseline = median Fast solve",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0017612
+    },
+    {
+      "baseline": 892957.0,
+      "better": "neutral",
+      "n": 25,
+      "name": "dense_mulmods_g2_p4001",
+      "note": "solve multiplications mod ell, Dense; baseline Fast. Dense does more counted work",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 915581.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 275,
+      "name": "g6_runs_identical",
+      "note": "(repeat, row, seed) where Fast and Dense agree on k, trials, relations, solve_rounds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 275.0
+    }
+  ],
+  "problem": "hec:g234-native-solve",
+  "raw": [
+    {
+      "bytes": 68426,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/rep1.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3d/3d30d6bcb320797ae97ff1611bdb7d9fb804198d92e266f80b85cf7eaa599200",
+      "sha256": "3d30d6bcb320797ae97ff1611bdb7d9fb804198d92e266f80b85cf7eaa599200",
+      "uploaded": false
+    },
+    {
+      "bytes": 68406,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/rep2.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9f/9f9f6cda9eb55d90f6dc7f0a6395d2ad11885de44551818722f41fda3f2275a1",
+      "sha256": "9f9f6cda9eb55d90f6dc7f0a6395d2ad11885de44551818722f41fda3f2275a1",
+      "uploaded": false
+    },
+    {
+      "bytes": 68406,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/rep3.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/83/8344cf9cffa356b50a400a58b98c89006c2458dba03628c146214c53de4bf915",
+      "sha256": "8344cf9cffa356b50a400a58b98c89006c2458dba03628c146214c53de4bf915",
+      "uploaded": false
+    },
+    {
+      "bytes": 68381,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/rep4.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d7/d78683f0348b1f350c6544cb4cc9d5d32ebeff95a51873186e8d440966269424",
+      "sha256": "d78683f0348b1f350c6544cb4cc9d5d32ebeff95a51873186e8d440966269424",
+      "uploaded": false
+    },
+    {
+      "bytes": 68405,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/rep5.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d0/d0e1752aaf4e730044ede21cc8530ec36ee200a77b3d88c387f28acc553638e8",
+      "sha256": "d0e1752aaf4e730044ede21cc8530ec36ee200a77b3d88c387f28acc553638e8",
+      "uploaded": false
+    },
+    {
+      "bytes": 144,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1c/1cbc8d0ec605aa64a16c9e8aaca293dc78c08206f31aad52754fb110eaf84a50",
+      "sha256": "1cbc8d0ec605aa64a16c9e8aaca293dc78c08206f31aad52754fb110eaf84a50",
+      "uploaded": false
+    },
+    {
+      "bytes": 477,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cc/cca78a0811e12a93ab9bff1067c438dc9da15d397ef4fbd33413a80e96c9ecfa",
+      "sha256": "cca78a0811e12a93ab9bff1067c438dc9da15d397ef4fbd33413a80e96c9ecfa",
+      "uploaded": false
+    },
+    {
+      "bytes": 6521,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/summary.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/75/75560b7681aaeeb4a95bf5a9493f99f4bddea74fdf4b9f3d38643adc475b58a8",
+      "sha256": "75560b7681aaeeb4a95bf5a9493f99f4bddea74fdf4b9f3d38643adc475b58a8",
+      "uploaded": false
+    },
+    {
+      "bytes": 33637,
+      "path": "research/hec_ic_speedup_20261113/s2b-20261114/pairs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/58/5833bd4e526279793f6906ab2b28f07f680ef8e45e62a87fa1eb0f28ba43b941",
+      "sha256": "5833bd4e526279793f6906ab2b28f07f680ef8e45e62a87fa1eb0f28ba43b941",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261114-hec-s2b-dense-solve/REPORT.pdf",
+    "png": [
+      "benchmarks/20261114-hec-s2b-dense-solve/ratios.png",
+      "benchmarks/20261114-hec-s2b-dense-solve/shares.png",
+      "benchmarks/20261114-hec-s2b-dense-solve/scaling.png"
+    ],
+    "svg": [
+      "benchmarks/20261114-hec-s2b-dense-solve/ratios.svg",
+      "benchmarks/20261114-hec-s2b-dense-solve/shares.svg",
+      "benchmarks/20261114-hec-s2b-dense-solve/scaling.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-s2b-dense-solve",
+  "status": "measured",
+  "summary": "S2b Solver::Dense (dense step-column block) vs S2a Fast in one process, 11 genus 2-4 rows x 5 seeds x 5 repeats: identical k/trials/relations/solve_rounds on 275/275 runs; genus 2 p>=503 median paired solve ratio 4.04-5.75x, Dense solve share 18-26%; more mulmods (+2.5-52%); shared host load 81-95; wall clock only, unvalidated",
+  "validation": null
+}
