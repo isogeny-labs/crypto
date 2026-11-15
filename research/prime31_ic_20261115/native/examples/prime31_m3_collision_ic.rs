@@ -174,9 +174,7 @@ impl TripleBank {
         let key = point_key(point);
         if let Some(&previous) = self.first.get(&key) {
             self.collisions += 1;
-            if self.hom.rank + 1 < self.hom.pivots.len() {
-                self.hom.insert(collision_row(previous, code, self.hom.pivots.len(), n), n);
-            } else if self.hom.rank < self.hom.pivots.len() - 1 {
+            if self.hom.rank < self.hom.pivots.len() - 1 {
                 self.hom.insert(collision_row(previous, code, self.hom.pivots.len(), n), n);
             }
             if self.hom.rank == self.hom.pivots.len() - 1
@@ -198,7 +196,8 @@ fn enumerate_triples(base: &Base, ar: &mut Arithmetic) -> TripleBank {
         for j in (i + 1)..b {
             let v = Some(base.points[j]);
             let uv_plus = ar.add(PRIME31, u, v);
-            let uv_minus = ar.add(PRIME31, u, ar.neg(PRIME31, v));
+            let neg_v = ar.neg(PRIME31, v);
+            let uv_minus = ar.add(PRIME31, u, neg_v);
             for k in (j + 1)..b {
                 let w = Some(base.points[k]);
                 let neg_w = ar.neg(PRIME31, w);
@@ -294,7 +293,9 @@ fn main() -> Result<(), String> {
         let a = target_rng.next(e.n);
         let b = target_rng.next(e.n);
         if b == 0 { continue; }
-        let mixed = ar.add(e, ar.scalar(e, a, Some(e.g)), ar.scalar(e, b, Q));
+        let ag = ar.scalar(e, a, Some(e.g));
+        let bq = ar.scalar(e, b, Q);
+        let mixed = ar.add(e, ag, bq);
         if let Some(&code) = bank.first.get(&point_key(mixed)) {
             if signed_point(code, &base, &mut ar) != mixed {
                 return Err("target witness replay failed".into());
