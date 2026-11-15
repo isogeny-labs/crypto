@@ -1,0 +1,150 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-14T23:31:45+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_gw_fbgrow_20261114/run-local.sh",
+        "research/ic_gw_fbgrow_20261114/bin",
+        "research/ic_gw_fbgrow_20261114/runs/local-20261114"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T23:08:17+00:00",
+      "wall_s": 1145.368
+    }
+  ],
+  "commit": "0402ffb5c12481c736a730d00e57978c70f6d20f",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T23:08:11+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261114-ic-gw-fbgrow"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T2308Z-ic-gw-fbgrow",
+  "metrics": [
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 15,
+      "name": "dl_meq_g160_over_ref_w0_h0_geomean",
+      "note": "DL counted M-eq, additions and hash free, geomean over k=18..22 (range over sizes); decisive grid fails (worst cell 107.7 at w0 h0.1); pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        98.04,
+        104.18
+      ],
+      "unit": "percent",
+      "value": 99.5
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 15,
+      "name": "dl_meq_g160_over_ref_w1_h0.1_geomean",
+      "note": "additions 1 M-eq, hash 0.1 M-eq; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        99.95,
+        100.77
+      ],
+      "unit": "percent",
+      "value": 100.43
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 15,
+      "name": "dl_meq_g155_over_ref_w0_h0_geomean",
+      "note": "additions and hash free; one seed above 1 at k=21 and 22; decisive grid fails (worst cell 104.5); pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        93.21,
+        95.41
+      ],
+      "unit": "percent",
+      "value": 94.42
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 15,
+      "name": "dl_meq_g155_over_ref_w1_h0.1_geomean",
+      "note": "additions 1 M-eq, hash 0.1 M-eq; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        101.06,
+        103.1
+      ],
+      "unit": "percent",
+      "value": 101.94
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 15,
+      "name": "total_cpu_dl_g160_over_ref_geomean",
+      "note": "L0 CPU diagnostic, geomean over sizes; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        103.86,
+        128.08
+      ],
+      "unit": "percent",
+      "value": 112.66
+    },
+    {
+      "baseline": 100.0,
+      "better": "lower",
+      "n": 15,
+      "name": "total_cpu_dl_g155_over_ref_geomean",
+      "note": "L0 CPU diagnostic, geomean over sizes; pcc:unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        105.86,
+        119.14
+      ],
+      "unit": "percent",
+      "value": 113.32
+    }
+  ],
+  "problem": "ic:gw-quartic-dl-fbgrow",
+  "raw": [
+    {
+      "bytes": 38193,
+      "path": "research/ic_gw_fbgrow_20261114/runs-local-20261114.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/df/dfc68e871d6aac0d10e62aad6ab7fc22c84d45616fdb29a732d385ad5d7a504b",
+      "sha256": "dfc68e871d6aac0d10e62aad6ab7fc22c84d45616fdb29a732d385ad5d7a504b",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261114-ic-gw-fbgrow/REPORT.pdf",
+    "png": [
+      "benchmarks/20261114-ic-gw-fbgrow/fbgrow.png"
+    ],
+    "svg": [
+      "benchmarks/20261114-ic-gw-fbgrow/fbgrow.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gw-fbgrow",
+  "status": "measured",
+  "summary": "incremental factor-base growth (G160, G155) vs v3 at c_D=1.7, counted cold M-eq: null under the frozen rule (G160 violates 20/30, G155 22/30 grid points); DL CPU 0.95-1.45 of REF; pcc:unverified",
+  "validation": null
+}

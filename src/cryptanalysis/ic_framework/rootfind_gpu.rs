@@ -1,0 +1,649 @@
+//! `rootfind-subtract-gpu`: the `rootfind-subtract` oracle (`m = 2`) with its
+//! sweep run in batches on the `gpu/rootfind` kernel, through the persistent
+//! worker `rootfind_serve` (`gpu/rootfind/rootfind_serve.cpp`).
+//!
+//! **Same search, same answer, same charge.**  For every target the CPU
+//! oracle walks the abscissae of the base in order and, at each, the two
+//! candidates `R − F_i` then `R + F_i`, returning the first that is a base
+//! point.  The kernel computes every candidate of every target in a batch
+//! and reports each hit as `R = ε·F_i + τ·F_j` with `j ≥ i` (ε = +1 is the
+//! candidate `R − F_i`).  This oracle sorts a target's hits into the CPU's
+//! order, recomputes each proposed candidate on the CPU, and confirms it
+//! through the CPU oracle's own lookup (key lookup, then the re-addition in
+//! the group on the ledger), so the returned indices are those
+//! `rootfind-subtract` returns.  The first CPU hit always has `j ≥ i`: a hit
+//! with `j < i` would have been found earlier, at abscissa `j`, because the
+//! base holds both signs of every abscissa (checked in `prepare`).  Targets
+//! whose abscissa is itself in the base (`R = ±F_i`, the degenerate rows)
+//! are handed to the CPU oracle whole.
+//!
+//! **Charged** exactly as `rootfind-subtract` charges the same target: the
+//! batched inversion, one group addition per candidate up to and including
+//! the first hit (all `2|F_x|` on a refutation), every lookup, and the
+//! confirming addition.  The tests demand equal ledgers.  What the GPU
+//! computes beyond that (the rest of a decomposing target's sweep, targets a
+//! lane round presented but the run never asked for) is not charged and is
+//! reported as native counters (`gpu_*`), as `fes-f2-gpu` reports `fes-f2`'s
+//! count.  Wall time is the only quantity the device changes.
+//!
+//! **Batches** come from [`DecompositionOracle::touch`]: the lane target
+//! sources (`walk-prime-batch-*`) touch every point of a round before
+//! decomposing them, so one round is one kernel launch.  Any other source
+//! gives batches of one target.  No worker, no run: `prepare` fails rather
+//! than fall back to the CPU, so a `-gpu` arm is never silently a CPU arm.
+//! Worker: `ICX_ROOTFIND_WORKER`, else `rootfind_serve_cuda` or
+//! `rootfind_serve` beside the running executable.
+
+use std::cell::RefCell;
+use std::collections::{BTreeMap, HashMap};
+use std::io::{BufReader, Read, Write};
+use std::path::{Path, PathBuf};
+use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
+use std::sync::Mutex;
+
+use super::plugins::RootfindSubtractOracle;
+use super::stages::{DecompositionOracle, InstanceCtx, Params};
+use crate::cryptanalysis::ic_boundary::{
+    FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimeInstance, PrimePoint,
+};
+
+const MAGIC_INIT: u32 = 0x3153_4652; // "RFS1"
+const MAGIC_BATCH: u32 = 0x3142_4652; // "RFB1"
+/// Largest batch sent to the worker (and its device buffers' size).
+pub const MAX_BATCH: usize = 4096;
+
+/// One relation as the worker reports it (`rf_relation`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct WorkerRelation {
+    pub target: u32,
+    pub i: u32,
+    pub j: u32,
+    pub eps: i8,
+    pub tau: i8,
+}
+
+/// The worker's answer to one batch.
+#[derive(Clone, Debug)]
+pub struct BatchReply {
+    pub relations: Vec<WorkerRelation>,
+    /// Device (or emulation) time of the batch, as the worker measured it.
+    pub kernel_seconds: f64,
+}
+
+/// Find the worker: `ICX_ROOTFIND_WORKER`, then the CUDA and the host build
+/// next to the current executable.
+pub fn discover_worker() -> Option<PathBuf> {
+    if let Ok(p) = std::env::var("ICX_ROOTFIND_WORKER") {
+        let path = PathBuf::from(p);
+        return path.is_file().then_some(path);
+    }
+    let exe = std::env::current_exe().ok()?;
+    let dir = exe.parent()?;
+    ["rootfind_serve_cuda", "rootfind_serve"]
+        .iter()
+        .map(|n| dir.join(n))
+        .find(|c| c.is_file())
+}
+
+/// A running `rootfind_serve --serve-bin`.
+pub struct RootfindWorker {
+    child: Child,
+    stdin: ChildStdin,
+    stdout: BufReader<ChildStdout>,
+    path: PathBuf,
+    /// Backend the last `init` resolved to (1 emulation, 2 CUDA).
+    pub backend: u32,
+}
+
+impl RootfindWorker {
+    pub fn spawn(worker: &Path) -> Result<Self, String> {
+        let mut child = Command::new(worker)
+            .arg("--serve-bin")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::inherit())
+            .spawn()
+            .map_err(|e| format!("failed to start {} --serve-bin: {e}", worker.display()))?;
+        let stdin = child.stdin.take().ok_or("no stdin on rootfind worker")?;
+        let stdout = BufReader::new(child.stdout.take().ok_or("no stdout on rootfind worker")?);
+        Ok(Self {
+            child,
+            stdin,
+            stdout,
+            path: worker.to_path_buf(),
+            backend: 0,
+        })
+    }
+
+    pub fn path(&self) -> &Path {
+        &self.path
+    }
+
+    fn send(&mut self, buf: &[u8]) -> Result<(), String> {
+        self.stdin
+            .write_all(buf)
+            .and_then(|_| self.stdin.flush())
+            .map_err(|e| format!("rootfind worker write: {e}"))
+    }
+
+    fn read(&mut self, n: usize) -> Result<Vec<u8>, String> {
+        let mut b = vec![0u8; n];
+        self.stdout
+            .read_exact(&mut b)
+            .map_err(|e| format!("rootfind worker read: {e}"))?;
+        Ok(b)
+    }
+
+    /// Load a factor base (canonical coordinates).  Lookup and chunk 0 let
+    /// the library choose, as `rf64_decompose` does.
+    pub fn init(&mut self, p: u64, xs: &[u64], ys: &[u64]) -> Result<(), String> {
+        let mut req = Vec::with_capacity(32 + 16 * xs.len());
+        req.extend_from_slice(&MAGIC_INIT.to_le_bytes());
+        req.extend_from_slice(&(xs.len() as u32).to_le_bytes());
+        req.extend_from_slice(&p.to_le_bytes());
+        for w in [0u32, 0, 0, MAX_BATCH as u32] {
+            req.extend_from_slice(&w.to_le_bytes());
+        }
+        for v in xs.iter().chain(ys) {
+            req.extend_from_slice(&v.to_le_bytes());
+        }
+        self.send(&req)?;
+        let r = self.read(24)?;
+        let w = |i: usize| u32::from_le_bytes(r[4 * i..4 * i + 4].try_into().unwrap());
+        if w(0) != MAGIC_INIT {
+            return Err(format!("rootfind worker: bad init reply magic {:#x}", w(0)));
+        }
+        if w(1) != 0 {
+            return Err(format!("rootfind worker: init status {}", w(1) as i32));
+        }
+        self.backend = w(2);
+        Ok(())
+    }
+
+    /// Decompose one batch (canonical coordinates, at most [`MAX_BATCH`]).
+    /// An overflowing batch is an error: its list is incomplete.
+    pub fn batch(&mut self, xs: &[u64], ys: &[u64]) -> Result<BatchReply, String> {
+        let mut req = Vec::with_capacity(8 + 16 * xs.len());
+        req.extend_from_slice(&MAGIC_BATCH.to_le_bytes());
+        req.extend_from_slice(&(xs.len() as u32).to_le_bytes());
+        for v in xs.iter().chain(ys) {
+            req.extend_from_slice(&v.to_le_bytes());
+        }
+        self.send(&req)?;
+        let h = self.read(24)?;
+        let w = |i: usize| u32::from_le_bytes(h[4 * i..4 * i + 4].try_into().unwrap());
+        if w(0) != MAGIC_BATCH {
+            return Err(format!(
+                "rootfind worker: bad batch reply magic {:#x}",
+                w(0)
+            ));
+        }
+        let (status, found, written) = (w(1) as i32, w(2), w(3));
+        let kernel_seconds = f64::from_le_bytes(h[16..24].try_into().unwrap());
+        let body = self.read(16 * written as usize)?;
+        if status != 0 || found != written {
+            return Err(format!(
+                "rootfind worker: batch status {status}, {written} of {found} relations"
+            ));
+        }
+        let relations = body
+            .chunks_exact(16)
+            .map(|c| WorkerRelation {
+                target: u32::from_le_bytes(c[0..4].try_into().unwrap()),
+                i: u32::from_le_bytes(c[4..8].try_into().unwrap()),
+                j: u32::from_le_bytes(c[8..12].try_into().unwrap()),
+                eps: c[12] as i8,
+                tau: c[13] as i8,
+            })
+            .collect();
+        Ok(BatchReply {
+            relations,
+            kernel_seconds,
+        })
+    }
+}
+
+impl Drop for RootfindWorker {
+    fn drop(&mut self) {
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
+/// One worker per process, kept across runs so the CUDA context is created
+/// once; each run re-`init`s it with its base.
+static SHARED: Mutex<Option<RootfindWorker>> = Mutex::new(None);
+
+fn with_worker<T>(f: impl FnOnce(&mut RootfindWorker) -> Result<T, String>) -> Result<T, String> {
+    let mut guard = SHARED.lock().unwrap_or_else(|p| p.into_inner());
+    if guard.is_none() {
+        let path = discover_worker().ok_or(
+            "rootfind-subtract-gpu: no worker (set ICX_ROOTFIND_WORKER or build \
+             gpu/rootfind `make serve` / `make serve-cuda`)",
+        )?;
+        *guard = Some(RootfindWorker::spawn(&path)?);
+    }
+    let out = f(guard.as_mut().expect("worker present"));
+    if out.is_err() {
+        *guard = None;
+    }
+    out
+}
+
+/// Sum of the worker's kernel seconds in this process (diagnostic only; not
+/// a counter, so records replay).
+static KERNEL_SECONDS: Mutex<f64> = Mutex::new(0.0);
+
+pub fn kernel_seconds_total() -> f64 {
+    *KERNEL_SECONDS.lock().unwrap_or_else(|p| p.into_inner())
+}
+
+/// `n` candidates that are not base points, as `rootfind-subtract` charges
+/// them one by one: an addition (two multiplications, a squaring and two
+/// conversions) and a lookup each.
+fn charge_misses(ops: &mut GroupOps, counters: &mut OracleCounters, n: usize) {
+    let n = n as u64;
+    ops.adds += n;
+    ops.field_ops.muls += 4 * n;
+    ops.field_ops.sqrs += n;
+    counters.lookups += n;
+}
+
+/// A target's hits in the CPU sweep's order: `(position, j, tau)` with
+/// `position = 2·i + (0 for ε = +1, 1 for ε = −1)`.
+type Hits = Vec<(usize, u32, i8)>;
+
+pub struct RootfindSubtractGpuOracle<'i> {
+    cpu: RootfindSubtractOracle<'i>,
+    m: u32,
+    pending: RefCell<Vec<PrimePoint>>,
+    swept: HashMap<(u64, u64), Hits>,
+    counters: BTreeMap<String, u64>,
+}
+
+impl<'i> RootfindSubtractGpuOracle<'i> {
+    pub fn new(m: u32, instance: &'i PrimeInstance) -> Self {
+        Self {
+            cpu: RootfindSubtractOracle::new(m, instance),
+            m,
+            pending: RefCell::new(Vec::new()),
+            swept: HashMap::new(),
+            counters: BTreeMap::new(),
+        }
+    }
+
+    fn bump(&mut self, name: &str, by: u64) {
+        *self.counters.entry(name.to_string()).or_insert(0) += by;
+    }
+
+    /// Sweep `point` and every touched point not yet swept, in batches.
+    fn sweep_batch(&mut self, point: PrimePoint) -> Result<(), String> {
+        let mut batch = vec![point];
+        let mut seen: std::collections::HashSet<(u64, u64)> = [(point.x, point.y)].into();
+        for p in self.pending.borrow_mut().drain(..) {
+            let key = (p.x, p.y);
+            if !p.infinity && !self.swept.contains_key(&key) && seen.insert(key) {
+                batch.push(p);
+            }
+        }
+        for chunk in batch.chunks(MAX_BATCH) {
+            let xs: Vec<u64> = chunk.iter().map(|p| p.x).collect();
+            let ys: Vec<u64> = chunk.iter().map(|p| p.y).collect();
+            let reply = with_worker(|w| w.batch(&xs, &ys))?;
+            *KERNEL_SECONDS.lock().unwrap_or_else(|p| p.into_inner()) += reply.kernel_seconds;
+            let mut hits: Vec<Hits> = vec![Vec::new(); chunk.len()];
+            for r in &reply.relations {
+                if r.tau == 0 {
+                    continue; // degenerate row: such targets go to the CPU oracle
+                }
+                let k = r.target as usize;
+                if k >= chunk.len() {
+                    return Err(format!("rootfind worker: target index {k} out of range"));
+                }
+                let pos = 2 * r.i as usize + usize::from(r.eps < 0);
+                hits[k].push((pos, r.j, r.tau));
+            }
+            for (p, mut h) in chunk.iter().zip(hits) {
+                h.sort_unstable();
+                self.swept.insert((p.x, p.y), h);
+            }
+            self.bump("gpu_batches", 1);
+            self.bump("gpu_targets_swept", chunk.len() as u64);
+        }
+        Ok(())
+    }
+}
+
+impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
+    fn name(&self) -> &str {
+        "rootfind-subtract-gpu"
+    }
+
+    fn summands(&self) -> u32 {
+        self.m
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "{}; the sweep runs in batches on the gpu/rootfind kernel (rootfind_serve worker), \
+             every hit confirmed on the CPU in rootfind-subtract's order and charge",
+            self.cpu.describe(params)
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "m",
+            "summands; only 2 (the kernel looks candidates up in the base)",
+        )]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        if self.m != 2 {
+            return Err(format!("rootfind-subtract-gpu takes m = 2, got {}", self.m));
+        }
+        self.cpu.prepare(ctx, fb, params, ops)?;
+        let (f, reps) = self
+            .cpu
+            .sweep()
+            .ok_or("rootfind-subtract did not prepare")?;
+        // Both signs of every abscissa (or a 2-torsion point) are in the
+        // base: what makes the kernel's `j ≥ i` hits contain the CPU's first.
+        let mut xs = Vec::with_capacity(reps.len());
+        let mut ys = Vec::with_capacity(reps.len());
+        for rep in reps {
+            let (x, y) = (f.from_mont(rep.x), f.from_mont(rep.y));
+            if rep.plus == rep.minus && y != 0 {
+                return Err(
+                    "rootfind-subtract-gpu needs a negation-closed base (both signs of every \
+                     abscissa)"
+                        .into(),
+                );
+            }
+            xs.push(x);
+            ys.push(y);
+        }
+        if xs.is_empty() {
+            return Err("rootfind-subtract-gpu: empty base".into());
+        }
+        let p = ctx.group.p;
+        // The backend (emulation or CUDA) is not a counter: a replay on a
+        // host without a GPU must read the same record.  The worker names it
+        // on stderr.
+        with_worker(|w| w.init(p, &xs, &ys))?;
+        self.swept.clear();
+        self.pending.borrow_mut().clear();
+        self.counters.clear();
+        Ok(())
+    }
+
+    fn setup_native(&self) -> BTreeMap<String, u64> {
+        self.cpu.setup_native()
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        self.cpu.setup_work_native()
+    }
+
+    fn relation_work_native(&self) -> BTreeMap<String, u64> {
+        self.cpu.relation_work_native()
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = self.cpu.relation_counters();
+        out.extend(self.counters.clone());
+        out.insert("gpu_targets_unused".into(), self.swept.len() as u64);
+        out
+    }
+
+    fn line_guard(&self) -> bool {
+        // The cache-line guard is the one that touches lane rounds ahead of
+        // their decomposition; membership answers are identical.
+        true
+    }
+
+    fn touch(&self, _ctx: &InstanceCtx<PrimeCurve>, point: &PrimePoint) {
+        self.pending.borrow_mut().push(*point);
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        if point.infinity {
+            return None;
+        }
+        let (f, k) = {
+            let (f, reps) = self.cpu.sweep()?;
+            (f, reps.len())
+        };
+        let key = (point.x, point.y);
+        if !self.swept.contains_key(&key) {
+            if let Err(e) = self.sweep_batch(point) {
+                // Fail closed: a run with a broken worker must not report
+                // relations it did not find, nor silently become a CPU run.
+                panic!("rootfind-subtract-gpu: {e}");
+            }
+        }
+        let hits = self.swept.remove(&key).unwrap_or_default();
+        if fb.x_index.contains_key(&point.x) {
+            // R = ±F_i: the CPU oracle takes the degenerate rows its own way.
+            self.bump("gpu_cpu_fallback_targets", 1);
+            return self.cpu.decompose(ctx, fb, ops, counters, point);
+        }
+        self.cpu.charge_sweep_setup(ops, counters);
+        let xr = f.to_mont(point.x);
+        let yr = f.to_mont(point.y);
+        let mut next = 0usize; // first candidate position not yet charged
+        for (pos, _j, _tau) in hits {
+            if pos < next {
+                continue; // a second hit at one candidate: already examined
+            }
+            charge_misses(ops, counters, pos - next);
+            next = pos + 1;
+            let (summand, t) = {
+                let (_, reps) = self.cpu.sweep()?;
+                let rep = reps[pos / 2];
+                let inv = f.inv(f.sub(xr, rep.x));
+                let lam = if pos % 2 == 0 {
+                    f.mul(f.add(yr, rep.y), inv)
+                } else {
+                    f.mul(f.sub(yr, rep.y), inv)
+                };
+                let x3 = f.sub(f.sub(f.sqr(lam), xr), rep.x);
+                let y3 = f.sub(f.mul(lam, f.sub(xr, x3)), yr);
+                let summand = if pos % 2 == 0 { rep.plus } else { rep.minus };
+                (
+                    summand,
+                    PrimePoint::affine(f.from_mont(x3), f.from_mont(y3)),
+                )
+            };
+            RootfindSubtractOracle::charge_candidate(ops);
+            self.bump("gpu_hits_confirmed_on_cpu", 1);
+            if let Some(found) = self.cpu.lookup(ctx, fb, ops, counters, point, summand, t) {
+                return Some(found);
+            }
+        }
+        charge_misses(ops, counters, 2 * k - next);
+        None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    //! Needs a worker: `make -C gpu/rootfind serve` and
+    //! `ICX_ROOTFIND_WORKER=$PWD/gpu/rootfind/rootfind_serve`.  Without one
+    //! the tests print why and pass, as the root crate builds no native code.
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{
+        find_prime_order_curve, prime_instance_for, Calibration, CountedGroup,
+    };
+    use crate::cryptanalysis::ic_framework::plugins::PrimeAbscissaBase;
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunReport};
+
+    fn worker_present() -> bool {
+        let ok = std::env::var("ICX_ROOTFIND_WORKER").is_ok() && discover_worker().is_some();
+        if !ok {
+            eprintln!("skipped: set ICX_ROOTFIND_WORKER to a built rootfind_serve");
+        }
+        ok
+    }
+
+    fn ctx(inst: &PrimeInstance, target: PrimePoint) -> InstanceCtx<'_, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    fn without_gpu(m: &BTreeMap<String, u64>) -> BTreeMap<String, u64> {
+        m.iter()
+            .filter(|(k, _)| !k.starts_with("gpu_"))
+            .map(|(k, v)| (k.clone(), *v))
+            .collect()
+    }
+
+    fn assert_same(cpu: &RunReport, gpu: &RunReport, label: &str) {
+        assert_eq!(cpu.recovered, gpu.recovered, "{label}: recovered");
+        assert_eq!(cpu.verified, gpu.verified, "{label}: verified");
+        assert_eq!(cpu.exhausted, gpu.exhausted, "{label}: exhausted");
+        let (dc, dg) = (&cpu.decomposition, &gpu.decomposition);
+        assert_eq!(dc.targets_tried, dg.targets_tried, "{label}: targets");
+        assert_eq!(dc.relations_found, dg.relations_found, "{label}: relations");
+        assert_eq!(dc.setup.group_ops, dg.setup.group_ops, "{label}: setup ops");
+        assert_eq!(
+            dc.setup.work_native, dg.setup.work_native,
+            "{label}: setup work"
+        );
+        assert_eq!(
+            dc.cost.group_ops, dg.cost.group_ops,
+            "{label}: relation ops"
+        );
+        assert_eq!(
+            without_gpu(&dc.cost.native),
+            without_gpu(&dg.cost.native),
+            "{label}: relation native"
+        );
+        assert_eq!(
+            dc.cost.work_native, dg.cost.work_native,
+            "{label}: relation work"
+        );
+        let (lc, lg) = (&cpu.linear_algebra, &gpu.linear_algebra);
+        assert_eq!(
+            (lc.rows, lc.rank, lc.work),
+            (lg.rows, lg.rank, lg.work),
+            "{label}: LA"
+        );
+        assert_eq!(cpu.total_gae, gpu.total_gae, "{label}: total gae");
+        assert_eq!(cpu.s, gpu.s, "{label}: S");
+    }
+
+    /// Whole pipeline runs: the GPU oracle reaches the same relations, the
+    /// same logarithm and the same counted cost in every phase as
+    /// `rootfind-subtract`, on lane targets (batched) and walk targets
+    /// (batches of one).
+    #[test]
+    fn gpu_oracle_matches_rootfind_subtract_end_to_end() {
+        if !worker_present() {
+            return;
+        }
+        let calib = Calibration::default();
+        let mut solved = 0;
+        for (inst, size) in [
+            (prime_instance_for(14, 1), 16usize),
+            (prime_instance_for(18, 1), 32),
+            (prime_instance_for(20, 59297), 48),
+            (find_prime_order_curve(17, 3116), 28),
+        ] {
+            let g = inst.generator_point();
+            for planted_seed in [11u64, 20_261_114] {
+                let planted = planted_seed % inst.r;
+                let q = inst.curve.mul(&mut GroupOps::default(), g, planted);
+                let c = ctx(&inst, q);
+                for targets in [
+                    Targets::WalkPrimeBatch16,
+                    Targets::WalkPrimeBatch256,
+                    Targets::Walk,
+                ] {
+                    for seed in [7u64, 3116] {
+                        let mut spec = PipelineSpec {
+                            factor_base: "prime-abscissa".into(),
+                            oracle: "rootfind-subtract".into(),
+                            targets,
+                            max_trials: 4_000_000,
+                            seed,
+                            ..Default::default()
+                        };
+                        spec.factor_base_params.set("size", size.to_string());
+                        spec.oracle_params.set("m", "2");
+                        let base = PrimeAbscissaBase { instance: &inst };
+                        let mut cpu_o = RootfindSubtractOracle::new(2, &inst);
+                        let cpu = run_pipeline(&c, &spec, &base, &mut cpu_o, planted, &calib, None)
+                            .unwrap();
+                        spec.oracle = "rootfind-subtract-gpu".into();
+                        let mut gpu_o = RootfindSubtractGpuOracle::new(2, &inst);
+                        let gpu = run_pipeline(&c, &spec, &base, &mut gpu_o, planted, &calib, None)
+                            .unwrap();
+                        let label = format!(
+                            "{} {} seed {seed} planted {planted}",
+                            inst.name,
+                            targets.name()
+                        );
+                        assert_same(&cpu, &gpu, &label);
+                        let gn = &gpu.decomposition.cost.native;
+                        assert!(
+                            gn.get("gpu_targets_swept").copied().unwrap_or(0) > 0,
+                            "{label}"
+                        );
+                        if targets != Targets::Walk {
+                            assert!(
+                                gn["gpu_targets_swept"] > gn["gpu_batches"],
+                                "{label}: lane rounds should batch"
+                            );
+                        }
+                        if cpu.verified {
+                            assert_eq!(cpu.recovered, Some(planted), "{label}");
+                            solved += 1;
+                        }
+                    }
+                }
+            }
+        }
+        assert!(solved > 0, "no run solved");
+    }
+
+    /// The fail-closed checks: m = 3 is refused.
+    #[test]
+    fn gpu_oracle_refuses_m3() {
+        let inst = prime_instance_for(14, 1);
+        let q = inst.generator_point();
+        let c = ctx(&inst, q);
+        let mut spec = PipelineSpec {
+            factor_base: "prime-abscissa".into(),
+            oracle: "rootfind-subtract-gpu".into(),
+            ..Default::default()
+        };
+        spec.factor_base_params.set("size", "16");
+        let mut o = RootfindSubtractGpuOracle::new(3, &inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        let r = run_pipeline(&c, &spec, &base, &mut o, 1, &Calibration::default(), None);
+        assert!(r.is_err());
+    }
+}
