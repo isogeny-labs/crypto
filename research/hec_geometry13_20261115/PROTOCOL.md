@@ -52,3 +52,7 @@ performancebenchmark/cloudworker/oldrecord/default/leaderboardmutation.
 ReportPDF/SVG andexistingPR4274update/checkpoint/currentheadCI. Next finite-
 fieldGamma00identity/Serredescent, explicitdivisortransport, completecosts;
 genus2and4remainpartoftheobjective.
+
+Pre-execution control amendment: smoothnessroutine must accept Fermat
+x^4+y^4+z^4 and reject x^4+y^4 at[0:0:1]. No scientific execution preceded
+this amendment; it only strengthens the registered algebraic control.
