@@ -391,6 +391,42 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual Miller level-compatibility proof](../miller_level_compatibility_audit_20261115/README.md)
+proves the chosen-function and final-evaluation core of Galbraith Exercise26.3.8.
+For every field with actual DecidableEq data and nonzero discriminant, actual
+nP=O implies f_(a*n)=f_n^a, including characteristics2/3 and zero/one extensions.
+The actual final local-unit subgroup derives the higher domain from the lower
+one; actual divisor evaluation gives f_N(D)=f_n(D)^(N/n) for n|N. For positive
+n,N and n|N|M, final exponents M/n and M/N agree. No function-correctness or
+evaluation-commutation premise is supplied. Canonical Tate construction,
+representative independence and reciprocity remain separate. No claim is made
+that the source omitted its implicit first-argument torsion domain.
+Both actual controls use E/F5:y²=x³+1, n2/N4/M4 and actual field cardinality5.
+Positive P=(4,0), exact order2, D=(0,1)−(2,2): proper values2/4 and final4=4≠1.
+Negative P=(0,1), exact order3/2P≠O, D=(2,3)−(4,0): proper values1/3 and final1≠3.
+Both degreezero divisors and all four full geometric final domains over actual
+AC(F5) are proved. Actual f4≠f2² in the negative control, with actual orders0
+versus−2 at(0,4). Thus deleting torsion fails while the qualified source core
+survives. Values come from actual coordinate fractions/local residues, not an oracle.
+Exact local **PCC-20261115-29cf72** PASS at2026-11-15T13:08:48Z; signed standing unverified. Fresh gate
+55theorems/6newmodules/0failures/0trustednative/fulltransitive standard
+foundations;87frozen dependency modules/0copies/previous679audit credited
+separately. All90 dependency source/config files and9 new formal/config files
+plus18artifacts=117pins. All107 predecessor pins checked before/after each
+numbered build. Full3589-character binding/native1complete/0prefix/0unresolved.
+Tenstates/sevenfailures/threesuccesses;185files/71objects/
+29952byte losslessXZ/fivegatefiles/PDF47533fulltextread/visual/inbounds.
+Final10project clean; inherited frozen-auditor String.mk deprecation retained.
+Ch26 fresh fulltext+visualPDF7/printed579, cumulative1–7/notall16; Lemma26.3.11
+proof continuationPDF8 and original Miller paper unread. Five correct KB calls/
+two Conductor calls127 beforeprocessing/edits; bounded local/official/primary
+fallback and existing local dependency pattern credited. No novelty/canonical
+promotion/newhost/backend/runtime/frozenedits/cryptoPython/raisedlimits/global
+flags/waivers/spend/upload. General scheme/divisor basechange/descent,
+translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonical Weil–Tate/MOV–FR
+and the remaining fourteen-item obligations stay open. [pcc:unverified]
+
+
 The [actual binary Miller audit](../binary_miller_audit_20261115/README.md)
 proves the carried point/function state is (nP,chosen f_n) for every field with
 actual DecidableEq operation data and actual nonzero discriminant, including
