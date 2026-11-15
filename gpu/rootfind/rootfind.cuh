@@ -325,6 +325,14 @@ struct DecompArgs {
     rf_relation *out;
     uint32_t *out_count;           /* atomic; may exceed out_cap */
     uint32_t out_cap;
+    /* Probe mode (probe_mode = 1): candidates are looked up in the set
+     * probe_x (Montgomery form; the lookup table is built on it) instead of
+     * the factor base, every hit is emitted whatever its index (no j >= i),
+     * and tau is +1 (the caller re-derives the summands).  This is the
+     * three-summand sweep against the abscissae of a pair table.  With
+     * probe_mode = 0, probe_x must equal fb_x. */
+    const typename F::elt *probe_x;
+    uint32_t probe_mode;
 };
 
 RF_HD uint32_t rf_atomic_inc(uint32_t *ctr) {
@@ -484,6 +492,11 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
             while (table.valid(pos, key)) {
                 const uint32_t j = table.index(pos);
                 pos = table.next(pos, key);
+                if (a.probe_mode) {
+                    if (!F::eq(f, x3, a.probe_x[j])) continue;   /* key collision */
+                    rf_emit(a.out, a.out_count, a.out_cap, k, i, j, eps, 1);
+                    continue;
+                }
                 if (j < i) continue;
                 if (!F::eq(f, x3, a.fb_x[j])) continue;   /* 64-bit key collision (P-256 only) */
                 const elt y3 = F::sub(f, F::mul(f, lam, F::sub(f, xr, x3)), yr);
