@@ -158,17 +158,18 @@ void model_replay(const std::filesystem::path&root,const std::filesystem::path&s
             throw std::runtime_error("missing frozen model-control case");
     std::cout<<"PASS OpenSSL complete model cases="<<rows.size()<<" models="<<models<<'\n';
 }
-void cold_replay(const std::filesystem::path&root,const std::filesystem::path&summary) {
+void cold_replay(const std::filesystem::path&root,const std::filesystem::path&summary,bool one=false) {
     Group group;const auto all=group.all();std::vector<Point> base;
     for(Point p:all)if(p.second<=8&&group.membership(p.first,3,1))base.push_back(p);
     if(base.size()!=3)throw std::runtime_error("OpenSSL base dimension");
     const auto targets=table(summary,"target_x\ttarget_y\trecovered_scalar\tattempts\tbackend_calls\tmisses\trank");
-    if(targets.size()!=18)throw std::runtime_error("cold target census incomplete");
+    if(targets.size()!=(one?1U:18U))throw std::runtime_error("cold target census incomplete");
     std::size_t relation_total=0,kernel_total=0;
     std::set<Point> census;
     for(const auto&row:targets) {
         if(row.size()!=7)throw std::runtime_error("invalid cold summary");
         const Point Q{number(row[0]),number(row[1])};
+        if(one&&Q!=Point{0,6})throw std::runtime_error("first cold target binding mismatch");
         if(!census.insert(Q).second)throw std::runtime_error("duplicate cold target");
         const auto directory=root/("target-x"+row[0]+"-y"+row[1]);
         const auto attempts=table(directory/"cold-attempts.tsv","attempt\tbatch\ta\tb\trx\try\tstatus\tbackend_call");
@@ -239,9 +240,10 @@ void cold_replay(const std::filesystem::path&root,const std::filesystem::path&su
 }
 int main(int argc,char**argv) {
     try {
-        if(argc!=4)throw std::runtime_error("usage: replay --models|--cold ROOT SUMMARY.tsv");
+        if(argc!=4)throw std::runtime_error("usage: replay --models|--cold|--cold-one ROOT SUMMARY.tsv");
         if(std::string(argv[1])=="--models")model_replay(argv[2],argv[3]);
         else if(std::string(argv[1])=="--cold")cold_replay(argv[2],argv[3]);
+        else if(std::string(argv[1])=="--cold-one")cold_replay(argv[2],argv[3],true);
         else throw std::runtime_error("unknown replay command");
         return 0;
     }catch(const std::exception&e){std::cerr<<"REJECT: "<<e.what()<<'\n';return 2;}
