@@ -44,8 +44,21 @@ that interface. These are scoped dependencies, not an impossibility claim.
 
 Ready main PR4311 is open at source28e9e365ed:
 https://github.com/isogeny-labs/crypto/pull/4311 . Final handoff changes no
-mathematical/native input, proof source or report pixels. Auto-merge is to be
-enabled after this final push; current-head required checks retain their own
-status. The remaining hand-coverage formalization and actual selector contract
-are recorded in RESUME.md. The goal's complete algorithm criterion is unmet.
+mathematical/native input, proof source or report pixels. Auto-merge was enabled;
+current-head required checks retain their own status. The selector contract
+is recorded in RESUME.md. The goal's complete algorithm criterion is unmet.
 [pcc:unverified]
+
+A1 extends the same PR with shared source2e4b08b's full actual finite-group
+coverage endpoint, exact moments and support cardinality. Its canonical local
+gate audits134theorems/0failures/0trusted-native exceptions; all six builds,
+source hashes and full receipts are copied under checks/coverage-laws/.
+PCC-20261115-950598 is unverified. Shared PR13merged as865577b, while hosted
+run43741500945 ran zero steps with the explicit billing-lock annotation.
+This formalizes unconditioned coverage, not the selector, curve conditioning,
+asymptotic analysis or native program. [pcc:unverified]
+
+Main advanced toe0e3725bac. The daily journal conflicts; one authorized
+Copilot request comment6898455027 is pending and that file is frozen. Keep
+incoming LA/GPU work untouched and preserve both full histories. These study
+changes can proceed independently. No numerical qualification is run.

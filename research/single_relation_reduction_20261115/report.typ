@@ -20,7 +20,7 @@ only public points and independent coins. Actual group relations and the
 final scalar are checked. A larger elliptic cofactor is compatible with this
 promise-problem reduction.
 
-This is a hand mathematical assessment with supporting local Lean laws.
+This assessment includes a complete local Lean check of finite-group coverage.
 It includes no native numerical run, timing, fitted exponent or complete
 classical subexponential ECDLP algorithm.
 
@@ -58,12 +58,14 @@ at balanced m. This rejects that named direct allocation as a subexponential
 implementation. It gives no lower bound for every sparse/circuit/GB method
 and no solving-degree lower bound for the earlier auxiliary norm systems.
 
-*Formal scope.* Shared source ad0b100 checks the mixed-label fibre cardinality,
-weighted-relation recovery and factorial/binomial inequality. Its canonical
-local gate audits 111 theorems, 0 failures, 0 trusted native exceptions. The first
-build lacked two explicit imports; the corrected second build and all logs
-are retained. The second moment, curve interpretation, asymptotics and
-native programs are not formalized by these supporting laws.
+*Formal scope.* Shared source 2e4b08b constructs the actual finite-group
+tuple-sum maps, counts single/pair events, derives both moments and proves
+the integer support bound above. Its canonical all-source/axiom gate audits
+134 theorems, 0 failures, 0 trusted native exceptions. All six build logs and
+source hashes are retained. Earlier source ad0b100 checks label fibres,
+recovery and the index inequality. Curve conditioning, asymptotics and
+native programs remain outside these formal results. Hosted jobs ran zero
+steps due to the explicit account billing lock; no hosted pass is asserted.
 
 Sources: APS, FFA51(2018), sections3--3.2/equations7--11; exact native Index
 source; existing oracle/code/GPU contracts. Spaenlehauer arXiv2610.32508v1,

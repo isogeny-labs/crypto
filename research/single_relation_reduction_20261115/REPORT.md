@@ -2,9 +2,10 @@
 
 This assesses a published alternative to the auxiliary-fibre route. It removes
 auxiliary-curve setup and the final relation matrix, but supplies no new fast
-relation selector. The finite probability argument and full conditional cost
-below are hand derivations, not a complete formal/program proof or a classical
-subexponential ECDLP algorithm. No numerical call is made. [pcc:unverified]
+relation selector. The unconditioned finite-group coverage argument now has a
+complete Lean endpoint. Elliptic conditioning, the conditional cost and native
+program behavior remain separate hand/implementation obligations. No numerical
+call is made. [pcc:unverified]
 
 PCC-20261115-3dfae3 records the hand assessment and remains unverified.
 
@@ -143,8 +144,8 @@ SCOPE.md and checks/ retain exact source identities. APS2018 equations7--11
 are the prior framework; its section3.2 leaves the selector cost unestimated.
 The existing native explicit-relations GPU service is an exact generic
 meet-in-the-middle backend and claims no subexponential contraction. Shared
-supporting Lean laws are checked separately; they do not formalize the
-second-moment argument, elliptic interpretation, asymptotics or program.
+supporting Lean laws and the full unconditioned coverage endpoint are checked
+separately. Elliptic interpretation, asymptotics and programs are not formalized.
 No new native panel is run while checkpoint access is unavailable.
 
 Shared support sourcead0b10055fe01cc8fba761382a0481491c947bb5 passes its
@@ -160,3 +161,34 @@ reduction or an implementation. [pcc:unverified]
 Shared PR11 merged as33c3451feeb45ad1785c14aeac97090ea45023dc. Its hosted
 run43738335731 executed zero steps and the annotation explicitly reports
 the same account billing lock. No hosted pass is asserted. [pcc:unverified]
+
+## A1. Full finite-group coverage formalization
+
+At shared source2e4b08b719452f49bfef91e5c31329f2e251b445, the theorem
+CryptoLean.PartiteCoverage.coverage_count works over an actual finite additive
+commutative group G, with m,b>0. It constructs tuple sums on the assignment
+space Omega=(Fin m times Fin b)->G. Single and distinct-pair sum maps are
+surjective, giving exact event counts and both moments. Finite Cauchy--Schwarz
+on the actual support proves, with r=|G|, L=b^m and N=r^(mb),
+
+    L*N <= (r+L-1) * |{x in Omega : exists a, sum_i x(i,a(i))=0}|.
+
+Dividing by N gives the uniform coverage lower bound L/(r+L-1). The formal
+statement uses integer cardinalities; no probability measure notation or
+assumed moment axioms replace the actual events. Prime order is unnecessary
+for this counting result. This endpoint checks unconditioned coverage; it
+constructs no relation selector. [pcc:unverified]
+
+The canonical repository-wide source/axiom gate audits134theorems,0failures,
+0trusted-native exceptions. This module contributes16audited declarations,
+including two definition equations. Complete gate/source hashes and all six
+build logs are copied under checks/coverage-laws/. Builds001,004and005failed
+for type inference/rewrite normalization; builds002,003and006pass their
+respective source versions. No endpoint was weakened or limit raised.
+PCC-20261115-950598 remains unverified; local proof checking is distinct from
+a signed PCC verdict. [pcc:unverified]
+
+Shared PR13 merged as865577bef93b64880cf6aba434f13c5b624488ac. Hosted
+run43741500945 executed zero steps in both jobs; its annotation explicitly
+reports the account billing lock. The local source/axiom pass is the evidence
+here, with no hosted pass asserted. [pcc:unverified]

@@ -11,10 +11,13 @@ Read the [two-page report](report.pdf), starting at page1, and its editable
 No new native case, measurement or paid job was run. The earlier multiprecision
 qualification remains pending its required checkpoint upload access.
 
-Three supporting shared field/cardinality/arithmetic laws have a passing local
-canonical Lean gate at ad0b10055fe01cc8fba761382a0481491c947bb5. They do not
-formalize the full second-moment/elliptic reduction or a native program. Exact
-logs, source pins, the failed first build and primary-source hashes are in
-checks/. The direct dense-index assessment is scoped to the named Index
-architecture; no lower bound for every relation algorithm is claimed.
+Shared source2e4b08b now checks the full unconditioned finite-group coverage
+argument, including actual events, both moments and the existential-support
+cardinality. The canonical all-source/axiom gate audits134theorems/0failures/
+0trusted-native exceptions. All six builds, gate logs and source hashes are in
+checks/coverage-laws/. Claim950598 is unverified. Earlier supporting laws at
+ad0b100 check labels/recovery/index arithmetic. Elliptic conditioning,
+asymptotics and native programs remain outside these formal results. The
+direct dense-index assessment applies to the named Index architecture; no
+lower bound for every relation algorithm is claimed.
 [pcc:unverified]
