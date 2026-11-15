@@ -39,20 +39,43 @@ jobs:
           git rev-parse --verify "origin/$BASE_REF^{commit}"
       - name: Sabotage canaries are all rejected
         run: python3 tools/pcc/pcc.py canary
-      - name: Ledger chain holds, and the base ledger is a prefix (pull request)
+      # Trust root (docs/SABOTAGE_RESISTANCE.md, "Whose keys count"): a pull
+      # request is judged with the keyring of its base branch, never its own,
+      # and may not change pcc/keyring.json unless the owner has pinned the new
+      # file's SHA-256 in the repository variable PCC_KEYRING_SHA256.
+      - name: Ledger chain holds, the base ledger is a prefix, the keyring is the base's (pull request)
         if: github.event_name == 'pull_request'
         env:
           BASE_REF: ${{ github.base_ref || 'main' }}
+          PCC_KEYRING_SHA256: ${{ vars.PCC_KEYRING_SHA256 }}
         run: python3 tools/pcc/pcc.py ledger verify --base "origin/$BASE_REF"
-      - name: Ledger chain holds (push)
-        if: github.event_name != 'pull_request'
+      - name: Ledger chain holds, and the previous tip is a prefix (push)
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+          PCC_KEYRING_SHA256: ${{ vars.PCC_KEYRING_SHA256 }}
+        run: |
+          case "$BEFORE" in
+            ''|0000000000000000000000000000000000000000)
+              python3 tools/pcc/pcc.py ledger verify ;;
+            *)
+              git fetch --no-tags --depth=1 --filter=blob:none origin "$BEFORE"
+              python3 tools/pcc/pcc.py ledger verify --base "$BEFORE" ;;
+          esac
+      - name: Ledger chain holds (manual run)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PCC_KEYRING_SHA256: ${{ vars.PCC_KEYRING_SHA256 }}
         run: python3 tools/pcc/pcc.py ledger verify
       - name: Every claim verifies (exit 2, not covered, is allowed; exit 1 fails)
+        env:
+          PCC_KEYRING_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref || 'main') || '' }}
         run: python3 tools/pcc/pcc.py verify-all || [ $? -eq 2 ]
       - name: PR body is strict - a strong-claim word needs [pcc:ID] or [pcc:unverified]
         if: github.event_name == 'pull_request'
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+          PCC_KEYRING_REF: ${{ format('origin/{0}', github.base_ref || 'main') }}
         run: printf '%s' "$PR_BODY" | python3 tools/pcc/pcc.py lint-prose --stdin
       - name: Advisory prose lint of changed session logs and reports
         if: github.event_name == 'pull_request'
@@ -86,6 +109,7 @@ jobs:
       - name: Sign verdicts for claims that do not stand
         env:
           PCC_SIGNING_KEY: ${{ secrets.PCC_SIGNING_KEY }}
+          PCC_KEYRING_SHA256: ${{ vars.PCC_KEYRING_SHA256 }}
         run: |
           if [ -z "$PCC_SIGNING_KEY" ]; then
             echo "::notice::PCC_SIGNING_KEY is not set; no verdicts signed"

@@ -1500,6 +1500,25 @@ pub fn relation_system_polys(
             out.push(eq.into_iter().filter(|&(_, c)| c != 0).collect());
         }
     }
+    let xs: Vec<usize> = (0..m).map(|i| xv(i, 0)).collect();
+    out.extend(s3_chain_polys(e, n_vars, &xs, m * n, xr));
+    (out, n_vars)
+}
+
+/// The `S_3` chain over unknowns `xs` (abscissae of the `m` summands) and
+/// helpers `u_k` at indices `u0 + k`: `S_3(x_1, x_2, X)` at `m = 2`, else
+/// `S_3(x_1, x_2, u_1), S_3(u_1, x_3, u_2), …, S_3(u_{m−2}, x_m, X)`.
+fn s3_chain_polys(
+    e: &Curve,
+    n_vars: usize,
+    xs: &[usize],
+    u0: usize,
+    xr: u64,
+) -> Vec<Vec<(Vec<u32>, u64)>> {
+    let p = e.p;
+    let m = xs.len();
+    let mut out = vec![];
+    let xv = |i: usize, _j: usize| xs[i];
     // S_3 chain. Slot: Some(var) or None for the constant X.
     let s3_poly = |a: Option<usize>, b: usize, last: Option<usize>| -> Vec<(Vec<u32>, u64)> {
         let m2 = p - 2;
@@ -1533,7 +1552,7 @@ pub fn relation_system_polys(
         }
         acc.into_iter().filter(|&(_, c)| c != 0).collect()
     };
-    let u = |k: usize| m * n + k; // u_1 … u_{m−2} at indices m·n + 0 …
+    let u = |k: usize| u0 + k; // u_1 … u_{m−2}
     if m == 2 {
         out.push(s3_poly(Some(xv(0, 0)), xv(1, 0), None));
     } else {
@@ -1543,7 +1562,7 @@ pub fn relation_system_polys(
             out.push(s3_poly(Some(u(k - 2)), xv(k, 0), right));
         }
     }
-    (out, n_vars)
+    out
 }
 
 /// Grevlex key: a larger key is a larger monomial.
@@ -1892,10 +1911,90 @@ pub fn algebraic_decompose(
     dmax: u32,
     budget: std::time::Duration,
 ) -> AlgebraicDecomposition {
+    let (terms, n_vars) = relation_system_polys(e, tower, m, r.0);
+    let n = tower.steps.len();
+    let xs: Vec<usize> = (0..m).map(|i| i * n).collect();
+    algebraic_decompose_system(e, &terms, n_vars, &xs, r, dmax, budget)
+}
+
+/// Membership in an arbitrary `V` written as one dense polynomial
+/// `∏_{v ∈ V} (x − v)` of degree `|V|` per summand, plus the `S_3` chain:
+/// unknowns `x_1 … x_m` then the `m − 2` helpers. Returns
+/// `(terms, n_vars, build_ops)`, `build_ops` the `F_p` multiplications spent
+/// expanding the product (`|V|(|V|+1)/2`).
+pub fn dense_relation_system_polys(
+    e: &Curve,
+    v: &[u64],
+    m: usize,
+    xr: u64,
+) -> (Vec<Vec<(Vec<u32>, u64)>>, usize, u64) {
+    assert!(m >= 2);
+    let p = e.p;
+    let n_vars = m + (m - 2);
+    // coefficients of ∏ (x − v), low degree first
+    let mut c = vec![1u64];
+    let mut ops = 0u64;
+    for &root in v {
+        let mut nc = vec![0u64; c.len() + 1];
+        for (k, &ck) in c.iter().enumerate() {
+            nc[k + 1] = addm(nc[k + 1], ck, p);
+            nc[k] = subm(nc[k], mulm(ck, root % p, p), p);
+        }
+        ops += c.len() as u64;
+        c = nc;
+    }
+    let mut out = vec![];
+    for i in 0..m {
+        out.push(
+            c.iter()
+                .enumerate()
+                .filter(|&(_, &ck)| ck != 0)
+                .map(|(k, &ck)| {
+                    let mut mono = vec![0u32; n_vars];
+                    mono[i] = k as u32;
+                    (mono, ck)
+                })
+                .collect(),
+        );
+    }
+    let xs: Vec<usize> = (0..m).collect();
+    out.extend(s3_chain_polys(e, n_vars, &xs, m, xr));
+    (out, n_vars, ops)
+}
+
+/// The algebraic oracle with membership written as one dense polynomial
+/// ([`dense_relation_system_polys`]): F4 and the same linear stage and
+/// lifting as [`algebraic_decompose`]. `field_ops` includes the
+/// polynomial's expansion.
+pub fn algebraic_decompose_dense(
+    e: &Curve,
+    v: &[u64],
+    m: usize,
+    r: (u64, u64),
+    dmax: u32,
+    budget: std::time::Duration,
+) -> AlgebraicDecomposition {
+    let (terms, n_vars, build) = dense_relation_system_polys(e, v, m, r.0);
+    let xs: Vec<usize> = (0..m).collect();
+    let mut d = algebraic_decompose_system(e, &terms, n_vars, &xs, r, dmax, budget);
+    d.field_ops += build;
+    d
+}
+
+/// Shared core: F4 on `terms`, the linear stage, lifting the abscissae at
+/// indices `xs` and keeping sign choices that sum to `r`.
+fn algebraic_decompose_system(
+    e: &Curve,
+    terms: &[Vec<(Vec<u32>, u64)>],
+    n_vars: usize,
+    xs_idx: &[usize],
+    r: (u64, u64),
+    dmax: u32,
+    budget: std::time::Duration,
+) -> AlgebraicDecomposition {
     use crate::cryptanalysis::f4_fp::{self, F4Options, Ordering};
     let p = e.p;
     assert!(p < 1 << 32, "f4_fp needs p < 2^32");
-    let (terms, n_vars) = relation_system_polys(e, tower, m, r.0);
     let input: Vec<f4_fp::Poly> = terms
         .iter()
         .map(|t| f4_fp::normalise(t, p, Ordering::Grevlex))
@@ -1903,7 +2002,6 @@ pub fn algebraic_decompose(
     let mut opts = F4Options::new(Ordering::Grevlex, dmax);
     opts.deadline = Some(std::time::Instant::now() + budget);
     let rep = f4_fp::f4(&input, n_vars, p, &opts);
-    let n = tower.steps.len();
     let mut relations: Vec<Vec<(u64, u64)>> = vec![];
     let (mut solutions, mut unlifted, mut lin_ops, mut delta) = (0, 0, 0u64, 0usize);
     let mut undetermined = rep.timed_out || rep.pairs_above_bound > 0;
@@ -1919,7 +2017,7 @@ pub fn algebraic_decompose(
                 delta = d;
                 solutions = pts.len();
                 for sol in pts {
-                    let xs: Vec<u64> = (0..m).map(|i| sol[i * n]).collect();
+                    let xs: Vec<u64> = xs_idx.iter().map(|&i| sol[i]).collect();
                     let lifted: Option<Vec<(u64, u64)>> = xs
                         .iter()
                         .map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
@@ -2258,6 +2356,51 @@ mod tests {
         for degs in [[2u64, 3, 2, 3], [3, 2, 3, 2], [3, 3, 2, 2]] {
             let t = isogeny_tower_on(f.aux, f.order, f.q, &degs, 1, f.curves_tried).unwrap();
             t.verify().unwrap();
+        }
+    }
+
+    #[test]
+    fn dense_oracle_finds_exactly_the_enumerated_relations() {
+        let p = 10_009;
+        let e = Curve { p, a: 3, b: 7 };
+        let mut rng = Rng(21);
+        let coset = kummer_tower(p, &[2, 2, 2], None, 5).unwrap().v;
+        let random: Vec<u64> = (0..8).map(|_| rng.below(p)).collect();
+        for v in [coset, random] {
+            let base: Vec<(u64, u64)> = v
+                .iter()
+                .filter_map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
+                .collect();
+            assert!(base.len() >= 2);
+            for m in [2usize, 3] {
+                for trial in 0..3 {
+                    let r = if trial < 2 {
+                        let pts: Vec<_> = (0..m)
+                            .map(|_| base[rng.below(base.len() as u64) as usize])
+                            .collect();
+                        match pts.iter().fold(None, |a, &q| e.add(a, Some(q))) {
+                            Some(r) => r,
+                            None => continue,
+                        }
+                    } else {
+                        e.random_point(&mut rng).unwrap()
+                    };
+                    let d = algebraic_decompose_dense(
+                        &e,
+                        &v,
+                        m,
+                        r,
+                        64,
+                        std::time::Duration::from_secs(60),
+                    );
+                    assert!(!d.undetermined, "m {m}");
+                    let (en, _) = enumerate_decompositions(&e, &v, m, r);
+                    assert_eq!(d.relations, en, "m {m} trial {trial}");
+                    if trial < 2 {
+                        assert!(!en.is_empty());
+                    }
+                }
+            }
         }
     }
 
