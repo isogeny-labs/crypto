@@ -41,3 +41,5 @@ The first report draft spilled109characters onto a second page. Its original PDF
 Visual review also caught a missing “nonzero regular function” qualification in the second draft’s order-zero diagram. The prose and Lean theorem already retained it; the final diagram now matches that hypothesis. The second draft is preserved in the same lossless archive. No formal source or gate changed. [pcc:unverified]
 
 Exact local **PCC-20261115-1a1570** replay PASS at 2026-11-15T11:01:06Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `44ba944398b9480b48d8eec905bc7976c0c37f7b` and local receipt `9ca1f86bd5c6039be5d4aa3b46da64af3d2a38a1` share tree `b720a248f30eb6aa507cb76d52a5bb5c0981cfea`. Anonymous fetch completed; fresh PR head/body/open/ready check matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
