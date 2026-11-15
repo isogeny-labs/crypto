@@ -131,7 +131,7 @@ names below can be launched (decision D2), each at most once, in this order: cel
    - On RunPod `nproc` reads the pod's affinity (16), while `MemTotal` reads the host's memory (263,400,384 kB on the
      smoke pod). The API's `memoryInGb` is RunPod's figure for the pod, not a measurement. The memory limit a run had
      is recorded from the cgroup copy (`memory.max`, or the v1 limit). The memory peak used by the memory rule of
-     section 4.2 is the cgroup's (`memory.peak`, or v1 `memory.max_usage_in_bytes`), else the pilot's own field.
+     section 4.2 is the pilot's own `VmHWM` field, else the cgroup's (`memory.peak`, or v1 `memory.max_usage_in_bytes`).
 
 ## 3. Route files
 
@@ -208,7 +208,7 @@ Precedence, first match wins:
 |:--|:--|:--|
 | P1 | no receipt shows a runner start | NOT_AN_ATTEMPT |
 | P2a | completion secured, runner ended after the run deadline | LIMIT |
-| P2m1 | completion secured, a 56Gi attempt with memory peak > 56 GiB (counted as the `-m112` attempt), and peak > 112 GiB or exit 137 with `oom_kill` > 0 | OOM (at `-m112`) |
+| P2m1 | completion secured, a 56Gi attempt with memory peak (pilot `VmHWM` first, else the cgroup; section 4.2) > 56 GiB (counted as the `-m112` attempt), and peak > 112 GiB or exit 137 with `oom_kill` > 0 | OOM (at `-m112`) |
 | P2m2 | as P2m1's first part, exit 137 without oom evidence | LOST (the `-m112` attempt) |
 | P2m3 | as P2m1's first part, admission rules 1-7 hold | ADMITTED (the cell's `-m112` row) |
 | P2m4 | as P2m1's first part, otherwise | NOT_ADMITTED |
@@ -253,11 +253,16 @@ What this settles, case by case (each is an offline test, `tests/README.md`):
   evidence, never by the exit code alone: `oom_kill` > 0 is OOM; `oom_kill` 0, or no cgroup file, is LOST.
 - **Memory rule (main session decision of 2026-11-15, fixed before any data).** Every run here has a 128 GB pod, so a
   56Gi run could finish here with more memory than its registered request; on EKS it would have been `OOMKilled`.
-  - The run's memory peak is the cgroup's: v2 `memory.peak`, else v1 `memory.max_usage_in_bytes` (bytes). If neither
-    file exists, it is the pilot's own field: the largest `memory R MB (peak P MB)` value in `runs/<cell>.log`, which
-    is the process's `VmHWM` in MiB (`examples/pkm_tower_pilot.rs`, `memory_mb`, at `f13a690df0`). That is the source
-    of the 20,618 MB peak of the t = 13 draw 1 cap 6 run (`RESULTS_T13_BRACKET.md` §2b; the largest such value in that
-    log is 20,618). The pilot samples it when each F4 step ends.
+  - The run's memory peak is, first, the pilot's own field: the largest `memory R MB (peak P MB)` value in
+    `runs/<cell>.log`, which is the process's `VmHWM` in MiB (`examples/pkm_tower_pilot.rs`, `memory_mb`, at
+    `f13a690df0`), converted to bytes as MiB × 1,048,576. That is the source of the 20,618 MB peak of the t = 13 draw 1
+    cap 6 run (`RESULTS_T13_BRACKET.md` §2b; the largest such value in that log is 20,618). Only when the log has no
+    such line is the cgroup figure used as a fallback: v2 `memory.peak`, else v1 `memory.max_usage_in_bytes` (bytes).
+  - Why the pilot first: the cgroup figure includes reclaimable file cache and the runner process, whereas an EKS
+    `OOMKilled` depends on memory that cannot be reclaimed. The process high-water mark is the closer analogue, and the
+    cgroup figure could censor a decisive t = 14 run for page cache alone.
+  - An exit 137 with cgroup `oom_kill` > 0 is OOM whatever either peak says (P2b, or P2m1 when the pilot peak is above
+    56 GiB).
   - A 56Gi attempt whose peak exceeds 56 GiB (60,129,542,144 bytes) counts as `OOMKilled` under Amendment 14, and the
     run itself is classified as the cell's `-m112` attempt (`outcome.json` `memory.as_m112` true). It is ADMITTED, as
     the cell's `-m112` row, when the peak is at most 112 GiB (120,259,084,288 bytes) and every other rule holds; it is
@@ -265,12 +270,15 @@ What this settles, case by case (each is an offline test, `tests/README.md`):
     It takes the `-m112` slot and Amendment 14's relaunch accounting: no `-m112` run follows it; if it is LOST or
     ABORTED, `-m112-r1` follows when the cell's relaunch is unused. It keeps its own stage (`--max-dense 12800000000`);
     if its row has `oversize true`, it is censored as an `-m112` run stopped on its limit.
-  - An `-m112` attempt whose peak exceeds 112 GiB is OOM (P2p), by the same reading at the larger size.
-  - If no peak is observable (no cgroup peak file and no pilot field), the run is NOT_ADMITTED (P2u) and goes to the
+  - An `-m112` attempt whose peak exceeds 112 GiB is OOM (P2p), by the same reading at the larger size and with the
+    same source priority. This step is the main session's extension of the memory rule (section 9, point 4).
+  - If no peak is observable (no pilot field and no cgroup peak file), the run is NOT_ADMITTED (P2u) and goes to the
     owner.
-  - The cgroup peak counts the whole container (the runner, the file cache of written files) and the pilot field only
-    the pilot process up to its last step line, so the two sources can differ; the source used is recorded in
-    `outcome.json` (`memory.source`).
+  - Disclosure: the pilot's `VmHWM` covers only the pilot process (not `pfd_grid_zeros`, the runner or the shell),
+    and the pilot prints it only when an F4 step ends, so a final rise after its last printed line is missed. The
+    cgroup figure covers the whole container, file cache included. Both are recorded in `outcome.json`'s `memory`
+    object (`pilot_peak_bytes`, `cgroup_peak_bytes`, `cgroup_peak_source`), with the one used in `source_used` and
+    `peak_bytes_used`.
 - **LOST** is the analogue of a Spot loss: nothing from the run is admitted or analysed, even if a partial tree was
   fetched. Each loss is recorded with its reason in `RUNPOD_LOSSES.md`, as in `SPOT_LOSSES.md`.
 - **ABORTED** counts as an attempt and is charged exactly like LOST for relaunch accounting, so an abort cannot buy a
@@ -367,8 +375,10 @@ checkpoint before launch, the director's launch and verify cards, and their rece
 2. NOT_ADMITTED is a class added for completed runs that fail an admission rule (section 4.1); accepted by the main
    session on 2026-11-15.
 3. The ceiling relies on the session or the scheduled `reap.sh` (section 2.6).
-4. The memory rule (section 4.2) was decided by the main session on 2026-11-15. Applying the 112 GiB limit to an
-   `-m112` run (P2p) is this revision's reading of that decision, for the reviewer to check.
+4. The memory rule (section 4.2) was decided by the main session on 2026-11-15, with the pilot's `VmHWM` as the
+   primary peak source and the cgroup figure as the fallback. P2p (the 112 GiB step for `-m112` attempts) is the main
+   session's extension of the owner-facing memory rule, which names only the 56Gi attempts; it is kept, and it is for
+   the owner to confirm with the rest of that rule.
 5. Checks that need a pod (one more development smoke, `pkm-x-dev-*`, t ≤ 10):
    - the new start command (`bash -c`, cgroup copy loop, then the runner) boots and the runner answers;
    - which cgroup files a RunPod CPU pod has, and what `memory.max` reads;
@@ -386,7 +396,7 @@ Recorded again at the freeze, after the development smoke (any edit made after i
 |:--|:--|
 | `common.sh` | `d36c08529db4dd0cdc539e3fa374ed789088a44507067bef29350495425a80d6` |
 | `run.sh` | `294c017735c5d6815c582ffe2e2f66f261dfb039c2192d00b57e840a1d0983ed` |
-| `fetch.sh` | `9bcbb41a24e851b3b93fe03ba37e37f78fe9c907dff7c56bd761d8a3883e50d1` |
+| `fetch.sh` | `6a46fc93c19cfcd18b1fa1cd4f451c68d5ce78b349197efeaffb2021de3700ea` |
 | `reap.sh` | `165d6ccc5ed67bece87c8cd7a5665fe609267f042144fb0c977d1ea4485eb202` |
 | `make_requests_m112.sh` | `1459e3d3ee821133e936cc40671946b94b6304413325d4d247e29c234e16d58b` |
 | `rp_pinned.sh` | `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d` (= main's `runpod/rp.sh` at `d2a16c723d`) |

@@ -98,17 +98,20 @@ Run: `bash tests/run_tests.sh` from `runpod_capped/` (about one minute).
 | D21 | PASS | completed in time but the transfer check failed past the deadline | LOST P6 | LOST P6 |
 | D22 | PASS | a file of the kept tree changed after collection (rule 6) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
 | D23 | PASS | create response not in the reserved tier (rule 7) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
-| D25 | PASS | memory: cgroup peak 30 GiB (below 56 GiB) | ADMITTED P2d as_m112=false source=cgroup_v2_memory.peak | ADMITTED P2d as_m112=false source=cgroup_v2_memory.peak |
-| D26 | PASS | memory: cgroup peak 70 GiB (between 56 and 112 GiB): the cell's -m112 row | ADMITTED P2m3 as_m112=true source=cgroup_v2_memory.peak | ADMITTED P2m3 as_m112=true source=cgroup_v2_memory.peak |
-| D27 | PASS | memory: cgroup peak 125 GiB (above 112 GiB): OOM at -m112 | OOM P2m1 as_m112=true source=cgroup_v2_memory.peak | OOM P2m1 as_m112=true source=cgroup_v2_memory.peak |
-| D28 | PASS | memory: no cgroup peak, pilot VmHWM field present (64 MiB) | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB |
-| D28b | PASS | memory: no cgroup peak, pilot VmHWM field 70,000 MiB (> 56 GiB) | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB |
-| D29 | PASS | memory: neither a cgroup peak nor a pilot field | NOT_ADMITTED P2u as_m112=false source=none | NOT_ADMITTED P2u as_m112=false source=none |
-| D30 | PASS | memory: cgroup v1 max_usage_in_bytes 60 GiB | ADMITTED P2m3 as_m112=true source=cgroup_v1_memory.max_usage_in_bytes | ADMITTED P2m3 as_m112=true source=cgroup_v1_memory.max_usage_in_bytes |
-| D31 | PASS | memory: an -m112 attempt with peak 113 GiB | OOM P2p as_m112=false source=cgroup_v2_memory.peak | OOM P2p as_m112=false source=cgroup_v2_memory.peak |
-| D32 | PASS | memory: an -m112 attempt with peak 100 GiB | ADMITTED P2d as_m112=false source=cgroup_v2_memory.peak | ADMITTED P2d as_m112=false source=cgroup_v2_memory.peak |
-| D33 | PASS | memory: peak exactly 56 GiB (not above) | ADMITTED P2d as_m112=false source=cgroup_v2_memory.peak | ADMITTED P2d as_m112=false source=cgroup_v2_memory.peak |
-| D34 | PASS | memory: peak 70 GiB and exit 137 without oom: a lost -m112 attempt | LOST P2m2 as_m112=true source=cgroup_v2_memory.peak | LOST P2m2 as_m112=true source=cgroup_v2_memory.peak |
+| D25 | PASS | memory: pilot 30,720 MiB (30 GiB), no cgroup file -> pilot, below 56 GiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB |
+| D26 | PASS | memory: pilot 71,680 MiB (70 GiB), no cgroup file -> pilot, between 56 and 112 GiB: the cell's -m112 row | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB |
+| D27 | PASS | memory: pilot 128,000 MiB (125 GiB), no cgroup file -> pilot, above 112 GiB: OOM at -m112 | OOM P2m1 as_m112=true source=pilot_log_VmHWM_MiB | OOM P2m1 as_m112=true source=pilot_log_VmHWM_MiB |
+| D28 | PASS | memory: pilot 64 MiB and cgroup 70 GiB -> pilot (primary); cgroup ignored | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB |
+| D28b | PASS | memory: no pilot line, cgroup v2 70 GiB -> cgroup fallback | ADMITTED P2m3 as_m112=true source=cgroup_v2_memory.peak | ADMITTED P2m3 as_m112=true source=cgroup_v2_memory.peak |
+| D29 | PASS | memory: no pilot line, no cgroup file -> none | NOT_ADMITTED P2u as_m112=false source=none | NOT_ADMITTED P2u as_m112=false source=none |
+| D30 | PASS | memory: no pilot line, cgroup v1 max_usage 60 GiB -> v1 fallback | ADMITTED P2m3 as_m112=true source=cgroup_v1_memory.max_usage_in_bytes | ADMITTED P2m3 as_m112=true source=cgroup_v1_memory.max_usage_in_bytes |
+| D31 | PASS | memory: -m112 attempt, pilot 115,712 MiB (113 GiB), no cgroup file -> pilot | OOM P2p as_m112=false source=pilot_log_VmHWM_MiB | OOM P2p as_m112=false source=pilot_log_VmHWM_MiB |
+| D32 | PASS | memory: -m112 attempt, pilot 102,400 MiB (100 GiB), no cgroup file -> pilot | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB |
+| D33 | PASS | memory: pilot exactly 57,344 MiB (56 GiB, not above), no cgroup file -> pilot | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB |
+| D34 | PASS | memory: pilot 70 GiB, exit 137, oom_kill 0 -> pilot: a lost -m112 attempt | LOST P2m2 as_m112=true source=pilot_log_VmHWM_MiB | LOST P2m2 as_m112=true source=pilot_log_VmHWM_MiB |
+| D35 | PASS | memory: cgroup 120 GiB (> 112 GiB) but pilot 92,160 MiB (90 GiB) -> pilot: not OOM, the cell's -m112 row | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB |
+| D35b | PASS | memory: -m112 attempt, cgroup 120 GiB but pilot 90 GiB -> pilot: P2p does not fire | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB |
+| D36 | PASS | memory: pilot 30 GiB but exit 137 with oom_kill 1 -> OOM whatever the peak | OOM P2b as_m112=false source=pilot_log_VmHWM_MiB | OOM P2b as_m112=false source=pilot_log_VmHWM_MiB |
 | D24 | PASS | pod no longer listed (deleted outside the route) | LOST P3 | LOST P3 |
 | E01 | PASS | nothing run yet | pkm-x-t14-k0-c6 | pkm-x-t14-k0-c6 |
 | E02 | PASS | base LOST | pkm-x-t14-k0-c6-r1 | pkm-x-t14-k0-c6-r1 |
@@ -144,4 +147,4 @@ Run: `bash tests/run_tests.sh` from `runpod_capped/` (about one minute).
 | G-curl_stub.sh | PASS | syntax of tests/curl_stub.sh | bash -n ok | rc 0 |
 | G-pin | PASS | pinned client copy unchanged | rp_pinned.sh sha256 b4b60199... | b4b60199 |
 
-Summary: 127 passed, 0 failed (run 2026-11-15T00:35:28Z).
+Summary: 130 passed, 0 failed (run 2026-11-15T00:38:41Z).
