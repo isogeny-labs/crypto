@@ -161,6 +161,18 @@ unpinned and natural arms, useful rank and full cold runtime selection remain
 open. No performance graph changed because this step produced no K600
 measurement.
 
+The [unpinned control amendment](UNPINNED_CONTROL_AMENDMENT.md) adds a
+`solve-unpinned` command gated on the exact pinned export, solver and native
+replay receipts. Its solver receipt binds the pinned replay-stage SHA-256,
+and the command rechecks the control and unpinned XCNF after the process.
+The release example remains **11/11** and its production build exits 0;
+[test](unpinned-control-test.log.gz) and
+[build](unpinned-control-build.log.gz) logs preserve results. This is an
+implemented admission gate, not a real unpinned solve or model replay.
+Natural export/query, the qualified image and cumulative budget controller,
+rank/logs and full cold-runtime selection remain open. No performance graph
+changed because no experiment was run in this code step.
+
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
 

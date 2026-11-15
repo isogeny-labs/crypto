@@ -908,15 +908,19 @@ fn solve(
     export_root: &Path,
     output: &Path,
     outer_seconds: u64,
+    pinned_controls: Option<(&Path, &Path, &Path)>,
 ) -> Result<Value> {
     let stage_start = Instant::now();
-    if mode != "positive-pinned"
-        || !output.is_absolute()
+    if !matches!(
+        (mode, pinned_controls.is_some()),
+        ("positive-pinned", false) | ("positive-unpinned", true)
+    ) || !output.is_absolute()
         || output.exists()
         || !(6..=3_600).contains(&outer_seconds)
     {
         return Err(
-            "constructed mode, new absolute output, and 6..3600 outer seconds required".into(),
+            "constructed mode/control, new absolute output, and 6..3600 outer seconds required"
+                .into(),
         );
     }
     let repo = fs::canonicalize(env!("CARGO_MANIFEST_DIR"))?;
@@ -928,9 +932,21 @@ fn solve(
     let panel = PathBuf::from(lock["panel_root"].as_str().ok_or("panel root missing")?);
     let stage_root = panel.parent().ok_or("stage root missing")?;
     let export_root = fs::canonicalize(export_root)?;
+    let pinned_controls = pinned_controls
+        .map(|(export, solver, replay)| -> Result<_> {
+            Ok((
+                fs::canonicalize(export)?,
+                fs::canonicalize(solver)?,
+                fs::canonicalize(replay)?,
+            ))
+        })
+        .transpose()?;
     if parent.starts_with(&repo)
         || parent.starts_with(stage_root)
         || parent.starts_with(&export_root)
+        || pinned_controls.as_ref().is_some_and(|(a, b, c)| {
+            parent.starts_with(a) || parent.starts_with(b) || parent.starts_with(c)
+        })
     {
         return Err("solver output overlaps frozen source or input".into());
     }
@@ -968,6 +984,10 @@ fn solve(
     let preflight_hashes = preflight_gate(&lock, preflight_lock_path, preflight_root)?;
     let (xcnf, export_hashes) =
         audited_constructed_export(&lock, &lock_path, &preflight_hashes, mode, &export_root)?;
+    let pinned_hashes = pinned_controls
+        .as_ref()
+        .map(|(a, b, c)| audited_pinned_replay(&lock, &lock_path, &preflight_hashes, a, b, c))
+        .transpose()?;
     let image = lock["image_id"].as_str().ok_or("image ID missing")?;
     let image_identity = format!("{image} linux/arm64 {commit}");
     let image_format = "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}";
@@ -1024,6 +1044,13 @@ fn solve(
             || audited_constructed_export(&lock, &lock_path, &preflight_hashes, mode, &export_root)?
                 .1
                 != export_hashes
+            || pinned_controls
+                .as_ref()
+                .map(|(a, b, c)| {
+                    audited_pinned_replay(&lock, &lock_path, &preflight_hashes, a, b, c)
+                })
+                .transpose()?
+                != pinned_hashes
             || docker_short(&["image", "inspect", "--format", image_format, image])?
                 != image_identity
         {
@@ -1038,6 +1065,7 @@ fn solve(
             "source_commit":commit,"lock_sha256":lock_sha,"image_id":image,
             "preflight_outer_sha256":preflight_hashes[1],
             "export_stage_sha256":export_hashes[0],"xcnf_sha256":export_hashes[2],
+            "pinned_replay_stage_sha256":pinned_hashes.as_ref().map(|hashes|&hashes[2]),
             "solver_binary_sha256":lock["solver_sha256"],"stdout_sha256":sha256_file(&stdout_path)?,
             "stderr_sha256":sha256_file(&stderr_path)?,"exit_code":exit,
             "outer_wall_limit_seconds":outer_seconds,"solver_internal_maxtime_seconds":solver_seconds,
@@ -1421,6 +1449,81 @@ fn replay_pinned(
     run
 }
 
+fn audited_pinned_replay(
+    lock: &Value,
+    lock_path: &Path,
+    preflight_hashes: &[String],
+    pinned_export_root: &Path,
+    pinned_solver_root: &Path,
+    pinned_replay_root: &Path,
+) -> Result<Vec<String>> {
+    let export_root = fs::canonicalize(pinned_export_root)?;
+    let solver_root = fs::canonicalize(pinned_solver_root)?;
+    let replay_root = fs::canonicalize(pinned_replay_root)?;
+    let (_, export_hashes) = audited_constructed_export(
+        lock,
+        lock_path,
+        preflight_hashes,
+        "positive-pinned",
+        &export_root,
+    )?;
+    let (_, _, solver_hashes) = audited_pinned_solver(
+        lock,
+        lock_path,
+        preflight_hashes,
+        &export_hashes,
+        &solver_root,
+    )?;
+    if replay_root.join("failure.json").exists() {
+        return Err("pinned replay has a terminal failure receipt".into());
+    }
+    let stage_path = replay_root.join("replay-stage.json");
+    let result_path = replay_root.join("replay.json");
+    let stage: Value = serde_json::from_slice(&fs::read(&stage_path)?)?;
+    let result: Value = serde_json::from_slice(&fs::read(&result_path)?)?;
+    let stage_hash = sha256_file(&stage_path)?;
+    let result_hash = sha256_file(&result_path)?;
+    if stage["schema"] != "n83.k600-m6-native-pinned-replay-stage/v1"
+        || stage["status"] != "PASS_PINNED_MODEL_REPLAY"
+        || stage["source_commit"] != lock["source_commit"]
+        || stage["lock_sha256"] != sha256_file(lock_path)?
+        || stage["preflight_outer_sha256"] != preflight_hashes[1]
+        || stage["export_stage_sha256"] != export_hashes[0]
+        || stage["solver_receipt_sha256"] != solver_hashes[0]
+        || stage["replay_json_sha256"] != result_hash
+        || stage["xcnf_sha256"] != export_hashes[2]
+        || stage["replay_binary_sha256"] != lock["exporter_replayer_sha256"]
+        || stage["checked_relation_row_decimal"] != result["relation_row_decimal"]
+        || !stage["total_index_calculus_runtime_ms"].is_null()
+        || !stage["selected_best_total_runtime"].is_null()
+        || result["schema"] != "n83.k600-m6-model-replay/v2"
+        || result["status"] != "PASS_ORIGINAL_XCNF_GROUP_AND_ROW_REPLAY"
+        || result["mode"] != "positive-pinned"
+        || result["source_commit"] != lock["source_commit"]
+        || result["export_binary_sha256"] != lock["exporter_replayer_sha256"]
+        || result["replay_binary_sha256"] != lock["exporter_replayer_sha256"]
+        || result["solver_stdout_sha256"] != solver_hashes[1]
+        || result["xcnf_sha256"] != export_hashes[2]
+        || result["object_sha256"] != OBJECT_SHA
+        || result["relation_row_decimal"]
+            .as_array()
+            .is_none_or(|v| v.len() != 600)
+        || result["chosen_indices"]
+            .as_array()
+            .is_none_or(|v| v.len() != 6)
+        || result["subgroup_order"] != "2417851639230796216685689"
+        || !result["selected_best_total_runtime"].is_null()
+    {
+        return Err("pinned replay result does not bind the frozen positive control".into());
+    }
+    Ok(vec![
+        export_hashes[0].clone(),
+        solver_hashes[0].clone(),
+        stage_hash,
+        result_hash,
+    ])
+}
+
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     let (output, result, stage_created_output) = match args.get(1).map(String::as_str) {
@@ -1451,7 +1554,17 @@ fn main() -> Result<()> {
             let result = (|| -> Result<Value> {
                 let seconds: u64 = args[8].parse()?;
                 solve(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
-                    &args[5],Path::new(&args[6]),&output,seconds)
+                    &args[5],Path::new(&args[6]),&output,seconds,None)
+            })();
+            (output,result,false)
+        }
+        Some("solve-unpinned") if args.len() == 11 => {
+            let output = PathBuf::from(&args[9]);
+            let result = (|| -> Result<Value> {
+                let seconds: u64 = args[10].parse()?;
+                solve(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
+                    "positive-unpinned",Path::new(&args[5]),&output,seconds,
+                    Some((Path::new(&args[6]),Path::new(&args[7]),Path::new(&args[8]))))
             })();
             (output,result,false)
         }
@@ -1464,7 +1577,7 @@ fn main() -> Result<()> {
             })();
             (output,result,false)
         }
-        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned|positive-unpinned NEW_OUTPUT_DIR OUTER_SECONDS | solve ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned EXPORT_DIR NEW_OUTPUT_DIR OUTER_SECONDS | replay-pinned ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR EXPORT_DIR SOLVER_DIR NEW_OUTPUT_DIR OUTER_SECONDS (unpinned and natural require completed earlier controls)".into()),
+        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned|positive-unpinned NEW_OUTPUT_DIR OUTER_SECONDS | solve ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR positive-pinned EXPORT_DIR NEW_OUTPUT_DIR OUTER_SECONDS | replay-pinned ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR EXPORT_DIR SOLVER_DIR NEW_OUTPUT_DIR OUTER_SECONDS | solve-unpinned ARM_LOCK_JSON PREFLIGHT_LOCK_JSON PREFLIGHT_RUN_DIR UNPINNED_EXPORT_DIR PINNED_EXPORT_DIR PINNED_SOLVER_DIR PINNED_REPLAY_DIR NEW_OUTPUT_DIR OUTER_SECONDS (natural requires completed earlier controls)".into()),
     };
     if let Err(error) = &result {
         if stage_created_output && output.is_dir() && !output.join("staging.json").exists() {
@@ -1733,7 +1846,24 @@ mod tests {
             "positive-unpinned",
             Path::new("/missing-export"),
             &output,
-            10
+            10,
+            None,
+        )
+        .is_err());
+        assert!(!output.exists());
+        assert!(solve(
+            Path::new("/missing-arm-lock"),
+            Path::new("/missing-preflight-lock"),
+            Path::new("/missing-preflight-run"),
+            "positive-unpinned",
+            Path::new("/missing-export"),
+            &output,
+            10,
+            Some((
+                Path::new("/missing-pinned-export"),
+                Path::new("/missing-pinned-solver"),
+                Path::new("/missing-pinned-replay")
+            )),
         )
         .is_err());
         assert!(!output.exists());
