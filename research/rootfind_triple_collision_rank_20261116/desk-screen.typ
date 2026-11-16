@@ -24,6 +24,8 @@ The triple counts are exactly $binom(B+2,3)$, not measured relation yields. The 
 
 *Before-data amendment.* `AMENDMENT-1.md` adds a paired generator control on the same unique triples. An on-demand cache stores the full two-point prefix, then adds the third point. The direct arm computes both additions. The source test requires exact full-point parity before collision processing and records cache hits, inserts and additions. No runtime or attack-cost ordering is inferred from this source preparation. [pcc:unverified]
 
+`AMENDMENT-2.md` adds replay of every serialized row using the general binary-curve group law and records the first prefix reaching rank $C-1$, if any. Its prefix counters are a deterministic work projection, not a timed early-stop implementation. [pcc:unverified]
+
 == Execution state
 
 The science run requires a complete branch-specific S3 resume checkpoint and a passing `scripts/checkpoint.sh gate`. Conductor T-6814 currently reserves `.resume/RESUME.md`; the existing `problems/rootfinding-complete-cost-calibration.md` tracks this obstruction. The source is a prepared test only. A rank screen does not establish a complete-call improvement against F4/F5/F6 or matched rho; those comparisons require the separate frozen panel and independent replay. [pcc:unverified]

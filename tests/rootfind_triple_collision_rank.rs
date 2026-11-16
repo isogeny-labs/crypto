@@ -1,12 +1,15 @@
 //! Source-bound triple-sum collision rank screen; see the frozen protocol at
 //! research/rootfind_triple_collision_rank_20261116/PROTOCOL.md.
+#![recursion_limit = "256"]
 
+use crypto_lib::binary_ecc::BinaryPoint;
 use crypto_lib::cryptanalysis::ic_boundary::{
-    koblitz_factor_base, koblitz_instance, BinaryGroup, ColumnFold, FactorBase, PairTable,
+    koblitz_factor_base, koblitz_instance, BinaryGroup, BinaryInstance, ColumnFold, FactorBase,
+    PairTable,
 };
 use crypto_lib::cryptanalysis::koblitz_fast::{FastCurve, FastPoint};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
-use serde_json::json;
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet};
 
@@ -137,6 +140,83 @@ fn triple_sum(curve: &FastCurve, fb: &FactorBase<FastPoint>, ids: [usize; 3]) ->
     )
 }
 
+fn recorded_triple(value: &Value, name: &str, points: usize) -> [usize; 3] {
+    let parts = value[name].as_array().expect("serialized triple array");
+    assert_eq!(parts.len(), 3);
+    let mut out = [0; 3];
+    for (dst, item) in out.iter_mut().zip(parts) {
+        *dst = item.as_u64().expect("serialized triple index") as usize;
+        assert!(*dst < points);
+    }
+    out
+}
+
+fn replay_general_sum(
+    inst: &BinaryInstance,
+    fb: &FactorBase<FastPoint>,
+    ids: [usize; 3],
+) -> BinaryPoint {
+    let general = inst.koblitz.as_ref().expect("Koblitz replay curve");
+    let mut sum = BinaryPoint::Infinity;
+    for idx in ids {
+        sum = general.add(&sum, &inst.fast.lower(fb.points[idx]));
+    }
+    sum
+}
+
+fn replay_rows(
+    inst: &BinaryInstance,
+    fb: &FactorBase<FastPoint>,
+    seed_basis: &Basis,
+    rows: &[Value],
+) -> usize {
+    let general = inst.koblitz.as_ref().expect("Koblitz replay curve");
+    let mut basis = seed_basis.clone();
+    for record in rows {
+        let later = recorded_triple(record, "triple", fb.points.len());
+        let a = replay_general_sum(inst, fb, later);
+        let mut rebuilt = vec![0u64; fb.columns];
+        for idx in later {
+            let col = fb.col_of[idx];
+            rebuilt[col] = (rebuilt[col] + fb.coef_of[idx]) % inst.r;
+        }
+        match record["kind"].as_str().expect("serialized row kind") {
+            "identity" => assert_eq!(a, BinaryPoint::Infinity),
+            "collision" => {
+                let first = recorded_triple(record, "first", fb.points.len());
+                let b = replay_general_sum(inst, fb, first);
+                match record["sign"].as_str().expect("serialized collision sign") {
+                    "equal" => {
+                        assert_eq!(a, b);
+                        for idx in first {
+                            let col = fb.col_of[idx];
+                            rebuilt[col] = sub(rebuilt[col], fb.coef_of[idx], inst.r);
+                        }
+                    }
+                    "opposite" => {
+                        assert_eq!(general.add(&a, &b), BinaryPoint::Infinity);
+                        for idx in first {
+                            let col = fb.col_of[idx];
+                            rebuilt[col] = (rebuilt[col] + fb.coef_of[idx]) % inst.r;
+                        }
+                    }
+                    other => panic!("unexpected collision sign: {other}"),
+                }
+            }
+            other => panic!("unexpected row kind: {other}"),
+        }
+        let recorded: Vec<u64> = record["row"]
+            .as_array()
+            .expect("serialized coefficient row")
+            .iter()
+            .map(|v| v.as_u64().expect("serialized coefficient"))
+            .collect();
+        assert_eq!(rebuilt, recorded);
+        assert_eq!(basis.add(rebuilt), record["independent"].as_bool().unwrap());
+    }
+    basis.rank
+}
+
 #[test]
 fn fixed_koblitz_triple_collision_rank() {
     for (n, d, points, keys, pair_collisions, seed_rank, curve_id, base_hash) in [
@@ -198,6 +278,7 @@ fn fixed_koblitz_triple_collision_rank() {
         pair_seed(&inst.fast, &fb, &collisions, &mut basis);
         assert_eq!(basis.rank, seed_rank);
         let mut direct_basis = basis.clone();
+        let replay_seed_basis = basis.clone();
 
         let capacity = points * (points + 1) * (points + 2) / 6;
         let limit = capacity.min(if n == 13 { capacity } else { 32_768 });
@@ -214,6 +295,7 @@ fn fixed_koblitz_triple_collision_rank() {
         let (mut parity_checks, mut verify_adds, mut tamper_adds) = (0u64, 0u64, 0u64);
         let (mut zero, mut dependent, mut independent) = (0u64, 0u64, 0u64);
         let mut rank_at = Vec::<(usize, usize)>::new();
+        let mut first_rank_ceiling: Option<Value> = None;
         let mut rows = Vec::new();
         let mut tamper_witness: Option<([usize; 3], [usize; 3])> = None;
         while seen.len() < limit {
@@ -254,6 +336,19 @@ fn fixed_koblitz_triple_collision_rank() {
                 } else if raised_rank {
                     independent += 1;
                     rank_at.push((seen.len(), basis.rank));
+                    if basis.rank == fb.columns - 1 && first_rank_ceiling.is_none() {
+                        first_rank_ceiling = Some(json!({
+                            "unique_triples":seen.len(), "rank":basis.rank,
+                            "direct_generator_additions":direct_adds,
+                            "cached_prefix_additions":prefix_adds,
+                            "cached_tail_additions":tail_adds,
+                            "cached_prefix_hits":prefix_hits,
+                            "prefix_cache_entries":prefixes.len(),
+                            "collision_verification_additions":verify_adds,
+                            "sum_key_lookups":seen.len() as u64-identity_sums,
+                            "rows":rows.len()+1,
+                        }));
+                    }
                 } else {
                     dependent += 1;
                 }
@@ -304,6 +399,19 @@ fn fixed_koblitz_triple_collision_rank() {
                 } else if raised_rank {
                     independent += 1;
                     rank_at.push((seen.len(), basis.rank));
+                    if basis.rank == fb.columns - 1 && first_rank_ceiling.is_none() {
+                        first_rank_ceiling = Some(json!({
+                            "unique_triples":seen.len(), "rank":basis.rank,
+                            "direct_generator_additions":direct_adds,
+                            "cached_prefix_additions":prefix_adds,
+                            "cached_tail_additions":tail_adds,
+                            "cached_prefix_hits":prefix_hits,
+                            "prefix_cache_entries":prefixes.len(),
+                            "collision_verification_additions":verify_adds,
+                            "sum_key_lookups":seen.len() as u64-identity_sums,
+                            "rows":rows.len()+1,
+                        }));
+                    }
                 } else {
                     dependent += 1;
                 }
@@ -343,13 +451,17 @@ fn fixed_koblitz_triple_collision_rank() {
         assert_eq!(sums, direct_sums);
         assert_eq!(basis.rank, direct_basis.rank);
         assert_eq!(basis.row_ops, direct_basis.row_ops);
+        assert_eq!(rows.len() as u64, zero + dependent + independent);
+        let replayed_rows = rows.len();
+        let independently_replayed_rank = replay_rows(&inst, &fb, &replay_seed_basis, &rows);
+        assert_eq!(independently_replayed_rank, basis.rank);
         assert_eq!(prefix_adds + prefix_hits, seen.len() as u64);
         assert_eq!(tail_adds, seen.len() as u64);
         assert_eq!(direct_adds, 2 * seen.len() as u64);
         println!(
             "TRIPLE_COLLISION_JSON={}",
             json!({
-                "schema":"rootfind-triple-collision-rank/v2", "n":n, "dimension":d,
+                "schema":"rootfind-triple-collision-rank/v3", "n":n, "dimension":d,
                 "curve_id":curve_id, "base_sha256":base_hash, "subgroup_order":inst.r,
                 "base_points":points, "columns":fb.columns, "pair_seed_rank":seed_rank,
                 "triples_possible":capacity, "unique_triples":seen.len(), "draws":draws,
@@ -379,6 +491,9 @@ fn fixed_koblitz_triple_collision_rank() {
                 "final_homogeneous_rank":basis.rank,
                 "cached_row_ops":basis.row_ops, "direct_row_ops":direct_basis.row_ops,
                 "rank_at_unique_triple":rank_at, "rows":rows,
+                "first_rank_ceiling_work_projection":first_rank_ceiling,
+                "independently_replayed_rows":replayed_rows,
+                "independently_replayed_rank":independently_replayed_rank,
                 "tamper_control":rejected,
             })
         );
