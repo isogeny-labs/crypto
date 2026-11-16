@@ -200,3 +200,13 @@ Stop each stage at600s and the focused scientific window at3600s. No paid comput
 Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
 close benchrec record, write REPORT + figure + PDF, update PR.
 >>>>>>> origin/main
+
+---
+
+# K13 rootfinding F4/F5/F6 screen, custody repeat (2026-11-16)
+
+Goal: finish the separately frozen 48-execution L0 screen with exact source custody; the EKS L2 ten-arm panel remains frozen and budget-gated.
+Spec: research/rootfind_k13_local_f456_screen_20261116/SPEC-K13-SCREEN.json, SHA-256 5c6b17ddf935d3e9ba153e0617a8b40522e6bbd79fc346932a830ddcb91e94ee. Read PROTOCOL.md and AMENDMENT-1/2/3.md before continuing.
+State: first epoch ECBS1h124a5b50bd9a is closed invalid for executable-path Git stamp mismatch, with 48 answer checks and 32 deterministic replays preserved. Identical binary SHA-256 dba933709f466966dc13f069b9bf0e91def033284f8b1cb779b25c8c9b3448c1 now lives under this branch's target/release/ecbench. Batch oracle 14/14 and focused registry checks passed. Broad suite has 23 known failures and was interrupted; see validation/.
+Next: commit/push this amendment and resume note, create a new bench record, push/gate S3 checkpoint, verify Git from binary directory equals current HEAD with clean tracked tree, run one custody repeat into a new session directory, then replay/analyze/upload/report/close/PR. Stop if the custody binding still fails. Do not pool invalid and repeat epochs.
+Runs in flight: none at this note. The first epoch is complete and invalid; the repeat has not started.
