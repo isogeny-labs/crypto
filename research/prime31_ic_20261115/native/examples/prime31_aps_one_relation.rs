@@ -2243,7 +2243,7 @@ mod factorized_coordinate_tests {
                 ];
                 got.sort_unstable();
                 let f=s3_coeff_mode::<true>(x,z);
-                assert_eq!(f.2,denom);
+                assert_eq!(f.0,denom);
                 assert_eq!(s3_eval_mode::<true>(f,got[0]),0);
                 assert_eq!(s3_eval_mode::<true>(f,got[1]),0);
                 let disc=subp(mulp_mersenne(f.1,f.1),
