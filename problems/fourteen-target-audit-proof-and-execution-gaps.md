@@ -3373,3 +3373,50 @@ header check, no independent parser/compiler/physical-host assurance. Standard
 foundations/defaultlimits/no holes/customaxioms/nativeproofeval/newglobalflags/
 waivers/frozenedits/cryptoPython/newnativecryptoexperiment/spend/upload.
 [pcc:unverified]
+
+
+### Actual local tame symbol and omitted-condition controls
+
+The [actual elliptic tame-symbol proof](../research/elliptic_tame_symbol_audit_20261115/README.md)
+now constructs the classical signed local symbol using the actual general
+Weierstrass function field/local orders/regular-ring unit character. Actual
+balanced local orders cancel; both multiplicative laws/skew/diagonal/local
+Steinberg hold in every characteristic. Actual translation constructs order1
+parameters at every actual point of every nonsingular model over every field;
+formula/independence for every actual order1 parameter is proved. Finite
+multiplicative support is derived before finprod. Actual disjoint principal
+supports give exact proper f(div g)/g(div f), with both actual guards; product1
+iff equality of the two evaluations is proved as an equivalence, not asserted
+for arbitrary functions. Exact coefficient-field constant/diagonal degree
+formulas and geometric degreezero product1 are derived.
+
+On credited actual F5 y²=x³+1, parameter/constant2 distinguish classical and
+corrected Milnor inverse conventions; actual simple poles f+g=1 have signed1
+but unsigned−1≠1. Actual x−1 has no rational finite zero/divisor−2O, giving
+actual rational-point-only product4≠1 with constant2. Same actual scalar-
+extended curve/functions have geometric product1. Actual nonsingular F2
+simple poles have signed/unsigned1. Author-hosted Gille–Szamuely first-edition
+errata p6 already corrects p187line4 inverse error; credit authors, no novelty
+or qualified-source refutation. Full general norm projection/ramification/P1
+reduction/global reciprocity/arbitrary divisor representatives/multiplication-
+isogeny comparison/general geometric descent/canonical Tate/general MOV-FR
+and remaining fourteen-item obligations remain open.
+
+Exact local **PCC-20261115-2d7887 PASS at 2026-11-16T00:02:27Z**, signedunverified. Wholegate71/0failures/
+0trusted-native/10newmodules (9concrete/1officialimportbridge);232formal17artifact
+249pins/187pinnedcustom/169actuallyimported (159credited frozen+10new).
+All238Auxiliarypins beforeafter14states and gate;9failed/5successes retained,
+including actual default recursion failure08 symmetric simp, fixed by directed
+congruence without raised limits. Exact current roots from01/0copies0hydration/
+23packages/no lakeupdate. Final14newwarnings0/39frozen inherited per build/one
+auditor deprecation. Full2194header SHA3880274ed056ca85c3f6fc2fac3f727c73fac24b4fc5e1f4e9b9103702625efb,
+native1complete0prefix0unresolved/empty suffix after actual completed gate.
+Lossless306files107objects56608B XZ/roundtrip and actualrestoreequal/fivegate
+files. Firstvalidonepage47201B PDF/all4644textcharsread/individualfullpagevisual/
+inbounds/no reportdraft. Fresh bounded complete primary local proof/stated
+norm-reduction proof/author erratum and official/prior APIs read; earlier norm
+map dependencies not allread.5correctKBcalls/Conductor127/boundedfallback/no
+absence claim; expandedpublicationConductor127beforemaps/outsidepins.
+Same prover/host/procedural binding, no independent compiler/parser/physical-
+host assurance. Standardfoundations/defaultlimits/no holes/customaxioms/native
+proofeval/newflags/waivers/frozenedits/cryptoPython/spend/uploads. [pcc:unverified]
