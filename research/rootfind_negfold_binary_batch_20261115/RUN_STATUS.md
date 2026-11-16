@@ -51,6 +51,14 @@ the existing kernel. The source-level arithmetic count, correctness
 checks and unchanged wall decision are recorded there. A new pushed-source
 receipt including Amendment 4 is required before execution.
 
+**Fifth before-data amendment:** [`AMENDMENT-5.md`](AMENDMENT-5.md)
+records the post-merge source revision and its cached point-lift integration.
+It leaves the six-arm spec and Amendment 3 wall decision unchanged. The
+merged release library, point-lift order and candidate first-witness tests
+passed; a new pushed-source `publication-amendment-5.json` receipt must bind
+this exact source before any scientific execution. Earlier receipts remain
+valid only for their listed revisions.
+
 ## Admission obstruction
 
 The read-only [AWS monthly budget response](budget-monthly-readback.json)
