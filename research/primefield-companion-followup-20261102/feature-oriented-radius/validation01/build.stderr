@@ -1,0 +1,407 @@
+warning: due to multiple output types requested, the explicitly specified output file name will be adapted for each output type
+
+error[E0428]: the name `OrientedBranch` is defined multiple times
+ --> oriented-image.rs:1:1
+  |
+1 | struct OrientedBranch{epsilon:u64,ring:QuadRing,canonical:CanonicalFiber,anchor:Option<Quad>}
+  | ^^^^^^^^^^^^^^^^^^^^^ `OrientedBranch` redefined here
+  |
+ ::: persistent.rs:9:1
+  |
+9 | struct OrientedBranch{u:u64,ring:QuadRing,constraints:Vec<Quad>}
+  | --------------------- previous definition of the type `OrientedBranch` here
+  |
+  = note: `OrientedBranch` must be defined only once in the type namespace of this module
+
+error[E0592]: duplicate definitions with name `keep`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `keep`
+   |
+  ::: oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ---------------------------------------------- other definition for `keep`
+
+error[E0034]: multiple applicable items in scope
+  --> persistent.rs:27:277
+   |
+27 | ...ientedBranch{u,ring,constraints:Vec::new()};branch.keep(phase)?;branches.push(branch);}
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> persistent.rs:39:143
+   |
+39 | ...(&value,a);c0.0[0][0]=(c0.0[0][0]+r-f[0])%r;branch.keep(c0)?;}
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> persistent.rs:40:279
+   |
+40 | ...e(&sq,right);let c2=branch.ring.sub(&l,&rr);branch.keep(c2)?;
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> persistent-checks.rs:4:112
+   |
+ 4 | ...r-w)%r,1]).unwrap(),constraints:Vec::new()};branch.keep(Quad([vec![0],vec![0]])).unwrap();branch.keep(Quad([vec![r-roots[0]],vec!...
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> persistent-checks.rs:4:158
+   |
+ 4 | ...anch.keep(Quad([vec![0],vec![0]])).unwrap();branch.keep(Quad([vec![r-roots[0]],vec![1]])).unwrap();assert_eq!(branch.ring.g.len()...
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> persistent-checks.rs:4:247
+   |
+ 4 | ....unwrap();assert_eq!(branch.ring.g.len(),2);branch.keep(Quad([vec![r-roots[1]],vec![1]])).unwrap();assert_eq!(branch.ring.g,vec![...
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> persistent-checks.rs:5:126
+   |
+ 5 | ...rap(),constraints:Vec::new()};for _ in 0..8{branch.keep(Quad([vec![0],vec![0]])).unwrap();}assert!(matches!(branch.keep(Quad([vec...
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> persistent-checks.rs:5:190
+   |
+ 5 | ...c![0],vec![0]])).unwrap();}assert!(matches!(branch.keep(Quad([vec![0],vec![0]])),Err(Error::Limit)));history_caps+=1;
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0609]: no field `canonical` on type `&mut OrientedBranch`
+ --> oriented-image.rs:2:73
+  |
+2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.cano...
+  |                                                                         ^^^^^^^^^ unknown field
+  |
+  = note: available fields are: `u`, `ring`, `constraints`
+
+error[E0609]: no field `canonical` on type `&mut OrientedBranch`
+ --> oriented-image.rs:2:130
+  |
+2 | ...nical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.canonical.support(&mut self.ring.p);Ok(())}}
+  |                                                         ^^^^^^^^^ unknown field
+  |
+  = note: available fields are: `u`, `ring`, `constraints`
+
+error[E0034]: multiple applicable items in scope
+  --> oriented-image.rs:15:98
+   |
+15 |     if !first{let mut c0=branch.ring.scale(&values[0],a);c0.0[0][0]=(c0.0[0][0]+r-f[0])%r;branch.keep(c0)?;}if branch.ring.g.len()==...
+   |                                                                                                  ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> oriented-image.rs:16:243
+   |
+16 | ...[0]=(equation.0[0][0]+r-mul(f[1],f[2],r))%r;branch.keep(equation)?;
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> oriented-image.rs:19:204
+   |
+19 | ...(&value,a);c0.0[0][0]=(c0.0[0][0]+r-f[0])%r;branch.keep(c0)?;}if branch.ring.g.len()==1{continue}
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0609]: no field `epsilon` on type `&mut OrientedBranch`
+  --> oriented-image.rs:20:28
+   |
+20 |     let epsilon=mul(branch.epsilon,pow(scale,h/self.m as u64,r),r);let(product,plus,minus)=branch.ring.oriented_pair_scaled(modes,sc...
+   |                            ^^^^^^^ unknown field
+   |
+   = note: available fields are: `u`, `ring`, `constraints`
+
+error[E0034]: multiple applicable items in scope
+  --> oriented-image.rs:20:361
+   |
+20 | ...[0]=(equation.0[0][0]+r-mul(f[1],f[2],r))%r;branch.keep(equation)?;(plus,minus)
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> oriented-image.rs:23:22
+   |
+23 |    if f[1]==0{branch.keep(plus.clone())?;}if branch.ring.g.len()==1{continue}
+   |                      ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> oriented-image.rs:24:22
+   |
+24 |    if f[2]==0{branch.keep(minus)?;}if branch.ring.g.len()==1{continue}
+   |                      ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0609]: no field `anchor` on type `&mut OrientedBranch`
+  --> oriented-image.rs:26:20
+   |
+26 |     let old=branch.anchor.as_ref().ok_or(Error::Arithmetic)?;
+   |                    ^^^^^^ unknown field
+   |
+   = note: available fields are: `u`, `ring`, `constraints`
+
+error[E0034]: multiple applicable items in scope
+  --> oriented-image.rs:28:151
+   |
+28 | ...;let equation=branch.ring.sub(&left,&right);branch.keep(equation)?;
+   |                                                       ^^^^ multiple `keep` found
+   |
+note: candidate #1 is defined in an impl for the type `OrientedBranch`
+  --> persistent.rs:11:2
+   |
+11 |  fn keep(&mut self,next:Quad)->Result<(),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `OrientedBranch`
+  --> oriented-image.rs:2:21
+   |
+ 2 | impl OrientedBranch{fn keep(&mut self,pair:Quad)->Result<(),Error>{self.canonical.keep(&mut self.ring.p,&pair)?;self.ring.g=self.can...
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0609]: no field `anchor` on type `&mut OrientedBranch`
+  --> oriented-image.rs:29:37
+   |
+29 |     if branch.ring.g.len()>1{branch.anchor=Some(Quad([branch.ring.rem(&old.0[0])?,branch.ring.rem(&old.0[1])?]));}
+   |                                     ^^^^^^ unknown field
+   |
+   = note: available fields are: `u`, `ring`, `constraints`
+
+error[E0609]: no field `anchor` on type `&mut OrientedBranch`
+  --> oriented-image.rs:30:30
+   |
+30 |    }else if establish{branch.anchor=Some(Quad([branch.ring.rem(&plus.0[0])?,branch.ring.rem(&plus.0[1])?]));}
+   |                              ^^^^^^ unknown field
+   |
+   = note: available fields are: `u`, `ring`, `constraints`
+
+error[E0609]: no field `canonical` on type `&mut OrientedBranch`
+  --> oriented-image.rs:36:108
+   |
+36 | ...n()==1{continue}let lift=balanced_fiber_lift(&branch.canonical,lift_cap,&mut branch.ring)?;if out.len()-1+lift.len()-1>image_cap{...
+   |                                                         ^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `u`, `ring`, `constraints`
+
+error[E0560]: struct `OrientedBranch` has no field named `epsilon`
+ --> oriented-initial.rs:7:76
+  |
+7 |   for g in domains{let ring=QuadRing::new(r,&g)?;let branch=OrientedBranch{epsilon,ring,canonical:CanonicalFiber::new(r,&g)?,anchor:N...
+  |                                                                            ^^^^^^^ `OrientedBranch` does not have this field
+  |
+  = note: available fields are: `u`, `constraints`
+
+error[E0560]: struct `OrientedBranch` has no field named `canonical`
+ --> oriented-initial.rs:7:89
+  |
+7 | ...let branch=OrientedBranch{epsilon,ring,canonical:CanonicalFiber::new(r,&g)?,anchor:None};branches.push(branch);}
+  |                                           ^^^^^^^^^ `OrientedBranch` does not have this field
+  |
+  = note: available fields are: `u`, `constraints`
+
+error[E0560]: struct `OrientedBranch` has no field named `anchor`
+ --> oriented-initial.rs:7:126
+  |
+7 | ...ing,canonical:CanonicalFiber::new(r,&g)?,anchor:None};branches.push(branch);}
+  |                                             ^^^^^^ `OrientedBranch` does not have this field
+  |
+  = note: available fields are: `u`, `constraints`
+
+error[E0609]: no field `epsilon` on type `&OrientedBranch`
+  --> oriented-checks.rs:28:119
+   |
+28 | ....n,l as usize);assert!(image.branches.iter().all(|q|q.epsilon==mul(sign,pow(2,h,r),r)));
+   |                                                          ^^^^^^^ unknown field
+   |
+   = note: available fields are: `u`, `ring`, `constraints`
+
+warning: variable does not need to be mutable
+  --> driver.rs:27:9
+   |
+27 |     let mut inv=pow(prefix[steps],r-2,r);if mul(inv,prefix[steps],r)!=1{return Err(Error::Arithmetic)}let mut ids=ds;
+   |         ----^^^
+   |         |
+   |         help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+  --> progression.rs:21:38
+   |
+21 |   let mut delta=prefix[self.d+1];let mut inv=pow(prefix[n],r-2,r);if mul(inv,prefix[n],r)!=1{return Err(Error::Arithmetic)}
+   |                                      ----^^^
+   |                                      |
+   |                                      help: remove this `mut`
+
+warning: variable does not need to be mutable
+  --> streamed.rs:19:18
+   |
+19 |   if steps>0{let mut inv=pow(prefix[steps],self.r-2,self.r);if mul(inv,prefix[steps],self.r)!=1{return Err(Error::Arithmetic)}
+   |                  ----^^^
+   |                  |
+   |                  help: remove this `mut`
+
+warning: variable does not need to be mutable
+  --> context.rs:18:18
+   |
+18 |   if steps>0{let mut inv=pow(prefix[steps],self.r-2,self.r);if mul(inv,prefix[steps],self.r)!=1{return Err(Error::Arithmetic)}
+   |                  ----^^^
+   |                  |
+   |                  help: remove this `mut`
+
+error: aborting due to 28 previous errors; 5 warnings emitted
+
+Some errors have detailed explanations: E0034, E0428, E0560, E0592, E0609.
+For more information about an error, try `rustc --explain E0034`.
