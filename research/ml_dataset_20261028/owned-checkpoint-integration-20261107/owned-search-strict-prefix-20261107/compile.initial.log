@@ -1,0 +1,26 @@
+error[E0503]: cannot use `self.reader.offset` because it was mutably borrowed
+  --> strict_prefix.rs:28:13
+   |
+23 |   let got=self.observed(n)?;
+   |           ---- `*self` is borrowed here
+...
+28 |   let start=self.reader.offset-n;self.pay(n as u64,(n as u64).checked_add(64).ok_or(Failure::Overflow)?)?;
+   |             ^^^^^^^^^^^^^^^^^^ use of borrowed `*self`
+29 |   let mut s=String::new();s.try_reserve_exact(n).map_err(|_|Failure::Allocation)?;let _=valid;s.push_str(std::str::from_utf8(&self.r...
+   |                                                                                         ----- borrow later used here
+
+error[E0499]: cannot borrow `*self` as mutable more than once at a time
+  --> strict_prefix.rs:28:34
+   |
+23 |   let got=self.observed(n)?;
+   |           ---- first mutable borrow occurs here
+...
+28 |   let start=self.reader.offset-n;self.pay(n as u64,(n as u64).checked_add(64).ok_or(Failure::Overflow)?)?;
+   |                                  ^^^^ second mutable borrow occurs here
+29 |   let mut s=String::new();s.try_reserve_exact(n).map_err(|_|Failure::Allocation)?;let _=valid;s.push_str(std::str::from_utf8(&self.r...
+   |                                                                                         ----- first borrow later used here
+
+error: aborting due to 2 previous errors
+
+Some errors have detailed explanations: E0499, E0503.
+For more information about an error, try `rustc --explain E0499`.

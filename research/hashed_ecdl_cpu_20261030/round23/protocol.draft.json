@@ -1,0 +1,682 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "rows.csv"
+    ],
+    "outputs": [
+      "summary.csv",
+      "latency.svg",
+      "analysis.log"
+    ],
+    "script": {
+      "path": "analyze.rs",
+      "sha256": "1a6956c274199a8bf2205abc20fed29b3e98a9cc5ebd8eec514d29fbee0b1c2e"
+    }
+  },
+  "arms": [
+    {
+      "description": "Pinned optimized CPU baseline batch64",
+      "id": "u",
+      "instrument": {
+        "binary_sha256": "d5d6c0e1164a805d7c2ea45ee128d8a2da1160bf5109203c01947ad176e505d6",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "commit": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "arm": "v"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Pinned optimized CPU baseline batch64"
+      },
+      "role": "baseline"
+    },
+    {
+      "description": "Suffix filter batch64",
+      "id": "v",
+      "instrument": {
+        "binary_sha256": "24c5c814de97fcc4767225e912e0660481c369182c8b43ddd36ba3a2ca33ef62",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "commit": "4939261c9fcc48bf86f17ac36fa458f52a155b2e",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "arm": "v",
+          "materialization": "candidate-materialization.json"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Suffix filter batch64"
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Suffix filter batch1",
+      "id": "w",
+      "instrument": {
+        "binary_sha256": "24c5c814de97fcc4767225e912e0660481c369182c8b43ddd36ba3a2ca33ef62",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "commit": "4939261c9fcc48bf86f17ac36fa458f52a155b2e",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "arm": "w",
+          "materialization": "candidate-materialization.json"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Suffix filter batch1"
+      },
+      "role": "reference"
+    },
+    {
+      "description": "Pinned optimized CPU baseline batch64",
+      "id": "x",
+      "instrument": {
+        "binary_sha256": "d5d6c0e1164a805d7c2ea45ee128d8a2da1160bf5109203c01947ad176e505d6",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "commit": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "arm": "v"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Pinned optimized CPU baseline batch64"
+      },
+      "role": "control_aa",
+      "same_instrument_as": "u"
+    },
+    {
+      "description": "No suffix filter batch64",
+      "id": "y",
+      "instrument": {
+        "binary_sha256": "324f67d2b0d40e26ab39b0decdb952d87adf980ac5e8ebde26bfa6ec4a333171",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "commit": "972d0d2fed4d1a40ec1a0b4bd2b504e76ec98942",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "arm": "v",
+          "materialization": "previous-materialization.json"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "No suffix filter batch64"
+      },
+      "role": "reference"
+    },
+    {
+      "description": "No suffix filter batch1",
+      "id": "z",
+      "instrument": {
+        "binary_sha256": "324f67d2b0d40e26ab39b0decdb952d87adf980ac5e8ebde26bfa6ec4a333171",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "commit": "972d0d2fed4d1a40ec1a0b4bd2b504e76ec98942",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "arm": "w",
+          "materialization": "inverse-materialization.json"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "No suffix filter batch1"
+      },
+      "role": "reference"
+    }
+  ],
+  "authors": [
+    "Codex"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "C1",
+      "text": "All six arms recover identical full certificates on all three fixed fixtures."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "C2",
+      "text": "Filter-on and filter-off source snapshots preserve exact full certificates at both batch sizes."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "C3",
+      "text": "L0 durations are diagnostics; isolated performance improvement and largest feasible scale are outside this panel."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": "C-aa",
+      "not_applicable_reason": null,
+      "present": true
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Every execution corrupts the recovered scalar after timing and requires rejection. All-target unit tests also compare exhaustive positive and negative relation answers; no random-population claim.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Each fixed public target is constructed from a known scalar before solver invocation; solver sees only P,Q. Exact recovery and independent replay must pass every execution.",
+      "present": false
+    }
+  },
+  "created": "2026-11-01",
+  "decision_rule": {
+    "comparison_ids": [
+      "C-native",
+      "C-batch",
+      "C-filter64",
+      "C-filter1"
+    ],
+    "effect_size_measure": "Exact counters and descriptive complete-cost ranges; no performance acceptance from L0 clocks.",
+    "interval": "exact counts; diagnostic full observed range, no confidence interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "exact certificate equality and structural counters; descriptive stage median/min/max",
+    "text": "All180cells must complete with full certificate equality and negative controls. L0 durations only guide optimization; they cannot complete the further10x performance goal.",
+    "threshold": "All fixed cells complete with identical certificates; expected batching and reuse counters are consistent.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "throughput",
+    "placement": {
+      "binary_source": {
+        "baseline": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf",
+        "candidate": "4939261c9fcc48bf86f17ac36fa458f52a155b2e",
+        "inverse": "972d0d2fed4d1a40ec1a0b4bd2b504e76ec98942",
+        "previous": "972d0d2fed4d1a40ec1a0b4bd2b504e76ec98942"
+      },
+      "candidate_materialization": {
+        "path": "candidate-materialization.json",
+        "sha256": "2102200266f15a44ec08adc4ef8aa6b6520eb5cc559c4ec07c6e047f431e6283",
+        "integrated": true
+      },
+      "cpu": 2,
+      "inverse_materialization": {
+        "path": "inverse-materialization.json",
+        "sha256": "176fdcd29cdd1ae802c992e403be854172bde08d0fa6b79dbc15e48d7ead52a6",
+        "integrated": true
+      },
+      "memory": "4Gi",
+      "previous_materialization": {
+        "path": "previous-materialization.json",
+        "sha256": "f1899b171fcf70136c716e09b77362ace6380c77a4ccf76e4182b5b1d617e78c",
+        "integrated": true
+      },
+      "runtime_image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "runtime_source": "cb2ec6873f30 (crypto main ancestor)",
+      "threads": 1
+    },
+    "queue": "isolab CPU Spot",
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 300
+  },
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "inadmissible": [
+    "Certified speedup from L0 clocks",
+    "Calling retained table capacity total peak memory",
+    "Ignoring preparation or discarded trials",
+    "Calling cached MITM tensor contraction or algebraic progress",
+    "Claiming largest feasible scale or rho/external advantage without matched measurements"
+  ],
+  "invalidation_rules": [
+    "Any full certificate mismatch, missing/duplicate cell, failed known scalar or negative replay, source/hash mismatch or deadline invalidates the panel."
+  ],
+  "links": {},
+  "literature": [
+    {
+      "claim": "Section14.3.3 motivates amortizing reciprocal reduction. Existing ceiling variant retains its separately proved bound and wide remainder fallback.",
+      "provenance": "retrieved",
+      "ref": "https://cacr.uwaterloo.ca/hac/about/chap14.pdf",
+      "verified_by": "Primary section read before implementation; reciprocal-candidate.md and curve-reciprocal/README.md document bounds."
+    },
+    {
+      "claim": "The supplied paper Section3.5/Lemma13 defines inverse-hash listing; its exact first difference advances encodings by modular addition. Invocation-local validation preserves full parameter checks. Verifier base reconstruction changes, but both independent certificate replays remain charged.",
+      "provenance": "retrieved",
+      "ref": "research/hashed_ecdl_cpu_20261030/hash-enumeration/README.md",
+      "verified_by": "Read implementation notes and validation records:37 standalone release tests, strict Clippy and format checks. No new novelty or performance claim."
+    },
+    {
+      "claim": "Jacobian equality follows by cross multiplying x=X/Z^2 and y=Y/Z^3, with identity handled separately.",
+      "provenance": "retrieved",
+      "ref": "https://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian.html",
+      "verified_by": "Primary coordinate definition reviewed during projective-replay implementation; independent affine-reference tests retained."
+    },
+    {
+      "claim": "Contiguous traversal trades tree nodes for linear shifting on out-of-order pivot insertion; no latency improvement follows from the data structure alone.",
+      "provenance": "retrieved",
+      "ref": "https://doc.rust-lang.org/std/vec/struct.Vec.html#method.insert",
+      "verified_by": "Official Vec and slice partition_point contracts reviewed during pivot-directory implementation; independent tree-based reference checks exact dependency coefficients."
+    },
+    {
+      "ref": "research/hashed_ecdl_cpu_20261030/oracle-filter/README.md",
+      "provenance": "retrieved",
+      "claim": "Exact rejection filter followed by the original lookup; collisions affect cost only. Added memory and preparation must be charged.",
+      "verified_by": "Source inspection, 47 library tests and independent saturated-filter lookup checks; no timing inference."
+    },
+    {
+      "ref": "research/hashed_ecdl_cpu_20261030/round22/results/stage-summary.csv",
+      "provenance": "retrieved",
+      "claim": "Oracle is the largest recorded individual stage in fixtures1/2; profile clocks are descriptive.",
+      "verified_by": "Completed round22 native analyzer and 500-entry manifest verification."
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "counters": [
+      "oracle_calls",
+      "preparations",
+      "built_rows",
+      "probed_rows",
+      "query_inversions",
+      "table_bytes",
+      "digest"
+    ],
+    "isolation_required": "L0",
+    "order": "alternate",
+    "record": [
+      "CPUinfo, kernel, process affinity and cgroups",
+      "rustc and executable/source hashes",
+      "every complete certificate",
+      "all stage durations and cumulative structural counters"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 1
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "median",
+        "definition": "Cumulative successful MITM preparations, including discarded trials; all arms use cached MITM.",
+        "id": "preparations",
+        "kind": "exact",
+        "name": "Reusable table preparations",
+        "resolution": "1",
+        "source": "rows.csv preparations",
+        "uncertainty": "none_exact",
+        "unit": "preparations"
+      },
+      {
+        "aggregation": "median",
+        "definition": "Cumulative residual inversion requests, including cached field-inverse lookups in candidate; excludes other arithmetic and is not total work. All arms are instrumented.",
+        "id": "query_inversions",
+        "kind": "exact",
+        "name": "Residual batch inversions",
+        "resolution": "1",
+        "source": "rows.csv query_inversions",
+        "uncertainty": "none_exact",
+        "unit": "inversions"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "median",
+        "definition": "Fresh-process algorithm interval: curve construction and known-target construction, solve including all base/table setup, discarded trials, target queries, reduction and internal verification, second independent replay, certificate serialization. Excludes process launch, archive I/O and negative control. Not the primary IC-online interval.",
+        "id": "complete_ms",
+        "kind": "timed",
+        "name": "complete_ms",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "source": "rows.csv complete_ms",
+        "uncertainty": "range",
+        "unit": "milliseconds"
+      },
+      {
+        "aggregation": "median",
+        "definition": "All oracle queries, including cold table preparation, discarded trials and witness checks.",
+        "id": "oracle_ms",
+        "kind": "timed",
+        "name": "oracle_ms",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "source": "rows.csv oracle_ms",
+        "uncertainty": "range",
+        "unit": "milliseconds"
+      },
+      {
+        "aggregation": "median",
+        "definition": "All base enumeration across all trials.",
+        "id": "bases_ms",
+        "kind": "timed",
+        "name": "bases_ms",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "source": "rows.csv bases_ms",
+        "uncertainty": "range",
+        "unit": "milliseconds"
+      },
+      {
+        "aggregation": "median",
+        "definition": "Solve remainder excluding bases and oracle: target generation, elimination, scalar recovery and internal replay; not a pure linear-algebra timer.",
+        "id": "reduction_other_ms",
+        "kind": "timed",
+        "name": "reduction_other_ms",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "source": "rows.csv reduction_other_ms",
+        "uncertainty": "range",
+        "unit": "milliseconds"
+      },
+      {
+        "aggregation": "median",
+        "definition": "Curve validation and known-target construction.",
+        "id": "curve_ms",
+        "kind": "timed",
+        "name": "curve_ms",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "source": "rows.csv curve_ms",
+        "uncertainty": "range",
+        "unit": "milliseconds"
+      },
+      {
+        "aggregation": "median",
+        "definition": "Second complete independent certificate verification.",
+        "id": "replay_ms",
+        "kind": "timed",
+        "name": "replay_ms",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "source": "rows.csv replay_ms",
+        "uncertainty": "range",
+        "unit": "milliseconds"
+      }
+    ]
+  },
+  "protocol_id": "HASHED-ECDL-CPU-SUFFIX-FILTER-20261101",
+  "question": "What complete cost and exact certificate behavior does a suffix rejection bitmap exhibit at batch64 and batch1 on all three fixed fixtures?",
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Unblinded analysis with fixed neutral machine labels; producer knows source mapping.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Three fixed complete-recovery software fixtures, covering 8/16-bit fields and 3/4 slots; no population or scale extrapolation."
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "nonce": null,
+      "note": "seed=111*(case+1), fixed across arms and rounds. Target scalar construction is solely a public known-answer fixture and excluded from solver inputs.",
+      "seeds": []
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "Per-arm complete CPU recovery diagnostic median and full observed range"
+    ],
+    "report_dir": "research/hashed_ecdl_cpu_20261030/reports/round23",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 3,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Exact source-level counts and deterministic equality need no sampling power. Nine repeats characterize descriptive ranges only; no timed significance test or equivalence claim.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 300,
+      "fixed_seconds": null,
+      "measured_on": "Unmeasured conservative allocation, not evidence. Round0 is fixed per-arm/case warmup/preflight. No timing data existed at freeze.",
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 9,
+    "warmups": 1
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "6arms x3instances x(1warmup+9rounds)=180 rows:162 measured and18 warmups; no extra repeats after viewing results."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Any incorrect output, timeout or missing cell invalidates panel; preserve failures. Per-cell60s, whole job300s, one attempt, no automatic reruns."
+    }
+  ],
+  "study_dir": "research/hashed_ecdl_cpu_20261030/round23",
+  "variable_ledger": {
+    "aa_not_applicable": null,
+    "comparisons": [
+      {
+        "arms": [
+          "u",
+          "v"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "implementation"
+        ],
+        "id": "C-native"
+      },
+      {
+        "arms": [
+          "w",
+          "v"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "implementation"
+        ],
+        "id": "C-batch"
+      },
+      {
+        "arms": [
+          "u",
+          "x"
+        ],
+        "design": "aa",
+        "differs_in": [],
+        "id": "C-aa"
+      },
+      {
+        "arms": [
+          "y",
+          "v"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "implementation"
+        ],
+        "id": "C-filter64"
+      },
+      {
+        "arms": [
+          "z",
+          "w"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "implementation"
+        ],
+        "id": "C-filter1"
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "y/v and z/w isolate the suffix rejection filter at fixed batch size; w/v and z/y isolate batching. candidate-source-delta.patch binds the runtime change. Original u/v measures accumulated implementation differences.",
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "Pinned original baseline and matched filter-on/off CPU source snapshots"
+      },
+      {
+        "how": "Public software fixtures; seeds111,222,333; max_trials16,max_work1000000,one target per execution.",
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "case0 p211,a0,b7,r199,P3:33,k42,m3,tau40; case1 p65521,a65518,b3,r65563,P0:64894,k45678,m3,tau80; case2 same curve,k54321,m4,tau64"
+      },
+      {
+        "how": "Same EKS job, CPU2,memory4Gi; one software thread per cell; shared VM L0. Capture CPUinfo, affinity, kernel, cgroups. No certified clocks.",
+        "name": "host",
+        "treatment": "measured"
+      },
+      {
+        "how": "Fresh process per cell; same tuple-row cap. Auxiliary allocations and inverse cache are included in setup but excluded from retained sum-table bytes. No total-memory equality claim.",
+        "name": "memory_layout",
+        "treatment": "randomized"
+      },
+      {
+        "how": "Six-arm rotation with alternating reversal by round and case, exactly as run.sh; ten rounds do not form complete balanced cycles.",
+        "name": "order",
+        "treatment": "crossed"
+      },
+      {
+        "how": "Analyst is unblinded. Frozen native analyzer computes exact certificate checks and descriptive ranges from neutral labels; labels do not provide human blinding.",
+        "name": "analyst",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "original baseline",
+          "filter batch64",
+          "filter batch1",
+          "no filter batch64",
+          "no filter batch1"
+        ],
+        "name": "implementation"
+      }
+    ]
+  },
+  "version": 1
+}

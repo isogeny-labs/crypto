@@ -1,0 +1,209 @@
+{
+  "schema": "twist.root-cover-pins/v1",
+  "repo_files": {
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/PROTOCOL.md": "9fb3e7fce0b8b227598fb07e0e1a627502fa7483c03ac8bf14b4573a190c6b38",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/README.md": "1bb564f10d0ed754b663d5f4c76fa8494a76b332d05d4b816d82d314301a3a65",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/RootCover.lean": "6f66c4c00fb5e81cc536822347c1a6b6d30b2e2f39322162b39c26e692af5b09",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/audit/Cargo.lock": "c46de2573a81f81d31dcdacdbe1983dbb63edeedd1b63e768aee32ccd9608d91",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/audit/Cargo.toml": "c666db3cc0bb1bcfb9de73fa22b49be6f52dbe06d1a970aad9ed42594178a5b3",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/audit.rs": "273c78839d51f57b60f46984cec7af5968cb1dd0ff449c31743e9660851a1f0c",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/compare.cpp": "69ac3e9d2e60b04ae854138eaba269c0354abe23503a10459703be5c9f2ca39b",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/controls/filter.lean": "253a360e7a14e7d3ec742c22998a8757a7203ad9313b475415088ff4f1a9d146",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/controls/identity.lean": "f122b93f5763eb10226b4049debf8c727dc56c4809b8740bd77caa0b54905188",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/controls/quadratic.lean": "70519db6c0fdf27672abf9437e316c328740633182c63a3d164c96d89ddb0fa1",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/describe.cpp": "0d3114e83df28b8e508e223457f3c33111578fd765c2230203db5558a11415d6",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/qualify.cpp": "ace5fed5e84ef6fda0c7b16aee86c862a566cd1754b293f7696d2c9da9044cfb",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/root-cover.cpp": "3311df711f9f830afead8ec228ac3ca013c94fc8a1a4214d8b84d3d4a1b874f9",
+    "research/quadratic_twist_field_cost_20261116/projective/root-cover/run.sh": "1480a2200950ce75848d50a03102ceae64b21e4c5aa446fc43a48dc806a90745"
+  },
+  "external_files": {
+    "/workspace/twist-native-run02-20261116/audit.json": "9e48248cede5094609574f2ff78bf4f85901ae04a931bcd08755520f032ef95b",
+    "/workspace/twist-torus-20261116/environment-inventory.json": "895f576428ba7b0e4a882dc8ee7d38962e248098172ebdcf44e06218cd92fc8e",
+    "/workspace/twist-lean-restore-20261115/lean-4.34.1-linux/bin/lean": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+    "/workspace/twist-rootcover-20261116/empty-legacy-controls.json": "715669b6894789f736958ebc7cc70c9fe25b4ee509cccc38d0908dcd1c6268af",
+    "/workspace/canonical-protocol-20261115/tools/experiment_protocol.py": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "/workspace/twist-torus-20261116/official/proof-gate.sh": "2fe88bb302db587bbb6ede217fc646cf8fa35f9b9a2980e4a15dae273b8df6eb",
+    "/workspace/twist-torus-20261116/official/trusted-native.txt": "934d0322ac07faec9502186b206c289cdeed7fb9a54f700cc097124476b6bf15",
+    "/workspace/twist-torus-20261116/official/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+  },
+  "legacy_controls_manifest": "/workspace/twist-rootcover-20261116/empty-legacy-controls.json",
+  "lean_inventory": "/workspace/twist-torus-20261116/environment-inventory.json",
+  "stage_plan": [
+    {
+      "name": "qualifier-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "cpp-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "rust-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "describe-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "compare-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "protocol-check",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-qualifier-head",
+      "expected_exit": 101
+    },
+    {
+      "name": "reject-qualifier-source",
+      "expected_exit": 101
+    },
+    {
+      "name": "proof-A",
+      "expected_exit": 0
+    },
+    {
+      "name": "proof-B",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-proof-identity",
+      "expected_exit": 1
+    },
+    {
+      "name": "reject-proof-filter",
+      "expected_exit": 1
+    },
+    {
+      "name": "reject-proof-quadratic",
+      "expected_exit": 1
+    },
+    {
+      "name": "produce-C",
+      "expected_exit": 0
+    },
+    {
+      "name": "produce-A",
+      "expected_exit": 0
+    },
+    {
+      "name": "produce-B",
+      "expected_exit": 0
+    },
+    {
+      "name": "independent-audit",
+      "expected_exit": 0
+    },
+    {
+      "name": "describe",
+      "expected_exit": 0
+    },
+    {
+      "name": "compare",
+      "expected_exit": 0
+    },
+    {
+      "name": "corrupt-map",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-map",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-missing-policy",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-missing-policy",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-scalar",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-scalar",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-log",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-log",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-cost",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-cost",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-source",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-source",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-columns",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-columns",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-missing-failure",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-missing-failure",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-cap",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-cap",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-witness",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-witness",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-root",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-root",
+      "expected_exit": 101
+    },
+    {
+      "name": "corrupt-branch",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-branch",
+      "expected_exit": 101
+    },
+    {
+      "name": "audit-original-again",
+      "expected_exit": 0
+    }
+  ]
+}

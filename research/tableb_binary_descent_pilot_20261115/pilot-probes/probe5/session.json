@@ -1,0 +1,58 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hacf247c6cff7",
+  "label": "tableb_binary_descent_pilot_20261115 n21 (pilot, not data)",
+  "spec_id": "ECS1heb4c0641133b",
+  "spec_sha256": "eb4c0641133b51c6c89728b1f9e1bb8936024c656284c1131d1cbd4934d646c2",
+  "env_class_id": "ECBENV3hb516f42f4ab3",
+  "host_sha256": "aa394724091cb86308524bcf45174c008e714d7f9ee7ff4f01e7fd3942cd35d9",
+  "plan_sha256": "47035d90ed6f4cc34180d704cf7a864991d177ccf5979019ba7c807da3d9f5ee",
+  "binary_sha256": "e8abdeb8d178d72fb5e6094cef39d12bc74c6d48dff6fd0aa69f6afee06c1355",
+  "git_commit": "6806177b5d4633c953ac825247f432571889dc27",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794772230972,
+  "finished_unix_ms": 1794772498234,
+  "status": "complete",
+  "executions_planned": 2,
+  "records_written": 2,
+  "records_sha256": "439c72926222eb52a3aad4eaeb627d84c23f5d8d4a1d411a4abe4b03d2614f5d",
+  "status_counts": {
+    "crashed": 1,
+    "timeout": 1
+  },
+  "last_seq": 1
+}
