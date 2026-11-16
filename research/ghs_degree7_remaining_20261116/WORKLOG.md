@@ -210,3 +210,29 @@ classes into a fixed-carrier degree-seven lower bound with stated scope.
 ### Errors
 
 None in preparation.
+
+## 2026-11-15 23:29 America/Los_Angeles
+
+### What was done
+
+Committed three-pole protocol/source at `652290a2d155`. Both counted runs
+completed. Each covered 643,043,610 logical candidates, 90 assignments,
+and 1,440 direct bitset controls. b=68 had 14,151 point-filter survivors,
+zero exact squares, 22.407 CPU s; b=84 had 13,980, zero, 19.561 CPU s.
+Both receipts bind to the same source SHA256. Wrote the result note.
+
+### Decisions made
+
+The three newly screened denominator classes are closed for the fixed
+trace-`+22` carrier and two source representatives. Do not claim a complete
+degree-seven exclusion yet: sparse and repeated-linear cases were screened
+for trace `+26`, not this trace.
+
+### Open threads
+
+Adapt the already published sparse and linear-square screens to trace `+22`;
+then combine all classes and audit the fixed-carrier bound.
+
+### Errors
+
+None in the three-pole counted runs.
