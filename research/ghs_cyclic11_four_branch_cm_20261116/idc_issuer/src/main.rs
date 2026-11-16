@@ -9,8 +9,9 @@ fn c(n:i64)->Expr {Expr::Const(n)}
 fn plus(a:Expr,b:Expr)->Expr {Expr::plus(a,b)}
 fn prod(xs:Vec<Expr>)->Expr {Expr::product(xs)}
 fn pow(x:Expr,n:usize)->Expr {prod(vec![x;n])}
+fn term(k:i64,x:&Expr,n:usize)->Expr {prod(vec![c(k),pow(x.clone(),n)])}
 fn main() {
-    let name=std::env::args().nth(1).expect("choose e2, e24 or q2");
+    let name=std::env::args().nth(1).expect("choose e2, e24, q2 or h2");
     let x=Expr::var("x");
     let xm1=plus(x.clone(),c(-1));
     let xm2=plus(x.clone(),c(-2));
@@ -46,6 +47,20 @@ fn main() {
             variables:vec!["x".into()],degree_bound:7,
             lhs:right,rhs:plus(left,correction)},
             0x2026_1116_0000_0202)
+    }else if name=="h2" {
+        let v=Expr::var("v");
+        let d=Expr::sum(vec![term(1,&v,11),term(-11,&v,9),term(44,&v,7),
+            term(-77,&v,5),term(55,&v,3),term(-11,&v,1)]);
+        let p=Expr::sum(vec![term(1,&v,5),term(1,&v,4),term(1,&v,3),
+            term(2,&v,2),term(3,&v,1),c(1)]);
+        let k=Expr::sum(vec![term(-2,&v,9),term(9,&v,7),term(2,&v,6),
+            term(-13,&v,5),term(2,&v,4),term(14,&v,3),term(4,&v,2)]);
+        (IdentityStatement{name:"F5 cyclic11 trace-2 Dickson square factor".into(),
+            source:"research/ghs_cyclic11_four_branch_cm_20261116/HYPERELL_PROTOCOL.md".into(),
+            variables:vec!["v".into()],degree_bound:11,
+            lhs:plus(d,c(-2)),
+            rhs:plus(prod(vec![plus(v,c(-2)),pow(p,2)]),prod(vec![c(5),k]))},
+            0x2026_1116_0000_0205)
     }else {panic!("unknown candidate")};
     let cert=issue(statement,seed,32,
         "issued by standalone Rust using repository identity_certificate module; checker replay uses 32 independent extra points",None)
