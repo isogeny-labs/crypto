@@ -1,3 +1,36 @@
+# Current checkpoint:34RUNNING ON RUNPOD; do not redispatch
+
+Sourcea06c298bc63f3e2d1fd04d5900c8b4fda46a7798(clean/pushed)precededone34dispatch202.
+Ownpodcy2tbnhzgtwr6e/4vCPU8GiB0.12USDh/pinnedRustimage/7200sDELETEguardian.
+Privateauthpointer/tmp/ic-runpod-auth-location (pod34.id/task34-header/token).
+NEVERprintcredentials/envresponses/passAPIkeytoPod. UserRunpodauthorizationpersists.
+LOCALstage /workspace/ic-runpod-runs/runpod-ic-graph-rho-portfolio-20261116-34.
+GETstatus https://PODID-8000.proxy.runpod.net/status withPRIVATEtask34-header;
+GETartifacts afterfinished,collect exactarchiveverifyportablepre/preworkers/post/
+qualifiedhashes THENimmediateDELETEownpod+confirm404,privatepod-ID.deletedmarker.
+Do not letmissinganalysislogabortcleanup. OriginalcopiedRustqualifier runsremotely.
+16:55flowIC/rankstop/rho-plain1exited0;rho-negation1inflight,remainingbatch16both.
+900sperworker/5500whole/7200runner/0warmandretries,correctedseed337. No finalresultyet.
+
+33failedBEFOREscientificcode(all6AlreadyExists stdout/rawcollision). Exactpacket/PCC
+b60806andcleanup204/404preserved;old33pod3lmv488eiypxctdeleted16:43:31Z.
+Correctedwrapper/NativeRusttransport-onlynegativeandpositivecontrolsbothpass.
+33failurePDFfinalonepageVIEWED/benchmarkPDFSVG150dpiPNGexact/hashPASS;
+initialfullSHAoverflowdraftretainedLOCAL/hashbound,presentationonlyfixed.
+
+PostcallRustportfolio-render(Clippy/buildPASS)+portfolio-report.typreadyfor34data.
+No frozen34source/worker/checker/criteriachanged. Completecost/band/ratiosnull,
+allarmsunrankable; held-outplantedanswerisNOTT1unknown-log. GoalACTIVE/no subagents.
+Newstandalone structural_rank_bound.rs pureRustcandidate,4meaningfulunitcontrols
+PASSincluding8192weightedstream-prefixdense-rankchecksacrossfields3/103.
+PCCfc956dunverified,sourcefrozenbeforetests. CandidateNOTintegrated/measuredyet.
+NEXTafter34packet: productionopt-instructuralgateintegration/chargeoverhead/Runpod
+matchedrankstopcomparison. Thiscanavoidimpossiblefullrankcheckpointwork; exact
+rank/affinedescent/scalarverificationremain. No35protocolselectedyet.
+
+CIread16:54a06workflows/statusEMPTY/unconfirmed;regularPR4288automerge/no manualmerge.
+No blocker; don'tstopgoal. Maintain<=60seccommentary/concreteactionloops.
+
 # Current checkpoint:34SOURCE READY;33transport failure preserved/deleted
 
 User wants Rust graphIC/rhoparity research on Runpod. GoalACTIVE/no subagents.
