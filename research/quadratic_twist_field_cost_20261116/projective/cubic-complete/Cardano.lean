@@ -6,7 +6,10 @@ variable {K : Type*} [Field K]
 theorem depress_identity (a b c x : K) (h3 : (3:K) ≠ 0) :
     x^3+a*x^2+b*x+c =
       (x+a/3)^3+(b-a^2/3)*(x+a/3)+(2*a^3/27-a*b/3+c) := by
-  have h27 : (27:K) ≠ 0 := by simpa using pow_ne_zero 3 h3
+  have h27 : (27:K) ≠ 0 := by
+    have heq : (3:K)^3=(27:K) := by ring
+    rw [← heq]
+    exact pow_ne_zero 3 h3
   field_simp [h3,h27]
   <;> ring
 

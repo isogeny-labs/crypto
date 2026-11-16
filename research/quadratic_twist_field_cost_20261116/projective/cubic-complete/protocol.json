@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "twist-cubic-complete-20261116",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-16",
   "repository": "crypto",
   "study_dir": "research/quadratic_twist_field_cost_20261116/projective/cubic-complete",
@@ -1443,7 +1443,7 @@
       {
         "name": "inputs",
         "treatment": "fixed",
-        "value": "ALL455policies×3roles×31diagnostics and30separate cold targets perprofile; sourcepoints repeat; full split/repeated cubic selftests over61base elements and32actualextension elements",
+        "value": "ALL455policies\u00d73roles\u00d731diagnostics and30separate cold targets perprofile; sourcepoints repeat; full split/repeated cubic selftests over61base elements and32actualextension elements",
         "how": "Deterministic complete declared finite domain, no candidate answer lookup"
       },
       {
@@ -1815,17 +1815,29 @@
       "claim": "Classical Cardano and primitivecube-unity derivation, not a new invention"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "denominator-proof-v2",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "Prior whole-module proof build failed at a denominator side condition before any native data; retain exact prior source/log, no accepted theorem inferred",
+      "changes": [
+        "Use explicit ring equality3^3=27 before pow_ne_zero instead of simplifier normalization",
+        "Native algorithm, field inputs, population, source controls and decision criteria unchanged",
+        "Fresh samebranch checkpoint before affected corrected proof attempt"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "ad58d95ba053b5701de2e6af25a6c8c3d546945cbdeb0e4eda623fb709e9b033",
-    "commit": "9519eb70c2c5ae3ae5f9b588819e8026358de054",
-    "frozen_at": "2026-11-16T11:28:11Z",
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
     "filed_before_affected_data": true
   },
   "extensions": {
-    "pins_sha256": "0576853dc237439df56c14fe9a8a4612797af74e4e1a8ede47e3a059b760c634",
-    "window": "11:15–12:15UTC2026-11-16",
+    "pins_sha256": "b2d567a49b31a8e2017a92e208a77dd74dd18055e9ad59cf11f1a5a4e19a1119",
+    "window": "11:15\u201312:15UTC2026-11-16",
     "deadline_epoch": 1794831300,
     "stage_plan": [
       {
@@ -2090,7 +2102,7 @@
       }
     ],
     "full_population": "1365profiles,42315diagnostics,40950separatecoldtargetworkloads PERfreshstream C/A/B; repeat30actualpoints",
-    "root_selftest": "All unordered triples WITHmultiplicity of61basefield elements, and32extension alphabet elements(actualμ31pluszero); roots expected independently outside candidate",
+    "root_selftest": "All unordered triples WITHmultiplicity of61basefield elements, and32extension alphabet elements(actual\u03bc31pluszero); roots expected independently outside candidate",
     "certificate_degree": "Original membership witness cap3; actual root product certificate degree3; scalar field-root exponentiation is separate actual work",
     "matrix_degree": null,
     "compressed_pullback_degree": null,
