@@ -16,7 +16,8 @@
   "validation": {
     "exact_source_extraction": "3 tests pass, including 20000 deterministic root inequalities using u128 squares",
     "first_library_replay": "19 pass; before final cost-sum control",
-    "final_library_replay": "20 focused BSGS tests pass; 6529 other tests filtered; release profile"
+    "final_library_replay": "20 focused BSGS tests pass; 6529 other tests filtered; release profile",
+    "after_main_merge": "20 BSGS tests pass in release; 6540 unrelated tests filtered"
   },
   "setup_failures_retained": [
     "Initial full-module compile omitted tracked research/chained_transfer_next_20261115/select_only.tsv in sparse checkout; materialized exact committed input.",
@@ -36,6 +37,14 @@
     },
     "lock_changes": "only these two matching entries",
     "report_outputs": "JSON, Markdown, SVG and PDF byte-identical before/after on current records",
-    "validation": "58 utility tests pass; shared parity passes; current-base keyring synchronization follows before publication"
+    "validation": "58 utility tests pass; parity 21 files; all 215 benchmark records pass after committed sparse inputs restored; main keyring aligned and 1179-entry ledger chain passes"
+  },
+  "reconciled_compile_fix": {
+    "path": "src/cryptanalysis/koblitz_index_calculus.rs",
+    "baseline_sha256": "fac83c5858f901abf32913e61db6c9d0e33c07384f97c4b789e041580e6dcb7b",
+    "after_sha256": "6f0d8af209a59b790cd0c371ae37e60b89a2c123471daffcf9fafe8624b3d952",
+    "original_failure": "E0308: cached packed lift returned Vec despite fixed array/count signature; both empty and successful branches retained old representation.",
+    "fix": "Return the packed empty tuple or two packed roots, preserving order.",
+    "validation": "New 0/1/2-count control and existing ordered-root comparison both pass; release library compiles with the complete change"
   }
 }
