@@ -1,0 +1,18 @@
+"""Normal owned source FF/tag custody; no scientific execution."""
+from pathlib import Path
+from datetime import datetime,timezone
+import json,lzma,os,subprocess
+r=Path('/workspace/crypto');h=Path('/workspace/scratch/ct525-native-word-normal-source-publication');h.mkdir()
+head=json.loads(Path('/workspace/scratch/ct521-native-word-preserved-raw-source-checkpoint/ACTUAL_NORMAL_COMPLETE_COMMIT.json').read_text())['head'];expected='c91b4802af77e32d6821ba89a95715228e699b58';branch='research/chained-transfer-odd-subgroup-frobenius-20261116';url='https://github.com/isogeny-labs/crypto.git';env={**os.environ,'GIT_OPTIONAL_LOCKS':'0','GIT_TERMINAL_PROMPT':'0'}
+def git(*a):return ['git','-c','gc.auto=0',*a]
+assert subprocess.check_output(git('rev-parse','HEAD'),cwd=r,env=env,text=True).strip()==head
+subprocess.run(git('merge-base','--is-ancestor',expected,head),cwd=r,env=env,check=True)
+for tag,ref in [('existing-source-branch','refs/heads/'+branch),('new-immutable-tag','refs/tags/chained-transfer-native-cofactor-word-source-20261116-'+head[:12])]:
+ out=h/tag;out.mkdir()
+ q=subprocess.run(git('ls-remote',url,ref),cwd=r,env=env,capture_output=True,timeout=60);(out/'entire-before.txt').write_bytes(q.stdout+q.stderr);assert q.returncode==0
+ if tag=='existing-source-branch':assert q.stdout.decode().split()[0]==expected
+ else:assert not q.stdout
+ q=subprocess.run(git('push','--no-force','--porcelain',url,head+':'+ref),cwd=r,env=env,capture_output=True,timeout=180);(out/'entire-normal-push.stdout.xz').write_bytes(lzma.compress(q.stdout));(out/'entire-normal-push.stderr.xz').write_bytes(lzma.compress(q.stderr));(out/'actual-push.exit').write_text(str(q.returncode)+'\n');assert q.returncode==0
+ q=subprocess.run(git('ls-remote',url,ref),cwd=r,env=env,capture_output=True,timeout=60);(out/'entire-after.txt').write_bytes(q.stdout+q.stderr);assert q.returncode==0 and q.stdout.decode().split()[0]==head
+ (out/'ACTUAL_NORMAL_PUBLICATION.json').write_text(json.dumps(dict(time=datetime.now(timezone.utc).isoformat(),head=head,expected_source_ancestor=expected,ref=ref,normal_nonforce_push=0,exact_readback=True,source_change='substantive completed native06/word07/report/new exact-source CI and complete current c91 ownCI, not an empty rerun',original_policy='seventeen whole objects still need original migration/replay and final gates, current merge remains blocked',authentication='normal inherited configured Git, no manual token/role/identity change'),indent=2)+'\n')
+ print(tag,head,flush=True)

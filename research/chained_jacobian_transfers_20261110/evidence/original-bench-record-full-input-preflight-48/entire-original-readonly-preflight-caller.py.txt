@@ -1,0 +1,25 @@
+"""Read-only original Git/record raw-byte custody preflight; no benchmark/data analysis."""
+from pathlib import Path
+from datetime import datetime,timezone
+import json,os,re,subprocess
+r=Path('/workspace/crypto');h=Path('/workspace/scratch/ct543-original-bench-raw-custody-preflight');h.mkdir();env={**os.environ,'GIT_OPTIONAL_LOCKS':'0','GIT_NO_LAZY_FETCH':'1'}
+text=Path('/workspace/scratch/ct542-original-bench-gate-complete-diagnostic/entire-original-gate.stdout.txt').read_text();paths=sorted(set(re.findall(r': raw (.+?) is neither in Git,',text)))
+expected={x:[]for x in paths}
+for f in sorted((r/'benchmarks/records').glob('*.json')):
+ d=json.loads(f.read_text())
+ for raw in d.get('raw',[]):
+  if raw.get('path')in expected:expected[raw['path']].append(dict(record=str(f.relative_to(r)),sha256=raw['sha256'],bytes=raw['bytes'],commit=d.get('commit'),s3_uri=raw.get('s3_uri')))
+args=['git','-c','gc.auto=0','ls-tree','-r','-z','HEAD','--',*paths];q=subprocess.run(args,cwd=r,env=env,capture_output=True,check=True);(h/'entire-exact-current-Git-tree-metadata.txt').write_bytes(q.stdout);entries={}
+for row in q.stdout.split(b'\0'):
+ if row:
+  header,path=row.split(b'\t',1);mode,typ,oid=header.decode().split();entries[path.decode()]=dict(mode=mode,type=typ,oid=oid)
+oids=sorted(set(x['oid']for x in entries.values()));q=subprocess.run(['git','-c','gc.auto=0','cat-file','--batch-check'],input=('\n'.join(oids)+'\n').encode(),cwd=r,env=env,capture_output=True);(h/'entire-original-local-object-metadata.stdout.txt').write_bytes(q.stdout);(h/'entire-original-local-object-metadata.stderr.txt').write_bytes(q.stderr);assert q.returncode==0
+info={}
+for row in q.stdout.decode().splitlines():
+ parts=row.split();info[parts[0]]=dict(missing=True)if parts[-1]=='missing'else dict(type=parts[1],bytes=int(parts[2]))
+rows=[]
+for x in paths:
+ tree=entries.get(x);obj=info.get(tree['oid'])if tree else None
+ rows.append(dict(path=x,local_exists=(r/x).exists(),original_Git=tree,local_object_metadata=obj,all_original_record_references=expected[x],scope='preflight only; no lazy object fetch/materialization/upload/record changes'))
+result=dict(time=datetime.now(timezone.utc).isoformat(),head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=r,env=env,text=True).strip(),original_diagnostics=189,distinct_failed_raw_paths=len(paths),Git_entries=len(entries),local_objects_missing=sum(1 for x in rows if not x['local_object_metadata']or x['local_object_metadata'].get('missing')),all_known_current_Git_blob_bytes=sum(x['local_object_metadata'].get('bytes',0)for x in rows if x['local_object_metadata']),original_reference_bytes=sum(max(y['bytes']for y in x['all_original_record_references'])for x in rows),files=rows,scope='full failed-input set preflight, no new verifier, benchmark or scientific run')
+(h/'ACTUAL_FULL_FAILED_RAW_CUSTODY_PREFLIGHT.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:v for k,v in result.items()if k!='files'},indent=2),flush=True)

@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T20:17:29Z",
+ "id": "PCC-20261116-d623f0",
+ "kind": "statement",
+ "producer": {
+  "commit": "278339b4b8da4ab25654a3d4bea97e6116b066cb",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/original-bench-record-gate-missing-inputs-47/ACTUAL_ORIGINAL_GATE_FAILURE.json",
+    "sha256": "e6c1b05b2338b1d0fcd32708e59e13e638ec2887c3646f40c72edc65d5573984"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/original-bench-record-gate-missing-inputs-47/entire-original-gate.stdout.txt.xz",
+    "sha256": "ed873c9ae41ec5f62baab7c586fd2b2acd2eb0ec62e7cdd125eda7c04dfd3cec"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Original prepublication benchrec gate exits1 with189 missing-raw problems across106 existing records; complete original diagnostic retained. First tool output truncated/not redirected and complete diagnostic recaptured once, no reconstructed output. Current diff tools/benchrec.py/benchmarks empty; one Git-tracked session.json is absent while adjacent original manifest only covers records.jsonl. Full failed-input custody cause not yet established. Preflight exact committed raw paths/hashes/sizes before any restoration, no record/tool/upload-flag/gate/skip change or benchmark/scientific run."
+}
