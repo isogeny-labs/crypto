@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Prepared/joint collector runtime qualification](point-table-joint-runtime-qualification.md) | open | matched native point-table/joint runtime result | current-source S3 upload/readback, authenticated exact native image/execution, admitted matched comparison |
 | [Prepared-table PCC/artifact storage](prepared-point-tables-ledger-artifact-policy.md) | open | canonical producer artifact registration | reviewed append-only storage contract or approved policy exception covering gate and migration readers |
 | [Native Koblitz measurement checkpoint access](native-koblitz-measurement-access.md) | open | requested isolated Rust baseline/candidate measurement | existing authorized S3 uploader, checkpoint gate, source-pinned EKS execution and verified receipts |
 

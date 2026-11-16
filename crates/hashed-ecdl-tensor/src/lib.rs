@@ -23,6 +23,7 @@ pub mod curve;
 pub mod encoding;
 pub mod factoring;
 pub mod finite;
+pub mod joint;
 pub mod network;
 pub mod partial;
 pub mod prepared;
