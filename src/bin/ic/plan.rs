@@ -97,6 +97,7 @@ pub fn profile_of(inst: &Instance) -> CurveProfile {
         | Instance::Fp4(_)
         | Instance::ThreeLeads(_)
         | Instance::Ext(_)
+        | Instance::Hec(_)
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)
