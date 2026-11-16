@@ -26,6 +26,12 @@ its recorded operations, and only the separate outer replay is added.
 Legacy TUNED credits remain separate. Native bookkeeping, RNG internals,
 tuned-reference pricing and complete totals remain open. [pcc:unverified]
 
+[The coverage note](coverage-note.json) makes diagnostic-calibration scope
+explicit: the legacy harness_prices call and the new Harness calibration
+are outside the reconstructed subtotal, while whole-process wall includes
+their execution. This note changes no original raw, qualifier or summary.
+[pcc:unverified]
+
 Sourceafdfc612cc74eba2ce59d6ec059412a81fab557a was committed and pushed
 before the sole scientific dispatch. The user's backend switch to Runpod
 occurred before any32data. CPU-only pod s1ngkkcetckkq6 had4vCPU/8GiB,

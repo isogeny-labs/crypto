@@ -1,4 +1,32 @@
-# Current checkpoint:32FINISHED ON RUNPOD; publish packet, no paid pod active
+# Current checkpoint:32PUBLISHED; fair reference portfolio/comparison next
+
+32packet c906c4e2f5061c2942daa845af3e881a63d7d109PUSHED/PRupdatedPCCproselint0.
+NativeRunpodmeasurementPASS/detailsbelow; sourceafdfc612...publishedbeforecall.
+Noownedpaidpodactive:corrected s1ngkkcetckkq6collected/hashcheckedthenDELETE204+
+GET404; failedstartup3aqk0v57a1udnqDELETE204beforedata/replacement. No compiler/job.
+GoalACTIVE/no stopgoal/subagents. USERREQUIRESALLFUTUREMEASUREMENTSRUNPOD.
+Privateauthpointer/tmp/ic-runpod-auth-location; NEVERprintheader/tokens/envresponses,
+nevercopysourcedatasecrets. Authpersists; don'taskprofile/credentialagain.
+
+CurrentresultCIread16:15c906 workflows/status/reviews/threadsEMPTY/checkruns0,
+requiredgatesunconfirmed. PR4288regular/automergeenabled. No manualmerge/bypass.
+NextCI>=17:05absentnewpublicationevent. Artifactbot32PNGmigrationnotobservedyet;
+iffuturebotdiffonlyPNGmanifest/ignore,inspect/FF/exactsparsebenchrestore/ignoredPNG
+fromLOCALstage/hash,neverreaddignoredPNG. Finishedsource/dataready/cleanbeforethis
+handoff; coverage-note.jsonpostcalladditionkeepsoriginalraw/qualifier/summaryexact.
+
+NEXT: reviewlatestjournal + actual32data, KB/sourcebeforeselectingfairrhoportfolio
+andmatchedIC/graph/rhoRunpodcohort. Nativepricingchangesbatchingtradeoffs, so
+don'tassumebatch16cheapest. No newtrialselected. Avoidfiveminutesofspeculative
+arithmetic/PRNG/IR/coordinateplanningwithouttoolsorcommentary. Chooseoneconcrete
+nextcode/data step,logdecision, nativechecks thenfreeze/publishBEFOREnewmeasure.
+Existingexample-onlyextensionscanreusecachedlibrary; don'tneedlesslyrebuild19min.
+Accountingscopeclarification: legacyharness_pricesinsidecountedreferenceandnew
+Harnessnativecalibrationoutsideexplicitrho_tally; wholeprocesswallincludesthem.
+Eliminateorreport/chargecalibrationbeforenewcompletecoldcomparison; don'twholehook
+snapshot+rho_tallydoublecount. LegacyTUNED/RNG/nativebookkeepinggapsremainopen.
+
+# Previous checkpoint:32FINISHED ON RUNPOD; publish packet, no paid pod active
 
 Sourceafdfc612cc74eba2ce59d6ec059412a81fab557aPUSHEDbeforesealedbundle/sole
 POST/run. USERbackendRunpodauthpersists; privateheaderdirectorypointer
