@@ -1,5 +1,53 @@
 # Curve25519 torus/S4: native Rust qualification
 
+## Current reduction and revised scaling plan
+
+Read the [retained-row contract addendum](reports/query-row-contract-v1/REPORT.md)
+with both reports below. Their independent-row-tag and P+B*D/y+L model
+retains at most one checked row per fresh private-coefficient query.
+A new concrete F5 certificate shows that a tag-blind nonzero kernel can
+cancel shared-query tags identically. Multi-output batching remains open
+with separate query-aggregate and complete-work conditions. The one-page
+[inspected addendum PDF](reports/query-row-contract-v1/report.pdf) and proof
+map preserve the older frozen contexts. PCC-20261116-8547d2 and 6fe501.
+[pcc:unverified]
+
+The [reduction report](reports/energy-reduction-v1/REPORT.md),
+[diagram](reports/energy-reduction-v1/pipeline.svg) and
+[inspected PDF](reports/energy-reduction-v1/report.pdf) document the
+controller-private coefficient proposal and its exact native/Lean controls.
+Three scalar-field endpoints reuse existing CryptoLean/Mathlib laws;
+the actual point-group and retained-row selection bridges remain open.
+The optional birthday diagnostic has exact calibrated tails and quadratic
+RAM; bounded base restarts are a separate conditional proposal.
+PCC-20261116-0bbe9a, ab1a1d, b8586d, f0439a and PCC-20261115-95e243.
+[pcc:unverified]
+
+The [new plan and cost audit](reports/scaling-audit-v1/REPORT.md),
+[diagram](reports/scaling-audit-v1/pipeline.svg) and
+[inspected PDF](reports/scaling-audit-v1/report.pdf) compare saturated-yield
+models for four, five, six and eight summands. Ten named Lean endpoints
+cover rational numeric-model minima and concrete parameter inequalities;
+none supplies a real solver cost or yield theorem. The actual current base
+bound exceeds the unit-constant sixth-root target, so six-sum work first
+needs an admissible parameter/recognition-cost analysis. The two many-coset
+products are arithmetic proposals, not constructed bases.
+PCC-20261116-ebfd31, 76dc04 and d45270. [pcc:unverified]
+
+The next scientific gate is a genuinely costed fixed-base batch or structured
+decomposition algorithm, with admissible base size, checked uniform targets
+and full phase/memory accounting. The native audit performs exact arithmetic;
+it launches no sampling or solver campaign. The old four-point source pin
+used by cryptanalysis and the original rejection criteria remain unchanged.
+
+Current-source standalone checks pass eight cases, formatting and strict
+all-target Clippy. The publication snapshot binds 32 source/manifest/fixture
+inputs and preserves the earlier lint failures and frozen controls.
+PCC-20261116-4e86fb explicitly corrects the count typo in b62ddf; see the
+[preserved erratum](energy-test-v1/publication-v1/ERRATA.md).
+These are software/byte checks, not independent performance evidence.
+[pcc:unverified]
+
 ## Current four-point follow-up
 
 The [four-point report](reports/four-point-v1/REPORT.md),
@@ -15,7 +63,7 @@ The [frozen geometric draft](theory-v1/energy-lemma.md) proposes an average
 four-sum collision bound under random admissible base shifts. Its
 [source addendum](theory-v1/SOURCE_ADDENDUM.md) identifies the degree theorem
 and related prior work. [Lean arithmetic](lean/PROOF_MAP.md) discharges only
-four concrete numerical dependencies; geometric formalization and independent
+four original concrete numerical dependencies; geometric formalization and independent
 review remain open. PCC-20261115-1ea4c1 and PCC-20261115-2deca4.
 [pcc:unverified]
 
