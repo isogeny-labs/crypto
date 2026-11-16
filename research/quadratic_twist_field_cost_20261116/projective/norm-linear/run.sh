@@ -4,7 +4,7 @@ set -euo pipefail
 mode=${1:?build or execute};out=${2:?fresh output};ref=${3:?connected reference}
 cd "$(git rev-parse --show-toplevel)";scope=research/quadratic_twist_field_cost_20261116/projective/norm-linear
 [[ $(git branch --show-current) = codex/twist-field-cost && $(git remote get-url origin) = https://github.com/isogeny-labs/crypto.git && -z $(git status --porcelain) ]]
-[[ $out = /workspace/twist-norm-linear-run02-20261116 ]]
+[[ $out = /tmp/twist-norm-linear-run03-20261116 ]]
 run(){ local name=$1 expected=$2 remaining cap code=0;shift 2;remaining=$(($(date -u -d '2026-11-16T16:55:00Z' +%s)-$(date -u +%s)));[[ $remaining -gt 0 ]];cap=$remaining;[[ $cap -le 600 ]]||cap=600
  printf '%q ' "$@" > "$out/$name.command";printf '\n' >> "$out/$name.command";date -u +%FT%TZ > "$out/$name.started-at"
  timeout --signal=TERM --kill-after=10 "$cap" "$@" > "$out/$name.log" 2>&1 || code=$?
@@ -15,7 +15,7 @@ if [[ $mode = build ]];then
  jq -e --arg h "$(git rev-parse HEAD)" '.head==$h and .state=="open" and .auto_merge==null and .source=="connected-github-read"' "$ref" > "$out/ref-check.log"
  run qualifier-build 0 g++ -std=c++20 -O2 -s -I/workspace/twist-native-tooling/include "$scope/qualify.cpp" -lcrypto -o "$out/qualifier.immutable"
  chmod 500 "$out/qualifier.immutable";sha256sum "$out/qualifier.immutable" > "$out/qualifier.sha256"
- run cpp-build 0 g++ -std=c++20 -O2 -s -I/workspace/twist-native-tooling/include -I/workspace/twist-callgrind-20261116/install/include "$scope/counter.cpp" -lcrypto -lz -o "$out/producer"
+ run cpp-build 0 g++ -std=c++20 -O2 -I/workspace/twist-native-tooling/include -I/workspace/twist-callgrind-20261116/install/include "$scope/counter.cpp" -lcrypto -lz -o "$out/producer"
  run semantic-build 0 g++ -std=c++20 -O2 -s -I/workspace/twist-native-tooling/include "$scope/norm-linear.cpp" -lcrypto -lz -o "$out/semantic"
  run rust-build 0 /workspace/twist-native-tooling/rustup/toolchains/1.85.1-x86_64-unknown-linux-gnu/bin/rustc --edition=2021 -O -C strip=symbols "$scope/audit.rs" -o "$out/audit"
  run references-build 0 g++ -std=c++20 -O2 -s -I/workspace/twist-native-tooling/include "$scope/references.cpp" -lcrypto -lz -o "$out/references"

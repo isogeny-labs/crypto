@@ -12,9 +12,9 @@ p.add_argument('archive',type=Path)
 p.add_argument('--remove-verified-new-copies',action='store_true')
 a=p.parse_args();source=a.input.resolve();archive=a.archive.resolve()
 assert source.is_dir() and not archive.exists() and source not in archive.parents
-assert str(source).startswith('/workspace/twist-norm-linear-run')
+assert str(source).startswith('/tmp/twist-norm-linear-run')
 if a.remove_verified_new_copies:
-    assert source.parent==Path('/workspace/twist-norm-linear-run02-20261116')
+    assert source.parent==Path('/tmp/twist-norm-linear-run03-20261116')
     assert source.name.startswith(('A-','B-','false-'))
 sha=lambda b:hashlib.sha256(b).hexdigest()
 files={};objects={}
