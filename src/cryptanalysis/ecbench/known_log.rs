@@ -491,7 +491,7 @@ mod tests {
     fn ksum_tables_recover_every_nonzero_prime_log() {
         let i = roster_prime_instance(10).unwrap();
         let g = &i.curve;
-        for k in [3u32, 4, 5] {
+        for k in [3u32, 4, 5, 6, 7] {
             let params = Parameters {
                 size: 7,
                 max_pair_work: 1 << 20,
@@ -590,7 +590,7 @@ mod tests {
                     let plan = plan_check(i.r, &params, None).is_ok();
                     let run = prepare(g, i.generator_point(), i.r, params).is_ok();
                     assert_eq!(plan, run, "pair {params:?}");
-                    for k in [0u32, 2, 3, 4, 5, 6] {
+                    for k in [0u32, 2, 3, 4, 5, 6, 7] {
                         let plan = plan_check(i.r, &params, Some(k)).is_ok();
                         let run = prepare_ksum(g, i.generator_point(), i.r, params, k).is_ok();
                         assert_eq!(plan, run, "ksum k = {k} {params:?}");

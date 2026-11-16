@@ -1,1 +1,0 @@
-T-1721 reserved review scope before preread plan. Exact published candidate inspected after parent confirmation. Read-only systemd/Conductor/path checks; no launch, compiler, test or producer edit. Parent retains serial release.

@@ -64,10 +64,14 @@ register the curve (`scripts/build_curve_registry.py`, AGENTS.md §11) before
 citing it. Word-size limits: `GF(p)` with `p < 2^62`, and `GF(2^m)` with
 `m ≤ 62` for every method. Koblitz curves with `64 ≤ m ≤ 127` build as
 `Instance::Wide` and run `rho.signed_frobenius_strong` and
-`claw.pair_table` only; to give another method a wide path, write it over
-the width-generic types (`koblitz_strong_rho::{RhoField, RhoScalar}` or
-`claw::ClawGroup`) so the one-word instantiation stays the committed code,
-and dispatch it in `methods::solve_wide`.
+`claw.pair_table` only. Koblitz curves with `128 ≤ m ≤ 191` build as
+`Instance::Big` (`koblitz_big`, three-word `Gf2W`, `U192` scalars, orders
+past `2^128`) and run the strong rho in its four ids and both claw ids
+(`methods::BIG_METHODS`). To give another method a wide or big path, write
+it over the width-generic types (`koblitz_strong_rho::{RhoField,
+RhoScalar}` or `claw::ClawGroup`) so the one-word instantiation stays the
+committed code. Dispatch it in `methods::solve_wide` or `solve_big`, and
+admit it in `methods::applicable`.
 
 A group that is not an elliptic curve over one field (a Jacobian, a curve
 over a tower) follows `ecbench::jacobian`, `plane_quartic` and

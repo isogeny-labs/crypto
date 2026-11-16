@@ -1,0 +1,49 @@
+[2026-11-16T21:07:44Z] CMD: python3 test_l11.py 2>&1 (stdout -> raw/unit_tests.txt)
+  exit=0
+  sha256 3e7632f3af6b8779f9cd7a064d0ef475d19ae1f0041c33fb41ae1de97eaa7496  raw/unit_tests.txt
+[2026-11-16T21:07:45Z] CMD: python3 l11.py gate-pic --p 103 (stdout -> raw/gate_pic_p103.json)
+  exit=0
+  sha256 f1fe3e3f397beb2fa80684d2941151f09fdb63342d1b7e6cf9fb48c898c1652c  raw/gate_pic_p103.json
+[2026-11-16T21:07:45Z] CMD: python3 l11.py gate-pic --p 127 (stdout -> raw/gate_pic_p127.json)
+  exit=0
+  sha256 050b730b3a458a7cff0132140d6eadbd6f8d606b9312f450480b4f3139982c8b  raw/gate_pic_p127.json
+[2026-11-16T21:07:48Z] CMD: python3 l11.py curves --k 8 (stdout -> -)
+  exit=0
+[2026-11-16T21:07:49Z] CMD: python3 l11.py curves --k 10 (stdout -> -)
+  exit=0
+[2026-11-16T21:07:50Z] CMD: python3 l11.py curves --k 12 (stdout -> -)
+  exit=0
+[2026-11-16T21:07:56Z] CMD: python3 l11.py curves --k 14 --curves 0-5 (stdout -> -)
+  exit=0
+[2026-11-16T21:08:13Z] CMD: python3 l11.py curves --k 14 --curves 6-11 (stdout -> -)
+  exit=0
+[2026-11-16T21:08:27Z] CMD: python3 l11.py run --k 8 --arms all --out raw/runs_k8.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:08:33Z] CMD: python3 l11.py run --k 10 --arms all --out raw/runs_k10.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:08:50Z] CMD: python3 l11.py run --k 12 --arms U,U2,U4,UAA,AF1,G --out raw/runs_k12_a.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:09:01Z] CMD: python3 l11.py run --k 12 --arms AF2,AF4,AF8,S --out raw/runs_k12_b.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:09:10Z] CMD: python3 l11.py run --k 12 --arms AS2,AS4,AS8 --out raw/runs_k12_c.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:09:22Z] CMD: python3 l11.py run --k 14 --arms U,U2,U4,UAA,AF1,G --curves 0-5 --out raw/runs_k14_a0.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:09:34Z] CMD: python3 l11.py run --k 14 --arms U,U2,U4,UAA,AF1,G --curves 6-11 --out raw/runs_k14_a1.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:09:46Z] CMD: python3 l11.py run --k 14 --arms AF2,AF4,AF8 --curves 0-5 --out raw/runs_k14_b0.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:09:59Z] CMD: python3 l11.py run --k 14 --arms AF2,AF4,AF8 --curves 6-11 --out raw/runs_k14_b1.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:10:15Z] CMD: python3 l11.py run --k 14 --arms S --curves 0-11 --out raw/runs_k14_s.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:10:32Z] CMD: python3 l11.py run --k 14 --arms AS2,AS4 --curves 0-11 --out raw/runs_k14_c.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:10:52Z] CMD: python3 l11.py run --k 14 --arms AS8 --curves 0-5 --out raw/runs_k14_d0.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:11:04Z] CMD: python3 l11.py run --k 14 --arms AS8 --curves 6-11 --out raw/runs_k14_d1.jsonl (stdout -> -)
+  exit=0
+[2026-11-16T21:11:18Z] CMD: python3 l11.py analyze --in 'raw/runs_k*.jsonl' --out raw/analysis.json --tsv raw/summary.tsv (stdout -> -)
+  exit=0
+[2026-11-16T21:12:16Z] CMD: sha256sum raw/* > raw/SHA256SUMS.tmp; mv raw/SHA256SUMS.tmp raw/SHA256SUMS (stdout -> -)
+  exit=0

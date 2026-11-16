@@ -1,0 +1,37 @@
+{
+  "schema": "compact-native-pre-call/v1",
+  "source_commit": "96f0c814d928f07e96e15361cc43a35fe7306377",
+  "class": "fixed-fixture actual-root arithmetic/CLI checks; no clock-value comparisons",
+  "captured_utc": "2026-11-15T22:54:46.140314+00:00",
+  "executables": {
+    "worker": {
+      "path": "/workspace/relation-native-qualifiers/compact-worker-96f0c814d-01",
+      "sha256": "4377360b85319884221fe8a0efaf17d4671ba8322342056ca494f11202a63d22",
+      "bytes": 17921192
+    },
+    "api": {
+      "path": "/workspace/relation-native-qualifiers/compact-api-96f0c814d-01",
+      "sha256": "594abe4c41ed2c80281171531b2da194039540d4607769ddad1234fd314ffb22",
+      "bytes": 19015056
+    },
+    "cli": {
+      "path": "/workspace/relation-native-qualifiers/compact-cli-96f0c814d-01",
+      "sha256": "cce8e010638c7ab748de2714a66440af86c0a7e1d712c34b76db6d07ff402e95",
+      "bytes": 2172624
+    }
+  },
+  "qualifier_sequence": [
+    "api",
+    "cli"
+  ],
+  "argv": [
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "environment": {
+    "RAYON_NUM_THREADS": "1",
+    "RELATION_ROOT_WORKER_BINARY": "/workspace/relation-native-qualifiers/compact-worker-96f0c814d-01"
+  },
+  "process_cap_seconds_per_qualifier": 180,
+  "address_space_cap_kib": 2097152
+}
