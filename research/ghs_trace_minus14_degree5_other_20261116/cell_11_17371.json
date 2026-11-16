@@ -1,0 +1,81 @@
+{
+  "bmask": 11,
+  "carrier": "x^11 + 2*x^8 + x^7 + 2*x^6 + 2*x^5 + x^4 + x^3 + x^2 + 1",
+  "consistent_rank_deficient": 11,
+  "counts": {
+    "constant": {
+      "coprime": 0,
+      "full_equation_hits": 0,
+      "interpolation_degree_five": 0,
+      "logical_assignments": 243
+    },
+    "double_linear": {
+      "coprime": 0,
+      "full_equation_hits": 0,
+      "interpolation_degree_five": 0,
+      "logical_assignments": 58806
+    },
+    "quadratic_branch": {
+      "coprime": 0,
+      "full_equation_hits": 0,
+      "interpolation_degree_five": 0,
+      "logical_assignments": 405
+    },
+    "quadratic_branch_double_linear": {
+      "coprime": 0,
+      "full_equation_hits": 0,
+      "interpolation_degree_five": 0,
+      "logical_assignments": 98010
+    },
+    "square_quadratic_nonbranch": {
+      "coprime": 0,
+      "full_equation_hits": 0,
+      "interpolation_degree_five": 0,
+      "logical_assignments": 14288643
+    },
+    "two_quadratic_branches": {
+      "coprime": 1,
+      "full_equation_hits": 0,
+      "interpolation_degree_five": 1,
+      "logical_assignments": 270
+    }
+  },
+  "cpu_seconds": 59.046518999999996,
+  "denominator_count": 60269,
+  "fallback_H_checks": 646811,
+  "field": "F3[a]/(a^5+2a+1)",
+  "fmask": 17371,
+  "hits": [],
+  "logical_assignment_count": 14446377,
+  "rational_branch_factor": "x + 2",
+  "schema": "ghs.trace-minus14.last-orbit-degree5/v1",
+  "source": "x^3 + x^2 + a^2 + 2",
+  "source_sha256": "3475a34d0c0eacbd434e874a098a620e849ebb23a52a0927903c1e852100ba8d",
+  "square_quadratic_rank_hist": {
+    "0": 1,
+    "1": 0,
+    "2": 10,
+    "3": 0,
+    "4": 232
+  },
+  "survivors": [
+    {
+      "A": "(2*a^4 + a^3 + 2*a^2 + 2*a + 1)*x^5 + (a^4 + 2*a^3 + a^2 + 2)*x^4 + (2*a^4 + 2*a^3 + a^2 + a + 2)*x^3 + (2*a^4 + 2*a^3 + 2*a^2)*x^2 + (a^3 + 2*a^2 + 2*a)*x + 2*a^4 + 2*a^3 + 2*a^2 + 1",
+      "B": "x^4 + (2*a^3 + 2*a^2 + 2*a + 1)*x^3 + (2*a^3 + 2*a)*x^2 + (a^4 + 2*a^3 + 2*a + 2)*x + a^4 + a^3 + a^2",
+      "choices": [
+        0,
+        0,
+        2
+      ],
+      "parameter": {
+        "quadratics": [
+          0,
+          2
+        ]
+      },
+      "shape": "two_quadratic_branches"
+    }
+  ],
+  "trace": -14,
+  "wall_seconds": 59.43259387499711
+}
