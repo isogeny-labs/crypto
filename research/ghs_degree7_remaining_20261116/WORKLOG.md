@@ -440,3 +440,30 @@ checking its direct-cover prior work.
 ### Errors
 
 None in the counted second-carrier runs or independent coordinate replay.
+
+## 2026-11-15 23:30 America/Los_Angeles
+
+### What was done
+
+Committed twelve-carrier result, all second-carrier receipts, source-bound
+audit, and independent coordinate replay at `08dbbe70d744`. Queried the KB
+and primary web sources for degree-eight covers, then derived the odd-degree
+denominator rule and froze eight branch-supported degree-eight shapes in
+`DEGREE8_SPARSE_PROTOCOL.md`. Wrote a Sage source for both carrier and source
+representatives. It includes direct point-filter equivalence controls and
+full exact identities for every survivor. No degree-eight counted run had
+started at this entry.
+
+### Decisions made
+
+Screen the sparse branch-supported degree-eight family first. A hit triggers
+independent morphism and subgroup replay; a null result only closes these
+eight shapes, not degree eight generally.
+
+### Open threads
+
+Commit source, run four carrier/source cells, inspect every hit and cost gate.
+
+### Errors
+
+None in preparation.
