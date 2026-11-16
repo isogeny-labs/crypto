@@ -1631,7 +1631,24 @@ fn post_jacobian_partition_screen()->Result<serde_json::Value,String>{
 fn algebraic_mode_factorized(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic
 )->Result<(Option<Solution>,Stats),String>{
-    let lookup=reverse_index(&parts[2]);
+    algebraic_mode_factorized_index(parts,q,ar,false)
+}
+// The labelled-source generator enforces uniqueness of x globally, so a
+// third-partition x identifies at most one index. This is an indexing-only
+// variant of the published APS root enumerator, NOT new non-generic algebra.
+fn algebraic_mode_factorized_index(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,compact:bool
+)->Result<(Option<Solution>,Stats),String>{
+    let lookup=(!compact).then(||reverse_index(&parts[2]));
+    let compact_lookup=if compact{
+        let mut map=HashMap::with_capacity(parts[2].len());
+        for (k,pt) in parts[2].iter().enumerate(){
+            if map.insert(pt.pt.0,k).is_some(){
+                return Err("compact APS index: duplicate x in third list".into());
+            }
+        }
+        Some(map)
+    }else{None};
     let mut stats=Stats::default();
     let mut fibres:[Vec<u64>;2]=std::array::from_fn(|j|
         Vec::with_capacity(parts[j].len()));
@@ -1694,8 +1711,13 @@ fn algebraic_mode_factorized(
             roots.sort_unstable();
             for (ridx,&root) in roots.iter().enumerate(){
                 if ridx==1 && root==roots[0] {continue;}
-                if let Some(candidates)=lookup.get(&root){
-                    for &k in candidates {
+                if let Some(&k)=compact_lookup.as_ref().and_then(|m|m.get(&root)){
+                    stats.matched_x+=1;
+                    if let Some(solution)=verify_candidate(
+                        left,right,&parts[2][k],[i,j,k],q,ar,&mut stats
+                    ){return Ok((Some(solution),stats));}
+                } else if let Some(candidates)=lookup.as_ref().and_then(|m|m.get(&root)){
+                    for &k in candidates{
                         stats.matched_x+=1;
                         if let Some(solution)=verify_candidate(
                             left,right,&parts[2][k],[i,j,k],q,ar,&mut stats
@@ -1709,6 +1731,10 @@ fn algebraic_mode_factorized(
 }
 
 fn execute_factorized_unequal(q:(u64,u64),sizes:[usize;3],round_limit:usize)
+    ->Result<serde_json::Value,String>{
+    execute_factorized_unequal_index(q,sizes,round_limit,false)
+}
+fn execute_factorized_unequal_index(q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool)
     ->Result<serde_json::Value,String>{
     if sizes.iter().any(|&n|n<16 || n>32_768)
        || sizes.iter().sum::<usize>()>40_000
@@ -1733,7 +1759,7 @@ fn execute_factorized_unequal(q:(u64,u64),sizes:[usize;3],round_limit:usize)
         let source_additions=ar.counts.group_additions-before;
         let root_begin=Instant::now();
         let before_verify=ar.counts.group_additions;
-        let (solution,stats)=algebraic_mode_factorized(&parts,q,&mut ar)?;
+        let (solution,stats)=algebraic_mode_factorized_index(&parts,q,&mut ar,compact)?;
         let root_ns=root_begin.elapsed().as_nanos();
         let verify_additions=ar.counts.group_additions-before_verify;
         let found=solution.is_some();
@@ -1745,7 +1771,7 @@ fn execute_factorized_unequal(q:(u64,u64),sizes:[usize;3],round_limit:usize)
             "rejected_duplicate_x":duplicates,
             "s3_query_ns":root_ns,
             "s3_pair_quadratics":stats.pair_s3,
-            "x_fibre_precompute":true,"jacobian_source":true,
+            "x_fibre_precompute":true,"jacobian_source":true,"compact_x_index":compact,
             "s3_sqrts":stats.s3_sqrt,
             "s3_batch_inversions":stats.batch_inversions,
             "signed_candidates":stats.signed_candidates,
@@ -2080,8 +2106,124 @@ fn compare_factorized_aps_bsgs_cold()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// A distinct public-target panel, prospectively frozen before the indexed
+// variant was implemented. All arms pay fully cold source setup, and no
+// verifier-known k reaches either solver or the algebraic oracle.
+fn compact_x_index_confirmation()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const PROFILE:[usize;3]=[384,384,16_384];
+    const TARGET_SEED:u64=0x5849_4458_5046_3331;
+    let mut rng=TARGET_SEED;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut totals=[0u128;4];
+    let mut wins=[0u64;3];
+    let mut cases=Vec::with_capacity(CASES);
+    for case in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let order: [usize;4]=match case%4 {
+            0=>[0,1,2,3],1=>[1,2,3,0],2=>[2,3,0,1],_=>[3,0,1,2]
+        };
+        let mut arms:[serde_json::Value;4]=std::array::from_fn(|_|json!(null));
+        for idx in order{
+            let result=match idx{
+                0=>execute_factorized_unequal_index(q,PROFILE,6,false)?,
+                1|2=>execute_factorized_unequal_index(q,PROFILE,6,true)?,
+                3=>cold_batched_bsgs(q)?,
+                _=>return Err("compact x-index invalid arm".into())
+            };
+            if result["complete_target_scalar_recovered"].as_bool()!=Some(true){
+                return Err(format!("compact x-index incomplete Q at case={case},arm={idx}"));
+            }
+            let k=if idx==3{
+                result["log"].as_u64().ok_or("BSGS scalar absent")?
+            }else{
+                result["attempts"].as_array()
+                    .and_then(|v|v.last())
+                    .and_then(|v|v["solution"]["log"].as_u64())
+                    .ok_or("APS scalar absent")?
+            };
+            if k!=known||verifier.scalar(PRIME31,k,Some(PRIME31.g))!=Some(q){
+                return Err(format!("compact x-index scalar replay failed case={case},arm={idx}"));
+            }
+            totals[idx]+=result["cold_wall_ns"].as_u64()
+                .ok_or("compact x-index missing cold clock")? as u128;
+            arms[idx]=result;
+        }
+        // Every original signed witness, S3 pair count and round must agree
+        // exactly: the old/new implementation differs solely in x-index map.
+        let old=arms[0]["attempts"].as_array().ok_or("old attempts missing")?;
+        let candidate=arms[1]["attempts"].as_array().ok_or("compact attempts missing")?;
+        let repeat=arms[2]["attempts"].as_array().ok_or("repeat attempts missing")?;
+        if old.len()!=candidate.len()||old.len()!=repeat.len(){
+            return Err(format!("compact x-index attempt count differs at case {case}"));
+        }
+        for attempt in 0..old.len(){
+            for other in [candidate,repeat]{
+                for field in ["s3_pair_quadratics","signed_candidates","solution",
+                              "rejected_duplicate_x","rejected_identity","round"]{
+                    if old[attempt][field]!=other[attempt][field]{
+                        return Err(format!("compact x-index different {field} at case={case},attempt={attempt}"));
+                    }
+                }
+            }
+        }
+        if arms[1]["cold_wall_ns"].as_u64()<arms[0]["cold_wall_ns"].as_u64(){
+            wins[0]+=1;
+        }
+        if arms[2]["cold_wall_ns"].as_u64()<arms[0]["cold_wall_ns"].as_u64(){
+            wins[1]+=1;
+        }
+        if arms[1]["cold_wall_ns"].as_u64()<arms[3]["cold_wall_ns"].as_u64(){
+            wins[2]+=1;
+        }
+        cases.push(json!({
+            "case":case,"public_Q":q,"caller_known_scalar_verifier_only":known,
+            "cyclic_order":order,
+            "old_vec_index_APS":arms[0],
+            "new_unique_x_index_APS":arms[1],
+            "new_unique_x_index_AA":arms[2],
+            "matched_cold_BSGS":arms[3]
+        }));
+    }
+    let ratio=(totals[1] as f64)/(totals[0] as f64);
+    let drift=(((totals[1] as i128)-(totals[2] as i128)).abs() as f64)/(totals[1] as f64);
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_COMPACT_X_INDEX_PROTOCOL_20261116.md",
+        "method":"published APS S3 root enumeration, compact x-unique lookup",
+        "classification":"generic MITM-equivalent algebraic decomposition engineering",
+        "p":P,"n":N,"cofactor":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),"profile":PROFILE,
+        "cases":cases,"cases_count":CASES,"all_cold_arms_verified":4*CASES,
+        "arm_names":["old_APS_vec_index","compact_APS","compact_APS_AA","cold_BSGS"],
+        "fully_cold_ns":totals,
+        "compact_vs_old_aggregate_ratio":ratio,
+        "compact_AA_drift_fraction":drift,
+        "per_case_wins_compact_vs_old":wins[0],
+        "per_case_wins_compact_repeat_vs_old":wins[1],
+        "per_case_wins_compact_vs_BSGS":wins[2],
+        "passes_preregistered_10_percent_engineering_gate":
+            ratio<=0.90 && wins[0]>=18 && drift<=0.05,
+        "note":"This is a 24 fresh-Q developer source-specific experiment; even a win is not an independent PCC nor a non-generic exponent gain"
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--compact-x-index-confirm" {
+        let result=compact_x_index_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--aps-vs-bsgs-cold" {
         let result=compare_factorized_aps_bsgs_cold()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -2488,5 +2630,27 @@ mod bsgs_cold_comparator_tests{
             assert_eq!(res["complete_target_scalar_recovered"].as_bool(),Some(true));
             assert_eq!(res["log"].as_u64(),Some(k));
         }
+    }
+}
+
+
+#[cfg(test)]
+mod compact_x_index_tests{
+    use super::*;
+    #[test]
+    fn unique_x_index_preserves_exact_signed_relation(){
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let (parts,_,_)=source_walk_profile_jac(PUBLIC_Q,SEED,&mut ar,[384,384,16_384]).unwrap();
+        let mut old_ar=Arithmetic::default();
+        let mut new_ar=Arithmetic::default();
+        let (old,old_stats)=
+            algebraic_mode_factorized_index(&parts,PUBLIC_Q,&mut old_ar,false).unwrap();
+        let (new,new_stats)=
+            algebraic_mode_factorized_index(&parts,PUBLIC_Q,&mut new_ar,true).unwrap();
+        assert_eq!(old.as_ref().map(|x|x.log),new.as_ref().map(|x|x.log));
+        assert_eq!(old.as_ref().map(|x|x.indices),new.as_ref().map(|x|x.indices));
+        assert_eq!(old.as_ref().map(|x|x.signs),new.as_ref().map(|x|x.signs));
+        assert_eq!(old_stats.pair_s3,new_stats.pair_s3);
     }
 }
