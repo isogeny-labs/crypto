@@ -1,0 +1,43 @@
+{
+ "created_at": "2026-11-05T22:45:22Z",
+ "id": "PCC-20261105-740808",
+ "kind": "statement",
+ "producer": {
+  "commit": "180d8ea25b00083894ba794f1c593c0850da4c9b",
+  "model": "",
+  "session": "codex-cubic-native-measurement-20261105"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cubic_extension_transfer_20261025/native_end_to_end/measure/evidence/development-tests.log",
+    "sha256": "fa905e4a4607fcbc6568ae225f24a47e0b97f8973bdccc31243cf7106d45a4bb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cubic_extension_transfer_20261025/native_end_to_end/measure/evidence/grading-preservation.json",
+    "sha256": "2b9c7ca9ea3ee3cf7e47f79ad1d78afbd6fde947111ef47840c50544c1486e00"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cubic_extension_transfer_20261025/native_end_to_end/measure/evidence/builds.json",
+    "sha256": "4fe35e5c67e5172417111c7597ea46c059179da85a950b69a821fbb9adddc90b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cubic_extension_transfer_20261025/native_end_to_end/measure/evidence/native-driver-negative.json",
+    "sha256": "e13c979f5f2e0e4d020832335294428adfc044ead36b61b69e5ec1421a55743d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Native measurement implementation and non-cryptographic development controls; root-library validation remains incomplete.",
+ "statement": "The native cubic measurement continuation adds process-resident C++/Rust hooks and a standalone runner reusing ecbench grading. Its unsigned receipts report 77 library tests and one lifecycle integration test passing, both actual solver entry points building, unchanged grading bytes, and the real C++ driver retaining its expected invalid-argument failure as L0. This is development evidence, not ECDLP benchmark or execution verification."
+}

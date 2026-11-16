@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-11-15" />
+  <title>A concrete cover transfer to a smaller field</title>
+  <style>
+    html {
+      font-size: 10pt;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="/usr/share/javascript/mathjax/MathJax.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">A concrete cover transfer to a smaller field</h1>
+<p class="date">15 November 2026</p>
+</header>
+<p>The construction transfers an order-seven subgroup from <strong>a
+prime field with 65,537 elements</strong> into <strong>a binary field
+with four elements</strong>, through a cubic cover, a marked-section
+lift, and a norm. The target logarithm is recovered by enumerating seven
+multiples. The source subgroup also has order seven: this is a toy
+existence construction. [pcc:unverified]</p>
+<figure>
+<img src="cover-transfer.png" style="width:100.0%"
+alt="The geometric route and its formalization boundary" />
+<figcaption aria-hidden="true">The geometric route and its formalization
+boundary</figcaption>
+</figure>
+<p>The source and target equations are</p>
+<p><span class="math display">\[
+E_p:y^2-xy-4y=x^3-4x^2,\qquad E_2:y^2+\omega y=x^3+\omega x^2,
+\]</span></p>
+<p>with <span class="math inline">\(\omega^2+\omega+1=0\)</span>. The
+source generator is <span class="math inline">\(P=(0,0)\)</span> and its
+challenge is <span class="math inline">\(Q=(2,2)=[3]P\)</span>. The
+target generator is <span
+class="math inline">\(G=\Phi(P)=(1,\omega+1)\)</span> and its challenge
+is <span class="math inline">\(T=\Phi(Q)=(\omega,\omega)\)</span>. For
+every integer <span class="math inline">\(k\)</span>, the Lean endpoint
+checks</p>
+<p><span class="math display">\[
+T=[k]G\ \Longleftrightarrow\ Q=[k]P\ \Longleftrightarrow\
+k\equiv3\pmod7.
+\]</span></p>
+<p>Both the chosen target generator and the source generator have exact
+order seven. This is the requested “something weaker” alternative; no
+GHS vulnerability or large-prime-order attack is claimed.
+[pcc:unverified]</p>
+<h2 id="the-actual-cover-and-the-fixed-lift">The actual cover and the
+fixed lift</h2>
+<p>Put <span class="math inline">\(b=t^3-t^2\)</span>, <span
+class="math inline">\(c=t^2-t\)</span>. The common elliptic family and
+its cubic cover are</p>
+<p><span class="math display">\[
+\mathcal E_t:y^2+(1-c)xy-by=x^3-bx^2,
+\qquad
+\mathcal C_t:v^2+(1-c)u^3v-bv=u^9-bu^6.
+\]</span></p>
+<p>The map is <span class="math inline">\(\pi_t(u,v)=(u^3,v)\)</span>.
+Its affine coordinate algebra is <span
+class="math inline">\(R_E[U]/(U^3-x)\)</span>, with a basis of length
+three checked in Lean. At <span class="math inline">\(t=2\)</span> it
+gives the source above; at <span class="math inline">\(t=\omega\)</span>
+it gives the target. Use the fixed integral model</p>
+<p><span class="math display">\[
+A=\mathbb Z[\zeta]/(\zeta^2+\zeta+1),\qquad t_0=2+65537\zeta.
+\]</span></p>
+<p>Its two ring specializations send <span
+class="math inline">\(t_0\)</span> to <span
+class="math inline">\(2\)</span> and <span
+class="math inline">\(\omega\)</span>. The receiving field on the
+65537-side is <span class="math inline">\(\mathbf F_{65537^2}\)</span>,
+but the reduced model and all seven marked points descend to the
+original <span class="math inline">\(\mathbf F_{65537}\)</span>. Both
+specializations and their nonzero discriminants are checked in
+<code>CoverIntegralLift.lean</code>. [pcc:unverified]</p>
+<p>The marked section <span class="math inline">\((0,0)\)</span> has
+multiples <span class="math inline">\((b,bc)\)</span> and <span
+class="math inline">\((c,b-c)\)</span> at scalars two and three. The
+integer-polynomial relations <span
+class="math inline">\(b^2-bc-c^3=0\)</span> and <span
+class="math inline">\((t-1)(b-c-c^2)=2c^2-bc-b+c\)</span>, checked in
+Lean, give <span class="math inline">\([2]([3]\mathcal P)=-\mathcal
+P\)</span>. Thus the seven marked sections provide the
+cross-characteristic lift on the chosen subgroup. This lift is limited
+to those seven sections; its existence does not supply an efficient lift
+for an arbitrary large-order subgroup.</p>
+<p>On either cubic cover, the ramification indices above <span
+class="math inline">\(P\)</span>, <span
+class="math inline">\(-P\)</span> and <span
+class="math inline">\(O\)</span> are three. Riemann–Hurwitz gives genus
+four. If <span class="math inline">\(D=[(0,0)]-[\infty]\)</span>, then
+<span class="math inline">\(\pi^*(P-O)=3D\)</span> and <span
+class="math inline">\(\pi_*D=P-O\)</span>. Lift and specialize the seven
+multiples of <span class="math inline">\(3D\)</span> through the fixed
+model, then apply the target norm. The result is <span
+class="math inline">\(\Phi=[3]\tau\)</span>, where <span
+class="math inline">\(\tau([n]P)=[n]R\)</span>. Since <span
+class="math inline">\(3\)</span> is invertible modulo <span
+class="math inline">\(7\)</span>, the norm retains the subgroup. These
+genus, Jacobian and specialization steps are the written geometric
+proof; the full Jacobian functor is not formalized in this project.
+[pcc:unverified]</p>
+<h2 id="verification-and-scope">Verification and scope</h2>
+<p>Lean checks the field cardinalities, actual elliptic points, orders,
+finite-free cubic cover algebras, affine cover equations, common
+integral-model ring maps, the scalar homomorphism and its seven-row
+table. Raw proof receipts and four <code>identity.certificate/v1</code>
+records are retained. Claims <code>PCC-20261115-1148a8</code> and
+<code>PCC-20261115-97a477</code> remain unsigned pending the
+repository’s independent process. [pcc:unverified]</p>
+<p>The full seven-row coordinate table, geometric derivation and
+formalization map are in <a
+href="COVER-CONSTRUCTION.md">COVER-CONSTRUCTION.md</a> and <a
+href="COVER-PROOF-MAP.md">COVER-PROOF-MAP.md</a>. Source modules are <a
+href="CoverDecodeExample.lean">CoverDecodeExample.lean</a> and <a
+href="CoverIntegralLift.lean">CoverIntegralLift.lean</a>. The pinned
+environment is Lean 4.24.0 / mathlib v4.24.0. Run
+<code>lake build</code> and <code>lake env lean AxiomAudit.lean</code>;
+the unchanged repository proof gate audits the complete example project.
+No performance measurement is reported.</p>
+</body>
+</html>

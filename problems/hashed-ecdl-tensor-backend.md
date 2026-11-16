@@ -76,6 +76,15 @@ Explicit work policies can terminate a run with an unknown result.
 
 ## Next discriminating step
 
+The [November 15 native dimension continuation](../research/hashed_ecdl_dimensions_20261115/README.md)
+adds exact candidate/sample/jet expressions, a coarse root-only precision
+envelope and five bounded source-routine controls. It also distinguishes
+retained jet lengths from outer-vector capacities: interpolation followed by
+truncation retains the larger buffer. Claim PCC-20261115-907a94 remains
+unverified. The sharp D.11 taper, D.14–15 enumeration refinement and aggregate
+allocation/bit-space upper bounds remain open; the coarse precision envelope
+does not discharge the branching exponent. [pcc:unverified]
+
 The [2026-11-04 entry-cost source audit](../research/hashed_ecdl_entry_cost_20261104/README.md)
 and [structured map](../research/hashed_ecdl_entry_cost_20261104/audit-map.json)
 isolate target-row usage, positive incoming exponents, preparation before the
