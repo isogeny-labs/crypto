@@ -1,0 +1,67 @@
+{
+  "schema": "source.review/v1",
+  "task": "T-1743",
+  "reviewer": "/root/review_materializer_fix",
+  "recorded_utc": "2026-11-07T00:40:27.577233+00:00",
+  "plan_sha256": "900a05c7af183063cfb47901d992170c7c876c51a04baee1dde42f05f2e0c02c",
+  "candidate_sha256": "085234b563a2c766040706ed7d805b2971074efba14da022265a6aa6db33ca63",
+  "base_sha256": "4e01f95cde6fe851a656819133ff22cf0b65d20e39fe9227ee6bce24ba557b71",
+  "helper_sha256": "2d506f0e676ff1db54036adc061680dd7f911b809b4519630fc02ff1606f9507",
+  "verdict": "source_change_supported_runtime_unqualified",
+  "runtime_executed": false,
+  "launch_authorized": false,
+  "findings": [
+    {
+      "id": "R1",
+      "status": "supported_source",
+      "joint": "Append durability",
+      "finding": "First record uses exclusive creation; each buffered append checks byte count, flushes and fsyncs before pointer update. First directory entry is fsynced."
+    },
+    {
+      "id": "R2",
+      "status": "supported_source",
+      "joint": "Checkpoint publication",
+      "finding": "A copied snapshot omits only inline cleanup for intermediate checkpoints. Existing temporary write, file fsync, replace and directory fsync remain. Prefix metadata identifies committed bytes, SHA256 and record count."
+    },
+    {
+      "id": "R3",
+      "status": "supported_source",
+      "joint": "Interrupted prefix",
+      "finding": "Crash or exception before pointer update leaves preceding committed prefix authoritative. A trailing partial or complete unreferenced record is not evidence of successful completion. Missing pointer denotes no committed records, not no children."
+    },
+    {
+      "id": "R4",
+      "status": "supported_source",
+      "joint": "Failure and final receipt",
+      "finding": "Normal final checkpoint includes original full inline array plus storage metadata. Append/fsync failure propagates into failed status. Inline final records may exceed last committed prefix. Finalizer catches cleanup journaling errors and retains failure. Divergence is permitted only on failed terminal records; a passed receipt must agree with its full prefix."
+    },
+    {
+      "id": "R5",
+      "status": "supported_source",
+      "joint": "Custody and scope",
+      "finding": "Cleanup helper is byte identical. Guard-through-finalization region is exact after replacing only cleanup recording call. Deadline, quota, ownership, source closure, checksums, command sequence and bounded cleanup remain unchanged."
+    },
+    {
+      "id": "R6",
+      "status": "pending_runtime",
+      "joint": "Consumer and execution qualification",
+      "finding": "No candidate code executed. Before admission, consumers must verify prefix length/hash/count and terminal status; actual durable filesystem behavior and bounded completion remain unqualified."
+    }
+  ],
+  "review_iteration": "Initial a243c87 reviewed; reviewer noted lazy nonexclusive creation. Producer refined to085234 using xb first record and explicit directory fsync. Initial source not recorded as passing.",
+  "publication_commit": "0c2f48f9a0738beeaece69ce32649684809335ae",
+  "limitations": [
+    "Source review does not establish filesystem durability under real faults or measured speedup.",
+    "Storage ABI of intermediate receipts changes intentionally; consumers must follow journal-prefix/v1. No existing reader is declared compatible by this review.",
+    "The full inline cleanup list remains in memory. This change reduces repeated serialization, not peak in-memory list size.",
+    "Existing signal interruption or failed final receipt persistence can leave only an incomplete checkpoint; no terminal success may be inferred."
+  ],
+  "independent_derivation": "N cleanup records formerly serialized at least N(N+1)/2 record appearances across per-child checkpoints, ignoring later checkpoints. New journal writes N appearances and final inline writes N. Variable record lengths and filesystem work preclude timing inference.",
+  "sources": [
+    "../root-materializer-native-limit-admission-v2-20261105/materialize.py",
+    "../materializer-source-successor-20261107/materialize.py",
+    "https://docs.python.org/3/library/os.html#os.fsync",
+    "https://man7.org/linux/man-pages/man2/fsync.2.html"
+  ],
+  "knowledge_promotion": "Not warranted: source transport change with runtime qualification pending; no scientific status transition."
+}

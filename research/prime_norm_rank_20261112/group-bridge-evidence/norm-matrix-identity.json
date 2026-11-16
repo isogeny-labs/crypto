@@ -1,0 +1,116 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hedd7e46a60a6ad5c",
+  "statement": {
+    "name": "short-form coordinate multiplication matrix determinant",
+    "source": "Mathlib CoordinateRing.norm_smul_basis; NormGroupBridge.normFunctionNorm; literal det[[A,-F*B],[-B,A]] expansion only",
+    "variables": [
+      "A",
+      "B",
+      "F"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "A"
+            },
+            {
+              "op": "var",
+              "args": "A"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "neg",
+                "args": {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "F"
+                    },
+                    {
+                      "op": "var",
+                      "args": "B"
+                    }
+                  ]
+                }
+              },
+              {
+                "op": "neg",
+                "args": {
+                  "op": "var",
+                  "args": "B"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "A"
+            },
+            {
+              "op": "var",
+              "args": "A"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "F"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "B"
+                  },
+                  {
+                    "op": "var",
+                    "args": "B"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2316557831630749697,
+  "value_digest": "2edbec03cd531d54ceb87e07515cd1db82ad9b6c7a196b5c3865a1ab433d6aa4",
+  "independence": "unsigned producer invocation of unchanged canonical issuer/checker; no independent signer; extra replay stream uses separate fixed seed; formal pointer is checked separately by Lean gate/fresh",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormGroupBridge.lean",
+    "sha256": "a38917ee4bf6c0f8ec5fd36fee2a9b0a093dc19b3044439edc588d928d3c2fef"
+  }
+}

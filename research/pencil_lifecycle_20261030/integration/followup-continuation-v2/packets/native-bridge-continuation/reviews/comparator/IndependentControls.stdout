@@ -1,0 +1,86 @@
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:4:24: error: Application type mismatch: The argument
+  [2, 3, 0, 4]
+has type
+  List ?m.15
+but is expected to have type
+  Bool
+in the application
+  ![2, 3, 0, 4]
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:5:24: error: Application type mismatch: The argument
+  [6, 9, 0, 12]
+has type
+  List ?m.15
+but is expected to have type
+  Bool
+in the application
+  ![6, 9, 0, 12]
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:6:24: error: Application type mismatch: The argument
+  [6, 9, 1, 12]
+has type
+  List ?m.15
+but is expected to have type
+  Bool
+in the application
+  ![6, 9, 1, 12]
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:7:27: error: Application type mismatch: The argument
+  [0, 0, 0, 3]
+has type
+  List ?m.15
+but is expected to have type
+  Bool
+in the application
+  ![0, 0, 0, 3]
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:8:8: warning: declaration uses `sorry`
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:8:56: warning: Unused tactic linter: `decide` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:9:113: error: Tactic `decide` failed for proposition
+  ((List.finRange 4).all fun i => (List.finRange 4).all fun j => x i * y j == x j * y i) = true
+because its `Decidable` instance
+  instDecidableEqBool ((List.finRange 4).all fun i => (List.finRange 4).all fun j => x i * y j == x j * y i) true
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `Bool.decEq`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match (List.finRange 4).all fun i => (List.finRange 4).all fun j => x i * y j == x j * y i, true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:10:115: error: Tactic `decide` failed for proposition
+  ((List.finRange 4).all fun i => (List.finRange 4).all fun j => x i * z j == x j * z i) = false
+because its `Decidable` instance
+  instDecidableEqBool ((List.finRange 4).all fun i => (List.finRange 4).all fun j => x i * z j == x j * z i) false
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `Bool.decEq`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match (List.finRange 4).all fun i => (List.finRange 4).all fun j => x i * z j == x j * z i, false with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:11:8: warning: declaration uses `sorry`
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:11:59: warning: Unused tactic linter: `decide` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:12:8: warning: declaration uses `sorry`
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:12:79: warning: Unused tactic linter: `decide` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/independent-comparator-review-20261101/snapshot/IndependentControls.lean:13:133: error: Tactic `decide` failed for proposition
+  ((List.finRange 4).all fun i => (List.finRange 4).all fun j => 0 * x j == 0 * x i) = true
+because its `Decidable` instance
+  instDecidableEqBool ((List.finRange 4).all fun i => (List.finRange 4).all fun j => 0 * x j == 0 * x i) true
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `Bool.decEq`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match (List.finRange 4).all fun i => (List.finRange 4).all fun j => 0 * x j == 0 * x i, true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+'nonunit_pivot' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'finite16_true' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'finite16_false' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'nonproportional' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'final_coordinate' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'zero_finite16' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

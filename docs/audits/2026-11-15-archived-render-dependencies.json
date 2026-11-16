@@ -1,0 +1,53 @@
+{
+  "kind": "archived dependency audit; unresolved historical pins",
+  "producer_reported": true,
+  "source_commit": "c0e8723ff0780900958374eceb96c123e33c4f00",
+  "observed_utc": "2026-11-15T12:07:04.105464+00:00",
+  "advisory": "GHSA-cxqh-p2w9-fmr7",
+  "upstream": "https://github.com/advisories/GHSA-cxqh-p2w9-fmr7",
+  "affected_component": "PyMuPDF CLI embedded get function in _main_.py",
+  "first_patched_version": "1.26.7",
+  "repository_alerts": [
+    85,
+    87,
+    88
+  ],
+  "entries": [
+    {
+      "round": "07",
+      "builder": "research/koblitz_modular_ic_20261018/rounds/07/build_report.py",
+      "builder_sha256": "2f8300473f0d534a1a2595ec78fcc65b707779e9363cf2fd941a362b5cab8b97",
+      "requirements": "research/koblitz_modular_ic_20261018/rounds/07/report-requirements.txt",
+      "requirements_sha256": "499b1f12dd7ee9b8accb14c6a0c247810310460817d5823be905439f141e0e30",
+      "direct_pymupdf_calls": [
+        "pymupdf.Matrix",
+        "pymupdf.open"
+      ]
+    },
+    {
+      "round": "09",
+      "builder": "research/koblitz_modular_ic_20261018/rounds/09/build_report.py",
+      "builder_sha256": "0d8acc861997d041e6d046e88957aaaa9c9887c40dbe71f1c930db4e455e0909",
+      "requirements": "research/koblitz_modular_ic_20261018/rounds/09/report-requirements.txt",
+      "requirements_sha256": "499b1f12dd7ee9b8accb14c6a0c247810310460817d5823be905439f141e0e30",
+      "direct_pymupdf_calls": [
+        "pymupdf.Matrix",
+        "pymupdf.open"
+      ]
+    },
+    {
+      "round": "10",
+      "builder": "research/koblitz_modular_ic_20261018/rounds/10/build_report.py",
+      "builder_sha256": "1439c3ba5e515907503c6300fc9aa0673950d50430adc889594782e2226a568f",
+      "requirements": "research/koblitz_modular_ic_20261018/rounds/10/report-requirements.txt",
+      "requirements_sha256": "499b1f12dd7ee9b8accb14c6a0c247810310460817d5823be905439f141e0e30",
+      "direct_pymupdf_calls": [
+        "pymupdf.Matrix",
+        "pymupdf.open"
+      ]
+    }
+  ],
+  "source_inspection_scope": "Three report-builder entrypoints use the library rendering API. No direct invocation of the affected CLI was found in these scripts; indirect callers and all archived environments were not exhaustively analyzed.",
+  "status": "The advisory is not remediated by this receipt; archived dependency pins and outputs are unchanged.",
+  "prospective_followup": "A separately versioned patched rendering environment needs source/output identity checks and independent render comparison before replacing any active reproduction entrypoint."
+}

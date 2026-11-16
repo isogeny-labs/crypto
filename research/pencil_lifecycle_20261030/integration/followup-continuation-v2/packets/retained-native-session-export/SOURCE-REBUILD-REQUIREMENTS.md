@@ -1,0 +1,11 @@
+# Source rebuild requirements after exhausted compatibility probes
+
+The original exporter compile and both metadata diagnostic allowances are exhausted. No tests have run. Three candidate graph artifacts all fail compiler SVH matching; see compat-result.json. Raising address-space limits does not correct this mismatch.
+
+The exact current native adapter is not a standalone leaf. diagnostic_file_adapter.rs calls diagnostic_preflight.rs; that imports runner::{prepare_lifecycle_child,resource_journal_capacity,PlanDoc,Session}, host::HostCapsule and spec::Spec. diagnostic_launch imports methods::ResolvedMethod. spec.rs imports methods::{applicable,decl,resolve,Applies,MethodSpec,ResolvedMethod} and workload types. runner.rs imports method implementation and accounting modules. Replacing these types or validation functions with test doubles would no longer verify the required actual typed adapter.
+
+An unchanged-source rebuild must produce a coherent crypto_lib rlib and its current pencil-symbolic-graph dependency (Cargo.toml path research/pencil_large_prime_20261029, reporting feature), plus any other path crate invalidated by source/compiler changes. Cached crypto_lib used default and redis-native-tls features. It must preserve Cargo.lock and rustc1.99.1, offline mode, one build job, isolate all output and avoid Cargo updating shared cache artifacts. Bind every source/include input and each reused compiled dependency; Cargo fingerprint presence alone is insufficient, as this diagnostic demonstrates.
+
+A prospective rebuild would use an isolated materialized source snapshot and isolated target directory, an explicit frozen Cargo build command selecting only --lib (not tests/binaries), then a separately bounded exporter compile/test against that freshly built closure. The cost of rebuilding the broad native library has not been established under the current 2 GiB/120-second envelope, so this document is requirements, not an approved execution command. An alternative is a reviewed source refactor extracting actual preparation/typed validation plus their data types into a narrow native crate; copying or mirroring the validators is not equivalent.
+
+No fourth historical candidate probe, source compilation, or exporter retry was performed.

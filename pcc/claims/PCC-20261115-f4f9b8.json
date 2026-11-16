@@ -1,0 +1,58 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-15T22:43:50Z",
+ "id": "PCC-20261115-f4f9b8",
+ "kind": "statement",
+ "producer": {
+  "commit": "b8cd452f3f52d8ad32aa77813f44a6b385567033",
+  "model": "claude-opus-5-5",
+  "session": "session_01TCbLH6jxWA7Yo11oJpoLxe"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md",
+    "sha256": "a77cbf9dd226845f1b8eed591ddd6fe0136f2d03b41cbd2f62247d376dfb55a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/PROOF.md",
+    "sha256": "bd19b3a61b382181c5dedab2c5fa410efdca49d2324ad4f53e6ffddb78fc96ed"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/lean/ICCounting/ICCounting.lean",
+    "sha256": "b9f7c49e3f0a897b1db6f6ecbb226ae3201dc8b93f63df66492f209653787178"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/lean/ICCounting/check.log",
+    "sha256": "5537de6c60df853260a3c815b8eacc817b54d2155548ae2454db10ddfe080db1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem-check/lean_recheck.log",
+    "sha256": "f7ab6030e458822afbb21b83959ebf82485d5ebc875fe6eadc87125681aee4d8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/theorem/out/L4_summary.json",
+    "sha256": "5cde34695f6da1def47c5b79728c7f25885fc858a1e34a25e722b0d3f23f20ee"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Paper proof only: research/prime_field_ic_closure_20261112/finish/theorem/PROOF.md (sha256 bd19b3a6...), checked line by line by one adversarial checker, verdict 'sound with gaps'; the checker's reading is recorded in research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md section 3. Not machine-checked: ICCounting.lean holds 12 counting/arithmetic declarations (e.g. amgm_core, master_sq; exit 0, standard axioms, re-run 2026-11-15) and none of the load-bearing steps. Outside the model: F4 and polynomial-calculus solvers (which the checker measured solving below the XL degree), split-Semaev chains, amortisation across targets, sparse XL, collision and known-log variants. This is not a lower bound against all index-calculus algorithms. research-kb prior-art check not done.",
+ "statement": "Theorem A (prime-field index calculus, restricted XL/Macaulay model): at arity m = 2 on a prime-order E(F_p) with n = #E, any factor base presented as a radical ideal (auxiliary variables allowed), with relations taken from the unsplit Semaev polynomial S_3 plus the base equations solved by XL, cost charged as the full XL rank with a fresh rank per target, a relation counted only when exposed through a block-1 univariate, at least c*|B| relations required (axiom A3) and uniform independent targets, has expected cost E[cost] >= c*sqrt(n); so in that model index calculus at m = 2 cannot beat Pollard rho's exponent 1/2. The bound needs two axioms the adversarial checker found implicit in the proof: (1) each attempt yields at most one relation, or cost is at least the number of relations output; (2) A3 holds, which excludes bases with known logarithms such as B = {iP}."
+}

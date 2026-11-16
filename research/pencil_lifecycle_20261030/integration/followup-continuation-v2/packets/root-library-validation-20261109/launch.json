@@ -1,0 +1,25 @@
+{
+  "schema": "prospective-root-validation-launch/v1",
+  "cwd": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109",
+  "argv": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "1795s",
+    "/usr/bin/python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py"
+  ],
+  "outer_total_seconds": 1800,
+  "maximum_attempts": 1,
+  "automatic_retry": false,
+  "no_overlap": true,
+  "launch_disabled": false,
+  "caller_receipt_directory": "/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109-control",
+  "caller_stdout": "/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109-control/outer.stdout",
+  "caller_stderr": "/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109-control/outer.stderr",
+  "caller_exit": "/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109-control/outer-exit.json",
+  "note": "Separate caller control directory, fresh and private; launcher owns durable_run. Final admission.json exists; root final publication/readback and live ownership/resource checks precede launch.",
+  "status": "final_configuration_pending_publication_readback",
+  "root_release_condition": "Root authorized one1800-second attempt after independent finalbindingreview and exact finalizedconfig publication/readback with live lease/resource/nooverlap checks. No launch by preparation agent."
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "prime_medium_rho_cpc.seeds/v1",
+  "rule": "seed(tag) = int(SHA-256(UTF-8(prefix + tag)).hexdigest()[0:12], 16)",
+  "prefix": "prime_medium_rho_cpc_20261109/v1/",
+  "seeds": [
+    {
+      "tag": "target_seed/PC",
+      "seed": 259652123255010
+    },
+    {
+      "tag": "target_seed/M",
+      "seed": 4704550062423
+    },
+    {
+      "tag": "measurement_seed/PC",
+      "seed": 159619901569003
+    },
+    {
+      "tag": "measurement_seed/M1",
+      "seed": 231691171589394
+    },
+    {
+      "tag": "measurement_seed/M2",
+      "seed": 176556980215943
+    },
+    {
+      "tag": "measurement_seed/M3",
+      "seed": 205778394191689
+    },
+    {
+      "tag": "measurement_seed/M4",
+      "seed": 33389262247476
+    }
+  ]
+}

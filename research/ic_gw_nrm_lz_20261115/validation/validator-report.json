@@ -1,0 +1,1318 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/ic_gw_nrm_lz_20261115",
+ "status": "pass",
+ "independent": true,
+ "independence_note": "Validator subagent with its own context, nonce, sample, runner, comparators, oracle build, mutants, stress harness and recompute script; the producer's analyze.py, plot.py and gen-report.py were not read or imported (only hashed). Same Claude Code session family and container as the producer: independence of reasoning and code, not of host or organization; no keyring signature.",
+ "validated_snapshot": {
+  "repository": "/home/user/crypto (branch claude/f4-f5-algorithm-speed-bvp7qd)",
+  "data_commit": "be6570bbcb46b646f3ea8a9c362ccb607581ada1 (2026-11-15T05:57:03Z; results, report, benchrec record)",
+  "protocol_freeze_commit": "851b8da629837ffa6e27fdb318fddcd1cadb4f9d (2026-11-15T05:39:39Z: PROTOCOL.md, analyze.py, make-units.sh, run-local.sh, units.tsv, src/; producer run.log start 05:39:53Z)",
+  "read_from": "git archive be6570bbcb (the working tree was briefly on another branch during this validation; nothing was read from it)",
+  "freeze_integrity": "PROTOCOL.md, analyze.py, make-units.sh, run-local.sh, units.tsv and src/*.rs byte-identical between 851b8da629 and be6570bbcb; REF source research/ic_gw_bl_reuse_20261115/amendment-1/src unchanged since its freeze 98a4fc6639; shared includes research/quartic_n4_20261019/{common,ghs,ic,solver}.rs and src/cryptanalysis/plane_quartic_pic.rs unchanged since 9a63c9161b",
+  "head_at_write": "e87d1ee9f7 (branch head when the reports were written; git diff be6570bbcb..HEAD is empty for research/ic_gw_nrm_lz_20261115, benchmarks/20261115-ic-gw-nrm-lz, the REF source, the shared includes, summary.json and the BLR1 VALIDATION.json)",
+  "dirty_tree": "git status clean for every path read"
+ },
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "d42debc19e0c816b64e0e36735f9c374bd76af5c71fbba04ecb2ed04c5db4201"
+ },
+ "raw_data_path_base": "paths in raw_data[].path are relative to research/ic_gw_nrm_lz_20261115/validation/ (the directory of this report); repo_path is repository-relative",
+ "raw_data": [
+  {
+   "path": "../runs-nrmlz-20261115.tar.gz",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/runs-nrmlz-20261115.tar.gz",
+   "sha256": "b59649528e51bd55408a6e3f70ec234c7b7c7182aa7591d89a01b190365de182",
+   "role": "producer raw JSONL of the 150 units + binary.sha256, host.txt, run.log, SHA256SUMS (303/303 inner OK)"
+  },
+  {
+   "path": "../units.tsv",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/units.tsv",
+   "sha256": "ef09bbf07f19637dae2d15c4ee006a37003947ca9be69f6ffa7ef04b37f9f62b",
+   "role": "frozen unit list (851b8da629)"
+  },
+  {
+   "path": "../PROTOCOL.md",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/PROTOCOL.md",
+   "sha256": "41ce07854a2ad471c359e7abb911bd7cfe23af410636bb3773e11bc1224d1684",
+   "role": "frozen protocol (851b8da629)"
+  },
+  {
+   "path": "../analysis.json",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/analysis.json",
+   "sha256": "340a83a64dbc12490a41cfa0a43108516c5ae285e43420b9aa864c1e0248b3ae",
+   "role": "producer's claimed numbers (compared, 405 cells)"
+  },
+  {
+   "path": "../src/ic2.rs",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/src/ic2.rs",
+   "sha256": "ee1377b8533f5f0208c3a402df5be50ad779f97691384793cb6b0faf300eb73d",
+   "role": "CAND source (NRM)"
+  },
+  {
+   "path": "../src/la2.rs",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/src/la2.rs",
+   "sha256": "15cb0dc25099560dbd15516b8318574f905018447706c6ddf8eb5e97ae5a67a5",
+   "role": "CAND source (LZ_REUSE)"
+  },
+  {
+   "path": "../../ic_gw_bl_reuse_20261115/amendment-1/src/ic2.rs",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/amendment-1/src/ic2.rs",
+   "sha256": "dc2532a956fd0207f3a37f15462b15eb5bb78b55b2ebc8f986aa2839d58f5b9d",
+   "role": "REF (BLR1) source"
+  },
+  {
+   "path": "../../ic_gw_bl_reuse_20261115/amendment-1/src/la2.rs",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/amendment-1/src/la2.rs",
+   "sha256": "6c3cc9ab851bd373e7a6fad9addad444bf271cfe8f8284eb456ef07e5aed4238",
+   "role": "REF (BLR1) source"
+  },
+  {
+   "path": "../../quartic_n4v2_20261020/results/summary.json",
+   "repo_path": "research/quartic_n4v2_20261020/results/summary.json",
+   "sha256": "a8d6c823f4b90829f409ef20e51df7de70fae6789a6458e272a730e71483ad7c",
+   "role": "frozen r_inv, r_lmul, gae (kind ic_size, arm DL)"
+  },
+  {
+   "path": "../../ic_gw_bl_reuse_20261115/validation/VALIDATION.json",
+   "repo_path": "research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json",
+   "sha256": "e51ee6815ef13a8802780433056833bcaa07c63a7bb6ecfdce01dba702e0825c",
+   "role": "frozen matched negation-map rho band (gae_band)"
+  },
+  {
+   "path": "replay/replay-runs-nrmlz-20261115.tar.gz",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/validation/replay/replay-runs-nrmlz-20261115.tar.gz",
+   "sha256": "a191758b908824b10ec3fcef43907e08f6d99da0d28c6c837fabbe8618d552b6",
+   "role": "validator replay raw JSONL/stderr (176 units), plans, nonce, stress summaries"
+  },
+  {
+   "path": "replay/SHA256SUMS.inner",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/validation/replay/SHA256SUMS.inner",
+   "sha256": "24509dd6239f4b88f67512877074511fbe01ee14475c69582cea474724ca1e96",
+   "role": "inner checksums of the replay tarball (365 files)"
+  },
+  {
+   "path": "recompute.json",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/validation/recompute.json",
+   "sha256": "3b7cc2cc0234d8ef9f91a983a9a93b65a8c56d0588f78b149d04ce79039f709e",
+   "role": "validator recompute from the producer tarball (gates, 405 cells, decision, gap)"
+  },
+  {
+   "path": "replay-compare.json",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/validation/replay-compare.json",
+   "sha256": "5c230f142931ed292731381e94ea9f5d28e3ec265bed4eaca01399aca0f1ffdc",
+   "role": "validator replay comparison (50 units)"
+  },
+  {
+   "path": "plan2-compare.json",
+   "repo_path": "research/ic_gw_nrm_lz_20261115/validation/plan2-compare.json",
+   "sha256": "579e8fc7bf56b224a69a9406f73c54b64a8eec94fcad757b5b37dd87ec40fc5b",
+   "role": "small-q sweep and negative controls"
+  }
+ ],
+ "headline": [
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=0.0, w_h=0",
+   "claimed": 0.9613930450261847,
+   "recomputed": 0.9613930450261847,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=0.0, w_h=0",
+   "claimed": 0.962397040284175,
+   "recomputed": 0.962397040284175,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=0.5, w_h=0",
+   "claimed": 0.9794856431113274,
+   "recomputed": 0.9794856431113274,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=0.5, w_h=0",
+   "claimed": 0.9798546650680021,
+   "recomputed": 0.9798546650680021,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=1.0, w_h=0",
+   "claimed": 0.9868688055839445,
+   "recomputed": 0.9868688055839445,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=1.0, w_h=0",
+   "claimed": 0.9872000921417721,
+   "recomputed": 0.9872000921417721,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=0.0, w_h=0",
+   "claimed": 0.9576607532881015,
+   "recomputed": 0.9576607532881015,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=0.0, w_h=0",
+   "claimed": 0.9585028417912062,
+   "recomputed": 0.9585028417912062,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=0.5, w_h=0",
+   "claimed": 0.9785947995064802,
+   "recomputed": 0.9785947995064802,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=0.5, w_h=0",
+   "claimed": 0.9790983637689995,
+   "recomputed": 0.9790983637689995,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=1.0, w_h=0",
+   "claimed": 0.9865655893780148,
+   "recomputed": 0.9865655893780148,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=1.0, w_h=0",
+   "claimed": 0.9869010359665338,
+   "recomputed": 0.9869010359665338,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=0.0, w_h=0",
+   "claimed": 0.9585239480937685,
+   "recomputed": 0.9585239480937685,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=0.0, w_h=0",
+   "claimed": 0.9588285944924918,
+   "recomputed": 0.9588285944924918,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=0.5, w_h=0",
+   "claimed": 0.9790339153622254,
+   "recomputed": 0.9790339153622254,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=0.5, w_h=0",
+   "claimed": 0.9791705212443036,
+   "recomputed": 0.9791705212443036,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=1.0, w_h=0",
+   "claimed": 0.986841913449371,
+   "recomputed": 0.986841913449371,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=1.0, w_h=0",
+   "claimed": 0.986923575084235,
+   "recomputed": 0.986923575084235,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=0.0, w_h=0",
+   "claimed": 0.9588834263245355,
+   "recomputed": 0.9588834263245355,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=0.0, w_h=0",
+   "claimed": 0.9589991002806841,
+   "recomputed": 0.9589991002806841,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=0.5, w_h=0",
+   "claimed": 0.9793603952025479,
+   "recomputed": 0.9793603952025479,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=0.5, w_h=0",
+   "claimed": 0.9795707652508041,
+   "recomputed": 0.9795707652508041,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=1.0, w_h=0",
+   "claimed": 0.9870809340808739,
+   "recomputed": 0.9870809340808739,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=1.0, w_h=0",
+   "claimed": 0.9872482818096123,
+   "recomputed": 0.9872482818096123,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=0.0, w_h=0",
+   "claimed": 0.9569028466800902,
+   "recomputed": 0.9569028466800902,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=0.0, w_h=0",
+   "claimed": 0.9569708049740198,
+   "recomputed": 0.9569708049740198,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=0.5, w_h=0",
+   "claimed": 0.9790705256034509,
+   "recomputed": 0.9790705256034509,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=0.5, w_h=0",
+   "claimed": 0.9792600236129149,
+   "recomputed": 0.9792600236129149,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=1.0, w_h=0",
+   "claimed": 0.9870584275934305,
+   "recomputed": 0.9870584275934305,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=1.0, w_h=0",
+   "claimed": 0.9872105091749867,
+   "recomputed": 0.9872105091749867,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=0.0, w_h=0",
+   "claimed": 0.8502553928307328,
+   "recomputed": 0.8502553928307328,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=0.0, w_h=0",
+   "claimed": 0.856341502656694,
+   "recomputed": 0.856341502656694,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=0.5, w_h=0",
+   "claimed": 0.9165990007813989,
+   "recomputed": 0.9165990007813989,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=0.5, w_h=0",
+   "claimed": 0.918601454911984,
+   "recomputed": 0.918601454911984,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=1.0, w_h=0",
+   "claimed": 0.939036028875159,
+   "recomputed": 0.939036028875159,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=1.0, w_h=0",
+   "claimed": 0.9409958118170941,
+   "recomputed": 0.9409958118170941,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=0.0, w_h=0",
+   "claimed": 0.8353448252490225,
+   "recomputed": 0.8353448252490225,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=0.0, w_h=0",
+   "claimed": 0.8407259071387362,
+   "recomputed": 0.8407259071387362,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=0.5, w_h=0",
+   "claimed": 0.9147802849259036,
+   "recomputed": 0.9147802849259036,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=0.5, w_h=0",
+   "claimed": 0.917548274979977,
+   "recomputed": 0.917548274979977,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=1.0, w_h=0",
+   "claimed": 0.9390902813043859,
+   "recomputed": 0.9390902813043859,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=1.0, w_h=0",
+   "claimed": 0.9410682625451652,
+   "recomputed": 0.9410682625451652,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=0.0, w_h=0",
+   "claimed": 0.8433783602888162,
+   "recomputed": 0.8433783602888162,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=0.0, w_h=0",
+   "claimed": 0.8451981081875357,
+   "recomputed": 0.8451981081875357,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=0.5, w_h=0",
+   "claimed": 0.9181913007997723,
+   "recomputed": 0.9181913007997723,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=0.5, w_h=0",
+   "claimed": 0.9189126143151815,
+   "recomputed": 0.9189126143151815,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=1.0, w_h=0",
+   "claimed": 0.9413396882227697,
+   "recomputed": 0.9413396882227697,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=1.0, w_h=0",
+   "claimed": 0.941806321269371,
+   "recomputed": 0.941806321269371,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=0.0, w_h=0",
+   "claimed": 0.8486689571113372,
+   "recomputed": 0.8486689571113372,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=0.0, w_h=0",
+   "claimed": 0.8493358856957504,
+   "recomputed": 0.8493358856957504,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=0.5, w_h=0",
+   "claimed": 0.9210113616624988,
+   "recomputed": 0.9210113616624988,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=0.5, w_h=0",
+   "claimed": 0.9220936258244862,
+   "recomputed": 0.9220936258244862,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=1.0, w_h=0",
+   "claimed": 0.9433451570699949,
+   "recomputed": 0.9433451570699949,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=1.0, w_h=0",
+   "claimed": 0.9442825720855278,
+   "recomputed": 0.9442825720855278,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=0.0, w_h=0",
+   "claimed": 0.8382425080934208,
+   "recomputed": 0.8382425080934208,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=0.0, w_h=0",
+   "claimed": 0.8386068786636026,
+   "recomputed": 0.8386068786636026,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=0.5, w_h=0",
+   "claimed": 0.9199627722902863,
+   "recomputed": 0.9199627722902863,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=0.5, w_h=0",
+   "claimed": 0.9209068103978005,
+   "recomputed": 0.9209068103978005,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=1.0, w_h=0",
+   "claimed": 0.9434887246391714,
+   "recomputed": 0.9434887246391714,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "DL1 cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=1.0, w_h=0",
+   "claimed": 0.9443112123926833,
+   "recomputed": 0.9443112123926833,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=0.0, w_h=0",
+   "claimed": 0.9713316252861097,
+   "recomputed": 0.9713316252861097,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=0.0, w_h=0",
+   "claimed": 0.9727750848413634,
+   "recomputed": 0.9727750848413634,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=0.5, w_h=0",
+   "claimed": 0.9742301567410059,
+   "recomputed": 0.9742301567410059,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=0.5, w_h=0",
+   "claimed": 0.9755225201883994,
+   "recomputed": 0.9755225201883994,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=18 (q=262111), w_add=1.0, w_h=0",
+   "claimed": 0.9762275834371278,
+   "recomputed": 0.9762275834371278,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=18 (q=262111), w_add=1.0, w_h=0",
+   "claimed": 0.9774164874982293,
+   "recomputed": 0.9774164874982293,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=0.0, w_h=0",
+   "claimed": 0.9716381153424818,
+   "recomputed": 0.9716381153424818,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=0.0, w_h=0",
+   "claimed": 0.9723119423813721,
+   "recomputed": 0.9723119423813721,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=0.5, w_h=0",
+   "claimed": 0.9746358863696797,
+   "recomputed": 0.9746358863696797,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=0.5, w_h=0",
+   "claimed": 0.9752610673809673,
+   "recomputed": 0.9752610673809673,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=19 (q=524287), w_add=1.0, w_h=0",
+   "claimed": 0.9766755129046598,
+   "recomputed": 0.9766755129046598,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=19 (q=524287), w_add=1.0, w_h=0",
+   "claimed": 0.9772644318144861,
+   "recomputed": 0.9772644318144861,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=0.0, w_h=0",
+   "claimed": 0.9724729844820844,
+   "recomputed": 0.9724729844820844,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=0.0, w_h=0",
+   "claimed": 0.9725643110513859,
+   "recomputed": 0.9725643110513859,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=0.5, w_h=0",
+   "claimed": 0.9753472949038741,
+   "recomputed": 0.9753472949038741,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=0.5, w_h=0",
+   "claimed": 0.9754384532223924,
+   "recomputed": 0.9754384532223924,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=20 (q=1048507), w_add=1.0, w_h=0",
+   "claimed": 0.9773050922721047,
+   "recomputed": 0.9773050922721047,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=20 (q=1048507), w_add=1.0, w_h=0",
+   "claimed": 0.9773948767078385,
+   "recomputed": 0.9773948767078385,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=0.0, w_h=0",
+   "claimed": 0.9733163857878929,
+   "recomputed": 0.9733163857878929,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=0.0, w_h=0",
+   "claimed": 0.9738760310493683,
+   "recomputed": 0.9738760310493683,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=0.5, w_h=0",
+   "claimed": 0.9761012457338527,
+   "recomputed": 0.9761012457338527,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=0.5, w_h=0",
+   "claimed": 0.9766081695511223,
+   "recomputed": 0.9766081695511223,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=21 (q=2097091), w_add=1.0, w_h=0",
+   "claimed": 0.9779951295696816,
+   "recomputed": 0.9779951295696816,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=21 (q=2097091), w_add=1.0, w_h=0",
+   "claimed": 0.978465442545205,
+   "recomputed": 0.978465442545205,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=0.0, w_h=0",
+   "claimed": 0.9736785139520757,
+   "recomputed": 0.9736785139520757,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=0.0, w_h=0",
+   "claimed": 0.9741282259391709,
+   "recomputed": 0.9741282259391709,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=0.5, w_h=0",
+   "claimed": 0.9764872896951512,
+   "recomputed": 0.9764872896951512,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=0.5, w_h=0",
+   "claimed": 0.976893433313479,
+   "recomputed": 0.976893433313479,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF geomean over seeds 1-6, k=22 (q=4194271), w_add=1.0, w_h=0",
+   "claimed": 0.9783878182843119,
+   "recomputed": 0.9783878182843119,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "D cold M-eq BOTH/REF max over seeds 1-6, k=22 (q=4194271), w_add=1.0, w_h=0",
+   "claimed": 0.9787638532950053,
+   "recomputed": 0.9787638532950053,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio NRM/DL over 30 cells x w_add (w_h=0)",
+   "claimed": 0.9872482818096123,
+   "recomputed": 0.9872482818096123,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio NRM/DL1 over 30 cells x w_add (w_h=0)",
+   "claimed": 0.9836989174625379,
+   "recomputed": 0.9836989174625379,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio NRM/D over 30 cells x w_add (w_h=0)",
+   "claimed": 0.9937706603760332,
+   "recomputed": 0.9937706603760332,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio LZ/DL over 30 cells x w_add (w_h=0)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio LZ/DL1 over 30 cells x w_add (w_h=0)",
+   "claimed": 0.9606467734561853,
+   "recomputed": 0.9606467734561853,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio LZ/D over 30 cells x w_add (w_h=0)",
+   "claimed": 0.9851801873048623,
+   "recomputed": 0.9851801873048623,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio BOTH/DL over 30 cells x w_add (w_h=0)",
+   "claimed": 0.9872482818096123,
+   "recomputed": 0.9872482818096123,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio BOTH/DL1 over 30 cells x w_add (w_h=0)",
+   "claimed": 0.9443112123926833,
+   "recomputed": 0.9443112123926833,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "decision max ratio BOTH/D over 30 cells x w_add (w_h=0)",
+   "claimed": 0.9787638532950053,
+   "recomputed": 0.9787638532950053,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 REF DL mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=0 GAE",
+   "claimed": 844014769.0560999,
+   "recomputed": 844014769.0560999,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 REF DL mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=0.1 GAE",
+   "claimed": 1014011904.4561,
+   "recomputed": 1014011904.4561,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 REF DL mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=1 GAE",
+   "claimed": 2543986123.0560994,
+   "recomputed": 2543986123.0560994,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 REF DL1 mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=0 GAE",
+   "claimed": 526400229.72096664,
+   "recomputed": 526400229.72096664,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 REF DL1 mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=0.1 GAE",
+   "claimed": 696397365.1209666,
+   "recomputed": 696397365.1209666,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 REF DL1 mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=1 GAE",
+   "claimed": 2226371583.7209663,
+   "recomputed": 2226371583.7209663,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 BOTH DL mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=0 GAE",
+   "claimed": 807657140.7227665,
+   "recomputed": 807657140.7227665,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 BOTH DL mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=0.1 GAE",
+   "claimed": 977654276.1227666,
+   "recomputed": 977654276.1227666,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 BOTH DL mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=1 GAE",
+   "claimed": 2507628494.7227664,
+   "recomputed": 2507628494.7227664,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 BOTH DL1 mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=0 GAE",
+   "claimed": 441298773.05553323,
+   "recomputed": 441298773.05553323,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 BOTH DL1 mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=0.1 GAE",
+   "claimed": 611295908.4555334,
+   "recomputed": 611295908.4555334,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 BOTH DL1 mean cold M-eq seeds 1-3, w_add=0, hash+cmp at w=1 GAE",
+   "claimed": 2141270127.0555332,
+   "recomputed": 2141270127.0555332,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 rho/IC BOTH DL, w=0",
+   "claimed": 469.9908920019036,
+   "recomputed": 469.9908920019036,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 rho/IC BOTH DL, w=0.1",
+   "claimed": 502.1343556608703,
+   "recomputed": 502.1343556608703,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 rho/IC BOTH DL, w=1",
+   "claimed": 595.3090751447373,
+   "recomputed": 595.3090751447373,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 rho/IC BOTH DL1, w=0",
+   "claimed": 860.1689448890265,
+   "recomputed": 860.1689448890265,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 rho/IC BOTH DL1, w=0.1",
+   "claimed": 803.0706458355264,
+   "recomputed": 803.0706458355264,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 rho/IC BOTH DL1, w=1",
+   "claimed": 697.1628572863774,
+   "recomputed": 697.1628572863774,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "k=22 IC/rho BOTH DL, w=0 (as printed in README/REPORT/tables, 3 significant digits)",
+   "claimed": 0.00213,
+   "recomputed": 0.0021277008065848854,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k=22 IC/rho BOTH DL, w=0.1 (as printed in README/REPORT/tables, 3 significant digits)",
+   "claimed": 0.00199,
+   "recomputed": 0.001991498866242437,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k=22 IC/rho BOTH DL, w=1 (as printed in README/REPORT/tables, 3 significant digits)",
+   "claimed": 0.00168,
+   "recomputed": 0.0016797996901976846,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k=22 IC/rho BOTH DL1, w=0 (as printed in README/REPORT/tables, 3 significant digits)",
+   "claimed": 0.00116,
+   "recomputed": 0.0011625623151612543,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k=22 IC/rho BOTH DL1, w=0.1 (as printed in README/REPORT/tables, 3 significant digits)",
+   "claimed": 0.00125,
+   "recomputed": 0.0012452204612205511,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k=22 IC/rho BOTH DL1, w=1 (as printed in README/REPORT/tables, 3 significant digits)",
+   "claimed": 0.00143,
+   "recomputed": 0.0014343850788212952,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "REF DL k=22 mean reproduces the frozen band IC value (BLR1 VALIDATION.json gae_band[0].ic)",
+   "claimed": 844014769.0560999,
+   "recomputed": 844014769.0560999,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "REF DL k=22 mean reproduces the frozen band IC value (BLR1 VALIDATION.json gae_band[0.1].ic)",
+   "claimed": 1014011904.4561,
+   "recomputed": 1014011904.4561,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "REF DL k=22 mean reproduces the frozen band IC value (BLR1 VALIDATION.json gae_band[1].ic)",
+   "claimed": 2543986123.0560994,
+   "recomputed": 2543986123.0560994,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "relations.mul ratio NRM/REF (DL record) geomean, k=18",
+   "claimed": 0.8776285148007179,
+   "recomputed": 0.8776285148007179,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "linear_algebra.lmul ratio BOTH/REF DL1 geomean, k=18",
+   "claimed": 0.7838737295883588,
+   "recomputed": 0.7838737295883588,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "relations.mul ratio NRM/REF (DL record) geomean, k=19",
+   "claimed": 0.8663003422287597,
+   "recomputed": 0.8663003422287597,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "linear_algebra.lmul ratio BOTH/REF DL1 geomean, k=19",
+   "claimed": 0.7764606899337463,
+   "recomputed": 0.7764606899337463,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "relations.mul ratio NRM/REF (DL record) geomean, k=20",
+   "claimed": 0.8840934307866615,
+   "recomputed": 0.8840934307866615,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "linear_algebra.lmul ratio BOTH/REF DL1 geomean, k=20",
+   "claimed": 0.7692776510147808,
+   "recomputed": 0.7692776510147808,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "relations.mul ratio NRM/REF (DL record) geomean, k=21",
+   "claimed": 0.8941549091470393,
+   "recomputed": 0.8941549091470393,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "linear_algebra.lmul ratio BOTH/REF DL1 geomean, k=21",
+   "claimed": 0.7655285166707216,
+   "recomputed": 0.7655285166707216,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "relations.mul ratio NRM/REF (DL record) geomean, k=22",
+   "claimed": 0.8837982839162601,
+   "recomputed": 0.8837982839162601,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "linear_algebra.lmul ratio BOTH/REF DL1 geomean, k=22",
+   "claimed": 0.7623075616533348,
+   "recomputed": 0.7623075616533348,
+   "rel_tol": 1e-09,
+   "agrees": true
+  }
+ ],
+ "headline_note": "claimed = producer's analysis.json (and the 3-digit IC/rho printed in README/REPORT.typ/tables.md, rel_tol 5e-3); recomputed = scripts/recompute.py from runs-nrmlz-20261115.tar.gz with the frozen constants. All 405 ratio cells (3 variants x 3 arms x 5 sizes x 3 w_add x 3 w_h, geomean/max/min/per-seed) agree with analysis.json with max relative difference 0.0.",
+ "decisions": {
+  "BOTH_improvement_recomputed": {
+   "DL": true,
+   "DL1": true,
+   "D": true
+  },
+  "BOTH_improvement_claimed": {
+   "DL": true,
+   "DL1": true,
+   "D": true
+  },
+  "BOTH_band_below_1_all_w_h": {
+   "DL": true,
+   "DL1": true,
+   "D": true
+  },
+  "NRM_LZ_descriptive_recomputed_equal_claimed": true,
+  "LZ_DL_exactly_1": true,
+  "gates": {
+   "G0": true,
+   "G1": true,
+   "G2": true,
+   "G3": true
+  },
+  "units_with_allowed_changes": {
+   "NRM": 30,
+   "LZ": 30,
+   "BOTH": 30
+  },
+  "ref_reproduces_frozen_band": {
+   "0": 0.0,
+   "0.1": 0.0,
+   "1": 0.0
+  },
+  "worst_BOTH_ratio_w_h_0": {
+   "DL": 0.9872482818096123,
+   "DL1": 0.9443112123926833,
+   "D": 0.9787638532950053
+  },
+  "ranges_BOTH_geomean": {
+   "DL": {
+    "0.0": [
+     0.9569028466800902,
+     0.9613930450261847
+    ],
+    "0.5": [
+     0.9785947995064802,
+     0.9794856431113274
+    ],
+    "1.0": [
+     0.9865655893780148,
+     0.9870809340808739
+    ]
+   },
+   "DL1": {
+    "0.0": [
+     0.8353448252490225,
+     0.8502553928307328
+    ],
+    "0.5": [
+     0.9147802849259036,
+     0.9210113616624988
+    ],
+    "1.0": [
+     0.939036028875159,
+     0.9434887246391714
+    ]
+   },
+   "D": {
+    "0.0": [
+     0.9713316252861097,
+     0.9736785139520757
+    ],
+    "0.5": [
+     0.9742301567410059,
+     0.9764872896951512
+    ],
+    "1.0": [
+     0.9762275834371278,
+     0.9783878182843119
+    ]
+   }
+  },
+  "k22_gap": {
+   "IC_over_rho_BOTH_DL": [
+    0.0021277008065848854,
+    0.001991498866242437,
+    0.0016797996901976846
+   ],
+   "IC_over_rho_BOTH_DL1": [
+    0.0011625623151612543,
+    0.0012452204612205511,
+    0.0014343850788212952
+   ],
+   "IC_over_rho_REF_DL": [
+    0.002223481740386968,
+    0.002065559991298065,
+    0.0017041547862333146
+   ],
+   "IC_over_rho_REF_DL1": [
+    0.001386754523536398,
+    0.0014185736174476386,
+    0.001491392486753853
+   ],
+   "order_IC_below_rho_holds_across_band": true
+  }
+ },
+ "checks": {
+  "artifacts": "runs tarball sha256 b59649528e51... (= benchrec raw record); 303/303 inner SHA256SUMS OK; 150 units (5 arms x 30 cells), 150 .jsonl + 150 .err + binary.sha256, host.txt, run.log; binary.sha256 inside equals REF e236855d7fef... and CAND a7e4ad7a41e5...",
+  "build": "REF and CAND rebuilt from git archive be6570bbcb with rustc 1.97.0 to the recorded sha256 (bit-identical)",
+  "freeze": "PROTOCOL.md, analyze.py, make-units.sh, run-local.sh, units.tsv and src/*.rs byte-identical between 851b8da629 and be6570bbcb; REF source research/ic_gw_bl_reuse_20261115/amendment-1/src unchanged since its freeze 98a4fc6639; shared includes research/quartic_n4_20261019/{common,ghs,ic,solver}.rs and src/cryptanalysis/plane_quartic_pic.rs unchanged since 9a63c9161b",
+  "diff_review": "CAND vs REF: rho2.rs, solver2.rs, summ2.rs identical; v3.rs differs only in five #[path] prefixes; ic2.rs differs only in the NRM-gated lines of find_relations_2lp; la2.rs only in the LZ_REUSE-gated lines of lanczos. Env read once per call (std::env::var(...).is_ok()); the runner unsets both before setting.",
+  "no_env_equals_ref": "by reading (identical op sequence: g2 = add(0, mul(ha0, mb0)) then t = 1..5 equals REF's t = 0..5 loop from 0; disc, lin, normaliser and both dots unchanged) and by measurement: G0 on all 30 producer cells, 2 replayed A/A units, 200,000 stress trials (result and counts equal to REF la2.rs)",
+  "gates_recomputed": "G0-G3 pass on the producer tarball (34320 counted fields); stderr equal after masking wall in all 150 units",
+  "replay": "50 units of plan 1, all verified, 0 mismatches, 25168 fields; plan 2: 120 small-q units, 0 mismatches, 6/6 mutants detected",
+  "oracle": "Every skipped multiplication had an operand equal to 1 (or was the exact 4*g1 = 2(g1+g1) rewrite) and every full value (g3, g1, g2, disc, residual points, normalised points) equals REF's; every reused v^T v_prev and w^T y equals the direct dot and every w_i^T A w_0 (i >= 1) is 0; the counted differences REF - CAND equal the oracle's skip/reuse counts exactly in every record (34 production-size units incl. all 30 producer cells, 207 small-q records incl. failed attempts).",
+  "stress": "the no-env path equals REF in result and counts on every trial; LZ gives the identical result (incl. every None) on every trial and its count saving follows (I-1)(2n-2)-1 exactly, also at ell = 2, 3, 5 where breakdown is frequent",
+  "metric_model": "recompute.py implements PROTOCOL.md's model from its text (not from analyze.py): per unit and arm, sum over that arm's ic records and the seven phases of mul + r_inv inv + r_lmul lmul + w_add (add + ladd) + w_h gae (hash + cmp), frozen per-q constants (kind ic_size, arm DL)",
+  "benchrec": "benchmarks/records/20261115T0539Z-ic-gw-nrm-lz.json metrics 95.69 / 98.71 / 83.82 percent equal the recomputed k = 22 geomeans (DL w_add 0, 1; DL1 w_add 0); its raw entry has uploaded: false"
+ },
+ "discrepancies": [
+  {
+   "id": "N1",
+   "severity": "none (disclosure)",
+   "what": "NRM changes relations.add as well as relations.mul: the g2 skip also drops add(0, x), and 4*g1 becomes two additions, so CAND does #pairs-with-disc - #g2-skips more additions (net +1 per pair with g3 != 0). PROTOCOL H_nrm allows relations.add to change; the count identity holds exactly."
+  },
+  {
+   "id": "N2",
+   "severity": "none (scope note)",
+   "what": "H_nrm says points are normalised with first coordinate 1; points with first coordinate 0 exist (56 residual points at production sizes; 134 fb pairs and 158 residual points in the small-q sweep). The code tests the operand at run time, so they take the counted path; verified exact."
+  },
+  {
+   "id": "N3",
+   "severity": "for the Coordinator (success criterion)",
+   "what": "The NRM saving is the removal of products whose operand is the constant 1 (five sites) and of the product by the constant 4 (one site, replaced by two additions). These are real operations of the REF code path that CAND no longer executes, not a re-pricing; but they are baseline waste rather than a new algorithmic idea. At w_add = 1 the 4*g1 rewrite costs one M-eq more than it saves; the ratio stays < 1 because of the other five sites."
+  },
+  {
+   "id": "N4",
+   "severity": "for the Coordinator (headline)",
+   "what": "LZ_REUSE does not touch DL (block Lanczos): LZ/REF for DL is exactly 1 at every cell, and the DL headline (BOTH) equals NRM alone. DL1 is cheaper than DL in this model at k = 22 already in REF (5.264e8 vs 8.440e8 M-eq at w = 0; 2.226e9 vs 2.544e9 at w = 1); the frozen band anchors only REF DL, so DL1's IC/rho (0.00116 / 0.00125 / 0.00143) uses the same rho but has no previously validated REF anchor; its records were replayed here (all sampled units) like DL's."
+  },
+  {
+   "id": "N5",
+   "severity": "none (disclosure)",
+   "what": "PROTOCOL.md reports a main-session pilot (q 262111 and 1048507, seed 1) before the freeze, which informed the predictions; the decision rule does not use the predictions."
+  }
+ ],
+ "null_object_control": "The claim is a deterministic counted-work ratio, not a statistical signal; there is no parameter whose increase should destroy it. Nulls of the same shape: (a) A0 (CAND, no env) = REF in every counted field on all 30 producer cells and 2 replayed units, ratio exactly 1; (b) LZ on the untouched DL arm gives exactly 1.000 at every cell, w_add and w_h (predicted negative case); (c) the oracle shows every skipped operand equals 1 and every reused dot equals the direct dot; (d) three mutants that make one skip or reuse inexact are all detected (6/6 runs). Mechanism check in place of a decay parameter: the LZ saving per call is (I-1)(2n-2)-1 lmul against matvec work growing with nnz, so its share should be larger after SGE (DL1: lmul ratio 0.784 -> 0.762 from k = 18 to 22) than on the full matrix (D: 0.981 -> 0.983) - observed.",
+ "validation_ladder_checks": {
+  "step1_assumptions_isolated": "NRM rests on operand == 1 at each skip; LZ on local and global A-orthogonality. Each measured separately per skip and per iteration by the oracle on all 30 producer cells, 6 sampled units, the c_D = 1.55 unit and 40 small-q cells, and stressed on 200,000 random matrices at ell down to 2 (failure mode hunted: an inexact reuse after a breakdown or a skip at a coordinate that is not 1). None found.",
+  "step2_measured_ratio_on_full_pipeline": "the ratio is measured on the full pipeline against REF at every size claimed (k = 18..22, 30 cells), re-measured on new seeds (10, 11) and at c_D = 1.55; predicted negative cases (A0 = REF, LZ on DL = 1) checked. No extrapolation is claimed.",
+  "step3_cheats": "none: no partial run; L0 host and 3-way concurrency affect only wall/CPU, which are not claimed.",
+  "step4_reproducibility": "REF and CAND rebuilt from the committed sources to the recorded hashes; units re-run from the committed command line; validator artifacts listed under raw_data with sha256."
+ },
+ "heuristic_validation_checks": "not applicable: no heuristic distribution is validated (deterministic counted operations).",
+ "cost_model_checks": {
+  "unit": "cold F_q-multiplication equivalents (M-eq): mul + r_inv inv + r_lmul lmul + w_add (add + ladd) + w_h gae (hash + cmp), frozen per-size r_inv, r_lmul, gae from research/quartic_n4v2_20261020/results/summary.json (kind ic_size, arm DL)",
+  "optimistic_assumptions": "r_inv and r_lmul are frozen time ratios from an earlier grid, not re-measured; additions free in the primary cell and in the rho band (band at w_add = 0); the 4*g1 rewrite is a saving only when additions are cheaper than half a multiplication; hash/cmp priced at 0, 0.1, 1 GAE (section 5a)",
+  "memory": "not reported by the study; NRM adds no storage; LZ adds three scalars (wy_cur, wy_prev, s0) per Lanczos call",
+  "total_cost_bookkeeping": "per-unit totals include every record of the arm (all attempts; every producer unit succeeded on attempt 1), so no success-probability correction is needed; the k = 22 band uses the mean over seeds 1-3 as frozen",
+  "rho_side": "frozen negation-map band of research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json (not re-measured here); REF DL reproduces its IC values with relative error 0"
+ },
+ "limitations": [
+  "L0: session container (4 vCPU), up to 3 units concurrent; only counted fields are claimed and compared. No EKS route, no native L2/replay/A/A admission; no wall-clock claim.",
+  "Scope: GHS-weak family E0/F_{q^3}, driver ic <q> <seed> D 3.0 1.7, k = 18..22, seeds 1-6 (producer), seeds 10 and 11, one c_D = 1.55 unit and q 223..32719 (validator). Transfer beyond these instances rests on the identity proofs, not on measurement.",
+  "The rho side is the frozen band; no rho was re-measured. The band prices additions at 0; with additions priced the IC side rises (w_add = 1 values are in tables.md) while the rho side was not re-priced.",
+  "Counted-cost improvement of 1.3-4.3% (DL) and 5.6-16.5% (DL1) depending on w_add; NRM is a removal of trivial products (N3).",
+  "Independence is of reasoning and code within the same session family and host; no keyring signature."
+ ],
+ "method": "scripts/: select_units.py (nonce sample, written before the nonce), make_plan.py, make_plan2.py, replay.sh, make_oracle.py (oracle build), make_mutants.py (negative controls), lzstress.rs (stress harness), compare_replay.py, compare_plan2.py, recompute.py (headline from the producer tarball), make_reports.py (this file and the certificate).",
+ "validation_report": {
+  "id": "VAL-20261115-5c7af8",
+  "task_id": "none named by the task card (main-session validation-gate request)",
+  "run_ids": [
+   "research/ic_gw_nrm_lz_20261115 runs-nrmlz-20261115 (150 units, data commit be6570bbcb)"
+  ],
+  "artifact_checks": [
+   "tarball sha256 + 303/303 inner checksums",
+   "150/150 units rc 0",
+   "binaries rebuilt bit-identically",
+   "freeze unchanged since 851b8da629",
+   "replay tarball 365/365 inner checksums"
+  ],
+  "metric_recomputations": [
+   "405 ratio cells = analysis.json (rel diff 0)",
+   "decision (9 variant/arm pairs) equal",
+   "k = 22 means and IC/rho equal",
+   "REF reproduces the frozen band (rel err 0)"
+  ],
+  "control_checks": [
+   "A0 = REF (30 + 2)",
+   "LZ on DL = 1 exactly",
+   "oracle: 0 bad skips / reuses",
+   "6/6 mutants detected",
+   "200k stress trials exact"
+  ],
+  "heuristic_validation_checks": [],
+  "cost_model_checks": [
+   "unit declared (cold M-eq)",
+   "optimistic assumptions listed",
+   "memory not reported by the study (no change by construction)"
+  ],
+  "proof_architecture_checks": [],
+  "verdict": "passed",
+  "limitations": [
+   "L0 counted only",
+   "rho band frozen, not re-measured",
+   "N3, N4 for the Coordinator"
+  ],
+  "artifact_paths": [
+   "research/ic_gw_nrm_lz_20261115/validation/replay-certificate.json",
+   "research/ic_gw_nrm_lz_20261115/validation/validator-report.json",
+   "research/ic_gw_nrm_lz_20261115/validation/replay/replay-runs-nrmlz-20261115.tar.gz",
+   "benchmarks/20261115-ic-gw-nrm-lz/replay-certificate.json",
+   "benchmarks/20261115-ic-gw-nrm-lz/validator-report.json"
+  ]
+ },
+ "review_attestation": {
+  "review_plan": "none attached to the task card; no joints assigned, so this report verdicts receipt admissibility",
+  "joints_owned": [],
+  "sources_read": [
+   "crypto-autoresearcher/docs/agent-runtime-core.md",
+   "crypto-autoresearcher/agents/validator.md",
+   "crypto-autoresearcher/docs/inventor-protocol.md sections 3 and 6",
+   "crypto/docs/VALIDATION_GATE.md",
+   "crypto/scripts/validation_gate.py (check functions)",
+   "research/ic_gw_nrm_lz_20261115/PROTOCOL.md",
+   "research/ic_gw_nrm_lz_20261115/README.md",
+   "research/ic_gw_nrm_lz_20261115/tables.md",
+   "research/ic_gw_nrm_lz_20261115/REPORT.typ",
+   "research/ic_gw_nrm_lz_20261115/analysis.json",
+   "research/ic_gw_nrm_lz_20261115/run-local.sh",
+   "research/ic_gw_nrm_lz_20261115/make-units.sh",
+   "research/ic_gw_nrm_lz_20261115/units.tsv",
+   "research/ic_gw_nrm_lz_20261115/src (diff vs REF; ic2.rs find_relations_2lp, local_data, pack2; la2.rs lanczos, matvec_pm1, dot; solver2.rs relation and linear-algebra dispatch; v3.rs arm map)",
+   "research/quartic_n4_20261019/common.rs (Fp, counters, Rng), research/quartic_n4_20261019/ic.rs (pnorm, line_points)",
+   "research/ic_gw_nrm_lz_20261115/runs-nrmlz-20261115.tar.gz",
+   "research/quartic_n4v2_20261020/results/summary.json (ic_size DL rows)",
+   "research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json, replay-certificate.json and validator-report.json (format only)",
+   "benchmarks/records/20261115T0539Z-ic-gw-nrm-lz.json (raw, metrics)"
+  ],
+  "not_read": [
+   "research/ic_gw_nrm_lz_20261115/analyze.py (hashed only)",
+   "research/ic_gw_nrm_lz_20261115/plot.py",
+   "research/ic_gw_nrm_lz_20261115/gen-report.py",
+   "research/ic_gw_bl_reuse_20261115/analyze.py"
+  ],
+  "read_sibling_reports": false,
+  "verdict": "passed"
+ }
+}

@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | inc | 16/16 | 8.053 | 8.760 | 15.129 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | ksum3-n10 | 16/16 | 19.881 | 23.476 | 55.830 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | ksum3-n14 | 16/16 | 10.355 | 11.908 | 25.885 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | ksum3-n28 | 16/16 | 12.330 | 12.699 | 16.021 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | ksum3-n40 | 16/16 | 30.597 | 30.879 | 33.419 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | mitm2-n81 | 16/16 | 12.816 | 13.989 | 24.547 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | mitm3-n41 | 16/16 | 51.995 | 57.066 | 102.697 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 16/16 | 1.372 | 1.497 | 2.625 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | inc vs ksum3-n10 | inc < ksum3-n10 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs ksum3-n14 | inc < ksum3-n14 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs ksum3-n28 | inc < ksum3-n28 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs ksum3-n40 | inc < ksum3-n40 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs mitm2-n81 | inc < mitm2-n81 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs mitm3-n41 | inc < mitm3-n41 |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n10 vs ksum3-n14 | ksum3-n14 < ksum3-n10 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n10 vs ksum3-n28 | ksum3-n28 < ksum3-n10 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n10 vs ksum3-n40 | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n10 vs mitm2-n81 | mitm2-n81 < ksum3-n10 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n10 vs mitm3-n41 | ksum3-n10 < mitm3-n41 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n10 vs rho-neg | rho-neg < ksum3-n10 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n14 vs ksum3-n28 | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n14 vs ksum3-n40 | ksum3-n14 < ksum3-n40 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n14 vs mitm2-n81 | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n14 vs mitm3-n41 | ksum3-n14 < mitm3-n41 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n14 vs rho-neg | rho-neg < ksum3-n14 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n28 vs ksum3-n40 | ksum3-n28 < ksum3-n40 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n28 vs mitm2-n81 | ksum3-n28 < mitm2-n81 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n28 vs mitm3-n41 | ksum3-n28 < mitm3-n41 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n28 vs rho-neg | rho-neg < ksum3-n28 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n40 vs mitm2-n81 | mitm2-n81 < ksum3-n40 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n40 vs mitm3-n41 | ksum3-n40 < mitm3-n41 |
+| icv1-fp24-tm1578-e83ed1b2 | ksum3-n40 vs rho-neg | rho-neg < ksum3-n40 |
+| icv1-fp24-tm1578-e83ed1b2 | mitm2-n81 vs mitm3-n41 | mitm2-n81 < mitm3-n41 |
+| icv1-fp24-tm1578-e83ed1b2 | mitm2-n81 vs rho-neg | rho-neg < mitm2-n81 |
+| icv1-fp24-tm1578-e83ed1b2 | mitm3-n41 vs rho-neg | rho-neg < mitm3-n41 |

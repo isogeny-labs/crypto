@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""Print the first JSON value on stdin, compactly; exit 1 if there is none.
+
+crypto-autoresearcher's lead_atlas.py --match --json prints the JSON array and
+then its text table, so its output as a whole is not JSON."""
+import json
+import sys
+
+text = sys.stdin.read().lstrip()
+try:
+    value, _ = json.JSONDecoder().raw_decode(text)
+except ValueError:
+    sys.exit(1)
+print(json.dumps(value))

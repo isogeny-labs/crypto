@@ -22,7 +22,18 @@ run_cmd do
       `IcNegative.sum_yield_cast,
       `IcNegative.total_yield_eq,
       `IcNegative.coverage_le_card_dom,
-      `IcNegative.coverage_le_card_cod] do
+      `IcNegative.coverage_le_card_cod,
+      `IcNegative.Lemma4.lemma4_fails_witnessA,
+      `IcNegative.Lemma4.qmul_zero_right,
+      `IcNegative.Lemma4.red_fA1,
+      `IcNegative.Lemma4.red_fA2,
+      `IcNegative.Lemma4.red_feX,
+      `IcNegative.Lemma4.red_feY,
+      `IcNegative.Lemma4Reverse.reverse_fails_witnessR,
+      `IcNegative.Lemma4Reverse.fake_noFall,
+      `IcNegative.FakeDegreeGap.gap_two_witnessW3,
+      `IcNegative.InsideGap.fe_first_fall_four,
+      `IcNegative.InsideGap.insideA_fall4] do
     let axioms ← Lean.collectAxioms name
     let forbidden := axioms.filter fun ax => !allowed.contains ax
     unless forbidden.isEmpty do

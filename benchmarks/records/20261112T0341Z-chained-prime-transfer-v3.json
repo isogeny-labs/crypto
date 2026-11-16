@@ -1,0 +1,357 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-12T07:51:49+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/chained_transfer_bench",
+        "run",
+        "--json",
+        "research/chained_prime_transfer_20261111/results_v3.json",
+        "--certs",
+        "research/chained_prime_transfer_20261111/certs_v3.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T03:47:53+00:00",
+      "wall_s": 0.18
+    },
+    {
+      "argv": [
+        "./target/release/chained_transfer_bench",
+        "run",
+        "--json",
+        "research/chained_prime_transfer_20261111/results_v3.json",
+        "--certs",
+        "research/chained_prime_transfer_20261111/certs_v3.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T04:38:38+00:00",
+      "wall_s": 0.166
+    },
+    {
+      "argv": [
+        "./target/release/chained_transfer_bench",
+        "run",
+        "--json",
+        "research/chained_prime_transfer_20261111/repro/results_v3.repro.json",
+        "--certs",
+        "research/chained_prime_transfer_20261111/repro/certs_v3.repro.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T07:49:05+00:00",
+      "wall_s": 0.179
+    }
+  ],
+  "commit": "1d0afb71100c02da18af000b0c205098278c59da",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T03:41:44+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T0341Z-chained-prime-transfer-v3",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_e1_ops_p211",
+      "note": "counted rho on E1; matched reference",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 428.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_e1prime_ops_p211",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 530.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_jc_ops_p211",
+      "note": "rho on pulled-back J(C) pair",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 396.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "ic_jc_group_ops_p211",
+      "note": "oracle-free genus-2 IC on pulled-back pair, relation-collection group ops; LA unpriced here",
+      "reference": 428.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 3419.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "ic_jc_la_mulmods_p211",
+      "note": "Z/r mulmods in linear algebra, unpriced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 14633.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_e1_ops_p419",
+      "note": "counted rho on E1; matched reference",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 357.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_e1prime_ops_p419",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 562.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_jc_ops_p419",
+      "note": "rho on pulled-back J(C) pair",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 361.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "ic_jc_group_ops_p419",
+      "note": "oracle-free genus-2 IC on pulled-back pair, relation-collection group ops; LA unpriced here",
+      "reference": 357.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 8475.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "ic_jc_la_mulmods_p419",
+      "note": "Z/r mulmods in linear algebra, unpriced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 51976.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_e1_ops_p821",
+      "note": "counted rho on E1; matched reference",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 370.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_e1prime_ops_p821",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 274.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_jc_ops_p821",
+      "note": "rho on pulled-back J(C) pair",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 414.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "ic_jc_group_ops_p821",
+      "note": "oracle-free genus-2 IC on pulled-back pair, relation-collection group ops; LA unpriced here",
+      "reference": 370.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 11353.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "ic_jc_la_mulmods_p821",
+      "note": "Z/r mulmods in linear algebra, unpriced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 164828.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_e1_ops_p1619",
+      "note": "counted rho on E1; matched reference",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 847.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_e1prime_ops_p1619",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 649.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "rho_jc_ops_p1619",
+      "note": "rho on pulled-back J(C) pair",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "gae",
+      "value": 869.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "ic_jc_group_ops_p1619",
+      "note": "oracle-free genus-2 IC on pulled-back pair, relation-collection group ops; LA unpriced here",
+      "reference": 847.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 34521.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "ic_jc_la_mulmods_p1619",
+      "note": "Z/r mulmods in linear algebra, unpriced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 603721.0
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 3342,
+      "path": "research/chained_prime_transfer_20261111/results_v3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/29/29d9e8602088bec7db6de442a37cdfe20964c1ac19f45f2aeae63250f98ba55e",
+      "sha256": "29d9e8602088bec7db6de442a37cdfe20964c1ac19f45f2aeae63250f98ba55e",
+      "uploaded": false
+    },
+    {
+      "bytes": 5265,
+      "path": "research/chained_prime_transfer_20261111/certs_v3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/26/263f47397d36f5ad6b4df55e04bc53cd214595cf24c8b0636f98000fa38a4f22",
+      "sha256": "263f47397d36f5ad6b4df55e04bc53cd214595cf24c8b0636f98000fa38a4f22",
+      "uploaded": false
+    },
+    {
+      "bytes": 3342,
+      "path": "research/chained_prime_transfer_20261111/repro/results_v3.repro.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/29/29d9e8602088bec7db6de442a37cdfe20964c1ac19f45f2aeae63250f98ba55e",
+      "sha256": "29d9e8602088bec7db6de442a37cdfe20964c1ac19f45f2aeae63250f98ba55e",
+      "uploaded": false
+    },
+    {
+      "bytes": 5265,
+      "path": "research/chained_prime_transfer_20261111/repro/certs_v3.repro.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/26/263f47397d36f5ad6b4df55e04bc53cd214595cf24c8b0636f98000fa38a4f22",
+      "sha256": "263f47397d36f5ad6b4df55e04bc53cd214595cf24c8b0636f98000fa38a4f22",
+      "uploaded": false
+    },
+    {
+      "bytes": 1699,
+      "path": "research/chained_prime_transfer_20261111/repro/v3.repro.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ba/ba07db9d98638d62acb96bb7822c1eedae72ef7f68780ece75cd84919e2efd63",
+      "sha256": "ba07db9d98638d62acb96bb7822c1eedae72ef7f68780ece75cd84919e2efd63",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-chained-prime-transfer/REPORT_leads_20261112.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-chained-prime-transfer/band-v2.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "chained-prime-transfer-v3",
+  "status": "measured",
+  "summary": "v3: real pulled-back instance, oracle-free LA, 16/16 certificates; IC/rho 8.0-40.8x at 0 GAE, 42-754x at 1 GAE; rerun from final source byte-identical [pcc:unverified]",
+  "validation": null
+}

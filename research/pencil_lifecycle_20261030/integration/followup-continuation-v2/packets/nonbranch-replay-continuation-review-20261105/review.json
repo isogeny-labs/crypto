@@ -1,0 +1,56 @@
+{
+  "schema": "prospective-source-review/v1",
+  "reviewed_commit": "d2682c2340865a8b82afcc71d1bf7f2eac90b84b",
+  "freeze_sha256": "74b03e071fab8fea1727ec451d635e0a55ba55ebdfafe42ac19f2cca09ffaa1c",
+  "reviewer": "reconcile_publication",
+  "status": "revision_required",
+  "machine_status": "not_executed",
+  "scope": "Operational wrapper source preservation and bounded continuation; no new mathematical or kernel validation",
+  "source_checks": {
+    "all_12_frozen_file_hashes_match": true,
+    "all_12_files_match_published_commit": true,
+    "producer_names": 10,
+    "reviewer_names": 20,
+    "compiler_calls": 4,
+    "full_custody_files_per_phase": 16736,
+    "full_custody_bytes_per_phase": 3111892318,
+    "partial_hash_reuse": false,
+    "negative_control_preserved": true
+  },
+  "accounting": {
+    "campaign_seconds": 46800,
+    "prior_charged_seconds": 300,
+    "remaining_before_new_attempt": 46500,
+    "attempt_ceiling_seconds": 2400,
+    "absolute_deadline": "2026-11-06T04:00:00Z",
+    "dollar_facts_only_waived_by_owner": true
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "status": "execution_blocker",
+      "location": "launch.py:45-46",
+      "finding": "Malformed, unreadable, or wrong-shape compiler receipt raises before the compiler outer row is retained and before mandatory post custody. Missing status has same effect.",
+      "derivation": "After subprocess.run returns, json.loads/read_text/native[status] raises; outer except records launcher-failure and reraises, bypassing next post iteration.",
+      "recommendation": "Guard receipt read, decode and status validation; preserve bounded failure details and compiler exit row; attempt post after compiler attempt whenever remaining budget and terminal ownership permit. Record explicit incomplete custody when post cannot be attempted."
+    },
+    {
+      "id": "R2",
+      "status": "execution_blocker",
+      "location": "launch.py:33-44",
+      "finding": "RuntimeMaxSec bounds service running time but no explicit TimeoutStopSec or bounded launcher wait is specified. Shutdown/wait can exceed phase and cumulative ceiling before elapsed checks run.",
+      "derivation": "subprocess.run has no timeout; elapsed tests occur only after systemd-run --wait returns. TERM handler and blocking native filesystem operations can delay termination; default stop grace is not pinned.",
+      "recommendation": "Pin stop grace and charge it within phase allowance. Bound launcher wait and stop/kill/reap reconciliation within reserved cleanup time; preserve receipt on failure. Never start another phase if service termination is unconfirmed; record unresolved ownership and stop. Do not claim SIGKILL guarantees terminating uninterruptible I/O."
+    }
+  ],
+  "preserved_obligations": [
+    "Fresh exclusive persistent workspace and exclusive phase markers",
+    "Full fresh pre and post dictionaries, realpath/stat/hash checks and equality",
+    "Runtime and source pins around compiler",
+    "Exact named axiom multiset with allowed axioms only",
+    "Malformed/duplicate/sorry parser guards and intended unsolved-goals negative rejection",
+    "Prior timeout and zero compiler invocations remain recorded",
+    "Failed pre stops compiler; no retries",
+    "Parent publication and runtime admission remain separate"
+  ]
+}

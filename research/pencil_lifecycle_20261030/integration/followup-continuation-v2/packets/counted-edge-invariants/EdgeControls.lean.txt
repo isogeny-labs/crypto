@@ -1,0 +1,33 @@
+import CountedContract
+set_option autoImplicit false
+namespace CountedEdgeControls
+open SignedWord CountedEdge
+instance : Fact (7:UInt64).toNat.Prime := ⟨by decide⟩
+def state : UnionState 2 := ⟨⟨id,fun _=>ident⟩,fun _=>none⟩
+def tied : UnionSize.Sizes 2 := ⟨#[1,1],rfl⟩
+def reverseSizes : UnionSize.Sizes 2 := ⟨#[2,1],rfl⟩
+theorem same_owner : owners (id : Fin 2→Fin 2) tied 0 0=id := by simp [owners]
+theorem tie_owner (h : System.Platform.numBits=64) : owners (id : Fin 2→Fin 2) tied 0 1 0=1 := by
+ simp [owners,tied,UnionSize.forward,UnionSize.child,UnionSize.parent,UnionSize.sizeAt,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.size,h,ComponentMap.merged]
+theorem reverse_owner (h : System.Platform.numBits=64) : owners (id : Fin 2→Fin 2) reverseSizes 0 1 1=0 := by
+ simp [owners,reverseSizes,UnionSize.forward,UnionSize.child,UnionSize.parent,UnionSize.sizeAt,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.size,h,ComponentMap.merged]
+theorem merged_cardinality (h : System.Platform.numBits=64) :
+ (ComponentMap.fiber (owners (id : Fin 2→Fin 2) tied 0 1) 1).card=2 := by
+ simp [owners,tied,UnionSize.forward,UnionSize.child,UnionSize.parent,UnionSize.sizeAt,USize.le_iff_toNat_le,USize.toNat_ofNat,USize.size,h]
+ decide
+theorem preserved_counter_wrap : (FindCount.ticks (UInt64.ofNat (2^64-1)) 1).toNat=0 := by decide
+theorem redundant_counts :
+ (BranchCount.run 7 state state.graph tied 0 0 ident ident 1 (-1) 0 0).2=⟨1,0,1⟩ := by decide
+theorem two_root_visits : FindCount.Counted 7 state.graph 0 state.graph 0 ident 1 ∧
+ FindCount.Counted 7 state.graph 1 state.graph 1 ident 1 := by
+ exact ⟨FindCount.Counted.root _ _ rfl,FindCount.Counted.root _ _ rfl⟩
+theorem owner_contract_instance
+ (ho : ComponentMap.Valid (decode 7 state.graph) (id : Fin 2→Fin 2))
+ (hz : ComponentMap.SizeValid (id : Fin 2→Fin 2) tied) (hn : 2<USize.size) :
+ let out:=EdgeDispatch.run 7 state state.graph tied 0 1 ident ident 1 (-1) 0 0
+ ComponentMap.Valid (decode 7 out.state.graph) (owners id tied 0 1) ∧
+ ComponentMap.SizeValid (owners id tied 0 1) out.sizes := by
+ apply after_finds_owner 7 state state.graph state.graph tied id 0 1 0 1 ident ident 1 (-1) 0 0 (by decide) (by decide) _ (Run.root _ _ rfl) (Run.root _ _ rfl) ho hz hn
+ intro i
+ exact ⟨Or.inl rfl,by simp [state,ident],by simp [state,ident]⟩
+end CountedEdgeControls

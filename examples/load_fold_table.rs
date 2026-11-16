@@ -33,8 +33,8 @@ use std::process::ExitCode;
 
 use crypto_lib::cryptanalysis::koblitz_fast::{BatchScratch, FastCurve, FastPoint};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
-    build_subgroup_orbit_factor_base, FoldedParts, FoldedStorage, FrobeniusFactorBase,
-    KoblitzCurve, PairSumTable, FILTER_PROBES,
+    build_subgroup_orbit_factor_base, FilterLayout, FoldedParts, FoldedStorage,
+    FrobeniusFactorBase, KoblitzCurve, PairSumTable, FILTER_PROBES,
 };
 
 struct TableFile {
@@ -121,6 +121,8 @@ fn read_table(path: &str) -> Result<TableFile, String> {
             present,
             present_mask,
             filter_probes,
+            // A table file is the GPU's, which picks words by low bits.
+            filter_layout: FilterLayout::Low,
             canon_tables,
         },
     })
@@ -220,7 +222,7 @@ fn check(path: &str, sample: Option<usize>) -> Result<(), String> {
     let file = read_table(path)?;
     let kc = KoblitzCurve::new(0, file.degree).ok_or("no Koblitz curve at that degree")?;
     let fb = build_subgroup_orbit_factor_base(&kc, file.seed, file.base_request)?;
-    let cpu = PairSumTable::build_folded_within(&kc, &fb, u128::MAX)
+    let cpu = PairSumTable::build_folded_within_layout(&kc, &fb, u128::MAX, FilterLayout::Low)
         .ok_or("the CPU would not build this table")?;
     let moved = {
         // The control: one bucket's words shifted into the next bucket,

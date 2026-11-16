@@ -297,6 +297,6 @@ suggests.**
   j = 0 curves with built-in ζ₃-endomorphism. Lets you separately
   calibrate GLV-accelerated ρ.
 - Index-calculus stress test using the highest-smoothness P-224 rows
-  against the [summation-poly](../src/cryptanalysis/summation_poly/)
+  against the [summation-poly](../src/cryptanalysis/semaev_prime_poly.rs)
   implementation. The expected result is *no* speedup from the inherited
   field structure; confirming this is itself valuable.
