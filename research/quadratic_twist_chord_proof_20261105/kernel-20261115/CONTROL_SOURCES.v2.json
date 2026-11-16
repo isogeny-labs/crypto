@@ -1,0 +1,37 @@
+[
+  {
+    "mode": "curve-line",
+    "file": "research/quadratic_twist_chord_proof_20261105/kernel-20261115/controls-v2/curve-line.lean.txt",
+    "sha256": "799ff260b17f849428b8eb68ecd28376805c6ecefbbf5f50929af263d34b79b7",
+    "old": "(x-a)*quad (l^2-a) (a*l^2+2*b*l+a^2+A) x := by",
+    "new": "(x-a)*quad (l^2-a) (a*l^2+2*b*l+a^2+A) x + 1 := by"
+  },
+  {
+    "mode": "cubic-remainder",
+    "file": "research/quadratic_twist_chord_proof_20261105/kernel-20261115/controls-v2/cubic-remainder.lean.txt",
+    "sha256": "772c060ba0c158b93787ef059e223b8bd6fd10dbaac5a296c149c401b7ce8356",
+    "old": "remU s p c₁ c₂*x + remV s p c₁ c₃ := by",
+    "new": "remU s p c₁ c₂*x + remV s p c₁ c₃ + 1 := by"
+  },
+  {
+    "mode": "vanishing-sound",
+    "file": "research/quadratic_twist_chord_proof_20261105/kernel-20261115/controls-v2/vanishing-sound.lean.txt",
+    "sha256": "ecf25535de3a1e92bad9e542a0d8dc5771b029047aeda27ffc9886a3abd1ef06",
+    "old": "(hv : remV s p c₁ c₃=0) : cubic c₁ c₂ c₃ x=0 := by",
+    "new": "(hv : remV s p c₁ c₃=0) : cubic c₁ c₂ c₃ x=1 := by"
+  },
+  {
+    "mode": "distinct-complete",
+    "file": "research/quadratic_twist_chord_proof_20261105/kernel-20261115/controls-v2/distinct-complete.lean.txt",
+    "sha256": "49ba79702b9d33cf5d9c31739c5ab1ee2d451c82162b66e3448cbbbb47f5c30c",
+    "old": "remU s p c₁ c₂=0 ∧ remV s p c₁ c₃=0 := by",
+    "new": "remU s p c₁ c₂=0 ∧ remV s p c₁ c₃=1 := by"
+  },
+  {
+    "mode": "diagonal",
+    "file": "research/quadratic_twist_chord_proof_20261105/kernel-20261115/controls-v2/diagonal.lean.txt",
+    "sha256": "df59a0ba55ecc0dddc8996b119dd1ac0be25173830c65ba3a0265eb5b608bfdd",
+    "old": "quad s p (s/2)=0 ↔ s^2-4*p=0 := by",
+    "new": "quad s p (s/2)=0 ↔ s^2-4*p=1 := by"
+  }
+]
