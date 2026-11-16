@@ -1,0 +1,24 @@
+module
+public import Mathlib.Data.Matrix.Basic
+public import Mathlib.Algebra.Group.Units.Defs
+
+public section
+namespace CryptoLean.MatrixRescaling
+open Matrix
+
+variable {R α β γ : Type*} [Semiring R] [Fintype β] [DecidableEq β]
+
+theorem diagonal_units_cancel (L : Matrix α β R) (P : Matrix β γ R) (v : β → Rˣ) :
+    (L*diagonal (fun j => (v j:R)))*(diagonal (fun j => (↑((v j)⁻¹):R))*P)=L*P := by
+  have hpair : diagonal (fun j => (v j:R))*diagonal (fun j => (↑((v j)⁻¹):R))=1 := by
+    rw [Matrix.diagonal_mul_diagonal]
+    have hvalues : (fun j => (v j:R)*(↑((v j)⁻¹):R))=(fun _ : β => (1:R)) :=
+      funext fun j => (v j).val_inv
+    rw [hvalues,Matrix.diagonal_one]
+  calc
+    _ = L*((diagonal (fun j => (v j:R))*diagonal (fun j => (↑((v j)⁻¹):R)))*P) := by
+      rw [Matrix.mul_assoc L _ _,← Matrix.mul_assoc (diagonal _) (diagonal _) P]
+    _ = L*P := by rw [hpair,Matrix.one_mul]
+
+end CryptoLean.MatrixRescaling
+#print axioms CryptoLean.MatrixRescaling.diagonal_units_cancel

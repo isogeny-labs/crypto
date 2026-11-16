@@ -1,0 +1,22 @@
+module
+public import CryptoLean.MatrixRescaling
+public import OrientationTransport
+public import Mathlib.NumberTheory.Height.NumberField
+public section
+noncomputable section
+open Polynomial
+namespace RescalingProbe
+variable {α β : Type*} [Fintype β] [DecidableEq β]
+def unit (q : ℕ) : ℚ[X]ˣ :=
+  ⟨C ((2:ℚ)^q),C (((2:ℚ)^q)⁻¹),by rw [← map_mul];simp,by rw [← map_mul];simp⟩
+theorem unit_val (q : ℕ) : (unit q:ℚ[X])=C ((2:ℚ)^q) := by simp only [unit]
+def left (L : Matrix α β ℚ[X]) (q : β → ℕ) : Matrix α β ℚ[X] := fun x j => L x j*C ((2:ℚ)^(q j))
+theorem diagonal_eq (L : Matrix α β ℚ[X]) (q : β → ℕ) :
+    left L q=L*Matrix.diagonal (fun j => (unit (q j):ℚ[X])) := by
+  apply Matrix.ext
+  intro x j
+  calc
+    _ = L x j*(unit (q j):ℚ[X]) := by simp only [left,unit_val]
+    _ = _ := (Matrix.mul_diagonal (fun j => (unit (q j):ℚ[X])) L x j).symm
+end RescalingProbe
+#print axioms RescalingProbe.diagonal_eq
