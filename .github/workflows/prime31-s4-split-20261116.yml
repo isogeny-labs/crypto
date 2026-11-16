@@ -114,6 +114,9 @@ jobs:
       - name: Matched 24 Q fully cold factorized APS versus batched Jacobian BSGS with A/A
         timeout-minutes: 7
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --aps-vs-bsgs-cold
+      - name: Preregistered 24-Q fully cold prime31 APS joint public jump batch vs packed source and BSGS
+        timeout-minutes: 7
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --joint-jumps-confirm
       - name: Twelve held-out complete prime31 Rust APS logarithms
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --holdouts
