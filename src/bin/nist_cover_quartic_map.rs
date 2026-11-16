@@ -246,7 +246,10 @@ fn run_wide(args: &[String]) -> ExitCode {
     let b = curve.f.from_mont(curve.b);
     let n = curve.n;
     let (gx, gy) = curve.canonical(g);
-    println!("E: p = {p} (2^{bits} - {}), a = -3, b = {b}, n = {n} (prime), G = ({gx}, {gy})", (1u128 << bits) - p as u128);
+    println!(
+        "E: p = {p} (2^{bits} - {}), a = -3, b = {b}, n = {n} (prime), G = ({gx}, {gy})",
+        (1u128 << bits) - p as u128
+    );
 
     // Independent E arithmetic: nc::Ecc (u128 affine) against prime_fast.
     let e = nc::Ecc::new(p, a, b);
@@ -275,13 +278,17 @@ fn run_wide(args: &[String]) -> ExitCode {
     }
     let Some((gamma, f, w)) = found else {
         eprintln!("no Smith-positive gamma in [1, {gamma_max}]");
-        let rec = json!({"p": p, "b": b, "n": n, "status": "no_smith_positive_gamma", "gamma_log": log});
+        let rec =
+            json!({"p": p, "b": b, "n": n, "status": "no_smith_positive_gamma", "gamma_log": log});
         std::fs::write(&out, serde_json::to_string_pretty(&rec).unwrap()).ok();
         return ExitCode::from(1);
     };
     let tried = log.len();
     println!("gamma = {gamma} (first Smith-positive of {tried} tried); f = {f:?}");
-    println!("trigonal map: n1 = {}, n0 = {}, d1 = {}, d0 = {}", w.tr.n1, w.tr.n0, w.tr.d1, w.tr.d0);
+    println!(
+        "trigonal map: n1 = {}, n0 = {}, d1 = {}, d0 = {}",
+        w.tr.n1, w.tr.n0, w.tr.d1, w.tr.d0
+    );
 
     // phi^* checks in J_H at this prime.
     let jac = sc::HJac::new(&f, p).expect("deg 7");
@@ -318,7 +325,10 @@ fn run_wide(args: &[String]) -> ExitCode {
         .iter()
         .filter(|h| k2.is_zero(wide::quartic_eval_fp2(&quartic, **h, p)))
         .count();
-    let hold_rational = hold_pts.iter().filter(|h| h.iter().all(|z| z.b == 0)).count();
+    let hold_rational = hold_pts
+        .iter()
+        .filter(|h| h.iter().all(|z| z.b == 0))
+        .count();
     // negative control: perturb one coefficient
     let mut bad = quartic;
     bad[1] = (bad[1] + 1) % p;

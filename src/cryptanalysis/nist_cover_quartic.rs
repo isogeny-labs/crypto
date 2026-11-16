@@ -646,8 +646,14 @@ pub mod wide {
         };
         const NPTS: u64 = 30;
         let xs: Vec<u64> = (1..=NPTS).collect();
-        let ra: Vec<u64> = xs.iter().map(|&u0| sylvester(&at(g, u0, 4), &at(&gu, u0, 3), p)).collect();
-        let rb: Vec<u64> = xs.iter().map(|&u0| sylvester(&at(g, u0, 4), &at(&gv, u0, 3), p)).collect();
+        let ra: Vec<u64> = xs
+            .iter()
+            .map(|&u0| sylvester(&at(g, u0, 4), &at(&gu, u0, 3), p))
+            .collect();
+        let rb: Vec<u64> = xs
+            .iter()
+            .map(|&u0| sylvester(&at(g, u0, 4), &at(&gv, u0, 3), p))
+            .collect();
         let pa = interpolate(&xs, &ra, p);
         let pb = interpolate(&xs, &rb, p);
         let (da, db) = (pdeg(&pa), pdeg(&pb));
@@ -655,7 +661,9 @@ pub mod wide {
             return Err("a resultant vanishes identically (F has a repeated component)".into());
         }
         if da > 12 || db > 12 {
-            return Err(format!("resultant degree {da}/{db} exceeds the Bezout bound 12"));
+            return Err(format!(
+                "resultant degree {da}/{db} exceeds the Bezout bound 12"
+            ));
         }
         Ok((da, db, pdeg(&pgcd(&pa, &pb, p))))
     }
@@ -668,8 +676,7 @@ pub mod wide {
         let f = tern_from_mons(q);
         let mut rng = sp::SplitMix64(seed);
         for _attempt in 0..64 {
-            let a: [[u64; 3]; 3] =
-                std::array::from_fn(|_| std::array::from_fn(|_| rng.below(p)));
+            let a: [[u64; 3]; 3] = std::array::from_fn(|_| std::array::from_fn(|_| rng.below(p)));
             let am: Vec<Vec<u64>> = a.iter().map(|r| r.to_vec()).collect();
             if det(am, p) == 0 {
                 continue;
@@ -748,8 +755,12 @@ pub mod wide {
                 }
                 acc
             };
-            let Some(y) = sp::sqrt_mod(fx, p) else { continue };
-            let Ok(ip) = w.tr.image_points(x, y) else { continue };
+            let Some(y) = sp::sqrt_mod(fx, p) else {
+                continue;
+            };
+            let Ok(ip) = w.tr.image_points(x, y) else {
+                continue;
+            };
             for xp in &ip.points {
                 if let Ok(h) = w.cm.psi_xpoint(xp) {
                     if let Some(hn) = sc::normalize_fp2(&k, h) {
@@ -973,7 +984,9 @@ mod tests {
         for _ in 0..20 {
             let x: [u64; 3] = std::array::from_fn(|_| rng.below(p));
             let ax: [u64; 3] = std::array::from_fn(|r| {
-                (0..3).fold(0u128, |s, c| (s + a[r][c] as u128 * x[c] as u128) % p as u128) as u64
+                (0..3).fold(0u128, |s, c| {
+                    (s + a[r][c] as u128 * x[c] as u128) % p as u128
+                }) as u64
             });
             let lhs = wide::quartic_eval_fp2(&gq, x.map(|v| k.c(v)), p);
             let rhs = wide::quartic_eval_fp2(&q, ax.map(|v| k.c(v)), p);

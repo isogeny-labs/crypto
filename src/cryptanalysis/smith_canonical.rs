@@ -425,7 +425,10 @@ pub struct QuarticFit {
 /// (the three differentials are independent), lie on no conic (`X` is not
 /// hyperelliptic) and on exactly one quartic.
 pub fn fit_quartic(p: u64, pts: &[[Fp2; 3]]) -> Result<QuarticFit, String> {
-    assert!(p < (1 << 32), "fit_quartic stores u32 coefficients; use fit_quartic_u64");
+    assert!(
+        p < (1 << 32),
+        "fit_quartic stores u32 coefficients; use fit_quartic_u64"
+    );
     let (q64, points) = fit_quartic_u64(p, pts)?;
     let mut quartic = [0u32; 15];
     for (q, c) in quartic.iter_mut().zip(q64) {
