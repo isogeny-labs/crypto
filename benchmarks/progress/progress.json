@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0800Z-catalog-candidate-b2",
+  "latest_record": "20261116T1532Z-ic-gpu-wake-probe-a100",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
-    "censored": 13,
+    "censored": 14,
     "invalid": 4,
-    "measured": 207,
+    "measured": 208,
     "open": 0
   },
   "repo": "crypto",
@@ -15266,6 +15266,315 @@
         }
       ],
       "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.1530233142520129,
+      "latest": 0.1530233142520129,
+      "latest_derived": {},
+      "metric": "one_time_startup_a_char2_n25",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.14870966847658484,
+            0.1615044185173436
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.1530233142520129
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.1462628539264288,
+      "latest": 0.1462628539264288,
+      "latest_derived": {},
+      "metric": "one_time_startup_a_koblitz_n23",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.1430513572913254,
+            0.1519824255613979
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.1462628539264288
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.1783384508994427,
+      "latest": 0.1783384508994427,
+      "latest_derived": {},
+      "metric": "one_time_startup_b_char2_n25",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.14503310603612696,
+            0.23617632769945757
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.1783384508994427
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.15761414262005402,
+      "latest": 0.15761414262005402,
+      "latest_derived": {},
+      "metric": "one_time_startup_b_koblitz_n23",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.14800710180624857,
+            0.16592646990391377
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.15761414262005402
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 36.0,
+      "latest": 36.0,
+      "latest_derived": {},
+      "metric": "probe_identity_check_cuda_cells",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 36,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 36.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.00010818999999999999,
+      "latest": 0.00010818999999999999,
+      "latest_derived": {},
+      "metric": "probe_unlocated_max_over_12_cuda_cells",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 12,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.00010818999999999999,
+            0.00010818999999999999
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.00010818999999999999
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 8.015666666666666e-05,
+      "latest": 8.015666666666666e-05,
+      "latest_derived": {},
+      "metric": "probe_unlocated_min_over_12_cuda_cells",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 12,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            8.015666666666666e-05,
+            8.015666666666666e-05
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 8.015666666666666e-05
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 9.442999999999999e-05,
+      "latest": 9.442999999999999e-05,
+      "latest_derived": {},
+      "metric": "probe_unlocated_reply_block_wspin0_gap100",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            9.442999999999999e-05,
+            9.442999999999999e-05
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 9.442999999999999e-05
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0002515238009189873,
+      "latest": 0.0002515238009189873,
+      "latest_derived": {},
+      "metric": "steady_state_round_trip_a_char2_n25",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.00025051737990529235,
+            0.00025261984739281427
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.0002515238009189873
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.00016812182294145134,
+      "latest": 0.00016812182294145134,
+      "latest_derived": {},
+      "metric": "steady_state_round_trip_a_koblitz_n23",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.00016777582428418743,
+            0.0001683881008233658
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.00016812182294145134
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.00018490898259952829,
+      "latest": 0.00018490898259952829,
+      "latest_derived": {},
+      "metric": "steady_state_round_trip_b_char2_n25",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.00018431248240621066,
+            0.000185251350482623
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.00018490898259952829
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.00010791372088634905,
+      "latest": 0.00010791372088634905,
+      "latest_derived": {},
+      "metric": "steady_state_round_trip_b_koblitz_n23",
+      "points": [
+        {
+          "commit": "b7094b686864",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0001068740675127694,
+            0.00010857954744423617
+          ],
+          "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+          "value": 0.00010791372088634905
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_wake_probe_a100",
       "unit": "wall_s"
     },
     {

@@ -20,8 +20,12 @@ homogeneous evaluator construction. A separate Rust F17 symbolic example is
 retained. It is not a general rational/isogeny solver implementation or formal
 validation. Original pinned proof/data/protocols remain unchanged.
 
-Remaining publication tasks: register pending theoretical statement, push final
-reports/record, update current-head PR4410 and inspect its actual gates. No
+Theoretical statement PCC-20261116-480062 and data statement80ec09 are registered
+and unverified. Completed reports, final local receipts and lessons are committed.
+A retrospective registration correction is documented in
+continuation-20261116/REGISTRATION_ERRATA.md; the original closed record is unchanged.
+Main4b2d25c933 is merged with both journal block multisets and exact ledger prefix.
+Remaining: push final head, update PR4410 and inspect its actual gates. No
 measurement active. Retain original closeout notes below as history.
 
 ## Publication closed — 16 November, 07:30 UTC
