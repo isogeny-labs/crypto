@@ -67,6 +67,7 @@ jobs:
           test $? -eq 3
 
   disclosed-sat-replay:
+    if: ${{ !github.event.pull_request.draft }}
     strategy:
       fail-fast: false
       matrix:
