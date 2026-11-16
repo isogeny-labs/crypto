@@ -489,7 +489,7 @@ fn main() -> ExitCode {
                                     LaMode::Baseline,
                                 ),
                                 'N' => (SplitOracle::LucasRoots, Some("C_coord"), LaMode::Coord),
-                                'S' | 'U' | 'V' => (
+                                'S' | 'U' | 'V' | 'W' => (
                                     SplitOracle::LucasRoots,
                                     Some(if a == 'S' {
                                         "C_coord_square"
@@ -511,11 +511,23 @@ fn main() -> ExitCode {
                             } else {
                                 label
                             };
-                            // U, V: arm S with the unit-T walk.
-                            let walk = if a == 'U' {
-                                WalkMode::UnitT
+                            // U: arm S with the unit-T walk.  (V, as run in the
+                            // unit-T study, kept the mixed walk: deviation D1.)
+                            // W: unit-T with capped restarts + fallback roots.
+                            let walk = match a {
+                                'U' => WalkMode::UnitT,
+                                'W' => WalkMode::UnitTCapped,
+                                _ => WalkMode::Mixed,
+                            };
+                            let oracle = if a == 'W' {
+                                SplitOracle::LucasRootsFast
                             } else {
-                                WalkMode::Mixed
+                                oracle
+                            };
+                            let label = if a == 'W' {
+                                Some("C_unit_t_capped_fast")
+                            } else {
+                                label
                             };
                             let o = run_ic_full(
                                 inst,

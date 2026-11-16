@@ -1537,6 +1537,11 @@ pub enum WalkMode {
     /// column is all `−1` (cycle-combined rows: small integers), and
     /// `log T` is that times `h⁻¹ mod r`.
     UnitT,
+    /// [`WalkMode::UnitT`] with the segment between restarts capped at
+    /// `max(64, ⌊√r / 16⌋)` steps.  A unit-T segment that falls into a rho
+    /// cycle only repeats rows (a revisit has the same coefficients), so the
+    /// segment must stay well inside the expected cycle length `≈ √r`.
+    UnitTCapped,
 }
 
 impl WalkMode {
@@ -1544,6 +1549,7 @@ impl WalkMode {
         match self {
             WalkMode::Mixed => "mixed",
             WalkMode::UnitT => "unit_t",
+            WalkMode::UnitTCapped => "unit_t_capped",
         }
     }
 }
@@ -1559,7 +1565,12 @@ pub struct IcCfg {
 /// [`run_ic_cfg`] with the walk chosen too ([`IcCfg`]).
 pub fn run_ic_full(inst: &Instance, prm: IcParams, restart: u64, cfg: IcCfg) -> IcResult {
     let IcCfg { oracle, la, walk } = cfg;
-    let unit_t = walk == WalkMode::UnitT;
+    let unit_t = walk != WalkMode::Mixed;
+    let restart = if walk == WalkMode::UnitTCapped {
+        restart.min((((inst.r as f64).sqrt() / 16.0) as u64).max(64))
+    } else {
+        restart
+    };
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -2135,6 +2146,38 @@ mod tests {
                     "p={p}: {} vs {}",
                     u.la_wied.mul,
                     m.la_wied.mul
+                );
+            }
+        }
+    }
+
+    /// The capped unit-T walk solves the small-r instances where uncapped
+    /// segments fall into rho cycles, with the coordinate solver and no
+    /// fallback.
+    #[test]
+    fn capped_unit_t_walk_solves_small_r_without_fallback() {
+        for p in [101u64, 131] {
+            let inst = small_instance(p);
+            for seed in [11u64, 1001, 2001] {
+                let prm = IcParams {
+                    arm: Arm::DoubleLp,
+                    nb: fb_size(Arm::DoubleLp, p, 2.0, 2.0),
+                    seed,
+                    max_trials: 3_000_000,
+                    verify_relations: true,
+                };
+                let cfg = IcCfg {
+                    oracle: SplitOracle::LucasRootsFast,
+                    la: LaMode::CoordSquare,
+                    walk: WalkMode::UnitTCapped,
+                };
+                let x = run_ic_full(&inst, prm, RESTART_DEFAULT, cfg);
+                assert!(x.certified, "p={p} seed={seed}");
+                assert_eq!(x.bad_relations, 0);
+                assert!(
+                    x.la_fallbacks <= 1,
+                    "p={p} seed={seed}: {} fallbacks",
+                    x.la_fallbacks
                 );
             }
         }
