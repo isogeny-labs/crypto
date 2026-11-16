@@ -24,7 +24,7 @@ set -e
 printf '%s\n' "$transport_exit" > "$2/transport-exit.txt"
 (( transport_exit == 0 )) || { echo 'Transport failed; request is not retried' >&2; exit 1; }
 [[ $(cat "$2/http-status.txt") == 200 ]] || { echo 'HTTP rejection; request is not retried' >&2; exit 1; }
-jq -e '.success == true and .exit_code == 0 and .truncated == false and ((.warnings // []) | length) == 0' \
+jq -e '.success == true and .exit_code == 0 and .truncated == false and .error == null and ((.warnings // []) | length) == 0' \
   "$2/response.json" > "$2/response-admission.txt"
 jq -er '.stdout' "$2/response.json" > "$2/stdout.log"
 echo 'CAS unit returned without reported error; exact native correctness checks still required.'
