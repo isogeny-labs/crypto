@@ -190,12 +190,34 @@ pub fn try_compact_quotient_basis(
     n: usize,
     p: u64,
 ) -> Result<CompactCertifiedBasis, String> {
+    compact_basis(input, n, p, false)
+}
+
+/// Eager all-vertices ablation with the same native checks as the lazy route.
+pub fn try_compact_quotient_basis_all_vertices(
+    input: &[Poly],
+    n: usize,
+    p: u64,
+) -> Result<CompactCertifiedBasis, String> {
+    compact_basis(input, n, p, true)
+}
+
+fn compact_basis(
+    input: &[Poly],
+    n: usize,
+    p: u64,
+    all_vertices: bool,
+) -> Result<CompactCertifiedBasis, String> {
     let original = canonical_input(input, n, p)?;
     let native_input = original
         .iter()
         .map(|f| native_polynomial(f, p))
         .collect::<Result<Vec<_>, _>>()?;
-    let output = algebra::quotient::compact::solve(&original, n, p)?;
+    let output = if all_vertices {
+        algebra::quotient::compact::solve_all_vertices(&original, n, p)?
+    } else {
+        algebra::quotient::compact::solve(&original, n, p)?
+    };
     let basis = export(&output.certificate.basis, p)?;
     let mut native_checks = TraceStats::default();
     if !super::reuse::certify(

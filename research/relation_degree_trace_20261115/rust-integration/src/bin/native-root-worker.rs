@@ -13,6 +13,7 @@ enum Engine {
     F4,
     Certified,
     Compact,
+    CompactAllVertices,
 }
 struct Options {
     engine: Engine,
@@ -25,7 +26,8 @@ fn options() -> Result<Options, String> {
         Some("f4") => Engine::F4,
         Some("certified") => Engine::Certified,
         Some("compact") => Engine::Compact,
-        _ => return Err("usage: native-root-worker f4|certified|compact [--degree-cap 12] [--deadline-ms 10000]; System JSON on stdin".into()),
+        Some("compact-all-vertices") => Engine::CompactAllVertices,
+        _ => return Err("usage: native-root-worker f4|certified|compact|compact-all-vertices [--degree-cap 12] [--deadline-ms 10000]; System JSON on stdin".into()),
     };
     let mut opts = Options {
         engine,
@@ -98,6 +100,7 @@ fn run(start: Instant) -> Result<Value, String> {
         Engine::F4 => "f4",
         Engine::Certified => "certified",
         Engine::Compact => "compact",
+        Engine::CompactAllVertices => "compact-all-vertices",
     };
     if matches!(opts.engine, Engine::F4) && p >= 1u64 << 32 {
         return Ok(json!({"status":"unsupported", "engine":engine, "prime":p,
@@ -144,20 +147,26 @@ fn run(start: Instant) -> Result<Value, String> {
                     "observed_solving_degree":null,"reason":reason}));
             }
         },
-        Engine::Compact => match certified::try_compact_quotient_basis(&input, n, p) {
-            Ok(report) => (
-                report.basis,
-                true,
-                Value::Null,
-                serde_json::to_value(report.info).map_err(|e| e.to_string())?,
-                Value::Null,
-            ),
-            Err(reason) => {
-                return Ok(json!({"status":"constructor_rejected", "engine":engine,
+        Engine::Compact | Engine::CompactAllVertices => {
+            match if matches!(opts.engine, Engine::Compact) {
+                certified::try_compact_quotient_basis(&input, n, p)
+            } else {
+                certified::try_compact_quotient_basis_all_vertices(&input, n, p)
+            } {
+                Ok(report) => (
+                    report.basis,
+                    true,
+                    Value::Null,
+                    serde_json::to_value(report.info).map_err(|e| e.to_string())?,
+                    Value::Null,
+                ),
+                Err(reason) => {
+                    return Ok(json!({"status":"constructor_rejected", "engine":engine,
                     "prime":p,"variables":n,"basis":null,
                     "observed_solving_degree":null,"reason":reason}));
+                }
             }
-        },
+        }
     };
     let construction_and_internal_checks_ns = solve_start.elapsed().as_nanos();
     let output_start = Instant::now();

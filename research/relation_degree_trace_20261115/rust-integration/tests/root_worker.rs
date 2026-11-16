@@ -35,7 +35,8 @@ fn actual_root_arms_agree_on_complete_development_basis() {
     let (control_ok, control) = call("f4", &system, &[]);
     let (candidate_ok, candidate) = call("certified", &system, &[]);
     let (compact_ok, compact) = call("compact", &system, &[]);
-    assert!(control_ok && candidate_ok && compact_ok);
+    let (all_ok, all) = call("compact-all-vertices", &system, &[]);
+    assert!(control_ok && candidate_ok && compact_ok && all_ok);
     assert_eq!(control["status"], "complete");
     assert_eq!(candidate["status"], "complete");
     assert!(control["observed_solving_degree"].is_u64());
@@ -43,6 +44,25 @@ fn actual_root_arms_agree_on_complete_development_basis() {
     assert!(!control["basis"].as_array().unwrap().is_empty());
     assert_eq!(control["basis"], candidate["basis"]);
     assert_eq!(control["basis"], compact["basis"]);
+    assert_eq!(compact["basis"], all["basis"]);
+    assert_eq!(all["engine"], "compact-all-vertices");
+    assert!(all["observed_solving_degree"].is_null());
+    assert_eq!(
+        compact["quotient_info"]["projection_work"]["edge_resultants"],
+        2
+    );
+    assert_eq!(
+        all["quotient_info"]["projection_work"]["edge_resultants"],
+        3
+    );
+    assert_eq!(
+        compact["quotient_info"]["projection_work"]["vertex_gcd_folds"],
+        1
+    );
+    assert_eq!(
+        all["quotient_info"]["projection_work"]["vertex_gcd_folds"],
+        3
+    );
     assert!(compact["observed_solving_degree"].is_null());
     assert!(compact["quotient_info"]["stored_proof_terms"].is_u64());
     assert!(candidate["quotient_info"].is_object());

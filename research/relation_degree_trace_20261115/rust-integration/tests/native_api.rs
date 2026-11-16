@@ -107,6 +107,19 @@ fn compact_chain_crosses_native_boundary_and_rejects_mutation() {
     for p in [2147483647, 9007199254740881] {
         let input = fixture(6, p);
         let mut report = try_compact_quotient_basis(&input, 6, p).unwrap();
+        let all =
+            crypto_lib::cryptanalysis::f4_fp::certified::try_compact_quotient_basis_all_vertices(
+                &input, 6, p,
+            )
+            .unwrap();
+        assert!(verify_compact_basis(&all, &input));
+        assert_eq!(report.basis, all.basis);
+        assert_eq!(report.certificate.definitions, all.certificate.definitions);
+        assert_eq!(report.certificate.basis, all.certificate.basis);
+        assert_eq!(report.info.projection_work.edge_resultants, 2);
+        assert_eq!(report.info.projection_work.vertex_gcd_folds, 1);
+        assert_eq!(all.info.projection_work.edge_resultants, 6);
+        assert_eq!(all.info.projection_work.vertex_gcd_folds, 6);
         assert!(verify_compact_basis(&report, &input));
         assert_eq!(report.observed_solving_degree, None);
         assert!(report.native_checks.certification_pairs > 0);

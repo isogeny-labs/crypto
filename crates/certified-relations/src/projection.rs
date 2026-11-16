@@ -185,20 +185,104 @@ pub struct Vertex {
     pub certificate_terms: usize,
     pub certificate_product_degree: usize,
 }
+/// Kernel invocation counts, not field-operation counts or timing samples.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct Work {
+    pub edge_resultants: usize,
+    pub vertex_gcd_folds: usize,
+}
 pub fn augment(inputs: &[Poly], n: usize, p: u64) -> (Vec<Poly>, Vec<Vertex>) {
-    augment_impl(inputs, n, p, false, None)
+    let (rows, vertices, _) = augment_impl(inputs, n, p, false, None);
+    (rows, vertices)
 }
 /// Alternative construction from original quadratic equations. No solver,
 /// witness, division by a polynomial, or saturated-ideal replacement is used.
 pub fn augment_quadratic(inputs: &[Poly], n: usize, p: u64) -> (Vec<Poly>, Vec<Vertex>) {
-    augment_impl(inputs, n, p, true, None)
+    let (rows, vertices, _) = augment_impl(inputs, n, p, true, None);
+    (rows, vertices)
 }
 /// Preserve the same augmented rows' original-input certificates for quotient
 /// construction. The polynomial-only interfaces retain their previous output.
 pub fn certified_quadratic(inputs: &[Poly], n: usize, p: u64) -> (Vec<Row>, Vec<Vertex>) {
+    let (rows, vertices, _) = all_quadratic(inputs, n, p);
+    (rows, vertices)
+}
+pub(crate) fn all_quadratic(inputs: &[Poly], n: usize, p: u64) -> (Vec<Row>, Vec<Vertex>, Work) {
     let mut rows = Vec::new();
-    let (_, info) = augment_impl(inputs, n, p, true, Some(&mut rows));
-    (rows, info)
+    let (_, info, work) = augment_impl(inputs, n, p, true, Some(&mut rows));
+    (rows, info, work)
+}
+/// Same highest eligible vertex and ordered GCD as all_quadratic, without
+/// constructing projections for vertices that selection never examines.
+pub(crate) fn selected_quadratic(
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    pairs: &[cheap::PairCandidate],
+) -> Option<(Row, Vertex, Work)> {
+    let mut cache: Vec<Option<Row>> = vec![None; pairs.len()];
+    let mut work = Work::default();
+    for axis in (0..n).rev() {
+        let incident: Vec<_> = pairs
+            .iter()
+            .enumerate()
+            .filter(|(_, pair)| pair.variables.contains(&axis))
+            .collect();
+        if incident.len() < 2 {
+            continue;
+        }
+        let mut projections = Vec::new();
+        for (index, pair) in incident {
+            let canonical = cache[index].get_or_insert_with(|| {
+                work.edge_resultants += 1;
+                let row = |i: usize| Row {
+                    poly: inputs[i].clone(),
+                    proof: BTreeMap::from([((i, vec![0; n]), 1)]),
+                };
+                quadratic_resultant(
+                    &row(pair.inputs[0]),
+                    &row(pair.inputs[1]),
+                    pair.variables,
+                    n,
+                    p,
+                )
+            });
+            if canonical.poly.is_empty() {
+                continue;
+            }
+            let oriented = if pair.variables[0] == axis {
+                canonical.clone()
+            } else {
+                swap(canonical, pair.variables[0], pair.variables[1])
+            };
+            assert!(verify(&oriented, inputs, p));
+            projections.push(oriented);
+        }
+        if projections.len() < 2 {
+            continue;
+        }
+        work.vertex_gcd_folds += 1;
+        let count = projections.len();
+        let mut iter = projections.into_iter();
+        let mut root = iter.next().unwrap();
+        for other in iter {
+            root = gcd(root, other, axis, p);
+        }
+        let d = degree(&root.poly);
+        if root.poly.is_empty() || !(2..=8).contains(&d) {
+            continue;
+        }
+        assert!(verify(&root, inputs, p));
+        let vertex = Vertex {
+            variable: axis,
+            incident_projections: count,
+            degree: d,
+            certificate_terms: root.proof.len(),
+            certificate_product_degree: certificate_degree(&root, inputs),
+        };
+        return Some((root, vertex, work));
+    }
+    None
 }
 fn augment_impl(
     inputs: &[Poly],
@@ -206,7 +290,8 @@ fn augment_impl(
     p: u64,
     quadratic: bool,
     mut certified: Option<&mut Vec<Row>>,
-) -> (Vec<Poly>, Vec<Vertex>) {
+) -> (Vec<Poly>, Vec<Vertex>, Work) {
+    let mut work = Work::default();
     let pairs = cheap::consequences(inputs, n, p);
     let mut incidence = BTreeMap::<usize, usize>::new();
     for pair in &pairs {
@@ -219,6 +304,7 @@ fn augment_impl(
         if pair.variables.iter().all(|v| incidence[v] < 2) {
             continue;
         }
+        work.edge_resultants += 1;
         let r = if quadratic {
             let row = |i: usize| Row {
                 poly: inputs[i].clone(),
@@ -258,6 +344,7 @@ fn augment_impl(
         if rows.len() < 2 {
             continue;
         }
+        work.vertex_gcd_folds += 1;
         let count = rows.len();
         let mut iter = rows.into_iter();
         let mut r = iter.next().unwrap();
@@ -292,11 +379,85 @@ fn augment_impl(
     if let Some(rows) = certified.as_mut() {
         rows.extend(input_rows(inputs, n));
     }
-    (prefix, info)
+    (prefix, info, work)
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn embedded_cycle(n: usize, p: u64) -> Vec<Poly> {
+        workload::generate(p, 3, 7)
+            .unwrap()
+            .system
+            .decode()
+            .unwrap()
+            .into_iter()
+            .map(|f| {
+                f.into_iter()
+                    .map(|(mut m, c)| {
+                        m.resize(n, 0);
+                        (m, c)
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+    fn compare_selected(inputs: &[Poly], n: usize, p: u64) -> (Vertex, Work) {
+        let pairs = cheap::consequences(inputs, n, p);
+        let (selected, vertex, work) = selected_quadratic(inputs, n, p, &pairs).unwrap();
+        let (all, vertices, all_work) = all_quadratic(inputs, n, p);
+        let expected = vertices
+            .iter()
+            .filter(|v| (2..=8).contains(&v.degree))
+            .max_by_key(|v| v.variable)
+            .unwrap();
+        assert_eq!(vertex.variable, expected.variable);
+        assert_eq!(vertex.degree, expected.degree);
+        let row = all
+            .iter()
+            .find(|r| {
+                is_univariate(&r.poly, expected.variable) && degree(&r.poly) == expected.degree
+            })
+            .unwrap();
+        assert_eq!(&selected, row, "original cofactor row must match exactly");
+        assert!(verify(&selected, inputs, p));
+        assert!(work.edge_resultants <= all_work.edge_resultants);
+        (vertex, work)
+    }
+    #[test]
+    fn selected_root_skips_unused_and_single_incident_vertices() {
+        for p in [2147483647, 9007199254740881] {
+            for n in [4, 6] {
+                let mut inputs = embedded_cycle(n, p);
+                if n == 6 {
+                    for z in [0, 1] {
+                        inputs.push(cheap::f3(n, [4, 5], 2, 3, z, p));
+                    }
+                }
+                let (root, work) = compare_selected(&inputs, n, p);
+                assert_eq!(root.variable, 2);
+                assert_eq!(work.edge_resultants, 2);
+                assert_eq!(work.vertex_gcd_folds, 1);
+                assert!(quotient::compact::solve(&inputs, n, p).is_err());
+                assert!(quotient::compact::solve_all_vertices(&inputs, n, p).is_err());
+            }
+        }
+    }
+    #[test]
+    fn selected_root_caches_edges_when_higher_vertices_are_ineligible() {
+        let p = 2147483647;
+        let mut inputs = embedded_cycle(6, p);
+        for (edge, a, b) in [([3, 4], 2, 3), ([4, 5], 5, 7), ([3, 5], 9, 11)] {
+            for z in [0, 1] {
+                inputs.push(cheap::f3(6, edge, a, b, z, p));
+            }
+        }
+        let (root, work) = compare_selected(&inputs, 6, p);
+        assert_eq!(root.variable, 2);
+        // Three upper vertices rejected, then the lower cycle supplies a root.
+        // Shared upper edges are each constructed once despite that fallback.
+        assert_eq!(work.edge_resultants, 5);
+        assert_eq!(work.vertex_gcd_folds, 4);
+    }
     #[test]
     fn direct_quadratic_identity_agrees_with_sylvester_in_degenerate_and_scaled_cases() {
         for p in [5, 7, 101] {

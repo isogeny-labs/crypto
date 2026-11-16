@@ -27,6 +27,7 @@ pub struct Info {
     pub basis_polynomial_degree: usize,
     pub coordinate_parents: Vec<Option<usize>>,
     pub derivation_depths: Vec<usize>,
+    pub projection_work: projection::Work,
 }
 pub struct Output {
     pub certificate: Certificate,
@@ -172,21 +173,36 @@ fn original_bound(row: &Row, bounds: &[usize]) -> usize {
 /// Same polynomial construction as the expanded control, with a different
 /// retained certificate representation. No oracle, witness or hidden fallback.
 pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
+    solve_impl(inputs, n, p, false)
+}
+/// Explicit ablation: eagerly construct every vertex before selecting a root.
+/// Polynomial kernels, proof representation and final checks match solve.
+pub fn solve_all_vertices(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
+    solve_impl(inputs, n, p, true)
+}
+fn solve_impl(inputs: &[Poly], n: usize, p: u64, all_vertices: bool) -> Result<Output, String> {
     if !admitted(inputs, n, p) {
         return Err("compact: unsupported prime/input shape".into());
     }
-    let (projected, vertices) = projection::certified_quadratic(inputs, n, p);
-    let root = vertices
-        .iter()
-        .filter(|v| (2..=8).contains(&v.degree))
-        .max_by_key(|v| v.variable)
-        .ok_or("compact: no supported certified vertex")?;
+    let (root_row, root, projection_work, pairs) = if all_vertices {
+        let (projected, vertices, work) = projection::all_quadratic(inputs, n, p);
+        let root = vertices
+            .into_iter()
+            .filter(|v| (2..=8).contains(&v.degree))
+            .max_by_key(|v| v.variable)
+            .ok_or("compact: no supported certified vertex")?;
+        let row = projected
+            .into_iter()
+            .find(|r| is_univariate(&r.poly, root.variable) && degree(&r.poly) == root.degree)
+            .ok_or("compact: missing root polynomial")?;
+        (row, root, work, cheap::consequences(inputs, n, p))
+    } else {
+        let pairs = cheap::consequences(inputs, n, p);
+        let (row, root, work) = projection::selected_quadratic(inputs, n, p, &pairs)
+            .ok_or("compact: no supported certified vertex")?;
+        (row, root, work, pairs)
+    };
     let t = root.variable;
-    let root_row = projected
-        .iter()
-        .find(|r| is_univariate(&r.poly, t) && degree(&r.poly) == root.degree)
-        .ok_or("compact: missing root polynomial")?
-        .clone();
     let mut chain = Chain {
         generators: inputs.to_vec(),
         definitions: Vec::new(),
@@ -196,7 +212,6 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
         p,
     };
     let h = chain.push(root_row)?;
-    let pairs = cheap::consequences(inputs, n, p);
     let originals = input_rows(inputs, n);
     let mut rules = vec![None; n];
     let mut known = vec![false; n];
@@ -292,6 +307,7 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
             .unwrap(),
         coordinate_parents: parents,
         derivation_depths: depths,
+        projection_work,
     };
     Ok(Output { certificate, info })
 }
@@ -309,6 +325,15 @@ mod tests {
                     .decode()
                     .unwrap();
                 let compact = solve(&inputs, n, p).unwrap();
+                let all = solve_all_vertices(&inputs, n, p).unwrap();
+                assert_eq!(compact.certificate.definitions, all.certificate.definitions);
+                assert_eq!(compact.certificate.basis, all.certificate.basis);
+                assert_eq!(compact.info.root_variable, n - 1);
+                assert_eq!(compact.info.projection_work.edge_resultants, 2);
+                assert_eq!(compact.info.projection_work.vertex_gcd_folds, 1);
+                assert_eq!(all.info.projection_work.edge_resultants, n);
+                assert_eq!(all.info.projection_work.vertex_gcd_folds, n);
+                assert!(verify(&all.certificate, &inputs, n, p));
                 assert!(verify(&compact.certificate, &inputs, n, p));
                 let (expanded, _) = super::super::solve(&inputs, n, p).unwrap();
                 assert_eq!(
