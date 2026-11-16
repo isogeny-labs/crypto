@@ -63,6 +63,9 @@ jobs:
               assert p["accepted_positive"]==32 and p["accepted_negative"]==32
               assert p["draws_including_rejections"]>=32
               assert p["safe_repeated_row_rejected"] and p["naive_repeated_row_false_zero"]
+              assert p["confluent_hermite_double_control"]
+              assert p["confluent_hermite_repeated_true_det"]==0
+              assert p["confluent_hermite_repeated_false_det"]!=0
               assert len(p["cases"])==32
               assert all(c["positive_det"]==0 and c["negative_det"]!=0
                          and c["no_repeated_or_infinite_points"] for c in p["cases"])
