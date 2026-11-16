@@ -25,6 +25,23 @@ frozen ledger. A plain ordinary conflict resolution cannot claim this gate is
 satisfied. Independently fix the inherited lint/report-path/runtime blockers,
 review merged source against both parents, and obtain fresh affected validation.
 
+
+## 2026-11-15 production binary-subtraction continuation
+
+Fetched main `30e066b0928150bcefa6c09bfe948830b175bba7` and the baseline
+continuation branch have a semantic common prefix of 1,088 entries; main has
+1,091 entries and the working continuation has 1,092. The official prefix check
+fails at entry 1,088. Both histories and claim bodies remain unchanged.
+[Current receipt](../research/binary_subtract_frontier_20261115/evidence/ledger-prefix-check.txt).
+No conflict-side selection, rechaining or waiver was performed. This also
+blocks crypto PR 4344's production continuation from being merged under the
+existing gate. The paired cryptanalysis ledger still passes its prefix check.
+Producer observation. [pcc:unverified]
+
+
+
+
+
 ## 2026-11-14 — orientation-anchor PR4118 occurrence
 
 [PR4118](https://github.com/isogeny-labs/crypto/pull/4118) encounters the
