@@ -3070,8 +3070,115 @@ fn rho_unfolded_match_panel()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// 48 fresh Q, prospective folded/unfolded sensitivity. This reuses the
+// independently tested core without changing the frozen 24-Q panel.
+fn rho_fold_sensitivity_48q_panel()->Result<serde_json::Value,String>{
+    const CASES:usize=48;
+    const TARGET_SEED:u64=0x5248_4f5f_4e45_5734;
+    const RHO_SEED:u64=0x5248_4f5f_4352_3031;
+    const STEP_CAP:u64=2_000_000;
+    let mut rng=TARGET_SEED;
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut used=HashSet::new();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut total_ns=[0u128;5];
+    let mut all_complete=[0u64;5];
+    let mut pair_wins=[0u64;3];
+    for i in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let rho_seed=RHO_SEED^(i as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
+        let chronological:[usize;5]=match i%5{
+            0=>[0,1,2,3,4],1=>[1,2,3,4,0],2=>[2,3,4,0,1],
+            3=>[3,4,0,1,2],_=>[4,0,1,2,3]
+        };
+        let mut arms:[serde_json::Value;5]=std::array::from_fn(|_|json!(null));
+        for index in chronological{
+            let res=match index{
+                0=>execute_factorized_unequal_index_variant_joint(
+                    q,[384,384,16_384],6,false,true,true)?,
+                1=>neg_rho_cold_watchdog(q,rho_seed,32,4,STEP_CAP,512)?,
+                2|4=>neg_rho_cold_policy(q,rho_seed,32,4,STEP_CAP,512,false)?,
+                3=>neg_rho_cold_policy(q,rho_seed^0x3634_5f44_5035,64,5,STEP_CAP,512,false)?,
+                _=>return Err("invalid unfolded rho panel arm".into())
+            };
+            let complete=res["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if complete{
+                let answer=if index==0{
+                    res["attempts"].as_array()
+                        .and_then(|a|a.last())
+                        .and_then(|a|a["solution"]["log"].as_u64())
+                }else{res["log"].as_u64()};
+                if answer!=Some(known) ||
+                    verifier.scalar(PRIME31,known,Some(PRIME31.g))!=Some(q){
+                    return Err(format!("invalid complete scalar i={i}, arm={index}"));
+                }
+                all_complete[index]+=1;
+            }
+            total_ns[index]+=res["cold_wall_ns"].as_u64()
+                .ok_or("missing fully cold ns")? as u128;
+            arms[index]=res;
+        }
+        if arms[0]["complete_target_scalar_recovered"].as_bool()==Some(true){
+            for (j,idx) in [1usize,2,3].into_iter().enumerate(){
+                if arms[idx]["complete_target_scalar_recovered"].as_bool()==Some(true) &&
+                    arms[0]["cold_wall_ns"].as_u64()<arms[idx]["cold_wall_ns"].as_u64(){
+                    pair_wins[j]+=1;
+                }
+            }
+        }
+        cases.push(json!({
+            "case":i,"public_Q":q,
+            "caller_known_scalar_verifier_only":known,
+            "chronological_order":chronological,
+            "incumbent_joint_APS":arms[0],
+            "folded_rho32_dp4":arms[1],
+            "unfolded_rho32_dp4":arms[2],
+            "unfolded_rho64_dp5":arms[3],
+            "unfolded_rho32_dp4_AA":arms[4]
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_RHO_FOLD_SENSITIVITY_48Q_PROTOCOL_20261116.md",
+        "curve":"ordinary prime-order prime31",
+        "p":P,"n":N,"cofactor":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),
+        "rho_seed_base":format!("{RHO_SEED:016x}"),
+        "cases_count":CASES,
+        "arm_names":["incumbent_joint_APS","folded_rho32_dp4",
+            "unfolded_rho32_dp4","unfolded_rho64_dp5","unfolded_rho32_dp4_AA"],
+        "successful_complete_calls":all_complete,
+        "fully_cold_ns":total_ns.map(|x|x.to_string()),
+        "paired_APS_wins_vs_folded32_unfolded32_unfolded64":pair_wins,
+        "all_240_complete":all_complete.iter().all(|&k|k==CASES as u64),
+        "ratios_APS_over_folded32_unfolded32_unfolded64":[
+            total_ns[0] as f64/total_ns[1] as f64,
+            total_ns[0] as f64/total_ns[2] as f64,
+            total_ns[0] as f64/total_ns[3] as f64
+        ],
+        "ratio_folded32_over_unfolded32":total_ns[1] as f64/total_ns[2] as f64,
+        "unfolded32_AA_drift":(total_ns[2] as f64/total_ns[4] as f64-1.0).abs(),
+        "classification":"published APS explicit S3 pair MITM vs folded and unfolded generic r-adding rho",
+        "scope":"source-specific unisolated development CI; tuned WZ rho and independent PCC untested",
+        "cases":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--rho-fold-sensitivity-48q" {
+        let result=rho_fold_sensitivity_48q_panel()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--rho-unfolded-match" {
         let result=rho_unfolded_match_panel()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
