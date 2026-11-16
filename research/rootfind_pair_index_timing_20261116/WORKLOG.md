@@ -122,3 +122,32 @@
 
 - None in the bounded run. The 0.38-second `/usr/bin/time -l` wall value
   covers the entire harness and is not a per-arm interval.
+
+## 2026-11-16, derived visual report
+
+### What was done
+
+- Confirmed raw run commit `11abb8a59a` was pushed before deriving this
+  report. Rendered the chart from `RESULTS.json`, built the one-page PDF from
+  editable Typst source, and inspected a Poppler-rendered page plus extracted
+  text. Its caption names the run, nanosecond units and 101 repetitions per
+  arm. [pcc:unverified]
+- Updated the branch handoff to distinguish the completed local component
+  screen from the still-unrun matched F4/F5/F6 panel.
+
+### Decisions made
+
+- Keep this result at descriptive L0 scope. No canonical leaderboard or
+  complete-call performance graph changes without the admitted panel and
+  independent verification. [pcc:unverified]
+
+### Open threads
+
+- Push the report and open the ready stacked PR. Integrate direct-build flat
+  only after T-6708 releases production collector files; then measure its
+  complete call under a fresh frozen contract.
+
+### Errors
+
+- No rendering or document-inspection error. The earlier source compile
+  refusal remains archived and is not a timed trial.

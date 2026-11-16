@@ -26,36 +26,40 @@ locked harness Cargo.lock SHA-256
 
 ## State
 The first release compile-only command failed on a source type mismatch and
-is archived as `build.*`. The corrected second compile-only command passed;
-`build2.*` is retained. The source-bound executable is
-`/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/deps/rootfind_pair_index_timing-79a07ef92fe2f245`,
-SHA-256 `4f8e218be771a8cf58cc1005c9aa49561ae85701d3846f5af0f266ca862ec7ff`.
-No timed test has executed. The correct AWS account's latest monthly and
-daily readbacks exceed their limits; this local L0 diagnostic needs no EKS
-job and cannot replace the frozen L2 F4/F5/F6 panel.
+is archived as `build.*`; corrected `build2.*` passed. The source-bound
+executable SHA-256 is
+`4f8e218be771a8cf58cc1005c9aa49561ae85701d3846f5af0f266ca862ec7ff`.
+The one frozen local diagnostic completed at 2026-11-16T14:14:19Z, 1/1 test
+passed, with all 1,515 measured rows and full duplicate/witness checks.
+`RUN_RECORD.json` and `RESULTS.json` are archived at `11abb8a59a` and pushed.
+The descriptive report, chart and inspected PDF are in
+`research/rootfind_pair_index_timing_20261116/reports/run-20261116T1414Z/`.
+The direct flat index had lower combined medians than hash for K13/K19,
+while K23 was higher; this is one L0 component timer, not a complete-call
+or independently replayed result. The correct AWS account's latest monthly
+and daily budget readbacks exceed their limits; the frozen L2 F4/F5/F6 panel
+was not submitted.
 
 ## Next steps
-1. Commit `build2.*` and this resume, push this branch-specific S3 checkpoint
-   with `scripts/checkpoint.sh gate`, and read back the uploaded resume.
-2. Execute the exact release test once under a 600-second watchdog:
-   `gtimeout -s TERM -k 10s 600s /usr/bin/time -l <executable> --exact fixed_koblitz_pair_index_build_probe_timing --nocapture`.
-   Save `run.meta`, `run.stdout` and `run.stderr` under the study directory.
-3. Check all 3 case lines and 1,515 measured arm rows, retain failures,
-   derive descriptive component counts, make a graph and PDF, then publish
-   in a new ready PR stacked on #4421. Do not promote an F4/F5/F6 result
-   from these microbench timings.
+1. Commit and push the derived report and updated handoff, then open a ready
+   PR stacked on #4421. Do not poll its CI.
+2. After production collector source reservation T-6708 is released,
+   integrate the direct-build flat candidate for small Koblitz cells under
+   a new source-bound protocol. Include allocation, pair-sum arithmetic,
+   probe generation, memory and complete-call correctness/timing.
+3. Recheck the correct-account EKS budget and isolation gates before the
+   separately frozen F4/F5/F6 panel; run only when admission allows it.
+   Require exact same targets, priced full phases and independent replay.
 
 ## Runs in flight
-None. No PID or cloud job exists for this branch. The executable path above
-is the only admitted local timer binary.
+None on this branch. The local timer has finished; no cloud job was
+submitted.
 
 ## Stop and success conditions
-Stop and preserve output on checkpoint refusal, wrong executable hash,
-wrong curve/base digest, pair-count or group-equation mismatch, wrong
-first-witness/checksum, panic, timeout, or missing raw rows. The screen
-completes only if K13/K19/K23 and every five-arm repetition return exact
-answers with all planned rows; a component winner must exceed the A/A
-difference. A complete-call F4/F5/F6 claim needs its separate frozen panel.
+The local component screen is complete at its frozen scope. The larger
+objective requires a matched, verified complete-call comparison against
+F4/F5/F6, including setup, relation collection, rank, verification, failed
+attempts and memory. Do not promote this component observation to that claim.
 
 ## Historical handoffs
 
