@@ -1,0 +1,92 @@
+{
+  "schema": "n83.k600-m6-linux-build-plan/v1",
+  "status": "FROZEN_BUILD_PLAN",
+  "target": "linux/arm64",
+  "toolchain_image_id": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+  "image_ref": "n83-k600-m6:${COMMIT}",
+  "steps": [
+    {
+      "name": "rust-binaries",
+      "program": "/bin/bash",
+      "program_sha256": "f5918390c5b15392ad8835e8368a79c1ee9937fbb19f2349cccf5d4524183299",
+      "args": [
+        "/Volumes/SSD990-2/tmp/n83-native-rank-query-wt/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-colima-charged-build-20261116/CHARGED_BUILD_STEPS.sh",
+        "rust-binaries",
+        "${OUT}"
+      ],
+      "env": {
+        "PATH": "/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/root",
+        "RUSTUP_HOME": "/usr/local/rustup",
+        "CARGO_HOME": "/usr/local/cargo"
+      },
+      "timeout_seconds": 1200,
+      "inputs": [
+        {
+          "path": "/Volumes/SSD990-2/tmp/n83-native-rank-query-wt/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-colima-charged-build-20261116/CHARGED_BUILD_STEPS.sh",
+          "sha256": "d13ce79155685437c7483f8d2e1d30461a14fc08e51e9c3cd4e3cdc0d3ad0c64"
+        }
+      ]
+    },
+    {
+      "name": "solver-binary",
+      "program": "/bin/bash",
+      "program_sha256": "f5918390c5b15392ad8835e8368a79c1ee9937fbb19f2349cccf5d4524183299",
+      "args": [
+        "/Volumes/SSD990-2/tmp/n83-native-rank-query-wt/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-colima-charged-build-20261116/CHARGED_BUILD_STEPS.sh",
+        "solver-binary",
+        "${OUT}",
+        "/inputs/cryptominisat.tar.gz",
+        "/inputs/cadical.tar.gz",
+        "/inputs/cadiback.tar.gz"
+      ],
+      "env": {
+        "PATH": "/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/root"
+      },
+      "timeout_seconds": 900,
+      "inputs": [
+        {
+          "path": "/Volumes/SSD990-2/tmp/n83-native-rank-query-wt/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-colima-charged-build-20261116/CHARGED_BUILD_STEPS.sh",
+          "sha256": "d13ce79155685437c7483f8d2e1d30461a14fc08e51e9c3cd4e3cdc0d3ad0c64"
+        },
+        {
+          "path": "/inputs/cryptominisat.tar.gz",
+          "sha256": "2ca8e47c3ab989c3b9842c3f230aca1c6f74a767797a24584c578dee264080a1"
+        },
+        {
+          "path": "/inputs/cadical.tar.gz",
+          "sha256": "beaeb17a751db88d5384b35d65be82501d94cf60f758b768b59bfb2b437cb34b"
+        },
+        {
+          "path": "/inputs/cadiback.tar.gz",
+          "sha256": "e9b29931f4d8e12a18eb12b862054af462332cf747be174eb9f7bdfdf4658918"
+        }
+      ]
+    },
+    {
+      "name": "runtime-image",
+      "program": "/bin/bash",
+      "program_sha256": "f5918390c5b15392ad8835e8368a79c1ee9937fbb19f2349cccf5d4524183299",
+      "args": [
+        "/Volumes/SSD990-2/tmp/n83-native-rank-query-wt/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-colima-charged-build-20261116/CHARGED_BUILD_STEPS.sh",
+        "runtime-image",
+        "${OUT}",
+        "${COMMIT}",
+        "n83-k600-m6:${COMMIT}"
+      ],
+      "env": {
+        "PATH": "/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOME": "/root",
+        "DOCKER_HOST": "unix:///var/run/docker.sock"
+      },
+      "timeout_seconds": 300,
+      "inputs": [
+        {
+          "path": "/Volumes/SSD990-2/tmp/n83-native-rank-query-wt/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-colima-charged-build-20261116/CHARGED_BUILD_STEPS.sh",
+          "sha256": "d13ce79155685437c7483f8d2e1d30461a14fc08e51e9c3cd4e3cdc0d3ad0c64"
+        }
+      ]
+    }
+  ]
+}

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import http.server
 import json
 import os
@@ -188,8 +189,37 @@ class WorkflowTests(unittest.TestCase):
             text = fh.read()
         test_job = text.split("\n  test:\n", 1)[1].split("\n  publish:\n", 1)[0]
         publish_job = text.split("\n  publish:\n", 1)[1]
-        self.assertIn("if: github.event_name == 'pull_request'", test_job)
-        self.assertNotRegex(publish_job, r"^    needs:", "publish must not wait on a second runner")
+        # Check scheduling behavior rather than one YAML spelling: the draft
+        # guard can be folded over several lines while remaining PR-only.
+        condition = re.search(r"^    if:[ \t]*(.*)$", test_job, re.M)
+        self.assertIsNotNone(condition, "test job has no scheduling condition")
+        expression = condition.group(1).strip()
+        if expression in (">", ">-", "|", "|-"):
+            chunks = []
+            for line in test_job[condition.end():].splitlines():
+                if not line.strip():
+                    continue
+                if not line.startswith("      "):
+                    break
+                chunks.append(line.strip())
+            expression = " ".join(chunks)
+        if expression.startswith("${{") and expression.endswith("}}"):
+            expression = expression[3:-2].strip()
+        allowed = (
+            ast.Expression, ast.BoolOp, ast.UnaryOp, ast.Compare,
+            ast.And, ast.Or, ast.Not, ast.Eq, ast.NotEq, ast.Constant,
+        )
+        for event in ("pull_request", "push", "schedule", "release", "workflow_dispatch", "merge_group"):
+            for draft in (False, True):
+                value = expression.replace("github.event_name", repr(event))
+                value = value.replace("github.event.pull_request.draft", repr(draft))
+                value = value.replace("&&", " and ").replace("||", " or ")
+                value = re.sub(r"!(?!=)", " not ", value).strip()
+                tree = ast.parse(value, mode="eval")
+                self.assertTrue(all(isinstance(node, allowed) for node in ast.walk(tree)))
+                actual = eval(compile(tree, path, "eval"), {"__builtins__": {}})
+                self.assertEqual(actual, event == "pull_request" and not draft)
+        self.assertNotRegex(publish_job, r"(?m)^    needs:", "publish must not wait on a second runner")
         test_runs = re.findall(r"^\s+run: (.+)$", test_job, re.M)
         before_deploy = publish_job.split("- name: Configure AWS", 1)[0]
         self.assertEqual(test_runs, re.findall(r"^\s+run: (.+)$", before_deploy, re.M))

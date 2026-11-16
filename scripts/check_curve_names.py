@@ -13,6 +13,9 @@ The lint fails on
    or HTML outside a fenced code block;
 2. an `icv1-…` slug in tracked Markdown or HTML that the registry does
    not hold;
+2a. a standard-panel-shaped alias (`K0-23`, `B23a`, `P36a`) that is not
+   a `panel_alias` of the registry, in `docs/ic/` or in a research
+   directory dated on or after the panel freeze (docs/ic/STANDARD_PANEL.md);
 3. with `--diff BASE`: a retired name on a line the branch adds to a
    Markdown, HTML, Rust, Python or YAML file, or a file the branch adds
    whose name uses a retired curve stem.
@@ -156,6 +159,21 @@ STEM = re.compile(EDGE_L + r"(k[01]n\d{1,3}|bench-\d+bit|generated-\d+bit-\d+"
                   r"|random-binary-n\d+-b[0-9a-f]+)" + EDGE_R)
 SUBFIELD = re.compile(r"E_\{(\d+),(\d+)\}/GF\((?:2\^(\d+)|(\d+))\)(?:\s+over\s+GF\(2\^(\d+)\))?")
 SLUG = re.compile(r"icv1-(?:f2m\d+|fp\d+(?:k\d+)?)-tm?\d+-[0-9a-f]{8}")
+# Standard-panel aliases (docs/ic/STANDARD_PANEL.md).  Text written before
+# the freeze used P35a, P45a, ... as local instance labels, so the rule binds
+# docs/ic/ and research directories dated on or after it.
+PANEL_TEXT = re.compile(r"(?<![A-Za-z0-9_./-])(K[01]-\d{2,3}|[BP]\d{2,3}[a-z])(?![A-Za-z0-9_-])")
+PANEL_FROZEN = 20261110
+PANEL_RESEARCH_DATE = re.compile(r"^research/[^/]*?(\d{8})[^/]*/")
+
+
+def panel_scoped(rel: str) -> bool:
+    if rel == "docs/ic/STANDARD_PANEL.md":  # the spec: off-panel aliases are its examples
+        return False
+    if rel.startswith(("docs/ic/", "docs/ic-")):
+        return True
+    m = PANEL_RESEARCH_DATE.match(rel)
+    return bool(m) and int(m.group(1)) >= PANEL_FROZEN
 RETIRED_FILE = re.compile(r"(?:^|/)(k[01]n\d+|bench-\d+bit|generated-\d+bit-\d+"
                           r"|random-binary-n\d+-b[0-9a-f]+)[-_.]")
 
@@ -225,8 +243,11 @@ class Resolver:
         self.reg = cid.load_registry()
         self.by_alias: dict[str, dict] = {}
         self.slugs = set()
+        self.panel = set()
         for c in self.reg["curves"]:
             self.slugs.add(c["slug"])
+            if c.get("panel_alias"):
+                self.panel.add(cid.normalise_alias(c["panel_alias"]))
             for a in c["aliases"] + c["standard_names"] + [c["slug"]]:
                 self.by_alias[cid.normalise_alias(a)] = c
 
@@ -323,6 +344,13 @@ def lint(res: Resolver, pins: dict[str, set[str]], fix: bool) -> list[str]:
                     and not allow_archived_slugs):
                 line = text.count("\n", 0, m.start()) + 1
                 problems.append(f"{rel}:{line}: {m.group(0)} is not in docs/curves/registry.json")
+        if panel_scoped(rel):
+            spans = fence_mask(text, rel)
+            for m in PANEL_TEXT.finditer(text):
+                if cid.normalise_alias(m.group(1)) not in res.panel and not in_spans(m.start(), spans):
+                    line = text.count("\n", 0, m.start()) + 1
+                    problems.append(f"{rel}:{line}: {m.group(1)!r} is not a standard-panel alias "
+                                    "(docs/ic/standard_panel.json)")
     if fix:
         print(f"rewrote {changed} files", file=sys.stderr)
     return problems

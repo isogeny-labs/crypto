@@ -1,5 +1,7 @@
 # N83 five-point Tier 1 paired result
 
+> **Correction 2026-10-20 (owner follow-up to validation sweep B, PR #2328):** the N83 online **54.10** median (K3240 `root21`, five fresh points; ratio of means 44.09, recomputed from `measurements.json`) compares IC, with 580-640 s of per-point setup excluded from its clock, against an **empty-table** strong rho (`fold-L64-DP6-E0`). It is superseded and is not an improvement. The matched Bernstein-Lange control in `research/20261016-n83-precomputed-rho-control/` (K3300 and K600, not K3240) shows precomputed rho faster online in every time- and memory-matched arm (IC/rho 3.74x to 395x), and the by-inference reading for K3240 has not been re-run directly. The measurement, setup-inclusive cost and replay results below are unchanged.
+
 The selected K3240 root21 index recovered each of five previously unseen
 public-point scalars faster online than the same-point strong-rho reference on
 one GitHub Actions allocation. The median paired rho/IC ratio was **54.10**;

@@ -1,0 +1,160 @@
+{
+  "schema": "recorded-result-review/v1",
+  "created_utc": "2026-11-15T03:42:12.081478+00:00",
+  "review_mode": "parse recorded coordinator evidence only; no algorithm/oracle rerun",
+  "raw_sha256": "09703da371733688e8a566991e76122bac174b7394665da5e9c48c1a4c3b9f29",
+  "raw_error": null,
+  "recorded_local_predicates": 1444,
+  "recorded_helper_predicates": 57409,
+  "recorded_raw_parameter_states": 52352,
+  "recorded_quadratic_rhs_checks": 28,
+  "groups": {
+    "(2, (2,))": {
+      "cells": 8,
+      "positive_cells": 1,
+      "candidate_count": 8,
+      "uniform_kzero_cells": 2
+    },
+    "(3, (1,))": {
+      "cells": 16,
+      "positive_cells": 0,
+      "candidate_count": 16,
+      "uniform_kzero_cells": 2
+    },
+    "(3, (1, 2))": {
+      "cells": 32,
+      "positive_cells": 4,
+      "candidate_count": 32,
+      "uniform_kzero_cells": 4
+    },
+    "(4, (1,))": {
+      "cells": 64,
+      "positive_cells": 0,
+      "candidate_count": 64,
+      "uniform_kzero_cells": 4
+    },
+    "(4, (1, 2))": {
+      "cells": 128,
+      "positive_cells": 0,
+      "candidate_count": 128,
+      "uniform_kzero_cells": 8
+    }
+  },
+  "positive_cells": [
+    {
+      "n": 2,
+      "basis": [
+        2
+      ],
+      "target": [
+        1,
+        0
+      ],
+      "h": 2,
+      "k": 3,
+      "parameter_pairs": [
+        [
+          1,
+          3
+        ]
+      ],
+      "ordered_source_counts": [
+        5
+      ]
+    },
+    {
+      "n": 3,
+      "basis": [
+        1,
+        2
+      ],
+      "target": [
+        4,
+        3
+      ],
+      "h": 2,
+      "k": 4,
+      "parameter_pairs": [
+        [
+          1,
+          1
+        ]
+      ],
+      "ordered_source_counts": [
+        1
+      ]
+    },
+    {
+      "n": 3,
+      "basis": [
+        1,
+        2
+      ],
+      "target": [
+        4,
+        3
+      ],
+      "h": 3,
+      "k": 5,
+      "parameter_pairs": [
+        [
+          6,
+          5
+        ]
+      ],
+      "ordered_source_counts": [
+        5
+      ]
+    },
+    {
+      "n": 3,
+      "basis": [
+        1,
+        2
+      ],
+      "target": [
+        4,
+        3
+      ],
+      "h": 6,
+      "k": 1,
+      "parameter_pairs": [
+        [
+          4,
+          4
+        ]
+      ],
+      "ordered_source_counts": [
+        5
+      ]
+    },
+    {
+      "n": 3,
+      "basis": [
+        1,
+        2
+      ],
+      "target": [
+        4,
+        3
+      ],
+      "h": 7,
+      "k": 3,
+      "parameter_pairs": [
+        [
+          7,
+          1
+        ]
+      ],
+      "ordered_source_counts": [
+        5
+      ]
+    }
+  ],
+  "claim": "repaired fixture now exercises positive odd-degree and even-degree norm cells; GF16 remains empty. These are scoped4+1 norm/source-order controls, no original auxiliaries or global root coverage, no measured gain or novelty.",
+  "limitations": [
+    "Independent source-index/oracle execution occurred inside declared coordinator worker; reviewer parsed complete recorded sets and did not rerun arithmetic.",
+    "No conditional profile run admitted or needed for this repair.",
+    "Old frozen source failure and unexecuted v1 preserved."
+  ]
+}
