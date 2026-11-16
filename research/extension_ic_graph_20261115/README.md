@@ -332,3 +332,10 @@ full IC measurement.
 No scoreboard or leaderboard figure changes: this packet has no admitted
 performance observations. Historical Python artifacts remain outside this
 repository; this execution path is native Rust throughout.
+
+The separate [capacity-selected recovery validation](local-cover-sieve-validation-20261116-21/report.pdf)
+completes both endpoints atp1009seed251: native and graph IC recover the held-out
+scalar after full elliptic replay; graph projects488rows to366 with366replays
+and zero fallback solves. This once-only protocol produces no comparative
+ratio or interval. It permits designing a new frozen comparison; it does not
+change the earlier pilot's failed gate. [pcc:unverified]

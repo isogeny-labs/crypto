@@ -1,3 +1,30 @@
+# Current checkpoint (06:59Z, 16 November)
+
+STAGE21 FINISHED PASS, source8ab624189, sole runlocal-cover-sieve-validation-20261116-21,
+exit0/40.445s,2starts/completions. OriginalcopiedRustanalyzeranalysis-original:
+full_recovery_validation_passedTRUE/global[]/comparativeFALSE. Bothactualscalar
+72041284332044320/l263807420025969577, native+outer replay. Graph488->366rows,
+366replays,122pivots1094merges,0fallback/refusal. No AA/ratioinference.
+Allpre/posthashes recheck. No processesactive. Need finish21exactraw47187B/
+summary/progress/custody/report andbenchmarkcopies, publish/updatePR BEFORE
+newlead. EndpointgateallowsNEWseparatelyfrozencomparison, not20failedgatepassing.
+Readnative/priorstrongrho timings for affordable22protocol; nonechosenyet.
+GoalACTIVE/localworks. PRbodycurrently21running; nextCI07:07absentevent.
+
+# Current checkpoint (06:58Z, 16 November)
+
+STAGE21 RUNNING, session70800, source8ab624189bd8743f4857658d275e15aa8315d1ba
+publishedbefore solewrappercall. Run=/workspace/ic-local-runs/local-cover-sieve-validation-20261116-21.
+70manifestPASS, clean source/no live compiler, driver/analyzer/host/sourcecheckpoint
+captured. Public p1009seed251; first ICworker collectingm9relations. Exactlytwo
+freshworkersICthenGraph,900s each/1900whole/CPU0/8GiB/no retry. No completedendpoint
+yet. Checkexitfile/processbeforeanyaction ifsessionlost. DoNOT compile/change
+source or parameters, terminateearly, or launchmoretrials. Original20gatefailed;
+21isnoncomparativevalidation, noAA/rho/ratio. Incidence+shareexplicitbotharms.
+Afterexit originalcopiedanalyzer/rawflow/preposthashes/report. Needbothactual
+scalars+native/outergroupreplay+nontrivialgraph nofallbackbeforeNEWprotocol.
+GoalACTIVE; localworks. PR4288bodyupdatepending21running. CI07:07nextabsentevent.
+
 # Current checkpoint (06:57Z, 16 November)
 
 Stage20censor PUBLISHED22b0d7836; artifact-only f15a0ebc6 ff integrated.
