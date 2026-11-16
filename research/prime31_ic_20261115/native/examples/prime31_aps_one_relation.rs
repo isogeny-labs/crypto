@@ -1809,6 +1809,18 @@ fn algebraic_mode_factorized_index(
 fn algebraic_mode_factorized_index_variant(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,compact:bool,packed:bool
 )->Result<(Option<Solution>,Stats),String>{
+    algebraic_mode_factorized_index_variant_y(parts,q,ar,compact,packed,false)
+}
+// The current public source already contains the genuine, on-curve affine
+// ordinate for each factorized S3 pair. For a fixed pair of x coordinates,
+// replacing either sqrt(f(x)) by its negative merely permutes the two S3
+// coordinate roots. The production source has already paid to normalize
+// and check these ordinates. This is ONLY a source-arithmetic improvement
+// to published APS; discovery still enumerates the generic pair support.
+fn algebraic_mode_factorized_index_variant_y(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,
+    compact:bool,packed:bool,use_public_y:bool
+)->Result<(Option<Solution>,Stats),String>{
     if compact && packed {return Err("APS index: choose only one mode".into());}
     let lookup=(!compact && !packed).then(||reverse_index(&parts[2]));
     let packed_lookup=if packed{Some(PackedXIndex::from_source(&parts[2])?)}else{None};
@@ -1826,16 +1838,20 @@ fn algebraic_mode_factorized_index_variant(
         Vec::with_capacity(parts[j].len()));
     for j in 0..2 {
         for point in &parts[j] {
-            // Only the abscissa is read; signs of fibre square roots do
-            // not affect the unordered pair of S3 coordinate roots.
+            // For either sign of a rational ordinate, the unordered
+            // two-root S3 fibre is exactly the same. Always verify y^2.
             let rhs=rhs_from_x::<true>(point.pt.0);
-            let y=sqrtp_mode::<true>(rhs)
-                .ok_or("factorized S3: public x has no rational fibre")?;
-            if mulp_mersenne(y,y)!=rhs {
-                return Err("factorized S3: invalid fibre square root".into());
+            let y=if use_public_y {
+                point.pt.1
+            }else{
+                sqrtp_mode::<true>(rhs)
+                    .ok_or("factorized S3: public x has no rational fibre")?
+            };
+            if y>=P || mulp_mersenne(y,y)!=rhs {
+                return Err("factorized S3: invalid rational ordinate".into());
             }
             fibres[j].push(y);
-            stats.s3_sqrt+=1;
+            if !use_public_y {stats.s3_sqrt+=1;}
         }
     }
     for (i,left) in parts[0].iter().enumerate(){
@@ -1925,6 +1941,11 @@ fn execute_factorized_unequal_index_variant_joint(q:(u64,u64),sizes:[usize;3],ro
 }
 fn execute_factorized_unequal_index_variant_jumpmode(q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool,packed:bool,jump_mode:u8)
     ->Result<serde_json::Value,String>{
+    execute_factorized_unequal_index_variant_jumpmode_y(
+        q,sizes,round_limit,compact,packed,jump_mode,false)
+}
+fn execute_factorized_unequal_index_variant_jumpmode_y(q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool,packed:bool,jump_mode:u8,use_public_y:bool)
+    ->Result<serde_json::Value,String>{
     if jump_mode>2{return Err("unsupported jump source".into());}
     if sizes.iter().any(|&n|n<16 || n>32_768)
        || sizes.iter().sum::<usize>()>40_000
@@ -1954,7 +1975,8 @@ fn execute_factorized_unequal_index_variant_jumpmode(q:(u64,u64),sizes:[usize;3]
         let source_additions=ar.counts.group_additions-before;
         let root_begin=Instant::now();
         let before_verify=ar.counts.group_additions;
-        let (solution,stats)=algebraic_mode_factorized_index_variant(&parts,q,&mut ar,compact,packed)?;
+        let (solution,stats)=algebraic_mode_factorized_index_variant_y(
+            &parts,q,&mut ar,compact,packed,use_public_y)?;
         let root_ns=root_begin.elapsed().as_nanos();
         let verify_additions=ar.counts.group_additions-before_verify;
         let found=solution.is_some();
@@ -1967,6 +1989,7 @@ fn execute_factorized_unequal_index_variant_jumpmode(q:(u64,u64),sizes:[usize;3]
             "s3_query_ns":root_ns,
             "s3_pair_quadratics":stats.pair_s3,
             "x_fibre_precompute":true,"jacobian_source":true,"joint_batched_public_jumps":jump_mode!=0,
+            "public_ordinate_s3":use_public_y,
             "public_jump_window_bits":if jump_mode==2{4}else if jump_mode==1{1}else{0},
             "compact_x_index":compact,"packed_x_index":packed,
             "s3_sqrts":stats.s3_sqrt,
@@ -3459,8 +3482,159 @@ fn aps_window4_public_jump_24q_panel()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// EXP-R31-APS-PUBLIC-Y: prospectively fixed fresh 24-target full cold panel.
+// All S3 pair root/witness transcripts must match the existing sqrt-lift
+// incumbent. Caller-held scalar never enters either solver.
+fn aps_public_ordinate_24q_panel()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const SIZES:[usize;3]=[384,384,16_384];
+    const TARGET_SEED:u64=0x5933_4150_534f_5231;
+    const RHO_SEED:u64=0x5933_5248_4f53_3231;
+    const STEP_CAP:u64=2_000_000;
+    let mut rng=TARGET_SEED;
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut seen=HashSet::new();
+    let mut all=Vec::with_capacity(CASES);
+    let mut totals=[0u128;5];
+    let mut oracle_ns=[0u128;3];
+    let mut source_ns=[0u128;3];
+    let mut solved=[0u64;5];
+    let mut wins=[0u64;3];
+    let mut sqrt_old=0u64;
+    let mut sqrt_new=0u64;
+    for i in 0..CASES {
+        let (known,q)=loop {
+            let k=prng(&mut rng)%N;
+            if k<=1 || !seen.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let rho_seed=RHO_SEED^(i as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
+        let order:[usize;5]=match i%5 {
+            0=>[0,1,2,3,4],1=>[1,2,3,4,0],2=>[2,3,4,0,1],
+            3=>[3,4,0,1,2],_=>[4,0,1,2,3]
+        };
+        let mut arms:[serde_json::Value;5]=std::array::from_fn(|_|json!(null));
+        for idx in order {
+            let result=match idx {
+                0=>execute_factorized_unequal_index_variant_jumpmode_y(
+                    q,SIZES,6,false,true,2,false)?,
+                1|2=>execute_factorized_unequal_index_variant_jumpmode_y(
+                    q,SIZES,6,false,true,2,true)?,
+                3=>neg_rho_cold_policy_jumps(
+                    q,rho_seed,32,4,STEP_CAP,512,false,32)?,
+                4=>neg_rho_cold_policy_jumps(
+                    q,rho_seed,32,4,STEP_CAP,512,false,64)?,
+                _=>unreachable!()
+            };
+            let ok=result["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if idx<3 && !ok {
+                return Err(format!("public-y APS incomplete case={i} arm={idx}"));
+            }
+            if ok {
+                let log=if idx<3 {
+                    result["attempts"].as_array().and_then(|a|a.last())
+                        .and_then(|a|a["solution"]["log"].as_u64())
+                }else{result["log"].as_u64()};
+                if log!=Some(known) ||
+                    verifier.scalar(PRIME31,known,Some(PRIME31.g))!=Some(q) {
+                    return Err(format!("public-y wrong scalar case={i} arm={idx}"));
+                }
+                solved[idx]+=1;
+            }
+            totals[idx]+=result["cold_wall_ns"].as_u64()
+                .ok_or("public-y missing cold ns")? as u128;
+            if idx<3 {
+                let rounds=result["attempts"].as_array().ok_or("public-y missing rounds")?;
+                oracle_ns[idx]+=rounds.iter()
+                    .map(|v|v["s3_query_ns"].as_u64().unwrap_or(0) as u128)
+                    .sum::<u128>();
+                source_ns[idx]+=rounds.iter()
+                    .map(|v|v["source_setup_ns"].as_u64().unwrap_or(0) as u128)
+                    .sum::<u128>();
+            }
+            arms[idx]=result;
+        }
+        let old=arms[0]["attempts"].as_array().ok_or("missing baseline attempts")?;
+        for idx in [1usize,2] {
+            let candidate=arms[idx]["attempts"].as_array().ok_or("missing candidate attempts")?;
+            if old.len()!=candidate.len() {
+                return Err(format!("public-y round count differs case={i} arm={idx}"));
+            }
+            for (r,(baseline,proposed)) in old.iter().zip(candidate.iter()).enumerate(){
+                for key in ["round","seed","s3_pair_quadratics","s3_batch_inversions",
+                    "signed_candidates","solution","rejected_duplicate_x",
+                    "rejected_identity"] {
+                    if baseline[key]!=proposed[key]{
+                        return Err(format!(
+                            "public-y changed transcript case={i} arm={idx} round={r} field={key}"
+                        ));
+                    }
+                }
+                let old_sqrts=baseline["s3_sqrts"].as_u64().ok_or("old sqrt count")?;
+                let new_sqrts=proposed["s3_sqrts"].as_u64().ok_or("new sqrt count")?;
+                if old_sqrts!=(SIZES[0]+SIZES[1]) as u64 || new_sqrts!=0 {
+                    return Err(format!("unexpected public-y sqrt count case={i} round={r}"));
+                }
+            }
+        }
+        sqrt_old+=old.iter().map(|r|r["s3_sqrts"].as_u64().unwrap_or(0)).sum::<u64>();
+        sqrt_new+=arms[1]["attempts"].as_array().unwrap()
+            .iter().map(|r|r["s3_sqrts"].as_u64().unwrap_or(0)).sum::<u64>();
+        for (j,idx) in [0usize,3,4].into_iter().enumerate(){
+            if arms[idx]["complete_target_scalar_recovered"].as_bool()==Some(true) &&
+               arms[1]["cold_wall_ns"].as_u64()<arms[idx]["cold_wall_ns"].as_u64(){
+                wins[j]+=1;
+            }
+        }
+        all.push(json!({
+            "case":i,"public_Q":q,"caller_known_scalar_verifier_only":known,
+            "chronological_order":order,
+            "APS_window4_sqrt":arms[0],"APS_window4_public_y":arms[1],
+            "APS_window4_public_y_AA":arms[2],
+            "unfolded_rho32":arms[3],"unfolded_rho64":arms[4]
+        }));
+    }
+    let ratio=totals[1] as f64/totals[0] as f64;
+    let drift=(totals[1] as f64/totals[2] as f64-1.0).abs();
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_PUBLIC_ORDINATE_PROTOCOL_20261116.md",
+        "classification":"published APS S3, explicit generic MITM-equivalent pair-root search",
+        "p":P,"n":N,"cofactor":1,"profile":SIZES,
+        "target_seed":format!("{TARGET_SEED:016x}"),
+        "rho_seed_base":format!("{RHO_SEED:016x}"),
+        "cases_count":CASES,
+        "arm_names":["APS_window4_sqrt","APS_window4_public_y",
+            "APS_window4_public_y_AA","unfolded_rho32","unfolded_rho64"],
+        "completed_calls":solved,"all_120_complete":solved.iter().all(|&v|v==CASES as u64),
+        "fully_cold_ns":totals.map(|v|v.to_string()),
+        "aps_s3_query_ns":oracle_ns.map(|v|v.to_string()),
+        "aps_source_setup_ns":source_ns.map(|v|v.to_string()),
+        "old_s3_square_roots":sqrt_old,"new_s3_square_roots":sqrt_new,
+        "candidate_over_previous_ratio":ratio,
+        "candidate_over_faster_rho_ratio":totals[1] as f64/
+            totals[3].min(totals[4]) as f64,
+        "candidate_AA_drift":drift,
+        "paired_wins_candidate_over_old_rho32_rho64":wins,
+        "passes_preregistered_5pct_gate":
+            solved[..3].iter().all(|&n|n==CASES as u64)
+            && ratio<=0.95 && wins[0]>=18 && drift<=0.05,
+        "limits":"producer CI only; no PCC or independent isolated runtime verification",
+        "cases":all
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--aps-public-y-24q" {
+        let result=aps_public_ordinate_24q_panel()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--aps-window4-jumps-24q" {
         let result=aps_window4_public_jump_24q_panel()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -4116,5 +4290,29 @@ mod aps_window4_jump_tests {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod aps_public_ordinate_tests {
+    use super::*;
+    #[test]
+    fn public_y_oracle_identical_s3_group_transcript(){
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let (parts,_,_)=source_walk_profile_jac_window4(
+            PUBLIC_Q,SEED,&mut ar,[32,32,512]).unwrap();
+        let (baseline,s1)=algebraic_mode_factorized_index_variant_y(
+            &parts,PUBLIC_Q,&mut ar,false,true,false).unwrap();
+        let (public_y,s2)=algebraic_mode_factorized_index_variant_y(
+            &parts,PUBLIC_Q,&mut ar,false,true,true).unwrap();
+        assert_eq!(serde_json::to_string(&json_solution(&baseline)).unwrap(),
+            serde_json::to_string(&json_solution(&public_y)).unwrap());
+        assert_eq!(s1.pair_s3,s2.pair_s3);
+        assert_eq!(s1.matched_x,s2.matched_x);
+        assert_eq!(s1.signed_candidates,s2.signed_candidates);
+        assert_eq!(s1.batch_inversions,s2.batch_inversions);
+        assert_eq!(s1.s3_sqrt,64);
+        assert_eq!(s2.s3_sqrt,0);
     }
 }
