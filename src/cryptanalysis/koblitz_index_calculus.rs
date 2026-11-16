@@ -1641,6 +1641,13 @@ fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) 
     }
     let inverse = field.inv(coordinate);
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
+    if crate::cryptanalysis::koblitz_fast::cached_point_lifts_enabled() {
+        let Some(root) = curve.half_trace_root_cached(rhs) else {
+            return (none, 0);
+        };
+        let point = FastPoint::affine(coordinate, field.mul(coordinate, root));
+        return ([point, curve.neg(point)], 2);
+    }
     let mut root = rhs;
     let mut power = rhs;
     for _ in 0..(curve.n - 1) / 2 {
@@ -4228,14 +4235,24 @@ pub enum DecompositionStrategy {
     /// is lifted and checked in the original curve group. Resource caps
     /// are supplied separately through `KoblitzIcOptions::chain_s3_limits`.
     ChainedS3,
+    /// Chained S3 with an opt-in Karatsuba field-product SAT circuit.
+    /// The finite coordinate domain and original-curve witness checks are
+    /// identical to `ChainedS3`.
+    ChainedS3Karatsuba,
+    /// Chained S3 with one-level split Karatsuba and direct field reduction.
+    ChainedS3ShallowKaratsuba,
     /// The same chained-S3 solver with an exact representative-and-Frobenius-
     /// phase domain for an ambient-basis signed-orbit base. This can avoid a
     /// large explicit-coordinate trie, but still requires the same complete
     /// curve-group witness and relation checks.
     ChainedS3FrobeniusOrbit,
+    /// Signed-Frobenius domain with the shallow split field-product circuit.
+    ChainedS3FrobeniusOrbitShallowKaratsuba,
     /// The Frobenius-orbit chained solver with `x_0 <= x_1` on the first
     /// S3 node. This preserves solutions under swapping its first pair.
     ChainedS3FrobeniusOrbitOrdered,
+    /// Signed-Frobenius domain, shallow products, and first-pair order.
+    ChainedS3FrobeniusOrbitOrderedShallowKaratsuba,
     /// **Meet in the middle** over a precomputed table of all pair sums
     /// `P_i + P_j` ([`PairSumTable`]).  `m = 2` is one lookup, `m = 3`
     /// is `|F|` lookups, `m = 4` is `|F|²` lookups — against
@@ -4384,6 +4401,20 @@ pub enum FilterLayout {
 }
 
 impl FilterLayout {
+    /// Filter bits a folded build adds to [`filter_bits_for`]'s width:
+    /// one for a [`FilterLayout::Top`] table (`KIC_FILTER_DOUBLE`, default
+    /// on), doubling its filter, and none for `Low`.  A `Low` table is the
+    /// format the table files, the GPU builder and `ecbench`'s methods
+    /// share, so their widths and counted bucket reads stay as they were;
+    /// a `Top` table lives only in this process.  The doubled filter
+    /// admits about a fifth as many absent keys; `0` keeps the old width.
+    fn extra_filter_bits(self) -> u32 {
+        static DOUBLE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+        let double =
+            *DOUBLE.get_or_init(|| std::env::var("KIC_FILTER_DOUBLE").map_or(true, |v| v != "0"));
+        u32::from(self == FilterLayout::Top && double)
+    }
+
     /// The layout this module's folded builds use: `Top`, unless
     /// `KIC_FILTER_LAYOUT=low` (the same-binary control).
     fn for_folded_builds() -> Self {
@@ -5716,6 +5747,23 @@ impl PairSumTable {
         fb: &FrobeniusFactorBase,
         byte_budget: u128,
     ) -> Option<Self> {
+        // A one-worker resource contract does not benefit from handing both
+        // construction and sorting to another thread on the same CPU.
+        // Keep all other configurations on the existing parallel path.
+        Self::build_full_within_runtime(
+            kc,
+            fb,
+            byte_budget,
+            std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1"),
+        )
+    }
+
+    fn build_full_within_runtime(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        serial: bool,
+    ) -> Option<Self> {
         if fb.points.len() > u32::MAX as usize {
             return None;
         }
@@ -5726,18 +5774,27 @@ impl PairSumTable {
         let points: Vec<FastPoint> = fb.points.iter().map(|p| curve.lift(p)).collect();
         let negated: Vec<FastPoint> = points.iter().map(|&p| curve.neg(p)).collect();
         let (negated_x, negated_y) = coordinate_slices(&negated);
-        let mut entries: Vec<(u64, u32, u32)> = (0..points.len())
-            .into_par_iter()
-            .flat_map_iter(|i| {
-                let mut sums = Vec::with_capacity(points.len() - i);
-                let mut scratch = BatchScratch::default();
-                curve.add_many(points[i], &points[i..], &mut sums, &mut scratch);
-                sums.into_iter()
-                    .enumerate()
-                    .map(move |(offset, sum)| (sum.pack(), i as u32, (i + offset) as u32))
-            })
-            .collect();
-        entries.par_sort_unstable();
+        let make_row = |i: usize| {
+            let mut sums = Vec::with_capacity(points.len() - i);
+            let mut scratch = BatchScratch::default();
+            curve.add_many(points[i], &points[i..], &mut sums, &mut scratch);
+            sums.into_iter()
+                .enumerate()
+                .map(move |(offset, sum)| (sum.pack(), i as u32, (i + offset) as u32))
+        };
+        let mut entries: Vec<(u64, u32, u32)> = if serial {
+            (0..points.len()).flat_map(make_row).collect()
+        } else {
+            (0..points.len())
+                .into_par_iter()
+                .flat_map_iter(make_row)
+                .collect()
+        };
+        if serial {
+            entries.sort_unstable();
+        } else {
+            entries.par_sort_unstable();
+        }
         if entries.len() > u32::MAX as usize {
             return None;
         }
@@ -6190,7 +6247,7 @@ impl PairSumTable {
         // At one thread there is one run, and its filter is the filter.
         // Every bit is set either way, so the filter is the same.
         const FILL_AHEAD: usize = 16;
-        let filter_bits = filter_bits_for(total);
+        let filter_bits = (filter_bits_for(total) + layout.extra_filter_bits()).min(32);
         let present_mask = (1u64 << filter_bits) - 1;
         let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
         let filter_words = (1usize << filter_bits) / 64;
@@ -6636,7 +6693,7 @@ impl PairSumTable {
             let total = bucket_start[buckets] as usize;
             let cursor: Vec<AtomicU32> = bucket_start.iter().map(|&c| AtomicU32::new(c)).collect();
             let mut rests = vec![0u32; total];
-            let filter_bits = filter_bits_for(total);
+            let filter_bits = (filter_bits_for(total) + layout.extra_filter_bits()).min(32);
             let present_mask = (1u64 << filter_bits) - 1;
             let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
             let words = (1usize << filter_bits) / 64;
@@ -10229,6 +10286,8 @@ fn sat_decompose_union_s4(
     }
 }
 
+/// Hard limits for an experimental five- or six-summand chained-S3 SAT
+/// decomposition. The variable cap is checked before a SAT solver is built;
 /// Hard limits for an experimental four- to six-summand chained-S3 SAT
 /// decomposition. The variable cap is checked before any SAT model is built;
 /// the conflict and model caps cover all intermediate-identity patterns.
@@ -10285,7 +10344,54 @@ pub fn sat_decompose_chained_s3(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, false, false)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
+}
+
+pub fn sat_decompose_chained_s3_karatsuba(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Karatsuba,
+    )
+}
+
+pub fn sat_decompose_chained_s3_shallow_karatsuba(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::ShallowKaratsuba,
+    )
 }
 
 /// Use one signed-Frobenius representative per column to constrain the same
@@ -10299,7 +10405,16 @@ pub fn sat_decompose_chained_s3_frobenius_orbit(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, false)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        true,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
 }
 
 /// An opt-in symmetry arm for the same exact signed-Frobenius domain.
@@ -10312,7 +10427,36 @@ pub fn sat_decompose_chained_s3_frobenius_orbit_ordered(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, true)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        true,
+        true,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
+}
+
+pub fn sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    order_first_pair: bool,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        true,
+        order_first_pair,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::ShallowKaratsuba,
+    )
 }
 
 /// The chained-S3 solver of [`sat_decompose_chained_s3`] and its
@@ -10366,6 +10510,7 @@ fn sat_decompose_chained_s3_with_domain(
     limits: ChainS3Limits,
     frobenius_orbits: bool,
     order_first_pair: bool,
+    kernel: crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
     if !(4..=6).contains(&m) {
         return (
@@ -10376,7 +10521,7 @@ fn sat_decompose_chained_s3_with_domain(
             },
         );
     }
-    sat_decompose_chained_s3_checked(
+    sat_decompose_chained_s3_checked_with_kernel(
         kc,
         fb,
         target,
@@ -10393,6 +10538,7 @@ fn sat_decompose_chained_s3_with_domain(
             tables: ChainS3Tables::default(),
             wall_budget: None,
         },
+        kernel,
     )
 }
 
@@ -11235,6 +11381,26 @@ fn sat_decompose_chained_s3_checked(
     limits: ChainS3Limits,
     options: ChainS3Options,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_checked_with_kernel(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        options,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
+}
+
+fn sat_decompose_chained_s3_checked_with_kernel(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    options: ChainS3Options,
+    kernel: crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
     let ChainS3Options {
         frobenius_orbits,
         order,
@@ -11435,13 +11601,14 @@ fn sat_decompose_chained_s3_checked(
                 continue;
             }
         }
-        let mut enc = match ChainedS3Encoding::build(
+        let mut enc = match ChainedS3Encoding::build_with_kernel(
             m,
             &kc.curve.irreducible,
             &kc.curve.b,
             target_x,
             identity_mask,
             limits.max_variables,
+            kernel,
         ) {
             Ok(enc) => enc,
             Err(
@@ -12517,7 +12684,7 @@ pub fn koblitz_index_calculus_dlp_with_progress(
 ) -> Option<KoblitzIcReport> {
     progress(KoblitzIcEvent::FactorBaseStarted);
     let fb = build_frobenius_factor_base(kc, opts.factor_index)?;
-    koblitz_index_calculus_dlp_observed(kc, q, &fb, opts, progress)
+    koblitz_index_calculus_dlp_observed(kc, q, &fb, opts, progress, None)
 }
 
 /// Run index calculus with a caller-supplied invariant factor base.
@@ -12531,7 +12698,7 @@ pub fn koblitz_index_calculus_dlp_with_factor_base(
     fb: &FrobeniusFactorBase,
     opts: &KoblitzIcOptions,
 ) -> Option<KoblitzIcReport> {
-    koblitz_index_calculus_dlp_observed(kc, q, fb, opts, &mut |_| {})
+    koblitz_index_calculus_dlp_observed(kc, q, fb, opts, &mut |_| {}, None)
 }
 
 /// Run index calculus on an arbitrary public subgroup target with a
@@ -12545,7 +12712,20 @@ pub fn koblitz_index_calculus_dlp_with_factor_base_and_progress(
     opts: &KoblitzIcOptions,
     progress: &mut dyn FnMut(KoblitzIcEvent),
 ) -> Option<KoblitzIcReport> {
-    koblitz_index_calculus_dlp_observed(kc, q, fb, opts, progress)
+    koblitz_index_calculus_dlp_observed(kc, q, fb, opts, progress, None)
+}
+
+/// The same pipeline with borrowed, live query equations. The observer sees
+/// existing attempts, without replaying queries or cloning their witnesses.
+pub fn koblitz_index_calculus_dlp_with_factor_base_and_trace(
+    kc: &KoblitzCurve,
+    q: &BinaryPoint,
+    fb: &FrobeniusFactorBase,
+    opts: &KoblitzIcOptions,
+    progress: &mut dyn FnMut(KoblitzIcEvent),
+    observer: Option<&QueryObserver<'_>>,
+) -> Option<KoblitzIcReport> {
+    koblitz_index_calculus_dlp_observed(kc, q, fb, opts, progress, observer)
 }
 
 /// Draw a nonzero relation coefficient from the entire prime subgroup.
@@ -12588,6 +12768,7 @@ fn koblitz_index_calculus_dlp_observed(
     fb: &FrobeniusFactorBase,
     opts: &KoblitzIcOptions,
     progress: &mut dyn FnMut(KoblitzIcEvent),
+    observer: Option<&QueryObserver<'_>>,
 ) -> Option<KoblitzIcReport> {
     if let Some(plan) = &opts.weil_charts {
         if opts.strategy != DecompositionStrategy::Groebner
@@ -12670,15 +12851,20 @@ fn koblitz_index_calculus_dlp_observed(
     if matches!(
         opts.strategy,
         DecompositionStrategy::ChainedS3
+            | DecompositionStrategy::ChainedS3Karatsuba
+            | DecompositionStrategy::ChainedS3ShallowKaratsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbit
+            | DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
-    ) && (!(4..=6).contains(&opts.m)
-        || !fb.uses_ambient_basis()
-        || opts.chain_s3_limits.max_variables == 0
-        || opts.chain_s3_limits.max_domain_clauses == 0
-        || opts.chain_s3_limits.max_models == 0
-        || opts.chain_s3_limits.conflict_budget == 0
-        || opts.relation_batch_size != 1)
+            | DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
+    ) && (!(5..=6).contains(&opts.m))
+        && (!(4..=6).contains(&opts.m)
+            || !fb.uses_ambient_basis()
+            || opts.chain_s3_limits.max_variables == 0
+            || opts.chain_s3_limits.max_domain_clauses == 0
+            || opts.chain_s3_limits.max_models == 0
+            || opts.chain_s3_limits.conflict_budget == 0
+            || opts.relation_batch_size != 1)
     {
         report.sat_unknowns = 1;
         return Some(report);
@@ -12959,6 +13145,26 @@ fn koblitz_index_calculus_dlp_observed(
                         sat_decompose_chained_s3(kc, fb, target, opts.m, opts.chain_s3_limits);
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
+                DecompositionStrategy::ChainedS3Karatsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
+                DecompositionStrategy::ChainedS3ShallowKaratsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_shallow_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
                 DecompositionStrategy::ChainedS3FrobeniusOrbit => {
                     let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit(
                         kc,
@@ -12969,6 +13175,17 @@ fn koblitz_index_calculus_dlp_observed(
                     );
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
+                DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                        false,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
                 DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered => {
                     let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit_ordered(
                         kc,
@@ -12976,6 +13193,17 @@ fn koblitz_index_calculus_dlp_observed(
                         target,
                         opts.m,
                         opts.chain_s3_limits,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
+                DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                        true,
                     );
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
@@ -13023,6 +13251,7 @@ fn koblitz_index_calculus_dlp_observed(
                             conflicts,
                             implied_rows,
                         });
+                        trace_relation_attempt(observer, report.attempt_records.last()?);
                         progress(KoblitzIcEvent::RelationAttemptFinished {
                             trial,
                             disposition: KoblitzRelationAttemptDisposition::DirectSolved,
@@ -13177,6 +13406,7 @@ fn koblitz_index_calculus_dlp_observed(
                 conflicts,
                 implied_rows,
             });
+            trace_relation_attempt(observer, report.attempt_records.last()?);
             progress(KoblitzIcEvent::RelationAttemptFinished {
                 trial,
                 disposition,
@@ -14490,6 +14720,74 @@ pub enum PdpOutcome {
     Identity,
 }
 
+/// A query coefficient, borrowed at full width or held in one machine word.
+#[derive(Clone, Copy, Debug)]
+pub enum TraceScalar<'a> {
+    Word(u64),
+    Wide(&'a BigUint),
+}
+
+impl std::fmt::Display for TraceScalar<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Word(value) => value.fmt(f),
+            Self::Wide(value) => value.fmt(f),
+        }
+    }
+}
+
+/// One completed query `R = [a]G + [b]Q`. Indices name the actual materialized
+/// factor base, with repetition. A witness still awaits the caller's admission
+/// and scalar verification. Trial indices are zero based in every producer.
+#[derive(Clone, Copy, Debug)]
+pub struct QueryTrace<'a> {
+    pub trial: u64,
+    pub a: TraceScalar<'a>,
+    pub b: TraceScalar<'a>,
+    pub outcome: PdpOutcome,
+    pub points: Option<&'a [usize]>,
+}
+
+impl<'a> QueryTrace<'a> {
+    fn word(trial: u64, a: u64, b: u64, pdp: &'a PdpAttempt) -> Self {
+        Self {
+            trial,
+            a: TraceScalar::Word(a),
+            b: TraceScalar::Word(b),
+            outcome: pdp.outcome,
+            points: pdp.points.as_deref(),
+        }
+    }
+}
+
+/// Synchronous observation only: no attempt history or replay is required.
+/// Collection callbacks run on workers in completion order.
+pub type QueryObserver<'a> = dyn Fn(QueryTrace<'_>) + Sync + 'a;
+
+fn trace_relation_attempt(
+    observer: Option<&QueryObserver<'_>>,
+    record: &KoblitzRelationAttemptRecord,
+) {
+    if let Some(observer) = observer {
+        let outcome = match record.disposition {
+            KoblitzRelationAttemptDisposition::RelationFound => PdpOutcome::Witness,
+            KoblitzRelationAttemptDisposition::Refuted => PdpOutcome::ProvedUnsat,
+            KoblitzRelationAttemptDisposition::Unsupported => PdpOutcome::Unsupported,
+            KoblitzRelationAttemptDisposition::Unknown => PdpOutcome::Unresolved,
+            KoblitzRelationAttemptDisposition::InvalidModel => PdpOutcome::InvalidModel,
+            KoblitzRelationAttemptDisposition::DirectSkipped
+            | KoblitzRelationAttemptDisposition::DirectSolved => PdpOutcome::Identity,
+        };
+        observer(QueryTrace {
+            trial: record.trial.saturating_sub(1) as u64,
+            a: TraceScalar::Wide(&record.coefficient_a),
+            b: TraceScalar::Wide(&record.coefficient_b),
+            outcome,
+            points: record.decomposition_indices.as_deref(),
+        });
+    }
+}
+
 /// SAT-like frontend that actually produced the retained counters.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -14730,6 +15028,21 @@ fn decompose_once(
                 sat_decompose_chained_s3(kc, fb, target, opts.m, opts.chain_s3_limits);
             PdpAttempt::chained(points, stats)
         }
+        DecompositionStrategy::ChainedS3Karatsuba => {
+            let (points, stats) =
+                sat_decompose_chained_s3_karatsuba(kc, fb, target, opts.m, opts.chain_s3_limits);
+            PdpAttempt::chained(points, stats)
+        }
+        DecompositionStrategy::ChainedS3ShallowKaratsuba => {
+            let (points, stats) = sat_decompose_chained_s3_shallow_karatsuba(
+                kc,
+                fb,
+                target,
+                opts.m,
+                opts.chain_s3_limits,
+            );
+            PdpAttempt::chained(points, stats)
+        }
         DecompositionStrategy::ChainedS3FrobeniusOrbit => {
             let (points, stats) = sat_decompose_chained_s3_frobenius_orbit(
                 kc,
@@ -14740,6 +15053,17 @@ fn decompose_once(
             );
             PdpAttempt::chained(points, stats)
         }
+        DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba => {
+            let (points, stats) = sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+                kc,
+                fb,
+                target,
+                opts.m,
+                opts.chain_s3_limits,
+                false,
+            );
+            PdpAttempt::chained(points, stats)
+        }
         DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered => {
             let (points, stats) = sat_decompose_chained_s3_frobenius_orbit_ordered(
                 kc,
@@ -14747,6 +15071,17 @@ fn decompose_once(
                 target,
                 opts.m,
                 opts.chain_s3_limits,
+            );
+            PdpAttempt::chained(points, stats)
+        }
+        DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba => {
+            let (points, stats) = sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+                kc,
+                fb,
+                target,
+                opts.m,
+                opts.chain_s3_limits,
+                true,
             );
             PdpAttempt::chained(points, stats)
         }
@@ -15185,7 +15520,7 @@ impl<'a> RelationCollector<'a> {
         unit: RelationWorkUnit,
         points: Option<&[u32]>,
     ) -> (Vec<CollectedRelation>, CollectionReport) {
-        self.collect_impl(unit, points, false, None)
+        self.collect_impl(unit, points, false, None, None)
     }
 
     /// Collect once while retaining every query and frontend outcome.
@@ -15193,7 +15528,7 @@ impl<'a> RelationCollector<'a> {
         &self,
         unit: RelationWorkUnit,
     ) -> (Vec<CollectedRelation>, CollectionReport) {
-        self.collect_impl(unit, None, true, None)
+        self.collect_impl(unit, None, true, None, None)
     }
 
     /// Observed counterpart of [`Self::collect_aimed`].
@@ -15202,7 +15537,7 @@ impl<'a> RelationCollector<'a> {
         unit: RelationWorkUnit,
         points: Option<&[u32]>,
     ) -> (Vec<CollectedRelation>, CollectionReport) {
-        self.collect_impl(unit, points, true, None)
+        self.collect_impl(unit, points, true, None, None)
     }
 
     /// Like [`Self::collect_aimed`], notifying once for every completed probe.
@@ -15215,7 +15550,23 @@ impl<'a> RelationCollector<'a> {
         points: Option<&[u32]>,
         progress: &(dyn Fn(u64, PdpOutcome) + Sync),
     ) -> (Vec<CollectedRelation>, CollectionReport) {
-        self.collect_impl(unit, points, false, Some(progress))
+        self.collect_impl(unit, points, false, Some(progress), None)
+    }
+
+    /// Like [`Self::collect_aimed`], borrowing each actual probe's coefficients
+    /// and decomposition as soon as it finishes, without retaining attempts.
+    pub fn collect_aimed_with_trace(
+        &self,
+        unit: RelationWorkUnit,
+        points: Option<&[u32]>,
+        observer: &QueryObserver<'_>,
+    ) -> (Vec<CollectedRelation>, CollectionReport) {
+        self.collect_impl(unit, points, false, None, Some(observer))
+    }
+
+    /// The materialized point list indexed by collection witnesses.
+    pub fn factor_base(&self) -> &FrobeniusFactorBase {
+        self.fb
     }
 
     fn collect_impl(
@@ -15224,18 +15575,19 @@ impl<'a> RelationCollector<'a> {
         points: Option<&[u32]>,
         observe: bool,
         progress: Option<&(dyn Fn(u64, PdpOutcome) + Sync)>,
+        observer: Option<&QueryObserver<'_>>,
     ) -> (Vec<CollectedRelation>, CollectionReport) {
         let _collection = measurement::scope(Phase::Queries);
         // Aiming takes precedence over sweeping: a run that names the
         // summands it still needs has said the sweep is what it wants to
         // stop doing.
         if let Some(targets) = points.and_then(|c| self.aimed(c)) {
-            return self.collect_walked(unit, targets, observe, progress);
+            return self.collect_walked(unit, targets, observe, progress, observer);
         }
         if let Some(window) = self.window() {
-            return self.collect_walked(unit, Targets::Window(window), observe, progress);
+            return self.collect_walked(unit, Targets::Window(window), observe, progress, observer);
         }
-        self.collect_swept(unit, observe, progress)
+        self.collect_swept(unit, observe, progress, observer)
     }
 
     /// [`Self::collect`] without the walked, windowed path: one scalar
@@ -15245,6 +15597,7 @@ impl<'a> RelationCollector<'a> {
         unit: RelationWorkUnit,
         observe: bool,
         progress: Option<&(dyn Fn(u64, PdpOutcome) + Sync)>,
+        observer: Option<&QueryObserver<'_>>,
     ) -> (Vec<CollectedRelation>, CollectionReport) {
         let begin = std::time::Instant::now();
         let g = self.kc.generator();
@@ -15294,6 +15647,9 @@ impl<'a> RelationCollector<'a> {
             };
             if let Some(progress) = progress {
                 progress(t, pdp.outcome);
+            }
+            if let Some(observer) = observer {
+                observer(QueryTrace::word(t, a, 0, &pdp));
             }
             (t, a, pdp)
         };
@@ -15350,6 +15706,7 @@ impl<'a> RelationCollector<'a> {
         targets: Targets,
         observe: bool,
         progress: Option<&(dyn Fn(u64, PdpOutcome) + Sync)>,
+        observer: Option<&QueryObserver<'_>>,
     ) -> (Vec<CollectedRelation>, CollectionReport) {
         let window = targets.len();
         let begin = std::time::Instant::now();
@@ -15400,6 +15757,9 @@ impl<'a> RelationCollector<'a> {
                 };
                 if let Some(progress) = progress {
                     progress(t, pdp.outcome);
+                }
+                if let Some(observer) = observer {
+                    observer(QueryTrace::word(t, a, 0, &pdp));
                 }
                 found.push(t, a, pdp, observe);
                 measurement::mark(Phase::Queries);
@@ -15970,7 +16330,19 @@ pub fn solve_factor_base_logs_with_progress(
     opts: &KoblitzIcOptions,
     progress: &mut dyn FnMut(LogTableStage, &LogTableReport),
 ) -> Option<(FactorBaseLogTable, LogTableReport)> {
-    let result = solve_factor_base_logs_progress_impl(kc, fb, opts, progress);
+    solve_factor_base_logs_with_trace(kc, fb, opts, progress, None)
+}
+
+/// Precomputation with optional live query equations as well as stage/rank
+/// notifications. The original batches, rank gates and query law are retained.
+pub fn solve_factor_base_logs_with_trace(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    opts: &KoblitzIcOptions,
+    progress: &mut dyn FnMut(LogTableStage, &LogTableReport),
+    observer: Option<&QueryObserver<'_>>,
+) -> Option<(FactorBaseLogTable, LogTableReport)> {
+    let result = solve_factor_base_logs_progress_impl(kc, fb, opts, progress, observer);
     if let Some((_, report)) = &result {
         progress(LogTableStage::Finished, report);
     }
@@ -15982,9 +16354,10 @@ fn solve_factor_base_logs_progress_impl(
     fb: &FrobeniusFactorBase,
     opts: &KoblitzIcOptions,
     progress: &mut dyn FnMut(LogTableStage, &LogTableReport),
+    observer: Option<&QueryObserver<'_>>,
 ) -> Option<(FactorBaseLogTable, LogTableReport)> {
     if kc.subgroup_order.bits() > 64 {
-        return solve_factor_base_logs_wide(kc, fb, opts, progress);
+        return solve_factor_base_logs_wide(kc, fb, opts, progress, observer);
     }
     let mut system = LogSystem::new(kc, fb, opts)?;
     let collector = RelationCollector::new(kc, fb, opts)?;
@@ -16006,7 +16379,7 @@ fn solve_factor_base_logs_progress_impl(
             start: report.trials as u64,
             count: count as u64,
         };
-        let (relations, creport) = collector.collect(unit);
+        let (relations, creport) = collector.collect_impl(unit, None, false, None, observer);
         report.trials += creport.trials;
         report.collection_seconds += creport.elapsed_seconds;
         for rel in &relations {
@@ -16063,6 +16436,7 @@ fn solve_factor_base_logs_wide(
     fb: &FrobeniusFactorBase,
     opts: &KoblitzIcOptions,
     progress: &mut dyn FnMut(LogTableStage, &LogTableReport),
+    observer: Option<&QueryObserver<'_>>,
 ) -> Option<(FactorBaseLogTable, LogTableReport)> {
     if fb.points.is_empty() || opts.strategy == DecompositionStrategy::PairTable {
         return None;
@@ -16087,9 +16461,27 @@ fn solve_factor_base_logs_wide(
         let a = wide_probe_scalar(&mut rng, &kc.subgroup_order, true);
         let target = kc.mul(generator, &a);
         if target == BinaryPoint::Infinity {
+            if let Some(observer) = observer {
+                observer(QueryTrace {
+                    trial: (report.trials - 1) as u64,
+                    a: TraceScalar::Wide(&a),
+                    b: TraceScalar::Word(0),
+                    outcome: PdpOutcome::Identity,
+                    points: None,
+                });
+            }
             continue;
         }
         let attempt = decompose_once(kc, fb, &index_of, &field, None, opts, &target);
+        if let Some(observer) = observer {
+            observer(QueryTrace {
+                trial: (report.trials - 1) as u64,
+                a: TraceScalar::Wide(&a),
+                b: TraceScalar::Word(0),
+                outcome: attempt.outcome,
+                points: attempt.points.as_deref(),
+            });
+        }
         let Some(points) = attempt.points else {
             continue;
         };
@@ -16536,12 +16928,16 @@ impl IndividualLogReport {
         a: u64,
         b: u64,
         progress: &mut Option<&mut dyn FnMut(usize, PdpOutcome)>,
+        observer: Option<&QueryObserver<'_>>,
         pdp: impl FnOnce() -> PdpAttempt,
     ) {
-        if self.attempts.is_some() || progress.is_some() {
+        if self.attempts.is_some() || progress.is_some() || observer.is_some() {
             let pdp = pdp();
             if let Some(progress) = progress {
                 progress(self.trials, pdp.outcome);
+            }
+            if let Some(observer) = observer {
+                observer(QueryTrace::word((self.trials - 1) as u64, a, b, &pdp));
             }
             if let Some(attempts) = &mut self.attempts {
                 attempts.push(QueryAttempt {
@@ -16599,7 +16995,7 @@ pub fn individual_log_with_pair_table(
     pair: Option<&PairSumTable>,
 ) -> Option<(BigUint, IndividualLogReport)> {
     if kc.subgroup_order.bits() > 64 {
-        return individual_log_wide(kc, fb, table, q, opts, None);
+        return individual_log_wide(kc, fb, table, q, opts, None, None);
     }
     IndividualLogSolver::new(kc, fb, table, opts, pair)?.solve(q)
 }
@@ -16615,7 +17011,7 @@ pub fn individual_log_with_progress(
     progress: &mut dyn FnMut(usize, PdpOutcome),
 ) -> Option<(BigUint, IndividualLogReport)> {
     if kc.subgroup_order.bits() > 64 {
-        return individual_log_wide(kc, fb, table, q, opts, Some(progress));
+        return individual_log_wide(kc, fb, table, q, opts, Some(progress), None);
     }
     let pair = if opts.strategy == DecompositionStrategy::PairTable {
         Some(PairSumTable::build(kc, fb)?)
@@ -16624,6 +17020,29 @@ pub fn individual_log_with_progress(
     };
     let report = IndividualLogSolver::new(kc, fb, table, opts, pair.as_ref())?
         .solve_report_with_progress(q, progress);
+    report.log.clone().map(|d| (d, report))
+}
+
+/// Individual descent with live coefficients and borrowed decomposition indices.
+/// It follows the same sampled or walked queries as [`individual_log`].
+pub fn individual_log_with_trace(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    table: &FactorBaseLogTable,
+    q: &BinaryPoint,
+    opts: &KoblitzIcOptions,
+    observer: &QueryObserver<'_>,
+) -> Option<(BigUint, IndividualLogReport)> {
+    if kc.subgroup_order.bits() > 64 {
+        return individual_log_wide(kc, fb, table, q, opts, None, Some(observer));
+    }
+    let pair = if opts.strategy == DecompositionStrategy::PairTable {
+        Some(PairSumTable::build(kc, fb)?)
+    } else {
+        None
+    };
+    let report = IndividualLogSolver::new(kc, fb, table, opts, pair.as_ref())?
+        .solve_report_with_trace(q, observer);
     report.log.clone().map(|d| (d, report))
 }
 
@@ -16637,6 +17056,7 @@ fn individual_log_wide(
     q: &BinaryPoint,
     opts: &KoblitzIcOptions,
     mut progress: Option<&mut dyn FnMut(usize, PdpOutcome)>,
+    observer: Option<&QueryObserver<'_>>,
 ) -> Option<(BigUint, IndividualLogReport)> {
     if fb.points.is_empty() || opts.strategy == DecompositionStrategy::PairTable {
         return None;
@@ -16671,6 +17091,15 @@ fn individual_log_wide(
             if let Some(progress) = &mut progress {
                 progress(report.trials, PdpOutcome::Identity);
             }
+            if let Some(observer) = observer {
+                observer(QueryTrace {
+                    trial: (report.trials - 1) as u64,
+                    a: TraceScalar::Wide(&a),
+                    b: TraceScalar::Wide(&b),
+                    outcome: PdpOutcome::Identity,
+                    points: None,
+                });
+            }
             if opts.allow_direct_relation {
                 if let Some(d) = solve_for_d(&a, &b, r) {
                     if kc.mul(generator, &d) == *q {
@@ -16689,6 +17118,15 @@ fn individual_log_wide(
         let attempt = decompose_once(kc, fb, &index_of, &field, None, opts, &target);
         if let Some(progress) = &mut progress {
             progress(report.trials, attempt.outcome);
+        }
+        if let Some(observer) = observer {
+            observer(QueryTrace {
+                trial: (report.trials - 1) as u64,
+                a: TraceScalar::Wide(&a),
+                b: TraceScalar::Wide(&b),
+                outcome: attempt.outcome,
+                points: attempt.points.as_deref(),
+            });
         }
         let Some(points) = attempt.points else {
             continue;
@@ -17105,6 +17543,7 @@ impl<'a> IndividualLogSolver<'a> {
         q: &BinaryPoint,
         report: &mut IndividualLogReport,
         progress: &mut Option<&mut dyn FnMut(usize, PdpOutcome)>,
+        observer: Option<&QueryObserver<'_>>,
     ) -> Option<Option<BigUint>> {
         let _query = measurement::scope(Phase::TargetQuery);
         let (fc, g) = self.fast.as_ref()?;
@@ -17168,7 +17607,7 @@ impl<'a> IndividualLogSolver<'a> {
                 }
                 report.trials += 1;
                 if state.infinity {
-                    report.record(*a, *b, progress, || {
+                    report.record(*a, *b, progress, observer, || {
                         PdpAttempt::bare(None, PdpOutcome::Identity)
                     });
                     if !self.opts.allow_direct_relation {
@@ -17194,7 +17633,7 @@ impl<'a> IndividualLogSolver<'a> {
                 }
                 if m == 2 {
                     if !pair.contains_key_hash(key, h) {
-                        report.record(*a, *b, progress, || {
+                        report.record(*a, *b, progress, observer, || {
                             PdpAttempt::bare(None, PdpOutcome::Unresolved)
                         });
                         continue;
@@ -17205,7 +17644,7 @@ impl<'a> IndividualLogSolver<'a> {
                         pair.decompose_fast_m2_known(*state, key, h, &mut hit_pairs),
                         PdpOutcome::Unresolved,
                     );
-                    report.record(*a, *b, progress, || pdp.clone());
+                    report.record(*a, *b, progress, observer, || pdp.clone());
                     let Some(idxs) = pdp.points else {
                         continue;
                     };
@@ -17227,7 +17666,7 @@ impl<'a> IndividualLogSolver<'a> {
                         PdpOutcome::Unsupported
                     },
                 );
-                report.record(*a, *b, progress, || pdp.clone());
+                report.record(*a, *b, progress, observer, || pdp.clone());
                 let Some(idxs) = pdp.points else {
                     continue;
                 };
@@ -17276,12 +17715,12 @@ impl<'a> IndividualLogSolver<'a> {
 
     /// Return the terminal report even when the trial budget is exhausted.
     pub fn solve_report(&self, q: &BinaryPoint) -> IndividualLogReport {
-        self.solve_impl(q, false, None)
+        self.solve_impl(q, false, None, None)
     }
 
     /// Like [`Self::solve_report`], retaining every attempted query in order.
     pub fn solve_observed(&self, q: &BinaryPoint) -> IndividualLogReport {
-        self.solve_impl(q, true, None)
+        self.solve_impl(q, true, None, None)
     }
 
     /// Like [`Self::solve_report`], notifying synchronously after every PDP
@@ -17292,7 +17731,17 @@ impl<'a> IndividualLogSolver<'a> {
         q: &BinaryPoint,
         progress: &mut dyn FnMut(usize, PdpOutcome),
     ) -> IndividualLogReport {
-        self.solve_impl(q, false, Some(progress))
+        self.solve_impl(q, false, Some(progress), None)
+    }
+
+    /// Like [`Self::solve_report`], borrowing each completed query for live
+    /// display. Failed queries are not retained in the returned report.
+    pub fn solve_report_with_trace(
+        &self,
+        q: &BinaryPoint,
+        observer: &QueryObserver<'_>,
+    ) -> IndividualLogReport {
+        self.solve_impl(q, false, None, Some(observer))
     }
 
     fn solve_impl(
@@ -17300,6 +17749,7 @@ impl<'a> IndividualLogSolver<'a> {
         q: &BinaryPoint,
         observe: bool,
         mut progress: Option<&mut dyn FnMut(usize, PdpOutcome)>,
+        observer: Option<&QueryObserver<'_>>,
     ) -> IndividualLogReport {
         let _query = measurement::scope(Phase::TargetQuery);
         let kc = self.kc;
@@ -17317,7 +17767,7 @@ impl<'a> IndividualLogSolver<'a> {
         // The walk needs the single-word arithmetic and a pair table;
         // without either, fall through to drawing probes.
         if self.opts.strategy == DecompositionStrategy::PairTable {
-            if let Some(found) = self.solve_by_walking(q, &mut report, &mut progress) {
+            if let Some(found) = self.solve_by_walking(q, &mut report, &mut progress, observer) {
                 report.log = found;
                 return report;
             }
@@ -17330,7 +17780,7 @@ impl<'a> IndividualLogSolver<'a> {
             let a = rng.gen_range(1..self.r_u64);
             let b = rng.gen_range(1..self.r_u64);
             let pdp = self.probe(q, q_fast, a, b);
-            report.record(a, b, &mut progress, || pdp.clone());
+            report.record(a, b, &mut progress, observer, || pdp.clone());
             let idxs = match pdp.points {
                 Some(idxs) => idxs,
                 None if pdp.outcome == PdpOutcome::Identity => {
@@ -17417,6 +17867,41 @@ mod tests {
                     });
                 let mut calls = calls.into_inner().unwrap();
                 calls.sort_by_key(|&(trial, _)| trial);
+                let traced_calls = std::sync::Mutex::new(Vec::new());
+                let (traced, traced_report) =
+                    collector.collect_aimed_with_trace(unit, aim, &|trace| {
+                        traced_calls.lock().unwrap().push((
+                            trace.trial,
+                            trace.a.to_string(),
+                            trace.b.to_string(),
+                            trace.outcome,
+                            trace.points.map(<[usize]>::to_vec),
+                        ));
+                    });
+                let mut traced_calls = traced_calls.into_inner().unwrap();
+                traced_calls.sort_by_key(|call| call.0);
+                let expected_traces: Vec<_> = observed
+                    .attempts
+                    .as_ref()
+                    .unwrap()
+                    .iter()
+                    .map(|attempt| {
+                        (
+                            attempt.trial,
+                            attempt.a.to_string(),
+                            attempt.b.to_string(),
+                            attempt.pdp.outcome,
+                            attempt.pdp.points.clone(),
+                        )
+                    })
+                    .collect();
+                assert_eq!(traced_calls, expected_traces);
+                assert_eq!(traced, expected);
+                assert!(traced_report.attempts.is_none());
+                assert_eq!(traced_report.summands_scanned, observed.summands_scanned);
+                for relation in &traced {
+                    assert!(verify_collected_relation(&kc, &fb, opts.m, relation));
+                }
                 let expected_calls: Vec<_> = observed
                     .attempts
                     .unwrap()
@@ -17479,6 +17964,35 @@ mod tests {
                 let actual = solver.solve_report_with_progress(&q, &mut |trial, outcome| {
                     calls.push((trial, outcome))
                 });
+                let traced_calls = std::sync::Mutex::new(Vec::new());
+                let traced = solver.solve_report_with_trace(&q, &|trace| {
+                    traced_calls.lock().unwrap().push((
+                        trace.trial,
+                        trace.a.to_string(),
+                        trace.b.to_string(),
+                        trace.outcome,
+                        trace.points.map(<[usize]>::to_vec),
+                    ));
+                });
+                let expected_traces: Vec<_> = expected
+                    .attempts
+                    .as_ref()
+                    .unwrap()
+                    .iter()
+                    .map(|attempt| {
+                        (
+                            attempt.trial,
+                            attempt.a.to_string(),
+                            attempt.b.to_string(),
+                            attempt.pdp.outcome,
+                            attempt.pdp.points.clone(),
+                        )
+                    })
+                    .collect();
+                assert_eq!(traced_calls.into_inner().unwrap(), expected_traces);
+                assert_eq!(traced.log, expected.log);
+                assert_eq!(traced.trials, expected.trials);
+                assert!(traced.attempts.is_none());
                 assert_eq!(actual.log, expected.log);
                 assert_eq!(actual.trials, expected.trials);
                 assert!(actual.attempts.is_none());
@@ -17632,6 +18146,22 @@ mod tests {
     }
 
     #[test]
+    fn cached_packed_lifts_cover_all_result_counts() {
+        let kc = KoblitzCurve::new(0, 5).unwrap();
+        let fast = FastCurve::new(&kc.curve).unwrap();
+        let mut seen = [false; 3];
+        for coordinate in 0..32 {
+            let expected = lift_x_packed(&fast, coordinate);
+            let cached = crate::cryptanalysis::koblitz_fast::with_cached_point_lifts(true, || {
+                lift_x_packed(&fast, coordinate)
+            });
+            assert_eq!(cached, expected, "coordinate {coordinate}");
+            seen[cached.1] = true;
+        }
+        assert_eq!(seen, [true; 3]);
+    }
+
+    #[test]
     fn fast_base_lifts_preserve_roots_and_order() {
         for n in [5, 7, 9, 11, 13, 17, 19, 23, 31, 53, 61] {
             let Some(kc) = KoblitzCurve::new(0, n) else {
@@ -17655,6 +18185,13 @@ mod tests {
                         points_with_x_fast(&fast, &x),
                         points_with_x(&curve, &x),
                         "ordered roots at n={n}, a={a}, b={b}, x={bits}",
+                    );
+                    assert_eq!(
+                        crate::cryptanalysis::koblitz_fast::with_cached_point_lifts(true, || {
+                            points_with_x_fast(&fast, &x)
+                        }),
+                        points_with_x(&curve, &x),
+                        "cached ordered roots at n={n}, a={a}, b={b}, x={bits}",
                     );
                 }
             }
@@ -17753,6 +18290,36 @@ mod tests {
         assert_eq!(cost, again);
         let (_, other) = build_subgroup_orbit_factor_base_with_cost(&kc, 6, 400).unwrap();
         assert_ne!(cost.abscissae_drawn, other.abscissae_drawn);
+    }
+
+    #[test]
+    fn full_pair_table_single_worker_matches_parallel_entries_and_budgets() {
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(4)
+            .build()
+            .unwrap();
+        for (a, n) in [(0, 19), (1, 11), (1, 23)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, 7, 32).unwrap();
+            let bytes = PairSumTable::byte_size(fb.points.len());
+            let serial = PairSumTable::build_full_within_runtime(&kc, &fb, bytes, true).unwrap();
+            let parallel = pool.install(|| {
+                PairSumTable::build_full_within_runtime(&kc, &fb, bytes, false).unwrap()
+            });
+            assert_eq!(serial.entries, parallel.entries);
+            assert_eq!(serial.bucket_start, parallel.bucket_start);
+            assert_eq!(serial.bucket_shift, parallel.bucket_shift);
+            assert_eq!(serial.present, parallel.present);
+            assert_eq!(serial.present_mask, parallel.present_mask);
+            for &(key, _, _) in &parallel.entries {
+                assert_eq!(serial.lookup(key), parallel.lookup(key));
+            }
+            for serial in [false, true] {
+                assert!(
+                    PairSumTable::build_full_within_runtime(&kc, &fb, bytes - 1, serial).is_none()
+                );
+            }
+        }
     }
 
     #[test]
@@ -18516,7 +19083,7 @@ mod tests {
         for d in 1..100u64 {
             let q = kc.mul(kc.generator(), &BigUint::from(d));
             let mut report = IndividualLogReport::default();
-            solver.solve_by_walking(&q, &mut report, &mut None);
+            solver.solve_by_walking(&q, &mut report, &mut None, None);
             assert!(report.trials <= 1);
             assert!(report
                 .relation
@@ -19466,28 +20033,18 @@ mod tests {
     }
 
     #[test]
-    fn chained_s3_frobenius_strategy_feeds_rank_and_target_solve() {
+    fn chained_s3_karatsuba_strategy_feeds_verified_relation_rank_and_target_solve() {
         let kc = KoblitzCurve::new(0, 7).unwrap();
         let BinaryPoint::Affine { x, .. } = kc.generator() else {
             panic!("generator is affine");
         };
-        let fb = (2u32..32)
-            .filter_map(
-                |scalar| match kc.mul(kc.generator(), &BigUint::from(scalar)) {
-                    BinaryPoint::Affine { x: other_x, .. } => {
-                        build_explicit_frobenius_orbit_factor_base(&kc, &[x.clone(), other_x])
-                    }
-                    BinaryPoint::Infinity => None,
-                },
-            )
-            .find(|base| base.signed_orbits.len() >= 2)
-            .expect("two distinct signed Frobenius orbits");
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
         let known = BigUint::from(3u32) % &kc.subgroup_order;
         let target = kc.mul(kc.generator(), &known);
         let opts = KoblitzIcOptions {
             m: 5,
-            strategy: DecompositionStrategy::ChainedS3FrobeniusOrbit,
-            max_trials: 64,
+            strategy: DecompositionStrategy::ChainedS3Karatsuba,
+            max_trials: 16,
             extra_relations: 1,
             allow_direct_relation: false,
             chain_s3_limits: ChainS3Limits {
@@ -19506,6 +20063,89 @@ mod tests {
         assert_eq!(report.sat_invalid_models, 0);
         assert_eq!(report.verification_failures, 0);
         assert!(!report.direct_relation);
+    }
+
+    #[test]
+    fn chained_s3_shallow_karatsuba_strategy_feeds_verified_relation_rank_and_target_solve() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
+        let known = BigUint::from(3u32) % &kc.subgroup_order;
+        let target = kc.mul(kc.generator(), &known);
+        let opts = KoblitzIcOptions {
+            m: 5,
+            strategy: DecompositionStrategy::ChainedS3ShallowKaratsuba,
+            max_trials: 16,
+            extra_relations: 1,
+            allow_direct_relation: false,
+            chain_s3_limits: ChainS3Limits {
+                max_variables: 2_000,
+                max_domain_clauses: 10_000,
+                max_models: 128,
+                conflict_budget: 500_000,
+            },
+            ..KoblitzIcOptions::default()
+        };
+        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(report.sat_calls > 0);
+        assert!(report.independent_relations > 0);
+        assert!(report.linear_solve_attempts > 0);
+        assert_eq!(report.sat_invalid_models, 0);
+        assert_eq!(report.verification_failures, 0);
+        assert!(!report.direct_relation);
+    }
+
+    #[test]
+    fn chained_s3_frobenius_strategy_feeds_rank_and_target_solve() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = (2u32..32)
+            .filter_map(
+                |scalar| match kc.mul(kc.generator(), &BigUint::from(scalar)) {
+                    BinaryPoint::Affine { x: other_x, .. } => {
+                        build_explicit_frobenius_orbit_factor_base(&kc, &[x.clone(), other_x])
+                    }
+                    BinaryPoint::Infinity => None,
+                },
+            )
+            .find(|base| base.signed_orbits.len() >= 2)
+            .expect("two distinct signed Frobenius orbits");
+        let known = BigUint::from(3u32) % &kc.subgroup_order;
+        let target = kc.mul(kc.generator(), &known);
+        for strategy in [
+            DecompositionStrategy::ChainedS3FrobeniusOrbit,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba,
+        ] {
+            let opts = KoblitzIcOptions {
+                m: 5,
+                strategy,
+                max_trials: 64,
+                extra_relations: 1,
+                allow_direct_relation: false,
+                chain_s3_limits: ChainS3Limits {
+                    max_variables: 2_000,
+                    max_domain_clauses: 10_000,
+                    max_models: 128,
+                    conflict_budget: 500_000,
+                },
+                ..KoblitzIcOptions::default()
+            };
+            let report =
+                koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+            assert_eq!(report.log, Some(known.clone()), "{strategy:?}: {report:?}");
+            assert!(report.sat_calls > 0);
+            assert!(report.independent_relations > 0);
+            assert!(report.linear_solve_attempts > 0);
+            assert_eq!(report.sat_invalid_models, 0);
+            assert_eq!(report.verification_failures, 0);
+            assert!(!report.direct_relation);
+        }
     }
 
     #[test]
@@ -21254,7 +21894,11 @@ mod tests {
             assert_eq!(ts.filter_layout, FilterLayout::Top);
             // The same stored pairs, a different filter.
             assert_eq!(ls.bucket_start, ts.bucket_start);
-            assert_eq!(ls.present_mask, ts.present_mask);
+            // A `Top` table's filter is wider by its extra bits.
+            assert_eq!(
+                ts.present_mask.count_ones(),
+                (ls.present_mask.count_ones() + FilterLayout::Top.extra_filter_bits()).min(32)
+            );
             assert_ne!(
                 ls.present, ts.present,
                 "K_{a}/2^{n}: the layout changed nothing"

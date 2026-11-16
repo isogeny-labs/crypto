@@ -1,0 +1,22 @@
+{
+  "card_id": "CARD-native-natural-1m-k2048-v20",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "reasons": [
+    "Native runner-v20 card-check exit 0: record_digests_verified=true, relay_verbatim=true, status=completed. Exact stdout/stderr/status preserved beside assessment.",
+    "Original receipt and actual relay are byte-identical; both SHA256 22a3141cbe6399b69753f8ef961b689e44a8e27464dd69b31839260ae4ca0470. Card unchanged; one exact specified argv attempt, exit 0, timed_out=false, seconds=3552.809621051; all fourteen declared outputs exist with verified receipt digests.",
+    "Audit records PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY and terminal conflicts=1000000, models=0, relations=0, rank=0. This assessment verifies execution and reported evidence only; research meaning is not assessed.",
+    "Startup synchronization records worker_held_until_sync=true, owned unit MemorySwapMax infinity->0 before release, kernel memory.max=8589934592, memory.swap.max=0, cpu.max=100000 100000, cpuset=14. RESOURCE_READY binds synchronization record digest matching outer.json.",
+    "All 59 retained memory samples record memory.max=8589934592 and memory.swap.max=0. Sampled agreement does not prove no changes between samples.",
+    "outer.json records exit_code=0, wall_censored=false, cleanup_verified=true, systemd_runtime_cleanup_verified=true. Final inspect shows exited 0 and OOMKilled=false. The owned MemorySwapMax runtime file is absent on independent read-only check; isolation-after.json exists with verified digest.",
+    "Frozen HEAD 66ab009b1d91792c46d078e15adfeda45eacf29f verified; receipt dirty_before/dirty_after empty; independent git status output zero bytes. No tracked edits, HEAD move, next-arm compilation or timed execution performed by director."
+  ],
+  "interpretation": "not_assessed",
+  "commit": "66ab009b1d91792c46d078e15adfeda45eacf29f",
+  "receipt_sha256": "22a3141cbe6399b69753f8ef961b689e44a8e27464dd69b31839260ae4ca0470",
+  "relay_sha256": "22a3141cbe6399b69753f8ef961b689e44a8e27464dd69b31839260ae4ca0470",
+  "card_check_exit_code": 0
+}

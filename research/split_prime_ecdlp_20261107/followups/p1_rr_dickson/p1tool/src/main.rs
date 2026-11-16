@@ -31,6 +31,10 @@ use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashMap};
 use std::process::exit;
 
+mod collection;
+mod extraction;
+mod reduction;
+
 // ───────────────────────────── field F_p, p < 2^32 ─────────────────────────
 
 #[derive(Clone, Copy, Debug)]
@@ -1857,6 +1861,15 @@ fn cmd_emit(m: &HashMap<String, String>) {
     };
     let f = F::new(inst.p);
     planted_check(&sys, f);
+    let (sys, reduction) = if let Some(mode) = m.get("reduce") {
+        if system != "rr" {
+            die("--reduce is currently defined only for RR");
+        }
+        reduction::reduce(sys, f, mode)
+    } else {
+        (sys, Value::Null)
+    };
+    planted_check(&sys, f);
     let txt = ms_text(&sys, inst.p);
     std::fs::write(out, &txt).unwrap_or_else(|e| die(&format!("{out}: {e}")));
     let degs: Vec<u32> = sys.eqs.iter().map(|e| e.deg()).collect();
@@ -1875,7 +1888,10 @@ fn cmd_emit(m: &HashMap<String, String>) {
         "instance": inst_json(&inst),
     });
     let plant_path = m.get("plant").cloned().unwrap_or_else(|| format!("{out}.plant.json"));
-    let full = json!({"summary": summary, "planted": plant});
+    let mut full = json!({"summary": summary, "planted": plant});
+    if !reduction.is_null() {
+        full["reduction"] = reduction;
+    }
     std::fs::write(&plant_path, serde_json::to_string_pretty(&full).unwrap()).unwrap();
     println!("{}", serde_json::to_string(&summary).unwrap());
 }
@@ -2071,7 +2087,7 @@ fn cmd_selftest() {
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.is_empty() {
-        eprintln!("usage: p1tool curve|emit|parse|check-gb|selftest [--flags]");
+        eprintln!("usage: p1tool curve|count|emit|parse|check-gb|lift|extract|collect|selftest [--flags]");
         exit(2);
     }
     let m = args_map(&args[1..]);
@@ -2087,6 +2103,9 @@ fn main() {
         "emit" => cmd_emit(&m),
         "parse" => cmd_parse(&m2),
         "check-gb" => cmd_check_gb(&m),
+        "lift" => reduction::cmd_lift(&m),
+        "extract" => extraction::cmd_extract(&m),
+        "collect" => collection::cmd_collect(&m),
         "selftest" => cmd_selftest(),
         _ => die("unknown subcommand"),
     }

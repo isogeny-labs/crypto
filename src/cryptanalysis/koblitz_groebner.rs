@@ -1041,6 +1041,137 @@ pub fn build_decomposition_system(
     })
 }
 
+/// `w^{2^a}` for the coordinate mask `w`, by `a` applications of the
+/// squaring table of `st`.
+fn frobenius_mask(w: u64, a: u32, st: &FieldStructure) -> u64 {
+    (0..a).fold(w, |acc, _| constant_square_mask(acc, st))
+}
+
+/// **Target-free 4-sum system**: `±(P₁^{(a₁)} + P₂^{(a₂)}) = ±(P₃^{(a₃)} + P₄^{(a₄)})`
+/// with no target `x_R`, as two `S₃` links sharing the middle abscissa `u`.
+///
+/// Unknown layout (`4ℓ + n` Boolean variables): `x₁, x₂, x₃, x₄ ∈ V`
+/// at `[0, ℓ)`, `[ℓ, 2ℓ)`, `[2ℓ, 3ℓ)`, `[3ℓ, 4ℓ)` (summand `i` owns
+/// `[i·ℓ, (i+1)·ℓ)`, the same convention as [`build_decomposition_system`]),
+/// then `u ∈ F_{2^n}` at `[4ℓ, 4ℓ+n)`.
+///
+/// Equations (`2n`, `n` per link): the Weil restrictions of
+/// `S₃(x₁^{2^{a₁}}, x₂^{2^{a₂}}, u) = 0` then
+/// `S₃(x₃^{2^{a₃}}, x₄^{2^{a₄}}, u) = 0`.  A twisted block is the same `ℓ`
+/// unknowns with basis vectors `v_t^{2^{a}}` (Frobenius is `F₂`-linear), so
+/// the degrees match the untwisted system.  `twists = [0,0,0,0]` is the
+/// plain 4-sum `P₁+P₂ = ±(P₃+P₄)`.  `DecompositionSystem::m` is 4; its
+/// `blocks`/`interleaved_order` helpers describe the chained system, not
+/// this one.
+///
+/// Returns `None` if `4ℓ + n > MAX_VARS`.
+pub fn build_target_free_system(
+    basis: &[F2mElement],
+    b: &F2mElement,
+    twists: [u32; 4],
+    st: &FieldStructure,
+) -> Option<DecompositionSystem> {
+    let ell = basis.len();
+    let n = st.n;
+    let n_vars = ell.checked_mul(4)?.checked_add(n as usize)?;
+    if n_vars > MAX_VARS {
+        return None;
+    }
+    let summand = |i: usize| -> SymElement {
+        let tw: Vec<F2mElement> = basis
+            .iter()
+            .map(|v| {
+                let w = v.raw_bits().first().copied().unwrap_or(0);
+                element_from_mask(frobenius_mask(w, twists[i], st), n)
+            })
+            .collect();
+        SymElement::from_subspace_vars(&tw, i * ell, n, n_vars)
+    };
+    let u = SymElement::from_free_vars(4 * ell, n, n_vars);
+    let mut equations = sym_semaev_s3(&summand(0), &summand(1), &u, b, st);
+    equations.extend(sym_semaev_s3(&summand(2), &summand(3), &u, b, st));
+    Some(DecompositionSystem {
+        equations,
+        n_vars,
+        ell,
+        m: 4,
+    })
+}
+
+/// **The eliminated fourth summation polynomial on a factor-base
+/// subspace**, Weil-restricted: the `n` Boolean coordinates of
+/// `S₄(x₁, x₂, x₃, x₄)` written as the resultant in `u` of the two links
+/// `S₃(x₁, x₂, u)` and `S₃(x₃, x₄, u)` (the formula of
+/// [`binary_semaev_s4`](crate::cryptanalysis::binary_semaev::binary_semaev_s4)):
+///
+/// ```text
+///   A = (x + x')²,  B = x·x',  C = (x·x')² + b        per pair
+///   S₄ = (A₁C₂ + A₂C₁)² + (A₁B₂ + A₂B₁)(B₁C₂ + B₂C₁)
+/// ```
+///
+/// With `target = None` all four `x_i ∈ V` are unknowns (`4ℓ` Boolean
+/// unknowns, `x_i` replaced by its Frobenius twist `x_i^{2^{twists[i]}}`):
+/// the target-free relation of lead L1
+/// (`research/ic_leads_20261018/`), whose leading forms the corollary to
+/// Lemma 1 places in `V^{(a)}V^{(b)}V^{(c)}V^{(d)}`. With
+/// `target = Some(x_R)` the fourth point is the constant `x_R` and only
+/// `x₁, x₂, x₃` are unknowns (`3ℓ`; `twists[3]` ignored): the same
+/// presentation with a target, the comparison arm. No intermediate
+/// unknown in either. `None` if the unknowns exceed [`MAX_VARS`].
+pub fn build_eliminated_s4_system(
+    basis: &[F2mElement],
+    b: &F2mElement,
+    target: Option<&F2mElement>,
+    twists: [u32; 4],
+    st: &FieldStructure,
+) -> Option<DecompositionSystem> {
+    let ell = basis.len();
+    let n = st.n;
+    let unknown = if target.is_some() { 3 } else { 4 };
+    let n_vars = ell.checked_mul(unknown)?;
+    if n_vars > MAX_VARS {
+        return None;
+    }
+    let summand = |i: usize| -> SymElement {
+        let tw: Vec<F2mElement> = basis
+            .iter()
+            .map(|v| {
+                let w = v.raw_bits().first().copied().unwrap_or(0);
+                element_from_mask(frobenius_mask(w, twists[i], st), n)
+            })
+            .collect();
+        SymElement::from_subspace_vars(&tw, i * ell, n, n_vars)
+    };
+    let x = [
+        summand(0),
+        summand(1),
+        summand(2),
+        match target {
+            Some(t) => SymElement::constant(t, n, n_vars),
+            None => summand(3),
+        },
+    ];
+    let bc = SymElement::constant(b, n, n_vars);
+    let abc = |p: &SymElement, q: &SymElement| {
+        let a = p.add(q).square(st);
+        let bb = p.mul(q, st);
+        let c = bb.square(st).add(&bc);
+        (a, bb, c)
+    };
+    let (a1, b1, c1) = abc(&x[0], &x[1]);
+    let (a2, b2, c2) = abc(&x[2], &x[3]);
+    let t1 = a1.mul(&c2, st).add(&a2.mul(&c1, st)).square(st);
+    let left = a1.mul(&b2, st).add(&a2.mul(&b1, st));
+    let right = b1.mul(&c2, st).add(&b2.mul(&c1, st));
+    let s4 = t1.add(&left.mul(&right, st));
+    Some(DecompositionSystem {
+        equations: s4.coords,
+        n_vars,
+        ell,
+        m: unknown,
+    })
+}
+
 // ── Block structure ────────────────────────────────────────────────
 
 impl DecompositionSystem {
@@ -2445,7 +2576,7 @@ pub fn matrix_f4_f2_counted_with(
 /// `KIC_F4_SOLVER_LINEAR_TAIL=0|1` overrides that selection and
 /// `KIC_F4_FLAT_MATRIX=0|1` controls the contiguous solver matrix,
 /// `KIC_F4_SOLVER_FULL_READBACK=1` restores the complete legacy readback.
-fn matrix_f4_f2_solver_consequences(
+pub(crate) fn matrix_f4_f2_solver_consequences(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
@@ -5485,6 +5616,14 @@ pub(crate) fn echelon_f2_counted(
 #[path = "f4_rref_tests.rs"]
 mod rref_tests;
 
+#[path = "f4_trace.rs"]
+mod f4_trace;
+pub use f4_trace::{
+    matrix_f4_f2_record, matrix_f4_f2_record_counted, matrix_f4_f2_replay,
+    matrix_f4_f2_replay_checked, matrix_f4_f2_replay_counted, F4Trace, F4TraceStep, ReplayReject,
+    DEFAULT_AUDIT,
+};
+
 // ── Macaulay profile / first fall degree ───────────────────────────
 
 /// Rank measurement of one Macaulay matrix.
@@ -6095,6 +6234,35 @@ pub enum SolverEngine {
         /// Highest Macaulay degree to build before splitting.
         max_degree: u32,
     },
+    /// MutantXL closure ([`ReducedBasis::from_system_closed_full`]) at every
+    /// node: the degree-`D` Macaulay row space saturated under multiplying
+    /// every element of lower degree (a "degree fall") by every variable,
+    /// for `D` from the node system's degree (at least 2) up to
+    /// `max_degree`.  A node is refuted when `1` enters the saturated row
+    /// space, and a forced variable is read off it as for the other engines.
+    ///
+    /// The saturated space contains the plain Macaulay space of the same
+    /// degree and lies in the ideal, so the engine is sound (it never
+    /// refutes a satisfiable node) and its verdicts and roots are those of
+    /// `MatrixF4`; only the tree differs, because the closure refutes and
+    /// forces earlier (degree 3-4 where plain XL needs 5-7 on unsatisfiable
+    /// descended Semaev systems:
+    /// `research/dreg_closure_mutantxl_20261016/RESULTS.md`).
+    ///
+    /// Structure: the closure runs at **every** node, from scratch, with no
+    /// basis inherited from the parent (the per-node closure is a fresh
+    /// `from_system_closed_full`, so the cost model is `MatrixF4`'s, not
+    /// `InheritedF4`'s), and the ladder is always ascending (cheapest
+    /// degree first, stopping at the first decisive one), whatever the
+    /// variable count.  Running it at the root only and splitting the
+    /// remainder with another engine would need the closure's rows to be
+    /// handed to a second engine; per node keeps one code path and lets the
+    /// closure prune deep nodes too.  [`SplitRule::Auto`] resolves to
+    /// `LowestFree`, the rule the from-scratch engines use.
+    Closure {
+        /// Highest Macaulay degree whose closure is built before splitting.
+        max_degree: u32,
+    },
     /// Full Buchberger Gröbner basis
     /// ([`crate::cryptanalysis::pq_groebner_f2::groebner_basis_f2`]) at
     /// every node.  The reference engine: same answers, far slower on
@@ -6163,11 +6331,17 @@ impl SolverEngine {
         let max_degree = match self {
             SolverEngine::MatrixF4 { max_degree }
             | SolverEngine::MatrixF5 { max_degree }
-            | SolverEngine::InheritedF4 { max_degree } => max_degree,
+            | SolverEngine::InheritedF4 { max_degree }
+            | SolverEngine::Closure { max_degree } => max_degree,
             SolverEngine::Buchberger => return None,
         };
         let base = system_degree.max(2);
         let top = max_degree.max(base);
+        if matches!(self, SolverEngine::Closure { .. }) {
+            // Ascending always: a closure at degree `d` is far cheaper than
+            // at `d + 1`, and the first decisive degree ends the ladder.
+            return Some(base..=top);
+        }
         // A higher-degree Macaulay matrix includes the lower-degree rows,
         // so this changes work scheduling rather than the ideal or roots.
         static HIGHEST_ONLY: std::sync::OnceLock<Option<bool>> = std::sync::OnceLock::new();
@@ -6562,6 +6736,11 @@ fn dump_node_system(system: &[F2BoolPoly], n_vars: usize, engine: SolverEngine) 
     let _ = writeln!(file, "{line}");
 }
 
+/// Closure rounds per node of [`SolverEngine::Closure`]: effectively
+/// unbounded, so each node's closure runs to saturation (the scan in
+/// `koblitz_bench::closure_refutation_scan` uses the same cap).
+const CLOSURE_ROUNDS: u32 = 1_000_000;
+
 fn reduce_system_uncached(
     system: &[F2BoolPoly],
     n_vars: usize,
@@ -6579,6 +6758,46 @@ fn reduce_system_uncached(
     match engine {
         SolverEngine::Buchberger => Some(groebner_basis_f2(system.to_vec(), n_vars)),
         SolverEngine::InheritedF4 { .. } => unreachable!("mapped to MatrixF4 above"),
+        SolverEngine::Closure { .. } => {
+            let ladder = engine
+                .degree_ladder(system_degree(system), n_vars)
+                .expect("closure has a ladder");
+            let mut best: Option<Vec<F2BoolPoly>> = None;
+            for d in ladder {
+                let started = std::time::Instant::now();
+                let Some((mut basis, mut cost)) =
+                    ReducedBasis::from_system_closed_full(system, n_vars, d, CLOSURE_ROUNDS)
+                else {
+                    // Matrix over the size caps: use what we have.
+                    stats.oversize += 1;
+                    f4_profile_add(|p| p.oversize += 1);
+                    break;
+                };
+                stats.max_degree_built = stats.max_degree_built.max(d);
+                let rows = if basis.is_refuted() {
+                    vec![F2BoolPoly::from_monos(vec![F2BoolMono::one()], n_vars)]
+                } else {
+                    basis.decisive_rows(&mut cost)
+                };
+                let word_ops = cost.word_ops();
+                charge_word_ops(word_ops);
+                let (rank, columns) = (basis.rank() as u64, basis.columns() as u64);
+                f4_profile_add(|p| {
+                    p.calls += 1;
+                    p.build_ns += started.elapsed().as_nanos();
+                    p.rows += rank;
+                    p.cols += columns;
+                    p.word_ops += word_ops;
+                });
+                let decisive = rows.iter().any(is_constant_one)
+                    || rows.iter().any(|p| forced_assignment(p).is_some());
+                best = Some(rows);
+                if decisive {
+                    break;
+                }
+            }
+            best
+        }
         SolverEngine::MatrixF4 { .. } | SolverEngine::MatrixF5 { .. } => {
             let criterion = RowCriterion::from_env_or(match engine {
                 SolverEngine::MatrixF5 { .. } => RowCriterion::F5,
@@ -9617,8 +9836,144 @@ mod tests {
                     assert_eq!(stats.max_degree_built, want_stats.max_degree_built);
                     assert_eq!(stats.oversize, want_stats.oversize);
                 }
+                // The closure engine prunes harder, so its tree is not the
+                // same, but it finds the same roots, never with more
+                // splits than the plain Macaulay tree, and never refutes a
+                // node the reference keeps.
+                for max_degree in [3u32, 4] {
+                    let opts = SolveOptions {
+                        engine: SolverEngine::Closure { max_degree },
+                        ..reference
+                    };
+                    let (mut got, stats) = solve_boolean_system(&sys.equations, sys.n_vars, &opts);
+                    got.sort_unstable();
+                    assert_eq!(
+                        got, want,
+                        "Closure({max_degree}) m={m} x_R={raw}: roots differ"
+                    );
+                    assert!(!stats.exhausted && stats.oversize == 0, "{stats:?}");
+                    assert!(
+                        stats.splits <= want_stats.splits,
+                        "Closure({max_degree}) m={m} x_R={raw}: {} splits against {}",
+                        stats.splits,
+                        want_stats.splits
+                    );
+                }
             }
         }
+    }
+
+    /// The constructed positive control of
+    /// `research/dreg_closure_mutantxl_20261016/PREREGISTRATION.md`:
+    /// `f1 = x1x2x3 + x4x5x6`, `f2 = f1 + x7 + 1`,
+    /// `f3 = x7x8x9 + x8x9 + 1`.  The degree fall `f1 + f2 = x7 + 1` times
+    /// `x8x9` meets `f3` in `1`, so the closure refutes the root at degree
+    /// 3, where plain XL needs degree 4.  The engine therefore closes the
+    /// root with no split; the plain solving degree is 4.
+    #[test]
+    fn closure_engine_refutes_the_constructed_control_at_the_root() {
+        let n = 9;
+        let m = |vars: &[u32]| F2BoolMono::from_mask(vars.iter().fold(0, |a, &v| a | 1 << v));
+        let f1 = F2BoolPoly::from_monos(vec![m(&[0, 1, 2]), m(&[3, 4, 5])], n);
+        let f2 = F2BoolPoly::from_monos(
+            vec![m(&[0, 1, 2]), m(&[3, 4, 5]), m(&[6]), F2BoolMono::one()],
+            n,
+        );
+        let f3 = F2BoolPoly::from_monos(vec![m(&[6, 7, 8]), m(&[7, 8]), F2BoolMono::one()], n);
+        let system = vec![f1, f2, f3];
+        assert_eq!(solving_degree(&system, n, 6).0, Some(4));
+        let run = |engine| {
+            solve_boolean_system(
+                &system,
+                n,
+                &SolveOptions {
+                    engine,
+                    max_solutions: 1 << 10,
+                    node_budget: 100_000,
+                    split_rule: SplitRule::LowestFree,
+                },
+            )
+        };
+        let (roots, stats) = run(SolverEngine::Closure { max_degree: 3 });
+        assert!(roots.is_empty());
+        assert_eq!(
+            (stats.reductions, stats.splits, stats.infeasible_branches),
+            (1, 0, 1),
+            "{stats:?}"
+        );
+        assert_eq!(stats.max_degree_built, 3);
+        let (roots, plain) = run(SolverEngine::MatrixF4 { max_degree: 3 });
+        assert!(roots.is_empty());
+        // The F4 engine's own propagation also closes this control at the
+        // root, so the guaranteed contract is only "no more splits".
+        assert!(plain.splits >= stats.splits, "{plain:?}");
+        // The closure and XL agree on the verdict at every degree they
+        // share; XL's own refutation degree is 4.
+        let (roots, deep) = run(SolverEngine::MatrixF4 { max_degree: 4 });
+        assert!(roots.is_empty());
+        assert_eq!(deep.splits, 0, "{deep:?}");
+    }
+
+    /// Soundness: the closure never refutes a satisfiable node.  Satisfiable
+    /// fixtures with a planted root are solved by the closure engine, which
+    /// must return exactly the brute-force variety (a spurious refutation
+    /// would lose a root).
+    #[test]
+    fn closure_engine_never_refutes_a_satisfiable_system() {
+        let mut seed = 0x0c10_5ed5_0bad_cafeu64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let mut satisfiable = 0usize;
+        for trial in 0..80 {
+            let n_vars = 6 + (trial % 5);
+            let planted = next() & ((1u64 << n_vars) - 1);
+            let m = 4 + (trial % 4);
+            // Random generators of degree up to 3, each shifted by its
+            // value at the planted point so the system is satisfiable.
+            let system: Vec<F2BoolPoly> = (0..m)
+                .map(|_| {
+                    let terms = 3 + (next() % 6) as usize;
+                    let mut monos: Vec<F2BoolMono> = (0..terms)
+                        .map(|_| {
+                            let d = (next() % 4) as u32;
+                            let mut mask = 0u64;
+                            for _ in 0..d {
+                                mask |= 1u64 << (next() % n_vars as u64);
+                            }
+                            F2BoolMono::from_mask(mask)
+                        })
+                        .collect();
+                    let p = F2BoolPoly::from_monos(monos.clone(), n_vars);
+                    if p.eval(planted) != 0 {
+                        monos.push(F2BoolMono::one());
+                    }
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            let brute: Vec<u64> = (0..(1u64 << n_vars))
+                .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
+                .collect();
+            assert!(brute.contains(&planted), "trial {trial}: fixture unsound");
+            satisfiable += 1;
+            for max_degree in [3u32, 4] {
+                let opts = SolveOptions {
+                    engine: SolverEngine::Closure { max_degree },
+                    max_solutions: 1 << 12,
+                    node_budget: 100_000,
+                    split_rule: SplitRule::LowestFree,
+                };
+                let (mut got, stats) = solve_boolean_system(&system, n_vars, &opts);
+                got.sort_unstable();
+                assert!(!stats.exhausted, "trial {trial}");
+                assert_eq!(got, brute, "trial {trial} Closure({max_degree})");
+            }
+        }
+        assert_eq!(satisfiable, 80);
     }
 
     /// `Auto` resolves to the rule each engine runs best with, and an
@@ -9745,6 +10100,19 @@ mod tests {
                         masks_low64(&got),
                         brute,
                         "trial {trial} {split_rule:?} {policy:?}: roots are not the variety"
+                    );
+                }
+                // The closure engine: same variety, on a different tree.
+                for max_degree in [3u32, 4] {
+                    let opts = SolveOptions {
+                        engine: SolverEngine::Closure { max_degree },
+                        ..reference
+                    };
+                    let (mut got, _) = solve_boolean_system(&system, n_vars, &opts);
+                    got.sort_unstable();
+                    assert_eq!(
+                        got, brute,
+                        "trial {trial} {split_rule:?} Closure({max_degree}): roots differ"
                     );
                 }
             }
@@ -10385,6 +10753,7 @@ mod tests {
             for engine in [
                 SolverEngine::MatrixF4 { max_degree: 3 },
                 SolverEngine::InheritedF4 { max_degree: 3 },
+                SolverEngine::Closure { max_degree: 3 },
             ] {
                 for split_rule in [SplitRule::LowestFree, SplitRule::HighestFree] {
                     for (rebuild_on_drop, support_local) in
@@ -10784,6 +11153,14 @@ mod tests {
                 (
                     SplitRule::HighestFree,
                     SolverEngine::InheritedF4 { max_degree: 3 },
+                ),
+                (
+                    SplitRule::LowestFree,
+                    SolverEngine::Closure { max_degree: 3 },
+                ),
+                (
+                    SplitRule::HighestFree,
+                    SolverEngine::Closure { max_degree: 4 },
                 ),
             ] {
                 let opts = SolveOptions {
@@ -12064,6 +12441,185 @@ thread_local! {
 /// `KIC_F4_EARLY_ABORT`; a same-binary control for tests and harnesses.
 pub fn set_early_abort_mode(mode: Option<u8>) {
     EARLY_ABORT_OVERRIDE.with(|m| m.set(mode));
+}
+
+#[cfg(test)]
+mod eliminated_s4_tests {
+    use super::*;
+    use crate::cryptanalysis::binary_semaev::binary_semaev_s4;
+    use crate::cryptanalysis::koblitz_bench::random_subspace_basis;
+    use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
+
+    fn word(e: &F2mElement) -> u64 {
+        e.raw_bits().first().copied().unwrap_or(0)
+    }
+
+    /// Every Boolean assignment: the system's equations evaluate to the
+    /// coordinates of `binary_semaev_s4` at the assigned (twisted) points.
+    fn check(n: u32, ell: usize, twists: [u32; 4], with_target: bool) {
+        let irr = find_irreducible_sparse(n).expect("field");
+        let st = FieldStructure::new(n, &irr);
+        let b = F2mElement::one(n);
+        let mut rng = StdRng::seed_from_u64(2000 + n as u64 * 10 + ell as u64);
+        let basis = random_subspace_basis(n, ell, &mut rng);
+        let x_r = element_from_mask(0b1011_0110 & ((1u64 << n) - 1) | 1, n);
+        let target = with_target.then_some(&x_r);
+        let sys = build_eliminated_s4_system(&basis, &b, target, twists, &st).expect("system");
+        let k = if with_target { 3 } else { 4 };
+        assert_eq!(sys.n_vars, k * ell);
+        assert_eq!(sys.equations.len(), n as usize);
+        let spans: Vec<Vec<u64>> = (0..4)
+            .map(|i| {
+                let w: Vec<u64> = basis
+                    .iter()
+                    .map(|v| frobenius_mask(word(v), twists[i], &st))
+                    .collect();
+                (0..1u64 << ell)
+                    .map(|c| {
+                        (0..ell)
+                            .filter(|t| c >> t & 1 == 1)
+                            .fold(0, |a, t| a ^ w[t])
+                    })
+                    .collect()
+            })
+            .collect();
+        let mask = (1u64 << ell) - 1;
+        let mut zeros = 0;
+        for a in 0..1u64 << sys.n_vars {
+            let pt: Vec<F2mElement> = (0..4)
+                .map(|i| {
+                    if i == 3 && with_target {
+                        x_r.clone()
+                    } else {
+                        element_from_mask(spans[i][((a >> (i * ell)) & mask) as usize], n)
+                    }
+                })
+                .collect();
+            let want = word(&binary_semaev_s4(&pt[0], &pt[1], &pt[2], &pt[3], &b, &irr));
+            let got = sys
+                .equations
+                .iter()
+                .enumerate()
+                .fold(0u64, |acc, (j, p)| acc | (p.eval(a) as u64) << j);
+            assert_eq!(got, want, "n={n} ell={ell} twists={twists:?} a={a:#x}");
+            zeros += (want == 0) as usize;
+        }
+        if !with_target && twists == [0, 0, 0, 0] {
+            // P₁ + P₂ = P₁ + P₂: every (x₁, x₂, x₁, x₂) is a zero.
+            assert!(zeros >= 1 << (2 * ell));
+        }
+    }
+
+    #[test]
+    fn eliminated_s4_matches_the_field_formula() {
+        check(7, 2, [0, 0, 0, 0], false);
+        check(8, 3, [0, 0, 0, 0], false);
+        check(8, 3, [0, 1, 2, 3], false);
+        check(9, 3, [0, 0, 0, 0], true);
+        check(9, 2, [0, 1, 2, 0], true);
+    }
+}
+
+#[cfg(test)]
+mod target_free_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_bench::{random_subspace_basis, S3LinkRoots};
+    use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
+
+    fn word(e: &F2mElement) -> u64 {
+        e.raw_bits().first().copied().unwrap_or(0)
+    }
+
+    fn check(n: u32, ell: usize, twists: [u32; 4]) {
+        let irr = find_irreducible_sparse(n).expect("field");
+        let st = FieldStructure::new(n, &irr);
+        let b = F2mElement::one(n);
+        let mut rng = StdRng::seed_from_u64(1000 + n as u64 * 10 + ell as u64);
+        let basis = random_subspace_basis(n, ell, &mut rng);
+        let sys = build_target_free_system(&basis, &b, twists, &st).expect("system");
+        assert_eq!(sys.n_vars, 4 * ell + n as usize);
+        assert_eq!(sys.equations.len(), 2 * n as usize);
+        // Span of V with the twist applied, indexed by coefficient vector.
+        let spans: Vec<Vec<u64>> = (0..4)
+            .map(|i| {
+                let w: Vec<u64> = basis
+                    .iter()
+                    .map(|v| frobenius_mask(word(v), twists[i], &st))
+                    .collect();
+                (0..1u64 << ell)
+                    .map(|c| {
+                        (0..ell)
+                            .filter(|t| c >> t & 1 == 1)
+                            .fold(0, |a, t| a ^ w[t])
+                    })
+                    .collect()
+            })
+            .collect();
+        let solver = S3LinkRoots::new(&irr, 1);
+        // Expected solution set, as full assignments.
+        let mut expected = std::collections::BTreeSet::new();
+        for c in 0..1u64 << (4 * ell) {
+            let cs: Vec<usize> = (0..4)
+                .map(|i| ((c >> (i * ell)) & ((1 << ell) - 1)) as usize)
+                .collect();
+            let r1 = solver.roots(spans[0][cs[0]], spans[1][cs[1]]);
+            if r1.is_empty() {
+                continue;
+            }
+            let r2 = solver.roots(spans[2][cs[2]], spans[3][cs[3]]);
+            for u in r1.iter().filter(|u| r2.contains(u)) {
+                expected.insert(c | (u << (4 * ell)));
+            }
+        }
+        let mut got = std::collections::BTreeSet::new();
+        for a in 0..1u64 << sys.n_vars {
+            if sys.equations.iter().all(|p| p.eval(a) == 0) {
+                got.insert(a);
+            }
+        }
+        assert_eq!(got, expected, "n={n} ell={ell} twists={twists:?}");
+        if twists == [0, 0, 0, 0] {
+            // x1=x3, x2=x4 and x1=x4, x2=x3 with u a root of the first link.
+            let mask = (1u64 << ell) - 1;
+            let mut trivial = 0;
+            for c1 in 0..1u64 << ell {
+                for c2 in 0..1u64 << ell {
+                    for u in solver.roots(spans[0][c1 as usize], spans[1][c2 as usize]) {
+                        for (c3, c4) in [(c1, c2), (c2, c1)] {
+                            let a =
+                                c1 | c2 << ell | c3 << (2 * ell) | c4 << (3 * ell) | u << (4 * ell);
+                            assert!(got.contains(&a), "trivial assignment missing");
+                            trivial += 1;
+                        }
+                    }
+                }
+            }
+            let _ = mask;
+            assert!(trivial > 0);
+        }
+        eprintln!(
+            "target_free n={n} ell={ell} twists={twists:?}: {} solutions",
+            got.len()
+        );
+    }
+
+    #[test]
+    fn target_free_matches_link_roots_plain() {
+        for (n, ell) in [(7, 2), (9, 2), (9, 3)] {
+            check(n, ell, [0, 0, 0, 0]);
+        }
+    }
+
+    #[test]
+    fn target_free_matches_link_roots_twisted() {
+        for (n, ell) in [(7, 2), (9, 2), (9, 3)] {
+            check(n, ell, [0, 1, 2, 3]);
+        }
+    }
 }
 
 /// Systems with more than 64 unknowns, which only the `wide-vars` build

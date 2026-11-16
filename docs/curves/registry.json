@@ -476,6 +476,7 @@
     "docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round4-2026-09-21.json"
    ],
+   "panel_alias": "K0-13",
    "representations": [
     {
      "ec1": "EC1N13Ce0h1dfa32cdf623",
@@ -858,7 +859,8 @@
     "a": 1,
     "n": 17,
     "modulus": "0x20009",
-    "modulus_rule": "recorded in the run"
+    "modulus_rule": "recorded in the run",
+    "generator_call": "KoblitzCurve::new(1, 17)"
    },
    "model_json": "{\"a\":\"0x1\",\"b\":\"0x1\",\"field\":\"f2m-17-237ceae1\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x20009\",\"v\":\"1\"}",
    "trace": -101,
@@ -882,6 +884,7 @@
     "docs/ic/runs/ic-boundary-ledger-round3-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json"
    ],
+   "panel_alias": "K1-17",
    "representations": [
     {
      "ec1": "EC1N17Ce1h381f66e2762a",
@@ -989,6 +992,7 @@
     "docs/curves/sources/generated.json",
     "prose, by the constructor rule: docs/curves/sources/generated.json"
    ],
+   "panel_alias": "K0-19",
    "representations": [
     {
      "ec1": "EC1N19Ce0h1e2a8f558313",
@@ -1038,7 +1042,8 @@
     "a": 1,
     "n": 19,
     "modulus": "0x80027",
-    "modulus_rule": "recorded in the run"
+    "modulus_rule": "recorded in the run",
+    "generator_call": "KoblitzCurve::new(1, 19)"
    },
    "model_json": "{\"a\":\"0x1\",\"b\":\"0x1\",\"field\":\"f2m-19-87f45376\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x80027\",\"v\":\"1\"}",
    "trace": -797,
@@ -1062,6 +1067,7 @@
     "docs/ic/runs/ic-boundary-ledger-round3-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json"
    ],
+   "panel_alias": "K1-19",
    "representations": [
     {
      "ec1": "EC1N19Ce1h6186a62ebfaa",
@@ -1201,6 +1207,7 @@
     "docs/curves/sources/generated.json",
     "prose, by the constructor rule: docs/curves/sources/generated.json"
    ],
+   "panel_alias": "K0-23",
    "representations": [
     {
      "ec1": "EC1N23Ce0h27a979171a13",
@@ -1272,6 +1279,7 @@
     "docs/ic/runs/ic-boundary-ledger-round3-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round3-rotation-2026-09-21.json"
    ],
+   "panel_alias": "K1-23",
    "representations": [
     {
      "ec1": "EC1N23Ce1heec6a3619e3f",
@@ -2056,6 +2064,7 @@
     "docs/ic/runs/ic-boundary-ledger-round2-holdout-2026-09-21.json",
     "docs/ic/runs/ic-boundary-ledger-round2-unguarded-diagnostic-2026-09-21.json"
    ],
+   "panel_alias": "K0-41",
    "representations": [
     {
      "ec1": "EC1N41Ce0he09550ab560a",
@@ -2980,6 +2989,7 @@
    "sources": [
     "research/ic_single_target_20260930/curve_records.json"
    ],
+   "panel_alias": "K1-83",
    "representations": [
     {
      "ec1": "EC1N83Ce1h35c7ced6b497",
@@ -3249,6 +3259,7 @@
     "ECC2K-130 (src/cryptanalysis/ecc2k130_guard.rs)",
     "prose, by the constructor rule: docs/ic-leaderboard.html"
    ],
+   "panel_alias": "K0-131",
    "representations": [],
    "ec1_unresolved": "the challenge's normal-basis points are not imported (src/bin/ic/params.rs)"
   },
@@ -12391,7 +12402,8 @@
    "params": {
     "p": "827",
     "a": "1",
-    "b": "15"
+    "b": "15",
+    "generator_call": "roster_prime_instance(10)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"15\",\"field\":\"fp-827\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"827\",\"v\":\"1\"}",
    "trace": 5,
@@ -12806,7 +12818,8 @@
    "params": {
     "p": "3907",
     "a": "1",
-    "b": "3"
+    "b": "3",
+    "generator_call": "roster_prime_instance(12)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"3\",\"field\":\"fp-3907\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"3907\",\"v\":\"1\"}",
    "trace": 19,
@@ -15380,7 +15393,8 @@
    "params": {
     "p": "16187",
     "a": "1",
-    "b": "12"
+    "b": "12",
+    "generator_call": "roster_prime_instance(14)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"12\",\"field\":\"fp-16187\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16187\",\"v\":\"1\"}",
    "trace": -43,
@@ -17204,7 +17218,8 @@
    "params": {
     "p": "65353",
     "a": "1",
-    "b": "16"
+    "b": "16",
+    "generator_call": "roster_prime_instance(16)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"16\",\"field\":\"fp-65353\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"65353\",\"v\":\"1\"}",
    "trace": 351,
@@ -17871,7 +17886,8 @@
    "params": {
     "p": "261847",
     "a": "3",
-    "b": "2"
+    "b": "2",
+    "generator_call": "roster_prime_instance(18)"
    },
    "model_json": "{\"a\":\"3\",\"b\":\"2\",\"field\":\"fp-261847\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"261847\",\"v\":\"1\"}",
    "trace": 175,
@@ -19495,6 +19511,141 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp20-tm1498-fba36596",
+   "icv1": "ICV1:fp-1047533:-1498:1049032:444436:unk:unk:r:fba36596f9b4",
+   "family": "prime",
+   "params": {
+    "p": "1047533",
+    "a": "140034",
+    "b": "681489"
+   },
+   "model_json": "{\"a\":\"140034\",\"b\":\"681489\",\"field\":\"fp-1047533\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1047533\",\"v\":\"1\"}",
+   "trace": -1498,
+   "order": "1049032",
+   "j": "444436",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k20/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k20.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k20.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp20-tm1218-27eeac22",
+   "icv1": "ICV1:fp-1047589:-1218:1048808:581006:unk:unk:r:27eeac2248c5",
+   "family": "prime",
+   "params": {
+    "p": "1047589",
+    "a": "525700",
+    "b": "559179"
+   },
+   "model_json": "{\"a\":\"525700\",\"b\":\"559179\",\"field\":\"fp-1047589\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1047589\",\"v\":\"1\"}",
+   "trace": -1218,
+   "order": "1048808",
+   "j": "581006",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k20/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k20.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k20.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp20-tm1666-acbf9fea",
+   "icv1": "ICV1:fp-1047701:-1666:1049368:183979:unk:unk:r:acbf9fea6341",
+   "family": "prime",
+   "params": {
+    "p": "1047701",
+    "a": "957688",
+    "b": "264532"
+   },
+   "model_json": "{\"a\":\"957688\",\"b\":\"264532\",\"field\":\"fp-1047701\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1047701\",\"v\":\"1\"}",
+   "trace": -1666,
+   "order": "1049368",
+   "j": "183979",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k20/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k20.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k20.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp20-tm1250-c45e00c4",
+   "icv1": "ICV1:fp-1047941:-1250:1049192:1011862:unk:unk:r:c45e00c4c6b7",
+   "family": "prime",
+   "params": {
+    "p": "1047941",
+    "a": "821384",
+    "b": "972474"
+   },
+   "model_json": "{\"a\":\"821384\",\"b\":\"972474\",\"field\":\"fp-1047941\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1047941\",\"v\":\"1\"}",
+   "trace": -1250,
+   "order": "1049192",
+   "j": "1011862",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k20/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k20.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k20.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp20-tm898-793f1c4c",
+   "icv1": "ICV1:fp-1047989:-898:1048888:213337:unk:unk:r:793f1c4cabbe",
+   "family": "prime",
+   "params": {
+    "p": "1047989",
+    "a": "88607",
+    "b": "585530"
+   },
+   "model_json": "{\"a\":\"88607\",\"b\":\"585530\",\"field\":\"fp-1047989\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1047989\",\"v\":\"1\"}",
+   "trace": -898,
+   "order": "1048888",
+   "j": "213337",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k20/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k20.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k20.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
    "slug": "icv1-fp20-tm1146-4a57e423",
    "icv1": "ICV1:fp-1047997:-1146:1049144:27350:unk:unk:r:4a57e423f317",
    "family": "prime",
@@ -19511,10 +19662,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k20.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k20/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k20/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k20.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k20.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k20.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -19536,10 +19689,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k20.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k20/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k20/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k20.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k20.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k20.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -19551,7 +19706,8 @@
    "params": {
     "p": "1048291",
     "a": "1",
-    "b": "11"
+    "b": "11",
+    "generator_call": "roster_prime_instance(20)"
    },
    "model_json": "{\"a\":\"1\",\"b\":\"11\",\"field\":\"fp-1048291\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1048291\",\"v\":\"1\"}",
    "trace": 1293,
@@ -19627,10 +19783,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k20.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k20/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k20/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k20.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k20.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k20.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -19652,10 +19810,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k20/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k20-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k20.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k20/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k20/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k20.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k20.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k20.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -257966,6 +258126,141 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp24-tm3458-53ccc2e9",
+   "icv1": "ICV1:fp-16775909:-3458:16779368:1851565:unk:unk:r:53ccc2e910b7",
+   "family": "prime",
+   "params": {
+    "p": "16775909",
+    "a": "11086019",
+    "b": "10551240"
+   },
+   "model_json": "{\"a\":\"11086019\",\"b\":\"10551240\",\"field\":\"fp-16775909\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16775909\",\"v\":\"1\"}",
+   "trace": -3458,
+   "order": "16779368",
+   "j": "1851565",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k24/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k24.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k24.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp24-tm3426-0438c267",
+   "icv1": "ICV1:fp-16775989:-3426:16779416:4110581:unk:unk:r:0438c2677b57",
+   "family": "prime",
+   "params": {
+    "p": "16775989",
+    "a": "3179964",
+    "b": "9686635"
+   },
+   "model_json": "{\"a\":\"3179964\",\"b\":\"9686635\",\"field\":\"fp-16775989\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16775989\",\"v\":\"1\"}",
+   "trace": -3426,
+   "order": "16779416",
+   "j": "4110581",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k24/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k24.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k24.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp24-tm1274-94607e3f",
+   "icv1": "ICV1:fp-16776077:-1274:16777352:15240536:unk:unk:r:94607e3fad94",
+   "family": "prime",
+   "params": {
+    "p": "16776077",
+    "a": "15331170",
+    "b": "14243071"
+   },
+   "model_json": "{\"a\":\"15331170\",\"b\":\"14243071\",\"field\":\"fp-16776077\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16776077\",\"v\":\"1\"}",
+   "trace": -1274,
+   "order": "16777352",
+   "j": "15240536",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k24/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k24.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k24.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp24-tm3106-7b0fab0e",
+   "icv1": "ICV1:fp-16776101:-3106:16779208:832958:unk:unk:r:7b0fab0e269d",
+   "family": "prime",
+   "params": {
+    "p": "16776101",
+    "a": "6476547",
+    "b": "723788"
+   },
+   "model_json": "{\"a\":\"6476547\",\"b\":\"723788\",\"field\":\"fp-16776101\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16776101\",\"v\":\"1\"}",
+   "trace": -3106,
+   "order": "16779208",
+   "j": "832958",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k24/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k24.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k24.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp24-tm4010-db2650ce",
+   "icv1": "ICV1:fp-16776173:-4010:16780184:15177467:unk:unk:r:db2650ce6b0a",
+   "family": "prime",
+   "params": {
+    "p": "16776173",
+    "a": "11184051",
+    "b": "6213596"
+   },
+   "model_json": "{\"a\":\"11184051\",\"b\":\"6213596\",\"field\":\"fp-16776173\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"16776173\",\"v\":\"1\"}",
+   "trace": -4010,
+   "order": "16780184",
+   "j": "15177467",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/bsgs/sessions/k24/spec.json",
+    "research/curve25519_autolab_20261104/bsgs/spec-k24.json",
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k24.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
    "slug": "icv1-fp24-tm1514-dce9313c",
    "icv1": "ICV1:fp-16776317:-1514:16777832:7814118:unk:unk:r:dce9313ce91c",
    "family": "prime",
@@ -257982,10 +258277,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k24.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k24/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k24/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k24.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k24.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k24.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -258007,10 +258304,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k24.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k24/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k24/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k24.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k24.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k24.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -258032,10 +258331,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k24.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k24/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k24/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k24.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k24.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k24.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -258057,10 +258358,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k24/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k24-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k24.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k24/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k24/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k24.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k24.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k24.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -258091,6 +258394,7 @@
     "research/bitop_ladder_20261019/sessions/train-P24-pair-ext1/spec.json",
     "research/bitop_ladder_20261019/sessions/train-P24-rf3-ext1/plan.json"
    ],
+   "panel_alias": "P24a",
    "representations": [
     {
      "ec1": "EC1P24Cfph095cb65c0da0",
@@ -258388,6 +258692,28 @@
      ]
     }
    ]
+  },
+  {
+   "slug": "icv1-fp25-t7604-505d2814",
+   "icv1": "ICV1:fp-19382351:7604:19374748:1581306:unk:unk:r:505d2814b340",
+   "family": "prime",
+   "params": {
+    "p": "19382351",
+    "a": "16075844",
+    "b": "3968456"
+   },
+   "model_json": "{\"a\":\"16075844\",\"b\":\"3968456\",\"field\":\"fp-19382351\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"19382351\",\"v\":\"1\"}",
+   "trace": 7604,
+   "order": "19374748",
+   "j": "1581306",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/coeff_model_semaev_20261109/smoke/smokeside.meta.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
    "slug": "icv1-fp25-t8886-2f25350b",
@@ -475791,6 +476117,141 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp28-tm4378-d002c9d0",
+   "icv1": "ICV1:fp-268434269:-4378:268438648:237807364:unk:unk:r:d002c9d05b9c",
+   "family": "prime",
+   "params": {
+    "p": "268434269",
+    "a": "265839570",
+    "b": "266541725"
+   },
+   "model_json": "{\"a\":\"265839570\",\"b\":\"266541725\",\"field\":\"fp-268434269\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"268434269\",\"v\":\"1\"}",
+   "trace": -4378,
+   "order": "268438648",
+   "j": "237807364",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k28.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k28/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k28-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp28-tm21298-bd3b771b",
+   "icv1": "ICV1:fp-268434389:-21298:268455688:238026273:unk:unk:r:bd3b771b29eb",
+   "family": "prime",
+   "params": {
+    "p": "268434389",
+    "a": "176974979",
+    "b": "188574103"
+   },
+   "model_json": "{\"a\":\"176974979\",\"b\":\"188574103\",\"field\":\"fp-268434389\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"268434389\",\"v\":\"1\"}",
+   "trace": -21298,
+   "order": "268455688",
+   "j": "238026273",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k28.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k28/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k28-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp28-tm4250-44fba591",
+   "icv1": "ICV1:fp-268434461:-4250:268438712:61184464:unk:unk:r:44fba591522b",
+   "family": "prime",
+   "params": {
+    "p": "268434461",
+    "a": "268066962",
+    "b": "85749650"
+   },
+   "model_json": "{\"a\":\"268066962\",\"b\":\"85749650\",\"field\":\"fp-268434461\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"268434461\",\"v\":\"1\"}",
+   "trace": -4250,
+   "order": "268438712",
+   "j": "61184464",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k28.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k28/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k28-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp28-tm17914-b06fd2c7",
+   "icv1": "ICV1:fp-268434557:-17914:268452472:246831622:unk:unk:r:b06fd2c752d3",
+   "family": "prime",
+   "params": {
+    "p": "268434557",
+    "a": "268215858",
+    "b": "39365730"
+   },
+   "model_json": "{\"a\":\"268215858\",\"b\":\"39365730\",\"field\":\"fp-268434557\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"268434557\",\"v\":\"1\"}",
+   "trace": -17914,
+   "order": "268452472",
+   "j": "246831622",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k28.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k28/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k28-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp28-tm29890-9a501a3e",
+   "icv1": "ICV1:fp-268434581:-29890:268464472:47011785:unk:unk:r:9a501a3efa7d",
+   "family": "prime",
+   "params": {
+    "p": "268434581",
+    "a": "178687587",
+    "b": "13872414"
+   },
+   "model_json": "{\"a\":\"178687587\",\"b\":\"13872414\",\"field\":\"fp-268434581\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"268434581\",\"v\":\"1\"}",
+   "trace": -29890,
+   "order": "268464472",
+   "j": "47011785",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k28.json",
+    "research/curve25519_autolab_20261104/siblings/smoke2-k28/plan.json",
+    "research/curve25519_autolab_20261104/siblings/smoke2-k28/spec.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
    "slug": "icv1-fp28-tm7530-06cb5560",
    "icv1": "ICV1:fp-268434781:-7530:268442312:106242694:unk:unk:r:06cb55607e61",
    "family": "prime",
@@ -475807,6 +476268,7 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
     "research/curve25519_autolab_20261104/multicurve/siblings-k28.json"
    ],
    "representations": [],
@@ -475829,10 +476291,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k28.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k28/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k28/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k28.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k28.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k28.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -475854,10 +476318,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k28.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k28/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k28/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k28.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k28.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k28.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -475879,10 +476345,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k28.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k28/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k28/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k28.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k28.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k28.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -475904,10 +476372,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k28/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k28-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k28.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k28/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k28/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k28.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k28.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k28.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -490878,6 +491348,141 @@
    ]
   },
   {
+   "slug": "icv1-fp32-tm5202-633eb5e4",
+   "icv1": "ICV1:fp-4294965733:-5202:4294970936:68236157:unk:unk:r:633eb5e46b58",
+   "family": "prime",
+   "params": {
+    "p": "4294965733",
+    "a": "1429693420",
+    "b": "2330223466"
+   },
+   "model_json": "{\"a\":\"1429693420\",\"b\":\"2330223466\",\"field\":\"fp-4294965733\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4294965733\",\"v\":\"1\"}",
+   "trace": -5202,
+   "order": "4294970936",
+   "j": "68236157",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k32.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k32/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k32-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp32-tm100554-bc281c80",
+   "icv1": "ICV1:fp-4294966237:-100554:4295066792:222970448:unk:unk:r:bc281c80c451",
+   "family": "prime",
+   "params": {
+    "p": "4294966237",
+    "a": "1427126548",
+    "b": "3550569863"
+   },
+   "model_json": "{\"a\":\"1427126548\",\"b\":\"3550569863\",\"field\":\"fp-4294966237\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4294966237\",\"v\":\"1\"}",
+   "trace": -100554,
+   "order": "4295066792",
+   "j": "222970448",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k32.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k32/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k32-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp32-tm44530-ae524bdb",
+   "icv1": "ICV1:fp-4294966373:-44530:4295010904:497743898:unk:unk:r:ae524bdbbd81",
+   "family": "prime",
+   "params": {
+    "p": "4294966373",
+    "a": "4292281626",
+    "b": "1693180126"
+   },
+   "model_json": "{\"a\":\"4292281626\",\"b\":\"1693180126\",\"field\":\"fp-4294966373\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4294966373\",\"v\":\"1\"}",
+   "trace": -44530,
+   "order": "4295010904",
+   "j": "497743898",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k32.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k32/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k32-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp32-tm35946-001a66f4",
+   "icv1": "ICV1:fp-4294966477:-35946:4295002424:2064599048:unk:unk:r:001a66f481c3",
+   "family": "prime",
+   "params": {
+    "p": "4294966477",
+    "a": "1429460708",
+    "b": "3319461337"
+   },
+   "model_json": "{\"a\":\"1429460708\",\"b\":\"3319461337\",\"field\":\"fp-4294966477\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4294966477\",\"v\":\"1\"}",
+   "trace": -35946,
+   "order": "4295002424",
+   "j": "2064599048",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k32.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k32/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k32-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
+   "slug": "icv1-fp32-tm78226-faf1c6ae",
+   "icv1": "ICV1:fp-4294966661:-78226:4295044888:3676553098:unk:unk:r:faf1c6ae6e46",
+   "family": "prime",
+   "params": {
+    "p": "4294966661",
+    "a": "4292568954",
+    "b": "1429033074"
+   },
+   "model_json": "{\"a\":\"4292568954\",\"b\":\"1429033074\",\"field\":\"fp-4294966661\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4294966661\",\"v\":\"1\"}",
+   "trace": -78226,
+   "order": "4295044888",
+   "j": "3676553098",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/curve25519_autolab_20261104/c1/confirm-curves.json",
+    "research/curve25519_autolab_20261104/c1/sessions/confirm-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-confirm-k32.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k32/spec.json",
+    "research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k32-local.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
    "slug": "icv1-fp32-tm96522-3f5dbef7",
    "icv1": "ICV1:fp-4294966813:-96522:4295063336:1451851440:unk:unk:r:3f5dbef7d275",
    "family": "prime",
@@ -490894,6 +491499,7 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
     "research/curve25519_autolab_20261104/multicurve/siblings-k32.json"
    ],
    "representations": [],
@@ -490916,10 +491522,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k32.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k32/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k32/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k32.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k32.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k32.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -490941,10 +491549,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k32.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k32/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k32/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k32.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k32.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k32.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -490966,10 +491576,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k32.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k32/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k32/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k32.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k32.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k32.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -490991,10 +491603,12 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
+    "research/curve25519_autolab_20261104/c1/sessions/screen-k32/spec.json",
+    "research/curve25519_autolab_20261104/c1/siblings-k32-10.json",
+    "research/curve25519_autolab_20261104/c1/spec-screen-k32.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k32/plan.json",
     "research/curve25519_autolab_20261104/multicurve/sessions/k32/spec.json",
-    "research/curve25519_autolab_20261104/multicurve/siblings-k32.json",
-    "research/curve25519_autolab_20261104/multicurve/spec-k32.json"
+    "research/curve25519_autolab_20261104/multicurve/siblings-k32.json"
    ],
    "representations": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
@@ -491053,6 +491667,7 @@
     "research/bitop_ladder_20261019/sessions/train-P32/plan.json",
     "research/bitop_ladder_20261019/sessions/train-P32/spec.json"
    ],
+   "panel_alias": "P32a",
    "representations": [
     {
      "ec1": "EC1P32Cfph06b9f59ff156",
@@ -491109,12 +491724,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
-    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+    "research/prime_medium_rho_cpc_20261109/attempts/M1-a1-startbuild-refused/receipts/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M1.request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/PC.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M1.pod/input-spec.json"
    ],
    "representations": [
     {
@@ -491170,12 +491785,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
-    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+    "research/prime_medium_rho_cpc_20261109/attempts/M1-a1-startbuild-refused/receipts/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M1.request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/PC.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M1.pod/input-spec.json"
    ],
    "representations": [
     {
@@ -491758,6 +492373,7 @@
     "research/bitop_ladder_20261019/specs/holdout-P36.json",
     "research/bitop_ladder_20261019/specs/train-P36.json"
    ],
+   "panel_alias": "P36a",
    "representations": [
     {
      "ec1": "EC1P36Cfphfa97d84519ef",
@@ -491836,12 +492452,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
-    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+    "research/prime_medium_rho_cpc_20261109/attempts/M1-a1-startbuild-refused/receipts/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M1.request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/PC.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M1.pod/input-spec.json"
    ],
    "representations": [
     {
@@ -491997,12 +492613,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
-    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+    "research/prime_medium_rho_cpc_20261109/attempts/M1-a1-startbuild-refused/receipts/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M1.request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/PC.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M1.pod/input-spec.json"
    ],
    "representations": [
     {
@@ -492655,6 +493271,7 @@
     "research/bitop_ladder_20261019/specs/holdout-P40.json",
     "research/bitop_ladder_20261019/specs/train-P40.json"
    ],
+   "panel_alias": "P40a",
    "representations": [
     {
      "ec1": "EC1P40Cfphd8c9e6e2886b",
@@ -492768,6 +493385,28 @@
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
   },
   {
+   "slug": "icv1-fp41-tm416168-5ad23dee",
+   "icv1": "ICV1:fp-1308776011747:-416168:1308776427916:135470416145:unk:unk:r:5ad23deedae1",
+   "family": "prime",
+   "params": {
+    "p": "1308776011747",
+    "a": "402886816442",
+    "b": "385063177331"
+   },
+   "model_json": "{\"a\":\"402886816442\",\"b\":\"385063177331\",\"field\":\"fp-1308776011747\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"1308776011747\",\"v\":\"1\"}",
+   "trace": -416168,
+   "order": "1308776427916",
+   "j": "135470416145",
+   "end": "unk",
+   "aliases": [],
+   "standard_names": [],
+   "sources": [
+    "research/coeff_model_semaev_20261109/runs/C40-SIDE.meta.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
    "slug": "icv1-fp41-tm405553-81153b6e",
    "icv1": "ICV1:fp-1495523448539:-405553:1495523854093:47688710942:unk:unk:r:81153b6ea065",
    "family": "prime",
@@ -492787,12 +493426,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
-    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+    "research/prime_medium_rho_cpc_20261109/attempts/M1-a1-startbuild-refused/receipts/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M1.request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/PC.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M1.pod/input-spec.json"
    ],
    "representations": [
     {
@@ -492901,12 +493540,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
-    "research/prime_medium_tier_rho_20261107/receipts/attempt-card2-J1/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J1.pod/input-spec.json"
+    "research/prime_medium_rho_cpc_20261109/attempts/M1-a1-startbuild-refused/receipts/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M1/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/PC/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M1.request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/PC.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M1.pod/input-spec.json"
    ],
    "representations": [
     {
@@ -493477,12 +494116,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J2/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J2.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J2.request.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J2.pod/input-spec.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J2.pod/session/plan.json"
+    "research/prime_medium_rho_cpc_20261109/receipts/M2/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M2.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M2.pod/input-spec.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M2.pod/session/plan.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M2.pod/session/spec.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M2/plan.json"
    ],
    "representations": [
     {
@@ -493538,12 +494177,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J2/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J2.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J2.request.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J2.pod/input-spec.json",
-    "research/prime_medium_tier_rho_20261107/sessions/J2.pod/session/plan.json"
+    "research/prime_medium_rho_cpc_20261109/receipts/M2/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M2.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M2.pod/input-spec.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M2.pod/session/plan.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M2.pod/session/spec.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M2/plan.json"
    ],
    "representations": [
     {
@@ -503617,12 +504256,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J3/request.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J4/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J3.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J4.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J3.request.json"
+    "research/prime_medium_rho_cpc_20261109/attempts/M3-a1-startbuild-refused/receipts/request.json",
+    "research/prime_medium_rho_cpc_20261109/receipts/M3/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M3.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M3.pod/input-spec.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M3.pod/session/plan.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M3.pod/session/spec.json"
    ],
    "representations": [
     {
@@ -503678,12 +504317,12 @@
    ],
    "standard_names": [],
    "sources": [
-    "research/prime_medium_tier_rho_20261107/curves.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J5/request.json",
-    "research/prime_medium_tier_rho_20261107/receipts/J6/request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J5.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/J6.request.json",
-    "research/prime_medium_tier_rho_20261107/requests/final/J5.request.json"
+    "research/prime_medium_rho_cpc_20261109/receipts/M4/request.json",
+    "research/prime_medium_rho_cpc_20261109/requests/M4.request.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M4.pod/input-spec.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M4.pod/session/plan.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M4.pod/session/spec.json",
+    "research/prime_medium_rho_cpc_20261109/sessions/M4/plan.json"
    ],
    "representations": [
     {
@@ -532662,7 +533301,8 @@
    "params": {
     "p": "6277101735386680763835789423207666416083908700390324961279",
     "a": "6277101735386680763835789423207666416083908700390324961276",
-    "b": "2455155546008943817740293915197451784769108058161191238065"
+    "b": "2455155546008943817740293915197451784769108058161191238065",
+    "model_form": "y^2=x^3+a*x+b"
    },
    "model_json": "{\"a\":\"6277101735386680763835789423207666416083908700390324961276\",\"b\":\"2455155546008943817740293915197451784769108058161191238065\",\"field\":\"fp-6277101735386680763835789423207666416083908700390324961279\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"6277101735386680763835789423207666416083908700390324961279\",\"v\":\"1\"}",
    "trace": 31607402316713927207482677199,
@@ -539648,7 +540288,8 @@
    "params": {
     "p": "26959946667150639794667015087019630673557916260026308143510066298881",
     "a": "26959946667150639794667015087019630673557916260026308143510066298878",
-    "b": "18958286285566608000408668544493926415504680968679321075787234672564"
+    "b": "18958286285566608000408668544493926415504680968679321075787234672564",
+    "model_form": "y^2=x^3+a*x+b"
    },
    "model_json": "{\"a\":\"26959946667150639794667015087019630673557916260026308143510066298878\",\"b\":\"18958286285566608000408668544493926415504680968679321075787234672564\",\"field\":\"fp-26959946667150639794667015087019630673557916260026308143510066298881\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"26959946667150639794667015087019630673557916260026308143510066298881\",\"v\":\"1\"}",
    "trace": 4733100108545601916421827343930821,
@@ -542606,7 +543247,8 @@
    "params": {
     "p": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
     "a": "115792089210356248762697446949407573530086143415290314195533631308867097853948",
-    "b": "41058363725152142129326129780047268409114441015993725554835256314039467401291"
+    "b": "41058363725152142129326129780047268409114441015993725554835256314039467401291",
+    "model_form": "y^2=x^3+a*x+b"
    },
    "model_json": "{\"a\":\"115792089210356248762697446949407573530086143415290314195533631308867097853948\",\"b\":\"41058363725152142129326129780047268409114441015993725554835256314039467401291\",\"field\":\"fp-115792089210356248762697446949407573530086143415290314195533631308867097853951\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"115792089210356248762697446949407573530086143415290314195533631308867097853951\",\"v\":\"1\"}",
    "trace": 89188191154553853111372247798585809583,
@@ -542867,7 +543509,8 @@
    "params": {
     "p": "115792089237316195423570985008687907853269984665640564039457584007908834671663",
     "a": "0",
-    "b": "7"
+    "b": "7",
+    "model_form": "y^2=x^3+a*x+b"
    },
    "model_json": "{\"a\":\"0\",\"b\":\"7\",\"field\":\"fp-115792089237316195423570985008687907853269984665640564039457584007908834671663\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"115792089237316195423570985008687907853269984665640564039457584007908834671663\",\"v\":\"1\"}",
    "trace": 432420386565659656852420866390673177327,
