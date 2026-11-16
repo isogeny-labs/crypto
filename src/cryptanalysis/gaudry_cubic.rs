@@ -70,7 +70,10 @@ pub use symmetric::{weil_s3_pair_test_symmetric, SymmetricPairStats};
 mod prepared;
 #[path = "gaudry_cubic_s4_f4.rs"]
 mod s4_f4;
-pub use s4_f4::{solve_s4_f4, S4F4Stats};
+pub use s4_f4::{solve_s4_f4, solve_s4_f4_krylov, S4F4Stats};
+#[path = "gaudry_cubic_krylov.rs"]
+mod krylov;
+pub use krylov::KrylovStats;
 #[path = "gaudry_cubic_sampling.rs"]
 mod sampling;
 
@@ -3723,6 +3726,8 @@ pub enum Solver {
     Groebner,
     /// Native F4 basis and counted finite-quotient extraction for S4.
     F4Groebner,
+    /// Native F4 with checked sparse FGLM, charged dense fallback.
+    F4Krylov,
     /// **Joux–Vitse**: look for decompositions into `k − 1 = 2` base
     /// points instead of `k = 3`, with one Weil-restricted `S₃` pair
     /// test on the residual itself.
@@ -3898,7 +3903,11 @@ fn run_gaudry_impl(
         curve.reset();
         m
     };
-    let pre = if matches!(solver, Solver::Groebner | Solver::F4Groebner) || cross_check {
+    let pre = if matches!(
+        solver,
+        Solver::Groebner | Solver::F4Groebner | Solver::F4Krylov
+    ) || cross_check
+    {
         Some(SymmetrisedS4::precompute(curve))
     } else {
         None
@@ -4087,10 +4096,15 @@ fn run_gaudry_impl(
                 rep.oracle_fp_muls += stats.fp_muls - before;
                 decs
             }
-            Solver::F4Groebner => {
+            Solver::F4Groebner | Solver::F4Krylov => {
                 let before = stats.fp_muls;
                 let work = rep.s4_f4_stats.get_or_insert_with(S4F4Stats::default);
-                let decs = s4_f4::triple_oracle(
+                let oracle = if solver == Solver::F4Krylov {
+                    s4_f4::triple_oracle_krylov
+                } else {
+                    s4_f4::triple_oracle
+                };
+                let decs = oracle(
                     inst,
                     base,
                     pre.as_ref().unwrap(),
@@ -4155,7 +4169,7 @@ fn run_gaudry_impl(
                         &mut st,
                     )
                 }
-                Solver::Groebner | Solver::F4Groebner => {
+                Solver::Groebner | Solver::F4Groebner | Solver::F4Krylov => {
                     subspace_triple_oracle(inst, base, &r, &mut rng).0
                 }
                 Solver::SymmetricPairOnly | Solver::PreparedSymmetricPairOnly => {

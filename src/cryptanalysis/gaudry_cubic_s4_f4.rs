@@ -17,6 +17,7 @@ pub struct S4F4Stats {
     pub quotient_dimension_total: u64,
     pub max_basis_columns: usize,
     pub counter_scope: &'static str,
+    pub krylov: KrylovStats,
 }
 
 fn packed_basis(basis: &[f4::Poly]) -> Option<Vec<Vec<([u8; 3], u64)>>> {
@@ -129,12 +130,45 @@ pub fn solve_s4_f4(
     stats: &mut SolveStats,
     work: &mut S4F4Stats,
 ) -> Option<Vec<[u64; 3]>> {
+    solve_with(inst, pre, x_r, rng, stats, work, false)
+}
+
+/// Same native basis and border construction, with checked sparse extraction.
+pub fn solve_s4_f4_krylov(
+    inst: &Instance3,
+    pre: &SymmetrisedS4,
+    x_r: &E3,
+    rng: &mut StdRng,
+    stats: &mut SolveStats,
+    work: &mut S4F4Stats,
+) -> Option<Vec<[u64; 3]>> {
+    solve_with(inst, pre, x_r, rng, stats, work, true)
+}
+
+fn solve_with(
+    inst: &Instance3,
+    pre: &SymmetrisedS4,
+    x_r: &E3,
+    rng: &mut StdRng,
+    stats: &mut SolveStats,
+    work: &mut S4F4Stats,
+    use_krylov: bool,
+) -> Option<Vec<[u64; 3]>> {
     work.calls += 1;
     work.counter_scope="native F4 row counter plus counted restriction/border/root work; polynomial scalar housekeeping unpriced; serial costing required";
     stats.solves += 1;
     let mut muls = 0;
     let mut trial_rng = rng.clone();
-    let result = solve_inner(inst, pre, x_r, &mut trial_rng, stats, work, &mut muls);
+    let result = solve_inner(
+        inst,
+        pre,
+        x_r,
+        &mut trial_rng,
+        stats,
+        work,
+        &mut muls,
+        use_krylov,
+    );
     stats.fp_muls += muls;
     if result.is_some() {
         work.completed += 1;
@@ -145,6 +179,7 @@ pub fn solve_s4_f4(
     result
 }
 
+#[allow(clippy::too_many_arguments)]
 fn solve_inner(
     inst: &Instance3,
     pre: &SymmetrisedS4,
@@ -153,6 +188,7 @@ fn solve_inner(
     stats: &mut SolveStats,
     work: &mut S4F4Stats,
     muls: &mut u64,
+    use_krylov: bool,
 ) -> Option<Vec<[u64; 3]>> {
     let f = &inst.curve.field;
     let before = f.muls();
@@ -247,6 +283,29 @@ fn solve_inner(
     work.normal_form_muls += *muls - before_nf;
     let mut nfs = NormalForms::new(&mut rows, &pivots, &std_index, dim, f.p);
     let matrix = mult_matrix(&cols, &col_index, &standard, [1, 0, 0], &mut nfs, muls)?;
+    if use_krylov {
+        let indices: Option<Vec<_>> = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]
+            .iter()
+            .map(|m| col_index.get(m).and_then(|c| std_index.get(c)).copied())
+            .collect();
+        if let Some(indices) = indices {
+            let mut trial = rng.clone();
+            if let Some(triples) = krylov::read(
+                &matrix,
+                indices.try_into().ok()?,
+                &comps,
+                f.p,
+                &mut trial,
+                stats,
+                &mut work.krylov,
+                muls,
+            ) {
+                *rng = trial;
+                return Some(triples);
+            }
+        }
+        work.krylov.dense_fallbacks += 1;
+    }
     match read_solutions(
         &matrix, &cols, &col_index, &standard, &std_index, &pivots, &mut nfs, &comps, f.p, rng,
         stats, muls, false, 24, true,
@@ -265,10 +324,36 @@ pub(super) fn triple_oracle(
     stats: &mut SolveStats,
     work: &mut S4F4Stats,
 ) -> Vec<Vec<(usize, i64)>> {
+    triple_with(inst, base, pre, r, rng, stats, work, false)
+}
+
+pub(super) fn triple_oracle_krylov(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    pre: &SymmetrisedS4,
+    r: &Pt3,
+    rng: &mut StdRng,
+    stats: &mut SolveStats,
+    work: &mut S4F4Stats,
+) -> Vec<Vec<(usize, i64)>> {
+    triple_with(inst, base, pre, r, rng, stats, work, true)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn triple_with(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    pre: &SymmetrisedS4,
+    r: &Pt3,
+    rng: &mut StdRng,
+    stats: &mut SolveStats,
+    work: &mut S4F4Stats,
+    use_krylov: bool,
+) -> Vec<Vec<(usize, i64)>> {
     if r.inf {
         return Vec::new();
     }
-    if let Some(triples) = solve_s4_f4(inst, pre, &r.x, rng, stats, work) {
+    if let Some(triples) = solve_with(inst, pre, &r.x, rng, stats, work, use_krylov) {
         let found = base
             .lookup(&inst.curve.field, r)
             .map(|(i, s)| vec![vec![(i, s)]])

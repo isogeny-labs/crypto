@@ -1,4 +1,4 @@
-//! Basis-phase feasibility only. F4 does not yet recover decompositions here.
+//! Explicitly separated basis-only and complete dense/sparse extraction controls.
 use clap::Parser;
 use crypto_lib::cryptanalysis::{f4_fp as f4, gaudry_cubic as cubic};
 use rand::{rngs::StdRng, Rng, SeedableRng};
@@ -27,6 +27,9 @@ struct Args {
     f4_max_degree: u32,
     #[arg(long, default_value_t = 50)]
     f4_deadline_ms: u64,
+    /// Complete native F4 coordinate solves, dense versus checked sparse FGLM.
+    #[arg(long)]
+    extraction_comparison: bool,
     #[arg(long)]
     source_revision: String,
     #[arg(long)]
@@ -109,6 +112,14 @@ fn vanishes(poly: &f4::Poly, point: [u64; 3], p: u64) -> bool {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
+    if args.extraction_comparison && (args.f4_max_degree != 24 || args.f4_deadline_ms != 0) {
+        return Err("complete extraction uses the native degree24/no-deadline solver".into());
+    }
+    let schema = if args.extraction_comparison {
+        "gaudry.cubic.s4-extraction/v1"
+    } else {
+        "gaudry.cubic.s4-component/v1"
+    };
     if args.source_revision.len() != 40
         || args.rounds < 5
         || args.warmup_rounds == 0
@@ -161,18 +172,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let input_digest = digest(&components)?;
                 let rng_seed = seed ^ ordinal.wrapping_mul(0x9e37_79b9) ^ 0x534f_4c56;
                 let qualifier_started = Instant::now();
-                let qualified = cubic::solve_s4_subspace_with(
-                    &inst,
-                    &pre,
-                    &point.x,
-                    &mut StdRng::seed_from_u64(rng_seed),
-                    &mut cubic::SolveStats::default(),
-                    cubic::SolveMode::default(),
-                );
+                let qualified = if args.extraction_comparison {
+                    cubic::solve_s4_f4(
+                        &inst,
+                        &pre,
+                        &point.x,
+                        &mut StdRng::seed_from_u64(rng_seed),
+                        &mut cubic::SolveStats::default(),
+                        &mut cubic::S4F4Stats::default(),
+                    )
+                } else {
+                    cubic::solve_s4_subspace_with(
+                        &inst,
+                        &pre,
+                        &point.x,
+                        &mut StdRng::seed_from_u64(rng_seed),
+                        &mut cubic::SolveStats::default(),
+                        cubic::SolveMode::default(),
+                    )
+                };
                 let qualifier_ns = qualifier_started.elapsed().as_nanos();
                 write_row(
                     &mut out,
-                    &json!({"schema":"gaudry.cubic.s4-component/v1","record_type":"fixture",
+                    &json!({"schema":schema,"record_type":"fixture",
                     "source_revision":args.source_revision,"p":p,"seed":seed,"ordinal":ordinal,
                     "field":inst.curve.field,"a":inst.curve.a,"b":inst.curve.b,"generator":inst.curve.g,
                     "target":inst.q,"subgroup_order":inst.curve.n,"known_answer_scalar":inst.d,
@@ -185,15 +207,58 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 {
                     for round in 0..count {
                         let mut arms = ["macaulay_a", "f4_a", "macaulay_b", "f4_b"];
+                        if args.extraction_comparison {
+                            arms = ["dense_a", "krylov_a", "dense_b", "krylov_b"];
+                        }
                         if round % 2 == 1 {
                             arms.reverse();
                         }
                         for arm in arms {
+                            if args.extraction_comparison {
+                                write_row(
+                                    &mut out,
+                                    &json!({"schema":schema,"record_type":"execution_start",
+                                "source_revision":args.source_revision,"p":p,"seed":seed,"ordinal":ordinal,
+                                "phase":phase,"round":round,"arm":arm}),
+                                )?;
+                            }
                             let mut valid = qualified.is_some();
                             let mut signatures = Vec::new();
                             let mut work = 0u64;
                             let elapsed;
-                            if arm.starts_with("macaulay") {
+                            if args.extraction_comparison {
+                                let started = Instant::now();
+                                let mut results = Vec::with_capacity(args.batch_iterations);
+                                for _ in 0..args.batch_iterations {
+                                    let mut stats = cubic::SolveStats::default();
+                                    let mut native = cubic::S4F4Stats::default();
+                                    let solver = if arm.starts_with("krylov") {
+                                        cubic::solve_s4_f4_krylov
+                                    } else {
+                                        cubic::solve_s4_f4
+                                    };
+                                    let triples = solver(
+                                        &inst,
+                                        &pre,
+                                        &point.x,
+                                        &mut StdRng::seed_from_u64(rng_seed),
+                                        &mut stats,
+                                        &mut native,
+                                    );
+                                    results.push((triples, stats, native));
+                                }
+                                elapsed = started.elapsed().as_nanos();
+                                for (triples, stats, native) in results {
+                                    valid &= triples == qualified && triples.is_some();
+                                    work += stats.fp_muls;
+                                    signatures.push(json!([
+                                        triples,
+                                        stats.fp_muls,
+                                        stats.quotient_dim_total,
+                                        native
+                                    ]));
+                                }
+                            } else if arm.starts_with("macaulay") {
                                 let started = Instant::now();
                                 let mut results = Vec::with_capacity(args.batch_iterations);
                                 for _ in 0..args.batch_iterations {
@@ -266,13 +331,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             }
                             write_row(
                                 &mut out,
-                                &json!({"schema":"gaudry.cubic.s4-component/v1","record_type":"execution",
+                                &json!({"schema":schema,"record_type":"execution",
                                 "source_revision":args.source_revision,"p":p,"seed":seed,"ordinal":ordinal,
                                 "phase":phase,"round":round,"arm":arm,"input_digest":input_digest,
                                 "batch_iterations":args.batch_iterations,"phase_wall_ns":elapsed,"valid":valid,
                                 "intra_batch_consistent":consistent,"signature":signatures.first(),"counted_field_work":work,
                                 "f4_max_degree":args.f4_max_degree,"f4_deadline_ms":args.f4_deadline_ms,
-                                "output_kind":if arm.starts_with("f4") {"basis_only_no_decomposition_recovery"} else {"complete_S4_coordinate_solve"}}),
+                                "output_kind":if !args.extraction_comparison && arm.starts_with("f4") {"basis_only_no_decomposition_recovery"} else {"complete_S4_coordinate_solve"}}),
                             )?;
                         }
                     }
@@ -290,6 +355,160 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn sparse_coordinate_extraction_matches_dense_on_all_tiny_targets_and_holdouts() {
+        for (p, seed, scalars) in [
+            (7, 3, vec![]),
+            (127, 83, vec![1, 13, 29]),
+            (1039, 89, vec![1, 13, 29]),
+        ] {
+            let inst = cubic::generate_instance3(p, seed);
+            let pre = cubic::SymmetrisedS4::precompute(&inst.curve);
+            let scalars = if p == 7 {
+                (1..inst.curve.n).collect()
+            } else {
+                scalars
+            };
+            for d in scalars.into_iter().filter(|&d| d < inst.curve.n) {
+                let r = inst.curve.mul(&inst.curve.g, d);
+                let mut work = cubic::S4F4Stats::default();
+                let dense = cubic::solve_s4_f4(
+                    &inst,
+                    &pre,
+                    &r.x,
+                    &mut StdRng::seed_from_u64(91),
+                    &mut cubic::SolveStats::default(),
+                    &mut cubic::S4F4Stats::default(),
+                );
+                let fast = cubic::solve_s4_f4_krylov(
+                    &inst,
+                    &pre,
+                    &r.x,
+                    &mut StdRng::seed_from_u64(91),
+                    &mut cubic::SolveStats::default(),
+                    &mut work,
+                );
+                // Both public coordinate APIs document None as unsupported,
+                // which the full collector routes through its charged oracle.
+                assert_eq!(dense, fast, "p={p} d={d}");
+                assert!(work.krylov.completed + work.krylov.dense_fallbacks <= 1);
+                if fast.is_some() && work.quotient_dimension_total > 0 {
+                    assert_eq!(work.krylov.completed + work.krylov.dense_fallbacks, 1);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn observed_unsupported_coordinate_case_keeps_the_exact_group_fallback() {
+        let inst = cubic::generate_instance3(7, 3);
+        let pre = cubic::SymmetrisedS4::precompute(&inst.curve);
+        let base = cubic::SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(3));
+        let c = &inst.curve;
+        let r = c.mul(&c.g, 171);
+        let mut native = cubic::S4F4Stats::default();
+        assert!(cubic::solve_s4_f4_krylov(
+            &inst,
+            &pre,
+            &r.x,
+            &mut StdRng::seed_from_u64(91),
+            &mut cubic::SolveStats::default(),
+            &mut native
+        )
+        .is_none());
+        assert_eq!(native.unsupported_quotients, 1);
+        let mut stats = cubic::SolveStats::default();
+        let got = cubic::subspace_triple_oracle_groebner(
+            &inst,
+            &base,
+            &pre,
+            &r,
+            &mut StdRng::seed_from_u64(91),
+            &mut stats,
+        );
+        let mut expected = Vec::new();
+        for i in 0..base.len() {
+            for j in i..base.len() {
+                for k in j..base.len() {
+                    for si in [1, -1] {
+                        for sj in [1, -1] {
+                            for sk in [1, -1] {
+                                let sum = c.add(
+                                    &c.add(
+                                        &c.mul_signed(&base.points[i], si),
+                                        &c.mul_signed(&base.points[j], sj),
+                                    ),
+                                    &c.mul_signed(&base.points[k], sk),
+                                );
+                                if sum == r {
+                                    let mut row = std::collections::BTreeMap::<usize, i64>::new();
+                                    for (index, sign) in [(i, si), (j, sj), (k, sk)] {
+                                        *row.entry(index).or_default() += sign;
+                                    }
+                                    expected.push(
+                                        row.into_iter()
+                                            .filter(|(_, s)| *s != 0)
+                                            .collect::<Vec<_>>(),
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        expected.sort();
+        expected.dedup();
+        assert_eq!(got, expected);
+        assert!(stats.fp_muls > 0);
+    }
+
+    #[test]
+    fn sparse_and_dense_graph_pipelines_recover_the_same_relation_prefix() {
+        let inst = cubic::generate_instance3(19, 11);
+        let base = cubic::SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(11));
+        let opts = cubic::GaudryOptions {
+            solver: cubic::Solver::F4Krylov,
+            small_base: 2,
+            max_large_primes: 2,
+            max_residuals: 10000,
+            ..cubic::GaudryOptions::default()
+        };
+        let fast = cubic::run_gaudry_with_sampler(
+            &inst,
+            &base,
+            11,
+            &opts,
+            cubic::LargePrimeBackend::SymbolicGraph,
+            cubic::ResidualSampler3::RAddingLong,
+        );
+        let pivot = cubic::run_gaudry_with_sampler(
+            &inst,
+            &base,
+            11,
+            &opts,
+            cubic::LargePrimeBackend::Pivot,
+            cubic::ResidualSampler3::RAddingLong,
+        );
+        let dense = cubic::run_gaudry_with_sampler(
+            &inst,
+            &base,
+            11,
+            &cubic::GaudryOptions {
+                solver: cubic::Solver::F4Groebner,
+                ..opts
+            },
+            cubic::LargePrimeBackend::SymbolicGraph,
+            cubic::ResidualSampler3::RAddingLong,
+        );
+        for r in [&fast, &pivot, &dense] {
+            assert_eq!(r.correct, Some(true));
+        }
+        assert_eq!(fast.lp_input_digest, pivot.lp_input_digest);
+        assert_eq!(fast.lp_input_digest, dense.lp_input_digest);
+        assert_eq!(fast.residuals, dense.residuals);
+    }
+
     #[test]
     fn quotient_bounds_and_reference_root_checks_are_exact() {
         let p = 7;

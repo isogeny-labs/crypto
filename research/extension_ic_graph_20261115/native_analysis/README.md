@@ -33,3 +33,16 @@ residual counts and recovered scalars across arithmetic implementations while
 allowing different field-work counts. Per-oracle SVGs accompany the complete
 plot. Numerical estimator assertions use a floating-point
 tolerance; scientific acceptance thresholds are unchanged. [pcc:unverified]
+
+The companion `s4-component-analysis` executable preserves the original
+`s4-f4-component` basis-only protocol. With an explicit
+`driver_kind: "s4-krylov-component"` plan it accepts the separate
+`gaudry.cubic.s4-extraction/v1` schema, dense/krylov A/A arms, and complete
+coordinate outputs. It requires ordered start/completion records and matches
+every output to the dense qualifier, including empty lists. The new metric is
+`complete_krylov_over_dense`; it is never labelled a basis-only result. First
+measured native work signatures accompany each case. The same command shape
+`RAW PLAN NEW-OUTPUT-DIR` emits JSON plus per-field native Plotters SVGs.
+Three companion tests include mismatched outputs and missing start records;
+the original08summary remains byte-identical under the extended analyzer.
+These are producer checks, not signed independent validation. [pcc:unverified]

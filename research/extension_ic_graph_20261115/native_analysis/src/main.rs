@@ -497,6 +497,9 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
         .build_cartesian_2d(0f64..strata.len().max(1) as f64, (min..max).log_scale())?;
     chart
         .configure_mesh()
+        .y_labels(6)
+        .max_light_lines(2)
+        .y_label_formatter(&|v| format!("{v:.2}"))
         .x_labels(0)
         .x_label_style(("sans-serif", 11))
         .y_desc("ratio, log scale (lower costs less)")
@@ -513,6 +516,7 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
             "PairOnly" => "Pair",
             "SymmetricPairOnly" => "Symmetric pair",
             "PreparedSymmetricPairOnly" => "Prepared pair",
+            "F4Krylov" => "F4 sparse FGLM",
             "F4Groebner" => "Native F4",
             "SymmetricMeetInTheMiddle" => "Symmetric triple",
             other => other,

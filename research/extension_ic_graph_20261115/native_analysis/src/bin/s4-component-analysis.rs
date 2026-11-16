@@ -47,6 +47,17 @@ fn positive(row: &Value, name: &str) -> Result<f64, Box<dyn Error>> {
         .ok_or_else(|| format!("invalid {name}").into())
 }
 fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Value, Box<dyn Error>> {
+    let extraction = plan["driver_kind"] == "s4-krylov-component";
+    let arms = if extraction {
+        ["dense_a", "krylov_a", "dense_b", "krylov_b"]
+    } else {
+        ARMS
+    };
+    let schema = if extraction {
+        "gaudry.cubic.s4-extraction/v1"
+    } else {
+        "gaudry.cubic.s4-component/v1"
+    };
     let source = plan["source_revision"]
         .as_str()
         .filter(|s| s.len() == 40)
@@ -75,8 +86,10 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
     let mut fixtures = BTreeMap::<Fixture, Value>::new();
     let mut executions = BTreeMap::<Key, Value>::new();
     let mut actual = Vec::new();
+    let mut starts = Vec::new();
+    let mut in_flight = None;
     for row in rows {
-        if row["source_revision"] != source || row["schema"] != "gaudry.cubic.s4-component/v1" {
+        if row["source_revision"] != source || row["schema"] != schema {
             problems.push("source/schema mismatch".to_owned());
         }
         let base = (
@@ -105,6 +118,10 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                     row["round"].as_u64().ok_or("round missing")?,
                     row["arm"].as_str().ok_or("arm missing")?.to_owned(),
                 );
+                if extraction && in_flight.take().as_ref() != Some(&key) {
+                    problems
+                        .push("completion lacks matching immediately preceding start".to_owned());
+                }
                 actual.push(key.clone());
                 if row["batch_iterations"] != plan["batch_iterations"]
                     || row["f4_max_degree"] != plan["f4_max_degree"]
@@ -116,6 +133,23 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                     problems.push(format!("duplicate execution {key:?}"));
                 }
             }
+            Some("execution_start") if extraction => {
+                let key = (
+                    base.0,
+                    base.1,
+                    base.2,
+                    row["phase"]
+                        .as_str()
+                        .ok_or("start phase missing")?
+                        .to_owned(),
+                    row["round"].as_u64().ok_or("start round missing")?,
+                    row["arm"].as_str().ok_or("start arm missing")?.to_owned(),
+                );
+                if in_flight.replace(key.clone()).is_some() {
+                    problems.push("new start precedes completion of previous batch".to_owned());
+                }
+                starts.push(key);
+            }
             _ => problems.push("unexpected raw record type".to_owned()),
         }
     }
@@ -125,7 +159,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
             for ordinal in 0..residuals {
                 for (phase, count) in [("warmup", warmups), ("measurement", rounds)] {
                     for round in 0..count {
-                        let mut arms = ARMS;
+                        let mut arms = arms;
                         if round % 2 == 1 {
                             arms.reverse();
                         }
@@ -147,6 +181,14 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
     if actual.len() > expected.len() || actual != expected[..actual.len().min(expected.len())] {
         problems.push("frozen execution order differs".to_owned());
     }
+    if extraction
+        && (starts.len() > expected.len()
+            || starts != expected[..starts.len().min(expected.len())]
+            || starts.len() < actual.len()
+            || starts.len() > actual.len() + 1)
+    {
+        problems.push("execution start/completion order differs".to_owned());
+    }
     let mut cases = Vec::new();
     for p in primes {
         for seed in seeds {
@@ -163,7 +205,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                 let mut completed = 0;
                 for (phase, count) in [("warmup", warmups), ("measurement", rounds)] {
                     for round in 0..count {
-                        let block: Vec<_> = ARMS
+                        let block: Vec<_> = arms
                             .iter()
                             .filter_map(|arm| {
                                 executions.get(&(
@@ -186,6 +228,11 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                                 && fixture.is_some_and(|f| {
                                     !f["input_digest"].is_null()
                                         && f["input_digest"] == r["input_digest"]
+                                        && (!extraction
+                                            || (!f["qualified_triples"].is_null()
+                                                && r["signature"][0] == f["qualified_triples"]
+                                                && r["output_kind"]
+                                                    == "complete_S4_coordinate_solve"))
                                 })
                         }) && block[0]["signature"] == block[2]["signature"]
                             && block[1]["signature"] == block[3]["signature"];
@@ -224,32 +271,78 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                 }
                 let estimate = estimate(&ratios, 20261115);
                 let eligible = reasons.is_empty() && completed == rounds;
-                cases.push(json!({"p":p,"seed":seed,"ordinal":ordinal,"complete_rounds":completed,
+                let mut case = json!({"p":p,"seed":seed,"ordinal":ordinal,"complete_rounds":completed,
             "basis_phase_over_complete_reference":estimate,"eligible_local_controlled_comparison":eligible,
             "invalid_reasons":reasons,"median_macaulay_aa":mc_control,"median_f4_aa":f4_control,
             "basis_phase_upper_below_half":eligible && estimate["bootstrap_95"][1].as_f64().is_some_and(|v|v<0.5),
-            "pipeline_or_rho_improvement_claim":false}));
+            "pipeline_or_rho_improvement_claim":false});
+                if extraction {
+                    let o = case.as_object_mut().unwrap();
+                    o.remove("basis_phase_over_complete_reference");
+                    o.remove("basis_phase_upper_below_half");
+                    o.remove("median_macaulay_aa");
+                    o.remove("median_f4_aa");
+                    o.insert("complete_krylov_over_dense".into(), estimate.clone());
+                    o.insert("median_dense_aa".into(), json!(mc_control));
+                    o.insert("median_krylov_aa".into(), json!(f4_control));
+                    o.insert(
+                        "complete_phase_upper_below_one".into(),
+                        json!(
+                            eligible
+                                && estimate["bootstrap_95"][1].as_f64().is_some_and(|v| v < 1.)
+                        ),
+                    );
+                    for (name, arm) in [
+                        ("first_measured_dense", "dense_a"),
+                        ("first_measured_krylov", "krylov_a"),
+                    ] {
+                        let first = executions.get(&(
+                            base.0,
+                            base.1,
+                            base.2,
+                            "measurement".to_owned(),
+                            0,
+                            arm.to_owned(),
+                        ));
+                        o.insert(
+                            name.into(),
+                            first.map(|r| r["signature"].clone()).unwrap_or(Value::Null),
+                        );
+                    }
+                }
+                cases.push(case);
             }
         }
     }
     let invalid_batches = executions.values().filter(|r| r["valid"] != true).count();
-    Ok(
-        json!({"schema":"gaudry.cubic.s4-component-analysis/v1","source_revision":source,"global_problems":problems,
+    let mut result = json!({"schema":"gaudry.cubic.s4-component-analysis/v1","source_revision":source,"global_problems":problems,
         "planned_execution_batches":expected.len(),"retained_execution_batches":actual.len(),"invalid_or_capped_batches":invalid_batches,
         "cases":cases,"boundary":"eight-call engine batches; F4 basis only versus full reference coordinate solve, extraction missing",
-        "no_pipeline_or_rho_claim":true,"interval_scope":"deterministic paired-round bootstrap; fixed inputs, no independent-curve inference"}),
-    )
+        "no_pipeline_or_rho_claim":true,"interval_scope":"deterministic paired-round bootstrap; fixed inputs, no independent-curve inference"});
+    if extraction {
+        result["schema"] = json!("gaudry.cubic.s4-extraction-analysis/v1");
+        result["boundary"] = json!("complete native F4 basis/border/extraction engine batches; shared symbolic preparation/input generation/qualification excluded and reported");
+        result["attempted_execution_batches"] = json!(starts.len());
+        result["in_flight_batches_without_completion"] =
+            json!(starts.len().saturating_sub(actual.len()));
+    }
+    Ok(result)
 }
 
 fn plot(summary: &Value, p: u64, path: &Path) -> Result<(), Box<dyn Error>> {
+    let extraction = summary["schema"] == "gaudry.cubic.s4-extraction-analysis/v1";
+    let metric = if extraction {
+        "complete_krylov_over_dense"
+    } else {
+        "basis_phase_over_complete_reference"
+    };
     let cases: Vec<_> = summary["cases"]
         .as_array()
         .unwrap()
         .iter()
         .filter(|r| r["p"] == p)
         .collect();
-    let ratio =
-        |r: &&Value, i: usize| r["basis_phase_over_complete_reference"]["bootstrap_95"][i].as_f64();
+    let ratio = |r: &&Value, i: usize| r[metric]["bootstrap_95"][i].as_f64();
     let lo = cases
         .iter()
         .filter_map(|r| ratio(r, 0))
@@ -264,7 +357,11 @@ fn plot(summary: &Value, p: u64, path: &Path) -> Result<(), Box<dyn Error>> {
     root.fill(&WHITE)?;
     let mut chart = ChartBuilder::on(&root)
         .caption(
-            format!("p{p}: F4 basis phase / complete S4 coordinate solve"),
+            if extraction {
+                format!("p{p}: complete native F4 Krylov / dense coordinate solve")
+            } else {
+                format!("p{p}: F4 basis phase / complete S4 coordinate solve")
+            },
             ("sans-serif", 24),
         )
         .margin(20)
@@ -273,7 +370,11 @@ fn plot(summary: &Value, p: u64, path: &Path) -> Result<(), Box<dyn Error>> {
         .build_cartesian_2d(0f64..cases.len().max(1) as f64, (lo..hi).log_scale())?;
     chart
         .configure_mesh()
-        .y_desc("batch wall ratio; extraction still missing")
+        .y_desc(if extraction {
+            "complete coordinate engine batch wall ratio"
+        } else {
+            "batch wall ratio; extraction still missing"
+        })
         .y_labels(6)
         .max_light_lines(2)
         .y_label_formatter(&|v| format!("{v:.2}"))
@@ -292,7 +393,7 @@ fn plot(summary: &Value, p: u64, path: &Path) -> Result<(), Box<dyn Error>> {
                 .into_text_style(&root)
                 .pos(Pos::new(HPos::Center, VPos::Top)),
         ))?;
-        let v = &r["basis_phase_over_complete_reference"];
+        let v = &r[metric];
         if let (Some(mean), Some(a), Some(b)) = (
             v["geometric_mean"].as_f64(),
             v["bootstrap_95"][0].as_f64(),
@@ -311,7 +412,7 @@ fn plot(summary: &Value, p: u64, path: &Path) -> Result<(), Box<dyn Error>> {
             chart.draw_series([PathElement::new([(x, a), (x, b)], BLACK)])?;
         }
     }
-    root.draw(&Text::new("Green: locally controlled; gray: retained invalid/incomplete. Basis time is a lower bound, never a pipeline win.",(80,580),("sans-serif",15)))?;
+    root.draw(&Text::new(if extraction { "Green: locally controlled; gray: retained invalid/incomplete. Complete coordinate phase; shared setup excluded." } else { "Green: locally controlled; gray: retained invalid/incomplete. Basis time is a lower bound, never a pipeline win." },(80,580),("sans-serif",15)))?;
     root.present()?;
     Ok(())
 }
@@ -353,6 +454,60 @@ fn main() -> Result<(), Box<dyn Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn extraction_requires_start_records_and_equal_complete_outputs() {
+        let source = "1234567890123456789012345678901234567890";
+        let plan = json!({"driver_kind":"s4-krylov-component","source_revision":source,
+            "primes":[127],"seeds":[83],"residuals_per_instance":1,"rounds":5,"warmup_rounds":1,
+            "aa_tolerance":1.1,"batch_iterations":2,"f4_max_degree":24,"f4_deadline_ms":0});
+        let fixture = json!({"schema":"gaudry.cubic.s4-extraction/v1","record_type":"fixture",
+            "source_revision":source,"p":127,"seed":83,"ordinal":0,"input_digest":"same","qualified_triples":[[1,2,3]]});
+        let mut rows = vec![fixture];
+        for (phase, count) in [("warmup", 1), ("measurement", 5)] {
+            for round in 0..count {
+                let mut arms = ["dense_a", "krylov_a", "dense_b", "krylov_b"];
+                if round % 2 == 1 {
+                    arms.reverse();
+                }
+                for arm in arms {
+                    let base = json!({"schema":"gaudry.cubic.s4-extraction/v1","record_type":"execution_start",
+                        "source_revision":source,"p":127,"seed":83,"ordinal":0,"phase":phase,"round":round,"arm":arm});
+                    rows.push(base.clone());
+                    let mut completed = base;
+                    completed["record_type"] = json!("execution");
+                    completed["batch_iterations"] = json!(2);
+                    completed["f4_max_degree"] = json!(24);
+                    completed["f4_deadline_ms"] = json!(0);
+                    completed["valid"] = json!(true);
+                    completed["intra_batch_consistent"] = json!(true);
+                    completed["input_digest"] = json!("same");
+                    completed["output_kind"] = json!("complete_S4_coordinate_solve");
+                    completed["signature"] = json!([
+                        [[1, 2, 3]],
+                        if arm.starts_with("krylov") { 20 } else { 100 }
+                    ]);
+                    completed["phase_wall_ns"] =
+                        json!(if arm.starts_with("krylov") { 20 } else { 100 });
+                    rows.push(completed);
+                }
+            }
+        }
+        let good = analyze(&plan, rows.clone(), 0).unwrap();
+        assert_eq!(good["cases"][0]["complete_phase_upper_below_one"], true);
+        assert_eq!(good["attempted_execution_batches"], 24);
+        assert!(good["cases"][0]["basis_phase_over_complete_reference"].is_null());
+        rows[4]["signature"][0] = json!([[1, 2, 4]]);
+        assert_eq!(
+            analyze(&plan, rows.clone(), 0).unwrap()["cases"][0]
+                ["eligible_local_controlled_comparison"],
+            false
+        );
+        rows.remove(1);
+        assert!(!analyze(&plan, rows, 0).unwrap()["global_problems"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+    }
     #[test]
     fn bootstrap_and_incomplete_cohorts_cannot_claim_a_pipeline_win() {
         let e = estimate(&[2f64.ln(); 5], 7);
