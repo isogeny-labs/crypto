@@ -9,7 +9,8 @@
 //! No interpolation, summation polynomial, or factor-base enumeration occurs
 //! in the finite-target candidate. The default is schoolbook arithmetic;
 //! explicit polynomial backends add Karatsuba and Newton division. Classical
-//! short-quotient Euclidean GCD remains quadratic in the worst case.
+//! short-quotient Euclid is retained as a reference; HalfGcd also batches
+//! quotient steps through recursive polynomial reduction matrices.
 //! small input degrees do not imply a small elimination/last-fall degree.
 //! This is public-data research code, not constant-time cryptographic code.
 //! Prime moduli are a caller precondition, not proved by these constructors.
@@ -113,6 +114,10 @@ pub struct Work {
     pub membership_lookups: u64,
     pub karatsuba_nodes: u64,
     pub newton_divisions: u64,
+    pub half_gcd_nodes: u64,
+    pub half_gcd_batches: u64,
+    pub rational_map_steps: u64,
+    pub certified_fibers: u64,
 }
 
 /// Explicit arithmetic choices; the historical constructor remains schoolbook.
@@ -124,6 +129,7 @@ pub enum PolynomialBackend {
     Schoolbook,
     Karatsuba,
     KaratsubaNewton,
+    HalfGcd,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -151,6 +157,11 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub type Point<E> = Option<(E, E)>;
 pub type Relation<E> = ((E, E), (E, E));
 type Poly<E> = Vec<E>;
+type PolyMatrix<E> = [[Poly<E>; 2]; 2];
+
+#[path = "vieta_coset/rational_tower.rs"]
+mod rational_tower;
+pub use rational_tower::{RationalMap, SplitTower};
 
 /// One independently budgeted stage. Operation limits are checked at loop
 /// boundaries, including each dense multiplication row and division step.
@@ -395,8 +406,10 @@ impl<F: PrimeField> Arithmetic<F> {
         if r.len() < b.len() {
             return Ok((vec![self.zero()], r));
         }
-        if self.polynomials == PolynomialBackend::KaratsubaNewton
-            && b.len() >= 32
+        if matches!(
+            self.polynomials,
+            PolynomialBackend::KaratsubaNewton | PolynomialBackend::HalfGcd
+        ) && b.len() >= 32
             && r.len() - b.len() + 1 >= 32
         {
             return self.divrem_newton(&r, &b);
@@ -451,6 +464,15 @@ impl<F: PrimeField> Arithmetic<F> {
     fn gcd(&self, a: &[F::E], b: &[F::E]) -> Result<Poly<F::E>> {
         let (mut a, mut b) = (self.trim(a.to_vec()), self.trim(b.to_vec()));
         while !self.is_zero(&b) {
+            self.check()?;
+            if self.polynomials == PolynomialBackend::HalfGcd && b.len() > 64 && a.len() > b.len() {
+                self.count(|w| w.half_gcd_batches += 1);
+                let matrix = self.half_gcd(&a, &b)?;
+                (a, b) = self.matrix_apply(&matrix, &a, &b)?;
+                if self.is_zero(&b) {
+                    break;
+                }
+            }
             let r = self.divrem(&a, &b)?.1;
             a = b;
             b = r;
@@ -459,6 +481,82 @@ impl<F: PrimeField> Arithmetic<F> {
             return Ok(a);
         }
         Ok(self.pscale(&a, &self.inv(a.last().unwrap())?))
+    }
+    fn matrix_identity(&self) -> PolyMatrix<F::E> {
+        [
+            [vec![self.one()], vec![self.zero()]],
+            [vec![self.zero()], vec![self.one()]],
+        ]
+    }
+    fn matrix_apply(
+        &self,
+        m: &PolyMatrix<F::E>,
+        a: &[F::E],
+        b: &[F::E],
+    ) -> Result<(Poly<F::E>, Poly<F::E>)> {
+        Ok((
+            self.padd(&self.pmul(&m[0][0], a)?, &self.pmul(&m[0][1], b)?),
+            self.padd(&self.pmul(&m[1][0], a)?, &self.pmul(&m[1][1], b)?),
+        ))
+    }
+    fn matrix_product(
+        &self,
+        a: &PolyMatrix<F::E>,
+        b: &PolyMatrix<F::E>,
+    ) -> Result<PolyMatrix<F::E>> {
+        let mut out = self.matrix_identity();
+        for i in 0..2 {
+            for j in 0..2 {
+                out[i][j] = self.padd(
+                    &self.pmul(&a[i][0], &b[0][j])?,
+                    &self.pmul(&a[i][1], &b[1][j])?,
+                );
+            }
+        }
+        Ok(out)
+    }
+    fn matrix_euclid_step(&self, m: PolyMatrix<F::E>, q: &[F::E]) -> Result<PolyMatrix<F::E>> {
+        Ok([
+            m[1].clone(),
+            [
+                self.psub_direct(&m[0][0], &self.pmul(q, &m[1][0])?),
+                self.psub_direct(&m[0][1], &self.pmul(q, &m[1][1])?),
+            ],
+        ])
+    }
+    fn high_part(&self, a: &[F::E], shift: usize) -> Poly<F::E> {
+        self.trim(a.get(shift..).unwrap_or(&[]).to_vec())
+    }
+    /// Forward matrix H: H*(a,b) gives consecutive Euclidean remainders
+    /// with deg(second)<floor(len(a)/2). FLINT uses the inverse convention.
+    fn half_gcd(&self, a: &[F::E], b: &[F::E]) -> Result<PolyMatrix<F::E>> {
+        self.check()?;
+        self.count(|w| w.half_gcd_nodes += 1);
+        let half = a.len() / 2;
+        if self.is_zero(b) || b.len() <= half {
+            return Ok(self.matrix_identity());
+        }
+        if a.len() <= 64 {
+            let (mut c, mut d) = (a.to_vec(), b.to_vec());
+            let mut matrix = self.matrix_identity();
+            while !self.is_zero(&d) && d.len() > half {
+                let (q, r) = self.divrem(&c, &d)?;
+                matrix = self.matrix_euclid_step(matrix, &q)?;
+                c = d;
+                d = r;
+            }
+            return Ok(matrix);
+        }
+        let first = self.half_gcd(&self.high_part(a, half), &self.high_part(b, half))?;
+        let (c, d) = self.matrix_apply(&first, a, b)?;
+        if self.is_zero(&d) || d.len() <= half {
+            return Ok(first);
+        }
+        let shift = 2 * half + 1 - d.len();
+        let (q, r) = self.divrem(&c, &d)?;
+        let first = self.matrix_euclid_step(first, &q)?;
+        let second = self.half_gcd(&self.high_part(&d, shift), &self.high_part(&r, shift))?;
+        self.matrix_product(&second, &first)
     }
     fn powmod(&self, a: &[F::E], e: &BigUint, f: &[F::E]) -> Result<Poly<F::E>> {
         let a = self.divrem(a, f)?.1;
@@ -956,6 +1054,66 @@ mod tests {
             (BigUint::from(1u8) << 224) - (BigUint::from(1u8) << 96) + 1u8,
         ));
     }
+    fn half_gcd_cases<F: PrimeField + Clone>(field: F) {
+        let fast = Arithmetic::new(field.clone(), Limits::default())
+            .unwrap()
+            .with_polynomials(PolynomialBackend::HalfGcd);
+        let slow = Arithmetic::new(field, Limits::default()).unwrap();
+        let mut seed = 0x48474344;
+        for n in [2usize, 31, 63, 64, 65, 66, 127, 128, 129, 255, 256, 257] {
+            for gap in [1, 2, n / 2, n - 1].into_iter().filter(|gap| *gap < n) {
+                let mut a: Vec<_> = (0..n).map(|_| fast.random_element(&mut seed)).collect();
+                let mut b: Vec<_> = (0..n - gap)
+                    .map(|_| fast.random_element(&mut seed))
+                    .collect();
+                *a.last_mut().unwrap() = fast.one();
+                *b.last_mut().unwrap() = fast.one();
+                let h = fast.half_gcd(&a, &b).unwrap();
+                let (c, d) = fast.matrix_apply(&h, &a, &b).unwrap();
+                let (mut x, mut y) = (a.clone(), b.clone());
+                while !slow.is_zero(&y) && y.len() > n / 2 {
+                    let r = slow.divrem(&x, &y).unwrap().1;
+                    x = y;
+                    y = r;
+                }
+                assert_eq!(
+                    (c, d),
+                    (x, y),
+                    "matrix must reproduce exact consecutive remainders"
+                );
+                let determinant = slow.psub_direct(
+                    &naive_product(&slow.field, &h[0][0], &h[1][1]),
+                    &naive_product(&slow.field, &h[0][1], &h[1][0]),
+                );
+                assert!(
+                    determinant == vec![slow.one()] || determinant == vec![slow.neg(&slow.one())]
+                );
+                assert_eq!(fast.gcd(&a, &b).unwrap(), slow.gcd(&a, &b).unwrap());
+                let factor = vec![fast.n(3), fast.zero(), fast.one()];
+                let a = naive_product(&fast.field, &a, &factor);
+                let b = naive_product(&fast.field, &b, &factor);
+                assert_eq!(fast.gcd(&a, &b).unwrap(), slow.gcd(&a, &b).unwrap());
+            }
+        }
+        for (a, b) in [
+            (vec![], vec![]),
+            (vec![fast.one()], vec![]),
+            (vec![fast.zero(); 129], vec![fast.one()]),
+            (vec![fast.one(); 129], vec![fast.one(); 129]),
+        ] {
+            assert_eq!(fast.gcd(&a, &b).unwrap(), slow.gcd(&a, &b).unwrap());
+        }
+        assert!(fast.work().half_gcd_batches > 0);
+        assert!(fast.work().half_gcd_nodes > fast.work().half_gcd_batches);
+    }
+    #[test]
+    fn half_gcd_matches_literal_euclidean_matrices_and_gcd() {
+        half_gcd_cases(WordField(65537));
+        half_gcd_cases(WideField(BigUint::from(65537u64)));
+        half_gcd_cases(WideField(
+            (BigUint::from(1u8) << 224) - (BigUint::from(1u8) << 96) + 1u8,
+        ));
+    }
     #[test]
     fn polynomial_backends_preserve_complete_relations_and_budgets() {
         for (p, a, b, m) in [(97, 2, 3, 32), (257, 1, 1, 128)] {
@@ -974,6 +1132,7 @@ mod tests {
                     PolynomialBackend::Schoolbook,
                     PolynomialBackend::Karatsuba,
                     PolynomialBackend::KaratsubaNewton,
+                    PolynomialBackend::HalfGcd,
                 ] {
                     let candidate = context(p).with_polynomials(mode);
                     assert_eq!(

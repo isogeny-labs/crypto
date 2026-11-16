@@ -1,6 +1,75 @@
 use serde_json::Value;
 use std::process::Command;
 
+#[test]
+fn next_comparison_charges_construction_and_rejects_replay_tampering() {
+    let bin = env!("CARGO_BIN_EXE_vieta-next-compare");
+    assert_eq!(
+        Command::new(bin)
+            .env_remove("VIETA_ISOLATED_RUN")
+            .args(["bench", "coset", "word62", "32", "2", "0", "10", "v1"])
+            .output()
+            .unwrap()
+            .status
+            .code(),
+        Some(2)
+    );
+    for kind in ["coset", "rational"] {
+        let out = Command::new(bin)
+            .args(["check", kind, "word62", "8", "2", "0", "10", "v1"])
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "{}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        let mut rows: Vec<Value> = String::from_utf8(out.stdout)
+            .unwrap()
+            .lines()
+            .map(|s| serde_json::from_str(s).unwrap())
+            .collect();
+        let q: Vec<_> = rows.iter().filter(|r| r["kind"] == "query").collect();
+        assert_eq!(q.len(), 10);
+        for r in q {
+            assert_eq!(r["status"], "ok");
+            assert!(r["elapsed_ns"].is_null());
+            assert_eq!(
+                r["work"]["muls"].as_u64().unwrap(),
+                r["query_work"]["muls"].as_u64().unwrap()
+                    + r["construction_work"]["muls"].as_u64().unwrap()
+            );
+        }
+        let path =
+            std::env::temp_dir().join(format!("vieta-next-{}-{kind}.jsonl", std::process::id()));
+        std::fs::write(
+            &path,
+            rows.iter().map(|r| format!("{r}\n")).collect::<String>(),
+        )
+        .unwrap();
+        assert!(Command::new(bin)
+            .args(["replay", path.to_str().unwrap()])
+            .output()
+            .unwrap()
+            .status
+            .success());
+        rows.iter_mut().find(|r| r["kind"] == "query").unwrap()["result_sha256"] =
+            Value::String("00".repeat(32));
+        std::fs::write(
+            &path,
+            rows.iter().map(|r| format!("{r}\n")).collect::<String>(),
+        )
+        .unwrap();
+        assert!(!Command::new(bin)
+            .args(["replay", path.to_str().unwrap()])
+            .output()
+            .unwrap()
+            .status
+            .success());
+        std::fs::remove_file(path).unwrap();
+    }
+}
+
 fn check_rows() -> Vec<Value> {
     let output = Command::new(env!("CARGO_BIN_EXE_vieta-coset-lab"))
         .args(["check", "word17", "8", "2", "30", "three"])
