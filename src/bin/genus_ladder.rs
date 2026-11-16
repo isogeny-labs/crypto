@@ -397,6 +397,16 @@ fn main() -> ExitCode {
                         gl::IcExt {
                             coord_square: true,
                             unit_t: false,
+                            ferrari: false,
+                        },
+                    ),
+                    'f' => (
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: true,
+                            ferrari: true,
                         },
                     ),
                     'w' => (
@@ -405,6 +415,7 @@ fn main() -> ExitCode {
                         gl::IcExt {
                             coord_square: true,
                             unit_t: true,
+                            ferrari: false,
                         },
                     ),
                     'R' | 'P' => {
@@ -475,14 +486,16 @@ fn main() -> ExitCode {
                     let mut rec = head.clone();
                     rec["kind"] = json!("run");
                     rec["arm"] = json!(format!(
-                        "{}{}{}{}{}",
+                        "{}{}{}{}{}{}",
                         o.arm,
                         if pre { "+pre" } else { "" },
                         if ext.coord_square { "+coord" } else { "" },
                         if ext.unit_t { "+unitT" } else { "" },
+                        if ext.ferrari { "+ferrari" } else { "" },
                         suffix
                     ));
                     rec["la_fallbacks"] = json!(o.la_fallbacks);
+                    rec["ferrari_undecided"] = json!(o.ferrari_undecided);
                     rec["certified"] = json!(o.certified);
                     rec["exhausted"] = json!(o.exhausted);
                     rec["ok"] = json!(o.recovered == Some(inst.t_secret));

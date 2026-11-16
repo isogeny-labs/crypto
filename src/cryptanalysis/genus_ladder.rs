@@ -51,8 +51,8 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    addm, build_rows, combine, mulmod, peel, split_order, subm, wiedemann, wiedemann_coord, Dsu,
-    Nat, Rel, Row, REL_FB,
+    addm, build_rows, combine, mulmod, pa, peel, pm, ppow, ps, split_order, subm, wiedemann,
+    wiedemann_coord, CubicOracle, Dsu, Nat, Rel, Row, REL_FB,
 };
 use super::ic_boundary::{
     invmod, pivot_inversion_steps, rho_reference_walk, CountedGroup, GroupOps, RhoWalk,
@@ -1253,6 +1253,8 @@ pub struct IcResult {
     pub attempts: u32,
     /// [`IcExt::coord_square`] solves that returned nothing and fell back.
     pub la_fallbacks: u32,
+    /// Candidates the Ferrari test left undecided (baseline test run).
+    pub ferrari_undecided: u64,
     pub wall_ns: u64,
 }
 
@@ -1273,6 +1275,95 @@ pub fn restart_sqrt(r: u64) -> u64 {
     (((r as f64).sqrt() / 2.0) as u64).clamp(16, RESTART)
 }
 
+/// Ferrari splitting test for a monic quartic `u = x⁴ + c₃x³ + c₂x² + c₁x + c₀`
+/// whose discriminant is already known to be a non-zero square (the parity
+/// prefilter passed).  For such a squarefree quartic Frobenius is the
+/// identity, a (2,2) or a (3,1) permutation of the roots.
+///
+/// * The resolvent cubic `R(z) = z³ − c₂z² + (c₁c₃ − 4c₀)z − (c₁² + c₀c₃² − 4c₀c₂)`
+///   has the roots `x₁x₂ + x₃x₄`, `x₁x₃ + x₂x₄`, `x₁x₄ + x₂x₃`; (3,1) permutes
+///   them cyclically, the identity and (2,2) fix them.  `disc R = disc u`, so
+///   the Cardano–Lucas cubic test decides (3,1) (not split) without any
+///   polynomial exponentiation.
+/// * Otherwise one root `θ` of `R` gives `b₁, b₂` (roots of `z² − θz + c₀`) and
+///   `a₁ = (c₁ − c₃b₁)/(b₂ − b₁)`, `a₂ = c₃ − a₁` with
+///   `u = (x² + a₁x + b₁)(x² + a₂x + b₂)` when the pairing is rational.  For
+///   the identity every `θ` gives a square `θ² − 4c₀`; for (2,2) a non-square
+///   proves "not split", and a square leaves the two quadratic discriminants
+///   to decide.
+///
+/// Returns `Some(None)` (not split), `Some(Some(roots))` (split, the four
+/// roots) or `None` (undecided: the caller runs the baseline test).  Every
+/// native operation is counted in `n`.
+pub(crate) fn ferrari_split(
+    co: &CubicOracle,
+    p: u64,
+    u: &[u64],
+    n: &mut Nat,
+) -> Option<Option<Vec<u64>>> {
+    if u.len() != 5 || u[4] != 1 {
+        return None;
+    }
+    let (c0, c1, c2, c3) = (u[0], u[1], u[2], u[3]);
+    let four_c0 = pm(p, 4, c0, n);
+    let r2 = ps(p, 0, c2, n);
+    let r1 = ps(p, pm(p, c1, c3, n), four_c0, n);
+    let t = pa(
+        p,
+        pm(p, c1, c1, n),
+        ps(p, pm(p, c0, pm(p, c3, c3, n), n), pm(p, four_c0, c2, n), n),
+        n,
+    );
+    let r0 = ps(p, 0, t, n);
+    let res: Vec<u64> = vec![r0, r1, r2, 1];
+    let (splits, info) = co.split_cubic(&res, n)?;
+    if !splits {
+        return Some(None); // (3,1)
+    }
+    let roots = match info {
+        Some((tt, pp)) => co.cubic_roots(&res, tt, pp, n),
+        None => None,
+    }
+    .or_else(|| co.split_cubic_roots_det(&res, n))?;
+    let theta = roots[0];
+    let d = ps(p, pm(p, theta, theta, n), four_c0, n);
+    if d == 0 {
+        return None;
+    }
+    if ppow(p, d, (p - 1) / 2, n) != 1 {
+        return Some(None); // (2,2): this pairing is not rational
+    }
+    let s = co.sqrt(d, n);
+    let inv2 = p.div_ceil(2);
+    let b1 = pm(p, pa(p, theta, s, n), inv2, n);
+    let b2 = pm(p, ps(p, theta, s, n), inv2, n);
+    if b1 == b2 {
+        return None;
+    }
+    let den = ps(p, b2, b1, n);
+    let a1 = pm(p, ps(p, c1, pm(p, c3, b1, n), n), ppow(p, den, p - 2, n), n);
+    let a2 = ps(p, c3, a1, n);
+    if pa(p, pm(p, a1, a2, n), pa(p, b1, b2, n), n) != c2 {
+        return None;
+    }
+    let mut out = Vec::with_capacity(4);
+    for (a, b) in [(a1, b1), (a2, b2)] {
+        let dq = ps(p, pm(p, a, a, n), pm(p, 4, b, n), n);
+        if dq == 0 {
+            return None;
+        }
+        if ppow(p, dq, (p - 1) / 2, n) != 1 {
+            return Some(None); // an irreducible quadratic factor
+        }
+        let sq = co.sqrt(dq, n);
+        let na = ps(p, 0, a, n);
+        out.push(pm(p, pa(p, na, sq, n), inv2, n));
+        out.push(pm(p, ps(p, na, sq, n), inv2, n));
+    }
+    out.sort_unstable();
+    Some(Some(out))
+}
+
 /// Optional speed-ups ported from the genus-3 positive control
 /// (`research/ic_positive_control_{la,capped}_20261116`).  The default is
 /// the frozen instrument, count for count.
@@ -1288,6 +1379,10 @@ pub struct IcExt {
     /// `h · log T` (column −1) and the segment between restarts is capped at
     /// `max(64, ⌊√r / 16⌋)` so a segment never runs into its rho cycle.
     pub unit_t: bool,
+    /// Ferrari splitting test for quartics ([`ferrari_split`]) after the
+    /// parity prefilter, at genus 4; undecided cases fall back to the
+    /// baseline test.  Needs [`IcParams::prefilter`].
+    pub ferrari: bool,
 }
 
 /// Run one index-calculus arm on an instance.  The structure is
@@ -1364,6 +1459,8 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
         jumps.push((curve.add(&mut ops, ag, bt), a, b));
     }
     res.setup_ops = ops.adds + ops.doubles;
+    // Cardano–Lucas constants for the Ferrari test, charged to the relation phase.
+    let cubic = (ext.ferrari && g == 4 && p > 3).then(|| CubicOracle::new(p, &mut res.rel));
     let restart = if ext.unit_t {
         prm.restart.min((((r as f64).sqrt() / 16.0) as u64).max(64))
     } else {
@@ -1426,12 +1523,26 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
                 // Two factors of a quadratic with square discriminant.
                 decided = g == 2;
             }
-            if !decided && !splits_completely(p, &u, &mut res.rel) {
+            let mut fer_roots = None;
+            if let (Some(co), true) = (cubic.as_ref(), prm.prefilter && g == 4) {
+                match ferrari_split(co, p, &u, &mut res.rel) {
+                    Some(None) => continue,
+                    Some(Some(r)) => fer_roots = Some(r),
+                    None => res.ferrari_undecided += 1,
+                }
+            }
+            if fer_roots.is_none() && !decided && !splits_completely(p, &u, &mut res.rel) {
                 continue;
             }
             res.splits += 1;
-            let Some(roots) = roots_of(p, &u, &mut rng, &mut res.rel) else {
-                continue;
+            let roots = match fer_roots {
+                Some(r) => r,
+                None => {
+                    let Some(r) = roots_of(p, &u, &mut rng, &mut res.rel) else {
+                        continue;
+                    };
+                    r
+                }
             };
             let vc = curve.v_coeffs(&cur);
             let mut rel = Rel {
@@ -2103,14 +2214,17 @@ mod tests {
                 IcExt {
                     coord_square: true,
                     unit_t: false,
+                    ferrari: false,
                 },
                 IcExt {
                     coord_square: false,
                     unit_t: true,
+                    ferrari: false,
                 },
                 IcExt {
                     coord_square: true,
                     unit_t: true,
+                    ferrari: false,
                 },
             ] {
                 let x = run_ic_ext(&inst, prm, ext);
@@ -2121,6 +2235,7 @@ mod tests {
                     == (IcExt {
                         coord_square: true,
                         unit_t: false,
+                        ferrari: false,
                     })
                 {
                     assert_eq!(x.relations, base.relations);
@@ -2133,6 +2248,91 @@ mod tests {
     }
     use super::*;
     use crate::cryptanalysis::chained_transfer::hyper64::H64Curve;
+
+    /// Every monic quartic with a non-zero square discriminant over small
+    /// primes (both residue classes of p mod 3, with and without a
+    /// single-exponent cube root): a decided Ferrari answer equals brute
+    /// force, roots included, and most candidates are decided.
+    #[test]
+    fn ferrari_matches_brute_force_on_every_square_disc_quartic() {
+        for p in [5u64, 7, 11, 13, 17, 19, 23] {
+            let mut chi = vec![-1i8; p as usize];
+            chi[0] = 0;
+            for y in 1..=(p - 1) / 2 {
+                chi[(y * y % p) as usize] = 1;
+            }
+            let mut n = Nat::default();
+            let co = CubicOracle::new(p, &mut n);
+            let (mut decided, mut total) = (0u64, 0u64);
+            for c0 in 0..p {
+                for c1 in 0..p {
+                    for c2 in 0..p {
+                        for c3 in 0..p {
+                            let u = vec![c0, c1, c2, c3, 1];
+                            if disc_character(p, &u, &chi, &mut n) != 1 {
+                                continue;
+                            }
+                            total += 1;
+                            let truth: Vec<u64> = (0..p)
+                                .filter(|&x| {
+                                    (((((x + c3) % p * x + c2) % p) * x + c1) % p * x + c0) % p == 0
+                                })
+                                .collect();
+                            match ferrari_split(&co, p, &u, &mut n) {
+                                None => {}
+                                Some(None) => {
+                                    decided += 1;
+                                    assert_ne!(truth.len(), 4, "p={p} u={u:?} split but rejected");
+                                }
+                                Some(Some(r)) => {
+                                    decided += 1;
+                                    assert_eq!(r, truth, "p={p} u={u:?}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            assert!(
+                decided * 10 >= total * 9,
+                "p={p}: decided {decided} of {total}"
+            );
+        }
+    }
+
+    /// The Ferrari arm certifies at genus 4 and spends fewer relation-phase
+    /// multiplications per trial than the same arm without it.
+    #[test]
+    fn ferrari_arm_certifies_and_cuts_relation_work() {
+        for p in [131u64, 257] {
+            let inst = first_instance(p, 4);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, 4, 2.0),
+                seed: 9,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: true,
+                sge: None,
+            };
+            let base = IcExt {
+                coord_square: true,
+                unit_t: true,
+                ferrari: false,
+            };
+            let fer = IcExt {
+                ferrari: true,
+                ..base
+            };
+            let a = run_ic_ext(&inst, prm, base);
+            let b = run_ic_ext(&inst, prm, fer);
+            assert!(b.certified && b.bad_relations == 0, "p={p}");
+            assert_eq!(b.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+            let per = |x: &IcResult| x.rel.mul as f64 / x.trials as f64;
+            assert!(per(&b) < per(&a), "p={p}: {} vs {}", per(&b), per(&a));
+        }
+    }
 
     fn first_instance(p: u64, g: u32) -> Instance {
         for cs in 1..400u64 {

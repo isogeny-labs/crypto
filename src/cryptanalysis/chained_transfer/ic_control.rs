@@ -79,7 +79,7 @@ pub(crate) fn pa(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
     }
 }
 #[inline]
-fn ps(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
+pub(crate) fn ps(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
     n.add += 1;
     if a >= b {
         a - b
@@ -411,7 +411,7 @@ impl CubicOracle {
     }
 
     /// Square root of a square (Tonelli–Shanks, every product counted).
-    fn sqrt(&self, a: u64, n: &mut Nat) -> u64 {
+    pub(crate) fn sqrt(&self, a: u64, n: &mut Nat) -> u64 {
         let p = self.p;
         if a == 0 {
             return 0;
@@ -447,7 +447,7 @@ impl CubicOracle {
     /// (`u = [c, b, a, 1]`).  Returns the decision and, for a split cubic
     /// with `P' ≠ 0`, `(t, P')` for root finding.  `None` means "use the
     /// baseline" (`P' = 0`).
-    fn split_cubic(&self, u: &Poly, n: &mut Nat) -> Option<(bool, Option<(u64, u64)>)> {
+    pub(crate) fn split_cubic(&self, u: &Poly, n: &mut Nat) -> Option<(bool, Option<(u64, u64)>)> {
         let p = self.p;
         let (c, b, a) = (u[0], u[1], u[2]);
         let a2 = pm(p, a, a, n);
@@ -493,7 +493,7 @@ impl CubicOracle {
     /// Cardano cube root: the first shift `b` with
     /// `gcd(u, (x + b)^((p−1)/2) − 1)` of degree 1 or 2 splits `u`, and the
     /// quadratic part is solved by the quadratic formula.
-    fn split_cubic_roots_det(&self, u: &Poly, n: &mut Nat) -> Option<Vec<u64>> {
+    pub(crate) fn split_cubic_roots_det(&self, u: &Poly, n: &mut Nat) -> Option<Vec<u64>> {
         let p = self.p;
         let ctx = ModU {
             p,
@@ -521,7 +521,7 @@ impl CubicOracle {
     }
 
     /// Roots of a split monic cubic from the Lucas data, when `3 ∤ m`.
-    fn cubic_roots(&self, u: &Poly, t: u64, pp: u64, n: &mut Nat) -> Option<Vec<u64>> {
+    pub(crate) fn cubic_roots(&self, u: &Poly, t: u64, pp: u64, n: &mut Nat) -> Option<Vec<u64>> {
         let p = self.p;
         let e = self.e?;
         let ve = self.lucas_v(t, e, n);
