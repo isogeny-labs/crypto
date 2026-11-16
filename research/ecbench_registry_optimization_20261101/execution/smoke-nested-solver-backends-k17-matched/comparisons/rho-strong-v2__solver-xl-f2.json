@@ -1,0 +1,139 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1ha1e011eb5144",
+  "resample_seed": 20261101,
+  "a": {
+    "session_id": "ECBS1h32ec7a422b45",
+    "arm": "rho-strong-v2",
+    "method_id": "ECM1h978325b3547a",
+    "method": "rho.signed_frobenius_strong_v2",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 0.7936562889254938,
+    "mean_ratio_to_floor": 3.6924275438864176,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 0.7790135477951873,
+      "max_s": 0.9098220352259252,
+      "max_over_median": 1.1679155488386053,
+      "top_run_share": 0.28659195672023985,
+      "top_run_id": "ECM1h978325b3547aW4bd5e680f4c6R5",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 233,
+      "partition_hashes_uncharged": 192,
+      "table_inserts_uncharged": 36,
+      "table_queries_uncharged": 40
+    }
+  },
+  "b": {
+    "session_id": "ECBS1h32ec7a422b45",
+    "arm": "solver-xl-f2",
+    "method_id": "ECM1h978f0d3e0243",
+    "method": "ic.pipeline",
+    "measured": 4,
+    "verified": 0,
+    "statuses": {
+      "error": 4
+    },
+    "mean_s": null,
+    "mean_ratio_to_floor": null,
+    "lower_bound": false,
+    "deterministic": false,
+    "censored": 0,
+    "unpriced_counts": {}
+  },
+  "workloads": [
+    {
+      "workload_id": "W4bd5e680f4c6",
+      "slug": "icv1-f2m17-tm101-00378d4e",
+      "r": 65587,
+      "floor_s": 0.21494160128871231,
+      "pairs": 0,
+      "a_mean_s": null,
+      "b_mean_s": null,
+      "ratio_b_over_a": null,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "workloads": 1,
+      "pairs": 0,
+      "ratio_b_over_a": null,
+      "ci95": null,
+      "ci_method": "none",
+      "indicative": true,
+      "censored_pairs": 0
+    }
+  ],
+  "ops": {
+    "status": "empty",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": null,
+    "ci95": null,
+    "ci_method": "none",
+    "pairs": 0,
+    "unpaired_runs": 4,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 10000,
+    "workloads": 0,
+    "indicative": true,
+    "ci_bootstrap_method": "within",
+    "censored_pairs": 0
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "0 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L0",
+    "pairs": 0,
+    "pairs_below_level": 0,
+    "median_ratio": null,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ns_per_gae_upper_bound_arms": [
+      "rho-strong-v2"
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 0,
+    "admitted_pairs": 0,
+    "levels": {
+      "unverified": 4
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": null,
+    "contention_observed_runs": 0,
+    "notes": [
+      "A/A bonus unavailable: the spec permits wall runs below L2"
+    ]
+  },
+  "verdict": "ops (empty): solver-xl-f2 / rho-strong-v2 = unknown (none) over 0 pairs on 1 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); heavy tail in rho-strong-v2: top run is 29% of the arm's total S (max/median 1.2); more runs needed; wall: descriptive (0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-v2 is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1hea23b20edbce",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

@@ -1,0 +1,454 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "disposition": "validated",
+ "session_id": "ECBS1h82f92968d112",
+ "validated_commit": "3592f4a17261623cbc5d71e1ee329671d61b77fe",
+ "evidence_commit": "09eece941fbc6922d8b8fbbb0a51d166fca0245d",
+ "date": "2026-11-07",
+ "raw_data": [
+  {
+   "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/session.json",
+   "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/session.json",
+   "sha256": "7713b77487d10ac0eb0556263d55c387292df84c3fc04997de9330c2dbeaaf6e"
+  },
+  {
+   "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/spec.json",
+   "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/spec.json",
+   "sha256": "66db6f740ca92610f5cfa47df592d9ef1a2136e5cd11ab39bbc95c95502f59ab"
+  },
+  {
+   "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/host.json",
+   "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/host.json",
+   "sha256": "647aac0f6354a5f2d51ddaac2986eb3b4cc761bb83a6c10014b6a8c4387eca77"
+  },
+  {
+   "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/.artifacts.json",
+   "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/.artifacts.json",
+   "sha256": "9a49b24a4f4481ca0f057ddd540ead1e9c12935a370077152880dbb0eed212db"
+  }
+ ],
+ "headline": [
+  {
+   "name": "S1(a) pooled paired ratio of mean S, candidate rho.negation_v3 / incumbent rho.negation_v2",
+   "claimed": 0.8643,
+   "recomputed": 0.864317418883534,
+   "rel_tol": 0.002,
+   "rel_diff": 2.0153340836883184e-05,
+   "pass": true,
+   "definition": "sum(cost.s, candidate) / sum(cost.s, incumbent) over 1152 pairs matched by (workload_id, round); equals mean S 1.0074891190 / 1.1656471303",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) candidate mean S at r = 212437",
+   "claimed": 1.152,
+   "recomputed": 1.151596915602375,
+   "rel_tol": 0.002,
+   "rel_diff": 0.0003498996507159896,
+   "pass": true,
+   "definition": "mean cost.s over the 192 candidate records with workload.curve.r = 212437",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) log2 r label for r = 212437",
+   "claimed": 17.7,
+   "recomputed": 17.696675535624497,
+   "rel_tol": 0.002,
+   "rel_diff": 0.00018782284607359324,
+   "pass": true,
+   "definition": "log2(workload.curve.r)",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) candidate mean S at r = 562427",
+   "claimed": 1.098,
+   "recomputed": 1.0980365304600275,
+   "rel_tol": 0.002,
+   "rel_diff": 3.3268893168863455e-05,
+   "pass": true,
+   "definition": "mean cost.s over the 192 candidate records with workload.curve.r = 562427",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) log2 r label for r = 562427",
+   "claimed": 19.1,
+   "recomputed": 19.101306328859888,
+   "rel_tol": 0.002,
+   "rel_diff": 6.838950370178346e-05,
+   "pass": true,
+   "definition": "log2(workload.curve.r)",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) candidate mean S at r = 2435809",
+   "claimed": 1.011,
+   "recomputed": 1.010966219216634,
+   "rel_tol": 0.002,
+   "rel_diff": 3.341323775065376e-05,
+   "pass": true,
+   "definition": "mean cost.s over the 192 candidate records with workload.curve.r = 2435809",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) log2 r label for r = 2435809",
+   "claimed": 21.22,
+   "recomputed": 21.215969580418946,
+   "rel_tol": 0.002,
+   "rel_diff": 0.00018993494726921625,
+   "pass": true,
+   "definition": "log2(workload.curve.r)",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) candidate mean S at r = 16482251",
+   "claimed": 0.923,
+   "recomputed": 0.9232494996761819,
+   "rel_tol": 0.002,
+   "rel_diff": 0.0002702407921903321,
+   "pass": true,
+   "definition": "mean cost.s over the 192 candidate records with workload.curve.r = 16482251",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) log2 r label for r = 16482251",
+   "claimed": 23.97,
+   "recomputed": 23.974409950711376,
+   "rel_tol": 0.002,
+   "rel_diff": 0.00018394407705730461,
+   "pass": true,
+   "definition": "log2(workload.curve.r)",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) candidate mean S at r = 42653927",
+   "claimed": 0.938,
+   "recomputed": 0.9383855753468701,
+   "rel_tol": 0.002,
+   "rel_diff": 0.00041089223555848976,
+   "pass": true,
+   "definition": "mean cost.s over the 192 candidate records with workload.curve.r = 42653927",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) log2 r label for r = 42653927",
+   "claimed": 25.35,
+   "recomputed": 25.346175235828202,
+   "rel_tol": 0.002,
+   "rel_diff": 0.00015087827107690115,
+   "pass": true,
+   "definition": "log2(workload.curve.r)",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) candidate mean S at r = 260192759",
+   "claimed": 0.923,
+   "recomputed": 0.9226999736347979,
+   "rel_tol": 0.002,
+   "rel_diff": 0.00032505565027313063,
+   "pass": true,
+   "definition": "mean cost.s over the 192 candidate records with workload.curve.r = 260192759",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(b) log2 r label for r = 260192759",
+   "claimed": 27.96,
+   "recomputed": 27.955005572422284,
+   "rel_tol": 0.002,
+   "rel_diff": 0.00017862759576956993,
+   "pass": true,
+   "definition": "log2(workload.curve.r)",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  },
+  {
+   "name": "S1(c) pooled paired ratio of mean S, plain-v3 rho.plain_v3 / plain rho.plain",
+   "claimed": 0.9391,
+   "recomputed": 0.9390672589557135,
+   "rel_tol": 0.002,
+   "rel_diff": 3.486427886968554e-05,
+   "pass": true,
+   "definition": "sum(cost.s, plain-v3) / sum(cost.s, plain) over 1152 pairs matched by (workload_id, round)",
+   "evidence": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl"
+  }
+ ],
+ "supplementary_checks": {
+  "aa_control_incumbent_aa_over_incumbent": {
+   "pairs": 1152,
+   "ratio": 1.0,
+   "claimed_in": "research/ecbench_rho_v3_ladder_20261107/sessions/main/comparisons/incumbent__incumbent-aa.json"
+  },
+  "band_5a_candidate_over_incumbent": {
+   "0.0": 0.864317418883534,
+   "0.1": 0.8684711479874035,
+   "1.0": 0.8879159411982224
+  },
+  "band_5a_candidate_over_incumbent_claimed": "[0.864317, 0.868471, 0.887916] in comparisons/incumbent__candidate.json ops.band; recomputed agrees to 6 decimals",
+  "band_5a_order_holds": true,
+  "band_5a_plainv3_over_plain": {
+   "0.0": 0.9390672589557135,
+   "0.1": 0.9436811220115409,
+   "1.0": 0.9852058895139859
+  },
+  "band_5a_plainv3_order_holds": true,
+  "band_rule": "S_w = (total_gae + w * U) / sqrt(r), U = sum of counters canonicalisations_uncharged + distinguished_point_table_inserts_uncharged + distinguished_point_table_queries_uncharged; ratio = sum S_w(candidate) / sum S_w(reference) over matched pairs; w in {0, 0.1, 1}",
+  "unpriced_totals": {
+   "incumbent": {
+    "canonicalisations_uncharged": 5581165,
+    "distinguished_point_table_inserts_uncharged": 69915,
+    "distinguished_point_table_queries_uncharged": 71078
+   },
+   "candidate": {
+    "canonicalisations_uncharged": 5153769,
+    "distinguished_point_table_inserts_uncharged": 65601,
+    "distinguished_point_table_queries_uncharged": 66756
+   },
+   "plain": {
+    "canonicalisations_uncharged": 0,
+    "distinguished_point_table_inserts_uncharged": 0,
+    "distinguished_point_table_queries_uncharged": 0
+   },
+   "plain-v3": {
+    "canonicalisations_uncharged": 0,
+    "distinguished_point_table_inserts_uncharged": 94451,
+    "distinguished_point_table_queries_uncharged": 95603
+   }
+  },
+  "ratio_of_summed_total_gae_for_contrast": {
+   "candidate_over_incumbent": 0.9021939908744911,
+   "plain_v3_over_plain": 0.9544345526539018,
+   "note": "A different statistic, weighted toward the 2^28 curve; not a discrepancy."
+  },
+  "per_curve_mean_S_all_arms": {
+   "candidate": [
+    {
+     "r": 212437,
+     "mean_S": 1.151596915602375,
+     "n": 192
+    },
+    {
+     "r": 562427,
+     "mean_S": 1.0980365304600275,
+     "n": 192
+    },
+    {
+     "r": 2435809,
+     "mean_S": 1.010966219216634,
+     "n": 192
+    },
+    {
+     "r": 16482251,
+     "mean_S": 0.9232494996761819,
+     "n": 192
+    },
+    {
+     "r": 42653927,
+     "mean_S": 0.9383855753468701,
+     "n": 192
+    },
+    {
+     "r": 260192759,
+     "mean_S": 0.9226999736347979,
+     "n": 192
+    }
+   ],
+   "incumbent": [
+    {
+     "r": 212437,
+     "mean_S": 1.3853515402334293,
+     "n": 192
+    },
+    {
+     "r": 562427,
+     "mean_S": 1.276096696072332,
+     "n": 192
+    },
+    {
+     "r": 2435809,
+     "mean_S": 1.1862739594041558,
+     "n": 192
+    },
+    {
+     "r": 16482251,
+     "mean_S": 1.106440236864279,
+     "n": 192
+    },
+    {
+     "r": 42653927,
+     "mean_S": 1.0569284376288528,
+     "n": 192
+    },
+    {
+     "r": 260192759,
+     "mean_S": 0.9827919115940825,
+     "n": 192
+    }
+   ],
+   "incumbent-aa": [
+    {
+     "r": 212437,
+     "mean_S": 1.3853515402334293,
+     "n": 192
+    },
+    {
+     "r": 562427,
+     "mean_S": 1.276096696072332,
+     "n": 192
+    },
+    {
+     "r": 2435809,
+     "mean_S": 1.1862739594041558,
+     "n": 192
+    },
+    {
+     "r": 16482251,
+     "mean_S": 1.106440236864279,
+     "n": 192
+    },
+    {
+     "r": 42653927,
+     "mean_S": 1.0569284376288528,
+     "n": 192
+    },
+    {
+     "r": 260192759,
+     "mean_S": 0.9827919115940825,
+     "n": 192
+    }
+   ],
+   "plain": [
+    {
+     "r": 212437,
+     "mean_S": 1.6675724505186744,
+     "n": 192
+    },
+    {
+     "r": 562427,
+     "mean_S": 1.640231436248796,
+     "n": 192
+    },
+    {
+     "r": 2435809,
+     "mean_S": 1.465751179336471,
+     "n": 192
+    },
+    {
+     "r": 16482251,
+     "mean_S": 1.4265862396325106,
+     "n": 192
+    },
+    {
+     "r": 42653927,
+     "mean_S": 1.3924565660476722,
+     "n": 192
+    },
+    {
+     "r": 260192759,
+     "mean_S": 1.3217833755021557,
+     "n": 192
+    }
+   ],
+   "plain-v3": [
+    {
+     "r": 212437,
+     "mean_S": 1.5165913261014108,
+     "n": 192
+    },
+    {
+     "r": 562427,
+     "mean_S": 1.495020624485947,
+     "n": 192
+    },
+    {
+     "r": 2435809,
+     "mean_S": 1.4015175049450634,
+     "n": 192
+    },
+    {
+     "r": 16482251,
+     "mean_S": 1.3706597926492277,
+     "n": 192
+    },
+    {
+     "r": 42653927,
+     "mean_S": 1.3188628106407807,
+     "n": 192
+    },
+    {
+     "r": 260192759,
+     "mean_S": 1.2685515043529116,
+     "n": 192
+    }
+   ]
+  }
+ },
+ "structure": {
+  "all_session_id": true,
+  "git_commit": "c047182e274ecc86280dc186042d336baebedb03",
+  "git_dirty": true,
+  "host_sha256_matches_session": true,
+  "n_records": 6720,
+  "plan_sha256_matches_session": true,
+  "records_sha256_matches_session": true,
+  "seq_contiguous": true,
+  "session_records_written": 6720,
+  "single_binary": [
+   "6a5f9e48ed38da503252381c9111a8f16bf84a3a543afbbef25497b62bb30529"
+  ],
+  "unique_record_ids": true
+ },
+ "measured_verified_records_per_arm": {
+  "candidate": 1152,
+  "incumbent": 1152,
+  "incumbent-aa": 1152,
+  "plain": 1152,
+  "plain-v3": 1152
+ },
+ "verifier_sha256": "da797c32ca0c9217b4886f050cacf350f3d7806785b7b7564c7f4198f75ede0f",
+ "notes": [
+  "Validated from commit 3592f4a17261623cbc5d71e1ee329671d61b77fe (HEAD of aburan28/wizardly-einstein-i9seky); the study directory was committed in 09eece941fbc6922d8b8fbbb0a51d166fca0245d and has no diff 09eece941fbc6922d8b8fbbb0a51d166fca0245d..HEAD; `git status --porcelain --ignored` is empty for it. Untracked files elsewhere in the tree (research/ecbench_rho_v3_frobenius_20261107/, benchmarks/20261107-rho-v3-frobenius/) are outside this validation.",
+  "Independence: the verifier (sha256 in verifier_sha256, source embedded in replay-certificate.json) reads records.jsonl directly and shares no code with ecbench (no compare/table/bound/verify). It was written by the validator; no keyring signature is attached (docs/SABOTAGE_RESISTANCE.md); no pcc claim was registered by the validator.",
+  "Filter: non-warmup records with outcome.status == 'verified'. S = cost.s; total GAE = cost.total_gae; r = workload.curve.r. cost.s was checked against total_gae / sqrt(r) for every record (max relative error 0). boundaries.floor_s was checked against sqrt(pi / (2A)), A = automorphisms_available = 2, and ratio_to_floor against s / floor_s on every record (max relative error 0).",
+  "Pairing: records are matched by (workload.workload_id, round); every matched pair also shares algorithm_seed and target; no duplicates, no unpaired records.",
+  "Tolerances: rel_tol 0.002 for values printed to 3-4 significant figures (as the dispatch asked); 0.0002 for values printed to 5 significant figures; 1e-9 where the claim is a full-precision float copied from a committed file.",
+  "Reproducibility caveat (not a headline failure): session.json and host.json record git_commit c047182e274ecc86280dc186042d336baebedb03 with git_dirty true (git_commit_source runtime_worktree). There is no src/ change between c047182e27 and 09eece941f, but 3592f4a172 changes src/cryptanalysis/ic_boundary.rs, ecbench/methods.rs and others (rho.signed_frobenius_v3), so the source of binary 6a5f9e48ed38... is not pinned by a clean commit. The producer's audit.json replayed every non-warmup record 'identical', but with the same binary sha, env class ECBENV3h8d80c7bc4dfc and hardware class ECBHW1he9e33daae9e7: not a cross-host replay. Counted GAE is deterministic; the scalar certificates below are independent of the binary.",
+  "Isolation L0 (spec isolation_required L0): only counted GAE is validated; no wall-clock figure is validated.",
+  "Large-file policy (AGENTS.md section 13; not a measurement defect): sessions/main/records.jsonl is committed directly to Git with no .artifacts.json manifest; it exceeds the 10 MiB limit of scripts/check-large-files.sh and the 64 KiB data-file threshold.",
+  "m=83 / ECC2K-130 disclosure: not applicable; prime-field curves of 18-28 bits, and the reports make no transfer claim to ECC2K-130 (no mention of ECC2K or m=83).",
+  "Curve parameters: p, trace, order, j and model12 are read from workload.curve.icv1 (ICV1:fp-<p>:<trace>:<order>:<j>:unk:unk:r:<model12>); a and b are not in the record. They were derived algebraically from the generator G and a target Q with x_G != x_Q (a = ((y_G^2 - x_G^3) - (y_Q^2 - x_Q^3)) / (x_G - x_Q), b = y_G^2 - x_G^3 - a x_G mod p). They were then bound by: SHA-256 of the canonical ICV1 model JSON (src/cryptanalysis/curve_id.rs prime_identity) equal to model12 and to the slug's model8; j = 6912 a^3 / (4a^3 + 27b^2) equal to the ICV1 j; trace = p + 1 - r; the same (p, a, b) as docs/curves/registry.json params (generator_call find_prime_order_curve(bits, 59297)); [r]G = O with r prime; and 2r > p + 1 + 2 sqrt(p), so #E(F_p) = r (cofactor 1). find_prime_order_curve (src/cryptanalysis/ic_boundary.rs, rand StdRng) was not re-executed.",
+  "Controls: the incumbent-aa A/A arm reproduces the incumbent's S exactly on all 1152 pairs (ratio 1.0; counted GAE is deterministic). Reference arm (incumbent rho.negation_v2) and baseline (plain rho.plain) are priced, and the section 5a band was recomputed for both comparisons; the order holds at w = 0, 0.1 and 1 in each.",
+  "rho.plain records carry zero unpriced counters; rho.plain_v3 carries distinguished-point inserts and queries (94451 and 95603), priced in the band."
+ ],
+ "hashed_in_artifact_store": {
+  "note": "Hashed but stored in the artifact store (gitignored; bytes in s3 via tools/artifacts). Not in raw_data because a checkout without hydration does not have them. The validator read the local copies; each one's sha256 matches the tracked .artifacts.json manifest and session.json (records_sha256 / plan_sha256), which are themselves pinned in raw_data.",
+  "files": [
+   {
+    "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/plan.json",
+    "path_from_evidence_dir": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/plan.json",
+    "sha256": "6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8",
+    "bytes": 1260541,
+    "manifest": "research/ecbench_rho_v3_ladder_20261107/sessions/main/.artifacts.json",
+    "manifest_sha256": "6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8",
+    "manifest_bytes": 1260541,
+    "matches_manifest": true,
+    "pinned_by_session_json": "6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8",
+    "matches_session_json": true,
+    "validated_from_local_copy": true,
+    "matches_previous_issue": true
+   },
+   {
+    "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl",
+    "path_from_evidence_dir": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl",
+    "sha256": "1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af",
+    "bytes": 44095470,
+    "manifest": "research/ecbench_rho_v3_ladder_20261107/sessions/main/.artifacts.json",
+    "manifest_sha256": "1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af",
+    "manifest_bytes": 44095470,
+    "matches_manifest": true,
+    "pinned_by_session_json": "1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af",
+    "matches_session_json": true,
+    "validated_from_local_copy": true,
+    "matches_previous_issue": true
+   }
+  ]
+ }
+}

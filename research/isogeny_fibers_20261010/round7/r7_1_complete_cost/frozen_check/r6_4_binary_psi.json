@@ -1,0 +1,114 @@
+{
+  "argv": [
+    "/tmp/claude-0/-home-user/717e4727-b5a7-5b25-924a-7b31edb43331/scratchpad/r71minitarget/release/examples/r6_4_vertical_margin_2",
+    "psi",
+    "37,41",
+    "600",
+    "/tmp/claude-0/-home-user/717e4727-b5a7-5b25-924a-7b31edb43331/scratchpad/r71tmp/psi_old.json"
+  ],
+  "arithmetic": "PolyMul::Auto; remainders by MonicDivisor (Newton); gcd and exact division schoolbook; CZ exponentiation 4-bit fixed window; x^(p^k) by square-and-multiply with x-multiplications as shifts",
+  "field_bits": 61,
+  "mode": "psi",
+  "rows": [
+    {
+      "asc": {
+        "cz_splits": 0,
+        "find": {
+          "I": 676,
+          "M": 249878620,
+          "Meq": 338724284,
+          "W": 88784148
+        },
+        "frobenius_gcd_degree": 18,
+        "psi": {
+          "I": 3,
+          "M": 216742,
+          "Meq": 217015,
+          "W": 0
+        },
+        "wall_s_contended": 1.651648623
+      },
+      "asc_reaches_crater": true,
+      "checks": [
+        "desc_images_order_N",
+        "lib_verify_kernel_desc",
+        "asc_reaches_crater_images_order_N",
+        "lib_verify_kernel_asc"
+      ],
+      "chi_m7": 1,
+      "crater_j": 1844593701334062976,
+      "desc": {
+        "cz_splits": 4,
+        "find": {
+          "I": 595,
+          "M": 547540093,
+          "Meq": 636734078,
+          "W": 89139840
+        },
+        "horizontal_retries": 0,
+        "psi": {
+          "I": 3,
+          "M": 216742,
+          "Meq": 217015,
+          "W": 0
+        },
+        "wall_s_contended": 2.667853658
+      },
+      "ell": 37,
+      "floor_j": 1214380450488434164,
+      "k": 18,
+      "p": 1844593701334066351
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "find": {
+          "I": 830,
+          "M": 14134586,
+          "Meq": 394431892,
+          "W": 380221776
+        },
+        "frobenius_gcd_degree": 20,
+        "psi": {
+          "I": 3,
+          "M": 290126,
+          "Meq": 290399,
+          "W": 0
+        },
+        "wall_s_contended": 3.777660842
+      },
+      "asc_reaches_crater": true,
+      "checks": [
+        "desc_images_order_N",
+        "lib_verify_kernel_desc",
+        "asc_reaches_crater_images_order_N",
+        "lib_verify_kernel_asc"
+      ],
+      "chi_m7": -1,
+      "crater_j": 1241259864072622024,
+      "desc": {
+        "cz_splits": 3,
+        "find": {
+          "I": 457,
+          "M": 199805435,
+          "Meq": 687040542,
+          "W": 487193520
+        },
+        "horizontal_retries": 0,
+        "psi": {
+          "I": 3,
+          "M": 290126,
+          "Meq": 290399,
+          "W": 0
+        },
+        "wall_s_contended": 5.553778005
+      },
+      "ell": 41,
+      "floor_j": 157060227239467510,
+      "k": 20,
+      "p": 1241259864072625399
+    }
+  ],
+  "total_wall_s_contended": 13.673246529,
+  "unit": "M = F_p mults+squarings (incl. schoolbook/Karatsuba coefficient products); W = word mults mod 62-bit NTT primes, counted as 1 M; I = F_p inversions; Meq = M + W + 91 I"
+}

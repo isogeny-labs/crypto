@@ -1,0 +1,23 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "signed-Frobenius rho v3 (ladder table, floor-sized DP, ladder check) against rho.signed_frobenius_v2, Koblitz 2^15.4..2^32.1",
+  "description": "Does the v3 table with distinguished points sized from the floor sqrt(pi r/4n) bring the signed-Frobenius walk to sqrt(pi/2A)? Incumbent rho.signed_frobenius_v2 with an A/A control, interleaved on the four toy-tier Koblitz curves of the 2026-10-06 challenge (1:17, 0:19, 0:23, 1:29) and two medium ones (0:37, 1:43), 24 planted targets each. Counted GAE; local L0 host.",
+  "workloads": {
+    "curves": [
+      {"kind": "koblitz", "a": 1, "n": 29},
+      {"kind": "koblitz", "a": 1, "n": 17},
+      {"kind": "koblitz", "a": 0, "n": 19},
+      {"kind": "koblitz", "a": 0, "n": 23},
+      {"kind": "koblitz", "a": 0, "n": 37},
+      {"kind": "koblitz", "a": 1, "n": 43}
+    ],
+    "targets_per_curve": 24,
+    "target_seed": 20261109
+  },
+  "arms": [
+    {"name": "incumbent", "role": "reference", "method": {"id": "rho.signed_frobenius_v2"}},
+    {"name": "candidate", "role": "candidate", "method": {"id": "rho.signed_frobenius_v3"}},
+    {"name": "incumbent-aa", "role": "control", "method": {"id": "rho.signed_frobenius_v2"}}
+  ],
+  "measurement": {"rounds": 6, "warmup": 1, "order": "alternate", "seed": 20261109, "isolation_required": "L0", "timeout_seconds": 600}
+}

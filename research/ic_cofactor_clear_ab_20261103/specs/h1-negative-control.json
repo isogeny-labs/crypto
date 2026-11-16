@@ -1,0 +1,139 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "negative control: prime-order 26-bit curves (h=1), cofactor clearing cannot matter",
+  "description": "Same arms as v2-treatment.json on curves of prime order (cofactor 1), where [h]P = P and the projected base equals the raw base up to scan bookkeeping. Counted metrics only. Protocol: research/ic_cofactor_clear_ab_20261103/protocol-h1-control.json",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261200
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261201
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261202
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261203
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261204
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261205
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261206
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261207
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261208
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261209
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261210
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261211
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261212
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 20261213
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261104,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "ic-raw",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "ic-clear",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=64,scan_cap=4096",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "ic-raw-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261104,
+    "isolation_required": "L1",
+    "timeout_seconds": 600
+  }
+}

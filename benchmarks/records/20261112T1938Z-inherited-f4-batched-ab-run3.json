@@ -1,0 +1,103 @@
+{
+  "branch": "claude/zealous-meitner-85ipb5",
+  "closed_utc": "2026-11-12T19:40:33+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/inherited_f4_batched_20261112/run_ab.sh",
+        "research/inherited_f4_batched_20261112/results_run3"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T19:38:42+00:00",
+      "wall_s": 72.093
+    }
+  ],
+  "commit": "0d45a47751c6ecf86bd63a8a2f26d66edac9c680",
+  "commit_dirty": false,
+  "created_utc": "2026-11-12T19:38:38+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261112-inherited-f4-batched"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T1938Z-inherited-f4-batched-ab-run3",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 234,
+      "name": "ops_differences_vs_run1",
+      "note": "per-target ops of both engines identical to run 1 (record 20261112T1829Z-inherited-f4-batched-ab) on all 234 target x engine pairs",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 13,
+      "name": "wall_ratio_batched_over_eager_median",
+      "note": "median over 13 cells of the paired per-target wall ratio at cd4dcfb3f1; run 1 at 4f0eca9eb4 gave 1.020; R 19:10:2 1.096 above the pre-stated 1.05 falsifier threshold",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.848,
+        1.117
+      ],
+      "unit": "ratio",
+      "value": 1.008
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 78,
+      "name": "disagreements_with_fes",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "study:inherited_f4_batched_20261112:descent-ab-run3",
+  "raw": [
+    {
+      "bytes": 105210,
+      "path": "research/inherited_f4_batched_20261112/results_run3.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dc/dcd4ec86cb7fed055a9b0c8eb582d2c5e4b356099a06bbb135cdae0e30fe0507",
+      "sha256": "dcd4ec86cb7fed055a9b0c8eb582d2c5e4b356099a06bbb135cdae0e30fe0507",
+      "uploaded": false
+    },
+    {
+      "bytes": 13236,
+      "path": "research/inherited_f4_batched_20261112/results_ab_run3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6f/6f520a4bddd2b9918d3ecf308784afed5fef1e4a289c8c93357907c8910b8f31",
+      "sha256": "6f520a4bddd2b9918d3ecf308784afed5fef1e4a289c8c93357907c8910b8f31",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/inherited_f4_batched_20261112/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/inherited_f4_batched_20261112/results_ab_run3.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "inherited-f4-batched-ab-run3",
+  "status": "measured",
+  "summary": "Paired ic descent of inherited-f4 and inherited-f4-batched at cd4dcfb3f1 (branch-light plan builder, pooled arena), 13 cells, 6 targets x 3 repeats: per-target ops identical to run 1 on all 234 pairs, 0 disagreements; wall batched/eager 1.04-1.12 at 14-16 unknowns, 0.98-1.10 at 18-20 (falsifier fired again on R 19:10:2 at 1.10), 0.85-0.97 from 22 up; no measurable change from run 1. Local container; unverified.",
+  "validation": null
+}

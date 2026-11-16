@@ -1,0 +1,336 @@
+{
+  "branch": "fes-wake-probe-20261116",
+  "closed_utc": "2026-11-16T15:37:38+00:00",
+  "commands": [
+    {
+      "argv": [
+        "modal",
+        "run",
+        "--detach",
+        "research/ic_gpu_wake_probe_20261116/modal_wake.py",
+        "--out",
+        "/tmp/claude-0/-home-user/e375a883-d595-5f04-8ef9-a57bb8288ce5/scratchpad/modal_wake"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T15:32:40+00:00",
+      "wall_s": 101.243
+    }
+  ],
+  "commit": "b7094b68686477d7a2d16cbd6ac2fe68d9acb9ab",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T15:32:39+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261116T1532Z-ic-gpu-wake-probe-a100",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "probe_unlocated_reply_block_wspin0_gap100",
+      "note": "derived: client round trip mean minus CUDA worker busy minus null-worker round trip in the same cell, 24 unknowns, 1500 replayed calls, mean of 3 repeats (the reproduction cell of the preregistration)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        9.442999999999999e-05,
+        9.442999999999999e-05
+      ],
+      "unit": "wall_s",
+      "value": 9.442999999999999e-05
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "probe_unlocated_min_over_12_cuda_cells",
+      "note": "derived, smallest of the 12 CUDA cells (reply block/spin x worker spin 0/2000 us x gap 0/100/1000 us)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        8.015666666666666e-05,
+        8.015666666666666e-05
+      ],
+      "unit": "wall_s",
+      "value": 8.015666666666666e-05
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "probe_unlocated_max_over_12_cuda_cells",
+      "note": "derived, largest of the 12 CUDA cells",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.00010818999999999999,
+        0.00010818999999999999
+      ],
+      "unit": "wall_s",
+      "value": 0.00010818999999999999
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "steady_state_round_trip_a_koblitz_n23",
+      "note": "derived (least-squares fit of the cumulative mean round trip to b + F/n over 4-5 points per run, max residual under 1 us): steady-state worker round trip per call, arm A",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.00016777582428418743,
+        0.0001683881008233658
+      ],
+      "unit": "wall_s",
+      "value": 0.00016812182294145134
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "one_time_startup_a_koblitz_n23",
+      "note": "derived (same fit): one-time cost F per process, arm A; the first call of a CUDA worker waits for its initialisation",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1430513572913254,
+        0.1519824255613979
+      ],
+      "unit": "wall_s",
+      "value": 0.1462628539264288
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "steady_state_round_trip_b_koblitz_n23",
+      "note": "derived (least-squares fit of the cumulative mean round trip to b + F/n over 4-5 points per run, max residual under 1 us): steady-state worker round trip per call, arm B",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0001068740675127694,
+        0.00010857954744423617
+      ],
+      "unit": "wall_s",
+      "value": 0.00010791372088634905
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "one_time_startup_b_koblitz_n23",
+      "note": "derived (same fit): one-time cost F per process, arm B; the first call of a CUDA worker waits for its initialisation",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.14800710180624857,
+        0.16592646990391377
+      ],
+      "unit": "wall_s",
+      "value": 0.15761414262005402
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "steady_state_round_trip_a_char2_n25",
+      "note": "derived (least-squares fit of the cumulative mean round trip to b + F/n over 4-5 points per run, max residual under 1 us): steady-state worker round trip per call, arm A",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.00025051737990529235,
+        0.00025261984739281427
+      ],
+      "unit": "wall_s",
+      "value": 0.0002515238009189873
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "one_time_startup_a_char2_n25",
+      "note": "derived (same fit): one-time cost F per process, arm A; the first call of a CUDA worker waits for its initialisation",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.14870966847658484,
+        0.1615044185173436
+      ],
+      "unit": "wall_s",
+      "value": 0.1530233142520129
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "steady_state_round_trip_b_char2_n25",
+      "note": "derived (least-squares fit of the cumulative mean round trip to b + F/n over 4-5 points per run, max residual under 1 us): steady-state worker round trip per call, arm B",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.00018431248240621066,
+        0.000185251350482623
+      ],
+      "unit": "wall_s",
+      "value": 0.00018490898259952829
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "one_time_startup_b_char2_n25",
+      "note": "derived (same fit): one-time cost F per process, arm B; the first call of a CUDA worker waits for its initialisation",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.14503310603612696,
+        0.23617632769945757
+      ],
+      "unit": "wall_s",
+      "value": 0.1783384508994427
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 36,
+      "name": "probe_identity_check_cuda_cells",
+      "note": "distinct reply checksums among 36 CUDA runs: the kernel appends solutions in a nondeterministic order, so a byte checksum is the wrong identity test for the CUDA worker; answers were not checked on the GPU (null worker: 1 distinct checksum in 36 runs)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 36.0
+    }
+  ],
+  "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+  "raw": [
+    {
+      "bytes": 321,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/347008d8835ef479c4b4f29fd3d18e9ef3337f5f193c91cd0c9384afcda2d640",
+      "sha256": "347008d8835ef479c4b4f29fd3d18e9ef3337f5f193c91cd0c9384afcda2d640",
+      "uploaded": false
+    },
+    {
+      "bytes": 10909,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/cells.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4b/4bed6549382d334f8962c895ca6d7ba930acb4f02dfe03bf1f384f3b5e647e7a",
+      "sha256": "4bed6549382d334f8962c895ca6d7ba930acb4f02dfe03bf1f384f3b5e647e7a",
+      "uploaded": false
+    },
+    {
+      "bytes": 27876,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/cells/capture.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/340408de49af84cbea6eb5d5d69659494464b28f77d2722584fbf6cb4251c7e3",
+      "sha256": "340408de49af84cbea6eb5d5d69659494464b28f77d2722584fbf6cb4251c7e3",
+      "uploaded": false
+    },
+    {
+      "bytes": 27876,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/cells/capture.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/340408de49af84cbea6eb5d5d69659494464b28f77d2722584fbf6cb4251c7e3",
+      "sha256": "340408de49af84cbea6eb5d5d69659494464b28f77d2722584fbf6cb4251c7e3",
+      "uploaded": false
+    },
+    {
+      "bytes": 41,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/fes-selftest.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/74/74cef93929666ab5a40ac88f6b87cf321df2892e38057c1b2441e4dcb2da24f2",
+      "sha256": "74cef93929666ab5a40ac88f6b87cf321df2892e38057c1b2441e4dcb2da24f2",
+      "uploaded": false
+    },
+    {
+      "bytes": 64,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/gpu.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/93/9356c0a8a247bed2e90ebabd99091b8f32ff3d259f365b8a069c55040507c9b8",
+      "sha256": "9356c0a8a247bed2e90ebabd99091b8f32ff3d259f365b8a069c55040507c9b8",
+      "uploaded": false
+    },
+    {
+      "bytes": 11078,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/job.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/10/10ee4330da5ff3bde1aa1503ae17a3f979491afe6f5a23181234ca1df269d41f",
+      "sha256": "10ee4330da5ff3bde1aa1503ae17a3f979491afe6f5a23181234ca1df269d41f",
+      "uploaded": false
+    },
+    {
+      "bytes": 609,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/launch.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7d/7dca2126d299e9e16c818b4e1944706a11dfcac7239b929ec9f174ccbc941a8f",
+      "sha256": "7dca2126d299e9e16c818b4e1944706a11dfcac7239b929ec9f174ccbc941a8f",
+      "uploaded": false
+    },
+    {
+      "bytes": 1218,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/lscpu.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c0/c060de4f34af24539200daef66467e0baead45beb228279dffc4e594792bc5ba",
+      "sha256": "c060de4f34af24539200daef66467e0baead45beb228279dffc4e594792bc5ba",
+      "uploaded": false
+    },
+    {
+      "bytes": 2,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/nproc.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/aa/aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+      "sha256": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+      "uploaded": false
+    },
+    {
+      "bytes": 208,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/nvcc.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/68/68f8b0a1301428031e307cf5260142a517bff25cc232a09eae2734be475d721f",
+      "sha256": "68f8b0a1301428031e307cf5260142a517bff25cc232a09eae2734be475d721f",
+      "uploaded": false
+    },
+    {
+      "bytes": 105,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/progress.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2db157232cee5cc539c6772a93db60c9bc2f0bc06c935de7246e409ac2dead54",
+      "sha256": "2db157232cee5cc539c6772a93db60c9bc2f0bc06c935de7246e409ac2dead54",
+      "uploaded": false
+    },
+    {
+      "bytes": 93,
+      "path": "research/ic_gpu_wake_probe_20261116/raw/uname.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1f/1f2b682809ea1507f5788cf27b6471c7a9a8c5383f3ca82ad7be558824acd5b4",
+      "sha256": "1f2b682809ea1507f5788cf27b6471c7a9a8c5383f3ca82ad7be558824acd5b4",
+      "uploaded": false
+    },
+    {
+      "bytes": 2172,
+      "path": "research/ic_gpu_wake_probe_20261116/startup_fit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d4/d4f87a31e1b4fc4a6340f4d11e3394644742239eb1730fb3ebd9229a1dc7706c",
+      "sha256": "d4f87a31e1b4fc4a6340f4d11e3394644742239eb1730fb3ebd9229a1dc7706c",
+      "uploaded": false
+    },
+    {
+      "bytes": 2173,
+      "path": "research/ic_gpu_wake_probe_20261116/startup_fit_A.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/3416f383c4d2dc7b823ab942503624a57364e17feeb544fd01c0acd077cf54e9",
+      "sha256": "3416f383c4d2dc7b823ab942503624a57364e17feeb544fd01c0acd077cf54e9",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_wake_probe_20261116/REPORT.pdf",
+    "png": [
+      "research/ic_gpu_wake_probe_20261116/fig_startup.png"
+    ],
+    "svg": [
+      "research/ic_gpu_wake_probe_20261116/fig_startup.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-wake-probe-a100",
+  "status": "measured",
+  "summary": "A100 80GB PCIe wake-up probe (72 cells) and a re-reading of the 12 runs of the earlier job: the 0.085 ms per call that no phase timer covered is a one-time worker start-up of about 150 ms (b + F/n fits the cumulative means to within 1 us), not a wake-up cost. Preregistered rules: reproduction yes (94 us), client wake (H1) and worker wake (H2) not supported (differences 7.6 and at most 13 us against a 40 us bar), H3 as stated (88.7 us with both sides spinning); the steady-state call on main at 24 unknowns is 108 us of round trip, equal to worker busy plus pipe floor within 1.5 us. The probe's byte checksum cannot verify CUDA answers (nondeterministic order). Fit values are derived, not measured. [pcc:unverified]",
+  "validation": null
+}

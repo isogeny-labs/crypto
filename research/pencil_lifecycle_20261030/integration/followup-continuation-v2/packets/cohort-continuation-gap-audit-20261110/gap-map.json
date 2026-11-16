@@ -1,0 +1,202 @@
+{
+  "schema": "research.cohort-continuation-gap-audit/v1",
+  "date": "2026-11-10",
+  "repository_revision": "36a0004f7857e06f5e3a8357819986ad1a88621d",
+  "mode": "source_only",
+  "execution": {
+    "targets_run": 0,
+    "tests_run": 0,
+    "compilers_run": 0,
+    "materialization_run": false,
+    "cloud_jobs_submitted": 0
+  },
+  "evidence_status": "pcc_unverified_no_signed_verdict",
+  "knowledge_base": {
+    "available": false,
+    "fallback": "retained repository protocols, source maps, exact source, and prior review packets"
+  },
+  "cohort_invariant": {
+    "targets": 1260,
+    "levels": [16, 20, 24, 28, 32, 36, 40],
+    "models_per_level": 3,
+    "targets_per_model": 60,
+    "arms": ["pencil", "rho", "rho_AA"],
+    "measured_streams_per_target": 5,
+    "warmups_per_target_arm": 1,
+    "execution_slots": 22680,
+    "measured_executions": 18900,
+    "warmup_executions": 3780,
+    "measured_candidate_reference_pairs": 6300,
+    "price_cells": 36,
+    "sm": [0, 0.5, 1],
+    "im": [1, 10, 100, 1000],
+    "native_gae": [0, 0.1, 1],
+    "smaller_completion_scope_allowed": false,
+    "historical_543_plus_later_records_union_allowed": false,
+    "old_717_open_target_handoff_completes_current_instrument": false
+  },
+  "implemented_components": [
+    {
+      "id": "C1",
+      "name": "exact_full_cohort_plan_and_controls",
+      "status": "implemented_preparation_no_solver_execution",
+      "evidence": [
+        "research/pencil_large_prime_20261029/prepared_specs/manifest.json",
+        "research/pencil_large_prime_20261029/prepared_native_plans/result.json"
+      ]
+    },
+    {
+      "id": "C2",
+      "name": "fail_closed_full1260_aggregation",
+      "status": "implemented",
+      "evidence": [
+        "research/pencil_large_prime_20261029/native_price/src/aggregate.rs"
+      ]
+    },
+    {
+      "id": "C3",
+      "name": "exact_36_cell_finite_price_mapping",
+      "status": "implemented_requires_final_source_bound_review",
+      "evidence": [
+        "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+        "research/pencil_large_prime_20261029/native_price/src/importer.rs"
+      ]
+    },
+    {
+      "id": "C4",
+      "name": "pencil_relation_trace_and_offline_replay_components",
+      "status": "implemented_for_unmanaged_donor_path_not_composed_with_managed_progress",
+      "evidence": [
+        "research/pencil_large_prime_20261029/src/relation_stream.rs",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/target-stream/src/lib.rs",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/relation-adapter/src/lib.rs"
+      ]
+    }
+  ],
+  "implementation_gates": [
+    {
+      "id": "I1",
+      "priority": 1,
+      "name": "unify_trace_and_managed_progress_solver",
+      "status": "missing",
+      "blocking_fact": "managed progress selects a separate copied solver with no ordered relation trace",
+      "acceptance": "one shared algorithmic core; no-sink, progress-only, trace-only, and combined modes preserve arithmetic, ordering, terminal result, and independently checked source identity"
+    },
+    {
+      "id": "I2",
+      "priority": 2,
+      "name": "retained_native_session_exporter",
+      "status": "missing",
+      "blocking_fact": "host, plan, preparation, child and owner files exist but are not joined into a checked retained actual-session export",
+      "acceptance": "hash-bound FilePins and postrun session report, separate external custody, no invented unknown fields, one attempt identity per expected slot"
+    },
+    {
+      "id": "I3",
+      "priority": 3,
+      "name": "production_target_local_ordered_relation_stream",
+      "status": "partial_uncomposed",
+      "blocking_fact": "actual managed collector streams checked equals zero",
+      "acceptance": "atomic target-local stream from actual managed path with exact shared rows, admissions, rejected/capped/pending/terminal dispositions and external identity custody"
+    },
+    {
+      "id": "I4",
+      "priority": 4,
+      "name": "offline_rank_collector_derivative",
+      "status": "partial_component_only",
+      "blocking_fact": "offline rank and sign adapter exist but are not bound to actual full-cohort streams or independent scalar replay",
+      "acceptance": "generated and incorporated prefix ranks, consistency, target identifiability, pending state, native pivot agreement, work/memory, and group verification joined for every attempt"
+    },
+    {
+      "id": "I5",
+      "priority": 5,
+      "name": "final_source_bound_complete_finite_cost_export",
+      "status": "partial_mapping_complete_final_binary_binding_missing",
+      "blocking_fact": "root report declares incomplete cost, group-only lower-bound GAE, unpriced work and null candidate/rho ratio",
+      "acceptance": "exact final binary/source/protocol coverage of all nine categories and calibration; every unconverted resource retained separately; no uncovered primitive silently free"
+    },
+    {
+      "id": "I7",
+      "priority": 6,
+      "name": "terminal_process_and_attempt_join",
+      "status": "missing_complete_join",
+      "blocking_fact": "normal solver terminal, trace failure, timeout, controller history, resource charge and retry identity are not one retained record",
+      "acceptance": "durable partial evidence plus explicit terminal absence for failures, all attempt identities and costs retained, no automatic scientific retry or zero-cost timeout"
+    },
+    {
+      "id": "I6",
+      "priority": 7,
+      "name": "matched_clock_endpoint",
+      "status": "missing_if_wall_cost_is_required",
+      "blocking_fact": "candidate/rho phase and cold endpoint mismatch; old calls below threshold; wall validity false",
+      "acceptance": "prospectively reviewed common cold endpoint, method-specific online mapping, fresh call state, A/A, observer policy, and fixed block estimand if needed"
+    }
+  ],
+  "separate_altered_collector_gates": [
+    {
+      "id": "K1",
+      "name": "signed_duplicate_label_integration",
+      "status": "fixed_and_archive_components_only",
+      "retained_result": {
+        "dispositions": 420,
+        "ineligible": 218,
+        "compared": 202,
+        "first": 174,
+        "redundant": 28,
+        "informative_natural_duplicates": 0,
+        "natural_yield": null,
+        "complete_cost_ratio": null
+      },
+      "next_code": "replace production target-local dedup set with reviewed first-label map at actual accepted signed-divisor gate; preserve graph behavior; verify candidate; charge complete work",
+      "requires_new_method_identity": true,
+      "required_cohort_targets": 1260
+    },
+    {
+      "id": "K2",
+      "name": "degree_one_signed_recovery_and_collector_rule",
+      "status": "fixed_component_passed_not_production",
+      "retained_result": {
+        "fixed_cases": 84,
+        "exact_recoveries": 84,
+        "new_degree_one_recoveries": 4,
+        "production_admission": false,
+        "cost_ratio": null
+      },
+      "next_code": "integrate boundary recovery, close caller premises and define justified degree-one graph equation so recovered divisors are not dropped",
+      "requires_new_method_identity": true,
+      "required_cohort_targets": 1260
+    },
+    {
+      "id": "K3",
+      "name": "signed_kummer_ordered_stream",
+      "status": "missing_production_adapter",
+      "next_code": "hook before dedup and around SignedGraph edge with shared equation assembly, labels, all bypass dispositions and signed node0 offline replay",
+      "requires_new_method_identity": true,
+      "required_cohort_targets": 1260
+    }
+  ],
+  "post_implementation_evidence_gates": [
+    "freeze and publish exact source binary full1260 protocol plans seeds mapper launch command resources deadline retry and exporter identities",
+    "complete separate 18-slot three-arm gate and fresh independent replay of all 15 measured executions",
+    "run all 1260 targets and 22680 primary slots for the selected final method",
+    "retain matched rho and rho_AA, every failure cap missing slot attempt resource charge and fresh replay",
+    "recompute 6300 measured pairs in every one of 36 cells; incomplete denominator keeps ratio null",
+    "publish standardized rows cost grid resources replay validator graphs neutral PDF checksums and artifact pointers"
+  ],
+  "recommended_order": ["I1", "I2", "I3", "I4", "I5", "I7", "I6", "gate18", "full1260", "publication"],
+  "source_hashes": {
+    "research/pencil_large_prime_20261029/prepared_specs/manifest.json": "31ac091fac15821fd86fbb3019e7a625376e3f86ae7da62a84bf60e654169179",
+    "research/pencil_large_prime_20261029/prepared_native_plans/result.json": "1892db0ad5937bba74894c5be9f3b6f1e48dcf20ddb0284f043686a2f822ef1e",
+    "research/pencil_large_prime_20261029/src/native_solver.rs": "cffa75c07a84cabeadec48b874edbeecf7dc275da8cada28ba620691d0dce753",
+    "src/cryptanalysis/ecbench/pencil.rs": "c2eec86cf9dd547ffe6db825b038c7171bade7f2def171b4269bb71bfb25ad79",
+    "src/cryptanalysis/ecbench/pencil_progress_native.rs": "87f3581cbbeadb826e878cc80887de8e9d0980cb65262058ca54b50aae86a0ae",
+    "research/pencil_large_prime_20261029/src/relation_stream.rs": "f062af1c896111cdbbf06f9044f24acec4f99f6a88078424b7c8bcff2a490526",
+    "research/pencil_large_prime_20261029/native_price/src/aggregate.rs": "8240aa54f6fa37eead6c63180e9dbf4b28752a7ba8df1433a337568a005b4b62",
+    "research/pencil_large_prime_20261029/native_price/src/analyzer.rs": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+    "research/pencil_large_prime_20261029/native_price/src/importer.rs": "db05f1bda12bfbdeaff4806f3d3ac968e165c05d06b28e8dd73bb9868963633d",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/target-stream/src/lib.rs": "81dba387614ce2451fbf07b62e52cfb38fdc6719b0500e68fd4557ce83033ba7",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/relation-adapter/src/lib.rs": "5c576f9675df206f463dee8169b860876b98c618f51b406323a35c7ed8423120",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/goal-coverage-audit/matrix.json": "f68a8659d7a111ec49e8a000e42901f783ac01529565930166ccf645a2a98194",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/continuation-reconciliation/remaining-binding-ledger.json": "e4a0a3c34312462288c343549fe3ab093069189f26e074f33ba5d87cfd534b32",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/analysis.json": "7024ed785cade871769b90a8d983a7e1828ccc59289c0f1225091a7a98f33fef"
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "branch": "claude/curve25519-autolab-ruling",
+  "closed_utc": "2026-11-04T16:04:23+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "-c",
+        "for k in 24 28 32; do ./target/release/ecbench run --wait --spec research/curve25519_autolab_20261104/rebaseline-seedrun/specs/rebase-k$k.json --out research/curve25519_autolab_20261104/rebaseline-seedrun/sessions/rebase-k$k --cpus auto --allow-busy && ./target/release/ecbench verify --dir research/curve25519_autolab_20261104/rebaseline-seedrun/sessions/rebase-k$k --replay 8 --out research/curve25519_autolab_20261104/rebaseline-seedrun/verify-k$k.json && ./target/release/ecbench band --dir research/curve25519_autolab_20261104/rebaseline-seedrun/sessions/rebase-k$k --json research/curve25519_autolab_20261104/rebaseline-seedrun/band-k$k.json --ranks > research/curve25519_autolab_20261104/rebaseline-seedrun/band-k$k.txt && ./target/release/ecbench compare --dir research/curve25519_autolab_20261104/rebaseline-seedrun/sessions/rebase-k$k --a inc --b inc-run --json > research/curve25519_autolab_20261104/rebaseline-seedrun/compare-k$k.json || exit 1; done"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-04T16:02:56+00:00",
+      "wall_s": 33.025
+    }
+  ],
+  "commit": "805395d80b43c945d8aec652794f3f04ed5dbd56",
+  "commit_dirty": false,
+  "created_utc": "2026-11-04T16:02:27+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39"
+  },
+  "id": "20261104T1602Z-c25519-rebaseline-seedrun",
+  "metrics": [
+    {
+      "baseline": 1.7225208135023296,
+      "better": "lower",
+      "n": 64,
+      "name": "s_w0_seedrun_k24",
+      "note": "seed=run (fresh table per run) vs fixed table",
+      "reference": 1.0841845116817346,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.105468649162268
+    },
+    {
+      "baseline": 1.6163885454565432,
+      "better": "lower",
+      "n": 64,
+      "name": "s_w0_seedrun_k28",
+      "note": "seed=run (fresh table per run) vs fixed table",
+      "reference": 1.0375047481075381,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.8834768805111894
+    },
+    {
+      "baseline": 1.606424464431742,
+      "better": "lower",
+      "n": 64,
+      "name": "s_w0_seedrun_k32",
+      "note": "seed=run (fresh table per run) vs fixed table",
+      "reference": 1.010478342570442,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.8423102792691786
+    }
+  ],
+  "problem": "ic:curve25519-family-k24-32",
+  "raw": [
+    {
+      "bytes": 2451,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/band-k24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/10/10b0dcec15ea5eac01b748cddce4af60632fa14c603cbf5ed097bd7ba15a89c7",
+      "sha256": "10b0dcec15ea5eac01b748cddce4af60632fa14c603cbf5ed097bd7ba15a89c7",
+      "uploaded": false
+    },
+    {
+      "bytes": 2466,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/band-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/82/8265d6ede15841a40f47a02dd27d2dbabd814e3272d10cc5563d77d0d221fb70",
+      "sha256": "8265d6ede15841a40f47a02dd27d2dbabd814e3272d10cc5563d77d0d221fb70",
+      "uploaded": false
+    },
+    {
+      "bytes": 2501,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/band-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/94/948bff7693bd34201e2a9f1e0c00dfc77d01d9c746ce60cc0875052a44f8bb2e",
+      "sha256": "948bff7693bd34201e2a9f1e0c00dfc77d01d9c746ce60cc0875052a44f8bb2e",
+      "uploaded": false
+    },
+    {
+      "bytes": 2509,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/verify-k24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/86/86f03f07f8fc7c49c3cd01961b4f2705d4d3406d6f54853860b22ccf9b489a61",
+      "sha256": "86f03f07f8fc7c49c3cd01961b4f2705d4d3406d6f54853860b22ccf9b489a61",
+      "uploaded": false
+    },
+    {
+      "bytes": 2508,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/verify-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2a/2a1ea76673907d15a9f9d1840c519a500c84e57ecb6f326ebd78f92bcc6a730c",
+      "sha256": "2a1ea76673907d15a9f9d1840c519a500c84e57ecb6f326ebd78f92bcc6a730c",
+      "uploaded": false
+    },
+    {
+      "bytes": 2507,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/verify-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/df/dfd2dc8f619e3f35c84b104990e3d549ff79437a410ce3f6799b060a25e58315",
+      "sha256": "dfd2dc8f619e3f35c84b104990e3d549ff79437a410ce3f6799b060a25e58315",
+      "uploaded": false
+    },
+    {
+      "bytes": 16714,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/compare-k24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/90/907e5a0011e2950da695e2ae62f85dc6221756ebb0ba4dbef49fa7614441a68b",
+      "sha256": "907e5a0011e2950da695e2ae62f85dc6221756ebb0ba4dbef49fa7614441a68b",
+      "uploaded": false
+    },
+    {
+      "bytes": 16771,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/compare-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5f/5f09935f3793ffa7eb2cb305b538f80e80f32caba2bc124cbf295b807bb4638d",
+      "sha256": "5f09935f3793ffa7eb2cb305b538f80e80f32caba2bc124cbf295b807bb4638d",
+      "uploaded": false
+    },
+    {
+      "bytes": 16935,
+      "path": "research/curve25519_autolab_20261104/rebaseline-seedrun/compare-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d5/d568774f7a87ca918a49e907386a34909bdf9a2bc43ea70dea3a0684e841f538",
+      "sha256": "d568774f7a87ca918a49e907386a34909bdf9a2bc43ea70dea3a0684e841f538",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/curve25519_autolab_20261104/rebaseline-seedrun/REPORT.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-rebaseline-seedrun",
+  "status": "measured",
+  "summary": "Re-baseline: wwalk incumbents with a fresh table per run cost S 2.11 / 1.88 / 1.84 at k = 24 / 28 / 32 (1.94x / 1.81x / 1.82x rho); fixed-table draws were favourable",
+  "validation": null
+}

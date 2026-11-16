@@ -1,0 +1,7 @@
+# Prospective native inverse / normalization composition — T1489
+
+Root authorized at most TWO95-second ordinary software attempts,190 seconds cumulative,8GiB address space,3500MiB Lean heap, internal16MiB stack and hardOS10MiB stack, one worker. Freeze exact source before each attempt, retain failures, stop after two attempts. No scientific execution or campaign debit. Outer TERM90s/KILL5s; internal total80s leaves hash/receipt/cleanup reserve. No source build before this protocol.
+
+Compose reviewed RecoverNarrowPow.inverseGenerator/generator_product/generator_decode with Solve4Normalize.word_inverse_contract. Derive canonical returned unit and decoded inverse, and decoded pivot nonzero from native nonzero plus canonical input. Goal eliminates free unit, unit-bound and decoded-inverse hypotheses; retains prime UInt64 modulus p<=2^32, canonical augmented row, native pivot nonzero and zero prior columns. Concrete array mutation, swapping/pivot search, counters and whole solve4 remain outside this theorem.
+
+Controls: exact nontrivial p7 normalized row and RHS; returned native unit; actual premise witness; successful application of composition; p2 and last pivot/RHS fixtures; zero-pivot and missing-prefix counterexamples; deliberately false normalized pivot result must fail. No desired output equation appears as premise. Separate exact named axiom readback allowlist propext/Classical.choice/Quot.sound, reject sorryAx. Bind source/dependency/toolchain hashes before and after. Independent non-author source-fidelity review required after publication.

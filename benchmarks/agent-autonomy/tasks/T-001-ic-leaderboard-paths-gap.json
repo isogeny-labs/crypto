@@ -1,0 +1,35 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-001",
+  "title": "Repair the ic-leaderboard path-filter check",
+  "class": "ci-repair",
+  "difficulty": 1,
+  "source": [
+    ".github/workflows/ic-leaderboard.yml",
+    "scripts/check_ic_leaderboard_paths.py",
+    "AGENTS.md section 7 (keep the scoreboard current)"
+  ],
+  "prompt": "`python3 scripts/check_ic_leaderboard_paths.py` exits 1 on this checkout. Find the cause and repair it the way a CI-repair PR would: the smallest change, without weakening the check. Also run `python3 scripts/test_check_ic_leaderboard_paths.py`. Report what you changed and why.",
+  "setup": "Harness restores .github/workflows/ic-leaderboard.yml from the commit before c368ecfc7f (`git checkout c368ecfc7f~1 -- .github/workflows/ic-leaderboard.yml`, 'ic-leaderboard: cover the 161 builder inputs the path filter missed') and commits it as the setup commit. The path-coverage check then fails because the builder reads inputs that no `paths:` list names.",
+  "acceptance": [
+    "python3 scripts/check_ic_leaderboard_paths.py exits 0",
+    "python3 scripts/test_check_ic_leaderboard_paths.py exits 0",
+    "the diff touches .github/workflows/ic-leaderboard.yml only",
+    "the diff removes no existing `paths:` entry"
+  ],
+  "check_command": "python3 scripts/check_ic_leaderboard_paths.py && python3 scripts/test_check_ic_leaderboard_paths.py && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc '^.github/workflows/ic-leaderboard.yml$')\" = 0 ] && [ \"$(git diff \"$T_BASE\" HEAD -- .github/workflows/ic-leaderboard.yml | grep -c '^-[^-]')\" = 0 ]",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "removing the `paths:` filter, or making the builder read fewer files"
+  ],
+  "max_wall_minutes": 20,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Real failure at b99e587bdc (1 of 266 builder inputs uncovered, exit 1, verified), fixed upstream by c368ecfc7f at 03:23Z. The setup now reverts that fix; failing state after the revert was not executed here (git diff against the working tree is slow in this checkout, so checks compare commits)."
+}

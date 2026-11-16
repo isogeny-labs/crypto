@@ -1,0 +1,19 @@
+# nc2_stage0 args: r=[2097349] c=[0, 1, 2] n=20000 seed=20261108 d1=None d3=false train=300 restarts=8 steps=40
+
+## r=2097349 C=0 (K=1, sqrt(r)=1448.2) Poisson floor 0.886
+D0  random-jump control (16 jumps): E = 0.9182 +- 0.0034 (n=20000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 0.8857 +- 0.0033 (n=20000)
+D0h hash-of-scalar jump (diagnostic): E = 0.9163 +- 0.0034 (n=20000)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.8909 +- 0.0060 (n=20000, 19571 censored at cap)
+
+## r=2097349 C=1 (K=2, sqrt(r)=1448.2) Poisson floor 1.329
+D0  random-jump control (16 jumps): E = 1.3824 +- 0.0035 (n=20000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 1.3269 +- 0.0034 (n=20000)
+D0h hash-of-scalar jump (diagnostic): E = 5.6779 +- 0.0306 (n=20000, 9972 censored at cap)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.9974 +- 0.0008 (n=20000, 19983 censored at cap)
+
+## r=2097349 C=2 (K=3, sqrt(r)=1448.2) Poisson floor 1.662
+D0  random-jump control (16 jumps): E = 1.7203 +- 0.0036 (n=20000)
+D0i i.i.d. uniform points (diagnostic, not a walk): E = 1.6613 +- 0.0034 (n=20000)
+D0h hash-of-scalar jump (diagnostic): E = 7.9575 +- 0.0253 (n=20000, 15057 censored at cap)
+D2  stride tiling (serpentine box; E is a lower bound when censored): E = 9.9998 +- 0.0000 (n=20000, 20000 censored at cap)
