@@ -107,5 +107,5 @@ The q = 24001 launch hit the session's 2 h background limit after 34 of 40 runs 
 positions 0–1 done). The remaining six runs (seed 5, positions 2–7) were run with
 `run_v5_part.sh`, using the same binary (hash checked), the same per-run command and the same
 order, and are marked `"resumed": true`. Their wall times come from a later process. q = 32003
-is about 3× slower per run, so it runs as one launch per seed (`run_v5_part.sh`, `SEEDS=<s>`), in
-seed order. No analysis was run on any data before this addendum.
+was expected to be about 3× slower per run, so it runs in several launches of `run_v5_part.sh`, in
+seed order. Seed 1 ran alone and took 868 s, so seeds 2–3 and then 4–5 run as one launch each. No analysis was run on any data before this addendum.
