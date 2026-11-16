@@ -8,7 +8,7 @@
 
 ## Problem
 
-The original P-192 speedup test remains open. All eight kernels have coset-image quotient/dual transfer. Kernel3 now has a smooth Fp quartic candidate,conditional square differential character,and qualified target/source Kummer-coordinate components. Finite inversion to destination divisors,consistent sign,Frobenius/divisor-class isogeny and a useful restricted-base P-192 solver remain required. Small full-base controls recover scalars on public F109/F1009 fixtures. Paid performance runs additionally require restored,live-confirmed budget headroom. [pcc:unverified]
+The original P-192 speedup test remains open. Kernel3 now has an explicit original-field degree6 map from its quartic to P-192,with a global equation and degree check. All226 retained points have actual elliptic norms,and six source-bound principal rows have rank6. See [BACKMAP.md](../research/nist_cover_three_tests_20261116/BACKMAP.md),PCC-20261116-00cca4 and PCC-20261116-e2980e. Next execute closed public fibers and target class pullback/norm. The full source-Jacobian isogeny/dual and useful restricted-base recovery remain required. Paid performance runs additionally require restored,live-confirmed budget headroom. [pcc:unverified]
 
 ## Evidence and uncertainty
 
@@ -31,7 +31,7 @@ The original P-192 speedup test remains open. All eight kernels have coset-image
 
 ## Next discriminating step
 
-Use the completed kernel3 eight-function basis,target coordinate match and actual public source Kummer images to construct and solve Tian's finite divisor inverse. See [KUMMER.md](../research/nist_cover_three_tests_20261116/KUMMER.md),PCC-20261116-41d5db,PCC-20261116-29e27d and PCC-20261116-4ed451. Extend target arithmetic to closed image divisors and orient the map consistently. The tested plain modular Giac mode fails the actual-prime control; a distinct typed-generator diagnostic still needs independent native qualification. Check actual public source-point classes,kernel,Frobenius and homomorphism identities before a destination DLP claim. Preserve exact kernel/moduli/descent witnesses. The original proposed experiment envelope remains2CPU/8GiB/1800s,zero retries and totalUSD5 after admission; larger solver panels need a frozen budget. Native development correctness checks do not constitute the paid cost evaluation. [pcc:unverified]
+Follow the [closed-fiber/class plan](../research/nist_cover_three_tests_20261116/FIBER_CLASS_PLAN.md) from the actual degree6 backmap:recover finite public fibers natively,adapt them to the existing large-model KM representation,and check composition[6],Frobenius,addition and public G/Q. The exact-field Giac bridge now passes native replay(PCC-20261116-21485b),but the one declared60-second seven-variable solve times out. The full-J(H) isogeny and projected individual descent remain separate requirements. Preserve every outcome and exact witness. The original paid experiment envelope remains2CPU/8GiB/1800s,zero retries and totalUSD5 after admission;native functional correctness does not constitute that cost evaluation. [pcc:unverified]
 
 ## Resolution and history
 

@@ -14,3 +14,7 @@ dot -Tsvg figures/kummer.dot -o figures/kummer.svg
 dot -Tpdf figures/kummer.dot -o figures/kummer.pdf
 sed 's@figures/kummer.svg@figures/kummer.pdf@g' KUMMER.md |
   pandoc --from markdown+tex_math_dollars --pdf-engine=pdflatex -V geometry:margin=0.7in -V fontsize=10pt -V colorlinks=true --resource-path=. -o KUMMER.pdf
+dot -Tsvg figures/backmap.dot -o figures/backmap.svg
+dot -Tpdf figures/backmap.dot -o figures/backmap.pdf
+sed 's@figures/backmap.svg@figures/backmap.pdf@g' BACKMAP.md |
+  pandoc --from markdown+tex_math_dollars --pdf-engine=pdflatex -V geometry:margin=0.7in -V fontsize=10pt -V colorlinks=true --resource-path=. -o BACKMAP.pdf

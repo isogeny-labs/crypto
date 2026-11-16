@@ -2,6 +2,8 @@
 
 2026-11-16. The actual P-192 d7 cover now has executable quotient-coordinate evaluation on public elliptic pullbacks and an exact8-by8 match to functions on the reconstructed kernel3 quartic. All results below have unsigned producer standing. The remaining construction is the finite inverse to destination divisors, including its sign and divisor-class arithmetic. [pcc:unverified]
 
+The subgroup construction now has an additional concrete route:an [explicit degree6 map from the quartic to P-192](BACKMAP.md),with global equation and degree checks. Its divisor pullback can supply the elliptic-subgroup transfer without first solving the seven-variable Kummer inverse. Closed public fibers and class arithmetic remain to be implemented. [pcc:unverified]
+
 ![Recorded coordinate components and remaining inverse](figures/kummer.svg)
 
 ## Why kernel3 is used
@@ -48,7 +50,7 @@ The native constructor now checks this system on all16 retained target triples:3
 
 Kummer coordinates identify a class with its negative. Inversion must therefore orient the map consistently, verify the divisor class rather than just its coordinates, and handle exceptional charts. Required class checks are kernel invariance,Frobenius,addition and dual composition[3]. With the existing degree2 cover maps, the elliptic transfer composition must be[6]. Public-point transfer and destination restricted-base relations must then recover/check a scalar on the original elliptic curve.
 
-The tested plain modular Giac mode fails the actual-prime known-answer control and is excluded. A separate nonconstant GF(p,2) diagnostic returns both prescribed roots and rejects its nonroot, but its coefficients still need independent native replay before use; it has not solved this inverse system. No paid/performance campaign was launched. [pcc:unverified]
+The tested plain modular Giac mode fails its actual-prime control and is excluded. The exact Fp24 primitive bridge now passes native basis arithmetic and independent native replay of the backend's reduced basis,roots and S-pair(PCC-20261116-21485b). All762 distinct coefficients of the actual G inverse system round-trip. The one declared60-second lexicographic solve times out without a basis;it does not solve this inverse system. The backmap route above proceeds independently. No paid/performance campaign was launched. [pcc:unverified]
 
 ## Reproduction and retained failures
 
