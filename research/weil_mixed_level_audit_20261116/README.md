@@ -13,3 +13,18 @@ Local **PCC-20261116-3a0d5c PASS at 2026-11-16T21:06:40Z**, signedunverified. Wh
 Sources: fresh bounded ch26 lines58–151/printed574–576 before protocol/setup/code, explicit coprimality/level law/source26.1 conventions; no fullchapter/externalproof/novelty claim. Canonical actual level-three/dyadic/ordinary models and official scalar/point APIs credited. SixKB calls and source/publicationConductor127; fallback does not establish absence. General odd powers, perfect-character duality, Scheme/isogeny comparison, descent and canonical Tate/MOV/FR remain open. Samehost checks do not establish parser/compiler/host independence or signed standing. All14active/zero spend. [pcc:unverified]
 
 Ready4444 is the current route; merged4389 stays closed. The actual fetched4cc03 main snapshot had1215ledger rows versus local predecessor651/common274/neitherprefix; local now652 preserves651prefix. No rechain/reissue/force/main merge. This is an explicit integration blocker, separate from local Lean PASS; current CI/review/signing remain pending. [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4444](https://github.com/isogeny-labs/crypto/pull/4444),
+now titled for both mixed-level characteristic guards. Local proof receipt
+`90dad37516e96c72e1d1b0187de557e6e31d17d8` and remote proof
+`edbfc803a05fd0c96cfe0a3e4f37fb4e7e7171a7` share tree
+`d73449eb25dd7af38396f95fa927b78b892a3ecf`. Completed anonymous fetch and fresh exact
+head/title/body/open/ready confirmation are recorded in
+[publication.json](publication.json). Current-head CI/review/signing remain
+pending; local replay does not establish signed standing. Auto-merge remains
+enabled per owner default, but the PR is nonmergeable with the explicit ledger
+prefix integration blocker. No rechain/reissue/force/main merge. General odd
+powers, perfect-character duality, full Scheme/isogeny comparison, descent
+and canonical Tate/MOV/Frey–Ruck remain open. [pcc:unverified]
