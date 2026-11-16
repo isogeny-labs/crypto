@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/crypto-worktrees/ghs-n7-membership-run-20261114/research/ghs_odd5_s7_benchmark_20261116/s7_attack.sage.py", line 121, in <module>
+    logs=M.solve_right(vector(GF(r),rhs))
+  File "sage/matrix/matrix2.pyx", line 966, in sage.matrix.matrix2.Matrix.solve_right
+    X = self._solve_right_general(C, check=check)
+  File "sage/matrix/matrix2.pyx", line 1114, in sage.matrix.matrix2.Matrix._solve_right_general
+    X = A.solve_right(B.matrix_from_rows(pivot_rows), check=False)
+  File "sage/matrix/matrix2.pyx", line 969, in sage.matrix.matrix2.Matrix.solve_right
+    X = self._solve_right_nonsingular_square(C, check_rank=True)
+  File "sage/matrix/matrix2.pyx", line 1057, in sage.matrix.matrix2.Matrix._solve_right_nonsingular_square
+    D.echelonize()
+  File "sage/matrix/matrix2.pyx", line 8538, in sage.matrix.matrix2.Matrix.echelonize
+    self._echelon_in_place(algorithm)
+  File "sage/matrix/matrix2.pyx", line 8839, in sage.matrix.matrix2.Matrix._echelon_in_place
+    sig_check()
+KeyboardInterrupt
