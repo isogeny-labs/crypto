@@ -1,0 +1,35 @@
+[
+  {
+    "id": "width5-wider-source-independent-placement-next",
+    "executed": false,
+    "hypothesis": "Validate5Dversus7Dandall-h on a fixed wider source-independent training/validation panel, with every placement/inputhash frozen before timing and no omitted unresolved arm.",
+    "plan": "research/width5_wider_panel_plan_20261112_v1/PLAN.md",
+    "budget": {
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cores": 1
+    },
+    "limitation": "Globalhspace remainsp; width32/64 escalates only after boundedcostadmission."
+  },
+  {
+    "id": "source-coupled-bernstein-next",
+    "executed": false,
+    "plan": "research/source_coupled_bernstein_plan_20261112_v1/PLAN.md",
+    "hypothesis": "Bound the same original integer sources together through symmetric Bernstein coefficients; intersect with existing independentS/T/Ubound, then compare full conditional recoverycost.",
+    "proof_scope": "Classical Bernsteinbound; abstractcoefficientwitness only, no provedactualcurveinstance or measuredgain.",
+    "headroom": "Currentwidth8panelhasnoemptyunexcludedfiber; useonlyasoverheadcontrol. Pruningbenefitrequiresfreshfrozeneligiblepanelwithcompleteempty-fiberoracle andchargedselection."
+  },
+  {
+    "id": "joint-on-demand-query-next",
+    "executed": false,
+    "plan": "research/joint_query_plan_20261112_v1/PLAN.md",
+    "hypothesis": "Separate no-cache pointqueries from all-target batches; compare genericFrobeniuspow, chargedlinearFrobenius andstrong directcoordinateinverse.",
+    "limitation": "Requires explicitinvertiblesource-linearmappremise; notgenericcurvecoverage."
+  },
+  {
+    "id": "external-reducer-original-root-and-baseline-stream",
+    "executed": false,
+    "hypothesis": "Pin a genuine external FLINT/fplll reducer and independently replay every certificate; continue fullmatchingF4/F5/F6 and globaloriginalrootbranchcoverage for actualGF(2^83), ordinarybinary/Koblitz,oddextensions,NISTprimes.",
+    "primary": "PRIMARY_SOURCE_REVIEW.json"
+  }
+]

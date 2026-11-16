@@ -1,0 +1,28 @@
+--- exporter-v4-qualification-v4-20261111/durable-worker.py
++++ exporter-v4-qualification-v5-20261111/durable-worker.py
+@@ -8,7 +8,7 @@
+ F=load_admission(P)
+ W=Path(F['workspace']); OUT=Path(F['durable_run'])/'worker'; SOURCE=W/'source'; STAGE=W/'cache'
+ START=time.monotonic(); END=float(os.environ['PENCIL_CHECK_END_MONOTONIC']); ACTIVE=None; INTERRUPTED=False;OWNED_OUTPUT=False;PERMIT_REQUIRED=False;PHASE_END=END-600;BUILD_END=END-600
+-R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'ten exporter controls plus one synthetic file export over all6300 frozen triplets; no solver calls'}
++R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'eleven exporter controls and four fixed public-fixture managed parity controls; software solver calls, no scientific cohort'}
+ resource.setrlimit(resource.RLIMIT_AS,(16*1024**3,16*1024**3))
+ def checkpoint(phase):
+  R['phase']=phase;R['elapsed_seconds']=time.monotonic()-START
+@@ -181,6 +181,7 @@
+  checkpoint('concurrent-traversal-control-passed');guard()
+  command('materialize',['/usr/bin/python3','-B',str(P/'materialize.py')],cwd=P)
+  materialized=json.loads((W/'materialization.json').read_text());assert materialized['status']=='passed' and materialized['build_end_monotonic']==BUILD_END
++ assert materialized['source_files']==4501 and materialized['source_manifest_sha256']==F['source_manifest_sha256']
+  assert materialized['cache_mode_inventory_sha256']==H(P/'cache-mode-inventory.json') and materialized['cache_modes_verified']==2165 and materialized['cache_executable_modes_verified']==82
+  R['materialization_receipt_sha256']=H(W/'materialization.json');verify_private_source();R['pre_inputs_verified']=True
+  cargo=F['toolchain']+'/bin/cargo'
+@@ -214,7 +215,7 @@
+    summaries=[x for x in json_rows(output) if x.get('qualification')=='synthetic_empty_interrupted_file_export']
+    assert len(summaries)==1 and summaries[0]['attempt_rows']==22680 and summaries[0]['triplets']==6300 and summaries[0]['eligible_pairs']==0 and summaries[0]['scientific_evidence'] is False
+    R['synthetic_file_summary']=summaries[0]
+- assert len(R['exact_test_results'])==11
++ assert len(R['exact_test_results'])==15
+  assert H(binary)==R['test_binary']['sha256'],'binary changed after tests'
+  verify_private_source()
+  manifest=Path(F['immutable_manifest']['path']);assert H(manifest)==F['immutable_manifest']['sha256'];inputs=json.loads(manifest.read_text());verify(inputs['immutable'])

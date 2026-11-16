@@ -329,7 +329,7 @@ impl ValueOperation {
             Self::IntegerAddBit => {
                 let sum = values[0]
                     .to_u8()
-                    .and_then(|a| values[1].to_u8().map(|b| (a, b)))
+                    .zip(values[1].to_u8())
                     .and_then(|(a, b)| values[2].to_u8().map(|c| (a, b, c)))
                     .ok_or_else(|| integrity("canonical add-bit input"))?;
                 let sum = sum.0 + sum.1 + sum.2;
@@ -1622,9 +1622,16 @@ mod tests {
                 .unwrap()
             })
             .collect::<Vec<_>>();
-        let network =
-            crate::reduction::decomposition_network(&curve, &bases, curve.generator(), &mut work)
-                .unwrap();
+        // Fourier explicitly: its pointwise and transform vertices are the
+        // ones above the exact cap (the default picks schoolbook at this width).
+        let network = crate::reduction::decomposition_network_with_multiplier(
+            &curve,
+            &bases,
+            curve.generator(),
+            crate::encoding::Multiplier::Fourier,
+            &mut work,
+        )
+        .unwrap();
         let pins = vec![None; network.edge_count()];
         let snapshot = CanonicalNetwork::capture(
             &network,

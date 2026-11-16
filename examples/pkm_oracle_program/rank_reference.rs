@@ -5,6 +5,88 @@
 //! Sparse provenance retains combinations of original input rows. The tiny
 //! control uses at most 258 columns; the explicit 512-column limit is wider.
 use std::collections::BTreeMap;
+use std::{cell::RefCell, rc::Rc};
+
+// Source-operation calls, not machine instructions or calibrated prices.
+// Modular/inverse/iteration counters are diagnostics overlapping their leaves.
+macro_rules! count_fields {
+    ($($field:ident),+ $(,)?) => {
+        #[derive(Clone, Default, Debug, PartialEq, Eq)]
+        pub(super) struct Counts { $(pub $field: u64,)+ }
+        impl Counts {
+            pub fn entries(&self) -> Vec<(&'static str, u64)> {
+                vec![$((stringify!($field), self.$field),)+]
+            }
+        }
+    };
+}
+count_fields!(
+    modular_products,
+    modular_differences,
+    modular_sums,
+    u128_products,
+    u128_additions,
+    u128_subtractions,
+    u128_remainders,
+    u64_additions,
+    u64_remainders,
+    inverse_calls,
+    euclidean_iterations,
+    i128_divisions,
+    i128_products,
+    i128_subtractions,
+    i128_rem_euclid_calls,
+    primality_guard_divisions,
+    primality_divisibility_tests,
+    row_length_checks,
+    coefficient_range_checks,
+    space_constructor_calls
+);
+
+#[derive(Default)]
+struct MeterState {
+    counts: Counts,
+    overflowed: bool,
+}
+
+/// Caller-owned across spaces and errors. Counter overflow makes ALL counts
+/// unavailable rather than an exact zero/saturated ledger; arithmetic is intact.
+#[derive(Clone, Default)]
+pub(super) struct Meter(Rc<RefCell<MeterState>>);
+impl Meter {
+    fn bump(&self, field: fn(&mut Counts) -> &mut u64, amount: u64) {
+        let mut state = self.0.borrow_mut();
+        let (value, overflow) = field(&mut state.counts).overflowing_add(amount);
+        *field(&mut state.counts) = if overflow { u64::MAX } else { value };
+        state.overflowed |= overflow;
+    }
+    pub fn snapshot(&self) -> Option<Counts> {
+        let state = self.0.borrow();
+        (!state.overflowed).then(|| state.counts.clone())
+    }
+    pub fn overflowed(&self) -> bool {
+        self.0.borrow().overflowed
+    }
+    fn product(&self, a: u64, b: u64, p: u64) -> u64 {
+        self.bump(|c| &mut c.modular_products, 1);
+        self.bump(|c| &mut c.u128_products, 1);
+        self.bump(|c| &mut c.u128_remainders, 1);
+        product(a, b, p)
+    }
+    fn difference(&self, a: u64, b: u64, p: u64) -> u64 {
+        self.bump(|c| &mut c.modular_differences, 1);
+        self.bump(|c| &mut c.u128_additions, 1);
+        self.bump(|c| &mut c.u128_subtractions, 1);
+        self.bump(|c| &mut c.u128_remainders, 1);
+        difference(a, b, p)
+    }
+    fn sum(&self, a: u64, b: u64, p: u64) -> u64 {
+        self.bump(|c| &mut c.modular_sums, 1);
+        self.bump(|c| &mut c.u64_additions, 1);
+        self.bump(|c| &mut c.u64_remainders, 1);
+        (a + b) % p
+    }
+}
 
 pub(super) type Combination = Vec<(usize, u64)>;
 
@@ -14,10 +96,15 @@ fn product(a: u64, b: u64, p: u64) -> u64 {
 fn difference(a: u64, b: u64, p: u64) -> u64 {
     ((u128::from(a) + u128::from(p) - u128::from(b)) % u128::from(p)) as u64
 }
-fn inverse(a: u64, p: u64) -> Result<u64, String> {
+fn inverse(a: u64, p: u64, meter: &Meter) -> Result<u64, String> {
+    meter.bump(|c| &mut c.inverse_calls, 1);
     let (mut r, mut next_r) = (i128::from(p), i128::from(a));
     let (mut t, mut next_t) = (0i128, 1i128);
     while next_r != 0 {
+        meter.bump(|c| &mut c.euclidean_iterations, 1);
+        meter.bump(|c| &mut c.i128_divisions, 1);
+        meter.bump(|c| &mut c.i128_products, 2);
+        meter.bump(|c| &mut c.i128_subtractions, 2);
         let quotient = r / next_r;
         (r, next_r) = (next_r, r - quotient * next_r);
         (t, next_t) = (next_t, t - quotient * next_t);
@@ -25,16 +112,24 @@ fn inverse(a: u64, p: u64) -> Result<u64, String> {
     if r != 1 {
         return Err("noninvertible reference coefficient".into());
     }
+    meter.bump(|c| &mut c.i128_rem_euclid_calls, 1);
     Ok(t.rem_euclid(i128::from(p)) as u64)
 }
-fn canonical(row: &[u64], dimension: usize, p: u64) -> Result<(), String> {
-    if row.len() != dimension || row.iter().any(|&x| x >= p) {
+fn canonical(row: &[u64], dimension: usize, p: u64, meter: &Meter) -> Result<(), String> {
+    meter.bump(|c| &mut c.row_length_checks, 1);
+    if row.len() != dimension {
         return Err("noncanonical reference row".into());
+    }
+    for &x in row {
+        meter.bump(|c| &mut c.coefficient_range_checks, 1);
+        if x >= p {
+            return Err("noncanonical reference row".into());
+        }
     }
     Ok(())
 }
-fn accumulate(weights: &mut BTreeMap<usize, u64>, index: usize, value: u64, p: u64) {
-    let sum = (weights.get(&index).copied().unwrap_or(0) + value) % p;
+fn accumulate(weights: &mut BTreeMap<usize, u64>, index: usize, value: u64, p: u64, meter: &Meter) {
+    let sum = meter.sum(weights.get(&index).copied().unwrap_or(0), value, p);
     if sum == 0 {
         weights.remove(&index);
     } else {
@@ -49,25 +144,37 @@ struct Vector {
 }
 
 pub(super) struct Space {
+    meter: Meter,
     p: u64,
     dimension: usize,
     input_rows: usize,
     basis: Vec<Vector>,
 }
 impl Space {
+    #[cfg(test)]
     pub fn new(p: u64, dimension: usize) -> Result<Self, String> {
+        Self::new_metered(p, dimension, Meter::default())
+    }
+    pub fn new_metered(p: u64, dimension: usize, meter: Meter) -> Result<Self, String> {
+        meter.bump(|c| &mut c.space_constructor_calls, 1);
         if !(2..1u64 << 32).contains(&p) || !(1..=512).contains(&dimension) {
             return Err("unsupported reference scalar space".into());
         }
         // Separate bounded primality check; no shared producer helper.
         let mut divisor = 2;
-        while divisor <= p / divisor {
+        loop {
+            meter.bump(|c| &mut c.primality_guard_divisions, 1);
+            if divisor > p / divisor {
+                break;
+            }
+            meter.bump(|c| &mut c.primality_divisibility_tests, 1);
             if p.is_multiple_of(divisor) {
                 return Err("reference scalar modulus is not prime".into());
             }
             divisor += 1;
         }
         Ok(Self {
+            meter,
             p,
             dimension,
             input_rows: 0,
@@ -78,7 +185,7 @@ impl Space {
         self.basis.len()
     }
     fn reduce(&self, row: &[u64]) -> Result<(Vec<u64>, BTreeMap<usize, u64>), String> {
-        canonical(row, self.dimension, self.p)?;
+        canonical(row, self.dimension, self.p, &self.meter)?;
         let mut remaining = row.to_vec();
         let mut used = BTreeMap::new();
         for vector in &self.basis {
@@ -87,14 +194,17 @@ impl Space {
                 continue;
             }
             for (a, &b) in remaining.iter_mut().zip(&vector.values) {
-                *a = difference(*a, product(coefficient, b, self.p), self.p);
+                *a = self
+                    .meter
+                    .difference(*a, self.meter.product(coefficient, b, self.p), self.p);
             }
             for (&index, &weight) in &vector.provenance {
                 accumulate(
                     &mut used,
                     index,
-                    product(coefficient, weight, self.p),
+                    self.meter.product(coefficient, weight, self.p),
                     self.p,
+                    &self.meter,
                 );
             }
         }
@@ -107,17 +217,19 @@ impl Space {
         let Some(pivot) = remaining.iter().rposition(|&x| x != 0) else {
             return Ok(false);
         };
-        let scale = inverse(remaining[pivot], self.p)?;
+        let scale = inverse(remaining[pivot], self.p, &self.meter)?;
         for x in &mut remaining {
-            *x = product(*x, scale, self.p);
+            *x = self.meter.product(*x, scale, self.p);
         }
         let mut provenance = BTreeMap::from([(index, scale)]);
         for (prior, weight) in used {
             accumulate(
                 &mut provenance,
                 prior,
-                difference(0, product(scale, weight, self.p), self.p),
+                self.meter
+                    .difference(0, self.meter.product(scale, weight, self.p), self.p),
                 self.p,
+                &self.meter,
             );
         }
         self.basis.push(Vector {
@@ -144,7 +256,7 @@ impl Space {
         weights: &Combination,
         target: &[u64],
     ) -> Result<(), String> {
-        canonical(target, self.dimension, self.p)?;
+        canonical(target, self.dimension, self.p, &self.meter)?;
         let mut actual = vec![0u64; self.dimension];
         let mut previous = None;
         for &(index, weight) in weights {
@@ -155,9 +267,11 @@ impl Space {
             {
                 return Err("invalid sparse combination certificate".into());
             }
-            canonical(&rows[index], self.dimension, self.p)?;
+            canonical(&rows[index], self.dimension, self.p, &self.meter)?;
             for (a, &b) in actual.iter_mut().zip(&rows[index]) {
-                *a = (*a + product(weight, b, self.p)) % self.p;
+                *a = self
+                    .meter
+                    .sum(*a, self.meter.product(weight, b, self.p), self.p);
             }
             previous = Some(index);
         }
@@ -177,7 +291,7 @@ impl Space {
         let variables = self.dimension - 1;
         let mut previous = None;
         for (pivot, row) in rows {
-            canonical(row, self.dimension, self.p)?;
+            canonical(row, self.dimension, self.p, &self.meter)?;
             if *pivot >= variables
                 || previous.is_some_and(|p| p >= *pivot)
                 || row[*pivot] != 1
@@ -216,16 +330,20 @@ impl Space {
             kernel[free] = 1;
             // Rightmost-pivot rows contain only earlier coordinates.
             for vector in self.basis.iter().rev() {
-                let sum = vector.values[..vector.pivot]
-                    .iter()
-                    .zip(&kernel)
-                    .fold(0, |sum, (&a, &b)| (sum + product(a, b, self.p)) % self.p);
-                kernel[vector.pivot] = difference(0, sum, self.p);
+                let sum =
+                    vector.values[..vector.pivot]
+                        .iter()
+                        .zip(&kernel)
+                        .fold(0, |sum, (&a, &b)| {
+                            self.meter
+                                .sum(sum, self.meter.product(a, b, self.p), self.p)
+                        });
+                kernel[vector.pivot] = self.meter.difference(0, sum, self.p);
             }
             if kernel[coordinate] != 0 {
-                let scale = inverse(kernel[coordinate], self.p)?;
+                let scale = inverse(kernel[coordinate], self.p, &self.meter)?;
                 for x in &mut kernel {
-                    *x = product(*x, scale, self.p);
+                    *x = self.meter.product(*x, scale, self.p);
                 }
                 return Ok(Some(kernel));
             }
@@ -238,16 +356,16 @@ impl Space {
         coordinate: usize,
         kernel: &[u64],
     ) -> Result<(), String> {
-        canonical(kernel, self.dimension, self.p)?;
+        canonical(kernel, self.dimension, self.p, &self.meter)?;
         if coordinate >= self.dimension || kernel[coordinate] != 1 {
             return Err("ambiguity witness must change the target by one".into());
         }
         for row in rows {
-            canonical(row, self.dimension, self.p)?;
-            let sum = row
-                .iter()
-                .zip(kernel)
-                .fold(0, |sum, (&a, &b)| (sum + product(a, b, self.p)) % self.p);
+            canonical(row, self.dimension, self.p, &self.meter)?;
+            let sum = row.iter().zip(kernel).fold(0, |sum, (&a, &b)| {
+                self.meter
+                    .sum(sum, self.meter.product(a, b, self.p), self.p)
+            });
             if sum != 0 {
                 return Err("ambiguity witness is not in the original-row kernel".into());
             }
@@ -259,6 +377,85 @@ impl Space {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn counted_inverse_children_and_failed_calls_stay_with_the_caller() {
+        let meter = Meter::default();
+        assert_eq!(inverse(2, 19, &meter).unwrap(), 10);
+        let counts = meter.snapshot().unwrap();
+        assert_eq!(counts.inverse_calls, 1);
+        assert_eq!(counts.euclidean_iterations, 2);
+        assert_eq!(counts.i128_divisions, 2);
+        assert_eq!(counts.i128_products, 4);
+        assert_eq!(counts.i128_subtractions, 4);
+        assert_eq!(counts.i128_rem_euclid_calls, 1);
+        assert!(inverse(0, 19, &meter).is_err());
+        let counts = meter.snapshot().unwrap();
+        assert_eq!(counts.inverse_calls, 2);
+        assert_eq!(counts.i128_divisions, 2); // failed zero inverse did no division
+        let rejected = Meter::default();
+        assert!(Space::new_metered(9, 2, rejected.clone()).is_err());
+        let counts = rejected.snapshot().unwrap();
+        assert_eq!(counts.space_constructor_calls, 1);
+        assert_eq!(counts.primality_guard_divisions, 2);
+        assert_eq!(counts.primality_divisibility_tests, 2);
+    }
+    #[test]
+    fn shared_space_ledgers_conserve_work_and_late_certificate_refusals() {
+        let work = |meter: Meter, row: &[u64]| {
+            let mut space = Space::new_metered(19, 3, meter).unwrap();
+            space.insert(row).unwrap();
+            space.contains(&[0, 0, 1]).unwrap();
+        };
+        let a = Meter::default();
+        let b = Meter::default();
+        let shared = Meter::default();
+        work(a.clone(), &[1, 0, 1]);
+        work(b.clone(), &[0, 1, 1]);
+        work(shared.clone(), &[1, 0, 1]);
+        work(shared.clone(), &[0, 1, 1]);
+        for (((key, total), (ka, ca)), (kb, cb)) in shared
+            .snapshot()
+            .unwrap()
+            .entries()
+            .into_iter()
+            .zip(a.snapshot().unwrap().entries())
+            .zip(b.snapshot().unwrap().entries())
+        {
+            assert_eq!(key, ka);
+            assert_eq!(key, kb);
+            assert_eq!(total, ca + cb);
+        }
+        let meter = Meter::default();
+        let space = Space::new_metered(19, 3, meter.clone()).unwrap();
+        let before = meter.snapshot().unwrap();
+        assert!(space
+            .verify_combination(&[vec![1, 2, 3]], &vec![(0, 1), (1, 1)], &[1, 2, 3])
+            .is_err());
+        let after = meter.snapshot().unwrap();
+        assert_eq!(after.modular_products - before.modular_products, 3);
+        assert_eq!(after.modular_sums - before.modular_sums, 3);
+        assert_eq!(after.u128_products, after.modular_products);
+        assert_eq!(after.u64_additions, after.modular_sums);
+        let before = after;
+        assert!(space.contains(&[19, 0, 0]).is_err());
+        let after = meter.snapshot().unwrap();
+        assert_eq!(
+            after.coefficient_range_checks - before.coefficient_range_checks,
+            1
+        );
+        assert_eq!(after.row_length_checks - before.row_length_checks, 1);
+        assert_eq!(after.modular_products, before.modular_products);
+    }
+    #[test]
+    fn counter_overflow_is_unavailable_not_zero_or_saturated_exact_work() {
+        let meter = Meter::default();
+        meter.0.borrow_mut().counts.u128_products = u64::MAX;
+        assert_eq!(meter.product(2, 10, 19), 1);
+        assert!(meter.overflowed());
+        assert_eq!(meter.snapshot(), None);
+        assert_eq!(meter.difference(0, 1, 19), 18);
+        assert_eq!(meter.snapshot(), None);
+    }
     #[test]
     fn all_two_by_three_f3_spaces_match_minor_rank_and_check_every_certificate() {
         for code in 0..729u64 {

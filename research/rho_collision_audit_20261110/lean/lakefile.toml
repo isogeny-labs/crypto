@@ -1,0 +1,11 @@
+name = "rho_collision_audit"
+version = "0.1.0"
+defaultTargets = ["RhoCollisionAudit"]
+
+[[require]]
+name = "walk_audit"
+path = "../../walk_audit_20261109/lean"
+
+[[lean_lib]]
+name = "RhoCollisionAudit"
+roots = ["FirstCollision", "BoundedSteps", "UniformCollision", "Counterfamily"]

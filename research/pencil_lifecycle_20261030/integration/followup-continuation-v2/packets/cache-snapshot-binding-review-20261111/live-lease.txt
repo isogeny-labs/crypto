@@ -1,0 +1,36 @@
+---
+id: T-2141
+project: experiments
+status: claimed
+visibility: team_summary
+owner: user:ec2-user
+executor: agent:cli/attempt-1
+lease:
+    id: bfac4dbc-7fdf-496f-b7ff-ba542483c242
+    fencing_epoch: 1
+    holder: ec2-user
+    expires_at: 2026-11-11T01:21:09.659992Z
+worktree: /home/ec2-user/crypto-pencil-evidence-recovery-20261105
+route:
+    role: implementer
+    harness: cli
+    model_alias: ""
+    reasoning_effort: medium
+budget:
+    max_attempts: 4
+scopes:
+    - resource: dir:research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/cache-snapshot-final-binding-20261111
+      mode: write_exclusive
+    - resource: path:research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-cache-snapshot-renewal-20261111/release.json
+      mode: write_exclusive
+---
+
+# Review and bind current readonly cache snapshot
+
+## Artifacts
+
+- Commit: not yet published
+
+## Privacy note
+
+This card contains coordination state only. It does not contain the originating chat transcript or hidden model reasoning.

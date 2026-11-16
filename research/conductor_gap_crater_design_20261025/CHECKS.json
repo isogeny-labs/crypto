@@ -1,0 +1,35 @@
+{
+  "status": "pass",
+  "scope": "Existing-data reanalysis and provisional design; zero new scientific solver measurements",
+  "native_checks": "checks/native-validation.json",
+  "rust_library": {
+    "passed": 4494,
+    "failed": 0,
+    "ignored": 119,
+    "log": "checks/rust-lib.log",
+    "command": "cargo test --release --lib --offline"
+  },
+  "site_tests": {
+    "passed": 49,
+    "failed": 0,
+    "log": "checks/site-tests.log"
+  },
+  "validation_gate_tests": {
+    "passed": 49,
+    "failed": 0,
+    "log": "checks/gate-tests.log"
+  },
+  "validation_gate": {
+    "status": "pass",
+    "base": "8e6eb294faaac9145fa72e3befc710ebe32ef259",
+    "log": "checks/gate-check.log"
+  },
+  "original_archive_hash": "pass",
+  "pdf": "PDF_INSPECTION.json",
+  "conductor": {
+    "available": false,
+    "log": "checks/conductor.log"
+  },
+  "larger_size_or_more_repetition_measurements": "not performed",
+  "input_snapshot_head": "20af12f8641c19710a8135655b012b5359ffe02d"
+}

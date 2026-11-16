@@ -1,0 +1,64 @@
+{
+  "all_logs_recovered": 977,
+  "baseline_bsgs": {
+    "baby_entries": 32,
+    "mean_cold_add_calls": 46.76970317297851,
+    "mean_online_add_calls": 14.769703172978506,
+    "setup_add_calls": 32
+  },
+  "basis_logs": [
+    1,
+    116,
+    364,
+    232,
+    764,
+    866,
+    390,
+    914
+  ],
+  "caveat": "Optimized signed stride selected with uncharged O(r|S|log|S|) integer operations. Both omit field-operation pricing, point verification, curve/factor-base/locus selection, memory and CI PCC; favors signed search.",
+  "curve": [
+    46,
+    158
+  ],
+  "group_order": 977,
+  "matched_rank6_control": {
+    "cold_setup_add_calls": 409,
+    "mean_cold_add_calls": 410.80757420675536,
+    "optimized_mean_online_add_calls": 1.8075742067553735,
+    "optimized_stride": 125,
+    "optimized_worst_add_calls": 7,
+    "point": [
+      34,
+      48
+    ],
+    "rank": 6,
+    "support": 256,
+    "z": 34
+  },
+  "p": 1019,
+  "rank_selected_signed": {
+    "cold_setup_add_calls": 429,
+    "factor_base_log_add_calls": 111,
+    "mean_cold_add_calls": 430.9150460593654,
+    "optimistic_amortized_break_even_targets": 31,
+    "optimized_stride": 379,
+    "optimized_stride_mean_online_add_calls": 1.9150460593654044,
+    "optimized_stride_worst_add_calls": 8,
+    "stride_multiply_add_calls": 15,
+    "table_build_add_calls": 271,
+    "uncharged_stride_scan_candidates": 976,
+    "unoptimized_stride_mean_online_add_calls": 4.051177072671443,
+    "unoptimized_stride_worst_add_calls": 23
+  },
+  "signed_table_size": 256,
+  "standing": "[pcc:unverified]",
+  "structural_null": {
+    "conditioned_rank": 4,
+    "eligible_nonconditioned_eighth_abscissae": 480,
+    "full_support_iff_twice_eighth_point_outside_difference_set": true,
+    "full_support_rank6_controls": 48,
+    "seven_difference_set_size": 879,
+    "seven_point_support": 128
+  }
+}

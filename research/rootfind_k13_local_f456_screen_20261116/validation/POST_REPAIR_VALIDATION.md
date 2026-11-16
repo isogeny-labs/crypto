@@ -1,0 +1,9 @@
+# K13 identity and oracle gate after pre-data repair
+
+Source repair commit: `dc545f8364` (index and alias map derived from unchanged committed catalog). Release build used Rust 1.99.1 and completed with a nonfatal `rust-objcopy`/libLLVM debug-strip warning. The resulting `ecbench` SHA-256 is `dba933709f466966dc13f069b9bf0e91def033284f8b1cb779b25c8c9b3448c1`.
+
+The rebuilt `ecbench plan --json` on the unchanged spec `ECS1h326f1843d687` gives 48 executions, 8 arms and the two public K13 workloads. Each workload's ID, SHA-256, target coordinates, `registered=true`, curve UID, EC1 alias and subgroup order exactly equal `prior-admitted-workloads.json` produced by the prior admitted binary (SHA-256 `c4b63be34e52621d5d43e9cfcb2107f596b1148c7d06715fb7560dcae32e5d80`). The derived index and alias map match `registry_index_text` and `alias_map_text` of the committed catalog byte-for-byte.
+
+`cargo test --release --bin ecbench pdp3_koblitz` first completed 12 passed and 2 failed because a manifest-backed F4 replay file was not hydrated. The exact 1,159,289-byte `research/f4_harvest_remeasure_20261024/sessions/K1n11/records.jsonl` was pulled and hash-checked against its manifest (`943f1264c76849877b6ee1ecb1ea743684a8b2c30a3f4010342852abeba97f19`). The same 14-test command then passed 14/14. The two rebuilt library tests `registry_entry_matches_the_full_parse` and `registered_prime_curve_resolves_its_slug_and_ec1` also passed individually. Earlier rootfinding/pair-table library controls passed 2/2 before the registry repair; the batch-specific tests above bind the repaired source.
+
+The broad release suite attempt and global registry-generator mismatch remain in `PRE_RUN_VALIDATION.md` and `REGISTRY_OBSTRUCTION.md`. These focused passes qualify this local diagnostic's input identity and method execution, not a repository-wide green suite or a quantitative speed claim.
