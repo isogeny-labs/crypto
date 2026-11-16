@@ -1,0 +1,47 @@
+{
+  "Id": "6b73596e98bf5251b23183597fd45cf7a766ddebce52062cad0faab94819560f",
+  "Image": "sha256:c82c1b301d5d2add9733bdb0ca4f5039c23c8062632a2c0ef34295e2ab237b19",
+  "Path": "/usr/bin/timeout",
+  "Args": [
+    "--signal=TERM",
+    "--kill-after=20",
+    "1800",
+    "/bin/bash",
+    "/opt/fixed-run.sh"
+  ],
+  "State": {
+    "Status": "running",
+    "StartedAt": "2026-10-28T03:25:14.271936277Z",
+    "Pid": 1176738
+  },
+  "Config": {
+    "Image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0f591bb57d9c2c0a694d0fec1b83ef822453df0a10632f2ad4ffff731f51b2ab",
+    "User": "1000:1000"
+  },
+  "HostConfig": {
+    "Memory": 17179869184,
+    "NanoCpus": 4000000000
+  },
+  "Mounts": [
+    {
+      "Source": "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_fixed_degree_sweep_20261028/run-container.sh",
+      "Destination": "/opt/fixed-run.sh",
+      "RW": false
+    },
+    {
+      "Source": "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_fixed_factor_base_20261028/data",
+      "Destination": "/bases",
+      "RW": false
+    },
+    {
+      "Source": "/home/ec2-user/n83-fixed-degree-recovery/r1/results",
+      "Destination": "/results",
+      "RW": true
+    },
+    {
+      "Source": "/home/ec2-user/n83-fixed-degree-recovery/target/release/n83-fixed-degree-sweep",
+      "Destination": "/opt/fixed-sweep",
+      "RW": false
+    }
+  ]
+}

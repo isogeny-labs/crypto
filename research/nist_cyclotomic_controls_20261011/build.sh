@@ -5,6 +5,7 @@
 # The figures come from the experiment program, from recorded rows only:
 #   cargo run --release --example nist_cyclotomic_controls -- --protocol v1 --plot
 #   cargo run --release --example nist_cyclotomic_controls -- --protocol v2 --plot
+#   cargo run --release --example nist_cyclotomic_controls -- --protocol v3 --plot
 # Needs pandoc and a Chromium binary (CHROME, default: the Playwright one).
 set -e
 here=$(cd "$(dirname "$0")" && pwd)
@@ -13,6 +14,8 @@ tmp="$here/.build"; mkdir -p "$tmp"
 {
   cat "$here/REPORT.md"
   printf '\n\n---\n\n'
+  sed 's/^#/##/' "$here/RESULTS_v3.md"
+  printf '\n\n---\n\n'
   sed 's/^#/##/' "$here/RESULTS_v2.md"
   printf '\n\n---\n\n'
   sed 's/^#/##/' "$here/RESULTS_v1.md"
@@ -20,8 +23,10 @@ tmp="$here/.build"; mkdir -p "$tmp"
   sed 's/^#/###/' "$here/PROTOCOL.md"
   printf '\n\n## Appendix B: AMENDMENT_1.md (frozen)\n\n'
   sed 's/^#/###/' "$here/AMENDMENT_1.md"
+  printf '\n\n## Appendix C: AMENDMENT_2.md (frozen)\n\n'
+  sed 's/^#/###/' "$here/AMENDMENT_2.md"
 } > "$tmp/report.md"
-cp "$here"/controls_v1.svg "$here"/controls_v2.svg "$tmp/"
+cp "$here"/controls_v1.svg "$here"/controls_v2.svg "$here"/controls_v3.svg "$tmp/"
 cat > "$tmp/style.css" <<'CSS'
 body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; line-height: 1.35; max-width: 100%; margin: 0; }
 table { border-collapse: collapse; font-size: 8pt; width: 100%; }

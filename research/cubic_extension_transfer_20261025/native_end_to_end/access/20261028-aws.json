@@ -1,0 +1,67 @@
+{
+  "schema": "cubic-extension-aws-access-receipt/v1",
+  "observed_utc": "2026-10-28T15:53:59Z",
+  "account": "104186811093",
+  "principal_arn": "arn:aws:iam::104186811093:user/claude",
+  "region": "us-east-2",
+  "aws_cli_version": "1.46.2",
+  "credential_handling": {
+    "broad_credentials_saved_to_files": false,
+    "credential_values_recorded_in_repository": false,
+    "restricted_checkpoint_upload_token": "one-day lifetime; private file outside repository"
+  },
+  "checkpoint": {
+    "gate_exit_code": 0,
+    "uri": "s3://setec-astronomy-artifacts/checkpoints/crypto/codex__cubic-transfer-aws-continuation-20261028/20261028T154602Z-6187036c049b/",
+    "archive_bytes": 2215,
+    "downloaded_archive_sha256": "0b8f91c11d7512bd9467a218e623eb9abab691b38cf647d467a3d3360251124e",
+    "resume_readback_matches": true,
+    "server_side_encryption": "AES256",
+    "later_gate_uri": "s3://setec-astronomy-artifacts/checkpoints/crypto/codex__cubic-transfer-aws-continuation-20261028/20261028T155037Z-6187036c049b/"
+  },
+  "access_checks": [
+    {
+      "operation": "sts:GetCallerIdentity",
+      "outcome": "success"
+    },
+    {
+      "operation": "s3:HeadBucket",
+      "bucket": "setec-astronomy-artifacts",
+      "expected_bucket_owner": "104186811093",
+      "outcome": "success"
+    },
+    {
+      "operation": "s3:ListBucket",
+      "bucket": "isolab-results-104186811093-us-east-2",
+      "prefix": "runs/",
+      "max_keys": 1,
+      "outcome": "success"
+    },
+    {
+      "operation": "codebuild:BatchGetBuilds",
+      "resource": "arn:aws:codebuild:us-east-2:104186811093:project/isolab-experiment-launcher",
+      "outcome": "AccessDeniedException",
+      "reason": "No identity-based policy allows codebuild:BatchGetBuilds"
+    },
+    {
+      "operation": "codebuild:BatchGetProjects",
+      "outcome": "AccessDeniedException",
+      "required_for_documented_launch": false
+    },
+    {
+      "operation": "iam:SimulatePrincipalPolicy",
+      "outcome": "AccessDenied",
+      "required_for_documented_launch": false
+    }
+  ],
+  "untested": [
+    "codebuild:StartBuild",
+    "codebuild:StopBuild",
+    "s3:PutObject to lab inputs/requests/*",
+    "worker placement/readiness",
+    "native L2 measurement"
+  ],
+  "paid_jobs_submitted": 0,
+  "new_crypto_experiments": 0,
+  "full_native_transfer_implemented": false
+}

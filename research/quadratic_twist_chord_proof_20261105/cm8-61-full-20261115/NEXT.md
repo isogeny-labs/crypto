@@ -1,0 +1,21 @@
+# Next discriminating lead: state-dependent, genuinely partial shared collection
+
+Read the accepted collector construction in quadratic_twist_followup_20261105/IDEAS.md, immutable2bd7fc62 blob4f435d5f. Its complete-or-unknown union warning still applies. We now have ACTUALLY executed partial distinct/diagonal certificates and an independently checked F61 source transport; this changes what can be tested, rather than inventing a new generic map or repeating a completed cap panel. Primary chord/first-fall/trace antecedents and current KB/atlas access gaps are recorded in PROTOCOL.md and engineering sources. No novelty/disposition claim. [pcc:unverified]
+
+## Why another empty-state census is not decisive
+
+Elementary argument, not a new Lean/PCC theorem: with THREE ordered signed-base columns, a two-summand relation at a NONIDENTITY query has coefficient vector among the6 vectors ±2e_i and12 vectors ±e_i±e_j (i<j). The inverse-pair vector0 belongs only to the origin. Each of these18 nonzero vectors has exactly one actual group sum Q, so row sets at different Q partition a subset of these18 vectors. For every Q, rank overF31 is at most its row count. Thus sum over all30 nonidentity Q of INITIAL admitted rank is at most18, and expected INITIAL rank under uniform Q is at most18/30. This uses neither generic PairRank independence nor target scalar labels. [pcc:unverified]
+
+The full native source panel attains numerator18 atcap8 for every455 policy, while operational peaks and failed work stay explicit. This explains why raising caps or repeating EMPTY-state comparisons cannot establish strictly higher initial yield in the same two-summand/three-column model. It does NOT settle lower degree at equal yield, nonempty-state useful rank, collection time, a differently sized base/encoding or total work. It is not a universal no-advantage claim. [pcc:unverified]
+
+## Next actual experiment, not executed yet
+
+For each fixed source base and transported columns, use the partial source/twist rows at a declared cap as separate actual certified query kernels. Study rank increments modulo the CURRENT collected coefficient subspace L. Compare main-only, twist-only, frozen alternating and dual-chart schedules. A dual query costs BOTH attempts, maps, setup, polynomial/field/root/row/verification work, including failures; two independent source attempts and the entire source policy/degree frontier are required controls. A posthoc best-chart-per-target oracle is diagnostic only. [pcc:unverified]
+
+Uniform known PUBLIC multipliers m1..30 sampled iid with replacement can legitimately generate setup queries mP without knowing any target scalar. A faithful state process must retain the actual reachable subspaces/transitions and distinguish self-loops, absorption/infinite expectation and generic identity online recovery. A scalar recurrence asserted to solve its own equation is not a probability theorem. Use a native exact state/transition replay and a genuinely faithful probability/finite-tail proof attempt before claiming an expected-collection advantage; no generic independence assumption. Cold recovery still receives actual unknown Q and checks scalars on original E/P. [pcc:unverified]
+
+Freeze NEW sources, canonical resource/coverage/order/cost/analysis contracts and meaningful wrong-state/column/map/multiplicity/missing-failure/uncharged-second-call controls before affected calls. This next collector instrument DOES NOT EXIST yet. It must not be substituted for the finished full F61 panel or silently interpreted as a speed claim. If work pricing cannot be completed in one bounded iteration, report oracle-count and operation-vector components honestly and keep speed unestablished. [pcc:unverified]
+
+## Dated follow-through,22:14UTC
+
+The first-policy finite-state engineering probe has now ACTUALLY run under separately published cm8-61-collector-20261115 sources/contract. All9caps,50 reachable state/cap records,0 conditional dual rank gains vs two iid source attempts,26 stages/10 changed controls. It is neither full455-policy coverage nor a stationary/stopping-time/speed result. The FULL collector/faithful probability/cost contract above remains future work; do not repeat the first-policy probe to reset progress. [pcc:unverified]

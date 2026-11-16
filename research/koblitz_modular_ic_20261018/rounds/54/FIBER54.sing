@@ -1,0 +1,84 @@
+LIB "linalg.lib";
+proc require54(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump54(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../../53/runs/supersingular53-01/descended-supersingular53.sing"));
+int count54=size(gb53[1])+size(gb53[2]);intmat catalog54[count54][3];list coefficients54;
+int i54;int j54;int k54;int row54=0;intvec exponents54;
+poly remaining54;poly term54;list relationStrings54;
+for(i54=1;i54<=2;i54++){
+ relationStrings54[i54]=string(gb53[i54]);remaining54=gb53[i54];
+ while(remaining54!=0){term54=lead(remaining54);row54++;exponents54=leadexp(term54);catalog54[row54,1]=i54;catalog54[row54,2]=exponents54[1];catalog54[row54,3]=exponents54[2];coefficients54[row54]=string(leadcoef(term54));remaining54=remaining54-term54;}
+}
+execute(read("../../../52/source-data/compact-pid51.sing"));
+matrix H54=matrix(basis51);
+execute(read("../../../52/source-data/nu-pid-certificate51.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));intmat parents54=parents50;
+execute(read("../../../52/runs/closure52-02/closure-certificate52.sing"));
+setring compactPid51;
+map nuMap54=nuPidCertificate51,u;map tableMap54=tablePidCertificate50,u;
+matrix nc54=nuMap54(lift51);vector target54=nuMap54(target51);matrix targetCol54[32][1];
+for(i54=1;i54<=32;i54++){targetCol54[i54,1]=target54[i54];}
+matrix embedding54=tableMap54(sourceLift50);
+require54(H54==nuMap54(H51) && H54*nc54==targetCol54,"FIBER54_NU_GLOBAL_PID_PRODUCT");
+require54(embedding54==sourceLift51 && H54*embedding54==commonDenominator51*unitmat(32),"FIBER54_SOURCE_EMBEDDING_PRODUCT");
+ring rrFiber54=(2,a),(d),dp;minpoly=a^5+a^2+1;short=0;
+map tableMap54=tablePidCertificate50,a;matrix table54=tableMap54(table50);
+map compactMap54=compactPid51,a;matrix embedding54=compactMap54(embedding54);matrix nc54=compactMap54(nc54);
+map closureMap54=closureCertificate52,a;matrix savedNu54=closureMap54(T52);
+proc multiply54(matrix x){
+ matrix M[32][32];int p;int i;int j;int k;
+ for(p=1;p<=528;p++){i=parents54[p,1];j=parents54[p,2];for(k=1;k<=32;k++){M[k,j]=M[k,j]+x[i,1]*table54[k,p];if(i!=j){M[k,i]=M[k,i]+x[j,1]*table54[k,p];}}}
+ return(M);
+}
+matrix one54[32][1];matrix lambda54[32][1];matrix baseV54[32][1];
+for(i54=1;i54<=32;i54++){one54[i54,1]=embedding54[i54,1];lambda54[i54,1]=embedding54[i54,2];baseV54[i54,1]=embedding54[i54,17];}
+matrix identity54=unitmat(32);matrix zero54[32][32];matrix L54=multiply54(lambda54);matrix V54=multiply54(baseV54);matrix N54=multiply54(nc54);
+require54(multiply54(one54)==identity54,"FIBER54_COMPLETE_UNIT_PRODUCT");
+require54(N54==savedNu54,"FIBER54_ACTUAL_NU_ACTION_BINDING");
+require54(L54*V54==V54*L54 && L54*N54==N54*L54 && V54*N54==N54*V54,"FIBER54_COMMUTATORS");
+require54(V54*V54+a^2*V54+(a+a^3)*identity54==zero54,"FIBER54_BASE_EQUATION");
+number vValue54=(1+a^4+a)/(a+a^2);number bValue54=1+1/a;
+matrix E54=(1/a^2)*(V54+(vValue54+a^2)*identity54);
+require54(E54*E54==E54 && V54*E54==vValue54*E54,"FIBER54_BASE_IDEMPOTENT");
+matrix R54=(1+a)*V54+a^3*identity54;
+require54(a*(R54+identity54)*E54==E54 && a*R54*(R54+identity54)*E54==bValue54*E54,"FIBER54_ACTUAL_BASE_POINT");
+matrix e54=E54*one54;matrix K54[32][16];matrix nj54=e54;matrix x54;int col54=0;
+for(j54=0;j54<4;j54++){x54=nj54;for(i54=0;i54<4;i54++){col54++;for(k54=1;k54<=32;k54++){K54[k54,col54]=x54[k54,1];}x54=L54*x54;}nj54=N54*nj54;}
+int rankE54=mat_rk(E54);int rankK54=mat_rk(K54);int image54=(E54*K54==K54);
+list lP54;list nP54;lP54[1]=E54;nP54[1]=E54;
+for(i54=1;i54<=6;i54++){lP54[i54+1]=L54*lP54[i54];}
+for(i54=1;i54<=4;i54++){nP54[i54+1]=N54*nP54[i54];}
+matrix residual154[32][32];matrix residual254[32][32];matrix value54;number coefficient54;
+for(row54=1;row54<=count54;row54++){
+ execute("coefficient54="+coefficients54[row54]+";");value54=coefficient54*nP54[catalog54[row54,2]+1]*lP54[catalog54[row54,3]+1];
+ if(catalog54[row54,1]==1){residual154=residual154+value54;}else{residual254=residual254+value54;}
+}
+int relations54=(residual154==zero54 && residual254==zero54);int inverse54=0;
+matrix F54;matrix LC54;matrix NC54;matrix lambdaBorder54;matrix nuBorder54;
+matrix lambdaFourth54=lP54[5]*one54;matrix nuFourth54=nP54[5]*one54;
+if(rankE54==16 && rankK54==16 && image54){
+ F54=lift(module(K54),module(E54));
+ require54(K54*F54==E54 && F54*K54==unitmat(16),"FIBER54_TWO_FULL_INVERSE_PRODUCTS");
+ LC54=F54*L54*K54;NC54=F54*N54*K54;
+ require54(L54*K54==K54*LC54 && N54*K54==K54*NC54,"FIBER54_COMPLETE_MULTIPLICATION_PRODUCTS");
+ lambdaBorder54=F54*lambdaFourth54;nuBorder54=F54*nuFourth54;
+ require54(K54*lambdaBorder54==lambdaFourth54 && K54*nuBorder54==nuFourth54,"FIBER54_BORDER_PRODUCTS");
+ matrix corrupt54=K54;int selected54=0;
+ for(i54=1;i54<=32;i54++){if(F54[1,i54]!=0){selected54=i54;break;}}
+ require54(selected54>0,"FIBER54_NONVACUOUS_INVERSE");corrupt54[selected54,1]=corrupt54[selected54,1]+1;
+ require54(F54*corrupt54!=unitmat(16),"FIBER54_CORRUPTION_DETECTED");inverse54=1;
+}
+link out54="ASCII:w rr-fiber-certificate54.sing";
+write(out54,"ring rrFiberCertificate54=(2,a),(d),dp;minpoly=a^5+a^2+1;short=0;int rankE54="+string(rankE54)+";int rankK54="+string(rankK54)+";int image54="+string(image54)+";int relations54="+string(relations54)+";int inverse54="+string(inverse54)+";");
+dump54(out54,"E54",E54);dump54(out54,"K54",K54);dump54(out54,"one54",one54);dump54(out54,"e54",e54);dump54(out54,"L54",L54);dump54(out54,"N54",N54);dump54(out54,"V54",V54);
+dump54(out54,"residual154",residual154);dump54(out54,"residual254",residual254);
+if(inverse54){dump54(out54,"F54",F54);dump54(out54,"LC54",LC54);dump54(out54,"NC54",NC54);dump54(out54,"lambdaBorder54",lambdaBorder54);dump54(out54,"nuBorder54",nuBorder54);}
+close(out54);
+if(inverse54){
+ link equations54="ASCII:w rr-fiber-equations54.sing";write(equations54,"ring rrFiberEquations54=(2,a),(n,l),lp;minpoly=a^5+a^2+1;short=0;");
+ string lambdaString54="l^4";string nuString54="n^4";col54=0;
+ for(j54=0;j54<4;j54++){for(i54=0;i54<4;i54++){col54++;if(lambdaBorder54[col54,1]!=0){lambdaString54=lambdaString54+"+("+string(lambdaBorder54[col54,1])+")*n^"+string(j54)+"*l^"+string(i54);}if(nuBorder54[col54,1]!=0){nuString54=nuString54+"+("+string(nuBorder54[col54,1])+")*n^"+string(j54)+"*l^"+string(i54);}}}
+ write(equations54,"ideal derived54="+lambdaString54+","+nuString54+";ideal comparison54="+relationStrings54[1]+","+relationStrings54[2]+";");close(equations54);
+}
+print("FIBER54_RESULT rank_E="+string(rankE54)+" rank_K="+string(rankK54)+" image="+string(image54)+" relations="+string(relations54)+" inverse="+string(inverse54));
+print("FIBER54_ALL_CHECKS_PASS");quit;

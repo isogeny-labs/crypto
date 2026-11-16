@@ -1,0 +1,404 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXPLICIT-RELATIONS-PROFILE-20261031",
+  "version": 2,
+  "created": "2026-10-31",
+  "repository": "crypto",
+  "study_dir": "research/explicit_relations_profile_20261031",
+  "authors": [
+    "Codex"
+  ],
+  "links": {},
+  "question": "Can supported external GPU profilers corroborate the v1 block-cycle diagnosis on the exact recorded query prefixes?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Both unprofiled transcript replays match v1 responses exactly; external profiler outcomes are retained verbatim.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "External counter/timeline attribution is diagnostic only; no cross-host timing or speedup claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "b",
+      "role": "baseline",
+      "description": "Unprofiled byte-exact transcript replay",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_profile_20261031/nsight-only.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "prefix_queries": 8
+      }
+    },
+    {
+      "id": "t",
+      "role": "candidate",
+      "description": "Nsight Systems trace",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_profile_20261031/nsight-only.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "prefix_queries": 8
+      }
+    },
+    {
+      "id": "c",
+      "role": "candidate",
+      "description": "Nsight Compute first matching search launch",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_profile_20261031/nsight-only.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "prefix_queries": 8
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Only descriptive profiler attribution; no performance comparison. Prior v1 retains five rounds of A/A event-time controls."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Provider GPU control kernel through tools/profile.sh probe; v1 315 exact query cases and37584 arithmetic cases already passed on unchanged source."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "V1 retained54 exhausted misses and three zero-error sanitizers on unchanged source; this supplement does not modify the query implementation."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "profiler",
+        "levels": [
+          "none",
+          "nsys",
+          "ncu"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "how": "Same GPU code and nvccflags as v1 stock; new sourcecommit includes publishedv1 inputs and supplement script. PinnedCUDAimage; recordbinarySHA."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "how": "Read both immutable v1 transcripts and responses; no new query generation."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "One fresh RTX4090; record hardware identity. No cross-host time comparison."
+      },
+      {
+        "name": "tool_versions",
+        "treatment": "measured",
+        "how": "Install gawk and pinned cuda-nsight-systems-13-2=13.2.2-1 and cuda-nsight-compute-13-2=13.2.2-1 from configured NVIDIA CUDA apt repository; record resolved dependency versions. Official repository Packages.gz checked before launch."
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": "probe; seed101 b/t/c; seed202 b/t/c",
+        "how": "No significance or throughput comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Read frozen wrapper native outputs; no estimated unavailable counters."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-complete",
+        "arms": [
+          "b",
+          "t",
+          "c"
+        ],
+        "differs_in": [
+          "profiler"
+        ],
+        "design": "absolute",
+        "threshold": "Retain every process exit and every actual supported/unsupported profile. Baseline responses must match."
+      }
+    ],
+    "aa_not_applicable": "No throughput inference; external profilers alter clocks/replay/cache state.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "One fixed external attribution attempt per tool/input, no timing comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "Exactly101/202, existing63-bit input files copied unchanged; driver RNG unchanged."
+    },
+    "instance_sampling": {
+      "rule": "Both recorded v1 eight-query transcripts, immutable and hashed.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive instrumentation, not inferential analysis; labels not masked.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact response checks and descriptive profiler outcomes; no statistical hypothesis test."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 3600,
+      "measured_on": "V1 ran in about4.5minutes including setup. Supplement builds onlystockservice; each externalprofiler capped600s, totalworker3600/controller3900s."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "verified_queries",
+        "name": "Exact unprofiled replies",
+        "unit": "queries",
+        "kind": "exact",
+        "definition": "Eight for baseline iff complete stdout equals v1 answers; external tools have no new recovery claim.",
+        "source": "cmp exit and preservedstdout",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": [
+      "verified_queries"
+    ],
+    "record": [
+      "Native profiler manifests and raw reports",
+      "All exits including unsupported and timeout",
+      "Exact input and binary hashes",
+      "Package versions, source and GPU identity"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "runpod",
+    "queue": "Secure Cloud full RTX 4090",
+    "placement": {
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "count": 1,
+      "container_disk_gb": 40
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Oneprobe and two fixed inputs, eachbaseline/nsys/ncu once; no repeats or panelrerun. Worker3600/controller3900seconds, eachtool600seconds. Deleteownedpodaftercollection.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "An unprofiled response mismatch invalidates source/input continuity. Failed or unsupported externalprofiler attempts remain reported with exit/reason; no counters invented."
+  ],
+  "decision_rule": {
+    "text": "Report baseline reply identity and native external-profiler statuses. Interpret instruction/stall/occupancy/source evidence only if actually collected. Preserve v1 setup failures and cycle data unchanged.",
+    "comparison_ids": [
+      "C-complete"
+    ],
+    "threshold": "Two exact baseline replies; allsix attempts accounted for unless preflight fails",
+    "statistic": "Exact checks and native profiler counters",
+    "interval": "Not applicable; no inference",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "None: diagnostic attribution only",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../tools/profile.sh",
+      "sha256": "42a7c0dee60712fb3a767647043136d154b5c5713cda76930c027c2571ac5375"
+    },
+    "inputs": [
+      "Native Nsight reports"
+    ],
+    "outputs": [
+      "probe",
+      "nsys-101",
+      "ncu-101",
+      "nsys-202",
+      "ncu-202"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Native supported kernel/memory/stall plots; v1 graph retained if no supported counters"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Calling prefix execution a complete recovery",
+    "Converting concurrent block-cycle totals or shares into production seconds",
+    "Treating instrumented kernel time as a throughput or speedup result",
+    "Changing samples after seeing costs",
+    "Silently skipping failed cells or counter permission failures"
+  ],
+  "literature": [
+    {
+      "ref": "research/explicit_relations_affine_20261030/RESULTS.md and gpu/explicit-relations/AFFINE-QUERY.md",
+      "provenance": "internal",
+      "claim": "Large affine runs are dominated by query oracle; arithmetic count omits conversion normalization and index memory costs.",
+      "verified_by": "Read before implementation2026-10-31"
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-support.html#clock-and-clock64",
+      "provenance": "retrieved",
+      "claim": "Per-SM cycle intervals include time slicing; they are not instruction execution cost.",
+      "verified_by": "Read primary guide clock section2026-10-31"
+    },
+    {
+      "ref": "https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html",
+      "provenance": "retrieved",
+      "claim": "Replay/cache controls and metric collection perturb kernels; source counters and occupancy can explain costs if supported.",
+      "verified_by": "Read primary guide and repo profile skill before implementation2026-10-31"
+    }
+  ],
+  "amendments": [
+    {
+      "reason": "V1 completed all30 replaycells; five optional profiler invocations exited2 before data because gawk was missing. Install prerequisites and rerun only external profiles on already captured transcripts. No v1 results replaced.",
+      "filed_before_affected_data": true,
+      "filed": "2026-10-31",
+      "id": "A2-profiler-prerequisites",
+      "changes": [
+        "Install gawk and Nsight Systems; attempt only external profilers on the recorded v1 prefixes"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "4dc4c0560a8af2ad967d99c9f1d08526eb676e435b12ef658a174e093eba869e",
+    "commit": "b50e30d47458881eba10d802b7f972a9f56541bd",
+    "frozen_at": "2026-10-31T07:44:11Z",
+    "filed_before_affected_data": true
+  }
+}

@@ -1,5 +1,7 @@
 # N83 packed-root capacity and prefix-base result
 
+> **Correction 2026-10-20 (validation sweep B, verdict 110.1: contradicted).** The 18.528377 rho/IC ratio compares against rho with an empty table. It is superseded and not an improvement; see `benchmarks/20261016-n83-precomputed-rho-control`. The within-IC K1798 vs K1500 result stands.
+
 **K1798 dense is the lowest-mean-probe completed prefix base in the frozen
 64-point comparison.** It contains 298,468 distinct subgroup-usable points
 in 1,798 signed-Frobenius columns and uses an 8 GiB packed root table. Its

@@ -1,0 +1,39 @@
+import DispatchAcceptance
+import AffineControls
+import StoredValidControls
+set_option autoImplicit false
+namespace AcceptanceControls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput AffineDispatch
+-- Invalid right input is returned by the left-identity branch and fails validation.
+-- Thus the new theorem cannot discard its input-validity premises.
+theorem invalid_identity_output :
+ Runs 17 [] identity ⟨0,#[2,0,0],#[0,0]⟩ .leftIdentity ⟨0,#[2,0,0],#[0,0]⟩ ∧
+ StoredValidity.test 17 [] ⟨0,#[2,0,0],#[0,0]⟩=false := by
+ exact ⟨Runs.left rfl,StoredValidityControls.leading_guard⟩
+-- Validator success does not supply canonical inactive storage.
+theorem acceptance_not_canonical :
+ StoredValidity.test 17 [] ⟨0,#[1,17,0],#[0,0]⟩=true ∧
+ ¬WellFormed 17 (wordsPoly 17 []) ⟨0,#[1,17,0],#[0,0]⟩ :=
+ StoredValidityControls.inactive_noncanonical_accepted
+
+theorem degree_fallback_accepted : ∃ out,
+ Runs 17 AffineControls.f5 StoredControls.pointZero StoredControls.supportZero .degreeFallback out ∧
+ StoredValidity.test 17 AffineControls.f5 out=true := by
+ obtain ⟨out,hr,hw⟩:=AffineControls.fallback_degree_execution
+ exact ⟨out,hr,StoredValidity.test_accepts_wellformed 17 _ _ (by decide) (by decide)
+  (by simp [Canon,AffineControls.f5]) hw⟩
+
+theorem norm_fallback_accepted : ∃ out,
+ Runs 17 AffineControls.f5 StoredControls.supportZero StoredControls.supportZero .normZero out ∧
+ StoredValidity.test 17 AffineControls.f5 out=true := by
+ obtain ⟨out,hr,hw⟩:=AffineControls.fallback_norm_execution
+ exact ⟨out,hr,StoredValidity.test_accepts_wellformed 17 _ _ (by decide) (by decide)
+  (by simp [Canon,AffineControls.f5]) hw⟩
+
+theorem slope_fallback_accepted : ∃ out,
+ Runs 17 AffineControls.fs StoredControls.supportZero AffineControls.otherZero .slopeZero out ∧
+ StoredValidity.test 17 AffineControls.fs out=true := by
+ obtain ⟨out,hr,hw⟩:=AffineControls.fallback_slope_execution
+ exact ⟨out,hr,StoredValidity.test_accepts_wellformed 17 _ _ (by decide) (by decide)
+  (by simp [Canon,AffineControls.fs]) hw⟩
+end AcceptanceControls

@@ -1,0 +1,338 @@
+{
+  "schema": "isogeny-walk-summary/v1",
+  "tool": "src/bin/isogeny_walk.rs",
+  "root": {
+    "name": "public-prime271-current-head",
+    "icv1_slug": "icv1-fp9-tm9-646fa80e",
+    "curve_id": "EC1P9Cfph8f235fad5066",
+    "curve_uid": "urn:ec-record:1:sha256:8f235fad5066f836fc5a166b776ccc5f8fa2ab7f69726860100651cf8dac245f"
+  },
+  "config": {
+    "primes": [11],
+    "max_curves": 3,
+    "max_depth": 1,
+    "seed": 1,
+    "audit_points": 1,
+    "skipped_primes": [],
+    "threads": 1
+  },
+  "rules": {
+    "canonical_model": "icwalk-canon/v1: the registered model when the curve is the walk's root; else an a=-3 model with the least b when one exists over F_p; else y^2=x^3+3j(1728-j)c^2*x+2j(1728-j)^2c^3 with c the least of {1, least non-residue} that gives an F_p-isomorphic model",
+    "generator": "icwalk-gen/v1: [cofactor]P for the point P with the least x >= 0 whose y is nonzero (the smaller y as an integer) and whose multiple is not the identity",
+    "edge_direction": "d/u/h when both endpoint levels are proved (depth 0: all level 0; depth 1: ell+1 rational ell-isogenies = surface, one = floor); x otherwise"
+  },
+  "class": {
+    "trace": -9,
+    "frobenius_discriminant": -1003,
+    "frobenius_discriminant_trial_factors": [
+      [17, 1],
+      [59, 1]
+    ],
+    "frobenius_discriminant_trial_bound": 1048576,
+    "frobenius_discriminant_cofactor": 1,
+    "frobenius_discriminant_cofactor_status": "one",
+    "frobenius_discriminant_fundamental_if_cofactor_prime": true,
+    "order_probable_prime": true,
+    "twist_order": 263,
+    "twist_order_trial_factors": [
+      [263, 1]
+    ],
+    "twist_order_cofactor": 1,
+    "twist_order_cofactor_status": "one",
+    "embedding_degree": 28,
+    "embedding_degree_searched_to": 1000,
+    "ell": [
+      {
+        "ell": 11,
+        "splitting": "elkies",
+        "v_ell_discriminant": 0,
+        "volcano_depth": 0,
+        "level_zero_proved": true,
+        "expected_rational_neighbours": 2
+      }
+    ]
+  },
+  "modular_polynomials": [
+    {
+      "ell": 11,
+      "build_ms": 3,
+      "vanishing_checks_passed": 64
+    }
+  ],
+  "counts": {
+    "curves": 3,
+    "curves_expanded": 1,
+    "max_depth_reached": 1,
+    "edges_verified": 2,
+    "edges_beyond_cap": 0,
+    "failures": 0,
+    "order_proved_prime": 3,
+    "order_consistent_unproved": 0,
+    "order_refuted": 0,
+    "a_minus_3_models": 2,
+    "qr_prefix_64_min": 27,
+    "qr_prefix_64_max": 43
+  },
+  "qr_prefix_64_histogram": [
+    [27, 1],
+    [36, 1],
+    [43, 1]
+  ],
+  "proved_levels": [
+    {
+      "ell": 11,
+      "volcano_depth": 0,
+      "curves_by_level": [
+        [0, 3]
+      ],
+      "curves_unresolved": 0
+    }
+  ],
+  "roots_per_expanded_curve": [
+    {
+      "ell": 11,
+      "roots": 2,
+      "curves": 1
+    }
+  ],
+  "failures": [],
+  "class_audits": {
+    "scope": "depend only on p and #E, so they hold for every curve in the class; run once on the root",
+    "ecc_safety": {
+      "order_size": {
+        "verdict": "fail",
+        "detail": "generator order is 9 bits; minimum is 200 bits — ECDLP solvable in O(2^4) via Pollard-rho / BSGS"
+      },
+      "order_smoothness": {
+        "verdict": "fail",
+        "detail": "largest prime factor of order is 9 bits; minimum is 160 bits — Pohlig–Hellman reduces ECDLP to O(2^4) via prime-factor decomposition"
+      },
+      "effective_security": {
+        "verdict": "pass"
+      },
+      "generator_on_curve": {
+        "verdict": "pass"
+      },
+      "non_singular": {
+        "verdict": "pass"
+      },
+      "non_supersingular": {
+        "verdict": "pass"
+      },
+      "non_anomalous": {
+        "verdict": "pass"
+      },
+      "multi_target_margin": {
+        "verdict": "pass"
+      },
+      "no_weil_descent": {
+        "verdict": "pass"
+      },
+      "orbit_brittleness": {
+        "verdict": "pass"
+      },
+      "all_pass": false
+    },
+    "structural": {
+      "cm_discriminant_abs_bits": 10,
+      "cm_discriminant_trial_factors": [
+        [17, 1]
+      ],
+      "cm_discriminant_residue_bits": 6,
+      "cm_discriminant_residue_is_prime": true,
+      "twist_order": 263,
+      "twist_trial_factors": [],
+      "twist_residue_bits": 9,
+      "twist_residue_is_prime": true,
+      "max_twist_leak_bits": "0.000000",
+      "extension_orders": [
+        {
+          "k": 2,
+          "order": 73903
+        },
+        {
+          "k": 3,
+          "order": 19895924
+        },
+        {
+          "k": 4,
+          "order": 5393514843
+        },
+        {
+          "k": 6,
+          "order": 396109940508400
+        }
+      ],
+      "phase10_target_parity": [0, 1],
+      "phase10_blocked": true,
+      "trial_bound": 1048576
+    },
+    "pkm": {
+      "solinas_weight": 3,
+      "near_power_of_two": true,
+      "trace_small_factors": [
+        [3, 2]
+      ],
+      "n_minus_1_small_factors": [
+        [2, 3],
+        [5, 1],
+        [7, 1]
+      ],
+      "embedding_degree_within_cap": null,
+      "embedding_cap": 16,
+      "divisor_sets": "run",
+      "scores": {
+        "special_prime": "0.000000",
+        "trace_factors": "0.250000",
+        "order_neighbourhood": "0.111111",
+        "embedding_window": "1.000000",
+        "overall": "0.001835",
+        "divisor_sets": "0.750000"
+      }
+    },
+    "invariance_check": {
+      "audits": "ecc_safety and pkm re-run on walked curves' own models and generators",
+      "curves_sampled": 2,
+      "identical_to_root": false,
+      "differences": [
+        {
+          "a": 268,
+          "b": 85,
+          "safety": {
+            "order_size": {
+              "verdict": "fail",
+              "detail": "generator order is 9 bits; minimum is 200 bits — ECDLP solvable in O(2^4) via Pollard-rho / BSGS"
+            },
+            "order_smoothness": {
+              "verdict": "fail",
+              "detail": "largest prime factor of order is 9 bits; minimum is 160 bits — Pohlig–Hellman reduces ECDLP to O(2^4) via prime-factor decomposition"
+            },
+            "effective_security": {
+              "verdict": "pass"
+            },
+            "generator_on_curve": {
+              "verdict": "pass"
+            },
+            "non_singular": {
+              "verdict": "pass"
+            },
+            "non_supersingular": {
+              "verdict": "pass"
+            },
+            "non_anomalous": {
+              "verdict": "pass"
+            },
+            "multi_target_margin": {
+              "verdict": "pass"
+            },
+            "no_weil_descent": {
+              "verdict": "pass"
+            },
+            "orbit_brittleness": {
+              "verdict": "pass"
+            },
+            "all_pass": false
+          },
+          "pkm": {
+            "solinas_weight": 3,
+            "near_power_of_two": true,
+            "trace_small_factors": [
+              [3, 2]
+            ],
+            "n_minus_1_small_factors": [
+              [2, 3],
+              [5, 1],
+              [7, 1]
+            ],
+            "embedding_degree_within_cap": null,
+            "embedding_cap": 16,
+            "divisor_sets": "run",
+            "scores": {
+              "special_prime": "0.000000",
+              "trace_factors": "0.250000",
+              "order_neighbourhood": "0.111111",
+              "embedding_window": "1.000000",
+              "overall": "0.001863",
+              "divisor_sets": "0.807550"
+            }
+          }
+        },
+        {
+          "a": 189,
+          "b": 19,
+          "safety": {
+            "order_size": {
+              "verdict": "fail",
+              "detail": "generator order is 9 bits; minimum is 200 bits — ECDLP solvable in O(2^4) via Pollard-rho / BSGS"
+            },
+            "order_smoothness": {
+              "verdict": "fail",
+              "detail": "largest prime factor of order is 9 bits; minimum is 160 bits — Pohlig–Hellman reduces ECDLP to O(2^4) via prime-factor decomposition"
+            },
+            "effective_security": {
+              "verdict": "pass"
+            },
+            "generator_on_curve": {
+              "verdict": "pass"
+            },
+            "non_singular": {
+              "verdict": "pass"
+            },
+            "non_supersingular": {
+              "verdict": "pass"
+            },
+            "non_anomalous": {
+              "verdict": "pass"
+            },
+            "multi_target_margin": {
+              "verdict": "pass"
+            },
+            "no_weil_descent": {
+              "verdict": "pass"
+            },
+            "orbit_brittleness": {
+              "verdict": "pass"
+            },
+            "all_pass": false
+          },
+          "pkm": {
+            "solinas_weight": 3,
+            "near_power_of_two": true,
+            "trace_small_factors": [
+              [3, 2]
+            ],
+            "n_minus_1_small_factors": [
+              [2, 3],
+              [5, 1],
+              [7, 1]
+            ],
+            "embedding_degree_within_cap": null,
+            "embedding_cap": 16,
+            "divisor_sets": "run",
+            "scores": {
+              "special_prime": "0.000000",
+              "trace_factors": "0.250000",
+              "order_neighbourhood": "0.111111",
+              "embedding_window": "1.000000",
+              "overall": "0.001849",
+              "divisor_sets": "0.777282"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "timing_practicality_note": {
+    "walk_ms": 0,
+    "audit_ms": 0
+  },
+  "run": {
+    "run_id": "custom-1148de5e104812ad",
+    "curve_args": ["--curve", "custom", "--p", "271", "--a", "1", "--b", "19", "--order", "281", "--gx", "3", "--gy", "7", "--cofactor", "1", "--name", "public-prime271-current-head"],
+    "walk_args": ["--primes", "11", "--max-curves", "3", "--max-depth", "1"]
+  },
+  "outputs": {
+    "curves.yaml": "c7d5db35487e77fbbac1c4360eac0c1ac2d3459b95eef47c5c317109983058ae",
+    "isogeny_routes.json": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7"
+  }
+}

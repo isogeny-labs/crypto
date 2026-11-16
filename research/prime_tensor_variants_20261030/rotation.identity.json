@@ -1,0 +1,136 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h90427cfbed72e56b",
+  "statement": {
+    "name": "Ternary pair rotation cubed, both coordinates",
+    "source": "prime_tensor_variants_20261030 T2; S(a,b)=(-a-b,a); z mixes both coordinates",
+    "variables": [
+      "a",
+      "b",
+      "z"
+    ],
+    "degree_bound": 2,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "z"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "add",
+                      "args": [
+                        {
+                          "op": "neg",
+                          "args": {
+                            "op": "add",
+                            "args": [
+                              {
+                                "op": "var",
+                                "args": "a"
+                              },
+                              {
+                                "op": "var",
+                                "args": "b"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "op": "var",
+                          "args": "a"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "add",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "a"
+                        },
+                        {
+                          "op": "var",
+                          "args": "b"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "add",
+            "args": [
+              {
+                "op": "neg",
+                "args": {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "b"
+                    }
+                  ]
+                }
+              },
+              {
+                "op": "var",
+                "args": "a"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "z"
+            },
+            {
+              "op": "var",
+              "args": "a"
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "b"
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "seed": 20261030,
+  "value_digest": "9b8b360b556d7507301df6b8a9015675c0423899250c46d0a65064e0e502dc71",
+  "independence": "Issued by the parent native harness. Additional check stream is domain-separated; this is not a claim of independent human certificate issuance.",
+  "proof": null
+}

@@ -18,8 +18,10 @@
 //! `x(φ(Q)) = x · (Π(1 − x x_s))² / (Π(x − x_s))²`, where `Δ` cancels.
 //!
 //! With Karatsuba multiplication the measured cost exponent was 0.82–0.86
-//! in `ℓ` over `2^10 ≤ ℓ ≤ 2^24` (round 4, lead 16.3); the asymptotic
-//! `Õ(√ℓ)` needs fast (NTT/FFT) multiplication, not implemented here.
+//! in `ℓ` over `2^10 ≤ ℓ ≤ 2^24` (round 4, lead 16.3).  The polynomial
+//! products follow the field's [`super::counted_fp::PolyMul`]; with the
+//! NTT (the default above [`super::poly::NTT_THRESHOLD`]) the asymptotic
+//! cost is `Õ(√ℓ)` (round 5, lead R5.3, re-measures it).
 
 use super::counted_fp::{OpCounter, PrimeField};
 use super::montgomery::{batch_to_affine, ladder, xadd, xdbl, MontgomeryCurve, XZ};

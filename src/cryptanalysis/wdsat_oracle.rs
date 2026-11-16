@@ -19,7 +19,7 @@ use crate::cryptanalysis::koblitz_groebner::FieldStructure;
 use crate::cryptanalysis::koblitz_index_calculus::{
     lift_candidate, FrobeniusFactorBase, KoblitzCurve, SatDecompositionStats,
 };
-use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{bit, F2BoolPoly, Mask, MASK_BITS};
 use num_bigint::BigUint;
 use std::collections::HashMap;
 use std::fs;
@@ -47,8 +47,13 @@ impl AnfRow {
                 constant = !constant;
                 continue;
             }
-            let mut vars: Vec<u32> = (0..64).filter(|i| (term.mask >> i) & 1 == 1).collect();
-            vars.sort_unstable();
+            // The set bits in increasing order (already sorted).
+            let mut vars = Vec::with_capacity(term.mask.count_ones() as usize);
+            let mut m = term.mask;
+            while m != 0 {
+                vars.push(m.trailing_zeros());
+                m &= m - 1;
+            }
             monomials.push(vars);
         }
         Self {
@@ -220,14 +225,14 @@ pub fn validate_anf(anf: &str, model: &[bool]) -> bool {
     true
 }
 
-fn model_to_u64(model: &[bool]) -> Option<u64> {
-    if model.len() > 64 {
+fn model_to_u64(model: &[bool]) -> Option<Mask> {
+    if model.len() > MASK_BITS {
         return None;
     }
-    let mut root = 0u64;
-    for (i, bit) in model.iter().enumerate() {
-        if *bit {
-            root |= 1u64 << i;
+    let mut root: Mask = 0;
+    for (i, on) in model.iter().enumerate() {
+        if *on {
+            root |= bit(i as u32);
         }
     }
     Some(root)
@@ -478,6 +483,10 @@ pub fn write_config_for_anf(anf: &str, path: &Path) -> Result<WdsatCapacity, Str
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
 
     #[test]
@@ -558,7 +567,9 @@ mod tests {
         let options = |binary: PathBuf| WdsatSolveOptions {
             binary,
             work_dir: Some(dir.clone()),
-            timeout: Duration::from_secs(2),
+            // On macOS a newly created executable script can spend several
+            // seconds in its first process launch before the shell starts.
+            timeout: Duration::from_secs(30),
             keep_anf: None,
         };
         let anf = "p cnf 5 0\n";
@@ -650,12 +661,12 @@ mod tests {
                 if !sys
                     .equations
                     .iter()
-                    .all(|equation| equation.eval(root) == 0)
+                    .all(|equation| equation.eval(mask_from64(root)) == 0)
                 {
                     return false;
                 }
                 let xs: Vec<F2mElement> = (0..2)
-                    .map(|i| sys.summand_x(&fb.subspace_basis, root, i, kc.n))
+                    .map(|i| sys.summand_x(&fb.subspace_basis, mask_from64(root), i, kc.n))
                     .collect();
                 lift_candidate(&kc, &fb, &index_of, &xs, &target).is_some()
             })
@@ -664,7 +675,7 @@ mod tests {
             .find(|&root| {
                 sys.equations
                     .iter()
-                    .any(|equation| equation.eval(root) != 0)
+                    .any(|equation| equation.eval(mask_from64(root)) != 0)
             })
             .expect("system has an invalid root candidate");
         let bits = |root: u64| {

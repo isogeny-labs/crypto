@@ -35,6 +35,9 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
+use num_bigint::BigUint;
+use num_traits::{One, Zero};
+
 use super::gaudry_cubic::{mm, sm};
 use super::jv_cover::{EllE, Fld, Fq3, PtE6, E2, E6};
 use super::residual_walk::pow_mod;
@@ -1084,6 +1087,12 @@ pub struct Walk2Trial {
     pub order: u128,
     pub trace: i128,
     pub kronecker: [i8; 3],
+    /// `v₂(4q³ − t²)`; the class's 2-volcano has depth 1 iff this is 5
+    /// (`t = 2t′` with `t′` odd, `q³ ≡ 1 mod 8`, depth 1 iff `v₂(t′² − q³) = 3`).
+    pub v2_disc: u32,
+    /// Refused before any enumeration: depth-1 classes hold no weak curve
+    /// (PR #1556, exact at p = 5…19).  Only the point count was charged.
+    pub refused: bool,
     pub degrees_used: Vec<u64>,
     pub found: bool,
     /// Met `cap` distinct curves without a weak one.
@@ -1125,6 +1134,13 @@ pub struct Walk2Report {
     pub closure_mode: bool,
     pub from_weak_class: bool,
     pub weak_class_moves: usize,
+    pub refuse_depth1: bool,
+    /// Trials refused by the depth-1 test; counted as not found in
+    /// `success_fraction`, excluded from `success_fraction_admitted`.
+    pub refused: usize,
+    pub success_fraction_admitted: f64,
+    pub mean_muls_admitted: f64,
+    pub mean_muls_refused: f64,
     pub found: usize,
     pub capped: usize,
     pub exhausted: usize,
@@ -1264,6 +1280,7 @@ pub fn run_walk2(
     closure_mode: bool,
     from_weak_class: bool,
     weak_class_moves: usize,
+    refuse_depth1: bool,
 ) -> Walk2Report {
     let start = Instant::now();
     let ctx = WalkCtx::new(p);
@@ -1309,6 +1326,19 @@ pub fn run_walk2(
         row.trace = q3 + 1 - row.order as i128;
         let disc = row.trace * row.trace - 4 * q3;
         row.kronecker = [kronecker(disc, 3), kronecker(disc, 5), kronecker(disc, 7)];
+        row.v2_disc = if disc < 0 {
+            ((-disc) as u128).trailing_zeros()
+        } else {
+            64
+        };
+        if refuse_depth1 && row.v2_disc == 5 {
+            row.refused = true;
+            row.curves = seen.len() as u64;
+            row.muls = f.muls();
+            row.ms = t0.elapsed().as_secs_f64() * 1e3;
+            rows.push(row);
+            continue;
+        }
         let degrees: Vec<u64> = jumps
             .iter()
             .copied()
@@ -1443,6 +1473,22 @@ pub fn run_walk2(
     let exhausted = rows.iter().filter(|r| r.exhausted).count();
     let start_weak = rows.iter().filter(|r| r.start_weak).count();
     let proper: Vec<&Walk2Trial> = rows.iter().filter(|r| r.found && !r.start_weak).collect();
+    let refused = rows.iter().filter(|r| r.refused).count();
+    let admitted = rows.iter().filter(|r| !r.refused && !r.start_weak).count();
+    let mean_muls_admitted = mean(
+        &rows
+            .iter()
+            .filter(|r| !r.refused)
+            .map(|r| r.muls as f64)
+            .collect::<Vec<_>>(),
+    );
+    let mean_muls_refused = mean(
+        &rows
+            .iter()
+            .filter(|r| r.refused)
+            .map(|r| r.muls as f64)
+            .collect::<Vec<_>>(),
+    );
     let mut curves: Vec<f64> = proper.iter().map(|r| r.curves as f64).collect();
     curves.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let total_curves: u64 = rows.iter().map(|r| r.curves).sum();
@@ -1468,6 +1514,11 @@ pub fn run_walk2(
         closure_mode,
         from_weak_class,
         weak_class_moves,
+        refuse_depth1,
+        refused,
+        success_fraction_admitted: proper.len() as f64 / admitted.max(1) as f64,
+        mean_muls_admitted,
+        mean_muls_refused,
         found,
         capped,
         exhausted,
@@ -1562,6 +1613,7 @@ pub fn walk_to_weak_record(
             let mut steps = Vec::new();
             let mut j = weak_j;
             while let Some((pj, step)) = parent.get(&j) {
+                super::jv_bitops::probe(6);
                 steps.push(step.clone());
                 j = *pj;
             }
@@ -1573,9 +1625,12 @@ pub fn walk_to_weak_record(
         // 2-isogeny edges
         for e in cur.two_edges(ctx, known) {
             let tj = e.curve.j(f);
+            // bitop/v1: the seen-set probe, then the parent and curve maps
+            super::jv_bitops::probe(6);
             if !seen.insert(tj) {
                 continue;
             }
+            super::jv_bitops::probes(2, 6);
             parent.insert(tj, (cj, Step::Two { from: cur, k: e.k }));
             curve_of.insert(tj, e.curve);
             if e.curve.weak_by_norms(f) {
@@ -1590,9 +1645,11 @@ pub fn walk_to_weak_record(
         for &ell in &degrees {
             for (tgt, ker) in cur.ell_targets_with_kernels(ctx, ell, rng) {
                 let tj = tgt.j(f);
+                super::jv_bitops::probe(6);
                 if !seen.insert(tj) {
                     continue;
                 }
+                super::jv_bitops::probes(2, 6);
                 parent.insert(
                     tj,
                     (
@@ -1684,42 +1741,36 @@ pub struct EndToEndReport {
     pub wall_ms: f64,
 }
 
-#[allow(clippy::too_many_arguments)]
-pub fn run_end_to_end(
+/// The instance of §18.1 for `(p, seed, moves)`: the weak instance of the
+/// seed (`spec0`, whose planted `d` is the logarithm), moved `moves` random
+/// isogeny steps off the weak locus to the challenge curve, with `G`, `Q`
+/// transported onto it.  The instance's construction, never charged.
+#[derive(Clone, Debug)]
+pub struct Challenge {
+    pub spec0: super::jv_cover::Spec,
+    pub curve: Curve2,
+    pub g: Pt2,
+    pub q: Pt2,
+}
+
+/// Build the challenge with the walk context and the run's generator (whose
+/// state the attack then continues from, as [`run_end_to_end`] always has).
+/// `Err` when the moves could not leave the weak locus.
+fn build_challenge(
+    ctx: &WalkCtx,
     p: u64,
     seed: u64,
     moves: usize,
     jumps: &[u64],
-    cap_mult: u64,
-    rho_s_ref: f64,
-    margin: f64,
-    stop: Option<usize>,
-) -> EndToEndReport {
+    rng: &mut StdRng,
+) -> Result<Challenge, &'static str> {
     use super::jv_cover::generate_spec;
-    use super::jv_sieve::{run_cover_sieve_dlp, run_cover_sieve_dlp_on};
-    let start = Instant::now();
-    let ctx = WalkCtx::new(p);
     let f = &ctx.f;
     let spec0 = generate_spec(p, seed);
-    let l = spec0.l;
     let w0 = Curve2 {
         e: [E6::ZERO, spec0.alpha, f.sigma(&spec0.alpha)],
     };
-    let trace = (p as i128).pow(6) + 1 - 4 * l as i128;
-    let mut rng = StdRng::seed_from_u64(seed ^ 0xE2E_18);
-    let mut rep = EndToEndReport {
-        p,
-        seed,
-        moves,
-        l,
-        bits: (l as f64).log2(),
-        c_add_e: 0.0,
-        rho_s_ref,
-        stage: String::from("ok"),
-        ..Default::default()
-    };
-
-    // ── build the challenge C: move away from weak, transporting G, Q
+    // ── move away from weak, transporting G, Q
     let mut cur = w0;
     let mut g = (spec0.g.x, spec0.g.y);
     let mut q = (spec0.q.x, spec0.q.y);
@@ -1727,12 +1778,12 @@ pub fn run_end_to_end(
     for i in 0..(moves + 200) {
         // candidate moves: 2-edges and ℓ-targets, each with its codomain
         let mut cands: Vec<(Step, Curve2)> = cur
-            .two_edges(&ctx, None)
+            .two_edges(ctx, None)
             .into_iter()
             .map(|e| (Step::Two { from: cur, k: e.k }, e.curve))
             .collect();
         for &ell in jumps {
-            for (tgt, ker) in cur.ell_targets_with_kernels(&ctx, ell, &mut rng) {
+            for (tgt, ker) in cur.ell_targets_with_kernels(ctx, ell, rng) {
                 cands.push((
                     Step::Odd {
                         from: cur,
@@ -1756,21 +1807,121 @@ pub fn run_end_to_end(
         }
     }
     if !done && cur.weak_by_norms(f) {
-        // could not leave the weak locus; report the failure honestly
-        rep.stage = String::from("challenge_weak");
-        rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
-        return rep;
+        return Err("challenge_weak");
     }
-    rep.challenge_non_weak = !cur.weak_by_norms(f);
-    let challenge = cur;
-    let gc = g;
-    let qc = q;
-    debug_assert!(challenge.on_curve(f, &gc) && challenge.on_curve(f, &qc));
+    debug_assert!(cur.on_curve(f, &g) && cur.on_curve(f, &q));
+    Ok(Challenge {
+        spec0,
+        curve: cur,
+        g,
+        q,
+    })
+}
+
+/// The challenge of [`run_end_to_end`] for `(p, seed, moves)`, the same
+/// curve and points the attack is handed (for a reference arm run on it).
+pub fn challenge_instance(
+    p: u64,
+    seed: u64,
+    moves: usize,
+    jumps: &[u64],
+) -> Result<Challenge, String> {
+    let ctx = WalkCtx::new(p);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE2E_18);
+    build_challenge(&ctx, p, seed, moves, jumps, &mut rng).map_err(str::to_string)
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn run_end_to_end(
+    p: u64,
+    seed: u64,
+    moves: usize,
+    jumps: &[u64],
+    cap_mult: u64,
+    rho_s_ref: f64,
+    margin: f64,
+    stop: Option<usize>,
+) -> EndToEndReport {
+    run_end_to_end_with(
+        p, seed, moves, jumps, cap_mult, rho_s_ref, margin, stop, true,
+    )
+}
+
+/// [`run_end_to_end`], with the paired walk-free route on the weak curve of
+/// the same seed run only when `paired` is set (it is a comparison, not part
+/// of the attack).  Phases are attributed for `jv_bitops` (instance and
+/// harness work outside the attack's phases); the paired route attributes
+/// its own phases like the attack's, so a counted run sets `paired = false`.
+#[allow(clippy::too_many_arguments)]
+pub fn run_end_to_end_with(
+    p: u64,
+    seed: u64,
+    moves: usize,
+    jumps: &[u64],
+    cap_mult: u64,
+    rho_s_ref: f64,
+    margin: f64,
+    stop: Option<usize>,
+    paired: bool,
+) -> EndToEndReport {
+    use super::jv_bitops::{enter, Phase};
+    use super::jv_sieve::{run_cover_sieve_dlp, run_cover_sieve_dlp_on};
+    let start = Instant::now();
+    let ctx = {
+        let _g = enter(Phase::Walk);
+        WalkCtx::new(p)
+    };
+    let f = &ctx.f;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE2E_18);
+
+    // ── build the challenge C: move away from weak, transporting G, Q
+    let built = {
+        let _g = enter(Phase::Instance);
+        build_challenge(&ctx, p, seed, moves, jumps, &mut rng)
+    };
+    let (spec0, challenge, gc, qc) = match built {
+        Ok(c) => (c.spec0, c.curve, c.g, c.q),
+        Err(stage) => {
+            // could not leave the weak locus; report the failure honestly
+            let spec0 = super::jv_cover::generate_spec(p, seed);
+            return EndToEndReport {
+                p,
+                seed,
+                moves,
+                l: spec0.l,
+                bits: (spec0.l as f64).log2(),
+                rho_s_ref,
+                stage: String::from(stage),
+                wall_ms: start.elapsed().as_secs_f64() * 1e3,
+                ..Default::default()
+            };
+        }
+    };
+    let l = spec0.l;
+    let trace = (p as i128).pow(6) + 1 - 4 * l as i128;
+    let mut rep = EndToEndReport {
+        p,
+        seed,
+        moves,
+        l,
+        bits: (l as f64).log2(),
+        c_add_e: 0.0,
+        rho_s_ref,
+        stage: String::from("ok"),
+        ..Default::default()
+    };
+    rep.challenge_non_weak = {
+        let _g = enter(Phase::Instance);
+        !challenge.weak_by_norms(f)
+    };
 
     // ── attack: walk back to a weak curve (charged)
     f.reset_muls();
     let cap = cap_mult * p * p;
-    let walk = walk_to_weak_record(&ctx, challenge, jumps, cap, trace, &mut rng);
+    let walk = {
+        let _g = enter(Phase::Walk);
+        walk_to_weak_record(&ctx, challenge, jumps, cap, trace, &mut rng)
+    };
     rep.walk_muls = f.muls();
     let Some((weak, path)) = walk else {
         rep.stage = String::from("walk_none");
@@ -1789,15 +1940,19 @@ pub fn run_end_to_end(
     f.reset_muls();
     let mut gw = gc;
     let mut qw = qc;
-    for step in &path {
-        gw = map_step(f, step, &gw);
-        qw = map_step(f, step, &qw);
+    {
+        let _g = enter(Phase::Transport);
+        for step in &path {
+            gw = map_step(f, step, &gw);
+            qw = map_step(f, step, &qw);
+        }
     }
     rep.transport_muls = f.muls();
     debug_assert!(weak.on_curve(f, &gw) && weak.on_curve(f, &qw));
 
     // ── model change onto the cover's form (charged)
     f.reset_muls();
+    let model_guard = enter(Phase::Model);
     let Some((alpha, mapped)) = model_change(&ctx, &weak, &[gw, qw]) else {
         rep.model_muls = f.muls();
         rep.stage = String::from("model_change_none");
@@ -1820,9 +1975,14 @@ pub fn run_end_to_end(
         rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
         return rep;
     };
+    drop(model_guard);
 
-    // ── the sieved route on the transported instance
-    let route = run_cover_sieve_dlp_on(&spec, seed, 0, rho_s_ref, stop, margin, None, true);
+    // ── the sieved route on the transported instance (it attributes its
+    // own phases; anything it leaves unattributed is the attack's)
+    let route = {
+        let _g = enter(Phase::Unattributed);
+        run_cover_sieve_dlp_on(&spec, seed, 0, rho_s_ref, stop, margin, None, true)
+    };
     rep.route_muls = route.total_muls;
     rep.route_solved = route.solved;
     rep.route_correct = route.correct;
@@ -1830,6 +1990,7 @@ pub fn run_end_to_end(
 
     // ── verify the recovered scalar on the challenge curve itself
     if route.correct {
+        let _g = enter(Phase::Verification);
         let got = challenge.scalar_mul(f, &gc, spec0.d as u128);
         rep.verified_on_challenge = got == Some(qc);
     }
@@ -1844,9 +2005,12 @@ pub fn run_end_to_end(
     rep.s_over_rho = rep.total_muls as f64 / rho_muls;
 
     // ── paired walk-free route on the weak curve of the same seed
-    let route_only = run_cover_sieve_dlp(p, seed, 0, rho_s_ref, stop, margin, None, true);
-    rep.route_only_s_over_rho = route_only.total_muls as f64 / rho_muls;
-    rep.e2e_over_route_only = rep.total_muls as f64 / (route_only.total_muls.max(1)) as f64;
+    if paired {
+        let _g = enter(Phase::Harness);
+        let route_only = run_cover_sieve_dlp(p, seed, 0, rho_s_ref, stop, margin, None, true);
+        rep.route_only_s_over_rho = route_only.total_muls as f64 / rho_muls;
+        rep.e2e_over_route_only = rep.total_muls as f64 / (route_only.total_muls.max(1)) as f64;
+    }
     rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
     rep
 }
@@ -2233,6 +2397,41 @@ pub fn characterize_weak(reports: &[ExactCensus]) -> String {
                 cells.join(" · ")
             );
         }
+        // §18.6's registered readout for rule R-v2 (weak iff v₂(D) ≥ 6)
+        let v2_of = |t: i128| val(t * t - 4 * q3, 2);
+        let weak_v5 = weak.iter().filter(|&&t| v2_of(t) == 5).count();
+        let bucket = |pred: &dyn Fn(u32) -> bool| -> (u64, u64) {
+            let mut w = 0u64;
+            let mut n = 0u64;
+            for &t in &classes {
+                if pred(v2_of(t)) {
+                    n += 1;
+                    w += weak.contains(&t) as u64;
+                }
+            }
+            (w, n)
+        };
+        let (w6, n6) = bucket(&|v| v == 6);
+        let (w7, n7) = bucket(&|v| (7..99).contains(&v));
+        let (w5, n5) = bucket(&|v| v == 5);
+        let sampled = r.random_traces.len().max(1) as f64;
+        let pred_reach =
+            r.random_traces.iter().filter(|&&t| v2_of(t) >= 6).count() as f64 / sampled;
+        let _ = writeln!(
+            out,
+            "- **R-v2 readout**: V1 weak traces with v₂(D) = 5: {}/{} ({:.2} %) · V2 weak share at v₂ = 6: {:.3} ({}), at v₂ ≥ 7: {:.3} ({}), at v₂ = 5: {:.3} ({}) · V3 predicted reach (sampled curves with v₂ ≥ 6) {:.4} against census reach {:.4}",
+            weak_v5,
+            weak.len(),
+            100.0 * weak_v5 as f64 / weak.len().max(1) as f64,
+            w6 as f64 / n6.max(1) as f64,
+            n6,
+            w7 as f64 / n7.max(1) as f64,
+            n7,
+            w5 as f64 / n5.max(1) as f64,
+            n5,
+            pred_reach,
+            r.random_in_weak_classes
+        );
     }
     out
 }
@@ -2321,9 +2520,695 @@ pub fn summarize_walk2(reports: &[Walk2Report]) -> String {
     out
 }
 
+// ── class-group odd isogenies: Vélu through a kernel polynomial ───────────
+//
+// The rational-root walk above takes an ℓ-isogeny only when a kernel point's
+// x-coordinate is rational over F_{q³} (`roots_q3(ψ_ℓ)`).  A cyclic ℓ-subgroup
+// that is Galois-stable but has no rational point is still a rational isogeny.
+// Its kernel polynomial h(x) = Π_{k=1}^{(ℓ−1)/2}(x − x([k]T)) lies in F_{q³}[x]
+// even when the x([k]T) do not.  These functions find such h and evaluate the
+// Vélu isogeny through h by symmetric functions only.  (Module
+// `research/jv_classgroup_walk_20261112`.)
+
+/// Derivative of a polynomial (coefficients low to high).
+fn pderiv(f: &Fq3, a: &[E6]) -> P6 {
+    if a.len() <= 1 {
+        return Vec::new();
+    }
+    let c = |k: u64| f.from_fq(E2([k % f.f.p, 0]));
+    let mut out: P6 = (1..a.len()).map(|i| f.mul(&a[i], &c(i as u64))).collect();
+    ptrim(&mut out);
+    out
+}
+
+/// `a` quotient and remainder by monic-or-not `m` (returns (q, r), a = q·m + r).
+fn pdivmod(f: &Fq3, a: &[E6], m: &[E6]) -> (P6, P6) {
+    let mut r = a.to_vec();
+    ptrim(&mut r);
+    let dm = m.len() - 1;
+    let li = f.inv(m.last().unwrap());
+    if r.len() <= dm {
+        return (Vec::new(), r);
+    }
+    let mut q: P6 = vec![E6::ZERO; r.len() - dm];
+    while r.len() > dm {
+        let coef = f.mul(r.last().unwrap(), &li);
+        let shift = r.len() - m.len();
+        q[shift] = coef;
+        for (i, c) in m.iter().enumerate() {
+            r[shift + i] = f.sub(&r[shift + i], &f.mul(&coef, c));
+        }
+        ptrim(&mut r);
+    }
+    ptrim(&mut q);
+    (q, r)
+}
+
+/// `x^{(q³)^k} mod m` by `k` Frobenius powers, each a BigUint powmod of
+/// exponent `q³ = p^6` (so no u128 overflow at large p).
+fn frob_pow(f: &Fq3, k: u32, m: &[E6]) -> P6 {
+    let q3 = BigUint::from(f.f.p).pow(6);
+    let mut cur: P6 = vec![E6::ZERO, E6::ONE]; // x
+    for _ in 0..k {
+        cur = ppowmod_big(f, &cur, &q3, m);
+    }
+    cur
+}
+
+/// `a^e mod m`, BigUint exponent.
+fn ppowmod_big(f: &Fq3, a: &[E6], e: &BigUint, m: &[E6]) -> P6 {
+    let mut base = prem(f, a, m);
+    let mut acc = vec![E6::ONE];
+    let mut e = e.clone();
+    while !e.is_zero() {
+        if (&e & BigUint::one()) == BigUint::one() {
+            acc = prem(f, &pmul(f, &acc, &base), m);
+        }
+        e >>= 1;
+        if !e.is_zero() {
+            base = prem(f, &pmul(f, &base, &base), m);
+        }
+    }
+    acc
+}
+
+/// Irreducible factors of `poly` of degree exactly `d` over F_{q³}, assuming
+/// `poly` squarefree (ψ_ℓ is, on an ordinary curve).  Distinct-degree part
+/// isolated by `gcd(poly, x^{q³^d} − x)` after removing lower degrees, then
+/// equal-degree split (Cantor–Zassenhaus).  Only `d ∈ {1, 2, 3}` are used.
+fn irreducible_factors_deg(f: &Fq3, poly: &[E6], d: u32, rng: &mut StdRng) -> Vec<P6> {
+    // remove factors of degree < d
+    let mut g = pmonic(f, poly);
+    for i in 1..d {
+        let fr = frob_pow(f, i, &g);
+        let gi = pgcd(f, &g, &psub(f, &fr, &[E6::ZERO, E6::ONE]));
+        if gi.len() > 1 {
+            g = pdivmod(f, &g, &gi).0;
+        }
+    }
+    // the degree-d part
+    let frd = frob_pow(f, d, &g);
+    let gd = pgcd(f, &g, &psub(f, &frd, &[E6::ZERO, E6::ONE]));
+    if gd.len() <= 1 {
+        return Vec::new();
+    }
+    // equal-degree split of gd into degree-d irreducibles
+    let mut out = Vec::new();
+    let qd_minus_1_half = (BigUint::from(f.f.p).pow(6 * d) - BigUint::one()) >> 1;
+    edf_split(
+        f,
+        &pmonic(f, &gd),
+        d as usize,
+        &qd_minus_1_half,
+        rng,
+        &mut out,
+    );
+    out
+}
+
+fn edf_split(f: &Fq3, g: &[E6], d: usize, e: &BigUint, rng: &mut StdRng, out: &mut Vec<P6>) {
+    let deg = g.len() - 1;
+    if deg == 0 {
+        return;
+    }
+    if deg == d {
+        out.push(pmonic(f, g));
+        return;
+    }
+    loop {
+        let r: P6 = (0..=d).map(|_| f.random(rng)).collect();
+        let w = psub(f, &ppowmod_big(f, &r, e, g), &[E6::ONE]);
+        let h = pgcd(f, g, &w);
+        if h.len() > 1 && h.len() < g.len() {
+            let other = pdivmod(f, g, &h).0;
+            edf_split(f, &h, d, e, rng, out);
+            edf_split(f, &other, d, e, rng, out);
+            return;
+        }
+    }
+}
+
+/// On `y² = x³ + a₂x² + a₄x`, the multiplication-by-2 x-map numerator/denom:
+/// `X₂(x) = x − ψ₃/(4F) = (4xF − ψ₃)/(4F)`.
+fn two_x_map(f: &Fq3, dp: &DivPolys) -> (P6, P6) {
+    let c4 = f.from_fq(E2([4 % f.f.p, 0]));
+    let four_f = pscale6(f, &dp.big_f, &c4);
+    let x_four_f = pmul(f, &[E6::ZERO, E6::ONE], &four_f);
+    let n = psub(f, &x_four_f, &dp.psi3);
+    (n, four_f)
+}
+
+/// Whether monic `h` (degree d = (ℓ−1)/2, dividing ψ_ℓ) is a kernel polynomial
+/// of a cyclic ℓ-isogeny: the point-doubling x-map must permute its roots.
+/// Tested in F_{q³}[x]: `h | Σ_j c_j N^j D^{d−j}` with `h = Σ c_j x^j`,
+/// `X₂ = N/D`.
+fn is_kernel_poly(f: &Fq3, h: &[E6], n: &[E6], dd: &[E6]) -> bool {
+    let d = h.len() - 1;
+    // numerator of h(N/D) times D^d:  Σ_j c_j N^j D^{d-j}
+    let mut acc: P6 = Vec::new();
+    let mut npow: P6 = vec![E6::ONE]; // N^0
+    let mut dpows: Vec<P6> = vec![vec![E6::ONE]]; // D^0..D^d
+    for i in 1..=d {
+        dpows.push(pmul(f, &dpows[i - 1], dd));
+    }
+    for j in 0..=d {
+        let term = pscale6(f, &pmul(f, &npow, &dpows[d - j]), &h[j]);
+        acc = padd(f, &acc, &term);
+        if j < d {
+            npow = pmul(f, &npow, n);
+        }
+    }
+    prem(f, &acc, h).is_empty()
+}
+
+fn padd(f: &Fq3, a: &[E6], b: &[E6]) -> P6 {
+    let n = a.len().max(b.len());
+    let mut out: P6 = (0..n)
+        .map(|i| {
+            f.add(
+                &a.get(i).copied().unwrap_or(E6::ZERO),
+                &b.get(i).copied().unwrap_or(E6::ZERO),
+            )
+        })
+        .collect();
+    ptrim(&mut out);
+    out
+}
+
+/// The certified kernel polynomials of cyclic ℓ-isogenies from a curve with
+/// full 2-torsion (model translated `e₀ ↦ 0`), ℓ ∈ {3, 5, 7}.  Includes the
+/// rational-kernel ones; each is monic of degree (ℓ−1)/2 and self-certified
+/// (`velu_image_through_h` returns the degree-ℓ check).
+pub fn kernel_polys(ctx: &WalkCtx, curve: &Curve2, ell: u64, rng: &mut StdRng) -> Vec<P6> {
+    let f = &ctx.f;
+    let u = f.sub(&curve.e[1], &curve.e[0]);
+    let v = f.sub(&curve.e[2], &curve.e[0]);
+    let a2 = f.neg(&f.add(&u, &v));
+    let a4 = f.mul(&u, &v);
+    let dp = DivPolys::new(f, &a2, &a4);
+    let psi = pmonic(f, &dp.psi(f, ell));
+    let d = ((ell - 1) / 2) as u32;
+    let (n, dd) = two_x_map(f, &dp);
+    // candidate degree-d factors of ψ_ℓ: products of irreducible factors
+    // whose degrees sum to d (d ≤ 3, so by partition of d)
+    let mut cands: Vec<P6> = Vec::new();
+    match d {
+        1 => cands.extend(
+            irreducible_factors_deg(f, &psi, 1, rng)
+                .into_iter()
+                .filter(|h| h.len() == 2),
+        ),
+        2 => {
+            cands.extend(irreducible_factors_deg(f, &psi, 2, rng));
+            let lin = irreducible_factors_deg(f, &psi, 1, rng);
+            for i in 0..lin.len() {
+                for j in i + 1..lin.len() {
+                    cands.push(pmonic(f, &pmul(f, &lin[i], &lin[j])));
+                }
+            }
+        }
+        3 => {
+            cands.extend(irreducible_factors_deg(f, &psi, 3, rng));
+            let d2 = irreducible_factors_deg(f, &psi, 2, rng);
+            let lin = irreducible_factors_deg(f, &psi, 1, rng);
+            for q in &d2 {
+                for l in &lin {
+                    cands.push(pmonic(f, &pmul(f, q, l)));
+                }
+            }
+            for i in 0..lin.len() {
+                for j in i + 1..lin.len() {
+                    for k in j + 1..lin.len() {
+                        cands.push(pmonic(f, &pmul(f, &lin[i], &pmul(f, &lin[j], &lin[k]))));
+                    }
+                }
+            }
+        }
+        _ => {}
+    }
+    let mut out: Vec<P6> = Vec::new();
+    for h in cands {
+        if h.len() != (d as usize) + 1 {
+            continue;
+        }
+        // must divide ψ_ℓ and pass the doubling-closure criterion and self-cert
+        if !prem(f, &psi, &h).is_empty() {
+            continue;
+        }
+        if !is_kernel_poly(f, &h, &n, &dd) {
+            continue;
+        }
+        if velu_image_through_h(ctx, curve, &h).is_some() && !out.contains(&h) {
+            out.push(h);
+        }
+    }
+    out
+}
+
+/// Vélu through a kernel polynomial `h`: the weighted sums at an evaluation
+/// point `xp` (not a root of `h`), for `A ∈ {F', F}`.  Returns `(S1, S2, S3)`
+/// with `Sk = Σ_i A(x_i)/(xp − x_i)^k`, computed from `PA = (A·h') mod h` and
+/// its derivatives — no individual roots.
+fn velu_sums(f: &Fq3, a: &[E6], hh: &[E6], hp: &[E6], xp: &E6) -> (E6, E6, E6) {
+    let pa = prem(f, &pmul(f, a, hp), hh);
+    let pa1 = pderiv(f, &pa);
+    let pa2 = pderiv(f, &pa1);
+    let hpp = pderiv(f, hp);
+    let (h0, h1, h2) = (peval6(f, hh, xp), peval6(f, hp, xp), peval6(f, &hpp, xp));
+    let (p0, p1, p2) = (peval6(f, &pa, xp), peval6(f, &pa1, xp), peval6(f, &pa2, xp));
+    let hi = f.inv(&h0);
+    let hi2 = f.sq(&hi);
+    let s1 = f.mul(&p0, &hi);
+    // S2 = (P h' − P' h)/h²
+    let s2 = f.mul(&f.sub(&f.mul(&p0, &h1), &f.mul(&p1, &h0)), &hi2);
+    // S3 = ½ r'' = ½[(P''h − P h'')h − 2h'(P'h − P h')]/h³
+    let num = f.sub(
+        &f.mul(&f.sub(&f.mul(&p2, &h0), &f.mul(&p0, &h2)), &h0),
+        &f.mul(&f.add(&h1, &h1), &f.sub(&f.mul(&p1, &h0), &f.mul(&p0, &h1))),
+    );
+    let inv2 = f.inv(&f.from_fq(E2([2 % f.f.p, 0])));
+    let s3 = f.mul(&f.mul(&num, &f.mul(&hi2, &hi)), &inv2);
+    (s1, s2, s3)
+}
+
+/// The image curve of the Vélu isogeny through kernel polynomial `h` on
+/// `curve` (model `e₀ ↦ 0`), and the self-certification: `Some(image)` iff the
+/// x-map has degree exactly ℓ with denominator `h²` (gcd(numerator, h) = 1).
+/// The image's three full-2-torsion x-coordinates are the images of 0, u, v.
+pub fn velu_image_through_h(ctx: &WalkCtx, curve: &Curve2, h: &[E6]) -> Option<Curve2> {
+    let f = &ctx.f;
+    let u = f.sub(&curve.e[1], &curve.e[0]);
+    let v = f.sub(&curve.e[2], &curve.e[0]);
+    let a2 = f.neg(&f.add(&u, &v));
+    let a4 = f.mul(&u, &v);
+    let big_f: P6 = vec![E6::ZERO, a4, a2, E6::ONE];
+    let fp = pderiv(f, &big_f); // F'
+    let hp = pderiv(f, h);
+    let d = h.len() - 1;
+    // self-cert: X = [x·h² + 2(F'h' mod h)h + 4((F h' mod h)h' − (..)'h)]/h²,
+    // numerator degree must be 2d+1 = ℓ and gcd(numerator, h) = 1.
+    let h2 = pmul(f, h, h);
+    let pfp = prem(f, &pmul(f, &fp, &hp), h); // (F' h') mod h
+    let pf = prem(f, &pmul(f, &big_f, &hp), h); // (F h') mod h
+    let pf1 = pderiv(f, &pf);
+    let x = vec![E6::ZERO, E6::ONE];
+    let term0 = pmul(f, &x, &h2);
+    let c2 = f.from_fq(E2([2 % f.f.p, 0]));
+    let c4 = f.from_fq(E2([4 % f.f.p, 0]));
+    let term1 = pscale6(f, &pmul(f, &pfp, h), &c2);
+    let term2 = pscale6(f, &psub(f, &pmul(f, &pf, &hp), &pmul(f, &pf1, h)), &c4);
+    let num = padd(f, &term0, &padd(f, &term1, &term2));
+    if num.len() != 2 * d + 2 {
+        return None; // degree ≠ ℓ = 2d+1
+    }
+    if pgcd(f, &num, h).len() > 1 {
+        return None; // cancellation: not a clean degree-ℓ map
+    }
+    // image 2-torsion x-coords = X(0), X(u), X(v) on the e₀ ↦ 0 model
+    let img = |xp: &E6| -> Option<E6> {
+        if peval6(f, h, xp) == E6::ZERO {
+            return None;
+        }
+        let (s1f, _, _) = velu_sums(f, &fp, h, &hp, xp); // A = F'
+        let (_, s2big, _) = velu_sums(f, &big_f, h, &hp, xp); // A = F
+                                                              // X = x + 2 S1[F'] + 4 S2[F]
+        Some(f.add(xp, &f.add(&f.mul(&c2, &s1f), &f.mul(&c4, &s2big))))
+    };
+    let e0 = img(&E6::ZERO)?;
+    let e1 = img(&u)?;
+    let e2 = img(&v)?;
+    if e0 == e1 || e1 == e2 || e0 == e2 {
+        return None;
+    }
+    Some(Curve2 { e: [e0, e1, e2] })
+}
+
+/// Vélu's odd isogeny through a kernel polynomial `h`, on an affine point,
+/// model `e₀ ↦ 0`.  Mirrors [`map_odd`] but uses `h`'s symmetric functions, so
+/// it transports points through isogenies whose kernel has no rational point.
+pub fn map_odd_h(f: &Fq3, from: &Curve2, h: &[E6], p: &Pt2) -> Pt2 {
+    let u = f.sub(&from.e[1], &from.e[0]);
+    let v = f.sub(&from.e[2], &from.e[0]);
+    let a2 = f.neg(&f.add(&u, &v));
+    let a4 = f.mul(&u, &v);
+    let big_f: P6 = vec![E6::ZERO, a4, a2, E6::ONE];
+    let fp = pderiv(f, &big_f);
+    let hp = pderiv(f, h);
+    let c2 = f.from_fq(E2([2 % f.f.p, 0]));
+    let c4 = f.from_fq(E2([4 % f.f.p, 0]));
+    let c8 = f.from_fq(E2([8 % f.f.p, 0]));
+    let x = f.sub(&p.0, &from.e[0]);
+    let (s1f, s2f, _) = velu_sums(f, &fp, h, &hp, &x);
+    let (_, s2big, s3big) = velu_sums(f, &big_f, h, &hp, &x);
+    // X = x + 2 S1[F'] + 4 S2[F];  Ysum = 8 S3[F] + 2 S2[F']
+    let xx = f.add(&x, &f.add(&f.mul(&c2, &s1f), &f.mul(&c4, &s2big)));
+    let ysum = f.add(&f.mul(&c8, &s3big), &f.mul(&c2, &s2f));
+    (xx, f.mul(&p.1, &f.sub(&E6::ONE, &ysum)))
+}
+
+/// A breadth-first walk to a weak curve using the **class-group** odd isogenies
+/// (2-isogenies plus every certified cyclic ℓ-isogeny via [`kernel_polys`], not
+/// only the rational-kernel ones of [`walk_to_weak_record`]).  Returns the weak
+/// curve and the found path's (2-step, odd-step) counts, or `None` if the
+/// reachable set closes or `cap` distinct curves are met.  Reachability only
+/// (the coverage study `research/jv_classgroup_walk_20261112`); no point
+/// transport.  The caller brackets it with the field counter.
+pub fn walk_to_weak_classgroup(
+    ctx: &WalkCtx,
+    start: Curve2,
+    jumps: &[u64],
+    cap: u64,
+    trace: i128,
+    rng: &mut StdRng,
+) -> Option<(Curve2, usize, usize)> {
+    let f = &ctx.f;
+    if !trace_may_hold_weak_curve(f.f.p, trace) {
+        return None;
+    }
+    let p3 = (f.f.p as i128).pow(6);
+    let disc = trace * trace - 4 * p3;
+    let degrees: Vec<u64> = jumps
+        .iter()
+        .copied()
+        .filter(|&ell| kronecker(disc, ell) != -1)
+        .collect();
+    let j0 = start.j(f);
+    if start.weak_by_norms(f) {
+        return Some((start, 0, 0));
+    }
+    // parent: j -> (parent_j, odd_step?)
+    let mut parent: HashMap<E6, (E6, bool)> = HashMap::new();
+    let mut seen: HashSet<E6> = HashSet::new();
+    seen.insert(j0);
+    let mut queue: VecDeque<(Curve2, Option<(usize, E6)>)> = VecDeque::new();
+    queue.push_back((start, None));
+    let path_of = |weak_j: E6, parent: &HashMap<E6, (E6, bool)>| -> (usize, usize) {
+        let (mut two, mut odd) = (0usize, 0usize);
+        let mut j = weak_j;
+        while let Some(&(pj, is_odd)) = parent.get(&j) {
+            if is_odd {
+                odd += 1;
+            } else {
+                two += 1;
+            }
+            j = pj;
+        }
+        (two, odd)
+    };
+    while let Some((cur, known)) = queue.pop_front() {
+        let cj = cur.j(f);
+        for e in cur.two_edges(ctx, known) {
+            let tj = e.curve.j(f);
+            if !seen.insert(tj) {
+                continue;
+            }
+            parent.insert(tj, (cj, false));
+            if e.curve.weak_by_norms(f) {
+                let (t, o) = path_of(tj, &parent);
+                return Some((e.curve, t, o));
+            }
+            if seen.len() as u64 >= cap {
+                return None;
+            }
+            queue.push_back((e.curve, Some((0, e.dual_root))));
+        }
+        for &ell in &degrees {
+            for h in kernel_polys(ctx, &cur, ell, rng) {
+                let Some(tgt) = velu_image_through_h(ctx, &cur, &h) else {
+                    continue;
+                };
+                let tj = tgt.j(f);
+                if !seen.insert(tj) {
+                    continue;
+                }
+                parent.insert(tj, (cj, true));
+                if tgt.weak_by_norms(f) {
+                    let (t, o) = path_of(tj, &parent);
+                    return Some((tgt, t, o));
+                }
+                if seen.len() as u64 >= cap {
+                    return None;
+                }
+                queue.push_back((tgt, None));
+            }
+        }
+    }
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // ── class-group odd-isogeny correctness gates (PROTOCOL.md C1–C5) ─────
+
+    fn poly_from_roots(f: &Fq3, roots: &[E6]) -> P6 {
+        let mut h = vec![E6::ONE];
+        for r in roots {
+            h = pmul(f, &h, &[f.neg(r), E6::ONE]);
+        }
+        h
+    }
+
+    fn sample_point(f: &Fq3, c: &Curve2, rng: &mut StdRng) -> Option<Pt2> {
+        for _ in 0..40 {
+            let x = f.random(rng);
+            let rhs = f.mul(
+                &f.mul(&f.sub(&x, &c.e[0]), &f.sub(&x, &c.e[1])),
+                &f.sub(&x, &c.e[2]),
+            );
+            if rhs == E6::ZERO {
+                continue;
+            }
+            if let Some(y) = f.sqrt(&rhs, rng) {
+                return Some((x, y));
+            }
+        }
+        None
+    }
+
+    fn ell_e(f: &Fq3, c: &Curve2) -> (E6, E6, E6) {
+        let u = f.sub(&c.e[1], &c.e[0]);
+        let v = f.sub(&c.e[2], &c.e[0]);
+        (f.neg(&f.add(&u, &v)), f.mul(&u, &v), c.e[0])
+    }
+
+    #[test]
+    fn c1_symmetric_velu_agrees_with_per_root_on_split_kernels() {
+        // On kernels with rational roots, the symmetric-function image curve
+        // and point map equal the validated per-root `ell_targets_with_kernels`
+        // / `map_odd`.  ≥ 200 (curve, ℓ) cases over p ∈ {37, 1009}.
+        let mut cases = 0usize;
+        for &p in &[37u64, 1009] {
+            let ctx = WalkCtx::new(p);
+            let f = &ctx.f;
+            let mut rng = StdRng::seed_from_u64(0xC1 ^ p);
+            for _ in 0..400 {
+                let c = random_curve(f, &mut rng);
+                for &ell in &[3u64, 5, 7] {
+                    for (tgt, ker) in c.ell_targets_with_kernels(&ctx, ell, &mut rng) {
+                        let h = poly_from_roots(f, &ker);
+                        let img = velu_image_through_h(&ctx, &c, &h)
+                            .expect("split kernel must self-certify");
+                        assert_eq!(img, tgt, "image mismatch p={p} ell={ell}");
+                        for _ in 0..3 {
+                            if let Some(pt) = sample_point(f, &c, &mut rng) {
+                                let a = map_odd(f, &c, &ker, &pt);
+                                let b = map_odd_h(f, &c, &h, &pt);
+                                assert_eq!(a, b, "point map mismatch p={p} ell={ell}");
+                            }
+                        }
+                        cases += 1;
+                    }
+                }
+                if cases >= 300 {
+                    break;
+                }
+            }
+        }
+        assert!(cases >= 200, "only {cases} agreement cases");
+    }
+
+    #[test]
+    fn c2_c4_certified_isogenies_are_homomorphisms_onto_real_points() {
+        // Certified kernel polynomials (including non-rational kernels): random
+        // real points map to real points on the image curve (C2), and the map
+        // is a group homomorphism φ(P+Q)=φ(P)+φ(Q) (C4).  p ∈ {37, 1009, 1511}.
+        let mut certified_nonsplit = 0usize;
+        for &p in &[37u64, 1009, 1511] {
+            let ctx = WalkCtx::new(p);
+            let f = &ctx.f;
+            let mut rng = StdRng::seed_from_u64(0xC2 ^ p);
+            let mut curves = 0;
+            while curves < 20 {
+                let c = random_curve(f, &mut rng);
+                curves += 1;
+                for &ell in &[3u64, 5, 7] {
+                    for h in kernel_polys(&ctx, &c, ell, &mut rng) {
+                        let img = velu_image_through_h(&ctx, &c, &h).unwrap();
+                        if h.len() > 2 {
+                            certified_nonsplit += 1; // a non-rational kernel
+                        }
+                        // C2: random real points land on the image curve
+                        let mut pts = Vec::new();
+                        for _ in 0..6 {
+                            if let Some(pt) = sample_point(f, &c, &mut rng) {
+                                if peval6(f, &h, &f.sub(&pt.0, &c.e[0])) == E6::ZERO {
+                                    continue; // kernel point
+                                }
+                                let ip = map_odd_h(f, &c, &h, &pt);
+                                assert!(
+                                    img.on_curve(f, &ip),
+                                    "image off curve p={p} ell={ell} deg={}",
+                                    h.len() - 1
+                                );
+                                pts.push(pt);
+                            }
+                        }
+                        // C4: homomorphism on the elliptic group law
+                        let (sa2, sa4, se0) = ell_e(f, &c);
+                        let (ia2, ia4, ie0) = ell_e(f, &img);
+                        let src = EllE::from_a2_a4(f, sa2, sa4);
+                        let dst = EllE::from_a2_a4(f, ia2, ia4);
+                        let tr = |e0: &E6, pt: &Pt2| PtE6 {
+                            x: f.sub(&pt.0, e0),
+                            y: pt.1,
+                            inf: false,
+                        };
+                        let phi = |pt: &Pt2| -> PtE6 {
+                            let ip = map_odd_h(f, &c, &h, pt);
+                            PtE6 {
+                                x: f.sub(&ip.0, &ie0),
+                                y: ip.1,
+                                inf: false,
+                            }
+                        };
+                        if pts.len() >= 2 {
+                            let pp = tr(&se0, &pts[0]);
+                            let qq = tr(&se0, &pts[1]);
+                            let rr = src.add(&pp, &qq);
+                            if !rr.inf {
+                                let r_un = (f.add(&rr.x, &se0), rr.y);
+                                if peval6(f, &h, &f.sub(&r_un.0, &c.e[0])) != E6::ZERO {
+                                    let lhs = dst.add(&phi(&pts[0]), &phi(&pts[1]));
+                                    let rhs = phi(&r_un);
+                                    assert!(
+                                        lhs.x == rhs.x
+                                            && (lhs.y == rhs.y || dst.neg(&lhs).y == rhs.y)
+                                            || (lhs.inf && rhs.inf),
+                                        "not a homomorphism p={p} ell={ell}"
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert!(
+            certified_nonsplit > 0,
+            "no non-rational kernel polynomials were certified across the primes"
+        );
+    }
+
+    #[test]
+    fn c3_doubling_closure_is_the_decisive_filter() {
+        // The doubling-closure test rejects degree-d factors of ψ_ℓ whose roots
+        // are not a subgroup (it is necessary and sufficient for prime ℓ), and
+        // every factor `kernel_polys` returns divides ψ_ℓ, is doubling-closed,
+        // and self-certifies as a degree-ℓ map.  A non-kernel pair is rejected
+        // somewhere across the sample.
+        let ctx = WalkCtx::new(1009);
+        let f = &ctx.f;
+        let mut rng = StdRng::seed_from_u64(0xC3);
+        let mut rejected_any = false;
+        let mut accepted_any = false;
+        for _ in 0..60 {
+            let c = random_curve(f, &mut rng);
+            let (u, v) = (f.sub(&c.e[1], &c.e[0]), f.sub(&c.e[2], &c.e[0]));
+            let a2 = f.neg(&f.add(&u, &v));
+            let a4 = f.mul(&u, &v);
+            let dp = DivPolys::new(f, &a2, &a4);
+            let psi = pmonic(f, &dp.psi(f, 5)); // degree 12, 6 blocks of 2
+            let (n, dd) = two_x_map(f, &dp);
+            let roots = roots_q3(f, &psi, &mut rng);
+            // test every pair of distinct rational roots: closed iff same block
+            for i in 0..roots.len() {
+                for j in i + 1..roots.len() {
+                    let h = poly_from_roots(f, &[roots[i], roots[j]]);
+                    if !prem(f, &psi, &h).is_empty() {
+                        continue;
+                    }
+                    if is_kernel_poly(f, &h, &n, &dd) {
+                        // a genuine split kernel: must self-certify degree 5
+                        assert!(
+                            velu_image_through_h(&ctx, &c, &h).is_some(),
+                            "closed kernel failed self-cert"
+                        );
+                        accepted_any = true;
+                    } else {
+                        rejected_any = true;
+                    }
+                }
+            }
+            for &ell in &[3u64, 5, 7] {
+                for h in kernel_polys(&ctx, &c, ell, &mut rng) {
+                    assert!(prem(f, &pmonic(f, &dp.psi(f, ell)), &h).is_empty() || ell != 5);
+                    assert!(
+                        velu_image_through_h(&ctx, &c, &h).is_some(),
+                        "kernel_polys output failed self-cert ℓ={ell}"
+                    );
+                }
+            }
+        }
+        assert!(rejected_any, "no non-kernel pair was ever rejected");
+        assert!(accepted_any, "no split kernel pair was ever accepted");
+    }
+
+    #[test]
+    fn c5_isogeny_count_is_a_valid_subgroup_count() {
+        // The number of certified cyclic ℓ-isogenies is one of the classically
+        // possible counts of rational ℓ-subgroups, {0, 1, 2, ℓ+1}; every
+        // rational root of ψ_ℓ lies in exactly one certified kernel polynomial
+        // (completeness); distinct kernel polynomials are coprime (no double
+        // counting).  ≥ 100 curves per ℓ.
+        let ctx = WalkCtx::new(1009);
+        let f = &ctx.f;
+        let mut rng = StdRng::seed_from_u64(0xC5);
+        for &ell in &[3u64, 5, 7] {
+            for _ in 0..100 {
+                let c = random_curve(f, &mut rng);
+                let (u, v) = (f.sub(&c.e[1], &c.e[0]), f.sub(&c.e[2], &c.e[0]));
+                let dp = DivPolys::new(f, &f.neg(&f.add(&u, &v)), &f.mul(&u, &v));
+                let psi = pmonic(f, &dp.psi(f, ell));
+                let polys = kernel_polys(&ctx, &c, ell, &mut rng);
+                let n = polys.len();
+                assert!(
+                    n == 0 || n == 1 || n == 2 || n as u64 == ell + 1,
+                    "ℓ={ell}: {n} isogenies, not a valid subgroup count"
+                );
+                // completeness: every rational root of ψ_ℓ is covered once
+                let roots = roots_q3(f, &psi, &mut rng);
+                for r in &roots {
+                    let covering: usize =
+                        polys.iter().filter(|h| peval6(f, h, r) == E6::ZERO).count();
+                    assert_eq!(
+                        covering, 1,
+                        "ℓ={ell}: rational root covered {covering} times"
+                    );
+                }
+                // coprimality: distinct kernel polys share no root
+                for i in 0..polys.len() {
+                    for j in i + 1..polys.len() {
+                        assert!(
+                            pgcd(f, &polys[i], &polys[j]).len() <= 1,
+                            "ℓ={ell}: two kernel polys share a root"
+                        );
+                    }
+                }
+            }
+        }
+    }
     use crate::cryptanalysis::jv_cover::generate_spec;
 
     #[test]
@@ -2629,7 +3514,18 @@ mod tests {
     #[test]
     fn the_rebuilt_walk_reaches_weak_curves_at_p7_and_p13() {
         for (p, trials) in [(7u64, 20usize), (13, 12)] {
-            let r = run_walk2(p, 1, trials, 3 * p * p, &[3, 5, 7], 1000, false, false, 8);
+            let r = run_walk2(
+                p,
+                1,
+                trials,
+                3 * p * p,
+                &[3, 5, 7],
+                1000,
+                false,
+                false,
+                8,
+                false,
+            );
             // every walk ends found, capped or exhausted; at these sizes many
             // closures hold no weak curve, so exhaustion is common
             assert_eq!(
@@ -2716,6 +3612,60 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    #[ignore = "long end-to-end sieve; run in jv-isogeny-walk CI"]
+    fn counted_end_to_end_keeps_the_legacy_counts_and_charges_every_phase() {
+        use crate::cryptanalysis::jv_bitops::{self, Kind, Phase};
+        use crate::cryptanalysis::jv_cover::set_trace_scope;
+        // one thread: every nested parallel iterator runs on the pool's
+        // thread, which owns the tally
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .unwrap();
+        let run = |scope: u64| {
+            pool.install(|| {
+                set_trace_scope(scope);
+                jv_bitops::claim();
+                jv_bitops::set_moduli(101, super::super::jv_cover::generate_spec(101, 1).l);
+                let before = jv_bitops::snapshot();
+                let r = run_end_to_end_with(101, 1, 8, &[3, 5, 7], 3, 1.3, 1.25, Some(64), false);
+                (r, jv_bitops::snapshot().since(&before))
+            })
+        };
+        jv_bitops::enable(true);
+        let (a, ta) = run(0xA11CE);
+        let (b, tb) = run(0xB0B);
+        // a cold trace scope per run: the same counts both times
+        assert_eq!(ta, tb);
+        assert_eq!(
+            (a.walk_muls, a.transport_muls, a.model_muls, a.route_muls),
+            (b.walk_muls, b.transport_muls, b.model_muls, b.route_muls)
+        );
+        assert!(a.route_correct && a.verified_on_challenge, "{a:?}");
+        for ph in [
+            Phase::Instance,
+            Phase::Walk,
+            Phase::Model,
+            Phase::FactorBase,
+            Phase::Relations,
+            Phase::Descent,
+            Phase::LinearAlgebra,
+            Phase::Verification,
+        ] {
+            assert!(ta.phase(ph).field_ops() > 0, "{ph:?} has no field work");
+        }
+        // the sieve's probes and scans, the descent's F4 row operations, the
+        // linear algebra modulo ℓ
+        assert!(ta.phase(Phase::Relations).get(Kind::WordOp) > 0);
+        assert!(ta.phase(Phase::Relations).get(Kind::HashProbe) > 0);
+        assert!(ta.phase(Phase::LinearAlgebra).get(Kind::ModrMul) > 0);
+        assert!(ta.phase(Phase::Descent).get(Kind::FieldInv) > 0);
+        // the legacy product count is a lower bound of the counted products
+        let ic = ta.sum(&Phase::IC);
+        assert!(ic.get(Kind::FieldMul) + ic.get(Kind::ModrMul) > 0);
     }
 
     #[test]

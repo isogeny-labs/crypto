@@ -1,7 +1,7 @@
 # ECC2K-130 status page
 
 Static dashboard for the `ecc2k-130` distinguished-point campaign,
-published at <https://aburan28.github.io/crypto/status/>. The Action
+published at <https://isogeny-labs.github.io/crypto/status/>. The Action
 overwrites `status.json` and `history.json`; this HTML only renders those
 files, and `scripts/site/build.py` lays them out for publishing.
 
@@ -54,6 +54,13 @@ endpoints, the scalar reference's replay and the caption disagree.
 The worker table is empty on the live ingest feed: `dp_ingest.py` does
 not publish `per_worker` (`worker_id` is an upload-object name). The
 dashboard names that, instead of "No workers have reported points."
+
+`challenges.html` is the roster of other curves: the Certicom ECC2K, ECC2,
+and ECCp lists, and the families in the cryptanalysis research catalog.
+ECC2K-130 is the only row whose points are the store this dashboard
+counts. The page says so, and `test_build.py` fails if another row is
+marked live. `challenges.json` is the same roster in a form a program
+can read.
 
 The **Contribute compute** section under the worker table is static: it
 carries the [cairn](https://github.com/aburan28/cairn) download link

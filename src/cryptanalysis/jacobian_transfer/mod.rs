@@ -19,7 +19,7 @@
 //! | `GF(p)` | same-field genus-2 cover (`COVERS.md`) | genus, degree | solver cost |
 //! | `GF(p)` | base change to `GF(p^k)` then a genus-`k` descent | nothing (existence open) | solver cost at the most favourable genus |
 //! | `GF(p^k)` | Gaudry–Diem decomposition on `E(F_{p^k})` | — | relation and decomposition cost |
-//! | `GF(p^k)` | descent to a genus-`k` cover over `GF(p)` | nothing (existence open) | solver cost at the most favourable genus |
+//! | `GF(p^k)` | descent to a cover over `GF(p)` | nothing (existence open) | solver cost at the most favourable genus: `k`, or the GHS floor ([`ghs_genus_floor`]) where that is higher |
 //!
 //! Every row is a formula.  A `formula_advantage` row says the literature's
 //! complexity formulas, with the stated constants, put the route below rho on
@@ -41,11 +41,34 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
+use crate::cryptanalysis::cover_catalog;
 use crate::cryptanalysis::curve_traits::arith::{factor, log2_abs};
 use crate::cryptanalysis::ec_trapdoor::DescentRow;
 use cost::{CostModel, DestinationCost, DestinationSolver};
 
-pub const SCHEMA: &str = "jacobian-transfers/2";
+pub const SCHEMA: &str = "jacobian-transfers/3";
+
+/// Least genus of a GHS compositum cover in odd characteristic, by the
+/// Frobenius period `n` of the branch set (that is, for `E/F_{q^n}` with
+/// `F_q(j(E)) = F_{q^n}`), for `n = 1..=14`.  It depends only on the orbit
+/// type of the branch locus, never on `q`.  Every degree-2 function on such
+/// an `E` has a branch set of period exactly `n`, so this is a lower bound on
+/// every GHS cover; whether a particular curve attains it is a separate
+/// question (Joux–Vitse, Eurocrypt 2012, App. C, shapes 12/13, give 9 as the
+/// minimum at `n = 6`, not a genus-9 cover of any given curve).
+/// Source: `research/odd_char_descent_genus3_20261014/` (Theorem 3 and the
+/// exact enumeration in `results/run-20261014T1800Z/min_genus.csv`).
+const GHS_GENUS_FLOOR: [u32; 14] = [1, 2, 3, 5, 5, 9, 7, 33, 81, 49, 1793, 25, 9217, 41];
+
+/// The least genus of any GHS cover of `E/F_{p^k}` when `F_p(j(E)) = F_{p^k}`,
+/// or `None` for `k` outside the enumerated range `1..=14`.  A curve whose
+/// `j` lies in a proper subfield can have a smaller cover, and a non-GHS
+/// construction is not covered by this bound.
+pub fn ghs_genus_floor(k: u32) -> Option<u32> {
+    k.checked_sub(1)
+        .and_then(|i| GHS_GENUS_FLOOR.get(i as usize))
+        .copied()
+}
 
 /// Pollard-rho iterations spent factoring an order whose subgroup the
 /// registry does not record.
@@ -375,7 +398,12 @@ pub struct TransferFile {
     pub schema: String,
     pub generated_by: String,
     pub what_this_is: String,
-    pub registry_sha256: String,
+    /// The manifest naming the registry rows screened
+    /// (`docs/curves/cover-catalog.json`).
+    pub catalog: String,
+    /// SHA-256 of those rows ([`crate::cryptanalysis::cover_catalog::rows_sha256`]),
+    /// not of the registry file: rows the manifest does not name leave it unchanged.
+    pub catalog_rows_sha256: String,
     pub factor_budget: u64,
     pub cost_model: CostModel,
     pub summary: Summary,
@@ -814,6 +842,24 @@ fn extension_routes(
             ("extension_degree", Value::from(k)),
             ("relations_exponent", Value::from(round_to(2.0 - 2.0 / f64::from(k), 3))),
             ("decomposition_bezout_log2", Value::from(k * (k - 1))),
+            (
+                "decomposition_trials_log2",
+                Value::from(round_to(rb.model.log2_extension_trials(p_bits, k), 3)),
+            ),
+            (
+                "decomposition_solve_log2_fp_mults",
+                Value::from(round_to(rb.model.log2_extension_solve_mults(k), 3)),
+            ),
+            (
+                "decomposition_solve_basis",
+                Value::from(
+                    if rb.model.extension_measured_solve_mults.iter().any(|&(kk, _)| kk == k) {
+                        "measured"
+                    } else {
+                        "degree_cubed_estimate"
+                    },
+                ),
+            ),
         ]),
         Destination {
             object: format!("E(GF(p^{k}))"),
@@ -828,36 +874,90 @@ fn extension_routes(
         DestinationCost {
             solver: DestinationSolver::ExtensionIndexCalculus,
             log2_cost: dest_log2,
-            log2_leading: (2.0 - 2.0 / f64::from(k)) * p_bits + f64::from(k * (k - 1)),
+            log2_leading: rb.model.log2_extension_trials(p_bits, k)
+                + rb.model.log2_extension_solve_mults(k),
             considered,
             enge_gaudry_hypothesis_holds: false,
         },
         vec![
-            "no transfer: the method works on E itself with a subfield factor base; the decomposition price is the Bézout bound of the Semaev system, a stand-in for the Gröbner solve".into(),
-            "the repository's gaudry_cubic measurements at k = 3 found the solve constant far above this formula; a formula advantage here is a lead, not a measurement".into(),
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at the estimate D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system (a dense FGLM-style solve; not a lower bound)".into(),
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; C_3 = 0.876e6 is measured, and C_4 = 8.69e10 is the plain S_5 solve with sparsest pivots, the chain eigen step and shape replay (2026-10-19; 13.9x below the 1.227e12 charged from 2026-10-16), 0.34 bits above D^3; the D_4-symmetric oracle on curves with rational 2-torsion measured about 2^26, so D^3 at other k is an estimate, and a formula advantage here is a lead, not a measurement".into(),
         ],
     ));
-    // Descent to a genus-k cover over GF(p).
-    let genus = BigUint::from(k);
-    let log2_genus = log2_biguint(&genus);
-    let transport = rb.transport_by_size(log2_genus, p_bits);
+    // Descent to a cover over GF(p).  The cheapest genus the literature
+    // allows is k for the Weil restriction in general, but no GHS cover has
+    // genus below `ghs_genus_floor(k)`; where that is above k the row is priced
+    // at the floor, and keeps what it said at genus k for the record.
+    let floor = ghs_genus_floor(k).filter(|&f| f > k);
+    let genus_of = |g: u32| {
+        let g = BigUint::from(g);
+        let transport = rb.transport_by_size(log2_biguint(&g), p_bits);
+        (g, transport)
+    };
+    let priced_genus = floor.unwrap_or(k);
+    let (genus, transport) = genus_of(priced_genus);
+    let mut invariants = inv(vec![
+        ("extension_degree", Value::from(k)),
+        ("genus_lower_bound", Value::from(priced_genus)),
+        ("rational_two_torsion_point", Value::from(two_torsion)),
+    ]);
+    let mut notes = vec![
+        "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)".into(),
+    ];
+    if let Some(f) = floor {
+        // What the row said before 2026-10-15, when it was priced at g = k.
+        let (gk, tk) = genus_of(k);
+        let at_k = rb.jacobian_route(
+            "cover_descent",
+            String::new(),
+            Evidence::Proposed,
+            BTreeMap::new(),
+            &gk,
+            p_bits,
+            tk,
+            f64::NEG_INFINITY,
+            Vec::new(),
+        );
+        invariants.insert("genus_basis".into(), Value::from("ghs_genus_floor"));
+        invariants.insert(
+            "class_at_genus_k".into(),
+            Value::from(class_name(at_k.class)),
+        );
+        invariants.insert(
+            "ratio_log2_at_genus_k".into(),
+            Value::from(at_k.cost.ratio_log2),
+        );
+        let attained = if k == 6 {
+            invariants.insert(
+                "conditional_on".into(),
+                Value::from("a genus-9 cover of this curve being exhibited"),
+            );
+            "Joux–Vitse (Eurocrypt 2012, App. C) shapes 12/13 give 9 as the minimum genus, not the existence of a genus-9 cover for this curve, so the row is conditional on such a cover being exhibited"
+        } else {
+            "whether this curve attains that genus is not verified"
+        };
+        notes.push(format!(
+            "priced at g = {f}, the least genus of any GHS cover of E/GF(p^{k}) when F_p(j(E)) = GF(p^{k}) (research/odd_char_descent_genus3_20261014/); {attained}.  Until 2026-10-15 the row was priced at g = {k}, which no GHS cover has, and was {} ({:+.1} bits against rho).  A curve whose j lies in a proper subfield, or a non-GHS cover, could have a smaller genus, so the row is a lower bound on the GHS route only",
+            class_name(at_k.class),
+            at_k.cost.ratio_log2
+        ));
+    } else {
+        invariants.insert("genus_basis".into(), Value::from("weil_restriction"));
+        notes.push(
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+                .into(),
+        );
+    }
     routes.push(rb.jacobian_route(
         "cover_descent",
-        format!("descent to a genus-{k} cover C/GF(p) of E/GF(p^{k})"),
+        format!("descent to a genus-{priced_genus} cover C/GF(p) of E/GF(p^{k})"),
         Evidence::Proposed,
-        inv(vec![
-            ("extension_degree", Value::from(k)),
-            ("genus_lower_bound", Value::from(k)),
-            ("rational_two_torsion_point", Value::from(two_torsion)),
-        ]),
+        invariants,
         &genus,
         p_bits,
         transport,
         f64::NEG_INFINITY,
-        vec![
-            "existence of a genus-k cover over GF(p) is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)".into(),
-            "priced at the most favourable genus, g = k, so the row is a lower bound on the route".into(),
-        ],
+        notes,
     ));
     routes
 }
@@ -910,14 +1010,21 @@ pub fn screen(c: &RegistryCurve, model: &CostModel, budget: u64) -> CurveTransfe
 }
 
 impl TransferFile {
-    pub fn build(registry_text: &str, model: CostModel, budget: u64) -> Result<Self, String> {
+    /// Screen the registry rows the catalog manifest names.
+    pub fn build(
+        registry_text: &str,
+        catalog_text: &str,
+        model: CostModel,
+        budget: u64,
+    ) -> Result<Self, String> {
         use rayon::prelude::*;
-        let curves = read_registry(registry_text)?;
+        let restricted = cover_catalog::restrict(registry_text, catalog_text)?;
+        let curves = read_registry(&restricted)?;
         let records: Vec<CurveTransfers> = curves
             .par_iter()
             .map(|c| screen(c, &model, budget))
             .collect();
-        let digest = crate::hash::sha256::sha256(registry_text.as_bytes());
+        let digest = cover_catalog::rows_sha256(&restricted);
         let mut by_class = BTreeMap::new();
         let mut by_route_kind = BTreeMap::new();
         let mut formula_advantage = Vec::new();
@@ -945,7 +1052,8 @@ impl TransferFile {
                            on the same subgroup; see docs/curves/JACOBIAN_TRANSFERS.md. Rows are \
                            formulas and leads, never measurements or security claims."
                 .into(),
-            registry_sha256: digest.iter().map(|b| format!("{b:02x}")).collect(),
+            catalog: cover_catalog::MANIFEST_PATH.into(),
+            catalog_rows_sha256: digest,
             factor_budget: budget,
             cost_model: model,
             summary: Summary {
@@ -986,6 +1094,13 @@ mod tests {
     use super::*;
 
     const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
+    const CATALOG: &str = include_str!("../../../docs/curves/cover-catalog.json");
+
+    fn catalog_len() -> usize {
+        serde_json::from_str::<Value>(CATALOG).unwrap()["count"]
+            .as_u64()
+            .unwrap() as usize
+    }
 
     fn registry() -> Vec<RegistryCurve> {
         read_registry(REGISTRY).unwrap()
@@ -1086,13 +1201,15 @@ mod tests {
             );
         }
         // c2pnb304w1's 288-bit subgroup does not fit in a 256-bit Jacobian;
-        // its best route is the n = 4 descent over GF(2^76).
+        // its best route is the n = 4 descent over GF(2^76). Priced with the
+        // measured Jacobian operation counts (#1983) it costs 2^160.259
+        // against matched rho's 2^160.226, so it is no longer below rho.
         let r = screen(
             &by_name("c2pnb304w1"),
             &CostModel::default(),
             DEFAULT_FACTOR_BUDGET,
         );
-        assert_eq!(r.verdict, RouteClass::FormulaMarginal);
+        assert_eq!(r.verdict, RouteClass::Boundary);
         assert_eq!(
             r.routes[r.best_route.unwrap()].invariants["base_degree"],
             76
@@ -1203,6 +1320,77 @@ mod tests {
     }
 
     #[test]
+    fn ghs_genus_floor_matches_the_odd_characteristic_study() {
+        // research/odd_char_descent_genus3_20261014/results/run-20261014T1800Z/
+        // min_genus.csv, column min_genus_period_n, n = 1..=14.  Joux–Vitse
+        // App. C gives 9 at n = 6.  Genus n is attained at n = 1, 2, 3, 5, 7
+        // only; at n = 4 the least genus is 5 and at n = 9 it is 81.
+        let csv = [1, 2, 3, 5, 5, 9, 7, 33, 81, 49, 1793, 25, 9217, 41];
+        for (i, g) in csv.into_iter().enumerate() {
+            assert_eq!(ghs_genus_floor(i as u32 + 1), Some(g), "n = {}", i + 1);
+        }
+        assert_eq!(ghs_genus_floor(6), Some(9));
+        assert_eq!(ghs_genus_floor(10), Some(49));
+        assert_eq!(ghs_genus_floor(14), Some(41));
+        assert_eq!(ghs_genus_floor(0), None);
+        assert_eq!(ghs_genus_floor(15), None);
+    }
+
+    #[test]
+    fn cover_descent_is_priced_at_the_ghs_floor_where_it_exceeds_k() {
+        let file = TransferFile::build(
+            REGISTRY,
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap();
+        let (mut raised, mut unchanged) = (0, 0);
+        for c in file.curves.iter().filter(|c| c.field.kind == "extension") {
+            let k = c.field.degree;
+            let r = c.routes.iter().find(|r| r.kind == "cover_descent").unwrap();
+            match ghs_genus_floor(k).filter(|&f| f > k) {
+                Some(f) => {
+                    assert_eq!(r.destination.genus, f.to_string(), "{}", c.slug);
+                    assert_eq!(r.invariants["genus_lower_bound"], f);
+                    assert_eq!(r.invariants["genus_basis"], "ghs_genus_floor");
+                    assert_eq!(
+                        r.label,
+                        format!("descent to a genus-{f} cover C/GF(p) of E/GF(p^{k})")
+                    );
+                    // Pricing at a larger genus never improves the class.
+                    let before: RouteClass =
+                        serde_json::from_value(r.invariants["class_at_genus_k"].clone()).unwrap();
+                    assert!(before <= r.class, "{} k = {k}", c.slug);
+                    assert!(
+                        r.invariants["ratio_log2_at_genus_k"].as_f64().unwrap()
+                            >= r.cost.ratio_log2,
+                        "{}",
+                        c.slug
+                    );
+                    assert!(r.notes.last().unwrap().contains("Until 2026-10-15"));
+                    assert_eq!(
+                        r.invariants.contains_key("conditional_on"),
+                        k == 6,
+                        "{} k = {k}",
+                        c.slug
+                    );
+                    raised += 1;
+                }
+                None => {
+                    assert_eq!(r.destination.genus, k.to_string(), "{}", c.slug);
+                    assert_eq!(r.invariants["genus_basis"], "weil_restriction");
+                    assert!(!r.invariants.contains_key("class_at_genus_k"));
+                    unchanged += 1;
+                }
+            }
+            // The verdict is still the best class over the routes.
+            assert_eq!(c.verdict, c.routes.iter().map(|r| r.class).min().unwrap());
+        }
+        assert!(raised > 0 && unchanged > 0);
+    }
+
+    #[test]
     fn unrecorded_subgroups_fall_back_to_the_largest_prime() {
         let c = registry()
             .into_iter()
@@ -1215,9 +1403,17 @@ mod tests {
 
     #[test]
     fn the_whole_registry_builds_and_round_trips() {
-        let file =
-            TransferFile::build(REGISTRY, CostModel::default(), DEFAULT_FACTOR_BUDGET).unwrap();
-        assert_eq!(file.curves.len(), registry().len());
+        let file = TransferFile::build(
+            REGISTRY,
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap();
+        // The screen covers the catalog's rows, not every registry row.
+        assert_eq!(file.curves.len(), catalog_len());
+        assert!(file.curves.len() <= registry().len());
+        assert_eq!(file.catalog, cover_catalog::MANIFEST_PATH);
         let json = file.to_json();
         assert!(
             !json.contains("null,") || !json.contains("\"log2_cost\": null"),
@@ -1243,10 +1439,41 @@ mod tests {
             }
         }
         // Rebuilding is deterministic.
-        let again =
-            TransferFile::build(REGISTRY, CostModel::default(), DEFAULT_FACTOR_BUDGET).unwrap();
+        let again = TransferFile::build(
+            REGISTRY,
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap();
         assert_eq!(again.to_json(), json);
         assert_eq!(file.summary.curves, file.curves.len());
         assert!(file.find("Oakley Group 3").is_some());
+    }
+
+    #[test]
+    fn registry_rows_outside_the_catalog_leave_the_file_unchanged() {
+        let base = TransferFile::build(
+            REGISTRY,
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap()
+        .to_json();
+        // A new registry row the manifest does not name, as a research sweep adds.
+        let mut doc: Value = serde_json::from_str(REGISTRY).unwrap();
+        let mut census = doc["curves"][0].clone();
+        census["slug"] = "icv1-census-row-outside-the-catalog".into();
+        doc["curves"].as_array_mut().unwrap().insert(0, census);
+        let grown = TransferFile::build(
+            &doc.to_string(),
+            CATALOG,
+            CostModel::default(),
+            DEFAULT_FACTOR_BUDGET,
+        )
+        .unwrap()
+        .to_json();
+        assert_eq!(base, grown);
     }
 }

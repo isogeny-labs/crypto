@@ -1,0 +1,26 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp25-t9734-bcfe9f51 | 20.92 | bsgs-neg-v2 | 24/24 | 1.057 | 1.160 | 2.086 | — |
+| icv1-fp25-t9734-bcfe9f51 | 20.92 | kangaroo-v2 | 24/24 | 1.228 | 1.242 | 1.375 | — |
+| icv1-fp25-t9734-bcfe9f51 | 20.92 | rho-cubic | 24/24 | 0.638 | 0.690 | 1.155 | — |
+| icv1-fp25-t9734-bcfe9f51 | 20.92 | rho-cubic-v2 | 24/24 | 0.726 | 0.786 | 1.325 | — |
+| icv1-fp25-t9734-bcfe9f51 | 20.92 | rho-neg-v2 | 24/24 | 1.135 | 1.242 | 2.203 | — |
+| icv1-fp25-t9734-bcfe9f51 | 20.92 | rho-plain | 24/24 | 1.263 | 1.263 | 1.263 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp25-t9734-bcfe9f51 | bsgs-neg-v2 vs kangaroo-v2 | unresolved inside the band |
+| icv1-fp25-t9734-bcfe9f51 | bsgs-neg-v2 vs rho-cubic | rho-cubic < bsgs-neg-v2 |
+| icv1-fp25-t9734-bcfe9f51 | bsgs-neg-v2 vs rho-cubic-v2 | rho-cubic-v2 < bsgs-neg-v2 |
+| icv1-fp25-t9734-bcfe9f51 | bsgs-neg-v2 vs rho-neg-v2 | bsgs-neg-v2 < rho-neg-v2 |
+| icv1-fp25-t9734-bcfe9f51 | bsgs-neg-v2 vs rho-plain | unresolved inside the band |
+| icv1-fp25-t9734-bcfe9f51 | kangaroo-v2 vs rho-cubic | rho-cubic < kangaroo-v2 |
+| icv1-fp25-t9734-bcfe9f51 | kangaroo-v2 vs rho-cubic-v2 | rho-cubic-v2 < kangaroo-v2 |
+| icv1-fp25-t9734-bcfe9f51 | kangaroo-v2 vs rho-neg-v2 | unresolved inside the band |
+| icv1-fp25-t9734-bcfe9f51 | kangaroo-v2 vs rho-plain | unresolved inside the band |
+| icv1-fp25-t9734-bcfe9f51 | rho-cubic vs rho-cubic-v2 | rho-cubic < rho-cubic-v2 |
+| icv1-fp25-t9734-bcfe9f51 | rho-cubic vs rho-neg-v2 | rho-cubic < rho-neg-v2 |
+| icv1-fp25-t9734-bcfe9f51 | rho-cubic vs rho-plain | rho-cubic < rho-plain |
+| icv1-fp25-t9734-bcfe9f51 | rho-cubic-v2 vs rho-neg-v2 | rho-cubic-v2 < rho-neg-v2 |
+| icv1-fp25-t9734-bcfe9f51 | rho-cubic-v2 vs rho-plain | unresolved inside the band |
+| icv1-fp25-t9734-bcfe9f51 | rho-neg-v2 vs rho-plain | unresolved inside the band |

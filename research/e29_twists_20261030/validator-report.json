@@ -1,0 +1,3490 @@
+{
+ "schema": "validator-report/v1",
+ "status": "fail",
+ "independent": true,
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E29; this recompute is its own standard-library Rust program (validate_e29.rs: JSON parser, SHA-256 and leaf comparator taken from the E27 validator's validate_e27.rs, the rest new) and shares no code with examples/e29_twist.rs, examples/e29_tables.rs, crypto_lib or experiments/34_twist24_stage_r/summary.json",
+ "date": "2026-10-31",
+ "row": "E29 (GLV note §9.27 pre-registration, §9.31 results): order-24 twist action on E18's j = 0 curves. Kill test (8 curves), Stage R (8 curves, order-6 and order-24 walks, two arithmetics) and Stage A (3 curves, flat / cubic / twist24 arms with E18's exact oracle) are measurements; the handover n* is a model. Evidence directory research/e29_twists_20261030",
+ "script": "research/e29_twists_20261030/validate_e29.rs (rustc -O --edition 2021; `validate_e29 report <repo> research/e29_twists_20261030`)",
+ "status_rule": "pass iff (a) every check holds, (b) every headline agrees with its printed figure within half a unit of the last printed digit, and (c) the row has a measured end-to-end index-calculus cost S to set against a matched rho. E29 has no measured S (c): the index-calculus side is a modelled handover. Status is fail for the gate; the measured parts are verified (replay-certificate.json)",
+ "gate_refusal": "model-only: no measured end-to-end S exists for E29 (the handover is §11.16's model; Stage A's decompositions come from an unpriced exact oracle; no S5 solve was run), and Stage R is a rho-against-rho measurement with no index-calculus arm",
+ "numbers_verified": true,
+ "raw_data": [
+  {
+   "path": "../../experiments/34_twist24_stage_r/tables.md",
+   "sha256": "8a560e52c72b024874ef8ca89e35da3fbfd214a7d4636ad0d5b1820abc1cb14d"
+  },
+  {
+   "path": "../../experiments/34_twist24_stage_r/kill.json",
+   "sha256": "0aca3733b0cd0c8ef9bc300a33ab61744e60593f035aa74fbb300b678ba3734c"
+  },
+  {
+   "path": "../../experiments/26_quartic_folds_psi.json",
+   "sha256": "50fd9d479e85fcde6dec0c42107d52d7d74d638437f2acfead24a8fd45b3ac6d"
+  },
+  {
+   "path": "replay/twist_check.json",
+   "sha256": "f35a4d9074ac611c8c5a57696acc815d295d58a981ea4990d22d3ee43350fec2"
+  },
+  {
+   "path": "replay/twist_input.txt",
+   "sha256": "f196a47ee779ee9905fa4b20e698a1875732350224593bc804a2c0334745ce90"
+  },
+  {
+   "path": "../../experiments/34_twist24_stage_r/stage_r_p241.json",
+   "sha256": "6b67abb555a1035b20071c54b692c7752bcee1e1e083a2a3e922a1a8b366d0aa"
+  },
+  {
+   "path": "../../experiments/34_twist24_stage_r/stage_r_rest.json",
+   "sha256": "e3193c18b6ac2b2699a618815ca2cc1233f3739b6f915673dbac31469909fb87"
+  },
+  {
+   "path": "../../experiments/34_twist24_stage_r/stage_a_p241.json",
+   "sha256": "54a852d0a6c1b40ba42fc48a2f756a41a9513c15e443d64c72853c5f404ebaf5"
+  },
+  {
+   "path": "../../experiments/34_twist24_stage_r/stage_a_p337.json",
+   "sha256": "6e5647ad16b3111e3594d93e6e710291c1d096f8fdd85504c8ceb54a9eda9044"
+  },
+  {
+   "path": "../../experiments/34_twist24_stage_r/stage_a_p541.json",
+   "sha256": "f5dec977a38497f4e86bde3d9184cd8d8a7ab45386aeea6ae13609409b8b0002"
+  }
+ ],
+ "check_failures": [],
+ "headline_disagreements": [],
+ "checks": [
+  {
+   "id": "K.1",
+   "check": "Kill test (the binary's checks on E18's own models, replayed): on all 8 curves psi_p maps E to E, lambda_p found of order 24, ord chi6(b) = 6 (so ord lambda_p = 4 ord chi6(b)), ord lambda_omega = 3, |<lambda_p, lambda_omega, -1>| = 24, u^2 not in F_p, canonical b0 = 3,3,3,9,9,2,17,3; n mod 24 and mod 96 recomputed from n (1, and 1 or 49); n equals E18's recorded n",
+   "holds": true,
+   "detail": "p=241: true; p=337: true; p=541: true; p=601: true; p=733: true; p=769: true; p=997: true; p=1069: true"
+  },
+  {
+   "id": "K.2",
+   "check": "Validator's own F_p4 arithmetic on the 8 canonical models y^2 = x^3 + b0 t^3 (replay/twist_check.rs): a point P (own Tonelli-Shanks, and Stage A's generator for p = 241, 337, 541) with [n]P = O, n prime in the Hasse interval (#E = n, as E18's), psi(x, y) = (t^(1-p) x^p, t^(3(1-p)/2) y^p) on E with psi(P) = [lambda]P, lambda of order 8 (psi^4 = -1 for this normalisation, N(u) = -1), lambda_omega of order 3, lambda * lambda_omega of order 24 and |<lambda, lambda_omega, -1>| = 24 on every curve: the kill criterion's group, independently. E18's own models' coefficients are not in the records, so ord lambda_p = 24 for E18's normalisation (u = b^(-(p-1)/6)) rests on the replayed binary check (K.1); it differs from this psi by an automorphism",
+   "holds": true,
+   "detail": "11 of 11 lines ok"
+  },
+  {
+   "id": "R.1",
+   "check": "Stage R: 8 curves x 2 arithmetics x {order 6, order 24} x 16 walks; every walk record correct (512 records = 256 walks, each priced in both arithmetics)",
+   "holds": true,
+   "detail": "512 of 512 records"
+  },
+  {
+   "id": "R.2",
+   "check": "Stage R: schoolbook and Karatsuba records are the same walks (seed, steps, group ops, recovered, cycle escapes)",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.1",
+   "check": "Stage A: flat, cubic and twist24 arms solved and correct with the known logarithm on all 3 curves; all 48 walks per curve correct",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.2",
+   "check": "Stage A: cubic / twist24 columns = 4.00 on every curve",
+   "holds": true,
+   "detail": "true"
+  }
+ ],
+ "headline": [
+  {
+   "name": "canonical_b0_p241",
+   "source": "experiments/34_twist24_stage_r/tables.md, kill test",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "least b0 with #(y^2 = x^3 + b0 t^3) = n (binary), and own check K.2"
+  },
+  {
+   "name": "canonical_b0_p337",
+   "source": "experiments/34_twist24_stage_r/tables.md, kill test",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "least b0 with #(y^2 = x^3 + b0 t^3) = n (binary), and own check K.2"
+  },
+  {
+   "name": "canonical_b0_p541",
+   "source": "experiments/34_twist24_stage_r/tables.md, kill test",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "least b0 with #(y^2 = x^3 + b0 t^3) = n (binary), and own check K.2"
+  },
+  {
+   "name": "canonical_b0_p601",
+   "source": "experiments/34_twist24_stage_r/tables.md, kill test",
+   "printed": "9",
+   "claimed": 9,
+   "recomputed": 9,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "least b0 with #(y^2 = x^3 + b0 t^3) = n (binary), and own check K.2"
+  },
+  {
+   "name": "canonical_b0_p733",
+   "source": "experiments/34_twist24_stage_r/tables.md, kill test",
+   "printed": "9",
+   "claimed": 9,
+   "recomputed": 9,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "least b0 with #(y^2 = x^3 + b0 t^3) = n (binary), and own check K.2"
+  },
+  {
+   "name": "canonical_b0_p769",
+   "source": "experiments/34_twist24_stage_r/tables.md, kill test",
+   "printed": "2",
+   "claimed": 2,
+   "recomputed": 2,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "least b0 with #(y^2 = x^3 + b0 t^3) = n (binary), and own check K.2"
+  },
+  {
+   "name": "canonical_b0_p997",
+   "source": "experiments/34_twist24_stage_r/tables.md, kill test",
+   "printed": "17",
+   "claimed": 17,
+   "recomputed": 17,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "least b0 with #(y^2 = x^3 + b0 t^3) = n (binary), and own check K.2"
+  },
+  {
+   "name": "canonical_b0_p1069",
+   "source": "experiments/34_twist24_stage_r/tables.md, kill test",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "least b0 with #(y^2 = x^3 + b0 t^3) = n (binary), and own check K.2"
+  },
+  {
+   "name": "kill_group_order_24_curves",
+   "source": "note §9.31 (\"on all eight curves ... |<lambda_p, lambda_omega, -1>| = 24\")",
+   "printed": "8",
+   "claimed": 8,
+   "recomputed": 8,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "curves with group order 24 in the validator's own check"
+  },
+  {
+   "name": "steps_order6_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "24896",
+   "claimed": 24896,
+   "recomputed": 24896,
+   "rel_tol": 0.000020083547577924163,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "15514",
+   "claimed": 15514,
+   "recomputed": 15513.6875,
+   "rel_tol": 0.00003222895452494521,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.605",
+   "claimed": 1.605,
+   "recomputed": 1.6047764272678562,
+   "rel_tol": 0.00031152648006230535,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "3.0300e6",
+   "claimed": 3030000,
+   "recomputed": 3029977.875,
+   "rel_tol": 0.000016501650181518152,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "3.2599e6",
+   "claimed": 3259900,
+   "recomputed": 3259937.8125,
+   "rel_tol": 0.00001533789381576122,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.929",
+   "claimed": 0.929,
+   "recomputed": 0.9294587962327886,
+   "rel_tol": 0.0005382131329386437,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "121.7",
+   "claimed": 121.7,
+   "recomputed": 121.70540950353471,
+   "rel_tol": 0.00041084634387838955,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "210.1",
+   "claimed": 210.1,
+   "recomputed": 210.13300754575596,
+   "rel_tol": 0.0002379819136125655,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "52.2",
+   "claimed": 52.2,
+   "recomputed": 52.167266445822946,
+   "rel_tol": 0.0009578544070881226,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p241_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "56.1",
+   "claimed": 56.1,
+   "recomputed": 56.12649711559386,
+   "rel_tol": 0.0008912655980392158,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "24896",
+   "claimed": 24896,
+   "recomputed": 24896,
+   "rel_tol": 0.000020083547577924163,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "15514",
+   "claimed": 15514,
+   "recomputed": 15513.6875,
+   "rel_tol": 0.00003222895452494521,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.605",
+   "claimed": 1.605,
+   "recomputed": 1.6047764272678562,
+   "rel_tol": 0.00031152648006230535,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.5008e6",
+   "claimed": 2500800,
+   "recomputed": 2500810.125,
+   "rel_tol": 0.000019993602067338452,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.9053e6",
+   "claimed": 2905300,
+   "recomputed": 2905251.9375,
+   "rel_tol": 0.000017209926702922245,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.861",
+   "claimed": 0.861,
+   "recomputed": 0.8607894181982625,
+   "rel_tol": 0.000580720093495935,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "100.5",
+   "claimed": 100.5,
+   "recomputed": 100.45027815713368,
+   "rel_tol": 0.0004975124383084579,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "187.3",
+   "claimed": 187.3,
+   "recomputed": 187.27023716959621,
+   "rel_tol": 0.0002669514151094501,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "43.1",
+   "claimed": 43.1,
+   "recomputed": 43.05656130287314,
+   "rel_tol": 0.0011600928085846868,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p241_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "50.0",
+   "claimed": 50,
+   "recomputed": 50.01985432510983,
+   "rel_tol": 0.001000000001,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "54891",
+   "claimed": 54891,
+   "recomputed": 54891.4375,
+   "rel_tol": 0.000009108961405330565,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "33320",
+   "claimed": 33320,
+   "recomputed": 33319.8125,
+   "rel_tol": 0.000015006002415966388,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.647",
+   "claimed": 1.647,
+   "recomputed": 1.6474113562313712,
+   "rel_tol": 0.00030358227109896787,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "6.2964e6",
+   "claimed": 6296400,
+   "recomputed": 6296368.625,
+   "rel_tol": 0.00000794104568483578,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "6.6429e6",
+   "claimed": 6642900,
+   "recomputed": 6642882.5,
+   "rel_tol": 0.000007526833167743005,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.948",
+   "claimed": 0.948,
+   "recomputed": 0.9478368200852567,
+   "rel_tol": 0.000527426160864979,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "114.7",
+   "claimed": 114.7,
+   "recomputed": 114.70584323830106,
+   "rel_tol": 0.00043591979119442025,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "199.4",
+   "claimed": 199.4,
+   "recomputed": 199.36734337865798,
+   "rel_tol": 0.0002507522570210632,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "55.4",
+   "claimed": 55.4,
+   "recomputed": 55.44133750363767,
+   "rel_tol": 0.0009025270767148016,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p337_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "58.5",
+   "claimed": 58.5,
+   "recomputed": 58.492491881303785,
+   "rel_tol": 0.0008547008555555557,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "54891",
+   "claimed": 54891,
+   "recomputed": 54891.4375,
+   "rel_tol": 0.000009108961405330565,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "33320",
+   "claimed": 33320,
+   "recomputed": 33319.8125,
+   "rel_tol": 0.000015006002415966388,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.647",
+   "claimed": 1.647,
+   "recomputed": 1.6474113562313712,
+   "rel_tol": 0.00030358227109896787,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "5.2066e6",
+   "claimed": 5206600,
+   "recomputed": 5206598.375,
+   "rel_tol": 0.000009603195953213231,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "5.9533e6",
+   "claimed": 5953300,
+   "recomputed": 5953265.75,
+   "rel_tol": 0.000008398703248618415,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.875",
+   "claimed": 0.875,
+   "recomputed": 0.874578524400662,
+   "rel_tol": 0.0005714285720000001,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "94.9",
+   "claimed": 94.9,
+   "recomputed": 94.85265119901442,
+   "rel_tol": 0.0005268703904109589,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "178.7",
+   "claimed": 178.7,
+   "recomputed": 178.67044569953688,
+   "rel_tol": 0.00027979854532736437,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "45.8",
+   "claimed": 45.8,
+   "recomputed": 45.84559687438352,
+   "rel_tol": 0.0010917030578602622,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p337_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "52.4",
+   "claimed": 52.4,
+   "recomputed": 52.42021796247621,
+   "rel_tol": 0.0009541984742366413,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "130968",
+   "claimed": 130968,
+   "recomputed": 130967.8125,
+   "rel_tol": 0.00000381772647135178,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "84224",
+   "claimed": 84224,
+   "recomputed": 84224.1875,
+   "rel_tol": 0.0000059365501579122346,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.555",
+   "claimed": 1.555,
+   "recomputed": 1.554990512671909,
+   "rel_tol": 0.00032154340868167203,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.4566e7",
+   "claimed": 14565999.999999998,
+   "recomputed": 14566123.8125,
+   "rel_tol": 0.00003432651383358507,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.6795e7",
+   "claimed": 16795000,
+   "recomputed": 16795438.1875,
+   "rel_tol": 0.00002977076513843406,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.867",
+   "claimed": 0.867,
+   "recomputed": 0.8672666738365203,
+   "rel_tol": 0.0005767012693194926,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "111.2",
+   "claimed": 111.2,
+   "recomputed": 111.219112043274,
+   "rel_tol": 0.0004496402882194245,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "199.4",
+   "claimed": 199.4,
+   "recomputed": 199.41347831345954,
+   "rel_tol": 0.0002507522570210632,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "49.8",
+   "claimed": 49.8,
+   "recomputed": 49.76790469869569,
+   "rel_tol": 0.0010040160652610443,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p541_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "57.4",
+   "claimed": 57.4,
+   "recomputed": 57.384777024277696,
+   "rel_tol": 0.0008710801402439026,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "130968",
+   "claimed": 130968,
+   "recomputed": 130967.8125,
+   "rel_tol": 0.00000381772647135178,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "84224",
+   "claimed": 84224,
+   "recomputed": 84224.1875,
+   "rel_tol": 0.0000059365501579122346,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.555",
+   "claimed": 1.555,
+   "recomputed": 1.554990512671909,
+   "rel_tol": 0.00032154340868167203,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.2058e7",
+   "claimed": 12058000,
+   "recomputed": 12057752.1875,
+   "rel_tol": 0.0000414662465168353,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.5156e7",
+   "claimed": 15156000,
+   "recomputed": 15155511.8125,
+   "rel_tol": 0.00003299023492346266,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.796",
+   "claimed": 0.796,
+   "recomputed": 0.7956017808356018,
+   "rel_tol": 0.0006281407041457287,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "92.1",
+   "claimed": 92.1,
+   "recomputed": 92.06653113718303,
+   "rel_tol": 0.0005428881655808904,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "179.9",
+   "claimed": 179.9,
+   "recomputed": 179.9425113183787,
+   "rel_tol": 0.0002779321848249027,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "41.2",
+   "claimed": 41.2,
+   "recomputed": 41.1975807340742,
+   "rel_tol": 0.001213592234223301,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p541_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "51.8",
+   "claimed": 51.8,
+   "recomputed": 51.78165977809319,
+   "rel_tol": 0.0009652509662162164,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "200133",
+   "claimed": 200133,
+   "recomputed": 200133.125,
+   "rel_tol": 0.0000024983386073261283,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "95185",
+   "claimed": 95185,
+   "recomputed": 95185.3125,
+   "rel_tol": 0.00000525292851289594,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.103",
+   "claimed": 2.103,
+   "recomputed": 2.10256309238886,
+   "rel_tol": 0.00023775558749405612,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.2064e7",
+   "claimed": 22064000,
+   "recomputed": 22063936.6875,
+   "rel_tol": 0.000022661348826142134,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.8353e7",
+   "claimed": 18353000,
+   "recomputed": 18352782,
+   "rel_tol": 0.000027243502451915218,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.202",
+   "claimed": 1.202,
+   "recomputed": 1.2022121053636445,
+   "rel_tol": 0.0004159733781198004,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "110.2",
+   "claimed": 110.2,
+   "recomputed": 110.24630074356756,
+   "rel_tol": 0.00045372050862068974,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "192.8",
+   "claimed": 192.8,
+   "recomputed": 192.81107051048448,
+   "rel_tol": 0.00025933609984439836,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "61.1",
+   "claimed": 61.1,
+   "recomputed": 61.08475948795552,
+   "rel_tol": 0.0008183306063829788,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p601_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "50.8",
+   "claimed": 50.8,
+   "recomputed": 50.81030145631301,
+   "rel_tol": 0.0009842519694881892,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "200133",
+   "claimed": 200133,
+   "recomputed": 200133.125,
+   "rel_tol": 0.0000024983386073261283,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "95185",
+   "claimed": 95185,
+   "recomputed": 95185.3125,
+   "rel_tol": 0.00000525292851289594,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.103",
+   "claimed": 2.103,
+   "recomputed": 2.10256309238886,
+   "rel_tol": 0.00023775558749405612,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.8270e7",
+   "claimed": 18270000,
+   "recomputed": 18269974.3125,
+   "rel_tol": 0.000027367268773946364,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.6508e7",
+   "claimed": 16508000,
+   "recomputed": 16507728,
+   "rel_tol": 0.000030288345075115098,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.107",
+   "claimed": 1.107,
+   "recomputed": 1.1067528076849824,
+   "rel_tol": 0.0004516711838301717,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "91.3",
+   "claimed": 91.3,
+   "recomputed": 91.2891072504864,
+   "rel_tol": 0.0005476451265060242,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "173.4",
+   "claimed": 173.4,
+   "recomputed": 173.4272606396076,
+   "rel_tol": 0.0002883506346597463,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "50.6",
+   "claimed": 50.6,
+   "recomputed": 50.58104555577569,
+   "rel_tol": 0.0009881422934782608,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p601_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "45.7",
+   "claimed": 45.7,
+   "recomputed": 45.70220667574099,
+   "rel_tol": 0.0010940919048140045,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "272176",
+   "claimed": 272176,
+   "recomputed": 272175.75,
+   "rel_tol": 0.000001837046618731997,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "167136",
+   "claimed": 167136,
+   "recomputed": 167135.6875,
+   "rel_tol": 0.0000029915757257562706,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.628",
+   "claimed": 1.628,
+   "recomputed": 1.6284717768609411,
+   "rel_tol": 0.0003071253074324325,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.9874e7",
+   "claimed": 29874000,
+   "recomputed": 29873879.6875,
+   "rel_tol": 0.000016736961923411666,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "3.2980e7",
+   "claimed": 32980000,
+   "recomputed": 32980351.5,
+   "rel_tol": 0.000015160703471801092,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.906",
+   "claimed": 0.906,
+   "recomputed": 0.9058084080001391,
+   "rel_tol": 0.0005518763802428257,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "109.8",
+   "claimed": 109.8,
+   "recomputed": 109.75952004357478,
+   "rel_tol": 0.0004553734066484518,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "197.3",
+   "claimed": 197.3,
+   "recomputed": 197.3268067000951,
+   "rel_tol": 0.00025342118626457173,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "55.6",
+   "claimed": 55.6,
+   "recomputed": 55.60104784558624,
+   "rel_tol": 0.000899280576438849,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p733_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "61.4",
+   "claimed": 61.4,
+   "recomputed": 61.382790615007956,
+   "rel_tol": 0.0008143322483713356,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "272176",
+   "claimed": 272176,
+   "recomputed": 272175.75,
+   "rel_tol": 0.000001837046618731997,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "167136",
+   "claimed": 167136,
+   "recomputed": 167135.6875,
+   "rel_tol": 0.0000029915757257562706,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.628",
+   "claimed": 1.628,
+   "recomputed": 1.6284717768609411,
+   "rel_tol": 0.0003071253074324325,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.4741e7",
+   "claimed": 24741000,
+   "recomputed": 24740624.3125,
+   "rel_tol": 0.000020209369083707206,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.9797e7",
+   "claimed": 29796999.999999996,
+   "recomputed": 29796906,
+   "rel_tol": 0.000016780212789878178,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.830",
+   "claimed": 0.83,
+   "recomputed": 0.8303084995636796,
+   "rel_tol": 0.0006024096391566266,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "90.9",
+   "claimed": 90.9,
+   "recomputed": 90.8994438795521,
+   "rel_tol": 0.000550055006050605,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "178.3",
+   "claimed": 178.3,
+   "recomputed": 178.27973454203192,
+   "rel_tol": 0.00028042624817722943,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "46.0",
+   "claimed": 46,
+   "recomputed": 46.04707023388646,
+   "rel_tol": 0.0010869565228260871,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p733_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "55.5",
+   "claimed": 55.5,
+   "recomputed": 55.45778497761233,
+   "rel_tol": 0.0009009009018018019,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "230688",
+   "claimed": 230688,
+   "recomputed": 230688.5,
+   "rel_tol": 0.0000021674296040539607,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "178811",
+   "claimed": 178811,
+   "recomputed": 178811.125,
+   "rel_tol": 0.0000027962485557376226,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.290",
+   "claimed": 1.29,
+   "recomputed": 1.2901238667336834,
+   "rel_tol": 0.0003875968996124031,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.5386e7",
+   "claimed": 25386000.000000004,
+   "recomputed": 25385681.6875,
+   "rel_tol": 0.000019695895395099662,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "3.4151e7",
+   "claimed": 34151000,
+   "recomputed": 34150905.5,
+   "rel_tol": 0.000014640859725923108,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.743",
+   "claimed": 0.743,
+   "recomputed": 0.7433384654324905,
+   "rel_tol": 0.0006729475107671602,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "110.0",
+   "claimed": 110,
+   "recomputed": 110.04311739640251,
+   "rel_tol": 0.000454545455,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "191.0",
+   "claimed": 191,
+   "recomputed": 190.98870665905156,
+   "rel_tol": 0.00026178010497382204,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "42.9",
+   "claimed": 42.9,
+   "recomputed": 42.92758160113207,
+   "rel_tol": 0.0011655011666666668,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p769_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "57.7",
+   "claimed": 57.7,
+   "recomputed": 57.74971106352726,
+   "rel_tol": 0.0008665511273830156,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "230688",
+   "claimed": 230688,
+   "recomputed": 230688.5,
+   "rel_tol": 0.0000021674296040539607,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "178811",
+   "claimed": 178811,
+   "recomputed": 178811.125,
+   "rel_tol": 0.0000027962485557376226,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.290",
+   "claimed": 1.29,
+   "recomputed": 1.2901238667336834,
+   "rel_tol": 0.0003875968996124031,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.1022e7",
+   "claimed": 21022000,
+   "recomputed": 21021773.3125,
+   "rel_tol": 0.0000237846066263914,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "3.0750e7",
+   "claimed": 30750000,
+   "recomputed": 30750266.75,
+   "rel_tol": 0.000016260162617886178,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.684",
+   "claimed": 0.684,
+   "recomputed": 0.6836289741291431,
+   "rel_tol": 0.0007309941527777778,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "91.1",
+   "claimed": 91.1,
+   "recomputed": 91.1262300136331,
+   "rel_tol": 0.0005488474209659715,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "172.0",
+   "claimed": 172,
+   "recomputed": 171.9706575863219,
+   "rel_tol": 0.00029069767470930234,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "35.5",
+   "claimed": 35.5,
+   "recomputed": 35.54814483146994,
+   "rel_tol": 0.001408450705633803,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p769_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "52.0",
+   "claimed": 52,
+   "recomputed": 51.99917817519918,
+   "rel_tol": 0.0009615384625000002,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "510536",
+   "claimed": 510536,
+   "recomputed": 510536.125,
+   "rel_tol": 0.0000009793628666734571,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "272126",
+   "claimed": 272126,
+   "recomputed": 272126.3125,
+   "rel_tol": 0.000001837384154766542,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.876",
+   "claimed": 1.876,
+   "recomputed": 1.876099816698174,
+   "rel_tol": 0.0002665245205223881,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "5.5710e7",
+   "claimed": 55710000,
+   "recomputed": 55709604.75,
+   "rel_tol": 0.000008975049371746545,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "5.3466e7",
+   "claimed": 53465999.99999999,
+   "recomputed": 53465759.875,
+   "rel_tol": 0.000009351737562189057,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.042",
+   "claimed": 1.042,
+   "recomputed": 1.0419678852455476,
+   "rel_tol": 0.00047984644961612284,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "109.1",
+   "claimed": 109.1,
+   "recomputed": 109.11980959231828,
+   "rel_tol": 0.0004582951425297893,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "196.5",
+   "claimed": 196.5,
+   "recomputed": 196.47405421333522,
+   "rel_tol": 0.0002544529264631043,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "56.0",
+   "claimed": 56,
+   "recomputed": 56.045424262263296,
+   "rel_tol": 0.0008928571437500001,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p997_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "53.8",
+   "claimed": 53.8,
+   "recomputed": 53.78805340920442,
+   "rel_tol": 0.0009293680306691451,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "510536",
+   "claimed": 510536,
+   "recomputed": 510536.125,
+   "rel_tol": 0.0000009793628666734571,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "272126",
+   "claimed": 272126,
+   "recomputed": 272126.3125,
+   "rel_tol": 0.000001837384154766542,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.876",
+   "claimed": 1.876,
+   "recomputed": 1.876099816698174,
+   "rel_tol": 0.0002665245205223881,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "4.6147e7",
+   "claimed": 46147000,
+   "recomputed": 46146560.25,
+   "rel_tol": 0.000010834940527011509,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "4.8329e7",
+   "claimed": 48329000.00000001,
+   "recomputed": 48329316.625,
+   "rel_tol": 0.000010345755147013178,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "0.955",
+   "claimed": 0.955,
+   "recomputed": 0.9548357699336701,
+   "rel_tol": 0.0005235602099476441,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "90.4",
+   "claimed": 90.4,
+   "recomputed": 90.38843284596169,
+   "rel_tol": 0.0005530973456858407,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "177.6",
+   "claimed": 177.6,
+   "recomputed": 177.5988370290359,
+   "rel_tol": 0.0002815315318130631,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "46.4",
+   "claimed": 46.4,
+   "recomputed": 46.424733384153924,
+   "rel_tol": 0.001077586207974138,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p997_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "48.6",
+   "claimed": 48.6,
+   "recomputed": 48.62064749352543,
+   "rel_tol": 0.0010288065853909466,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "523426",
+   "claimed": 523426,
+   "recomputed": 523426.0625,
+   "rel_tol": 0.0000009552448684245722,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "256444",
+   "claimed": 256444,
+   "recomputed": 256443.5,
+   "rel_tol": 0.000001949743415716492,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.041",
+   "claimed": 2.041,
+   "recomputed": 2.0410970155219377,
+   "rel_tol": 0.0002449779522292994,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "5.7107e7",
+   "claimed": 57107000,
+   "recomputed": 57106529.0625,
+   "rel_tol": 0.000008755494081286008,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "5.0411e7",
+   "claimed": 50411000,
+   "recomputed": 50411236.1875,
+   "rel_tol": 0.000009918470185078655,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.133",
+   "claimed": 1.133,
+   "recomputed": 1.1328135031265147,
+   "rel_tol": 0.0004413062669902913,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "109.1",
+   "claimed": 109.1,
+   "recomputed": 109.1014245445602,
+   "rel_tol": 0.0004582951425297893,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "196.6",
+   "claimed": 196.6,
+   "recomputed": 196.57833475014965,
+   "rel_tol": 0.0002543234997456766,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "50.0",
+   "claimed": 50,
+   "recomputed": 49.97245926540395,
+   "rel_tol": 0.001000000001,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p1069_schoolbook",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "44.1",
+   "claimed": 44.1,
+   "recomputed": 44.113580150203184,
+   "rel_tol": 0.0011337868492063492,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_order6_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "523426",
+   "claimed": 523426,
+   "recomputed": 523426.0625,
+   "rel_tol": 0.0000009552448684245722,
+   "agrees": true,
+   "definition": "mean steps, 16 order-6 walks (printed rounded)"
+  },
+  {
+   "name": "steps_order24_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "256444",
+   "claimed": 256444,
+   "recomputed": 256443.5,
+   "rel_tol": 0.000001949743415716492,
+   "agrees": true,
+   "definition": "mean steps, 16 order-24 walks (printed rounded)"
+  },
+  {
+   "name": "steps_ratio_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "2.041",
+   "claimed": 2.041,
+   "recomputed": 2.0410970155219377,
+   "rel_tol": 0.0002449779522292994,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "muls_order6_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "4.7304e7",
+   "claimed": 47304000.00000001,
+   "recomputed": 47303880.9375,
+   "rel_tol": 0.000010569930671824791,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 6"
+  },
+  {
+   "name": "muls_order24_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "4.5565e7",
+   "claimed": 45565000,
+   "recomputed": 45565194.8125,
+   "rel_tol": 0.000010973334807417975,
+   "agrees": true,
+   "definition": "mean fp_muls - verify_fp_muls, order 24"
+  },
+  {
+   "name": "muls_ratio_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "1.038",
+   "claimed": 1.038,
+   "recomputed": 1.0381582067662536,
+   "rel_tol": 0.00048169556888246634,
+   "agrees": true,
+   "definition": "order 6 / order 24"
+  },
+  {
+   "name": "per_step_order6_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "90.4",
+   "claimed": 90.4,
+   "recomputed": 90.37356816274314,
+   "rel_tol": 0.0005530973456858407,
+   "agrees": true,
+   "definition": "F_p mults per step, order 6"
+  },
+  {
+   "name": "per_step_order24_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "177.7",
+   "claimed": 177.7,
+   "recomputed": 177.68122339813644,
+   "rel_tol": 0.0002813731010129432,
+   "agrees": true,
+   "definition": "F_p mults per step, order 24"
+  },
+  {
+   "name": "srho_order6_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "41.4",
+   "claimed": 41.4,
+   "recomputed": 41.39441324927289,
+   "rel_tol": 0.0012077294698067636,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 6"
+  },
+  {
+   "name": "srho_order24_p1069_karatsuba",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage R",
+   "printed": "39.9",
+   "claimed": 39.9,
+   "recomputed": 39.87293360441839,
+   "rel_tol": 0.0012531328333333337,
+   "agrees": true,
+   "definition": "F_p mults per sqrt(n), order 24"
+  },
+  {
+   "name": "steps_ratio_min",
+   "source": "note §9.31 Stage R",
+   "printed": "1.29",
+   "claimed": 1.29,
+   "recomputed": 1.2901238667336834,
+   "rel_tol": 0.0038759689961240314,
+   "agrees": true,
+   "definition": "least order-6/order-24 steps per curve"
+  },
+  {
+   "name": "steps_ratio_max",
+   "source": "note §9.31 Stage R",
+   "printed": "2.10",
+   "claimed": 2.1,
+   "recomputed": 2.10256309238886,
+   "rel_tol": 0.0023809523833333334,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "steps_ratio_pooled",
+   "source": "note §9.31 Stage R",
+   "printed": "1.701",
+   "claimed": 1.701,
+   "recomputed": 1.700927367223997,
+   "rel_tol": 0.0002939447386831276,
+   "agrees": true,
+   "definition": "sum over curves of mean steps / sqrt(n), order 6 over order 24"
+  },
+  {
+   "name": "per_step_order24_min",
+   "source": "note §9.31 Stage R",
+   "printed": "191",
+   "claimed": 191,
+   "recomputed": 190.98870665905156,
+   "rel_tol": 0.0026178010497382204,
+   "agrees": true,
+   "definition": "least F_p mults per step, order 24, schoolbook"
+  },
+  {
+   "name": "per_step_order24_max",
+   "source": "note §9.31 Stage R",
+   "printed": "210",
+   "claimed": 210,
+   "recomputed": 210.13300754575596,
+   "rel_tol": 0.002380952383333334,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "per_step_order6_min",
+   "source": "note §9.31 Stage R",
+   "printed": "109",
+   "claimed": 109,
+   "recomputed": 109.1014245445602,
+   "rel_tol": 0.004587155967889909,
+   "agrees": true,
+   "definition": "least F_p mults per step, order 6, schoolbook"
+  },
+  {
+   "name": "per_step_order6_max",
+   "source": "note §9.31 Stage R",
+   "printed": "122",
+   "claimed": 122,
+   "recomputed": 121.70540950353471,
+   "rel_tol": 0.0040983606598360665,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "muls_ratio_schoolbook_min",
+   "source": "note §9.31 Stage R",
+   "printed": "0.743",
+   "claimed": 0.743,
+   "recomputed": 0.7433384654324905,
+   "rel_tol": 0.0006729475107671602,
+   "agrees": true,
+   "definition": "least order-6/order-24 F_p cost per curve"
+  },
+  {
+   "name": "muls_ratio_schoolbook_max",
+   "source": "note §9.31 Stage R",
+   "printed": "1.202",
+   "claimed": 1.202,
+   "recomputed": 1.2022121053636445,
+   "rel_tol": 0.0004159733781198004,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "muls_ratio_schoolbook_pooled",
+   "source": "note §9.31 Stage R",
+   "printed": "0.962",
+   "claimed": 0.962,
+   "recomputed": 0.9617131057920246,
+   "rel_tol": 0.0005197505202702704,
+   "agrees": true,
+   "definition": "pooled per sqrt(n)"
+  },
+  {
+   "name": "muls_ratio_karatsuba_min",
+   "source": "note §9.31 Stage R",
+   "printed": "0.684",
+   "claimed": 0.684,
+   "recomputed": 0.6836289741291431,
+   "rel_tol": 0.0007309941527777778,
+   "agrees": true,
+   "definition": "least, Karatsuba"
+  },
+  {
+   "name": "muls_ratio_karatsuba_max",
+   "source": "note §9.31 Stage R",
+   "printed": "1.107",
+   "claimed": 1.107,
+   "recomputed": 1.1067528076849824,
+   "rel_tol": 0.0004516711838301717,
+   "agrees": true,
+   "definition": "largest, Karatsuba"
+  },
+  {
+   "name": "muls_ratio_karatsuba_pooled",
+   "source": "note §9.31 Stage R",
+   "printed": "0.884",
+   "claimed": 0.884,
+   "recomputed": 0.8843589602434904,
+   "rel_tol": 0.0005656108602941178,
+   "agrees": true,
+   "definition": "pooled per sqrt(n), Karatsuba"
+  },
+  {
+   "name": "srho_per_sqrt_n_order6",
+   "source": "note §9.31 Stage R",
+   "printed": "52.9",
+   "claimed": 52.9,
+   "recomputed": 52.875972638812165,
+   "rel_tol": 0.0009451795850661627,
+   "agrees": true,
+   "definition": "mean over the 8 curves of F_p mults / sqrt(n), order 6, schoolbook"
+  },
+  {
+   "name": "srho_per_sqrt_n_order24",
+   "source": "note §9.31 Stage R",
+   "printed": "55.0",
+   "claimed": 55,
+   "recomputed": 54.98102533942889,
+   "rel_tol": 0.00090909091,
+   "agrees": true,
+   "definition": "same, order 24"
+  },
+  {
+   "name": "e18_psi_walk_srho",
+   "source": "note §9.31 (\"E18's psi walk measured 54.1\")",
+   "printed": "54.1",
+   "claimed": 54.1,
+   "recomputed": 54.1253743626427,
+   "rel_tol": 0.0009242144186691313,
+   "agrees": true,
+   "definition": "mean over E18's 8 curves of its Psi walks' mean fp_muls / sqrt(n) (E18 records carry no verify_fp_muls)"
+  },
+  {
+   "name": "walks_correct",
+   "source": "note §9.31 (\"all 256 walks correct\")",
+   "printed": "256",
+   "claimed": 256,
+   "recomputed": 256,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "walks correct (each walk recorded in two arithmetics)"
+  },
+  {
+   "name": "cols_p241_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "96",
+   "claimed": 96,
+   "recomputed": 96,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p241_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "7575",
+   "claimed": 7575,
+   "recomputed": 7575,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p241_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "78.1",
+   "claimed": 78.1,
+   "recomputed": 78.09278350515464,
+   "rel_tol": 0.0006402048661971832,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p241_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2.375e6",
+   "claimed": 2375000,
+   "recomputed": 2374992,
+   "rel_tol": 0.00021052631600000003,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p241_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.7838",
+   "claimed": 0.7838,
+   "recomputed": 0.7838314660961014,
+   "rel_tol": 0.00006379178368206175,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p241_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.7285",
+   "claimed": 0.7285,
+   "recomputed": 0.7285390509270643,
+   "rel_tol": 0.00006863417989018532,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "nstar_order6_log2_p241_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^166.4",
+   "claimed": 166.4,
+   "recomputed": 166.4224232424304,
+   "rel_tol": 0.00030048076953125,
+   "agrees": true,
+   "definition": "4 log2(y (cols/p) C4 / ((S_rho/sqrt n)(1 - r))), order-6 walk"
+  },
+  {
+   "name": "nstar_order24_log2_p241_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^164.7",
+   "claimed": 164.7,
+   "recomputed": 164.6859219495333,
+   "rel_tol": 0.00030358227109896787,
+   "agrees": true,
+   "definition": "same, order-24 walk"
+  },
+  {
+   "name": "cols_p241_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "32",
+   "claimed": 32,
+   "recomputed": 32,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p241_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2637",
+   "claimed": 2637,
+   "recomputed": 2637,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p241_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "79.9",
+   "claimed": 79.9,
+   "recomputed": 79.9090909090909,
+   "rel_tol": 0.0006257822284105132,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p241_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2.509e5",
+   "claimed": 250900,
+   "recomputed": 250864,
+   "rel_tol": 0.00019928258290155442,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p241_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.0828",
+   "claimed": 0.0828,
+   "recomputed": 0.08279400390011099,
+   "rel_tol": 0.0006038647349033818,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p241_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.0770",
+   "claimed": 0.077,
+   "recomputed": 0.07695361520028995,
+   "rel_tol": 0.00064935065,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "nstar_order6_log2_p241_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^151.9",
+   "claimed": 151.9,
+   "recomputed": 151.87489785842806,
+   "rel_tol": 0.00032916392396313364,
+   "agrees": true,
+   "definition": "4 log2(y (cols/p) C4 / ((S_rho/sqrt n)(1 - r))), order-6 walk"
+  },
+  {
+   "name": "nstar_order24_log2_p241_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^151.4",
+   "claimed": 151.4,
+   "recomputed": 151.41611967531958,
+   "rel_tol": 0.0003302509910832233,
+   "agrees": true,
+   "definition": "same, order-24 walk"
+  },
+  {
+   "name": "cols_p241_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "8",
+   "claimed": 8,
+   "recomputed": 8,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p241_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "587",
+   "claimed": 587,
+   "recomputed": 587,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p241_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "65.2",
+   "claimed": 65.2,
+   "recomputed": 65.22222222222223,
+   "rel_tol": 0.0007668711664110431,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p241_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1.886e4",
+   "claimed": 18860,
+   "recomputed": 18864,
+   "rel_tol": 0.000265111347030753,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p241_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.0062",
+   "claimed": 0.0062,
+   "recomputed": 0.006225788034838373,
+   "rel_tol": 0.008064516137096776,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p241_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.0058",
+   "claimed": 0.0058,
+   "recomputed": 0.0057866134524613725,
+   "rel_tol": 0.008620689663793106,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "nstar_order6_log2_p241_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^142.2",
+   "claimed": 142.2,
+   "recomputed": 142.24022440439583,
+   "rel_tol": 0.00035161744057665267,
+   "agrees": true,
+   "definition": "4 log2(y (cols/p) C4 / ((S_rho/sqrt n)(1 - r))), order-6 walk"
+  },
+  {
+   "name": "nstar_order24_log2_p241_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^141.8",
+   "claimed": 141.8,
+   "recomputed": 141.81552597309567,
+   "rel_tol": 0.0003526093092383639,
+   "agrees": true,
+   "definition": "same, order-24 walk"
+  },
+  {
+   "name": "cols_p337_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "180",
+   "claimed": 180,
+   "recomputed": 180,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p337_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "3647",
+   "claimed": 3647,
+   "recomputed": 3647,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p337_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "20.1",
+   "claimed": 20.1,
+   "recomputed": 20.14917127071823,
+   "rel_tol": 0.0024875621915422886,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p337_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "8.105e6",
+   "claimed": 8105000,
+   "recomputed": 8105200,
+   "rel_tol": 0.00006169031468229488,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p337_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1.2873",
+   "claimed": 1.2873,
+   "recomputed": 1.2872816829399025,
+   "rel_tol": 0.000038840985046220774,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p337_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1.2201",
+   "claimed": 1.2201,
+   "recomputed": 1.2201329769117548,
+   "rel_tol": 0.00004098024756167528,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "cols_p337_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "60",
+   "claimed": 60,
+   "recomputed": 60,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p337_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1205",
+   "claimed": 1205,
+   "recomputed": 1205,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p337_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "19.8",
+   "claimed": 19.8,
+   "recomputed": 19.75409836065574,
+   "rel_tol": 0.002525252527777778,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p337_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1.037e6",
+   "claimed": 1036999.9999999999,
+   "recomputed": 1036912,
+   "rel_tol": 0.0004821600776277725,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p337_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.1647",
+   "claimed": 0.1647,
+   "recomputed": 0.16468413172044863,
+   "rel_tol": 0.0003035822710989678,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p337_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.1561",
+   "claimed": 0.1561,
+   "recomputed": 0.15609368372841156,
+   "rel_tol": 0.00032030749551569513,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "nstar_order6_log2_p337_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^145.7",
+   "claimed": 145.7,
+   "recomputed": 145.6911947594083,
+   "rel_tol": 0.0003431708994509266,
+   "agrees": true,
+   "definition": "4 log2(y (cols/p) C4 / ((S_rho/sqrt n)(1 - r))), order-6 walk"
+  },
+  {
+   "name": "nstar_order24_log2_p337_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^145.3",
+   "claimed": 145.3,
+   "recomputed": 145.32299317615076,
+   "rel_tol": 0.000344115623193393,
+   "agrees": true,
+   "definition": "same, order-24 walk"
+  },
+  {
+   "name": "cols_p337_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "15",
+   "claimed": 15,
+   "recomputed": 15,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p337_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "249",
+   "claimed": 249,
+   "recomputed": 249,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p337_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "15.6",
+   "claimed": 15.6,
+   "recomputed": 15.5625,
+   "rel_tol": 0.003205128208333334,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p337_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "6.830e4",
+   "claimed": 68300,
+   "recomputed": 68304,
+   "rel_tol": 0.00007320644224011713,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p337_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.0108",
+   "claimed": 0.0108,
+   "recomputed": 0.010848157734729198,
+   "rel_tol": 0.004629629634259259,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p337_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.0103",
+   "claimed": 0.0103,
+   "recomputed": 0.010282283331069005,
+   "rel_tol": 0.004854368936893205,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "nstar_order6_log2_p337_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^135.3",
+   "claimed": 135.3,
+   "recomputed": 135.33940148249386,
+   "rel_tol": 0.0003695491504065041,
+   "agrees": true,
+   "definition": "4 log2(y (cols/p) C4 / ((S_rho/sqrt n)(1 - r))), order-6 walk"
+  },
+  {
+   "name": "nstar_order24_log2_p337_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^135.0",
+   "claimed": 135,
+   "recomputed": 135.0269435190465,
+   "rel_tol": 0.0003703703707407408,
+   "agrees": true,
+   "definition": "same, order-24 walk"
+  },
+  {
+   "name": "cols_p541_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "264",
+   "claimed": 264,
+   "recomputed": 264,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p541_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "7587",
+   "claimed": 7587,
+   "recomputed": 7587,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p541_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "28.6",
+   "claimed": 28.6,
+   "recomputed": 28.630188679245283,
+   "rel_tol": 0.0017482517500000002,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p541_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1.537e7",
+   "claimed": 15370000,
+   "recomputed": 15368560,
+   "rel_tol": 0.0003253090439167209,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p541_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1.0551",
+   "claimed": 1.0551,
+   "recomputed": 1.055089205462567,
+   "rel_tol": 0.00004738887313998674,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p541_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.9150",
+   "claimed": 0.915,
+   "recomputed": 0.9150437058223373,
+   "rel_tol": 0.00005464480879781421,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "nstar_order24_log2_p541_flat",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^166.6",
+   "claimed": 166.6,
+   "recomputed": 166.64252193928138,
+   "rel_tol": 0.0003001200483193278,
+   "agrees": true,
+   "definition": "same, order-24 walk"
+  },
+  {
+   "name": "cols_p541_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "88",
+   "claimed": 88,
+   "recomputed": 88,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p541_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2648",
+   "claimed": 2648,
+   "recomputed": 2648,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p541_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "29.8",
+   "claimed": 29.8,
+   "recomputed": 29.752808988764045,
+   "rel_tol": 0.001677852350671141,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p541_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1.947e6",
+   "claimed": 1947000,
+   "recomputed": 1946864,
+   "rel_tol": 0.00025680534180790965,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p541_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.1337",
+   "claimed": 0.1337,
+   "recomputed": 0.13365697182453495,
+   "rel_tol": 0.00037397157853403146,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p541_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.1159",
+   "claimed": 0.1159,
+   "recomputed": 0.11591623738932592,
+   "rel_tol": 0.0004314063852459017,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "nstar_order6_log2_p541_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^147.9",
+   "claimed": 147.9,
+   "recomputed": 147.9458539137267,
+   "rel_tol": 0.00033806626132521975,
+   "agrees": true,
+   "definition": "4 log2(y (cols/p) C4 / ((S_rho/sqrt n)(1 - r))), order-6 walk"
+  },
+  {
+   "name": "nstar_order24_log2_p541_cubic",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^147.0",
+   "claimed": 147,
+   "recomputed": 147.0070654575939,
+   "rel_tol": 0.0003401360547619048,
+   "agrees": true,
+   "definition": "same, order-24 walk"
+  },
+  {
+   "name": "cols_p541_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "22",
+   "claimed": 22,
+   "recomputed": 22,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "columns"
+  },
+  {
+   "name": "residuals_p541_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "639",
+   "claimed": 639,
+   "recomputed": 639,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "residuals_at_solve"
+  },
+  {
+   "name": "y_p541_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "27.8",
+   "claimed": 27.8,
+   "recomputed": 27.782608695652176,
+   "rel_tol": 0.001798561152877698,
+   "agrees": true,
+   "definition": "residuals / relations"
+  },
+  {
+   "name": "la16_p541_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "1.401e5",
+   "claimed": 140100,
+   "recomputed": 140080,
+   "rel_tol": 0.000356887937544611,
+   "agrees": true,
+   "definition": "16 * la_ops"
+  },
+  {
+   "name": "r_order6_p541_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.0096",
+   "claimed": 0.0096,
+   "recomputed": 0.009616834361917861,
+   "rel_tol": 0.005208333338541668,
+   "agrees": true,
+   "definition": "16 LA / mean order-6 walk"
+  },
+  {
+   "name": "r_order24_p541_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "0.0083",
+   "claimed": 0.0083,
+   "recomputed": 0.008340359949897258,
+   "rel_tol": 0.006024096391566266,
+   "agrees": true,
+   "definition": "16 LA / mean order-24 walk"
+  },
+  {
+   "name": "nstar_order6_log2_p541_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^138.8",
+   "claimed": 138.8,
+   "recomputed": 138.77828499199006,
+   "rel_tol": 0.0003602305479106628,
+   "agrees": true,
+   "definition": "4 log2(y (cols/p) C4 / ((S_rho/sqrt n)(1 - r))), order-6 walk"
+  },
+  {
+   "name": "nstar_order24_log2_p541_twist24",
+   "source": "experiments/34_twist24_stage_r/tables.md, Stage A",
+   "printed": "2^137.9",
+   "claimed": 137.9,
+   "recomputed": 137.94904231094972,
+   "rel_tol": 0.00036258158121827414,
+   "agrees": true,
+   "definition": "same, order-24 walk"
+  },
+  {
+   "name": "la_ratio_min",
+   "source": "note §9.31 Stage A",
+   "printed": "13.3",
+   "claimed": 13.3,
+   "recomputed": 13.298558100084817,
+   "rel_tol": 0.0037593985,
+   "agrees": true,
+   "definition": "least la_ops cubic / twist24"
+  },
+  {
+   "name": "la_ratio_max",
+   "source": "note §9.31 Stage A",
+   "printed": "15.2",
+   "claimed": 15.2,
+   "recomputed": 15.180838603888498,
+   "rel_tol": 0.0032894736875000007,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "r24_min",
+   "source": "note §9.31 Stage A",
+   "printed": "0.0058",
+   "claimed": 0.0058,
+   "recomputed": 0.0057866134524613725,
+   "rel_tol": 0.008620689663793106,
+   "agrees": true,
+   "definition": "least 16 LA twist24 / order-24 walk"
+  },
+  {
+   "name": "r24_max",
+   "source": "note §9.31 Stage A",
+   "printed": "0.0103",
+   "claimed": 0.0103,
+   "recomputed": 0.010282283331069005,
+   "rel_tol": 0.004854368936893205,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "nstar_twist24_min_log2",
+   "source": "note §9.31 G2.109 (\"2^135.0-2^142.2\")",
+   "printed": "135.0",
+   "claimed": 135,
+   "recomputed": 135.0269435190465,
+   "rel_tol": 0.0003703703707407408,
+   "agrees": true,
+   "definition": "least log2 n* of the twist24 arm over both walks"
+  },
+  {
+   "name": "nstar_twist24_max_log2",
+   "source": "note §9.31 G2.109",
+   "printed": "142.2",
+   "claimed": 142.2,
+   "recomputed": 142.24022440439583,
+   "rel_tol": 0.00035161744057665267,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "nstar_cubic_min_log2",
+   "source": "task statement / §9.31 (\"E18's 2^146-2^152\")",
+   "printed": "146",
+   "claimed": 146,
+   "recomputed": 145.6911947594083,
+   "rel_tol": 0.003424657537671233,
+   "agrees": true,
+   "definition": "least log2 n* of the cubic (E18 psi fold) arm, order-6 walk"
+  },
+  {
+   "name": "nstar_cubic_max_log2",
+   "source": "task statement / §9.31",
+   "printed": "152",
+   "claimed": 152,
+   "recomputed": 151.87489785842806,
+   "rel_tol": 0.0032894736875000003,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "gap_to_e24_min_bits",
+   "source": "note §9.31 G2.109 (\"2^44.9-2^52.1 above E24's 2^90.1\")",
+   "printed": "44.9",
+   "claimed": 44.9,
+   "recomputed": 44.92694351904652,
+   "rel_tol": 0.0011135857472160358,
+   "agrees": true,
+   "definition": "least twist24 log2 n* minus E24's 90.1 (cited, not recomputed)"
+  },
+  {
+   "name": "gap_to_e24_max_bits",
+   "source": "note §9.31 G2.109",
+   "printed": "52.1",
+   "claimed": 52.1,
+   "recomputed": 52.14022440439584,
+   "rel_tol": 0.0009596928992322458,
+   "agrees": true,
+   "definition": "largest"
+  }
+ ],
+ "stage_r": [
+  {
+   "p": 241,
+   "karatsuba": false,
+   "steps_ratio": 1.6047764272678562,
+   "muls_ratio": 0.9294587962327886,
+   "per_step_6": 121.70540950353471,
+   "per_step_24": 210.13300754575596,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 3029977.875,
+     "order24": 3259937.8125,
+     "order6_over_order24": 0.9294587962327886
+    },
+    {
+     "weight": "0.1",
+     "order6": 3271469.075,
+     "order24": 3410420.58125,
+     "order6_over_order24": 0.9592567828689708
+    },
+    {
+     "weight": "1",
+     "order6": 5444889.875,
+     "order24": 4764765.5,
+     "order6_over_order24": 1.1427403667609666
+    }
+   ]
+  },
+  {
+   "p": 241,
+   "karatsuba": true,
+   "steps_ratio": 1.6047764272678562,
+   "muls_ratio": 0.8607894181982625,
+   "per_step_6": 100.45027815713368,
+   "per_step_24": 187.27023716959621,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 2500810.125,
+     "order24": 2905251.9375,
+     "order6_over_order24": 0.8607894181982625
+    },
+    {
+     "weight": "0.1",
+     "order6": 2742301.325,
+     "order24": 3055734.70625,
+     "order6_over_order24": 0.8974278164236825
+    },
+    {
+     "weight": "1",
+     "order6": 4915722.125,
+     "order24": 4410079.625,
+     "order6_over_order24": 1.1146560930858476
+    }
+   ]
+  },
+  {
+   "p": 337,
+   "karatsuba": false,
+   "steps_ratio": 1.6474113562313712,
+   "muls_ratio": 0.9478368200852567,
+   "per_step_6": 114.70584323830106,
+   "per_step_24": 199.36734337865798,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 6296368.625,
+     "order24": 6642882.5,
+     "order6_over_order24": 0.9478368200852567
+    },
+    {
+     "weight": "0.1",
+     "order6": 6828815.56875,
+     "order24": 6966084.68125,
+     "order6_over_order24": 0.9802946534845498
+    },
+    {
+     "weight": "1",
+     "order6": 11620838.0625,
+     "order24": 9874904.3125,
+     "order6_over_order24": 1.1768051309408574
+    }
+   ]
+  },
+  {
+   "p": 337,
+   "karatsuba": true,
+   "steps_ratio": 1.6474113562313712,
+   "muls_ratio": 0.874578524400662,
+   "per_step_6": 94.85265119901442,
+   "per_step_24": 178.67044569953688,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 5206598.375,
+     "order24": 5953265.75,
+     "order6_over_order24": 0.874578524400662
+    },
+    {
+     "weight": "0.1",
+     "order6": 5739045.31875,
+     "order24": 6276467.93125,
+     "order6_over_order24": 0.9143749926890856
+    },
+    {
+     "weight": "1",
+     "order6": 10531067.8125,
+     "order24": 9185287.5625,
+     "order6_over_order24": 1.1465147651440226
+    }
+   ]
+  },
+  {
+   "p": 541,
+   "karatsuba": false,
+   "steps_ratio": 1.554990512671909,
+   "muls_ratio": 0.8672666738365203,
+   "per_step_6": 111.219112043274,
+   "per_step_24": 199.41347831345954,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 14566123.8125,
+     "order24": 16795438.1875,
+     "order6_over_order24": 0.8672666738365203
+    },
+    {
+     "weight": "0.1",
+     "order6": 15836511.59375,
+     "order24": 17612412.80625,
+     "order6_over_order24": 0.8991676363689479
+    },
+    {
+     "weight": "1",
+     "order6": 27270001.625,
+     "order24": 24965184.375,
+     "order6_over_order24": 1.0923212588931661
+    }
+   ]
+  },
+  {
+   "p": 541,
+   "karatsuba": true,
+   "steps_ratio": 1.554990512671909,
+   "muls_ratio": 0.7956017808356018,
+   "per_step_6": 92.06653113718303,
+   "per_step_24": 179.9425113183787,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 12057752.1875,
+     "order24": 15155511.8125,
+     "order6_over_order24": 0.7956017808356018
+    },
+    {
+     "weight": "0.1",
+     "order6": 13328139.96875,
+     "order24": 15972486.43125,
+     "order6_over_order24": 0.8344436557274912
+    },
+    {
+     "weight": "1",
+     "order6": 24761630,
+     "order24": 23325258,
+     "order6_over_order24": 1.0615801119970463
+    }
+   ]
+  },
+  {
+   "p": 601,
+   "karatsuba": false,
+   "steps_ratio": 2.10256309238886,
+   "muls_ratio": 1.2022121053636445,
+   "per_step_6": 110.24630074356756,
+   "per_step_24": 192.81107051048448,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 22063936.6875,
+     "order24": 18352782,
+     "order6_over_order24": 1.2022121053636445
+    },
+    {
+     "weight": "0.1",
+     "order6": 24005228,
+     "order24": 19276079.53125,
+     "order6_over_order24": 1.2453376715469138
+    },
+    {
+     "weight": "1",
+     "order6": 41476849.8125,
+     "order24": 27585757.3125,
+     "order6_over_order24": 1.5035603098598094
+    }
+   ]
+  },
+  {
+   "p": 601,
+   "karatsuba": true,
+   "steps_ratio": 2.10256309238886,
+   "muls_ratio": 1.1067528076849824,
+   "per_step_6": 91.2891072504864,
+   "per_step_24": 173.4272606396076,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 18269974.3125,
+     "order24": 16507728,
+     "order6_over_order24": 1.1067528076849824
+    },
+    {
+     "weight": "0.1",
+     "order6": 20211265.625,
+     "order24": 17431025.53125,
+     "order6_over_order24": 1.1594995135980748
+    },
+    {
+     "weight": "1",
+     "order6": 37682887.4375,
+     "order24": 25740703.3125,
+     "order6_over_order24": 1.4639416406000347
+    }
+   ]
+  },
+  {
+   "p": 733,
+   "karatsuba": false,
+   "steps_ratio": 1.6284717768609411,
+   "muls_ratio": 0.9058084080001391,
+   "per_step_6": 109.75952004357478,
+   "per_step_24": 197.3268067000951,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 29873879.6875,
+     "order24": 32980351.5,
+     "order6_over_order24": 0.9058084080001391
+    },
+    {
+     "weight": "0.1",
+     "order6": 32513984.4625,
+     "order24": 34601567.66875,
+     "order6_over_order24": 0.93966795879785
+    },
+    {
+     "weight": "1",
+     "order6": 56274927.4375,
+     "order24": 49192513.1875,
+     "order6_over_order24": 1.1439734177232415
+    }
+   ]
+  },
+  {
+   "p": 733,
+   "karatsuba": true,
+   "steps_ratio": 1.6284717768609411,
+   "muls_ratio": 0.8303084995636796,
+   "per_step_6": 90.8994438795521,
+   "per_step_24": 178.27973454203192,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 24740624.3125,
+     "order24": 29796906,
+     "order6_over_order24": 0.8303084995636796
+    },
+    {
+     "weight": "0.1",
+     "order6": 27380729.0875,
+     "order24": 31418122.16875,
+     "order6_over_order24": 0.8714947679060912
+    },
+    {
+     "weight": "1",
+     "order6": 51141672.0625,
+     "order24": 46009067.6875,
+     "order6_over_order24": 1.1115563655812668
+    }
+   ]
+  },
+  {
+   "p": 769,
+   "karatsuba": false,
+   "steps_ratio": 1.2901238667336834,
+   "muls_ratio": 0.7433384654324905,
+   "per_step_6": 110.04311739640251,
+   "per_step_24": 190.98870665905156,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 25385681.6875,
+     "order24": 34150905.5,
+     "order6_over_order24": 0.7433384654324905
+    },
+    {
+     "weight": "0.1",
+     "order6": 27623360.1375,
+     "order24": 35885373.4125,
+     "order6_over_order24": 0.7697665514016336
+    },
+    {
+     "weight": "1",
+     "order6": 47762466.1875,
+     "order24": 51495584.625,
+     "order6_over_order24": 0.9275060480488719
+    }
+   ]
+  },
+  {
+   "p": 769,
+   "karatsuba": true,
+   "steps_ratio": 1.2901238667336834,
+   "muls_ratio": 0.6836289741291431,
+   "per_step_6": 91.1262300136331,
+   "per_step_24": 171.9706575863219,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 21021773.3125,
+     "order24": 30750266.75,
+     "order6_over_order24": 0.6836289741291431
+    },
+    {
+     "weight": "0.1",
+     "order6": 23259451.7625,
+     "order24": 32484734.6625,
+     "order6_over_order24": 0.7160117514935542
+    },
+    {
+     "weight": "1",
+     "order6": 43398557.8125,
+     "order24": 48094945.875,
+     "order6_over_order24": 0.9023517341155548
+    }
+   ]
+  },
+  {
+   "p": 997,
+   "karatsuba": false,
+   "steps_ratio": 1.876099816698174,
+   "muls_ratio": 1.0419678852455476,
+   "per_step_6": 109.11980959231828,
+   "per_step_24": 196.47405421333522,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 55709604.75,
+     "order24": 53465759.875,
+     "order6_over_order24": 1.0419678852455476
+    },
+    {
+     "weight": "0.1",
+     "order6": 60661805.1625,
+     "order24": 56105385.10625,
+     "order6_over_order24": 1.0812118132265065
+    },
+    {
+     "weight": "1",
+     "order6": 105231608.875,
+     "order24": 79862012.1875,
+     "order6_over_order24": 1.3176678873046332
+    }
+   ]
+  },
+  {
+   "p": 997,
+   "karatsuba": true,
+   "steps_ratio": 1.876099816698174,
+   "muls_ratio": 0.9548357699336701,
+   "per_step_6": 90.38843284596169,
+   "per_step_24": 177.5988370290359,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 46146560.25,
+     "order24": 48329316.625,
+     "order6_over_order24": 0.9548357699336701
+    },
+    {
+     "weight": "0.1",
+     "order6": 51098760.6625,
+     "order24": 50968941.85625,
+     "order6_over_order24": 1.0025470178803424
+    },
+    {
+     "weight": "1",
+     "order6": 95668564.375,
+     "order24": 74725568.9375,
+     "order6_over_order24": 1.280265453114403
+    }
+   ]
+  },
+  {
+   "p": 1069,
+   "karatsuba": false,
+   "steps_ratio": 2.0410970155219377,
+   "muls_ratio": 1.1328135031265147,
+   "per_step_6": 109.1014245445602,
+   "per_step_24": 196.57833475014965,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 57106529.0625,
+     "order24": 50411236.1875,
+     "order6_over_order24": 1.1328135031265147
+    },
+    {
+     "weight": "0.1",
+     "order6": 62183761.86875,
+     "order24": 52898738.1375,
+     "order6_over_order24": 1.1755244842913903
+    },
+    {
+     "weight": "1",
+     "order6": 107878857.125,
+     "order24": 75286255.6875,
+     "order6_over_order24": 1.4329156914481995
+    }
+   ]
+  },
+  {
+   "p": 1069,
+   "karatsuba": true,
+   "steps_ratio": 2.0410970155219377,
+   "muls_ratio": 1.0381582067662536,
+   "per_step_6": 90.37356816274314,
+   "per_step_24": 177.68122339813644,
+   "band": [
+    {
+     "weight": "0",
+     "order6": 47303880.9375,
+     "order24": 45565194.8125,
+     "order6_over_order24": 1.0381582067662536
+    },
+    {
+     "weight": "0.1",
+     "order6": 52381113.74375,
+     "order24": 48052696.7625,
+     "order6_over_order24": 1.090076463401069
+    },
+    {
+     "weight": "1",
+     "order6": 98076209,
+     "order24": 70440214.3125,
+     "order6_over_order24": 1.3923326321083587
+    }
+   ]
+  }
+ ],
+ "walk_band_5a": {
+  "definition": "walk cost(w) = mean F_p multiplications (fp_muls - verify_fp_muls) + w * 97 * mean steps; pooled ratio = sum over curves of cost/sqrt(n), order 6 over order 24",
+  "rows": [
+   {
+    "arithmetic": "schoolbook",
+    "weight": "0",
+    "pooled_order6_over_order24": 0.9617131057920246,
+    "curves_where_order24_is_cheaper": 3,
+    "per_curve": [
+     0.9294587962327886,
+     0.9478368200852567,
+     0.8672666738365203,
+     1.2022121053636445,
+     0.9058084080001391,
+     0.7433384654324905,
+     1.0419678852455476,
+     1.1328135031265147
+    ]
+   },
+   {
+    "arithmetic": "schoolbook",
+    "weight": "0.1",
+    "pooled_order6_over_order24": 0.9962646749771445,
+    "curves_where_order24_is_cheaper": 3,
+    "per_curve": [
+     0.9592567828689708,
+     0.9802946534845498,
+     0.8991676363689479,
+     1.2453376715469138,
+     0.93966795879785,
+     0.7697665514016336,
+     1.0812118132265065,
+     1.1755244842913903
+    ]
+   },
+   {
+    "arithmetic": "schoolbook",
+    "weight": "1",
+    "pooled_order6_over_order24": 1.2049195275127502,
+    "curves_where_order24_is_cheaper": 7,
+    "per_curve": [
+     1.1427403667609666,
+     1.1768051309408574,
+     1.0923212588931661,
+     1.5035603098598094,
+     1.1439734177232415,
+     0.9275060480488719,
+     1.3176678873046332,
+     1.4329156914481995
+    ]
+   },
+   {
+    "arithmetic": "Karatsuba",
+    "weight": "0",
+    "pooled_order6_over_order24": 0.8843589602434904,
+    "curves_where_order24_is_cheaper": 2,
+    "per_curve": [
+     0.8607894181982625,
+     0.874578524400662,
+     0.7956017808356018,
+     1.1067528076849824,
+     0.8303084995636796,
+     0.6836289741291431,
+     0.9548357699336701,
+     1.0381582067662536
+    ]
+   },
+   {
+    "arithmetic": "Karatsuba",
+    "weight": "0.1",
+    "pooled_order6_over_order24": 0.9265467049267079,
+    "curves_where_order24_is_cheaper": 3,
+    "per_curve": [
+     0.8974278164236825,
+     0.9143749926890856,
+     0.8344436557274912,
+     1.1594995135980748,
+     0.8714947679060912,
+     0.7160117514935542,
+     1.0025470178803424,
+     1.090076463401069
+    ]
+   },
+   {
+    "arithmetic": "Karatsuba",
+    "weight": "1",
+    "pooled_order6_over_order24": 1.1723334300269752,
+    "curves_where_order24_is_cheaper": 7,
+    "per_curve": [
+     1.1146560930858476,
+     1.1465147651440226,
+     1.0615801119970463,
+     1.4639416406000347,
+     1.1115563655812668,
+     0.9023517341155548,
+     1.280265453114403,
+     1.3923326321083587
+    ]
+   }
+  ],
+  "order_changes_inside_band": true
+ },
+ "stage_a": [
+  {
+   "p": 241,
+   "log": 271,
+   "walk_order6": 3029977.875,
+   "walk_order24": 3259937.8125,
+   "arms": [
+    {
+     "arm": "flat",
+     "cols": 96,
+     "y": 78.09278350515464,
+     "la16": 2374992,
+     "r6": 0.7838314660961014,
+     "r24": 0.7285390509270643,
+     "nstar6_log2": 166.4224232424304,
+     "nstar24_log2": 164.6859219495333
+    },
+    {
+     "arm": "cubic",
+     "cols": 32,
+     "y": 79.9090909090909,
+     "la16": 250864,
+     "r6": 0.08279400390011099,
+     "r24": 0.07695361520028995,
+     "nstar6_log2": 151.87489785842806,
+     "nstar24_log2": 151.41611967531958
+    },
+    {
+     "arm": "twist24",
+     "cols": 8,
+     "y": 65.22222222222223,
+     "la16": 18864,
+     "r6": 0.006225788034838373,
+     "r24": 0.0057866134524613725,
+     "nstar6_log2": 142.24022440439583,
+     "nstar24_log2": 141.81552597309567
+    }
+   ]
+  },
+  {
+   "p": 337,
+   "log": 271,
+   "walk_order6": 6296368.625,
+   "walk_order24": 6642882.5,
+   "arms": [
+    {
+     "arm": "flat",
+     "cols": 180,
+     "y": 20.14917127071823,
+     "la16": 8105200,
+     "r6": 1.2872816829399025,
+     "r24": 1.2201329769117548,
+     "nstar6_log2": null,
+     "nstar24_log2": null
+    },
+    {
+     "arm": "cubic",
+     "cols": 60,
+     "y": 19.75409836065574,
+     "la16": 1036912,
+     "r6": 0.16468413172044863,
+     "r24": 0.15609368372841156,
+     "nstar6_log2": 145.6911947594083,
+     "nstar24_log2": 145.32299317615076
+    },
+    {
+     "arm": "twist24",
+     "cols": 15,
+     "y": 15.5625,
+     "la16": 68304,
+     "r6": 0.010848157734729198,
+     "r24": 0.010282283331069005,
+     "nstar6_log2": 135.33940148249386,
+     "nstar24_log2": 135.0269435190465
+    }
+   ]
+  },
+  {
+   "p": 541,
+   "log": 271,
+   "walk_order6": 14566123.8125,
+   "walk_order24": 16795438.1875,
+   "arms": [
+    {
+     "arm": "flat",
+     "cols": 264,
+     "y": 28.630188679245283,
+     "la16": 15368560,
+     "r6": 1.055089205462567,
+     "r24": 0.9150437058223373,
+     "nstar6_log2": null,
+     "nstar24_log2": 166.64252193928138
+    },
+    {
+     "arm": "cubic",
+     "cols": 88,
+     "y": 29.752808988764045,
+     "la16": 1946864,
+     "r6": 0.13365697182453495,
+     "r24": 0.11591623738932592,
+     "nstar6_log2": 147.9458539137267,
+     "nstar24_log2": 147.0070654575939
+    },
+    {
+     "arm": "twist24",
+     "cols": 22,
+     "y": 27.782608695652176,
+     "la16": 140080,
+     "r6": 0.009616834361917861,
+     "r24": 0.008340359949897258,
+     "nstar6_log2": 138.77828499199006,
+     "nstar24_log2": 137.94904231094972
+    }
+   ]
+  }
+ ],
+ "verdicts_recomputed": [
+  {
+   "id": "G2.104",
+   "note": "holds (not killed)",
+   "recomputed": "replayed binary checks on E18's models (K.1) and the validator's own group computation on the canonical models (K.2): |<lambda_p, lambda_omega, -1>| = 24 on all 8"
+  },
+  {
+   "id": "G2.105",
+   "note": "holds pooled (at the band's edge), falsified per curve",
+   "recomputed": "pooled 1.7009 in [1.7, 2.3]; per curve 1.290-2.103, 5 of 8 below 1.7"
+  },
+  {
+   "id": "G2.106",
+   "note": "falsified",
+   "recomputed": "order-6/order-24 F_p cost 0.743-1.202 (schoolbook), 0.684-1.107 (Karatsuba), outside [1.3, 2.0] on every curve"
+  },
+  {
+   "id": "G2.107",
+   "note": "the producer's reading holds at 0 GAE only",
+   "recomputed": "at 0 GAE the order-6 walk is cheaper pooled (0.962 / 0.884); at 1 GAE (one native operation per step) the order-24 walk is cheaper pooled and on 7 of 8 curves, so under §5a the two walks are unresolved across the band (see walk_band_5a); \"no correction of E18's psi rows at the pooled level\" holds only at 0 GAE"
+  },
+  {
+   "id": "G2.108",
+   "note": "holds except r_24, falsified low at p = 241 and 541",
+   "recomputed": "cols 4.00 on 3/3; LA ratio 13.30-15.18 in [10, 22]; r_24 p=241 0.00579, p=337 0.01028, p=541 0.00834; logs on 9/9 arms"
+  },
+  {
+   "id": "G2.109",
+   "note": "holds at p = 241, falsified low at 337 and 541; the >= 2^45 clause misses by 0.1 bit at 337",
+   "recomputed": "p=241: 2^142.24 / 2^141.82; p=337: 2^135.34 / 2^135.03; p=541: 2^138.78 / 2^137.95"
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "§9.31 G2.107 / What it says: \"the matched reference stays the order-6 walk (cheaper pooled)\"; \"E18's psi-arm distances stand\"",
+   "recomputed": "true at 0 GAE only. Pricing one native operation per walk step (the repository's convention, E27) at 0, 0.1 and 1 GAE: pooled order-6/order-24 cost 0.962 at 0, 0.996 at 0.1, 1.205 at 1 (schoolbook) and 0.884 at 0, 0.927 at 0.1, 1.172 at 1 (Karatsuba); at 1 GAE the order-24 walk is cheaper on 7 of 8 curves",
+   "effect": "AGENTS.md §5a: the order of the two walks changes inside the band, so neither is the stronger reference across it; the order-24 walk also has more unemitted per-step work (12 candidate comparisons against fewer), which the band does not price, so the ranking is unresolved, not reversed. E18's psi-arm distances are lower bounds at 1 GAE"
+  }
+ ],
+ "pre_registration": "§9.27 committed e772a783c (2026-10-30T19:00:23Z) before E29's code 0e4fccce1 (21:47:35Z) and records 22f560ff3 (21:52:49Z); its text at HEAD equals the registered text (one trailing blank line)",
+ "limitations": [
+  "No measured end-to-end index-calculus S exists for E29: Stage A uses E18's exact meet-in-the-middle oracle (its pair-table lookups unpriced) and the S5 solve was not run (no Stage B, by registration). The handover n* is §11.16's model with §11.17's C4 = 1.213e12 (cited, not recomputed) and each arm's own y, cols/p, r and walk; y rests on 9-89 relations. E24's 2^90.1 is cited from the note, not recomputed here.",
+  "The validation gate cannot show a modelled handover as a measured row: this report's status is fail for that reason alone; every recomputed number and check is listed.",
+  "Kill test: the replayed binary checks E18's own models; the validator's independent check is on the canonical models (E18's coefficients b are not in the records), which verifies the isomorphism-invariant group |<lambda_p, lambda_omega, -1>| = 24, not ord lambda_p = 24 in E18's normalisation.",
+  "Operation counts only. The replay ran locally in the validator's 4-vCPU container, not on isolab-eks; no wall time is compared or claimed."
+ ],
+ "comparator_controls": {
+  "all_hold": true,
+  "cases": [
+   {
+    "control": "record against itself",
+    "fields_compared": 729,
+    "mismatches": 0,
+    "holds": true
+   },
+   {
+    "control": "steps 15654 -> 15655",
+    "mismatches": 1,
+    "expected": "exactly 1",
+    "holds": true
+   },
+   {
+    "control": "visit_digest + 1 (beyond f64 precision)",
+    "mismatches": 1,
+    "expected": "exactly 1",
+    "holds": true
+   },
+   {
+    "control": "correct true -> false",
+    "mismatches": 1,
+    "expected": "exactly 1",
+    "holds": true
+   }
+  ]
+ }
+}

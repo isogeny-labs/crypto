@@ -1,0 +1,48 @@
+{
+  "schema": "isolab.premerge-integration.verification/v1",
+  "verified_at": "2026-10-21T02:19:47.328510+00:00",
+  "github_build_run": "https://github.com/aburan28/crypto/actions/runs/39527210297",
+  "source_revision": "e862ee96a5d1109ef284a8ddf8e21528d2f988af",
+  "reviewed_head": "abe6b1b52fe976a05b9382655be21b2db2af2034",
+  "job_name": "pr2342-abe6b1b52f-premerge-20261021",
+  "job_uid": "c86beb9c-058a-4914-b8d2-68106f1914d0",
+  "pod_uid": "f7ce31c7-60aa-41d9-90b4-f10832f906c8",
+  "l2_records": 108,
+  "matching_replays": 90,
+  "manifest_files": 19,
+  "no_smt": true,
+  "instance_type": "m8a.2xlarge",
+  "aa": {
+    "status": "admitted",
+    "reasons": [],
+    "required_level": "L2",
+    "pairs": 10,
+    "pairs_below_level": 0,
+    "median_ratio": 1.0148534868574546,
+    "ci95": [
+      0.9951100498878953,
+      1.0328800332075918
+    ],
+    "aa_arms": [
+      "rho-neg",
+      "rho-neg-aa"
+    ],
+    "aa_pairs": 10,
+    "aa_median_ratio": 1.0148534868574546,
+    "aa_ci95": [
+      0.9951100498878953,
+      1.0324926862547843
+    ],
+    "outside_noise": false
+  },
+  "build": {
+    "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:bf31fa75550f3ff3d916a05d338ff839f31714a8aa3912e443213879324bce8e",
+    "source_revision": "e862ee96a5d1109ef284a8ddf8e21528d2f988af",
+    "ecbench_sha256": "3958d37e00925c52f69036f908086fd48cb5216f6ee66272a225e3f674b1472b"
+  },
+  "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/pr2342-abe6b1b52f-premerge-20261021/f7ce31c7-60aa-41d9-90b4-f10832f906c8/",
+  "receipt_uri": "s3://isolab-results-104186811093-us-east-2/runs/pr2342-abe6b1b52f-premerge-20261021/launcher/d5fa0e33-cddc-4de0-984a-5d8cd91a5ae9/",
+  "publication": "reviewed publisher on harness, ephemeral EKS Docker daemon",
+  "postmerge_github_action": "still required",
+  "retries": 0
+}

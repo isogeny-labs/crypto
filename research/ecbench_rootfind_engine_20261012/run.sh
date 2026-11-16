@@ -48,6 +48,8 @@ run claim-n13 docs/ecbench/specs/claim-koblitz-rootfind-n13.json rho-strong \
   rho-frob ic-f4-m3 ic-rootfind-m3 ic-f4-m2 ic-rootfind-m2 rho-strong-aa
 run panel-prime docs/ecbench/specs/panel-prime-rootfind.json rho-neg \
   ic-subtract ic-mitm ic-rootfind-m2 ic-rootfind-m3 rho-neg-aa
+run claim-n13-v2 docs/ecbench/specs/claim-koblitz-rootfind-n13.json rho-strong \
+  rho-frob ic-f4-m3 ic-rootfind-m3 ic-f4-m2 ic-rootfind-m2 rho-strong-aa
 run claim-n19 docs/ecbench/specs/claim-koblitz-rootfind-n19.json rho-strong \
   rho-frob ic-f4-m3 ic-rootfind-m3 ic-f4-m2 ic-rootfind-m2 rho-strong-aa
 echo "== done"

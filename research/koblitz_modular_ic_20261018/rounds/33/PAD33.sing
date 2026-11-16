@@ -1,0 +1,81 @@
+// Original source r and the native Tate group law add31 precede this block.
+ring rabin33=2,(h),lp;poly mp33=h^5+h^2+1;
+if(reduce(h^32+h,std(ideal(mp33)))!=0 || gcd(mp33,h^2+h)!=1){ERROR("PAD33_FIELD_NOT_IRREDUCIBLE");}
+ring paddingField33=(2,a),(X,Z,T,w),dp;minpoly=a^5+a^2+1;
+ideal as33=std(ideal(T^2+T+1));list elements33;int i33;int j33;int k33;int bits33;
+number value33;number power33;
+for(i33=0;i33<32;i33++){
+ value33=0;power33=1;bits33=i33;
+ for(j33=0;j33<5;j33++){if(bits33%2==1){value33=value33+power33;}bits33=bits33 div 2;power33=power33*a;}
+ elements33[i33+1]=value33;
+}
+proc eqPad33(list p,list q){int i;for(i=1;i<=4;i++){if(p[i]!=q[i]){return(0);}}return(1);}
+proc squarePad33(list p){list q;int i;for(i=1;i<=4;i++){q[i]=p[i]^2;}return(q);}
+int iu33;int iv33;int il33;int in33;int affine33;int baseException33;int ordinary33;
+int hits33;int classes33;int unitRejected33;int period33;int label33;int q33;int c33;
+number uu33;number vv33;number rrn33;number ccn33;number bb33;number cc33;number aa33;number ll33;number nn33;
+ideal specialised33;ideal unitPolys33;ideal residues33;ideal corrupted33;ideal testUnit33;
+list point33;list fp33;list representatives33;list classSizes33;list torsionSum33;list torsionP33;
+link allOut33="ASCII:w padding-points.sing";open(allOut33);write(allOut33,"list paddingPoints33;");
+for(iu33=1;iu33<=32;iu33++){for(iv33=1;iv33<=32;iv33++){
+ uu33=elements33[iu33];vv33=elements33[iv33];
+ if(vv33^2+vv33==uu33^3+uu33){
+  affine33++;
+  if(uu33==0 || uu33==1){baseException33++;}
+  else{
+   rrn33=(uu33+1)*vv33+1;ccn33=rrn33+uu33^3;
+   bb33=rrn33*ccn33/uu33^7;cc33=ccn33/uu33^4;aa33=1+cc33;
+   if(bb33==0 || cc33==0 || aa33==0 || bb33+cc33*aa33^3==0){baseException33++;}
+   else{
+    ordinary33++;
+    map prep33=r,Z+bb33*T,X+aa33*T,bb33,cc33;
+    specialised33=reduce(prep33(original),as33);unitPolys33=prep33(registered);
+    for(il33=1;il33<=32;il33++){for(in33=1;in33<=32;in33++){
+     ll33=elements33[il33];nn33=elements33[in33];
+     residues33=reduce(subst(subst(specialised33,X,ll33),Z,nn33),as33);
+     if(size(residues33)==0){
+      unitRejected33=0;
+      for(k33=1;k33<=8;k33++){
+       testUnit33=as33,subst(subst(unitPolys33[k33],X,ll33),Z,nn33);
+       if(std(testUnit33)[1]!=1){unitRejected33++;}
+      }
+      if(unitRejected33!=0){ERROR("PAD33_HIT_OUTSIDE_REGISTERED_OPEN");}
+      corrupted33=reduce(subst(subst(specialised33,X,ll33),Z,nn33+1),as33);
+      if(size(corrupted33)==0){ERROR("PAD33_CORRUPTED_NU_ACCEPTED");}
+      // Independent exact order11 check, using the already frozen native law.
+      torsionP33=list(number(0),number(0));torsionSum33=list();
+      for(k33=1;k33<=11;k33++){
+       torsionSum33=add31(torsionSum33,torsionP33,bb33,aa33);
+       if(k33<11 && size(torsionSum33)==0){ERROR("PAD33_EARLY_TATE_ORDER");}
+      }
+      if(size(torsionSum33)!=0){ERROR("PAD33_TATE_ORDER_NOT11");}
+      point33=list(bb33,cc33,ll33,nn33);fp33=point33;period33=0;
+      for(k33=1;k33<=5;k33++){fp33=squarePad33(fp33);if(eqPad33(fp33,point33)==1){period33=k33;break;}}
+      if(period33!=5){ERROR("PAD33_POINT_NOT_DEGREE5");}
+      label33=0;
+      for(q33=1;q33<=classes33;q33++){
+       fp33=representatives33[q33];
+       for(k33=0;k33<5;k33++){if(eqPad33(fp33,point33)==1){label33=q33;}fp33=squarePad33(fp33);}
+      }
+      if(label33==0){classes33++;label33=classes33;representatives33[label33]=point33;classSizes33[label33]=0;}
+      classSizes33[label33]=classSizes33[label33]+1;hits33++;
+      print("PAD33_HIT index="+string(hits33)+" closed_class="+string(label33)+" degree=5");
+      write(allOut33,"paddingPoints33["+string(hits33)+"]=list(number("+string(bb33)+"),number("+string(cc33)+"),number("+string(ll33)+"),number("+string(nn33)+"));");
+     }
+    }}
+   }
+  }
+ }
+}}
+close(allOut33);
+if(affine33!=24){ERROR("PAD33_BASE_COUNT_CONTROL");}
+for(c33=1;c33<=classes33;c33++){if(classSizes33[c33]!=5){ERROR("PAD33_FROBENIUS_ORBIT_INCOMPLETE");}}
+link repsOut33="ASCII:w padding-representatives.sing";open(repsOut33);write(repsOut33,"list paddingRepresentatives33;");
+for(c33=1;c33<=classes33;c33++){
+ point33=representatives33[c33];
+ write(repsOut33,"paddingRepresentatives33["+string(c33)+"]=list(number("+string(point33[1])+"),number("+string(point33[2])+"),number("+string(point33[3])+"),number("+string(point33[4])+"));");
+}
+close(repsOut33);
+print("PAD33_COUNTS affine="+string(affine33)+" exceptional="+string(baseException33)+" ordinary="+string(ordinary33)+" hits="+string(hits33)+" closed_classes="+string(classes33));
+print("PAD33_SCOPE ordinaryregisteredopenF32; noPicardclass/propernormalizationclaim");
+print("PAD33_ALL_CHECKS_PASS");quit;

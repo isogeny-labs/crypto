@@ -57,11 +57,14 @@ pub enum StoreCmd {
         #[arg(long)]
         out: Option<PathBuf>,
     },
-    /// Re-hash cached objects; with --remote also check the remote has each.
+    /// Re-hash cached objects; --remote checks HEAD, --download hashes remote bytes.
     Verify {
         names: Vec<String>,
         #[arg(long)]
         remote: bool,
+        /// Download each remote object temporarily and verify its SHA-256.
+        #[arg(long)]
+        download: bool,
     },
     /// Drop cached objects the index no longer names (dry run unless --apply).
     /// The remote is never touched.
@@ -78,6 +81,17 @@ fn mib(bytes: u64) -> String {
 }
 
 pub fn run(args: &StoreArgs) -> Result<(), String> {
+    let mut report_emitted = false;
+    let result = run_inner(args, &mut report_emitted);
+    if args.json && !report_emitted {
+        if let Err(error) = &result {
+            println!("{}", json!({"status": "error", "error": error}));
+        }
+    }
+    result
+}
+
+fn run_inner(args: &StoreArgs, report_emitted: &mut bool) -> Result<(), String> {
     let mut store = Store::open_default()?;
     match &args.cmd {
         StoreCmd::Status => {
@@ -223,7 +237,7 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
         }
         StoreCmd::Pull { spec, out } => {
             let got = store.ensure(spec)?;
-            if got.fetched {
+            if got.fetched && !args.json {
                 eprintln!(
                     "fetched {} ({}, sha256 {})",
                     got.name.as_deref().unwrap_or(spec),
@@ -231,66 +245,158 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
                     got.sha256
                 );
             }
-            if let Some(out) = out {
+            let result_path = if let Some(out) = out {
                 if std::fs::symlink_metadata(out).is_ok() {
                     return Err(format!("{} already exists; not overwriting", out.display()));
                 }
                 super::backend::copy_into(&got.path, out)?;
-                println!("{}", out.display());
+                out.clone()
             } else {
-                println!("{}", got.path.display());
+                got.path.clone()
+            };
+            if args.json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&json!({
+                        "status": "ok",
+                        "name": got.name,
+                        "sha256": got.sha256,
+                        "bytes": got.bytes,
+                        "fetched": got.fetched,
+                        "cache_path": got.path,
+                        "path": result_path,
+                        "copied": out.is_some(),
+                    }))
+                    .map_err(|e| e.to_string())?
+                );
+            } else {
+                println!("{}", result_path.display());
             }
         }
-        StoreCmd::Verify { names, remote } => {
-            let rows = store.verify(names, *remote)?;
-            let mut bad = 0;
-            for r in &rows {
-                let cache = match &r.cache {
-                    CacheState::Ok => "cache ok".to_string(),
-                    CacheState::Missing => "not cached".to_string(),
-                    CacheState::Corrupt(why) => {
-                        bad += 1;
-                        format!("CACHE CORRUPT: {why}")
-                    }
-                };
-                let remote = match &r.remote {
-                    None => String::new(),
-                    Some(RemoteState::Ok) => ", remote ok".to_string(),
-                    Some(RemoteState::Absent) => {
-                        bad += 1;
-                        ", REMOTE ABSENT".to_string()
-                    }
-                    Some(RemoteState::Mismatch(why)) => {
-                        bad += 1;
-                        format!(", REMOTE MISMATCH: {why}")
-                    }
-                };
-                println!("{}: {cache}{remote}", r.name);
+        StoreCmd::Verify {
+            names,
+            remote,
+            download,
+        } => {
+            let rows = if *download {
+                store.verify_download(names)?
+            } else {
+                store.verify(names, *remote)?
+            };
+            let bad = rows
+                .iter()
+                .map(|r| {
+                    usize::from(matches!(&r.cache, CacheState::Corrupt(_)))
+                        + usize::from(matches!(
+                            &r.remote,
+                            Some(RemoteState::Absent | RemoteState::Mismatch(_))
+                        ))
+                })
+                .sum::<usize>();
+            if args.json {
+                let entries: Vec<_> = rows
+                    .iter()
+                    .map(|r| {
+                        let cache = match &r.cache {
+                            CacheState::Ok => json!({"status": "ok"}),
+                            CacheState::Missing => json!({"status": "missing"}),
+                            CacheState::Corrupt(why) => {
+                                json!({"status": "corrupt", "detail": why})
+                            }
+                        };
+                        let remote = match &r.remote {
+                            None => serde_json::Value::Null,
+                            Some(RemoteState::Ok) => json!({"status": "ok"}),
+                            Some(RemoteState::BytesOk) => json!({"status": "bytes_ok"}),
+                            Some(RemoteState::Absent) => json!({"status": "absent"}),
+                            Some(RemoteState::Mismatch(why)) => {
+                                json!({"status": "mismatch", "detail": why})
+                            }
+                        };
+                        json!({"name": r.name, "sha256": r.sha256, "bytes": r.bytes,
+                               "cache": cache, "remote": remote})
+                    })
+                    .collect();
+                let report = serde_json::to_string_pretty(&json!({
+                    "status": if bad == 0 { "ok" } else { "error" },
+                    "checked": rows.len(),
+                    "problems": bad,
+                    "remote_checked": *remote || *download,
+                    "download_checked": *download,
+                    "entries": entries,
+                }))
+                .map_err(|e| e.to_string())?;
+                println!("{report}");
+                *report_emitted = true;
+            } else {
+                for r in &rows {
+                    let cache = match &r.cache {
+                        CacheState::Ok => "cache ok".to_string(),
+                        CacheState::Missing => "not cached".to_string(),
+                        CacheState::Corrupt(why) => format!("CACHE CORRUPT: {why}"),
+                    };
+                    let remote = match &r.remote {
+                        None => String::new(),
+                        Some(RemoteState::Ok) => ", remote ok".to_string(),
+                        Some(RemoteState::BytesOk) => ", remote bytes ok".to_string(),
+                        Some(RemoteState::Absent) => ", REMOTE ABSENT".to_string(),
+                        Some(RemoteState::Mismatch(why)) => {
+                            format!(", REMOTE MISMATCH: {why}")
+                        }
+                    };
+                    println!("{}: {cache}{remote}", r.name);
+                }
             }
             if bad > 0 {
                 return Err(format!("{bad} problem(s)"));
             }
-            eprintln!("{} entries verified", rows.len());
+            if !args.json {
+                eprintln!("{} entries verified", rows.len());
+            }
         }
         StoreCmd::Gc { apply } => {
             let doomed = store.gc(*apply)?;
             let total: u64 = doomed.iter().map(|(_, b)| b).sum();
-            for (p, _) in &doomed {
-                println!("{}", p.display());
+            if args.json {
+                let files: Vec<_> = doomed
+                    .iter()
+                    .map(|(path, bytes)| json!({"path": path, "bytes": bytes}))
+                    .collect();
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&json!({
+                        "status": "ok", "applied": apply, "count": doomed.len(),
+                        "total_bytes": total, "files": files,
+                    }))
+                    .map_err(|e| e.to_string())?
+                );
+            } else {
+                for (p, _) in &doomed {
+                    println!("{}", p.display());
+                }
+                eprintln!(
+                    "{} {} file(s), {}",
+                    if *apply { "removed" } else { "would remove" },
+                    doomed.len(),
+                    mib(total)
+                );
             }
-            eprintln!(
-                "{} {} file(s), {}",
-                if *apply { "removed" } else { "would remove" },
-                doomed.len(),
-                mib(total)
-            );
         }
         StoreCmd::Rm { name } => {
-            if store.index.entries.remove(name).is_none() {
-                return Err(format!("{name} is not in the index"));
+            let removed = store.remove_name(name)?;
+            if args.json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&json!({
+                        "status": "ok", "name": name,
+                        "sha256": removed.sha256, "bytes": removed.bytes,
+                        "remote_unchanged": true,
+                    }))
+                    .map_err(|e| e.to_string())?
+                );
+            } else {
+                eprintln!("removed {name} from the index; the remote object is kept");
             }
-            store.save_index()?;
-            eprintln!("removed {name} from the index; the remote object is kept");
         }
     }
     Ok(())

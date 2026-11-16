@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:53:11Z",
+ "id": "PCC-20261113-b3ddee",
+ "kind": "theorem",
+ "producer": {
+  "commit": "3487f067dbbcfe28582517c7da35596804354cbb",
+  "model": "",
+  "session": "norm-crt-reciprocity-20261113"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "c629570e7051721590526d254eaae91890f38cbb3c18ef0c45828e46cda53399",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormCRTReciprocity.weightedReciprocity"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "bounded CRT polynomial pairing only; full Hankel radicals, branch restriction, public-input finder and complexity bound remain separate",
+ "statement": "For positive-degree monic F,H and explicit Bezout U*F+V*(f*H)=1, the top coefficients of f*R*V modulo F and R*U modulo H sum to zero for natDegree R below deg F+deg H-1."
+}

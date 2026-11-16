@@ -1,0 +1,10 @@
+Diff in /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/tests/disjoint_actual_packet.rs:214:
+         value["execution_history"] = future_history_binding.clone();
+     }
+     let observed_lineage_path = dir.join("lineage-with-future-observations.json");
+-    observed["enrollment"]["protocol_lineage"] =
+-        write(&observed_lineage_path, &observed_lineage);
++    observed["enrollment"]["protocol_lineage"] = write(&observed_lineage_path, &observed_lineage);
+     assert!(aggregate::validate_disjoint_manifest(&observed).is_ok());
+     let mut duplicate_session = observed.clone();
+     let mut duplicate_lineage: Value =

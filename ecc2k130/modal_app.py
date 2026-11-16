@@ -103,6 +103,24 @@ if PACKED_GENERATED_PRODUCT == "1" and PACKED_DIRECT_REDUCE != "1":
 PACKED_CLMAD = os.environ.get("ECC_PACKED_CLMAD", "0")
 if PACKED_CLMAD not in ("0", "1"):
     raise ValueError("ECC_PACKED_CLMAD must be 0 or 1")
+PACKED_INLINE_POLY = os.environ.get("ECC_PACKED_INLINE_POLY", "0")
+if PACKED_INLINE_POLY not in ("0", "1", "2", "3"):
+    raise ValueError("ECC_PACKED_INLINE_POLY must be 0, 1, 2 or 3")
+SIGMA_FUSED = os.environ.get("ECC_SIGMA_FUSED", "0")
+PACKED_SIGMA_TABLE = os.environ.get("ECC_PACKED_SIGMA_TABLE", "0")
+if SIGMA_FUSED not in ("0", "1") or PACKED_SIGMA_TABLE not in ("0", "1"):
+    raise ValueError("ECC_SIGMA_FUSED and ECC_PACKED_SIGMA_TABLE must be 0 or 1")
+if PACKED_SIGMA_TABLE == "1" and (SIGMA_FUSED != "1" or PACKED_INLINE_POLY != "3"):
+    raise ValueError("ECC_PACKED_SIGMA_TABLE=1 requires the verified fused inline preset")
+# The persisting-L2 window over the field blob and the funnel-shift tail
+# layout of the product's 3-bit correction.  Together they were promoted on
+# the sigma-table walk at the automatic worker count (17.088 vs 16.029 B/s,
+# benchmarks/sigma-table-tuned); the window only pays when the state fits
+# its 80 MiB cap, so they go with WORKERS=96256 in run.sh.
+PACKED_L2_PERSIST = os.environ.get("ECC_PACKED_L2_PERSIST", "0")
+PACKED_TAIL_LAYOUT = os.environ.get("ECC_PACKED_TAIL_LAYOUT", "0")
+if PACKED_L2_PERSIST not in ("0", "1") or PACKED_TAIL_LAYOUT not in ("0", "1", "2"):
+    raise ValueError("ECC_PACKED_L2_PERSIST must be 0 or 1 and ECC_PACKED_TAIL_LAYOUT 0, 1 or 2")
 PACKED_CLMAD_SQUARE = os.environ.get("ECC_PACKED_CLMAD_SQUARE", "0")
 if PACKED_CLMAD_SQUARE not in ("0", "1"):
     raise ValueError("ECC_PACKED_CLMAD_SQUARE must be 0 or 1")
@@ -234,7 +252,9 @@ LOCAL = pathlib.Path(__file__).parent
 # What the image already contains.  A request for exactly this on a matching
 # architecture needs no rebuild, and the default ::bench is exactly this -- it
 # was spending minutes recompiling a binary it already had, in silence.
-BAKED = {"batch": 32, "threads": 256 if PACKED_STATE_TILE == "256" else 128, "leaf": 0, "minBlocks": 2,
+BAKED = {"batch": 16 if PACKED_SIGMA_TABLE == "1" else 32,
+         "threads": 512 if PACKED_SIGMA_TABLE == "1" else (256 if PACKED_STATE_TILE == "256" else 128),
+         "leaf": 0, "minBlocks": 1 if PACKED_SIGMA_TABLE == "1" else 2,
          "packedPolynomialState": PACKED_POLY_STATE == "1",
          "packedDirectReduction": PACKED_DIRECT_REDUCE == "1",
          "packedGeneratedProduct": PACKED_GENERATED_PRODUCT == "1",
@@ -244,6 +264,11 @@ BAKED = {"batch": 32, "threads": 256 if PACKED_STATE_TILE == "256" else 128, "le
          "packedCompactState": PACKED_COMPACT_STATE == "1",
          "packedSharedSigma": PACKED_SHARED_SIGMA == "1",
          "packedTopClmad": PACKED_TOP_CLMAD == "1",
+         "packedInlinePoly": int(PACKED_INLINE_POLY),
+         "sigmaFused": SIGMA_FUSED == "1",
+         "packedSigmaTable": PACKED_SIGMA_TABLE == "1",
+         "packedL2Persist": PACKED_L2_PERSIST == "1",
+         "packedTailLayout": int(PACKED_TAIL_LAYOUT),
          "walkTable": WALK_TABLE == "1",
          "tablePivotBytes": TABLE_PIVOT_BYTES == "1",
          "packedWeightedPrefix": int(PACKED_WEIGHTED_PREFIX),
@@ -286,6 +311,11 @@ image = (
           "ECC_PACKED_COMPACT_STATE": PACKED_COMPACT_STATE,
           "ECC_PACKED_SHARED_SIGMA": PACKED_SHARED_SIGMA,
           "ECC_PACKED_TOP_CLMAD": PACKED_TOP_CLMAD,
+          "ECC_PACKED_INLINE_POLY": PACKED_INLINE_POLY,
+          "ECC_SIGMA_FUSED": SIGMA_FUSED,
+          "ECC_PACKED_SIGMA_TABLE": PACKED_SIGMA_TABLE,
+          "ECC_PACKED_L2_PERSIST": PACKED_L2_PERSIST,
+          "ECC_PACKED_TAIL_LAYOUT": PACKED_TAIL_LAYOUT,
           "ECC_WALK_TABLE": WALK_TABLE,
           "ECC_TABLE_PIVOT_BYTES": TABLE_PIVOT_BYTES,
           "ECC_PACKED_WEIGHTED_PREFIX": PACKED_WEIGHTED_PREFIX,
@@ -320,7 +350,7 @@ image = (
         f'PACKED_POLY_CHAIN={PACKED_POLY_CHAIN} PACKED_UNROLL_INV={PACKED_UNROLL_INV} '
         f'PACKED_PAIR_PRODUCTS={PACKED_PAIR_PRODUCTS} PACKED_POLY_STATE={PACKED_POLY_STATE} '
         f'PACKED_DIRECT_REDUCE={PACKED_DIRECT_REDUCE} '
-        f'PACKED_GENERATED_PRODUCT={PACKED_GENERATED_PRODUCT} PACKED_CLMAD={PACKED_CLMAD} PACKED_CLMAD_SQUARE={PACKED_CLMAD_SQUARE} PACKED_KARAT3={PACKED_KARAT3} PACKED_COMPACT_STATE={PACKED_COMPACT_STATE} PACKED_SHARED_SIGMA={PACKED_SHARED_SIGMA} PACKED_TOP_CLMAD={PACKED_TOP_CLMAD} PACKED_WEIGHTED_PREFIX={PACKED_WEIGHTED_PREFIX} PACKED_STATE_TILE={PACKED_STATE_TILE} WALK_TABLE={WALK_TABLE} TABLE_PIVOT_BYTES={TABLE_PIVOT_BYTES} WITNESS={WITNESS}',
+        f'PACKED_GENERATED_PRODUCT={PACKED_GENERATED_PRODUCT} PACKED_CLMAD={PACKED_CLMAD} PACKED_CLMAD_SQUARE={PACKED_CLMAD_SQUARE} PACKED_KARAT3={PACKED_KARAT3} PACKED_COMPACT_STATE={PACKED_COMPACT_STATE} PACKED_SHARED_SIGMA={PACKED_SHARED_SIGMA} PACKED_TOP_CLMAD={PACKED_TOP_CLMAD} PACKED_INLINE_POLY={PACKED_INLINE_POLY} SIGMA_FUSED={SIGMA_FUSED} PACKED_SIGMA_TABLE={PACKED_SIGMA_TABLE} PACKED_L2_PERSIST={PACKED_L2_PERSIST} PACKED_TAIL_LAYOUT={PACKED_TAIL_LAYOUT} PACKED_WEIGHTED_PREFIX={PACKED_WEIGHTED_PREFIX} PACKED_STATE_TILE={PACKED_STATE_TILE} WALK_TABLE={WALK_TABLE} TABLE_PIVOT_BYTES={TABLE_PIVOT_BYTES} WITNESS={WITNESS}',
     )
 )
 # The full image stays the module-level `image` assignment (codegen tests read
@@ -405,8 +435,8 @@ def gpuName():
 def buildFor(batch, threads, leaf, arch=None, minBlocks=2,
              streamKarat=False, smemSpill=False, globalCg=False):
     """Rebuild the client for one architecture and one set of knobs."""
-    if PACKED_STATE_TILE == "256" and threads != 256:
-        return False, "ECC_PACKED_STATE_TILE=256 requires 256 threads per block"
+    if PACKED_STATE_TILE == "256" and threads % 256:
+        return False, "ECC_PACKED_STATE_TILE=256 requires a multiple of 256 threads per block"
     arch = arch or computeCapability()
     # leaf 0 means "let the generator choose by register budget", which is what
     # gen.py does with no --leaf: the largest halving-chain size whose
@@ -429,6 +459,11 @@ def buildFor(batch, threads, leaf, arch=None, minBlocks=2,
             "packedCompactState": PACKED_COMPACT_STATE == "1",
             "packedSharedSigma": PACKED_SHARED_SIGMA == "1",
             "packedTopClmad": PACKED_TOP_CLMAD == "1",
+            "packedInlinePoly": int(PACKED_INLINE_POLY),
+            "sigmaFused": SIGMA_FUSED == "1",
+            "packedSigmaTable": PACKED_SIGMA_TABLE == "1",
+            "packedL2Persist": PACKED_L2_PERSIST == "1",
+            "packedTailLayout": int(PACKED_TAIL_LAYOUT),
             "walkTable": WALK_TABLE == "1",
             "tablePivotBytes": TABLE_PIVOT_BYTES == "1",
             "packedWeightedPrefix": int(PACKED_WEIGHTED_PREFIX),
@@ -459,7 +494,7 @@ def buildFor(batch, threads, leaf, arch=None, minBlocks=2,
         f"PACKED_POLY_CHAIN={PACKED_POLY_CHAIN} PACKED_UNROLL_INV={PACKED_UNROLL_INV} "
         f"PACKED_PAIR_PRODUCTS={PACKED_PAIR_PRODUCTS} PACKED_POLY_STATE={PACKED_POLY_STATE} "
         f"PACKED_DIRECT_REDUCE={PACKED_DIRECT_REDUCE} "
-        f"PACKED_GENERATED_PRODUCT={PACKED_GENERATED_PRODUCT} PACKED_CLMAD={PACKED_CLMAD} PACKED_CLMAD_SQUARE={PACKED_CLMAD_SQUARE} PACKED_KARAT3={PACKED_KARAT3} PACKED_COMPACT_STATE={PACKED_COMPACT_STATE} PACKED_SHARED_SIGMA={PACKED_SHARED_SIGMA} PACKED_TOP_CLMAD={PACKED_TOP_CLMAD} PACKED_WEIGHTED_PREFIX={PACKED_WEIGHTED_PREFIX} PACKED_STATE_TILE={PACKED_STATE_TILE} WALK_TABLE={WALK_TABLE} TABLE_PIVOT_BYTES={TABLE_PIVOT_BYTES} WITNESS={WITNESS}",
+        f"PACKED_GENERATED_PRODUCT={PACKED_GENERATED_PRODUCT} PACKED_CLMAD={PACKED_CLMAD} PACKED_CLMAD_SQUARE={PACKED_CLMAD_SQUARE} PACKED_KARAT3={PACKED_KARAT3} PACKED_COMPACT_STATE={PACKED_COMPACT_STATE} PACKED_SHARED_SIGMA={PACKED_SHARED_SIGMA} PACKED_TOP_CLMAD={PACKED_TOP_CLMAD} PACKED_INLINE_POLY={PACKED_INLINE_POLY} SIGMA_FUSED={SIGMA_FUSED} PACKED_SIGMA_TABLE={PACKED_SIGMA_TABLE} PACKED_L2_PERSIST={PACKED_L2_PERSIST} PACKED_TAIL_LAYOUT={PACKED_TAIL_LAYOUT} PACKED_WEIGHTED_PREFIX={PACKED_WEIGHTED_PREFIX} PACKED_STATE_TILE={PACKED_STATE_TILE} WALK_TABLE={WALK_TABLE} TABLE_PIVOT_BYTES={TABLE_PIVOT_BYTES} WITNESS={WITNESS}",
         timeout=1800,
         prefix="  build| ",
     )
@@ -502,6 +537,11 @@ def benchmarkIdentity(packed=False):
                 packedCompactState=(PACKED_COMPACT_STATE == '1') if packed else None,
                 packedSharedSigma=(PACKED_SHARED_SIGMA == '1') if packed else None,
                 packedTopClmad=(PACKED_TOP_CLMAD == '1') if packed else None,
+                packedInlinePoly=int(PACKED_INLINE_POLY) if packed else None,
+                sigmaFused=(SIGMA_FUSED == '1') if packed else None,
+                packedSigmaTable=(PACKED_SIGMA_TABLE == '1') if packed else None,
+                packedL2Persist=(PACKED_L2_PERSIST == '1') if packed else None,
+                packedTailLayout=int(PACKED_TAIL_LAYOUT) if packed else None,
                 walkTable=(WALK_TABLE == '1') if packed else None,
                 tablePivotBytes=(TABLE_PIVOT_BYTES == '1') if packed else None,
                 packedWeightedPrefix=int(PACKED_WEIGHTED_PREFIX) if packed else None,
@@ -520,14 +560,26 @@ def checkPackedReduction(sample):
         ('compact state', 'packedCompactState', 'expectedPackedCompactState', PACKED_COMPACT_STATE),
         ('shared sigma', 'packedSharedSigma', 'expectedPackedSharedSigma', PACKED_SHARED_SIGMA),
         ('top clmad', 'packedTopClmad', 'expectedPackedTopClmad', PACKED_TOP_CLMAD),
+        ('sigma fused', 'sigmaFused', 'expectedSigmaFused', SIGMA_FUSED),
+        ('sigma table', 'packedSigmaTable', 'expectedPackedSigmaTable', PACKED_SIGMA_TABLE),
+        ('L2 persist', 'packedL2Persist', 'expectedPackedL2Persist', PACKED_L2_PERSIST),
     ):
         modes = re.findall(r'^packed ' + marker + r': (.*)$', sample.get('raw', ''), re.MULTILINE)
         actual = modes[0] if len(modes) == 1 else None
+        if marker == 'sigma table' and actual is not None:
+            actual = actual.split(' ', 1)[0]
         sample[expectedField] = expected == '1'
         sample[field] = (actual == '1') if actual in ('0', '1') else None
         sample['valid'] = bool(sample.get('valid') and actual == expected)
         if actual != expected:
             sample.setdefault('error', 'packed ' + marker + ' identity is missing, duplicated or different from the requested build')
+    tails = re.findall(r'^packed tail layout: (.*)$', sample.get('raw', ''), re.MULTILINE)
+    actualTail = tails[0] if len(tails) == 1 else None
+    sample['expectedPackedTailLayout'] = int(PACKED_TAIL_LAYOUT)
+    sample['packedTailLayout'] = int(actualTail) if actualTail in ('0', '1', '2') else None
+    if actualTail != PACKED_TAIL_LAYOUT:
+        sample['valid'] = False
+        sample.setdefault('error', 'packed tail layout identity is missing, duplicated or different from the requested build')
     weighted = re.findall(r'^packed weighted prefix: (.*)$', sample.get('raw', ''), re.MULTILINE)
     actualWeighted = weighted[0] if len(weighted) == 1 else None
     sample['expectedPackedWeightedPrefix'] = int(PACKED_WEIGHTED_PREFIX)
@@ -542,6 +594,13 @@ def checkPackedReduction(sample):
     if actualTile != PACKED_STATE_TILE:
         sample['valid'] = False
         sample.setdefault('error', 'packed state tile identity is missing, duplicated or different from the requested build')
+    inline = re.findall(r'^packed inline polynomial: (.*)$', sample.get('raw', ''), re.MULTILINE)
+    actualInline = inline[0] if len(inline) == 1 else None
+    sample['expectedPackedInlinePoly'] = int(PACKED_INLINE_POLY)
+    sample['packedInlinePoly'] = int(actualInline) if actualInline in ('0', '1', '2', '3') else None
+    if actualInline != PACKED_INLINE_POLY:
+        sample['valid'] = False
+        sample.setdefault('error', 'packed inline polynomial identity is missing, duplicated or different from the requested build')
     if not sample['valid']:
         sample['rate'] = 0.0
     return sample['valid']
@@ -683,6 +742,11 @@ def runBench(batch=32, threads=128, leaf=0, minBlocks=2, steps=64, launches=20,
                 packedCompactState=PACKED_COMPACT_STATE == '1',
                 packedSharedSigma=PACKED_SHARED_SIGMA == '1',
                 packedTopClmad=PACKED_TOP_CLMAD == '1',
+                packedInlinePoly=int(PACKED_INLINE_POLY),
+                sigmaFused=SIGMA_FUSED == '1',
+                packedSigmaTable=PACKED_SIGMA_TABLE == '1',
+                packedL2Persist=PACKED_L2_PERSIST == '1',
+                packedTailLayout=int(PACKED_TAIL_LAYOUT),
                 walkTable=WALK_TABLE == '1',
                 tablePivotBytes=TABLE_PIVOT_BYTES == '1',
                 packedWeightedPrefix=int(PACKED_WEIGHTED_PREFIX),
@@ -1328,6 +1392,20 @@ def waitForLine(proc, timeout):
     return proc.stdout.readline()
 
 
+def checkpointShapeError(ckFile, threads, batch, runId):
+    """Why a pass must not start on this checkpoint, or None.
+
+    The client refuses a checkpoint whose worker count or batch differs from
+    the pass and then starts the run over, re-walking seeds it already
+    covered; a default change would do that to every old run id silently."""
+    saved = readCheckpointHeader(ckFile) if os.path.exists(ckFile) else None
+    if saved is None or (int(saved["threads"]) == int(threads) and int(saved["batch"]) == int(batch)):
+        return None
+    return (f"run {runId}: checkpoint {ckFile} was written with {saved['threads']} worker "
+            f"threads x batch {saved['batch']}, this pass asks for {threads} x {batch}; "
+            f"resume it with WORKERS={saved['threads']} or start a new run id")
+
+
 def defaultStatusHeader(curve, threads, batch, runId, packed):
     return dict(version=2 if packed else 1, m=int(curve), threads=int(threads),
                 batch=int(batch), lanes=1 if packed else 32, runId=int(runId),
@@ -1613,7 +1691,8 @@ def _runSearch(hours=1.0, curve=97, batch=8, threads=128, leaf=0, dpWeight=-1,
               % int(verify), flush=True)
     backendFlag = ' --packed' if packed else ''
     if rebuild:
-        ok, log = buildFor(batch, threads, leaf)
+        ok, log = buildFor(batch, threads, leaf,
+                           minBlocks=1 if PACKED_SIGMA_TABLE == "1" else 2)
         if not ok:
             return {"error": log[-2000:]}
     name = gpuName()
@@ -1637,6 +1716,14 @@ def _runSearch(hours=1.0, curve=97, batch=8, threads=128, leaf=0, dpWeight=-1,
             raise RuntimeError('could not determine the automatic worker count')
         workerThreads = int(match.group(1))
     walks = workerThreads * batch * (1 if packed else 32)
+    # A checkpoint written at another shape would be refused by the client,
+    # which then starts the run over and re-walks seeds it already covered.
+    # That is how a default change (385,024 -> 96,256 workers, 2026-10-17)
+    # would quietly waste an old run id, so refuse it here instead.
+    if resume:
+        shapeError = checkpointShapeError(ckFile, workerThreads, batch, runId)
+        if shapeError:
+            return {"error": shapeError}
     # The bench above measured this GPU, so the length of the pass about to run
     # is known rather than guessed; size the cutoff against that.
     plannedIters = rate * 1e6 * hours * HOUR

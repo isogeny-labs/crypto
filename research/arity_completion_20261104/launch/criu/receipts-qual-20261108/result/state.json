@@ -1,0 +1,93 @@
+{
+  "schema": "isolab.eks.recovery-state/v1",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "arity-criu-qual-20261108",
+    "deadline_unix_seconds": 1794137441,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:fd4a039bd778b7a7796e59a1b3918a54327d35b5e813722c11733b074ea2480b",
+      "source_revision": "4fa25efc0e2392b2e02e4c84253059ebc7c67e02",
+      "ecbench_sha256": "e3632febbc2bf340a0f86f01b03543c8e34466b84b249f3d3d015c245483f90b"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:fd4a039bd778b7a7796e59a1b3918a54327d35b5e813722c11733b074ea2480b",
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 120,
+    "max_restores": 10,
+    "memory": "8Gi",
+    "command": {
+      "argv": [
+        "/opt/study/launch/job-criu-qual.sh"
+      ],
+      "outputs": "/work/compute/out",
+      "threads": 2,
+      "binaries": {
+        "/opt/study/launch/job-lib.sh": "f03e57cfb02ca045daaf514896f2204992fbbded02dbc986292504371e6650af",
+        "/opt/study/resume/prime/cells/ctl-m3-n15-kummer.jsonl": "dc26d5e5836525090ca20c764686b6cbd8d47574523cc8c943462deeb7cb0b9e",
+        "/usr/local/bin/pkm_tower_pilot": "5b6d8c9c91f36f471e16251db5aa41de836805cf1a9553355622cc7adac78a0b"
+      },
+      "pvc_gib": 16
+    }
+  },
+  "request_sha256": "e45cf2fde5d217750faec543a7fb72c34aef1f369a8ec553c71ba154e07de7b8",
+  "owner_build": "isolab-recovery-controller:0dfa26fb-b0a7-4bf8-bc6e-01c3ee990d1b",
+  "phase": "command_completed",
+  "attempt": 1,
+  "restores": 1,
+  "next_generation": 5,
+  "checkpoint_generation": 5,
+  "current_pod_uid": "04805af1-7a13-452c-b60f-fde43a37c65c",
+  "current_instance": "i-08f6f1883de6f039a",
+  "original_node_runtime": {
+    "architecture": "amd64",
+    "containerRuntimeVersion": "containerd://2.3.5+unknown",
+    "kernelVersion": "6.18.54-121.166.amzn2023.x86_64",
+    "osImage": "Amazon Linux 2023.12.20261012"
+  },
+  "terminated_instances": [
+    "i-037cca11b696d6f76"
+  ],
+  "generations": [
+    {
+      "number": 3,
+      "request_sha256": "e45cf2fde5d217750faec543a7fb72c34aef1f369a8ec553c71ba154e07de7b8",
+      "snapshot_name": "arity-criu-qual-20261108-g3",
+      "snapshot_id": "snap-0e3838919d9e857ac",
+      "archive_key": "recovery/runs/arity-criu-qual-20261108/generations/g3/checkpoint.tar",
+      "archive_version": "FWwFGHA0QDAo8k_wE4uod09QDcwfYkyX",
+      "archive_sha256": "37c2c6419de6973c257be474853f79acde69530058047ac38ccf5e80607b25be",
+      "manifest_sha256": "a77210ab68ef79d577738bc30677ac952303be22acd2a799c690295d077594e3",
+      "archive_bytes": 1150218240,
+      "source_instance": "i-08f6f1883de6f039a",
+      "source_pod_uid": "04805af1-7a13-452c-b60f-fde43a37c65c",
+      "committed_unix_seconds": 1794136268,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    },
+    {
+      "number": 4,
+      "request_sha256": "e45cf2fde5d217750faec543a7fb72c34aef1f369a8ec553c71ba154e07de7b8",
+      "snapshot_name": "arity-criu-qual-20261108-g4",
+      "snapshot_id": "snap-0fa9313b6b5e6308b",
+      "archive_key": "recovery/runs/arity-criu-qual-20261108/generations/g4/checkpoint.tar",
+      "archive_version": ".0nXbvo3MgL8bReZWz.Gq5H8iRzPxQXQ",
+      "archive_sha256": "39469434e0d6ea0daa93679a9fa93fde26cab56a670235425446cd2187a15384",
+      "manifest_sha256": "d86c7fc0def7f3cc806ec2797e40f4f14fae1e67eccbc06a6f6ef03586c7266d",
+      "archive_bytes": 1192017920,
+      "source_instance": "i-08f6f1883de6f039a",
+      "source_pod_uid": "04805af1-7a13-452c-b60f-fde43a37c65c",
+      "committed_unix_seconds": 1794136586,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    }
+  ],
+  "last_checkpoint_at": 1794136586,
+  "selected_generation": 1,
+  "failure": null,
+  "benchmark_job": null,
+  "benchmark_uid": null,
+  "benchmark_manifest": null,
+  "benchmark_create_attempted": false,
+  "command_exit_code": 0
+}

@@ -1,0 +1,72 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "proj-a",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t6-g4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=6",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t6-g4-s1093",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=6,seed=1093",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  }
+ ],
+ "description": "research/curve25519_isogeny_seed_20261103/PROTOCOL.md Addendum T5 (frozen before data). Same k=20 Curve25519 miniature and arms as curve25519_algebraic_ecbench_20261102, fresh target_seed; adds the incumbent algebraic arm with the log-free selected tower seed 1093. Public synthetic curve; no security claim.",
+ "label": "Curve25519 k=20: PKM isogeny tower seed 0 vs selected seed 1093, ecbench counted unit",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 1,
+  "seed": 2026110341,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 63700,
+    "b": 872826,
+    "group_order": 1049624,
+    "gx": 349837,
+    "gy": 122,
+    "kind": "prime_explicit",
+    "p": 1048573,
+    "r": 131203
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 2026110340,
+  "targets_per_curve": 6
+ }
+}

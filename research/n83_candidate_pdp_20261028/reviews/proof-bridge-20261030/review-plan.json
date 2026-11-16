@@ -1,0 +1,156 @@
+{
+  "schema": "n83.proof-bridge-review-plan/v1",
+  "task": "T-995",
+  "producer_revision": "c64f02c176787dbf40d455f95b75bd2dd5bfe5bf",
+  "main_review_revision": "cc5addeba4dd53edc51f2c0ad9331b3ba0307adc",
+  "review_kind": "technical proof-map review; no official promotion",
+  "producer_authorship": "Coordinator wrote the proposed argument; cannot supply independent fidelity verdict.",
+  "prior": "Arithmetic replay is established; the universal graded-syzygy and filtered-space arguments remain independently unreviewed. Expect possible missing hypotheses or degree bookkeeping errors; retain inconclusive outcomes.",
+  "claims": [
+    {
+      "id": "C-graded",
+      "claim": "For the exact prime chain with ell27, characteristic above27 and all nonzero selector weights, every homogeneous syzygy of weighted total degree at most16 is Koszul; matching source-bound upper witness is at17.",
+      "machine_status_before": "not_verified except eight arithmetic lemmas"
+    },
+    {
+      "id": "C-filtered",
+      "claim": "Conditional on full top-syzygy Koszul generation through16, the proposed bounded-representation reduction identifies V16 with bounded products; the source-bound nonzero pairing separates g16 from V16 while the saved derivation puts g in V17. No global LFD upper bound."
+    },
+    {
+      "id": "C-machine",
+      "claim": "Eight named Std-only Lean arithmetic lemmas check numerical prerequisites, not the polynomial-algebra or FFD/LFD theorem."
+    }
+  ],
+  "reviewers": [
+    {
+      "id": "graded",
+      "joints_owned": [
+        "block SLP and primitive decomposition",
+        "tensor sector degree and no truncation",
+        "free chain regularity/Koszul generation",
+        "selector-square lifting and finite-characteristic FFD conventions"
+      ],
+      "worked_attack": "Choose sectors at the maximal primitive degree and multi-block syzygies at degrees8-16; attempt to find a quotient relation hidden by truncation or a non-Koszul mixed square/quartic relation. Check off-by-one at degree17 and char<=ell failure.",
+      "permitted": [
+        "immutable producer graded proof and proof map",
+        "LefschetzBoundary.lean",
+        "exact source donor",
+        "primary literature"
+      ],
+      "forbidden": [
+        "filtered reviewer report",
+        "blind reviewer report",
+        "Coordinator synthesis"
+      ]
+    },
+    {
+      "id": "filtered",
+      "joints_owned": [
+        "bounded representation descent",
+        "closure under allowed multiplication",
+        "coefficient functional annihilation and nonzero separation",
+        "connection to exact source and rational-point scope"
+      ],
+      "worked_attack": "Find a low-degree element created by repeated reduction/multiplication that is absent from one-shot bounded products; test removal of Koszul-generation hypothesis, zero pairing, zero polynomial, and cancellation in g. Check unrestricted U and end-of-chain indexing.",
+      "permitted": [
+        "immutable producer filtered argument",
+        "source-functional instrument and source donor",
+        "arithmetic case records",
+        "primary literature"
+      ],
+      "forbidden": [
+        "graded reviewer report",
+        "blind reviewer report",
+        "Coordinator synthesis"
+      ]
+    },
+    {
+      "id": "blind",
+      "joints_owned": [
+        "independent derivation from mathematical system definition"
+      ],
+      "worked_attack": "Derive a degree obstruction or explicit counterexample directly from the odd-width chain; do not inherit producer degree values or its method. If unresolved, identify precise missing theorem.",
+      "permitted": [
+        "blind-statement.md only for project mathematics",
+        "primary literature",
+        "main AGENTS for workflow"
+      ],
+      "forbidden": [
+        "all producer proof texts and code",
+        "all case results and reports",
+        "sibling reports",
+        "parent conversation history"
+      ]
+    }
+  ],
+  "controls": [
+    "Fresh kernel check each of eight arithmetic declarations with print axioms",
+    "No-truncation inequality fails at the next odd-width boundary",
+    "Without top-syzygy hypothesis {U^2,U^2-U} exhibits recursive degree fall",
+    "Zero scalar pairing does not establish membership or absence",
+    "No conflation of coefficient polynomial degree with regularity"
+  ],
+  "attestation_required": [
+    "joints_owned",
+    "sources_read",
+    "sibling_report_access",
+    "blind_rederivation_compliance",
+    "per_joint holds|breaks|inconclusive",
+    "missing bridges",
+    "machine and fidelity statuses separately"
+  ],
+  "inputs": [
+    {
+      "path": "PRIME_LEFSCHETZ_ARGUMENT.md",
+      "sha256": "31a7eb352373149428e47afbe5c03b9243cf9375aaf06ca34c5fbcf9d6fefdab",
+      "bytes": 6870
+    },
+    {
+      "path": "PRIME_FILTERED_FUNCTIONAL_DESIGN.md",
+      "sha256": "3acd4b3570a6c1becfba37eef0bfd8f631e09e354668ca5e2e8071dcfa46e167",
+      "bytes": 5138
+    },
+    {
+      "path": "LEFSCHETZ_PROOF_MAP.md",
+      "sha256": "91cbfac992caf4545d500b4fd130c97ee905527647d17f68c5ff1d2f64eeda01",
+      "bytes": 5256
+    },
+    {
+      "path": "LefschetzBoundary.lean",
+      "sha256": "1278a3102c773081aafab2c7c193cc0fff49e9654f2dbd4884024f6cdc7d8f59",
+      "bytes": 2623
+    },
+    {
+      "path": "SOURCE_FUNCTIONAL_PLAN.md",
+      "sha256": "2a7ad58ef3aa7f8abb0fdcaaf3743319ee6d0ff905c1c674ee06a60d04934d47",
+      "bytes": 2241
+    },
+    {
+      "path": "src/bin/prime_source_functional.rs",
+      "sha256": "56347f621119c908cfd4fb8217dff4625d192ab9ab787f35185a578481b7f576",
+      "bytes": 16703
+    },
+    {
+      "path": "src/prime_linear_source_donor.rs",
+      "sha256": "ce6042fcecc4e3d997acaa48b9af1426622a08e0a76c875673ccf1923d6a7b2f",
+      "bytes": 5232
+    },
+    {
+      "path": "evidence/source-functional-r2/summary.json",
+      "sha256": "aeb01ac732ded452885bf5db773167851c364442a8b48d29078f7067b0b78547",
+      "bytes": 15517
+    },
+    {
+      "path": "evidence/source-functional-r2/original-prime-m3-natural.json",
+      "sha256": "187d52e70ff2f947f43b9b19227385ef8edbb0a68463986ff3b13d3ce381f5c1",
+      "bytes": 1490
+    },
+    {
+      "path": "validation/lefschetz-boundary/verification.json",
+      "sha256": "7dedfa8eddffbe313d3b1d3cb05ec9e3802717e9be9ed239216ecf4abc438137",
+      "bytes": 1411
+    }
+  ],
+  "official_decision": "none; preserve existing datasets and null LFD fields",
+  "claim_changes": "Any repair is a new version; never edit prior raw records or signed reviewer reports"
+}

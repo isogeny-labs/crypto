@@ -1,0 +1,48 @@
+name: Synthetic volcano experiment
+
+on:
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
+    paths:
+      - 'research/synthetic_volcano_ecdlp_20261018/**'
+      - 'tools/volcano-diagram/**'
+      - '.github/workflows/synthetic-volcano.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic-contract:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|synthetic-volcano.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|synthetic-volcano.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/synthetic_volcano_ecdlp_20261018/
+            /tools/volcano-diagram/
+      - name: Native contracts and original synthetic-record audit
+        run: make -C research/synthetic_volcano_ecdlp_20261018 check
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install plot and document dependencies
+        run: python -m pip install matplotlib numpy reportlab
+      - name: Render an independently generated synthetic run
+        working-directory: research/synthetic_volcano_ecdlp_20261018
+        env:
+          MPLCONFIGDIR: /tmp/volcano-ci-matplotlib
+        run: |
+          build/simulate --out run-ci
+          python3 tools/render.py run-ci
+          test -s run-ci/reports/experiment_report.pdf
+          test -s run-ci/reports/explorer.html

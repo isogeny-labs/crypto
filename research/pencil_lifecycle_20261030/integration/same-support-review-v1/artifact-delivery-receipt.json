@@ -1,0 +1,109 @@
+{
+  "schema": "same-support-artifact-delivery/v1",
+  "utc": "2026-10-30T21:36:08.115826+00:00",
+  "owner_task": "T-954",
+  "delegated_scope": "research/pencil_lifecycle_20261030/integration/same-support-review-v1",
+  "artifact": {
+    "sha256": "8a3bc72d274f5c890b4480619f2df78fd22204c4307db5c5f150bad86adef074",
+    "bytes": 1329631
+  },
+  "push": {
+    "exit_code": 0,
+    "command": "python3 tools/artifacts/artifacts.py push research/pencil_lifecycle_20261030/integration/same-support-review-v1/same-support-review-v1.tar.gz --jobs 1"
+  },
+  "remote_verify": {
+    "exit_code": 0,
+    "command": "python3 tools/artifacts/artifacts.py verify research/pencil_lifecycle_20261030/integration/same-support-review-v1/same-support-review-v1.tar.gz --remote"
+  },
+  "fresh_download": {
+    "command": [
+      "aws",
+      "s3api",
+      "get-object",
+      "--bucket",
+      "setec-astronomy-artifacts",
+      "--key",
+      "store/sha256/8a/8a3bc72d274f5c890b4480619f2df78fd22204c4307db5c5f150bad86adef074",
+      "--checksum-mode",
+      "ENABLED",
+      "/var/tmp/same-support-artifact-fresh-umypryfj/same-support-review-v1.tar.gz"
+    ],
+    "exit_code": 0,
+    "seconds": 1.4930888270027936,
+    "utc": "2026-10-30T21:35:41.057630+00:00",
+    "fresh_directory": "/var/tmp/same-support-artifact-fresh-umypryfj",
+    "source_cache_used": false,
+    "sha256": "8a3bc72d274f5c890b4480619f2df78fd22204c4307db5c5f150bad86adef074",
+    "bytes": 1329631,
+    "hash_matches": true
+  },
+  "remote_uri": "s3://setec-astronomy-artifacts/store/sha256/8a/8a3bc72d274f5c890b4480619f2df78fd22204c4307db5c5f150bad86adef074",
+  "head_before": "57c1449cf8c3afdf7df7224da0a7fd13fa75c8aa",
+  "head_after": "57c1449cf8c3afdf7df7224da0a7fd13fa75c8aa",
+  "head_unchanged": true,
+  "source_or_runtime_edits": false,
+  "commits": false,
+  "artifact_pointer_staged_by_tool": true,
+  "files": [
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/artifact-push.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/delivery.json",
+      "sha256": "a1d3d251695fe84f577de9f4507c41fbac1803289ffdf7607984a8d701798536",
+      "bytes": 1504
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/artifact-verify.stderr",
+      "sha256": "6e2623adaef15f8acd22d86062ea8eb8b1c61fba31969cf2b00ffcf7dfeaebb7",
+      "bytes": 48
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/artifact-fresh-get.receipt.json",
+      "sha256": "e22df9df62b5c1dcf00aaa78afa1b0f536d2898a290ae518a6f8e45ec2fef8a7",
+      "bytes": 655
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/artifact-fresh-get.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/.gitignore",
+      "sha256": "50b3aa4ad183be19bca7ef66203cdd44b9aeae84759e5f03692540a5993534b8",
+      "bytes": 155
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/artifact-verify.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/pre-upload.json",
+      "sha256": "492c1cb8a4792d9c14ada67f0c82b55b3ceb72bdbd8b27e70278eb10c73c4b52",
+      "bytes": 310
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/artifact-fresh-get.stdout",
+      "sha256": "121a85e5a715a9a056bfbe213259fe4b7d13d44fb009db1ea50f8b2095f07236",
+      "bytes": 368
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/artifact-push.stderr",
+      "sha256": "9b50b41800c085d4f9323d9b45a87705ee8ba76b950046d61d66c146437bf0ae",
+      "bytes": 120
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/README.md",
+      "sha256": "88cb079c3dc100695ebdc4c4ca653d448d9dfe12cd75c0081ae7f984246f5be3",
+      "bytes": 2010
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/same-support-review-v1/.artifacts.json",
+      "sha256": "c92db222c8790f1b2280639a829e599c761a7b2d4a5fc79448e171d9df1b34e8",
+      "bytes": 187
+    }
+  ]
+}

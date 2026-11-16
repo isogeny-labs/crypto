@@ -14,7 +14,7 @@ metadata:
     taskq/pool: {{ $pool.name }}
 spec:
   {{- if not (and $.Values.keda.enabled $pool.keda) }}
-  replicas: {{ $pool.replicas | default 1 }}
+  replicas: {{ if hasKey $pool "replicas" }}{{ $pool.replicas }}{{ else }}1{{ end }}
   {{- end }}
   selector:
     matchLabels: {app.kubernetes.io/instance: {{ $.Release.Name }}, taskq/pool: {{ $pool.name }}}
@@ -59,6 +59,7 @@ spec:
           env:
             {{- include "taskq.redisEnv" $ | nindent 12 }}
             - {name: TASKQ_ARTIFACT_DIR, value: /results/artifacts}
+            - {name: TASKQ_CHECKPOINT_DIR, value: /results/checkpoints}
             - {name: TASKQ_RESULT_DIR, value: /results/results}
             - {name: TASKQ_CACHE_DIR, value: /var/cache/taskq}
             - {name: TASKQ_IMAGE, value: "{{ $img.repository }}:{{ $img.tag }}"}

@@ -3,11 +3,12 @@
 //! and the order audit.
 
 use num_bigint::BigUint;
+use serde::{Deserialize, Serialize};
 
 use super::field::{Fe, Field};
 
 /// A model `y² = x³ + ax + b`.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Model {
     pub a: Fe,
     pub b: Fe,
@@ -238,7 +239,7 @@ pub fn deterministic_generator(f: &Field, m: &Model, cofactor: &BigUint) -> (Fe,
 }
 
 /// How the order of a model was established.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OrderAudit {
     /// `[n]P = O` for a point `P ≠ O` and `n` prime above `(√p + 1)²`'s
     /// half width: `n | #E` and the Hasse interval holds one multiple.

@@ -1,0 +1,782 @@
+{
+  "schema": "cubic-native-stage-protocol/v1",
+  "scope": "Fixed quartic stages and direct source controls; full transfer is not implemented",
+  "baseline": "Pinned native quartic reference; source rho with and without negation, using adjugate Fp3 inversion",
+  "samples_per_arm": 5,
+  "primes": [
+    109,
+    157
+  ],
+  "arms": [
+    "source-rho",
+    "source-rho-neg",
+    "target-ic",
+    "target-rho",
+    "target-rho-neg"
+  ],
+  "timing_admission": "Strict PSI required; missing metrics block qualification. Diagnostic runs remain unqualified.",
+  "jobs": [
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho",
+        "20261025"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho-neg",
+        "20261025"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-ic",
+        "20261025"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho",
+        "20261025"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho-neg",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho-neg",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-ic",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho-neg",
+        "20261025"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261026,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho",
+        "20261026"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261026,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho-neg",
+        "20261026"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261026,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-ic",
+        "20261026"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261026,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho",
+        "20261026"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261026,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho-neg",
+        "20261026"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261026,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho",
+        "20261026"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261026,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho-neg",
+        "20261026"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261026,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-ic",
+        "20261026"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261026,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho",
+        "20261026"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261026,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho-neg",
+        "20261026"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261027,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho",
+        "20261027"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261027,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho-neg",
+        "20261027"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261027,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-ic",
+        "20261027"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261027,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho",
+        "20261027"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261027,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho-neg",
+        "20261027"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261027,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho",
+        "20261027"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261027,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho-neg",
+        "20261027"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261027,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-ic",
+        "20261027"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261027,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho",
+        "20261027"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261027,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho-neg",
+        "20261027"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261028,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho",
+        "20261028"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261028,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho-neg",
+        "20261028"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261028,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-ic",
+        "20261028"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261028,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho",
+        "20261028"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261028,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho-neg",
+        "20261028"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261028,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho",
+        "20261028"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261028,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho-neg",
+        "20261028"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261028,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-ic",
+        "20261028"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261028,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho",
+        "20261028"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261028,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho-neg",
+        "20261028"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261029,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho",
+        "20261029"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261029,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho-neg",
+        "20261029"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261029,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-ic",
+        "20261029"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261029,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho",
+        "20261029"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261029,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-rho-neg",
+        "20261029"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261029,
+      "arm": "source-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho",
+        "20261029"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261029,
+      "arm": "source-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho-neg",
+        "20261029"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261029,
+      "arm": "target-ic",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-ic",
+        "20261029"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261029,
+      "arm": "target-rho",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho",
+        "20261029"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261029,
+      "arm": "target-rho-neg",
+      "control": "main",
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-rho-neg",
+        "20261029"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "source-rho-neg",
+      "control": "AA",
+      "repeat": 0,
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho-neg",
+        "20261025"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "source-rho-neg",
+      "control": "AA",
+      "repeat": 1,
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "source-rho-neg",
+        "20261025"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "target-ic",
+      "control": "AA",
+      "repeat": 0,
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-ic",
+        "20261025"
+      ]
+    },
+    {
+      "p": 109,
+      "seed": 20261025,
+      "arm": "target-ic",
+      "control": "AA",
+      "repeat": 1,
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p109.fixture",
+        "target-ic",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "source-rho-neg",
+      "control": "AA",
+      "repeat": 0,
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho-neg",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "source-rho-neg",
+      "control": "AA",
+      "repeat": 1,
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "source-rho-neg",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "target-ic",
+      "control": "AA",
+      "repeat": 0,
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-ic",
+        "20261025"
+      ]
+    },
+    {
+      "p": 157,
+      "seed": 20261025,
+      "arm": "target-ic",
+      "control": "AA",
+      "repeat": 1,
+      "command": [
+        "./build/quartic_followup",
+        "fixture",
+        "fixtures/p157.fixture",
+        "target-ic",
+        "20261025"
+      ]
+    }
+  ]
+}

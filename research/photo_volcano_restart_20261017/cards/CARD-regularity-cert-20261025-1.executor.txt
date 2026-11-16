@@ -1,0 +1,32 @@
+card: CARD-regularity-cert-20261025-1 (sha256 c67c3e05b8879c18930a9bad8f710a2be5fc3b544de9edad0ff59ea50d8aa72a)
+commit: 2763e90542c38fd9a92d755f452508bbd8cf60ee
+receipt: cards/CARD-regularity-cert-20261025-1.receipt.json sha256 267c369fc7b4e75a7d1ace39917a7c404449cdf3c87be9ffff6485672336b02d
+status: completed
+command 1 (native-certificates): ["./regularity_cert", "run", "/workspace/photo_volcano_restart_20261017", "/workspace/photo_volcano_restart_20261017/sessions/regularity_cert_20261025"] exit 0 (5.627 s) succeeded
+  stdout sha256 5404d9877343d83b09e8e2d18b69a11c929ec0d9f5843bf842266b9a7b6e0fdd; last 1 lines:
+    REGULARITY_NATIVE_PASSED cases=14720 controls=920
+  output sessions/regularity_cert_20261025/summary.json: 589c167161ff0b78b970a0c483582b19b6cd2f592f5ebe0c361543c45a39b9fe
+  output sessions/regularity_cert_20261025/cases.jsonl: 28557174503b5a57022fc68132644dc5870a9b3f77ac5f79d88696d5db5873b4
+  output sessions/regularity_cert_20261025/controls.jsonl: 6f7a6435eaca1ec4aea4cae9803320eb3c0642711c1913eaf15684d9978b2597
+  output sessions/regularity_cert_20261025/setups.jsonl: 81c6569d9e632fe0a7ca4f54f74bfc5a46231fdc472806eda985b03fcfa31f3f
+  output sessions/regularity_cert_20261025/verify.gp: e7d92fed31b6a15b44a9ff595ffaf438a87a2163a1da72ee52299b0c741ac54b
+command 2 (prepare-independent-toy): ["./regularity_cert", "toy", "/workspace/photo_volcano_restart_20261017", "/workspace/photo_volcano_restart_20261017/sessions/regularity_cert_20261025/toy"] exit 0 (0.006 s) succeeded
+  stdout sha256 1fee041e2c97e3bab7aecf377a44d0cf595721d0ab620fbe7acf636dceee8a41; last 1 lines:
+    TOY_INPUT_PREPARED
+  output sessions/regularity_cert_20261025/toy/toy.sing: f6162fb07bb22e89bb885295c2b37ccb140b0b366a74cf3f78605099e7d93ba0
+command 3 (independent-resolution): ["./measure_process", "sessions/regularity_cert_20261025/toy.resources.json", "sessions/regularity_cert_20261025/toy.stdout", "sessions/regularity_cert_20261025/toy.stderr", "/usr/bin/env", "LD_LIBRARY_PATH=/workspace/photo_volcano_restart_20261017/runtime/singular_root/usr/lib/x86_64-linux-gnu:/workspace/photo_volcano_restart_20261017/runtime/root/usr/lib/x86_64-linux-gnu", "SINGULARPATH=/workspace/photo_volcano_restart_20261017/runtime/singular_root/usr/share/singular/LIB", "runtime/singular_root/usr/bin/Singular", "-q", "--no-rc", "--no-shell", "--cpus=1", "--threads=1", "--flint-threads=1", "--random=20261025", "sessions/regularity_cert_20261025/toy/toy.sing"] exit 0 (0.045 s) succeeded
+  stdout sha256 6da4880dd93ca05e160d97fc10a69f57ee729a6daee999e83f1788ff5520ed81; last 1 lines:
+    {"argv":["/usr/bin/env","LD_LIBRARY_PATH=/workspace/photo_volcano_restart_20261017/runtime/singular_root/usr/lib/x86_64-linux-gnu:/workspace/photo_volcano_restart_20261017/runtime/root/usr/lib/x86_64-linux-gnu","SINGULARPATH=/workspace/photo_volcano_restart_20261017/runtime/singular_root/usr/share/singular/LIB","runtime/singular_root/usr/bin/Singular","-q","--no-rc","--no-shell","--cpus=1","--threads=1","--flint-threads=1","--random=20261025","sessions/regularity_cert_20261025/toy/toy.sing"],"child_system_us":14994,"child_user_us":17569,"exit_status":0,"involuntary_switches":0,"major_faults":8,"max_rss_kib":9556,"minor_faults":1220,"stderr":"sessions/regularity_cert_20261025/toy.stderr","stdout":"sessions/regularity_cert_20261025/toy.stdout","voluntary_switches":26,"wall_ns":42420898}
+  output sessions/regularity_cert_20261025/toy.resources.json: 9896b8ae77ee9912e7bf546a8ed561f8fa2ba7e8a2e78ba5ebc80b3c0a07bea7
+  output sessions/regularity_cert_20261025/toy.stdout: c1e01ac4831f216cebc83c9019b02e956ef85df44eef9cdd751c3f1cd2f73328
+  output sessions/regularity_cert_20261025/toy.stderr: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+command 4 (independent-actual-field): ["./measure_process", "sessions/regularity_cert_20261025/gp.resources.json", "sessions/regularity_cert_20261025/gp.stdout", "sessions/regularity_cert_20261025/gp.stderr", "/usr/bin/env", "LD_LIBRARY_PATH=/workspace/photo_volcano_restart_20261017/runtime/root/usr/lib/x86_64-linux-gnu", "runtime/root/usr/bin/gp", "-q", "-f", "-s", "256M", "sessions/regularity_cert_20261025/verify.gp"] exit 0 (7.37 s) succeeded
+  stdout sha256 c0140286dfca8e7cf40b06fc388cf3b4a0e340d1831485d55e4cbebbcc500ca8; last 1 lines:
+    {"argv":["/usr/bin/env","LD_LIBRARY_PATH=/workspace/photo_volcano_restart_20261017/runtime/root/usr/lib/x86_64-linux-gnu","runtime/root/usr/bin/gp","-q","-f","-s","256M","sessions/regularity_cert_20261025/verify.gp"],"child_system_us":330153,"child_user_us":7032496,"exit_status":0,"involuntary_switches":86,"major_faults":0,"max_rss_kib":201260,"minor_faults":49891,"stderr":"sessions/regularity_cert_20261025/gp.stderr","stdout":"sessions/regularity_cert_20261025/gp.stdout","voluntary_switches":1,"wall_ns":7364692421}
+  output sessions/regularity_cert_20261025/gp.resources.json: 10beaf75348c29058ffb65d6b2d9fbc195caf045953cfa19232344ad91f5c33b
+  output sessions/regularity_cert_20261025/gp.stdout: 254f43233cf3762bd3fd28cccb7c26ac22d3bfb7846bf9c0bbf210bc9c715331
+  output sessions/regularity_cert_20261025/gp.stderr: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+command 5 (audit): ["./regularity_cert", "audit", "/workspace/photo_volcano_restart_20261017", "/workspace/photo_volcano_restart_20261017/sessions/regularity_cert_20261025"] exit 0 (0.011 s) succeeded
+  stdout sha256 97f609a9a0afd3da2177c2cd67bdcc2867bfde0e939b729099795d8bb3835ab5; last 1 lines:
+    REGULARITY_AUDIT_PASSED
+  output sessions/regularity_cert_20261025/independent_audit.json: 32632ec7d6d78d84b46ab66d73ef770a412c4c63eb5b864aeed6afe8a89f3b15

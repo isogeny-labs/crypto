@@ -1,0 +1,26 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc | 16/16 | 8.679 | 9.366 | 15.550 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ksum4-n5 | 16/16 | 34.150 | 39.915 | 91.799 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | ksum5-n4 | 0/16 | — | — | — | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | mitm2-n22 | 16/16 | 11.449 | 12.552 | 22.481 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | mitm2-n45 | 16/16 | 14.020 | 14.738 | 21.204 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 16/16 | 1.340 | 1.430 | 2.245 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | inc vs ksum4-n5 | inc < ksum4-n5 |
+| icv1-fp20-tm1050-4295f05e | inc vs ksum5-n4 | incomplete |
+| icv1-fp20-tm1050-4295f05e | inc vs mitm2-n22 | inc < mitm2-n22 |
+| icv1-fp20-tm1050-4295f05e | inc vs mitm2-n45 | inc < mitm2-n45 |
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1050-4295f05e | ksum4-n5 vs ksum5-n4 | incomplete |
+| icv1-fp20-tm1050-4295f05e | ksum4-n5 vs mitm2-n22 | mitm2-n22 < ksum4-n5 |
+| icv1-fp20-tm1050-4295f05e | ksum4-n5 vs mitm2-n45 | mitm2-n45 < ksum4-n5 |
+| icv1-fp20-tm1050-4295f05e | ksum4-n5 vs rho-neg | rho-neg < ksum4-n5 |
+| icv1-fp20-tm1050-4295f05e | ksum5-n4 vs mitm2-n22 | incomplete |
+| icv1-fp20-tm1050-4295f05e | ksum5-n4 vs mitm2-n45 | incomplete |
+| icv1-fp20-tm1050-4295f05e | ksum5-n4 vs rho-neg | incomplete |
+| icv1-fp20-tm1050-4295f05e | mitm2-n22 vs mitm2-n45 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | mitm2-n22 vs rho-neg | rho-neg < mitm2-n22 |
+| icv1-fp20-tm1050-4295f05e | mitm2-n45 vs rho-neg | rho-neg < mitm2-n45 |

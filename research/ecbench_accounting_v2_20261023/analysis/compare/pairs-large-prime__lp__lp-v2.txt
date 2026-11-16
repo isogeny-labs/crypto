@@ -1,0 +1,13 @@
+ops (ok): lp-v2 / lp = 1.0003 [1.000, 1.000] (cluster) over 16 pairs on 4 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); wall: admitted median 1.0137 [0.989, 1.029]
+measurement quality: 75 / 100; paired attempts 16, verified 16, admitted 16; levels {"L2": 16}; p95 foreign busy 17.97%, p95 run queue 0.12%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+| curve | log2 r | workloads | lp-v2 / lp | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m11-t67-ae0facd2 | 9.95 | 4 | 1.0003 | [1.0003, 1.0003] | cluster |
+
+| workload | curve | log2 r | lp mean S | lp-v2 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W7a23f29c7be1 | icv1-f2m11-t67-ae0facd2 | 9.95 | 2711.8515 | 2712.7410 | 1.0003 |
+| W9c483fe9033c | icv1-f2m11-t67-ae0facd2 | 9.95 | 2711.2639 | 2712.1851 | 1.0003 |
+| Wb54ff80c4f95 | icv1-f2m11-t67-ae0facd2 | 9.95 | 2711.4862 | 2712.4074 | 1.0003 |
+| Weddf3ddfbeb7 | icv1-f2m11-t67-ae0facd2 | 9.95 | 2711.3671 | 2712.2566 | 1.0003 |

@@ -1,0 +1,21 @@
+int mcI;number mcCoefficient;
+for(mcI=1;mcI<=385;mcI++){
+ mcCoefficient=leadcoef(subst(mcExpected1,w,0));
+ if(mcEvaluated1[mcI]!=mcCoefficient){mcFailures=mcFailures+1;}
+ mcChecks=mcChecks+1;mcExpected1=(mcExpected1+mcCoefficient)/w;
+ mcCoefficient=leadcoef(subst(mcExpected2,w,0));
+ if(mcEvaluated2[mcI]!=mcCoefficient){mcFailures=mcFailures+1;}
+ mcChecks=mcChecks+1;mcExpected2=(mcExpected2+mcCoefficient)/w;
+}
+if(mcExpected1!=0 || mcExpected2!=0){mcFailures=mcFailures+1;}
+for(mcI=386;mcI<=454;mcI++){
+ if(mcEvaluated1[mcI]!=0 || mcEvaluated2[mcI]!=0){mcFailures=mcFailures+1;}
+ mcChecks=mcChecks+2;
+}
+if(mcEvaluated1[455]!=1 || mcEvaluated2[455]!=0){mcFailures=mcFailures+1;}
+mcChecks=mcChecks+2;
+print("MAPCHECK27_CONTROL_COUNTS checks,failures");mcChecks;mcFailures;
+if(mcChecks!=910 || mcFailures!=0){print("MAPCHECK27_REJECTED_NO_SOLVER");quit;}
+mcAllowed=1;
+print("MAPCHECK27_TWO_FULL_SOURCE_JET_CONTROLS_PASS");
+setring mapTarget27;

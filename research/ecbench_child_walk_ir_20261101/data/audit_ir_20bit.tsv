@@ -1,0 +1,14 @@
+binary	sha256_16	seq	arm	method	before_solve_Ir	solve_Ir	total_gae	ir_per_gae
+baseline main 8a208fa570	b8775974f8d8d876	0	rho-neg	rho.negation	206896333	1295567	1706	759.42
+baseline main 8a208fa570	b8775974f8d8d876	1	inc	ic.pipeline N=32	206928755	14889758	14101	1055.94
+baseline main 8a208fa570	b8775974f8d8d876	2	sel	ic.pipeline N=45	206920193	10123197	10632	952.14
+A: warm fix (curve_id)	e6a5053058cd1b0b	0	rho-neg	rho.negation	3341048	1296509	1706	759.97
+A: warm fix (curve_id)	e6a5053058cd1b0b	1	inc	ic.pipeline N=32	3371805	14885744	14101	1055.65
+B: A + walk (ic_boundary)	0eff84e84d22b1a6	0	rho-neg	rho.negation	3331282	1222380	1706	716.52
+B: A + walk (ic_boundary)	0eff84e84d22b1a6	1	inc	ic.pipeline N=32	3362189	14887062	14101	1055.75
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	0	rho-neg	rho.negation	207188998	1296397	1706	759.90
+C: B + registry index (main 5ac38ef4e9)	0038806674a3af21	0	rho-neg	rho.negation	2170921	1222979	1706	716.87
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	1	inc	ic.pipeline N=32	207239335	15142243	14101	1073.84
+C: B + registry index (main 5ac38ef4e9)	0038806674a3af21	1	inc	ic.pipeline N=32	2203287	15144353	14101	1073.99
+baseline main 5ac38ef4e9	9dd9e01b6b6b18a2	2	sel	ic.pipeline N=45	207250032	10275946	10632	966.51
+C: B + registry index (main 5ac38ef4e9)	0038806674a3af21	2	sel	ic.pipeline N=45	2203287	10267488	10632	965.72

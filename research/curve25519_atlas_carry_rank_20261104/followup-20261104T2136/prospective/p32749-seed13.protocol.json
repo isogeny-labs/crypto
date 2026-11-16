@@ -1,0 +1,741 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": false,
+    "inputs": [
+      "queries.tsv",
+      "generic.csv",
+      "selection.txt",
+      "solver-run/summary.json"
+    ],
+    "outputs": [
+      "experiment.export/v1"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "source support, mod bounded multiplication encoding",
+      "id": "source-mod",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "source",
+        "columns": 8,
+        "encoding": "mod",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "reference",
+      "same_instrument_as": null
+    },
+    {
+      "description": "source support, carry bounded multiplication encoding",
+      "id": "source-carry",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "source",
+        "columns": 8,
+        "encoding": "carry",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "candidate",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "same_support support, mod bounded multiplication encoding",
+      "id": "same_support-mod",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "same_support",
+        "columns": 8,
+        "encoding": "mod",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "candidate",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "same_support support, carry bounded multiplication encoding",
+      "id": "same_support-carry",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "same_support",
+        "columns": 8,
+        "encoding": "carry",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "candidate",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "target_native support, mod bounded multiplication encoding",
+      "id": "target_native-mod",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "target_native",
+        "columns": 8,
+        "encoding": "mod",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "candidate",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "target_native support, carry bounded multiplication encoding",
+      "id": "target_native-carry",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "target_native",
+        "columns": 8,
+        "encoding": "carry",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "candidate",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "mixed support, mod bounded multiplication encoding",
+      "id": "mixed-mod",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "mixed",
+        "columns": 8,
+        "encoding": "mod",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "candidate",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "mixed support, carry bounded multiplication encoding",
+      "id": "mixed-carry",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "mixed",
+        "columns": 8,
+        "encoding": "carry",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "candidate",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "random support, mod bounded multiplication encoding",
+      "id": "random-mod",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "random",
+        "columns": 8,
+        "encoding": "mod",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "control_negative",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "random support, carry bounded multiplication encoding",
+      "id": "random-carry",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "random",
+        "columns": 8,
+        "encoding": "carry",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "control_negative",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "positive support, mod bounded multiplication encoding",
+      "id": "positive-mod",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "positive",
+        "columns": 8,
+        "encoding": "mod",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "control_positive",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "positive support, carry bounded multiplication encoding",
+      "id": "positive-carry",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "base": "positive",
+        "columns": 8,
+        "encoding": "carry",
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "control_positive",
+      "same_instrument_as": "source-mod"
+    },
+    {
+      "description": "Byte-identical source-mod query in a fresh solver process",
+      "id": "source-aa-mod",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "make",
+            "build"
+          ]
+        ],
+        "commit": null,
+        "env": {},
+        "flags": {
+          "codec": "bounded_bv",
+          "solver": "Z3 5.3.3",
+          "timeout_seconds": "30"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "p": 32749,
+        "seed": 13
+      },
+      "role": "control_aa",
+      "same_instrument_as": "source-mod"
+    }
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "K-correct",
+      "text": "Every successful solver row matches the exact miniature reference, with SAT witnesses checked natively."
+    },
+    {
+      "class": "comparative",
+      "decided_by": [
+        "C-isogeny",
+        "C-carry",
+        "C-shape"
+      ],
+      "id": "K-resource",
+      "if_not_supported": "retain null, negative and censored outcomes",
+      "if_supported": "component counts only after all controls and replay pass",
+      "text": "Finite-workload differences in solver resource units only; no population, timing, complexity or full pipeline inference."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": "C-aa",
+      "not_applicable_reason": null,
+      "present": true
+    },
+    "negative": {
+      "arm": "random-mod",
+      "not_applicable_reason": null,
+      "null_population": {
+        "description": "Uniform equal-column subgroup sign-orbit base",
+        "generator": "C++ atlas random arm with frozen mt19937_64 seed",
+        "matched_on": [
+          "field",
+          "subgroup",
+          "columns",
+          "targets",
+          "solver"
+        ],
+        "n": 32,
+        "why_n": "All queries of the fixed finite cell; no sampling power claim"
+      },
+      "present": true
+    },
+    "positive": {
+      "arm": "positive-mod",
+      "expected_detection": "SAT for the three distinct planted signed points through the same unpinned solver path",
+      "not_applicable_reason": null,
+      "present": true
+    }
+  },
+  "created": "2026-11-04",
+  "decision_rule": {
+    "comparison_ids": [
+      "C-isogeny",
+      "C-carry",
+      "C-shape"
+    ],
+    "effect_size_measure": "paired solver resource-unit differences, component only",
+    "interval": "none: exact finite workload, not population inference",
+    "multiple_comparison_correction": "holm",
+    "statistic": "paired finite resource counts; no censored-case deletion",
+    "text": "Read resource-count differences only on a complete fixed cell with matching native outcomes and passing controls; all pipeline costs and larger-size claims remain open",
+    "verdict_vocabulary": [
+      "component_lower",
+      "component_equal",
+      "component_higher",
+      "incomplete",
+      "invalid"
+    ]
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "budget_usd_total": 5,
+      "cpu": 4,
+      "memory_gib": 4,
+      "per_query_timeout_seconds": 30
+    },
+    "queue": "cpu-spot",
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 900
+  },
+  "freeze": {
+    "commit": null,
+    "filed_before_affected_data": null,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "status": "draft"
+  },
+  "inadmissible": [
+    "Calling rlimit units wall time, GAE or S",
+    "Dropping timeout/error queries",
+    "Selecting on held-out data",
+    "Treating generic enumeration as an algebraic solver",
+    "Promoting a component result into a complete IC gain"
+  ],
+  "links": {
+    "scope": "One cell of the original 2029/8173/32749, seeds 13/29/47/71 panel; other cells stay required"
+  },
+  "measurement": {
+    "clock": "none",
+    "counters": [
+      "solver_rlimit"
+    ],
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source commit and dirty state",
+      "binary hashes",
+      "query and base hashes",
+      "raw stdout/stderr",
+      "host facts",
+      "timeouts and failures"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "One fresh Z3 invocation, including its solver setup; excludes fixture generation, native replay and all other pipeline phases",
+        "id": "solver_rlimit",
+        "kind": "counted",
+        "name": "Z3 resource-limit counter",
+        "resolution": "1",
+        "source": "solver stdout :rlimit-count",
+        "uncertainty": "none_exact",
+        "unit": "z3-5.3.3-rlimit"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "1 iff expected SAT/UNSAT agrees and every SAT witness replays natively",
+        "id": "producer_check_passed",
+        "kind": "exact",
+        "name": "Native expected-status and witness check",
+        "resolution": "1",
+        "source": "atlas.solver-row/v1 producer_check_passed",
+        "uncertainty": "none_exact",
+        "unit": "boolean"
+      }
+    ]
+  },
+  "protocol_id": "ATLAS-p32749-seed13",
+  "question": "On the fixed miniature cell, do matched representation/support arms change Z3 resource units while every result agrees with the native signed three-sum reference? This is a component comparison, not full IC cost.",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Counted software units only, fresh process per query, no machine-time comparison; retain A/A counter variation",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite counters and native witnesses; no blind population estimate is claimed"
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Prepared arm-independent holdout targets, disjoint modulo negation from calibration; planted controls separate"
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "C++ mt19937_64 seed 13; target shuffle uses seed xor 0x4f5554, representatives 1..(ell-1)/2 with random signs; raw fixtures bind library-specific shuffle"
+    }
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 32,
+    "power": {
+      "alpha": 0.05,
+      "correction": "holm",
+      "method": "exact",
+      "note": "Finite frozen workload, exact descriptive counters; no statistical significance or population-power claim",
+      "passes": true,
+      "tests_in_family": 3
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": null,
+      "fixed_seconds": null,
+      "measured_on": null,
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Attempt every planned row once; do not drop timeout, error or null outcomes"
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "USD 5 aggregate including builds/idle/failures, original per-job deadline 900 seconds; no automatic retries or quota increases"
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Hash mismatch, wrong status, invalid witness, failed positive control or incomplete panel blocks a gain claim"
+    }
+  ],
+  "study_dir": "research/curve25519_atlas_carry_rank_20261104",
+  "variable_ledger": {
+    "comparisons": [
+      {
+        "arms": [
+          "source-mod",
+          "same_support-mod"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "curve_representation"
+        ],
+        "id": "C-isogeny"
+      },
+      {
+        "arms": [
+          "source-mod",
+          "source-carry"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "multiplication_encoding"
+        ],
+        "id": "C-carry"
+      },
+      {
+        "arms": [
+          "source-mod",
+          "mixed-mod"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "base_support"
+        ],
+        "id": "C-shape"
+      },
+      {
+        "arms": [
+          "source-mod",
+          "source-aa-mod"
+        ],
+        "design": "aa",
+        "differs_in": [
+          "invocation"
+        ],
+        "id": "C-aa"
+      }
+    ],
+    "crosses_map": true,
+    "factors": [
+      {
+        "how": "Same solver image, binary, arguments and query bytes for A/A",
+        "name": "invocation",
+        "treatment": "fixed",
+        "value": "fresh single-thread solver process"
+      },
+      {
+        "how": "Record actual host facts; no wall clock is admitted",
+        "name": "host",
+        "treatment": "measured"
+      },
+      {
+        "how": "Freeze configuration, base, target, query and manifest hashes before comparisons; target sign orbits are disjoint between train and holdout",
+        "name": "inputs",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Native deterministic export; labels unmasked; no discretionary omissions",
+        "name": "analyst",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "source",
+          "2-isogenous"
+        ],
+        "name": "curve_representation"
+      },
+      {
+        "levels": [
+          "mod",
+          "carry"
+        ],
+        "name": "multiplication_encoding"
+      },
+      {
+        "levels": [
+          "source",
+          "target-native",
+          "mixed",
+          "random"
+        ],
+        "name": "base_support"
+      }
+    ],
+    "transfer_obligations": [
+      {
+        "map": "rational 2-isogeny",
+        "scope": "native finite homomorphism, dual and subgroup inverse fixtures; same-support control"
+      }
+    ]
+  },
+  "version": 1
+}

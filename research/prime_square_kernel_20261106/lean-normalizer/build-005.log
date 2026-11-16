@@ -1,0 +1,42 @@
+✖ [3139/3140] Building CauchyNormalizer (2.0s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean -o /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean/CauchyNormalizer.olean -i /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean/CauchyNormalizer.ilean -c /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/ir/CauchyNormalizer.c --setup /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/ir/CauchyNormalizer.setup.json --json
+warning: CauchyNormalizer.lean:95:33: `if_false` has been deprecated: Use `ite_false` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵f̵a̵l̵s̵e̵i̲t̲e̲_̲f̲a̲l̲s̲e̲
+error: CauchyNormalizer.lean:96:8: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ∏ j ∈ Finset.range (n + 1), if j = 0 then 1 else ↑0 - ↑j
+in the target expression
+  (∏ x ∈ Finset.range (n + 1), if x = 0 then 1 else -↑x) * -↑(n + 1) = (-1) ^ (n + 1) * ↑(n + 1).factorial
+
+case succ
+n : ℕ
+ih : (∏ j ∈ Finset.range (n + 1), if j = 0 then 1 else ↑0 - ↑j) = (-1) ^ n * ↑n.factorial
+⊢ (∏ x ∈ Finset.range (n + 1), if x = 0 then 1 else -↑x) * -↑(n + 1) = (-1) ^ (n + 1) * ↑(n + 1).factorial
+warning: CauchyNormalizer.lean:104:34: `if_false` has been deprecated: Use `ite_false` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵f̵a̵l̵s̵e̵i̲t̲e̲_̲f̲a̲l̲s̲e̲
+error: CauchyNormalizer.lean:114:2: Tactic `apply` failed: could not unify the conclusion of `Finset.prod_congr rfl`
+  Finset.prod ?m.180 ?m.177 = Finset.prod ?m.180 ?m.178
+with the goal
+  (∏ x ∈ Finset.range (n + 1), if x = k then 1 else ↑k + 1 - (↑x + 1)) = ↑k + 1
+
+Note: The full type of `Finset.prod_congr rfl` is
+  (∀ x ∈ ?m.180, ?m.177 x = ?m.178 x) → Finset.prod ?m.180 ?m.177 = Finset.prod ?m.180 ?m.178
+
+case e_a
+n k : ℕ
+h :
+  (∏ j ∈ Finset.range (n + 1), if j + 1 = k + 1 then 1 else ↑(k + 1) - ↑(j + 1)) =
+    ∏ j ∈ Finset.range (n + 1), if j = k then 1 else ↑k - ↑j
+⊢ (∏ x ∈ Finset.range (n + 1), if x = k then 1 else ↑k + 1 - (↑x + 1)) = ↑k + 1
+info: CauchyNormalizer.lean:142:0: 'CauchyNormalizer.choose_all_ones' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:143:0: 'CauchyNormalizer.choose_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:144:0: 'CauchyNormalizer.weight_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:145:0: 'CauchyNormalizer.signedWeight_ratio_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:146:0: 'CauchyNormalizer.puncture_formula' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: CauchyNormalizer.lean:147:0: 'CauchyNormalizer.puncture_normalizer_unit' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- CauchyNormalizer
+error: build failed

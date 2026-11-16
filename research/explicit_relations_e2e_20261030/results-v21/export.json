@@ -1,0 +1,866 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "ER-E2E-v21-g2naamm7l8d25t",
+  "created": "2026-10-30T23:13:08.878083+00:00",
+  "protocol": {
+    "path": "../protocol-v21.json",
+    "sha256": "e15407b5acb04f557cfb0476dbe8ae00a4973583f6bf7be3e7435962d125174b",
+    "protocol_id": "EXPLICIT-RELATIONS-E2E-20261030",
+    "version": 21
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "ecbench-e2e-v21",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "253abb737139e0e0eaac49bc2bb8a296f353f67c",
+    "dirty": false
+  },
+  "backend": "runpod",
+  "host": {
+    "path": "gpu-before.txt",
+    "sha256": "114f16dc4e6c73a27caa6631b3507733ba17fde763bb43c6e612d8a58b4bf9a7",
+    "class_id": "runpod-g2naamm7l8d25t",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0",
+      "gpu": "RTX 4090"
+    }
+  },
+  "arms": [
+    {
+      "id": "b",
+      "role": "baseline",
+      "binary_sha256": "25411f28f6f9a90a6da1bc625a8e1450cb5cf4ddcac76ac7d7c701a7c1afb92a",
+      "commit": "253abb737139e0e0eaac49bc2bb8a296f353f67c"
+    },
+    {
+      "id": "u",
+      "role": "candidate",
+      "binary_sha256": "25411f28f6f9a90a6da1bc625a8e1450cb5cf4ddcac76ac7d7c701a7c1afb92a",
+      "commit": "253abb737139e0e0eaac49bc2bb8a296f353f67c"
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "binary_sha256": "25411f28f6f9a90a6da1bc625a8e1450cb5cf4ddcac76ac7d7c701a7c1afb92a",
+      "commit": "253abb737139e0e0eaac49bc2bb8a296f353f67c"
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "binary_sha256": "25411f28f6f9a90a6da1bc625a8e1450cb5cf4ddcac76ac7d7c701a7c1afb92a",
+      "commit": "253abb737139e0e0eaac49bc2bb8a296f353f67c"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "g2naamm7l8d25t-52-101-b",
+      "arm": "b",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 3.05437074,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 3.044364267,
+          "verify_seconds": 0.004759181,
+          "bases_ms": 7.049865,
+          "targets_ms": 1.344031,
+          "oracle_ms": 2754.851462,
+          "linear_ms": 10.107405,
+          "replay_ms": 1.61962,
+          "relations": 251,
+          "attempts": 341
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-52-101-u",
+      "arm": "u",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.553425656,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.542737658,
+          "verify_seconds": 0.004529719,
+          "bases_ms": 5.678766,
+          "targets_ms": 5.009335,
+          "oracle_ms": 4251.889626,
+          "linear_ms": 5.403645,
+          "replay_ms": 1.247578,
+          "relations": 195,
+          "attempts": 2866
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-52-101-v",
+      "arm": "v",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.644747298,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.634252381,
+          "verify_seconds": 0.00469048,
+          "bases_ms": 5.550656,
+          "targets_ms": 9.954986,
+          "oracle_ms": 6339.792098,
+          "linear_ms": 5.004572,
+          "replay_ms": 2.065753,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-52-101-x",
+      "arm": "x",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.635261938,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.62624989,
+          "verify_seconds": 0.003625073,
+          "bases_ms": 5.307614,
+          "targets_ms": 9.655814,
+          "oracle_ms": 6342.62968,
+          "linear_ms": 4.946632,
+          "replay_ms": 0.941376,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-52-202-x",
+      "arm": "x",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.840582782,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.829474311,
+          "verify_seconds": 0.005687577,
+          "bases_ms": 5.370374,
+          "targets_ms": 6.537749,
+          "oracle_ms": 4519.274937,
+          "linear_ms": 4.66298,
+          "replay_ms": 1.661931,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-52-202-v",
+      "arm": "v",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.814270184,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.806433764,
+          "verify_seconds": 0.003654704,
+          "bases_ms": 5.850107,
+          "targets_ms": 6.596551,
+          "oracle_ms": 4513.867276,
+          "linear_ms": 3.983186,
+          "replay_ms": 1.043717,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-52-202-u",
+      "arm": "u",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.698336282,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.689136464,
+          "verify_seconds": 0.004363788,
+          "bases_ms": 6.002069,
+          "targets_ms": 4.116718,
+          "oracle_ms": 4379.69743,
+          "linear_ms": 5.570826,
+          "replay_ms": 1.811602,
+          "relations": 202,
+          "attempts": 2318
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-52-202-b",
+      "arm": "b",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 2.733022716,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 2.723672666,
+          "verify_seconds": 0.004406408,
+          "bases_ms": 5.764807,
+          "targets_ms": 1.449239,
+          "oracle_ms": 2449.586475,
+          "linear_ms": 11.00859,
+          "replay_ms": 1.901893,
+          "relations": 261,
+          "attempts": 306
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-63-101-v",
+      "arm": "v",
+      "instance_id": "63",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 2600.976384513,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 2600.961378579,
+          "verify_seconds": 0.006749812,
+          "bases_ms": 5.133392,
+          "targets_ms": 49.603073,
+          "oracle_ms": 2600586.033121,
+          "linear_ms": 40.328023,
+          "replay_ms": 2.828278,
+          "relations": 338,
+          "attempts": 15737
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    },
+    {
+      "run_id": "g2naamm7l8d25t-63-202-v",
+      "arm": "v",
+      "instance_id": "63",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 1192.904873666,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 1192.88759844,
+          "verify_seconds": 0.007651016,
+          "bases_ms": 6.36656,
+          "targets_ms": 41.81223,
+          "oracle_ms": 1192429.319231,
+          "linear_ms": 41.348885,
+          "replay_ms": 2.881397,
+          "relations": 344,
+          "attempts": 13733
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; same-threshold certificate byte equality and cross-threshold scalar equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+          "bytes": 11436,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+          "bytes": 18781,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "g2naamm7l8d25t"
+    }
+  ],
+  "files": [
+    {
+      "path": "rows.csv",
+      "sha256": "576954ad8bb9a5f0e370623ffd2a77e340543c1de9543094893c0d79e60cc479",
+      "bytes": 1546,
+      "kind": "raw"
+    },
+    {
+      "path": "certificate-audit.json",
+      "sha256": "839eba43edc2f0edcc7d948b43dba02583c5a5a25256d9b4212f931d1b8ba1e0",
+      "bytes": 11436,
+      "kind": "raw"
+    },
+    {
+      "path": "archive-manifest.json",
+      "sha256": "bbb4a499b47f1f919ba2c2ec0663260ff5f6c36ea70f773b59aaa2702d89ec4b",
+      "bytes": 18781,
+      "kind": "raw"
+    },
+    {
+      "path": "curves.txt",
+      "sha256": "64e5335d0a39eb574afb3072208ac6237425d484d17c69634e55c112fcf4d9c5",
+      "bytes": 164,
+      "kind": "raw"
+    },
+    {
+      "path": "instruments.sha256",
+      "sha256": "3c464dac18334c759e2d0c7af7c7d89ea26f4492b92c387fcd54a05e6aa6b1ca",
+      "bytes": 834,
+      "kind": "raw"
+    },
+    {
+      "path": "receipt.json",
+      "sha256": "04740b1b1a2e56d84a109676fe745d25f1de8619ae4b6cda0079ac7f746a1d9a",
+      "bytes": 422,
+      "kind": "raw"
+    },
+    {
+      "path": "deletion.txt",
+      "sha256": "084f4cc9acef95c52148de34bb5882bacf11792f1b3d8e30dc366fcf167b1f0c",
+      "bytes": 33,
+      "kind": "raw"
+    },
+    {
+      "path": "source-commit.txt",
+      "sha256": "84b17a01c20d15e15c111fe45f287c2a494e5de123707e80cb06fd06bf90098b",
+      "bytes": 41,
+      "kind": "raw"
+    },
+    {
+      "path": "source-checkout.sha256",
+      "sha256": "2f2dddce8659864ea090f42097c1027232fee4089b3156dc8315d5b3f6c742b6",
+      "bytes": 86,
+      "kind": "raw"
+    },
+    {
+      "path": "source-rehearsal.json",
+      "sha256": "f7f8f84b3166660a218e81a2c8936995d857cc6a36797fb2d5e5278af0a32911",
+      "bytes": 181593,
+      "kind": "raw"
+    },
+    {
+      "path": "coverage.json",
+      "sha256": "c45bc3ecfd6f6f6a588dced9f9c9384679b1dca5b665145c1c6c0235207a2433",
+      "bytes": 147,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../analyze-memory.rs",
+      "sha256": "6765a00ebd6a1c48ed700c6edc636a898cf18d1d5d5133adc9303f02c68f6a9e",
+      "bytes": 4201,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "summary.txt",
+        "sha256": "a0d46d2193ed673a7be43d0f8e6f204d85b5479e2b50a4b118867cd233a4dc8a",
+        "bytes": 74,
+        "kind": "analysis"
+      },
+      {
+        "path": "scaling.svg",
+        "sha256": "fbd6fd80ca27e53722fcd6847b2c491c50d4e312cc2ec9e26920aa7ec5757c2f",
+        "bytes": 2536,
+        "kind": "analysis"
+      },
+      {
+        "path": "analysis.log",
+        "sha256": "1e7ad1587a45696c7729cce34c96e42f8788657087e345e03eec3ef69c5d6d5d",
+        "bytes": 105,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Protocol maximum10 executions; recorded10; unattempted0 under frozen stopping rule. Canonical flow counts recorded process outcomes, including explicit limit failures as completed failed processes; coverage.json separately counts verified recoveries. Limited native statuses map to failed; counters retain original labels. No timeouts or limits excluded. All clocks are L0/wall_valid=false. No human blinding."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Service binary hash is the arm identity; shared driver hash is recorded separately in instruments.sha256. Complete raw certificates and relation logs are in the content-hashed S3 archive; archive-manifest.json hashes every member and certificate-audit.json retains replay and negative-control outputs. These manifests do not replace the native certificate replay, which ran on the GPU host. Pod deletion verified. No root crypto plug-in build was performed locally."
+    }
+  ],
+  "reviews_dir": "reviews",
+  "flow": {
+    "planned": 10,
+    "attempted": 10,
+    "completed": 10,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  }
+}

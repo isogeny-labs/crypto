@@ -1,0 +1,32 @@
+{
+  "schema": "isolab.post_execution_command_record/v1",
+  "recorded_utc": "2026-10-30T22:22:17.078163+00:00",
+  "provenance": "Reconstructed after execution from root orchestration invocation; not a contemporaneous signed launch receipt. Existing native output, source and artifact receipts are retained unchanged.",
+  "cwd": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1",
+  "build_command": [
+    "timeout",
+    "-k",
+    "2s",
+    "120s",
+    "cargo",
+    "+1.99.1",
+    "build",
+    "--release",
+    "--locked",
+    "--offline",
+    "--target",
+    "x86_64-unknown-linux-musl",
+    "-j",
+    "2"
+  ],
+  "container_command": [
+    "bash",
+    "run-reviewed-container-v4.sh",
+    "sha256:fdee14f586902162cc587d180fa734a9f21e395719e357ac75720345bfeef8df",
+    "7aa53cc278569ca13f1f0d9a860a65de7004b77c854db27f3f56ed819a8dd7f9",
+    "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/container-observation-v1"
+  ],
+  "script_sha256": "8dc2b499f81b6014cd9ec53715a89c4b41abd519064d34e3ef07b8c856561d73",
+  "container_executions": 1,
+  "repeated_for_provenance": false
+}

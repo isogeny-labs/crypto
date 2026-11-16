@@ -58,6 +58,14 @@
 //! `negation_folded=1`.  Completeness is unchanged; cold `S` drops by the
 //! saved set-up.  `rootfind-window-negfold` is the windowed `m = 3` scan
 //! on that half table.
+//! `rootfind-negfold-batch` keeps the same ordered half table and probe,
+//! but shares an inversion over each binary table row's ordinary additions.
+//! For `m = 3`, consecutive scan additions share an inversion in blocks of
+//! eight. The scan computes an ordinate only when a table key is present.
+//! Completed blocks charge every addition, including any candidates after
+//! the first hit. Any wall benefit needs a
+//! separate controlled measurement. It has a separate method identity so
+//! the scalar arm remains reproducible.
 //!
 //! ## The base
 //!
@@ -82,6 +90,14 @@
 //!   that unit unpriced, so `S` is a lower bound and the record says so.
 //!   Reductions, splits, propagations and every F6 gate counter ride in the
 //!   totals' `extra` map.
+//! - The whole of each call — the system's instantiation (and, on the
+//!   first call, its template's symbolic `F_{2^n}` build), the solver's
+//!   Macaulay builds, sorts, indexes, packing, pivot searches, read-back
+//!   and tree scans, the lift of each root and the gate's lookups — is
+//!   also reported in `bitop/v1` primitives through the `bitop_*` keys of
+//!   `extra` with `bitop_complete = 1`
+//!   ([`crypto_lib::cryptanalysis::bitop_tally`]), which is what the
+//!   `bitop/v1` work view prices.
 //!
 //! The word-XOR counter is per thread.  `ic.pipeline` decomposes on its
 //! calling thread, and the elimination runs there.
@@ -112,6 +128,7 @@ use num_traits::One;
 
 use crypto_lib::binary_ecc::{BinaryCurve, F2mElement};
 
+use crypto_lib::cryptanalysis::bitop_tally;
 use crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins;
 use crypto_lib::cryptanalysis::ic_boundary::{
     decompose_mitm, koblitz_factor_base, lift_abscissae, BinaryGroup, BinaryInstance, ColumnFold,
@@ -121,12 +138,14 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SolverCost, SolverTotals,
     SystemShape,
 };
-use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
+use crypto_lib::cryptanalysis::koblitz_fast::{BatchScratch, FastPoint};
 use crypto_lib::cryptanalysis::koblitz_groebner::{
-    f4_word_ops_thread, FieldStructure, SolveStats, SolverEngine,
+    f4_word_ops_thread, parse_linear_harvest, set_linear_harvest, FieldStructure, LinearHarvest,
+    SolveStats, SolverEngine,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
-    build_standard_subspace_factor_base, groebner_decompose, groebner_decompose_f6_ic, point_key,
+    build_standard_subspace_factor_base, groebner_decompose, groebner_decompose_f6_ic,
+    groebner_decompose_f6_ic_pair_index, point_key, reset_f6_ic_pair_index_cache,
     FrobeniusFactorBase, KoblitzCurve, PairSumTable,
 };
 
@@ -323,6 +342,11 @@ pub enum Pdp3Engine {
     InheritedF4,
     /// `groebner_decompose_f6_ic`: inherited F4 with the geometric gate.
     F6Ic,
+    /// `groebner_decompose_f6_ic_pair_index`: F6-IC whose one-fixed-summand
+    /// closure answers from a pair-sum index of the base (built once per
+    /// run, its |F|(|F|+1)/2 additions charged) with one charged addition
+    /// per lift, instead of scanning the base at every closed node.
+    F6IcPair,
     /// `groebner_decompose` with Boolean matrix-F4, every node from scratch.
     MatrixF4,
     /// `groebner_decompose` with Boolean matrix-F5: matrix-F4's matrices
@@ -340,6 +364,9 @@ pub enum Pdp3Engine {
     /// Root finding on [`PairTable::build_negation_folded`]: about half
     /// the set-up additions of [`Self::Rootfind`], sign-recovering probe.
     RootfindNegfold,
+    /// The same negation-folded table and probe, with batched binary
+    /// additions during table construction.
+    RootfindNegfoldBatch,
     /// Windowed `m = 3` scan on the negation-folded [`PairTable`].
     RootfindWindowNegfold,
 }
@@ -349,15 +376,19 @@ impl Pdp3Engine {
         match s {
             "inherited-f4" => Ok(Self::InheritedF4),
             "f6-ic" => Ok(Self::F6Ic),
+            "f6-ic-pair" => Ok(Self::F6IcPair),
             "matrix-f4" => Ok(Self::MatrixF4),
             "matrix-f5" => Ok(Self::MatrixF5),
             "rootfind" => Ok(Self::Rootfind),
             "rootfind-window" => Ok(Self::RootfindWindow),
             "rootfind-negfold" => Ok(Self::RootfindNegfold),
+            "rootfind-negfold-batch" => Ok(Self::RootfindNegfoldBatch),
             "rootfind-window-negfold" => Ok(Self::RootfindWindowNegfold),
             other => Err(format!(
-                "unknown engine `{other}`; try inherited-f4, f6-ic, matrix-f4, matrix-f5, \
-                 rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold"
+                "unknown engine `{other}`; try inherited-f4, f6-ic, f6-ic-pair, matrix-f4, \
+                 matrix-f5, \
+                 rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch \
+                 or rootfind-window-negfold"
             )),
         }
     }
@@ -366,11 +397,13 @@ impl Pdp3Engine {
         match self {
             Self::InheritedF4 => "inherited-f4",
             Self::F6Ic => "f6-ic",
+            Self::F6IcPair => "f6-ic-pair",
             Self::MatrixF4 => "matrix-f4",
             Self::MatrixF5 => "matrix-f5",
             Self::Rootfind => "rootfind",
             Self::RootfindWindow => "rootfind-window",
             Self::RootfindNegfold => "rootfind-negfold",
+            Self::RootfindNegfoldBatch => "rootfind-negfold-batch",
             Self::RootfindWindowNegfold => "rootfind-window-negfold",
         }
     }
@@ -388,13 +421,17 @@ impl Pdp3Engine {
             Self::Rootfind
                 | Self::RootfindWindow
                 | Self::RootfindNegfold
+                | Self::RootfindNegfoldBatch
                 | Self::RootfindWindowNegfold
         )
     }
 
     /// Whether set-up uses [`PairTable::build_negation_folded`].
     pub fn is_negfold(self) -> bool {
-        matches!(self, Self::RootfindNegfold | Self::RootfindWindowNegfold)
+        matches!(
+            self,
+            Self::RootfindNegfold | Self::RootfindNegfoldBatch | Self::RootfindWindowNegfold
+        )
     }
 
     /// Whether the `m = 3` third-summand scan is windowed.
@@ -406,12 +443,15 @@ impl Pdp3Engine {
     /// `None` for a root-finding engine, which has no tree.
     fn solver(self, max_degree: u32) -> Option<SolverEngine> {
         match self {
-            Self::InheritedF4 | Self::F6Ic => Some(SolverEngine::InheritedF4 { max_degree }),
+            Self::InheritedF4 | Self::F6Ic | Self::F6IcPair => {
+                Some(SolverEngine::InheritedF4 { max_degree })
+            }
             Self::MatrixF4 => Some(SolverEngine::MatrixF4 { max_degree }),
             Self::MatrixF5 => Some(SolverEngine::MatrixF5 { max_degree }),
             Self::Rootfind
             | Self::RootfindWindow
             | Self::RootfindNegfold
+            | Self::RootfindNegfoldBatch
             | Self::RootfindWindowNegfold => None,
         }
     }
@@ -473,10 +513,11 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
     e
 }
 
-/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N`,
+/// `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic|f6-ic-pair,degree=D,node_budget=N[,linear_harvest=H]`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind`,
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
+/// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch`, or
 /// `pdp3-koblitz:m=3,engine=rootfind-window-negfold`.
 pub struct Pdp3KoblitzOracle<'i> {
     name: &'static str,
@@ -485,6 +526,12 @@ pub struct Pdp3KoblitzOracle<'i> {
     engine: Pdp3Engine,
     solver: SolverEngine,
     node_budget: usize,
+    /// The root linear-row harvest of `koblitz_groebner` (PR #1862) for
+    /// this arm: `None` leaves the library's process default in force (the
+    /// parameter was not given, so the method's identity and counters are
+    /// those of every earlier session); `Some(None)` switches it off;
+    /// `Some(Some(h))` forces configuration `h`.
+    linear_harvest: Option<Option<LinearHarvest>>,
     frob: Option<FrobeniusFactorBase>,
     index_of: HashMap<(BigUint, BigUint), usize>,
     st: Option<FieldStructure>,
@@ -494,6 +541,16 @@ pub struct Pdp3KoblitzOracle<'i> {
     pair: Option<PairSumTable>,
     /// Negation-folded [`PairTable`] under `*-negfold` engines.
     pair_neg: Option<PairTable>,
+    /// Reused by the batched `m = 3` scan; all completed additions are charged.
+    scan_scratch: BatchScratch,
+    scan_addends: Vec<FastPoint>,
+    scan_sums: Vec<FastPoint>,
+    scan_lambdas: Vec<u64>,
+    #[cfg(target_arch = "x86_64")]
+    scan_x3: Vec<u64>,
+    /// The signed base starts with one self-negative point, then adjacent
+    /// pairs. Checked once so every later relation scan can align its blocks.
+    scan_pair_layout: Option<bool>,
     /// Base size the table was built on; `0` under a Groebner engine.
     pair_table_points: usize,
     /// Third-summand window for windowed engines; `0` otherwise.
@@ -519,6 +576,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             engine: Pdp3Engine::InheritedF4,
             solver: SolverEngine::InheritedF4 { max_degree: 3 },
             node_budget: 0,
+            linear_harvest: None,
             frob: None,
             index_of: HashMap::new(),
             st: None,
@@ -526,6 +584,13 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             totals: SolverTotals::default(),
             pair: None,
             pair_neg: None,
+            scan_scratch: BatchScratch::default(),
+            scan_addends: Vec::new(),
+            scan_sums: Vec::new(),
+            scan_lambdas: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
+            scan_x3: Vec::new(),
+            scan_pair_layout: None,
             pair_table_points: 0,
             scan_window_len: 0,
             window_div: 0,
@@ -622,6 +687,108 @@ impl<'i> Pdp3KoblitzOracle<'i> {
     ) -> Option<Vec<usize>> {
         let table = self.pair_neg.as_ref()?;
         let g = ctx.group;
+        if self.engine == Pdp3Engine::RootfindNegfoldBatch && self.summands == 3 {
+            const SCAN_BLOCK: usize = 8;
+            let paired_layout = *self.scan_pair_layout.get_or_insert_with(|| {
+                fb.points.len() % 2 == 1
+                    && fb.neg_index.first() == Some(&0)
+                    && fb.points[1..].chunks_exact(2).enumerate().all(|(j, pair)| {
+                        let k = 1 + 2 * j;
+                        fb.neg_index[k] == k + 1
+                            && fb.neg_index[k + 1] == k
+                            && !pair[0].infinity
+                            && !pair[1].infinity
+                            && pair[0].x == pair[1].x
+                    })
+            });
+            let mut from = 0;
+            while from < fb.points.len() {
+                // The first point has no signed twin. Keeping it in its
+                // own block makes every following eight-point block four
+                // complete pairs, ready for the existing paired SIMD kernel.
+                let to = if paired_layout && from == 0 {
+                    1
+                } else {
+                    (from + SCAN_BLOCK).min(fb.points.len())
+                };
+                self.scan_addends.clear();
+                self.scan_addends
+                    .extend(fb.points[from..to].iter().map(|&p| g.neg(p)));
+                self.scan_sums.clear();
+                self.scan_lambdas.clear();
+                #[cfg(target_arch = "x86_64")]
+                let simd_paired = if paired_layout && from > 0 {
+                    let pairs = self.scan_addends.len() / 2;
+                    debug_assert_eq!(2 * pairs, self.scan_addends.len());
+                    debug_assert!(pairs <= SCAN_BLOCK / 2);
+                    let (mut px, mut pya, mut pyb) = ([0u64; 4], [0u64; 4], [0u64; 4]);
+                    for (j, pair) in self.scan_addends.chunks_exact(2).enumerate() {
+                        debug_assert_eq!(pair[0].x, pair[1].x);
+                        px[j] = pair[0].x;
+                        pya[j] = pair[0].y;
+                        pyb[j] = pair[1].y;
+                    }
+                    self.scan_x3.clear();
+                    g.0.add_many_lazy_soa_paired(
+                        point,
+                        &px[..pairs],
+                        &pya[..pairs],
+                        &pyb[..pairs],
+                        &mut self.scan_x3,
+                        &mut self.scan_lambdas,
+                        &mut self.scan_scratch,
+                        self.scan_addends.len() as u64,
+                    )
+                } else {
+                    false
+                };
+                #[cfg(not(target_arch = "x86_64"))]
+                let simd_paired = false;
+                #[cfg(target_arch = "x86_64")]
+                if simd_paired {
+                    self.scan_sums.extend(
+                        self.scan_x3
+                            .iter()
+                            .copied()
+                            .map(|x| FastPoint::affine(x, 0)),
+                    );
+                }
+                if !simd_paired {
+                    g.0.add_many_lazy_paired_x(
+                        point,
+                        &self.scan_addends,
+                        &mut self.scan_sums,
+                        &mut self.scan_lambdas,
+                        &mut self.scan_scratch,
+                    );
+                }
+                assert_eq!(self.scan_sums.len(), self.scan_addends.len());
+                assert_eq!(self.scan_lambdas.len(), self.scan_addends.len());
+                // The batch has already formed all sums, even if an early
+                // probe hits. The ledger therefore charges the entire block.
+                ops.adds += self.scan_addends.len() as u64;
+                for (offset, (&rest, &lambda)) in
+                    self.scan_sums.iter().zip(&self.scan_lambdas).enumerate()
+                {
+                    if g.is_identity(&rest) {
+                        continue;
+                    }
+                    if let Some((i, j)) = table.probe_binary_lazy(
+                        g,
+                        fb,
+                        ops,
+                        &mut counters.lookups,
+                        point,
+                        rest,
+                        lambda,
+                    ) {
+                        return Some(vec![from + offset, i, j]);
+                    }
+                }
+                from = to;
+            }
+            return None;
+        }
         if !self.engine.is_window() {
             return decompose_mitm(g, fb, table, self.summands, ops, counters, point);
         }
@@ -677,6 +844,12 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                  (m = {}); no Groebner search",
                 self.summands
             ),
+            Some("rootfind-negfold-batch") => format!(
+                "root finding over the standard subspace on a negation-folded PairTable \
+                 built with batched binary additions; the same probe as rootfind-negfold \
+                 (m = {}); no Groebner search",
+                self.summands
+            ),
             Some("rootfind-window-negfold") => format!(
                 "root finding with negation-folded PairTable and cyclic third-summand window \
                  of length ⌈|F|/window_div⌉ (div={}); m = {}; no Groebner search",
@@ -698,14 +871,16 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         &[
             (
                 "m",
-                "summands; #1333 ran 3 (Semaev S4); rootfind and rootfind-negfold take 2 or 3; \
+                "summands; #1333 ran 3 (Semaev S4); rootfind, rootfind-negfold and \
+                 rootfind-negfold-batch take 2 or 3; \
                  window engines take 3 only",
             ),
             (
                 "engine",
                 "inherited-f4 (the control), f6-ic, matrix-f4, matrix-f5, rootfind (full \
                  PairSumTable), rootfind-window (m = 3 cyclic ⌈|F|/3⌉ window), \
-                 rootfind-negfold (PairTable negation fold, ~half set-up), or \
+                 rootfind-negfold (PairTable negation fold, ~half set-up), \
+                 rootfind-negfold-batch (same table with batched binary additions), or \
                  rootfind-window-negfold (window + negation fold)",
             ),
             (
@@ -719,12 +894,19 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                  refused under every rootfind* engine",
             ),
             (
+                "linear_harvest",
+                "optional, inherited-f4 and f6-ic only: off (the engine before PR #1862), \
+                 default (the library default now in force), gpv (PR #1862's gate alone) or \
+                 every (every node, no gate). Omitted: the library default, with the \
+                 method's identity unchanged. Refused under every other engine",
+            ),
+            (
                 "dimension",
                 "the base's; copied from koblitz-standard-subspace when omitted",
             ),
             (
                 "window_div",
-                "required under rootfind-window-negfold: window length ⌈|F|/div⌉; \
+                "under rootfind-window-negfold (default 3): window length ⌈|F|/div⌉; \
                  refused under other engines (rootfind-window stays fixed at div=3)",
             ),
         ]
@@ -756,9 +938,16 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         // Parameters that change the search have no default.
         let engine = params.get("engine").ok_or(
             "missing parameter `engine`; try inherited-f4, f6-ic, matrix-f4, matrix-f5, \
-             rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold",
+             rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch \
+             or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
+        self.scan_pair_layout = None;
+        if self.engine == Pdp3Engine::F6IcPair {
+            // Reuse within this pipeline solve, never across independent
+            // records or replayed records in the auditor process.
+            reset_f6_ic_pair_index_cache();
+        }
         let mut max_degree = 0u32;
         if self.engine.is_groebner() {
             let degree = params
@@ -780,6 +969,32 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             self.node_budget = budget
                 .parse()
                 .map_err(|_| format!("node_budget `{budget}` is not a number"))?;
+            self.linear_harvest = match params.get("linear_harvest") {
+                None => None,
+                Some(raw) => {
+                    if !matches!(
+                        self.engine,
+                        Pdp3Engine::InheritedF4 | Pdp3Engine::F6Ic | Pdp3Engine::F6IcPair
+                    ) {
+                        return Err(format!(
+                            "engine={} does not take linear_harvest (only inherited-f4 and \
+                             f6-ic harvest the root's linear rows)",
+                            self.engine.name()
+                        ));
+                    }
+                    Some(match raw {
+                        "off" => None,
+                        "default" => parse_linear_harvest("1"),
+                        "gpv" => parse_linear_harvest("gpv"),
+                        "every" => parse_linear_harvest("every"),
+                        other => {
+                            return Err(format!(
+                                "linear_harvest `{other}` is not off, default, gpv or every"
+                            ))
+                        }
+                    })
+                }
+            };
             self.scan_window_len = 0;
             self.window_div = 0;
             self.pair_table_points = 0;
@@ -789,7 +1004,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             // A root-finding engine has no Groebner search to bound.  A
             // bound it ignored would be a parameter in the method's
             // identity that changes nothing, so it is refused.
-            for key in ["degree", "node_budget"] {
+            for key in ["degree", "node_budget", "linear_harvest"] {
                 if params.get(key).is_some() {
                     return Err(format!(
                         "engine={} performs no Groebner search and takes no `{key}`",
@@ -804,17 +1019,21 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                     self.summands
                 ));
             }
-            // window_div changes the search; required under
+            // window_div changes the search; optional (default 3) under
             // rootfind-window-negfold, refused elsewhere (the fixed
             // rootfind-window engine keeps div=3 with no parameter).
             match self.engine {
                 Pdp3Engine::RootfindWindowNegfold => {
-                    let raw = params.get("window_div").ok_or(
-                        "engine=rootfind-window-negfold requires window_div (try 2, 3 or 4)",
-                    )?;
-                    let div: usize = raw
-                        .parse()
-                        .map_err(|_| format!("window_div `{raw}` is not a number"))?;
+                    // Absent means the window `rootfind-window-negfold` had
+                    // before the divisor became a parameter (`⌈|F|/3⌉`): the
+                    // committed parity cycle-1 session names the engine without
+                    // one and must keep replaying.  New specs should state it.
+                    let div: usize = match params.get("window_div") {
+                        None => 3,
+                        Some(raw) => raw
+                            .parse()
+                            .map_err(|_| format!("window_div `{raw}` is not a number"))?,
+                    };
                     if !(2..=8).contains(&div) {
                         return Err(format!("window_div must be 2..=8, got {div}"));
                     }
@@ -885,7 +1104,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                         "engine=rootfind-negfold needs a factor base with abscissa grouping".into(),
                     );
                 }
-                let table = PairTable::build_negation_folded(ctx.group, fb);
+                let table = if self.engine == Pdp3Engine::RootfindNegfoldBatch {
+                    PairTable::build_negation_folded_binary_batch(ctx.group, fb)
+                } else {
+                    PairTable::build_negation_folded(ctx.group, fb)
+                };
                 ops.merge(table.build_ops);
                 self.pair_neg = Some(table);
                 self.pair = None;
@@ -977,10 +1200,15 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         let target = view.instance().fast.lower(point);
         let decompose = match self.engine {
             Pdp3Engine::F6Ic => groebner_decompose_f6_ic,
+            Pdp3Engine::F6IcPair => groebner_decompose_f6_ic_pair_index,
             _ => groebner_decompose,
         };
         let before = f4_word_ops_thread();
+        let tally_before = bitop_tally::snapshot();
         let started = Instant::now();
+        // The harvest is a thread-local override, read on the solving
+        // thread; set for this solve and always cleared after it.
+        set_linear_harvest(self.linear_harvest);
         let (indices, stats) = decompose(
             kc,
             frob,
@@ -991,10 +1219,29 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             self.solver,
             self.node_budget,
         );
+        set_linear_harvest(None);
         let word_xors = f4_word_ops_thread().wrapping_sub(before);
         let wall_ns = started.elapsed().as_nanos() as u64;
         // The gate's point additions are group work: charge them.
         ops.adds += stats.geometric_group_additions;
+        // The whole call in `bitop/v1` primitives: the engine's word XORs
+        // (`ops`), everything else `bitop_tally` saw on this thread — the
+        // system's instantiation from its template (and the template's
+        // symbolic `F_{2^n}` build on the first call), the solver's
+        // Macaulay builds, column sorts and indexes, packing, pivot
+        // searches, read-back and splitting-tree scans, and the lift of
+        // each root (`F_{2^n}` operations and base lookups) — and the
+        // F6 gate's lookups, a hash probe each, and support checks, a
+        // word operation a coordinate.  The gate's point additions are
+        // group work, charged to `ops.adds` above, not here.
+        let mut tally = bitop_tally::snapshot().since(tally_before);
+        tally.hash_probes += stats.geometric_residual_lookups
+            + stats.geometric_fast_residual_lookups
+            + stats.geometric_pair_index_lookups;
+        tally.word_ops += (stats.geometric_support_checks + stats.geometric_partial_support_checks)
+            * u64::from(frob.ell);
+        let mut extra = stats_extra(&stats);
+        tally.put_complete(&mut extra, word_xors);
         let cost = SolverCost {
             ops: word_xors,
             op_unit: WORD_XOR_UNIT.into(),
@@ -1003,7 +1250,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             degree_reached: Some(stats.max_degree_built),
             solving_degree: None,
             timed_out: stats.exhausted,
-            extra: stats_extra(&stats),
+            extra,
         };
         self.totals.absorb(shape, Some(&cost), stats.exhausted);
         let indices = indices?;
@@ -1016,6 +1263,22 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 None
             }
         }
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        // The full pair-sum table inserts every unordered pair once; the
+        // negation-folded PairTable counts its own attempts; the algebraic
+        // engines build no table.
+        let mut c = match (&self.pair, &self.pair_neg) {
+            (Some(_), _) => {
+                let f = self.pair_table_points as u64;
+                BTreeMap::from([("table_insert_attempts".to_string(), f * (f + 1) / 2)])
+            }
+            (None, Some(t)) => t.work_counters(),
+            (None, None) => BTreeMap::new(),
+        };
+        c.insert("counted:table_insert_attempts".to_string(), 1);
+        c
     }
 
     fn setup_native(&self) -> BTreeMap<String, u64> {
@@ -1081,5 +1344,333 @@ pub fn plugins() -> BinaryPlugins {
             Some(Box::new(Pdp3KoblitzOracle::new(name, summands, instance))
                 as Box<dyn DecompositionOracle<BinaryGroup<'_>> + '_>)
         },
+    }
+}
+
+/// Committed sessions recorded before later changes altered what a
+/// registered method counts under the same id (`ecbench::legacy`): they
+/// must still replay bit for bit, each under the accounting that produced
+/// it.  The oracle lives in this binary, so the replays do too.
+#[cfg(test)]
+mod engine_names {
+    use super::{Pdp3Engine, Pdp3KoblitzOracle};
+
+    #[test]
+    fn f6_ic_pair_parses_and_shares_the_f6_solver() {
+        let engine = Pdp3Engine::parse("f6-ic-pair").unwrap();
+        assert_eq!(engine, Pdp3Engine::F6IcPair);
+        assert_eq!(engine.name(), "f6-ic-pair");
+        assert!(engine.is_groebner());
+        assert_eq!(engine.solver(3), Pdp3Engine::F6Ic.solver(3));
+    }
+
+    #[test]
+    fn binary_batch_table_engine_keeps_the_rootfind_contract() {
+        let engine = Pdp3Engine::parse("rootfind-negfold-batch").unwrap();
+        assert_eq!(engine.name(), "rootfind-negfold-batch");
+        assert!(engine.is_rootfind());
+        assert!(engine.is_negfold());
+        assert!(!engine.is_window());
+        assert_eq!(engine.solver(3), None);
+    }
+
+    #[test]
+    fn binary_batch_scan_keeps_scalar_first_witness_and_lookup_order() {
+        use super::{decompose_mitm, BinaryGroup, ColumnFold, FastPoint, GroupOps};
+        use super::{OracleCounters, PairTable};
+        use crypto_lib::cryptanalysis::ic_boundary::{koblitz_factor_base, koblitz_instance};
+        use crypto_lib::cryptanalysis::ic_framework::stages::InstanceCtx;
+        use crypto_lib::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+        use num_bigint::BigUint;
+
+        let inst = koblitz_instance(0, 13).expect("Koblitz E0 n13");
+        let frob = build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), 5)
+            .expect("standard subspace");
+        let fb = koblitz_factor_base(&inst, &frob, ColumnFold::Abscissa, "d5".into())
+            .expect("signed base");
+        assert_eq!(fb.points.len(), 33);
+        assert_eq!(fb.neg_index[0], 0, "the first K13 point is self-negative");
+        for k in (1..fb.points.len()).step_by(2) {
+            assert_eq!(fb.neg_index[k], k + 1, "K13 signed pair at {k}");
+            assert_eq!(fb.points[k].x, fb.points[k + 1].x);
+        }
+        let group = BinaryGroup(&inst.fast);
+        let table = PairTable::build_negation_folded_binary_batch(&group, &fb);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let mut batch = Pdp3KoblitzOracle::new("pdp3-binary", 3, &inst);
+        batch.engine = Pdp3Engine::RootfindNegfoldBatch;
+        batch.pair_neg = Some(table);
+        let mut points = Vec::new();
+        for k in 1..=256u64 {
+            points.push(
+                group
+                    .0
+                    .mul(inst.generator, &BigUint::from((53 * k % (inst.r - 1)) + 1)),
+            );
+        }
+        for k in [0, 1, fb.points.len() / 2, fb.points.len() - 1] {
+            points.push(
+                group
+                    .0
+                    .add(fb.points[k], group.0.add(fb.points[3], fb.points[7])),
+            );
+        }
+        points.push(fb.points[0]);
+        points.push(group.0.neg(fb.points[0]));
+        points.push(FastPoint::INFINITY);
+        for point in points {
+            let mut scalar_ops = GroupOps::default();
+            let mut scalar_ctr = OracleCounters::default();
+            let expected = decompose_mitm(
+                &group,
+                &fb,
+                batch.pair_neg.as_ref().unwrap(),
+                3,
+                &mut scalar_ops,
+                &mut scalar_ctr,
+                point,
+            );
+            let mut batch_ops = GroupOps::default();
+            let mut batch_ctr = OracleCounters::default();
+            let got =
+                batch.decompose_rootfind_negfold(&ctx, &fb, &mut batch_ops, &mut batch_ctr, point);
+            assert_eq!(got, expected, "first witness at {point:?}");
+            assert_eq!(batch_ctr.lookups, scalar_ctr.lookups);
+            // A completed eight-point block may do up to seven additions
+            // beyond the scalar first-hit point; misses do identical work.
+            assert!(batch_ops.adds >= scalar_ops.adds);
+            assert!(batch_ops.adds <= scalar_ops.adds + 7);
+        }
+        assert_eq!(batch.scan_pair_layout, Some(true));
+    }
+}
+
+#[cfg(test)]
+mod committed_replays {
+    use crypto_lib::cryptanalysis::ecbench::audit::{
+        replay_input_json, replay_record, replay_with_accounting,
+    };
+    use crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins;
+    use crypto_lib::cryptanalysis::ecbench::runner::read_records;
+    use crypto_lib::cryptanalysis::ecbench::spec::{plan, Spec};
+    use std::path::PathBuf;
+
+    fn root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+    }
+
+    /// Replay `seq` of `rel`; `None` when the checkout does not carry the session.
+    fn replay(rel: &str, seq: u64) -> Option<(bool, String)> {
+        register_binary_plugins(crate::binary_plugins());
+        let dir = root().join(rel);
+        dir.join("session.json")
+            .exists()
+            .then(|| replay_record(&dir, seq).unwrap())
+    }
+
+    #[test]
+    fn rootfind_records_predating_the_set_up_descriptors_replay() {
+        // oracle_setup then carried `pair_table_entries` alone.
+        let rel = "research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted";
+        if let Some((ok, detail)) = replay(rel, 59) {
+            assert!(ok && detail == "identical", "{detail}");
+        }
+    }
+
+    #[test]
+    fn inherited_f4_record_from_apple_silicon_replays_under_the_pre_2043_accounting() {
+        // Recorded on aarch64 before the eager rewrite and before the F4
+        // word XORs were priced: lazy rewrite, wall-priced solver term
+        // taken back out, 300,531 word XORs (current accounting: 301,961).
+        let rel = "research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted";
+        if let Some((ok, detail)) = replay(rel, 58) {
+            assert!(ok && detail.contains("pre-2043"), "{detail}");
+        }
+    }
+
+    #[test]
+    fn priced_inherited_f4_record_replays_under_the_pre_2043_priced_accounting() {
+        let rel = "research/ecbench_rootfind_faster_20261014/sessions/cycle1";
+        if let Some((ok, detail)) = replay(rel, 10) {
+            assert!(ok && detail.contains("pre-2043-priced"), "{detail}");
+        }
+    }
+
+    #[test]
+    fn f6_ic_ladder_record_replays_under_the_pre_1646_accounting() {
+        // Recorded 2026-10-05, before the early node oracle and the Four
+        // Russians echelon of #1646, the harvest and gate-first defaults.
+        let rel = "research/f6_ic_ecbench_ladder_20261005/sessions/n13";
+        for seq in [24, 25] {
+            if let Some((ok, detail)) = replay(rel, seq) {
+                assert!(ok && detail.contains("pre-1646"), "seq {seq}: {detail}");
+            }
+        }
+    }
+
+    #[test]
+    fn exhausted_inherited_f4_record_replays_under_the_pre_2043_accounting() {
+        let rel = "research/f6_ic_ecbench_ladder_20261005/sessions/n7";
+        if let Some((ok, detail)) = replay(rel, 1) {
+            assert!(ok, "{detail}");
+        }
+    }
+
+    #[test]
+    fn calibration_row_added_in_1640_is_not_applied_to_older_records() {
+        let rel = "research/ecbench_all_candidates_20261003/sessions/koblitz";
+        if let Some((ok, detail)) = replay(rel, 625) {
+            assert!(ok && detail.contains("pre-1646"), "{detail}");
+        }
+    }
+
+    /// Recorded 2026-10-24, before repair R8 (`59fcca75d4`, 2026-10-26)
+    /// narrowed the default linear harvest from `gpv OR rank >= 331` to the
+    /// rank gate: the `f4-m3-default` arm (every sixth seq from 2) harvests
+    /// fewer root rows today and counts fewer solver operations; the other
+    /// arms (`off`, `gpv`, m = 2) never differed.
+    #[test]
+    fn f4_default_harvest_record_replays_under_the_pre_r8_harvest_accounting() {
+        let rel = "research/f4_harvest_remeasure_20261024/sessions/K1n11";
+        for seq in [2, 8, 140] {
+            if let Some((ok, detail)) = replay(rel, seq) {
+                assert!(
+                    ok && detail.contains("pre-r8-harvest"),
+                    "seq {seq}: {detail}"
+                );
+            }
+        }
+        for seq in [1, 3, 4, 5] {
+            if let Some((ok, detail)) = replay(rel, seq) {
+                assert!(ok && detail == "identical", "seq {seq}: {detail}");
+            }
+        }
+    }
+
+    /// The profile excuses nothing the record does not reproduce, and is
+    /// offered to its producer alone.
+    #[test]
+    fn the_pre_r8_harvest_accounting_does_not_excuse_a_changed_count_or_binary() {
+        let rel = "research/f4_harvest_remeasure_20261024/sessions/K1n11";
+        if let Some((ok, detail)) = replay_edited(rel, 2, |r| {
+            *r.phases[2].native.get_mut("solver_ops").unwrap() += 1;
+        }) {
+            assert!(!ok, "{detail}");
+        }
+        if let Some((ok, detail)) = replay_edited(rel, 2, |r| {
+            r.binary_sha256 = Some("0".repeat(64));
+        }) {
+            assert!(!ok, "{detail}");
+        }
+    }
+
+    #[test]
+    fn window_negfold_without_a_divisor_is_the_original_third_window() {
+        let rel = "research/ecbench_rootfind_parity_20261013/sessions/cycle1";
+        if let Some((ok, detail)) = replay(rel, 17) {
+            assert!(ok, "{detail}");
+        }
+    }
+
+    /// Replay record `seq` of `rel` after `edit` has changed the record
+    /// (not its session): `None` when the checkout does not carry it.
+    fn replay_edited(
+        rel: &str,
+        seq: u64,
+        edit: impl FnOnce(&mut crypto_lib::cryptanalysis::ecbench::record::Record),
+    ) -> Option<(bool, String)> {
+        register_binary_plugins(crate::binary_plugins());
+        let dir = root().join(rel);
+        if !dir.join("session.json").exists() {
+            return None;
+        }
+        let spec_text = std::fs::read_to_string(dir.join("spec.json")).unwrap();
+        let p = plan(Spec::from_json(&spec_text).unwrap()).unwrap();
+        let mut records = read_records(&dir).unwrap();
+        let r = records.iter_mut().find(|r| r.seq == seq).unwrap();
+        edit(r);
+        let session = crypto_lib::cryptanalysis::ecbench::runner::read_session(&dir).unwrap();
+        let host: crypto_lib::cryptanalysis::ecbench::host::HostCapsule =
+            serde_json::from_str(&std::fs::read_to_string(dir.join("host.json")).unwrap()).unwrap();
+        Some(replay_with_accounting(
+            &replay_input_json(&p, r).unwrap(),
+            r,
+            &host,
+            &session,
+        ))
+    }
+
+    /// A legacy accounting is accepted only when the whole record
+    /// reproduces: one word XOR more in the record, and it does not.
+    #[test]
+    fn a_legacy_accounting_does_not_excuse_a_changed_count() {
+        let rel = "research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted";
+        if let Some((ok, detail)) = replay_edited(rel, 58, |r| {
+            *r.phases[2].native.get_mut("solver_ops").unwrap() += 1;
+        }) {
+            assert!(!ok, "{detail}");
+            assert!(detail.contains("phase counts"), "{detail}");
+        }
+    }
+
+    /// A record that names a binary no profile lists is replayed exactly:
+    /// the same committed record, one digit of its binary hash changed,
+    /// is not excused by any legacy accounting.  One case per profile, and
+    /// one for the set-up descriptors and the missing `window_div`.
+    #[test]
+    fn a_record_from_an_unlisted_binary_is_not_excused() {
+        let unlisted = "0".repeat(64);
+        let cases = [
+            // pre-2043: lazy rewrite, F4 solver term taken out
+            (
+                "research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted",
+                58,
+            ),
+            // pre-2043-priced
+            (
+                "research/ecbench_rootfind_faster_20261014/sessions/cycle1",
+                10,
+            ),
+            // pre-1646
+            ("research/f6_ic_ecbench_ladder_20261005/sessions/n13", 25),
+            // the calibration row of #1640, under pre-1646
+            (
+                "research/ecbench_all_candidates_20261003/sessions/koblitz",
+                625,
+            ),
+            // set-up descriptors the record predates
+            (
+                "research/ecbench_rootfind_engine_20261012/abandoned/claim-n13-interrupted",
+                59,
+            ),
+            // rootfind-window-negfold without window_div
+            (
+                "research/ecbench_rootfind_parity_20261013/sessions/cycle1",
+                17,
+            ),
+        ];
+        for (rel, seq) in cases {
+            let listed = replay_edited(rel, seq, |_| {});
+            let Some((ok, detail)) = listed else { continue };
+            assert!(ok, "{rel} seq {seq} replays as committed: {detail}");
+            let (ok, detail) = replay_edited(rel, seq, |r| {
+                r.binary_sha256 = Some(unlisted.clone());
+            })
+            .unwrap();
+            assert!(
+                !ok,
+                "{rel} seq {seq} excused from an unlisted binary: {detail}"
+            );
+            assert!(!detail.contains("accounting of the code"), "{detail}");
+        }
     }
 }

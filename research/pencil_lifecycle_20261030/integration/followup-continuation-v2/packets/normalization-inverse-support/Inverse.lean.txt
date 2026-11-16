@@ -1,0 +1,50 @@
+import Stored
+set_option autoImplicit false
+namespace NormalizationInverse
+open Polynomial MumfordNormalization MumfordValidity
+variable {K : Type*} [Field K]
+
+theorem affine_composition (a b c d : K) :
+ (affine a b).comp (affine c d)=affine (a*c) (a*d+b) := by
+ simp only [affine,add_comp,mul_comp,C_comp,X_comp,map_add,map_mul]
+ ring
+
+theorem transform_composition (n : ℕ) (a b c d : K) (f : K[X]) :
+ T n c d (T n a b f)=T n (a*c) (a*d+b) f := by
+ simp only [T,mul_comp,C_comp,comp_assoc,affine_composition]
+ rw [← mul_assoc,← map_mul]
+ congr 1
+ simp [mul_pow,mul_comm]
+
+theorem inverse_left (n : ℕ) (a b : K) (ha : a≠0) (f : K[X]) :
+ T n a⁻¹ (-b/a) (T n a b f)=f := by
+ rw [transform_composition]
+ have h : a*(-b/a)+b=0 := by field_simp; ring
+ rw [h,mul_inv_cancel₀ ha]
+ simp [T,affine]
+
+theorem inverse_right (n : ℕ) (a b : K) (ha : a≠0) (f : K[X]) :
+ T n a b (T n a⁻¹ (-b/a) f)=f := by
+ rw [transform_composition]
+ have h : a⁻¹*b+(-b/a)=0 := by field_simp; ring
+ rw [h,inv_mul_cancel₀ ha]
+ simp [T,affine]
+
+theorem transform_injective (n : ℕ) (a b : K) (ha : a≠0) :
+ Function.Injective (T n a b : K[X]→K[X]) := by
+ intro f g h
+ have he := congrArg (T n a⁻¹ (-b/a)) h
+ simpa only [inverse_left n a b ha] using he
+
+theorem valid_iff (a b : K) (ha : a≠0) (f u v : K[X]) :
+ Valid (T 6 a b f) (T u.natDegree a b u) (T 3 a b v) ↔ Valid f u v := by
+ constructor
+ · intro h
+   have h' := valid_transport a⁻¹ (-b/a) (inv_ne_zero ha) _ _ _ h
+   rw [natDegree_transport _ _ _ ha] at h'
+   simpa only [inverse_left _ a b ha] using h'
+ · exact valid_transport a b ha f u v
+
+theorem negation_commutes (n : ℕ) (a b : K) (v : K[X]) :
+ T n a b (-v)=-(T n a b v) := by simp [T]
+end NormalizationInverse

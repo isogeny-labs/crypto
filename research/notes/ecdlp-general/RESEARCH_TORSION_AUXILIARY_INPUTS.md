@@ -456,3 +456,21 @@ By AGENTS.md §3, against the boundary each row is entitled to.
    operations and `√(p/d)/Θ` less memory; that trade is where a
    large-instance run would be engineered, and the Fujitsu numbers say the
    two converge with distinguished-point tuning.
+
+## 11. Update 2026-10-22: Cheon on curves shaped like P-224, measured natively
+
+[`research/cheon_p224_shape_20261022/`](../../cheon_p224_shape_20261022/REPORT.md)
+(protocol pre-registered, native counted Cheon `n - 1` and `n + 1` in
+`src/cryptanalysis/cheon_counted.rs`, matched ecbench `rho.negation`, 7 sizes
+of 32 to 56 bits, 6 planted targets per curve, every answer verified) measures
+the scaling at P-224's `d / n` shapes (`d` about `n^0.129` for `n - 1`, `n^0.211`
+for `n + 1`). Fitted exponents of `log2(ops)` against `log2 n`: Cheon `n - 1`
+0.447 +- 0.012, Cheon `n + 1` 0.413 +- 0.013, rho 0.517 +- 0.024 and
+0.511 +- 0.028. `ops / F(n,d)` is 3.8 to 6.3 (`n - 1`, comb) and 11 to 19
+(`n + 1`), flat. **Extrapolation** (not measured, 168 bits beyond the
+largest curve): `2^101.7` and `2^95.6` at the P-224 shape against the
+formulas `2^97.5` and `2^88.4`. The `n + 1` variant consumes `2d = 2^48.3`
+leaked powers there. The constants above differ from section 6's (`15` to
+`34`, `125` to `185`) because the shapes, comb widths and polynomial-phase
+share differ; the two are not a matched comparison. Details, failures, the
+pre-registered predictions and the deviations are in the study's `REPORT.md`.

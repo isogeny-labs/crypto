@@ -1,7 +1,9 @@
 name: ECC2K-130 n19 sparse S3 growth gate
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, labeled]
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
+  push:
+    branches: [main]
     paths:
       - 'research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/**'
       - '.github/workflows/ecc2k130-s3-sparse-n19-growth.yml'
@@ -12,7 +14,7 @@ permissions:
   issues: read
 jobs:
   frozen-and-archive:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-s3-sparse-n19-growth.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-s3-sparse-n19-growth.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -24,25 +26,30 @@ jobs:
       - name: Exercise harmless Linux wall, direct-memory and descendant controls
         run: python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/test_resource_cap.py
       - name: Check source and input hashes; replay archive only when committed
-        run: |
-          python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py
-          if test -f research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final/receipt.json; then
-            python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py \
-              --evidence research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final
-          fi
+        env:
+          FROZEN_VIEW_STEP: |
+            python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py
+            if test -f research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final/receipt.json; then
+              python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py \
+                --evidence research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final
+            fi
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_s3_sparse_n19_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
   measured-first-attempt:
-    if: ${{ github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795 }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795)
     needs: frozen-and-archive
     concurrency:
       group: ecc2k130-n19-sparse-first-release-795
       cancel-in-progress: false
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-s3-sparse-n19-growth.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-s3-sparse-n19-growth.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
+          filter: blob:none
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

@@ -1,0 +1,13 @@
+PencilWordRefinement.distinct_word_branch_preserves (p : UInt64) [Fact (Nat.Prime p.toNat)]
+  (f : Polynomial (ZMod p.toNat)) (a b : PencilWordRefinement.WordD1) (hfive : 5 ≤ p.toNat) (hbound : p.toNat < 2 ^ 31)
+  (ha : PencilWordRefinement.WordD1.canonical p a) (hb : PencilWordRefinement.WordD1.canonical p b) (haz : a.z ≠ 0)
+  (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0) (hva : PencilWordRefinement.WordD1.normalizedValid p f a)
+  (hvb : PencilWordRefinement.WordD1.normalizedValid p f b)
+  (hx :
+    WeightedAdd11.nx (PencilWordRefinement.WordD1.decode p a) ≠
+      WeightedAdd11.nx (PencilWordRefinement.WordD1.decode p b)) :
+  have c := PencilWordRefinement.add11WordPayload p a b;
+  PencilWordRefinement.wordGuard p a b = PencilWordRefinement.Add11Branch.distinct ∧
+    PencilWordRefinement.WeightedWord.canonical p c ∧
+      c.z ≠ 0 ∧ c.w ≠ 0 ∧ PencilWordRefinement.WeightedWord.normalizedValid p f c
+'PencilWordRefinement.distinct_word_branch_preserves' depends on axioms: [propext, Classical.choice, Quot.sound]

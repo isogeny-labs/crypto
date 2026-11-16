@@ -1,0 +1,54 @@
+{
+  "schema": "n83.highk-report-review/v1",
+  "reviewed_pr_head": "8259b9bc8357967a4899e0990723845ab91460ba",
+  "integrated_base": "de2c78e5205efbc34753629736c548d4c11bfa51",
+  "review_merge_head": "1ae449723c0b259357c84a4e94d44eb4c17da224",
+  "independent_replay": {
+    "status": "PASS_IDENTICAL_INDEPENDENT_REPLAY",
+    "base_points": 594944,
+    "targets": 128,
+    "analysis_identical": true,
+    "summary_identical": true,
+    "command": "python3 -u review_replay.py",
+    "harness": "import importlib.util,sys,json,hashlib,pathlib\nroot=pathlib.Path(__file__).resolve().parent;study=root/'research/n83_root11_highk_screen_20261017';sys.path.insert(0,str(study))\nimport run,verify,summarize\nplan=json.loads((study/'plan.json').read_text());raw=pathlib.Path('/Volumes/SSD990/crypto/artifacts/n83_root11_highk_screen_20261017');cmd=json.loads((raw/'k3584/command.json').read_text())\noriginal_fixture=pathlib.Path(cmd['argv'][2]);assert run.digest(original_fixture)==run.digest(run.FIXTURE)==plan['sha256']['targets'];run.FIXTURE=original_fixture\nrun.SOURCE=pathlib.Path('/Volumes/T7/pr-repair-20261019/2091-frozen-example.rs')\nfrozen=run.frozen(pathlib.Path(plan['binary_path']));print('PASS frozen input, binary and original fixture-path binding',flush=True)\nactual=verify.verify_one(raw/'k3584',3584,frozen);expected=json.loads((study/'results/k3584_analysis.json').read_text());assert actual==expected;print('PASS complete independent arithmetic replay: 594944 base points and 128 targets; archived analysis identical',flush=True)\nassert summarize.summarize(raw)==json.loads((study/'summary.json').read_text())\nprint(json.dumps({'status':'PASS_IDENTICAL_INDEPENDENT_REPLAY','points':128,'base_points':actual['actual_usable_points'],'analysis_identical':True,'summary_identical':True}),flush=True)\n",
+    "source_binding": "run.SOURCE points to an unchanged git export of the pre-merge experiment source; run.FIXTURE points to the original command path after both copies matched the frozen target digest. Other frozen inputs are validated by run.frozen.",
+    "historical_source_sha256": "8a2fe55dd90dc33892c197d27260182bf783fc8212fb485d8297daf2bbba8e12",
+    "integrated_example_sha256": "8109fb33374ce2aa66c6a5a0b6e144d3b0143168ac756f9e0bd70af60a911829",
+    "first_attempt": "Arithmetic analysis matched; the following summary check rejected the newer example source restored from the base. The final fresh replay used an explicit retained-source binding and passed both checks.",
+    "producer_reexecuted": false
+  },
+  "lean": {
+    "status": "PASS",
+    "toolchain": "leanprover/lean4:v4.35.0",
+    "command": "lean +leanprover/lean4:v4.35.0 RootIndexCapacity.lean",
+    "declarations": 2,
+    "axioms": [
+      "propext",
+      "Quot.sound"
+    ]
+  },
+  "native_library": {
+    "status": "IDENTICAL_INPUT_REUSE",
+    "reference_commit": "c0274ce6e4c995e9e06c233b6ff223bb84b8a5c2",
+    "reference_recorded_passed": 4162,
+    "reference_recorded_failed": 0,
+    "compared_paths": [
+      "src",
+      "Cargo.toml",
+      "Cargo.lock",
+      "build.rs",
+      ".cargo"
+    ],
+    "changed_paths": [],
+    "limitation": "Previously completed validation reused for identical library inputs; no fresh library test execution in this report update."
+  },
+  "visual_review": {
+    "pdf_pages": 2,
+    "status": "PASS",
+    "benchmark_copy_identical": true
+  },
+  "logs": {
+    "review-replay.log": "425991343dc1e4da197a7724bdeb87507f4ad56abeb88070a5898012e1baee5c",
+    "review-lean.log": "7bcf7c921571941cc241b2c1aa38077adca3cde6b9f9668627d21e5270eac1f9"
+  }
+}

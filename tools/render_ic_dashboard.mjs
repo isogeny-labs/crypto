@@ -286,8 +286,39 @@ const rhoGraph = `<div class="rho-plot" data-measurement-chart role="group" aria
 let page = readFileSync(PAGE, 'utf8');
 const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
+// Recover the exact historical panel from its canonical committed source,
+// rather than depending on a previous render retaining it. These bytes come
+// from 0a0cb3e8f9:docs/index-calculus-scoreboard.html without recomputation.
+const threeLeadsRaw = readFileSync(resolve(ROOT, 'docs/ic/three-leads-e2e-panel.html'));
+assert.equal(sha(threeLeadsRaw), '23ee9d71ab77e9a5673fd8c15aa8edad06da22ad4c1cd0f798b932b3c01f8084', 'Historical three-leads panel changed; review its original evidence before changing the pin');
+const threeLeads = threeLeadsRaw.toString('utf8');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
+// GHS-weak E0/F_{q^3} plane-quartic panel: rendered from the committed frozen
+// summaries only (no arithmetic beyond formatting).
+function ghsWeakPanel() {
+  const read = rel => readFileSync(resolve(ROOT, rel), 'utf8').split('\n').filter(Boolean).map(line => JSON.parse(line));
+  const allRel = 'research/quartic_n4_20261019/results/summary_all.json';
+  const primRel = 'research/quartic_n4_20261019/results/summary_primary.json';
+  const all = read(allRel), prim = read(primRel);
+  const rows = all.filter(r => r.arm && r.q !== undefined && r.arm !== 'A0');
+  const fits = [...all.filter(r => r.fit), ...prim.filter(r => r.fit)];
+  const g3 = v => Number(v).toPrecision(3);
+  const cell = (r, i) => `${g3(r.ratio[i])} [${g3(r.ratio_lo[i])}, ${g3(r.ratio_hi[i])}]`;
+  const gh = rel => `https://github.com/aburan28/crypto/blob/main/${rel}`;
+  const body = rows.map(r => `<tr><td>${escape(r.arm)}</td><td class="n">${r.q}</td><td class="n">${r.units_ok}/${r.units}</td><td class="n">${r.rho_runs}</td><td>${cell(r,0)}</td><td>${cell(r,1)}</td><td>${cell(r,2)}</td><td>${escape(r.resolved)}</td></tr>`).join('');
+  const fitRows = fits.map((f, i) => `<tr><td>${escape(f.fit)}</td><td>${i < all.filter(r => r.fit).length ? 'all sizes' : 'primary range q &ge; 4051'}</td><td class="n">${f.sizes}</td><td>${g3(f.ic_exp_w0[0])} [${g3(f.ic_exp_w0[1])}, ${g3(f.ic_exp_w0[2])}]</td><td>${g3(f.rho_exp_w0[0])} [${g3(f.rho_exp_w0[1])}, ${g3(f.rho_exp_w0[2])}]</td><td>${g3(f.gap_w0[0])} [${g3(f.gap_w0[1])}, ${g3(f.gap_w0[2])}]</td></tr>`).join('');
+  const big = rows.filter(r => r.arm === 'B0').at(-1);
+  return `<section class="dash-section" id="ghs-weak-n4-20261019" aria-labelledby="ghs-weak-n4-title" data-collapse="open">
+<div class="dash-section-head"><div><p class="dash-kicker">GHS-weak family E0/F<sub>q<sup>3</sup></sub> with 4 | #E0(K) / plane-quartic index calculus / one target cold</p><h2 id="ghs-weak-n4-title">Below matched rho on one special family, with a smaller exponent.</h2><p class="panel-summary">IC/rho reads ${cell(big,0)} at q = ${big.q} (w = 0), down from above 1 at small q; all IC units verified and the order holds across 0, 0.1 and 1 GAE per unpriced operation for q &ge; 4051. Restricted to this GHS-weak family; not generic curves, not prime-order E/F<sub>q<sup>3</sup></sub>, not a standard curve.</p></div><span class="status good">Advance · special family only</span></div>
+<p class="dash-section-intro">Relation collection with a reduced factor base and one large prime, Lanczos modulo ell, and descent by canonical Pic<sup>0</sup> arithmetic, with no subgroup enumeration. The reference is a matched plain Pollard rho (no negation map) on the same E0(K) subgroup, in F<sub>q</sub>-multiplication equivalents, one cold target, shared 4-core VM with L0 isolation. Arm A0r (all rational points as the factor base) is the baseline for the improvement. Intervals are 95% bootstrap.</p>
+<div class="scroll"><table><caption>IC over matched rho, from the frozen summary.</caption><thead><tr><th>arm</th><th>q</th><th>units ok</th><th>rho runs</th><th>IC/rho, w = 0</th><th>w = 0.1</th><th>w = 1</th><th>resolved</th></tr></thead><tbody>${body}</tbody></table></div>
+<div class="scroll"><table><caption>Fitted cost exponents.</caption><thead><tr><th>arm</th><th>range</th><th>sizes</th><th>IC exponent (w = 0)</th><th>rho exponent (w = 0)</th><th>gap rho &minus; IC</th></tr></thead><tbody>${fitRows}</tbody></table></div>
+<p><a href="${gh('research/quartic_n4_20261019/README.md')}">Report</a> &middot; <a href="${gh(allRel)}">Frozen summary, all sizes</a> &middot; <a href="${gh(primRel)}">primary range</a> &middot; <a href="ic-leaderboard.html#ghs-weak-n4-20261019">Leaderboard section</a></p>
+</section>`;
+}
 const retainedPanels = [
+  ['ghs-weak-n4-20261019','GHS-weak family: plane-quartic index calculus against matched rho · 19 October 2026'],
+  ['conductor-gap-native-20261015','Conductor-gap native controls: paired solves and generic recurrence · 15 October 2026'],
   ['cold-compact-orbit-20261003','Historical compact-orbit cold-cost panel'],
   ['full-rank-compact-orbit-20261003','Historical compact-orbit full-rank panel'],
   ['n61-compact-orbit-hosted-20261003','n61 compact-orbit autolab panels · hosted isolated reruns'],
@@ -298,16 +329,32 @@ const retainedPanels = [
   ['drastic-conductor-gap-20261012','Drastic prime conductor gaps: ECDLP on both ends · 12 October 2026'],
   ['drastic-conductor-gap-round2-20261012','Drastic prime conductor gap round 2: the j = 0 crater · 12 October 2026'],
   ['drastic-conductor-gap-round3-20261012','Drastic prime conductor gap round 3: paired targets · 12 October 2026'],
+  ['n83-tier1-cold-20261016','N83 Tier 1 cold factor-base holdout · 16 October 2026'],
   ['lab-ecbench-all','Cross-method evidence · every measured candidate'],
   ['lab-pair-claw','Pair claw of cryptanalysis#175 · same-target strong rho'],
   ['lab-progress','Research progress over time · separate regimes and references'],
   ['lab-currency','How new results update this dashboard']
 ].map(([id,label])=>{
-  let html = section(oldFront,id);
+  let html = id === 'ghs-weak-n4-20261019' ? ghsWeakPanel() : section(oldFront,id);
+  if (id === 'conductor-gap-native-20261015') {
+    html = readFileSync(resolve(ROOT,'research/conductor_gap_cm_orbits_20261015/native/dashboard_panel.html'),'utf8').trimEnd();
+    assert.ok(html.includes(`id="${id}"`), 'Native conductor panel source lost its identity');
+  }
   if (id === 'lab-progress') {
     const marker = /(<script type="application\/json" id="progress-data">)[\s\S]*?(<\/script>)/;
     assert.ok(marker.test(html), 'Progress panel has no canonical data embed');
     html = html.replace(marker, (_, start, end) => start + progressRaw.toString('utf8') + end);
+    const timeline = JSON.parse(progressRaw);
+    const table = /(<summary>Every plotted point as a table<\/summary>[\s\S]*?<tbody>)[\s\S]*?(<\/table>)/;
+    assert.ok(table.test(html), 'Progress panel has no plotted-point table');
+    const rows = timeline.series.flatMap(series => series.points.map(point => {
+      assert.ok(Number.isFinite(point.value), `Invalid progress value: ${point.label}`);
+      const unit = point.unit ? `<br><small>${escape(point.unit)}</small>` : '';
+      // Keep each result's cost boundary, uncertainty and reference limitations
+      // beside its value; these are recorded descriptions, not new estimates.
+      return `<tr><td>${escape(point.date)}</td><td>${escape(series.label)}<br><small>${escape(series.note)}</small></td><td>${escape(point.label)}<br><small>${escape(point.detail)}</small></td><td class="n">${point.value}&times;${unit}</td><td>${escape(point.reference)}</td><td><span class="chip">${escape(point.class)}</span></td><td><a href="${escape(point.anchor)}">panel</a> &middot; <a href="${escape(point.source)}">source</a></td></tr>`;
+    })).join('\n');
+    html = html.replace(table, (_, start, end) => start + '\n' + rows + '\n</tbody>' + end);
   }
   return {id,label,html};
 });
@@ -397,6 +444,7 @@ ${[['rho-strong','Strong signed-Frobenius rho','—','—'],['ic-k8','K8','592',
 
 <section class="dash-section" id="lab-next" aria-labelledby="next-title"><div class="dash-section-head"><div><p class="dash-kicker">05 / Tournament design</p><h2 id="next-title">A local win is a candidate, not a final answer.</h2></div></div><div class="tournament-flow" aria-label="Proposed tournament flow"><article><span class="flow-number">01 / EXPLORE</span><strong>Keep diverse candidates</strong><p>Different bases, solver families and stage combinations. Preserve alternatives with different resource tradeoffs.</p></article><article><span class="flow-number">02 / ADMIT</span><strong>Pass correctness gates</strong><p>Source identity, natural yield, failed attempts, complete costs and verified recovered answers.</p></article><article><span class="flow-number">03 / COMPARE</span><strong>Pair frozen workloads</strong><p>Same fresh point, resources and reference. Screening and untouched confirmation have separate roles.</p></article><article><span class="flow-number">04 / DECIDE</span><strong>Promote or retain</strong><p>Apply the declared uncertainty gate. Keep negative outcomes and useful alternatives for later combinations.</p></article></div><div class="next-callout"><span class="status pending">Next gate</span><div><strong>Produce both native natural-yield records.</strong><p>Use each exact pipeline, retaining failed attempts. Then freeze new target exclusions, calibrated resources and strong references before a fresh paired tournament. The three historical confirmation sets remain closed.</p></div></div><p class="dash-footnote panel-summary">This diagram describes the proposed process. It does not claim that a fresh F5/SAT tournament has run, or that any implementation is globally fastest.</p></section>
 
+${threeLeads}
 <section class="dash-library-intro" id="evidence-search" aria-labelledby="library-title"><p class="dash-kicker">06 / Evidence</p><h2 id="library-title">Open the detail you need.</h2><p class="panel-summary">The historical ledger contains other curves, cost units and questions. Its reports are preserved; they are not a combined leaderboard.</p><label for="evidence-query">Search historical reports</label><input id="evidence-query" type="search" placeholder="Frobenius, F5, rho, factor base…" autocomplete="off" aria-controls="evidence-results"><p id="evidence-count" aria-live="polite"></p><ul id="evidence-results"></ul><noscript><p>Open the full ledger below and use your browser’s Find command.</p></noscript></section><details class="dash-details" id="historical-regimes"><summary>Historical best results by regime · different workloads and accounting</summary><div class="dash-detail-body">${historical}</div></details>
 ${historicalDetails}
 </main>
@@ -411,6 +459,7 @@ page = page.replace(/<link[^>]*href="https:\/\/fonts\.[^"]*"[^>]*>\n?/g, '');
 page = page.replace('it loads two webfont\n  families from Google Fonts and needs nothing else.', 'its overview needs no network requests\n  or installed dependencies.');
 assert.equal(between(page, '<div id="legacy-evidence">', '<!-- END IC EVIDENCE LIBRARY -->'), ledgerBefore, 'Historical ledger changed');
 assert.ok(page.includes(historical), 'Historical regime summary lost');
+assert.ok(page.includes(threeLeads), 'Three-leads results panel lost');
 for (const panel of retainedPanels) assert.ok(page.includes(panel.html), `Historical panel lost: ${panel.id}`);
 const data = {
   schema_version: 3, scope: 'bounded IC autolab overview; not all repository research',
@@ -431,6 +480,7 @@ const data = {
   rho_online_table: Object.values(rows).map(row=>Object.fromEntries(['alias','online_ms','rho_online_over_IC_online','verified','scheduled'].map(key=>[key,row[key]]))),
   historical_ledger_sha256: sha(ledgerBefore), historical_regime_summary_sha256: sha(historical),
   historical_overview_panels: retainedPanels.map(panel=>({section_id:panel.id,sha256:sha(panel.html)})),
+  three_leads_panel_sha256: sha(threeLeads),
   progress_timeline_sha256: sha(progressRaw)
 };
 const output = JSON.stringify(data,null,2) + '\n';

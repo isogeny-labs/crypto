@@ -1,0 +1,595 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "MEAS-20261103-ic-cofactor-clear-h1-control",
+  "version": 1,
+  "created": "2026-11-03",
+  "repository": "crypto",
+  "study_dir": "research/ic_cofactor_clear_ab_20261103",
+  "authors": [
+    "Claude Code session (crypto, ecbench lane)"
+  ],
+  "links": {
+    "prereg": "research/ic_cofactor_clear_ab_20261103/PREREG.md",
+    "spec": "research/ic_cofactor_clear_ab_20261103/specs/h1-negative-control.json",
+    "note": "Hypothesis test, not a result. Pre-data evidence is the freeze timestamp in this file and the S3 checkpoint pushed by the repository run gate; no local commit precedes the data (see PREREG.md section 4).",
+    "main_protocol": "research/ic_cofactor_clear_ab_20261103/protocol-v2.json"
+  },
+  "question": "On 14 prime-order 26-bit curves (cofactor 1), where [h]P = P and clearing the cofactor cannot change which points are in the base, does the prime-projected-abscissa base give the same end-to-end counted S as prime-abscissa at 64 columns? (Negative control for MEAS-20261103-ic-cofactor-clear-v2.)",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Equivalence: the 95% interval of G_0 = sum S(ic-raw) / sum S(ic-clear) lies inside [0.95, 1.05] at 0 GAE per unpriced native operation, so any gain in the main protocol is not an artefact of the arm plumbing.",
+      "class": "comparative",
+      "decided_by": [
+        "C-main"
+      ],
+      "if_supported": "the V2 gain can be read as a cofactor effect",
+      "if_not_supported": "the main verdict is invalid_controls"
+    },
+    {
+      "id": "C2",
+      "text": "The positive control holds: rho-plain / rho-neg has a 95% lower limit above 1.2.",
+      "class": "comparative",
+      "decided_by": [
+        "C-positive"
+      ]
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "With h = 1 the projection is the identity, so the two bases coincide up to scan bookkeeping and G_0 is 1.",
+      "mechanism": "[1]P = P; prime-projected-abscissa and prime-abscissa scan the same abscissae in the same order.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "M-gain-w0",
+          "direction": "equal_within",
+          "minimum_effect": "95% interval of G_0 inside [0.95, 1.05]",
+          "role": "decisive",
+          "provenance": {
+            "written_at": "2026-11-03",
+            "first_recorded_in": "research/ic_cofactor_clear_ab_20261103/PREREG.md",
+            "data_seen": [],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "14 prime_search curves, seeds 20261200..20261213"
+          }
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "matched strong rho: rho.negation, the census reference arm",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "rho-plain",
+      "role": "control_positive",
+      "description": "rho.plain: a known counted-operation effect against rho.negation (negation fold, about sqrt 2); proves the paired detector sees a real counted difference",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "same_instrument_as": "rho-neg",
+      "parameters": {
+        "method": "rho.plain"
+      }
+    },
+    {
+      "id": "ic-raw",
+      "role": "baseline",
+      "description": "the census ic arm: ic.pipeline, prime-abscissa:size=64, mitm:negation_folded=1",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "same_instrument_as": "rho-neg",
+      "parameters": {
+        "factor_base": "prime-abscissa:size=64",
+        "oracle": "mitm:negation_folded=1"
+      }
+    },
+    {
+      "id": "ic-clear",
+      "role": "control_negative",
+      "description": "the cofactor-cleared arm on curves where h = 1 (negative control: it cannot matter here)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "same_instrument_as": "rho-neg",
+      "parameters": {
+        "factor_base": "prime-projected-abscissa:size=64,scan_cap=4096",
+        "oracle": "mitm:negation_folded=1"
+      }
+    },
+    {
+      "id": "ic-raw-aa",
+      "role": "control_aa",
+      "description": "A/A: the ic-raw arm run again under its own derived algorithm seeds, to give the noise floor of the paired ratio",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "same_instrument_as": "ic-raw",
+      "parameters": {
+        "factor_base": "prime-abscissa:size=64",
+        "oracle": "mitm:negation_folded=1"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "rho-plain",
+      "expected_detection": "rho-plain / rho-neg priced S ratio with a 95% lower limit above 1.2 (negation fold, about sqrt 2)",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "ic-clear",
+      "null_population": {
+        "description": "14 prime-order 26-bit curves (cofactor 1), same five arms and analysis as the main protocol",
+        "generator": "ecbench prime_search, bits 26, seeds 20261200..20261213",
+        "n": 14,
+        "why_n": "14 workload clusters, the same number as the main population",
+        "matched_on": [
+          "field size (26 bits)",
+          "arms, base size 64 and oracle",
+          "number of curves and targets per curve",
+          "analysis commands"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "factor_base",
+        "levels": [
+          "prime-abscissa:size=64",
+          "prime-projected-abscissa:size=64,scan_cap=4096"
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "rho.plain",
+          "ic.pipeline"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "binary",
+        "treatment": "fixed",
+        "value": "b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4",
+        "how": "one ecbench binary for every arm; hash recorded in every record"
+      },
+      {
+        "name": "oracle",
+        "treatment": "fixed",
+        "value": "mitm:negation_folded=1",
+        "how": "same method params on both ic arms"
+      },
+      {
+        "name": "base_size",
+        "treatment": "fixed",
+        "value": 64,
+        "how": "size=64 on both ic arms"
+      },
+      {
+        "name": "curves",
+        "treatment": "fixed",
+        "value": "14 prime_search curves, bits 26, seeds 20261200..20261213 (prime order, h = 1)",
+        "how": "listed in specs/h1-negative-control.json"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "8 planted_shared targets per curve, target_seed 20261104",
+        "how": "ecbench derives the same target for every arm"
+      },
+      {
+        "name": "algorithm_seeds",
+        "treatment": "randomized",
+        "how": "ecbench derives each execution's seed from spec.measurement.seed (20261103); recorded in every record"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "measurement.order = alternate, interleaved by round"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "host.json of the session: shared KVM VM, no readable PMU, graded L1"
+      },
+      {
+        "name": "isolation",
+        "treatment": "measured",
+        "how": "per-record isolation level; counted metrics are independent of it"
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "value": "none",
+        "how": "local run, no spot capacity, no checkpoint/resume"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "single analysis path",
+        "how": "ecbench compare/band commands listed in analysis_plan, fixed before data"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-main",
+        "arms": [
+          "ic-raw",
+          "ic-clear"
+        ],
+        "differs_in": [
+          "factor_base"
+        ],
+        "design": "one_factor",
+        "reason": "equivalence test at h = 1",
+        "threshold": "95% interval of G_0 inside [0.95, 1.05]"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "ic-raw",
+          "ic-raw-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": "noise floor",
+        "threshold": "95% interval contains 1"
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "rho-neg",
+          "rho-plain"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "reason": "known counted effect",
+        "threshold": "lower limit of rho-plain / rho-neg > 1.2"
+      },
+      {
+        "id": "C-gap",
+        "arms": [
+          "ic-raw",
+          "ic-clear",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "confounded",
+        "reason": "distance remaining to the matched rho, reported not decided",
+        "threshold": null
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "ecbench measurement.order = alternate over 4 measured rounds after 1 warm-up round",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261104
+      ],
+      "note": "spec.measurement.seed and workloads.target_seed are both 20261104; ecbench derives every execution algorithm seed from them"
+    },
+    "instance_sampling": {
+      "rule": "14 prime_search curves with seeds 20261200..20261213, 8 targets each, fixed in advance",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "no masking: the analysis is a fixed ecbench command list run on all arms identically and its commands and thresholds are frozen here before data"
+    }
+  },
+  "sample_size": {
+    "instances": 112,
+    "replicates": 4,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "other",
+      "passes": true,
+      "note": "no power calculation was run; this is an assumption. The interval is reported whatever its width. The 3x threshold is large relative to the interval width expected from 112 paired units (assumed relative half-width of order 10%). Correction: intersection-union over the three weights, no alpha adjustment."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 60,
+      "per_sample_seconds": 0.5,
+      "threads": 1,
+      "estimated_total_seconds": 2860,
+      "measured_on": "not measured on this spec: estimated from the 72-execution smoke run of the same binary on this host (5.9 s wall, 20-bit curve), scaled up; no pilot of this spec was run because it would show counted results"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "M-gain-w0",
+        "name": "end-to-end S gain, unpriced work at 0 GAE",
+        "unit": "ratio of totals sum S(ic-raw) / sum S(ic-clear)",
+        "kind": "derived",
+        "definition": "over matched (workload, round) pairs of the 112 V2 workloads and 4 measured rounds, total S of ic-raw divided by total S of ic-clear; S is total GAE over the session floor, all phases (factor base, oracle set-up, relations, linear algebra, solve)",
+        "source": "records.jsonl cost.s; ecbench compare --a ic-clear --b ic-raw --weight 0",
+        "formula": "sum S_raw / sum S_clear",
+        "aggregation": "paired_ratio",
+        "uncertainty": "paired_bootstrap_ci95",
+        "resolution": null
+      }
+    ],
+    "secondary": [
+      {
+        "id": "M-gain-w01",
+        "name": "S gain at 0.1 GAE per unpriced native operation",
+        "unit": "ratio of totals",
+        "kind": "derived",
+        "definition": "as M-gain-w0 with every unpriced native operation priced at 0.1 GAE on both arms",
+        "source": "ecbench compare --weight 0.1",
+        "formula": "sum S_raw / sum S_clear",
+        "aggregation": "paired_ratio",
+        "uncertainty": "paired_bootstrap_ci95",
+        "resolution": null
+      },
+      {
+        "id": "M-gain-w1",
+        "name": "S gain at 1 GAE per unpriced native operation",
+        "unit": "ratio of totals",
+        "kind": "derived",
+        "definition": "as M-gain-w0 at 1 GAE per unpriced native operation",
+        "source": "ecbench compare --weight 1",
+        "formula": "sum S_raw / sum S_clear",
+        "aggregation": "paired_ratio",
+        "uncertainty": "paired_bootstrap_ci95",
+        "resolution": null
+      },
+      {
+        "id": "M-trials",
+        "name": "trials per relation ratio (mechanism)",
+        "unit": "ratio",
+        "kind": "counted",
+        "definition": "phases[relations].native.trials / native.relations for ic-raw divided by the same for ic-clear; reported only",
+        "source": "records.jsonl phases[].native",
+        "formula": null,
+        "aggregation": "mean",
+        "uncertainty": "bootstrap_ci95",
+        "resolution": null
+      },
+      {
+        "id": "M-gap",
+        "name": "distance remaining to matched rho",
+        "unit": "ratio of totals S(ic arm) / S(rho-neg)",
+        "kind": "derived",
+        "definition": "for ic-raw and ic-clear at each pricing weight; reported, not a gate",
+        "source": "ecbench compare --a rho-neg --b <ic arm>",
+        "formula": "sum S(ic arm) / sum S(rho-neg) over matched pairs",
+        "aggregation": "paired_ratio",
+        "uncertainty": "paired_bootstrap_ci95",
+        "resolution": null
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L1",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "total_gae",
+      "phases[].adds",
+      "phases[].doubles",
+      "phases[].scalar_mults",
+      "phases[].native"
+    ],
+    "record": [
+      "records.jsonl",
+      "session.json",
+      "host.json",
+      "plan.json",
+      "spec.json"
+    ],
+    "timed_primary_justification": "the primary metric is counted S (group operations), valid at any isolation level; no wall-clock figure is a decision input"
+  },
+  "execution": {
+    "backend": "local",
+    "measurement_class": "measurement",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": 0,
+      "grace_seconds": 0,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "run all 2800 planned executions (112 units x 5 arms x 5 rounds including warm-up)",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "invalidate and report if any record is not verified, or the A/A, positive or negative control fails",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "valid if the 95% interval of G_0 lies inside [0.95, 1.05] and the positive control (rho-plain / rho-neg) has a lower limit above 1.2. A failure makes the main protocol verdict invalid_controls.",
+    "comparison_ids": [
+      "C-main",
+      "C-positive"
+    ],
+    "threshold": "G_0 interval inside [0.95, 1.05]",
+    "statistic": "ratio of totals B/A over matched (workload, round) pairs as defined in src/cryptanalysis/ecbench/compare.rs, workloads as clusters",
+    "interval": "ecbench compare primary ci95 (linearised delta-method interval, workloads as clusters, Student t); the percentile bootstrap beside it (4000 resamples, seed 20261002) is reported too",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "ratio of means G_w",
+    "verdict_vocabulary": [
+      "advances",
+      "trades",
+      "matches",
+      "regresses",
+      "invalid_controls"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/ic_cofactor_clear_ab_20261103/analysis.sh",
+      "sha256": "b8646be78ac90a925586cecb1b22f7c2a9c6f67f823e89e6de4cf27c670cbe5c"
+    },
+    "inputs": [
+      "<session>/records.jsonl",
+      "<session>/session.json"
+    ],
+    "outputs": [
+      "comparison JSON per command",
+      "band report"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1"
+  },
+  "literature": [
+    {
+      "ref": "src/cryptanalysis/ic_framework/plugins.rs PrimeProjectedAbscissaBase",
+      "provenance": "internal",
+      "claim": "the treatment already exists as the prime-projected-abscissa factor base"
+    },
+    {
+      "ref": "crypto-autoresearcher knowledge/leads/ecdlp/ic-binary/LEAD-ICB-cofactor-projected-ladder-base.yaml",
+      "provenance": "internal",
+      "claim": "same lever measured at 1.29x, 1.58x, 3.36x on binary random curves, h = 2, 2, 6; engineering class"
+    },
+    {
+      "ref": "research/pdp_literature_leads_20261022/leads/LEAD-19.md",
+      "provenance": "internal",
+      "claim": "mechanism and desk estimate"
+    },
+    {
+      "ref": "src/cryptanalysis/ic_framework/fiber.rs",
+      "provenance": "internal",
+      "claim": "fiber-aware oracles recover the same yield from the oracle side; not tested here"
+    }
+  ],
+  "inadmissible": [
+    "any session whose ecbench verify --replay-all reports a problem",
+    "any record whose outcome.status is not verified, unless it is a censored pair reported as a bound",
+    "any session recorded with git_dirty true, or a binary_sha256 other than the pinned one",
+    "any arm result from a session in which the A/A, positive or negative control failed (the verdict is invalid_controls)"
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "dc582b4525fab3358519a5a72e14f7bf3e7c947c9773472bde486416b8fc919b",
+    "commit": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+    "frozen_at": "2026-11-03T02:08:20Z",
+    "filed_before_affected_data": false
+  }
+}

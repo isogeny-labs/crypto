@@ -1,0 +1,56 @@
+import Find
+set_option autoImplicit false
+namespace FindReviewer
+open GraphFind SignedGraphAlgebra
+abbrev F:=ZMod 17
+def s : State F 5 :=
+ ⟨fun i=>if i=1 then 0 else if i=2 then 1 else if i=3 then 2 else i,
+ fun i=>if i=1 then ⟨-1,2,3⟩ else if i=2 then ⟨1,5,-2⟩ else if i=3 then ⟨-1,-4,6⟩ else ident⟩
+def rank (i:Fin 5):Nat:=i.val
+def vals (i:Fin 5):F:=if i=0 then 7 else if i=1 then 1 else if i=2 then 2 else if i=3 then 6 else 9
+def p1:Potential F:=compose (s.pot 1) ident
+def t1:State F 5:=compress s 1 0 p1
+def p2:Potential F:=compose (t1.pot 2) p1
+def t2:State F 5:=compress t1 2 0 p2
+def p3:Potential F:=compose (t2.pot 3) p2
+def t3:State F 5:=compress t2 3 0 p3
+
+theorem depth_three_run : Run s 3 t3 0 p3 := by
+ apply Run.step s t2 3 0 p2 (by decide)
+ change Run s 2 t2 0 p2
+ apply Run.step s t1 2 0 p1 (by decide)
+ change Run s 1 t1 0 p1
+ apply Run.step s s 1 0 ident (by decide)
+ exact Run.root s 0 (by decide)
+theorem valid_forest : Forest s rank := by unfold Forest s rank; decide
+theorem valid_values : Represents s vals 2 := by unfold Represents s vals eval ident; decide
+theorem signed_offsets : p3.s=1 ∧ p3.a=(-11:F) ∧ p3.b=5 := by decide
+theorem global_preservation : Represents t3 vals 2 :=
+ (run_preserves s t3 3 0 p3 depth_three_run rank vals 2 valid_forest valid_values).2.1
+theorem global_forest : Forest t3 rank :=
+ (run_preserves s t3 3 0 p3 depth_three_run rank vals 2 valid_forest valid_values).1
+theorem recursive_post_read_frame : t2.pot 3=s.pot 3 ∧ t2.parent 3=s.parent 3 := by constructor <;> rfl
+theorem unrelated_node_unchanged : t3.parent 4=s.parent 4 ∧ t3.pot 4=s.pot 4 := by constructor <;> rfl
+theorem all_path_nodes_compressed : t3.parent 1=0 ∧ t3.parent 2=0 ∧ t3.parent 3=0 := by decide
+theorem incorrect_unsigned_composition : (7+2+5-4+(3-2+6)*2:F)≠vals 3 := by decide
+def bad : State F 5 := ⟨t3.parent,fun _=>ident⟩
+theorem bad_potentials_break_representation : ¬Represents bad vals 2 := by unfold Represents bad t3 compress vals eval ident; decide
+
+theorem run_has_initial_root {K:Type*} [CommRing K] {n:Nat}
+ (s t:State K n) (x r:Fin n) (p:Potential K) (h:Run s x t r p) :
+ ∃j,s.parent j=j := by
+ induction h with
+ | root x h => exact ⟨x,h⟩
+ | step t x r q hn rec ih => exact ih
+
+def cycle : State F 2 := ⟨fun i=>if i=0 then 1 else 0,fun _=>ident⟩
+theorem cyclic_no_root : ¬∃j,cycle.parent j=j := by decide
+theorem cyclic_no_run (t:State F 2) (r:Fin 2) (p:Potential F) : ¬Run cycle 0 t r p := by
+ intro h; exact cyclic_no_root (run_has_initial_root cycle t 0 r p h)
+theorem cyclic_no_rank (r:Fin 2→Nat) : ¬Forest cycle r := by
+ intro h
+ have h0:=h 0
+ have h1:=h 1
+ simp [cycle] at h0 h1
+ omega
+end FindReviewer

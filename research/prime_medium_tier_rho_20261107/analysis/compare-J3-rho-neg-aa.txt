@@ -1,0 +1,14 @@
+ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 0.9955 [0.991, 1.000], an A/A control (nothing to correct); end-to-end wall 0.9955 [0.991, 1.000]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 63 / 100; paired attempts 24, verified 24, admitted 9; levels {"L1": 15, "L2": 9}; p95 foreign busy 0.54%, p95 run queue 0.00%
+arm rho-neg: verified 24/24 (0 censored); max/median S 1.97, top run 8% of total; unpriced: canonicalisations_uncharged=460157567
+arm rho-neg-aa: verified 24/24 (0 censored); max/median S 1.97, top run 8% of total; unpriced: canonicalisations_uncharged=460157567
+| curve | log2 r | workloads | rho-neg-aa / rho-neg | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+
+| workload | curve | log2 r | rho-neg mean S | rho-neg-aa mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W083aa423c82d | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8437 | 0.8437 | 1.0000 |
+| W0b94780ff2c4 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0467 | 1.0467 | 1.0000 |
+| W564f70d9fbd8 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0336 | 1.0336 | 1.0000 |
+| W6153c7edee00 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0857 | 1.0857 | 1.0000 |

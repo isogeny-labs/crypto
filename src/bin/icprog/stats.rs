@@ -235,7 +235,7 @@ pub fn median(xs: &[f64]) -> f64 {
 // ── the exact sample deviation ──────────────────────────────────────
 
 /// `x` as the exact fraction `num / 2^k`.
-fn exact(x: f64) -> (BigInt, u32) {
+pub fn exact(x: f64) -> (BigInt, u32) {
     assert!(x.is_finite());
     if x == 0.0 {
         return (BigInt::zero(), 0);
@@ -258,7 +258,7 @@ fn exact(x: f64) -> (BigInt, u32) {
 }
 
 /// `n / d` correctly rounded to a float (Python's `int / int`).
-fn div_to_f64(n: &BigUint, d: &BigUint) -> f64 {
+pub fn div_to_f64(n: &BigUint, d: &BigUint) -> f64 {
     if n.is_zero() {
         return 0.0;
     }

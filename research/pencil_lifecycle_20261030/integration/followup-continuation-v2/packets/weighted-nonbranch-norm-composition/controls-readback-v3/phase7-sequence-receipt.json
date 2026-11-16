@@ -1,0 +1,46 @@
+{
+  "recipe_sha256": "79f11a6ce8f707af29d92ccd37ac6bc8a9d4e794838d7f0016a160cbe2dcc236",
+  "phases": [
+    {
+      "phase": "pre",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/controls-readback-v3/custody-phase7.py",
+        "pre"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 106.9222030689998
+    },
+    {
+      "phase": "compiler",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "595s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/controls-readback-v3/compiler-phase7.py"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 131.6530344170169
+    },
+    {
+      "phase": "post",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/controls-readback-v3/custody-phase7.py",
+        "post"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 45.47050376801053
+    }
+  ]
+}

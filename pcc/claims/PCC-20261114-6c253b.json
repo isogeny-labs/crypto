@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T06:54:56Z",
+ "id": "PCC-20261114-6c253b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0a12a195c66785b5b8b4b4409ab0cc02ee991f64",
+  "model": "",
+  "session": "norm-growing-input-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "0930683a73c4ffdadaf4d27e6cbeaa6981193a4dab48b8bfcb6ec78596313663",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormGrowingInput.exact_norm"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration context. Generic coefficient-support budget and actual Mathlib computed monic division over CommRing; actual growing chart over Field K, a=h+2 covers all a>=2. Literal multivariate variables have consecutive weights via explicit bijection. Actual norm/support/remainder, monicity/degrees, coefficient weightedTotalDegree <=2*degree(P)-2*j. Exact norm multiplication requires stated target-curve premise. Four-variable source binding is a polynomial-ring renaming equivalence, not finite-field value comparison. No degree29 normalized-row, full closure, public finder, coverage, extraction/retries or expected bit-cost claim. Unsigned; gate/fresh pending at creation.",
+ "statement": "Exact source-bound declaration NormGrowingInput.exact_norm: theorem exact_norm (h : \u2115) (alpha beta r z : K) (hp : z^2=r^3+alpha*r+beta) : (X-Polynomial.C (MvPolynomial.C r))*U h alpha beta r z=N h alpha beta r z"
+}

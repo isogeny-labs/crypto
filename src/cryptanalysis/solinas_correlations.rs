@@ -233,24 +233,36 @@ impl CorrelationTable {
         }
     }
 
+    /// Null z-score of the pair `(i, j)`, or `None` when a marginal is
+    /// degenerate (0 or 1).
+    ///
+    /// Under independence with *estimated* marginals the null standard
+    /// error of `p̂_joint − p̂_r·p̂_c` is `√(p_r(1−p_r)·p_c(1−p_c)/n)`.
+    /// (Correction 2026-10-22: the earlier `√(E(1−E)/n)` with `E = p_r·p_c`
+    /// overstated the error by about √3 at `p_r ≈ p_c ≈ ½`.)
+    pub fn z_score(&self, i: usize, j: usize) -> Option<f64> {
+        let n = self.n_samples as f64;
+        if n == 0.0 {
+            return None;
+        }
+        let p_r = self.marginal_r[i] as f64 / n;
+        let p_c = self.marginal_c[j] as f64 / n;
+        let p_joint = self.joint[i * 512 + j] as f64 / n;
+        let var = p_r * (1.0 - p_r) * p_c * (1.0 - p_c) / n;
+        if var > 0.0 {
+            Some((p_joint - p_r * p_c) / var.sqrt())
+        } else {
+            None
+        }
+    }
+
     /// Compute z-score for each (i, j) pair.  Returns vector of
     /// `(z, i, j)` sorted by descending |z|.
     pub fn flag_outliers(&self, top_k: usize) -> Vec<(f64, usize, usize)> {
-        let n = self.n_samples as f64;
-        if n == 0.0 {
-            return vec![];
-        }
         let mut scores: Vec<(f64, usize, usize)> = Vec::with_capacity(256 * 512);
         for i in 0..256 {
-            let p_r = self.marginal_r[i] as f64 / n;
             for j in 0..512 {
-                let p_c = self.marginal_c[j] as f64 / n;
-                let p_joint = self.joint[i * 512 + j] as f64 / n;
-                // Under independence: p_joint_expected = p_r · p_c.
-                let expected = p_r * p_c;
-                let var = expected * (1.0 - expected) / n;
-                if var > 0.0 {
-                    let z = (p_joint - expected) / var.sqrt();
+                if let Some(z) = self.z_score(i, j) {
                     scores.push((z, i, j));
                 }
             }
@@ -310,9 +322,13 @@ mod tests {
     #[test]
     fn solinas_micro_bit_correlations() {
         // For CI: N = 10K (fast).  Full result documented in
-        // research/notes/cm-isogeny/RESEARCH_P256.md was at N = 10⁶ (max |z| = 2.46 < 6.11
-        // threshold; clean null result).
-        let n_samples = 10_000u64;
+        // research/notes/cm-isogeny/RESEARCH_P256.md was at N = 10⁶ (recorded max |z| = 2.46 used a
+        // z-score scale too small by ~sqrt(3); see the 2026-10-22 correction).
+        // `SOLINAS_CORR_N` overrides N (e.g. 1000000 for the recorded run).
+        let n_samples = std::env::var("SOLINAS_CORR_N")
+            .ok()
+            .and_then(|v| v.parse::<u64>().ok())
+            .unwrap_or(10_000u64);
         let table = run_correlation_experiment(n_samples, 42);
 
         println!();
@@ -321,6 +337,20 @@ mod tests {
         println!("N = {} random 512-bit inputs", n_samples);
         println!("Computed Pr[r[i] = 1 | c[j] = 1] for all 256 × 512 = 131,072 (i,j) pairs.");
         println!();
+
+        // Histogram of |z| over all pairs in bins of width 0.5 (for the figure).
+        let mut hist = [0u64; 12];
+        for i in 0..256 {
+            for j in 0..512 {
+                if let Some(z) = table.z_score(i, j) {
+                    hist[((z.abs() * 2.0) as usize).min(11)] += 1;
+                }
+            }
+        }
+        println!(
+            "HIST |z| bins of 0.5 starting at 0 (last bin is >= 5.5): {:?}",
+            hist
+        );
 
         let outliers = table.flag_outliers(20);
         println!("Top 20 outlier (i, j) pairs by |z-score|:");
@@ -359,28 +389,69 @@ mod tests {
         assert!(table.n_samples == n_samples);
     }
 
+    /// Calibration of the z-score on *independent* random bits: the
+    /// fraction with |z| > 3 should be near 0.0027 and the maximum over
+    /// m pairs near sqrt(2 ln m).  The pre-2026-10-22 scale would give
+    /// a fraction near 0 and a maximum near 2.4 here.
+    #[test]
+    fn z_score_is_calibrated_on_independent_bits() {
+        let (nr, nc, n) = (64usize, 128usize, 4_000u64);
+        let mut rng = SmallRng::seed_from_u64(20261022);
+        let mut t = CorrelationTable::new();
+        for _ in 0..n {
+            let rb: Vec<bool> = (0..nr).map(|_| rng.gen()).collect();
+            let cb: Vec<bool> = (0..nc).map(|_| rng.gen()).collect();
+            t.n_samples += 1;
+            for i in 0..nr {
+                if rb[i] {
+                    t.marginal_r[i] += 1;
+                    for j in 0..nc {
+                        if cb[j] {
+                            t.joint[i * 512 + j] += 1;
+                        }
+                    }
+                }
+            }
+            for j in 0..nc {
+                if cb[j] {
+                    t.marginal_c[j] += 1;
+                }
+            }
+        }
+        let mut zs = Vec::new();
+        for i in 0..nr {
+            for j in 0..nc {
+                zs.push(t.z_score(i, j).unwrap().abs());
+            }
+        }
+        let m = zs.len() as f64;
+        let frac = zs.iter().filter(|&&z| z > 3.0).count() as f64 / m;
+        let max = zs.iter().cloned().fold(0.0, f64::max);
+        let target = (2.0 * m.ln()).sqrt();
+        println!("m={m} frac(|z|>3)={frac:.5} max={max:.2} sqrt(2 ln m)={target:.2}");
+        assert!((0.0008..0.0060).contains(&frac), "frac(|z|>3) = {frac}");
+        assert!(
+            (max - target).abs() < 0.8,
+            "max |z| = {max}, target {target}"
+        );
+        // Variance of z should be ~1.
+        let var = zs.iter().map(|z| z * z).sum::<f64>() / m;
+        assert!((0.9..1.1).contains(&var), "E[z^2] = {var}");
+    }
+
     /// Coarse pattern: plot the bit-pair structure as a histogram of
     /// |z| values.  For larger statistics.
     #[test]
     fn solinas_correlation_z_distribution() {
         let n_samples = 5_000u64;
         let table = run_correlation_experiment(n_samples, 7);
-        let n = table.n_samples as f64;
 
         // Compute |z| for all pairs and bucket.
         let mut buckets = [0u64; 10]; // |z| ∈ [0,1), [1,2), ..., [9,∞)
         for i in 0..256 {
-            let p_r = table.marginal_r[i] as f64 / n;
             for j in 0..512 {
-                let p_c = table.marginal_c[j] as f64 / n;
-                let p_joint = table.joint[i * 512 + j] as f64 / n;
-                let expected = p_r * p_c;
-                let var = expected * (1.0 - expected) / n;
-                if var > 0.0 {
-                    let z = (p_joint - expected) / var.sqrt();
-                    let abs_z = z.abs();
-                    let bucket = (abs_z as usize).min(9);
-                    buckets[bucket] += 1;
+                if let Some(z) = table.z_score(i, j) {
+                    buckets[(z.abs() as usize).min(9)] += 1;
                 }
             }
         }

@@ -11,6 +11,73 @@ pre-registered hypotheses)
 *On index calculus algorithms for subfield curves*, SAC 2020
 (ePrint 2020/1315).
 
+**Modular and low-genus carrier follow-up (2026-10-26):**
+[Round22](research/koblitz_modular_ic_20261018/rounds/22/REPORT.md)
+solves the complete integral equivariant norm-zero recovery system:all eight
+Smith factors are1,the least scalar is1,and the full kernel has rank24.
+A small exact certificate uses only M1 and M3=7I,with22 both-sign order11
+fixtures checked. The inherited augmentation metric has Smith diagonal1,1,1,5.
+This concerns augmentation targets;the regular-target denominator5 below
+remains valid. The genus-one Tate base,complete base divisors,generic degree16
+QR model and degree8-by2 trace tower are checked. Proper lifted divisors,
+complete prescribed RR and the integral level77 modular-factor map remain open.
+The four Q40 node187 scalar points are excluded by a coupled valuation/descent
+argument under explicit proper/pole bridges;an explicit polynomial membership
+certificate and whole saturation remain open. Arbitrary modular-divisor reverse
+evaluation and ordinary460/367 fibers/images are still required. No new IC rank
+or efficiency assessment is supplied. See the [proof map](research/koblitz_modular_ic_20261018/rounds/22/PROOF_MAP.md)
+for the separation between Lean statements,native certificates and written geometry.
+
+[Round21](research/koblitz_modular_ic_20261018/rounds/21/REPORT.md)
+proves the characteristic2 five-root obstruction. Combined with actual
+trace-zero descent and a written valuative/formal-group bridge,it excludes
+the old Q34 scalar points.32 coupled norms and1330 pure-source resultants
+retain four new complete scalar models on node187;whole saturation remains
+open. The averaged recovery A*Phi=5I is equivariant,with denominator5 sharp
+in this regular-target CM presentation by a mod5 norm/fixed-vector proof.
+The206-statement proof map separates universal/actual coefficients from
+written geometry and native field/DAG semantics. The final quotient,
+243 sections,full theta actions and integral level77 map remain open.
+
+[Round20](research/koblitz_modular_ic_20261018/rounds/20/REPORT.md)
+constructs an explicit integral CM retraction for the20 weighted orbit
+maps. It gives a proper scalar-cover embedding and20 global source-image
+equations,or100 Galois-stable conjugates,under the written morphism/descent
+bridges. Canonical symmetric Pic2 matching holds. Full degree45,315,63,171
+elliptic bases and the57 companion basis specify a factorized polarized
+source embedding. The2952 ordinary F2 orbit sections have binary evaluation
+rank2688 on16 retained tuples per sign;this is a section-independence lower
+bound,not an IC relation rank. All48 scalar-kernel probes are noninvariant.
+The final105/19 quotient,complete kernel actions and243 sections remain open.
+
+A complementary524288 quadratic numerator/sign search yields ten exact
+constant maps only. Proper normalization,pole divisors and the evaluated
+integral level77 factor/divisor map remain open. Q33's186-term coupled
+relation has top(U+V)^19 and excludes none of Q32. Q34 retains four complete
+uncapped models on123,124,126,127;complete simultaneous source arcs or
+separators and whole quotient saturation remain open. Seventy-six new
+named Lean results distinguish actual matrices and finite bindings from
+native field/search semantics and written geometry.
+
+[Round19](research/koblitz_modular_ic_20261018/rounds/19/REPORT.md)'s
+335544320-case controlled-pole null,G25 weighted polarization and Q28/Q30
+exclusions remain frozen inputs. Its canonical-class and proper-source
+obligations are advanced above;the quotient obligations stay open.
+
+[Round18](research/koblitz_modular_ic_20261018/rounds/18/REPORT.md)'s
+canonical symmetric characters, selected-cover rotation obstruction and
+scalar105 refinement remain frozen inputs. Its actual diamond-2 action
+and shared residual Hecke system remain valid; the new search extends
+its failed affine-linear ansatz. Earlier ranks and divisors stay unchanged.
+
+[Round15](research/koblitz_modular_ic_20261018/rounds/15/REPORT.md)'s
+level7p CM carriers include genus45589 for n=131 after a diamond twist.
+Its new norms of ordinary pushed degrees460/367 still need source fibers
+and images. [Round14](research/koblitz_modular_ic_20261018/rounds/14/REPORT.md)'s
+eight complete signed divisors and principal/deck nonzero ranks15/15 and
+18/17 remain frozen. See the [construction problem](problems/koblitz-modular-carrier-transfer.md).
+No IC efficiency verdict is supplied; the user assesses those implications.
+
 ## The setting
 
 A Koblitz curve `K_a : y² + xy = x³ + a x² + 1`, `a ∈ {0, 1}`, is
@@ -979,3 +1046,9 @@ In `koblitz_groebner`:
   (F4)*, J. Pure Appl. Algebra 139 (1999).
 - G. Bard, *Algebraic Cryptanalysis*, Springer 2009, ch. 13 — the
   Boolean-ring representation.
+
+Round22 also certifies the original supersingular SS5 affine incidence fiber,
+keeping nu and every registered unit:four degree20 closed points over F2,
+with both ideal-inclusion lifts,nonzero relative Jacobian and exact Frobenius
+matrix. The full proper normalized branch table remains open;see the Round22
+CM and validation records. No relation-rank or IC cost claim follows.

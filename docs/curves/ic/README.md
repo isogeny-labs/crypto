@@ -29,7 +29,7 @@ Weierstrass model is not yet registered under ICV1. Its ICV1 fields are
 therefore `null`. Do not synthesize an ICV1 slug from a translated or
 isomorphic model without a recorded isomorphism and registry support.
 
-The [factor-base browser](https://aburan28.github.io/crypto/browser/#factor-bases)
+The [factor-base browser](https://isogeny-labs.github.io/crypto/browser/#factor-bases)
 is generated from committed ecbench sessions and lists `FB1` summaries.
 It is not a point store. Large bases remain in cryptanalysis's
 [`fb-archive`](https://github.com/aburan28/cryptanalysis/tree/main/experiments/fb-archive):
@@ -234,3 +234,7 @@ need AWS credentials that can read and write the prefix.
 
 The bucket is encrypted (SSE-S3) and blocks public access.  Versioning is
 off; write-once keys make it unnecessary for these objects.
+
+## 2026-10-18 Fp4 candidate metadata correction
+
+Four Fp4 constructor records were temporarily appended here without an upstream catalog update or canonical ICV1 registration. This living mirror now again matches cryptanalysis `main`; its existing lock is unchanged. Their exact appended bytes and computed identities are preserved in the [research-only erratum](../../../research/ideas_execution_20261018/fp4_metadata_erratum/README.md). They are unregistered candidate provenance, not catalog entries. No frozen plan, EC1 preimage, run manifest or prior evidence was rewritten.

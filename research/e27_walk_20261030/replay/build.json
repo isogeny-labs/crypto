@@ -1,0 +1,21 @@
+{
+ "schema": "e27-validator-build/v1",
+ "recorded_binary_commit": "af2504ef161cbe804d855f3fa26c435bc02ba282",
+ "repository_head_at_start": "5b8f3d21768300db266bfa5e4350570d57706e22 (branch claude/glv-endomorphism-index-calculus-pe7ige, PR #2152); working tree clean except .resume/ (gitignored)",
+ "source": "git archive af2504ef1 of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/e27_walk.rs, examples/quartic_pipeline_gls.rs, every explicit [[bin]]/[[example]]/[[bench]] path of Cargo.toml, the six path dependencies (crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, isogeny_algos without docs/, research/pencil_large_prime_20261029 Cargo.toml + src) and every include_str!/include_bytes! target of src (50 files under docs/, research/, tests/). Extracted to /dev/shm/e27val-tree; 1,732 files, each equal to its af2504ef1 blob (git hash-object).",
+ "target_dir": "/dev/shm/e27val-target: a fresh, empty target directory on tmpfs (the root filesystem had ~0.5 GB free). Nothing was reused from the producer's target/ directory; its binaries were not run.",
+ "command": "cd /dev/shm/e27val-tree && CARGO_TARGET_DIR=/dev/shm/e27val-target CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e27_walk --example quartic_pipeline_gls",
+ "attempts": [
+  "2026-10-30T23:27:02Z: first attempt from an export without the include_str! targets; 231 crates compiled, then the crypto crate failed with 8 `couldn't read` errors (missing docs/ files the library embeds). Recorded, not a code error.",
+  "2026-10-30T23:31:30Z: same command after adding those files from af2504ef1 and moving the tree to tmpfs; `Finished release profile [optimized] target(s) in 10m 13s` at 23:41:43Z."
+ ],
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+ "binaries": [
+  {"name": "e27_walk", "sha256": "97e01b2c3fd42893fd91e8850cce577907778342311be60124f6898fd6afc2e3", "bytes": 5122928},
+  {"name": "quartic_pipeline_gls", "sha256": "91de8b21227fc478ef23d7306bbd3a1120bd5e00489b537368549a7044af1b7a", "bytes": 5782560}
+ ],
+ "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, not isolab-eks. The replay admits operation counts only (no wall time is compared or claimed), so a local run suffices.",
+ "run_command": "BIN_W=/dev/shm/e27val-target/release/examples/e27_walk BIN_P=/dev/shm/e27val-target/release/examples/quartic_pipeline_gls research/e27_walk_20261030/replay/replay.sh (from the repository root)",
+ "environment": "Stage W: RAYON_NUM_THREADS unset (its records do not depend on the thread count: walks are seeded per walk and collected in order; the replay is byte-identical). End to end: RAYON_NUM_THREADS=4 as in experiments/32_walk_karatsuba/run_e2e.sh, which fixes the target stream (§9.19).",
+ "concurrency": "The end-to-end replays shared the 4 vCPUs with the validator's own unit-test build and HEAD build; only wall-clock fields (wall_ms, solve_ms) are affected, and they are listed, not compared."
+}

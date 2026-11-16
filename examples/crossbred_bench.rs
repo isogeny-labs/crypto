@@ -39,6 +39,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_frobenius_factor_base, KoblitzCurve,
 };
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, masks_low64};
 use num_bigint::BigUint;
 use std::time::Instant;
 
@@ -50,7 +51,7 @@ const BITS_PER_WORD_OP: u64 = 64;
 fn brute_force(system: &[F2BoolPoly], n_vars: usize) -> (Vec<u64>, u64) {
     let terms: u64 = system.iter().map(|p| p.terms.len() as u64).sum();
     let roots = (0..(1u64 << n_vars))
-        .filter(|&p| system.iter().all(|q| q.eval(p) == 0))
+        .filter(|&p| system.iter().all(|q| q.eval(mask_from64(p)) == 0))
         .collect();
     (roots, (1u64 << n_vars) * terms)
 }
@@ -278,7 +279,7 @@ fn main() {
                     },
                 );
                 roots.sort_unstable();
-                (roots, false)
+                (masks_low64(&roots), false)
             };
 
             let tf = Instant::now();
@@ -311,7 +312,7 @@ fn main() {
             // Soundness, always: every crossbred root really is a root.
             if !got
                 .iter()
-                .all(|&r| sys.equations.iter().all(|p| p.eval(r) == 0))
+                .all(|&r| sys.equations.iter().all(|p| p.eval(mask_from64(r)) == 0))
             {
                 agree = false;
             }

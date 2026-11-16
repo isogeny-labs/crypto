@@ -1,0 +1,31 @@
+{
+  "schema": "research.additive-prospective-review/v1",
+  "source_manifest_sha256": "45fb5fd73cc1bd0d5834f6f132cc871b62e8e57e3b7b808925ddf7a2ca7e5323",
+  "clarification_sha256": "1b3579d3925c6c4e1f498b06c14304eb759126ac6d5f7a26322c9ecaf2598d72",
+  "original_review_manifest_sha256": "d107fc28f2fa523d2e700b1711278ebf0addf172718cea3d2fada015f64542fb",
+  "plan_sha256": "3897cb96ffd34acfa61ddf945ae4b2dfb177249a247232b0f98af0e3504a8b68",
+  "findings": {
+    "no_start_evidence": "resolved in proposal text: positive authenticated owner/controller launch evidence; missing output/status/exec error alone insufficient",
+    "failclosed": "resolved in proposal text: started, uncertain spawn, post-spawn/preemption/restore, unknown timeout, scientific timeout/cap/wrong answer ineligible",
+    "attempt_count": "initial plus at most one retry, no owner/process/request reset; exact counter granularity still needs prospective binding",
+    "accounting": "all partial/failed/owner/recovery/collection work charged; unknown ledger blocks admission; unchanged25200s/06:00UTC",
+    "known_C1_stop": "preserved; changed-instrument gate remains expressly unapproved",
+    "scheduling": "completion not assured; full denominators retained; reserve only tightens limits"
+  },
+  "remaining_precision": [
+    {
+      "id": "attempt_counter_unit",
+      "finding": "counter_scope names same exact prepared execution, potentially two attempts per each of18slots rather than two for the entire gate/controller request",
+      "required": "Prospective decision and source mapping must name whether attempt counter belongs to whole gate request, worker job, or individual prepared execution; do not infer a broader retry allowance from this review."
+    },
+    {
+      "id": "actual_launch_boundary",
+      "finding": "exact producer boundary and receipt verification remain explicitly pending",
+      "required": "Source-review and bind authenticated evidence and single-owner reconciliation before any retry eligibility can be operationally established."
+    }
+  ],
+  "disposition": "Specific never-started/failclosed/accounting clarification supported; counter unit and actual enforcement remain pre-freeze obligations. No protocol freeze or scientific admission.",
+  "execution_performed": false,
+  "scientific_execution_admitted": false,
+  "original_packets_unchanged": true
+}

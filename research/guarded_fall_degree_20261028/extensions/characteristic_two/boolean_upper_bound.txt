@@ -1,0 +1,211 @@
+Boolean upper bound for the two-S3, three-coordinate-block presentation
+Date: 2026-10-28
+
+Status and scope
+----------------
+This note proves a syntactic ordinary-degree upper bound for one explicit
+Boolean presentation. It contains no new experiment, implementation, timing
+claim, novelty claim, or Lean formalization. The argument has been audited
+algebraically, including the staged multiplication degrees.
+
+Primary context: Semaev, arXiv:1504.01175, Section 2, supplies the binary
+summation polynomial; Kosters--Yeo, arXiv:1503.08001, Sections 2 and 4.2,
+discuss summation polynomials and binary Weil descent; Huang--Kosters--Yeo,
+arXiv:1505.02532, supplies last-fall-degree/Weil-descent context. No result
+from those sources is being claimed as this note's proof. In particular,
+the proof below does not use a first-fall heuristic or the ordinary-field
+three-abscissa degree-five theorem.
+
+1. Exact presentation and theorem
+---------------------------------
+Let k=GF(2^n), choose an F2-basis beta_1,...,beta_n of k, and let ell>=1.
+Choose three F2-linear embeddings
+  L_X:F2^ell -> k; L_Y:F2^ell -> k; L_Z:F2^ell -> k.
+Their images may be different subspaces. Write the images of the standard
+basis as alpha_j, gamma_j, eta_j, respectively. In the polynomial ring
+over F2 introduce independent Boolean variables
+  X_1,...,X_ell, Y_1,...,Y_ell, Z_1,...,Z_ell,
+  U_1,...,U_n, V_1,...,V_n,
+and define the k-valued linear forms
+  x=sum_j alpha_j*X_j, y=sum_j gamma_j*Y_j,
+  z=sum_j eta_j*Z_j, u=sum_j beta_j*U_j,
+  v=sum_j beta_j*V_j.
+When the guard is omitted, the V variables may also be omitted.
+
+Fix r,a6 in k and put
+  f3(A,B,C)=(A*B+A*C+B*C)^2+A*B*C+a6,
+  f1=f3(x,y,u), f2=f3(u,z,r).
+Optionally include the inverse guard
+  h=v*(x+y)+1.
+Take the n coefficient polynomials over F2 of each included k-valued
+equation f1,f2,(h), together with an explicit Boolean equation
+  W^2+W
+for EVERY variable W. Call this generating set F. The coefficient inputs
+may be supplied either raw or already in multilinear normal form. The
+raw coefficient polynomials have degree at most four.
+
+Let V(F,D) be the smallest F2-linear space containing every input of degree
+at most D and closed under multiplication by any polynomial whenever the
+ordinary product degree is at most D. Degree is ordinary total degree in
+the Boolean-coordinate variables; all reductions used below are derived
+from the explicitly included Boolean equations.
+
+THEOREM. If F is unsatisfiable over F2, then
+  1 belongs to V(F,3*ell+1), and hence d_F(F)<=3*ell+1.
+The theorem holds with or without the guard and for the three possibly
+different linear embeddings above. The proof even allows noninjective
+linear maps, although embeddings give the intended factor-base model.
+
+For the elliptic-curve interpretation one may assume
+  E:Y^2+X*Y=X^3+a2*X^2+a6, a6!=0,
+that each image consists of rational point abscissas, and that r=x(R) for
+an affine rational target. Those hypotheses give the intended relation
+semantics. They are NOT needed for this syntactic upper bound: the proof
+uses only the displayed polynomial shapes and explicit Boolean equations.
+
+2. Boolean reductions preserve the required degree cap
+------------------------------------------------------
+For any polynomial P of ordinary degree at most D, its multilinear normal
+form NF(P) is obtained by replacing W^a with W for positive exponents.
+The difference P-NF(P) is a sum of multiples of W^2+W whose products have
+degree at most D. This follows by reducing one repeated variable at a
+time: to replace a monomial M*W^a, a>=2, subtract
+  M*W^(a-2)*(W^2+W).
+Each new term has no larger degree, and the process terminates. Therefore
+  P-NF(P) belongs to V(F,D).
+In particular, if P already belongs to V(F,D), so does NF(P).
+
+Raw input normalization costs at most degree four. For ell>=1 this is
+within the final cap 3*ell+1. This statement explicitly covers raw quartic
+coefficient inputs; it does not silently replace the input presentation.
+
+3. The reduced inputs are affine in all auxiliary bits
+-------------------------------------------------------
+Let b denote the 3*ell base bits X,Y,Z and t the auxiliary bits U,V.
+For a k-valued linear form q=sum c_j*B_j define
+  q^[2]=sum c_j^2*B_j.
+It is the multilinear normal form of q^2, because the characteristic is
+two. In particular u^[2] is LINEAR in the U bits.
+
+The reduced k-valued equations are
+  NF(f1)=x^[2]*y^[2]+(x^[2]+y^[2])*u^[2]+x*y*u+a6,
+  NF(f2)=(z^[2]+r^2)*u^[2]+r*z*u+r^2*z^[2]+a6,
+  NF(h)=v*(x+y)+1, if the guard is included.
+Consequently every F2 coefficient polynomial p_i has the form
+  p_i(b,t)=c_i0(b)+sum_j c_ij(b)*t_j.
+Thus it is affine-linear in ALL auxiliary bits, with no products of two
+auxiliary bits. The first input has total degree at most three, the second
+and the guard at most two. Their base supports satisfy
+  f1 coefficients: only X,Y bits, at most 2*ell;
+  f2 coefficients: only Z bits, at most ell;
+  guard coefficients: only X,Y bits, at most 2*ell.
+Extracting components in the fixed F2-basis changes neither these degree
+bounds nor the affine-in-auxiliaries property.
+
+4. A support-aware Boolean localization lemma
+---------------------------------------------
+Here is the general elementary fact used by the proof. Suppose a system
+over F2 has s Boolean base bits b, arbitrary Boolean auxiliary bits t,
+and multilinear equations
+  p_i(b,t)=c_i0(b)+sum_j c_ij(b)*t_j.
+Let A_i be the base support of p_i, with s_i=|A_i|. Suppose the Boolean
+equations are explicit and the p_i have already been derived within cap D.
+Assume also that the Boolean solutions of the p_i are exactly the solutions
+of the original system; in particular this holds when they are normal
+forms of all the original non-Boolean equations, as in this application.
+If
+  D>=s+1 and D>=s_i+2 for every i,
+then unsatisfiability implies 1 belongs to V(F,D).
+
+Proof. Fix a full base assignment a in F2^s. For A a subset of base bits
+write its assignment indicator as
+  delta_(a,A)=product_(B_j in A)(B_j+1+a_j).
+This is one at assignment a on A and zero at other Boolean assignments.
+
+Starting with p_i, multiply successively by the indicator factors for bits
+in A_i, applying NF after EVERY multiplication. Each current normal form
+is multilinear in at most s_i base bits and affine in the auxiliary bits.
+It therefore has degree at most s_i+1. The next linear-factor product has
+degree at most s_i+2, and its Boolean reduction is available within that
+same cap by Section 2. All staged rows thus belong to V(F,D).
+
+After all support factors have been used, the exact normal form is
+  delta_(a,A_i)*p_i(a,t).
+To justify this as a polynomial identity, both sides are multilinear in
+the A_i bits and affine in t. On every Boolean assignment of A_i they
+agree coefficientwise as polynomials in t, hence are identical by Boolean
+interpolation. No assignment to auxiliary variables is used in this step.
+
+Multiply by the complementary indicator delta_(a,base\A_i). The resulting
+row is
+  delta_a*p_i(a,t), delta_a=delta_(a,base).
+Its ordinary degree is at most s+1, so this multiplication is also allowed.
+
+For the fixed a, the affine system p_i(a,t)=0 is inconsistent over F2:
+otherwise its solution, together with a, would satisfy the whole Boolean
+system. An inconsistent affine system over a field has 1 in the constant-
+coefficient linear span of its equations. Equivalently, elementary linear
+algebra gives lambda_i in F2 with
+  sum_i lambda_i*p_i(a,t)=1
+as a polynomial identity. Taking the same combination of localized rows
+derives delta_a. Finally the EXACT polynomial identity
+  sum_(a in F2^s) delta_a
+    =product_j((1+B_j)+B_j)=1
+derives 1. This proves the lemma.
+
+5. Applying the lemma: the cap is 3*ell+1
+-----------------------------------------
+Here s=3*ell and every s_i<=2*ell. Raw inputs normalize within cap four.
+For ell>=1,
+  max(4, s+1, max_i(s_i+2))
+    <= max(4,3*ell+1,2*ell+2)=3*ell+1.
+Section 4 therefore derives 1 inside V(F,3*ell+1).
+
+Every algebraic-closure zero of the full system has Boolean coordinates,
+because each W satisfies W^2+W=0. Thus unsatisfiability over F2 is also
+algebraic-closure unsatisfiability, and the generated ideal is the unit
+ideal. For a unit ideal, the least cap deriving 1 equals last fall degree:
+the last-fall definition applied to 1 gives one inequality, and once 1 is
+available at cap D, multiplying it by each monomial of any polynomial f
+derives f at cap max(D,deg f). Hence the refutation bound proves the stated
+last-fall bound.
+
+The theorem is stated for ell>=1. With the guard and zero-dimensional linear
+images, x=y=0 makes the guard the constant one. If the guard is omitted,
+that particular argument does not apply; zero-dimensional systems can be
+analyzed directly and are not part of the stated theorem.
+
+6. Exact limitations and relation to the other notes
+----------------------------------------------------
+* This bound is for the specified fully Boolean, coefficientwise descended
+  system with EXPLICIT Boolean equations for all bits. It does not assert
+  the same degree bound for a presentation which omits those equations,
+  uses implicit reductions, or uses different auxiliary constraints.
+* Linearity of the three coordinate maps ensures the support and degree
+  bounds. Arbitrary nonlinear enumerations require a new degree audit.
+* The single shared auxiliary u is important: after fixing x,y,z, both
+  displayed S3 equations are affine in its Boolean coordinates. Longer
+  chains can have products of distinct auxiliary blocks; the affine-fibre
+  lemma then needs additional justification and is not asserted here.
+* The optional inverse guard is also affine after fixing the base bits.
+  Omitting it preserves this upper bound, but changes which relations and
+  extraneous summation-polynomial solutions the system represents.
+* The proof may use all 2^(3*ell) base assignments. It bounds degree, not
+  proof size, arithmetic work, memory, practical running time, or ECDLP
+  complexity, and makes no sub-rho claim.
+* No first-fall equality or growing lower bound follows. The ordinary-field
+  d_ff^ord=B+1 and cardinality-scale lower bounds concern another input
+  presentation. This note does not transfer those lower bounds.
+* This is not a certification of the earlier E12 instances, their closure
+  computations, or any first/last-fall labels. Applying it to that ledger
+  requires checking that the actual generators, guard convention, field
+  equations, coordinate maps, and auxiliary blocks match this theorem.
+* There is no conflict with finite d_F>=5 examples: an upper bound growing
+  as 3*ell+1 neither proves nor disproves a constant ceiling in a restricted
+  experimental family. No exact growing-ell last-fall value is claimed.
+
+Under the additional rational-lift hypotheses of the local ordinary-field
+theorem, its triple-projector transfer also gives the weaker 3*ell+5 ceiling:
+its k-valued rows can be simulated coefficientwise using the multiplication
+structure constants of k/F2. The direct affine-fibre proof above avoids
+that dependency and gives the sharper bound with simpler degree accounting.

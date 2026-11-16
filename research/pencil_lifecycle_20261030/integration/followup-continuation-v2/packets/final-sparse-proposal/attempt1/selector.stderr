@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/var/tmp/pencil-final-sparse-proposal-20261031-v1/prepare-final.py", line 77, in <module>
+    (D/'selected.json').write_text(json.dumps({'commit':a.commit,'inventory_sha256':hashlib.sha256(I.read_bytes()).hexdigest(),'files':[dict(v,reasons=reasons[k]) for k,v in sorted(selected.items())]},indent=2)+'\n')
+                                                        ^^^^^^^^
+AttributeError: 'str' object has no attribute 'commit'

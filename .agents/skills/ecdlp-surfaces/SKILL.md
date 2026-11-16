@@ -15,8 +15,9 @@ description: Select, run, and interpret elliptic-curve surface and genus-2+ Jaco
 | Check the repository's n=83 binary Koblitz variants | `binary_surface_check` | Uses the pinned GF(2^83) basis and subgroups, classifies the binary pencil analytically, verifies quartic transfers, and checks the same/opposite products. |
 | Construct or replay a supported genus-2 or genus-3 cover | `hyperelliptic-cover construct` / `verify` in `crypto` | Checks the fixed cover's equation, smoothness, genus, degree, and field; subgroup preservation is a separate obligation. |
 | Compute with supported genus-2+ divisor classes | `hyperelliptic-cover arithmetic`, or the native Jacobian APIs | Checks Mumford arithmetic in the declared curve and infinity model; it does not construct an elliptic-subgroup map. |
-| Transfer into the binary genus-3 Jacobian | `OrdinaryBinaryCover` Rust API in both repositories | Constructs rational-point-class pullbacks and typed degree-three composition witnesses; injectivity requires an independently verified exact subgroup order coprime to three. |
+| Transfer into the binary genus-3 Jacobian | `OrdinaryBinaryCover` Rust API | Both repositories construct rational-point-class pullbacks and typed degree-three composition witnesses; injectivity requires an independently verified exact subgroup order coprime to three. Current `crypto` source alone adds all-class norm support for one exact polynomial-basis GF(8) fixture (`a=1`, `b=3`, `d=7`); the retained `cryptanalysis` parity receipt predates it. This is same-implementation fixture evidence, not catalog-general support or an independent norm oracle. |
 | Check a supplied CM genus-2 polarization candidate | `jacobian-certificate` in `crypto` | Certifies bounded Hermitian-lattice findings; genus-2 existence remains conditional on independently audited geometric hypotheses. |
+| Audit every candidate transfer of one curve (GHS descent, isogeny moves, covers, pairings) with a subgroup-preservation certificate and a four-phase cost against the matched rho | `transfer-audit` in `crypto` ([protocol and results](../../../research/transfer_audit_20261011/PROTOCOL.md)) | Per candidate: map status (executed, arithmetic, not evaluated), subgroup status (verified, arithmetic, not_evaluated, refuted), priced phases, verdict from the closed vocabulary. Cost rows are formula-level estimates; `m >= 2` GHS descents are not executable in the repository. |
 | Search for genus-2 gluing or other higher-genus targets | [Higher-genus workflow](references/higher-genus.md) | Routes construction, map, kernel, arithmetic, and cost checks; a search proposal is not an executable transfer. |
 
 Use this skill when the user requests these operations, asks about genus 2 or
@@ -200,6 +201,33 @@ kernel checks, unsupported operations, and complete solver-cost accounting.
   a faster target solver with complete transport costs are separate claims.
   The point arithmetic is variable-time demonstration code.
 
+## Hand off to transfer and solver measurement
+
+Use the checked construction as input to
+[`docs/transfer-assessment/METHODOLOGY.md`](../../../docs/transfer-assessment/METHODOLOGY.md),
+not as an advantage claim. Use the `transfer` assessment profile to type the
+correspondence, bind the source subgroup, prove recovery, and record open
+obligations. The matching machine record requires a named
+`solver_assessment`; “higher genus,” “surface,” “lattice,” or “index calculus”
+alone is not a solver.
+
+After the transfer is executable and the destination solver has a checked
+adapter for the image subgroup, follow
+[`MEASUREMENT.md`](../../../docs/transfer-assessment/MEASUREMENT.md): compare
+the strongest direct source solver, the destination generic control, and the
+specialized destination pipeline on identical one-target workloads. Use the
+`ecbench-measure` skill for the native matched run. Use `ecbench-bounds` only
+after a replayable end-to-end session exists to determine whether the result
+moves an exponent, constant, primitive-operation axis, or only makes a trade.
+Stage-only relation, arithmetic, or map improvements do not establish net
+transfer advantage.
+
+Use `curve-algebra` when the route or baseline depends on CM,
+endomorphisms, GLV/GLS, Frobenius, or automorphism actions. Apply
+`report-evidence` to every implementation and experiment, and
+`research-visuals` to each search round, run, or result PR. The skills route
+work; they do not replace certificates, replay, or cost accounting.
+
 ## Validate and hand off
 
 Run the existing package checks after changing the tool or its fixtures:
@@ -224,3 +252,22 @@ what was established. Preserve failures and remaining gaps. For substantive
 research, follow the repository's research-visuals and report-evidence rules
 where present. Refer to the [integration report](../../../docs/ecdlp-surfaces/REPORT.md)
 and [protocol](../../../docs/ecdlp-surfaces/PROTOCOL.md) for the existing evidence.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope ecdlp-surfaces`. Apply the
+   adopted lessons; treat candidates as hypotheses this run can test.
+2. **While acting**: resolve a blocker yourself within your authority
+   (diagnose the cause, try the documented remedy, then a materially different
+   approach) before escalating; AGENTS.md "Persistent scientific research loop".
+   Persistence grants no extra execution or spending authority.
+3. **After acting**: record the outcome with evidence,
+   `python3 tools/lessons.py outcome --scope ecdlp-surfaces --task "..." --result success|partial|fail|blocked --evidence <receipt|commit|job> [--applied L-...]`,
+   and `lessons.py test --lesson L-... --outcome confirm|refute --evidence ...`
+   for each lesson you applied. A surprise that would change what the next run
+   does becomes `lessons.py add --scope ecdlp-surfaces --trigger "..." --action "..." --evidence ...`.
+4. **Adapt**: when a lesson scoped to `ecdlp-surfaces` is adopted (two distinct
+   confirmations), propose the edit to this file in a PR that cites the lesson
+   id; when one is refuted twice more than confirmed, it retires itself.

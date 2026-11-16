@@ -2,7 +2,8 @@
 // Local, NUL-delimited git diffs avoid the API's 300-file path-filter limit.
 // Missing comparisons select every check; they must never silently skip work.
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+import { appendFileSync, closeSync, existsSync, mkdtempSync, openSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,12 +12,16 @@ export const scopes = ['rust_root', 'rust_cd', 'rust_fmt', 'release_rust',
   'javascript', 'python', 'rust'];
 
 const maintained = /^(src|tests|examples|benches)\//;
+const sharedAnalysis = /^crates\/crypto-analysis-core\//;
 const frozenExamples = /^experiments\/koblitz-s3-pair-query-20261007-v4\/(baseline|candidate)\.rs$/;
 const rustConfig = /^(Cargo\.(toml|lock)|build\.rs|rust-toolchain(\.toml)?|rustfmt\.toml|clippy\.toml|\.cargo\/.*)$/;
 // The release packages this independent crate and its path dependency. These
 // paths do not belong to the root Cargo package, so classify their own sources,
 // manifests, build script and embedded inputs explicitly.
 const isogenyCliRust = /^tools\/isogeny-cli\//;
+// The root crate depends on volcano-cli and factor-base. Their sources and
+// manifests, and volcano-cli's isogeny_algos dependency, are root inputs.
+const rootPathCrateRust = /^tools\/(?:volcano-cli|factor-base)\//;
 const isogenyAlgosInputs = /^isogeny_algos\/(?:Cargo\.toml|build\.rs|src\/.*\.rs)$/;
 const isogenyEmbeddedInputs = new Set([
   'docs/curves/registry.json',
@@ -28,13 +33,21 @@ const isogenyEmbeddedInputs = new Set([
 ]);
 const prose = /\.(md|rst|txt|pdf|svg|png|jpg|jpeg|gif)$/i;
 const control = /^\.github\/scripts\/.*ci-scope.*$/;
+// These trees are copied into every Rust release archive. Documentation is
+// normally compilation-neutral, but package payload changes (and attributes
+// that govern their byte identity) must exercise cross-platform staging and
+// the installed-tree smoke path before merge.
+const rustReleasePayload = /^docs\/(?:curves|ecdlp-audit)\//;
+const rustReleaseRootPayload = /^(?:README\.md|LICENSE(?:\.md)?)$/;
 
 export function classify(files, embedded = new Set(), cargoSources = new Set()) {
   const result = Object.fromEntries(scopes.map(key => [key, false]));
   for (const file of files) {
     if (control.test(file)) return Object.fromEntries(scopes.map(key => [key, true]));
-    const root = /\.rs$/.test(file) && maintained.test(file) || frozenExamples.test(file) || cargoSources.has(file) || rustConfig.test(file) || embedded.has(file);
-    result.rust_root ||= root || file === 'scripts/clippy-maintained.sh';
+    const root = /\.rs$/.test(file) && maintained.test(file) || frozenExamples.test(file) || cargoSources.has(file) || rustConfig.test(file) || embedded.has(file)
+      || (rootPathCrateRust.test(file) && !prose.test(file)) || isogenyAlgosInputs.test(file);
+    const releaseAttributes = file === '.gitattributes';
+    result.rust_root ||= root || sharedAnalysis.test(file) || file === 'scripts/clippy-maintained.sh';
     result.rust_cd ||= /^cd_attack\/(src|tests|examples|benches)\//.test(file) && !prose.test(file)
       || /^cd_attack\/(Cargo\.(toml|lock)|build\.rs|rust-toolchain(\.toml)?|\.cargo\/.*)$/.test(file)
       || /^rust-toolchain(\.toml)?$|^\.cargo\//.test(file);
@@ -42,19 +55,31 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
     result.release_rust ||= /^src\//.test(file) && !prose.test(file) || rustConfig.test(file)
       || file === 'tests/fixtures/ecbench_manifest_small.json'
       || /^docs\/curves\//.test(file) || embedded.has(file)
+      || isogenyCliRust.test(file) || rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)
+      || rustReleasePayload.test(file) || rustReleaseRootPayload.test(file)
+      || releaseAttributes || embedded.has(file)
       || isogenyCliRust.test(file) || isogenyAlgosInputs.test(file)
       || isogenyEmbeddedInputs.has(file);
     // Both Makefile targets compile src/main.cu against include/ and the
     // committed generated headers; research benchmark sources are separate.
     const client = file === 'ecc2k130/src/main.cu' || file === 'ecc2k130/Makefile'
       || /^ecc2k130\/(include|generated)\/.*\.(h|hpp|cuh|inc)$/.test(file);
-    result.release_native ||= client
+    result.release_native ||= client || releaseAttributes || file === 'ecc2k130/README.md'
       || /^gpu\/(ecc|ecc2k|semaev|macaulay|btcpuzzle)\//.test(file) && !prose.test(file);
-    result.release_cuda ||= client;
+    result.release_cuda ||= client || releaseAttributes;
     result.ecbench_replay ||= root
+      || /^research\/factor_base_shape_leads_20261018\//.test(file) && !prose.test(file)
       || /^docs\/(ecbench|bounds)\//.test(file) && !prose.test(file)
       || /^research\/(ecbench_[^/]+|ghs_curve_comparison_20261009)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
-      || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'));
+      || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
+      // ecbench.yml audits every committed session by schema, wherever it
+      // lives (research/, taskq/deploy/, ...), so its files select the audit
+      // anywhere in the tree (sheriff SHF-20261028-0f3f64, PPN-6). Large
+      // sessions commit their records gzip-compressed. Sessions whose records
+      // live in the artifact store keep only an .artifacts.json pointer in Git;
+      // re-pointing it changes the session's bytes, so it selects the audit too
+      // (sheriff SHF-20261106-a114e7, PPX-5).
+      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?|\.artifacts\.json)$/.test(file);
     result.actions ||= /^\.github\/(workflows|actions)\//.test(file);
     result.c_cpp ||= /\.(c|cc|cpp|cxx|h|hh|hpp|hxx|cu|cuh)$/.test(file)
       || /(^|\/)(Makefile|CMakeLists\.txt)$|\.cmake$/.test(file);
@@ -79,8 +104,21 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
 }
 
 function git(args, cwd) {
-  return execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
-    env: { ...process.env, GIT_TERMINAL_PROMPT: '0' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  // The tracked-path list can exceed child_process's buffered stdout limit.
+  // Keep every NUL-delimited path; spool stdout rather than truncating it or
+  // treating a complete checkout as an unavailable scope comparison.
+  const directory = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-git-'));
+  const output = path.join(directory, 'stdout');
+  let descriptor;
+  try {
+    descriptor = openSync(output, 'wx', 0o600);
+    execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+      env: { ...process.env, GIT_TERMINAL_PROMPT: '0' }, stdio: ['ignore', descriptor, 'pipe'] });
+    return readFileSync(output, 'utf8');
+  } finally {
+    if (descriptor !== undefined) closeSync(descriptor);
+    rmSync(directory, { recursive: true, force: true });
+  }
 }
 
 function trackedFiles(cwd) {
@@ -93,11 +131,10 @@ function sourceText(cwd, file) {
 
 // Cargo paths are literal TOML strings. Read the manifest from HEAD when a
 // scope-only sparse checkout hasn't materialized it, without loading archives.
-export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd)) {
-  if (!tracked.includes('Cargo.toml')) return new Set();
-  const manifest = existsSync(path.join(cwd, 'Cargo.toml'))
-    ? readFileSync(path.join(cwd, 'Cargo.toml'), 'utf8')
-    : git(['show', 'HEAD:Cargo.toml'], cwd);
+export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd), manifestPath = 'Cargo.toml') {
+  if (!tracked.includes(manifestPath)) return new Set();
+  const manifest = sourceText(cwd, manifestPath);
+  const crateDir = path.posix.dirname(manifestPath);
   const targets = new Set();
   for (const block of manifest.split(/^\s*(?:\[\[(?:example|bin|bench|test)\]\]|\[lib\])\s*$/m).slice(1)) {
     const table = block.split(/^\s*\[/m)[0];
@@ -106,7 +143,8 @@ export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd)) {
     const literal = line.match(/^("(?:[^"\\]|\\.)*"|'[^']*')\s*(?:#.*)?$/);
     if (!literal) throw new Error('unsupported Cargo target path syntax');
     const value = literal[1][0] === '"' ? JSON.parse(literal[1]) : literal[1].slice(1, -1);
-    const target = path.posix.normalize(value);
+    if (path.posix.isAbsolute(value)) throw new Error('Cargo target escapes the checkout');
+    const target = path.posix.normalize(path.posix.join(crateDir, value));
     if (target.startsWith('../') || path.posix.isAbsolute(target)) throw new Error('Cargo target escapes the checkout');
     targets.add(target);
   }
@@ -133,9 +171,21 @@ export function sourceFiles(cwd) {
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
     && (maintained.test(file) || frozenExamples.test(file) || file === 'build.rs')));
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
+  for (const source of pathDependencyFiles(cwd, tracked)) {
+    if (!source.endsWith('/Cargo.toml')) sources.add(source);
+  }
+  // Materialize the known sources in one batch before reading them. In the
+  // scope job's blob-less partial clone, `git show HEAD:<file>` fetches one
+  // missing blob per call, a round trip each; the path-dependency crates
+  // alone took the `scope` job past its 5-minute cap on every pull request
+  // on 2026-11-03. A sparse-checkout add fetches every missing blob at once.
+  materializeSources(cwd, sources);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
     const file = queue[index];
+    // Dependencies discovered while walking modules arrive in small groups;
+    // fetch everything still unread the first time one is missing.
+    if (!existsSync(path.join(cwd, file))) materializeSources(cwd, new Set(queue.slice(index)));
     const text = sourceText(cwd, file);
     const dir = path.posix.dirname(file);
     const add = dependency => {
@@ -188,9 +238,52 @@ export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
   return inputs;
 }
 
+// Directories of the path dependencies Cargo needs to resolve the root
+// package (`name = { path = "..." }`), followed through each dependency's own
+// manifest.  A scope-only sparse checkout has none of them, and Cargo refuses
+// to resolve the workspace without every one.
+export function pathDependencyDirs(cwd) {
+  const dirs = new Set();
+  const queue = ['.'];
+  for (let index = 0; index < queue.length; index++) {
+    const dir = queue[index];
+    const manifestPath = dir === '.' ? 'Cargo.toml' : `${dir}/Cargo.toml`;
+    let manifest;
+    try { manifest = sourceText(cwd, manifestPath); } catch { continue; }
+    for (const match of manifest.matchAll(/=\s*\{[^}\n]*\bpath\s*=\s*"([^"\n]+)"/g)) {
+      const dependency = path.posix.normalize(path.posix.join(dir, match[1]));
+      if (dependency.startsWith('../') || path.posix.isAbsolute(dependency)) {
+        throw new Error(`path dependency escapes the checkout: ${manifestPath}: ${match[1]}`);
+      }
+      if (!dirs.has(dependency)) {
+        dirs.add(dependency);
+        queue.push(dependency);
+      }
+    }
+  }
+  return dirs;
+}
+
+function pathDependencyFiles(cwd, tracked = trackedFiles(cwd)) {
+  const files = new Set();
+  for (const dir of pathDependencyDirs(cwd)) {
+    const manifest = `${dir}/Cargo.toml`;
+    if (!tracked.includes(manifest)) throw new Error(`missing tracked path-dependency manifest: ${manifest}`);
+    files.add(manifest);
+    for (const file of tracked) {
+      if (!file.startsWith(`${dir}/`)) continue;
+      const relative = file.slice(dir.length + 1);
+      if (relative === 'build.rs' || /^(src|tests|examples|benches)\/.*\.rs$/.test(relative)) files.add(file);
+    }
+    for (const target of cargoSourceFiles(cwd, tracked, manifest)) files.add(target);
+  }
+  return files;
+}
+
 export function materializeInputs(cwd = process.cwd()) {
   const sources = sourceFiles(cwd);
-  materializeSources(cwd, sources);
+  const manifests = [...pathDependencyFiles(cwd)].filter(file => file.endsWith('/Cargo.toml'));
+  materializeSources(cwd, new Set([...sources, ...manifests]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
     throw new Error('compile-time input escapes the checkout');
@@ -206,8 +299,8 @@ export function select({ event, base, head = 'HEAD', cwd = process.cwd() }) {
   try {
     try { git(['cat-file', '-e', `${base}^{commit}`], cwd); }
     catch { git(['fetch', '--no-tags', '--depth=1', 'origin', base], cwd); }
-    // HEAD is the tested merge result for PRs; comparing it directly to the
-    // event's base also works in shallow checkouts without a merge-base walk.
+    // For PRs, the workflow passes the tested merge commit's first parent as
+    // base. A direct diff works with its shallow, depth-two checkout.
     const files = git(['diff', '--name-only', '-z', '--no-renames', base, head, '--'], cwd)
       .split('\0').filter(Boolean);
     const sources = sourceFiles(cwd);

@@ -1,0 +1,19 @@
+
+theorem preserves_mumford (a b : Input K) (f : K[X])
+    (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+    (hx : nx a ≠ nx b)
+    (ha : (X-C (nx a)) ∣ f-(C (ny a))^2)
+    (hb : (X-C (nx b)) ∣ f-(C (ny b))^2) :
+    let c := output a b
+    c.z ≠ 0 ∧ c.w ≠ 0 ∧
+    (X^2+C (c.q/c.z^2)*X+C (c.r/c.z^4)) ∣
+      f-(C (c.s/(c.z^3*c.w))*X+C (c.t/(c.z^5*c.w)))^2 := by
+  obtain ⟨hz,hw,hq,hr,hs,ht⟩ := normalized_coefficients a b haz haw hbz hbw hx
+  refine ⟨hz,hw,?_⟩
+  rw [hq,hr,hs,ht]
+  exact (Add11Distinct.distinct_preserves_mumford f (nx a) (ny a) (nx b) (ny b) hx ha hb).2
+
+theorem distinct_guard [DecidableEq K] (a b : Input K)
+    (haz : a.z ≠ 0) (hbz : b.z ≠ 0) (hx : nx a ≠ nx b) :
+    Add11Distinct.classify (crossA a b) (crossY a b) (crossB a b) (crossY b a) = .distinct := by
+  exact Add11Distinct.distinct_guard _ _ _ _ (normalized_distinct_cross a b haz hbz hx)

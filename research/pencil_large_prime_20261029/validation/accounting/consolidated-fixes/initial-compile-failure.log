@@ -1,0 +1,39 @@
+   Compiling five-leads-study v0.1.0 (/home/ec2-user/crypto-pencil-primality-20261029/research/five_leads_e2e_20261019/native)
+error[E0560]: struct `geometry_events::Snapshot` has no field named `scalar_scalar_constructor_modular_muls`
+  --> /home/ec2-user/crypto-pencil-primality-20261029/research/five_leads_e2e_20261019/native/../../../src/cryptanalysis/three_leads_geometry_events.rs:36:9
+   |
+36 |         scalar_scalar_constructor_modular_muls: 0,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `geometry_events::Snapshot` does not have this field
+   |
+   = note: available fields are: `scalar_constructor_prime_calls`
+
+error[E0062]: field `scalar_constructor_modular_squares` specified more than once
+  --> /home/ec2-user/crypto-pencil-primality-20261029/research/five_leads_e2e_20261019/native/../../../src/cryptanalysis/three_leads_geometry_events.rs:41:9
+   |
+37 |         scalar_constructor_modular_squares: 0,
+   |         ------------------------------------- first use of `scalar_constructor_modular_squares`
+...
+41 |         scalar_constructor_modular_squares: 0,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ used more than once
+
+error[E0062]: field `scalar_constructor_standalone_reductions` specified more than once
+  --> /home/ec2-user/crypto-pencil-primality-20261029/research/five_leads_e2e_20261019/native/../../../src/cryptanalysis/three_leads_geometry_events.rs:42:9
+   |
+38 |         scalar_constructor_standalone_reductions: 0,
+   |         ------------------------------------------- first use of `scalar_constructor_standalone_reductions`
+...
+42 |         scalar_constructor_standalone_reductions: 0,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ used more than once
+
+error[E0062]: field `constructor_prime_calls` specified more than once
+  --> /home/ec2-user/crypto-pencil-primality-20261029/research/five_leads_e2e_20261019/native/../../../src/cryptanalysis/three_leads_geometry_events.rs:43:9
+   |
+39 |         constructor_prime_calls: 0,
+   |         -------------------------- first use of `constructor_prime_calls`
+...
+43 |         constructor_prime_calls: 0,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^ used more than once
+
+Some errors have detailed explanations: E0062, E0560.
+For more information about an error, try `rustc --explain E0062`.
+error: could not compile `five-leads-study` (lib) due to 4 previous errors

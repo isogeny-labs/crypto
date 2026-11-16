@@ -1,0 +1,40 @@
+# DRAFT (L10). Provisional id. Receipts: lean/IcTensorRoute.lean::{ladder_rule, ladder_rule_real, arity_two_never,
+# solver_saving_floor}; sweep: crypto-worktrees/prime-pdp-sat-sweep-20261031/research/prime_pdp_sat_sweep_20261031/lean/PrimePdpEncoding.lean::{rho_floor, m2_budget_below_one}.
+id: KR-IC-a10007
+area: index-calculus
+kind: known_bound
+title: Ladder rule and solver-saving floor for fixed-arity index calculus, reconciled with the sweep's rho_floor
+claim: >-
+  Two conventions, one statement. Ladder convention (IcTensorRoute): b = log2 p, window s = b/m bits, one
+  decomposition attempt costs 2^{e s}; relation phase ~ m! 2^{b(1+e)/m} against rho 2^{b/2}; ladder_rule
+  and ladder_rule_real (Lean): (1+e)/m < 1/2 iff e < m/2 - 1, so m = 2 never (arity_two_never), m = 3 needs
+  e < 1/2, m = 4 needs e < 1. Sweep convention (rho_floor, PrimePdpEncoding.lean, core Lean, Nat form):
+  window l, per-target oracle cost c, product-law work W = m! p c / 2^{(m-1) l}; if
+  2^{(m-1) l} <= c m s and s*s <= p then s 2^{(m-1) l} <= m! p c, i.e. W >= sqrt(p). Setting l = b/m,
+  c = 2^{e s}: rho_floor's threshold c < 2^{(m-1)l}/(m sqrt p) is e <= m/2 - 1 up to the factor m; both drop
+  linear algebra, so each is a NECESSARY condition for beating rho. rho_floor additionally drops (m-1)! (uses
+  m! >= m); ladder_rule drops m! entirely. Conventions differ in: strict vs non-strict inequality, exponent
+  scale (e in units of s vs c additive), and the m factor. Solver-saving floor (solver_saving_floor, Lean): a
+  Boolean solver costing 2^{n(1-delta)} with n >= b interface bits meets the per-attempt budget
+  2^{b(1/2-1/m)} only if delta >= 1/2 + 1/m (budget omits the factor m, a conservative direction). The
+  hypothesis n >= b is an assumption on the encoding (interface_lower_bound only gives an injectivity
+  count). Measured context: WDSat alpha ~ m (delta ~ 0) on binary PDP, pilot prime-16-bit sweep 2e5-1.6e6
+  conflicts vs enumeration 48-68 (sweep memory, unaudited here).
+status: proven
+setting: {field: any, model: per_attempt_oracle_fixed_arity}
+cost: "beats rho only if e < m/2 - 1 (m=3: e<0.5; m=4: e<1); solver needs delta >= 1/2 + 1/m"
+sources:
+  - ref: KN-LIT-caa51d
+    locator: "context for the black-box oracle model only; the arithmetic itself has no external source"
+    verification_state: secondary_source
+  # TODO: the arithmetic is internal; promote a KN-FIND (Lean receipt) as the source before filing.
+forecloses:
+  - SAT solver makes fixed-arity index calculus beat rho
+  - per-attempt decomposition cost exponent below m/2 - 1
+  - arity two index calculus
+  - Boolean solver with constant-factor savings rescues index calculus
+internal:
+  - {ref: LEAD-ICB-decomposition-encoding-and-sat, relation: extends, note: "alpha < m/2 - 1 is this ladder rule"}
+dominated_by: null
+added: '2026-10-31'
+superseded_by: null

@@ -1,0 +1,24 @@
+import ComponentInitial
+set_option autoImplicit false
+namespace ComponentMap
+variable {n : Nat} {K : Type*} [Field K]
+def extendMap (f : Fin n → Fin n) : Fin (n+1) → Fin (n+1) :=
+ Fin.lastCases (Fin.last n) (fun i => (f i).castSucc)
+@[simp] theorem extend_old (f : Fin n → Fin n) (i : Fin n) :
+ extendMap f i.castSucc = (f i).castSucc := by simp [extendMap]
+@[simp] theorem extend_new (f : Fin n → Fin n) :
+ extendMap f (Fin.last n) = Fin.last n := by simp [extendMap]
+def insertGraph (s : GraphFind.State K n) : GraphFind.State K (n+1) :=
+ ⟨extendMap s.parent, Fin.lastCases GraphFind.ident s.pot⟩
+theorem insert_valid (s : GraphFind.State K n) (owner : Fin n → Fin n)
+ (h : Valid s owner) : Valid (insertGraph s) (extendMap owner) := by
+ constructor
+ · intro x
+   refine Fin.lastCases ?_ (fun i => ?_) x
+   · simp [insertGraph]
+   · simpa [insertGraph] using congrArg Fin.castSucc (h.1 i)
+ · intro x
+   refine Fin.lastCases ?_ (fun i => ?_) x
+   · simp [insertGraph]
+   · simpa [insertGraph] using h.2 i
+end ComponentMap

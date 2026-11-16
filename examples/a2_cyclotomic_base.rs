@@ -21,6 +21,7 @@
 //! Public synthetic fixtures only: Koblitz `K_a` at `n ∈ {11, 23}`,
 //! targets `[k]G` from a seeded stream, no logarithm computed.
 
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_from64;
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
@@ -323,8 +324,9 @@ fn run_cell_child(spec: &CellSpec) {
                                 .iter()
                                 .enumerate()
                                 .fold(0u64, |acc, (i, &b)| acc | ((b as u64) << i));
-                            let xs: Vec<_> =
-                                (0..sys.m).map(|i| sys.summand_x(root, i, kc.n)).collect();
+                            let xs: Vec<_> = (0..sys.m)
+                                .map(|i| sys.summand_x(mask_from64(root), i, kc.n))
+                                .collect();
                             lift_ok(&kc, &built, &index_of, &xs, target)
                         });
                     WdsatRecord {

@@ -1,0 +1,7 @@
+# N83 full-D18 cadence-32 constructed control, 2026-10-26
+
+This directory copies the [attempt-5 source report](../../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-5/REPORT.md) for browsing. [RUN.pdf](RUN.pdf) and [RESULT.pdf](RESULT.pdf) are identical copies of that single source report; [CONTROL_TIMELINE.svg](CONTROL_TIMELINE.svg) and [PNG](CONTROL_TIMELINE.png) are copies of its same-source diagram. Edit and regenerate the study files first, then recopy. The study directory holds the S3 receipts, model sidecar, phase trace and independent native replay.
+
+The constructed arm recorded 85.564 s full-object import, 0.153 s formula construction, 0.352 s SAT search, and 86.603 s worker process wall on a shared Apple M4 Pro (L0). Its original-field group, signed-orbit row and retained assignment replay passed. macOS `/usr/bin/time -l` exited 1 on a denied `kern.clockrate` query; the child exit was not separately captured. The natural arm remained held. These are stage values for one constructed control, not a total IC runtime or comparative speedup. No same-target rho or cold end-to-end cost is attached.
+
+This entry remains **outside the admitted `benchmarks/README.md` table** because [`docs/VALIDATION_GATE.md`](../../docs/VALIDATION_GATE.md) requires a matched rho reference and independent headline validator before that table admits a row. Its browsable pointer is in the README prose above the table. `selected_best_total_runtime=null`.

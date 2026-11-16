@@ -1,0 +1,310 @@
+{
+  "cells": [],
+  "ecbench": {
+    "pricing": "priced S = recorded S + F4 word XORs * pinned ns_per_word_xor (docs/ic/calibration.json, another host) / sqrt(r); a sensitivity, not the recorded S",
+    "rows": [
+      {
+        "arm": "clo-unsplit-g4",
+        "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_f4_word_xors": 694485445.0,
+        "median_priced_over_signed_frobenius_rho": 2951.7401676666673,
+        "median_priced_over_standard_twin": 0.5374323705733116,
+        "median_priced_over_strong_rho": 889.2110280431684,
+        "median_priced_s": 2143.4437129799776,
+        "median_s_recorded": 1.8351062179867754,
+        "median_systems": 2532.0,
+        "n": 19,
+        "per_workload": [
+          {
+            "f4_word_xors": 694485445.0,
+            "priced_s": 2143.4437129799776,
+            "s": 1.9341728849891038,
+            "systems": 2532.0,
+            "verified": true,
+            "workload": "W1c21372a1280"
+          },
+          {
+            "f4_word_xors": 881533753.0,
+            "priced_s": 2720.2749292732556,
+            "s": 1.984782868186828,
+            "systems": 3216.0,
+            "verified": true,
+            "workload": "Wa15cccedfe3a"
+          },
+          {
+            "f4_word_xors": 481397895.0,
+            "priced_s": 1486.269650017743,
+            "s": 1.8351062179867754,
+            "systems": 1761.0,
+            "verified": true,
+            "workload": "Waafe0c6ff03b"
+          },
+          {
+            "f4_word_xors": 888642837.0,
+            "priced_s": 2742.0459566378763,
+            "s": 1.8342979578647949,
+            "systems": 3244.0,
+            "verified": true,
+            "workload": "Wfb6729b09e53"
+          },
+          {
+            "f4_word_xors": 342016733.0,
+            "priced_s": 1056.4240221224331,
+            "s": 1.7840698169957914,
+            "systems": 1251.0,
+            "verified": true,
+            "workload": "Wfcca45aeb56d"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.00158,
+        "priced_over_strong_rho_per_workload": [
+          416.9896312345164,
+          617.0809385309351,
+          889.2110280431684,
+          1260.1221979216316,
+          1270.2072648972137
+        ],
+        "runs": 5,
+        "verified": 5
+      },
+      {
+        "arm": "rho-frob",
+        "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_f4_word_xors": null,
+        "median_priced_over_signed_frobenius_rho": 1.0,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 0.2186315331536496,
+        "median_priced_s": 0.5220637812687217,
+        "median_s_recorded": 0.5220637812687217,
+        "median_systems": null,
+        "n": 19,
+        "per_workload": [
+          {
+            "f4_word_xors": null,
+            "priced_s": 2.18778878056911,
+            "s": 2.18778878056911,
+            "systems": null,
+            "verified": true,
+            "workload": "W1c21372a1280"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.4566838310911434,
+            "s": 0.4566838310911434,
+            "systems": null,
+            "verified": true,
+            "workload": "Wa15cccedfe3a"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.5035231983825427,
+            "s": 0.5035231983825427,
+            "systems": null,
+            "verified": true,
+            "workload": "Waafe0c6ff03b"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.370811657723578,
+            "s": 0.370811657723578,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfb6729b09e53"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.5718306090158334,
+            "s": 0.5718306090158334,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfcca45aeb56d"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.5406043641549005,
+            "s": 0.5406043641549005,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfe878ab56b16"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.00158,
+        "priced_over_strong_rho_per_workload": [
+          0.1717723440808365,
+          0.20905665928540515,
+          0.21155120271008285,
+          0.22571186359721637,
+          0.23672882892430533,
+          0.9076076497509318
+        ],
+        "runs": 6,
+        "verified": 6
+      },
+      {
+        "arm": "rho-strong",
+        "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_f4_word_xors": null,
+        "median_priced_over_signed_frobenius_rho": 4.578707652695323,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 1.0,
+        "median_priced_s": 2.3460964658755277,
+        "median_s_recorded": 2.3460964658755277,
+        "median_systems": null,
+        "n": 19,
+        "per_workload": [
+          {
+            "f4_word_xors": null,
+            "priced_s": 2.4105005959012016,
+            "s": 2.4105005959012016,
+            "systems": null,
+            "verified": true,
+            "workload": "W1c21372a1280"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 2.1587389967099306,
+            "s": 2.1587389967099306,
+            "systems": null,
+            "verified": true,
+            "workload": "Wa15cccedfe3a"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 2.4085489555973933,
+            "s": 2.4085489555973933,
+            "systems": null,
+            "verified": true,
+            "workload": "Waafe0c6ff03b"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 2.1587389967099306,
+            "s": 2.1587389967099306,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfb6729b09e53"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 2.5334539350411247,
+            "s": 2.5334539350411247,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfcca45aeb56d"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 2.2836439761536615,
+            "s": 2.2836439761536615,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfe878ab56b16"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.00158,
+        "priced_over_strong_rho_per_workload": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "runs": 6,
+        "verified": 6
+      },
+      {
+        "arm": "std-unsplit-g4",
+        "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_f4_word_xors": 1263878924.0,
+        "median_priced_over_signed_frobenius_rho": 6674.8308502875425,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 1670.8238077238216,
+        "median_priced_s": 3916.8731493239575,
+        "median_s_recorded": 19.586614728564903,
+        "median_systems": 8113.0,
+        "n": 19,
+        "per_workload": [
+          {
+            "f4_word_xors": 1242308904.0,
+            "priced_s": 3850.0032519644433,
+            "s": 19.22985157885335,
+            "systems": 7959.0,
+            "verified": true,
+            "workload": "W1c21372a1280"
+          },
+          {
+            "f4_word_xors": 698081764.0,
+            "priced_s": 2164.926802600132,
+            "s": 12.32768315805539,
+            "systems": 4487.0,
+            "verified": true,
+            "workload": "Wa15cccedfe3a"
+          },
+          {
+            "f4_word_xors": 971446771.0,
+            "priced_s": 3011.374443281043,
+            "s": 15.829262645944874,
+            "systems": 6222.0,
+            "verified": true,
+            "workload": "Waafe0c6ff03b"
+          },
+          {
+            "f4_word_xors": 1646587775.0,
+            "priced_s": 5102.1228098202755,
+            "s": 24.718446412369904,
+            "systems": 10597.0,
+            "verified": true,
+            "workload": "Wfb6729b09e53"
+          },
+          {
+            "f4_word_xors": 1496563014.0,
+            "priced_s": 4637.452461820135,
+            "s": 22.663203228388006,
+            "systems": 9620.0,
+            "verified": true,
+            "workload": "Wfcca45aeb56d"
+          },
+          {
+            "f4_word_xors": 1285448944.0,
+            "priced_s": 3983.7430466834717,
+            "s": 19.943377878276454,
+            "systems": 8267.0,
+            "verified": true,
+            "workload": "Wfe878ab56b16"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.00158,
+        "priced_over_strong_rho_per_workload": [
+          1002.8663983462716,
+          1250.2857524580108,
+          1597.1799627475561,
+          1744.4676527000872,
+          1830.486198181005,
+          2363.47368421855
+        ],
+        "runs": 6,
+        "verified": 6
+      }
+    ],
+    "sessions": [
+      "research/pdp_split_slots_20261012/sessions/A-n19-fast"
+    ]
+  },
+  "inputs": {
+    "calibration": "docs/ic/calibration.json",
+    "replica": null,
+    "rho_session": "research/pdp_split_dreg_20261011/sessions/rho-01",
+    "runs": ""
+  },
+  "ladder": {
+    "cells": [],
+    "files": [],
+    "rows": [],
+    "rule": "growth = (cost_k2/cost_k1)^(1/(k2-k1)) on mean XORs per branch; enumeration is 2"
+  },
+  "projection_rule": "S_relations = (F+1)/lambda * mean_word_xors * ns_per_word_xor / sqrt(r); relation phase only; pinned ratio from another host",
+  "replica_runs_compared": 0,
+  "replica_runs_mismatched": 0,
+  "schema": "pdp_split_dreg.analysis/v1"
+}

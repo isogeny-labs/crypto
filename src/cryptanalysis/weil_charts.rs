@@ -14,6 +14,7 @@ use super::{
     semaev_decomp::Gf2,
 };
 use crate::binary_ecc::{BinaryPoint, F2mElement};
+use crate::cryptanalysis::pq_groebner_f2::{mask_from64, mask_low64};
 use num_bigint::BigUint;
 use std::collections::{BTreeSet, HashMap, HashSet};
 
@@ -299,7 +300,7 @@ impl WeilChartPlan {
                     prepared.n_vars,
                     &opts,
                     |root| {
-                        let assignment = prepared.lift(root);
+                        let assignment = prepared.lift(mask_low64(root));
                         let x = combination(&self.charts[i], assignment);
                         let y = combination(&self.charts[j], assignment >> ell);
                         let pair = if x <= y { (x, y) } else { (y, x) };
@@ -420,7 +421,7 @@ fn prepare(
                         .iter()
                         .enumerate()
                         .filter(|(i, _)| r >> i & 1 != 0)
-                        .map(|(_, &m)| F2BoolMono::from_mask(m))
+                        .map(|(_, &m)| F2BoolMono::from_mask(mask_from64(m)))
                         .collect(),
                     nv,
                 )
@@ -485,7 +486,10 @@ fn prepare(
         }
         if !terms.is_empty() {
             equations.push(F2BoolPoly::from_monos(
-                terms.into_iter().map(F2BoolMono::from_mask).collect(),
+                terms
+                    .into_iter()
+                    .map(|t| F2BoolMono::from_mask(mask_from64(t)))
+                    .collect(),
                 nf,
             ));
         }
@@ -503,6 +507,10 @@ mod tests {
         build_frobenius_union_factor_base, linearised_kernel_basis,
     };
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     fn truth(plan: &WeilChartPlan, r: u64) -> BTreeSet<(u64, u64)> {
         let f = &plan.field;
         let mut out = BTreeSet::new();

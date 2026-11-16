@@ -5,6 +5,7 @@
 //! ic bench --bits 16 --factor-base prime-abscissa:size=24 \
 //!          --oracle mitm:negation_folded=1 --targets walk
 //! ic bench --sweep sweep.json --out docs/ic/runs/sweep-YYYY-MM-DD.json
+//! ic bench --bits 24 --auto             the stages `ic plan` picks for the curve
 //! ```
 //!
 //! A configuration is a choice at each stage.  The table it prints
@@ -15,22 +16,32 @@
 //! See `docs/ic/FRAMEWORK.md`.
 
 use clap::Args;
+use crypto_lib::cryptanalysis::curve25519_wide::scan_row;
+use crypto_lib::cryptanalysis::ic_framework::archive::{
+    self, ArchiveInstance, BinaryArchiveBase, PrimeArchiveBase,
+};
 use serde_json::{json, Value};
 
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
-    generic_floor_ops, koblitz_floor_instance, koblitz_instance, random_binary_instance,
-    rho_reference, rho_reference_negation, roster_prime_instance, signed_frobenius_rho,
-    BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps, PinOutcome, PrimeInstance,
-    RhoResult,
+    curve25519_family_instance, find_prime_order_curve, generic_floor_ops, koblitz_floor_instance,
+    koblitz_instance, random_binary_instance, rho_reference, rho_reference_negation,
+    roster_prime_instance, signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration,
+    CountedGroup, GroupOps, PinOutcome, PrimeInstance, RhoResult,
 };
+use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
+use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
+use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
-    BinarySubspaceBase, CompactOrbitScanBase, DescentAlgebraicOracle, FrobeniusMitmOracle,
-    GlvOrbitBase, KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase,
-    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, SubtractOracle, SymmetrisedOracle,
+    BinaryMultiplierBase, BinarySubspaceBase, ChainedXOracle, CmMultiplierBase,
+    CompactOrbitScanBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KnownLogBase,
+    KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase, KoblitzTraceZeroBase, MitmOracle,
+    PrimeAbscissaBase, PrimeBatchMitmOracle, RootfindSubtractOracle, SubtractOracle,
+    SymmetrisedOracle,
 };
+use crypto_lib::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
 };
@@ -47,6 +58,34 @@ pub struct BenchArgs {
     /// each plug-in reads, and exit.
     #[arg(long)]
     pub list: bool,
+    /// Verified local factory cache (populate with factor-base fetch).
+    #[arg(long, requires = "archive_manifest", conflicts_with_all = ["bits", "char2_degree", "koblitz_degree", "sweep", "model_b", "koblitz_a", "auto"])]
+    pub archive_store: Option<std::path::PathBuf>,
+    /// Content-addressed manifest: supplies the exact curve and generator.
+    #[arg(long, requires = "archive_store")]
+    pub archive_manifest: Option<String>,
+    /// Archive column symmetry: none, negation, frobenius, cubic or quartic.
+    /// Every multiplier is verified; Frobenius needs a closed Koblitz archive.
+    #[arg(long, requires = "archive_manifest", value_parser = ["none", "negation", "frobenius", "cubic", "quartic"])]
+    pub archive_symmetry: Option<String>,
+    /// Verify every relation and retain useful-rank receipts (automatic for archives).
+    #[arg(long)]
+    pub audit_rank: bool,
+    /// Let the planner (`ic plan`) choose every stage this command line
+    /// leaves at its default: factor base and size, oracle, relation
+    /// matrix and target source, from the measured evidence for this
+    /// curve.  A stage given explicitly (a non-default `--targets` or
+    /// `--linalg`, any `--factor-base` or `--oracle`) wins.  Not with
+    /// `--sweep`.
+    #[arg(long)]
+    pub auto: bool,
+    /// With `--auto`: memory the planned pair table may take, in GiB.
+    #[arg(long, default_value_t = 8.0)]
+    pub max_table_gib: f64,
+    /// With `--auto`: plan for this AGENTS.md §5a weight (GAE per unpriced
+    /// native operation); 0 plans for counted S.
+    #[arg(long, default_value_t = 0.0)]
+    pub native_weight: f64,
     /// Prime-field instance of this subgroup bit length.
     #[arg(long)]
     pub bits: Option<u32>,
@@ -54,9 +93,38 @@ pub struct BenchArgs {
     /// roster's curve at that size; `j0`, `j1728`, `d7` and `d8` generate
     /// a CM curve of that family (order certified against the Cornacchia
     /// candidates, deterministic in `--seed`) so that `glv-orbit` has an
-    /// automorphism group to fold by.
+    /// automorphism group to fold by.  `curve25519` takes the committed
+    /// Curve25519-family miniature at that size (20, 24, 28, 32 bits):
+    /// `p ≡ 5 (mod 8)`, `#E = 8r`, `#E' = 4r'`, smallest Montgomery `A`.
     #[arg(long, default_value = "generic")]
     pub family: String,
+    /// EFD model for the prime instance (`montgom`, `edwards`, `twisted`,
+    /// `twistedhessian`, `hessian`, `jintersect`, `jquartic`, `2dik`, `3dik`).
+    /// When set, the short-Weierstrass bench engine is built from the EFD
+    /// bridge and `--efd-chart` controls input/output.
+    #[arg(long)]
+    pub efd_model: Option<String>,
+    /// EFD chart id (`affine`, `xz`, `jacobian`, `extended`, ...).
+    #[arg(long, default_value = "affine")]
+    pub efd_chart: String,
+    /// Prime field modulus of the EFD curve (`5 <= p < 2^62`).
+    #[arg(long)]
+    pub efd_p: Option<String>,
+    /// EFD model parameter, `NAME=VALUE`; repeatable.
+    #[arg(long = "efd-param", value_name = "NAME=VALUE")]
+    pub efd_params: Vec<String>,
+    /// Prime subgroup order of the EFD curve.
+    #[arg(long)]
+    pub efd_order: Option<String>,
+    /// Cofactor of the EFD curve.
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u64).range(1..))]
+    pub efd_cofactor: u64,
+    /// Generator in `--efd-chart` coordinates, comma-separated.
+    #[arg(long)]
+    pub efd_generator: Option<String>,
+    /// Lift index for quotient EFD charts.
+    #[arg(long, default_value_t = 0)]
+    pub efd_lift: u32,
     /// Binary-field instance of this field degree (random curve).
     #[arg(long)]
     pub char2_degree: Option<u32>,
@@ -94,7 +162,8 @@ pub struct BenchArgs {
     /// `random` or `walk`.
     #[arg(long, default_value = "walk")]
     pub targets: String,
-    /// The relation matrix: `incremental-gauss` or `structured-gauss`.
+    /// The relation matrix: `incremental-gauss`, `structured-gauss`,
+    /// `sparse-cado`, … (`ic bench --list` prints them all).
     #[arg(long, default_value = "incremental-gauss")]
     pub linalg: String,
     #[arg(long, default_value_t = 2_000_000)]
@@ -125,7 +194,7 @@ pub struct BenchArgs {
     /// 0 (the classic oracle), 1 or 2.  Injected as the oracle's
     /// `large_primes` parameter into every configuration that does not
     /// set it; see `ic_framework::large_prime`.
-    #[arg(long)]
+    #[arg(long, value_parser = clap::value_parser!(u32).range(0..=2))]
     pub large_primes: Option<u32>,
     /// Size of the large-prime domain `D` as a multiple of `|F|` in signed
     /// points; injected as `lp_domain_factor` where the configuration
@@ -217,22 +286,75 @@ fn listing() -> Value {
         })
         .collect();
     json!({
+        "archive_techniques": [
+            {"technique": "column_symmetry", "options": archive::SYMMETRIES,
+             "status": "implemented", "gate": "exact curve action and every point multiplier; signed closure for Frobenius"},
+            {"technique": "one_or_two_large_primes", "options": [0, 1, 2],
+             "status": "implemented_for_closed_koblitz_archives",
+             "gate": "symmetry=frobenius; mitm-frobenius or mitm-frobenius-counted; m=3; bounded disjoint residual domain; only fully eliminated verified rows contribute rank"},
+            {"technique": "torsion_symmetrisation", "status": "native_control_base",
+             "gate": "koblitz-symmetrised with its matching symmetrised oracle and divisor; explicit factor-base replacement on the imported instance; not an archive point translation"},
+            {"technique": "subspaces_trace_zero_offsets_orbit_recipes", "status": "factory_recipes",
+             "gate": "recipe field checks; algebraic oracles additionally need a supported exact domain encoding"},
+            {"technique": "mitm_batching_walk_targets_and_polynomial_solvers", "status": "stage_plugins",
+             "gate": "see the registered stages and each plugin's parameters"},
+            {"technique": "gls_subfield_maps_isogenies_covers_and_new_models", "status": "extension_required",
+             "gate": "exact field/model codec, certified subgroup map and counted native backend; no transfer inferred from a curve label"}
+        ],
         "stages": [
             {
                 "stage": "factor base",
                 "trait": "FactorBaseBuilder",
                 "what_it_chooses": "which points relations are written over, and which unknown each point contributes to",
                 "plugins": [
+                    {"name": "archive", "regimes": ["prime", "char2", "koblitz"],
+                     "parameters": [{"name": "store", "means": "local verified factory cache"}, {"name": "manifest", "means": "immutable SHA-256 manifest"},
+                                    {"name": "symmetry", "means": "none, negation (default), frobenius (certified closed Koblitz archive), cubic (j=0), quartic (j=1728); every point coefficient is replayed"}]},
                     {"name": "prime-abscissa", "regimes": ["prime"],
-                     "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"}]},
+                     "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"},
+                                    {"name": "below", "means": "instead of size: every abscissa in [1, below) carrying a point; with below = 2^T it is pkm-semaev's bits=T interval (the naive algebraic arm)"}]},
+                    {"name": "prime-kummer", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "t", "means": "tower height: abscissae in g*mu_{2^t}, the zeros of t squarings; needs 2^t | p - 1"},
+                        {"name": "g", "means": "coset representative; default 1"}],
+                     "needs": "oracle pkm-semaev for the algebraic track; any other oracle treats it as a plain abscissa set"},
+                    {"name": "prime-isogeny", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "t", "means": "tower height: abscissae x(R' + <Q>) for Q of order 2^t on an auxiliary curve E'/F_p, the zeros of t Velu 2-isogeny x-maps; no condition on p"},
+                        {"name": "seed", "means": "public seed of the auxiliary-curve search (or of R' on a supersingular E'); default 0"},
+                        {"name": "aux", "means": "ordinary (searched, charged to the factor-base phase), supersingular, ss-j1728, ss-j1728-twist, ss-j0 or ss-j0-twist (#E' = p + 1, no search)"}],
+                     "needs": "oracle pkm-semaev for the algebraic track"},
+                    {"name": "known-log", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "size", "means": "columns B (need 2*B < r): multiples [i]G or seeded scalars, one column each, every logarithm known so linear algebra is skipped"},
+                        {"name": "scalars", "means": "progression (default): s_i = i, built by B-1 additions; random: s_i uniform in [1, r-1], one charged scalar multiplication each"},
+                        {"name": "seed", "means": "random only: seed of the scalar stream (default 20261019); the base is fixed per (G, size, seed)"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
                      "parameters": [
                         {"name": "size", "means": "seed abscissae; the base is their closure under the curve's automorphism group"},
                         {"name": "group", "means": "auto, negation, j0 or j1728 (use --family j0 or j1728 for a curve that has one)"},
                         {"name": "no_fold", "means": "1 to fold the same points by negation only: the control that shows what the fold buys"}]},
+                    {"name": "cm-multiplier", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "size", "means": "seed abscissae (columns)"},
+                        {"name": "norm", "means": "include alpha(P) = [a]P + [b]phi(P) for every alpha = a + b*phi of norm <= this (needs --family j0, j1728, d7 or d8); 0 for the seeds alone"},
+                        {"name": "endo", "means": "index of the curve's CM endomorphism; default 0"},
+                        {"name": "mult", "means": "also include [m]P for m = 2..=mult with weight m (needs no endomorphism); default 1"}]},
+                    {"name": "hashed-affine", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match the oracle"},
+                        {"name": "seed", "means": "SplitMix64 seed for the affine hash seeds; default 1"},
+                        {"name": "tau", "means": "shared threshold; default the Lemma 13 integer ceiling"},
+                        {"name": "s", "means": "shared hash prime in [2p,4p]; default the first prime there"},
+                        {"name": "steps", "means": "enumeration work budget in charged primitive steps"}]},
                     {"name": "gls-line", "regimes": ["gls (examples/glv_invariant_bench.rs)"],
                      "parameters": [
-                        {"name": "no_fold", "means": "1 to fold the same points by negation only"}]},
+                        {"name": "no_fold", "means": "1 to fold the same points by negation only"}],
+                     "needs": "a GLS instance over F_{p^2}: not selectable from `ic bench` (the prime dispatch has no arm for it); run examples/glv_invariant_bench.rs"},
+                    {"name": "binary-multiplier", "regimes": ["char2", "koblitz"],
+                     "parameters": [
+                        {"name": "size", "means": "seed abscissae (columns)"},
+                        {"name": "mult", "means": "include [m]P for m = 2..=mult with weight m; 1 for the seeds alone"}]},
                     {"name": "binary-subspace", "regimes": ["char2", "koblitz"],
                      "parameters": [{"name": "dimension", "means": "F_2-dimension of the abscissa subspace"}]},
                     {"name": "koblitz-orbit", "regimes": ["koblitz"],
@@ -274,6 +396,23 @@ fn listing() -> Value {
                     {"name": "mitm", "summands": "2 or 3", "regimes": ["prime", "char2", "koblitz"],
                      "parameters": [{"name": "negation_folded", "means": "1 to halve the table's additions"},
                                     {"name": "m", "means": "summands, 2 or 3"}]},
+                    {"name": "pkm-semaev", "summands": "2 or 3", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "m", "means": "summands, 2 or 3"},
+                        {"name": "mode", "means": "chain (S3 chain with free unknowns, default) or full (S_{m+1})"},
+                        {"name": "engine", "means": "f4 (algebraic track) or exhaustive (the grid reference: the control an algebraic engine has to beat)"},
+                        {"name": "degree", "means": "F4 degree bound; default 12"},
+                        {"name": "max_nnz", "means": "F4 matrix size bound"},
+                        {"name": "bits", "means": "on a base other than prime-kummer/prime-isogeny: membership in [lo, lo + 2^bits) written in bits"}],
+                     "needs": "prime-kummer or prime-isogeny (it solves on the base's own tower), or bits=T; F4 multiply-adds are native work priced across the AGENTS.md 5a band"},
+                    {"name": "hashed-tensor", "summands": "2..8", "regimes": ["prime"],
+                     "parameters": [
+                        {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match hashed-affine"},
+                        {"name": "seed", "means": "SplitMix64 seed for the affine hash seeds; default 1"},
+                        {"name": "tau", "means": "shared threshold; must match hashed-affine"},
+                        {"name": "s", "means": "shared hash prime; must match hashed-affine"},
+                        {"name": "steps", "means": "per-target contraction budget in charged primitive steps"}],
+                     "needs": "the hashed-affine factor base with identical slots, seed, tau and s; contraction steps are reported uncalibrated, so do not read its S as a priced end-to-end cost"},
                     {"name": "mitm-frobenius", "summands": "2 or 3", "regimes": ["koblitz"],
                      "parameters": [{"name": "m", "means": "summands, 2 or 3"},
                                     {"name": "large_primes", "means": "0, 1 or 2 residuals outside the base a partial relation may carry (m=3 only); --large-primes sets it for every configuration"},
@@ -289,6 +428,13 @@ fn listing() -> Value {
                                     {"name": "max_degree", "means": "Macaulay cap before splitting (default 3)"},
                                     {"name": "node_budget", "means": "algebraic reduction calls before a solve gives up (default 4096)"}],
                      "needs": "the koblitz-symmetrised factor base; solves in w = u² + u, s = Σu with koblitz_groebner"},
+                    {"name": "chained-x", "summands": "2, 3 or 4", "regimes": ["koblitz"],
+                     "parameters": [{"name": "m", "means": "summands, 2, 3 or 4 (m − 1 chained Semaev S3 links)"},
+                                    {"name": "engine", "means": "inherited-f4 (default), matrix-f4 or matrix-f5"},
+                                    {"name": "max_degree", "means": "Macaulay cap before splitting (default 3)"},
+                                    {"name": "node_budget", "means": "algebraic reduction calls before a solve gives up (default 4096)"},
+                                    {"name": "trace", "means": "1 keeps a per-call record (outcome, reductions, XORs) on the oracle"}],
+                     "needs": "a Koblitz instance and a subspace factor base (binary-subspace or koblitz-orbit); the layout has m·dimension + (m − 2)·n unknowns and is refused above 64"},
                 ],
             },
             {
@@ -478,6 +624,12 @@ fn matched_rho(instance: &Instance, seed: u64, repeats: usize, runs: usize) -> R
                 rule: "negation map (A = 2): the only eligible automorphism of this curve",
             }
         }
+        Instance::Wide255 => RhoReferences {
+            matched: None,
+            plain: None,
+            candidates: Vec::new(),
+            rule: "no matched rho reference is wired for the 255-bit wide group",
+        },
         Instance::Binary(i) => {
             let bg = BinaryGroup(&i.fast);
             let (gen, r) = (i.generator, i.r);
@@ -519,6 +671,43 @@ fn matched_rho(instance: &Instance, seed: u64, repeats: usize, runs: usize) -> R
 }
 
 /// One prime-field configuration, over `repeats` targets.
+/// The wide Curve25519 path: the relation phase runs, no relation exists, and
+/// the row is `exhausted`.  It exists so `ic bench`/`ic sweep` have an honest
+/// 255-bit measurement instead of a refusal.
+fn run_wide255(specs: &[PipelineSpec], args: &BenchArgs) -> Result<Value, String> {
+    let size_of = |spec: &PipelineSpec| -> usize {
+        spec.factor_base
+            .split([':', ','])
+            .find_map(|kv| kv.strip_prefix("size="))
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(1024)
+    };
+    let mut rows = Vec::new();
+    for spec in specs {
+        for rep in 0..args.repeats.max(1) {
+            let seed = args.seed ^ (rep as u64).wrapping_mul(0x9E37_79B9);
+            rows.push(scan_row(size_of(spec), args.max_trials, seed));
+        }
+    }
+    Ok(json!({
+        "schema_version": 1,
+        "operation": "bench",
+        "status": "complete",
+        "instance": "curve25519-wide",
+        "regime": "prime",
+        "rows": rows,
+        "configurations_skipped": [],
+        "rho_reference": Value::Null,
+        "calibration": Value::Null,
+        "what_this_is": "The real 255-bit Curve25519 relation phase, counted. With N base points and T probes the expected hits are T·N/ℓ, so no relation exists at any feasible size; the row is exhausted, not a solve.",
+        "what_this_is_not": [
+            "not a solved ECDLP: no relation was found",
+            "not a speed claim: operation counts only",
+            "not a claim about any deployed key",
+        ],
+    }))
+}
+
 fn run_prime(
     inst: &PrimeInstance,
     spec: &PipelineSpec,
@@ -530,12 +719,24 @@ fn run_prime(
     let or_name = spec.oracle.as_str();
     let abscissa = PrimeAbscissaBase { instance: inst };
     let orbit = GlvOrbitBase { instance: inst };
+    let archive = PrimeArchiveBase { instance: inst };
+    let known_log = KnownLogBase;
+    let multiplier = CmMultiplierBase { instance: inst };
+    let hashed = HashedAffineBase { instance: inst };
+    let kummer = PrimeKummerBase { instance: inst };
+    let isogeny = PrimeIsogenyBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
+        "archive" => &archive,
         "prime-abscissa" => &abscissa,
         "glv-orbit" => &orbit,
+        "known-log" => &known_log,
+        "cm-multiplier" => &multiplier,
+        "hashed-affine" => &hashed,
+        "prime-kummer" => &kummer,
+        "prime-isogeny" => &isogeny,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa or glv-orbit"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log, cm-multiplier, hashed-affine, prime-kummer or prime-isogeny"
             ))
         }
     };
@@ -560,12 +761,33 @@ fn run_prime(
         let m = spec.oracle_params.u64_or("m", 2)? as u32;
         let mut subtract = SubtractOracle;
         let mut mitm = MitmOracle::new(m);
+        let mut batch = PrimeBatchMitmOracle::new();
+        let mut blocked = PrimeBatchMitmOracle::blocked();
+        let mut rootfind = RootfindSubtractOracle::new(m, inst);
+        let mut rootfind_gpu =
+            crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
+                m, inst,
+            );
+        let mut hashed = HashedTensorOracle::new();
+        // Built on the base's own tower, so it refuses any other base.
+        let mut pkm = match or_name {
+            "pkm-semaev" => Some(PkmSemaevOracle::from_spec(m, &spec, inst)?),
+            _ => None,
+        };
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
+            "pkm-semaev" => pkm.as_mut().expect("built above"),
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
+            "mitm-prime-batch" => &mut batch,
+            "mitm-prime-blocked" => &mut blocked,
+            "rootfind-subtract" => &mut rootfind,
+            "rootfind-subtract-gpu" => &mut rootfind_gpu,
+            "hashed-tensor" => &mut hashed,
             other => {
                 return Err(format!(
-                    "oracle `{other}` is not available on a prime-field curve; try subtract or mitm"
+                    "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-subtract-gpu, \
+                     hashed-tensor or pkm-semaev"
                 ))
             }
         };
@@ -588,13 +810,25 @@ fn run_binary(
     let fb_name = spec.factor_base.as_str();
     let or_name = spec.oracle.as_str();
     let g = BinaryGroup(&inst.fast);
+    if fb_name == "archive" && matches!(or_name, "mitm-frobenius" | "mitm-frobenius-counted") {
+        if inst.koblitz.is_none() {
+            return Err("archive Frobenius oracle requires a certified Koblitz instance".into());
+        }
+        if spec.factor_base_params.get("symmetry") != Some("frobenius") {
+            return Err("archive Frobenius oracle requires --archive-symmetry frobenius (including closure verification)".into());
+        }
+    }
+    let archive = BinaryArchiveBase { instance: inst };
     let subspace = BinarySubspaceBase { instance: inst };
     let orbit = KoblitzOrbitBase { instance: inst };
     let trace_zero = KoblitzTraceZeroBase { instance: inst };
     let symmetrised_base = KoblitzSymmetrisedBase { instance: inst };
     let compact_orbit = CompactOrbitScanBase { instance: inst };
     let closure = KoblitzClosureBase { instance: inst };
+    let multiplier = BinaryMultiplierBase { instance: inst };
     let base: &dyn FactorBaseBuilder<BinaryGroup> = match fb_name {
+        "archive" => &archive,
+        "binary-multiplier" => &multiplier,
         "koblitz-closure" => &closure,
         "binary-subspace" => &subspace,
         "koblitz-orbit" => &orbit,
@@ -643,15 +877,16 @@ fn run_binary(
         let mut subtract = SubtractOracle;
         let mut mitm = MitmOracle::new(m);
         let mut frob = FrobeniusMitmOracle::new(m, inst);
+        let mut frob_counted = FrobeniusMitmOracle::new_counted(m, inst);
         let mut symmetrised = match or_name {
             "symmetrised" => Some(SymmetrisedOracle::new(m, inst)),
             _ => None,
         };
         let mut algebraic = match or_name {
             "descent-algebraic" => {
-                let raw = spec.solver.as_deref().ok_or(
-                    "descent-algebraic needs --solver (try buchberger-f2, sat-cdcl or exhaustive)",
-                )?;
+                let raw = spec.solver.as_deref().unwrap_or(
+                    crypto_lib::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER,
+                );
                 let (sname, sparams) = parse_plugin(raw)?;
                 let budget = (spec.solver_budget_seconds > 0)
                     .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
@@ -665,12 +900,18 @@ fn run_binary(
             }
             _ => None,
         };
+        let mut chained = match or_name {
+            "chained-x" => Some(ChainedXOracle::new(m, inst)),
+            _ => None,
+        };
         let oracle: &mut dyn DecompositionOracle<BinaryGroup> = match or_name {
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-frobenius" => &mut frob,
+            "mitm-frobenius-counted" => &mut frob_counted,
             "descent-algebraic" => algebraic.as_mut().expect("built above"),
             "symmetrised" => symmetrised.as_mut().expect("built above"),
+            "chained-x" => chained.as_mut().expect("built above"),
             other => return Err(format!("oracle `{other}` is not available here")),
         };
         out.push(run_pipeline(
@@ -685,6 +926,8 @@ fn run_binary(
 enum Instance {
     Prime(PrimeInstance),
     Binary(BinaryInstance),
+    /// The real 255-bit Curve25519 group (`--bits 255 --family curve25519`).
+    Wide255,
 }
 
 impl Instance {
@@ -692,6 +935,14 @@ impl Instance {
         match self {
             Instance::Prime(i) => &i.name,
             Instance::Binary(i) => &i.name,
+            Instance::Wide255 => "curve25519-wide",
+        }
+    }
+
+    fn representation_json(&self) -> Result<Option<Value>, String> {
+        match self {
+            Instance::Prime(i) => i.representation_json(),
+            _ => Ok(None),
         }
     }
 }
@@ -759,6 +1010,7 @@ fn spec_from(
         .get("factor_base")
         .cloned()
         .or_else(|| defaults.factor_base.clone())
+        .or_else(|| defaults.archive_manifest.as_ref().map(|_| "archive".into()))
         .ok_or("a configuration needs a `factor_base`")?;
     let or = cfg
         .get("oracle")
@@ -769,11 +1021,35 @@ fn spec_from(
         .get("targets")
         .cloned()
         .unwrap_or_else(|| defaults.targets.clone());
-    let (fb_name, fb_params) = parse_plugin(&fb)?;
+    let (fb_name, mut fb_params) = parse_plugin(&fb)?;
     let (or_name, mut or_params) = parse_plugin(&or)?;
+    if fb_name == "archive" {
+        if let (Some(root), Some(id)) = (&defaults.archive_store, &defaults.archive_manifest) {
+            fb_params.set("store", root.to_string_lossy().into_owned());
+            fb_params.set("manifest", id.clone());
+        }
+    }
+    if let Some(selected) = &defaults.archive_symmetry {
+        if fb_name != "archive" {
+            return Err("--archive-symmetry requires the archive factor base".into());
+        }
+        if fb_params
+            .get("symmetry")
+            .is_some_and(|value| value != selected)
+        {
+            return Err("conflicting archive symmetry selections".into());
+        }
+        fb_params.set("symmetry", selected.clone());
+    }
+    if defaults.audit_rank {
+        or_params.set("audit_rank", "true");
+    }
     // The large-prime flags are defaults for the Frobenius table oracle;
     // a configuration that names them itself wins.
-    if or_name == "mitm-frobenius" {
+    if matches!(
+        or_name.as_str(),
+        "mitm-frobenius" | "mitm-frobenius-counted"
+    ) {
         if let Some(lp) = defaults.large_primes {
             if or_params.get("large_primes").is_none() {
                 or_params.set("large_primes", lp.to_string());
@@ -784,6 +1060,12 @@ fn spec_from(
                 or_params.set("lp_domain_factor", c.to_string());
             }
         }
+    } else if defaults.large_primes.is_some()
+        || defaults.lp_domain_factor.is_some()
+        || or_params.get("large_primes").is_some()
+        || or_params.get("lp_domain_factor").is_some()
+    {
+        return Err("large-prime options require mitm-frobenius or mitm-frobenius-counted; no generic prime/binary residual collector is registered".into());
     }
     Ok(PipelineSpec {
         factor_base: fb_name,
@@ -806,7 +1088,130 @@ fn spec_from(
     })
 }
 
+fn parse_efd_u64(value: &str) -> Result<u64, String> {
+    let value = value.trim();
+    if let Some(hex) = value
+        .strip_prefix("0x")
+        .or_else(|| value.strip_prefix("0X"))
+    {
+        u64::from_str_radix(hex, 16).map_err(|_| format!("bad integer {value}"))
+    } else {
+        value
+            .parse::<u64>()
+            .map_err(|_| format!("bad integer {value}"))
+    }
+}
+
+fn parse_efd_params(items: &[String]) -> Result<std::collections::BTreeMap<String, u64>, String> {
+    let mut out = std::collections::BTreeMap::new();
+    for item in items {
+        let (name, value) = item
+            .split_once('=')
+            .ok_or_else(|| format!("--efd-param expects NAME=VALUE, got {item}"))?;
+        out.insert(name.trim().to_owned(), parse_efd_u64(value)?);
+    }
+    Ok(out)
+}
+
+fn parse_efd_coords(value: &str) -> Result<Vec<u64>, String> {
+    value.split(',').map(parse_efd_u64).collect()
+}
+
+/// The instance `--bits`, `--char2-degree` or `--koblitz-degree` names.
+fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instance, String> {
+    Ok(match regime {
+        "archive" => {
+            let root = args.archive_store.as_deref().ok_or("archive store required")?;
+            let id = args.archive_manifest.as_deref().ok_or("archive manifest required")?;
+            match archive::instance(root, id)? {
+                ArchiveInstance::Prime(i) => Instance::Prime(i),
+                ArchiveInstance::Binary(i) => Instance::Binary(*i),
+            }
+        }
+        "prime" if args.efd_model.is_some() => {
+            let model = args.efd_model.as_deref().ok_or("--efd-model required")?;
+            let p = parse_efd_u64(args.efd_p.as_deref().ok_or("--efd-model requires --efd-p")?)?;
+            let order = parse_efd_u64(
+                args.efd_order
+                    .as_deref()
+                    .ok_or("--efd-model requires --efd-order")?,
+            )?;
+            let generator = parse_efd_coords(
+                args.efd_generator
+                    .as_deref()
+                    .ok_or("--efd-model requires --efd-generator")?,
+            )?;
+            Instance::Prime(PrimeInstance::from_efd(
+                model,
+                &args.efd_chart,
+                p,
+                &parse_efd_params(&args.efd_params)?,
+                order,
+                args.efd_cofactor,
+                &generator,
+                args.efd_lift,
+            )?)
+        }
+        "prime" if args.family == "curve25519" && degree == 255 => {
+            // The real curve, over the generic Fp256 backend.  The relation
+            // phase runs; no relation exists at this size, so the row is an
+            // honest `exhausted` measurement.
+            Instance::Wide255
+        }
+        "prime" => Instance::Prime(if args.family == "curve25519" {
+            // The Curve25519-family miniatures keep Curve25519's structure
+            // (p ≡ 5 mod 8, #E = 8r, #E' = 4r', smallest Montgomery A) at a
+            // field size the u64 engine can hold.
+            curve25519_family_instance(degree).ok_or_else(|| {
+                format!(
+                    "no Curve25519-family miniature at {degree} bits (the committed ones are 20, 24, 28, 32, or 255 for the real curve)"
+                )
+            })?
+        } else {
+            match CmFamily::parse(&args.family)? {
+                CmFamily::Generic => roster_prime_instance(degree)
+                    .or_else(|| {
+                        (8..=32)
+                            .contains(&degree)
+                            .then(|| find_prime_order_curve(degree, args.seed))
+                    })
+                    .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
+                family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
+            }
+        }),
+        "char2" => Instance::Binary(
+            random_binary_instance(degree, args.seed, args.max_cofactor).ok_or_else(|| {
+                format!(
+                    "no random binary instance at degree {degree} with cofactor at most {}",
+                    args.max_cofactor
+                )
+            })?,
+        ),
+        "koblitz" => Instance::Binary(match (args.koblitz_a, args.model_b) {
+            (Some(a), Some(b)) => koblitz_floor_instance(a, degree, b).ok_or_else(|| {
+                format!(
+                    "no curve y^2 + xy = x^3 + {a}x^2 + b with b = {b:#x} of the K_{a} class at degree {degree} (b is a bitmask in the sparse modulus)"
+                )
+            })?,
+            (None, Some(_)) => return Err("--model-b needs --koblitz-a".into()),
+            (Some(a), None) => koblitz_instance(a, degree)
+                .ok_or_else(|| format!("no Koblitz instance K_{a} at degree {degree}"))?,
+            (None, None) => koblitz_instance(1, degree)
+                .or_else(|| koblitz_instance(0, degree))
+                .ok_or_else(|| format!("no Koblitz instance at degree {degree}"))?,
+        }),
+        other => {
+            return Err(format!(
+                "unknown regime `{other}`; try prime, char2 or koblitz"
+            ))
+        }
+    })
+}
+
 pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
+    if args.auto && args.archive_manifest.is_some() {
+        return Err("--auto cannot be combined with an archive source".into());
+    }
     if args.list {
         let l = listing();
         if !json_only {
@@ -863,14 +1268,22 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             )
         }
         None => {
-            let (regime, degree) = match (args.bits, args.char2_degree, args.koblitz_degree) {
-                (Some(b), None, None) => ("prime".to_string(), b),
-                (None, Some(n), None) => ("char2".to_string(), n),
-                (None, None, Some(n)) => ("koblitz".to_string(), n),
-                _ => return Err(
-                    "choose exactly one of --bits, --char2-degree, --koblitz-degree, or --sweep"
-                        .into(),
-                ),
+            let (regime, degree) = if args.efd_model.is_some() {
+                let p = parse_efd_u64(
+                    args.efd_p
+                        .as_deref()
+                        .ok_or("--efd-model requires --efd-p")?,
+                )?;
+                ("prime".to_string(), u64::BITS - p.leading_zeros())
+            } else if args.archive_manifest.is_some() {
+                ("archive".to_string(), 0)
+            } else {
+                match (args.bits, args.char2_degree, args.koblitz_degree) {
+                    (Some(b), None, None) => ("prime".to_string(), b),
+                    (None, Some(n), None) => ("char2".to_string(), n),
+                    (None, None, Some(n)) => ("koblitz".to_string(), n),
+                    _ => return Err("choose exactly one curve source (see ic bench --help)".into()),
+                }
             };
             let mut one = std::collections::BTreeMap::new();
             if let Some(v) = &args.factor_base {
@@ -884,6 +1297,83 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         }
     };
 
+    // `--auto`: the instance first, then the planner's stages for it.
+    let mut early_instance = None;
+    let mut plan_report = Value::Null;
+    if !(args.native_weight.is_finite() && args.native_weight >= 0.0) {
+        return Err(
+            "--native-weight must be a finite number of GAE per native operation, at least 0"
+                .into(),
+        );
+    }
+    let (configs, args) = if args.auto {
+        if args.sweep.is_some() {
+            return Err(
+                "--auto plans one configuration for one curve; it does not combine with --sweep"
+                    .into(),
+            );
+        }
+        let (regime, degree) = &instance_spec;
+        let inst = build_instance(regime, *degree, &args)?;
+        let profile = match &inst {
+            Instance::Prime(i) => CurveProfile::of_prime(i),
+            Instance::Binary(i) => CurveProfile::of_binary(i),
+            Instance::Wide255 => return Err(
+                "--auto has no planner profile for the 255-bit curve; give the stages explicitly"
+                    .into(),
+            ),
+        };
+        let plan = planner::plan(
+            &profile,
+            &PlanOptions {
+                max_table_bytes: args.max_table_gib * (1u64 << 30) as f64,
+                native_weight: args.native_weight,
+                ..PlanOptions::default()
+            },
+        );
+        let mut a = args.clone();
+        let chosen = |stage: &str| plan.get(stage).map(str::to_string);
+        if a.factor_base.is_none() {
+            a.factor_base = chosen("factor_base");
+        }
+        if a.oracle.is_none() {
+            a.oracle = chosen("oracle");
+        }
+        if a.targets == "walk" {
+            a.targets = chosen("targets").unwrap_or(a.targets);
+        }
+        if a.linalg == "incremental-gauss" {
+            a.linalg = chosen("linalg").unwrap_or(a.linalg);
+        }
+        if !json_only {
+            eprintln!("  plan ({}): {}", planner::PLANNER_VERSION, plan.verdict);
+            for c in &plan.choices {
+                eprintln!(
+                    "    {:<12} {}  [{} · {:?}]",
+                    c.stage, c.value, c.rule, c.support
+                );
+            }
+            for w in &plan.warnings {
+                eprintln!("    warning: {w}");
+            }
+        }
+        if a.factor_base.is_none() || a.oracle.is_none() {
+            return Err(format!(
+                "no index-calculus recipe for this curve: {}",
+                plan.verdict
+            ));
+        }
+        let mut one = std::collections::BTreeMap::new();
+        one.insert("factor_base".to_string(), a.factor_base.clone().unwrap());
+        one.insert("oracle".to_string(), a.oracle.clone().unwrap());
+        one.insert("targets".to_string(), a.targets.clone());
+        plan_report = serde_json::to_value(&plan).unwrap_or(Value::Null);
+        early_instance = Some(inst);
+        (vec![one], a)
+    } else {
+        (configs, args)
+    };
+
     // A sweep may override the CLI default solver per configuration.
     // Reject malformed SAT encoding before calibrations, rho or a target.
     for cfg in &configs {
@@ -894,46 +1384,55 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         }
     }
 
-    let (regime, degree) = instance_spec;
-    let instance = match regime.as_str() {
-        "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
-            CmFamily::Generic => roster_prime_instance(degree)
-                .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
-            family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
-        }),
-        "char2" => Instance::Binary(
-            random_binary_instance(degree, args.seed, args.max_cofactor).ok_or_else(|| {
-                format!(
-                    "no random binary instance at degree {degree} with cofactor at most {}",
-                    args.max_cofactor
-                )
-            })?,
-        ),
-        "koblitz" => Instance::Binary(match (args.koblitz_a, args.model_b) {
-            (Some(a), Some(b)) => koblitz_floor_instance(a, degree, b).ok_or_else(|| {
-                format!(
-                    "no curve y^2 + xy = x^3 + {a}x^2 + b with b = {b:#x} of the K_{a} class at degree {degree} (b is a bitmask in the sparse modulus)"
-                )
-            })?,
-            (None, Some(_)) => return Err("--model-b needs --koblitz-a".into()),
-            (Some(a), None) => koblitz_instance(a, degree)
-                .ok_or_else(|| format!("no Koblitz instance K_{a} at degree {degree}"))?,
-            (None, None) => koblitz_instance(1, degree)
-                .or_else(|| koblitz_instance(0, degree))
-                .ok_or_else(|| format!("no Koblitz instance at degree {degree}"))?,
-        }),
-        other => {
-            return Err(format!(
-                "unknown regime `{other}`; try prime, char2 or koblitz"
-            ))
-        }
+    // Parse every configuration's plug-in specs now too: a malformed one
+    // (a `,` list, a missing `=`) fails before the instance, calibration
+    // or rho reference rather than after them.
+    let specs = configs
+        .iter()
+        .map(|cfg| spec_from(cfg, &args))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    // A CUDA worker creates its context before it reads its first request (about 150 ms on an A100).  Start it
+    // now, so that this overlaps the instance build, calibration and the rho reference instead of being waited
+    // for by the first `fes-f2-gpu` call.  Only a configuration that will call it (`descent-algebraic` with that
+    // solver) starts one.
+    let default_solver = crypto_lib::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER;
+    if specs.iter().any(|s| {
+        s.oracle == "descent-algebraic"
+            && s.solver
+                .as_deref()
+                .unwrap_or(default_solver)
+                .split(':')
+                .next()
+                == Some("fes-f2-gpu")
+    }) {
+        crypto_lib::cryptanalysis::fes_gpu::prewarm_shared_server();
+    }
+
+    let (mut regime, degree) = instance_spec;
+    let instance = match early_instance {
+        Some(i) => i,
+        None => build_instance(&regime, degree, &args)?,
     };
 
+    if let Instance::Wide255 = &instance {
+        return run_wide255(&specs, &args);
+    }
+
+    if regime == "archive" {
+        regime = match &instance {
+            Instance::Prime(_) | Instance::Wide255 => "prime",
+            Instance::Binary(i) if i.koblitz.is_some() => "koblitz",
+            Instance::Binary(_) => "char2",
+        }
+        .into();
+    }
     let (calib, pins) = match &instance {
         Instance::Prime(i) => {
             calibration_for(&i.curve, &sample_prime_points(i), "prime", &i.name, i.r)
         }
         Instance::Binary(i) => calibration_for_binary(i, &regime),
+        Instance::Wide255 => unreachable!("the wide path returns before calibration"),
     };
 
     let started = std::time::Instant::now();
@@ -971,8 +1470,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     let mut rows: Vec<RunReport> = Vec::new();
     let mut failures: Vec<Value> = Vec::new();
     let mut frozen: Vec<Value> = Vec::new();
-    for cfg in &configs {
-        let spec = spec_from(cfg, &args)?;
+    for spec in &specs {
         if !json_only {
             eprintln!("  {} …", spec.label());
         }
@@ -981,8 +1479,9 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         // combinations that do not exist, and the useful output is the
         // ones that do plus a note on the ones that do not.
         let outcome = match &instance {
-            Instance::Prime(i) => run_prime(i, &spec, &args, &calib, rho_s),
-            Instance::Binary(i) => run_binary(i, &spec, &args, &calib, rho_s, &mut frozen),
+            Instance::Prime(i) => run_prime(i, spec, &args, &calib, rho_s),
+            Instance::Binary(i) => run_binary(i, spec, &args, &calib, rho_s, &mut frozen),
+            Instance::Wide255 => unreachable!("the wide path returns before the row loop"),
         };
         match outcome {
             Ok(mut got) => rows.append(&mut got),
@@ -1005,7 +1504,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             .map_err(|e| format!("cannot create {}: {e}", path.display()))?;
         serde_json::to_writer_pretty(file, &doc).map_err(|e| e.to_string())?;
     }
-    let all_verified = !rows.is_empty() && rows.iter().all(|r| r.verified);
+    let all_verified = failures.is_empty() && !rows.is_empty() && rows.iter().all(|r| r.verified);
     let markdown = format_markdown(&rows);
     if !json_only {
         eprintln!("\n{markdown}");
@@ -1013,13 +1512,15 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             eprintln!("  skipped: {}", f["configuration"].as_str().unwrap_or("?"));
         }
     }
-    Ok(json!({
+    let representation = instance.representation_json()?;
+    let mut report = json!({
         "schema_version": 1,
         "operation": "bench",
         "status": if all_verified { "complete" } else { "incomplete" },
-        "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with every stage's cost in group-addition equivalents and the total divided by sqrt(r).",
+        "cost_qualification": rows.iter().find_map(|r| r.cost_qualification.as_ref()),
+        "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
         "what_this_is_not": [
-            "not a speed claim: a configuration on a toy instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+            "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
             "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
             "not a claim about any deployed curve"
         ],
@@ -1041,5 +1542,284 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "elapsed_seconds": started.elapsed().as_secs_f64(),
         "markdown": markdown,
         "rows": rows,
-    }))
+        "plan": plan_report,
+    });
+    if let Some(representation) = representation {
+        report["representation"] = representation;
+    }
+    Ok(report)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Parser;
+
+    #[derive(Parser)]
+    struct Cli {
+        #[command(flatten)]
+        bench: BenchArgs,
+    }
+
+    fn bench_args(flags: &[&str]) -> BenchArgs {
+        Cli::parse_from(std::iter::once("ic-bench").chain(flags.iter().copied())).bench
+    }
+
+    #[test]
+    fn archive_flags_bind_instance_and_base_without_parsing_the_path_as_a_plugin() {
+        let args = bench_args(&[
+            "--archive-store",
+            "/tmp/cache,with spaces",
+            "--archive-manifest",
+            "abc",
+            "--oracle",
+            "subtract",
+        ]);
+        let spec = spec_from(&Default::default(), &args).unwrap();
+        assert_eq!(spec.factor_base, "archive");
+        assert_eq!(
+            spec.factor_base_params.get("store"),
+            Some("/tmp/cache,with spaces")
+        );
+        assert_eq!(spec.factor_base_params.get("manifest"), Some("abc"));
+    }
+
+    #[test]
+    fn archive_flags_require_a_pair_and_reject_generated_instance_flags() {
+        assert!(Cli::try_parse_from(["ic-bench", "--archive-manifest", "abc"]).is_err());
+        assert!(Cli::try_parse_from([
+            "ic-bench",
+            "--archive-store",
+            "/tmp/cache",
+            "--archive-manifest",
+            "abc",
+            "--bits",
+            "16"
+        ])
+        .is_err());
+    }
+
+    #[test]
+    fn auto_cannot_replace_an_explicit_archive() {
+        let flags = [
+            "--archive-store",
+            "/nonexistent-cache",
+            "--archive-manifest",
+            "abc",
+        ];
+        assert!(
+            Cli::try_parse_from(std::iter::once("ic-bench").chain(flags).chain(["--auto"]))
+                .is_err()
+        );
+        // Check callers that construct BenchArgs without clap as well, before
+        // any archive lookup or calibration can occur.
+        let mut args = bench_args(&flags);
+        args.auto = true;
+        assert!(run(args, true).unwrap_err().contains("archive source"));
+    }
+
+    #[test]
+    fn symmetry_and_large_prime_options_are_explicit_and_never_ignored() {
+        let mut args = bench_args(&[
+            "--archive-store",
+            "/tmp/cache",
+            "--archive-manifest",
+            "abc",
+            "--archive-symmetry",
+            "frobenius",
+            "--oracle",
+            "mitm-frobenius-counted:m=3",
+            "--large-primes",
+            "2",
+            "--lp-domain-factor",
+            "3",
+        ]);
+        let spec = spec_from(&Default::default(), &args).unwrap();
+        assert_eq!(spec.factor_base_params.get("symmetry"), Some("frobenius"));
+        assert_eq!(spec.oracle_params.get("large_primes"), Some("2"));
+        assert_eq!(spec.oracle_params.get("lp_domain_factor"), Some("3"));
+        args.oracle = Some("subtract".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("large-prime options"));
+        args.large_primes = None;
+        args.lp_domain_factor = None;
+        args.factor_base = Some("binary-subspace:dim=3".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("archive factor base"));
+        args.factor_base = Some("archive:symmetry=negation".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("conflicting archive symmetry"));
+        assert!(Cli::try_parse_from(["ic-bench", "--large-primes", "3"]).is_err());
+        assert!(Cli::try_parse_from(["ic-bench", "--archive-symmetry", "frobenius"]).is_err());
+    }
+
+    /// `--model-b` without `--koblitz-a` is refused when the instance is
+    /// chosen, before anything is built: a stand-in for "the long part of
+    /// the run starts here".
+    const INSTANCE_STAGE: [&str; 4] = ["--koblitz-degree", "17", "--model-b", "1"];
+
+    /// The control: with every spec well formed, the run reaches the
+    /// instance stage and stops there, so the test below is telling the
+    /// two stages apart.
+    #[test]
+    fn a_well_formed_spec_reaches_the_instance_stage() {
+        let mut flags = INSTANCE_STAGE.to_vec();
+        flags.extend(["--factor-base", "koblitz-orbit:divisor=1;2"]);
+        flags.extend(["--oracle", "mitm-frobenius:m=2"]);
+        let err = run(bench_args(&flags), true).unwrap_err();
+        assert_eq!(err, "--model-b needs --koblitz-a");
+    }
+
+    /// A comma list in a plug-in spec is refused before the instance, the
+    /// calibration or the rho reference, so a typo costs nothing.
+    #[test]
+    fn a_malformed_spec_fails_before_the_instance_stage() {
+        let mut flags = INSTANCE_STAGE.to_vec();
+        flags.extend(["--factor-base", "koblitz-orbit:divisor=1,2"]);
+        flags.extend(["--oracle", "mitm-frobenius:m=2"]);
+        let err = run(bench_args(&flags), true).unwrap_err();
+        assert!(err.contains("stray token `2`"), "{err}");
+    }
+
+    /// `--auto` fills every stage from the planner and runs it.
+    #[test]
+    fn auto_runs_the_planned_configuration() {
+        let report = run(
+            bench_args(&["--bits", "14", "--auto", "--repeats", "1"]),
+            true,
+        )
+        .unwrap();
+        assert_eq!(report["plan"]["planner"], planner::PLANNER_VERSION);
+        let row = &report["rows"][0];
+        let label = row["label"].as_str().unwrap_or_default().to_string();
+        assert!(label.contains("mitm-prime-blocked"), "{label}");
+        assert!(label.contains("prime-abscissa"), "{label}");
+        assert_eq!(row["verified"], true);
+    }
+
+    /// A stage named on the command line wins over the plan.
+    #[test]
+    fn auto_keeps_an_explicit_stage() {
+        let flags = [
+            "--bits",
+            "14",
+            "--auto",
+            "--repeats",
+            "1",
+            "--oracle",
+            "mitm:m=2,negation_folded=1",
+        ];
+        let report = run(bench_args(&flags), true).unwrap();
+        let label = report["rows"][0]["label"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string();
+        assert!(
+            label.contains("mitm[") && !label.contains("blocked"),
+            "{label}"
+        );
+    }
+
+    /// `ic bench --list` names `chained-x` among the decomposition oracles,
+    /// with the parameters its `prepare` reads.
+    #[test]
+    fn the_listing_registers_chained_x() {
+        let listing = listing();
+        let stage = listing["stages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|s| s["stage"] == "point decomposition")
+            .expect("the decomposition stage is listed");
+        let entry = stage["plugins"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["name"] == "chained-x")
+            .expect("chained-x is listed");
+        let params: Vec<&str> = entry["parameters"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|p| p["name"].as_str().unwrap())
+            .collect();
+        assert_eq!(
+            params,
+            ["m", "engine", "max_degree", "node_budget", "trace"]
+        );
+        assert_eq!(entry["regimes"], json!(["koblitz"]));
+    }
+
+    /// `chained-x` is dispatched, not just listed: a small Koblitz instance
+    /// over a subspace base recovers and verifies the logarithm, and the
+    /// row carries the oracle's name.
+    #[test]
+    fn chained_x_runs_through_the_bench_pipeline() {
+        let report = run(
+            bench_args(&[
+                "--koblitz-degree",
+                "13",
+                "--koblitz-a",
+                "0",
+                "--factor-base",
+                "binary-subspace:dimension=6",
+                "--oracle",
+                "chained-x:m=3",
+                "--repeats",
+                "1",
+                "--rho-runs",
+                "1",
+            ]),
+            true,
+        )
+        .unwrap();
+        let row = &report["rows"][0];
+        let label = row["label"].as_str().unwrap_or_default().to_string();
+        assert!(label.contains("chained-x[m=3"), "{label}");
+        assert_eq!(row["verified"], true, "{row}");
+    }
+
+    #[test]
+    fn auto_refuses_a_sweep() {
+        let err = run(
+            bench_args(&["--auto", "--sweep", "/nonexistent.json"]),
+            true,
+        )
+        .unwrap_err();
+        assert!(err.contains("sweep"), "{err}");
+    }
+
+    #[test]
+    fn efd_flags_build_a_prime_instance_with_a_chart() {
+        let args = bench_args(&[
+            "--efd-model",
+            "montgom",
+            "--efd-p",
+            "1019",
+            "--efd-param",
+            "a=131",
+            "--efd-param",
+            "b=1",
+            "--efd-order",
+            "269",
+            "--efd-cofactor",
+            "4",
+            "--efd-generator",
+            "604,1",
+            "--efd-chart",
+            "xz",
+        ]);
+        let instance = build_instance("prime", 10, &args).unwrap();
+        let Instance::Prime(prime) = instance else {
+            panic!("EFD flags must build a prime instance");
+        };
+        assert_eq!(prime.curve.a, 55);
+        assert_eq!(prime.curve.b, 762);
+        assert_eq!(prime.r, 269);
+        assert!(prime.representation.is_some());
+        assert!(prime.representation_json().unwrap().is_some());
+    }
 }

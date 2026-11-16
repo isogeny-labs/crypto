@@ -1,0 +1,430 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "ER-ECCP131-REPRESENTATION-FILTER-20261102",
+  "created": "2026-11-02T18:03:46Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "6e56a761622da5ab41aaff666c248b0a28bb062893f319440e074e20de1baa4e",
+    "protocol_id": "ECCP131-REPRESENTATION-FILTER-20261102",
+    "version": 5
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "eccp131-representation-filter-20261102",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "raw/local/host.json",
+    "sha256": "81cadbb7ace051b7f6759b3538d353128018b1419c662808e71c9ba671615f19",
+    "class_id": "local-kvm-xeon-8573c",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882662400,
+      "kernel": "6.18.57",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "small-x",
+      "role": "candidate",
+      "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
+      "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab"
+    },
+    {
+      "id": "random-base",
+      "role": "baseline",
+      "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
+      "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab"
+    },
+    {
+      "id": "small-x-aa",
+      "role": "control_aa",
+      "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
+      "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab"
+    },
+    {
+      "id": "planted-root",
+      "role": "control_positive",
+      "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
+      "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab"
+    },
+    {
+      "id": "independent-null",
+      "role": "control_negative",
+      "binary_sha256": "3a7738ab378c460c06775adf1829ad9a74d3d7508d0a702c4d75bb2d4c5a7219",
+      "commit": "33355ba6aed5fbb175211a757f0cc6da460f72ab"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "eccp131-filter-small-x-aggregate",
+      "arm": "small-x",
+      "instance_id": "0",
+      "seed": 131001,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": true,
+        "blockers": [
+          "shared KVM executor; no CPU exclusivity or stable-clock certificate"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native exact-curve checks and deterministic A/A/control replay in eccp131_representation_filter"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "eccp131-filter-random-base-aggregate",
+      "arm": "random-base",
+      "instance_id": "0",
+      "seed": 131004,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": true,
+        "blockers": [
+          "shared KVM executor; no CPU exclusivity or stable-clock certificate"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native exact-curve checks and deterministic A/A/control replay in eccp131_representation_filter"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "eccp131-filter-small-x-aa-aggregate",
+      "arm": "small-x-aa",
+      "instance_id": "0",
+      "seed": 131001,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": true,
+        "blockers": [
+          "shared KVM executor; no CPU exclusivity or stable-clock certificate"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native exact-curve checks and deterministic A/A/control replay in eccp131_representation_filter"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "eccp131-filter-planted-root",
+      "arm": "planted-root",
+      "instance_id": "0",
+      "seed": 131004,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "root_witnesses": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": true,
+        "blockers": [
+          "shared KVM executor; no CPU exclusivity or stable-clock certificate"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native exact-curve checks and deterministic A/A/control replay in eccp131_representation_filter"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "eccp131-filter-independent-null",
+      "arm": "independent-null",
+      "instance_id": "0",
+      "seed": 131001,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "root_witnesses": 0,
+          "relation_rows": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": true,
+        "blockers": [
+          "shared KVM executor; no CPU exclusivity or stable-clock certificate"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native exact-curve checks and deterministic A/A/control replay in eccp131_representation_filter"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 5,
+    "attempted": 5,
+    "completed": 5,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "raw/local/export-rows.jsonl",
+      "sha256": "6546dd9a6de3e6ad49764986a53b7eb8a2bc5237f5267e0fead0fd659cf5f9a2",
+      "bytes": 913,
+      "kind": "raw"
+    },
+    {
+      "path": "raw/local/result.json",
+      "sha256": "6219f3704bd5c26b35c76b0be225f65b607738e231f5d89d04316c4504507f81",
+      "bytes": 11730,
+      "kind": "raw"
+    },
+    {
+      "path": "raw/local/ic-prime-arity2.json",
+      "sha256": "33409131a8d66b5855ed4ae5a66b8ff08b2e12fe033f4d9798a37430c1494756",
+      "bytes": 3706,
+      "kind": "raw"
+    },
+    {
+      "path": "raw/local/ic-prime-arity3.json",
+      "sha256": "cdc3c40ad20c0947da4d540dc105b48a8f382ceaaf463a60d15c4097979b0f6e",
+      "bytes": 3715,
+      "kind": "raw"
+    },
+    {
+      "path": "raw/local/SHA256SUMS",
+      "sha256": "f42eca850d3189ba633b5c9acd4c40f95f1385cbec3886f36466415fa91a8d78",
+      "bytes": 664,
+      "kind": "raw"
+    },
+    {
+      "path": "raw/invalid-source-revision/SHA256SUMS",
+      "sha256": "228c68e2e8b0806e0d871a20cef9362b2ff7779d58f285b77daac370a90f7add",
+      "bytes": 416,
+      "kind": "raw"
+    },
+    {
+      "path": "audit/corrected-counted-projection.json",
+      "sha256": "5a63e30e69cd7414f60374f8406e665c66cbef29a210d8c96440c22acd817389",
+      "bytes": 10406,
+      "kind": "raw"
+    },
+    {
+      "path": "audit/invalid-run-counted-projection.json",
+      "sha256": "5a63e30e69cd7414f60374f8406e665c66cbef29a210d8c96440c22acd817389",
+      "bytes": 10406,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../examples/eccp131_representation_filter.rs",
+      "sha256": "b5a49207cb475a69923f1b32595ef3c20128f88d1d84d6b7623493c0f4dcd867",
+      "bytes": 26861,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "REPORT.md",
+        "sha256": "342ff92384109bcc0af301e37cbc88d04964be081bc652df224aed31b8009f81",
+        "bytes": 6699,
+        "kind": "report"
+      },
+      {
+        "path": "REPORT.pdf",
+        "sha256": "55d63be80d88ad7d161310cd189f30db323207aeeffae9c2caef60befcc23983",
+        "bytes": 62813,
+        "kind": "report"
+      },
+      {
+        "path": "raw/local/REPORT.md",
+        "sha256": "0aa90f60029ef3c1380128d0d63b1b3b77fea37cdc5069fd1a08cada266100ea",
+        "bytes": 2768,
+        "kind": "report"
+      },
+      {
+        "path": "raw/local/filter-enrichment.svg",
+        "sha256": "744f9800a5c81dbff04144fe3608472440fe7d5f88d0f13f7f0dd405510e61a4",
+        "bytes": 3759,
+        "kind": "report"
+      },
+      {
+        "path": "raw/local/filter-enrichment.png",
+        "sha256": "0462a9bec50eccf8832d2d7bb0b91010b89754116e36f5acdb97830c53e29995",
+        "bytes": 32873,
+        "kind": "report"
+      },
+      {
+        "path": "reports/run-20261102T1801Z/report.md",
+        "sha256": "6dc4b39aa0508cf63cdf50265d490bbc53c8ed4f37ea25fb1ec6b791757d5c10",
+        "bytes": 1113,
+        "kind": "report"
+      },
+      {
+        "path": "reports/run-20261102T1801Z/report.pdf",
+        "sha256": "e64b21e98c612a118964f202c4b771ed6588a3f2de3a9a057b8d9fd76da024c7",
+        "bytes": 48516,
+        "kind": "report"
+      },
+      {
+        "path": "reports/run-20261102T1801Z/filter-enrichment.svg",
+        "sha256": "744f9800a5c81dbff04144fe3608472440fe7d5f88d0f13f7f0dd405510e61a4",
+        "bytes": 3759,
+        "kind": "report"
+      },
+      {
+        "path": "reports/run-20261102T1801Z/filter-enrichment.png",
+        "sha256": "0462a9bec50eccf8832d2d7bb0b91010b89754116e36f5acdb97830c53e29995",
+        "bytes": 32873,
+        "kind": "report"
+      },
+      {
+        "path": "DEVIATIONS.md",
+        "sha256": "8be524eff8c2b4383749eb99b8fe744a09f47940bc6da75d597f78246c16e4a9",
+        "bytes": 2115,
+        "kind": "report"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "The frozen protocol models 15 logical cells, but the instrument emitted one aggregate process with six filter cells and single root/solver controls. This export records five observed aggregate arm records and does not duplicate the planted control into fictitious executions.",
+      "by": "executor"
+    },
+    {
+      "kind": "observation",
+      "text": "All local wall clocks are descriptive only and invalid for performance claims.",
+      "by": "executor"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

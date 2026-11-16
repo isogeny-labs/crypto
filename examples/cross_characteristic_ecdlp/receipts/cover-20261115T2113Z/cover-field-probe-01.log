@@ -1,0 +1,103 @@
+/workspace/scratch/CoverFieldProbe.lean:23:14: error: unsolved goals
+case inr.inr.inr.inr.inr.inr
+⊢ omega + 1 = 0 ∨ (omega = 0 ∨ omega + 1 = -1) ∨ (omega + 1) ^ 2 = omega ∨ (omega + 1) ^ 2 = omega + 1
+/workspace/scratch/CoverFieldProbe.lean:19:8: warning: This simp argument is unused:
+  CharTwo.add_cancel_right
+
+Hint: Omit it from the simp argument list.
+  simp [CharTwo.add_self_eq_zero, CharTwo.add_cancel_left, C̵h̵a̵r̵T̵w̵o̵.̵a̵d̵d̵_̵c̵a̵n̵c̵e̵l̵_̵r̵i̵g̵h̵t̵,̵ ̵add_comm, add_left_comm, add_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:19:59: warning: This simp argument is unused:
+  add_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [CharTwo.add_self_eq_zero, CharTwo.add_cancel_left, CharTwo.add_cancel_right, add_comm,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲a̵d̵d̵_̵l̵e̵f̵t̵_̵c̵o̵m̵m̵,̵ ̵a̵d̵d̵_̵a̵s̵s̵o̵c̵]̵a̲d̲d̲_̲l̲e̲f̲t̲_̲c̲o̲m̲m̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:29:33: warning: This simp argument is unused:
+  CharTwo.add_cancel_right
+
+Hint: Omit it from the simp argument list.
+  simp [mul_add, add_mul, ← pow_two, omega_sq, CharTwo.add_self_eq_zero,
+          CharTwo.add_cancel_left, C̵h̵a̵r̵T̵w̵o̵.̵a̵d̵d̵_̵c̵a̵n̵c̵e̵l̵_̵r̵i̵g̵h̵t̵,̵add_comm, add_left_comm, add_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:30:18: warning: This simp argument is unused:
+  add_left_comm
+
+Hint: Omit it from the simp argument list.
+  simp [mul_add, add_mul, ← pow_two, omega_sq, CharTwo.add_self_eq_zero,
+          CharTwo.add_cancel_left, CharTwo.add_cancel_right,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵add_comm, add_l̵e̵f̵t̵_̵c̵o̵m̵m̵,̵ ̵ad̵d̵_̵a̵ssoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:30:33: warning: This simp argument is unused:
+  add_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [mul_add, add_mul, ← pow_two, omega_sq, CharTwo.add_self_eq_zero,
+          CharTwo.add_cancel_left, CharTwo.add_cancel_right,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵add_comm, add_left_comm,̵ ̵a̵d̵d̵_̵a̵s̵s̵o̵c̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:39:27: error: failed to synthesize
+  CharP (↥Small) 2
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/workspace/scratch/CoverFieldProbe.lean:47:64: warning: `Equiv.Set.ofEq` has been deprecated: Use `Equiv.setCongr` instead
+
+Note: The updated constant is in a different namespace. Dot notation may need to be changed (e.g., from `x.ofEq` to `Equiv.setCongr x`).
+/workspace/scratch/CoverFieldProbe.lean:48:18: error(lean.unknownIdentifier): Unknown constant `Nat.card_coe_finset`
+/workspace/scratch/CoverFieldProbe.lean:49:13: error: unsolved goals
+s : Finset Fbig := {0, 1, omega, omega + 1}
+heq : ↑fourField = ↑s
+h0 : omega + 1 ≠ 0
+h1 : omega + 1 ≠ 1
+⊢ {0, 1, omega, omega + 1}.card = 4
+/workspace/scratch/CoverFieldProbe.lean:49:25: warning: This simp argument is unused:
+  h0
+
+Hint: Omit it from the simp argument list.
+  simp [s, h̵0̵,̵ ̵h1, omega_ne_zero, omega_ne_one, Ne.symm omega_ne_zero,
+  ̲  ̲ ̲ ̲ ̲ ̲Ne.symm omega_ne_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:49:29: warning: This simp argument is unused:
+  h1
+
+Hint: Omit it from the simp argument list.
+  simp [s, h0, h̵1̵,̵ ̵omega_ne_zero, omega_ne_one, Ne.symm omega_ne_zero,
+  ̲  ̲ ̲ ̲ ̲ ̲Ne.symm omega_ne_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:49:33: warning: This simp argument is unused:
+  omega_ne_zero
+
+Hint: Omit it from the simp argument list.
+  simp [s, h0, h1, o̵m̵e̵g̵a̵_̵n̵e̵_̵z̵e̵r̵o̵,̵ ̵omega_ne_one, Ne.symm omega_ne_zero, Ne.symm omega_ne_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:49:48: warning: This simp argument is unused:
+  omega_ne_one
+
+Hint: Omit it from the simp argument list.
+  simp [s, h0, h1, omega_ne_zero, o̵m̵e̵g̵a̵_̵n̵e̵_̵o̵n̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵Ne.symm omega_ne_zero, Ne.symm omega_ne_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:50:6: warning: This simp argument is unused:
+  Ne.symm omega_ne_zero
+
+Hint: Omit it from the simp argument list.
+  simp [s, h0, h1, omega_ne_zero, omega_ne_one, Ne.symm o̵m̵e̵g̵a̵_̵n̵e̵_̵z̵e̵r̵o̵,̵ ̵N̵e̵.̵s̵y̵m̵m̵ ̵omega_ne_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/workspace/scratch/CoverFieldProbe.lean:50:29: warning: This simp argument is unused:
+  Ne.symm omega_ne_one
+
+Hint: Omit it from the simp argument list.
+  simp [s, h0, h1, omega_ne_zero, omega_ne_one, Ne.symm o̵m̵e̵g̵a̵_̵n̵e̵_̵z̵e̵r̵o̵,̵ ̵N̵e̵.̵s̵y̵m̵m̵ ̵o̵m̵e̵g̵a̵_̵n̵e̵_̵o̵n̵e̵]̵o̲m̲e̲g̲a̲_̲n̲e̲_̲z̲e̲r̲o̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

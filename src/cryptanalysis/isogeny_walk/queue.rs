@@ -30,6 +30,8 @@ use super::traits::{self, CurveCtx};
 use super::walk::StartCurve;
 use crate::cryptanalysis::curve_id;
 
+type Row = (usize, String, (BigUint, BigUint, BigUint, BigUint));
+
 pub const SHARD_SCHEMA: &str = "isogeny-walk-trait-shard/v1";
 pub const TRAITS_FILE: &str = "traits.jsonl";
 pub const METRICS_FILE: &str = "metrics.json";
@@ -49,6 +51,62 @@ fn dec(v: &serde_json::Value, what: &str) -> Result<BigUint, String> {
     v.as_str()
         .and_then(|s| BigUint::parse_bytes(s.as_bytes(), 10))
         .ok_or_else(|| format!("{what}: expected a decimal string"))
+}
+
+fn detect_row(
+    i: usize,
+    node: &serde_json::Value,
+    start: &StartCurve,
+    field: &Field,
+    detectors: &[Box<dyn traits::Detector>],
+) -> Result<Row, String> {
+    let r = node["ref"].as_str().ok_or("ref")?;
+    let co = node["coefficients_a1_a2_a3_a4_a6"]
+        .as_array()
+        .ok_or("coefficients")?;
+    let (a, b) = (dec(&co[3], "a4")?, dec(&co[4], "a6")?);
+    let g = node["generator_G"].as_array().ok_or("generator")?;
+    let (gx, gy) = (dec(&g[0], "gx")?, dec(&g[1], "gy")?);
+    let id = curve_id::prime(&start.p, &a, &b, &start.order).ok_or("identity")?;
+    if node["icv1_slug"].as_str() != Some(id.slug.as_str()) {
+        return Err(format!("{r}: slug differs from the recomputed {}", id.slug));
+    }
+    let model = Model {
+        a: field.from_big(&a),
+        b: field.from_big(&b),
+    };
+    let ctx = CurveCtx {
+        field,
+        model: &model,
+        generator: (field.from_big(&gx), field.from_big(&gy)),
+        start,
+    };
+    let traits = V::Map(
+        detectors
+            .iter()
+            .map(|d| {
+                (
+                    d.name().to_string(),
+                    V::map(vec![
+                        ("value", d.detect(&ctx)),
+                        ("status", V::s(d.status())),
+                    ]),
+                )
+            })
+            .collect(),
+    );
+    let line = V::map(vec![
+        ("index", V::int(i)),
+        ("ref", V::s(r)),
+        ("icv1_slug", V::s(id.slug)),
+        (
+            "curve_uid",
+            V::s(node["curve_uid"].as_str().unwrap_or("").to_string()),
+        ),
+        ("traits", traits),
+    ])
+    .canonical_json();
+    Ok((i, line, (a, b, gx, gy)))
 }
 
 /// Run the detectors on shard `shard` of `of` of a walk's
@@ -73,59 +131,101 @@ pub fn run_shard(
         .enumerate()
         .filter(|(i, _)| i % of == shard)
         .collect();
-    type Row = (usize, String, (BigUint, BigUint, BigUint, BigUint));
     let rows: Vec<Result<Row, String>> = mine
         .par_iter()
-        .map(|(i, node)| {
-            let r = node["ref"].as_str().ok_or("ref")?;
+        .map(|(i, node)| detect_row(*i, node, start, &f, &detectors))
+        .collect();
+    finish_shard(
+        rows,
+        routes_text,
+        start,
+        shard,
+        of,
+        audit_sample,
+        nodes.len(),
+        mine.len(),
+        &detectors,
+    )
+}
+
+/// Continue a trait shard from a checked prefix of completed curve records.
+/// The callback is invoked after each new curve, allowing durable storage at
+/// exactly that boundary. A curve interrupted inside a detector is repeated.
+pub fn run_shard_resume(
+    routes_text: &str,
+    start: &StartCurve,
+    shard: usize,
+    of: usize,
+    audit_sample: usize,
+    completed: &[String],
+    on_curve: &mut dyn FnMut(usize, usize, &str) -> Result<(), String>,
+) -> Result<ShardOutput, String> {
+    if of == 0 || shard >= of {
+        return Err(format!("shard {shard} of {of}: need 0 <= shard < of"));
+    }
+    let routes: serde_json::Value = serde_json::from_str(routes_text).map_err(|e| e.to_string())?;
+    let nodes = routes["curve_nodes"].as_array().ok_or("curve_nodes")?;
+    let field = Field::new(&start.p).ok_or("bad field")?;
+    let detectors = traits::default_detectors();
+    let mine: Vec<(usize, &serde_json::Value)> = nodes
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| i % of == shard)
+        .collect();
+    if completed.len() > mine.len() {
+        return Err("trait checkpoint has more rows than this shard".into());
+    }
+    let mut rows = Vec::with_capacity(mine.len());
+    for (position, &(i, node)) in mine.iter().enumerate() {
+        if let Some(line) = completed.get(position) {
+            let saved: serde_json::Value =
+                serde_json::from_str(line).map_err(|e| format!("invalid saved trait row: {e}"))?;
             let co = node["coefficients_a1_a2_a3_a4_a6"]
                 .as_array()
                 .ok_or("coefficients")?;
-            let (a, b) = (dec(&co[3], "a4")?, dec(&co[4], "a6")?);
             let g = node["generator_G"].as_array().ok_or("generator")?;
+            let (a, b) = (dec(&co[3], "a4")?, dec(&co[4], "a6")?);
             let (gx, gy) = (dec(&g[0], "gx")?, dec(&g[1], "gy")?);
             let id = curve_id::prime(&start.p, &a, &b, &start.order).ok_or("identity")?;
-            if node["icv1_slug"].as_str() != Some(id.slug.as_str()) {
-                return Err(format!("{r}: slug differs from the recomputed {}", id.slug));
+            if saved["index"].as_u64() != Some(i as u64)
+                || saved["ref"] != node["ref"]
+                || saved["icv1_slug"].as_str() != Some(id.slug.as_str())
+                || saved["curve_uid"] != node["curve_uid"]
+                || !saved["traits"].is_object()
+            {
+                return Err(format!("saved trait row {position} differs from the walk"));
             }
-            let model = Model {
-                a: f.from_big(&a),
-                b: f.from_big(&b),
-            };
-            let ctx = CurveCtx {
-                field: &f,
-                model: &model,
-                generator: (f.from_big(&gx), f.from_big(&gy)),
-                start,
-            };
-            let traits = V::Map(
-                detectors
-                    .iter()
-                    .map(|d| {
-                        (
-                            d.name().to_string(),
-                            V::map(vec![
-                                ("value", d.detect(&ctx)),
-                                ("status", V::s(d.status())),
-                            ]),
-                        )
-                    })
-                    .collect(),
-            );
-            let line = V::map(vec![
-                ("index", V::int(i)),
-                ("ref", V::s(r)),
-                ("icv1_slug", V::s(id.slug)),
-                (
-                    "curve_uid",
-                    V::s(node["curve_uid"].as_str().unwrap_or("").to_string()),
-                ),
-                ("traits", traits),
-            ])
-            .canonical_json();
-            Ok((*i, line, (a, b, gx, gy)))
-        })
-        .collect();
+            rows.push(Ok((i, line.clone(), (a, b, gx, gy))));
+        } else {
+            let row = detect_row(i, node, start, &field, &detectors)?;
+            on_curve(position + 1, mine.len(), &row.1)?;
+            rows.push(Ok(row));
+        }
+    }
+    finish_shard(
+        rows,
+        routes_text,
+        start,
+        shard,
+        of,
+        audit_sample,
+        nodes.len(),
+        mine.len(),
+        &detectors,
+    )
+}
+
+fn finish_shard(
+    rows: Vec<Result<Row, String>>,
+    routes_text: &str,
+    start: &StartCurve,
+    shard: usize,
+    of: usize,
+    audit_sample: usize,
+    nodes_total: usize,
+    shard_total: usize,
+    detectors: &[Box<dyn traits::Detector>],
+) -> Result<ShardOutput, String> {
     let mut jsonl = String::new();
     let mut sample = Vec::new();
     for row in rows {
@@ -143,8 +243,8 @@ pub fn run_shard(
         ("root", V::s(start.name.clone())),
         ("shard", V::int(shard)),
         ("of", V::int(of)),
-        ("curves_total", V::int(nodes.len())),
-        ("curves_in_shard", V::int(mine.len())),
+        ("curves_total", V::int(nodes_total)),
+        ("curves_in_shard", V::int(shard_total)),
         ("traits_sha256", V::s(sha256_hex(&jsonl))),
         (
             "detectors",

@@ -1,0 +1,22 @@
+{
+  "lean_toolchain": "leanprover/lean4:v4.34.1",
+  "imports": ["Lean"],
+  "mathlib": null,
+  "crypto_lean_modules_imported": [],
+  "shared_gate": {
+    "repository": "https://github.com/aburan28/crypto-lean",
+    "revision": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+    "gate_path": "tools/proof-gate.sh",
+    "gate_git_blob": "a30e409df09f234e80420d0ee90efa39f8f4ed06",
+    "auditor_path": "tools/AuditAxioms.lean",
+    "auditor_git_blob": "577f1fac5d75cbe016bd0e95d621a8c9de9f62a6"
+  },
+  "repository_gate": {
+    "base_revision": "6187036c049b6de2b1521b014f575952e4f1705c",
+    "gate_path": "tools/lean/proof-gate.sh",
+    "gate_git_blob": "5aa8179f10dc940db5ef896d1b605f44a8ab78e9",
+    "auditor_path": "tools/lean/AuditAxioms.lean",
+    "auditor_git_blob": "5d346e4df70b264c339c49c334f56167184d63a1"
+  },
+  "scope": "Standalone core-only proofs, checked by both pinned gates. The CryptoLean Mathlib library itself is not imported or built; its separate v4.35 toolchain is not a dependency of these standalone files."
+}

@@ -41,6 +41,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, mask_low64};
 use crypto_lib::cryptanalysis::semaev_decomp::{decompose, Gf2};
 
 /// The **deciding degree**: the lowest Macaulay degree at which the
@@ -88,7 +89,7 @@ fn decide(system: &[F2BoolPoly], n_vars: usize, max_degree: u32) -> (u32, u64, b
             })
             .flat_map(|p| p.terms.iter())
             .map(|t| t.mask)
-            .fold(0u64, |a, b| a | b)
+            .fold(0u64, |a, b| a | mask_low64(b))
             .count_ones() as usize;
         if pinned >= n_vars {
             return (d, total, true);
@@ -193,7 +194,7 @@ fn main() {
                 // exactly what the algebra is trying to replace.
                 if !found {
                     for pt in 0..(1u64 << two) {
-                        if system.iter().all(|e| e.eval(pt) == 0) {
+                        if system.iter().all(|e| e.eval(mask_from64(pt)) == 0) {
                             found = true;
                             break;
                         }

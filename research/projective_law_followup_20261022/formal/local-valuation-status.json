@@ -1,0 +1,20 @@
+{
+  "schema": "projective-law-local-valuation/v1",
+  "proof_scope": "abstract DVR with chosen uniformizer and unit chart factor",
+  "checked": [
+    {"theorem": "Common22LocalValuation.chart_z_order", "result": "addVal(z)=2 from w^2=z*u"},
+    {"theorem": "Common22LocalValuation.nonzero_residue_unit", "result": "nonzero constant residue gives a chart unit"},
+    {"theorem": "Common22LocalValuation.zero_residue_order_one", "result": "C=0, B unit gives addVal(G)=1"},
+    {"theorem": "Common22LocalValuation.chart_interpolant_order_zero", "result": "source-shape G has addVal(G)=0 when C is a unit"},
+    {"theorem": "Common22LocalValuation.chart_interpolant_order_one", "result": "source-shape G has addVal(G)=1 when C=0 and B is a unit"}
+  ],
+  "unproved": [
+    "projective completion and DVR stalk at unique infinity point",
+    "w uniformizer, z chart coordinate, and u unit in actual stalk",
+    "fraction-field overlap and ord_infinity(g)=-6 or -5",
+    "zero-divisor multiplicity at repeated and Weierstrass roots",
+    "residual Mumford divisor and principal-divisor-to-Pic0 bridge",
+    "Rust-to-Lean runtime semantics"
+  ],
+  "numerical_cost_change": null
+}

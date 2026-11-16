@@ -1,0 +1,41 @@
+{
+ "note": "Blind-spot item 15. Matched negation-map rho added in the item binary (instruments/blindspots_15b_genus3_la_rho.rs) under PROTOCOL-ADDENDUM-matched-rho.md; the four b = 20 IC arms reproduce their recorded rows exactly in that binary. Priced on the section 5a band with the frozen protocol classing mod-ell products as unpriced native work, every IC arm is below rho at w = 0 and above it at w = 0.1 and 1: the order does not hold and IC vs rho is unresolved. The README table \"IC below rho at every price\" used c_ell pricing and does not survive section 5a. The linear-algebra headline (arm d LA 0.9862 of arm a at b = 20) recomputes exactly.",
+ "replay_certificate": {
+  "path": "replay-certificate-v2.json",
+  "sha256": "115f45edba5835f7dc0b55c7f88a149ba57c860bd94df569926acbe83815b461"
+ },
+ "rho_reference": {
+  "binary_or_process": "research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs (sha256 79a821504c5b7a4639470d8e04dfd35fc6ad1a91d34bacee466461f36811e991), built per card with rustc -C opt-level=3 -C codegen-units=1; one process per curve runs the four IC arms then the 16 rho walks (cards matched-rho-cards/card-m00..m03.yaml, receipts raw/matched/receipt-card-m00..m03.json)",
+  "descriptor": {
+   "path": "rho-reference.json",
+   "sha256": "8721d67f4a838e8cc866d36a894de6cde718b7d1f18496392b005fa35dfae5bf"
+  },
+  "gae_band": {
+   "0": {
+    "ic": 112352522.62037037,
+    "rho": 296890566.33989197
+   },
+   "0.1": {
+    "ic": 653439101.9953704,
+    "rho": 415182901.693017
+   },
+   "1": {
+    "ic": 5523218316.370371,
+    "rho": 1479813919.871142
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": false,
+  "protocol": "PROTOCOL.md 'Distance remaining' (round 4's measured negation-map rho), as amended before the runs by PROTOCOL-ADDENDUM-matched-rho.md (commit 7555a42a6c): round 4's rho_neg + canon on classes {P,-P} of E0(F_{q^3}), r = 64 adding walk, distinguished points, fruitless-cycle escape by doubling, 16 walks per curve (target 0 = the IC target k), b = 20, curves 0-3, decision rule 'Decision rule (frozen)' of the addendum",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "GAE: one generic affine E0(F_{q^3}) addition = c_add = 81 F_q-mult-eq (60 M_q + 1 I_q at ceil(log2 q) = 21), measured in each process; every arm's counted cost M_q + ceil(log2 q) I_q is divided by c_add and every native op (13 NAT counters, plus m_ell and i_ell for IC per the frozen PROTOCOL classification) is priced at w GAE"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "1cd7ee3f1dc37117cb129355ece1ee9bcb9a97ea7ddd86c8d6987d22d08d844f"
+ }
+}

@@ -1,0 +1,21 @@
+Producer, from the repository root (one invocation only):
+(
+  cd /home/ec2-user/crypto-n83-degree-sweep-20261027 || exit 1
+  ulimit -v 8388608 || exit 1
+  /usr/bin/time -v -o research/n83_candidate_pdp_20261028/evidence/chain-exact-spike38-20261111/producer.time /usr/bin/timeout --signal=TERM --kill-after=30s 3600s research/n83_candidate_pdp_20261028/target/release/chain_exact_basis run research/n83_candidate_pdp_20261028/evidence/chain-exact-spike38-20261111 > research/n83_candidate_pdp_20261028/evidence/chain-exact-spike38-20261111/producer.log 2>&1
+  status=$?
+  printf '%s\n' "$status" > research/n83_candidate_pdp_20261028/evidence/chain-exact-spike38-20261111/producer.exit
+  exit "$status"
+)
+
+Fresh-process replay, only after the producer has exited and its result files have been inventoried:
+(
+  cd /home/ec2-user/crypto-n83-degree-sweep-20261027 || exit 1
+  ulimit -v 8388608 || exit 1
+  /usr/bin/time -v -o research/n83_candidate_pdp_20261028/evidence/chain-exact-spike38-20261111/replay.time /usr/bin/timeout --signal=TERM --kill-after=30s 3600s research/n83_candidate_pdp_20261028/target/release/chain_exact_basis replay research/n83_candidate_pdp_20261028/evidence/chain-exact-spike38-20261111 > research/n83_candidate_pdp_20261028/evidence/chain-exact-spike38-20261111/replay.log 2>&1
+  status=$?
+  printf '%s\n' "$status" > research/n83_candidate_pdp_20261028/evidence/chain-exact-spike38-20261111/replay.exit
+  exit "$status"
+)
+
+If either command fails or is interrupted, keep every partial file and use a separately numbered new attempt directory; never rerun over this path.

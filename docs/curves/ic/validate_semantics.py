@@ -21,6 +21,8 @@ import yaml
 
 
 HEX64 = re.compile(r"[0-9a-f]{64}\Z")
+DECIMAL = re.compile(r"[1-9][0-9]*\Z")
+SIGNED_DECIMAL = re.compile(r"(0|-?[1-9][0-9]*)\Z")
 CURVE_ID = re.compile(r"EC1(N[1-9][0-9]*|P[1-9][0-9]*|Q[1-9][0-9]*D[1-9][0-9]*)C([a-z][a-z0-9]*)h([0-9a-f]{12,64})\Z")
 UNKNOWN = {"unknown", "unmeasured", "not_evaluated", "unproved_in_this_registry", "not_applicable"}
 PINNED = ("curves.yaml", "curves.schema.json", "curve-links/link.schema.json")
@@ -62,6 +64,19 @@ def repo_artifact(root: Path, reference: object) -> Path | None:
     root = root.resolve()
     resolved = (root / relative).resolve()
     return resolved if resolved.is_relative_to(root) else None
+
+
+def exact_int(value: object, signed: bool = False) -> int | None:
+    """An integer, or its canonical decimal string, as an int; anything else is None.
+
+    The EC1 preimage keeps the registry's encoding (decimal strings for orders), and the
+    UID hashes that encoding, so the validator reads both forms; the hash input is untouched.
+    """
+    if type(value) is int:
+        return value
+    if isinstance(value, str) and (SIGNED_DECIMAL if signed else DECIMAL).fullmatch(value):
+        return int(value)
+    return None
 
 
 def check(condition: bool, errors: list[str], where: str, message: str) -> None:
@@ -120,16 +135,24 @@ def check_curve_math_metadata(entry: dict, errors: list[str], where: str) -> Non
           "curve model or Weierstrass equation is missing")
     check(any(key in curve for key in ("coefficients", "coefficients_a1_a2_a3_a4_a6", "a2", "a6")),
           errors, where, "exact curve coefficients are missing")
-    check(type(r) is int and r > 0, errors, where, "subgroup order must be a positive integer")
-    check(type(cofactor) is int and cofactor > 0, errors, where, "cofactor must be a positive integer")
+    r_int, h_int = exact_int(r), exact_int(cofactor)
+    order_int, trace_int = exact_int(order), exact_int(trace, signed=True)
+    check(r_int is not None and r_int > 0, errors, where,
+          "subgroup order must be a positive integer or its decimal string")
+    check(h_int is not None and h_int > 0, errors, where,
+          "cofactor must be a positive integer or its decimal string")
+    check(order is None or (order_int is not None and order_int > 0), errors, where,
+          "curve order must be a positive integer or its decimal string")
+    check(trace is None or trace_int is not None, errors, where,
+          "trace must be an integer or its decimal string")
     check(isinstance(generator, list) and len(generator) == 2, errors, where,
           "generator must have two encoded coordinates")
     check(isinstance(curve.get("target_group"), str) and bool(curve["target_group"]),
           errors, where, "target group is missing")
-    if type(order) is int and type(r) is int and type(cofactor) is int:
-        check(order == r * cofactor, errors, where, "curve order differs from subgroup order times cofactor")
-    if all(type(v) is int for v in (p, n, order, trace)):
-        check(order == p**n + 1 - trace, errors, where, "curve order and trace disagree")
+    if None not in (order_int, r_int, h_int):
+        check(order_int == r_int * h_int, errors, where, "curve order differs from subgroup order times cofactor")
+    if type(p) is int and type(n) is int and order_int is not None and trace_int is not None:
+        check(order_int == p**n + 1 - trace_int, errors, where, "curve order and trace disagree")
 
 
 def validate_registry(directory: Path, errors: list[str]) -> tuple[dict, dict, dict]:
@@ -360,6 +383,23 @@ def validate_routes(directory: Path, by_ref: dict, errors: list[str]) -> dict:
     return routes
 
 
+def check_pdp_stage(pdp: dict, errors: list[str], where: str) -> None:
+    summands = pdp.get("summands")
+    family = pdp.get("solver_family")
+    if "summands" not in pdp and "solver_family" not in pdp:
+        # bench.candidate_manifest's original half-trace format uses
+        # summand_count and an exact implementation path, not the XL keys.
+        # Read that frozen format without changing its content-addressed ID.
+        summands = pdp.get("summand_count")
+        if (type(summands) is int and summands == 2
+                and pdp.get("implementation") ==
+                "experiments/pdp-degree-heuristics/htsolver.py"):
+            family = "ht"
+    check(type(summands) is int and summands >= 2
+          and pdp.get("stage_code") == f"PDP{summands}{family}",
+          errors, where, "PDP stage code disagrees with summands or solver family")
+
+
 def validate_candidates(root: Path, routes: dict, errors: list[str]) -> None:
     base = root / "experiments/ic-bench"
     archive = root / "experiments/fb-archive/index.csv"
@@ -381,9 +421,7 @@ def validate_candidates(root: Path, routes: dict, errors: list[str]) -> None:
         check("candidate_id" not in item, errors, where, "candidate_id must not enter its own hash input")
         stages = [item.get(k, {}).get("stage_code", "") for k in
                   ("point_decomposition", "relation_collection", "relation_linear_algebra", "target_descent")]
-        summands = item.get("point_decomposition", {}).get("summands")
-        family = item.get("point_decomposition", {}).get("solver_family")
-        check(stages[0] == f"PDP{summands}{family}", errors, where, "PDP stage code disagrees with summands or solver family")
+        check_pdp_stage(item.get("point_decomposition", {}), errors, where)
         check(all(re.fullmatch(prefix + r"[a-z0-9]+", code) for prefix, code in
                   zip(("PDP", "RC", "LA", "TD"), stages)), errors, where, "invalid stage code")
         count = fb.get("actual_usable_point_count")

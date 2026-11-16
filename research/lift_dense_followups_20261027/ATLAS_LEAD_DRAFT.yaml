@@ -1,0 +1,56 @@
+id: LEAD-ICB-lift-dense-twisted-line
+family: ic-binary
+title: >-
+  Lift-dense (twist-avoiding) factor bases: the twisted subfield line u·F_{2^d} on which every
+  abscissa lifts to E (composite degree, Tr(a) = 0)
+mechanism: >-
+  Relation yield is proportional to |V ∩ L|^m, where L is the set of abscissae lifting to E. If
+  Tr_{N/d}(u) = Tr_{N/d}(√b/u) = 0, the lift condition is the constant Tr(a) on the F_{2^d}-line
+  u·F_{2^d}. With Tr(a) = 0 every abscissa lifts, giving 2^n relations per Gaudry-Diem trial at the
+  same descent shape. With Tr(a) = 1 the whole line lies on the twist.
+disposition: open_next_step
+next_action:
+  step: >-
+    Complete toy solve (relations, linear algebra, log) with both bases on the C1 ladder, timed via
+    isolab-eks against the matched rho; then reprice the c2pnb (208w1, 368w1) and Oakley n = 5
+    lanes with the measured per-trial cost.
+  discriminates: >-
+    The end-to-end time ratio twisted/standard reproduces the 2LP prediction (about 2^-0.5) or not.
+best_measured: >-
+  Per-trial relation yield 1.024x of the 16x prediction on the C1 ladder (pooled), with the counted
+  Macaulay cost ratio 0.961 [0.928, 0.991]; c2pnb208w1/368w1 and Oakley groups 3 and 4 have
+  verified all-lift lines.
+obstruction:
+  kind: theorem
+  statement: >-
+    Prime degree (ECC2K-130): no proper subfield, so no twisted line. Tr(a) = 1 curves (c2pnb176v1,
+    272w1, 304w1): the line is all-twist (Lean-proved lift form). The all-lift dimension bound
+    N/2 + 1 follows from Weil's bound for Kloosterman sums (pen and paper; not formalised).
+  measured_not_proved: >-
+    Lift sets repel subspaces at prime degree: a bounded measurement (exhaustive k <= 4, N <= 13),
+    not a theorem. The Walsh 4th-moment identity ΣW⁴ = 2q³ − 2q² − 3q is exact, but it explains the
+    repulsion only in part: P2 fails, the first-order 3rd- and 4th-moment terms account for about
+    70 % of the measured k = 4 deficit, and about 48/q is unexplained
+    (research/lift_repulsion_mechanism_20261027).
+evidence:
+- repo: crypto
+  path: research/lift_dense_factor_base_20261027
+  note: theorem, Lean-proved lift form, c2pnb, prime-degree repulsion
+- repo: crypto
+  path: research/oakley_lift_dense_20261027
+  note: Oakley groups 3 and 4 applicable (n = 5, 32x per trial)
+- repo: crypto
+  path: research/c1_twisted_line_ladder_20261027
+  note: toy ladder yield and counted cost
+- repo: crypto
+  path: research/lift_repulsion_mechanism_20261027
+  note: exact Walsh 4th-moment identity; partial (about 70 %) explanation of the measured repulsion
+areas:
+- BINSTD
+- CERTBIN
+last_reviewed: '2026-10-27'
+forecloses:
+- twist-avoiding factor base on ECC2K-130
+- all-lift subfield line at prime degree
+- lift-dense subspace factor base beats the Weil cap
+- twisted line on a Tr(a) = 1 curve

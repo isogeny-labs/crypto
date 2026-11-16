@@ -22,6 +22,8 @@
 #
 #   modal run --detach modal_job.py --job benchmarks/autosweep/gpujob.sh --out DIR --gpu B200
 #   BASE_KNOBS / ARMS_FILE / MIN_GAIN / QUICK_LAUNCHES / REPS in the environment.
+#   PRESET_TARGET picks the base preset: gpu-preset (the table walk, default) or
+#   gpu-preset-sigma (the fused sigma-table walk the campaign runs).
 set -uo pipefail
 cd "${WORK:-/work}" || exit 1
 export DEBIAN_FRONTEND=noninteractive
@@ -76,7 +78,7 @@ build() {  # build NAME KNOBS...
   local name=$1; shift
   KNOBS[$name]="$*"
   echo "=== build $name: $*"
-  make -s gpu-preset "$ARCHFLAG" KNOBS="$BASE_KNOBS $*" > "$R/build-$name.log" 2>&1
+  make -s "${PRESET_TARGET:-gpu-preset}" "$ARCHFLAG" KNOBS="$BASE_KNOBS $*" > "$R/build-$name.log" 2>&1
   local info; info=$(grep -A2 "eccPacked131.*walk" "$R/build-$name.log" | grep -E "registers|spill" | head -2 | tr '\n' ' ')
   echo "    $info" | tee "$R/build-$name.txt"
   REGS[$name]=$(echo "$info" | grep -oE "Used [0-9]+ registers" | grep -oE "[0-9]+" | head -1)

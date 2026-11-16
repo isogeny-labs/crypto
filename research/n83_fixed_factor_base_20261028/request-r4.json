@@ -1,0 +1,12 @@
+{
+  "backend": "local",
+  "host": "existing m8i.8xlarge Spot workspace",
+  "threads": 6,
+  "virtual_memory_limit_bytes": 8589934592,
+  "timeout_seconds": 3300,
+  "kill_grace_seconds": 20,
+  "binary_sha256": "dea894c5bd3cf7e718a235c2a9335f6a2b2896036c0118bacbe22fc103d1e55b",
+  "command": ["bash", "research/n83_fixed_factor_base_20261028/run-local.sh", "/tmp/n83-fb-target/release/n83-factor-base", "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_fixed_factor_base_20261028/protocol-r4.json", "/home/ec2-user/n83-fixed-fb-recovery/local-r4/results"],
+  "image": null,
+  "automatic_retries": 0
+}

@@ -143,8 +143,9 @@ stage has a target. Galbraith's ellipticnews post (2012-02-06):
 paper does not discuss these cases." The obvious evasion was tested and
 fails: embedding `E(F_2^131)` into `F_2^{131m}` collapses both towers —
 with `q = 2^131` the cover step is trivial and decomposition reverts to
-the original problem over a larger field, and with `d = 131` the GHS
-cover has genus `≈ 2^130`, which is exactly the constraint
+the original problem over a larger field, and with `d = 131` the ordinary GHS
+cover is either the genus-1 branch whose transfer annihilates the target or a
+nontrivial genus-`2^130−1`/`2^130` branch, which is exactly the constraint
 `research/notes/ecc2k130/RESEARCH_ECC2K130_HYPERELLIPTIC.md` derived independently. No 2011–2026
 work removes the composite-degree condition.
 
@@ -174,8 +175,9 @@ refuted claims touch any of:
   rho or scalar multiplication — the τ-adic expansion, CM by
   `(1 ± √−7)/2`, the class group of `Z[τ]`.
 
-The hard structural constraints (`131` prime, `2` primitive mod `131`,
-genera `1, 2^129, 2^130` only) pre-filter much of item 4. **They do not
+The hard structural constraints (`131` prime, `2` primitive mod `131`, ordinary
+GHS magic values `{1,131}`, and genera `1`, `2^130−1`, or `2^130`) pre-filter
+much of item 4. **They do not
 touch item 3 at all** — the choice of MQ/hybrid solver is orthogonal to
 the factor-base construction — and they do not obviously touch item 5.
 
@@ -276,6 +278,181 @@ Generic `2^{n/2}` is `2^65.5`; the rho reference is `2^60.8`.
   (`≈ 1250`, `≈ 2000`) are the papers' rounded figures.  The exact crossings
   of the formulas at `ω = log₂ 7` are `n = 1144` (Kousidis–Wiemers) and
   `n = 1876` (Petit–Quisquater).
+
+## Addendum, 2026-10-26: `openai/math` updates since the 2026-10-07 review
+
+Read at `openai/math` commit `7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a`
+(2026-10-26T14:18:03-07:00; 721 manuscripts in 373 families; 751 preprint
+directories).  The repository has seven commits.  Two of them carry content
+after the initial release `adc7f12` (2026-10-06):
+
+- `3014888` (2026-10-07): withdrawals, revised editions and Lean additions.
+- `42907c9` (2026-10-26): new manuscripts, new Lean and verification data.
+
+Both diffs were read file by file (`git diff --name-status`).  Nothing below
+was built or run here: the Lean libraries were not compiled and no corpus
+proof was checked.
+
+### The 2026-10-07 update (`3014888`)
+
+- **Withdrawn**: three Hodge/K3 manuscripts (split abelian eightfolds,
+  Kuga–Satake for K3, rational Hodge for products of K3).  None is cited
+  in this repository.
+- **Revised editions** of 14 manuscripts, plus 13 citation-only updates.
+  Among the revised and citation-updated manuscripts, those on elliptic
+  curves concern their arithmetic over `ℚ`:
+  - BSD from low Selmer corank, and the two-primary BSD formula
+  - the Selmer converse at every prime, and the pointwise 2-converse
+  - Goldfeld's density conjecture, and the mean analytic rank of twists
+  - modularity at the prime 2 (Fontaine–Mazur, and unrestricted pro-modularity)
+  - the `p`-adic section conjecture
+  - Milne's rationality conjecture, and the rational Hodge conjecture for CM
+    abelian varieties
+
+  Rank, Sha and modularity over `ℚ` give no algorithm for ECDLP in
+  `E(F_{2^n})`, and nothing in this repository depends on them.
+- **No family this note uses moved.**  No file of family 107 (matrix
+  multiplication), 142 (deterministic polynomial factorization over prime
+  fields) or 279 (exact quantum factoring) changed in either update.
+
+### The 2026-10-26 update (`42907c9`)
+
+- **New**: local smoothing for the wave equation (family 079), which is not
+  relevant here, and the ETH disproof (378).
+- **New Lean**: about 40,000 Lean files (most in algebraic geometry, number
+  theory and algorithms), a formalization of the Hodge conjecture for CM
+  abelian varieties, and restored C++/checker data for mutually unbiased
+  bases in dimension six.
+- **Family 378, "The Exponential Time Hypothesis is False".**  It counts the
+  satisfying assignments of a `k`-CNF deterministically in
+  `(n+m)^{O_k(1)} 2^{n/(log n)^{1/2+o(1)}}` time and polynomial space
+  (Lean scope, `lean/docs/378.md`: `2^{O_k(n (log log n)^2/√log n)}`).
+  Its appendix applies it to inverting Boolean maps of constant output
+  locality.  For relation finding it is **galactic**:
+  - The overview's cost (eq. `overview-three-costs`) includes a factor
+    `2^{2n/r}` with `r = Θ(√log n/(log log n)^2)`, and its parameter bounds
+    hold only "for sufficiently large `n`".  That one factor beats the
+    `2^{0.386 n}` of PPSZ on 3-SAT only when `r > 5.2`.  With the hidden
+    constant set to 1 and natural logarithms, `r > 5.2` needs
+    `log n ≈ 10^6`, that is `n ≈ e^{10^6}` variables.  The SAT encodings of
+    point decomposition have thousands of variables.  This is arithmetic on
+    the paper's stated bounds, not a measurement.
+  - Encoding a whole ECDLP as CNF does not help either: Tseitin variables
+    grow with circuit size, not with the 131 scalar bits, so `2^{N/√log N}`
+    with `N = poly(131)` is far above `2^{65.5}`.  EC scalar multiplication
+    is not a constant-locality map, so the appendix corollary does not
+    apply directly.
+  - What it changes is the asymptotic floor for SAT-based decomposition
+    (the CDCL SAT line of this note's scope, and
+    `research/sat_factor_base_review_20260908/`): no `2^{Ω(n)}` lower bound
+    on the SAT step may be assumed any more.  No cost row in this repository
+    assumes ETH (`grep -w ETH` finds only unrelated uses).
+
+### Provenance: OpenAI's 2026-10-26 announcement
+
+OpenAI's post "Working with academic communities to build scientific
+understanding" (2026-10-26,
+<https://openai.com/index/building-scientific-understanding-with-academic-communities/>)
+accompanies `42907c9`.  The page returned HTTP 403 to automated fetches
+from this session.  What follows comes from a search-engine summary of it
+and from Gizmodo's coverage (2026-10-26), not from the post itself:
+
+- It announces three results: local smoothing/Kakeya (family 079), the ETH
+  disproof (378), and a construction of four-dimensional interacting gauge
+  theories including QCD.  The QCD result is not in `openai/math`: its
+  external group chose to write it up themselves.
+- It calls the manuscripts "raw research data" and names outside
+  "shepherds" who form groups to interpret them.  For ETH, `history.md`
+  names a working group led by R. Impagliazzo, R. Paturi and R. Williams.
+  OpenAI says it seeks no academic credit.
+- The coverage recalls that in an earlier claim (Navier–Stokes), Lean
+  "verified a weaker assertion" than the one published.  That is why this
+  note treats every corpus "formalized" claim as unchecked until its
+  Comparator statement is compared with the paper.  That applies to
+  `complex_omega_le_nine_quarters`, `omega_lt_source_constant` and
+  `exact_count_and_sat`.
+
+Effect on this note: none on any number.  Family 378 stays galactic and
+unverified here until its working group reports.
+
+### Correction to the 2026-10-07 addendum: family 107 was already formalized
+
+`lean/docs/107.md` and its Comparator statements date from the initial
+release `adc7f12` (2026-10-06), before the 2026-10-07 review.  Neither
+update changed them.  The 2026-10-07 addendum calls the characteristic-0
+proof one that "nobody here has verified".  That is still true, but it
+omitted that the corpus claims a Lean proof:
+
+- **`ω(ℂ) ≤ 9/4`** in the arithmetic-operation model.  Comparator statement:
+  `ComparatorChallenges/MatrixMultiplication.lean`,
+  `complex_omega_le_nine_quarters`.
+- **`ω(F) < 2.371054886006746` over every field**, characteristic 2
+  included.  Comparator statement: `MatrixFields.lean`,
+  `omega_lt_source_constant`.  This is `2.8·10^-4` below the published
+  `2.371339` and changes no row materially.
+
+Neither statement was compared with its paper here, and the Lean was not
+built.
+
+The characteristic-2 status of `9/4` is unchanged: **conditional**.
+- The main paper (`Matrix-Multiplication-Nine-Fourths-October-2-2026`)
+  states its theorem over `ℂ` only.  Its one field-dependent step found here
+  is the primitive `L`-th root of unity, `L = 5M`, which the 2026-10-07
+  review handled.
+- Its detecting-characters lemma (Appendix A) is proved in Strassen's
+  asymptotic-spectrum framework.  The tools it names are finite-dimensional
+  separation, compactness and a fixed-point theorem, none of which depends
+  on the field on its face.
+- The corpus formalized `9/4` only over `ℂ`.  It states no every-field
+  `9/4`, and says `2.258` holds "outside finitely many positive
+  characteristics".  That is an **unexplained gap, not evidence** against
+  characteristic 2: it may be a scope choice.
+- Closing the gap would need the shared-leg entropy inequality and the
+  detecting-characters lemma checked over `F_{2^k}`.  Neither was attempted
+  here.
+
+`src/cryptanalysis/matmul_exponent.rs` still tags `CORPUS_FAMILY_107` as
+`ProofStatus::Unverified`.  That is accurate for this repository, which
+built no proof.  Two code changes are left open:
+- a "formalized upstream, not rebuilt" status;
+- a `2.3711` every-field row.
+
+## Addendum, 2026-11-07: `ω ≤ 9/4` reported over every field
+
+This answers the open question the 2026-10-07 and 2026-10-26 addenda left on the `9/4` row. Two independent reports now state `ω ≤ 9/4` over every field, characteristic 2 included. A third gives a constructive proof in characteristic 0 only. None of the three was checked here.
+
+- **Amanov, van den Berg and Zuiddam, arXiv [2610.30054](https://arxiv.org/abs/2610.30054)** (21 Oct 2026).
+  - Theorem 1.1, quoted: "For every field 𝔽, ω𝔽≤9/4." The paper is an exposition of the openai/math family-107 argument, reworked for every characteristic.
+  - It also proves an *operational barrier*: the current degeneration ingredients cannot improve on `9/4`.
+  - Read here: the abstract and the first part of the HTML. The barrier theorem and the positive-characteristic sections are known only from a summary.
+- **Navot, [`matrix-multiplication-all-fields`](https://github.com/selanavot/matrix-multiplication-all-fields)**.
+  - A Lean fork of the openai/math proof. It states `omega_le_nine_quarters (F : Type*) [Field F] : Arithmetic.omega F ≤ 9/4` for any characteristic.
+  - The README reports only `propext`, `Classical.choice` and `Quot.sound` as axioms.
+  - Not built here, and the statement was not compared with the claim.
+- **Pass, arXiv [2610.28627](https://arxiv.org/abs/2610.28627).** An explicit, galactic `O(n^{9/4+γ})` algorithm for integer matrices, in characteristic 0. It does not cover GF(2^k).
+
+Effect on the table in the 2026-10-07 addendum:
+- **The `9/4` row** changes from *conditional* to *reported for every field*. The numbers are unchanged: `log₂ T = 68.96` at `n = 131`, still above generic `2^65.5` and rho `2^60.8`, with the turning point at `n = 227`.
+- **What the row still is.** It remains an existence-only exponent inside a contested first-fall-degree model, not an attack.
+- **The barrier.** Do not extrapolate a further fall in `ω` from this line of work.
+- **`src/cryptanalysis/matmul_exponent.rs`** still tags `CORPUS_FAMILY_107` as `Conditional` in characteristic 2. Re-tagging it is a code change, left open until someone here builds the Navot Lean artefact or checks the proof.
+
+Both arXiv papers (20–21 Oct) predate the 2026-10-26 review, which missed them.
+
+`openai/math` was reviewed through `4eaee87` (2026-10-29). The only change since `7ef5c0c` is a namespace fix in the CM-Hodge Comparator challenge, with nothing ECDLP-relevant. No report from the ETH working group (family 378) was found as of 2026-11-07.
+
+The knowledge-base records are in crypto-autoresearcher#3153: KN-LIT-eef882, KN-LIT-d4aa5d, KN-LIT-ac18f4, and KN-LIT-58d42d, which supersedes KN-LIT-0b036e. KN-OPEN-57907f is superseded by KN-LIT-eef882.
+
+### Wider sweep, same day
+
+A 60-day sweep of arXiv and ePrint is in [`research/lit_sweep_20261107/`](../../lit_sweep_20261107/README.md), with a report, two figures and a PDF.
+
+- **Lü, arXiv 2610.18914.** A third reported route to `9/4` in characteristic 2: every algebraically closed field, and ω depends only on the characteristic.
+- **Dias and Lima, arXiv 2611.00517.** OpenAI's ETH algorithm beats brute force only beyond `n ≈ 10^32` variables (constant `C = 2`) to `10^3517` (`C = 10`). That confirms the galactic assessment above.
+- **Majdoddin, arXiv 2610.41622.** Anthropic's parallel #3-SAT algorithm crosses over at about `2^420` clauses at density 1.
+- **Sun, arXiv 2610.13971.** Claims ω = 2. It is an unverified outlier and is not used.
+
+No new paper in the window targets ECDLP index calculus directly, and no number in this note changes.
 
 ## Honest limits
 

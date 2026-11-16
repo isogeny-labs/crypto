@@ -50,6 +50,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
     build_decomposition_system, matrix_f4_f2, solving_profile, FieldStructure,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -225,7 +226,7 @@ fn signature(polys: &[F2BoolPoly]) -> Vec<Vec<u64>> {
     let mut s: Vec<Vec<u64>> = polys
         .iter()
         .map(|p| {
-            let mut m: Vec<u64> = p.terms.iter().map(|t| t.mask).collect();
+            let mut m: Vec<u64> = p.terms.iter().map(|t| mask_low64(t.mask)).collect();
             m.sort_unstable();
             m
         })

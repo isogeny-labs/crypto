@@ -1,0 +1,12 @@
+import FallbackWordRemainder
+set_option autoImplicit false
+namespace FallbackGeometry
+
+theorem control_nonzero_remainder : remainder 17 [1,0,1] [1,1]=some [2] := by decide
+theorem control_constant_divisor : remainder 17 [1,2,3] [1]=some [] := by decide
+theorem control_nonmonic_remainder : remainder 17 [3,6] [3]=some [] := by decide
+theorem control_empty_divisor : remainder 17 [1] []=none := by decide
+theorem control_missing_second_premise : (1 : Int) ∣ 1-0*0 ∧ ¬(2 : Int) ∣ 1-0*0 := by decide
+theorem control_zero_cancellation_rejected :
+ (0 : Int)*(1-0)=0*(2*0) ∧ ¬(2 : Int) ∣ 1-0 := by decide
+end FallbackGeometry

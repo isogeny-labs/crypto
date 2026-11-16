@@ -1,0 +1,143 @@
+{
+  "schema": "ideas-cloud-readiness/v1",
+  "items": [
+    7,
+    13
+  ],
+  "local_host": {
+    "cpu_cores": 4,
+    "memory_bytes": 17179869184,
+    "gpu": false
+  },
+  "local_credential_presence": {
+    "RUNPOD_API_KEY": false,
+    "MODAL_TOKEN_ID": false,
+    "MODAL_TOKEN_SECRET": false,
+    "AWS_ACCESS_KEY_ID": false,
+    "AWS_SECRET_ACCESS_KEY": false
+  },
+  "attempts": [
+    {
+      "command": "python3 cloud/fleet.py status (cryptanalysis)",
+      "result": "RUNPOD_API_KEY missing"
+    },
+    {
+      "command": "gh secret list --repo aburan28/cryptanalysis",
+      "result": "403 Resource not accessible by integration; repository-held credentials remain unknown"
+    },
+    {
+      "command": "gh workflow run cloud-ecc2k130.yml --repo aburan28/cryptanalysis --ref claude/cryptanalysis-repo-setup-p59kek -f action=doctor",
+      "result": "422 workflow is disabled"
+    },
+    {
+      "command": "gh api repos/aburan28/cryptanalysis/actions/workflows/367505054",
+      "result": {
+        "state": "disabled_manually",
+        "path": ".github/workflows/cloud-ecc2k130.yml"
+      }
+    }
+  ],
+  "updates": [
+    {
+      "event": "User supplied RunPod access and selected RunPod route",
+      "credential_value_retained": false
+    },
+    {
+      "event": "Authenticated status and GPU catalogue/availability queries succeeded"
+    },
+    {
+      "event": "First allocation refused HTTP400 for unsupported provider CUDA13.3 enum; no pod created"
+    },
+    {
+      "event": "Amended provider family13.0 request created dedicated ddklh0efbq99mv at2.49USD/hour with2hourcap; SSH readiness pending; actualdriver/nativegatesnotyetpassed"
+    },
+    {
+      "event": "Both first SSH-readiness allocations were explicitly deleted; no scientific work ran on them."
+    },
+    {
+      "event": "Third dedicated instance uf7o6868cpoxi7 allocated at0.69USD/hour,28vCPU,125GBhostRAM,RTX5090; provider and native hardware receipts retained in sibling study."
+    },
+    {
+      "event": "Provider logs confirmed listening sshd; directSSH route unavailable. Documented fixed-job HTTP delivery/retrieval used, with ephemeral bearer separate from user API key."
+    },
+    {
+      "event": "Automatic review initially refused transfer as possible private-source disclosure; public GitHub visibility and unauthenticated exact-hash download established public payload, then same launch was approved."
+    },
+    {
+      "event": "HTTP run0 terminal packet fetched/hashverified; GPU/frontier refused incomplete transport and permissions, four native negation arms completed with three censored. Failure retained."
+    },
+    {
+      "event": "Corrected complete-manifest/executable-bit payload v2 published; fresh run1 passed setup and is executing unchanged native scientific workflow on same pod."
+    },
+    {
+      "event": "Run 1 passed 48 native GPU arithmetic fixtures and 2,697 checks. A short walk produced 1,719 reports over 3,145,728 iterations. The original ingestion gate refused six valid zero-length starts, leaving the subsequent challenge stages unrun."
+    },
+    {
+      "event": "The run-1 CPU MutantXL closure failed at its 80-billion-byte address-space cap with signal 6 / exit 134 after 748.35 seconds; peak RSS was 77,709,264 KiB. Solving degree remains unmeasured."
+    },
+    {
+      "event": "The original ingestion failure is preserved. A separate native v2 checker locally validates all 1,719 report records and independently rewalks all six zero-length starts and eight positive fixtures; 1,705 positive walks remain unreplayed."
+    },
+    {
+      "event": "Evidence from pod uf7o6868cpoxi7 was fetched, the pod deleted, and its absence verified."
+    },
+    {
+      "event": "Combined high-RAM GPU requests and API-v1 CPU requests refused capacity; no CPU pod was allocated."
+    },
+    {
+      "event": "The fourth allocated pod, 3nkvjgy3jmlzol, built the CUDA client but failed device discovery with unknown error and an empty device list. Its driver reported a reboot recovery action. GPU tests and walks did not follow. Effective memory of 125 GB also failed the 192 GB frontier gate."
+    },
+    {
+      "event": "The GPU-v3 archive was fetched and all 120 manifest-listed payload files verified. Pod 3nkvjgy3jmlzol was deleted and its absence verified; the independent watchdog also confirmed absence."
+    },
+    {
+      "event": "Published the prospective documented API-v2 CPU controller at cryptanalysis commit 493f0ca after twelve offline infrastructure controls passed. The same public payload-v5 and native scientific command remained fixed."
+    },
+    {
+      "event": "Actual API-v2 requests for cpu3m and cpu5m, each 32 vCPU / derived 256 GB, both received explicit HTTP 400 capacity refusals. No fifth pod was allocated and no scientific execution occurred."
+    },
+    {
+      "event": "An independent complete API-v2 inventory found zero resources for the fresh request name and zero active campaign resources. Root verified and stopped only the exact local idle watchdog. Original false deletion/absence flags remain unchanged because no provider resource required deletion."
+    },
+    {
+      "event": "A separately frozen final GPU continuation reallocates the unused CPU compute envelope without increasing the total bound. Fifth and last actual pod isu6msmhvdzvgs allocated as RTX 4090, 36 vCPU / 71 GB RAM, reported 0.34 USD/hour. Independent pre-POST cleanup watchdog is armed; unchanged native payload-v5 is running. No further allocations are authorized by this bounded round."
+    },
+    {
+      "event": "The final RTX 4090 host built the CUDA client for sm_89 but device discovery failed with unknown error and an empty device list (driver API 13.0, runtime 13.3). NVIDIA reported a reboot recovery action; the cause remains undiagnosed. GPU arithmetic, walk, corrected ingestion, health, restart, throughput and challenge stages did not run on this host."
+    },
+    {
+      "event": "Final-host CPU arithmetic and eight ingestion fixtures passed. Only tiny frontier controls ran; 71 GB effective RAM refused the 192 GB minimum. Archive d74c3fab830939e3ecfc18c03925b37d9dc5d1d30a893bacc68302eaf637d4de was fetched; all 120 manifest-listed payload files and exact coverage were independently verified."
+    },
+    {
+      "event": "Pod isu6msmhvdzvgs was deleted and its exact ID returned 404. A separate complete inventory found all five campaign IDs absent and zero campaign resources. The detached watcher is stopped (zombie process state, no running process). No further allocations will run in this bounded round."
+    }
+  ],
+  "cloud_provisioning_executed": true,
+  "workflow_enable_executed": false,
+  "challenge_logarithm_recovered": false,
+  "blocked_scope": "No challenge logarithm or full closure was obtained. Run 1 stopped at the original ingestion gate; the two later GPU hosts failed device initialization before corrected GPU gates. The large CPU cell exceeded its fixed memory cap and all bounded larger-memory allocation requests were refused.",
+  "next_concrete_route": "No remote work or provisioning remains active. Continuing the fixed GPU packet requires working CUDA device initialization; the unchanged larger frontier packet needs actually available effective memory of at least 192 GB.",
+  "interpretation": "Actual GPU arithmetic and shortwalk controls, local corrected ingestion control, memory-censored CPU closure and infrastructure failures are distinct. No end-to-end gain, security exponent, measured solving degree or challenge solution is established.",
+  "bounded_measurement_status": "completed bounded cloud attempts; all five allocated pods closed and absence verified",
+  "user_credential_in_artifact": false,
+  "active_owned_pod_ids": [],
+  "evidence": {
+    "repository": "aburan28/cryptanalysis",
+    "published_commit": "21c9273bbfc7c48fa39ad408dd96409821ee287d",
+    "study": "experiments/ideas_gpu_20261018",
+    "report_pdf": "experiments/ideas_gpu_20261018/reports/report.pdf",
+    "run1_archive_sha256": "c7ddcdbd1a88c72e28c25177ddbce7fe0531e55dab12260ccc2cec9126890096",
+    "gpu_v3_archive_sha256": "15516ac73ae3b4e7874bb03b2dbb5c1eedafebbc50382ec7ccd8ca8f582b967d",
+    "cpu_api_v2_source_commit": "493f0ca1b7183dbd9e42ddcf8c44c650754e3fdb",
+    "cpu_api_v2_run": "experiments/ideas_gpu_20261018/resource-runs/cpu-api-v2-01",
+    "report_published_commit": "193b86b2d29e728301c2c56da7f9688dc9559014",
+    "final_gpu_source_commit": "390898259771f708e431a49f356dcf2a296f82aa",
+    "final_gpu_run": "experiments/ideas_gpu_20261018/resource-runs/gpu-final-01",
+    "final_gpu_archive_sha256": "d74c3fab830939e3ecfc18c03925b37d9dc5d1d30a893bacc68302eaf637d4de",
+    "independent_audit_commit": "21c9273bbfc7c48fa39ad408dd96409821ee287d",
+    "independent_audit": "experiments/ideas_gpu_20261018/reports/final-independent-audit.json",
+    "independent_audit_scope": "741 distinct bound files, four remote archives and 26 benchmark copies; retained five-pod closeout, not a fresh provider query; exact-value credential scan zero matches"
+  },
+  "updated_utc": "2026-10-18T07:08:14Z",
+  "initial_credential_measurement_scope": "initial readiness only; later user access is recorded below"
+}

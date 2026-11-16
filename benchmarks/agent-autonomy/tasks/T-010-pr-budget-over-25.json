@@ -1,0 +1,36 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-010",
+  "title": "Bring a routine PR job back under the CI time budget",
+  "class": "ci-repair",
+  "difficulty": 1,
+  "source": [
+    ".github/scripts/check-pr-budgets.py",
+    ".github/scripts/test-pr-budgets.py",
+    ".github/CI.md",
+    "AGENTS.md 'Default workflow' merge set"
+  ],
+  "prompt": "`python3 .github/scripts/check-pr-budgets.py` reports a routine pull-request job whose budget is over the limit. Repair it. Do not add an exception for it.",
+  "setup": "Harness sets `timeout-minutes: 40` on the job in .github/workflows/lab-parity.yml and commits it as the setup commit.",
+  "acceptance": [
+    "python3 .github/scripts/check-pr-budgets.py exits 0",
+    "python3 .github/scripts/test-pr-budgets.py exits 0",
+    "the job's timeout-minutes is at most 25",
+    ".github/scripts/check-pr-budgets.py is unchanged"
+  ],
+  "check_command": "python3 .github/scripts/check-pr-budgets.py && python3 .github/scripts/test-pr-budgets.py && git diff --quiet \"$T_BASE\" HEAD -- .github/scripts/check-pr-budgets.py",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "adding the workflow to NAMED_BUDGET_EXCEPTIONS or FROZEN_BUDGET_EXCEPTIONS"
+  ],
+  "max_wall_minutes": 10,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Fixture not executed: whether lab-parity.yml is a routine PR job was not confirmed. Harness should pick any job that check-pr-budgets.py counts as routine."
+}

@@ -44,6 +44,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
 use crypto_lib::cryptanalysis::koblitz_index_calculus::invariant_subspace_basis;
 use crypto_lib::cryptanalysis::matrix_f5_f2::F5Criterion;
 use crypto_lib::cryptanalysis::pc_degree_harness::{rank_and_refute, sparse_rank_and_refute};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, mask_low64};
 use crypto_lib::cryptanalysis::sparse_macaulay::{
     eliminate_high_columns, eliminate_high_columns_dense_finish, SparseElimination,
 };
@@ -147,7 +148,7 @@ fn column_boundaries(sys: &DecompositionSystem, d: u32, n_cols: usize) -> (usize
         }
         for mult in monomials_up_to(sys.n_vars, d - pdeg) {
             all.clear();
-            all.extend(p.terms.iter().map(|t| t.mask | mult));
+            all.extend(p.terms.iter().map(|t| t.mask | mask_from64(mult)));
             all.sort_unstable();
             let mut i = 0;
             while i < all.len() {
@@ -156,7 +157,7 @@ fn column_boundaries(sys: &DecompositionSystem, d: u32, n_cols: usize) -> (usize
                     j += 1;
                 }
                 if (j - i) % 2 == 1 {
-                    cols.insert(all[i]);
+                    cols.insert(mask_low64(all[i]));
                 }
                 i = j;
             }
@@ -503,7 +504,7 @@ fn f5_criterion(n: u32, m: usize, d: u32, seed: u64) -> Box<dyn Workload> {
         })
         .collect();
     Box::new(Closure(move || {
-        let c = F5Criterion::new(&sys.equations, sys.n_vars, d, mask);
+        let c = F5Criterion::new(&sys.equations, sys.n_vars, d, mask_from64(mask));
         let (rows, zero) = c.lower_level_rows();
         let (koszul, frob) = c.pruned_by_part();
         let mut fp = Fp::new()
@@ -516,7 +517,7 @@ fn f5_criterion(n: u32, m: usize, d: u32, seed: u64) -> Box<dyn Workload> {
         for (i, ts) in candidates.iter().enumerate() {
             let mut h = ts.len() as u64;
             for &t in ts {
-                h = (h << 1 | c.prunes(i, t) as u64).rotate_left(7) ^ t;
+                h = (h << 1 | c.prunes(i, mask_from64(t)) as u64).rotate_left(7) ^ t;
                 h = h.wrapping_mul(0x9e37_79b9_7f4a_7c15);
             }
             fp = fp.u64(h);

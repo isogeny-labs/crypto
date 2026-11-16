@@ -29,7 +29,9 @@ use rand::Rng;
 use rayon::prelude::*;
 use serde::Serialize;
 
-use super::gaudry_cubic::{am, mm, sm, split_eigenspace, PolyRing, UPoly};
+use super::gaudry_cubic::{
+    am, charpoly_mod_p, eigenvectors_mod_p, mm, rref_mod_p, sm, split_eigenspace, PolyRing, UPoly,
+};
 use super::residual_walk::{inv_mod, pow_mod};
 
 // ── F_{p⁴} = F_p[t] / (t⁴ − c) ───────────────────────────────────────────
@@ -55,10 +57,106 @@ pub struct Fp4 {
     pub p: u64,
     pub c: u64,
     muls: Cell<u64>,
+    /// E27 (§9.25): products by the Karatsuba tower (`13`) instead of the
+    /// schoolbook (`19`).  The result is the same element either way.
+    karatsuba: bool,
+    /// `F_p` inversions performed by [`Fp4::inv`] (E27's bound on what a
+    /// batched inversion could still save).
+    fp_invs: Cell<u64>,
+}
+
+/// Process-wide default for [`Fp4::new`]: `false` keeps every count this
+/// repository recorded before E27; E27's drivers switch it on.
+static KARATSUBA_DEFAULT: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// Every [`Fp4`] built after this call multiplies by the Karatsuba tower
+/// (`true`) or the schoolbook (`false`).
+pub fn set_karatsuba_default(on: bool) {
+    KARATSUBA_DEFAULT.store(on, std::sync::atomic::Ordering::SeqCst);
+}
+
+/// `F_p` inversions performed by every [`Fp4::inv`] in the process (E27's
+/// IC-side bound on what batching could still save).
+static FP_INVERSIONS_TOTAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+pub fn fp_inversions_total() -> u64 {
+    FP_INVERSIONS_TOTAL.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+pub fn reset_fp_inversions_total() {
+    FP_INVERSIONS_TOTAL.store(0, std::sync::atomic::Ordering::SeqCst);
+}
+
+/// E30 (§9.28): the audit of structurally trivial `F_{p⁴}` products.  When
+/// on, every product whose operand is `0` or `1` (re-priced `0`) or lies in
+/// `F_p` (re-priced `4`, a scaling) adds the difference from its charged cost
+/// to a process-wide counter.  Recorded counts never change.
+static AUDIT_ON: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static AUDIT_SAVINGS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+pub fn set_trivial_product_audit(on: bool) {
+    AUDIT_ON.store(on, std::sync::atomic::Ordering::SeqCst);
+}
+
+pub fn trivial_product_audit() -> bool {
+    AUDIT_ON.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+pub fn trivial_product_savings() -> u64 {
+    AUDIT_SAVINGS.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+pub fn reset_trivial_product_savings() {
+    AUDIT_SAVINGS.store(0, std::sync::atomic::Ordering::SeqCst);
+}
+
+/// What the audit re-prices one product at, given its charged cost.
+pub fn audited_product_cost(a: &E4, b: &E4, charged: u64) -> u64 {
+    let unit = |x: &E4| x.is_zero() || *x == E4::ONE;
+    if unit(a) || unit(b) {
+        0
+    } else if a.in_fp() || b.in_fp() {
+        4.min(charged)
+    } else {
+        charged
+    }
+}
+
+pub fn karatsuba_default() -> bool {
+    KARATSUBA_DEFAULT.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+/// Montgomery's simultaneous inversion of nonzero elements of `F_p`:
+/// `3(m − 1)` products and one inversion, which is charged `16` as in
+/// [`Fp4::inv`].  Returns the inverses and the cost.
+pub fn batch_inv_fp(ds: &[u64], p: u64) -> (Vec<u64>, u64) {
+    let m = ds.len();
+    if m == 0 {
+        return (Vec::new(), 0);
+    }
+    let mut prefix = Vec::with_capacity(m);
+    let mut acc = 1u64;
+    for (i, &d) in ds.iter().enumerate() {
+        assert!(d != 0, "inverse of zero in F_p");
+        acc = if i == 0 { d } else { mm(acc, d, p) };
+        prefix.push(acc);
+    }
+    let mut inv = inv_mod(acc, p);
+    let mut out = vec![0u64; m];
+    for i in (1..m).rev() {
+        out[i] = mm(inv, prefix[i - 1], p);
+        inv = mm(inv, ds[i], p);
+    }
+    out[0] = inv;
+    (out, 3 * (m as u64 - 1) + 16)
 }
 
 impl Fp4 {
     pub fn new(p: u64) -> Fp4 {
+        Fp4::with_arith(p, karatsuba_default())
+    }
+    /// `F_{p⁴}` with the product chosen explicitly (E27).
+    pub fn with_arith(p: u64, karatsuba: bool) -> Fp4 {
         assert!(
             p % 4 == 1,
             "t⁴ − c is irreducible over F_p only when p ≡ 1 (mod 4)"
@@ -70,13 +168,25 @@ impl Fp4 {
             p,
             c,
             muls: Cell::new(0),
+            karatsuba,
+            fp_invs: Cell::new(0),
         }
+    }
+    pub fn is_karatsuba(&self) -> bool {
+        self.karatsuba
+    }
+    /// Charge `k` `F_p` multiplications (a batch's share, E27).
+    pub fn charge(&self, k: u64) {
+        self.count(k);
     }
     fn count(&self, k: u64) {
         self.muls.set(self.muls.get() + k);
     }
     pub fn muls(&self) -> u64 {
         self.muls.get()
+    }
+    pub fn fp_inversions(&self) -> u64 {
+        self.fp_invs.get()
     }
     pub fn reset_muls(&self) {
         self.muls.set(0);
@@ -98,8 +208,83 @@ impl Fp4 {
         self.count(4);
         E4(core::array::from_fn(|i| mm(a.0[i], k, self.p)))
     }
-    /// Schoolbook with `t⁴ = c`: 16 products and 3 reductions.
+    /// Characteristic-`p` Frobenius when `t^p = z t`, `z ∈ F_p`.
+    /// Three nonconstant coordinate multiplications are charged.
+    pub fn frob_p(&self, a: &E4, z: u64) -> E4 {
+        debug_assert_eq!(pow_mod(z, 4, self.p), 1);
+        let z2 = mm(z, z, self.p);
+        let z3 = mm(z2, z, self.p);
+        self.count(5); // z², z³, and three coordinate products.
+        E4([
+            a.0[0],
+            mm(a.0[1], z, self.p),
+            mm(a.0[2], z2, self.p),
+            mm(a.0[3], z3, self.p),
+        ])
+    }
+    /// Multiply by `k t^degree`, `degree < 4`.  This keeps a twist
+    /// Frobenius's monomial `y` multiplier out of a generic 19-product
+    /// field multiplication.  All four products and each reduction count.
+    pub fn mul_monomial(&self, a: &E4, k: u64, degree: usize) -> E4 {
+        assert!(degree < 4);
+        let mut out = [0u64; 4];
+        for (i, &ai) in a.0.iter().enumerate() {
+            let j = i + degree;
+            let v = mm(ai, k, self.p);
+            out[j % 4] = if j >= 4 { mm(v, self.c, self.p) } else { v };
+        }
+        self.count(4 + degree as u64);
+        E4(out)
+    }
+    /// Schoolbook with `t⁴ = c`: 16 products and 3 reductions; or, in
+    /// Karatsuba mode, [`Fp4::mul_karatsuba`] (`13`).
     pub fn mul(&self, a: &E4, b: &E4) -> E4 {
+        if AUDIT_ON.load(std::sync::atomic::Ordering::Relaxed) {
+            let charged = if self.karatsuba { 13 } else { 19 };
+            let saved = charged - audited_product_cost(a, b, charged);
+            if saved > 0 {
+                AUDIT_SAVINGS.fetch_add(saved, std::sync::atomic::Ordering::Relaxed);
+            }
+        }
+        if self.karatsuba {
+            return self.mul_karatsuba(a, b);
+        }
+        self.mul_schoolbook(a, b)
+    }
+    /// Karatsuba over the tower `F_{p²}[t]/(t² − s)`, `F_p[s]/(s² − c)`:
+    /// `a = A + Bt`, `A = a₀ + a₂s`, `B = a₁ + a₃s`.  `AC`, `BD` and
+    /// `(A + B)(C + D)` cost `3` products and `1` reduction by `c` each;
+    /// `BD·s` one more reduction.  Thirteen `F_p` multiplications, each one
+    /// performed and charged.
+    pub fn mul_karatsuba(&self, a: &E4, b: &E4) -> E4 {
+        let p = self.p;
+        let c = self.c;
+        self.count(13);
+        // (x0 + x1 s)(y0 + y1 s) in F_p[s]/(s² − c): 4 multiplications.
+        let m2 = |x0: u64, x1: u64, y0: u64, y1: u64| -> (u64, u64) {
+            let v0 = mm(x0, y0, p);
+            let v1 = mm(x1, y1, p);
+            let mid = mm(am(x0, x1, p), am(y0, y1, p), p);
+            (am(v0, mm(c, v1, p), p), sm(sm(mid, v0, p), v1, p))
+        };
+        let (a0, a1, a2, a3) = (a.0[0], a.0[1], a.0[2], a.0[3]);
+        let (b0, b1, b2, b3) = (b.0[0], b.0[1], b.0[2], b.0[3]);
+        // A = (a0, a2), B = (a1, a3); C = (b0, b2), D = (b1, b3).
+        let (ac0, ac1) = m2(a0, a2, b0, b2);
+        let (bd0, bd1) = m2(a1, a3, b1, b3);
+        let (s0, s1) = m2(am(a0, a1, p), am(a2, a3, p), am(b0, b1, p), am(b2, b3, p));
+        // BD·s = c·bd1 + bd0·s.
+        let (bds0, bds1) = (mm(c, bd1, p), bd0);
+        // even part AC + BD s; odd part (A+B)(C+D) − AC − BD.
+        let e0 = am(ac0, bds0, p);
+        let e1 = am(ac1, bds1, p);
+        let o0 = sm(sm(s0, ac0, p), bd0, p);
+        let o1 = sm(sm(s1, ac1, p), bd1, p);
+        // element = e0 + o0 t + e1 t² + o1 t³.
+        E4([e0, o0, e1, o1])
+    }
+    /// The schoolbook product, whatever the mode (E27's reference).
+    pub fn mul_schoolbook(&self, a: &E4, b: &E4) -> E4 {
         let p = self.p;
         self.count(19);
         let mut d = [0u64; 7];
@@ -124,6 +309,17 @@ impl Fp4 {
     /// of `30` for `Fp3::inv` implies (it performs `14`): `40` in all, the
     /// figure §11.16's `97` per addition rests on.
     pub fn inv(&self, a: &E4) -> E4 {
+        let norm = self.inv_norm(a);
+        let dinv = inv_mod(norm.d, self.p);
+        self.count(16);
+        self.fp_invs.set(self.fp_invs.get() + 1);
+        FP_INVERSIONS_TOTAL.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        self.inv_finish(a, &norm, dinv)
+    }
+    /// The first half of [`Fp4::inv`]: the norm `n = A² − sB²` to `F_{p²}`
+    /// and its norm `d ∈ F_p` (`12` multiplications charged).  E27 batches
+    /// the inversions of the `d`'s across walks.
+    pub fn inv_norm(&self, a: &E4) -> InvNorm {
         let p = self.p;
         let c = self.c;
         let (a0, a1, a2, a3) = (a.0[0], a.0[1], a.0[2], a.0[3]);
@@ -134,23 +330,31 @@ impl Fp4 {
                 am(x01, x01, p),
             )
         };
-        let m2 = |x0: u64, x1: u64, y0: u64, y1: u64| -> (u64, u64) {
-            (
-                am(mm(x0, y0, p), mm(c, mm(x1, y1, p), p), p),
-                am(mm(x0, y1, p), mm(x1, y0, p), p),
-            )
-        };
         let (aa0, aa1) = sqr(a0, a2);
         let (bb0, bb1) = sqr(a1, a3);
         // s·B² = c·bb1 + bb0·s.
         let (n0, n1) = (sm(aa0, mm(c, bb1, p), p), sm(aa1, bb0, p));
         let d = sm(mm(n0, n0, p), mm(c, mm(n1, n1, p), p), p);
         assert!(d != 0, "inverse of zero in F_p⁴");
-        let dinv = inv_mod(d, p);
-        let (i0, i1) = (mm(n0, dinv, p), (p - mm(n1, dinv, p)) % p);
+        self.count(12);
+        InvNorm { n0, n1, d }
+    }
+    /// The second half of [`Fp4::inv`], given `d⁻¹` (`12` multiplications
+    /// charged; the inversion of `d` is the caller's).
+    pub fn inv_finish(&self, a: &E4, norm: &InvNorm, dinv: u64) -> E4 {
+        let p = self.p;
+        let c = self.c;
+        let (a0, a1, a2, a3) = (a.0[0], a.0[1], a.0[2], a.0[3]);
+        let m2 = |x0: u64, x1: u64, y0: u64, y1: u64| -> (u64, u64) {
+            (
+                am(mm(x0, y0, p), mm(c, mm(x1, y1, p), p), p),
+                am(mm(x0, y1, p), mm(x1, y0, p), p),
+            )
+        };
+        let (i0, i1) = (mm(norm.n0, dinv, p), (p - mm(norm.n1, dinv, p)) % p);
         let (x0, x2) = m2(a0, a2, i0, i1);
         let (y0, y2) = m2(a1, a3, i0, i1);
-        self.count(40);
+        self.count(12);
         E4([x0, (p - y0) % p, x2, (p - y2) % p])
     }
     pub fn pow(&self, a: &E4, mut e: u128) -> E4 {
@@ -215,7 +419,42 @@ impl Fp4 {
     }
 }
 
+/// The norm data of one inversion in flight ([`Fp4::inv_norm`]).
+#[derive(Clone, Copy, Debug)]
+pub struct InvNorm {
+    pub n0: u64,
+    pub n1: u64,
+    pub d: u64,
+}
+
 // ── The curve `y² = x³ + a x + b` over `F_{p⁴}` ─────────────────────────
+
+/// An affine addition split at its inversion, so that the inversions of
+/// many additions can be batched (E27, §9.25).  [`Curve4::add_begin`]
+/// performs everything before the inversion, [`Curve4::add_end`] the rest;
+/// together they perform and charge exactly what [`Curve4::add`] does,
+/// except the `F_p` inversion, which the batch charges.
+#[derive(Clone, Copy, Debug)]
+pub enum AddJob {
+    Done(Pt4),
+    Pending {
+        p1: Pt4,
+        p2: Pt4,
+        num: E4,
+        den: E4,
+        norm: InvNorm,
+    },
+}
+
+impl AddJob {
+    /// The `F_p` element whose inverse the batch must supply.
+    pub fn norm(&self) -> Option<u64> {
+        match self {
+            AddJob::Done(_) => None,
+            AddJob::Pending { norm, .. } => Some(norm.d),
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Pt4 {
@@ -319,6 +558,59 @@ impl Curve4 {
             inf: false,
         }
     }
+    /// [`Curve4::add`] up to its inversion (E27).
+    pub fn add_begin(&self, p1: &Pt4, p2: &Pt4) -> AddJob {
+        let f = &self.f;
+        self.ops.set(self.ops.get() + 1);
+        if p1.inf {
+            return AddJob::Done(*p2);
+        }
+        if p2.inf {
+            return AddJob::Done(*p1);
+        }
+        let (num, den) = if p1.x == p2.x {
+            if p1.y != p2.y || p1.y.is_zero() {
+                return AddJob::Done(Pt4::INF);
+            }
+            let x2 = f.sq(&p1.x);
+            let num = f.add(&f.add(&f.add(&x2, &x2), &x2), &self.a);
+            (num, f.add(&p1.y, &p1.y))
+        } else {
+            (f.sub(&p2.y, &p1.y), f.sub(&p2.x, &p1.x))
+        };
+        AddJob::Pending {
+            p1: *p1,
+            p2: *p2,
+            num,
+            den,
+            norm: f.inv_norm(&den),
+        }
+    }
+    /// [`Curve4::add`] after its inversion, given the inverse of the job's
+    /// norm (E27).
+    pub fn add_end(&self, job: &AddJob, dinv: Option<u64>) -> Pt4 {
+        let f = &self.f;
+        match job {
+            AddJob::Done(pt) => *pt,
+            AddJob::Pending {
+                p1,
+                p2,
+                num,
+                den,
+                norm,
+            } => {
+                let inv = f.inv_finish(den, norm, dinv.expect("a pending job's inverse"));
+                let lambda = f.mul(num, &inv);
+                let x3 = f.sub(&f.sub(&f.sq(&lambda), &p1.x), &p2.x);
+                let y3 = f.sub(&f.mul(&lambda, &f.sub(&p1.x, &x3)), &p1.y);
+                Pt4 {
+                    x: x3,
+                    y: y3,
+                    inf: false,
+                }
+            }
+        }
+    }
     pub fn sub(&self, p1: &Pt4, p2: &Pt4) -> Pt4 {
         self.add(p1, &self.neg(p2))
     }
@@ -327,8 +619,12 @@ impl Curve4 {
     }
     /// A fresh curve with its own counters, for a worker thread.
     pub fn with_params(p: u64, a: E4, b: E4) -> Curve4 {
+        Curve4::with_params_arith(p, a, b, karatsuba_default())
+    }
+    /// [`Curve4::with_params`] with the `F_{p⁴}` product chosen (E27).
+    pub fn with_params_arith(p: u64, a: E4, b: E4, karatsuba: bool) -> Curve4 {
         Curve4 {
-            f: Fp4::new(p),
+            f: Fp4::with_arith(p, karatsuba),
             a,
             b,
             ops: Cell::new(0),
@@ -662,12 +958,15 @@ impl SymmetrisedS5 {
 
 // ── Monomials in four variables ───────────────────────────────────────────
 
-fn deg4<const N: usize>(m: &[u8; N]) -> u16 {
-    m.iter().map(|&x| x as u16).sum()
+/// The degree of `m` when unknown `k` has weight `w[k]`: the total degree
+/// for weights all 1.
+fn wdeg<const N: usize>(m: &[u8; N], w: &[u8; N]) -> u16 {
+    m.iter().zip(w).map(|(&x, &k)| x as u16 * k as u16).sum()
 }
 
-fn grevlex_cmp4<const N: usize>(a: &[u8; N], b: &[u8; N]) -> std::cmp::Ordering {
-    let (da, db) = (deg4(a), deg4(b));
+/// Weighted degree, then reverse lexicographic: grevlex for weights all 1.
+fn wgrevlex_cmp<const N: usize>(a: &[u8; N], b: &[u8; N], w: &[u8; N]) -> std::cmp::Ordering {
+    let (da, db) = (wdeg(a, w), wdeg(b, w));
     if da != db {
         return da.cmp(&db);
     }
@@ -679,57 +978,68 @@ fn grevlex_cmp4<const N: usize>(a: &[u8; N], b: &[u8; N]) -> std::cmp::Ordering 
     std::cmp::Ordering::Equal
 }
 
-/// Monomials of total degree `≤ d` in `N` variables (any order).
-fn exponents_n<const N: usize>(d: u8) -> Vec<[u8; N]> {
+/// Monomials of weighted degree `≤ d` in `N` variables (any order).
+fn exponents_w<const N: usize>(d: u8, w: &[u8; N]) -> Vec<[u8; N]> {
     let mut out = Vec::new();
     let mut cur = [0u8; N];
-    fn rec<const N: usize>(i: usize, left: u8, cur: &mut [u8; N], out: &mut Vec<[u8; N]>) {
+    fn rec<const N: usize>(
+        i: usize,
+        left: u8,
+        w: &[u8; N],
+        cur: &mut [u8; N],
+        out: &mut Vec<[u8; N]>,
+    ) {
         if i == N {
             out.push(*cur);
             return;
         }
-        for k in 0..=left {
+        for k in 0..=left / w[i] {
             cur[i] = k;
-            rec(i + 1, left - k, cur, out);
+            rec(i + 1, left - k * w[i], w, cur, out);
         }
         cur[i] = 0;
     }
-    rec(0, d, &mut cur, &mut out);
+    rec(0, d, w, &mut cur, &mut out);
     out
 }
 
-/// Monomials of total degree `≤ d` in `N` variables, grevlex descending.
-fn monomials4_desc<const N: usize>(d: u8) -> Vec<[u8; N]> {
-    let mut v = exponents_n::<N>(d);
-    v.sort_by(|x, y| grevlex_cmp4(y, x));
+/// Monomials of weighted degree `≤ d`, weighted grevlex descending.
+fn monomials_w_desc<const N: usize>(d: u8, w: &[u8; N]) -> Vec<[u8; N]> {
+    let mut v = exponents_w::<N>(d, w);
+    v.sort_by(|x, y| wgrevlex_cmp(y, x, w));
     v
 }
 
-fn leading_monomial4<const N: usize>(f: &HashMap<[u8; N], u64>) -> Option<[u8; N]> {
+fn leading_monomial_w<const N: usize>(f: &HashMap<[u8; N], u64>, w: &[u8; N]) -> Option<[u8; N]> {
     f.iter()
         .filter(|(_, &c)| c != 0)
         .map(|(m, _)| *m)
-        .max_by(grevlex_cmp4)
+        .max_by(|a, b| wgrevlex_cmp(a, b, w))
 }
 
 /// As `gaudry_cubic`'s `triangularise_leads`, for four components.
 fn triangularise_leads4<const N: usize>(
     comps: &[HashMap<[u8; N], u64>],
+    w: &[u8; N],
     p: u64,
     muls: &mut u64,
 ) -> (Vec<HashMap<[u8; N], u64>>, Vec<Option<[u8; N]>>) {
     let mut fs: Vec<HashMap<[u8; N], u64>> = comps.to_vec();
     for _round in 0..16 {
-        fs.sort_by(|a, b| match (leading_monomial4(a), leading_monomial4(b)) {
-            (Some(x), Some(y)) => grevlex_cmp4(&y, &x),
-            (Some(_), None) => std::cmp::Ordering::Less,
-            (None, Some(_)) => std::cmp::Ordering::Greater,
-            (None, None) => std::cmp::Ordering::Equal,
-        });
+        fs.sort_by(
+            |a, b| match (leading_monomial_w(a, w), leading_monomial_w(b, w)) {
+                (Some(x), Some(y)) => wgrevlex_cmp(&y, &x, w),
+                (Some(_), None) => std::cmp::Ordering::Less,
+                (None, Some(_)) => std::cmp::Ordering::Greater,
+                (None, None) => std::cmp::Ordering::Equal,
+            },
+        );
         let mut changed = false;
         for i in 1..fs.len() {
-            let (Some(li), Some(lj)) = (leading_monomial4(&fs[i]), leading_monomial4(&fs[i - 1]))
-            else {
+            let (Some(li), Some(lj)) = (
+                leading_monomial_w(&fs[i], w),
+                leading_monomial_w(&fs[i - 1], w),
+            ) else {
                 continue;
             };
             if li == lj {
@@ -748,7 +1058,7 @@ fn triangularise_leads4<const N: usize>(
             break;
         }
     }
-    let leads = fs.iter().map(leading_monomial4).collect();
+    let leads = fs.iter().map(|f| leading_monomial_w(f, w)).collect();
     (fs, leads)
 }
 
@@ -773,10 +1083,39 @@ fn axpy_dyn(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
 }
 
 #[inline(always)]
+/// Every prime `p ≡ 1 (mod 4)` below 300 gets the constant-modulus loop
+/// (the `k = 4` solves run there); others take the run-time remainder.
 fn axpy_portable(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
     match p {
-        269 => axpy_const::<269>(row, piv, f),
+        5 => axpy_const::<5>(row, piv, f),
+        13 => axpy_const::<13>(row, piv, f),
+        17 => axpy_const::<17>(row, piv, f),
+        29 => axpy_const::<29>(row, piv, f),
+        37 => axpy_const::<37>(row, piv, f),
+        41 => axpy_const::<41>(row, piv, f),
+        53 => axpy_const::<53>(row, piv, f),
+        61 => axpy_const::<61>(row, piv, f),
+        73 => axpy_const::<73>(row, piv, f),
+        89 => axpy_const::<89>(row, piv, f),
+        97 => axpy_const::<97>(row, piv, f),
+        101 => axpy_const::<101>(row, piv, f),
+        109 => axpy_const::<109>(row, piv, f),
+        113 => axpy_const::<113>(row, piv, f),
+        137 => axpy_const::<137>(row, piv, f),
+        149 => axpy_const::<149>(row, piv, f),
+        157 => axpy_const::<157>(row, piv, f),
+        173 => axpy_const::<173>(row, piv, f),
+        181 => axpy_const::<181>(row, piv, f),
+        193 => axpy_const::<193>(row, piv, f),
+        197 => axpy_const::<197>(row, piv, f),
+        229 => axpy_const::<229>(row, piv, f),
+        233 => axpy_const::<233>(row, piv, f),
+        241 => axpy_const::<241>(row, piv, f),
         257 => axpy_const::<257>(row, piv, f),
+        269 => axpy_const::<269>(row, piv, f),
+        277 => axpy_const::<277>(row, piv, f),
+        281 => axpy_const::<281>(row, piv, f),
+        293 => axpy_const::<293>(row, piv, f),
         _ => axpy_dyn(row, piv, f, p),
     }
 }
@@ -798,7 +1137,7 @@ unsafe fn axpy_avx2(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
 }
 
 #[inline]
-fn axpy(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
+pub(crate) fn axpy(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
     #[cfg(target_arch = "x86_64")]
     {
         if is_x86_feature_detected!("avx512bw") && is_x86_feature_detected!("avx512vl") {
@@ -861,7 +1200,7 @@ fn rref_u16(m: &mut [Vec<u16>], p: u32, muls: &mut u64) -> Vec<usize> {
 /// is a similarity by `I + Σ fᵢ E_{i,j+1}`, whose elementary factors
 /// commute (their products vanish), so its row operations can all run
 /// before its column operations: the same matrix as the interleaved order.
-fn charpoly_u16(a: &[Vec<u64>], p: u32, muls: &mut u64) -> UPoly {
+pub(crate) fn charpoly_u16(a: &[Vec<u64>], p: u32, muls: &mut u64) -> UPoly {
     let n = a.len();
     let mut h: Vec<Vec<u16>> = a
         .iter()
@@ -941,7 +1280,12 @@ fn charpoly_u16(a: &[Vec<u64>], p: u32, muls: &mut u64) -> UPoly {
 }
 
 /// As `gaudry_cubic::eigenvectors_mod_p`: a kernel basis of `m − λI`.
-fn eigenvectors_u16(m: &[Vec<u16>], lambda: u64, p: u32, muls: &mut u64) -> Vec<Vec<u64>> {
+pub(crate) fn eigenvectors_u16(
+    m: &[Vec<u16>],
+    lambda: u64,
+    p: u32,
+    muls: &mut u64,
+) -> Vec<Vec<u64>> {
     let n = m.len();
     let mut a: Vec<Vec<u16>> = m.to_vec();
     for (i, row) in a.iter_mut().enumerate() {
@@ -1001,6 +1345,46 @@ pub struct QuarticSolve {
     pub total_ms: f64,
     pub outcome: String,
     pub replay: ReplayOutcome,
+    /// Held rows a replay reduced into its echelon to reach the recorded
+    /// rank (`top_up`): 0 when the replayed rows had it.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub topped_up: u64,
+    /// E33 (§9.35): pivot-selection native operations of a counted solver
+    /// (zero, and absent from the JSON, for every other solver): initial
+    /// counts, key comparisons and count maintenance after row updates.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub pivot_init_ops: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub pivot_compare_ops: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub pivot_update_ops: u64,
+    /// E33: entries read by the echelon's lead scans (every rule; not
+    /// selection work).
+    #[serde(skip_serializing_if = "is_zero")]
+    pub lead_scan_reads: u64,
+    /// E33 diagnostics: maintained counts that differed from a recount, and
+    /// a digest of the pivot chosen in every column.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub pivot_count_mismatches: u64,
+    #[serde(skip)]
+    pub pivot_digest: u64,
+    /// E40 (§9.50): Macaulay cells the profile build stores (rows kept from
+    /// their lead on); zero, and absent from the JSON, for every other solver.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub macaulay_stored_entries: u64,
+    /// E40: native operations the profile storage adds (each use of a row's
+    /// offset); zero and absent for every other solver.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub profile_offset_ops: u64,
+    /// E42 (§9.54): native operations W's reserved tails add (support
+    /// scans, reserve lookups, pivot ends, fill checks, re-allocations);
+    /// zero and absent for every other solver.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub tail_extent_ops: u64,
+}
+
+fn is_zero(v: &u64) -> bool {
+    *v == 0
 }
 
 impl QuarticSolve {
@@ -1022,12 +1406,12 @@ impl QuarticSolve {
     }
 }
 
-struct Echelon {
-    rows: Vec<Vec<u16>>,
-    pivot_row: Vec<u32>,
-    zero_rows: usize,
+pub(crate) struct Echelon {
+    pub(crate) rows: Vec<Vec<u16>>,
+    pub(crate) pivot_row: Vec<u32>,
+    pub(crate) zero_rows: usize,
     /// Input rows that reduced to zero (or were zero), by index.
-    zero_ids: Vec<u32>,
+    pub(crate) zero_ids: Vec<u32>,
 }
 
 /// Forward elimination by leading column.  Every unused row has zeros
@@ -1038,7 +1422,23 @@ struct Echelon {
 /// elimination, without scanning rows that are already zero there;
 /// `muls` counts the nonzero entries of each pivot row once per row it is
 /// subtracted from, and once for its normalisation.
-fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool) -> Echelon {
+pub(crate) fn echelon_by_lead(rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool) -> Echelon {
+    echelon_by_lead_with(rows, p, muls, debug, false)
+}
+
+/// [`echelon_by_lead`], optionally with sparsest pivots.
+///
+/// With `sparsest`, each column's pivot is instead the row of its bucket
+/// with the fewest nonzero entries (lowest index on a tie), which cuts the
+/// work and the fill; the row space and the pivot columns are the same
+/// either way.
+pub(crate) fn echelon_by_lead_with(
+    mut rows: Vec<Vec<u16>>,
+    p: u32,
+    muls: &mut u64,
+    debug: bool,
+    sparsest: bool,
+) -> Echelon {
     let ncols = rows.first().map_or(0, |r| r.len());
     let mut buckets: Vec<Vec<u32>> = vec![Vec::new(); ncols];
     let mut zero_rows = 0usize;
@@ -1052,6 +1452,14 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
             }
         }
     }
+    // Nonzero entries of each row (kept only for `sparsest`).
+    let mut row_nnz: Vec<u32> = if sparsest {
+        rows.par_iter()
+            .map(|r| r.iter().filter(|&&x| x != 0).count() as u32)
+            .collect()
+    } else {
+        Vec::new()
+    };
     let mut pivot_row = vec![u32::MAX; ncols];
     let start = Instant::now();
     let mut npiv = 0usize;
@@ -1061,6 +1469,12 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
             continue;
         }
         b.sort_unstable();
+        if sparsest && b.len() > 1 {
+            let best = (0..b.len())
+                .min_by_key(|&i| (row_nnz[b[i] as usize], i))
+                .unwrap_or(0);
+            b.swap(0, best);
+        }
         let pr = b[0] as usize;
         let mut piv = std::mem::take(&mut rows[pr]);
         let inv = inv_mod(piv[c] as u64, p as u64) as u32;
@@ -1073,12 +1487,12 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
         }
         *muls += nz.len() as u64;
         let dense = nz.len() * 8 > ncols - c;
-        let mut others: Vec<(u32, Vec<u16>, Option<usize>)> = b[1..]
+        let mut others: Vec<(u32, Vec<u16>, Option<usize>, u32)> = b[1..]
             .iter()
-            .map(|&r| (r, std::mem::take(&mut rows[r as usize]), None))
+            .map(|&r| (r, std::mem::take(&mut rows[r as usize]), None, 0))
             .collect();
         *muls += (others.len() * nz.len()) as u64;
-        others.par_iter_mut().for_each(|(_, row, lead)| {
+        others.par_iter_mut().for_each(|(_, row, lead, nnz)| {
             let f = row[c] as u32;
             if dense {
                 axpy(&mut row[c..], &piv[c..], f, p);
@@ -1090,8 +1504,16 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
                 }
             }
             *lead = row[c + 1..].iter().position(|&x| x != 0).map(|k| k + c + 1);
+            if sparsest {
+                if let Some(l) = *lead {
+                    *nnz = row[l..].iter().filter(|&&x| x != 0).count() as u32;
+                }
+            }
         });
-        for (r, row, lead) in others {
+        for (r, row, lead, nnz) in others {
+            if sparsest {
+                row_nnz[r as usize] = nnz;
+            }
             rows[r as usize] = row;
             match lead {
                 Some(l) => buckets[l].push(r),
@@ -1121,24 +1543,355 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
     }
 }
 
+// ── E33: pivot selection, counted (RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.35) ──
+//
+// Additive.  `echelon_by_lead_with` above is unchanged; the counted
+// echelon below performs the same elimination and emits the native work of
+// its pivot selection (one operation per entry examined for its zero
+// status, one per comparison of two candidates' keys).
+
+/// How [`echelon_by_lead_counted`] picks each column's pivot.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum PivotRule {
+    /// The lowest-indexed row of the bucket (E31 A, E25): no selection work.
+    Lowest,
+    /// E31 B as built: a nonzero count of every row before eliminating and
+    /// a recount of each updated row's tail.
+    SparsestRecount,
+    /// B′: the same choices as B; counts inherited by the caller
+    /// (`init_nnz`) and updated by the zero status of each entry the pivot
+    /// row touches.
+    SparsestIncremental,
+    /// B″: counts inherited as in B′, then the Markowitz fill bound
+    /// `min(nnz − 1 + |pivot| − 1, cols − lead)` per updated row.
+    SparsestEstimate,
+}
+
+/// Diagnostics and negative controls for [`echelon_by_lead_counted`]
+/// (all off by default; nothing here is charged).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PivotCheck {
+    /// Compare every maintained count (initial and after each update)
+    /// with a recount; mismatches go to `PivotWork::count_mismatches`.
+    pub verify: bool,
+    /// Negative control: in the `k`-th column with more than one candidate,
+    /// take the second-best candidate instead.
+    pub second_best_at: Option<usize>,
+    /// Negative control: add one to the first maintained update.
+    pub perturb_count: bool,
+}
+
+/// The native work of one counted echelon.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct PivotWork {
+    /// Entries examined for the initial counts (B: `rows · cols`; B′, B″:
+    /// charged by the caller that inherits them).
+    pub init: u64,
+    /// Comparisons of candidates' keys (`|bucket| − 1` per column).
+    pub compare: u64,
+    /// Count maintenance after row updates (B: the recount reads; B′: two
+    /// per entry the pivot row touches plus one per row; B″: two per row).
+    pub update: u64,
+    /// Entries read by the lead scans every rule performs (not selection).
+    pub lead_scan: u64,
+    /// FNV-1a digest of `(column, pivot row)` over the elimination.
+    pub digest: u64,
+    /// Updated rows whose maintained count differed from a recount
+    /// (`PivotCheck::verify`; for B″ an estimate is expected to differ).
+    pub count_mismatches: u64,
+    /// Columns that had more than one candidate.
+    pub contested: u64,
+}
+
+impl PivotWork {
+    /// The selection work charged as native operations.
+    pub fn selection(&self) -> u64 {
+        self.init + self.compare + self.update
+    }
+}
+
+fn fnv(h: u64, x: u64) -> u64 {
+    let mut h = h;
+    for b in x.to_le_bytes() {
+        h ^= u64::from(b);
+        h = h.wrapping_mul(0x0000_0100_0000_01B3);
+    }
+    h
+}
+
+/// [`echelon_by_lead_with`] with its pivot selection counted (E33).
+///
+/// The elimination, the multiplications charged to `muls` and, for
+/// `Lowest` and the two exact sparsest rules, the pivot choices are those
+/// of `echelon_by_lead_with(…, sparsest = rule != Lowest)`.  `init_nnz`
+/// supplies the initial counts for `SparsestIncremental` and
+/// `SparsestEstimate` (required there, ignored otherwise).
+pub(crate) fn echelon_by_lead_counted(
+    mut rows: Vec<Vec<u16>>,
+    p: u32,
+    muls: &mut u64,
+    rule: PivotRule,
+    init_nnz: Option<Vec<u32>>,
+    check: PivotCheck,
+    work: &mut PivotWork,
+) -> Echelon {
+    let sparsest = rule != PivotRule::Lowest;
+    let ncols = rows.first().map_or(0, |r| r.len());
+    let mut buckets: Vec<Vec<u32>> = vec![Vec::new(); ncols];
+    let mut zero_rows = 0usize;
+    let mut zero_ids: Vec<u32> = Vec::new();
+    for (r, row) in rows.iter().enumerate() {
+        match row.iter().position(|&x| x != 0) {
+            Some(c) => {
+                work.lead_scan += c as u64 + 1;
+                buckets[c].push(r as u32);
+            }
+            None => {
+                work.lead_scan += ncols as u64;
+                zero_rows += 1;
+                zero_ids.push(r as u32);
+            }
+        }
+    }
+    let recount = |r: &[u16]| r.iter().filter(|&&x| x != 0).count() as u32;
+    let mut row_nnz: Vec<u32> = match rule {
+        PivotRule::Lowest => Vec::new(),
+        PivotRule::SparsestRecount => {
+            work.init += (rows.len() * ncols) as u64;
+            rows.iter().map(|r| recount(r)).collect()
+        }
+        PivotRule::SparsestIncremental | PivotRule::SparsestEstimate => {
+            let v = init_nnz.expect("inherited counts");
+            assert_eq!(v.len(), rows.len());
+            if check.verify {
+                for (r, row) in rows.iter().enumerate() {
+                    if recount(row) != v[r] {
+                        work.count_mismatches += 1;
+                    }
+                }
+            }
+            v
+        }
+    };
+    let mut perturbed = !check.perturb_count;
+    let mut digest = 0xCBF2_9CE4_8422_2325u64;
+    let mut pivot_row = vec![u32::MAX; ncols];
+    for c in 0..ncols {
+        let mut b = std::mem::take(&mut buckets[c]);
+        if b.is_empty() {
+            continue;
+        }
+        b.sort_unstable();
+        if b.len() > 1 {
+            work.contested += 1;
+        }
+        if sparsest && b.len() > 1 {
+            work.compare += b.len() as u64 - 1;
+            let mut best = (0..b.len())
+                .min_by_key(|&i| (row_nnz[b[i] as usize], i))
+                .unwrap_or(0);
+            if check.second_best_at == Some(work.contested as usize - 1) {
+                best = (0..b.len())
+                    .filter(|&i| i != best)
+                    .min_by_key(|&i| (row_nnz[b[i] as usize], i))
+                    .unwrap_or(best);
+            }
+            b.swap(0, best);
+        }
+        let pr = b[0] as usize;
+        digest = fnv(fnv(digest, c as u64), pr as u64);
+        let mut piv = std::mem::take(&mut rows[pr]);
+        let inv = inv_mod(piv[c] as u64, p as u64) as u32;
+        let mut nz: Vec<u32> = Vec::new();
+        for j in c..ncols {
+            if piv[j] != 0 {
+                piv[j] = ((piv[j] as u32 * inv) % p) as u16;
+                nz.push(j as u32);
+            }
+        }
+        *muls += nz.len() as u64;
+        let dense = nz.len() * 8 > ncols - c;
+        // (row, data, new lead, new count, lead-scan reads, update work, mismatch)
+        type Upd = (u32, Vec<u16>, Option<usize>, u32, u64, u64, bool);
+        let mut others: Vec<Upd> = b[1..]
+            .iter()
+            .map(|&r| {
+                (
+                    r,
+                    std::mem::take(&mut rows[r as usize]),
+                    None,
+                    0,
+                    0,
+                    0,
+                    false,
+                )
+            })
+            .collect();
+        *muls += (others.len() * nz.len()) as u64;
+        let nnz_ref = &row_nnz;
+        let nzr = &nz;
+        others
+            .par_iter_mut()
+            .for_each(|(r, row, lead, nnz, scan, upd, bad)| {
+                let old_nz = if rule == PivotRule::SparsestIncremental {
+                    nzr.iter().filter(|&&j| row[j as usize] != 0).count() as u32
+                } else {
+                    0
+                };
+                let f = row[c] as u32;
+                if dense {
+                    axpy(&mut row[c..], &piv[c..], f, p);
+                } else {
+                    let nf = p - f;
+                    for &j in nzr {
+                        let j = j as usize;
+                        row[j] = ((row[j] as u32 + nf * piv[j] as u32) % p) as u16;
+                    }
+                }
+                *lead = row[c + 1..].iter().position(|&x| x != 0).map(|k| k + c + 1);
+                *scan = match *lead {
+                    Some(l) => (l - c) as u64,
+                    None => (ncols - c - 1) as u64,
+                };
+                let Some(l) = *lead else {
+                    return;
+                };
+                match rule {
+                    PivotRule::Lowest => {}
+                    PivotRule::SparsestRecount => {
+                        *nnz = row[l..].iter().filter(|&&x| x != 0).count() as u32;
+                        *upd = (ncols - l) as u64;
+                    }
+                    PivotRule::SparsestIncremental => {
+                        let new_nz = nzr.iter().filter(|&&j| row[j as usize] != 0).count() as u32;
+                        *nnz = nnz_ref[*r as usize] - old_nz + new_nz;
+                        *upd = 2 * nzr.len() as u64 + 1;
+                        if check.verify {
+                            *bad = recount(&row[l..]) != *nnz;
+                        }
+                    }
+                    PivotRule::SparsestEstimate => {
+                        let est = (nnz_ref[*r as usize] + nzr.len() as u32).saturating_sub(2);
+                        *nnz = est.min((ncols - l) as u32);
+                        *upd = 2;
+                        if check.verify {
+                            *bad = recount(&row[l..]) != *nnz;
+                        }
+                    }
+                }
+            });
+        for (r, row, lead, mut nnz, scan, upd, bad) in others {
+            work.lead_scan += scan;
+            work.update += upd;
+            if sparsest && lead.is_some() {
+                if !perturbed {
+                    nnz += 1;
+                    perturbed = true;
+                    if check.verify {
+                        // The recount check sees the perturbed count.
+                        let l = lead.unwrap_or(0);
+                        if recount(&row[l..]) != nnz {
+                            work.count_mismatches += 1;
+                        }
+                    }
+                } else if bad {
+                    work.count_mismatches += 1;
+                }
+                row_nnz[r as usize] = nnz;
+            }
+            rows[r as usize] = row;
+            match lead {
+                Some(l) => buckets[l].push(r),
+                None => {
+                    zero_rows += 1;
+                    zero_ids.push(r);
+                }
+            }
+        }
+        rows[pr] = piv;
+        pivot_row[c] = pr as u32;
+    }
+    work.digest = digest;
+    zero_ids.sort_unstable();
+    Echelon {
+        rows,
+        pivot_row,
+        zero_rows,
+        zero_ids,
+    }
+}
+
+/// Reduce `held` rows, in order, into a forward echelon until `need` new
+/// pivots are found (or the rows run out): each is reduced left to right
+/// by the pivot rows (one multiplication per nonzero entry of a pivot row
+/// used) and, if it survives, normalised (one per nonzero) as the pivot of
+/// its lead.  The echelon then spans what the full row set spans up to the
+/// rows not reached.  Returns the number of held rows reduced.
+fn top_up_echelon(
+    ech: &mut Echelon,
+    held: Vec<Vec<u16>>,
+    mut need: usize,
+    p: u32,
+    muls: &mut u64,
+) -> u64 {
+    let ncols = ech.pivot_row.len();
+    let mut used = 0u64;
+    for mut v in held {
+        if need == 0 {
+            break;
+        }
+        used += 1;
+        let mut lead = None;
+        for c in 0..ncols {
+            if v[c] == 0 {
+                continue;
+            }
+            let pr = ech.pivot_row[c];
+            if pr == u32::MAX {
+                lead = Some(c);
+                break;
+            }
+            let f = v[c] as u32;
+            let piv = &ech.rows[pr as usize];
+            *muls += piv[c..].iter().filter(|&&x| x != 0).count() as u64;
+            axpy(&mut v[c..], &piv[c..], f, p);
+        }
+        let Some(c) = lead else {
+            ech.zero_rows += 1;
+            continue;
+        };
+        let inv = inv_mod(v[c] as u64, p as u64) as u32;
+        for x in &mut v[c..] {
+            if *x != 0 {
+                *x = ((*x as u32 * inv) % p) as u16;
+                *muls += 1;
+            }
+        }
+        ech.pivot_row[c] = ech.rows.len() as u32;
+        ech.rows.push(v);
+        need -= 1;
+    }
+    used
+}
+
 /// Memoised normal forms over the standard monomials, computed for a set
 /// of target columns by one sweep from the right over the pivots they
 /// reach — iteratively, since a chain of pivots can be tens of thousands
 /// deep.
-struct NormalForms4<'a> {
-    ech: &'a Echelon,
-    is_std: Vec<bool>,
-    std_index: Vec<u32>,
-    dim: usize,
-    p: u32,
-    memo: Vec<Option<(Vec<u16>, u64)>>,
-    reached: usize,
+pub(crate) struct NormalForms4<'a> {
+    pub(crate) ech: &'a Echelon,
+    pub(crate) is_std: Vec<bool>,
+    pub(crate) std_index: Vec<u32>,
+    pub(crate) dim: usize,
+    pub(crate) p: u32,
+    pub(crate) memo: Vec<Option<(Vec<u16>, u64)>>,
+    pub(crate) reached: usize,
 }
 
 impl<'a> NormalForms4<'a> {
     /// Make every column in `targets` resolvable.  `Err(c)` names a column
     /// reached that is neither standard nor a pivot.
-    fn ensure(&mut self, targets: &[usize], muls: &mut u64) -> Result<(), usize> {
+    pub(crate) fn ensure(&mut self, targets: &[usize], muls: &mut u64) -> Result<(), usize> {
         let ncols = self.is_std.len();
         let mut need: Vec<usize> = Vec::new();
         let mut seen = vec![false; ncols];
@@ -1221,7 +1974,7 @@ impl<'a> NormalForms4<'a> {
         Ok(())
     }
 
-    fn vector(&self, c: usize) -> Vec<u64> {
+    pub(crate) fn vector(&self, c: usize) -> Vec<u64> {
         if self.is_std[c] {
             let mut v = vec![0u64; self.dim];
             v[self.std_index[c] as usize] = 1;
@@ -1279,6 +2032,31 @@ pub fn solve_system4(
         None,
         None,
     )
+}
+
+/// [`solve_system4`] in `N` unknowns, each equation shifted by its own
+/// degree: the `D₄` system's solve, for callers outside the crate.
+pub fn solve_system_n<const N: usize>(
+    comps: &[HashMap<[u8; N], u64>],
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+) -> Option<Vec<[u64; N]>> {
+    solve_system_n_inner::<N>(
+        comps,
+        equation_degree,
+        macaulay_degree,
+        p,
+        rng,
+        st,
+        false,
+        None,
+        None,
+    )
+    .ok()
+    .flatten()
 }
 
 /// The shape of one Macaulay solve, recorded on a first system and replayed
@@ -1404,19 +2182,73 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
     replay: Option<&ShapeTrace>,
     record: Option<&mut ShapeTrace>,
 ) -> Result<Option<Vec<[u64; N]>>, ()> {
+    solve_system_w_inner::<N>(
+        comps,
+        &[1; N],
+        false,
+        false,
+        false,
+        equation_degree,
+        macaulay_degree,
+        p,
+        rng,
+        st,
+        debug,
+        replay,
+        record,
+    )
+}
+
+/// [`solve_system_n_inner`] in a weighted grading: unknown `k` has weight
+/// `w[k]`, the Macaulay matrix holds the monomials of weighted degree
+/// `≤ macaulay_degree`, each equation is shifted by the monomials of
+/// weighted degree `≤ macaulay_degree − (its weighted degree)`, and the
+/// multiplication matrix is that of the first unknown of weight 1 (so its
+/// border stays inside the matrix).  Weights all 1 are the unweighted solve,
+/// operation for operation.  A rational eigenvalue whose eigenspace holds
+/// more than one solution is split by the multiplication matrices of the
+/// other unknowns when their border is inside the matrix; otherwise its
+/// solutions are lost, which the caller's exact check sees (they are never
+/// returned wrong: every returned solution satisfies all equations).
+/// `chains`: the eigen step along the chains of the multiplication
+/// unknown ([`solve_along_chains`]) instead of the dense
+/// multiplication matrix; `sparsest`: the elimination's pivot in each
+/// column is the sparsest candidate row ([`echelon_by_lead_with`]).
+/// Both off is the unweighted solve's arithmetic.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn solve_system_w_inner<const N: usize>(
+    comps: &[HashMap<[u8; N], u64>],
+    w: &[u8; N],
+    chains: bool,
+    sparsest: bool,
+    top_up: bool,
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+) -> Result<Option<Vec<[u64; N]>>, ()> {
     assert!(p < 1 << 15, "rows are u16 and products must fit u32");
+    let Some(mvar) = w.iter().position(|&k| k == 1) else {
+        st.outcome = "no unknown of weight 1".into();
+        return Ok(None);
+    };
     let t0 = Instant::now();
     st.equation_degree = equation_degree;
     st.macaulay_degree = macaulay_degree;
-    let cols = monomials4_desc(macaulay_degree);
+    let cols = monomials_w_desc(macaulay_degree, w);
     let col_index: HashMap<[u8; N], usize> =
         cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
     let mut tri = 0u64;
-    let (comps, leads) = triangularise_leads4(comps, p, &mut tri);
+    let (comps, leads) = triangularise_leads4(comps, w, p, &mut tri);
     st.triangularise_muls += tri;
     let leads_v: Vec<Option<Vec<u8>>> = leads.iter().map(|l| l.map(|m| m.to_vec())).collect();
     if let Some(t) = replay {
         if t.leads != leads_v {
+            st.outcome = "replay: leads differ".into();
             return Err(());
         }
     }
@@ -1427,13 +2259,15 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
         } else {
             c.iter()
                 .filter(|(_, &v)| v != 0)
-                .map(|(m, _)| deg4(m) as u8)
+                .map(|(m, _)| wdeg(m, w) as u8)
                 .max()
                 .unwrap_or(0)
         }
     };
     let divides = |lm: &[u8; N], m: &[u8; N]| (0..N).all(|k| lm[k] <= m[k]);
     let mut rows: Vec<Vec<u16>> = Vec::new();
+    // With `top_up`, the rows a replay skips, kept for a rank shortfall.
+    let mut held: Vec<Vec<u16>> = Vec::new();
     let mut built = 0usize;
     let mut skip_at = 0usize;
     for (i, comp) in comps.iter().enumerate() {
@@ -1444,7 +2278,7 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
         }
         let shifts = shifts_by
             .entry(dg)
-            .or_insert_with(|| monomials4_desc::<N>(macaulay_degree - dg));
+            .or_insert_with(|| monomials_w_desc::<N>(macaulay_degree - dg, w));
         for sh in shifts.iter() {
             if leads
                 .iter()
@@ -1455,10 +2289,14 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
             }
             let index = built;
             built += 1;
+            let mut skip = false;
             if let Some(t) = replay {
                 if skip_at < t.zero_ids.len() && t.zero_ids[skip_at] as usize == index {
                     skip_at += 1;
-                    continue;
+                    if !top_up {
+                        continue;
+                    }
+                    skip = true;
                 }
             }
             let mut row = vec![0u16; cols.len()];
@@ -1467,11 +2305,16 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
                 let ci = col_index[&m];
                 row[ci] = am(row[ci] as u64, c, p) as u16;
             }
-            rows.push(row);
+            if skip {
+                held.push(row);
+            } else {
+                rows.push(row);
+            }
         }
     }
     if let Some(t) = replay {
         if t.rows_built != built {
+            st.outcome = "replay: row count differs".into();
             return Err(());
         }
     }
@@ -1488,19 +2331,33 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
     }
     let t1 = Instant::now();
     let mut ech_muls = 0u64;
-    let ech = echelon_by_lead(rows, p as u32, &mut ech_muls, debug);
+    let mut ech = echelon_by_lead_with(rows, p as u32, &mut ech_muls, debug, sparsest);
+    if let Some(t) = replay {
+        if top_up {
+            let have = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
+            if have < t.pivots {
+                st.topped_up +=
+                    top_up_echelon(&mut ech, held, t.pivots - have, p as u32, &mut ech_muls);
+            }
+        }
+    }
     st.echelon_muls += ech_muls;
     st.echelon_ms = t1.elapsed().as_secs_f64() * 1e3;
     st.zero_rows = ech.zero_rows;
     st.pivots = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
     let is_std: Vec<bool> = (0..cols.len())
-        .map(|c| ech.pivot_row[c] == u32::MAX && deg4(&cols[c]) < macaulay_degree as u16)
+        .map(|c| ech.pivot_row[c] == u32::MAX && wdeg(&cols[c], w) < macaulay_degree as u16)
         .collect();
     let standard: Vec<usize> = (0..cols.len()).filter(|&c| is_std[c]).collect();
     let dim = standard.len();
     st.dim = dim;
-    if let Some(t) = replay {
+    // With `top_up` a replay needs no rank check: it stops at the recorded
+    // rank, which a specialised system cannot exceed when the recorded one
+    // had the generic rank (Macaulay rank is lower semicontinuous), or it
+    // has used every row.  Either way it spans what the full matrix spans.
+    if let (Some(t), false) = (replay, top_up) {
         if t.pivots != st.pivots || t.dim != dim {
+            st.outcome = "replay: pivots or dimension differ".into();
             return Err(());
         }
     }
@@ -1539,11 +2396,22 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
         }
     }
     if low.iter().any(|&c| !is_std[c]) {
-        st.outcome = "1 or a variable is not standard".into();
+        st.outcome = if is_std[low[0]] {
+            "a variable is not standard"
+        } else {
+            "1 is not standard: inconsistent"
+        }
+        .into();
         return Ok(None);
     }
     let idx: Vec<usize> = low.iter().map(|&c| std_index[c] as usize).collect();
     let t2 = Instant::now();
+    if chains {
+        return Ok(solve_along_chains::<N>(
+            &ech, &cols, &col_index, &is_std, &standard, &std_index, &idx, mvar, &comps, p, rng,
+            st, t0, t2,
+        ));
+    }
     let mut nfs = NormalForms4 {
         ech: &ech,
         is_std,
@@ -1554,25 +2422,31 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
         reached: 0,
     };
     // Multiplication matrix of a variable: column b ↦ NF(var · b).
-    let mult_matrix =
-        |nfs: &mut NormalForms4, var: usize, muls: &mut u64| -> Option<Vec<Vec<u64>>> {
-            let mut targets = Vec::with_capacity(dim);
-            for &bc in &standard {
-                let mut m = cols[bc];
-                m[var] += 1;
-                targets.push(*col_index.get(&m)?);
+    let mult_matrix = |nfs: &mut NormalForms4,
+                       var: usize,
+                       muls: &mut u64|
+     -> Option<Vec<Vec<u64>>> {
+        let mut targets = Vec::with_capacity(dim);
+        for &bc in &standard {
+            let mut m = cols[bc];
+            m[var] += 1;
+            targets.push(*col_index.get(&m)?);
+        }
+        if debug {
+            let border = targets.iter().filter(|&&t| !nfs.is_std[t]).count();
+            eprintln!("  multiplication by unknown {var}: {border} of {dim} products outside the standard monomials");
+        }
+        nfs.ensure(&targets, muls).ok()?;
+        let mut out = vec![vec![0u64; dim]; dim];
+        for (bi, &tc) in targets.iter().enumerate() {
+            for (ri, v) in nfs.vector(tc).into_iter().enumerate() {
+                out[ri][bi] = v;
             }
-            nfs.ensure(&targets, muls).ok()?;
-            let mut out = vec![vec![0u64; dim]; dim];
-            for (bi, &tc) in targets.iter().enumerate() {
-                for (ri, v) in nfs.vector(tc).into_iter().enumerate() {
-                    out[ri][bi] = v;
-                }
-            }
-            Some(out)
-        };
+        }
+        Some(out)
+    };
     let mut nf_muls = 0u64;
-    let m_e1 = mult_matrix(&mut nfs, 0, &mut nf_muls);
+    let m_e1 = mult_matrix(&mut nfs, mvar, &mut nf_muls);
     st.nf_muls += nf_muls;
     st.nf_ms = t2.elapsed().as_secs_f64() * 1e3;
     st.reached_pivots = nfs.reached;
@@ -1605,6 +2479,8 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
         }
     }
     drop(m_e1);
+    // The other unknowns, in order, for splitting a degenerate eigenspace.
+    let other_vars: Vec<usize> = (0..N).filter(|&v| v != mvar).collect();
     let mut others: Vec<Option<Vec<Vec<u64>>>> = vec![None; N - 1];
     let mut out = Vec::new();
     for lam in lambdas {
@@ -1612,29 +2488,31 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
         let mut ker = eigenvectors_u16(&mt, lam, p as u32, &mut ev);
         if ker.len() > 1 {
             st.degenerate_eigenspaces += 1;
-            for k in 0..N - 1 {
+            for (k, &var) in other_vars.iter().enumerate() {
                 if ker.len() <= 1 {
                     break;
                 }
                 if others[k].is_none() {
                     let mut nm = 0u64;
-                    others[k] = mult_matrix(&mut nfs, k + 1, &mut nm);
+                    others[k] = mult_matrix(&mut nfs, var, &mut nm);
                     st.nf_muls += nm;
                 }
+                // An unknown whose border leaves the matrix (weight above
+                // 1) cannot split it; with weights all 1 none does.
                 let Some(mv) = &others[k] else {
-                    break;
+                    continue;
                 };
                 ker = split_eigenspace(&ker, mv, p, rng, &mut ev);
             }
         }
         st.eigenvector_muls += ev;
-        for w in &ker {
-            if w[idx[0]] == 0 {
+        for v in &ker {
+            if v[idx[0]] == 0 {
                 continue;
             }
-            let inv = inv_mod(w[idx[0]], p);
-            let e: [u64; N] = core::array::from_fn(|k| mm(w[idx[k + 1]], inv, p));
-            if e[0] != lam {
+            let inv = inv_mod(v[idx[0]], p);
+            let e: [u64; N] = core::array::from_fn(|k| mm(v[idx[k + 1]], inv, p));
+            if e[mvar] != lam {
                 continue;
             }
             let mut vm = 0u64;
@@ -1653,6 +2531,467 @@ pub(crate) fn solve_system_n_inner<const N: usize>(
     st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
     st.close();
     Ok(Some(out))
+}
+
+// ── The quotient along the chains of the multiplication unknown ───────────
+//
+// With `x` the multiplication unknown (weight 1) and `B` the standard
+// monomials, an order ideal, `B` splits into chains `h, hx, …, hx^{ℓ−1}`
+// from the heads `h ∈ B` not divisible by `x`; `M_x` maps each chain
+// element to the next, and only a chain's last element leaves `B`, to the
+// border monomial `hx^ℓ`.  A left eigenvector `w` of `M_x` for `λ` (the
+// evaluation at a solution, up to scale) is then fixed by its values `u`
+// on the heads, `w(hx^t) = λ^t u_h`, and the border relations
+// `w · NF(h_j x^{ℓ_j}) = λ^{ℓ_j} u_j` are `A(λ) u = 0` for the `k × k`
+// matrix `A(λ)_{ji} = Σ_t NF(h_j x^{ℓ_j})[h_i x^t] λ^t − δ_{ji} λ^{ℓ_j}`,
+// `k` the number of chains.  `det A(λ) = ± det(λI − M_x)`, of degree
+// `Σ ℓ_j = dim`.  So only the `k` border normal forms are computed, the
+// characteristic polynomial is `det A` (at every point of `F_p` when
+// `p ≤ dim + 1`, whose zeros are then the rational eigenvalues, otherwise
+// at `dim + 1` points and interpolated), and an eigenvector is a kernel
+// vector of a `k × k` matrix.
+
+/// What the chain step found, or why it could not run (the caller then
+/// reports the solve unsolved, its work charged).
+struct Chains {
+    /// For each standard index: (chain, position).
+    pos: Vec<(u32, u32)>,
+    /// Chain lengths.
+    len: Vec<u32>,
+    /// For each chain, its border normal form as (chain, position, coef).
+    nf: Vec<Vec<(u32, u32, u64)>>,
+}
+
+/// The heads, chains and border normal forms.  `Err` names the failure.
+#[allow(clippy::too_many_arguments)]
+fn chains_of<const N: usize>(
+    ech: &Echelon,
+    cols: &[[u8; N]],
+    col_index: &HashMap<[u8; N], usize>,
+    is_std: &[bool],
+    standard: &[usize],
+    std_index: &[u32],
+    mvar: usize,
+    p: u32,
+    muls: &mut u64,
+) -> Result<Chains, String> {
+    let dim = standard.len();
+    let ncols = cols.len();
+    // Successor of each standard monomial under x, or its border column.
+    let mut next: Vec<Result<usize, usize>> = Vec::with_capacity(dim);
+    for &bc in standard {
+        let mut m = cols[bc];
+        m[mvar] += 1;
+        let Some(&t) = col_index.get(&m) else {
+            return Err("border unreachable at this degree".into());
+        };
+        next.push(if is_std[t] {
+            Ok(std_index[t] as usize)
+        } else {
+            Err(t)
+        });
+    }
+    let mut pos = vec![(u32::MAX, u32::MAX); dim];
+    let mut len = Vec::new();
+    let mut ends = Vec::new();
+    for s in 0..dim {
+        if cols[standard[s]][mvar] != 0 {
+            continue;
+        }
+        let j = len.len() as u32;
+        let (mut cur, mut t) = (s, 0u32);
+        loop {
+            if pos[cur].0 != u32::MAX {
+                return Err("chain structure: a standard monomial on two chains".into());
+            }
+            pos[cur] = (j, t);
+            t += 1;
+            match next[cur] {
+                Ok(n) => cur = n,
+                Err(b) => {
+                    ends.push(b);
+                    break;
+                }
+            }
+        }
+        len.push(t);
+    }
+    if pos.iter().any(|&(j, _)| j == u32::MAX) {
+        return Err("chain structure: standard monomials are not an order ideal in x".into());
+    }
+    // nnz of each pivot row from its lead: bookkeeping, not arithmetic.
+    let nnz: Vec<u64> = (0..ncols)
+        .map(|c| match ech.pivot_row[c] {
+            u32::MAX => 0,
+            r => ech.rows[r as usize][c..]
+                .iter()
+                .filter(|&&v| v != 0)
+                .count() as u64,
+        })
+        .collect();
+    // Each border normal form by reducing e_b left to right by the pivot
+    // rows (normalised, lead 1): one multiplication per nonzero entry of a
+    // pivot row per use.
+    let reduced: Vec<Result<(Vec<u16>, u64), String>> = ends
+        .par_iter()
+        .map(|&b| {
+            let mut v = vec![0u16; ncols];
+            v[b] = 1;
+            let mut m = 0u64;
+            for c in b..ncols {
+                if v[c] == 0 || is_std[c] {
+                    continue;
+                }
+                let pr = ech.pivot_row[c];
+                if pr == u32::MAX {
+                    return Err("border unreachable at this degree".into());
+                }
+                let f = v[c] as u32;
+                axpy(&mut v[c..], &ech.rows[pr as usize][c..], f, p);
+                m += nnz[c];
+            }
+            Ok((v, m))
+        })
+        .collect();
+    let mut nf = Vec::with_capacity(ends.len());
+    for r in reduced {
+        let (v, m) = r?;
+        *muls += m;
+        nf.push(
+            standard
+                .iter()
+                .enumerate()
+                .filter(|&(_, &c)| v[c] != 0)
+                .map(|(s, &c)| (pos[s].0, pos[s].1, v[c] as u64))
+                .collect(),
+        );
+    }
+    Ok(Chains { pos, len, nf })
+}
+
+impl Chains {
+    fn k(&self) -> usize {
+        self.len.len()
+    }
+
+    /// `A(λ)`, charged one multiplication per term and per power.
+    fn matrix(&self, lam: u64, p: u64, muls: &mut u64) -> Vec<Vec<u64>> {
+        let top = *self.len.iter().max().unwrap_or(&0) as usize;
+        let mut pw = vec![1u64; top + 1];
+        for t in 1..=top {
+            pw[t] = mm(pw[t - 1], lam, p);
+        }
+        *muls += top as u64;
+        let k = self.k();
+        let mut a = vec![vec![0u64; k]; k];
+        for (j, row) in self.nf.iter().enumerate() {
+            for &(i, t, c) in row {
+                let e = &mut a[j][i as usize];
+                *e = am(*e, mm(c, pw[t as usize], p), p);
+            }
+            *muls += row.len() as u64;
+            let d = &mut a[j][j];
+            *d = sm(*d, pw[self.len[j] as usize], p);
+        }
+        a
+    }
+
+    /// `det A(λ)` by elimination, charged as `rref_mod_p` charges.
+    fn det(&self, lam: u64, p: u64, muls: &mut u64) -> u64 {
+        let mut a = self.matrix(lam, p, muls);
+        let k = a.len();
+        let mut det = 1u64;
+        for c in 0..k {
+            let Some(r) = (c..k).find(|&r| a[r][c] != 0) else {
+                return 0;
+            };
+            if r != c {
+                a.swap(r, c);
+                det = (p - det) % p;
+            }
+            det = mm(det, a[c][c], p);
+            let inv = inv_mod(a[c][c], p);
+            *muls += 1;
+            for r in (c + 1)..k {
+                if a[r][c] == 0 {
+                    continue;
+                }
+                let f = mm(a[r][c], inv, p);
+                for j in (c + 1)..k {
+                    a[r][j] = sm(a[r][j], mm(f, a[c][j], p), p);
+                }
+                *muls += (k - c) as u64;
+            }
+        }
+        det
+    }
+
+    /// The left eigenvectors of `M_x` for `λ` (as functionals on the
+    /// standard monomials): the kernel of `A(λ)`, along the chains.
+    fn eigenvectors(&self, lam: u64, p: u64, muls: &mut u64) -> Vec<Vec<u64>> {
+        let a = self.matrix(lam, p, muls);
+        let ker = eigenvectors_mod_p(&a, 0, p, muls);
+        let top = *self.len.iter().max().unwrap_or(&0) as usize;
+        let mut pw = vec![1u64; top + 1];
+        for t in 1..=top {
+            pw[t] = mm(pw[t - 1], lam, p);
+        }
+        *muls += top as u64;
+        ker.iter()
+            .map(|u| {
+                *muls += self.pos.len() as u64;
+                self.pos
+                    .iter()
+                    .map(|&(j, t)| mm(u[j as usize], pw[t as usize], p))
+                    .collect()
+            })
+            .collect()
+    }
+}
+
+/// The rational roots of `det A`: its zeros on `F_p` when `p ≤ dim + 1`,
+/// else the roots of its interpolation on `0, …, dim`.  `Err` if the
+/// interpolated determinant does not have degree `dim` and leading
+/// coefficient `±1`.
+fn chain_eigenvalues(
+    ch: &Chains,
+    dim: usize,
+    p: u64,
+    rng: &mut StdRng,
+    cp_muls: &mut u64,
+    roots_muls: &mut u64,
+) -> Result<Vec<u64>, String> {
+    let npts = if p <= dim as u64 + 1 {
+        p
+    } else {
+        dim as u64 + 1
+    };
+    let vals: Vec<(u64, u64)> = (0..npts)
+        .into_par_iter()
+        .map(|x| {
+            let mut m = 0u64;
+            (ch.det(x, p, &mut m), m)
+        })
+        .collect();
+    *cp_muls += vals.iter().map(|v| v.1).sum::<u64>();
+    if npts == p {
+        return Ok((0..p).filter(|&x| vals[x as usize].0 == 0).collect());
+    }
+    // Newton's divided differences on 0, …, dim (inverses of 1, …, dim
+    // once), then the Newton form expanded: O(dim²) each.
+    let n = dim + 1;
+    let inv: Vec<u64> = (0..n as u64)
+        .map(|d| if d == 0 { 0 } else { inv_mod(d, p) })
+        .collect();
+    let mut dd: Vec<u64> = vals.iter().map(|v| v.0).collect();
+    for lvl in 1..n {
+        for i in (lvl..n).rev() {
+            dd[i] = mm(sm(dd[i], dd[i - 1], p), inv[lvl], p);
+        }
+        *cp_muls += (n - lvl) as u64;
+    }
+    // Σ dd[i] Π_{j<i} (X − j), Horner from the top.
+    let mut poly = vec![0u64; n];
+    for i in (0..n).rev() {
+        // poly ← poly · (X − i) + dd[i]
+        let mut nxt = vec![0u64; n];
+        for d in 0..n - 1 {
+            if poly[d] != 0 {
+                nxt[d + 1] = am(nxt[d + 1], poly[d], p);
+                nxt[d] = sm(nxt[d], mm(poly[d], i as u64 % p, p), p);
+            }
+        }
+        *cp_muls += (n - 1 - i) as u64;
+        nxt[0] = am(nxt[0], dd[i], p);
+        poly = nxt;
+    }
+    let lead = poly[dim];
+    if lead != 1 && lead != p - 1 {
+        return Err(format!("det A(λ) has leading coefficient {lead}, not ±1"));
+    }
+    let ring = PolyRing::new(p);
+    let r = ring.roots(&UPoly(poly), rng);
+    *roots_muls += ring.muls.get();
+    Ok(r)
+}
+
+/// [`split_eigenspace`] for a multiplication unknown whose border may
+/// leave the matrix: `wᵢ · M_v` is known only at the standard monomials
+/// `b` with `v·b` standard (`known`: `(b, v·b)` as standard indices), which
+/// determine `a` when the `w` restricted to them are independent.
+/// Returns `w` unchanged if they are not (the eigenspace stays unsplit).
+fn split_eigenspace_partial(
+    w: &[Vec<u64>],
+    known: &[(usize, usize)],
+    p: u64,
+    rng: &mut StdRng,
+    muls: &mut u64,
+) -> Vec<Vec<u64>> {
+    let k = w.len();
+    let mut a = vec![vec![0u64; k]; k];
+    for i in 0..k {
+        let mut sys: Vec<Vec<u64>> = known
+            .iter()
+            .map(|&(l, t)| {
+                let mut row: Vec<u64> = (0..k).map(|j| w[j][l]).collect();
+                row.push(w[i][t]);
+                row
+            })
+            .collect();
+        let pivots = rref_mod_p(&mut sys, p, muls);
+        if pivots.len() != k || pivots.iter().any(|&c| c >= k) {
+            return w.to_vec();
+        }
+        for (r, &pc) in pivots.iter().enumerate() {
+            a[i][pc] = sys[r][k];
+        }
+    }
+    let mut at = vec![vec![0u64; k]; k];
+    for i in 0..k {
+        for j in 0..k {
+            at[j][i] = a[i][j];
+        }
+    }
+    let cp = charpoly_mod_p(&a, p, muls);
+    let ring = PolyRing::new(p);
+    let mus = ring.roots(&cp, rng);
+    *muls += ring.muls.get();
+    let dim = w[0].len();
+    let mut out = Vec::new();
+    for mu in mus {
+        for v in eigenvectors_mod_p(&at, mu, p, muls) {
+            let mut u = vec![0u64; dim];
+            for j in 0..k {
+                if v[j] == 0 {
+                    continue;
+                }
+                for r in 0..dim {
+                    if w[j][r] != 0 {
+                        u[r] = am(u[r], mm(v[j], w[j][r], p), p);
+                        *muls += 1;
+                    }
+                }
+            }
+            out.push(u);
+        }
+    }
+    out
+}
+
+/// The eigen step of [`solve_system_w_inner`] along the chains: border
+/// normal forms (`nf_muls`), `det A` at points (`charpoly_muls`), its
+/// roots (`roots_muls`), kernels of `A(λ)` and splits (`eigenvector_muls`),
+/// each solution checked in every equation (`verify_muls`).  A degenerate
+/// eigenspace is split by the other unknowns where their products stay
+/// standard.  `None` (with `st.outcome`) when the chain step cannot run.
+#[allow(clippy::too_many_arguments)]
+fn solve_along_chains<const N: usize>(
+    ech: &Echelon,
+    cols: &[[u8; N]],
+    col_index: &HashMap<[u8; N], usize>,
+    is_std: &[bool],
+    standard: &[usize],
+    std_index: &[u32],
+    idx: &[usize],
+    mvar: usize,
+    comps: &[HashMap<[u8; N], u64>],
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    t0: Instant,
+    t2: Instant,
+) -> Option<Vec<[u64; N]>> {
+    let dim = standard.len();
+    let mut nf_muls = 0u64;
+    let ch = chains_of::<N>(
+        ech,
+        cols,
+        col_index,
+        is_std,
+        standard,
+        std_index,
+        mvar,
+        p as u32,
+        &mut nf_muls,
+    );
+    st.nf_muls += nf_muls;
+    st.nf_ms = t2.elapsed().as_secs_f64() * 1e3;
+    let ch = match ch {
+        Ok(ch) => ch,
+        Err(why) => {
+            st.outcome = why;
+            return None;
+        }
+    };
+    st.reached_pivots = ch.k();
+    let t3 = Instant::now();
+    let (mut cp, mut rm) = (0u64, 0u64);
+    let lambdas = chain_eigenvalues(&ch, dim, p, rng, &mut cp, &mut rm);
+    st.charpoly_muls += cp;
+    st.roots_muls += rm;
+    st.charpoly_ms = t3.elapsed().as_secs_f64() * 1e3;
+    let lambdas = match lambdas {
+        Ok(l) => l,
+        Err(why) => {
+            st.outcome = why;
+            return None;
+        }
+    };
+    st.rational_eigenvalues = lambdas.len();
+    let t4 = Instant::now();
+    // For each other unknown, the standard monomials it keeps standard.
+    let known: Vec<Vec<(usize, usize)>> = (0..N)
+        .filter(|&v| v != mvar)
+        .map(|v| {
+            (0..dim)
+                .filter_map(|s| {
+                    let mut m = cols[standard[s]];
+                    m[v] += 1;
+                    let &t = col_index.get(&m)?;
+                    is_std[t].then(|| (s, std_index[t] as usize))
+                })
+                .collect()
+        })
+        .collect();
+    let mut out = Vec::new();
+    for lam in lambdas {
+        let mut ev = 0u64;
+        let mut ker = ch.eigenvectors(lam, p, &mut ev);
+        if ker.len() > 1 {
+            st.degenerate_eigenspaces += 1;
+            for kn in &known {
+                if ker.len() <= 1 {
+                    break;
+                }
+                ker = split_eigenspace_partial(&ker, kn, p, rng, &mut ev);
+            }
+        }
+        st.eigenvector_muls += ev;
+        for v in &ker {
+            if v[idx[0]] == 0 {
+                continue;
+            }
+            let inv = inv_mod(v[idx[0]], p);
+            let e: [u64; N] = core::array::from_fn(|k| mm(v[idx[k + 1]], inv, p));
+            if e[mvar] != lam {
+                continue;
+            }
+            let mut vm = 0u64;
+            let ok = comps.iter().all(|c| eval4(c, &e, p, &mut vm) == 0);
+            st.verify_muls += vm;
+            if ok {
+                out.push(e);
+            }
+        }
+    }
+    st.eigen_ms = t4.elapsed().as_secs_f64() * 1e3;
+    out.sort_unstable();
+    out.dedup();
+    st.e_solutions = out.len();
+    st.outcome = "solved".into();
+    st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
+    st.close();
+    Some(out)
 }
 
 /// The multisets `{x₁, …, x₄} ⊂ F_p` whose elementary symmetric functions
@@ -1707,6 +3046,103 @@ pub fn solve_s5_subspace(
     let comps = pre.weil_restrict(f, x_r);
     st.weil_muls += f.muls() - before;
     let es = solve_system4(&comps, 8, 29, f.p, rng, st, debug)?;
+    let mut out = Vec::new();
+    for e in es {
+        let mut sm_ = 0u64;
+        if let Some(x) = split_quartic(&e, f.p, rng, &mut sm_) {
+            out.push(x);
+        }
+        st.split_muls += sm_;
+    }
+    st.close();
+    out.sort_unstable();
+    Some(out)
+}
+
+/// Solver options the `D₄` oracle uses ([`crate::cryptanalysis::gaudry_quartic_d4::D4Options`]),
+/// applied to the plain system.  All off is [`solve_s5_subspace`] /
+/// [`solve_system4`], operation for operation.  There is no `weighted`:
+/// the plain `S₅` has no `σ₄ = π²` to substitute.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct PlainOptions {
+    /// The eigen step along the chains of `e₁` ([`solve_along_chains`]).
+    pub chains: bool,
+    /// The elimination's pivot in each column is the sparsest candidate.
+    pub sparsest: bool,
+}
+
+/// [`solve_system4_traced`] with [`PlainOptions`].  A replay that does not
+/// match runs the full solve as well, both charged in `st`; with options
+/// on, a replay tops up a rank shortfall from the held rows, as the `D₄`
+/// oracle's does.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_system4_with(
+    comps: &[HashMap<[u8; 4], u64>],
+    opts: PlainOptions,
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+) -> Option<Vec<[u64; 4]>> {
+    let top_up = opts != PlainOptions::default();
+    let run = |rng: &mut StdRng,
+               st: &mut QuarticSolve,
+               replay: Option<&ShapeTrace>,
+               record: Option<&mut ShapeTrace>| {
+        solve_system_w_inner::<4>(
+            comps,
+            &[1; 4],
+            opts.chains,
+            opts.sparsest,
+            top_up,
+            equation_degree,
+            macaulay_degree,
+            p,
+            rng,
+            st,
+            debug,
+            replay,
+            record,
+        )
+    };
+    let mut outcome = ReplayOutcome::Recorded;
+    if let Some(t) = replay {
+        match run(rng, st, Some(t), None) {
+            Ok(sols) => {
+                st.replay = ReplayOutcome::Replayed;
+                return sols;
+            }
+            Err(()) => outcome = ReplayOutcome::FellBack,
+        }
+    }
+    let r = run(rng, st, None, record).unwrap_or(None);
+    st.replay = outcome;
+    r
+}
+
+/// [`solve_s5_subspace`] with [`PlainOptions`] and an optional shape trace
+/// ([`solve_system4_with`]).
+#[allow(clippy::too_many_arguments)]
+pub fn solve_s5_subspace_with(
+    curve: &Curve4,
+    pre: &SymmetrisedS5,
+    x_r: &E4,
+    opts: PlainOptions,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+) -> Option<Vec<[u64; 4]>> {
+    let f = &curve.f;
+    let before = f.muls();
+    let comps = pre.weil_restrict(f, x_r);
+    st.weil_muls += f.muls() - before;
+    let es = solve_system4_with(&comps, opts, 8, 29, f.p, rng, st, debug, replay, record)?;
     let mut out = Vec::new();
     for e in es {
         let mut sm_ = 0u64;
@@ -2216,6 +3652,40 @@ mod tests {
     use rand::SeedableRng;
 
     #[test]
+    fn both_echelon_pivot_policies_preserve_the_exact_small_row_space() {
+        fn span(rows: &[Vec<u16>], p: u16) -> std::collections::BTreeSet<Vec<u16>> {
+            let width = rows.first().map_or(0, Vec::len);
+            let mut result = std::collections::BTreeSet::new();
+            for mut code in 0..u64::from(p).pow(rows.len() as u32) {
+                let mut sum = vec![0; width];
+                for row in rows {
+                    let coefficient = (code % u64::from(p)) as u16;
+                    code /= u64::from(p);
+                    for (out, value) in sum.iter_mut().zip(row) {
+                        *out = (*out + coefficient * value) % p;
+                    }
+                }
+                result.insert(sum);
+            }
+            result
+        }
+        let rows = vec![
+            vec![1, 1, 1, 1],
+            vec![1, 0, 0, 1],
+            vec![0, 1, 1, 0],
+            vec![0, 0, 0, 0],
+        ];
+        let expected = span(&rows, 3);
+        for sparsest in [false, true] {
+            let mut work = 0;
+            let echelon = echelon_by_lead_with(rows.clone(), 3, &mut work, false, sparsest);
+            assert_eq!(span(&echelon.rows, 3), expected);
+            assert_eq!(echelon.zero_rows, 2);
+            assert!(work > 0);
+        }
+    }
+
+    #[test]
     fn u16_kernels_match_the_reference_routines() {
         use super::super::gaudry_cubic::{charpoly_mod_p, eigenvectors_mod_p};
         let mut rng = StdRng::seed_from_u64(7);
@@ -2357,6 +3827,73 @@ mod tests {
     #[test]
     fn the_solver_finds_planted_roots_of_cubics() {
         planted(3, 7);
+    }
+
+    /// [`PlainOptions`] all off is [`solve_system4`], count for count; each
+    /// option on returns the same solutions, and a replay of the first
+    /// system's shape on a second system of the same support does too.
+    #[test]
+    fn plain_options_keep_the_solutions_and_off_is_the_committed_solve() {
+        let p = 269u64;
+        let system = |seed: u64| {
+            let mut rng = StdRng::seed_from_u64(seed);
+            let root: [u64; 4] = core::array::from_fn(|_| rng.gen_range(0..p));
+            let comps: Vec<HashMap<[u8; 4], u64>> = (0..4)
+                .map(|_| {
+                    let mut c: HashMap<[u8; 4], u64> = exponents4(3)
+                        .iter()
+                        .map(|m| (*m, rng.gen_range(1..p)))
+                        .collect();
+                    let mut dummy = 0u64;
+                    let v = eval4(&c, &root, p, &mut dummy);
+                    let e = c.entry([0, 0, 0, 0]).or_insert(0);
+                    *e = sm(*e, v, p);
+                    c
+                })
+                .collect();
+            (comps, root)
+        };
+        let (comps, root) = system(11);
+        let solve = |opts: PlainOptions,
+                     comps: &[HashMap<[u8; 4], u64>],
+                     replay: Option<&ShapeTrace>,
+                     record: Option<&mut ShapeTrace>| {
+            let mut st = QuarticSolve::default();
+            let mut rng = StdRng::seed_from_u64(5);
+            let s = solve_system4_with(
+                comps, opts, 3, 9, p, &mut rng, &mut st, false, replay, record,
+            )
+            .expect("closes");
+            (s, st)
+        };
+        let mut rng = StdRng::seed_from_u64(5);
+        let mut st0 = QuarticSolve::default();
+        let base = solve_system4(&comps, 3, 9, p, &mut rng, &mut st0, false).expect("closes");
+        assert!(base.contains(&root));
+        let (off, st_off) = solve(PlainOptions::default(), &comps, None, None);
+        assert_eq!(off, base);
+        assert_eq!(st_off.total_muls, st0.total_muls);
+        assert_eq!(st_off.echelon_muls, st0.echelon_muls);
+        for (chains, sparsest) in [(false, true), (true, false), (true, true)] {
+            let opts = PlainOptions { chains, sparsest };
+            let (s, st) = solve(opts, &comps, None, None);
+            assert_eq!(s, base, "{opts:?}");
+            if sparsest {
+                assert!(st.echelon_muls < st0.echelon_muls, "{opts:?}");
+            }
+        }
+        let opts = PlainOptions {
+            chains: true,
+            sparsest: true,
+        };
+        let mut shape = ShapeTrace::default();
+        let _ = solve(opts, &comps, None, Some(&mut shape));
+        let (comps2, root2) = system(12);
+        let (full, _) = solve(opts, &comps2, None, None);
+        let (replayed, st_r) = solve(opts, &comps2, Some(&shape), None);
+        assert!(full.contains(&root2));
+        assert_eq!(replayed, full);
+        assert_ne!(st_r.replay, ReplayOutcome::Recorded);
     }
 
     /// §11.18's pipeline end to end at a toy size: a prime-order curve,

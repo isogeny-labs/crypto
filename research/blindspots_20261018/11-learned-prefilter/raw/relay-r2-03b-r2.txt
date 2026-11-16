@@ -1,0 +1,36 @@
+status: completed
+
+card: CARD-BLINDSPOT-11-03b-r2 (sha256 8d5e1cbddb5835872c763adb2d6764cd5e3772130d0283934067be5c625cdf92)
+commit: 41a0e13d11dd491654eec48c06a3daafe1bea81a
+receipt: research/blindspots_20261018/11-learned-prefilter/raw/receipt-card-03b-r2.json sha256 59db2b790168f45a5dbfa4a0280c592d2379fedc693d01e49ad6f54c3633c1f3
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-11/card-03b-r2"] exit 0 (0.005 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-11/card-03b-r2/b11", "examples/blindspots_11_learned_prefilter.rs"] exit 0 (6.419 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (cell-n19-m3-u-r2): ["prlimit", "--as=4294967296", "target/blindspots-11/card-03b-r2/b11", "cell", "--n", "19", "--m", "3", "--per-base", "2000", "--perms", "20", "--pilot", "400", "--pop", "U"] exit 0 (93.339 s) succeeded
+  stdout sha256 9cb094c02c59f6b6d7dc771617895dde86aa446aa4a625dc270e74e2694dff66; last 20 lines:
+    {"pop":"U","kind":"base","n":19,"m":3,"l":7,"idx":8,"type":"P","classes":55,"tv0":false,"dset0":true,"dset1":true,"sumset0":true,"sumset1":true,"targets":2000,"pos":684,"pos_frac":0.342000,"b_refutes":0}
+    {"pop":"U","kind":"base","n":19,"m":3,"l":7,"idx":9,"type":"P","classes":72,"tv0":false,"dset0":true,"dset1":true,"sumset0":true,"sumset1":true,"targets":2000,"pos":1162,"pos_frac":0.581000,"b_refutes":0}
+    {"pop":"U","kind":"label_summary","n":19,"m":3,"l":7,"targets":20000,"pos":7984,"false_refutations_b":0,"seconds":0.154102}
+    {"pop":"U","kind":"cost","n":19,"m":3,"l":7,"feat_mul":36.000000,"feat_sqr":21.000000,"feat_lin":144.000000,"lr_model_ops":248,"gbt_model_ops":400,"dec_neg_field_ops":452.856525,"dec_neg_lin":123.101864,"dec_pos_field_ops":266.618737,"dec_pos_lin":26.351453,"neg_targets":12016,"pos_targets":7984}
+    {"pop":"U","kind":"summary","n":19,"m":3,"l":7,"model":"lr","type":"ALL","neg":12016,"pos":7984,"rate_b":0.338632,"rate_c":0.000000,"fr":7,"delta":-0.338632,"delta_lo":-0.347037,"delta_hi":-0.330143,"rate_union":0.339048,"roc0":0.338798,"auc":0.722037,"null_auc_max":0.515073,"null_auc_mean":0.506998,"null_roc0_max":0.001914,"null_roc0_mean":0.000932,"perms":20}
+    {"pop":"U","kind":"summary","n":19,"m":3,"l":7,"model":"lr","type":"T","neg":5186,"pos":2814,"rate_b":0.784612,"rate_c":0.784612,"fr":0,"delta":0.000000,"delta_lo":0.000000,"delta_hi":0.000000,"rate_union":0.784612,"roc0":0.784612,"auc":0.894353,"null_auc_max":0.512294,"null_auc_mean":0.500548,"null_roc0_max":0.004242,"null_roc0_mean":0.001581,"perms":20}
+    {"pop":"U","kind":"summary","n":19,"m":3,"l":7,"model":"lr","type":"G","neg":3595,"pos":2405,"rate_b":0.000000,"rate_c":0.000000,"fr":1,"delta":0.000000,"delta_lo":0.000000,"delta_hi":0.000000,"rate_union":0.000278,"roc0":0.000000,"auc":0.492432,"null_auc_max":0.514300,"null_auc_mean":0.501154,"null_roc0_max":0.001669,"null_roc0_mean":0.000473,"perms":20}
+    {"pop":"U","kind":"summary","n":19,"m":3,"l":7,"model":"lr","type":"P","neg":3235,"pos":2765,"rate_b":0.000000,"rate_c":0.000000,"fr":6,"delta":0.000000,"delta_lo":0.000000,"delta_hi":0.000000,"rate_union":0.001236,"roc0":0.000618,"auc":0.504873,"null_auc_max":0.512433,"null_auc_mean":0.501870,"null_roc0_max":0.001546,"null_roc0_mean":0.000402,"perms":20}
+    {"pop":"U","kind":"control","n":19,"m":3,"l":7,"model":"lr","name":"planted_trace","neg":10124,"pos":9876,"auc":1.000000,"fr":6,"rate_cal":1.000000,"roc0":1.000000}
+    {"pop":"U","kind":"control","n":19,"m":3,"l":7,"model":"lr","name":"planted_selector","neg":10085,"pos":9915,"auc":0.874520,"fr":6,"rate_cal":0.488052,"roc0":0.487952}
+    {"pop":"U","kind":"timing","n":19,"m":3,"model":"lr","seconds":11.571093}
+    {"pop":"U","kind":"summary","n":19,"m":3,"l":7,"model":"gbt","type":"ALL","neg":12016,"pos":7984,"rate_b":0.338632,"rate_c":0.000000,"fr":5,"delta":-0.338632,"delta_lo":-0.346788,"delta_hi":-0.329893,"rate_union":0.339381,"roc0":0.339298,"auc":0.726352,"null_auc_max":0.518546,"null_auc_mean":0.513792,"null_roc0_max":0.002830,"null_roc0_mean":0.000890,"perms":20}
+    {"pop":"U","kind":"summary","n":19,"m":3,"l":7,"model":"gbt","type":"T","neg":5186,"pos":2814,"rate_b":0.784612,"rate_c":0.784612,"fr":0,"delta":0.000000,"delta_lo":0.000000,"delta_hi":0.000000,"rate_union":0.784612,"roc0":0.784612,"auc":0.898915,"null_auc_max":0.515978,"null_auc_mean":0.500452,"null_roc0_max":0.006363,"null_roc0_mean":0.001735,"perms":20}
+    {"pop":"U","kind":"summary","n":19,"m":3,"l":7,"model":"gbt","type":"G","neg":3595,"pos":2405,"rate_b":0.000000,"rate_c":0.000000,"fr":2,"delta":0.000000,"delta_lo":0.000000,"delta_hi":0.000000,"rate_union":0.000834,"roc0":0.000556,"auc":0.493829,"null_auc_max":0.518176,"null_auc_mean":0.500023,"null_roc0_max":0.001113,"null_roc0_mean":0.000223,"perms":20}
+    {"pop":"U","kind":"summary","n":19,"m":3,"l":7,"model":"gbt","type":"P","neg":3235,"pos":2765,"rate_b":0.000000,"rate_c":0.000000,"fr":3,"delta":0.000000,"delta_lo":0.000000,"delta_hi":0.000000,"rate_union":0.001855,"roc0":0.001855,"auc":0.493835,"null_auc_max":0.511236,"null_auc_mean":0.500580,"null_roc0_max":0.001236,"null_roc0_mean":0.000278,"perms":20}
+    {"pop":"U","kind":"gbt_splits","n":19,"m":3,"l":7,"total":2467,"splits_polybits":308,"splits_normalbits":361,"splits_powertraces":438,"splits_hilbert90":40,"splits_shiftedV":205,"splits_halftrace":604,"splits_context":511}
+    {"pop":"U","kind":"control","n":19,"m":3,"l":7,"model":"gbt","name":"planted_trace","neg":10124,"pos":9876,"auc":1.000000,"fr":0,"rate_cal":1.000000,"roc0":1.000000}
+    {"pop":"U","kind":"control","n":19,"m":3,"l":7,"model":"gbt","name":"planted_selector","neg":10085,"pos":9915,"auc":1.000000,"fr":0,"rate_cal":1.000000,"roc0":1.000000}
+    {"pop":"U","kind":"timing","n":19,"m":3,"model":"gbt","seconds":81.608784}
+    {"pop":"U","kind":"done","n":19,"m":3,"l":7,"seconds":93.334025,"rss_peak_kb":15808}
+command 4 (remove-bin): ["rm", "-f", "target/blindspots-11/card-03b-r2/b11"] exit 0 (0.006 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (remove-bin-dir): ["rmdir", "target/blindspots-11/card-03b-r2"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

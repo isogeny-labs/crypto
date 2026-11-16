@@ -5,6 +5,14 @@ use std::{
     sync::atomic::{AtomicUsize, Ordering},
 };
 static NEXT: AtomicUsize = AtomicUsize::new(0);
+
+fn ic_binary() -> PathBuf {
+    option_env!("CARGO_BIN_EXE_ic")
+        .or(option_env!("IC_TEST_BINARY"))
+        .map(PathBuf::from)
+        .expect("CLI contracts require Cargo's integration-test executable or IC_TEST_BINARY pointing to a freshly built ic; see docs/ic/cli-contract-tests.md")
+}
+
 fn path() -> PathBuf {
     std::env::temp_dir().join(format!(
         "ic-test-{}-{}.json",
@@ -13,7 +21,7 @@ fn path() -> PathBuf {
     ))
 }
 fn command(args: &[&str]) -> (bool, Value) {
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .args(args)
         .arg("--json")
         .output()
@@ -33,6 +41,189 @@ fn generated() -> Value {
     let (ok, v) = command(&["generate", "--degree", "9", "--seed", "41"]);
     assert!(ok);
     v
+}
+
+#[test]
+fn verbose_run_traces_trials_and_preserves_report_and_json_output() {
+    let file = path();
+    let args = [
+        "run",
+        "--degree",
+        "9",
+        "--solver",
+        "enumerate",
+        "--batch",
+        "1",
+    ];
+    let (ok, expected) = command(&args);
+    assert!(ok, "{expected}");
+    let output = Command::new(ic_binary())
+        .arg("-v")
+        .args(args)
+        .arg("--out")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{:?}", output);
+    let text = String::from_utf8(output.stdout).unwrap();
+    for fragment in [
+        "ic: [1/4] factor base:",
+        "ic: [2/4] batch:",
+        "ic: [2/4] trial 1/",
+        "ic: [3/4] matrix:",
+        "ic: [4/4] verification: passed",
+    ] {
+        assert!(text.contains(fragment), "missing {fragment}: {text}");
+    }
+    let report: Value = serde_json::from_slice(&std::fs::read(&file).unwrap()).unwrap();
+    assert_eq!(report["result"], expected["result"]);
+    assert_eq!(report["counts"], expected["counts"]);
+    assert_eq!(report["arguments"], expected["arguments"]);
+    assert!(!report.to_string().contains("verbose"));
+    std::fs::remove_file(file).unwrap();
+    let (ok, report) = command(&["run", "--degree", "9", "--verbose"]);
+    assert!(ok, "{report}");
+    assert_eq!(report["result"]["verified"], true);
+}
+
+#[test]
+fn verbose_trial_lines_are_visible_while_collection_is_still_running() {
+    use std::{
+        io::{BufRead, BufReader},
+        process::Stdio,
+        sync::mpsc,
+        time::Duration,
+    };
+    let mut child = Command::new(ic_binary())
+        .args([
+            "run",
+            "--degree",
+            "15",
+            "--curve-a",
+            "1",
+            "--solver",
+            "pair-table",
+            "--control",
+            "--max-trials",
+            "1000000",
+            "--batch",
+            "1",
+            "--verbose",
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    let stdout = child.stdout.take().unwrap();
+    let (tx, rx) = mpsc::channel();
+    let reader = std::thread::spawn(move || {
+        for line in BufReader::new(stdout).lines() {
+            let line = line.unwrap();
+            if line.contains("ic: [2/4] trial 1/1000000:") {
+                let _ = tx.send(line);
+            }
+        }
+    });
+    let line = rx.recv_timeout(Duration::from_secs(30));
+    let still_running = child.try_wait().unwrap().is_none();
+    let _ = child.kill();
+    child.wait().unwrap();
+    reader.join().unwrap();
+    assert!(line.is_ok(), "first trial was not streamed: {line:?}");
+    assert!(still_running, "trace appeared only after collection ended");
+}
+
+#[test]
+fn verbose_workflow_collection_reports_every_probe_and_json_remains_clean() {
+    let params = path();
+    let dir = path().with_extension("run");
+    std::fs::write(
+        &params,
+        serde_json::to_vec(&json!({
+            "schema_version":1,"name":"verbose-test","curve":{"degree":9,"curve_a":0},
+            "summands":2,"solver":"pair_table","seed":1,
+            "collection":{"unit_trials":4,"units":1,"max_units":1},
+            "factor_base":{"mode":"spec","spec":{"kind":"factor","index":0}},
+            "targets":[{"known_log":"53"}]
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    let args = [
+        "workflow",
+        "--params",
+        params.to_str().unwrap(),
+        "--dir",
+        dir.to_str().unwrap(),
+        "--collect-units",
+        "0",
+        "--verbose",
+    ];
+    let output = Command::new(ic_binary()).args(args).output().unwrap();
+    assert!(output.status.success(), "{output:?}");
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert_eq!(
+        text.lines()
+            .filter(|line| line.contains("unit 00000, trial "))
+            .count(),
+        4,
+        "{text}"
+    );
+    let (ok, report) = command(&args);
+    assert!(ok, "{report}");
+    std::fs::remove_file(params).unwrap();
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn verbose_log_precomputation_and_descent_report_actual_work() {
+    let db = path();
+    let output = Command::new(ic_binary())
+        .args([
+            "logs",
+            "--degree",
+            "9",
+            "--solver",
+            "pair-table",
+            "--verbose",
+            "--database",
+        ])
+        .arg(&db)
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{output:?}");
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("logs: collection;"), "{text}");
+    assert!(
+        text.contains("linear algebra and column verification started"),
+        "{text}"
+    );
+    assert!(text.contains("verified=true"), "{text}");
+    let output = Command::new(ic_binary())
+        .args([
+            "solve",
+            "--degree",
+            "9",
+            "--solver",
+            "pair-table",
+            "--verbose",
+            "--logs",
+        ])
+        .arg(&db)
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{output:?}");
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("solve: trial 1/"), "{text}");
+    assert!(text.contains("solve: scalar verification passed"), "{text}");
+    std::fs::remove_file(db).unwrap();
+    let output = Command::new(ic_binary())
+        .args(["generate", "--verbose"])
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{output:?}");
+    serde_json::from_slice::<Value>(&output.stdout)
+        .expect("generated parameters remain importable");
 }
 #[test]
 fn named_profiles_report_inspection_only_and_missing_representation() {
@@ -285,13 +476,13 @@ fn synthetic_targets_are_reproducible_and_imports_are_not_run_arguments() {
     let (ok2, b) = command(&args);
     assert!(ok && ok2);
     assert_eq!(a["parameters"], b["parameters"]);
-    let status = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let status = Command::new(ic_binary())
         .args(["run", "--file", "anything.json"])
         .output()
         .unwrap()
         .status;
     assert!(!status.success());
-    let status = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let status = Command::new(ic_binary())
         .args(["run", "--degree", "131"])
         .output()
         .unwrap()
@@ -350,7 +541,7 @@ fn report_files_are_created_once_and_generated_reports_are_importable() {
     assert!(ok);
     let bytes = std::fs::read(&file).unwrap();
     assert_eq!(serde_json::from_slice::<Value>(&bytes).unwrap(), v);
-    let run = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let run = Command::new(ic_binary())
         .args(["generate", "--out", file.to_str().unwrap()])
         .output()
         .unwrap();

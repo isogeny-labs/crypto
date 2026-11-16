@@ -618,6 +618,8 @@ class OtherAdapterTests(unittest.TestCase):
             self.assertEqual(argv[argv.index(flag) + 1], "0")
         self.assertIn("--no-accel", argv)
         self.assertEqual(argv[argv.index("--la-pivot") + 1], "min_fill")
+        if "--rho" in argv:
+            self.assertEqual(argv[argv.index("--rho-walk") + 1], "plain")
 
     def test_autoresearcher_refuses_a_strong_rho_claim(self):
         ad = adapters.get("autoresearcher.index_calculus")
@@ -640,6 +642,20 @@ class OtherAdapterTests(unittest.TestCase):
         self.assertEqual(fb["usable_points"], 2 * ic["factor_base"]["size"], "signed points, as crypto and cryptanalysis count")
         self.assertEqual(out["units"]["count.s3_solves"]["total"], ic["s3_solves"] + ic["table_s3_solves"])
         self.assertEqual(out["reference"]["id"], "rho.plain")
+
+    def test_autoresearcher_parse_refuses_a_negation_walk_labelled_plain(self):
+        ad = adapters.get("autoresearcher.index_calculus")
+        sp = self.spec("ar-p16-smallx-m2-enum.yaml")
+        doc = json.loads(_read(os.path.join(FIX, "autoresearcher-p16-smallx-m2-enum.json")))
+        doc.setdefault("rho", {"verified": True, "group_ops": 1, "walk_ops": 1, "setup_ops": 0, "walks": 1})
+        doc["rho"]["walk"] = "negation"
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "out.json")
+            with open(path, "w", encoding="utf-8") as fh:
+                json.dump(doc, fh)
+            out = ad.parse(sp["spec"], sp["workloads"][0], self.ctx, path)
+        self.assertEqual(out["outcome"]["status"], "error")
+        self.assertIn("rho.plain", out["outcome"]["reason"])
 
 
 class AdapterReviewRegressionTests(unittest.TestCase):

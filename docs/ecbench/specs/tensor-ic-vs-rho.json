@@ -1,0 +1,68 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "tensor-contraction IC (ic.tensor_contraction_v1, m = 2) against rho.negation and the prime IC baseline on the registered bench-roster prime curves of 10, 12 and 14 bits (counts and L2 wall time)",
+  "description": "Speed of the toy index calculus of crates/ecdl-tensor-ic (Rust port of the Go ecdltensor prototype): relations found by exact sparse tensor contraction of the whole-point network over m = 2 SHA-256 hashed factor bases. Exponential by construction (no [Ope26] solver); the session measures its cost in S and wall time against the matched rho reference, the prime-curve ic.pipeline baseline and a rho A/A control. The 16-bit roster curve is measured in counts only by tensor-ic-vs-rho-16.json. Protocol: research/ecdl_tensor_ic_speed_20261030/protocol.json.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_roster",
+        "bits": 10
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 12
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 14
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261030
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-mitm",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "tensor-m2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.tensor_contraction_v1",
+        "params": {
+          "m": "2"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261030,
+    "isolation_required": "L2",
+    "timeout_seconds": 900
+  }
+}

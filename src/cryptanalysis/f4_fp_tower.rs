@@ -55,7 +55,11 @@
 //!   full echelon (note §15).
 //! - **Rows are formed on demand.** A row is kept as the product that makes
 //!   it and formed again, a block at a time, when it is eliminated, so a
-//!   step's memory is `B'` rather than the matrix.
+//!   step's memory is `B'` rather than the matrix. The scan keeps the
+//!   products it forms for the elimination to read back, up to `2²³` terms a
+//!   step (64 MiB of stored term payload; the vectors' spare capacity comes
+//!   on top, see `PRODUCT_CACHE_TERMS`); the rest of a larger step is
+//!   formed again.
 //! - **The basis keeps the echelon's rows.** A new element is the pivot row
 //!   the elimination leaves, dense over the step's columns without a divisor
 //!   from its lead on, and the elements a step adds share that column list:
@@ -140,7 +144,7 @@ impl Fp {
             self.p - a
         }
     }
-    fn pow(self, mut a: u64, mut e: u64) -> u64 {
+    pub(crate) fn pow(self, mut a: u64, mut e: u64) -> u64 {
         let mut r = 1u64;
         a %= self.p;
         while e > 0 {
@@ -184,15 +188,144 @@ const DEG_SHIFT: u32 = 96;
 /// Free variables a monomial can carry.
 pub const MAX_FREE: usize = 4;
 
-/// The monomial with tower mask `mask` and free exponents `free`.
+/// Positive integer weights `1..=8` on the tower variables: the grading of
+/// a weighted run ([`TowerF4Options::weights`]).
+///
+/// The weight of variable `j` is `1 + Σ_b 2^b·bit_j(planes[b])`, so the
+/// default (all planes zero) is the unit grading, under which every key is
+/// the one [`mono`] makes. A weighted degree with positive weights, broken
+/// by the same reverse-lexicographic comparison of the key's low half, is a
+/// monomial order. Its use here: a radix-`2^k` Kummer tower `u^{2^k} = u'`
+/// is the radix-2 tower `y_0 = u, y_{i+1} = y_i²` with weights
+/// `1, 2, …, 2^{k−1}` on each block of `k` levels. The ring, its rules and its
+/// standard monomials are the same; only the grading, and so the order in
+/// which F4 meets the monomials, changes. [`TowerWeights::check`] says when
+/// the rules still have leading monomials `y_j²`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct TowerWeights {
+    planes: [u64; 3],
+}
+
+impl TowerWeights {
+    /// The unit grading.
+    pub const UNIT: TowerWeights = TowerWeights { planes: [0; 3] };
+
+    /// Weights given per tower variable, each in `1..=8`; variables past the
+    /// slice's end get weight 1.
+    pub fn from_slice(w: &[u32]) -> Self {
+        assert!(w.len() <= 64, "f4_fp_tower: at most 64 tower weights");
+        let mut planes = [0u64; 3];
+        for (j, &x) in w.iter().enumerate() {
+            assert!(
+                (1..=8).contains(&x),
+                "f4_fp_tower: weight {x} of y_{j} is not in 1..=8"
+            );
+            let e = x - 1;
+            for (b, plane) in planes.iter_mut().enumerate() {
+                if (e >> b) & 1 == 1 {
+                    *plane |= 1u64 << j;
+                }
+            }
+        }
+        TowerWeights { planes }
+    }
+
+    /// Radix-`2^k` blocks on `n` tower variables laid out as `blocks` towers
+    /// of `t` consecutive levels each (`n = blocks·t`): level `i` of every
+    /// tower gets weight `2^(i mod k)`. `k = 1` is the unit grading.
+    pub fn radix_blocks(blocks: usize, t: usize, k: u32) -> Self {
+        assert!(
+            (1..=4).contains(&k),
+            "f4_fp_tower: radix exponent k must be 1..=4"
+        );
+        let w: Vec<u32> = (0..blocks)
+            .flat_map(|_| (0..t).map(move |i| 1u32 << (i as u32 % k)))
+            .collect();
+        Self::from_slice(&w)
+    }
+
+    pub fn is_unit(self) -> bool {
+        self.planes == [0; 3]
+    }
+
+    /// The weight of tower variable `j`.
+    #[inline]
+    pub fn weight(self, j: u32) -> u32 {
+        1 + self
+            .planes
+            .iter()
+            .enumerate()
+            .map(|(b, p)| (((p >> j) & 1) as u32) << b)
+            .sum::<u32>()
+    }
+
+    /// The weighted degree of a tower mask.
+    #[inline]
+    pub fn mask_degree(self, mask: u64) -> u32 {
+        mask.count_ones()
+            + (mask & self.planes[0]).count_ones()
+            + 2 * (mask & self.planes[1]).count_ones()
+            + 4 * (mask & self.planes[2]).count_ones()
+    }
+
+    /// Panics unless every rule of `ring` keeps `y_j²` as its leading
+    /// monomial in this grading, so that the tower stays a Gröbner basis
+    /// with pairwise coprime leads (Lemma 1 of the note):
+    /// - a `b·y_next` term needs `w(next) ≤ 2·w(j)` (at equality the reverse
+    ///   lexicographic tie-break puts `y_next`, the later variable, below);
+    /// - an `a·y_j·y_next` term needs `w(next) ≤ w(j)`, by the same argument;
+    /// - `c·y_j` and `d` are always below.
+    pub fn check(self, ring: &TowerRing) {
+        assert!(
+            self.planes
+                .iter()
+                .all(|p| ring.n_tower() == 64 || p >> ring.n_tower() == 0),
+            "f4_fp_tower: weights set on variables past the tower"
+        );
+        for (j, r) in ring.rules.iter().enumerate() {
+            let wj = self.weight(j as u32);
+            if let Some(nx) = r.next {
+                let wn = self.weight(u32::from(nx));
+                if r.b != 0 {
+                    assert!(
+                        wn <= 2 * wj,
+                        "f4_fp_tower: weight of y_{nx} ({wn}) above twice that of y_{j} ({wj}): y_{j}² is not the leading monomial"
+                    );
+                }
+                if r.a != 0 {
+                    assert!(
+                        wn <= wj,
+                        "f4_fp_tower: rule {j} has a y_{j}·y_{nx} term and w(y_{nx}) = {wn} > w(y_{j}) = {wj}"
+                    );
+                }
+            }
+        }
+    }
+}
+
+/// The key of degree `deg`, tower mask `mask` and free exponents `free`.
 #[inline]
-pub fn mono(mask: u64, free: [u8; MAX_FREE]) -> Mono {
-    let deg = mask.count_ones() + free.iter().map(|&e| u32::from(e)).sum::<u32>();
+fn key_with_degree(deg: u32, mask: u64, free: [u8; MAX_FREE]) -> Mono {
     let mut key = (u128::from(deg) << DEG_SHIFT) | u128::from(!mask);
     for (k, &e) in free.iter().enumerate() {
         key |= u128::from(255 - e) << (FREE_SHIFT + 8 * k as u32);
     }
     key
+}
+
+/// The monomial with tower mask `mask` and free exponents `free`, in the
+/// unit grading.
+#[inline]
+pub fn mono(mask: u64, free: [u8; MAX_FREE]) -> Mono {
+    mono_w(mask, free, TowerWeights::UNIT)
+}
+
+/// The monomial with tower mask `mask` and free exponents `free`, in the
+/// grading `w`.
+#[inline]
+pub fn mono_w(mask: u64, free: [u8; MAX_FREE], w: TowerWeights) -> Mono {
+    let deg = w.mask_degree(mask) + free.iter().map(|&e| u32::from(e)).sum::<u32>();
+    key_with_degree(deg, mask, free)
 }
 
 /// The tower variables of `m`, as a mask.
@@ -230,17 +363,35 @@ pub(crate) fn divides(a: Mono, b: Mono) -> bool {
     fa.iter().zip(&fb).all(|(x, y)| x <= y)
 }
 
+/// `a | b` from the masks and free exponents alone, whatever grading
+/// either key is in.
+#[inline]
+pub(crate) fn divides_ungraded(a: Mono, b: Mono) -> bool {
+    if mask_of(a) & !mask_of(b) != 0 {
+        return false;
+    }
+    let (fa, fb) = (free_of(a), free_of(b));
+    fa.iter().zip(&fb).all(|(x, y)| x <= y)
+}
+
 #[inline]
 pub(crate) fn lcm(a: Mono, b: Mono) -> Mono {
+    lcm_w(a, b, TowerWeights::UNIT)
+}
+
+/// The lcm of `a` and `b`, keyed in the grading `w` (both must be).
+#[inline]
+pub(crate) fn lcm_w(a: Mono, b: Mono, w: TowerWeights) -> Mono {
     let (fa, fb) = (free_of(a), free_of(b));
     let mut f = [0u8; MAX_FREE];
     for k in 0..MAX_FREE {
         f[k] = fa[k].max(fb[k]);
     }
-    mono(mask_of(a) | mask_of(b), f)
+    mono_w(mask_of(a) | mask_of(b), f, w)
 }
 
-/// `a / b`, for `b | a`.
+/// `a / b`, for `b | a`. Its degree is `deg a − deg b` in any grading, so
+/// the quotient is keyed in the grading of its arguments.
 #[inline]
 pub(crate) fn quotient(a: Mono, b: Mono) -> Mono {
     let (fa, fb) = (free_of(a), free_of(b));
@@ -248,7 +399,7 @@ pub(crate) fn quotient(a: Mono, b: Mono) -> Mono {
     for k in 0..MAX_FREE {
         f[k] = fa[k] - fb[k];
     }
-    mono(mask_of(a) & !mask_of(b), f)
+    key_with_degree(degree_of(a) - degree_of(b), mask_of(a) & !mask_of(b), f)
 }
 
 #[inline]
@@ -261,7 +412,7 @@ pub(crate) fn coprime(a: Mono, b: Mono) -> bool {
 }
 
 #[inline]
-fn add_free(a: [u8; MAX_FREE], b: [u8; MAX_FREE]) -> [u8; MAX_FREE] {
+pub(crate) fn add_free(a: [u8; MAX_FREE], b: [u8; MAX_FREE]) -> [u8; MAX_FREE] {
     let mut f = [0u8; MAX_FREE];
     for k in 0..MAX_FREE {
         f[k] = a[k]
@@ -347,6 +498,13 @@ fn merge_masks(fp: Fp, terms: &mut Vec<(u64, u64)>) {
     terms.truncate(out);
 }
 
+/// The two working lists of [`TowerRing::mask_product_into`].
+#[derive(Default)]
+struct MaskScratch {
+    cur: Vec<(u64, u64)>,
+    next: Vec<(u64, u64)>,
+}
+
 /// `F_p[y_0, …, y_{n−1}, u_0, …] / (y_j² − rule_j)`. The tower variables
 /// come first; the free variables follow, at global indices
 /// `n_tower .. n_tower + n_free`.
@@ -424,84 +582,139 @@ impl TowerRing {
     }
 
     /// `coef · y^ma · y^mb` in normal form (tower parts only), pushed onto
-    /// `out` with repeats allowed.
-    fn mask_product_into(&self, fp: Fp, ma: u64, mb: u64, coef: u64, out: &mut Vec<(u64, u64)>) {
+    /// `out` with repeats allowed. `scratch` holds the working lists, so a
+    /// caller that forms many products allocates them once.
+    fn mask_product_into(
+        &self,
+        fp: Fp,
+        ma: u64,
+        mb: u64,
+        coef: u64,
+        out: &mut Vec<(u64, u64)>,
+        scratch: &mut MaskScratch,
+    ) {
         let common = ma & mb;
         if common == 0 {
             out.push((ma | mb, coef));
             return;
         }
         // y^ma · y^mb = y^(ma ∪ mb) · Π_{j ∈ ma ∩ mb} y_j.
-        let mut cur = vec![(ma | mb, coef)];
-        let mut next = Vec::new();
+        let MaskScratch { cur, next } = scratch;
+        cur.clear();
+        cur.push((ma | mb, coef));
         let mut bits = common;
         while bits != 0 {
             let j = bits.trailing_zeros() as usize;
             bits &= bits - 1;
             next.clear();
-            for &(m, c) in &cur {
-                self.mul_var_into(fp, m, j, c, &mut next);
+            for &(m, c) in cur.iter() {
+                self.mul_var_into(fp, m, j, c, next);
             }
             // Without merging, a chain of rewrites repeats monomials and
             // the list grows exponentially in the number of common bits.
-            merge_masks(fp, &mut next);
-            std::mem::swap(&mut cur, &mut next);
+            merge_masks(fp, next);
+            std::mem::swap(cur, next);
         }
-        out.extend(cur);
+        out.extend_from_slice(cur);
     }
 
-    /// `u · g` in normal form.
+    /// `u · g` in normal form (unit grading).
     pub fn mul_mono(&self, g: &RPoly, u: Mono) -> RPoly {
         let fp = Fp::new(self.p);
-        self.mul_mono_fp(fp, g, u)
+        self.mul_mono_fp(fp, g, u, TowerWeights::UNIT)
     }
 
-    fn mul_mono_fp(&self, fp: Fp, g: &RPoly, u: Mono) -> RPoly {
+    /// `u · g` in normal form, with `g`, `u` and the result keyed in `w`.
+    pub fn mul_mono_w(&self, g: &RPoly, u: Mono, w: TowerWeights) -> RPoly {
+        let fp = Fp::new(self.p);
+        self.mul_mono_fp(fp, g, u, w)
+    }
+
+    fn mul_mono_fp(&self, fp: Fp, g: &RPoly, u: Mono, w: TowerWeights) -> RPoly {
         let terms = g.monos.iter().copied().zip(g.coefs.iter().copied());
-        self.mul_terms_fp(fp, terms, g.len(), u)
+        self.mul_terms_fp(fp, terms, g.len(), u, w)
     }
 
-    fn mul_elem(&self, fp: Fp, g: &Elem, u: Mono) -> RPoly {
-        self.mul_terms_fp(fp, g.terms(), g.len(), u)
+    fn mul_elem(&self, fp: Fp, g: &Elem, u: Mono, w: TowerWeights) -> RPoly {
+        self.mul_terms_fp(fp, g.terms(), g.len(), u, w)
     }
 
     /// `u · g` in normal form, for `g` given by its terms, descending and
-    /// with non-zero coefficients (`len` of them).
+    /// with non-zero coefficients (`len` of them). `g`, `u` and the result
+    /// are keyed in the grading `w`.
     pub(crate) fn mul_terms_fp(
         &self,
         fp: Fp,
         g: impl Iterator<Item = (Mono, u32)>,
         len: usize,
         u: Mono,
+        w: TowerWeights,
     ) -> RPoly {
         let (mu, fu) = (mask_of(u), free_of(u));
-        let mut terms: Vec<(Mono, u64)> = Vec::with_capacity(len);
-        let mut carried = false;
+        // When `u` has no free variable, the key of a plain product is the
+        // key of the term plus a constant: the degree rises by that of `u`,
+        // the complemented mask loses `mu` (the masks are disjoint, so those
+        // bits are set in it and nothing borrows) and the free bytes stay.
+        let plain_shift =
+            (fu == [0; MAX_FREE]).then(|| (u128::from(degree_of(u)) << DEG_SHIFT) - u128::from(mu));
+        // A term that shares no tower variable with `u` is a plain product,
+        // injective and order-preserving: those terms stay distinct and
+        // descending, and go straight into the result. Only the terms that
+        // rewrite (`carried`) come out in no order, and only they are sorted.
+        let mut monos: Vec<Mono> = Vec::with_capacity(len);
+        let mut coefs: Vec<u32> = Vec::with_capacity(len);
+        let mut carried: Vec<(Mono, u64)> = Vec::new();
         let mut tmp: Vec<(u64, u64)> = Vec::new();
+        let mut scratch = MaskScratch::default();
         for (m, c) in g {
             let mm = mask_of(m);
-            let f = add_free(free_of(m), fu);
             if mm & mu == 0 {
-                terms.push((mono(mm | mu, f), u64::from(c)));
+                monos.push(match plain_shift {
+                    Some(shift) => m + shift,
+                    None => mono_w(mm | mu, add_free(free_of(m), fu), w),
+                });
+                coefs.push(c);
             } else {
-                carried = true;
+                let f = add_free(free_of(m), fu);
                 tmp.clear();
-                self.mask_product_into(fp, mm, mu, u64::from(c), &mut tmp);
-                for &(x, cc) in &tmp {
-                    terms.push((mono(x, f), cc));
-                }
+                self.mask_product_into(fp, mm, mu, u64::from(c), &mut tmp, &mut scratch);
+                carried.extend(tmp.iter().map(|&(x, cc)| (mono_w(x, f, w), cc)));
             }
         }
-        if carried {
-            RPoly::from_terms(fp, terms)
-        } else {
-            // A product by a monomial without carries is injective and
-            // order-preserving: the terms are distinct and still descending.
-            RPoly {
-                monos: terms.iter().map(|t| t.0).collect(),
-                coefs: terms.iter().map(|t| t.1 as u32).collect(),
+        if carried.is_empty() {
+            return RPoly { monos, coefs };
+        }
+        carried.sort_unstable_by_key(|t| std::cmp::Reverse(t.0));
+        // Merge the two descending lists, adding the coefficients of a
+        // repeated monomial and dropping a zero sum: what `from_terms` does
+        // to the concatenation. Both lists hold coefficients below `p`.
+        let mut out = RPoly {
+            monos: Vec::with_capacity(monos.len() + carried.len()),
+            coefs: Vec::with_capacity(monos.len() + carried.len()),
+        };
+        let (mut i, mut j) = (0, 0);
+        loop {
+            let m = match (monos.get(i), carried.get(j)) {
+                (Some(&a), Some(&(b, _))) => a.max(b),
+                (Some(&a), None) => a,
+                (None, Some(&(b, _))) => b,
+                (None, None) => break,
+            };
+            let mut c = 0u64;
+            if i < monos.len() && monos[i] == m {
+                c = u64::from(coefs[i]);
+                i += 1;
+            }
+            while j < carried.len() && carried[j].0 == m {
+                c = fp.add(c, carried[j].1);
+                j += 1;
+            }
+            if c != 0 {
+                out.monos.push(m);
+                out.coefs.push(c as u32);
             }
         }
+        out
     }
 
     /// The normal form of a polynomial given by arbitrary exponent vectors
@@ -586,7 +799,7 @@ impl RPoly {
             let m = terms[i].0;
             let mut c = 0u64;
             while i < terms.len() && terms[i].0 == m {
-                c = fp.add(c, terms[i].1 % fp.p);
+                c = fp.add(c, fp.reduce(terms[i].1));
                 i += 1;
             }
             if c != 0 {
@@ -626,18 +839,18 @@ impl RPoly {
 /// a divisor, so an entry costs four bytes where a sparse term costs twenty,
 /// and a new element is the echelon's own row, not a copy of it.
 #[derive(Clone, Debug)]
-struct Elem {
+pub(crate) struct Elem {
     /// Monomials, descending.
-    cols: Arc<[Mono]>,
-    start: u32,
+    pub(crate) cols: Arc<[Mono]>,
+    pub(crate) start: u32,
     /// `vals[i]` is the coefficient of `cols[start + i]`; `vals[0]` is not 0.
-    vals: Vec<u32>,
+    pub(crate) vals: Vec<u32>,
     /// Non-zero entries of `vals`.
-    len: u32,
+    pub(crate) len: u32,
 }
 
 impl Elem {
-    fn new(cols: Arc<[Mono]>, start: u32, vals: Vec<u32>) -> Self {
+    pub(crate) fn new(cols: Arc<[Mono]>, start: u32, vals: Vec<u32>) -> Self {
         debug_assert!(vals.first().is_some_and(|&v| v != 0));
         debug_assert!(start as usize + vals.len() <= cols.len());
         let len = vals.iter().filter(|&&v| v != 0).count() as u32;
@@ -649,7 +862,7 @@ impl Elem {
         }
     }
 
-    fn from_rpoly(p: RPoly) -> Self {
+    pub(crate) fn from_rpoly(p: RPoly) -> Self {
         let len = p.len() as u32;
         Elem {
             cols: p.monos.into(),
@@ -660,17 +873,17 @@ impl Elem {
     }
 
     /// Leading monomial.
-    fn lm(&self) -> Mono {
+    pub(crate) fn lm(&self) -> Mono {
         self.cols[self.start as usize]
     }
 
     /// Number of terms.
-    fn len(&self) -> usize {
+    pub(crate) fn len(&self) -> usize {
         self.len as usize
     }
 
     /// The terms, descending.
-    fn terms(&self) -> impl Iterator<Item = (Mono, u32)> + '_ {
+    pub(crate) fn terms(&self) -> impl Iterator<Item = (Mono, u32)> + '_ {
         self.cols[self.start as usize..]
             .iter()
             .zip(&self.vals)
@@ -678,7 +891,7 @@ impl Elem {
             .map(|(&m, &v)| (m, v))
     }
 
-    fn to_rpoly(&self) -> RPoly {
+    pub(crate) fn to_rpoly(&self) -> RPoly {
         let (monos, coefs) = self.terms().unzip();
         RPoly { monos, coefs }
     }
@@ -723,6 +936,52 @@ pub struct TowerF4Options {
     /// then reduces to zero, and no pivot changes. On by default; off
     /// reproduces the elimination row for row, multiply-adds included.
     pub full_rank_exit: bool,
+    /// Learn an [`F4Trace`]: on a run that ends in a refutation, record for
+    /// each step the S-rows that gave a new pivot (and the promoted rows),
+    /// and the leading monomials of the new elements. Costs nothing in
+    /// multiply-adds; the result is [`TowerF4Report::learned`].
+    pub record_trace: bool,
+    /// Replay a learned trace on another specialisation of the same system
+    /// shape: each step reduces only the recorded rows (and only the
+    /// reducers they reach), and stops with a failure as soon as the new
+    /// elements' leads differ from the trace's. Only a refutation (`1` in
+    /// the ideal) is a result of a replay; it is sound whatever the trace
+    /// was learned on, because every row computed lies in the ideal. A
+    /// replay that does not refute has not decided anything.
+    pub replay: Option<Arc<F4Trace>>,
+    /// The grading of the run: weights on the tower variables
+    /// ([`TowerWeights`]). `None` is the unit grading, and leaves every key,
+    /// every step and every count as before. With weights the inputs are
+    /// re-keyed at entry, the steps and `solving_degree_max` are weighted
+    /// degrees, and the basis comes back keyed in the grading
+    /// ([`degree_of`] on it is the weighted degree; [`mask_of`] and
+    /// [`free_of`] are unchanged).
+    pub weights: Option<TowerWeights>,
+}
+
+/// What an F4 run that ended in a refutation learned about its system
+/// shape: per step, which rows to reduce. See [`TowerF4Options::replay`].
+#[derive(Clone, Debug, Default)]
+pub struct F4Trace {
+    pub steps: Vec<TraceStep>,
+}
+
+/// One step of an [`F4Trace`].
+#[derive(Clone, Debug, Default)]
+pub struct TraceStep {
+    pub degree: u32,
+    /// `(multiplier, element)` of the rows kept: S-rows that gave a pivot,
+    /// and the S-rows promoted to reducers.
+    pub kept: std::collections::HashSet<(Mono, u32)>,
+    /// Leading monomials of the step's new elements, ascending.
+    pub fresh_lms: Vec<Mono>,
+}
+
+impl F4Trace {
+    /// Rows kept over all steps (a measure of the trace's size).
+    pub fn kept_rows(&self) -> usize {
+        self.steps.iter().map(|s| s.kept.len()).sum()
+    }
 }
 
 impl TowerF4Options {
@@ -737,7 +996,15 @@ impl TowerF4Options {
             on_stop: None,
             on_sig_step: None,
             full_rank_exit: true,
+            record_trace: false,
+            replay: None,
+            weights: None,
         }
+    }
+    /// Run in the grading `w` (see [`TowerF4Options::weights`]).
+    pub fn with_weights(mut self, w: TowerWeights) -> Self {
+        self.weights = (!w.is_unit()).then_some(w);
+        self
     }
     pub fn on_step(mut self, f: fn(usize, &StepTrace)) -> Self {
         self.on_step = Some(f);
@@ -853,6 +1120,13 @@ pub struct TowerF4Report {
     /// entries (`dense_entries`). The basis fields are those before the
     /// step, and `pairs_left` counts the step's pairs again.
     pub stopped_step: Option<StepTrace>,
+    /// With [`TowerF4Options::record_trace`] and a refutation: the trace.
+    pub learned: Option<F4Trace>,
+    /// With [`TowerF4Options::replay`]: why the replay stopped without a
+    /// refutation (a replay that refuted leaves `None` and `inconsistent`).
+    pub replay_failure: Option<&'static str>,
+    /// For a lead mismatch: (step, new elements found, new elements in the trace).
+    pub replay_mismatch: Option<(usize, usize, usize)>,
 }
 
 // ── Sparse rows and the two eliminations ─────────────────────────────
@@ -867,22 +1141,70 @@ pub(crate) struct Row {
 
 pub(crate) const NONE: u32 = u32::MAX;
 
+/// A pivot row prepared for [`Acc::sub_tail`]: the row, lead first and
+/// columns ascending, and the words of the accumulator's bitset that its tail
+/// has columns in, with the bits to set in each.
+///
+/// Setting the bits of a long row one entry at a time makes the entries that
+/// share a word wait, each for the store of the one before it. The words a
+/// row touches do not change, so the list is made once with the pivot and
+/// read every time the pivot is subtracted.
+pub(crate) struct Pivot {
+    row: Row,
+    /// `(word, bits)`, in the order of the tail's columns.
+    runs: Vec<(u32, u64)>,
+}
+
+impl Pivot {
+    pub(crate) fn new(row: Row) -> Self {
+        let mut runs: Vec<(u32, u64)> = Vec::new();
+        for &c in &row.cols[1..] {
+            let (w, b) = (c / 64, 1u64 << (c % 64));
+            match runs.last_mut() {
+                Some(r) if r.0 == w => r.1 |= b,
+                _ => runs.push((w, b)),
+            }
+        }
+        Pivot { row, runs }
+    }
+
+    pub(crate) fn into_row(self) -> Row {
+        self.row
+    }
+}
+
 /// A dense accumulator with a bitset of the columns it may be non-zero
 /// in, scanned in ascending order while rows are subtracted. `hi` is the
 /// last bitset word anything was written to, so a scan stops there instead
 /// of at the end of the matrix.
+///
+/// While the matrix is narrow enough that no entry can reach `2⁶⁴`, an entry
+/// is held unreduced (`lazy`): a subtraction adds its product and leaves the
+/// reduction to the read, which goes through [`take`](Acc::take). A column
+/// left holding a multiple of `p` reads as zero there, as it did when every
+/// subtraction reduced.
 pub(crate) struct Acc {
     pub(crate) vals: Vec<u64>,
     pub(crate) bits: Vec<u64>,
     pub(crate) hi: usize,
+    lazy: bool,
 }
 
 impl Acc {
-    pub(crate) fn new(n_cols: usize) -> Self {
+    /// An accumulator for rows of `n_cols` columns over `fp`.
+    ///
+    /// A column starts below `p` and gains at most one product `(p − 1)²`
+    /// from each pivot row subtracted, and a scan meets each column's pivot
+    /// once, at a lead to the left of it: fewer than `n_cols` products. Their
+    /// sum stays below `2⁶⁴` when `n_cols · (p − 1)² + p` does, and any wider
+    /// matrix reduces at every subtraction.
+    pub(crate) fn new(fp: Fp, n_cols: usize) -> Self {
+        let worst = n_cols as u128 * u128::from(fp.p - 1).pow(2) + u128::from(fp.p);
         Acc {
             vals: vec![0; n_cols],
             bits: vec![0; n_cols.div_ceil(64).max(1)],
             hi: 0,
+            lazy: worst < 1 << 64,
         }
     }
 
@@ -895,34 +1217,51 @@ impl Acc {
         self.hi = row.cols.last().map_or(0, |&c| c as usize / 64);
     }
 
-    /// Subtract `f · row` (without its lead, which the caller zeroes). New
-    /// columns are always to the right of the lead, so a scan standing on
-    /// the lead's word sees those in its own word through `word`.
+    /// Column `c`, reduced, leaving it zero.
+    #[inline(always)]
+    pub(crate) fn take(&mut self, fp: Fp, c: usize) -> u64 {
+        let v = std::mem::take(&mut self.vals[c]);
+        if self.lazy {
+            fp.reduce(v)
+        } else {
+            v
+        }
+    }
+
+    /// Subtract `f · pivot` (without its lead, which the caller zeroes), for
+    /// `f < p`. The columns written are to the right of the lead, so those
+    /// in the lead's own word, which the caller holds in `word` with the
+    /// accumulator's copy cleared, are collected from the accumulator once
+    /// the row is done.
     #[inline]
     pub(crate) fn sub_tail(
         &mut self,
         fp: Fp,
         f: u64,
-        row: &Row,
+        piv: &Pivot,
         cur_word: usize,
         word: &mut u64,
     ) -> u64 {
         let nf = fp.neg(f);
-        for (&c, &v) in row.cols[1..].iter().zip(&row.vals[1..]) {
-            let ci = c as usize;
-            let x = self.vals[ci] + nf * u64::from(v);
-            self.vals[ci] = fp.reduce(x);
-            let (w, b) = (ci / 64, 1u64 << (ci % 64));
-            if w == cur_word {
-                *word |= b;
-            } else {
-                self.bits[w] |= b;
+        let (cols, vals) = (&piv.row.cols[1..], &piv.row.vals[1..]);
+        if self.lazy {
+            for (&c, &v) in cols.iter().zip(vals) {
+                self.vals[c as usize] += nf * u64::from(v);
+            }
+        } else {
+            for (&c, &v) in cols.iter().zip(vals) {
+                let x = &mut self.vals[c as usize];
+                *x = fp.reduce(*x + nf * u64::from(v));
             }
         }
-        if let Some(&c) = row.cols.last() {
+        for &(w, b) in &piv.runs {
+            self.bits[w as usize] |= b;
+        }
+        *word |= std::mem::take(&mut self.bits[cur_word]);
+        if let Some(&c) = piv.row.cols.last() {
             self.hi = self.hi.max(c as usize / 64);
         }
-        row.cols.len() as u64 - 1
+        cols.len() as u64
     }
 
     /// Move every non-zero entry from word `w` on into `out`, scaled by
@@ -936,12 +1275,26 @@ impl Acc {
                 let b = word.trailing_zeros() as usize;
                 word &= word - 1;
                 let c = w * 64 + b;
-                let v = self.vals[c];
-                self.vals[c] = 0;
+                let v = self.take(fp, c);
                 if v != 0 {
                     out.cols.push(c as u32);
                     out.vals.push(fp.mul(v, scale) as u32);
                 }
+            }
+            w += 1;
+        }
+    }
+
+    /// Leave the accumulator clean from word `w` on, discarding what it
+    /// holds there.
+    pub(crate) fn clear_from(&mut self, w: usize) {
+        let mut w = w;
+        while w <= self.hi {
+            let mut word = std::mem::take(&mut self.bits[w]);
+            while word != 0 {
+                let b = word.trailing_zeros() as usize;
+                word &= word - 1;
+                self.vals[w * 64 + b] = 0;
             }
             w += 1;
         }
@@ -952,7 +1305,7 @@ impl Acc {
 /// pivots so far and kept, monic, if anything survives. Rows are
 /// semi-reduced: once the lead is a new pivot column the rest is kept as it
 /// stands. Returns the pivots, or `None` past the deadline.
-fn echelon(
+pub(crate) fn echelon(
     fp: Fp,
     mut rows: Vec<Row>,
     n_cols: usize,
@@ -962,8 +1315,8 @@ fn echelon(
     rows.retain(|r| !r.cols.is_empty());
     rows.sort_by_key(|r| (r.cols[0], r.cols.len()));
     let mut pivot_of = vec![NONE; n_cols];
-    let mut pivots: Vec<Row> = Vec::new();
-    let mut acc = Acc::new(n_cols);
+    let mut pivots: Vec<Pivot> = Vec::new();
+    let mut acc = Acc::new(fp, n_cols);
     for (k, row) in rows.into_iter().enumerate() {
         if k % 256 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
             return None;
@@ -977,10 +1330,10 @@ fn echelon(
                 .map(|&v| fp.mul(u64::from(v), inv) as u32)
                 .collect();
             pivot_of[row.cols[0] as usize] = pivots.len() as u32;
-            pivots.push(Row {
+            pivots.push(Pivot::new(Row {
                 cols: row.cols,
                 vals,
-            });
+            }));
             continue;
         }
         acc.load(&row);
@@ -993,8 +1346,7 @@ fn echelon(
                 let b = word.trailing_zeros() as usize;
                 word &= word - 1;
                 let c = w * 64 + b;
-                let v = acc.vals[c];
-                acc.vals[c] = 0;
+                let v = acc.take(fp, c);
                 if v == 0 {
                     continue;
                 }
@@ -1018,10 +1370,10 @@ fn echelon(
         }
         if let Some(out) = found {
             pivot_of[out.cols[0] as usize] = pivots.len() as u32;
-            pivots.push(out);
+            pivots.push(Pivot::new(out));
         }
     }
-    Some(pivots)
+    Some(pivots.into_iter().map(Pivot::into_row).collect())
 }
 
 /// `acc += a · b` with lazy reduction: every entry stays below `2⁶³`
@@ -1034,6 +1386,38 @@ fn lazy_axpy(acc: &mut [u64], a: u32, b: &[u32], m: u64) {
         let s = *x + u64::from(a) * u64::from(y);
         *x = s - ((s >> 63).wrapping_neg() & m);
     }
+}
+
+/// `acc += a · b` with no reduction at all: the caller has bounded the
+/// number of products an entry can take (see [`Kernel::with_budget`]) so
+/// the sum stays below `2⁶⁴`, and reads every entry through
+/// [`Fp::reduce`].
+#[inline(always)]
+fn exact_axpy(acc: &mut [u64], a: u32, b: &[u32]) {
+    let n = acc.len().min(b.len());
+    for (x, &y) in acc[..n].iter_mut().zip(&b[..n]) {
+        *x += u64::from(a) * u64::from(y);
+    }
+}
+
+/// [`exact_axpy`] compiled for AVX2.
+///
+/// # Safety
+/// The CPU must support AVX2.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn exact_axpy_avx2(acc: &mut [u64], a: u32, b: &[u32]) {
+    exact_axpy(acc, a, b)
+}
+
+/// [`exact_axpy`] compiled for AVX-512.
+///
+/// # Safety
+/// The CPU must support AVX-512F.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn exact_axpy_avx512(acc: &mut [u64], a: u32, b: &[u32]) {
+    exact_axpy(acc, a, b)
 }
 
 /// [`lazy_axpy`] compiled for AVX2.
@@ -1090,11 +1474,21 @@ struct Kernel {
     /// The largest multiple of `p` at most `2⁶³`, when `p < 2³¹`.
     lazy: Option<u64>,
     lanes: Lanes,
+    /// No entry can take enough products to reach `2⁶⁴`: nothing is
+    /// subtracted at all and every read goes through [`Fp::reduce`].
+    exact: bool,
 }
 
 impl Kernel {
-    fn new(fp: Fp) -> Self {
-        Self::with_lanes(fp, Lanes::detect())
+    /// A kernel for accumulators that take at most `max_products` products
+    /// each between two full reductions, all read through [`Fp::reduce`]:
+    /// when `max_products · (p − 1)² + p < 2⁶⁴` the entries are only added
+    /// to, with no conditional subtraction of a multiple of `p`.
+    fn with_budget(fp: Fp, max_products: usize) -> Self {
+        let mut k = Self::with_lanes(fp, Lanes::detect());
+        let worst = max_products as u128 * u128::from(fp.p - 1).pow(2) + u128::from(fp.p);
+        k.exact = worst < 1 << 64;
+        k
     }
 
     fn with_lanes(fp: Fp, lanes: Lanes) -> Self {
@@ -1102,6 +1496,7 @@ impl Kernel {
             fp,
             lazy: (fp.p < 1 << 31).then(|| ((1u64 << 63) / fp.p) * fp.p),
             lanes,
+            exact: false,
         }
     }
 
@@ -1109,6 +1504,18 @@ impl Kernel {
     /// below `2⁶³` (lazy) or below `p` (otherwise), and stays so.
     #[inline]
     fn axpy(self, acc: &mut [u64], a: u32, b: &[u32]) {
+        if self.exact {
+            match self.lanes {
+                #[cfg(target_arch = "x86_64")]
+                // SAFETY: `Lanes::detect` found AVX-512F on this CPU.
+                Lanes::Avx512 => unsafe { exact_axpy_avx512(acc, a, b) },
+                #[cfg(target_arch = "x86_64")]
+                // SAFETY: `Lanes::detect` found AVX2 on this CPU.
+                Lanes::Avx2 => unsafe { exact_axpy_avx2(acc, a, b) },
+                _ => exact_axpy(acc, a, b),
+            }
+            return;
+        }
         match (self.lazy, self.lanes) {
             #[cfg(target_arch = "x86_64")]
             // SAFETY: `Lanes::detect` found AVX-512F on this CPU.
@@ -1135,33 +1542,38 @@ impl Kernel {
 }
 
 /// Why an elimination stopped early.
-enum Stop {
+pub(crate) enum Stop {
     Deadline,
     Oversize,
 }
 
 /// Counters of one elimination, for the trace.
 #[derive(Default)]
-struct ElimStats {
+pub(crate) struct ElimStats {
     /// S-rows that the reducers alone do not reduce to zero, among those
     /// reduced.
-    residual_rows: usize,
+    pub(crate) residual_rows: usize,
     /// S-rows reduced when the echelon had a pivot on every `Q` column, if
     /// it did, and the S-rows then skipped.
-    full_rank_after: Option<usize>,
-    skipped_rows: usize,
+    pub(crate) full_rank_after: Option<usize>,
+    pub(crate) skipped_rows: usize,
     /// Columns no reducer leads: those without a divisor.
-    q_cols: usize,
+    pub(crate) q_cols: usize,
     /// Entries of the reduced reducer block `B'`.
-    dense_entries: u64,
-    muladds: u64,
+    pub(crate) dense_entries: u64,
+    pub(crate) muladds: u64,
     /// Time spent on `B'`, and on the S-rows and their echelon.
-    ms_reducers: f64,
-    ms_residues: f64,
+    pub(crate) ms_reducers: f64,
+    pub(crate) ms_residues: f64,
+    /// Input: form `B'` only for the reducers the S-rows reach, directly or
+    /// through other reducers (a replay; the plain run forms all of it).
+    pub(crate) prune_reducers: bool,
+    /// Output: the S-rows (indices) that gave a new pivot, in order.
+    pub(crate) useful: Vec<u32>,
 }
 
 /// Forms row `k` of a set of rows on demand.
-type FormRow<'a> = &'a (dyn Fn(usize) -> Row + Sync);
+pub(crate) type FormRow<'a> = &'a (dyn Fn(usize) -> Row + Sync);
 
 /// One step's matrix, eliminated in the manner of Faugère–Lachartre.
 ///
@@ -1189,7 +1601,7 @@ type FormRow<'a> = &'a (dyn Fn(usize) -> Row + Sync);
 /// rows over `Q` that step 3 leaves. `B'` larger than `max_dense` entries
 /// stops it as oversize.
 #[allow(clippy::too_many_arguments)]
-fn eliminate(
+pub(crate) fn eliminate(
     fp: Fp,
     n_cols: usize,
     piv_leads: &[u32],
@@ -1202,7 +1614,12 @@ fn eliminate(
     full_rank_exit: bool,
     st: &mut ElimStats,
 ) -> Result<Echelon, Stop> {
-    let kern = Kernel::new(fp);
+    // An entry of an accumulator takes at most one product per column of
+    // its row at a pivot column (at most `n_cols`), and later one per
+    // earlier lead (at most `nq ≤ n_cols`, the old and the chunk's new
+    // leads together), the rest being reduced in between: `2 · n_cols`
+    // products bound every entry between two reductions.
+    let kern = Kernel::with_budget(fp, 2 * n_cols + 4);
     // Q, ascending; `q_start[c]` is the first Q index at or after `c`.
     let mut q_of = vec![NONE; n_cols];
     let mut q_start = vec![0u32; n_cols];
@@ -1246,6 +1663,29 @@ fn eliminate(
         pos[k as usize] = i as u32;
     }
     let mut bred: Vec<Vec<u32>> = vec![Vec::new(); n_piv];
+    // A replay forms `B'` only for the reducers its S-rows reach.
+    let needed: Option<Vec<bool>> = st.prune_reducers.then(|| {
+        let mut need = vec![false; n_piv];
+        let mut work: Vec<u32> = Vec::new();
+        let mark = |row: &Row, from: usize, need: &mut Vec<bool>, work: &mut Vec<u32>| {
+            for &c in &row.cols[from..] {
+                if q_of[c as usize] == NONE {
+                    let j = pivot_of[c as usize];
+                    if !need[j as usize] {
+                        need[j as usize] = true;
+                        work.push(j);
+                    }
+                }
+            }
+        };
+        for k in 0..n_s {
+            mark(&s_row(k), 0, &mut need, &mut work);
+        }
+        while let Some(j) = work.pop() {
+            mark(&piv_row(j as usize), 1, &mut need, &mut work);
+        }
+        need
+    });
     const BLOCK: usize = 64;
     for (b, block) in order.chunks(BLOCK).enumerate() {
         let first = (b * BLOCK) as u32;
@@ -1257,8 +1697,8 @@ fn eliminate(
                 let mut acc = vec![0u64; nq - s0];
                 let mut later = Vec::new();
                 let mut work = 0u64;
-                if past() {
-                    return (acc, later, work);
+                if past() || needed.as_ref().is_some_and(|n| !n[k as usize]) {
+                    return (Vec::new(), later, work);
                 }
                 let row = piv_row(k as usize);
                 debug_assert_eq!(row.cols[0], piv_leads[k as usize]);
@@ -1350,7 +1790,9 @@ fn eliminate(
                         }
                     }
                 }
-                ents.sort_unstable();
+                // (column, row) is unique, so the key orders the entries
+                // exactly as the whole tuple did
+                ents.sort_unstable_by_key(|&(c, r, _)| u64::from(c) << 32 | u64::from(r));
                 for &(c, r, v) in &ents {
                     let (off, end) = (
                         r as usize * nq + q_start[c as usize] as usize,
@@ -1428,6 +1870,7 @@ fn eliminate(
                 .collect();
             let at = new_leads.partition_point(|&m| m < l as u32);
             new_leads.insert(at, l as u32);
+            st.useful.push(rows[i] as u32);
             if leads.len() + new_leads.len() == nq {
                 st.full_rank_after = Some(done + i + 1);
             }
@@ -1449,10 +1892,10 @@ fn eliminate(
 /// `l` of `leads` (ascending), is the pivot whose lead is the `Q` column `l`,
 /// which is column `q_col[l]` of the step: monic, dense over the `Q` columns
 /// from `l` on. The other `rows` are empty.
-struct Echelon {
-    q_col: Vec<u32>,
-    leads: Vec<u32>,
-    rows: Vec<Vec<u32>>,
+pub(crate) struct Echelon {
+    pub(crate) q_col: Vec<u32>,
+    pub(crate) leads: Vec<u32>,
+    pub(crate) rows: Vec<Vec<u32>>,
 }
 
 impl Echelon {
@@ -1500,11 +1943,23 @@ struct State {
     /// Active leading monomial → element.
     lm_index: MonoMap<u32>,
     pairs: Vec<Pair>,
+    /// The grading every key of this run is in.
+    w: TowerWeights,
 }
 
 /// Every monomial `L'` with `lo | L' | L`, `L'` ≠ `L`, is passed to `f`
 /// until it returns `true`; returns whether one did.
-fn any_between(lo: Mono, l: Mono, mut f: impl FnMut(Mono) -> bool) -> bool {
+pub(crate) fn any_between(lo: Mono, l: Mono, f: impl FnMut(Mono) -> bool) -> bool {
+    any_between_w(lo, l, TowerWeights::UNIT, f)
+}
+
+/// [`any_between`] with every monomial keyed in the grading `w`.
+pub(crate) fn any_between_w(
+    lo: Mono,
+    l: Mono,
+    w: TowerWeights,
+    mut f: impl FnMut(Mono) -> bool,
+) -> bool {
     let (lo_mask, l_mask) = (mask_of(lo), mask_of(l));
     let extra = l_mask & !lo_mask;
     let (lo_f, l_f) = (free_of(lo), free_of(l));
@@ -1513,7 +1968,7 @@ fn any_between(lo: Mono, l: Mono, mut f: impl FnMut(Mono) -> bool) -> bool {
     loop {
         let mut fv = lo_f;
         loop {
-            let cand = mono(lo_mask | s, fv);
+            let cand = mono_w(lo_mask | s, fv, w);
             if cand != l && f(cand) {
                 return true;
             }
@@ -1560,7 +2015,7 @@ impl State {
             self.pairs.push(Pair {
                 kind: PairKind::Tower(h as u32, v as u8),
                 lcm: lh,
-                deg: dh + 1,
+                deg: dh + self.w.weight(v),
             });
         }
 
@@ -1576,7 +2031,7 @@ impl State {
             if !self.active[g] {
                 continue;
             }
-            let l = lcm(lh, self.lm[g]);
+            let l = lcm_w(lh, self.lm[g], self.w);
             let e = groups.entry(l).or_insert((g as u32, false));
             if coprime(lh, self.lm[g]) {
                 e.1 = true;
@@ -1584,7 +2039,7 @@ impl State {
         }
         let mut kept: Vec<(u32, Mono)> = Vec::new();
         for (&l, &(g, has_coprime)) in &groups {
-            if any_between(lh, l, |c| groups.contains_key(&c)) {
+            if any_between_w(lh, l, self.w, |c| groups.contains_key(&c)) {
                 rep.pairs_chain_skipped += 1;
                 continue;
             }
@@ -1597,13 +2052,14 @@ impl State {
         // Old critical pairs whose lcm `LM(h)` divides, strictly on both
         // sides (criterion B).
         let lm = &self.lm;
+        let w = self.w;
         let mut dropped = 0u64;
         self.pairs.retain(|p| match p.kind {
             PairKind::Tower(..) => true,
             PairKind::Critical(i, j) => {
                 let keep = !divides(lh, p.lcm)
-                    || lcm(lm[i as usize], lh) == p.lcm
-                    || lcm(lm[j as usize], lh) == p.lcm;
+                    || lcm_w(lm[i as usize], lh, w) == p.lcm
+                    || lcm_w(lm[j as usize], lh, w) == p.lcm;
                 if !keep {
                     dropped += 1;
                 }
@@ -1640,7 +2096,7 @@ impl State {
         loop {
             let mut fv = [0u8; MAX_FREE];
             loop {
-                if let Some(&g) = self.lm_index.get(&mono(s, fv)) {
+                if let Some(&g) = self.lm_index.get(&mono_w(s, fv, self.w)) {
                     if best
                         .is_none_or(|b| self.polys[g as usize].len() < self.polys[b as usize].len())
                     {
@@ -1711,8 +2167,11 @@ pub(crate) fn staircase_at_most(
         bound: usize,
     ) -> bool {
         let (lms, n_tower, n_free, cap) = ctx;
+        // Divisibility on masks and exponents alone: the leads may be keyed
+        // in a weighted grading, which `divides`'s degree test would mix
+        // with this unit-keyed `cur`.
         let cur = mono(mask, *free);
-        if lms.iter().any(|&l| divides(l, cur)) {
+        if lms.iter().any(|&l| divides_ungraded(l, cur)) {
             return true;
         }
         if k == n_tower + n_free {
@@ -1750,49 +2209,149 @@ pub(crate) fn staircase_at_most(
 
 /// A row of a step's matrix, kept as the product that forms it.
 #[derive(Clone, Copy, Debug)]
-struct RowDesc {
-    mult: Mono,
-    g: u32,
+pub(crate) struct RowDesc {
+    pub(crate) mult: Mono,
+    pub(crate) g: u32,
     /// The product's leading monomial and number of terms.
-    lead: Mono,
-    len: u32,
+    pub(crate) lead: Mono,
+    pub(crate) len: u32,
+    /// Where the product itself is held in the step's [`ProductCache`], or
+    /// [`NONE`] when it is not and must be formed again.
+    pub(crate) at: u32,
+}
+
+/// The most terms a step keeps of the products its symbolic preprocessing
+/// forms. A term costs eight bytes (a `u32` column number and a `u32`
+/// coefficient), so the stored payload is at most 64 MiB however large the
+/// step. This bounds `len`, not allocated memory: the two vectors grow by
+/// doubling, so their capacity (and, while one reallocates, the old and new
+/// buffers together) can exceed that, by up to about twice in the worst
+/// case. That is still small beside the working set of the steps whose
+/// products do not fit in memory together, which is why a row is formed on
+/// demand at all. A product that would pass the limit is not kept and is
+/// formed again when its row is eliminated.
+pub(crate) const PRODUCT_CACHE_TERMS: usize = 1 << 23;
+
+/// The products a step's scan has formed, one after another, so that the
+/// elimination reads each row back instead of multiplying again. A row is
+/// eliminated once, and the products are deterministic: a cached row is the
+/// row the product would give.
+///
+/// A term is kept as the number its monomial was given when the scan first
+/// met it (the value of `examined`), not as the monomial: the columns are
+/// not known until the scan is over, and a number is turned into its column
+/// by an array read where a monomial needs a hash lookup.
+#[derive(Default)]
+pub(crate) struct ProductCache {
+    pub(crate) ids: Vec<u32>,
+    pub(crate) coefs: Vec<u32>,
+    /// Terms this cache may hold.
+    limit: usize,
+}
+
+impl ProductCache {
+    pub(crate) fn new(limit: usize) -> Self {
+        ProductCache {
+            // A position is a `u32` below `NONE`.
+            limit: limit.min(NONE as usize - 1),
+            ..Default::default()
+        }
+    }
+
+    /// Whether a product of `terms` terms fits.
+    pub(crate) fn has_room(&self, terms: usize) -> bool {
+        self.ids.len() + terms <= self.limit
+    }
+
+    /// Keeps a product, which must fit: its position.
+    pub(crate) fn keep(&mut self, ids: &[u32], coefs: &[u32]) -> u32 {
+        debug_assert!(self.has_room(ids.len()) && ids.len() == coefs.len());
+        let at = self.ids.len() as u32;
+        self.ids.extend_from_slice(ids);
+        self.coefs.extend_from_slice(coefs);
+        at
+    }
+}
+
+/// The number `examined` holds for `m`: a monomial is numbered when it is
+/// first met, in order of arrival, and then joins `frontier`.
+#[inline]
+pub(crate) fn number_of(examined: &mut MonoMap<u32>, frontier: &mut Vec<Mono>, m: Mono) -> u32 {
+    let next = examined.len() as u32;
+    *examined.entry(m).or_insert_with(|| {
+        frontier.push(m);
+        next
+    })
+}
+
+/// The columns of a matrix over the monomials of `examined`, numbered as
+/// [`number_of`] does: the monomials, descending (column `i` is `cols[i]`),
+/// and the column of each number.
+pub(crate) fn order_columns(examined: &MonoMap<u32>) -> (Vec<Mono>, Vec<u32>) {
+    let mut numbered: Vec<(Mono, u32)> = examined.iter().map(|(&m, &n)| (m, n)).collect();
+    numbered.par_sort_unstable_by(|a, b| b.0.cmp(&a.0));
+    let mut col_of_number = vec![0u32; numbered.len()];
+    for (i, &(_, n)) in numbered.iter().enumerate() {
+        col_of_number[n as usize] = i as u32;
+    }
+    (
+        numbered.into_iter().map(|(m, _)| m).collect(),
+        col_of_number,
+    )
 }
 
 /// Forms the products `mult · polys[g]` of `todo` a batch at a time and
 /// records each non-empty one in `out`. Every monomial of a product, past
-/// its first `skip`, that `examined` has not seen joins `frontier`. The
-/// products themselves are dropped. Returns the number of terms formed.
+/// its first `skip`, that `examined` has not seen joins `frontier` and is
+/// numbered there, in order of arrival. A product is kept in `cache` while it
+/// has room and dropped otherwise. Returns the number of terms formed.
+///
+/// The first `skip` monomials are ones `examined` has seen.
 #[allow(clippy::too_many_arguments)]
 fn scan_products(
     ring: &TowerRing,
     fp: Fp,
+    w: TowerWeights,
     polys: &[Elem],
     todo: &[(Mono, u32)],
     skip: usize,
     out: &mut Vec<RowDesc>,
-    examined: &mut MonoMap<()>,
+    examined: &mut MonoMap<u32>,
     frontier: &mut Vec<Mono>,
+    cache: &mut ProductCache,
 ) -> u64 {
     let mut terms = 0u64;
+    let mut ids: Vec<u32> = Vec::new();
     for batch in todo.chunks(1024) {
         let prods: Vec<RPoly> = batch
             .par_iter()
-            .map(|&(mult, g)| ring.mul_elem(fp, &polys[g as usize], mult))
+            .map(|&(mult, g)| ring.mul_elem(fp, &polys[g as usize], mult, w))
             .collect();
         for (&(mult, g), p) in batch.iter().zip(&prods) {
             let Some(lead) = p.lm() else { continue };
             terms += p.len() as u64;
+            let keep = cache.has_room(p.len());
+            ids.clear();
+            if keep {
+                ids.extend(p.monos.iter().take(skip).map(|m| examined[m]));
+            }
+            for &m in p.monos.iter().skip(skip) {
+                let id = number_of(examined, frontier, m);
+                if keep {
+                    ids.push(id);
+                }
+            }
             out.push(RowDesc {
                 mult,
                 g,
                 lead,
                 len: p.len() as u32,
+                at: if keep {
+                    cache.keep(&ids, &p.coefs)
+                } else {
+                    NONE
+                },
             });
-            for &m in p.monos.iter().skip(skip) {
-                if examined.insert(m, ()).is_none() {
-                    frontier.push(m);
-                }
-            }
         }
     }
     terms
@@ -1803,7 +2362,20 @@ fn scan_products(
 /// **F4 on `R`** for the ideal generated by `input` (tower normal forms),
 /// with the normal selection strategy. See the module notes.
 pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> TowerF4Report {
+    f4_tower_cached(input, ring, opts, PRODUCT_CACHE_TERMS)
+}
+
+/// [`f4_tower`] with a step keeping at most `cache_terms` terms of its
+/// products (see [`ProductCache`]). The result does not depend on it.
+fn f4_tower_cached(
+    input: &[RPoly],
+    ring: &TowerRing,
+    opts: &TowerF4Options,
+    cache_terms: usize,
+) -> TowerF4Report {
     ring.check();
+    let w = opts.weights.unwrap_or(TowerWeights::UNIT);
+    w.check(ring);
     let started = Instant::now();
     let fp = Fp::new(ring.p);
     let mut rep = TowerF4Report::default();
@@ -1818,9 +2390,25 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
         }]
     };
 
-    let inputs: Vec<RPoly> = input.iter().filter(|p| !p.is_empty()).cloned().collect();
+    let mut inputs: Vec<RPoly> = input.iter().filter(|p| !p.is_empty()).cloned().collect();
+    if !w.is_unit() {
+        // Re-key every term in the grading. The map is injective on
+        // (mask, free), so the terms stay distinct; only their order moves.
+        for p in &mut inputs {
+            let mut t: Vec<(Mono, u32)> = p
+                .monos
+                .iter()
+                .zip(&p.coefs)
+                .map(|(&m, &c)| (mono_w(mask_of(m), free_of(m), w), c))
+                .collect();
+            t.sort_unstable_by_key(|x| std::cmp::Reverse(x.0));
+            p.monos = t.iter().map(|x| x.0).collect();
+            p.coefs = t.iter().map(|x| x.1).collect();
+        }
+    }
     if inputs.iter().any(|p| p.is_unit()) {
         rep.inconsistent = true;
+        rep.learned = opts.record_trace.then(F4Trace::default);
         rep.basis = unit();
         return finish(rep);
     }
@@ -1864,6 +2452,7 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
     };
     if start.iter().any(|p| p.is_unit()) {
         rep.inconsistent = true;
+        rep.learned = opts.record_trace.then(F4Trace::default);
         rep.basis = unit();
         return finish(rep);
     }
@@ -1876,12 +2465,14 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
         active: Vec::new(),
         lm_index: MonoMap::default(),
         pairs: Vec::new(),
+        w,
     };
     for p in start {
         s.insert(Elem::from_rpoly(p), &mut rep);
     }
     // (solving_degree_max, max_cols_to_solution, steps_to_solution)
     let mut learned = (0u32, 0usize, 0usize);
+    let mut trace_steps: Vec<TraceStep> = Vec::new();
     let mut max_cols_so_far = 0usize;
 
     let active_basis = |s: &State| -> Vec<RPoly> {
@@ -1942,12 +2533,34 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
                 PairKind::Tower(g, v) => {
                     tr.tower_pairs += 1;
                     // A tower multiplier lies inside LM(g), a half's outside it.
-                    let mult = mono(1u64 << v, [0; MAX_FREE]);
+                    let mult = mono_w(1u64 << v, [0; MAX_FREE], s.w);
                     if seen.insert((mult, g), ()).is_none() {
                         jobs.push((mult, g));
                     }
                 }
             }
+        }
+        // Replay: keep only the rows the trace kept at this step. The lcm
+        // columns stay as they are: a column of `lcm_cols` is never searched
+        // for a reducer, and the row promoted there (kept) is what leads it;
+        // dropping a column whose promoted row is a tower product would send
+        // it to the reducer search and change the matrix.
+        let rstep: Option<&TraceStep> = match &opts.replay {
+            None => None,
+            Some(trace) => match trace.steps.get(rep.steps - 1) {
+                None => {
+                    rep.replay_failure = Some("trace exhausted");
+                    break;
+                }
+                Some(ts) if ts.degree != d => {
+                    rep.replay_failure = Some("step degree differs");
+                    break;
+                }
+                Some(ts) => Some(ts),
+            },
+        };
+        if let Some(ts) = rstep {
+            jobs.retain(|j| ts.kept.contains(j));
         }
         rep.critical_pairs_reduced += tr.critical_pairs as u64;
         rep.tower_pairs_reduced += tr.tower_pairs as u64;
@@ -1955,20 +2568,30 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
         // Symbolic preprocessing, one frontier at a time. A row is kept as
         // the product that makes it and formed again when it is eliminated:
         // the products of a large step do not fit in memory together, their
-        // monomials do.
-        let mut examined: MonoMap<()> = lcm_cols.clone();
+        // monomials do. The first `cache_terms` terms of products are kept
+        // as well, and the elimination reads those back.
+        // Every monomial the matrix will have a column for, each with the
+        // number it was first met under: the lcm columns first.
+        let mut examined: MonoMap<u32> = lcm_cols
+            .keys()
+            .enumerate()
+            .map(|(i, &m)| (m, i as u32))
+            .collect();
         let mut no_divisor: MonoMap<()> = MonoMap::default();
         let mut frontier: Vec<Mono> = Vec::new();
         let mut s_desc: Vec<RowDesc> = Vec::with_capacity(jobs.len());
+        let mut cache = ProductCache::new(cache_terms);
         let mut nnz = scan_products(
             ring,
             fp,
+            s.w,
             &s.polys,
             &jobs,
             0,
             &mut s_desc,
             &mut examined,
             &mut frontier,
+            &mut cache,
         );
         let mut r_desc: Vec<RowDesc> = Vec::new();
         let mut aborted = false;
@@ -1995,12 +2618,14 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
             nnz += scan_products(
                 ring,
                 fp,
+                s.w,
                 &s.polys,
                 &todo,
                 1,
                 &mut r_desc,
                 &mut examined,
                 &mut frontier,
+                &mut cache,
             );
             debug_assert!(
                 r_desc[before..]
@@ -2032,14 +2657,14 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
         rep.reducer_rows += r_desc.len() as u64;
 
         // Columns, descending.
-        let mut cols: Vec<Mono> = examined.keys().copied().collect();
-        drop(examined);
-        cols.par_sort_unstable_by(|a, b| b.cmp(a));
-        let col_of: MonoMap<u32> = cols
-            .iter()
-            .enumerate()
-            .map(|(i, &m)| (m, i as u32))
-            .collect();
+        let (cols, col_of_id) = order_columns(&examined);
+        // The map of the scan becomes the column map: each monomial's number
+        // is replaced by its column. The numbers kept in the cache are turned
+        // into columns by `col_of_id`.
+        let mut col_of = examined;
+        for c in col_of.values_mut() {
+            *c = col_of_id[*c as usize];
+        }
         let n_cols = cols.len();
         let mut pivot_of = vec![NONE; n_cols];
         let mut piv: Vec<RowDesc> = r_desc;
@@ -2083,7 +2708,17 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
         );
         let polys = &s.polys;
         let form = |d: &RowDesc| -> Row {
-            let p = ring.mul_elem(fp, &polys[d.g as usize], d.mult);
+            if d.at != NONE {
+                let at = d.at as usize..d.at as usize + d.len as usize;
+                return Row {
+                    cols: cache.ids[at.clone()]
+                        .iter()
+                        .map(|&id| col_of_id[id as usize])
+                        .collect(),
+                    vals: cache.coefs[at].to_vec(),
+                };
+            }
+            let p = ring.mul_elem(fp, &polys[d.g as usize], d.mult, s.w);
             debug_assert_eq!(
                 p.len(),
                 d.len as usize,
@@ -2109,7 +2744,10 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
         };
         let s_row = |k: usize| form(&s_list[k]);
         let piv_leads: Vec<u32> = piv.iter().map(|d| col_of[&d.lead]).collect();
-        let mut st = ElimStats::default();
+        let mut st = ElimStats {
+            prune_reducers: rstep.is_some(),
+            ..Default::default()
+        };
         let result = eliminate(
             fp,
             n_cols,
@@ -2123,6 +2761,9 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
             opts.full_rank_exit,
             &mut st,
         );
+        // Nothing reads the cached products past the elimination.
+        drop(cache);
+        drop(col_of_id);
         tr.muladds = st.muladds;
         rep.muladds += st.muladds;
         tr.residual_rows = st.residual_rows;
@@ -2179,7 +2820,38 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
             learned = (learned.0.max(d), max_cols_so_far, rep.steps);
             rep.last_productive_degree = d;
         }
-        if fresh.iter().any(|p| p.lm() == ONE) {
+        let refuted = fresh.iter().any(|p| p.lm() == ONE);
+        let mut fresh_lms: Vec<Mono> = Vec::new();
+        if opts.record_trace || rstep.is_some() {
+            fresh_lms = fresh.iter().map(|p| p.lm()).collect();
+            fresh_lms.sort_unstable();
+        }
+        if opts.record_trace {
+            let mut kept: std::collections::HashSet<(Mono, u32)> = st
+                .useful
+                .iter()
+                .map(|&k| (s_list[k as usize].mult, s_list[k as usize].g))
+                .collect();
+            kept.extend(piv[n_reducers..].iter().map(|d| (d.mult, d.g)));
+            trace_steps.push(TraceStep {
+                degree: d,
+                kept,
+                fresh_lms: fresh_lms.clone(),
+            });
+        }
+        if let Some(ts) = rstep {
+            // A refutation stands on its own; anything else must follow the
+            // trace, or the replay stops.
+            if !refuted && fresh_lms != ts.fresh_lms {
+                rep.replay_failure = Some("new leads differ from the trace");
+                rep.replay_mismatch = Some((rep.steps, fresh_lms.len(), ts.fresh_lms.len()));
+                break;
+            }
+        }
+        if refuted {
+            if opts.record_trace {
+                rep.learned = Some(F4Trace { steps: trace_steps });
+            }
             rep.inconsistent = true;
             rep.basis = unit();
             record(&mut rep, learned);
@@ -2342,6 +3014,17 @@ mod tests {
                     }
                     let got: Vec<u128> = acc.iter().map(|&x| u128::from(f.reduce(x))).collect();
                     assert_eq!(got, exact, "p = {p}, {l:?}");
+                }
+                // the unreduced kernel, where the budget allows it
+                let kern = Kernel::with_budget(f, steps.len() + 1);
+                assert_eq!(kern.exact, p == 3 || p == 786433, "p = {p}");
+                if kern.exact {
+                    let mut acc = init.clone();
+                    for (a, b) in &steps {
+                        kern.axpy(&mut acc, *a, b);
+                    }
+                    let got: Vec<u128> = acc.iter().map(|&x| u128::from(f.reduce(x))).collect();
+                    assert_eq!(got, exact, "p = {p}, exact");
                 }
             }
         }
@@ -2892,7 +3575,7 @@ mod tests {
             assert_eq!(e.to_rpoly(), g, "trial {trial}");
             let u = key_of(&exponents(&mut rng), nt);
             assert_eq!(
-                ring.mul_elem(fp(p), &e, u),
+                ring.mul_elem(fp(p), &e, u, TowerWeights::UNIT),
                 ring.mul_mono(&g, u),
                 "trial {trial}"
             );
@@ -3007,6 +3690,168 @@ mod tests {
                 }
             }
         }
+    }
+
+    // ── Weighted gradings (radix-2^k presentations of the same tower) ──
+
+    /// The key `mono` made before gradings existed, written out again.
+    fn unit_key_reference(mask: u64, free: [u8; MAX_FREE]) -> Mono {
+        let deg = mask.count_ones() + free.iter().map(|&e| u32::from(e)).sum::<u32>();
+        let mut key = (u128::from(deg) << DEG_SHIFT) | u128::from(!mask);
+        for (k, &e) in free.iter().enumerate() {
+            key |= u128::from(255 - e) << (FREE_SHIFT + 8 * k as u32);
+        }
+        key
+    }
+
+    #[test]
+    fn unit_weights_leave_every_key_unchanged() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        assert!(TowerWeights::radix_blocks(3, 5, 1).is_unit());
+        assert!(TowerWeights::from_slice(&[1; 64]).is_unit());
+        for _ in 0..20_000 {
+            let (ma, mb): (u64, u64) = (rng.gen(), rng.gen());
+            let fa = [
+                rng.gen_range(0..9u8),
+                rng.gen_range(0..9),
+                0,
+                rng.gen_range(0..3),
+            ];
+            let fb = [rng.gen_range(0..9u8), 0, rng.gen_range(0..4), 0];
+            let (a, b) = (mono(ma, fa), mono(mb, fb));
+            assert_eq!(a, unit_key_reference(ma, fa));
+            assert_eq!(mono_w(ma, fa, TowerWeights::UNIT), a);
+            let l = lcm(a, b);
+            assert_eq!(lcm_w(a, b, TowerWeights::UNIT), l);
+            // The quotient now subtracts degrees; it must equal the old
+            // recomputation exactly.
+            let (qa, qb) = (free_of(l), free_of(b));
+            let mut qf = [0u8; MAX_FREE];
+            for k in 0..MAX_FREE {
+                qf[k] = qa[k] - qb[k];
+            }
+            assert_eq!(quotient(l, b), unit_key_reference(mask_of(l) & !mb, qf));
+        }
+    }
+
+    #[test]
+    fn a_weighted_key_order_is_a_monomial_order() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(11);
+        for k in 2..=3u32 {
+            let w = TowerWeights::radix_blocks(4, 6, k);
+            assert_eq!(w.weight(0), 1);
+            assert_eq!(w.weight(1), 2);
+            assert_eq!(w.weight(6), 1);
+            for _ in 0..20_000 {
+                let n = 24u32;
+                let full = (1u64 << n) - 1;
+                let (ma, mb, mu) = (
+                    rng.gen::<u64>() & full,
+                    rng.gen::<u64>() & full,
+                    rng.gen::<u64>() & full,
+                );
+                let (ma, mb) = (ma & !mu, mb & !mu);
+                let z = [0u8; MAX_FREE];
+                let (a, b, u) = (mono_w(ma, z, w), mono_w(mb, z, w), mono_w(mu, z, w));
+                let (au, bu) = (mono_w(ma | mu, z, w), mono_w(mb | mu, z, w));
+                // Multiplicative, and the plain-product shortcut is exact.
+                assert_eq!(a < b, au < bu);
+                let shift = (u128::from(degree_of(u)) << DEG_SHIFT) - u128::from(mu);
+                assert_eq!(a + shift, au);
+                // Divisibility implies order, 1 is least, and the degree is
+                // the weighted one.
+                assert!(au >= a && a >= ONE);
+                assert_eq!(
+                    degree_of(a),
+                    (0..n)
+                        .filter(|j| ma >> j & 1 == 1)
+                        .map(|j| w.weight(j))
+                        .sum::<u32>()
+                );
+                assert!(divides_ungraded(a, au) && divides(a, au));
+                assert_eq!(quotient(au, a), u);
+                let _ = (b, bu);
+            }
+        }
+    }
+
+    #[test]
+    fn weighted_runs_refute_exactly_the_empty_systems_and_count_the_rest() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(2027);
+        let p = 97u64; // 2^5 | 96
+        for (t, k) in [(2usize, 2u32), (4, 2), (3, 3), (4, 3), (5, 2)] {
+            let (r0, pts) = kummer_block(p, t, 0);
+            let (r1, _) = kummer_block(p, t, t);
+            let ring = TowerRing {
+                p,
+                rules: [r0, r1].concat(),
+                n_free: 0,
+            };
+            let w = TowerWeights::radix_blocks(2, t, k);
+            for trial in 0..10 {
+                let plant: Option<Vec<u64>> = (trial % 2 == 0).then(|| {
+                    let a = &pts[rng.gen_range(0..pts.len())];
+                    let b = &pts[rng.gen_range(0..pts.len())];
+                    [a.clone(), b.clone()].concat()
+                });
+                let g = biquadratic(&mut rng, &ring, t, plant.as_deref());
+                let mut zeros = Vec::new();
+                for a in &pts {
+                    for b in &pts {
+                        let x = [a.clone(), b.clone()].concat();
+                        if ring.eval(&g, &x) == 0 {
+                            zeros.push(x);
+                        }
+                    }
+                }
+                let unit = f4_tower(std::slice::from_ref(&g), &ring, &TowerF4Options::new(64));
+                let rep = f4_tower(&[g], &ring, &TowerF4Options::new(64).with_weights(w));
+                assert!(!rep.timed_out && rep.pairs_above_bound == 0);
+                assert_eq!(
+                    rep.inconsistent,
+                    zeros.is_empty(),
+                    "t {t} k {k} trial {trial}"
+                );
+                assert_eq!(rep.inconsistent, unit.inconsistent);
+                if !rep.inconsistent {
+                    for z in &zeros {
+                        for b in &rep.basis {
+                            assert_eq!(ring.eval(b, z), 0, "a solution was lost (t {t} k {k})");
+                        }
+                    }
+                    // Every ideal of F_p^{V×V} is radical: the staircase of
+                    // the weighted basis counts the points too.
+                    let lms: Vec<Mono> = rep.basis.iter().map(|b| b.lm().unwrap()).collect();
+                    assert_eq!(
+                        staircase_at_most(&lms, ring.n_tower(), 0, 1 << 12),
+                        Some(zeros.len()),
+                        "t {t} k {k} trial {trial}"
+                    );
+                    // The basis is keyed in the grading.
+                    for b in &rep.basis {
+                        for &m in &b.monos {
+                            assert_eq!(m, mono_w(mask_of(m), free_of(m), w));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "is not the leading monomial")]
+    fn a_grading_that_unseats_the_square_is_refused() {
+        let (rules, _) = kummer_block(97, 2, 0);
+        let ring = TowerRing {
+            p: 97,
+            rules,
+            n_free: 0,
+        };
+        // w(y_1) = 3 > 2·w(y_0): y_1 would lead y_0² − y_1.
+        TowerWeights::from_slice(&[1, 3]).check(&ring);
     }
 
     #[test]
@@ -3223,5 +4068,675 @@ mod tests {
             STOPS.load(AtomicOrdering::Relaxed),
             in_elimination + in_preprocessing + dense_only
         );
+    }
+
+    /// `Fp::reduce` is the remainder for every `x < 2⁶⁴`, at the edges of
+    /// each multiple of `p` as well as at random.
+    #[test]
+    fn reduce_is_the_remainder() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(61);
+        for &p in &[
+            3u64,
+            5,
+            97,
+            786433,
+            (1 << 31) - 1,
+            (1 << 31) + 11,
+            4294967291,
+            4294967295,
+        ] {
+            let f = fp(p);
+            let mut xs = vec![0, 1, p - 1, p, p + 1, u64::MAX, u64::MAX - 1, u64::MAX - p];
+            for _ in 0..2000 {
+                let k = rng.gen_range(0..=u64::MAX / p);
+                xs.extend([k * p, (k * p).saturating_sub(1), rng.gen::<u64>()]);
+            }
+            for x in xs {
+                assert_eq!(f.reduce(x), x % p, "p = {p}, x = {x}");
+            }
+        }
+    }
+
+    /// The product of a polynomial and a monomial, formed by sorting every
+    /// term's product together, as it was before the terms that carry were
+    /// told from the ones that do not.
+    fn product_by_full_sort(ring: &TowerRing, f: Fp, g: &RPoly, u: Mono) -> (RPoly, usize) {
+        let (mu, fu) = (mask_of(u), free_of(u));
+        let mut terms = Vec::new();
+        let mut tmp = Vec::new();
+        for (&m, &c) in g.monos.iter().zip(&g.coefs) {
+            let free = add_free(free_of(m), fu);
+            tmp.clear();
+            ring.mask_product_into(
+                f,
+                mask_of(m),
+                mu,
+                u64::from(c),
+                &mut tmp,
+                &mut MaskScratch::default(),
+            );
+            terms.extend(tmp.iter().map(|&(x, cc)| (mono(x, free), cc)));
+        }
+        let before = terms.len();
+        (RPoly::from_terms(f, terms), before)
+    }
+
+    /// Merging the plain terms with the sorted carried ones is `from_terms`
+    /// of all of them: on general and Kummer towers, over small and large
+    /// primes, with repeated monomials and cancelling sums.
+    #[test]
+    fn a_product_merges_plain_and_carried_terms_like_a_full_sort() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(31);
+        let (mut mixed, mut merged, mut cancelled) = (0, 0, 0);
+        // Products with plain terms, by whether `u` has a free variable: the
+        // key sum or `mono` forms their keys.
+        let (mut by_sum, mut by_mono) = (0, 0);
+        for &p in &[3u64, 7, 97, 1_000_003, 4294967291] {
+            let f = fp(p);
+            for trial in 0..120 {
+                let ring = random_ring(&mut rng, p, 2, 4, 2, trial % 2 == 0);
+                let (n, nt) = (ring.n_vars(), ring.n_tower());
+                let exps = |rng: &mut rand::rngs::StdRng, density: f64| -> Vec<u32> {
+                    (0..n)
+                        .map(|i| {
+                            if !rng.gen_bool(density) {
+                                0
+                            } else if i < nt {
+                                1
+                            } else {
+                                rng.gen_range(1..3)
+                            }
+                        })
+                        .collect()
+                };
+                let raw: Vec<(Vec<u32>, u64)> = (0..rng.gen_range(1..16))
+                    .map(|_| (exps(&mut rng, 0.4), rng.gen_range(1..p)))
+                    .collect();
+                let g = ring.from_raw(&raw);
+                let density = rng.gen_range(0.05..0.8);
+                let u = key_of(&exps(&mut rng, density), nt);
+                let (want, before) = product_by_full_sort(&ring, f, &g, u);
+                assert_eq!(ring.mul_mono(&g, u), want, "p = {p}, trial {trial}");
+                let carries = g.monos.iter().any(|&m| mask_of(m) & mask_of(u) != 0);
+                let plain = g.monos.iter().any(|&m| mask_of(m) & mask_of(u) == 0);
+                mixed += usize::from(carries && plain);
+                merged += usize::from(want.len() < before);
+                cancelled += usize::from(want.len() + 2 <= before);
+                by_sum += usize::from(plain && free_of(u) == [0; MAX_FREE]);
+                by_mono += usize::from(plain && free_of(u) != [0; MAX_FREE]);
+            }
+        }
+        assert!(
+            mixed > 100 && merged > 100 && cancelled > 50,
+            "the cases that merge were not reached: {mixed} {merged} {cancelled}"
+        );
+        assert!(
+            by_sum > 100 && by_mono > 100,
+            "both ways to key a plain product are to be reached: {by_sum} {by_mono}"
+        );
+    }
+
+    /// The same on the widest towers, 63 and 64 tower variables as one chain,
+    /// as blocks of three or four and as one block each: terms and multipliers
+    /// with `y_63`, the top bit of the mask, in the key sum and in the merge.
+    #[test]
+    fn a_product_on_a_64_variable_tower_merges_like_a_full_sort() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(43);
+        let (mut mixed, mut top_bit, mut by_sum, mut by_mono) = (0, 0, 0, 0);
+        for &p in &[3u64, 97, 1_000_003, 4294967291] {
+            let f = fp(p);
+            for &(blocks, t) in &[(1usize, 64usize), (1, 63), (16, 4), (21, 3), (64, 1)] {
+                for n_free in [0, 1, 4] {
+                    for _ in 0..12 {
+                        let ring = random_ring(&mut rng, p, blocks, t, n_free, true);
+                        ring.check();
+                        let (n, nt) = (ring.n_vars(), ring.n_tower());
+                        // Terms spread over the whole mask; a few common bits
+                        // with the multiplier, so that the rewrites stay small.
+                        let raw: Vec<(Vec<u32>, u64)> = (0..rng.gen_range(1..20))
+                            .map(|_| {
+                                let density = rng.gen_range(0.02..0.25);
+                                let mut e: Vec<u32> = (0..n)
+                                    .map(|i| {
+                                        if i < nt {
+                                            u32::from(rng.gen_bool(density))
+                                        } else {
+                                            rng.gen_range(0..4)
+                                        }
+                                    })
+                                    .collect();
+                                if nt == 64 && rng.gen_bool(0.3) {
+                                    e[63] = 1;
+                                }
+                                (e, rng.gen_range(1..p))
+                            })
+                            .collect();
+                        let g = ring.from_raw(&raw);
+                        let mut mask = 0u64;
+                        for _ in 0..rng.gen_range(0..6) {
+                            mask |= 1 << rng.gen_range(0..nt);
+                        }
+                        if nt == 64 && rng.gen_bool(0.4) {
+                            mask |= 1 << 63;
+                        }
+                        let mut free = [0u8; MAX_FREE];
+                        if rng.gen_bool(0.5) {
+                            for e in free.iter_mut().take(n_free) {
+                                *e = rng.gen_range(0..3);
+                            }
+                        }
+                        let u = mono(mask, free);
+                        let (want, _) = product_by_full_sort(&ring, f, &g, u);
+                        assert_eq!(ring.mul_mono(&g, u), want, "p = {p}, {blocks} x {t}");
+                        let carries = g.monos.iter().any(|&m| mask_of(m) & mask != 0);
+                        let plain = g.monos.iter().any(|&m| mask_of(m) & mask == 0);
+                        mixed += usize::from(carries && plain);
+                        top_bit += usize::from(mask >> 63 == 1 && nt == 64);
+                        by_sum += usize::from(plain && free == [0; MAX_FREE]);
+                        by_mono += usize::from(plain && free != [0; MAX_FREE]);
+                    }
+                }
+            }
+        }
+        assert!(
+            mixed > 50 && top_bit > 20 && by_sum > 50 && by_mono > 20,
+            "{mixed} {top_bit} {by_sum} {by_mono}"
+        );
+    }
+
+    /// The key of a plain product, one without a tower variable in common,
+    /// is the term's key plus the constant `mul_terms_fp` adds when the
+    /// multiplier has no free variable: at the edges of the mask (bit 63,
+    /// the empty mask) and of the free bytes.
+    #[test]
+    fn a_plain_product_key_is_the_term_key_plus_a_constant() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(17);
+        for _ in 0..20_000 {
+            let (mm, mu) = match rng.gen_range(0..4) {
+                0 => (rng.gen::<u64>(), 0),
+                1 => (0, rng.gen::<u64>()),
+                2 => (1 << 63, rng.gen::<u64>() >> 1),
+                _ => {
+                    let a = rng.gen::<u64>();
+                    (a, !a & rng.gen::<u64>())
+                }
+            };
+            let free: [u8; MAX_FREE] = std::array::from_fn(|_| rng.gen_range(0..=255));
+            let (m, u) = (mono(mm, free), mono(mu, [0; MAX_FREE]));
+            let shift = (u128::from(degree_of(u)) << DEG_SHIFT) - u128::from(mask_of(u));
+            assert_eq!(mask_of(m) & mask_of(u), 0);
+            assert_eq!(m + shift, mono(mm | mu, free), "mask {mm:#x} by {mu:#x}");
+        }
+    }
+
+    /// The counters and basis of a run, and its trace without the timings.
+    fn the_run(r: &TowerF4Report) -> (Vec<RPoly>, Vec<u64>, serde_json::Value) {
+        let mut trace = serde_json::to_value(&r.trace).unwrap();
+        for step in trace.as_array_mut().unwrap() {
+            step.as_object_mut()
+                .unwrap()
+                .retain(|k, _| !k.starts_with("ms"));
+        }
+        let counters = vec![
+            u64::from(r.inconsistent),
+            u64::from(r.degree_reached),
+            u64::from(r.solving_degree_max),
+            u64::from(r.last_productive_degree),
+            r.max_cols_to_solution as u64,
+            r.steps_to_solution as u64,
+            r.steps as u64,
+            r.max_rows as u64,
+            r.max_cols as u64,
+            r.max_nnz,
+            r.max_residual_rows as u64,
+            r.max_dense_entries,
+            r.muladds,
+            r.critical_pairs_reduced,
+            r.tower_pairs_reduced,
+            r.pairs_product_skipped,
+            r.pairs_chain_skipped,
+            r.reducer_rows,
+            r.pairs_above_bound as u64,
+            r.staircase_at_stop.map_or(u64::MAX, |c| c as u64),
+            u64::from(r.timed_out),
+            u64::from(r.oversize),
+        ];
+        (r.basis.clone(), counters, trace)
+    }
+
+    /// A step keeps the products it formed while they fit the cache and
+    /// forms the rest again: with no room, with room for some rows only and
+    /// with room for all, the run is the same, to the last counter.
+    #[test]
+    fn the_run_does_not_depend_on_the_product_cache() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(73);
+        let limits = [0, 1, 25, 400, 6000, 100_000, usize::MAX];
+        let mut big_runs = 0;
+        for trial in 0..14 {
+            let (ring, input, max_degree) = if trial % 2 == 0 {
+                // Two Kummer towers and a biquadratic in their first levels.
+                let p = 97u64;
+                let t = 3 + trial / 8;
+                let (r0, pts) = kummer_block(p, t, 0);
+                let (r1, _) = kummer_block(p, t, t);
+                let ring = TowerRing {
+                    p,
+                    rules: [r0, r1].concat(),
+                    n_free: 0,
+                };
+                let x = [pts[rng.gen_range(0..pts.len())].clone(), pts[0].clone()].concat();
+                let plant = (trial % 4 == 0).then_some(&x[..]);
+                let g = biquadratic(&mut rng, &ring, t, plant);
+                (ring, vec![g], 64)
+            } else {
+                // A general tower, a free variable and several generators.
+                let p = 1_000_003u64;
+                let ring = random_ring(&mut rng, p, 2, 2 + trial % 3, trial % 3, true);
+                let n = ring.n_vars();
+                let input: Vec<RPoly> = (0..1 + trial % 3)
+                    .map(|_| {
+                        let raw: Vec<(Vec<u32>, u64)> = (0..5)
+                            .map(|_| {
+                                let mut left = 3u32;
+                                let e: Vec<u32> = (0..n)
+                                    .map(|_| {
+                                        if left > 0 && rng.gen_range(0..3) == 0 {
+                                            left -= 1;
+                                            1
+                                        } else {
+                                            0
+                                        }
+                                    })
+                                    .collect();
+                                (e, rng.gen_range(1..p))
+                            })
+                            .collect();
+                        ring.from_raw(&raw)
+                    })
+                    .collect();
+                (ring, input, 40)
+            };
+            let opts = TowerF4Options::new(max_degree);
+            let want = the_run(&f4_tower_cached(&input, &ring, &opts, usize::MAX));
+            for &limit in &limits {
+                let got = the_run(&f4_tower_cached(&input, &ring, &opts, limit));
+                assert_eq!(got, want, "trial {trial}, cache of {limit} terms");
+            }
+            let full = f4_tower_cached(&input, &ring, &opts, usize::MAX);
+            big_runs += usize::from(full.max_nnz > 400);
+        }
+        assert!(
+            big_runs >= 4,
+            "too few runs have steps larger than the small caches: {big_runs}"
+        );
+    }
+
+    /// Monomials are numbered in order of arrival, once each, and
+    /// `order_columns` turns the numbers into the descending order of the
+    /// monomials.
+    #[test]
+    fn monomials_are_numbered_by_arrival_and_ordered_into_columns() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(5);
+        let mut examined: MonoMap<u32> = MonoMap::default();
+        let mut frontier = Vec::new();
+        let mut seen: Vec<Mono> = Vec::new();
+        for _ in 0..3000 {
+            let m = mono(rng.gen_range(0..64u64), [rng.gen_range(0..3), 0, 0, 0]);
+            let n = number_of(&mut examined, &mut frontier, m);
+            match seen.iter().position(|&x| x == m) {
+                Some(k) => assert_eq!(n as usize, k, "a repeat keeps its number"),
+                None => {
+                    assert_eq!(n as usize, seen.len(), "a new one takes the next");
+                    assert_eq!(frontier.last(), Some(&m));
+                    seen.push(m);
+                }
+            }
+        }
+        assert_eq!(frontier, seen, "the frontier is the new monomials in order");
+        assert!(seen.len() > 100);
+        let (cols, col_of_number) = order_columns(&examined);
+        let mut want = seen.clone();
+        want.sort_unstable_by(|a, b| b.cmp(a));
+        assert_eq!(cols, want);
+        for (k, m) in seen.iter().enumerate() {
+            assert_eq!(cols[col_of_number[k] as usize], *m);
+        }
+    }
+
+    #[test]
+    fn the_product_cache_keeps_what_fits_and_nothing_else() {
+        // A product of `k` terms, numbered from `from`, with coefficient `from`.
+        let keep = |c: &mut ProductCache, k: usize, from: u32| -> u32 {
+            if !c.has_room(k) {
+                return NONE;
+            }
+            let ids: Vec<u32> = (from..from + k as u32).collect();
+            c.keep(&ids, &vec![from; k])
+        };
+        let mut c = ProductCache::new(10);
+        assert_eq!(keep(&mut c, 4, 100), 0);
+        assert_eq!(keep(&mut c, 7, 200), NONE, "one past the room left");
+        assert_eq!(keep(&mut c, 6, 300), 4, "an exact fit");
+        assert_eq!(keep(&mut c, 1, 400), NONE, "full");
+        assert_eq!(keep(&mut c, 0, 500), 10, "an empty product always fits");
+        assert_eq!(c.ids.len(), 10);
+        assert_eq!(c.coefs.len(), 10);
+        assert_eq!(c.ids[4..10], [300, 301, 302, 303, 304, 305]);
+        assert_eq!(c.coefs[..4], [100; 4]);
+        assert_eq!(c.coefs[4..], [300; 6]);
+        // No limit still leaves `NONE` unused as a position.
+        assert_eq!(ProductCache::new(usize::MAX).limit, NONE as usize - 1);
+        assert!(!ProductCache::new(0).has_room(1));
+    }
+
+    /// Every sparse row ascending, with entries below `p`, over `n_cols`
+    /// columns: `lead` first, then each later column with probability
+    /// `density`.
+    fn random_sparse_row(
+        rng: &mut rand::rngs::StdRng,
+        p: u64,
+        n_cols: usize,
+        lead: usize,
+        density: f64,
+    ) -> Row {
+        use rand::Rng;
+        let mut row = Row {
+            cols: vec![lead as u32],
+            vals: vec![rng.gen_range(1..p) as u32],
+        };
+        for c in lead + 1..n_cols {
+            if rng.gen_bool(density) {
+                row.cols.push(c as u32);
+                row.vals.push(rng.gen_range(1..p) as u32);
+            }
+        }
+        row
+    }
+
+    /// [`echelon`] by dense, exact arithmetic: the same rows in the same
+    /// order, each reduced at its lead and kept as it stands past a new one.
+    /// Returns the pivots and the multiply-adds.
+    fn dense_echelon(p: u64, mut rows: Vec<Row>, n_cols: usize) -> (Vec<Row>, u64) {
+        let f = fp(p);
+        rows.retain(|r| !r.cols.is_empty());
+        rows.sort_by_key(|r| (r.cols[0], r.cols.len()));
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut pivots: Vec<Row> = Vec::new();
+        let mut work = 0u64;
+        for row in rows {
+            let mut v = vec![0u64; n_cols];
+            for (&c, &x) in row.cols.iter().zip(&row.vals) {
+                v[c as usize] = u64::from(x);
+            }
+            for c in row.cols[0] as usize..n_cols {
+                if v[c] == 0 {
+                    continue;
+                }
+                let q = pivot_of[c];
+                if q != NONE {
+                    let a = v[c];
+                    v[c] = 0;
+                    let piv = &pivots[q as usize];
+                    for (&cc, &x) in piv.cols[1..].iter().zip(&piv.vals[1..]) {
+                        let sub = a * u64::from(x) % p;
+                        v[cc as usize] = (v[cc as usize] + p - sub) % p;
+                    }
+                    work += piv.cols.len() as u64 - 1;
+                    continue;
+                }
+                let inv = f.inv(v[c]);
+                let mut out = Row {
+                    cols: vec![c as u32],
+                    vals: vec![1],
+                };
+                for (cc, &x) in v.iter().enumerate().skip(c + 1) {
+                    if x != 0 {
+                        out.cols.push(cc as u32);
+                        out.vals
+                            .push((u128::from(x) * u128::from(inv) % u128::from(p)) as u32);
+                    }
+                }
+                pivot_of[c] = pivots.len() as u32;
+                pivots.push(out);
+                break;
+            }
+        }
+        (pivots, work)
+    }
+
+    /// A pivot lists exactly the bitset words its tail has columns in, with
+    /// the bits of those columns, whatever the order and the density.
+    #[test]
+    fn a_pivot_lists_the_words_its_tail_touches() {
+        use rand::seq::SliceRandom;
+        use rand::{Rng, SeedableRng};
+        use std::collections::BTreeMap;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(83);
+        for _ in 0..300 {
+            let n = rng.gen_range(1..700usize);
+            let density = rng.gen_range(0.01..1.0);
+            let mut row = random_sparse_row(&mut rng, 97, n, 0, density);
+            if rng.gen_bool(0.3) {
+                // The list does not rely on the columns being ascending.
+                row.cols[1..].shuffle(&mut rng);
+            }
+            let mut want: BTreeMap<u32, u64> = BTreeMap::new();
+            for &c in &row.cols[1..] {
+                *want.entry(c / 64).or_insert(0) |= 1u64 << (c % 64);
+            }
+            let piv = Pivot::new(row);
+            let mut got: BTreeMap<u32, u64> = BTreeMap::new();
+            for &(w, b) in &piv.runs {
+                *got.entry(w).or_insert(0) |= b;
+            }
+            assert_eq!(got, want);
+            assert!(piv.runs.iter().all(|&(_, b)| b != 0));
+        }
+    }
+
+    /// The columns at which the accumulator turns lazy: `n_cols · (p − 1)² +
+    /// p < 2⁶⁴`, at the last width that holds and the first that does not.
+    #[test]
+    fn the_lazy_accumulator_guard_is_exact() {
+        for &p in &[
+            3u64, 97, 786433, 469762049, 998244353, 2013265921, 4294967291,
+        ] {
+            let f = fp(p);
+            let sq = u128::from(p - 1).pow(2);
+            let n_max = ((1u128 << 64) - 1 - u128::from(p)) / sq;
+            if n_max > 4096 {
+                assert!(Acc::new(f, 4096).lazy, "p = {p}");
+                continue;
+            }
+            let n = n_max as usize;
+            assert!(n as u128 * sq + u128::from(p) < 1 << 64);
+            assert!((n as u128 + 1) * sq + u128::from(p) >= 1 << 64);
+            assert!(Acc::new(f, n).lazy, "p = {p}, {n} columns");
+            assert!(!Acc::new(f, n + 1).lazy, "p = {p}, {} columns", n + 1);
+        }
+    }
+
+    /// The largest value a column can reach: every pivot row full of `p − 1`,
+    /// every multiplier `p − 1`, at the widest lazy matrix. The sum is held
+    /// exactly, and reads as its remainder.
+    #[test]
+    fn a_lazy_column_at_the_guard_holds_the_exact_sum() {
+        for &p in &[786433u64, 469762049, 998244353, 2013265921, 4294967291] {
+            let f = fp(p);
+            let sq = u128::from(p - 1).pow(2);
+            let n = (((1u128 << 64) - 1 - u128::from(p)) / sq).min(700) as usize;
+            let mut acc = Acc::new(f, n);
+            assert!(acc.lazy, "p = {p}");
+            let start = Row {
+                cols: (0..n as u32).collect(),
+                vals: vec![(p - 1) as u32; n],
+            };
+            acc.load(&start);
+            let mut want = vec![u128::from(p - 1); n];
+            for lead in 0..n {
+                let row = Row {
+                    cols: (lead as u32..n as u32).collect(),
+                    vals: vec![(p - 1) as u32; n - lead],
+                };
+                let mut word = 0u64;
+                acc.sub_tail(f, 1, &Pivot::new(row), lead / 64, &mut word);
+                for w in &mut want[lead + 1..] {
+                    *w += sq;
+                }
+            }
+            let top = *want.iter().max().unwrap();
+            assert!(top < 1 << 64, "p = {p}: the guard let a sum pass 2^64");
+            for (c, &w) in want.iter().enumerate() {
+                assert_eq!(u128::from(acc.vals[c]), w, "p = {p}, column {c}");
+                assert_eq!(
+                    u128::from(acc.take(f, c)),
+                    w % u128::from(p),
+                    "p = {p}, column {c}"
+                );
+            }
+        }
+    }
+
+    /// A column that holds a multiple of `p` reads as zero: not pushed out
+    /// by a drain, and not a pivot candidate for a scan.
+    #[test]
+    fn a_multiple_of_p_in_a_lazy_column_reads_as_zero() {
+        let p = 786433u64;
+        let f = fp(p);
+        let mut acc = Acc::new(f, 3);
+        assert!(acc.lazy);
+        // Column 1 starts at 5; subtracting 7 · row[1] with v chosen so that
+        // 5 + (p − 7)·v ≡ 0 leaves the raw value 5 + (p − 7)·v, a multiple of
+        // p that is not zero.
+        let v = f.mul(p - 5, f.inv(p - 7));
+        let lead = Row {
+            cols: vec![0, 1, 2],
+            vals: vec![1, v as u32, 3],
+        };
+        acc.load(&Row {
+            cols: vec![0, 1],
+            vals: vec![7, 5],
+        });
+        let mut word = 0;
+        acc.take(f, 0);
+        acc.bits[0] = 0;
+        acc.sub_tail(f, 7, &Pivot::new(lead), 0, &mut word);
+        assert_ne!(acc.vals[1], 0, "the raw value is a multiple of p, not 0");
+        assert_eq!(acc.vals[1] % p, 0);
+        assert_eq!(word, 0b110);
+        acc.bits[0] = word;
+        let mut out = Row::default();
+        acc.drain_from(f, 0, 1, &mut out);
+        assert_eq!(out.cols, vec![2], "column 1 reads as zero");
+        assert_eq!(out.vals, vec![f.mul(3, p - 7) as u32]);
+        assert!(acc.vals.iter().all(|&x| x == 0) && acc.bits.iter().all(|&b| b == 0));
+    }
+
+    /// [`Acc::clear_from`] leaves the accumulator as a drain does.
+    #[test]
+    fn clearing_the_accumulator_leaves_it_clean() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(81);
+        for &p in &[97u64, 4294967291] {
+            let f = fp(p);
+            for _ in 0..30 {
+                let n = rng.gen_range(1..400usize);
+                let mut acc = Acc::new(f, n);
+                let row = random_sparse_row(&mut rng, p, n, 0, 0.3);
+                acc.load(&row);
+                for _ in 0..4 {
+                    let lead = rng.gen_range(0..n);
+                    let pivot = random_sparse_row(&mut rng, p, n, lead, 0.3);
+                    let mut word = 0;
+                    acc.sub_tail(
+                        f,
+                        rng.gen_range(1..p),
+                        &Pivot::new(pivot),
+                        lead / 64,
+                        &mut word,
+                    );
+                    acc.bits[lead / 64] |= word;
+                }
+                acc.clear_from(0);
+                assert!(acc.vals.iter().all(|&x| x == 0), "p = {p}");
+                assert!(acc.bits.iter().all(|&b| b == 0), "p = {p}");
+            }
+        }
+    }
+
+    /// The accumulator, lazy or not, echelonizes as exact arithmetic does:
+    /// the same pivots, entry for entry, and the same count of multiply-adds,
+    /// at widths on both sides of the guard.
+    #[test]
+    fn an_accumulator_echelon_matches_dense_exact_arithmetic() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(97);
+        let (mut lazy_runs, mut eager_runs, mut cancelled) = (0, 0, 0u64);
+        for (p, widths) in [
+            (3u64, vec![150usize, 330]),
+            (5, vec![200]),
+            (97, vec![64, 301]),
+            (786433, vec![190, 400]),
+            (469762049, vec![83, 84, 130]),
+            (998244353, vec![18, 19, 70]),
+            (2013265921, vec![4, 5, 90]),
+            (4294967291, vec![1, 2, 60]),
+        ] {
+            let f = fp(p);
+            for &n_cols in &widths {
+                for round in 0..5 {
+                    let density = [0.9, 0.5, 0.2, 0.05, 1.0][round];
+                    let n_rows = rng.gen_range(n_cols / 2 + 1..2 * n_cols + 2);
+                    let mut rows: Vec<Row> = Vec::new();
+                    for _ in 0..n_rows {
+                        let lead = rng.gen_range(0..n_cols);
+                        rows.push(random_sparse_row(&mut rng, p, n_cols, lead, density));
+                    }
+                    // Rows that are sums of earlier ones: cancellations.
+                    for _ in 0..n_rows / 4 {
+                        let (a, b) = (rng.gen_range(0..rows.len()), rng.gen_range(0..rows.len()));
+                        let mut v = vec![0u64; n_cols];
+                        for r in [&rows[a], &rows[b]] {
+                            for (&c, &x) in r.cols.iter().zip(&r.vals) {
+                                v[c as usize] = (v[c as usize] + u64::from(x)) % p;
+                            }
+                        }
+                        let sum = Row {
+                            cols: (0..n_cols as u32).filter(|&c| v[c as usize] != 0).collect(),
+                            vals: v.iter().filter(|&&x| x != 0).map(|&x| x as u32).collect(),
+                        };
+                        if !sum.cols.is_empty() {
+                            rows.push(sum);
+                        }
+                    }
+                    let (want, want_work) = dense_echelon(p, rows.clone(), n_cols);
+                    let mut work = 0u64;
+                    let got = echelon(f, rows, n_cols, &mut work, None).unwrap();
+                    assert_eq!(work, want_work, "p = {p}, {n_cols} columns, round {round}");
+                    assert_eq!(
+                        got.len(),
+                        want.len(),
+                        "p = {p}, {n_cols} columns, round {round}"
+                    );
+                    for (g, w) in got.iter().zip(&want) {
+                        assert_eq!(g.cols, w.cols, "p = {p}, {n_cols} columns, round {round}");
+                        assert_eq!(g.vals, w.vals, "p = {p}, {n_cols} columns, round {round}");
+                    }
+                    cancelled += (n_rows as u64).saturating_sub(want.len() as u64);
+                    if Acc::new(f, n_cols).lazy {
+                        lazy_runs += 1;
+                    } else {
+                        eager_runs += 1;
+                    }
+                }
+            }
+        }
+        assert!(lazy_runs > 20 && eager_runs > 20 && cancelled > 100);
     }
 }

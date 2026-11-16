@@ -1,0 +1,24 @@
+F2 := GF(2);
+P<X> := PolynomialRing(F2);
+L<z> := ext<F2 | X^24+X^16+X^15+X^14+X^13+X^10+X^9+X^7+X^5+X^3+1>;
+K := FiniteField(2,12); Embed(K,L);
+P2<x,y,z0> := ProjectiveSpace(K,2);
+D := x^2+x*z0+K!(L!(1+z+z^3+z^4+z^5+z^7+z^8+z^10+z^11+z^12+z^14+z^15+z^17+z^20))*z0^2;
+N := K!(L!(1+z+z^2+z^4+z^6+z^13+z^16+z^17+z^18+z^19+z^20+z^21+z^23))*x*z0^3+K!(L!(1+z^2+z^3+z^4+z^7+z^8+z^10+z^12+z^15+z^16+z^18+z^19+z^20+z^21+z^22+z^23))*z0^4;
+C0 := Curve(P2,D*(y^2+y*z0)+N);
+print "GENUS"; print Genus(C0);
+pt := C0![K!0,K!(L!(1+z+z^4+z^6+z^8+z^9+z^11+z^12+z^14+z^17+z^19+z^21+z^22+z^23)),K!1];
+print "PT"; print pt;
+E0,toE := EllipticCurve(C0,pt);
+print "E0"; print E0;
+E := EllipticCurve([K|1,K!(L!(1+z^2+z^3+z^4+z^6+z^7+z^8+z^10+z^14+z^18+z^20+z^22)),0,0,K!(L!(z+z^3+z^4+z^6+z^7+z^8+z^14+z^15+z^16+z^17+z^19+z^23))]);
+print "TARGET"; print E;
+print "ORDER"; print #E;
+ok,iso := IsIsomorphic(E0,E);
+print "ISOMORPHIC"; print ok;
+if ok then print "TO_E";print toE;print "ISO";print iso;print "ISO_DATA";print IsomorphismData(iso);end if;
+
+P := E![K!(L!(1+z+z^3+z^4+z^6+z^7+z^8+z^14+z^15+z^16+z^17+z^19+z^23)),K!(L!(z+z^3+z^5+z^6+z^8+z^10+z^11+z^13+z^14+z^15+z^16+z^17+z^20+z^21+z^23))];
+print "SOURCE_POINT";print P;
+P0 := P@@iso; print "E0_POINT";print P0;
+C0pt := P0@@toE; pts := RationalPoints(C0pt); print "PREIMAGE_POINTS";print pts;

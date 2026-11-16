@@ -1,0 +1,90 @@
+{
+  "schema": "research.proof-component/v1",
+  "utc": "2026-10-31T07:19:45.217507+00:00",
+  "branch": "double22_weighted_variant B=0,s!=0",
+  "main_check": "attempt4",
+  "fixed_controls_check": "controls5",
+  "separate_axiom_readback": "readback1",
+  "compiled_main": true,
+  "fixed_controls_passed": true,
+  "independent_review_complete": false,
+  "canonical_integration": false,
+  "lemmas": [
+    "scale",
+    "decode",
+    "normalized_root",
+    "extraction",
+    "zero_y_square",
+    "doubling"
+  ],
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "controls": [
+    "F5 valid nonunit weighted input and coprime curve",
+    "singular rational input: extracted ordinate and subsequent weight zero",
+    "F2 original validity does not ensure extracted point validity",
+    "zero input s excluded"
+  ],
+  "receipts": [
+    {
+      "directory": "attempt1",
+      "exit_code": 0,
+      "source_sha256": "3c2de07c12406309b8f38f0c1793910d282580d3c5a84a591a7ea3a788e197c6"
+    },
+    {
+      "directory": "attempt2",
+      "exit_code": 1,
+      "source_sha256": "3c2de07c12406309b8f38f0c1793910d282580d3c5a84a591a7ea3a788e197c6"
+    },
+    {
+      "directory": "attempt3",
+      "exit_code": 1,
+      "source_sha256": "c189856292ad1d406205866e1747d60d52ec4ab924680052d976f0a3530ea28a"
+    },
+    {
+      "directory": "attempt4",
+      "exit_code": 0,
+      "source_sha256": "fc887ea4f235f5ca43928186a40d692b2af761e545e792c80aa842d019d08849"
+    },
+    {
+      "directory": "controls1",
+      "exit_code": 1,
+      "source_sha256": "07725c243a05ad2ce1c6a2777e6ada89b624c5d9926791bd6c1b7fb5aa12a7c6"
+    },
+    {
+      "directory": "controls2",
+      "exit_code": 1,
+      "source_sha256": "e3dbb65f016034cdba1b5725e08e0d1ffc5ec0cadd803c06b1aed161ed0f1872"
+    },
+    {
+      "directory": "controls3",
+      "exit_code": 1,
+      "source_sha256": "4a8910063c65c893b2d1cdb184dc4894a9663e3b0c7bb02a6461fd85a980fdcc"
+    },
+    {
+      "directory": "controls4",
+      "exit_code": 1,
+      "source_sha256": "149955657cf4dea6c27f7d958802d50c234947e1a8cb4bc825e673fa36860d07"
+    },
+    {
+      "directory": "controls5",
+      "exit_code": 0,
+      "source_sha256": "5c0ac5e98a3ea046d1a7295005544e28a01216c4ac074314146d955d47bb9fa7"
+    },
+    {
+      "directory": "probe1",
+      "exit_code": 1,
+      "source_sha256": "a1ce8484c58a06db83438607f79dc66939fb90497b288fe87d9cc4d6f6bcb999"
+    },
+    {
+      "directory": "readback1",
+      "exit_code": 0,
+      "source_sha256": "69d135c14e0f7efa5c853c2980fc32e88b7bb0861b3daafd620e6c3418c383af"
+    }
+  ],
+  "scientific_execution": false,
+  "next_action": "Independent statement and literal-source fidelity review before canonical integration"
+}

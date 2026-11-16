@@ -1,0 +1,21 @@
+# Generic synthesis/structural check only: no FPGA placement or timing claim.
+read_verilog build/rtl/synth.v
+hierarchy -check -top crypto_kernels_top
+proc
+opt
+memory_collect
+opt
+# Emit ordinary mux trees instead of tool-specific one-hot parallel-case functions.
+pmuxtree
+opt
+check -assert
+# Modular reduction must not accidentally infer a runtime integer divider.
+select -assert-none t:$div t:$mod t:$divfloor t:$modfloor t:$dlatch t:$adlatch
+# Normalize logical-not to an explicit single-bit result. Keep multipliers
+# at word level: DSP mapping belongs to the vendor implementation.
+simplemap t:$logic_not
+opt
+check -assert
+scc -expect 0
+stat
+write_verilog -noattr build/rtl/synth_checked.v

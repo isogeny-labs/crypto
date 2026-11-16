@@ -4,7 +4,7 @@
   "use strict";
   var REPO = "https://github.com/aburan28/crypto/blob/main/";
   var DATA = null;
-  var byId = { curve: {}, method: {}, fb: {}, candidate: {}, round: {}, session: {} };
+  var byId = { curve: {}, method: {}, fb: {}, candidate: {}, round: {}, session: {}, store: {} };
   var view = document.getElementById("view");
   var loading = document.getElementById("loading");
 
@@ -64,9 +64,19 @@
     if (c.field.degree > 1) return "GF(p^" + c.field.degree + ") = GF(p)[t]/(" + extensionModulus(c.field.modulus) + "), p = " + c.field.p + "; coefficients listed over 1, t, …, t^" + (c.field.degree - 1);
     return "GF(p), p = " + c.field.p + " (" + c.field.bits + " bits)";
   }
+  function bestRow(c) {
+    var rows = (c.leaderboard || []).filter(function (b) {
+      return b.regime !== "koblitz_batch" && b.verified && typeof b.ratio_rho === "number";
+    });
+    rows.sort(function (a, b) { return a.ratio_rho - b.ratio_rho; });
+    return rows[0] || null;
+  }
   function bestRatio(c) {
-    var vals = (c.leaderboard || []).map(function (b) { return b.ratio_rho; }).filter(function (v) { return typeof v === "number"; });
-    return vals.length ? Math.min.apply(null, vals) : null;
+    var row = bestRow(c);
+    return row ? row.ratio_rho : null;
+  }
+  function opsCell(log2) {
+    return el("td", { class: "n", text: typeof log2 === "number" ? "2^" + fmt(log2, 2) + " GAE" : "–" });
   }
   function parseHash() {
     var h = location.hash.replace(/^#/, "") || "curves";
@@ -93,7 +103,11 @@
   function table(columns, rows, opts) {
     opts = opts || {};
     var state = { key: opts.sortKey || columns[0].key, dir: opts.sortDir || 1 };
+    var page = 0;
+    var pageSize = opts.pageSize || 0;
     var wrap = el("div", { class: "scroll" });
+    var container = pageSize ? el("div") : wrap;
+    if (pageSize) container.appendChild(wrap);
     var tbl = el("table");
     var thead = el("thead");
     var tr = el("tr");
@@ -101,6 +115,7 @@
       var th = el("th", { class: col.numeric ? "n" : null, text: col.label, scope: "col" });
       th.addEventListener("click", function () {
         if (state.key === col.key) state.dir = -state.dir; else { state.key = col.key; state.dir = col.numeric ? -1 : 1; }
+        page = 0;
         render();
       });
       tr.appendChild(th);
@@ -110,6 +125,19 @@
     var tbody = el("tbody");
     tbl.appendChild(tbody);
     wrap.appendChild(tbl);
+    var previous, next, pageLabel;
+    if (pageSize) {
+      var controls = el("nav", { class: "pagination", "aria-label": "Table pages" });
+      previous = el("button", { type: "button", text: "Previous" });
+      next = el("button", { type: "button", text: "Next" });
+      pageLabel = el("span", { "aria-live": "polite" });
+      previous.addEventListener("click", function () { if (page > 0) { page--; render(); } });
+      next.addEventListener("click", function () { if ((page + 1) * pageSize < rows.length) { page++; render(); } });
+      controls.appendChild(previous);
+      controls.appendChild(pageLabel);
+      controls.appendChild(next);
+      container.appendChild(controls);
+    }
     function render() {
       var col = columns.filter(function (c) { return c.key === state.key; })[0];
       var sorted = rows.slice().sort(function (a, b) {
@@ -123,10 +151,18 @@
         th.setAttribute("aria-sort", columns[i].key === state.key ? (state.dir > 0 ? "ascending" : "descending") : "none");
       });
       while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+      var visible = pageSize ? sorted.slice(page * pageSize, (page + 1) * pageSize) : sorted;
+      if (pageSize) {
+        previous.disabled = page === 0;
+        next.disabled = (page + 1) * pageSize >= sorted.length;
+        pageLabel.textContent = sorted.length ?
+          "Showing " + (page * pageSize + 1) + "–" + Math.min((page + 1) * pageSize, sorted.length) + " of " + sorted.length :
+          "Showing 0 of 0";
+      }
       if (!sorted.length) {
         tbody.appendChild(el("tr", null, [el("td", { colspan: String(columns.length), class: "empty", text: opts.empty || "Nothing matches." })]));
       }
-      sorted.forEach(function (row) {
+      visible.forEach(function (row) {
         var r = el("tr");
         columns.forEach(function (c) {
           var cell = c.cell ? c.cell(row) : el("td", { class: c.numeric ? "n" : null, text: fmt(row[c.key], c.digits) });
@@ -136,7 +172,7 @@
       });
     }
     render();
-    return wrap;
+    return container;
   }
   function tdLink(href, text) { return el("td", null, [link(href, text)]); }
   function tdText(text, cls) { return el("td", { class: cls || null, text: text }); }
@@ -151,7 +187,8 @@
   function curvesView(q) {
     var head = el("div", null, [
       el("h1", { text: "Curves" }),
-      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. A conductor is not an invariant of a curve over a finite field; the endomorphism discriminant (−7 for every Koblitz curve) is the nearest thing recorded." })
+      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. For curves with a cold one-target row, the lowest ratio in the ranked leaderboard subset identifies a base and recipe; pre-gate rows are labelled. Batch-only rows remain visible in each curve's detail. Later studies also appear in the progress timeline. IC/rho = 1.0× is parity; larger means IC costs more. Absolute 2^x GAE is shown only for counted whole-pipeline rows. Cover certificates are available for " + DATA.counts.cover_assessed + "; the other " + DATA.counts.cover_unassessed + " models remain unassessed in the frozen cover catalog. Search by identity and filter by field or measurement. Click a slug for its full record. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." }),
+      el("p", { class: "note" }, ["Progress by merge date: ", link("../scoreboard/#lab-progress", "full IC/rho timeline"), "."])
     ]);
     var f = el("form", { class: "filters" });
     function input(name, label, type, extra) {
@@ -183,7 +220,7 @@
       f.appendChild(el("label", { class: "check" }, [inp, label]));
       return inp;
     }
-    var text = input("q", "Search slug, ICV1, EC1, standard or retired name", "search", { wide: true, placeholder: "e.g. ECC2K-130, f2m41, sect163k1, k0n31, EC1N7C…" });
+    var text = input("q", "Search ICV1 slug, EC1, standard or retired alias", "search", { wide: true, placeholder: "e.g. icv1-f2m83-tm6151469093347-debefd74, ECC2K-130, EC1N7C…" });
     var family = select("family", "Family", [["", "any"], ["koblitz", "Koblitz"], ["binary", "random binary"], ["prime", "prime field"], ["subfield", "subfield"]]);
     var ch = select("char", "Characteristic", [["", "any"], ["2", "2"], ["p", "p (prime field)"]]);
     var deg = range("bits", "Field bits (degree m, or bits of p)");
@@ -255,9 +292,17 @@
         { key: "end", label: "End. disc.", cell: function (c) { return tdText(c.endomorphism_discriminant === null ? "–" : String(c.endomorphism_discriminant), "n"); } },
         { key: "cover", label: "Cover", cell: function (c) {
           var cert = c.hyperelliptic_cover && c.hyperelliptic_cover.certificate;
-          return tdText(cert ? "genus " + cert.genus + ", degree " + cert.degree : "unresolved");
+          return tdText(cert ? "genus " + cert.genus + ", degree " + cert.degree :
+            (c.hyperelliptic_cover ? "unresolved" : "not assessed"));
         } },
-        { key: "best", label: "Best IC / rho", numeric: true, sort: bestRatio, cell: function (c) { return ratioCell(bestRatio(c)); } },
+        { key: "base", label: "Ranked factor base", sort: function (c) { var b = bestRow(c); return b ? b.best_base_points : null; }, cell: function (c) {
+          var b = bestRow(c);
+          return tdText(b ? "|F|=" + b.best_base_points + " · " + b.best_recipe +
+            (b.validation_status === "validated" ? "" : " · " + (b.validation_status || "validation unknown")) : "–", "wrap");
+        } },
+        { key: "ic_ops", label: "IC operations", numeric: true, sort: function (c) { var b = bestRow(c); return b ? b.log2_ic_gae : null; }, cell: function (c) { var b = bestRow(c); return opsCell(b && b.log2_ic_gae); } },
+        { key: "rho_ops", label: "rho operations", numeric: true, sort: function (c) { var b = bestRow(c); return b ? b.log2_rho_gae : null; }, cell: function (c) { var b = bestRow(c); return opsCell(b && b.log2_rho_gae); } },
+        { key: "best", label: "Ranked cold IC / rho", numeric: true, sort: bestRatio, cell: function (c) { return ratioCell(bestRatio(c)); } },
         { key: "measured", label: "Cited by", sort: function (c) { return c.ecbench.length + c.tournament_cells.length + (c.on_leaderboard ? 1 : 0); }, cell: function (c) {
           var items = [];
           if (c.on_leaderboard) items.push(chip("leaderboard", "ok"));
@@ -267,7 +312,7 @@
           if (!items.length) items.push(chip("registered only"));
           var td = el("td"); items.forEach(function (i) { td.appendChild(i); }); return td;
         } }
-      ], rows, { sortKey: "field_bits", sortDir: 1 }));
+      ], rows, { sortKey: "field_bits", sortDir: 1, pageSize: 100 }));
     }
     f.addEventListener("input", apply);
     f.addEventListener("submit", function (e) { e.preventDefault(); apply(); });
@@ -329,7 +374,7 @@
         fact("Subfield descent / subgroup transfer", "Not tested"),
         fact("DLP advantage", "Not measured")
       ]));
-      view.appendChild(el("p", { class: "note" }, [cert ? "An explicit geometric cover is recorded. Computational advantage requires separate evidence. " : "This result establishes neither existence nor nonexistence. ", repoLink("docs/curves/COVERS.md", "Proof and scope"), "; ", repoLink("docs/curves/covers.json", "replayable catalog findings"), "; ", repoLink("docs/curves/cover-links.yaml", "YAML identity graph"), "."]));
+      view.appendChild(el("p", { class: "note" }, [cert ? "An explicit geometric cover is recorded. Computational advantage requires separate evidence. " : "This result establishes neither existence nor nonexistence. ", "The cover graph is frozen to the earlier catalog; EC1 identities above come from the current registry. ", repoLink("docs/curves/COVERS.md", "Proof and scope"), "; ", repoLink("docs/curves/covers.json", "replayable catalog findings"), "; ", repoLink("docs/curves/cover-links.yaml", "frozen YAML identity graph"), "."]));
       if (cert) {
         var details = el("details", null, [el("summary", { text: "Cover equation and map certificate" })]);
         details.appendChild(el("p", { text: "Ascending powers of u; H: v² + h(u)v = f(u). Map to the short model: x = x(u), y = y_v(u)v + y_0(u); compose with target_model_map when present. Coefficients use the curve's field representation." }));
@@ -357,14 +402,21 @@
 
     view.appendChild(el("h2", { text: "On the leaderboard" }));
     if (c.leaderboard.length) {
+      view.appendChild(el("p", { class: "note" }, ["Ranked factor base is the base of the lowest verified cold one-target IC/rho row in this leaderboard subset; the validation column distinguishes fully validated and pre-gate evidence. Later studies are retained in the timeline. 1.0× is parity. GAE counts are available only where the frozen whole-pipeline record counted them. See ", link("../scoreboard/#lab-progress", "progress over time"), "."]));
       view.appendChild(table([
         { key: "regime", label: "Regime" },
         { key: "log2_r", label: "log₂ r", numeric: true, digits: 2 },
         { key: "best_recipe", label: "Best recipe", cell: function (b) { return tdText(fmt(b.best_recipe), "mono"); } },
+        { key: "best_base_points", label: "Base |F|", numeric: true },
+        { key: "best_base_columns", label: "Columns", numeric: true },
+        { key: "log2_ic_gae", label: "IC operations", numeric: true, cell: function (b) { return opsCell(b.log2_ic_gae); } },
+        { key: "log2_rho_gae", label: "rho operations", numeric: true, cell: function (b) { return opsCell(b.log2_rho_gae); } },
         { key: "best_s", label: "S", numeric: true, digits: 3 },
         { key: "ratio_rho", label: "IC / rho", numeric: true, cell: function (b) { return ratioCell(b.ratio_rho); } },
         { key: "ratio_floor", label: "IC / floor", numeric: true, cell: function (b) { return ratioCell(b.ratio_floor); } },
-        { key: "reference", label: "Reference", cell: function (b) { return tdText(fmt(b.reference), "wrap"); } }
+        { key: "validation_status", label: "Validation" },
+        { key: "reference", label: "Reference", cell: function (b) { return tdText(fmt(b.reference), "wrap"); } },
+        { key: "best_base_source", label: "Frozen source", cell: function (b) { return el("td", null, [repoLink(b.best_base_source, "record")]); } }
       ], c.leaderboard));
       view.appendChild(el("p", { class: "note" }, ["Quoted from ", repoLink("docs/ic/leaderboard.json"), "; drawn on the ", link("../scoreboard/ic-leaderboard.html", "leaderboard page"), "."]));
     } else view.appendChild(el("p", { class: "note", text: "No whole-pipeline index-calculus row on the leaderboard for this curve." }));
@@ -386,6 +438,11 @@
     if (c.factor_bases.length) {
       view.appendChild(table(fbColumns(), c.factor_bases.map(function (id) { return byId.fb[id]; }).filter(Boolean)));
     } else view.appendChild(el("p", { class: "note", text: "No ecbench factor base recorded on this curve." }));
+
+    view.appendChild(el("h2", { text: "Stored files" }));
+    if (c.store_objects.length) {
+      view.appendChild(table(storeColumns(), c.store_objects.map(function (n) { return byId.store[n]; }).filter(Boolean), { sortKey: "name" }));
+    } else view.appendChild(el("p", { class: "note", text: "No file in the object store is named for this curve." }));
 
     view.appendChild(el("h2", { text: "Tournament cells" }));
     if (c.tournament_cells.length) {
@@ -446,12 +503,16 @@
   }
 
   /* ---------- factor bases ---------- */
+  function recordedCurveCell(slug) {
+    if (!slug) return tdText("–");
+    return byId.curve[slug] ? tdLink("#curve/" + slug, slug) : tdText(slug + " (registration pending)");
+  }
   function fbColumns() {
     return [
       { key: "fb_id", label: "Factor base", cell: function (f) { return tdLink("#fb/" + f.fb_id, f.fb_id); } },
       { key: "family", label: "Family" },
       { key: "params", label: "Parameters", cell: function (f) { return tdText(paramsText(f.params), "mono"); } },
-      { key: "curve", label: "Curve", cell: function (f) { return f.curve ? tdLink("#curve/" + f.curve, f.curve) : tdText("–"); } },
+      { key: "curve", label: "Curve", cell: function (f) { return recordedCurveCell(f.curve || f.recorded_curve); } },
       { key: "signed_points", label: "Signed points", numeric: true },
       { key: "abscissae", label: "Abscissae", numeric: true },
       { key: "columns", label: "Columns", numeric: true },
@@ -472,13 +533,52 @@
     view.appendChild(el("h1", { text: f.fb_id }));
     view.appendChild(el("dl", { class: "facts" }, [
       fact("Family", f.family), fact("Parameters", paramsText(f.params), true), fact("Description", f.description),
-      fact("Curve", f.curve ? link("#curve/" + f.curve, f.curve) : null, true),
+      fact("Curve", f.curve ? link("#curve/" + f.curve, f.curve) : (f.recorded_curve ? f.recorded_curve + " (registration pending)" : null), true),
       fact("Signed points", f.signed_points), fact("Abscissae", f.abscissae), fact("Columns", f.columns), fact("Dimension", f.dimension),
       fact("Points SHA-256", f.points_sha256, true), fact("Record SHA-256", f.fb_sha256, true)
     ]));
+    var held = DATA.store.objects.filter(function (o) { return o.fb_id === f.fb_id; });
+    if (held.length) {
+      view.appendChild(el("h2", { text: "Stored file" }));
+      view.appendChild(table(storeColumns(), held, { sortKey: "name" }));
+    }
     view.appendChild(el("h2", { text: "Used by" }));
     view.appendChild(el("ul", { class: "plain" }, f.methods.map(function (m) { var mm = byId.method[m]; return el("li", null, [link("#method/" + m, m), mm ? " · " + mm.method + " " + paramsText(mm.params) : ""]); })
       .concat(f.sessions.map(function (s) { var ss = byId.session[s]; return el("li", null, [link("#session/" + s, s), ss ? " · " + ss.label : ""]); }))));
+  }
+
+  /* ---------- object store ---------- */
+  function mib(bytes) { return bytes >= 1048576 ? (bytes / 1048576).toFixed(1) + " MiB" : (bytes / 1024).toFixed(1) + " KiB"; }
+  function storeColumns() {
+    return [
+      { key: "name", label: "Name", cell: function (o) { return tdLink("#store-object/" + o.name, o.name); } },
+      { key: "kind", label: "Kind" },
+      { key: "bytes", label: "Size", numeric: true, cell: function (o) { return tdText(mib(o.bytes), "n"); } },
+      { key: "sha256", label: "SHA-256", cell: function (o) { return tdText(o.sha256.slice(0, 16) + "…", "mono"); } },
+      { key: "tags", label: "Tags", sort: function (o) { return o.tags.join(","); }, cell: function (o) { return tdText(o.tags.join(", "), "wrap"); } }
+    ];
+  }
+  function storeView() {
+    var total = DATA.store.objects.reduce(function (a, o) { return a + o.bytes; }, 0);
+    view.appendChild(el("h1", { text: "Object store" }));
+    view.appendChild(el("p", { class: "lede", text: "Files too large for Git that the repository names by content: " + DATA.store.objects.length + " objects, " + mib(total) + ", held in " + DATA.store.remote + " under their SHA-256 and indexed in store/index.json. Fetch one with `ecbench store pull NAME` (or use `store:NAME` wherever a command takes a path); the cache re-hashes it before use." }));
+    view.appendChild(table(storeColumns(), DATA.store.objects, { sortKey: "name" }));
+    view.appendChild(el("p", { class: "note" }, ["How it works: ", repoLink("docs/store/README.md"), "."]));
+  }
+  function storeDetail(name) {
+    var o = byId.store[name];
+    if (!o) { view.appendChild(el("p", { class: "note", text: "No stored file " + name + "." })); return; }
+    view.appendChild(el("p", { class: "crumbs" }, [link("#store", "Object store"), " / " + o.name]));
+    view.appendChild(el("h1", { text: o.name }));
+    view.appendChild(el("dl", { class: "facts" }, [
+      fact("Kind", o.kind), fact("Size", mib(o.bytes) + " (" + o.bytes + " bytes)"), fact("SHA-256", o.sha256, true),
+      fact("Remote object", DATA.store.remote + "/sha256/" + o.sha256.slice(0, 2) + "/" + o.sha256, true),
+      fact("Fetch", "ecbench store pull " + o.name, true),
+      fact("Description", o.description), fact("Provenance", o.provenance), fact("Tags", o.tags.join(", ")),
+      fact("Curve", o.curve ? link("#curve/" + o.curve, o.curve) : (o.recorded_curve ? o.recorded_curve + " (registration pending)" : null), true),
+      fact("Factor base", o.fb_id ? link("#fb/" + o.fb_id, o.fb_id) : o.recorded_fb_id, true),
+      fact("Superseded digests", o.superseded.map(function (x) { return x.sha256 + " (" + x.bytes + " bytes)"; }).join("; "), true)
+    ]));
   }
 
   /* ---------- candidates ---------- */
@@ -609,7 +709,7 @@
       return { slug: slug, r_bits: c ? c.r_bits : null, arms: ref.length, best: best === Infinity ? null : best };
     });
     view.appendChild(table([
-      { key: "slug", label: "Curve", cell: function (r) { return tdLink("#curve/" + r.slug, r.slug); } },
+      { key: "slug", label: "Curve", cell: function (r) { return recordedCurveCell(r.slug); } },
       { key: "r_bits", label: "log₂ r", numeric: true, digits: 2 },
       { key: "arms", label: "Arms measured", numeric: true },
       { key: "best", label: "Lowest mean S", numeric: true, digits: 3 }
@@ -664,7 +764,7 @@
       count.textContent = rows.length + " of " + DATA.yields.length + " runs" + (meanYield === null ? "" : " · mean yield over " + verified.length + " verified: " + (100 * meanYield).toFixed(3) + " %");
       while (holder.firstChild) holder.removeChild(holder.firstChild);
       holder.appendChild(table([
-        { key: "curve", label: "Curve", cell: function (y) { return tdLink("#curve/" + y.curve, y.curve); } },
+        { key: "curve", label: "Curve", cell: function (y) { return recordedCurveCell(y.curve); } },
         { key: "target_index", label: "Target", numeric: true, cell: function (y) { return tdText(y.target_index === null ? "–" : "#" + y.target_index, "n"); } },
         { key: "fb_id", label: "Factor base", cell: function (y) { return y.fb_id ? el("td", null, [link("#fb/" + y.fb_id, y.fb_id, "mono"), " ", chip(y.fb_family || "")]) : tdText("–"); } },
         { key: "fb_columns", label: "Cols", numeric: true },
@@ -720,7 +820,7 @@
     while (view.firstChild) view.removeChild(view.firstChild);
     Array.prototype.forEach.call(document.querySelectorAll(".views a"), function (a) {
       var v = a.getAttribute("data-view");
-      var active = h.view === v || (h.view === "curve" && v === "curves") || (h.view === "method" && v === "methods") || (h.view === "fb" && v === "factor-bases") || (h.view === "candidate" && v === "candidates") || (h.view === "round" && v === "rounds") || (h.view === "session" && v === "sessions") || (h.view === "yield" && v === "yield");
+      var active = h.view === v || (h.view === "curve" && v === "curves") || (h.view === "method" && v === "methods") || (h.view === "fb" && v === "factor-bases") || (h.view === "candidate" && v === "candidates") || (h.view === "round" && v === "rounds") || (h.view === "session" && v === "sessions") || (h.view === "yield" && v === "yield") || (h.view === "store-object" && v === "store");
       if (active) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
     switch (h.view) {
@@ -736,6 +836,8 @@
       case "sessions": sessionsView(); break;
       case "session": sessionDetail(h.id); break;
       case "yield": yieldView(h.q); break;
+      case "store": storeView(); break;
+      case "store-object": storeDetail(h.id); break;
       case "vocabulary": vocabularyView(); break;
       default: curvesView(h.q);
     }
@@ -753,6 +855,7 @@
     d.candidates.forEach(function (k) { byId.candidate[k.candidate_id] = k; });
     d.rounds.forEach(function (r) { byId.round[r.round] = r; });
     d.sessions.forEach(function (s) { byId.session[s.session_id] = s; });
+    d.store.objects.forEach(function (o) { byId.store[o.name] = o; });
     loading.hidden = true;
     view.hidden = false;
     window.addEventListener("hashchange", route);
