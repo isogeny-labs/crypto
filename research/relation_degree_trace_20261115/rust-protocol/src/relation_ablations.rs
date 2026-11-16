@@ -34,10 +34,10 @@ fn edges(n: usize, class: usize) -> Vec<(usize, usize)> {
     e.dedup();
     e
 }
-fn wire(row: &Row) -> Value {
+pub(super) fn wire(row: &Row) -> Value {
     json!({"poly":row.poly.iter().collect::<Vec<_>>(),"proof":row.proof.iter().collect::<Vec<_>>()})
 }
-fn row(v: &Value) -> Result<Row> {
+pub(super) fn row(v: &Value) -> Result<Row> {
     let f: Vec<(Vec<usize>, u64)> = serde_json::from_value(v["poly"].clone())?;
     let proof: Vec<((usize, Vec<usize>), u64)> = serde_json::from_value(v["proof"].clone())?;
     let r = Row {
@@ -58,7 +58,7 @@ fn row(v: &Value) -> Result<Row> {
     }
     Ok(r)
 }
-fn identity_script(s: &System, inputs: &[Poly], rows: &[Row]) -> String {
+pub(super) fn identity_script(s: &System, inputs: &[Poly], rows: &[Row]) -> String {
     let mut code = format!(
         "ring r={},({}),dp;\npoly h;\n",
         s.prime,
@@ -86,7 +86,7 @@ fn identity_script(s: &System, inputs: &[Poly], rows: &[Row]) -> String {
     }
     code + "print(\"IDENTITIES_OK\");quit;\n"
 }
-fn prepare(dir: &Path, s: &System) -> Result<String> {
+pub(super) fn prepare(dir: &Path, s: &System) -> Result<String> {
     let inputs = s.decode()?;
     let bytes = serde_json::to_vec(s)?;
     write_new(&dir.join("system.json"), &bytes)?;
@@ -143,7 +143,7 @@ fn selected(inputs: &[Poly], n: usize, class: usize) -> Result<(Vec<Row>, Value)
         json!({"all_constructed_vertices":vertices,"selected_vertices":info}),
     ))
 }
-fn reference_file(path: &Path, n: usize) -> Result<Basis> {
+pub(super) fn reference_file(path: &Path, n: usize) -> Result<Basis> {
     let v: Value = serde_json::from_slice(&fs::read(path)?)?;
     native_basis(&v["basis"], n)
 }

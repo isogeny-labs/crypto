@@ -21,6 +21,8 @@ const ORDERS: [&str; 6] = ["FEC", "ECF", "CFE", "CEF", "EFC", "FCE"];
 mod matched_fresh;
 #[path = "../relation_ablations.rs"]
 mod relation_ablations;
+#[path = "../rank_relations.rs"]
+mod rank_relations;
 #[path = "../callgrind_capture.rs"]
 mod callgrind_capture;
 #[path = "../phase_capture.rs"]
@@ -771,6 +773,11 @@ fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().collect();
     match a.get(1).map(String::as_str){
     Some("prepare")if a.len()==4=>prepare(Path::new(&a[2]),&a[3]),
+    Some("rank-matrix-probe")if a.len()==3=>rank_relations::matrix_probe(Path::new(&a[2])),
+    Some("rank-matrix-audit")if a.len()==4=>rank_relations::matrix_audit(Path::new(&a[2]),Path::new(&a[3])),
+    Some("rank-study")if a.len()==5=>rank_relations::run(Path::new(&a[2]),Path::new(&a[3]),&a[4]),
+    Some("rank-build")if a.len()==5=>rank_relations::build(Path::new(&a[2]),Path::new(&a[3]),a[4].parse()?),
+    Some("rank-report")if a.len()==5=>rank_relations::report(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("relation-ablations")if a.len()==5=>relation_ablations::run(Path::new(&a[2]),Path::new(&a[3]),&a[4]),
     Some("relation-diagnostics")if a.len()==6=>relation_ablations::diagnostics(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4]),a[5].parse()?),
     Some("relation-ablation-report")if a.len()==5=>relation_ablations::report(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),

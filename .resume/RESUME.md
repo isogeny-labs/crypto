@@ -392,3 +392,6 @@ Both studies measured/closed: fresh3cases324answers+6diagnostics, all-case susta
 
 ## Final follow-up publication34 receipt
 Remote115a6f26f62902e35a3bdff10638d80e84550452/tree54b7d86dff3bdfa5d2b028d0f694fd535b2e096b/exactlocal5a6dca9eb... verified; PR4349 updated, all60blobs and remote reportSHA passed. See followup-publication-34.json. BOTH bounded studies complete; no benchmark/background job. Originalholdoutsunused. No new15x; no degree drop. Current nextlead budgeted early rank contribution unmeasured. Signedvalidation/CI/review remain; no canonicalexportconformance. Finalhandoffmetadata being published; mathematical source/raw/result payload alreadyremote34.
+
+## Active successor override: budgeted early rank
+User requested continued work; new activegoal fixed RANK_BUDGET_PROTOCOL_02.md PCCd8ef6a (01tagerror1d2f7b retained). Source47tests/lint/build50 passe54197. Nextfreeze source then4Singular matrix probes +6oldn3 correctness cells, corruptedrankrefusal, publish36 then18n3/4/6seed7arms. Actualrootworker8d0ba116c unchanged. No fresh/reservedinputs allowed. LocalCPU0/L0/checkpointwaived/zero$. Prior studiescomplete.
