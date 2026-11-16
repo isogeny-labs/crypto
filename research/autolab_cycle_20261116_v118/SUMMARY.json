@@ -1,0 +1,137 @@
+{
+  "oracle": {
+    "out": {
+      "cases": 32,
+      "original_assignments": 3072,
+      "encoded_assignments": 3072,
+      "complete_root_multisets": 128,
+      "offbranch_assignments": 1536,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "profile": {
+    "out": {
+      "actual_controls": 72,
+      "branch_controls": [
+        24,
+        24,
+        24
+      ],
+      "original_complete": false,
+      "inputs": 65,
+      "variables": 62650,
+      "clauses": 231270,
+      "gate_kinds": {
+        "false": 1,
+        "true": 1,
+        "input": 65,
+        "and": 19252,
+        "xor": 43263,
+        "not": 70
+      },
+      "synthesis": {
+        "synthesis_rounds": 256,
+        "pair_events": 985235,
+        "stop_reason": "round_cap",
+        "target_forms": 405,
+        "pair_index_entries": 32546,
+        "fallback_forms": 0,
+        "shared_direction_dimension": 55,
+        "max_extra_directions": 8,
+        "primary_inputs": 65,
+        "generator_functions": 79
+      },
+      "graph_sha256": "5994243f2689e89811f8ea4f937e92d686bdaa125b82ba8519ad37f286c97d1d",
+      "cold_total_seconds": 2.1439495199883822,
+      "all_three_cases_retained": true
+    },
+    "error": null
+  },
+  "search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "allthreeleadingcases inonefixednecessarynormfamily;otherouterfamilies/source/Uunresolved",
+      "inputs": 65,
+      "variables": 62650,
+      "synthesis": {
+        "synthesis_rounds": 256,
+        "pair_events": 985235,
+        "stop_reason": "round_cap",
+        "target_forms": 405,
+        "pair_index_entries": 32546,
+        "fallback_forms": 0,
+        "shared_direction_dimension": 55,
+        "max_extra_directions": 8,
+        "primary_inputs": 65,
+        "generator_functions": 79
+      },
+      "cold_compile_seconds": 0.5640216690080706,
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 3.7465132049983367,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "203441",
+        "sat mk clause 3ary": "69219",
+        "sat mk clause nary": "440159",
+        "sat mk var": "125167",
+        "sat gc clause": "62855",
+        "sat del clause": "267960",
+        "sat conflicts": "96790",
+        "sat decisions": "214626",
+        "sat propagations 2ary": "31796466",
+        "sat propagations nary": "194794500",
+        "sat restarts": "14087",
+        "sat minimized lits": "1699381",
+        "sat subs resolution dyn": "36112",
+        "sat units": "644",
+        "sat elim bool vars res": "30550",
+        "sat backjumps": "96779",
+        "sat backtracks": "11",
+        "sat elim clauses": "492",
+        "sat elim literals": "572",
+        "sat subsumed": "1963",
+        "sat subs resolution": "2809",
+        "sat scc elim vars": "62509",
+        "sat scc elim binary": "3",
+        "sat tr": "2",
+        "sat probing assigned": "1",
+        "sat-cut.eqs": "248",
+        "sat-cut.cuts": "722753",
+        "sat-cut.ands": "19252",
+        "sat-cut.xors": "43263",
+        "sat-cut.xands": "6402",
+        "sat-cut.xites": "12264",
+        "sat-cut.xxors": "38201",
+        "sat-cut.dc-reduce": "7468",
+        "rlimit count": "210236201",
+        "max memory": "586.84",
+        "memory": "318.26",
+        "num allocs": "20279288303.0",
+        "time": "42.577"
+      },
+      "engine_seconds": 46.327133593003964,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "qualified_speedup": null,
+  "original_complete": false
+}
