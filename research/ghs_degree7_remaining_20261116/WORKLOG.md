@@ -30,7 +30,7 @@ solutions and failures, then move to the other two denominator classes.
 Conductor holds `docs/session-logs/2026-11-15.md` under T-6448, so this scoped
 worklog records this task's decisions until that journal can be reconciled.
 
-## 2026-11-15 22:46 America/Los_Angeles
+## 2026-11-15 22:44 America/Los_Angeles
 
 ### What was done
 
@@ -54,7 +54,7 @@ Complete and audit b=68 and b=84; then address other denominator classes.
 Initial solver logic treated positive-dimensional ideals as censored. The
 amended bounded enumeration resolves them or records a solver error.
 
-## 2026-11-15 22:55 America/Los_Angeles
+## 2026-11-15 22:50 America/Los_Angeles
 
 ### What was done
 
@@ -79,7 +79,7 @@ Commit, rerun, audit all cells and exact identities; continue the other shapes.
 Univariate gcd was needlessly expensive. Direct root filtering is exact here
 because every specialized equation is quadratic or lower in `w`.
 
-## 2026-11-15 23:02 America/Los_Angeles
+## 2026-11-15 22:56 America/Los_Angeles
 
 ### What was done
 
@@ -106,7 +106,7 @@ Commit third amendment; finish b=68 and b=84, independently audit receipts.
 The direct finite-field fallback was exact but not computationally bounded
 enough in the exceptional ideals. The interrupted files contain no results.
 
-## 2026-11-15 23:08 America/Los_Angeles
+## 2026-11-15 22:58 America/Los_Angeles
 
 ### What was done
 
@@ -133,7 +133,7 @@ explicit trace-+22 transfer if any map is found.
 
 None in the final v3 runs. Earlier interrupted receipts remain incomplete.
 
-## 2026-11-15 23:13 America/Los_Angeles
+## 2026-11-15 23:00 America/Los_Angeles
 
 ### What was done
 
@@ -158,7 +158,7 @@ class.
 
 None in this preparation.
 
-## 2026-11-15 23:18 America/Los_Angeles
+## 2026-11-15 23:03 America/Los_Angeles
 
 ### What was done
 
@@ -185,7 +185,7 @@ shape results and assess the fixed-carrier degree-seven bound.
 
 None in the two counted runs.
 
-## 2026-11-15 23:23 America/Los_Angeles
+## 2026-11-15 23:05 America/Los_Angeles
 
 ### What was done
 
@@ -211,7 +211,7 @@ classes into a fixed-carrier degree-seven lower bound with stated scope.
 
 None in preparation.
 
-## 2026-11-15 23:29 America/Los_Angeles
+## 2026-11-15 23:08 America/Los_Angeles
 
 ### What was done
 
@@ -237,7 +237,7 @@ then combine all classes and audit the fixed-carrier bound.
 
 None in the three-pole counted runs.
 
-## 2026-11-15 23:35 America/Los_Angeles
+## 2026-11-15 23:09 America/Los_Angeles
 
 ### What was done
 
@@ -261,7 +261,7 @@ then audit the denominator partition and combine receipts.
 
 None in source preparation.
 
-## 2026-11-15 23:40 America/Los_Angeles
+## 2026-11-15 23:12 America/Los_Angeles
 
 ### What was done
 
@@ -288,7 +288,7 @@ move to a different carrier or degree in Howe's 4–26 window.
 
 None in these four counted runs.
 
-## 2026-11-15 23:47 America/Los_Angeles
+## 2026-11-15 23:17 America/Los_Angeles
 
 ### What was done
 
@@ -317,7 +317,7 @@ geometry classes remain to be searched. Continue new-family construction.
 
 None in audit or Lean checks.
 
-## 2026-11-15 23:55 America/Los_Angeles
+## 2026-11-15 23:20 America/Los_Angeles
 
 ### What was done
 
@@ -344,7 +344,7 @@ search cells, audit hits and coverage, update bound/novelty status.
 
 None in preparation.
 
-## 2026-11-15 23:58 America/Los_Angeles
+## 2026-11-15 23:21 America/Los_Angeles
 
 ### What was done
 
@@ -367,3 +367,47 @@ Run orbit certificate and ten search cells; audit.
 
 Initial exact-string replacement failed on cubic source formatting. The
 unique-assignment assertion now handles both spacing styles.
+
+## 2026-11-15 23:22 America/Los_Angeles
+
+### What was done
+
+Committed the second-carrier protocol and source copies at `ecd9cbd26c16`.
+The first source-bound orbit-certificate execution verified its assertions
+but failed while serializing Sage integers to JSON. Added `default=int` to
+the JSON encoder. No counted second-carrier cover search had begun.
+
+### Decisions made
+
+Commit the serialization amendment, then rerun the certificate and ten cells.
+
+### Open threads
+
+Complete second-carrier runs and audit maps or exclusions.
+
+### Errors
+
+Sage `Integer` is not directly JSON serializable by Python's encoder; the
+explicit integer conversion fixes only receipt serialization.
+
+## 2026-11-15 23:22 America/Los_Angeles — timestamp correction
+
+### What was done
+
+Compared worklog headings against exact Git commit times and the local `date`
+command. Corrected several later headings that had been estimated ahead of
+the clock; all entries now appear in chronological order. The work details
+and committed source/receipt evidence were unchanged.
+
+### Decisions made
+
+Use the local clock, rather than an elapsed-time estimate, for further log
+headings.
+
+### Open threads
+
+Rerun the corrected orbit certificate; then second-carrier searches.
+
+### Errors
+
+Earlier worklog headings were ahead of local time.

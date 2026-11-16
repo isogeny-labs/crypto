@@ -53,4 +53,4 @@ print(json.dumps({'schema':'ghs.trace22.pgl2-carrier-orbits/v1',
                   'components':components,
                   'representative_maps':{
                    str(m):{str(n):edges[m][n] for n in components[i]}
-                   for i,m in enumerate((32280,35349))}},sort_keys=True))
+                   for i,m in enumerate((32280,35349))}},sort_keys=True,default=int))
