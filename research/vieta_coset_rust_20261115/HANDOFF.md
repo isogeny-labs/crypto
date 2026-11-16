@@ -1,5 +1,15 @@
 # Vieta Rust port: continuation receipt
 
+## Publication closed — 16 November, 07:30 UTC
+
+Results PR4358 merged at03:20:47 UTC as a79fc35e35c1be023e8c862cb74128b356c4ef30.
+See CLOSEOUT.md and scale-20261115T2053Z/closeout-20261116.json for actual
+job outcomes. Required jobs failed after merge; this is not a green-CI or
+independent-validation claim [pcc:unverified]. Scientific observations and the
+hand argument retain pending standing. The results follow-up automation is
+paused; no benchmark rerun or cloud experiment occurred. Older continuation
+receipts below are historical.
+
 ## Current follow-up — 16 November, 03:14 UTC
 
 PR4358 had no Copilot response after four hours; generic autofix lacked its API
