@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:14:14Z",
+ "id": "PCC-20261116-24c1ba",
+ "kind": "statement",
+ "producer": {
+  "commit": "926f7788069664844864128425b96cebe4674af1",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-geometry"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/quotient_theta2.cpp",
+    "sha256": "d7832ebb7a7bcc638906c950951c5463d74162408b95cc96ef88c71b769140a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/QUOTIENT_THETA_PROTOCOL.md",
+    "sha256": "18a1f485174150cf326d678f35adf3b90c78f9d43e8e0b76e12c60265afd1dd4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/quotient-theta2-v1/result.json",
+    "sha256": "e2bc519efa4a601d2f3969e2237dee235335a950ed34187874c6649028ef08a9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/quotient-theta2-v1/pre-call-manifest.sha256",
+    "sha256": "55420379b487e968cd6e5b52d65fe09110e46f75d6dc45a76f602814a8a3f720"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "For actual P192 d7 kernel1, native Fp24 computation reports384 heldout source level2 normalization identities and identical64 quotient theta-square values at two distinct kernel representatives. All28 odd values vanish and none of the36 even values vanishes. This is unsigned producer quotient-moduli evidence supporting the nonhyperelliptic reconstruction branch, not a constructed same-field quartic or checked divisor map."
+}

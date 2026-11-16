@@ -1,6 +1,6 @@
 # Mixed 3-torsion transfers and a working small-curve IC prototype
 
-2026-11-16. Follow-up to [PR4348](https://github.com/isogeny-labs/crypto/pull/4348), delivered in [PR4403](https://github.com/isogeny-labs/crypto/pull/4403). **The public small-curve prototype now recovers scalars end to end. P-192 has transfer/quotient-image checks, with no DLP recovery or speed result.** These are native development correctness tests, not performance experiments. All new assertions remain producer-unverified under the repository PCC policy. [pcc:unverified]
+2026-11-16. Follow-up to [PR4348](https://github.com/isogeny-labs/crypto/pull/4348), delivered in [PR4403](https://github.com/isogeny-labs/crypto/pull/4403). **The actual P-192 kernel1 quotient moduli now yield a smooth plane-quartic candidate descended to the original prime field. The public small-curve prototype recovers scalars end to end.** P-192 divisor-map/twist identification remains open, with no P-192 DLP recovery or speed result. These are native development correctness tests, not performance experiments. All new assertions remain producer-unverified under the repository PCC policy. [pcc:unverified]
 
 ## Findings
 
@@ -8,7 +8,13 @@ The P-192 d7 cover now has executable native pullback and norm, six explicit gen
 
 ![Eight kernel rationality checks](figures/kernels.svg)
 
-All eight P-192 kernels now have executable kernel-coset quotient image arithmetic and a dual candidate, with TF=[6] and inverse6 source-point roundtrips. A distinct OpenSSL backend checks40 public elliptic endpoint receipts. These coset models do not reconstruct a plane quartic or cover every rational point of the algebraic quotient. Neither a P-192 DLP speedup nor a general obstruction is established. [pcc:unverified]
+All eight P-192 kernels have executable kernel-coset quotient image arithmetic and a dual candidate, with TF=[6] and inverse6 source-point roundtrips. A distinct OpenSSL backend checks40 public elliptic endpoint receipts. The coset model covers the declared image; a separate geometric construction now reconstructs a candidate curve for kernel1. Neither a P-192 DLP speedup nor a general obstruction is established. [pcc:unverified]
+
+## Actual P-192 candidate curve
+
+Starting from the emitted actual kernel1, native code constructs normalized level3 Weil functions, checks their multiplication and special charts, computes the quotient's64 theta-square values, and reconstructs a smooth Riemann quartic. All28 odd values vanish and all36 even values are nonzero. The curve is explicitly descended from the auxiliary Fp24 tower to Fp using28 labelled bitangents, Frobenius and matrix Hilbert90. The full [geometric report](GEOMETRY.md), [PDF](GEOMETRY.pdf) and [exact15-term model](evidence/p192-d7-kernel1-plane-quartic.json) retain the construction and checks. PCC-20261116-901321 has unsigned producer standing. [pcc:unverified]
+
+The candidate's Jacobian still needs identification with the polarized quotient over Fp, including a possible Serre quadratic twist, and an executable divisor-class map. A fixed coordinate-window factor base contains234 points and five principal vertical-line relations of coefficient rank5. Native target Jacobian arithmetic now checks rational point classes, addition, cancellation and one principal relation using85 evaluations. These have no source-image binding or base logarithms; see PCC-20261116-d2bdb3 and PCC-20261116-94a153. [pcc:unverified]
 
 ## End-to-end scalar recovery on public controls
 
@@ -49,9 +55,9 @@ The active solver is `toy_ic_v4.cpp`; the pinned `toy_ic.cpp` retains v3. V4 che
 | Actual mixed3 kernels on the genus3 Jacobian | Six generators span729 distinct classes. Eight subgroups of27 elements are explicitly realized and Frobenius-stable. Pairing transport uses aligned roots and the standard polarized degree2 pullback identities. |
 | Boundary inputs | Origin, second branch class, and both ramified fibers at elliptic x=1 over a quadratic extension. The latter tests execute pullback fiber/additivity; the norm backend is restricted to rational-coefficient divisors over the base prime field. |
 | Corruption controls | Nine rejected cases: count, Frobenius, form, missing modules, duplicate module, torsion point, cube-root/pairing witness, curve coefficient and non-isotropic kernel. |
-| Explicit quotient, nonhyperelliptic target and descent | Exact finite kernel-coset image representation implemented; plane-quartic/Jacobian coordinates and full rational-point coverage remain unconstructed. |
+| Explicit quotient, nonhyperelliptic target and descent | Exact coset image plus a smooth kernel1 quartic candidate descended to Fp, with native target arithmetic on rational-support fixtures. Polarized Jacobian identification, Serre twist, isogeny lift and full target input coverage remain open. |
 | Executed dual composition TF=[6] | Executed for all8 P-192 kernels with source-point recovery and separate OpenSSL endpoint checks; not a target-curve-coordinate implementation. |
-| Candidate projected relation solver | A working full-base small-curve principal-function IC control is implemented. A useful restricted-base P-192 solver remains open. |
+| Candidate projected relation solver | Full-base small controls recover scalars. The actual P-192 candidate has234 coordinate-window points and five principal relations; source-image binding and a useful restricted-base solver remain open. |
 | Complete cost / rho / scaling panel | Not attempted. Small correctness fixtures are not performance trials. No P-192 advantage or scientific measurement is claimed. |
 
 All executed rows above have unsigned producer standing; see the linked raw outputs and PCC records. [pcc:unverified]
@@ -118,7 +124,7 @@ For each actual $K$, represent a point by the coset $D+K$, with its least full M
 
 The native [quotient replay](evidence/quotient-v1/rows.jsonl) partitions the729 source3-torsion classes into27 cosets of27 for each kernel, checks135 representative choices and five source scalar fixtures per kernel (including a hash-derived full-width known-answer scalar), and checks inverse6 source-point recovery. [OpenSSL](evidence/quotient-openssl-v1/checker.txt) verifies all40 recorded elliptic endpoints and rejects a corrupted recovery point. No logarithm is recovered by applying inverse6: it recovers the original source point. [pcc:unverified]
 
-This models the image of $J(H)(\mathbf F_{p^8})$ in its quotient, not all $A(\mathbf F_{p^8})$ or $A(\mathbf F_p)$. In particular the 27 cosets from source 3-torsion are not the full geometric $A[3]$, which still has 729 points. The cryptographic order-$r$ subgroup is preserved. A nonhyperelliptic target curve, rational descent of its geometric model and full target divisor arithmetic remain distinct obligations.
+This models the image of $J(H)(\mathbf F_{p^8})$ in its quotient, not all $A(\mathbf F_{p^8})$ or $A(\mathbf F_p)$. In particular the 27 cosets from source 3-torsion are not the full geometric $A[3]$, which still has 729 points. The cryptographic order-$r$ subgroup is preserved. A separate kernel1 construction now supplies a base-field candidate curve; polarized Jacobian identification, the possible twist and full target divisor/map arithmetic remain distinct obligations.
 
 For a transported source base $D_i$, the projected row identity is exactly
 
@@ -148,11 +154,11 @@ PCC statements: `PCC-20261116-b0b9e9` (finite modules), `PCC-20261116-4a86ed` (s
 
 ## Full test still required
 
-The coset-image implementation now checks the transfer and dual compositions. An explicit nonhyperelliptic quotient model, its target divisor arithmetic, and a useful P-192 restricted-base solver are still required for the original proposed attack. The relation problem is
+The coset-image implementation checks the transfer and dual compositions, and actual quotient moduli supply a smooth candidate curve over Fp. Its polarized Jacobian identification/twist, target divisor-class map and a useful P-192 restricted-base solver are still required for the original proposed attack. The relation problem is
 
 $$T\left(\sum n_iD_i\right)=aP+bQ,$$
 
-allowing a free residual in ker(T). The small full-base control now solves a version of this problem; it does not supply a scalable prime-field factor base or favourable cost bound. The original P-192 evaluation still needs the target-geometry construction, an appropriate solver, independent replay and all cold costs against direct elliptic equations and matched rho. Merely applying Diem's ambient genus3 solver does not provide the hypothesized elliptic-subgroup advantage. [pcc:unverified]
+allowing a free residual in ker(T). The small full-base control solves a version of this problem; it does not supply a scalable prime-field factor base or favourable cost bound. The original P-192 evaluation still needs the checked target-map/twist identification, an appropriate solver, independent replay and all cold costs against direct elliptic equations and matched rho. Merely applying Diem's ambient genus3 solver does not provide the hypothesized elliptic-subgroup advantage. [pcc:unverified]
 
 The [named obstruction](../../problems/nist-mixed-three-quotient-and-relation-solver.md), [blocked backlog card](../../backlog/XP-20261116-nist-mixed-three-quotient/README.md) and [protocol](PROTOCOL.md) preserve the original requirements. The current main journal reports monthly lab spend USD1982.224 againstUSD1300; this executor has no live AWS readback. No paid experiment/build was submitted, and no alternative backend was used to bypass that admission limit. Restored budget alone would not supply the missing quotient and solver.
 
