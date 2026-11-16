@@ -4,8 +4,15 @@ Current checkpoint: the construction, qualified fixed native controls,
 source-linked two-page report and three conditional existing-law Lean
 endpoints are finished locally. Native PCC-20261116-b3227f and Lean
 PCC-20261116-77b508 remain unsigned. [pcc:unverified]
-Publication is pending the final source/artifact/history checks and normal
-lane push. NEXT.md retains the solver/accounting step. The pre-code notes
+Source/evidence is published as20e82118494e438afedb83e1dfdfb3b2b27a3dcd
+from scientific commitd174823774609e0d5249bfa01824a91db59ebfa5, with exact
+tree equality and all1135 then-published ledger events retained.
+Source-head current/recompute failed on unchanged backend S3 artifact reads
+before validation. Separate diagnostic PCC-20261116-ffe108 records complete
+decoded logs/identity; it is not a result for a later metadata head.
+[pcc:unverified]
+Final metadata publication and fresh-head checks remain due. NEXT.md retains
+the solver/accounting step. The pre-code notes
 below are historical preparation; no solver campaign has started.
 
 The pre-code protocol is PROTOCOL.md. No implementation or qualified native
