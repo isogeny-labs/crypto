@@ -76,3 +76,5 @@ closed points and residue norms, scheme identification, arbitrary divisor
 representatives, multiplication-isogeny comparison, general descent,
 canonical Tate and general MOV/Frey–Rück remain open. All fourteen targets
 remain active. [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389). Remote proof `fd1100c243fef6e37e187f37a8d0700cda391b11` and local receipt `a05c1e55fe5fd5c3ac2c1076c0db85d949678c4b` share tree `fad20513b7bc29fc303926478ad9447b17c96e2e`. Anonymous fetch completed and a fresh read matched the exact head, title, body and ready state. All 43 pinsets / 5049 entries match. Current-head CI, review and signing are pending. [pcc:unverified]
