@@ -398,6 +398,34 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+    run_pipeline_inner(ctx, spec, base_builder, oracle, Some(planted), calib, rho_s)
+}
+
+/// Run the pipeline using only public instance and target inputs; recovery is
+/// checked against the source point, without supplying a held answer.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_public<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<RunReport, String> {
+    run_pipeline_inner(ctx, spec, base_builder, oracle, None, calib, rho_s)
+        .map(|(report, _)| report)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_pipeline_inner<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: Option<u64>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -529,6 +557,29 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             }
         }
     }
+    let seed_start = std::time::Instant::now();
+    let (mut setup_seed_independent, mut setup_seed_dependent) = (0u64, 0u64);
+    for seed_row in oracle.setup_rows() {
+        if seed_row.len() != fb.columns {
+            return Err(format!(
+                "oracle setup row has {} columns, expected {}",
+                seed_row.len(),
+                fb.columns
+            ));
+        }
+        let mut row = seed_row.clone();
+        row.push(0);
+        match matrix.add_row(row, 0) {
+            crate::cryptanalysis::ic_boundary::RowStatus::Independent => {
+                setup_seed_independent += 1
+            }
+            crate::cryptanalysis::ic_boundary::RowStatus::Dependent => setup_seed_dependent += 1,
+            crate::cryptanalysis::ic_boundary::RowStatus::Inconsistent => {
+                return Err("verified oracle setup row was inconsistent".into());
+            }
+        }
+    }
+    let setup_seed_ns = seed_start.elapsed().as_nanos() as u64;
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
@@ -664,6 +715,22 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     };
     for (name, value) in oracle.relation_counters() {
         outcome.relations.count(&name, value);
+    }
+    let setup_seed_rows = setup_seed_independent + setup_seed_dependent;
+    if setup_seed_rows > 0 {
+        outcome.linear_algebra.wall_ns += setup_seed_ns;
+        outcome
+            .linear_algebra
+            .count("setup_seed_rows", setup_seed_rows);
+        outcome
+            .linear_algebra
+            .count("setup_seed_independent", setup_seed_independent);
+        outcome
+            .linear_algebra
+            .count("setup_seed_dependent", setup_seed_dependent);
+        outcome
+            .linear_algebra
+            .work("row_build_words", setup_seed_rows * (fb.columns as u64 + 1));
     }
     outcome.relations.work_all(&oracle.relation_work_native());
     // Kept opt-in so the previously recorded full-rank sessions retain
@@ -895,7 +962,8 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             cost_qualification: cost_qualification.clone(),
             verify: ver,
             recovered: outcome.recovered,
-            verified: outcome.verified && outcome.recovered == Some(planted),
+            verified: outcome.verified
+                && planted.is_none_or(|known| outcome.recovered == Some(known)),
             total_gae,
             s,
             rho_s,
@@ -908,7 +976,6 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         fb,
     ))
 }
-
 /// The table a sweep prints.
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
@@ -1334,6 +1401,19 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+
+        let mut public_oracle = MitmOracle::new(2);
+        let public_report = run_pipeline_public(
+            &ctx,
+            &spec,
+            &base,
+            &mut public_oracle,
+            &Calibration::default(),
+            None,
+        )
+        .expect("public-only pipeline should run");
+        assert!(public_report.verified, "public source-point check failed");
+        assert_eq!(public_report.recovered, report.recovered);
         // Every stage marks the work it now counts for `bitop/v1`, and
         // counts some: the base's indexes, the table's inserts, the walk's
         // bookkeeping, the rows and the elimination's scans.

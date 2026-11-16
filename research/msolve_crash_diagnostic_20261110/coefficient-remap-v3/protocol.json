@@ -1,0 +1,543 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "msolve-crash-diagnostic-20261110",
+  "version": 3,
+  "created": "2026-11-10",
+  "repository": "crypto",
+  "study_dir": "research/msolve_crash_diagnostic_20261110/coefficient-remap-v3",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "formal_source": "../../theorem_census_20261109/lean/F4SaturationBoundary.lean"
+  },
+  "question": "In pinned0.6.5 exactLA2, do common-logged baseline and one-lookup correction retain different exact known-answer outcomes, and what old/new/live coefficient indices are recorded? Backport current-upstream matrix lookup only in17bit reducer, with no general Crefinement or novelty claim.",
+  "claims": [
+    {
+      "id": "D1",
+      "class": "exact_computation",
+      "text": "Four fixed native output/exit/index-log observations, with expected bases checked by frozen exactC++ arithmetic. Source variants differ only in one lookup after identical logging; no full Crefinement, source safety or novel upstream finding.",
+      "decided_by": [
+        "fixed-diagnostics"
+      ]
+    },
+    {
+      "id": "D2",
+      "class": "theorem",
+      "text": "Prior actual F4Run ideal containment and saturation-domain disproof remain decided only by frozen Lean proofs.",
+      "decided_by": []
+    },
+    {
+      "id": "D3",
+      "class": "out_of_scope",
+      "text": "C refinement, source bug causality, statistical/time comparisons, generic ideals, independence and signed execution are not established by these calls.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "logged-l2-ordinary",
+      "role": "reference",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "87d9417042fa3d5628cdf07c3a03f9a99cafe73c26eda70cb7bcd288a938650e",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "address only; leaks disabled; undefined shift not instrumented or repaired",
+          "patch_sha256": "c1f9e3578e9a5aec8b1863918d6a18c79c3650ab9d51cc58b5c5f50f63a2280c",
+          "common_logging": "old/new/live index logs"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1"
+        }
+      },
+      "parameters": {
+        "mode": "ordinary",
+        "linear_algebra": 2,
+        "build": "logged"
+      }
+    },
+    {
+      "id": "logged-l2-saturation",
+      "role": "reference",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "87d9417042fa3d5628cdf07c3a03f9a99cafe73c26eda70cb7bcd288a938650e",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "address only; leaks disabled; undefined shift not instrumented or repaired",
+          "patch_sha256": "c1f9e3578e9a5aec8b1863918d6a18c79c3650ab9d51cc58b5c5f50f63a2280c",
+          "common_logging": "old/new/live index logs"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1"
+        }
+      },
+      "parameters": {
+        "mode": "saturation",
+        "linear_algebra": 2,
+        "build": "logged"
+      }
+    },
+    {
+      "id": "corrected-l2-ordinary",
+      "role": "candidate",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "685e63a614c20e68647a58e523f08759e60cca51798790b1f2e01b13c0f27e9a",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "address only; leaks disabled; undefined shift not instrumented or repaired",
+          "patch_sha256": "64b77ab2e688c1a70e01928bcab2a0cf0f854b09dacae10bd9cf2d7757951068",
+          "common_logging": "old/new/live index logs"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1"
+        }
+      },
+      "parameters": {
+        "mode": "ordinary",
+        "linear_algebra": 2,
+        "build": "corrected"
+      }
+    },
+    {
+      "id": "corrected-l2-saturation",
+      "role": "candidate",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "685e63a614c20e68647a58e523f08759e60cca51798790b1f2e01b13c0f27e9a",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "address only; leaks disabled; undefined shift not instrumented or repaired",
+          "patch_sha256": "64b77ab2e688c1a70e01928bcab2a0cf0f854b09dacae10bd9cf2d7757951068",
+          "common_logging": "old/new/live index logs"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1"
+        }
+      },
+      "parameters": {
+        "mode": "saturation",
+        "linear_algebra": 2,
+        "build": "corrected"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Fixed exact diagnostic cells with known answers and synthetic checker calibration. No population, noise, time, causal or statistical inference; not required for exact computation."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Fixed exact diagnostic cells with known answers and synthetic checker calibration. No population, noise, time, causal or statistical inference; not required for exact computation."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Fixed exact diagnostic cells with known answers and synthetic checker calibration. No population, noise, time, causal or statistical inference; not required for exact computation."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "mode",
+        "levels": [
+          "ordinary",
+          "saturation"
+        ]
+      },
+      {
+        "name": "lookup",
+        "levels": [
+          "basis",
+          "matrix"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "diagnostic_cell",
+        "treatment": "crossed",
+        "value": "mode x coefficientlookup, all4cells; exactLA2,address-only,commonlogging",
+        "how": "Absolute per-cell known answers, no causal/performance claim."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "how": "One shared authorized local host, no clock evidence."
+      },
+      {
+        "name": "inputs_order_randomness",
+        "treatment": "fixed",
+        "value": "one ideal; listed order; one thread; genericity0; no warmups or sampled instance",
+        "how": "Preserve full argv and outcomes, no postdata retries."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded exact expected bases",
+        "how": "Frozen analyzer and prior Lean witnesses."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "fixed-diagnostics",
+        "arms": [
+          "logged-l2-ordinary",
+          "logged-l2-saturation",
+          "corrected-l2-ordinary",
+          "corrected-l2-saturation"
+        ],
+        "differs_in": [
+          "diagnostic_cell"
+        ],
+        "design": "absolute",
+        "threshold": "Per-cell zero discrepancy from its literal known answer; failure/timeout remains not_validated."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "No sampled instance or random form; genericity disabled, exact sparse algebra. Any undocumented internal randomness is not used for inference."
+    },
+    "instance_sampling": {
+      "rule": "One fixed Boolean idealF65537, documented mode toggles; all8 diagnostic cells, not sampled.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Literal known answers and exact arithmetic; no subjective inclusion or fit."
+    },
+    "arm_order_reason": "Fixed exact known-answer diagnostic, no statistics/noise or timing inference; full2x2cells."
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exactly4fixed arms x1instance x1replicate=4calls; no statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 5,
+      "threads": 1,
+      "estimated_total_seconds": 20,
+      "measured_on": "Bounded admission5s/cell,20stotal. Prior address-onlyLA2fault atla_ff32:543 seen; new patched/logged outputs not seen."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "basis_ok",
+        "name": "Literal known-answer basis",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Exit0, literal expected basis, field65537 header, Buchberger S-pairs and input reductions zero.",
+        "source": "evidence/analysis.jsonl:basis_matches",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "dimension",
+        "name": "Known quotient dimension",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Bounded standard-monomial staircase equals3 ordinary and1 saturation.",
+        "source": "evidence/analysis.jsonl:standard_monomials",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "boundary",
+        "name": "Evaluation witness",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Ordinary rows vanish at(0,1); saturation contains y and does not vanish there.",
+        "source": "evidence/analysis.jsonl:vanishes_at_zero_one",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "boolean_grid",
+        "name": "Boolean candidate zero count",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Check only (0,0),(0,1),(1,0),(1,1), count3ordinary/1saturation; not a full F65537^2 enumeration.",
+        "source": "evidence/analysis.jsonl:boolean_grid_zeros",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "sanitizer_diagnostic",
+        "name": "Raw sanitizer diagnostic",
+        "unit": "text",
+        "kind": "exact",
+        "definition": "Preserve complete stderr; do not turn presence/absence into C correctness proof.",
+        "source": "evidence/runs/*.stderr",
+        "aggregation": "per_row",
+        "resolution": "literal",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "binary/source/input/analyzer hashes",
+      "argv",
+      "stdout/stderr/output/exit",
+      "UTC start/end timestamps (provenance only)",
+      "host and compiler provenance"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 20,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly4listed logged/corrected exactLA2 calls, one attempt each, retain all outputs and index logs.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "5second watchdog per call,20second native batch allowance, no outcome-dependent retry.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Missing/malformed output, timeout or nonzero exit is not_validated; no silent exclusion.",
+    "No parser/source fix after affected data under this protocol; preserve and label new version if correction needed."
+  ],
+  "decision_rule": {
+    "text": "fixture_pass only when every exact registered check passes for the arm; otherwise discrepancy or not_validated.",
+    "comparison_ids": [
+      "fixed-diagnostics"
+    ],
+    "threshold": "zero discrepancies",
+    "statistic": "exact polynomial equality and finite integer checks",
+    "interval": "none; exact known answers",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "integer discrepancy from known answer",
+    "verdict_vocabulary": [
+      "fixture_pass",
+      "discrepancy",
+      "not_validated"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "8df81cca80bf6eaab4d5000af6bb3ba81bfb34768cfa7fe27b9401eaff6a673b"
+    },
+    "inputs": [
+      "inputs/*.ms",
+      "evidence/runs/*"
+    ],
+    "outputs": [
+      "evidence/analysis.jsonl",
+      "export.json",
+      "report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "reports/proof-20261110/diagnostic.svg"
+    ],
+    "report_dir": "reports/proof-20261110"
+  },
+  "inadmissible": [
+    "Promoting this fixture to general ordinary msolve F4Run refinement.",
+    "Calling saturation output an ordinary ideal consequence.",
+    "Claiming timing, statistics, independent-host validation or signed execution.",
+    "Suppressing any outcome or changing frozen expected rows/parser.",
+    "Treating four Boolean candidates as exhaustive F65537^2 enumeration or hiding the v1registration/dispatch failures."
+  ],
+  "literature": [
+    {
+      "ref": "../f4-model-imports.json; original04 F4Containment/SubspaceCriterion and original08 SolvingDegreeBound",
+      "provenance": "internal",
+      "claim": "Actual F4Run invariant and exact original model bytes."
+    },
+    {
+      "ref": "msolve@5e72b9d99eaea55fe87eb8ac945ec9e914a69327 main.c -S; msolve.c basis output2230-2252 and saturation3816-3844; f4sat.c429-458",
+      "provenance": "retrieved",
+      "claim": "-S saturates first k-1 input polys by last; -g2 returns full basis; simplify reading belongs to saturation path. msolve.c3799requires32bit field path; io.c599-615selects32bits at p>=65536."
+    },
+    {
+      "ref": "Mathlib56a00585 MvPolynomial/Ideal.span; ../lean/F4SaturationBoundary.lean and F4ExpectedOutputs.lean",
+      "provenance": "internal",
+      "claim": "Actual ideal membership, evaluation nonmembership and power-witness saturation; expected modular coefficients bound in Lean."
+    },
+    {
+      "ref": "Pinned upstream main.c advanced linear algebra1/2 flags; neogb/io.c599-615ff_bits, f4.c matrixdispatch, la_ff_32.c exact sparse and sparse/dense paths; GCC AddressSanitizer/UndefinedBehaviorSanitizer options; https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html",
+      "provenance": "retrieved",
+      "claim": "Source-guided diagnostic only; instruments may change observable failure; no source bug conclusion from outcome alone."
+    },
+    {
+      "ref": "Upstream current la_ff_32.c ef2e6aa39cca7b25f63a9a15a0779bf516718b3c355–390; pinned0.6.5la_ff_16.c160–190; pinned32bitfunction and exact_sparse_reduced_echelon_form_ff_32 remap2619–2623",
+      "provenance": "retrieved",
+      "claim": "Both current32bit and pinned16bit paths read matrix coefficient table after remap. Candidate backports that concrete lookup in17bit path; no upstream novelty or fullsource refinement claim."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "common-logging-and-one-lookup",
+      "filed": "2026-11-10",
+      "filed_before_affected_data": true,
+      "reason": "V2address-only detectsLA2READfault at la_ff_32.c543. Static remap moves coeffindex into mat table, but old17bit known branch reads bs table. Currentupstream/pinned16bit matrix lookup read before choosing patch. All previous14calls retained; new4variant outputs not yet seen.",
+      "changes": [
+        "Identical old/new/live logging in bothvariants.",
+        "Candidate changes only known-pivot coefflookup bs to mat in17bit reducer.",
+        "ExactLA2,4cells,5seach,20stotal; no source repair of earlier signedshift."
+      ],
+      "supersedes_fields": [
+        "version",
+        "study_dir",
+        "arms",
+        "question",
+        "analysis_plan"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "99beb12894356af04718d67210835f4f698513f6351e7f446968c0860bf9e7e4",
+    "commit": "a549657b3f64b2c6dfd2bcb911e7a84e0d728e8d",
+    "frozen_at": "2026-11-10T17:39:52Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "original_items": [
+      9,
+      12
+    ],
+    "checkpoint_exception": "Approved bounded local/zero-paid diagnostic.",
+    "in_sample": true,
+    "previous_version": {
+      "path": "../address-only-v2/protocol.json",
+      "sha256": "3677845401c2c198f6919c10aad7b6c39e7f5eb57feefb2a62e56c7d7ca71fb3",
+      "export": "../address-only-v2/export.json",
+      "observed": "LA1ordinaryPASS,LA2ordinaryASANSEGV543,bothsat124; previous14calls retained."
+    },
+    "prior_calls": 14,
+    "new_planned_calls": 4,
+    "native_budget_seconds": 20,
+    "per_call_timeout_seconds": 5,
+    "instance_batch_timeout_seconds": 20,
+    "sanitized_binary": null,
+    "patches": {
+      "logged": "c1f9e3578e9a5aec8b1863918d6a18c79c3650ab9d51cc58b5c5f50f63a2280c",
+      "corrected": "64b77ab2e688c1a70e01928bcab2a0cf0f854b09dacae10bd9cf2d7757951068"
+    },
+    "analyzer_binary_sha256": "b2513d28f4f3ca4f227a8c11f6b525e8bc8748e0dcd25ede49bedc91783a66fc"
+  }
+}

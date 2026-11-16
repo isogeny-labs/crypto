@@ -1,0 +1,35 @@
+setring paddingBaseField34;
+ideal residueQP34=std(ideal(T^2+T+1));int qQP34;int rowQP34;int colQP34;int omitQP34;int nextQP34;int jQP34;int countQP34;int presentationQP34;int allZeroQP34;list pQP34;number bQP34;number cQP34;number uQP34;number vQP34;matrix sQP34;matrix jacQP34;matrix mmQP34[3][3];matrix zeroSQP34[4][17];matrix zeroDerivativeQP34[17][3];ideal sourceQP34;ideal productsQP34;ideal gensQP34;matrix witnessQP34;matrix reconstructionQP34;poly determinantQP34;poly dQP34;poly hQP34;
+for(qQP34=1;qQP34<=2;qQP34++){
+ pQP34=paddingRepresentatives33[qQP34];bQP34=pQP34[1];cQP34=pQP34[2];uQP34=(bQP34+cQP34)/cQP34^2;vQP34=((bQP34/cQP34)*uQP34^3+1)/(uQP34+1);
+ if(uQP34!=baseUQP34){ERROR("QPOLY34_DIFFERENT_BASE_POINT");}
+ map evaluateQP34=paddingPolynomial34,pQP34[4]+bQP34*T,pQP34[3]+(1+cQP34)*T,vQP34,uQP34;
+ sourceQP34=reduce(evaluateQP34(reducedSourceQP34),residueQP34);if(size(sourceQP34)!=0){ERROR("QPOLY34_SOURCE");}
+ dQP34=evaluateQP34(reducedDQP34);hQP34=evaluateQP34(reducedHQP34);gensQP34=residueQP34,dQP34*hQP34;if(std(gensQP34)[1]!=1){ERROR("QPOLY34_REQUIRED_UNITS");}
+ sQP34=evaluateQP34(reducedSQP34);jacQP34=evaluateQP34(reducedJacQP34);
+ for(rowQP34=1;rowQP34<=4;rowQP34++){
+  for(colQP34=1;colQP34<=17;colQP34++){sQP34[rowQP34,colQP34]=reduce(sQP34[rowQP34,colQP34],residueQP34);}
+  for(colQP34=1;colQP34<=3;colQP34++){jacQP34[rowQP34,colQP34]=reduce(jacQP34[rowQP34,colQP34],residueQP34);}
+ }
+ if(reduce(transpose(sQP34)*jacQP34,residueQP34)!=zeroDerivativeQP34){ERROR("QPOLY34_DIFFERENTIATED_SYZYGY");}
+ productsQP34=0;countQP34=0;
+ for(omitQP34=1;omitQP34<=4;omitQP34++){
+  nextQP34=0;for(rowQP34=1;rowQP34<=4;rowQP34++){if(rowQP34!=omitQP34){nextQP34++;for(colQP34=1;colQP34<=3;colQP34++){mmQP34[nextQP34,colQP34]=jacQP34[rowQP34,colQP34];}}}
+  determinantQP34=reduce(det(mmQP34),residueQP34);
+  for(jQP34=1;jQP34<=17;jQP34++){countQP34++;productsQP34[countQP34]=reduce(sQP34[omitQP34,jQP34]*determinantQP34,residueQP34);}
+ }
+ if(countQP34!=68){ERROR("QPOLY34_PRODUCT_COUNT");}
+ gensQP34=residueQP34,productsQP34;presentationQP34=0;
+ if(std(gensQP34)[1]==1){presentationQP34=1;witnessQP34=lift(gensQP34,ideal(1));reconstructionQP34=matrix(gensQP34)*witnessQP34;if(reconstructionQP34[1,1]!=1){ERROR("QPOLY34_UNIT_RECONSTRUCTION");}}
+ allZeroQP34=0;if(sQP34==zeroSQP34){allZeroQP34=1;}
+ link outQP34="ASCII:w padding-polynomial-q"+string(qQP34)+".sing";open(outQP34);
+ write(outQP34,"matrix evaluatedSyzygies34[4][17];matrix evaluatedJacobian34[4][3];ideal evaluatedProducts34;");
+ for(rowQP34=1;rowQP34<=4;rowQP34++){
+  for(colQP34=1;colQP34<=17;colQP34++){write(outQP34,"evaluatedSyzygies34["+string(rowQP34)+","+string(colQP34)+"]="+string(sQP34[rowQP34,colQP34])+";");}
+  for(colQP34=1;colQP34<=3;colQP34++){write(outQP34,"evaluatedJacobian34["+string(rowQP34)+","+string(colQP34)+"]="+string(jacQP34[rowQP34,colQP34])+";");}
+ }
+ for(rowQP34=1;rowQP34<=68;rowQP34++){write(outQP34,"evaluatedProducts34["+string(rowQP34)+"]="+string(productsQP34[rowQP34])+";");}
+ if(presentationQP34==1){write(outQP34,"ideal polynomialUnitGenerators34;matrix polynomialUnitWitness34["+string(nrows(witnessQP34))+"][1];");for(rowQP34=1;rowQP34<=ncols(matrix(gensQP34));rowQP34++){write(outQP34,"polynomialUnitGenerators34["+string(rowQP34)+"]="+string(gensQP34[rowQP34])+";polynomialUnitWitness34["+string(rowQP34)+",1]="+string(witnessQP34[rowQP34,1])+";");}}
+ close(outQP34);print("QPOLY34_POINT q="+string(qQP34)+" products=68 presentation="+string(presentationQP34)+" all_syzygy_values_zero="+string(allZeroQP34));
+}
+print("QPOLY34_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T05:52:42Z",
+ "id": "PCC-20261112-d4010b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "59d2ac7063567dd733cfeb0f62d3c54480b95c48",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "0640025a173d9a44b980531468decd4b8ae604e522a37a8e0009d3a8ddd9c9ff",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/QuarticFibre.lean",
+   "theorem": "QuarticFibre.cleared_fibre_factorization"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful finite-algebra identities over an explicit commutative quotient ring,including nilpotents. Inverse/curve hypotheses explicit;actual fields,divisors,proper curve maps,Picard and global degree geometry remain written.",
+ "statement": "theorem cleared_fibre_factorization {K : Type} [CommRing K] (f m n q a b x y : K) (hcover : f*m^2=n^3+a*n*q^4+b*q^6) (hpoint : y^2=x^3+a*x+b) : f*m^2-y^2*q^6 = (n-x*q^2)*(n^2+n*x*q^2+x^2*q^4+a*q^4)"
+}
