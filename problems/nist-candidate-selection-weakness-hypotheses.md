@@ -4,10 +4,21 @@
 - **Kind:** unknown selection cause; missing applicable attack construction and validation
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-04
 - **Latest search:** [30 October exact label-allocation audit](../research/nist_skip_criterion_20261025/exact_pair_audit_20261030/RESULTS.md)
 
 ## Problem
+
+**4 November engineering continuation:** a separate native journal reader
+and fresh-directory recovery wrapper now retain the requested contiguous
+attempt prefix. Local bounded controls cover full-order rejection replay,
+accepted-point/count corruption, missing/reordered rows, torn final writes
+and recovery byte equality. Claim `PCC-20261104-ab1619` has standing unverified;
+no primary sample or cloud restore is reported. The complete six-field request
+is retained in [the blocked baseline card](../backlog/XP-20261104-nist-random-curve-baseline/README.md).
+Next: admit the reviewed source and qualify its PARI/EKS route, checkpoint,
+pilot budget and canonical recovery adapter before any new primary sampling.
+[pcc:unverified]
 
 **Latest result, 30 October, exact allocation audit:** using the already
 verified scores, the fixed comparison of42additional candidates with eight

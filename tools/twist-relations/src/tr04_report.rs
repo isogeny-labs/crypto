@@ -21,7 +21,7 @@ const ARMS: [&str; 9] = [
     "b2_negative",
 ];
 type MetricMaps = (Map<String, Value>, Map<String, Value>);
-const LIMITS: &str = "Exact finite operation-counter audit only. Generic decomposition (bounded by sqrt(r); cannot beat rho). Primitive work counters are not independently recomputed; allocator/cache/branch/RNG-internal and byte-peak costs are unpriced. No physical runtime, complete GAE, ECDLP speedup, statistical interval or general-curve claim. Failed selector/rank mass is retained. Audit DP/trie/cache acceleration is not free algorithm work.";
+const LIMITS: &str = "Exact finite operation-counter audit only. Generic decomposition. Primitive work counters are not independently recomputed; allocator/cache/branch/RNG-internal and byte-peak costs are unpriced. No physical runtime, complete GAE, ECDLP speedup, statistical interval or general-curve claim. Failed selector/rank mass is retained. Audit DP/trie/cache acceleration is not free algorithm work.";
 
 fn hash(bytes: &[u8]) -> String {
     Sha256::digest(bytes)

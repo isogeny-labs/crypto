@@ -12,7 +12,7 @@ without a shell, stdin from /dev/null, cwd = the repository root.
 | `lean-verify` | Lean project dir or `.lean` file (one) | yes | `tools/lean/proof-gate.sh --out`; pass on 0, fail on 1, exit 3 (invalid) on infrastructure error; `artifact_sha256` is the hash of the gate's receipt `build.log` |
 | `isolab-dispatch` | `<40-hex sha>[,key=value...]` (one) | no | checkpoint gate, then `gh workflow run isolab-experiment.yml --ref main`; finds the run and writes `.delphi-tools/isolab/<run_id>.json` (gitignored) |
 | `isolab-status` | GitHub run id (one) | yes | `gh run view`; `not_covered` while running, `pass` on success, else `fail` |
-| `writeback` | round record JSON (file) | no | writes `knowledge/programs/<pid>/round-<n>.json`, regenerates `LEDGER.md`, appends a session-log entry, writes `problems/delphi-program-<pid>-r<n>.md` for a blocked round, then opens a PR on `delphi/<pid>-r<n>` with auto-merge |
+| `writeback` | round record JSON (file) | no | writes `reports/delphi-programs/<pid>/round-<n>.json` (watched by the lead atlas `--delta`, with `atlas_matches` from `lead_atlas.py --match` when `DELPHI_TOOLS_ATLAS` names a crypto-autoresearcher checkout), regenerates `LEDGER.md`, appends a session-log entry, writes `problems/delphi-program-<pid>-r<n>.md` for a blocked round, then opens a PR on `delphi/<pid>-r<n>` with auto-merge |
 | `make-tools-json` | none | no | prints a complete `tools.json` for this checkout |
 
 `isolab-dispatch` keys: `spec_path`, `seconds`, `instance_type`, `resumable`,

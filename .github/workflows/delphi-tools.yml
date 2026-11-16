@@ -1,6 +1,7 @@
 name: Delphi tools
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - tools/delphi_tools/**
       - .github/workflows/delphi-tools.yml
@@ -12,6 +13,7 @@ permissions:
   contents: read
 jobs:
   test:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -20,7 +22,9 @@ jobs:
           persist-credentials: false
       - name: Install shellcheck and jq
         run: sudo apt-get update && sudo apt-get install -y shellcheck jq
-      - name: shellcheck
-        run: find tools/delphi_tools -maxdepth 1 -type f ! -name '*.md' -print0 | xargs -0 shellcheck -s bash
+      - name: shellcheck (bash scripts, by shebang)
+        run: grep -lZ '^#!/usr/bin/env bash' tools/delphi_tools/* | xargs -0 shellcheck -s bash
+      - name: Python helpers compile
+        run: grep -l '^#!/usr/bin/env python3' tools/delphi_tools/* | xargs python3 -m py_compile
       - name: Tests
         run: bash tools/delphi_tools/test.sh

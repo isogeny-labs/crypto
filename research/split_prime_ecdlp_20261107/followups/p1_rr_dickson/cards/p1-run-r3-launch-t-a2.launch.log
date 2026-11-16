@@ -1,0 +1,27 @@
+card: CARD-p1-r3-launch-t-a2 (sha256 907502cf8fddf7bd5a5be9785ebba0a2e6815e4515a76d85f30b95c7c2d90893)
+commit: e6941cb25ce6e30d9c834f2dc9e30aea6bd443fd
+receipt: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-t-a2.receipt.json sha256 ae1a1922275df7587c882f34a479f51b0f986751ff5ee1e6feb8ddfec395efd3
+status: completed
+command 1 (launch-t): ["taskq/deploy/eks-karpenter/remote/launch-remote-command", "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/request-t-a2.json"] exit 0 (675.531 s) succeeded
+  stdout sha256 ab54ef82c7848d6ec458fa5f2b61553c008f1e91cc6fd7ce173684d07efdf192; last 20 lines:
+    {
+      "schema": "isolab.eks.command-result/v1",
+      "state": "active",
+      "job_name": "p1r3-t-a2-20261108",
+      "job_uid": "8fce259e-0d10-4bc4-995f-6c29c3eed183",
+      "pods": [
+        {
+          "uid": "828468c7-4c6d-401e-b547-6af2f9224aac",
+          "phase": "Pending",
+          "node": null,
+          "exit_code": null
+        }
+      ],
+      "results_prefix": "s3://isolab-results-104186811093-us-east-2/runs/p1r3-t-a2-20261108/",
+      "receipt_uri": "s3://isolab-results-104186811093-us-east-2/runs/p1r3-t-a2-20261108/launcher/4fd098c9-d158-423f-9ba9-0360830db190/",
+      "request_sha256": "b609f5a124ba780ee45375ec13c74cfb52ae867d1e9567e53908018c1c5a59ca",
+      "manifest_sha256": "c8a52d227dca84c1b9b089534cc2c6949bab022bd74baebf3d8ac4b1034dfb85",
+      "launcher": "isolab-experiment-launcher:4fd098c9-d158-423f-9ba9-0360830db190",
+      "exit_code": 0
+    }
+  output research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2.launch.stdout: ab54ef82c7848d6ec458fa5f2b61553c008f1e91cc6fd7ce173684d07efdf192

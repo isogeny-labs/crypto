@@ -2,6 +2,7 @@ name: Finite-field handbook Lean proof
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'knowledge/finite-fields/lean/**'
       - '.github/workflows/finite-field-handbook-lean.yml'
@@ -12,6 +13,7 @@ permissions:
 
 jobs:
   proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:

@@ -1,0 +1,185 @@
+{
+ "args": {
+  "boot": 2000,
+  "curves": 10,
+  "old_root": "../prime_medium_tier_rho_20261107",
+  "out": "analysis/power.json",
+  "rounds": 6,
+  "seed": 20261108,
+  "sims": 200,
+  "targets": 36
+ },
+ "delta_check_old_J1_288_pairs_halfwidth": 0.11344117966374263,
+ "delta_check_old_J1_observed_halfwidth": 0.11349999999999993,
+ "delta_method": {
+  "1.2850": {
+   "halfwidth_at_pooled_rho": 0.041406750458498204,
+   "halfwidth_at_rho_0": 0.03767730303159449,
+   "halfwidth_at_rho_lo": 0.04472821219671282,
+   "n_for_0.05_at_rho_0": 1227,
+   "n_for_0.05_at_rho_lo": 1729
+  },
+  "1.3500": {
+   "halfwidth_at_pooled_rho": 0.04350125534550396,
+   "halfwidth_at_rho_0": 0.03958315882696699,
+   "halfwidth_at_rho_lo": 0.04699072876697458,
+   "n_for_0.05_at_rho_0": 1354,
+   "n_for_0.05_at_rho_lo": 1908
+  },
+  "1.4142": {
+   "halfwidth_at_pooled_rho": 0.04557041873323466,
+   "halfwidth_at_rho_0": 0.04146595559604815,
+   "halfwidth_at_rho_lo": 0.04922587105781554,
+   "n_for_0.05_at_rho_0": 1486,
+   "n_for_0.05_at_rho_lo": 2094
+  }
+ },
+ "design": {
+  "curves": 10,
+  "pairs": 2160,
+  "rounds": 6,
+  "targets_per_curve": 36
+ },
+ "evidence_class": "derived (from committed [pcc:unverified] counts)",
+ "inputs": "per-workload mean S of rho-neg and rho-plain, research/prime_medium_tier_rho_20261107/sessions/J1..J6/comparisons/rho-neg__rho-plain.json (variance only; no old ratio enters the new estimate)",
+ "old_variance": {
+  "curves": 10,
+  "cv_neg": 0.4104939887109119,
+  "cv_plain": 0.5611590202106153,
+  "mean_s_neg": 0.9690278481988093,
+  "mean_s_plain": 1.2702866693034718,
+  "note": "run SD = sqrt(pairs * pooled within-curve variance of workload means); assumes no target effect",
+  "pair_correlation": -0.21800274991333882,
+  "pair_correlation_ci95": [
+   -0.42946715991694023,
+   0.016125273677411248
+  ],
+  "pairs_per_workload": 6,
+  "run_sd_neg": 0.3977801065790813,
+  "run_sd_plain": 0.7128328227329421,
+  "within_curve_dof": 70,
+  "workloads": 80
+ },
+ "python": "3.13.18",
+ "schema": "prime_medium_rho_p4_confirm.power/v1",
+ "simulation": [
+  {
+   "bootstrap_resamples": 2000,
+   "coverage_of_true_theta": 0.93,
+   "distribution": "lognormal pairs, old pooled means/CVs",
+   "halfwidth_median": 0.040635144617842345,
+   "halfwidth_p90": 0.043316683644927134,
+   "outcome_probability": {
+    "exceeds_1.2_below_sqrt2": 0.98,
+    "inconclusive": 0.02
+   },
+   "outcomes": {
+    "exceeds_1.2_below_sqrt2": 196,
+    "inconclusive": 4
+   },
+   "p_halfwidth_le_0.05": 1.0,
+   "pair_correlation": -0.21800274991333882,
+   "sims": 200,
+   "theta_true": 1.285
+  },
+  {
+   "bootstrap_resamples": 2000,
+   "coverage_of_true_theta": 0.955,
+   "distribution": "lognormal pairs, old pooled means/CVs",
+   "halfwidth_median": 0.04268736823170899,
+   "halfwidth_p90": 0.04580557493856596,
+   "outcome_probability": {
+    "confirm_sqrt2": 0.135,
+    "exceeds_1.2_below_sqrt2": 0.865
+   },
+   "outcomes": {
+    "confirm_sqrt2": 27,
+    "exceeds_1.2_below_sqrt2": 173
+   },
+   "p_halfwidth_le_0.05": 1.0,
+   "pair_correlation": -0.21800274991333882,
+   "sims": 200,
+   "theta_true": 1.35
+  },
+  {
+   "bootstrap_resamples": 2000,
+   "coverage_of_true_theta": 0.935,
+   "distribution": "lognormal pairs, old pooled means/CVs",
+   "halfwidth_median": 0.044777458603714626,
+   "halfwidth_p90": 0.04712784065136033,
+   "outcome_probability": {
+    "confirm_sqrt2": 0.935,
+    "exceeds_1.2_below_sqrt2": 0.02,
+    "exceeds_sqrt2": 0.045
+   },
+   "outcomes": {
+    "confirm_sqrt2": 187,
+    "exceeds_1.2_below_sqrt2": 4,
+    "exceeds_sqrt2": 9
+   },
+   "p_halfwidth_le_0.05": 0.985,
+   "pair_correlation": -0.21800274991333882,
+   "sims": 200,
+   "theta_true": 1.4142135623730951
+  },
+  {
+   "bootstrap_resamples": 2000,
+   "coverage_of_true_theta": 0.955,
+   "distribution": "lognormal pairs, old pooled means/CVs",
+   "halfwidth_median": 0.0439250965167165,
+   "halfwidth_p90": 0.04701712419197002,
+   "outcome_probability": {
+    "exceeds_1.2_below_sqrt2": 0.965,
+    "inconclusive": 0.035
+   },
+   "outcomes": {
+    "exceeds_1.2_below_sqrt2": 193,
+    "inconclusive": 7
+   },
+   "p_halfwidth_le_0.05": 1.0,
+   "pair_correlation": -0.42946715991694023,
+   "sims": 200,
+   "theta_true": 1.285
+  },
+  {
+   "bootstrap_resamples": 2000,
+   "coverage_of_true_theta": 0.945,
+   "distribution": "lognormal pairs, old pooled means/CVs",
+   "halfwidth_median": 0.0464646734718277,
+   "halfwidth_p90": 0.04893303941573113,
+   "outcome_probability": {
+    "confirm_sqrt2": 0.24,
+    "exceeds_1.2_below_sqrt2": 0.76
+   },
+   "outcomes": {
+    "confirm_sqrt2": 48,
+    "exceeds_1.2_below_sqrt2": 152
+   },
+   "p_halfwidth_le_0.05": 0.94,
+   "pair_correlation": -0.42946715991694023,
+   "sims": 200,
+   "theta_true": 1.35
+  },
+  {
+   "bootstrap_resamples": 2000,
+   "coverage_of_true_theta": 0.935,
+   "distribution": "lognormal pairs, old pooled means/CVs",
+   "halfwidth_median": 0.0481508497311251,
+   "halfwidth_p90": 0.05152407103240886,
+   "outcome_probability": {
+    "confirm_sqrt2": 0.935,
+    "exceeds_1.2_below_sqrt2": 0.035,
+    "exceeds_sqrt2": 0.03
+   },
+   "outcomes": {
+    "confirm_sqrt2": 187,
+    "exceeds_1.2_below_sqrt2": 7,
+    "exceeds_sqrt2": 6
+   },
+   "p_halfwidth_le_0.05": 0.75,
+   "pair_correlation": -0.42946715991694023,
+   "sims": 200,
+   "theta_true": 1.4142135623730951
+  }
+ ]
+}

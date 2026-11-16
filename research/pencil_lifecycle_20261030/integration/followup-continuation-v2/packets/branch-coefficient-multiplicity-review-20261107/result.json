@@ -1,0 +1,40 @@
+{
+  "schema": "formal.source_review/v1",
+  "task": "T-1734",
+  "claim": "actual coefficientData supports nonzero with base root multiplicities summing to one under the listed branch hypotheses",
+  "candidate_commit": "6a803d2d9d74956e91881575bc3dbc023dd2573a",
+  "candidate_sha256": "4e8cfd2ff984359b4fbd92e8fd0432db04b82e08fd19223eb5dac9d718995b76",
+  "fidelity": "faithful_scoped",
+  "machine_status": "not_verified",
+  "review_outcome": "inconclusive",
+  "assumptions": [
+    "Field K",
+    "branch root hroot",
+    "separable normalized quintic",
+    "coefficientData determinant nonzero hb",
+    "both support divisor congruences valid1 and valid2",
+    "three-support product vanishes at a hsupport"
+  ],
+  "nonvacuity": "explicit rational witness derived on paper; not a compiled fixture",
+  "controls_executed": false,
+  "source_change_requested": false,
+  "review_attestation": {
+    "reviewer": "review_specialization",
+    "joints_owned": [
+      "identity instantiation",
+      "multiplicity bridge",
+      "nonvacuity and claim scope"
+    ],
+    "source_bindings": "source-bindings.json",
+    "sibling_reports_read": false,
+    "blind_rederivation_compliance": "preread schematic composition only; no claim of blind inherited valuation proof",
+    "source_verdict": "holds",
+    "kernel_verdict": "inconclusive"
+  },
+  "deviations": [
+    "Source-only scope: no machine verification under expired execution deadline",
+    "Journal-only main merge conflict pending root workflow; exact pinned primary sources reviewed",
+    "Candidate was read after preread plan and prior to publication; exact same source hash subsequently independently read back from published commit"
+  ],
+  "independence_checker": "tools/check_review_independence.py absent in this checkout; no checker pass claimed. Explicit plan and reviewer attestation retained."
+}

@@ -1,0 +1,66 @@
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:19:57: error: Invalid simp theorem: Expected a proposition, but found
+  (X : Type u_5) → [TopologicalSpace X] → Filter X
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:19:42: error: unsolved goals
+⊢ ActualNonbranchNorm.residual 0 (-1) 0 1 0 (-4) 0 1 = -(C 81 * X)
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:21:49: error: unsolved goals
+⊢ X * C 4 - X ^ 3 * C 5 + X ^ 5 = X * C 4 - X ^ 3 - X ^ 3 * C 4 + X ^ 5
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:26:50: error: unsolved goals
+⊢ X * C 4 - X ^ 3 * C 5 + X ^ 5 = X * C 4 - X ^ 3 - X ^ 3 * C 4 + X ^ 5
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:34:55: error: unsolved goals
+⊢ -42375 + X * 112400 - X * C 4 * 28100 + X ^ 2 * 14500 - X ^ 2 * C 5 * C 3 * 20236 + X ^ 2 * C 4 * 72260 -
+                                        X ^ 3 * 44150 +
+                                      X ^ 3 * C 5 * 42375 -
+                                    X ^ 3 * C 5 * C 3 * 14275 +
+                                  X ^ 3 * C 4 * 11600 -
+                                X ^ 4 * C 5 * 92164 +
+                              X ^ 4 * C 5 * C 3 * 40140 -
+                            X ^ 4 * C 4 * 35320 -
+                          X ^ 5 * 42375 -
+                        X ^ 5 * C 5 * 225 +
+                      X ^ 5 * C 5 * C 3 * 2900 +
+                    X ^ 6 * 112400 +
+                  X ^ 6 * C 5 * 4010 -
+                X ^ 6 * C 5 * C 3 * 8830 +
+              X ^ 7 * 14500 -
+            X ^ 7 * C 5 * 2900 -
+          X ^ 8 * 44150 +
+        X ^ 8 * C 5 * 8830 +
+      C 4 * 20236 =
+    C 38569
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:74:2: error: unknown tactic
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:120:6: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  MulHomClass (AddValuation ↑Rm ℕ∞) ↑Rm ℕ∞
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:120:14: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  MulHomClass (AddValuation ↑Rm ℕ∞) ↑Rm ℕ∞
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean:121:2: error: Type mismatch
+  Eq.trans (Eq.symm he) conjugate_order_zero
+has type
+  (IsDiscreteValuationRing.addVal ↑Rm) (em u) + (IsDiscreteValuationRing.addVal ↑Rm) (em v) +
+      (IsDiscreteValuationRing.addVal ↑Rm) (em U) =
+    0
+but is expected to have type
+  (IsDiscreteValuationRing.addVal ↑Rm) (em u) * (IsDiscreteValuationRing.addVal ↑Rm) (em v) *
+      (IsDiscreteValuationRing.addVal ↑Rm) (em U) =
+    0

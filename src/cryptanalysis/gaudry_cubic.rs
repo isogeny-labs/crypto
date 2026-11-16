@@ -4810,7 +4810,7 @@ mod tests {
             1,
             &GaudryOptions {
                 max_residuals: 200_000,
-                small_base: (base.len() as f64).powf(0.75).ceil() as usize,
+                small_base: 1,
                 max_large_primes: 4,
                 arity: 4,
                 ..GaudryOptions::default()

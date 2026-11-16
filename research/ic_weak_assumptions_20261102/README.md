@@ -5,6 +5,13 @@ Date: 2026-11-02
 Status: literature-complete first pass, reproducible reanalysis of committed
 evidence, and fail-closed obligation graph. No new scientific run was taken.
 
+The [six-obligation follow-up](FOLLOWUP.md) now adds two validated
+implementation artifacts: an arbitrary-precision numeric D.4 admission audit
+for tensor contraction and a source-bound finite-field unit-explanation proof
+kernel for the arity-three canonical IR. It also records why the named yield
+batch cannot presently run and sharpens the PKM, Wagner, and xedni next objects.
+No scientific performance run was taken in that continuation either.
+
 ## Outcome
 
 The security argument is not one hardness assumption. It is a serial chain of

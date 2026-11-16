@@ -1,0 +1,14 @@
+{
+ "created_at": "2026-11-05T15:42:32Z",
+ "id": "PCC-20261105-37a78d",
+ "kind": "statement",
+ "producer": {
+  "commit": "d49e204deb35934d6cadd819658dab074faf9d65",
+  "model": "",
+  "session": "https://claude.ai/code/session_01AXUKfUwhrkCU1Jp7P4AXYb"
+ },
+ "proofs": [],
+ "schema": "pcc.claim/v1",
+ "scope": "Curve25519-family miniatures k = 20, 24, 28, 32, five family curves per size, ledger generic incumbents (wsum2g-b15 at k = 20; wwalk g=1 grow=2 seed=run at k = 24, 28, 32), ecbench counted GAE, local route L1; no signed replay or recompute",
+ "statement": "Multi-curve re-baseline (research/curve25519_autolab_20261104/multicurve): 12 fresh public targets x 2 rounds on each of five family curves per size (the ledger curve and four sibling primes under the family rule, from curve25519_family siblings), audit 720/720 records and 8 replays reproduced at every size. Mean S at w = 0 over the five curves, incumbent vs rho-neg: k = 20 2.601 vs 1.660 (mean per-curve ratio 1.57, range 1.44 to 1.69); k = 24 2.111 vs 1.193 (1.78, range 1.52 to 2.10); k = 28 1.869 vs 1.040 (1.80, range 1.62 to 1.94); k = 32 1.930 vs 1.013 (1.91, range 1.69 to 2.13). The ratio varies by up to plus or minus 0.2 between curves of one size; the 1.8x to 1.9x plateau of the single-curve ledger rows holds across curves, and no incumbent S falls below the K = 3 floor of 1.662."
+}

@@ -1,0 +1,135 @@
+{
+  "schema": "private.gate.candidate-build/v1",
+  "source_sha256": "6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc",
+  "compiler_path": "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+  "compiler_sha256": "4f597c5343a03531e174d3a96e7af1ac329d3959966d90f68eb72fd495e8509c",
+  "toolchain_manifest_sha256": "d3059f6a44903b1c0705da1991eff2fb3a7af83c40b08c8b911ebe738055e724",
+  "toolchain_files_verified": 364,
+  "child_environment": {
+    "PATH": "/usr/bin:/bin",
+    "LC_ALL": "C",
+    "REALGCC": "/usr/bin/gcc",
+    "TMPDIR": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build-v2/attempt1/tmp"
+  },
+  "frozen_plan_sha256": "e4a9d701e82cbe15dc1919361f651b3206e04c047d117079ed0822133fa2064a",
+  "runtime_admitted": false,
+  "image_admitted": false,
+  "candidate_executed": false,
+  "commands": [
+    {
+      "label": "compiler-version",
+      "argv": [
+        "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+        "--version"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 4002443,
+      "pgid": 4002443,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "compiler-target",
+      "argv": [
+        "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+        "-dumpmachine"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 4002444,
+      "pgid": 4002444,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "candidate-build",
+      "argv": [
+        "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+        "-static",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-march=x86-64",
+        "-mtune=generic",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualifier/gate.c",
+        "-o",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build-v2/attempt1/gate-candidate.bin"
+      ],
+      "cap_seconds": 60,
+      "launch_uncertain": false,
+      "pid": 4002445,
+      "pgid": 4002445,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "candidate-elf",
+      "argv": [
+        "/usr/bin/readelf",
+        "-h",
+        "-l",
+        "-d",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build-v2/attempt1/gate-candidate.bin"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 4002452,
+      "pgid": 4002452,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "helper-build",
+      "argv": [
+        "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+        "-static",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-march=x86-64",
+        "-mtune=generic",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build-v2/controls.c",
+        "-o",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build-v2/attempt1/helper-controls.bin"
+      ],
+      "cap_seconds": 60,
+      "launch_uncertain": false,
+      "pid": 4002453,
+      "pgid": 4002453,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "helper-controls",
+      "argv": [
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build-v2/attempt1/helper-controls.bin"
+      ],
+      "cap_seconds": 25,
+      "launch_uncertain": false,
+      "pid": 4002478,
+      "pgid": 4002478,
+      "exit_code": 0,
+      "reap_confirmed": true
+    }
+  ],
+  "compiler_target": "x86_64-amazon-linux",
+  "candidate_sha256": "830406f4c2ddaf900ff4f95ca85f5b1c111b71c9d4d8bf6467ffa46853ae88e9",
+  "candidate_bytes": 51672,
+  "helper_binary_sha256": "9f30d3f7439ad88e1145db00fa2e1fc9f42dc0583e5575ebd84da2cfc181fe13",
+  "helper_controls": {
+    "status": "helper_controls_passed",
+    "checks": 154,
+    "partial_lengths": 37,
+    "real_timeout_seconds": 15.008782,
+    "uid_gid_mocked": true,
+    "whole_gate_executed": false
+  },
+  "status": "candidate_built_helper_controls_passed_unadmitted",
+  "pending_signal": null,
+  "elapsed_seconds": 15.562215228012064
+}

@@ -970,6 +970,17 @@ fn main() {
                 continue; // inconsistent system: 1 in the ideal; not an instance for the criterion
             }
             let inst = build_instance(&g, &cv, &sub, x_r);
+            if let Ok(dir) = std::env::var("PQ2_DUMP") {
+                // cross-check hook: the descended equations and Z, for an independent closure
+                let eqs: Vec<String> = inst.eqs.iter().map(|e| {
+                    let ms: Vec<String> = e.iter().map(|&m| format!("{:?}", mono_vars(m))).collect();
+                    format!("[{}]", ms.join(","))
+                }).collect();
+                let zs: Vec<String> = z.iter().map(|v| v.to_string()).collect();
+                let path = format!("{dir}/n{n}_i{done}.json");
+                std::fs::write(&path, format!("{{\"n\":{n},\"N\":{},\"eqs\":[{}],\"Z\":[{}]}}",
+                    inst.big_n, eqs.join(","), zs.join(","))).expect("dump");
+            }
             // consistency: every z in Z satisfies all descended equations, and a random
             // non-solution assignment fails at least one (bitwise equality of descents)
             for &zz in &z {

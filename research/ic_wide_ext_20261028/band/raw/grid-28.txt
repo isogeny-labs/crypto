@@ -1,0 +1,158 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm3161-380f655a | 27.96 | b1024-L16 | 24/24 | 69.165 | 69.996 | 77.471 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b1024-L32 | 24/24 | 69.224 | 70.051 | 77.497 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b1024-W | 24/24 | 68.969 | 69.773 | 77.007 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b1024-blk-L32 | 24/24 | 69.224 | 70.051 | 77.497 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b2048-L16 | 24/24 | 262.352 | 262.864 | 267.475 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b2048-L32 | 24/24 | 262.239 | 262.702 | 266.868 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b2048-W | 24/24 | 262.323 | 262.840 | 267.487 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b2048-blk-L32 | 24/24 | 262.239 | 262.702 | 266.868 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b256-L16 | 24/24 | 21.517 | 24.970 | 56.045 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b256-L32 | 24/24 | 20.480 | 23.709 | 52.774 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b256-W | 24/24 | 19.079 | 22.058 | 48.863 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b256-blk-L32 | 24/24 | 20.480 | 23.709 | 52.774 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b512-L16 | 24/24 | 24.917 | 26.624 | 41.995 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b512-L32 | 24/24 | 25.516 | 27.327 | 43.623 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b512-W | 24/24 | 24.799 | 26.495 | 41.760 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | b512-blk-L32 | 24/24 | 25.516 | 27.327 | 43.623 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | rho-neg | 24/24 | 1.029 | 1.130 | 2.035 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b1024-L32 | b1024-L16 < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b1024-W | b1024-W < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b1024-blk-L32 | b1024-L16 < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b2048-L16 | b1024-L16 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b2048-L32 | b1024-L16 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b2048-W | b1024-L16 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b2048-blk-L32 | b1024-L16 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b256-L16 | b256-L16 < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b256-L32 | b256-L32 < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b256-W | b256-W < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b256-blk-L32 | b256-blk-L32 < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b512-L16 | b512-L16 < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b512-L32 | b512-L32 < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b512-W | b512-W < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs b512-blk-L32 | b512-blk-L32 < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L16 vs rho-neg | rho-neg < b1024-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b1024-W | b1024-W < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b1024-blk-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b2048-L16 | b1024-L32 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b2048-L32 | b1024-L32 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b2048-W | b1024-L32 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b2048-blk-L32 | b1024-L32 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b256-L16 | b256-L16 < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b256-L32 | b256-L32 < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b256-W | b256-W < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b256-blk-L32 | b256-blk-L32 < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b512-L16 | b512-L16 < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b512-L32 | b512-L32 < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b512-W | b512-W < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs b512-blk-L32 | b512-blk-L32 < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-L32 vs rho-neg | rho-neg < b1024-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b1024-blk-L32 | b1024-W < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b2048-L16 | b1024-W < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b2048-L32 | b1024-W < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b2048-W | b1024-W < b2048-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b2048-blk-L32 | b1024-W < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b256-L16 | b256-L16 < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b256-L32 | b256-L32 < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b256-W | b256-W < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b256-blk-L32 | b256-blk-L32 < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b512-L16 | b512-L16 < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b512-L32 | b512-L32 < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b512-W | b512-W < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs b512-blk-L32 | b512-blk-L32 < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-W vs rho-neg | rho-neg < b1024-W |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b2048-L16 | b1024-blk-L32 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b2048-L32 | b1024-blk-L32 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b2048-W | b1024-blk-L32 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b2048-blk-L32 | b1024-blk-L32 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b256-L16 | b256-L16 < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b256-L32 | b256-L32 < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b256-W | b256-W < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b256-blk-L32 | b256-blk-L32 < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b512-L16 | b512-L16 < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b512-L32 | b512-L32 < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b512-W | b512-W < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs b512-blk-L32 | b512-blk-L32 < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b1024-blk-L32 vs rho-neg | rho-neg < b1024-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b2048-L32 | b2048-L32 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b2048-W | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b2048-blk-L32 | b2048-blk-L32 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b256-L16 | b256-L16 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b256-L32 | b256-L32 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b256-W | b256-W < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b256-blk-L32 | b256-blk-L32 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b512-L16 | b512-L16 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b512-L32 | b512-L32 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b512-W | b512-W < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs b512-blk-L32 | b512-blk-L32 < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L16 vs rho-neg | rho-neg < b2048-L16 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b2048-W | b2048-L32 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b2048-blk-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b256-L16 | b256-L16 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b256-L32 | b256-L32 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b256-W | b256-W < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b256-blk-L32 | b256-blk-L32 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b512-L16 | b512-L16 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b512-L32 | b512-L32 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b512-W | b512-W < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs b512-blk-L32 | b512-blk-L32 < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-L32 vs rho-neg | rho-neg < b2048-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b2048-blk-L32 | b2048-blk-L32 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b256-L16 | b256-L16 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b256-L32 | b256-L32 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b256-W | b256-W < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b256-blk-L32 | b256-blk-L32 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b512-L16 | b512-L16 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b512-L32 | b512-L32 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b512-W | b512-W < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs b512-blk-L32 | b512-blk-L32 < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-W vs rho-neg | rho-neg < b2048-W |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs b256-L16 | b256-L16 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs b256-L32 | b256-L32 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs b256-W | b256-W < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs b256-blk-L32 | b256-blk-L32 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs b512-L16 | b512-L16 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs b512-L32 | b512-L32 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs b512-W | b512-W < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs b512-blk-L32 | b512-blk-L32 < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b2048-blk-L32 vs rho-neg | rho-neg < b2048-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b256-L16 vs b256-L32 | b256-L32 < b256-L16 |
+| icv1-fp28-tm3161-380f655a | b256-L16 vs b256-W | b256-W < b256-L16 |
+| icv1-fp28-tm3161-380f655a | b256-L16 vs b256-blk-L32 | b256-blk-L32 < b256-L16 |
+| icv1-fp28-tm3161-380f655a | b256-L16 vs b512-L16 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L16 vs b512-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L16 vs b512-W | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L16 vs b512-blk-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L16 vs rho-neg | rho-neg < b256-L16 |
+| icv1-fp28-tm3161-380f655a | b256-L32 vs b256-W | b256-W < b256-L32 |
+| icv1-fp28-tm3161-380f655a | b256-L32 vs b256-blk-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L32 vs b512-L16 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L32 vs b512-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L32 vs b512-W | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L32 vs b512-blk-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-L32 vs rho-neg | rho-neg < b256-L32 |
+| icv1-fp28-tm3161-380f655a | b256-W vs b256-blk-L32 | b256-W < b256-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b256-W vs b512-L16 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-W vs b512-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-W vs b512-W | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-W vs b512-blk-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-W vs rho-neg | rho-neg < b256-W |
+| icv1-fp28-tm3161-380f655a | b256-blk-L32 vs b512-L16 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-blk-L32 vs b512-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-blk-L32 vs b512-W | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-blk-L32 vs b512-blk-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b256-blk-L32 vs rho-neg | rho-neg < b256-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b512-L16 vs b512-L32 | b512-L16 < b512-L32 |
+| icv1-fp28-tm3161-380f655a | b512-L16 vs b512-W | b512-W < b512-L16 |
+| icv1-fp28-tm3161-380f655a | b512-L16 vs b512-blk-L32 | b512-L16 < b512-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b512-L16 vs rho-neg | rho-neg < b512-L16 |
+| icv1-fp28-tm3161-380f655a | b512-L32 vs b512-W | b512-W < b512-L32 |
+| icv1-fp28-tm3161-380f655a | b512-L32 vs b512-blk-L32 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | b512-L32 vs rho-neg | rho-neg < b512-L32 |
+| icv1-fp28-tm3161-380f655a | b512-W vs b512-blk-L32 | b512-W < b512-blk-L32 |
+| icv1-fp28-tm3161-380f655a | b512-W vs rho-neg | rho-neg < b512-W |
+| icv1-fp28-tm3161-380f655a | b512-blk-L32 vs rho-neg | rho-neg < b512-blk-L32 |

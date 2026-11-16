@@ -1,0 +1,11 @@
+# Private runtime admission preparation
+
+T-1428, 2026-11-03. Bind the corrected private supervisor, complete gate controls and retained inputs to concrete prospective assembly and qualification records. Existing drafts and failed attempts remain immutable. This preparation does not itself admit execution.
+
+Sources checked before preparation: runtime-private-supervisor/PLAN.md and INTERFACE.md; runtime-private-integration/independent-review.json; runtime-private-gate-build-v2/{build-receipt,review-receipt}.json; runtime-private-qualifier-v2/supervise.py admission checks; preexec-native-execution-review/review.json; planning-20261103/planning-limits.json. The local system header /usr/include/sys/un.h and https://man7.org/linux/man-pages/man7/unix.7.html specify the Unix pathname bound. The corrected supervisor must receive independent review after its short-path/private-shim changes, including retained-storage reuse between phases.
+
+Prepare separate assembly and qualification decisions, preserving the proposed600/300-second ceilings and one-attempt rules. Fill exact inputs only after checking their bytes, source identity and actual current ownership. Assembly must stop and reconcile before qualification can bind its image and disk receipt. A native helper pass is not a kernel/container qualification result. The latest gate controls must cover the prior parser/rejection controls and new held-release controls, with all substitutions explicit.
+
+Before any runtime launch: verify current source/input/review joins; reconcile matching existing units/processes/storage; reconcile campaign accounting and remaining cumulative allowance; obtain the required independent prospective decision. The existing owner-authorized goal permits necessary work once its gates pass; no additional signing key, expanded permissions or speculative approval flow is introduced. The planning record alone does not authorize an experiment. Any missing accounting or ownership observation remains explicit, not zero or idle by assumption.
+
+Output: structured readiness and binding records, scoped session notes, a neutral PDF and editable graph. Preserve unresolved dependencies rather than filling them with assertions. Source/hash and read-only checks only during preparation; no Docker build, service, mount, namespace or cloud mutation is authorized by this file.

@@ -53,7 +53,7 @@ use super::stages::{
     DecompositionOracle, InstanceCtx, Params, SolverCost, SolverTotals, SystemShape,
 };
 use crate::cryptanalysis::f4_fp_tower::{
-    f4_tower, F4Trace, Fp, RPoly, SquareRule, TowerF4Options, TowerRing,
+    f4_tower, mono, F4Trace, Fp, RPoly, SquareRule, TowerF4Options, TowerRing, MAX_FREE,
 };
 use crate::cryptanalysis::ic_boundary::{
     lift_abscissae, CountedGroup, FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimePoint,
@@ -456,6 +456,139 @@ pub fn bits_factor_base(
     abscissa_factor_base(inst, xs, format!("x in [{lo}, {lo} + 2^{t})"))
 }
 
+/// The `digits@LO:c_1;…;c_t` base: every point whose abscissa is one of
+/// the `2^t` subset sums `lo + Σ_(j∈S) c_j` (mod p), one column per
+/// distinct abscissa, both signs.  `digits = [1, 2, …, 2^(t−1)]` is
+/// [`bits_factor_base`] (research/curve25519_leads_wave4_20261104, L14).
+pub fn digits_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    lo: u64,
+    digits: &[u64],
+) -> FactorBase<PrimePoint> {
+    let xs = digit_sums(inst.curve.p, lo, digits);
+    abscissa_factor_base(inst, xs, format!("x = {lo} + subset sums of {digits:?}"))
+}
+
+/// The `2^t` subset sums `lo + Σ_(j∈S) c_j` (mod p) of `digits`, indexed
+/// by the mask of `S`: entry `k` adds the digits at the set bits of `k`,
+/// so for `c_j = 2^j` entry `k` is `lo + k`, the order of the bits form.
+pub fn digit_sums(p: u64, lo: u64, digits: &[u64]) -> Vec<u64> {
+    (0..(1u64 << digits.len()))
+        .map(|k| {
+            digits
+                .iter()
+                .enumerate()
+                .filter(|(j, _)| (k >> j) & 1 == 1)
+                .fold(lo % p, |acc, (_, &c)| addm(acc, c % p, p))
+        })
+        .collect()
+}
+
+/// A semicolon-separated digit list `c_1;…;c_t` (the `digits=` oracle
+/// parameter and the `digits@LO:…` form of `curve25519_family f4cost`).
+pub fn parse_digits(list: &str) -> Result<Vec<u64>, String> {
+    let digits = list
+        .split(';')
+        .map(|s| {
+            s.trim()
+                .parse::<u64>()
+                .map_err(|e| format!("digits: `{s}` is not an integer ({e})"))
+        })
+        .collect::<Result<Vec<u64>, String>>()?;
+    if digits.len() > 64 {
+        return Err(format!(
+            "digits: {} digits; the engine takes at most 64",
+            digits.len()
+        ));
+    }
+    Ok(digits)
+}
+
+/// The harness base `prime-interval:t=T[,lo=L]`: every point with
+/// `x ∈ [L, L + 2^T)` (mod p), one column an abscissa, both signs, in
+/// ascending x.  The point set is [`bits_factor_base`]'s, so the base and
+/// `pkm-semaev`'s bits membership cannot drift apart.  The whole interval
+/// scan is charged like `prime_factor_base`: `2^T` abscissae scanned, one
+/// Legendre symbol each, a square root per carrier, and the index build.
+pub struct PrimeIntervalBase<'i> {
+    pub instance: &'i crate::cryptanalysis::ic_boundary::PrimeInstance,
+}
+
+impl PrimeIntervalBase<'_> {
+    /// The `(t, lo)` of a `prime-interval` spec, checked against `p`.
+    pub fn interval(params: &Params, p: u64) -> Result<(u32, u64), String> {
+        if let Some(k) = params.0.keys().find(|k| !matches!(k.as_str(), "t" | "lo")) {
+            return Err(format!(
+                "prime-interval: unknown parameter `{k}` (takes t, lo)"
+            ));
+        }
+        let t = params.u64("t")?;
+        if t == 0 || t >= 64 || (1u64 << t) >= p {
+            return Err(format!(
+                "prime-interval: t must satisfy 1 <= t and 2^t < p = {p}"
+            ));
+        }
+        let lo = params.u64_or("lo", 0)?;
+        if lo >= p {
+            return Err(format!("prime-interval: lo must satisfy 0 <= lo < p = {p}"));
+        }
+        Ok((t as u32, lo))
+    }
+}
+
+impl super::stages::FactorBaseBuilder<PrimeCurve> for PrimeIntervalBase<'_> {
+    fn name(&self) -> &str {
+        "prime-interval"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "every point with x in [lo, lo + 2^t) mod p, t = {}, lo = {}, one column an abscissa",
+            params.get("t").unwrap_or("?"),
+            params.get("lo").unwrap_or("0")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "t",
+                "interval width 2^t (2^t < p); pkm-semaev reads it as bits=t",
+            ),
+            ("lo", "left end of the interval, 0 <= lo < p, default 0"),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let start = Instant::now();
+        let curve = &self.instance.curve;
+        let p = curve.p;
+        let (t, lo) = Self::interval(params, p)?;
+        let scanned = 1u64 << t;
+        let sqrts = (0..scanned)
+            .filter(|&k| curve.legendre(curve.rhs((lo + k) % p)) >= 0)
+            .count() as u64;
+        if sqrts == 0 {
+            return Err(format!(
+                "prime-interval: no abscissa in [{lo}, {lo} + 2^{t}) carries a point"
+            ));
+        }
+        let mut fb = bits_factor_base(self.instance, t, lo);
+        let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
+        crate::cryptanalysis::ic_boundary::count_index_build(&mut fb, a + n, a);
+        fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+        fb.cost.count("abscissae_scanned", scanned);
+        fb.cost.count("legendre_symbols", scanned);
+        fb.cost.count("sqrt_solves", sqrts);
+        Ok(fb)
+    }
+}
+
 /// `x = w² + s` for `w ∈ [lo, lo + 2^t)` (the `square-bits` grid).
 pub fn square_abscissae(p: u64, t: u32, lo: u64, s: u64) -> Vec<u64> {
     (0..(1u64 << t))
@@ -610,6 +743,14 @@ pub enum Membership {
     /// Interval by bits: `x = lo + Σ_j 2^j·b_j`, `b_j² = b_j` (each bit a
     /// top-level tower variable): `V = [lo, lo + 2^t)`.  No condition on `p`.
     Bits { lo: u64 },
+    /// Digit set: `x = lo + Σ_j c_j·b_j`, `b_j² = b_j`, with arbitrary digits
+    /// `c_j ∈ F_p` in place of `2^j` ([`Membership::Bits`] is
+    /// `digits = [1, 2, …, 2^(t−1)]`): the same variables and `b² = b`
+    /// rules, only the linear coefficients change.  `V` is the `2^t` subset
+    /// sums `lo + Σ_(j∈S) c_j` ([`digit_sums`]), which must be distinct.
+    /// Hybrid guessing fixes the top `guess` digits `c_(t−G) … c_(t−1)` of
+    /// the first summand, as the bits form fixes its top bits.
+    Digits { lo: u64, digits: Vec<u64> },
     /// Interval in Ed25519's Edwards coordinate: `y = Σ_j 2^j b_j`,
     /// `b_j² = b_j`, `y ∈ [0, 2^t) ∖ {1}`, and `x_W = (1 + y)/(1 − y) + s`
     /// (`s = A/3`, the abscissa of `T₀`; `None` until `prepare` derives it
@@ -654,9 +795,9 @@ pub struct PkmSemaevOracle {
     stop_staircase: Option<usize>,
     budget: Option<Duration>,
     crosscheck: bool,
-    /// Hybrid guessing (bits and isogeny forms): the top `guess` bits (or
-    /// tower levels) of the first summand are enumerated, one F4 system per
-    /// assignment.
+    /// Hybrid guessing (bits, digits and isogeny forms): the top `guess`
+    /// bits (digits, tower levels) of the first summand are enumerated, one
+    /// F4 system per assignment.
     guess: u32,
     /// F4 trace (`trace=1`): learn one refutation trace per branch system at
     /// `prepare`, replay it per target, fall back to plain F4 when it fails.
@@ -668,6 +809,16 @@ pub struct PkmSemaevOracle {
     /// Cofactor-fiber lifts (`lifts=1`): the rational `h`-torsion `E(F_q)[h]`,
     /// computed once in `prepare`; `decompose` tries the targets `R + K`.
     lifts: bool,
+    /// `lifts=2`: ONE F4 system per target (per guess branch) for all the
+    /// lifts. The third abscissa is a free ring variable `X`, constrained by
+    /// `P_R(X) = Π (X − x(R+K))` over the distinct lift abscissae, built
+    /// numerically per target. Set in `prepare` once the fiber is known
+    /// (false when the fiber is trivial: then the oracle is the blind one).
+    shared_req: bool,
+    shared: bool,
+    /// The lift targets `R + K` of the call in progress (shared system only),
+    /// in the order `lifts=1` tries them.
+    shared_pts: Vec<PrimePoint>,
     fiber: Option<CofactorFiber<PrimePoint>>,
     in_lift: bool,
     /// `t0-bits`: `w ↦` the base abscissae over it (target-independent,
@@ -705,6 +856,9 @@ impl PkmSemaevOracle {
             traces: Vec::new(),
             trace_setup: BTreeMap::new(),
             lifts: false,
+            shared_req: false,
+            shared: false,
+            shared_pts: Vec::new(),
             fiber: None,
             in_lift: false,
             t0_map: std::collections::HashMap::new(),
@@ -739,6 +893,14 @@ impl PkmSemaevOracle {
         o
     }
 
+    /// `m` summands with `x = lo + Σ_j c_j b_j` over the digit set `digits`
+    /// (`t = digits.len()`, checked in `prepare`).
+    pub fn new_digits(m: u32, t: u32, lo: u64, digits: Vec<u64>) -> Self {
+        let mut o = Self::new(m, t, 1);
+        o.membership = Membership::Digits { lo, digits };
+        o
+    }
+
     /// `m` summands with `x = (lo + Σ 2^j b_j)² + A/3` (the 2-descent base).
     pub fn new_square_bits(m: u32, t: u32, lo: u64) -> Self {
         let mut o = Self::new(m, t, 1);
@@ -759,8 +921,9 @@ impl PkmSemaevOracle {
     /// deterministically from `(p, t, seed, aux)`; the rebuild is not
     /// charged, since the base's build on the factor-base ledger is the
     /// same work), or any base with `bits=T[,lo=L]` on the oracle (an
-    /// interval written in bits). ecbench and `ic bench` both build the
-    /// oracle here, so the two harnesses solve the same system.
+    /// interval written in bits) or `digits=c1;…;ct[,lo=L]` (a digit set,
+    /// `t` its length). ecbench and `ic bench` both build the oracle here,
+    /// so the two harnesses solve the same system.
     pub fn from_spec(
         m: u32,
         spec: &super::PipelineSpec,
@@ -784,11 +947,33 @@ impl PkmSemaevOracle {
                 let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
                 Self::new_isogeny(m, t, tower.v.clone(), steps, tower.c)
             }
+            "prime-interval" => {
+                let (t, lo) = PrimeIntervalBase::interval(fb, inst.curve.p)?;
+                let op = &spec.oracle_params;
+                if op.get("bits").is_some() && op.u64("bits")? != u64::from(t) {
+                    return Err(format!(
+                        "pkm-semaev: bits={} disagrees with the base's prime-interval t={t}",
+                        op.u64("bits")?
+                    ));
+                }
+                if op.get("lo").is_some() && op.u64("lo")? != lo {
+                    return Err(format!(
+                        "pkm-semaev: lo={} disagrees with the base's prime-interval lo={lo}",
+                        op.u64("lo")?
+                    ));
+                }
+                Self::new_bits(m, t, lo)
+            }
             _ if spec.oracle_params.get("bits").is_some() => Self::new_bits(
                 m,
                 spec.oracle_params.u64("bits")? as u32,
                 spec.oracle_params.u64_or("lo", 0)?,
             ),
+            _ if spec.oracle_params.get("digits").is_some() => {
+                let digits = parse_digits(spec.oracle_params.get("digits").unwrap_or(""))?;
+                let t = digits.len() as u32;
+                Self::new_digits(m, t, spec.oracle_params.u64_or("lo", 0)?, digits)
+            }
             _ if spec.oracle_params.get("t0_bits").is_some() => Self::new_t0_bits(
                 m,
                 spec.oracle_params.u64("t0_bits")? as u32,
@@ -805,8 +990,9 @@ impl PkmSemaevOracle {
             other => {
                 return Err(format!(
                     "oracle `pkm-semaev` solves on prime-kummer or prime-isogeny, or on any base \
-                     with `bits=T` (an interval [lo, lo + 2^T) written in bits) or \
-                     `edwards_bits=T` (Edwards y in [0, 2^T)), not `{other}`"
+                     with `bits=T` (an interval [lo, lo + 2^T) written in bits), \
+                     `digits=c1;…;ct` (a digit set) or `edwards_bits=T` (Edwards y in \
+                     [0, 2^T)), not `{other}`"
                 ))
             }
         };
@@ -912,11 +1098,20 @@ impl PkmSemaevOracle {
         if self.trace && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some()) {
             return Err("pkm-semaev: trace=1 needs engine=f4 and no staircase stop".into());
         }
-        self.lifts = match params.u64_or("lifts", 0)? {
-            0 => false,
-            1 => true,
-            o => return Err(format!("pkm-semaev: lifts is 0 or 1, not {o}")),
-        };
+        let lifts = params.u64_or("lifts", 0)?;
+        if lifts > 2 {
+            return Err(format!("pkm-semaev: lifts is 0, 1 or 2, not {lifts}"));
+        }
+        self.lifts = lifts >= 1;
+        self.shared_req = lifts == 2;
+        if self.shared_req
+            && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some() || self.m != 2)
+        {
+            return Err(
+                "pkm-semaev: lifts=2 (shared system) needs engine=f4, m=2 and no staircase stop"
+                    .into(),
+            );
+        }
         if self.guess > 0 {
             if matches!(self.membership, Membership::Kummer) {
                 return Err("pkm-semaev: guess=G applies to the bits and isogeny forms".into());
@@ -951,9 +1146,12 @@ impl PkmSemaevOracle {
         let n_vars = prep.ring.n_vars();
         let mut degrees = prep.degrees.clone();
         degrees.extend(std::iter::repeat_n(2, prep.tower_eqs));
+        if self.shared {
+            degrees.push(self.fiber.as_ref().map_or(1, |f| f.size() as u32));
+        }
         self.shape = Some(SystemShape {
             n_vars,
-            n_equations: prep.eqs.len() + prep.tower_eqs,
+            n_equations: prep.eqs.len() + prep.tower_eqs + usize::from(self.shared),
             degrees,
             semi_regular_degree: None,
         });
@@ -1007,7 +1205,33 @@ impl PkmSemaevOracle {
                 z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
                 let x_r = (z ^ (z >> 31)) % p;
                 let before = self.native.get("pkm_system_fp_mults_uncharged").copied();
-                let sys = self.specialise_branch(branch, x_r);
+                let shared_before = self
+                    .native
+                    .get("pkm_shared_poly_fp_mults_uncharged")
+                    .copied();
+                // Shared system: learn on a made-up P_R (fiber-size random
+                // roots from the same fixed stream).
+                let d = self.fiber.as_ref().map_or(1, |f| f.size() as u64);
+                let learn_roots: Vec<u64> = (0..d)
+                    .map(|j| {
+                        let mut z = ((br as u64 * 16 + attempt + 1) * 64 + j + 1)
+                            .wrapping_mul(0x9E37_79B9_7F4A_7C15);
+                        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+                        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+                        (z ^ (z >> 31)) % p
+                    })
+                    .collect();
+                let roots = self.shared.then_some(&learn_roots[..]);
+                let sys = self.specialise_branch(branch, x_r, roots);
+                match shared_before {
+                    Some(b) => {
+                        self.native
+                            .insert("pkm_shared_poly_fp_mults_uncharged".into(), b);
+                    }
+                    None => {
+                        self.native.remove("pkm_shared_poly_fp_mults_uncharged");
+                    }
+                }
                 let after = self.native.get("pkm_system_fp_mults_uncharged").copied();
                 spec += after.unwrap_or(0) - before.unwrap_or(0);
                 // Not a per-target cost: take it back off the target ledger.
@@ -1115,36 +1339,54 @@ impl PkmSemaevOracle {
             }
             _ => None,
         };
-        let n_free = if self.mode == PkmMode::Chain {
+        let n_free_base = if self.mode == PkmMode::Chain {
             m - 2
         } else {
             0
         };
-        let n = n_t + n_free + 1; // last variable: x_R
+        // Shared system (`lifts=2`): the third abscissa is one more free
+        // ring variable X (after the chain unknowns), not a parameter.
+        let n_free = n_free_base + usize::from(self.shared);
+        let n = n_t + n_free + 1; // last variable: x_R (unused when shared)
         let xr_var = n - 1;
         let x = |i: usize| match &self.membership {
             Membership::Kummer => Pol::var(n, i * t).scale(self.g, p),
             Membership::Isogeny { .. } => Pol::var(n, i * t),
             Membership::Bits { .. }
+            | Membership::Digits { .. }
             | Membership::EdwardsBits { .. }
             | Membership::T0Bits { .. }
             | Membership::SquareBits { .. } => {
                 let lo = &match &self.membership {
-                    Membership::Bits { lo } | Membership::SquareBits { lo, .. } => *lo,
+                    Membership::Bits { lo }
+                    | Membership::Digits { lo, .. }
+                    | Membership::SquareBits { lo, .. } => *lo,
                     // w = lo + Σ 2^j b_j, entered at x = w + s of the quotient
                     Membership::T0Bits { lo, q } => {
                         (lo + q.expect("t0 quotient resolved in prepare").s) % p
                     }
                     _ => 0,
                 };
+                // The coefficient of b_j: 2^j, or the digit c_j.
+                let coef = |j: usize| match &self.membership {
+                    Membership::Digits { digits, .. } => digits[j] % p,
+                    _ => (1u64 << j) % p,
+                };
                 let g = self.guess as usize;
+                // Guessing fixes the top g coefficients (j = t − g … t − 1)
+                // of summand 0 to the bits of `a`: bit k of `a` is b_(t−g+k).
                 let (base, free_bits) = match fixed {
-                    Some(a) if i == 0 => ((lo + (a << (t - g))) % p, t - g),
+                    Some(a) if i == 0 => {
+                        let off = (0..g)
+                            .filter(|k| (a >> k) & 1 == 1)
+                            .fold(0, |acc, k| addm(acc, coef(t - g + k), p));
+                        (addm(lo % p, off, p), t - g)
+                    }
                     _ => (lo % p, t),
                 };
                 let mut acc = Pol::constant(n, base, p);
                 for j in 0..free_bits {
-                    acc = acc.add(&Pol::var(n, i * t + j).scale((1u64 << j) % p, p), p);
+                    acc = acc.add(&Pol::var(n, i * t + j).scale(coef(j), p), p);
                 }
                 if let Membership::SquareBits { shift, .. } = &self.membership {
                     // x = w² + s, s = x_W(T₀)
@@ -1154,7 +1396,11 @@ impl PkmSemaevOracle {
                 acc
             }
         };
-        let xr = Pol::var(n, xr_var);
+        let xr = if self.shared {
+            Pol::var(n, n_t + n_free_base)
+        } else {
+            Pol::var(n, xr_var)
+        };
         let raw: Vec<Pol> = if let Membership::EdwardsBits { shift } = &self.membership {
             // x_i = N_i/D_i with N_i = (1 + s) + (1 − s)·y_i, D_i = 1 − y_i.
             let s = shift.expect("edwards shift resolved in prepare") % p;
@@ -1246,6 +1492,7 @@ impl PkmSemaevOracle {
                     continue;
                 }
                 if let Membership::Bits { .. }
+                | Membership::Digits { .. }
                 | Membership::EdwardsBits { .. }
                 | Membership::T0Bits { .. }
                 | Membership::SquareBits { .. } = &self.membership
@@ -1323,6 +1570,7 @@ impl PkmSemaevOracle {
                 None => v.clone(),
             },
             Membership::Bits { lo } => (0..(1u64 << t)).map(|k| (lo + k) % p).collect(),
+            Membership::Digits { lo, digits } => digit_sums(p, *lo, digits),
             Membership::SquareBits { lo, shift } => {
                 square_abscissae(p, self.t, *lo, shift.expect("resolved in prepare"))
             }
@@ -1348,7 +1596,12 @@ impl PkmSemaevOracle {
     /// The system at `x_R` on guessing branch `b` (or the full system):
     /// `Σ_k x_R^k E_k`, one multiplication per coefficient of every `k ≥ 1`
     /// part (and one per power of `x_R`).
-    fn specialise_branch(&mut self, branch: Option<usize>, x_r: u64) -> Vec<RPoly> {
+    fn specialise_branch(
+        &mut self,
+        branch: Option<usize>,
+        x_r: u64,
+        roots: Option<&[u64]>,
+    ) -> Vec<RPoly> {
         let prep = match branch {
             Some(b) => &self.branches[b],
             None => self.prepared.as_ref().expect("prepared"),
@@ -1376,6 +1629,33 @@ impl PkmSemaevOracle {
                 }
             }
             out.push(RPoly::from_terms(fp, terms));
+        }
+        // Shared system: P_R(X) = Π (X − root) over the lift abscissae,
+        // built numerically per target (one multiplication per coefficient
+        // step; native, listed apart, unpriced like the specialisation).
+        let mut shared_mults = 0u64;
+        if let (true, Some(roots)) = (self.shared, roots) {
+            let mut c = vec![1u64];
+            for &r in roots {
+                let mut nx = vec![0u64; c.len() + 1];
+                for (k, &ck) in c.iter().enumerate() {
+                    nx[k + 1] = addm(nx[k + 1], ck, p);
+                    nx[k] = subm(nx[k], mulm(ck, r, p), p);
+                    shared_mults += 1;
+                }
+                c = nx;
+            }
+            let mut free = [0u8; MAX_FREE];
+            let terms: Vec<_> = c
+                .iter()
+                .enumerate()
+                .map(|(k, &ck)| {
+                    free[0] = k as u8;
+                    (mono(0, free), ck)
+                })
+                .collect();
+            out.push(RPoly::from_terms(fp, terms));
+            self.bump("pkm_shared_poly_fp_mults_uncharged", shared_mults);
         }
         self.bump("pkm_system_fp_mults_uncharged", mults);
         let terms = out.iter().map(|q| q.len() as u64).sum::<u64>();
@@ -1497,6 +1777,53 @@ impl PkmSemaevOracle {
     }
 }
 
+impl PkmSemaevOracle {
+    /// The shared system was not refuted (consistent, or undecided): read
+    /// the solutions of each lift's grid, in the order `lifts=1` tries the
+    /// lifts, and return the first relation that lifts to that lift target.
+    /// The grid is exact, so the verdict equals the per-lift one.
+    fn read_shared(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        undecided: bool,
+    ) -> Option<Vec<usize>> {
+        let curve = ctx.group;
+        let pts = self.shared_pts.clone();
+        let mut any = false;
+        for (i, t) in pts.iter().enumerate() {
+            let (sols, mults) = self.grid(curve, t.x, false);
+            self.bump("pkm_grid_fp_mults_uncharged", mults);
+            for xs in &sols {
+                any = true;
+                if xs.iter().all(|x| fb.x_index.contains_key(x)) {
+                    if let Some(idx) = lift_abscissae(curve, fb, ops, xs, *t) {
+                        if i != 0 {
+                            self.bump("pkm_lift_hits_nonidentity", 1);
+                        }
+                        self.bump("pkm_consistent_systems", 1);
+                        return Some(idx);
+                    }
+                }
+                counters.lift_failures += 1;
+            }
+        }
+        if undecided {
+            self.bump("pkm_undecided_systems", 1);
+        } else if !any {
+            self.bump("pkm_consistent_without_grid_solution", 1);
+        } else {
+            self.bump("pkm_consistent_systems", 1);
+        }
+        if any {
+            counters.unliftable_systems += 1;
+        }
+        None
+    }
+}
+
 impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
     fn name(&self) -> &str {
         "pkm-semaev"
@@ -1515,6 +1842,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "the base's Vélu 2-isogeny tower (PKM isogeny form)".into()
             }
             Membership::Bits { lo } => format!("bits: x = {lo} + Σ 2^j b_j, b_j² = b_j"),
+            Membership::Digits { lo, digits } => {
+                format!("digits: x = {lo} + Σ c_j b_j, b_j² = b_j, c = {digits:?}")
+            }
             Membership::SquareBits { lo, .. } => format!(
                 "2-descent bits: x = ({lo} + Σ 2^j b_j)² + A/3, b_j² = b_j (base in 2E(F_p))"
             ),
@@ -1588,7 +1918,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             ),
             (
                 "lifts",
-                "1: cofactor-fiber lifts; try R + K for each x-distinct K in E(F_q)[h], first liftable relation wins; relations are over the projection [h]P (see fiber.rs)",
+                "1: cofactor-fiber lifts; try R + K for each x-distinct K in E(F_q)[h], first liftable relation wins; relations are over the projection [h]P (see fiber.rs). 2: the same verdicts from ONE F4 system per target: the third abscissa is a free variable X with P_R(X) = prod (X - x(R+K)) (m = 2, engine f4)",
             ),
         ]
     }
@@ -1607,6 +1937,8 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             // operations are charged to the set-up ledger.
             self.fiber = Some(cofactor_fiber(ctx.group, fb, ctx.r, ctx.cofactor, ops));
         }
+        self.shared = self.shared_req && self.fiber.as_ref().is_some_and(|f| f.size() > 1);
+        self.shared_pts.clear();
         let curve = ctx.group;
         let p = curve.p;
         if p >= 1 << 31 {
@@ -1715,6 +2047,28 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 }
                 return self.finish_prepare(curve, 0);
             }
+            Membership::Digits { lo, digits } => {
+                if digits.len() != self.t as usize {
+                    return Err(format!(
+                        "pkm-semaev: {} digits for a tower of height t = {}",
+                        digits.len(),
+                        self.t
+                    ));
+                }
+                let sums = digit_sums(p, *lo, digits);
+                let set: HashSet<u64> = sums.iter().copied().collect();
+                if set.len() != sums.len() {
+                    return Err(format!(
+                        "pkm-semaev: the digits {digits:?} have a repeated subset sum mod {p}"
+                    ));
+                }
+                if let Some(x) = fb.abscissa_list.iter().find(|x| !set.contains(x)) {
+                    return Err(format!(
+                        "pkm-semaev: abscissa {x} of the base is not {lo} + a subset sum of {digits:?}"
+                    ));
+                }
+                return self.finish_prepare(curve, 0);
+            }
         }
         primitive_two_power_root(p, self.t)
             .ok_or_else(|| format!("pkm-semaev: 2^{} does not divide p − 1", self.t))?;
@@ -1766,6 +2120,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
         if !self.in_lift {
+            self.shared_pts.clear();
             if let Some(ks) = self
                 .fiber
                 .as_ref()
@@ -1775,35 +2130,57 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 if point.infinity {
                     return None;
                 }
-                // The cofactor fiber of the target: every row is written over
-                // the projection [h]P and [h]K = O, so a decomposition of
-                // R + K is as good a relation as one of R (fiber.rs, `lifts`).
-                // A lift whose abscissa was already tried is skipped
-                // (x(R+K) = x(-R-K)); each addition is charged.
-                let mut tried_x: Vec<u64> = Vec::with_capacity(ks.len());
-                self.in_lift = true;
-                let mut found = None;
-                for (i, &k) in ks.iter().enumerate() {
-                    let t = if i == 0 {
-                        point
-                    } else {
-                        ctx.group.add(ops, point, k)
-                    };
-                    if t.infinity || tried_x.contains(&t.x) {
-                        continue;
-                    }
-                    tried_x.push(t.x);
-                    self.bump("pkm_lift_targets_tried", 1);
-                    if let Some(idx) = self.decompose(ctx, fb, ops, counters, t) {
-                        if i != 0 {
-                            self.bump("pkm_lift_hits_nonidentity", 1);
+                if self.shared {
+                    // One system for all the lifts: same lift list and
+                    // charged additions as lifts=1, one F4 call per branch.
+                    let mut tried_x: Vec<u64> = Vec::with_capacity(ks.len());
+                    let mut pts = Vec::with_capacity(ks.len());
+                    for (i, &k) in ks.iter().enumerate() {
+                        let t = if i == 0 {
+                            point
+                        } else {
+                            ctx.group.add(ops, point, k)
+                        };
+                        if t.infinity || tried_x.contains(&t.x) {
+                            continue;
                         }
-                        found = Some(idx);
-                        break;
+                        tried_x.push(t.x);
+                        pts.push(t);
                     }
+                    self.bump("pkm_shared_lifts", pts.len() as u64);
+                    self.bump("pkm_shared_systems", 1);
+                    self.shared_pts = pts;
+                } else {
+                    // The cofactor fiber of the target: every row is written over
+                    // the projection [h]P and [h]K = O, so a decomposition of
+                    // R + K is as good a relation as one of R (fiber.rs, `lifts`).
+                    // A lift whose abscissa was already tried is skipped
+                    // (x(R+K) = x(-R-K)); each addition is charged.
+                    let mut tried_x: Vec<u64> = Vec::with_capacity(ks.len());
+                    self.in_lift = true;
+                    let mut found = None;
+                    for (i, &k) in ks.iter().enumerate() {
+                        let t = if i == 0 {
+                            point
+                        } else {
+                            ctx.group.add(ops, point, k)
+                        };
+                        if t.infinity || tried_x.contains(&t.x) {
+                            continue;
+                        }
+                        tried_x.push(t.x);
+                        self.bump("pkm_lift_targets_tried", 1);
+                        if let Some(idx) = self.decompose(ctx, fb, ops, counters, t) {
+                            if i != 0 {
+                                self.bump("pkm_lift_hits_nonidentity", 1);
+                            }
+                            found = Some(idx);
+                            break;
+                        }
+                    }
+                    self.in_lift = false;
+                    return found;
                 }
-                self.in_lift = false;
-                return found;
             }
         }
         if self.dataset_trace {
@@ -1873,7 +2250,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 let mut last = None;
                 for br in 0..n_branches {
                     let branch = (!self.branches.is_empty()).then_some(br);
-                    let sys = self.specialise_branch(branch, x_r);
+                    let shared_roots: Vec<u64> = self.shared_pts.iter().map(|t| t.x).collect();
+                    let roots = self.shared.then_some(&shared_roots[..]);
+                    let sys = self.specialise_branch(branch, x_r, roots);
                     if let Some(snapshot) = &mut self.dataset_artifact {
                         snapshot["specialized_equations"] = serde_json::json!(sys
                             .iter()
@@ -1979,13 +2358,23 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 let (rep, undecided) = last.expect("at least one branch");
                 if rep.inconsistent {
                     if self.crosscheck {
-                        let (sols, mults) = self.grid(curve, x_r, true);
-                        self.bump("pkm_crosscheck_fp_mults", mults);
-                        if !sols.is_empty() {
-                            self.bump("pkm_crosscheck_disagreements", 1);
+                        let xs: Vec<u64> = if self.shared_pts.is_empty() {
+                            vec![x_r]
+                        } else {
+                            self.shared_pts.iter().map(|t| t.x).collect()
+                        };
+                        for x in xs {
+                            let (sols, mults) = self.grid(curve, x, true);
+                            self.bump("pkm_crosscheck_fp_mults", mults);
+                            if !sols.is_empty() {
+                                self.bump("pkm_crosscheck_disagreements", 1);
+                            }
                         }
                     }
                     return None;
+                }
+                if !self.shared_pts.is_empty() {
+                    return self.read_shared(ctx, fb, ops, counters, undecided);
                 }
                 // Consistent, or undecided: the grid reads the solutions.
                 let (sols, mults) = self.grid(curve, x_r, false);
@@ -2108,6 +2497,8 @@ mod tests {
             r: 13_043_059,
             cofactor: 1,
             generator: (0, 6_024_490),
+
+            representation: None,
         }
     }
 
@@ -2571,6 +2962,143 @@ mod tests {
             .is_err());
     }
 
+    /// The digit form with `digits = [1, 2, …, 2^(t−1)]` is the bits form:
+    /// the same prepared system (rules, equations, grid) with and without
+    /// guessing, and the same decomposition verdict on every target, on the
+    /// Montgomery miniature for two frames.
+    #[test]
+    fn digits_two_powers_reproduce_bits() {
+        let (inst, _) = montgomery_instance_from(211);
+        let curve = &inst.curve;
+        let t = 5u32;
+        let two_powers: Vec<u64> = (0..t).map(|j| 1u64 << j).collect();
+        for lo in [0u64, 37] {
+            let fb = bits_factor_base(&inst, t, lo);
+            assert_eq!(
+                digits_factor_base(&inst, lo, &two_powers).abscissa_list,
+                fb.abscissa_list
+            );
+            for extra in ["", ",guess=1", ",guess=2"] {
+                let prep = |mut o: PkmSemaevOracle| {
+                    let (_, params) =
+                        Params::parse_spec(&format!("pkm-semaev:m=2,mode=full{extra}")).unwrap();
+                    o.prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+                        .unwrap_or_else(|e| panic!("lo = {lo}{extra}: prepare: {e}"));
+                    o
+                };
+                let mut bits = prep(PkmSemaevOracle::new_bits(2, t, lo));
+                let mut digits = prep(PkmSemaevOracle::new_digits(2, t, lo, two_powers.clone()));
+                assert_eq!(
+                    bits.prepared_system_artifact(),
+                    digits.prepared_system_artifact(),
+                    "lo = {lo}{extra}: prepared system"
+                );
+                assert_eq!(bits.branches.len(), digits.branches.len());
+                for (b, d) in bits.branches.iter().zip(&digits.branches) {
+                    assert_eq!(b.ring.rules, d.ring.rules, "lo = {lo}{extra}: rules");
+                    assert_eq!(b.eqs, d.eqs, "lo = {lo}{extra}: branch equations");
+                    assert_eq!(b.v, d.v, "lo = {lo}{extra}: branch grid");
+                }
+                let mut rng = StdRng::seed_from_u64(41);
+                let g = inst.generator_point();
+                let mut hits = 0;
+                for k in 0..24u64 {
+                    let target = if k.is_multiple_of(3) {
+                        let idx: Vec<usize> =
+                            (0..2).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                        sum(curve, &fb, &idx)
+                    } else {
+                        curve.mul(&mut GroupOps::default(), g, rng.gen_range(1..inst.r))
+                    };
+                    if target.infinity {
+                        continue;
+                    }
+                    let run = |o: &mut PkmSemaevOracle| {
+                        o.decompose(
+                            &ctx(&inst),
+                            &fb,
+                            &mut GroupOps::default(),
+                            &mut OracleCounters::default(),
+                            target,
+                        )
+                    };
+                    let (a, b) = (run(&mut bits), run(&mut digits));
+                    assert_eq!(a, b, "lo = {lo}{extra}: target {k}");
+                    hits += usize::from(a.is_some());
+                }
+                assert!(hits >= 4, "lo = {lo}{extra}: planted targets decompose");
+            }
+        }
+    }
+
+    /// An arbitrary digit set: the base is exactly the points over the
+    /// `2^t` subset sums, F4 agrees with the grid and the exact decomposable
+    /// set (planted relations included) with and without guessing, a base
+    /// outside the sums and a repeated subset sum are refused, and
+    /// `digits=` parses the oracle from a spec.
+    #[test]
+    fn digit_set_form_agrees_with_grid() {
+        let (inst, _) = montgomery_instance_from(211);
+        let curve = &inst.curve;
+        let p = curve.p;
+        let (lo, digits) = (37u64, vec![2u64, 11, 37, 83, 141]);
+        let t = digits.len() as u32;
+        let sums = digit_sums(p, lo, &digits);
+        let distinct: HashSet<u64> = sums.iter().copied().collect();
+        assert_eq!(distinct.len(), 1 << t, "the subset sums are distinct");
+        let fb = digits_factor_base(&inst, lo, &digits);
+        let mut expect: Vec<u64> = distinct
+            .iter()
+            .copied()
+            .filter(|&x| curve.sqrt(curve.rhs(x)).is_some())
+            .collect();
+        expect.sort_unstable();
+        assert_eq!(
+            fb.abscissa_list, expect,
+            "base = points over the subset sums"
+        );
+        assert!(fb.columns >= 8, "columns = {}", fb.columns);
+        for extra in ["", ",guess=1", ",guess=2"] {
+            agrees_with_grid(
+                &inst,
+                &fb,
+                &|| PkmSemaevOracle::new_digits(2, t, lo, digits.clone()),
+                &format!("digits{extra}"),
+                extra,
+            );
+        }
+        let (_, params) = Params::parse_spec("pkm-semaev:m=2").unwrap();
+        let other = bits_factor_base(&inst, t, lo);
+        assert!(
+            PkmSemaevOracle::new_digits(2, t, lo, digits.clone())
+                .prepare(&ctx(&inst), &other, &params, &mut GroupOps::default())
+                .is_err(),
+            "a base outside the subset sums is refused"
+        );
+        assert!(
+            PkmSemaevOracle::new_digits(2, t, lo, vec![2, 11, 37, 83, 13])
+                .prepare(&ctx(&inst), &fb, &params, &mut GroupOps::default())
+                .is_err(),
+            "a repeated subset sum (2 + 11 = 13) is refused"
+        );
+        assert_eq!(parse_digits("2;11; 37;83;141").unwrap(), digits);
+        assert!(parse_digits("2,11").is_err());
+        let (_, oracle_params) =
+            Params::parse_spec("pkm-semaev:m=2,digits=2;11;37;83;141,lo=37").unwrap();
+        let spec = super::super::PipelineSpec {
+            factor_base: "explicit-x".into(),
+            oracle: "pkm-semaev".into(),
+            oracle_params,
+            ..Default::default()
+        };
+        let o = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
+        assert_eq!(o.t, t);
+        match &o.membership {
+            Membership::Digits { lo: l, digits: d } => assert_eq!((*l, d), (lo, &digits)),
+            other => panic!("{other:?}"),
+        }
+    }
+
     /// `m = 3` on a membership form: the chained and the full presentation
     /// and the grid all give the exact decomposability verdict of
     /// `decomposable_points(.., 3, ..)`, and every relation sums to the target.
@@ -2731,6 +3259,8 @@ mod tests {
                     r: n,
                     cofactor: 1,
                     generator: (x, y),
+
+                    representation: None,
                 };
             }
         }
@@ -2827,6 +3357,237 @@ mod tests {
         assert!(PkmSemaevOracle::from_spec(2, &spec, &inst).is_err());
     }
 
+    /// The k = 20 Curve25519-family miniature of the T11 protocol
+    /// (research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base).
+    fn prime_interval_k20() -> PrimeInstance {
+        PrimeInstance {
+            name: "c25519-k20".into(),
+            curve: PrimeCurve {
+                p: 1_048_573,
+                a: 63_700,
+                b: 872_826,
+            },
+            group_order: 1_049_624,
+            r: 131_203,
+            cofactor: 8,
+            generator: (349_837, 122),
+
+            representation: None,
+        }
+    }
+
+    fn prime_interval_ctx(inst: &PrimeInstance) -> InstanceCtx<'_, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: inst.generator_point(),
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    fn prime_interval_build(
+        inst: &PrimeInstance,
+        spec: &str,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let (_, params) = Params::parse_spec(spec).unwrap();
+        PrimeIntervalBase { instance: inst }.build(
+            &prime_interval_ctx(inst),
+            &params,
+            &mut GroupOps::default(),
+        )
+    }
+
+    /// The frozen abscissa lists of `selection/frames.json` (t = 5).
+    const PRIME_INTERVAL_FRAMES: [(u64, &[u64]); 3] = [
+        (0, &[1, 2, 3, 8, 10, 11, 15, 18, 21, 22, 27]),
+        (
+            976_503,
+            &[
+                976503, 976504, 976505, 976507, 976508, 976509, 976512, 976513, 976515, 976516,
+                976517, 976518, 976519, 976520, 976521, 976523, 976524, 976525, 976526, 976528,
+                976529, 976531, 976532, 976534,
+            ],
+        ),
+        (
+            541_434,
+            &[
+                541434, 541436, 541437, 541439, 541442, 541444, 541445, 541446, 541450, 541454,
+                541456, 541459, 541461, 541463, 541464, 541465,
+            ],
+        ),
+    ];
+
+    /// U1: the three frozen frames, column for column `bits_factor_base`.
+    #[test]
+    fn prime_interval_u1_frames_equal_bits_factor_base() {
+        let inst = prime_interval_k20();
+        for (lo, xs) in PRIME_INTERVAL_FRAMES {
+            let fb = prime_interval_build(&inst, &format!("prime-interval:t=5,lo={lo}")).unwrap();
+            assert_eq!(fb.columns, xs.len(), "lo = {lo}");
+            assert_eq!(fb.abscissa_list, xs.to_vec(), "lo = {lo}");
+            let bits = bits_factor_base(&inst, 5, lo);
+            assert_eq!(fb.points, bits.points, "lo = {lo}");
+            assert_eq!(fb.col_of, bits.col_of, "lo = {lo}");
+            assert_eq!(fb.coef_of, bits.coef_of, "lo = {lo}");
+        }
+        assert_eq!(PRIME_INTERVAL_FRAMES.map(|(_, xs)| xs.len()), [11, 24, 16]);
+    }
+
+    /// U2: lo = 0 is `prime-abscissa:below=32` (x = 0 carries no point).
+    #[test]
+    fn prime_interval_u2_lo0_equals_prime_abscissa_below() {
+        use crate::cryptanalysis::ic_framework::plugins::PrimeAbscissaBase;
+        let inst = prime_interval_k20();
+        let c = &inst.curve;
+        assert_eq!(c.legendre(c.rhs(0)), -1, "x = 0 carries no point");
+        let fb = prime_interval_build(&inst, "prime-interval:t=5,lo=0").unwrap();
+        let (_, below) = Params::parse_spec("prime-abscissa:below=32").unwrap();
+        let naive = PrimeAbscissaBase { instance: &inst }
+            .build(&prime_interval_ctx(&inst), &below, &mut GroupOps::default())
+            .unwrap();
+        let keys = |f: &FactorBase<PrimePoint>| {
+            let mut k: Vec<u64> = f.points.iter().map(|q| c.key(q)).collect();
+            k.sort_unstable();
+            k
+        };
+        assert_eq!(keys(&fb), keys(&naive));
+        assert_eq!(fb.columns, naive.columns);
+        assert_eq!(fb.abscissa_list, naive.abscissa_list);
+    }
+
+    /// U3 and U4: lo = 976503 is `explicit-x` on its 24 carriers, and the
+    /// whole interval scan is charged.
+    #[test]
+    fn prime_interval_u3_u4_explicit_x_and_charging() {
+        use crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase;
+        let inst = prime_interval_k20();
+        let (lo, xs) = PRIME_INTERVAL_FRAMES[1];
+        let fb = prime_interval_build(&inst, &format!("prime-interval:t=5,lo={lo}")).unwrap();
+        let list: Vec<String> = xs.iter().map(|x| x.to_string()).collect();
+        let (_, ex) = Params::parse_spec(&format!("explicit-x:xs={}", list.join(";"))).unwrap();
+        let explicit = PrimeExplicitXBase
+            .build(&prime_interval_ctx(&inst), &ex, &mut GroupOps::default())
+            .unwrap();
+        assert_eq!(fb.points, explicit.points);
+        assert_eq!(fb.col_of, explicit.col_of);
+        assert_eq!(fb.coef_of, explicit.coef_of);
+        assert_eq!(fb.columns, explicit.columns);
+        assert_eq!(fb.cost.get("abscissae_scanned"), 32);
+        assert_eq!(fb.cost.get("legendre_symbols"), 32);
+        assert_eq!(fb.cost.get("sqrt_solves"), 24);
+        assert_eq!(
+            fb.cost.work_native.get("counted:base_index_builds"),
+            Some(&1)
+        );
+    }
+
+    /// U5: malformed specs and an oracle that disagrees with the base are
+    /// refused; the same parameters given twice are accepted.
+    #[test]
+    fn prime_interval_u5_rejections() {
+        use crate::cryptanalysis::ic_framework::stages::Targets;
+        use crate::cryptanalysis::ic_framework::PipelineSpec;
+        let inst = prime_interval_k20();
+        for bad in [
+            "prime-interval",
+            "prime-interval:lo=5",
+            "prime-interval:t=0",
+            "prime-interval:t=20",
+            "prime-interval:t=64",
+            "prime-interval:t=5,lo=1048573",
+            "prime-interval:t=5,size=3",
+        ] {
+            assert!(prime_interval_build(&inst, bad).is_err(), "{bad}");
+        }
+        // A width-2 interval of the small fixture with no carrier.
+        let small = small_prime_order_instance();
+        let c = &small.curve;
+        let lo = (0..c.p - 1)
+            .find(|&x| c.legendre(c.rhs(x)) < 0 && c.legendre(c.rhs(x + 1)) < 0)
+            .expect("two consecutive non-carriers");
+        let err = prime_interval_build(&small, &format!("prime-interval:t=1,lo={lo}"));
+        assert!(err.is_err());
+
+        let spec = |fb: &str, or: &str| {
+            let (factor_base, factor_base_params) = Params::parse_spec(fb).unwrap();
+            let (oracle, oracle_params) = Params::parse_spec(or).unwrap();
+            PipelineSpec {
+                factor_base,
+                factor_base_params,
+                oracle,
+                oracle_params,
+                targets: Targets::Random,
+                ..Default::default()
+            }
+        };
+        for (fb, or, ok) in [
+            ("prime-interval:t=5", "pkm-semaev:m=2,bits=4", false),
+            ("prime-interval:t=5,lo=0", "pkm-semaev:m=2,lo=1", false),
+            (
+                "prime-interval:t=5,lo=976503",
+                "pkm-semaev:m=2,bits=5,lo=976503",
+                true,
+            ),
+            (
+                "prime-interval:t=5,lo=976503",
+                "pkm-semaev:m=2,mode=full,guess=3",
+                true,
+            ),
+            ("prime-interval:t=5,lo=7,x=1", "pkm-semaev:m=2", false),
+        ] {
+            let got = PkmSemaevOracle::from_spec(2, &spec(fb, or), &inst);
+            assert_eq!(got.is_ok(), ok, "{fb} with {or}");
+        }
+    }
+
+    /// U6: an end-to-end pipeline solve on the small prime fixture through
+    /// `from_spec`, with the interval read from the base.
+    #[test]
+    fn prime_interval_u6_pipeline_solves() {
+        use crate::cryptanalysis::ic_boundary::Calibration;
+        use crate::cryptanalysis::ic_framework::stages::Targets;
+        use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+        let inst = small_prime_order_instance();
+        let curve = &inst.curve;
+        let mut ops = GroupOps::default();
+        let planted = 1 + 7919 % (inst.r - 1);
+        let target = curve.mul(&mut ops, inst.generator_point(), planted);
+        let mut ictx = prime_interval_ctx(&inst);
+        ictx.target = target;
+        let fb_spec = "prime-interval:t=5,lo=500";
+        let (factor_base, factor_base_params) = Params::parse_spec(fb_spec).unwrap();
+        let (oracle, oracle_params) =
+            Params::parse_spec("pkm-semaev:m=2,mode=full,guess=1").unwrap();
+        let spec = PipelineSpec {
+            factor_base,
+            factor_base_params,
+            oracle,
+            oracle_params,
+            targets: Targets::Random,
+            linalg: "incremental-gauss".into(),
+            max_trials: 20_000,
+            seed: 11,
+            ..Default::default()
+        };
+        let mut o = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
+        let report = run_pipeline(
+            &ictx,
+            &spec,
+            &PrimeIntervalBase { instance: &inst },
+            &mut o,
+            planted,
+            &Calibration::default(),
+            Some(1.0),
+        )
+        .unwrap_or_else(|e| panic!("{fb_spec}: {e}"));
+        assert!(report.verified, "{report:?}");
+        assert_eq!(report.recovered, Some(planted));
+    }
+
     /// A small Montgomery miniature `y² = x³ + A x² + x` over `p ≡ 5 (8)`
     /// with `A² − 4` a non-residue (so `T₀ = (0, 0)` is the only rational
     /// 2-torsion point), in short Weierstrass form `x_W = u + A/3`.
@@ -2878,6 +3639,8 @@ mod tests {
             r: n as u64,
             cofactor: 1,
             generator: gen.unwrap(),
+
+            representation: None,
         };
         (inst, mulm(am, third, p))
     }
@@ -3362,6 +4125,8 @@ mod tests {
                     r,
                     cofactor: h,
                     generator: (gen.x, gen.y),
+
+                    representation: None,
                 };
                 return (inst, torsion);
             }
@@ -3510,5 +4275,167 @@ mod tests {
             o1.solver_totals().unwrap().calls,
             o0.solver_totals().unwrap().calls
         );
+    }
+
+    /// `lifts=2` (one shared F4 system per target): the verdicts and the
+    /// relations equal `lifts=1`'s and the brute-force fiber's, on random
+    /// and planted targets, with and without guessing and the F4 trace.
+    #[test]
+    fn shared_lift_system_matches_lifts_one_and_the_brute_force_fiber() {
+        use crate::cryptanalysis::ic_boundary::prime_factor_base;
+        let (inst, torsion) = cofactor_instance();
+        let curve = &inst.curve;
+        let h = inst.cofactor;
+        let fb = prime_factor_base(&inst, 20);
+        let max = *fb.abscissa_list.iter().max().unwrap();
+        let t = 64 - max.leading_zeros();
+        let decomposable = decomposable_points(curve, &fb, 2, &mut GroupOps::default());
+        let c = InstanceCtx {
+            cofactor: inst.cofactor,
+            ..ctx(&inst)
+        };
+        let prep = |spec: &str| {
+            let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+            let mut o = PkmSemaevOracle::new_bits(2, t, 0);
+            o.prepare(&c, &fb, &params, &mut GroupOps::default())
+                .expect("prepare");
+            o
+        };
+        let mut one = prep("m=2,mode=full,lifts=1");
+        let mut shared = [
+            prep("m=2,mode=full,lifts=2"),
+            prep("m=2,mode=full,lifts=2,guess=1"),
+            prep("m=2,mode=full,lifts=2,trace=1"),
+        ];
+        assert!(shared[0].shared, "the fiber is nontrivial: shared system");
+        // h^{-1} mod r (r prime), to plant R with S = R + K.
+        let mut hinv = 1u128;
+        let (mut bsq, mut e) = (h as u128 % inst.r as u128, inst.r as u128 - 2);
+        while e > 0 {
+            if e & 1 == 1 {
+                hinv = hinv * bsq % inst.r as u128;
+            }
+            bsq = bsq * bsq % inst.r as u128;
+            e >>= 1;
+        }
+        let mut ops = GroupOps::default();
+        let g = inst.generator_point();
+        let mut rng = StdRng::seed_from_u64(99);
+        // 3 random + 3 planted: the shared system solves at degree 8 to 10 on
+        // this base (about 30 s per system); 52 targets took over 30 minutes.
+        const RANDOM: usize = 3;
+        const PLANTED: usize = 3;
+        let mut targets = Vec::new();
+        for _ in 0..RANDOM {
+            targets.push(curve.mul(&mut ops, g, rng.gen_range(1..inst.r)));
+        }
+        let mut planted = 0;
+        while planted < PLANTED {
+            let (i, j) = (
+                rng.gen_range(0..fb.points.len()),
+                rng.gen_range(0..fb.points.len()),
+            );
+            let s = curve.add(&mut ops, fb.points[i], fb.points[j]);
+            let ph = curve.mul(&mut ops, s, h);
+            if ph.infinity {
+                continue;
+            }
+            targets.push(curve.mul(&mut ops, ph, hinv as u64));
+            planted += 1;
+        }
+        let (mut hits, mut calls_before) = (0, 0u64);
+        for (n, &target) in targets.iter().enumerate() {
+            let truth = torsion.iter().any(|&kk| {
+                let s = curve.add(&mut ops, target, kk);
+                decomposable.contains(&curve.key(&s))
+            });
+            if n >= RANDOM {
+                assert!(truth, "planted target {n} is lift-decomposable");
+            }
+            let run = |o: &mut PkmSemaevOracle| {
+                o.decompose(
+                    &c,
+                    &fb,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    target,
+                )
+            };
+            let want = run(&mut one);
+            assert_eq!(want.is_some(), truth, "lifts=1 verdict, target {n}");
+            for o in shared.iter_mut() {
+                let got = run(o);
+                assert_eq!(got.is_some(), truth, "lifts=2 verdict, target {n}");
+                if let Some(idx) = &got {
+                    let s = sum(curve, &fb, idx);
+                    let d = curve.add(&mut ops, s, curve.neg(target));
+                    assert!(torsion.contains(&d), "sum - R is in E[h]");
+                    assert_eq!(
+                        curve.mul(&mut ops, s, h),
+                        curve.mul(&mut ops, target, h),
+                        "[h]sum = [h]R"
+                    );
+                    assert_eq!(&got, &want, "same relation as lifts=1");
+                }
+            }
+            hits += usize::from(truth);
+        }
+        let calls = |o: &PkmSemaevOracle| o.solver_totals().unwrap().calls;
+        calls_before += calls(&one);
+        assert_eq!(
+            calls(&shared[0]),
+            targets.len() as u64,
+            "one call per target"
+        );
+        assert_eq!(
+            calls(&shared[2]),
+            targets.len() as u64,
+            "one call per target (trace)"
+        );
+        // Guessing: one call per branch reached (a non-refuted branch ends the
+        // target), so between one and two calls per target with 2 branches.
+        let g_calls = calls(&shared[1]);
+        assert!(
+            g_calls > targets.len() as u64 && g_calls <= 2 * targets.len() as u64,
+            "guess=1: {g_calls} calls for {} targets",
+            targets.len()
+        );
+        let nat = shared[0].relation_counters();
+        assert!(
+            nat["pkm_shared_poly_fp_mults_uncharged"] > 0,
+            "P_R construction is listed"
+        );
+        assert_eq!(nat["pkm_shared_systems"], targets.len() as u64);
+        eprintln!(
+            "shared_lifts: {} targets, lift-decomposable {hits}, F4 calls lifts=1 {calls_before}, lifts=2 {}",
+            targets.len(),
+            calls(&shared[0])
+        );
+        assert!(hits > 0);
+
+        // h = 1: lifts=2 is the blind oracle (no shared system).
+        let inst1 = instance();
+        let fb1 = base(&inst1, 3);
+        let (_, p1) = Params::parse_spec("pkm-semaev:m=2,lifts=2").unwrap();
+        let mut o1 = PkmSemaevOracle::new(2, 3, 1);
+        o1.prepare(&ctx(&inst1), &fb1, &p1, &mut GroupOps::default())
+            .unwrap();
+        assert!(!o1.shared);
+        let mut o0 = oracle(&inst1, &fb1, 2, 3, "m=2");
+        for _ in 0..10 {
+            let tg = inst1
+                .curve
+                .mul(&mut ops, inst1.generator_point(), rng.gen_range(1..inst1.r));
+            let run = |o: &mut PkmSemaevOracle| {
+                o.decompose(
+                    &ctx(&inst1),
+                    &fb1,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    tg,
+                )
+            };
+            assert_eq!(run(&mut o1), run(&mut o0));
+        }
     }
 }

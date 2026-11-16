@@ -212,6 +212,20 @@ Keep the receipt and native audit/replay results. A successful Pod or existing
 S3 prefix alone is insufficient; [HARNESS.md](HARNESS.md) defines failure states
 and exact source/build checks.
 
+### Command Jobs through the bridge
+
+`remote/launch-remote-command REQUEST.json` submits one arbitrary-command Job
+(`isolab.eks.command-request/v1`: digest-pinned image in `isolab/tasks`, argv,
+cpu, memory, seconds, isolation profile, optional instance type, a bounded
+`wait_seconds` ≤ 3000) or reads one Job's state
+(`isolab.eks.command-status/v1`). The same CodeBuild launcher runs
+`remote/run-command` or `remote/status-command`, fetched by sha256 like
+`run-request`; a long Job is observed later through status requests and its
+S3 results under `runs/<job>/<pod-uid>/`, which the command must upload itself.
+Command Jobs have no L2 gate, replay or A/A admission: their seconds are
+diagnostic only. Images without a daemon: `oci-layer-publish.py` appends one
+layer to a base image and pushes by digest.
+
 ## 3. Trigger the commit-building GitHub Action
 
 Authenticate `gh` with repository Actions write access. No AWS credentials are

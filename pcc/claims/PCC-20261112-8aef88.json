@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T06:46:12Z",
+ "id": "PCC-20261112-8aef88",
+ "kind": "statement",
+ "producer": {
+  "commit": "33e8ef7524c2dddec08f1e61447933ae3fbbd500",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-source-unrun-19.rs",
+    "sha256": "642105f026c38b3a751a1751919e50a186c1e2053b89d380cee5c3b82fa33d78"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-source-unrun-19.sha256",
+    "sha256": "b8f0cf5da04095d4f5862a60f3a0cf02f56d2e912d0b8617d03ccf347ff94334"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-zero-tests-19.txt",
+    "sha256": "d35d80c8e0762f53c1d6f299d3dda408d0dfb9afaf7675ba885d5ba5df41e0b4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-cached-clippy-19.txt",
+    "sha256": "0b5fe2277fd2b29cc111b76604c482f8ec516047dbc0954657203c5614f4e4db"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned endpoint-control attempt19 ran ZERO tests/91filtered despite exit0;no endpoint arithmetic acceptance. Two cloned packages shared one Cargo target directory;cached binary lists original ct27-only T1norm test and lacks the newly added T1-copy endpoint test. Source/hash/zero-test/static receipts preserved. Use a separate target cache/fresh compile and require1native test before acceptance. Earlier accepted prototype receipts have named positive tests and explicit compiling paths;actual consumer has its own targetdir."
+}

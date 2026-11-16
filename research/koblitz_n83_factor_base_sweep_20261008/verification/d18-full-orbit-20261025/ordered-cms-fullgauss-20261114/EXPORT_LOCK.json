@@ -1,0 +1,26 @@
+{
+  "schema": "n83.d18-ordered-cms-fullgauss-lock/v1",
+  "date_utc": "2026-11-14",
+  "source_commit": "afebef39283466fca4ddff01063d26df9b59c45e",
+  "input_root": "/Volumes/SSD990-2/tmp/n83-d18-cms-20261114/input",
+  "producer_manifest_sha256": "1d3650eabc4662d8f2597498d7ac92b7cd0a4134ac5f8155aaa49c7af3407dce",
+  "s3_manifest_sha256": "1b93351febd47dac4de8c5dd39dbf58564d0057a044054baf448d978f6c0d616",
+  "compressed_object_sha256": "eaef94ef45b3d2d4cd2ec2f40c1173b4cdb2a437b7e618a858c73fb1caf3902b",
+  "worker_binary_sha256": "c30c6f0e2d04e4131740bf768c1485885d64dbc7fa9c0d2e63c07221a711ae66",
+  "solver_binary_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "positive_replay_sha256": "7c453cc9b5d73dca2e59982a047e4f2532ad4d087c7479f350e2c80540be1b7f",
+  "exports": {
+    "positive": {
+      "worker_receipt_sha256": "5d481718c4d34292bce4e8aba0969f369e8b637185212cc67c6569d065a0c07f",
+      "xcnf_sha256": "c632c152447cb09dbe7dd7cf7e29f713588c37bd56b67dfbf1fa7dac4cb15b74",
+      "xcnf_bytes": 50523891,
+      "variables": 329808,
+      "dimacs_header_clauses": 2811900,
+      "cnf_clauses": 2807999,
+      "xor_rows": 3901
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7",
+  "solver_flags": ["--threads", "1", "--random", "20261114", "--maxtime", "600", "--maxconfl", "1000000", "--verb", "1", "--verbstat", "1", "--printsol", "1", "--maxnummatrices", "32", "--autodisablegauss", "0", "--gaussusefulcutoff", "0"],
+  "outer_watchdog_seconds": 660
+}
