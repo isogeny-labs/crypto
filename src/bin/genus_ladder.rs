@@ -46,6 +46,10 @@ struct Cfg {
     threads: usize,
     rho_cap: f64,
     seed_search: u64,
+    /// `--curve-seeds p=s1/s2/...,p=...`: evaluate only these curve seeds in
+    /// the hyperelliptic cells of `p` (to re-run admitted instances of an
+    /// earlier study without its seed search).  Same admission path.
+    curve_seeds: std::collections::HashMap<u64, Vec<u64>>,
     max_trials: u64,
     restart_sqrt: bool,
     smith: bool,
@@ -74,6 +78,7 @@ fn parse() -> Result<Cfg, String> {
         threads: 4,
         rho_cap: 3.0e7,
         seed_search: 600,
+        curve_seeds: Default::default(),
         max_trials: 50_000_000,
         restart_sqrt: false,
         smith: false,
@@ -127,6 +132,19 @@ fn parse() -> Result<Cfg, String> {
             "--threads" => c.threads = num(&v)? as usize,
             "--rho-cap" => c.rho_cap = num(&v)?,
             "--seed-search" => c.seed_search = num(&v)? as u64,
+            "--curve-seeds" => {
+                for cell in v.split(',') {
+                    let (p, ss) = cell
+                        .split_once('=')
+                        .ok_or(format!("--curve-seeds wants p=s1/s2,..., not {cell}"))?;
+                    let p: u64 = p.parse().map_err(|e| format!("--curve-seeds p: {e}"))?;
+                    let ss = ss
+                        .split('/')
+                        .map(|x| x.parse::<u64>().map_err(|e| format!("--curve-seeds: {e}")))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    c.curve_seeds.insert(p, ss);
+                }
+            }
             "--max-trials" => c.max_trials = num(&v)? as u64,
             "--smith-census" => c.smith_census = num(&v)? as u64,
             "--sge" => {
@@ -231,7 +249,16 @@ fn main() -> ExitCode {
         let mut tried = 0u64;
         let mut reasons: std::collections::BTreeMap<String, u64> = Default::default();
         let ts = Instant::now();
-        for cs in 1..=cfg.seed_search {
+        let listed = if g == 0 {
+            None
+        } else {
+            cfg.curve_seeds.get(&p)
+        };
+        let seeds: Vec<u64> = match listed {
+            Some(v) => v.clone(),
+            None => (1..=cfg.seed_search).collect(),
+        };
+        for cs in seeds {
             if admitted >= cfg.curves {
                 break;
             }
@@ -332,11 +359,30 @@ fn main() -> ExitCode {
             let head = json!({"family": "hyperelliptic", "p": p, "g": g, "curve_seed": curve_seed,
                 "seed": seed, "r": r, "h": h});
             for ch in cfg.arms.chars() {
-                let (arm, pre) = match ch {
-                    'A' => (Arm::Full, false),
-                    'a' => (Arm::Full, true),
-                    'C' => (Arm::DoubleLp, false),
-                    'c' => (Arm::DoubleLp, true),
+                // v: c + coordinate Wiedemann on a square row subset;
+                // w: v + the capped unit-T walk (gl::IcExt).
+                let no_ext = gl::IcExt::default();
+                let (arm, pre, ext) = match ch {
+                    'A' => (Arm::Full, false, no_ext),
+                    'a' => (Arm::Full, true, no_ext),
+                    'C' => (Arm::DoubleLp, false, no_ext),
+                    'c' => (Arm::DoubleLp, true, no_ext),
+                    'v' => (
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: false,
+                        },
+                    ),
+                    'w' => (
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: true,
+                        },
+                    ),
                     'R' => {
                         let expect = (std::f64::consts::PI * *r as f64 / 4.0).sqrt();
                         let mut rec = head.clone();
@@ -365,7 +411,7 @@ fn main() -> ExitCode {
                 };
                 let settings = std::iter::once(None).chain(cfg.sge.iter().copied().map(Some));
                 for sge in settings {
-                    let o = gl::run_ic(
+                    let o = gl::run_ic_ext(
                         &inst,
                         IcParams {
                             arm,
@@ -381,6 +427,7 @@ fn main() -> ExitCode {
                             verify_relations: false,
                             sge,
                         },
+                        ext,
                     );
                     let suffix = match sge {
                         None => String::new(),
@@ -389,11 +436,14 @@ fn main() -> ExitCode {
                     let mut rec = head.clone();
                     rec["kind"] = json!("run");
                     rec["arm"] = json!(format!(
-                        "{}{}{}",
+                        "{}{}{}{}{}",
                         o.arm,
                         if pre { "+pre" } else { "" },
+                        if ext.coord_square { "+coord" } else { "" },
+                        if ext.unit_t { "+unitT" } else { "" },
                         suffix
                     ));
+                    rec["la_fallbacks"] = json!(o.la_fallbacks);
                     rec["certified"] = json!(o.certified);
                     rec["exhausted"] = json!(o.exhausted);
                     rec["ok"] = json!(o.recovered == Some(inst.t_secret));

@@ -51,8 +51,8 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    addm, build_rows, combine, mulmod, peel, split_order, subm, wiedemann, Dsu, Nat, Rel, Row,
-    REL_FB,
+    addm, build_rows, combine, mulmod, peel, split_order, subm, wiedemann, wiedemann_coord, Dsu,
+    Nat, Rel, Row, REL_FB,
 };
 use super::ic_boundary::{
     invmod, pivot_inversion_steps, rho_reference_walk, CountedGroup, GroupOps, RhoWalk,
@@ -1251,6 +1251,8 @@ pub struct IcResult {
     pub core_rows: usize,
     pub core_cols: usize,
     pub attempts: u32,
+    /// [`IcExt::coord_square`] solves that returned nothing and fell back.
+    pub la_fallbacks: u32,
     pub wall_ns: u64,
 }
 
@@ -1271,9 +1273,31 @@ pub fn restart_sqrt(r: u64) -> u64 {
     (((r as f64).sqrt() / 2.0) as u64).clamp(16, RESTART)
 }
 
+/// Optional speed-ups ported from the genus-3 positive control
+/// (`research/ic_positive_control_{la,capped}_20261116`).  The default is
+/// the frozen instrument, count for count.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct IcExt {
+    /// Coordinate Wiedemann on a random square row subset
+    /// (`ic_control::wiedemann_coord`): only the target's coordinate, no
+    /// `AᵀDA`, no reconstruction.  A failed certificate falls back, in the
+    /// same attempt and counted, to the baseline [`wiedemann`].  Ignored
+    /// when [`IcParams::sge`] is set.
+    pub coord_square: bool,
+    /// Unit-T walk: starts `a G + T`, jumps `α G`; the unknown is
+    /// `h · log T` (column −1) and the segment between restarts is capped at
+    /// `max(64, ⌊√r / 16⌋)` so a segment never runs into its rho cycle.
+    pub unit_t: bool,
+}
+
 /// Run one index-calculus arm on an instance.  The structure is
 /// `ic_control::run_ic_with`, with the genus a variable.
 pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
+    run_ic_ext(inst, prm, IcExt::default())
+}
+
+/// [`run_ic`] with the speed-ups of [`IcExt`].
+pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1330,12 +1354,21 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
     let mut jumps: Vec<(JDiv, u64, u64)> = Vec::new();
     for _ in 0..16 {
         let a = rng.gen_range(1..short);
+        if ext.unit_t {
+            jumps.push((curve.mul(&mut ops, inst.g, a), a, 0));
+            continue;
+        }
         let b = rng.gen_range(1..short);
         let ag = curve.mul(&mut ops, inst.g, a);
         let bt = curve.mul(&mut ops, inst.target, b);
         jumps.push((curve.add(&mut ops, ag, bt), a, b));
     }
     res.setup_ops = ops.adds + ops.doubles;
+    let restart = if ext.unit_t {
+        prm.restart.min((((r as f64).sqrt() / 16.0) as u64).max(64))
+    } else {
+        prm.restart
+    };
 
     let mut rels: Vec<Rel> = Vec::new();
     let mut vid: HashMap<u32, u32> = HashMap::new();
@@ -1353,7 +1386,14 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
                 res.exhausted = true;
                 break 'outer;
             }
-            if since_restart >= prm.restart.max(1) {
+            if since_restart >= restart.max(1) && ext.unit_t {
+                let a = rng.gen_range(1..r);
+                let ag = curve.mul(&mut ops, inst.g, a);
+                cur = curve.add(&mut ops, ag, inst.target);
+                ca = a;
+                cb = 1;
+                since_restart = 0;
+            } else if since_restart >= restart.max(1) {
                 let a = rng.gen_range(1..r);
                 let b = rng.gen_range(1..r);
                 let ag = curve.mul(&mut ops, inst.g, a);
@@ -1429,9 +1469,15 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
             if rel.nfb == 0 && lps.is_empty() {
                 continue;
             }
-            res.rel.mul += 2;
             rel.rhs = mulmod(h % r, ca, r);
-            rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            if ext.unit_t {
+                debug_assert_eq!(cb, 1);
+                res.rel.mul += 1;
+                rel.tcoef = r - 1; // unknown h·log T
+            } else {
+                res.rel.mul += 2;
+                rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            }
             if prm.verify_relations {
                 let mut sum = JDiv::IDENTITY;
                 for &(x, y) in &places {
@@ -1489,40 +1535,74 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
         }
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
-        let sol = match prm.sge {
-            None => wiedemann(&core, cc, r, &mut rng, dense, &mut w_nat).map(|x| x[ct as usize]),
-            Some(sp) => {
-                let mut s_nat = Nat::default();
-                let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
-                res.la_sge.merge(s_nat);
-                res.la.merge(s_nat);
-                res.sge = st;
-                // The merged system is solved with a copy of the stream; the
-                // stream itself advances as the unmerged solve would, so a
-                // failed attempt resumes the relation phase identically.
-                let mut wrng = rng.clone();
-                skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
-                wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
-            }
+        // UnitT solves for h·log T: one inversion of h and one product.
+        let h_inv = if ext.unit_t {
+            w_nat.mul += pivot_inversion_steps(r) + 1;
+            invmod(h % r, r)
+        } else {
+            1
         };
-        res.la_wied.merge(w_nat);
-        res.la.merge(w_nat);
-        if let Some(t) = sol {
+        let to_log = |t: u64| if ext.unit_t { mulmod(t, h_inv, r) } else { t };
+        // The certificate: [t]G = T by the counted multiplication (its group
+        // operations are verify_ops) and by an independent one whose field
+        // work is taken back out of the tally.
+        // (Assigned, not accumulated, exactly as the frozen instrument does.)
+        let certify = |t: u64, ops: &mut GroupOps, verify_ops: &mut u64| -> bool {
             let v0 = ops.adds + ops.doubles;
-            let chk = curve.mul(&mut ops, inst.g, t);
-            res.verify_ops = ops.adds + ops.doubles - v0;
+            let chk = curve.mul(ops, inst.g, t);
+            *verify_ops = ops.adds + ops.doubles - v0;
             let (cm, ci) = (curve.fmul(), curve.finv());
             let ok = chk == inst.target && curve.mul_rtl(inst.g, t) == inst.target;
-            // The second, independent multiplication is a certificate, not
-            // solver work: take it back out of the field tally.
             curve.k.mul.set(cm);
             curve.k.inv.set(ci);
-            if ok {
-                res.recovered = Some(t);
-                res.certified = true;
-                solved = true;
-                continue;
+            ok
+        };
+        let mut answer = None;
+        if ext.coord_square && prm.sge.is_none() {
+            let t = wiedemann_coord(&core, cc, ct as usize, r, &mut rng, true, &mut w_nat);
+            match t.map(to_log) {
+                Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
+                _ => res.la_fallbacks += 1,
             }
+        }
+        if answer.is_none() {
+            let sol = match prm.sge {
+                None => wiedemann(
+                    &core,
+                    cc,
+                    r,
+                    &mut rng,
+                    dense || ext.coord_square,
+                    &mut w_nat,
+                )
+                .map(|x| x[ct as usize]),
+                Some(sp) => {
+                    let mut s_nat = Nat::default();
+                    let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+                    res.la_sge.merge(s_nat);
+                    res.la.merge(s_nat);
+                    res.sge = st;
+                    // The merged system is solved with a copy of the stream; the
+                    // stream itself advances as the unmerged solve would, so a
+                    // failed attempt resumes the relation phase identically.
+                    let mut wrng = rng.clone();
+                    skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                    wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
+                }
+            };
+            if let Some(t) = sol.map(to_log) {
+                if certify(t, &mut ops, &mut res.verify_ops) {
+                    answer = Some(t);
+                }
+            }
+        }
+        res.la_wied.merge(w_nat);
+        res.la.merge(w_nat);
+        if let Some(t) = answer {
+            res.recovered = Some(t);
+            res.certified = true;
+            solved = true;
+            continue;
         }
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
     }
@@ -1950,6 +2030,96 @@ pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
 
 #[cfg(test)]
 mod tests {
+
+    /// The default extension is the frozen instrument: every count equal.
+    #[test]
+    fn ext_default_is_run_ic_count_for_count() {
+        for (p, g) in [(131u64, 3u32), (131, 4), (257, 3)] {
+            let inst = first_instance(p, g);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, g, 2.0),
+                seed: 5,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: false,
+                sge: None,
+            };
+            let a = run_ic(&inst, prm);
+            let b = run_ic_ext(&inst, prm, IcExt::default());
+            assert_eq!(
+                (
+                    a.trials,
+                    a.relations,
+                    a.group_ops(),
+                    a.rel,
+                    a.la,
+                    a.verify_ops,
+                    a.recovered
+                ),
+                (
+                    b.trials,
+                    b.relations,
+                    b.group_ops(),
+                    b.rel,
+                    b.la,
+                    b.verify_ops,
+                    b.recovered
+                )
+            );
+        }
+    }
+
+    /// Coordinate Wiedemann and the unit-T walk certify at genus 3 and 4, alone
+    /// and together, and the coordinate solve spends fewer LA multiplications.
+    #[test]
+    fn ext_arms_certify_at_genus_3_and_4() {
+        for (p, g) in [(131u64, 3u32), (131, 4), (257, 4)] {
+            let inst = first_instance(p, g);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, g, 2.0),
+                seed: 9,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: true,
+                sge: None,
+            };
+            let base = run_ic(&inst, prm);
+            for ext in [
+                IcExt {
+                    coord_square: true,
+                    unit_t: false,
+                },
+                IcExt {
+                    coord_square: false,
+                    unit_t: true,
+                },
+                IcExt {
+                    coord_square: true,
+                    unit_t: true,
+                },
+            ] {
+                let x = run_ic_ext(&inst, prm, ext);
+                assert!(x.certified, "p={p} g={g} {ext:?}");
+                assert_eq!(x.bad_relations, 0);
+                assert_eq!(x.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+                if ext
+                    == (IcExt {
+                        coord_square: true,
+                        unit_t: false,
+                    })
+                {
+                    assert_eq!(x.relations, base.relations);
+                    if x.la_fallbacks == 0 {
+                        assert!(x.la_wied.mul < base.la_wied.mul, "p={p} g={g}");
+                    }
+                }
+            }
+        }
+    }
     use super::*;
     use crate::cryptanalysis::chained_transfer::hyper64::H64Curve;
 
