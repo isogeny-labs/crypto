@@ -9,6 +9,15 @@ result_dir=$4
 [[ -x "$adapter" && -f "$raw_stdout" && ! -e "$result_dir" ]] || { echo 'Invalid input or nonfresh output' >&2; exit 2; }
 [[ $depth == 1 || $depth == 2 ]] || { echo 'Only registered complete unit depths1/2 admitted' >&2; exit 2; }
 mkdir -p "$result_dir"
+awk '
+  /^BEGIN_ARM / {
+    if (inside || ($2!="dense" && $2!="tower" && $2!="paired" && $2!="oriented") || seen[$2]++) exit 2;
+    inside=$2; count++; next
+  }
+  /^END_ARM / { if (inside!=$2) exit 2; inside=""; next }
+  !inside && $0 !~ /^[[:space:]]*$/ { exit 2 }
+  END { if (inside || count!=4) exit 2 }
+' "$raw_stdout"
 for arm in dense tower paired oriented; do
   awk -v arm="$arm" '
     $0 == "BEGIN_ARM " arm { if (seen || inside) exit 2; seen=1; inside=1; next }

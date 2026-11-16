@@ -138,7 +138,7 @@ std::string reduced_program(const Base& b,unsigned m,const std::string& arm,cons
     for(unsigned j=0;j<m;++j) {
         auto coordinate=[&](const std::string& suffix) {
             const Poly& p=reduced.reconstruction.at("p"+num(j)+suffix);
-            return variables.empty()?"Integers()!(F!("+magma_poly2(p)+"))":"Integers()!Evaluate(R!("+magma_poly2(p)+"),Eltseq(solution))";
+            return variables.empty()?"Integers()!(F!("+magma_poly2(p)+"))":"Integers()!Evaluate(R!("+magma_poly2(p)+"),[solution[k]:k in [1.."+num(variables.size())+"]])";
         };
         code+="  printf \"P %o %o\\n\", "+coordinate("_x")+", "+coordinate("_y")+";\n";
     }
@@ -159,7 +159,7 @@ int main(int argc,char** argv) {
         require(argc==3 && std::string(argv[1])=="selftest","usage: linear_reduce selftest FRESH_OUTPUT_DIRECTORY");
         std::filesystem::path out=argv[2]; require(!std::filesystem::exists(out),"output must be fresh");
         std::vector<std::string> summaries;
-        for(unsigned depth:{1U,4U}) {
+        for(unsigned depth:{1U,2U,4U}) {
             Base b=build(depth); auto domain=signed_points(b);
             for(unsigned m=2;m<=7;++m) for(const std::string arm:{"dense","tower","paired","oriented"}) {
                 auto indices=planted_indices(b,m); Point target=replay(domain,indices);
@@ -174,7 +174,7 @@ int main(int argc,char** argv) {
                 std::string prefix="d"+num(depth)+"-m"+num(m)+"-"+arm;
                 write(out/(prefix+"-certificate.json"),object({{"schema",jquote("p256.affine_linear_elimination/v1")},
                   {"summary",summary(b,m,arm,r)},{"unit_pivots",array(r.certificates)}}));
-                if(depth==1 && m==2) write(out/(prefix+".m"),reduced_program(b,m,arm,r));
+                if(depth<=2 && m==2) write(out/(prefix+".m"),reduced_program(b,m,arm,r));
             }
         }
         // Check the exact symbolic certificate, not only one evaluated point.
@@ -189,7 +189,7 @@ int main(int argc,char** argv) {
         rejects([&]{check_substitution_identity(before,after+Poly(1),"x",good.expression);},"corrupt substitution remainder");
         write(out/"summary.json",object({{"schema",jquote("p256.affine_linear_elimination_selftest/v1")},
           {"cases",array(summaries)},{"symbolic_negative_controls","3"},{"performance_experiment","false"}}));
-        std::cout<<"48 exact affine-elimination/reconstruction unit cases and3 corruption controls pass; no timing claim.\n";
+        std::cout<<"72 exact affine-elimination/reconstruction unit cases and3 corruption controls pass; no timing claim.\n";
         return 0;
     } catch(const std::exception& e) { std::cerr<<"linear_reduce: "<<e.what()<<'\n'; return 1; }
 }
