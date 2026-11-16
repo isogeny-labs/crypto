@@ -58,8 +58,11 @@ base=[];base_index={}
 for pt in pts:
  xi,yi=pt[0],pt[1]
  if yi==0 or digits(yi,3)>digits(-yi,3):continue
- base_index[xi]=len(base)
- base.append(J(Rk([-xi,1]),Rk([yi])))
+ cls=J(Rk([-xi,1]),Rk([yi]))
+ if h*cls==O:
+  base_index[xi]=None
+ else:
+  base_index[xi]=len(base);base.append(cls)
 n=len(base);assert n>0
 def smooth(D):
  U,V=D[0],D[1]
@@ -69,27 +72,32 @@ def smooth(D):
   if fac.degree()!=1:return None
   xi=-fac[0]/fac[1];yi=V(xi)
   if yi==0:continue
-  j=base_index.get(xi)
-  if j is None:return None
+  if xi not in base_index:return None
+  j=base_index[xi]
+  if j is None:continue
   bj=base[j][1][0]
   if yi!=bj and yi!=-bj:return None
   row[j]+=(1 if yi==bj else -1)*int(mult)
  return row
 
-start=time.process_time_ns();rows=[];rhs=[];attempts=0;walk=O
-for aa in range(1,20001):
- walk+=G;attempts=aa
- row=smooth(walk)
- if row is None:continue
- rows.append(row);rhs.append(int(h*aa%r))
- if len(rows)>=n and matrix(GF(r),rows).rank()==n:break
-else:
+start=time.process_time_ns();rows=[];rhs=[];attempts=0;full_rank=False
+for shift_index in [-1]+list(range(n)):
+ walk=O if shift_index<0 else base[shift_index]
+ for aa in range(1,3001):
+  walk+=G;attempts+=1
+  row=smooth(walk)
+  if row is None:continue
+  if shift_index>=0:row[shift_index]-=1
+  rows.append(row);rhs.append(int(h*aa%r))
+  if len(rows)>=n and matrix(GF(r),rows).rank()==n:
+   full_rank=True;break
+ if full_rank:break
+if not full_rank:
  print(json.dumps({'phase':'relation_rank_cap','factor_base_size':n,'rational_points':len(pts),
                    'attempts':attempts,'accepted':len(rows),
                    'rank':int(matrix(GF(r),rows).rank()) if rows else 0,
-                   'zero_projected_indices':[i for i in range(n) if h*base[i]==O],
                    'column_support':[sum(v[i]!=0 for v in rows) for i in range(n)]},sort_keys=True),flush=True)
- raise RuntimeError('relation rank not reached within 20000 walk steps')
+ raise RuntimeError('relation rank not reached within shifted relation cap')
 M=matrix(GF(r),rows);logs=M.solve_right(vector(GF(r),rhs))
 assert all(int(logs[i]) * G==h*base[i] for i in range(n))
 timing['relations_and_la_cpu_s']=(time.process_time_ns()-start)/1e9
