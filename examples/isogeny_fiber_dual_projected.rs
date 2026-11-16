@@ -2038,8 +2038,7 @@ fn summarize_grid(run_dir: &str, svg_path: &str) {
         let exact_bytes = fs::read(&exact_path).unwrap();
         let exact_summary: Value = exact_bytes
             .split(|&byte| byte == b'\n')
-            .filter(|row| !row.is_empty())
-            .last()
+            .rfind(|row| !row.is_empty())
             .map(|row| serde_json::from_slice(row).unwrap())
             .unwrap();
         assert_eq!(

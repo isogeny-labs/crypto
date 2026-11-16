@@ -36,6 +36,16 @@ direct dual/signed rho was 312.322. Mean whole-child thread CPU was
 direct and 0.614 ms signed rho. This was shared-host L0 execution;
 the CPU readings do not yield an isolated wall ratio.
 
+The 12 raw B=64 records give a derived group-count stage diagnostic.
+Mean setup/query/verification $S_"group"$ is
+805.736/1685.374/1.024 for direct dual,
+873.470/1685.374/1.024 for direct inverse, and
+1.718/5.237/1.024 for signed rho. The dual saves 67.734 in setup
+and changes none of the paired query group work. With hypothetical
+zero setup, its measured query plus verification count is 1686.398,
+which is 211.344 times the measured whole-child rho count. This is
+a fixed-target sensitivity calculation, not a 64-target reuse run.
+
 The prespecified generic two-class counting floor is 0.886227.
 Complete portable $S$ remains unset because field, square-root,
 polynomial/table, allocation, startup and I/O work is not fully
