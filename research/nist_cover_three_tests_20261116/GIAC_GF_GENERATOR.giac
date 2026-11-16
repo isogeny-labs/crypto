@@ -1,0 +1,9 @@
+taskprime:=6277101735386680763835789423207666416083908700390324961279;
+taskfield:=GF(taskprime,2);
+typed_basis:=gbasis([x+y-g-1,x*y-g],[x,y],plex);
+print("GENERATOR",g,type(g),op(g));
+print("TYPED_BASIS",typed_basis);
+print("TYPED_ROOT_1",normal(subst(typed_basis,[x,y],[g,1])));
+print("TYPED_ROOT_2",normal(subst(typed_basis,[x,y],[1,g])));
+print("TYPED_NONROOT",normal(subst(typed_basis,[x,y],[0,0])));
+print("CONSTANT_COEFFICIENT",coeff(typed_basis[0],y,0),op(coeff(typed_basis[0],y,0)));

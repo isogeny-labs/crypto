@@ -74,7 +74,7 @@ $$Q_A=s\,M_0^t Q_C M_0.$$
 
 All four full quadratic forms agree, and s lies in Fp with quadratic character-1. The execution also checks384 source normalization equations,12 source and12 target derivatives and the declared discriminator/corruption controls. Exact forms, source representative, matrices and scalar are in evidence/differential-twist-v2/result.json. The run exits0 and post-call source hashes match. PCC-20261116-08b9be is unsigned. [pcc:unverified]
 
-Under TWIST_PROTOCOL's marked-ppav normalization argument, s nonsquare means the differential identification requires the quadratic extension, pointing to a nontrivial Serre obstruction for kernel1. This is a conditional producer result. The general argument and implemented normalizations still need independent review; no executable divisor-class isogeny is supplied by a differential matrix. The next same-field construction input is recorded kernel2, using fresh kernel-dependent predecessors under KERNEL_CONTINUATION_PROTOCOL.
+Under TWIST_PROTOCOL's marked-ppav normalization argument, s nonsquare means the differential identification requires the quadratic extension, pointing to a nontrivial Serre obstruction for kernel1. Kernel2's fresh chain agrees. Kernel3's resumed unchanged descent suffix now completes with an original-field scalar of character+1 (PCC-20261116-ba8a27). The general argument and implemented normalizations still need independent review; actual map/Frobenius checks remain required. Kernel3 is now the input for the [eight-function coordinate construction](KUMMER.md), whose target fit and source public-point evaluator have completed their declared checks. [pcc:unverified]
 
 ## Evidence and reproduction
 
@@ -92,7 +92,7 @@ Source review: Tian arXiv:2007.03172 sections2--5; Dalla Piazza--Fiorentino--Sal
 
 ## Next executable acceptance test
 
-Let A=J(H)/K. The present kernel has order27, giving a (3,3,3) quotient; this differs from Smith's original (2,2,2) construction. The conditional kernel1 comparison points to a nontrivial Serre sign. Continue through the remaining recorded kernels in order to seek a same-field Jacobian, preserving kernel1's result and every intermediate. An extension-field route requires explicit field accounting; a nonhyperelliptic curve cannot absorb the opposite Jacobian sign by the usual hyperelliptic curve-twist construction. [pcc:unverified]
+Let A=J(H)/K. The present kernels have order27, giving a (3,3,3) quotient; this differs from Smith's original (2,2,2) construction. Kernel3 passes the current conditional same-field differential criterion and supplies the coordinate-lift input. Preserve kernels1/2's opposite sign and every intermediate. An extension-field route requires explicit field accounting; a nonhyperelliptic curve cannot absorb the opposite Jacobian sign by the usual hyperelliptic curve-twist construction. [pcc:unverified]
 
 Next implement the quotient map $\phi$ on divisor classes, lifting its Kummer coordinates to actual J(C) classes and checking exceptional inputs. Acceptance requires $\phi(D+k)=\phi(D)$ for every k in the actual kernel, compatibility with Frobenius and addition, and a dual $\psi$ satisfying $\psi(\phi(D))=[3]D$ on the tested domain. Combine it with the existing cover pullback and norm: $F=\phi\circ\pi^*$ and $T=\pi_*\circ\psi$ must satisfy $T(F(P))=[6]P$. The current coset implementation checks this identity; the new test must execute it in target divisor coordinates. [pcc:unverified]
 

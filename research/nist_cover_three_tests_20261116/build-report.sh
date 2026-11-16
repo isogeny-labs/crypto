@@ -10,3 +10,7 @@ dot -Tsvg figures/kernel-pairs.dot -o figures/kernel-pairs.svg
 dot -Tpdf figures/kernel-pairs.dot -o figures/kernel-pairs.pdf
 sed 's@figures/kernel-pairs.svg@figures/kernel-pairs.pdf@g' SYMMETRY.md |
   pandoc --from markdown+tex_math_dollars --pdf-engine=pdflatex -V geometry:margin=0.7in -V fontsize=10pt -V colorlinks=true --resource-path=. -o SYMMETRY.pdf
+dot -Tsvg figures/kummer.dot -o figures/kummer.svg
+dot -Tpdf figures/kummer.dot -o figures/kummer.pdf
+sed 's@figures/kummer.svg@figures/kummer.pdf@g' KUMMER.md |
+  pandoc --from markdown+tex_math_dollars --pdf-engine=pdflatex -V geometry:margin=0.7in -V fontsize=10pt -V colorlinks=true --resource-path=. -o KUMMER.pdf
