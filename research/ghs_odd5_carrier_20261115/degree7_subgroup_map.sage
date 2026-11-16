@@ -64,5 +64,5 @@ def run_hit(hit,hit_index):
          'checks':{'identity':True,'degree_seven':True,'pole_fiber_twotorsion':True,'source_order_109':True,'pullback_order_109':True,'trace_nonzero':True,'trace_order_109':True,'trace_F3_fixed':True,'pullback_37P_eq_37_pullback_P':True,'trace_37P_eq_37_trace_P':True}}
 
 out={'schema':'ghs.odd5.degree7-subgroup-map/v1','source_sha256':hashlib.sha256(Path(__file__).with_suffix('').read_bytes()).hexdigest(),'bmask':bmask,'maps':[run_hit(h,i) for i,h in enumerate(receipt['hits'])]}
-(PTH/('degree7_subgroup_map_%d.json'%bmask)).write_text(json.dumps(out,indent=2,sort_keys=True)+'\n')
+(PTH/('degree7_subgroup_map_%d.json'%bmask)).write_text(json.dumps(out,indent=2,sort_keys=True,default=int)+'\n')
 print(json.dumps({'schema':out['schema'],'bmask':bmask,'map_count':len(out['maps']),'all_checks':all(all(m['checks'].values()) for m in out['maps'])},sort_keys=True))

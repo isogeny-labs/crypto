@@ -7,3 +7,5 @@ For a retained `B=Qi*H²` cover `phi:(x,y)->(A/B,y*C/B²)`, verify `deg A=7`, `d
 The small-field transfer is `T(P)=sum_(i=0)^4 Frob_3^i D(P)`. Verify `[109]D(P)=0`, `[109]T(P)=0`, `T(P)!=0`, and `Frob_3(T(P))=T(P)`. For an independently chosen scalar `k=37`, verify `D([k]P)=[k]D(P)` and `T([k]P)=[k]T(P)` using independently computed preimage divisors. Retain exact P, kP, source map polynomials, corrected Mumford representatives and traced Mumford representatives. These are finite-point checks of the explicit rational map, supplemented by the exact function-field identity and standard divisor pullback functoriality; Lean does not formalize the geometric functoriality.
 
 This protocol does not claim a faster discrete-logarithm attack. A full decomposition, factor-log, target-recovery and same-target rho comparison remains required, particularly after base change to larger subgroup sizes.
+
+The first frozen run reached all assertions but failed when Python JSON encoding encountered Sage's Integer type in the output. Commit `0ade70b35bd3` retains that attempt. The amended source converts Sage integers during serialization; no mathematical check was relaxed.
