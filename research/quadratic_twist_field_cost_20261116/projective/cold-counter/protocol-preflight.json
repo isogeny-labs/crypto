@@ -643,7 +643,7 @@
       {
         "name": "inputs",
         "treatment": "fixed",
-        "value": "Fixed engineeringpolicy0;3roles\u00d72methods\u00d730actualtargets,9counterintervals including3calibrations,12warmupintervals perstream",
+        "value": "Fixed engineeringpolicy0;3roles×2methods×30actualtargets,9counterintervals including3calibrations,12warmupintervals perstream",
         "how": "No new favorable policy/target selection, all failures retained"
       },
       {
@@ -971,15 +971,15 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": false
+    "status": "frozen",
+    "protocol_sha256": "8510586bffa197668c72525e19b5c48813665eef765ab94713cb806c249d857d",
+    "commit": "b740cdc3953f7edee4344bc2559f4e0b739d7adc",
+    "frozen_at": "2026-11-16T08:58:54Z",
+    "filed_before_affected_data": true
   },
   "extensions": {
     "pins_sha256": "448403afb168863c5f8ee91fdfc2994d0a914e4fdf97bc7d1b9f34b28d66b78d",
-    "window": "08:30\u201309:30UTC2026-11-16",
+    "window": "08:30–09:30UTC2026-11-16",
     "deadline_epoch": 1794821400,
     "stage_plan": [
       {
@@ -1104,7 +1104,7 @@
     "target_workloads_per_stream_including_controls": 270,
     "stored_warmup_workloads_per_stream": 360,
     "full_panel_not_launched": true,
-    "future_full_scope": "ALL455policies\u00d73roles\u00d72methods\u00d730targets perstream; new full protocol/resource binding required before data",
+    "future_full_scope": "ALL455policies×3roles×2methods×30targets perstream; new full protocol/resource binding required before data",
     "storage_contract": "read/hash NEWdump,gzip exclusivefile,inflate exactbytes,bind hashes/sizes,then remove only redundant NEWrawcopy; every path rehydrates",
     "no_python_research_dispatch": true,
     "historical_results_observed": true,
