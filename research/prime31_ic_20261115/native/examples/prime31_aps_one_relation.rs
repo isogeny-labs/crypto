@@ -1412,8 +1412,108 @@ fn s3_xfibre_confirmation()->Result<serde_json::Value,String>{
     }))
 }
 
+// Frozen 24-target matched cold solve: source only differs in arithmetic.
+// Exact per-round semantic counters and final scalar must match all arms.
+// Negative speed result is retained as a valid completed experiment.
+fn jacobian_batch_confirmation()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const PROFILE:[usize;3]=[384,384,16_384];
+    let mut rng=0x4a41_4342_5f32_3431u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    let mut totals=[0u128;3];
+    let mut setup_costs=[0u128;3];
+    let mut queries=[0u64;3];
+    let mut wins=0usize;
+    let mut cases=Vec::new();
+    for case in 0..CASES{
+        let known=loop{
+            let k=prng(&mut rng)%N;
+            if k>1 && used.insert(k){break k;}
+        };
+        let q=verifier.scalar(PRIME31,known,Some(PRIME31.g))
+            .ok_or("Jacobian panel public target is identity")?;
+        let order=if case%2==0 {[0usize,1,2]}else{[1usize,2,0]};
+        let mut times=[0u64;3];
+        let mut expected_transcript:Option<Vec<serde_json::Value>>=None;
+        let mut results=Vec::new();
+        for (position,&arm) in order.iter().enumerate(){
+            let run=execute_unequal_profile_source(q,PROFILE,6,true,arm!=0)?;
+            if run["complete_target_scalar_recovered"].as_bool()!=Some(true){
+                return Err(format!("Jacobian arm {arm} missed public Q {case}"));
+            }
+            let attempts=run["attempts"].as_array().ok_or("missing attempt transcript")?;
+            let log=attempts.last().and_then(|a|a.pointer("/solution/log"))
+                .and_then(|v|v.as_u64()).ok_or("missing recovered scalar")?;
+            if log!=known || verifier.scalar(PRIME31,log,Some(PRIME31.g))!=Some(q){
+                return Err(format!("incorrect Jacbatch scalar on case {case} arm {arm}"));
+            }
+            let sem:Vec<_>=attempts.iter().map(|a|json!({
+                "seed":a["seed"],"solution":a["solution"],
+                "s3_pair_quadratics":a["s3_pair_quadratics"],
+                "s3_sqrts":a["s3_sqrts"],
+                "s3_batch_inversions":a["s3_batch_inversions"],
+                "signed_candidates":a["signed_candidates"],
+                "rejected_identity":a["rejected_identity"],
+                "rejected_duplicate_x":a["rejected_duplicate_x"]
+            })).collect();
+            if let Some(ref expected)=expected_transcript{
+                if expected!=&sem{
+                    return Err(format!("Jacbatch changed relation transcript on case {case} arm {arm}"));
+                }
+            }else{expected_transcript=Some(sem);}
+            let ns=run["cold_wall_ns"].as_u64().ok_or("missing full cold timing")?;
+            let source_ns=attempts.iter().map(|a|
+                a["source_setup_ns"].as_u64().unwrap_or(0) as u128).sum::<u128>();
+            let pair_queries=attempts.iter().map(|a|
+                a["s3_pair_quadratics"].as_u64().unwrap_or(0)).sum::<u64>();
+            times[arm]=ns;
+            totals[arm]+=u128::from(ns);
+            setup_costs[arm]+=source_ns;
+            queries[arm]+=pair_queries;
+            results.push(json!({
+                "arm":match arm {0=>"affine",1=>"jacobian_batch",_=>"jacobian_repeat"},
+                "position":position,"verified_complete_scalar":log,
+                "full_cold_ns":ns,"paid_source_ns":source_ns.to_string(),
+                "s3_pair_queries":pair_queries,"attempts":attempts
+            }));
+        }
+        if times[1]<times[0]{wins+=1;}
+        cases.push(json!({
+            "case":case,"public_target":q,
+            "known_scalar_caller_verifier_only":known,"arms":results
+        }));
+    }
+    let ratio=totals[1] as f64/totals[0] as f64;
+    let drift=((totals[2] as f64/totals[1] as f64)-1.0).abs();
+    let passed=ratio<=0.90 && drift<=0.05 && wins>=18;
+    Ok(json!({
+        "standing":"[pcc:unverified]","curve_field":P,"group_order":N,"cofactor":1,
+        "method":"APS S3 one-relation plus public Jacobian source batch normalization",
+        "classification":"index calculus methodology, generic MITM equivalent",
+        "full_cold_in_process":true,"fresh_public_targets":CASES,
+        "profile":PROFILE,"round_cap":6,
+        "all_72_scalars_correct":true,"exact_source_and_relation_transcripts":true,
+        "arms":["affine","jacobian_batch","jacobian_repeat"],
+        "cold_total_ns":totals.map(|n|n.to_string()),
+        "source_total_ns":setup_costs.map(|n|n.to_string()),
+        "S3_pair_quadratics":queries,"candidate_over_control":ratio,
+        "candidate_aa_drift":drift,"candidate_paired_wins":wins,
+        "passes_preregistered_development_gate":passed,
+        "no_mature_external_or_independent_PCC":true,
+        "cases_detail":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--jacbatch-confirm" {
+        let result=jacobian_batch_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        // Incomplete or wrong recovery fails; slower valid results are
+        // recorded as a negative benchmark, not silently discarded.
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--xfibre-confirm" {
         let result=s3_xfibre_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -1492,6 +1592,51 @@ fn main()->Result<(),String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn jacobian_mixed_and_batch_normalizer_match_affine() {
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let g=PRIME31.g;
+        let neg=ar.neg(PRIME31,Some(g)).unwrap();
+        assert_eq!(jac_mixed(jac_affine(g),neg).z,0);
+        let doubled=jac_double(jac_affine(g));
+        assert_eq!(normalize_jac_batch(&[(doubled,1,2)]).unwrap()[0].pt,
+            ar.add(PRIME31,Some(g),Some(g)).unwrap());
+        let mut j=jac_affine(g);
+        let mut expected=Some(g);
+        let mut block=Vec::new();
+        for k in 2..211u64{
+            let step=ar.scalar(PRIME31,k,Some(g)).unwrap();
+            j=jac_mixed(j,step);
+            expected=ar.add(PRIME31,expected,Some(step));
+            if let Some(pt)=expected{
+                assert_eq!(normalize_jac_batch(&[(j,7,11)]).unwrap()[0].pt,pt);
+                block.push((j,k,k+1));
+            }else{
+                assert_eq!(j.z,0);
+                block.clear();
+            }
+        }
+        for (source,normalized) in block.iter().zip(normalize_jac_batch(&block).unwrap()){
+            assert_eq!(normalize_jac_batch(&[*source]).unwrap()[0].pt,normalized.pt);
+        }
+    }
+    #[test]
+    fn jacobian_source_matches_exact_affine_walk_labels() {
+        let mut ar_a=Arithmetic::default();
+        let mut ar_b=Arithmetic::default();
+        for sizes in [[32,48,64],[384,384,2048]]{
+            let original=source_walk_profile(PUBLIC_Q,SEED,&mut ar_a,sizes).unwrap();
+            let candidate=source_walk_profile_jac(PUBLIC_Q,SEED,&mut ar_b,sizes).unwrap();
+            assert_eq!((original.1,original.2),(candidate.1,candidate.2));
+            for (p,q) in original.0.iter().zip(candidate.0.iter()){
+                assert_eq!(p.len(),q.len());
+                for (x,y) in p.iter().zip(q.iter()){
+                    assert_eq!((x.pt,x.a,x.b),(y.pt,y.a,y.b));
+                }
+            }
+        }
+    }
     #[test]
     fn precomputed_s3_x_fibre_matches_all_signed_roots() {
         let mut ar=Arithmetic::default();
