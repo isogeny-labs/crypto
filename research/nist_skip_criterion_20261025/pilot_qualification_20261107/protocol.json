@@ -1,0 +1,412 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "nist-native-six-field-pilot-20261107",
+  "version": 1,
+  "created": "2026-11-07",
+  "repository": "crypto",
+  "study_dir": "research/nist_skip_criterion_20261025/pilot_qualification_20261107",
+  "authors": [
+    "native NIST pilot preparation"
+  ],
+  "links": {
+    "parent_protocol": "research/nist_skip_criterion_20261025/random_curve_validation_20261029/PROTOCOL.md",
+    "backlog_card": "backlog/XP-20261104-nist-random-curve-baseline",
+    "scope": "Separate engineering pilot; not the 60000-accepted primary cohort or its percentiles."
+  },
+  "question": "Can the published native sampler and separate full-order journal replay complete ten accepted records in each of the six pinned fields through the existing EKS command bridge with complete failure custody?",
+  "claims": [
+    {
+      "id": "pilot-integrity",
+      "class": "exact_computation",
+      "text": "If admitted and completed, each field has ten accepted records whose full journal prefix and acceptance predicates pass the separate reader.",
+      "decided_by": [
+        "complete-pair"
+      ]
+    },
+    {
+      "id": "historical-cause",
+      "class": "out_of_scope",
+      "text": "The pilot does not test a historical selection cause, a G/b mechanism, percentile precision, performance or a weakness.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "producer",
+      "role": "baseline",
+      "description": "Existing sampler_resume --pilot, target ten accepted records per field, preserving every attempt.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "e1826419b7911c9ae6a66ad91312a3861b292920",
+        "build": [
+          [
+            "bash",
+            "research/nist_skip_criterion_20261025/pilot_qualification_20261107/prepare-layer.sh",
+            "/ABSOLUTE/FRESH/OUTPUT"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "standard": "C++17",
+          "linkage": "static"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "field_bits": [
+          192,
+          224,
+          239,
+          256,
+          384,
+          521
+        ],
+        "accepted_target_per_field": 10,
+        "mode": "--pilot"
+      }
+    },
+    {
+      "id": "full-replay",
+      "role": "candidate",
+      "description": "Separate journal_check verify over every mapped attempt, including sampler early-abort rejections; no new draw or replacement nonce.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "e1826419b7911c9ae6a66ad91312a3861b292920",
+        "build": [
+          [
+            "bash",
+            "research/nist_skip_criterion_20261025/pilot_qualification_20261107/prepare-layer.sh",
+            "/ABSOLUTE/FRESH/OUTPUT"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "standard": "C++17",
+          "linkage": "static"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "format": "sampler-v1",
+        "target": 10
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "No timing or comparative statistical claim. The deterministic toy A/A and recovery byte identities are separate required qualification controls, not additional real-field draws."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "This is an engineering collection/replay pilot, not a feature detector. Known correct toy journals must pass the separate prelaunch qualification suite."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Malformed, missing, corrupt and reordered journals must be refused in the separate prelaunch qualification suite; they are not sampled null curves."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "field_bits",
+        "levels": [
+          192,
+          224,
+          239,
+          256,
+          384,
+          521
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "Native source pinned by SOURCE.sha256; old sampler law and original cohort unchanged.",
+        "how": "Bind publication receipt, image digest, native binaries and source inventory before freeze."
+      },
+      {
+        "name": "nonce_and_index",
+        "treatment": "fixed",
+        "value": "One post-freeze nonce with field/index domain separation.",
+        "how": "Keep the original nonce and next-index law on every recovery; never skip a slow or failed index."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record node, pod, imageID, CPU, kernel, resources, interruption and original deadline. No speed metric."
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": "Producer then full replay within each field; bounded waves after capacity admission.",
+        "how": "Replay consumes the producer's exact journals. No independent resampling arm."
+      },
+      {
+        "name": "failures",
+        "treatment": "measured",
+        "how": "Retain every attempt, incomplete field, timeout, OOM, corruption and infrastructure failure; no automatic retry."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "complete-pair",
+        "arms": [
+          "producer",
+          "full-replay"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All six fields complete exactly ten accepted rows and full replay succeeds on the same journal bytes before their original deadlines."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Replay requires the producer's immutable journal; counts, not execution time, are evaluated.",
+    "seed_derivation": {
+      "method": "external_nonce",
+      "nonce": null,
+      "note": "After the committed freeze, draw one fresh 32-byte nonce. Preserve the October 29 SHA256 domain, nonce, uint16_be(field_bits), uint64_be(index) mapping and SHA1 curve expansion."
+    },
+    "instance_sampling": {
+      "rule": "The six pinned fields and the original acceptance predicates; ten accepted rows per field, every attempted seed retained.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "All 21 original labels and old results are already known. This pilot cannot serve as a blinded historical-cause test.",
+      "unmasked_at": "Before this draft."
+    }
+  },
+  "sample_size": {
+    "instances": 6,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Ten accepted curves per field is an engineering pilot, not a powered distribution test. No p-value or percentile inference is licensed."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "accepted",
+        "name": "Accepted records per field",
+        "unit": "records",
+        "kind": "counted",
+        "definition": "Complete accepted journal rows retained before the original deadline; target ten. Incomplete fields stay incomplete.",
+        "source": "accepted.tsv rows and journal_check report.accepted",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "replay",
+        "name": "Full prefix replay outcome",
+        "unit": "pass or failure",
+        "kind": "exact",
+        "definition": "Separate reader rederives seed, curve, full order and acceptance for all mapped attempts; success requires target completion.",
+        "source": "journal_check verify exit status and raw report",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "attempts",
+        "name": "Retained seed attempts",
+        "unit": "attempts",
+        "kind": "counted",
+        "definition": "Every contiguous attempted index, including map rejects and early composite aborts; never a replacement for accepted count.",
+        "source": "attempts.tsv and journal_check report",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "accepted journal rows",
+      "attempted seed indices",
+      "full replay status"
+    ],
+    "record": [
+      "source and binary hashes",
+      "image digest and runtime imageID",
+      "protocol hash and nonce",
+      "field and attempt bounds",
+      "request hash and CodeBuild ID",
+      "Job and Pod UIDs",
+      "original deadline, resource limits, failures and cost receipts"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "placement": {
+      "requested_cpu": 2,
+      "memory": "4Gi",
+      "concurrency_ceiling": 2,
+      "instance_type": "c8a.2xlarge",
+      "capacity_admission": "Pending live NodePool, quota, existing node/job and default-vCPU accounting."
+    },
+    "measurement_class": "throughput",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "application",
+      "interval_seconds": 60,
+      "grace_seconds": 60,
+      "restore_validation": "application_managed",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Stop a field at exactly ten accepted records; never count ten attempted seeds as completion."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Do not admit any spend while the owner dollar cap, shared charged/committed/reserved balance or original absolute deadline is unknown; charge builds, whole workers, idle/queue exposure, storage, transfer and status launchers."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "The entire producer plus replay stays within the original per-field 3600-second deadline including provisioning; max one attempt and no automatic retry."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "An image/source mismatch, missing journal, invalid replay or failed custody prevents completion. Preserve and export the failure rather than resample."
+    }
+  ],
+  "invalidation_rules": [
+    "Unresolved image/source, checkpoint, admission or canonical-export binding prevents launch.",
+    "No production restore claim without a separate real interruption/restore receipt."
+  ],
+  "decision_rule": {
+    "text": "Only declare this pilot complete if all six producer/replay pairs reach the fixed target with exact custody and independent reader success. Otherwise report the exact partial or failed flow.",
+    "comparison_ids": [
+      "complete-pair"
+    ],
+    "statistic": "Six field-level completion and replay outcomes; no hypothesis-test statistic.",
+    "interval": "None; no statistical inference.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "None; completion counts only.",
+    "verdict_vocabulary": [
+      "complete pilot",
+      "partial pilot",
+      "invalid pilot",
+      "not launched"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "attempts.tsv",
+      "accepted.tsv",
+      "raw replay and launcher receipts"
+    ],
+    "outputs": [
+      "experiment.export/v1",
+      "field flow and failures"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "report_dir": "research/nist_skip_criterion_20261025/pilot_qualification_20261107"
+  },
+  "inadmissible": [
+    "Treating this draft as a freeze or launch approval.",
+    "Replacing the 60000-accepted primary cohort or ten published percentiles with this pilot.",
+    "Historical selection, G/b causation, speed or weakness claims from these engineering counts.",
+    "Discarding failures or slow indices, rerunning with a new nonce, or weakening a required gate.",
+    "Executing frozen Python, uploading the denied older auxiliary archive, changing credentials, infrastructure or keyrings."
+  ],
+  "literature": [
+    {
+      "ref": "research/nist_skip_criterion_20261025/random_curve_validation_20261029/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Preserve exact sampling, acceptance, six fields, known-label disclosure and the separate primary target."
+    },
+    {
+      "ref": "research/nist_skip_criterion_20261025/journal_qualification_20261104/README.md",
+      "provenance": "internal",
+      "claim": "Full replay recounts mapped rejects; native recovery alone is not durable Spot recovery."
+    },
+    {
+      "ref": "taskq/deploy/eks-karpenter/COST_CONTROLS.md",
+      "provenance": "internal",
+      "claim": "Shared daily/monthly admission includes charged, committed, reserved and all ancillary spending."
+    },
+    {
+      "ref": "https://pari.math.u-bordeaux.fr/dochtml/html/Elliptic_curves.html#ellsea",
+      "provenance": "retrieved",
+      "claim": "ellsea(E,1) may abort with zero; full replay treats that as a disposition, never an order."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "launch_admission": "NOT_READY",
+    "owner_dollar_cap_usd": null,
+    "original_absolute_deadline": null,
+    "image_digest": null,
+    "source_publication_receipt": null,
+    "uploaded_session_checkpoint": null,
+    "runtime_checkpoint_adapter": "Not implemented/qualified in this change; fsync to emptyDir is insufficient.",
+    "canonical_export_adapter": "Pending; preserve failure/unstarted flow without fabricated attempts.",
+    "qualification": "Local static build and bounded development controls only. EKS image execution and real-field pilot remain unrun.",
+    "canonical_tool_revision": "5f9d6fb501d408f3e8ad6ee89afbbbdadb8b560e"
+  }
+}

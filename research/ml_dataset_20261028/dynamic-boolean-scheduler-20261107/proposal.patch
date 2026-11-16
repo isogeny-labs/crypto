@@ -1,0 +1,41 @@
+--- v1/scheduler.rs
++++ v2/scheduler.rs
+@@ -51,9 +51,9 @@
+  a.result=(||{
+   m.pay(1,0)?;if n>limits.variables||g.len()>limits.generators||g.len()>limits.tasks{return Err(Failure::Cap)}
+   if !g.is_empty()&&limits.proof==0{return Err(Failure::Cap)}
+-  for p in g{m.validate(p,n)?}
++  for p in g{m.pay(1,0)?;m.validate(p,n)?}
+   a.basis=m.alloc(limits.basis)?;a.pending=m.alloc(limits.tasks)?;let mut serial=0u64;
+-  for(i,p)in g.iter().enumerate(){a.pending.push(Task{kind:Kind::Original(i),degree:p.last().map_or(0,Vec::len),serial});serial=serial.checked_add(1).ok_or(Failure::Overflow)?;}
++  for(i,p)in g.iter().enumerate(){m.pay(1,0)?;a.pending.push(Task{kind:Kind::Original(i),degree:p.last().map_or(0,Vec::len),serial});serial=serial.checked_add(1).ok_or(Failure::Overflow)?;}
+   loop{
+    m.pay(1,0)?;if a.pending.is_empty(){a.complete=true;return Ok(())}
+    m.scan(a.pending.len())?;let k=(0..a.pending.len()).min_by_key(|i|(a.pending[*i].degree,a.pending[*i].serial)).unwrap();let task=a.pending[k];a.active=Some(task);a.last_degree=task.degree;
+--- v1/harness.rs
++++ v2/harness.rs
+@@ -21,4 +21,24 @@
+  #[test]fn high_index_nontrivial_elimination_and_partial_retention(){let g=vec![vec![vec![128],vec![128,129]],vec![vec![129],vec![128,129]]];let mut l=limits();l.degree=2;let a=run(130,&g,l,Instant::now()+Duration::from_secs(10),&mut Ledger::default());check(&g,&a);assert!(!a.complete);assert_eq!(a.result,Err(super::scheduler::Failure::Cap));assert!(a.row_xors>0);assert!(a.basis.iter().any(|r|r.polynomial==vec![vec![128],vec![129]]));}
+  #[test]fn owner_refusals_retain_every_committed_proof(){let g=vec![poly(14,2),poly(7,2)];for at in 1..1500{let mut owner=Ledger{stop:Some(at),..Default::default()};let a=run(2,&g,limits(),Instant::now()+Duration::from_secs(10),&mut owner);check(&g,&a);assert_eq!(a.charge.work,owner.work);assert_eq!(a.charge.bytes,owner.bytes);if !a.complete{assert_eq!(a.result,Err(super::scheduler::Failure::Owner));}}}
+  #[test]fn cumulative_caps_deadline_and_malformed(){let g=vec![poly(14,2)];for cap in [0,1,100,1000,10000]{let mut l=limits();l.work=cap;let a=run(2,&g,l,Instant::now()+Duration::from_secs(10),&mut Ledger::default());check(&g,&a);assert!(a.charge.work<=cap);}let a=run(2,&g,limits(),Instant::now(),&mut Ledger::default());assert_eq!(a.result,Err(super::scheduler::Failure::Deadline));let bad=vec![vec![vec![1],vec![0]]];assert_eq!(run(2,&bad,limits(),Instant::now()+Duration::from_secs(1),&mut Ledger::default()).result,Err(super::scheduler::Failure::Malformed));}
++ #[test]fn zero_generators_stop_during_validation_and_task_admission(){
++  // Every empty generator used to bypass validate's internal term checks.
++  // Initial check is #1; generator validation checks are #2..#65.
++  let g=vec![vec![];64];let mut owner=Ledger{stop:Some(5),..Default::default()};
++  let a=run(2,&g,limits(),Instant::now()+Duration::from_secs(10),&mut owner);
++  assert_eq!(a.result,Err(super::scheduler::Failure::Owner));
++  assert_eq!(owner.checks,5);assert_eq!(a.charge.work,5);
++  assert!(a.pending.is_empty());assert!(a.basis.is_empty());assert_eq!(a.completed,0);
++  // Two preallocated vectors add checks #66,#67; first three task admissions
++  // are #68,#69,#70. Refusal on #70 must retain only the first two originals.
++  let mut owner=Ledger{stop:Some(70),..Default::default()};
++  let a=run(2,&g,limits(),Instant::now()+Duration::from_secs(10),&mut owner);
++  assert_eq!(a.result,Err(super::scheduler::Failure::Owner));
++  assert_eq!(owner.checks,70);assert_eq!(a.pending.len(),2);
++  assert_eq!(a.pending[0].kind,Kind::Original(0));assert_eq!(a.pending[1].kind,Kind::Original(1));
++  assert!(a.active.is_none());assert_eq!(a.completed,0);assert!(!a.complete);
++  assert_eq!(a.charge.work,owner.work);assert_eq!(a.charge.bytes,owner.bytes);
++  check(&g,&a);
++ }
++
+ }

@@ -1,0 +1,63 @@
+{
+  "schema": "t20-review-recheck/v1",
+  "reviewed_head": "913e7e2a092d4aee8583d395e99dc10db995ac44",
+  "reviewed_date": "2026-10-22",
+  "scope": "Existing recorded dataset replay and software validation; no new timed trial",
+  "replay": [
+    {
+      "g_q_on_curve_and_rG_is_O": true,
+      "kind": "t20_replay_base",
+      "sidecar_d_gives_Q": true
+    },
+    {
+      "d_times_G_equals_Q": true,
+      "equals_sidecar_answer": true,
+      "file": "research/t20_n73_k600_e2e_20261019/runs/ic_N1.row.jsonl",
+      "kind": "t20_replay_row",
+      "recovered_scalar": "12345678901234567"
+    },
+    {
+      "d_times_G_equals_Q": true,
+      "equals_sidecar_answer": true,
+      "file": "research/t20_n73_k600_e2e_20261019/runs/ic_O1.row.jsonl",
+      "kind": "t20_replay_row",
+      "recovered_scalar": "12345678901234567"
+    },
+    {
+      "d_times_G_equals_Q": true,
+      "equals_sidecar_answer": true,
+      "file": "research/t20_n73_k600_e2e_20261019/runs/ic_N2.row.jsonl",
+      "kind": "t20_replay_row",
+      "recovered_scalar": "12345678901234567"
+    }
+  ],
+  "analysis_matches_original": true,
+  "input_sha256": {
+    "experiments/koblitz-single-target-n73-20261002/base_n73_K600.jsonl": "a65776025e4b9ebc4a1e074f9304d834ac12cd533afc7d89a1d3ee72a2a766cc",
+    "experiments/koblitz-single-target-n73-20261003/frozen/target_points.jsonl": "f813c261330dfa7b0dfaeb010c7d14828f596b32b3b08b908dbbed1250beb83b",
+    "experiments/koblitz-single-target-n73-20261003/frozen/fixture.json": "43b93188f74dfa0e00c18e3f6966e4c8af2065e4df7620ace1cb581127add988"
+  },
+  "library_validation": {
+    "initial_passed": 4485,
+    "initial_failed_missing_checkout_fixtures": 9,
+    "missing_fixture_reruns_passed": 9,
+    "ignored": 121
+  },
+  "example_tests": {
+    "producer": 28,
+    "analyzer": 4,
+    "replay_unit_tests": 0
+  },
+  "missing_gate": "Protocol-matched strongest rho comparison with complete charged IC counters at all required weights remains unavailable.",
+  "invalid_cli_controls": {
+    "rejected_without_analysis": 6,
+    "cases": [
+      "unverified IC row",
+      "altered N2 relation",
+      "altered N2 target",
+      "unverified rho draw",
+      "altered rho target",
+      "missing rho draw"
+    ]
+  }
+}

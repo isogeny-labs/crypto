@@ -1,0 +1,224 @@
+    Checking isogeny_algos v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/isogeny_algos)
+    Checking factor-base v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/tools/factor-base)
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/crates/hashed-ecdl-tensor)
+    Checking ecdl-tensor-ic v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/crates/ecdl-tensor-ic)
+    Checking pencil-symbolic-graph v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/research/pencil_large_prime_20261029)
+    Checking volcano-cli v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/tools/volcano-cli)
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105)
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/ic/boundary_targets.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/ecbench/claim.rs:39:32
+   |
+39 | pub const CLAIM_LEDGER: &str = include_str!("../../../docs/ic/boundary_targets.json");
+   |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/ecbench/schema.sql`: No such file or directory (os error 2)
+  --> src/cryptanalysis/ecbench/db.rs:42:30
+   |
+42 | pub const SCHEMA_SQL: &str = include_str!("../../../docs/ecbench/schema.sql");
+   |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/ecbench/three_leads.rs:65:38
+   |
+65 |                 serde_json::from_str(include_str!("../../../docs/curves/registry.json"))
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../docs/curves/registry.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/workload.rs:929:24
+    |
+929 | const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../docs/ic/calibration.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ic_boundary.rs:260:34
+    |
+260 | const PINNED_CALIBRATION: &str = include_str!("../../docs/ic/calibration.json");
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/../../docs/curves/standards/parameters.json`: No such file or directory (os error 2)
+  --> src/cryptanalysis/secg_standards.rs:20:31
+   |
+20 | const PARAMETERS_JSON: &str = include_str!("../../docs/curves/standards/parameters.json");
+   |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `compat_u128`
+  --> src/cryptanalysis/ecbench/bounds.rs:31:48
+   |
+31 | use crate::cryptanalysis::ecbench::canonical::{compat_u128, sha256_hex, short_id};
+   |                                                ^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `compat_u128`
+  --> src/cryptanalysis/ecbench/workload.rs:24:57
+   |
+24 | use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
+   |                                                         ^^^^^^^^^^^
+
+error[E0605]: non-primitive cast: `ExactScalar` as `f64`
+    --> src/cryptanalysis/ecbench/bounds.rs:1262:20
+     |
+1262 |         let ln_r = (row.r as f64).ln();
+     |                    ^^^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0605]: non-primitive cast: `ExactScalar` as `f64`
+    --> src/cryptanalysis/ecbench/bounds.rs:1341:44
+     |
+1341 |                         (g > 0.0).then(|| ((row.r as f64).ln(), (g / add).ln()))
+     |                                            ^^^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0605]: non-primitive cast: `ExactScalar` as `f64`
+    --> src/cryptanalysis/ecbench/bounds.rs:1520:35
+     |
+1520 |                         pts.push(((row.r as f64).ln(), p.gae.ln()));
+     |                                   ^^^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0605]: non-primitive cast: `ExactScalar` as `f64`
+    --> src/cryptanalysis/ecbench/compare.rs:1073:25
+     |
+1073 |                 log2_r: (mine[0].r as f64).log2(),
+     |                         ^^^^^^^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0605]: non-primitive cast: `ExactScalar` as `f64`
+  --> src/cryptanalysis/ecbench/db.rs:95:16
+   |
+95 |         f(Some((c.r as f64).log2())),
+   |                ^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0605]: non-primitive cast: `ExactScalar` as `f64`
+   --> src/cryptanalysis/ecbench/db.rs:483:16
+    |
+483 |         f(Some((c.r as f64).log2())),
+    |                ^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1167:30
+     |
+1167 |                 group_order: u128::from(order),
+     |                              ^^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1167 |                 group_order: u128::from(order).into(),
+     |                                               +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1168:20
+     |
+1168 |                 r: u128::from(r),
+     |                    ^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1168 |                 r: u128::from(r).into(),
+     |                                 +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1169:27
+     |
+1169 |                 cofactor: u128::from(h),
+     |                           ^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1169 |                 cofactor: u128::from(h).into(),
+     |                                        +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1186:30
+     |
+1186 |                 group_order: u128::from(i.group_order()),
+     |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1186 |                 group_order: u128::from(i.group_order()).into(),
+     |                                                         +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1187:20
+     |
+1187 |                 r: u128::from(i.l),
+     |                    ^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1187 |                 r: u128::from(i.l).into(),
+     |                                   +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1188:27
+     |
+1188 |                 cofactor: 4,
+     |                           ^ expected `ExactScalar`, found integer
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1224:30
+     |
+1224 |                 group_order: u128::from(i.group_order),
+     |                              ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1224 |                 group_order: u128::from(i.group_order).into(),
+     |                                                       +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1225:20
+     |
+1225 |                 r: u128::from(i.r),
+     |                    ^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1225 |                 r: u128::from(i.r).into(),
+     |                                   +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1226:27
+     |
+1226 |                 cofactor: u128::from(i.cofactor),
+     |                           ^^^^^^^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1226 |                 cofactor: u128::from(i.cofactor).into(),
+     |                                                 +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1244:30
+     |
+1244 |                 group_order: u128::from(i.group_order),
+     |                              ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1244 |                 group_order: u128::from(i.group_order).into(),
+     |                                                       +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1245:20
+     |
+1245 |                 r: u128::from(i.r),
+     |                    ^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1245 |                 r: u128::from(i.r).into(),
+     |                                   +++++++
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:1246:27
+     |
+1246 |                 cofactor: u128::from(i.cofactor),
+     |                           ^^^^^^^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1246 |                 cofactor: u128::from(i.cofactor).into(),
+     |                                                 +++++++
+
+Some errors have detailed explanations: E0308, E0605.
+For more information about an error, try `rustc --explain E0308`.
+warning: `crypto` (lib) generated 2 warnings
+error: could not compile `crypto` (lib) due to 24 previous errors; 2 warnings emitted

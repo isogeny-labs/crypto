@@ -1,0 +1,16 @@
+name = "P256MinimalTransportProofs"
+defaultTargets = ["P256MinimalTransport", "Probe", "PrintAxioms"]
+
+[[require]]
+name = "CryptoLean"
+git = "https://github.com/aburan28/crypto-lean"
+rev = "f74b0e8bd3815fdf2adae5b180431fc94d2be107"
+
+[[lean_lib]]
+name = "P256MinimalTransport"
+
+[[lean_lib]]
+name = "Probe"
+
+[[lean_lib]]
+name = "PrintAxioms"

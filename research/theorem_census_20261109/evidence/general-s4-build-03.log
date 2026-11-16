@@ -1,0 +1,30 @@
+GeneralS4.lean:88:4: error: ring failed, ring expressions not equal
+K : Type u_1
+inst✝ : Field K
+W : WeierstrassCurve.Affine K
+x u y v z w : K
+hx : x ≠ y
+hP : W.Equation x u
+hQ : W.Equation y v
+r : K := ⋯
+s : K := ⋯
+hh :
+  (x - y) ^ 2 * (chordX W x u y v + chordX W x u y (W.negY y v)) =
+    2 * x * y * (x + y) + WeierstrassCurve.b₂ W * x * y + WeierstrassCurve.b₄ W * (x + y) + WeierstrassCurve.b₆ W
+⊢ -(x * y * WeierstrassCurve.b₂ W * 2) - x * y * chordX W x u y v * 4 - x * y * chordX W x u y (W.negY y v) * 2 -
+                            x * y * chordX W x u y (-v - W.a₁ * y - W.a₃) * 2 -
+                          x * y ^ 2 * 4 -
+                        x * WeierstrassCurve.b₄ W * 2 -
+                      x ^ 2 * y * 4 +
+                    x ^ 2 * chordX W x u y v * 2 +
+                  x ^ 2 * chordX W x u y (W.negY y v) +
+                x ^ 2 * chordX W x u y (-v - W.a₁ * y - W.a₃) -
+              y * WeierstrassCurve.b₄ W * 2 +
+            y ^ 2 * chordX W x u y v * 2 +
+          y ^ 2 * chordX W x u y (W.negY y v) +
+        y ^ 2 * chordX W x u y (-v - W.a₁ * y - W.a₃) -
+      WeierstrassCurve.b₆ W * 2 =
+    0
+GeneralS4.lean:97:2: error: No goals to be solved
+'GeneralS4Audit.quadratic_resultant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'GeneralS4Audit.generalS4_repeated_pairs' depends on axioms: [propext, Classical.choice, Quot.sound]

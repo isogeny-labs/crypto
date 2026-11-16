@@ -43,7 +43,9 @@ use crate::cryptanalysis::ecbench::workload::WideInstance;
 use crate::cryptanalysis::ic_boundary::{BinaryGroup, BinaryInstance, CountedGroup, GroupOps};
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::koblitz_fast::{FastPoint, FrobeniusCanon, FrobeniusPowers};
-use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, RhoScalar, WideStrongRho};
+use crate::cryptanalysis::koblitz_strong_rho::{
+    NarrowRhoScalar, RawPointG, RhoScalar, WideStrongRho,
+};
 
 /// The two shape parameters, as multiples of their natural scales.
 #[derive(Clone, Copy, Debug)]
@@ -126,7 +128,7 @@ impl Schedule {
 /// claw is written once, so the wide claw is the one-word claw.
 pub trait ClawGroup {
     type P: Copy + PartialEq;
-    type S: RhoScalar;
+    type S: NarrowRhoScalar;
     fn n(&self) -> u32;
     fn r(&self) -> Self::S;
     fn lambda(&self) -> Self::S;

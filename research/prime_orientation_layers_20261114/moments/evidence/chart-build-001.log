@@ -1,0 +1,11 @@
+../evidence/chart-draft-001.lean.txt:41:75: error: unsolved goals
+a : ℕ
+m s : Nodes a
+hsm : s ≠ m
+⊢ C (LocalIntegral.integralRing.subtype ↑(LocalIntegral.rhoUnit a m)) *
+        (C (LocalIntegral.integralRing.subtype (LocalIntegral.chartRatio a m s)) * X) *
+      Polynomial.map LocalIntegral.integralRing.subtype
+        (∏ j ∈ (univ.erase m).erase s, (1 + C (LocalIntegral.chartRatio a m j) * X)) =
+    C ↑↑(LocalIntegral.rhoUnit a m) * (C ↑(LocalIntegral.chartRatio a m s) * X) *
+      Polynomial.map LocalIntegral.integralRing.subtype
+        (∏ j ∈ (univ.erase m).erase s, (1 + C (LocalIntegral.chartRatio a m j) * X))

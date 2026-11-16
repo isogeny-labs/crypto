@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T07:45:05Z",
+ "id": "PCC-20261112-167fc6",
+ "kind": "theorem",
+ "producer": {
+  "commit": "9712627653dd163442dd20c03061c10b9bb7011e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "19c1ab998a0efc15fed18811f0356a874637345ad0c078c8af3198d3ddf0b8a4",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ChainCompression.lean",
+   "theorem": "ChainCompression.rational_two_hop_factorization"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful module consequence of explicit cleared map factors, middle norm-pullback4 and linearity. Rational cancellation requires explicit multiplication4 injectivity; actual fields, varieties, Picard, global Hom cancellation and geometry remain written.",
+ "statement": "theorem rational_two_hop_factorization {J0 J1 J2 E0 E1 E2 : Type} [IntModule J1] [IntModule J2] [IntModule E1] [IntModule E2] (f : J0 \u2192 J1) (g : J1 \u2192 J2) (h0 : J0 \u2192 E0) (k1 : E1 \u2192 J1) (h1 : J1 \u2192 E1) (k2 : E2 \u2192 J2) (a : E0 \u2192 E1) (b : E1 \u2192 E2) (hf : \u2200 x, (4 : Int) \u2022 f x = k1 (a (h0 x))) (hg : \u2200 x, (4 : Int) \u2022 g x = k2 (b (h1 x))) (hm : \u2200 e, h1 (k1 e) = (4 : Int) \u2022 e) (gl : \u2200 n : Int, \u2200 x, g (n \u2022 x) = n \u2022 g x) (bl : \u2200 n : Int, \u2200 e, b (n \u2022 e) = n \u2022 b e) (kl : \u2200 n : Int, \u2200 e, k2 (n \u2022 e) = n \u2022 k2 e) (cancel4 : \u2200 u v : J2, (4 : Int) \u2022 u = (4 : Int) \u2022 v \u2192 u = v) : \u2200 x, (4 : Int) \u2022 g (f x) = k2 (b (a (h0 x)))"
+}
