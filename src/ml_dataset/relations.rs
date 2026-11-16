@@ -945,6 +945,8 @@ mod tests {
     #[test]
     fn genuine_unknown_scalar_large_prime_cycle_replay() {
         let config = CaseConfig {
+                        channels: None,
+            factor_base_policy: None,
             family: "koblitz".into(),
             n: 13,
             m: 3,

@@ -603,6 +603,8 @@ mod tests {
 
     fn fixture(family: &str, n: u32, twist: bool) -> (CaseConfig, CaseData) {
         let config = CaseConfig {
+                        channels: None,
+            factor_base_policy: None,
             family: family.into(),
             n,
             m: 2,

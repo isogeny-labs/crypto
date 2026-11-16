@@ -798,6 +798,8 @@ mod tests {
     use super::*;
     fn config(family: &str, n: u32, twist: bool, m: usize) -> CaseConfig {
         CaseConfig {
+                        channels: None,
+            factor_base_policy: None,
             family: family.into(),
             n,
             m,
