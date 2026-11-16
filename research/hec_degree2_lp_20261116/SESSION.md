@@ -55,3 +55,17 @@ Approved storage access/restoration and finite gate/bridge validation remain pen
 
 ### Errors
 GitHub metadata-update timeout recovered; S3 artifact read/write issue remains external. No scientific execution, new data, hidden rerun or source change to the frozen experiment.
+
+## General restricted span derivation, genera 2–4
+
+### What was done
+Added GENERAL-SPAN.md with forward polynomial/divisor construction and converse via partition and reduced Mumford uniqueness for g>=2. Explicit full (Q,v) residual keys include mixed rational/nonrational factors in g3/4. Derived signed candidate schedule ratio 1+2(H-g-1)/(g+2), and conditional full-residual birthday exponents 6/5,12/7,20/9. No experiment executed; original frozen files unchanged. Reviewed current rational.rs and primary 2005 Gaudry–Thériault–Thomé sections2–3. KB revision9141e386254340a9bdba3036f2bb706a predates work; exact queries/source receipts retained in the derivation.
+
+### Decisions made
+Full residual equality is essential: irreducible-only matching cannot establish higher-genus coverage. Counts compare a matched restricted augmentation, not Compact speed. Conditional uniform-pool calculation cautions against treating whole degree-g residuals as degree-one primes. Finite span comparison must be separately frozen after unchanged original gate. This turn makes mathematical progress; tenfold full-cost objective remains active.
+
+### Open threads
+Independent proof review, approved storage access, original rank gate, then separately frozen mixed-factor/repeated-factor/direct-span controls. No finite higher-genus span result or full-cost gain claimed. PR remains unmerged. Shared daily log reserved; scoped handoff used.
+
+### Errors
+Initial CLI claim reported already claimed, then MCP attach returned500. Revalidated: release reported no live lease; explicit scoped CLI claim succeeded, epoch7. First new-file write preceded this successful lease; no conflicting holder was reported by the prior scope check. Subsequent edits under live lease. No scientific execution or custody waiver. Unrelated resume edit untouched.
