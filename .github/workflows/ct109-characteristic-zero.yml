@@ -1,0 +1,34 @@
+name: CT109 characteristic-zero line field
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct109/**'
+      - '.github/workflows/ct109-characteristic-zero.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct109/**'
+      - '.github/workflows/ct109-characteristic-zero.yml'
+  workflow_dispatch:
+jobs:
+  exact-identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct109
+          sparse-checkout-cone-mode: true
+      - name: Independent exact integer identity and index
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct109
+          python3 -B "$D/ct109_exact_minpoly.py" >/tmp/ct109-py.json
+          python3 -O -B "$D/ct109_exact_minpoly.py" >/tmp/ct109-pyopt.json
+          node "$D/ct109_exact_minpoly_independent.js" >/tmp/ct109-js.json
+          node --no-opt "$D/ct109_exact_minpoly_independent.js" >/tmp/ct109-jsopt.json
+          cmp /tmp/ct109-py.json /tmp/ct109-pyopt.json
+          cmp /tmp/ct109-py.json /tmp/ct109-js.json
+          cmp /tmp/ct109-py.json /tmp/ct109-jsopt.json
+          printf '%s  %s\n' 54bd0e9ea52e9054c0638a869e57e50bf16339acf0701475e31d2f32cba1b8b1 /tmp/ct109-py.json | sha256sum -c
