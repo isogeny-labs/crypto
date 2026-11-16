@@ -40,6 +40,8 @@ extern "C" int rf_cuda_session64_run(void *h, const uint64_t *tx, const uint64_t
                                      rf_relation *out, uint32_t *n_found, double *seconds);
 extern "C" void rf_cuda_session64_destroy(void *h);
 extern "C" int rf_cuda_warmup(void);
+extern "C" int rf_cuda_pairs_bench(uint64_t p, uint32_t n, uint64_t seed, double *t_cell, double *t_run,
+                                   uint64_t *mismatch);
 extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, const uint64_t *fb_x,
                                               const uint64_t *fb_y, uint32_t n_fb, uint32_t chunk,
                                               uint32_t max_targets, uint32_t cap, void **out,
@@ -345,7 +347,8 @@ extern "C" int rf64_session_create_pairs(uint64_t p, uint64_t curve_a, const uin
         rc = rf_cuda_session64_create_pairs(&s->f, a_m, s->fbx.data(), s->fby.data(), n_fb, s->chunk,
                                             max_targets, s->cap, &s->cuda, n_entries, &pb);
         if (rc == RF_OK) {
-            s->pairb.assign(pb, pb + *n_entries);
+            /* the device translates hits to build indices itself (pb is null) */
+            if (pb) s->pairb.assign(pb, pb + *n_entries);
             /* the probe set itself stays on the device; px only marks probe mode here */
             s->px.assign(1, 0);
         }
@@ -359,13 +362,13 @@ extern "C" int rf64_session_create_pairs(uint64_t p, uint64_t curve_a, const uin
         const uint32_t n = n_fb;
         std::unordered_map<uint64_t, uint32_t> first;
         first.reserve((size_t)n * (n + 1));
-        uint32_t b = 0;
+        /* the device's batched runs (rf_pair_run), then the first pair per key in build order */
+        std::vector<uint64_t> keys((size_t)n * (n + 1));
         for (uint32_t ai = 0; ai < n; ai++)
-            for (uint32_t bi = ai; bi < n; bi++)
-                for (int sg = 0; sg < 2; sg++, b++) {
-                    uint64_t xk;
-                    if (rf_pair_x(s->f, a_m, s->fbx.data(), s->fby.data(), ai, bi, sg, &xk)) first.emplace(xk, b);
-                }
+            for (uint32_t b0 = ai; b0 < n; b0 += RF_PAIR_CHUNK)
+                rf_pair_run(s->f, a_m, s->fbx.data(), s->fby.data(), n, ai, b0, keys.data());
+        for (uint32_t b = 0; b < (uint32_t)keys.size(); b++)
+            if (keys[b] != RF_PAIR_EMPTY) first.emplace(keys[b], b);
         s->px.reserve(first.size());
         s->pairb.reserve(first.size());
         for (const auto &kv : first) { s->px.push_back(kv.first); s->pairb.push_back(kv.second); }
@@ -438,4 +441,13 @@ extern "C" const char *rf_strerror(int status) {
         case RF_ERR_NOMEM: return "out of memory";
         default: return "unknown status";
     }
+}
+
+int rf_pairs_bench(uint64_t p, uint32_t n, uint64_t seed, double *t_cell, double *t_run, uint64_t *mismatch) {
+#if RF_HAVE_CUDA
+    return rf_cuda_pairs_bench(p, n, seed, t_cell, t_run, mismatch);
+#else
+    (void)p; (void)n; (void)seed; (void)t_cell; (void)t_run; (void)mismatch;
+    return -1;
+#endif
 }
