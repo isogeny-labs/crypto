@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1540Z-genus4-positive-control",
+  "latest_record": "20261116T1650Z-genus4-rho-refs",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 207,
+    "measured": 208,
     "open": 1
   },
   "repo": "crypto",
@@ -24893,6 +24893,29 @@
       "unit": "count"
     },
     {
+      "better": "neutral",
+      "first": 1.303,
+      "latest": 1.303,
+      "latest_derived": {},
+      "metric": "plain_over_negation_rho_w0",
+      "points": [
+        {
+          "commit": "1a3f5a3d464b",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1650Z-genus4-rho-refs",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Genus 4 p=8209, 9 targets: negation rho is the cheapest rho (plain 1.30-1.35x). IC arm w vs cheapest rho at w=1: Q1 mults-only 0.469 [0.341,0.709]; Q2 IC adds priced 1.367 [0.995,2.068]; Q3 all emitted ops 0.142; Qcal 0.008. Below at w=0, 0.1 in every reading. [pcc:unverified]",
+          "value": 1.303
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
       "better": "lower",
       "first": 0.0,
       "latest": 0.0,
@@ -32273,6 +32296,84 @@
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.469,
+      "latest": 0.469,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q1_w1",
+      "points": [
+        {
+          "commit": "1a3f5a3d464b",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1650Z-genus4-rho-refs",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.341,
+            0.709
+          ],
+          "summary": "Genus 4 p=8209, 9 targets: negation rho is the cheapest rho (plain 1.30-1.35x). IC arm w vs cheapest rho at w=1: Q1 mults-only 0.469 [0.341,0.709]; Q2 IC adds priced 1.367 [0.995,2.068]; Q3 all emitted ops 0.142; Qcal 0.008. Below at w=0, 0.1 in every reading. [pcc:unverified]",
+          "value": 0.469
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.367,
+      "latest": 1.367,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q2_w1",
+      "points": [
+        {
+          "commit": "1a3f5a3d464b",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1650Z-genus4-rho-refs",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.995,
+            2.068
+          ],
+          "summary": "Genus 4 p=8209, 9 targets: negation rho is the cheapest rho (plain 1.30-1.35x). IC arm w vs cheapest rho at w=1: Q1 mults-only 0.469 [0.341,0.709]; Q2 IC adds priced 1.367 [0.995,2.068]; Q3 all emitted ops 0.142; Qcal 0.008. Below at w=0, 0.1 in every reading. [pcc:unverified]",
+          "value": 1.367
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.142,
+      "latest": 0.142,
+      "latest_derived": {},
+      "metric": "w_over_cheapest_rho_q3_w1",
+      "points": [
+        {
+          "commit": "1a3f5a3d464b",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 9,
+          "record": "20261116T1650Z-genus4-rho-refs",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.102,
+            0.215
+          ],
+          "summary": "Genus 4 p=8209, 9 targets: negation rho is the cheapest rho (plain 1.30-1.35x). IC arm w vs cheapest rho at w=1: Q1 mults-only 0.469 [0.341,0.709]; Q2 IC adds priced 1.367 [0.995,2.068]; Q3 all emitted ops 0.142; Qcal 0.008. Below at w=0, 0.1 in every reading. [pcc:unverified]",
+          "value": 0.142
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
     },
     {
       "better": "lower",
