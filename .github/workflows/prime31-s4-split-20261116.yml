@@ -39,6 +39,11 @@ jobs:
       - name: Target-dependent prime31 m8 chained-S3 actual F4 versus frozen S4
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --m8-s3chain-f4
+      - name: Prime31 m8 rational-base quotient equivalence gate (Rust only)
+        timeout-minutes: 3
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_quotient_bridge
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_quotient_bridge
       - name: Rust APS one-relation solver algebraic correctness tests
         timeout-minutes: 2
         run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
@@ -48,3 +53,9 @@ jobs:
       - name: Same-source Rust APS algebraic versus independent direct group join
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --compare
+      - name: Same twelve held-out prime31 Q across five Rust APS partition sizes
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --size-sweep
+      - name: Twelve held-out complete prime31 Rust APS logarithms
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --holdouts
