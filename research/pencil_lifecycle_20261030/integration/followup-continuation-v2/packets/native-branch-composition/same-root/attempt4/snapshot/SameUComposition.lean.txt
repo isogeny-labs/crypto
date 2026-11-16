@@ -1,0 +1,48 @@
+import ZeroSlope
+import GlobalSmooth
+set_option autoImplicit false
+namespace SameUComposition
+open Polynomial MixedCancellation SameUMixed SameUZeroSlope
+variable {K : Type*} [Field K]
+inductive Route | otherSupport | inverse | equalDouble22 | zeroSlopeError | mixed
+ deriving DecidableEq
+noncomputable def route [DecidableEq K] (a b : D2 K) : Route :=
+ if crossQ a b=crossQ b a ∧ crossR a b=crossR b a then
+  if crossS a b= -crossS b a ∧ crossT a b= -crossT b a then .inverse
+  else if crossS a b=crossS b a ∧ crossT a b=crossT b a then .equalDouble22
+  else if sourceK a b=0 then .zeroSlopeError else .mixed
+ else .otherSupport
+
+theorem source_same_u_mixed [DecidableEq K] (a0 a1 a2 a3 : K) (a b : D2 K)
+ (haz : a.z≠0) (haw : a.w≠0) (hbz : b.z≠0) (hbw : b.w≠0)
+ (ha : validTwo (WeightedDoubling.curve a0 a1 a2 a3) a)
+ (hb : validTwo (WeightedDoubling.curve a0 a1 a2 a3) b)
+ (hq : crossQ a b=crossQ b a) (hr : crossR a b=crossR b a)
+ (hni : ¬(crossS a b= -crossS b a ∧ crossT a b= -crossT b a))
+ (hne : ¬(crossS a b=crossS b a ∧ crossT a b=crossT b a))
+ (hg : IsCoprime (WeightedDoubling.curve a0 a1 a2 a3) (WeightedDoubling.curve a0 a1 a2 a3).derivative)
+ (hchar : (2:K)≠0) :
+ sourceK a b≠0 ∧ route a b=.mixed ∧
+ (sourcePoint a b).z≠0 ∧ (sourcePoint a b).w≠0 ∧ (sourcePoint a b).y≠0 ∧
+ validPoint (WeightedDoubling.curve a0 a1 a2 a3) (sourcePoint a b) ∧
+ (MixedPositiveDistinct.doubled a0 a1 a2 a3 (sourcePoint a b)).z≠0 ∧
+ (MixedPositiveDistinct.doubled a0 a1 a2 a3 (sourcePoint a b)).w≠0 ∧
+ validTwo (WeightedDoubling.curve a0 a1 a2 a3) (MixedPositiveDistinct.doubled a0 a1 a2 a3 (sourcePoint a b)) := by
+ have hkr := source_zero_slope_excluded _ a b haz haw hbz hbw ha hb hq hr hni hne
+ obtain ⟨qa,ra,sa,ta⟩ := cross_scales a b haz haw hbz hbw
+ obtain ⟨qb,rb,sb,tb⟩ := cross_scales b a hbz hbw haz haw
+ rw [mul_comm b.z a.z] at qb rb sb tb
+ rw [mul_comm b.w a.w] at sb tb
+ have hz : a.z*b.z≠0 := mul_ne_zero haz hbz
+ have hqn : nq a=nq b := mul_left_cancel₀ (pow_ne_zero 2 hz) (qa.symm.trans (hq.trans qb))
+ have hrn : nr a=nr b := mul_left_cancel₀ (pow_ne_zero 4 hz) (ra.symm.trans (hr.trans rb))
+ have hkn : ns a-ns b≠0 := by
+  intro hh;apply hkr;rw [source_k_scale a b haz haw hbz hbw,hh,mul_zero]
+ have hnn : ¬(ns a= -ns b ∧ nt a= -nt b) := by
+  rintro ⟨hs,ht⟩;apply hni
+  rw [sa,sb,ta,tb,hs,ht,mul_neg,mul_neg];exact ⟨rfl,rfl⟩
+ obtain ⟨pz,pw,pv⟩ := source_point_valid _ a b haz haw hbz hbw ha hb hqn hrn hkn hnn
+ have hl := SameUGlobal.global_implies_local a0 a1 a2 a3 hg ((nt b-nt a)/(ns a-ns b))
+ obtain ⟨py,oz,ow,ov⟩ := SameULocal.source_extraction_then_doubling a0 a1 a2 a3 a b haz haw hbz hbw ha hb hqn hrn hkn hnn hchar hl
+ exact ⟨hkr,by simp [route,hq,hr,hni,hne,hkr],pz,pw,py,pv,oz,ow,ov⟩
+end SameUComposition

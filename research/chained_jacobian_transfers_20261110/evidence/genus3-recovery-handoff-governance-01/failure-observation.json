@@ -1,0 +1,9 @@
+{
+  "source": "actual tool transcript and original combined artifact.txt;Python outer stderr was not separately captured",
+  "failure": "caller asserts every combined stdout+stderr line is an offender row;artifact tool printed exact FOUR expected file rows plus explanatory stderr footer,so collector assertion failed",
+  "actual_artifact_exit": 1,
+  "actual_expected_data_files": 4,
+  "gate": "not bypassed;four whole archives still pending publication",
+  "remedy": "use original command stdout for exact offender set;retain complete combined log and all original staged paths",
+  "native": "no source/native/test/rank/policy change"
+}

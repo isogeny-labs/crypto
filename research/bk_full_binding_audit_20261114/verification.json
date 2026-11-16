@@ -1,0 +1,74 @@
+{
+  "schema": "bk-full-binding-verification/v1",
+  "source_commit": "7f36182f63bb3721e0e633e18e5111979aa3850e",
+  "claim_id": "PCC-20261114-8c5c1e",
+  "declaration_sha256": "255334b4de88ddc92803431efa042b40aa02db63affd414666c7a20c01cb02ed",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 26,
+  "gate_declarations": 1,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 44,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-8c5c1e",
+    "claim_sha256": "39a988665333eb10ea77a3d0e744a20bbbb25b7b0acf97c6ddae8bb7b3363feb",
+    "commit": "7f36182f63bb3721e0e633e18e5111979aa3850e",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/bk_full_binding_audit_20261114/lean (FullBKCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T15:14:07Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-8c5c1e",
+    "claim_sha256": "39a988665333eb10ea77a3d0e744a20bbbb25b7b0acf97c6ddae8bb7b3363feb",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47183,
+    "sha256": "18bfe0ce33eff19a432abe3eff25d5fd9214d8e69338e768cb3413f5c48211e4",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "old_claim_unchanged": true,
+    "old_math_refuted": false,
+    "concrete_full_binding_wrapper": true,
+    "canonical_shared_verifier_modified": false,
+    "semantic_binding_globally_closed": false,
+    "new_math_generalization": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

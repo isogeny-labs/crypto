@@ -1,0 +1,259 @@
+{
+  "small": [
+    {
+      "r": 7,
+      "queries": 200,
+      "tensor_constructor_counts": [
+        2932,
+        132,
+        0
+      ],
+      "tensor_slots_per_target": [
+        18,
+        18,
+        18,
+        18
+      ],
+      "candidate": [
+        66220,
+        2800,
+        1400
+      ],
+      "direct": [
+        99404,
+        4274,
+        1400
+      ]
+    },
+    {
+      "r": 19,
+      "queries": 2144,
+      "tensor_constructor_counts": [
+        16492,
+        552,
+        0
+      ],
+      "tensor_slots_per_target": [
+        35,
+        35,
+        35,
+        36,
+        34,
+        35,
+        35,
+        34,
+        34,
+        35,
+        35,
+        34,
+        36,
+        35,
+        35,
+        35
+      ],
+      "candidate": [
+        2158609,
+        85475,
+        19296
+      ],
+      "direct": [
+        3295513,
+        123267,
+        19296
+      ]
+    },
+    {
+      "r": 199,
+      "queries": 350,
+      "tensor_constructor_counts": [
+        34033,
+        741,
+        0
+      ],
+      "tensor_slots_per_target": [
+        126,
+        126,
+        126,
+        126,
+        126,
+        126,
+        126
+      ],
+      "candidate": [
+        8109124,
+        188871,
+        10150
+      ],
+      "direct": [
+        12338608,
+        261615,
+        10150
+      ]
+    }
+  ],
+  "P192": {
+    "candidate": {
+      "queries": 24,
+      "selected": [
+        19449,
+        1317,
+        168
+      ],
+      "numerator_formation_counts": [
+        6408,
+        0,
+        0
+      ],
+      "numerator_norm_counts": [
+        11106,
+        1008,
+        0
+      ],
+      "numerator_formation_and_norm_counts": [
+        17514,
+        1008,
+        0
+      ],
+      "denominator_formation_and_norm_counts": [
+        864,
+        0,
+        0
+      ],
+      "division_counts": [
+        144,
+        144,
+        0
+      ]
+    },
+    "direct": {
+      "queries": 24,
+      "selected": [
+        34569,
+        1461,
+        168
+      ],
+      "numerator_formation_counts": [
+        21528,
+        144,
+        0
+      ],
+      "numerator_norm_counts": [
+        11106,
+        1008,
+        0
+      ],
+      "numerator_formation_and_norm_counts": [
+        32634,
+        1152,
+        0
+      ],
+      "denominator_formation_and_norm_counts": [
+        864,
+        0,
+        0
+      ],
+      "division_counts": [
+        144,
+        144,
+        0
+      ]
+    },
+    "target_setups": [
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "public_Q",
+        "tensor_cache_counts": [
+          1138,
+          18,
+          0
+        ],
+        "tensor_coefficient_slots": 72,
+        "tensor_slot_bound": 72
+      },
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "mu_G",
+        "tensor_cache_counts": [
+          1138,
+          18,
+          0
+        ],
+        "tensor_coefficient_slots": 72,
+        "tensor_slot_bound": 72
+      },
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "relation_lambda_G",
+        "tensor_cache_counts": [
+          1138,
+          18,
+          0
+        ],
+        "tensor_coefficient_slots": 72,
+        "tensor_slot_bound": 72
+      }
+    ],
+    "tensor_constructor_counts": [
+      3414,
+      54,
+      0
+    ],
+    "selected_plus_incremental_tensor_cache": [
+      22863,
+      1371,
+      168
+    ]
+  },
+  "counter_models": "small includes inverse powers in K multiplication count; P192 excludes inverse internals; separate models/no timing claim"
+}

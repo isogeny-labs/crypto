@@ -1,0 +1,55 @@
+{
+  "schema": "formal-review/v1",
+  "subject": "signed-graph-union-mutation",
+  "producer_commit": "3d48e8e3ee78bc57067f9dd1d9f501a1c0f7efd5",
+  "machine_status": "passed",
+  "source_fidelity": "faithful_scoped",
+  "review_outcome": "validated_scoped",
+  "counts": {
+    "main": 5,
+    "producer_controls": 8,
+    "reviewer_controls": 12,
+    "readbacks": 25,
+    "producer_manifest_entries": 620
+  },
+  "acceptance": "acceptance.json",
+  "scope": "post-find decoded-field global vertex and stored-anchor equations; valid-state candidate/zero-constraint correctness",
+  "source": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs",
+    "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+    "lines": "1558-1712"
+  },
+  "boundaries": [
+    "initial true reduced edge and Valid prestate",
+    "two finds not composed",
+    "forest/rank/size not proved",
+    "word signs/Vec/counters/overflow/compiled behavior not modeled",
+    "invalid-state model none differs from native assertion failure"
+  ],
+  "controls": [
+    "forward positive sign with target offset",
+    "reverse target offset changes sign",
+    "signed grandchild",
+    "retained child and descendant anchors",
+    "transported parent anchor",
+    "both-fixed nonzero candidate",
+    "zero consistent",
+    "inconsistent zero state excluded by Valid",
+    "wrong reversal sign"
+  ],
+  "instrument_controls": {
+    "missing_dependency_attempt": "subject/invocation-h7k5m2iq",
+    "false_after_dependencies": "subject/invocation-egyqsts7",
+    "both_gate_exit": 1
+  },
+  "scientific_execution": false,
+  "repository_edits": false,
+  "visual_inspection": {
+    "pages": [
+      1,
+      2
+    ],
+    "svg_embedded": true,
+    "result": "all pages inspected, legible, no clipping"
+  }
+}

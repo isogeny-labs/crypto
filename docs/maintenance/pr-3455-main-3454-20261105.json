@@ -1,0 +1,34 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 3455,
+  "standing": "unverified",
+  "date": "2026-11-05",
+  "head_before": "05bc41a102a17b9dda9ede6a584eeff6eb89192b",
+  "incoming_main": "3b27a31f7cc3362bccc1bc8f80fbbdab87dcccb9",
+  "parents": [
+    "05bc41a102a17b9dda9ede6a584eeff6eb89192b",
+    "3b27a31f7cc3362bccc1bc8f80fbbdab87dcccb9"
+  ],
+  "exact_upstream_entries": [
+    {
+      "path": "pcc",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "37b8e501fc460c49610dad8dc156f1020686035a"
+    },
+    {
+      "path": "research/cubic_extension_transfer_20261025",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2f54006fb262fb4cb4ba484658b6bd2b09e4d97b"
+    }
+  ],
+  "preservation": {
+    "both_parent_journal_sequences": true,
+    "branch_pcc_and_cubic_subtrees_equal_common_base": true,
+    "all_other_branch_paths_unchanged": true,
+    "benchmark_record_inputs_unchanged": true
+  },
+  "validation": "Fresh current-head CI required. Prior software/benchmark results apply only to their unchanged inputs. No new local execution or scientific trial.",
+  "source": "Merged PR3454 records unfrozen preparation/access failures and two unsigned attestations; this merge carries its exact ledger bytes without rewriting or re-chaining them."
+}

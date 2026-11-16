@@ -1,0 +1,41 @@
+{
+  "schema": "n83.prime-terminal-storage/v1",
+  "archive": {
+    "path": "prime-terminal-archives/runs.tar.gz",
+    "kind": "raw",
+    "bytes": 12959786,
+    "sha256": "6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a"
+  },
+  "object": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+  "worker_custody": {
+    "archive_sha256": "6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+    "archive_bytes": 12959786,
+    "archive_object": "s3://setec-astronomy-artifacts/store/sha256/6b/6b4d82a70e5bbfefce061374d79a58f5435142321b33ccdc98efbd7f3874011a",
+    "terminal": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T06:32:02Z",
+      "finished_at": "2026-10-30T06:32:46Z",
+      "backend": "existing_host",
+      "run_id": "n83-prime-terminal-20261030-r3",
+      "wall_valid": false
+    },
+    "manifest_payloads": 269
+  },
+  "source": {
+    "sha256": "3872386e578a0fceaafc778b2c7ff4723d8a5b7fb203a0ebb8d81e135f0e0884",
+    "bytes": 85937,
+    "manifest_payloads": 100,
+    "source_revision": "1ec2f68e9a2956dfc55c4e35354e9ce7c0fcaeab",
+    "protocol_sha256": "e197dbafacbee40a41a695ffcbf472c35951686d36af58899f58f7acb9b7d143",
+    "object": "s3://setec-astronomy-artifacts/runs/n83-prime-terminal-20261030-r3/source/source.tar.gz"
+  },
+  "prior_failed_image": {
+    "source_revision": "f454e8ad1bed4ab448aa3a9a10dfdf7ee3534913",
+    "binary_sha256": "db78c87e524c61f2b35d6f6fcad6bee62480cf0ed68ca31cd481fbb1e6a3fd64",
+    "source_repository": "https://github.com/isogeny-labs/crypto",
+    "architecture": "linux/amd64",
+    "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:e53e3595101464371f54159124a357da78c337d88709f7c94dd8929dffefbcf1",
+    "runtime_controls_passed": true
+  },
+  "restoration": "Hydrate/extract archive;verify manifest;instrument replay ROOT ROOT/results;verify manifest again. No parent archive needed."
+}

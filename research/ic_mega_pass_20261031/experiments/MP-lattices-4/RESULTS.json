@@ -1,0 +1,13 @@
+{"idea_id":"MP-lattices-4","outcome":"supports","seeds":{"gp_setrand":1,"mc_numpy":7},
+"identity_p":"nextprime(2^32)","signflip_checks_ok":800,"signflip_bad":0,"negctrl_wrong_c_identity_fails":"50/50","d4_monomials":105,
+"reach_JM_componentwise_by_l":{
+"1":{"xbox":9.53e-6,"S4_e_x":1.263e-4,"D4":5.95e-4,"dims":[6561,495,105],"D4/S4e":4.71},
+"2":{"xbox":0.002455,"S4_e_x":0.003199,"D4":0.004015,"dims":[83521,4845,825],"D4/S4e":1.255},
+"3":{"xbox":0.004804,"S4_e_x":0.005434,"D4":0.006090,"dims":[390625,20475,3185],"D4/S4e":1.121},
+"4":{"xbox":0.006334,"S4_e_x":0.006848,"D4":0.007374,"dims":[1185921,58905,8721],"D4/S4e":1.077},
+"5":{"xbox":0.007372,"S4_e_x":0.007801,"D4":0.008237,"dims":[2825761,135751,19481],"D4/S4e":1.056}},
+"asymptotic_reach_MC":{"xbox":0.012500,"S4_e_x":0.012505,"D4":0.012508,"ratio":1.0003,"target_1_over_80":0.0125},
+"dim_ratio_S4e_over_D4":[4.71,5.87,6.43,6.75,6.97],"dim_ratio_box_over_D4":[62.5,101.2,122.6,136.0,145.1],
+"claimB_reparam_reach_equal":"Ybox=Mobius=x+k=1/x identical at all l (degree-8-per-variable box preserved)",
+"not_run":["fplll dim-105 finite-p validation","exact log-det at 2^130/2^256","lit2026 min-cut code cross-check (binary output saved but different strategy)"],
+"runtime_cpu_min":4,"tools":"PARI/GP, python3 numpy"}

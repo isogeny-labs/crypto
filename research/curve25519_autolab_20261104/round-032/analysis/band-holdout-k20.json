@@ -1,0 +1,152 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "inc",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        2.570350657558792,
+        2.6866561562146845,
+        3.7334056441177172
+      ],
+      "charged_sum": 59586.0,
+      "native_sum": 26962,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "inc-aa",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        2.570350657558792,
+        2.6866561562146845,
+        3.7334056441177172
+      ],
+      "charged_sum": 59586.0,
+      "native_sum": 26962,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "rho-neg",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        1.558015726004572,
+        1.6706373400876535,
+        2.6842318668353875
+      ],
+      "charged_sum": 36118.0,
+      "native_sum": 26108,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "rho-neg-aa",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        1.558015726004572,
+        1.6706373400876535,
+        2.6842318668353875
+      ],
+      "charged_sum": 36118.0,
+      "native_sum": 26108,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "sel",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        2.8077757241718153,
+        2.947090403520183,
+        4.200922517655497
+      ],
+      "charged_sum": 65090.0,
+      "native_sum": 32296,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "inc-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "sel",
+      "verdict": "inc < sel"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc-aa",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc-aa"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc-aa",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < inc-aa"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc-aa",
+      "b": "sel",
+      "verdict": "inc-aa < sel"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "rho-neg-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "sel",
+      "verdict": "rho-neg < sel"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg-aa",
+      "b": "sel",
+      "verdict": "rho-neg-aa < sel"
+    }
+  ]
+}

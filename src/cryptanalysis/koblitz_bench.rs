@@ -1946,6 +1946,12 @@ pub fn sparse_closure_refutes(
         max_weight: 0,
     };
     let mut queue: Vec<Vec<Mask>> = Vec::new();
+    // `DREG_SPARSE_PROGRESS=1`: one stderr line every 2^20 inserts (rows
+    // offered, stored rank, falls, queue length, stored entries), so a long
+    // run can be projected.  Off by default; it changes nothing else.
+    let progress = std::env::var_os("DREG_SPARSE_PROGRESS").is_some();
+    let started = std::time::Instant::now();
+    let mut offered = 0u64;
 
     // Insert one row; a new fall goes on the queue.  `false` on the cap.
     let mut insert = |mut row: Vec<Mask>,
@@ -1953,6 +1959,19 @@ pub fn sparse_closure_refutes(
                       queue: &mut Vec<Vec<Mask>>,
                       out: &mut SparseClosure|
      -> bool {
+        offered += 1;
+        if progress && offered.is_multiple_of(1 << 20) {
+            eprintln!(
+                "sparse closure: {:.0}s offered {} rank {} falls {} queue {} entries {} products {}",
+                started.elapsed().as_secs_f64(),
+                offered,
+                out.rank,
+                out.falls,
+                queue.len(),
+                entries,
+                out.products
+            );
+        }
         row.sort_unstable_by(cmp);
         // Boolean products can repeat a monomial; equal pairs cancel.
         let mut dedup: Vec<Mask> = Vec::with_capacity(row.len());
@@ -2700,6 +2719,55 @@ mod tests {
             }
         }
         assert_eq!(checked, 6);
+    }
+
+    /// The production closure engine ([`SolverEngine::Closure`]) agrees
+    /// with `MatrixF4` on the chained draws of the closure scan: the same
+    /// roots on satisfiable and unsatisfiable draws alike, and on the
+    /// unsatisfiable ones it closes the tree in no more splits.
+    #[test]
+    fn closure_engine_agrees_with_matrix_f4_on_chained_draws() {
+        use crate::cryptanalysis::koblitz_groebner::{
+            solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
+        };
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        let mut seen = (0usize, 0usize);
+        for (m, n, ell, seed) in [(3usize, 5u32, 2usize, 11u64), (3, 7, 2, 12), (4, 4, 1, 13)] {
+            let irr = find_irreducible_sparse(n).unwrap();
+            let st = FieldStructure::new(n, &irr);
+            let b = F2mElement::one(n);
+            let mut rng = StdRng::seed_from_u64(seed);
+            for _ in 0..6 {
+                let (basis, x_r) = ladder_sample(n, ell, &mut rng);
+                let sys = build_decomposition_system(&basis, &x_r, &b, m, &st).unwrap();
+                let run = |engine| {
+                    let opts = SolveOptions {
+                        engine,
+                        max_solutions: 1 << 12,
+                        node_budget: 1_000_000,
+                        split_rule: SplitRule::LowestFree,
+                    };
+                    let (mut roots, stats) =
+                        solve_boolean_system(&sys.equations, sys.n_vars, &opts);
+                    roots.sort_unstable();
+                    assert!(!stats.exhausted);
+                    (roots, stats)
+                };
+                let (want, plain) = run(SolverEngine::MatrixF4 { max_degree: 3 });
+                for max_degree in [3u32, 4] {
+                    let (got, stats) = run(SolverEngine::Closure { max_degree });
+                    assert_eq!(got, want, "m={m} n={n} seed={seed} Closure({max_degree})");
+                    assert!(stats.splits <= plain.splits, "{stats:?} against {plain:?}");
+                }
+                if want.is_empty() {
+                    seen.0 += 1;
+                } else {
+                    seen.1 += 1;
+                }
+            }
+        }
+        // Both outcomes occur, so the agreement is not vacuous.
+        assert!(seen.0 > 0 && seen.1 > 0, "{seen:?}");
     }
 
     #[test]

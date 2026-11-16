@@ -1,0 +1,12 @@
+name = "continuous_h1_comparison_audit"
+version = "0.1.0"
+defaultTargets = ["ContinuousH1ComparisonAudit"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "56a005855ea17e0b0958f73ec801ae140b0a1679"
+
+[[lean_lib]]
+name = "ContinuousH1ComparisonAudit"
+roots = ["GaloisGenerator", "FiniteQuotients", "FiniteCocycles", "CocycleClasses", "FieldCharacterRoots", "CoinvariantCharacters", "PerfectEvaluation", "GaloisUnits", "GaloisCharacters", "PerfectCocyclePairing", "CharTwoGaloisControl", "HomogeneousCocycles", "PrincipalBoundaries", "ComplexH1", "GaloisCoefficients", "CanonicalPairing", "ContinuousH1Certificate"]

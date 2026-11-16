@@ -1,0 +1,1086 @@
+[
+  {
+    "id": "FF.ring_laws",
+    "source": "HFF2013:2.1.1",
+    "title": "Ring distributive and associative laws",
+    "statement": "Addition commutes, multiplication associates, and both distributive laws hold.",
+    "hypotheses": [
+      "R is a non-unital ring."
+    ],
+    "declaration": "FiniteFieldHandbook.ring_laws",
+    "module": "FiniteFieldHandbook",
+    "relation": "definition_consequence",
+    "fidelity_note": "Four displayed laws; the other additive group axioms remain encoded in the typeclass.",
+    "aliases": [
+      "ring",
+      "distributivity",
+      "associativity"
+    ]
+  },
+  {
+    "id": "FF.domain_no_zero_divisors",
+    "source": "HFF2013:2.1.2",
+    "title": "Zero-product criterion",
+    "statement": "a*b=0 iff a=0 or b=0.",
+    "hypotheses": [
+      "R is a commutative domain."
+    ],
+    "declaration": "FiniteFieldHandbook.domain_no_zero_divisors",
+    "module": "FiniteFieldHandbook",
+    "relation": "definition_consequence",
+    "fidelity_note": "Covers part 3 of the definition.",
+    "aliases": [
+      "zero",
+      "divisors",
+      "integral",
+      "domain"
+    ]
+  },
+  {
+    "id": "FF.finite_division_ring_is_field",
+    "source": "HFF2013:2.1.5",
+    "title": "Wedderburn little theorem",
+    "statement": "Every finite division ring is a field.",
+    "hypotheses": [
+      "D is a finite division ring."
+    ],
+    "declaration": "FiniteFieldHandbook.finite_division_ring_is_field",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Uses Mathlib's finite division-ring field instance.",
+    "aliases": [
+      "Wedderburn",
+      "division",
+      "ring",
+      "commutative"
+    ]
+  },
+  {
+    "id": "FF.domain_characteristic_prime",
+    "source": "HFF2013:2.1.7",
+    "title": "Prime characteristic of a domain",
+    "statement": "A nontrivial ring without zero divisors has prime characteristic when its characteristic is positive.",
+    "hypotheses": [
+      "R is a nontrivial ring without zero divisors; CharP R p; p is nonzero."
+    ],
+    "declaration": "FiniteFieldHandbook.domain_characteristic_prime",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Nontriviality and positive characteristic are explicit.",
+    "aliases": [
+      "prime",
+      "characteristic",
+      "domain"
+    ]
+  },
+  {
+    "id": "FF.finite_field_characteristic_prime",
+    "source": "HFF2013:2.1.8",
+    "title": "Finite-field characteristic",
+    "statement": "The characteristic of a finite field is prime.",
+    "hypotheses": [
+      "K is a finite field."
+    ],
+    "declaration": "FiniteFieldHandbook.finite_field_characteristic_prime",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "The typeclass supplies positive finite-field characteristic.",
+    "aliases": [
+      "prime",
+      "characteristic",
+      "finite",
+      "field"
+    ]
+  },
+  {
+    "id": "FF.frobenius_add",
+    "source": "HFF2013:2.1.9",
+    "title": "Frobenius preserves addition",
+    "statement": "(a+b)^(p^n)=a^(p^n)+b^(p^n).",
+    "hypotheses": [
+      "R is a commutative ring of prime characteristic p; n is a natural number."
+    ],
+    "declaration": "FiniteFieldHandbook.frobenius_add",
+    "module": "FiniteFieldHandbook",
+    "relation": "corrected",
+    "fidelity_note": "Prime characteristic is explicit; n=0 is included. The characteristic-four counterexample records why the prime assumption matters.",
+    "aliases": [
+      "Frobenius",
+      "freshman",
+      "dream",
+      "characteristic",
+      "binomial"
+    ]
+  },
+  {
+    "id": "FF.frobenius_sum",
+    "source": "HFF2013:2.1.9",
+    "title": "Frobenius preserves finite sums",
+    "statement": "Raising a finite sum to p^n equals the sum of the p^n powers.",
+    "hypotheses": [
+      "R is a commutative ring of prime characteristic p; finite index set; n natural."
+    ],
+    "declaration": "FiniteFieldHandbook.frobenius_sum",
+    "module": "FiniteFieldHandbook",
+    "relation": "corrected",
+    "fidelity_note": "Covers the book's arbitrary finite sum; n=0 and the empty sum are also valid.",
+    "aliases": [
+      "Frobenius",
+      "finite",
+      "sum"
+    ]
+  },
+  {
+    "id": "FF.extension_cardinality",
+    "source": "HFF2013:2.1.10",
+    "title": "Cardinality from extension degree",
+    "statement": "|L|=|K|^[L:K].",
+    "hypotheses": [
+      "K and L are finite fields with an algebra structure K→L."
+    ],
+    "declaration": "FiniteFieldHandbook.extension_cardinality",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "The algebra structure gives the vector-space structure; dimensions are Mathlib finrank.",
+    "aliases": [
+      "extension",
+      "degree",
+      "cardinality",
+      "vector",
+      "space"
+    ]
+  },
+  {
+    "id": "FF.field_cardinality_prime_power",
+    "source": "HFF2013:2.1.12",
+    "title": "Finite-field prime-power order",
+    "statement": "A finite field has cardinality p^n for prime p and positive n.",
+    "hypotheses": [
+      "K is finite field of characteristic p."
+    ],
+    "declaration": "FiniteFieldHandbook.field_cardinality_prime_power",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Prime-power existence; the dimension identification is in cardinality_prime_field_dimension.",
+    "aliases": [
+      "finite",
+      "field",
+      "cardinality",
+      "prime",
+      "power"
+    ]
+  },
+  {
+    "id": "FF.fermat",
+    "source": "HFF2013:2.1.16",
+    "title": "Finite-field Fermat rule",
+    "statement": "a^(|K|-1)=1 for nonzero a.",
+    "hypotheses": [
+      "K is a finite field; a≠0."
+    ],
+    "declaration": "FiniteFieldHandbook.fermat",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Nonzero-element clause; power_card covers the all-elements clause.",
+    "aliases": [
+      "Fermat",
+      "exponent",
+      "group",
+      "order"
+    ]
+  },
+  {
+    "id": "FF.power_card",
+    "source": "HFF2013:2.1.16",
+    "title": "Every element satisfies x^q=x",
+    "statement": "a^|K|=a.",
+    "hypotheses": [
+      "K is a finite field; a is any element."
+    ],
+    "declaration": "FiniteFieldHandbook.power_card",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "All-elements clause including zero.",
+    "aliases": [
+      "Frobenius",
+      "fixed",
+      "points",
+      "power"
+    ]
+  },
+  {
+    "id": "FF.power_card_iterate",
+    "source": "HFF2013:2.1.16",
+    "title": "Iterated q-power identity",
+    "statement": "a^(|K|^n)=a.",
+    "hypotheses": [
+      "K is a finite field; n is natural."
+    ],
+    "declaration": "FiniteFieldHandbook.power_card_iterate",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Derived iteration of the all-elements clause.",
+    "aliases": [
+      "Frobenius",
+      "iterate"
+    ]
+  },
+  {
+    "id": "FF.inverse_power",
+    "source": "HFF2013:2.1.17",
+    "title": "Inverse by exponentiation",
+    "statement": "a^(|K|-2)=a⁻¹.",
+    "hypotheses": [
+      "K is a finite field; a≠0."
+    ],
+    "declaration": "FiniteFieldHandbook.inverse_power",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Includes the two-element field; natural subtraction is justified by |K|≥2.",
+    "aliases": [
+      "inverse",
+      "exponentiation"
+    ]
+  },
+  {
+    "id": "FF.sum_elements",
+    "source": "HFF2013:2.1.18",
+    "title": "Sum of field elements",
+    "statement": "The sum of all elements is zero when |K|>2.",
+    "hypotheses": [
+      "K is a finite field; |K|>2."
+    ],
+    "declaration": "FiniteFieldHandbook.sum_elements",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Covers the zero-sum assertion; the exceptional field's sum is not a separate declaration.",
+    "aliases": [
+      "sum",
+      "finite",
+      "field",
+      "elements"
+    ]
+  },
+  {
+    "id": "FF.polynomial_frobenius",
+    "source": "HFF2013:2.1.26",
+    "title": "Polynomial q-power expansion",
+    "statement": "Expanding exponents by q equals raising the polynomial to q.",
+    "hypotheses": [
+      "K is a finite field; f is in K[X]; q=|K|."
+    ],
+    "declaration": "FiniteFieldHandbook.polynomial_frobenius",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Mathlib expand sends X to X^q, matching the book's notation.",
+    "aliases": [
+      "polynomial",
+      "Frobenius",
+      "expansion"
+    ]
+  },
+  {
+    "id": "FF.field_polynomial_roots",
+    "source": "HFF2013:2.1.27",
+    "title": "Roots of X^q-X",
+    "statement": "The roots multiset of X^q-X is exactly the multiset of all field elements.",
+    "hypotheses": [
+      "K is a finite field; q=|K|."
+    ],
+    "declaration": "FiniteFieldHandbook.field_polynomial_roots",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Root multiset statement; field_polynomial_factorization separately proves the displayed product identity.",
+    "aliases": [
+      "field",
+      "polynomial",
+      "roots",
+      "simple",
+      "factorization"
+    ]
+  },
+  {
+    "id": "FF.field_polynomial_splits",
+    "source": "HFF2013:2.1.32",
+    "title": "Field polynomial splits",
+    "statement": "X^|K|-X splits over K.",
+    "hypotheses": [
+      "K is a finite field."
+    ],
+    "declaration": "FiniteFieldHandbook.field_polynomial_splits",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Only the splitting assertion; existence and uniqueness have separate entries.",
+    "aliases": [
+      "splitting",
+      "field",
+      "polynomial"
+    ]
+  },
+  {
+    "id": "FF.multiplicative_group_cyclic",
+    "source": "HFF2013:2.1.37",
+    "title": "Cyclic multiplicative group",
+    "statement": "The nonzero elements of a finite field form a cyclic group.",
+    "hypotheses": [
+      "K is a finite field; nonzero elements are represented as units."
+    ],
+    "declaration": "FiniteFieldHandbook.multiplicative_group_cyclic",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Uses Mathlib's actual units group.",
+    "aliases": [
+      "primitive",
+      "element",
+      "cyclic",
+      "multiplicative",
+      "group"
+    ]
+  },
+  {
+    "id": "FF.multiplicative_group_cardinality",
+    "source": "HFF2013:2.1.38",
+    "title": "Order of the multiplicative group",
+    "statement": "|K×|=|K|-1.",
+    "hypotheses": [
+      "K is a finite field."
+    ],
+    "declaration": "FiniteFieldHandbook.multiplicative_group_cardinality",
+    "module": "FiniteFieldHandbook",
+    "relation": "definition_consequence",
+    "fidelity_note": "Structural ingredient in the primitive-element definition; does not count primitive elements.",
+    "aliases": [
+      "units",
+      "multiplicative",
+      "cardinality"
+    ]
+  },
+  {
+    "id": "FF.polynomial_function_exists",
+    "source": "HFF2013:2.1.131",
+    "title": "Polynomial representation of functions",
+    "statement": "Every function K→K is evaluation of a polynomial.",
+    "hypotheses": [
+      "K is a finite field."
+    ],
+    "declaration": "FiniteFieldHandbook.polynomial_function_exists",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Existence alone; polynomial_function_bounded supplies the degree bound.",
+    "aliases": [
+      "interpolation",
+      "function",
+      "polynomial"
+    ]
+  },
+  {
+    "id": "FF.polynomial_function_bounded",
+    "source": "HFF2013:2.1.131",
+    "title": "Bounded polynomial representation",
+    "statement": "Every function K→K has a polynomial representative of degree <|K|.",
+    "hypotheses": [
+      "K is a finite field."
+    ],
+    "declaration": "FiniteFieldHandbook.polynomial_function_bounded",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Uses actual Lagrange interpolation; paired with uniqueness this covers the theorem.",
+    "aliases": [
+      "Lagrange",
+      "interpolation",
+      "degree"
+    ]
+  },
+  {
+    "id": "FF.polynomial_function_unique",
+    "source": "HFF2013:2.1.131",
+    "title": "Uniqueness of bounded representation",
+    "statement": "Polynomials of degree <|K| agreeing on K are equal.",
+    "hypotheses": [
+      "K is a finite field; both polynomial degrees are <|K|."
+    ],
+    "declaration": "FiniteFieldHandbook.polynomial_function_unique",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "The strict degree hypotheses are necessary.",
+    "aliases": [
+      "interpolation",
+      "uniqueness",
+      "polynomial",
+      "functions"
+    ]
+  },
+  {
+    "id": "FF.irreducible_divides_field_polynomial",
+    "source": "HFF2013:2.1.29",
+    "title": "Irreducible degree divisibility test",
+    "statement": "f divides X^(q^m)-X iff degree(f) divides m.",
+    "hypotheses": [
+      "K is a finite field; f is irreducible; m is natural; q=|K|."
+    ],
+    "declaration": "FiniteFieldHandbook.irreducible_divides_field_polynomial",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Includes m=0, where the right polynomial is zero.",
+    "aliases": [
+      "irreducibility",
+      "test",
+      "factorization",
+      "divisibility"
+    ]
+  },
+  {
+    "id": "FF.permutation_iff_injective",
+    "source": "HFF2013:8.1.1",
+    "title": "Permutation criterion on a finite field",
+    "statement": "A self-map of a finite field is bijective iff it is injective.",
+    "hypotheses": [
+      "K is a finite field; f is a self-map."
+    ],
+    "declaration": "FiniteFieldHandbook.permutation_iff_injective",
+    "module": "FiniteFieldHandbook",
+    "relation": "definition_consequence",
+    "fidelity_note": "Function-level equivalent criterion; polynomial evaluation is a special case.",
+    "aliases": [
+      "permutation",
+      "polynomial",
+      "bijective",
+      "injective"
+    ]
+  },
+  {
+    "id": "FF.minimal_polynomial_irreducible",
+    "source": "HFF2013:2.1.58",
+    "title": "Irreducible minimal polynomial",
+    "statement": "The minimal polynomial of an algebraic element is irreducible.",
+    "hypotheses": [
+      "K→L is a field extension; a is integral over K (equivalent to algebraic over a field)."
+    ],
+    "declaration": "FiniteFieldHandbook.minimal_polynomial_irreducible",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Exposes algebraicity needed for a nonzero minimal polynomial.",
+    "aliases": [
+      "minimal",
+      "polynomial",
+      "irreducible",
+      "algebraic"
+    ]
+  },
+  {
+    "id": "FF.degree_tower",
+    "source": "HFF2013:2.1.60",
+    "title": "Tower law",
+    "statement": "[E:K]=[L:K][E:L].",
+    "hypotheses": [
+      "K→L→E is a compatible tower of finite-dimensional field extensions."
+    ],
+    "declaration": "FiniteFieldHandbook.degree_tower",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "The IsScalarTower hypothesis records map compatibility.",
+    "aliases": [
+      "tower",
+      "law",
+      "extension",
+      "degree"
+    ]
+  },
+  {
+    "id": "FF.finite_extension_algebraic",
+    "source": "HFF2013:2.1.62",
+    "title": "Finite extensions are algebraic",
+    "statement": "Every element of a finite-dimensional field extension is algebraic.",
+    "hypotheses": [
+      "K→L is a finite-dimensional field extension."
+    ],
+    "declaration": "FiniteFieldHandbook.finite_extension_algebraic",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "IsIntegral agrees with algebraic over fields.",
+    "aliases": [
+      "algebraic",
+      "finite",
+      "extension"
+    ]
+  },
+  {
+    "id": "FF.trace_formula",
+    "source": "HFF2013:2.1.80",
+    "title": "Trace as Frobenius sum",
+    "statement": "The image of Tr(L/K)(a) in L is the sum of a^(|K|^i) over 0≤i<[L:K].",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.trace_formula",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Proves the bridge from the book's sum to the standard algebraic trace.",
+    "aliases": [
+      "trace",
+      "conjugates",
+      "Frobenius",
+      "sum"
+    ]
+  },
+  {
+    "id": "FF.trace_add",
+    "source": "HFF2013:2.1.83",
+    "title": "Trace is additive",
+    "statement": "Tr(a+b)=Tr(a)+Tr(b).",
+    "hypotheses": [
+      "K→L is a field extension."
+    ],
+    "declaration": "FiniteFieldHandbook.trace_add",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 2. The trace map is a Mathlib linear map.",
+    "aliases": [
+      "trace",
+      "additive",
+      "linearity"
+    ]
+  },
+  {
+    "id": "FF.trace_smul",
+    "source": "HFF2013:2.1.83",
+    "title": "Trace respects base scalars",
+    "statement": "Tr(c*a)=c*Tr(a).",
+    "hypotheses": [
+      "K→L is a field extension; c lies in K."
+    ],
+    "declaration": "FiniteFieldHandbook.trace_smul",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 3. Scalar multiplication uses the given algebra map.",
+    "aliases": [
+      "trace",
+      "scalar",
+      "linearity"
+    ]
+  },
+  {
+    "id": "FF.trace_surjective",
+    "source": "HFF2013:2.1.83",
+    "title": "Trace is onto",
+    "statement": "Every base-field value is the trace of some extension-field element.",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.trace_surjective",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Surjectivity in part 4; separability is inferred from finite fields.",
+    "aliases": [
+      "trace",
+      "surjective",
+      "onto"
+    ]
+  },
+  {
+    "id": "FF.trace_base",
+    "source": "HFF2013:2.1.83",
+    "title": "Trace of a base element",
+    "statement": "Tr(algebraMap(a))=[L:K]*a.",
+    "hypotheses": [
+      "K→L is a finite-dimensional field extension; a lies in K."
+    ],
+    "declaration": "FiniteFieldHandbook.trace_base",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 5. The extension degree is cast into K.",
+    "aliases": [
+      "trace",
+      "base",
+      "field",
+      "dimension"
+    ]
+  },
+  {
+    "id": "FF.trace_tower",
+    "source": "HFF2013:2.1.83",
+    "title": "Trace transitivity",
+    "statement": "Tr(L/K)(Tr(E/L)(a))=Tr(E/K)(a).",
+    "hypotheses": [
+      "K→L→E is a compatible tower of finite-dimensional field extensions."
+    ],
+    "declaration": "FiniteFieldHandbook.trace_tower",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 8, in composition order.",
+    "aliases": [
+      "trace",
+      "transitivity",
+      "tower"
+    ]
+  },
+  {
+    "id": "FF.trace_pairing_nondegenerate",
+    "source": "HFF2013:2.1.84",
+    "title": "Nondegenerate trace pairing",
+    "statement": "If a≠0 there exists b with Tr(a*b)≠0.",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.trace_pairing_nondegenerate",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Proves nondegeneracy; the classification of all linear functionals is still a separate obligation.",
+    "aliases": [
+      "trace",
+      "pairing",
+      "nondegenerate",
+      "dual"
+    ]
+  },
+  {
+    "id": "FF.norm_formula",
+    "source": "HFF2013:2.1.86",
+    "title": "Norm as Frobenius product",
+    "statement": "The image of N(L/K)(a) is the product of a^(|K|^i) over 0≤i<[L:K].",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.norm_formula",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Bridge to the product in the book's definition.",
+    "aliases": [
+      "norm",
+      "conjugates",
+      "product"
+    ]
+  },
+  {
+    "id": "FF.norm_power",
+    "source": "HFF2013:2.1.86",
+    "title": "Norm by exponentiation",
+    "statement": "The image of N(L/K)(a) is a^((|L|-1)/(|K|-1)).",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.norm_power",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Matches the quotient exponent formula, including zero.",
+    "aliases": [
+      "norm",
+      "exponent",
+      "power"
+    ]
+  },
+  {
+    "id": "FF.norm_mul",
+    "source": "HFF2013:2.1.88",
+    "title": "Norm is multiplicative",
+    "statement": "N(a*b)=N(a)*N(b).",
+    "hypotheses": [
+      "K→L is a field extension."
+    ],
+    "declaration": "FiniteFieldHandbook.norm_mul",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 2, from the standard norm monoid homomorphism.",
+    "aliases": [
+      "norm",
+      "multiplicative"
+    ]
+  },
+  {
+    "id": "FF.norm_surjective",
+    "source": "HFF2013:2.1.88",
+    "title": "Norm is onto",
+    "statement": "Every base-field element is a norm.",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.norm_surjective",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 3 on the full fields, including zero.",
+    "aliases": [
+      "norm",
+      "onto",
+      "surjective"
+    ]
+  },
+  {
+    "id": "FF.norm_units_surjective",
+    "source": "HFF2013:2.1.88",
+    "title": "Norm is onto on nonzero elements",
+    "statement": "Every nonzero base-field element is the norm of a nonzero extension-field element.",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.norm_units_surjective",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 3 restricted to the actual units groups.",
+    "aliases": [
+      "norm",
+      "units",
+      "surjective"
+    ]
+  },
+  {
+    "id": "FF.norm_base",
+    "source": "HFF2013:2.1.88",
+    "title": "Norm of a base element",
+    "statement": "N(algebraMap(a))=a^[L:K].",
+    "hypotheses": [
+      "K→L is a finite-dimensional field extension; a lies in K."
+    ],
+    "declaration": "FiniteFieldHandbook.norm_base",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 4.",
+    "aliases": [
+      "norm",
+      "base",
+      "field",
+      "degree"
+    ]
+  },
+  {
+    "id": "FF.norm_tower",
+    "source": "HFF2013:2.1.88",
+    "title": "Norm transitivity",
+    "statement": "N(L/K)(N(E/L)(a))=N(E/K)(a).",
+    "hypotheses": [
+      "K→L→E is a compatible tower of finite-dimensional field extensions."
+    ],
+    "declaration": "FiniteFieldHandbook.norm_tower",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 6, in composition order.",
+    "aliases": [
+      "norm",
+      "transitivity",
+      "tower"
+    ]
+  },
+  {
+    "id": "FF.normal_basis_exists",
+    "source": "HFF2013:2.1.102",
+    "title": "Independent Galois orbit",
+    "statement": "Some element's Galois orbit is linearly independent over the base field.",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.normal_basis_exists",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Normal-basis ingredient only; primitive normality is not established here.",
+    "aliases": [
+      "normal",
+      "basis",
+      "existence",
+      "independent"
+    ]
+  },
+  {
+    "id": "FF.normal_basis_orbit",
+    "source": "HFF2013:2.1.102",
+    "title": "Normal basis theorem",
+    "statement": "There is a spanning basis consisting of the Galois orbit of one element.",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.normal_basis_orbit",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Full normal-basis existence; the additional primitive-element requirement in this remark remains open.",
+    "aliases": [
+      "normal",
+      "basis",
+      "spanning",
+      "Galois",
+      "orbit"
+    ]
+  },
+  {
+    "id": "FF.frobenius_order",
+    "source": "HFF2013:2.1.76",
+    "title": "Order of Frobenius",
+    "statement": "The q-power automorphism has order [L:K].",
+    "hypotheses": [
+      "K→L is a field extension with L finite; K has a finite enumeration; q=|K|."
+    ],
+    "declaration": "FiniteFieldHandbook.frobenius_order",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Establishes generator order; frobenius_enumerates gives exhaustive enumeration.",
+    "aliases": [
+      "Frobenius",
+      "automorphism",
+      "order"
+    ]
+  },
+  {
+    "id": "FF.galois_group_cyclic",
+    "source": "HFF2013:2.1.77",
+    "title": "Finite-field Galois group is cyclic",
+    "statement": "The automorphism group of L over K is cyclic.",
+    "hypotheses": [
+      "K→L is a field extension with L finite."
+    ],
+    "declaration": "FiniteFieldHandbook.galois_group_cyclic",
+    "module": "FiniteFieldHandbook",
+    "relation": "corrected",
+    "fidelity_note": "Uses the extension field L as required by the editors' erratum.",
+    "aliases": [
+      "Galois",
+      "group",
+      "cyclic",
+      "automorphism"
+    ]
+  },
+  {
+    "id": "FF.frobenius_enumerates",
+    "source": "HFF2013:2.1.76",
+    "title": "Frobenius powers enumerate automorphisms",
+    "statement": "The powers indexed by 0≤i<[L:K] biject onto all K-automorphisms of L.",
+    "hypotheses": [
+      "K→L is a field extension with L finite; K has a finite enumeration."
+    ],
+    "declaration": "FiniteFieldHandbook.frobenius_enumerates",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Bijection records distinctness and exhaustiveness.",
+    "aliases": [
+      "Frobenius",
+      "powers",
+      "automorphisms",
+      "enumeration"
+    ]
+  },
+  {
+    "id": "FF.trace_frobenius",
+    "source": "HFF2013:2.1.83",
+    "title": "Trace is Frobenius invariant",
+    "statement": "Tr(a^|K|)=Tr(a).",
+    "hypotheses": [
+      "K→L is a field extension with L finite; K has a finite enumeration."
+    ],
+    "declaration": "FiniteFieldHandbook.trace_frobenius",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 6, via invariance under K-algebra automorphisms.",
+    "aliases": [
+      "trace",
+      "Frobenius",
+      "invariant"
+    ]
+  },
+  {
+    "id": "FF.norm_frobenius",
+    "source": "HFF2013:2.1.88",
+    "title": "Norm is Frobenius invariant",
+    "statement": "N(a^|K|)=N(a).",
+    "hypotheses": [
+      "K→L is a field extension with L finite; K has a finite enumeration."
+    ],
+    "declaration": "FiniteFieldHandbook.norm_frobenius",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 5, via invariance under K-algebra automorphisms.",
+    "aliases": [
+      "norm",
+      "Frobenius",
+      "invariant"
+    ]
+  },
+  {
+    "id": "FF.linearized_add",
+    "source": "HFF2013:2.1.105",
+    "title": "Linearized polynomials preserve addition",
+    "statement": "Any finite sum of c_i*x^(q^i) preserves addition.",
+    "hypotheses": [
+      "K→L is a finite-field extension; coefficients c_i lie in L; q=|K|."
+    ],
+    "declaration": "FiniteFieldHandbook.linearized_add",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 1; the proof explicitly bridges Frobenius iterates to polynomial exponents.",
+    "aliases": [
+      "linearized",
+      "q",
+      "polynomial",
+      "additive"
+    ]
+  },
+  {
+    "id": "FF.linearized_smul",
+    "source": "HFF2013:2.1.105",
+    "title": "Linearized polynomials respect base scalars",
+    "statement": "Any finite sum of c_i*x^(q^i) commutes with multiplication by a base-field scalar.",
+    "hypotheses": [
+      "K→L is a finite-field extension; coefficients c_i lie in L; scalar lies in K."
+    ],
+    "declaration": "FiniteFieldHandbook.linearized_smul",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Part 2; the same explicit exponent bridge is proved.",
+    "aliases": [
+      "linearized",
+      "q",
+      "polynomial",
+      "scalar",
+      "linear"
+    ]
+  },
+  {
+    "id": "FF.finite_field_exists",
+    "source": "HFF2013:2.1.32",
+    "title": "Finite field of prescribed order",
+    "statement": "GaloisField(p,n) has cardinality p^n.",
+    "hypotheses": [
+      "p is prime; n is a nonzero natural number."
+    ],
+    "declaration": "FiniteFieldHandbook.finite_field_exists",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "The actual GaloisField construction supplies a Field instance. Uniqueness is a separate obligation.",
+    "aliases": [
+      "finite",
+      "field",
+      "existence",
+      "prime",
+      "power"
+    ]
+  },
+  {
+    "id": "FF.cardinality_prime_field_dimension",
+    "source": "HFF2013:2.1.12",
+    "title": "Cardinality and prime-field dimension",
+    "statement": "p^[K:F_p]=|K|.",
+    "hypotheses": [
+      "K is a finite field of prime characteristic p, with its prime-field algebra structure."
+    ],
+    "declaration": "FiniteFieldHandbook.cardinality_prime_field_dimension",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Dimension clause paired with prime-power existence.",
+    "aliases": [
+      "prime",
+      "field",
+      "dimension",
+      "cardinality"
+    ]
+  },
+  {
+    "id": "FF.totient_multiplicative",
+    "source": "HFF2013:2.1.44",
+    "title": "Euler totient multiplicativity",
+    "statement": "φ(m*n)=φ(m)*φ(n) when m and n are coprime.",
+    "hypotheses": [
+      "m,n natural; gcd(m,n)=1."
+    ],
+    "declaration": "FiniteFieldHandbook.totient_multiplicative",
+    "module": "FiniteFieldHandbook",
+    "relation": "equivalent",
+    "fidelity_note": "Includes zero whenever the coprimality premise allows it.",
+    "aliases": [
+      "Euler",
+      "totient",
+      "multiplicative",
+      "coprime"
+    ]
+  },
+  {
+    "id": "FF.power_order",
+    "source": "HFF2013:2.1.42",
+    "title": "Order of a power",
+    "statement": "ord(g^t)=ord(g)/gcd(ord(g),t).",
+    "hypotheses": [
+      "G is a finite group; g lies in G; t natural."
+    ],
+    "declaration": "FiniteFieldHandbook.power_order",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "The element-order formula underlying the primitive-power criterion; the iff for primitive generators is not separately declared.",
+    "aliases": [
+      "primitive",
+      "power",
+      "order",
+      "gcd"
+    ]
+  },
+  {
+    "id": "FF.irreducible_splits_degree_extension",
+    "source": "HFF2013:2.1.118",
+    "title": "Irreducible polynomial splits in its degree extension",
+    "statement": "An irreducible degree-n polynomial over K splits in the degree-n finite-field extension.",
+    "hypotheses": [
+      "K finite field of prime characteristic p; n>0; f irreducible with natDegree f=n."
+    ],
+    "declaration": "FiniteFieldHandbook.irreducible_splits_degree_extension",
+    "module": "FiniteFieldHandbook",
+    "relation": "corrected",
+    "fidelity_note": "Applies the editors' missing irreducibility hypothesis. This proves the first sentence; the following roots-of-unity discussion is not included.",
+    "aliases": [
+      "irreducible",
+      "roots",
+      "extension",
+      "splitting",
+      "correction"
+    ]
+  },
+  {
+    "id": "FF.extension_embedding_iff",
+    "source": "HFF2013:2.1.35",
+    "title": "Embedding criterion for finite extensions",
+    "statement": "A K-field embeds into an L-field over F iff its degree over F divides the degree of L over F.",
+    "hypotheses": [
+      "F,K,L finite fields with F-algebra structures on K and L."
+    ],
+    "declaration": "FiniteFieldHandbook.extension_embedding_iff",
+    "module": "FiniteFieldHandbook",
+    "relation": "part",
+    "fidelity_note": "Existence of an embedding; uniqueness of the subfield inside L is not separately declared.",
+    "aliases": [
+      "subfield",
+      "extension",
+      "embedding",
+      "divisibility"
+    ]
+  },
+  {
+    "id": "FF.composite_characteristic_frobenius_fails",
+    "source": "HFF2013:2.1.9",
+    "title": "Characteristic-four counterexample",
+    "statement": "(1+1)^4 differs from 1^4+1^4 in Z/4Z.",
+    "hypotheses": [
+      "Arithmetic is in ZMod 4."
+    ],
+    "declaration": "FiniteFieldHandbook.composite_characteristic_frobenius_fails",
+    "module": "FiniteFieldHandbook",
+    "relation": "corrected",
+    "fidelity_note": "Kernel-reduced counterexample to extending the formula to arbitrary composite characteristic. This clarifies the prime-p convention, rather than alleging an editors-listed erratum.",
+    "aliases": [
+      "counterexample",
+      "characteristic",
+      "four",
+      "Frobenius"
+    ]
+  }
+,{
+  "id": "FF.field_polynomial_factorization",
+  "source": "HFF2013:2.1.27",
+  "title": "Factorization of X^q-X",
+  "statement": "X^q-X is the product of X-a over all a in the field.",
+  "hypotheses": [
+    "K is a finite field; q=|K|."
+  ],
+  "declaration": "FiniteFieldHandbook.field_polynomial_factorization",
+  "module": "FiniteFieldHandbook",
+  "relation": "equivalent",
+  "fidelity_note": "Exact displayed identity, using monicity and the checked roots multiset.",
+  "aliases": [
+    "field",
+    "polynomial",
+    "factorization",
+    "roots"
+  ]
+}
+]

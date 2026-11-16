@@ -1,0 +1,19 @@
+digraph TwistBridge {
+  graph [rankdir=LR, bgcolor="white", pad=0.1, nodesep=0.25, ranksep=0.33,
+         label="mixed-20261022T0718Z: checked short-model image; remaining bridges explicit", labelloc=b,
+         fontname="Helvetica", fontsize=10];
+  node [shape=box, style="rounded,filled", fillcolor="#e0f2fe", color="#0369a1",
+        fontname="Helvetica", fontsize=11, margin=0.10];
+  edge [color="#475569", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+  root [label="Finite odd base field\nd nonsquare; u^2=d\nPROVED: u^q=-u"];
+  image [label="Actual injective point map\n(X,Y) -> (X/d,Y/(d*u))\nO -> O"];
+  neg [label="PROVED: Frobenius\nnegates image and\nevery finite image sum"];
+  vanish [label="PROVED: rational relation\n+ odd image annihilator\n=> twist aggregate is O"];
+  root -> image; image -> neg; neg -> vanish;
+  group [label="OPEN: additive isomorphism\nfull eigenspace surjectivity\nS3/S4 lifting; pairing bridge",
+         fillcolor="#fef3c7", color="#b45309"];
+  two [label="RETAINED CONTROL\nNonzero 2-torsion survives\n14,688 mixed rational sums",
+       fillcolor="#ffe4e6", color="#be123c"];
+  image -> group [style=dashed, label="separate obligation"];
+  neg -> two [label="remove oddness"];
+}

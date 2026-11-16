@@ -1,0 +1,86 @@
+{
+  "schema": "source.review/v1",
+  "claim_standing": "pcc:unverified",
+  "reviewer_authored_producer_wrappers": false,
+  "reviewer_blind": false,
+  "method": "read-only source inspection and byte-hash comparisons",
+  "execution_count": 0,
+  "status": "reviewed_source_corrections_no_runtime_acceptance",
+  "findings": [
+    {
+      "id": "F1",
+      "location": "v1 launcher67,116-117; worker77,126",
+      "finding": "Duplicate rejection can overwrite prior receipt",
+      "disposition": "v2 owned-output flags address source path"
+    },
+    {
+      "id": "F2",
+      "location": "v1 launcher75-81,101",
+      "finding": "Launch gap can leave worker executing after lease loss",
+      "disposition": "v2 worker waits for short-lived ownership permit"
+    },
+    {
+      "id": "F3",
+      "location": "v1 durable_io39-48; worker104",
+      "finding": "Admission can omit all four exact controls",
+      "disposition": "v2 exact ordered list and critical recipe fields compared"
+    },
+    {
+      "id": "F4",
+      "location": "v1 durable_io24-27",
+      "finding": "Live prefix may include bytes appended after fsync",
+      "disposition": "v2 fixed length hashed then fsynced"
+    },
+    {
+      "id": "F5",
+      "location": "v1 durable_io35",
+      "finding": "Positive ceiling accepts infinity and bool",
+      "disposition": "v2 finite nonbool values and allocation receipt checked"
+    },
+    {
+      "id": "F6",
+      "location": "v2-initial durable_io74-78",
+      "finding": "Concurrent atomic temporary deletion can abort size census",
+      "disposition": "Known atomic-temp disappearance only is tolerated; other I/O errors fail"
+    },
+    {
+      "id": "F7",
+      "location": "v2-initial launcher125-127",
+      "finding": "Seal failure can leave previous terminal receipt marked passed",
+      "disposition": "Pending receipt, sealed manifest and separate completion marker required"
+    }
+  ],
+  "finalization_followup": {
+    "finding": "Sealing may cross deadline before success marker",
+    "disposition": "Final UTC/monotonic/signal/error check added; acceptance requires durable outer exit zero and consistent sealed records"
+  },
+  "remaining_obligations": [
+    "no wrapper execution or runtime qualification yet",
+    "materialized default-feature source/input/toolchain closure",
+    "current finite funding and live resource admission",
+    "GitHub publication bindings and durable outer-exit recorder",
+    "independent controlled failure-path validation"
+  ],
+  "reviewed_final_sources": {
+    "durable_io.py": {
+      "sha256": "27654595f0ed9e062d9a648ca61c41d8ba6923f21690ad6ef0ac394d85e93546",
+      "snapshot": "v2-final-durable_io.py.txt"
+    },
+    "durable-launcher.py": {
+      "sha256": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c",
+      "snapshot": "v2-final-durable-launcher.py.txt"
+    },
+    "durable-worker.py": {
+      "sha256": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e",
+      "snapshot": "v2-final-durable-worker.py.txt"
+    },
+    "recipe-proposal.json": {
+      "sha256": "249b99544fcc46ff39d477f8101e02bb4eceeb94bd141a7022ac4c34c1a2c5c2",
+      "snapshot": "v2-final-recipe-proposal.json.txt"
+    },
+    "PLAN.md": {
+      "sha256": "8edbbe9145e3c8a8e436931b84a7913319fd6c9248b42b22f0129a2f5362d184",
+      "snapshot": "v2-final-PLAN.md.txt"
+    }
+  }
+}
