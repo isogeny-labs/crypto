@@ -40,9 +40,6 @@ fn poly_mul(a:&[u64],b:&[u64])->Poly{
     }
     z
 }
-fn poly_eval(a:&[u64],x:u64)->u64{
-    a.iter().rev().fold(0,|acc,&c|add(mul(acc,x),c))
-}
 fn monic_roots(xs:&[u64])->Poly{
     xs.iter().fold(vec![1],|acc,&x|poly_mul(&acc,&[sub(0,x),1]))
 }
