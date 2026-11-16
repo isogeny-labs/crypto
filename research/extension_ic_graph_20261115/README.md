@@ -254,9 +254,12 @@ no standard lab admission or canonical export validation is asserted.
   convolution ablation has two gains and six inconclusive cases. One delayed
   timing rejection remains visible. [pcc:unverified]
 - [Certified S4 trace reuse](AMENDMENT_13_CERTIFIED_TRACE.md) is integrated as
-  explicit `f4-trace-delayed`, preserving all basis/root/group checks. A cold
-  distinct-residual coordinate-batch comparison is frozen in
-  [this plan](certified-trace-plan.json); validation passes, timing unstarted.
+  explicit `f4-trace-delayed`, preserving all basis/root/group checks. The
+  [864-batch cold comparison](local-certified-s4-trace-20261116-18/report.pdf)
+  completes with equal canonical outputs. All 33 controlled cases lose at
+  2.981–16.086 times fresh F4; three timing rejections remain. Largest-field
+  pools accept six or seven replays per eight distinct residuals, but produce
+  zero controlled gains. The frozen condition rejects a full-IC follow-up.
   [pcc:unverified]
 
 Native summaries, every local stratum, flow and raw custody hashes accompany

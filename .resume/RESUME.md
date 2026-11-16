@@ -1,6 +1,30 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (04:15Z, 16 November)
+## Current checkpoint (04:38Z, 16 November)
+
+STAGE18COMPLETE,negative. Published source f8c6f8b891cbca871da3323f915dd9b71d195c2e
+precedes sole local18call. Exit0,131.978s,864starts/completions,144warm720measure,
+36fixtures/6912coordinates. All outputs canonicaldenseequal, protocolglobal[],
+allcoldlearning/source/family/order/semantic checks pass. 33eligible ALL33lose,
+ratios2.98064–16.08599,lowerintervalsallabove1. ThreeAArejectionsretained.
+Largest12allcontrolledlose11.8229–14.9565despite6or7acceptedreplaysper8calls.
+allows_later_frozen_full_ic=false;NOfullIC18followup. No trials or compilers active.
+
+Full39910-byte summary/flow/raw/source/binary/prepost hashes retained. Four-page
+finalPDFallpagesvisuallyinspected, exactbenchPDF/SVG/150dpiPNGcopies/hashesdone;
+PNGsalsopreservedlocal18. Evidencefolderlocal-certified-s4-trace-20261116-18.
+Needcommit/pushthisfinishedpacketandupdatePR4288bodycurrentlycovers16/17only.
+Currentvalidation49cubic+5pool+5S4example+21analysischecksandactualreleasebuilds/
+ClippyPASS. No independentverdict, admission or whole-parent-pass asserted.
+
+Nextreview actual certification path before selecting a new cheaper exact
+method; NO nextlead/trialchosen. FreshKB/primaryreceiptneeded. Keepoldchecks,
+no unchangedretries, no uncheckedbasis. GoalACTIVE, localbackendworking.
+CI/reviews last04:23f8c6:appmigrate/reviewSUCCESS, requiredgate/size/artifacts
+unconfirmed;nextreadnotbefore05:13absentevent. No merge/bypass. Mainfetched
+beforejournal;preserveallincomingjournal/ledgerrecordsifintegratingmain.
+
+## Previous source checkpoint (04:15Z, superseded pending states)
 
 STAGE18SOURCEIMPLEMENTED/VALIDATED,NOTTIMED. CertifiednativeF4TracePoolwired
 throughS4TraceStateboundtocurve/field/generator/subgroup/originaltarget; varying
