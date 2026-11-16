@@ -53,7 +53,9 @@ source-IP-restricted security group `sg-0b3da730791ffdefc`. The exact
 before launch. Set Spot `MaxPrice=0.18` USD/hour, one-time/terminate behavior,
 one instance, and a 150 GiB `gp3` root volume with
 `DeleteOnTermination=true`. No instance role or additional ingress rule is
-needed. This is a bounded capacity decision, not an IC cost estimate. Record
+needed. Set instance-initiated shutdown behavior to `terminate` and pass the
+committed [`user-data.sh`](user-data.sh), which schedules shutdown 225 minutes
+after boot as a backstop. This is a bounded capacity decision, not an IC cost estimate. Record
 the observed Spot price and actual instance lifecycle; terminate the instance
 within four hours of launch, whether the validation passes, fails, times out,
 or setup stops. Verify EC2 termination and root-volume deletion. Do not
