@@ -88,6 +88,7 @@ fn pown(mut x:u64,mut k:u64,m:u64)->u64 {
     }
     a
 }
+#[cfg(test)]
 fn sqrtp(x:u64)->Option<u64> {
     let r=pown(x,(P+1)/4,P);
     (mulp(r,r)==x).then_some(r)
@@ -217,6 +218,7 @@ fn s3_coeff_mode<const FAST:bool>(x:u64,y:u64)->(u64,u64,u64) {
     let c=subp(cc,mulp_mode::<FAST>(mulp_mode::<FAST>(4,PRIME31.b),sum));
     (a,b,c)
 }
+#[cfg(test)]
 fn s3_coeff(x:u64,y:u64)->(u64,u64,u64) {
     s3_coeff_mode::<false>(x,y)
 }
@@ -225,6 +227,7 @@ fn s3_eval_mode<const FAST:bool>(coeff:(u64,u64,u64),z:u64)->u64 {
     addp(addp(mulp_mode::<FAST>(a,mulp_mode::<FAST>(z,z)),
         mulp_mode::<FAST>(b,z)),c)
 }
+#[cfg(test)]
 fn s3_eval(coeff:(u64,u64,u64),z:u64)->u64 {
     s3_eval_mode::<false>(coeff,z)
 }
@@ -878,6 +881,16 @@ fn heldout_twelve()->Result<serde_json::Value,String>{
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    // Reproducible complete optimized Rust APS one-relation solver,
+    // with all public labelled-walk setup, algebraic work and replay paid.
+    if args.len()==1 && args[0]=="--walk-mersenne-one" {
+        let value=execute_sized_mode_mul(false,ROUNDS,PUBLIC_Q,T,true,true)?;
+        println!("{}",serde_json::to_string_pretty(&value).map_err(|e|e.to_string())?);
+        if value["complete_target_scalar_recovered"].as_bool()!=Some(true) {
+            return Err("optimized prime31 APS walk did not recover the public log".into());
+        }
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--mersenne-confirm" {
         let result=mersenne_field_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -913,7 +926,7 @@ fn main()->Result<(),String> {
         [] => false,
         [a] if a=="--one" => false,
         [a] if a=="--compare" => true,
-        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep|--size-confirm|--walk-confirm|--mersenne-confirm".into())
+        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep|--size-confirm|--walk-confirm|--mersenne-confirm|--walk-mersenne-one".into())
     };
     let v=execute(compare,ROUNDS,PUBLIC_Q)?;
     println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
