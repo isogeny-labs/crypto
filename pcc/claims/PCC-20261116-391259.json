@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T02:45:17Z",
+ "id": "PCC-20261116-391259",
+ "kind": "statement",
+ "producer": {
+  "commit": "1dc3b7784d226976408d8473915549c8c33f8758",
+  "model": "",
+  "session": "prime-field-transfer-goal-round-02"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/round-02/local_torsion.cpp",
+    "sha256": "10943c5719179f30cf939854c5f07894ef33e7cf24f2091b2331665bd0a78a4b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/round-02/public_fixture.cpp",
+    "sha256": "47d5ab183485524d1cfe13f035f6391de18127011a120cd576dfbad6b4131ee8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-02/native-03-p17.jsonl",
+    "sha256": "86b528ef2307f47e9177408bc028225659653fec2a5363112ab2d5c3b7edd54d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-02/native-03-p257.jsonl",
+    "sha256": "0ad852fa0d8b8226d9423763a728caa05584c9290870cb8de8835a9937211ab6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-02/native-04-public-0.jsonl",
+    "sha256": "46a4f17dc00546c14fb3f911f1bd32aa5c064067de85238bbfbe891f719e1642"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-02/native-04-public-1.jsonl",
+    "sha256": "2e5be4563f943c00464aaa94c120b1293f4992936c6ea6a97eddbb25b7402f67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-02/native-04-public-2.jsonl",
+    "sha256": "891ae6d1244b838247998ff9a931d1438f017097b9d9216e7228d3ab2a10b599"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-02/native-04-public-3.jsonl",
+    "sha256": "86a6943267f805d3ce418300c12e2d6674e81cb524831f373487b45201194412"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Producer development observations only, unsigned; no timing, independent execution proof, new global selector, target-solving advantage, or novelty claim. Both earlier 60-second timeouts are preserved; full coverage uses separately sealed fixture/public-point calls.",
+ "statement": "The frozen native local-torsion evaluator, which takes no input scalar, passes the planned seven precisions through p^64 on all 18 and 82 nonidentity points of the p17/order19 and p257/order83 fixtures and on four hash-derived public secp256k1 points. Separate Jacobian arithmetic checks torsion, the small-fixture scalar relations, and secp256k1 negation/addition; OpenSSL checks source arithmetic. This is a classical source-local lifting component, not a cross-prime transfer."
+}

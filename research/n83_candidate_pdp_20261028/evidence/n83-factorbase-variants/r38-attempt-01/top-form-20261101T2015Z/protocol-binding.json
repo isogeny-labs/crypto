@@ -1,0 +1,53 @@
+{
+  "schema": "n83.candidate-top-resume-binding/v1",
+  "protocol_id": "N83-FACTOR-BASE-TOP-DREG-20261031-V2",
+  "protocol_version": 2,
+  "protocol_freeze_sha256": "3d852e474eb7b129e51f68bb564f379d9d997148dbe9c3727e529102a6ef47c6",
+  "current_protocol_file_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+  "candidate_id": "spike38",
+  "coordinate_bit": 38,
+  "families": [
+    "koblitz",
+    "binary",
+    "prime"
+  ],
+  "m_values": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "target_kinds": [
+    "planted",
+    "natural"
+  ],
+  "systems_planned": 48,
+  "source_revision": "52665c7a6e8308f86201e10c9305afa346fd134b",
+  "pdp_binary_sha256": "b8e00f73512977828497c4bb30f0ae08d319350688a90b15310aa4143308a3ca",
+  "top_binary_sha256": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a",
+  "matched_inputs_sha256": "f7325211302b4ca21f98ea9a7022d2dcc023b29ea2fad9329867e90b75a01c82",
+  "factor_base_index_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+  "factor_base_family_manifest_sha256": {
+    "koblitz": "f6573e4f71d511672a1da6bd4aa170e2e54acd9291423f014ce87f9ce8266caa",
+    "binary": "28816f378a8604ad0eab78c2b0418289e0d6a8650455564e5f2a03dea3726796",
+    "prime": "976a24675d8634b5b21246e99c42009bcc1b7a7dcc1c8df19b2db02b042bbc71"
+  },
+  "factor_base_recovery_audit": "../terminal-recovery-20261101T2000Z/r38-recovery-audit.json",
+  "s3_output_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/",
+  "s3_prefix_was_empty_before_run": true,
+  "pre_run_outputs_found": false,
+  "pre_run_active_pdp_or_top_process_found": false,
+  "target_tests": {
+    "pdp": "6 passed",
+    "top": "10 passed"
+  },
+  "broad_workspace_test_note": "Broad cargo test reached unrelated prime_centered_witness tests requiring a persistent-output environment variable; two failed for NotPresent. The protocol targets were then run directly and passed.",
+  "claim_scope": "Top-form quotient Dreg certificate or interval only; not affine FFD/LFD, solving degree, CM regularity, solver cost, or ECDLP recovery.",
+  "factor_base_data_index_sha256": "3fb72aa61147882832bbb17fc65a3ccfb8f5f179c047a43e4ccf65cecfa34623",
+  "pdp_source_sha256": "8e23a7287dc82afc967ef3f50e20c486f3f01d1e4a5f1847b5891b24df3b7629",
+  "top_source_sha256": "2b22d880eb68ba304c8cca67fec0694c8987f1523436ef728bfa9ad39a621e7e"
+}

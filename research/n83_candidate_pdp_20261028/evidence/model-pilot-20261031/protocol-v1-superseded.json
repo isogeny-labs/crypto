@@ -1,0 +1,23 @@
+{
+  "id":"n83-fixed-factor-base-model-pilot-20261031",
+  "version":1,
+  "status":"frozen-local-protocol",
+  "scope":"Exploratory prediction of certified top-form degree interval midpoint from 6 completed fixed bases (r27,r28,r30,r31,r32,r33); no elite ranking and no causal claims.",
+  "arms":["feature_ridge","group_mean_baseline"],
+  "data":{
+    "rows_per_base":48,"total_rows":288,"unit":"top-form input system",
+    "group":"coordinate-bit base; all 48 family/m/target rows from a base stay in one fold",
+    "target":"(dreg_lower_bound+dreg_upper_bound)/2 for finite_interval; positive_dimensional rows excluded from regression and reported separately",
+    "sources":"/tmp/n83-candidate-inputs/spike{27,28,30,31,32,33}, /tmp/n83-candidate-top/spike{27,28,30,31,32,33}-parent/certificates/summary.json"
+  },
+  "features":["m","family one-hot","target_kind one-hot","binary_terms","n_vars","input_equations","number of factor_base_membership points","mean normalized x coordinate of those points","mean normalized y coordinate of those points"],
+  "preprocessing":"numeric standardization fit on training folds only; categorical one-hot; no coordinate-bit/base ID/hash/target coordinates included",
+  "model":"ridge regression with intercept, alpha=10; deterministic closed-form via pure Python Gauss-Jordan elimination",
+  "validation":"leave-one-coordinate-bit base out (6 folds); compare MAE to training-fold mean predictor; no tuning or refitting",
+  "metrics":["finite-interval rows and positive-dimensional counts","grouped OOF MAE for interval midpoint","per-fold MAE and baseline MAE"],
+  "controls":{"baseline":"training-fold mean predictor","positive":"not applicable: predictive benchmark, no detector claim","negative":"not applicable: no hypothesis test or significance claim","aa":"not applicable: deterministic fitting; no timing claim"},
+  "randomness":"none; deterministic fixed folds, fixed feature list and alpha",
+  "decision":"exploratory lead only if model beats baseline on at least 4 of 6 held-out bases and aggregate MAE improves; any lead remains descriptive due to only six groups and interval-midpoint proxy",
+  "inadmissible":"no elite ranking, no candidate selection, no causal interpretation, no claims of global degree of regularity, no extrapolation to unmeasured coordinate bases",
+  "analysis":"/tmp/n83-model-pilot/train.py"
+}

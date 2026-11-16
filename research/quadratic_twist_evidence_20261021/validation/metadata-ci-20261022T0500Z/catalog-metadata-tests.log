@@ -1,0 +1,38 @@
+E.E
+======================================================================
+ERROR: test_complete_catalog_join (__main__.CoverCatalogTests.test_complete_catalog_join)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto-next/scripts/test_cover_catalog.py", line 11, in test_complete_catalog_join
+    data = browser.build()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 718, in build
+    curves = curve_rows(registry, leaderboard)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 361, in curve_rows
+    a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+    ^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 361, in <genexpr>
+    a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+                  ^^^^^^^^^^^^
+TypeError: sequence item 0: expected str instance, int found
+
+======================================================================
+ERROR: test_stale_and_ambiguous_findings_rejected (__main__.CoverCatalogTests.test_stale_and_ambiguous_findings_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto-next/scripts/test_cover_catalog.py", line 48, in test_stale_and_ambiguous_findings_rejected
+    curves = browser.curve_rows(browser.load(browser.REGISTRY), browser.load(browser.LEADERBOARD))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 361, in curve_rows
+    a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+    ^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 361, in <genexpr>
+    a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+                  ^^^^^^^^^^^^
+TypeError: sequence item 0: expected str instance, int found
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.529s
+
+FAILED (errors=2)

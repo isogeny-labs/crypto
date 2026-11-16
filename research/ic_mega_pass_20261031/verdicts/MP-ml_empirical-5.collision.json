@@ -1,0 +1,19 @@
+{
+ "idea_id": "MP-ml_empirical-5",
+ "skeptic_lens": "prior-art and closure collision",
+ "verdict": "survives_with_fix",
+ "confidence": 0.6,
+ "reason": "Partial collisions, none exact. (1) LEAD-ICB-decomposition-encoding-and-sat (closed_obstructed, measured) already fits WDSat/SAT UNSAT cost 2^{alpha l} with alpha~m (2.9985 bits/unit l at m=3; 4.09-4.33 at m=4), n=11..31; the idea's 'propagations exponent in l' is the same quantity under a different cost proxy, with default (static) order. Forecloses 'SAT/XOR solver beats rho'. (2) KR-IC-5765d2 (known_result): SAT/XOR/CMS/XOR-GE for PDP is a known constant-factor mechanism; internal note says WDSat's gain is its static branching order, so branching order is known to matter only as a constant. (3) LEAD-ICE-sat-xor-pdp-oracle notes the pdp CNF-XOR model is a complete enumerator of V^m mod S_m, so UNSAT leaves must cover the full space and a branching order cannot cut UNSAT-proof size below that floor; this predicts the falsifier's 'slope unchanged' branch. (4) LEAD-EXO-ml-learned-models (open_next_step) lists 'solver branching policy' explicitly, and LEAD-ICP-icperf-binary-pdp-solver is open for solver choice; so the idea is in the corpus as an open lead, not a closed one. Literature: WDSat (Trimoska-Ionica-Dequen, CHES 2020 / eprint 2019/313, arXiv 2001.11229) uses a hand-designed static branching order; RLAF (Tonshoff-Grohe, arXiv 2505.16053) is generic one-shot GNN variable weights/polarities for CDCL; web search (extended, 2 queries) found no paper combining learned branching with Weil-descent/ECDLP CNF-XOR. Not found: 2603.07176 and Xorcle were not independently verified here. Uncovered part: learned order on WDSat/CMS for descended S_3 with the slope measured against the m/2-1 threshold. Class stays engineering; the idea passes only as a cheap measurement, not as a route.",
+ "fix": "Restate in the closed lead's units: report log2(UNSAT leaves or propagations) per unit l (alpha) at m=3, default vs learned order, with SAT instances split into SAT/UNSAT; the pass criterion is alpha < m/2-1 (i.e. <0.5 bit/unit l at m=3 vs measured ~3), not a 0.2 slope drop, since a 0.2 drop leaves it ~2.8 bits above the rho threshold and does not change the closure. Restrict to cells under 64 Boolean unknowns (m=3, n up to 23; m=4 at n>=23 is unmeasured by the programme's own tooling). Compare against WDSat static order as the baseline, not only CMS default. Cite the enumerator-floor identity as the null prediction and label expected class engineering. Transfer to n=23 should be pre-registered as a fit on n=17..21.",
+ "collisions": [
+  "MAP_closed: LEAD-ICB-decomposition-encoding-and-sat (closed_obstructed; alpha~m, forecloses 'SAT or XOR solver for point decomposition beats rho')",
+  "MAP_closed: KR-IC-5765d2 (known_result; SAT/XOR/CMS/Gaussian elimination in SAT for PDP; WDSat gain = static branching order)",
+  "Atlas: LEAD-ICE-sat-xor-pdp-oracle (open_next_step; CNF-XOR model is complete enumerator of V^m mod S_m)",
+  "Atlas: LEAD-ICP-icperf-binary-pdp-solver (open_next_step; solver choice for binary PDP)",
+  "Atlas: LEAD-EXO-ml-learned-models (open_next_step; names solver branching policy)",
+  "Atlas: LEAD-ICB-learned-cost-model-factor-base-selection (open_next_step; adjacent learned model, different target)",
+  "Lit: WDSat, Trimoska-Ionica-Dequen eprint 2019/313 and arXiv 2001.11229 (custom static branching order)",
+  "Lit: RLAF Tonshoff-Grohe arXiv 2505.16053 (generic GNN-guided CDCL branching)"
+ ],
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-ml_empirical-5.collision.json"
+}

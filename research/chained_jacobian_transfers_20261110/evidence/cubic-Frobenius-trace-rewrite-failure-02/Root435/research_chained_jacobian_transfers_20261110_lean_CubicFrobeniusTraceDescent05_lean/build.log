@@ -1,0 +1,250 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/CubicFrobeniusTraceDescent05.lean:31:16: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  F (?x + ?y)
+in the target expression
+  x + y + (F x + F y) + (F (F x) + F (F y)) = x + F x + F (F x) + (y + F y + F (F y))
+
+M : Type
+inst✝ : IntModule M
+F : M → M
+hadd : ∀ (x y : M), F (x + y) = F x + F y
+x y : M
+⊢ x + y + (F x + F y) + (F (F x) + F (F y)) = x + F x + F (F x) + (y + F y + F (F y))
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/CubicFrobeniusTraceDescent05.lean:38:16: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  F (?n • ?x)
+in the target expression
+  n • x + n • F x + n • F (F x) = n • (x + F x + F (F x))
+
+M : Type
+inst✝ : IntModule M
+F : M → M
+hlin : ∀ (n : Int) (x : M), F (n • x) = n • F x
+n : Int
+x : M
+⊢ n • x + n • F x + n • F (F x) = n • (x + F x + F (F x))
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/CubicFrobeniusTraceDescent05.lean:140:34: error: `grind` failed
+case grind.1.1.1
+M T : Type
+inst : IntModule M
+inst_1 : IntModule T
+F : M → M
+f : M → T
+flin : ∀ (n : Int) (x : M), f (n • x) = n • f x
+fixed_target : ∀ (x : M), f (F x) = f x
+P : M
+r lam u v : Int
+hr : r • P = 0
+heigen : F P = lam • P
+hbez : u * (lam - 1) + v * r = 1
+fz : f 0 = 0
+ht : r • f P = 0
+he : lam • f P = f P
+h : ¬(lam + -1) • f P = 0
+h_1 : lam = v
+h_2 : r = u
+h_3 : lam = u
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] ∀ (n : Int) (x : M), f (n • x) = n • f x
+    [prop] ∀ (x : M), f (F x) = f x
+    [prop] r • P = 0
+    [prop] F P = lam • P
+    [prop] u * (lam + -1) + v * r + -1 = 0
+    [prop] f 0 = 0
+    [prop] r • f P = 0
+    [prop] lam • f P = f P
+    [prop] ¬(lam + -1) • f P = 0
+    [prop] f (r • P) = r • f P
+    [prop] f (F P) = f P
+    [prop] f (F 0) = f 0
+    [prop] f (lam • P) = lam • f P
+    [prop] f (F (F 0)) = f (F 0)
+    [prop] f (F (F P)) = f (F P)
+    [prop] f (F (F (F P))) = f (F (F P))
+    [prop] f (F (F (F 0))) = f (F (F 0))
+    [prop] f (F (F (F (F 0)))) = f (F (F (F 0)))
+    [prop] f (F (F (F (F P)))) = f (F (F (F P)))
+    [prop] f (F (F (F (F (F P))))) = f (F (F (F (F P))))
+    [prop] f (F (F (F (F (F 0))))) = f (F (F (F (F 0))))
+    [prop] lam = v
+    [prop] f (F (F (F (F (F (F 0)))))) = f (F (F (F (F (F 0)))))
+    [prop] f (F (F (F (F (F (F P)))))) = f (F (F (F (F (F P)))))
+    [prop] f (F (F (F (F (F (F (F P))))))) = f (F (F (F (F (F (F P))))))
+    [prop] f (F (F (F (F (F (F (F 0))))))) = f (F (F (F (F (F (F 0))))))
+    [prop] f (F (F (F (F (F (F (F (F 0)))))))) = f (F (F (F (F (F (F (F 0)))))))
+    [prop] f (F (F (F (F (F (F (F (F P)))))))) = f (F (F (F (F (F (F (F P)))))))
+    [prop] r = u
+    [prop] lam = u
+  [eqc] True propositions
+    [prop] r = u
+    [prop] lam = u
+    [prop] lam = v
+    [prop] u = v
+    [prop] ∀ (x : M), f (F x) = f x
+    [prop] ∀ (n : Int) (x : M), f (n • x) = n • f x
+  [eqc] False propositions
+    [prop] (lam + -1) • f P = 0
+  [eqc] Equivalence classes
+    [eqc] {r, lam, u, v}
+    [eqc] {F P, 0, r • P, lam • P}
+    [eqc] {f P,
+        f 0,
+        0,
+        r • f P,
+        lam • f P,
+        f (F P),
+        f (F 0),
+        f (r • P),
+        f (F (F P)),
+        f (F (F 0)),
+        f (lam • P),
+        f (F (F (F P))),
+        f (F (F (F 0))),
+        f (F (F (F (F P)))),
+        f (F (F (F (F 0)))),
+        f (F (F (F (F (F P))))),
+        f (F (F (F (F (F 0))))),
+        f (F (F (F (F (F (F P)))))),
+        f (F (F (F (F (F (F 0)))))),
+        f (F (F (F (F (F (F (F P))))))),
+        f (F (F (F (F (F (F (F 0))))))),
+        f (F (F (F (F (F (F (F (F P)))))))),
+        f (F (F (F (F (F (F (F (F 0))))))))}
+    [eqc] {0, u * (lam + -1) + v * r + -1}
+    [eqc] {lam * u, v * r}
+    [eqc] {F 0, F (F P)}
+    [eqc] {F (F 0), F (F (F P))}
+    [eqc] {F (F (F 0)), F (F (F (F P)))}
+    [eqc] {F (F (F (F 0))), F (F (F (F (F P))))}
+    [eqc] {F (F (F (F (F 0)))), F (F (F (F (F (F P)))))}
+    [eqc] {F (F (F (F (F (F 0))))), F (F (F (F (F (F (F P))))))}
+    [eqc] {F (F (F (F (F (F (F 0)))))), F (F (F (F (F (F (F (F P)))))))}
+  [cases] Case analyses
+    [cases] [1/2]: lam = v
+      [cases] source: Model-based theory combination at argument #4 of
+            lam * u
+          and
+            v * r
+    [cases] [1/2]: r = u
+      [cases] source: Model-based theory combination at argument #5 of
+            lam * u
+          and
+            v * r
+    [cases] [1/2]: lam = u
+      [cases] source: Model-based theory combination at argument #4 of
+            lam * u
+          and
+            u * (lam + -1)
+  [ematch] E-matching patterns
+    [thm] flin: [f (@HSMul.hSMul `[Int] `[M] `[M] `[instHSMul] #1 #0)]
+    [thm] fixed_target: [f (F #0)]
+    [thm] fixed_target: [F #0]
+    [thm] fixed_target: [f #0]
+  [cutsat] Assignment satisfying linear constraints
+    [assign] r := -1
+    [assign] lam := -1
+    [assign] u := -1
+    [assign] v := -1
+  [linarith] Linarith
+    [linarith] Linarith assignment for `M`
+      [assign] P := 1
+      [assign] F P := 0
+      [assign] F 0 := 3
+      [assign] F (F P) := 3
+      [assign] F (F 0) := 4
+      [assign] F (F (F P)) := 4
+      [assign] F (F (F 0)) := 5
+      [assign] F (F (F (F P))) := 5
+      [assign] F (F (F (F 0))) := 6
+      [assign] F (F (F (F (F P)))) := 6
+      [assign] F (F (F (F (F 0)))) := 7
+      [assign] F (F (F (F (F (F P))))) := 7
+      [assign] F (F (F (F (F (F 0))))) := 8
+      [assign] F (F (F (F (F (F (F P)))))) := 8
+      [assign] F (F (F (F (F (F (F 0)))))) := 9
+      [assign] F (F (F (F (F (F (F (F P))))))) := 9
+      [assign] F (F (F (F (F (F (F (F 0))))))) := 10
+    [linarith] Linarith assignment for `T`
+      [assign] f P := 0
+      [assign] f 0 := 0
+      [assign] f (F P) := 0
+      [assign] f (F 0) := 0
+      [assign] f (r • P) := 0
+      [assign] f (F (F P)) := 0
+      [assign] f (F (F 0)) := 0
+      [assign] f (lam • P) := 0
+      [assign] f (F (F (F P))) := 0
+      [assign] f (F (F (F 0))) := 0
+      [assign] f (F (F (F (F P)))) := 0
+      [assign] f (F (F (F (F 0)))) := 0
+      [assign] f (F (F (F (F (F P))))) := 0
+      [assign] f (F (F (F (F (F 0))))) := 0
+      [assign] f (F (F (F (F (F (F P)))))) := 0
+      [assign] f (F (F (F (F (F (F 0)))))) := 0
+      [assign] f (F (F (F (F (F (F (F P))))))) := 0
+      [assign] f (F (F (F (F (F (F (F 0))))))) := 0
+      [assign] f (F (F (F (F (F (F (F (F P)))))))) := 0
+      [assign] f (F (F (F (F (F (F (F (F 0)))))))) := 0
+  [ring] Ring `Int`
+    [basis] Basis
+      [_] 2 * r ^ 2 + -1 * r + -1 = 0
+      [_] lam + -1 * v = 0
+      [_] u + -1 * r = 0
+      [_] v + -1 * r = 0
+  [limits] Thresholds reached
+    [limit] maximum term generation has been reached, threshold: `(gen := 8)`
+[grind] Issues
+  [issue] `grind linarith` term with unexpected instance
+        r • P
+  [issue] `grind linarith` term with unexpected instance
+        r • P
+  [issue] `grind linarith` term with unexpected instance
+        r • f P
+  [issue] `grind linarith` term with unexpected instance
+        r • f P
+  [issue] `grind linarith` term with unexpected instance
+        (lam + -1) • f P
+  [issue] `grind linarith` term with unexpected instance
+        (lam + -1) • f P
+  [issue] `grind linarith` term with unexpected instance
+        r • P
+  [issue] `grind linarith` term with unexpected instance
+        r • P
+  [issue] `grind linarith` term with unexpected instance
+        r • f P
+  [issue] `grind linarith` term with unexpected instance
+        r • f P
+  [issue] `grind linarith` term with unexpected instance
+        lam • f P
+  [issue] `grind linarith` term with unexpected instance
+        lam • f P
+  [issue] `grind linarith` term with unexpected instance
+        lam • P
+  [issue] `grind linarith` term with unexpected instance
+        lam • P
+[grind] Diagnostics
+  [ematch] E-matching Diagnostics
+    [thm] Theorem Instance Count
+      [thm] fixed_target ↦ 16
+      [thm] flin ↦ 2
+'CubicFrobeniusTraceDescent05.recover_annihilated_point' depends on axioms: [propext]
+'CubicFrobeniusTraceDescent05.trace3_add' depends on axioms: [sorryAx]
+'CubicFrobeniusTraceDescent05.trace3_smul' depends on axioms: [sorryAx]
+'CubicFrobeniusTraceDescent05.trace3_commutes' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.trace3_fixed_image' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.trace3_fixed_input' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.normalized_fixed_input' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.normalized_fixed_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.normalized_idempotent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.trace_zero_complement' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.faithful_stable_cyclic_forces_fixed' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CubicFrobeniusTraceDescent05.fixed_target_eigenline_zero' depends on axioms: [propext, sorryAx]
+'CubicFrobeniusTraceDescent05.trace_eigenline_zero' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.composition_covariance' does not depend on any axioms
+'CubicFrobeniusTraceDescent05.nonfixed_scalar_control' depends on axioms: [propext]
+'CubicFrobeniusTraceDescent05.fixed_scalar_control' depends on axioms: [propext]
+'CubicFrobeniusTraceDescent05.characteristic_three_exception_control' depends on axioms: [propext, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

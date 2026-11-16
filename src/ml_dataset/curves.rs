@@ -2088,7 +2088,7 @@ mod tests {
             &certificate,
         )
         .unwrap();
-        super::super::verify_prime_root_outcome(&rooted.outcome, &certificate).unwrap();
+        super::super::verify_prime_root_outcome(&rooted.outcome, &certificate, cfg.m).unwrap();
         assert_eq!(rooted.outcome["scalar_recovered_without_witness"], false);
         assert_eq!(certificate["execution_trace_complete_verified"], false);
         assert_eq!(certificate["total_operation_count_verified"], false);

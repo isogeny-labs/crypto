@@ -1,0 +1,20 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\begin{document}
+\title{Literal Kummer row-fold arithmetic}
+\author{T-1242 producer packet}
+\date{1 November 2026}\maketitle
+The literal four-step word fold now has a proved correspondence to the field row action and the widened dot-product remainder. The proof preserves the source orientation: row $i$, columns $j=0,1,2,3$, accumulator initially zero.
+
+\paragraph{Assumptions and bounds.} Canonical inputs and matrix entries, prime $p\leq2^{32}$. Each product is below $2^{64}$; each accumulator addition is below $2^{33}$. The four-product natural dot is below $2^{66}$ and therefore fits 128 bits. Native arithmetic uses narrow 64-bit multiplication; the proof does not silently replace it by widened multiplication.
+
+\paragraph{Nonzero bridge.} Sixteen row-by-column remainder equalities $M^2\bmod p=cI$, with canonical $c\ne0$, imply the decoded field scalar-square identity. Combined with the prior field repair proof and canonical word decoding, the new theorem establishes that native row-fold output is nonzero exactly when its input is nonzero.
+
+\paragraph{Checks.} Twelve new main declarations and ten fixed arithmetic controls; separate axiom readback. Controls cover orientation, transpose mismatch, zero, noncanonical input, singularity, exact bound endpoints, overflow beyond the bound, widened accumulation, and repeated action. Failed intermediate proofs remain recorded. These are proof controls, not new curve observations.
+
+\paragraph{Source and custody.} Literal source: snapshot/walk-source.rs.txt, lines14--21 and48--50. Prior manifest: fixed133-binding.json (SHA256 beginning 8f6c33e4); prior105 matrix actions are historical and were not replayed. Full source references, exact theorem inventory, receipts, and hashes accompany this report.
+
+\paragraph{Remaining interfaces.} Operation counters require headroom for16 increments each; their effects are unmodeled. Runtime identity/custody, compiler fidelity, geometric action and successful xadd branch interpretation remain separate. The arithmetic proof does not require odd characteristic; the historical chart construction has its own assumptions. Independent review is pending publication. No scientific execution or timing measurement occurred.
+\end{document}

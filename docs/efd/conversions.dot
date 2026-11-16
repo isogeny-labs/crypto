@@ -1,0 +1,41 @@
+digraph efd_conversions {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=11, bgcolor="white",
+         label="EFD model conversions: every curve shape bridges to its short Weierstrass model",
+         labelloc=t, pad=0.3];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=8, dir=both];
+  subgraph cluster_g1p {
+    label="GF(p), p odd — EFD g1p — 471 formulas, 33 charts";
+    style="rounded"; color="#4a6fa5"; fontcolor="#4a6fa5";
+    m_2dik_g1p [label="2dik\ny^2=x^3+a*x^2+16*a*x\n1 chart", fillcolor="#e8f0ff"];
+    m_3dik_g1p [label="3dik\ny^2=x^3+3*a*(x+1)^2\n1 chart", fillcolor="#e8f0ff"];
+    m_edwards_g1p [label="edwards\nx^2+y^2=c^2(1+d*x^2*y^2)\n4 charts", fillcolor="#e8f0ff"];
+    m_hessian_g1p [label="hessian\nx^3+y^3+1=3*d*x*y\n2 charts", fillcolor="#e8f0ff"];
+    m_jintersect_g1p [label="jintersect\ns^2+c^2=1, a*s^2+d^2=1\n2 charts", fillcolor="#e8f0ff"];
+    m_jquartic_g1p [label="jquartic\ny^2=x^4+2*a*x^2+1\n6 charts", fillcolor="#e8f0ff"];
+    m_montgom_g1p [label="montgom\nb*y^2=x^3+a*x^2+x\n1 chart", fillcolor="#e8f0ff"];
+    m_shortw_g1p [label="shortw\ny^2=x^3+ax+b\n11 charts", fillcolor="#e8f0ff"];
+    m_twisted_g1p [label="twisted\na*x^2+y^2=1+d*x^2*y^2\n4 charts", fillcolor="#e8f0ff"];
+    m_twistedhessian_g1p [label="twistedhessian\na*x^3+y^3+1=d*x*y\n1 chart", fillcolor="#e8f0ff"];
+    m_2dik_g1p -> m_shortw_g1p [style=dashed, label="identity (u=x, v=y)"];
+    m_3dik_g1p -> m_shortw_g1p [style=dashed, label="identity (u=x, v=y)"];
+    m_edwards_g1p -> m_shortw_g1p [style=solid, label="rational map"];
+    m_hessian_g1p -> m_shortw_g1p [style=solid, label="rational map"];
+    m_jintersect_g1p -> m_shortw_g1p [style=solid, label="rational map"];
+    m_jquartic_g1p -> m_shortw_g1p [style=solid, label="rational map"];
+    m_montgom_g1p -> m_shortw_g1p [style=dashed, label="identity (u=x, v=y)"];
+    m_twisted_g1p -> m_shortw_g1p [style=solid, label="rational map"];
+    m_twistedhessian_g1p -> m_shortw_g1p [style=solid, label="rational map"];
+  }
+  subgraph cluster_g12o {
+    label="GF(2^m) — EFD g12o — 135 formulas, 19 charts";
+    style="rounded"; color="#3f7a3f"; fontcolor="#3f7a3f";
+    m_edwards_g12o [label="edwards\nx^2+y^2=c^2(1+d*x^2*y^2)\n8 charts", fillcolor="#eaf7ea"];
+    m_hessian_g12o [label="hessian\nx^3+y^3+1=3*d*x*y\n1 chart", fillcolor="#eaf7ea"];
+    m_shortw_g12o [label="shortw\ny^2=x^3+ax+b\n10 charts", fillcolor="#eaf7ea"];
+    m_edwards_g12o -> m_shortw_g12o [style=solid, label="rational map"];
+    m_hessian_g12o -> m_shortw_g12o [style=solid, label="rational map"];
+  }
+  m_shortw_g1p -> m_shortw_g12o [style=invis, constraint=false];
+  note [shape=note, fillcolor="#fff8dc", label="Within a section all shapes are mutually convertible\nthrough the hub. Across sections (GF(p) vs GF(2^m)) no conversion exists.\nChart-to-affine conversion is separate: exact for full charts, lossy for quotient charts."];
+}

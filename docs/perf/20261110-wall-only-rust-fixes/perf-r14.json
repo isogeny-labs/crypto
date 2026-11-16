@@ -1,0 +1,49 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "perf workload: descent-algebraic and mitm (R14)",
+  "description": "Baseline binary (4e909cd242) against the candidate binary on the same spec and seeds: every counter, steps, gae, recovered and replay digest must be identical. Not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261110
+  },
+  "arms": [
+    {
+      "name": "rf-mitm",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "rootfind-mitm:m=3"
+        }
+      }
+    },
+    {
+      "name": "da-f4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261110,
+    "isolation_required": "L0",
+    "timeout_seconds": 300
+  }
+}

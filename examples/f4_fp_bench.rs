@@ -103,21 +103,23 @@ fn main() {
         let opts = F4Options::new(Ordering::Grevlex, dmax);
         let mut times = Vec::new();
         let mut fp = String::new();
-        let mut shape = (0, 0, 0, 0);
+        let mut shape = (0, 0, 0, 0, 0);
         for _ in 0..repeats {
             let r = f4(&sys, n, p, &opts);
             times.push(r.ms);
             fp = fingerprint(&r.basis);
-            shape = (r.steps, r.max_rows, r.max_cols, r.basis.len());
+            shape = (r.steps, r.max_rows, r.max_cols, r.basis.len(), r.field_ops);
         }
         let mut line = json!({
             "case": name, "f4_ms": median(times), "basis_fp": fp,
             "steps": shape.0, "max_rows": shape.1, "max_cols": shape.2, "basis_len": shape.3,
+            "field_ops": shape.4,
         });
         if do_solve {
             let mut times = Vec::new();
             let mut sols = 0;
             let mut sfp = String::new();
+            let mut sops = 0u64;
             for _ in 0..repeats {
                 let s = solve(&sys, n, p, &opts);
                 times.push(s.ms);
@@ -125,10 +127,12 @@ fn main() {
                     sols = v.len();
                 }
                 sfp = fingerprint(&format!("{:?}", s.verdict));
+                sops = s.field_ops;
             }
             line["solve_ms"] = json!(median(times));
             line["solutions"] = json!(sols);
             line["solve_fp"] = json!(sfp);
+            line["solve_field_ops"] = json!(sops);
         }
         println!("{line}");
     }

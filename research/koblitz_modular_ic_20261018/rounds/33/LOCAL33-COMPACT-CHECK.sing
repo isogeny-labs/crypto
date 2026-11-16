@@ -1,0 +1,38 @@
+ideal residueCompact33=std(ideal(T^2+T+1));int casesCompact33;
+proc inverseCompact33(poly value){
+ ideal gens=residueCompact33,value;if(std(gens)[1]!=1){ERROR("LOCAL33_COMPACT_REQUIRED_UNIT");}
+ matrix wit=lift(gens,ideal(1));poly ans=reduce(wit[nrows(wit),1],residueCompact33);
+ if(reduce(value*ans+1,residueCompact33)!=0){ERROR("LOCAL33_COMPACT_INVERSE");}return(ans);
+}
+proc checkCompact33(string label,number b,number c,number descentL,number descentN){
+ number A=1+c;if(c==0){ERROR("LOCAL33_COMPACT_C_EXCEPTION");}
+ number u0=(b+c)/c^2;if(u0==0 || u0==1){ERROR("LOCAL33_COMPACT_U_EXCEPTION");}
+ number v0=((b/c)*u0^3+1)/(u0+1);number rn=(u0+1)*v0+1;number cn=rn+u0^3;
+ if(v0^2+v0!=u0^3+u0 || b!=rn*cn/u0^7 || c!=cn/u0^4){ERROR("LOCAL33_COMPACT_PLANE_INVERSE");}
+ list family=specialiseLocalFamily33(u0,descentN+b*T,descentL+A*T,v0);
+ ideal values=reduce(family[1],residueCompact33);if(size(values)!=0){ERROR("LOCAL33_COMPACT_POINT_SOURCE");}
+ poly dValue=family[4];poly hValue=family[3];poly di=inverseCompact33(dValue);poly hi=inverseCompact33(hValue);
+ matrix sj=family[5];matrix ss=family[2];
+ int i;int j;int row;int col;int target;int productIndex=0;poly determinant;ideal products;
+ for(i=1;i<=4;i++){
+  for(j=1;j<=3;j++){sj[i,j]=reduce(sj[i,j],residueCompact33);}
+  for(j=1;j<=ncols(ss);j++){ss[i,j]=reduce(ss[i,j],residueCompact33);}
+ }
+ for(i=1;i<=3;i++){
+  matrix mm[3][3];target=0;
+  for(row=1;row<=4;row++){if(row!=i){target++;for(col=1;col<=3;col++){mm[target,col]=sj[row,col];}}}
+  determinant=reduce(det(mm),residueCompact33);
+  for(j=1;j<=ncols(ss);j++){productIndex++;products[productIndex]=reduce(ss[i,j]*determinant,residueCompact33);}
+ }
+ if(productIndex!=51){ERROR("LOCAL33_COMPACT_WITNESS_COUNT");}
+ ideal gens=residueCompact33,products;if(std(gens)[1]!=1){ERROR("LOCAL33_COMPACT_NO_PRESENTATION_ON_SOME_BRANCH");}
+ matrix witness=lift(gens,ideal(1));matrix reconstructed=matrix(gens)*witness;if(reconstructed[1,1]!=1){ERROR("LOCAL33_COMPACT_EXACT_UNIT_IDENTITY");}
+ link out="ASCII:w compact-local-"+label+".sing";open(out);
+ write(out,"poly localDValue="+string(dValue)+";poly localDInverse="+string(di)+";poly localHValue="+string(hValue)+";poly localHInverse="+string(hi)+";ideal localUnitGenerators;");
+ write(out,"matrix localUnitWitness["+string(nrows(witness))+"][1];");
+ for(i=1;i<=ncols(matrix(gens));i++){
+  write(out,"localUnitGenerators["+string(i)+"]="+string(gens[i])+";");write(out,"localUnitWitness["+string(i)+",1]="+string(witness[i,1])+";");
+ }
+ close(out);casesCompact33++;
+ print("LOCAL33_COMPACT_CHECK "+label+" denominator=unit Tate_factor=unit exact_local_presentation=standard_etale_over_u");
+}

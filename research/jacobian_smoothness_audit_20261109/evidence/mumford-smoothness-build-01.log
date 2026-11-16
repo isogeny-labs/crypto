@@ -1,0 +1,35 @@
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:14:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instSub', which is 'noncomputable'
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:24:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instOne', which is 'noncomputable'
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:29:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instZero', which is 'noncomputable'
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:38:50: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'modByMonic', which is 'noncomputable'
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:38:0: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instDecidableValid._aux_1', which is 'noncomputable'
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:46:72: error: Tactic `decide` failed to reduce
+  @decide (∀ (D : Candidate), (uPolynomial D).Monic) Fintype.decidableForallFintype
+to `true` or `false`.
+
+After unfolding the instances `decidable_of_decidable_of_iff`, `decidable_of_iff`, `instDecidableEqFin`, `instDecidableEqNat`, `Classical.decEq`, `Classical.propDecidable`, `Finset.decidableDforallFinset`, `Fintype.decidableForallFintype`, `List.decidableBAll`, `Multiset.decidableDforallMultiset`, `Multiset.decidableForallMultiset`, `Nat.decEq`, `ZMod.decidableEq`, `Monic.decidable`, `ZMod.decidableEq._aux_3`, and `Monic.decidable._aux_1`, reduction got stuck at
+  (↑(uPolynomial ↑⟨{ toFun := ⇑Candidate.proxyTypeEquiv, inj' := ⋯ } (Sum.inl PUnit.unit), ⋯⟩).leadingCoeff).beq ↑1
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:49:55: error: Tactic `decide` failed to reduce
+  @decide (∀ (D : Candidate), (uPolynomial D).natDegree ≤ 2) Fintype.decidableForallFintype
+to `true` or `false`.
+
+After unfolding the instances `decidable_of_decidable_of_iff`, `decidable_of_iff`, `Classical.decEq`, `Classical.propDecidable`, `Finset.decidableDforallFinset`, `Fintype.decidableForallFintype`, `List.decidableBAll`, `Multiset.decidableDforallMultiset`, `Multiset.decidableForallMultiset`, and `Nat.decLe`, reduction got stuck at
+  (uPolynomial ↑⟨{ toFun := ⇑Candidate.proxyTypeEquiv, inj' := ⋯ } (Sum.inl PUnit.unit), ⋯⟩).natDegree.ble 2
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:52:73: error: Tactic `decide` failed to reduce
+  @decide (∀ (D : Candidate), (vPolynomial D).degree < (uPolynomial D).degree) Fintype.decidableForallFintype
+to `true` or `false`.
+
+After unfolding the instances `decidable_of_decidable_of_iff`, `decidable_of_iff`, `Classical.decEq`, `Classical.propDecidable`, `Finset.decidableDforallFinset`, `Fintype.decidableForallFintype`, `List.decidableBAll`, `Multiset.decidableDforallMultiset`, `Multiset.decidableForallMultiset`, and `WithBot.decidableLT`, reduction got stuck at
+  match (vPolynomial ↑⟨{ toFun := ⇑Candidate.proxyTypeEquiv, inj' := ⋯ } (Sum.inl PUnit.unit), ⋯⟩).degree,
+    (uPolynomial ↑⟨{ toFun := ⇑Candidate.proxyTypeEquiv, inj' := ⋯ } (Sum.inl PUnit.unit), ⋯⟩).degree with
+  | x, none => isFalse ⋯
+  | none, some a => isTrue ⋯
+  | some a, some b => decidable_of_iff' (a < b) ⋯
+/workspace/crypto-audit/research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean:54:76: error: Tactic `decide` failed to reduce
+  @decide (Fintype.card { D // Valid D } = 8) (instDecidableEqNat (Fintype.card { D // Valid D }) 8)
+to `true` or `false`.
+
+After unfolding the instances `decidable_of_decidable_of_iff`, `decidable_of_iff`, `instDecidableAnd`, `instDecidableEqNat`, `AddMonoidAlgebra.instDecidableEq`, `Classical.decEq`, `Classical.propDecidable`, `Equiv.decidableEq`, `Finset.decidableEq`, `Finsupp.instDecidableEq`, `Multiset.decidableEq`, `instDecidableValid`, `Nat.decEq`, `instDecidableEq`, `Function.Injective.decidableEq`, `instDecidableValid._aux_1`, `Monic.decidable`, and `Monic.decidable._aux_1`, reduction got stuck at
+  (Fintype.card { D // Valid D }).beq 8
+'MumfordSmoothnessAudit.candidate_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MumfordSmoothnessAudit.valid_cardinality' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

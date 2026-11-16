@@ -1,0 +1,104 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-15T03:15:17+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/ic_gpu_rootfind_m3_20261115/analyze.py",
+        "/tmp/claude-0/-home-user/648c3177-6621-55ff-b9d8-09ead07ab678/scratchpad/rm3res"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T03:15:17+00:00",
+      "wall_s": 0.094
+    }
+  ],
+  "commit": "219333b6ab8c199043be9444fb4f49c060a74985",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T02:39:51+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0239Z-ic-gpu-rootfind-m3",
+  "metrics": [
+    {
+      "baseline": 27.364,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf2_daemon_solve_s_r31_f4096",
+      "note": "complete solve, rootfind-subtract-gpu:m=2 worker=daemon vs rootfind-subtract (CPU, 1 thread), log2 r=31.3, |F_x|=4096; identical S 24151 (22198x matched rho); worker-per-run arm 0.424 s (A/A copy 0.506 s); daemon one-time start 0.38 s",
+      "reference": 0.00486,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.214
+    },
+    {
+      "baseline": 0.156,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf2_daemon_setup_s_r31_f4096",
+      "note": "oracle set-up per solve: daemon 0.002-0.004 s vs worker per run 0.156-0.251 s (CUDA context per process)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.004
+    },
+    {
+      "baseline": 0.214,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_daemon_solve_s_r31_f1024",
+      "note": "negative: rootfind-subtract-gpu:m=3 daemon vs CPU m=3 at log2 r=31.2, |F_x|=1024: 0.86x the CPU solve speed (set-up 0.215 vs 0.084 s outweighs relation phase 0.012 vs 0.107 s); S 79.8 identical (43x rho)",
+      "reference": 0.00905,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.249
+    },
+    {
+      "baseline": 79.8,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_s_r31_f1024",
+      "note": "counted S identical on CPU, spawn and daemon arms (the GPU does not change S); 43x the matched rho mean S",
+      "reference": 1.86,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 79.8
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 225932,
+      "path": "research/ic_gpu_rootfind_m3_20261115/raw/out_rm3.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/17/1742922aa6fdc0af2cebd56b8e89277e5de095690c48ccdb1728b1954314ca95",
+      "sha256": "1742922aa6fdc0af2cebd56b8e89277e5de095690c48ccdb1728b1954314ca95",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_rootfind_m3_20261115/REPORT.md",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_rootfind_m3_20261115/fig_m3.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-rootfind-m3",
+  "status": "measured",
+  "summary": "rootfind-subtract-gpu on an A100 in complete ecbench IC solves: 232/232 records verified and replayed, 128 GPU-vs-CPU pairs equal S. worker=daemon removes the per-solve CUDA start (set-up 0.16-0.25 s -> 2-4 ms): m=2 solves 20.8-127.8x the CPU, 2.0-3.5x the worker-per-run arm. m=3 (pair-table probe on the device) is correct but 0.41-0.86x the CPU solve: device set-up outweighs a small relation phase. S unchanged (m=3 43-672x rho, m=2 5847-22198x). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+  "validation": null
+}

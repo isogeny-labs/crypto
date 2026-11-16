@@ -1,0 +1,434 @@
+{
+  "schema": "bk-general-source-plan/v1",
+  "created": "2026-11-15T17:17:04.033517+00:00",
+  "formal": {
+    "project": "research/bk_general_frobenius_audit_20261115/lean",
+    "theorem": "BKGeneralFrobeniusAudit.general_frobenius_certificate",
+    "statement": "theorem general_frobenius_certificate : (∀ (F L : Type*) [Field F] [Fintype F] [Field L] [Algebra F L] [Algebra.IsAlgebraic F L] [DecidableEq L] (W : WeierstrassCurve.Affine F) (r : ℕ), Function.Bijective (actualFrobenius F L W r) ∧ ∀ P : Torsion (W.baseChange L) r, (frobeniusEquiv W r P).val = pointFrobenius W P.val) ∧ (∀ (F K L : Type*) [Field F] [Fintype F] [Field K] [Fintype K] [Field L] [Algebra F K] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [DecidableEq K] [DecidableEq L] (W : WeierstrassCurve.Affine F) (r k : ℕ) (_hc : Fintype.card K = Fintype.card F^k), Nonempty (Torsion (W.baseChange K) r ≃ₗ[ZMod r] actualFixedPower F L W r k) ∧ Finite (actualFixedPower F L W r k) ∧ Nat.card (actualFixedPower F L W r k) = Nat.card (Torsion (W.baseChange K) r) ∧ ((∀ P : (W.baseChange L).Point, r • P = 0 → P ∈ Set.range (actualPointMap F K L W)) ↔ (actualFrobenius F L W r)^k = 1)) ∧ (∀ (F L : Type*) [Field F] [Fintype F] [Field L] [Algebra F L] [DecidableEq F] [DecidableEq L] (W : WeierstrassCurve.Affine F) (r : ℕ), r.Prime → r ∣ Nat.card W.Point → ∃ P : Torsion (W.baseChange L) r, P ≠ 0 ∧ linearFrobenius W r P = P) ∧ (∀ (K : Type*) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K), Subsingleton (Torsion W 1) ∧ Nonempty (Torsion W 0 ≃+ W.Point)) ∧ (SourceNineteen.curve.Δ ≠ 0 ∧ Nat.card SourceNineteen.curve.Point = 18 ∧ addOrderOf SourceNineteen.generator = 18 ∧ IsAddCyclic SourceNineteen.curve.Point ∧ Nat.card (Torsion SourceNineteen.curve 3) = 3 ∧ Nat.card (Torsion (SourceNineteen.curve.baseChange SourceNineteen.Closure) 3) = 9 ∧ Nat.card (actualFixedPower (ZMod 19) SourceNineteen.Closure SourceNineteen.curve 3 1) = 3 ∧ actualFrobenius (ZMod 19) SourceNineteen.Closure SourceNineteen.curve 3 ≠ 1 ∧ orderOf (actualFrobenius (ZMod 19) SourceNineteen.Closure SourceNineteen.curve 3) = 3 ∧ SourceNineteen.sourceMatrix.det = (19 : ZMod 3) ∧ Fintype.card SourceNineteen.CubeField = 19^3 ∧ Nat.card (Torsion (SourceNineteen.curve.baseChange SourceNineteen.CubeField) 3) = 9) ∧ (∀ (K : Type*) [Field K] [Fintype K] [Algebra (ZMod 19) K] [Algebra K SourceNineteen.Closure] [IsScalarTower (ZMod 19) K SourceNineteen.Closure] [DecidableEq K] (k : ℕ), Fintype.card K = 19^k → ((∀ P : (SourceNineteen.curve.baseChange SourceNineteen.Closure).Point, (3 : ℕ) • P = 0 → P ∈ Set.range (actualPointMap (ZMod 19) K SourceNineteen.Closure SourceNineteen.curve)) ↔ 3 ∣ k)) ∧ (∀ P : (SourceNineteen.curve.baseChange SourceNineteen.Closure).Point, (3 : ℕ) • P = 0 → P ∈ Set.range (actualPointMap (ZMod 19) SourceNineteen.CubeField SourceNineteen.Closure SourceNineteen.curve))",
+    "decl_sha256": "1496e8cfdebbf83c0db95c47a6fd234bcd8e9f29294f9a4ae96b80b88e4be677",
+    "scope": "Actual r-killed point subgroup/canonical ZModr module for every naturalr/generalWeierstrass nonsingular-point group. Actualcoefficient pointmaps and injectivity; actual coordinateqFrobenius linear endomorphism injective inanyambientfieldextension, actuallinearautomorphism whenambientextensionalgebraic overfinitebase, inverse derivedfromofficialFrobeniusAlgEquiv. Actual fixedpowerkernel linearlyequivalent toactualcompatible chosenfinitefield K torsion atcardK=q^k; actualfinitefixedpopulation/cardinality derivedfromactualfinitepointencoding. Actualrationalnonzero fixedtorsionpoint forprimer dividingactualbasepointcount fromcreditedCauchy/injectiveinclusion; r1actualsubgrouptrivial/r0allactualpoints. No suppliedrank2/basis/determinantq/globaltorsionfiniteness/rationalityconclusion. OriginalBK1998RemarksF19knowncontrol actualy²=x³+x+6/Δnonzero/card18/generator0,5exactorder18/wholegroupcyclic/base3kernelcard3/geometrickernel9/fixedkernel3/Frobnonid despite19mod3=1 and9|18. ActualΨ3factor3(X−12)g,g=X³+12X²+13X+9 monicdegree3/19nonroots/irreducible. ActualAdjoinRootfielddim3/card6859/algebraicembedding/tower intoactualclosure; finitefieldrootpower givesx^(19³)=x; actualpointgeometry/signrigidity and creditedactual3basis giveactualFrob³id/exactorder3/source-onlydet19mod3. Everycompatiblechosenfinitefield19^kcontainsfullgeometric3torsioniff3|k; constructedcubicfieldactual3kernelcard9/minimalpositiveextensiondegree3. Kernelcounts includeinfinity, notnineexactorder3points. Knownoriginalsourceexample/establishedmodule-field-descent-AdjoinRoot-Cauchy-methods credited/no novelty. QualifiedBKsource retained; arbitraryprimerank2/generaldeterminantq/canonicalWeilnecessity/fullallkp<500population/remaining14open. Tennewmodules9concrete1adapter/24frozenlocalmodules0copies/39oldformalconfigs55oldformal-artifactpins checkedbeforeafter15states/gate. Complete2588character mainheader withtransparentactual-object aliases, no namedassignment prefix; nativefullcheck/frozenverifierunchanged. Samehost/prover/proceduralheadercheck/notkernelparser-hash-compiler-physicalhostrefinement. Standardfoundations/currentdefaultlimits/noholes/customaxioms/nativeproofeval/newglobalflags/waivers/frozenedits/cryptoPython/nativecryptoexperiment/spend/upload/canonicalpromotion/full14claim; inheritedlocalproofsettings/advisoriesretained.",
+    "sources": [
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualCriterion.lean",
+        "bytes": 4882,
+        "sha256": "f3ba6212a416b534a4841417745ebe3d73ed1c02888abb8ed2cf2fea7a8ed2cd"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualFrobenius.lean",
+        "bytes": 2094,
+        "sha256": "7f19c4896dcb2f348fef4fb18de4d7764e97b76303101c22863d7e9d1edaaf5c"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualMatrix.lean",
+        "bytes": 3338,
+        "sha256": "dc1118fec71e3e25a176da44e798721baba5385efc0e16aa14ad46edefca00f5"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/BinaryFrobenius.lean",
+        "bytes": 6838,
+        "sha256": "aa30f2493cc100239a5ddeb100634b301b95b6a21b95fb026ddb39787260a128"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/FrobeniusCertificate.lean",
+        "bytes": 4692,
+        "sha256": "9acab37c18f95fac719755b684d1acd96561a0bb9665e457b39bee0c907a9ee5"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/GenericFrobenius.lean",
+        "bytes": 2580,
+        "sha256": "15975255d4f4ac1d84be82f104c4f339c5e752923a1881b446766a883c1d464e"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/RationalTorsion.lean",
+        "bytes": 1492,
+        "sha256": "0c146876e71121a4716165bce9e3125e65cce4e9de466ab72aa9bc129835aaa4"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/CharacteristicThree.lean",
+        "bytes": 2653,
+        "sha256": "187b01e8b72494449ceb9f2fd42cd33fd10b09f85b57d14a0d695688ec8b9550"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+        "bytes": 2734,
+        "sha256": "b91669f10694a42c73ea6712da413ae4ff2ed3fe9e5d84fd5c9189cfaa189a73"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralBasis.lean",
+        "bytes": 5157,
+        "sha256": "44c162daf6bc9ea3bacb0a3e5b965d8572f4f097d60aaa215df81a452bfbbab3"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralCardinality.lean",
+        "bytes": 2400,
+        "sha256": "5caa1d00afe151a6259dc659c40295afcb128a3b3fc6234f7c27e68a8e926cd2"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralRoots.lean",
+        "bytes": 6143,
+        "sha256": "ae23e54b95ea98aa9f98d1a7f3a22d2c4fb0c4321330dd2dc36a4579e88c7f72"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralTriplePoint.lean",
+        "bytes": 4722,
+        "sha256": "f61099252ac9f05b6482e4f19559f02e9ef199fc7d44395dbb599c650bb0beb6"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeometricCardinality.lean",
+        "bytes": 2294,
+        "sha256": "139ff737ff154ca1f3952d82b4dab42512ddf382a977f76fc8e4ec301d4b2339"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/QuarticRoots.lean",
+        "bytes": 3190,
+        "sha256": "c93226b190f59c494c6b01beaeaa71c9a01036edfea09d35ebabf64915bfc1dc"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TernaryBasis.lean",
+        "bytes": 2533,
+        "sha256": "32894b1a1e4f10e6a04d06ebf02324ff999442826f4cb3a8e548a4abddbb01b9"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+        "bytes": 3715,
+        "sha256": "1dadaec158b5091e91533cf53563a17ebb39c15638ebf86587d76b893e0bf471"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lakefile.toml",
+        "bytes": 519,
+        "sha256": "af999734bbc208c01f4a5d309c6794a74fefc4af4a759d0dc966bfc35f87687d"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4154,
+        "sha256": "7b264e6be03b8ef82293d0897a321bfdb3a244b4a301ca374dba1182b6a831cf"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lakefile.toml",
+        "bytes": 520,
+        "sha256": "75482bba02323d8372112c526c6ac31c5c9ab728dc2644d23b2bf39be8fa8f42"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3245,
+        "sha256": "2cdb762e99019400e5f5792dd18fe8bbfd9056d528666fb0143f93088475213b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lakefile.toml",
+        "bytes": 282,
+        "sha256": "a8b213339113a23409463c0085eeb018856674ecb04338455d072c3d22a242d1"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3810,
+        "sha256": "eb1cf595e6547efb084a2f16644bdbd3d6a9ddd5752f9d1639396e94217bc2ea"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/BKGeneralImports.lean",
+        "bytes": 108,
+        "sha256": "06f9fbcc506f25527dfee888896a79efe07585d82990772078a56f74ccdc64fe"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/FixedFields.lean",
+        "bytes": 4444,
+        "sha256": "abb1359d42b8895deac74b9a464eba53496f721f59129176021edff204de08f5"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/GeneralCertificate.lean",
+        "bytes": 5034,
+        "sha256": "f73561c8ca92bce2c568e99e2444ed2dd8c12d6e9e716b41074a27757416aa22"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/GeneralFrobenius.lean",
+        "bytes": 4150,
+        "sha256": "4c8a4e433b6e7591ed42ce175e90acc946514bb8d7848cd77791edeb6e5d6904"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/GeneralTorsion.lean",
+        "bytes": 2932,
+        "sha256": "caafc8e86841c089513531f4a590b8de34edb342fb477f3a4a6970e4ce4ad488"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/NineteenCubic.lean",
+        "bytes": 3363,
+        "sha256": "5c306ddd9435dcf54100aca1b4f32dc1c71bcca45d4a02dd33d7f896857bc1d5"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/SourceField.lean",
+        "bytes": 2984,
+        "sha256": "b39ebc758539adb30fc81c0b562299b08f49bd5732eaabfc74c55fe366293e71"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/SourceGeometric.lean",
+        "bytes": 2765,
+        "sha256": "c283bfd39e9c969eb7f3247ee6aa2da3c9e26b7481d879bd7b08f489a6194172"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/SourceNineteen.lean",
+        "bytes": 2871,
+        "sha256": "4d0ad49bf868675909f9ea815510b87be221ff5f1c4c3a7e2cea71f115ad46ba"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/SourcePowers.lean",
+        "bytes": 4306,
+        "sha256": "870c7717d4ef6a5efc70fd0f87072c29ea4b061dc847aa401e23d7836076b23c"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4922,
+        "sha256": "a38121e0446f4c7fe17246dd34e2804866679b1e943464edd6d6b2d75a3104b3"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/lakefile.toml",
+        "bytes": 438,
+        "sha256": "8614ca360187e79c8cd6d52276ad45c8dfcf3a353d52a7b25d5ea002115a0e54"
+      },
+      {
+        "path": "research/bk_general_frobenius_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualCriterion",
+    "ActualFrobenius",
+    "ActualMatrix",
+    "BKGeneralImports",
+    "BinaryFrobenius",
+    "CharacteristicThree",
+    "DivisionQuartic",
+    "FixedFields",
+    "FrobeniusCertificate",
+    "FrobeniusFiniteExtension",
+    "FrobeniusPointDescent",
+    "GeneralBasis",
+    "GeneralCardinality",
+    "GeneralCertificate",
+    "GeneralFrobenius",
+    "GeneralRoots",
+    "GeneralTorsion",
+    "GeneralTriplePoint",
+    "GenericFrobenius",
+    "GeometricCardinality",
+    "NineteenCubic",
+    "QuarticRoots",
+    "RationalCounterexample",
+    "RationalTorsion",
+    "S3Completion",
+    "S3Roots",
+    "SourceField",
+    "SourceGeometric",
+    "SourceNineteen",
+    "SourcePowers",
+    "StructuralAudit",
+    "TernaryBasis",
+    "TorsionBoundaries",
+    "TriplePoint"
+  ],
+  "artifacts": [
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 32344,
+      "sha256": "e60ab8b7afff8e76a8f40eb3a7868783917f439259ebdf63314f58bd342c3231"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "05af53bcc1b0e323ca1a4134bbce4c379f1996378b4218a9acd5d5e4b316d76b"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/evidence/attempts.json",
+      "bytes": 230,
+      "sha256": "210d6ce58b037fd2a2350e14675cd4c769b5442574cf512a91d4c3c87a4b0faa"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 3708,
+      "sha256": "6c8d582e89d23d8c08ec9fbd68f3205de5b81fea770bea65ffe3e98bea7f6ef4"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/evidence/gate.json",
+      "bytes": 21526,
+      "sha256": "b5deecaf0b95ce12f13bfe598cec4d4de404168c3336de5d51b3bb194e49eade"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/evidence/source-review.json",
+      "bytes": 4984,
+      "sha256": "96d0e6f1c0198828baa3d32341142617f443f2f26642fc1a95aaa6aa381400fd"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/evidence/binding-check.json",
+      "bytes": 9954,
+      "sha256": "ffce7a90afe7261833f430d12cfb6f38f8d23e764d3c31cac2cbb865144d401b"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/proof-map.json",
+      "bytes": 9731,
+      "sha256": "3be956f41a4270e8f841b5fc77d13114265f3e3198fe35978a4c352d4ee83f57"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/render_report.py",
+      "bytes": 7860,
+      "sha256": "3406460de2235ce1a90c6319358fc6bdd778ee4340ac4d10592a7258c2f549a4"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/export_binding_input.py",
+      "bytes": 1739,
+      "sha256": "0bd8153a41c9318d313b2dde74f44696a84dd01b518799888b8f3d1942439e6a"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/PROTOCOL.md",
+      "bytes": 7828,
+      "sha256": "9e361586492c8ad0b277e3359210dce0b8992d2ea16204a648e7d2b15917c856"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/preflight.json",
+      "bytes": 23117,
+      "sha256": "59532b6676087463894a8136affffb454434918545a957515e68ad00124cab78"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/reports/general-frobenius.svg",
+      "bytes": 1456,
+      "sha256": "55e2cc7be2aedea060d786885f108d4acf664db779feaaf8497dba7d3e558795"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/reports/layout.json",
+      "bytes": 232,
+      "sha256": "59aaf2eb7858ac4c68910a66c8b25bbc8b6de3c972ed65b612407d4e8caeec04"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/reports/report.pdf",
+      "bytes": 47798,
+      "sha256": "8ae07093c051ce1ddfb980749b59c13dd719dc9a4a04eca1fdf9ea06637054ee"
+    },
+    {
+      "path": "research/bk_frobenius_bridge_audit_20261114/sources.json",
+      "bytes": 16010,
+      "sha256": "4429244ca0ad8918ad025a1cfa77a6d056c95654d78a70545bb49403f76ac28f"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 59,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_allr_torsion_Frobenius_module": true,
+    "actual_algebraic_ambient_Frobenius_automorphism": true,
+    "actual_fixedpower_field_torsion_linear_equivalence": true,
+    "actual_finite_fixedpopulation_derived": true,
+    "actual_rational_prime_fixedpoint": true,
+    "r1_trivial_r0_allpoints": true,
+    "source_F19_known_control_verified": true,
+    "source_F19_allk_criterion": true,
+    "source_actual_cubic_field_and_embedding": true,
+    "source_only_determinantq_derived": true,
+    "arbitrary_prime_geometric_rank2": false,
+    "general_determinantq": false,
+    "canonical_Weil_necessity": false,
+    "qualified_source_refuted": false,
+    "full_allk_p_under500_census": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}
