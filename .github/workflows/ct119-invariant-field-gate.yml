@@ -5,12 +5,14 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct119/**'
       - '.github/workflows/ct119-invariant-field-gate.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct119/**'
       - '.github/workflows/ct119-invariant-field-gate.yml'
   workflow_dispatch:
 jobs:
   ct119:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:

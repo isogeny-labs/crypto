@@ -45,6 +45,74 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+| Date | Documentary run outside admitted table | Headline measurement | Host and isolation | Study record |
+| --- | --- | --- | --- | --- |
+| 2026-11-16 | [N83 K600 zero-trial preflight](20261116-n83-k600-zero-trial-preflight/) ([run PDF](20261116-n83-k600-zero-trial-preflight/run-report.pdf), [results PDF](20261116-n83-k600-zero-trial-preflight/results-report.pdf), [SVG](20261116-n83-k600-zero-trial-preflight/diagram.svg), [150 dpi PNG](20261116-n83-k600-zero-trial-preflight/diagram.png)) | One native outer wall 4,040.215208 ms; external second-resolution endpoints span 5 s; cgroup peak 105,897,984 B of a 4,294,967,296 B limit; 0 trials, relations and SAT calls; no comparative ratio | Shared macOS ARM64 host, native supervisor plus Linux ARM64 container, one CPU, 4 GiB, no swap, no network; resource-capped preflight, not isolation-tier IC comparison | [Source-linked report and raw run receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-k600-preflight/attempt-6-zero-trial-pass/REPORT.md) |
+
+This row records a passed source/input/resource preflight. It does not report a
+factor-base search result, cold one-target IC runtime or matched rho. It is
+outside the admitted results table because it has no cryptographic outcome or
+paired reference. The earlier stopped attempts and setup builds remain in the
+study records.
+
+The [16 November N83 K600 host-native supervisor build](20261116-n83-k600-mac-supervisor-build/)
+([run PDF](20261116-n83-k600-mac-supervisor-build/run-report.pdf),
+[results PDF](20261116-n83-k600-mac-supervisor-build/results-report.pdf),
+[SVG](20261116-n83-k600-mac-supervisor-build/build-intervals.svg),
+[150 dpi PNG](20261116-n83-k600-mac-supervisor-build/build-intervals.png))
+records one shared macOS ARM64 setup build with Rust 1.99.1 and one Cargo
+job. The complete wrapper interval was 1,531 s by UTC endpoints; Cargo
+reported 1,530 s. The executable digest, 51 disk samples and terminal exit
+are in the [source-linked study report and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-k600-preflight/attempt-3-mac-supervisor-build/REPORT.md).
+There is one sample per interval and no comparative ratio. This is a
+documentary setup measurement outside the admitted results table; it does
+not report relation yield, rank, descent, matched rho or cold one-target IC
+cost.
+
+The [16 November N83 K600 source-matched charged build](20261116-n83-k600-charged-build/)
+([PDF](20261116-n83-k600-charged-build/run-report.pdf),
+[SVG](20261116-n83-k600-charged-build/build-cost.svg),
+[150 dpi PNG](20261116-n83-k600-charged-build/build-cost.png))
+records one Linux ARM64 setup build on a shared local macOS host with a hard
+12 GiB container cgroup. The outer interval was 2,978 s; Rust, solver and
+runtime-image stage intervals to receipt start were 1,540.905, 523.518 and
+199.725 s. All stages, image/source hashes and cleanup passed. There is one
+sample per interval and no comparative ratio. The [study report and raw
+receipts](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261116-charged-retry/attempt-6-build-success/REPORT.md)
+are authoritative. This documentary setup timing has no relation, rank,
+descent, matched rho or cold one-target IC result, and therefore remains
+outside the admitted results table under the validation gate.
+
+The [15 November N83 K600 v3 local-store construction control](20261115-n83-k600-v3-local-custody/)
+([PDF](20261115-n83-k600-v3-local-custody/REPORT.pdf),
+[SVG](20261115-n83-k600-v3-local-custody/custody-flow.svg),
+[150 dpi PNG](20261115-n83-k600-v3-local-custody/custody-flow.png))
+records one primary GF(2^83) base construction and independent local-store
+import: 600 signed-Frobenius columns, 99,600 points, and an exact match to
+the historical 3,025,798-byte compressed object. Construction took
+1,102.783 ms; generic replay took 753.807 ms; local publish and fresh pull
+took 36.091 and 22.700 ms; the producer's in-process wall was 1,963.477 ms.
+These are single-sample L0 diagnostics on a shared macOS arm64 Darwin 27.2.0
+host, with no comparative ratio. The [study result and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-local-custody-20261115/RESULT.md)
+are the source of truth. No relation search, matched rho or cold IC total
+runtime was measured, so this documentary record remains outside the admitted
+table; the temporary file store was not an S3 publication.
+The repository bot subsequently archived the object and PNG to its configured
+S3 artifact store; the [fresh GET and hash addendum](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-local-custody-20261115/S3_CUSTODY_ADDENDUM_20261115.md)
+records that later custody event without changing the run's scope.
+
+The [15 November K600 native read-only S3 adoption](20261115-k600-s3-adoption/)
+([PDF](20261115-k600-s3-adoption/RUN_REPORT.pdf),
+[SVG](20261115-k600-s3-adoption/timings.svg),
+[150 dpi PNG](20261115-k600-s3-adoption/timings.png)) preserves the separate
+custody control against the exact 3,025,798-byte archived object. Two fresh
+GETs from distinct empty caches and native v3 imports passed, each replaying
+99,600 points and 600 representatives. Shared Darwin arm64 L0 diagnostics:
+S3 pulls 2099.774 and 2166.021 ms; generic replays 767.248 and 765.460 ms;
+in-process walls 2907.904 and 2973.111 ms. The [study report and raw receipts](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-s3-adoption-20261115/RUN_REPORT.md)
+are authoritative. This custody measurement has no relation, rank, descent,
+cold IC total or matched rho, so it remains outside the admitted results table.
+
 The [10 November tm1514 recheck at k = 24](20261110-tm1514-recheck/)
 ([PDF](20261110-tm1514-recheck/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a
 frozen re-measurement of the ledger incumbent (`wwalkGg-x09-sr-n2`) against matched
