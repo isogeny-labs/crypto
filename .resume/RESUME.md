@@ -1,3 +1,29 @@
+# Current checkpoint:35PUBLISHED/PRUPDATED; no owned paid pod active
+
+35results7f60931a3fede3e33974070a93717b28c73b8dd9PUSHED/PR4288actual35updated
+PCCproselint0. ResultPCC7e4f97unverified; allactual35source/data/cleanup/reportbelow.
+No compiler/scientificjob/OWNpaidRunpodactive; all32/33/34/35ownpodsdeleted.
+GoalACTIVE/no stopgoal/subagents. AllfuturemeasurementsRunpod(userexplicit), Rust
+scienceonly. Privateauthpointer/tmp/ic-runpod-auth-location persists; NEVERprint
+key/headers/tokens/envresponses/passAPIkeytopod. Don'taskcredential/profileagain.
+
+NEXTsourceinspectioncompleted: residual_walk::RelationSystem::insert_by ALREADY
+skipszeropivotcoefficientsinforwardupdatesandusesnonzerosupportinbackwardupdates.
+Do NOT writearedundantwholesale sparseRREFrewrite. Normalizationstilldense;
+nextpossiblecandidateisatinyimmutablematrixreplayquantifyingzero-normalization
+orremainingcoefficient-scanworkBEFORErootintegration. Couldchooseotherleadwith
+KB/sourceevidence. No36protocol/implementation/callselectedyet. Neverassumegain,
+repriceoldrecordsorcomposecrosscohortsubtotals. KBstatus/exact/negativequeries
+unavailable/tmp/ic-sparse-rref-kb-{status,search1,search2}.log;actualsourcewasread.
+Avoidfiveminutesofspeculation; chooseoneconcretecode/datastepandexecute.
+
+7fCIread17:53workflows/statusEMPTY,requiredgatesunconfirmed;regularPR/automerge,
+no manualmerge. Nextcheck>=18:43unlesspublicationevent. ArtifactbotifPNGmigration
+inspectdiff/FF/exactsparsebenchrestore/ignoredPNGfromLOCAL/hash;neverreaddignoredPNG.
+Historical35source280manifestbindsc79, currentstudyREADMEchangedPOSTCALLasnoted.
+No outstandingfailedmeasurementtoretry. Keepgoalactive; fullrho-parityrequirements
+stillopenwithoutblockingindependentcode/experiments. Maintaincommentary<=60sec.
+
 # Current checkpoint:35COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
 
 GoalACTIVE:Rust graphIC/extension-field algebraic relationfinder work and Runpod
