@@ -11,7 +11,12 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Iso Lab EC2 Fleet request quota](isolab-ec2-fleet-request-quota-20261115.md) | open | provisioning the worker for the four-rung single-target tournament | reconcile AWS fleet-count refusal and admit the original Job within its existing deadline and limits |
+| [Original FB30 character extension](https://github.com/isogeny-labs/cryptanalysis/blob/fe91441709ba1860f8e5b0e54834f5fa0e8fd0c3/problems/chained-transfer-original-FB30-character-extension-02.md) | investigating | Collected constraints admit a finite noncharacter functional | Prospective unassisted actual-relation completion, full-population checks and separately admitted matched costs. [pcc:unverified] |
+| [Chained transfer admission and ledger synchronization](chained-transfer-admission-and-ledger-sync.md) | open | admitted solving-cost comparison,lead-atlas integration and root3877/consumer1484 merges;both frozen histories fork | checkpoint/budget access,vault binding,accepted reconciliation retaining both histories and final-head CI/review |
+| [Chained transfer workspace interruption](chained-transfer-workspace-unavailable-20261111.md) | resolved (execution/custody restored) | CT20 compatible gluing/actual Jacobian7-hop and local receipt recovery | usable execution workspace; inspect original pending records or retain fresh gated receipts |
+
+---
+
 | [Historical benchmark registry path](benchmark-record-mutable-registry-path.md) | resolved | offline archived-input availability for a reused registry path | existing guarded archive verification, matched readback and substitution controls; both records preserved |
 | [Primo has no prime-field or bit-vector route for index calculus](primo-prime-field-theory-gap.md) | open | using `primo-smt` on prime-field IC or claiming a prime-field performance advantage from the binary adapter | exact native frontend or qualified Primo theory support, SAT/UNSAT controls with independent model checks, and a matched stage benchmark |
 | [Lift to characteristic zero, reduce at a second prime p′](lift-reduce-second-prime-transfer.md) | open (proposed lead; untracked route) | deciding whether lifting to an abelian variety over a number field and reducing at a second prime can weaken a prime-field ECDLP | atlas/KB lookup for a duplicate; review of the derived g = 1 and non-torsion reductions; a bound on the field of definition of an N-torsion lift for g ≥ 2 |
@@ -167,7 +172,7 @@ cause is unknown; explicit unknowns are useful, invented explanations are not.
 - `resolved`: linked evidence meets the stated exit criteria for this specific
   obstruction. State any remaining limitations.
 - `superseded`: a linked successor now tracks this obstruction; this is not a
-  claim that it was solved.
+  claim that it was solved. [pcc:unverified]
 
 These statuses describe the problem record, not the scientific status of a
 hypothesis or the completion of a campaign. Stopping work does not resolve
@@ -176,7 +181,7 @@ a problem or authorize abandoning the user's requirement.
 Keep observations, calculations, hypotheses, resource/access/assistance gaps,
 and proved limits distinct. Bound a negative result by its exact inputs and
 search limits. A resource ceiling, missing implementation, or failed search
-does not establish a mathematical obstruction or a security theorem.
+does not establish a mathematical obstruction or a security theorem. [pcc:unverified]
 
 Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
@@ -187,9 +192,26 @@ existing review, archival, and claim-promotion rules.
 
 
 
+| [Iso Lab EC2 Fleet request quota](isolab-ec2-fleet-request-quota-20261115.md) | open | provisioning the worker for the four-rung single-target tournament | reconcile AWS fleet-count refusal and admit the original Job within its existing deadline and limits |
+
+
+
+
+
+
+
+
+  claim that it was solved.
+
+
+does not establish a mathematical obstruction or a security theorem.
+
+
+
+
+
 | [Historical genus-3 cold-target native/counting admission](genus3-cold-target-native-counted-replay.md) | open | primary cold single-target IC evaluation from the historical Python/BSGS audit | full native cover path, exact identity/map, counted matched rho, qualified execution and signed independent replay |
 
----
 
 
 
@@ -501,9 +523,6 @@ existing review, archival, and claim-promotion rules.
 
 | [Frozen chained-transfer PCC data addresses](chained-transfer-pcc-evidence-addresses.md) | resolved at feature-checkpoint CI scope | Original current-source PCC succeeds with full source/address custody; PR4396 merged40839 | Keep immutable snapshot subjects; main-ledger integration and scientific NEW28 remain separate. [pcc:unverified] |
 | [Current chained-transfer store and startup](chained-transfer-current-store-and-startup.md) | investigating | Currentb846 PCC/validation store403 and original migration startup0jobs block final-head merge; whole CI115681 retained | Original authenticated current-source pulls/upload/full replay and all unchanged merge gates; no role/identity/policy bypass. [pcc:unverified] |
-| [Original FB30 character extension](https://github.com/isogeny-labs/cryptanalysis/blob/fe91441709ba1860f8e5b0e54834f5fa0e8fd0c3/problems/chained-transfer-original-FB30-character-extension-02.md) | investigating | Collected constraints admit a finite noncharacter functional | Prospective unassisted actual-relation completion, full-population checks and separately admitted matched costs. [pcc:unverified] |
-| [Chained transfer admission and ledger synchronization](chained-transfer-admission-and-ledger-sync.md) | open | admitted solving-cost comparison,lead-atlas integration and root3877/consumer1484 merges;both frozen histories fork | checkpoint/budget access,vault binding,accepted reconciliation retaining both histories and final-head CI/review |
-| [Chained transfer workspace interruption](chained-transfer-workspace-unavailable-20261111.md) | resolved (execution/custody restored) | CT20 compatible gluing/actual Jacobian7-hop and local receipt recovery | usable execution workspace; inspect original pending records or retain fresh gated receipts |
 
 
 
@@ -512,10 +531,8 @@ existing review, archival, and claim-promotion rules.
 
 
 
-  claim that it was solved. [pcc:unverified]
 
 
-does not establish a mathematical obstruction or a security theorem. [pcc:unverified]
 
 
 
