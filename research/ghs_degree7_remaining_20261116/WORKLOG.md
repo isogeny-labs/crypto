@@ -492,3 +492,28 @@ Commit sparse receipts; freeze and run two-quadratic-pole degree-eight arm.
 ### Errors
 
 None in these four runs.
+
+## 2026-11-15 23:34 America/Los_Angeles
+
+### What was done
+
+Committed the degree-eight sparse results at `f47d00388c98`. Derived the
+two-quadratic-pole degree-eight identity with `B=LQiQj` or `L³QiQj`,
+`M=f/(LQiQj)`, and a quadratic numerator multiplier. Wrote the frozen
+protocol and exact bitset source for four carrier/source cells. Its logical
+candidate count is 3,858,261,660 per cell, represented by exact 243-bit
+sets, with twenty point controls per branch assignment. No counted run had
+started at this entry.
+
+### Decisions made
+
+Commit source before the four runs. A positive full identity requires
+independent map and subgroup replay; a null closes only these two shapes.
+
+### Open threads
+
+Run four cells, inspect any hits, and audit source/counter completeness.
+
+### Errors
+
+None in source preparation.
