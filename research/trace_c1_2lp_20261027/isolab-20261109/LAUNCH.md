@@ -61,8 +61,10 @@ The cause of the 2026-11-09 d5 failure is still unknown. The route has completed
 | reference-d4.json | 43903240817 | **failed at launch**: the build succeeded and the image was published, then `aws codebuild start-build` returned `AccountLimitExceededException: Cannot have more than 0 builds in queue for the account` (exit 254, 16:23:48Z) |
 | reference-d3.json | 43903281961 | **failed at launch**: same `AccountLimitExceededException` (16:24:16Z) |
 | reference-d2.json | 43903325505 | **failed at launch**: same `AccountLimitExceededException` (16:28:00Z) |
-| reference-d5.json | 43903192953 | still queued for a GitHub runner at 16:41Z |
+| reference-d5.json | 43903192953 | **failed before build**: it started at 17:03Z after about an hour in the GitHub queue. In the `contracts` job, "Pull store data (tools/artifacts)" got S3 `HeadObject` 403 Forbidden on every `store/sha256/...` object (exit 2), so the build and experiment jobs were skipped |
 
 The CodeBuild launcher never started, so no EKS Job, Pod or `result.json` exists and no lab compute was charged. **Measured rows: 0.**
 
 This is an AWS account-level CodeBuild limit on the lab account (104186811093, us-east-2). It is not caused by the specs or the source. Raising it is an owner action on the AWS account; this repository cannot change it. There was no resubmission.
+
+At 17:03Z the artifact-store read credentials (the `ARTIFACTS_AWS_*` secrets used by `tools/artifacts`) were denied too. The lab currently has two independent access blocks: the CodeBuild queue limit is 0, and the artifact-store S3 read returns 403. **All four sizes: 0 measured rows.**
