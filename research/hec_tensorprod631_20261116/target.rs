@@ -909,7 +909,7 @@ impl QuarticJacobian {
     }
 
     /// `x + y`; see the module documentation for the steps.
-    pub fn add_raw(&self, x: &QClass, y: &QClass) -> QClass {
+    pub fn add_raw(&self, x: &QClass, y: &QClass) -> QClass { let _phase=crate::phase::Span::new("group_add_raw");
         let fm = &self.forms;
         let p = self.p;
         let wx = self.w3(x);
@@ -939,7 +939,7 @@ impl QuarticJacobian {
     }
 
     /// `−x`: one flip against the fixed divisor `B` (`div c = 2D∞ + B`).
-    pub fn neg_raw(&self, x: &QClass) -> QClass {
+    pub fn neg_raw(&self, x: &QClass) -> QClass { let _phase=crate::phase::Span::new("group_neg_raw");
         let fm = &self.forms;
         let p = self.p;
         let wx = self.w3(x);
