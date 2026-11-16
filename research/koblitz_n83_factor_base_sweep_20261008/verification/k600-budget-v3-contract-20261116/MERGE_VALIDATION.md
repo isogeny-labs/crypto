@@ -36,12 +36,15 @@ No test was disabled or skipped to obtain a green result.
 
 The raw full-library log has 620,688 bytes and SHA-256
 `daa725e16436ccb3f4ddb244524644c1c42a7a9c5ea45833efb58053eda6cbde`.
-Its deterministic `gzip -n` copy is [`merge-lib-attempt1.log.gz`](merge-lib-attempt1.log.gz):
+Its deterministic `gzip -n` copy is named `merge-lib-attempt1.log.gz`:
 119,445 bytes, SHA-256
 `8a15039f6fbf582e6d515b937461c099ffb6a6e67946342e1f187b58ef9d46a0`.
-Decompression reproduced the raw SHA-256. If repository artifact migration
-replaces the compressed blob, use its generated manifest and verify the same
-hash before decompressing.
+Artifact migration commit `d948ea32fe88` replaced the Git blob with the
+[manifest](.artifacts.json). A fresh read-only GetObject from
+`s3://setec-astronomy-artifacts/store/sha256/8a/8a15039f6fbf582e6d515b937461c099ffb6a6e67946342e1f187b58ef9d46a0`
+returned 119,445 bytes with the expected compressed SHA-256; decompression
+reproduced the raw SHA-256. This read-back proves log custody, not a passing
+test result or authorization for a new factor-base publication.
 
 No K600 arm, relation search, rank calculation, or factor-base S3 write was
 performed by this merge validation. A full-fixture Linux run of the exact
