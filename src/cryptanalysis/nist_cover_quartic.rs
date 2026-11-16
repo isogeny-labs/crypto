@@ -163,7 +163,7 @@ impl Ecc {
         // factor n
         let mut fs: Vec<u128> = Vec::new();
         while d * d <= m {
-            while m % d == 0 {
+            while m.is_multiple_of(d) {
                 fs.push(d);
                 m /= d;
             }
@@ -173,7 +173,7 @@ impl Ecc {
             fs.push(m);
         }
         for pf in fs {
-            while ord % pf == 0 && self.mul(pt, ord / pf).is_none() {
+            while ord.is_multiple_of(pf) && self.mul(pt, ord / pf).is_none() {
                 ord /= pf;
             }
         }
@@ -255,8 +255,8 @@ fn largest_prime_factor(mut n: u128) -> (u128, u128) {
     let mut d = 2u128;
     let mut best = 1u128;
     while d * d <= n {
-        if n % d == 0 {
-            while n % d == 0 {
+        if n.is_multiple_of(d) {
+            while n.is_multiple_of(d) {
                 n /= d;
             }
             best = d;
@@ -291,7 +291,7 @@ impl Chain {
             return Err(format!("#E = {n} has no usable prime subgroup"));
         }
         for gamma in 1..=gamma_max {
-            if gamma % p == 0 {
+            if gamma.is_multiple_of(p) {
                 continue;
             }
             let f = cover_f(p, a, b, gamma);

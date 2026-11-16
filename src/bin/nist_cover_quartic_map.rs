@@ -36,7 +36,7 @@ fn find_prime_e(p: u64) -> Option<(u64, u128)> {
         let mut is_prime = n >= 2;
         let mut d = 2u128;
         while d * d <= n {
-            if n % d == 0 {
+            if n.is_multiple_of(d) {
                 is_prime = false;
                 break;
             }
