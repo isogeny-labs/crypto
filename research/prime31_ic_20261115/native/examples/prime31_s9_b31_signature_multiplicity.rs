@@ -233,6 +233,22 @@ fn panel(ar: &mut Arithmetic, base: Vec<(u64, u64)>, label: &str,
     let zero = measure(ar, &h, &pts, None, "identity_cancellation", 0, None);
     assert!(zero["positive"].as_bool().unwrap());
     rows.push(zero);
+    // Retrospective controls from independently recorded earlier two-base CI.
+    // These two Q are NOT part of the prospective 32-target sample.
+    for (case, q) in [
+        Some((854_640_086_u64, 1_374_782_344_u64)),
+        Some((1_146_958_692_u64, 202_234_633_u64)),
+    ].into_iter().enumerate() {
+        let row = measure(ar, &h, &pts, q, "retrospective_cross_base_regression", case, None);
+        if label.starts_with("dickson") {
+            assert_eq!(row["distinct_eight_net_signatures"].as_u64(), Some(0),
+                "prior Dickson nonrepresentation falsified by new exhaustive oracle");
+        } else {
+            assert!(row["positive"].as_bool().unwrap(),
+                "prior first-x representation falsified by new exhaustive oracle");
+        }
+        rows.push(row);
+    }
     json!({
         "base_kind":label,
         "factor_base":base,
