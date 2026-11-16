@@ -19,7 +19,7 @@ permissions:
 jobs:
   split-s4:
     runs-on: ubuntu-24.04
-    timeout-minutes: 9
+    timeout-minutes: 12
     env:
       RAYON_NUM_THREADS: '1'
     steps:
@@ -39,3 +39,9 @@ jobs:
       - name: Target-dependent prime31 m8 chained-S3 actual F4 versus frozen S4
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_balanced_f4_input -- --m8-s3chain-f4
+      - name: Rust APS one-relation solver algebraic correctness tests
+        timeout-minutes: 2
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
+      - name: Cold Rust APS single-relation solver on ordinary prime31
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --one
