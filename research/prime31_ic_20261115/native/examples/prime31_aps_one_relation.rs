@@ -1622,8 +1622,280 @@ fn post_jacobian_partition_screen()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// EXP-R31-S3-FACTORIZED (preregistered): x-only fibre chord-coordinate
+// roots of S3(x,z,U), with no public ordinates or EC group operations in
+// candidate discovery. This is classical E arithmetic and an explicitly
+// enumerated pair support: generic-MITM-equivalent, not novel algebraic IC.
+// Distinct abscissae are a checked invariant of the labelled source.
+fn algebraic_mode_factorized(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic
+)->Result<(Option<Solution>,Stats),String>{
+    let lookup=reverse_index(&parts[2]);
+    let mut stats=Stats::default();
+    let mut fibres:[Vec<u64>;2]=std::array::from_fn(|j|
+        Vec::with_capacity(parts[j].len()));
+    for j in 0..2 {
+        for point in &parts[j] {
+            // Only the abscissa is read; signs of fibre square roots do
+            // not affect the unordered pair of S3 coordinate roots.
+            let rhs=rhs_from_x::<true>(point.pt.0);
+            let y=sqrtp_mode::<true>(rhs)
+                .ok_or("factorized S3: public x has no rational fibre")?;
+            if mulp_mersenne(y,y)!=rhs {
+                return Err("factorized S3: invalid fibre square root".into());
+            }
+            fibres[j].push(y);
+            stats.s3_sqrt+=1;
+        }
+    }
+    for (i,left) in parts[0].iter().enumerate(){
+        let x=left.pt.0;
+        let mut denoms=Vec::with_capacity(parts[1].len());
+        let mut prefix=Vec::with_capacity(parts[1].len()+1);
+        prefix.push(1u64);
+        for right in &parts[1]{
+            let z=right.pt.0;
+            if x==z {
+                // x=z needs tangent/identity exceptional branches. The
+                // globally x-unique source must make this unreachable.
+                return Err("factorized S3: repeated x across partitions".into());
+            }
+            let diff=subp(x,z);
+            let d=mulp_mersenne(diff,diff);
+            if d==0 {return Err("factorized S3: zero denominator".into());}
+            prefix.push(mulp_mersenne(*prefix.last()
+                .ok_or("factorized S3: missing prefix")?,d));
+            denoms.push(d);
+            stats.pair_s3+=1;
+        }
+        let mut total_inverse=pownp_mode::<true>(
+            *prefix.last().ok_or("factorized S3: empty prefix")?,P-2);
+        stats.batch_inversions+=1;
+        let mut inverses=vec![0u64;denoms.len()];
+        for j in (0..denoms.len()).rev(){
+            inverses[j]=mulp_mersenne(total_inverse,prefix[j]);
+            total_inverse=mulp_mersenne(total_inverse,denoms[j]);
+        }
+        if total_inverse!=1 {
+            return Err("factorized S3: batch inversion invariant".into());
+        }
+        let u=fibres[0][i];
+        for (j,right) in parts[1].iter().enumerate(){
+            let z=right.pt.0;
+            let v=fibres[1][j];
+            let sum_x=addp(x,z);
+            let plus=addp(u,v);
+            let minus=subp(u,v);
+            let mut roots=[
+                subp(mulp_mersenne(mulp_mersenne(plus,plus),inverses[j]),sum_x),
+                subp(mulp_mersenne(mulp_mersenne(minus,minus),inverses[j]),sum_x)
+            ];
+            roots.sort_unstable();
+            for (ridx,&root) in roots.iter().enumerate(){
+                if ridx==1 && root==roots[0] {continue;}
+                if let Some(candidates)=lookup.get(&root){
+                    for &k in candidates {
+                        stats.matched_x+=1;
+                        if let Some(solution)=verify_candidate(
+                            left,right,&parts[2][k],[i,j,k],q,ar,&mut stats
+                        ){return Ok((Some(solution),stats));}
+                    }
+                }
+            }
+        }
+    }
+    Ok((None,stats))
+}
+
+fn execute_factorized_unequal(q:(u64,u64),sizes:[usize;3],round_limit:usize)
+    ->Result<serde_json::Value,String>{
+    if sizes.iter().any(|&n|n<16 || n>32_768)
+       || sizes.iter().sum::<usize>()>40_000
+       || round_limit==0 || round_limit>8{
+        return Err("factorized S3 admission limit".into());
+    }
+    let cold=Instant::now();
+    let mut ar=Arithmetic::default();
+    check_curve(PRIME31,&mut ar)?;
+    if !ar.on_curve(PRIME31,Some(q)) || q==PRIME31.g{
+        return Err("factorized S3 invalid public target".into());
+    }
+    let mut attempts=Vec::new();
+    for round in 0..round_limit{
+        let seed=SEED.wrapping_add((round as u64)
+            .wrapping_mul(0xd1b5_4a32_d192_ed03));
+        let begin=Instant::now();
+        let before=ar.counts.group_additions;
+        let (parts,identities,duplicates)=
+            source_walk_profile_jac(q,seed,&mut ar,sizes)?;
+        let source_ns=begin.elapsed().as_nanos();
+        let source_additions=ar.counts.group_additions-before;
+        let root_begin=Instant::now();
+        let before_verify=ar.counts.group_additions;
+        let (solution,stats)=algebraic_mode_factorized(&parts,q,&mut ar)?;
+        let root_ns=root_begin.elapsed().as_nanos();
+        let verify_additions=ar.counts.group_additions-before_verify;
+        let found=solution.is_some();
+        attempts.push(json!({
+            "round":round,"seed":format!("{seed:016x}"),"profile":sizes,
+            "source_setup_ns":source_ns,
+            "source_group_additions":source_additions,
+            "rejected_identity":identities,
+            "rejected_duplicate_x":duplicates,
+            "s3_query_ns":root_ns,
+            "s3_pair_quadratics":stats.pair_s3,
+            "x_fibre_precompute":true,"jacobian_source":true,
+            "s3_sqrts":stats.s3_sqrt,
+            "s3_batch_inversions":stats.batch_inversions,
+            "signed_candidates":stats.signed_candidates,
+            "verification_group_additions":verify_additions,
+            "solution":json_solution(&solution),
+            "elapsed_cold_ns":cold.elapsed().as_nanos()
+        }));
+        if found{
+            return Ok(json!({
+                "standing":"[pcc:unverified]",
+                "method":"published APS one relation; factored x-fibre S3 roots",
+                "classification":"generic decomposition / explicit pair support",
+                "p":P,"n":N,"cofactor":1,"public_Q":q,
+                "profile":sizes,"round_cap":round_limit,
+                "complete_target_scalar_recovered":true,
+                "known_answer_in_solver":false,
+                "cold_wall_ns":cold.elapsed().as_nanos(),
+                "attempts":attempts
+            }));
+        }
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "method":"published APS one relation; factored x-fibre S3 roots",
+        "classification":"generic decomposition / explicit pair support",
+        "p":P,"n":N,"cofactor":1,"public_Q":q,
+        "profile":sizes,"round_cap":round_limit,
+        "complete_target_scalar_recovered":false,
+        "status":"bounded_exhaustion",
+        "cold_wall_ns":cold.elapsed().as_nanos(),
+        "attempts":attempts
+    }))
+}
+
+fn factorized_s3_confirmation()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const PROFILE:[usize;3]=[384,384,16_384];
+    let mut rng=0x4633_4348_4f52_4430u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut totals=[0u128;3];
+    let mut sources=[0u128;3];
+    let mut queries=[0u64;3];
+    let mut completed=[0usize;3];
+    let mut paired_wins=0usize;
+    let mut cases=Vec::with_capacity(CASES);
+    for case in 0..CASES{
+        let known=loop{
+            let k=prng(&mut rng)%N;
+            if k>1 && used.insert(k){break k;}
+        };
+        let q=verifier.scalar(PRIME31,known,Some(PRIME31.g))
+            .ok_or("factorized S3 fixture Q identity")?;
+        let order:[usize;3]=std::array::from_fn(|i|(i+case%3)%3);
+        let mut times=[0u64;3];
+        let mut reference:Option<Vec<serde_json::Value>>=None;
+        let mut arms=Vec::with_capacity(3);
+        for (position,&arm) in order.iter().enumerate(){
+            let run=if arm==0{
+                execute_unequal_profile_source(q,PROFILE,6,true,true)?
+            }else{
+                execute_factorized_unequal(q,PROFILE,6)?
+            };
+            let attempts=run["attempts"].as_array()
+                .ok_or("factorized S3 missing attempt array")?;
+            let complete=run["complete_target_scalar_recovered"].as_bool()==Some(true);
+            let found=attempts.last().and_then(|v|v.pointer("/solution/log"))
+                .and_then(|v|v.as_u64());
+            if !complete || found!=Some(known)
+              || verifier.scalar(PRIME31,found.unwrap_or(0),Some(PRIME31.g))!=Some(q){
+                return Err(format!("factorized S3 failed complete public log, case={case}, arm={arm}"));
+            }
+            let signatures=attempts.iter().map(|a|json!({
+                "round":a["round"],"seed":a["seed"],
+                "rejected_identity":a["rejected_identity"],
+                "rejected_duplicate_x":a["rejected_duplicate_x"],
+                "s3_pair_quadratics":a["s3_pair_quadratics"],
+                "s3_sqrts":a["s3_sqrts"],
+                "s3_batch_inversions":a["s3_batch_inversions"],
+                "signed_candidates":a["signed_candidates"],
+                "solution":a["solution"]
+            })).collect::<Vec<_>>();
+            if let Some(ref incumbent)=reference{
+                if &signatures!=incumbent{
+                    return Err(format!("factorized S3 changed the exact signed relation transcript, case={case}, arm={arm}"));
+                }
+            }else{
+                reference=Some(signatures);
+            }
+            completed[arm]+=1;
+            let t=run["cold_wall_ns"].as_u64()
+                .ok_or("factorized S3 missing cold wall")?;
+            times[arm]=t;
+            totals[arm]+=t as u128;
+            let source=attempts.iter().map(|a|
+                a["source_setup_ns"].as_u64().unwrap_or(0) as u128).sum::<u128>();
+            sources[arm]+=source;
+            let query=attempts.iter().map(|a|
+                a["s3_pair_quadratics"].as_u64().unwrap_or(0)).sum::<u64>();
+            queries[arm]+=query;
+            arms.push(json!({
+                "arm":arm,"position":position,
+                "full_cold_ns":t,"source_total_ns":source.to_string(),
+                "pair_queries":query,"recovered_log":found,
+                "all_paid_rounds":attempts
+            }));
+        }
+        if times[1]<times[0]{paired_wins+=1;}
+        cases.push(json!({
+            "case":case,"public_target":q,
+            "known_scalar_caller_verifier_only":known,
+            "chronological_arms":arms
+        }));
+    }
+    let drift=(totals[2] as f64/totals[1] as f64-1.0).abs();
+    let candidate_ratio=totals[1] as f64/totals[0] as f64;
+    let passes=completed==[CASES;3] && drift<=0.05
+        && candidate_ratio<=0.90 && paired_wins>=18;
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "experiment":"prospective same-host prime31 S3 chord-coordinate factorization",
+        "classification":"generic decomposition: published APS one-relation with MITM equivalent pair enumeration",
+        "p":P,"n":N,"cofactor":1,"profile":PROFILE,
+        "cases":CASES,"round_cap":6,
+        "public_seed":"0x463343484f524430",
+        "arms":["old_S3_coefficient_xfibre","new_factorized_xfibre","new_factorized_repeat"],
+        "complete_cold_per_target":true,
+        "all_failed_rounds_charged":true,
+        "identical_signed_relation_transcripts":true,
+        "completed_solves_per_arm":completed,
+        "cold_total_ns":totals.map(|t|t.to_string()),
+        "source_total_ns":sources.map(|t|t.to_string()),
+        "s3_pair_quadratics":queries,
+        "candidate_ratio_to_incumbent":candidate_ratio,
+        "candidate_aa_drift":drift,
+        "candidate_paired_wins":paired_wins,
+        "passes_preregistered_exploratory_gate":passes,
+        "requires_fresh_confirmation_and_independent_pcc":true,
+        "cases_detail":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--factorized-s3-confirm" {
+        let result=factorized_s3_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--post-jac-profile" {
         let result=post_jacobian_partition_screen()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -1940,5 +2212,61 @@ mod tests {
         assert_eq!(addn(alpha,muln(bb,k)),0);
         assert_eq!(muln(subn(0,alpha),pown(bb,N-2,N)),k);
         assert!(aa<N);
+    }
+}
+
+
+#[cfg(test)]
+mod factorized_coordinate_tests {
+    use super::*;
+    #[test]
+    fn factorized_roots_match_original_s3_and_complete_labelled_solver(){
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let (parts,_,_)=source_walk_profile_jac(
+            PUBLIC_Q,SEED,&mut ar,[384,384,16_384]).unwrap();
+        for l in parts[0].iter().take(48){
+            for r in parts[1].iter().take(48){
+                let x=l.pt.0;
+                let z=r.pt.0;
+                assert_ne!(x,z);
+                let u=sqrtp_mode::<true>(rhs_from_x::<true>(x)).unwrap();
+                let v=sqrtp_mode::<true>(rhs_from_x::<true>(z)).unwrap();
+                let denom=mulp_mersenne(subp(x,z),subp(x,z));
+                let inv=pownp_mode::<true>(denom,P-2);
+                let sumx=addp(x,z);
+                let plus=addp(u,v);
+                let minus=subp(u,v);
+                let mut got=[
+                    subp(mulp_mersenne(mulp_mersenne(plus,plus),inv),sumx),
+                    subp(mulp_mersenne(mulp_mersenne(minus,minus),inv),sumx)
+                ];
+                got.sort_unstable();
+                let f=s3_coeff_mode::<true>(x,z);
+                assert_eq!(f.2,denom);
+                assert_eq!(s3_eval_mode::<true>(f,got[0]),0);
+                assert_eq!(s3_eval_mode::<true>(f,got[1]),0);
+                let disc=subp(mulp_mersenne(f.1,f.1),
+                    mulp_mersenne(4,mulp_mersenne(f.2,f.0)));
+                let droot=sqrtp_mode::<true>(disc).unwrap();
+                let dinv=pownp_mode::<true>(mulp_mersenne(2,denom),P-2);
+                let mut expected=[
+                    mulp_mersenne(subp(droot,f.1),dinv),
+                    mulp_mersenne(subp(subp(0,droot),f.1),dinv)
+                ];
+                expected.sort_unstable();
+                assert_eq!(got,expected);
+            }
+        }
+        let mut old_ar=Arithmetic::default();
+        let mut new_ar=Arithmetic::default();
+        let (old,old_stats)=
+            algebraic_mode_precomp::<true,true>(&parts,PUBLIC_Q,&mut old_ar).unwrap();
+        let (new,new_stats)=
+            algebraic_mode_factorized(&parts,PUBLIC_Q,&mut new_ar).unwrap();
+        assert_eq!(old.as_ref().map(|s|s.log),new.as_ref().map(|s|s.log));
+        assert_eq!(old.as_ref().map(|s|s.indices),new.as_ref().map(|s|s.indices));
+        assert_eq!(old.as_ref().map(|s|s.signs),new.as_ref().map(|s|s.signs));
+        assert_eq!(old_stats.pair_s3,new_stats.pair_s3);
     }
 }
