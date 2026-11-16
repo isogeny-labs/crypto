@@ -64,3 +64,24 @@ New focused GitHub Actions development workflow `.github/workflows/prime31-s4-sp
 4. **Published:** Petit–Kosters–Messeng, PKC 2016, DOI 10.1007/978-3-662-49387-8_1 (prime-field rational-map/summation polynomial IC); Amadori–Pintore–Sala, FFA 2018, DOI 10.1016/j.ffa.2018.01.009 (one-factor-base-relation alternative). Rewriting S4 as chained S3 is classical resultant algebra and no novelty is claimed. Journal metadata/abstracts and the published PKM paper were consulted; full APS text was not authenticated here. KB MCP and repo wrapper unavailable: **bounded** review, not exhaustive novelty search.
 
 **Proper frontier-first protocol**: compare complete, exact-output target-dependent algebraic queries on matched inputs against PKM-style, APS-style, native dense/tower F4 and the certified quotient worker; external msolve/Singular for mature Gröbner engine claims. Do not invent APS runtime numbers if that arm is not implemented. Then require actual natural-positive signed m8 rows, enough independent rank to solve 31 base logs plus unknown Q, twelve held-out cold unknown target recoveries, complete setup/failures/linear algebra/verification, and finally matched optimized Rust negation-rho as a *separate* whole-ECDLP security control. Any independent PCC endorsement requires a separate verifier.
+
+
+## Actual Rust development execution — negative F4 presentation result
+
+**Exact PR-source job:** [GitHub Actions 43783635698](https://github.com/isogeny-labs/crypto/actions/runs/43783635698), job `133026303660`, head `b4b19f5afbc498cb50d54ccde4b061c95e13acee`, checked-out PR merge `4991909c` over base `92b7b35f`; completed **success** 2026-11-16 01:01 UTC. This qualified **source-specific development execution** (not independent scientific PCC): 40/40 Rust release library tests passed and both new Rust modes compiled and ran. Exact stdout and F4 counters are frozen in [S4_S3_CHAIN_CI_EVIDENCE_20261116.json](S4_S3_CHAIN_CI_EVIDENCE_20261116.json). No raw stage time is called cold IC or used as a completed-ideal speed ratio.
+
+| Frozen original-curve Rust ideal | Status | F4 degree reached | Partial F4 muladds | Reported attempted/peak dense reducer |
+|---|---|---:|---:|---:|
+| Single S4 resultant, 3 towers + u | **oversize / undetermined** | 10 | 14,129 | 2,571 previously accepted |
+| Two S3s with pair (0,1), 3 towers + u,h | **oversize / undetermined** | 6 | 30,993 | 30,969 attempted |
+| Two S3s with pair (0,2) | **oversize / undetermined** | 6 | 30,993 | 30,966 attempted |
+| Two S3s with pair (1,2) | **oversize / undetermined** | 6 | 30,993 | 30,964 attempted |
+| Complete conditional m8 old two S4s + target S4, fixed positive w | **oversize / undetermined** | 10 | 56,211 | 10,229 previously accepted |
+| Conditional m8 four S3s + target S4, fixed positive w | **oversize / undetermined** | 5 | 41,032 | 17,433 attempted |
+| Same conditional m8 S3 chain, seven public-Q w controls | **7/7 oversize / undetermined** | 5 | 41,032 **each** | 17,433 attempted **each** |
+
+All 3 single-side chained presentations retained the original signed witness and all 8 conditional m8 branches executed without invalid known-positive refutation. **No chained arm completed the ideal, no roots were extracted, and no independent relation rows or scalar were recovered.** The caps and internal F4 clocks are stage diagnostics only. The original S4 single-side and full conditional m8 controls **also failed** to complete, so neither 30,993 versus 14,129 nor 41,032 versus 56,211 is a valid completed-work speed ratio.
+
+**Decision:** This particular low-degree S3 chain does **not** fix the early F4 matrix blockage. Its three single-side variants consistently hit a larger attempted reducer around 30,965 entries at degree six, while the full conditional m8 S3 presentation also crosses 15k (17,433) by degree five. Changing the order of the initial pair did not give a gate breakthrough on this fixture. Increasing budget or merely cycling all w-roots before changing the fixed-ideal engine would repeat known censorship; do not claim an IC gain.
+
+**Next discriminating mathematical/engineering gate:** move *target-conditioned* elimination into the **certified quotient/subresultant/selected-root** engine from the now-merged #4228 and open #4349, but first establish the missing supported 31-bit field route. Preserve exact original-ideal certificates, exceptional saturation, full rational root lifting and independent rank. Compare completed calls at identical inputs against PKM/APS algebraic IC frontier, then the complete cold-target cost independently. This experiment has closed the straightforward low-degree-vs-resultant presentation hypothesis at the registered cap, not ruled out other presentations or stronger solvers.
