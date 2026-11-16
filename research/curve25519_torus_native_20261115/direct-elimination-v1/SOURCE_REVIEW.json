@@ -1,0 +1,62 @@
+{
+  "schema": "curve25519.solver-source-review/v1",
+  "standing": "producer unsigned/unverified",
+  "source_snapshots": [
+    {
+      "path": "src/cryptanalysis/f4_prime_dynamic.rs",
+      "commit": "d4f4da8bbfdec953f0b60b26aa5acc8173bccc3d",
+      "blob": "7e157f2cc7ebf1cb5b801c8aa64e433cf430638c",
+      "sha256": "baaf522e19f51c5ee07e0b6b1db77a7865a752ed1806b61cd7dfd6fbc9d3abb5",
+      "bytes": 80860
+    },
+    {
+      "path": "src/cryptanalysis/fp_backend.rs",
+      "commit": "d4f4da8bbfdec953f0b60b26aa5acc8173bccc3d",
+      "blob": "09fb5cece2f6dec8a73037ac97ecac1338883836",
+      "sha256": "2722bbf0c1e58a079772af71680aabc514f7354e8b51bb3ed10ca5729a0da0e1",
+      "bytes": 109960
+    },
+    {
+      "path": "src/cryptanalysis/groebner_f4.rs",
+      "commit": "d4f4da8bbfdec953f0b60b26aa5acc8173bccc3d",
+      "blob": "dde515af115c89ff08ae91e2fe09117324d02875",
+      "sha256": "576eceef9f2abd24ec8fadb2c14f74e7bcca9db57999c7978ed6485503c18c4e",
+      "bytes": 21219
+    },
+    {
+      "path": "src/cryptanalysis/symmetrized_semaev.rs",
+      "commit": "d4f4da8bbfdec953f0b60b26aa5acc8173bccc3d",
+      "blob": "0658181f5ff7717cfef4ca83ae3a77b222f8d7be",
+      "sha256": "cd24d3edf9480a418e104def8db2d8fe0357afa173ff9fd4737a39b959340ca5",
+      "bytes": 20423
+    }
+  ],
+  "archive": {
+    "path": "source-review-context.tar.xz",
+    "sha256": "722c9dd1b69f199e283c7f897e5bdbc9f61913d99aa2fcf8bc35af1ddb4c5e22",
+    "bytes": 48372
+  },
+  "primary_sources": [
+    {
+      "url": "https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf",
+      "read": "sections4/5 and construction; low-degree compositional bases and generalized root-finding; no transferred complexity bound"
+    },
+    {
+      "url": "https://arxiv.org/pdf/1503.08001",
+      "read": "Proposition2.1 and complexity warning; no transfer of variable-arity hardness to the fixed-six target law"
+    },
+    {
+      "url": "https://msolve.lip6.fr/",
+      "read": "official0.11.0 landing page/features only; exact prime-width support not established"
+    }
+  ],
+  "facts": [
+    "dynamic F4 interface uses MAX_VARIABLES28 and concrete borrowed Fp64Arithmetic withu64 coefficients",
+    "generic try_buchberger declares STEP_CAP5000; this does not bound every allocation or field operation"
+  ],
+  "decisions": [
+    "new adapter must support the exact255-bit modulus and dynamic sparse monomials",
+    "register exact work/allocation/refusal/root-replay protocol before implementation",
+    "all new source capability/cost hypotheses remain pending; no engine was run in this review"
+  ]
+}

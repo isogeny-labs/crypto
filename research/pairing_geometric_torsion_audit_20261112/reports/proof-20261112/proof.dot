@@ -1,0 +1,20 @@
+digraph proof {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.22", ranksep="0.32"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fb", color="#37618b", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.09"];
+  edge [color="#4d6780", arrowsize=0.7];
+  finite [label="Frozen actual F25 arithmetic\nNine torsion points; actual P,Q basis"];
+  roots [label="Explicit coordinate factors\nx=0 or x^3=1; y=+/-1 or +/-beta"];
+  descent [label="Actual point base change\nNonsingularity reflects; all 3-torsion descends"];
+  iso [label="Actual additive equivalence\nE(F25)[3] = E(K)[3] under the embedding"];
+  closed [label="Algebraically closed K / F5\nEmbedding constructed by IsAlgClosed.lift"];
+  geom [label="Geometric torsion has nine points\nActual basis (Z/3)^2; no rank premise", fillcolor="#e9f5ec"];
+  frob [label="Frobenius commutes with point map\nActual matrix (a,b) -> (a,-b)", fillcolor="#e9f5ec"];
+  rational [label="Actual F5-rational image\nPrecisely b=0", fillcolor="#e9f5ec"];
+  boundary [label="Open: all-curve BK; canonical pairing divisors;\ngeneral MOV / Frey-Ruck; p<500 census", fillcolor="#fff3de", color="#996c27"];
+  finite -> roots -> descent -> iso -> geom;
+  closed -> geom;
+  finite -> frob;
+  iso -> frob -> rational;
+  geom -> boundary [style=dashed, arrowhead=none];
+  rational -> boundary [style=dashed, arrowhead=none];
+}

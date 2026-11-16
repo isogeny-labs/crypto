@@ -1,0 +1,42 @@
+[
+  {
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "ledger",
+      "verify",
+      "--base",
+      "origin/main"
+    ],
+    "exit_code": 0,
+    "stdout": "ledger: 1094 entries, chain ok\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check",
+      "--cached",
+      "origin/main",
+      "--",
+      "docs/session-logs/2026-11-15.md",
+      "research/single_relation_reduction_20261115"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "lint-prose",
+      "--stdin"
+    ],
+    "input": "research/single_relation_reduction_20261115/checks/pr-body007.md",
+    "exit_code": 0,
+    "stdout": "lint-prose: 0 finding(s)\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,202 @@
+{
+  "schema": "weighted-cycle-source-plan/v1",
+  "created": "2026-11-14T10:12:16.168757+00:00",
+  "formal": {
+    "project": "research/weighted_cycle_coupling_audit_20261114/lean",
+    "theorem": "WeightedCycleCouplingAudit.weighted_cycle_certificate",
+    "statement": "theorem weighted_cycle_certificate : (∀ (I : Type) [Fintype I] (q : PMF I), labelPair q = q.bind (fun i => q.map (fun j => (i,j)))) ∧ (∀ (I : Type) [Fintype I] (n : ℕ) [NeZero n] (q : PMF I) (g : I → ZMod n) (t : ℕ) (f : ZMod n → ℝ) (x : ZMod n), expectation (kernelLaw q (incrementStep g) t x) f = weightedAverage q (incrementStep g) t f x) ∧ (∀ (I : Type) [Fintype I] (n : ℕ) (q : PMF I) (g : I → ZMod n) (a b : I) (t : ℕ) (f : ZMod n → ℝ) (x y : ZMod n), weightedAverage (labelPair q) (coupledLabelStep g a b) t (fun s => f s.1) (x,y) = weightedAverage q (incrementStep g) t f x ∧ weightedAverage (labelPair q) (coupledLabelStep g a b) t (fun s => f s.2) (x,y) = weightedAverage q (incrementStep g) t f y) ∧ (∀ (I : Type) [Fintype I] (p : ℕ) [Fact p.Prime] (q : PMF I) (g : I → ZMod p) (a b : I), g a ≠ g b → ∀ s : ZMod p × ZMod p, pairMean q (fun z => normalizedPotential g a b (coupledLabelStep g a b z s)) = normalizedPotential g a b s-(2*weight q a*weight q b)*mismatch s) ∧ (∀ (I : Type) [Fintype I] (p : ℕ) [Fact p.Prime] (q : PMF I) (g : I → ZMod p) (a b : I), 0 < weight q a → 0 < weight q b → g a ≠ g b → ∀ t : ℕ, 0 < t → ∀ (x : ZMod p) (A : Finset (ZMod p)), abs (probability q g t x A-(A.card : ℝ)/p) ≤ (p : ℝ)^2/(8*weight q a*weight q b*t)) ∧ (∀ (I : Type) [Fintype I] [Nontrivial I] (w : I → NNReal) (hw : ∑ i, w i = 1), (∀ i, 0 < w i) → ∀ ε : ℝ, 0 < ε → ∃ γ : ℝ, 0 < γ ∧ ∀ (p : ℕ) [Fact p.Prime] (g : I → ZMod p), Function.Injective g → ∀ t : ℕ, γ*(p : ℝ)^2 ≤ t → ∀ (x : ZMod p) (A : Finset (ZMod p)), abs (probability (labelLaw w hw) g t x A-(A.card : ℝ)/p) < ε) ∧ Function.Injective compositeIncrements ∧ (∀ i : Bool, weight fairCoin i = 1/2) ∧ evenEvent.card = 2 ∧ (∀ t : ℕ, abs (probability fairCoin compositeIncrements t 0 evenEvent- (evenEvent.card : ℝ)/4) = 1/2) ∧ (¬ ∃ γ : ℝ, 0 < γ ∧ ∀ t : ℕ, γ*(4 : ℝ)^2 ≤ t → ∀ (x : ZMod 4) (A : Finset (ZMod 4)), abs (probability fairCoin compositeIncrements t x A-(A.card : ℝ)/4) < 1/4)",
+    "decl_sha256": "6392c4699f5b7f881febf34a2c29b4bc3ec709fca57e48741aae00f803125fe9",
+    "scope": "QualifiedHildebrand1994Theorem2uniformquadraticmixing: anyfixedfinitek>=2 normalizedstrictlypositive NNReal weightvector, actualconstructedlabelPMF and independent iteratedincrement law, allprimemoduli/allinjectivesupports/allstartingpoints/allevents. Positiveepsilon constantgamma dependsweights/epsilon notmodulus/support; allintegert>=gamma*p² give strictdistance<epsilon. Explicitstrongerquantitativebound p²/(8w_a*w_b*t)foranyactualfinitePMF with two positiveweights/distinctprimefieldincrements. ActualproductlabelPMFequalstwoindependentbinds; equalproductmass transposition coupling/bothalltimemarginalexpectations/coalescence/normalizedZModdifference/potentialdrift2w_a*w_b/uniformstationarity derived. ActualcompositeZMod4distinctincrements0/2/bothhalfweights confined{0,2}/card2/eventdistance1/2alltime/directnoquadraticconstant after deletingprimemodulus. Sourcealreadywarnscompositesubgroups, no noveltyclaim. FullpublishedHildebrand13pagesread/visuallyinspected; LPWselectedcouplingmethodcredited. StrongerrandomsupportTheorem1exponent/staticrho/collisionlaws notproved/refuted; possibleLemma4k2issueonlycandidateoutsidecurrentproof. Standardfoundations/defaultlimits/noholes/customaxioms/nativeeval/raisedlimits/newglobalflags/waivers/nativeexperiment/paidcompute/upload.",
+    "sources": [
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/CycleGeometry.lean",
+        "bytes": 3091,
+        "sha256": "0f72ae19b1db96d1df095815efef07ef9b028c4b03ab6990c226f7acad35e38c"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/CycleMixing.lean",
+        "bytes": 5528,
+        "sha256": "87b3d3e087e26ffaff9dad99d1778ef3777dd49cbd10fb97bfd9570d99da05c3"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/FairKernel.lean",
+        "bytes": 4718,
+        "sha256": "b52bbe21e0157df1def29b77daa23dc6ba816ccd2abfe42ac29c9e885d0659bd"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/LabelCoupling.lean",
+        "bytes": 4909,
+        "sha256": "e9bc1101aa8b998f26ed6d85b5c16d95218b2f600369da5c373cc25974939068"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/NormalizedDrift.lean",
+        "bytes": 3748,
+        "sha256": "02f0ce69de9b768c5d7e1db7aa411e62e8045c42b40f1f449de6fb328afb3d89"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/SourceAndControl.lean",
+        "bytes": 3217,
+        "sha256": "97b3c2628308e7cda8bb00f5ef3e257423e9e740b2af47b34c1f3c2e95132864"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedCycle.lean",
+        "bytes": 7435,
+        "sha256": "c0150a51ac5409bc122333c09bde0c5a8b05b07d875d4d72e79dcc2f2f20a754"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedCycleCertificate.lean",
+        "bytes": 3341,
+        "sha256": "ee0671ed15a207a5a6b297cb4a5964beaa367174458e66f5232f9435b8a4dea4"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedKernel.lean",
+        "bytes": 5558,
+        "sha256": "22c81842c4402fc536128b11218617d9b63bf90bb648d65ee941e48f305c3fed"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 376,
+        "sha256": "e78ce13d461503c1e1cfcd78289586d99f17f00c1a757f4e0b2d61e0d430e129"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3690,
+        "sha256": "0bb802dd0905e950265a6f107ceff9f534c12d5036a89a552d643b0508f447f8"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 306,
+        "sha256": "5cf902fcb4908f6a1935ba0cd3735d4e91e2c4d2a1ba37617302439679d91af1"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3397,
+        "sha256": "c1f50dd86468022811659b7d11f1bc3e613ece5e63048a972635635f8bd5bb91"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CycleGeometry",
+    "CycleMixing",
+    "FairKernel",
+    "LabelCoupling",
+    "NormalizedDrift",
+    "SourceAndControl",
+    "WeightedCycle",
+    "WeightedCycleCertificate",
+    "WeightedKernel"
+  ],
+  "artifacts": [
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 20486,
+      "sha256": "1b0fe11702d32bc02c1de2f1dbba75553f96da9b69bb0f51a531a4f58c09ec26"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/evidence/attempts.json",
+      "bytes": 18675,
+      "sha256": "d5b0777652f8fe7ae0114a3a3788584861ea41d097dd60b2b2e3dc250967cf26"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1206,
+      "sha256": "e7a4c4cabb586389157d1cdd5c31242c3a5d63d08913948498840923cca02380"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/evidence/gate.json",
+      "bytes": 1263,
+      "sha256": "3b55e928bc3a14143812411f351d7b0e7447787201a06f485ea213f54edd4870"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/evidence/source-review.json",
+      "bytes": 6174,
+      "sha256": "aca495acf2d6f8117b7f6d73e037e2117f3613be0ee6010794db2ea415239553"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/proof-map.json",
+      "bytes": 2379,
+      "sha256": "ce0e7eddfed85fd6de80a4dae5c036e86852e1c073934921140e046701053843"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/render_report.py",
+      "bytes": 6303,
+      "sha256": "d5e27be49c315d4187271327cdd6a7762d643efa7c5e68efd344d9c80f24ebc7"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/restore_attempts.py",
+      "bytes": 1016,
+      "sha256": "f7f877a20ba801a14592f27377e5ec1d142d77fd91e8346130995731b8adfbe4"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/reports/layout.json",
+      "bytes": 268,
+      "sha256": "ca06f9bf9e668325bc43f9e3c5b0632ad9fc7ac3d65a56c5a5161db8e1621300"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/reports/report.pdf",
+      "bytes": 47254,
+      "sha256": "bf5482afac35ee69a94e725f1d7bec7ce75c3469a2334e4b11b017e8c9de9c00"
+    },
+    {
+      "path": "research/weighted_cycle_coupling_audit_20261114/reports/weighted-cycle-bound.svg",
+      "bytes": 1401,
+      "sha256": "363443fe9a2343138aae3d3cda822209370c704ea9b5eaaf731f01082ba99841"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 59,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "qualified_uniform_Hildebrand_theorem_two_proved": true,
+    "arbitrary_positive_fixed_weight_vector_and_support_size": true,
+    "actual_product_independence_and_marginal_expectations": true,
+    "actual_potential_and_uniform_stationarity": true,
+    "explicit_weight_dependent_constant": true,
+    "actual_prime_deletion_counter": true,
+    "qualified_source_refuted": false,
+    "stronger_random_support_theorem_one_proved": false,
+    "static_rho_or_collision_law_proved": false,
+    "full_Hildebrand_primary_read_and_inspected": true,
+    "full_LPW_book_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

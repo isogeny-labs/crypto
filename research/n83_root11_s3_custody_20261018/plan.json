@@ -1,0 +1,47 @@
+{
+  "schema": "n83.root11-s3-custody-plan/v1",
+  "source_run_id": "39061060775",
+  "source_commit": "9b9a0f3842de6cf921e38573cb99fcaed2a4683c",
+  "source_artifacts": [
+    {"stratum": 0, "artifact_id": 12117791208, "zip_sha256": "333b8d9b4ab4c26721a2d54d5deccc1fc8b4123c4c198113f6fe933f1426816d"},
+    {"stratum": 1, "artifact_id": 12117767580, "zip_sha256": "36a03a4609c21756d6fc0a948e3121ab65d24df85d48a3498b9fc43c055c8155"},
+    {"stratum": 2, "artifact_id": 12117189785, "zip_sha256": "0c03a53b49831f9b2d387eecb0b8459c29b097567702746f23c798b5dbfce9c1"},
+    {"stratum": 3, "artifact_id": 12117837188, "zip_sha256": "7f2e1cf81fee4511057976f31ef2513f54ebb966bce3b05ebe8ba47f646b3084"}
+  ],
+  "curve": {
+    "n": 83,
+    "a": 1,
+    "field_modulus_low_terms": [0, 2, 4, 7],
+    "subgroup_order": 8569786107849059,
+    "kind": "point_defined_factor_base"
+  },
+  "destination_bucket": "crypto-autoresearcher",
+  "destination_prefix": "factor-bases/icv1/etc/n83_root11_tier1_20261018/a1/objects/",
+  "points_per_orbit_column": 166,
+  "expected_copies_per_arm": 32,
+  "arms": [
+    {
+      "role": "k2816root11",
+      "candidate_id": "IC1N83Ckb1a1fb467456PDP4rootRCguidedLAgaussTDdirectISO0hf693b1b33c8b",
+      "candidate_manifest_path": "research/n83_intermediate_factor_base_holdout_20261017/candidate_IC1N83Ckb1a1fb467456PDP4rootRCguidedLAgaussTDdirectISO0hf693b1b33c8b.json",
+      "candidate_manifest_sha256": "257bdf475bf2caf7abd488849f9948b0bae89762ff56a197afd0c9a0af709e0f",
+      "orbit_columns": 2816,
+      "point_count": 467456,
+      "base_hash": "9208460bf63be634f0aee6091abaaed855e05004fc2894e28a9c1fd394c35ec4",
+      "raw_sha256": "e3b9a30d57ee61a31ae5b80d585ba6aee55475654062ad8dda17693a38adc5cb",
+      "raw_bytes": 38121432
+    },
+    {
+      "role": "k3072root11",
+      "candidate_id": "IC1N83Ckb1a1fb509952PDP4rootRCguidedLAgaussTDdirectISO0hec7ae07d8b9a",
+      "candidate_manifest_path": "research/n83_smallk_challenge_20261017/candidate_IC1N83Ckb1a1fb509952PDP4rootRCguidedLAgaussTDdirectISO0hec7ae07d8b9a.json",
+      "candidate_manifest_sha256": "3259e58a238ca9e802d789ec840d0e2bf8c052271ae58b78384bec39b2216e1a",
+      "orbit_columns": 3072,
+      "point_count": 509952,
+      "base_hash": "c5511247735bc183359d5425c4dd794aaad49ad38d2ca964799e1caa76afaa08",
+      "raw_sha256": "a58965693e46b7af7e8de7852649c101d51f70854473459c99b5e8a8c6692874",
+      "raw_bytes": 41603811
+    }
+  ],
+  "selected_best_total_runtime": null
+}

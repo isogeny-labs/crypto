@@ -51,3 +51,24 @@ and fresh replay exit0; its matrix base/rank obligations and separate broader
 research objective remain open. Those unsigned component checks do not resolve
 this integration conflict or imply a mathematical impossibility
 [pcc:unverified].
+
+
+
+
+
+## 2026-11-16: external PR4378 merge audit
+
+The read-only [round-one merge audit](../research/prime_field_transfer_goal_20261116/receipts/round-02/round01-external-merge-audit.json)
+finds external merge3f50ddffe7504818c1fd44dfbf362d54e3f3348c preserves its
+incoming main parent's1184-row canonical prefix but not the previously
+published PR parent's1182-row prefix; their common prefix has1179 rows.
+Both parents' full normalized journal blocks and multiplicities survive.
+PR4378 merged at66d1727b4ab2086a2855578fd5b0942954d5664a,02:30:36Z.
+The reporting session neither performed nor repairs this frozen-ledger
+resolution. These are unsigned provenance observations. [pcc:unverified]
+
+The successor local-lifting component publishes from a fresh main with
+unchanged claim files. Its *unpublished* local ledger snapshot is retained,
+and new registrations use the existing append tool after the current main
+prefix. That normal publication check does not retroactively preserve the
+older published prefix or resolve this canonical reconciliation problem.

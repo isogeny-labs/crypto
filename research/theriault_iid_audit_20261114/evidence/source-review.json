@@ -1,0 +1,96 @@
+{
+  "schema": "theriault-iid-source-review/v1",
+  "primary": {
+    "url": "https://link.springer.com/content/pdf/10.1007/978-3-540-40061-5_5.pdf",
+    "bytes": 216881,
+    "sha256": "3048be18dd347b51421ab723165f87de2af1ac108445e11ea8647105c0eb6a33",
+    "pages": 18
+  },
+  "doi": "10.1007/978-3-540-40061-5_5",
+  "citation": "Nicolas Theriault, Index Calculus Attack for Hyperelliptic Curves of Small Genus, ASIACRYPT2003,LNCS2894,75–92",
+  "primary_review": {
+    "path": "research/theriault_collision_audit_20261114/evidence/source-review.json",
+    "bytes": 3804,
+    "sha256": "3697f5e1d97f7ae250f383bfe33e900ce6c45d82948c172926544b6f45e1a06e"
+  },
+  "primary_read_scope": "Definitions/algorithm in sections2–4 including Definition7/Proposition2; selected smoothness/intersection/search/linear-algebra/optimization sections5.3–5.12. Exact printed pages85–86 visually inspected. Not a full-paper or full-dependency review.",
+  "primary_visual_inspection": [
+    {
+      "printed_page": 85,
+      "pdf_page": 11,
+      "bytes": 262968,
+      "sha256": "0a6f883cb59c7756a0bbcb09bf8ad51af3fa7f8d24909626ed5f47bbe8f2fd85",
+      "full_visual_inspection": true
+    },
+    {
+      "printed_page": 86,
+      "pdf_page": 12,
+      "bytes": 249530,
+      "sha256": "241203e7cca1ce7201800ed424a1741c96436b7dc6877708d03709a9dfecc5c9",
+      "full_visual_inspection": true
+    }
+  ],
+  "source_theorem1": {
+    "printed_page": 85,
+    "domain": "3<=s<n/2; uniform draws with replacement, large primes paired by negation, self-negative points excluded",
+    "lower_bound": "2s^2/(3n)",
+    "upper_bound": "s^2/n",
+    "intersections": "s minus number of distinct negation orbits; a label occurring k times contributes k-1, not choose(k,2)",
+    "counterexample": "n8,s3, actual Pool=Fin4×Bool; negation flips Bool. All512 equally likely ordered triples, total352, expectation11/16<3/4.",
+    "bad_proof_step": "Printedp86 lower-bound chain replaces s(s-1)/n−2s(s-1)(s-2)/(3n²) by larger s²/n−2s³/(3n²) under a > sign."
+  },
+  "purpose": "Close actual generic iid-to-recurrence bridge in prior packet; earlier frozen conditional repair unchanged.",
+  "formal_primary_read": {
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "files": [
+      "Mathlib/Data/Fintype/Card.lean",
+      "Mathlib/Logic/Equiv/Basic.lean",
+      "Mathlib/Logic/Equiv/Prod.lean",
+      "Mathlib/Algebra/BigOperators/Ring/Finset.lean",
+      "Mathlib/Data/Fintype/BigOperators.lean"
+    ],
+    "scope": "Complement subtype cardinality, actual subtype-function and product-function equivalences, finite sum interchange/cardinality/indicators and projection transfer."
+  },
+  "actual_proof": "For all finite nonempty color types and all sample sizes, count missing-color functions and swap support indicators to derive actual expected Nat repeats. For all finite nonempty nuisance labels, actual uniform product draws preserve projected expectation. Bool provides a free sign involution/exact orbit semantics. Derive source closedform/recurrence without assuming them, then apply immutable recurrence bound. Actual unbounded Fin(t+4)×Bool counterfamily satisfies strict source domain at s3.",
+  "controls": {
+    "paired8": "11/16",
+    "unpaired8": "23/64",
+    "sample_space": "Every ordered function Fin s→pool with equal rational weight, with replacement; no walk or Jacobian uniformity assumed."
+  },
+  "prior_dependency": {
+    "file": {
+      "path": "research/theriault_iid_audit_20261114/lean/RecurrenceBounds.lean",
+      "bytes": 3311,
+      "sha256": "bd5f8956865bab0df2fee26da75996e1b546dd35498c5d5ee673452b1d0bb028"
+    },
+    "equal_to": "research/theriault_collision_audit_20261114/lean/RecurrenceBounds.lean",
+    "byte_equal": true,
+    "pcc": "PCC-20261114-332aee",
+    "signed_standing": "unverified"
+  },
+  "scalar_identity_supplement": {
+    "id": "IDC1h939108711fe75407",
+    "certificate": {
+      "path": "research/theriault_collision_audit_20261114/identity-certificate.json",
+      "bytes": 1422,
+      "sha256": "910b65023ac3786bae6bec046b38e68f9189ee4647b49967a8813d3b9fc67892"
+    },
+    "official_checker_log": {
+      "path": "research/theriault_collision_audit_20261114/evidence/identity-check.log",
+      "bytes": 79,
+      "sha256": "b00f454616556eb87cb80d1191cdbf83634e84b06268d2bbb277f1b965e697c5"
+    },
+    "same_scalar_symbolic_lemma": "TheriaultCollisionAudit.closed_form_cleared_identity",
+    "new_issuance": false,
+    "not_a_generic_occupancy_proof": true
+  },
+  "kb": "MCP absent; status/two positive-negative occupancy searches/theorem127; original primary/frozen review/pinned Mathlib fallback.",
+  "conductor": "Scoped check unavailable127 before edits.",
+  "full_paper_read": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "actual_random_walk_iid_proved": false,
+  "general_source_runtime_refuted": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}
