@@ -48,7 +48,7 @@ def trace(Pt):
 timing={};start=time.process_time_ns()
 G=trace(P);H=trace(Q);G37=trace(37*P)
 assert G!=O and r*G==O and H==secret*G and G37==37*G
-timing['transfer_cpu_s']=(time.process_time_ns()-start)/1e9
+timing['transfer_cpu_s']=float((time.process_time_ns()-start)/1e9)
 
 def digits(v,n):
  c=[int(x) for x in v.polynomial().list()]
@@ -100,7 +100,7 @@ if not full_rank:
  raise RuntimeError('relation rank not reached within shifted relation cap')
 M=matrix(GF(r),rows);logs=M.solve_right(vector(GF(r),rhs))
 assert all(int(logs[i]) * G==h*base[i] for i in range(n))
-timing['relations_and_la_cpu_s']=(time.process_time_ns()-start)/1e9
+timing['relations_and_la_cpu_s']=float((time.process_time_ns()-start)/1e9)
 start=time.process_time_ns();T=H;descent_attempts=0
 for tt in range(20001):
  row=smooth(T);descent_attempts=tt+1
@@ -109,7 +109,7 @@ for tt in range(20001):
 else:raise RuntimeError('target descent not reached within 20000 offsets')
 recover=(int(sum(row[i]*logs[i] for i in range(n)))*inverse_mod(h,r)-tt)%r
 assert recover*P==Q and recover*G==H and recover==secret
-timing['descent_verify_cpu_s']=(time.process_time_ns()-start)/1e9
+timing['descent_verify_cpu_s']=float((time.process_time_ns()-start)/1e9)
 timing['ghs_total_cpu_s']=sum(timing.values())
 
 # The K-Frobenius eigenvalue has order three on this new r-primary subgroup.
@@ -140,7 +140,7 @@ def rho_trial(seed):
     if den:
      candidate=((aa0-aa)*inverse_mod(den,r))%r
      if candidate*P==Q:
-      return {'cpu_s':(time.process_time_ns()-start)/1e9,'steps':count,
+      return {'cpu_s':float((time.process_time_ns()-start)/1e9),'steps':count,
               'restarts':restart,'scalar':int(candidate)}
     break
    seen[state]=(aa,bb)
@@ -157,5 +157,7 @@ out={'schema':'ghs.odd5.s3-full-attack/v1','source_sha256':hashlib.sha256(Path(_
  'relation_rank':int(M.rank()),'descent_attempts':descent_attempts,'recovered_scalar':int(recover),
  'timing':timing,'rho_eigenvalue':lam,'rho_trials':rho,'rho_median_cpu_s':sorted(z['cpu_s'] for z in rho)[len(rho)//2],
  'rho_median_steps':sorted(z['steps'] for z in rho)[len(rho)//2]}
-(PTH/'s3_full_attack.json').write_text(json.dumps(out,indent=2,sort_keys=True,default=int)+'\n')
-print(json.dumps({k:out[k] for k in ['schema','r','factor_base_size','relation_attempts','accepted_relations','relation_rank','descent_attempts','recovered_scalar','timing','rho_eigenvalue','rho_median_cpu_s','rho_median_steps']},sort_keys=True))
+target=PTH/'s3_full_attack.json'
+assert not target.exists(), 'refusing to overwrite immutable receipt'
+target.write_text(json.dumps(out,indent=2,sort_keys=True,default=int)+'\n')
+print(json.dumps({k:out[k] for k in ['schema','r','factor_base_size','relation_attempts','accepted_relations','relation_rank','descent_attempts','recovered_scalar','timing','rho_eigenvalue','rho_median_cpu_s','rho_median_steps']},sort_keys=True,default=int))
