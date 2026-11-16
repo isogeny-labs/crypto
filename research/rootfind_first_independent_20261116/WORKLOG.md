@@ -35,3 +35,28 @@
 ### Errors
 
 - The current AWS identity is the wrong account for IsoLab admission.
+
+## 2026-11-16, source implementation
+
+### What was done
+
+- Added `tests/rootfind_first_independent.rs`, adapting the source-bound
+  Koblitz harness to maintain three independent rank bases. The candidate
+  probes until its first rank-advancing triple or the full scan; all
+  candidate triples are re-added in the group before insertion.
+- Formatted the source with Rust 1.99.1 and checked the diff. No scientific
+  run has occurred yet. [pcc:unverified]
+
+### Decisions made
+
+- Keep source separate from the production collector held by T-6708.
+  Commit the source before the locked release harness run.
+
+### Open threads
+
+- Build and run the frozen harness, retain raw output, derive the comparison,
+  make the visual report, and publish the PR update.
+
+### Errors
+
+- None in the source step.
