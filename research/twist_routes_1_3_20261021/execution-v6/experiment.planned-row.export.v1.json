@@ -1,0 +1,251 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-full-order-failure-20261027-v1",
+  "created": "2026-10-27T08:10:40.208Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "248a8120237f48e6cd74022bf964582a898c876bc9b8ecc73aed834fc031d8d2",
+    "protocol_id": "twist-generator-census-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-full-order-generator-20261027",
+    "role": "operational failure serialization"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "9643e917922cca9c50ae91709ba12f4ea9d6bfa1",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "376307efd9528c6ab9c670c10a652801a6a9769044b9ca336391d9d84df2aa25",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "98cd6b5d914745db7f245d216529dcbbf4d6e83ed347f837f21d8cb686d8638a",
+      "commit": "9643e917922cca9c50ae91709ba12f4ea9d6bfa1"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "9643e917922cca9c50ae91709ba12f4ea9d6bfa1"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "full-order-native-000",
+      "arm": "native",
+      "instance_id": "original-ten-fixtures-two-seeds-all-bases",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "No performance claim; whole panel stopped before a complete output."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "unsupported-full-order-candidate"
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "998844edb84d13ff70db937d6983215ff22f91b9e5b4bc740489056bc93ef839",
+          "bytes": 976,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "c2d0c7c720d4eacb1d619a9c8da6857e096102441b72156c4eb33ca3759fee99",
+          "bytes": 564,
+          "kind": "receipt"
+        },
+        {
+          "path": "FAILURE.json",
+          "sha256": "1c633ac712a3a81cdcd7299c06c57487a057fd579b48058827aeb85526d2d462",
+          "bytes": 534,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T07:49:03.837Z",
+      "finished_at": "2026-10-27T07:49:03.988Z",
+      "worker": "98cd6b5d914745db7f245d216529dcbbf4d6e83ed347f837f21d8cb686d8638a",
+      "backend_ref": "runs/producer-transport.json"
+    },
+    {
+      "run_id": "full-order-pari-000",
+      "arm": "pari",
+      "instance_id": "original-ten-fixtures-two-seeds-all-bases",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "cancelled",
+      "outcome_class": "not_completed",
+      "attempts": 0,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "No performance claim; whole panel stopped before a complete output."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "reference-not-run-after-producer-stop"
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "998844edb84d13ff70db937d6983215ff22f91b9e5b4bc740489056bc93ef839",
+          "bytes": 976,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "c2d0c7c720d4eacb1d619a9c8da6857e096102441b72156c4eb33ca3759fee99",
+          "bytes": 564,
+          "kind": "receipt"
+        },
+        {
+          "path": "FAILURE.json",
+          "sha256": "1c633ac712a3a81cdcd7299c06c57487a057fd579b48058827aeb85526d2d462",
+          "bytes": 534,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 1,
+    "completed": 1,
+    "not_completed": 1,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": [
+      {
+        "rule": "reference-not-run-after-producer-stop",
+        "run_ids": [
+          "full-order-pari-000"
+        ]
+      },
+      {
+        "rule": "unsupported-full-order-candidate",
+        "run_ids": [
+          "full-order-native-000"
+        ]
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "ca3df32c27b4fd849a454427cb3e221bd4ced28b34cb33aff1ebf0a9d92c9272",
+      "bytes": 11230,
+      "kind": "protocol"
+    },
+    {
+      "path": "FROZEN.json",
+      "sha256": "279e651521a8bc93d881c5bb7acb53cf0b6f5a015ef34a0111d4a756820bd392",
+      "bytes": 1568,
+      "kind": "receipt"
+    },
+    {
+      "path": "FAILURE.json",
+      "sha256": "1c633ac712a3a81cdcd7299c06c57487a057fd579b48058827aeb85526d2d462",
+      "bytes": 534,
+      "kind": "receipt"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/bin/twist-generator-census.rs",
+      "sha256": "ffd890f2e4d2ef4617e72f0048ff340d1ad7d210d245fa98fd99c5ffe4d9fa2b",
+      "bytes": 16612,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "FAILURE.json",
+        "sha256": "1c633ac712a3a81cdcd7299c06c57487a057fd579b48058827aeb85526d2d462",
+        "bytes": 534,
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "One actual native process failed closed. The GP reference row records a planned but unattempted execution, not a fabricated run. No complete point-order/base census or performance result is admitted; keep the separate successor distinct.",
+      "by": "operational serializer"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

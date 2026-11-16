@@ -1,0 +1,16 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp14-tm43-158b6914 | 13.99 | rho-neg | 48/48 | 1.715 | 1.829 | 2.857 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | rho-neg-aa | 48/48 | 1.715 | 1.829 | 2.857 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | rho-plain | 48/48 | 2.178 | 2.178 | 2.178 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | rho-neg | 48/48 | 1.839 | 1.962 | 3.075 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | rho-neg-aa | 48/48 | 1.839 | 1.962 | 3.075 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | rho-plain | 48/48 | 1.892 | 1.892 | 1.892 | — |
+| icv1-fp18-t175-45770ebc | 18.00 | rho-neg | 48/48 | 1.349 | 1.453 | 2.381 | — |
+| icv1-fp18-t175-45770ebc | 18.00 | rho-neg-aa | 48/48 | 1.349 | 1.453 | 2.381 | — |
+| icv1-fp18-t175-45770ebc | 18.00 | rho-plain | 48/48 | 1.532 | 1.532 | 1.532 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | rho-neg | 48/48 | 1.245 | 1.353 | 2.328 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | rho-neg-aa | 48/48 | 1.245 | 1.353 | 2.328 | — |
+| icv1-fp20-t1293-3c2999ba | 20.00 | rho-plain | 48/48 | 1.631 | 1.631 | 1.631 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.

@@ -1,0 +1,7 @@
+# Independent static anchor-torsion review
+
+The actual curve is y²+xy=x³+1, A=0/B=1 in characteristic2. Both selected source points (1,0),(1,1) are rational and negatives of each other. For x!=0, binary doubling uses lambda=x+y/x, x(2P)=lambda²+lambda+A, y(2P)=x²+(lambda+1)x(2P). Here lambda=1 or0, so both points double to (0,1). This finite point is selfnegative and nonidentity, hence exact order2. Both selected source points consequently have exact order4 and 2P=2(-P).
+
+The65 distinct registered parameter cells all use this special abscissa a=1. They are not65 generic geometric anchor problems. The observed528 distinct cubics versus1,040 distinct h/ordinate/k receipts suggests geometric redundancy, but no exact orbit quotient/bijection has been proved by that count alone. The shared doubled point explains why both source ordinates can yield related residual cubic problems; do not claim generic anchor coverage from this panel. Existing raw data, source and results remain unchanged.
+
+A future generic-anchor experiment must preregister a new source-only selection rule before norm-support/timing observations: for example the first nonconstant source abscissa in the fixed V with a rational lift whose doubled point is neither infinity nor order2. Exact doubling/curve verification and both rational ordinates must be retained. Selection must be based on field/curve/domain and torsion guards, not favorable root count or speed. Keep the current torsion panel as a regression component. No algorithm was executed for this static review.

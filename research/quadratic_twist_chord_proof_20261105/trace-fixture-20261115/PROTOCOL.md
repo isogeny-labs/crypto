@@ -1,0 +1,13 @@
+# Proper-extension auxiliary trace fixture engineering screen
+
+New bounded local window, at most3600s; each compiler/native stage600s, two workers maximum. Source/protocol publication on the existing branch is the authorized GitHub start checkpoint. No paid resources or result-asset upload. This is a new finite fixture screen, not a relation solver or degree experiment. [pcc:unverified]
+
+Before data freeze both C++ producer and independently written Rust auditor. Field F49=F7[i]/(i²−3), codes a+7b lexicographic; extension K=F49[w]/(w²−delta), delta first nonzero nonsquare. Exhaust all49²(A,B), retain nonsingular models whose j is outside F7 and whose source/twist orders are distinct primes>=11. Select first(A,B) under fixed loop order, retain eligible count; no outcome-selected curve. Twist parameters delta²A,delta³B. No registry/ICV1/EC1 identification is claimed. [pcc:unverified]
+
+Both instruments independently enumerate base/twist points and check EVERY pair(B,T), including identities: c=psi(T)=(x/delta,y*w/delta²) lies on source over K, c+Frob49(c)=O, and L=[h]B+c has trace B for h=(r+1)/2. Auditor additionally enumerates all K-curve points via independent square multiplicities; expected cardinality r*t must hold. Source targets are actual B points; no logarithm table or solver fed by target labels. This establishes only a finite trace-lift route, not cheaper relations. [pcc:unverified]
+
+One producer, two separate audit executions; identical audit receipts required. Six changed JSON controls: delta,A,twist_A,source_order,half,trace_pairs. Every control increments the numeric value by1 and must exit101 with no receipt. Controls use metadata mutation only; independent Rust recomputes arithmetic and selection. Missing/extra fields reject. Any failure retained, no silent predicate weakening, fixture fallback or census truncation.
+
+Exact source hashes are frozen in PINS.json before compilation. Binary hashes recorded after build, not falsely predeclared. Stage command/exit/stdout/stderr and all altered JSON remain outside checkout. C++/Rust no shared field/group code. Current official proof auditor is not involved in this native engineering screen; no signed PCC standing, formal trace theorem, useful-rank gain, actual solving degree or speed claim. [pcc:unverified]
+
+Sources checked (KB unavailable): prior auxiliary trace geometry and source README, Gorla–Massierer1405.1059 §2.2 and historical trace transport arguments. No novelty claim or complexity transfer from higher trace-zero dimensions. Keep source setup/strongest frontier and projected coefficient-row deduplication for the subsequent algebraic-membership experiment.
