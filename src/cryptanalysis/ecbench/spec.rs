@@ -80,34 +80,7 @@ pub enum Order {
     AlternateMeasured,
 }
 
-/// The isolation level a wall-clock figure needs (`docs/ecbench/README.md`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub enum Level {
-    L0,
-    L1,
-    L2,
-    L3,
-}
-
-impl Level {
-    pub fn name(self) -> &'static str {
-        match self {
-            Level::L0 => "L0",
-            Level::L1 => "L1",
-            Level::L2 => "L2",
-            Level::L3 => "L3",
-        }
-    }
-    pub fn parse(s: &str) -> Option<Self> {
-        match s {
-            "L0" => Some(Level::L0),
-            "L1" => Some(Level::L1),
-            "L2" => Some(Level::L2),
-            "L3" => Some(Level::L3),
-            _ => None,
-        }
-    }
-}
+pub use super::isolation::Level;
 
 fn default_warmup() -> u32 {
     1

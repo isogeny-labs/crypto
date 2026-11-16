@@ -137,7 +137,7 @@
   "records": {
     "censored": 10,
     "invalid": 4,
-    "measured": 203,
+    "measured": 201,
     "open": 1
   },
   "repo": "crypto",
@@ -3537,276 +3537,6 @@
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "percent"
-    },
-    {
-      "better": "lower",
-      "first": 11.1939,
-      "latest": 11.1939,
-      "latest_derived": {
-        "value_over_reference": 5.693744
-      },
-      "metric": "s_ksum4_w0_n15",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.693744
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.966,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 11.1939
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 9.7891,
-      "latest": 9.7891,
-      "latest_derived": {
-        "value_over_reference": 5.21529
-      },
-      "metric": "s_ksum4_w0_n18",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.21529
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.877,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 9.7891
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.7274,
-      "latest": 6.7274,
-      "latest_derived": {
-        "value_over_reference": 5.335395
-      },
-      "metric": "s_ksum4_w0_n21",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.335395
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.2609,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 6.7274
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.5766,
-      "latest": 6.5766,
-      "latest_derived": {
-        "value_over_reference": 5.432962
-      },
-      "metric": "s_ksum4_w0_n24",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.432962
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.2105,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 6.5766
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.7022,
-      "latest": 6.7022,
-      "latest_derived": {
-        "value_over_reference": 6.271358
-      },
-      "metric": "s_ksum4_w0_n27",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 6.271358
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.0687,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 6.7022
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 13.4685,
-      "latest": 13.4685,
-      "latest_derived": {
-        "value_over_reference": 6.850712
-      },
-      "metric": "s_ksum5_w0_n15",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 6.850712
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.966,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 13.4685
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 11.2571,
-      "latest": 11.2571,
-      "latest_derived": {
-        "value_over_reference": 5.997389
-      },
-      "metric": "s_ksum5_w0_n18",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.997389
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.877,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 11.2571
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 7.007,
-      "latest": 7.007,
-      "latest_derived": {
-        "value_over_reference": 5.557142
-      },
-      "metric": "s_ksum5_w0_n21",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.557142
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.2609,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 7.007
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.9905,
-      "latest": 6.9905,
-      "latest_derived": {
-        "value_over_reference": 5.774886
-      },
-      "metric": "s_ksum5_w0_n24",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.774886
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.2105,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 6.9905
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.4143,
-      "latest": 6.4143,
-      "latest_derived": {
-        "value_over_reference": 6.001965
-      },
-      "metric": "s_ksum5_w0_n27",
-      "points": [
-        {
-          "commit": "77bc2141984f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 6.001965
-          },
-          "n": 432,
-          "record": "20261115T1728Z-tableb-binary-ksum-l1",
-          "reference": 1.0687,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] Table B random-binary rows, counted cost at L0: ksum5 / strictest tuned pair-table incumbent 0.68/0.66/0.59 (n21), 0.64/0.63/0.61 (n24), 0.46/0.44/0.39 (n27) at w=0/0.1/1; L1 holds on all primary rows, not on secondary n15/n18 for ksum5. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Same-host replay only; validation gate not met.",
-          "value": 6.4143
-        }
-      ],
-      "problem": "ecdlp:tableb-random-binary-ksum-l1",
-      "unit": "S"
     },
     {
       "better": "lower",
@@ -8739,60 +8469,6 @@
       "unit": "count"
     },
     {
-      "better": "lower",
-      "first": 1.05,
-      "latest": 1.05,
-      "latest_derived": {
-        "value_over_reference": 1.105263
-      },
-      "metric": "s_kf3_n23_w0p1",
-      "points": [
-        {
-          "commit": "9fa38942e40f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 1.105263
-          },
-          "n": 432,
-          "record": "20261115T2224Z-koblitz-ksum-fold-study",
-          "reference": 0.95,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "kf3-c1g-sr vs lazy orbit-member incumbent, band-priced pooled R: K1 n23 0.784/0.799/0.832 at w=0/0.1/1 (improves), K1 n29 5.30/5.62/6.31 (regresses); local L0; pcc:unverified",
-          "value": 1.05
-        }
-      ],
-      "problem": "ic:koblitz-ksum-fold-n23-n29",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 11.597,
-      "latest": 11.597,
-      "latest_derived": {
-        "value_over_reference": 2.475347
-      },
-      "metric": "s_kf3_n29_w0p1",
-      "points": [
-        {
-          "commit": "9fa38942e40f",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 2.475347
-          },
-          "n": 432,
-          "record": "20261115T2224Z-koblitz-ksum-fold-study",
-          "reference": 4.685,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "kf3-c1g-sr vs lazy orbit-member incumbent, band-priced pooled R: K1 n23 0.784/0.799/0.832 at w=0/0.1/1 (improves), K1 n29 5.30/5.62/6.31 (regresses); local L0; pcc:unverified",
-          "value": 11.597
-        }
-      ],
-      "problem": "ic:koblitz-ksum-fold-n23-n29",
-      "unit": "S"
-    },
-    {
       "better": "higher",
       "first": 1.0044447074829879,
       "latest": 1.0078455598240346,
@@ -9505,7 +9181,7 @@
     {
       "better": "neutral",
       "first": 0.9936946952799995,
-      "latest": 0.9936946952799995,
+      "latest": 1.0002249485271448,
       "latest_derived": {},
       "metric": "admitted_aa_k0n53",
       "points": [
@@ -9523,6 +9199,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9936946952799995
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.962455760187498,
+            1.052731552711639
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0002249485271448
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9531,7 +9222,7 @@
     {
       "better": "neutral",
       "first": 0.9906579495433447,
-      "latest": 0.9906579495433447,
+      "latest": 0.9908515592794462,
       "latest_derived": {},
       "metric": "admitted_aa_k0n61",
       "points": [
@@ -9549,6 +9240,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9906579495433447
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9633635219831673,
+            1.0151837880178802
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9908515592794462
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9607,9 +9313,61 @@
       "unit": "ratio"
     },
     {
+      "better": "higher",
+      "first": 2.60729240581533,
+      "latest": 2.60729240581533,
+      "latest_derived": {},
+      "metric": "admitted_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.4826899800443893,
+            2.7174251311293083
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 2.60729240581533
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.573647068364809,
+      "latest": 2.573647068364809,
+      "latest_derived": {},
+      "metric": "admitted_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.500478369643154,
+            2.654160332791119
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 2.573647068364809
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 1.0252541002390572,
-      "latest": 1.0252541002390572,
+      "latest": 0.970128248245923,
       "latest_derived": {},
       "metric": "build_aa_k0n53",
       "points": [
@@ -9627,6 +9385,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.0252541002390572
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9148986609247828,
+            1.0222508794676612
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.970128248245923
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9635,7 +9408,7 @@
     {
       "better": "neutral",
       "first": 1.0098062333040732,
-      "latest": 1.0098062333040732,
+      "latest": 1.0123265869528344,
       "latest_derived": {},
       "metric": "build_aa_k0n61",
       "points": [
@@ -9653,6 +9426,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.0098062333040732
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9798306203714428,
+            1.0540970157404068
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0123265869528344
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9803,6 +9591,58 @@
       "unit": "percent"
     },
     {
+      "better": "higher",
+      "first": 1.0122252208564697,
+      "latest": 1.0122252208564697,
+      "latest_derived": {},
+      "metric": "build_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9817663846605311,
+            1.0429527268792707
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0122252208564697
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9871286540703486,
+      "latest": 0.9871286540703486,
+      "latest_derived": {},
+      "metric": "build_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9356056526775712,
+            1.053593418587798
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9871286540703486
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 33.62852825584937,
       "latest": 33.62852825584937,
@@ -9949,7 +9789,7 @@
     {
       "better": "neutral",
       "first": 0.9975502951567751,
-      "latest": 0.9975502951567751,
+      "latest": 0.9935932860469807,
       "latest_derived": {},
       "metric": "collect_aa_k0n53",
       "points": [
@@ -9967,6 +9807,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9975502951567751
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9758018259571236,
+            1.0176740308735146
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9935932860469807
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9975,7 +9830,7 @@
     {
       "better": "neutral",
       "first": 0.9868535955289628,
-      "latest": 0.9868535955289628,
+      "latest": 0.980559856788509,
       "latest_derived": {},
       "metric": "collect_aa_k0n61",
       "points": [
@@ -9993,6 +9848,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9868535955289628
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9640228893025966,
+            1.0162249677390807
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.980559856788509
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -10051,9 +9921,61 @@
       "unit": "ratio"
     },
     {
+      "better": "higher",
+      "first": 1.0996385745907045,
+      "latest": 1.0996385745907045,
+      "latest_derived": {},
+      "metric": "collect_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0630331408112088,
+            1.1249220806680211
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0996385745907045
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0789368965136354,
+      "latest": 1.0789368965136354,
+      "latest_derived": {},
+      "metric": "collect_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0626082086389348,
+            1.1150021012169142
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0789368965136354
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 1.007316210958665,
-      "latest": 1.007316210958665,
+      "latest": 0.9991725107503957,
       "latest_derived": {},
       "metric": "filter_aa_k0n53",
       "points": [
@@ -10071,6 +9993,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.007316210958665
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9511772843015918,
+            1.0536215064537593
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9991725107503957
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -10079,7 +10016,7 @@
     {
       "better": "neutral",
       "first": 0.9857451205160304,
-      "latest": 0.9857451205160304,
+      "latest": 0.9908117684022968,
       "latest_derived": {},
       "metric": "filter_aa_k0n61",
       "points": [
@@ -10097,6 +10034,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9857451205160304
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9686130186943898,
+            1.0236769218442299
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9908117684022968
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -10155,9 +10107,61 @@
       "unit": "ratio"
     },
     {
+      "better": "higher",
+      "first": 1.2944251904039803,
+      "latest": 1.2944251904039803,
+      "latest_derived": {},
+      "metric": "filter_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.225829845422297,
+            1.3423376748488516
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.2944251904039803
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.2095500396428485,
+      "latest": 1.2095500396428485,
+      "latest_derived": {},
+      "metric": "filter_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1758443563487844,
+            1.2358777251779893
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.2095500396428485
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 1.018536182234212,
-      "latest": 1.018536182234212,
+      "latest": 0.9931878940906476,
       "latest_derived": {},
       "metric": "setup_aa_k0n53",
       "points": [
@@ -10175,6 +10179,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.018536182234212
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9710272039905103,
+            1.017033244801555
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9931878940906476
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -10183,7 +10202,7 @@
     {
       "better": "neutral",
       "first": 0.9930865502835435,
-      "latest": 0.9930865502835435,
+      "latest": 0.986175075247113,
       "latest_derived": {},
       "metric": "setup_aa_k0n61",
       "points": [
@@ -10201,6 +10220,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9930865502835435
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9678871677965422,
+            1.0362867746515256
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.986175075247113
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -10259,868 +10293,56 @@
       "unit": "ratio"
     },
     {
-      "better": "lower",
-      "first": 10.552,
-      "latest": 10.552,
-      "latest_derived": {
-        "value_over_reference": 5.367243
-      },
-      "metric": "s_ksum4p_w0_b15",
+      "better": "higher",
+      "first": 1.062414092641178,
+      "latest": 1.062414092641178,
+      "latest_derived": {},
+      "metric": "setup_single_over_doubled_k0n53",
       "points": [
         {
-          "commit": "fff219f63f8e",
+          "commit": "2826b353f98c",
           "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.367243
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.966,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 10.552
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0463499904992302,
+            1.0811703185044066
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.062414092641178
         }
       ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
     },
     {
-      "better": "lower",
-      "first": 9.3358,
-      "latest": 9.3358,
-      "latest_derived": {
-        "value_over_reference": 4.973788
-      },
-      "metric": "s_ksum4p_w0_b18",
+      "better": "higher",
+      "first": 1.0658220940279266,
+      "latest": 1.0658220940279266,
+      "latest_derived": {},
+      "metric": "setup_single_over_doubled_k0n61",
       "points": [
         {
-          "commit": "fff219f63f8e",
+          "commit": "2826b353f98c",
           "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 4.973788
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.877,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 9.3358
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.044807069517664,
+            1.0987128375824735
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0658220940279266
         }
       ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.5535,
-      "latest": 6.5535,
-      "latest_derived": {
-        "value_over_reference": 5.197478
-      },
-      "metric": "s_ksum4p_w0_b21",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.197478
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.2609,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.5535
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.3957,
-      "latest": 6.3957,
-      "latest_derived": {
-        "value_over_reference": 5.283519
-      },
-      "metric": "s_ksum4p_w0_b24",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.283519
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.2105,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.3957
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.6012,
-      "latest": 6.6012,
-      "latest_derived": {
-        "value_over_reference": 6.17685
-      },
-      "metric": "s_ksum4p_w0_b27",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 6.17685
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.0687,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.6012
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.4613,
-      "latest": 6.4613,
-      "latest_derived": {
-        "value_over_reference": 5.091246
-      },
-      "metric": "s_ksum4p_w0_p20",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.091246
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.2691,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.4613
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.1395,
-      "latest": 6.1395,
-      "latest_derived": {
-        "value_over_reference": 5.238928
-      },
-      "metric": "s_ksum4p_w0_p22",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.238928
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.1719,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.1395
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.2556,
-      "latest": 6.2556,
-      "latest_derived": {
-        "value_over_reference": 5.753863
-      },
-      "metric": "s_ksum4p_w0_p24",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.753863
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.0872,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.2556
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 11.1984,
-      "latest": 11.1984,
-      "latest_derived": {
-        "value_over_reference": 5.696033
-      },
-      "metric": "s_ksum5p_w0_b15",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.696033
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.966,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 11.1984
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 9.6538,
-      "latest": 9.6538,
-      "latest_derived": {
-        "value_over_reference": 5.143207
-      },
-      "metric": "s_ksum5p_w0_b18",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.143207
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.877,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 9.6538
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.3367,
-      "latest": 6.3367,
-      "latest_derived": {
-        "value_over_reference": 5.025537
-      },
-      "metric": "s_ksum5p_w0_b21",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.025537
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.2609,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.3367
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.5169,
-      "latest": 6.5169,
-      "latest_derived": {
-        "value_over_reference": 5.383643
-      },
-      "metric": "s_ksum5p_w0_b24",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.383643
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.2105,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.5169
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.038,
-      "latest": 6.038,
-      "latest_derived": {
-        "value_over_reference": 5.649855
-      },
-      "metric": "s_ksum5p_w0_b27",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.649855
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.0687,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.038
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.4409,
-      "latest": 6.4409,
-      "latest_derived": {
-        "value_over_reference": 5.075171
-      },
-      "metric": "s_ksum5p_w0_p20",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.075171
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.2691,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.4409
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.1113,
-      "latest": 6.1113,
-      "latest_derived": {
-        "value_over_reference": 5.214865
-      },
-      "metric": "s_ksum5p_w0_p22",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.214865
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.1719,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.1113
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 5.9784,
-      "latest": 5.9784,
-      "latest_derived": {
-        "value_over_reference": 5.498896
-      },
-      "metric": "s_ksum5p_w0_p24",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.498896
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.0872,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 5.9784
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 11.9155,
-      "latest": 11.9155,
-      "latest_derived": {
-        "value_over_reference": 5.657882
-      },
-      "metric": "s_ksum5p_w0p1_b15",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.657882
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 2.106,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 11.9155
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 10.378,
-      "latest": 10.378,
-      "latest_derived": {
-        "value_over_reference": 5.131019
-      },
-      "metric": "s_ksum5p_w0p1_b18",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.131019
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 2.0226,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 10.378
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 7.0626,
-      "latest": 7.0626,
-      "latest_derived": {
-        "value_over_reference": 5.15255
-      },
-      "metric": "s_ksum5p_w0p1_b21",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.15255
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.3707,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 7.0626
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 7.3988,
-      "latest": 7.3988,
-      "latest_derived": {
-        "value_over_reference": 5.606001
-      },
-      "metric": "s_ksum5p_w0p1_b24",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.606001
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.3198,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 7.3988
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.7914,
-      "latest": 6.7914,
-      "latest_derived": {
-        "value_over_reference": 5.816049
-      },
-      "metric": "s_ksum5p_w0p1_b27",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.816049
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.1677,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.7914
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 7.1886,
-      "latest": 7.1886,
-      "latest_derived": {
-        "value_over_reference": 5.210263
-      },
-      "metric": "s_ksum5p_w0p1_p20",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.210263
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.3797,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 7.1886
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.8529,
-      "latest": 6.8529,
-      "latest_derived": {
-        "value_over_reference": 5.355502
-      },
-      "metric": "s_ksum5p_w0p1_p22",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.355502
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.2796,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.8529
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 6.7532,
-      "latest": 6.7532,
-      "latest_derived": {
-        "value_over_reference": 5.699865
-      },
-      "metric": "s_ksum5p_w0p1_p24",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.699865
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 1.1848,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 6.7532
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 18.3695,
-      "latest": 18.3695,
-      "latest_derived": {
-        "value_over_reference": 5.458179
-      },
-      "metric": "s_ksum5p_w1_b15",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.458179
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 3.3655,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 18.3695
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 16.8951,
-      "latest": 16.8951,
-      "latest_derived": {
-        "value_over_reference": 5.069037
-      },
-      "metric": "s_ksum5p_w1_b18",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.069037
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 3.333,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 16.8951
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 13.5961,
-      "latest": 13.5961,
-      "latest_derived": {
-        "value_over_reference": 5.764479
-      },
-      "metric": "s_ksum5p_w1_b21",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.764479
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 2.3586,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 13.5961
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 15.3365,
-      "latest": 15.3365,
-      "latest_derived": {
-        "value_over_reference": 6.658201
-      },
-      "metric": "s_ksum5p_w1_b24",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 6.658201
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 2.3034,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 15.3365
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 13.572,
-      "latest": 13.572,
-      "latest_derived": {
-        "value_over_reference": 6.59251
-      },
-      "metric": "s_ksum5p_w1_b27",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 6.59251
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 2.0587,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 13.572
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 13.9172,
-      "latest": 13.9172,
-      "latest_derived": {
-        "value_over_reference": 5.860861
-      },
-      "metric": "s_ksum5p_w1_p20",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 5.860861
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 2.3746,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 13.9172
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 13.5275,
-      "latest": 13.5275,
-      "latest_derived": {
-        "value_over_reference": 6.014628
-      },
-      "metric": "s_ksum5p_w1_p22",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 6.014628
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 2.2491,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 13.5275
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 13.7269,
-      "latest": 13.7269,
-      "latest_derived": {
-        "value_over_reference": 6.655144
-      },
-      "metric": "s_ksum5p_w1_p24",
-      "points": [
-        {
-          "commit": "fff219f63f8e",
-          "date": "2026-11-15",
-          "derived": {
-            "value_over_reference": 6.655144
-          },
-          "n": 432,
-          "record": "20261115T2211Z-ksum-prune-tableb",
-          "reference": 2.0626,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
-          "value": 13.7269
-        }
-      ],
-      "problem": "ic:ksum_prune_tableb",
-      "unit": "S"
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
     },
     {
       "better": "lower",
