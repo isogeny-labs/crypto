@@ -1,0 +1,36 @@
+{
+  "schema": "native-start-invariant-rho-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "start-invariant-rho",
+      "expected_decl_sha256": "67e5dab5404c635114f843a3257bb0556c706a3a6359d7ecffd69373015c65b7",
+      "full_characters": 1697,
+      "full_decl_sha256": "67e5dab5404c635114f843a3257bb0556c706a3a6359d7ecffd69373015c65b7",
+      "full_normalized_signature": "theorem start_invariant_rho_certificate : (∀ (q : ℕ) [NeZero q] (I : Type*) [Fintype I] [DecidableEq I] (w : I → ℝ) (hw0 : ∀ i, 0 ≤ w i) (hw : ∑ i, w i = 1) (g : I → ZMod q), jointMean q w hw0 hw g = expectation w (fun h : Hash (ZMod q) I => (firstCollision q (step g h) 0 : ℝ)) ∧ (∀ (a : ZMod q) (φ : ℕ → ℝ), expectation w (fun h : Hash (ZMod q) I => φ (firstCollision q (step g h) a)) = expectation w (fun h : Hash (ZMod q) I => φ (firstCollision q (step g h) 0)))) ∧ (∀ (q : ℕ) [NeZero q], 1902 < q → TwoStepCollisionAudit.DegreeTwoGeneric (SidonRhoCounterfamilyAudit.increments q) ∧ (∀ (h : Hash (ZMod q) (Fin 20)) (a : ZMod q), q ≤ 951 * firstCollision q (SidonRhoCounterfamilyAudit.transition q h) a ∧ firstCollision q (SidonRhoCounterfamilyAudit.transition q h) a ≤ q) ∧ uniformMean q = ∑ z : GeneralTwoStepCollisionAudit.JointSample (ZMod q) (Fin 20), (SidonRhoCounterfamilyAudit.localLaw q z).toReal * (firstCollision q (SidonRhoCounterfamilyAudit.transition q z.1) z.2.1 : ℝ) ∧ uniformMean q = SidonRhoCounterfamilyAudit.meanCollision q ∧ (q : ℝ) ≤ 951 * uniformMean q ∧ uniformMean q ≤ q ∧ (SidonRhoCounterfamilyAudit.localLaw q).toOuterMeasure (GeneralTwoStepCollisionAudit.freshEvent (SidonRhoCounterfamilyAudit.increments q) : Set (GeneralTwoStepCollisionAudit.JointSample (ZMod q) (Fin 20))) = ENNReal.ofReal ((7581 : ℝ) / (8000 * q))) ∧ (∀ C : ℕ, ∃ (q : ℕ) (hq : Nat.Prime q), 1902 < q ∧ (C : ℝ) * q < (@uniformMean q ⟨hq.ne_zero⟩)^2) ∧ (¬∃ C : ℝ, ∀ (q : ℕ) (hq : Nat.Prime q), 1902 < q → TwoStepCollisionAudit.DegreeTwoGeneric (SidonRhoCounterfamilyAudit.increments q) → (@uniformMean q ⟨hq.ne_zero⟩)^2 ≤ C * q) ∧ Nat.Prime 10000019 ∧ (4 : ℝ) * 10000019 < (uniformMean 10000019)^2",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "start_invariant_rho_certificate",
+        "end_byte": 6318,
+        "file": "/workspace/scratch/start-rho-input01/UniformStartCounterfamily.lean",
+        "qualified_decl_id": "StartInvariantRhoAudit.start_invariant_rho_certificate",
+        "signature": "theorem start_invariant_rho_certificate :\n    (∀ (q : ℕ) [NeZero q] (I : Type*) [Fintype I] [DecidableEq I] (w : I → ℝ)\n      (hw0 : ∀ i, 0 ≤ w i) (hw : ∑ i, w i = 1) (g : I → ZMod q),\n      jointMean q w hw0 hw g =\n        expectation w (fun h : Hash (ZMod q) I => (firstCollision q (step g h) 0 : ℝ)) ∧\n      (∀ (a : ZMod q) (φ : ℕ → ℝ),\n        expectation w (fun h : Hash (ZMod q) I => φ (firstCollision q (step g h) a)) =\n          expectation w (fun h : Hash (ZMod q) I => φ (firstCollision q (step g h) 0)))) ∧\n    (∀ (q : ℕ) [NeZero q], 1902 < q →\n      TwoStepCollisionAudit.DegreeTwoGeneric (SidonRhoCounterfamilyAudit.increments q) ∧\n      (∀ (h : Hash (ZMod q) (Fin 20)) (a : ZMod q),\n        q ≤ 951 * firstCollision q (SidonRhoCounterfamilyAudit.transition q h) a ∧\n          firstCollision q (SidonRhoCounterfamilyAudit.transition q h) a ≤ q) ∧\n      uniformMean q =\n        ∑ z : GeneralTwoStepCollisionAudit.JointSample (ZMod q) (Fin 20),\n          (SidonRhoCounterfamilyAudit.localLaw q z).toReal *\n            (firstCollision q (SidonRhoCounterfamilyAudit.transition q z.1) z.2.1 : ℝ) ∧\n      uniformMean q = SidonRhoCounterfamilyAudit.meanCollision q ∧\n      (q : ℝ) ≤ 951 * uniformMean q ∧ uniformMean q ≤ q ∧\n      (SidonRhoCounterfamilyAudit.localLaw q).toOuterMeasure\n        (GeneralTwoStepCollisionAudit.freshEvent (SidonRhoCounterfamilyAudit.increments q) :\n          Set (GeneralTwoStepCollisionAudit.JointSample (ZMod q) (Fin 20))) =\n        ENNReal.ofReal ((7581 : ℝ) / (8000 * q))) ∧\n    (∀ C : ℕ, ∃ (q : ℕ) (hq : Nat.Prime q), 1902 < q ∧\n      (C : ℝ) * q < (@uniformMean q ⟨hq.ne_zero⟩)^2) ∧\n    (¬∃ C : ℝ, ∀ (q : ℕ) (hq : Nat.Prime q), 1902 < q →\n      TwoStepCollisionAudit.DegreeTwoGeneric (SidonRhoCounterfamilyAudit.increments q) →\n        (@uniformMean q ⟨hq.ne_zero⟩)^2 ≤ C * q) ∧\n    Nat.Prime 10000019 ∧ (4 : ℝ) * 10000019 < (uniformMean 10000019)^2",
+        "start_byte": 4311
+      },
+      "recorded_statement": "theorem start_invariant_rho_certificate : (∀ (q : ℕ) [NeZero q] (I : Type*) [Fintype I] [DecidableEq I] (w : I → ℝ) (hw0 : ∀ i, 0 ≤ w i) (hw : ∑ i, w i = 1) (g : I → ZMod q), jointMean q w hw0 hw g = expectation w (fun h : Hash (ZMod q) I => (firstCollision q (step g h) 0 : ℝ)) ∧ (∀ (a : ZMod q) (φ : ℕ → ℝ), expectation w (fun h : Hash (ZMod q) I => φ (firstCollision q (step g h) a)) = expectation w (fun h : Hash (ZMod q) I => φ (firstCollision q (step g h) 0)))) ∧ (∀ (q : ℕ) [NeZero q], 1902 < q → TwoStepCollisionAudit.DegreeTwoGeneric (SidonRhoCounterfamilyAudit.increments q) ∧ (∀ (h : Hash (ZMod q) (Fin 20)) (a : ZMod q), q ≤ 951 * firstCollision q (SidonRhoCounterfamilyAudit.transition q h) a ∧ firstCollision q (SidonRhoCounterfamilyAudit.transition q h) a ≤ q) ∧ uniformMean q = ∑ z : GeneralTwoStepCollisionAudit.JointSample (ZMod q) (Fin 20), (SidonRhoCounterfamilyAudit.localLaw q z).toReal * (firstCollision q (SidonRhoCounterfamilyAudit.transition q z.1) z.2.1 : ℝ) ∧ uniformMean q = SidonRhoCounterfamilyAudit.meanCollision q ∧ (q : ℝ) ≤ 951 * uniformMean q ∧ uniformMean q ≤ q ∧ (SidonRhoCounterfamilyAudit.localLaw q).toOuterMeasure (GeneralTwoStepCollisionAudit.freshEvent (SidonRhoCounterfamilyAudit.increments q) : Set (GeneralTwoStepCollisionAudit.JointSample (ZMod q) (Fin 20))) = ENNReal.ofReal ((7581 : ℝ) / (8000 * q))) ∧ (∀ C : ℕ, ∃ (q : ℕ) (hq : Nat.Prime q), 1902 < q ∧ (C : ℝ) * q < (@uniformMean q ⟨hq.ne_zero⟩)^2) ∧ (¬∃ C : ℝ, ∀ (q : ℕ) (hq : Nat.Prime q), 1902 < q → TwoStepCollisionAudit.DegreeTwoGeneric (SidonRhoCounterfamilyAudit.increments q) → (@uniformMean q ⟨hq.ne_zero⟩)^2 ≤ C * q) ∧ Nat.Prime 10000019 ∧ (4 : ℝ) * 10000019 < (uniformMean 10000019)^2",
+      "recorded_text_sha256": "67e5dab5404c635114f843a3257bb0556c706a3a6359d7ecffd69373015c65b7",
+      "source_plan": "research/start_invariant_rho_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "StartInvariantRhoAudit.start_invariant_rho_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native processing, not kernel parsing/hash/host execution refinement."
+}

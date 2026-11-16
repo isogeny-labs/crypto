@@ -1,0 +1,49 @@
+{
+  "archive": "research/elliptic_picard_bridge_audit_20261115/evidence/gate.tar.gz",
+  "files": 5,
+  "unique_objects": 5,
+  "losslessly_deduplicated": false,
+  "roundtrip_equal": true,
+  "inventory": [
+    {
+      "member": "research_elliptic_picard_bridge_audit_20261115_lean/audit.log",
+      "bytes": 3882,
+      "sha256": "dd266f2064c56b38d5b13663eff64084dce66ad762c37233056351d0188b7c73"
+    },
+    {
+      "member": "research_elliptic_picard_bridge_audit_20261115_lean/build.log",
+      "bytes": 23800,
+      "sha256": "536065e4e22cae9f00bfa097f502479e3f6ef041180f40125f4ade72d444076a"
+    },
+    {
+      "member": "research_elliptic_picard_bridge_audit_20261115_lean/cache.log",
+      "bytes": 138,
+      "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+    },
+    {
+      "member": "research_elliptic_picard_bridge_audit_20261115_lean/source-build.log",
+      "bytes": 23800,
+      "sha256": "849a603639c69ba5317ac40264e8d81dee4fd6149fabf346dfd9caf9477117d6"
+    },
+    {
+      "member": "research_elliptic_picard_bridge_audit_20261115_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+    }
+  ],
+  "declarations": 35,
+  "failing": 0,
+  "trusted_native": 0,
+  "new_modules": 8,
+  "new_concrete_modules": 8,
+  "credited_dependency_modules": 76,
+  "credited_prior_gate": 536,
+  "new_source_warnings": 0,
+  "inherited_advisories": {
+    "build.log": [],
+    "source-build.log": [],
+    "audit.log": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ]
+  }
+}

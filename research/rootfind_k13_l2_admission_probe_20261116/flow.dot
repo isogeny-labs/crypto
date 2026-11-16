@@ -1,0 +1,13 @@
+digraph admission {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.38", ranksep="0.5"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=14,
+        color="#243b53", fillcolor="#f4f8fc", margin="0.17,0.12"];
+  edge [color="#526b80", penwidth=1.4, arrowsize=0.7, fontsize=11];
+  local [label="Archived K13 L0 readback\n36 batch solves below 1 ms\nseeds 202611160401 / 202611160511", fillcolor="#fff4db"];
+  rule [label="ecbench grade_v3\nsolve >= 1 ms for L2", fillcolor="#e9f0fb"];
+  probe [label="Before-data x86 probe\n8 frozen targets x 2 A/A arms\n32 measured solves", fillcolor="#e8f6f1"];
+  full [label="Frozen ten-arm K13 panel\n560 executions; F4/F5/F6\nsame-target L2 comparison", fillcolor="#e8f6f1"];
+  local -> rule [label="risk signal only"];
+  rule -> probe [label="test on intended host"];
+  probe -> full [label="only if every row admits"];
+}
