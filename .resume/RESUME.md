@@ -1,3 +1,22 @@
+# Active checkpoint: anchored descent42 frozen, Runpod pending
+
+Production41landed in PR4453, merge268f4bdc5b476b0f5a7763e5a9277def6f062b12.
+New branch feat/extension-ic-anchored-descent; sourcePCC69b00bUNVERIFIED.
+28worker/44checker tests, strictClippy/nativebuilds pass. Safe input9967e973...,
+4507420B, contains supplied public/homogeneous state only. Three-arm fixed seed401
+component protocol5400srunner/8192residuals/32rows is frozen and not dispatched.
+All owned old pods deleted. Publish regularPR/seal/Runpod/collect/hash/delete next.
+Current main removes PCC/keyring/accounting/AGENTS sources; full merge aborted.
+The tested component baseline is retained; shared ledger/journal fully reconciled.
+No merged-main build/trust admission asserted. Goal ACTIVE.
+
+Complete incoming main handoff is preserved in immutable public Git history:
+https://github.com/isogeny-labs/crypto/blob/80a76623de94a7e5d0213333e0715ca04fa8fbf4/.resume/RESUME.md
+SHA256 75ab72c54ecc211f6bafe352fc1ce6644431d0844cb23c023d05c524428df44c; 8608377bytes. Its automatic-merge snapshot
+is also retained locally at /workspace/ic-runpod-runs/anchored42-main-reconciliation-20261116/RESUME.md.automatic-merge.
+The prior feature handoff follows byte-for-byte, including its older snapshots.
+Historical draft/pending publication statements below are superseded here.
+
 # Active checkpoint: Rust anchored-descent continuation after trial 41
 
 Trial 41 is published in regular PR4453, with auto-merge enabled. All owned
