@@ -387,7 +387,7 @@
       "per_sample_seconds": null,
       "threads": 1,
       "estimated_total_seconds": 3600,
-      "measured_on": "Bootstrap/preflight is separate, excluded from comparisons. This number is the enforced conservative envelope, not a measured forecast or cross-field runtime extrapolation."
+      "measured_on": "Separate word62/m32 bootstrap: 12 arm calls complete and replayed; isolated thin-driver wall 0.0175705530000414 seconds, zero other-process CPU reported. This is not extrapolated across degrees/fields. The declared3600 seconds is an enforced shared envelope, not a fitted forecast."
     }
   },
   "metrics": {
@@ -565,11 +565,11 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "1abbbad626f0fd1a7714eb833f61ed5cd1bbd55a9a2d84a7e922c63eb9527c1d",
+    "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+    "frozen_at": "2026-11-16T16:00:07Z",
+    "filed_before_affected_data": true
   },
   "invalidation_rules": [
     "Counted results require complete-set equality and separate-process replay.",
@@ -602,6 +602,10 @@
     "total_shared_deadline_seconds": 3600,
     "user_authorization": "Explicit local/Git-only authorization retained through requested continuation; no cloud spend.",
     "standard_panel_exception": "Reuse exact prior power-of-two coset fixtures to attribute arithmetic changes; word62 has no asserted prime subgroup order. P224 standard curve.",
-    "preflight": "Separate bootstrap calibration only; primary freeze updated with its receipt before main data."
+    "preflight": "Separate bootstrap calibration only; primary freeze updated with its receipt before main data.",
+    "preflight_receipt": {
+      "path": "continuation-20261116/run/preflight/isolation.jsonl",
+      "sha256": "6148e20957c3f430b7d08f3f2a58f5f06f1a272d6f07efcff8040691c30a3bf2"
+    }
   }
 }
