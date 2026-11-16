@@ -27,3 +27,9 @@ PASS only after new exact-source Rust 1.100 CI completes both B31 bases and orig
 ## Solver implication
 
 A completed non-generic ECDLP algorithm still requires actual target-conditioned `f` plus sign/orientation extraction from R using existing Rust #4228/#4349 original-ideal-certified quotient, *without* generic 4+4 or scanning 48,903,492 B31 x multisets. Require useful rank32 signed rows and fully cold unknown-scalar solves, and compare to tuned Wiener-Zuccherato rho and mature external PKM/APS/F4/CAS. Existing same-source 48-Q producer full cold reference: APS 109.734280 ms vs unfolded rho64 99.473873 ms, intervals overlap parity. No further speedup or novel non-generic algorithm is asserted.
+
+## Prospective additional squarefree falsifier (amended before source edit)
+
+A squarefree degree-eight polynomial supported on eight **distinct** base abscissae has `||d||_1=8` under every one of its 256 sign orientations. Therefore the zero-fibre theorem predicts **zero** orientations mapping to infinity on the actual Dickson31 base, conditional on the D4-injectivity result. In contrast, a repeated-root `(T-x_0)^8` has exactly one cancelling orientation class mapping to infinity among its nine net signatures.
+
+Extend the already checked-in native Rust `prime31_s9_orientation_fibres.rs` with a `squarefree_identity_sign_orientations` counter, an assertion of 0 over all 256 masks, and exact-source CI check. Retain all previously frozen 256 masks, sign seeds, eight x and 9 repeated-root cases. This provides a direct falsifier for a selected-root S9 solver which spuriously reports squarefree f solutions to Q=O. This amendment changes no existing dataset, target cases or result claims; no standalone cost measurement is implied. [pcc:unverified]
