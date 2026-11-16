@@ -6,7 +6,10 @@ use serde_json::{json, Value};
 use torus_s4::{Field, Point, Poly, System};
 use torus_s4_tree::Fp2;
 
+pub mod aggregation;
+pub mod aggregation_controls;
 pub mod controls;
+pub mod index;
 pub type Result<T> = std::result::Result<T, String>;
 
 #[derive(Clone)]
@@ -41,15 +44,14 @@ struct Builder {
 }
 impl Builder {
     fn alloc(&mut self, name: &str, op: Op) -> Poly {
-        let v = Poly::var(&self.system.p, self.ops.len());
+        let index = self.system.variables.len();
+        let v = Poly::var(&self.system.p, index);
         match &op {
             Op::Expr(p) => self.system.equations.push(&v - p),
             Op::Inverse(p) => self.system.equations.push(&(&v * p) - &self.c(1)),
             Op::Input(_) => {}
         }
-        self.system
-            .variables
-            .push(format!("{name}_{}", self.ops.len()));
+        self.system.variables.push(format!("{name}_{index}"));
         self.ops.push(op);
         v
     }
@@ -107,10 +109,13 @@ pub struct Circuit {
     pub system: System,
     ops: Vec<Op>,
     image: Option<Pair>,
+    raw_point: Option<Pair>,
+    parameter: Pair,
     pub width: u32,
     power_gates: usize,
     selector_gates: usize,
 }
+#[derive(Clone)]
 pub struct WitnessInput {
     pub z: Fp2,
     /// Zero-based selector x=j-1; may exceed k-1 for rejection controls.
@@ -173,6 +178,7 @@ impl Circuit {
         b.system.equations.push(&power.0 - &selected.0);
         b.system.equations.push(&power.1 - &selected.1);
         let selector_gates = b.pair_muls - power_gates;
+        let mut raw_point = None;
         let image = if let Some(a) = &s.curve_a {
             if a.is_zero() || a >= &f.p {
                 return Err("invalid curve coefficient".into());
@@ -188,6 +194,7 @@ impl Circuit {
                 Op::Expr(&center + &(&(&b.c(1) - &branch.scale(2)) * &delta)),
             );
             let square = b.alloc("raw_u_square", Op::Expr(&u * &u));
+            raw_point = Some((u.clone(), v.clone()));
             let ca = b.constant(a.clone());
             b.system
                 .equations
@@ -202,6 +209,8 @@ impl Circuit {
             system: b.system,
             ops: b.ops,
             image,
+            raw_point,
+            parameter: z,
             width,
             power_gates,
             selector_gates,
@@ -235,6 +244,30 @@ impl Circuit {
             None => Ok(None),
             Some((u, v)) => Ok(Some((u.evaluate(values)?, v.evaluate(values)?))),
         }
+    }
+    /// Symbolic roles, independent of generated variable names or slots.
+    pub fn image_polys(&self) -> Option<(Poly, Poly)> {
+        self.image.clone()
+    }
+    pub fn raw_point_polys(&self) -> Option<(Poly, Poly)> {
+        self.raw_point.clone()
+    }
+    pub fn parameter_polys(&self) -> (Poly, Poly) {
+        self.parameter.clone()
+    }
+    pub fn selector_value(&self, values: &[BigUint]) -> Result<u64> {
+        self.system.check(values)?;
+        let mut x = 0u64;
+        for (i, op) in self.ops.iter().enumerate() {
+            if let Op::Input(Input::Selector(bit)) = op {
+                if values[i] == BigUint::one() {
+                    x |= 1u64 << bit;
+                } else if !values[i].is_zero() {
+                    return Err("nonbinary selector".into());
+                }
+            }
+        }
+        Ok(x + 1)
     }
     pub fn first_selector(&self) -> Option<usize> {
         self.ops
