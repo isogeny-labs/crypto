@@ -1,0 +1,129 @@
+c GAUSSCONF max_num_matrices=5 autodisable=1 max_matrix_rows=2000 max_matrix_columns=1000 min_gauss_xor_clauses=2
+c -- header says num vars:            473
+c -- header says num clauses:        1287
+c -- clauses added: 1224
+c -- xor clauses added: 63
+c -- vars added 473
+c [find&init matx] performing matrix init
+c [gauss] XOR-encoding clauses are not detached, so no need to reattach them.
+c [xor-rem-unconnected] left with 63 xors from 63 non-empty xors T: 0.00
+c [xor-together] xored together: 0 orig xors: 63 new xors: 63 T: 0.00
+c [xor-rem-unconnected] left with 63 xors from 63 non-empty xors T: 0.00
+c [xor-clean-equiv] removed equivalent xors: 0 left with: 63
+c [matrix] unused xors from cleaning: 0
+c [matrix] Good   matrix  0     42 x  326  density:0.0679  xorlen avg: 22.14
+c [matrix] Good   matrix  1      7 x   42  density:0.5034  xorlen avg: 21.14
+c [matrix] Good   matrix  2      7 x   42  density:0.5034  xorlen avg: 21.14
+c [matrix] Good   matrix  3      7 x   42  density:0.5034  xorlen avg: 21.14
+c [matrix] Using 4 matrices recovered from 0 xors T: 0.00 T-out: N
+c [branch] adjusting to: vsid (from: vsid) var_decay:0.95 descr: VSIDS
+c rst  geom  stb   vs     1   111    1043  5400   816    3.91    3.66     6    27    78     0   29.68   29.68
+c rst  geom  stb   vs     2   234    1043  5400   816    3.91    3.66     6    31   197     0   32.80   32.80
+c  res  pol bran  nres  conf freevar  IrrL  IrrB l/longC  l/allC RedL0 RedL1 RedL2  RedB l/longC  l/allC
+c rst  geom  stb   vs     3   370    1043  5400   816    3.91    3.66     7    33   330     0   33.32   33.32
+c rst  geom  stb   vs     4   517    1043  5400   816    3.91    3.66    13    80   423     1   29.97   29.92
+c rst  geom  stb   vs     5   679    1043  5400   816    3.91    3.66    26   111   540     2   29.15   29.07
+c rst  geom  stb   vs     6   857    1043  5400   816    3.91    3.66    29   115   711     2   29.49   29.43
+c [g  <2] Disabling GJ-elim in this round.  Usefulness was: 17.0858%  over 1352 calls
+c rst  geom  stb   vs     7  1051    1043  5400   816    3.91    3.66    36   195   818     2   28.27   28.22
+c rst  geom  stb   vs     8  1265    1043  5400   816    3.91    3.66    40   238   984     3   26.97   26.91
+c rst  geom  stb   vs     9  1500    1043  5400   816    3.91    3.66    57   288  1152     3   26.64   26.59
+c rst  geom  stb   vs    10  1757    1043  5400   816    3.91    3.66    61   324  1369     3   25.42   25.38
+c rst  geom  stb   vs    11  2040    1043  5400   816    3.91    3.66    69   354  1613     4   24.36   24.32
+c rst  geom  stb   vs    12  2351    1043  5400   816    3.91    3.66    98   413  1832     8   23.51   23.43
+c rst  geom  stb   vs    13  2691    1043  5400   816    3.91    3.66   115   462  2105     9   22.72   22.65
+c rst  geom  stb   vs    14  3065    1043  5400   816    3.91    3.66   116   467  2473     9   21.53   21.47
+c [g  <1] Disabling GJ-elim in this round.  Usefulness was: 17.9853%  over 2174 calls
+c [g  <3] Disabling GJ-elim in this round.  Usefulness was: 12.0810%  over 1432 calls
+c rst  geom  stb   vs    15  3475    1043  5400   816    3.91    3.66   119   474  2872    10   20.80   20.74
+c rst  geom  stb   vs    16  3925    1043  5400   816    3.91    3.66   119   484  3312    10   19.85   19.80
+c rst  geom  stb   vs    17  4420    1043  5400   816    3.91    3.66   121   537  3752    10   18.92   18.89
+c rst  geom  stb   vs    18  4964    1043  5400   816    3.91    3.66   122   616  4215    11   18.02   17.99
+c rst  geom  stb   vs    19  5563    1043  5400   816    3.91    3.66   142   800  4609    12   17.56   17.53
+c [branch] adjusting to: vmtf (from: vsid) var_decay:0.95 descr: VMTF
+c [distill-long-red0] cls tried: 142/142 T: 0.00 T-out: N T-r: 99.97%
+c [distill-long-red1] cls tried: 510/800 T: 0.01 T-out: Y T-r: -0.33%
+c rst  luby ibes  vmt    20  5665    1042  5400   816    3.91    3.66   106   788  4621   147   17.29   16.89
+c rst  luby ibes  vmt    21  5766    1042  5400   816    3.91    3.66   115   840  4661   147   17.22   16.83
+c rst  luby ibes  vmt    22  5968    1041  5400   816    3.91    3.66   132   901  4778   153   16.97   16.59
+c rst  luby ibes  vmt    23  6070    1041  5400   816    3.91    3.66   132   938  4843   153   16.83   16.46
+c rst  luby ibes  vmt    24  6172    1041  5400   816    3.91    3.66   132   946  4937   153   16.75   16.38
+c rst  luby ibes  vmt    25  6374    1041  5400   816    3.91    3.66   132   980  5105   153   16.49   16.15
+c rst  luby ibes  vmt    26  6776    1041  5400   816    3.91    3.66   140  1107  5372   155   16.20   15.88
+c rst  luby ibes  vmt    27  6878    1041  5400   816    3.91    3.66   144  1166  5410   156   16.13   15.81
+c rst  luby ibes  vmt    28  6979    1040  5400   816    3.91    3.66   164  1238  5416   159   16.08   15.76
+c rst  luby ibes  vmt    29  7181    1039  5400   816    3.91    3.66   184  1382  5452   161   15.95   15.64
+c rst  luby ibes  vmt    30  7283    1039  5400   816    3.91    3.66   190  1466  5463   162   15.90   15.59
+c rst  luby ibes  vmt    31  7384    1039  5400   816    3.91    3.66   208  1534  5475   165   15.81   15.51
+c rst  luby ibes  vmt    32  7586     821  4628   747    3.82    3.57   126   882  2574   137   11.19   10.85
+c rst  luby ibes  vmt    33  7599     461  4628   747    3.82    3.57   130   882  2574   141   11.19   10.84
+c ------- FINAL TOTAL SEARCH STATS ---------
+c UIP search time          : 0.18        (96.13     % time)
+c restarts                 : 33          (230.27    confls per restart)
+c blocked restarts         : 0           (0.00      per normal restart)
+c time                     : 0.18        
+c decisions                : 8939        (0.00      % random)
+c propagations             : 778K        (4323K     props/s)
+c decisions/conflicts      : 1.18        
+c conflicts                : 7599        
+c conf lits non-minim      : 436620      (57.46     lit/confl)
+c conf lits final          : 15.81       
+c red which0               : 334         (4.40      % of confl)
+c props/decision           : 0.00        
+c props/conflict           : 0.00        
+c 0-depth assigns          : 582         (55.80     % vars)
+c 0-depth assigns by CNF   : 0           (0.00      % vars)
+c reduceDB time            : 0.00        (0.00      % time)
+c OccSimplifier time       : 0.00        (0.00      % time)
+c [occur] 0.00 is overhead
+c [occur] link-in T: 0.00 cleanup T: 0.00
+c [occ-substr] long subBySub: 0 subByStr: 0 lits-rem-str: 0 T: 0.00
+c SCC time                 : 0.00        (0.00      % time)
+c [scc] new: 0 BP 0M  T: 0.00
+c vrep replace time        : 0.00        (0.00      % time)
+c vrep tree roots          : 0           
+c vrep trees' crown        : 0           (0.00      leafs/tree)
+c distill long time        : 0.01        (6.46      % time)
+c distill bin time         : 0.00        (0.00      % time)
+c strength cache-irred time: 0.00        (0.00      % time)
+c strength cache-red time  : 0.00        (0.00      % time)
+c avg cls in red 0         : 104.03      
+c avg cls in red 1         : 587.38      
+c avg cls in red 2         : 3047.32     
+c Conflicts in UIP         : 7599        (40562.83  confl/time_this_thread)
+c Max Memory (rss) used    : 7512 kB     
+c Total time (this thread) : 0.19        
+c DRIVER conflicts: 7599
+c DRIVER decisions: 8939
+c DRIVER propagations: 778620
+c DRIVER solve_cpu_s: 0.187113
+c DRIVER solve_wall_s: 0.188038
+s UNSATISFIABLE
+c [g 0] truth-find prop checks  : 108K
+c [g 0] -> of which prop        : 34.71 %
+c [g 0] -> of which confl       :  2.81 %
+c [g 0] elim called             : 24K
+c [g 0] ---> which lead to prop : 13.31 %
+c [g 0] ---> which lead to confl:  0.80 %
+c [g 0] size: 42    x 326  
+c [g 1] truth-find prop checks  : 1413
+c [g 1] -> of which prop        : 21.02 %
+c [g 1] -> of which confl       :  3.68 %
+c [g 1] elim called             : 429
+c [g 1] ---> which lead to prop :  9.09 %
+c [g 1] ---> which lead to confl:  0.70 %
+c [g 1] size: 7     x 42   
+c [g 2] truth-find prop checks  : 855
+c [g 2] -> of which prop        : 19.77 %
+c [g 2] -> of which confl       :  1.87 %
+c [g 2] elim called             : 328
+c [g 2] ---> which lead to prop : 13.11 %
+c [g 2] ---> which lead to confl:  0.91 %
+c [g 2] size: 7     x 42   
+c [g 3] truth-find prop checks  : 936
+c [g 3] -> of which prop        : 14.74 %
+c [g 3] -> of which confl       :  3.74 %
+c [g 3] elim called             : 358
+c [g 3] ---> which lead to prop :  0.00 %
+c [g 3] ---> which lead to confl:  0.00 %
+c [g 3] size: 7     x 42   

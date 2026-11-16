@@ -49,7 +49,7 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, Targets,
 };
 use crypto_lib::cryptanalysis::ic_framework::{
-    format_markdown, run_pipeline, PipelineSpec, RunReport,
+    format_markdown, run_pipeline, run_pipeline_with_progress, PipelineSpec, RunReport,
 };
 
 #[derive(Args, Clone)]
@@ -325,7 +325,10 @@ fn listing() -> Value {
                         {"name": "aux", "means": "ordinary (searched, charged to the factor-base phase), supersingular, ss-j1728, ss-j1728-twist, ss-j0 or ss-j0-twist (#E' = p + 1, no search)"}],
                      "needs": "oracle pkm-semaev for the algebraic track"},
                     {"name": "known-log", "regimes": ["prime"],
-                     "parameters": [{"name": "size", "means": "multiples [i]G, 1 <= i <= size, one column each, every logarithm known so linear algebra is skipped"}]},
+                     "parameters": [
+                        {"name": "size", "means": "columns B (need 2*B < r): multiples [i]G or seeded scalars, one column each, every logarithm known so linear algebra is skipped"},
+                        {"name": "scalars", "means": "progression (default): s_i = i, built by B-1 additions; random: s_i uniform in [1, r-1], one charged scalar multiplication each"},
+                        {"name": "seed", "means": "random only: seed of the scalar stream (default 20261019); the base is fixed per (G, size, seed)"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
                      "parameters": [
                         {"name": "size", "means": "seed abscissae; the base is their closure under the curve's automorphism group"},
@@ -335,7 +338,8 @@ fn listing() -> Value {
                      "parameters": [
                         {"name": "size", "means": "seed abscissae (columns)"},
                         {"name": "norm", "means": "include alpha(P) = [a]P + [b]phi(P) for every alpha = a + b*phi of norm <= this (needs --family j0, j1728, d7 or d8); 0 for the seeds alone"},
-                        {"name": "endo", "means": "index of the curve's CM endomorphism; default 0"}]},
+                        {"name": "endo", "means": "index of the curve's CM endomorphism; default 0"},
+                        {"name": "mult", "means": "also include [m]P for m = 2..=mult with weight m (needs no endomorphism); default 1"}]},
                     {"name": "hashed-affine", "regimes": ["prime"],
                      "parameters": [
                         {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match the oracle"},
@@ -345,7 +349,8 @@ fn listing() -> Value {
                         {"name": "steps", "means": "enumeration work budget in charged primitive steps"}]},
                     {"name": "gls-line", "regimes": ["gls (examples/glv_invariant_bench.rs)"],
                      "parameters": [
-                        {"name": "no_fold", "means": "1 to fold the same points by negation only"}]},
+                        {"name": "no_fold", "means": "1 to fold the same points by negation only"}],
+                     "needs": "a GLS instance over F_{p^2}: not selectable from `ic bench` (the prime dispatch has no arm for it); run examples/glv_invariant_bench.rs"},
                     {"name": "binary-multiplier", "regimes": ["char2", "koblitz"],
                      "parameters": [
                         {"name": "size", "means": "seed abscissae (columns)"},
@@ -388,6 +393,9 @@ fn listing() -> Value {
                 "plugins": [
                     {"name": "subtract", "summands": 2, "regimes": ["prime", "char2", "koblitz"],
                      "parameters": []},
+                    {"name": "subtract-binary-batch", "summands": 2, "regimes": ["char2", "koblitz"],
+                     "parameters": [{"name": "block", "means": "batch size 1..4096, default 32"},
+                                    {"name": "lazy", "means": "1 (default) to finish only candidate ordinates; 0 for full batch"}]},
                     {"name": "mitm", "summands": "2 or 3", "regimes": ["prime", "char2", "koblitz"],
                      "parameters": [{"name": "negation_folded", "means": "1 to halve the table's additions"},
                                     {"name": "m", "means": "summands, 2 or 3"}]},
@@ -759,6 +767,10 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
+        let mut rootfind_gpu =
+            crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
+                m, inst,
+            );
         let mut hashed = HashedTensorOracle::new();
         // Built on the base's own tower, so it refuses any other base.
         let mut pkm = match or_name {
@@ -772,15 +784,17 @@ fn run_prime(
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
+            "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, hashed-tensor or pkm-semaev"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-subtract-gpu, \
+                     hashed-tensor or pkm-semaev"
                 ))
             }
         };
-        out.push(run_pipeline(
+        out.push(run_traced(
             &ctx, &spec, base, oracle, planted, calib, rho_s,
         )?);
     }
@@ -864,6 +878,7 @@ fn run_binary(
             }
         }
         let mut subtract = SubtractOracle;
+        let mut subtract_binary = crypto_lib::cryptanalysis::ic_framework::binary_subtract::BinarySubtractOracle::new();
         let mut mitm = MitmOracle::new(m);
         let mut frob = FrobeniusMitmOracle::new(m, inst);
         let mut frob_counted = FrobeniusMitmOracle::new_counted(m, inst);
@@ -873,9 +888,9 @@ fn run_binary(
         };
         let mut algebraic = match or_name {
             "descent-algebraic" => {
-                let raw = spec.solver.as_deref().ok_or(
-                    "descent-algebraic needs --solver (try buchberger-f2, sat-cdcl or exhaustive)",
-                )?;
+                let raw = spec.solver.as_deref().unwrap_or(
+                    crypto_lib::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER,
+                );
                 let (sname, sparams) = parse_plugin(raw)?;
                 let budget = (spec.solver_budget_seconds > 0)
                     .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
@@ -895,6 +910,7 @@ fn run_binary(
         };
         let oracle: &mut dyn DecompositionOracle<BinaryGroup> = match or_name {
             "subtract" => &mut subtract,
+            "subtract-binary-batch" => &mut subtract_binary,
             "mitm" => &mut mitm,
             "mitm-frobenius" => &mut frob,
             "mitm-frobenius-counted" => &mut frob_counted,
@@ -903,11 +919,50 @@ fn run_binary(
             "chained-x" => chained.as_mut().expect("built above"),
             other => return Err(format!("oracle `{other}` is not available here")),
         };
-        out.push(run_pipeline(
+        out.push(run_traced(
             &ctx, &spec, base, oracle, planted, calib, rho_s,
         )?);
     }
     Ok(out)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_traced<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: u64,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<RunReport, String> {
+    if super::progress::enabled() {
+        super::progress::line(format_args!(
+            "bench: {}; factor base {}; oracle {}; matrix {}",
+            ctx.name, spec.factor_base, spec.oracle, spec.linalg
+        ));
+        if super::progress::level() >= 2 {
+            super::progress::line(format_args!(
+                "bench: G = {:?}; Q = {:?}",
+                ctx.generator, ctx.target
+            ));
+        }
+        if spec.targets == Targets::Residual {
+            super::progress::line(format_args!("bench: residual collector reports setup and final rank; per-query equations are unavailable for this query law"));
+        }
+        run_pipeline_with_progress(
+            ctx,
+            spec,
+            base,
+            oracle,
+            planted,
+            calib,
+            rho_s,
+            &mut |event| super::progress::pipeline(event, spec.max_trials, ctx.cofactor, ctx.r),
+        )
+    } else {
+        run_pipeline(ctx, spec, base, oracle, planted, calib, rho_s)
+    }
 }
 
 /// The instance a sweep runs every configuration on, built once.
@@ -1380,6 +1435,23 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         .iter()
         .map(|cfg| spec_from(cfg, &args))
         .collect::<Result<Vec<_>, _>>()?;
+
+    // A CUDA worker creates its context before it reads its first request (about 150 ms on an A100).  Start it
+    // now, so that this overlaps the instance build, calibration and the rho reference instead of being waited
+    // for by the first `fes-f2-gpu` call.  Only a configuration that will call it (`descent-algebraic` with that
+    // solver) starts one.
+    let default_solver = crypto_lib::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER;
+    if specs.iter().any(|s| {
+        s.oracle == "descent-algebraic"
+            && s.solver
+                .as_deref()
+                .unwrap_or(default_solver)
+                .split(':')
+                .next()
+                == Some("fes-f2-gpu")
+    }) {
+        crypto_lib::cryptanalysis::fes_gpu::prewarm_shared_server();
+    }
 
     let (mut regime, degree) = instance_spec;
     let instance = match early_instance {

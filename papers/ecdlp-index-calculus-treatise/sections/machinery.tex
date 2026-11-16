@@ -352,6 +352,93 @@ admitted wall-time ratio a ratio of start-up costs. This, with
 \S\ref{sec:em-allocator}, is why wall time is admitted only above a minimum
 solve length and with an A/A interval.
 
+\section{What the band can read: two instrument checks}\label{sec:em-yardstick}
+
+Two studies of 12 November, on the chained-transfer index calculus over
+genus-2 and genus-3 covers, asked what the instrument can and cannot show.
+Every number is \texttt{[pcc:unverified]}; every log was certified by an
+independent $[k]G=T$ check.
+
+\paragraph{Three instrument fixes.} The first study corrected three parts
+of the transfer instrument and re-ran its rows
+(\art{research/instrument_fixes_20261112/RESULTS.md}). (1) The recorded
+genus-2 linear-algebra counter equals $(\abs\Fb+2)\cdot\text{rows}+1$; a full
+count of the same elimination is $1.001$--$1.02$ times it in
+multiplications, plus $1.5$--$1.8$ additions per multiplication. (2) The
+recorded matched rho spent about 400 group operations on jump-table set-up;
+the tuned negation walk spends 51--66 on set-up at the v3 sizes (56--79 on
+the tower) and totals 63--92 group operations there against a recorded
+357--847, so the recorded reference was 5--9 times too expensive. (3) Double large primes and walk
+collection cut arm C's group operations at $p=1{,}619$ from $34{,}521$ to
+$2{,}583$ ($13.4\times$). Against the corrected rho the distance remaining
+grew in 50 of 54 (row, price) cells. One verdict changed: genus 2 at
+$p=251$, recorded ``unresolved'' ($0.67\times$ the plain rho at $w=0$), is now
+above rho at all three prices ($11.0\times$ at $w=0$). At $p=1{,}619$ arm C
+reads $28.1$, $247$ and $1{,}715\times$ the negation rho at $w=0$, 0.1 and 1.
+The accounting change alone (row L) made every gap larger and is not an
+improvement; the algorithm change (arm C) is a measured improvement of that
+baseline that does not reach rho. An independent validator then reproduced
+the earlier v3, \texttt{tower\_large} and cover rows and declined to admit
+them, because their rho reference is the plain walk
+(\art{research/validation_20261112/REPORT.md}); the re-measurement against
+the tuned negation rho was admitted on 13 November: 156 of 162 rows above
+rho at 0, 0.1 and 1~GAE, 6 unresolved lower bounds, none below
+(\art{research/validation_20261113/REPORT.md}).
+
+\paragraph{A positive control.} The second study ran the one regime where
+index calculus is known to win asymptotically: genus-3 imaginary
+hyperelliptic Jacobians over $\FF_p$, $p=131$ to $65{,}537$, with arm C a
+double-large-prime index calculus (base $2p^{2/3}$, cost $\tilde O(p^{4/3})$)
+against negation rho on the order-$r$ subgroup ($p^{3/2}$); 572 runs, all
+certified (\art{research/ic_positive_control_20261112/RESULTS.md}).
+Table~\ref{tab:em-posctl} gives the ratios. Its frozen rule, C below rho at
+all three prices at some $p$, did not fire: C is below rho at $w=0$ from
+$p=257$ and above it at $w=0.1$ and 1 at every $p$. Each trial drags about
+362 native multiplications (smoothness test and root finding) behind its
+one group operation. The fitted slopes are $1.158$ for C's group operations
+and $1.427$ for rho's, and $1.325$ and $1.329$ for C's totals at $w=0.1$
+and 1; extrapolating the $w=0.1$ fits puts the crossover near $p=10^{13}$,
+which the source reads as ``not in range''.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrllll@{}}
+\toprule
+$p$ & runs (C, R) & $w=0$ & $w=0.1$ & $w=1$ & calibrated \\
+\midrule
+131 & 20, 20 & $1.804$ & $19.769$ & $111.267$ & $3.194$ \\
+ & & $[1.343,2.580]$ & $[14.526,29.218]$ & $[81.246,162.666]$ & $[2.445,4.423]$ \\
+257 & 20, 20 & $0.621$ & $9.470$ & $51.560$ & $1.350$ \\
+ & & $[0.493,0.803]$ & $[7.530,12.124]$ & $[41.241,66.320]$ & $[1.093,1.724]$ \\
+2{,}053 & 20, 20 & $0.271$ & $8.780$ & $47.299$ & $0.988$ \\
+ & & $[0.201,0.397]$ & $[6.562,12.906]$ & $[34.957,71.427]$ & $[0.728,1.461]$ \\
+16{,}411 & 8, 8 & $0.164$ & $7.538$ & $40.729$ & $0.768$ \\
+ & & $[0.112,0.277]$ & $[5.222,12.472]$ & $[27.900,67.977]$ & $[0.517,1.262]$ \\
+65{,}537 & 4, 4 & $0.114$ & $5.818$ & $31.485$ & $0.582$ \\
+ & & $[0.079,0.184]$ & $[3.839,9.370]$ & $[20.782,52.650]$ & $[0.384,0.938]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Positive control: genus-3 double-large-prime index calculus (C)
+over negation rho (R), ratio of mean totals in GAE with a bootstrap 95\%
+interval over runs (2{,}000 resamples), at five of the ten primes. The
+calibrated column prices a native multiplication at its measured cost
+relative to one Cantor addition (about $0.005$ in the relation phase and
+$0.013$ in the linear algebra on this shared host); it is informational and
+never part of the verdict. \texttt{[pcc:unverified]}. Source:
+\art{research/ic_positive_control_20261112/RESULTS.md}.}
+\label{tab:em-posctl}
+\end{table}
+
+\noindent The control fixes how earlier distances read. A win in the
+known-winning regime shows at $w=0$, is unresolved inside the band at
+$p=65{,}537$, and needs the calibrated price to cross 1. Distances read at
+$w=0.1$ and 1 whose gap is below the control's own (about 6 and about 31)
+cannot be told apart from a winning algorithm's reading; only the $w=0$
+column and the order across the band discriminate. The earlier $w=0$
+distances of the transfer line (for example $47.11\times$ at $p=64{,}007$)
+are real losses in group operations, since the same instrument reads $0.114$
+for a winning method.
+
 \section{What a measured engine result must carry}\label{sec:em-contract}
 
 The corrections above add up to a contract that every result in the
@@ -664,6 +751,283 @@ records that on the $\Sem3$ chain F4 and F6-IC grow faster in $n$ than the
 meet-in-the-middle floor at $m=3$ and $m=4$, with the slope-difference
 interval above zero.
 
+\section{The $m=2$ descent ladder end to end, 10--12 November}\label{sec:bo-ladder}
+
+Four studies of 10--12 November priced the algebraic $m=2$ oracle inside a
+complete solve and then made its engines faster. All ran on a shared
+4-vCPU container with one solver thread, are local development checks,
+and carry no replay certificate, validator report or pcc claim. Two later
+studies have validator reports: the \texttt{fes-then-batched} ladder
+(13 November) and the RunPod ecbench session at degree 13 (15 November),
+both validated as measurements with their rankings unresolved inside the
+band. No number in this section carries a pcc claim, and none is a
+leaderboard row.
+
+\paragraph{The instrument.} \texttt{ic bench --sweep} builds a
+\texttt{binary-subspace} factor base of dimension $\lceil n/2\rceil$
+($2\lceil n/2\rceil$ Boolean unknowns, $n$ quadratics), collects relations
+until the matrix has full rank, eliminates, recovers planted logarithms and
+prices every phase in group-addition equivalents, $S=\text{GAE}/\sqrt r$,
+beside a matched counted rho of 16 runs on the same subgroup. Inherited F4,
+\texttt{f4-f2} and \texttt{fes-f2} are priced from their word-XOR counts at
+the pinned ratio (``measured'' on the random curves); M4GB reports no count
+and is priced by wall time. Between a count-priced and a wall-priced engine
+$S$ therefore compares pricing bases, not engines, and the M4GB rows are
+upper bounds in that sense (\art{research/m4gb_e2e_ic_ladder_20261110/README.md}).
+The solver is 83--100\% of each algebraic row's GAE, and the hit rate is
+about 0.65 per target, so the per-call cost of the solver is the cost of the
+solve.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+instance (unknowns) & rho & pair table & inherited F4 & \texttt{fes-f2} & \texttt{f4-f2} & M4GB & best/rho \\
+\midrule
+Koblitz 13 (14) & 2.76 & 197.7 & 123.1 & \textbf{94.7} & 455 & 136{,}908 & 34.30 \\
+random 15 (16) & 2.64 & 474.0 & \textbf{357.5} & 426.5 & 1{,}736 & 124{,}118 & 135.58 \\
+Koblitz 17 (18) & 2.02 & 493.0 & \textbf{249.1} & 494.0 & 1{,}844 & 176{,}669 & 123.49 \\
+Koblitz 19 (20) & 1.48 & 1{,}063.2 & \textbf{411.0} & 2{,}548.0 & 6{,}709 & 253{,}620 & 278.04 \\
+random 21 (22) & 1.36 & \textbf{1{,}975.8} & 2{,}758.3 & 21{,}807.9 & 705{,}787 & 1{,}285{,}977 & 1{,}449.00 \\
+Koblitz 23 (24) & 0.92 & 3{,}986.2 & \textbf{1{,}852.5} & 18{,}444.0 & 1{,}657{,}918 & 1{,}834{,}209 & 2{,}014.13 \\
+\bottomrule
+\end{tabular}
+\caption[]{The $m=2$ descent ladder end to end: mean $S$ per configuration,
+every configuration and every matched rho run recovering its planted
+logarithm. Columns rho to \texttt{fes-f2}: the run of 12 November (two
+repeats). Columns \texttt{f4-f2} and M4GB: the run of 10 November (two
+repeats, one at degree 23, where its rho read 0.88). Bold: the lowest IC
+row; best/rho is that row's mean $S$ over matched rho as the source gives
+it, the distance remaining. Inherited F4's $S$ on the random curves differs
+between the runs (287 and 2{,}912 on 10 November) because those rows are priced by
+measured wall. Unverified, local, not a leaderboard row. Sources:
+\art{research/inherited_f4_next_20261112/RESULTS_E2E.md},
+\art{research/m4gb_e2e_ic_ladder_20261110/RESULTS.md}.}
+\label{tab:bo-ladder}
+\end{table}
+
+\paragraph{Exhaustive search at 14 unknowns.} At degree 13 \texttt{fes-f2}
+gives the lowest IC row, $S=94.7$ ($83.7$--$105.7$) against inherited F4's
+$123.1$ ($117.8$--$128.4$): $0.77$ of it, $34.3\times$ matched rho instead of
+$44.6\times$. The two repeats of each engine do not overlap. Two word XORs per
+Gray-code point over $2^{14}$ points cost less than the inherited tree's
+eliminations. From 16 unknowns up the count of \texttt{fes-f2} doubles per
+unknown and its $S$ is $1.2$ (random 15) to $10\times$ inherited F4's.
+The study states the prediction (degree 13 below, degree 17 or 19 up above)
+before the run; it held
+(\art{research/inherited_f4_next_20261112/README.md}). It is an end-to-end
+change over the descent baseline on one curve, producer-reported, with two
+repeats.
+
+\paragraph{The validated session at degree 13.} The preregistered
+ecbench comparison (protocol \texttt{FES-K13-VALIDATED-20261112}: one
+session, 8 public targets, 6 measured rounds, the strong signed-Frobenius
+rho \texttt{rho.signed\_frobenius\_strong\_v2} as reference with an A/A
+copy) was blocked on 12 November by the Iso Lab budget (USD $1{,}585.60$
+spent against a USD $1{,}300$ monthly limit). On 14 November the owner moved
+it to RunPod, and session \texttt{ECBS1h695ef8e76c34} ran on 15 November on a
+4-vCPU AMD EPYC 9575F container of a shared host: no L2 gate, no image
+digest, and no admissible wall figure. Its hypotheses were H1, a paired
+$S$ ratio \texttt{fes-f2}/inherited F4 with its 95\% interval below 1 and
+the order holding at $w=0$, 0.1 and 1~GAE, and H2, both solvers priced in
+the pinned word-XOR unit with nothing left unpriced
+(\art{research/fes_k13_validated_20261112/RESULTS.md}).
+Table~\ref{tab:bo-fesk13} gives the validator's recomputation.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrlrrr@{}}
+\toprule
+arm & mean $S$ & 95\% interval & $w=0$ & $w=0.1$ & $w=1$ \\
+\midrule
+\texttt{rho-sfstrong-v2} (reference) & $2.584$ & $[2.512,2.659]$ & $2.584$ & $2.677$ & $3.513$ \\
+\texttt{rho-negation} & $2.788$ & $[2.505,3.103]$ & & & \\
+\texttt{fes-f2} & $86.07$ & $[78.91,93.87]$ & $15.177$ & $3{,}081.763$ & $30{,}681.037$ \\
+inherited F4 & $121.54$ & $[106.69,138.47]$ & $15.174$ & $4{,}621.699$ & $46{,}080.422$ \\
+pair table (positive control) & $197.49$ & $[197.11,197.87]$ & & & \\
+\addlinespace
+\texttt{fes-f2}/inherited F4 & $0.7081$ & $[0.6683,0.7503]$ & $1.000184$ & $0.6668$ & $0.6658$ \\
+\texttt{fes-f2}/strong rho & $33.30$ & & $5.872$ & $1{,}151.07$ & $8{,}734.35$ \\
+inherited F4/strong rho & $47.03$ & & $5.871$ & $1{,}726.25$ & $13{,}118.28$ \\
+\bottomrule
+\end{tabular}
+\caption[]{\texttt{fes-f2} against inherited F4 inside the same descent
+pipeline on Koblitz $K_0$ over $\FF_{2^{13}}$ ($r=2{,}003$), session
+\texttt{ECBS1h695ef8e76c34}: 48 measured runs per arm, all verified. Mean
+$S$ at the pinned word-XOR price (the calibration point) with the 95\%
+interval over the 8 workloads; the band columns price every unpriced native
+operation at $w$~GAE. The paired ratio is over 48 pairs (47 below 1). The
+A/A copy of the reference reads identically. Validated for counts only;
+\texttt{[pcc:unverified]}. Source:
+\art{research/fes_k13_validated_20261112/runpod-a1/VALIDATION.json} and
+\art{research/fes_k13_validated_20261112/RESULTS.md}.}
+\label{tab:bo-fesk13}
+\end{table}
+
+\noindent H1 is not supported. The paired interval lies below 1, but at
+$w=0$ the two arms differ by 6 group operations out of $32{,}598$ summed over
+48 runs, both arms tried $2{,}007$ targets, and the order flips between $w=0$
+and $w=0.1$. The frozen amendment reads that as ``unresolved inside the
+band''. H2 is supported: all 112 descent records are priced in the pinned
+unit with empty \texttt{cost.unpriced}. The strong rho is below every
+index-calculus arm at every weight; at the calibration point
+\texttt{fes-f2}'s distance remaining is $33.30\times$, at $\log_2r=10.97$
+only, where rho's fixed set-up is about 40\% of its $S$. The validator's
+disposition is ``validated for counts only'': a replay on an Intel Xeon
+host reproduced all 288 measured runs, and the binary-to-source binding
+(finding F5) was closed on 15 November by the validator's own rebuild of
+ecbench from \texttt{e9d5dbdccd}, which replayed 288 of 288 identically
+(\art{research/fes_k13_validated_20261112/runpod-a1/f5-rebuild/F5-ASSESSMENT.md}).
+No wall figure is admissible: the A/A wall control could not meet its
+frozen threshold (each A/A solve is about $0.12$\,ms, under the 1\,ms
+minimum), and the route had no L2 gate. No improvement of \texttt{fes-f2}
+over inherited F4 is claimed, and no leaderboard row follows. The
+producer-reported $0.77$ and ``$34.3\times$'' above are the same
+calibration-point reading at two repeats; the validated session replaces
+them.
+
+\paragraph{The same work, faster.} \texttt{inherited-f4-next} runs the same
+eliminations with faster kernels. Per call on 13 cells of 14--32 unknowns
+(6 targets, 3 repeats) it is $0.86$--$0.94\times$ inherited F4, below it on
+74 of 78 targets, with the same word-XOR count on every target and 0
+disagreements; inside the pipeline its wall per call is $0.74$--$0.99\times$
+and its $S$ is identical on every instance. A Callgrind profile puts
+55--64\% of inherited F4's instructions in the specialisation down the
+tree, which is counted work
+(\art{research/inherited_f4_next_20261112/README.md}). The next lever,
+\texttt{inherited-f4-batched}, rewrites a kept row only when it is read or
+at a split; tests pin identical decisions and never more word XORs (ratio
+$0.9843$ over 41 test systems). Its first version cut the counted work per
+target to $0.879$ and $0.830$ on Koblitz 19 and 23 but used 8--13\% more
+wall time, all in the allocator; an arena fix brought Callgrind
+instructions to $0.913$ of eager. Three runs followed on 12 November, each
+with its expectation and falsifier stated before it, on the same shared
+container, one thread (\art{research/inherited_f4_batched_20261112/README.md}).
+\begin{itemize}
+\item \emph{Run 1, paired per call} (13 cells, 6 targets, 3 repeats): the
+  word XORs fall on every target, $0.70$--$0.91$ per target, median $0.84$
+  over the cells, with 0 disagreements with \texttt{fes-f2}. Wall per call
+  is $1.08$--$1.14\times$ eager at 14--16 unknowns, about 1.0 at 18, and
+  $0.85$--$0.95\times$ from 24 unknowns up. The preregistered falsifier
+  (median paired wall ratio above $1.05$ at 20 unknowns and up) fired on
+  random 19:10:2 ($1.08$).
+\item \emph{Run 3}, after a plan-builder change: all 234 target and engine
+  pairs have run~1's counts. The paired wall moved by up to $0.07$ either
+  way, the size of the run-to-run spread, and the falsifier fired again on
+  random 19:10:2 ($1.10$). Below 20 unknowns the batched mode stays 4--12\%
+  above eager in wall; the remaining cost is composed-plan builds, which
+  are counted work.
+\item \emph{Run 2, end to end} on the six ladder instances: $S$ is
+  $0.816$--$0.889\times$ inherited F4's on every instance
+  (Table~\ref{tab:bo-ftb}), with the solver 88--100\% of the row's GAE.
+  At 20 unknowns and below the in-pipeline wall per call is
+  $0.99$--$1.12\times$ eager, so there the lower $S$ is counted work that
+  disappears, offset by an overhead the counted unit does not see.
+\end{itemize}
+No row has a replay certificate or validator report; all are
+\texttt{[pcc:unverified]}.
+
+\paragraph{The two levers combined.} \texttt{fes-then-batched} is the size
+rule with \texttt{inherited-f4-batched} above the threshold: \texttt{fes-f2}
+on quadratic systems of at most 14 unknowns, the batched engine otherwise
+(\art{research/fes_then_batched_20261112/README.md}). One run on 12
+November (3 repeats, 16 matched rho runs, one thread, binary built at
+\texttt{4900647bcd}) recovered every planted logarithm.
+Table~\ref{tab:bo-ftb} gives its means.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+instance (unknowns) & rho & pair table & inherited F4 & \texttt{f-t-i} & \texttt{f-t-b} & \texttt{f-t-b}/inh.\ F4 & \texttt{f-t-b}/rho \\
+\midrule
+Koblitz 13 (14) & 2.89 & 197.8 & 137.9 & 101.9 & 101.9 & 0.739 & 35.24 \\
+random 15 (16) & 2.28 & 473.7 & 326.0 & 326.0 & 277.5 & 0.851 & 121.7 \\
+Koblitz 17 (18) & 1.73 & 493.2 & 304.5 & 304.5 & 249.7 & 0.820 & 144.7 \\
+Koblitz 19 (20) & 1.35 & 1{,}063.3 & 465.5 & 465.5 & 413.6 & 0.889 & 305.5 \\
+random 21 (22) & 1.24 & 1{,}975.9 & 4{,}411.6 & 4{,}411.6 & 3{,}726.1 & 0.845 & 3{,}012.6 \\
+Koblitz 23 (24) & 0.88 & 3{,}986.3 & 2{,}051.2 & 2{,}051.2 & 1{,}674.3 & 0.816 & 1{,}907.8 \\
+\bottomrule
+\end{tabular}
+\caption[]{\texttt{fes-then-batched} (\texttt{f-t-b}) end to end on the
+$m=2$ descent ladder, mean $S$ over 3 repeats at the calibration point,
+beside inherited F4 and \texttt{fes-then-inherited} (\texttt{f-t-i}). The
+last column is the distance remaining to the matched rho, as corrected by
+the validator. On the Koblitz instances \texttt{f-t-b} reproduces
+\texttt{inherited-f4-batched}'s run-2 $S$ to every digit; on the random
+instances $S$ moves between runs with the host-measured word-XOR price
+(run~2 read $262.7$ and $4{,}299.2$ for inherited F4 at random 15 and 21),
+while the ratio to inherited F4 in the same run is unchanged.
+\texttt{[pcc:unverified]}. Source:
+\art{research/fes_then_batched_20261112/README.md}.}
+\label{tab:bo-ftb}
+\end{table}
+
+\noindent An independent validator replayed the six sweeps from its own
+build of \texttt{d81dc1241b} on 13 November: every counted scalar of the 72
+index-calculus rows and 256 rho runs was identical, and all 36 table cells
+recomputed within half a printed unit. \texttt{VALIDATION.json} passes
+the gate script. Under the band of \S\ref{sec:band} rho is below every
+index-calculus arm at every weight, and the index-calculus rows stay
+$2.96\times$ rho or more even at $w=0$. Against inherited F4 the ranking is
+unresolved: an exact tie at $w=0$ on five instances (identical decisions,
+solver free) and a higher $S$ at degree 13 ($16.23$ against $15.71$, because
+\texttt{fes-f2} tried $50.7$ targets against $47.3$), lower at $w=0.1$ and 1
+($0.816$--$0.888$). Against the pair table the order flips on every
+instance. What the study establishes is the measurement and the
+calibration-point comparison; the owner recorded no leaderboard row
+(\art{research/fes_then_batched_20261112/VALIDATION.json}).
+
+\paragraph{M4GB.} On the descent ladder M4GB is never the best row. Per
+call it is 15--25$\times$ slower than inherited F4 on every cell and crosses
+the in-house full-basis \texttt{f4-f2} at 20--22 unknowns ($3.7\times$
+faster at 24). Two engineering changes followed.
+\begin{itemize}
+\item \emph{A persistent server} removes the per-call process start: a
+  paired saving of $3.8$--$7.9$\,ms on the ten $m=2$ cells under 50\,ms,
+  server below one-shot on 55 of 60 targets, ratio $0.36\times$ at 12
+  unknowns rising to $0.95$--$0.99\times$ at 24, 0 disagreements over 20
+  cells. The preregistered falsifier fired on one cell by its summary
+  statistic (Koblitz, 18 unknowns, $1.00\times$; 4 of 6 targets below). On
+  the cubic $m=3$ cells the server is 3--5\% slower, an allocator effect
+  that was not isolated
+  (\art{research/m4gb_persistent_server_20261111/README.md}).
+\item \emph{Divisibility signatures in the Gebauer--M\"oller update}
+  (patch 0004): \texttt{update()} was 70\% of a 24-variable profile.
+  Two 64-bit masks decide divisibility exactly when every exponent is at
+  most 2, which the field equations guarantee over $\FF_2$. Instructions
+  fell to $0.47\times$ and $0.43\times$ on two profiled systems. On 90
+  captured systems, 5 repeats and an A/A server, the patched build is
+  $0.57$--$0.75\times$ per call from 14 unknowns up (below the old build on
+  65 of 66 systems; A/A cell medians $0.93$--$1.11$), $0.88$--$0.89\times$ on
+  the degree-6 $m=3$ systems, and without effect at 12 unknowns, with 0
+  disagreements in 1{,}350 paired requests
+  (\art{research/m4gb_update_signatures_20261112/README.md}).
+\end{itemize}
+Inherited F4 stays 6--28$\times$ below the M4GB server per call at $m=2$ and
+240--290$\times$ at $m=3$. These are stage results, measured on one shared
+4-vCPU container and unverified; none moves the ranking of
+Table~\ref{tab:bo-ladder}.
+
+\paragraph{The size rule, end to end.} A solver \texttt{fes-then-inherited}
+runs \texttt{fes-f2} on quadratic systems of at most 14 unknowns and
+inherited F4 otherwise; the threshold was fixed from earlier per-call
+word-XOR counts before the run. The same study folded the faster kernels
+into \texttt{inherited-f4}, keeping the old ones as
+\texttt{inherited-f4-legacy}. On the six ladder instances (3 repeats, 16
+matched rho runs, one local thread) every configuration recovered its
+planted logarithm. Folded and legacy kernels give identical $S$ on all six
+instances. The size rule is the best algebraic row on each: at degree 13 it
+runs \texttt{fes-f2} and gives $S=101.9$ ($83.7$--$116.3$) against
+inherited F4's $138.0$ ($117.8$--$167.6$), $0.74$ of it and $35.3\times$
+matched rho instead of $47.8\times$; on the other five it equals inherited
+F4. The pair table stays best at random degree 21. The degree-13 figures
+differ from the earlier run ($94.7$ and $123.1$) because this run's third
+repeat is dearer for both engines and its rho mean moved from $2.76$ to
+$2.89$. Rho is cheaper on every instance, by $35.3\times$ at degree 13 and
+more elsewhere. No leaderboard row; \texttt{[pcc:unverified]}
+(\art{research/size_rule_fold_20261112/README.md}).
+
 \section{F6-IC: from closure to lookup}\label{sec:bo-f6}
 
 F6-IC adds to inherited F4 a factor-base domain gate and meet-in-the-middle
@@ -826,6 +1190,125 @@ learnable signal. Until conflicts are priced the
 row is unranked, and statistics version~2 flags such arms as upper bounds on
 the wall statistic (\S\ref{sec:em-stats}). Prime-field SAT and SMT
 presentations are in \S\ref{sec:pa-sat}.
+
+\paragraph{Twelve SAT and SMT ideas, piloted.} On 14 November twelve
+proposals logged the day before were piloted at toy size, one producer and
+one independent skeptic per idea, on binary curves with $n=7$--31, subspace
+bases of dimension $\ell=1$--10 and $m=3$ (\art{research/sat_smt_leads_20261114/README.md}).
+They are pilots: no protocol was frozen in Git before the runs, there is
+no rho arm, every number is \texttt{[pcc:unverified]}, and each idea used
+its own generator and encoding, most weaker than the repository's. The
+yardstick is the linear 2+1 scan, $2^\ell$ leaves.
+Table~\ref{tab:bo-satpilots} lists the verdicts after review.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}rXl@{}}
+\toprule
+\# & idea & verdict after skeptic \\
+\midrule
+1 & proof-size slope as a go/no-go gate & kill criterion met \\
+2 & linear-leaf XCNF & kill criterion met (producer: inconclusive) \\
+3 & cut-variable branching with bounded nogood memory ($m=4$) & kill criterion met \\
+4 & XOR cubes on symmetric functions & inconclusive \\
+5 & conflict-directed polynomial lemmas & kill criterion met \\
+6 & BDD/ZDD bucket elimination & kill criterion met \\
+7 & one homogeneous AllSAT instance for factor-base-only relations & kill criterion met \\
+8 & target-parametric incremental solving & inconclusive \\
+9 & solution-rich regime with budgets and XOR streamlining & kill criterion met \\
+10 & bit-sliced multi-target propagation & kill criterion met \\
+11 & solver-driven synthesis of the factor base & inconclusive (producer: kill) \\
+12 & MaxSAT for relation filtering and structured elimination & kill criterion met \\
+\bottomrule
+\end{tabularx}
+\caption[]{Local pilots of twelve SAT/SMT index-calculus ideas
+(CaDiCaL~1.5.3, Glucose~4, CryptoMiniSat, Z3; one 4-core container). A
+kill covers the pilot encoding only. \texttt{[pcc:unverified]}. Source:
+\art{research/sat_smt_leads_20261114/README.md} and the per-idea
+\texttt{SKEPTIC.md} files.}
+\label{tab:bo-satpilots}
+\end{table}
+
+\noindent No SAT arm reached the scan count $2^\ell$. Backward-trimmed DRAT
+cores grew at $3.27$ bits per unit of $\ell$ against $3.34$ for conflicts
+($n=17$, $\ell=2$--5), so trimming does not expose short refutations; the
+$2^\ell$ linear certificate was not translated into a clausal proof. Two
+same-day follow-ups:
+\begin{itemize}
+\item \emph{Sub-scan test} (kill by its rule): (leaves$+$conflicts)$/2^\ell$
+  was at least $2.48$ at $\ell=8$. A dual-rail encoding with $x_1$ assigned
+  brought CryptoMiniSat to about $1.6$ conflicts per leaf warm (about 20
+  fresh), against 151 ($\ell=4$) to more than $19{,}570$ ($\ell=8$) with plain
+  AND gates; it is the first SAT arm in these pilots within a small
+  constant of the scan count.
+\item \emph{Idea 8, powered rerun} (60 targets per cell; inconclusive):
+  the incremental over best-fresh conflict ratio on non-decomposable
+  targets was $0.590$, $0.747$ and $0.793$ $[0.773,0.812]$ at $\ell=3,4,5$
+  against a threshold of $0.8$, rising with $\ell$; propagations were at
+  least $1.14\times$ the fresh arm and wall time $2.1$--$2.4\times$.
+\end{itemize}
+A plan of 15 November for SAT on the point decomposition sets the decisive
+quantity as the median solver work per target over $\binom{2^\ell}{2}$ and
+the falsifier as a value below $0.5$ at two consecutive $\ell\ge8$; it has
+no data and no frozen protocol. It records that the clause-reuse
+replication of \S\ref{sec:bo-satladder} has still not run, and that
+XOR-learning solvers remain blocked by the network policy
+(\art{research/sat_pdp_exotic_20261115/PLAN.md}).
+
+\section{CDCL on the scalar ladder}\label{sec:bo-satladder}
+
+A different SAT presentation drops the factor base altogether: the
+bit-level projective x-only Montgomery ladder, Tseitin-encoded with
+schoolbook multipliers, with the $\lceil\log_2r\rceil$ bits of the scalar as
+the only free inputs and $x([k]G)$ fixed. Study F4 of 10--11 November
+measured the median CaDiCaL~3.0.1 conflict count against the field size $n$,
+one prime-order curve per $n$, 10 targets, budget $4\cdot10^6$ conflicts
+(\art{research/sat_ladder_scaling_20261110/README.md}; boundary diagnostic,
+no $S$ and no rho row, unverified). The frozen grid $n=10$--20 was amended
+before the run to $n=4$--9, after development runs censored every solve at
+$n=10,12$. Two arms were run: FRESH builds a solver per target; REUSE keeps
+one incremental solver per curve and passes each target as assumptions, so
+learned clauses carry over. Table~\ref{tab:bo-satladder} gives the counts.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$n$ & $r$ & clauses & FRESH (cens.) & REUSE (cens.) & REUSE, first & REUSE, later \\
+\midrule
+4 & 19 & 31{,}326 & 11{,}393.5 (0) & 57.5 (0) & 14{,}679 & 0 \\
+5 & 29 & 41{,}523 & 9{,}856.0 (0) & 29.5 (0) & 24{,}724 & 25 \\
+6 & 71 & 90{,}762 & 250{,}058.5 (0) & 1{,}240.5 (0) & 351{,}983 & 1{,}064 \\
+7 & 131 & 115{,}102 & 296{,}736.0 (0) & 1{,}027.0 (0) & 301{,}358 & 1{,}021 \\
+8 & 257 & 188{,}187 & censored (6) & 4{,}240.0 (1) & censored & 1{,}033 \\
+9 & 479 & 227{,}543 & censored (8) & 1{,}080{,}637.0 (3) & censored & 640{,}356 \\
+\bottomrule
+\end{tabular}
+\caption[]{CaDiCaL conflicts to invert the x-only Montgomery ladder, 10
+targets per $n$. FRESH, REUSE: median conflicts; ``cens.'': solves
+censored at $4\cdot10^6$ conflicts. The last two columns split REUSE by
+solve order: the first solve, and the median of orders 1--9 (derived in the
+source from the per-solve counts). 102 of 120 solves found
+a model, and all 102 decode to $k$ or $r-k$. Unverified, no pcc claim.
+Source: \art{research/sat_ladder_scaling_20261110/README.md}.}
+\label{tab:bo-satladder}
+\end{table}
+
+The FRESH exponent is $\alpha=1.877$ $[1.675,2.188]$ in
+$\log_2(\text{conflicts})\approx\alpha n+c$ over $n=4$--7, against a
+preregistered $[0.85,1.15]$ and rho's $0.5$: prediction P1 failed upward, as
+the study expected before the run. The REUSE/FRESH ratio is $0.003$--$0.005$
+at $n=4$--7, which fires the clause-reuse branch of decision rule 2 (``lead
+alive''); the alpha branch does not fire. The first REUSE solve costs about
+a FRESH solve ($1.02$--$2.51\times$ its median at $n=4$--7) and later solves
+cost far less. The study names two readings it cannot separate. Learned
+clauses may amount to a partial table of a tiny group: the 10 targets cover
+7 of the 9 $x$-classes at $n=4$. Alternatively they may encode reusable
+structure of the circuit. The prescribed replication (a second solver,
+40 targets, the warm cost against $r$) is preregistered and
+\emph{pending}. Any amortisation across targets is advice in the
+preprocessing sense and falls under the generic preprocessing bound the
+study names ($S\cdot T^2\gtrsim n$ in its notation).
 
 \section{The $n=83$ engine campaign}\label{sec:bo-n83}
 
@@ -1079,6 +1562,79 @@ changes the cost of a multiplication. In ecbench the four PKM tower engines
 (F4, F5, F6 and geometric enumeration) all run and read $4.62$--$5.03\times$
 negation rho on the current binary (\S\ref{sec:em-frontier}); the
 presentations that change the system shape are in \S\ref{sec:pa-pkm}.
+
+\section{The exponent of one decomposition system on subgroup bases}\label{sec:fe-exponent}
+
+The cost model of Petit, Kosters and Messeng~\cite{pkm2016} balances the
+relation and linear-algebra phases on a base of size $\abs V=p^a$. With
+$\omega=2$ an exponent lever exists at $m=4$ only if the cost $T$ of one
+decomposition system grows more slowly than $\abs V^{1/2}$, and at $m=3$
+only if $T$ stays flat in $\abs V$. A preregistered study fits the exponent
+$s$ of $T$ in $\abs V$, with $T$ the $\FF_p$ multiplications of the F4 row
+reduction (\texttt{F4Report.field\_ops}) of one symmetrised system over a
+multiplicative-subgroup base $\abs V=d$ of a Curve25519-family miniature
+(\S\ref{sec:c25519}). The lever rules are: upper 95\% bound of $s$ below
+0.5 at $m=4$, below 0 at $m=3$. The estimator applies only to at least 4
+complete cells with $d\ge9$ spanning $4\times$ in $\abs V$.
+
+The parent study (8--10 November) found no lever at $m=2$ ($s=2.77$
+$[2.31,3.23]$ at $k=20$) and left $m=3,4$ ``undetermined'' under 3.5\,GB
+and 1{,}200\,s per target. The extension (10--12 November) raised the
+limits to 12\,GB of virtual memory and 10{,}800\,s, and added even divisors
+$d$ of $p-1$ (\art{research/curve25519_exponent_study_ext_20261110/README.md}).
+It has a \texttt{validator-report.json} with status \texttt{pass\_with\_errata} and
+disposition \texttt{validated} (independent; 72 of 74 headline values
+agreed, two by $0.01$; errata E1--E11 applied). No pcc claim was
+registered, so its numbers remain unverified assertions under the claim
+rule. It is an engine measurement in counted units, not a solve, and gives
+no gap to rho.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrlrrrl@{}}
+\toprule
+$k$ & $m$ & $d=\abs V$ & factors & $T$ (field ops) & solving degree & max columns & outcome \\
+\midrule
+20 & 3 & 12 & $2\cdot2\cdot3$ & $7.748\cdot10^8$ & 7 & 7{,}759 & complete \\
+20 & 3 & 14 & $2\cdot7$ & $7.766\cdot10^8$ & 10 & 10{,}651 & complete \\
+20 & 3 & 18 & $2\cdot3\cdot3$ & $2.4275\cdot10^{10}$ & 7 & 13{,}616 & complete \\
+20 & 3 & 28 & $2\cdot2\cdot7$ & $2.0161\cdot10^{11}$ & 11 & 54{,}949 & complete \\
+20 & 3 & 36 & $2\cdot2\cdot3\cdot3$ & --- & --- & --- & memory, 4{,}521\,s \\
+20 & 4 & 12 & $2\cdot2\cdot3$ & --- & --- & --- & memory, 6{,}226\,s \\
+20 & 4 & 19 & 19 & --- & --- & --- & memory, 1{,}027\,s \\
+22 & 3 & 55 & $5\cdot11$ & --- & --- & --- & memory, 5{,}286\,s \\
+\bottomrule
+\end{tabular}
+\caption[]{Exponent-study extension: the eight cells, 6 targets each (all
+inconsistent systems), \texttt{RAYON\_NUM\_THREADS=1}. $T$ is the mean of
+\texttt{field\_ops} over the targets. ``memory'': allocation failure under
+\texttt{ulimit -v 12000000}; no target reached the time cap. The $m=4$,
+$d=19$ cell ran against the protocol's chain rule (erratum E1) and enters no
+fit. Validated (validator report, errata applied); no pcc claim. Source:
+\art{research/curve25519_exponent_study_ext_20261110/README.md}.}
+\label{tab:fe-exponent}
+\end{table}
+
+\begin{itemize}
+\item \emph{Preregistered verdicts.} Still ``undetermined'' at $m=3$ and
+  $m=4$. At $k=20$, $m=3$ there are now 8 complete cells with $d\ge9$, but
+  they span $3.1\times$; the span gate needed $d=36$, which exhausted 12\,GB.
+  At $m=4$ only $d=9$ is complete above the boundary cells. Memory, not
+  wall time, was the binding limit in every censored cell.
+\item \emph{Other readings, not verdicts.} The $d\ge9$ fit at $k=20$, $m=3$,
+  computed despite the gate, is $s=6.08$ $[1.69,10.47]$ over 8 cells (the
+  parent's 4 cells gave $5.56$ $[-8.75,19.88]$); the fit over all 10
+  complete cells gives $6.87$ $[5.01,8.73]$. Every point estimate lies far
+  above both thresholds and no upper bound lies below them.
+\item \emph{Cost does not follow $\abs V$ alone.} $d=18$ cost $110\times$
+  $d=19$, and $d=12$ cost $5\times$ $d=9$. The symmetrised system has one
+  chain variable per prime factor of $d$ per summand. An exploratory joint
+  fit, not preregistered, gives $5.16$ $[4.15,6.16]$ in $\ln d$ and $2.14$
+  $[1.35,2.93]$ per prime factor.
+\end{itemize}
+The study's own next step is an engine change (sparse elimination, or a
+degree-bounded engine) under a new freeze; at $m=4$ the dense F4 cannot
+reach $d=36$ at any plausible memory.
 
 \section{The chain-solve levers on the GLS $\FF_{p^4}$ line}\label{sec:fe-chain}
 
@@ -1477,6 +2033,66 @@ $0.297$ $[0.295,0.299]$ of B0 at $q=262{,}111$
 line the linear algebra is at most $0.006\%$ of $S$ (\S\ref{sec:fe-chain}).
 The relation phase, not the matrix, sets the cost on every line measured.
 
+\paragraph{Gram reuse and normalised points on the quartic, 15 November.}
+Two counted-cost changes act on the same line's double-large-prime arm DL
+($c_D=1.7$, square-root chain, fast relation stage; $k=18$--22, seeds 1--6,
+30 cells per arm; L0 container, counted operations only, cold M-eq). Block
+Lanczos reads $MV_{i-1}^{\mathsf T}MV_i$ from the columns of the same
+iteration's full Gram matrix $V^{\mathsf T}MV$ and, from the third
+iteration, $V_i^{\mathsf T}V_0$ from the three-term recurrence; in 30 of 30
+pairs every counted field other than the DL linear algebra's products and
+additions, the iteration and narrowing counts and every logarithm are
+identical, and the linear algebra's products fall to $0.729$--$0.738$
+(\art{research/ic_gw_bl_reuse_20261115/README.md}). An amendment guards the
+recurrence after a narrowing in the final iteration; the guarded build
+raises those products by at most $0.04\%$ and moves no ratio by more than
+$0.0002$ (\art{research/ic_gw_bl_reuse_20261115/amendment-1/RESULT.md}). The
+second change (NRM) normalises factor-base and residual points to first
+coordinate 1 and drops the products by that 1, and by 4, in the relation
+stage; a scalar-Lanczos dot-product reuse (LZ) changes only arms D and DL1
+and leaves DL at exactly $1.0000$
+(\art{research/ic_gw_nrm_lz_20261115/README.md}). The validator classes
+NRM as the removal of real operations of the reference path that are
+products by a constant, baseline waste rather than a new algorithmic
+idea; at $w_{\rm add}=1$ the $4g_1$ rewrite costs one M-eq more than it
+saves. Table~\ref{tab:in-gw-la} gives the paired ratios. Both changes pass
+the validation gate with independent replays (validator reports
+\texttt{VAL-20261115-b1e7a3} and \texttt{VAL-20261115-5c7af8}), and both
+\texttt{VALIDATION.json} files record \texttt{order\_holds\_across\_band:
+true} against the frozen negation-map rho at $k=22$
+(\art{research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json},
+\art{research/ic_gw_nrm_lz_20261115/validation/VALIDATION.json}). There the
+index calculus with the Gram reuse is $0.00222$, $0.00207$ and $0.00170$ of
+rho at $w=0$, $0.1$ and 1, and with NRM added $0.00213$, $0.00199$ and
+$0.00168$. Both are constants on a weak family; \texttt{[pcc:unverified]}.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$k$ & $q$ & \multicolumn{2}{c}{Gram reuse / REF, DL} & \multicolumn{2}{c}{NRM+LZ / Gram reuse, DL} & NRM+LZ, DL1 \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+ & & $w_{\rm add}=0$ & $w_{\rm add}=1$ & $w_{\rm add}=0$ & $w_{\rm add}=1$ & $w_{\rm add}=0$ \\
+\midrule
+18 & 262{,}111 & 0.8182 & 0.8833 & 0.9614 & 0.9869 & 0.8503 \\
+19 & 524{,}287 & 0.8104 & 0.8836 & 0.9577 & 0.9866 & 0.8353 \\
+20 & 1{,}048{,}507 & 0.8152 & 0.8864 & 0.9585 & 0.9868 & 0.8434 \\
+21 & 2{,}097{,}091 & 0.8189 & 0.8892 & 0.9589 & 0.9871 & 0.8487 \\
+22 & 4{,}194{,}271 & 0.8126 & 0.8894 & 0.9569 & 0.9871 & 0.8382 \\
+\bottomrule
+\end{tabular}
+\caption[]{GHS-weak plane quartic, counted cold M-eq: paired ratios,
+geometric means over seeds 1--6, hash and comparison operations at 0. The
+Gram-reuse columns are the frozen build; the guarded build of the
+amendment moves none by more than $0.0002$. The NRM+LZ columns are against
+the guarded build; on DL they equal NRM alone. Every cell is below 1 at
+every hash price ($0$, $0.1$, $1$\,GAE). Validated (validation gate);
+\texttt{[pcc:unverified]}. Sources:
+\art{research/ic_gw_bl_reuse_20261115/README.md},
+\art{research/ic_gw_nrm_lz_20261115/tables.md}.}
+\label{tab:in-gw-la}
+\end{table}
+
 \section{Planners}\label{sec:in-planners}
 
 \texttt{ic plan} chooses a factor base, oracle and parameters for a curve
@@ -1541,6 +2157,133 @@ not an admitted result. The relations are generic meet-in-the-middle, so the
 method is bounded by the collision floor of \S\ref{sec:gf-collision}; what
 the line measures is engineering reach, not a distance.
 
+\section{Index-calculus kernels on a GPU, 12--14 November}\label{sec:in-gpuic}
+
+A GPU audit of 12 November merged four kernel commits in the CUDA
+directories \texttt{gpu/spmv}, \texttt{gpu/fes}, \texttt{gpu/macaulay},
+\texttt{gpu/rootfind} and \texttt{gpu/semaev} with no GPU run. Five studies
+ran them on single A100 80\,GB pods (RunPod; one Modal A100), changed them,
+and put the FES worker into a complete index-calculus solve. Every number
+is from the session that wrote the code and is \texttt{[pcc:unverified]};
+the one validator review admits no row. Wall time is a practicality note:
+the GPU engines are charged exactly as their CPU twins, so counted $S$
+cannot move, and nothing here is a counted-cost improvement. The
+root-finding kernel is in \S\ref{sec:rf-gpu}, and its $m=3$ rounds of
+15 November in \S\ref{sec:rf-gpu15}.
+
+\paragraph{Kernels} (\art{research/ic_gpu_measure_20261112/REPORT.md}).
+Timing is kernel-only, five interleaved rounds per arm with medians, and an
+A/A arm (the same source built twice) beside every comparison; every arm
+passed its device selftest and matched the CPU workers' outputs.
+\begin{itemize}
+\item \emph{The audit on hardware.} \texttt{spmv} $8.175\to0.540$\,ms
+  ($2^{16}$ rows, 32 non-zeros, 32 lanes); Macaulay $831.7\to718.2$\,ms per
+  batch of 8{,}192; root finding $23.53\to19.91$\,ms at $\abs\Fb=1{,}024$.
+  At $n=16$, $m=3$ the pre-audit FES kernel returned 64 of the CPU's 8{,}256
+  solutions (a per-thread cap); the audit's fix returns all of them. At
+  the same split the audit's shared-memory walk table was $1.13\times$
+  slower than the base.
+\item \emph{FES, $O(1)$ Gray-code walk} (the bookkeeping of Bouillaguet et
+  al.): one shared-memory load and two XORs per point instead of $n$, the
+  same zeros in the same order; $132.8\to5.14$\,ms at $n=30$. A
+  block-unrolled walk ($K=6$) then gave $5.043\to1.301$\,ms at $n=30$ and
+  $19.85\to4.834$\,ms at $n=32$; cumulatively $132.8\to1.30$\,ms at $n=30$.
+\item \emph{Macaulay, shared-resident 16-bit matrix} for $p<2^{16}$ on
+  sm\_80 ($718.3\to196.5$\,ms per batch of 8{,}192), then a 2D update mapping
+  ($197.1\to176.9$\,ms); against the pre-audit base $831.7\to176.7$\,ms.
+\item \emph{Rejected or unchanged}: a fused root-finding unwind and sweep
+  (never the best configuration; $2.8\times$ slower at one), and the
+  root-finding launch knobs (defaults within $1.5\%$ of the best).
+\end{itemize}
+A100 A/A arms read $0.995$--$1.007$. Two build breaks found on hardware
+were fixed (a root-finding link error under \texttt{nvcc}, and the
+\texttt{semaev} \texttt{clmad} path on CUDA 12.8).
+
+\paragraph{FES in a complete solve.} Engine \texttt{fes-f2-gpu} runs
+\texttt{fes-f2}'s search on a persistent CUDA worker and shares its form
+building, word-XOR count and CPU verification of every returned point
+(\art{research/ic_gpu_e2e_20261113/REPORT.md}). The first run followed a
+different trajectory from \texttt{fes-f2} (2{,}642 against 1{,}878 calls)
+because the kernel returns zeros in thread order and the descent oracle
+keeps the first solution that lifts; after sorting proposals into Gray
+order every \texttt{fes-f2-gpu} row equals its \texttt{fes-f2} row in calls,
+hit rate and $S$. Table~\ref{tab:in-gpu-e2e} gives the run and its replay on a
+second A100 host one day later.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+instance (unknowns) & solver & calls & $S$/rho & $S$/rho, replay & solve (s) & solve, replay (s) \\
+\midrule
+Koblitz 23 (24) & inherited F4 & 2{,}487 & \textbf{2{,}014} & & 38.7 & \\
+ & \texttt{fes-f2} & 1{,}878 & 20{,}054 & & 26.8 & \\
+ & \texttt{fes-f2-gpu} & 1{,}878 & 20{,}054 & & 2.18 & \\
+char.~2, 25 (26) & inherited F4 & 1{,}193 & \textbf{4{,}362} & 4{,}113.67 & 33.6 & 25.49 \\
+ & \texttt{fes-f2} & 2{,}338 & 231{,}367 & 218{,}198 & 141.9 & 98.71 \\
+ & \texttt{fes-f2-gpu} & 2{,}338 & 231{,}367 & 218{,}198 & 3.22 & 0.90 \\
+char.~2, 29 (30) & inherited F4 & 8{,}977 & \textbf{30{,}856} & 32{,}742 & 895.5 & 662.93 \\
+ & \texttt{fes-f2-gpu} & 8{,}977 & 3{,}270{,}693 & 3{,}470{,}603 & 38.7 & 13.47 \\
+\bottomrule
+\end{tabular}
+\caption[]{\texttt{fes-f2-gpu} in a complete index-calculus solve
+(\texttt{ic bench --sweep}: factor base, descent relations, linear algebra,
+planted-log check, 16 matched rho runs) on an A100. Koblitz: 2 repeats, the
+replay columns omitted because the replay used repeat 2 only (calls 1{,}006,
+$S$/rho $1{,}628.93$ and $21{,}484.69$ unchanged); char.~2: 1 repeat. The
+replay reproduces every counted field of all 14 rows; on the char.~2
+curves $S$/rho moves by $-5.7\%$ and $+6.1\%$ for every engine alike,
+because the word-XOR price is measured once per run. Bold: the lowest
+$S$/rho, the distance remaining. \texttt{fes-f2} at 30 unknowns was not run
+(its $S$ equals \texttt{fes-f2-gpu}'s by construction). Whole-solve wall is
+descriptive; the replay host had a faster CPU and the overhead changes of
+14 November. \texttt{[pcc:unverified]}. Sources:
+\art{research/ic_gpu_e2e_20261113/REPORT.md},
+\art{research/ic_gpu_replay_20261114/REPORT.md}.}
+\label{tab:in-gpu-e2e}
+\end{table}
+
+\noindent In wall time the GPU engine's whole solve is $12.3\times$ and
+$44.1\times$ faster than \texttt{fes-f2} at 24 and 26 unknowns, and
+$17.7\times$, $10.4\times$ and $23.1\times$ faster than inherited F4 at 24, 26
+and 30. In counted cost inherited F4 is $9.96\times$, 53$\times$ and
+106$\times$ cheaper at the same sizes and stays the best row; the distance
+to rho is unchanged.
+
+\paragraph{The cost around the kernel.} The first solve spent 1.0, 1.2 and
+3.6\,ms per call at 24, 26 and 30 unknowns against kernel times of about
+0.1, 0.2 and 1.3\,ms. Two sessions cut it at the same time.
+\begin{itemize}
+\item \emph{Direct packing} (\texttt{fes\_pack\_direct}): preparation per
+  call $0.2201\to0.0081$\,ms and $0.2720\to0.0102$\,ms on a Modal A100, and
+  the whole call $0.615\to0.389$\,ms and $0.735\to0.475$\,ms at 24 and 26
+  unknowns, with 0 of 6 runs differing in any counted field. A timer defect
+  had counted the idle wait as request parsing; corrected, the parse is
+  about 13\,$\mu$s of a $0.39$\,ms call
+  (\art{research/ic_gpu_call_overhead_20261113/REPORT.typ}).
+\item \emph{A binary serve protocol} with single-copy I/O, measured against
+  main with direct packing (A/B~2): solver time per call $0.204\to0.129$\,ms
+  on the second Koblitz target, $0.423\to0.367$\,ms at 26 unknowns and
+  $1.547\to1.443$\,ms at 30; the first Koblitz target, which carries the
+  worker start, shows no difference within a same-arm spread of $1.31$
+  (\art{research/ic_gpu_overhead_20261114/REPORT.md}). At 30 unknowns the
+  call is now $1.44$\,ms, of which about $1.30$\,ms is kernel.
+\end{itemize}
+Batching several systems per launch was bounded rather than built: since
+the oracle stops at the first liftable solution, batching adds counted
+work, and the worker's own timers bound the saving at $\le30\%$, $\le42.4\%$
+and $\le6.1\%$ of the solve at 24, 26 and 30 unknowns
+(\art{research/ic_gpu_replay_20261114/REPORT.md}). A validator review
+(\art{research/ic_gpu_replay_20261114/VALIDATION_REVIEW.md}, its own format,
+not a \texttt{validation-gate/v1} report) recomputed 76 planted-log
+certificates and confirmed the reports with five corrections, among them
+the counted-$S$ gap at 23 ($9.96\times$, first written $9\times$). It
+records that the reports omit the band; with a free solver the
+index-calculus rows stay above rho ($2.79\times$, $2.54\times$, $4.08\times$).
+The replay was launched by the producing session and is a reproduction on
+another host, not an independent replay.
+
 \section{Hashed-ECDL engines}\label{sec:in-hashed}
 
 The hashed factor base and the conditional tensor-contraction route are in
@@ -1553,6 +2296,205 @@ $0.316$ to $0.283$\,ms at $p=211$ (\art{research/hashed_ecdl_cpu_20261030/README
 L0, one EKS VM). The larger-field ladder expired with zero executions. The
 README states that these establish exact software behaviour on fixed
 fixtures and no speed-up, matched-rho advantage or large-curve attack.
+
+\section{Collection-stage levers on the Table~A pipeline}\label{sec:in-levers}
+
+Two levers of 12 November act on the aimed collection scan of the Koblitz
+Table~A pipeline (\S\ref{sec:tablea}), on suite row \texttt{M1-T01} at
+\texttt{k0n53} ($\log_2r=44.3$) and \texttt{k0n61} ($47.2$). Both keep
+certificates and counts identical to the default, and both ran on the
+session's container (Intel Xeon at 2.1\,GHz, 4 vCPU, AVX-512) under
+\texttt{isolated\_bench --cpus 2}, one thread.
+\begin{itemize}
+\item \emph{One inverse per $\pm$ twin pair (lever 2).} The base stores each
+  point's negation at the next index (100\% adjacent at $n=53$ and 61), and
+  two twins share the denominator $x_R+x_k$, so one prefix product and one
+  inverse serve both sums. Kernel: $1.985\to1.435$\,ns per summand at
+  $n=53$. A preregistered same-session A/B with its own A/A (39 and 41
+  rounds) found the collect phase $1.040\times$ faster $[1.019,1.059]$ at
+  $2^{44.3}$, established against the A/A ($0.982$ $[0.936,1.017]$); at
+  $2^{47.2}$ ($1.027$ $[1.000,1.056]$) and for the whole set-up at either
+  size no effect is established
+  (\art{research/ic_tool_program/explorations/paired-inverse-20261112/ab/summary.json};
+  bench record \texttt{20261112T0607Z-ic-paired-inverse-ab}). It has no
+  replay certificate, validator report or matched-rho reference, so under
+  the validation gate it has no benchmark row and no leaderboard section.
+\item \emph{A split-block presence filter (lever 3).} One bit in each of the
+  eight words of a 64-byte line, with AVX-512 probe and set, at 8 or 16 bits
+  per key, optionally on 2\,MiB pages. Once vectorised it is within noise of
+  the default filter at both sizes, and slower before that (scalar
+  version: collect $200.3\to247.0$--$268.6$\,ms at \texttt{k0n53}). The patch
+  is kept in the study directory and the default build is unchanged
+  (\art{research/ic_tool_program/explorations/blocked-filter-20261112/README.md};
+  exploration record, not a round).
+\end{itemize}
+
+From 12 to 15 November the same programme ran five more preregistered
+same-binary A/Bs on the set-up of the two suite rows, each with a protocol
+frozen before its first row, a same-session A/A, 41--44 rounds and zero
+identity mismatches (Table~\ref{tab:in-levers2}). A step probe of 13
+November had put three quarters of the folded pair-table build in placing
+pairs: stream push $15.07$ and $13.85$\,ns per stored pair and counting
+sort with filter fill $11.63$ and $12.88$, of a whole $34.58$ and $35.48$\,ns
+at \texttt{k0n53} and \texttt{k0n61}
+(\art{research/ic_tool_program/explorations/build-steps-20261113/README.md};
+a diagnostic).
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}lllX@{}}
+\toprule
+lever (date) & phase & \texttt{k0n53} ($2^{44.3}$) & \texttt{k0n61} ($2^{47.2}$) & outcome \\
+\midrule
+build-side twin pairing (13 Nov) & build & $1.044$ $[1.028,1.064]$ & $1.036$ $[0.991,1.068]$ & not established; reverted \\
+filter lookahead 64 (13 Nov) & collect & $0.997$ $[0.978,1.015]$ & $0.997$ $[0.966,1.055]$ & not established; reverted \\
+partition-local filter layout (13 Nov) & build & $\mathbf{1.104}$ $[1.069,1.142]$ & $\mathbf{1.142}$ $[1.098,1.164]$ & established; set-up not established; kept \\
+one packed stream a partition (14 Nov) & build & $\mathbf{1.244}$ $[1.214,1.276]$ & $\mathbf{1.252}$ $[1.223,1.266]$ & established; kept \\
+ & set-up & $\mathbf{1.068}$ $[1.051,1.080]$ & $1.038$ $[1.020,1.050]$ & established at \texttt{k0n53} only \\
+split min chains (14 Nov) & collect & $1.020$ $[1.006,1.034]$ & $1.019$ $[1.004,1.035]$ & not established against the A/A; opt-in \\
+block-filled filter tests (15 Nov) & collect & $\mathbf{1.086}$ $[1.071,1.121]$ & $\mathbf{1.097}$ $[1.076,1.115]$ & established; kept \\
+ & set-up & $1.049$ $[1.027,1.074]$ & $\mathbf{1.086}$ $[1.056,1.102]$ & established at \texttt{k0n61} only \\
+\bottomrule
+\end{tabularx}
+\caption[]{Set-up levers on the Koblitz Table~A pipeline: median paired
+ratio old/new of the phase's wall time with its 95\% interval, same binary,
+one thread, on the session's container. Bold: established against the
+same-session A/A by the frozen rule. Certificates and counts are identical
+between arms, so these are component results on one host class with no
+replay certificate, validator report or matched rho; none has a benchmark
+row. \texttt{[pcc:unverified]}. Sources: the \texttt{README.md} of each
+directory under \art{research/ic_tool_program/explorations/}
+(\texttt{build-pairing-lookahead-20261112}, \texttt{filter-layout-20261113},
+\texttt{fold-pack-20261114}, \texttt{key-chains-20261114},
+\texttt{scan-vfilter-20261115}).}
+\label{tab:in-levers2}
+\end{table}
+
+\noindent Two explorations of 15 November on the aimed scan's admitted
+stage (2.8\% and 2.0\% of summands admitted, nearly all false positives) were
+dropped: a lagged run prefetch saved about $0.15$\,ns a summand, about 1\% of
+collection and below what the A/B resolves, and a doubled filter netted
+about 3\% of collection at \texttt{k0n61} and nothing measurable at
+\texttt{k0n53} while changing the counted bucket reads
+(\art{research/ic_tool_program/explorations/admitted-stage-20261115/README.md}).
+None of these levers moves a count, so none changes a distance to rho.
+
+A survey of 14 November reads the relation-phase records of the prime
+multi-target pipeline and names the target-phase table layout at
+$2^{32}$ as the lever with measured room: in wall time the multi-target
+index calculus climbs from $0.70\times$ rho at $2^{24}$ to $1.18\times$ at
+$2^{32}$, which its source attributes to hash lookups that leave cache. It
+made no measurement and its preregistration is a draft
+(\art{research/relation_phase_survey_20261114/README.md}).
+
+Two frozen studies of 15 November measured that pipeline's wall time
+against the best of several tuned multi-target rhos on one pinned CPU of
+the session's container (Intel Xeon at 2.30\,GHz, 4 vCPU), four instances
+per size, every arm timed whole, so the band of unpriced native work is
+empty for every arm. The first ran the IC at $k=4$ and $\mu=0.85$ at
+$2^{32}$, $2^{34}$ and $2^{36}$ (2{,}052 executions, 0 errors). The
+distance grows with the group in all three $T$ cells, as its primary gate
+predicted (Table~\ref{tab:in-mt}); two single instances at $2^{32}$ have the
+IC below the best rho ($0.975$, $0.971$), and above $2^{32}$ every instance
+has it behind. At $2^{32}$ this host reproduces the earlier EPYC~9575F
+distances to within $0.02$, and $\mu=0.85$ stays the best of
+$\{0.7,0.85,1.0\}$ in 8 of 9 cells
+(\art{research/mt_ic_scale_20261115/RESULTS.md}). From phase timestamps
+the table build takes 47--52\% and the target phase 44--51\% of the IC's
+solve, both bound by one modular inversion per entry or trial. The second
+study gave Montgomery batched inversion to the IC and to rho alike
+(1{,}296 executions, 0 errors; the batched IC has the unbatched IC's
+table, trials and relations in all 24 configurations). It takes the IC to
+$0.438$--$0.507$ of its unbatched time and the best rho to $0.331$--$0.381$
+(cell medians), so the distance grows from $0.993$--$1.105$ to
+$1.245$--$1.269$ at $2^{32}$ and from $1.167$--$1.286$ to $1.754$--$1.813$
+at $2^{36}$ (\art{research/mt_batch_inv_20261115/RESULTS.md};
+Figure~\ref{fig:u16grob-mt}). Inversions fall about 8--12-fold at about 30
+extra multiplications each. A shared full inversion per group operation
+had flattered the IC's ratio in every earlier round. The batched
+inversion is a measured reduction of the multi-target IC's own wall
+time; the distance to rho grows. Neither study has a validator report or
+replay certificate; \texttt{[pcc:unverified]}.
+
+\begin{table}[t]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+& \multicolumn{3}{c}{unbatched (scale study)} & \multicolumn{2}{c}{both batched} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}
+$T$ & $2^{32}$ & $2^{34}$ & $2^{36}$ & $2^{32}$ & $2^{36}$ \\
+\midrule
+1{,}024 & $1.148$ ($1.025$--$1.251$) & $1.160$ ($1.097$--$1.276$) & $1.194$ ($1.165$--$1.227$) & $1.269$ ($1.142$--$1.436$) & $1.813$ ($1.618$--$1.969$) \\
+4{,}096 & $1.079$ ($0.975$--$1.238$) & $1.168$ ($1.054$--$1.255$) & $1.264$ ($1.201$--$1.360$) & $1.268$ ($1.146$--$1.300$) & $1.764$ ($1.484$--$1.985$) \\
+16{,}384 & $1.048$ ($0.971$--$1.099$) & $1.235$ ($1.188$--$1.276$) & $1.222$ ($1.145$--$1.331$) & $1.245$ ($1.193$--$1.378$) & $1.754$ ($1.446$--$1.821$) \\
+\bottomrule
+\end{tabular}
+\caption[]{Multi-target index calculus ($k=4$, $\mu=0.85$) over the best
+multi-target rho, wall time on one pinned CPU of the session's container:
+cell median (per-instance range) of four instances. The batched columns
+give Montgomery batched inversion to both methods; the best batched rho is
+\texttt{rhodpb} in all 24 configurations. 0 of 9 and 0 of 6 cells have the
+IC at most rho on all four instances. \texttt{[pcc:unverified]}. Sources:
+\art{research/mt_ic_scale_20261115/RESULTS.md},
+\art{research/mt_batch_inv_20261115/RESULTS.md}.}
+\label{tab:in-mt}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\linewidth]{figures/fig-u16grob-mt.pdf}
+\caption[]{Data of Table~\ref{tab:in-mt}: multi-target IC over the best
+multi-target rho against group size, per $T$; markers are cell medians,
+bars the per-instance range. Filled: both methods unbatched; open: both with batched inversion.
+Dashed: parity. Data \art{figures/data-u16grob-mt.json}.}
+\label{fig:u16grob-mt}
+\end{figure}
+
+\section{Wall-only fixes, merge against first parent}\label{sec:in-wallfix}
+
+Three merged pull requests changed wall time only: \#3850 (hot-path fixes in
+the volcano and isomorphism-class rho arithmetic, \texttt{StructuredGauss},
+the \texttt{f4\_fp} counters, root-finding buffers and the tensor IC
+inverse), \#3991 (a new \texttt{rootfind-mitm-prime-batch} oracle and a
+lock-step negation rho under new identifiers, among others) and \#4009 (GPU
+kernel fixes and a Rust memory pass). A RunPod study measured each merge
+(B) against its first parent (A), one binary each, 36 ecbench sessions in
+three counterbalanced rounds, 20 measured runs per arm, on an 8-vCPU pod
+of a shared AMD EPYC 9575F host at L0
+(\art{research/wallfix_runpod_20261114/README.md}). A first run built
+byte-identical binaries (a stale cargo fingerprint) and is kept as the A/A
+control.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llrlrl@{}}
+\toprule
+PR & spec & B/A & 3-round range & A/A spread & dominant arm \\
+\midrule
+\#4009 & tensor & $\mathbf{0.654}$ & $0.645$--$0.664$ & $1.012$ & \texttt{ic-tensor} (100\%) \\
+\#3850 & prime & $\mathbf{0.905}$ & $0.905$--$0.905$ & $1.001$ & \texttt{ic-rf-pairs} (94\%) \\
+\#4009 & Koblitz & $\mathbf{0.926}$ & $0.925$--$0.927$ & $1.015$ & \texttt{da-f4} (93\%) \\
+\#3850 & tensor & $0.964$ & $0.958$--$0.968$ & $1.025$ & \texttt{ic-tensor} (100\%) \\
+\#3850 & Koblitz & $0.977$ & $0.973$--$0.981$ & $1.001$ & \texttt{rf-pairs} (8\%), \texttt{da-f4} \\
+\#3991 & prime & $\mathbf{1.013}$ & $1.011$--$1.015$ & $1.004$ & \texttt{ic-rf-pairs} (94\%) \\
+\bottomrule
+\end{tabular}
+\caption[]{Session-total solve CPU time of the merge over its first parent,
+geometric mean of three rounds. \#3991 on the prime spec is a small,
+consistent slowdown, not attributed. Outputs are identical outside timing
+in all 18 pairs, and all 36 sessions replay on the pod and on a second
+host, so counted cost and the band against matched rho are the same for A
+and B; rho stays ahead of the index calculus across the band on every
+curve. An independent recompute (\texttt{validator-report.json}, status
+pass) reproduces the headline figures; the benchmark entry carries a
+\texttt{VALIDATION.json}. RunPod L0, \texttt{[pcc:unverified]}. Source:
+\art{research/wallfix_runpod_20261114/README.md},
+\art{benchmarks/20261114-wallfix-runpod-abab/VALIDATION.json}.}
+\label{tab:in-wallfix}
+\end{table}
+
+\noindent Table~\ref{tab:in-wallfix} is a wall-time result on one shared
+host class. Since no count moved, it changes no $S$ and no distance.
 
 \section{Component speed-ups and end-to-end changes}\label{sec:in-summary}
 
@@ -1572,6 +2514,16 @@ Chained SAT with lookups, $n=83$ & $m$ up to 9 decided & no complete DLP \\
 F4 trace replay (PKM--Semaev) & $0.29$--$0.45$ of plain F4 & $27.9$--$1.13\cdot10^5\times$ \\
 CADO filter port & $10.40\times$ (filter) & LA $<2\%$ of solves \\
 Generic-field tower F4 & $2.18$--$2.57\times$ & not priced \\
+\texttt{inherited-f4-next} & wall per call $0.86$--$0.94$; $S$ unchanged & $44.59$--$2{,}022.93\times$ (ladder) \\
+M4GB divisibility signatures & wall per call $0.57$--$0.75$ & never the best row \\
+Paired inverse, Table~A collect & $1.040\times$ at $2^{44.3}$ only & not priced \\
+Table~A set-up levers, 13--15 Nov & build up to $1.252\times$, collect $1.086$--$1.097\times$ & not priced \\
+FES GPU walk and Macaulay GPU kernels & $102\times$ ($n=30$), $4.7\times$ (A100 kernel time) & not priced \\
+\texttt{fes-f2-gpu} in a complete solve & whole solve $12.3$--$44.1\times$ faster; $S$ unchanged & inherited F4 cheaper in $S$ \\
+Wall-only merges \#3850, \#4009 (validated) & solve CPU $0.654$--$0.977$ of parent & counts identical \\
+$m=3$ root finding on an A100, device tables (validated, scoped) & solve $4.0$--$57.3\times$ one CPU thread; $S$ unchanged & $107$--$1{,}019\times$ over the band \\
+IFMA native root-finding sweep & relation phase $1.25$--$1.67\times$ the scalar sweep & $150$--$16{,}809\times$ at $w=0$ \\
+Batched inversion, multi-target IC & wall $0.438$--$0.507$ of unbatched & gap grows: $1.754$--$1.813\times$ at $2^{36}$ \\
 \addlinespace
 \multicolumn{3}{@{}l}{\emph{End-to-end changes over an IC baseline}} \\
 Faster \texttt{f4\_fp} in the cover pipeline & $S$ $4.99$--$5.08\times$ lower & $194$--$850\times$ (lower bound) \\
@@ -1580,17 +2532,27 @@ E39 arrival-order pivots (validated) & ahead of A at every weight & $5.15\cdot10
 E40 lead-stored rows (validated) & ahead of A at $w>0$ only & $6.00\cdot10^3\times$ at best \\
 Generator-orbit base, Koblitz (validated) & $1.26$--$3.20\times$ & below rho only at $n=29$, one column (BSGS) \\
 Harvest default, inherited F4 & $+9.6\%$ to $-4.1\%$ by size & $7$--$1{,}250\times$ (frozen strong) \\
+\texttt{fes-f2} oracle, Koblitz $n=13$ (validated, counts) & $S$ $0.7081\times$ inherited F4; tie at $w=0$ & $33.30\times$ (calibration point) \\
+\texttt{inherited-f4-batched} & $S$ $0.816$--$0.889\times$ inherited F4 & $121.7$--$3{,}012.6\times$ (\texttt{fes-then-batched} run) \\
+\texttt{fes-then-batched} (validated) & ties inherited F4 at $w=0$; unranked & rho below at every weight \\
+Double large primes, chained transfer & group operations $13.4\times$ fewer ($p=1{,}619$) & $28.1$--$1{,}715\times$ \\
+Block Lanczos Gram reuse, GHS-weak quartic (validated) & DL M-eq $0.8104$--$0.8894$ & IC $0.00170$--$0.00222$ of rho \\
+Normalised points, GHS-weak quartic (validated) & DL M-eq $0.9569$--$0.9871$ & IC $0.00168$--$0.00213$ of rho \\
+\texttt{incremental-gauss-echelon}, $m=3$ (validated, scoped) & \texttt{row\_ops} $0.10$--$0.15$; tie at $w=0$ & $52$--$1{,}230\times$ at $w=0$ \\
 \addlinespace
 \multicolumn{3}{@{}l}{\emph{Accounting and instrument changes}} \\
 Accounting v2 & references resized & gap larger \\
 Statistics v2 & censored runs kept & engine ratios lower bounds \\
 Allocator confound & wall time of small arms & counts identical \\
 64-bit field truncation, $n=83$ & refutations voided & --- \\
+Corrected matched rho, chained transfer & reference 5--9$\times$ cheaper & gap larger \\
 \bottomrule
 \end{tabularx}
 \caption[]{The part's results by class. ``Validated'': a \texttt{VALIDATION.json}
 with a passing validator report; every other row is producer-reported.
-Sources in \S\S\ref{sec:em-accounting}--\ref{sec:in-gpu}.}
+Sources in \S\S\ref{sec:em-accounting}--\ref{sec:em-yardstick},
+\ref{sec:bo-ladder}, \ref{sec:in-la}, \ref{sec:in-gpu}--\ref{sec:in-gpuic},
+\ref{sec:in-levers}--\ref{sec:in-wallfix} and \ref{sec:rf-gpu15}.}
 \label{tab:in-summary}
 \end{table}
 

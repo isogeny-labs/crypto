@@ -1,0 +1,51 @@
+{
+  "phase": "pre-call",
+  "timestamp": "2026-11-16T06:43:04.316Z",
+  "pins": [
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/root_certificates.cpp",
+      "sha256": "9ab823f9675d1151ebc98babc5adc920fb6bfb3df418d59526ad36f3fc761c3f",
+      "qualifier_path": "/tmp/prime-transfer-round04-root-qualifier-01/root_certificates.cpp",
+      "qualifier_sha256": "9ab823f9675d1151ebc98babc5adc920fb6bfb3df418d59526ad36f3fc761c3f"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/identity_support.hpp",
+      "sha256": "dd92c81774e13ba0c302de98c9e83df19502f91b18a1bfd1322b00f47d9ae966",
+      "qualifier_path": "/tmp/prime-transfer-round04-root-qualifier-01/identity_support.hpp",
+      "qualifier_sha256": "dd92c81774e13ba0c302de98c9e83df19502f91b18a1bfd1322b00f47d9ae966"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/v2/exact.hpp",
+      "sha256": "d52df5722fbde3fa4c2491d4ad15f3061cf04308d617997b33665af7e4ec7cb9",
+      "qualifier_path": "/tmp/prime-transfer-round04-root-qualifier-01/v2/exact.hpp",
+      "qualifier_sha256": "d52df5722fbde3fa4c2491d4ad15f3061cf04308d617997b33665af7e4ec7cb9"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/PROOF-MAP.md",
+      "sha256": "e353d0df4ce29226107da56706ac0ada4549adb91e7b729b8560043ee6ba2cf2",
+      "qualifier_path": "/tmp/prime-transfer-round04-root-qualifier-01/PROOF-MAP.md",
+      "qualifier_sha256": "e353d0df4ce29226107da56706ac0ada4549adb91e7b729b8560043ee6ba2cf2"
+    },
+    {
+      "path": "/tmp/prime-transfer-round04-root-qualifier-01/issuer",
+      "sha256": "6bcd5d8e2dfcd3c0334ba71114b8a73474e3b5b4afa44b3d6e31ecf8dba7086f"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/models/u3.model",
+      "sha256": "0b37ca148021c382ff6f4a71752d2bd73c966d8d9629e581bad127dc4373766b"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/root-input-01.txt",
+      "sha256": "3edf464912aa9c6aa97eb0f4902ca12e5653a19156f2ab74a3d3cead167cb1b7"
+    }
+  ],
+  "command": [
+    "timeout",
+    "60s",
+    "/tmp/prime-transfer-round04-root-qualifier-01/issuer",
+    "research/prime_field_transfer_goal_20261116/receipts/round-04/models/u3.model",
+    "research/prime_field_transfer_goal_20261116/receipts/round-04/root-input-01.txt",
+    "research/prime_field_transfer_goal_20261116/receipts/round-04/root-certificates-01",
+    "research/prime_field_transfer_goal_20261116/lean/WeberRootBoundary.lean"
+  ]
+}

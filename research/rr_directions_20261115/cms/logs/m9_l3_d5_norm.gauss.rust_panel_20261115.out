@@ -1,0 +1,76 @@
+c GAUSSCONF max_num_matrices=5 autodisable=1 max_matrix_rows=2000 max_matrix_columns=1000 min_gauss_xor_clauses=2
+c -- header says num vars:            162
+c -- header says num clauses:         468
+c -- clauses added: 432
+c -- xor clauses added: 36
+c -- vars added 162
+c [find&init matx] performing matrix init
+c [gauss] XOR-encoding clauses are not detached, so no need to reattach them.
+c [xor-rem-unconnected] left with 35 xors from 35 non-empty xors T: 0.00
+c [xor-together] xored together: 0 orig xors: 35 new xors: 35 T: 0.00
+c [xor-rem-unconnected] left with 35 xors from 35 non-empty xors T: 0.00
+c [xor-clean-equiv] removed equivalent xors: 0 left with: 35
+c [matrix] unused xors from cleaning: 0
+c [matrix] Good   matrix  0     35 x  162  density:0.2145  xorlen avg: 34.74
+c [matrix] Using 1 matrices recovered from 0 xors T: 0.00 T-out: N
+c [branch] adjusting to: vsid (from: vsid) var_decay:0.95 descr: VSIDS
+c rst  geom  stb   vs     1   111     707  4719   309    3.96    3.84     2    25    83     1   17.44   17.30
+c rst  geom  stb   vs     2   233     707  4719   309    3.96    3.84     6    30   196     1   16.06   16.00
+c  res  pol bran  nres  conf freevar  IrrL  IrrB l/longC  l/allC RedL0 RedL1 RedL2  RedB l/longC  l/allC
+c rst  geom  stb   vs     3   367     707  4719   309    3.96    3.84    11    50   305     1   14.02   13.98
+c rst  geom  stb   vs     4   515     707  4719   309    3.96    3.84    12    56   444     3   13.36   13.29
+c rst  geom  stb   vs     5   677     707  4719   309    3.96    3.84    12   110   552     3   12.53   12.48
+c rst  geom  stb   vs     6   854     707  4719   309    3.96    3.84    13   151   687     3   12.06   12.02
+c rst  geom  stb   vs     7  1048     707  4719   309    3.96    3.84    13   170   862     3   11.88   11.86
+c rst  geom  stb   vs     8  1263     707  4719   309    3.96    3.84    18   281   960     4   11.29   11.26
+c rst  geom  stb   vs     9  1499     704  4719   309    3.96    3.84    33   396  1061     8   10.67   10.62
+c rst  geom  stb   vs    10  1557     312  2860   414    3.66    3.45     1     7     0     1    4.25    4.00
+c ------- FINAL TOTAL SEARCH STATS ---------
+c UIP search time          : 0.02        (74.02     % time)
+c restarts                 : 10          (155.70    confls per restart)
+c blocked restarts         : 0           (0.00      per normal restart)
+c time                     : 0.02        
+c decisions                : 1698        (0.00      % random)
+c propagations             : 102K        (6070K     props/s)
+c decisions/conflicts      : 1.09        
+c conflicts                : 1557        
+c conf lits non-minim      : 49322       (31.68     lit/confl)
+c conf lits final          : 10.55       
+c red which0               : 43          (2.76      % of confl)
+c props/decision           : 0.00        
+c props/conflict           : 0.00        
+c 0-depth assigns          : 397         (55.99     % vars)
+c 0-depth assigns by CNF   : 0           (0.00      % vars)
+c reduceDB time            : 0.00        (0.00      % time)
+c OccSimplifier time       : 0.00        (0.00      % time)
+c [occur] 0.00 is overhead
+c [occur] link-in T: 0.00 cleanup T: 0.00
+c [occ-substr] long subBySub: 0 subByStr: 0 lits-rem-str: 0 T: 0.00
+c SCC time                 : 0.00        (0.00      % time)
+c [scc] new: 0 BP 0M  T: 0.00
+c vrep replace time        : 0.00        (0.00      % time)
+c vrep tree roots          : 0           
+c vrep trees' crown        : 0           (0.00      leafs/tree)
+c distill long time        : 0.00        (0.00      % time)
+c distill bin time         : 0.00        (0.00      % time)
+c strength cache-irred time: 0.00        (0.00      % time)
+c strength cache-red time  : 0.00        (0.00      % time)
+c avg cls in red 0         : 13.59       
+c avg cls in red 1         : 147.97      
+c avg cls in red 2         : 610.20      
+c Conflicts in UIP         : 1557        (68298.46  confl/time_this_thread)
+c Max Memory (rss) used    : 6144 kB     
+c Total time (this thread) : 0.02        
+c DRIVER conflicts: 1557
+c DRIVER decisions: 1698
+c DRIVER propagations: 102432
+c DRIVER solve_cpu_s: 0.024121
+c DRIVER solve_wall_s: 0.196097
+s UNSATISFIABLE
+c [g 0] truth-find prop checks  : 19066
+c [g 0] -> of which prop        : 37.89 %
+c [g 0] -> of which confl       :  5.15 %
+c [g 0] elim called             : 3777
+c [g 0] ---> which lead to prop : 17.79 %
+c [g 0] ---> which lead to confl:  2.22 %
+c [g 0] size: 25    x 160  

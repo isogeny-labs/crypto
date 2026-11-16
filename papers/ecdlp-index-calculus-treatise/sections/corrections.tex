@@ -182,6 +182,12 @@ Item & Original reading & Correction & Source \\
 \midrule
 Residual collectors at $w>0$ & res4/rho $41$--$58\times$ at $w=1$; C1 met in 6 of 8 cells & 1 Nov, option~B: res4/rho $3.6$--$4.8\times$; C1 met in 2 of 8 & \art{research/ic_byte_counter_pricing_20261101/} \\
 \addlinespace
+Pooled $k$-sum tables & no \texttt{VALIDATION.json}; unqualified & 12 Nov: gate-validated (16 rows), claim \texttt{PCC-20261112-31adb2}, unverified standing; \S\ref{sec:pg-ksum} & \art{research/prime_ksum_pooled_20261029/VALIDATION.json} \\
+\addlinespace
+Multi-target IC (ic4) & cheaper than rho at $T=16384$ (\texttt{PCC-20261111-fa13c8}) & 11 Nov: withdrawn as a statement about rho after the rho start fix; superseded by \texttt{PCC-20261111-9a26ac}; \S\ref{sec:pg-multitarget} & \art{research/mt_rho_start_fix_20261111/} \\
+\addlinespace
+Tensor-contraction route & ``nothing was measured'' & 11--12 Nov: graph widths measured; exact Boolean contraction of the encodings costs at least about $2^{2b}$; no cost of the route measured; \S\ref{sec:pt-tensor} & \art{research/semaev_tensor_treewidth_20261111/} \\
+\addlinespace
 Small-root lattice reach & $\varepsilon(\Sem3)=0.8408$, best margin $-0.0481$ at $m=4$ & 24 Oct (\texttt{CORR-20261024-b2a799}): wrong exponent in \texttt{smallroot\_reach.py}, $\varepsilon_{HG}=\varepsilon_{TOOL}/n$; $\varepsilon(\Sem3)=0.2803$, margin $-0.6086$ at $(4,2)$, best $-0.5161$ at $m=32$ & \art{crypto-autoresearcher:analysis/smallroot-reach/CORRECTION.md} \\
 \addlinespace
 Oracle gate of the Semaev-alternatives memo & ``$e<1$ at $m=4$'' & 4 Nov: not implied by its own cost model; a generic 2+2 MITM passes it ($s=1.93$) at cost $p^{2/3}$; correct gate $s<m-3$, i.e.\ $e<(m-3)/4$ & \art{research/semaev_alternatives_audit_20261104/README.md} \\
@@ -270,6 +276,8 @@ solve) out of each record's total
 \toprule
 Item & Original reading & Correction & Source \\
 \midrule
+Cheon with auxiliary inputs & no exponent separation established; medium-tier re-run frozen, no results & 7--11 Nov: the validated 11-size study separates the fitted exponents over 36--56 bits in both families ($r-1$ by $0.002$, $r+1$ by $0.026$--$0.032$); the medium tier reproduced 272 of 272 runs; \S\ref{sec:gf-cheon} & \art{research/cheon_ecbench_wide_20261106/REPORT.md} \\
+\addlinespace
 Automorphism rho, prime & cubic/negation $0.611$, quartic/negation $0.791$ & 24 Oct: $0.647$ $[0.543,0.770]$ and $0.819$ $[0.722,0.929]$; the quartic interval no longer contains $1/\sqrt2$, so finding 1 holds for cubic only & \art{research/prime_rho_automorphism_20261015/README.md} \\
 \addlinespace
 Volcano crater controls & $j=0$ $0.697$, $j=1728$ $0.707$ & 24 Oct: $0.716$ $[0.598,0.857]$ and $0.723$ $[0.621,0.843]$; both still exclude 1 & \art{research/isogeny-volcano-cost_20261017/README.md} \\
@@ -323,6 +331,10 @@ Isogeny seed, curve25519 & seed 1093 cheaper than seed 0 & 3 Nov: V2 failed (mea
 CM canonical lift (lane L9) & closure argument as first written & \texttt{CORR-20260810-930c42}: closes only ordinary prime-field Serre--Tate/global CM models of fixed arity $2$--$9$; point-lifting routes give $\Pr\le p^{-1+o(1)}$, exponent 1 against rho's $1/2$ & \art{crypto-autoresearcher:knowledge/leads/ecdlp/transfer/LEAD-TRF-cm-canonical-lift-heights.yaml} \\
 \addlinespace
 GHS magic number & legacy \texttt{ec\_trapdoor::\allowbreak magic\_number} (plain orbit) & 13 Oct: MMT definition; consequences for ECC2K-130 are in \S\ref{sec:koblitz} and \S\ref{sec:ladder3} & \art{research/weak_isogeny_classes_20261013/REPORT.md} \\
+\addlinespace
+JV sieve, table-line arm U & ``no validation file'' (\S\ref{sec:jac-jv}, through 11 Nov) & validated 11 Nov, 02:01Z: U at $0.0141$, $0.0857$, $0.0900$ of matched rho at $w=0$, $0.1$, $1$ (weak class only); text corrected 12 Nov & \art{research/jv_sieve_line_vs_rho_20261103/VALIDATION.json} \\
+\addlinespace
+JV Nagao arm against matched rho & $1.41$ and $1.16$ of matched rho; $1.59$--$1.98$ against a pooled constant & 12 Nov: with the Hilbert stop, $1.003$ $[0.916,1.104]$, $0.837$, $0.695$ at $p=1301$, 1451, 1601 (local, unverified); \S\ref{sec:ext-jv-nov} & \art{research/jv_nagao_hilbert_20261112/rescore/table.md} \\
 \bottomrule
 \end{tabularx}
 \caption[]{Corrections in the transfer and cover studies. All
@@ -396,6 +408,8 @@ Planted generic-group null & Stage 1 null on planted $\ZZ/n$, $n$ of 16--20 bits
 \addlinespace
 ETH-route leads & twelve leads as written in \texttt{LEADS.md} & 2 Nov errata; told in \S\ref{sec:tn-corrections} & \art{research/ic_prime_eth_leads_20261031/LEADS.md} \S9 \\
 \addlinespace
+Interpolation of the discrete logarithm (Lange--Winterhof, Kiltz--Winterhof) & theorem statements read only in abstracts & 12 Nov: Kiltz--Winterhof 2004, Theorems 5 and 6 transcribed with their scope; Lange--Winterhof 2002 still unread (paywalled); \S\ref{sec:um-generic} & \art{research/cheon_aux_leads_20261112/LITERATURE_LANGE_WINTERHOF.md} \\
+\addlinespace
 Learned WDSat branching & learned order $16{,}097$ held-out conflicts against $3{,}092$ & confounded with the symmetry switch; told in \S\ref{sec:ln-components} & \art{cryptanalysis:experiments/ideas_learning_20261018/REPORT.md} \\
 \addlinespace
 Hashed-ECDL set-up hang & user report: Fourier-network construction impractical & 30 Oct: the AKS branch above \texttt{u64}; told in Table~\ref{tab:tn-native} & \art{research/hashed_ecdl_hash_prime_20261030/README.md} \\
@@ -414,6 +428,90 @@ jet correction removed a closure that had no derivation behind it, and the
 JKSST audit (Table~\ref{tab:corr-xref}) turned an exact-form closure into a
 conditional one. A withdrawn closure is a correction, not evidence for the
 route.
+
+\section{Corrections of 12--15 November}\label{sec:corr-nov15}
+
+The update of 15 November changed these readings of the 12 November text.
+Each row points to the chapter that now carries the correction.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+JV Nagao arm, Hilbert stop & below matched rho across the band at $p=1451$, 1601 (local) & validator: insufficient evidence; fresh same-binary rho $1.050$, $0.876$, $0.728$; band order not established (below on emitted counters only); \S\ref{sec:ext-jv-nov} & \art{research/jv_nagao_hilbert_20261112/validation/VALIDATION.json} \\
+\addlinespace
+Factor-base constant $c=1.60$ (J2) & engineering improvement, order holding across the band; row near $0.005\times$ rho & validator: insufficient evidence (gain only with additions unpriced; CPU $1.00$--$1.07$ of $c=2.00$); $0.005$ is DL's figure, DL1 is $0.0028$; \S\ref{sec:ladder4} & \art{research/leads_followup_20261114/item03_j2_validation/VALIDATOR_REPORT.md} \\
+\addlinespace
+Curve25519 wave 5 & 8-of-8 solving-degree match; SD $\ge65{,}148$ for every base & errata E1--E7: the match is in-sample; the bound holds only for chain and flat presentations; solving degree is not a cost law ($R^2=0.09$); \S\ref{sec:open-leads} & \art{research/curve25519_leads_wave5_20261112/README.md} \\
+\addlinespace
+Cover images as factor bases & line closed at $m\le3$, $t\le8$ & round 3 left $m=3$, $t\ge5$ and $m=4$ open; rounds 4--7 close $m\le5$; round 6's \emph{mixed} at $m=4$, $t=3$ overturned by round 7's timing ($1.26$--$1.42\times$ PKM) & \art{research/cover_image_fb_r7_mixed_20261113/README.md} \\
+\addlinespace
+Chained prime transfer & distances to plain-walk rho; genus 2 at $p=251$ below rho ($0.67$) & against the negation rho (validated) distances are $4.35$--$9.22\times$ larger; $p=251$ is above at all three prices; \S\ref{sec:jac-chain} & \art{research/negation_remeasure_20261113/RESULTS.md} \\
+\addlinespace
+Bielliptic push-forward & first-collision arms below rho at small $p$ & against the negation rho above or unresolved; $J(C)$ arm at $p=12{,}841$: $394/4{,}720/43{,}658\times$ $\to$ $2{,}473/20{,}667/51{,}693\times$ at $w=0/0.1/1$; \S\ref{sec:obs-pushforward} & \art{research/negation_remeasure_20261113/RESULTS.md} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Corrections of 12--15 November, part 1: frontier, leads and
+transfers. Standing as each source states; rows naming a validator carry
+its disposition, the rest are producer records.}
+\label{tab:corr-nov15a}
+\end{table}
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+Small-$D_E$ endomorphism bases & draft, not frozen, not run & frozen, run, validated with caveats: the saving is the folding, which a generic control matches; every arm above rho; \S\ref{sec:iso-endo} & \art{research/small_de_endo_fb_20261112/} \\
+\addlinespace
+\texttt{fes-f2} at degree 13 & frozen, not run; producer $0.77\times$ inherited F4, $34.3\times$ rho & run 15 Nov (RunPod): paired $0.7081$ $[0.6683,0.7503]$, $33.30\times$ strong rho, tie at $w=0$; unresolved inside the band; validated for counts only; \S\ref{sec:bo-ladder} & \art{research/fes_k13_validated_20261112/RESULTS.md} \\
+\addlinespace
+PKM fall degree & raw records not committed; C-step prediction untested & 8 Nov EKS relaunch reproduced the $t\le10$ medians; C-step holds at $t=11,12$, undecided at $t=13$; \S\ref{sec:fd-pkm} & \art{research/pkm_falldegree_unblock_20261107/RESULTS.md} \\
+\addlinespace
+Small roots beyond one ideal & open for multi-target ideals, exceptional specialisations and joint lattices beyond $s=3$ & the multi-target joint lattice is closed at toy scale by computation (not proof); open only for the exceptional specialisations and joint lattices beyond $s=3$; \S\ref{sec:pa-smallroot} & \art{research/prime_leads_chase_20261113/L2-lattice/REPORT.md} \\
+\addlinespace
+Kummer tower at $m=8$ & a projected gain at $m=8$ & charging one whole solve per target (cost floor $p<W^2$, Lean-checked) removes the projected gain inside its own cost model; \S\ref{sec:pt-summary} & \art{research/prime_norm_rank_20261112/} \\
+\addlinespace
+Validated below-rho measurements & one (the JV sieve) & two outside Tables A--C: the JV sieve and, since 14 Nov, the GHS-weak DL arm at $k=22$ ($0.0027$, $0.0025$, $0.0018$ of negation rho); Chapter~\ref{ch:audit} & \art{research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Corrections of 12--15 November, part 2: endomorphisms,
+engines, fall degree, prime fields and the validated count. Standing as in
+Table~\ref{tab:corr-nov15a}.}
+\label{tab:corr-nov15}
+\end{table}
+
+\section{Corrections of 15 November, evening}\label{sec:corr-nov15b}
+
+Table~\ref{tab:corr-nov15b} lists the readings that the studies merged after
+05:00Z on 15 November changed. All are producer-reported unless the
+correction column names a validator.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+PKM stage B & no admitted row & RunPod rows of 15 Nov for $m=2$--$6$, Table~\ref{tab:pa-dfm}; $[$pcc:unverified$]$ & \art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_B.md} \\
+\addlinespace
+PKM $t=14$ & cap-6 cells owed & cap 5 and cap 6 complete without refuting: $d_F\ge7$; cap 7 pending; \S\ref{sec:pa-pkm} & \art{research/prime_fall_degree_20261027/reports/growth-law-20261115/README.md} \\
+\addlinespace
+Symmetric PKM component ratio & leaderboard component ratio as reported & excludes the per-target $S_5$ build, $7.362\times$ the F4 stage at $N=12$; Table~\ref{tab:pa-pkm-priced} & \art{research/pkm_priced_20261115/REPORT.md} \\
+\addlinespace
+GPU root finding, Table~\ref{tab:rf-gpu-ic} & no validator yet & validated (scoped) by an independent review: 88 certificates re-verified, every record replayed, no number refuted, wall rated 0/100 & \art{research/ic_gpu_rootfind_ic_20261114/VALIDATION_REVIEW.md} \\
+\addlinespace
+Table A in Chapter~\ref{ch:distance} & rule v7, $3.43$--$11.51\times$ & the board reads rule v9 since 11 Nov: $4.08$ $[3.76,4.44]$ to $11.13$ $[9.92,12.60]\times$, sweep verdict validated with caveats; Table~\ref{tab:fr-boardA} & \art{docs/ic/leaderboard.json} \\
+\addlinespace
+PKM $t=13$ & ``undecided'' (draw 0 killed by Spot) & $d_F=6$ on both draws after the RunPod re-run of draw 0; \S\ref{sec:pa-pkm} & \art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_B.md} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Corrections of 15 November, evening.}
+\label{tab:corr-nov15b}
+\end{table}
 
 \section{Papers, notes and provenance}\label{sec:corr-papers}
 

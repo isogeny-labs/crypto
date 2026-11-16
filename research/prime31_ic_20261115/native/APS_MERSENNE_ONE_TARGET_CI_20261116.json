@@ -1,0 +1,73 @@
+{
+  "standing": "[pcc:unverified]",
+  "source_run": "https://github.com/isogeny-labs/crypto/actions/runs/43804915562",
+  "run_id": 43804915562,
+  "job_id": 133093351405,
+  "source_head_sha": "710aeb31fda4933a43f95a1500df2f098f043910",
+  "command": "cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --walk-mersenne-one",
+  "scope": "complete optimized one-public-target Rust APS index-calculus-derived solver; source-specific developer CI, no independent PCC or external frontier win",
+  "exact_output": {
+    "attempts": [
+      {
+        "algebraic_S3_pair_roots_ns": 20695197,
+        "algebraic_batch_field_inversions": 130,
+        "algebraic_cold_wall_until_output_ns": 23058090,
+        "algebraic_field_square_roots": 199680,
+        "algebraic_matching_x_candidates": 1,
+        "algebraic_signed_candidates": 1,
+        "algebraic_unusable_beta": 0,
+        "algebraic_visited_pairs": 199680,
+        "ec_group_additions_candidate_verification_only": 57,
+        "field_multiplier": "mersenne_fold",
+        "generic_direct_join_control": null,
+        "points_per_partition": 1536,
+        "precompute_labels_ns": 2103212,
+        "public_label_source": "public_additive_walk",
+        "public_seed": "4150535f50523331",
+        "rejected_global_duplicate_x": 0,
+        "rejected_identity": 0,
+        "round": 0,
+        "solution": {
+          "alpha": 382398479,
+          "beta": 682772235,
+          "identity_equation": "alpha + beta * log = 0 (mod n)",
+          "log": 1038579171,
+          "partition_indices": [
+            129,
+            814,
+            1002
+          ],
+          "signs": [
+            -1,
+            1,
+            -1
+          ],
+          "status": "verified"
+        },
+        "source_point_generation_group_additions": 10798
+      }
+    ],
+    "classification": "index-calculus methodology, generic pair-MITM equivalent, not a novel non-generic attack",
+    "cofactor": 1,
+    "cold_rust_wall_ns": 23058090,
+    "complete_target_scalar_recovered": true,
+    "curve_a": 847514846,
+    "curve_b": 2087444724,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "method": "published APS 2018 dynamic labelled one-relation S3, m=3",
+    "n": 2147446831,
+    "no_f4_or_factor_base_linear_algebra": true,
+    "no_known_target_log_in_solver": true,
+    "p": 2147483647,
+    "points_per_partition": 1536,
+    "public_target": [
+      1477799919,
+      824532935
+    ],
+    "round_limit": 3,
+    "standing": "[pcc:unverified]"
+  }
+}
