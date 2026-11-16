@@ -1,0 +1,26 @@
+   Compiling crypto v0.1.0 (/workspace/crypto-current-base-20261026)
+    Finished `release` profile [optimized] target(s) in 12m 23s
+     Running unittests examples/ic_projected_query_law.rs (/workspace/crypto-integration-target/release/examples/ic_projected_query_law-7e611f1ca339d8ee)
+
+running 11 tests
+test law::tests::a_certificate_cannot_be_reused_with_a_different_group_domain ... ok
+test law::tests::a_complete_noncyclic_kernel_covers_the_group_and_recovers_every_target ... ok
+test law::tests::identity_hit_is_verified_without_inventing_a_factor_base_relation ... ok
+test law::tests::incomplete_duplicate_or_non_kernel_censuses_are_rejected ... ok
+test law::tests::invalid_logs_full_relations_targets_and_ranges_fail_closed ... ok
+test law::tests::kernel_randomization_covers_each_ambient_point_once_for_every_target ... ok
+test law::tests::noncyclic_or_incompatible_kernel_and_invalid_orders_are_rejected ... ok
+test law::tests::omitting_kernel_randomization_reaches_only_the_prime_subgroup ... ok
+test law::tests::supplied_kernel_supports_cofactor_4232_without_claiming_a_curve_certificate ... ok
+test law::tests::verified_signed_relations_recover_scalars_from_independently_looked_up_logs ... ok
+test tests::binary_adapter_checks_full_query_coverage_and_relation_recovery_against_reference ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/ic_projected_recovery_identity.rs (/workspace/crypto-integration-target/release/examples/ic_projected_recovery_identity-36ba74743ee7bb6b)
+
+running 1 test
+test tests::an_unconditional_claim_to_recover_without_an_inverse_is_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,14 @@
+digraph Solver {
+ graph [rankdir=LR, bgcolor="white",pad=0.2,ranksep=0.3,nodesep=0.35];
+ node [shape=box,style="rounded,filled",fillcolor="#edf5fb",color="#264c70",fontname="Helvetica",fontsize=11];
+ edge [fontname="Helvetica",fontsize=10,color="#264c70"];
+ input [label="Public System + limits\nexact BigUint modulus\ndynamic sparse monomials"];
+ prop [label="Linear/quadratic propagation\ncounted rational-root branches\nactual control: 8 nodes"];
+ gb [label="Ordinary Buchberger fallback\nsmall coupled controls only\nactual control: 0 calls",fillcolor="#fff4dc"];
+ replay [label="Complete original assignment\nunchanged System check\nindependent indexed-row/group replay"];
+ stop [label="Cap / unsupported / observation\nnever an absence certificate",fillcolor="#f9eded"];
+ input -> prop; prop -> replay [label="actual q1/k2 root"];
+ prop -> gb [style=dashed,label="if needed"];
+ gb -> prop [style=dashed,label="new consequences"];
+ prop -> stop; gb -> stop;
+}

@@ -1,0 +1,41 @@
+ Downloading crates ...
+  Downloaded unicode-ident v1.0.27
+  Downloaded syn v3.0.10
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling syn v3.0.10
+   Compiling serde_json v1.0.154
+   Compiling serde_derive v1.0.229
+   Compiling cubic-graph-analysis v0.1.0 (/workspace/crypto/research/extension_ic_graph_20261115/native_analysis)
+    Finished `release` profile [optimized] target(s) in 13.78s
+     Running unittests src/bin/cover-validation-analysis.rs (research/extension_ic_graph_20261115/native_analysis/target/release/build/cubic-graph-analysis/22234700ae4b9920/out/cover_validation_analysis-22234700ae4b9920)
+
+running 22 tests
+test accounting::bitops::tests::entry_widths_by_hand ... ok
+test accounting::bitops::tests::every_primitive_prices_where_it_should ... ok
+test accounting::bitops::tests::log2_is_exact_on_powers_and_close_elsewhere ... ok
+test accounting::bitops::tests::committed_v2_vectors_are_frozen ... ok
+test accounting::bitops::tests::group_operations_dominate_field_products ... ok
+test accounting::bitops::tests::committed_vectors_are_frozen ... ok
+test accounting::bitops::tests::small_widths_by_hand ... ok
+test common::tests::a_reported_mst_resource_refusal_can_recover_but_never_pass_projection_gate ... ok
+test common::tests::complete_public_fixture_keeps_flow_and_singleton_cannot_claim_parity ... ok
+test common::tests::censor_keeps_inflight_and_never_makes_a_partial_interval ... ok
+test common::tests::inner_or_outer_aa_failure_is_retained ... ok
+test common::tests::false_valid_flag_or_placeholder_cannot_hide_wrong_scalar ... ok
+test common::tests::explicit_sieve_recipe_and_process_limits_bind_every_record ... ok
+test common::tests::native_answer_flags_graph_proofs_and_signatures_stay_checked ... ok
+test common::tests::mst_identity_and_counter_tampering_cannot_qualify ... ok
+test tests::censor_and_nonzero_exit_block_followup ... ok
+test tests::accounting_diagnostic_reprices_and_never_allows_comparison ... ok
+test common::tests::public_digest_source_and_duplicate_case_are_enforced ... ok
+test tests::endpoints_are_validation_not_comparative_evidence ... ok
+test tests::explicit_mst_validation_binds_worker_identity_and_counters ... ok
+test tests::wrong_scalar_fake_mode_and_fallback_never_qualify ... ok
+test common::tests::parity_requires_three_distinct_public_challenges_and_zero_exit ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

@@ -1,0 +1,42 @@
+{
+  "authoring_session_issued_merge": false,
+  "ci_green_at_merge": false,
+  "coverage": "Publication-to-merge only. Prompt and human-message timestamps are unavailable; no zero-intervention, recovery-attribution, full-session-duration or autonomy-success claim.",
+  "final_head": "4f724205866a334fb3ac137cb4aca2d57444a4f0",
+  "merge_commit": "2dee266203bedb19e302d2af64240815c679f085",
+  "merged_at": "2026-11-16T01:35:32Z",
+  "merged_by": "aburan28",
+  "observed_at": "2026-11-16T02:07:52.694865+00:00",
+  "pr": 1591,
+  "published_at": "2026-11-15T23:12:16Z",
+  "repository": "isogeny-labs/cryptanalysis",
+  "required_checks": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-16T01:35:55Z",
+      "conclusion": "FAILURE",
+      "detailsUrl": "https://github.com/isogeny-labs/cryptanalysis/actions/runs/43787143168/job/133037211164",
+      "name": "store",
+      "startedAt": "2026-11-16T01:35:27Z",
+      "status": "COMPLETED",
+      "workflowName": "artifacts"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-16T01:36:46Z",
+      "conclusion": "FAILURE",
+      "detailsUrl": "https://github.com/isogeny-labs/cryptanalysis/actions/runs/43787143075/job/133037211860",
+      "name": "gate",
+      "startedAt": "2026-11-16T01:35:27Z",
+      "status": "COMPLETED",
+      "workflowName": "pcc-gate"
+    }
+  ],
+  "required_checks_observed_in_progress_at_merge": [
+    "store",
+    "gate"
+  ],
+  "revert_check_due": "2026-11-30T01:35:32+00:00",
+  "schema": "curve25519.pr-closure/v1",
+  "standing": "pcc:unverified"
+}

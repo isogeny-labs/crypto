@@ -1,0 +1,403 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 55,
+  "runs": [
+    {
+      "attempt": "check55-01",
+      "source_revision": "6ae924d4a54cd9536a6a4ac83af3db44447560ab",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHECK55_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 12,
+      "first_errors": [
+        "   ? `entry55` is undefined",
+        "   ? error occurred in or before input.sing line 41: ` column55=32*k55+j55;entry55=reduce(rho55^k55*values55[1,j55],normGB55);`",
+        "   ? `entry55` is undefined",
+        "   ? error occurred in or before input.sing line 41: ` column55=32*k55+j55;entry55=reduce(rho55^k55*values55[1,j55],normGB55);`",
+        "   ? `entry55` is undefined",
+        "   ? error occurred in or before input.sing line 41: ` column55=32*k55+j55;entry55=reduce(rho55^k55*values55[1,j55],normGB55);`",
+        "   ? `entry55` is undefined",
+        "   ? error occurred in or before input.sing line 41: ` column55=32*k55+j55;entry55=reduce(rho55^k55*values55[1,j55],normGB55);`"
+      ],
+      "native_results": [
+        "CHECK55_RESULT quotient_dimension=80 binary_entries=25600 evaluation_entries=12800 source_products=528 point_values=128 full_recovery=1"
+      ],
+      "point_results": [],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-10-31T18:02:24Z",
+      "finished_utc": "2026-10-31T18:02:32Z",
+      "native_wall_seconds": 8.0
+    },
+    {
+      "attempt": "check55-02",
+      "source_revision": "c0c9494004aa66c5423cb7ccbfca5d49a6917467",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHECK55_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "CHECK55_RESULT quotient_dimension=80 binary_entries=25600 evaluation_entries=12800 source_products=528 point_values=128 full_recovery=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T18:03:38Z",
+      "finished_utc": "2026-10-31T18:03:46Z",
+      "native_wall_seconds": 8.0
+    },
+    {
+      "attempt": "diag55-01",
+      "source_revision": "c4184e363744d0df8ae40b0c024ac66c0bdaee15",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DIAG55_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "DIAG55_V=32x32 I=32x32 residual=32x32",
+        "DIAG55_BASE_ZERO=0",
+        "DIAG55_R=32x64",
+        "DIAG55_SCALAR_LEFT=32x32 RIGHT=32x32",
+        "DIAG55_ALL_CHECKS_PASS"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T17:54:48Z",
+      "finished_utc": "2026-10-31T17:54:51Z",
+      "native_wall_seconds": 3.0
+    },
+    {
+      "attempt": "quotient-lean55-01",
+      "source_revision": "f646d68ff0b73425c5f3454fe0e102db7187e448",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": [
+        "Quotient55.evaluation_surjective",
+        "Quotient55.kernel_iff_image",
+        "Quotient55.range_eq_kernel",
+        "Quotient55.scalar_mem_image"
+      ],
+      "authored_claims": [
+        "Quotient55.evaluation_surjective",
+        "Quotient55.kernel_iff_image",
+        "Quotient55.range_eq_kernel",
+        "Quotient55.scalar_mem_image"
+      ],
+      "generated_equation_declarations": [],
+      "status": "accepted"
+    },
+    {
+      "attempt": "quotient55-01",
+      "source_revision": "5e93ffe67d8d7bb908892adcbc19d9c71107c7e4",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "QUOTIENT55_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 359,
+      "first_errors": [
+        "   ? QUOTIENT55_GLOBAL_BASE_EQUATION",
+        "   ? leaving ::require55 (0)",
+        "   ? matrix size not compatible(32x64, 32x32)",
+        "   ? error occurred in or before input.sing line 20: `matrix A55=I55+u*(R55+I55);matrix conjugate55=A55+(u^3+u^4)*I55;`",
+        "   ? expected matrix-expression. type 'help matrix;'",
+        "   ? `A55` is not defined",
+        "   ? error occurred in or before input.sing line 20: `matrix A55=I55+u*(R55+I55);matrix conjugate55=A55+(u^3+u^4)*I55;`",
+        "   ? expected matrix-expression. type 'help matrix;'"
+      ],
+      "native_results": [
+        "RESULT55 quotient_dimension=80 rank_A=80 rank_E=80 CRT_degree=80 source_products=528 source_values=32 full_annihilator=1 full_recovery=1"
+      ],
+      "point_results": [],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-10-31T17:52:46Z",
+      "finished_utc": "2026-10-31T17:52:51Z",
+      "native_wall_seconds": 5.0
+    },
+    {
+      "attempt": "quotient55-02",
+      "source_revision": "c7df5322af80bc6c4fefba6d1e0f018dd4fbbc8c",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "QUOTIENT55_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "RESULT55 quotient_dimension=80 rank_A=80 rank_E=80 CRT_degree=80 source_products=528 source_values=32 full_annihilator=1 full_recovery=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T17:55:46Z",
+      "finished_utc": "2026-10-31T17:55:56Z",
+      "native_wall_seconds": 10.0
+    }
+  ],
+  "input_pins": [
+    {
+      "attempt": "check55-01",
+      "artifact": "input.sing",
+      "revision": "6ae924d4a54cd9536a6a4ac83af3db44447560ab",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/CHECK55.sing",
+      "sha256": "f98474fa116983f64949b9bb2e10d8831c90cf69b58256e6c86253e246101d05"
+    },
+    {
+      "attempt": "check55-01",
+      "artifact": "driver.sh",
+      "revision": "6ae924d4a54cd9536a6a4ac83af3db44447560ab",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/NATIVE_DRIVER.sh",
+      "sha256": "3ff2d7e72e69bfb49cdd3abdb322479d792f53977bf25928ccf1027d9fd33f62"
+    },
+    {
+      "attempt": "check55-01",
+      "artifact": "launcher.sh",
+      "revision": "6ae924d4a54cd9536a6a4ac83af3db44447560ab",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "check55-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "6ae924d4a54cd9536a6a4ac83af3db44447560ab",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/PROTOCOL.md",
+      "sha256": "de4a446fddeacb2a93d97434a3e2cbbe47d2c2068c78776efdf0cd86d9331c4e"
+    },
+    {
+      "attempt": "check55-01",
+      "artifact": "protocol.json",
+      "revision": "6ae924d4a54cd9536a6a4ac83af3db44447560ab",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/protocol.json",
+      "sha256": "9278ba0f2ff9cdf3635c1f9ca10a00724691879cd6ac74668287e7733fc6d1f2"
+    },
+    {
+      "attempt": "check55-01",
+      "artifact": "donors.json",
+      "revision": "6ae924d4a54cd9536a6a4ac83af3db44447560ab",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/donors.json",
+      "sha256": "1d82bc33615e967373ca75548256ac441eaf3e66a45b4e0d5cc940cfdaf7f6b3"
+    },
+    {
+      "attempt": "check55-02",
+      "artifact": "input.sing",
+      "revision": "c0c9494004aa66c5423cb7ccbfca5d49a6917467",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/CHECK55.sing",
+      "sha256": "90b83f6c0682e85e5ad9329d0c03d8310374c089b787fc0293e3381a2697c1af"
+    },
+    {
+      "attempt": "check55-02",
+      "artifact": "driver.sh",
+      "revision": "c0c9494004aa66c5423cb7ccbfca5d49a6917467",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/NATIVE_DRIVER.sh",
+      "sha256": "3ff2d7e72e69bfb49cdd3abdb322479d792f53977bf25928ccf1027d9fd33f62"
+    },
+    {
+      "attempt": "check55-02",
+      "artifact": "launcher.sh",
+      "revision": "c0c9494004aa66c5423cb7ccbfca5d49a6917467",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "check55-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "c0c9494004aa66c5423cb7ccbfca5d49a6917467",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/PROTOCOL.md",
+      "sha256": "337629c9b5fb4f38204b64d1b4cd0a3c492f5b42e9a290b702bf19240f047c7a"
+    },
+    {
+      "attempt": "check55-02",
+      "artifact": "protocol.json",
+      "revision": "c0c9494004aa66c5423cb7ccbfca5d49a6917467",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/protocol.json",
+      "sha256": "9278ba0f2ff9cdf3635c1f9ca10a00724691879cd6ac74668287e7733fc6d1f2"
+    },
+    {
+      "attempt": "check55-02",
+      "artifact": "donors.json",
+      "revision": "c0c9494004aa66c5423cb7ccbfca5d49a6917467",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/donors.json",
+      "sha256": "1d82bc33615e967373ca75548256ac441eaf3e66a45b4e0d5cc940cfdaf7f6b3"
+    },
+    {
+      "attempt": "diag55-01",
+      "artifact": "input.sing",
+      "revision": "c4184e363744d0df8ae40b0c024ac66c0bdaee15",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/DIAG55.sing",
+      "sha256": "5d5e40fcdd81be7ed6942ea0c6964b65eb89b4ef54d0eaff89bc22180dd0512c"
+    },
+    {
+      "attempt": "diag55-01",
+      "artifact": "driver.sh",
+      "revision": "c4184e363744d0df8ae40b0c024ac66c0bdaee15",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/NATIVE_DRIVER.sh",
+      "sha256": "3ff2d7e72e69bfb49cdd3abdb322479d792f53977bf25928ccf1027d9fd33f62"
+    },
+    {
+      "attempt": "diag55-01",
+      "artifact": "launcher.sh",
+      "revision": "c4184e363744d0df8ae40b0c024ac66c0bdaee15",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "diag55-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "c4184e363744d0df8ae40b0c024ac66c0bdaee15",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/PROTOCOL.md",
+      "sha256": "bcdfc2ddb1d0409b313070989e34e1346708fb8713305a823b38372ea7331696"
+    },
+    {
+      "attempt": "diag55-01",
+      "artifact": "protocol.json",
+      "revision": "c4184e363744d0df8ae40b0c024ac66c0bdaee15",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/protocol.json",
+      "sha256": "9278ba0f2ff9cdf3635c1f9ca10a00724691879cd6ac74668287e7733fc6d1f2"
+    },
+    {
+      "attempt": "diag55-01",
+      "artifact": "donors.json",
+      "revision": "c4184e363744d0df8ae40b0c024ac66c0bdaee15",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/donors.json",
+      "sha256": "41a2be5f6cdff9188a4102cdf996da04932dc08d8af9b82acda6f2b8e106256a"
+    },
+    {
+      "attempt": "quotient-lean55-01",
+      "artifact": "driver.sh",
+      "revision": "f646d68ff0b73425c5f3454fe0e102db7187e448",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/LEAN_DRIVER.sh",
+      "sha256": "0644bf9d3017095277becebaecda88023f203081023eaeba680e871d1244785d"
+    },
+    {
+      "attempt": "quotient-lean55-01",
+      "artifact": "launcher.sh",
+      "revision": "f646d68ff0b73425c5f3454fe0e102db7187e448",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/REPLAY_LEAN.sh",
+      "sha256": "7ca4de0fdae4e7e41392ad0d2f7ca50799a94208bdf332a88b2e58ab55410c28"
+    },
+    {
+      "attempt": "quotient-lean55-01",
+      "artifact": "Quotient55.lean",
+      "revision": "f646d68ff0b73425c5f3454fe0e102db7187e448",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/lean/Quotient55.lean",
+      "sha256": "8329c52c8777f3dd227175c314a2353318281100714318af87a802e43b38043f"
+    },
+    {
+      "attempt": "quotient-lean55-01",
+      "artifact": "LEAN-PROTOCOL.md",
+      "revision": "f646d68ff0b73425c5f3454fe0e102db7187e448",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/LEAN-PROTOCOL.md",
+      "sha256": "4d063c3b328da78c9b59b1c9498e4f2e5184126ffef1f46f439e57e90d9b0609"
+    },
+    {
+      "attempt": "quotient-lean55-01",
+      "artifact": "AuditAxioms.lean",
+      "revision": "f646d68ff0b73425c5f3454fe0e102db7187e448",
+      "git_source": "tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "attempt": "quotient55-01",
+      "artifact": "input.sing",
+      "revision": "5e93ffe67d8d7bb908892adcbc19d9c71107c7e4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/QUOTIENT55.sing",
+      "sha256": "c5f05d9f55a3397f6575a8af88f69a6a7f1e9388e65dd5c9d2cb4e95985f7b53"
+    },
+    {
+      "attempt": "quotient55-01",
+      "artifact": "driver.sh",
+      "revision": "5e93ffe67d8d7bb908892adcbc19d9c71107c7e4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/NATIVE_DRIVER.sh",
+      "sha256": "3ff2d7e72e69bfb49cdd3abdb322479d792f53977bf25928ccf1027d9fd33f62"
+    },
+    {
+      "attempt": "quotient55-01",
+      "artifact": "launcher.sh",
+      "revision": "5e93ffe67d8d7bb908892adcbc19d9c71107c7e4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "quotient55-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "5e93ffe67d8d7bb908892adcbc19d9c71107c7e4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/PROTOCOL.md",
+      "sha256": "73c3f0fe16720a9fda4cb15ac8cbeb82e9f9fad19172e5ac312fb9fc995047fe"
+    },
+    {
+      "attempt": "quotient55-01",
+      "artifact": "protocol.json",
+      "revision": "5e93ffe67d8d7bb908892adcbc19d9c71107c7e4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/protocol.json",
+      "sha256": "4d7d6ee877d4fb139f37a7d09171ce20b7e005a728f6f92b81f12b1ac690d26c"
+    },
+    {
+      "attempt": "quotient55-01",
+      "artifact": "donors.json",
+      "revision": "5e93ffe67d8d7bb908892adcbc19d9c71107c7e4",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/donors.json",
+      "sha256": "41a2be5f6cdff9188a4102cdf996da04932dc08d8af9b82acda6f2b8e106256a"
+    },
+    {
+      "attempt": "quotient55-02",
+      "artifact": "input.sing",
+      "revision": "c7df5322af80bc6c4fefba6d1e0f018dd4fbbc8c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/QUOTIENT55.sing",
+      "sha256": "80a2bc5d2f397e6316d949f4a5df9b33144d219b17e2b44c493e23380f1b3b0f"
+    },
+    {
+      "attempt": "quotient55-02",
+      "artifact": "driver.sh",
+      "revision": "c7df5322af80bc6c4fefba6d1e0f018dd4fbbc8c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/NATIVE_DRIVER.sh",
+      "sha256": "3ff2d7e72e69bfb49cdd3abdb322479d792f53977bf25928ccf1027d9fd33f62"
+    },
+    {
+      "attempt": "quotient55-02",
+      "artifact": "launcher.sh",
+      "revision": "c7df5322af80bc6c4fefba6d1e0f018dd4fbbc8c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "quotient55-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "c7df5322af80bc6c4fefba6d1e0f018dd4fbbc8c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/PROTOCOL.md",
+      "sha256": "7493777541bd60a0f045894c99331c2300ce307ea0b0a75605f1851d2f4de0a7"
+    },
+    {
+      "attempt": "quotient55-02",
+      "artifact": "protocol.json",
+      "revision": "c7df5322af80bc6c4fefba6d1e0f018dd4fbbc8c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/protocol.json",
+      "sha256": "9278ba0f2ff9cdf3635c1f9ca10a00724691879cd6ac74668287e7733fc6d1f2"
+    },
+    {
+      "attempt": "quotient55-02",
+      "artifact": "donors.json",
+      "revision": "c7df5322af80bc6c4fefba6d1e0f018dd4fbbc8c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/55/donors.json",
+      "sha256": "41a2be5f6cdff9188a4102cdf996da04932dc08d8af9b82acda6f2b8e106256a"
+    }
+  ],
+  "authored_proved_claims": [
+    "Quotient55.evaluation_surjective",
+    "Quotient55.kernel_iff_image",
+    "Quotient55.range_eq_kernel",
+    "Quotient55.scalar_mem_image"
+  ],
+  "audited_declarations": [
+    "Quotient55.evaluation_surjective",
+    "Quotient55.kernel_iff_image",
+    "Quotient55.range_eq_kernel",
+    "Quotient55.scalar_mem_image"
+  ]
+}

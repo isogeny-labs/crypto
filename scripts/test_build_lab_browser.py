@@ -57,6 +57,7 @@ class RepositoryInputsTests(unittest.TestCase):
 
     def test_sparse_head_and_materialized_worktree_are_overlaid(self):
         source = browser.RepositoryInputs(str(self.root))
+        self.addCleanup(source.close)
         self.assertEqual(source.git_env["GIT_NO_LAZY_FETCH"], "1")
         self.assertEqual(
             source.glob_files("tracked/*.json"),
@@ -96,6 +97,7 @@ class RepositoryInputsTests(unittest.TestCase):
 
     def test_missing_sparse_blob_fails_closed_with_its_path(self):
         source = browser.RepositoryInputs(str(self.root))
+        self.addCleanup(source.close)
         loose = self.root / ".git" / "objects" / self.off_oid[:2] / self.off_oid[2:]
         loose.unlink()
         with self.assertRaisesRegex(OSError, r"HEAD:tracked/off\.json"):
@@ -111,6 +113,7 @@ class RepositoryInputsTests(unittest.TestCase):
         self.git("add", "docs")
         self.git("commit", "-qm", "candidate inputs")
         source = browser.RepositoryInputs(str(self.root))
+        self.addCleanup(source.close)
         with mock.patch.object(browser, "MAX_SCAN_BYTES", 32):
             rows = browser.candidate_identities(source)
         self.assertEqual([row["candidate_id"] for row in rows], [core_id])
@@ -120,6 +123,80 @@ class RepositoryInputsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             with self.assertRaisesRegex(RuntimeError, "cannot enumerate committed"):
                 browser.RepositoryInputs(root)
+
+    def test_batch_reads_preserve_empty_binary_and_newline_paths(self):
+        fixtures = {"empty.json": b"", "line\nbreak.json": b"first\nsecond\0tail"}
+        for name, data in fixtures.items():
+            (self.root / name).write_bytes(data)
+            self.git("add", "--", name)
+        self.git("commit", "-qm", "batch fixture")
+        self.git("update-index", "--skip-worktree", "--", *fixtures)
+        for name in fixtures:
+            (self.root / name).unlink()
+        with browser.RepositoryInputs(str(self.root)) as source:
+            # Exercise both uncached HEAD requests and resolved object IDs.
+            for name, data in fixtures.items():
+                self.assertEqual(source.read_bytes(name), data)
+            source.prefetch_sizes(list(fixtures))
+            for _ in range(3):
+                for name, data in fixtures.items():
+                    self.assertEqual(source.read_bytes(name), data)
+                    self.assertEqual(source.size(name), len(data))
+            (self.root / "empty.json").write_bytes(b"materialized local edit")
+            self.assertEqual(source.read_bytes("empty.json"), b"materialized local edit")
+            self.assertEqual(source.size("empty.json"), 23)
+            reader = source._blob_reader
+        self.assertIsNotNone(reader.poll())
+
+    def test_batch_reads_preserve_head_when_the_index_differs(self):
+        blob = subprocess.check_output(
+            ["git", "hash-object", "-w", "--stdin"], cwd=self.root,
+            input=b"different staged bytes\n",
+        ).decode().strip()
+        self.git("update-index", "--cacheinfo", f"100644,{blob},tracked/off.json")
+        self.git("update-index", "--skip-worktree", "tracked/off.json")
+        with browser.RepositoryInputs(str(self.root)) as source:
+            source.prefetch_sizes(["tracked/off.json"])
+            self.assertEqual(source.size("tracked/off.json"), 18)
+            self.assertEqual(source.read_text("tracked/off.json"), '{"source":"head"}\n')
+
+    def test_batch_read_reports_object_loss_after_metadata_lookup(self):
+        with browser.RepositoryInputs(str(self.root)) as source:
+            source.prefetch_sizes(["tracked/off.json"])
+            loose = self.root / ".git" / "objects" / self.off_oid[:2] / self.off_oid[2:]
+            loose.unlink()
+            with self.assertRaisesRegex(OSError, "tracked/off.json"):
+                source.read_bytes("tracked/off.json")
+            self.assertIsNone(source._blob_reader)
+
+    def test_build_closes_batch_child_when_generation_fails(self):
+        readers = []
+        def fail_after_read(source):
+            source.read_bytes("tracked/off.json")
+            readers.append(source._blob_reader)
+            raise ValueError("generation failed")
+        with mock.patch.object(browser, "ROOT", str(self.root)), \
+             mock.patch.object(browser, "_build", side_effect=fail_after_read):
+            with self.assertRaisesRegex(ValueError, "generation failed"):
+                browser.build()
+        self.assertEqual(len(readers), 1)
+        self.assertIsNotNone(readers[0].poll())
+
+    def test_glob_prefix_pruning_matches_full_scan(self):
+        for name in ("abc.json", "[x].json", "λ.json", ".hidden.json"):
+            (self.root / "tracked" / name).write_text("{}")
+        self.git("add", "-f", "tracked")
+        with browser.RepositoryInputs(str(self.root)) as source:
+            for pattern in ("tracked/abc.json", "tracked/ab*.json",
+                            "tracked/[[]x].json", "tracked/[a-z]*.json",
+                            "tracked/**/*.json", "**/inside.json",
+                            "tracked/.hidden.json", "tracked/λ.json",
+                            "missing/**"):
+                with self.subTest(pattern=pattern):
+                    expected = sorted(path for path in source.tracked_files
+                                      if browser._glob_match(path, pattern)
+                                      and source.exists(path))
+                    self.assertEqual(source.glob_files(pattern), expected)
 
 
 class CoverJoinTests(unittest.TestCase):

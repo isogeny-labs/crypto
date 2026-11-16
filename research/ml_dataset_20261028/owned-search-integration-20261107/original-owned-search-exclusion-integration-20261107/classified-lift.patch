@@ -1,0 +1,52 @@
+--- a/checked_model.rs
++++ b/checked_model.rs
+@@ -116,16 +116,31 @@
+     sum.map(|point| point.0) == expected_x
+ }
+ 
++/// Exhaustion is scoped to this exact checked model and supplied signed domain.
++/// It does not refute other Boolean models, identity patterns or factor bases.
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++pub enum LiftVerdict { SignedRelation, ExhaustedForModel }
++
++/// Compatibility API: preserve the prior caller-visible rejection behavior.
++pub fn verify(map: &CheckedMap, model: &[bool], signed_domain: &[(u64,u64)],
++    target: Option<(u64,u64)>, p: &mut Progress,
++    o: &mut impl VerificationAdmission) -> Result<(),Error> {
++    match verify_classified(map,model,signed_domain,target,p,o)? {
++        LiftVerdict::SignedRelation => Ok(()),
++        LiftVerdict::ExhaustedForModel => Err(Error::Semantics),
++    }
++}
++
+ /// Caller owns model and Progress before entry; failure retains every buffer.
+ /// Success is signed PDP existence for one pattern, never scalar recovery.
+-pub fn verify(
++pub fn verify_classified(
+     map: &CheckedMap,
+     model: &[bool],
+     signed_domain: &[(u64, u64)],
+     target: Option<(u64, u64)>,
+     p: &mut Progress,
+     o: &mut impl VerificationAdmission,
+-) -> Result<(), Error> {
++) -> Result<LiftVerdict, Error> {
+     charge(o, 64, 0)?;
+     if p.formula_rows != 0
+         || !p.blocks.is_empty()
+@@ -323,10 +338,11 @@
+         if complete && p.sum == target {
+             o.check()?;
+             p.signed_relation = true;
+-            return Ok(());
+-        }
+-    }
+-    Err(Error::Semantics)
++            return Ok(LiftVerdict::SignedRelation);
++        }
++    }
++    o.check()?;
++    Ok(LiftVerdict::ExhaustedForModel)
+ }
+ 
+ #[cfg(test)]

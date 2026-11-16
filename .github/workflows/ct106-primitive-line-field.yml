@@ -1,6 +1,7 @@
 name: CT106 primitive eleven-torsion line field
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct106/**'
       - '.github/workflows/ct106-primitive-line-field.yml'
@@ -11,6 +12,7 @@ on:
   workflow_dispatch:
 jobs:
   exact:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
