@@ -17857,6 +17857,22 @@ mod tests {
     }
 
     #[test]
+    fn cached_packed_lifts_cover_all_result_counts() {
+        let kc = KoblitzCurve::new(0, 5).unwrap();
+        let fast = FastCurve::new(&kc.curve).unwrap();
+        let mut seen = [false; 3];
+        for coordinate in 0..32 {
+            let expected = lift_x_packed(&fast, coordinate);
+            let cached = crate::cryptanalysis::koblitz_fast::with_cached_point_lifts(true, || {
+                lift_x_packed(&fast, coordinate)
+            });
+            assert_eq!(cached, expected, "coordinate {coordinate}");
+            seen[cached.1] = true;
+        }
+        assert_eq!(seen, [true; 3]);
+    }
+
+    #[test]
     fn fast_base_lifts_preserve_roots_and_order() {
         for n in [5, 7, 9, 11, 13, 17, 19, 23, 31, 53, 61] {
             let Some(kc) = KoblitzCurve::new(0, n) else {
