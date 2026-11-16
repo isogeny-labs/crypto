@@ -1,0 +1,14 @@
+digraph G {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.3"];
+  node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="DejaVu Sans",fontsize=11,margin="0.14,0.10"];
+  edge [color="#34566e"];
+  actual [label="Actual iteration on Z/p\nf(x)=x+h(x)+1; h(x) in 0..19"];
+  least [label="T = least repeated-state index\nStrict natural path lift S, S(n) <= 20n"];
+  bound [label="Repeat: p divides positive S(T)-S(i)\np <= 20T; T <= p"];
+  pmf [label="Actual independent uniform node-label PMF\np <= 20 E[T]; E[T] <= p"];
+  variance [label="Distinct nonzero increments 1..20\nActual indegree mean 1; variance 19/20"];
+  prime [label="Euclid: arbitrarily large prime p\nFor each real C, some E[T]^2 > Cp",fillcolor="#d8eee4"];
+  scope [label="Fixed-support obstruction only\nRandom-table heuristic / averaged mixing remain open",fillcolor="#fff1d5"];
+  actual -> least -> bound -> pmf -> prime -> scope;
+  actual -> variance -> prime;
+}

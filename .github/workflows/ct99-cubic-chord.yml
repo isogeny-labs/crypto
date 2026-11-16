@@ -5,12 +5,14 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct99/**"
       - ".github/workflows/ct99-cubic-chord.yml"
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "research/cross_characteristic_global_torsion_20261112/ct99/**"
       - ".github/workflows/ct99-cubic-chord.yml"
   workflow_dispatch:
 jobs:
   exact-chord:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:

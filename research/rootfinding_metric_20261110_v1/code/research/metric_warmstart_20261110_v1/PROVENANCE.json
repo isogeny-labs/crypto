@@ -1,0 +1,44 @@
+{
+  "schema": "metric-warmstart-provenance/v1",
+  "scientific_execution": false,
+  "author_compilation": false,
+  "commands": [
+    [
+      "python",
+      "-m",
+      "research.metric_warmstart_20261110_v1.worker",
+      "metric-controls-20261110-v1",
+      "controls"
+    ],
+    [
+      "python",
+      "-m",
+      "research.metric_warmstart_20261110_v1.worker",
+      "metric-bench-20261110-v1",
+      "bench"
+    ]
+  ],
+  "artifacts": [
+    "raw-controls.json.gz",
+    "raw-bench.json.gz"
+  ],
+  "inputs": {
+    "research/dual_ladder_20261109_v3/raw-profile.json.gz": "68d4f7e02a25380f5611f57285fba094145f9de6f7b13877883ae0a6101c6587",
+    "research/dual_ladder_20261109_v3/planted_inputs.json": "403db5080e81eda5e9b5643020babf54283472b338831f4f14d7655ef5955c93",
+    "lab/research/nist_presets.json": "a614dac35438fce60fb05d822d0e90f0149bdfde616986f32255f10722ea2a7c"
+  },
+  "budget": {
+    "worker_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cores": 1,
+    "whole_bench_candidate_u_cap": 180000,
+    "six_arm_base_work": 176400
+  },
+  "timing_scope": "amortized component; one common compile/wrapper, six fresh native arms, paid independent replay and serialized masks; not cold full pipelines",
+  "sha256": {
+    "research/metric_warmstart_20261110_v1/PROOF.md": "cb84aa729ae7220019c750b5409cbd7efec6633f7babefced2a250f9e84f1e97",
+    "research/metric_warmstart_20261110_v1/worker.py": "abddcbf169581123c245afab81a3d62285a82189f102d79d1a3a4c1ba077bab4",
+    "research/metric_warmstart_20261110_v1/EXTERNAL_GMP.json": "edd39099d523d2679f4a7b9ab0d09717b3701c3c1824197d9926206bee4d7301",
+    "research/metric_warmstart_20261110_v1/native.cpp": "092da9fbcd548158105aba01efedf008d9bc1b0ec994750758af5aac2e7b7bc7"
+  }
+}

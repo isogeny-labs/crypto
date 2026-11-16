@@ -1,0 +1,990 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "rho-constant-preflight-20261112",
+  "created": "2026-11-12T22:27:03Z",
+  "protocol": {
+    "path": "protocol-preflight.json",
+    "sha256": "3892337a84ebace912724965f9008904940611b1784ea987fee8d2921081712e",
+    "protocol_id": "rho-constant-ecbench-preflight-20261112",
+    "version": 1
+  },
+  "producer": {
+    "runtime": null,
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": null,
+    "dirty": null
+  },
+  "backend": "ecbench",
+  "host": {
+    "path": "sessions/preflight/host.json",
+    "sha256": "48aee58b9e3bb77ffbd6be01d419eb8e9eca59314741441355ade8514a4813c2",
+    "class_id": "ECBENV3h4ed1141c63b6",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882662400,
+      "kernel": "6.18.57",
+      "hypervisor": "{\"cpu_flag\": \"hypervisor\", \"systemd_detect_virt_vm\": \"kvm\"}",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
+      "commit": null
+    },
+    {
+      "id": "rho-plain",
+      "role": "baseline",
+      "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
+      "commit": null
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
+      "commit": null
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "ECR1h706c8b20594b",
+      "arm": "rho-neg",
+      "instance_id": "W592e6a3d460b",
+      "seed": "15135734312211569705",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 355.0,
+          "s": 2.786478613681826
+        },
+        "wall_seconds": 0.00020537,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.0,
+        "cpu_sys_seconds": 0.005999,
+        "max_rss_bytes": 13180928,
+        "counters": {
+          "canonicalisations_uncharged": 281,
+          "cycle_escape_doublings": 4,
+          "cycles_length_2": 0,
+          "cycles_length_4": 3,
+          "cycles_other_length": 1,
+          "distinguished_point_bits": 3,
+          "distinguished_points": 33,
+          "jump_coefficient_bits": 6,
+          "jumps": 4,
+          "look_ahead_additions": 36,
+          "setup_additions": 25,
+          "setup_doublings": 32,
+          "start_additions": 32,
+          "steps": 208,
+          "useless_collisions": 0,
+          "verification_operations": 18,
+          "walk_operations": 248,
+          "walks": 33,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 857,
+          "field_ops.sqrs": 404,
+          "field_ops.invs": 355
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hefea4e0ebe79W592e6a3d460bR1"
+    },
+    {
+      "run_id": "ECR1h78d5e41627c6",
+      "arm": "rho-plain",
+      "instance_id": "W592e6a3d460b",
+      "seed": "15135734312211569705",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 241.0,
+          "s": 1.8916657630910425
+        },
+        "wall_seconds": 0.000147516,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.0,
+        "cpu_sys_seconds": 0.004255,
+        "max_rss_bytes": 13156352,
+        "counters": {
+          "canonicalisations_uncharged": 0,
+          "cycle_escape_doublings": 0,
+          "cycles_length_2": 0,
+          "cycles_length_4": 0,
+          "cycles_other_length": 0,
+          "distinguished_point_bits": 3,
+          "distinguished_points": 22,
+          "jump_coefficient_bits": 6,
+          "jumps": 4,
+          "look_ahead_additions": 0,
+          "setup_additions": 25,
+          "setup_doublings": 32,
+          "start_additions": 21,
+          "steps": 145,
+          "useless_collisions": 0,
+          "verification_operations": 18,
+          "walk_operations": 145,
+          "walks": 22,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 617,
+          "field_ops.sqrs": 286,
+          "field_ops.invs": 241
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hb367476fce6cW592e6a3d460bR1"
+    },
+    {
+      "run_id": "ECR1h869078019d91",
+      "arm": "rho-neg-aa",
+      "instance_id": "W592e6a3d460b",
+      "seed": "15135734312211569705",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 355.0,
+          "s": 2.786478613681826
+        },
+        "wall_seconds": 0.000249195,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.003525,
+        "cpu_sys_seconds": 0.000352,
+        "max_rss_bytes": 13279232,
+        "counters": {
+          "canonicalisations_uncharged": 281,
+          "cycle_escape_doublings": 4,
+          "cycles_length_2": 0,
+          "cycles_length_4": 3,
+          "cycles_other_length": 1,
+          "distinguished_point_bits": 3,
+          "distinguished_points": 33,
+          "jump_coefficient_bits": 6,
+          "jumps": 4,
+          "look_ahead_additions": 36,
+          "setup_additions": 25,
+          "setup_doublings": 32,
+          "start_additions": 32,
+          "steps": 208,
+          "useless_collisions": 0,
+          "verification_operations": 18,
+          "walk_operations": 248,
+          "walks": 33,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 857,
+          "field_ops.sqrs": 404,
+          "field_ops.invs": 355
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hefea4e0ebe79W592e6a3d460bR2"
+    },
+    {
+      "run_id": "ECR1h0235d35ed25f",
+      "arm": "rho-neg",
+      "instance_id": "W37c608457bbd",
+      "seed": "325128915932787194",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 372.0,
+          "s": 1.4590703749617833
+        },
+        "wall_seconds": 0.00017541,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.001231,
+        "cpu_sys_seconds": 0.003958,
+        "max_rss_bytes": 13086720,
+        "counters": {
+          "canonicalisations_uncharged": 219,
+          "cycle_escape_doublings": 1,
+          "cycles_length_2": 0,
+          "cycles_length_4": 1,
+          "cycles_other_length": 0,
+          "distinguished_point_bits": 4,
+          "distinguished_points": 10,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 10,
+          "setup_additions": 54,
+          "setup_doublings": 75,
+          "start_additions": 9,
+          "steps": 198,
+          "useless_collisions": 0,
+          "verification_operations": 25,
+          "walk_operations": 209,
+          "walks": 10,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 1020,
+          "field_ops.sqrs": 464,
+          "field_ops.invs": 372
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hefea4e0ebe79W37c608457bbdR1"
+    },
+    {
+      "run_id": "ECR1h2536a70d0f45",
+      "arm": "rho-plain",
+      "instance_id": "W37c608457bbd",
+      "seed": "325128915932787194",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 254.0,
+          "s": 0.9962469764524005
+        },
+        "wall_seconds": 0.000108953,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.003133,
+        "cpu_sys_seconds": 0.001001,
+        "max_rss_bytes": 13332480,
+        "counters": {
+          "canonicalisations_uncharged": 0,
+          "cycle_escape_doublings": 0,
+          "cycles_length_2": 0,
+          "cycles_length_4": 0,
+          "cycles_other_length": 0,
+          "distinguished_point_bits": 4,
+          "distinguished_points": 2,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 0,
+          "setup_additions": 54,
+          "setup_doublings": 75,
+          "start_additions": 1,
+          "steps": 99,
+          "useless_collisions": 0,
+          "verification_operations": 25,
+          "walk_operations": 99,
+          "walks": 2,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 781,
+          "field_ops.sqrs": 345,
+          "field_ops.invs": 254
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hb367476fce6cW37c608457bbdR1"
+    },
+    {
+      "run_id": "ECR1h26c54d0a0777",
+      "arm": "rho-neg-aa",
+      "instance_id": "W37c608457bbd",
+      "seed": "325128915932787194",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 372.0,
+          "s": 1.4590703749617833
+        },
+        "wall_seconds": 0.001065598,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.0,
+        "cpu_sys_seconds": 0.005948,
+        "max_rss_bytes": 11616256,
+        "counters": {
+          "canonicalisations_uncharged": 219,
+          "cycle_escape_doublings": 1,
+          "cycles_length_2": 0,
+          "cycles_length_4": 1,
+          "cycles_other_length": 0,
+          "distinguished_point_bits": 4,
+          "distinguished_points": 10,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 10,
+          "setup_additions": 54,
+          "setup_doublings": 75,
+          "start_additions": 9,
+          "steps": 198,
+          "useless_collisions": 0,
+          "verification_operations": 25,
+          "walk_operations": 209,
+          "walks": 10,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 1020,
+          "field_ops.sqrs": 464,
+          "field_ops.invs": 372
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hefea4e0ebe79W37c608457bbdR2"
+    },
+    {
+      "run_id": "ECR1hc99452da43c7",
+      "arm": "rho-neg",
+      "instance_id": "W6f4baf109b00",
+      "seed": "17850166523046510890",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 387.0,
+          "s": 0.756539326139634
+        },
+        "wall_seconds": 0.000137498,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.00486,
+        "cpu_sys_seconds": 0.0,
+        "max_rss_bytes": 13246464,
+        "counters": {
+          "canonicalisations_uncharged": 226,
+          "cycle_escape_doublings": 4,
+          "cycles_length_2": 1,
+          "cycles_length_4": 2,
+          "cycles_other_length": 1,
+          "distinguished_point_bits": 4,
+          "distinguished_points": 11,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 13,
+          "setup_additions": 56,
+          "setup_doublings": 80,
+          "start_additions": 10,
+          "steps": 198,
+          "useless_collisions": 0,
+          "verification_operations": 26,
+          "walk_operations": 215,
+          "walks": 11,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 1080,
+          "field_ops.sqrs": 489,
+          "field_ops.invs": 387
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hefea4e0ebe79W6f4baf109b00R1"
+    },
+    {
+      "run_id": "ECR1hd875abad6a20",
+      "arm": "rho-plain",
+      "instance_id": "W6f4baf109b00",
+      "seed": "17850166523046510890",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 535.0,
+          "s": 1.0458618591336026
+        },
+        "wall_seconds": 0.000151488,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.004567,
+        "cpu_sys_seconds": 0.001112,
+        "max_rss_bytes": 13385728,
+        "counters": {
+          "canonicalisations_uncharged": 0,
+          "cycle_escape_doublings": 0,
+          "cycles_length_2": 0,
+          "cycles_length_4": 0,
+          "cycles_other_length": 0,
+          "distinguished_point_bits": 4,
+          "distinguished_points": 23,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 0,
+          "setup_additions": 56,
+          "setup_doublings": 80,
+          "start_additions": 22,
+          "steps": 351,
+          "useless_collisions": 0,
+          "verification_operations": 26,
+          "walk_operations": 351,
+          "walks": 23,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 1364,
+          "field_ops.sqrs": 633,
+          "field_ops.invs": 535
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hb367476fce6cW6f4baf109b00R1"
+    },
+    {
+      "run_id": "ECR1h8bf978029605",
+      "arm": "rho-neg-aa",
+      "instance_id": "W6f4baf109b00",
+      "seed": "17850166523046510890",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 387.0,
+          "s": 0.756539326139634
+        },
+        "wall_seconds": 0.000172739,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.004571,
+        "cpu_sys_seconds": 0.0,
+        "max_rss_bytes": 13058048,
+        "counters": {
+          "canonicalisations_uncharged": 226,
+          "cycle_escape_doublings": 4,
+          "cycles_length_2": 1,
+          "cycles_length_4": 2,
+          "cycles_other_length": 1,
+          "distinguished_point_bits": 4,
+          "distinguished_points": 11,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 13,
+          "setup_additions": 56,
+          "setup_doublings": 80,
+          "start_additions": 10,
+          "steps": 198,
+          "useless_collisions": 0,
+          "verification_operations": 26,
+          "walk_operations": 215,
+          "walks": 11,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 1080,
+          "field_ops.sqrs": 489,
+          "field_ops.invs": 387
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hefea4e0ebe79W6f4baf109b00R2"
+    },
+    {
+      "run_id": "ECR1h25aed6eabd4b",
+      "arm": "rho-neg",
+      "instance_id": "W7b411114689e",
+      "seed": "8287508584014093421",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 2561.0,
+          "s": 2.5028593513176975
+        },
+        "wall_seconds": 0.000420817,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.0,
+        "cpu_sys_seconds": 0.003845,
+        "max_rss_bytes": 13365248,
+        "counters": {
+          "canonicalisations_uncharged": 2402,
+          "cycle_escape_doublings": 10,
+          "cycles_length_2": 0,
+          "cycles_length_4": 9,
+          "cycles_other_length": 1,
+          "distinguished_point_bits": 5,
+          "distinguished_points": 61,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 139,
+          "setup_additions": 57,
+          "setup_doublings": 77,
+          "start_additions": 60,
+          "steps": 2192,
+          "useless_collisions": 0,
+          "verification_operations": 26,
+          "walk_operations": 2341,
+          "walks": 61,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 5443,
+          "field_ops.sqrs": 2668,
+          "field_ops.invs": 2561
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hefea4e0ebe79W7b411114689eR1"
+    },
+    {
+      "run_id": "ECR1h6074c0d38f7b",
+      "arm": "rho-plain",
+      "instance_id": "W7b411114689e",
+      "seed": "8287508584014093421",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 2348.0,
+          "s": 2.294694946073391
+        },
+        "wall_seconds": 0.000443196,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.004048,
+        "cpu_sys_seconds": 0.0,
+        "max_rss_bytes": 13574144,
+        "counters": {
+          "canonicalisations_uncharged": 0,
+          "cycle_escape_doublings": 0,
+          "cycles_length_2": 0,
+          "cycles_length_4": 0,
+          "cycles_other_length": 0,
+          "distinguished_point_bits": 5,
+          "distinguished_points": 67,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 0,
+          "setup_additions": 57,
+          "setup_doublings": 77,
+          "start_additions": 66,
+          "steps": 2122,
+          "useless_collisions": 0,
+          "verification_operations": 26,
+          "walk_operations": 2122,
+          "walks": 67,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 4987,
+          "field_ops.sqrs": 2445,
+          "field_ops.invs": 2348
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hb367476fce6cW7b411114689eR1"
+    },
+    {
+      "run_id": "ECR1hf6145c505376",
+      "arm": "rho-neg-aa",
+      "instance_id": "W7b411114689e",
+      "seed": "8287508584014093421",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "total_gae": 2561.0,
+          "s": 2.5028593513176975
+        },
+        "wall_seconds": 0.001892376,
+        "wall_valid": false,
+        "cpu_user_seconds": 0.0,
+        "cpu_sys_seconds": 0.005974,
+        "max_rss_bytes": 13443072,
+        "counters": {
+          "canonicalisations_uncharged": 2402,
+          "cycle_escape_doublings": 10,
+          "cycles_length_2": 0,
+          "cycles_length_4": 9,
+          "cycles_other_length": 1,
+          "distinguished_point_bits": 5,
+          "distinguished_points": 61,
+          "jump_coefficient_bits": 9,
+          "jumps": 8,
+          "look_ahead_additions": 139,
+          "setup_additions": 57,
+          "setup_doublings": 77,
+          "start_additions": 60,
+          "steps": 2192,
+          "useless_collisions": 0,
+          "verification_operations": 26,
+          "walk_operations": 2341,
+          "walks": 61,
+          "walks_abandoned_in_a_cycle": 0,
+          "walks_capped": 0,
+          "field_ops.muls": 5443,
+          "field_ops.sqrs": 2668,
+          "field_ops.invs": 2561
+        },
+        "perf": {
+          "instructions": null,
+          "cycles": null
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": false,
+        "blockers": [
+          "L1: no CPU reservation (--cpus none, or no affinity control on this OS)"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "ecbench: [k]G = Q recomputed by the harness"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": "ECM1hefea4e0ebe79W7b411114689eR2"
+    }
+  ],
+  "flow": {
+    "planned": 12,
+    "attempted": 12,
+    "completed": 12,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "sessions/preflight/spec.json",
+      "sha256": "f3b618ff2ffa989243693d47010f5552aa565a8b796d4f21541085a5d2aa1280",
+      "bytes": 1344,
+      "kind": "protocol"
+    },
+    {
+      "path": "sessions/preflight/plan.json",
+      "sha256": "2c101439de4324df90e6f9d25e034053e9804858c921ffc720861585c14b7a20",
+      "bytes": 7457,
+      "kind": "protocol"
+    },
+    {
+      "path": "sessions/preflight/records.jsonl",
+      "sha256": "160d23d10ceff70f8d3fc6a7ff7fcd886a1b6db1d593fb178403f2117b079bc1",
+      "bytes": 71183,
+      "kind": "raw"
+    },
+    {
+      "path": "sessions/preflight/session.json",
+      "sha256": "0ae06dae8b100a571706a0c68eb8ffcb9080b0c00b40c48d6f088c4d1229ae35",
+      "bytes": 2261,
+      "kind": "summary"
+    },
+    {
+      "path": "sessions/preflight/host.json",
+      "sha256": "48aee58b9e3bb77ffbd6be01d419eb8e9eca59314741441355ade8514a4813c2",
+      "bytes": 3927,
+      "kind": "host"
+    }
+  ],
+  "analysis": {
+    "script": null,
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [],
+  "reviews_dir": "reviews",
+  "backend_record": {
+    "session_id": "ECBS1h9cd21a0011c9",
+    "spec_sha256": "bc386ee698fd5cd6870d4753aab1a7153dfd2406e54480d4d9406882463d6e83",
+    "records_sha256": "160d23d10ceff70f8d3fc6a7ff7fcd886a1b6db1d593fb178403f2117b079bc1",
+    "status": "complete"
+  }
+}

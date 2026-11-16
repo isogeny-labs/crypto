@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.3,ranksep=0.3];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f2f8",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#34556b"];
+ a [label="Actual coefficient rings\nR0=K[x1][x2]; R(n+1)=R(n)[Z]"];
+ b [label="Base: canonical S3\nCoefficient of T^2 = (x1-x2)^2 !=0"];
+ c [label="Actual successor Sylvester resultant\nDeclared sizes 2^(n+1) and 2\nTwo fresh independent inputs"];
+ d [label="General fixed-size step theorem\nLeading coefficient = Pn(Z)^2\nDomain and nonzero incoming polynomial"];
+ e [label="Induction for the defined family\nArity m>=3: last-input degree 2^(m-2)",fillcolor="#d4eedb"];
+ f [label="Exact arity-four bridge\nRecursive member equals canonical S4"];
+ g [label="Separate open obligations\nOther input degrees / symmetry\nZero-sum equivalence beyond S4 / irreducibility",fillcolor="#fff2cf"];
+ a -> c; b -> c; c -> d; d -> e; c -> f; e -> g [style=dashed];
+}

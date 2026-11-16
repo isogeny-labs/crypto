@@ -1,0 +1,104 @@
+{
+  "reviewed_utc": "2026-11-15T06:09:38.927534+00:00",
+  "independent_replay": {
+    "schema": "recorded-full-quintic87-verification/v1",
+    "verified": true,
+    "method": "independent bit-convolution arithmetic/literal norms; reconstruct166baseline columns,104AS/Frobenius map and87AS/e3 map, allborder matrices/ranks/coordinate andrawkernels/cosets; no2^73 orroot search",
+    "baseline_variables": 166,
+    "baseline_rank": 93,
+    "frozen104_variables": 104,
+    "frozen104_border_rank": 31,
+    "new87_variables": 87,
+    "new87_border_rows": 14,
+    "new87_border_rank": 14,
+    "trace_rho": 1,
+    "surviving_bits": 73,
+    "all_three_same_complete_affine_family": true,
+    "supported_roots_computed": false,
+    "raw_sha256": "c01327bb67cef302f7a3dda0b14895f381ee8559eaa23915c091014c54ee28cf",
+    "seconds": 0.7532827180002641,
+    "qualified_speedup": null,
+    "original_global_complete": false
+  },
+  "controls": {
+    "all_r_s_states": 13008,
+    "nonzero_k_exercised": true,
+    "repeated_H_observations": 1715,
+    "synthetic_AS_cases": [
+      {
+        "C": 0,
+        "allowed": [
+          0
+        ],
+        "solutions": [
+          0,
+          1
+        ]
+      },
+      {
+        "C": 1,
+        "allowed": [
+          0
+        ],
+        "solutions": []
+      },
+      {
+        "C": 0,
+        "allowed": [
+          0,
+          1
+        ],
+        "solutions": [
+          0,
+          1
+        ]
+      },
+      {
+        "C": 1,
+        "allowed": [
+          0,
+          1
+        ],
+        "solutions": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "median_total_seconds": {
+    "baseline166": 0.34127674599949387,
+    "frozen104": 0.35699654900054156,
+    "new87": 0.3421411020008236
+  },
+  "median_stages": {
+    "baseline166": {
+      "setup_seconds": 0.28857851099928666,
+      "compile_seconds": 0.033635159001278225,
+      "verify_seconds": 0.019256519999544253
+    },
+    "frozen104": {
+      "setup_seconds": 0.28425559700008307,
+      "compile_seconds": 0.05285134500081767,
+      "verify_seconds": 0.019522320000760374
+    },
+    "new87": {
+      "setup_seconds": 0.2873967180003092,
+      "compile_seconds": 0.035867627999323304,
+      "verify_seconds": 0.019073622999712825
+    }
+  },
+  "internal_total_ratios": {
+    "baseline166_over_new87": 0.997473685575118,
+    "frozen104_over_new87": 1.0434190657387963
+  },
+  "conclusion": "exact87-coordinate map confirmed; no gain over strongest166 comparator",
+  "worker_wall_seconds": 4.621354945000348,
+  "worker_peak_process_rss_kib": 160332,
+  "raw_bytes": 16166,
+  "raw_uncompressed_bytes": 42306,
+  "supported_roots_computed": false,
+  "qualified_speedup": null,
+  "original_global_complete": false,
+  "novelty_claim": false
+}

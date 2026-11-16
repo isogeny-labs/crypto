@@ -1,6 +1,7 @@
 name: CT80 seven-torsion point-field and independent two-prime audit
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct80/**'
       - '.github/workflows/ct80-seven-point-field.yml'
@@ -9,6 +10,7 @@ permissions:
   contents: read
 jobs:
   ct80-seven-point-field:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

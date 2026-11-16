@@ -1,0 +1,13 @@
+[package]
+name="hec-runtime-chart13"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="chart13"
+path="main.rs"
+[[bin]]
+name="chart-cohort13"
+path="collect.rs"
