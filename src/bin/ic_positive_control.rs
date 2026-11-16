@@ -17,8 +17,8 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::chained_transfer::ic_control as ic;
 use crypto_lib::cryptanalysis::chained_transfer::ic_control::{
-    fb_size, jacobian_order_bsgs, random_curve, run_ic_oracle, run_rho, split_order, Arm,
-    IcParams, IcResult, Instance, RhoOut, SplitOracle, RESTART_DEFAULT,
+    fb_size, jacobian_order_bsgs, random_curve, run_ic_oracle, run_rho, split_order, Arm, IcParams,
+    IcResult, Instance, RhoOut, SplitOracle, RESTART_DEFAULT,
 };
 use crypto_lib::cryptanalysis::ic_boundary::CountedGroup;
 use serde_json::{json, Value};
@@ -528,7 +528,14 @@ fn main() -> ExitCode {
         let rv: Vec<Value> = rv.into_iter().map(|x| x.1).collect();
         // per-arm means
         let mut arms = serde_json::Map::new();
-        for name in ["A_full", "B_single_lp", "C_double_lp", "C_lucas", "C_lucas_roots", "R_rho_negation"] {
+        for name in [
+            "A_full",
+            "B_single_lp",
+            "C_double_lp",
+            "C_lucas",
+            "C_lucas_roots",
+            "R_rho_negation",
+        ] {
             let rs: Vec<&Value> = rv.iter().filter(|r| r["arm"] == name).collect();
             if rs.is_empty() {
                 continue;
@@ -574,7 +581,14 @@ fn main() -> ExitCode {
     // fits and crossovers
     let mut fits = serde_json::Map::new();
     let mut cross = serde_json::Map::new();
-    for name in ["A_full", "B_single_lp", "C_double_lp", "C_lucas", "C_lucas_roots", "R_rho_negation"] {
+    for name in [
+        "A_full",
+        "B_single_lp",
+        "C_double_lp",
+        "C_lucas",
+        "C_lucas_roots",
+        "R_rho_negation",
+    ] {
         for key in [
             "group_ops",
             "total_w0",

@@ -1382,8 +1382,8 @@ pub fn run_ic_oracle(
     }
     res.fb_cols = ncols;
     // Cardano–Lucas constants, charged to the relation phase.
-    let cubic = (oracle != SplitOracle::Frobenius && p > 3)
-        .then(|| CubicOracle::new(p, &mut res.rel));
+    let cubic =
+        (oracle != SplitOracle::Frobenius && p > 3).then(|| CubicOracle::new(p, &mut res.rel));
     let tcol = ncols as u32;
     let nunk = ncols + 1;
 
@@ -1708,7 +1708,12 @@ mod tests {
                 assert_eq!(luc.rels_by_lp, base.rels_by_lp);
                 assert_eq!(luc.group_ops(), base.group_ops());
                 assert_eq!(luc.la, base.la);
-                assert!(luc.rel.mul < base.rel.mul, "p={p} {arm:?}: {} vs {}", luc.rel.mul, base.rel.mul);
+                assert!(
+                    luc.rel.mul < base.rel.mul,
+                    "p={p} {arm:?}: {} vs {}",
+                    luc.rel.mul,
+                    base.rel.mul
+                );
             }
         }
     }
