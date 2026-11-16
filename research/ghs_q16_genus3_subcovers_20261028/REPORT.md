@@ -6,11 +6,12 @@ The new degree-three screen found **two Frobenius orbits of exact
 nonzero-trace source equations** in class `3.16.a_a_ah`. Representatives
 have explicit degree-three covers, nonzero subgroup maps, and complete
 relation solves. Their full transfer is 1,236–1,430 times slower than
-matched rho in this q16 run. These are potentially new **exact cover
-instances** outside the published trace-zero genus-three locus, not a
-demonstrated new vulnerable family or measured speedup. General cover and
-decomposition methods were already published. Exact-equation publication
-status remains unverified.
+matched rho in this q16 run. A later isogeny check shows that **all 36
+nonzero-trace cover descriptions in this bounded scan are isogenous to
+base-field elliptic curves over `K`**. Thus the trace-zero-factor route
+is established prior territory. The exact cover equations may still be
+new records, but their publication status remains unverified. The scan
+does not establish a new vulnerable family or measured speedup.
 
 The earlier search found **15 exact q16 source equations outside the earlier
 66-equation frontier** with explicit genus-three covers over `F16`. For all
@@ -89,6 +90,75 @@ order 4090 and a 409-order prime subgroup. The `h` class has group order
 4104 and largest prime subgroup 19. These are exhaustive counts for this
 catalog slice and cover ansatz only.
 
+### Base-field isogeny gate for every nonzero-trace hit
+
+For a base elliptic curve over `k=F16` with Frobenius trace `s`, its
+cubic-extension trace is `t=s^3-48s`. The Weil restriction polynomial
+of its base change factors as
+
+`T^6-t*T^3+4096 = (T^2-s*T+16) *
+ (T^4+s*T^3+(s^2-16)*T^2+16s*T+256)`.
+
+The [six-class gate](base_isogeny_degree3_gate_receipt.json) checks this
+identity, exact point counts, and explicit base elliptic witnesses for
+all four nonzero-trace classes. For `3.16.a_a_ah`, `s=7`, `t=7`, and
+`#E0(k)=10`; the complementary trace-zero factor has order 409. For
+`3.16.a_a_h`, `s=-7`, `t=-7`, and `#E0(k)=24`; the complementary factor
+has order 171. The `abv` and `bv` classes similarly come from base
+traces `-1` and `1`. Their 36 cover descriptions therefore lie in
+base-defined **isogeny classes** even when the displayed source
+coefficient `b` has nonzero relative trace. The two trace-zero classes
+`adt` and `dt` have irreducible degree-six Weil polynomials over `Q`.
+This is an isogeny-class statement; it does not construct a short
+isogeny between each displayed source equation and its base witness.
+
+### Degree-four bound across the same catalog slice
+
+For a branch-supported degree-four rational `X`, the order-three-pole
+lemma below eliminates 24 of the 30 possible exponent patterns. The
+remaining six are permutations of `(2,2,-2,-2)`. The
+[degree-four scan](degree4_all_q16_scan_receipt.json) tests all
+`10,664*6=63,984` model-pattern pairs. Every residue matrix has full
+column rank 24. Exactly 1,020 complete Artin–Schreier identities
+survive, representing 510 distinct `(u,b)` source equations across 36
+cataloged classes. Ninety have `u=0`; these are counted as exact
+constant-zero identities. Independent GF(4096) trace arithmetic in the
+[per-hit prior gate](prior_work_degree4_receipt.json) confirms
+`Tr_(K/k)(b)=0` for **all 1,020 descriptions**. Each therefore meets
+the published Joux–Vitse trace-zero coefficient criterion; equivalence
+of each exact cover formula to a published one remains unverified.
+
+Combining the degree-three and degree-four screens gives a bounded
+exclusion: among these 10,664 cataloged models and branch-supported
+ordinary elliptic covers of degree at most four, every nonzero-trace
+source found is in a base-defined isogeny class, and every degree-four
+source has trace-zero `b`. This does not exclude degree-five or higher
+covers, zeros or poles away from the four branch points, other curve
+models, or isogeny correspondences. It narrows the next search without
+asserting a global vulnerability classification.
+
+### Degree-five branch-supported obstruction
+
+There is a field-independent next bound. Suppose the same four nonzero
+simple branch residues are supported at four distinct roots, all zeros
+and poles of an involution-compatible elliptic `X=R(x)` lie at those
+roots, and `deg R=5`. Each root must be a zero or pole. A zero or pole
+of odd order greater than one leaves an unremovable odd Artin–Schreier
+pole, so the positive and negative orders must each partition five as
+`4+1`. The only exponent vectors are the 24 permutations of
+`(4,1,-4,-1)`.
+
+At the order-four pole `r`, write its Laurent leading term as
+`c*t^-4`. The coefficient of `t^-3` is
+`c*(1/(r-r_+) + 1/(r-r_-))`, where `r_+` and `r_-` are the distinct
+roots carrying exponents `1` and `-1`. In characteristic two this sum is
+`(r_+ + r_-)/((r-r_+)(r-r_-))`, which is nonzero. A coboundary
+`H^2+H` cannot remove that order-three term while keeping conductor one.
+Thus **no branch-supported degree-five map of this form exists over any
+characteristic-two field** with four distinct nonzero simple branch
+residues. `BranchPole.lean` checks the nonzero inverse-sum algebra; the
+Laurent and divisor argument is stated here and is not Lean-formalized.
+
 ### Two 409-order nonzero-trace representatives
 
 The table gives exact source curves using polynomial-basis masks for `u,b`
@@ -135,12 +205,14 @@ describes the characteristic-two trace-zero genus-three cover locus.
 [Magma's GHS documentation](https://www.math.uzh.ch/sepp/magma-2.25.2-ds/HandbookVolume10.pdf)
 documents the general trace-conorm construction, and
 [Iijima et al.](https://globals.ieice.org/en_transactions/fundamentals/10.1093/ietfec/e88-a.1.97/_p)
-give a broader extension framework. The displayed nonzero-trace covers
-are outside the **specific** Joux–Vitse trace-zero locus, but the
-literature check does not establish a globally new cover family or an
-unpublished exact equation. The new finding is an explicit, reproducible
-nonzero-trace cover and subgroup-transfer instance in a previously
-unsearched local branch-supported degree-three locus.
+give a broader extension framework. [Massierer](https://www.aimsciences.org/article/doi/10.3934/amc.2015.9.515)
+studies index calculus in elliptic trace-zero varieties. The displayed
+nonzero-trace coefficients fall outside the **specific** Joux–Vitse
+trace-zero coefficient locus, yet their source curves lie in base-field
+isogeny classes. This removes the earlier tentative new-family label.
+The retained finding is an explicit degree-three cover and subgroup
+transfer through a known isogeny-class route; exact-equation publication
+status remains unverified.
 
 The checked Lean additions in `PatternAccounting.lean` verify finite
 search accounting and the 409-order factorization. They do not formalize

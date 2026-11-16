@@ -14,3 +14,14 @@ Predictions:
 Falsifiers:
 - P1 fails if G_t(4) ≠ 11 at any of t = 8, 9, 10.
 - P3 fails if G_10(5) ≠ 19, or if 1 enters.
+
+## Addendum, frozen before the c = 5, t ≥ 11 runs (2026-11-15T08:20Z)
+
+Observed before freezing (Rust `hky_depth`, m = 2):
+- `G_10(5) = 19`, and 1 never enters. P3 held.
+- Planted (consistent) draws give `G = 15, 17` at t = 8, 9. That is `2t − 1`, which also gives 19 at t = 10, so t = 10 cannot tell saturation from growth.
+
+Prediction:
+- P4. Conjecture D (saturation): `G_11(5) = G_12(5) = 19`.
+- The alternative "still growing as 2t − 1" predicts 21 and 23.
+- Falsifier: P4 fails if `G_11(5) ≠ 19`.

@@ -40,7 +40,9 @@ jobs:
         run: node .github/scripts/run-frozen-workflow-replays.mjs --only leaf_m10_support_20260930 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
 
   measure:
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch')
     needs: validate
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-leaf-m10-support.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-leaf-m10-support.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 35
