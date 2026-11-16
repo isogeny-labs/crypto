@@ -110,7 +110,7 @@ impl Small {
                 pts.push(acc);
             }
         }
-        let xs = (0..1024).map(|_| (rng.next() & inst.gf.mask).max(1)).collect();
+        let xs = (0..1024).map(|_| (rng.next() & ((1u64 << n) - 1)).max(1)).collect();
         Ok(Self { inst, pts, xs, sink: 0 })
     }
     #[inline(always)]

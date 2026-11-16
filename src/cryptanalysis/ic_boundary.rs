@@ -8698,6 +8698,9 @@ impl PairTable {
         let mut addends = Vec::new();
         let mut sums = Vec::new();
         let mut lambdas = Vec::new();
+        #[cfg(target_arch = "x86_64")]
+        let (mut pair_x, mut pair_ya, mut pair_yb, mut x3) =
+            (Vec::new(), Vec::new(), Vec::new(), Vec::new());
         for ai in 0..a {
             let i = groups[ai][0];
             indices.clear();
@@ -8711,13 +8714,63 @@ impl PairTable {
                 }
             }
             ops.adds += addends.len() as u64;
-            g.0.add_many_lazy(
-                fb.points[i],
-                &addends,
-                &mut sums,
-                &mut lambdas,
-                &mut scratch,
-            );
+            // The same-abscissa group is exceptional for every row. Leaving
+            // it in the batch makes the SIMD kernel decline the entire row.
+            // Keep its first-witness order, then batch the ordinary sums.
+            let diagonal_len = groups[ai].len();
+            for &q in &addends[..diagonal_len] {
+                sums.push(g.0.add(fb.points[i], q));
+                lambdas.push(FastCurve::LAZY_DONE);
+            }
+            let off_diagonal = &addends[diagonal_len..];
+            if !off_diagonal.is_empty() {
+                #[cfg(target_arch = "x86_64")]
+                let paired = {
+                    pair_x.clear();
+                    pair_ya.clear();
+                    pair_yb.clear();
+                    x3.clear();
+                    let complete_pairs = off_diagonal.len().is_multiple_of(2)
+                        && off_diagonal.chunks_exact(2).all(|pair| {
+                            !pair[0].infinity && !pair[1].infinity && pair[0].x == pair[1].x
+                        });
+                    if complete_pairs {
+                        for pair in off_diagonal.chunks_exact(2) {
+                            pair_x.push(pair[0].x);
+                            pair_ya.push(pair[0].y);
+                            pair_yb.push(pair[1].y);
+                        }
+                        if g.0.add_many_lazy_soa_paired(
+                            fb.points[i],
+                            &pair_x,
+                            &pair_ya,
+                            &pair_yb,
+                            &mut x3,
+                            &mut lambdas,
+                            &mut scratch,
+                            off_diagonal.len() as u64,
+                        ) {
+                            sums.extend(x3.iter().copied().map(|x| FastPoint::affine(x, 0)));
+                            true
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                };
+                #[cfg(not(target_arch = "x86_64"))]
+                let paired = false;
+                if !paired {
+                    g.0.add_many_lazy_paired_x(
+                        fb.points[i],
+                        off_diagonal,
+                        &mut sums,
+                        &mut lambdas,
+                        &mut scratch,
+                    );
+                }
+            }
             debug_assert_eq!(sums.len(), indices.len());
             debug_assert_eq!(lambdas.len(), indices.len());
             for (&j, s) in indices.iter().zip(sums.iter()) {

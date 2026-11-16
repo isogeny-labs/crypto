@@ -1,0 +1,342 @@
+{
+  "standing": "[pcc:unverified]",
+  "source": "https://github.com/isogeny-labs/crypto/actions/runs/43787167910",
+  "job_id": 133037288540,
+  "source_branch": "research/prime31-aps-result-20261116",
+  "source_commit": "6b2c38de448684caa299c8873a7fa20abbc96e1f",
+  "execution": "GitHub Actions release Rust producer development CI, same-run sequential comparison, not independently PCC-signed, no A/A isolation",
+  "curve": {
+    "p": 2147483647,
+    "n": 2147446831,
+    "cofactor": 1
+  },
+  "checks": {
+    "single_completed": true,
+    "matched_completed": true,
+    "holdouts": 12,
+    "total": 12,
+    "all_verifier_scalars_equal": true
+  },
+  "algebraic_one": {
+    "attempts": [
+      {
+        "algebraic_S3_pair_roots_ns": 168922358,
+        "algebraic_batch_field_inversions": 438,
+        "algebraic_cold_wall_until_output_ns": 267921547,
+        "algebraic_field_square_roots": 672768,
+        "algebraic_matching_x_candidates": 1,
+        "algebraic_signed_candidates": 1,
+        "algebraic_unusable_beta": 0,
+        "algebraic_visited_pairs": 672768,
+        "ec_group_additions_candidate_verification_only": 57,
+        "generic_direct_join_control": null,
+        "points_per_partition": 1536,
+        "precompute_labels_ns": 98636551,
+        "public_seed": "4150535f50523331",
+        "rejected_global_duplicate_x": 0,
+        "rejected_identity": 0,
+        "round": 0,
+        "solution": {
+          "alpha": 1144570523,
+          "beta": 2011873483,
+          "identity_equation": "alpha + beta * log = 0 (mod n)",
+          "log": 1038579171,
+          "partition_indices": [
+            437,
+            1247,
+            879
+          ],
+          "signs": [
+            -1,
+            1,
+            -1
+          ],
+          "status": "verified"
+        }
+      }
+    ],
+    "classification": "index-calculus methodology, generic pair-MITM equivalent, not a novel non-generic attack",
+    "cofactor": 1,
+    "cold_rust_wall_ns": 267921547,
+    "complete_target_scalar_recovered": true,
+    "curve_a": 847514846,
+    "curve_b": 2087444724,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "method": "published APS 2018 dynamic labelled one-relation S3, m=3",
+    "n": 2147446831,
+    "no_f4_or_factor_base_linear_algebra": true,
+    "no_known_target_log_in_solver": true,
+    "p": 2147483647,
+    "public_target": [
+      1477799919,
+      824532935
+    ],
+    "standing": "[pcc:unverified]"
+  },
+  "source_matched_algebraic_vs_generic": {
+    "attempts": [
+      {
+        "algebraic_S3_pair_roots_ns": 169421471,
+        "algebraic_batch_field_inversions": 438,
+        "algebraic_cold_wall_until_output_ns": 268610255,
+        "algebraic_field_square_roots": 672768,
+        "algebraic_matching_x_candidates": 1,
+        "algebraic_signed_candidates": 1,
+        "algebraic_unusable_beta": 0,
+        "algebraic_visited_pairs": 672768,
+        "ec_group_additions_candidate_verification_only": 57,
+        "generic_direct_join_control": {
+          "group_additions": 1345017,
+          "group_lookup_ns": 325897345,
+          "matching_x": 1,
+          "same_public_labelled_sources": true,
+          "separate_generic_control": true,
+          "signed_candidates": 1,
+          "solution": {
+            "alpha": 1144570523,
+            "beta": 2011873483,
+            "identity_equation": "alpha + beta * log = 0 (mod n)",
+            "log": 1038579171,
+            "partition_indices": [
+              437,
+              1247,
+              879
+            ],
+            "signs": [
+              -1,
+              1,
+              -1
+            ],
+            "status": "verified"
+          },
+          "source_plus_generic_control_ns": 424771464,
+          "visited_pairs": 672480,
+          "warning": "development same-dataset sequential A/B, no isolation or A/A calibration"
+        },
+        "points_per_partition": 1536,
+        "precompute_labels_ns": 98874119,
+        "public_seed": "4150535f50523331",
+        "rejected_global_duplicate_x": 0,
+        "rejected_identity": 0,
+        "round": 0,
+        "solution": {
+          "alpha": 1144570523,
+          "beta": 2011873483,
+          "identity_equation": "alpha + beta * log = 0 (mod n)",
+          "log": 1038579171,
+          "partition_indices": [
+            437,
+            1247,
+            879
+          ],
+          "signs": [
+            -1,
+            1,
+            -1
+          ],
+          "status": "verified"
+        }
+      }
+    ],
+    "classification": "index-calculus methodology, generic pair-MITM equivalent, not a novel non-generic attack",
+    "cofactor": 1,
+    "cold_rust_wall_ns": 268610255,
+    "complete_target_scalar_recovered": true,
+    "curve_a": 847514846,
+    "curve_b": 2087444724,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "method": "published APS 2018 dynamic labelled one-relation S3, m=3",
+    "n": 2147446831,
+    "no_f4_or_factor_base_linear_algebra": true,
+    "no_known_target_log_in_solver": true,
+    "p": 2147483647,
+    "public_target": [
+      1477799919,
+      824532935
+    ],
+    "standing": "[pcc:unverified]"
+  },
+  "twelve_heldout_public_targets": {
+    "cases": 12,
+    "cases_detail": [
+      {
+        "attempts": 1,
+        "case": 0,
+        "cold_wall_ns": 101792649,
+        "known_answer_verifier_only": 504113487,
+        "public_target": [
+          995016677,
+          752736292
+        ],
+        "recovered_log": 504113487,
+        "s3_pairs": 10752,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 1,
+        "cold_wall_ns": 204057410,
+        "known_answer_verifier_only": 1213895432,
+        "public_target": [
+          2042969722,
+          539832143
+        ],
+        "recovered_log": 1213895432,
+        "s3_pairs": 422400,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 2,
+        "cold_wall_ns": 125236114,
+        "known_answer_verifier_only": 1503437256,
+        "public_target": [
+          125100676,
+          1701353652
+        ],
+        "recovered_log": 1503437256,
+        "s3_pairs": 105984,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 3,
+        "cold_wall_ns": 141919527,
+        "known_answer_verifier_only": 712986906,
+        "public_target": [
+          2022902848,
+          1774145501
+        ],
+        "recovered_log": 712986906,
+        "s3_pairs": 172032,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 4,
+        "cold_wall_ns": 504566118,
+        "known_answer_verifier_only": 1803751110,
+        "public_target": [
+          1009440099,
+          1688789539
+        ],
+        "recovered_log": 1803751110,
+        "s3_pairs": 1634304,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 5,
+        "cold_wall_ns": 133165129,
+        "known_answer_verifier_only": 1301856749,
+        "public_target": [
+          1918045950,
+          506773218
+        ],
+        "recovered_log": 1301856749,
+        "s3_pairs": 138240,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 6,
+        "cold_wall_ns": 110542461,
+        "known_answer_verifier_only": 352316451,
+        "public_target": [
+          1543997873,
+          473461090
+        ],
+        "recovered_log": 352316451,
+        "s3_pairs": 47616,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 7,
+        "cold_wall_ns": 158688359,
+        "known_answer_verifier_only": 531498008,
+        "public_target": [
+          142251308,
+          198121505
+        ],
+        "recovered_log": 531498008,
+        "s3_pairs": 241152,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 8,
+        "cold_wall_ns": 218895681,
+        "known_answer_verifier_only": 1918296127,
+        "public_target": [
+          1725841757,
+          459732445
+        ],
+        "recovered_log": 1918296127,
+        "s3_pairs": 482304,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 9,
+        "cold_wall_ns": 252456367,
+        "known_answer_verifier_only": 1685945575,
+        "public_target": [
+          241072893,
+          641974407
+        ],
+        "recovered_log": 1685945575,
+        "s3_pairs": 622080,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 10,
+        "cold_wall_ns": 113752830,
+        "known_answer_verifier_only": 528133461,
+        "public_target": [
+          186343923,
+          1478469610
+        ],
+        "recovered_log": 528133461,
+        "s3_pairs": 59904,
+        "success": true
+      },
+      {
+        "attempts": 1,
+        "case": 11,
+        "cold_wall_ns": 206088570,
+        "known_answer_verifier_only": 2108109880,
+        "public_target": [
+          828902702,
+          401334219
+        ],
+        "recovered_log": 2108109880,
+        "s3_pairs": 431616,
+        "success": true
+      }
+    ],
+    "classification": "published APS-style S3 pair enumeration; generic MITM equivalent",
+    "curve_prime": 2147483647,
+    "fixture": "12 deterministic independent nontrivial public Q=[k]G; k not passed to execute",
+    "group_order": 2147446831,
+    "scientific_limit": "source-specific developer CI, no independent PCC or non-generic cost claim",
+    "standing": "[pcc:unverified]",
+    "successes": 12,
+    "total_cold_wall_ns": "2271161215",
+    "total_s3_pair_roots": 4368384
+  },
+  "limitations": [
+    "S3 pair-list root evaluation is generic MITM equivalent, not a novel non-generic algorithm",
+    "same-run sequential and producer-only; not a randomized A/A benchmark",
+    "one fixture ordinary prime31, no cross-size scaling or independent PCC",
+    "generic group join is an explicit control, not the prime-field IC frontier",
+    "only public known-answer holdouts verified post-solve, not deployed curves"
+  ]
+}

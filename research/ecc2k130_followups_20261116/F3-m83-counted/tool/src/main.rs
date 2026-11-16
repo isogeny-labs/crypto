@@ -114,17 +114,17 @@ fn smoke_row(dir: &str, checks: &mut Vec<Value>) -> Row {
     for line in text.lines().filter(|l| !l.trim().is_empty()) {
         let rec: Value = serde_json::from_str(line).unwrap();
         let arm = rec["arm"].as_str().unwrap_or("?").to_string();
-        let gae = rec["cost"]["total_gae"]
-            .as_f64()
-            .or_else(|| rec["total_gae"].as_f64())
-            .unwrap_or(f64::NAN);
-        let s = rec["cost"]["S"].as_f64().or_else(|| rec["S"].as_f64()).unwrap_or(f64::NAN);
+        if rec["warmup"].as_bool() == Some(true) {
+            continue;
+        }
+        let gae = rec["cost"]["total_gae"].as_f64().unwrap_or(f64::NAN);
+        let s = rec["cost"]["s"].as_f64().unwrap_or(f64::NAN);
         if s.is_finite() && gae.is_finite() && s > 0.0 {
             r_val = (gae / s).powi(2);
         }
-        let ok = rec["verified"].as_bool().unwrap_or(false);
-        let wall = rec["wall_ns"].as_f64().or_else(|| rec["timing"]["wall_ns"].as_f64()).unwrap_or(f64::NAN);
-        let tgt = rec["target_id"].as_str().or_else(|| rec["workload_id"].as_str()).unwrap_or("").to_string();
+        let ok = rec["outcome"]["status"] == "verified" && rec["outcome"]["matches_target"] == true;
+        let wall = rec["time"]["solve_wall_ns"].as_f64().unwrap_or(f64::NAN);
+        let tgt = format!("{:06}", rec["workload"]["target_index"].as_u64().unwrap_or(u64::MAX));
         by_arm.entry(arm).or_default().push((tgt, gae, ok, wall));
     }
     let mean = |a: &str| -> (f64, usize, usize, f64) {
@@ -138,8 +138,10 @@ fn smoke_row(dir: &str, checks: &mut Vec<Value>) -> Row {
     let (gr, okr, nr, wr) = mean("rho-strong");
     let (ga, oka, na, _) = mean("rho-strong-aa");
     // A/A: identical GAE target by target, in record order.
-    let rho = by_arm.get("rho-strong").cloned().unwrap_or_default();
-    let aa = by_arm.get("rho-strong-aa").cloned().unwrap_or_default();
+    let mut rho = by_arm.get("rho-strong").cloned().unwrap_or_default();
+    let mut aa = by_arm.get("rho-strong-aa").cloned().unwrap_or_default();
+    rho.sort_by(|x, y| x.0.cmp(&y.0));
+    aa.sort_by(|x, y| x.0.cmp(&y.0));
     let aa_exact = rho.len() == aa.len()
         && rho.iter().zip(aa.iter()).all(|(x, y)| x.0 == y.0 && x.1 == y.1);
     checks.push(json!({
@@ -204,8 +206,20 @@ fn main() {
     let l7 = read_json(&arg(&args, "--l7").expect("--l7"));
     let px = arg(&args, "--px-specs").expect("--px-specs");
     let out = arg(&args, "--out").expect("--out");
-    let rho_ns: f64 = arg(&args, "--rho-ns-per-step").expect("--rho-ns-per-step").parse().unwrap();
-    let ic_ns: f64 = arg(&args, "--ic-ns-per-gae").expect("--ic-ns-per-gae").parse().unwrap();
+    // Rate probe: every record exhausted its 10^6-step cap (koblitz_strong_rho.rs: the cap
+    // is max(10^6, factor x ideal); factor 0 gives 10^6). ns per step = median wall / 10^6.
+    let probe = arg(&args, "--probe").expect("--probe");
+    let mut probe_ns: Vec<f64> = vec![];
+    let mut probe_status: Vec<String> = vec![];
+    for line in fs::read_to_string(format!("{probe}/records.jsonl")).unwrap().lines() {
+        let rec: Value = serde_json::from_str(line).unwrap();
+        probe_status.push(rec["outcome"]["status"].as_str().unwrap_or("?").to_string());
+        probe_ns.push(rec["time"]["solve_wall_ns"].as_f64().unwrap() / 1.0e6);
+    }
+    let probe_all = probe_ns.clone();
+    let rho_ns = pct(&mut probe_ns, 0.5);
+    // The IC arm has no wide implementation: its ns per GAE is assumed equal (PROTOCOL 5).
+    let ic_ns = rho_ns;
     let mut rows = committed_rows(&l7, &px);
     let mut smoke_checks = vec![];
     for d in args_all(&args, "--smoke") {
@@ -306,6 +320,8 @@ fn main() {
                     "core_hours_per_target": rho_core_h,
                     "usd_per_target": [rho_core_h * PRICE_LO, rho_core_h * PRICE_HI]},
         "ic_ns_per_gae_assumed": ic_ns,
+        "probe": {"session": probe, "ns_per_step_each": probe_all, "status_each": probe_status,
+                  "label": "L0, shared 4-vCPU container, cores 0-2, provisional"},
         "price_usd_per_vcpu_hour_assumed": [PRICE_LO, PRICE_HI],
         "scenarios": sc_out,
         "smoke": smoke_checks,
