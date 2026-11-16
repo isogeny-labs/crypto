@@ -1,3 +1,77 @@
+# Resume: rootfinding first-independent collector on codex/rootfind-multihit-relations-20261116
+
+This top section is the current handoff for the worktree and PR #4421. The
+complete earlier resume text follows under "Preserved prior task notes"; its
+three merge-marker lines were removed while retaining both conflicting sides.
+The untouched original is saved locally at
+`.resume/RESUME.before-rootfind-20261116.md` with SHA-256
+`97231b21e85008f87510f5ceb3a88531ee6446c8681d61c67e00c56ee77088c0`. Earlier task status has not been independently refreshed.
+
+## Goal
+Continue the rootfinding ECDLP index-calculus work until an exact matched
+complete-call result is faster than F4/F5/F6; the current bounded task is the
+first-independent relation-collection screen in PR #4421.
+
+## Lead / hypothesis
+The batch oracle returns the first verified triple even if its relation is
+dependent. `research/rootfind_first_independent_20261116/PROTOCOL.md` freezes a
+policy that continues the same residual until the first independent row and
+compares first-hit and all-hit controls on public K13/K19/K23 streams.
+
+## Spec
+`research/rootfind_first_independent_20261116/PROTOCOL.md`, frozen at commit
+`0e413634e86a9358d431aaf2e0a3dc77ce5e9b40`; source commit
+`83407456e0f052d4cf51d533b1fda824063b2287`; pinned harness commit
+`ea2fc503bfb431f1b2ad7f5a9ec24c1241fcba9f`; archived result commit
+`6322b6d89f`. PR #4421 is the publication surface.
+
+## State
+The release harness compiled with `--locked --no-run`; executable SHA-256 is
+`f58ad80e4402725f22ee51dfe14db1b8bb0af12a2c56f22cddbbf6de5b6c0247`.
+The frozen first-independent screen ran once at 2026-11-16T13:42:02Z from
+the source-bound executable and passed 1/1. K13/K19/K23 first versus
+candidate modeled group additions to full rank were 963/991,
+14203/15337 and 128211/144219; the candidate missed its operation
+prediction in all three fixed streams. Raw `run.meta`, `run.stdout`,
+`run.stderr`, derived `RESULTS.json`, the editable diagram/chart, and the
+inspected two-page PDF are committed under
+`research/rootfind_first_independent_20261116/`. Raw/executable hashes and
+operation arithmetic passed separate checks. The full development
+library suite ended 6416 passed, 16 failed, 135 ignored; raw logs and
+scoped reruns are retained in that study's `TEST_STATUS.json`.
+The frozen EKS F4/F5/F6 panel remains budget-gated: the correct AWS account's
+latest observed monthly actual was USD 2094.914 against USD 1300.
+
+## Next steps
+1. Push the archived branch and update existing PR #4421 with the three-cell
+   operation result, validation scope and PDF link.
+2. Keep first-independent out of the production collector: the frozen
+   operation prediction failed on all three registered streams.
+3. Recheck live correct-account daily and monthly budgets before any EKS
+   F4/F5/F6 panel submission; do not launch while either is exhausted.
+4. When budget and isolation admit the panel, compare complete same-target
+   calls with independent replay and priced setup, relation, rank, verification
+   and failed attempts. The production collector paths are still held by
+   Conductor T-6708 and today's shared session log by T-6720.
+
+## Runs in flight
+None for this branch. The source-bound test executable is at
+`/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/deps/rootfind_first_independent-0455cb05dd584dab`.
+No PID or cloud job exists for this screen.
+
+## Stop and success conditions
+Stop on checkpoint refusal, wrong curve/base identity, wrong answer, failed
+relation re-addition, inconsistent row, timeout, or missing raw output; retain
+all failures. The fixed screen succeeds only when all three curves complete
+and every full-rank arm verifies scalar 641. A candidate operation gain
+requires fewer modeled group additions than first-hit on the fixed stream;
+only the frozen complete-call L2 F4/F5/F6 panel can decide the larger goal.
+
+## Preserved prior task notes
+
+The following notes are historical and have not been revalidated in this
+session. They are retained so checkpoint repair loses no preceding handoff.
+
 # Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
 
 ## Goal
@@ -63,7 +137,6 @@ Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete
 Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
 Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
-<<<<<<< HEAD
 ## Open questions
 - Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
 - /home/user/crypto-autoresearcher is half-switched, pending the owner.
@@ -195,8 +268,6 @@ Commit exact source, pass current official checkpoint gate, then run pinned lake
 None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
 ## Stop and success conditions
 Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
-=======
 ## Next steps
 Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
 close benchrec record, write REPORT + figure + PDF, update PR.
->>>>>>> origin/main
