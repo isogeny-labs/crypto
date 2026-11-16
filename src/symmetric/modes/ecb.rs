@@ -45,7 +45,10 @@ pub fn pkcs7_unpad<const N: usize>(data: &[u8]) -> Option<Vec<u8>> {
 }
 
 /// **ECB encrypt** with PKCS#7 padding.
-pub fn ecb_encrypt<C: BlockCipher<N>, const N: usize>(cipher: &C, plaintext: &[u8]) -> Vec<u8> {
+pub fn ecb_encrypt<C: BlockCipher<N> + ?Sized, const N: usize>(
+    cipher: &C,
+    plaintext: &[u8],
+) -> Vec<u8> {
     let padded = pkcs7_pad::<N>(plaintext);
     let mut out = Vec::with_capacity(padded.len());
     for chunk in padded.chunks(N) {
@@ -59,7 +62,7 @@ pub fn ecb_encrypt<C: BlockCipher<N>, const N: usize>(cipher: &C, plaintext: &[u
 
 /// **ECB decrypt** with PKCS#7 padding validation.  Returns `None` on
 /// length or padding error.
-pub fn ecb_decrypt<C: BlockCipher<N>, const N: usize>(
+pub fn ecb_decrypt<C: BlockCipher<N> + ?Sized, const N: usize>(
     cipher: &C,
     ciphertext: &[u8],
 ) -> Option<Vec<u8>> {

@@ -1,0 +1,17 @@
+{
+  "schema": "primary_source_scope_review_v1",
+  "repo": "CGAL/cgal",
+  "commit": "44ab808c25399fc6dbd89a6e114f3fd6b5ae8142",
+  "source": "Algebraic_kernel_d/include/CGAL/Algebraic_kernel_d/Bitstream_descartes_E08_tree.h",
+  "url": "https://github.com/CGAL/cgal/blob/44ab808c25399fc6dbd89a6e114f3fd6b5ae8142/Algebraic_kernel_d/include/CGAL/Algebraic_kernel_d/Bitstream_descartes_E08_tree.h",
+  "author_identified_by_header": "Arno Eigenwillig",
+  "findings": [
+    "The primary implementation includes Power_to_Bernstein_pm1_nofrac_matrix and Bitstream_bernstein_from_power, with integer Pascal/factorial transformations for a Bernstein representation in a Descartes root-isolation framework.",
+    "This is a univariate transformed-interval implementation, not the current three-source tensor bound. It demonstrates that power-to-Bernstein conversion and Bernstein root-isolation machinery are established techniques, not a novelty claim for this project.",
+    "The header warns that inherited EXACUS comments may be outdated; the assessment is confined to the concrete exposed transformation code and identifiers, not every inherited comment.",
+    "Our tensor degree(2,2,2) formula and ten symmetric classes require the separate project derivation plus independent generic27-coefficient/literal-source oracles. A reference implementation alone does not certify those formulas or useful curve pruning."
+  ],
+  "novelty_established": false,
+  "performance_claim": false,
+  "next": "If controls pass, first establish nonzero pruning headroom on a newly frozen panel and compare full conditional outputs/costs. Do not retime the already saturated width8 panel to claim extra exclusions."
+}

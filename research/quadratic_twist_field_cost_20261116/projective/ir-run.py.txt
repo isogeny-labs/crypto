@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# Build/process/hash/file IO only. No research arithmetic or counter analysis in Python.
+from pathlib import Path
+import subprocess,os,sys,json,time,hashlib,shlex
+repo=Path.cwd();scope=repo/'research/quadratic_twist_field_cost_20261116/projective'
+out=Path(os.environ['IR_OUTPUT']).resolve();assert not out.exists() and not out.is_relative_to(repo)
+assert subprocess.check_output(['git','branch','--show-current'],text=True).strip()=='codex/twist-field-cost'
+assert subprocess.check_output(['git','remote','get-url','origin'],text=True).strip()=='https://github.com/isogeny-labs/crypto.git'
+assert not subprocess.check_output(['git','status','--porcelain'],text=True).strip()
+head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();ref=json.loads(Path(os.environ['IR_REF']).read_text())
+assert ref['head']==head and ref['state']=='open' and ref['auto_merge'] is None and ref['source']=='connected-github-read' and 0<=time.time()-ref['observed_epoch']<=60
+pins=json.loads((scope/'ir-PINS.json').read_text())
+for name,h in pins['files'].items():assert hashlib.sha256((scope/name).read_bytes()).hexdigest()==h,name
+for name,h in pins['external_files'].items():assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==h,name
+protocol=json.loads((scope/'ir-protocol.json').read_text());assert protocol['freeze']['status']=='frozen'
+subprocess.run([sys.executable,'/workspace/canonical-protocol-20261115/tools/experiment_protocol.py','validate',str(scope/'ir-protocol.json')],check=True)
+out.mkdir(mode=0o700);stages=[]
+for name in pins['files']:
+    p=out/'sources'/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes((scope/name).read_bytes())
+(out/'source-ref.json').write_text(json.dumps(ref,indent=2)+'\n')
+def run(name,args,expected=0,env=None):
+    remaining=int(1794806700-time.time());assert remaining>0,'05:25UTC scientific deadline'
+    (out/(name+'.command')).write_text(shlex.join(map(str,args))+'\n')
+    with (out/(name+'.log')).open('wb')as log:r=subprocess.run(['timeout','--signal=TERM','--kill-after=10',str(min(600,remaining)),*map(str,args)],stdout=log,stderr=subprocess.STDOUT,env=env)
+    (out/(name+'.exit')).write_text(str(r.returncode)+'\n');stages.append({'name':name,'exit':r.returncode,'expected_exit':expected});(out/'stages.json').write_text(json.dumps(stages,indent=2)+'\n');assert r.returncode==expected,(name,r.returncode)
+tool=Path('/workspace/twist-callgrind-20261116/install')
+run('cpp-build',['g++','-std=c++20','-O2','-g','-Wall','-Wextra','-I/workspace/twist-native-tooling/include','-I'+str(tool/'include'),scope/'ir.cpp','-lcrypto','-lz','-o',out/'ir'])
+env=os.environ.copy();env.update(CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup',CARGO_BUILD_JOBS='2',CARGO_TARGET_DIR=str(out/'target'),PATH='/workspace/twist-native-tooling/cargo/bin:'+env['PATH'])
+run('rust-build',['cargo','build','--release','--locked','--offline','--manifest-path',scope/'ir-audit/Cargo.toml'],env=env)
+auditor=out/'target/release/twist_ir_audit';prior=Path('/workspace/twist-projective-run03-20261116/audit.json')
+(out/'binaries.sha256').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+str(p)+'\n'for p in[out/'ir',auditor]))
+for tag in['A','B']:
+    dest=out/tag;dest.mkdir();run('count-'+tag,[tool/'bin/valgrind','--tool=callgrind','--instr-atstart=yes','--collect-atstart=no','--cache-sim=no','--branch-sim=no','--callgrind-out-file='+str(dest/'counter'),out/'ir',dest/'cases.json',dest/'counter'])
+    run('audit-'+tag,[auditor,dest/'cases.json',prior,out/('audit-'+tag+'.json')])
+controls=[]
+for mode in['cost','raw-summary','missing','source']:
+    dest=out/('false-'+mode);dest.mkdir();j=json.loads((out/'A/cases.json').read_text())
+    for r in j['records']:
+        old=Path(r['counter_path']);new=dest/old.name;os.link(old,new);r['counter_path']=str(new)
+    if mode=='cost':j['records'][0]['result']['counts'][0]=0
+    elif mode=='missing':j['records'].pop(0)
+    elif mode=='source':j['field']=59
+    else:
+        p=Path(j['records'][0]['counter_path']);old=p.read_text();lines=old.splitlines();line=next(i for i,s in enumerate(lines)if s.startswith('summary:'));lines[line]='summary: 1';new='\n'.join(lines)+'\n';assert new!=old;p.unlink();p.write_text(new)
+    data=(json.dumps(j,separators=(',',':'))+'\n').encode();(dest/'cases.json').write_bytes(data);receipt=out/('false-'+mode+'-receipt.json');run('reject-'+mode,[auditor,dest/'cases.json',prior,receipt],101);assert not receipt.exists()
+    controls.append({'mode':mode,'changed_payload_sha256':hashlib.sha256(data).hexdigest(),'rejected':True,'receipt_exists':False})
+(out/'controls.json').write_text(json.dumps(controls,indent=2)+'\n')
