@@ -1,0 +1,1307 @@
+{
+  "accounting_diagnostic_only": true,
+  "allows_new_frozen_comparison": false,
+  "attempted_executions": 2,
+  "comparative_eligibility": false,
+  "completed_executions": 2,
+  "full_recovery_validation_passed": true,
+  "global_problems": [],
+  "in_flight_without_completion": null,
+  "observed_process_exit": 0,
+  "outcomes": [
+    {
+      "arm": "ic_a",
+      "child_exit": 0,
+      "completed": true,
+      "component_accounting": {
+        "complete": false,
+        "component_totals": {
+          "filter": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "mapping": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "original_solve": {
+            "diagnostic_priced_bitops": "364321367580",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8818423,
+              "modr_inv": 1051,
+              "modr_mul": 8819997,
+              "rng_words": 525,
+              "word_op": 525
+            }
+          },
+          "output": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "projected_solve": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "replay": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        },
+        "diagnostic_component_bitops": "364321367580",
+        "known_uncounted": "native bookkeeping remains incomplete",
+        "observed_component_primitives": {
+          "field_add": 0,
+          "field_inv": 0,
+          "field_mul": 0,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 8818423,
+          "modr_inv": 1051,
+          "modr_mul": 8819997,
+          "rng_words": 525,
+          "word_op": 525
+        },
+        "projection_calls": [],
+        "schema": "cover.graph.checked-subtotals/v1",
+        "solve_calls": [
+          {
+            "attempt": 1,
+            "columns": 525,
+            "complete": false,
+            "diagnostic_priced_bitops": "364321367580",
+            "kind": "original",
+            "known_uncounted": "solver native bookkeeping remains incomplete",
+            "marker": "counted:cover_solve_subtotals",
+            "nonzeros": 4721,
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8818423,
+              "modr_inv": 1051,
+              "modr_mul": 8819997,
+              "rng_words": 525,
+              "word_op": 525
+            },
+            "returned_solution": true,
+            "rows": 525,
+            "schema": "cover.sieve.solve-work/v1"
+          }
+        ],
+        "unallocated_linear_algebra": {
+          "diagnostic_priced_bitops": "1039744",
+          "primitives": {
+            "field_add": 0,
+            "field_inv": 0,
+            "field_mul": 0,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 16246
+          }
+        }
+      },
+      "endpoint_valid": true,
+      "nontrivial_graph_without_fallback": false,
+      "p": 1009,
+      "progress_path": "/workspace/ic-local-runs/local-cover-subcounts-validation-20261116-25/progress-p1009-s271-validation-0-ic_a.stderr",
+      "recorded_outer_wall_ns": 27661918910,
+      "recovered_scalar": 102559623889752301,
+      "seed": 271,
+      "work": {
+        "base": 524,
+        "base_muls": 537630,
+        "base_steps": 81067516,
+        "bits": 57.87226275460321,
+        "bs": 297300,
+        "c_add_e": 331.0,
+        "c_add_j": 2122.0,
+        "c_rel": 2396687.5248091603,
+        "correct": false,
+        "descent_c_cov": 918345.5030048076,
+        "descent_digest": 10979183528187978201,
+        "descent_f4_muls": 1186260486,
+        "descent_f4_native_ops": 75427866,
+        "descent_hilbert": 0,
+        "descent_hilbert_applied": 0,
+        "descent_hilbert_fallbacks": 0,
+        "descent_incomplete": 0,
+        "descent_lin_fallback": 3,
+        "descent_lin_muls": 334545032,
+        "descent_muls": 1531666953,
+        "descent_over_rho": 0.0090093372715187,
+        "descent_post_muls": 2778679,
+        "descent_rejected": 0,
+        "descent_replayed": 0,
+        "descent_residuals": 1664,
+        "descent_stopped": 1664,
+        "descent_stream_muls": 3531008,
+        "descent_successes": 2,
+        "descent_tests_per_success": 832.0,
+        "descent_timed_out": 0,
+        "descent_trace_mismatches": 0,
+        "descent_verify_muls": 9028,
+        "descent_weil_muls": 4542720,
+        "duplicates": 0,
+        "enum_adds": 83649490,
+        "enum_lookups": 79822806,
+        "enum_muls": 732967586,
+        "estimate_by_m": [
+          [
+            9,
+            1273.8637512400794
+          ],
+          [
+            10,
+            128660.23887524802
+          ],
+          [
+            11,
+            11789968.015693191
+          ],
+          [
+            12,
+            992322307.9875104
+          ],
+          [
+            13,
+            76943220688.365
+          ]
+        ],
+        "exhausted": false,
+        "expected_rels_per_line": 0.002780533509700177,
+        "extract_muls": 3593517,
+        "false_hits": 0,
+        "filtered_out": 1,
+        "hits": 524,
+        "inc_hinted_bs": 297003,
+        "l": 263807419686068737,
+        "la_attempts": 1,
+        "la_muls": 141103152,
+        "la_ops": 8818947,
+        "la_ops_last": 8818947,
+        "la_over_rho": 0.0008299753963826419,
+        "lin_mode": "fast",
+        "lines": 154709,
+        "m_final": 9,
+        "m_rule": 9,
+        "margin": 1.25,
+        "p": 1009,
+        "per_m": [
+          [
+            9,
+            297300,
+            154709,
+            524,
+            524
+          ]
+        ],
+        "rate_ratio": 1.2181129903008352,
+        "relation_muls": 1255864263,
+        "relation_over_rho": 0.007395703194590787,
+        "relations": 524,
+        "relations_available": 2830.808336089065,
+        "rels_failed_verify": 0,
+        "rels_per_line": 0.0033870039881325584,
+        "rels_verified": 524,
+        "rho": [],
+        "rho_s_mean": 1.0,
+        "rho_s_sd": 0.0,
+        "roots": 161814652,
+        "row_weight": 9.0,
+        "s": 0.01723501586249213,
+        "s_over_rho": 0.01723501586249213,
+        "s_plus": 0.03371881648145407,
+        "s_plus_over_rho": 0.03371881648145407,
+        "seed": 271,
+        "setup_muls": 933007,
+        "shared_bs": 24421,
+        "sieve_adds": 2396780867,
+        "sieve_lookups": 161814652,
+        "sieve_muls": 516135374,
+        "sieve_shared_reads": 80323960,
+        "sieve_steps": 156101381,
+        "solved": true,
+        "table_muls": 28108,
+        "total_muls": 2930105005,
+        "total_plus": 5732496780,
+        "trace": false,
+        "unknowns": 525,
+        "verify_muls": 3139678,
+        "wall_ms": 27649.429594,
+        "work_native": [
+          {
+            "attempt": 1,
+            "columns": 525,
+            "complete": false,
+            "kind": "original",
+            "known_uncounted": "solver native bookkeeping remains incomplete",
+            "marker": "counted:cover_solve_subtotals",
+            "nonzeros": 4721,
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8818423,
+              "modr_inv": 1051,
+              "modr_mul": 8819997,
+              "rng_words": 525,
+              "word_op": 525
+            },
+            "returned_solution": true,
+            "rows": 525,
+            "schema": "cover.sieve.solve-work/v1"
+          }
+        ]
+      },
+      "work_native": {
+        "comparison_eligible": false,
+        "complete": false,
+        "diagnostic_priced_bitops": "3935679644920",
+        "excluded": "public domain validation; instance construction; control, allocation and memory under bitop/v1",
+        "foreign_hook_calls": 0,
+        "known_uncounted": [
+          {
+            "count": null,
+            "name": "graph_maps_sets_normalization_scheduling_and_replay_bookkeeping",
+            "status": "coverage_or_emission_pending"
+          },
+          {
+            "count": null,
+            "name": "cover_scalar_rng_and_native_bookkeeping_audit",
+            "status": "coverage_or_emission_pending"
+          },
+          {
+            "count": null,
+            "name": "rng_internal_work",
+            "status": "coverage_or_emission_pending"
+          }
+        ],
+        "observed_primitives": {
+          "field_add": 4497681469,
+          "field_inv": 8848649,
+          "field_mul": 2319535915,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 96983412,
+          "legendre": 0,
+          "modr_add": 8818423,
+          "modr_inv": 1051,
+          "modr_mul": 8819997,
+          "rng_words": 2573,
+          "word_op": 1667886260
+        },
+        "operand_rechecks": "included where inseparable from existing hooks",
+        "other_modulus_ops": 0,
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "unattributed",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "transport",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "528694340",
+            "phase": "model",
+            "primitives": {
+              "field_add": 332888,
+              "field_inv": 1419,
+              "field_mul": 391650,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "691798428",
+            "phase": "factor_base",
+            "primitives": {
+              "field_add": 233292,
+              "field_inv": 0,
+              "field_mul": 537630,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 524,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 2048,
+              "word_op": 2572
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "1900233362936",
+            "phase": "relations",
+            "primitives": {
+              "field_add": 3300260050,
+              "field_inv": 8100693,
+              "field_mul": 1119485418,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 6288,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 1143288109
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "1669810560642",
+            "phase": "descent",
+            "primitives": {
+              "field_add": 1196792479,
+              "field_inv": 746359,
+              "field_mul": 1199052762,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 96976600,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 524578808
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "364322407324",
+            "phase": "linear_algebra",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8818423,
+              "modr_inv": 1051,
+              "modr_mul": 8819997,
+              "rng_words": 525,
+              "word_op": 16771
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "92821250",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 62760,
+              "field_inv": 178,
+              "field_mul": 68455,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        ],
+        "pricing": "executed modular hooks and observed native events",
+        "schema": "cover.graph.accounting-diagnostic/v1",
+        "total_bitops": null,
+        "unit": "bitop/v1",
+        "widths": {
+          "field_bits": 10,
+          "r_bits": 58
+        }
+      }
+    },
+    {
+      "arm": "graph_a",
+      "child_exit": 0,
+      "completed": true,
+      "component_accounting": {
+        "complete": false,
+        "component_totals": {
+          "filter": {
+            "diagnostic_priced_bitops": "806228620",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 8819,
+              "modr_inv": 1099,
+              "modr_mul": 17057,
+              "rng_words": 0,
+              "word_op": 186426
+            }
+          },
+          "mapping": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "original_solve": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "output": {
+            "diagnostic_priced_bitops": "0",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          "projected_solve": {
+            "diagnostic_priced_bitops": "666381953262",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 16133888,
+              "modr_inv": 789,
+              "modr_mul": 16135069,
+              "rng_words": 394,
+              "word_op": 394
+            }
+          },
+          "replay": {
+            "diagnostic_priced_bitops": "869597544",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 20845,
+              "modr_inv": 0,
+              "modr_mul": 20609,
+              "rng_words": 0,
+              "word_op": 286724
+            }
+          }
+        },
+        "diagnostic_component_bitops": "668057779426",
+        "known_uncounted": "native bookkeeping remains incomplete",
+        "observed_component_primitives": {
+          "field_add": 0,
+          "field_inv": 0,
+          "field_mul": 0,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 16163552,
+          "modr_inv": 1888,
+          "modr_mul": 16172735,
+          "rng_words": 394,
+          "word_op": 473544
+        },
+        "projection_calls": [
+          {
+            "accepted": true,
+            "call_index": 1,
+            "candidate_nonzeros": 12982,
+            "candidate_rows": 394,
+            "complete": false,
+            "input_nonzeros": 4721,
+            "input_rows": 525,
+            "known_uncounted": "graph native bookkeeping remains incomplete",
+            "marker": "counted:graph_projection_subtotals",
+            "schema": "cover.graph.projection-work/v1",
+            "stages": [
+              {
+                "diagnostic_priced_bitops": "0",
+                "primitives": {
+                  "field_add": 0,
+                  "field_inv": 0,
+                  "field_mul": 0,
+                  "field_sqr": 0,
+                  "field_sqrt": 0,
+                  "hash_probe": 0,
+                  "legendre": 0,
+                  "modr_add": 0,
+                  "modr_inv": 0,
+                  "modr_mul": 0,
+                  "rng_words": 0,
+                  "word_op": 0
+                },
+                "stage": "mapping"
+              },
+              {
+                "diagnostic_priced_bitops": "806228620",
+                "primitives": {
+                  "field_add": 0,
+                  "field_inv": 0,
+                  "field_mul": 0,
+                  "field_sqr": 0,
+                  "field_sqrt": 0,
+                  "hash_probe": 0,
+                  "legendre": 0,
+                  "modr_add": 8819,
+                  "modr_inv": 1099,
+                  "modr_mul": 17057,
+                  "rng_words": 0,
+                  "word_op": 186426
+                },
+                "stage": "filter"
+              },
+              {
+                "diagnostic_priced_bitops": "869597544",
+                "primitives": {
+                  "field_add": 0,
+                  "field_inv": 0,
+                  "field_mul": 0,
+                  "field_sqr": 0,
+                  "field_sqrt": 0,
+                  "hash_probe": 0,
+                  "legendre": 0,
+                  "modr_add": 20845,
+                  "modr_inv": 0,
+                  "modr_mul": 20609,
+                  "rng_words": 0,
+                  "word_op": 286724
+                },
+                "stage": "replay"
+              },
+              {
+                "diagnostic_priced_bitops": "0",
+                "primitives": {
+                  "field_add": 0,
+                  "field_inv": 0,
+                  "field_mul": 0,
+                  "field_sqr": 0,
+                  "field_sqrt": 0,
+                  "hash_probe": 0,
+                  "legendre": 0,
+                  "modr_add": 0,
+                  "modr_inv": 0,
+                  "modr_mul": 0,
+                  "rng_words": 0,
+                  "word_op": 0
+                },
+                "stage": "output"
+              }
+            ]
+          }
+        ],
+        "schema": "cover.graph.checked-subtotals/v1",
+        "solve_calls": [
+          {
+            "attempt": 1,
+            "columns": 394,
+            "complete": false,
+            "diagnostic_priced_bitops": "666381953262",
+            "kind": "projected",
+            "known_uncounted": "solver native bookkeeping remains incomplete",
+            "marker": "counted:cover_solve_subtotals",
+            "nonzeros": 12982,
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 16133888,
+              "modr_inv": 789,
+              "modr_mul": 16135069,
+              "rng_words": 394,
+              "word_op": 394
+            },
+            "returned_solution": true,
+            "rows": 394,
+            "schema": "cover.sieve.solve-work/v1"
+          }
+        ],
+        "unallocated_linear_algebra": {
+          "diagnostic_priced_bitops": "1039744",
+          "primitives": {
+            "field_add": 0,
+            "field_inv": 0,
+            "field_mul": 0,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 16246
+          }
+        }
+      },
+      "endpoint_valid": true,
+      "nontrivial_graph_without_fallback": true,
+      "p": 1009,
+      "progress_path": "/workspace/ic-local-runs/local-cover-subcounts-validation-20261116-25/progress-p1009-s271-validation-0-graph_a.stderr",
+      "recorded_outer_wall_ns": 26750736259,
+      "recovered_scalar": 102559623889752301,
+      "seed": 271,
+      "work": {
+        "base": 524,
+        "base_muls": 537630,
+        "base_steps": 81067516,
+        "bits": 57.87226275460321,
+        "bs": 297300,
+        "c_add_e": 331.0,
+        "c_add_j": 2122.0,
+        "c_rel": 2396687.5248091603,
+        "correct": false,
+        "descent_c_cov": 918345.5030048076,
+        "descent_digest": 10979183528187978201,
+        "descent_f4_muls": 1186260486,
+        "descent_f4_native_ops": 75427866,
+        "descent_hilbert": 0,
+        "descent_hilbert_applied": 0,
+        "descent_hilbert_fallbacks": 0,
+        "descent_incomplete": 0,
+        "descent_lin_fallback": 3,
+        "descent_lin_muls": 334545032,
+        "descent_muls": 1531666953,
+        "descent_over_rho": 0.0090093372715187,
+        "descent_post_muls": 2778679,
+        "descent_rejected": 0,
+        "descent_replayed": 0,
+        "descent_residuals": 1664,
+        "descent_stopped": 1664,
+        "descent_stream_muls": 3531008,
+        "descent_successes": 2,
+        "descent_tests_per_success": 832.0,
+        "descent_timed_out": 0,
+        "descent_trace_mismatches": 0,
+        "descent_verify_muls": 9028,
+        "descent_weil_muls": 4542720,
+        "duplicates": 0,
+        "enum_adds": 83649490,
+        "enum_lookups": 79822806,
+        "enum_muls": 732967586,
+        "estimate_by_m": [
+          [
+            9,
+            1273.8637512400794
+          ],
+          [
+            10,
+            128660.23887524802
+          ],
+          [
+            11,
+            11789968.015693191
+          ],
+          [
+            12,
+            992322307.9875104
+          ],
+          [
+            13,
+            76943220688.365
+          ]
+        ],
+        "exhausted": false,
+        "expected_rels_per_line": 0.002780533509700177,
+        "extract_muls": 3593517,
+        "false_hits": 0,
+        "filtered_out": 1,
+        "graph_filter": {
+          "calls": 1,
+          "counter_scope": "complete wall includes graph mapping/filter/replay/drop; legacy la_ops/la_muls/total_muls omit graph modular and native work",
+          "fallback_solves": 0,
+          "filter_call_wall_ns": 6327033,
+          "input_digest": "7f910ad9d30883fad004b2957b4383c26d59f7967b261e7d38c4d43659b08b6e",
+          "input_rows": 525,
+          "last_report": {
+            "complete_relations": 394,
+            "core_large_vertices": 131,
+            "core_relations": 489,
+            "cycles_closed": 358,
+            "duplicate_relations": 0,
+            "input_large_vertices": 131,
+            "input_relations": 525,
+            "merges": 1099,
+            "peeled_relations": 0,
+            "pivots": 131,
+            "rejected_fill": 0
+          },
+          "output_rows": 394,
+          "projected": 1,
+          "refusals": 0,
+          "replayed_rows": 394,
+          "work_native": [
+            {
+              "accepted": true,
+              "call_index": 1,
+              "candidate_nonzeros": 12982,
+              "candidate_rows": 394,
+              "complete": false,
+              "input_nonzeros": 4721,
+              "input_rows": 525,
+              "known_uncounted": "graph native bookkeeping remains incomplete",
+              "marker": "counted:graph_projection_subtotals",
+              "schema": "cover.graph.projection-work/v1",
+              "stages": [
+                {
+                  "primitives": {
+                    "field_add": 0,
+                    "field_inv": 0,
+                    "field_mul": 0,
+                    "field_sqr": 0,
+                    "field_sqrt": 0,
+                    "hash_probe": 0,
+                    "legendre": 0,
+                    "modr_add": 0,
+                    "modr_inv": 0,
+                    "modr_mul": 0,
+                    "rng_words": 0,
+                    "word_op": 0
+                  },
+                  "stage": "mapping"
+                },
+                {
+                  "primitives": {
+                    "field_add": 0,
+                    "field_inv": 0,
+                    "field_mul": 0,
+                    "field_sqr": 0,
+                    "field_sqrt": 0,
+                    "hash_probe": 0,
+                    "legendre": 0,
+                    "modr_add": 8819,
+                    "modr_inv": 1099,
+                    "modr_mul": 17057,
+                    "rng_words": 0,
+                    "word_op": 186426
+                  },
+                  "stage": "filter"
+                },
+                {
+                  "primitives": {
+                    "field_add": 0,
+                    "field_inv": 0,
+                    "field_mul": 0,
+                    "field_sqr": 0,
+                    "field_sqrt": 0,
+                    "hash_probe": 0,
+                    "legendre": 0,
+                    "modr_add": 20845,
+                    "modr_inv": 0,
+                    "modr_mul": 20609,
+                    "rng_words": 0,
+                    "word_op": 286724
+                  },
+                  "stage": "replay"
+                },
+                {
+                  "primitives": {
+                    "field_add": 0,
+                    "field_inv": 0,
+                    "field_mul": 0,
+                    "field_sqr": 0,
+                    "field_sqrt": 0,
+                    "hash_probe": 0,
+                    "legendre": 0,
+                    "modr_add": 0,
+                    "modr_inv": 0,
+                    "modr_mul": 0,
+                    "rng_words": 0,
+                    "word_op": 0
+                  },
+                  "stage": "output"
+                }
+              ]
+            }
+          ]
+        },
+        "hits": 524,
+        "inc_hinted_bs": 297003,
+        "l": 263807419686068737,
+        "la_attempts": 1,
+        "la_muls": 258148496,
+        "la_ops": 16134281,
+        "la_ops_last": 16134281,
+        "la_over_rho": 0.0015184416312201364,
+        "lin_mode": "fast",
+        "lines": 154709,
+        "m_final": 9,
+        "m_rule": 9,
+        "margin": 1.25,
+        "p": 1009,
+        "per_m": [
+          [
+            9,
+            297300,
+            154709,
+            524,
+            524
+          ]
+        ],
+        "rate_ratio": 1.2181129903008352,
+        "relation_muls": 1255864263,
+        "relation_over_rho": 0.007395703194590787,
+        "relations": 524,
+        "relations_available": 2830.808336089065,
+        "rels_failed_verify": 0,
+        "rels_per_line": 0.0033870039881325584,
+        "rels_verified": 524,
+        "rho": [],
+        "rho_s_mean": 1.0,
+        "rho_s_sd": 0.0,
+        "roots": 161814652,
+        "row_weight": 9.0,
+        "s": 0.017923482097329625,
+        "s_over_rho": 0.017923482097329625,
+        "s_plus": 0.03440728271629156,
+        "s_plus_over_rho": 0.03440728271629156,
+        "seed": 271,
+        "setup_muls": 933007,
+        "shared_bs": 24421,
+        "sieve_adds": 2396780867,
+        "sieve_lookups": 161814652,
+        "sieve_muls": 516135374,
+        "sieve_shared_reads": 80323960,
+        "sieve_steps": 156101381,
+        "solved": true,
+        "table_muls": 28108,
+        "total_muls": 3047150349,
+        "total_plus": 5849542124,
+        "trace": false,
+        "unknowns": 525,
+        "verify_muls": 3139678,
+        "wall_ms": 26739.838603,
+        "work_native": [
+          {
+            "attempt": 1,
+            "columns": 394,
+            "complete": false,
+            "kind": "projected",
+            "known_uncounted": "solver native bookkeeping remains incomplete",
+            "marker": "counted:cover_solve_subtotals",
+            "nonzeros": 12982,
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 16133888,
+              "modr_inv": 789,
+              "modr_mul": 16135069,
+              "rng_words": 394,
+              "word_op": 394
+            },
+            "returned_solution": true,
+            "rows": 394,
+            "schema": "cover.sieve.solve-work/v1"
+          }
+        ]
+      },
+      "work_native": {
+        "comparison_eligible": false,
+        "complete": false,
+        "diagnostic_priced_bitops": "4239416056766",
+        "excluded": "public domain validation; instance construction; control, allocation and memory under bitop/v1",
+        "foreign_hook_calls": 0,
+        "known_uncounted": [
+          {
+            "count": null,
+            "name": "graph_maps_sets_normalization_scheduling_and_replay_bookkeeping",
+            "status": "coverage_or_emission_pending"
+          },
+          {
+            "count": null,
+            "name": "cover_scalar_rng_and_native_bookkeeping_audit",
+            "status": "coverage_or_emission_pending"
+          },
+          {
+            "count": null,
+            "name": "rng_internal_work",
+            "status": "coverage_or_emission_pending"
+          }
+        ],
+        "observed_primitives": {
+          "field_add": 4497681469,
+          "field_inv": 8848649,
+          "field_mul": 2319535915,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 96983412,
+          "legendre": 0,
+          "modr_add": 16163552,
+          "modr_inv": 1888,
+          "modr_mul": 16172735,
+          "rng_words": 2442,
+          "word_op": 1668359279
+        },
+        "operand_rechecks": "included where inseparable from existing hooks",
+        "other_modulus_ops": 0,
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "unattributed",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "transport",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "528694340",
+            "phase": "model",
+            "primitives": {
+              "field_add": 332888,
+              "field_inv": 1419,
+              "field_mul": 391650,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "691798428",
+            "phase": "factor_base",
+            "primitives": {
+              "field_add": 233292,
+              "field_inv": 0,
+              "field_mul": 537630,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 524,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 2048,
+              "word_op": 2572
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "1900233362936",
+            "phase": "relations",
+            "primitives": {
+              "field_add": 3300260050,
+              "field_inv": 8100693,
+              "field_mul": 1119485418,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 6288,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 1143288109
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "1669810560642",
+            "phase": "descent",
+            "primitives": {
+              "field_add": 1196792479,
+              "field_inv": 746359,
+              "field_mul": 1199052762,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 96976600,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 524578808
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "668058819170",
+            "phase": "linear_algebra",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 16163552,
+              "modr_inv": 1888,
+              "modr_mul": 16172735,
+              "rng_words": 394,
+              "word_op": 489790
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "92821250",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 62760,
+              "field_inv": 178,
+              "field_mul": 68455,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        ],
+        "pricing": "executed modular hooks and observed native events",
+        "schema": "cover.graph.accounting-diagnostic/v1",
+        "total_bitops": null,
+        "unit": "bitop/v1",
+        "widths": {
+          "field_bits": 10,
+          "r_bits": 58
+        }
+      }
+    }
+  ],
+  "planned_executions": 2,
+  "projection_and_solve_accounting_checked": true,
+  "raw_executions": 2,
+  "rho_parity": false,
+  "schema": "cover.sieve.validation-summary/v1",
+  "scope": "two public-input endpoint checks; no AA or comparative timing inference; all recorded wall is spent-work diagnostic",
+  "source_revision": "2c5e02b34cb2d56dc392cd3b1f57d706d0d7b24a",
+  "unattempted_executions": 0
+}

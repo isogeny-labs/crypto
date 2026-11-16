@@ -434,6 +434,33 @@ L3 needs a lab host, which `isolab` prepares (§9).
 
 ## 7. The unit, and what each method is charged
 
+`ic.hashed_native_v1` invokes `crates/hashed-ecdl-tensor` on cofactor-one
+prime curves. Its `source`, `selectors`, `width` and `partial` backends use
+the actual native reduction/oracles. A scoped single-thread observer charges
+every checked native point-addition call (including identities/inverses);
+equal nonidentity inputs are labelled doubles. Scalar multiplication expands
+into those calls and is not charged a second time. Pairwise controls match
+the `CountedGroup` unit. Cold setup, bases, network construction, contraction,
+witness/row checks, elimination and internal recovery replay are included.
+
+Per-phase `native_meter_attempts_uncharged` counts attempted diagnostic meter
+charges, including exhausted attempts. Selector/cache/witness counters remain
+diagnostics. These do not inventory or calibrate all native arithmetic, so
+native S is a lower bound and cannot support a full cost ranking, even if an
+illustrative 0/0.1/1 band is stable. Clocks measure the instrumented solver;
+observer overhead is not calibrated away. Process/harness overhead and the
+runner's independent scalar check remain separately recorded.
+
+The native online window starts with the first labelled relation query after
+initial bases are ready; earlier curve/target validation remains cold setup.
+Later base retries stay online. Partial-base/collector initialization is in
+the cold base stage. Every canonical online phase is present, with explicit
+reasons for zero stages. A resource limit produces `exhausted`, never a zero
+witness count or a fast success. An outer killed child can have missing native
+counters; it is incomplete and cannot be ranked. The adapter does not support
+131-bit or binary challenge workloads. See
+[the bounded feasibility protocol](../../research/hashed_ecdl_ecbench_20261030/README.md).
+
 > **Every record is also priced in `bitop/v1`** (`docs/units/BITOPS.md`):
 > two-input gates per primitive, under frozen formulas, with nothing left
 > unpriced or converted by a host. It is the unit in which methods,
@@ -516,6 +543,29 @@ default; the ids are:
 | `transfer.quartic_cover` | rho | pull the instance back along the double cover `V⁴ = x³ + ax + b → E` into the Jacobian of a smooth plane quartic (non-hyperelliptic, genus 3), solve there, check on `E`; prime curves, `29 ≤ p < 2³¹`; frozen (the square roots of the point searches are neither charged nor tallied) |
 | `transfer.quartic_cover_v2` | rho | `transfer.quartic_cover` with the `F_p` multiplications of the point searches' square roots and `f(x)` evaluations tallied as `root_search_field_muls_uncharged` and listed unpriced (2026-10-28); charged work identical |
 | `transfer.ghs_cover` | rho | carry a `ghs_fp6` instance by the GHS conorm–norm map into the Jacobian of its genus-3 hyperelliptic cover over `F_{p²}`, solve there, check on `E` |
+
+**Which methods run on which Koblitz field.** Every method runs on a Koblitz
+curve with `n ≤ 62` (one word). Past one word, only methods written over the
+width-generic types run. The plan refuses every other pair with the message
+`methods::applicable` gives.
+
+| class | field degree | subgroup order | methods |
+|---|---|---|---|
+| one word (`Instance::Binary`) | `3 ≤ n ≤ 62` | below `2^64` | every applicable method |
+| wide (`Instance::Wide`, `koblitz_wide`) | `64 ≤ n ≤ 127` | below `2^127` | `rho.signed_frobenius_strong`, `…_legacy`, `…_escape`, `claw.pair_table` at plan time; `solve` also takes `…_strong_v2` and `claw.pair_table_v2` |
+| big (`Instance::Big`, `koblitz_big`) | `128 ≤ n ≤ 191` | past `2^128`, below `2^192` | `rho.signed_frobenius_strong`, `…_legacy`, `…_escape`, `…_strong_v2`, `claw.pair_table`, `claw.pair_table_v2` |
+
+The big class charges each method exactly as the table below states for the
+one-word curve. Its field is the three-word `Gf2W` of
+`certicom131_symlp::gf2w`. Its word and scalar types are `koblitz_big::W192`
+and `U192` (Montgomery arithmetic on three limbs). On curves small enough to
+solve, the unit tests check two things. The three-word strong rho walks step
+for step as the wide one: the same logarithm, steps, walks, table and
+charges, for all four ids. The three-word claw under the wide seed rule
+gives the wide claw's logarithm, counters and phase operations. The plain
+generic methods (`bsgs.*`, `rho.plain`, `rho.negation`, `kangaroo.*`) are
+written over the one-word `CountedGroup` with a `u64` order. They refuse
+both the wide and the big class.
 
 Curves of higher genus and the transfers are described in
 [§7a](#7a-curves-of-higher-genus-and-transfers).
@@ -1931,16 +1981,36 @@ Stated so that nothing here is read as more than it is:
   is a passing audit of these exact files, run elsewhere, that
   reproduced both runs, and a reader checks the receipt itself at the
   pointer the claim cites.
-- **Wide curves run two methods.** Prime curves need `p < 2^62`. Binary
-  curves run every method for `m ≤ 62`. Koblitz curves with `64 ≤ m ≤ 127`
-  (`koblitz_wide`, over the registry's modulus, so the m = 83 gate curve
-  `icv1-f2m83-tm6151469093347-debefd74` of AGENTS.md §8a builds) run only
-  `rho.signed_frobenius_strong` and `claw.pair_table`. Both are the one-word
-  code made generic over the word, and the committed sessions' replays pin
-  that the one-word walk did not change. Every other method refuses a wide
-  curve. A subgroup order past `2^64` is written as a decimal string
-  (`canonical::compat_u128`) and gets the `_v2` target laws
-  (`uniform_scalar_sha256_v2`, `hash_to_subgroup_v2`). Of the registered
+- **Wide and big curves run two method families.** Prime curves need
+  `p < 2^62`. Binary curves run every method for `m ≤ 62`. Koblitz curves
+  with `64 ≤ m ≤ 127` (`koblitz_wide`, over the registry's modulus, so the
+  m = 83 gate curve `icv1-f2m83-tm6151469093347-debefd74` of AGENTS.md §8a
+  builds) run only `rho.signed_frobenius_strong` and `claw.pair_table`.
+  Koblitz curves with `128 ≤ m ≤ 191` (`koblitz_big`, the three-word field)
+  run the strong rho in all four ids and the claw in both (§7, "Which
+  methods run on which Koblitz field"). All of them are the one-word code
+  made generic over the word, and the committed sessions' replays pin that
+  the one-word walk did not change. Every other method refuses a wide or
+  big curve at plan time. A subgroup order past `2^64` is written as a
+  decimal string (`ExactScalar`, the encoding `canonical::compat_u128` gave)
+  and gets the `_v2` target laws (`uniform_scalar_sha256_v2`,
+  `hash_to_subgroup_v2`). An order past `2^128` (the big class only) gets
+  the laws `uniform_scalar_sha256_big_v3` and `hash_to_subgroup_big_v3`.
+  They take the same inputs as decimal strings and use the whole 256-bit
+  SHA-256 digest. A planted scalar is `1 + D mod (r − 1)`. A public
+  abscissa is the digest's low `m` bits, and bit 255 picks the ordinate.
+  Every order that fits a `u128` keeps its law, so every existing workload
+  and record is unchanged.
+- **Only two big Koblitz curves exist, and neither is solvable here.** In
+  `128 ≤ m ≤ 191`, only `K_0` over `F_{2^131}` (ECC2K-130's field,
+  `icv1-f2m131-tm22283658519494248867-115e0dc5`, `r ≈ 2^129`) and `K_1` over
+  `F_{2^163}` (K-163, `icv1-f2m163-tm4845466632539410776804317-e15e581e`,
+  `r ≈ 2^162`) have `#E` equal to the cofactor times a prime. Both are in
+  the registry with their moduli. The generator is the constructor's
+  first-abscissa rule, not ECC2K-130's or SEC 2's published point, so
+  neither record carries an EC1 alias. A run on either is an instrument
+  check: it ends `exhausted` at its cap, and it does not measure a
+  solve. Of the registered
   wide Koblitz curves only m = 83 and m = 97 have a prime `#E/h`, so the
   cheapest wide solve is m = 83 itself: about `2^37` strong-rho steps,
   some 20 single-core hours at the 0.49 µs per step measured on Apple

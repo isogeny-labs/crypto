@@ -1,1 +1,0 @@
-Source-only native controller verification: eleven unit tests pass and strict all-targets Clippy passes after retaining the initial three test-only clone warnings/failure. The scientific binary remains unchanged. No new scientific case ran during these checks.
