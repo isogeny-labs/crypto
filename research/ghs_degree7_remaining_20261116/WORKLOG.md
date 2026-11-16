@@ -105,3 +105,30 @@ Commit third amendment; finish b=68 and b=84, independently audit receipts.
 
 The direct finite-field fallback was exact but not computationally bounded
 enough in the exceptional ideals. The interrupted files contain no results.
+
+## 2026-11-15 23:08 America/Los_Angeles
+
+### What was done
+
+Committed the Frobenius reduction at `0c362e2ba465`. Both counted v3 runs
+completed. b=68: 243 systems, 232 zero-dimensional, ten Frobenius-reduced,
+one constant assignment, 2,785 parameter solutions, 355 degree-seven
+coprime candidates, zero full identities, zero censored, 7.636379 CPU s.
+b=84: corresponding counts 243, 232, ten, one, 2,774, 340, zero, zero,
+7.837593 CPU s. The source SHA256 matches between both receipts. Wrote the
+bounded result note.
+
+### Decisions made
+
+This closes the cubic-square denominator class for the fixed carrier and
+the two target representatives. Continue to two quadratic branch poles plus
+a linear square, then three quadratic branch poles.
+
+### Open threads
+
+Independent elimination replay; remaining two degree-seven pole classes;
+explicit trace-+22 transfer if any map is found.
+
+### Errors
+
+None in the final v3 runs. Earlier interrupted receipts remain incomplete.
