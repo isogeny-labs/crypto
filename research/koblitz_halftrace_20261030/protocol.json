@@ -1,0 +1,622 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "Verified native session and receipt manifests",
+      "Native replay and A/A admission",
+      "All records including warmups, failures and holdouts"
+    ],
+    "outputs": [
+      "Saved native cache, IC A/A, rho A/A and matched-rho comparisons",
+      "S pricing bands at unpriced weights 0, 0.1 and 1",
+      "Canonical export and flow accounting"
+    ],
+    "script": {
+      "path": "research/koblitz_halftrace_20261030/analyze.sh",
+      "sha256": "19c10fd6ce77a858ead6c2a0ea1735d2855c2f367ed7fbd99591a025f0060627"
+    }
+  },
+  "arms": [
+    {
+      "description": "Strong signed-Frobenius rho reference",
+      "id": "rho-strong",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "commit": "7c58661935b79153ff74c1208d0592aa56ed04a1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.signed_frobenius_strong"
+      },
+      "role": "reference"
+    },
+    {
+      "description": "Identical rho reference under another arm name",
+      "id": "rho-aa",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "commit": "7c58661935b79153ff74c1208d0592aa56ed04a1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.signed_frobenius_strong"
+      },
+      "role": "control_aa",
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "description": "Unchanged legacy halftrace algorithm inside the candidate executable; this is not an unmodified-source binary",
+      "id": "ic-baseline",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "commit": "7c58661935b79153ff74c1208d0592aa56ed04a1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "factor_base": "koblitz-orbit:divisor=1;2",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "method": "ic.pipeline",
+        "oracle": "mitm-frobenius-counted:m=3"
+      },
+      "role": "baseline",
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "description": "Identical legacy-path IC under another arm name",
+      "id": "ic-aa",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "commit": "7c58661935b79153ff74c1208d0592aa56ed04a1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "factor_base": "koblitz-orbit:divisor=1;2",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "method": "ic.pipeline",
+        "oracle": "mitm-frobenius-counted:m=3"
+      },
+      "role": "control_aa",
+      "same_instrument_as": "rho-strong"
+    },
+    {
+      "description": "Only the lifting cache parameter changes; cold construction is charged",
+      "id": "ic-halftrace-tables",
+      "instrument": {
+        "binary_sha256": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "commit": "7c58661935b79153ff74c1208d0592aa56ed04a1",
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release"
+        },
+        "image_digest": null,
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "factor_base": "koblitz-orbit:divisor=1;2,halftrace_tables=1",
+        "linalg": "incremental-gauss-full-rank-checked",
+        "method": "ic.pipeline",
+        "oracle": "mitm-frobenius-counted:m=3"
+      },
+      "role": "candidate",
+      "same_instrument_as": "rho-strong"
+    }
+  ],
+  "authors": [
+    "Native Rust integration session"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "C1",
+      "text": "All recovered scalars verify and baseline/candidate factor-base point hashes match."
+    },
+    {
+      "class": "comparative",
+      "decided_by": [
+        "C-cache"
+      ],
+      "id": "C2",
+      "if_not_supported": "Report regression, control overlap or invalid admission as observed.",
+      "if_supported": "Only this source, curve, workload and flag comparison; no comparison against an unmodified-source executable.",
+      "text": "The opt-in cache has a lower admitted cold end-to-end wall cost than the same-binary legacy lift on these frozen workloads."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "C3",
+      "text": "Default-path regression versus unmodified source, m=83 transfer, ECC2K-130 solving and asymptotic improvement remain unestablished."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": "C-ic-aa",
+      "not_applicable_reason": null,
+      "present": true
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "This measures implementation cost on identical public instances and asserts no detection or null-population claim; IC and rho A/A arms are the cost null controls.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every row is a planted known-answer instance independently verified by the existing native harness; native E2E fixtures also exercise verified recovery through the same public recipe.",
+      "present": false
+    }
+  },
+  "created": "2026-10-30",
+  "decision_rule": {
+    "comparison_ids": [
+      "C-cache"
+    ],
+    "effect_size_measure": "Candidate/baseline cold native ratio; report per-workload rows and reusable setup separately.",
+    "interval": "Native ecbench v2 linearised 95-percent total-wall interval and paired bootstrap supplement (4000 resamples, seed 20261030).",
+    "multiple_comparison_correction": "none",
+    "statistic": "Native ecbench total-wall ratio of sums over matched workload/round pairs; counted S and strong-rho distance separately.",
+    "text": "Report native total-wall candidate/baseline ratio, the native linearised 95-percent interval and bootstrap supplement, IC and rho A/A results, complete pair counts and all failures. C2 is supported only if admitted native total-wall interval lies below one, the shift exceeds IC A/A spread, every scalar and base hash verifies, and no held-out workload reverses the claimed ordering beyond the same control spread. Otherwise report overlap, regression, invalid admission or inconclusive as observed. Do not infer default-path regression against the saved unmodified binary.",
+    "threshold": "Admitted cold ratio interval entirely below 1 and beyond IC A/A; correctness and holdout conditions all pass.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "within_control_distribution",
+      "regression_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "measurement",
+    "placement": {
+      "cpus": 4,
+      "instance_type": "c8a.2xlarge",
+      "memory": "4Gi",
+      "spot": true
+    },
+    "queue": "cpu-l2-spot",
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 900
+  },
+  "freeze": {
+    "commit": "7c58661935b79153ff74c1208d0592aa56ed04a1",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-30T15:33:21Z",
+    "protocol_sha256": "e8e527aacb96a7e172069353254b47bce33526da7111f913b67bcdc4648c0d07",
+    "status": "frozen"
+  },
+  "hypotheses": [
+    {
+      "id": "H1",
+      "mechanism": "Curve-local byte tables replace dependent squarings; cold table construction is included.",
+      "predictions": [
+        {
+          "direction": "lower",
+          "id": "P1",
+          "metric": "cold_wall",
+          "minimum_effect": "Native admitted total-wall interval below one and beyond IC A/A spread.",
+          "provenance": {
+            "data_seen": [],
+            "decisive_scope": "Eight predeclared n=31 workloads only.",
+            "first_recorded_in": "research/koblitz_halftrace_20261030/PROTOCOL.md",
+            "sample_status": "out_of_sample",
+            "written_at": "2026-10-30"
+          },
+          "role": "decisive"
+        }
+      ],
+      "statement": "A cached linear halftrace reduces repeated lifting work while preserving output order."
+    }
+  ],
+  "inadmissible": [
+    "Local native timing as substitute for required EKS admission",
+    "Changing frozen workloads or recipe after seeing data",
+    "Default-path no-regression or unmodified-source speedup claims from same-binary controls",
+    "m=83, ECC2K-130 or asymptotic transfer claims",
+    "Marking a planned or submitted run complete without receipts and replay"
+  ],
+  "invalidation_rules": [
+    "Any failed scalar replay or unequal baseline/candidate factor-base point hash invalidates C2.",
+    "Retain all timeouts, failures, interrupted rows and exclusions; do not select only fast successes.",
+    "L2, native A/A admission and complete matched pairs are mandatory for a native-time claim.",
+    "A stage-only gain, correctness elapsed time or unchanged coarse operation counter is not an end-to-end result."
+  ],
+  "links": {
+    "note": "Prospective record before scientific data. Existing PROTOCOL.md and spec inputs are unchanged. Later main has an independently recorded build failure; measurements are scoped to this tested source.",
+    "pull_request": "https://github.com/isogeny-labs/crypto/pull/2955",
+    "source": "7c58661935b79153ff74c1208d0592aa56ed04a1",
+    "spec": "research/koblitz_halftrace_20261030/spec.json"
+  },
+  "literature": [
+    {
+      "claim": "Binary point-recovery contract.",
+      "provenance": "retrieved",
+      "ref": "https://www.secg.org/sec1-v2.pdf section 2.3.4",
+      "verified_by": "Native integration session before implementation."
+    },
+    {
+      "claim": "Halftrace linearity precedent, first-root ordering and existing complete native pipeline.",
+      "provenance": "internal",
+      "ref": "src/binary_ecc/f2m.rs and existing Koblitz factor-base implementation",
+      "verified_by": "Source review and differential/E2E tests."
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "counters": [
+      "group operations",
+      "as_solves",
+      "native field counts",
+      "unpriced operations",
+      "factor-base points hash",
+      "relation counts",
+      "matrix rank"
+    ],
+    "isolation_required": "L2",
+    "order": "alternate",
+    "record": [
+      "cpu_model",
+      "SMT",
+      "NUMA",
+      "kernel_release",
+      "hypervisor",
+      "binary_sha256",
+      "OCI digest",
+      "source_revision",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "PSI",
+      "steal_ticks",
+      "foreign_busy_ticks",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": "This is a native engineering cache. Existing coarse as_solves counts do not price its squaring/table delta. Only admitted L2 native complete-pipeline time against A/A can decide C2; counted S is secondary and no algebraic improvement is inferred.",
+    "warmups": 1
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "paired_ratio",
+        "definition": "Existing ic.pipeline solve interval includes cold factor-base and cache construction, relation collection, matrix solving and verified recovery. Retain process wall separately; stage times alone cannot establish improvement.",
+        "id": "cold_wall",
+        "kind": "timed",
+        "name": "Cold complete-pipeline native wall cost",
+        "resolution": "Native monotonic-clock resolution recorded by the harness",
+        "source": "records.jsonl time.solve_wall_ns; native comparison wall.total_wall_ratio and total_wall_ci95",
+        "uncertainty": "paired_bootstrap_ci95",
+        "unit": "ns"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "paired_ratio",
+        "definition": "All charged native phases, with unpriced operations separately retained and evaluated at weights 0, 0.1 and 1. Unchanged Artin-Schreier solve count does not price the cache delta.",
+        "id": "s",
+        "kind": "counted",
+        "name": "S",
+        "resolution": "1 GAE/sqrt(r)",
+        "source": "records.jsonl cost.s and native comparison ops",
+        "uncertainty": "paired_bootstrap_ci95",
+        "unit": "GAE/sqrt(r)"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Scalar replay and identical ordered factor-base point hashes in IC baseline and candidate.",
+        "id": "verified",
+        "kind": "exact",
+        "name": "Verified scalar and base parity",
+        "resolution": "exact",
+        "source": "Native audit/replay records and factor_base.points_sha256",
+        "uncertainty": "none_exact",
+        "unit": "boolean per execution"
+      }
+    ]
+  },
+  "protocol_id": "KOBLITZ-HALFTRACE-NATIVE-20261030",
+  "question": "On the frozen eight degree-31 K_0 one-target workloads, what is the native cold complete-pipeline cost of cached halftrace lifting versus the preserved legacy lift in the same executable, including table construction?",
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Unmasked engineering flag comparison. Analysis commands and decision rule are frozen prospectively; no parameter tuning after data.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Eight uniform-scalar one-target workloads from target_seed=20261030, fixed before data."
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "nonce": null,
+      "note": "Existing ecbench law from measurement.seed=20261030 and frozen plan; retain all row algorithm_seed values.",
+      "seeds": []
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "Cold total wall by arm and workload with A/A",
+      "Phase breakdown and S against strong rho"
+    ],
+    "report_dir": "research/koblitz_halftrace_20261030",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 8,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "paired_bootstrap",
+      "min_attainable_two_sided_p": null,
+      "note": "Eight independent workload clusters with six paired rounds; same native linearised interval and bootstrap supplement. This is not a prospective guarantee of power for a small effect. A/A overlap or an imprecise interval is inconclusive. The four held-out workloads are reported separately without retuning.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": null,
+      "fixed_seconds": null,
+      "measured_on": "Unmeasured: no authorized isolated preflight has run. Do not substitute correctness-test times. The first admitted call per arm supplies a diagnostic only; it does not alter the fixed budget, sample size or stopping rules.",
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 6,
+    "warmups": 1
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Fixed 5 arms x 8 workloads x (1 warmup plus 6 measured rounds) = 280 planned executions; keep the original 900-second Kubernetes deadline including provisioning."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Stop scientific launch if S3 resume checkpoint or source-image identity is not admitted. No automatic measurement retries or input retuning after any observed data."
+    }
+  ],
+  "study_dir": "research/koblitz_halftrace_20261030",
+  "variable_ledger": {
+    "aa_not_applicable": null,
+    "comparisons": [
+      {
+        "arms": [
+          "ic-baseline",
+          "ic-halftrace-tables"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "halftrace_tables"
+        ],
+        "id": "C-cache"
+      },
+      {
+        "arms": [
+          "ic-baseline",
+          "ic-aa"
+        ],
+        "design": "aa",
+        "differs_in": [],
+        "id": "C-ic-aa"
+      },
+      {
+        "arms": [
+          "rho-strong",
+          "rho-aa"
+        ],
+        "design": "aa",
+        "differs_in": [],
+        "id": "C-rho-aa"
+      },
+      {
+        "arms": [
+          "rho-strong",
+          "ic-halftrace-tables"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "method"
+        ],
+        "id": "C-rho-context"
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Existing registered K_0 n=31 constructor, same irreducible polynomial and subgroup.",
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "icv1-f2m31-tm90707-c95f16f5"
+      },
+      {
+        "how": "Uniform scalar law fixed before data; first four primary, last four untouched holdouts; no retuning.",
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "target_seed=20261030; eight separate one-target workloads"
+      },
+      {
+        "how": "One native source-pinned binary for all arms; record actual binary hash and OCI digest in receipts before interpreting data.",
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "7c58661935b79153ff74c1208d0592aa56ed04a1"
+      },
+      {
+        "how": "Native ecbench child environment sets RAYON_NUM_THREADS=1 and OMP_NUM_THREADS=1.",
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1
+      },
+      {
+        "how": "Frozen ecbench alternate order, six rounds and one warmup; all arms interleaved.",
+        "name": "arm_order",
+        "treatment": "randomized"
+      },
+      {
+        "how": "Harness derives each execution seed from frozen measurement seed 20261030 and plan.",
+        "name": "algorithm_seed",
+        "treatment": "randomized"
+      },
+      {
+        "how": "Record CPU, SMT, NUMA, kernel, hypervisor, affinity, frequency and load; retain every L2 admission result.",
+        "name": "host_and_frequency",
+        "treatment": "measured"
+      },
+      {
+        "how": "A new FastCurve is constructed inside each factor-base build; cold byte-table allocation and construction stay charged.",
+        "name": "cache_setup_and_layout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Mandatory L2 and A/A checks; record PSI, steal and foreign busy ticks; no local-time fallback.",
+        "name": "co_tenants_and_memory_pressure",
+        "treatment": "measured"
+      },
+      {
+        "how": "No automatic benchmark retries; invalid interrupted clocks retained and not admitted.",
+        "name": "preemption",
+        "treatment": "measured"
+      },
+      {
+        "how": "Native frozen analysis commands; labels not masked, no post-data recipe selection.",
+        "name": "analyst",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "0",
+          "1"
+        ],
+        "name": "halftrace_tables"
+      }
+    ]
+  },
+  "version": 1
+}
