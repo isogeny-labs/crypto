@@ -164,3 +164,6 @@ Before the final artifact-tool publication, a disposable linked worktree and fil
 ## Portable source ownership (2026-11-16)
 
 A second disposable file-remote control on a case-insensitive filesystem reproduced an uppercase manifest spelling replacing a tracked lowercase successor with exit zero. Normalize ownership keys with NFC and case folding, so ambiguous portable spellings remain owned even when the tracked source is omitted. This is a conservative source-preservation rule across hosts. The new regression covers case and canonical Unicode aliases with present and omitted tracked sources. All 48 artifact controls pass; all 8,228 existing entries remain accepted and unchanged. Canonical source SHA256 is 35dfef67a6acda1184353d5e024ab850debfd404dd72241ed369be42daeaaa8d. [pcc:unverified]
+
+## Claim records and complete consumer membership
+PCC-20261116-942215 pins the four software-control receipts, protocol and reports; PCC-20261116-e2b3ae pins the retained artifact-control receipts. Both remain not_covered unsigned data. No signed verdict is asserted. Add cryptanalysis to the artifact-tool lock entry because that repository already has the shared copy; its parity check now includes the tool. The owner still lands before either prepared consumer.
