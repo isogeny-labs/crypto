@@ -27,3 +27,17 @@ Run certified replay, preserve failures, summarize/reconcile counts natively, wr
 
 ### Errors
 No original scientific error. Imported warnings retained. Disk tight, no cleanup authorized.
+
+## Full-row replay and report completed
+
+### What was done
+Separately frozend34e82f88f19/checkpoint20261116T163558Z, once-only replay exits0/empty stderr. Dense full-catalogue ranks confirm all48systems consistent: target-rank difference1on16successes,0on32noncompletions. Original24fields match in every policy; input/control files byte-match. Native reduction also verifies all6old-source/original-size count vectors against preceding shifted candidate. Wrote exact summary/graph and identical3page combined reports under bothrunids; all3pages visually inspected.
+
+### Decisions made
+All12original-size inputs recover including6full-degree-source cases. Four further successes only genus3H18, at much higher generation counts thanH36. All16successes use full core rank. Small genus2/4failures are real finite admitted-equation shortages, not a missed pivot. Full-family exhaustion in applicable small-Hcases cannot be repaired by LA reorder alone; changing row supply/policy would be new algorithm/data. No timing or10xpremise follows from core shrinkage. Objective active, PR unmerged.
+
+### Open threads
+Need a new cheap-constraint supply/cost mechanism rather than matrix-only tuning, plus changed-endpoint elimination costs if used. Producer gates share native arithmetic and do not replace independent scientific validation. Today's shared log remains reserved; scoped handoff used. Current-head CI to be checked after push.
+
+### Errors
+No scientific/build/render failure. Imported warnings retained. Original Cargo bytes preserve first manifest. No unrelated cleanup; .resume/RESUME.md remains unstaged.
