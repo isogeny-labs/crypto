@@ -16,6 +16,13 @@ use crate::cryptanalysis::large_prime_filter::{
 use rand::rngs::StdRng;
 use std::collections::HashMap;
 
+#[path = "jv_sieve_two_large_prime_dlp.rs"]
+mod dlp;
+pub use dlp::{
+    run_two_large_prime_dlp_on, ProtectedTargetProjection, TwoLargePrimeDlpOptions,
+    VerifiedDescentRelation,
+};
+
 /// Distinct roots of a nonzero polynomial of degree <= 2, or refusal.
 /// Repeated roots are refused, rather than silently treated as simple roots.
 fn low_degree_roots(ring: &FpRing, f: &[u64], sqrt: &[u64]) -> Option<Vec<u64>> {
@@ -285,6 +292,16 @@ impl TwoLargePrimeSieve {
         relations: &[TwoLargePrimeRelation],
         options: &LargePrimeFilterOptions,
     ) -> Result<FilteredTwoLargePrimeRelations, &'static str> {
+        let inputs = self.checked_inputs(ctx, relations, options)?;
+        filter_and_replay(&inputs, options)
+    }
+
+    fn checked_inputs(
+        &self,
+        ctx: &Ctx,
+        relations: &[TwoLargePrimeRelation],
+        options: &LargePrimeFilterOptions,
+    ) -> Result<Vec<PartialRelation>, &'static str> {
         if !(3..1u64 << 63).contains(&options.modulus)
             || options.modulus.is_multiple_of(2)
             || relations.len() > 4096
@@ -304,30 +321,36 @@ impl TwoLargePrimeSieve {
                 return Err("input relation binding or Jacobian verification failed");
             }
         }
-        let inputs: Vec<_> = relations.iter().map(|r| r.partial.clone()).collect();
-        let (certificates, report) =
-            filter_large_primes(inputs.clone(), options).map_err(|_| "graph refusal")?;
-        for row in &certificates {
-            let replay =
-                replay_complete_relation(row, &inputs, options.modulus).ok_or("witness refusal")?;
-            if replay.small != row.small || replay.rhs != row.rhs {
-                return Err("witness mismatch");
-            }
-        }
-        let rows = certificates
-            .iter()
-            .map(|r| SparseRel {
-                cols: r.small.iter().map(|&(c, v)| (c as usize, v)).collect(),
-                rhs: r.rhs,
-            })
-            .collect();
-        Ok(FilteredTwoLargePrimeRelations {
-            rows,
-            replayed_rows: certificates.len(),
-            certificates,
-            report,
-        })
+        Ok(relations.iter().map(|r| r.partial.clone()).collect())
     }
+}
+
+fn filter_and_replay(
+    inputs: &[PartialRelation],
+    options: &LargePrimeFilterOptions,
+) -> Result<FilteredTwoLargePrimeRelations, &'static str> {
+    let (certificates, report) =
+        filter_large_primes(inputs.to_vec(), options).map_err(|_| "graph refusal")?;
+    for row in &certificates {
+        let replay =
+            replay_complete_relation(row, inputs, options.modulus).ok_or("witness refusal")?;
+        if replay.small != row.small || replay.rhs != row.rhs {
+            return Err("witness mismatch");
+        }
+    }
+    let rows = certificates
+        .iter()
+        .map(|r| SparseRel {
+            cols: r.small.iter().map(|&(c, v)| (c as usize, v)).collect(),
+            rhs: r.rhs,
+        })
+        .collect();
+    Ok(FilteredTwoLargePrimeRelations {
+        rows,
+        replayed_rows: certificates.len(),
+        certificates,
+        report,
+    })
 }
 
 #[cfg(test)]

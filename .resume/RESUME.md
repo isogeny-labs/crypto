@@ -1,4 +1,52 @@
-# Current checkpoint:28FINISHED, publish packet then target integration (16 November12:50Z)
+# Current checkpoint:29SOURCE READY, NOTRUN (16 November13:36Z)
+
+NEWtypedaffine/protectedtarget2LPfullpipeline+publicworkers implemented,
+allfinalsourcechecksPASS. Native22sieve(twoignored)/12genericfilter/3RREF/
+newpublicinput1/oldworker1;library/3examplesstrictClippy/actual3builds;
+metadata-onlycalibrationemissionexample rebuilt/retested/linted. Qualifier14
+(12shared+2new) +component12/build/strictClippy PASS;old28summaryBYTEEXACT.
+Rootlibraryfrozenduringnativechecks. Original6filebefore-testhashprecedes
+example-onlymetadatachange; distinct /tmp/ic-two-lp-dlp-post-metadata-root-source.sha256
+ALLPASS. No livecompiler/scientificjob. No29rundir/data existsyet.
+
+FILESnew src/cryptanalysis/jv_sieve_two_large_prime_dlp.rs and publicexample
+examples/jv_sieve_two_large_prime_dlp_compare.rs; parent2LPhelperrefactored
+to share checked_inputs/filter_and_replay, olddefaultpathsunchanged.
+run_two_large_prime_dlp_on: uniqueBcollector, typedverified6pointdescent,
+protecttargetcolumnsmall_count with-b/RHSa, LPeliminate/replay, incremental
+RelationSystem targetsolve, actualellipticreplay. Fatalcert/wrongscalarstops;
+no oldsolvefallback. Reportsallhomrows/descentprefixes/attempts/finalcerts.
+Newworkerpublicserde rejectsanswerfields, generatorseparate/Spec.d0; oneclaimed
+Rayonthread. Legacyunitcalibration emittedseparately/excludedICsubtotal but
+includedcapturedprocesswall. Allcompletecost/primarycomparativeflagsfalse.
+
+SELECTEDProspectiveAmendment24/cover-two-lp-dlp-validation-plan.json +
+run-two-lp-dlp-local.sh/two-lp-dlp-report.typ: p1009fresh307,m9,75%smallbase,
+full1018081B,8192residualcap/32accepteddescents, originalICthen2LP,
+1validation0warm/noRho/AA/ratios,900worker1900whole/60fixtureCPU0/8GiB/noretry.
+Requireheldoutactualscalars/native+extraellreplay, true2LP/nontrivialcycle,
+allaffinecertificates and independentlydeterminedtarget, flow/phaseprice/
+selecteduniform/zeroOTHERforeign. Rustqualifier two-lp-dlp-analysis checks
+RUN-DIR/status+6flow+public/privatebinding+linearproof+scalar+prices; no signed
+independentJacobianverdict. BEFOREsolecall mustfreshsource/buildmanifests,
+COMMIT/PUSH cleanSOURCE/spec to PR4288, then
+/workspace/ic-local-runs/local-cover-two-lp-dlp-validation-20261116-29.
+Wrappercopiesimmutablebins/source; distinctpre-workers.sha256 capturespublic/
+parentfixture+argvBEFOREeitherattack. Afterexit originalcopiedqualifier/newsummary,
+fullrawLOCALif>64KiB+hash,fullflow/report/inspectallpages/exactbenchcopies/publication.
+No29measurementyet. CurrentHEADb8001c4a3 +DIRTYnewfullcode/docs/qualifier/prep/lessonO.
+
+28PUBLISHEDf96518ee578a4572451d776adc55cb659a131193/PRactualrank29vs114updated.
+Artifactbotb8001c4a3 FF integrated/exactignored28PNGrestored/hashPASS,neverreadd.
+ScopedoutcomeO-a66fa8db423e recorded. KB/Conductorabsent/fallbacksourcesread;
+newreceiptsvalidation/two-lp-dlp-{kb-search1,kb-search2,conductor,checkpoint-gate}.log.
+S3gatefailsmissingprofile/token; userexplicitlocalorRunpod overridesbackend,
+no credentialrequest/S3uploadassertion. GoalACTIVE/localusable/no stopgoal/subagents.
+CIlastd2at12:47appreview+migrateSUCCESS/otherlistsEMPTY/requiredgatesunconfirmed,
+next>=13:37absentevent/newsourcepublication. PRregular/automerge/no manualmerge.
+Fullcoldstrongrho costs remainopen; no parityclaim fromimplementation orrankgain.
+
+# Previous checkpoint:28FINISHED, publish packet then target integration (16 November12:50Z)
 
 Sourced2c2e7f947ce1ea549c74532424207e7c8c8879d publishedBEFOREsole28call.
 Run /workspace/ic-local-runs/local-cover-two-lp-component-20261116-28 exits0/46.497s,

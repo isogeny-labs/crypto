@@ -2,7 +2,7 @@
 #[allow(dead_code, clippy::enum_variant_names)]
 #[path = "../../../../../src/cryptanalysis/bitops.rs"]
 mod bitops;
-use bitops::{Field, Prim, Widths};
+pub(crate) use bitops::{Field, Prim, Widths};
 use serde_json::{json, Value};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -10,9 +10,9 @@ use std::{
     fs::{self, File, OpenOptions},
     io::Write,
 };
-type Terms = Vec<(u64, u64)>;
+pub(crate) type Terms = Vec<(u64, u64)>;
 type Row = (Terms, Terms);
-const KINDS: [&str; 12] = [
+pub(crate) const KINDS: [&str; 12] = [
     "field_add",
     "field_mul",
     "field_sqr",
@@ -26,7 +26,7 @@ const KINDS: [&str; 12] = [
     "hash_probe",
     "rng_words",
 ];
-const PHASES: [&str; 9] = [
+pub(crate) const PHASES: [&str; 9] = [
     "unattributed",
     "walk",
     "transport",
@@ -37,16 +37,16 @@ const PHASES: [&str; 9] = [
     "linear_algebra",
     "verification",
 ];
-fn n(v: &Value, k: &str) -> Result<u64, String> {
+pub(crate) fn n(v: &Value, k: &str) -> Result<u64, String> {
     v[k].as_u64().ok_or_else(|| format!("invalid {k}"))
 }
-fn mul(a: u64, b: u64, p: u64) -> u64 {
+pub(crate) fn mul(a: u64, b: u64, p: u64) -> u64 {
     ((a as u128 * b as u128) % p as u128) as u64
 }
-fn add(a: u64, b: u64, p: u64) -> u64 {
+pub(crate) fn add(a: u64, b: u64, p: u64) -> u64 {
     ((a as u128 + b as u128) % p as u128) as u64
 }
-fn pow(mut a: u64, mut e: u64, p: u64) -> u64 {
+pub(crate) fn pow(mut a: u64, mut e: u64, p: u64) -> u64 {
     let mut r = 1;
     while e > 0 {
         if e & 1 != 0 {
@@ -59,7 +59,7 @@ fn pow(mut a: u64, mut e: u64, p: u64) -> u64 {
 }
 // Reuse residual_walk::is_prime_u64's twelve-base deterministic u64 test;
 // arithmetic here is independent of the collector and its counters.
-fn prime(n: u64) -> bool {
+pub(crate) fn prime(n: u64) -> bool {
     if n < 2 {
         return false;
     }
@@ -85,7 +85,7 @@ fn prime(n: u64) -> bool {
     }
     true
 }
-fn canonical(v: &Value, limit: u64, p: u64) -> Result<Terms, String> {
+pub(crate) fn canonical(v: &Value, limit: u64, p: u64) -> Result<Terms, String> {
     let t: Terms = serde_json::from_value(v.clone()).map_err(|_| "invalid sparse terms")?;
     if t.len() > 4096
         || t.iter().any(|&(i, c)| i >= limit || c == 0 || c >= p)
@@ -95,7 +95,7 @@ fn canonical(v: &Value, limit: u64, p: u64) -> Result<Terms, String> {
     }
     Ok(t)
 }
-fn accumulate(out: &mut BTreeMap<u64, u64>, row: &Terms, c: u64, p: u64) {
+pub(crate) fn accumulate(out: &mut BTreeMap<u64, u64>, row: &Terms, c: u64, p: u64) {
     for &(i, a) in row {
         let slot = out.entry(i).or_default();
         *slot = add(*slot, mul(c, a, p), p);
@@ -135,7 +135,7 @@ fn rank(rows: &[Terms], columns: usize, p: u64) -> usize {
     }
     r
 }
-fn counts(v: &Value) -> Result<BTreeMap<String, u64>, String> {
+pub(crate) fn counts(v: &Value) -> Result<BTreeMap<String, u64>, String> {
     if v.as_object().is_none_or(|m| m.len() != KINDS.len()) {
         return Err("counter schema".into());
     }
@@ -148,7 +148,7 @@ fn counts(v: &Value) -> Result<BTreeMap<String, u64>, String> {
     }
     Ok(m)
 }
-fn price(m: &BTreeMap<String, u64>, w: &Widths) -> Result<u128, String> {
+pub(crate) fn price(m: &BTreeMap<String, u64>, w: &Widths) -> Result<u128, String> {
     m.iter()
         .filter(|(k, _)| k.as_str() != "rng_words")
         .try_fold(0u128, |s, (k, &v)| {
@@ -160,6 +160,12 @@ fn price(m: &BTreeMap<String, u64>, w: &Widths) -> Result<u128, String> {
             )
             .ok_or("price overflow".into())
         })
+}
+pub(crate) fn bitop_mul64() -> u128 {
+    bitops::int_mul(64)
+}
+pub(crate) fn bitop_add64() -> u128 {
+    bitops::int_add(64)
 }
 fn validate(raw: &Value) -> Result<Value, String> {
     let s = &raw["summary"];
@@ -332,7 +338,7 @@ fn validate(raw: &Value) -> Result<Value, String> {
     let calls = n(u, "calls")?;
     let draws = n(u, "raw_draws")?;
     let rejected = n(u, "rejections")?;
-    let int_price = (draws as u128) * bitops::int_mul(64) + (calls as u128) * bitops::int_add(64);
+    let int_price = (draws as u128) * bitop_mul64() + (calls as u128) * bitop_add64();
     if u["schema"] != "modular-uniform-events/v1"
         || u["complete"] != false
         || u["other_modulus_calls"] != 0
