@@ -6,6 +6,7 @@ import random
 import time
 from pathlib import Path
 
+t_program_start=time.process_time_ns()
 PTH=Path(__file__).resolve().parent
 hit=json.loads((PTH/'degree7_quadratic_square_30.json').read_text())['hits'][0]
 F3=GF(3);Z=PolynomialRing(F3,'z');z=Z.gen()
@@ -110,7 +111,10 @@ else:raise RuntimeError('target descent not reached within 20000 offsets')
 recover=(int(sum(row[i]*logs[i] for i in range(n)))*inverse_mod(h,r)-tt)%r
 assert recover*P==Q and recover*G==H and recover==secret
 timing['descent_verify_cpu_s']=float((time.process_time_ns()-start)/1e9)
-timing['ghs_total_cpu_s']=sum(timing.values())
+t_after_attack=time.process_time_ns()
+phase_cpu_s=sum(timing.values())
+timing['ghs_total_cpu_s']=float((t_after_attack-t_program_start)/1e9)
+timing['setup_and_factor_base_cpu_s']=timing['ghs_total_cpu_s']-phase_cpu_s
 
 # The K-Frobenius eigenvalue has order three on this new r-primary subgroup.
 Fr=lambda Pt:E(Pt[0]^243,Pt[1]^243)
@@ -156,7 +160,14 @@ out={'schema':'ghs.odd5.s3-full-attack/v1','source_sha256':hashlib.sha256(Path(_
  'factor_base_size':n,'factor_base_rational_points':len(pts),'relation_attempts':attempts,'accepted_relations':len(rows),
  'relation_rank':int(M.rank()),'descent_attempts':descent_attempts,'recovered_scalar':int(recover),
  'timing':timing,'rho_eigenvalue':lam,'rho_trials':rho,'rho_median_cpu_s':sorted(z['cpu_s'] for z in rho)[len(rho)//2],
- 'rho_median_steps':sorted(z['steps'] for z in rho)[len(rho)//2]}
+ 'rho_median_steps':sorted(z['steps'] for z in rho)[len(rho)//2],
+ 'source_P':[[int(c) for c in z.polynomial().list()] for z in (P[0],P[1])],
+ 'source_Q':[[int(c) for c in z.polynomial().list()] for z in (Q[0],Q[1])],
+ 'trace_G':[[[int(c) for c in v.polynomial().list()] for v in z.list()] for z in (G[0],G[1])],
+ 'trace_H':[[[int(c) for c in v.polynomial().list()] for v in z.list()] for z in (H[0],H[1])],
+ 'factor_base_points':[[list(digits(z,3)) for z in (pt[0],pt[1])] for pt in pts if pt[1]!=0 and digits(pt[1],3)<=digits(-pt[1],3) and h*J(Rk([-pt[0],1]),Rk([pt[1]]))!=O],
+ 'relation_rows':rows,'relation_rhs':rhs,'factor_base_logs':[int(z) for z in logs],
+ 'descent_row':row,'descent_offset':tt}
 target=PTH/'s3_full_attack.json'
 assert not target.exists(), 'refusing to overwrite immutable receipt'
 target.write_text(json.dumps(out,indent=2,sort_keys=True,default=int)+'\n')
