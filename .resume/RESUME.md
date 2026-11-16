@@ -1,3 +1,40 @@
+# Current checkpoint:38SOURCE READY; ownedRunpodCPUready/notdispatched
+
+GoalACTIVE/RustgraphIC+cheapextension-field relationfinderresearchtowardrho parity.
+UserRustscience/Runpodmeasurements. No subagents/stopgoal. Allold32–37ownedpodsdeleted.
+NEWOWN38h5315kmxrjchl8CPU4/8/.12h/pinnedRustimagecreated19:14:37Z,
+900s localDELETEguardian+GraphQLfallbackactive. Healthready/startedfalse19:14:50.
+Privateauthpointer/tmp/ic-runpod-auth-location:pod38.id/task38-token/header.
+NEVERprintcredentials/headers/tokens/envresponse/copyAPIkeytoPod.
+
+38Amendment33/quotient-plan.json ALLsiximmutable37graphraws(allSHAfrozen).
+Pairbaselineoriginalhomogeneouscheckpoint+fullaffineRREFversussamecheckpoint+
+checkedcodim1kernel+rowprojection+two-columnsolve. Preservezero-normalization
+behavior(no36composition). InitialcheckpointchargedBOTHarms;candidatekernel
+negations/dotproducts/adds/knownwordeventscharged; nativegapsremainunrankable.
+No newDLPsample/end-to-end37repricing/composition/full-costratio/parity.
+Oneworker6pairs0warm/retry60worker180whole900runner8GiBfirstallowedCPU.
+26qualifier/23driver tests/strictClippy/build/actualwrappertransport/capture
+auth-oncecontrolsPASS.307source/binaryhashPASS; PCC1fe548UNVERIFIED.
+No compileractive. InitialClippyfixed/retained; unexpectedoutertest1diagnosed
+withsame-sourceexplicitcargoexit0/26+23PASS,alllogsretained.
+
+NEXTcommit/pushcleansource/spec/manifestsbeforeprepare-quotient-runpod.sh NEWSTAGE
+/workspace/ic-runpod-runs/runpod-factor-base-balance-20261116-37/returned/task/run.
+Upload/POSTONCE; collectexactarchiveandportablepre/preworker/post/qualifiedhashes,
+thenimmediatelyv2DELETEown38+GET404(orGraphQLfallback)/markprivatepod-ID.deleted.
+Don'tredispatchuncertainPOST. Nooptionalfile-readbeforecleanup. Postcall307source
+blobreconstruction, allinputcmp/SHA/credentialscans. Renderquotient-render/
+quotient-report.typ,VIEWallPDFpages/exactbenchmarkcopies/hash/PCC/lesson/journal/
+commit/PRactual. Thenintegratemeasuredreuseintooptionalproductionpipelineand
+freshend-to-endmeasurement;keepgoalactive. No38resultyet.
+
+37published92c2dc008/PRactual37updatedlint0;sourcef3beforecall,all7recover
+10013957165807875. Alloldsource/custody/reportdetailsbelowunchanged. Latest92cCI
+workflow/statusEMPTY19:03,requiredgatesunconfirmed/no manualmerge. Current307
+manifestbindsthisnewsource;old297manifesthistoricalf3,donotrunoncurrentworktree.
+Maintain<=60seccommentary/concreteactions; avoidlongspeculation.
+
 # Current checkpoint:37COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
 
 GoalACTIVE/Rust graphIC+cheap extension-field relationfinding towardrho parity.

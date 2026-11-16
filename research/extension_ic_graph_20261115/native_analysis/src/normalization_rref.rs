@@ -86,6 +86,10 @@ impl<const SKIP_ZERO: bool> Rref<SKIP_ZERO> {
     pub fn rank(&self) -> usize {
         self.pivots.len()
     }
+    /// Read-only basis access for a separately charged quotient construction.
+    pub fn pivot_rows(&self) -> &[(usize, Vec<u64>, u64)] {
+        &self.pivots
+    }
     pub fn state_digest(&self) -> String {
         // Diagnostic validation, excluded from arithmetic counters and included
         // in process wall. Both modes hash their entire pivot state per insert.
