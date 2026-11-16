@@ -61,3 +61,17 @@ No new scientific run yet; all old source/build failures remain immutable. [pcc:
 
 ###02:19integrated first build
 C++build0; Rust101 because source assembly omitted standard JSON/Path/SHA imports and digest helper located after the old recovery function. Exact failed6b0512b source/logs retained in run01; added imports/helper ONLY, unchanged native verification predicates. New source checkpoint before retry; no data has run. [pcc:unverified]
+
+##02:32 integrated engineering census completed
+
+### What was done
+Full native36stages complete02:22:49–02:32:05UTC, all16 genuine altered controls reject101/no receipt. Independent Rust reconstructs all3640profiles/109200workloads. Terminal cap3 yields12269algebraic/1381identity/0blocked versus legacy13650blocked. Atcap4 terminal13325algebraic/325identity versus legacy12269/1381. Tate progression preserves results, cap3mapcalls248352→68250 with195133fieldprogressmultiplications, cap4mapcalls149047→68250 with94772multiplications; different units not a complete price. [pcc:unverified]
+
+### Decisions made
+Retain unisolated fixed-order wall streams as ENGINEERING DIAGNOSTICS ONLY, not admitted runtime speed claims. Current mainAGENTS5f3a21e3 adds standard-panel disclosure/lane/check-budget rules; study uses historical CM8 actual transferable fixture to isolate identical-input degree/mapping changes, not standard-panel fidelity. SameactivePR retained, no lane duplication. Prior four-field clock-ratio wording also needs this isolation qualification. [pcc:unverified]
+
+### Open threads
+Within SAME02:09–03:09window prepare explicit post-data timing replication: unmodified official isolation wrapper, interleaved per-target arms, freshA/B, paired log-t4 intervals/Holm before new timing data. Oldprotocol/source/data unchanged; new source and amendment freeze separately. No new timing outcome inferred. [pcc:unverified]
+
+### Errors
+Initial isolation helper import failed (missing result_switches); fetched same-official helper dependency unchanged, help succeeds. No scientific command ran in failed help. Earlier newRust omitted-import failure preserved. Current oldCargo manifest briefly prepared for a new binary, then restored byte-exact to frozen input before any new affected launch; timing binary uses its OWNmanifest/lock. [pcc:unverified]
