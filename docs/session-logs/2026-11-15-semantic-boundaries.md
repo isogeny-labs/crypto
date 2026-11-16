@@ -160,3 +160,7 @@ The close command correctly required a report PDF. Created and visually inspecte
 
 ### Additional reproduced finding
 Before the final artifact-tool publication, a disposable linked worktree and file remote reproduced a .git manifest entry overwriting the worktree's Git control file with a 300,000-byte payload and exit zero. Reject checkout control filenames and common filesystem spellings before hydration; apply the same rule to migration policy. A real linked-worktree regression checks eight names. All 47 artifact controls pass; all 8,228 entries in 3,791 current manifests satisfy the new parser, with zero existing manifest edits. Owner source SHA256 is now 5cad5ee04286bcd157cae3f2d6ae5ededf787645cfe3a471ed5584bc25c97c49. [pcc:unverified]
+
+## Portable source ownership (2026-11-16)
+
+A second disposable file-remote control on a case-insensitive filesystem reproduced an uppercase manifest spelling replacing a tracked lowercase successor with exit zero. Normalize ownership keys with NFC and case folding, so ambiguous portable spellings remain owned even when the tracked source is omitted. This is a conservative source-preservation rule across hosts. The new regression covers case and canonical Unicode aliases with present and omitted tracked sources. All 48 artifact controls pass; all 8,228 existing entries remain accepted and unchanged. Canonical source SHA256 is 35dfef67a6acda1184353d5e024ab850debfd404dd72241ed369be42daeaaa8d. [pcc:unverified]

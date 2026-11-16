@@ -77,6 +77,27 @@ class RoundTrip(unittest.TestCase):
         self.art("pull", "research/r1/runs/a.jsonl")
         self.assertFalse(path.exists())
 
+    def test_pull_preserves_case_and_unicode_aliases_of_tracked_paths(self):
+        self.art("push", "research/r1/runs/a.jsonl")
+        directory = self.repo / "research/r1/runs"
+        successor = b"current tracked successor\n"
+        for source_name, alias in (("a.jsonl", "A.JSONL"), ("caf\u00e9.jsonl", "cafe\u0301.JSONL")):
+            with self.subTest(alias=alias):
+                source = directory / source_name
+                source.write_bytes(successor)
+                self.git("add", "-f", f"research/r1/runs/{source_name}")
+                manifest = {"schema": artifacts.MANIFEST_SCHEMA, "files": {
+                    alias: {"sha256": hashlib.sha256(self.big).hexdigest(), "bytes": len(self.big)}}}
+                (directory / ".artifacts.json").write_text(json.dumps(manifest))
+                self.git("add", "research/r1/runs/.artifacts.json")
+                self.art("pull", "research")
+                self.assertEqual(source.read_bytes(), successor)
+                # Source ownership remains authoritative while sparse/omitted.
+                source.unlink()
+                self.art("pull", "research")
+                self.assertFalse(source.exists())
+                self.assertFalse((directory / alias).exists())
+
     def test_manifest_cannot_replace_linked_worktree_control_files(self):
         self.art("push", "research/r1/runs/a.jsonl")
         self.git("commit", "-qm", "store fixture")

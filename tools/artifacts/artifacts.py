@@ -40,6 +40,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -607,15 +608,23 @@ def cmd_push(cfg: Config, args) -> int:
     return 0
 
 
+def git_path_key(path: str) -> str:
+    """Portable source ownership across case and canonical Unicode aliases."""
+    return unicodedata.normalize("NFC", path).casefold()
+
+
 def cmd_pull(cfg: Config, args) -> int:
     items = selected(cfg.root, [Path(p) for p in args.paths])
     # A manifest may retain an old object after the path returns to Git.
     # Git's index is authoritative, including for omitted sparse files and
     # staged additions: hydration must never restore the historical object
     # over it. Do not infer ownership from the working file's presence.
-    tracked = set(git(cfg.root, "ls-files", "-z").decode().split("\0"))
-    preserved = [item for item in items if rel(cfg.root, item[0] / item[1]) in tracked]
-    items = [item for item in items if rel(cfg.root, item[0] / item[1]) not in tracked]
+    # Treat ambiguous portable spellings as owned even when an omitted source
+    # has no inode to compare. This also keeps behavior stable across hosts.
+    tracked = {git_path_key(path) for path in
+               git(cfg.root, "ls-files", "-z").decode(errors="surrogateescape").split("\0")}
+    preserved = [item for item in items if git_path_key(rel(cfg.root, item[0] / item[1])) in tracked]
+    items = [item for item in items if git_path_key(rel(cfg.root, item[0] / item[1])) not in tracked]
     if preserved:
         print(f"preserved {len(preserved)} tracked files with historical store entries", file=sys.stderr)
     todo = []
