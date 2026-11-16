@@ -1,0 +1,781 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PRIME-MEDIUM-TIER-RHO-20261107",
+  "version": 1,
+  "created": "2026-11-07",
+  "repository": "crypto",
+  "study_dir": "research/prime_medium_tier_rho_20261107",
+  "authors": [
+    "Claude Code subagent (prime_medium_tier_rho), 2026-11-07"
+  ],
+  "links": {
+    "narrative": "PROTOCOL.md",
+    "curves": "curves.json",
+    "seeds": "seeds.json",
+    "specs": "specs/",
+    "requests": "requests/",
+    "fit": "fit.sh",
+    "rfit": "examples/prime_medium_tier_rho_rfit.rs",
+    "lead": "crypto-autoresearcher:knowledge/leads/ecdlp/generic/LEAD-RHO-matched-rho-calibration.yaml"
+  },
+  "question": "What do rho.negation, rho.plain and bsgs.negation cost, as sealed ecbench bounds with the section 5a band, on generic prime-order curves at log2 r 32-49 (the medium tier), and is the toy excess of rho.negation over sqrt(pi/4) finite-size set-up or a persistent walk shortfall?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every admitted run recovers the planted logarithm and every run replays exactly (pod verify --replay-all and a local re-audit).",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "The medium-tier bound constant of rho.negation (ratio to the floor sqrt(pi/4), w = 0) is classified by the PROTOCOL.md section 9 table: setup_excess, walk_shortfall, intermediate_excess or unresolved.",
+      "class": "comparative",
+      "decided_by": [
+        "C-neg-floor"
+      ],
+      "if_supported": "seal docs/bounds/records/prime-medium-rho-neg*.json; report the toy/medium factor as derived; update the lead",
+      "if_not_supported": "report the verdict as written; walk_shortfall reopens LEAD-RHO-negation-map-fruitless-cycles"
+    },
+    {
+      "id": "C3",
+      "text": "The harness resolves a known sqrt(2) constant (rho.plain over rho.negation) at medium sizes.",
+      "class": "comparative",
+      "decided_by": [
+        "C-positive"
+      ],
+      "if_supported": "C2 is decidable",
+      "if_not_supported": "C2 is inconclusive"
+    },
+    {
+      "id": "C4",
+      "text": "The finite-size law R(N) = 1 + c N^-beta (and R_inf + c N^-beta) fitted over toy and medium sizes, N = sqrt(r).",
+      "class": "heuristic_estimate",
+      "decided_by": []
+    },
+    {
+      "id": "C5",
+      "text": "Nothing here is a statement about cryptographic sizes or a lower bound on ECDLP.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "The toy excess of rho.negation is set-up: the medium-tier constant is within 1.10 x the floor.",
+      "mechanism": "O(log r) jump-table and start set-up plus distinguished-point overshoot are a vanishing fraction of sqrt(r); an r-adding walk adds only a few percent",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "neg_ratio_to_floor",
+          "direction": "lower",
+          "minimum_effect": "point 1.06, inside [1.00, 1.10]",
+          "provenance": {
+            "written_at": "2026-11-07",
+            "data_seen": [
+              {
+                "path": "docs/bounds/records/calibration-prime-rho-neg-v2.json",
+                "measured": "toy rho.negation 1.453 [1.184, 1.772] x floor, alpha 0.398"
+              },
+              {
+                "path": "research/prime_medium_tier_rho_20261107/sources/prior-pool.txt",
+                "measured": "pooled committed prime rho.negation records 32-50 bits: 1.062 x floor (n=18735, heterogeneous)"
+              },
+              {
+                "path": "docs/bounds/records/cheon-ecbench-medium-plus-rho.json",
+                "measured": "oracle-domain medium rho.negation reference 1.14 x floor, 8 runs/size"
+              },
+              {
+                "path": "research/prime_medium_tier_rho_20261107/analysis/rfit-toy-only-rho-neg.json",
+                "measured": "toy-only model A beta 0.826 [0.408,1.748]"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P4",
+          "metric": "plain_over_neg",
+          "direction": "higher",
+          "minimum_effect": "paired ratio about 1.41, interval lower end above 1.2",
+          "provenance": {
+            "written_at": "2026-11-07",
+            "data_seen": [
+              {
+                "path": "docs/bounds/records/calibration-prime-rho-neg-v2.json",
+                "measured": "toy rho.negation 1.453 [1.184, 1.772] x floor, alpha 0.398"
+              },
+              {
+                "path": "research/prime_medium_tier_rho_20261107/sources/prior-pool.txt",
+                "measured": "pooled committed prime rho.negation records 32-50 bits: 1.062 x floor (n=18735, heterogeneous)"
+              },
+              {
+                "path": "docs/bounds/records/cheon-ecbench-medium-plus-rho.json",
+                "measured": "oracle-domain medium rho.negation reference 1.14 x floor, 8 runs/size"
+              },
+              {
+                "path": "research/prime_medium_tier_rho_20261107/analysis/rfit-toy-only-rho-neg.json",
+                "measured": "toy-only model A beta 0.826 [0.408,1.748]"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        },
+        {
+          "id": "P6",
+          "metric": "r_inf_model_b",
+          "direction": "lower",
+          "minimum_effect": "inside [1.00, 1.10]",
+          "provenance": {
+            "written_at": "2026-11-07",
+            "data_seen": [
+              {
+                "path": "docs/bounds/records/calibration-prime-rho-neg-v2.json",
+                "measured": "toy rho.negation 1.453 [1.184, 1.772] x floor, alpha 0.398"
+              },
+              {
+                "path": "research/prime_medium_tier_rho_20261107/sources/prior-pool.txt",
+                "measured": "pooled committed prime rho.negation records 32-50 bits: 1.062 x floor (n=18735, heterogeneous)"
+              },
+              {
+                "path": "docs/bounds/records/cheon-ecbench-medium-plus-rho.json",
+                "measured": "oracle-domain medium rho.negation reference 1.14 x floor, 8 runs/size"
+              },
+              {
+                "path": "research/prime_medium_tier_rho_20261107/analysis/rfit-toy-only-rho-neg.json",
+                "measured": "toy-only model A beta 0.826 [0.408,1.748]"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho.negation, matched prime rho of every prime IC gap; the toy bound's method id",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "specs": "specs/J1.json..J6.json",
+        "ecbench_arm": "rho-neg",
+        "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
+      }
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation again with the same seeds (A/A)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "specs": "specs/J1.json..J6.json",
+        "ecbench_arm": "rho-neg-aa",
+        "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-plain",
+      "role": "control_positive",
+      "description": "rho.plain, positive control (sqrt 2)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.plain",
+        "specs": "specs/J1.json..J6.json",
+        "ecbench_arm": "rho-plain",
+        "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "bsgs-neg",
+      "role": "baseline",
+      "description": "bsgs.negation, exact-analysis constant S = 1.0",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "bsgs.negation",
+        "specs": "specs/J1.json..J6.json",
+        "ecbench_arm": "bsgs-neg",
+        "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-neg-v2",
+      "role": "candidate",
+      "description": "rho.negation_v2, the _v2 accounting; secondary, reported only",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation_v2",
+        "specs": "specs/J1.json..J6.json",
+        "ecbench_arm": "rho-neg-v2",
+        "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "rho-plain",
+      "expected_detection": "paired S ratio rho-plain/rho-neg near sqrt(2) = 1.414 with the 95% interval lower end above 1.2; bsgs-neg S interval containing 1.0",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "no claim that a curve is unusual against a null population is made; C2 compares a measured constant with fixed thresholds. Two exchangeable random generic prime-order curves per size give a curve-effect heterogeneity diagnostic (PROTOCOL.md section 8, z test per size, Holm over five), reported and not decisive"
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "rho.plain",
+          "bsgs.negation",
+          "rho.negation_v2"
+        ]
+      },
+      {
+        "name": "size",
+        "levels": [
+          "log2 r ~32",
+          "~36",
+          "~40",
+          "~44",
+          "~48-49"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "one ecbench binary from the landing commit for every arm and job",
+        "how": "job.build binds image digest, source and binary sha256"
+      },
+      {
+        "name": "curve",
+        "treatment": "randomized",
+        "how": "two curves per size from a derived seed; curve effect tested"
+      },
+      {
+        "name": "target",
+        "treatment": "randomized",
+        "how": "planted uniform_scalar_sha256_v1 from derived target seeds; 8 per curve"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "ecbench derives one seed per workload and round, shared by every arm (paired)"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "alternate over 6 measured rounds after 1 warmup; balanced"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "EKS c8a.2xlarge L2 pool; per-row isolation grade; counts host-independent"
+      },
+      {
+        "name": "job",
+        "treatment": "crossed",
+        "how": "sizes are split across six sessions on the same image; counts are host- and session-independent; wall time is compared only within a session; sizes are nested in jobs (J1: 33/37/41 bits, J2: 45, J3-J6: 49), so size and job are confounded for wall time only, which is not a primary metric"
+      },
+      {
+        "name": "pricing_weight",
+        "treatment": "fixed",
+        "value": "0, 0.1, 1 GAE per unpriced native operation",
+        "how": "three bound records per arm"
+      },
+      {
+        "name": "spot_preemption",
+        "treatment": "measured",
+        "how": "an interrupted session is incomplete, kept, excluded by the harness and rerun once (PROTOCOL.md section 10)"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "every figure computed by ecbench and the frozen rfit example; no hand edits"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-neg-floor",
+        "arms": [
+          "rho-neg"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "ratio to floor 1.10 and 1.30 (PROTOCOL.md section 9)"
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "rho-neg",
+          "rho-plain"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-bsgs",
+        "arms": [
+          "bsgs-neg"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "declared S = 1.0 inside the 95% interval"
+      },
+      {
+        "id": "C-v2",
+        "arms": [
+          "rho-neg",
+          "rho-neg-v2"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        201624291843241,
+        24642267360510,
+        18561872162765,
+        135799598603144,
+        119518173357916,
+        181458334271012,
+        185150999512726,
+        196853410870112,
+        40016877808970,
+        203571419754608,
+        54849620745713,
+        262858262117844,
+        107516164087790,
+        26995759977218,
+        166668755239101,
+        6472169882280,
+        54391810056847,
+        22552766203232,
+        227095582935304
+      ],
+      "nonce": null,
+      "note": "seeds.json: seed(tag) = int(SHA-256('prime_medium_tier_rho_20261107/v1/' + tag)[0:12 hex], 16) for curve, target and measurement seeds, written before any data; ecbench derives per-run algorithm seeds from them"
+    },
+    "instance_sampling": {
+      "rule": "curves from generate_instance(generic, bits, seed); targets uniform planted scalars from the target seed",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "every figure is produced by ecbench bound fit / compare / table and the frozen rfit example from sealed records; the method identity is part of the accounting and cannot be masked",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 80,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "cluster bootstrap over workloads (ecbench bound fit). primary decision is one interval (rho.negation medium constant). Per-run SD about 0.55 x floor (prior pool) gives SE about 0.025 over 480 runs per arm; 96 runs per size and arm (>= 24 required). Secondary tests: Holm over 3 methods and over 5 curve-effect tests."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 60,
+      "per_sample_seconds": 0,
+      "threads": 1,
+      "estimated_total_seconds": 9500,
+      "measured_on": "development preflight on the shared 4-core Xeon 2.1 GHz host (not isolated): rho arms 213-217 ns/GAE and bsgs.negation 414 ns/GAE at 49 bits (one target), 147-176 ns/GAE at 33 bits; model per job = 7 rounds x targets x sum over arms of S x sqrt(r) x ns/GAE, doubled for the pod's replay-all, plus 60 s settle; J1 486 s, J2 1500 s, J3/J4 1396 s, J5/J6 1732 s of solve+replay; see README Compute estimate"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "neg_ratio_to_floor",
+        "name": "rho.negation medium-tier bound constant over the floor",
+        "unit": "dimensionless",
+        "kind": "counted",
+        "definition": "constant.ratio_to_floor of ecbench bound fit --tier medium --arm rho-neg over the six sessions: mean over sizes of mean S / sqrt(pi/4), S = total_gae / sqrt(r), every phase charged",
+        "source": "docs/bounds/records/prime-medium-rho-neg.json",
+        "aggregation": "mean",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "plain_over_neg",
+        "name": "paired rho.plain / rho.negation S ratio",
+        "unit": "dimensionless",
+        "kind": "counted",
+        "definition": "sum S rho-plain / sum S rho-neg over paired (workload, round)",
+        "source": "ecbench compare --a rho-neg --b rho-plain",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "bsgs_s",
+        "name": "bsgs.negation medium constant S",
+        "unit": "S",
+        "kind": "counted",
+        "definition": "constant.s of the bsgs-neg medium bound",
+        "source": "docs/bounds/records/prime-medium-bsgs-neg.json",
+        "aggregation": "mean",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "plain_r",
+        "name": "rho.plain medium R = S / 1.2533",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "constant.s of the rho-plain bound over sqrt(pi/2)",
+        "source": "docs/bounds/records/prime-medium-rho-plain.json",
+        "aggregation": "mean",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95",
+        "formula": "R = constant.s(rho-plain) / sqrt(pi/2)"
+      },
+      {
+        "id": "v2_over_neg",
+        "name": "paired rho.negation_v2 / rho.negation S ratio",
+        "unit": "dimensionless",
+        "kind": "counted",
+        "definition": "ecbench compare --a rho-neg --b rho-neg-v2",
+        "source": "compare JSON",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "band_constants",
+        "name": "medium constants at w = 0.1 and 1",
+        "unit": "S",
+        "kind": "counted",
+        "definition": "bound fit --weight 0.1 and --weight 1 for every arm",
+        "source": "docs/bounds/records/prime-medium-*-w0.1.json, -w1.json",
+        "aggregation": "mean",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "alpha",
+        "name": "fitted exponent alpha per arm",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "fit.alpha of gae = C r^alpha over the 10 medium curves",
+        "source": "bound records",
+        "aggregation": "per_row",
+        "resolution": "n/a",
+        "uncertainty": "bootstrap_ci95",
+        "formula": "ln gae = ln C + alpha ln r, fitted by ecbench bound fit over the 10 medium curves"
+      },
+      {
+        "id": "r_inf_model_b",
+        "name": "R(N) asymptote and model-A beta",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "examples/prime_medium_tier_rho_rfit.rs over the toy and medium records; parametric bootstrap, 2000 resamples, seed 20261107",
+        "source": "analysis/rfit-*.json",
+        "aggregation": "per_row",
+        "resolution": "beta grid 0.002",
+        "uncertainty": "bootstrap_ci95",
+        "formula": "R(N) = R_inf + c N^-beta and R(N) = 1 + c N^-beta, N = sqrt(r), R = mean S / declared S per size, weights 1/se^2"
+      },
+      {
+        "id": "ns_per_gae",
+        "name": "L2 solve wall per GAE",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "time.solve_wall_ns / total_gae on L2 rows, read against the session A/A",
+        "source": "records.jsonl",
+        "aggregation": "median",
+        "resolution": "1 us",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "total_gae",
+      "phases",
+      "field_ops",
+      "canonicalisations_uncharged",
+      "inserts_uncharged",
+      "lookups_uncharged",
+      "distinguished_point_table_inserts_uncharged",
+      "distinguished_point_table_queries_uncharged",
+      "every other *_uncharged counter emitted"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "env_class_id",
+      "isolation",
+      "steal",
+      "PSI",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "six jobs (J1-J6), each once; fixed N",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "a per-execution timeout (300 s) or exhaustion is a censored row kept in the session",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "an incomplete session (Spot loss, launcher failure) is kept and rerun once under a new job name with the identical spec; a second failure stops that job and the bound is fitted on the completed sessions, saying so",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "a complete session with a passing audit is admitted for counts even if the pod's L2 gate failed; its wall time is not reported",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "PROTOCOL.md section 9. M = medium constant.ratio_to_floor of rho.negation at w = 0. setup_excess if M <= 1.10 and ci95_hi < 1.30; walk_shortfall if M >= 1.30 and ci95_lo > 1.10; intermediate_excess if ci95_lo > 1.10 and M < 1.30; unresolved otherwise; within_1.10_strict reported when ci95_hi <= 1.10; inconclusive if the positive control (plain/neg interval lower end above 1.2) fails or any audit fails. Correction: the primary is a single interval (no correction); Holm applies to the secondary families (three method constants; five curve-effect tests).",
+    "comparison_ids": [
+      "C-neg-floor",
+      "C-positive",
+      "C-bsgs",
+      "C-v2"
+    ],
+    "threshold": "1.10 and 1.30 x floor",
+    "statistic": "bound constant ratio_to_floor (mean over sizes of mean S / floor)",
+    "interval": "ecbench cluster bootstrap 95%, 2000 resamples, harness seed",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "ratio to floor; toy/medium factor (derived)",
+    "verdict_vocabulary": [
+      "setup_excess",
+      "within_1.10_strict",
+      "walk_shortfall",
+      "intermediate_excess",
+      "unresolved",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "examples/prime_medium_tier_rho_rfit.rs",
+      "sha256": "b79e7d00440547dd635e3611a709cba9ef0bf72af48ee22e38a5a5b1202d0837"
+    },
+    "inputs": [
+      "sessions/J1..J6 (records.jsonl, session.json, plan.json, spec.json, host.json)",
+      "sessions/J*.audit.json",
+      "docs/bounds/records/calibration-prime-*-v2.json",
+      "fit.sh (sha256 9fd4e3860933756bb0df2210dfc74a7318913a44b4aa27a93b78399c8dfa5e7f)"
+    ],
+    "outputs": [
+      "docs/bounds/records/prime-medium-{rho-neg,rho-plain,bsgs-neg,rho-neg-v2}[-w0.1|-w1].json",
+      "docs/bounds/FRONTIER.md",
+      "analysis/rfit-*.json",
+      "compare and table outputs",
+      "reports/ (research-visuals)"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "ratio to floor against log2 r, toy and medium, with model A and B",
+      "band constants per arm",
+      "paired ratios per size"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "changing curves, seeds, targets, rounds, arms, unit, accounting, weights or thresholds after any result",
+    "dropping or rerunning individual executions",
+    "pooling toy and medium in one bound",
+    "reading the R(N) extrapolation beyond 49 bits as a measurement",
+    "quoting local or non-L2 wall time",
+    "rerunning a complete session because of its numbers"
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "5643e3e78d4fe23a624a0834b266fba9d2da81adc091595d418ba35d6c664cd6",
+    "commit": "529aa8ee4d18b0fbe2f54f317421bcc63980fda8",
+    "frozen_at": "2026-11-07T21:15:05Z",
+    "filed_before_affected_data": true
+  }
+}

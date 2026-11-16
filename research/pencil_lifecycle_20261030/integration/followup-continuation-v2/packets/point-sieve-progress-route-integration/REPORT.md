@@ -1,0 +1,21 @@
+# Finite differences on the diagnostic progress route
+
+The actual progress module now uses the same reviewed finite-difference recurrence as the non-progress native solver. The exact validated candidate was applied to `src/cryptanalysis/ecbench/pencil_progress_native.rs` after root independently checked the source substitution and all 6,398 raw counter pairs. Every other source byte, including diagnostic emissions and exceptional branches, remains unchanged.
+
+The `Some(sink)` branch in `pencil.rs` selects this progress module; `None` selects `native_solver`. The source gap was observed directly, without a bottleneck or timing inference. Prior recurrence/word proofs and NIST's forward-difference definitions informed the implementation; see PLAN.md.
+
+The passing ordinary check compiled the complete progress module and real progress sink with the actual standalone producer's engine, kernel and measurement dependencies. Private test-only wiring exposes those modules to one exact selected test. It does not compile the complete root ecbench adapter crate or execute the scientific collector.
+
+The single named test passed, with 78 unrelated tests filtered. It checked 6,398 full ordered SieveResult pairs, 20,207 coefficient sequences comprising 134,067 samples, 32 canonical boundary transitions, and three known-wrong controls. Observed branch counters were [22232, 12812, 5366, 267, 753]. All actual arithmetic/meter fields are retained. For k=2d+1, the observed deltas are additions 3p+2-kp, multiplications -kp, and entry visits -k(p-1); other recorded arithmetic/meter fields match. Degree-zero/one addition regressions and the final unused advance remain included. No synthetic old charges were added.
+
+Real diagnostic helper controls checked the exact three emissions at completed counts 1,4,16; their boundary, epoch, walk and live counter payload; disabled-sink suppression; Noop; and the complete eight-element milestone set. The higher-level solver emission sites were preserved byte-for-byte, but no complete solve_one event trace was executed.
+
+Both attempts are preserved. The first stopped after 20.784042 seconds with FileNotFoundError while compilation was active; no tests ran. Its receipt retained the exception repr but not the traceback/path. Source inspection identifies the dynamic target-directory sampling race as the likely cause, not a recorded failing filename. The compiler group was killed/reaped and empty; frozen inputs stayed unchanged. A separately reviewed and released successor tolerates only disappearing ENOENT target entries, rejects symlinks, and retains tracebacks and cleanup return codes.
+
+The successor completed in 33.860280 seconds with compiler/test and outer exits zero, unchanged pre/post inputs, no signals or cleanup errors, and an empty owned process group. Its sampled target peak was 113,504,733 bytes, below the monitored 2 GiB threshold. This threshold is a monitor, not a hard filesystem quota. Each attempt had its own approved 240-second total envelope, 4 GiB address space, one Cargo job, one test thread, offline locked dependencies and bounded output. These elapsed values describe ordinary validation cost, not sieve performance.
+
+Candidate and canonical SHA256: `87f3581cbbeadb826e878cc80887de8e9d0980cb65262058ca54b50aae86a0ae`. The passing native receipt SHA256 is `1ee614c52efbc65f4dfe9598b08305b520132c9787f11d3073c6217e82a35445`. Root's nonauthor review is preserved separately in root-postreview.json; the implementation author does not claim an independent review of their own code.
+
+The official evidence archive retains both private source/vendor closures, raw receipts/stdout/stderr and the executed test binary. `counter-pairs.csv.gz` contains a compact ten-column extraction of all 6,398 pairs; its uncompressed hash is in counter-pairs-custody.json. Fresh official-store download and member verification are recorded in artifact-delivery.json. No prior failure or native proof record is rewritten.
+
+Next bind the final producer binary, diagnostic route, mapper, baseline, protocol and candidate image to these exact source changes. The earlier qualified image and cached library retain their historical source identities; this component check does not supply new runtime or scientific admission.

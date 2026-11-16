@@ -93,6 +93,18 @@ cells within 0.75–1.3× of the dense model). Several n=41 cells have < 32 rela
 the K=5 5-sum control found 0 relations where ~7 were expected (unresolved, ~0.1%
 outcome).
 
+**Update 2026-10-18 (quartic root finder).** The "one S₄ root solve costs 20–60 S₃"
+obstruction is removed: `S4Tables::roots` solves the quartic directly (resolvent cubic by a
+Lucas/Dickson ladder, two Artin–Schreier quadratics by byte-table half-traces; fail-closed
+fallback to the old routine, 0 fallbacks on complete quartics; `KIC_S4_ROOTS=split|resolvent`,
+default resolvent). An S₄ pair now costs ~1.8 S₃ by wall (2.5 priced) against break-even ~12.
+At n=41, B2 wall per verified relation: K=10 3.89 s -> 0.350 s (11.1x vs the split control;
+6.8x below the 4-sum), K=20 1.34 s -> 0.128 s (10.5x; 3.7x below the 4-sum); same S₄ counts,
+every relation re-added (0 rejects). Classification: engineering, stage improvement of
+relation extraction; no end-to-end `S`, no rho or key-recovery claim. Tests 10/10. Evidence:
+`research/ic_techniques_20261012/sixsum_extraction/` ("Update 2026-10-18",
+`raw_resolvent_20261018/`).
+
 ## 5. Shantz–Teske δ method
 
 **Built.** Sage `--delta-sweep` in `factor_base_dor.sage` (work-per-relation proxy

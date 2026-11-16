@@ -1,0 +1,440 @@
+{
+  "head": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+  "read_window_utc": "2026-10-27 21:50\u201321:54",
+  "all_events": true,
+  "inventory_pages": 1,
+  "reported_runs": 5,
+  "retrieved_runs": 5,
+  "runs": [
+    {
+      "id": 40580080263,
+      "name": "ic-leaderboard-recompute",
+      "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "updated_at": "2026-10-27T20:41:00Z",
+      "run_attempt": 1,
+      "job_pages": 1,
+      "reported_jobs": 1,
+      "retrieved_jobs": 1,
+      "jobs": [
+        {
+          "id": 122456811050,
+          "name": "recompute",
+          "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000046610,
+          "started_at": "2026-10-27T20:40:09Z",
+          "completed_at": "2026-10-27T20:40:59Z",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "The check catches a tampered row and a missing row",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Every board row recomputes from raw records",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "The standing rho has not changed since a table was assessed",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ],
+          "annotations": [
+            {
+              "annotation_level": "warning",
+              "title": "",
+              "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 40580080291,
+      "name": "backend-leaderboard",
+      "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "updated_at": "2026-10-27T20:40:55Z",
+      "run_attempt": 1,
+      "job_pages": 1,
+      "reported_jobs": 1,
+      "retrieved_jobs": 1,
+      "jobs": [
+        {
+          "id": 122456806062,
+          "name": "current",
+          "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+          "status": "completed",
+          "conclusion": "failure",
+          "runner_id": 1000046606,
+          "started_at": "2026-10-27T20:40:08Z",
+          "completed_at": "2026-10-27T20:40:54Z",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Pull store data this workflow reads (tools/artifacts)",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run dtolnay/rust-toolchain@master",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run Swatinem/rust-cache@v2",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Materialize the manifest's sealed inputs",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Format, admission tests and lint",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "All generated views match their sealed sources",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "name": "Post Run Swatinem/rust-cache@v2",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ],
+          "annotations": [
+            {
+              "annotation_level": "warning",
+              "title": "",
+              "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+            },
+            {
+              "annotation_level": "failure",
+              "title": "",
+              "message": "Process completed with exit code 1."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 40580080339,
+      "name": "validation-gate",
+      "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "failure",
+      "updated_at": "2026-10-27T20:46:45Z",
+      "run_attempt": 1,
+      "job_pages": 1,
+      "reported_jobs": 1,
+      "retrieved_jobs": 1,
+      "jobs": [
+        {
+          "id": 122456811437,
+          "name": "gate",
+          "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+          "status": "completed",
+          "conclusion": "failure",
+          "runner_id": 1000046611,
+          "started_at": "2026-10-27T20:40:09Z",
+          "completed_at": "2026-10-27T20:46:44Z",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Free runner disk",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Fetch the base tip",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "The gate's own tests, with a positive and a negative fixture",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "name": "Every leaderboard and benchmarks row is validated or frozen pre-gate",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ],
+          "annotations": [
+            {
+              "annotation_level": "warning",
+              "title": "",
+              "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+            },
+            {
+              "annotation_level": "failure",
+              "title": "",
+              "message": "Process completed with exit code 1."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 40580073550,
+      "name": "artifact-autofix",
+      "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+      "event": "pull_request_target",
+      "status": "completed",
+      "conclusion": "success",
+      "updated_at": "2026-10-27T20:40:42Z",
+      "run_attempt": 1,
+      "job_pages": 1,
+      "reported_jobs": 1,
+      "retrieved_jobs": 1,
+      "jobs": [
+        {
+          "id": 122456786730,
+          "name": "migrate",
+          "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000046573,
+          "started_at": "2026-10-27T20:40:06Z",
+          "completed_at": "2026-10-27T20:40:41Z",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Require a push token that starts CI on the new commit",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Checkout trusted artifact tool and policy",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Checkout exact PR head without data blobs",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Require the trusted artifact destination and policy",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Upload changed data and replay remote bytes",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Commit pointers and remove tracked data from the PR branch",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Checkout exact PR head without data blobs",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Checkout trusted artifact tool and policy",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ],
+          "annotations": [
+            {
+              "annotation_level": "warning",
+              "title": "",
+              "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+            },
+            {
+              "annotation_level": "notice",
+              "title": "",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 40580073863,
+      "name": "Free LLM pull-request review",
+      "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+      "event": "pull_request_target",
+      "status": "completed",
+      "conclusion": "success",
+      "updated_at": "2026-10-27T20:40:18Z",
+      "run_attempt": 1,
+      "job_pages": 1,
+      "reported_jobs": 1,
+      "retrieved_jobs": 1,
+      "jobs": [
+        {
+          "id": 122456788175,
+          "name": "review",
+          "head_sha": "6f188a7cbfa87ab790c83bc4e2e9fc651993a292",
+          "status": "completed",
+          "conclusion": "success",
+          "runner_id": 1000046574,
+          "started_at": "2026-10-27T20:40:08Z",
+          "completed_at": "2026-10-27T20:40:17Z",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Validate reviewer",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Review pull request",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ],
+          "annotations": [
+            {
+              "annotation_level": "warning",
+              "title": "",
+              "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+            },
+            {
+              "annotation_level": "warning",
+              "title": "LLM review skipped",
+              "message": "No reviewer provider is configured. Add OPENROUTER_API_KEY, or add FIREWORKS_API_KEY plus the FIREWORKS_MODEL repository variable."
+            },
+            {
+              "annotation_level": "notice",
+              "title": "",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "known_denied_routes_not_retried": [
+    "combined status",
+    "GraphQL statusCheckRollup",
+    "job log download/redirect, including backend 122456806062"
+  ],
+  "all_required_gates_established": false,
+  "no_submitted_or_inline_reviews_or_threads": true,
+  "old_codex_summary_head": "133e90f0743f9b270353ad8a595809bfd2e359d0",
+  "source_regression_demonstrated": false,
+  "raw_inventory_sha256": "d1e1dbb6e9830880508db3f85bb66ba99addc8d31611b5737b5e9870806ee50f",
+  "job_totals": {
+    "retrieved": 5,
+    "success": 3,
+    "failure": 2
+  }
+}

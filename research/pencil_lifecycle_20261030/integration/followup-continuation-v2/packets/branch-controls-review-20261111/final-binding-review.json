@@ -1,0 +1,38 @@
+{
+  "schema": "operational-binding-review/v1",
+  "task": "T-2108",
+  "status": "no_blocking_final_binding_finding",
+  "reviewed_at_utc": "2026-11-11T00:10:16.754104+00:00",
+  "release_sha256": "bcbe1b0b3a1da832b45e3d1fed9dabfc6c8d8fe2afdc8c60b4be9fb1c054bdfe",
+  "execution_command_sha256": "f701bcd2e03330ff36ab75688fbb99252250d46e86f67f2754753ee56fa9f38c",
+  "source_review_publication": "d6365d5265bb24a3ffffa1560a13a66d04c1741a",
+  "five_receipt_hashes_match": true,
+  "latest_cast_terminal_hash_and_all_phase_owners_verified": true,
+  "ledger": {
+    "charged": 600,
+    "reserved": 600,
+    "unreserved": 128400,
+    "release_prior": 600,
+    "release_remaining_before": 129000,
+    "ceiling": 129600
+  },
+  "deadline": "2026-11-11T12:00:00Z",
+  "attempt_seconds": 600,
+  "attempt_limit": 1,
+  "automatic_retry": false,
+  "lease": {
+    "task_id": "1a84914e-d99c-4e05-8722-5fef2a80c9b2",
+    "attempt_id": "d984cf8b-1095-4db7-a9c9-b945b9b4ff2b",
+    "lease_id": "2e3a35ed-e17c-4e30-90e4-bfbcfae3a8f9",
+    "fencing_epoch": 1
+  },
+  "archived_claim_unexpired_at_review": true,
+  "lease_expires_at": "2026-11-11T00:17:52.078883Z",
+  "no_payload_or_compiler": true,
+  "notes": [
+    "Serial receipt retains older observed_utc and prior_cast_workspace_present false fields from earlier reconciliation; they are historical, not freshness evidence. Latest_cast_completion pin establishes latest attempt terminal status separately. Root must refresh live serial/lease observation before and throughout run.",
+    "Materializer900 remains prior campaign provenance; not added to current600 charge.",
+    "Remote source/review readback reported by coordinator; this review checks exact local bound bytes, not an additional GitHub query."
+  ],
+  "findings": []
+}

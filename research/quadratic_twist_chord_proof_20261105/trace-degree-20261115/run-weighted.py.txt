@@ -1,0 +1,40 @@
+# Process/file/hash orchestration only; all polynomial/group arithmetic is native.
+from pathlib import Path
+import subprocess,sys,json,hashlib,datetime,os
+root=Path('/workspace/crypto-twist-chord-proof');scope=Path('research/quadratic_twist_chord_proof_20261105/trace-degree-20261115')
+out=Path(sys.argv[1]);checkpoint=sys.argv[2]
+assert not out.exists();assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==checkpoint
+assert subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True)==''
+pins=json.loads((root/scope/'PINS.weighted.json').read_text())
+for p,h in pins['inputs'].items():assert hashlib.sha256((root/p).read_bytes()).hexdigest()==h
+out.mkdir();rows=[];start=datetime.datetime.now(datetime.timezone.utc).isoformat()
+def run(name,cmd,want=0):
+    with (out/(name+'.stdout')).open('wb')as a,(out/(name+'.stderr')).open('wb')as b:
+        r=subprocess.run(['timeout','600',*cmd],cwd=root,stdout=a,stderr=b,env=dict(os.environ,CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup'))
+    rows.append(dict(name=name,command=cmd,exit=r.returncode,expected=want));(out/'stages.json').write_text(json.dumps(rows,indent=2)+'\n');assert r.returncode==want,(name,r.returncode)
+try:
+    run('cpp',['g++','-std=c++20','-O2','-Wall','-Wextra',str(scope/'solver-weighted.cpp'),'-o',str(out/'solver')])
+    run('rust',['/workspace/twist-native-tooling/cargo/bin/rustc','+1.85.1','-O',str(scope/'audit-weighted.rs'),'-o',str(out/'auditor')])
+    run('solver',[str(out/'solver')]);(out/'cases.txt').write_bytes((out/'solver.stdout').read_bytes())
+    for tag in ['A','B']:run('audit'+tag,[str(out/'auditor'),str(out/'cases.txt'),str(out/('audit'+tag+'.json'))])
+    assert (out/'auditA.json').read_bytes()==(out/'auditB.json').read_bytes()
+    original=(out/'cases.txt').read_text().splitlines();controls=[]
+    for mode in ['header','source','input','witness','missing-configuration','false-complete']:
+        lines=original.copy()
+        if mode=='header':lines[0]=lines[0].replace('7 3 8','7 3 9',1)
+        elif mode=='source':lines[0]=lines[0].replace('8 1 8 47','8 2 8 47',1)
+        elif mode=='input':
+            i=next(i for i,x in enumerate(lines)if x.startswith('I '));lines[i]=lines[i].replace(':1',':2',1)
+        elif mode=='witness':
+            i=next(i for i,x in enumerate(lines)if x.startswith('B '));v=lines[i].split();j=next(j for j in range(2,len(v))if v[j]!='-');v[j]=v[j].replace(':1',':2',1);lines[i]=' '.join(v)
+        elif mode=='missing-configuration':
+            i=max(i for i,x in enumerate(lines)if x.startswith('CASE '));lines=lines[:i]
+        else:
+            i=next(i for i,x in enumerate(lines)if x.startswith('CASE ')and x.split()[2:6]==['0','-1','-1','14']);v=lines[i].split();assert v[6]=='cap';v[6]='complete';lines[i]=' '.join(v)
+        payload=('\n'.join(lines)+'\n').encode();assert payload!=(out/'cases.txt').read_bytes()
+        path=out/('false-'+mode+'.txt');path.write_bytes(payload);receipt=out/('false-'+mode+'.json')
+        run('reject-'+mode,[str(out/'auditor'),str(path),str(receipt)],101);assert not receipt.exists()
+        controls.append(dict(mode=mode,sha256=hashlib.sha256(payload).hexdigest(),receipt=False))
+    (out/'controls.json').write_text(json.dumps(controls,indent=2)+'\n')
+finally:
+    (out/'run.json').write_text(json.dumps(dict(checkpoint=checkpoint,start=start,finish=datetime.datetime.now(datetime.timezone.utc).isoformat(),stages=len(rows)),indent=2)+'\n')

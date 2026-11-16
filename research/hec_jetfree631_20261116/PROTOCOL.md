@@ -1,0 +1,7 @@
+# No-base quotient-algebra section shortcut
+
+If the common section base factor g=1, numerator evaluation after a Hensel lift modulo u²and reduction modulo u equals direct evaluation modulo u: the lift is congruent to the original interpolation polynomial modulo u, and polynomial evaluation preserves congruence. No cancellation consumes extra precision in this branch. Compute reduced numerators once and their common gcd; for g=1return those residues. For nontrivial g retain the complete old Hensel/cancellation path.
+
+This gate compares each returned numerator coefficient and base factor exactly against the original implementation on every actual direct-output class/primary/adjacent/corruption evaluation in both coordinate charts. Additionally form reduced support u=(x-xO)*residual with y=the tangent line, require nontrivial base factor and exact fallback match. Require both branch counters nonzero. Reuse prior direct-output reconstruction policy, require both unique classes and corrupted adjacency rejection. No old class or scalar is input; post-run independent byte comparison is permitted validation.
+
+Freeze source/lock/all arithmetic/section/input/binary hashes, commit and S3 checkpoint/gate before once-only correctness run. This comparison build intentionally executes the reference as well and cannot measure speedup. Preserve all failures. No new timing/10x/global-map/generic support claim. This is an algebraically justified branch optimization, not asserted algorithmic novelty. Measured earlier inverse comparison remains unchanged.

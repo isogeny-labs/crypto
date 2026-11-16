@@ -463,12 +463,295 @@ pub fn pe_closure_with(
     max_rows: usize,
     opts: PeOptions,
 ) -> Option<PeReport> {
+    pe_closure_checkpointed(system, n_vars, degree, mode, max_cols, max_rows, opts, None)
+}
+
+/// Where and how often [`pe_closure_checkpointed`] saves its state.
+#[derive(Clone, Debug)]
+pub struct PeCheckpoint {
+    /// The checkpoint file.  It is written to `path` + `.tmp`, synced, and
+    /// renamed over `path`, so a crash never leaves a torn file.
+    pub path: std::path::PathBuf,
+    /// Minimum time between saves.  A save happens only at a consistent
+    /// point: after a seed chunk or a whole expansion batch is absorbed.
+    pub every: std::time::Duration,
+}
+
+/// Saved loop state beside the engine's basis and report.
+struct Saved {
+    /// 0: still absorbing the seed; 1: in the expansion loop.
+    phase: u8,
+    /// Next seed chunk to absorb (phase 0).
+    seed_next: u64,
+    full_vars: bool,
+    queue: Vec<(u32, u32, usize)>,
+    /// Pivots the seed has produced so far (phase 0).
+    new: Vec<usize>,
+    /// Wall seconds spent before this process started.
+    secs_before: f64,
+}
+
+const CKPT_MAGIC: &[u8; 8] = b"PECKPT01";
+
+/// Identity of a run: the system, the layout and every option.  A
+/// checkpoint is resumed only under the same fingerprint.
+fn fingerprint(
+    system: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    mode: PeMode,
+    max_cols: usize,
+    opts: PeOptions,
+) -> [u8; 32] {
+    let mut h = blake3::Hasher::new();
+    h.update(b"pe_closure checkpoint v1");
+    h.update(&(n_vars as u64).to_le_bytes());
+    h.update(&degree.to_le_bytes());
+    h.update(&(max_cols as u64).to_le_bytes());
+    match mode {
+        PeMode::Full => h.update(&[0u8]),
+        PeMode::Partial { batch_rows } => {
+            h.update(&[1u8]);
+            h.update(&(batch_rows as u64).to_le_bytes())
+        }
+    };
+    match opts.order {
+        PeOrder::LowFirst => h.update(&[0u8]),
+        PeOrder::HighFirst => h.update(&[1u8]),
+        PeOrder::Random(s) => {
+            h.update(&[2u8]);
+            h.update(&s.to_le_bytes())
+        }
+    };
+    h.update(&opts.seed_degree.unwrap_or(u32::MAX).to_le_bytes());
+    h.update(&[opts.restrict_vars as u8]);
+    h.update(&(system.len() as u64).to_le_bytes());
+    for p in system {
+        h.update(&(p.terms.len() as u64).to_le_bytes());
+        for t in &p.terms {
+            h.update(&(t.mask as u128).to_le_bytes());
+        }
+    }
+    *h.finalize().as_bytes()
+}
+
+fn put_u64(w: &mut impl std::io::Write, v: u64) -> std::io::Result<()> {
+    w.write_all(&v.to_le_bytes())
+}
+
+fn get_u64(r: &mut impl std::io::Read) -> std::io::Result<u64> {
+    let mut b = [0u8; 8];
+    r.read_exact(&mut b)?;
+    Ok(u64::from_le_bytes(b))
+}
+
+fn save_checkpoint(
+    e: &Engine,
+    ck: &PeCheckpoint,
+    fp: &[u8; 32],
+    st: &Saved,
+) -> std::io::Result<()> {
+    use std::io::Write;
+    let mut tmp = ck.path.clone().into_os_string();
+    tmp.push(".tmp");
+    let tmp = std::path::PathBuf::from(tmp);
+    let file = std::fs::File::create(&tmp)?;
+    let mut w = std::io::BufWriter::with_capacity(1 << 22, file);
+    w.write_all(CKPT_MAGIC)?;
+    w.write_all(fp)?;
+    w.write_all(&[st.phase, st.full_vars as u8])?;
+    put_u64(&mut w, st.seed_next)?;
+    put_u64(&mut w, st.secs_before.to_bits())?;
+    let r = &e.report;
+    for v in [
+        r.peak_basis_rows as u64,
+        r.peak_matrix_rows as u64,
+        r.absorbs as u64,
+        r.expanded,
+        r.products,
+        r.word_ops,
+        r.completion_at_rows.map_or(u64::MAX, |x| x as u64),
+    ] {
+        put_u64(&mut w, v)?;
+    }
+    put_u64(&mut w, e.words as u64)?;
+    put_u64(&mut w, e.basis.len() as u64)?;
+    for &c in &e.piv {
+        put_u64(&mut w, c as u64)?;
+    }
+    let mut buf = Vec::with_capacity(e.words * 8);
+    for row in &e.basis {
+        buf.clear();
+        for x in row {
+            buf.extend_from_slice(&x.to_le_bytes());
+        }
+        w.write_all(&buf)?;
+    }
+    put_u64(&mut w, st.queue.len() as u64)?;
+    for &(a, b, c) in &st.queue {
+        w.write_all(&a.to_le_bytes())?;
+        w.write_all(&b.to_le_bytes())?;
+        put_u64(&mut w, c as u64)?;
+    }
+    put_u64(&mut w, st.new.len() as u64)?;
+    for &c in &st.new {
+        put_u64(&mut w, c as u64)?;
+    }
+    w.write_all(b"END!")?;
+    let file = w.into_inner().map_err(|e| e.into_error())?;
+    file.sync_all()?;
+    std::fs::rename(&tmp, &ck.path)?;
+    if let Some(dir) = ck.path.parent() {
+        if let Ok(d) = std::fs::File::open(dir) {
+            let _ = d.sync_all();
+        }
+    }
+    Ok(())
+}
+
+/// Load a checkpoint into `e`.  `Ok(None)` when there is none; an error
+/// when it is torn or belongs to a different run (never silently ignored).
+fn load_checkpoint(
+    e: &mut Engine,
+    ck: &PeCheckpoint,
+    fp: &[u8; 32],
+) -> std::io::Result<Option<Saved>> {
+    use std::io::{Error, ErrorKind, Read};
+    let file = match std::fs::File::open(&ck.path) {
+        Ok(f) => f,
+        Err(err) if err.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(err) => return Err(err),
+    };
+    let mut r = std::io::BufReader::with_capacity(1 << 22, file);
+    let bad = |m: &str| Error::new(ErrorKind::InvalidData, m.to_string());
+    let mut magic = [0u8; 8];
+    r.read_exact(&mut magic)?;
+    if &magic != CKPT_MAGIC {
+        return Err(bad("not a pe_closure checkpoint"));
+    }
+    let mut got = [0u8; 32];
+    r.read_exact(&mut got)?;
+    if &got != fp {
+        return Err(bad("checkpoint belongs to a different system or options"));
+    }
+    let mut flags = [0u8; 2];
+    r.read_exact(&mut flags)?;
+    let seed_next = get_u64(&mut r)?;
+    let secs_before = f64::from_bits(get_u64(&mut r)?);
+    let mut counters = [0u64; 7];
+    for v in counters.iter_mut() {
+        *v = get_u64(&mut r)?;
+    }
+    let words = get_u64(&mut r)? as usize;
+    if words != e.words {
+        return Err(bad("checkpoint row width differs from the layout"));
+    }
+    let nrows = get_u64(&mut r)? as usize;
+    let mut piv = Vec::with_capacity(nrows);
+    for _ in 0..nrows {
+        piv.push(get_u64(&mut r)? as usize);
+    }
+    let mut basis = Vec::with_capacity(nrows);
+    let mut buf = vec![0u8; words * 8];
+    for _ in 0..nrows {
+        r.read_exact(&mut buf)?;
+        basis.push(
+            buf.chunks_exact(8)
+                .map(|b| u64::from_le_bytes(b.try_into().unwrap()))
+                .collect::<Vec<u64>>(),
+        );
+    }
+    let nq = get_u64(&mut r)? as usize;
+    let mut queue = Vec::with_capacity(nq);
+    for _ in 0..nq {
+        let mut a = [0u8; 4];
+        let mut b = [0u8; 4];
+        r.read_exact(&mut a)?;
+        r.read_exact(&mut b)?;
+        queue.push((
+            u32::from_le_bytes(a),
+            u32::from_le_bytes(b),
+            get_u64(&mut r)? as usize,
+        ));
+    }
+    let nn = get_u64(&mut r)? as usize;
+    let mut new = Vec::with_capacity(nn);
+    for _ in 0..nn {
+        new.push(get_u64(&mut r)? as usize);
+    }
+    let mut end = [0u8; 4];
+    r.read_exact(&mut end)?;
+    if &end != b"END!" {
+        return Err(bad("checkpoint is torn"));
+    }
+    e.basis = basis;
+    e.piv = piv;
+    let rep = &mut e.report;
+    rep.peak_basis_rows = counters[0] as usize;
+    rep.peak_matrix_rows = counters[1] as usize;
+    rep.absorbs = counters[2] as usize;
+    rep.expanded = counters[3];
+    rep.products = counters[4];
+    rep.word_ops = counters[5];
+    rep.completion_at_rows = (counters[6] != u64::MAX).then_some(counters[6] as usize);
+    Ok(Some(Saved {
+        phase: flags[0],
+        seed_next,
+        full_vars: flags[1] != 0,
+        queue,
+        new,
+        secs_before,
+    }))
+}
+
+/// [`pe_closure_with`] that saves its state to `ckpt` at consistent points
+/// and resumes from it when the file exists, so a killed process (or a
+/// lost host whose disk survives) continues where it stopped.  The resumed
+/// run computes exactly what an uninterrupted one would: the same basis,
+/// queue order and counters.
+#[allow(clippy::too_many_arguments)]
+pub fn pe_closure_checkpointed(
+    system: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    mode: PeMode,
+    max_cols: usize,
+    max_rows: usize,
+    opts: PeOptions,
+    ckpt: Option<&PeCheckpoint>,
+) -> Option<PeReport> {
     let started = Instant::now();
     let label = match mode {
         PeMode::Full => "full",
         PeMode::Partial { .. } => "partial",
     };
     let mut e = Engine::new(system, degree, max_cols, label)?;
+    let fp = fingerprint(system, n_vars, degree, mode, max_cols, opts);
+    let resumed = ckpt.and_then(|c| {
+        load_checkpoint(&mut e, c, &fp)
+            .unwrap_or_else(|err| panic!("checkpoint {}: {err}", c.path.display()))
+    });
+    let secs_before = resumed.as_ref().map_or(0.0, |s| s.secs_before);
+    let mut last_save = Instant::now();
+    let mut maybe_save = |e: &Engine, st: &dyn Fn() -> Saved| {
+        if let Some(c) = ckpt {
+            if last_save.elapsed() >= c.every {
+                // A failed save (a full disk, say) must not cost the run:
+                // the previous checkpoint is still intact, because the new
+                // one only replaces it by rename after a complete write.
+                if let Err(err) = save_checkpoint(e, c, &fp, &st()) {
+                    eprintln!(
+                        "checkpoint {}: save failed, continuing: {err}",
+                        c.path.display()
+                    );
+                    let mut tmp = c.path.clone().into_os_string();
+                    tmp.push(".tmp");
+                    let _ = std::fs::remove_file(std::path::PathBuf::from(tmp));
+                }
+                last_save = Instant::now();
+            }
+        }
+    };
     let occurring = e.vars.iter().fold(0 as Mask, |a, v| a | v);
     let seed_degree = match mode {
         PeMode::Full => degree,
@@ -481,14 +764,26 @@ pub fn pe_closure_with(
                 .unwrap_or(0),
         ),
     };
-    let seed = macaulay_rows_monos_with_mask(system, n_vars, seed_degree, occurring, None)?;
-    // Absorb the seed in chunks so one elimination never holds it all.
-    let mut new = Vec::new();
-    for chunk in seed.chunks(8192) {
-        let rows: Vec<Vec<u64>> = chunk.iter().map(|m| e.pack(m)).collect();
-        new.extend(e.absorb(rows));
-        if e.report.refuted || e.basis.len() > max_rows {
-            break;
+    let in_loop = resumed.as_ref().is_some_and(|s| s.phase == 1);
+    let mut new = resumed.as_ref().map_or(Vec::new(), |s| s.new.clone());
+    if !in_loop {
+        let seed = macaulay_rows_monos_with_mask(system, n_vars, seed_degree, occurring, None)?;
+        // Absorb the seed in chunks so one elimination never holds it all.
+        let first = resumed.as_ref().map_or(0, |s| s.seed_next as usize);
+        for (i, chunk) in seed.chunks(8192).enumerate().skip(first) {
+            let rows: Vec<Vec<u64>> = chunk.iter().map(|m| e.pack(m)).collect();
+            new.extend(e.absorb(rows));
+            maybe_save(&e, &|| Saved {
+                phase: 0,
+                seed_next: i as u64 + 1,
+                full_vars: !opts.restrict_vars,
+                queue: Vec::new(),
+                new: new.clone(),
+                secs_before: secs_before + started.elapsed().as_secs_f64(),
+            });
+            if e.report.refuted || e.basis.len() > max_rows {
+                break;
+            }
         }
     }
     // Queue keyed (leading degree, leading-variable rank, column): the
@@ -501,9 +796,14 @@ pub fn pe_closure_with(
     };
     let mut full_vars = !opts.restrict_vars;
     let mut queue: BTreeSet<(u32, u32, usize)> = BTreeSet::new();
-    for c in new {
-        if e.lead_degree(c) < degree {
-            queue.insert(key(&e, c));
+    if let Some(s) = resumed.as_ref().filter(|s| s.phase == 1) {
+        full_vars = s.full_vars;
+        queue.extend(s.queue.iter().copied());
+    } else {
+        for c in new {
+            if e.lead_degree(c) < degree {
+                queue.insert(key(&e, c));
+            }
         }
     }
     loop {
@@ -558,11 +858,21 @@ pub fn pe_closure_with(
                 }
             }
         }
+        if !e.report.refuted {
+            maybe_save(&e, &|| Saved {
+                phase: 1,
+                seed_next: 0,
+                full_vars,
+                queue: queue.iter().copied().collect(),
+                new: Vec::new(),
+                secs_before: secs_before + started.elapsed().as_secs_f64(),
+            });
+        }
     }
     e.report.refuted_in_completion = e.report.refuted && e.report.completion_at_rows.is_some();
     e.report.saturated = e.report.refuted || (queue.is_empty() && !e.report.capped);
     e.report.final_rows = e.basis.len();
-    e.report.secs = started.elapsed().as_secs_f64();
+    e.report.secs = secs_before + started.elapsed().as_secs_f64();
     let _ = e.degree;
     Some(e.report)
 }
@@ -640,6 +950,127 @@ mod tests {
     }
 
     /// A planted solution is never refuted, in either mode.
+    /// A run interrupted at any point and resumed from its checkpoint ends
+    /// exactly where an uninterrupted run does: same verdict, rank and
+    /// counters.  A checkpoint for another system is refused.
+    #[test]
+    fn resumed_run_equals_uninterrupted_run() {
+        let dir = std::env::temp_dir().join(format!("pe_ckpt_test_{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let mut checked = 0;
+        for (m, n, ell) in [(3usize, 9u32, 3usize), (4, 5, 2)] {
+            for (k, (sys, n_vars)) in draws(m, n, ell, 2, 20261103 + n as u64)
+                .into_iter()
+                .enumerate()
+            {
+                for restrict_vars in [false, true] {
+                    let opts = PeOptions {
+                        restrict_vars,
+                        ..PeOptions::default()
+                    };
+                    let mode = PeMode::Partial { batch_rows: 8 };
+                    let whole =
+                        pe_closure_with(&sys, n_vars, 4, mode, 1 << 20, usize::MAX, opts).unwrap();
+                    for cut in [
+                        whole.final_rows / 4,
+                        whole.final_rows / 2,
+                        whole.final_rows * 9 / 10,
+                    ] {
+                        let ck = PeCheckpoint {
+                            path: dir.join(format!("m{m}n{n}k{k}r{restrict_vars}c{cut}.ckpt")),
+                            every: std::time::Duration::ZERO,
+                        };
+                        let _ = std::fs::remove_file(&ck.path);
+                        let first = pe_closure_checkpointed(
+                            &sys,
+                            n_vars,
+                            4,
+                            mode,
+                            1 << 20,
+                            cut.max(1),
+                            opts,
+                            Some(&ck),
+                        )
+                        .unwrap();
+                        if first.refuted || !first.capped {
+                            continue;
+                        }
+                        let resumed = pe_closure_checkpointed(
+                            &sys,
+                            n_vars,
+                            4,
+                            mode,
+                            1 << 20,
+                            usize::MAX,
+                            opts,
+                            Some(&ck),
+                        )
+                        .unwrap();
+                        assert_eq!(
+                            (
+                                resumed.refuted,
+                                resumed.saturated,
+                                resumed.final_rows,
+                                resumed.products,
+                                resumed.expanded,
+                                resumed.absorbs,
+                                resumed.word_ops,
+                                resumed.peak_basis_rows,
+                                resumed.completion_at_rows
+                            ),
+                            (
+                                whole.refuted,
+                                whole.saturated,
+                                whole.final_rows,
+                                whole.products,
+                                whole.expanded,
+                                whole.absorbs,
+                                whole.word_ops,
+                                whole.peak_basis_rows,
+                                whole.completion_at_rows
+                            ),
+                            "m={m} n={n} k={k} restrict={restrict_vars} cut={cut}"
+                        );
+                        checked += 1;
+                    }
+                }
+            }
+        }
+        // A checkpoint is refused for a different system.
+        let mut refused = false;
+        if let Some(path) = std::fs::read_dir(&dir)
+            .unwrap()
+            .flatten()
+            .map(|e| e.path())
+            .find(|p| p.extension().is_some_and(|x| x == "ckpt"))
+        {
+            let (sys, n_vars) = draws(3, 7, 2, 1, 1).remove(0);
+            let ck = PeCheckpoint {
+                path,
+                every: std::time::Duration::ZERO,
+            };
+            refused = std::panic::catch_unwind(|| {
+                pe_closure_checkpointed(
+                    &sys,
+                    n_vars,
+                    4,
+                    PeMode::Partial { batch_rows: 8 },
+                    1 << 20,
+                    usize::MAX,
+                    PeOptions::default(),
+                    Some(&ck),
+                )
+            })
+            .is_err();
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+        assert!(
+            checked >= 4,
+            "the panel exercised resumption ({checked} cases)"
+        );
+        assert!(refused, "a foreign checkpoint must be refused");
+    }
+
     #[test]
     fn every_order_computes_the_same_closure() {
         let orders = [

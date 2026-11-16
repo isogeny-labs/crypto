@@ -1,0 +1,39 @@
+option(redSB);short=0;ring original49=2,(n,l,b,c),dp;ideal sourceS49;ideal sourceU49;
+sourceS49[1]=b^1*c^7+b^2*c^5+b^1*c^6+b^2*c^4+c^6+b^5+b^4*c^1+b^3*c^2+b^2*c^3;
+sourceS49[2]=b^2*c^10+b^3*c^8+b^2*c^9+b^6*c^3+b^5*c^4+b^2*c^7+b^1*c^8+b^4*c^4+c^8+b^7+b^6*c^1+b^3*c^4+b^2*c^5;
+sourceS49[3]=n^2*l^6+n^1*l^6*b^1+n^2*l^5*c^1+n^1*l^5*b^1*c^1+n^2*l^4*c^2+n^1*l^4*b^1*c^2+n^2*l^3*c^3+n^1*l^3*b^1*c^3+n^2*l^5+n^2*l^4*b^1+n^1*l^5*b^1+n^1*l^4*b^2+n^2*l^3*c^2+n^2*l^2*b^1*c^2+n^1*l^3*b^1*c^2+n^1*l^2*b^2*c^2+n^2*l^4+n^2*l^3*b^1+n^1*l^4*b^1+n^2*l^2*b^2+n^1*l^3*b^2+n^1*l^2*b^3+n^3*l^2*c^1+n^2*l^3*c^1+n^1*l^3*b^1*c^1+n^2*l^1*b^2*c^1+n^1*l^2*b^2*c^1+n^1*l^1*b^3*c^1+n^3*l^1*c^2+n^1*l^1*b^2*c^2+n^3*c^3+n^2*b^1*c^3+n^3*l^2+n^2*l^3+n^2*l^2*b^1+n^1*l^3*b^1+n^2*b^3+n^1*b^4+l^1*b^4+n^3*b^1*c^1+n^2*b^2*c^1+n^1*b^3*c^1+b^4*c^1+n^3*c^2+n^2*b^1*c^2+n^4+n^3*l^1+n^3*b^1+n^2*b^2+n^1*l^1*b^2+n^3*c^1+n^2*b^1*c^1+n^3+n^2*b^1;
+sourceS49[4]=l^7*b^1+n^1*l^6*c^1+l^6*b^1*c^1+n^1*l^5*c^2+l^5*b^1*c^2+n^1*l^4*c^3+l^4*b^1*c^3+n^1*l^3*c^4+n^1*l^6+l^6*b^1+l^5*b^2+n^1*l^4*b^1*c^1+n^1*l^4*c^2+l^4*b^1*c^2+l^3*b^2*c^2+n^1*l^2*b^1*c^3+n^2*l^4+n^1*l^5+l^5*b^1+l^4*b^2+l^3*b^3+n^1*l^4*c^1+l^4*b^1*c^1+n^1*l^2*b^2*c^1+l^3*b^2*c^1+l^2*b^3*c^1+n^1*l^1*b^2*c^2+l^2*b^2*c^2+n^2*l^1*c^3+n^2*c^4+n^1*l^4+l^4*b^1+n^1*l^2*b^2+l^1*b^4+n^1*l^2*b^1*c^1+n^1*b^3*c^1+n^2*l^1*c^2+n^2*b^1*c^2+b^3*c^2+n^1*l^3+n^2*l^1*b^1+n^2*b^2+l^2*b^2+n^3*c^1+n^2*l^1*c^1+n^2*b^1*c^1+b^3*c^1+n^3+n^2*l^1+n^2;
+sourceS49[5]=l^8+l^4*c^4+l^3*b^1*c^2+n^1*l^2*c^3+l^2*b^1*c^3+n^1*l^1*c^4+n^1*l^2*c^2+l^2*b^1*c^2+l^1*b^2*c^2+n^1*b^1*c^3+l^4+l^3*b^1+l^2*b^2+b^4+n^1*l^2*c^1+l^2*b^1*c^1+n^1*l^2+l^2*b^1+l^1*b^2+n^1*b^1*c^1+n^1*l^1;
+sourceU49[1]=b^1;
+sourceU49[2]=c^4+c^3+c^2+b^1+c^1;
+sourceU49[3]=c^1;
+sourceU49[4]=c^1;
+sourceU49[5]=b^2+b^1*c^1;
+sourceU49[6]=c^2+b^1+c^1;
+sourceU49[7]=l^3*b^1+n^1*l^2*c^1+l^2*b^1*c^1+n^1*l^1*c^2+n^1*l^2+l^2*b^1+l^1*b^2+n^1*b^1*c^1+n^2+n^1*l^1;
+sourceU49[8]=l^2*b^2*c^1+n^2*c^3+l^2*b^2+b^3*c^1+n^2*c^2+n^2*c^1+n^2;
+ring compactGamma49=2,(n,l,b,c,g),dp;
+map compactTwist49=original49,n+b*g,l+(1+c)*g,b,c;
+ideal gammaIdeal49=std(ideal(g^2+g+1));
+ideal compactGammaIdeal49=reduce(compactTwist49(sourceS49),gammaIdeal49);
+int compactCheck49;
+for(compactCheck49=1;compactCheck49<=size(compactGammaIdeal49);compactCheck49++){if(subst(compactGammaIdeal49[compactCheck49],g,0)!=compactGammaIdeal49[compactCheck49]){ERROR("COMPACT49_NOT_DESCENDED");quit;}}
+link compactOut49="ASCII:w compact-source49.sing";open(compactOut49);
+write(compactOut49,"ring compact49=2,(n,l,b,c),dp;ideal compactSource49;");
+int compactIndex49;
+for(compactIndex49=1;compactIndex49<=size(compactGammaIdeal49);compactIndex49++){write(compactOut49,"compactSource49["+string(compactIndex49)+"]="+string(compactGammaIdeal49[compactIndex49])+";");}
+close(compactOut49);execute(read("compact-source49.sing"));
+execute(read("accepted-plane49.sing"));
+ring compactGeneric49=(2,u),(n,l,v),dp;
+poly base49=v^2+v+u^3+u;
+poly rn49=(u+1)*v+1;poly cn49=rn49+u^3;
+poly b49=rn49*cn49/u^7;poly c49=cn49/u^4;
+if(u*c49^2+b49+c49!=0 || (u+1)*v*c49+b49*u^3+c49!=0){ERROR("COMPACT49_INVERSE_IDENTITIES");quit;}
+map compactToPlane49=compact49,n,l,b49,c49;
+map acceptedToField49=affine49,n,l,v,u;
+ideal compactGenericIdeal49=compactToPlane49(compactSource49),base49;
+ideal acceptedGenericIdeal49=acceptedToField49(sourceIdeal49);
+ideal compactGenericStd49=std(compactGenericIdeal49);ideal acceptedGenericStd49=std(acceptedGenericIdeal49);
+if(vdim(compactGenericStd49)!=32 || size(reduce(compactGenericIdeal49,acceptedGenericStd49))!=0 || size(reduce(acceptedGenericIdeal49,compactGenericStd49))!=0){ERROR("COMPACT49_GENERIC_MODEL_BINDING");quit;}
+print("COMPACT49_RESULT F2_descent=true generic_model_binding=true generic_degree=32 normalization_performed=false");
+print("COMPACT49_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,95 @@
+{
+  "schema": "pkm.recorded-child-native/v1",
+  "recorded_utc": "2026-11-05T15:01:15.365247+00:00",
+  "source_commit": "fc09f0f1fdefbdb016f724528badfc9eac31abec",
+  "all5_source_objects_clean_equal": {
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/recorded_child.rs": "135be5b3c8b8333f21794c4ecb3071b8a939bdb4",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/child_observation.rs": "11587ba7b86428f75a58305a2838cc32418baa3b",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/child_fixture.rs": "e09448fbe7a7866d2510c8d0706dba4400045de7",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/attempt_driver.rs": "5b670a3d484bd34a094e29be52b2d12dbf19c670",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/durable_attempt.rs": "0d4acf23d34597507ecd2518e372d31f494eac51"
+  },
+  "commands": "committed validate.sh,5object and globaltrackedclean guard before each phase",
+  "recipe_sha256": "3d6bb1d0fa778379ea1204fe1707d9da536041fe44ce994f371e378d0ed20bdd",
+  "passed": 27,
+  "new_integration_controls": 9,
+  "existing_child_driver_record_controls": 18,
+  "failed": 0,
+  "ignored": 0,
+  "phases": {
+    "toolchain": {
+      "exit": 0,
+      "started": "2026-11-05T14:58:21Z",
+      "finished": "2026-11-05T14:58:21Z"
+    },
+    "fixture-build": {
+      "exit": 0,
+      "started": "2026-11-05T14:58:22Z",
+      "finished": "2026-11-05T14:58:23Z"
+    },
+    "test-build": {
+      "exit": 0,
+      "started": "2026-11-05T14:58:25Z",
+      "finished": "2026-11-05T14:58:26Z"
+    },
+    "tests": {
+      "exit": 0,
+      "started": "2026-11-05T14:58:27Z",
+      "finished": "2026-11-05T14:58:28Z"
+    },
+    "clippy": {
+      "exit": 0,
+      "started": "2026-11-05T14:58:29Z",
+      "finished": "2026-11-05T14:58:30Z"
+    },
+    "fixture-clippy": {
+      "exit": 0,
+      "started": "2026-11-05T14:58:31Z",
+      "finished": "2026-11-05T14:58:32Z"
+    },
+    "format": {
+      "exit": 0,
+      "started": "2026-11-05T14:58:33Z",
+      "finished": "2026-11-05T14:58:33Z"
+    }
+  },
+  "supervisor_exit": 0,
+  "supervisor_finished": "2026-11-05T14:58:33Z",
+  "binaries": [
+    {
+      "path": "/workspace/pkm-recorded-child-20261105/native-final/fixture",
+      "bytes": 4557472,
+      "sha256": "e99d325502704ddd5f5f9ed0e31ef30d3f980a97da466ec8ce1622519b1836d4"
+    },
+    {
+      "path": "/workspace/pkm-recorded-child-20261105/native-final/tests",
+      "bytes": 7797040,
+      "sha256": "12ca0fa7cfb81476b4c1979800553042d166862415e6fafbb67598066c89300c"
+    },
+    {
+      "path": "/workspace/pkm-recorded-child-20261105/native-final/clippy-tests",
+      "bytes": 7798680,
+      "sha256": "ce41d25dc74910e34dc1243ea6d51c30bb946c1745f412469a33f7c3d342f003"
+    },
+    {
+      "path": "/workspace/pkm-recorded-child-20261105/native-final/clippy-fixture",
+      "bytes": 4557472,
+      "sha256": "ab23df66627e10bf50b2344fbe5b6406958dad4d7191de4e8c68b7836a019602"
+    }
+  ],
+  "captures": "phase-captures.json; raw_utf8 exactly reconstructs raw bytecount/hash",
+  "scope": "local Unix dummy-process descriptor/gate-callback/reap/outcome-label integration and consistency only",
+  "important_limits": [
+    "program/args captured from same ownedCommand, but not executed-image/source attestation",
+    "binarySHA256/request/source labels supplied, environment/image/argv0/io/preexec/resolution unbound",
+    "mockPermit is not checkpoint/protocol/runtime qualification",
+    "root-only; no process-tree/pipe-drain/powerloss/hostile-root/remote durability/resume qualification",
+    "reader checks recorded bytes, not execution truth or writer durability acknowledgment",
+    "work counts and uninterrupted time unavailable; no scientific cost/panel"
+  ],
+  "initial_attempt": "../initial-b9d6a4862/receipt.json;27tests0thenstrictclippy1 preserved, not used for changed final source",
+  "Rust_getter_source_changed": "child_observation.rs success/signal getters freshly covered by this5input target; oldf543receipt remains oldsourceonly",
+  "Cargo_and_formal_inputs_changed": false,
+  "aggregate": "stillFAIL:oldstrictlint2/legacyPCC13/runtimeclock2/fullsuitecap/currentmainprefixfork; no currentGitHub requiredgate pass",
+  "pcc_standing": "unverified producer observation"
+}

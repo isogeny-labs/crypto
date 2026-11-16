@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title> </title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title"> </h1>
+</header>
+<style>body{font-family:Helvetica,Arial,sans-serif;font-size:10.5pt;max-width:none;line-height:1.35}table{border-collapse:collapse}td,th{border:1px solid #999;padding:2px 6px}img{width:100%}</style>
+<h1
+id="sub-exponential-ecdlp-over-prime-fields-new-obstructions-the-residual-search-space-three-probes">Sub-exponential
+ECDLP over prime fields: new obstructions, the residual search space,
+three probes</h1>
+<p><strong>Date</strong> 2026-11-10. <strong>Study</strong>
+<code>research/ecdlp_subexp_ideas_20261110/</code> (README with
+derivations and sources). <strong>Classification</strong> desk note. No
+algorithm is claimed, nothing was measured, no disposition changes.
+Labels: <code>[derived]</code> checkable from the text;
+<code>[literature]</code> recalled, not re-read; <code>[proposed]</code>
+idea or prediction; <code>[closed on paper]</code> reduces to a recorded
+obstruction. Quoted repository numbers: <code>[pcc:unverified]</code>.
+The <code>research-kb</code> server and CLI were unavailable in this
+session; the keyword census that replaced them is in README “Sources
+checked”.</p>
+<h2
+id="lemma-a-low-degree-additive-maps-are-algebraic-homomorphisms-derived">1.
+Lemma A: low-degree additive maps are algebraic homomorphisms
+<code>[derived]</code></h2>
+<p>Let N = #E(F_p) be prime, G/F_p a connected commutative algebraic
+group, f : E → G a morphism of degree d with f(O) = 0 and f(X+Y) = f(X)
++ f(Y) for all X, Y ∈ E(F_p). If d &lt; p/4 then f is a homomorphism of
+algebraic groups: h(X,Y) = f(X+Y) − f(X) − f(Y) is a morphism E × E → G
+of degree O(d) vanishing on all N² ≈ p² rational points, and a nonzero h
+vanishes on at most O(d·p) of them (Lang–Weil / Bézout + Hasse–Weil). By
+Chevalley, f factors through the abelian part A of G and E is an isogeny
+factor of A; any image in the linear part needs N | #L(F_p) = p^u
+∏(p^{d_i} − ε_i), i.e. N = p or dim L ≥ k = ord_N(p), the embedding
+degree.</p>
+<p><em>Closed at once:</em> theta-group / Heisenberg representations
+(spectrum = Weil pairing), Hecke spectra, Chow-group and étale
+regulators, correspondences T ⊂ E × C (E | J(C), cost ≥ p), class-group
+action on points (principal ideals act as known integers because π = 1
+on E(F_p)), point-count oracles (the graph of [k] has degree k²).
+<em>Limit:</em> degree ≥ p maps can be cheap (Frobenius); Conjecture A′
+extends the lemma to straight-line complexity and is a Lean target
+(P1).</p>
+<p><em>Kummer = MOV.</em> Q ↦ [π(R) − R] ∈ E[N]/(π−1)E[N] ≅ Z/N with
+[N]R = Q is the discrete logarithm up to a unit; it is computable
+exactly when E[N] is rational over a small field, i.e. when k is small.
+Every cohomological reformulation inherits the pairing obstruction.</p>
+<h2 id="elliptic-surfaces-closed-on-paper">2. Elliptic surfaces
+<code>[closed on paper]</code></h2>
+<p>For a pencil E_t with E_{t₀} = E, a curve C ∈ |D| with C·F = d
+through d prescribed fibre points exists iff Σ P_i = T_D (restriction of
+H⁰(S, D) to the fibre is the Riemann–Roch space of a degree-d bundle):
+the multisection relation Σ P_i = tr_C(t₀) <em>is</em> Semaev’s
+condition. Two-fibre transfers through a nodal (G_m) or smooth-order
+fibre fail because the specialisation kernels Λ₀, Λ₁ ⊂ Z^r are
+unrelated. Ulmer’s unbounded-rank families need generators of degree
+exponential in log p. The open question remains the
+section-through-a-point timing
+(<code>LEAD-EXO-global-lift-height</code>; frozen family α = 3 against
+the α &lt; 1/2 a source needs).</p>
+<h2 id="the-arity-goalpost-depends-on-the-linear-algebra-derived">3. The
+arity goalpost depends on the linear algebra <code>[derived]</code></h2>
+<p>With a free oracle, cost(B) ≈ p/B^{m−1} + LA(B):</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">m</th>
+<th style="text-align: left;">oracle</th>
+<th style="text-align: left;">LA = B²</th>
+<th style="text-align: left;">LA = Õ(B)</th>
+<th style="text-align: left;">reading</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">free S₃</td>
+<td style="text-align: left;">p^{2/3}</td>
+<td style="text-align: left;">p^{1/2}</td>
+<td style="text-align: left;">never beats rho</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">free S₄</td>
+<td style="text-align: left;">p^{1/2} (tie)</td>
+<td style="text-align: left;"><strong>p^{1/3}</strong></td>
+<td style="text-align: left;">beats rho only with structured LA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">free S₅</td>
+<td style="text-align: left;">p^{2/5}</td>
+<td style="text-align: left;">p^{1/4}</td>
+<td style="text-align: left;">program note’s first viable arity</td>
+</tr>
+</tbody>
+</table>
+<p>The target splits: (T1) an S₄ oracle at δ = 1/3 (lattice reach 1/24
+asymptotic, 1/35.5 at feasible dimension) <em>plus</em> (T3) a relation
+matrix with a sub-quadratic solve, or (T2) an S₅ oracle at δ = 1/5. The
+program note’s “first arity that could beat rho is m = 4” assumes B²
+linear algebra and should record that assumption.</p>
+<figure>
+<img src="figures/route_closure_map.svg" alt="Route map" />
+<figcaption aria-hidden="true">Route map</figcaption>
+</figure>
+<p><em>A: families Lemma A closes. B: the inventory of non-algebraic
+operations on [0, p) with the recorded status of each; one row (sieving
+by congruence classes) has neither an obstruction nor a lead. C: the
+arity frontier under the two linear-algebra costs. Drawn from
+<code>data/routes.json</code>; nothing measured.</em></p>
+<h2
+id="residual-search-space-and-the-one-unexamined-operation-proposed">4.
+Residual search space and the one unexamined operation
+<code>[proposed]</code></h2>
+<p>Lemma A and Shoup leave only non-algebraic integer operations on
+coordinates. The inventory (smoothness, lattices, continued fractions,
+digits, Hensel, Frobenius on lifts, CRT, sum–product, fast evaluation)
+is closed or an active lead in every row but one: <em>sieving by
+congruence classes</em>, the Eratosthenes step that makes NFS/FFS
+relation collection O(1) per candidate. Its elliptic form, Question C: a
+base F with |F| = p^δ, membership in poly(log p), <em>and</em> an
+indicator 1_F(Q + aG) with a Fourier coefficient ≫ √|F|/N at a frequency
+computable from the curve. Coordinate boxes satisfy the first (the
+character-sum lead measured nulls for the second); scalar bases {kG : k
+≤ B} satisfy the second and not the first. Expected answer: no such
+base; P2 is the exact measurement.</p>
+<h2 id="three-falsifiable-probes-proposed">5. Three falsifiable probes
+<code>[proposed]</code></h2>
+<ul>
+<li><strong>P1 (desk).</strong> Lean statement of Lemma A: the vanishing
+count on E × E and the rigidity step. A proof closes §1’s family with a
+theorem.</li>
+<li><strong>P2 (toy compute, minutes).</strong> Full Fourier transform
+over Z/N of 1_{F_B}(Q + aG), B = N^{1/3}, N ≈ 2<sup>20..2</sup>28, ≥ 3
+primes per size; statistic: max nonzero coefficient against 400
+size-matched random bases; positive control: the scalar base (an
+interval). Closes as exhausted at scale if inside the null band at every
+size.</li>
+<li><strong>P3 (CPU-hours).</strong> Relation matrices of existing toy m
+= 2 prime-field sessions: structured-elimination time and singular-value
+profile against an Erdős–Rényi null of equal row weight. Closes (T3) as
+a cost-model entry if nothing separates at 2^16, 2^20, 2^24.</li>
+</ul>
+<p>Each runs under <code>controlled-experiment</code> if scheduled; none
+is run here. Expected outcomes: P1 proof, P2 null, P3 closure.</p>
+<h2 id="what-a-sub-exponential-algorithm-would-have-to-contain">6. What
+a sub-exponential algorithm would have to contain</h2>
+<ol type="1">
+<li>a non-lattice small-root solver for one structured congruence (S₄ at
+δ = 1/3 or S₅ at δ = 1/5) that uses the roots-are-points structure no
+lattice uses; or (2) an affine-in-the-scalar structure on
+decomposability (Question C); or (3) a cheap non-algebraic additive map
+violating Conjecture A′; or (4) a structured relation matrix together
+with (1) at m = 3. This note found no candidate for any of them; its
+contribution is to make the closure of the transfer and surface families
+a theorem rather than a list, and to name the single unexamined
+operation.</li>
+</ol>
+</body>
+</html>

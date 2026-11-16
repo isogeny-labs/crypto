@@ -1,0 +1,475 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "VIETA-COSET-RUST-SCALE-20261115",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/vieta_coset_rust_20261115",
+  "authors": [
+    "Codex"
+  ],
+  "question": "What complete two-sum sets and component costs does the native Vieta coset extractor produce across field width and coset size, versus matched scalar and batched lookup?",
+  "claims": [
+    {
+      "id": "C-output",
+      "class": "exact_computation",
+      "text": "Successful arms return identical complete ordered relation sets on each frozen target.",
+      "decided_by": [
+        "C-candidate"
+      ]
+    },
+    {
+      "id": "C-cost",
+      "class": "comparative",
+      "text": "Report descriptive component costs by configuration and population, including all failures and cold setup; no directional or fastest-backend claim.",
+      "decided_by": [
+        "C-candidate"
+      ]
+    },
+    {
+      "id": "C-excluded",
+      "class": "out_of_scope",
+      "text": "No last-fall-degree bound, exponent fit, fastest-native-backend or end-to-end ECDLP speedup is established.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "batched",
+      "role": "reference",
+      "description": "Simultaneous-inversion subtraction and prepared membership set.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "batched"
+      }
+    },
+    {
+      "id": "scalar",
+      "role": "baseline",
+      "description": "Scalar group subtraction with complete membership lookup.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "batched",
+      "parameters": {
+        "arm": "scalar"
+      }
+    },
+    {
+      "id": "vieta",
+      "role": "candidate",
+      "description": "Composed quadratic remainder, gcd and separate discriminant branch.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "batched",
+      "parameters": {
+        "arm": "vieta"
+      }
+    },
+    {
+      "id": "batched-aa",
+      "role": "control_aa",
+      "description": "Identical batched lookup repeated under a second label.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "batched",
+      "parameters": {
+        "arm": "batched-aa"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Each arm receives five independently named conditioned-two-sum target calls per configuration. Every such target must return a nonempty set, with complete equality to lookup; these input-level controls use every arm rather than a separate arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Random x conditioned on rational lift is a separate population, not assumed unsatisfiable. Complete lookup determines zero/nonzero output. No null-probability or absence claim is made."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "vieta",
+          "scalar",
+          "batched",
+          "batched-aa"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "field_and_m",
+        "treatment": "crossed",
+        "value": {
+          "fields": [
+            "word17",
+            "word31",
+            "word62",
+            "p224"
+          ],
+          "m": [
+            32,
+            128,
+            512,
+            2048,
+            8192
+          ]
+        },
+        "how": "All 20 configurations are retained separately; no pooled speed or exponent fit."
+      },
+      {
+        "name": "target_population",
+        "treatment": "crossed",
+        "value": [
+          "uniform-x-rational",
+          "conditioned-two-sum"
+        ],
+        "how": "Five retained target calls of each population per configuration; same target across arms."
+      },
+      {
+        "name": "binary_flags_threads",
+        "treatment": "fixed",
+        "value": "one release binary, locked dependencies, one thread",
+        "how": "Record compiler, source and binary hashes before execution; same binary and primitive counters for all arms."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "fixed",
+        "value": "alternating forward/reverse four-arm order",
+        "how": "Interleave per target so first/last arm cost is balanced; two distinct warmups per configuration."
+      },
+      {
+        "name": "host_environment",
+        "treatment": "measured",
+        "how": "Record CPU, frequency, SMT, NUMA, kernel, virtualization, co-tenants, PSI, affinity, memory, interruptions and actual admission. No clock interpretation below required tier."
+      },
+      {
+        "name": "layout_hashing",
+        "treatment": "measured",
+        "how": "HashSet iteration never decides search order. Hashing/allocation/sorting are unpriced by field counters and remain in secondary clock intervals."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded descriptive native analyzer",
+        "how": "No significance test or directional declaration; retain all status classes and separate populations."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-candidate",
+        "arms": [
+          "vieta",
+          "batched"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "method"
+        ]
+      },
+      {
+        "id": "C-scalar",
+        "arms": [
+          "scalar",
+          "batched"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "method"
+        ]
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "batched",
+          "batched-aa"
+        ],
+        "design": "aa",
+        "differs_in": []
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "native/main.rs fixes the fixture seed to 0x76696574612d7631 XOR m, uses SplitMix64 words via Arithmetic::random_element, alternating random rational targets and fixed base-index sums. Root seed is the post-fixture seed XOR call index. Freeze exact source before data."
+    },
+    "instance_sampling": {
+      "rule": "20 field/coset configurations, each with two warmups then ten matched target calls, half per population. Random x is reduced modulo p, rejection on nonsquare RHS, canonical Tonelli sign; not uniform points.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive tables only, unblinded method labels; no inferential decision.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 20,
+    "replicates": 10,
+    "warmups": 2,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Not powered for a statistical hypothesis. Ten target calls per configuration give five descriptive observations per population. No significance or general scaling exponent claim is licensed."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "muls",
+        "name": "Primitive multiplications",
+        "unit": "field multiplications",
+        "kind": "counted",
+        "definition": "All multiplications inside each independent stage, including inverse/sqrt internals; cold accounting includes declared reusable setup.",
+        "source": "row.work.muls",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "range"
+      },
+      {
+        "id": "relations",
+        "name": "Complete ordered relations",
+        "unit": "point pairs",
+        "kind": "exact",
+        "definition": "Length and SHA-256 of sorted complete pair set, compared across arms and replayed by wide scalar subtraction.",
+        "source": "row.relations and row.result_sha256",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "elapsed",
+        "name": "Stage wall interval",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "First to last stage operation, fixture generation excluded; include cold setup separately. Do not interpret without admitted host/A-A receipts.",
+        "source": "row.elapsed_ns",
+        "aggregation": "median",
+        "resolution": "monotonic Instant, actual host resolution recorded",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 2,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "muls",
+      "inversions",
+      "square_roots",
+      "polynomial_products",
+      "polynomial_divisions",
+      "split_attempts",
+      "group_adds",
+      "membership_lookups"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "rustc",
+      "cpu_model",
+      "kernel",
+      "SMT",
+      "NUMA",
+      "memory",
+      "PSI",
+      "affinity",
+      "co_tenants",
+      "interruptions",
+      "isolation",
+      "A/A",
+      "failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "max_cpu": 4,
+      "max_memory_gib": 8,
+      "max_usd": 3,
+      "live_budget_check_required": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "20 configurations x 4 arms x (2 warmups +10 retained target calls) =960 query rows plus setup. Stop at 3600-second absolute deadline; preserve missing rows and failures."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "A set mismatch terminates that configuration as invalid. Budget failure preserves remaining control arms and yields nonzero status. No extra attempts."
+    }
+  ],
+  "decision_rule": {
+    "text": "Descriptive component tables only after complete set equality, successful replay and host/A-A admission. Missing rows or failed admission remain explicitly inconclusive; no directional speed claim.",
+    "comparison_ids": [
+      "C-candidate",
+      "C-scalar"
+    ],
+    "statistic": "per-population median and quartiles; no pooling across configurations",
+    "interval": "empirical interquartile range, not a confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "matched component costs at declared cold/warm scope; no exponent fit",
+    "verdict_vocabulary": [
+      "descriptive_only",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/analyze.rs",
+      "sha256": null
+    },
+    "inputs": [
+      "raw/*.jsonl",
+      "host-and-admission.json"
+    ],
+    "outputs": [
+      "summary.json",
+      "report.pdf",
+      "scale.svg"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "inadmissible": [
+    "Launch before checkpoint, live budget/capacity and source/image gates",
+    "Represent a fixture ecbench job as this component study",
+    "Silently reduce m, fields, target counts or controls",
+    "Treat development tests as scale timings",
+    "Pool identity and finite-target costs or the two target populations",
+    "Count inverse/sqrt calls twice on top of nested primitive totals",
+    "Declare fastest backend without the repository Montgomery/external comparison",
+    "Promote unsigned producer observations to verified claims"
+  ],
+  "literature": [
+    {
+      "ref": "https://christophe.petit.web.ulb.be/files/16PKC_primeECDLP.pdf",
+      "provenance": "retrieved",
+      "claim": "Smooth subgroup/coset low-degree power maps.",
+      "verified_by": "producer source read; no signed PCC verdict"
+    },
+    {
+      "ref": "RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md; src/cryptanalysis/prime_fast.rs; src/cryptanalysis/fp_backend.rs; src/cryptanalysis/pkm_smooth_tower.rs",
+      "provenance": "internal",
+      "claim": "Existing decomposition, batch lookup and native arithmetic controls.",
+      "verified_by": "producer source read; KB unavailable"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

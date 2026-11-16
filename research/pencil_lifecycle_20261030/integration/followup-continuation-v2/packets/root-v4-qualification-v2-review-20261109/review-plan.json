@@ -1,0 +1,14 @@
+{
+  "schema": "prospective-source-review-plan/v1",
+  "reviewer": "renew_materializer",
+  "producer": "materializer_qualification",
+  "prior": "Reported class-local datetime assignment shadows imported module before timezone lookup. Reordering can preserve intended fake-clock behavior; verify exact source and remaining startup without executing.",
+  "familiarity": "Reviewed original v4 fixture and worker source; did not author successor fix. Original source review missed the fixture class-local shadow.",
+  "joints": [
+    "Exact diff restricted to DT class assignment order.",
+    "Actual worker/launcher and pins remain unchanged.",
+    "Inspect all startup bindings and fixed24-case callable references without running.",
+    "Retain native initial failure and full60-second debit; successor requires distinct path/manual release."
+  ],
+  "execution_permitted": false
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "random-support-average-verification/v1",
+  "source_commit": "0cfc82b95922480ab83fcfe01dd17b422368b66b",
+  "claim_id": "PCC-20261114-4f738d",
+  "declaration_sha256": "83b7a165067e380a276ddcf08733e5cdecb404684ee336251d3560d70d5af070",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 60,
+  "gate_declarations": 34,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 126,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-4f738d",
+    "claim_sha256": "a61f32ad88994818ef9c0eec17ae7c63beef4a009a7cef9620bf0a0044f9eec1",
+    "commit": "0cfc82b95922480ab83fcfe01dd17b422368b66b",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/random_support_average_audit_20261114/lean (AverageCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T13:26:37Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-4f738d",
+    "claim_sha256": "a61f32ad88994818ef9c0eec17ae7c63beef4a009a7cef9620bf0a0044f9eec1",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46364,
+    "sha256": "f6cfe2286d8949217f91e17f2f0fb90a3c3692676d774fcc781e81d7ce2b4123",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 34,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_full_uniform_ordered_distinct_support_law": true,
+    "actual_support_expectation_decomposition": true,
+    "all_standard_characters_indexed": true,
+    "actual_finite_mean_square_TV_bound": true,
+    "exact_source_floor_and_exponent": true,
+    "constants_chosen_before_modulus_support": true,
+    "stronger_expected_random_support_mixing_closed": true,
+    "zero_weight_all_time_average_lower": true,
+    "unbounded_prime_strict_weight_deletion_refuted": true,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_preprint_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

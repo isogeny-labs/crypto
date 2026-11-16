@@ -1,0 +1,716 @@
+{
+ "schema": "replay-certificate/v1",
+ "evidence_dir": "research/prime_ksum_pooled_20261029",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "independence": {
+  "replayer": "planning subagent of a Claude Code session (claude-opus-5-5) that did not produce the study's sessions, code, analysis or README; producer receipts untouched",
+  "same_binary_as_measurement": false,
+  "same_host_class_as_measurement": false,
+  "independent_implementation": false,
+  "independent_scalar_check": true,
+  "statement": "Replay of every measured deterministic run of all 8 sessions with an ecbench built from a clean git archive of 6edb2cb36d on Linux x86_64, against records recorded by ecbench-v2 (fc86ee11, macOS aarch64, 26249b4 + #2852 diff). Operation counts are host-independent; this is a different-build, different-host-class replay, not an independent implementation. Every holdout scalar re-verified [d]G = Q with this script's own affine arithmetic. The `independent: true` boolean is the writer's; the sabotage contract's signed verdict is not part of this file."
+ },
+ "binary": {
+  "path": "/tmp/claude-0/-home-user/89d98138-21ce-5c29-8de4-5fe8ac9e919c/scratchpad/ksum/target/release/ecbench",
+  "sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+  "source": "git archive 6edb2cb36d (isogeny-labs/crypto main, 2026-11-11), cargo build --release --locked",
+  "equals_session_binary_sha256": false,
+  "session_binary_sha256": "fc86ee11178da3bc373abecfaa1de532939637ab92fb86ecadf92e9ee1f9c195"
+ },
+ "command": "RAYON_NUM_THREADS=1 <binary> verify --dir <scratchpad>/sessions/<session> --replay-all --exit-code --out <scratchpad>/replay/replay-<session>.audit.json",
+ "independent_scalar_check": {
+  "method": "make_replay_certificate.py: a, b derived from G and a target; [d]G recomputed for every measured holdout record",
+  "curves": {
+   "icv1-fp20-tm1141-c50333f6": {
+    "p": 731999,
+    "a": 393706,
+    "b": 663716,
+    "r": 733141,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp20-t457-f60a16c1": {
+    "p": 658199,
+    "a": 423941,
+    "b": 256755,
+    "r": 657743,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp20-tm1079-bf1bb5fd": {
+    "p": 584767,
+    "a": 198133,
+    "b": 297747,
+    "r": 585847,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp20-t375-aef80152": {
+    "p": 923743,
+    "a": 891514,
+    "b": 586300,
+    "r": 923369,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp24-tm1215-254f2c18": {
+    "p": 15155017,
+    "a": 3658211,
+    "b": 6153727,
+    "r": 15156233,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp24-tm3365-ba8f1013": {
+    "p": 13881823,
+    "a": 514726,
+    "b": 10178410,
+    "r": 13885189,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp24-tm2615-5e182037": {
+    "p": 9845107,
+    "a": 8171369,
+    "b": 9819050,
+    "r": 9847723,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp24-t5097-1f48e65c": {
+    "p": 13115629,
+    "a": 7911932,
+    "b": 1797942,
+    "r": 13110533,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp28-tm5475-0f58a032": {
+    "p": 146781643,
+    "a": 51738534,
+    "b": 54545012,
+    "r": 146787119,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp28-t12791-9e92c6c2": {
+    "p": 213708647,
+    "a": 186338265,
+    "b": 118330842,
+    "r": 213695857,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp28-t20259-8fb841e7": {
+    "p": 155913907,
+    "a": 146268840,
+    "b": 128469689,
+    "r": 155893649,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp28-t24271-da5b2687": {
+    "p": 204948281,
+    "a": 148287127,
+    "b": 84954211,
+    "r": 204924011,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp32-tm70799-e5f3e6f2": {
+    "p": 2468872309,
+    "a": 740848899,
+    "b": 111551246,
+    "r": 2468943109,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp32-tm14249-af783d1f": {
+    "p": 3149148911,
+    "a": 711291984,
+    "b": 671517315,
+    "r": 3149163161,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp32-t8395-a5210489": {
+    "p": 2981198323,
+    "a": 1238630014,
+    "b": 2744266586,
+    "r": 2981189929,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   },
+   "icv1-fp32-tm30557-158f1cf7": {
+    "p": 3101101781,
+    "a": 832459755,
+    "b": 1784514525,
+    "r": 3101132339,
+    "p_prime": true,
+    "r_prime": true,
+    "cofactor": 1,
+    "j_not_0_or_1728": true,
+    "rG_is_identity": true
+   }
+  },
+  "measured_records": 5952,
+  "failures": []
+ },
+ "sessions": [
+  {
+   "session_dir": "sessions/holdout-P20",
+   "session_id": "ECBS1hacb7f105de0a",
+   "receipt": "replay-holdout-P20.audit.json (scratchpad; to be copied to validation/)",
+   "receipt_sha256": "9ee7a1049a67f403b6f043f8d2e52793f87197b70a1855bb8ae424577450136b",
+   "end_line": "end rc=0 elapsed_s=3 2026-11-12T04:13:20Z",
+   "records": 2016,
+   "verified_records": 2016,
+   "replays": 1344,
+   "replays_reproduced": 1344,
+   "replay_details": [
+    "identical"
+   ],
+   "problems": [],
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+   },
+   "ok": true,
+   "session_files_sha256": {
+    "session.json": "4b40585b1c564e730645c76d3f374922dfc624a1fce82b90f7be3a5eb3033394",
+    "spec.json": "92fc0d2aa0d94f6e5814c71aac49bd36637bfa259d0bc66d0ad820f21731fe27",
+    "plan.json": "4b3b938e26a38d27784ffffdbed95e5a3f7e9c76d6fb8d26d30733debea44de5",
+    "host.json": "deccdd4969bfc05b82742d506f2d1791f2bd1b7c696c1afe6c60cb368e7588df",
+    "records.jsonl": "4d0406a9f46f8e438a2b66e49d948b40f96b11a08eae7a508feefe60e5a0a267"
+   },
+   "session_json_files_equal_repo_6edb2cb": true,
+   "records_jsonl_source": "git blob at a0ff77014f:research/prime_ksum_pooled_20261029/sessions/holdout-P20/records.jsonl",
+   "records_jsonl_equals_session_records_sha256": true,
+   "producer_receipt": "audits/holdout-P20.json",
+   "producer_receipt_sha256": "8164989bca095900d5ff3c60ae5d7c6534f82c961e4dd231f40e0a0e0b75544c",
+   "auditor_binary_sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+   "auditor_env_class_id": "ECBENV3h4e3a011621d8",
+   "session_ok": true
+  },
+  {
+   "session_dir": "sessions/holdout-P24",
+   "session_id": "ECBS1hbd8f99f49bd4",
+   "receipt": "replay-holdout-P24.audit.json (scratchpad; to be copied to validation/)",
+   "receipt_sha256": "1397cae592593ac4b245ed37de3a404624d2299f2467c178009e9cd61575eb28",
+   "end_line": "end rc=0 elapsed_s=9 2026-11-12T04:13:43Z",
+   "records": 2304,
+   "verified_records": 2304,
+   "replays": 1536,
+   "replays_reproduced": 1536,
+   "replay_details": [
+    "identical"
+   ],
+   "problems": [],
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+   },
+   "ok": true,
+   "session_files_sha256": {
+    "session.json": "4130cbbe909bcc1c2629fddbd7dfa035bdcc88cd89a18d88d8c554a7520f6630",
+    "spec.json": "a3b63620505c2f190c6d706b7c83d9498f80fbe1a55af33c087fc3cc3a18cee1",
+    "plan.json": "cbbc839f237ca44ba9ba3cf13c231efa331d38db1fbeea4967d54cca6a9e7823",
+    "host.json": "c755b0f3036dd48fa15c3383e8f6b562d121eb5265b64e00377a0b175662d612",
+    "records.jsonl": "72408ce5bc266ddd3d1e81cfc27f56de644a7aaf66c7e48c5a9aa0ae712fc0a6"
+   },
+   "session_json_files_equal_repo_6edb2cb": true,
+   "records_jsonl_source": "git blob at a0ff77014f:research/prime_ksum_pooled_20261029/sessions/holdout-P24/records.jsonl",
+   "records_jsonl_equals_session_records_sha256": true,
+   "producer_receipt": "audits/holdout-P24.json",
+   "producer_receipt_sha256": "e1d6eb0e9dd7494403d83395d7cf660b03cdfe8fea08a411993535a408ab610a",
+   "auditor_binary_sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+   "auditor_env_class_id": "ECBENV3h4e3a011621d8",
+   "session_ok": true
+  },
+  {
+   "session_dir": "sessions/holdout-P28",
+   "session_id": "ECBS1h569bfb294d4d",
+   "receipt": "replay-holdout-P28.audit.json (scratchpad; to be copied to validation/)",
+   "receipt_sha256": "33c927e7da4e5a80db17408e9a0a761f446fa66e80186a8f02d4c401634bc83f",
+   "end_line": "end rc=0 elapsed_s=35 2026-11-12T04:14:09Z",
+   "records": 2304,
+   "verified_records": 2304,
+   "replays": 1536,
+   "replays_reproduced": 1536,
+   "replay_details": [
+    "identical"
+   ],
+   "problems": [],
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+   },
+   "ok": true,
+   "session_files_sha256": {
+    "session.json": "550d0e19ec1fda17413cdb1d85dfe16303a17d5e345ac2defbb3132f668ef764",
+    "spec.json": "a04484e2f36a96e6270800600cc2a056966a6df0bdb555eec0fbae6dca711a1e",
+    "plan.json": "970718a614bea9ff79d360f62a7007af3fb93b6def58dfd18c8b32375af47f89",
+    "host.json": "9dd5aeb777ab138bbc3e79aa3078736c5012f3000a9366ed7273228bc256b3c5",
+    "records.jsonl": "d1b005cbf9ec2dac50bc1122ccf5a87c3dc27eed2f6df5f47cde15ec744b5516"
+   },
+   "session_json_files_equal_repo_6edb2cb": true,
+   "records_jsonl_source": "git blob at a0ff77014f:research/prime_ksum_pooled_20261029/sessions/holdout-P28/records.jsonl",
+   "records_jsonl_equals_session_records_sha256": true,
+   "producer_receipt": "audits/holdout-P28.json",
+   "producer_receipt_sha256": "1d2d7d124675e1c026523bbca81054b3586c7a341327746905cf2cd8c721d195",
+   "auditor_binary_sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+   "auditor_env_class_id": "ECBENV3h4e3a011621d8",
+   "session_ok": true
+  },
+  {
+   "session_dir": "sessions/holdout-P32",
+   "session_id": "ECBS1h407e9e2de743",
+   "receipt": "replay-holdout-P32.audit.json (scratchpad; to be copied to validation/)",
+   "receipt_sha256": "9e25910dc8561a422a84a37f0f56f1200a94ea2234b7b27c3e779c455540a1d9",
+   "end_line": "end rc=0 elapsed_s=238 2026-11-12T04:18:35Z",
+   "records": 2304,
+   "verified_records": 2304,
+   "replays": 1536,
+   "replays_reproduced": 1536,
+   "replay_details": [
+    "identical"
+   ],
+   "problems": [],
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+   },
+   "ok": true,
+   "session_files_sha256": {
+    "session.json": "85ac39a21f2bb522065323c5d5aa05b4ad8503693c1b8204a4738db8da75b72b",
+    "spec.json": "fa55d5964758707ad69bfb5c8fcd833f698af2316f390a2b698d878e8fe0c8de",
+    "plan.json": "56a353261952ff576e5b905cf73e23acf4e3798961acd0ae83e7020abbfd8e83",
+    "host.json": "c08a455466faeaf3655a08343dfa1da6453b1ca7275eb72f198a484b65212f71",
+    "records.jsonl": "fc4c325893dd52ffec5c98a4b675a74b985cdbe66d16525357b3e8c1d08ff144"
+   },
+   "session_json_files_equal_repo_6edb2cb": true,
+   "records_jsonl_source": "git blob at a0ff77014f:research/prime_ksum_pooled_20261029/sessions/holdout-P32/records.jsonl",
+   "records_jsonl_equals_session_records_sha256": true,
+   "producer_receipt": "audits/holdout-P32.json",
+   "producer_receipt_sha256": "19ac8490803634e9c59bdbb25b995b8b9ffe0c8581782601d942941463228e71",
+   "auditor_binary_sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+   "auditor_env_class_id": "ECBENV3h4e3a011621d8",
+   "session_ok": true
+  },
+  {
+   "session_dir": "sessions/train-P20",
+   "session_id": "ECBS1hccc51e0efaaf",
+   "receipt": "replay-train-P20.audit.json (scratchpad; to be copied to validation/)",
+   "receipt_sha256": "9c49acfe46d9a3f18d0affa99415bcac70534499d8017664a475b77f4aa90c97",
+   "end_line": "end rc=0 elapsed_s=6 2026-11-12T04:13:23Z",
+   "records": 1224,
+   "verified_records": 1224,
+   "replays": 816,
+   "replays_reproduced": 816,
+   "replay_details": [
+    "identical"
+   ],
+   "problems": [],
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+   },
+   "ok": true,
+   "session_files_sha256": {
+    "session.json": "72c553caad76008b39de678a817155e9653d66f778c174b31d671b4b9a008f20",
+    "spec.json": "4072c9b6a3caddc9b8d7fc9549ff32e11c10b632702a3e11e1b14ba31676d60c",
+    "plan.json": "17ab74ecea2ec89ea7fcc88ba1b75ee86e2954f3e5a7e92ea5f8c2fb7f9e8fe2",
+    "host.json": "ba62f83e3f353284466f519ce3a68a638d41c07950afaff6342e65a4e4408d4d",
+    "records.jsonl": "f6b450327de721c5ac02fe230b5479f4884dbf55712b423b2e4811684eb98a44"
+   },
+   "session_json_files_equal_repo_6edb2cb": true,
+   "records_jsonl_source": "git blob at a0ff77014f:research/prime_ksum_pooled_20261029/sessions/train-P20/records.jsonl",
+   "records_jsonl_equals_session_records_sha256": true,
+   "producer_receipt": "audits/train-P20.txt",
+   "producer_receipt_sha256": "be864efc1c951d5222c5b421fe63fb3e5d876f5c21b960ffc89c964b7a2df005",
+   "auditor_binary_sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+   "auditor_env_class_id": "ECBENV3h4e3a011621d8",
+   "session_ok": true
+  },
+  {
+   "session_dir": "sessions/train-P24",
+   "session_id": "ECBS1hbebf7126eeb8",
+   "receipt": "replay-train-P24.audit.json (scratchpad; to be copied to validation/)",
+   "receipt_sha256": "9db5152129f854660515281fd17c6e6fbb8f56405a9742b53d557cfa0a2b4c91",
+   "end_line": "end rc=0 elapsed_s=17 2026-11-12T04:13:34Z",
+   "records": 1224,
+   "verified_records": 1224,
+   "replays": 816,
+   "replays_reproduced": 816,
+   "replay_details": [
+    "identical"
+   ],
+   "problems": [],
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+   },
+   "ok": true,
+   "session_files_sha256": {
+    "session.json": "d060df3257c77aeb503c9a59dc975cb1610629e6bb4b51e9af568b76a63258ca",
+    "spec.json": "993b62ba4e6be8d2560e6e51512d62943e4e915b06318313a683e6c8a232638f",
+    "plan.json": "acebd934f47bb76771b76f6ddc9dba63cf6f8e81718e6ca41a726e224af82917",
+    "host.json": "a16a3c888691428e638f3990237886d60fc3814e1806b284e740e8e3634bf2d9",
+    "records.jsonl": "8f94b334389b90b53e46db7a467fb11b304e420090d28aebbbd09b5ef8f6a738"
+   },
+   "session_json_files_equal_repo_6edb2cb": true,
+   "records_jsonl_source": "git blob at a0ff77014f:research/prime_ksum_pooled_20261029/sessions/train-P24/records.jsonl",
+   "records_jsonl_equals_session_records_sha256": true,
+   "producer_receipt": "audits/train-P24.txt",
+   "producer_receipt_sha256": "95ddc54795e3fcd1b60e152337b0d185950783ceabcad6bb51e2f4650d85e6a6",
+   "auditor_binary_sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+   "auditor_env_class_id": "ECBENV3h4e3a011621d8",
+   "session_ok": true
+  },
+  {
+   "session_dir": "sessions/train-P28",
+   "session_id": "ECBS1hcb6fd8bf4a01",
+   "receipt": "replay-train-P28.audit.json (scratchpad; to be copied to validation/)",
+   "receipt_sha256": "53a0a645217d058c2b2601941a6f42d2b9d12de86719a96fd0cf20432c432ebb",
+   "end_line": "end rc=0 elapsed_s=63 2026-11-12T04:14:37Z",
+   "records": 1224,
+   "verified_records": 1224,
+   "replays": 816,
+   "replays_reproduced": 816,
+   "replay_details": [
+    "identical"
+   ],
+   "problems": [],
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+   },
+   "ok": true,
+   "session_files_sha256": {
+    "session.json": "4ead54efe121746ae126fcca07d674a514a065b3117c6ff33a1fc103a111441b",
+    "spec.json": "8c6aa9e4d8543b07493ec8abda70962e7cccfba2be5ec097470db2368902da54",
+    "plan.json": "d8bfdac115f430d38c879c81f5741701a91506278d89b69937f05393b88933ae",
+    "host.json": "939548b9a742e8f83160ef7c91e9e72e86f1e660f0ebcd021bf84f99a9111adb",
+    "records.jsonl": "71b56035fd166590e67f9224eec5b86834bacfac3cd462f7cccfa08bae780a2f"
+   },
+   "session_json_files_equal_repo_6edb2cb": true,
+   "records_jsonl_source": "git blob at a0ff77014f:research/prime_ksum_pooled_20261029/sessions/train-P28/records.jsonl",
+   "records_jsonl_equals_session_records_sha256": true,
+   "producer_receipt": "audits/train-P28.txt",
+   "producer_receipt_sha256": "3b69137379ec086edad3be8f1452ec97db9d0181a81264544391e64a0963942e",
+   "auditor_binary_sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+   "auditor_env_class_id": "ECBENV3h4e3a011621d8",
+   "session_ok": true
+  },
+  {
+   "session_dir": "sessions/train-P32",
+   "session_id": "ECBS1h7fb9572c17af",
+   "receipt": "replay-train-P32.audit.json (scratchpad; to be copied to validation/)",
+   "receipt_sha256": "5ebaebbbafbcdf60d815a4f75064ec124fab9fc35c0794f90f7fbd8d749b49df",
+   "end_line": "end rc=0 elapsed_s=450 2026-11-12T04:22:07Z",
+   "records": 1224,
+   "verified_records": 1224,
+   "replays": 816,
+   "replays_reproduced": 816,
+   "replay_details": [
+    "identical"
+   ],
+   "problems": [],
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+   },
+   "ok": true,
+   "session_files_sha256": {
+    "session.json": "628bf7d7b1cc83f8d05c0e990a99e0e8923ca0ff3a0f8426233f70863e473011",
+    "spec.json": "eeb03fe0652cc2665cff358eccb1a51bd3787b3032519fd4838a85aea4f57d0c",
+    "plan.json": "7642102b00d21759aca55edc7c93bfbbbe0dc67eb45b24ce9f791f9a4cafef89",
+    "host.json": "1b47d4d03919fd630098ba37da370b6e62f9ae564e52248d7e45b96fb39e6173",
+    "records.jsonl": "d4e5539588c3f5a5199a58ab68d92bdd32f031a5dae2436fbb8ea57ffaaa07ef"
+   },
+   "session_json_files_equal_repo_6edb2cb": true,
+   "records_jsonl_source": "git blob at a0ff77014f:research/prime_ksum_pooled_20261029/sessions/train-P32/records.jsonl",
+   "records_jsonl_equals_session_records_sha256": true,
+   "producer_receipt": "audits/train-P32.txt",
+   "producer_receipt_sha256": "fa9749ff675a5b97acfc2e823da7f88c03cf53870b6a69662e2df5520c5c8086",
+   "auditor_binary_sha256": "1df488d3fac9bf47a75b70bc22e201badf3882ef076200844ad20e94c6beb258",
+   "auditor_env_class_id": "ECBENV3h4e3a011621d8",
+   "session_ok": true
+  }
+ ],
+ "runs": [
+  {
+   "session": "holdout-P20",
+   "audit": {
+    "path": "validation/replay/replay-holdout-P20.audit.json",
+    "sha256": "9ee7a1049a67f403b6f043f8d2e52793f87197b70a1855bb8ae424577450136b"
+   },
+   "measured_holdout_records_scalar_checked": 1344,
+   "scalar_checks_dG_equals_Q": 1344,
+   "reproduced": 1344,
+   "status": "verified"
+  },
+  {
+   "session": "holdout-P24",
+   "audit": {
+    "path": "validation/replay/replay-holdout-P24.audit.json",
+    "sha256": "1397cae592593ac4b245ed37de3a404624d2299f2467c178009e9cd61575eb28"
+   },
+   "measured_holdout_records_scalar_checked": 1536,
+   "scalar_checks_dG_equals_Q": 1536,
+   "reproduced": 1536,
+   "status": "verified"
+  },
+  {
+   "session": "holdout-P28",
+   "audit": {
+    "path": "validation/replay/replay-holdout-P28.audit.json",
+    "sha256": "33c927e7da4e5a80db17408e9a0a761f446fa66e80186a8f02d4c401634bc83f"
+   },
+   "measured_holdout_records_scalar_checked": 1536,
+   "scalar_checks_dG_equals_Q": 1536,
+   "reproduced": 1536,
+   "status": "verified"
+  },
+  {
+   "session": "holdout-P32",
+   "audit": {
+    "path": "validation/replay/replay-holdout-P32.audit.json",
+    "sha256": "9e25910dc8561a422a84a37f0f56f1200a94ea2234b7b27c3e779c455540a1d9"
+   },
+   "measured_holdout_records_scalar_checked": 1536,
+   "scalar_checks_dG_equals_Q": 1536,
+   "reproduced": 1536,
+   "status": "verified"
+  },
+  {
+   "session": "train-P20",
+   "audit": {
+    "path": "validation/replay/replay-train-P20.audit.json",
+    "sha256": "9c49acfe46d9a3f18d0affa99415bcac70534499d8017664a475b77f4aa90c97"
+   },
+   "measured_holdout_records_scalar_checked": 0,
+   "scalar_checks_dG_equals_Q": 0,
+   "reproduced": 0,
+   "status": "verified"
+  },
+  {
+   "session": "train-P24",
+   "audit": {
+    "path": "validation/replay/replay-train-P24.audit.json",
+    "sha256": "9db5152129f854660515281fd17c6e6fbb8f56405a9742b53d557cfa0a2b4c91"
+   },
+   "measured_holdout_records_scalar_checked": 0,
+   "scalar_checks_dG_equals_Q": 0,
+   "reproduced": 0,
+   "status": "verified"
+  },
+  {
+   "session": "train-P28",
+   "audit": {
+    "path": "validation/replay/replay-train-P28.audit.json",
+    "sha256": "53a0a645217d058c2b2601941a6f42d2b9d12de86719a96fd0cf20432c432ebb"
+   },
+   "measured_holdout_records_scalar_checked": 0,
+   "scalar_checks_dG_equals_Q": 0,
+   "reproduced": 0,
+   "status": "verified"
+  },
+  {
+   "session": "train-P32",
+   "audit": {
+    "path": "validation/replay/replay-train-P32.audit.json",
+    "sha256": "5ebaebbbafbcdf60d815a4f75064ec124fab9fc35c0794f90f7fbd8d749b49df"
+   },
+   "measured_holdout_records_scalar_checked": 0,
+   "scalar_checks_dG_equals_Q": 0,
+   "reproduced": 0,
+   "status": "verified"
+  }
+ ],
+ "runs_detail": {
+  "path": "validation/replay/scalar-checks.jsonl",
+  "sha256": "34515ca15fb30b9f593a0577b22635cf91835969ca150898642d1b749234ac01",
+  "records": 5952,
+  "note": "one line per measured holdout record: session, record id, arm, curve, target, round, recovered scalar, independent [d]G = Q check, replay outcome; the per-session audit files pinned in runs carry ecbench's own replay of every record (train and warm-ups included)"
+ },
+ "compacted_from": {
+  "sha256": "700f78573b7d439e8e8d66a3fd86664751a2c706cb44218af799b6c1c8991af9",
+  "reason": "the per-record certificate (2.07 MB) exceeded the artifact store's 1 MiB threshold and was moved out of Git, where the gate and pcc read it; runs are summarised per session and the per-record list is runs_detail"
+ }
+}

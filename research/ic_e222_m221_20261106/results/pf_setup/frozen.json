@@ -1,0 +1,8 @@
+{"arms": {"new_c1": {"table": true, "batched": true, "batched_setup": true, "c": 1.0},
+          "new_c2": {"table": true, "batched": true, "batched_setup": true, "c": 2.0},
+          "bsgs_tuned": {"mode": "tuned"}},
+ "reference_rows": "results/pf_batched/eval_batched_* (previous batched arm, unbatched setup, c = 2.0) on identical targets; run-to-run noise 1.2x to 1.3x (validator)",
+ "T": [1000, 10000], "bits": [25, 29, 31], "instances": {"25": 2, "29": 2, "31": 1}, "extra": 6,
+ "basis": "c = 1.0 chosen from a 27-bit exploratory run (c in {1, 2}, 2 instances x 2 residues; results in pf_setup/explore_27_*.txt); 25/29/31-bit curves were not used for any tuning of the batched-setup arm.",
+ "prediction": "new_c1 / previous batched (c = 2.0 committed rows) <= 0.85 at T = 1000 (median over rows); new_c1 / tuned BSGS <= 5 at T = 1000 (median); at T = 10000 new_c1 / previous batched <= 1.0",
+ "abandon_if": "new_c1 / previous batched median >= 1.0 at T = 1000"}

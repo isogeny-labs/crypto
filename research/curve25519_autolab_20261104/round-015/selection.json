@@ -1,0 +1,117 @@
+{
+  "holdout_spec_sha256": {
+    "holdout-k28": "4a0ae834f85dbd27bd20f28015bb87985a7abecd6f6483f9f008b4129ce4251a"
+  },
+  "round": 15,
+  "rule": "lowest mean S at w = 0 among candidates whose every run verified; a challenger only if below inc at w = 0",
+  "schema": "ic_autolab.selection/v1",
+  "selected": "2026-11-04T05:13:27Z",
+  "sizes": {
+    "28": {
+      "alt_w1": {
+        "factor_base": "prime-projected-abscissa:size=15,scan_cap=240",
+        "family": "ksum4f",
+        "n": 15,
+        "name": "ksum4f-n15",
+        "oracle": "ksum:m=4,free=1"
+      },
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=15,scan_cap=240",
+            "family": "ksum4f",
+            "n": 15,
+            "name": "ksum4f-n15",
+            "oracle": "ksum:m=4,free=1"
+          },
+          "s": [
+            6.674662160491985,
+            7.494487029459031,
+            14.872910850162416
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=22,scan_cap=352",
+            "family": "ksum4f",
+            "n": 22,
+            "name": "ksum4f-n22",
+            "oracle": "ksum:m=4,free=1"
+          },
+          "s": [
+            12.634733151519642,
+            12.87290683173207,
+            15.016469953643954
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=26,scan_cap=416",
+            "family": "ksum3f",
+            "n": 26,
+            "name": "ksum3f-n26",
+            "oracle": "ksum:m=3,free=1"
+          },
+          "s": [
+            9.449492616291181,
+            10.865220470025456,
+            23.606771153633936
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=36,scan_cap=576",
+            "family": "ksum3f",
+            "n": 36,
+            "name": "ksum3f-n36",
+            "oracle": "ksum:m=3,free=1"
+          },
+          "s": [
+            8.75599943471638,
+            9.416265578038358,
+            15.358660867936154
+          ],
+          "status": "verified"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=16,scan_cap=256",
+            "family": "ksum5",
+            "n": 16,
+            "name": "ksum5-n16",
+            "oracle": "ksum:m=5"
+          },
+          "s": [
+            16.072421280526296,
+            16.23895620610456,
+            17.737770536308943
+          ],
+          "status": "verified"
+        }
+      ],
+      "inc_s": [
+        7.43983779235473,
+        7.9059058850926816,
+        12.100518719734245
+      ],
+      "rho_s": [
+        0.99260341796217,
+        1.0854410381063084,
+        1.9209796194035542
+      ],
+      "sel": {
+        "factor_base": "prime-projected-abscissa:size=15,scan_cap=240",
+        "family": "ksum4f",
+        "n": 15,
+        "name": "ksum4f-n15",
+        "oracle": "ksum:m=4,free=1"
+      },
+      "session_id": "ECBS1h491e106d4af1",
+      "status": "challenger"
+    }
+  },
+  "track": "generic"
+}

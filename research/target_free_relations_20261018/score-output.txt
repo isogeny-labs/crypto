@@ -1,0 +1,14 @@
+Records: 4 files, 4 (cell, basis, twists) groups.
+
+| (n, ℓ) | basis | twists | target-free measured / draws | target-free solving (measured; bounds ≥) | target m = 3 measured / draws | target solving (measured) | unsat. target draws | registered reading | single-arm reading (fewer than 3 draws) |
+|---|---|---|--:|---|--:|---|--:|---|---|
+| (16, 4) | gp | [0,0,0,0] | 0 / 1 | bounds ≥ 4 | 1 / 1 | 4 | 1 | unmeasured | not lower (bounded: every target-free draw ≥ target median) |
+| (16, 4) | gp | [0,1,2,3] | 0 / 1 | bounds ≥ 4 | 1 / 1 | 4 | 1 | unmeasured | not lower (bounded: every target-free draw ≥ target median) |
+| (16, 4) | random | [0,0,0,0] | 0 / 4 | bounds ≥ 4, 4, 4, 4 | 4 / 4 | 4, 4, 4, 4 | 4 | unmeasured | not lower (bounded: every target-free draw ≥ target median) |
+| (16, 4) | random | [0,1,2,3] | 0 / 4 | bounds ≥ 4, 4, 4, 4 | 4 / 4 | 4, 4, 4, 4 | 4 | unmeasured | not lower (bounded: every target-free draw ≥ target median) |
+
+Registered verdict: killed on the bounded reading (no cell reads lower for gp on any draw, measured or bounded); undecided by the registered rule (fewer than 3 measured draws per arm). gp cells reading lower: []; random cells reading lower: []; gp cells with a registered reading: 0 of 1; gp cells bounded not-lower on every twist: 1 of 1.
+P1 (gp plain reads higher or equal at every measured cell): unmeasured — (16,4)[0000]: unmeasured, bounded not lower
+P2 (gp twisted reads equal at every measured cell): unmeasured — (16,4)[0123]: unmeasured, bounded not lower
+P3 (random never reads lower): unmeasured — (16,4)[0000]: unmeasured, bounded not lower; (16,4)[0123]: unmeasured, bounded not lower
+P4 (target arm F4 solving degree = 4 on unsatisfiable draws at (16,4), (18,4)): holds — 10 of 10 unsatisfiable measured target draws read 4

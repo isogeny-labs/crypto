@@ -1,0 +1,192 @@
+{
+  "schema": "semaev-original-source-plan/v1",
+  "created": "2026-11-10T11:50:45.066737+00:00",
+  "status": "Preissue frozen sources; whole28gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/semaev_source_audit_20261110/lean",
+    "theorem": "SemaevBinaryFourthCertificateAudit.binary_fourth_source_audit_certificate",
+    "statement": "theorem binary_fourth_source_audit_certificate : (∀ (K : Type) [Field K] [CharP K 2] (a x y z w : K), generalS4 (binaryCurve a) x y z w=correctedFourth x y z w) ∧ Nat.card F=4 ∧ curve.Δ≠0 ∧ alpha^2+alpha+1=0 ∧ generalS4 curve 1 1 alpha (alpha^2)=0 ∧ literalPrintedFourth (1:F) 1 alpha (alpha^2)=1 ∧ fourPoints curve 1 1 alpha (alpha^2) ∧ (∀ x y z w : ZMod 2,correctedFourth x y z w=literalPrintedFourth x y z w) ∧ (¬∀ a x y z w : F, literalPrintedFourth x y z w=generalS4 (binaryCurve a) x y z w) ∧ (¬∀ x y z w : F,fourPoints curve x y z w→literalPrintedFourth x y z w=0)",
+    "decl_sha256": "e8d707fe77dc62601ec8e9a70378f77244ac0dfb77822755fa38963248633268",
+    "sources": [
+      {
+        "path": "research/semaev_source_audit_20261110/lean/BinaryFourth.lean",
+        "bytes": 1856,
+        "sha256": "b2e2130e75b5d5ff0067cc8b731e8b31b98e9542b3de37fbebe2db5d12b97dbd"
+      },
+      {
+        "path": "research/semaev_source_audit_20261110/lean/BinaryFourthCertificate.lean",
+        "bytes": 2406,
+        "sha256": "419fc8577b674d24da0d40e91834d728ae4a660db247f76da9cce3ff877b0e10"
+      },
+      {
+        "path": "research/semaev_source_audit_20261110/lean/BinaryFourthControl.lean",
+        "bytes": 2055,
+        "sha256": "c2f2779614c4d759e3e339edbbca8fd5da5bea32ac2e06cbbefc3ee26db19583"
+      },
+      {
+        "path": "research/semaev_source_audit_20261110/lean/BinaryFourthPoints.lean",
+        "bytes": 3296,
+        "sha256": "ff68b553d823788527f20205dd52103e67a9dfc6d6359a5f6ca3b993c4a8d357"
+      },
+      {
+        "path": "research/semaev_source_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4086,
+        "sha256": "b8ded4aa6492ea60d20bb5a779c806b0db824040243e44b0400a2ed126c256e8"
+      },
+      {
+        "path": "research/semaev_source_audit_20261110/lean/lakefile.toml",
+        "bytes": 310,
+        "sha256": "81955e024df3b5df8af980ac5962d02a06ecf03e4de384384655d0ebe15c80c5"
+      },
+      {
+        "path": "research/semaev_source_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/BinaryS3.lean",
+        "bytes": 11572,
+        "sha256": "d8e15f0092c6721d3078461babf2f07376ac84598429c23b3f7c0b2878e0f188"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/DiemSmallField.lean",
+        "bytes": 9131,
+        "sha256": "ac3c9012cec758c657f824f193da20586062414264155d20d7abef11a998ff68"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/DiemThreshold.lean",
+        "bytes": 3355,
+        "sha256": "2537128120f15b7ddc6be380ab2e6c7a2c3a800252034364867efe2329d0790d"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS3.lean",
+        "bytes": 13770,
+        "sha256": "13ffefd385f4e20e60df00483802c80c00cc21c9f25caf41987d41845d375633"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS3Controls.lean",
+        "bytes": 7137,
+        "sha256": "d6e1c36ef211edbbb21c708972de95d1a086a5b730215267a91bc71a5bdfa32d"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS4.lean",
+        "bytes": 11447,
+        "sha256": "1d73c0555b406b7c54796796f11f4ca720708060b2d5dba4de95c9d455bc378b"
+      }
+    ],
+    "scope": "For every characteristic-two field/a/tuple, corrected binary S4 expression equals actual Mathlib resultant. Actual F4/nonsingular binary curve/four rational points sum0 while literal missing-plus product is1 and resultant0. Direct formula equality and vanishing negations; all16F2tuples agree. Literal typography of pinned author manuscript, no refutation of generic recursive theorem or other source versions."
+  },
+  "artifacts": [
+    {
+      "path": "research/semaev_source_audit_20261110/evidence/attempts.tar.gz",
+      "bytes": 8412,
+      "sha256": "b772b4e1665664813de2f34b9d4b33d48f3c66e175ee5e84724c5335f7084548"
+    },
+    {
+      "path": "research/semaev_source_audit_20261110/evidence/attempts.json",
+      "bytes": 5343,
+      "sha256": "a8765b8f2107f69fb60fe3c76e56176a3b198f0ccab4c135d69ddf673093aff7"
+    },
+    {
+      "path": "research/semaev_source_audit_20261110/evidence/gate.tar.gz",
+      "bytes": 2706,
+      "sha256": "62f9217f570d87515b2b98c355c105d504d29641d478149720b40777d6ecc076"
+    },
+    {
+      "path": "research/semaev_source_audit_20261110/evidence/gate.json",
+      "bytes": 1151,
+      "sha256": "af52879ce606b23e12e1683159714f719de519a348b52de96a229e9f7035de93"
+    },
+    {
+      "path": "research/semaev_source_audit_20261110/evidence/source-review.json",
+      "bytes": 1934,
+      "sha256": "1dd9edff27582290435cb51b7ab095f3c2b19d3ea93b8df205d0179aa9df9906"
+    },
+    {
+      "path": "research/semaev_source_audit_20261110/coverage.json",
+      "bytes": 907,
+      "sha256": "be373a5ad05f4a0f83d3eedbf4cf0364d1abd5706ea0f74379c6450b3aabc3ed"
+    },
+    {
+      "path": "research/semaev_source_audit_20261110/resultant-identity-certificate.json",
+      "bytes": 12988,
+      "sha256": "2bf48b202f37dd256196a3b40fcaf88565de371ef8af059cb9f256864b473864"
+    }
+  ],
+  "gate": {
+    "archive": "research/semaev_source_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 28,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/semaev_source_audit_20261110/evidence/attempts.tar.gz",
+    "files": 31,
+    "roundtrip_equal": true
+  },
+  "proof_outline": [
+    "Simplify actual binary Weierstrass invariants to six quadratic coefficients.",
+    "Actual determinant/res22 identity plus characteristic-two Frobenius square identities prove universal additive formula.",
+    "AdjoinRoot alpha relation/card4 and actual affine equations construct P,T,R,S.",
+    "Actual coordinate formulas prove2P=T,R+S=T,2T=O.",
+    "Fixed tuple has sigma1=sigma3=sigma4=1; actual resultant0 vs literal1.",
+    "Direct universal negations and all16F2tuple equality control are kernel checked."
+  ],
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "paid_compute": 0,
+    "native_experiment": false,
+    "new_IDC_sampling": false,
+    "lean4checker": "Unavailable; kernel/transitive axiom gate.",
+    "advisories": "Imported legacy-module/linter advisories retained; no waivers, added elaboration settings or altered issued parents."
+  },
+  "source_review": {
+    "schema": "semaev-original-source-review/v1",
+    "created": "2026-11-10T11:50:45.065822+00:00",
+    "source_id": "S-SEMAEV-2004",
+    "title": "Summation polynomials and the discrete logarithm problem on elliptic curves",
+    "author": "Igor Semaev",
+    "document_date": "2004-02-05",
+    "url": "https://www.researchgate.net/profile/Igor-Semaev-3/publication/2869464_Summation_Polynomials_and_the_Discrete_Logarithm_Problem_on_Elliptic_Curves/links/5440f69f0cf228087b6a11ba/Summation-Polynomials-and-the-Discrete-Logarithm-Problem-on-Elliptic-Curves.pdf",
+    "bytes": 131064,
+    "sha256": "1cab0ae675996cdba6393b1e369a22113fd2e74bcf1223595743dc140631c7d6",
+    "pages": 6,
+    "read_scope": "Entire original manuscript including theorem1proof, remarks1–2 and references. Printed pages2and5 visually inspected.",
+    "official_access": "IACR fullPDF previously403; author-upload PDF publicHTTP200 after correcting malformed relative-link resolution. No authentication bypass.",
+    "source_hypotheses": "Theorem1 short Weierstrass char not2/3, algebraic-closure points, arbitrary recursive split. Remark1 binary Koblitz normal form a0/1; missing plus between continuation lines in this exact version.",
+    "not_refuted": "S3 formula, recursive resultant construction, algebraic-closure equivalence and individual degrees. Earlier rational-only converse is an extra restriction; source section3 explicitly allows quadratic-extension y.",
+    "remaining_formal_obligations": [
+      "all-arity polynomial permutation invariance",
+      "absolute irreducibility",
+      "arbitrary-split exact normalization",
+      "qualified bounded-root solver/independence/asymptotic complexity",
+      "generic nonrational-part 2-torsion transfer"
+    ],
+    "KB": "No MCPtools; wrapperstatus127, no executable. Bounded repository/Mathlib and primary/formula/errata searches.",
+    "novelty": "No novelty or global absence assertion; searches found no accepted correction source."
+  },
+  "identity_supplement": {
+    "id": "IDC1hbf1f44625ee306dc",
+    "scope": "Byte-identical existing six-coefficient scalar resultant supplement only. Fixed61-bit-prime evaluations do not prove actual char2 or curve claims; these rest on Lean."
+  }
+}

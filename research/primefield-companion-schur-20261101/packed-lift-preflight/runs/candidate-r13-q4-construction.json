@@ -1,0 +1,6974 @@
+{
+  "method": "packed_lift_cyclic_certified_exclusion_geometric_block_border",
+  "program": null,
+  "counts": {
+    "boundary_field_products": 1105,
+    "boundary_field_inversions": 1,
+    "boundary_field_additions": 209,
+    "boundary_integer_multiplications": 15,
+    "boundary_packing_bytes": 780,
+    "boundary_product_bytes": 750,
+    "boundary_coefficient_reductions": 375,
+    "boundary_operand_bitlength_product_sum": 548016,
+    "solve_field_additions": 878,
+    "solve_field_inversions": 13,
+    "solve_field_products": 652,
+    "native_solve_left": 71,
+    "native_solve_div": 3,
+    "native_solve_sub": 153,
+    "native_solve_mul": 287,
+    "native_solve_add": 117,
+    "native_solve_to_bytes_calls": 615,
+    "native_solve_to_bytes_bytes": 46000,
+    "native_solve_input_entries": 390,
+    "native_solve_padding_bytes": 1560,
+    "native_solve_joined_bytes": 21360,
+    "native_solve_from_bytes_calls": 252,
+    "native_solve_from_bytes_bytes": 59892,
+    "native_solve_right": 188,
+    "native_solve_broadcast_calls": 45,
+    "native_solve_repeated_bytes": 37800,
+    "native_solve_and": 207,
+    "native_solve_canonical_lanes": 4503,
+    "native_solve_border_extractions": 183,
+    "native_solve_coefficient_entries": 152,
+    "native_solve_updated_generator_entries": 2160,
+    "exclusion_field_inversions": 2,
+    "exclusion_field_products": 177,
+    "exclusion_field_additions": 42,
+    "exclusion_integer_multiplications": 18,
+    "exclusion_input_integer_encodings": 28,
+    "exclusion_packing_bytes": 578,
+    "exclusion_product_bytes": 698,
+    "exclusion_decoded_bytes": 50,
+    "exclusion_coefficient_reductions": 50,
+    "exclusion_operand_bitlength_product_sum": 378672
+  },
+  "profile": {
+    "max_border_entries": 25,
+    "initial_input_entries": 390,
+    "max_packed_generator_bits": 23847,
+    "max_query_result_entries": 25,
+    "backsub_scalar_slots": 100,
+    "dual_panel_scalar_slots": 76,
+    "max_packed_query_result_slots": 25,
+    "generator_width": 15,
+    "diagonal_length": 15,
+    "streamed_feature_slots": 13,
+    "attempts": 1
+  },
+  "certificate": {
+    "status": "feature_excluded",
+    "rank": null,
+    "generated_columns": 15,
+    "available_columns": 15,
+    "attempts": [
+      {
+        "attempt": 0,
+        "seed": 21561501,
+        "gamma": 12,
+        "weights": [
+          6,
+          4,
+          8,
+          10,
+          6,
+          6,
+          3,
+          9
+        ],
+        "labels_sha256": "3c955df7f73d5afa97313cadd38bd14f2087e6cabc11fe800b228141bca42043",
+        "diagonal_sha256": "451b7758ad0d7ec19505a8e6d84469b357f96c9dffd8dcc4b65064743404262a",
+        "initial_generators_sha256": "5eccff8a17b5f531a78bfb1487f98927065fa3d815217185890ff1d5be4073d0",
+        "boundary_counts": {
+          "field_products": 1105,
+          "field_inversions": 1,
+          "field_additions": 209,
+          "integer_multiplications": 15,
+          "packing_bytes": 780,
+          "product_bytes": 750,
+          "coefficient_reductions": 375,
+          "operand_bitlength_product_sum": 548016
+        },
+        "boundary_packed_blocks": [
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 196,
+            "b_bits": 196,
+            "product_bits": 392
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 196,
+            "b_bits": 196,
+            "product_bits": 392
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 196,
+            "b_bits": 196,
+            "product_bits": 392
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 180,
+            "b_bits": 196,
+            "product_bits": 376
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 193,
+            "b_bits": 196,
+            "product_bits": 388
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 196,
+            "b_bits": 196,
+            "product_bits": 392
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 196,
+            "b_bits": 196,
+            "product_bits": 392
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 193,
+            "b_bits": 196,
+            "product_bits": 388
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 180,
+            "b_bits": 196,
+            "product_bits": 376
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 162,
+            "b_bits": 196,
+            "product_bits": 357
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 193,
+            "b_bits": 196,
+            "product_bits": 388
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 180,
+            "b_bits": 196,
+            "product_bits": 376
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 162,
+            "b_bits": 196,
+            "product_bits": 357
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 193,
+            "b_bits": 196,
+            "product_bits": 388
+          },
+          {
+            "a_length": 13,
+            "b_length": 13,
+            "digit_bytes": 2,
+            "a_bits": 180,
+            "b_bits": 196,
+            "product_bits": 376
+          }
+        ],
+        "solve": {
+          "status": "unresolved_block_cap",
+          "solution": null,
+          "failed_size": 2,
+          "block_sizes": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            1,
+            1
+          ],
+          "attempts": [
+            {
+              "size": 13,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 25,
+              "counts": {
+                "field_additions": 75,
+                "field_inversions": 1,
+                "field_products": 52
+              }
+            },
+            {
+              "size": 12,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 23,
+              "counts": {
+                "field_additions": 69,
+                "field_inversions": 1,
+                "field_products": 48
+              }
+            },
+            {
+              "size": 11,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 21,
+              "counts": {
+                "field_additions": 63,
+                "field_inversions": 1,
+                "field_products": 44
+              }
+            },
+            {
+              "size": 10,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 19,
+              "counts": {
+                "field_additions": 57,
+                "field_inversions": 1,
+                "field_products": 40
+              }
+            },
+            {
+              "size": 9,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 17,
+              "counts": {
+                "field_additions": 51,
+                "field_inversions": 1,
+                "field_products": 36
+              }
+            },
+            {
+              "size": 8,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 15,
+              "counts": {
+                "field_additions": 45,
+                "field_inversions": 1,
+                "field_products": 32
+              }
+            },
+            {
+              "size": 7,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 13,
+              "counts": {
+                "field_additions": 39,
+                "field_inversions": 1,
+                "field_products": 28
+              }
+            },
+            {
+              "size": 6,
+              "block_size": 1,
+              "pivot_rows": [],
+              "invertible": false,
+              "border_entries": 11,
+              "counts": {
+                "field_additions": 33,
+                "field_inversions": 0,
+                "field_products": 22
+              }
+            },
+            {
+              "size": 6,
+              "block_size": 2,
+              "pivot_rows": [
+                0,
+                1
+              ],
+              "invertible": true,
+              "border_entries": 20,
+              "counts": {
+                "field_additions": 68,
+                "field_inversions": 2,
+                "field_products": 56
+              }
+            },
+            {
+              "size": 4,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 7,
+              "counts": {
+                "field_additions": 21,
+                "field_inversions": 1,
+                "field_products": 16
+              }
+            },
+            {
+              "size": 3,
+              "block_size": 1,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": true,
+              "border_entries": 5,
+              "counts": {
+                "field_additions": 15,
+                "field_inversions": 1,
+                "field_products": 12
+              }
+            },
+            {
+              "size": 2,
+              "block_size": 1,
+              "pivot_rows": [],
+              "invertible": false,
+              "border_entries": 3,
+              "counts": {
+                "field_additions": 9,
+                "field_inversions": 0,
+                "field_products": 6
+              }
+            },
+            {
+              "size": 2,
+              "block_size": 2,
+              "pivot_rows": [
+                0
+              ],
+              "invertible": false,
+              "border_entries": 4,
+              "counts": {
+                "field_additions": 16,
+                "field_inversions": 1,
+                "field_products": 16
+              }
+            }
+          ],
+          "profile": {
+            "max_border_entries": 25,
+            "initial_input_entries": 390,
+            "max_packed_generator_bits": 23847,
+            "max_query_result_entries": 25,
+            "backsub_scalar_slots": 100,
+            "dual_panel_scalar_slots": 76
+          },
+          "pascal_dual": [
+            0,
+            1,
+            11,
+            5,
+            3,
+            5,
+            9,
+            10,
+            11,
+            0,
+            0,
+            0,
+            0
+          ],
+          "dual_counts": {
+            "field_inversions": 2,
+            "field_products": 8,
+            "field_additions": 16,
+            "integer_multiplications": 10,
+            "input_integer_encodings": 20,
+            "packing_bytes": 304,
+            "product_bytes": 284,
+            "decoded_bytes": 22,
+            "coefficient_reductions": 11,
+            "operand_bitlength_product_sum": 117018
+          },
+          "dual_packed_blocks": [
+            {
+              "kind": "dual_panel",
+              "k": 2,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 1,
+              "right_bits": 18,
+              "result_bits": 18
+            },
+            {
+              "kind": "dual_panel",
+              "k": 3,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 17,
+              "right_bits": 35,
+              "result_bits": 51
+            },
+            {
+              "kind": "dual_panel",
+              "k": 4,
+              "b": 2,
+              "digit_bytes": 2,
+              "left_bits": 33,
+              "right_bits": 178,
+              "result_bits": 210
+            },
+            {
+              "kind": "dual_panel",
+              "k": 6,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 65,
+              "right_bits": 82,
+              "result_bits": 146
+            },
+            {
+              "kind": "dual_panel",
+              "k": 7,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 81,
+              "right_bits": 100,
+              "result_bits": 180
+            },
+            {
+              "kind": "dual_panel",
+              "k": 8,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 97,
+              "right_bits": 115,
+              "result_bits": 211
+            },
+            {
+              "kind": "dual_panel",
+              "k": 9,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 113,
+              "right_bits": 131,
+              "result_bits": 243
+            },
+            {
+              "kind": "dual_panel",
+              "k": 10,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 129,
+              "right_bits": 145,
+              "result_bits": 273
+            },
+            {
+              "kind": "dual_panel",
+              "k": 11,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 145,
+              "right_bits": 164,
+              "result_bits": 308
+            },
+            {
+              "kind": "dual_panel",
+              "k": 12,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 161,
+              "right_bits": 178,
+              "result_bits": 338
+            }
+          ]
+        },
+        "solve_counts": {
+          "field_additions": 878,
+          "field_inversions": 13,
+          "field_products": 652
+        },
+        "native_solve_counts": {
+          "left": 71,
+          "div": 3,
+          "sub": 153,
+          "mul": 287,
+          "add": 117,
+          "to_bytes_calls": 615,
+          "to_bytes_bytes": 46000,
+          "input_entries": 390,
+          "padding_bytes": 1560,
+          "joined_bytes": 21360,
+          "from_bytes_calls": 252,
+          "from_bytes_bytes": 59892,
+          "right": 188,
+          "broadcast_calls": 45,
+          "repeated_bytes": 37800,
+          "and": 207,
+          "canonical_lanes": 4503,
+          "border_extractions": 183,
+          "coefficient_entries": 152,
+          "updated_generator_entries": 2160
+        },
+        "native_solve_events": [
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 4,
+            "result_bits": 14
+          },
+          {
+            "op": "div",
+            "left_bits": 14,
+            "right_bits": 4,
+            "result_bits": 10
+          },
+          {
+            "op": "sub",
+            "left_bits": 14,
+            "right_bits": 1,
+            "result_bits": 13
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 3,
+            "result_bits": 6
+          },
+          {
+            "op": "sub",
+            "left_bits": 6,
+            "right_bits": 4,
+            "result_bits": 5
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 9,
+            "result_bits": 481
+          },
+          {
+            "op": "sub",
+            "left_bits": 481,
+            "right_bits": 1,
+            "result_bits": 480
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 6,
+            "result_bits": 33
+          },
+          {
+            "op": "sub",
+            "left_bits": 33,
+            "right_bits": 1,
+            "result_bits": 32
+          },
+          {
+            "op": "div",
+            "left_bits": 480,
+            "right_bits": 32,
+            "result_bits": 449
+          },
+          {
+            "op": "sub",
+            "left_bits": 4,
+            "right_bits": 1,
+            "result_bits": 4
+          },
+          {
+            "op": "mul",
+            "left_bits": 4,
+            "right_bits": 4,
+            "result_bits": 8
+          },
+          {
+            "op": "mul",
+            "left_bits": 3,
+            "right_bits": 8,
+            "result_bits": 10
+          },
+          {
+            "op": "add",
+            "left_bits": 10,
+            "right_bits": 4,
+            "result_bits": 10
+          },
+          {
+            "op": "div",
+            "left_bits": 10,
+            "right_bits": 4,
+            "result_bits": 6
+          },
+          {
+            "op": "mul",
+            "left_bits": 4,
+            "right_bits": 6,
+            "result_bits": 10
+          },
+          {
+            "op": "right",
+            "left_bits": 11971,
+            "right_bits": 10,
+            "result_bits": 11011
+          },
+          {
+            "op": "add",
+            "left_bits": 11971,
+            "right_bits": 11011,
+            "result_bits": 11971
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 11521,
+            "result_bits": 11533
+          },
+          {
+            "op": "left",
+            "left_bits": 11521,
+            "right_bits": 3,
+            "result_bits": 11526
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 11521,
+            "result_bits": 11525
+          },
+          {
+            "op": "right",
+            "left_bits": 11876,
+            "right_bits": 14,
+            "result_bits": 356
+          },
+          {
+            "op": "and",
+            "left_bits": 356,
+            "right_bits": 480,
+            "result_bits": 356
+          },
+          {
+            "op": "mul",
+            "left_bits": 11971,
+            "right_bits": 356,
+            "result_bits": 12326
+          },
+          {
+            "op": "right",
+            "left_bits": 12326,
+            "right_bits": 9,
+            "result_bits": 11878
+          },
+          {
+            "op": "and",
+            "left_bits": 11878,
+            "right_bits": 11533,
+            "result_bits": 11530
+          },
+          {
+            "op": "mul",
+            "left_bits": 11530,
+            "right_bits": 10,
+            "result_bits": 11539
+          },
+          {
+            "op": "right",
+            "left_bits": 11539,
+            "right_bits": 4,
+            "result_bits": 11526
+          },
+          {
+            "op": "and",
+            "left_bits": 11526,
+            "right_bits": 11533,
+            "result_bits": 11526
+          },
+          {
+            "op": "mul",
+            "left_bits": 11526,
+            "right_bits": 4,
+            "result_bits": 11530
+          },
+          {
+            "op": "sub",
+            "left_bits": 11530,
+            "right_bits": 11530,
+            "result_bits": 11523
+          },
+          {
+            "op": "add",
+            "left_bits": 11523,
+            "right_bits": 11525,
+            "result_bits": 11525
+          },
+          {
+            "op": "and",
+            "left_bits": 11525,
+            "right_bits": 11526,
+            "result_bits": 3846
+          },
+          {
+            "op": "right",
+            "left_bits": 3846,
+            "right_bits": 3,
+            "result_bits": 3841
+          },
+          {
+            "op": "mul",
+            "left_bits": 3841,
+            "right_bits": 4,
+            "result_bits": 3844
+          },
+          {
+            "op": "sub",
+            "left_bits": 11523,
+            "right_bits": 3844,
+            "result_bits": 11523
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 11521
+          },
+          {
+            "op": "sub",
+            "left_bits": 11521,
+            "right_bits": 1,
+            "result_bits": 11520
+          },
+          {
+            "op": "and",
+            "left_bits": 11876,
+            "right_bits": 11520,
+            "result_bits": 10915
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 10561,
+            "result_bits": 10573
+          },
+          {
+            "op": "left",
+            "left_bits": 10561,
+            "right_bits": 3,
+            "result_bits": 10566
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 10561,
+            "result_bits": 10565
+          },
+          {
+            "op": "right",
+            "left_bits": 11971,
+            "right_bits": 14,
+            "result_bits": 451
+          },
+          {
+            "op": "and",
+            "left_bits": 451,
+            "right_bits": 480,
+            "result_bits": 451
+          },
+          {
+            "op": "add",
+            "left_bits": 451,
+            "right_bits": 0,
+            "result_bits": 451
+          },
+          {
+            "op": "mul",
+            "left_bits": 10915,
+            "right_bits": 451,
+            "result_bits": 11366
+          },
+          {
+            "op": "right",
+            "left_bits": 11366,
+            "right_bits": 9,
+            "result_bits": 10918
+          },
+          {
+            "op": "and",
+            "left_bits": 10918,
+            "right_bits": 10573,
+            "result_bits": 10569
+          },
+          {
+            "op": "mul",
+            "left_bits": 10569,
+            "right_bits": 10,
+            "result_bits": 10579
+          },
+          {
+            "op": "right",
+            "left_bits": 10579,
+            "right_bits": 4,
+            "result_bits": 10566
+          },
+          {
+            "op": "and",
+            "left_bits": 10566,
+            "right_bits": 10573,
+            "result_bits": 10566
+          },
+          {
+            "op": "mul",
+            "left_bits": 10566,
+            "right_bits": 4,
+            "result_bits": 10569
+          },
+          {
+            "op": "sub",
+            "left_bits": 10569,
+            "right_bits": 10569,
+            "result_bits": 10564
+          },
+          {
+            "op": "add",
+            "left_bits": 10564,
+            "right_bits": 10565,
+            "result_bits": 10565
+          },
+          {
+            "op": "and",
+            "left_bits": 10565,
+            "right_bits": 10566,
+            "result_bits": 3846
+          },
+          {
+            "op": "right",
+            "left_bits": 3846,
+            "right_bits": 3,
+            "result_bits": 3841
+          },
+          {
+            "op": "mul",
+            "left_bits": 3841,
+            "right_bits": 4,
+            "result_bits": 3844
+          },
+          {
+            "op": "sub",
+            "left_bits": 10564,
+            "right_bits": 3844,
+            "result_bits": 10564
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 11489,
+            "result_bits": 11501
+          },
+          {
+            "op": "left",
+            "left_bits": 11489,
+            "right_bits": 3,
+            "result_bits": 11494
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 11489,
+            "result_bits": 11493
+          },
+          {
+            "op": "mul",
+            "left_bits": 10561,
+            "right_bits": 449,
+            "result_bits": 11009
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 11009,
+            "result_bits": 11018
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 11521
+          },
+          {
+            "op": "sub",
+            "left_bits": 11521,
+            "right_bits": 1,
+            "result_bits": 11520
+          },
+          {
+            "op": "and",
+            "left_bits": 11971,
+            "right_bits": 11520,
+            "result_bits": 11012
+          },
+          {
+            "op": "right",
+            "left_bits": 11971,
+            "right_bits": 14,
+            "result_bits": 451
+          },
+          {
+            "op": "and",
+            "left_bits": 451,
+            "right_bits": 480,
+            "result_bits": 451
+          },
+          {
+            "op": "mul",
+            "left_bits": 10562,
+            "right_bits": 451,
+            "result_bits": 11012
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 11012,
+            "result_bits": 11012
+          },
+          {
+            "op": "add",
+            "left_bits": 11012,
+            "right_bits": 11018,
+            "result_bits": 11018
+          },
+          {
+            "op": "sub",
+            "left_bits": 11018,
+            "right_bits": 11012,
+            "result_bits": 11018
+          },
+          {
+            "op": "mul",
+            "left_bits": 11018,
+            "right_bits": 10,
+            "result_bits": 11027
+          },
+          {
+            "op": "right",
+            "left_bits": 11027,
+            "right_bits": 4,
+            "result_bits": 11014
+          },
+          {
+            "op": "and",
+            "left_bits": 11014,
+            "right_bits": 11501,
+            "result_bits": 11014
+          },
+          {
+            "op": "mul",
+            "left_bits": 11014,
+            "right_bits": 4,
+            "result_bits": 11018
+          },
+          {
+            "op": "sub",
+            "left_bits": 11018,
+            "right_bits": 11018,
+            "result_bits": 11009
+          },
+          {
+            "op": "add",
+            "left_bits": 11009,
+            "right_bits": 11493,
+            "result_bits": 11493
+          },
+          {
+            "op": "and",
+            "left_bits": 11493,
+            "right_bits": 11494,
+            "result_bits": 10630
+          },
+          {
+            "op": "right",
+            "left_bits": 10630,
+            "right_bits": 3,
+            "result_bits": 10625
+          },
+          {
+            "op": "mul",
+            "left_bits": 10625,
+            "right_bits": 4,
+            "result_bits": 10628
+          },
+          {
+            "op": "sub",
+            "left_bits": 11009,
+            "right_bits": 10628,
+            "result_bits": 11009
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 11521
+          },
+          {
+            "op": "sub",
+            "left_bits": 11521,
+            "right_bits": 1,
+            "result_bits": 11520
+          },
+          {
+            "op": "and",
+            "left_bits": 11876,
+            "right_bits": 11520,
+            "result_bits": 10915
+          },
+          {
+            "op": "right",
+            "left_bits": 11876,
+            "right_bits": 14,
+            "result_bits": 356
+          },
+          {
+            "op": "and",
+            "left_bits": 356,
+            "right_bits": 480,
+            "result_bits": 356
+          },
+          {
+            "op": "mul",
+            "left_bits": 10562,
+            "right_bits": 356,
+            "result_bits": 10917
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 10917,
+            "result_bits": 10917
+          },
+          {
+            "op": "add",
+            "left_bits": 10915,
+            "right_bits": 11018,
+            "result_bits": 11018
+          },
+          {
+            "op": "sub",
+            "left_bits": 11018,
+            "right_bits": 10917,
+            "result_bits": 11018
+          },
+          {
+            "op": "mul",
+            "left_bits": 11018,
+            "right_bits": 10,
+            "result_bits": 11027
+          },
+          {
+            "op": "right",
+            "left_bits": 11027,
+            "right_bits": 4,
+            "result_bits": 11014
+          },
+          {
+            "op": "and",
+            "left_bits": 11014,
+            "right_bits": 11501,
+            "result_bits": 11014
+          },
+          {
+            "op": "mul",
+            "left_bits": 11014,
+            "right_bits": 4,
+            "result_bits": 11018
+          },
+          {
+            "op": "sub",
+            "left_bits": 11018,
+            "right_bits": 11018,
+            "result_bits": 11012
+          },
+          {
+            "op": "add",
+            "left_bits": 11012,
+            "right_bits": 11493,
+            "result_bits": 11493
+          },
+          {
+            "op": "and",
+            "left_bits": 11493,
+            "right_bits": 11494,
+            "result_bits": 11014
+          },
+          {
+            "op": "right",
+            "left_bits": 11014,
+            "right_bits": 3,
+            "result_bits": 11009
+          },
+          {
+            "op": "mul",
+            "left_bits": 11009,
+            "right_bits": 4,
+            "result_bits": 11012
+          },
+          {
+            "op": "sub",
+            "left_bits": 11012,
+            "right_bits": 11012,
+            "result_bits": 10916
+          },
+          {
+            "op": "right",
+            "left_bits": 11009,
+            "right_bits": 10,
+            "result_bits": 10049
+          },
+          {
+            "op": "add",
+            "left_bits": 11009,
+            "right_bits": 10049,
+            "result_bits": 11009
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 10561,
+            "result_bits": 10573
+          },
+          {
+            "op": "left",
+            "left_bits": 10561,
+            "right_bits": 3,
+            "result_bits": 10566
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 10561,
+            "result_bits": 10565
+          },
+          {
+            "op": "right",
+            "left_bits": 10916,
+            "right_bits": 14,
+            "result_bits": 356
+          },
+          {
+            "op": "and",
+            "left_bits": 356,
+            "right_bits": 480,
+            "result_bits": 356
+          },
+          {
+            "op": "mul",
+            "left_bits": 11009,
+            "right_bits": 356,
+            "result_bits": 11364
+          },
+          {
+            "op": "right",
+            "left_bits": 11364,
+            "right_bits": 9,
+            "result_bits": 10916
+          },
+          {
+            "op": "and",
+            "left_bits": 10916,
+            "right_bits": 10573,
+            "result_bits": 10569
+          },
+          {
+            "op": "mul",
+            "left_bits": 10569,
+            "right_bits": 10,
+            "result_bits": 10578
+          },
+          {
+            "op": "right",
+            "left_bits": 10578,
+            "right_bits": 4,
+            "result_bits": 10565
+          },
+          {
+            "op": "and",
+            "left_bits": 10565,
+            "right_bits": 10573,
+            "result_bits": 10565
+          },
+          {
+            "op": "mul",
+            "left_bits": 10565,
+            "right_bits": 4,
+            "result_bits": 10569
+          },
+          {
+            "op": "sub",
+            "left_bits": 10569,
+            "right_bits": 10569,
+            "result_bits": 10563
+          },
+          {
+            "op": "add",
+            "left_bits": 10563,
+            "right_bits": 10565,
+            "result_bits": 10565
+          },
+          {
+            "op": "and",
+            "left_bits": 10565,
+            "right_bits": 10566,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 10563,
+            "right_bits": 0,
+            "result_bits": 10563
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 10561
+          },
+          {
+            "op": "sub",
+            "left_bits": 10561,
+            "right_bits": 1,
+            "result_bits": 10560
+          },
+          {
+            "op": "and",
+            "left_bits": 10916,
+            "right_bits": 10560,
+            "result_bits": 9956
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 9601,
+            "result_bits": 9613
+          },
+          {
+            "op": "left",
+            "left_bits": 9601,
+            "right_bits": 3,
+            "result_bits": 9606
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 9601,
+            "result_bits": 9605
+          },
+          {
+            "op": "right",
+            "left_bits": 11009,
+            "right_bits": 14,
+            "result_bits": 449
+          },
+          {
+            "op": "and",
+            "left_bits": 449,
+            "right_bits": 480,
+            "result_bits": 449
+          },
+          {
+            "op": "add",
+            "left_bits": 449,
+            "right_bits": 0,
+            "result_bits": 449
+          },
+          {
+            "op": "mul",
+            "left_bits": 9956,
+            "right_bits": 449,
+            "result_bits": 10404
+          },
+          {
+            "op": "right",
+            "left_bits": 10404,
+            "right_bits": 9,
+            "result_bits": 9956
+          },
+          {
+            "op": "and",
+            "left_bits": 9956,
+            "right_bits": 9613,
+            "result_bits": 9609
+          },
+          {
+            "op": "mul",
+            "left_bits": 9609,
+            "right_bits": 10,
+            "result_bits": 9618
+          },
+          {
+            "op": "right",
+            "left_bits": 9618,
+            "right_bits": 4,
+            "result_bits": 9605
+          },
+          {
+            "op": "and",
+            "left_bits": 9605,
+            "right_bits": 9613,
+            "result_bits": 9605
+          },
+          {
+            "op": "mul",
+            "left_bits": 9605,
+            "right_bits": 4,
+            "result_bits": 9609
+          },
+          {
+            "op": "sub",
+            "left_bits": 9609,
+            "right_bits": 9609,
+            "result_bits": 9604
+          },
+          {
+            "op": "add",
+            "left_bits": 9604,
+            "right_bits": 9605,
+            "result_bits": 9605
+          },
+          {
+            "op": "and",
+            "left_bits": 9605,
+            "right_bits": 9606,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 9604,
+            "right_bits": 0,
+            "result_bits": 9604
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 10529,
+            "result_bits": 10541
+          },
+          {
+            "op": "left",
+            "left_bits": 10529,
+            "right_bits": 3,
+            "result_bits": 10534
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 10529,
+            "result_bits": 10533
+          },
+          {
+            "op": "mul",
+            "left_bits": 9601,
+            "right_bits": 449,
+            "result_bits": 10049
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 10049,
+            "result_bits": 10058
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 10561
+          },
+          {
+            "op": "sub",
+            "left_bits": 10561,
+            "right_bits": 1,
+            "result_bits": 10560
+          },
+          {
+            "op": "and",
+            "left_bits": 11009,
+            "right_bits": 10560,
+            "result_bits": 10049
+          },
+          {
+            "op": "right",
+            "left_bits": 11009,
+            "right_bits": 14,
+            "result_bits": 449
+          },
+          {
+            "op": "and",
+            "left_bits": 449,
+            "right_bits": 480,
+            "result_bits": 449
+          },
+          {
+            "op": "mul",
+            "left_bits": 9604,
+            "right_bits": 449,
+            "result_bits": 10052
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 10052,
+            "result_bits": 10052
+          },
+          {
+            "op": "add",
+            "left_bits": 10049,
+            "right_bits": 10058,
+            "result_bits": 10058
+          },
+          {
+            "op": "sub",
+            "left_bits": 10058,
+            "right_bits": 10052,
+            "result_bits": 10058
+          },
+          {
+            "op": "mul",
+            "left_bits": 10058,
+            "right_bits": 10,
+            "result_bits": 10067
+          },
+          {
+            "op": "right",
+            "left_bits": 10067,
+            "right_bits": 4,
+            "result_bits": 10054
+          },
+          {
+            "op": "and",
+            "left_bits": 10054,
+            "right_bits": 10541,
+            "result_bits": 10054
+          },
+          {
+            "op": "mul",
+            "left_bits": 10054,
+            "right_bits": 4,
+            "result_bits": 10058
+          },
+          {
+            "op": "sub",
+            "left_bits": 10058,
+            "right_bits": 10058,
+            "result_bits": 10051
+          },
+          {
+            "op": "add",
+            "left_bits": 10051,
+            "right_bits": 10533,
+            "result_bits": 10533
+          },
+          {
+            "op": "and",
+            "left_bits": 10533,
+            "right_bits": 10534,
+            "result_bits": 9670
+          },
+          {
+            "op": "right",
+            "left_bits": 9670,
+            "right_bits": 3,
+            "result_bits": 9665
+          },
+          {
+            "op": "mul",
+            "left_bits": 9665,
+            "right_bits": 4,
+            "result_bits": 9668
+          },
+          {
+            "op": "sub",
+            "left_bits": 10051,
+            "right_bits": 9668,
+            "result_bits": 10051
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 10561
+          },
+          {
+            "op": "sub",
+            "left_bits": 10561,
+            "right_bits": 1,
+            "result_bits": 10560
+          },
+          {
+            "op": "and",
+            "left_bits": 10916,
+            "right_bits": 10560,
+            "result_bits": 9956
+          },
+          {
+            "op": "right",
+            "left_bits": 10916,
+            "right_bits": 14,
+            "result_bits": 356
+          },
+          {
+            "op": "and",
+            "left_bits": 356,
+            "right_bits": 480,
+            "result_bits": 356
+          },
+          {
+            "op": "mul",
+            "left_bits": 9604,
+            "right_bits": 356,
+            "result_bits": 9959
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 9959,
+            "result_bits": 9959
+          },
+          {
+            "op": "add",
+            "left_bits": 9956,
+            "right_bits": 10058,
+            "result_bits": 10058
+          },
+          {
+            "op": "sub",
+            "left_bits": 10058,
+            "right_bits": 9959,
+            "result_bits": 10058
+          },
+          {
+            "op": "mul",
+            "left_bits": 10058,
+            "right_bits": 10,
+            "result_bits": 10067
+          },
+          {
+            "op": "right",
+            "left_bits": 10067,
+            "right_bits": 4,
+            "result_bits": 10054
+          },
+          {
+            "op": "and",
+            "left_bits": 10054,
+            "right_bits": 10541,
+            "result_bits": 10054
+          },
+          {
+            "op": "mul",
+            "left_bits": 10054,
+            "right_bits": 4,
+            "result_bits": 10058
+          },
+          {
+            "op": "sub",
+            "left_bits": 10058,
+            "right_bits": 10058,
+            "result_bits": 10052
+          },
+          {
+            "op": "add",
+            "left_bits": 10052,
+            "right_bits": 10533,
+            "result_bits": 10533
+          },
+          {
+            "op": "and",
+            "left_bits": 10533,
+            "right_bits": 10534,
+            "result_bits": 10054
+          },
+          {
+            "op": "right",
+            "left_bits": 10054,
+            "right_bits": 3,
+            "result_bits": 10049
+          },
+          {
+            "op": "mul",
+            "left_bits": 10049,
+            "right_bits": 4,
+            "result_bits": 10052
+          },
+          {
+            "op": "sub",
+            "left_bits": 10052,
+            "right_bits": 10052,
+            "result_bits": 9956
+          },
+          {
+            "op": "right",
+            "left_bits": 10051,
+            "right_bits": 10,
+            "result_bits": 9091
+          },
+          {
+            "op": "add",
+            "left_bits": 10051,
+            "right_bits": 9091,
+            "result_bits": 10051
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 9601,
+            "result_bits": 9613
+          },
+          {
+            "op": "left",
+            "left_bits": 9601,
+            "right_bits": 3,
+            "result_bits": 9606
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 9601,
+            "result_bits": 9605
+          },
+          {
+            "op": "right",
+            "left_bits": 9956,
+            "right_bits": 14,
+            "result_bits": 356
+          },
+          {
+            "op": "and",
+            "left_bits": 356,
+            "right_bits": 480,
+            "result_bits": 356
+          },
+          {
+            "op": "mul",
+            "left_bits": 10051,
+            "right_bits": 356,
+            "result_bits": 10406
+          },
+          {
+            "op": "right",
+            "left_bits": 10406,
+            "right_bits": 9,
+            "result_bits": 9958
+          },
+          {
+            "op": "and",
+            "left_bits": 9958,
+            "right_bits": 9613,
+            "result_bits": 9610
+          },
+          {
+            "op": "mul",
+            "left_bits": 9610,
+            "right_bits": 10,
+            "result_bits": 9619
+          },
+          {
+            "op": "right",
+            "left_bits": 9619,
+            "right_bits": 4,
+            "result_bits": 9606
+          },
+          {
+            "op": "and",
+            "left_bits": 9606,
+            "right_bits": 9613,
+            "result_bits": 9606
+          },
+          {
+            "op": "mul",
+            "left_bits": 9606,
+            "right_bits": 4,
+            "result_bits": 9610
+          },
+          {
+            "op": "sub",
+            "left_bits": 9610,
+            "right_bits": 9610,
+            "result_bits": 9602
+          },
+          {
+            "op": "add",
+            "left_bits": 9602,
+            "right_bits": 9605,
+            "result_bits": 9605
+          },
+          {
+            "op": "and",
+            "left_bits": 9605,
+            "right_bits": 9606,
+            "result_bits": 966
+          },
+          {
+            "op": "right",
+            "left_bits": 966,
+            "right_bits": 3,
+            "result_bits": 961
+          },
+          {
+            "op": "mul",
+            "left_bits": 961,
+            "right_bits": 4,
+            "result_bits": 964
+          },
+          {
+            "op": "sub",
+            "left_bits": 9602,
+            "right_bits": 964,
+            "result_bits": 9602
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 9601
+          },
+          {
+            "op": "sub",
+            "left_bits": 9601,
+            "right_bits": 1,
+            "result_bits": 9600
+          },
+          {
+            "op": "and",
+            "left_bits": 9956,
+            "right_bits": 9600,
+            "result_bits": 8996
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 8641,
+            "result_bits": 8653
+          },
+          {
+            "op": "left",
+            "left_bits": 8641,
+            "right_bits": 3,
+            "result_bits": 8646
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 8641,
+            "result_bits": 8645
+          },
+          {
+            "op": "right",
+            "left_bits": 10051,
+            "right_bits": 14,
+            "result_bits": 451
+          },
+          {
+            "op": "and",
+            "left_bits": 451,
+            "right_bits": 480,
+            "result_bits": 451
+          },
+          {
+            "op": "add",
+            "left_bits": 451,
+            "right_bits": 0,
+            "result_bits": 451
+          },
+          {
+            "op": "mul",
+            "left_bits": 8996,
+            "right_bits": 451,
+            "result_bits": 9446
+          },
+          {
+            "op": "right",
+            "left_bits": 9446,
+            "right_bits": 9,
+            "result_bits": 8998
+          },
+          {
+            "op": "and",
+            "left_bits": 8998,
+            "right_bits": 8653,
+            "result_bits": 8649
+          },
+          {
+            "op": "mul",
+            "left_bits": 8649,
+            "right_bits": 10,
+            "result_bits": 8658
+          },
+          {
+            "op": "right",
+            "left_bits": 8658,
+            "right_bits": 4,
+            "result_bits": 8645
+          },
+          {
+            "op": "and",
+            "left_bits": 8645,
+            "right_bits": 8653,
+            "result_bits": 8645
+          },
+          {
+            "op": "mul",
+            "left_bits": 8645,
+            "right_bits": 4,
+            "result_bits": 8649
+          },
+          {
+            "op": "sub",
+            "left_bits": 8649,
+            "right_bits": 8649,
+            "result_bits": 8644
+          },
+          {
+            "op": "add",
+            "left_bits": 8644,
+            "right_bits": 8645,
+            "result_bits": 8645
+          },
+          {
+            "op": "and",
+            "left_bits": 8645,
+            "right_bits": 8646,
+            "result_bits": 966
+          },
+          {
+            "op": "right",
+            "left_bits": 966,
+            "right_bits": 3,
+            "result_bits": 961
+          },
+          {
+            "op": "mul",
+            "left_bits": 961,
+            "right_bits": 4,
+            "result_bits": 964
+          },
+          {
+            "op": "sub",
+            "left_bits": 8644,
+            "right_bits": 964,
+            "result_bits": 8644
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 9569,
+            "result_bits": 9581
+          },
+          {
+            "op": "left",
+            "left_bits": 9569,
+            "right_bits": 3,
+            "result_bits": 9574
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 9569,
+            "result_bits": 9573
+          },
+          {
+            "op": "mul",
+            "left_bits": 8641,
+            "right_bits": 449,
+            "result_bits": 9089
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 9089,
+            "result_bits": 9098
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 9601
+          },
+          {
+            "op": "sub",
+            "left_bits": 9601,
+            "right_bits": 1,
+            "result_bits": 9600
+          },
+          {
+            "op": "and",
+            "left_bits": 10051,
+            "right_bits": 9600,
+            "result_bits": 9090
+          },
+          {
+            "op": "right",
+            "left_bits": 10051,
+            "right_bits": 14,
+            "result_bits": 451
+          },
+          {
+            "op": "and",
+            "left_bits": 451,
+            "right_bits": 480,
+            "result_bits": 451
+          },
+          {
+            "op": "mul",
+            "left_bits": 8641,
+            "right_bits": 451,
+            "result_bits": 9091
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 9091,
+            "result_bits": 9091
+          },
+          {
+            "op": "add",
+            "left_bits": 9090,
+            "right_bits": 9098,
+            "result_bits": 9098
+          },
+          {
+            "op": "sub",
+            "left_bits": 9098,
+            "right_bits": 9091,
+            "result_bits": 9098
+          },
+          {
+            "op": "mul",
+            "left_bits": 9098,
+            "right_bits": 10,
+            "result_bits": 9107
+          },
+          {
+            "op": "right",
+            "left_bits": 9107,
+            "right_bits": 4,
+            "result_bits": 9094
+          },
+          {
+            "op": "and",
+            "left_bits": 9094,
+            "right_bits": 9581,
+            "result_bits": 9094
+          },
+          {
+            "op": "mul",
+            "left_bits": 9094,
+            "right_bits": 4,
+            "result_bits": 9098
+          },
+          {
+            "op": "sub",
+            "left_bits": 9098,
+            "right_bits": 9098,
+            "result_bits": 9092
+          },
+          {
+            "op": "add",
+            "left_bits": 9092,
+            "right_bits": 9573,
+            "result_bits": 9573
+          },
+          {
+            "op": "and",
+            "left_bits": 9573,
+            "right_bits": 9574,
+            "result_bits": 8934
+          },
+          {
+            "op": "right",
+            "left_bits": 8934,
+            "right_bits": 3,
+            "result_bits": 8929
+          },
+          {
+            "op": "mul",
+            "left_bits": 8929,
+            "right_bits": 4,
+            "result_bits": 8932
+          },
+          {
+            "op": "sub",
+            "left_bits": 9092,
+            "right_bits": 8932,
+            "result_bits": 9092
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 9601
+          },
+          {
+            "op": "sub",
+            "left_bits": 9601,
+            "right_bits": 1,
+            "result_bits": 9600
+          },
+          {
+            "op": "and",
+            "left_bits": 9956,
+            "right_bits": 9600,
+            "result_bits": 8996
+          },
+          {
+            "op": "right",
+            "left_bits": 9956,
+            "right_bits": 14,
+            "result_bits": 356
+          },
+          {
+            "op": "and",
+            "left_bits": 356,
+            "right_bits": 480,
+            "result_bits": 356
+          },
+          {
+            "op": "mul",
+            "left_bits": 8641,
+            "right_bits": 356,
+            "result_bits": 8996
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 8996,
+            "result_bits": 8996
+          },
+          {
+            "op": "add",
+            "left_bits": 8996,
+            "right_bits": 9098,
+            "result_bits": 9098
+          },
+          {
+            "op": "sub",
+            "left_bits": 9098,
+            "right_bits": 8996,
+            "result_bits": 9098
+          },
+          {
+            "op": "mul",
+            "left_bits": 9098,
+            "right_bits": 10,
+            "result_bits": 9107
+          },
+          {
+            "op": "right",
+            "left_bits": 9107,
+            "right_bits": 4,
+            "result_bits": 9094
+          },
+          {
+            "op": "and",
+            "left_bits": 9094,
+            "right_bits": 9581,
+            "result_bits": 9094
+          },
+          {
+            "op": "mul",
+            "left_bits": 9094,
+            "right_bits": 4,
+            "result_bits": 9098
+          },
+          {
+            "op": "sub",
+            "left_bits": 9098,
+            "right_bits": 9098,
+            "result_bits": 9092
+          },
+          {
+            "op": "add",
+            "left_bits": 9092,
+            "right_bits": 9573,
+            "result_bits": 9573
+          },
+          {
+            "op": "and",
+            "left_bits": 9573,
+            "right_bits": 9574,
+            "result_bits": 9094
+          },
+          {
+            "op": "right",
+            "left_bits": 9094,
+            "right_bits": 3,
+            "result_bits": 9089
+          },
+          {
+            "op": "mul",
+            "left_bits": 9089,
+            "right_bits": 4,
+            "result_bits": 9092
+          },
+          {
+            "op": "sub",
+            "left_bits": 9092,
+            "right_bits": 9092,
+            "result_bits": 8964
+          },
+          {
+            "op": "right",
+            "left_bits": 9092,
+            "right_bits": 10,
+            "result_bits": 8132
+          },
+          {
+            "op": "add",
+            "left_bits": 9092,
+            "right_bits": 8132,
+            "result_bits": 9092
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 8641,
+            "result_bits": 8653
+          },
+          {
+            "op": "left",
+            "left_bits": 8641,
+            "right_bits": 3,
+            "result_bits": 8646
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 8641,
+            "result_bits": 8645
+          },
+          {
+            "op": "right",
+            "left_bits": 8964,
+            "right_bits": 14,
+            "result_bits": 324
+          },
+          {
+            "op": "and",
+            "left_bits": 324,
+            "right_bits": 480,
+            "result_bits": 324
+          },
+          {
+            "op": "mul",
+            "left_bits": 9092,
+            "right_bits": 324,
+            "result_bits": 9415
+          },
+          {
+            "op": "right",
+            "left_bits": 9415,
+            "right_bits": 9,
+            "result_bits": 8967
+          },
+          {
+            "op": "and",
+            "left_bits": 8967,
+            "right_bits": 8653,
+            "result_bits": 8649
+          },
+          {
+            "op": "mul",
+            "left_bits": 8649,
+            "right_bits": 10,
+            "result_bits": 8659
+          },
+          {
+            "op": "right",
+            "left_bits": 8659,
+            "right_bits": 4,
+            "result_bits": 8646
+          },
+          {
+            "op": "and",
+            "left_bits": 8646,
+            "right_bits": 8653,
+            "result_bits": 8646
+          },
+          {
+            "op": "mul",
+            "left_bits": 8646,
+            "right_bits": 4,
+            "result_bits": 8649
+          },
+          {
+            "op": "sub",
+            "left_bits": 8649,
+            "right_bits": 8649,
+            "result_bits": 8644
+          },
+          {
+            "op": "add",
+            "left_bits": 8644,
+            "right_bits": 8645,
+            "result_bits": 8645
+          },
+          {
+            "op": "and",
+            "left_bits": 8645,
+            "right_bits": 8646,
+            "result_bits": 2886
+          },
+          {
+            "op": "right",
+            "left_bits": 2886,
+            "right_bits": 3,
+            "result_bits": 2881
+          },
+          {
+            "op": "mul",
+            "left_bits": 2881,
+            "right_bits": 4,
+            "result_bits": 2884
+          },
+          {
+            "op": "sub",
+            "left_bits": 8644,
+            "right_bits": 2884,
+            "result_bits": 8644
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 8641
+          },
+          {
+            "op": "sub",
+            "left_bits": 8641,
+            "right_bits": 1,
+            "result_bits": 8640
+          },
+          {
+            "op": "and",
+            "left_bits": 8964,
+            "right_bits": 8640,
+            "result_bits": 8033
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 7681,
+            "result_bits": 7693
+          },
+          {
+            "op": "left",
+            "left_bits": 7681,
+            "right_bits": 3,
+            "result_bits": 7686
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 7681,
+            "result_bits": 7685
+          },
+          {
+            "op": "right",
+            "left_bits": 9092,
+            "right_bits": 14,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "add",
+            "left_bits": 452,
+            "right_bits": 0,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 8033,
+            "right_bits": 452,
+            "result_bits": 8484
+          },
+          {
+            "op": "right",
+            "left_bits": 8484,
+            "right_bits": 9,
+            "result_bits": 8036
+          },
+          {
+            "op": "and",
+            "left_bits": 8036,
+            "right_bits": 7693,
+            "result_bits": 7690
+          },
+          {
+            "op": "mul",
+            "left_bits": 7690,
+            "right_bits": 10,
+            "result_bits": 7699
+          },
+          {
+            "op": "right",
+            "left_bits": 7699,
+            "right_bits": 4,
+            "result_bits": 7686
+          },
+          {
+            "op": "and",
+            "left_bits": 7686,
+            "right_bits": 7693,
+            "result_bits": 7686
+          },
+          {
+            "op": "mul",
+            "left_bits": 7686,
+            "right_bits": 4,
+            "result_bits": 7690
+          },
+          {
+            "op": "sub",
+            "left_bits": 7690,
+            "right_bits": 7690,
+            "result_bits": 7682
+          },
+          {
+            "op": "add",
+            "left_bits": 7682,
+            "right_bits": 7685,
+            "result_bits": 7685
+          },
+          {
+            "op": "and",
+            "left_bits": 7685,
+            "right_bits": 7686,
+            "result_bits": 2886
+          },
+          {
+            "op": "right",
+            "left_bits": 2886,
+            "right_bits": 3,
+            "result_bits": 2881
+          },
+          {
+            "op": "mul",
+            "left_bits": 2881,
+            "right_bits": 4,
+            "result_bits": 2884
+          },
+          {
+            "op": "sub",
+            "left_bits": 7682,
+            "right_bits": 2884,
+            "result_bits": 7682
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 8609,
+            "result_bits": 8621
+          },
+          {
+            "op": "left",
+            "left_bits": 8609,
+            "right_bits": 3,
+            "result_bits": 8614
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 8609,
+            "result_bits": 8613
+          },
+          {
+            "op": "mul",
+            "left_bits": 7681,
+            "right_bits": 449,
+            "result_bits": 8129
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 8129,
+            "result_bits": 8138
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 8641
+          },
+          {
+            "op": "sub",
+            "left_bits": 8641,
+            "right_bits": 1,
+            "result_bits": 8640
+          },
+          {
+            "op": "and",
+            "left_bits": 9092,
+            "right_bits": 8640,
+            "result_bits": 8132
+          },
+          {
+            "op": "right",
+            "left_bits": 9092,
+            "right_bits": 14,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 7683,
+            "right_bits": 452,
+            "result_bits": 8134
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 8134,
+            "result_bits": 8134
+          },
+          {
+            "op": "add",
+            "left_bits": 8132,
+            "right_bits": 8138,
+            "result_bits": 8138
+          },
+          {
+            "op": "sub",
+            "left_bits": 8138,
+            "right_bits": 8134,
+            "result_bits": 8138
+          },
+          {
+            "op": "mul",
+            "left_bits": 8138,
+            "right_bits": 10,
+            "result_bits": 8147
+          },
+          {
+            "op": "right",
+            "left_bits": 8147,
+            "right_bits": 4,
+            "result_bits": 8134
+          },
+          {
+            "op": "and",
+            "left_bits": 8134,
+            "right_bits": 8621,
+            "result_bits": 8134
+          },
+          {
+            "op": "mul",
+            "left_bits": 8134,
+            "right_bits": 4,
+            "result_bits": 8138
+          },
+          {
+            "op": "sub",
+            "left_bits": 8138,
+            "right_bits": 8138,
+            "result_bits": 8132
+          },
+          {
+            "op": "add",
+            "left_bits": 8132,
+            "right_bits": 8613,
+            "result_bits": 8613
+          },
+          {
+            "op": "and",
+            "left_bits": 8613,
+            "right_bits": 8614,
+            "result_bits": 7942
+          },
+          {
+            "op": "right",
+            "left_bits": 7942,
+            "right_bits": 3,
+            "result_bits": 7937
+          },
+          {
+            "op": "mul",
+            "left_bits": 7937,
+            "right_bits": 4,
+            "result_bits": 7940
+          },
+          {
+            "op": "sub",
+            "left_bits": 8132,
+            "right_bits": 7940,
+            "result_bits": 8132
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 14,
+            "result_bits": 8641
+          },
+          {
+            "op": "sub",
+            "left_bits": 8641,
+            "right_bits": 1,
+            "result_bits": 8640
+          },
+          {
+            "op": "and",
+            "left_bits": 8964,
+            "right_bits": 8640,
+            "result_bits": 8033
+          },
+          {
+            "op": "right",
+            "left_bits": 8964,
+            "right_bits": 14,
+            "result_bits": 324
+          },
+          {
+            "op": "and",
+            "left_bits": 324,
+            "right_bits": 480,
+            "result_bits": 324
+          },
+          {
+            "op": "mul",
+            "left_bits": 7683,
+            "right_bits": 324,
+            "result_bits": 8006
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 8006,
+            "result_bits": 8006
+          },
+          {
+            "op": "add",
+            "left_bits": 8033,
+            "right_bits": 8138,
+            "result_bits": 8138
+          },
+          {
+            "op": "sub",
+            "left_bits": 8138,
+            "right_bits": 8006,
+            "result_bits": 8138
+          },
+          {
+            "op": "mul",
+            "left_bits": 8138,
+            "right_bits": 10,
+            "result_bits": 8147
+          },
+          {
+            "op": "right",
+            "left_bits": 8147,
+            "right_bits": 4,
+            "result_bits": 8134
+          },
+          {
+            "op": "and",
+            "left_bits": 8134,
+            "right_bits": 8621,
+            "result_bits": 8134
+          },
+          {
+            "op": "mul",
+            "left_bits": 8134,
+            "right_bits": 4,
+            "result_bits": 8138
+          },
+          {
+            "op": "sub",
+            "left_bits": 8138,
+            "right_bits": 8138,
+            "result_bits": 8132
+          },
+          {
+            "op": "add",
+            "left_bits": 8132,
+            "right_bits": 8613,
+            "result_bits": 8613
+          },
+          {
+            "op": "and",
+            "left_bits": 8613,
+            "right_bits": 8614,
+            "result_bits": 8134
+          },
+          {
+            "op": "right",
+            "left_bits": 8134,
+            "right_bits": 3,
+            "result_bits": 8129
+          },
+          {
+            "op": "mul",
+            "left_bits": 8129,
+            "right_bits": 4,
+            "result_bits": 8132
+          },
+          {
+            "op": "sub",
+            "left_bits": 8132,
+            "right_bits": 8132,
+            "result_bits": 8033
+          },
+          {
+            "op": "right",
+            "left_bits": 8132,
+            "right_bits": 10,
+            "result_bits": 7172
+          },
+          {
+            "op": "add",
+            "left_bits": 8132,
+            "right_bits": 7172,
+            "result_bits": 8132
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 7681,
+            "result_bits": 7693
+          },
+          {
+            "op": "left",
+            "left_bits": 7681,
+            "right_bits": 3,
+            "result_bits": 7686
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 7681,
+            "result_bits": 7685
+          },
+          {
+            "op": "right",
+            "left_bits": 8033,
+            "right_bits": 13,
+            "result_bits": 353
+          },
+          {
+            "op": "and",
+            "left_bits": 353,
+            "right_bits": 480,
+            "result_bits": 353
+          },
+          {
+            "op": "mul",
+            "left_bits": 8132,
+            "right_bits": 353,
+            "result_bits": 8484
+          },
+          {
+            "op": "right",
+            "left_bits": 8484,
+            "right_bits": 9,
+            "result_bits": 8036
+          },
+          {
+            "op": "and",
+            "left_bits": 8036,
+            "right_bits": 7693,
+            "result_bits": 7689
+          },
+          {
+            "op": "mul",
+            "left_bits": 7689,
+            "right_bits": 10,
+            "result_bits": 7698
+          },
+          {
+            "op": "right",
+            "left_bits": 7698,
+            "right_bits": 4,
+            "result_bits": 7685
+          },
+          {
+            "op": "and",
+            "left_bits": 7685,
+            "right_bits": 7693,
+            "result_bits": 7685
+          },
+          {
+            "op": "mul",
+            "left_bits": 7685,
+            "right_bits": 4,
+            "result_bits": 7689
+          },
+          {
+            "op": "sub",
+            "left_bits": 7689,
+            "right_bits": 7689,
+            "result_bits": 7684
+          },
+          {
+            "op": "add",
+            "left_bits": 7684,
+            "right_bits": 7685,
+            "result_bits": 7685
+          },
+          {
+            "op": "and",
+            "left_bits": 7685,
+            "right_bits": 7686,
+            "result_bits": 2886
+          },
+          {
+            "op": "right",
+            "left_bits": 2886,
+            "right_bits": 3,
+            "result_bits": 2881
+          },
+          {
+            "op": "mul",
+            "left_bits": 2881,
+            "right_bits": 4,
+            "result_bits": 2884
+          },
+          {
+            "op": "sub",
+            "left_bits": 7684,
+            "right_bits": 2884,
+            "result_bits": 7684
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 7681
+          },
+          {
+            "op": "sub",
+            "left_bits": 7681,
+            "right_bits": 1,
+            "result_bits": 7680
+          },
+          {
+            "op": "and",
+            "left_bits": 8033,
+            "right_bits": 7680,
+            "result_bits": 7073
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 6721,
+            "result_bits": 6733
+          },
+          {
+            "op": "left",
+            "left_bits": 6721,
+            "right_bits": 3,
+            "result_bits": 6726
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 6721,
+            "result_bits": 6725
+          },
+          {
+            "op": "right",
+            "left_bits": 8132,
+            "right_bits": 13,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "add",
+            "left_bits": 452,
+            "right_bits": 0,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 7073,
+            "right_bits": 452,
+            "result_bits": 7524
+          },
+          {
+            "op": "right",
+            "left_bits": 7524,
+            "right_bits": 9,
+            "result_bits": 7076
+          },
+          {
+            "op": "and",
+            "left_bits": 7076,
+            "right_bits": 6733,
+            "result_bits": 6729
+          },
+          {
+            "op": "mul",
+            "left_bits": 6729,
+            "right_bits": 10,
+            "result_bits": 6738
+          },
+          {
+            "op": "right",
+            "left_bits": 6738,
+            "right_bits": 4,
+            "result_bits": 6725
+          },
+          {
+            "op": "and",
+            "left_bits": 6725,
+            "right_bits": 6733,
+            "result_bits": 6725
+          },
+          {
+            "op": "mul",
+            "left_bits": 6725,
+            "right_bits": 4,
+            "result_bits": 6729
+          },
+          {
+            "op": "sub",
+            "left_bits": 6729,
+            "right_bits": 6729,
+            "result_bits": 6723
+          },
+          {
+            "op": "add",
+            "left_bits": 6723,
+            "right_bits": 6725,
+            "result_bits": 6725
+          },
+          {
+            "op": "and",
+            "left_bits": 6725,
+            "right_bits": 6726,
+            "result_bits": 2886
+          },
+          {
+            "op": "right",
+            "left_bits": 2886,
+            "right_bits": 3,
+            "result_bits": 2881
+          },
+          {
+            "op": "mul",
+            "left_bits": 2881,
+            "right_bits": 4,
+            "result_bits": 2884
+          },
+          {
+            "op": "sub",
+            "left_bits": 6723,
+            "right_bits": 2884,
+            "result_bits": 6723
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 7649,
+            "result_bits": 7661
+          },
+          {
+            "op": "left",
+            "left_bits": 7649,
+            "right_bits": 3,
+            "result_bits": 7654
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 7649,
+            "result_bits": 7653
+          },
+          {
+            "op": "mul",
+            "left_bits": 6721,
+            "right_bits": 449,
+            "result_bits": 7169
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 7169,
+            "result_bits": 7178
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 7681
+          },
+          {
+            "op": "sub",
+            "left_bits": 7681,
+            "right_bits": 1,
+            "result_bits": 7680
+          },
+          {
+            "op": "and",
+            "left_bits": 8132,
+            "right_bits": 7680,
+            "result_bits": 7170
+          },
+          {
+            "op": "right",
+            "left_bits": 8132,
+            "right_bits": 13,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 6723,
+            "right_bits": 452,
+            "result_bits": 7174
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 7174,
+            "result_bits": 7174
+          },
+          {
+            "op": "add",
+            "left_bits": 7170,
+            "right_bits": 7178,
+            "result_bits": 7178
+          },
+          {
+            "op": "sub",
+            "left_bits": 7178,
+            "right_bits": 7174,
+            "result_bits": 7178
+          },
+          {
+            "op": "mul",
+            "left_bits": 7178,
+            "right_bits": 10,
+            "result_bits": 7187
+          },
+          {
+            "op": "right",
+            "left_bits": 7187,
+            "right_bits": 4,
+            "result_bits": 7174
+          },
+          {
+            "op": "and",
+            "left_bits": 7174,
+            "right_bits": 7661,
+            "result_bits": 7174
+          },
+          {
+            "op": "mul",
+            "left_bits": 7174,
+            "right_bits": 4,
+            "result_bits": 7178
+          },
+          {
+            "op": "sub",
+            "left_bits": 7178,
+            "right_bits": 7178,
+            "result_bits": 7169
+          },
+          {
+            "op": "add",
+            "left_bits": 7169,
+            "right_bits": 7653,
+            "result_bits": 7653
+          },
+          {
+            "op": "and",
+            "left_bits": 7653,
+            "right_bits": 7654,
+            "result_bits": 7014
+          },
+          {
+            "op": "right",
+            "left_bits": 7014,
+            "right_bits": 3,
+            "result_bits": 7009
+          },
+          {
+            "op": "mul",
+            "left_bits": 7009,
+            "right_bits": 4,
+            "result_bits": 7012
+          },
+          {
+            "op": "sub",
+            "left_bits": 7169,
+            "right_bits": 7012,
+            "result_bits": 7169
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 7681
+          },
+          {
+            "op": "sub",
+            "left_bits": 7681,
+            "right_bits": 1,
+            "result_bits": 7680
+          },
+          {
+            "op": "and",
+            "left_bits": 8033,
+            "right_bits": 7680,
+            "result_bits": 7073
+          },
+          {
+            "op": "right",
+            "left_bits": 8033,
+            "right_bits": 13,
+            "result_bits": 353
+          },
+          {
+            "op": "and",
+            "left_bits": 353,
+            "right_bits": 480,
+            "result_bits": 353
+          },
+          {
+            "op": "mul",
+            "left_bits": 6723,
+            "right_bits": 353,
+            "result_bits": 7075
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 7075,
+            "result_bits": 7075
+          },
+          {
+            "op": "add",
+            "left_bits": 7073,
+            "right_bits": 7178,
+            "result_bits": 7178
+          },
+          {
+            "op": "sub",
+            "left_bits": 7178,
+            "right_bits": 7075,
+            "result_bits": 7178
+          },
+          {
+            "op": "mul",
+            "left_bits": 7178,
+            "right_bits": 10,
+            "result_bits": 7187
+          },
+          {
+            "op": "right",
+            "left_bits": 7187,
+            "right_bits": 4,
+            "result_bits": 7174
+          },
+          {
+            "op": "and",
+            "left_bits": 7174,
+            "right_bits": 7661,
+            "result_bits": 7174
+          },
+          {
+            "op": "mul",
+            "left_bits": 7174,
+            "right_bits": 4,
+            "result_bits": 7178
+          },
+          {
+            "op": "sub",
+            "left_bits": 7178,
+            "right_bits": 7178,
+            "result_bits": 7172
+          },
+          {
+            "op": "add",
+            "left_bits": 7172,
+            "right_bits": 7653,
+            "result_bits": 7653
+          },
+          {
+            "op": "and",
+            "left_bits": 7653,
+            "right_bits": 7654,
+            "result_bits": 7174
+          },
+          {
+            "op": "right",
+            "left_bits": 7174,
+            "right_bits": 3,
+            "result_bits": 7169
+          },
+          {
+            "op": "mul",
+            "left_bits": 7169,
+            "right_bits": 4,
+            "result_bits": 7172
+          },
+          {
+            "op": "sub",
+            "left_bits": 7172,
+            "right_bits": 7172,
+            "result_bits": 7076
+          },
+          {
+            "op": "right",
+            "left_bits": 7169,
+            "right_bits": 10,
+            "result_bits": 6209
+          },
+          {
+            "op": "add",
+            "left_bits": 7169,
+            "right_bits": 6209,
+            "result_bits": 7169
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 6721,
+            "result_bits": 6733
+          },
+          {
+            "op": "left",
+            "left_bits": 6721,
+            "right_bits": 3,
+            "result_bits": 6726
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 6721,
+            "result_bits": 6725
+          },
+          {
+            "op": "right",
+            "left_bits": 7076,
+            "right_bits": 13,
+            "result_bits": 356
+          },
+          {
+            "op": "and",
+            "left_bits": 356,
+            "right_bits": 480,
+            "result_bits": 356
+          },
+          {
+            "op": "mul",
+            "left_bits": 7169,
+            "right_bits": 356,
+            "result_bits": 7524
+          },
+          {
+            "op": "right",
+            "left_bits": 7524,
+            "right_bits": 9,
+            "result_bits": 7076
+          },
+          {
+            "op": "and",
+            "left_bits": 7076,
+            "right_bits": 6733,
+            "result_bits": 6729
+          },
+          {
+            "op": "mul",
+            "left_bits": 6729,
+            "right_bits": 10,
+            "result_bits": 6738
+          },
+          {
+            "op": "right",
+            "left_bits": 6738,
+            "right_bits": 4,
+            "result_bits": 6725
+          },
+          {
+            "op": "and",
+            "left_bits": 6725,
+            "right_bits": 6733,
+            "result_bits": 6725
+          },
+          {
+            "op": "mul",
+            "left_bits": 6725,
+            "right_bits": 4,
+            "result_bits": 6729
+          },
+          {
+            "op": "sub",
+            "left_bits": 6729,
+            "right_bits": 6729,
+            "result_bits": 6723
+          },
+          {
+            "op": "add",
+            "left_bits": 6723,
+            "right_bits": 6725,
+            "result_bits": 6725
+          },
+          {
+            "op": "and",
+            "left_bits": 6725,
+            "right_bits": 6726,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 6723,
+            "right_bits": 0,
+            "result_bits": 6723
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 6721
+          },
+          {
+            "op": "sub",
+            "left_bits": 6721,
+            "right_bits": 1,
+            "result_bits": 6720
+          },
+          {
+            "op": "and",
+            "left_bits": 7076,
+            "right_bits": 6720,
+            "result_bits": 6179
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 5761,
+            "result_bits": 5773
+          },
+          {
+            "op": "left",
+            "left_bits": 5761,
+            "right_bits": 3,
+            "result_bits": 5766
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 5761,
+            "result_bits": 5765
+          },
+          {
+            "op": "right",
+            "left_bits": 7169,
+            "right_bits": 13,
+            "result_bits": 449
+          },
+          {
+            "op": "and",
+            "left_bits": 449,
+            "right_bits": 480,
+            "result_bits": 449
+          },
+          {
+            "op": "add",
+            "left_bits": 449,
+            "right_bits": 0,
+            "result_bits": 449
+          },
+          {
+            "op": "mul",
+            "left_bits": 6179,
+            "right_bits": 449,
+            "result_bits": 6627
+          },
+          {
+            "op": "right",
+            "left_bits": 6627,
+            "right_bits": 9,
+            "result_bits": 6179
+          },
+          {
+            "op": "and",
+            "left_bits": 6179,
+            "right_bits": 5773,
+            "result_bits": 5769
+          },
+          {
+            "op": "mul",
+            "left_bits": 5769,
+            "right_bits": 10,
+            "result_bits": 5778
+          },
+          {
+            "op": "right",
+            "left_bits": 5778,
+            "right_bits": 4,
+            "result_bits": 5765
+          },
+          {
+            "op": "and",
+            "left_bits": 5765,
+            "right_bits": 5773,
+            "result_bits": 5765
+          },
+          {
+            "op": "mul",
+            "left_bits": 5765,
+            "right_bits": 4,
+            "result_bits": 5769
+          },
+          {
+            "op": "sub",
+            "left_bits": 5769,
+            "right_bits": 5769,
+            "result_bits": 5764
+          },
+          {
+            "op": "add",
+            "left_bits": 5764,
+            "right_bits": 5765,
+            "result_bits": 5765
+          },
+          {
+            "op": "and",
+            "left_bits": 5765,
+            "right_bits": 5766,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 5764,
+            "right_bits": 0,
+            "result_bits": 5764
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 6689,
+            "result_bits": 6701
+          },
+          {
+            "op": "left",
+            "left_bits": 6689,
+            "right_bits": 3,
+            "result_bits": 6694
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 6689,
+            "result_bits": 6693
+          },
+          {
+            "op": "mul",
+            "left_bits": 5761,
+            "right_bits": 449,
+            "result_bits": 6209
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 6209,
+            "result_bits": 6218
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 6721
+          },
+          {
+            "op": "sub",
+            "left_bits": 6721,
+            "right_bits": 1,
+            "result_bits": 6720
+          },
+          {
+            "op": "and",
+            "left_bits": 7169,
+            "right_bits": 6720,
+            "result_bits": 6212
+          },
+          {
+            "op": "right",
+            "left_bits": 7169,
+            "right_bits": 13,
+            "result_bits": 449
+          },
+          {
+            "op": "and",
+            "left_bits": 449,
+            "right_bits": 480,
+            "result_bits": 449
+          },
+          {
+            "op": "mul",
+            "left_bits": 5764,
+            "right_bits": 449,
+            "result_bits": 6212
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 6212,
+            "result_bits": 6212
+          },
+          {
+            "op": "add",
+            "left_bits": 6212,
+            "right_bits": 6218,
+            "result_bits": 6218
+          },
+          {
+            "op": "sub",
+            "left_bits": 6218,
+            "right_bits": 6212,
+            "result_bits": 6218
+          },
+          {
+            "op": "mul",
+            "left_bits": 6218,
+            "right_bits": 10,
+            "result_bits": 6227
+          },
+          {
+            "op": "right",
+            "left_bits": 6227,
+            "right_bits": 4,
+            "result_bits": 6214
+          },
+          {
+            "op": "and",
+            "left_bits": 6214,
+            "right_bits": 6701,
+            "result_bits": 6214
+          },
+          {
+            "op": "mul",
+            "left_bits": 6214,
+            "right_bits": 4,
+            "result_bits": 6218
+          },
+          {
+            "op": "sub",
+            "left_bits": 6218,
+            "right_bits": 6218,
+            "result_bits": 6212
+          },
+          {
+            "op": "add",
+            "left_bits": 6212,
+            "right_bits": 6693,
+            "result_bits": 6693
+          },
+          {
+            "op": "and",
+            "left_bits": 6693,
+            "right_bits": 6694,
+            "result_bits": 6022
+          },
+          {
+            "op": "right",
+            "left_bits": 6022,
+            "right_bits": 3,
+            "result_bits": 6017
+          },
+          {
+            "op": "mul",
+            "left_bits": 6017,
+            "right_bits": 4,
+            "result_bits": 6020
+          },
+          {
+            "op": "sub",
+            "left_bits": 6212,
+            "right_bits": 6020,
+            "result_bits": 6212
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 6721
+          },
+          {
+            "op": "sub",
+            "left_bits": 6721,
+            "right_bits": 1,
+            "result_bits": 6720
+          },
+          {
+            "op": "and",
+            "left_bits": 7076,
+            "right_bits": 6720,
+            "result_bits": 6179
+          },
+          {
+            "op": "right",
+            "left_bits": 7076,
+            "right_bits": 13,
+            "result_bits": 356
+          },
+          {
+            "op": "and",
+            "left_bits": 356,
+            "right_bits": 480,
+            "result_bits": 356
+          },
+          {
+            "op": "mul",
+            "left_bits": 5764,
+            "right_bits": 356,
+            "result_bits": 6119
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 6119,
+            "result_bits": 6119
+          },
+          {
+            "op": "add",
+            "left_bits": 6179,
+            "right_bits": 6218,
+            "result_bits": 6218
+          },
+          {
+            "op": "sub",
+            "left_bits": 6218,
+            "right_bits": 6119,
+            "result_bits": 6218
+          },
+          {
+            "op": "mul",
+            "left_bits": 6218,
+            "right_bits": 10,
+            "result_bits": 6227
+          },
+          {
+            "op": "right",
+            "left_bits": 6227,
+            "right_bits": 4,
+            "result_bits": 6214
+          },
+          {
+            "op": "and",
+            "left_bits": 6214,
+            "right_bits": 6701,
+            "result_bits": 6214
+          },
+          {
+            "op": "mul",
+            "left_bits": 6214,
+            "right_bits": 4,
+            "result_bits": 6218
+          },
+          {
+            "op": "sub",
+            "left_bits": 6218,
+            "right_bits": 6218,
+            "result_bits": 6212
+          },
+          {
+            "op": "add",
+            "left_bits": 6212,
+            "right_bits": 6693,
+            "result_bits": 6693
+          },
+          {
+            "op": "and",
+            "left_bits": 6693,
+            "right_bits": 6694,
+            "result_bits": 6214
+          },
+          {
+            "op": "right",
+            "left_bits": 6214,
+            "right_bits": 3,
+            "result_bits": 6209
+          },
+          {
+            "op": "mul",
+            "left_bits": 6209,
+            "right_bits": 4,
+            "result_bits": 6212
+          },
+          {
+            "op": "sub",
+            "left_bits": 6212,
+            "right_bits": 6212,
+            "result_bits": 6179
+          },
+          {
+            "op": "right",
+            "left_bits": 6212,
+            "right_bits": 10,
+            "result_bits": 5252
+          },
+          {
+            "op": "add",
+            "left_bits": 6212,
+            "right_bits": 5252,
+            "result_bits": 6212
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 5761,
+            "result_bits": 5773
+          },
+          {
+            "op": "left",
+            "left_bits": 5761,
+            "right_bits": 3,
+            "result_bits": 5766
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 5761,
+            "result_bits": 5765
+          },
+          {
+            "op": "right",
+            "left_bits": 6179,
+            "right_bits": 13,
+            "result_bits": 419
+          },
+          {
+            "op": "and",
+            "left_bits": 419,
+            "right_bits": 480,
+            "result_bits": 419
+          },
+          {
+            "op": "mul",
+            "left_bits": 6212,
+            "right_bits": 419,
+            "result_bits": 6630
+          },
+          {
+            "op": "right",
+            "left_bits": 6630,
+            "right_bits": 9,
+            "result_bits": 6182
+          },
+          {
+            "op": "and",
+            "left_bits": 6182,
+            "right_bits": 5773,
+            "result_bits": 5769
+          },
+          {
+            "op": "mul",
+            "left_bits": 5769,
+            "right_bits": 10,
+            "result_bits": 5778
+          },
+          {
+            "op": "right",
+            "left_bits": 5778,
+            "right_bits": 4,
+            "result_bits": 5765
+          },
+          {
+            "op": "and",
+            "left_bits": 5765,
+            "right_bits": 5773,
+            "result_bits": 5765
+          },
+          {
+            "op": "mul",
+            "left_bits": 5765,
+            "right_bits": 4,
+            "result_bits": 5769
+          },
+          {
+            "op": "sub",
+            "left_bits": 5769,
+            "right_bits": 5769,
+            "result_bits": 5764
+          },
+          {
+            "op": "add",
+            "left_bits": 5764,
+            "right_bits": 5765,
+            "result_bits": 5765
+          },
+          {
+            "op": "and",
+            "left_bits": 5765,
+            "right_bits": 5766,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 5764,
+            "right_bits": 0,
+            "result_bits": 5764
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 5761
+          },
+          {
+            "op": "sub",
+            "left_bits": 5761,
+            "right_bits": 1,
+            "result_bits": 5760
+          },
+          {
+            "op": "and",
+            "left_bits": 6179,
+            "right_bits": 5760,
+            "result_bits": 5219
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 4801,
+            "result_bits": 4813
+          },
+          {
+            "op": "left",
+            "left_bits": 4801,
+            "right_bits": 3,
+            "result_bits": 4806
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 4801,
+            "result_bits": 4805
+          },
+          {
+            "op": "right",
+            "left_bits": 6212,
+            "right_bits": 13,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "add",
+            "left_bits": 452,
+            "right_bits": 0,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 5219,
+            "right_bits": 452,
+            "result_bits": 5670
+          },
+          {
+            "op": "right",
+            "left_bits": 5670,
+            "right_bits": 9,
+            "result_bits": 5222
+          },
+          {
+            "op": "and",
+            "left_bits": 5222,
+            "right_bits": 4813,
+            "result_bits": 4810
+          },
+          {
+            "op": "mul",
+            "left_bits": 4810,
+            "right_bits": 10,
+            "result_bits": 4819
+          },
+          {
+            "op": "right",
+            "left_bits": 4819,
+            "right_bits": 4,
+            "result_bits": 4806
+          },
+          {
+            "op": "and",
+            "left_bits": 4806,
+            "right_bits": 4813,
+            "result_bits": 4806
+          },
+          {
+            "op": "mul",
+            "left_bits": 4806,
+            "right_bits": 4,
+            "result_bits": 4810
+          },
+          {
+            "op": "sub",
+            "left_bits": 4810,
+            "right_bits": 4810,
+            "result_bits": 4802
+          },
+          {
+            "op": "add",
+            "left_bits": 4802,
+            "right_bits": 4805,
+            "result_bits": 4805
+          },
+          {
+            "op": "and",
+            "left_bits": 4805,
+            "right_bits": 4806,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 4802,
+            "right_bits": 0,
+            "result_bits": 4802
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 5729,
+            "result_bits": 5741
+          },
+          {
+            "op": "left",
+            "left_bits": 5729,
+            "right_bits": 3,
+            "result_bits": 5734
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 5729,
+            "result_bits": 5733
+          },
+          {
+            "op": "mul",
+            "left_bits": 4801,
+            "right_bits": 449,
+            "result_bits": 5249
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 5249,
+            "result_bits": 5258
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 5761
+          },
+          {
+            "op": "sub",
+            "left_bits": 5761,
+            "right_bits": 1,
+            "result_bits": 5760
+          },
+          {
+            "op": "and",
+            "left_bits": 6212,
+            "right_bits": 5760,
+            "result_bits": 5251
+          },
+          {
+            "op": "right",
+            "left_bits": 6212,
+            "right_bits": 13,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 4802,
+            "right_bits": 452,
+            "result_bits": 5253
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 5253,
+            "result_bits": 5253
+          },
+          {
+            "op": "add",
+            "left_bits": 5251,
+            "right_bits": 5258,
+            "result_bits": 5258
+          },
+          {
+            "op": "sub",
+            "left_bits": 5258,
+            "right_bits": 5253,
+            "result_bits": 5258
+          },
+          {
+            "op": "mul",
+            "left_bits": 5258,
+            "right_bits": 10,
+            "result_bits": 5267
+          },
+          {
+            "op": "right",
+            "left_bits": 5267,
+            "right_bits": 4,
+            "result_bits": 5254
+          },
+          {
+            "op": "and",
+            "left_bits": 5254,
+            "right_bits": 5741,
+            "result_bits": 5254
+          },
+          {
+            "op": "mul",
+            "left_bits": 5254,
+            "right_bits": 4,
+            "result_bits": 5258
+          },
+          {
+            "op": "sub",
+            "left_bits": 5258,
+            "right_bits": 5258,
+            "result_bits": 5252
+          },
+          {
+            "op": "add",
+            "left_bits": 5252,
+            "right_bits": 5733,
+            "result_bits": 5733
+          },
+          {
+            "op": "and",
+            "left_bits": 5733,
+            "right_bits": 5734,
+            "result_bits": 5158
+          },
+          {
+            "op": "right",
+            "left_bits": 5158,
+            "right_bits": 3,
+            "result_bits": 5153
+          },
+          {
+            "op": "mul",
+            "left_bits": 5153,
+            "right_bits": 4,
+            "result_bits": 5156
+          },
+          {
+            "op": "sub",
+            "left_bits": 5252,
+            "right_bits": 5156,
+            "result_bits": 5252
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 5761
+          },
+          {
+            "op": "sub",
+            "left_bits": 5761,
+            "right_bits": 1,
+            "result_bits": 5760
+          },
+          {
+            "op": "and",
+            "left_bits": 6179,
+            "right_bits": 5760,
+            "result_bits": 5219
+          },
+          {
+            "op": "right",
+            "left_bits": 6179,
+            "right_bits": 13,
+            "result_bits": 419
+          },
+          {
+            "op": "and",
+            "left_bits": 419,
+            "right_bits": 480,
+            "result_bits": 419
+          },
+          {
+            "op": "mul",
+            "left_bits": 4802,
+            "right_bits": 419,
+            "result_bits": 5220
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 5220,
+            "result_bits": 5220
+          },
+          {
+            "op": "add",
+            "left_bits": 5219,
+            "right_bits": 5258,
+            "result_bits": 5258
+          },
+          {
+            "op": "sub",
+            "left_bits": 5258,
+            "right_bits": 5220,
+            "result_bits": 5258
+          },
+          {
+            "op": "mul",
+            "left_bits": 5258,
+            "right_bits": 10,
+            "result_bits": 5267
+          },
+          {
+            "op": "right",
+            "left_bits": 5267,
+            "right_bits": 4,
+            "result_bits": 5254
+          },
+          {
+            "op": "and",
+            "left_bits": 5254,
+            "right_bits": 5741,
+            "result_bits": 5254
+          },
+          {
+            "op": "mul",
+            "left_bits": 5254,
+            "right_bits": 4,
+            "result_bits": 5258
+          },
+          {
+            "op": "sub",
+            "left_bits": 5258,
+            "right_bits": 5258,
+            "result_bits": 5252
+          },
+          {
+            "op": "add",
+            "left_bits": 5252,
+            "right_bits": 5733,
+            "result_bits": 5733
+          },
+          {
+            "op": "and",
+            "left_bits": 5733,
+            "right_bits": 5734,
+            "result_bits": 5254
+          },
+          {
+            "op": "right",
+            "left_bits": 5254,
+            "right_bits": 3,
+            "result_bits": 5249
+          },
+          {
+            "op": "mul",
+            "left_bits": 5249,
+            "right_bits": 4,
+            "result_bits": 5252
+          },
+          {
+            "op": "sub",
+            "left_bits": 5252,
+            "right_bits": 5252,
+            "result_bits": 5220
+          },
+          {
+            "op": "right",
+            "left_bits": 5252,
+            "right_bits": 10,
+            "result_bits": 4292
+          },
+          {
+            "op": "add",
+            "left_bits": 5252,
+            "right_bits": 4292,
+            "result_bits": 5252
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 4801,
+            "result_bits": 4813
+          },
+          {
+            "op": "left",
+            "left_bits": 4801,
+            "right_bits": 3,
+            "result_bits": 4806
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 4801,
+            "result_bits": 4805
+          },
+          {
+            "op": "right",
+            "left_bits": 5220,
+            "right_bits": 13,
+            "result_bits": 420
+          },
+          {
+            "op": "and",
+            "left_bits": 420,
+            "right_bits": 480,
+            "result_bits": 420
+          },
+          {
+            "op": "mul",
+            "left_bits": 5252,
+            "right_bits": 420,
+            "result_bits": 5671
+          },
+          {
+            "op": "right",
+            "left_bits": 5671,
+            "right_bits": 9,
+            "result_bits": 5223
+          },
+          {
+            "op": "and",
+            "left_bits": 5223,
+            "right_bits": 4813,
+            "result_bits": 4809
+          },
+          {
+            "op": "mul",
+            "left_bits": 4809,
+            "right_bits": 10,
+            "result_bits": 4819
+          },
+          {
+            "op": "right",
+            "left_bits": 4819,
+            "right_bits": 4,
+            "result_bits": 4806
+          },
+          {
+            "op": "and",
+            "left_bits": 4806,
+            "right_bits": 4813,
+            "result_bits": 4806
+          },
+          {
+            "op": "mul",
+            "left_bits": 4806,
+            "right_bits": 4,
+            "result_bits": 4809
+          },
+          {
+            "op": "sub",
+            "left_bits": 4809,
+            "right_bits": 4809,
+            "result_bits": 4804
+          },
+          {
+            "op": "add",
+            "left_bits": 4804,
+            "right_bits": 4805,
+            "result_bits": 4806
+          },
+          {
+            "op": "and",
+            "left_bits": 4806,
+            "right_bits": 4806,
+            "result_bits": 4806
+          },
+          {
+            "op": "right",
+            "left_bits": 4806,
+            "right_bits": 3,
+            "result_bits": 4801
+          },
+          {
+            "op": "mul",
+            "left_bits": 4801,
+            "right_bits": 4,
+            "result_bits": 4804
+          },
+          {
+            "op": "sub",
+            "left_bits": 4804,
+            "right_bits": 4804,
+            "result_bits": 3844
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 13,
+            "result_bits": 4801
+          },
+          {
+            "op": "sub",
+            "left_bits": 4801,
+            "right_bits": 1,
+            "result_bits": 4800
+          },
+          {
+            "op": "and",
+            "left_bits": 5220,
+            "right_bits": 4800,
+            "result_bits": 4260
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 3841,
+            "result_bits": 3853
+          },
+          {
+            "op": "left",
+            "left_bits": 3841,
+            "right_bits": 3,
+            "result_bits": 3846
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 3841,
+            "result_bits": 3845
+          },
+          {
+            "op": "right",
+            "left_bits": 5252,
+            "right_bits": 13,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "add",
+            "left_bits": 452,
+            "right_bits": 0,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 4260,
+            "right_bits": 452,
+            "result_bits": 4711
+          },
+          {
+            "op": "right",
+            "left_bits": 4711,
+            "right_bits": 9,
+            "result_bits": 4263
+          },
+          {
+            "op": "and",
+            "left_bits": 4263,
+            "right_bits": 3853,
+            "result_bits": 3849
+          },
+          {
+            "op": "mul",
+            "left_bits": 3849,
+            "right_bits": 10,
+            "result_bits": 3858
+          },
+          {
+            "op": "right",
+            "left_bits": 3858,
+            "right_bits": 4,
+            "result_bits": 3845
+          },
+          {
+            "op": "and",
+            "left_bits": 3845,
+            "right_bits": 3853,
+            "result_bits": 3845
+          },
+          {
+            "op": "mul",
+            "left_bits": 3845,
+            "right_bits": 4,
+            "result_bits": 3849
+          },
+          {
+            "op": "sub",
+            "left_bits": 3849,
+            "right_bits": 3849,
+            "result_bits": 3844
+          },
+          {
+            "op": "add",
+            "left_bits": 3844,
+            "right_bits": 3845,
+            "result_bits": 3845
+          },
+          {
+            "op": "and",
+            "left_bits": 3845,
+            "right_bits": 3846,
+            "result_bits": 1926
+          },
+          {
+            "op": "right",
+            "left_bits": 1926,
+            "right_bits": 3,
+            "result_bits": 1921
+          },
+          {
+            "op": "mul",
+            "left_bits": 1921,
+            "right_bits": 4,
+            "result_bits": 1924
+          },
+          {
+            "op": "sub",
+            "left_bits": 3844,
+            "right_bits": 1924,
+            "result_bits": 3844
+          },
+          {
+            "op": "right",
+            "left_bits": 5252,
+            "right_bits": 10,
+            "result_bits": 4292
+          },
+          {
+            "op": "add",
+            "left_bits": 5252,
+            "right_bits": 4292,
+            "result_bits": 5252
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 4801,
+            "result_bits": 4813
+          },
+          {
+            "op": "left",
+            "left_bits": 4801,
+            "right_bits": 3,
+            "result_bits": 4806
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 4801,
+            "result_bits": 4805
+          },
+          {
+            "op": "right",
+            "left_bits": 5220,
+            "right_bits": 12,
+            "result_bits": 1380
+          },
+          {
+            "op": "and",
+            "left_bits": 1380,
+            "right_bits": 480,
+            "result_bits": 420
+          },
+          {
+            "op": "mul",
+            "left_bits": 5252,
+            "right_bits": 420,
+            "result_bits": 5671
+          },
+          {
+            "op": "right",
+            "left_bits": 5671,
+            "right_bits": 9,
+            "result_bits": 5223
+          },
+          {
+            "op": "and",
+            "left_bits": 5223,
+            "right_bits": 4813,
+            "result_bits": 4809
+          },
+          {
+            "op": "mul",
+            "left_bits": 4809,
+            "right_bits": 10,
+            "result_bits": 4818
+          },
+          {
+            "op": "right",
+            "left_bits": 4818,
+            "right_bits": 4,
+            "result_bits": 4805
+          },
+          {
+            "op": "and",
+            "left_bits": 4805,
+            "right_bits": 4813,
+            "result_bits": 4805
+          },
+          {
+            "op": "mul",
+            "left_bits": 4805,
+            "right_bits": 4,
+            "result_bits": 4809
+          },
+          {
+            "op": "sub",
+            "left_bits": 4809,
+            "right_bits": 4809,
+            "result_bits": 4804
+          },
+          {
+            "op": "add",
+            "left_bits": 4804,
+            "right_bits": 4805,
+            "result_bits": 4805
+          },
+          {
+            "op": "and",
+            "left_bits": 4805,
+            "right_bits": 4806,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 4804,
+            "right_bits": 0,
+            "result_bits": 4804
+          },
+          {
+            "op": "right",
+            "left_bits": 5220,
+            "right_bits": 13,
+            "result_bits": 420
+          },
+          {
+            "op": "and",
+            "left_bits": 420,
+            "right_bits": 480,
+            "result_bits": 420
+          },
+          {
+            "op": "mul",
+            "left_bits": 5252,
+            "right_bits": 420,
+            "result_bits": 5671
+          },
+          {
+            "op": "right",
+            "left_bits": 5671,
+            "right_bits": 9,
+            "result_bits": 5223
+          },
+          {
+            "op": "and",
+            "left_bits": 5223,
+            "right_bits": 4813,
+            "result_bits": 4809
+          },
+          {
+            "op": "mul",
+            "left_bits": 4809,
+            "right_bits": 10,
+            "result_bits": 4819
+          },
+          {
+            "op": "right",
+            "left_bits": 4819,
+            "right_bits": 4,
+            "result_bits": 4806
+          },
+          {
+            "op": "and",
+            "left_bits": 4806,
+            "right_bits": 4813,
+            "result_bits": 4806
+          },
+          {
+            "op": "mul",
+            "left_bits": 4806,
+            "right_bits": 4,
+            "result_bits": 4809
+          },
+          {
+            "op": "sub",
+            "left_bits": 4809,
+            "right_bits": 4809,
+            "result_bits": 4804
+          },
+          {
+            "op": "add",
+            "left_bits": 4804,
+            "right_bits": 4805,
+            "result_bits": 4806
+          },
+          {
+            "op": "and",
+            "left_bits": 4806,
+            "right_bits": 4806,
+            "result_bits": 4806
+          },
+          {
+            "op": "right",
+            "left_bits": 4806,
+            "right_bits": 3,
+            "result_bits": 4801
+          },
+          {
+            "op": "mul",
+            "left_bits": 4801,
+            "right_bits": 4,
+            "result_bits": 4804
+          },
+          {
+            "op": "sub",
+            "left_bits": 4804,
+            "right_bits": 4804,
+            "result_bits": 3844
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 12,
+            "result_bits": 3841
+          },
+          {
+            "op": "sub",
+            "left_bits": 3841,
+            "right_bits": 1,
+            "result_bits": 3840
+          },
+          {
+            "op": "and",
+            "left_bits": 5220,
+            "right_bits": 3840,
+            "result_bits": 3300
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 2881,
+            "result_bits": 2893
+          },
+          {
+            "op": "left",
+            "left_bits": 2881,
+            "right_bits": 3,
+            "result_bits": 2886
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 2881,
+            "result_bits": 2885
+          },
+          {
+            "op": "right",
+            "left_bits": 5252,
+            "right_bits": 12,
+            "result_bits": 1412
+          },
+          {
+            "op": "and",
+            "left_bits": 1412,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "right",
+            "left_bits": 5252,
+            "right_bits": 13,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "add",
+            "left_bits": 452,
+            "right_bits": 452,
+            "result_bits": 453
+          },
+          {
+            "op": "mul",
+            "left_bits": 3300,
+            "right_bits": 453,
+            "result_bits": 3752
+          },
+          {
+            "op": "right",
+            "left_bits": 3752,
+            "right_bits": 9,
+            "result_bits": 3304
+          },
+          {
+            "op": "and",
+            "left_bits": 3304,
+            "right_bits": 2893,
+            "result_bits": 2890
+          },
+          {
+            "op": "mul",
+            "left_bits": 2890,
+            "right_bits": 10,
+            "result_bits": 2900
+          },
+          {
+            "op": "right",
+            "left_bits": 2900,
+            "right_bits": 4,
+            "result_bits": 2887
+          },
+          {
+            "op": "and",
+            "left_bits": 2887,
+            "right_bits": 2893,
+            "result_bits": 2887
+          },
+          {
+            "op": "mul",
+            "left_bits": 2887,
+            "right_bits": 4,
+            "result_bits": 2890
+          },
+          {
+            "op": "sub",
+            "left_bits": 2890,
+            "right_bits": 2890,
+            "result_bits": 2884
+          },
+          {
+            "op": "add",
+            "left_bits": 2884,
+            "right_bits": 2885,
+            "result_bits": 2885
+          },
+          {
+            "op": "and",
+            "left_bits": 2885,
+            "right_bits": 2886,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 2884,
+            "right_bits": 0,
+            "result_bits": 2884
+          },
+          {
+            "op": "right",
+            "left_bits": 5252,
+            "right_bits": 13,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "add",
+            "left_bits": 452,
+            "right_bits": 0,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 3300,
+            "right_bits": 452,
+            "result_bits": 3752
+          },
+          {
+            "op": "right",
+            "left_bits": 3752,
+            "right_bits": 9,
+            "result_bits": 3304
+          },
+          {
+            "op": "and",
+            "left_bits": 3304,
+            "right_bits": 2893,
+            "result_bits": 2889
+          },
+          {
+            "op": "mul",
+            "left_bits": 2889,
+            "right_bits": 10,
+            "result_bits": 2899
+          },
+          {
+            "op": "right",
+            "left_bits": 2899,
+            "right_bits": 4,
+            "result_bits": 2886
+          },
+          {
+            "op": "and",
+            "left_bits": 2886,
+            "right_bits": 2893,
+            "result_bits": 2886
+          },
+          {
+            "op": "mul",
+            "left_bits": 2886,
+            "right_bits": 4,
+            "result_bits": 2889
+          },
+          {
+            "op": "sub",
+            "left_bits": 2889,
+            "right_bits": 2889,
+            "result_bits": 2883
+          },
+          {
+            "op": "add",
+            "left_bits": 2883,
+            "right_bits": 2885,
+            "result_bits": 2885
+          },
+          {
+            "op": "and",
+            "left_bits": 2885,
+            "right_bits": 2886,
+            "result_bits": 1926
+          },
+          {
+            "op": "right",
+            "left_bits": 1926,
+            "right_bits": 3,
+            "result_bits": 1921
+          },
+          {
+            "op": "mul",
+            "left_bits": 1921,
+            "right_bits": 4,
+            "result_bits": 1924
+          },
+          {
+            "op": "sub",
+            "left_bits": 2883,
+            "right_bits": 1924,
+            "result_bits": 2883
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 3809,
+            "result_bits": 3821
+          },
+          {
+            "op": "left",
+            "left_bits": 3809,
+            "right_bits": 3,
+            "result_bits": 3814
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 3809,
+            "result_bits": 3813
+          },
+          {
+            "op": "mul",
+            "left_bits": 2881,
+            "right_bits": 449,
+            "result_bits": 3329
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 3329,
+            "result_bits": 3338
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 12,
+            "result_bits": 3841
+          },
+          {
+            "op": "sub",
+            "left_bits": 3841,
+            "right_bits": 1,
+            "result_bits": 3840
+          },
+          {
+            "op": "and",
+            "left_bits": 5252,
+            "right_bits": 3840,
+            "result_bits": 3329
+          },
+          {
+            "op": "right",
+            "left_bits": 5252,
+            "right_bits": 12,
+            "result_bits": 1412
+          },
+          {
+            "op": "and",
+            "left_bits": 1412,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 2883,
+            "right_bits": 452,
+            "result_bits": 3334
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 3334,
+            "result_bits": 3334
+          },
+          {
+            "op": "right",
+            "left_bits": 5252,
+            "right_bits": 13,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 2882,
+            "right_bits": 452,
+            "result_bits": 3334
+          },
+          {
+            "op": "add",
+            "left_bits": 3334,
+            "right_bits": 3334,
+            "result_bits": 3335
+          },
+          {
+            "op": "add",
+            "left_bits": 3329,
+            "right_bits": 3338,
+            "result_bits": 3338
+          },
+          {
+            "op": "sub",
+            "left_bits": 3338,
+            "right_bits": 3335,
+            "result_bits": 3337
+          },
+          {
+            "op": "mul",
+            "left_bits": 3337,
+            "right_bits": 10,
+            "result_bits": 3347
+          },
+          {
+            "op": "right",
+            "left_bits": 3347,
+            "right_bits": 4,
+            "result_bits": 3334
+          },
+          {
+            "op": "and",
+            "left_bits": 3334,
+            "right_bits": 3821,
+            "result_bits": 3334
+          },
+          {
+            "op": "mul",
+            "left_bits": 3334,
+            "right_bits": 4,
+            "result_bits": 3337
+          },
+          {
+            "op": "sub",
+            "left_bits": 3337,
+            "right_bits": 3337,
+            "result_bits": 3332
+          },
+          {
+            "op": "add",
+            "left_bits": 3332,
+            "right_bits": 3813,
+            "result_bits": 3813
+          },
+          {
+            "op": "and",
+            "left_bits": 3813,
+            "right_bits": 3814,
+            "result_bits": 3142
+          },
+          {
+            "op": "right",
+            "left_bits": 3142,
+            "right_bits": 3,
+            "result_bits": 3137
+          },
+          {
+            "op": "mul",
+            "left_bits": 3137,
+            "right_bits": 4,
+            "result_bits": 3140
+          },
+          {
+            "op": "sub",
+            "left_bits": 3332,
+            "right_bits": 3140,
+            "result_bits": 3332
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 12,
+            "result_bits": 3841
+          },
+          {
+            "op": "sub",
+            "left_bits": 3841,
+            "right_bits": 1,
+            "result_bits": 3840
+          },
+          {
+            "op": "and",
+            "left_bits": 5220,
+            "right_bits": 3840,
+            "result_bits": 3300
+          },
+          {
+            "op": "right",
+            "left_bits": 5220,
+            "right_bits": 12,
+            "result_bits": 1380
+          },
+          {
+            "op": "and",
+            "left_bits": 1380,
+            "right_bits": 480,
+            "result_bits": 420
+          },
+          {
+            "op": "mul",
+            "left_bits": 2883,
+            "right_bits": 420,
+            "result_bits": 3302
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 3302,
+            "result_bits": 3302
+          },
+          {
+            "op": "right",
+            "left_bits": 5220,
+            "right_bits": 13,
+            "result_bits": 420
+          },
+          {
+            "op": "and",
+            "left_bits": 420,
+            "right_bits": 480,
+            "result_bits": 420
+          },
+          {
+            "op": "mul",
+            "left_bits": 2882,
+            "right_bits": 420,
+            "result_bits": 3301
+          },
+          {
+            "op": "add",
+            "left_bits": 3302,
+            "right_bits": 3301,
+            "result_bits": 3303
+          },
+          {
+            "op": "add",
+            "left_bits": 3300,
+            "right_bits": 3338,
+            "result_bits": 3338
+          },
+          {
+            "op": "sub",
+            "left_bits": 3338,
+            "right_bits": 3303,
+            "result_bits": 3338
+          },
+          {
+            "op": "mul",
+            "left_bits": 3338,
+            "right_bits": 10,
+            "result_bits": 3347
+          },
+          {
+            "op": "right",
+            "left_bits": 3347,
+            "right_bits": 4,
+            "result_bits": 3334
+          },
+          {
+            "op": "and",
+            "left_bits": 3334,
+            "right_bits": 3821,
+            "result_bits": 3334
+          },
+          {
+            "op": "mul",
+            "left_bits": 3334,
+            "right_bits": 4,
+            "result_bits": 3338
+          },
+          {
+            "op": "sub",
+            "left_bits": 3338,
+            "right_bits": 3338,
+            "result_bits": 3332
+          },
+          {
+            "op": "add",
+            "left_bits": 3332,
+            "right_bits": 3813,
+            "result_bits": 3813
+          },
+          {
+            "op": "and",
+            "left_bits": 3813,
+            "right_bits": 3814,
+            "result_bits": 3334
+          },
+          {
+            "op": "right",
+            "left_bits": 3334,
+            "right_bits": 3,
+            "result_bits": 3329
+          },
+          {
+            "op": "mul",
+            "left_bits": 3329,
+            "right_bits": 4,
+            "result_bits": 3332
+          },
+          {
+            "op": "sub",
+            "left_bits": 3332,
+            "right_bits": 3332,
+            "result_bits": 3300
+          },
+          {
+            "op": "right",
+            "left_bits": 3332,
+            "right_bits": 10,
+            "result_bits": 2372
+          },
+          {
+            "op": "add",
+            "left_bits": 3332,
+            "right_bits": 2372,
+            "result_bits": 3332
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 2881,
+            "result_bits": 2893
+          },
+          {
+            "op": "left",
+            "left_bits": 2881,
+            "right_bits": 3,
+            "result_bits": 2886
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 2881,
+            "result_bits": 2885
+          },
+          {
+            "op": "right",
+            "left_bits": 3300,
+            "right_bits": 12,
+            "result_bits": 420
+          },
+          {
+            "op": "and",
+            "left_bits": 420,
+            "right_bits": 480,
+            "result_bits": 420
+          },
+          {
+            "op": "mul",
+            "left_bits": 3332,
+            "right_bits": 420,
+            "result_bits": 3752
+          },
+          {
+            "op": "right",
+            "left_bits": 3752,
+            "right_bits": 9,
+            "result_bits": 3304
+          },
+          {
+            "op": "and",
+            "left_bits": 3304,
+            "right_bits": 2893,
+            "result_bits": 2890
+          },
+          {
+            "op": "mul",
+            "left_bits": 2890,
+            "right_bits": 10,
+            "result_bits": 2899
+          },
+          {
+            "op": "right",
+            "left_bits": 2899,
+            "right_bits": 4,
+            "result_bits": 2886
+          },
+          {
+            "op": "and",
+            "left_bits": 2886,
+            "right_bits": 2893,
+            "result_bits": 2886
+          },
+          {
+            "op": "mul",
+            "left_bits": 2886,
+            "right_bits": 4,
+            "result_bits": 2890
+          },
+          {
+            "op": "sub",
+            "left_bits": 2890,
+            "right_bits": 2890,
+            "result_bits": 2884
+          },
+          {
+            "op": "add",
+            "left_bits": 2884,
+            "right_bits": 2885,
+            "result_bits": 2885
+          },
+          {
+            "op": "and",
+            "left_bits": 2885,
+            "right_bits": 2886,
+            "result_bits": 1926
+          },
+          {
+            "op": "right",
+            "left_bits": 1926,
+            "right_bits": 3,
+            "result_bits": 1921
+          },
+          {
+            "op": "mul",
+            "left_bits": 1921,
+            "right_bits": 4,
+            "result_bits": 1924
+          },
+          {
+            "op": "sub",
+            "left_bits": 2884,
+            "right_bits": 1924,
+            "result_bits": 2884
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 12,
+            "result_bits": 2881
+          },
+          {
+            "op": "sub",
+            "left_bits": 2881,
+            "right_bits": 1,
+            "result_bits": 2880
+          },
+          {
+            "op": "and",
+            "left_bits": 3300,
+            "right_bits": 2880,
+            "result_bits": 2337
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 1921,
+            "result_bits": 1933
+          },
+          {
+            "op": "left",
+            "left_bits": 1921,
+            "right_bits": 3,
+            "result_bits": 1926
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 1921,
+            "result_bits": 1925
+          },
+          {
+            "op": "right",
+            "left_bits": 3332,
+            "right_bits": 12,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "add",
+            "left_bits": 452,
+            "right_bits": 0,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 2337,
+            "right_bits": 452,
+            "result_bits": 2788
+          },
+          {
+            "op": "right",
+            "left_bits": 2788,
+            "right_bits": 9,
+            "result_bits": 2340
+          },
+          {
+            "op": "and",
+            "left_bits": 2340,
+            "right_bits": 1933,
+            "result_bits": 1929
+          },
+          {
+            "op": "mul",
+            "left_bits": 1929,
+            "right_bits": 10,
+            "result_bits": 1938
+          },
+          {
+            "op": "right",
+            "left_bits": 1938,
+            "right_bits": 4,
+            "result_bits": 1925
+          },
+          {
+            "op": "and",
+            "left_bits": 1925,
+            "right_bits": 1933,
+            "result_bits": 1925
+          },
+          {
+            "op": "mul",
+            "left_bits": 1925,
+            "right_bits": 4,
+            "result_bits": 1929
+          },
+          {
+            "op": "sub",
+            "left_bits": 1929,
+            "right_bits": 1929,
+            "result_bits": 1924
+          },
+          {
+            "op": "add",
+            "left_bits": 1924,
+            "right_bits": 1925,
+            "result_bits": 1926
+          },
+          {
+            "op": "and",
+            "left_bits": 1926,
+            "right_bits": 1926,
+            "result_bits": 1926
+          },
+          {
+            "op": "right",
+            "left_bits": 1926,
+            "right_bits": 3,
+            "result_bits": 1921
+          },
+          {
+            "op": "mul",
+            "left_bits": 1921,
+            "right_bits": 4,
+            "result_bits": 1924
+          },
+          {
+            "op": "sub",
+            "left_bits": 1924,
+            "right_bits": 1924,
+            "result_bits": 964
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 2849,
+            "result_bits": 2861
+          },
+          {
+            "op": "left",
+            "left_bits": 2849,
+            "right_bits": 3,
+            "result_bits": 2854
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 2849,
+            "result_bits": 2853
+          },
+          {
+            "op": "mul",
+            "left_bits": 1921,
+            "right_bits": 449,
+            "result_bits": 2369
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 2369,
+            "result_bits": 2378
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 12,
+            "result_bits": 2881
+          },
+          {
+            "op": "sub",
+            "left_bits": 2881,
+            "right_bits": 1,
+            "result_bits": 2880
+          },
+          {
+            "op": "and",
+            "left_bits": 3332,
+            "right_bits": 2880,
+            "result_bits": 2371
+          },
+          {
+            "op": "right",
+            "left_bits": 3332,
+            "right_bits": 12,
+            "result_bits": 452
+          },
+          {
+            "op": "and",
+            "left_bits": 452,
+            "right_bits": 480,
+            "result_bits": 452
+          },
+          {
+            "op": "mul",
+            "left_bits": 1923,
+            "right_bits": 452,
+            "result_bits": 2375
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 2375,
+            "result_bits": 2375
+          },
+          {
+            "op": "add",
+            "left_bits": 2371,
+            "right_bits": 2378,
+            "result_bits": 2378
+          },
+          {
+            "op": "sub",
+            "left_bits": 2378,
+            "right_bits": 2375,
+            "result_bits": 2378
+          },
+          {
+            "op": "mul",
+            "left_bits": 2378,
+            "right_bits": 10,
+            "result_bits": 2387
+          },
+          {
+            "op": "right",
+            "left_bits": 2387,
+            "right_bits": 4,
+            "result_bits": 2374
+          },
+          {
+            "op": "and",
+            "left_bits": 2374,
+            "right_bits": 2861,
+            "result_bits": 2374
+          },
+          {
+            "op": "mul",
+            "left_bits": 2374,
+            "right_bits": 4,
+            "result_bits": 2378
+          },
+          {
+            "op": "sub",
+            "left_bits": 2378,
+            "right_bits": 2378,
+            "result_bits": 2371
+          },
+          {
+            "op": "add",
+            "left_bits": 2371,
+            "right_bits": 2853,
+            "result_bits": 2853
+          },
+          {
+            "op": "and",
+            "left_bits": 2853,
+            "right_bits": 2854,
+            "result_bits": 2182
+          },
+          {
+            "op": "right",
+            "left_bits": 2182,
+            "right_bits": 3,
+            "result_bits": 2177
+          },
+          {
+            "op": "mul",
+            "left_bits": 2177,
+            "right_bits": 4,
+            "result_bits": 2180
+          },
+          {
+            "op": "sub",
+            "left_bits": 2371,
+            "right_bits": 2180,
+            "result_bits": 2371
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 12,
+            "result_bits": 2881
+          },
+          {
+            "op": "sub",
+            "left_bits": 2881,
+            "right_bits": 1,
+            "result_bits": 2880
+          },
+          {
+            "op": "and",
+            "left_bits": 3300,
+            "right_bits": 2880,
+            "result_bits": 2337
+          },
+          {
+            "op": "right",
+            "left_bits": 3300,
+            "right_bits": 12,
+            "result_bits": 420
+          },
+          {
+            "op": "and",
+            "left_bits": 420,
+            "right_bits": 480,
+            "result_bits": 420
+          },
+          {
+            "op": "mul",
+            "left_bits": 1923,
+            "right_bits": 420,
+            "result_bits": 2343
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 2343,
+            "result_bits": 2343
+          },
+          {
+            "op": "add",
+            "left_bits": 2337,
+            "right_bits": 2378,
+            "result_bits": 2378
+          },
+          {
+            "op": "sub",
+            "left_bits": 2378,
+            "right_bits": 2343,
+            "result_bits": 2378
+          },
+          {
+            "op": "mul",
+            "left_bits": 2378,
+            "right_bits": 10,
+            "result_bits": 2387
+          },
+          {
+            "op": "right",
+            "left_bits": 2387,
+            "right_bits": 4,
+            "result_bits": 2374
+          },
+          {
+            "op": "and",
+            "left_bits": 2374,
+            "right_bits": 2861,
+            "result_bits": 2374
+          },
+          {
+            "op": "mul",
+            "left_bits": 2374,
+            "right_bits": 4,
+            "result_bits": 2378
+          },
+          {
+            "op": "sub",
+            "left_bits": 2378,
+            "right_bits": 2378,
+            "result_bits": 2372
+          },
+          {
+            "op": "add",
+            "left_bits": 2372,
+            "right_bits": 2853,
+            "result_bits": 2853
+          },
+          {
+            "op": "and",
+            "left_bits": 2853,
+            "right_bits": 2854,
+            "result_bits": 2374
+          },
+          {
+            "op": "right",
+            "left_bits": 2374,
+            "right_bits": 3,
+            "result_bits": 2369
+          },
+          {
+            "op": "mul",
+            "left_bits": 2369,
+            "right_bits": 4,
+            "result_bits": 2372
+          },
+          {
+            "op": "sub",
+            "left_bits": 2372,
+            "right_bits": 2372,
+            "result_bits": 2339
+          },
+          {
+            "op": "right",
+            "left_bits": 2371,
+            "right_bits": 10,
+            "result_bits": 1411
+          },
+          {
+            "op": "add",
+            "left_bits": 2371,
+            "right_bits": 1411,
+            "result_bits": 2371
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 1921,
+            "result_bits": 1933
+          },
+          {
+            "op": "left",
+            "left_bits": 1921,
+            "right_bits": 3,
+            "result_bits": 1926
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 1921,
+            "result_bits": 1925
+          },
+          {
+            "op": "right",
+            "left_bits": 2339,
+            "right_bits": 11,
+            "result_bits": 419
+          },
+          {
+            "op": "and",
+            "left_bits": 419,
+            "right_bits": 480,
+            "result_bits": 419
+          },
+          {
+            "op": "mul",
+            "left_bits": 2371,
+            "right_bits": 419,
+            "result_bits": 2789
+          },
+          {
+            "op": "right",
+            "left_bits": 2789,
+            "right_bits": 9,
+            "result_bits": 2341
+          },
+          {
+            "op": "and",
+            "left_bits": 2341,
+            "right_bits": 1933,
+            "result_bits": 1930
+          },
+          {
+            "op": "mul",
+            "left_bits": 1930,
+            "right_bits": 10,
+            "result_bits": 1939
+          },
+          {
+            "op": "right",
+            "left_bits": 1939,
+            "right_bits": 4,
+            "result_bits": 1926
+          },
+          {
+            "op": "and",
+            "left_bits": 1926,
+            "right_bits": 1933,
+            "result_bits": 1926
+          },
+          {
+            "op": "mul",
+            "left_bits": 1926,
+            "right_bits": 4,
+            "result_bits": 1930
+          },
+          {
+            "op": "sub",
+            "left_bits": 1930,
+            "right_bits": 1930,
+            "result_bits": 1923
+          },
+          {
+            "op": "add",
+            "left_bits": 1923,
+            "right_bits": 1925,
+            "result_bits": 1925
+          },
+          {
+            "op": "and",
+            "left_bits": 1925,
+            "right_bits": 1926,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 1923,
+            "right_bits": 0,
+            "result_bits": 1923
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 11,
+            "result_bits": 1921
+          },
+          {
+            "op": "sub",
+            "left_bits": 1921,
+            "right_bits": 1,
+            "result_bits": 1920
+          },
+          {
+            "op": "and",
+            "left_bits": 2339,
+            "right_bits": 1920,
+            "result_bits": 1377
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 961,
+            "result_bits": 973
+          },
+          {
+            "op": "left",
+            "left_bits": 961,
+            "right_bits": 3,
+            "result_bits": 966
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 961,
+            "result_bits": 965
+          },
+          {
+            "op": "right",
+            "left_bits": 2371,
+            "right_bits": 11,
+            "result_bits": 451
+          },
+          {
+            "op": "and",
+            "left_bits": 451,
+            "right_bits": 480,
+            "result_bits": 451
+          },
+          {
+            "op": "add",
+            "left_bits": 451,
+            "right_bits": 0,
+            "result_bits": 451
+          },
+          {
+            "op": "mul",
+            "left_bits": 1377,
+            "right_bits": 451,
+            "result_bits": 1827
+          },
+          {
+            "op": "right",
+            "left_bits": 1827,
+            "right_bits": 9,
+            "result_bits": 1379
+          },
+          {
+            "op": "and",
+            "left_bits": 1379,
+            "right_bits": 973,
+            "result_bits": 969
+          },
+          {
+            "op": "mul",
+            "left_bits": 969,
+            "right_bits": 10,
+            "result_bits": 978
+          },
+          {
+            "op": "right",
+            "left_bits": 978,
+            "right_bits": 4,
+            "result_bits": 965
+          },
+          {
+            "op": "and",
+            "left_bits": 965,
+            "right_bits": 973,
+            "result_bits": 965
+          },
+          {
+            "op": "mul",
+            "left_bits": 965,
+            "right_bits": 4,
+            "result_bits": 969
+          },
+          {
+            "op": "sub",
+            "left_bits": 969,
+            "right_bits": 969,
+            "result_bits": 964
+          },
+          {
+            "op": "add",
+            "left_bits": 964,
+            "right_bits": 965,
+            "result_bits": 965
+          },
+          {
+            "op": "and",
+            "left_bits": 965,
+            "right_bits": 966,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 0,
+            "right_bits": 3,
+            "result_bits": 0
+          },
+          {
+            "op": "mul",
+            "left_bits": 0,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "sub",
+            "left_bits": 964,
+            "right_bits": 0,
+            "result_bits": 964
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 1889,
+            "result_bits": 1901
+          },
+          {
+            "op": "left",
+            "left_bits": 1889,
+            "right_bits": 3,
+            "result_bits": 1894
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 1889,
+            "result_bits": 1893
+          },
+          {
+            "op": "mul",
+            "left_bits": 961,
+            "right_bits": 449,
+            "result_bits": 1409
+          },
+          {
+            "op": "mul",
+            "left_bits": 10,
+            "right_bits": 1409,
+            "result_bits": 1418
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 11,
+            "result_bits": 1921
+          },
+          {
+            "op": "sub",
+            "left_bits": 1921,
+            "right_bits": 1,
+            "result_bits": 1920
+          },
+          {
+            "op": "and",
+            "left_bits": 2371,
+            "right_bits": 1920,
+            "result_bits": 1412
+          },
+          {
+            "op": "right",
+            "left_bits": 2371,
+            "right_bits": 11,
+            "result_bits": 451
+          },
+          {
+            "op": "and",
+            "left_bits": 451,
+            "right_bits": 480,
+            "result_bits": 451
+          },
+          {
+            "op": "mul",
+            "left_bits": 962,
+            "right_bits": 451,
+            "result_bits": 1412
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 1412,
+            "result_bits": 1412
+          },
+          {
+            "op": "add",
+            "left_bits": 1412,
+            "right_bits": 1418,
+            "result_bits": 1418
+          },
+          {
+            "op": "sub",
+            "left_bits": 1418,
+            "right_bits": 1412,
+            "result_bits": 1418
+          },
+          {
+            "op": "mul",
+            "left_bits": 1418,
+            "right_bits": 10,
+            "result_bits": 1427
+          },
+          {
+            "op": "right",
+            "left_bits": 1427,
+            "right_bits": 4,
+            "result_bits": 1414
+          },
+          {
+            "op": "and",
+            "left_bits": 1414,
+            "right_bits": 1901,
+            "result_bits": 1414
+          },
+          {
+            "op": "mul",
+            "left_bits": 1414,
+            "right_bits": 4,
+            "result_bits": 1418
+          },
+          {
+            "op": "sub",
+            "left_bits": 1418,
+            "right_bits": 1418,
+            "result_bits": 1412
+          },
+          {
+            "op": "add",
+            "left_bits": 1412,
+            "right_bits": 1893,
+            "result_bits": 1893
+          },
+          {
+            "op": "and",
+            "left_bits": 1893,
+            "right_bits": 1894,
+            "result_bits": 1414
+          },
+          {
+            "op": "right",
+            "left_bits": 1414,
+            "right_bits": 3,
+            "result_bits": 1409
+          },
+          {
+            "op": "mul",
+            "left_bits": 1409,
+            "right_bits": 4,
+            "result_bits": 1412
+          },
+          {
+            "op": "sub",
+            "left_bits": 1412,
+            "right_bits": 1412,
+            "result_bits": 1380
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 11,
+            "result_bits": 1921
+          },
+          {
+            "op": "sub",
+            "left_bits": 1921,
+            "right_bits": 1,
+            "result_bits": 1920
+          },
+          {
+            "op": "and",
+            "left_bits": 2339,
+            "right_bits": 1920,
+            "result_bits": 1377
+          },
+          {
+            "op": "right",
+            "left_bits": 2339,
+            "right_bits": 11,
+            "result_bits": 419
+          },
+          {
+            "op": "and",
+            "left_bits": 419,
+            "right_bits": 480,
+            "result_bits": 419
+          },
+          {
+            "op": "mul",
+            "left_bits": 962,
+            "right_bits": 419,
+            "result_bits": 1380
+          },
+          {
+            "op": "add",
+            "left_bits": 0,
+            "right_bits": 1380,
+            "result_bits": 1380
+          },
+          {
+            "op": "add",
+            "left_bits": 1377,
+            "right_bits": 1418,
+            "result_bits": 1418
+          },
+          {
+            "op": "sub",
+            "left_bits": 1418,
+            "right_bits": 1380,
+            "result_bits": 1418
+          },
+          {
+            "op": "mul",
+            "left_bits": 1418,
+            "right_bits": 10,
+            "result_bits": 1427
+          },
+          {
+            "op": "right",
+            "left_bits": 1427,
+            "right_bits": 4,
+            "result_bits": 1414
+          },
+          {
+            "op": "and",
+            "left_bits": 1414,
+            "right_bits": 1901,
+            "result_bits": 1414
+          },
+          {
+            "op": "mul",
+            "left_bits": 1414,
+            "right_bits": 4,
+            "result_bits": 1418
+          },
+          {
+            "op": "sub",
+            "left_bits": 1418,
+            "right_bits": 1418,
+            "result_bits": 1412
+          },
+          {
+            "op": "add",
+            "left_bits": 1412,
+            "right_bits": 1893,
+            "result_bits": 1893
+          },
+          {
+            "op": "and",
+            "left_bits": 1893,
+            "right_bits": 1894,
+            "result_bits": 1414
+          },
+          {
+            "op": "right",
+            "left_bits": 1414,
+            "right_bits": 3,
+            "result_bits": 1409
+          },
+          {
+            "op": "mul",
+            "left_bits": 1409,
+            "right_bits": 4,
+            "result_bits": 1412
+          },
+          {
+            "op": "sub",
+            "left_bits": 1412,
+            "right_bits": 1412,
+            "result_bits": 1348
+          },
+          {
+            "op": "right",
+            "left_bits": 1380,
+            "right_bits": 10,
+            "result_bits": 420
+          },
+          {
+            "op": "add",
+            "left_bits": 1380,
+            "right_bits": 420,
+            "result_bits": 1380
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 961,
+            "result_bits": 973
+          },
+          {
+            "op": "left",
+            "left_bits": 961,
+            "right_bits": 3,
+            "result_bits": 966
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 961,
+            "result_bits": 965
+          },
+          {
+            "op": "right",
+            "left_bits": 1348,
+            "right_bits": 10,
+            "result_bits": 388
+          },
+          {
+            "op": "and",
+            "left_bits": 388,
+            "right_bits": 480,
+            "result_bits": 388
+          },
+          {
+            "op": "mul",
+            "left_bits": 1380,
+            "right_bits": 388,
+            "result_bits": 1767
+          },
+          {
+            "op": "right",
+            "left_bits": 1767,
+            "right_bits": 9,
+            "result_bits": 1319
+          },
+          {
+            "op": "and",
+            "left_bits": 1319,
+            "right_bits": 973,
+            "result_bits": 7
+          },
+          {
+            "op": "mul",
+            "left_bits": 7,
+            "right_bits": 10,
+            "result_bits": 16
+          },
+          {
+            "op": "right",
+            "left_bits": 16,
+            "right_bits": 4,
+            "result_bits": 3
+          },
+          {
+            "op": "and",
+            "left_bits": 3,
+            "right_bits": 973,
+            "result_bits": 3
+          },
+          {
+            "op": "mul",
+            "left_bits": 3,
+            "right_bits": 4,
+            "result_bits": 7
+          },
+          {
+            "op": "sub",
+            "left_bits": 7,
+            "right_bits": 7,
+            "result_bits": 4
+          },
+          {
+            "op": "add",
+            "left_bits": 4,
+            "right_bits": 965,
+            "result_bits": 965
+          },
+          {
+            "op": "and",
+            "left_bits": 965,
+            "right_bits": 966,
+            "result_bits": 6
+          },
+          {
+            "op": "right",
+            "left_bits": 6,
+            "right_bits": 3,
+            "result_bits": 1
+          },
+          {
+            "op": "mul",
+            "left_bits": 1,
+            "right_bits": 4,
+            "result_bits": 4
+          },
+          {
+            "op": "sub",
+            "left_bits": 4,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 10,
+            "result_bits": 961
+          },
+          {
+            "op": "sub",
+            "left_bits": 961,
+            "right_bits": 1,
+            "result_bits": 960
+          },
+          {
+            "op": "and",
+            "left_bits": 1348,
+            "right_bits": 960,
+            "result_bits": 449
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 1,
+            "result_bits": 13
+          },
+          {
+            "op": "left",
+            "left_bits": 1,
+            "right_bits": 3,
+            "result_bits": 6
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 1,
+            "result_bits": 5
+          },
+          {
+            "op": "right",
+            "left_bits": 1380,
+            "right_bits": 10,
+            "result_bits": 420
+          },
+          {
+            "op": "and",
+            "left_bits": 420,
+            "right_bits": 480,
+            "result_bits": 420
+          },
+          {
+            "op": "add",
+            "left_bits": 420,
+            "right_bits": 0,
+            "result_bits": 420
+          },
+          {
+            "op": "mul",
+            "left_bits": 449,
+            "right_bits": 420,
+            "result_bits": 868
+          },
+          {
+            "op": "right",
+            "left_bits": 868,
+            "right_bits": 9,
+            "result_bits": 420
+          },
+          {
+            "op": "and",
+            "left_bits": 420,
+            "right_bits": 13,
+            "result_bits": 8
+          },
+          {
+            "op": "mul",
+            "left_bits": 8,
+            "right_bits": 10,
+            "result_bits": 17
+          },
+          {
+            "op": "right",
+            "left_bits": 17,
+            "right_bits": 4,
+            "result_bits": 4
+          },
+          {
+            "op": "and",
+            "left_bits": 4,
+            "right_bits": 13,
+            "result_bits": 4
+          },
+          {
+            "op": "mul",
+            "left_bits": 4,
+            "right_bits": 4,
+            "result_bits": 8
+          },
+          {
+            "op": "sub",
+            "left_bits": 8,
+            "right_bits": 8,
+            "result_bits": 4
+          },
+          {
+            "op": "add",
+            "left_bits": 4,
+            "right_bits": 5,
+            "result_bits": 6
+          },
+          {
+            "op": "and",
+            "left_bits": 6,
+            "right_bits": 6,
+            "result_bits": 6
+          },
+          {
+            "op": "right",
+            "left_bits": 6,
+            "right_bits": 3,
+            "result_bits": 1
+          },
+          {
+            "op": "mul",
+            "left_bits": 1,
+            "right_bits": 4,
+            "result_bits": 4
+          },
+          {
+            "op": "sub",
+            "left_bits": 4,
+            "right_bits": 4,
+            "result_bits": 0
+          },
+          {
+            "op": "right",
+            "left_bits": 1380,
+            "right_bits": 10,
+            "result_bits": 420
+          },
+          {
+            "op": "add",
+            "left_bits": 1380,
+            "right_bits": 420,
+            "result_bits": 1380
+          },
+          {
+            "op": "mul",
+            "left_bits": 13,
+            "right_bits": 961,
+            "result_bits": 973
+          },
+          {
+            "op": "left",
+            "left_bits": 961,
+            "right_bits": 3,
+            "result_bits": 966
+          },
+          {
+            "op": "mul",
+            "left_bits": 5,
+            "right_bits": 961,
+            "result_bits": 965
+          },
+          {
+            "op": "right",
+            "left_bits": 1348,
+            "right_bits": 0,
+            "result_bits": 1348
+          },
+          {
+            "op": "and",
+            "left_bits": 1348,
+            "right_bits": 480,
+            "result_bits": 449
+          },
+          {
+            "op": "mul",
+            "left_bits": 1380,
+            "right_bits": 449,
+            "result_bits": 1828
+          },
+          {
+            "op": "right",
+            "left_bits": 1828,
+            "right_bits": 9,
+            "result_bits": 1380
+          },
+          {
+            "op": "and",
+            "left_bits": 1380,
+            "right_bits": 973,
+            "result_bits": 968
+          },
+          {
+            "op": "mul",
+            "left_bits": 968,
+            "right_bits": 10,
+            "result_bits": 977
+          },
+          {
+            "op": "right",
+            "left_bits": 977,
+            "right_bits": 4,
+            "result_bits": 964
+          },
+          {
+            "op": "and",
+            "left_bits": 964,
+            "right_bits": 973,
+            "result_bits": 964
+          },
+          {
+            "op": "mul",
+            "left_bits": 964,
+            "right_bits": 4,
+            "result_bits": 968
+          },
+          {
+            "op": "sub",
+            "left_bits": 968,
+            "right_bits": 968,
+            "result_bits": 964
+          },
+          {
+            "op": "add",
+            "left_bits": 964,
+            "right_bits": 965,
+            "result_bits": 966
+          },
+          {
+            "op": "and",
+            "left_bits": 966,
+            "right_bits": 966,
+            "result_bits": 966
+          },
+          {
+            "op": "right",
+            "left_bits": 966,
+            "right_bits": 3,
+            "result_bits": 961
+          },
+          {
+            "op": "mul",
+            "left_bits": 961,
+            "right_bits": 4,
+            "result_bits": 964
+          },
+          {
+            "op": "sub",
+            "left_bits": 964,
+            "right_bits": 964,
+            "result_bits": 4
+          },
+          {
+            "op": "right",
+            "left_bits": 1348,
+            "right_bits": 10,
+            "result_bits": 388
+          },
+          {
+            "op": "and",
+            "left_bits": 388,
+            "right_bits": 480,
+            "result_bits": 388
+          },
+          {
+            "op": "mul",
+            "left_bits": 1380,
+            "right_bits": 388,
+            "result_bits": 1767
+          },
+          {
+            "op": "right",
+            "left_bits": 1767,
+            "right_bits": 9,
+            "result_bits": 1319
+          },
+          {
+            "op": "and",
+            "left_bits": 1319,
+            "right_bits": 973,
+            "result_bits": 7
+          },
+          {
+            "op": "mul",
+            "left_bits": 7,
+            "right_bits": 10,
+            "result_bits": 16
+          },
+          {
+            "op": "right",
+            "left_bits": 16,
+            "right_bits": 4,
+            "result_bits": 3
+          },
+          {
+            "op": "and",
+            "left_bits": 3,
+            "right_bits": 973,
+            "result_bits": 3
+          },
+          {
+            "op": "mul",
+            "left_bits": 3,
+            "right_bits": 4,
+            "result_bits": 7
+          },
+          {
+            "op": "sub",
+            "left_bits": 7,
+            "right_bits": 7,
+            "result_bits": 4
+          },
+          {
+            "op": "add",
+            "left_bits": 4,
+            "right_bits": 965,
+            "result_bits": 965
+          },
+          {
+            "op": "and",
+            "left_bits": 965,
+            "right_bits": 966,
+            "result_bits": 6
+          },
+          {
+            "op": "right",
+            "left_bits": 6,
+            "right_bits": 3,
+            "result_bits": 1
+          },
+          {
+            "op": "mul",
+            "left_bits": 1,
+            "right_bits": 4,
+            "result_bits": 4
+          },
+          {
+            "op": "sub",
+            "left_bits": 4,
+            "right_bits": 4,
+            "result_bits": 0
+          }
+        ],
+        "status": "feature_excluded",
+        "exclusion": {
+          "dual": [
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            11,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projections": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "target_pairing": 1,
+          "verified": true,
+          "counts": {
+            "field_inversions": 2,
+            "field_products": 177,
+            "field_additions": 42,
+            "integer_multiplications": 18,
+            "input_integer_encodings": 28,
+            "packing_bytes": 578,
+            "product_bytes": 698,
+            "decoded_bytes": 50,
+            "coefficient_reductions": 50,
+            "operand_bitlength_product_sum": 378672
+          },
+          "packed_blocks": [
+            {
+              "kind": "dual_panel",
+              "k": 2,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 1,
+              "right_bits": 18,
+              "result_bits": 18
+            },
+            {
+              "kind": "dual_panel",
+              "k": 3,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 17,
+              "right_bits": 35,
+              "result_bits": 51
+            },
+            {
+              "kind": "dual_panel",
+              "k": 4,
+              "b": 2,
+              "digit_bytes": 2,
+              "left_bits": 33,
+              "right_bits": 178,
+              "result_bits": 210
+            },
+            {
+              "kind": "dual_panel",
+              "k": 6,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 65,
+              "right_bits": 82,
+              "result_bits": 146
+            },
+            {
+              "kind": "dual_panel",
+              "k": 7,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 81,
+              "right_bits": 100,
+              "result_bits": 180
+            },
+            {
+              "kind": "dual_panel",
+              "k": 8,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 97,
+              "right_bits": 115,
+              "result_bits": 211
+            },
+            {
+              "kind": "dual_panel",
+              "k": 9,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 113,
+              "right_bits": 131,
+              "result_bits": 243
+            },
+            {
+              "kind": "dual_panel",
+              "k": 10,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 129,
+              "right_bits": 145,
+              "result_bits": 273
+            },
+            {
+              "kind": "dual_panel",
+              "k": 11,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 145,
+              "right_bits": 164,
+              "result_bits": 308
+            },
+            {
+              "kind": "dual_panel",
+              "k": 12,
+              "b": 1,
+              "digit_bytes": 2,
+              "left_bits": 161,
+              "right_bits": 178,
+              "result_bits": 338
+            },
+            {
+              "a_length": 13,
+              "b_length": 13,
+              "digit_bytes": 2,
+              "a_bits": 177,
+              "b_bits": 196,
+              "product_bits": 372
+            }
+          ],
+          "projection_events": [
+            {
+              "pattern": [
+                0
+              ],
+              "ell": 4,
+              "digit_bytes": 2,
+              "left_bits": 162,
+              "right_bits": 244,
+              "result_bits": 405
+            },
+            {
+              "pattern": [
+                0,
+                1
+              ],
+              "ell": 3,
+              "digit_bytes": 2,
+              "left_bits": 162,
+              "right_bits": 228,
+              "result_bits": 389
+            },
+            {
+              "pattern": [
+                0,
+                1,
+                2
+              ],
+              "ell": 2,
+              "digit_bytes": 2,
+              "left_bits": 162,
+              "right_bits": 164,
+              "result_bits": 325
+            },
+            {
+              "pattern": [
+                0,
+                1,
+                3
+              ],
+              "ell": 1,
+              "digit_bytes": 2,
+              "left_bits": 162,
+              "right_bits": 180,
+              "result_bits": 341
+            },
+            {
+              "pattern": [
+                0,
+                2
+              ],
+              "ell": 2,
+              "digit_bytes": 2,
+              "left_bits": 162,
+              "right_bits": 193,
+              "result_bits": 354
+            },
+            {
+              "pattern": [
+                0,
+                2,
+                3
+              ],
+              "ell": 1,
+              "digit_bytes": 2,
+              "left_bits": 162,
+              "right_bits": 196,
+              "result_bits": 357
+            },
+            {
+              "pattern": [
+                0,
+                3
+              ],
+              "ell": 1,
+              "digit_bytes": 2,
+              "left_bits": 162,
+              "right_bits": 196,
+              "result_bits": 357
+            }
+          ]
+        }
+      }
+    ],
+    "dual": [
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      11,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "feature_generators": []
+}
