@@ -1,0 +1,131 @@
+{
+  "branch": "claude/curve25519-ic-autolab-round4",
+  "closed_utc": "2026-11-04T04:24:23+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ic_autolab",
+        "--home",
+        "research/curve25519_autolab_20261104",
+        "loop",
+        "--rounds",
+        "1",
+        "--track",
+        "generic",
+        "--sizes",
+        "20",
+        "--max-candidates",
+        "9",
+        "--cpus",
+        "auto",
+        "--allow-busy",
+        "--replay",
+        "8"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-04T04:23:34+00:00",
+      "wall_s": 20.715
+    }
+  ],
+  "commit": "62c2fb6bb27e715afe279b32539ea0a7494d193a",
+  "commit_dirty": false,
+  "created_utc": "2026-11-04T04:23:33+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39"
+  },
+  "id": "20261104T0423Z-c25519-autolab-r7-k20",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 64,
+      "name": "s_w0_incumbent",
+      "note": "holdout ECBS1ha3ed7f4ce6e6; incumbent ksum3-n11 kept (ksum4-n8 1.026, regression); pcc PCC-20261104-15a1d6 unverified",
+      "reference": 1.7964329395165954,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 8.34775146090461
+    }
+  ],
+  "problem": "ic:curve25519-family-k20",
+  "raw": [
+    {
+      "bytes": 3536,
+      "path": "research/curve25519_autolab_20261104/round-007/RESULT.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/06/06596ab794f06d0c94d98bc83a2ee3c749c4cfefe31cfc5e46809cee13bc5ec0",
+      "sha256": "06596ab794f06d0c94d98bc83a2ee3c749c4cfefe31cfc5e46809cee13bc5ec0",
+      "uploaded": false
+    },
+    {
+      "bytes": 4712,
+      "path": "research/curve25519_autolab_20261104/round-007/selection.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f3/f3a3f07780a9613f062b6743044bcd9d477df915f485c46ff8bf63f293204c2c",
+      "sha256": "f3a3f07780a9613f062b6743044bcd9d477df915f485c46ff8bf63f293204c2c",
+      "uploaded": false
+    },
+    {
+      "bytes": 3327,
+      "path": "research/curve25519_autolab_20261104/round-007/analysis/band-holdout-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dc/dc2c9e8bcf46a735fb9fc5cda9fbd0417994cfccdb2289c9a65b3a8d6edb5015",
+      "sha256": "dc2c9e8bcf46a735fb9fc5cda9fbd0417994cfccdb2289c9a65b3a8d6edb5015",
+      "uploaded": false
+    },
+    {
+      "bytes": 11913,
+      "path": "research/curve25519_autolab_20261104/round-007/analysis/band-train-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3ac2013612fada9a859e5c999a851770096692b1bd48f5dcbb6e8e9e8b704db",
+      "sha256": "e3ac2013612fada9a859e5c999a851770096692b1bd48f5dcbb6e8e9e8b704db",
+      "uploaded": false
+    },
+    {
+      "bytes": 1099,
+      "path": "research/curve25519_autolab_20261104/round-007/analysis/run-holdout.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d5/d517297fbb7cdddc812926a55a5f8b43d1b47664d0229be8c58b0411873445f3",
+      "sha256": "d517297fbb7cdddc812926a55a5f8b43d1b47664d0229be8c58b0411873445f3",
+      "uploaded": false
+    },
+    {
+      "bytes": 1089,
+      "path": "research/curve25519_autolab_20261104/round-007/analysis/run-train.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f6/f6bd7046595d20cbb360178816e71b7a5c83850db6892aa63ec361f6e7d75aa1",
+      "sha256": "f6bd7046595d20cbb360178816e71b7a5c83850db6892aa63ec361f6e7d75aa1",
+      "uploaded": false
+    },
+    {
+      "bytes": 2509,
+      "path": "research/curve25519_autolab_20261104/round-007/analysis/verify-holdout-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c5/c5bc567be380c0c0e77d8e31f6b13c752dfeb0ec3d805ff6aca41959635cae1f",
+      "sha256": "c5bc567be380c0c0e77d8e31f6b13c752dfeb0ec3d805ff6aca41959635cae1f",
+      "uploaded": false
+    },
+    {
+      "bytes": 2508,
+      "path": "research/curve25519_autolab_20261104/round-007/analysis/verify-train-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9f/9fc538ecb45b3525b3525a1d7d625d3a07d1e953f0e2a515f573538f475d3f18",
+      "sha256": "9fc538ecb45b3525b3525a1d7d625d3a07d1e953f0e2a515f573538f475d3f18",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/curve25519_autolab_20261104/round-007/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/curve25519_autolab_20261104/round-007/round.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-autolab-r7-k20",
+  "status": "measured",
+  "summary": "ic_autolab round 7, k = 20: regression; train leader ksum4-n8 costs 1.026 of the incumbent on the fresh holdout; ksum3-n11 kept",
+  "validation": null
+}

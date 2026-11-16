@@ -1,0 +1,14 @@
+card_id: CARD-isogeny-ic-yield-p1-tier1-20261102-1
+relay_verbatim: not_checked   # no receipt exists (the card never completed) and no executor report file was supplied; check-relay needs both
+outcome: impeded
+stopped_at_step: tier1
+recommendation: rerun_after_infrastructure_fix
+reasons:
+  - "Infrastructure stop, not a card or data fault: the executor-mechanical Bash tool kills run_in_background commands after 30 minutes (harness default); the run started 04:38, was killed at 05:08 and the executor returned only [killed]. The card timeout_seconds is 21600, so the card limit was not reached."
+  - "No receipt: cards/CARD-isogeny-ic-yield-p1-tier1-20261102-1.receipt.json does not exist, nor do the .run.stdout and .run.stderr files; the declared outputs are therefore not attested by a receipt."
+  - "Partial output retained unread under cards/_failed/CARD-isogeny-ic-yield-p1-tier1-20261102-1-attempt1/: tier1.log (3798 lines, last line [3798/14016] n7_1 m3t2 null tau=25, sha256 6b659a5d38e35212dd7a3b824d64ba2aa09389ecbf5a9b4cdc73809fb93f8440) and tier1_rows.jsonl (3799 lines, 12796234 bytes, sha256 22d47d6f8664b21a31ad7e8e00f74f2377bd84cff57ae7404f89ba84b4a07d57; stored gzipped in the main checkout). The run reached 3798 of 14016 steps: no data is used in analysis."
+  - "Moved aside so must_not_exist (p1_eccp131/runs) passes: the whole runs/ directory was moved to cards/_failed/ (inside write_scope) and removed; ls p1_eccp131/runs reports no such directory. Worktree /home/user/crypto-p1run HEAD is d6153ce46e, the pin; nothing committed there."
+  - "Card unchanged: python3 tools/task_card.py lint in /home/user/crypto-p1run prints CARD OK (card sha256 ae351c29564581153ceb13d2511ae8816e570e4b8f02433e88df039b2e6bc3a0); every bind sha256 matches the file on disk."
+  - "Relaunch route: detached launch per LAUNCH_NOTE.md in the same directory, same card, same argv, env and binary."
+  - "No process of the card remained after the kill (ps showed none for p1_eccp131, run_full, task_card, ecbench, p3h)."
+interpretation: not_assessed

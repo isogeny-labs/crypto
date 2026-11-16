@@ -42,5 +42,4 @@ lake env lean RegistryOrderUniqueness.lean > "$logs/registry-order-axioms.txt" 2
 if grep -Eq 'sorryAx|^error:' "$logs/lean-axioms.txt" "$logs/registry-order-axioms.txt"; then
   cat "$logs/lean-axioms.txt" "$logs/registry-order-axioms.txt"
   exit 1
-fi
 printf 'Lean build and axiom inspection passed\n'

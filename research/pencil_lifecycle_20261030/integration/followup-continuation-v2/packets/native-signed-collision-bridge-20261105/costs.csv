@@ -1,0 +1,11 @@
+operation,symbolic_increment,counted_location,scope
+first normalization,2 Ring additions if sign flipped else 0,shared Ring counts,"derived source count, unmeasured"
+duplicate normalization,2 Ring additions if sign flipped else 0,shared Ring counts,"derived source count, unmeasured"
+two deltas,4 Ring additions,two sub calls each add+neg,"derived source count, unmeasured"
+nonzero denominator candidate,1 Ring addition + 1 inversion + 1 multiplication,neg/inv/mul,"derived source count, unmeasured"
+source verification,one source scalar multiplication and equality,s.e.f shared counts; relations phase,actual counts unknown
+new-mode source admission,membership checks and rG multiplication,s.e.f; walk_initialization,actual counts unknown
+first map,one insertion per eligible first key,new unpriced insert counter,container comparisons/allocations unmeasured
+duplicate map,one lookup per eligible duplicate,new unpriced lookup counter,container comparisons/allocations unmeasured
+logical value payload,24 bytes per retained first entry,checked u64 byte arithmetic,excludes keys/tree/allocator; not RSS
+observer and failures,unknown,outer complete-cost obligation,"missing costs null, not zero"

@@ -1,0 +1,231 @@
+{
+    "apiVersion": "batch/v1",
+    "kind": "Job",
+    "metadata": {
+        "creationTimestamp": "2026-11-10T22:07:16Z",
+        "generation": 1,
+        "labels": {
+            "isolab.dev/job": "true"
+        },
+        "name": "rule-v9-20261106-a1",
+        "namespace": "isolab",
+        "resourceVersion": "12617443",
+        "uid": "5a545fed-4434-4e26-bda4-ce55bee21c5e"
+    },
+    "spec": {
+        "activeDeadlineSeconds": 43200,
+        "backoffLimit": 0,
+        "completionMode": "NonIndexed",
+        "completions": 1,
+        "manualSelector": false,
+        "parallelism": 1,
+        "podReplacementPolicy": "TerminatingOrFailed",
+        "selector": {
+            "matchLabels": {
+                "batch.kubernetes.io/controller-uid": "5a545fed-4434-4e26-bda4-ce55bee21c5e"
+            }
+        },
+        "suspend": false,
+        "template": {
+            "metadata": {
+                "annotations": {
+                    "karpenter.sh/do-not-disrupt": "true"
+                },
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "5a545fed-4434-4e26-bda4-ce55bee21c5e",
+                    "batch.kubernetes.io/job-name": "rule-v9-20261106-a1",
+                    "controller-uid": "5a545fed-4434-4e26-bda4-ce55bee21c5e",
+                    "isolab.dev/job": "true",
+                    "job-name": "rule-v9-20261106-a1"
+                }
+            },
+            "spec": {
+                "affinity": {
+                    "podAntiAffinity": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": [
+                            {
+                                "labelSelector": {
+                                    "matchLabels": {
+                                        "isolab.dev/job": "true"
+                                    }
+                                },
+                                "topologyKey": "kubernetes.io/hostname"
+                            }
+                        ]
+                    }
+                },
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "/opt/rulev9/job.sh"
+                        ],
+                        "env": [
+                            {
+                                "name": "HOME",
+                                "value": "/work"
+                            },
+                            {
+                                "name": "AWS_REGION",
+                                "value": "us-east-2"
+                            },
+                            {
+                                "name": "AWS_DEFAULT_REGION",
+                                "value": "us-east-2"
+                            },
+                            {
+                                "name": "POD_UID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.uid"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "NODE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "spec.nodeName"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "ISOLAB_JOB_ID",
+                                "value": "rule-v9-20261106-a1"
+                            },
+                            {
+                                "name": "ISOLAB_OUTPUT_DIR",
+                                "value": "/work/results"
+                            },
+                            {
+                                "name": "ISOLAB_RESULTS_URI",
+                                "value": "s3://isolab-results-104186811093-us-east-2/runs/rule-v9-20261106-a1/$(POD_UID)/"
+                            },
+                            {
+                                "name": "RAYON_NUM_THREADS",
+                                "value": "4"
+                            },
+                            {
+                                "name": "OMP_NUM_THREADS",
+                                "value": "4"
+                            }
+                        ],
+                        "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:99008289b0b5bd78a1d9e260ada9c26ca1bf0e4cba95a69a8fc6c337480859cb",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "task",
+                        "resources": {
+                            "limits": {
+                                "cpu": "4",
+                                "ephemeral-storage": "10Gi",
+                                "memory": "12Gi"
+                            },
+                            "requests": {
+                                "cpu": "4",
+                                "ephemeral-storage": "10Gi",
+                                "memory": "12Gi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/work",
+                                "name": "work"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ],
+                        "workingDir": "/work"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                    "isolab.dev/cpu-isolation": "v6",
+                    "isolab.dev/pool": "cpu-l2-spot",
+                    "node.kubernetes.io/instance-type": "c8a.2xlarge"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 1000,
+                    "runAsGroup": 1000,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "runner",
+                "serviceAccountName": "runner",
+                "terminationGracePeriodSeconds": 60,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "isolab.dev/workload",
+                        "operator": "Equal",
+                        "value": "cpu"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "isolab.dev/measurement",
+                        "operator": "Equal",
+                        "value": "l2"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "8Gi"
+                        },
+                        "name": "work"
+                    },
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "tmp"
+                    }
+                ]
+            }
+        },
+        "ttlSecondsAfterFinished": 86400
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": "2026-11-10T22:22:14Z",
+                "lastTransitionTime": "2026-11-10T22:22:14Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "FailureTarget"
+            },
+            {
+                "lastProbeTime": "2026-11-10T22:22:15Z",
+                "lastTransitionTime": "2026-11-10T22:22:15Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "Failed"
+            }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-10T22:07:16Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+    }
+}

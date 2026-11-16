@@ -1,0 +1,31 @@
+{
+  "schema": "research.source-overlay-manifest-supersession/v1",
+  "date": "2026-11-11",
+  "reason": "independent review overlapped the final single-use trace and per-plan cohort-cardinality source corrections",
+  "superseded_manifest": {
+    "path": "overlay-manifest.pre-supersession.json",
+    "sha256": "5608333063882f0e6f8688d6f608d5706b26c185a9a42207e56d4c184d6c14b2",
+    "preserved": true
+  },
+  "replacement_manifest": {
+    "path": "overlay-manifest.json",
+    "sha256": "703148cc9d9861693b4bd40be181db94ce251dbdaa02a75fef9fd47b7e37c7c7"
+  },
+  "corrected_bindings": {
+    "overlay/src/cryptanalysis/ecbench/pencil.rs": {
+      "superseded": "26a1a9e6b8b90327a516d7e4ddd4ed7e5c9d347b95e7fa17667a65c7e459243c",
+      "final": "6561b93037b2b005763e64f428af43d24c251732e1a6480980d0f0367ed98249"
+    },
+    "overlay/src/cryptanalysis/ecbench/retained_attempt_join.rs": {
+      "superseded": "90c250a4db8f26b5f1de57847e3e69219541282c4d89b940ed546719bb38a20b",
+      "final": "8e47a8ce34e7dac49b224171a6a8414f708be5bc4b00eb6ebb9e60b6620d42c1"
+    },
+    "integration.patch": {
+      "superseded": "099301e85e7d7b0131c942fe04279b3b69fd03489852dba18ecb9c4a285c8810",
+      "final": "a402e5a1dabdc7c9cb0c9e0cccbc6f521091e6b7271f356e4ac1b1510460164b"
+    }
+  },
+  "final_git_apply_check": "pass_against_exact_original_with_strip_1",
+  "source_frozen_for_independent_review": true,
+  "compile_or_runtime_checked": false
+}

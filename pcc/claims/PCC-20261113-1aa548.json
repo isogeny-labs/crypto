@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-13T12:11:05Z",
+ "id": "PCC-20261113-1aa548",
+ "kind": "statement",
+ "producer": {
+  "commit": "582e21bfb32977a9a4a06b8c4d683d8290315dc7",
+  "model": "",
+  "session": "norm-native-recovery-control-20261113"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_norm_rank_20261112/recovery-evidence/native-control.json",
+    "sha256": "81e7b4b55b6db1efba8f886b0d638fb236940cdc370cbdab638a6cfcb31d6f21"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_norm_rank_20261112/recovery-evidence/checks.json",
+    "sha256": "bd4842d840c8694c916399ce1ef50c527876d17f11fc0e1f2a6650da022b360a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "One deterministic artifact invocation/two fixed development controls; unsigned producer data, no global unsatisfiability, attack solver, independent A/A, timing, relation-yield, DLP or asymptotic inference.",
+ "statement": "In the fixed F17 native certificate control, the same reduced matrix has rank4 in both cases; the known norm target has zero cofactor pairings, while the changed distinct rational support has pairings[0,12,4,12,16,5] modulo17 and is rejected for this fixed certificate."
+}

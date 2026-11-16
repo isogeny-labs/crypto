@@ -1,0 +1,14 @@
+Baseline source: 3b34d504bc13ce668e86d8e68cdf57e3fbaba89a
+Toolchain: rustc 1.99.1 (58cf8f9c3 2026-10-13)
+Build commands (development, not measurements):
+  cargo build --release --lib --locked
+  cargo build --release --locked --bin ecbench
+Both completed before the Rust source edits.
+Frozen artifact SHA-256:
+  94c0463a0e5935f9074bcc6ebe929f9b3f856aef1e576bbf533202077268ff4a  libcrypto_lib.rlib
+  52e5cf442313ba4c25974eaf639394823f0888ef9262b59cd34a1110211b4218  ecbench
+Artifacts are preserved locally under /tmp/crypto-native-baseline. This local
+location is not durable experiment evidence and does not replace EKS image
+and receipt identity. No runtime comparison has been admitted.
+Development build host metadata: development/build-host.txt (not an isolated
+measurement host or an L2 admission record).

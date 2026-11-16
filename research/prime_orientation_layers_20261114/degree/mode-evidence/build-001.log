@@ -1,0 +1,69 @@
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-001.lean.txt:26:43: error: unsolved goals
+a u i k : ℕ
+hiu : i < u
+x : Ports a
+rb : MomentLabels u k
+h : ¬rowResidue u ↑x = ↑rb.1
+hn : 0 ≠ 0
+⊢ False
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-001.lean.txt:45:84: error: unsolved goals
+a u i k : ℕ
+t : ℤ
+m : ℕ → ℕ
+rb : MomentLabels u k
+y : Ports a
+hn : trimmedRight a u i k t m rb y ≠ 0
+hc : (↑rb.1).testBit i = (↑y).testBit i
+⊢ (!decide ((↑y).testBit i = !(↑y).testBit i)) = true
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-001.lean.txt:56:4: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Matroid ?m.6) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Matroid ?m.6
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-001.lean.txt:56:7: error: Function expected at
+  odeWeight
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  w
+
+Hint: The identifier `odeWeight` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-001.lean.txt:59:7: error: Function expected at
+  odeWeight
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  w
+
+Hint: The identifier `odeWeight` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-001.lean.txt:102:27: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Matroid ?m.8) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Matroid ?m.8
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-001.lean.txt:108:62: error: unsolved goals
+a u i r : ℕ
+hu : u ≤ a
+m : ℕ → ℕ
+hi : i < u
+hm : ∀ j < u, sorry <m sorry
+A : Matrix (Ports a) (Fin r) ℚ[X]
+B : Matrix (Fin r) (Ports a) ℚ[X]
+happrox : ∀ (x y : Ports a), Content 1 (OrientationFullChart.normalizedChartMatrix a u i m x y - (A * B) x y)
+Ae : Matrix (Ports a) (Fin r) ℚ := fun x j => eval 1 (A x j)
+Be : Matrix (Fin r) (Ports a) ℚ := fun j y => eval 1 (B j y)
+x y : Ports a
+⊢ ∑ x_1, eval 1 (A x x_1) * eval 1 (B x_1 y) = ((fun x j => eval 1 (A x j)) * fun j y => eval 1 (B j y)) x y
+'OrientationModeProfile.actual_weighted_left_support' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'OrientationModeProfile.actual_right_support' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationModeProfile.weight_fiber_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-001.lean.txt:126:14: error(lean.unknownIdentifier): Unknown constant `OrientationModeProfile.negative_pole_polynomial_width`

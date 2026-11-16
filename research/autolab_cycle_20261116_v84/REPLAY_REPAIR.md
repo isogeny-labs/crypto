@@ -1,0 +1,1 @@
+Initial REPLAY.py and its evidence index remain preserved. Direct script invocation did not place the repository root on sys.path and failed before certificate checks. REPLAY_v2.py explicitly adds its repository root; scientific sources,inputs,raw evidence and frozen manifests are unchanged. This is a portable verifier repair,not another experiment.

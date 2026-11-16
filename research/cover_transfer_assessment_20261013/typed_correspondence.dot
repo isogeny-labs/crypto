@@ -19,7 +19,6 @@ digraph cover_transfer_assessment {
     fillcolor="#eaf2f8",
     color="#2471a3",
     penwidth=2
-  ];
 
   maps [
     shape=plain,
@@ -33,11 +32,8 @@ digraph cover_transfer_assessment {
         <TR><TD>1,324 GF(p^k)</TD><TD BGCOLOR="#eafaf1">same-declared-field<BR/>construction + geometry</TD><TD BGCOLOR="#f8f9f9">proper-subfield descent<BR/>+ balanced maps: UNKNOWN</TD></TR>
       </TABLE>
     >
-  ];
 
   subgroups [
-    shape=plain,
-    label=<
       <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#af7ac5">
         <TR><TD COLSPAN="3" BGCOLOR="#f4ecf7"><B>Subgroup assessments: 979 / 979 exact EC1 / curve / map triples</B></TD></TR>
         <TR><TD><B>Profile</B></TD><TD BGCOLOR="#eafaf1"><B>SUPPORTED</B></TD><TD BGCOLOR="#fef9e7"><B>UNKNOWN unless overlaid</B></TD></TR>
@@ -45,20 +41,19 @@ digraph cover_transfer_assessment {
         <TR><TD>exact binary<BR/>overlay</TD><TD BGCOLOR="#eafaf1">icv1-f2m7-t13-616700dd<BR/>generator + image order 29</TD><TD>only that EC1/map triple</TD></TR>
         <TR><TD>837 odd</TD><TD BGCOLOR="#eafaf1">identity + gcd(2,r)</TD><TD BGCOLOR="#fef9e7">generator/order evidence;<BR/>every induced-map claim</TD></TR>
         <TR><TD>exact odd<BR/>overlay</TD><TD BGCOLOR="#eafaf1">icv1-fp10-t5-192cb216<BR/>map geometry + order-823 identity</TD><TD BGCOLOR="#fef9e7">no subgroup preservation follows</TD></TR>
-      </TABLE>
-    >
-  ];
 
   legend [
-    shape=plain,
-    label=<
       <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#566573">
         <TR><TD BGCOLOR="#eafaf1">SUPPORTED on labeled domain</TD><TD BGCOLOR="#fef9e7">UNKNOWN / conditional</TD><TD BGCOLOR="#fdedec">REFUTED implementation claim</TD><TD BGCOLOR="#f8f9f9">MIXED: inline labels govern</TD></TR>
-      </TABLE>
-    >
-  ];
 
   catalog -> maps [color="#2471a3"];
   maps -> subgroups [color="#7d3c98"];
   subgroups -> legend [style="invis", weight=80];
 }
+    label="Catalog-wide profile assessment (2026-10-24)"
+
+
+
+        <TR><TD>142 binary<BR/>(140 tested)</TD><TD BGCOLOR="#eafaf1">identity and gcd(3,r) for all;<BR/>G on E, [r]G=O, pullback,<BR/>composition and recovery for 140</TD><TD BGCOLOR="#fef9e7">two generators untested; exact ord(G)=r;<BR/>additivity, injectivity, image order;<BR/>arbitrary-result recovery</TD></TR>
+
+

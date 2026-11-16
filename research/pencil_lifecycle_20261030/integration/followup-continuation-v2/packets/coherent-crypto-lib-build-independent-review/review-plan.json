@@ -1,0 +1,22 @@
+{
+  "task": "T-1521",
+  "created_at": "2026-11-03T21:06:13.843316+00:00",
+  "scope": "Read-only prospective wrapper/argv review; no compiler invocation",
+  "reviewer": "assembler_independent_review_v2",
+  "source_author": "witness_independent_review_v2",
+  "independent": true,
+  "prior_context": "Read draft REBUILD2 plan and argv before final runner freeze; advisory findings communicated.",
+  "checks": [
+    "Exact source/reused/toolchain input joins",
+    "Real pipe jobserver descriptors and pass_fds inheritance; zero additional tokens",
+    "Single owned compiler process group and bounded signal/timeout cleanup",
+    "8GiB AS and perfile/aggregate disk distinction; recorded overshoot",
+    "Final source verification and no success after deadline/signal",
+    "No source-generation, cache takeover, compiler rerun, scientific execution or index mutation"
+  ],
+  "reference_urls": [
+    "https://doc.rust-lang.org/rustc/jobserver.html",
+    "https://doc.rust-lang.org/stable/nightly-rustc/cargo/compiler/job_queue/index.html"
+  ],
+  "execution_admission": false
+}

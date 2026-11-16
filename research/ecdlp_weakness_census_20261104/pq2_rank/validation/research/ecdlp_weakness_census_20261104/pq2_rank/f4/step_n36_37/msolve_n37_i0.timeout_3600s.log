@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "/home/user/crypto/research/ecdlp_weakness_census_20261104/pq2_rank/f4/run_msolve.py", line 109, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/crypto/research/ecdlp_weakness_census_20261104/pq2_rank/f4/run_msolve.py", line 93, in main
+    r = run(os.path.join(ddir, f))
+  File "/home/user/crypto/research/ecdlp_weakness_census_20261104/pq2_rank/f4/run_msolve.py", line 64, in run
+    p = subprocess.run([MSOLVE, "-f", fin, "-g", "2", "-v", "2", "-o", fout],
+                       capture_output=True, text=True, timeout=3600)
+  File "/usr/local/lib/python3.13/subprocess.py", line 557, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/subprocess.py", line 1223, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/subprocess.py", line 2156, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/subprocess.py", line 1270, in _check_timeout
+    raise TimeoutExpired(
+    ...<2 lines>...
+            stderr=b''.join(stderr_seq) if stderr_seq else None)
+subprocess.TimeoutExpired: Command '['msolve', '-f', '/tmp/tmpxzyih77l/in.ms', '-g', '2', '-v', '2', '-o', '/tmp/tmpxzyih77l/out.ms']' timed out after 3600 seconds

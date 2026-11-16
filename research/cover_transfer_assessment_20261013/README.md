@@ -5,7 +5,6 @@ date: "2026-10-24"
 subject: "cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; geometry_verified_maps=15791; ec1_representations=979; assessed_maps=15791; unassessed_maps=0; assessed_subgroups=979; unassessed_subgroups=0"
 geometry: margin=0.8in
 fontsize: 10pt
----
 
 <!-- cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; geometry_verified_maps=15791; ec1_representations=979; assessed_maps=15791; unassessed_maps=0; assessed_subgroups=979; unassessed_subgroups=0 -->
 
@@ -137,7 +136,6 @@ assessment rows. The 15,626 odd-characteristic rows comprise 14,302 prime-field
 rows and 1,324 extension-field rows.
 
 | Subgroup profile | EC1 bindings | Established catalog-wide facts | Still open |
-|---|---:|---|---|
 | Binary degree 3 | 142 | exact identity joins, `gcd(3,r)=1`, typed generator-level transfer checks | additivity and all-element composition; injectivity and image order; proof-grade numeric exact order except order 29; arbitrary-result norm/recovery |
 | Odd degree 2 | 837 | exact identity joins and `gcd(2,r)=1` | generator/order certificates and every induced-map claim |
 | **Total** | **979** | **every binding classified** | **unknowns remain explicit** |
@@ -180,10 +178,8 @@ For an ordinary binary target over its exact polynomial-basis field,
 
 put \(d=\sqrt b\) and construct
 
-\[
  H: v^2+u^2v=u^7+a u^4+d u,
  \qquad \phi(u,v)=(u^3,uv+d).
-\]
 
 The native checker verifies \(d^2=b\), the defining-equation identity,
 affine smoothness, the infinity chart, genus three, degree three, and
@@ -197,16 +193,12 @@ criterion. The details and proof are in
 After any recorded degree-one Montgomery or Edwards normalization, write the
 short target as
 
-\[
  E: y^2=F(x)=x^3+a x+b.
-\]
 
 Choose the first \(c\in\{0,1,2,3\}\) with \(F(c)\ne0\), and construct
 
-\[
  H: v^2=F(u^2+c),
  \qquad \phi(u,v)=(u^2+c,v).
-\]
 
 The checker verifies the equation identity, the monic squarefree sextic,
 genus two, two rational points at infinity, degree two, separability, and the
@@ -291,9 +283,7 @@ retrieval and replay details.
 
 The experiment uses the smooth plane quartic
 
-\[
  C:v^4=x^3+ax+b, \qquad \pi(x,v)=(x,v^2),
-\]
 
 over bounded small prime fields. A smooth plane quartic has genus three and is
 **non-hyperelliptic**. `quartic-ic` certifies complete line sections, then forms
@@ -415,7 +405,6 @@ The remaining proof-grade subgroup obligations are tracked separately in
 The v2 ledger keeps four narrow overlays rather than extrapolating them:
 
 | Overlay | Added evidence | Boundary |
-|---|---|---|
 | `icv1-f2m7-t13-616700dd` degree-three map | detailed geometry replay | does not widen the typed transfer domain |
 | `icv1-f2m7-t13-616700dd` order-29 subgroup | exact source and image order | only that one EC1/map triple |
 | `icv1-fp10-t5-192cb216` degree-two map | detailed geometry replay | no induced odd Jacobian map |
@@ -454,9 +443,7 @@ preserved in
 The generated curve browser has been refreshed to the current catalog
 snapshot. Its 15,791 cards use this geometry status:
 
-```text
 verified_over_declared_field
-```
 
 They retain `subgroup_transfer: not_tested` and keep DLP advantage null. The
 v2 sidecar does not silently turn those geometry cards into transfer badges.
@@ -475,7 +462,6 @@ new norm or CLI changes.
 # Validation controls
 
 | Control | Status | Scope and limit |
-|---|---|---|
 | Exact identity joins | `supported` | all 15,791 map UIDs and 979 EC1/curve/map triples; identity alone claims no arithmetic |
 | Cover geometry | `supported` | all 15,791 fixed-family rows; equations, smoothness, genus, degree, separability, and infinity behavior, conditional on the declared odd base-prime assumptions described above |
 | Internal Jacobian arithmetic | `supported` on stated models | binary and separate odd-prime one-infinity fixtures; not the 15,626 odd two-infinity cover sources |
@@ -535,7 +521,6 @@ Editable source:
 exist only on the bounded domains printed beside them. An identity binding
 does not claim arithmetic, a transfer implementation, or a solver result.*
 
-Editable source:
 [`typed_transfer_context.dot`](typed_transfer_context.dot). Vector rendering:
 [`typed_transfer_context.svg`](typed_transfer_context.svg). No edge in either
 figure denotes an unlisted solver result.
@@ -550,11 +535,9 @@ python -m jsonschema \
   -i docs/curves/cover-transfer-assessments.json \
   docs/curves/cover-transfer-assessment.schema.json
 node research/cover_transfer_assessment_20261013/verify_assessment.mjs
-```
 
 Replay the native geometry, arithmetic, and subgroup checks:
 
-```sh
 cargo test --release --locked --bin curve_cover_check
 cargo test --release --locked --lib hyperelliptic
 cargo test --release --locked --lib binary_ecc::cover_transfer::tests
@@ -562,9 +545,7 @@ cargo test --release --locked --bin hyperelliptic-cover -- \
   --test-threads=1
 cargo test --release --locked --bin hyperelliptic-cover \
   every_current_catalog_model_reaches_the_standalone_constructor
-cargo test --release --locked --bin hyperelliptic-cover \
   every_binary_ec1_generator_has_checked_typed_transfer_hypotheses
-```
 
 The earlier standalone-binary suite was run offline with Rust 1.90.0 and
 reported 13 passed, 0 failed against the prior 2,100-row catalog. Exact
@@ -572,17 +553,14 @@ source and registry hashes are retained in
 [`release_replay.txt`](release_replay.txt). Rebuild and audit the Lean package
 when sufficient cache space is available:
 
-```sh
 cd research/cover_transfer_assessment_20261013/lean
 lake exe cache get
 lake build
 lake env lean AxiomAudit.lean
-```
 
 Regenerate the visual and PDF after any reported count, status, or conclusion
 changes:
 
-```sh
 cd research/cover_transfer_assessment_20261013
 dot -Tsvg typed_correspondence.dot -o typed_correspondence.svg
 dot -Tpng -Gdpi=150 typed_correspondence.dot -o typed_correspondence.png
@@ -596,7 +574,6 @@ pandoc README.md \
 python3 -m pip install pypdf==6.0.0
 python3 set_pdf_metadata.py
 pdfinfo cover_transfer_assessment_20261013.pdf
-```
 
 When the Tectonic bundle endpoint is unavailable, the same Markdown source can
 be rendered with installed XeLaTeX using `--pdf-engine=xelatex`. Then run
@@ -636,3 +613,137 @@ prove minimal genus or degree, exhaust all cover families, or infer security
 from an unsupported path. A failed construction outside the supported
 families remains a structured unsupported result, never proof that no cover
 exists.
+
+
+
+
+
+
+
+- the retained native batch receipt covers 140 of 142 binary EC1 bindings for generator membership,
+  degree-inverse recovery; the refreshed catalog has two binary bindings without
+  native batch evidence;
+
+
+
+
+
+
+
+
+
+| Pullback, pushforward, and subgroup transfer | partial | bounded binary point-class domains and 140 retained generator checks; exhaustive arbitrary-class pushforward exists only for the non-catalog exact fixed-`GF(8)` fixture; catalog-general binary norm and all odd induced maps remain open |
+| EC1/ICV1 catalog evidence | partial | exact memberships, typed object bindings, hashes, statuses, and five narrow overlays cover the 15,791 catalog geometry rows; the positive fixed-GF(8) source/target/Jacobian/map fixture is non-catalog and has no EC1/ICV1/HC1/CV1 export or transfer-certificate binding |
+
+
+
+
+arithmetic replays (including 30 normalized targets) and 1,324 extension-field
+rows.
+
+| Binary degree 3 | 142 | exact identity joins, `gcd(3,r)=1`; 140 have typed generator-level transfer checks | additivity and all-element composition; injectivity and image order; proof-grade numeric exact order except order 29; arbitrary-result norm/recovery; two linked bindings lack native batch evidence |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## The 140 retained binary subgroup checks
+
+For each of the 140 binary triples in the retained native batch receipt, the test decodes the
+
+
+`unknown` for 139 of the 140 binary bindings; the retained
+
+
+certificate, and does not promote the tested catalog bindings by itself.
+
+
+
+
+
+
+
+
+
+
+[4a181ccb](https://github.com/aburan28/crypto/commit/4a181ccb3201d3275cbf7aed29bfd72f58d82467). That commit pins the three
+
+against the later 2,572-row catalog. No exact batch receipt ran all current
+
+
+
+
+
+
+| Binary catalog generators | `supported` on tested generators | 140 retained triples pass the listed membership, annihilation, pullback, composition, and inverse-degree checks; two additional binary triples are absent from that test receipt; no subgroup-wide promotion |
+| Published artifact on all current inputs | `refuted` as evidence claim | only its bundled 592 rows were directly replayed; 746/1,354 is a historical static allowlist classification, not a catalog-wide receipt |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. Replay generator membership and catalog-order annihilation for the 837 odd
+   bindings and the two binary bindings outside the retained native batch;
+   replay typed transfer for those two binary bindings.
+5. Replay map additivity and composition through an independent divisor-class
+6. Add coordinate-isomorphism commutation and proper-subfield descent controls.
+7. Publish and replay a standalone artifact that accepts all 15,791 current
+8. Refresh the legacy formula inventory without promoting modeled routes to
+9. Keep the full solver and every cost claim behind its separate acceptance
+
+

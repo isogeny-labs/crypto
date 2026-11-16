@@ -1,0 +1,42 @@
+Replayable synthetic ECDLP/PDP training datasets and immutable artifact receipts
+
+Usage: crypto dataset [OPTIONS] <COMMAND>
+
+Commands:
+  custody       Create, verify, publish or restore a restricted full-run custody bundle
+  start         Validate a delivered launch grant and start the frozen bounded worker
+  budget        Inspect or reserve cumulative campaign allocations; admission is not launch authorization
+  plan          Freeze a deterministic cross-product; planning performs no cryptography
+  generate      Execute a bounded number of cells, preserving failures and resuming verified cells
+  preflight     Check readable frozen inputs, clean build identity and receipt routing without running cryptography
+  verify        Hash-check every artifact and independently replay known-answer identities
+  status        Count recorded outcomes without rerunning any solver
+  report        Write an immutable partial coverage and measurement report from retained artifacts
+  publish       Publish all completed cell manifests and round-trip their bytes through the store
+  capabilities  Show actual method support and instrumentation limits
+  export        Produce strict public features and separate restricted labels from replayed cells
+  restore       Download and independently replay a completed cell from its portable receipt
+  reconcile     Preserve an interrupted attempt after proving no matching worker remains
+  help          Print this message or the help of the given subcommand(s)
+
+Options:
+      --color <COLOR>
+          Color output mode: `auto` (default), `always`, or `never`. `auto` enables colors only on TTY.  Respected by every visual renderer [default: auto]
+      --owned-replay-policy <OWNED_REPLAY_POLICY>
+          Independently bounded owned-search capture and row replay allowance
+      --owned-replay-receipt <OWNED_REPLAY_RECEIPT>
+          
+      --search-replay-policy <SEARCH_REPLAY_POLICY>
+          
+      --search-replay-receipt <SEARCH_REPLAY_RECEIPT>
+          
+      --sat-replay-policy <SAT_REPLAY_POLICY>
+          Independently authorized finite historical SAT replay allowance
+      --sat-replay-receipt <SAT_REPLAY_RECEIPT>
+          
+      --affine-replay-policy <AFFINE_REPLAY_POLICY>
+          
+      --affine-replay-receipt <AFFINE_REPLAY_RECEIPT>
+          
+  -h, --help
+          Print help

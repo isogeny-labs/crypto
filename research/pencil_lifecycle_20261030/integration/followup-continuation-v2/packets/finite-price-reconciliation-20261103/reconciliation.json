@@ -1,0 +1,153 @@
+{
+  "schema": "pencil.finite-price-reconciliation/v1",
+  "scope": "read-only source reconciliation; not independent coverage admission",
+  "historical_review": {
+    "path": "research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/coverage-review.json",
+    "sha256": "8936f5d99b49538a35d78729f2450a326801ff9df720ec1f5966166756cfa252",
+    "status": "reviewed_complete",
+    "binary_sha256": [
+      "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab"
+    ],
+    "protocol_sha256": "cf8f76eadc42ff487644ea13b3392af1fd31c94e4629eecd6ad7b9a18820badb",
+    "mapping_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+    "categories": 9,
+    "preserved": true
+  },
+  "source_comparison": [
+    {
+      "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+      "prior_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+      "current_sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "matches": false,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_price/src/importer.rs",
+      "prior_sha256": "53a622d46dc2950144999f5aeaa9dac00d5b458952f835f6162a6c484c85d229",
+      "current_sha256": "db05f1bda12bfbdeaff4806f3d3ac968e165c05d06b28e8dd73bb9868963633d",
+      "matches": false,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/collector.rs",
+      "prior_sha256": "ada360c21d2c9ccd135379f4cb841713f8e31b626dda526e70cfc776ad93f6d8",
+      "current_sha256": "ada360c21d2c9ccd135379f4cb841713f8e31b626dda526e70cfc776ad93f6d8",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/lib.rs",
+      "prior_sha256": "615ba55e378fe2e1b5d086d679abdd63017b227a0d641173d1a541833b86164d",
+      "current_sha256": "208d0ed9ac15bd486d55d33b1663527f3e5bca411cf3f7ae804fa9ce5733419d",
+      "matches": false,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/meter.rs",
+      "prior_sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+      "current_sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+      "prior_sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+      "current_sha256": "63dbad396450f7f3435cb2b6aa1aacb468c8a6bda752b40178eac8ba4eb812bf",
+      "matches": false,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/outer_primality.rs",
+      "prior_sha256": "15dc97eca3aad733aaad43757a608af11e090f3b3c3806ad0aaab57e53df0937",
+      "current_sha256": "15dc97eca3aad733aaad43757a608af11e090f3b3c3806ad0aaab57e53df0937",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/residual.rs",
+      "prior_sha256": "21fd29dc330fbbf8ce3c45876584418c55c366876adc85d24888d0693144966f",
+      "current_sha256": "21fd29dc330fbbf8ce3c45876584418c55c366876adc85d24888d0693144966f",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/scalar_ledger.rs",
+      "prior_sha256": "fa5c52c8137bd2da5aef8e560ef1e72111e508b81db4f329928e89ce110cf6ba",
+      "current_sha256": "fa5c52c8137bd2da5aef8e560ef1e72111e508b81db4f329928e89ce110cf6ba",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/sparse.rs",
+      "prior_sha256": "f6e5920670339fa73c3b070b09e83858887531255d6c5061841f3fca761f2821",
+      "current_sha256": "f6e5920670339fa73c3b070b09e83858887531255d6c5061841f3fca761f2821",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/tracked_set.rs",
+      "prior_sha256": "fc41c2295ee032a3018325928859ac13eee2f0a6261da5a4e4ebaa0743f52991",
+      "current_sha256": "fc41c2295ee032a3018325928859ac13eee2f0a6261da5a4e4ebaa0743f52991",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/pencil.rs",
+      "prior_sha256": "48424cb11a2b308f385d4628dc92024ea7c09589da340247f85a5c2ac5f31b8e",
+      "current_sha256": "481f94cc389a1e79880fc168c3a98b5bb37e9411694d424632d4f8f389e5ed00",
+      "matches": false,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/three_leads.rs",
+      "prior_sha256": "02dd6a5e6f665e302c1ccb208f5d9810955dab195aa993714a478df6cd567716",
+      "current_sha256": "6d3572b5fdaf97b48989b21c1d1d5bef9351e295d3d51fe19c3aafa417700a9c",
+      "matches": false,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "src/cryptanalysis/three_leads.rs",
+      "prior_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+      "current_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "src/cryptanalysis/three_leads_constructor_primality.rs",
+      "prior_sha256": "b239f2041f4183c2694079a5d4c990c9e37fee251262fc48f94b56c8a34286fb",
+      "current_sha256": "b239f2041f4183c2694079a5d4c990c9e37fee251262fc48f94b56c8a34286fb",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "src/cryptanalysis/three_leads_geometry_events.rs",
+      "prior_sha256": "a60e3894f4178cf5894b3c277991627ab15c1279a78daf2000e897064f0f20ee",
+      "current_sha256": "a60e3894f4178cf5894b3c277991627ab15c1279a78daf2000e897064f0f20ee",
+      "matches": true,
+      "prior_snapshot_hash_valid": true
+    },
+    {
+      "path": "src/cryptanalysis/three_leads_rho_events.rs",
+      "prior_sha256": "dd1a67d91cab300d7c19a113c76ce0d0cd44cbd6d6abd075459bbf08d3c43a24",
+      "current_sha256": "16d51e2d8ba04bf08477f0a935c47ef0a8dbb7930ee833039515ba1088f42836",
+      "matches": false,
+      "prior_snapshot_hash_valid": true
+    }
+  ],
+  "identical_files": 10,
+  "changed_files": 7,
+  "valuation_finding": "Existing executable finite model already values its nine chosen semantic categories, with prior independent closure. Old draft/header incompleteness is not evidence of new missing valuations. Exact current-source and binary/protocol rebinding is required.",
+  "actionable_freeze_changes": [
+    "Freeze exact amended protocol/body hash, candidate/reference binary and source/build/toolchain identities; preserve original p739 review and records.",
+    "Retain same36 cells and atomic inverse/disjoint primitive mapping unless explicit prospective policy change; no allocation/serialization GAE invented.",
+    "Independently review changed native solver trace route, pencil progress route and moved applicability boundary; bind actual selected implementation and added source closure.",
+    "For finite differences, inventory recurrence setup/update plus all collection reads/copies/initializations/comparisons, maintain scalar/base domains, phase sums and unchanged exceptional/batch work.",
+    "Rebind all9 category entries to exact hashes/source sites, retaining unchanged prior audit where justified; update mapper hash even if only identity handling changed.",
+    "Bind native-price executable/build and full cohort aggregation/disjoint enrollment inputs, retain exact missing/capped/failed pair nulls and ratio-of-sums policy.",
+    "Review current source-addition calibration equality and include algorithm-plus-calibration ratio explicitly; separate allocation/report/harness/cloud costs in own units.",
+    "Historical p739 output equivalence does not convert old counters into optimized-candidate costs. Coordinator decision: preserve old-arm evidence and require new candidate execution across all1260 original targets; no silent historical candidate-cost reuse."
+  ],
+  "price_cells": 36,
+  "new_ratios": null,
+  "runtime_or_tests": false
+}

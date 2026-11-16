@@ -1,0 +1,11 @@
+name = "three_torsion_character_audit"
+version = "0.1.0"
+defaultTargets = ["ThreeTorsionCharacterAudit"]
+
+[[require]]
+name = "bk_frobenius_bridge_audit"
+path = "../../bk_frobenius_bridge_audit_20261114/lean"
+
+[[lean_lib]]
+name = "ThreeTorsionCharacterAudit"
+roots = ["ThreeCharacterScalar", "ThreeCharacterPoint", "ThreeCharacterModule", "ThreeCharacterFrobenius", "ThreeCharacterControls", "ThreeCharacterCertificate"]

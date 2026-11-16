@@ -72,6 +72,12 @@ pub struct RunOptions {
     /// `/proc/self/exe`, so a rebuild during the session cannot swap the
     /// code under the hash recorded at its start.
     pub exe: PathBuf,
+    /// The calibrated per-host weight of AGENTS.md §5a, when the session was
+    /// run with one (`ecbench run --w-cal ...`).  Additive: absent is not
+    /// written, so a session without it serialises as before, and `band`
+    /// reads it when no flag overrides it ([`read_wcal`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub w_cal: Option<crate::cryptanalysis::ecbench::band::WCal>,
 }
 
 fn default_hz() -> u64 {
@@ -433,7 +439,7 @@ fn ingest_lifecycle_v2(input: &ChildInput, line: &[u8]) -> Result<Value, String>
         &child.lifecycle_directory(),
         &child.envelope.prefix.identity,
     );
-    let candidate = child.envelope.arm.method == "ic.three_leads_genus2_pencil_symbolic_v2";
+    let candidate = super::three_leads::is_pencil_symbolic(&child.envelope.arm.method);
     let prefix = if candidate {
         Some(super::diagnostics::ingest(
             &child.output_root,
@@ -1721,7 +1727,7 @@ fn assemble(
     // This audit clock is separate from child timing and its isolation grade.
     let audit_verification = recovered.map(|k| {
         let started = Instant::now();
-        let matches = inst.mul_generator_hex(k).as_ref() == Some(&w.target);
+        let matches = inst.mul_generator_exact(k).as_ref() == Some(&w.target);
         let elapsed_ns = u64::try_from(started.elapsed().as_nanos())
             .expect("bounded parent audit verification interval");
         (matches, elapsed_ns)
@@ -1746,7 +1752,7 @@ fn assemble(
     } else {
         "exhausted"
     };
-    let sqrt_r = (w.curve.r as f64).sqrt();
+    let sqrt_r = (w.curve.r.to_f64()).sqrt();
     let floor = floor_s(w.curve.automorphisms_available);
     let s = report.as_ref().map(|r| r.total_gae / sqrt_r);
     let placement = reaped
@@ -1925,6 +1931,53 @@ fn read_record_lines_with(
                 .map_err(|e| format!("records.jsonl line {}: {e}", i + 1))
         })
         .collect()
+}
+
+/// File name of the sidecar a measured `w_cal` is written to
+/// (`ecbench wcal --session DIR`): the session's own `session.json` is not
+/// rewritten after it is sealed.
+pub const WCAL_SIDECAR: &str = "w_cal.json";
+
+/// The calibrated weight attached to the session in `dir`: the sidecar
+/// [`WCAL_SIDECAR`] if present, else `options.w_cal` of `session.json`;
+/// `None` when neither exists (every session written before 2026-11-13).
+/// A weight that does not validate is an error, not a silent `None`.
+pub fn read_wcal(dir: &Path) -> Result<Option<crate::cryptanalysis::ecbench::band::WCal>, String> {
+    let side = dir.join(WCAL_SIDECAR);
+    let wcal = if side.exists() {
+        let text =
+            std::fs::read_to_string(&side).map_err(|e| format!("{}: {e}", side.display()))?;
+        Some(
+            serde_json::from_str::<crate::cryptanalysis::ecbench::band::WCal>(&text)
+                .map_err(|e| format!("{}: {e}", side.display()))?,
+        )
+    } else if dir.join("session.json").exists() {
+        read_session(dir)?.options.w_cal
+    } else {
+        None
+    };
+    if let Some(w) = &wcal {
+        w.validate()
+            .map_err(|e| format!("{}: {e}", dir.display()))?;
+    }
+    Ok(wcal)
+}
+
+/// The one weight shared by the sessions in `dirs`: `None` when none has
+/// one, an error when some have one and some do not, or they differ (a
+/// different host's reading is a different price).
+pub fn shared_wcal(
+    dirs: &[std::path::PathBuf],
+) -> Result<Option<crate::cryptanalysis::ecbench::band::WCal>, String> {
+    let all: Vec<_> = dirs
+        .iter()
+        .map(|d| read_wcal(d))
+        .collect::<Result<_, _>>()?;
+    let first = all.first().cloned().flatten();
+    if all.iter().all(|w| *w == first) {
+        return Ok(first);
+    }
+    Err("the sessions carry different (or only some carry a) w_cal; pass --w-cal, --w-cal-method and --w-cal-host to choose one".into())
 }
 
 pub fn read_session(dir: &Path) -> Result<Session, String> {
@@ -2115,6 +2168,7 @@ mod robustness_tests {
             allow_busy: true,
             thresholds: Thresholds::default(),
             exe: PathBuf::from(exe),
+            w_cal: None,
         }
     }
 

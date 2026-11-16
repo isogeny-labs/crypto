@@ -18,14 +18,22 @@ is textual (comments and layout survive) and idempotent; checkouts into a
 
     python3 tools/artifacts/wire_workflows.py [--check] [WORKFLOW ...]
 
-`--check` edits nothing and exits 1 if any workflow lacks the step it needs,
-which is how CI keeps new workflows honest.
+`--check` edits nothing and exits 1 if any workflow lacks the step it needs
+or carries a stale one, which is how CI keeps new workflows honest.
+
+The pull list is derived from the workflow text outside the generated step:
+the step's own `pull` line is output, never a reference, so a directory the
+workflow stops naming is dropped on regeneration. Inputs a workflow's scripts
+discover at run time are declared with `# tools/artifacts pull: PATH ...`
+comment lines; hand edits to the generated line do not survive.
 """
 
 from __future__ import annotations
 
 import argparse
 import fnmatch
+import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -34,6 +42,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import artifacts  # noqa: E402
 
 STEP_NAME = "Pull store data this workflow reads (tools/artifacts)"
+# A workflow whose scripts find their inputs at run time (a gate that follows
+# VALIDATION.json to the session records it names) declares them, one or more
+# paths per comment line, since its text never names them:
+#     # tools/artifacts pull: research/x/sessions research/y/results
+DECLARE_RE = re.compile(r"^\s*#\s*tools/artifacts pull:(.*)$")
 PATH_RE = re.compile(r"(?<![A-Za-z0-9_./*-])((?:[A-Za-z0-9_+*-][A-Za-z0-9_.+*-]*/)+[A-Za-z0-9_.+*-]*)")
 
 
@@ -42,7 +55,11 @@ def moved_paths(root: Path) -> set[str]:
     for d, name, _ in artifacts.selected(root, []):
         drel = artifacts.rel(root, d)
         out.add(f"{drel}/{name}" if drel else name)
-    return out
+    # Manifests retain historical objects after a path returns to Git (for
+    # example the append-only PCC ledger). Never hydrate an old object over
+    # the authoritative tracked file, regardless of local hydration state.
+    tracked = set(artifacts.git(root, "ls-files", "-z").decode().split("\0"))
+    return out - tracked
 
 
 def moved_dirs(moved: set[str]) -> set[str]:
@@ -55,9 +72,39 @@ def moved_dirs(moved: set[str]) -> set[str]:
     }
 
 
+def strip_generated(text: str) -> str:
+    """The workflow without the pull steps this tool generated.
+
+    The generated `artifacts.py pull ...` line names every directory it pulls,
+    so scanning it would make each pulled directory a reference to itself and
+    keep it after the workflow stopped naming it.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^(\s*)- name: (.*)$", lines[i])
+        if not (m and m.group(2).strip() == STEP_NAME):
+            out.append(lines[i])
+            i += 1
+            continue
+        indent = len(m.group(1))
+        i += 1
+        while i < len(lines) and (not lines[i].strip() or len(lines[i]) - len(lines[i].lstrip()) > indent):
+            i += 1
+    return "\n".join(out)
+
+
 def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
     """Paths the workflow names that are, or contain, moved files; minimal cover."""
     found = set()
+    text = strip_generated(text)
+    for line in text.split("\n"):
+        if m := DECLARE_RE.match(line):
+            # Declared, so kept while it still names moved data, and dropped
+            # (like any stale entry) once it does not.
+            found.update(p for p in (x.rstrip("/") for x in m.group(1).split())
+                         if p in moved or any(x.startswith(p + "/") for x in moved))
     # A sibling script may read data in the same artifact directory. Do not
     # infer that it reads every artifact in a broad ancestor such as
     # research/notes: many independent studies share that namespace.
@@ -92,6 +139,129 @@ def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
     return sorted(p for p in found if not any(p.startswith(q + "/") for q in found))
 
 
+GATE_RUN_RE = re.compile(r"\bpython3?\s+(?:\./)?scripts/(?:test_)?validation_gate\.py\b")
+
+
+def reads_validation_gate(text: str) -> bool:
+    """True when a workflow step runs the validation gate or its tests.
+
+    A mention in a `paths:` filter or a comment does not count: those do not
+    open the evidence directories. The IC leaderboard builder reads the gate
+    for the leaderboard rows only and keeps its own pull list.
+    """
+    return any(GATE_RUN_RE.search(line) for line in text.split("\n") if not line.lstrip().startswith("#"))
+
+
+def _evidence_file(base: Path, name: object, root: Path) -> str | None:
+    """Repository-relative path of `name` under an evidence directory, or None."""
+    if not isinstance(name, str) or not name:
+        return None
+    p = Path(os.path.normpath(base / name))
+    try:
+        return p.relative_to(root).as_posix()
+    except ValueError:
+        return None
+
+
+def admitted_evidence_dirs(root: Path) -> tuple[set[str] | None, str]:
+    """Evidence directories the gate opens: those of the admitted benchmarks rows
+    and of the leaderboard rows (the gate's own readers), or (None, reason) when
+    those tables cannot be read here, in which case callers take every directory.
+    """
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("_vg_for_wire", root / "scripts" / "validation_gate.py")
+        vg = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = vg
+        spec.loader.exec_module(vg)
+        out = {f"benchmarks/{d}" for d in vg.benchmark_groups((root / vg.BENCHMARKS_README).read_text())}
+        out |= {vg.board_evidence_dir(r) for r in json.loads((root / vg.LEADERBOARD_JSON).read_text())["board"]}
+        return {d.rstrip("/") for d in out}, ""
+    except Exception as e:  # noqa: BLE001 - any unreadable table means "take all"
+        return None, f"{type(e).__name__}: {e}"
+
+
+def evidence_store_files(root: Path, moved: set[str]) -> tuple[dict[str, set[str]], list[str]]:
+    """Store-backed files that the validation gate reads, per VALIDATION.json.
+
+    The gate (scripts/validation_gate.py, `check_evidence_dir`) opens, for each
+    evidence directory, the pinned replay certificate and validator report and
+    every `raw_data` file the report lists. Any of those that sits in the
+    artifact store must be hydrated before the gate runs. Returns
+    ({VALIDATION.json path: {store-backed files it reads}}, notes).
+    """
+    need: dict[str, set[str]] = {}
+    notes: list[str] = []
+    admitted, why = admitted_evidence_dirs(root)
+    if admitted is None:
+        notes.append(f"admitted rows unreadable ({why}); every VALIDATION.json is treated as read by the gate")
+    for vj in sorted(root.rglob("VALIDATION.json")):
+        parts = vj.relative_to(root).parts
+        if "fixtures" in parts or ".git" in parts:
+            continue
+        if admitted is not None and vj.parent.relative_to(root).as_posix() not in admitted:
+            continue
+        rel_vj = vj.relative_to(root).as_posix()
+        try:
+            spec = json.loads(vj.read_text())
+        except (OSError, ValueError):
+            continue
+        if not isinstance(spec, dict):
+            continue
+        base = vj.parent
+        files: set[str] = set()
+        report_rel = None
+        for key in ("replay_certificate", "validator_report"):
+            item = spec.get(key)
+            rel = _evidence_file(base, item.get("path") if isinstance(item, dict) else None, root)
+            if rel is None:
+                continue
+            if rel in moved:
+                files.add(rel)
+            if key == "validator_report":
+                report_rel = rel
+        raw: list = []
+        if report_rel is not None:
+            try:
+                rep = json.loads((root / report_rel).read_text())
+                raw = (rep.get("raw_data") or []) if isinstance(rep, dict) else []
+            except (OSError, ValueError):
+                if report_rel in moved:
+                    # Its raw_data are unknowable until it is hydrated: pull the whole
+                    # study (first two path components) rather than guess narrower.
+                    files.update(m for m in moved if m.startswith("/".join(report_rel.split("/")[:2]) + "/"))
+                    notes.append(f"{rel_vj}: validator report {report_rel} is store-backed and not hydrated, "
+                                 "so its raw_data cannot be read; its whole study is pulled instead")
+        for it in raw:
+            rel = _evidence_file(base, it.get("path") if isinstance(it, dict) else it, root)
+            if rel is not None and rel in moved:
+                files.add(rel)
+        if files:
+            need[rel_vj] = files
+    return need, notes
+
+
+def cover(files: set[str], moved: set[str]) -> list[str]:
+    """Pull prefixes that hydrate exactly `files` among the moved files.
+
+    A file's own directory is used when every moved file below it is wanted
+    (one short prefix per result directory); otherwise the file itself, so a
+    directory that also holds unread store data is never pulled whole.
+    """
+    out: set[str] = set()
+    for f in files:
+        parent = f.rsplit("/", 1)[0] if "/" in f else ""
+        ok = parent.count("/") >= 1 and all(m in files for m in moved if m.startswith(parent + "/"))
+        out.add(parent if ok else f)
+    return sorted(p for p in out if not any(p.startswith(q + "/") for q in out))
+
+
+def pulled_by(text: str) -> list[str]:
+    """Prefixes named by the pull command of an inserted step."""
+    m = re.search(r"artifacts\.py pull (?:--jobs \d+ )?(.*)$", text, re.M)
+    return m.group(1).split() if m else []
+
+
 def step_lines(indent: str, paths: list[str]) -> list[str]:
     i2 = indent + "  "
     return [
@@ -120,7 +290,10 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
 
 
 def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
-    """Insert the pull step after each workspace checkout; returns (text, notes)."""
+    """Insert the pull step after each workspace checkout; returns (text, notes).
+
+    With no paths, an earlier generated step is removed and nothing is added.
+    """
     lines = text.split("\n")
     notes: list[str] = []
     out: list[str] = []
@@ -150,7 +323,8 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             out.extend(block)
             i = j
             continue
-        block = add_sparse_pattern(block, indent)
+        if paths:
+            block = add_sparse_pattern(block, indent)
         out.extend(block)
         k = next((k for k in range(j, len(lines)) if lines[k].strip()), len(lines))
         if k < len(lines) and STEP_NAME in lines[k]:
@@ -162,6 +336,9 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
                 j += 1
             while j > k + 1 and not lines[j - 1].strip():
                 j -= 1
+        if not paths:
+            i = j
+            continue
         step = step_lines(indent, paths)
         cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
                      if re.match(rf"^{indent}(?:- |  )if: ", b)), None)
@@ -216,10 +393,18 @@ def main() -> int:
     dirs = moved_dirs(moved)
     files = [Path(w) for w in args.workflows] or sorted((root / ".github/workflows").glob("*.y*ml"))
     missing = 0
+    evidence, evidence_notes = evidence_store_files(root, moved)
+    for n in evidence_notes:
+        print(n, file=sys.stderr)
     for f in files:
         text = f.read_text()
         paths = needed(text, moved, dirs)
-        if not paths:
+        if reads_validation_gate(text):
+            # Derived, not hand-listed: whatever store-backed evidence the gate
+            # opens (VALIDATION.json -> report -> raw_data) is pulled.
+            both = set(paths) | set(cover({x for v in evidence.values() for x in v}, moved))
+            paths = sorted(p for p in both if not any(p.startswith(q + "/") for q in both))
+        if not paths and STEP_NAME not in text:
             continue
         new, notes = wire(text, paths)
         for n in notes:
@@ -227,12 +412,24 @@ def main() -> int:
         if new != text:
             missing += 1
             if args.check:
-                print(f"{f.name}: needs `{STEP_NAME}` for {' '.join(paths)}")
+                if paths:
+                    print(f"{f.name}: needs `{STEP_NAME}` for {' '.join(paths)}")
+                else:
+                    print(f"{f.name}: stale `{STEP_NAME}`: the workflow names no moved data")
+                if reads_validation_gate(text):
+                    have = pulled_by(text)
+                    for v, fs in sorted(evidence.items()):
+                        gap = sorted(x for x in fs if not any(x == q or x.startswith(q + "/") for q in have))
+                        if gap:
+                            print(f"  {f.name}: the validation gate reads store-backed evidence of {v} "
+                                  f"that this workflow does not pull: {', '.join(gap[:3])}"
+                                  f"{' ...' if len(gap) > 3 else ''}; run python3 tools/artifacts/wire_workflows.py "
+                                  f"(the list is derived, do not hand-edit it)")
             else:
                 f.write_text(new)
-                print(f"{f.name}: pull {' '.join(paths)}")
+                print(f"{f.name}: pull {' '.join(paths)}" if paths else f"{f.name}: pull step removed")
     if args.check and missing:
-        print(f"\n{missing} workflow(s) read store data without pulling it; run "
+        print(f"\n{missing} workflow(s) lack the pull step they need or carry a stale one; run "
               f"python3 tools/artifacts/wire_workflows.py", file=sys.stderr)
         return 1
     return 0

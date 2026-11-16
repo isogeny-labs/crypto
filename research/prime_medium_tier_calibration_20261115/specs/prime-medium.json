@@ -1,0 +1,113 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "calibration: prime medium tier, matched rho and BSGS at log2 r 32-48",
+  "description": "Preregistered in ../PROTOCOL.md. Seals the missing prime-curve medium-tier bounds (LEAD-RHO-matched-rho-calibration): rho.negation (the matched reference on a prime curve), its _v2-accounting twin, rho.plain, and bsgs.negation(_v2) on five prime-order curves (cofactor 1, j not 0 or 1728) at log2 r 31.9, 35.3, 39.2, 43.2, 47.6, given explicitly (curves.json, gen_curves.py) so planning and audits skip the O(p) search. Operation counts are the measurement; wall time descriptive.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 4023993091,
+        "a": 3961754303,
+        "b": 408480019,
+        "group_order": 4024040347,
+        "r": 4024040347,
+        "gx": 1730744424,
+        "gy": 1503193332
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42069223081,
+        "a": 30231791235,
+        "b": 12127048050,
+        "group_order": 42069403111,
+        "r": 42069403111,
+        "gx": 8265373091,
+        "gy": 17388357853
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 651107284357,
+        "a": 307303156469,
+        "b": 428929797036,
+        "group_order": 651106074121,
+        "r": 651106074121,
+        "gx": 343203606359,
+        "gy": 246978722088
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 10124949775277,
+        "a": 2520806973686,
+        "b": 5046169159260,
+        "group_order": 10124950060697,
+        "r": 10124950060697,
+        "gx": 5995515006304,
+        "gy": 3614691790659
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 211546967373601,
+        "a": 172752434979270,
+        "b": 126827580280354,
+        "group_order": 211546965957793,
+        "r": 211546965957793,
+        "gx": 29499901659099,
+        "gy": 74114639166084
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261115
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-v2",
+      "role": "baseline",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    },
+    {
+      "name": "bsgs-neg-v2",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.negation_v2"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261115,
+    "isolation_required": "L2",
+    "timeout_seconds": 3600
+  }
+}

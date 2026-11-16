@@ -9,11 +9,13 @@ missing methods cannot silently disappear from the campaign report.
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-SOURCE_COMMIT = "48c8a4767d2d1eed6a7b379f74410bc729239380"
-BINARY_SHA256 = "91f5895637501c6de257bbaf3afc9cbc2c0f5e964964d3dc4fc3bf78a427d96b"
+SOURCE_COMMIT = "ff7ad61cfed11908fb79de9dd485b696d0ada779"
+BINARY_SHA256 = "924d090c1d83a20ce954848c04b116cee4d5a7cb04187bb618dff60958bfd64d"
 
 LEGACY_CONTROL = {
     "ic.three_leads_genus2_v1",
@@ -132,7 +134,11 @@ def cell(method: dict) -> str:
 
 
 def main() -> None:
-    methods = json.loads((ROOT / "method-registry.json").read_text())
+    registry_path = ROOT / "method-registry.json"
+    if binary := os.environ.get("ECBENCH_BIN"):
+        raw = subprocess.check_output([binary, "methods", "--json"])
+        registry_path.write_bytes(raw)
+    methods = json.loads(registry_path.read_text())
     if len(methods) != 74 or len({m["id"] for m in methods}) != 74:
         raise SystemExit("expected exactly 74 unique live methods")
 
@@ -150,7 +156,7 @@ def main() -> None:
                 "fresh_run": (
                     "not_globally_rankable"
                     if state in {"diagnostic_only", "legacy_control", "pricing_sensitivity"}
-                    else "blocked_no_authenticated_eks_route"
+                    else "blocked_checkpoint_gate"
                 ),
                 "note": note,
             }
@@ -161,7 +167,7 @@ def main() -> None:
             "id": name,
             "disposition": "nested_backend",
             "campaign_cell": "algebraic-solver matched systems",
-            "fresh_run": "blocked_no_authenticated_eks_route",
+            "fresh_run": "blocked_checkpoint_gate",
             "native_unit": unit,
             "global_rankable": False,
         }

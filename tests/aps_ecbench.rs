@@ -1,5 +1,6 @@
 //! Public-interface correctness controls, not performance measurements.
 //! The planted scalar constructs Q outside every method invocation.
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crypto_lib::cryptanalysis::{
     ecbench::{
         aps, audit,
@@ -72,7 +73,12 @@ fn fixture(orbit: bool) -> (Instance, CurveFacts, [String; 2]) {
 }
 
 fn verified(report: &SolveReport, expected: u128) {
-    assert_eq!(report.recovered, Some(expected), "{}", report.detail);
+    assert_eq!(
+        report.recovered,
+        Some(ExactScalar::from(expected)),
+        "{}",
+        report.detail
+    );
     assert!(!report.exhausted);
     assert_eq!(report.detail["outcome"], "verified");
     assert_eq!(report.detail["native_work_accounting_complete"], false);

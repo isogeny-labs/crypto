@@ -1,0 +1,246 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Validator fresh session F2: Koblitz a=1 n=23, koblitz ksum fold study (VAL), nonce-derived seed",
+ "description": "Validator re-measurement on new target seeds drawn from the validator nonce after the study's results were published. Registered candidate and incumbents unchanged; extra rho and IC arms to check reference strength and incumbent fairness. Engineering; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 23
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 837363905859,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-strong-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-strong-v2",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong_v2"
+   }
+  },
+  {
+   "name": "rho-strong-escape",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong_escape"
+   }
+  },
+  {
+   "name": "rho-frob",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius"
+   }
+  },
+  {
+   "name": "rho-frob-v2",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v2"
+   }
+  },
+  {
+   "name": "rho-frob-v3",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v3"
+   }
+  },
+  {
+   "name": "rho-frob-v4",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v4"
+   }
+  },
+  {
+   "name": "rho-frob-v5",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  },
+  {
+   "name": "lazy-c3",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=100000000",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "lazy-c4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "lazy-c5",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=5,raw_x_cap=100000000",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "layout-c4-sr",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "gen-layout-c2",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "gen-layout-c3",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "gen-layout-c4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "gen-layout-c5",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=5,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "gen-layout-c4-sr",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "gen-lazy-c4-sr",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-lazy-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "kf3-c1g-sr",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "1000000000",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "kf3-c1g-sg",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 837363906859,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

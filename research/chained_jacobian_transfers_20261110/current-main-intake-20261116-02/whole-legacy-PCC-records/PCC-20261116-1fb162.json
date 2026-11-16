@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T20:43:50Z",
+ "id": "PCC-20261116-1fb162",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e12f0ed198ebe96f5be4e7e43ffa9613ab05fb51",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "c5613a93bb82cbdccb382f2e5a3d9f0c7c0972678bb1ea555e279e12b25521bd",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-final-03/CubicNativeNormEuclid22309.lean",
+   "theorem": "CubicNativeNormEuclid22309.raw_norm_decode"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Literal normalized UInt64 q223 norm and actual signed Euclidean inverse model; finite223 base certificates derive termination/gcd/unit/all-state signed64 bounds, original dual64/0/j1/120/default memory. No Rust compiler/counter/runtime, complete composed field/Jacobian or signed standing.",
+ "statement": "theorem raw_norm_decode (a b c p0 p1 p2 : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) (hp0 : p0.toNat<223) (hp1 : p1.toNat<223) (hp2 : p2.toNat<223) : decodeWord (rawNormBlock a b c p0 p1 p2)= decodeWord a*decodeWord p0+3*(decodeWord b*decodeWord p2+decodeWord c*decodeWord p1)"
+}

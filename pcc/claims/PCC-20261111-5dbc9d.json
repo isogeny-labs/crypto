@@ -1,0 +1,30 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T12:35:09Z",
+ "id": "PCC-20261111-5dbc9d",
+ "kind": "statement",
+ "producer": {
+  "commit": "944c7f6564b043b693aef161dcd5a3917de481df",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/independent-shifted-field6-01.txt",
+    "sha256": "5369c94fd8bcd01b6df9dd51241ed50534e86a19bcc0b25afdea690cb915b9c1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/shifted101-field6-witness-01.tsv",
+    "sha256": "ad478e7a5aa4e4edf88eb35d60174e5bbd7dc25564853cd1e8f42819e96faa07"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Independent pre-existing flat Fp6 arithmetic replays128 frozen shifted F101 tower-field witnesses for products,inverses and Frobenius powers, with exact wide seed coordinates, independent Rabin irreducibility and explicit gamma=T+s primitive bridge. Checked flat monic coefficients[33,46,2,18,56,12,1], cubic[56,13,6,1], s\u00b2=2. Existing F17 fixture still matches byte-for-byte and both root tests pass. Only test/fixture changes, no existing field engine arithmetic modified; validates bounded field layer, not independently the whole Jacobian map or scientific standing. No speed, solver or cross-prime descent result."
+}

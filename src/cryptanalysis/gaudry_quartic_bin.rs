@@ -2296,6 +2296,58 @@ pub struct BinD4Solve {
     pub witnesses: Vec<[PtB; 4]>,
 }
 
+/// Probe only (LEAD-ICB-d4bin-constant-quadratic-elimination, step 1; not
+/// called by any solver path): the triangularised leading monomials and the
+/// standard monomials of the weighted Macaulay echelon at `macaulay`, built
+/// exactly as [`solve_once`] builds it without a replay (same rows, same
+/// column order, same `is_std` rule).  `None` when an equation lies above
+/// the Macaulay degree.
+#[allow(clippy::type_complexity)]
+pub fn macaulay_staircase<const N: usize>(
+    f: &Gf2q,
+    comps: &[HashMap<[u8; N], Fe>],
+    w: &[u8; N],
+    macaulay: u8,
+    sparsest: bool,
+) -> Option<(Vec<Option<[u8; N]>>, Vec<[u8; N]>)> {
+    let g = &f.tab;
+    let cols = monomials_desc(macaulay, w);
+    let col_index: HashMap<[u8; N], usize> =
+        cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
+    let mut tri = 0;
+    let (comps, leads) = triangularise(g, comps, w, &mut tri);
+    let divides = |lm: &[u8; N], m: &[u8; N]| (0..N).all(|k| lm[k] <= m[k]);
+    let mut rows: Vec<Vec<Fe>> = Vec::new();
+    for (i, comp) in comps.iter().enumerate() {
+        let dg = comp.keys().map(|m| wdeg(m, w)).max().unwrap_or(0) as u8;
+        if dg > macaulay {
+            return None;
+        }
+        for sh in monomials_desc::<N>(macaulay - dg, w) {
+            if leads
+                .iter()
+                .take(i)
+                .any(|lm| lm.is_some_and(|lm| divides(&lm, &sh)))
+            {
+                continue;
+            }
+            let mut row = vec![0u32; cols.len()];
+            for (&e, &c) in comp {
+                let m: [u8; N] = core::array::from_fn(|k| e[k] + sh[k]);
+                row[col_index[&m]] ^= c;
+            }
+            rows.push(row);
+        }
+    }
+    let mut em = 0;
+    let ech = echelon(g, rows, &mut em, sparsest);
+    let standard = (0..cols.len())
+        .filter(|&c| ech.pivot_row[c] == u32::MAX && wdeg(&cols[c], w) < macaulay as Fe)
+        .map(|c| cols[c])
+        .collect();
+    Some((leads, standard))
+}
+
 /// Decompose `r` as `±P₁ ± P₂ ± P₃ ± P₄` with `t(P_i) ∈ F_q`: the Weil
 /// restriction of `H(·; t(r))`, its solve, and for each rational solution
 /// the split `w_i` (roots of `X⁴ + s₁X³ + s₂X² + s₃X + s₄`), `t_i² + t_i =
@@ -2325,7 +2377,13 @@ pub fn solve_d4_bin(
             fq,
             &comps,
             &FROBENIUS_WEIGHTS,
-            3,
+            // chain unknown: P (index 3) by default; `D4_BIN_MVAR=2` selects the other
+            // weight-1 unknown s4 (LEAD-ICB-d4bin-chain-variable-sweep probe).
+            std::env::var("D4_BIN_MVAR")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .filter(|&v: &usize| v == 2 || v == 3)
+                .unwrap_or(3),
             macaulay,
             opts.sparsest,
             &mut out.solve,
@@ -3204,6 +3262,18 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
     fn summands(&self) -> u32 {
         4
     }
+    /// The set-up interpolates the symmetrised system (solver work, in the
+    /// solver block) and builds no table, so with large primes off there
+    /// are no table inserts to count and the item is complete; the
+    /// large-prime store's pivot inserts are not counted, so with large
+    /// primes on the item stays listed (`ecbench::work`).
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        if self.lp.enabled() {
+            BTreeMap::new()
+        } else {
+            BTreeMap::from([("counted:table_insert_attempts".to_string(), 1)])
+        }
+    }
     fn describe(&self, _params: &Params) -> String {
         let form = if self.opts.frobenius {
             "(s₂², s₃², s₄, π²), weights (2, 2, 1, 1): 64 solutions"
@@ -3297,6 +3367,9 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
                         .entry("degenerate_fq_muls".into())
                         .or_insert(0) += cost.total_muls;
                 }
+                let degree = u32::from(self.macaulay);
+                self.totals
+                    .observe_degree(degree, degree, cost.total_muls, true, false);
                 return None;
             }
         };
@@ -3314,14 +3387,17 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
             self.totals.solving_degree_max.max(u32::from(self.macaulay));
         self.totals.calls_with_a_degree += 1;
         self.last_witnesses = sol.witnesses.clone();
-        let w = sol.witness?;
-        let idx: Option<Vec<usize>> = w
-            .iter()
-            .map(|q| fb.index_of_key(CountedGroup::key(c, q)))
-            .collect();
-        if idx.is_none() {
+        let idx: Option<Vec<usize>> = sol.witness.as_ref().and_then(|w| {
+            w.iter()
+                .map(|q| fb.index_of_key(CountedGroup::key(c, q)))
+                .collect()
+        });
+        if sol.witness.is_some() && idx.is_none() {
             counters.lift_failures += 1;
         }
+        let degree = u32::from(self.macaulay);
+        self.totals
+            .observe_degree(degree, degree, sol.solve.total_muls, false, idx.is_some());
         idx
     }
     fn decompose_relations(
@@ -3381,6 +3457,30 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn two_large_prime_cycle_closes_over_small_columns() {
+        let mut lp = LargePrimes {
+            max_large: 2,
+            small_permille: 500,
+            small_cols: 2,
+            ..LargePrimes::default()
+        };
+        let r = 101;
+        let (stored, first_ops) = lp.feed(&[(0, 1), (2, 1), (3, 1)], 10, 1, r);
+        assert!(stored.is_none());
+        assert_eq!(first_ops, 0);
+
+        let (closed, second_ops) = lp.feed(&[(1, 1), (2, 1), (3, 1)], 20, 2, r);
+        let closed = closed.expect("the repeated two-large-prime edge closes a cycle");
+        assert_eq!(closed.columns, vec![(0, 100), (1, 1)]);
+        assert_eq!((closed.a, closed.b), (10, 1));
+        assert!(second_ops > 0);
+        assert_eq!(lp.counts.get("lp_decompositions_2_large"), Some(&2));
+        assert_eq!(lp.counts.get("lp_stored_2_large"), Some(&1));
+        assert_eq!(lp.counts.get("lp_full_merged"), Some(&1));
+        assert_eq!(lp.counts.get("lp_merges"), Some(&1));
+    }
 
     fn random_point(c: &CurveB, rng: &mut StdRng) -> PtB {
         loop {

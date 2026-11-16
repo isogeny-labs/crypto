@@ -1,0 +1,15 @@
+{
+  "action": "enable extensions.worktreeConfig first, or write files with git show instead",
+  "created": "2026-11-15T18:41:17Z",
+  "evidence": [
+    "research/ic_native_sweep_20261115/VALIDATION_REVIEW.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "before git sparse-checkout init in a scratch worktree of a shared clone",
+  "why": "sparse-checkout init in a linked worktree writes core.sparseCheckout=true into the shared .git/config"
+}

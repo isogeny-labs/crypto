@@ -1,0 +1,38 @@
+{
+  "schema": "validation-gate/v1",
+  "_comment": "DRAFT, named .draft.json so no builder reads it. gae_band holds the medians over the 72 default-configuration instances (pooled over the three rungs; per-instance and per-rung values are in band/ and RESULTS_band.md). Still refused by the gate: both pinned files say independent=false, and the robustness rows are not in the repository.",
+  "replay_certificate": {
+    "path": "replay-log.json",
+    "sha256": "7433d27b1dd18f8da86ddf5acacd672e7ad78bdc5e0eb25899edeee96349373a"
+  },
+  "validator_report": {
+    "path": "recompute-output.json",
+    "sha256": "5b52f997bc784343f631cfcf39b2467e71c3727daaee639b2cc24499c75b2066"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "counted negation-map Pollard rho (A = 2), 16 runs with distinct walk seeds on the same instance (ic solve-prime-file --matched-rho-runs 16); charged cost = group additions + doublings",
+    "unit": "GAE (group additions + doublings)",
+    "binary_or_process": "the same ic solve-prime-file invocation as the index-calculus arm; binary blake3 1e8e07b434fc35810636e6486ec3241489b0ce66a91e2ae113b0a7e88c0f5f16 (band/binary.json)",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "strongest_available_note": "a and b are nonzero on every instance (checked by the run: matched_rho_eligible); no automorphism beyond negation was looked for",
+    "gae_band": {
+      "0": {
+        "ic": 111534.5,
+        "rho": 453.0625
+      },
+      "0.1": {
+        "ic": 113548.75,
+        "rho": 482.903125
+      },
+      "1": {
+        "ic": 131677.0,
+        "rho": 751.46875
+      }
+    },
+    "order_holds_across_band": true
+  }
+}

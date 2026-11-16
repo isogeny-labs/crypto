@@ -1,0 +1,40 @@
+{
+  "candidate_id": "spike35",
+  "certificate_sha256": "4d895f37c1105ad944b70d878a398889d1e3b102b88c07eb0d1c85990743e4ab",
+  "family": "koblitz",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "koblitz-m2-planted",
+  "input_row_sha256": "3a0afbb368377106821988e3ccce592fc139e0f48d93155d6155b001594279b8",
+  "m": 2,
+  "producer_exit_code": "not captured",
+  "producer_stderr_captured": false,
+  "producer_stdout_captured": false,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-01/cases/spike35/koblitz-m2-planted/input",
+      "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-01/cases/spike35/koblitz-m2-planted/output/koblitz-m2-planted.json"
+    ],
+    "elapsed_seconds": 0.05,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"koblitz-m2-planted\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": null,
+  "runner_error": "TypeError: bounded() missing 1 required positional argument: env; exception occurred after fall run wrote result certificate and results.json but before attempt.json/replay were saved",
+  "s3_certificate_key": "runs/n83-ffd-lfd-factorbase-panel-20261102/v2/spike35/first-fall-attempt-01/certificates/koblitz-m2-planted.json",
+  "s3_readback_sha256": "4d895f37c1105ad944b70d878a398889d1e3b102b88c07eb0d1c85990743e4ab",
+  "status": "recovered_certificate_after_runner_exception",
+  "system_bytes": 390719,
+  "system_sha256": "eb615fddc0d61ff464daed7c26b02d5b0fc8b6fa0563dddc03867679577f6f0c",
+  "target_kind": "planted"
+}

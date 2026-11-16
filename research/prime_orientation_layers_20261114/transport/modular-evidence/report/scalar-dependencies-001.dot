@@ -1,0 +1,12 @@
+digraph G {
+ rankdir=TB; graph[bgcolor="white",ranksep=.5,nodesep=.35];
+ node[shape=box,style="rounded,filled",fillcolor="#eaf1fa",fontname="Helvetica",fontsize=12];
+ A[label="Direct scalar products\nPacked denominator + expression"];
+ B[label="Materialized Vector boxes\nactual right value agreement"];
+ C[label="Canonical coefficient\nat creation precision"];
+ D[label="Actual expression nodes\nunary powers / grid / mass"];
+ E[label="Declared scalar-product\ncount MODEL bound"];
+ F[label="OPEN: operation trace\nscalar + total bit / entry cost",fillcolor="#fff0d8",style="rounded,dashed"];
+ {rank=same;A;B;C;}{rank=same;D;E;F;}
+ A->B[constraint=false];B->C[constraint=false];A->D;D->E[constraint=false];E->F[constraint=false,style=dashed];B->F[style=dashed];
+}
