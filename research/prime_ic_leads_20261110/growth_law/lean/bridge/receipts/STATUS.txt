@@ -1,0 +1,13 @@
+2026-11-15: BUILT. lake build rc 0 on RunPod pod 13l04c7i0gsbjb (Ubuntu 24.04, 4 vCPU, 32 GB),
+Lean 4.35.0 (eb6cafb7), Mathlib 56a005855ea17e0b0958f73ec801ae140b0a1679 (tag v4.35.0, from
+`lake exe cache get`). Receipt: 20261115_pod/ (MANIFEST.sha256 from rp.sh pull, hashes verified).
+  b1/  first build of the bridge as written: 8 errors, all in Uni.levelMap / Kummer.levelMap
+       (instance synthesis on `(level ..).R`), build rc 1.
+  b2/  after the fix (binder type ascriptions `a : R p (t + 1)` in hadd/hsmul/hmul), build rc 0;
+       SOURCE.sha256 = hashes of the Bridge.lean / GrowthLaw.lean in this directory;
+       axioms.log (the file's own #print axioms lines), axioms_all.log (#print axioms on all 105
+       top-level declarations of Bridge.lean and GrowthLaw.lean via AllAxioms.lean): no sorryAx,
+       only propext, Classical.choice, Quot.sound; sorry_grep.txt: no `sorry` in either file.
+Warnings only: deprecated `if_neg` (3), unused section variable [Fact (1 < p)] (4), module-system hint.
+The header of Bridge.lean still reads "NOT YET BUILT"; it was left unedited so that its hash
+matches the built file. Status of every value: [pcc:unverified].

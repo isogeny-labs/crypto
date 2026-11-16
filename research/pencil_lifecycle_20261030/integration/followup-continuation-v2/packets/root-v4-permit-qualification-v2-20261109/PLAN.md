@@ -1,0 +1,3 @@
+Correct one Python class-scope binding order: capture datetime.timezone before assigning the class-local datetime=DateTime. All24 case bodies/order, worker/launcher pins, limits and output semantics remain unchanged. The original failed source and caller receipts remain immutable.
+
+One prospective invocation,60 seconds charged; internal50-second alarm; timeout55s with5s kill;512MiBAS and1MiB per-file limit. New output /var/tmp/pencil-root-v4-permit-qualification-v2-20261109 and caller suffix-control. No execution until independent review, exact publication and separate root release/reservation. No compiler/network/nativepayload.

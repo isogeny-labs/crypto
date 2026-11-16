@@ -1,0 +1,40 @@
+{
+  "schema": "vieta-pre-call/v1",
+  "phase": "fixture-clock-repair",
+  "qualifier_sha256": "f98f64c3e70371aacc2247d2ed0d6c251dcb0168dee1ef36bdc4784858af56a8",
+  "protocol_sha256": "8e6edd0f0d25b84d7435f82f84b48a6931608182427e09177d7ae1cff1752712",
+  "panel": "three-repair",
+  "cpus": [
+    4
+  ],
+  "timeout_seconds": 600,
+  "stage_seconds": 120,
+  "rounds": 10,
+  "warmups": 2,
+  "original_failure_preserved": true,
+  "clock_standing": "diagnostic below L2",
+  "command": [
+    "python3",
+    "tools/isolated_bench.py",
+    "run",
+    "--cpus",
+    "4",
+    "--out",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/repair/isolation.jsonl",
+    "--",
+    "env",
+    "VIETA_ISOLATED_RUN=1",
+    "VIETA_PANEL=three-repair",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "600",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/bin/qualifier-fixture-fix",
+    "bench",
+    "p224",
+    "128",
+    "10",
+    "120",
+    "three"
+  ]
+}

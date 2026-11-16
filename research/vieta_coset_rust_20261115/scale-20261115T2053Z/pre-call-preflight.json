@@ -1,0 +1,31 @@
+{
+  "schema": "vieta-pre-call/v1",
+  "phase": "preflight",
+  "source_revision": "6f6b4845b7391b337fde1a1c44bcdfb39ef19b16",
+  "plan_sha256": "4aabfebb631650bedd1736ec6d9021f36123aee819e6d1a8a84185b32be93542",
+  "qualifier_sha256": "1b527b222b82f2c862c48cc36ffbae8470c136abbf1ad180c7a06064459da782",
+  "build_manifest_sha256": "d57aef3e6a9a39f4980ffa92c14c7c22cd56737ab394854e3c56b1bb2fca6bee",
+  "cpus": [
+    4
+  ],
+  "local_clock_level": "below L2; PSI unavailable",
+  "command": [
+    "python3",
+    "tools/isolated_bench.py",
+    "run",
+    "--cpus",
+    "4",
+    "--out",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/preflight/isolation.jsonl",
+    "--",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "180",
+    "bash",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/bin/run-panel.sh",
+    "preflight",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/preflight",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/bin/qualifier"
+  ]
+}

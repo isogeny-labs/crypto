@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T03:59:18Z",
+ "id": "PCC-20261112-22e5d2",
+ "kind": "measurement",
+ "producer": {
+  "commit": "1f85ca3678ac93517ebabb3874b98b8a23ddea2c",
+  "model": "",
+  "session": "https://claude.ai/code/session_01TCbLH9FoRiHTPWAKdyQi2r"
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/mt_fieldops_v5_20261112/validation/replay-certificate.json",
+   "sha256": "3a495bbc3d30abf358e8828d45b313cd6a6c9dd24f9f65b8d79da5fbf32292f4"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/mt_fieldops_v5_20261112/validation/claim-report.json",
+   "sha256": "9fa1c5239ebcc8815013d87d0f3ac762f1fdcf438ed05ac5916dc999505cdff0"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/mt_fieldops_v5_20261112",
+ "statement": "On 33 fresh prime-order Weierstrass curves (group orders about 2^24, 2^28 and 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p and mod-n operations (I = 3/10/30 M, S = M) with hash-table, solver and counted native operations (rho step-index hashes, distinguished-point canonicalisations and point hashes, IC offset-step indices) at 0/0.1/1 GAE each: the cheapest of four multi-target index-calculus variants (ic5, ic5ks, ic5w, ic5rw) per configuration and price is unranked against the cheapest of ten runs of this harness's multi-target rho (Kuhn-Struik retention rho rho2xks, distinguished-point rho rhodpu) in all 27 cell x I/M section-5a decisions, because the order flips with h: at I = 10M it costs 1.06-1.16x per target at h = 0 (dearer in all 9 cells), 1.00-1.05x at h = 0.1 and 0.71-0.80x at h = 1 (cheaper in all 9 cells); with native operations unpriced it is dearer in all 27; it is 1.11-1.47x a paired BSGS."
+}

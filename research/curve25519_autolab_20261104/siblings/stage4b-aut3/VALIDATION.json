@@ -1,0 +1,86 @@
+{
+  "schema": "validation-gate/v1",
+  "covers": "sib8-p512-aut3 (ic.pipeline, wwalk x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=512,aut=3) against rho-cubic (rho.cubic, A = 6) in GAE, on the j0b7 sessions at p = 34, 37, 40 bits (five curves each) of this directory. Not covered: any bit-op (bitop/v1) ratio of the aut=3 arms (validator-report.json erratum N1).",
+  "curve_uid": null,
+  "curve_uid_note": "curve_uid is null on every record and in the bench record (no registered curve UIDs). The 15 curves are identified by their ICV1 slugs in band-j0b7-*.json; none was invented here.",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "7c08475a611e2a1d9602fa8ec407fadee3aed99638cb03b4bf055653a77df535"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "31ec99ac3da2dc5203496d2d135c0fce95cbc40138e92046d475231c5052d2d1"
+  },
+  "rho_reference": {
+    "kind": "automorphism_fold",
+    "protocol": "PROTOCOL.md (frozen at 709f978290): rho-cubic, ecbench rho.cubic, the walk on {+-zeta3^i(P)} (A = 6) of the j = 0 curve's order-3 automorphism, named as the matched rho",
+    "unit": "S = GAE / sqrt(r) per run (ecbench.gae), mean over the 180 paired measured runs of one size. The band adds w GAE per unpriced native operation: cost.unpriced counts (rho-cubic canonicalisations_uncharged; aut3 aut_canonicalisations_uncharged and the factor-base and row counters) plus counted table_insert_attempts, sibling_second_points and sibling_lift_products.",
+    "binary_or_process": "ecbench sha256 a2338b69323813fedc51e30a0eae52eb7287e0825f127c25600e7cf5f6256fe5; both arms in the same session per size (same spec, workloads, targets and algorithm seeds)",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 0.49060433999301523,
+        "rho": 0.53981076749968682
+      },
+      "0.1": {
+        "ic": 0.74104633103839723,
+        "rho": 0.59373605131023621
+      },
+      "1": {
+        "ic": 2.995024250446833,
+        "rho": 1.079063605605181
+      }
+    },
+    "gae_band_size": "p = 40 bits (sessions/j0b7-40), the largest size; every size in gae_band_by_size",
+    "gae_band_reading": "AGENTS.md 5a applied alike to both arms; canonicalisations priced on both (E1 fixed: aut_canonicalisations_uncharged in cost.unpriced on 1,260/1,260 aut3 records, canonicalisations_uncharged on 630/630 rho-cubic records). This is the committed band.rs default reading; the validator recomputed it independently.",
+    "gae_band_by_size": {
+      "j0b7-34": {
+        "0": {
+          "ic": 0.51787848432776151,
+          "rho": 0.52193785849784324
+        },
+        "0.1": {
+          "ic": 0.77795391707378669,
+          "rho": 0.57370628143260194
+        },
+        "1": {
+          "ic": 3.1186328117880153,
+          "rho": 1.0396220878454299
+        }
+      },
+      "j0b7-37": {
+        "0": {
+          "ic": 0.47807080193017049,
+          "rho": 0.54644212484882115
+        },
+        "0.1": {
+          "ic": 0.72089436846846244,
+          "rho": 0.60092694011473591
+        },
+        "1": {
+          "ic": 2.9063064673130898,
+          "rho": 1.0912902775079689
+        }
+      },
+      "j0b7-40": {
+        "0": {
+          "ic": 0.49060433999301523,
+          "rho": 0.53981076749968682
+        },
+        "0.1": {
+          "ic": 0.74104633103839723,
+          "rho": 0.59373605131023621
+        },
+        "1": {
+          "ic": 2.995024250446833,
+          "rho": 1.079063605605181
+        }
+      }
+    },
+    "order_holds_across_band": false,
+    "order_note": "Unresolved at every size: sib8-p512-aut3 / rho-cubic is 0.992 / 0.875 / 0.909 at w = 0 (below) and 1.356 / 1.200 / 1.248 at w = 0.1 and 3.000 / 2.663 / 2.776 at w = 1 (above). No ranking of the two arms is supported. Per curve: 10/15 unresolved, 5/15 rho-cubic lower at every weight, 0/15 sib8-p512-aut3 lower at every weight."
+  }
+}

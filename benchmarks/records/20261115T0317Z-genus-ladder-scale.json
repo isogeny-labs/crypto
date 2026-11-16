@@ -1,0 +1,99 @@
+{
+  "branch": "claude/ecstatic-edison-cgo57l",
+  "closed_utc": "2026-11-15T06:00:10+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/399ffebe-249c-517d-8b4e-5c372f2544d0/scratchpad/scale/go2.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T05:07:47+00:00",
+      "wall_s": 3035.251
+    }
+  ],
+  "commit": "30e46a98d6b67a78e4b3d91ea2786337c622ac0c",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T03:17:05+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0317Z-genus-ladder-scale",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "fpm_mid_2lp_over_rho_g2_p16777259",
+      "note": "genus 2, p = 2^24, double large prime + prefilter over negation rho, FPM primary; no crossing; unverified pre-gate",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        2.43,
+        11.9
+      ],
+      "unit": "ratio",
+      "value": 5.07
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "fpm_mid_2lp_over_rho_g3_p32771",
+      "note": "genus 3, p = 32771, 2LP+prefilter over rho, FPM primary; below across the FPM band; unverified pre-gate",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.407,
+        0.686
+      ],
+      "unit": "ratio",
+      "value": 0.537
+    }
+  ],
+  "problem": "hcdlp:genus_ladder",
+  "raw": [
+    {
+      "bytes": 58732,
+      "path": "research/genus_ladder_scale_20261115/scale_g2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/712cece77d7830e9a8938b32347c60666da0cacbee34687662baf6f372dd183e",
+      "sha256": "712cece77d7830e9a8938b32347c60666da0cacbee34687662baf6f372dd183e",
+      "uploaded": false
+    },
+    {
+      "bytes": 36317,
+      "path": "research/genus_ladder_scale_20261115/scale_g2b.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0a/0aa7c6fddb7eaf58495c206bf6c742fa3c27e471c6671d5d0f1e1ab92aeb1ad3",
+      "sha256": "0aa7c6fddb7eaf58495c206bf6c742fa3c27e471c6671d5d0f1e1ab92aeb1ad3",
+      "uploaded": false
+    },
+    {
+      "bytes": 28248,
+      "path": "research/genus_ladder_scale_20261115/scale_g3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/ed8258049ae38a5fab5ebc5dfe6138d7823aa99ed2b2b2016297c03a311382fd",
+      "sha256": "ed8258049ae38a5fab5ebc5dfe6138d7823aa99ed2b2b2016297c03a311382fd",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/genus_ladder_scale_20261115/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/genus_ladder_scale_20261115/fig_ratio_g2.svg",
+      "research/genus_ladder_scale_20261115/fig_cost_g3.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "genus-ladder-scale",
+  "status": "measured",
+  "summary": "Genus ladder scaling: genus 2 to 2^24 (no crossing, both exponents 1), genus 3 to 2^15 (2LP exponent 1.344, 0.54 of rho at 32771); 234 runs all certified; unverified pre-gate.",
+  "validation": null
+}

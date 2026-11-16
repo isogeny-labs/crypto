@@ -23,13 +23,17 @@ pub mod curve;
 pub mod encoding;
 pub mod factoring;
 pub mod finite;
+pub mod joint;
 pub mod network;
 pub mod partial;
+pub mod prepared;
 pub mod primality;
 pub mod reduction;
+pub mod relations;
 pub mod ring;
 pub mod structured;
 pub mod structured_runner;
+pub mod treewidth;
 pub mod weighted;
 pub mod width;
 

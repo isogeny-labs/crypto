@@ -1,0 +1,29 @@
+option(redSB);short=0;
+print("CANDIDATE50_STAGE triangular_extraction_begin=true");
+poly A50=subst(prime49_1[2],v,0);poly B50=(prime49_1[2]+A50)/v;
+poly nRest50=prime49_1[3]+n;
+poly C50=subst(nRest50,v,0);poly D50=(nRest50+C50)/v;
+if(A50+B50*v!=prime49_1[2] || C50+D50*v!=nRest50 || subst(A50,v,0)!=A50 || subst(B50,v,0)!=B50 || subst(C50,v,0)!=C50 || subst(D50,v,0)!=D50 || subst(A50,n,0)!=A50 || subst(B50,n,0)!=B50 || subst(C50,n,0)!=C50 || subst(D50,n,0)!=D50){ERROR("CANDIDATE50_TRIANGULAR_STRUCTURE");quit;}
+ring candidateField50=(2,u),(t),dp;
+option(redSB);short=0;
+map extract50=genericCertificate49,0,t,0;
+poly a50=extract50(A50);poly b50=extract50(B50);poly c50=extract50(C50);poly d50=extract50(D50);
+poly norm50=a50^2+a50*b50+(u^3+u)*b50^2;
+if(deg(norm50)!=32 || b50==0){ERROR("CANDIDATE50_NORM_DEGREE");quit;}
+number normLead50=leadcoef(norm50);poly monic50=norm50/normLead50;
+poly nNumerator50=c50*b50+d50*a50;
+link fieldOut50="ASCII:w rational-candidate50.sing";open(fieldOut50);
+write(fieldOut50,"ring rationalCandidate50=(2,u),(t),dp;short=0;");
+write(fieldOut50,"poly a50="+string(a50)+";");write(fieldOut50,"poly b50="+string(b50)+";");
+write(fieldOut50,"poly c50="+string(c50)+";");write(fieldOut50,"poly d50="+string(d50)+";");
+write(fieldOut50,"poly norm50="+string(norm50)+";");write(fieldOut50,"poly monic50="+string(monic50)+";");
+write(fieldOut50,"poly nNumerator50="+string(nNumerator50)+";");close(fieldOut50);
+print("CANDIDATE50_STAGE rational_arrays_exported=true polynomial_degree=32 inverse_computed=false map_verified=false");
+poly integral50=u^128*subst(monic50,t,t/u^4);
+if(deg(integral50)!=32 || leadcoef(integral50)!=1){ERROR("CANDIDATE50_SCALED_MONIC_DEGREE");quit;}
+int term50;
+for(term50=1;term50<=size(integral50);term50++){if(denominator(leadcoef(integral50[term50]))!=1){ERROR("CANDIDATE50_NOT_INTEGRAL");quit;}}
+link planeOut50="ASCII:w integral-candidate50.sing";open(planeOut50);
+write(planeOut50,"ring integralCandidate50=2,(t,u),dp;short=0;ideal candidateIdeal50;candidateIdeal50[1]="+string(integral50)+";");close(planeOut50);
+print("CANDIDATE50_RESULT norm_degree=32 scale_u_power=4 monic_integral_candidate=true rational_arrays_exported=true model_binding_verified=false normalization_performed=false");
+print("CANDIDATE50_ALL_CHECKS_PASS");quit;

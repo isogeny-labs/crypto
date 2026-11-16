@@ -1,0 +1,13 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | ic-pipeline | 8/8 | 3.159 | 4.033 | 11.900 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | rho-strong | 8/8 | 0.129 | 0.156 | 0.396 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | rho-strong-aa | 8/8 | 0.129 | 0.156 | 0.396 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m61-t158598901-ab42b6c5 | ic-pipeline vs rho-strong | rho-strong < ic-pipeline |
+| icv1-f2m61-t158598901-ab42b6c5 | ic-pipeline vs rho-strong-aa | rho-strong-aa < ic-pipeline |
+| icv1-f2m61-t158598901-ab42b6c5 | rho-strong vs rho-strong-aa | unresolved inside the band |

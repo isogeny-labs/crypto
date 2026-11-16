@@ -1,0 +1,38 @@
+ring integralCandidate50=2,(t,u),dp;short=0;ideal candidateIdeal50;candidateIdeal50[1]=t^32+(u^8+1)*t^24+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^20+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t^17+(u^64+u^54+u^53+u^50+u^49+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1)*t^16+(u^73+u^71+u^69+u^65+u^64+u^62+u^59+u^57+u^56+u^54+u^53+u^48+u^47+u^46+u^45+u^41+u^40+u^38+u^37+u^35)*t^12+(u^85+u^84+u^83+u^82+u^80+u^76+u^75+u^74+u^71+u^69+u^66+u^65+u^64+u^63+u^62+u^61+u^54+u^50+u^49+u^47+u^45+u^44+u^43+u^39+u^36+u^35)*t^9+(u^86+u^84+u^82+u^81+u^77+u^75+u^74+u^72+u^71+u^69+u^64+u^62+u^61+u^59+u^57+u^56+u^55+u^52+u^51+u^50+u^49+u^48+u^47+u^46+u^44+u^43+u^42+u^41+u^40+u^39+u^38+u^37+u^36+u^24)*t^8+(u^94+u^90+u^87+u^86+u^82+u^81+u^80+u^77+u^76+u^75+u^71+u^70+u^66+u^65+u^64+u^62+u^61+u^60+u^59+u^58)*t^5+(u^105+u^103+u^101+u^97+u^96+u^95+u^94+u^93+u^92+u^90+u^89+u^88+u^87+u^86+u^82+u^81+u^80+u^79+u^78+u^77+u^74+u^73+u^67+u^66+u^61+u^60+u^59+u^56+u^55+u^54+u^49+u^47)*t^4+(u^109+u^108+u^107+u^106+u^105+u^104+u^102+u^101+u^100+u^97+u^94+u^92+u^87+u^86+u^85+u^84+u^83+u^81+u^78+u^77+u^75+u^74+u^73+u^72+u^71+u^67)*t^2+(u^117+u^116+u^115+u^114+u^112+u^108+u^107+u^106+u^104+u^100+u^99+u^98+u^96+u^93+u^92+u^90+u^89+u^88+u^87+u^83+u^82+u^81+u^75+u^72+u^71+u^70+u^69+u^67+u^65+u^62+u^61+u^58+u^57+u^56)*t+(u^128+u^118+u^117+u^114+u^113+u^111+u^109+u^108+u^107+u^102+u^99+u^98+u^96+u^95+u^93+u^92+u^90+u^86+u^85+u^83+u^81+u^80+u^77+u^74+u^71+u^70+u^68+u^67+u^63+u^61+u^60+u^56+u^48);
+ring relativeFinite50=2,(t,v,u),wp(4,2,1);short=0;ideal relativeIdeal50;relativeIdeal50[1]=v^2+v+u^3+u;relativeIdeal50[2]=t^16+(u^8+1)*t^8*v+(u^32+u^24+u^20+u^14+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1)*t^8+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^4*v+(u^42+u^39+u^37+u^34+u^31+u^28+u^26+u^25+u^24+u^23+u^22+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^12+u^11)*t^4+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t*v+(u^54+u^47+u^46+u^43+u^42+u^41+u^34+u^33+u^31+u^30+u^28+u^23+u^22+u^20+u^15+u^11)*t+(u^54+u^53+u^50+u^49+u^48+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^24+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1)*v+(u^64+u^56+u^55+u^53+u^52+u^51+u^50+u^49+u^45+u^44+u^40+u^37+u^35+u^33+u^32+u^31+u^29+u^28+u^26+u^25+u^24+u^22+u^20+u^17+u^16+u^12+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1);poly relativeB50=(u^8+1)*t^8+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^4+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t+(u^54+u^53+u^50+u^49+u^48+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^24+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1);
+ring boundaryCertificate50=(2,a),(w),dp;minpoly=a^2+a+1;ideal point0;ideal point1;
+point0[1]=(a);point0[2]=0;point0[3]=1;
+point1[1]=(a);point1[2]=1;point1[3]=1;
+point0[4]=(a+1);point0[5]=0;point0[6]=1;
+point1[4]=(a+1);point1[5]=1;point1[6]=1;
+setring relativeFinite50;short=0;
+poly fiberFactor50=t^2+t+1;
+map planeIntoRelative50=integralCandidate50,t,u;
+ideal planeInside50=planeIntoRelative50(candidateIdeal50);
+if(subst(relativeIdeal50[1],u,1)!=v^2+v || subst(relativeIdeal50[2],u,1)!=fiberFactor50^8 || subst(planeInside50[1],u,1)!=fiberFactor50^16){ERROR("FIBER50_COMPLETE_FIBER_FACTORS");quit;}
+poly primitiveB50=relativeB50;poly originalA50=subst(relativeIdeal50[2],v,0);
+int contentPower50=0;int previousDegree50;
+if(primitiveB50==0 || subst(primitiveB50,v,0)!=primitiveB50){ERROR("FIBER50_DENOMINATOR_SHAPE");quit;}
+while(subst(primitiveB50,u,1)==0){
+ previousDegree50=deg(primitiveB50);primitiveB50=primitiveB50/(u+1);contentPower50++;
+ if(deg(primitiveB50)>=previousDegree50){ERROR("FIBER50_CONTENT_DEGREE_DROP");quit;}
+}
+poly saturationParameter50=(u+1)^contentPower50;
+poly saturationWitness50=primitiveB50*v;
+if(saturationParameter50*primitiveB50!=relativeB50 || saturationParameter50*saturationWitness50+originalA50!=relativeIdeal50[2]){ERROR("FIBER50_FULL_SATURATION_IDENTITY");quit;}
+if(saturationParameter50*(saturationWitness50+1)+originalA50==relativeIdeal50[2]){ERROR("FIBER50_CORRUPTED_IDENTITY_ACCEPTED");quit;}
+link fiberOut50="ASCII:w parameter-saturation50.sing";open(fiberOut50);
+write(fiberOut50,"ring parameterSaturation50=2,(t,v,u),wp(4,2,1);short=0;int contentPower50="+string(contentPower50)+";poly parameter50="+string(saturationParameter50)+";poly witness50="+string(saturationWitness50)+";poly planeNumerator50="+string(originalA50)+";poly sourceGenerator50="+string(relativeIdeal50[2])+";");close(fiberOut50);
+setring boundaryCertificate50;
+int conjugate50;int separated50=1;poly root50;poly value050;poly value150;
+for(conjugate50=0;conjugate50<2;conjugate50++){
+ root50=point0[3*conjugate50+1];
+ map eval050=relativeFinite50,root50,0,1;map eval150=relativeFinite50,root50,1,1;
+ ideal residual050=eval050(relativeIdeal50);ideal residual150=eval150(relativeIdeal50);
+ if(size(residual050)!=0 || size(residual150)!=0){ERROR("FIBER50_SOURCE_RECHECK");quit;}
+ value050=eval050(saturationWitness50);value150=eval150(saturationWitness50);
+ if(value050==value150){separated50=0;}
+ print("FIBER50_PAIR conjugate="+string(conjugate50)+" witness0="+string(value050)+" witness1="+string(value150));
+}
+print("FIBER50_RESULT plane_fiber_exponent=16 refined_fiber_exponent=8 content_power="+string(contentPower50)+" full_source_product=true witness_separated="+string(separated50));
+print("FIBER50_ALL_CHECKS_PASS");quit;

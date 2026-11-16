@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T18:03:20Z",
+ "id": "PCC-20261116-e53864",
+ "kind": "theorem",
+ "producer": {
+  "commit": "292abb6a209601b0ad78be4621da7ad85bcf64b2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "c1ae60d5f9ccae797d0f0b8479c455ad660837a576ce64454905d276c931b4e5",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+   "theorem": "CubicFrobeniusTraceDescent05.trace3_fixed_image"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Abstract cubic additive action with explicit module/scalar/additive/cube/annihilator/Bezout/stable-cyclic-faithfulness or endpoint-covariance hypotheses as stated. Normalized trace projection, complement, cyclic fixed implication and eigenline annihilation; abstract Fin109/3 controls are not actual curve Frobenius instances. Both original gates17/0 atj1/120/default memory. No global Jacobian/field/ECDLP cost or signed standing.",
+ "statement": "theorem trace3_fixed_image {M : Type} [IntModule M] (F : M \u2192 M) (hadd : \u2200 x y, F (x+y)=F x+F y) (hcube : \u2200 x, F (F (F x))=x) (x : M) : F (trace3 F x)=trace3 F x"
+}
