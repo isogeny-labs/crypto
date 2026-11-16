@@ -5,10 +5,10 @@ import hashlib
 import json
 
 here=Path(__file__).resolve().parent
-source=here/'s7_attack_v2.sage'
+source=here/'s7_attack_v3.sage'
 transfer=here/'s7_transfer.json'
-checkpoint=here/'s7_relations_v2.json'
-result=here/'s7_attack_v2.json'
+checkpoint=here/'s7_relations_v3.json'
+result=here/'s7_attack_v3.json'
 c=json.loads(checkpoint.read_text())
 d=json.loads(result.read_text())
 source_hash=hashlib.sha256(source.read_bytes()).hexdigest()
