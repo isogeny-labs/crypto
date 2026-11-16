@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" font-family="Helvetica, Arial, sans-serif">
+  <rect width="900" height="300" fill="#ffffff"/>
+  <!-- boxes -->
+  <g>
+    <rect x="20" y="95" width="200" height="110" rx="10" fill="#eaf2fb" stroke="#1f5fa8" stroke-width="2"/>
+    <text x="120" y="125" text-anchor="middle" font-size="15" font-weight="bold" fill="#13355e">E(F_p)</text>
+    <text x="120" y="150" text-anchor="middle" font-size="12" fill="#13355e">y² = x³ − 3x + b</text>
+    <text x="120" y="170" text-anchor="middle" font-size="12" fill="#13355e">prime order r</text>
+    <text x="120" y="190" text-anchor="middle" font-size="11" fill="#555">(NIST a=−3 shape)</text>
+  </g>
+  <g>
+    <rect x="340" y="80" width="230" height="140" rx="10" fill="#fdf0e3" stroke="#d2771a" stroke-width="2"/>
+    <text x="455" y="108" text-anchor="middle" font-size="15" font-weight="bold" fill="#6e3b06">J_H(F_p)</text>
+    <text x="455" y="130" text-anchor="middle" font-size="11" fill="#6e3b06">H_γ : v² = u·[(u²+γ)³</text>
+    <text x="455" y="147" text-anchor="middle" font-size="11" fill="#6e3b06">+ a u²(u²+γ) + b u³]</text>
+    <text x="455" y="170" text-anchor="middle" font-size="12" fill="#6e3b06">genus-3 hyperelliptic</text>
+    <text x="455" y="190" text-anchor="middle" font-size="11" fill="#555">novel cover, γ free</text>
+  </g>
+  <g>
+    <rect x="690" y="95" width="195" height="110" rx="10" fill="#eaf6ee" stroke="#2e8b57" stroke-width="2"/>
+    <text x="787" y="125" text-anchor="middle" font-size="15" font-weight="bold" fill="#17492d">Pic⁰(C)</text>
+    <text x="787" y="150" text-anchor="middle" font-size="12" fill="#17492d">C : plane quartic</text>
+    <text x="787" y="170" text-anchor="middle" font-size="12" fill="#17492d">same field F_p</text>
+    <text x="787" y="190" text-anchor="middle" font-size="11" fill="#555">non-hyperelliptic IC</text>
+  </g>
+  <!-- arrows -->
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#333"/></marker>
+  </defs>
+  <line x1="222" y1="150" x2="336" y2="150" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+  <text x="279" y="138" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">φ*</text>
+  <text x="279" y="172" text-anchor="middle" font-size="10" fill="#333">deg-2 pullback</text>
+  <text x="279" y="186" text-anchor="middle" font-size="10" fill="#333">inj. on ⟨P⟩</text>
+  <line x1="572" y1="150" x2="686" y2="150" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+  <text x="629" y="138" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">Ψ</text>
+  <text x="629" y="172" text-anchor="middle" font-size="10" fill="#333">Smith trigonal</text>
+  <text x="629" y="186" text-anchor="middle" font-size="10" fill="#333">ker S exp 2, ⊥ r</text>
+  <!-- title/caption -->
+  <text x="450" y="40" text-anchor="middle" font-size="15" font-weight="bold" fill="#111">Explicit transfer chain: planted log k carried E → J_H → Pic⁰(C), recovered on C by BSGS</text>
+  <text x="450" y="62" text-anchor="middle" font-size="11" fill="#444">φ(u,v) = ((u²+γ)/u, v/u²);  γ=1,a=−3 recovers the known u⁷+bu⁴+u cover.  run 20261116T1637Z, 4/4 instances.</text>
+  <text x="450" y="280" text-anchor="middle" font-size="10" fill="#666">Exact-correctness construction. For a prime-field target, index calculus on a same-field genus-3 C is O~(p), above rho's O~(√r): no speedup claimed.</text>
+</svg>

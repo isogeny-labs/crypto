@@ -1,0 +1,22 @@
+# Local audit, 2026-11-16. No paid resources.
+# SOURCE_ROOT: checkout of 2ca7ece552ad276908db4ec211c2ab452283dd58
+bash native/stage.sh SOURCE_ROOT
+cargo build --release --locked --manifest-path native/Cargo.toml
+cargo test --release --locked --manifest-path native/Cargo.toml
+native/target/release/g4audit recalc ORIGINAL_RUN_JSONL
+native/target/release/g4audit recalc FOLLOWUP_RUN_JSONL
+native/target/release/g4audit calibrated FOLLOWUP_RUN_JSONL
+# Original full replay, Bash time, 1200-second bound:
+time timeout 1200 native/target/release/g4audit replay ORIGINAL_RUN_JSONL cvwR 3
+native/target/release/g4audit certify ORIGINAL_REPLAY_JSONL
+native/target/release/g4audit transfer ORIGINAL_RUN_JSONL
+# Instrumented relation observation, unchanged RNG/arithmetic/counters:
+G4_AUDIT_DUMP=1 bash native/stage.sh SOURCE_ROOT
+cargo build --release --locked --manifest-path native/Cargo.toml
+G4_REL_DUMP=NEW_RELATIONS_JSONL native/target/release/g4audit replay out/relation-input.jsonl w 1 verify
+native/target/release/g4audit relations NEW_RELATIONS_JSONL
+# Original plain-rho input rows, arm changed to audit Q, same instances/seeds:
+timeout 300 native/target/release/g4audit replay out/lean-rho-input.jsonl Q 1
+timeout 900 native/target/release/g4audit replay out/lean-rho-rest-input.jsonl Q 3
+# Layout only:
+python render_report.py

@@ -1,1 +1,0 @@
-Original source and attempt paths are retained in receipts. Lean sources are archived as .lean.txt; restore .lean in a private replay directory. Compiled caches are excluded. Original absolute paths require restoration and binding. Independent review pending. The outer manifest binds archive names after artifact-store hydration.

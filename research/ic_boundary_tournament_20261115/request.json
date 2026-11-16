@@ -1,0 +1,158 @@
+{
+  "status": "AUTHORIZED_PREPARING",
+  "created_at": "2026-11-15T19:05:25.511403+00:00",
+  "source_revision": "a10cb7b4f8e48f094efe70c31d9a24b6d72aee4a",
+  "protocol_sha256": "c0ca4da259900666773e650600be01707517216edb6b6202279a51c016063d25",
+  "requested_scope": "Current single-target online comparisons",
+  "beats": [
+    {
+      "beat": "koblitz.compact_orbit.n61_single_target",
+      "n": 61,
+      "a": 0,
+      "workloads": 64,
+      "tune_workloads_per_k": 4,
+      "k_candidates": [
+        300,
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "command": [
+        "python3",
+        "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py",
+        "launch-single",
+        "--beat",
+        "koblitz.compact_orbit.n61_single_target",
+        "--workloads",
+        "64",
+        "--tune-workloads",
+        "4",
+        "--cpu",
+        "CPU_SELECTED_FROM_RESERVED_LINUX_CORE"
+      ],
+      "timeout_seconds": 10800
+    },
+    {
+      "beat": "koblitz.compact_orbit.n71_single_target",
+      "n": 71,
+      "a": 0,
+      "workloads": 16,
+      "tune_workloads_per_k": 1,
+      "k_candidates": [
+        200,
+        600
+      ],
+      "command": [
+        "python3",
+        "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py",
+        "launch-single",
+        "--beat",
+        "koblitz.compact_orbit.n71_single_target",
+        "--workloads",
+        "16",
+        "--tune-workloads",
+        "1",
+        "--cpu",
+        "CPU_SELECTED_FROM_RESERVED_LINUX_CORE"
+      ],
+      "timeout_seconds": 10800
+    },
+    {
+      "beat": "koblitz.compact_orbit.n73_single_target",
+      "n": 73,
+      "a": 0,
+      "workloads": 16,
+      "tune_workloads_per_k": 1,
+      "k_candidates": [
+        200,
+        600
+      ],
+      "command": [
+        "python3",
+        "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py",
+        "launch-single",
+        "--beat",
+        "koblitz.compact_orbit.n73_single_target",
+        "--workloads",
+        "16",
+        "--tune-workloads",
+        "1",
+        "--cpu",
+        "CPU_SELECTED_FROM_RESERVED_LINUX_CORE"
+      ],
+      "timeout_seconds": 10800
+    },
+    {
+      "beat": "koblitz.compact_orbit.n83_single_target",
+      "n": 83,
+      "a": 1,
+      "workloads": 16,
+      "tune_workloads_per_k": 1,
+      "k_candidates": [
+        200,
+        600
+      ],
+      "command": [
+        "python3",
+        "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py",
+        "launch-single",
+        "--beat",
+        "koblitz.compact_orbit.n83_single_target",
+        "--workloads",
+        "16",
+        "--tune-workloads",
+        "1",
+        "--cpu",
+        "CPU_SELECTED_FROM_RESERVED_LINUX_CORE"
+      ],
+      "timeout_seconds": 10800
+    }
+  ],
+  "eval_workloads_total": 112,
+  "resource_ceiling": {
+    "pool": "cpu-l2-spot",
+    "max_worker_vcpus": 8,
+    "max_worker_ram_gib": 32,
+    "concurrent_measurements": 1,
+    "rayon_threads_per_arm": 1
+  },
+  "proposed_cost_ceiling_usd": 20,
+  "cost_includes": [
+    "image build",
+    "queue and idle worker time",
+    "measurement",
+    "failed and interrupted attempts",
+    "storage and transfer"
+  ],
+  "retry_allowance": 0,
+  "proposed_total_duration_ceiling_hours": 13,
+  "submitted_jobs": [],
+  "remaining_execution_prerequisites": [
+    "Publish exact launch configuration before build",
+    "Build and verify digest-pinned image from frozen source",
+    "Recheck all-pool capacity and charged/reserved spend",
+    "Require qualifying isolation and independent replay receipts"
+  ],
+  "acceptance": [
+    "same public point in both arms per workload",
+    "exclusive IC online phases and reusable setup separate",
+    "rho walk, collision and recovery verification timed",
+    "per-workload independent replay certificates",
+    "retain failures and claim-check results",
+    "no ledger promotion without independent-host replay"
+  ],
+  "authorized_cost_ceiling_usd": 20,
+  "authorization": "Owner explicitly authorized USD20 additional despite monthly ceiling, all four rungs, zero automatic retries, 13-hour limit.",
+  "authorized_at": "2026-11-15T19:11:12.640103+00:00",
+  "original_deadline_utc": "2026-11-16T08:11:12.640103+00:00",
+  "job_name": "ic-boundary-single-20261115-1912",
+  "runtime": {
+    "instance_type": "m8a.2xlarge",
+    "cpu": 4,
+    "memory": "24Gi",
+    "isolation_profile": "l2",
+    "retries": 0
+  }
+}

@@ -1,0 +1,26 @@
+   Compiling relation-native-qualification v0.1.0 (/workspace/crypto-integrate/research/relation_degree_trace_20261115/rust-integration)
+    Finished `release` profile [optimized] target(s) in 6.37s
+     Running tests/native_api.rs (target/release/build/relation-native-qualification/a7bce1093147ef05/out/native_api-a7bce1093147ef05)
+
+running 9 tests
+test invalid_and_unrecognized_inputs_are_explicit_errors ... ok
+test native_polynomial_trace_preserves_incomplete_status ... ok
+test exact_kernel_choices_keep_full_root_proof_acceptance ... ok
+test separate_replay_public_api_checks_complete_basis_and_changed_identity ... ok
+test compact_chain_crosses_native_boundary_and_rejects_mutation ... ok
+test wide_field_duplicates_scaling_and_tampered_results ... ok
+test pending_native_wire_needs_complete_root_replay_and_rejects_changed_proof ... ok
+test agrees_with_complete_native_f4_on_development_cycles ... ok
+test six_variable_breadth_first_basis_passes_on_both_fields ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests/root_worker.rs (target/release/build/relation-native-qualification/ccc433365c24c393/out/root_worker-ccc433365c24c393)
+
+running 3 tests
+test capped_f4_cannot_supply_a_complete_basis_or_solving_degree ... ok
+test wide_control_is_explicitly_unsupported ... ok
+test actual_root_arms_agree_on_complete_development_basis ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
